@@ -160,7 +160,7 @@ class VolunteerCertificateService
         try {
             $userRow = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
             if ($userRow && !empty($userRow->email)) {
-                LocaleContext::withLocale($userRow, function () use ($userRow, $id, $totalHours, $userId) {
+                LocaleContext::withLocale($userRow, function () use ($userRow, $id, $totalHours, $userId, $tenantId) {
                     $firstName = $userRow->first_name ?? $userRow->name ?? __('emails.common.fallback_name');
                     $certUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteering/certificates/' . $id;
                     $html = EmailTemplateBuilder::make()
@@ -169,7 +169,7 @@ class VolunteerCertificateService
                         ->paragraph(__('emails_misc.vol_certificate.ready_body', ['hours' => round($totalHours, 2)]))
                         ->button(__('emails_misc.vol_certificate.ready_cta'), $certUrl)
                         ->render();
-                    if (!\App\Services\EmailDispatchService::sendRaw($userRow->email, __('emails_misc.vol_certificate.ready_subject'), $html, null, null, null, 'volunteer_certificate')) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($userRow->email, __('emails_misc.vol_certificate.ready_subject'), $html, null, null, null, 'volunteer_certificate', ['tenant_id' => $tenantId])) {
                         \Illuminate\Support\Facades\Log::warning('[VolunteerCertificateService] certificate ready email send returned false', ['user_id' => $userId]);
                     }
                 });

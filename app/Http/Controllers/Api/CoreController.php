@@ -68,7 +68,7 @@ class CoreController extends BaseApiController
         $sent = false;
         try {
             $replyTo = "{$name} <{$email}>";
-            $sent = EmailDispatchService::sendRaw($tenantEmail, $emailSubject, $emailBody, null, $replyTo, null, 'contact_form');
+            $sent = EmailDispatchService::sendRaw($tenantEmail, $emailSubject, $emailBody, null, $replyTo, null, 'contact_form', ['tenant_id' => TenantContext::getId()]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Contact form email error: " . $e->getMessage());
         }

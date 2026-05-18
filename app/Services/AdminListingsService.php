@@ -107,7 +107,7 @@ class AdminListingsService
                             ->paragraph(__('emails_misc.listing_moderation.approved_body', ['title' => $safeTitle]))
                             ->button(__('emails_misc.listing_moderation.approved_cta'), $fullUrl)
                             ->render();
-                        if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.listing_moderation.approved_subject', ['title' => $safeTitle]), $html, null, null, null, 'listing_moderation')) {
+                        if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.listing_moderation.approved_subject', ['title' => $safeTitle]), $html, null, null, null, 'listing_moderation', ['tenant_id' => $tenantId])) {
                             Log::warning("AdminListingsService::approve email failed for listing #{$listingId}");
                         }
                     }
@@ -198,7 +198,7 @@ class AdminListingsService
                             $builder->paragraph('<strong>' . __('emails_misc.listing_moderation.rejected_reason_label') . ':</strong> ' . htmlspecialchars($reason, ENT_QUOTES, 'UTF-8'));
                         }
                         $html = $builder->button(__('emails_misc.listing_moderation.rejected_cta'), $fullUrl)->render();
-                        if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.listing_moderation.rejected_subject', ['title' => $safeTitle]), $html, null, null, null, 'listing_moderation')) {
+                        if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.listing_moderation.rejected_subject', ['title' => $safeTitle]), $html, null, null, null, 'listing_moderation', ['tenant_id' => $tenantId])) {
                             Log::warning("AdminListingsService::reject email failed for listing #{$listingId}");
                         }
                     }

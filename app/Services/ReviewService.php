@@ -265,7 +265,7 @@ class ReviewService
                 $receiver = DB::table('users')->where('id', $receiverId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($receiver && !empty($receiver->email)) {
                     // Render subject + body under the receiver's preferred locale.
-                    LocaleContext::withLocale($receiver, function () use ($receiver, $receiverId, $review) {
+                    LocaleContext::withLocale($receiver, function () use ($receiver, $receiverId, $review, $tenantId) {
                         $firstName = $receiver->first_name ?? $receiver->name ?? __('emails.common.fallback_name');
                         $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/profile/' . $receiverId . '/reviews';
                         $html = EmailTemplateBuilder::make()
@@ -274,7 +274,7 @@ class ReviewService
                             ->paragraph(__('emails_misc.review.received_body', ['rating' => (int) $review->rating]))
                             ->button(__('emails_misc.review.received_cta'), $fullUrl)
                             ->render();
-                        if (!\App\Services\EmailDispatchService::sendRaw($receiver->email, __('emails_misc.review.received_subject'), $html, null, null, null, 'review')) {
+                        if (!\App\Services\EmailDispatchService::sendRaw($receiver->email, __('emails_misc.review.received_subject'), $html, null, null, null, 'review', ['tenant_id' => $tenantId])) {
                             Log::warning('[ReviewService] create email failed', ['receiver_id' => $receiverId]);
                         }
                     });

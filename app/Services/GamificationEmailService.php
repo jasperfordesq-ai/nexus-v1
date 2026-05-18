@@ -244,7 +244,7 @@ class GamificationEmailService
                 // Default to sending on error
             }
 
-            $user = User::find($userId, ['id', 'email', 'first_name', 'last_name', 'preferred_language']);
+            $user = User::find($userId, ['id', 'tenant_id', 'email', 'first_name', 'last_name', 'preferred_language']);
 
             if (!$user || empty($user->email)) {
                 return false;
@@ -254,7 +254,7 @@ class GamificationEmailService
                 $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
                 [$subject, $body] = $this->buildMilestoneEmail($name, $type, $data);
 
-                return EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, 'gamification_milestone');
+                return EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, 'gamification_milestone', ['tenant_id' => (int) $user->tenant_id]);
             });
         } catch (\Throwable $e) {
             Log::error('GamificationEmailService: Failed to send milestone email', [

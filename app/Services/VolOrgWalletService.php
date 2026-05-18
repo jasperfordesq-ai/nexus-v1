@@ -237,7 +237,7 @@ class VolOrgWalletService
             try {
                 $depositor = DB::table('users')->where('id', $userId)->where('tenant_id', TenantContext::getId())->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($depositor && !empty($depositor->email)) {
-                    LocaleContext::withLocale($depositor, function () use ($depositor, $result, $userId) {
+                    LocaleContext::withLocale($depositor, function () use ($depositor, $result, $userId, $tenantId) {
                         $orgNameSafe  = htmlspecialchars($result['_org_name'] ?? '', ENT_QUOTES, 'UTF-8');
                         $amount       = (int) ($result['_amount'] ?? 0);
                         $walletUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/wallet';
@@ -252,7 +252,7 @@ class VolOrgWalletService
                             ->render();
 
                         $subject = __('emails_misc.vol_org_wallet.deposit_subject', ['org' => $result['_org_name'] ?? '']);
-                        if (!\App\Services\EmailDispatchService::sendRaw($depositor->email, $subject, $html, null, null, null, 'vol_org_wallet')) {
+                        if (!\App\Services\EmailDispatchService::sendRaw($depositor->email, $subject, $html, null, null, null, 'vol_org_wallet', ['tenant_id' => $tenantId])) {
                             Log::warning('[VolOrgWalletService] Deposit confirmation email failed', ['user_id' => $userId]);
                         }
                     });
@@ -359,7 +359,7 @@ class VolOrgWalletService
             try {
                 $volunteer = DB::table('users')->where('id', $volunteerId)->where('tenant_id', TenantContext::getId())->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($volunteer && !empty($volunteer->email)) {
-                    LocaleContext::withLocale($volunteer, function () use ($volunteer, $result, $volunteerId) {
+                    LocaleContext::withLocale($volunteer, function () use ($volunteer, $result, $volunteerId, $tenantId) {
                         $orgNameSafe = htmlspecialchars($result['_org_name'] ?? '', ENT_QUOTES, 'UTF-8');
                         $amount      = (int) ($result['_amount'] ?? 0);
                         $walletUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/wallet';
@@ -375,7 +375,7 @@ class VolOrgWalletService
                             ->render();
 
                         $subject = __('emails_misc.vol_org_wallet.payment_subject', ['org' => $result['_org_name'] ?? '']);
-                        if (!\App\Services\EmailDispatchService::sendRaw($volunteer->email, $subject, $html, null, null, null, 'vol_org_wallet')) {
+                        if (!\App\Services\EmailDispatchService::sendRaw($volunteer->email, $subject, $html, null, null, null, 'vol_org_wallet', ['tenant_id' => $tenantId])) {
                             Log::warning('[VolOrgWalletService] Payment confirmation email failed', ['volunteer_id' => $volunteerId]);
                         }
                     });

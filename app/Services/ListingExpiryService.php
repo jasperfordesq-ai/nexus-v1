@@ -97,7 +97,7 @@ class ListingExpiryService
                                 ->button(__('emails_listings.listings.expired.cta'), $listingUrl)
                                 ->render();
 
-                            if (!EmailDispatchService::sendRaw($ownerRow->email, __('emails_listings.listings.expired.subject'), $html, null, null, null, 'listing_expiry')) {
+                            if (!EmailDispatchService::sendRaw($ownerRow->email, __('emails_listings.listings.expired.subject'), $html, null, null, null, 'listing_expiry', ['tenant_id' => $tenantId])) {
                                 Log::warning("[ListingExpiryService] Email send returned false for user={$listing->user_id}, listing={$listing->id}");
                             }
                         }

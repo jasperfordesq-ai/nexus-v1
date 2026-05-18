@@ -320,7 +320,8 @@ class VolunteerExpenseService
                     $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
                     $user = DB::table('users')->where('id', $expense->user_id)->where('tenant_id', TenantContext::getId())->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                     if ($user && !empty($user->email)) {
-                        LocaleContext::withLocale($user, function () use ($user, $expense, $isApproved, $subjectKey, $titleKey, $bodyKey, $params, $fullUrl, $notes) {
+                        $tenantId = TenantContext::getId();
+                        LocaleContext::withLocale($user, function () use ($user, $expense, $isApproved, $subjectKey, $titleKey, $bodyKey, $params, $fullUrl, $notes, $tenantId) {
                             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                             $builder = EmailTemplateBuilder::make()
                                 ->title(__($titleKey))
@@ -330,7 +331,7 @@ class VolunteerExpenseService
                                 $builder->paragraph('<strong>' . __('emails_misc.expense.rejected_notes_label') . ':</strong> ' . htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'));
                             }
                             $renderedHtml = $builder->button(__('emails_misc.expense.' . ($isApproved ? 'approved' : 'rejected') . '_cta'), $fullUrl)->render();
-                            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $params), $renderedHtml, null, null, null, 'volunteer_expense')) {
+                            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $params), $renderedHtml, null, null, null, 'volunteer_expense', ['tenant_id' => $tenantId])) {
                                 Log::warning('[VolunteerExpenseService] reviewExpense email failed', ['user_id' => $expense->user_id]);
                             }
                         });
@@ -370,7 +371,7 @@ class VolunteerExpenseService
                     $tenantId  = TenantContext::getId();
                     $user      = DB::table('users')->where('id', $expense->user_id)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                     if ($user && !empty($user->email)) {
-                        LocaleContext::withLocale($user, function () use ($user, $expense, $id, $paymentReference) {
+                        LocaleContext::withLocale($user, function () use ($user, $expense, $id, $paymentReference, $tenantId) {
                             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                             $params    = [
                                 'amount'   => number_format((float) $expense->amount, 2),
@@ -391,7 +392,7 @@ class VolunteerExpenseService
 
                             $html = $builder->button(__('emails_misc.expense.paid_cta'), $fullUrl)->render();
 
-                            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.expense.paid_subject', $params), $html, null, null, null, 'volunteer_expense')) {
+                            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.expense.paid_subject', $params), $html, null, null, null, 'volunteer_expense', ['tenant_id' => $tenantId])) {
                                 Log::warning('[VolunteerExpenseService] markPaid email failed', ['user_id' => $expense->user_id]);
                             }
                         });

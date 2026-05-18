@@ -161,7 +161,7 @@ class GroupInviteService
             // this resolves to null and falls back to the caller's locale.
             $emailSent = false;
             try {
-                $emailSent = LocaleContext::withLocale($existingUser ?? null, function () use ($email, $token, $group, $inviterName, $message, $groupId): bool {
+                $emailSent = LocaleContext::withLocale($existingUser ?? null, function () use ($email, $token, $group, $inviterName, $message, $groupId, $tenantId): bool {
                     $inviteUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/invite/' . $token;
                     $subject   = __('emails_misc.group_invite.email_subject', ['group' => $group->name]);
                     $body      = __('emails_misc.group_invite.email_body', [
@@ -180,7 +180,7 @@ class GroupInviteService
 
                     $html = $builder->button(__('emails_misc.group_invite.email_cta'), $inviteUrl)->render();
 
-                    if (!\App\Services\EmailDispatchService::sendRaw($email, $subject, $html, null, null, null, 'group_invite')) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($email, $subject, $html, null, null, null, 'group_invite', ['tenant_id' => $tenantId])) {
                         Log::warning('[GroupInviteService] invite email failed to send', ['email' => $email, 'group_id' => $groupId]);
                         return false;
                     }

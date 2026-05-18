@@ -95,7 +95,7 @@ class ExchangeRatingService
         try {
             $user = DB::table('users')->where('id', $ratedId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
             if ($user && !empty($user->email)) {
-                LocaleContext::withLocale($user, function () use ($user, $rating, $exchangeId, $ratedId) {
+                LocaleContext::withLocale($user, function () use ($user, $rating, $exchangeId, $ratedId, $tenantId) {
                     $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                     $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/exchanges/' . $exchangeId;
                     $html = EmailTemplateBuilder::make()
@@ -104,7 +104,7 @@ class ExchangeRatingService
                         ->paragraph(__('emails_misc.exchange_rating.received_body', ['rating' => $rating]))
                         ->button(__('emails_misc.exchange_rating.received_cta'), $fullUrl)
                         ->render();
-                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.exchange_rating.received_subject'), $html, null, null, null, 'exchange_rating')) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.exchange_rating.received_subject'), $html, null, null, null, 'exchange_rating', ['tenant_id' => $tenantId])) {
                         Log::warning('[ExchangeRatingService] submitRating email failed', ['rated_id' => $ratedId]);
                     }
                 });

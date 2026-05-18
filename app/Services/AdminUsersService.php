@@ -69,7 +69,7 @@ class AdminUsersService
             $previousTenantId = TenantContext::currentId();
             try {
                 TenantContext::setById($tenantId);
-                LocaleContext::withLocale($user, function () use ($user, $reason, $userId) {
+                LocaleContext::withLocale($user, function () use ($user, $reason, $userId, $tenantId) {
                     $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                     $community = TenantContext::getName();
                     $builder = EmailTemplateBuilder::make()
@@ -81,7 +81,7 @@ class AdminUsersService
                         $builder->paragraph('<strong>' . __('emails_misc.user_ban.banned_reason_label') . ':</strong> ' . htmlspecialchars($reason, ENT_QUOTES, 'UTF-8'));
                     }
                     $html = $builder->render();
-                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.user_ban.banned_subject'), $html, null, null, null, 'admin_user_status')) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.user_ban.banned_subject'), $html, null, null, null, 'admin_user_status', ['tenant_id' => $tenantId])) {
                         Log::warning('[AdminUsersService] ban email failed', ['user_id' => $userId]);
                     }
                 });
@@ -116,7 +116,7 @@ class AdminUsersService
             $previousTenantId = TenantContext::currentId();
             try {
                 TenantContext::setById($tenantId);
-                LocaleContext::withLocale($user, function () use ($user, $userId) {
+                LocaleContext::withLocale($user, function () use ($user, $userId, $tenantId) {
                     $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                     $community = TenantContext::getName();
                     $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
@@ -125,7 +125,7 @@ class AdminUsersService
                         ->greeting($firstName)
                         ->paragraph(__('emails_misc.user_ban.unbanned_body', ['community' => htmlspecialchars($community, ENT_QUOTES, 'UTF-8')]))
                         ->render();
-                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.user_ban.unbanned_subject'), $html, null, null, null, 'admin_user_status')) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.user_ban.unbanned_subject'), $html, null, null, null, 'admin_user_status', ['tenant_id' => $tenantId])) {
                         Log::warning('[AdminUsersService] unban email failed', ['user_id' => $userId]);
                     }
                 });

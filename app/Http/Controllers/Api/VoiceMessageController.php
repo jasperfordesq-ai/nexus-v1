@@ -130,7 +130,8 @@ class VoiceMessageController extends BaseApiController
             $receiver = DB::table('users')->where('id', $receiverId)->where('tenant_id', \App\Core\TenantContext::getId())->select('name', 'email', 'preferred_language')->first();
 
             if ($receiver && $receiver->email) {
-                LocaleContext::withLocale($receiver, function () use ($sender, $receiver, $receiverId, $senderId, $audioResult) {
+                $tenantId = \App\Core\TenantContext::getId();
+                LocaleContext::withLocale($receiver, function () use ($sender, $receiver, $receiverId, $senderId, $audioResult, $tenantId) {
                     $replyLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/messages/" . $senderId;
 
                     $durationFormatted = gmdate("i:s", $audioResult['duration']);
@@ -144,7 +145,7 @@ class VoiceMessageController extends BaseApiController
                         ->render();
 
                     try {
-                        if (!EmailDispatchService::sendRaw($receiver->email, __('emails_misc.voice_message.email_subject', ['sender' => $senderName]), $emailHtml, null, null, null, 'message')) {
+                        if (!EmailDispatchService::sendRaw($receiver->email, __('emails_misc.voice_message.email_subject', ['sender' => $senderName]), $emailHtml, null, null, null, 'message', ['tenant_id' => $tenantId])) {
                             Log::warning('[VoiceMessage] Email notification failed to send', ['receiver_id' => $receiverId]);
                         }
                     } catch (\Throwable $e) {

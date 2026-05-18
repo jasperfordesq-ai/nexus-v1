@@ -144,7 +144,7 @@ class VolunteerReminderService
                         if ($user && !empty($user->email)) {
                             try {
                                 // Cron → render in recipient's language, not 'en' default.
-                                $emailOk = LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $userId): bool {
+                                $emailOk = LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $userId, $tenantId): bool {
                                     $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                                     $shiftTime = $shift->start_time
                                         ? date('D, d M Y H:i', strtotime($shift->start_time))
@@ -177,7 +177,7 @@ class VolunteerReminderService
                                         'community' => $communityName,
                                     ]);
 
-                                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'volunteer_reminder')) {
+                                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'volunteer_reminder', ['tenant_id' => $tenantId])) {
                                         Log::warning('[VolunteerReminderService] sendReminders email failed', [
                                             'user_id' => $userId,
                                             'shift_id' => $shift->id,
@@ -525,7 +525,7 @@ class VolunteerReminderService
 
                                         $subject = __('emails_volunteer.shift_starting_soon.subject', ['title' => $opportunityTitle]);
 
-                                        if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'volunteer_reminder')) {
+                                        if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'volunteer_reminder', ['tenant_id' => $tenantId])) {
                                             Log::warning('[VolunteerReminderService] sendPreShiftReminders email failed', [
                                                 'tenant_id' => $tenantId,
                                                 'user_id'   => $userId,
@@ -685,7 +685,7 @@ class VolunteerReminderService
 
                                         $subject = __('emails_volunteer.post_shift_feedback.subject', ['title' => $opportunityTitle]);
 
-                                        if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'volunteer_reminder')) {
+                                        if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'volunteer_reminder', ['tenant_id' => $tenantId])) {
                                             Log::warning('[VolunteerReminderService] sendPostShiftFeedback email failed', [
                                                 'tenant_id' => $tenantId,
                                                 'user_id'   => $userId,

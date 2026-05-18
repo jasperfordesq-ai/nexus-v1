@@ -240,7 +240,7 @@ class ListingExpiryReminderService
                     ->button(__('emails_listings.listings.expiry_reminder.cta'), $listingUrl)
                     ->render();
 
-                if (!EmailDispatchService::sendRaw($email, __('emails_listings.listings.expiry_reminder.subject', ['days_text' => $daysText]), $html, null, null, null, 'listing_expiry')) {
+                if (!EmailDispatchService::sendRaw($email, __('emails_listings.listings.expiry_reminder.subject', ['days_text' => $daysText]), $html, null, null, null, 'listing_expiry', ['tenant_id' => (int) ($listing->tenant_id ?? TenantContext::getId())])) {
                     return false;
                 }
             }
@@ -296,7 +296,8 @@ class ListingExpiryReminderService
                     null,
                     null,
                     null,
-                    'listing_expiry'
+                    'listing_expiry',
+                    ['tenant_id' => (int) ($listing->tenant_id ?? TenantContext::getId())]
                 )) {
                     return false;
                 }

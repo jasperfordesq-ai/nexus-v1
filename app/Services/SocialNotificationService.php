@@ -414,7 +414,7 @@ class SocialNotificationService
                 ->button(__('notifications.email_view_content', ['content_type' => ucfirst($contentLabel)]), $fullLink)
                 ->render();
 
-            if (!EmailDispatchService::sendRaw($owner->email, $title . ' — ' . $tenantName, $html, null, null, null, 'social_notification')) {
+            if (!EmailDispatchService::sendRaw($owner->email, $title . ' — ' . $tenantName, $html, null, null, null, 'social_notification', ['tenant_id' => TenantContext::currentId()])) {
                 Log::warning('SocialNotificationService: like email send returned false', [
                     'owner_id' => $owner->id ?? null,
                     'content_type' => $contentType,
@@ -451,7 +451,7 @@ class SocialNotificationService
                 ->button(__('notifications.email_view_comment'), $fullLink)
                 ->render();
 
-            if (!EmailDispatchService::sendRaw($owner->email, $title . ' — ' . $tenantName, $html, null, null, null, 'social_notification')) {
+            if (!EmailDispatchService::sendRaw($owner->email, $title . ' — ' . $tenantName, $html, null, null, null, 'social_notification', ['tenant_id' => TenantContext::currentId()])) {
                 Log::warning('SocialNotificationService: comment email send returned false', [
                     'owner_id' => $owner->id ?? null,
                     'content_type' => $contentType,
@@ -489,7 +489,7 @@ class SocialNotificationService
                 ->button(__('notifications.email_view_reply'), $fullLink)
                 ->render();
 
-            if (!EmailDispatchService::sendRaw($owner->email, $subject, $html, null, null, null, 'social_notification')) {
+            if (!EmailDispatchService::sendRaw($owner->email, $subject, $html, null, null, null, 'social_notification', ['tenant_id' => TenantContext::currentId()])) {
                 Log::warning('SocialNotificationService: comment reply email send returned false', [
                     'owner_id' => $owner->id ?? null,
                     'content_type' => $contentType,
@@ -525,7 +525,7 @@ class SocialNotificationService
                 ->button(__('notifications.email_view_content', ['content_type' => ucfirst($contentLabel)]), $fullLink)
                 ->render();
 
-            if (!EmailDispatchService::sendRaw($owner->email, $title . ' — ' . $tenantName, $html, null, null, null, 'social_notification')) {
+            if (!EmailDispatchService::sendRaw($owner->email, $title . ' — ' . $tenantName, $html, null, null, null, 'social_notification', ['tenant_id' => TenantContext::currentId()])) {
                 Log::warning('SocialNotificationService: share email send returned false', [
                     'owner_id' => $owner->id ?? null,
                     'content_type' => $contentType,

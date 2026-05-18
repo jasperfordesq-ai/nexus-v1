@@ -607,7 +607,7 @@ class AdminVettingController extends BaseApiController
     </div>
 </div>
 HTML;
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'vetting')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'vetting', ['tenant_id' => $tenantId])) {
                         Log::warning('AdminVettingController::sendVettingNotification mailer returned false', [
                             'user_id' => $userId,
                             'status' => $status,

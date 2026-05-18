@@ -193,7 +193,7 @@ class ListingModerationService
         // Send email notification to listing owner — render in owner's locale
         try {
             if ($owner && !empty($owner->email) && filter_var($owner->email, FILTER_VALIDATE_EMAIL)) {
-                LocaleContext::withLocale($owner, function () use ($owner, $listingId, $title, $safeReason) {
+                LocaleContext::withLocale($owner, function () use ($owner, $listingId, $title, $safeReason, $tenantId) {
                     $ownerName = htmlspecialchars($owner->first_name ?? $owner->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
                     $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
                     $frontendUrl = TenantContext::getFrontendUrl();
@@ -213,7 +213,7 @@ class ListingModerationService
                         ->button(__('emails_listings.listings.rejected.cta'), $listingUrl)
                         ->render();
 
-                    if (!EmailDispatchService::sendRaw($owner->email, __('emails_listings.listings.rejected.subject'), $html, null, null, null, 'listing_moderation')) {
+                    if (!EmailDispatchService::sendRaw($owner->email, __('emails_listings.listings.rejected.subject'), $html, null, null, null, 'listing_moderation', ['tenant_id' => $tenantId])) {
                         Log::warning("[ListingModerationService] reject email send returned false for user={$listing->user_id}, listing={$listingId}");
                     }
                 });

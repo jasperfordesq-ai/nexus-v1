@@ -668,7 +668,7 @@ class VereinDuesService
             ? $linkOrUrl
             : (TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $linkOrUrl);
 
-        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $titleKey, $bodyKey, $params, $url, $ctaKey, $userId): void {
+        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $titleKey, $bodyKey, $params, $url, $ctaKey, $userId, $tenantId): void {
             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
             $html = EmailTemplateBuilder::make()
@@ -678,7 +678,7 @@ class VereinDuesService
                 ->button(__($ctaKey), $url)
                 ->render();
 
-            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $params), $html, null, null, null, 'verein_dues')) {
+            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $params), $html, null, null, null, 'verein_dues', ['tenant_id' => $tenantId])) {
                 Log::warning('VereinDues: email send failed', ['user_id' => $userId]);
             }
         });

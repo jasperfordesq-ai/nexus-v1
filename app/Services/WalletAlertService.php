@@ -56,16 +56,16 @@ class WalletAlertService
         $previousTenantId = TenantContext::currentId();
         TenantContext::setById($tenantId);
         try {
-            $sent = (bool) LocaleContext::withLocale($user, function () use ($user, $newBalance) {
+            $sent = (bool) LocaleContext::withLocale($user, function () use ($user, $newBalance, $tenantId) {
                 $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $balanceFormatted = number_format($newBalance, 1);
                 $baseUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
 
                 if ($newBalance <= 0) {
-                    return self::sendEmptyBalanceEmail($user->email, $firstName, $balanceFormatted, $baseUrl);
+                    return self::sendEmptyBalanceEmail($user->email, $firstName, $balanceFormatted, $baseUrl, $tenantId);
                 }
 
-                return self::sendLowBalanceEmail($user->email, $firstName, $balanceFormatted, $baseUrl);
+                return self::sendLowBalanceEmail($user->email, $firstName, $balanceFormatted, $baseUrl, $tenantId);
             });
 
             if ($sent) {
@@ -80,7 +80,7 @@ class WalletAlertService
         }
     }
 
-    private static function sendLowBalanceEmail(string $email, string $firstName, string $balance, string $baseUrl): bool
+    private static function sendLowBalanceEmail(string $email, string $firstName, string $balance, string $baseUrl, int $tenantId): bool
     {
         $html = \App\Core\EmailTemplateBuilder::make()
             ->theme('brand')
@@ -98,11 +98,12 @@ class WalletAlertService
             null,
             null,
             null,
-            'wallet_alert'
+            'wallet_alert',
+            ['tenant_id' => $tenantId]
         );
     }
 
-    private static function sendEmptyBalanceEmail(string $email, string $firstName, string $balance, string $baseUrl): bool
+    private static function sendEmptyBalanceEmail(string $email, string $firstName, string $balance, string $baseUrl, int $tenantId): bool
     {
         $html = \App\Core\EmailTemplateBuilder::make()
             ->theme('brand')
@@ -120,7 +121,8 @@ class WalletAlertService
             null,
             null,
             null,
-            'wallet_alert'
+            'wallet_alert',
+            ['tenant_id' => $tenantId]
         );
     }
 }

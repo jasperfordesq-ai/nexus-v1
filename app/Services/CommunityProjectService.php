@@ -408,7 +408,7 @@ class CommunityProjectService
             $proposedBy = (int) $project->proposed_by;
             $user = DB::table('users')->where('id', $proposedBy)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
             if ($user && !empty($user->email)) {
-                LocaleContext::withLocale($user, function () use ($user, $project, $status, $feedback, $proposalId) {
+                LocaleContext::withLocale($user, function () use ($user, $project, $status, $feedback, $proposalId, $tenantId) {
                     $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                     $safeTitle  = htmlspecialchars($project->title ?? '', ENT_QUOTES, 'UTF-8');
                     $prefix     = match ($status) {
@@ -426,7 +426,7 @@ class CommunityProjectService
                         $builder->paragraph('<strong>' . __('emails_misc.community_project.rejected_notes_label') . ':</strong> ' . htmlspecialchars($feedback, ENT_QUOTES, 'UTF-8'));
                     }
                     $html = $builder->button(__("emails_misc.community_project.{$prefix}_cta"), $fullUrl)->render();
-                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __("emails_misc.community_project.{$prefix}_subject", ['title' => $safeTitle]), $html, null, null, null, 'community_project')) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __("emails_misc.community_project.{$prefix}_subject", ['title' => $safeTitle]), $html, null, null, null, 'community_project', ['tenant_id' => $tenantId])) {
                         Log::warning('[CommunityProjectService] review email failed', ['proposal_id' => $proposalId]);
                     }
                 });

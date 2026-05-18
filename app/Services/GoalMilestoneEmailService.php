@@ -96,7 +96,7 @@ class GoalMilestoneEmailService
             return false;
         }
 
-        return (bool) LocaleContext::withLocale($user, function () use ($user, $userId, $goalTitle, $goalId, $milestone) {
+        return (bool) LocaleContext::withLocale($user, function () use ($user, $userId, $goalTitle, $goalId, $milestone, $tenantId) {
             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
             $safeTitle = htmlspecialchars($goalTitle, ENT_QUOTES, 'UTF-8');
             $goalUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/goals/' . $goalId;
@@ -128,7 +128,7 @@ class GoalMilestoneEmailService
                 ->button($cta, $goalUrl)
                 ->render();
 
-            if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'goal_milestone')) {
+            if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'goal_milestone', ['tenant_id' => $tenantId])) {
                 Log::warning('[GoalMilestoneEmailService] mailer send failed', [
                     'user_id'   => $userId,
                     'goal_id'   => $goalId,

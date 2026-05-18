@@ -1390,7 +1390,7 @@ class IdeationChallengeService
                 ->render();
 
             $subject = $title . ' — ' . $tenantName;
-            if (!EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'ideation')) {
+            if (!EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'ideation', ['tenant_id' => TenantContext::currentId()])) {
                 Log::warning('[IdeationChallengeService] ideation email returned false', [
                     'recipient_id' => $recipient->id ?? null,
                 ]);

@@ -564,7 +564,7 @@ class JobInterviewService
                 return false;
             }
 
-            return (bool) LocaleContext::withLocale($user, function () use ($user, $userId, $subjectKey, $messageKey, $params, $jobLink) {
+            return (bool) LocaleContext::withLocale($user, function () use ($user, $userId, $subjectKey, $messageKey, $params, $jobLink, $tenantId) {
                 $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $bodyText   = __($messageKey, $params);
                 $subject    = __($subjectKey, $params);
@@ -578,7 +578,7 @@ class JobInterviewService
                     ->button(__('emails_misc.jobs.interview_email_cta'), $fullUrl)
                     ->render();
 
-                if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'job_interview')) {
+                if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'job_interview', ['tenant_id' => $tenantId])) {
                     Log::warning('[JobInterviewService] Interview email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
                     return false;
                 }

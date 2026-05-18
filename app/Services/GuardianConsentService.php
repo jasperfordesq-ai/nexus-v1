@@ -139,7 +139,7 @@ class GuardianConsentService
             ->value('preferred_language');
 
         try {
-            LocaleContext::withLocale($minorLocale, function () use ($guardianData, $verifyUrl) {
+            LocaleContext::withLocale($minorLocale, function () use ($guardianData, $verifyUrl, $tenantId) {
                 $safeName = htmlspecialchars($guardianData['guardian_name'], ENT_QUOTES, 'UTF-8');
                 $safeRelationship = htmlspecialchars($guardianData['relationship'], ENT_QUOTES, 'UTF-8');
 
@@ -158,7 +158,7 @@ class GuardianConsentService
                     ->paragraph(__('emails_misc.guardian.consent_ignore'))
                     ->render();
 
-                if (!EmailDispatchService::sendRaw($guardianData['guardian_email'], __('emails_misc.guardian.consent_subject'), $html, null, null, null, 'guardian_consent')) {
+                if (!EmailDispatchService::sendRaw($guardianData['guardian_email'], __('emails_misc.guardian.consent_subject'), $html, null, null, null, 'guardian_consent', ['tenant_id' => $tenantId])) {
                     Log::warning('GuardianConsentService consent email send returned false');
                 }
             });
