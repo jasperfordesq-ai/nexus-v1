@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   Card,
@@ -93,7 +94,8 @@ const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'>
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MarketplaceAdmin() {
-  usePageTitle("Marketplace");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('marketplace.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -124,11 +126,11 @@ export function MarketplaceAdmin() {
         }
       }
     } catch {
-      toast.error("Failed to load dashboard");
+      toast.error(t('marketplace.failed_load_dashboard'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   useEffect(() => {
@@ -136,53 +138,53 @@ export function MarketplaceAdmin() {
   }, [loadDashboard]);
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title={"Marketplace"}
-        description={"Manage marketplace listings, sellers, and orders"}
+        title={t('marketplace.title')}
+        description={t('marketplace.description')}
         actions={
           <Button
             variant="flat"
             startContent={<RefreshCw size={16} />}
             onPress={loadDashboard}
           >
-            {"Refresh"}
+            {t('marketplace.refresh')}
           </Button>
         }
       />
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
-          label={"Total Listings"}
+          label={t('marketplace.stat_total_listings')}
           value={stats?.total_listings ?? 0}
           icon={ShoppingBag}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={"Active Listings"}
+          label={t('marketplace.stat_active_listings')}
           value={stats?.active_listings ?? 0}
           icon={PackageCheck}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={"Total Sellers"}
+          label={t('marketplace.stat_total_sellers')}
           value={stats?.total_sellers ?? 0}
           icon={Store}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label={"Pending Review"}
+          label={t('marketplace.stat_pending_moderation')}
           value={stats?.pending_moderation ?? 0}
           icon={Clock}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label={"Total Orders"}
+          label={t('marketplace.stat_total_orders')}
           value={stats?.total_orders ?? 0}
           icon={DollarSign}
           color="default"
@@ -191,17 +193,17 @@ export function MarketplaceAdmin() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Link to={tenantPath('/admin/marketplace/moderation')}>
-          <Card shadow="sm" isPressable className="w-full">
+          <Card shadow="sm" isPressable className="w-full border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03] transition-transform hover:-translate-y-0.5">
             <CardBody className="flex flex-row items-center gap-4 p-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-warning bg-warning/10">
                 <Shield size={24} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-foreground">{"Moderation Queue"}</p>
+                <p className="font-semibold text-foreground">{t('marketplace.moderation_queue')}</p>
                 <p className="text-sm text-default-500">
-                  {"Listings awaiting review"}
+                  {t('marketplace.moderation_queue_desc')}
                 </p>
               </div>
               <ChevronRight size={20} className="text-default-400" />
@@ -209,15 +211,15 @@ export function MarketplaceAdmin() {
           </Card>
         </Link>
         <Link to={tenantPath('/admin/marketplace/sellers')}>
-          <Card shadow="sm" isPressable className="w-full">
+          <Card shadow="sm" isPressable className="w-full border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03] transition-transform hover:-translate-y-0.5">
             <CardBody className="flex flex-row items-center gap-4 p-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-primary bg-primary/10">
                 <Users size={24} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-foreground">{"Seller Management"}</p>
+                <p className="font-semibold text-foreground">{t('marketplace.seller_management')}</p>
                 <p className="text-sm text-default-500">
-                  {"Manage and verify marketplace sellers"}
+                  {t('marketplace.seller_management_desc')}
                 </p>
               </div>
               <ChevronRight size={20} className="text-default-400" />
@@ -227,34 +229,34 @@ export function MarketplaceAdmin() {
       </div>
 
       {/* Recent Listings Table */}
-      <Card shadow="sm">
+      <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
         <CardHeader className="flex items-center justify-between px-4 pt-4">
-          <h3 className="text-lg font-semibold text-foreground">{"Recent Listings"}</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('marketplace.recent_listings')}</h3>
           <Link to={tenantPath('/admin/marketplace/moderation')}>
             <Button size="sm" variant="flat" color="primary">
-              {"View All"}
+              {t('marketplace.view_all')}
             </Button>
           </Link>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Spinner label={"Loading listings..."} />
+              <Spinner label={t('marketplace.loading_recent_listings')} />
             </div>
           ) : recentListings.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <ShoppingBag size={32} className="text-default-300 mb-2" />
-              <p className="text-sm text-default-500">{"No listings yet"}</p>
+              <p className="text-sm text-default-500">{t('marketplace.no_listings_yet')}</p>
             </div>
           ) : (
-            <Table aria-label={"Recent Listings"} removeWrapper>
+            <Table aria-label={t('marketplace.recent_listings')} removeWrapper>
               <TableHeader>
-                <TableColumn>{"Title"}</TableColumn>
-                <TableColumn>{"Seller"}</TableColumn>
-                <TableColumn>{"Price"}</TableColumn>
-                <TableColumn>{"Status"}</TableColumn>
-                <TableColumn>{"Moderation"}</TableColumn>
-                <TableColumn>{"Created"}</TableColumn>
+                <TableColumn>{t('marketplace.col_title')}</TableColumn>
+                <TableColumn>{t('marketplace.col_seller')}</TableColumn>
+                <TableColumn>{t('marketplace.col_price')}</TableColumn>
+                <TableColumn>{t('marketplace.col_status')}</TableColumn>
+                <TableColumn>{t('marketplace.col_moderation')}</TableColumn>
+                <TableColumn>{t('marketplace.col_created')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {recentListings.map((listing) => (
