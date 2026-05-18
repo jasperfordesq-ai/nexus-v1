@@ -6,12 +6,9 @@
 
 namespace App\Services;
 
-use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\CommunityEventCreated;
 use App\Events\CommunityEventUpdated;
-use App\I18n\LocaleContext;
 use App\Models\Event;
 use App\Models\EventRsvp;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,6 +22,11 @@ use Illuminate\Support\Facades\Schema;
  */
 class EventService
 {
+    private static bool $lastRsvpChanged = false;
+
+    /** @var array<string,mixed> */
+    private static array $lastMeaningfulUpdateChanges = [];
+
     public function __construct(
         private readonly Event $event,
         private readonly EventRsvp $rsvp,
@@ -225,6 +227,8 @@ class EventService
      */
     public static function create(int $userId, array $data): Event
     {
+        $tenantId = (int) TenantContext::getId();
+
         validator($data, [
             'title'       => 'required|string|max:255',
             'description' => 'required|string',
@@ -233,7 +237,7 @@ class EventService
             'location'    => 'nullable|string|max:255',
         ])->validate();
 
-        $event = DB::transaction(function () use ($userId, $data) {
+        $event = DB::transaction(function () use ($userId, $data, $tenantId) {
             $event = new Event([
                 'user_id'              => $userId,
                 'title'                => trim($data['title']),
@@ -259,59 +263,35 @@ class EventService
             // Fire-and-forget: federation push is queued; failure must not
             // break event creation.
             try {
-                CommunityEventCreated::dispatch($fresh ?? $event, (int) TenantContext::getId());
+                $previousTenantId = TenantContext::currentId();
+                try {
+                    CommunityEventCreated::dispatch($fresh ?? $event, (int) TenantContext::getId());
+                } finally {
+                    if ($previousTenantId !== null) {
+                        TenantContext::setById($previousTenantId);
+                    }
+                }
             } catch (\Throwable $e) {
                 Log::warning('Failed to dispatch CommunityEventCreated', [
                     'event_id' => $event->id ?? null,
                     'error'    => $e->getMessage(),
                 ]);
             }
+            TenantContext::setById($tenantId);
 
             return $fresh ?? $event;
         });
+        TenantContext::setById($tenantId);
 
-        // Send creation confirmation email to the event organizer
+        // Send creation confirmation through the auditable event notification path.
         try {
-            $creator = DB::table('users')
-                ->where('id', $userId)
-                ->where('tenant_id', TenantContext::getId())
-                ->select(['email', 'first_name', 'name', 'preferred_language'])
-                ->first();
-
-            if ($creator && !empty($creator->email)) {
-                // Render greeting, subject, body + CTA in the creator's preferred_language.
-                LocaleContext::withLocale($creator, function () use ($creator, $event) {
-                    $firstName  = $creator->first_name ?? $creator->name ?? __('emails.common.fallback_name');
-                    $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
-                    $eventUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/events/' . $event->id;
-                    $eventTitle = $event->title ?? '';
-
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('success')
-                        ->title(__('emails_created.event.title'))
-                        ->previewText(__('emails_created.event.preview', ['title' => $eventTitle, 'community' => $tenantName]))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_created.event.body'))
-                        ->highlight($eventTitle)
-                        ->button(__('emails_created.event.cta'), $eventUrl)
-                        ->render();
-
-                    if (!\App\Services\EmailDispatchService::sendRaw(
-                        $creator->email,
-                        __('emails_created.event.subject', ['title' => $eventTitle, 'community' => $tenantName]),
-                        $html,
-                        null,
-                        null,
-                        null,
-                        'event',
-                        ['tenant_id' => $creator->tenant_id ?? \App\Core\TenantContext::currentId()]
-                    )) {
-                        Log::warning('[EventService] creation email send returned false', ['event_id' => $event->id]);
-                    }
-                });
-            }
+            app(EventNotificationService::class)->notifyEventCreated(
+                $tenantId,
+                (int) $event->id,
+                $userId
+            );
         } catch (\Throwable $e) {
-            Log::warning('[EventService] creation email failed: ' . $e->getMessage());
+            Log::warning('[EventService] creation notification failed: ' . $e->getMessage());
         }
 
         return $event;
@@ -328,6 +308,7 @@ class EventService
     public static function update(int $id, int $userId, array $data): bool
     {
         self::$errors = [];
+        self::$lastMeaningfulUpdateChanges = [];
         $tenantId = \App\Core\TenantContext::getId();
 
         /** @var Event|null $event */
@@ -362,17 +343,43 @@ class EventService
             'is_online', 'online_link', 'image_url', 'federated_visibility',
         ];
 
+        $meaningfulKeys = ['title', 'start_time', 'end_time', 'location'];
+        $original = [];
+        foreach ($meaningfulKeys as $key) {
+            $original[$key] = $event->getAttribute($key);
+        }
+
         $event->fill(collect($data)->only($allowed)->all());
+        foreach ($meaningfulKeys as $key) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+
+            $before = self::normalizeEventChangeValue($key, $original[$key] ?? null);
+            $after = self::normalizeEventChangeValue($key, $event->getAttribute($key));
+            if ($before !== $after) {
+                self::$lastMeaningfulUpdateChanges[$key] = $event->getAttribute($key);
+            }
+        }
+
         $event->save();
 
         try {
-            CommunityEventUpdated::dispatch($event->fresh() ?? $event, (int) TenantContext::getId());
+            $previousTenantId = TenantContext::currentId();
+            try {
+                CommunityEventUpdated::dispatch($event->fresh() ?? $event, (int) TenantContext::getId());
+            } finally {
+                if ($previousTenantId !== null) {
+                    TenantContext::setById($previousTenantId);
+                }
+            }
         } catch (\Throwable $e) {
             Log::warning('Failed to dispatch CommunityEventUpdated', [
                 'event_id' => $event->id ?? null,
                 'error'    => $e->getMessage(),
             ]);
         }
+        TenantContext::setById($tenantId);
 
         return true;
     }
@@ -534,6 +541,7 @@ class EventService
     public static function rsvp(int $eventId, int $userId, string $status): bool
     {
         self::$errors = [];
+        self::$lastRsvpChanged = false;
 
         $validStatuses = ['going', 'interested', 'not_going', 'declined'];
         if (!in_array($status, $validStatuses)) {
@@ -580,6 +588,10 @@ class EventService
 
                 $currentUserStatus = self::getUserRsvp($eventId, $userId);
                 $isAlreadyGoing = ($currentUserStatus === 'going');
+                if ($currentUserStatus === $status) {
+                    self::removeFromWaitlist($eventId, $userId);
+                    return true;
+                }
 
                 if (!$isAlreadyGoing && $currentGoing >= $maxAttendees) {
                     self::addToWaitlist($eventId, $userId);
@@ -600,12 +612,19 @@ class EventService
                 );
 
                 self::removeFromWaitlist($eventId, $userId);
+                self::$lastRsvpChanged = true;
 
                 return true;
             });
         }
 
         try {
+            $currentUserStatus = self::getUserRsvp($eventId, $userId);
+            if ($currentUserStatus === $status) {
+                self::removeFromWaitlist($eventId, $userId);
+                return true;
+            }
+
             // Upsert RSVP (no capacity limit)
             DB::statement(
                 "INSERT INTO event_rsvps (event_id, user_id, tenant_id, status, created_at)
@@ -614,12 +633,50 @@ class EventService
                 [$eventId, $userId, $tenantId, $status]
             );
 
+            self::removeFromWaitlist($eventId, $userId);
+            self::$lastRsvpChanged = true;
+
             return true;
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("EventService::rsvp error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.event_rsvp_update_failed')];
             return false;
         }
+    }
+
+    public static function wasLastRsvpChanged(): bool
+    {
+        return self::$lastRsvpChanged;
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    public static function getLastMeaningfulUpdateChanges(): array
+    {
+        return self::$lastMeaningfulUpdateChanges;
+    }
+
+    private static function normalizeEventChangeValue(string $key, mixed $value): mixed
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value->getTimestamp();
+        }
+
+        if (in_array($key, ['start_time', 'end_time'], true)) {
+            if ($value === null || $value === '') {
+                return null;
+            }
+
+            $timestamp = strtotime((string) $value);
+            return $timestamp === false ? (string) $value : $timestamp;
+        }
+
+        if (is_string($value)) {
+            return trim($value);
+        }
+
+        return $value;
     }
 
     private static function allowsKissTreffenRsvp(int $eventId, int $userId, int $tenantId): bool

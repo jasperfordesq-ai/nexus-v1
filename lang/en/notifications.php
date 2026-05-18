@@ -143,6 +143,7 @@ return [
     'event_change_date_time'     => 'date/time',
     'event_change_location'      => 'location',
     'event_change_title'         => 'title',
+    'event_change_separator'     => ' and ',
 
     // =========================================================================
     // NotificationDispatcher — Push titles

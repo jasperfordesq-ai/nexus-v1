@@ -278,7 +278,10 @@ class EventsController extends BaseApiController
 
         // Notify attendees of meaningful changes
         try {
-            $this->eventNotificationService->notifyEventUpdated($id, $data);
+            $meaningfulChanges = $this->eventService->getLastMeaningfulUpdateChanges();
+            if (!empty($meaningfulChanges)) {
+                $this->eventNotificationService->notifyEventUpdated($id, $meaningfulChanges);
+            }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("Event update notification error: " . $e->getMessage());
         }
@@ -381,7 +384,9 @@ class EventsController extends BaseApiController
 
         // Notify event organizer of RSVP
         try {
-            $this->eventNotificationService->notifyRsvp($id, $userId, $status);
+            if ($this->eventService->wasLastRsvpChanged()) {
+                $this->eventNotificationService->notifyRsvp($id, $userId, $status);
+            }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("RSVP notification error: " . $e->getMessage());
         }

@@ -131,7 +131,7 @@ class EventNotificationService
             $event = DB::table('events')
                 ->where('id', $eventId)
                 ->where('tenant_id', $tenantId)
-                ->select(['id', 'title', 'start_time', 'location', 'is_online', 'online_url'])
+                ->select(['id', 'title', 'start_time', 'location', 'is_online', 'online_link'])
                 ->first();
 
             if (!$event) {
@@ -387,7 +387,7 @@ class EventNotificationService
                     if (isset($meaningfulChanges['title'])) {
                         $changeParts[] = __('notifications.event_change_title');
                     }
-                    $changeLabel = implode(' and ', $changeParts);
+                    $changeLabel = implode(__('notifications.event_change_separator'), $changeParts);
                     $message = __('notifications.event_updated', ['title' => $eventTitle, 'changes' => $changeLabel]);
 
                     Notification::create([
@@ -461,7 +461,7 @@ class EventNotificationService
             $organizer = DB::table('users')
                 ->where('id', $organizerId)
                 ->where('tenant_id', $tenantId)
-                ->select(['id as user_id', 'email', 'name', 'first_name', 'preferred_language'])
+                ->select(['id as user_id', 'tenant_id', 'email', 'name', 'first_name', 'preferred_language'])
                 ->first();
 
             // Organizer bell + email — rendered in the organizer's locale.
@@ -550,7 +550,7 @@ class EventNotificationService
             $event = DB::table('events')
                 ->where('id', $eventId)
                 ->where('tenant_id', $tenantId)
-                ->select(['id', 'title', 'start_time', 'end_time', 'location', 'is_online', 'online_url'])
+                ->select(['id', 'title', 'start_time', 'end_time', 'location', 'is_online', 'online_link'])
                 ->first();
 
             if (!$event) {
@@ -561,7 +561,7 @@ class EventNotificationService
             $organizer = DB::table('users')
                 ->where('id', $organizerId)
                 ->where('tenant_id', $tenantId)
-                ->select(['id as user_id', 'email', 'name', 'first_name', 'preferred_language'])
+                ->select(['id as user_id', 'tenant_id', 'email', 'name', 'first_name', 'preferred_language'])
                 ->first();
 
             if (!$organizer) {
@@ -796,7 +796,7 @@ class EventNotificationService
         $when = date('l, M j \a\t g:i A', strtotime($event->start_time));
 
         $locationText = '';
-        if (!empty($event->is_online) && !empty($event->online_url)) {
+        if (!empty($event->is_online) && !empty($event->online_link)) {
             $locationText = ' (Online)';
         } elseif (!empty($event->location)) {
             $loc = htmlspecialchars($event->location, ENT_QUOTES, 'UTF-8');
@@ -1070,7 +1070,7 @@ HTML;
 
         // Location row
         $locationHtml = '';
-        if (!empty($event->is_online) && !empty($event->online_url)) {
+        if (!empty($event->is_online) && !empty($event->online_link)) {
             $onlineLabel = htmlspecialchars(__('emails.events.online_event'), ENT_QUOTES, 'UTF-8');
             $locationHtml = "<p style=\"color: #6366f1; margin: 0; font-size: 14px;\">&#127760; {$onlineLabel}</p>";
         } elseif (!empty($event->location)) {
@@ -1124,7 +1124,7 @@ HTML;
 
         $onlineEventLabel = htmlspecialchars(__('emails.events.online_event'), ENT_QUOTES, 'UTF-8');
         $locationHtml = '';
-        if (!empty($event->is_online) && !empty($event->online_url)) {
+        if (!empty($event->is_online) && !empty($event->online_link)) {
             $locationHtml = "<p style=\"color: #6366f1; margin: 4px 0 0; font-size: 14px;\">{$onlineEventLabel}</p>";
         } elseif (!empty($event->location)) {
             $loc = htmlspecialchars($event->location, ENT_QUOTES, 'UTF-8');
