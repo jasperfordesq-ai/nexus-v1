@@ -139,4 +139,88 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('notification_queue_suppressed_recently', $codes);
         $this->assertNotContains('notification_queue_marked_sent_without_email_log', $codes);
     }
+
+    public function test_run_detects_sent_notification_queue_with_only_failed_email_log(): void
+    {
+        if (!Schema::hasTable('notification_queue') || !Schema::hasTable('email_log')) {
+            $this->markTestSkipped('Notification queue/email log tables are not available.');
+        }
+
+        $userId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Failed Queue Evidence User',
+            'email' => 'failed-queue-evidence@example.test',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $createdAt = now()->subMinutes(3);
+        DB::table('notification_queue')->insert([
+            'tenant_id' => 2,
+            'user_id' => $userId,
+            'activity_type' => 'new_message',
+            'content_snippet' => 'Message audit row',
+            'link' => '/messages',
+            'status' => 'sent',
+            'frequency' => 'instant',
+            'sent_at' => now()->subMinute(),
+            'created_at' => $createdAt,
+        ]);
+
+        DB::table('email_log')->insert([
+            'tenant_id' => 2,
+            'user_id' => $userId,
+            'recipient_email' => 'failed-queue-evidence@example.test',
+            'category' => 'notification_queue',
+            'subject' => 'Message audit row',
+            'provider' => 'sendgrid',
+            'status' => 'failed',
+            'error' => 'simulated failure',
+            'created_at' => now()->subMinutes(2),
+            'updated_at' => now()->subMinutes(2),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('notification_queue_marked_sent_without_email_log', $codes);
+    }
+
+    public function test_run_detects_new_user_with_only_failed_account_email_log(): void
+    {
+        if (!Schema::hasTable('email_log')) {
+            $this->markTestSkipped('Email log table is not available.');
+        }
+
+        $createdAt = now()->subMinutes(5);
+        $userId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Failed Welcome User',
+            'email' => 'failed-welcome-user@audit-fixture.localhost.testmail',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => $createdAt,
+            'updated_at' => $createdAt,
+        ]);
+
+        DB::table('email_log')->insert([
+            'tenant_id' => 2,
+            'user_id' => $userId,
+            'recipient_email' => 'failed-welcome-user@audit-fixture.localhost.testmail',
+            'category' => 'welcome',
+            'subject' => 'Welcome',
+            'provider' => 'sendgrid',
+            'status' => 'failed',
+            'error' => 'simulated failure',
+            'created_at' => now()->subMinutes(4),
+            'updated_at' => now()->subMinutes(4),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('new_users_without_account_email_attempt', $codes);
+    }
 }

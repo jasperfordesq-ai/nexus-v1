@@ -198,7 +198,8 @@ class EmailTriggerAuditService
                         'email_verification',
                         'identity_verification',
                         'welcome',
-                    ]);
+                    ])
+                    ->whereIn('email_log.status', ['sent', 'delivered', 'bounced']);
             })
             ->groupBy('users.tenant_id');
         $this->excludeReservedEmailDomains($q, 'users.email');
@@ -235,7 +236,8 @@ class EmailTriggerAuditService
                     ->whereRaw('email_log.recipient_email COLLATE utf8mb4_unicode_ci = pr.email COLLATE utf8mb4_unicode_ci')
                     ->whereColumn('email_log.tenant_id', 'pr.tenant_id')
                     ->whereColumn('email_log.created_at', '>=', 'pr.created_at')
-                    ->where('email_log.category', 'password_reset');
+                    ->where('email_log.category', 'password_reset')
+                    ->whereIn('email_log.status', ['sent', 'delivered', 'bounced']);
             })
             ->groupBy('pr.tenant_id');
         $this->excludeReservedEmailDomains($q, 'pr.email');
@@ -274,7 +276,8 @@ class EmailTriggerAuditService
                     ->whereColumn('email_log.recipient_email', 'gi.email')
                     ->whereColumn('email_log.tenant_id', 'gi.tenant_id')
                     ->whereColumn('email_log.created_at', '>=', 'gi.created_at')
-                    ->where('email_log.category', 'group_invite');
+                    ->where('email_log.category', 'group_invite')
+                    ->whereIn('email_log.status', ['sent', 'delivered', 'bounced']);
             })
             ->groupBy('gi.tenant_id');
         $this->excludeReservedEmailDomains($q, 'gi.email');
@@ -383,7 +386,8 @@ class EmailTriggerAuditService
                         ->whereColumn('email_log.user_id', 'nq.user_id')
                         ->whereRaw("email_log.tenant_id = {$queuedTenantExpr}")
                         ->whereColumn('email_log.created_at', '>=', 'nq.created_at')
-                        ->whereIn('email_log.category', ['notification_queue', 'notification_digest']);
+                        ->whereIn('email_log.category', ['notification_queue', 'notification_digest'])
+                        ->whereIn('email_log.status', ['sent', 'delivered', 'bounced']);
                 })
                 ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$queuedTenantExpr} = ?", [$tenantId]))
                 ->groupByRaw($queuedTenantExpr)
