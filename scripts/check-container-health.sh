@@ -29,22 +29,31 @@
 set -u
 
 # --- Config ---
-# Load local secrets if present (gitignored .secrets.local/deploy.env)
-# shellcheck disable=SC1091
-[ -f "$(dirname "$0")/../.secrets.local/deploy.env" ] && . "$(dirname "$0")/../.secrets.local/deploy.env"
+LOCAL_MODE="${LOCAL_MODE:-0}"
+SSH_OPTS=""
 
-SSH_KEY="${SSH_KEY:-${PROD_SSH_KEY:-}}"
-SSH_HOST="${SSH_HOST:-${PROD_SSH_HOST:-}}"
+if [ "$LOCAL_MODE" != "1" ]; then
+    # Load local secrets if present (gitignored .secrets.local/deploy.env).
+    # These are only needed when the script is run from a workstation and must
+    # SSH into production. The post-deploy scheduler runs on the VM itself.
+    # shellcheck disable=SC1091
+    [ -f "$(dirname "$0")/../.secrets.local/deploy.env" ] && . "$(dirname "$0")/../.secrets.local/deploy.env"
 
-if [ -z "$SSH_KEY" ] || [ -z "$SSH_HOST" ]; then
-    echo "ERROR: SSH_HOST and SSH_KEY (or PROD_SSH_HOST/PROD_SSH_KEY) must be set." >&2
-    echo "       Either create .secrets.local/deploy.env or export them." >&2
-    exit 1
+    SSH_KEY="${SSH_KEY:-${PROD_SSH_KEY:-}}"
+    SSH_HOST="${SSH_HOST:-${PROD_SSH_HOST:-}}"
+
+    if [ -z "$SSH_KEY" ] || [ -z "$SSH_HOST" ]; then
+        echo "ERROR: SSH_HOST and SSH_KEY (or PROD_SSH_HOST/PROD_SSH_KEY) must be set." >&2
+        echo "       Either create .secrets.local/deploy.env or export them." >&2
+        exit 1
+    fi
+    SSH_OPTS="-i \"$SSH_KEY\" -o RequestTTY=force -o StrictHostKeyChecking=accept-new"
+else
+    SSH_HOST="${SSH_HOST:-$(hostname -f 2>/dev/null || hostname)}"
 fi
-SSH_OPTS="-i \"$SSH_KEY\" -o RequestTTY=force -o StrictHostKeyChecking=accept-new"
 MEM_THRESHOLD_PCT="${MEM_THRESHOLD_PCT:-90}"   # percent of limit → WARN/FAIL
 OOM_LOOKBACK="${OOM_LOOKBACK:-1h}"             # docker events window
-CONTAINER_NAME_RE='nexus-php-app|nexus-php-db|nexus-php-redis|nexus-react-prod|nexus-sales-site|nexus-meilisearch|nexus-(blue|green)-(php-app|frontend|sales|queue|scheduler)'
+CONTAINER_NAME_RE='nexus-php-app|nexus-php-db|nexus-php-redis|nexus-react-prod|nexus-sales-site|nexus-meilisearch|nexus-(blue|green)-(php-app|react|frontend|sales|php-queue|php-scheduler|queue|scheduler)'
 
 # --- Colors ---
 if [ -t 1 ]; then
@@ -63,7 +72,7 @@ log_err()  { echo -e "${RED}[FAIL]${NC} $1"; }
 # run_remote: run a shell snippet either directly (LOCAL_MODE=1) or via SSH
 run_remote() {
     local cmd="$1"
-    if [ "${LOCAL_MODE:-0}" = "1" ]; then
+    if [ "$LOCAL_MODE" = "1" ]; then
         bash -c "$cmd"
     else
         # shellcheck disable=SC2086
@@ -75,7 +84,7 @@ FAIL=0
 WARN=0
 
 echo -e "${BOLD}Project NEXUS - Container Health Check${NC}"
-if [ "${LOCAL_MODE:-0}" = "1" ]; then
+if [ "$LOCAL_MODE" = "1" ]; then
     MODE_LABEL="local"
 else
     MODE_LABEL="ssh"
@@ -151,7 +160,7 @@ echo -e "${BOLD}3. Container state (OOMKilled / RestartCount / Policy)${NC}"
 CONTAINERS=$(run_remote "sudo docker ps --format '{{.Names}}' | grep -E '^(${CONTAINER_NAME_RE})$' || true")
 while read -r CNAME; do
     [ -z "$CNAME" ] && continue
-    INSPECT=$(run_remote "sudo docker inspect $CNAME --format '{{.State.OOMKilled}}|{{.State.RestartCount}}|{{.HostConfig.RestartPolicy.Name}}|{{.State.Status}}' 2>/dev/null || echo 'ERR|0|none|unknown'")
+    INSPECT=$(run_remote "sudo docker inspect $CNAME --format '{{.State.OOMKilled}}|{{.RestartCount}}|{{.HostConfig.RestartPolicy.Name}}|{{.State.Status}}' 2>/dev/null || echo 'ERR|0|none|unknown'")
     IFS='|' read -r OOMK RCOUNT POLICY STATE <<< "$INSPECT"
     LINE=$(printf "  %-28s OOMKilled=%-5s RestartCount=%-3s Policy=%-10s Status=%s" "$CNAME" "$OOMK" "$RCOUNT" "$POLICY" "$STATE")
     if [ "$OOMK" = "true" ]; then
