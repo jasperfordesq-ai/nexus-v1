@@ -1064,6 +1064,7 @@
       "date": "Requested",
       "format": "Format",
       "size": "Size",
+      "count": "{{count}} exports",
       "empty": "You haven't exported your data yet."
     },
     "errors": {

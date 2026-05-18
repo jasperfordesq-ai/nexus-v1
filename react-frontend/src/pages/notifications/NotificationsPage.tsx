@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Skeleton, Avatar, AvatarGroup } from '@heroui/react';
+import { Button, Chip, Skeleton, Avatar, AvatarGroup } from '@heroui/react';
 import Bell from 'lucide-react/icons/bell';
 import MessageSquare from 'lucide-react/icons/message-square';
 import ListTodo from 'lucide-react/icons/list-todo';
@@ -242,8 +242,8 @@ export function NotificationsPage() {
     }, 4000);
 
     toastRef.current.info(
-      tRef.current('toast.deleted', 'Notification deleted'),
-      tRef.current('toast.undo_hint', 'Click to undo within 4 seconds'),
+      tRef.current('toast.deleted'),
+      tRef.current('toast.undo_hint'),
     );
 
     // Expose undo mechanism via a module-level ref so the toast button can call it
@@ -293,51 +293,50 @@ export function NotificationsPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6">
       <PageMeta title={t('page_meta.title')} noIndex />
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Bell className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-            {t('title')}
-            {unreadCount > 0 && (
-              <span className="text-sm px-2 py-1 rounded-full bg-indigo-500 text-white font-medium">
-                {t('unread_badge', { count: unreadCount })}
-              </span>
-            )}
-          </h1>
-          <p className="text-theme-muted mt-1">{t('subtitle')}</p>
-        </div>
+      <header className="overflow-hidden rounded-2xl border border-theme-default bg-theme-surface">
+        <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl">
+            <Chip size="sm" variant="flat" color={unreadCount > 0 ? 'primary' : 'success'} className="mb-3 font-medium">
+              {unreadCount > 0 ? t('unread_badge', { count: unreadCount }) : t('caught_up_badge')}
+            </Chip>
+            <h1 className="flex items-center gap-3 text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
+              <Bell className="h-8 w-8 text-indigo-500" aria-hidden="true" />
+              {t('title')}
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-theme-muted sm:text-base">{t('subtitle')}</p>
+          </div>
 
-        <div className="flex gap-2">
-          {unreadCount > 0 && (
-            <Button
-              variant="flat"
-              size="sm"
-              className="bg-theme-elevated text-theme-primary"
-              startContent={<CheckCheck className="w-4 h-4" aria-hidden="true" />}
-              onPress={markAllAsRead}
-            >
-              {t('mark_all_read')}
-            </Button>
-          )}
-          <Link to={tenantPath("/settings")}>
-            <Button
-              variant="flat"
-              size="sm"
-              className="bg-theme-elevated text-theme-primary"
-              isIconOnly
-              aria-label={t('settings_aria')}
-            >
-              <Settings className="w-4 h-4" aria-hidden="true" />
-            </Button>
-          </Link>
+          <div className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-stretch">
+            {unreadCount > 0 && (
+              <Button
+                variant="flat"
+                size="sm"
+                className="bg-theme-elevated text-theme-primary"
+                startContent={<CheckCheck className="w-4 h-4" aria-hidden="true" />}
+                onPress={markAllAsRead}
+              >
+                {t('mark_all_read')}
+              </Button>
+            )}
+            <Link to={tenantPath('/settings')}>
+              <Button
+                variant="flat"
+                size="sm"
+                className="w-full bg-theme-elevated text-theme-primary"
+                startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('settings_label')}
+              </Button>
+            </Link>
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* Filter */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 rounded-2xl border border-theme-default bg-theme-surface p-2">
         <Button
           size="sm"
           variant={filter === 'all' ? 'solid' : 'flat'}
@@ -359,14 +358,14 @@ export function NotificationsPage() {
       {/* Undo delete banner */}
       {lastDeletedNotification && (
         <div className="flex items-center justify-between p-3 rounded-xl bg-theme-elevated border border-theme-default text-sm">
-          <span className="text-theme-muted">{t('toast.deleted', 'Notification deleted')}</span>
+          <span className="text-theme-muted">{t('toast.deleted')}</span>
           <Button
             size="sm"
             variant="flat"
             className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
             onPress={handleUndoDelete}
           >
-            {t('undo', 'Undo')}
+            {t('undo')}
           </Button>
         </div>
       )}
@@ -375,13 +374,13 @@ export function NotificationsPage() {
       {loadError && !isLoading && (
         <GlassCard className="p-8 text-center">
           <Bell className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4 opacity-50" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error_title', 'Unable to load')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error_title')}</h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
             className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
             onPress={loadNotifications}
           >
-            {t('try_again', 'Try Again')}
+            {t('try_again')}
           </Button>
         </GlassCard>
       )}
@@ -436,7 +435,7 @@ export function NotificationsPage() {
                 onPress={loadMoreNotifications}
                 isLoading={isLoadingMore}
               >
-                {t('load_more', 'Load more')}
+                {t('load_more')}
               </Button>
             </div>
           )}
@@ -538,7 +537,7 @@ const NotificationCard = memo(function NotificationCard({ notification, onMarkRe
               </p>
               {isGrouped && (
                 <span className="text-[10px] text-theme-subtle bg-theme-elevated px-1.5 py-0.5 rounded-full">
-                  {notification.group_count} {t('notifications_count', 'notifications')}
+                  {notification.group_count} {t('notifications_count')}
                 </span>
               )}
             </div>
@@ -553,7 +552,7 @@ const NotificationCard = memo(function NotificationCard({ notification, onMarkRe
               size="sm"
               className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
               onPress={() => setIsExpanded(!isExpanded)}
-              aria-label={isExpanded ? t('collapse_group', 'Collapse') : t('expand_group', 'Expand')}
+              aria-label={isExpanded ? t('collapse_group') : t('expand_group')}
             >
               {isExpanded ? <ChevronUp className="w-4 h-4" aria-hidden="true" /> : <ChevronDown className="w-4 h-4" aria-hidden="true" />}
             </Button>
@@ -565,7 +564,7 @@ const NotificationCard = memo(function NotificationCard({ notification, onMarkRe
               size="sm"
               className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
               onPress={onMarkRead}
-              aria-label={isGrouped ? t('mark_group_read_aria', 'Mark group as read') : t('mark_read_aria')}
+              aria-label={isGrouped ? t('mark_group_read_aria') : t('mark_read_aria')}
             >
               <Check className="w-4 h-4" aria-hidden="true" />
             </Button>
@@ -611,7 +610,7 @@ const NotificationCard = memo(function NotificationCard({ notification, onMarkRe
             ))}
             {(notification.remaining_count ?? 0) > 0 && (
               <p className="text-xs text-theme-subtle pl-10">
-                {t('and_others', 'and {{count}} others', { count: notification.remaining_count })}
+                {t('and_others', { count: notification.remaining_count })}
               </p>
             )}
           </motion.div>

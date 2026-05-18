@@ -196,15 +196,15 @@ export function NotificationsTab({
             />
 
             <SettingToggle
-              label={t('notification_prefs.caring_smart_nudges', 'Caring community smart nudges')}
-              description={t('notification_descriptions.caring_smart_nudges', 'Personalised reminders to check in on members who may need support. Sent only when our caring-community engine identifies a clear, actionable nudge — never bulk.')}
+              label={t('notification_prefs.caring_smart_nudges')}
+              description={t('notification_descriptions.caring_smart_nudges')}
               checked={notifications.caring_smart_nudges}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, caring_smart_nudges: checked }))}
             />
 
             <SettingToggle
-              label={t('notification_prefs.federation_notifications', 'Cross-platform federation notifications')}
-              description={t('notification_descriptions.federation_notifications', 'Notifications about activity from members on partner timebanks (reviews left for you, connection requests, etc.). Turn off if you only want notifications about activity on this platform.')}
+              label={t('notification_prefs.federation_notifications')}
+              description={t('notification_descriptions.federation_notifications')}
               checked={notifications.federation_notifications_enabled}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, federation_notifications_enabled: checked }))}
             />
@@ -280,17 +280,14 @@ export function NotificationsTab({
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                   <p className="font-medium text-theme-primary">
-                    {t('notification_prefs.activity_digest', 'Activity digest frequency')}
+                    {t('notification_prefs.activity_digest')}
                   </p>
                   <p className="text-sm text-theme-subtle">
-                    {t(
-                      'notification_descriptions.activity_digest',
-                      'How often to email you a digest of activity in your groups and threads. Direct messages, connection requests, and transaction confirmations are always sent immediately regardless of this setting.'
-                    )}
+                    {t('notification_descriptions.activity_digest')}
                   </p>
                 </div>
                 <Select
-                  aria-label={t('notification_prefs.activity_digest', 'Activity digest frequency')}
+                  aria-label={t('notification_prefs.activity_digest')}
                   selectedKeys={[digestFrequency]}
                   onSelectionChange={(keys) => {
                     const value = Array.from(keys)[0] as string;
@@ -302,10 +299,10 @@ export function NotificationsTab({
                     value: 'text-theme-primary',
                   }}
                 >
-                  <SelectItem key="off">{t('activity_digest.off', 'Off')}</SelectItem>
-                  <SelectItem key="instant">{t('activity_digest.instant', 'Instant')}</SelectItem>
-                  <SelectItem key="daily">{t('activity_digest.daily', 'Daily')}</SelectItem>
-                  <SelectItem key="monthly">{t('activity_digest.monthly', 'Monthly')}</SelectItem>
+                  <SelectItem key="off">{t('activity_digest.off')}</SelectItem>
+                  <SelectItem key="instant">{t('activity_digest.instant')}</SelectItem>
+                  <SelectItem key="daily">{t('activity_digest.daily')}</SelectItem>
+                  <SelectItem key="monthly">{t('activity_digest.monthly')}</SelectItem>
                 </Select>
               </div>
             </div>
@@ -409,11 +406,11 @@ export function NotificationsTab({
               label={t('notification_prefs.enable_push')}
               description={
                 !webPush.isSupported
-                  ? t('push_status.unsupported', 'Your browser does not support push notifications.')
+                  ? t('push_status.unsupported')
                   : webPush.permission === 'denied'
-                    ? t('push_status.denied', 'You have blocked notifications. Update your browser settings to re-enable.')
+                    ? t('push_status.denied')
                     : webPush.isSubscribed
-                      ? t('push_status.subscribed', 'You are subscribed on this device.')
+                      ? t('push_status.subscribed')
                       : t('notification_descriptions.enable_push')
               }
               checked={pushToggleChecked}

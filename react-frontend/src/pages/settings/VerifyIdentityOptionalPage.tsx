@@ -74,6 +74,7 @@ export function VerifyIdentityOptionalPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [isStarting, setIsStarting] = useState(false);
   const [feeCents, setFeeCents] = useState(0);
+  const [feeCurrency, setFeeCurrency] = useState('EUR');
   const [dob, setDob] = useState('');
   const [isSavingDob, setIsSavingDob] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -95,6 +96,7 @@ export function VerifyIdentityOptionalPage() {
 
       const data = response.data;
       setFeeCents(data.fee_cents || 0);
+      setFeeCurrency(data.fee_currency || 'EUR');
 
       if (data.has_id_verified_badge) {
         setPageState('verified');
@@ -130,9 +132,9 @@ export function VerifyIdentityOptionalPage() {
       }
     } catch {
       setPageState('error');
-      setErrorMessage('Unable to check verification status. Please try again.');
+      setErrorMessage(t('identity.error_check_status'));
     }
-  }, [stopPolling]);
+  }, [stopPolling, t]);
 
   const startPolling = useCallback(() => {
     stopPolling();
@@ -148,7 +150,7 @@ export function VerifyIdentityOptionalPage() {
   // ─── Handlers ──────────────────────────────────────────────────────
 
   const handleSaveDob = async () => {
-    if (!dob) { setErrorMessage('Please enter your date of birth.'); return; }
+    if (!dob) { setErrorMessage(t('identity.error_missing_dob')); return; }
     setIsSavingDob(true);
     setErrorMessage('');
     try {
@@ -208,7 +210,7 @@ export function VerifyIdentityOptionalPage() {
       if (!response.success) {
         if (response.code === 'DOB_REQUIRED') { setPageState('dob_collection'); return; }
         if (response.code === 'PAYMENT_REQUIRED') { setPageState('payment_required'); return; }
-        setErrorMessage(response.error || 'Unable to start verification.');
+        setErrorMessage(response.error || t('identity.error_start_verification'));
         userStartedRef.current = false;
         return;
       }
@@ -225,7 +227,7 @@ export function VerifyIdentityOptionalPage() {
         }
       }
     } catch {
-      setErrorMessage('Unable to start verification. Please try again later.');
+      setErrorMessage(t('identity.error_start_verification'));
     } finally {
       setIsStarting(false);
     }
@@ -377,7 +379,10 @@ export function VerifyIdentityOptionalPage() {
   // ─── Payment Required ──────────────────────────────────────────────
 
   if (pageState === 'payment_required') {
-    const feeDisplay = `€${(feeCents / 100).toFixed(2)}`;
+    const feeDisplay = new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency: feeCurrency,
+    }).format(feeCents / 100);
 
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
@@ -469,10 +474,10 @@ export function VerifyIdentityOptionalPage() {
             <div className="space-y-4">
               <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
                 <h3 className="font-medium text-theme-primary text-sm mb-2">{t('identity.what_needed_title')}</h3>
-                <ul className="text-sm text-theme-muted space-y-1">
-                  <li>• {t('identity.need_document')}</li>
-                  <li>• {t('identity.need_camera')}</li>
-                  <li>• {t('identity.need_minutes')}</li>
+                <ul className="list-disc space-y-1 pl-5 text-sm text-theme-muted">
+                  <li>{t('identity.need_document')}</li>
+                  <li>{t('identity.need_camera')}</li>
+                  <li>{t('identity.need_minutes')}</li>
                 </ul>
               </div>
 

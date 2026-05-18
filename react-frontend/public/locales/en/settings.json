@@ -44,7 +44,10 @@
     "waiting": "Waiting for verification result...",
     "cancel_start_over": "Cancel & Start Over",
     "error_save_dob": "Failed to save date of birth. Please try again.",
-    "error_create_payment": "Failed to create payment. Please try again."
+    "error_create_payment": "Failed to create payment. Please try again.",
+    "error_check_status": "Unable to check verification status. Please try again.",
+    "error_missing_dob": "Please enter your date of birth.",
+    "error_start_verification": "Unable to start verification. Please try again later."
   },
   "identity_verified_lock_dob": "Your date of birth is locked because your identity has been verified.",
   "marketing_consent_confirm_title": "Subscribe to Marketing Emails",
@@ -222,7 +225,10 @@
     "hot_match_alerts": "Hot Match Alerts",
     "mutual_match_alerts": "Mutual Match Alerts",
     "enable_push": "Enable Push Notifications",
-    "marketing_emails": "Marketing Emails"
+    "marketing_emails": "Marketing Emails",
+    "caring_smart_nudges": "Caring community smart nudges",
+    "federation_notifications": "Cross-platform federation notifications",
+    "activity_digest": "Activity digest frequency"
   },
   "privacy_prefs": {
     "profile_visibility": "Who can see your profile",
@@ -289,7 +295,10 @@
   },
   "header": {
     "title": "Settings",
-    "subtitle": "Manage your account preferences"
+    "subtitle": "Manage your account preferences",
+    "badge": "Account controls",
+    "unsaved_badge": "Unsaved changes",
+    "current_section": "Current section"
   },
   "save_changes": "Save Changes",
   "save_preferences": "Save Preferences",
@@ -321,7 +330,10 @@
     "hot_match_alerts": "Get notified about high-compatibility matches",
     "mutual_match_alerts": "Get notified when someone you matched with also matches you",
     "enable_push": "Receive real-time notifications on your device",
-    "marketing_emails": "Receive newsletters, promotions, and community updates"
+    "marketing_emails": "Receive newsletters, promotions, and community updates",
+    "caring_smart_nudges": "Personalised reminders to check in on members who may need support. Sent only when our caring-community engine identifies a clear, actionable nudge.",
+    "federation_notifications": "Notifications about activity from members on partner timebanks, including reviews, connection requests, and other cross-community updates.",
+    "activity_digest": "How often to email you a digest of activity in your groups and threads. Direct messages, connection requests, and transaction confirmations are always sent immediately."
   },
   "match_digest": {
     "frequency": "Digest Frequency",
@@ -558,6 +570,9 @@
     "title": "Blocked Users",
     "subtitle": "Manage users you have blocked",
     "description": "Blocked members cannot view your profile, message you, or interact with your content.",
+    "privacy_badge": "Privacy control",
+    "summary_label": "Blocked members",
+    "count": "{{count}} blocked",
     "empty": "No blocked users",
     "empty_desc": "Users you block won't be able to see your profile, message you, or interact with your content.",
     "unblock": "Unblock",

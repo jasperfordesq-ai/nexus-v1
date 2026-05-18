@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+import { Button, Avatar, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldOff from 'lucide-react/icons/shield-off';
 import UserX from 'lucide-react/icons/user-x';
@@ -85,24 +85,35 @@ export function BlockedUsersPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-0">
       <PageMeta title={t('blocked_users.title')} noIndex />
 
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link to={tenantPath('/settings?tab=privacy')}>
-          <Button isIconOnly variant="light" aria-label={t('back', { ns: 'common' })}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <ShieldOff className="w-7 h-7 text-[var(--color-error)]" />
-            {t('blocked_users.title')}
-          </h1>
-          <p className="text-theme-muted mt-1">{t('blocked_users.subtitle')}</p>
+      <header className="overflow-hidden rounded-2xl border border-theme-default bg-theme-surface">
+        <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex max-w-2xl items-start gap-4">
+            <Link to={tenantPath('/settings?tab=privacy')}>
+              <Button isIconOnly variant="flat" className="bg-theme-elevated text-theme-primary" aria-label={t('back', { ns: 'common' })}>
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+            <div>
+              <Chip size="sm" variant="flat" color="danger" className="mb-3 font-medium">
+                {t('blocked_users.privacy_badge')}
+              </Chip>
+              <h1 className="flex items-center gap-3 text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
+                <ShieldOff className="h-8 w-8 text-[var(--color-error)]" />
+                {t('blocked_users.title')}
+              </h1>
+              <p className="mt-2 text-sm leading-6 text-theme-muted sm:text-base">{t('blocked_users.subtitle')}</p>
+            </div>
+          </div>
+          <div className="rounded-xl border border-theme-default bg-theme-elevated px-4 py-3 lg:min-w-64">
+            <span className="block text-xs font-medium uppercase tracking-wide text-theme-subtle">{t('blocked_users.summary_label')}</span>
+            <span className="mt-1 block font-semibold text-theme-primary">{t('blocked_users.count', { count: blockedUsers.length })}</span>
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* List */}
       {blockedUsers.length === 0 ? (
@@ -115,11 +126,11 @@ export function BlockedUsersPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="space-y-3"
+          className="grid gap-3"
         >
           {blockedUsers.map((user) => (
-            <GlassCard key={user.user_id} className="p-4">
-              <div className="flex items-center gap-4">
+            <GlassCard key={user.user_id} className="p-4 sm:p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Avatar
                   src={resolveAvatarUrl(user.avatar_url)}
                   name={user.name}
@@ -141,7 +152,7 @@ export function BlockedUsersPage() {
                 <Button
                   size="sm"
                   variant="flat"
-                  className="bg-red-500/10 text-red-600 dark:text-red-400"
+                  className="bg-red-500/10 text-red-600 dark:text-red-400 sm:ml-auto"
                   onPress={() => setUnblockTarget(user)}
                 >
                   {t('blocked_users.unblock')}

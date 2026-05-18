@@ -16,6 +16,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Chip,
 } from '@heroui/react';
 import Download from 'lucide-react/icons/download';
 import ShieldCheck from 'lucide-react/icons/shield-check';
@@ -157,26 +158,37 @@ export function DataExportPage(): JSX.Element {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-3xl mx-auto space-y-6 p-4"
+      className="mx-auto max-w-5xl space-y-6 p-4"
     >
       <PageMeta title={t('data_export.meta.title')} noIndex />
 
       {/* Hero */}
-      <GlassCard className="p-6">
-        <div className="flex items-start gap-3">
-          <div className="rounded-full bg-indigo-500/10 p-2">
-            <ShieldCheck className="w-6 h-6 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+      <header className="overflow-hidden rounded-2xl border border-theme-default bg-theme-surface">
+        <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex max-w-2xl items-start gap-4">
+            <div className="rounded-2xl bg-indigo-500/15 p-3">
+              <ShieldCheck className="h-7 w-7 text-indigo-500" aria-hidden="true" />
+            </div>
+            <div className="space-y-2">
+              <Chip size="sm" variant="flat" color="primary" className="font-medium">
+                {t('data_export.format.label')}
+              </Chip>
+              <h1 className="text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">{t('data_export.title')}</h1>
+              <p className="text-sm leading-6 text-theme-muted sm:text-base">{t('data_export.subtitle')}</p>
+              <p className="text-sm leading-6 text-theme-muted">{t('data_export.intro')}</p>
+            </div>
           </div>
-          <div className="flex-1 space-y-2">
-            <h1 className="text-2xl font-bold text-theme-primary">{t('data_export.title')}</h1>
-            <p className="text-theme-muted">{t('data_export.subtitle')}</p>
-            <p className="text-theme-muted text-sm">{t('data_export.intro')}</p>
+          <div className="rounded-xl border border-theme-default bg-theme-elevated px-4 py-3 lg:min-w-72">
+            <span className="block text-xs font-medium uppercase tracking-wide text-theme-subtle">{t('data_export.history.title')}</span>
+            <span className="mt-1 block font-semibold text-theme-primary">
+              {isLoadingHistory ? t('data_export.downloading') : t('data_export.history.count', { count: history.length })}
+            </span>
           </div>
         </div>
-      </GlassCard>
+      </header>
 
       {/* Format + download */}
-      <GlassCard className="p-6 space-y-6">
+      <GlassCard className="space-y-6 p-5 sm:p-6">
         <RadioGroup
           label={t('data_export.format.label')}
           value={format}
@@ -201,7 +213,7 @@ export function DataExportPage(): JSX.Element {
             onPress={handleDownload}
             isLoading={isDownloading}
             startContent={!isDownloading ? <Download className="w-4 h-4" aria-hidden="true" /> : null}
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white sm:w-auto"
           >
             {isDownloading ? t('data_export.downloading') : t('data_export.download_button')}
           </Button>
@@ -209,7 +221,7 @@ export function DataExportPage(): JSX.Element {
       </GlassCard>
 
       {/* History */}
-      <GlassCard className="p-6">
+      <GlassCard className="p-5 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
           <History className="w-5 h-5 text-indigo-500" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary">{t('data_export.history.title')}</h2>

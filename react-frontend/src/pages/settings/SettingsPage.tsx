@@ -22,6 +22,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
+  Chip,
   Tabs,
   Tab,
   Modal,
@@ -244,6 +245,7 @@ export function SettingsPage() {
   const [insuranceLoading, setInsuranceLoading] = useState(false);
   const [insuranceUploading, setInsuranceUploading] = useState(false);
   const [insuranceType, setInsuranceType] = useState('public_liability');
+  const activeTabLabel = t(`tabs.${activeTab === 'linked-accounts' ? 'linked' : activeTab === 'connected-accounts' ? 'connected_accounts' : activeTab}`);
 
   const applyTabSelection = useCallback((tab: SettingsTabKey) => {
     setActiveTab(tab);
@@ -909,30 +911,43 @@ export function SettingsPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="max-w-3xl mx-auto space-y-6"
+      className="mx-auto max-w-5xl space-y-6"
     >
       <PageMeta title={t('page_meta.title')} noIndex />
       {/* Header */}
-      <motion.div variants={itemVariants}>
-        <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-          <Settings className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-          {t("header.title")}
-        </h1>
-        <p className="text-theme-muted mt-1">{t("header.subtitle")}</p>
+      <motion.div variants={itemVariants} className="overflow-hidden rounded-2xl border border-theme-default bg-theme-surface">
+        <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl">
+            <Chip size="sm" variant="flat" color={isDirty ? 'warning' : 'primary'} className="mb-3 font-medium">
+              {isDirty ? t('header.unsaved_badge') : t('header.badge')}
+            </Chip>
+            <h1 className="flex items-center gap-3 text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
+              <Settings className="h-8 w-8 text-indigo-500" aria-hidden="true" />
+              {t('header.title')}
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-theme-muted sm:text-base">{t('header.subtitle')}</p>
+          </div>
+          <div className="rounded-xl border border-theme-default bg-theme-elevated px-4 py-3 lg:min-w-72">
+            <span className="block text-xs font-medium uppercase tracking-wide text-theme-subtle">
+              {t('header.current_section')}
+            </span>
+            <span className="mt-1 block font-semibold text-theme-primary">{activeTabLabel}</span>
+          </div>
+        </div>
       </motion.div>
 
       {/* Tabs */}
       <motion.div
         variants={itemVariants}
-        className="relative max-w-full after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-10 after:rounded-r-lg after:bg-gradient-to-l after:from-[var(--background)] after:via-[var(--background)]/80 after:to-transparent after:shadow-[-10px_0_18px_rgba(0,0,0,0.08)] sm:after:hidden"
+        className="relative max-w-full rounded-2xl border border-theme-default bg-theme-surface p-2 after:pointer-events-none after:absolute after:inset-y-2 after:right-2 after:w-10 after:rounded-r-xl after:bg-gradient-to-l after:from-[var(--background)] after:via-[var(--background)]/80 after:to-transparent sm:after:hidden"
       >
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={handleTabSelection}
           classNames={{
             base: 'w-full max-w-full',
-            tabList: 'w-full max-w-full justify-start gap-1 bg-theme-elevated p-1 rounded-lg overflow-x-auto flex-nowrap overscroll-x-contain scrollbar-hide',
-            cursor: 'bg-theme-hover',
+            tabList: 'w-full max-w-full justify-start gap-1 bg-transparent p-0 overflow-x-auto flex-nowrap overscroll-x-contain scrollbar-hide',
+            cursor: 'bg-theme-elevated shadow-sm',
             tab: 'w-auto flex-none px-2.5 sm:px-3 text-sm text-theme-muted data-[selected=true]:text-theme-primary',
             tabContent: 'whitespace-nowrap',
           }}
