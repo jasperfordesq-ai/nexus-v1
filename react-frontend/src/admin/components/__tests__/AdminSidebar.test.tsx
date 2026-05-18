@@ -135,6 +135,13 @@ describe('AdminSidebar', () => {
     expect(screen.getByText('Dashboard')).toBeTruthy();
   });
 
+  it('keeps Broker Panel visible as a pinned admin link', () => {
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+    expect(screen.getByText('Broker Panel')).toBeTruthy();
+  });
+
   it('applies w-16 class when collapsed', () => {
     const { container } = render(
       <W><AdminSidebar collapsed={true} onToggle={mockOnToggle} /></W>
@@ -158,6 +165,6 @@ describe('AdminSidebar', () => {
     // Section labels translated via admin_nav namespace
     expect(screen.getByText('Users')).toBeTruthy();
     expect(screen.getByText('Content')).toBeTruthy();
-    expect(screen.getByText('System')).toBeTruthy();
+    expect(screen.getByText('Platform Operations')).toBeTruthy();
   });
 });
