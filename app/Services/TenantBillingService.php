@@ -831,7 +831,7 @@ class TenantBillingService
         string $link,
         array $ctaText
     ): void {
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         TenantContext::setById($tenantId);
 
         try {

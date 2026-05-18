@@ -110,7 +110,7 @@ class SendGridWebhookController extends BaseApiController
                 continue;
             }
 
-            $previousTenantId = TenantContext::getId();
+            $previousTenantId = TenantContext::currentId();
 
             // Validate tenant exists AND is active before accepting the tenant_id from payload
             if ($tenantId > 0) {

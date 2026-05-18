@@ -754,7 +754,7 @@ class MarketplacePaymentService
 
         // Notify buyer of the refund
         if ($order) {
-            $previousTenantId = TenantContext::getId();
+            $previousTenantId = TenantContext::currentId();
             try {
                 TenantContext::setById((int) $payment->tenant_id);
 

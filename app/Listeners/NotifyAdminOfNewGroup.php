@@ -65,7 +65,7 @@ class NotifyAdminOfNewGroup implements ShouldQueue
                     continue;
                 }
 
-                LocaleContext::withLocale($admin, function () use ($admin, $group, $groupName, $groupUrl, $creatorName, $tenantName, $adminEmail) {
+                LocaleContext::withLocale($admin, function () use ($admin, $group, $groupName, $groupUrl, $creatorName, $tenantName, $adminEmail, $event) {
                     $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
 
                     $bellContent = __('emails_misc.admin_notify.new_group_bell', ['name' => $groupName]);
@@ -86,7 +86,7 @@ class NotifyAdminOfNewGroup implements ShouldQueue
                         ->button(__('emails_misc.admin_notify.new_group_cta'), $groupUrl)
                         ->render();
 
-                    if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_group')) {
+                    if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_group', ['tenant_id' => $event->tenantId])) {
                         Log::warning('NotifyAdminOfNewGroup: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                     }
                 });

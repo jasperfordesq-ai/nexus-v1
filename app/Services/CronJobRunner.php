@@ -287,10 +287,30 @@ class CronJobRunner
     }
 
 
+    private function repairNotificationQueueTenantIds(): int
+    {
+        try {
+            return DB::update(
+                "UPDATE notification_queue q
+                 JOIN users u ON u.id = q.user_id
+                    SET q.tenant_id = u.tenant_id
+                  WHERE q.tenant_id IS NULL"
+            );
+        } catch (\Throwable $e) {
+            Log::warning('CronJobRunner: notification_queue tenant_id repair failed', [
+                'error' => $e->getMessage(),
+            ]);
+            return 0;
+        }
+    }
+
+
     private function processDigest($frequency)
     {
         header('Content-Type: text/plain');
         echo "Starting $frequency digest processing...\n";
+
+        $this->repairNotificationQueueTenantIds();
 
         DB::update(
             "UPDATE notification_queue
@@ -301,10 +321,11 @@ class CronJobRunner
         );
 
         // 1. Find users with pending items for this frequency
-        $sql = "SELECT user_id, COUNT(*) as count
-                FROM notification_queue
-                WHERE frequency = ? AND status = 'pending'
-                GROUP BY user_id";
+        $sql = "SELECT q.user_id, q.tenant_id, COUNT(*) as count
+                FROM notification_queue q
+                JOIN users u ON u.id = q.user_id AND u.tenant_id = q.tenant_id
+                WHERE q.frequency = ? AND q.status = 'pending'
+                GROUP BY q.user_id, q.tenant_id";
 
         $users = array_map(fn($r) => (array) $r, DB::select($sql, [$frequency]));
 
@@ -326,11 +347,20 @@ class CronJobRunner
             TenantContext::reset();
 
             $userId = $uRow['user_id'];
+            $userTenantId = (int) $uRow['tenant_id'];
             $count = $uRow['count'];
+
+            TenantContext::setById($userTenantId);
 
             $user = User::findById($userId);
             if (!$user || empty($user['email'])) {
                 echo "Skipping User ID $userId (No email/Invalid).\n";
+                DB::update(
+                    "UPDATE notification_queue
+                        SET status = 'failed'
+                      WHERE user_id = ? AND tenant_id = ? AND frequency = ? AND status = 'pending'",
+                    [$userId, $userTenantId, $frequency]
+                );
                 continue;
             }
 
@@ -357,7 +387,7 @@ class CronJobRunner
                             SET status = 'sent', sent_at = NOW()
                           WHERE user_id = ? AND frequency = ? AND status = 'pending'
                             AND tenant_id = ?",
-                        [$userId, $frequency, $user['tenant_id']]
+                        [$userId, $frequency, $userTenantId]
                     );
                     continue;
                 }
@@ -373,8 +403,8 @@ class CronJobRunner
             // Race condition fix: atomically claim items by setting status='processing'
             $claimSql = "UPDATE notification_queue
                          SET status = 'processing'
-                         WHERE user_id = ? AND frequency = ? AND status = 'pending'";
-            $claimed = DB::update($claimSql, [$userId, $frequency]);
+                         WHERE user_id = ? AND tenant_id = ? AND frequency = ? AND status = 'pending'";
+            $claimed = DB::update($claimSql, [$userId, $userTenantId, $frequency]);
 
             if ($claimed === 0) {
                 echo " - Items already claimed by another runner, skipping.\n";
@@ -383,9 +413,9 @@ class CronJobRunner
 
             // Fetch the items we just claimed
             $itemsSql = "SELECT * FROM notification_queue
-                         WHERE user_id = ? AND frequency = ? AND status = 'processing'
+                         WHERE user_id = ? AND tenant_id = ? AND frequency = ? AND status = 'processing'
                          ORDER BY created_at ASC";
-            $items = array_map(fn($r) => (array) $r, DB::select($itemsSql, [$userId, $frequency]));
+            $items = array_map(fn($r) => (array) $r, DB::select($itemsSql, [$userId, $userTenantId, $frequency]));
 
             // Render digest in the RECIPIENT's preferred language — cron workers
             // default to config('app.locale') = 'en' otherwise.
@@ -406,8 +436,7 @@ class CronJobRunner
                 // matching an ID range) from crossing tenants. The user's tenant
                 // is the authoritative source here.
                 $ids = array_column($items, 'id');
-                $userTenantId = $user['tenant_id'] ?? null;
-                if (!empty($ids) && $userTenantId) {
+                if (!empty($ids)) {
                     $inQuery = implode(',', array_fill(0, count($ids), '?'));
                     $updateSql = "UPDATE notification_queue SET status = 'sent', sent_at = NOW()
                                   WHERE id IN ($inQuery) AND tenant_id = ?";
@@ -419,8 +448,7 @@ class CronJobRunner
 
                 // Revert processing items back to pending so they can be retried
                 $ids = array_column($items, 'id');
-                $userTenantId = $user['tenant_id'] ?? null;
-                if (!empty($ids) && $userTenantId) {
+                if (!empty($ids)) {
                     $inQuery = implode(',', array_fill(0, count($ids), '?'));
                     $revertSql = "UPDATE notification_queue SET status = 'pending'
                                   WHERE id IN ($inQuery) AND tenant_id = ?";
@@ -453,10 +481,12 @@ class CronJobRunner
                 return;
             }
 
+            $this->repairNotificationQueueTenantIds();
+
             // Race condition fix: atomically claim up to 50 pending items
             $claimSql = "UPDATE notification_queue
                          SET status = 'processing'
-                         WHERE frequency = 'instant' AND status = 'pending'
+                         WHERE frequency = 'instant' AND status = 'pending' AND tenant_id IS NOT NULL
                          ORDER BY created_at ASC
                          LIMIT 50";
             $claimed = DB::update($claimSql);
@@ -468,7 +498,7 @@ class CronJobRunner
                 // to avoid picking up stale items from crashed previous runs
                 $sql = "SELECT q.*, u.email, u.name, u.tenant_id as user_tenant_id, u.preferred_language
                         FROM notification_queue q
-                        JOIN users u ON q.user_id = u.id
+                        JOIN users u ON q.user_id = u.id AND q.tenant_id = u.tenant_id
                         WHERE q.frequency = 'instant' AND q.status = 'processing'
                         ORDER BY q.created_at ASC
                         LIMIT 50";
@@ -532,7 +562,7 @@ class CronJobRunner
             }
 
             // Clean up any stale 'processing' items older than 10 minutes (from crashed runs)
-            DB::update("UPDATE notification_queue SET status = 'failed' WHERE status = 'processing' AND created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)");
+            DB::update("UPDATE notification_queue SET status = 'failed' WHERE frequency = 'instant' AND status = 'processing' AND created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)");
             Cache::forget($lockKey);
 
             echo "Done.\n";
@@ -1307,17 +1337,19 @@ class CronJobRunner
             return;
         }
 
+        try {
+        $this->repairNotificationQueueTenantIds();
+
         // Race condition fix: atomically claim up to 50 pending items
         $claimSql = "UPDATE notification_queue
                      SET status = 'processing'
-                     WHERE frequency = 'instant' AND status = 'pending'
+                     WHERE frequency = 'instant' AND status = 'pending' AND tenant_id IS NOT NULL
                      ORDER BY created_at ASC
                      LIMIT 50";
         $claimed = DB::update($claimSql);
 
         if ($claimed === 0) {
             echo "   No pending instant notifications.\n";
-            Cache::forget($lockKey);
             return;
         }
 
@@ -1327,7 +1359,7 @@ class CronJobRunner
         // cron worker's. Mirrors the public runInstantQueue() at line 409.
         $sql = "SELECT q.*, u.email, u.name, u.tenant_id as user_tenant_id, u.preferred_language
                 FROM notification_queue q
-                JOIN users u ON q.user_id = u.id
+                JOIN users u ON q.user_id = u.id AND q.tenant_id = u.tenant_id
                 WHERE q.frequency = 'instant' AND q.status = 'processing'
                 ORDER BY q.created_at ASC
                 LIMIT 50";
@@ -1383,10 +1415,12 @@ class CronJobRunner
         }
 
         // Clean up any stale 'processing' items older than 10 minutes (from crashed runs)
-        DB::update("UPDATE notification_queue SET status = 'failed' WHERE status = 'processing' AND created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)");
-        Cache::forget($lockKey);
+        DB::update("UPDATE notification_queue SET status = 'failed' WHERE frequency = 'instant' AND status = 'processing' AND created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)");
 
         echo "   Sent $sent instant notifications.\n";
+        } finally {
+            Cache::forget($lockKey);
+        }
     }
 
     /**

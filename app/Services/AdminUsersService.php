@@ -66,7 +66,7 @@ class AdminUsersService
             ->update(['status' => 'banned', 'ban_reason' => $reason, 'updated_at' => now()]);
 
         if ($affected > 0 && $user && !empty($user->email)) {
-            $previousTenantId = TenantContext::getId();
+            $previousTenantId = TenantContext::currentId();
             try {
                 TenantContext::setById($tenantId);
                 LocaleContext::withLocale($user, function () use ($user, $reason, $userId) {
@@ -113,7 +113,7 @@ class AdminUsersService
             ->update(['status' => 'active', 'ban_reason' => null, 'updated_at' => now()]);
 
         if ($affected > 0 && $user && !empty($user->email)) {
-            $previousTenantId = TenantContext::getId();
+            $previousTenantId = TenantContext::currentId();
             try {
                 TenantContext::setById($tenantId);
                 LocaleContext::withLocale($user, function () use ($user, $userId) {

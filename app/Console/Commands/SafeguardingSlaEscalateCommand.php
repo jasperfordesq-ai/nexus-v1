@@ -56,7 +56,7 @@ class SafeguardingSlaEscalateCommand extends Command
         $tenantsProcessed = 0;
         $tenantsSkipped = 0;
 
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
 
         foreach ($tenantIds as $tenantId) {
             if ($tenantId <= 0) {

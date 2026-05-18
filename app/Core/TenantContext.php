@@ -340,6 +340,21 @@ class TenantContext
     }
 
     /**
+     * Return the tenant already set on this request/job without resolving a
+     * default tenant from host state. Use this in queued email paths where a
+     * missing tenant must remain visible instead of silently becoming tenant 1.
+     */
+    public static function currentId(): ?int
+    {
+        if (self::$cachedId !== null) {
+            return self::$cachedId;
+        }
+
+        $id = self::$tenant['id'] ?? null;
+        return $id !== null ? (int) $id : null;
+    }
+
+    /**
      * Reset all per-request tenant state. Required for Octane/Swoole-style
      * persistent workers; safe no-op under PHP-FPM/mod_php.
      */

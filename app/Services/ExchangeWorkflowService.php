@@ -795,7 +795,7 @@ class ExchangeWorkflowService
                 ->first();
 
             if ($exchange) {
-                $previousTenantId = TenantContext::getId();
+                $previousTenantId = TenantContext::currentId();
                 try {
                     TenantContext::setById((int) $exchange->tenant_id);
                     $link        = '/exchanges/' . $exchangeId;
@@ -935,7 +935,7 @@ class ExchangeWorkflowService
      */
     private static function sendDisputeResolvedEmails(ExchangeRequest $exchange, float $finalHours): void
     {
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         if (!empty($exchange->tenant_id)) {
             TenantContext::setById((int) $exchange->tenant_id);
         }

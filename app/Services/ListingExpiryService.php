@@ -136,7 +136,7 @@ class ListingExpiryService
             return ['total_expired' => 0, 'total_errors' => 1, 'tenants_processed' => 0];
         }
 
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         try {
             foreach ($tenantIds as $tenantId) {
                 try {

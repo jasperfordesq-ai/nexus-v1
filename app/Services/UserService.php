@@ -445,7 +445,7 @@ class UserService
 
         // Security notification: bell + email to OLD address when email is changed
         if ($oldEmail && isset($data['email']) && $oldEmail !== $data['email']) {
-            LocaleContext::withLocale($userLocale, function () use ($userId, $oldEmail) {
+            LocaleContext::withLocale($userLocale, function () use ($userId, $oldEmail, $updated) {
                 try {
                     Notification::createNotification(
                         $userId,
@@ -469,7 +469,7 @@ class UserService
                         ->render();
 
                     $subject = __('emails.security.email_changed_subject', ['community' => $tenantName]);
-                    if (!EmailDispatchService::sendRaw($oldEmail, $subject, $html, null, null, null, 'security_alert')) {
+                    if (!EmailDispatchService::sendRaw($oldEmail, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $updated->tenant_id ?? TenantContext::currentId()])) {
                         Log::warning('Email change notification send returned false', ['user_id' => $userId]);
                     }
                 } catch (\Throwable $e) {

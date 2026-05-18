@@ -39,7 +39,7 @@ class PostFeedActivityOnVolLogApproved
             return;
         }
 
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
 
         try {
             TenantContext::setById($event->tenantId);

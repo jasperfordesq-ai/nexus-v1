@@ -541,7 +541,7 @@ class EventNotificationService
      */
     public function notifyEventCreated(int $tenantId, int $eventId, int $organizerId, bool $notifyInitialAttendees = false): void
     {
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
 
         try {
             TenantContext::setById($tenantId);
@@ -649,42 +649,54 @@ class EventNotificationService
             return false;
         }
 
-        // Respect user's notification frequency preference
-        $frequency = $this->getUserEventEmailFrequency($userId);
-
-        if ($frequency === 'off') {
-            return true;
+        $tenantId = $this->resolveRecipientTenantId($user);
+        if ($tenantId === null) {
+            Log::warning('[EventNotificationService] Could not resolve recipient tenant for email', [
+                'user_id' => $userId,
+                'type' => $type,
+            ]);
+            return false;
         }
 
-        if ($frequency === 'instant') {
-            // Send immediately
-            try {
-                $body   = $htmlBody ?? $this->buildDefaultEventEmailHtml($subject, $content, $link, $user);
-                $sent   = EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, 'event_notification');
-                if (!$sent) {
-                    Log::warning("[EventNotificationService] Instant email send returned false", [
-                        'user_id' => $userId,
-                        'type'    => $type,
-                    ]);
+        return (bool) TenantContext::runForTenant($tenantId, function () use ($user, $subject, $content, $link, $type, $htmlBody, $userId, $tenantId): bool {
+            // Respect user's notification frequency preference
+            $frequency = $this->getUserEventEmailFrequency($userId);
+
+            if ($frequency === 'off') {
+                return true;
+            }
+
+            if ($frequency === 'instant') {
+                // Send immediately
+                try {
+                    $body   = $htmlBody ?? $this->buildDefaultEventEmailHtml($subject, $content, $link, $user);
+                    $sent   = EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, 'event_notification', ['tenant_id' => $tenantId]);
+                    if (!$sent) {
+                        Log::warning("[EventNotificationService] Instant email send returned false", [
+                            'user_id' => $userId,
+                            'tenant_id' => $tenantId,
+                            'type'    => $type,
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning("[EventNotificationService] Instant email send failed: " . $e->getMessage());
+                    $sent = false;
                 }
-            } catch (\Throwable $e) {
-                Log::warning("[EventNotificationService] Instant email send failed: " . $e->getMessage());
-                $sent = false;
+
+                // Also send web push
+                try {
+                    WebPushService::sendToUserStatic($userId, $subject, $content, $link);
+                } catch (\Throwable $e) {
+                    Log::debug("[EventNotificationService] WebPush failed: " . $e->getMessage());
+                }
+
+                return (bool) $sent;
             }
 
-            // Also send web push
-            try {
-                WebPushService::sendToUserStatic($userId, $subject, $content, $link);
-            } catch (\Throwable $e) {
-                Log::debug("[EventNotificationService] WebPush failed: " . $e->getMessage());
-            }
-
-            return (bool) $sent;
-        } else {
             // Queue for daily/monthly digest
             try {
                 DB::table('notification_queue')->insert([
-                    'tenant_id'       => TenantContext::getId(),
+                    'tenant_id'       => $tenantId,
                     'user_id'         => $userId,
                     'activity_type'   => $type,
                     'content_snippet' => substr($content, 0, 250),
@@ -699,7 +711,34 @@ class EventNotificationService
                 Log::warning("[EventNotificationService] Email queue insert failed: " . $e->getMessage());
                 return false;
             }
+        });
+    }
+
+    private function resolveRecipientTenantId(object $user): ?int
+    {
+        if (!empty($user->tenant_id)) {
+            return (int) $user->tenant_id;
         }
+
+        $contextTenantId = TenantContext::currentId();
+        $userId = (int) ($user->user_id ?? $user->id ?? 0);
+        if ($userId <= 0) {
+            return $contextTenantId !== null ? (int) $contextTenantId : null;
+        }
+
+        try {
+            $tenantId = DB::table('users')->where('id', $userId)->value('tenant_id');
+            if ($tenantId !== null) {
+                return (int) $tenantId;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[EventNotificationService] Recipient tenant lookup failed', [
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return $contextTenantId !== null ? (int) $contextTenantId : null;
     }
 
     /**

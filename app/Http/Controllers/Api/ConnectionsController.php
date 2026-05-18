@@ -259,7 +259,7 @@ class ConnectionsController extends BaseApiController
                             ->render();
 
                         $subject = __('emails_security_alerts.connection_declined.subject', ['community' => $tenantName]);
-                        if (!EmailDispatchService::sendRaw($requester->email, $subject, $html, null, null, null, 'connection_declined')) {
+                        if (!EmailDispatchService::sendRaw($requester->email, $subject, $html, null, null, null, 'connection_declined', ['tenant_id' => $requester->tenant_id ?? TenantContext::currentId()])) {
                             Log::warning('[ConnectionsController] connection declined email failed to send', [
                                 'requester_id' => $requesterId,
                             ]);

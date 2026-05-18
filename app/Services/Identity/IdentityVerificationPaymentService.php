@@ -150,7 +150,7 @@ class IdentityVerificationPaymentService
         Log::info("Verification payment completed for session {$session['id']}");
 
         // Notify user that their verification fee was received
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         try {
             $userId   = (int) ($session['user_id'] ?? 0);
             $tenantId = (int) ($session['tenant_id'] ?? 0);
@@ -206,7 +206,7 @@ class IdentityVerificationPaymentService
         Log::warning("Verification payment failed for session {$session['id']}");
 
         // Notify user so they can retry
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         try {
             $userId   = (int) ($session['user_id'] ?? 0);
             $tenantId = (int) ($session['tenant_id'] ?? 0);

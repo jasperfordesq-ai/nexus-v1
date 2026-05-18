@@ -557,10 +557,10 @@ class RegistrationService
         }
 
         // Send the verification email
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         try {
             TenantContext::setById($tenantId);
-            LocaleContext::withLocale($user, function () use ($user, $token) {
+            LocaleContext::withLocale($user, function () use ($user, $token, $tenantId) {
                 $appUrl = TenantContext::getFrontendUrl();
                 $basePath = TenantContext::getSlugPrefix();
                 $verifyUrl = $appUrl . $basePath . '/verify-email?token=' . $token;
@@ -583,10 +583,10 @@ class RegistrationService
                     ->button(__('emails_misc.registration.verify_cta'), $verifyUrl)
                     ->render();
 
-                if (!EmailDispatchService::sendRaw($user->email, __('emails_misc.registration.verify_subject', ['tenant' => $tenantName]), $html, null, null, null, 'email_verification')) {
+                if (!EmailDispatchService::sendRaw($user->email, __('emails_misc.registration.verify_subject', ['tenant' => $tenantName]), $html, null, null, null, 'email_verification', ['tenant_id' => $tenantId])) {
                     Log::warning('RegistrationService: verification email send returned false', [
                         'user_id' => $user->id ?? null,
-                        'tenant_id' => TenantContext::getId(),
+                        'tenant_id' => $tenantId,
                     ]);
                 }
             });

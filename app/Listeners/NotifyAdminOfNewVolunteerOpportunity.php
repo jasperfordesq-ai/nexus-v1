@@ -66,7 +66,7 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
                     continue;
                 }
 
-                LocaleContext::withLocale($admin, function () use ($admin, $opportunity, $oppTitle, $oppUrl, $oppPath, $posterName, $tenantName, $adminEmail) {
+                LocaleContext::withLocale($admin, function () use ($admin, $opportunity, $oppTitle, $oppUrl, $oppPath, $posterName, $tenantName, $adminEmail, $event) {
                     $adminName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
 
                     $bellContent = __('emails_misc.admin_notify.new_vol_opp_bell', ['title' => $oppTitle]);
@@ -87,7 +87,7 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
                         ->button(__('emails_misc.admin_notify.new_vol_opp_cta'), $oppUrl)
                         ->render();
 
-                    if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_volunteer_opportunity')) {
+                    if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_volunteer_opportunity', ['tenant_id' => $event->tenantId])) {
                         Log::warning('NotifyAdminOfNewVolunteerOpportunity: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                     }
                 });

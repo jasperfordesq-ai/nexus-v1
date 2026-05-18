@@ -57,7 +57,7 @@ class AppreciationReceived
 
                 $subject = __('emails.appreciation.subject', ['sender' => $senderName]);
 
-                if (!EmailDispatchService::sendRaw($recipient->email, $subject, $builder->render(), null, null, null, 'appreciation')) {
+                if (!EmailDispatchService::sendRaw($recipient->email, $subject, $builder->render(), null, null, null, 'appreciation', ['tenant_id' => $recipient->tenant_id ?? TenantContext::currentId()])) {
                     Log::warning('[AppreciationReceived] email returned false', [
                         'recipient_id' => $recipient->id ?? null,
                     ]);

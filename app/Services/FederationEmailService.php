@@ -45,7 +45,7 @@ class FederationEmailService
             $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
-            $previousTenantId = TenantContext::getId();
+            $previousTenantId = TenantContext::currentId();
             TenantContext::setById($recipientTenantId);
 
             $sent = false;
@@ -124,7 +124,7 @@ class FederationEmailService
             $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
-            $previousTenantId = TenantContext::getId();
+            $previousTenantId = TenantContext::currentId();
             TenantContext::setById($recipientTenantId);
             $sent = false;
             try {
@@ -245,7 +245,7 @@ class FederationEmailService
      */
     public static function sendWeeklyDigest(int $userId, int $tenantId): bool
     {
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
 
         try {
             // Must set tenant context before any tenant-specific call (mailer, URLs, branding).
@@ -355,7 +355,7 @@ class FederationEmailService
             }
 
             $safeRequestingName = htmlspecialchars($requestingTenantName, ENT_QUOTES, 'UTF-8');
-            $previousTenantId = TenantContext::getId();
+            $previousTenantId = TenantContext::currentId();
 
             if (!TenantContext::setById($targetTenantId)) {
                 return false;
@@ -448,7 +448,7 @@ class FederationEmailService
             $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
-            $previousTenantId = TenantContext::getId();
+            $previousTenantId = TenantContext::currentId();
             TenantContext::setById($recipientTenantId);
             $sent = false;
             try {
@@ -521,7 +521,7 @@ class FederationEmailService
             $recipient = self::getUserBasicInfo($recipientUserId, $recipientTenantId);
             $recipientTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$recipientTenantId]);
 
-            $previousTenantId = TenantContext::getId();
+            $previousTenantId = TenantContext::currentId();
             TenantContext::setById($senderTenantId);
             $sent = false;
             try {

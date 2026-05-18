@@ -53,7 +53,7 @@ class WalletAlertService
             return;
         }
 
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         TenantContext::setById($tenantId);
         try {
             $sent = (bool) LocaleContext::withLocale($user, function () use ($user, $newBalance) {

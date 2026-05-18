@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Mail;
 
 use App\Core\EmailTemplateBuilder;
+use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Services\EmailDispatchService;
 use Illuminate\Support\Facades\Log;
@@ -40,7 +41,7 @@ class VereinCrossInvitationAccepted
 
                 $subject = __('emails.verein_federation.invitation_accepted_subject');
 
-                if (!EmailDispatchService::sendRaw($recipient->email, $subject, $builder->render(), null, null, null, 'verein_federation')) {
+                if (!EmailDispatchService::sendRaw($recipient->email, $subject, $builder->render(), null, null, null, 'verein_federation', ['tenant_id' => $recipient->tenant_id ?? TenantContext::currentId()])) {
                     Log::warning('[VereinCrossInvitationAccepted] email returned false', [
                         'recipient_id' => $recipient->id ?? null,
                     ]);

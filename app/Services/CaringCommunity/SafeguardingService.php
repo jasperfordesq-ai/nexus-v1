@@ -614,7 +614,6 @@ class SafeguardingService
                         'link'       => '/admin/caring-community/safeguarding/' . $reportId,
                         'is_read'    => 0,
                         'created_at' => $now,
-                        'updated_at' => $now,
                     ]);
                 } catch (\Throwable $e) {
                     Log::warning('[Safeguarding] Notification insert failed: ' . $e->getMessage());
@@ -637,7 +636,7 @@ class SafeguardingService
                     $mailable = new SafeguardingCriticalMail($reportPayload, $reporterName);
                     $subject  = (string) ($mailable->envelope()->subject ?? __('safeguarding.critical.subject'));
                     $html     = $mailable->render();
-                    $sent     = \App\Services\EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'safeguarding');
+                    $sent     = \App\Services\EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'safeguarding', ['tenant_id' => $tenantId]);
                     if (!$sent) {
                         Log::warning('[Safeguarding] Critical email returned false from Mailer', [
                             'user_id' => $userId,

@@ -65,7 +65,7 @@ class SendOnboardingCompletionEmail implements ShouldQueue
                 return [$subject, $html];
             });
 
-            $sent = EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'onboarding_completed');
+            $sent = EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'onboarding_completed', ['tenant_id' => $event->tenantId]);
 
             if (!$sent) {
                 Log::warning('SendOnboardingCompletionEmail: email returned false', [

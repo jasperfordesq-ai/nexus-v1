@@ -35,7 +35,7 @@ class GroupReportingService
         $sent = 0;
         $totalGroups = 0;
 
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
 
         try {
             $tenants = DB::table('tenants')

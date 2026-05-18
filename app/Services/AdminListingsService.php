@@ -95,7 +95,7 @@ class AdminListingsService
                 }
 
                 // Email notification
-                $previousTenantId = TenantContext::getId();
+                $previousTenantId = TenantContext::currentId();
                 try {
                     TenantContext::setById($tenantId);
                     if ($user && !empty($user->email)) {
@@ -184,7 +184,7 @@ class AdminListingsService
                 }
 
                 // Email notification
-                $previousTenantId = TenantContext::getId();
+                $previousTenantId = TenantContext::currentId();
                 try {
                     TenantContext::setById($tenantId);
                     if ($user && !empty($user->email)) {

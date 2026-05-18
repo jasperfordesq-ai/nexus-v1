@@ -10,6 +10,7 @@ namespace App\Services;
 
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -68,7 +69,7 @@ class EmailDispatchService
     public function send(string $to, string $subject, string $body, array $options = []): bool
     {
         $category = trim((string) ($options['category'] ?? ''));
-        $tenantId = $this->resolveTenantId($options);
+        $tenantId = $this->resolveTenantId($options, $to);
         $source = (string) ($options['source'] ?? 'EmailDispatchService');
 
         if ($category === '') {
@@ -125,15 +126,51 @@ class EmailDispatchService
     /**
      * @param array<string,mixed> $options
      */
-    private function resolveTenantId(array $options): ?int
+    private function resolveTenantId(array $options, string $to): ?int
     {
-        $tenantId = $options['tenant_id'] ?? $options['tenantId'] ?? TenantContext::getId();
+        $tenantId = $options['tenant_id'] ?? $options['tenantId'] ?? null;
 
         if ($tenantId === null || $tenantId === '') {
-            return null;
+            $tenantId = TenantContext::currentId();
+        }
+
+        if ($tenantId === null || $tenantId === '') {
+            return $this->resolveTenantIdFromRecipientEmail($to);
         }
 
         return (int) $tenantId;
+    }
+
+    private function resolveTenantIdFromRecipientEmail(string $email): ?int
+    {
+        try {
+            $tenantIds = DB::table('users')
+                ->whereRaw('LOWER(email) = ?', [mb_strtolower($email)])
+                ->whereNull('deleted_at')
+                ->distinct()
+                ->pluck('tenant_id')
+                ->filter(fn ($tenantId): bool => $tenantId !== null)
+                ->map(fn ($tenantId): int => (int) $tenantId)
+                ->values();
+
+            if ($tenantIds->count() === 1) {
+                return (int) $tenantIds->first();
+            }
+
+            if ($tenantIds->count() > 1) {
+                Log::warning('EmailDispatchService::send could not infer tenant because recipient email exists in multiple tenants', [
+                    'to' => $this->maskEmail($email),
+                    'tenant_ids' => $tenantIds->all(),
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('EmailDispatchService::send tenant inference failed', [
+                'to' => $this->maskEmail($email),
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return null;
     }
 
     private function maskEmail(string $email): string

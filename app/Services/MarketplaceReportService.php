@@ -442,7 +442,7 @@ class MarketplaceReportService
         $count = 0;
 
         foreach ($overdue as $report) {
-            $previousTenantId = TenantContext::getId();
+            $previousTenantId = TenantContext::currentId();
 
             $report->status = 'acknowledged';
             $report->acknowledged_at = now();

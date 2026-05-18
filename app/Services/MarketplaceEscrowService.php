@@ -177,7 +177,7 @@ class MarketplaceEscrowService
             ->get();
 
         foreach ($escrows as $escrow) {
-            $previousTenantId = TenantContext::getId();
+            $previousTenantId = TenantContext::currentId();
 
             try {
                 // Set tenant context before any scoped operations

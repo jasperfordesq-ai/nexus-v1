@@ -269,11 +269,14 @@ class NotificationDispatcher
     {
         $snippet = substr($content, 0, 250);
 
-        // Resolve tenant_id: use current context, or fall back to user's tenant
-        $tenantId = TenantContext::getId();
-        if (!$tenantId) {
-            $user = \App\Models\User::findById($userId);
-            $tenantId = $user['tenant_id'] ?? null;
+        $tenantId = self::resolveTenantIdForQueue((int) $userId);
+        if ($tenantId === null) {
+            Log::error('NotificationDispatcher::queueNotification could not resolve tenant_id', [
+                'user_id' => (int) $userId,
+                'activity_type' => $activityType,
+                'frequency' => $frequency,
+            ]);
+            return;
         }
 
         DB::table('notification_queue')->insert([
@@ -287,6 +290,37 @@ class NotificationDispatcher
             'created_at'     => now(),
             'status'         => 'pending',
         ]);
+    }
+
+    private static function resolveTenantIdForQueue(int $userId): ?int
+    {
+        $contextTenantId = TenantContext::currentId();
+
+        try {
+            $userTenantId = DB::table('users')
+                ->where('id', $userId)
+                ->value('tenant_id');
+
+            if ($userTenantId !== null) {
+                $userTenantId = (int) $userTenantId;
+                if ($contextTenantId !== null && (int) $contextTenantId !== $userTenantId) {
+                    Log::warning('NotificationDispatcher::queueNotification tenant context differed from recipient tenant', [
+                        'context_tenant_id' => (int) $contextTenantId,
+                        'user_tenant_id' => $userTenantId,
+                        'user_id' => $userId,
+                    ]);
+                }
+
+                return $userTenantId;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('NotificationDispatcher::queueNotification tenant lookup failed', [
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return $contextTenantId !== null ? (int) $contextTenantId : null;
     }
 
     // =========================================================================

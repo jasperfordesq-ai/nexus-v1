@@ -115,7 +115,7 @@ class GroupWelcomeService
                 'user_id' => $userId,
                 'type' => 'group_welcome',
                 'title' => __('api.group_welcome_notification_title', ['group' => $group->name]),
-                'content' => $message,
+                'message' => $message,
                 'link' => '/groups/' . $groupId,
                 'is_read' => 0,
                 'created_at' => now(),

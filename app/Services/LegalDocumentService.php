@@ -611,9 +611,10 @@ class LegalDocumentService
 
         $sentCount = 0;
         foreach ($users as $user) {
-            $bellSent = LocaleContext::withLocale($user, function () use ($user, $document, $version, $docSlug) {
+            $bellSent = LocaleContext::withLocale($user, function () use ($user, $document, $version, $docSlug, $tenantId) {
                 try {
                     DB::table('notifications')->insert([
+                        'tenant_id'  => $tenantId,
                         'user_id'    => $user->id,
                         'type'       => 'legal_update',
                         'title'      => __('svc_notifications.legal.update_title', ['title' => $document['title']]),
@@ -633,7 +634,7 @@ class LegalDocumentService
 
             // Email notification (only if user has an email address)
             if ($sendEmail && ! empty($user->email)) {
-                LocaleContext::withLocale($user, function () use ($user, $docType, $community, $reviewUrl) {
+                LocaleContext::withLocale($user, function () use ($user, $docType, $community, $reviewUrl, $tenantId) {
                     try {
                         $firstName = $user->first_name ?? (explode(' ', $user->name ?? '')[0] ?: 'there');
 
@@ -654,7 +655,8 @@ class LegalDocumentService
                             null,
                             null,
                             null,
-                            'legal_update'
+                            'legal_update',
+                            ['tenant_id' => $tenantId]
                         )) {
                             Log::warning('[LegalDocumentService] email returned false for user ' . $user->id);
                         }

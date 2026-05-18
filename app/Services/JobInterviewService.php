@@ -421,7 +421,7 @@ class JobInterviewService
                 ->get();
 
             foreach ($upcoming as $interview) {
-                $previousTenantId = TenantContext::getId();
+                $previousTenantId = TenantContext::currentId();
                 try {
                     $emailOk = true;
 

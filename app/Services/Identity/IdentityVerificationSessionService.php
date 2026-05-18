@@ -178,7 +178,7 @@ class IdentityVerificationSessionService
         }
 
         // Set tenant context so Mailer + URL helpers resolve correctly.
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         TenantContext::setById((int) $row->tenant_id);
         try {
             LocaleContext::withLocale($row, function () use ($row, $sessionId, $status, $failureReason) {

@@ -168,7 +168,7 @@ class TwoFactorController extends BaseApiController
                         ->render();
 
                     $subject = __('emails_security_alerts.2fa_enabled.subject', ['community' => $tenantName]);
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $user->tenant_id ?? TenantContext::currentId()])) {
                         Log::warning('[2FA] Failed to send 2FA enabled email', ['user_id' => $userId]);
                     }
                 });
@@ -283,7 +283,7 @@ class TwoFactorController extends BaseApiController
                         ->render();
 
                     $subject = __('emails_security_alerts.2fa_disabled.subject', ['community' => $tenantName]);
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $user->tenant_id ?? TenantContext::currentId()])) {
                         Log::warning('[2FA] Failed to send 2FA disabled email', ['user_id' => $userId]);
                     }
                 });

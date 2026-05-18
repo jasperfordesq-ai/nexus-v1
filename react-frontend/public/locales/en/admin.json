@@ -9472,6 +9472,22 @@
         "title": "Notification emails failed",
         "body": "{{count}} queued notification emails failed in the last {{window_hours}} hours."
       },
+      "notification_queue_missing_tenant_id": {
+        "title": "Notification queue missing tenant",
+        "body": "{{count}} queued notifications are pending or processing without tenant ownership. They cannot be routed reliably until repaired."
+      },
+      "notification_queue_tenant_mismatch": {
+        "title": "Notification queue tenant mismatch",
+        "body": "{{count}} queued notifications belong to a different tenant than their recipient user. These rows risk wrong-tenant routing."
+      },
+      "notifications_missing_tenant_id": {
+        "title": "Notifications missing tenant",
+        "body": "{{count}} in-app notifications have no tenant ownership, so users may not see them consistently."
+      },
+      "notifications_tenant_mismatch": {
+        "title": "Notifications tenant mismatch",
+        "body": "{{count}} in-app notifications belong to a different tenant than their recipient user. These rows risk cross-tenant visibility failures."
+      },
       "notification_queue_marked_sent_without_email_log": {
         "title": "Notification marked sent without email evidence",
         "body": "{{count}} queued notifications were marked sent without a matching email log entry in the last {{window_hours}} hours."

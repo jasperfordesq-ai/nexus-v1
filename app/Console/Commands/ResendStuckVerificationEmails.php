@@ -153,7 +153,7 @@ class ResendStuckVerificationEmails extends Command
 
         return LocaleContext::withLocale(
             $user->preferred_language ?? null,
-            function () use ($user, $tenantName, $verifyUrl) {
+            function () use ($user, $tenantName, $verifyUrl, $tenantId) {
                 $firstName = (string) ($user->first_name ?? '');
                 $greeting = $firstName !== ''
                     ? __('emails_misc.auth.verify_email_greeting', [
@@ -171,7 +171,7 @@ class ResendStuckVerificationEmails extends Command
                     ->render();
 
                 $subject = __('emails_misc.auth.verify_email_subject', ['community' => $tenantName]);
-                return \App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'email_verification');
+                return \App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'email_verification', ['tenant_id' => $tenantId]);
             }
         );
     }

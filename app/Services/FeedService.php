@@ -1644,7 +1644,7 @@ class FeedService
         // so MentionService::processText and downstream tenant-scoped code uses
         // the correct tenant. Without this, posts from tenant A could trigger
         // mention processing under tenant B.
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         $posts = FeedPost::withoutGlobalScopes()
             ->where('publish_status', 'scheduled')
             ->where('scheduled_at', '<=', now())

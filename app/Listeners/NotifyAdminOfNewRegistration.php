@@ -56,7 +56,7 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                 }
 
                 try {
-                    LocaleContext::withLocale($admin, function () use ($admin, $user, $profileUrl, $tenantName, $adminEmail) {
+                    LocaleContext::withLocale($admin, function () use ($admin, $user, $profileUrl, $tenantName, $adminEmail, $event) {
                         $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
 
                         $bellContent = __('emails_misc.admin_notify.new_user_bell');
@@ -76,7 +76,7 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                             ->button(__('emails_misc.admin_notify.new_user_cta'), $profileUrl)
                             ->render();
 
-                        if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_registration')) {
+                        if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_registration', ['tenant_id' => $event->tenantId])) {
                             Log::warning('NotifyAdminOfNewRegistration: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                         }
                     });

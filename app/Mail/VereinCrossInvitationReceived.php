@@ -54,7 +54,7 @@ class VereinCrossInvitationReceived
 
                 $subject = __('emails.verein_federation.invitation_received_subject', ['target' => $targetName]);
 
-                if (!EmailDispatchService::sendRaw($recipient->email, $subject, $builder->render(), null, null, null, 'verein_federation')) {
+                if (!EmailDispatchService::sendRaw($recipient->email, $subject, $builder->render(), null, null, null, 'verein_federation', ['tenant_id' => $recipient->tenant_id ?? TenantContext::currentId()])) {
                     Log::warning('[VereinCrossInvitationReceived] email returned false', [
                         'recipient_id' => $recipient->id ?? null,
                         'invitation_id' => $invitationId,

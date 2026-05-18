@@ -237,7 +237,7 @@ class WebAuthnController extends BaseApiController
                         ->render();
 
                     $subject = __('emails_security_alerts.passkey_registered.subject', ['community' => $tenantName]);
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $user->tenant_id ?? TenantContext::currentId()])) {
                         \Illuminate\Support\Facades\Log::warning("Failed to send passkey registered email to user {$userId}");
                     }
                 });
@@ -533,7 +533,7 @@ class WebAuthnController extends BaseApiController
                         ->render();
 
                     $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $user->tenant_id ?? TenantContext::currentId()])) {
                         Log::warning('[WebAuthn] Failed to send passkey removed email', ['user_id' => $userId]);
                     }
                 });
@@ -627,7 +627,7 @@ class WebAuthnController extends BaseApiController
                             ->render();
 
                         $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
-                        if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert')) {
+                        if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $user->tenant_id ?? TenantContext::currentId()])) {
                             Log::warning('[WebAuthn] Failed to send all-passkeys removed email', ['user_id' => $userId]);
                         }
                     });

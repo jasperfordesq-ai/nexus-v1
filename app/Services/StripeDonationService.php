@@ -252,7 +252,7 @@ class StripeDonationService
 
             if (!empty($donorEmail)) {
                 // Set tenant context if running from webhook (no active context)
-                $previousTenantId = TenantContext::getId();
+                $previousTenantId = TenantContext::currentId();
 
                 try {
                     if ($donation->tenant_id) {

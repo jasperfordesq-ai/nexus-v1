@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 
 class Notification extends Model
@@ -47,6 +48,22 @@ class Notification extends Model
      * Backend stores `is_read` (boolean) and `message` (string).
      */
     protected $appends = ['read_at', 'body', 'title'];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Notification $notification): void {
+            $userId = (int) ($notification->user_id ?? 0);
+            if ($userId <= 0) {
+                return;
+            }
+
+            $notification->tenant_id = self::resolveTenantIdForRecipient(
+                $userId,
+                isset($notification->tenant_id) ? (int) $notification->tenant_id : null,
+                'Notification::create'
+            );
+        });
+    }
 
     /**
      * read_at accessor — converts boolean `is_read` to nullable timestamp.
@@ -116,7 +133,7 @@ class Notification extends Model
      * @param string   $type        Notification type (e.g. 'info', 'connection_request', 'federation_connection')
      * @param bool     $isImportant Whether this is a high-priority notification
      * @param int|null $tenantId    Explicit tenant ID for cross-tenant notifications (e.g. federation).
-     *                              When null, uses TenantContext::getId().
+     *                              When null, uses the recipient user's tenant.
      */
     public static function createNotification(
         int $userId,
@@ -126,7 +143,7 @@ class Notification extends Model
         bool $isImportant = false,
         ?int $tenantId = null
     ): int {
-        $tenantId = $tenantId ?? TenantContext::getId();
+        $tenantId = self::resolveTenantIdForRecipient($userId, $tenantId, 'Notification::createNotification');
 
         $id = DB::table('notifications')->insertGetId([
             'user_id' => $userId,
@@ -139,6 +156,40 @@ class Notification extends Model
         ]);
 
         return (int) $id;
+    }
+
+    private static function resolveTenantIdForRecipient(int $userId, ?int $candidateTenantId, string $source): ?int
+    {
+        $contextTenantId = TenantContext::currentId();
+        $candidateTenantId = $candidateTenantId ?: ($contextTenantId ?: null);
+
+        $recipientTenantId = DB::table('users')
+            ->where('id', $userId)
+            ->value('tenant_id');
+
+        if ($recipientTenantId !== null) {
+            $recipientTenantId = (int) $recipientTenantId;
+            if ($candidateTenantId !== null && (int) $candidateTenantId !== $recipientTenantId) {
+                Log::warning('Notification tenant context differed from recipient tenant; using recipient tenant', [
+                    'source' => $source,
+                    'user_id' => $userId,
+                    'context_tenant_id' => $contextTenantId,
+                    'candidate_tenant_id' => (int) $candidateTenantId,
+                    'recipient_tenant_id' => $recipientTenantId,
+                ]);
+            }
+
+            return $recipientTenantId;
+        }
+
+        if ($candidateTenantId === null) {
+            Log::warning('Notification created without tenant context and recipient tenant could not be resolved', [
+                'source' => $source,
+                'user_id' => $userId,
+            ]);
+        }
+
+        return $candidateTenantId;
     }
 
     /**

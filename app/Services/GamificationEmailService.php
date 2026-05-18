@@ -42,7 +42,7 @@ class GamificationEmailService
         $skipped = 0;
         $errors = 0;
 
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
 
         try {
             $tenants = DB::table('tenants')

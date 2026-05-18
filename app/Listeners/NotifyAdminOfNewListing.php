@@ -56,7 +56,7 @@ class NotifyAdminOfNewListing implements ShouldQueue
                 }
 
                 // Each admin's notification renders in THEIR language.
-                LocaleContext::withLocale($admin, function () use ($admin, $listing, $listingTitle, $listingType, $listingUrl, $posterName, $tenantName, $adminEmail) {
+                LocaleContext::withLocale($admin, function () use ($admin, $listing, $listingTitle, $listingType, $listingUrl, $posterName, $tenantName, $adminEmail, $event) {
                     $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
 
                     $bellContent = __('emails_misc.admin_notify.new_listing_bell', [
@@ -81,7 +81,7 @@ class NotifyAdminOfNewListing implements ShouldQueue
                         ->button(__('emails_misc.admin_notify.new_listing_cta'), $listingUrl)
                         ->render();
 
-                    if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_listing')) {
+                    if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_listing', ['tenant_id' => $event->tenantId])) {
                         Log::warning('NotifyAdminOfNewListing: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                     }
                 });

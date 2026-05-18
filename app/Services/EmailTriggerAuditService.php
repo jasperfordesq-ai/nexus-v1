@@ -81,6 +81,7 @@ class EmailTriggerAuditService
                 $this->checkPasswordResetsWithoutEmail($tenantId, $since, $windowHours),
                 $this->checkGroupInvitesWithoutEmail($tenantId, $since, $windowHours),
                 $this->checkNotificationQueueHealth($tenantId, $since, $windowHours),
+                $this->checkNotificationStoreHealth($tenantId),
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
                 $this->checkTenantProviderConfiguration($tenantId),
                 $this->checkDirectEmailSendSurface($tenantId)
@@ -255,6 +256,29 @@ class EmailTriggerAuditService
         $queueHasTenantId = Schema::hasColumn('notification_queue', 'tenant_id');
         $tenantExpr = $queueHasTenantId ? 'notification_queue.tenant_id' : 'users.tenant_id';
 
+        if ($queueHasTenantId) {
+            $missingTenant = DB::table('notification_queue')
+                ->selectRaw('NULL as tenant_id, COUNT(*) as count')
+                ->whereNull('tenant_id')
+                ->whereIn('status', ['pending', 'processing'])
+                ->when($tenantId !== null, fn ($q) => $q->whereRaw('1 = 0'))
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($missingTenant, 'notification_queue_missing_tenant_id', 'critical', 'notifications', 'queue_dispatch'));
+
+            if ($this->hasTables(['users'])) {
+                $tenantMismatch = DB::table('notification_queue as nq')
+                    ->join('users as u', 'u.id', '=', 'nq.user_id')
+                    ->selectRaw('u.tenant_id as tenant_id, COUNT(*) as count')
+                    ->whereNotNull('nq.tenant_id')
+                    ->whereRaw('nq.tenant_id <> u.tenant_id')
+                    ->whereIn('nq.status', ['pending', 'processing'])
+                    ->when($tenantId !== null, fn ($q) => $q->where('u.tenant_id', $tenantId))
+                    ->groupBy('u.tenant_id')
+                    ->get();
+                $issues = array_merge($issues, $this->rowsToIssues($tenantMismatch, 'notification_queue_tenant_mismatch', 'critical', 'notifications', 'queue_dispatch'));
+            }
+        }
+
         $instantPending = DB::table('notification_queue')
             ->when(!$queueHasTenantId, fn ($q) => $q->join('users', 'users.id', '=', 'notification_queue.user_id'))
             ->selectRaw("{$tenantExpr} as tenant_id, COUNT(*) as count")
@@ -308,6 +332,38 @@ class EmailTriggerAuditService
         }
 
         return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkNotificationStoreHealth(?int $tenantId): array
+    {
+        if (!$this->hasTables(['notifications', 'users']) || !Schema::hasColumn('notifications', 'tenant_id')) {
+            return [];
+        }
+
+        $missingTenant = DB::table('notifications as n')
+            ->join('users as u', 'u.id', '=', 'n.user_id')
+            ->selectRaw('u.tenant_id as tenant_id, COUNT(*) as count')
+            ->whereNull('n.tenant_id')
+            ->when($tenantId !== null, fn ($q) => $q->where('u.tenant_id', $tenantId))
+            ->groupBy('u.tenant_id')
+            ->get();
+
+        $tenantMismatch = DB::table('notifications as n')
+            ->join('users as u', 'u.id', '=', 'n.user_id')
+            ->selectRaw('u.tenant_id as tenant_id, COUNT(*) as count')
+            ->whereNotNull('n.tenant_id')
+            ->whereRaw('n.tenant_id <> u.tenant_id')
+            ->when($tenantId !== null, fn ($q) => $q->where('u.tenant_id', $tenantId))
+            ->groupBy('u.tenant_id')
+            ->get();
+
+        return array_merge(
+            $this->rowsToIssues($missingTenant, 'notifications_missing_tenant_id', 'critical', 'notifications', 'bell_dispatch'),
+            $this->rowsToIssues($tenantMismatch, 'notifications_tenant_mismatch', 'critical', 'notifications', 'bell_dispatch')
+        );
     }
 
     /**

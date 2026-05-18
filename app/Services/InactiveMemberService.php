@@ -208,7 +208,7 @@ class InactiveMemberService
             ->update(['notified_at' => now()]);
 
         // Send re-engagement emails
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         try {
             TenantContext::setById($tenantId);
 

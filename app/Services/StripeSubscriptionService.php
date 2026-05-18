@@ -789,7 +789,7 @@ class StripeSubscriptionService
      */
     private static function sendTenantAdminEmail(int $tenantId, array $subject, array $title, array $body, string $link, array $ctaText, string $theme = 'default'): void
     {
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         TenantContext::setById($tenantId);
 
         try {

@@ -282,7 +282,7 @@ class GroupSearchService
         );
 
         // Set tenant context so indexGroupContent queries are scoped correctly
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         TenantContext::setById($tenantId);
 
         $totalIndexed = 0;

@@ -467,7 +467,7 @@ class BrokerMessageVisibilityService
 
             $subject = __('emails_misc.safeguarding.broker_message_flagged_subject', ['sender' => $senderDisplayName]);
 
-            if (!EmailDispatchService::sendRaw($broker->email, $subject, $html, null, null, null, 'safeguarding')) {
+            if (!EmailDispatchService::sendRaw($broker->email, $subject, $html, null, null, null, 'safeguarding', ['tenant_id' => $broker->tenant_id ?? TenantContext::currentId()])) {
                 Log::warning('[BrokerMessageVisibilityService] Broker review email failed to send', [
                     'broker_id'    => $broker->id,
                     'broker_email' => $broker->email,

@@ -91,8 +91,8 @@ class SendWelcomeNotification implements ShouldQueue
                         ->paragraph(__('emails.welcome.pending_ignore'))
                         ->render();
 
-                    if (!EmailDispatchService::sendRaw($userEmail, __('emails.welcome.pending_subject', ['community' => $tenantName]), $html, null, null, null, 'activation')) {
-                        Log::warning('SendWelcomeNotification: pending welcome email failed to send', ['user_email' => $userEmail]);
+                    if (!EmailDispatchService::sendRaw($userEmail, __('emails.welcome.pending_subject', ['community' => $tenantName]), $html, null, null, null, 'activation', ['tenant_id' => $event->tenantId])) {
+                        Log::warning('SendWelcomeNotification: pending welcome email failed to send', ['user_email' => $userEmail, 'tenant_id' => $event->tenantId]);
                     }
                 } else {
                     // Already active user (admin-created) â€” generic welcome only
@@ -113,8 +113,8 @@ class SendWelcomeNotification implements ShouldQueue
                         ->button(__('emails.welcome.active_button'), EmailTemplateBuilder::tenantUrl('/feed'))
                         ->render();
 
-                    if (!EmailDispatchService::sendRaw($userEmail, __('emails.welcome.subject', ['community' => $tenantName]), $html, null, null, null, 'welcome')) {
-                        Log::warning('SendWelcomeNotification: welcome email failed to send', ['user_email' => $userEmail]);
+                    if (!EmailDispatchService::sendRaw($userEmail, __('emails.welcome.subject', ['community' => $tenantName]), $html, null, null, null, 'welcome', ['tenant_id' => $event->tenantId])) {
+                        Log::warning('SendWelcomeNotification: welcome email failed to send', ['user_email' => $userEmail, 'tenant_id' => $event->tenantId]);
                     }
                 }
             });

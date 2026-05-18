@@ -139,7 +139,8 @@ class GenerateMonthlyReports extends Command
                 null,
                 null,
                 null,
-                'regional_analytics'
+                'regional_analytics',
+                ['tenant_id' => $sub->tenant_id ?? null]
             )) {
                 \Illuminate\Support\Facades\Log::warning('Regional analytics report email send returned false', [
                     'tenant_id' => $sub->tenant_id ?? null,

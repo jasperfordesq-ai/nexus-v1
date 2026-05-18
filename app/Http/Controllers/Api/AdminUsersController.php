@@ -500,7 +500,7 @@ class AdminUsersController extends BaseApiController
         if ($sendWelcomeEmail) {
             try {
                 $newUser = User::findById($newUserId, true);
-                LocaleContext::withLocale($newUser['preferred_language'] ?? null, function () use ($email, $password) {
+                LocaleContext::withLocale($newUser['preferred_language'] ?? null, function () use ($email, $password, $tenantId) {
                     $tenant = TenantContext::get();
                     $tenantName = $tenant['name'] ?? 'Project NEXUS';
                     $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/login";
@@ -519,7 +519,7 @@ class AdminUsersController extends BaseApiController
                         ->button(__('emails_misc.admin_actions.welcome_created_cta'), $loginLink)
                         ->render();
 
-                    if (!EmailDispatchService::sendRaw($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html, null, null, null, 'admin_welcome')) {
+                    if (!EmailDispatchService::sendRaw($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html, null, null, null, 'admin_welcome', ['tenant_id' => $tenantId])) {
                         Log::warning('[AdminUsers] Welcome email returned false for admin-created user', [
                             'email' => $email,
                         ]);

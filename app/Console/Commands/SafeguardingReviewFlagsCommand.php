@@ -219,7 +219,7 @@ class SafeguardingReviewFlagsCommand extends Command
             return true;
         }
 
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         try {
             TenantContext::setById($userBatch['tenant_id']);
 
@@ -292,7 +292,7 @@ class SafeguardingReviewFlagsCommand extends Command
             return false;
         }
 
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         $emailFailures = 0;
         try {
             TenantContext::setById($userBatch['tenant_id']);

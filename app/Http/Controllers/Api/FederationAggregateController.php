@@ -63,7 +63,7 @@ class FederationAggregateController extends BaseApiController
         }
 
         // Set tenant context so the service can scope queries correctly.
-        $previousTenantId = TenantContext::getId();
+        $previousTenantId = TenantContext::currentId();
         TenantContext::setById((int) $tenant->id);
 
         try {
