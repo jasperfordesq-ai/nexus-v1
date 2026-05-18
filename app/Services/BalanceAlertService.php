@@ -265,7 +265,7 @@ class BalanceAlertService
                 $owner = DB::table('users')
                     ->where('id', $org->user_id)
                     ->where('tenant_id', $tenantId)
-                    ->select(['id', 'email', 'first_name', 'name', 'preferred_language'])
+                    ->select(['id', 'email', 'first_name', 'name', 'preferred_language', 'tenant_id'])
                     ->first();
 
                 if ($owner && !empty($owner->email)) {

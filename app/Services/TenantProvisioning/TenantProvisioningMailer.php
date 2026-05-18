@@ -123,10 +123,10 @@ class TenantProvisioningMailer
                 $subject = __('emails_provisioning.rejection.subject');
                 $html    = $builder->render();
 
-                // Rejected provisioning requests do not have a tenant yet; pass
-                // the current platform context explicitly so the dispatcher logs
-                // this as an intentional pre-tenant send rather than guessing.
-                if (!EmailDispatchService::sendRaw($applicantEmail, $subject, $html, null, null, null, 'tenant_provisioning', ['tenant_id' => TenantContext::currentId()])) {
+                // Rejected provisioning requests do not have a tenant yet. Tell
+                // the dispatcher this is an intentional platform/pre-tenant
+                // send so a stale request or worker tenant is not inherited.
+                if (!EmailDispatchService::sendRaw($applicantEmail, $subject, $html, null, null, null, 'tenant_provisioning', ['tenant_id' => null, 'allow_missing_tenant' => true])) {
                     Log::warning('TenantProvisioningMailer rejection send returned false');
                 }
             } catch (Throwable $e) {

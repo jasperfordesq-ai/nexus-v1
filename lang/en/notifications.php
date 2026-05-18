@@ -41,6 +41,7 @@ return [
     'email_new_like_title'       => 'New Like on Your :content_type',
     'email_new_comment_title'    => 'New Comment on Your :content_type',
     'email_new_comment_reply_title' => 'New Reply to Your Comment',
+    'email_subject_with_community' => ':title - :community',
     'email_new_comment_reply_subject' => ':title - :community',
     'email_shared_title'         => 'Your :content_type Was Shared',
     'email_liked_subtitle'       => ':name liked your :content_type',

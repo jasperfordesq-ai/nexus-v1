@@ -155,7 +155,7 @@ class BrokerMessageVisibilityService
             $brokerUsers = User::where('tenant_id', $tenantId)
                 ->whereIn('role', ['admin', 'tenant_admin', 'broker', 'super_admin'])
                 ->where('status', 'active')
-                ->select(['id', 'email', 'first_name', 'name', 'preferred_language'])
+                ->select(['id', 'email', 'first_name', 'name', 'preferred_language', 'tenant_id'])
                 ->get();
 
             // Recipients include role='broker', who can't access /admin/* routes
@@ -449,7 +449,7 @@ class BrokerMessageVisibilityService
     private function sendBrokerReviewEmail(object $broker, string $senderDisplayName, string $reason, string $reviewUrl): void
     {
         try {
-            $brokerName = $broker->first_name ?? $broker->name ?? 'Broker';
+            $brokerName = $broker->first_name ?? $broker->name ?? __('emails.common.fallback_manager');
 
             $bodyKey = $reason === self::REASON_HIGH_RISK_LISTING
                 ? 'emails_misc.safeguarding.broker_message_high_risk_body'

@@ -63,6 +63,7 @@ class EmailDispatchService
      *   category?:string|null,
      *   tenant_id?:int|null,
      *   tenantId?:int|null,
+     *   allow_missing_tenant?:bool,
      *   source?:string|null
      * } $options
      */
@@ -89,7 +90,7 @@ class EmailDispatchService
         }
 
         try {
-            return (bool) TenantContext::runForTenant($tenantId, function () use ($to, $subject, $body, $options, $category, $tenantId, $source): bool {
+            return (bool) $this->runWithResolvedTenant($tenantId, function () use ($to, $subject, $body, $options, $category, $tenantId, $source): bool {
                 $sent = Mailer::forCurrentTenant()->send(
                     $to,
                     $subject,
@@ -129,6 +130,7 @@ class EmailDispatchService
     private function resolveTenantId(array $options, string $to): ?int
     {
         $tenantId = $options['tenant_id'] ?? $options['tenantId'] ?? null;
+        $allowMissingTenant = (bool) ($options['allow_missing_tenant'] ?? false);
 
         if ($tenantId !== null && $tenantId !== '') {
             return (int) $tenantId;
@@ -161,7 +163,33 @@ class EmailDispatchService
             ]);
         }
 
+        if ($allowMissingTenant) {
+            return null;
+        }
+
         return $contextTenantId !== null ? (int) $contextTenantId : null;
+    }
+
+    /**
+     * Run the actual send under the resolved tenant. A null tenant means an
+     * intentional platform/pre-tenant send; clear any leaked worker/request
+     * tenant while the message is rendered and logged, then restore it.
+     *
+     * @template T
+     * @param callable():T $callback
+     * @return T
+     */
+    private function runWithResolvedTenant(?int $tenantId, callable $callback)
+    {
+        if ($tenantId !== null) {
+            return TenantContext::runForTenant($tenantId, $callback);
+        }
+
+        return TenantContext::runForTenant(null, function () use ($callback) {
+            TenantContext::reset();
+
+            return $callback();
+        });
     }
 
     /**

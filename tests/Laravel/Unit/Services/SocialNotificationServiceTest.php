@@ -77,4 +77,15 @@ class SocialNotificationServiceTest extends TestCase
         $result = SocialNotificationService::getContentPreview('unknown', 1);
         $this->assertEquals('', $result);
     }
+
+    public function test_social_email_helpers_use_recipient_tenant_and_translated_subjects(): void
+    {
+        $source = file_get_contents(app_path('Services/SocialNotificationService.php'));
+
+        $this->assertStringContainsString("'preferred_language', 'tenant_id'", $source);
+        $this->assertStringContainsString("__('emails.common.platform_name')", $source);
+        $this->assertStringContainsString("__('notifications.email_subject_with_community'", $source);
+        $this->assertStringNotContainsString("'Project NEXUS'", $source);
+        $this->assertStringContainsString("'tenant_id' => \$tenantId", $source);
+    }
 }

@@ -70,7 +70,7 @@ class SocialNotificationService
             $owner = DB::table('users')
                 ->where('id', $contentOwnerId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name', 'preferred_language'])
+                ->select(['email', 'name', 'first_name', 'preferred_language', 'tenant_id'])
                 ->first();
             if (!$owner) {
                 return;
@@ -120,7 +120,7 @@ class SocialNotificationService
             $owner = DB::table('users')
                 ->where('id', $contentOwnerId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name', 'preferred_language'])
+                ->select(['email', 'name', 'first_name', 'preferred_language', 'tenant_id'])
                 ->first();
             if (!$owner) {
                 return;
@@ -179,7 +179,7 @@ class SocialNotificationService
             $owner = DB::table('users')
                 ->where('id', $commentOwnerId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name', 'preferred_language'])
+                ->select(['email', 'name', 'first_name', 'preferred_language', 'tenant_id'])
                 ->first();
             if (!$owner) {
                 return;
@@ -226,7 +226,7 @@ class SocialNotificationService
             $owner = DB::table('users')
                 ->where('id', $contentOwnerId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name', 'preferred_language'])
+                ->select(['email', 'name', 'first_name', 'preferred_language', 'tenant_id'])
                 ->first();
             if (!$owner) {
                 return;
@@ -396,8 +396,9 @@ class SocialNotificationService
     {
         try {
             $tenant = TenantContext::get();
-            $tenantName = $tenant['name'] ?? 'Project NEXUS';
+            $tenantName = $tenant['name'] ?? __('emails.common.platform_name');
             $fullLink = TenantContext::getFrontendUrl() . $link;
+            $tenantId = (int) ($owner->tenant_id ?? TenantContext::currentId() ?? 0);
 
             $likerName = $liker->name ?? __('emails.common.fallback_someone');
             $contentLabel = self::getContentLabel($contentType);
@@ -414,7 +415,8 @@ class SocialNotificationService
                 ->button(__('notifications.email_view_content', ['content_type' => ucfirst($contentLabel)]), $fullLink)
                 ->render();
 
-            if (!EmailDispatchService::sendRaw($owner->email, $title . ' — ' . $tenantName, $html, null, null, null, 'social_notification', ['tenant_id' => TenantContext::currentId()])) {
+            $subject = __('notifications.email_subject_with_community', ['title' => $title, 'community' => $tenantName]);
+            if (!EmailDispatchService::sendRaw($owner->email, $subject, $html, null, null, null, 'social_notification', ['tenant_id' => $tenantId])) {
                 Log::warning('SocialNotificationService: like email send returned false', [
                     'owner_id' => $owner->id ?? null,
                     'content_type' => $contentType,
@@ -433,8 +435,9 @@ class SocialNotificationService
     {
         try {
             $tenant = TenantContext::get();
-            $tenantName = $tenant['name'] ?? 'Project NEXUS';
+            $tenantName = $tenant['name'] ?? __('emails.common.platform_name');
             $fullLink = TenantContext::getFrontendUrl() . $link;
+            $tenantId = (int) ($owner->tenant_id ?? TenantContext::currentId() ?? 0);
 
             $commenterName = $commenter->name ?? __('emails.common.fallback_someone');
             $contentLabel = self::getContentLabel($contentType);
@@ -451,7 +454,8 @@ class SocialNotificationService
                 ->button(__('notifications.email_view_comment'), $fullLink)
                 ->render();
 
-            if (!EmailDispatchService::sendRaw($owner->email, $title . ' — ' . $tenantName, $html, null, null, null, 'social_notification', ['tenant_id' => TenantContext::currentId()])) {
+            $subject = __('notifications.email_subject_with_community', ['title' => $title, 'community' => $tenantName]);
+            if (!EmailDispatchService::sendRaw($owner->email, $subject, $html, null, null, null, 'social_notification', ['tenant_id' => $tenantId])) {
                 Log::warning('SocialNotificationService: comment email send returned false', [
                     'owner_id' => $owner->id ?? null,
                     'content_type' => $contentType,
@@ -472,6 +476,7 @@ class SocialNotificationService
             $tenant = TenantContext::get();
             $tenantName = $tenant['name'] ?? __('emails.common.platform_name');
             $fullLink = TenantContext::getFrontendUrl() . $link;
+            $tenantId = (int) ($owner->tenant_id ?? TenantContext::currentId() ?? 0);
 
             $replierName = $replier->name ?? __('emails.common.fallback_someone');
             $contentLabel = self::getContentLabel($contentType);
@@ -489,7 +494,7 @@ class SocialNotificationService
                 ->button(__('notifications.email_view_reply'), $fullLink)
                 ->render();
 
-            if (!EmailDispatchService::sendRaw($owner->email, $subject, $html, null, null, null, 'social_notification', ['tenant_id' => TenantContext::currentId()])) {
+            if (!EmailDispatchService::sendRaw($owner->email, $subject, $html, null, null, null, 'social_notification', ['tenant_id' => $tenantId])) {
                 Log::warning('SocialNotificationService: comment reply email send returned false', [
                     'owner_id' => $owner->id ?? null,
                     'content_type' => $contentType,
@@ -507,8 +512,9 @@ class SocialNotificationService
     {
         try {
             $tenant = TenantContext::get();
-            $tenantName = $tenant['name'] ?? 'Project NEXUS';
+            $tenantName = $tenant['name'] ?? __('emails.common.platform_name');
             $fullLink = TenantContext::getFrontendUrl() . $link;
+            $tenantId = (int) ($owner->tenant_id ?? TenantContext::currentId() ?? 0);
 
             $sharerName = $sharer->name ?? __('emails.common.fallback_someone');
             $contentLabel = self::getContentLabel($contentType);
@@ -525,7 +531,8 @@ class SocialNotificationService
                 ->button(__('notifications.email_view_content', ['content_type' => ucfirst($contentLabel)]), $fullLink)
                 ->render();
 
-            if (!EmailDispatchService::sendRaw($owner->email, $title . ' — ' . $tenantName, $html, null, null, null, 'social_notification', ['tenant_id' => TenantContext::currentId()])) {
+            $subject = __('notifications.email_subject_with_community', ['title' => $title, 'community' => $tenantName]);
+            if (!EmailDispatchService::sendRaw($owner->email, $subject, $html, null, null, null, 'social_notification', ['tenant_id' => $tenantId])) {
                 Log::warning('SocialNotificationService: share email send returned false', [
                     'owner_id' => $owner->id ?? null,
                     'content_type' => $contentType,

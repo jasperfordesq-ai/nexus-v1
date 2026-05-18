@@ -120,6 +120,61 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         $this->assertSame($this->testTenantId, TenantContext::currentId());
     }
 
+    public function test_email_dispatcher_allows_intentional_platform_send_without_leaked_context(): void
+    {
+        $email = 'external-provisioning-' . uniqid('', true) . '@example.test';
+
+        TenantContext::setById($this->testTenantId);
+
+        $method = new \ReflectionMethod(EmailDispatchService::class, 'resolveTenantId');
+        $method->setAccessible(true);
+
+        $tenantId = $method->invoke(app(EmailDispatchService::class), [
+            'tenant_id' => null,
+            'allow_missing_tenant' => true,
+        ], $email);
+
+        $this->assertNull($tenantId);
+        $this->assertSame($this->testTenantId, TenantContext::currentId());
+    }
+
+    public function test_email_dispatcher_clears_context_for_null_tenant_sends(): void
+    {
+        $source = file_get_contents(app_path('Services/EmailDispatchService.php'));
+
+        $this->assertStringContainsString('runWithResolvedTenant', $source);
+        $this->assertStringContainsString('TenantContext::reset();', $source);
+        $this->assertStringContainsString("'allow_missing_tenant'", $source);
+    }
+
+    public function test_tenant_provisioning_rejection_is_explicit_platform_email(): void
+    {
+        $source = file_get_contents(app_path('Services/TenantProvisioning/TenantProvisioningMailer.php'));
+
+        $this->assertStringContainsString("'tenant_id' => null", $source);
+        $this->assertStringContainsString("'allow_missing_tenant' => true", $source);
+        $this->assertStringNotContainsString("'tenant_id' => TenantContext::currentId()", $source);
+    }
+
+    public function test_activity_email_helpers_select_recipient_tenant_for_dispatch(): void
+    {
+        $ideationSource = file_get_contents(app_path('Services/IdeationChallengeService.php'));
+        $balanceSource = file_get_contents(app_path('Services/BalanceAlertService.php'));
+        $brokerSource = file_get_contents(app_path('Services/BrokerMessageVisibilityService.php'));
+
+        $this->assertStringContainsString("'preferred_language', 'tenant_id'", $ideationSource);
+        $this->assertStringContainsString("'tenant_id' => \$tenantId", $ideationSource);
+        $this->assertStringNotContainsString("'tenant_id' => TenantContext::currentId()", $ideationSource);
+        $this->assertStringNotContainsString("'Project NEXUS'", $ideationSource);
+
+        $this->assertStringContainsString("'preferred_language', 'tenant_id'", $balanceSource);
+        $this->assertStringContainsString('$owner->tenant_id ?? TenantContext::currentId()', $balanceSource);
+
+        $this->assertStringContainsString("'preferred_language', 'tenant_id'", $brokerSource);
+        $this->assertStringContainsString('$broker->tenant_id ?? TenantContext::currentId()', $brokerSource);
+        $this->assertStringContainsString("__('emails.common.fallback_manager')", $brokerSource);
+    }
+
     public function test_instant_queue_stale_cleanup_only_marks_instant_rows_failed(): void
     {
         $source = file_get_contents(app_path('Services/CronJobRunner.php'));

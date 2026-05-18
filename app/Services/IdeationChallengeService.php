@@ -1127,7 +1127,7 @@ class IdeationChallengeService
             $owner = DB::table('users')
                 ->where('id', $challenge->user_id)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name', 'preferred_language'])
+                ->select(['email', 'name', 'first_name', 'preferred_language', 'tenant_id'])
                 ->first();
             if (! $owner) {
                 return;
@@ -1147,7 +1147,7 @@ class IdeationChallengeService
 
                 if ($owner->email) {
                     try {
-                        $tenantName  = TenantContext::getSetting('site_name', 'Project NEXUS');
+                        $tenantName  = TenantContext::getSetting('site_name', __('emails.common.platform_name'));
                         $firstName   = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_name');
                         $challengeTitle = $challenge->title ?? '';
                         $ideaUrl     = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/ideation/' . $challengeId . '/ideas/' . $ideaId;
@@ -1205,7 +1205,7 @@ class IdeationChallengeService
             $owner = DB::table('users')
                 ->where('id', $ideaAuthorId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name', 'preferred_language'])
+                ->select(['email', 'name', 'first_name', 'preferred_language', 'tenant_id'])
                 ->first();
             if (! $owner) {
                 return;
@@ -1259,7 +1259,7 @@ class IdeationChallengeService
             $owner = DB::table('users')
                 ->where('id', $ideaAuthorId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name', 'preferred_language'])
+                ->select(['email', 'name', 'first_name', 'preferred_language', 'tenant_id'])
                 ->first();
             if (! $owner) {
                 return;
@@ -1282,7 +1282,7 @@ class IdeationChallengeService
 
                 if ($owner->email) {
                     try {
-                        $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+                        $tenantName = TenantContext::getSetting('site_name', __('emails.common.platform_name'));
                         $firstName  = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_name');
                         $ideaTitle  = $idea->title ?? '';
                         $commentUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
@@ -1330,7 +1330,7 @@ class IdeationChallengeService
             $owner = DB::table('users')
                 ->where('id', $ideaAuthorId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name', 'preferred_language'])
+                ->select(['email', 'name', 'first_name', 'preferred_language', 'tenant_id'])
                 ->first();
             if (! $owner) {
                 return;
@@ -1380,8 +1380,9 @@ class IdeationChallengeService
     {
         try {
             $tenant = TenantContext::get();
-            $tenantName = $tenant['name'] ?? 'Project NEXUS';
+            $tenantName = $tenant['name'] ?? __('emails.common.platform_name');
             $fullLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+            $tenantId = (int) ($recipient->tenant_id ?? TenantContext::currentId() ?? 0);
 
             $html = \App\Core\EmailTemplateBuilder::make()
                 ->theme('brand')
@@ -1391,8 +1392,8 @@ class IdeationChallengeService
                 ->button($ctaLabel, $fullLink)
                 ->render();
 
-            $subject = $title . ' — ' . $tenantName;
-            if (!EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'ideation', ['tenant_id' => TenantContext::currentId()])) {
+            $subject = __('notifications.email_subject_with_community', ['title' => $title, 'community' => $tenantName]);
+            if (!EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'ideation', ['tenant_id' => $tenantId])) {
                 Log::warning('[IdeationChallengeService] ideation email returned false', [
                     'recipient_id' => $recipient->id ?? null,
                 ]);
