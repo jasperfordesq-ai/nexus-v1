@@ -7,7 +7,9 @@
 namespace Tests\Laravel\Integration;
 
 use App\Services\EmailService;
+use App\Services\EmailDispatchService;
 use App\Services\EmailTriggerAuditService;
+use App\Core\TenantContext;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
 use Tests\Laravel\TestCase;
@@ -68,6 +70,35 @@ class EmailMailerRoutingTest extends TestCase
             $source,
             'EmailDispatchService must NOT use Mail::send() - that bypasses SendGrid'
         );
+    }
+
+    public function test_email_dispatch_service_refuses_missing_tenant_without_explicit_allowance(): void
+    {
+        $previousTenantId = TenantContext::currentId();
+        TenantContext::reset();
+
+        try {
+            $result = EmailDispatchService::sendRaw(
+                'recipient-without-tenant@example.test',
+                'Subject',
+                'Body',
+                null,
+                null,
+                null,
+                'test'
+            );
+
+            $this->assertFalse(
+                $result,
+                'EmailDispatchService must not send tenantless email unless allow_missing_tenant is explicit.'
+            );
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
+        }
     }
 
     /**

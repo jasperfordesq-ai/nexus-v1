@@ -72,6 +72,7 @@ class EmailDispatchService
         $category = trim((string) ($options['category'] ?? ''));
         $tenantId = $this->resolveTenantId($options, $to);
         $source = (string) ($options['source'] ?? 'EmailDispatchService');
+        $allowMissingTenant = (bool) ($options['allow_missing_tenant'] ?? false);
 
         if ($category === '') {
             Log::warning('EmailDispatchService::send called without category', [
@@ -81,8 +82,17 @@ class EmailDispatchService
             ]);
         }
 
+        if ($tenantId === null && !$allowMissingTenant) {
+            Log::error('EmailDispatchService::send refused missing tenant context', [
+                'source' => $source,
+                'category' => $category !== '' ? $category : null,
+                'to' => $this->maskEmail($to),
+            ]);
+            return false;
+        }
+
         if ($tenantId === null) {
-            Log::warning('EmailDispatchService::send called without tenant context', [
+            Log::warning('EmailDispatchService::send running intentional tenantless send', [
                 'source' => $source,
                 'category' => $category !== '' ? $category : null,
                 'to' => $this->maskEmail($to),
