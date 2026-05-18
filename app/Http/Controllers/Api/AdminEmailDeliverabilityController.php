@@ -115,6 +115,9 @@ class AdminEmailDeliverabilityController extends BaseApiController
         if ($status = trim((string) $this->input('status', ''))) {
             $q->where('status', $status);
         }
+        if ($category = trim((string) $this->input('category', ''))) {
+            $q->where('category', 'like', '%' . str_replace('%', '\\%', $category) . '%');
+        }
         if ($since = trim((string) $this->input('since', ''))) {
             $q->where('created_at', '>=', $since);
         }

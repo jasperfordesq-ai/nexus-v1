@@ -9319,8 +9319,108 @@
     }
   },
   "email_deliverability": {
+    "title": "Email Deliverability",
+    "subtitle": "Track trigger evidence, send attempts, provider status, and suppressed recipients for this tenant.",
     "trigger_score": "Trigger score",
     "trigger_coverage": "{{issues}} issues across {{count}} monitored flows",
+    "actions": {
+      "refresh": "Refresh",
+      "reset": "Reset",
+      "search": "Search"
+    },
+    "windows": {
+      "1": "Last 24h",
+      "7": "Last 7 days",
+      "30": "Last 30 days",
+      "90": "Last 90 days"
+    },
+    "filters": {
+      "all": "All",
+      "category": "Category",
+      "email": "Email",
+      "recipient": "Recipient email",
+      "reason": "Reason",
+      "since": "Since",
+      "status": "Status",
+      "until": "Until",
+      "window": "Time window"
+    },
+    "metrics": {
+      "accepted": "Accepted",
+      "bad_outcomes": "{{count}} failed, bounced, or suppressed",
+      "bounced": "Bounced",
+      "delivered": "Delivered",
+      "not_available": "No trigger audit data",
+      "total": "Total",
+      "trigger_score": "Trigger score",
+      "unconfirmed": "{{count}} accepted but unconfirmed",
+      "webhook_confirmed": "Confirmed by provider webhook",
+      "window_days": "{{days}} day window"
+    },
+    "status": {
+      "bounced": "Bounced",
+      "delivered": "Delivered",
+      "failed": "Failed",
+      "queued": "Queued",
+      "sent": "Sent",
+      "suppressed": "Suppressed"
+    },
+    "status_breakdown": {
+      "title": "Status Breakdown",
+      "subtitle": "A compact view of the current tenant's send outcomes for the selected window."
+    },
+    "trigger_health": {
+      "critical": "Critical trigger issues",
+      "monitored": "Monitored flows",
+      "warning": "Warning trigger issues"
+    },
+    "logs": {
+      "title": "Email Attempt Log",
+      "subtitle": "Search every send attempt by recipient, category, status, and date.",
+      "table_label": "Email attempt log",
+      "empty": "No emails match the current filters.",
+      "columns": {
+        "category": "Category",
+        "delivered": "Delivered",
+        "error": "Error",
+        "provider": "Provider",
+        "recipient": "Recipient",
+        "sent": "Sent",
+        "status": "Status",
+        "subject": "Subject"
+      }
+    },
+    "pagination": {
+      "page_size": "Rows per page",
+      "summary": "{{from}}-{{to}} of {{total}}"
+    },
+    "suppressions": {
+      "title": "Suppression List",
+      "subtitle": "Platform-wide recipients that providers have bounced, blocked, invalidated, or unsubscribed.",
+      "table_label": "Email suppression list",
+      "empty": "No suppressed recipients match the current filters.",
+      "confirm_remove": "Remove {{email}} from the suppression list? They will be eligible to receive email again.",
+      "remove": "Remove suppression",
+      "remove_failed": "Failed to remove suppression.",
+      "removed": "Removed {{email}}.",
+      "columns": {
+        "actions": "Actions",
+        "detail": "Detail",
+        "email": "Email",
+        "reason": "Reason",
+        "suppressed_at": "Suppressed at"
+      },
+      "reasons": {
+        "block": "Block",
+        "bounce": "Bounce",
+        "invalid": "Invalid",
+        "spam_report": "Spam report",
+        "unsubscribe": "Unsubscribe"
+      }
+    },
+    "empty": {
+      "no_statuses": "No statuses yet"
+    },
     "warnings": {
       "default_title": "Email warning",
       "default_body": "Email delivery needs attention.",
