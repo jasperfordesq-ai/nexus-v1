@@ -609,6 +609,7 @@ smoke_color() {
     webauthn_challenge="$(curl -sf -X POST "http://127.0.0.1:$api_port/api/webauthn/auth-challenge" \
         -H 'Host: api.project-nexus.ie' \
         -H 'Origin: https://hour-timebank.ie' \
+        -H 'X-Tenant-Slug: hour-timebank' \
         -H 'Accept: application/json' \
         -H 'Content-Type: application/json' \
         --data '{}' || true)"
@@ -910,6 +911,7 @@ post_cutover_smoke() {
     local webauthn_challenge
     webauthn_challenge="$(curl -sf -X POST https://api.project-nexus.ie/api/webauthn/auth-challenge \
         -H 'Origin: https://hour-timebank.ie' \
+        -H 'X-Tenant-Slug: hour-timebank' \
         -H 'Accept: application/json' \
         -H 'Content-Type: application/json' \
         --data '{}' || true)"
