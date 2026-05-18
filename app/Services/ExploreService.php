@@ -211,18 +211,12 @@ class ExploreService
                     'likes_count' => (int) $row->likes_count,
                     'comments_count' => (int) $row->comments_count,
                     'engagement' => $engagement,
-                    'is_hot' => $velocity >= 2.0, // "trending" badge for high-velocity content
+                    'trending_score' => $trendingScore,
+                    'is_hot' => $velocity >= 2.0,
                 ];
             }
 
-            usort($scored, fn($a, $b) => $b['engagement'] <=> $a['engagement']); // fallback sort
-            usort($scored, function ($a, $b) {
-                // Hot items first, then by engagement
-                if ($a['is_hot'] !== $b['is_hot']) {
-                    return $b['is_hot'] <=> $a['is_hot'];
-                }
-                return $b['engagement'] <=> $a['engagement'];
-            });
+            usort($scored, fn($a, $b) => $b['trending_score'] <=> $a['trending_score']);
 
             return array_slice($scored, 0, 10);
         } catch (\Throwable $e) {
