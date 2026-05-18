@@ -129,6 +129,8 @@ class SafeguardingSlaEscalateCommand extends Command
             } catch (Throwable) {
                 // ignore
             }
+        } else {
+            TenantContext::reset();
         }
 
         $this->info(sprintf(

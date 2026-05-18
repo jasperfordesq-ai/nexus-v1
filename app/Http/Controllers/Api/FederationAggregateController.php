@@ -92,6 +92,8 @@ class FederationAggregateController extends BaseApiController
                 } catch (\Throwable $e) {
                     // Best-effort restore.
                 }
+            } else {
+                TenantContext::reset();
             }
         }
 

@@ -243,12 +243,14 @@ class SafeguardingReviewFlagsCommand extends Command
                     $userBatch['email'],
                     __('safeguarding.review.reminder_subject'),
                     $html,
-                    ['category' => 'safeguarding_review']
+                    ['category' => 'safeguarding_review', 'tenant_id' => $userBatch['tenant_id']]
                 );
             });
         } finally {
             if ($previousTenantId !== null) {
                 TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
             }
         }
     }
@@ -340,7 +342,7 @@ class SafeguardingReviewFlagsCommand extends Command
                                 $admin->email,
                                 __('safeguarding.review.escalation_subject'),
                                 $escalationHtml,
-                                ['category' => 'safeguarding_review']
+                                ['category' => 'safeguarding_review', 'tenant_id' => $userBatch['tenant_id']]
                             );
                             if (!$sent) {
                                 $emailFailures++;
@@ -358,6 +360,8 @@ class SafeguardingReviewFlagsCommand extends Command
         } finally {
             if ($previousTenantId !== null) {
                 TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
             }
         }
 

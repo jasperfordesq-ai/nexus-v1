@@ -14,7 +14,6 @@ use App\Services\RegionalAnalytics\RegionalReportPdfGenerator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 /**
  * AG59 — Generate monthly regional analytics reports for active subscriptions.

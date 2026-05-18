@@ -838,6 +838,8 @@ class ExchangeWorkflowService
                 } finally {
                     if ($previousTenantId !== null) {
                         TenantContext::setById($previousTenantId);
+                    } else {
+                        TenantContext::reset();
                     }
                 }
             }
@@ -996,6 +998,8 @@ class ExchangeWorkflowService
         } finally {
             if ($previousTenantId !== null) {
                 TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
             }
         }
     }
