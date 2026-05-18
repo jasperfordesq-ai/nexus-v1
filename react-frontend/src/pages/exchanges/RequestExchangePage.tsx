@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Input, Textarea } from '@heroui/react';
+import { Button, Avatar, Input, Textarea, Chip } from '@heroui/react';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import Clock from 'lucide-react/icons/clock';
 import User from 'lucide-react/icons/user';
@@ -187,7 +187,7 @@ export function RequestExchangePage() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-2xl mx-auto space-y-6"
+      className="mx-auto max-w-5xl space-y-6"
     >
       <PageMeta title={t('page_meta.request.title')} noIndex />
       {/* Breadcrumbs */}
@@ -198,28 +198,38 @@ export function RequestExchangePage() {
       ]} />
 
       {/* Header */}
-      <div className="text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 mb-4">
-          <ArrowRightLeft className="w-8 h-8 text-emerald-400" aria-hidden="true" />
+      <header className="overflow-hidden rounded-2xl border border-theme-default bg-theme-surface">
+        <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/15">
+              <ArrowRightLeft className="h-7 w-7 text-emerald-500" aria-hidden="true" />
+            </div>
+            <h1 className="text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
+              {t('request.title')}
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-theme-muted sm:text-base">
+              {t('request.subtitle')}
+            </p>
+          </div>
+          <div className="rounded-xl border border-theme-default bg-theme-elevated px-4 py-3 lg:min-w-72">
+            <span className="block text-xs font-medium uppercase tracking-wide text-theme-subtle">{t('request.summary_estimate')}</span>
+            <span className="mt-1 block font-semibold text-theme-primary">
+              {t('request.estimated_hours', { hours: listing.hours_estimate || listing.estimated_hours || '?' })}
+            </span>
+          </div>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">
-          {t('request.title')}
-        </h1>
-        <p className="text-theme-muted mt-2">
-          {t('request.subtitle')}
-        </p>
-      </div>
+      </header>
 
       {/* Listing Summary */}
-      <GlassCard className="p-6">
-        <div className="flex items-start gap-4">
+      <GlassCard className="p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
           <Avatar
             src={resolveAvatarUrl(listing.user?.avatar)}
             name={listing.user?.name || t('unknown')}
             size="lg"
           />
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-semibold text-theme-primary">
+            <h2 className="text-lg font-semibold leading-tight text-theme-primary">
               {listing.title}
             </h2>
             <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-theme-muted">
@@ -238,19 +248,25 @@ export function RequestExchangePage() {
                 {t('request.estimated_hours', { hours: listing.hours_estimate || listing.estimated_hours || '?' })}
               </span>
             </div>
-            <span className={`
-              inline-block mt-2 text-xs px-2 py-1 rounded-full
-              ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}
-            `}>
+            <Chip
+              size="sm"
+              variant="flat"
+              color={listing.type === 'offer' ? 'success' : 'warning'}
+              className="mt-3"
+            >
               {listing.type === 'offer' ? t('request.service_offer') : t('request.service_request')}
-            </span>
+            </Chip>
           </div>
         </div>
       </GlassCard>
 
       {/* Request Form */}
-      <GlassCard className="p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <GlassCard className="p-5 sm:p-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div>
+            <h2 className="text-xl font-semibold text-theme-primary">{t('request.form_heading')}</h2>
+            <p className="mt-1 text-sm leading-6 text-theme-muted">{t('request.form_description')}</p>
+          </div>
           <div>
             <Input
               type="number"
@@ -315,7 +331,7 @@ export function RequestExchangePage() {
             </div>
           )}
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row">
             <Button
               type="button"
               variant="flat"

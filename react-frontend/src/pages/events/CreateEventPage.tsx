@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Button, Input, Textarea, Select, SelectItem, DatePicker, TimeInput, Switch, CheckboxGroup, Checkbox } from '@heroui/react';
+import { Button, Input, Textarea, Select, SelectItem, DatePicker, TimeInput, Switch, CheckboxGroup, Checkbox, Chip } from '@heroui/react';
 import type { DateInputValue, TimeInputValue } from '@heroui/react';
 import { parseDate, parseTime, today, getLocalTimeZone } from '@internationalized/date';
 import Save from 'lucide-react/icons/save';
@@ -153,7 +153,8 @@ export function CreateEventPage() {
   const toast = useToast();
   const isEditing = !!id;
   const groupId = searchParams.get('group_id');
-  usePageTitle(isEditing ? t('form.edit_title') : t('form.create_title'));
+  const pageTitle = isEditing ? t('form.edit_title') : t('form.create_title');
+  usePageTitle(pageTitle);
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isLoading, setIsLoading] = useState(false);
@@ -535,37 +536,66 @@ export function CreateEventPage() {
   }
 
   const hasImage = imagePreview || existingImage;
+  const selectedCategoryLabel = formData.category ? t(`category.${formData.category}`) : t('form.summary_not_set');
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-2xl mx-auto space-y-6"
+      className="mx-auto max-w-5xl space-y-6"
     >
-      <PageMeta title={t('page_meta.create.title')} noIndex />
+      <PageMeta title={pageTitle} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('title'), href: '/events' },
         { label: isEditing ? t('form.nav_edit') : t('form.nav_new') },
       ]} />
 
+      <header className="overflow-hidden rounded-2xl border border-theme-default bg-theme-surface">
+        <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl">
+            <Chip size="sm" variant="flat" color="warning" className="mb-3 font-medium">
+              {isEditing ? t('form.edit_badge') : t('form.create_badge')}
+            </Chip>
+            <h1 className="text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
+              {pageTitle}
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-theme-muted sm:text-base">
+              {t('form.create_intro')}
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:min-w-72">
+            <div className="rounded-xl border border-theme-default bg-theme-elevated px-4 py-3">
+              <span className="block text-xs font-medium uppercase tracking-wide text-theme-subtle">{t('form.summary_category')}</span>
+              <span className="mt-1 block truncate font-semibold text-theme-primary">{selectedCategoryLabel}</span>
+            </div>
+            <div className="rounded-xl border border-theme-default bg-theme-elevated px-4 py-3">
+              <span className="block text-xs font-medium uppercase tracking-wide text-theme-subtle">{t('form.summary_format')}</span>
+              <span className="mt-1 block font-semibold text-theme-primary">
+                {formData.allowRemoteAttendance ? t('form.summary_remote') : t('form.summary_in_person')}
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* Form */}
-      <GlassCard className="p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-theme-primary mb-6 flex items-center gap-3">
+      <GlassCard className="p-5 sm:p-8">
+        <h2 className="mb-6 flex items-center gap-3 text-xl font-bold text-theme-primary">
           <Calendar className="w-7 h-7 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-          {isEditing ? t('form.edit_title') : t('form.create_title')}
-        </h1>
+          {t('form.essentials_section')}
+        </h2>
 
         {groupId && !isEditing && (
           <div className="flex items-center gap-3 p-3 mb-4 rounded-lg bg-primary/5 border border-primary/20">
             <Users className="w-5 h-5 text-primary flex-shrink-0" />
             <p className="text-sm text-theme-primary">
-              {t('form.group_event_notice', 'This event will be associated with your group.')}
+              {t('form.group_event_notice')}
             </p>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
           {/* Cover Image Upload */}
           <div>
             <label className="block text-sm font-medium text-theme-muted mb-2">

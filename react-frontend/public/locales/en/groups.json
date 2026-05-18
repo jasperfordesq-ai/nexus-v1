@@ -236,7 +236,10 @@
       "updated": "Group updated",
       "save_failed": "Failed to save group",
       "something_wrong": "Something went wrong"
-    }
+    },
+    "create_intro": "Set the purpose, privacy, location, and image for a group people can understand at a glance.",
+    "summary_visibility": "Visibility",
+    "essentials_section": "Group essentials"
   },
   "announcements": {
     "heading": "Announcements",

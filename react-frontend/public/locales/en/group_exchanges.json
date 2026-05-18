@@ -142,7 +142,12 @@
     "weight_placeholder": "Weight",
     "hours_for": "Hours for {{name}}",
     "weight_for": "Weight for {{name}}",
-    "aria_hour_split_preview": "Hour split preview"
+    "aria_hour_split_preview": "Hour split preview",
+    "current_step": "Current step",
+    "step_of_named": "Step {{current}} of {{total}}: {{name}}",
+    "hours_value": "{{hours}}h",
+    "hours_suffix": "h",
+    "weight_suffix": "x"
   },
   "toast": {
     "load_more_failed": "Failed to load more exchanges",

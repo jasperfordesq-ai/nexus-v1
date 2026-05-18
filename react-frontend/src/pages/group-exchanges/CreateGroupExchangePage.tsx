@@ -374,6 +374,7 @@ export function CreateGroupExchangePage() {
     t('create.step_review_split'),
     t('create.step_confirm'),
   ];
+  const currentStepLabel = stepLabels[currentStep - 1] ?? t('create.step_details');
 
   // ─────────────────────────────────────────────────────────────────────────
   // Render
@@ -383,7 +384,7 @@ export function CreateGroupExchangePage() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-2xl mx-auto space-y-6"
+      className="mx-auto max-w-5xl space-y-6"
     >
       <PageMeta title={t('page_meta.create.title')} noIndex />
       {/* Breadcrumbs */}
@@ -393,15 +394,30 @@ export function CreateGroupExchangePage() {
       ]} />
 
       {/* Title */}
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-theme-primary flex items-center justify-center gap-3">
-          <ArrowLeftRight className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-          {t('create.title')}
-        </h1>
-        <p className="text-theme-muted mt-1">{t('create.subtitle')}</p>
-      </div>
+      <header className="overflow-hidden rounded-2xl border border-theme-default bg-theme-surface">
+        <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500/15">
+              <ArrowLeftRight className="h-7 w-7 text-indigo-500" aria-hidden="true" />
+            </div>
+            <h1 className="text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
+              {t('create.title')}
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-theme-muted sm:text-base">{t('create.subtitle')}</p>
+          </div>
+          <div className="rounded-xl border border-theme-default bg-theme-elevated px-4 py-3 lg:min-w-72">
+            <span className="block text-xs font-medium uppercase tracking-wide text-theme-subtle">
+              {t('create.current_step')}
+            </span>
+            <span className="mt-1 block font-semibold text-theme-primary">
+              {t('create.step_of_named', { current: currentStep, total: TOTAL_STEPS, name: currentStepLabel })}
+            </span>
+          </div>
+        </div>
+      </header>
 
       {/* Step Indicator */}
+      <div className="rounded-2xl border border-theme-default bg-theme-surface p-4">
       <div className="flex items-center">
         {stepLabels.map((label, idx) => {
           const stepNum = idx + 1;
@@ -446,6 +462,7 @@ export function CreateGroupExchangePage() {
         }}
         aria-label={t('create.step_of', { current: currentStep, total: TOTAL_STEPS })}
       />
+      </div>
 
       {/* Step Content */}
       <AnimatePresence mode="wait" custom={slideDirection}>
@@ -773,7 +790,7 @@ export function CreateGroupExchangePage() {
                           <ArrowRight className="w-4 h-4 inline" aria-label={t('detail.gives_to')} />
                         </TableCell>
                         <TableCell className="text-amber-400">{split.receiverName}</TableCell>
-                        <TableCell className="text-right font-medium text-theme-primary">{split.amount}h</TableCell>
+                        <TableCell className="text-right font-medium text-theme-primary">{t('create.hours_value', { hours: split.amount })}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -816,7 +833,7 @@ export function CreateGroupExchangePage() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-theme-primary">{totalForParticipant}h</p>
+                          <p className="font-bold text-theme-primary">{t('create.hours_value', { hours: totalForParticipant })}</p>
                           <p className="text-xs text-theme-subtle">
                             {p.role === 'provider' ? t('create.giving') : t('create.receiving')}
                           </p>
@@ -867,7 +884,7 @@ export function CreateGroupExchangePage() {
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-theme-muted mb-1">{t('detail.total_hours')}</h3>
-                      <p className="text-theme-primary font-semibold">{totalHours}h</p>
+                      <p className="text-theme-primary font-semibold">{t('create.hours_value', { hours: totalHours })}</p>
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-theme-muted mb-1">{t('create.participants_label')}</h3>
@@ -978,7 +995,7 @@ function ParticipantRow({ participant, splitType, onRemove, onHoursChange, onWei
           className="w-24 shrink-0"
           classNames={inputClassNames}
           aria-label={t('create.hours_for', { name: participant.name })}
-          endContent={<span className="text-theme-subtle text-xs">h</span>}
+          endContent={<span className="text-theme-subtle text-xs">{t('create.hours_suffix')}</span>}
         />
       )}
 
@@ -995,7 +1012,7 @@ function ParticipantRow({ participant, splitType, onRemove, onHoursChange, onWei
           className="w-24 shrink-0"
           classNames={inputClassNames}
           aria-label={t('create.weight_for', { name: participant.name })}
-          endContent={<span className="text-theme-subtle text-xs">x</span>}
+          endContent={<span className="text-theme-subtle text-xs">{t('create.weight_suffix')}</span>}
         />
       )}
 

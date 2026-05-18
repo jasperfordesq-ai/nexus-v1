@@ -153,7 +153,13 @@
     "broker_approval_title": "Broker Approval Required",
     "broker_approval_description": "This exchange will need to be approved by a community coordinator before it can proceed.",
     "cancel": "Cancel",
-    "send_request": "Send Request"
+    "send_request": "Send Request",
+    "summary_estimate": "Estimated time",
+    "form_heading": "Request details",
+    "form_description": "Confirm the proposed hours and add context so the other member can respond confidently.",
+    "prep_time_label": "Preparation Time",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Additional time needed for preparation (optional)"
   },
   "page_meta": {
     "list": {

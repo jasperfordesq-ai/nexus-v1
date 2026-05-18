@@ -11,7 +11,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Textarea, Switch, Avatar } from '@heroui/react';
+import { Button, Input, Textarea, Switch, Avatar, Chip } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Users from 'lucide-react/icons/users';
@@ -56,7 +56,8 @@ export function CreateGroupPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation('groups');
   const isEditing = !!id;
-  usePageTitle(isEditing ? t('form.edit_title') : t('form.create_title'));
+  const pageTitle = isEditing ? t('form.edit_title') : t('form.create_title');
+  usePageTitle(pageTitle);
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -313,23 +314,45 @@ export function CreateGroupPage() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-2xl mx-auto space-y-6"
+      className="mx-auto max-w-5xl space-y-6"
     >
-      <PageMeta title={t('page_meta.create.title')} noIndex />
+      <PageMeta title={pageTitle} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('title'), href: '/groups' },
         { label: isEditing ? t('form.nav_edit') : t('form.nav_new') },
       ]} />
 
-      {/* Form */}
-      <GlassCard className="p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-theme-primary mb-6 flex items-center gap-3">
-          <Users className="w-7 h-7 text-purple-600 dark:text-purple-400" aria-hidden="true" />
-          {isEditing ? t('form.edit_title') : t('form.create_title')}
-        </h1>
+      <header className="overflow-hidden rounded-2xl border border-theme-default bg-theme-surface">
+        <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl">
+            <Chip size="sm" variant="flat" color={formData.is_private ? 'warning' : 'success'} className="mb-3 font-medium">
+              {formData.is_private ? t('form.private_group') : t('form.public_group')}
+            </Chip>
+            <h1 className="text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
+              {pageTitle}
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-theme-muted sm:text-base">
+              {t('form.create_intro')}
+            </p>
+          </div>
+          <div className="rounded-xl border border-theme-default bg-theme-elevated px-4 py-3 lg:min-w-72">
+            <span className="block text-xs font-medium uppercase tracking-wide text-theme-subtle">{t('form.summary_visibility')}</span>
+            <span className="mt-1 block font-semibold text-theme-primary">
+              {formData.is_private ? t('form.private_desc') : t('form.public_desc')}
+            </span>
+          </div>
+        </div>
+      </header>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Form */}
+      <GlassCard className="p-5 sm:p-8">
+        <h2 className="mb-6 flex items-center gap-3 text-xl font-bold text-theme-primary">
+          <Users className="w-7 h-7 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+          {t('form.essentials_section')}
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-8">
           {/* Group Image Upload */}
           <div>
             <label className="block text-sm font-medium text-theme-muted mb-2">
@@ -480,8 +503,8 @@ export function CreateGroupPage() {
           </div>
 
           {/* Privacy Setting */}
-          <div className="p-4 rounded-lg bg-theme-elevated border border-theme-default">
-            <div className="flex items-center justify-between">
+          <div className="rounded-xl border border-theme-default bg-theme-elevated p-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
                 {formData.is_private ? (
                   <Lock className="w-5 h-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
@@ -511,7 +534,7 @@ export function CreateGroupPage() {
           </div>
 
           {/* Submit */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row">
             <Button
               type="submit"
               className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -523,7 +546,7 @@ export function CreateGroupPage() {
             <Button
               type="button"
               variant="flat"
-              className="bg-theme-elevated text-theme-primary"
+              className="bg-theme-elevated text-theme-primary sm:min-w-32"
               onPress={() => navigate(tenantPath('/groups'))}
             >
               {t('form.cancel')}
