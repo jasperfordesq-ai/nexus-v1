@@ -18,5 +18,3 @@ export type { SocialInteractionsOptions, LikerUser, LikersResult, MentionUser } 
 export { useHeaderScroll } from './useHeaderScroll';
 export type { HeaderScrollState } from './useHeaderScroll';
 export { useLinkPreview } from './useLinkPreview';
-export { useProximity } from './useProximity';
-export type { ProximityPosition } from './useProximity';

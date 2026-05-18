@@ -24,7 +24,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant } from '@/contexts';
-import { usePageTitle, useProximity } from '@/hooks';
+import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
@@ -233,14 +233,13 @@ function MarktCard({ item }: MarktCardProps) {
 export function MarktPage() {
   const { t } = useTranslation('common');
   usePageTitle(t('markt.meta.title'));
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { hasFeature, tenantPath } = useTenant();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<MarktTab>('all');
   const [radiusKm, setRadiusKm] = useState<number | null>(null);
   const [subRegionId, setSubRegionId] = useState<number | null>(null);
-  const { position } = useProximity();
   const [items, setItems] = useState<MarktItem[]>([]);
   const [meta, setMeta] = useState<MarktMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -274,10 +273,10 @@ export function MarktPage() {
       params.set('page', String(reset ? 1 : page));
       params.set('per_page', '20');
 
-      if (radiusKm !== null && position !== null) {
+      if (radiusKm !== null && user?.latitude != null && user?.longitude != null) {
         params.set('radius_km', String(radiusKm));
-        params.set('lat', String(position.lat));
-        params.set('lng', String(position.lng));
+        params.set('lat', String(user.latitude));
+        params.set('lng', String(user.longitude));
       }
 
       if (subRegionId !== null) {
@@ -309,7 +308,7 @@ export function MarktPage() {
         setIsLoadingMore(false);
       }
     }
-  }, [activeTab, page, radiusKm, position, subRegionId, t]);
+  }, [activeTab, page, radiusKm, user?.latitude, user?.longitude, subRegionId, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadRef = useRef(loadItems);
   loadRef.current = loadItems;

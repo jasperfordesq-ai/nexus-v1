@@ -39,7 +39,6 @@ import { MapSearchView } from '@/components/marketplace/MapSearchView';
 import { MarketplaceListingGrid } from '@/components/marketplace';
 import type { MarketplaceListingItem } from '@/types/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
-import { useGeolocation } from '@/hooks/useGeolocation';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -84,10 +83,9 @@ const RADIUS_OPTIONS = [
 export function MarketplaceMapSearchPage() {
   const { t } = useTranslation('marketplace');
   usePageTitle(t('map.page_title', 'Map Search - Marketplace'));
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
-  const geo = useGeolocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // View mode (mobile)
@@ -104,12 +102,16 @@ export function MarketplaceMapSearchPage() {
   const [categories, setCategories] = useState<ApiCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Map center state
-  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>(
-    searchParams.get('lat') && searchParams.get('lng')
-      ? { lat: parseFloat(searchParams.get('lat')!), lng: parseFloat(searchParams.get('lng')!) }
-      : undefined
-  );
+  // Map center — prefer URL params, fall back to user profile location
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>(() => {
+    if (searchParams.get('lat') && searchParams.get('lng')) {
+      return { lat: parseFloat(searchParams.get('lat')!), lng: parseFloat(searchParams.get('lng')!) };
+    }
+    if (user?.latitude != null && user?.longitude != null) {
+      return { lat: user.latitude, lng: user.longitude };
+    }
+    return undefined;
+  });
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -123,20 +125,6 @@ export function MarketplaceMapSearchPage() {
       if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     };
   }, [searchQuery]);
-
-  // Auto-detect location on mount if no center specified
-  useEffect(() => {
-    if (!mapCenter && !geo.latitude && !geo.loading) {
-      geo.requestLocation();
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // When geo resolves, set map center
-  useEffect(() => {
-    if (geo.latitude && geo.longitude && !mapCenter) {
-      setMapCenter({ lat: geo.latitude, lng: geo.longitude });
-    }
-  }, [geo.latitude, geo.longitude]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load categories
   useEffect(() => {
@@ -209,14 +197,14 @@ export function MarketplaceMapSearchPage() {
     setSearchParams(params, { replace: true });
   }, [debouncedQuery, categoryId, radiusKm, mapCenter, setSearchParams]);
 
-  // "Use my location" handler
+  // "Use my location" handler — centres map on the user's profile location
   const handleUseMyLocation = useCallback(() => {
-    if (geo.latitude && geo.longitude) {
-      setMapCenter({ lat: geo.latitude, lng: geo.longitude });
+    if (user?.latitude != null && user?.longitude != null) {
+      setMapCenter({ lat: user.latitude, lng: user.longitude });
     } else {
-      geo.requestLocation();
+      toast.error(t('members.near_me_no_location', 'Set your location in your profile to use this feature'));
     }
-  }, [geo]);
+  }, [user?.latitude, user?.longitude, toast, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Save / Unsave handlers
   const handleSave = useCallback(async (id: number) => {

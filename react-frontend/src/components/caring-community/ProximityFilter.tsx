@@ -4,9 +4,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useTranslation } from 'react-i18next';
-import { Button, Spinner } from '@heroui/react';
+import { Button, Select, SelectItem } from '@heroui/react';
 import MapPin from 'lucide-react/icons/map-pin';
-import { useProximity } from '@/hooks/useProximity';
+import { useAuth, useToast } from '@/contexts';
 
 export interface ProximityFilterProps {
   radiusKm: number | null;
@@ -14,87 +14,62 @@ export interface ProximityFilterProps {
   className?: string;
 }
 
-const RADIUS_OPTIONS: Array<{ value: number | null; labelKey: string }> = [
-  { value: null, labelKey: 'proximity.off' },
-  { value: 1, labelKey: 'proximity.radius_option' },
-  { value: 2, labelKey: 'proximity.radius_option' },
-  { value: 5, labelKey: 'proximity.radius_option' },
-  { value: 10, labelKey: 'proximity.radius_option' },
-];
+const RADIUS_OPTIONS = [5, 10, 25, 50, 100] as const;
+const DEFAULT_RADIUS = 25;
 
 export function ProximityFilter({ radiusKm, onRadiusChange, className }: ProximityFilterProps) {
   const { t } = useTranslation('common');
-  const { position, isLoading, error, requestLocation } = useProximity();
-
-  function handleSelect(value: number | null) {
-    onRadiusChange(value);
-    if (value !== null && position === null) {
-      requestLocation();
-    }
-  }
+  const { user } = useAuth();
+  const toast = useToast();
 
   const isActive = radiusKm !== null;
 
+  function handleToggle() {
+    if (isActive) {
+      onRadiusChange(null);
+      return;
+    }
+    if (user?.latitude == null || user?.longitude == null) {
+      toast.error(t('members.near_me_no_location'));
+      return;
+    }
+    onRadiusChange(DEFAULT_RADIUS);
+  }
+
   return (
-    <div className={['flex flex-col gap-2', className].filter(Boolean).join(' ')}>
-      {/* Row: icon + label + pill options */}
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-1.5 text-theme-muted">
-          <MapPin className="w-4 h-4 shrink-0" aria-hidden="true" />
-          <span className="text-sm font-medium text-theme-secondary">{t('proximity.label')}</span>
-        </div>
+    <div className={['flex flex-wrap items-center gap-2', className].filter(Boolean).join(' ')}>
+      <Button
+        size="sm"
+        variant={isActive ? 'solid' : 'flat'}
+        className={isActive
+          ? 'bg-emerald-600 text-white shadow-sm'
+          : 'bg-theme-elevated text-theme-primary hover:bg-emerald-500/10 hover:text-emerald-600'}
+        startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
+        onPress={handleToggle}
+        aria-pressed={isActive}
+      >
+        {t('members.near_me')}
+      </Button>
 
-        <div
-          className="flex flex-wrap gap-1"
-          role="radiogroup"
-          aria-label={t('proximity.label')}
-        >
-          {RADIUS_OPTIONS.map(({ value }) => {
-            const isSelected = value === radiusKm;
-            const label =
-              value === null
-                ? t('proximity.off')
-                : t('proximity.radius_option', { km: value });
-
-            return (
-              <Button
-                key={String(value)}
-                size="sm"
-                variant={isSelected ? 'solid' : 'flat'}
-                color={isSelected ? 'primary' : 'default'}
-                className={[
-                  'text-xs px-3 py-1 min-w-0 h-auto rounded-full',
-                  isSelected
-                    ? 'text-white'
-                    : 'text-theme-muted hover:text-theme-primary bg-theme-elevated hover:bg-theme-hover',
-                ].join(' ')}
-                onPress={() => handleSelect(value)}
-                role="radio"
-                aria-checked={isSelected}
-              >
-                {label}
-              </Button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Status line — only shown when a radius is active */}
       {isActive && (
-        <div className="flex items-center gap-2 text-xs text-theme-muted pl-0.5">
-          {isLoading ? (
-            <>
-              <Spinner size="sm" color="current" className="w-3.5 h-3.5" />
-              <span>{t('proximity.requesting')}</span>
-            </>
-          ) : error ? (
-            <span className="text-warning">{error}</span>
-          ) : position !== null ? (
-            <span className="text-teal-600 dark:text-teal-400 font-medium">
-              {t('proximity.active_label', { km: radiusKm })}
-            </span>
-          ) : null}
-        </div>
+        <Select
+          aria-label={t('members.radius_label')}
+          selectedKeys={[String(radiusKm)]}
+          disallowEmptySelection
+          onSelectionChange={(keys) => {
+            const val = keys instanceof Set ? ([...keys][0] as string) : String(DEFAULT_RADIUS);
+            onRadiusChange(Number(val) || DEFAULT_RADIUS);
+          }}
+          className="w-28"
+          classNames={{
+            trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+            value: 'text-theme-primary',
+          }}
+        >
+          {RADIUS_OPTIONS.map((km) => (
+            <SelectItem key={String(km)}>{t(`radius_${km}`)}</SelectItem>
+          ))}
+        </Select>
       )}
     </div>
   );
