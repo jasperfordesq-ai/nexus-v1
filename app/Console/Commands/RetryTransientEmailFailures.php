@@ -59,10 +59,13 @@ class RetryTransientEmailFailures extends Command
         // suppressed/bounced rows are real failures so we don't touch them.
         $rows = DB::table('email_log')
             ->where('status', 'failed')
+            ->where('provider', 'sendgrid')
+            ->whereNotNull('provider_message_id')
+            ->where('provider_message_id', '<>', '')
             ->where('created_at', '>=', $cutoff)
             ->orderBy('id')
             ->limit($limit)
-            ->get(['id', 'recipient_email', 'subject', 'created_at', 'sent_at']);
+            ->get(['id', 'recipient_email', 'subject', 'provider_message_id', 'created_at', 'sent_at']);
 
         if ($rows->isEmpty()) {
             $this->info('No failed rows in the window — nothing to do.');
@@ -74,7 +77,7 @@ class RetryTransientEmailFailures extends Command
 
         foreach ($rows as $row) {
             try {
-                $hit = $this->lookupActivity($apiKey, $row->recipient_email, (string) $row->created_at);
+                $hit = $this->lookupActivity($apiKey, $row->recipient_email, (string) $row->provider_message_id, (string) $row->created_at);
                 if ($hit !== null) {
                     $reconciled++;
                     $this->line("  ✓ {$row->recipient_email} — SendGrid reports {$hit['status']} @ {$hit['ts']}");
@@ -111,16 +114,18 @@ class RetryTransientEmailFailures extends Command
     }
 
     /**
-     * Query SendGrid's activity API for the address and return
+     * Query SendGrid's activity API for the exact provider message id and return
      *   ['status' => 'delivered'|'processed'|'bounce'|..., 'ts' => 'YYYY-MM-DD HH:MM:SS', 'msg_id' => '...']
      * for the most recent hit after $sinceIso, or null if SendGrid has no
      * record (genuine failure).
      */
-    private function lookupActivity(string $apiKey, string $email, string $sinceIso): ?array
+    private function lookupActivity(string $apiKey, string $email, string $messageId, string $sinceIso): ?array
     {
         // SendGrid messages search endpoint uses a simple query DSL.
-        // We narrow to (to_email = X AND last_event_time > since).
-        $query = sprintf('to_email = "%s"', $email);
+        // We narrow to the provider message id captured at send time. Recipient
+        // alone is not evidence: the same address can receive many emails from
+        // different tenants and categories within the reconciliation window.
+        $query = sprintf('msg_id = "%s"', $messageId);
 
         $resp = \Illuminate\Support\Facades\Http::withToken($apiKey)
             ->acceptJson()
@@ -146,6 +151,11 @@ class RetryTransientEmailFailures extends Command
                 continue;
             }
             $status = (string) ($msg['status'] ?? '');
+            $hitMessageId = (string) ($msg['msg_id'] ?? '');
+            $hitEmail = (string) ($msg['to_email'] ?? '');
+            if ($hitMessageId !== $messageId || strcasecmp($hitEmail, $email) !== 0) {
+                continue;
+            }
             // Only treat 'delivered' or 'processed' as a successful
             // reconciliation. Bounces / dropped are confirmed failures and
             // our row's `failed` status is correct.

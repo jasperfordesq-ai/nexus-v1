@@ -259,19 +259,28 @@ class SendGridWebhookController extends BaseApiController
             }
 
             if ($logUpdate) {
-                $row = DB::table('email_log')
+                if ($tenantId <= 0 || $baseId === '') {
+                    Log::warning('SendGrid webhook skipped email_log update without tenant/message id', [
+                        'tenant_id' => $tenantId > 0 ? $tenantId : null,
+                        'has_message_id' => $baseId !== '',
+                        'event' => $type,
+                    ]);
+                } else {
+                    $row = DB::table('email_log')
                     ->where('recipient_email', $email)
-                    ->when($tenantId > 0, fn ($q) => $q->where('tenant_id', $tenantId))
-                    ->when($baseId !== '', fn ($q) => $q->where('provider_message_id', 'like', $baseId . '%'))
+                    ->where('tenant_id', $tenantId)
+                    ->where('provider', 'sendgrid')
+                    ->where('provider_message_id', 'like', $baseId . '%')
                     ->orderByDesc('id')
                     ->first();
-                if ($row) {
-                    // Don't regress terminal states.
-                    if (isset($update['status']) && in_array($row->status, ['bounced', 'failed'], true)
-                        && $update['status'] === 'delivered') {
-                        unset($update['status']);
+                    if ($row) {
+                        // Don't regress terminal states.
+                        if (isset($update['status']) && in_array($row->status, ['bounced', 'failed'], true)
+                            && $update['status'] === 'delivered') {
+                            unset($update['status']);
+                        }
+                        DB::table('email_log')->where('id', $row->id)->update($update);
                     }
-                    DB::table('email_log')->where('id', $row->id)->update($update);
                 }
             }
 
