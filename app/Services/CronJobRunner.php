@@ -398,6 +398,19 @@ class CronJobRunner
                 ]);
             }
 
+            if ($this->isEmailSuppressed((string) $user['email'])) {
+                echo " - Recipient is suppressed, marking pending items as suppressed without emailing.\n";
+                $this->logSuppressedDigestEmail($user, $frequency, $userTenantId);
+                DB::update(
+                    "UPDATE notification_queue
+                        SET status = 'suppressed', sent_at = NULL
+                      WHERE user_id = ? AND frequency = ? AND status = 'pending'
+                        AND tenant_id = ?",
+                    [$userId, $frequency, $userTenantId]
+                );
+                continue;
+            }
+
             echo "Processing User: {$user['name']} ($count items)...\n";
 
             // Race condition fix: atomically claim items by setting status='processing'
@@ -458,6 +471,60 @@ class CronJobRunner
         }
 
         echo "Done.\n";
+    }
+
+    private function logSuppressedDigestEmail(array $user, string $frequency, int $tenantId): void
+    {
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('email_log')) {
+                return;
+            }
+
+            $subject = LocaleContext::withLocale(
+                $user['preferred_language'] ?? null,
+                fn () => __('emails.digest.subject', ['frequency' => $frequency])
+            );
+
+            DB::table('email_log')->insert([
+                'tenant_id' => $tenantId,
+                'user_id' => (int) $user['id'],
+                'recipient_email' => (string) $user['email'],
+                'category' => 'notification_digest',
+                'subject' => mb_substr((string) $subject, 0, 255),
+                'provider' => null,
+                'status' => 'suppressed',
+                'provider_message_id' => null,
+                'error' => 'recipient on local suppression list',
+                'sent_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::debug('processDigest: suppressed digest email_log insert failed', [
+                'user_id' => $user['id'] ?? null,
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function isEmailSuppressed(string $email): bool
+    {
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('email_suppression')) {
+                return false;
+            }
+
+            return DB::table('email_suppression')
+                ->where('email', $email)
+                ->exists();
+        } catch (\Throwable $e) {
+            Log::debug('processDigest: suppression lookup failed', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
     }
 
     public function runInstantQueue()
