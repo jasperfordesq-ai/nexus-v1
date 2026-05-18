@@ -434,11 +434,21 @@ class AdminVolunteerController extends BaseApiController
                             ->button(__("emails.volunteer_approval.{$emailKey}_cta"), $url)
                             ->render();
 
-                        \App\Core\Mailer::forCurrentTenant()->send(
+                        if (!\App\Core\Mailer::forCurrentTenant()->send(
                             $volDetail->email,
                             __("emails.volunteer_approval.{$emailKey}_subject"),
-                            $html
-                        );
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'volunteering'
+                        )) {
+                            Log::warning('AdminVolunteerController: hours status email returned false', [
+                                'vol_log_id' => $id,
+                                'user_id' => $volDetail->user_id ?? null,
+                                'status' => $newStatus,
+                            ]);
+                        }
                     });
                 }
             } catch (\Throwable $emailEx) {
@@ -880,11 +890,19 @@ class AdminVolunteerController extends BaseApiController
                             ->button(__('emails.volunteer_approval.application_approved_cta'), $url)
                             ->render();
 
-                        \App\Core\Mailer::forCurrentTenant()->send(
+                        if (!\App\Core\Mailer::forCurrentTenant()->send(
                             $applicant->email,
                             __('emails.volunteer_approval.application_approved_subject'),
-                            $html
-                        );
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'volunteering'
+                        )) {
+                            Log::warning('AdminVolunteerController: approval email returned false', [
+                                'application_id' => $id,
+                            ]);
+                        }
                     });
                 }
             } catch (\Throwable $emailEx) {

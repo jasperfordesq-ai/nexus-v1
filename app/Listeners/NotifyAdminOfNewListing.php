@@ -83,7 +83,7 @@ class NotifyAdminOfNewListing implements ShouldQueue
                         ->button(__('emails_misc.admin_notify.new_listing_cta'), $listingUrl)
                         ->render();
 
-                    if (!$mailer->send($adminEmail, $subject, $html)) {
+                    if (!$mailer->send($adminEmail, $subject, $html, null, null, null, 'admin_new_listing')) {
                         Log::warning('NotifyAdminOfNewListing: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                     }
                 });

@@ -611,7 +611,11 @@ class NotificationDispatcher
                 );
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($user->email, $subject, $emailBody, null, null, null, 'transaction');
+                if (!$mailer->send($user->email, $subject, $emailBody, null, null, null, 'transaction')) {
+                    Log::warning('NotificationDispatcher::sendCreditEmail mailer returned false', [
+                        'user_id' => $userId,
+                    ]);
+                }
             });
         } catch (\Exception $e) {
             Log::warning("NotificationDispatcher::sendCreditEmail failed: " . $e->getMessage());
@@ -683,7 +687,11 @@ class NotificationDispatcher
                     'community' => $tenantName,
                 ]);
 
-                Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'transaction');
+                if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'transaction')) {
+                    Log::warning('NotificationDispatcher::sendCreditSentEmail mailer returned false', [
+                        'user_id' => $userId,
+                    ]);
+                }
             });
         } catch (\Exception $e) {
             Log::warning("NotificationDispatcher::sendCreditSentEmail failed: " . $e->getMessage());
@@ -745,7 +753,11 @@ class NotificationDispatcher
                     ->button(__('emails.review_request.cta'), $reviewUrl)
                     ->render();
 
-                Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'review');
+                if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'review')) {
+                    Log::warning('NotificationDispatcher::sendReviewRequestEmail mailer returned false', [
+                        'user_id' => $userId,
+                    ]);
+                }
             });
         } catch (\Exception $e) {
             Log::warning('NotificationDispatcher::sendReviewRequestEmail failed: ' . $e->getMessage());
@@ -807,7 +819,11 @@ class NotificationDispatcher
                 );
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($user->email, $subject, $emailBody, null, null, null, 'review');
+                if (!$mailer->send($user->email, $subject, $emailBody, null, null, null, 'review')) {
+                    Log::warning('NotificationDispatcher::sendReviewEmail mailer returned false', [
+                        'user_id' => $receiverUserId,
+                    ]);
+                }
             });
         } catch (\Exception $e) {
             Log::warning("NotificationDispatcher::sendReviewEmail failed: " . $e->getMessage());
@@ -856,7 +872,11 @@ class NotificationDispatcher
 
             try {
                 $subject = __('emails_identity.started.subject', ['community' => $tenantName]);
-                Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'identity_verification');
+                if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'identity_verification')) {
+                    Log::warning('[IdentityVerification] started email returned false', [
+                        'user_id' => $userId,
+                    ]);
+                }
             } catch (\Throwable $e) {
                 Log::warning('[IdentityVerification] started email failed: ' . $e->getMessage());
             }
@@ -903,7 +923,11 @@ class NotificationDispatcher
 
                 try {
                     $subject = __('emails_identity.passed.subject', ['community' => $tenantName]);
-                    Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'identity_verification');
+                    if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'identity_verification')) {
+                        Log::warning('[IdentityVerification] passed email returned false', [
+                            'user_id' => $userId,
+                        ]);
+                    }
                 } catch (\Throwable $e) {
                     Log::warning('[IdentityVerification] passed email failed: ' . $e->getMessage());
                 }
@@ -957,7 +981,11 @@ class NotificationDispatcher
 
                 try {
                     $subject = __('emails_identity.failed.subject', ['community' => $tenantName]);
-                    Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'identity_verification');
+                    if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'identity_verification')) {
+                        Log::warning('[IdentityVerification] failed email returned false', [
+                            'user_id' => $userId,
+                        ]);
+                    }
                 } catch (\Throwable $e) {
                     Log::warning('[IdentityVerification] failed email failed: ' . $e->getMessage());
                 }
@@ -1002,7 +1030,7 @@ class NotificationDispatcher
         }
     }
 
-    public static function dispatchVerificationReminder(int $userId): void
+    public static function dispatchVerificationReminder(int $userId): bool
     {
         // Lookup recipient's preferred_language so bell + queued email render
         // under the recipient's locale, not the caller/worker locale.
@@ -1013,7 +1041,7 @@ class NotificationDispatcher
             ->select(['preferred_language'])
             ->first();
 
-        LocaleContext::withLocale($user, function () use ($userId) {
+        return (bool) LocaleContext::withLocale($user, function () use ($userId): bool {
         $content = __('notifications.verification_reminder');
         $link = "/verify-identity";
 
@@ -1044,6 +1072,7 @@ class NotificationDispatcher
 HTML;
 
         self::queueNotification($userId, 'verification_reminder', $content, $link, 'instant', $htmlContent);
+        return true;
         });
     }
 
@@ -1174,13 +1203,22 @@ HTML;
                     $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
                     $subject = __('emails.notification.credit_received_subject', ['sender' => $senderName, 'amount' => $amountDisplay, 'community' => $tenantName]);
                     $emailBody = self::buildCreditReceivedEmail($recipientName, $senderName, $amount, $description, $fullUrl, $tenantName);
-                    $mailer->send($user->email, $subject, $emailBody, null, null, null, 'transaction');
+                    if (!$mailer->send($user->email, $subject, $emailBody, null, null, null, 'transaction')) {
+                        Log::warning('NotificationDispatcher: credit received email returned false', [
+                            'user_id' => $user->id ?? null,
+                        ]);
+                    }
                 } else {
                     $exchangeDetails = self::getExchangeDetailsForEmail($data['exchange_id'] ?? 0);
                     $userArr = ['email' => $user->email, 'name' => $user->name, 'first_name' => $user->first_name];
                     $emailBody = self::buildRichExchangeEmail($type, $data, $userArr, $exchangeDetails, $fullUrl);
                     $subject = self::getExchangeEmailSubject($type, $exchangeDetails);
-                    $mailer->send($user->email, $subject, $emailBody, null, null, null, 'exchange');
+                    if (!$mailer->send($user->email, $subject, $emailBody, null, null, null, 'exchange')) {
+                        Log::warning('NotificationDispatcher: exchange email returned false', [
+                            'user_id' => $user->id ?? null,
+                            'type' => $type,
+                        ]);
+                    }
                 }
             });
         } catch (\Exception $e) {

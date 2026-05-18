@@ -228,11 +228,17 @@ class AdminListingsController extends BaseApiController
                         ->paragraph(__('emails_listings.listings.approved.email_body', ['title' => $safeTitle]))
                         ->button(__('emails_listings.listings.approved.email_cta'), $listingUrl)
                         ->render();
-                    \App\Core\Mailer::forCurrentTenant()->send(
+                    if (!\App\Core\Mailer::forCurrentTenant()->send(
                         $owner->email,
                         __('emails_listings.listings.approved.email_subject', ['title' => $safeTitle]),
-                        $html
-                    );
+                        $html,
+                        null,
+                        null,
+                        null,
+                        'listing_moderation'
+                    )) {
+                        Log::warning("[AdminListingsController] approve email returned false for listing #{$id}");
+                    }
                 });
             }
         } catch (\Exception $e) {
@@ -302,11 +308,17 @@ class AdminListingsController extends BaseApiController
                         ->paragraph(__('emails_listings.listings.removed.email_body', ['title' => $title]))
                         ->button(__('emails_listings.listings.removed.email_cta'), $fullUrl)
                         ->render();
-                    \App\Core\Mailer::forCurrentTenant()->send(
+                    if (!\App\Core\Mailer::forCurrentTenant()->send(
                         $user->email,
                         __('emails_listings.listings.removed.email_subject', ['title' => $title]),
-                        $html
-                    );
+                        $html,
+                        null,
+                        null,
+                        null,
+                        'listing_moderation'
+                    )) {
+                        Log::warning("[AdminListingsController] destroy email returned false for listing #{$id}");
+                    }
                 }
             });
         } catch (\Exception $e) {

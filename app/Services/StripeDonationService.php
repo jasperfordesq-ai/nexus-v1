@@ -283,11 +283,19 @@ class StripeDonationService
                         ->button(__('emails_created.donation.cta'), $accountUrl)
                         ->render();
 
-                    Mailer::forCurrentTenant()->send(
+                    if (!Mailer::forCurrentTenant()->send(
                         $donorEmail,
                         __('emails_created.donation.subject', ['community' => $tenantName]),
-                        $html
-                    );
+                        $html,
+                        null,
+                        null,
+                        null,
+                        'donation_receipt'
+                    )) {
+                        Log::warning('[StripeDonationService] donation receipt email returned false', [
+                            'donation_id' => $donation->id ?? null,
+                        ]);
+                    }
                 });
             }
         } catch (\Throwable $e) {

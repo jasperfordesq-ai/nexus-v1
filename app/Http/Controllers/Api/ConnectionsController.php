@@ -14,7 +14,6 @@ use App\Models\User;
 use App\Services\ConnectionService;
 use Illuminate\Http\JsonResponse;
 use App\Models\Notification;
-use App\Services\NotificationDispatcher;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -179,32 +178,6 @@ class ConnectionsController extends BaseApiController
             \Log::warning('Gamification XP award failed', ['action' => 'make_connection', 'user' => $userId, 'error' => $e->getMessage()]);
         }
 
-        // Notify the original requester that their connection request was accepted
-        try {
-            $requesterId = $connection->requester_id;
-            $accepter = User::find($userId);
-            $requester = User::find($requesterId);
-            LocaleContext::withLocale($requester, function () use ($accepter, $requesterId, $userId) {
-                $accepterName = $accepter->first_name ?? $accepter->name ?? __('emails.common.fallback_someone');
-
-                NotificationDispatcher::dispatch(
-                    $requesterId,
-                    'global',
-                    null,
-                    'connection_accepted',
-                    "{$accepterName} accepted your connection request",
-                    '/members/' . $userId,
-                    null
-                );
-            });
-        } catch (\Throwable $e) {
-            \Log::warning('Connection accepted notification failed', [
-                'accepter' => $userId,
-                'requester' => $connection->requester_id ?? null,
-                'error' => $e->getMessage(),
-            ]);
-        }
-
         return $this->respondWithData([
             'connection_id' => $connection->id,
             'status'        => 'connected',
@@ -258,8 +231,21 @@ class ConnectionsController extends BaseApiController
                         'connection_declined'
                     );
 
-                    // Email notification
-                    if ($requester && $requester->email) {
+                    // Email notification. Declines use the same connections
+                    // preference as requests/acceptances so the direct email
+                    // path does not bypass the canonical opt-out.
+                    $emailEnabled = true;
+                    try {
+                        $prefs = User::getNotificationPreferences((int) $requesterId);
+                        $emailEnabled = (bool) ($prefs['email_connections'] ?? true);
+                    } catch (\Throwable $prefError) {
+                        Log::debug('[ConnectionsController] connection declined preference lookup failed', [
+                            'requester_id' => $requesterId,
+                            'error' => $prefError->getMessage(),
+                        ]);
+                    }
+
+                    if ($emailEnabled && $requester && $requester->email) {
                         $requesterName = $requester->first_name ?? $requester->name ?? '';
 
                         $html = EmailTemplateBuilder::make()

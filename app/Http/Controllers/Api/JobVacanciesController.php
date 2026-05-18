@@ -545,11 +545,20 @@ class JobVacanciesController extends BaseApiController
                             ->paragraph(__('emails_commerce.job_application_applicant.next_steps'))
                             ->button(__('emails_commerce.job_application_applicant.cta'), $appUrl)
                             ->render();
-                        Mailer::forCurrentTenant()->send(
+                        if (!Mailer::forCurrentTenant()->send(
                             $applicantUser->email,
                             __('emails_commerce.job_application_applicant.subject', ['job_title' => $jobTitle, 'community' => $community]),
-                            $html
-                        );
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'job_application'
+                        )) {
+                            Log::warning('[JobVacanciesController] applicant confirmation email returned false', [
+                                'job_id' => $id,
+                                'user_id' => $applicantUser->id ?? null,
+                            ]);
+                        }
                     });
                 }
             }
@@ -582,11 +591,20 @@ class JobVacanciesController extends BaseApiController
                             ->paragraph(__('emails_commerce.job_application_employer.body', ['applicant_name' => htmlspecialchars($applicantName, ENT_QUOTES, 'UTF-8'), 'job_title' => $jobTitle]))
                             ->button(__('emails_commerce.job_application_employer.cta'), $reviewUrl)
                             ->render();
-                        Mailer::forCurrentTenant()->send(
+                        if (!Mailer::forCurrentTenant()->send(
                             $posterUser->email,
                             __('emails_commerce.job_application_employer.subject', ['job_title' => $jobTitle, 'community' => $community]),
-                            $html
-                        );
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'job_application'
+                        )) {
+                            Log::warning('[JobVacanciesController] employer alert email returned false', [
+                                'job_id' => $id,
+                                'user_id' => $posterUser->id ?? null,
+                            ]);
+                        }
                     });
                 }
             }

@@ -818,7 +818,7 @@ class StripeSubscriptionService
                 ->button(__($ctaText['key'], $ctaText['params'] ?? []), $fullUrl)
                 ->render();
 
-            if (!Mailer::forCurrentTenant()->send($admin->email, __($subject['key'], $subject['params'] ?? []), $html)) {
+            if (!Mailer::forCurrentTenant()->send($admin->email, __($subject['key'], $subject['params'] ?? []), $html, null, null, null, 'billing')) {
                 Log::warning('[StripeSubscriptionService] tenant admin email failed', ['tenant_id' => $tenantId]);
             }
         });

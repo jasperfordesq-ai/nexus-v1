@@ -169,7 +169,7 @@ class NotifySafeguardingStaff implements ShouldQueue
 
         $subject = __('emails_misc.safeguarding.onboarding_flag_subject', ['name' => $memberName]);
         $mailer  = Mailer::forCurrentTenant();
-        $sent    = $mailer->send($staff->email, $subject, $html);
+        $sent    = $mailer->send($staff->email, $subject, $html, null, null, null, 'safeguarding');
 
         if (!$sent) {
             Log::critical('NotifySafeguardingStaff: email send returned false — safeguarding notification not delivered', [

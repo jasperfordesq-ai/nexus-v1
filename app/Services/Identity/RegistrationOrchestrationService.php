@@ -699,9 +699,12 @@ class RegistrationOrchestrationService
 
         foreach ($abandoned as $row) {
             try {
-                \App\Services\NotificationDispatcher::dispatchVerificationReminder((int) $row['user_id']);
-                IdentityVerificationSessionService::markReminderSent((int) $row['id']);
-                $count++;
+                if (\App\Services\NotificationDispatcher::dispatchVerificationReminder((int) $row['user_id'])) {
+                    // The reminder is now durably queued in notification_queue;
+                    // actual email send/retry status is tracked by that queue.
+                    IdentityVerificationSessionService::markReminderSent((int) $row['id']);
+                    $count++;
+                }
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning("[VerificationReminder] Failed for session {$row['id']}: " . $e->getMessage());
             }

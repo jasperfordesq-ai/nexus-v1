@@ -678,7 +678,7 @@ class VereinDuesService
                 ->button(__($ctaKey), $url)
                 ->render();
 
-            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $params), $html)) {
+            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $params), $html, null, null, null, 'verein_dues')) {
                 Log::warning('VereinDues: email send failed', ['user_id' => $userId]);
             }
         });

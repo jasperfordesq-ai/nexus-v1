@@ -647,11 +647,17 @@ class LegalDocumentService
                             ->button(__('emails_content.legal_update.cta'), $reviewUrl)
                             ->render();
 
-                        Mailer::forCurrentTenant()->send(
+                        if (!Mailer::forCurrentTenant()->send(
                             $user->email,
                             __('emails_content.legal_update.subject', ['community' => $community, 'doc_type' => $docType]),
-                            $html
-                        );
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'legal_update'
+                        )) {
+                            Log::warning('[LegalDocumentService] email returned false for user ' . $user->id);
+                        }
                     } catch (\Throwable $e) {
                         Log::warning('[LegalDocumentService] email failed for user ' . $user->id . ': ' . $e->getMessage());
                     }

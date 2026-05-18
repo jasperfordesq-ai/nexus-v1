@@ -78,7 +78,7 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                             ->button(__('emails_misc.admin_notify.new_user_cta'), $profileUrl)
                             ->render();
 
-                        if (!$mailer->send($adminEmail, $subject, $html)) {
+                        if (!$mailer->send($adminEmail, $subject, $html, null, null, null, 'admin_new_registration')) {
                             Log::warning('NotifyAdminOfNewRegistration: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                         }
                     });

@@ -88,7 +88,7 @@ class NotifyAdminOfNewGroup implements ShouldQueue
                         ->button(__('emails_misc.admin_notify.new_group_cta'), $groupUrl)
                         ->render();
 
-                    if (!$mailer->send($adminEmail, $subject, $html)) {
+                    if (!$mailer->send($adminEmail, $subject, $html, null, null, null, 'admin_new_group')) {
                         Log::warning('NotifyAdminOfNewGroup: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                     }
                 });

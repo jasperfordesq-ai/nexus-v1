@@ -1374,7 +1374,7 @@ class IdeationChallengeService
 
             $mailer = Mailer::forCurrentTenant();
             $subject = $title . ' — ' . $tenantName;
-            $mailer->send($recipient->email, $subject, $html);
+            $mailer->send($recipient->email, $subject, $html, null, null, null, 'ideation');
         } catch (\Throwable $e) {
             Log::warning("IdeationChallengeService::sendIdeationEmail error: " . $e->getMessage());
         }

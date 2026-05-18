@@ -790,7 +790,12 @@ class MarketplacePaymentService
                             ->paragraph(__($emailBodyKey, ['amount' => $amountFormatted, 'currency' => $currency, 'order_number' => $orderNumber]))
                             ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
                             ->render();
-                        Mailer::forCurrentTenant()->send($buyer->email, __($emailSubjectKey, ['order_number' => $orderNumber]), $html, null, null, null, 'marketplace_refund');
+                        if (!Mailer::forCurrentTenant()->send($buyer->email, __($emailSubjectKey, ['order_number' => $orderNumber]), $html, null, null, null, 'marketplace_refund')) {
+                            Log::warning('MarketplacePayment webhook: refund email returned false', [
+                                'order_id' => $order->id,
+                                'buyer_id' => $buyer->id ?? null,
+                            ]);
+                        }
                     });
                 }
 

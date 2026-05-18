@@ -88,7 +88,7 @@ class NotifyAdminOfNewCommunityEvent implements ShouldQueue
                         ->button(__('emails_misc.admin_notify.new_event_cta'), $eventUrl)
                         ->render();
 
-                    if (!$mailer->send($adminEmail, $subject, $html)) {
+                    if (!$mailer->send($adminEmail, $subject, $html, null, null, null, 'admin_new_event')) {
                         Log::warning('NotifyAdminOfNewCommunityEvent: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                     }
                 });

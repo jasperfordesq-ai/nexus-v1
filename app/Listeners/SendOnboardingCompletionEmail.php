@@ -66,7 +66,7 @@ class SendOnboardingCompletionEmail implements ShouldQueue
             });
 
             $mailer = Mailer::forCurrentTenant();
-            $sent   = $mailer->send($user->email, $subject, $html);
+            $sent   = $mailer->send($user->email, $subject, $html, null, null, null, 'onboarding_completed');
 
             if (!$sent) {
                 Log::warning('SendOnboardingCompletionEmail: email returned false', [
