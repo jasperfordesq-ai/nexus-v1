@@ -177,6 +177,8 @@ class MarketplaceEscrowService
             ->get();
 
         foreach ($escrows as $escrow) {
+            $previousTenantId = TenantContext::getId();
+
             try {
                 // Set tenant context before any scoped operations
                 TenantContext::setById($escrow->tenant_id);
@@ -208,6 +210,12 @@ class MarketplaceEscrowService
                     'order_id' => $escrow->order_id,
                     'error' => $e->getMessage(),
                 ]);
+            } finally {
+                if ($previousTenantId !== null) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
             }
         }
 

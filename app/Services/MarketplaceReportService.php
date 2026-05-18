@@ -442,17 +442,19 @@ class MarketplaceReportService
         $count = 0;
 
         foreach ($overdue as $report) {
+            $previousTenantId = TenantContext::getId();
+
             $report->status = 'acknowledged';
             $report->acknowledged_at = now();
             $report->save();
             $count++;
 
-            // Set tenant context per-report so sendReportEmail uses the correct
-            // tenant's mailer, URLs, and translations.
-            TenantContext::setById((int) $report->tenant_id);
-
-            // Notify reporter their report is now under review
             try {
+                // Set tenant context per-report so sendReportEmail uses the correct
+                // tenant's mailer, URLs, and translations.
+                TenantContext::setById((int) $report->tenant_id);
+
+                // Notify reporter their report is now under review
                 self::sendReportEmail(
                     (int) $report->reporter_id,
                     'emails_misc.marketplace_report.acknowledged_subject',
@@ -466,6 +468,12 @@ class MarketplaceReportService
                 );
             } catch (\Throwable $e) {
                 Log::warning('[MarketplaceReportService] processUnacknowledged email failed: ' . $e->getMessage());
+            } finally {
+                if ($previousTenantId !== null) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
             }
         }
 

@@ -542,6 +542,8 @@ class EventNotificationService
      */
     public function notifyEventCreated(int $tenantId, int $eventId, int $organizerId, bool $notifyInitialAttendees = false): void
     {
+        $previousTenantId = TenantContext::getId();
+
         try {
             TenantContext::setById($tenantId);
 
@@ -610,6 +612,12 @@ class EventNotificationService
             }
         } catch (\Throwable $e) {
             Log::error("EventNotificationService::notifyEventCreated error: " . $e->getMessage());
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
     }
 

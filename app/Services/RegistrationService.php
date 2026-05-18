@@ -558,6 +558,7 @@ class RegistrationService
         }
 
         // Send the verification email
+        $previousTenantId = TenantContext::getId();
         try {
             TenantContext::setById($tenantId);
             LocaleContext::withLocale($user, function () use ($user, $token) {
@@ -597,7 +598,11 @@ class RegistrationService
                 'error' => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
 
         return $token;
