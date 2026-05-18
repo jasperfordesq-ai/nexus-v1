@@ -581,7 +581,13 @@ class FederationEmailService
     private static function getUserWithEmail(int $userId, int $tenantId): ?object
     {
         return DB::selectOne(
-            "SELECT id, email, first_name, last_name, preferred_language FROM users WHERE id = ? AND tenant_id = ? AND email IS NOT NULL",
+            "SELECT u.id, u.email, u.first_name, u.last_name, u.preferred_language,
+                    u.federation_notifications_enabled, fus.email_notifications
+             FROM users u
+             LEFT JOIN federation_user_settings fus ON fus.user_id = u.id
+             WHERE u.id = ? AND u.tenant_id = ? AND u.email IS NOT NULL
+               AND COALESCE(u.federation_notifications_enabled, 1) = 1
+               AND COALESCE(fus.email_notifications, 1) = 1",
             [$userId, $tenantId]
         );
     }

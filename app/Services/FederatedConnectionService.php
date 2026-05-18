@@ -144,6 +144,22 @@ class FederatedConnectionService
                 ]);
             }
 
+            try {
+                FederationEmailService::sendConnectionRequestNotification(
+                    $receiverId,
+                    $requesterId,
+                    $requesterTenantId,
+                    $receiverTenantId
+                );
+            } catch (\Exception $emailEx) {
+                Log::warning('[FederatedConnection] sendRequest email notification failed', [
+                    'connection_id' => $connectionId,
+                    'requester_tenant_id' => $requesterTenantId,
+                    'receiver_tenant_id' => $receiverTenantId,
+                    'error' => $emailEx->getMessage(),
+                ]);
+            }
+
             return ['success' => true, 'connection_id' => $connectionId];
         } catch (\Exception $e) {
             Log::error('[FederatedConnection] sendRequest failed', ['error' => $e->getMessage()]);
@@ -207,6 +223,22 @@ class FederatedConnectionService
             } catch (\Exception $notifEx) {
                 Log::warning('[FederatedConnection] acceptRequest notification failed', [
                     'error' => $notifEx->getMessage(),
+                ]);
+            }
+
+            try {
+                FederationEmailService::sendConnectionAcceptedNotification(
+                    (int) $connection->requester_user_id,
+                    $userId,
+                    $tenantId,
+                    (int) $connection->requester_tenant_id
+                );
+            } catch (\Exception $emailEx) {
+                Log::warning('[FederatedConnection] acceptRequest email notification failed', [
+                    'connection_id' => $connectionId,
+                    'requester_tenant_id' => (int) $connection->requester_tenant_id,
+                    'receiver_tenant_id' => $tenantId,
+                    'error' => $emailEx->getMessage(),
                 ]);
             }
 

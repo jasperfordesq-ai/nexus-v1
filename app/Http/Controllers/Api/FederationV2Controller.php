@@ -2598,6 +2598,38 @@ class FederationV2Controller extends BaseApiController
             $this->federationAuditService->log('federation_transaction', $tenantId, $receiverTenantIdInt, $userId,
                 ['transaction_id' => $txId, 'amount' => $amount, 'receiver_id' => $receiverIdInt]);
 
+            try {
+                FederationEmailService::sendTransactionNotification(
+                    $receiverIdInt,
+                    $userId,
+                    $tenantId,
+                    (float) $amount,
+                    $description,
+                    $receiverTenantIdInt
+                );
+
+                $senderBalance = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->value('balance');
+
+                FederationEmailService::sendTransactionConfirmation(
+                    $userId,
+                    $receiverIdInt,
+                    $receiverTenantIdInt,
+                    (float) $amount,
+                    $description,
+                    (float) ($senderBalance ?? 0)
+                );
+            } catch (\Throwable $emailEx) {
+                \Illuminate\Support\Facades\Log::warning('FederationV2::sendTransaction email notification failed', [
+                    'transaction_id' => $txId,
+                    'sender_tenant_id' => $tenantId,
+                    'receiver_tenant_id' => $receiverTenantIdInt,
+                    'error' => $emailEx->getMessage(),
+                ]);
+            }
+
             return $this->respondWithData(['transaction_id' => $txId, 'status' => 'completed', 'amount' => $amount], null, 201);
         } catch (\Throwable $e) {
             DB::rollBack();

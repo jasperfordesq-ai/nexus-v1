@@ -899,6 +899,25 @@ class FederationController extends BaseApiController
 
         $this->federationAuditService->log('api_transaction_initiated', $partnerTenantId, $recipient['tenant_id'], null, ['transaction_id' => $transactionId, 'amount' => $amount, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternal]);
 
+        try {
+            FederationEmailService::sendTransactionNotification(
+                (int) $recipient['id'],
+                $senderId,
+                $partnerTenantId,
+                (float) $amount,
+                (string) $input['description'],
+                (int) $recipient['tenant_id']
+            );
+        } catch (\Throwable $emailEx) {
+            \Illuminate\Support\Facades\Log::warning('FederationV1::createTransaction email notification failed', [
+                'transaction_id' => (int) $transactionId,
+                'sender_tenant_id' => $partnerTenantId,
+                'receiver_tenant_id' => (int) $recipient['tenant_id'],
+                'external_partner' => $isExternal,
+                'error' => $emailEx->getMessage(),
+            ]);
+        }
+
         return $this->fedSuccess(['transaction_id' => (int) $transactionId, 'status' => $status, 'amount' => $amount, 'note' => $status === 'completed' ? 'Transaction completed successfully' : 'Transaction requires recipient confirmation'], 201);
     }
 
