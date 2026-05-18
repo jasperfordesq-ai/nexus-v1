@@ -146,6 +146,10 @@ class EmailDispatchService
             return (int) $tenantId;
         }
 
+        if ($allowMissingTenant && (array_key_exists('tenant_id', $options) || array_key_exists('tenantId', $options))) {
+            return null;
+        }
+
         $contextTenantId = TenantContext::currentId();
         $recipientTenantIds = $this->resolveTenantIdsFromRecipientEmail($to);
 

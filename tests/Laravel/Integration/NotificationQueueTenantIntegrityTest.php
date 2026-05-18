@@ -138,6 +138,28 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         $this->assertSame($this->testTenantId, TenantContext::currentId());
     }
 
+    public function test_email_dispatcher_does_not_infer_tenant_for_explicit_platform_send(): void
+    {
+        $email = 'external-provisioning-existing-' . uniqid('', true) . '@example.test';
+        User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'email' => $email,
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+
+        $method = new \ReflectionMethod(EmailDispatchService::class, 'resolveTenantId');
+        $method->setAccessible(true);
+
+        $tenantId = $method->invoke(app(EmailDispatchService::class), [
+            'tenant_id' => null,
+            'allow_missing_tenant' => true,
+        ], $email);
+
+        $this->assertNull($tenantId);
+        $this->assertSame($this->testTenantId, TenantContext::currentId());
+    }
+
     public function test_email_dispatcher_clears_context_for_null_tenant_sends(): void
     {
         $source = file_get_contents(app_path('Services/EmailDispatchService.php'));
