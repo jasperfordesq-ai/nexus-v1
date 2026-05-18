@@ -12,7 +12,7 @@ use App\Core\Env;
 use App\Core\TenantContext;
 use App\Core\EmailTemplateBuilder;
 use App\I18n\LocaleContext;
-use App\Services\EmailService;
+use App\Services\EmailDispatchService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -46,7 +46,7 @@ class TenantProvisioningMailer
         $locale = $request['default_language'] ?? 'en';
         try {
             TenantContext::setById($tenantId);
-            LocaleContext::withLocale($locale, function () use ($request, $tenant, $applicantEmail, $tempPassword) {
+            LocaleContext::withLocale($locale, function () use ($request, $tenant, $tenantId, $applicantEmail, $tempPassword) {
                 try {
                     $name      = $request['applicant_name'] ?? '';
                     $tenantUrl = self::tenantUrl($tenant);
@@ -75,9 +75,7 @@ class TenantProvisioningMailer
                     $subject = __('emails_provisioning.welcome.subject', ['name' => $tenant->name]);
                     $html    = $builder->render();
 
-                    /** @var EmailService $email */
-                    $email = app(EmailService::class);
-                    if (!$email->send($applicantEmail, $subject, $html, ['category' => 'tenant_provisioning'])) {
+                    if (!EmailDispatchService::sendRaw($applicantEmail, $subject, $html, null, null, null, 'tenant_provisioning', ['tenant_id' => $tenantId])) {
                         Log::warning('TenantProvisioningMailer welcome send returned false', [
                             'tenant_id' => $tenant->id ?? null,
                         ]);
@@ -125,9 +123,7 @@ class TenantProvisioningMailer
                 $subject = __('emails_provisioning.rejection.subject');
                 $html    = $builder->render();
 
-                /** @var EmailService $email */
-                $email = app(EmailService::class);
-                if (!$email->send($applicantEmail, $subject, $html, ['category' => 'tenant_provisioning'])) {
+                if (!EmailDispatchService::sendRaw($applicantEmail, $subject, $html, null, null, null, 'tenant_provisioning')) {
                     Log::warning('TenantProvisioningMailer rejection send returned false');
                 }
             } catch (Throwable $e) {

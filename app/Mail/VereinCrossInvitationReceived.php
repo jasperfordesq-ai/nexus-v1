@@ -11,7 +11,7 @@ namespace App\Mail;
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
-use App\Services\EmailService;
+use App\Services\EmailDispatchService;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -54,9 +54,7 @@ class VereinCrossInvitationReceived
 
                 $subject = __('emails.verein_federation.invitation_received_subject', ['target' => $targetName]);
 
-                /** @var EmailService $email */
-                $email = app(EmailService::class);
-                if (!$email->send($recipient->email, $subject, $builder->render(), ['category' => 'verein_federation'])) {
+                if (!EmailDispatchService::sendRaw($recipient->email, $subject, $builder->render(), null, null, null, 'verein_federation')) {
                     Log::warning('[VereinCrossInvitationReceived] email returned false', [
                         'recipient_id' => $recipient->id ?? null,
                         'invitation_id' => $invitationId,

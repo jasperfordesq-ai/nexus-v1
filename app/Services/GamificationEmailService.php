@@ -32,7 +32,7 @@ class GamificationEmailService
      * Send monthly progress digests to users who actually have activity.
      *
      * Iterates all active tenants, finds users with XP activity in the past 30 days,
-     * generates a digest for each, and sends it via EmailService.
+     * generates a digest for each, and sends it through EmailDispatchService.
      *
      * @return array{sent: int, skipped: int, errors: int}
      */
@@ -42,8 +42,6 @@ class GamificationEmailService
         $skipped = 0;
         $errors = 0;
 
-        /** @var EmailService $emailService */
-        $emailService = app(EmailService::class);
         $previousTenantId = TenantContext::getId();
 
         try {
@@ -112,12 +110,12 @@ class GamificationEmailService
                             continue;
                         }
 
-                        $success = LocaleContext::withLocale($user, function () use ($user, $digest, $tenant, $emailService) {
+                        $success = LocaleContext::withLocale($user, function () use ($user, $digest, $tenant) {
                             $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
                             $subject = __('emails.gamification_digest.subject');
                             $body = $this->buildDigestEmailBody($name, $digest, $tenant->name ?? __('emails.common.fallback_tenant_name'));
 
-                            return $emailService->send($user->email, $subject, $body, ['category' => 'gamification_digest']);
+                            return EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, 'gamification_digest', ['tenant_id' => (int) $tenant->id]);
                         });
 
                         if ($success) {
@@ -256,10 +254,7 @@ class GamificationEmailService
                 $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
                 [$subject, $body] = $this->buildMilestoneEmail($name, $type, $data);
 
-                /** @var EmailService $emailService */
-                $emailService = app(EmailService::class);
-
-                return $emailService->send($user->email, $subject, $body, ['category' => 'gamification_milestone']);
+                return EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, 'gamification_milestone');
             });
         } catch (\Throwable $e) {
             Log::error('GamificationEmailService: Failed to send milestone email', [

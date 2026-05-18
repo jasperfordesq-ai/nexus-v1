@@ -35,8 +35,6 @@ class GroupReportingService
         $sent = 0;
         $totalGroups = 0;
 
-        /** @var EmailService $emailService */
-        $emailService = app(EmailService::class);
         $previousTenantId = TenantContext::getId();
 
         try {
@@ -99,8 +97,7 @@ class GroupReportingService
                         $result = self::processGroupDigest(
                             $group,
                             $tenant,
-                            $digestSince,
-                            $emailService
+                            $digestSince
                         );
                         $sent += $result;
                     } catch (\Throwable $e) {
@@ -139,8 +136,7 @@ class GroupReportingService
     private static function processGroupDigest(
         object $group,
         object $tenant,
-        \DateTimeInterface $weekAgo,
-        EmailService $emailService
+        \DateTimeInterface $weekAgo
     ): int {
         $tenantId = $tenant->id;
 
@@ -211,12 +207,12 @@ class GroupReportingService
                 // Wrap subject + body (stat labels, greetings, CTA) render in the
                 // recipient's preferred_language. Each admin/owner gets the digest
                 // in their own language.
-                $success = LocaleContext::withLocale($user, function () use ($user, $group, $stats, $tenant, $emailService) {
+                $success = LocaleContext::withLocale($user, function () use ($user, $group, $stats, $tenant) {
                     $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
                     $subject = __('emails.group_digest.subject', ['group' => $group->name]);
                     $body = self::buildDigestEmailBody($name, $stats, $tenant->name ?? __('emails.common.fallback_tenant_name'));
 
-                    return $emailService->send($user->email, $subject, $body, ['category' => 'group_digest']);
+                    return EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, 'group_digest', ['tenant_id' => (int) $tenant->id]);
                 });
 
                 if ($success) {

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
@@ -618,8 +617,7 @@ class NotificationDispatcher
                     htmlspecialchars($tenantName)
                 );
 
-                $mailer = Mailer::forCurrentTenant();
-                if (!$mailer->send($user->email, $subject, $emailBody, null, null, null, 'transaction')) {
+                if (!EmailDispatchService::sendRaw($user->email, $subject, $emailBody, null, null, null, 'transaction')) {
                     Log::warning('NotificationDispatcher::sendCreditEmail mailer returned false', [
                         'user_id' => $recipientUserId,
                     ]);
@@ -695,7 +693,7 @@ class NotificationDispatcher
                     'community' => $tenantName,
                 ]);
 
-                if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'transaction')) {
+                if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'transaction')) {
                     Log::warning('NotificationDispatcher::sendCreditSentEmail mailer returned false', [
                         'user_id' => $senderUserId,
                     ]);
@@ -761,7 +759,7 @@ class NotificationDispatcher
                     ->button(__('emails.review_request.cta'), $reviewUrl)
                     ->render();
 
-                if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'review')) {
+                if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'review')) {
                     Log::warning('NotificationDispatcher::sendReviewRequestEmail mailer returned false', [
                         'user_id' => $userId,
                     ]);
@@ -826,8 +824,7 @@ class NotificationDispatcher
                     htmlspecialchars($tenantName)
                 );
 
-                $mailer = Mailer::forCurrentTenant();
-                if (!$mailer->send($user->email, $subject, $emailBody, null, null, null, 'review')) {
+                if (!EmailDispatchService::sendRaw($user->email, $subject, $emailBody, null, null, null, 'review')) {
                     Log::warning('NotificationDispatcher::sendReviewEmail mailer returned false', [
                         'user_id' => $receiverUserId,
                     ]);
@@ -880,7 +877,7 @@ class NotificationDispatcher
 
             try {
                 $subject = __('emails_identity.started.subject', ['community' => $tenantName]);
-                if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'identity_verification')) {
+                if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'identity_verification')) {
                     Log::warning('[IdentityVerification] started email returned false', [
                         'user_id' => $userId,
                     ]);
@@ -931,7 +928,7 @@ class NotificationDispatcher
 
                 try {
                     $subject = __('emails_identity.passed.subject', ['community' => $tenantName]);
-                    if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'identity_verification')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'identity_verification')) {
                         Log::warning('[IdentityVerification] passed email returned false', [
                             'user_id' => $userId,
                         ]);
@@ -989,7 +986,7 @@ class NotificationDispatcher
 
                 try {
                     $subject = __('emails_identity.failed.subject', ['community' => $tenantName]);
-                    if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'identity_verification')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'identity_verification')) {
                         Log::warning('[IdentityVerification] failed email returned false', [
                             'user_id' => $userId,
                         ]);
@@ -1199,8 +1196,6 @@ HTML;
                 $slugPrefix = TenantContext::getSlugPrefix();
                 $fullUrl = $baseUrl . $slugPrefix . $link;
 
-                $mailer = Mailer::forCurrentTenant();
-
                 if ($type === 'credit_received') {
                     $senderName = htmlspecialchars($data['sender_name'] ?? __('emails.common.fallback_member_name'));
                     $amount = (float) ($data['amount'] ?? 0);
@@ -1211,7 +1206,7 @@ HTML;
                     $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
                     $subject = __('emails.notification.credit_received_subject', ['sender' => $senderName, 'amount' => $amountDisplay, 'community' => $tenantName]);
                     $emailBody = self::buildCreditReceivedEmail($recipientName, $senderName, $amount, $description, $fullUrl, $tenantName);
-                    if (!$mailer->send($user->email, $subject, $emailBody, null, null, null, 'transaction')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $emailBody, null, null, null, 'transaction')) {
                         Log::warning('NotificationDispatcher: credit received email returned false', [
                             'user_id' => $user->id ?? null,
                         ]);
@@ -1221,7 +1216,7 @@ HTML;
                     $userArr = ['email' => $user->email, 'name' => $user->name, 'first_name' => $user->first_name];
                     $emailBody = self::buildRichExchangeEmail($type, $data, $userArr, $exchangeDetails, $fullUrl);
                     $subject = self::getExchangeEmailSubject($type, $exchangeDetails);
-                    if (!$mailer->send($user->email, $subject, $emailBody, null, null, null, 'exchange')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $emailBody, null, null, null, 'exchange')) {
                         Log::warning('NotificationDispatcher: exchange email returned false', [
                             'user_id' => $user->id ?? null,
                             'type' => $type,

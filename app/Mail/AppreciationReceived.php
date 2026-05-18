@@ -11,7 +11,7 @@ namespace App\Mail;
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
-use App\Services\EmailService;
+use App\Services\EmailDispatchService;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -57,9 +57,7 @@ class AppreciationReceived
 
                 $subject = __('emails.appreciation.subject', ['sender' => $senderName]);
 
-                /** @var EmailService $email */
-                $email = app(EmailService::class);
-                if (!$email->send($recipient->email, $subject, $builder->render(), ['category' => 'appreciation'])) {
+                if (!EmailDispatchService::sendRaw($recipient->email, $subject, $builder->render(), null, null, null, 'appreciation')) {
                     Log::warning('[AppreciationReceived] email returned false', [
                         'recipient_id' => $recipient->id ?? null,
                     ]);

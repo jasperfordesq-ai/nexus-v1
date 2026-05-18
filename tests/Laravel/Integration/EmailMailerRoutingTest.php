@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Integration;
 
 use App\Services\EmailService;
+use App\Services\EmailTriggerAuditService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
 use Tests\Laravel\TestCase;
@@ -181,6 +182,21 @@ class EmailMailerRoutingTest extends TestCase
             $offences,
             "Mail:: facade usage detected outside app/Mail/. Route through Mailer::forCurrentTenant() instead:\n  - "
                 . implode("\n  - ", $offences)
+        );
+    }
+
+    public function test_no_legacy_direct_email_send_surface_remains(): void
+    {
+        $surface = app(EmailTriggerAuditService::class)->directEmailSendSurface();
+
+        $this->assertSame(
+            [],
+            $surface,
+            "Legacy direct email send paths detected. Route through EmailDispatchService::sendRaw() with an explicit category:\n  - "
+                . implode("\n  - ", array_map(
+                    fn (array $row): string => "{$row['path']}:{$row['line']} ({$row['pattern']})",
+                    $surface
+                ))
         );
     }
 }

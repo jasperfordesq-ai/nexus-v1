@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
-use App\Services\EmailService;
+use App\Services\EmailDispatchService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -483,7 +483,6 @@ class AdminSafeguardingController extends BaseApiController
                         ]);
 
                         if (!empty($guardianUser->email)) {
-                            $emailService = app(EmailService::class);
                             $guardianName = trim(($guardianUser->first_name ?? '') . ' ' . ($guardianUser->last_name ?? '')) ?: ($guardianUser->name ?? '');
                             $wardName = trim(($wardUser->first_name ?? '') . ' ' . ($wardUser->last_name ?? '')) ?: ($wardUser->name ?? __('api_controllers_1.admin_safeguarding.a_member'));
                             $safeGuardian = htmlspecialchars($guardianName, ENT_QUOTES, 'UTF-8');
@@ -499,7 +498,7 @@ class AdminSafeguardingController extends BaseApiController
                                 ->button(__('emails_misc.safeguarding.guardian_assigned_cta'), EmailTemplateBuilder::tenantUrl('/settings?tab=safeguarding'))
                                 ->render();
                             $subject = __('emails_misc.safeguarding.guardian_assigned_subject');
-                            if (!$emailService->send($guardianUser->email, $subject, $html, ['category' => 'safeguarding'])) {
+                            if (!EmailDispatchService::sendRaw($guardianUser->email, $subject, $html, null, null, null, 'safeguarding')) {
                                 \Illuminate\Support\Facades\Log::warning('AdminSafeguardingController: guardian assignment email failed', ['guardian_id' => $guardianId]);
                             }
                         }
@@ -519,7 +518,6 @@ class AdminSafeguardingController extends BaseApiController
                         ]);
 
                         if (!empty($wardUser->email)) {
-                            $emailService = app(EmailService::class);
                             $wardName2 = trim(($wardUser->first_name ?? '') . ' ' . ($wardUser->last_name ?? '')) ?: ($wardUser->name ?? '');
                             $guardianDisplay = trim(($guardianUser->first_name ?? '') . ' ' . ($guardianUser->last_name ?? '')) ?: ($guardianUser->name ?? __('api_controllers_1.admin_safeguarding.a_coordinator'));
                             $safeWard2 = htmlspecialchars($wardName2, ENT_QUOTES, 'UTF-8');
@@ -534,7 +532,7 @@ class AdminSafeguardingController extends BaseApiController
                                 ->button(__('emails_misc.safeguarding.ward_assigned_cta'), EmailTemplateBuilder::tenantUrl('/settings?tab=safeguarding'))
                                 ->render();
                             $subject2 = __('emails_misc.safeguarding.ward_assigned_subject');
-                            if (!$emailService->send($wardUser->email, $subject2, $html2, ['category' => 'safeguarding'])) {
+                            if (!EmailDispatchService::sendRaw($wardUser->email, $subject2, $html2, null, null, null, 'safeguarding')) {
                                 \Illuminate\Support\Facades\Log::warning('AdminSafeguardingController: ward assignment email failed', ['ward_id' => $wardId]);
                             }
                         }
@@ -615,12 +613,11 @@ class AdminSafeguardingController extends BaseApiController
                 $wardUser       = \App\Models\User::where('id', $assignment->ward_user_id)->where('tenant_id', $tenantId)->first();
                 $wardName       = $wardUser ? (trim(($wardUser->first_name ?? '') . ' ' . ($wardUser->last_name ?? '')) ?: ($wardUser->name ?? '')) : '';
                 $guardianName   = $guardianUser ? (trim(($guardianUser->first_name ?? '') . ' ' . ($guardianUser->last_name ?? '')) ?: ($guardianUser->name ?? '')) : '';
-                $emailService   = app(EmailService::class);
                 $safeCommunity  = htmlspecialchars($communityName, ENT_QUOTES, 'UTF-8');
 
                 // Bell + email — guardian (rendered in guardian's locale)
                 if ($guardianUser) {
-                    LocaleContext::withLocale($guardianUser, function () use ($tenantId, $assignment, $guardianUser, $wardName, $guardianName, $emailService, $safeCommunity) {
+                    LocaleContext::withLocale($guardianUser, function () use ($tenantId, $assignment, $guardianUser, $wardName, $guardianName, $safeCommunity) {
                         \App\Models\Notification::create([
                             'tenant_id' => $tenantId,
                             'user_id'   => $assignment->guardian_user_id,
@@ -639,7 +636,7 @@ class AdminSafeguardingController extends BaseApiController
                                 ->greeting($safeGuardianName)
                                 ->paragraph(__('emails_misc.safeguarding.assignment_revoked_guardian_body', ['name' => $safeWardName, 'community' => $safeCommunity]))
                                 ->render();
-                            if (!$emailService->send($guardianUser->email, __('emails_misc.safeguarding.assignment_revoked_guardian_subject'), $html, ['category' => 'safeguarding'])) {
+                            if (!EmailDispatchService::sendRaw($guardianUser->email, __('emails_misc.safeguarding.assignment_revoked_guardian_subject'), $html, null, null, null, 'safeguarding')) {
                                 \Illuminate\Support\Facades\Log::warning('AdminSafeguardingController: guardian revocation email failed', ['guardian_id' => $assignment->guardian_user_id]);
                             }
                         }
@@ -648,7 +645,7 @@ class AdminSafeguardingController extends BaseApiController
 
                 // Bell + email — ward (rendered in ward's locale)
                 if ($wardUser) {
-                    LocaleContext::withLocale($wardUser, function () use ($tenantId, $assignment, $wardUser, $wardName, $emailService, $safeCommunity) {
+                    LocaleContext::withLocale($wardUser, function () use ($tenantId, $assignment, $wardUser, $wardName, $safeCommunity) {
                         \App\Models\Notification::create([
                             'tenant_id' => $tenantId,
                             'user_id'   => $assignment->ward_user_id,
@@ -667,7 +664,7 @@ class AdminSafeguardingController extends BaseApiController
                                 ->paragraph(__('emails_misc.safeguarding.assignment_revoked_ward_body', ['community' => $safeCommunity]))
                                 ->button(__('emails_misc.safeguarding.assignment_revoked_cta'), EmailTemplateBuilder::tenantUrl('/help'))
                                 ->render();
-                            if (!$emailService->send($wardUser->email, __('emails_misc.safeguarding.assignment_revoked_guardian_subject'), $html2, ['category' => 'safeguarding'])) {
+                            if (!EmailDispatchService::sendRaw($wardUser->email, __('emails_misc.safeguarding.assignment_revoked_guardian_subject'), $html2, null, null, null, 'safeguarding')) {
                                 \Illuminate\Support\Facades\Log::warning('AdminSafeguardingController: ward revocation email failed', ['ward_id' => $assignment->ward_user_id]);
                             }
                         }

@@ -11,7 +11,6 @@ namespace App\Mail;
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
-use App\Services\EmailService;
 use Throwable;
 
 /**
@@ -48,7 +47,7 @@ class CivicDigestMail
      * @param object               $recipient  User-like object with email/first_name/last_name/preferred_language
      * @param string               $cadence    'daily' | 'monthly'
      * @param list<array<string,mixed>> $items   Digest items as returned by CivicDigestService::digestForMember()
-     * @return bool                            true if EmailService::send() returned true; false otherwise
+     * @return bool                            true if EmailDispatchService returned true; false otherwise
      */
     public static function dispatchDigest(object $recipient, string $cadence, array $items): bool
     {
@@ -149,13 +148,14 @@ class CivicDigestMail
                 $builder->button(__('civic_digest.email.view_all'), $digestUrl);
                 $builder->paragraph(__('civic_digest.email.footer', ['community' => $community]));
 
-                /** @var EmailService $email */
-                $email = app(EmailService::class);
-                $sent = $email->send(
+                $sent = \App\Services\EmailDispatchService::sendRaw(
                     (string) $recipient->email,
                     $subject,
                     $builder->render(),
-                    ['unsubscribeUrl' => $prefsUrl, 'category' => 'civic_digest'],
+                    null,
+                    null,
+                    $prefsUrl,
+                    'civic_digest',
                 );
                 return $sent === true;
             } catch (Throwable $e) {

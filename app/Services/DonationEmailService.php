@@ -42,7 +42,7 @@ class DonationEmailService
         // ── Donor confirmation — render in donor's preferred_language ──────
         try {
             if (!empty($donor->email)) {
-                LocaleContext::withLocale($donor, function () use ($donor, $recipient, $amount, $message, $walletUrl) {
+                LocaleContext::withLocale($donor, function () use ($tenantId, $donor, $recipient, $amount, $message, $walletUrl) {
                     $donorName         = $donor->first_name ?? $donor->name ?? __('emails.common.fallback_name');
                     $recipientFullName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) ?: ($recipient->name ?? __('emails.common.fallback_member_name'));
 
@@ -65,9 +65,7 @@ class DonationEmailService
                         ->button(__('emails.donation.sent_cta'), $walletUrl)
                         ->render();
 
-                    /** @var EmailService $emailService */
-                    $emailService = app(EmailService::class);
-                    if (!$emailService->send($donor->email, $subject, $html, ['category' => 'donation'])) {
+                    if (!EmailDispatchService::sendRaw($donor->email, $subject, $html, null, null, null, 'donation', ['tenant_id' => $tenantId])) {
                         Log::warning('DonationEmailService: donor confirmation send returned false', [
                             'donor_id' => $donor->id ?? null,
                         ]);
@@ -85,7 +83,7 @@ class DonationEmailService
         // ── Recipient notification — render in recipient's preferred_language ──
         try {
             if (!empty($recipient->email)) {
-                LocaleContext::withLocale($recipient, function () use ($donor, $recipient, $amount, $message, $walletUrl) {
+                LocaleContext::withLocale($recipient, function () use ($tenantId, $donor, $recipient, $amount, $message, $walletUrl) {
                     $recipientName = $recipient->first_name ?? $recipient->name ?? __('emails.common.fallback_name');
                     $donorFullName = trim(($donor->first_name ?? '') . ' ' . ($donor->last_name ?? '')) ?: ($donor->name ?? __('emails.common.fallback_member_name'));
 
@@ -108,9 +106,7 @@ class DonationEmailService
                         ->button(__('emails.donation.received_cta'), $walletUrl)
                         ->render();
 
-                    /** @var EmailService $emailService */
-                    $emailService = app(EmailService::class);
-                    if (!$emailService->send($recipient->email, $subject, $html, ['category' => 'donation'])) {
+                    if (!EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'donation', ['tenant_id' => $tenantId])) {
                         Log::warning('DonationEmailService: recipient notification send returned false', [
                             'recipient_id' => $recipient->id ?? null,
                         ]);

@@ -10,7 +10,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
-use App\Services\EmailService;
+use App\Services\EmailDispatchService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -178,7 +178,7 @@ class SafeguardingReviewFlagsCommand extends Command
                     'tenant_id' => (int) $row->tenant_id,
                     'user_id' => (int) $row->user_id,
                     'name' => trim(($row->first_name ?? '') . ' ' . ($row->last_name ?? ''))
-                        ?: ($row->display_name ?? 'A member'),
+                        ?: ($row->display_name ?? __('emails.common.fallback_member_name')),
                     'preference_ids' => [],
                 ];
             }
@@ -226,7 +226,7 @@ class SafeguardingReviewFlagsCommand extends Command
             // Safeguarding reminder rendered in the recipient member's language.
             return (bool) LocaleContext::withLocale($userBatch['preferred_language'] ?? null, function () use ($userBatch): bool {
                 $safeName = htmlspecialchars($userBatch['name'] ?: __('emails.common.fallback_member_name'), ENT_QUOTES, 'UTF-8');
-                $safeCommunity = htmlspecialchars($userBatch['community'] ?: 'the community', ENT_QUOTES, 'UTF-8');
+                $safeCommunity = htmlspecialchars($userBatch['community'] ?: __('emails.common.fallback_tenant_name'), ENT_QUOTES, 'UTF-8');
 
                 $html = EmailTemplateBuilder::make()
                     ->theme('info')
@@ -239,7 +239,7 @@ class SafeguardingReviewFlagsCommand extends Command
                     )
                     ->render();
 
-                return \App\Services\EmailDispatchService::sendWithOptions(
+                return EmailDispatchService::sendWithOptions(
                     $userBatch['email'],
                     __('safeguarding.review.reminder_subject'),
                     $html,
@@ -336,7 +336,7 @@ class SafeguardingReviewFlagsCommand extends Command
                     // Email
                     if (!empty($admin->email)) {
                         try {
-                            $sent = \App\Services\EmailDispatchService::sendWithOptions(
+                            $sent = EmailDispatchService::sendWithOptions(
                                 $admin->email,
                                 __('safeguarding.review.escalation_subject'),
                                 $escalationHtml,

@@ -357,7 +357,6 @@ class EmailTriggerAuditService
             app_path('Services/EmailDispatchService.php'),
             app_path('Services/EmailService.php'),
             app_path('Services/EmailTriggerAuditService.php'),
-            app_path('Services/NotificationDispatcher.php'),
         ]));
 
         $patterns = [
@@ -365,7 +364,7 @@ class EmailTriggerAuditService
             'mailer_new_send' => '/new\s+(?:\\\\?App\\\\Core\\\\)?Mailer\s*\([^;]*\)\s*\)?\s*->\s*send\s*\(/',
             'mailer_variable_send' => '/(?:\$mailer|\$[A-Za-z_][A-Za-z0-9_]*mailer[A-Za-z0-9_]*)\s*->\s*send\s*\(/i',
             'email_service_app_send' => '/app\s*\(\s*EmailService::class\s*\)\s*->\s*send\s*\(/',
-            'email_service_variable_send' => '/\$[A-Za-z_][A-Za-z0-9_]*(?:emailService|email)[A-Za-z0-9_]*\s*->\s*send\s*\(/i',
+            'email_service_variable_send' => '/(?:\$email|\$emailService|\$[A-Za-z_][A-Za-z0-9_]*(?:emailservice|email)[A-Za-z0-9_]*)\s*->\s*send\s*\(/i',
         ];
 
         $surface = [];
