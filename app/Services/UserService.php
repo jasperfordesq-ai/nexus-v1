@@ -507,7 +507,70 @@ class UserService
         $user->password_hash = Hash::make($newPassword);
         $user->save();
 
+        self::notifyPasswordChanged($user);
+
         return true;
+    }
+
+    private static function notifyPasswordChanged(User $user): void
+    {
+        $tenantId = (int) ($user->tenant_id ?? TenantContext::getId());
+        $recipientLocale = $user->preferred_language ?? null;
+
+        try {
+            TenantContext::runForTenant($tenantId, function () use ($user, $recipientLocale): void {
+                LocaleContext::withLocale($recipientLocale, function () use ($user): void {
+                    Notification::createNotification(
+                        (int) $user->id,
+                        __('api_controllers_2.password_reset.changed_bell'),
+                        null,
+                        'password_changed',
+                        false,
+                        (int) $user->tenant_id
+                    );
+                });
+            });
+        } catch (\Throwable $e) {
+            Log::warning('UserService::notifyPasswordChanged bell failed', [
+                'user_id' => $user->id,
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        if (empty($user->email)) {
+            return;
+        }
+
+        try {
+            TenantContext::runForTenant($tenantId, function () use ($user, $recipientLocale, $tenantId): void {
+                LocaleContext::withLocale($recipientLocale, function () use ($user, $tenantId): void {
+                    $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('emails.security.password_changed_title'))
+                        ->previewText(__('emails.security.password_changed_preview'))
+                        ->paragraph(__('emails.security.password_changed_body'))
+                        ->highlight(__('emails.security.password_changed_warning'))
+                        ->render();
+
+                    $subject = __('emails.security.password_changed_subject', ['community' => $tenantName]);
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $tenantId])) {
+                        Log::warning('UserService::notifyPasswordChanged email returned false', [
+                            'user_id' => $user->id,
+                            'tenant_id' => $tenantId,
+                        ]);
+                    }
+                });
+            });
+        } catch (\Throwable $e) {
+            Log::warning('UserService::notifyPasswordChanged email failed', [
+                'user_id' => $user->id,
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
