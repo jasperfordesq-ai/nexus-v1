@@ -1732,16 +1732,21 @@ class CronJobRunner
         try {
             echo "Processing hot match notifications...\n";
 
-            // Find listings created in the last hour that haven't been processed
+            // Find listings created in the last hour that haven't been processed.
+            // Keep the scan tenant-scoped so category IDs cannot match users
+            // from another tenant.
             $sql = "SELECT l.*, u.name as user_name, c.name as category_name
                     FROM listings l
-                    JOIN users u ON l.user_id = u.id
+                    JOIN users u ON l.user_id = u.id AND u.tenant_id = l.tenant_id
                     LEFT JOIN categories c ON l.category_id = c.id
                     WHERE l.status = 'active'
                     AND l.created_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)
-                    AND l.id NOT IN (
-                        SELECT DISTINCT listing_id FROM match_history
-                        WHERE action = 'notified' AND created_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)
+                    AND NOT EXISTS (
+                        SELECT 1 FROM match_history mh
+                        WHERE mh.tenant_id = l.tenant_id
+                          AND mh.listing_id = l.id
+                          AND mh.action = 'notified'
+                          AND mh.created_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)
                     )
                     LIMIT 50";
 
@@ -1767,17 +1772,25 @@ class CronJobRunner
                 $oppositeType = $listingType === 'offer' ? 'request' : 'offer';
 
                 // Find users with opposite type listings in same category
+                $tenantId = (int) ($listing['tenant_id'] ?? 0);
+                if ($tenantId <= 0) {
+                    continue;
+                }
+
                 $matchSql = "SELECT DISTINCT l.user_id, u.name, u.email
                              FROM listings l
-                             JOIN users u ON l.user_id = u.id
+                             JOIN users u ON l.user_id = u.id AND u.tenant_id = ?
                              WHERE l.category_id = ?
+                             AND l.tenant_id = ?
                              AND l.type = ?
                              AND l.status = 'active'
                              AND l.user_id != ?
                              LIMIT 20";
 
                 $potentialUsers = array_map(fn($r) => (array) $r, DB::select($matchSql, [
+                    $tenantId,
                     $listing['category_id'],
+                    $tenantId,
                     $oppositeType,
                     $listing['user_id']
                 ]));
@@ -1793,8 +1806,8 @@ class CronJobRunner
 
                     // Get user's listings to calculate proper match score
                     $userListings = array_map(fn($r) => (array) $r, DB::select(
-                        "SELECT * FROM listings WHERE user_id = ? AND status = 'active'",
-                        [$user['user_id']]
+                        "SELECT * FROM listings WHERE user_id = ? AND tenant_id = ? AND status = 'active'",
+                        [$user['user_id'], $tenantId]
                     ));
 
                     if (empty($userListings)) continue;
@@ -1815,7 +1828,6 @@ class CronJobRunner
                         // would be re-emailed each tick. The dedup table also has a UNIQUE
                         // index on (tenant_id, listing_id, matched_user_id) as a second line
                         // of defence.
-                        $tenantId = (int) ($listing['tenant_id'] ?? \App\Core\TenantContext::getId() ?? 0);
                         try {
                             $alreadySent = DB::selectOne(
                                 "SELECT 1 FROM match_notification_sent
@@ -1838,7 +1850,13 @@ class CronJobRunner
                             'distance_km' => $matchResult['distance'] ?? null
                         ]);
 
-                        NotificationDispatcher::dispatchHotMatch($user['user_id'], $matchData);
+                        $dispatched = \App\Core\TenantContext::runForTenant($tenantId, function () use ($user, $matchData): bool {
+                            return NotificationDispatcher::dispatchHotMatch($user['user_id'], $matchData);
+                        });
+                        if (!$dispatched) {
+                            continue;
+                        }
+
                         $notificationsSent++;
 
                         // Record dedup marker. INSERT IGNORE swallows race-condition duplicates

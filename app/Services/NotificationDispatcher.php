@@ -288,7 +288,7 @@ class NotificationDispatcher
         return $translated !== $key ? $translated : __('notifications.push_default');
     }
 
-    private static function queueNotification($userId, $activityType, $content, $link, $frequency = 'daily', $emailBody = null): void
+    private static function queueNotification($userId, $activityType, $content, $link, $frequency = 'daily', $emailBody = null): bool
     {
         $snippet = substr($content, 0, 250);
 
@@ -299,7 +299,7 @@ class NotificationDispatcher
                 'activity_type' => $activityType,
                 'frequency' => $frequency,
             ]);
-            return;
+            return false;
         }
 
         DB::table('notification_queue')->insert([
@@ -313,6 +313,8 @@ class NotificationDispatcher
             'created_at'     => now(),
             'status'         => 'pending',
         ]);
+
+        return true;
     }
 
     private static function resolveTenantIdForQueue(int $userId): ?int
@@ -353,17 +355,17 @@ class NotificationDispatcher
     /**
      * Dispatch a HOT MATCH notification (85%+ match).
      */
-    public static function dispatchHotMatch($userId, $match): void
+    public static function dispatchHotMatch($userId, $match): bool
     {
         // Check user's match notification preferences (cheap DB miss exit first)
         $prefs = \App\Services\MatchingService::getPreferencesStatic($userId);
         if (empty($prefs['notify_hot_matches'])) {
-            return;
+            return false;
         }
 
         $frequency = $prefs['notification_frequency'] ?? 'fortnightly';
         if ($frequency === 'never') {
-            return;
+            return false;
         }
 
         // Normalize legacy/unsupported digest frequencies for the queue.
@@ -380,7 +382,7 @@ class NotificationDispatcher
             ->select(['preferred_language'])
             ->first();
 
-        LocaleContext::withLocale($recipient, function () use ($userId, $match, $queueFrequency) {
+        return (bool) LocaleContext::withLocale($recipient, function () use ($userId, $match, $queueFrequency): bool {
             $listingTitle = $match['title'] ?? 'New Listing';
             $matchScore = (int) ($match['match_score'] ?? 85);
             $userName = $match['user_name'] ?? __('emails.common.fallback_someone');
@@ -394,7 +396,7 @@ class NotificationDispatcher
             Notification::createNotification((int) $userId, $content, $link, 'hot_match');
 
             $htmlContent = self::buildHotMatchEmail($match, $matchScore);
-            self::queueNotification($userId, 'hot_match', $content, $link, $queueFrequency, $htmlContent);
+            return self::queueNotification($userId, 'hot_match', $content, $link, $queueFrequency, $htmlContent);
         });
     }
 
@@ -1133,8 +1135,7 @@ class NotificationDispatcher
 </div>
 HTML;
 
-        self::queueNotification($userId, 'verification_reminder', $content, $link, 'instant', $htmlContent);
-        return true;
+        return self::queueNotification($userId, 'verification_reminder', $content, $link, 'instant', $htmlContent);
         });
     }
 

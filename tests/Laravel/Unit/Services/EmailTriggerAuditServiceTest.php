@@ -29,6 +29,12 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('groups:group_email_invite:group_invite', $keys);
         $this->assertContains('safeguarding:incident_flag_vetting_guardian_training:safeguarding', $keys);
         $this->assertContains('newsletter:newsletter_queue_dispatch:newsletter', $keys);
+        $this->assertContains('security:account_suspended_banned_deleted_reactivated:admin_user_status', $keys);
+        $this->assertContains('messages:direct_message_received:message', $keys);
+        $this->assertContains('federation:federated_message_received:federation_message', $keys);
+        $this->assertContains('marketplace:offer_order_refund_rating_report_dispute:marketplace_order', $keys);
+        $this->assertContains('verein:verein_dues_invoice_reminder_paid:verein_dues', $keys);
+        $this->assertContains('events:event_created_update_cancellation_rsvp_reminder:event_notification', $keys);
     }
 
     public function test_run_returns_score_and_issue_structure(): void

@@ -136,6 +136,17 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         );
     }
 
+    public function test_hot_match_cron_scopes_candidates_and_dedupe_by_tenant(): void
+    {
+        $source = file_get_contents(app_path('Services/CronJobRunner.php'));
+
+        $this->assertStringContainsString('u.tenant_id = l.tenant_id', $source);
+        $this->assertStringContainsString('mh.tenant_id = l.tenant_id', $source);
+        $this->assertStringContainsString('AND l.tenant_id = ?', $source);
+        $this->assertStringContainsString('TenantContext::runForTenant($tenantId', $source);
+        $this->assertStringContainsString('if (!$dispatched)', $source);
+    }
+
     public function test_event_notification_queue_resolves_tenant_from_recipient_when_context_is_missing(): void
     {
         $user = User::factory()->forTenant($this->testTenantId)->create([
