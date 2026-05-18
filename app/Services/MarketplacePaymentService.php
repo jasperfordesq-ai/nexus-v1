@@ -549,9 +549,13 @@ class MarketplacePaymentService
         ]);
 
         // Send refund notification emails and in-app bells
+        $previousTenantId = TenantContext::currentId();
         try {
+            TenantContext::setById((int) $payment->tenant_id);
+
             $listingTitle = DB::table('marketplace_listings')
                 ->where('id', $order->marketplace_listing_id)
+                ->where('tenant_id', $payment->tenant_id)
                 ->value('title') ?? 'item';
             $title = htmlspecialchars($listingTitle, ENT_QUOTES, 'UTF-8');
 
@@ -610,10 +614,16 @@ class MarketplacePaymentService
 
             // In-app bell notifications
             $bellMsg = __('api_controllers_3.marketplace_order.refunded', ['amount' => number_format($refundAmount, 2), 'currency' => $currency, 'order_number' => $order->order_number]);
-            Notification::create(['user_id' => $order->buyer_id, 'message' => $bellMsg, 'link' => $link, 'type' => 'marketplace_order', 'created_at' => now()]);
-            Notification::create(['user_id' => $order->seller_id, 'message' => $bellMsg, 'link' => $link, 'type' => 'marketplace_order', 'created_at' => now()]);
+            Notification::create(['tenant_id' => (int) $payment->tenant_id, 'user_id' => $order->buyer_id, 'message' => $bellMsg, 'link' => $link, 'type' => 'marketplace_order', 'created_at' => now()]);
+            Notification::create(['tenant_id' => (int) $payment->tenant_id, 'user_id' => $order->seller_id, 'message' => $bellMsg, 'link' => $link, 'type' => 'marketplace_order', 'created_at' => now()]);
         } catch (\Throwable $emailEx) {
             Log::warning('[MarketplacePaymentService] refund notification failed: ' . $emailEx->getMessage());
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
 
         return $payment->fresh();
@@ -677,28 +687,35 @@ class MarketplacePaymentService
             ->where('stripe_payment_intent_id', $piId)
             ->first();
 
-        if (!$paymentRecord) {
-            Log::warning('MarketplacePayment webhook: no local payment record for PI — rejecting event', [
+        $orderRecord = $paymentRecord
+            ? MarketplaceOrder::withoutGlobalScopes()->find($paymentRecord->order_id)
+            : MarketplaceOrder::withoutGlobalScopes()
+                ->where('payment_intent_id', $piId)
+                ->first();
+
+        if (!$orderRecord) {
+            Log::warning('MarketplacePayment webhook: no local order/payment record for PI - rejecting event', [
                 'payment_intent_id' => $piId,
             ]);
             return;
         }
 
-        $orderId = (int) $paymentRecord->order_id;
-        $tenantId = (int) $paymentRecord->tenant_id;
+        $orderId = (int) $orderRecord->id;
+        $tenantId = (int) $orderRecord->tenant_id;
 
         if (!$orderId || !$tenantId) {
-            Log::warning('MarketplacePayment webhook: local record missing order/tenant — rejecting event', [
+            Log::warning('MarketplacePayment webhook: local record missing order/tenant - rejecting event', [
                 'payment_intent_id' => $piId,
                 'payment_id' => $paymentRecord->id ?? null,
+                'order_id' => $orderRecord->id ?? null,
             ]);
             return;
         }
 
         // Set tenant context from our trusted DB record (never from Stripe metadata)
-        TenantContext::setById($tenantId);
-
+        $previousTenantId = TenantContext::currentId();
         try {
+            TenantContext::setById($tenantId);
             self::confirmPayment($piId);
         } catch (\Exception $e) {
             Log::error('MarketplacePayment webhook: confirmPayment failed', [
@@ -706,6 +723,12 @@ class MarketplacePaymentService
                 'order_id' => $orderId,
                 'error' => $e->getMessage(),
             ]);
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
     }
 

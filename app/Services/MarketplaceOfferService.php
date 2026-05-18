@@ -28,66 +28,75 @@ class MarketplaceOfferService
      */
     public static function create(int $buyerId, int $listingId, array $data): MarketplaceOffer
     {
-        $listing = MarketplaceListing::findOrFail($listingId);
+        $listing = MarketplaceListing::withoutGlobalScopes()->findOrFail($listingId);
+        $tenantId = (int) $listing->tenant_id;
 
-        // Prevent self-offers
-        if ($listing->user_id === $buyerId) {
-            throw new \InvalidArgumentException('Cannot make an offer on your own listing.');
-        }
+        return TenantContext::runForTenant($tenantId, function () use ($buyerId, $listingId, $data, $listing, $tenantId): MarketplaceOffer {
+            // Prevent self-offers
+            if ($listing->user_id === $buyerId) {
+                throw new \InvalidArgumentException('Cannot make an offer on your own listing.');
+            }
 
-        // Check for existing active offer
-        $existingOffer = MarketplaceOffer::where('marketplace_listing_id', $listingId)
-            ->where('buyer_id', $buyerId)
-            ->whereIn('status', ['pending', 'countered'])
-            ->first();
+            // Check for existing active offer
+            $existingOffer = MarketplaceOffer::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('marketplace_listing_id', $listingId)
+                ->where('buyer_id', $buyerId)
+                ->whereIn('status', ['pending', 'countered'])
+                ->first();
 
-        if ($existingOffer) {
-            throw new \InvalidArgumentException('You already have an active offer on this listing.');
-        }
+            if ($existingOffer) {
+                throw new \InvalidArgumentException('You already have an active offer on this listing.');
+            }
 
-        $offer = new MarketplaceOffer();
-        $offer->tenant_id = TenantContext::getId();
-        $offer->marketplace_listing_id = $listingId;
-        $offer->buyer_id = $buyerId;
-        $offer->seller_id = $listing->user_id;
-        $offer->amount = $data['amount'];
-        $offer->currency = $data['currency'] ?? $listing->price_currency ?? 'EUR';
-        $offer->message = $data['message'] ?? null;
-        $offer->status = 'pending';
-        $offer->expires_at = now()->addDays(2); // 48h expiry
-        $offer->save();
+            $offer = new MarketplaceOffer();
+            $offer->tenant_id = $tenantId;
+            $offer->marketplace_listing_id = $listingId;
+            $offer->buyer_id = $buyerId;
+            $offer->seller_id = $listing->user_id;
+            $offer->amount = $data['amount'];
+            $offer->currency = $data['currency'] ?? $listing->price_currency ?? 'EUR';
+            $offer->message = $data['message'] ?? null;
+            $offer->status = 'pending';
+            $offer->expires_at = now()->addDays(2); // 48h expiry
+            $offer->save();
 
-        // Increment contacts count on listing
-        MarketplaceListing::where('id', $listingId)->increment('contacts_count');
+            // Increment contacts count on listing
+            MarketplaceListing::withoutGlobalScopes()
+                ->where('id', $listingId)
+                ->where('tenant_id', $tenantId)
+                ->increment('contacts_count');
 
-        // Notify seller of the new offer
-        try {
-            $buyerName = self::userName($buyerId);
-            $amount    = number_format((float) $offer->amount, 2) . ' ' . $offer->currency;
-            self::sendOfferEmail(
-                (int) $listing->user_id,
-                'emails_misc.marketplace_offer.received_subject',
-                'emails_misc.marketplace_offer.received_title',
-                'emails_misc.marketplace_offer.received_body',
-                ['title' => $listing->title, 'buyer' => $buyerName, 'amount' => $amount],
-                ['title' => $listing->title],
-                '/marketplace/listings/' . $listingId,
-                'emails_misc.marketplace_offer.received_cta'
-            );
-        } catch (\Throwable $e) {
-            Log::warning('[MarketplaceOfferService] create email failed: ' . $e->getMessage());
-        }
+            // Notify seller of the new offer
+            try {
+                $buyerName = self::userName($buyerId);
+                $amount    = number_format((float) $offer->amount, 2) . ' ' . $offer->currency;
+                self::sendOfferEmail(
+                    (int) $listing->user_id,
+                    'emails_misc.marketplace_offer.received_subject',
+                    'emails_misc.marketplace_offer.received_title',
+                    'emails_misc.marketplace_offer.received_body',
+                    ['title' => $listing->title, 'buyer' => $buyerName, 'amount' => $amount],
+                    ['title' => $listing->title],
+                    '/marketplace/listings/' . $listingId,
+                    'emails_misc.marketplace_offer.received_cta'
+                );
+            } catch (\Throwable $e) {
+                Log::warning('[MarketplaceOfferService] create email failed: ' . $e->getMessage());
+            }
 
-        // In-app bell to seller
-        Notification::create([
-            'user_id'    => $listing->user_id,
-            'message'    => __('api_controllers_3.marketplace_offer.received', ['buyer' => self::userName($buyerId), 'amount' => number_format((float) $offer->amount, 2) . ' ' . $offer->currency, 'title' => $listing->title]),
-            'link'       => '/marketplace/listings/' . $listingId,
-            'type'       => 'marketplace_offer',
-            'created_at' => now(),
-        ]);
+            // In-app bell to seller
+            Notification::create([
+                'tenant_id'   => $tenantId,
+                'user_id'     => $listing->user_id,
+                'message'     => __('api_controllers_3.marketplace_offer.received', ['buyer' => self::userName($buyerId), 'amount' => number_format((float) $offer->amount, 2) . ' ' . $offer->currency, 'title' => $listing->title]),
+                'link'        => '/marketplace/listings/' . $listingId,
+                'type'        => 'marketplace_offer',
+                'created_at'  => now(),
+            ]);
 
-        return $offer;
+            return $offer;
+        });
     }
 
     /**
@@ -95,52 +104,60 @@ class MarketplaceOfferService
      */
     public static function accept(MarketplaceOffer $offer, int $sellerId): MarketplaceOffer
     {
-        self::assertSellerOwns($offer, $sellerId);
-        self::assertOfferActionable($offer);
+        return self::withOfferTenant($offer, function () use ($offer, $sellerId): MarketplaceOffer {
+            self::assertSellerOwns($offer, $sellerId);
+            self::assertOfferActionable($offer);
 
-        $offer->status = 'accepted';
-        $offer->accepted_at = now();
-        $offer->save();
+            $tenantId = (int) $offer->tenant_id;
+            $offer->status = 'accepted';
+            $offer->accepted_at = now();
+            $offer->save();
 
-        // Mark listing as reserved
-        MarketplaceListing::where('id', $offer->marketplace_listing_id)
-            ->update(['status' => 'reserved']);
+            // Mark listing as reserved
+            MarketplaceListing::withoutGlobalScopes()
+                ->where('id', $offer->marketplace_listing_id)
+                ->where('tenant_id', $tenantId)
+                ->update(['status' => 'reserved']);
 
-        // Decline all other pending offers on this listing
-        MarketplaceOffer::where('marketplace_listing_id', $offer->marketplace_listing_id)
-            ->where('id', '!=', $offer->id)
-            ->whereIn('status', ['pending', 'countered'])
-            ->update(['status' => 'declined']);
+            // Decline all other pending offers on this listing
+            MarketplaceOffer::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('marketplace_listing_id', $offer->marketplace_listing_id)
+                ->where('id', '!=', $offer->id)
+                ->whereIn('status', ['pending', 'countered'])
+                ->update(['status' => 'declined']);
 
-        // Notify buyer their offer was accepted
-        try {
-            $listing = MarketplaceListing::find($offer->marketplace_listing_id);
-            $amount  = number_format((float) $offer->amount, 2) . ' ' . $offer->currency;
-            self::sendOfferEmail(
-                (int) $offer->buyer_id,
-                'emails_misc.marketplace_offer.accepted_subject',
-                'emails_misc.marketplace_offer.accepted_title',
-                'emails_misc.marketplace_offer.accepted_body',
-                ['title' => $listing->title ?? '', 'amount' => $amount],
-                ['title' => $listing->title ?? ''],
-                '/marketplace/orders',
-                'emails_misc.marketplace_offer.accepted_cta'
-            );
-        } catch (\Throwable $e) {
-            Log::warning('[MarketplaceOfferService] accept email failed: ' . $e->getMessage());
-        }
+            // Notify buyer their offer was accepted
+            try {
+                $listing = self::listingForOffer($offer);
+                $amount  = number_format((float) $offer->amount, 2) . ' ' . $offer->currency;
+                self::sendOfferEmail(
+                    (int) $offer->buyer_id,
+                    'emails_misc.marketplace_offer.accepted_subject',
+                    'emails_misc.marketplace_offer.accepted_title',
+                    'emails_misc.marketplace_offer.accepted_body',
+                    ['title' => $listing->title ?? '', 'amount' => $amount],
+                    ['title' => $listing->title ?? ''],
+                    '/marketplace/orders',
+                    'emails_misc.marketplace_offer.accepted_cta'
+                );
+            } catch (\Throwable $e) {
+                Log::warning('[MarketplaceOfferService] accept email failed: ' . $e->getMessage());
+            }
 
-        // In-app bell to buyer
-        $listing ??= MarketplaceListing::find($offer->marketplace_listing_id);
-        Notification::create([
-            'user_id'    => $offer->buyer_id,
-            'message'    => __('api_controllers_3.marketplace_offer.accepted', ['title' => $listing->title ?? '']),
-            'link'       => '/marketplace/orders',
-            'type'       => 'marketplace_offer',
-            'created_at' => now(),
-        ]);
+            // In-app bell to buyer
+            $listing ??= self::listingForOffer($offer);
+            Notification::create([
+                'tenant_id'   => $tenantId,
+                'user_id'     => $offer->buyer_id,
+                'message'     => __('api_controllers_3.marketplace_offer.accepted', ['title' => $listing->title ?? '']),
+                'link'        => '/marketplace/orders',
+                'type'        => 'marketplace_offer',
+                'created_at'  => now(),
+            ]);
 
-        return $offer;
+            return $offer;
+        });
     }
 
     /**
@@ -148,40 +165,44 @@ class MarketplaceOfferService
      */
     public static function decline(MarketplaceOffer $offer, int $sellerId): MarketplaceOffer
     {
-        self::assertSellerOwns($offer, $sellerId);
-        self::assertOfferActionable($offer);
+        return self::withOfferTenant($offer, function () use ($offer, $sellerId): MarketplaceOffer {
+            self::assertSellerOwns($offer, $sellerId);
+            self::assertOfferActionable($offer);
 
-        $offer->status = 'declined';
-        $offer->save();
+            $tenantId = (int) $offer->tenant_id;
+            $offer->status = 'declined';
+            $offer->save();
 
-        // Notify buyer their offer was declined
-        try {
-            $listing = MarketplaceListing::find($offer->marketplace_listing_id);
-            self::sendOfferEmail(
-                (int) $offer->buyer_id,
-                'emails_misc.marketplace_offer.declined_subject',
-                'emails_misc.marketplace_offer.declined_title',
-                'emails_misc.marketplace_offer.declined_body',
-                ['title' => $listing->title ?? ''],
-                ['title' => $listing->title ?? ''],
-                '/marketplace/listings/' . $offer->marketplace_listing_id,
-                'emails_misc.marketplace_offer.declined_cta'
-            );
-        } catch (\Throwable $e) {
-            Log::warning('[MarketplaceOfferService] decline email failed: ' . $e->getMessage());
-        }
+            // Notify buyer their offer was declined
+            try {
+                $listing = self::listingForOffer($offer);
+                self::sendOfferEmail(
+                    (int) $offer->buyer_id,
+                    'emails_misc.marketplace_offer.declined_subject',
+                    'emails_misc.marketplace_offer.declined_title',
+                    'emails_misc.marketplace_offer.declined_body',
+                    ['title' => $listing->title ?? ''],
+                    ['title' => $listing->title ?? ''],
+                    '/marketplace/listings/' . $offer->marketplace_listing_id,
+                    'emails_misc.marketplace_offer.declined_cta'
+                );
+            } catch (\Throwable $e) {
+                Log::warning('[MarketplaceOfferService] decline email failed: ' . $e->getMessage());
+            }
 
-        // In-app bell to buyer
-        $listing ??= MarketplaceListing::find($offer->marketplace_listing_id);
-        Notification::create([
-            'user_id'    => $offer->buyer_id,
-            'message'    => __('api_controllers_3.marketplace_offer.declined', ['title' => $listing->title ?? '']),
-            'link'       => '/marketplace/listings/' . $offer->marketplace_listing_id,
-            'type'       => 'marketplace_offer',
-            'created_at' => now(),
-        ]);
+            // In-app bell to buyer
+            $listing ??= self::listingForOffer($offer);
+            Notification::create([
+                'tenant_id'   => $tenantId,
+                'user_id'     => $offer->buyer_id,
+                'message'     => __('api_controllers_3.marketplace_offer.declined', ['title' => $listing->title ?? '']),
+                'link'        => '/marketplace/listings/' . $offer->marketplace_listing_id,
+                'type'        => 'marketplace_offer',
+                'created_at'  => now(),
+            ]);
 
-        return $offer;
+            return $offer;
+        });
     }
 
     /**
@@ -189,45 +210,49 @@ class MarketplaceOfferService
      */
     public static function counter(MarketplaceOffer $offer, int $sellerId, array $data): MarketplaceOffer
     {
-        self::assertSellerOwns($offer, $sellerId);
-        self::assertOfferActionable($offer);
+        return self::withOfferTenant($offer, function () use ($offer, $sellerId, $data): MarketplaceOffer {
+            self::assertSellerOwns($offer, $sellerId);
+            self::assertOfferActionable($offer);
 
-        $offer->status = 'countered';
-        $offer->counter_amount = $data['amount'];
-        $offer->counter_message = $data['message'] ?? null;
-        $offer->expires_at = now()->addDays(2); // Reset expiry
-        $offer->save();
+            $tenantId = (int) $offer->tenant_id;
+            $offer->status = 'countered';
+            $offer->counter_amount = $data['amount'];
+            $offer->counter_message = $data['message'] ?? null;
+            $offer->expires_at = now()->addDays(2); // Reset expiry
+            $offer->save();
 
-        // Notify buyer about the counter-offer
-        try {
-            $listing = MarketplaceListing::find($offer->marketplace_listing_id);
-            $amount  = number_format((float) $offer->counter_amount, 2) . ' ' . $offer->currency;
-            self::sendOfferEmail(
-                (int) $offer->buyer_id,
-                'emails_misc.marketplace_offer.countered_subject',
-                'emails_misc.marketplace_offer.countered_title',
-                'emails_misc.marketplace_offer.countered_body',
-                ['title' => $listing->title ?? '', 'amount' => $amount],
-                ['title' => $listing->title ?? ''],
-                '/marketplace/offers',
-                'emails_misc.marketplace_offer.countered_cta'
-            );
-        } catch (\Throwable $e) {
-            Log::warning('[MarketplaceOfferService] counter email failed: ' . $e->getMessage());
-        }
+            // Notify buyer about the counter-offer
+            try {
+                $listing = self::listingForOffer($offer);
+                $amount  = number_format((float) $offer->counter_amount, 2) . ' ' . $offer->currency;
+                self::sendOfferEmail(
+                    (int) $offer->buyer_id,
+                    'emails_misc.marketplace_offer.countered_subject',
+                    'emails_misc.marketplace_offer.countered_title',
+                    'emails_misc.marketplace_offer.countered_body',
+                    ['title' => $listing->title ?? '', 'amount' => $amount],
+                    ['title' => $listing->title ?? ''],
+                    '/marketplace/offers',
+                    'emails_misc.marketplace_offer.countered_cta'
+                );
+            } catch (\Throwable $e) {
+                Log::warning('[MarketplaceOfferService] counter email failed: ' . $e->getMessage());
+            }
 
-        // In-app bell to buyer
-        $listing ??= MarketplaceListing::find($offer->marketplace_listing_id);
-        $counterAmount = number_format((float) $offer->counter_amount, 2) . ' ' . $offer->currency;
-        Notification::create([
-            'user_id'    => $offer->buyer_id,
-            'message'    => __('api_controllers_3.marketplace_offer.countered', ['title' => $listing->title ?? '', 'amount' => $counterAmount]),
-            'link'       => '/marketplace/offers',
-            'type'       => 'marketplace_offer',
-            'created_at' => now(),
-        ]);
+            // In-app bell to buyer
+            $listing ??= self::listingForOffer($offer);
+            $counterAmount = number_format((float) $offer->counter_amount, 2) . ' ' . $offer->currency;
+            Notification::create([
+                'tenant_id'   => $tenantId,
+                'user_id'     => $offer->buyer_id,
+                'message'     => __('api_controllers_3.marketplace_offer.countered', ['title' => $listing->title ?? '', 'amount' => $counterAmount]),
+                'link'        => '/marketplace/offers',
+                'type'        => 'marketplace_offer',
+                'created_at'  => now(),
+            ]);
 
-        return $offer;
+            return $offer;
+        });
     }
 
     /**
@@ -235,25 +260,29 @@ class MarketplaceOfferService
      */
     public static function withdraw(MarketplaceOffer $offer, int $buyerId): MarketplaceOffer
     {
-        if ($offer->buyer_id !== $buyerId) {
-            throw new \InvalidArgumentException('Only the buyer can withdraw their offer.');
-        }
-        self::assertOfferActionable($offer);
+        return self::withOfferTenant($offer, function () use ($offer, $buyerId): MarketplaceOffer {
+            if ($offer->buyer_id !== $buyerId) {
+                throw new \InvalidArgumentException('Only the buyer can withdraw their offer.');
+            }
+            self::assertOfferActionable($offer);
 
-        $offer->status = 'withdrawn';
-        $offer->save();
+            $tenantId = (int) $offer->tenant_id;
+            $offer->status = 'withdrawn';
+            $offer->save();
 
-        // In-app bell to seller
-        $listing = MarketplaceListing::find($offer->marketplace_listing_id);
-        Notification::create([
-            'user_id'    => $offer->seller_id,
-            'message'    => __('api_controllers_3.marketplace_offer.withdrawn', ['buyer' => self::userName($buyerId), 'title' => $listing->title ?? '']),
-            'link'       => '/marketplace/listings/' . $offer->marketplace_listing_id,
-            'type'       => 'marketplace_offer',
-            'created_at' => now(),
-        ]);
+            // In-app bell to seller
+            $listing = self::listingForOffer($offer);
+            Notification::create([
+                'tenant_id'   => $tenantId,
+                'user_id'     => $offer->seller_id,
+                'message'     => __('api_controllers_3.marketplace_offer.withdrawn', ['buyer' => self::userName($buyerId), 'title' => $listing->title ?? '']),
+                'link'        => '/marketplace/listings/' . $offer->marketplace_listing_id,
+                'type'        => 'marketplace_offer',
+                'created_at'  => now(),
+            ]);
 
-        return $offer;
+            return $offer;
+        });
     }
 
     /**
@@ -261,57 +290,65 @@ class MarketplaceOfferService
      */
     public static function acceptCounter(MarketplaceOffer $offer, int $buyerId): MarketplaceOffer
     {
-        if ($offer->buyer_id !== $buyerId) {
-            throw new \InvalidArgumentException('Only the buyer can accept a counter-offer.');
-        }
-        if ($offer->status !== 'countered') {
-            throw new \InvalidArgumentException('This offer has not been countered.');
-        }
+        return self::withOfferTenant($offer, function () use ($offer, $buyerId): MarketplaceOffer {
+            if ($offer->buyer_id !== $buyerId) {
+                throw new \InvalidArgumentException('Only the buyer can accept a counter-offer.');
+            }
+            if ($offer->status !== 'countered') {
+                throw new \InvalidArgumentException('This offer has not been countered.');
+            }
 
-        $offer->status = 'accepted';
-        $offer->amount = $offer->counter_amount; // Final agreed price
-        $offer->accepted_at = now();
-        $offer->save();
+            $tenantId = (int) $offer->tenant_id;
+            $offer->status = 'accepted';
+            $offer->amount = $offer->counter_amount; // Final agreed price
+            $offer->accepted_at = now();
+            $offer->save();
 
-        // Mark listing as reserved
-        MarketplaceListing::where('id', $offer->marketplace_listing_id)
-            ->update(['status' => 'reserved']);
+            // Mark listing as reserved
+            MarketplaceListing::withoutGlobalScopes()
+                ->where('id', $offer->marketplace_listing_id)
+                ->where('tenant_id', $tenantId)
+                ->update(['status' => 'reserved']);
 
-        // Decline other offers
-        MarketplaceOffer::where('marketplace_listing_id', $offer->marketplace_listing_id)
-            ->where('id', '!=', $offer->id)
-            ->whereIn('status', ['pending', 'countered'])
-            ->update(['status' => 'declined']);
+            // Decline other offers
+            MarketplaceOffer::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('marketplace_listing_id', $offer->marketplace_listing_id)
+                ->where('id', '!=', $offer->id)
+                ->whereIn('status', ['pending', 'countered'])
+                ->update(['status' => 'declined']);
 
-        // Notify seller their counter-offer was accepted
-        try {
-            $listing = MarketplaceListing::find($offer->marketplace_listing_id);
-            $amount  = number_format((float) $offer->amount, 2) . ' ' . $offer->currency;
-            self::sendOfferEmail(
-                (int) $offer->seller_id,
-                'emails_misc.marketplace_offer.counter_accepted_subject',
-                'emails_misc.marketplace_offer.counter_accepted_title',
-                'emails_misc.marketplace_offer.counter_accepted_body',
-                ['title' => $listing->title ?? '', 'amount' => $amount],
-                ['title' => $listing->title ?? ''],
-                '/marketplace/orders',
-                'emails_misc.marketplace_offer.counter_accepted_cta'
-            );
-        } catch (\Throwable $e) {
-            Log::warning('[MarketplaceOfferService] acceptCounter email failed: ' . $e->getMessage());
-        }
+            // Notify seller their counter-offer was accepted
+            try {
+                $listing = self::listingForOffer($offer);
+                $amount  = number_format((float) $offer->amount, 2) . ' ' . $offer->currency;
+                self::sendOfferEmail(
+                    (int) $offer->seller_id,
+                    'emails_misc.marketplace_offer.counter_accepted_subject',
+                    'emails_misc.marketplace_offer.counter_accepted_title',
+                    'emails_misc.marketplace_offer.counter_accepted_body',
+                    ['title' => $listing->title ?? '', 'amount' => $amount],
+                    ['title' => $listing->title ?? ''],
+                    '/marketplace/orders',
+                    'emails_misc.marketplace_offer.counter_accepted_cta'
+                );
+            } catch (\Throwable $e) {
+                Log::warning('[MarketplaceOfferService] acceptCounter email failed: ' . $e->getMessage());
+            }
 
-        // In-app bell to seller
-        $listing ??= MarketplaceListing::find($offer->marketplace_listing_id);
-        Notification::create([
-            'user_id'    => $offer->seller_id,
-            'message'    => __('api_controllers_3.marketplace_offer.counter_accepted', ['title' => $listing->title ?? '']),
-            'link'       => '/marketplace/orders',
-            'type'       => 'marketplace_offer',
-            'created_at' => now(),
-        ]);
+            // In-app bell to seller
+            $listing ??= self::listingForOffer($offer);
+            Notification::create([
+                'tenant_id'   => $tenantId,
+                'user_id'     => $offer->seller_id,
+                'message'     => __('api_controllers_3.marketplace_offer.counter_accepted', ['title' => $listing->title ?? '']),
+                'link'        => '/marketplace/orders',
+                'type'        => 'marketplace_offer',
+                'created_at'  => now(),
+            ]);
 
-        return $offer;
+            return $offer;
+        });
     }
 
     // -----------------------------------------------------------------
@@ -401,7 +438,8 @@ class MarketplaceOfferService
      */
     public static function expireStaleOffers(): int
     {
-        return MarketplaceOffer::whereIn('status', ['pending', 'countered'])
+        return MarketplaceOffer::withoutGlobalScopes()
+            ->whereIn('status', ['pending', 'countered'])
             ->where('expires_at', '<', now())
             ->update(['status' => 'expired']);
     }
@@ -455,12 +493,32 @@ class MarketplaceOfferService
 
     private static function userName(int $userId): string
     {
-        $user = DB::table('users')->where('id', $userId)->select(['first_name', 'last_name', 'name'])->first();
+        $tenantId = TenantContext::getId();
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['first_name', 'last_name', 'name'])
+            ->first();
         if (!$user) {
-            return 'A member';
+            return __('emails.common.fallback_member_name');
         }
         $full = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
         return $full ?: ($user->name ?? __('emails.common.fallback_member_name'));
+    }
+
+    private static function withOfferTenant(MarketplaceOffer $offer, callable $callback): mixed
+    {
+        $tenantId = (int) ($offer->tenant_id ?: TenantContext::getId());
+
+        return TenantContext::runForTenant($tenantId, $callback);
+    }
+
+    private static function listingForOffer(MarketplaceOffer $offer): ?MarketplaceListing
+    {
+        return MarketplaceListing::withoutGlobalScopes()
+            ->where('id', $offer->marketplace_listing_id)
+            ->where('tenant_id', (int) $offer->tenant_id)
+            ->first();
     }
 
     private static function assertSellerOwns(MarketplaceOffer $offer, int $sellerId): void
