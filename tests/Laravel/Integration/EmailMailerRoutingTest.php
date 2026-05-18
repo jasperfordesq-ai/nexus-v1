@@ -259,4 +259,31 @@ class EmailMailerRoutingTest extends TestCase
             'The billing upgrade email failure must use a translated API message.'
         );
     }
+
+    public function test_event_reminder_bells_are_created_only_after_email_acceptance(): void
+    {
+        $legacySource = file_get_contents(app_path('Services/EventReminderService.php'));
+        $legacyFailureGuard = strpos($legacySource, 'if (!$emailOk) {');
+        $legacyBellInsert = strpos($legacySource, 'INSERT INTO notifications');
+
+        $this->assertNotFalse($legacyFailureGuard, 'EventReminderService must guard failed email sends.');
+        $this->assertNotFalse($legacyBellInsert, 'EventReminderService must still create reminder bell notifications.');
+        $this->assertLessThan(
+            $legacyBellInsert,
+            $legacyFailureGuard,
+            'EventReminderService must not create duplicate bells before a failed email can retry.'
+        );
+
+        $eventSource = file_get_contents(app_path('Services/EventNotificationService.php'));
+        $emailSend = strpos($eventSource, '$emailOk = $this->sendEventEmail(');
+        $bellCreate = strpos($eventSource, '$this->createReminderNotification($userId, $event, $message);');
+
+        $this->assertNotFalse($emailSend, 'EventNotificationService must send the reminder email.');
+        $this->assertNotFalse($bellCreate, 'EventNotificationService must create the reminder bell.');
+        $this->assertLessThan(
+            $bellCreate,
+            $emailSend,
+            'EventNotificationService must create event reminder bells only after email acceptance.'
+        );
+    }
 }

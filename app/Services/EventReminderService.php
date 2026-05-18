@@ -157,12 +157,6 @@ class EventReminderService
 
                         $link = "/events/{$eventId}";
 
-                        // Create in-app notification
-                        DB::insert(
-                            "INSERT INTO notifications (user_id, tenant_id, message, link, type, created_at) VALUES (?, ?, ?, ?, 'event_reminder', NOW())",
-                            [$userId, $tenantId, $message, $link]
-                        );
-
                         // Email notification
                         $emailOk = true;
                         if (!empty($attendee->email)) {
@@ -204,6 +198,13 @@ class EventReminderService
                         if (!$emailOk) {
                             return;
                         }
+
+                        // Create in-app notification after email acceptance so
+                        // retrying a transient mail failure cannot duplicate bells.
+                        DB::insert(
+                            "INSERT INTO notifications (user_id, tenant_id, message, link, type, created_at) VALUES (?, ?, ?, ?, 'event_reminder', NOW())",
+                            [$userId, $tenantId, $message, $link]
+                        );
 
                         // Mark reminder as sent
                         DB::statement(

@@ -168,7 +168,7 @@ class EventNotificationService
                         // the stored bell text AND email subject/body both render in
                         // THEIR preferred_language, not the caller's.
                         LocaleContext::withLocale($attendee, function () use ($attendee, $event, $type, $userId, $tenantId, $eventId, &$sent) {
-                            $message = $this->createReminderNotification($userId, $event, $type);
+                            $message = $this->buildReminderMessage($event, $type);
 
                             // Send reminder email
                             try {
@@ -187,6 +187,7 @@ class EventNotificationService
                                 );
 
                                 if ($emailOk) {
+                                    $this->createReminderNotification($userId, $event, $message);
                                     $this->markReminderSent($tenantId, $eventId, $userId, $type);
                                     $sent++;
                                 } else {
@@ -787,11 +788,9 @@ class EventNotificationService
     // =========================================================================
 
     /**
-     * Create an in-app reminder notification for an event attendee.
-     *
-     * @return string The notification message text (used for email)
+     * Build the event reminder text shared by the bell and email.
      */
-    private function createReminderNotification(int $userId, object $event, string $reminderType): string
+    private function buildReminderMessage(object $event, string $reminderType): string
     {
         $title = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
         $when = date('l, M j \a\t g:i A', strtotime($event->start_time));
@@ -810,6 +809,14 @@ class EventNotificationService
             $message = __('notifications.event_reminder_1h', ['title' => $title, 'when' => $when, 'location' => $locationText]);
         }
 
+        return $message;
+    }
+
+    /**
+     * Create an in-app reminder notification after the email path is accepted.
+     */
+    private function createReminderNotification(int $userId, object $event, string $message): void
+    {
         $link = "/events/{$event->id}";
 
         Notification::create([
@@ -820,8 +827,6 @@ class EventNotificationService
             'type' => 'event_reminder',
             'created_at' => now(),
         ]);
-
-        return $message;
     }
 
     /**
