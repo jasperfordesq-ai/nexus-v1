@@ -226,7 +226,8 @@ class AdminEmailController extends BaseApiController
             null,
             null,
             null,
-            'email_test'
+            'email_test',
+            ['tenant_id' => \App\Core\TenantContext::currentId()]
         );
 
         if ($result) {
@@ -272,7 +273,8 @@ class AdminEmailController extends BaseApiController
             null,
             null,
             null,
-            'email_test'
+            'email_test',
+            ['tenant_id' => \App\Core\TenantContext::currentId()]
         );
 
         if ($result) {

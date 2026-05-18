@@ -1169,7 +1169,8 @@ class IdeationChallengeService
                             null,
                             null,
                             null,
-                            'ideation'
+                            'ideation',
+                            ['tenant_id' => $owner->tenant_id ?? \App\Core\TenantContext::currentId()]
                         )) {
                             Log::warning('[IdeationChallengeService] idea submitted email returned false', [
                                 'idea_id' => $ideaId,
@@ -1303,7 +1304,8 @@ class IdeationChallengeService
                             null,
                             null,
                             null,
-                            'ideation'
+                            'ideation',
+                            ['tenant_id' => $owner->tenant_id ?? \App\Core\TenantContext::currentId()]
                         )) {
                             Log::warning('[IdeationChallengeService] idea commented email returned false', [
                                 'idea_id' => $ideaId,

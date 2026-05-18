@@ -532,7 +532,7 @@ class JobVacanciesController extends BaseApiController
                     ->select(['email', 'first_name', 'name', 'preferred_language'])
                     ->first();
                 if ($applicantUser && !empty($applicantUser->email)) {
-                    LocaleContext::withLocale($applicantUser, function () use ($applicantUser, $job, $id) {
+                    LocaleContext::withLocale($applicantUser, function () use ($applicantUser, $job, $id, $tenantId) {
                         $firstName = $applicantUser->first_name ?? $applicantUser->name ?? __('emails.common.fallback_name');
                         $community = TenantContext::getName();
                         $jobTitle  = htmlspecialchars($job->title, ENT_QUOTES, 'UTF-8');
@@ -552,7 +552,8 @@ class JobVacanciesController extends BaseApiController
                             null,
                             null,
                             null,
-                            'job_application'
+                            'job_application',
+                            ['tenant_id' => $tenantId]
                         )) {
                             Log::warning('[JobVacanciesController] applicant confirmation email returned false', [
                                 'job_id' => $id,
@@ -576,7 +577,7 @@ class JobVacanciesController extends BaseApiController
                     ->first();
                 if ($posterUser && !empty($posterUser->email)) {
                     $applicant = $applicant ?? \App\Models\User::find($userId);
-                    LocaleContext::withLocale($posterUser, function () use ($posterUser, $applicant, $job, $id) {
+                    LocaleContext::withLocale($posterUser, function () use ($posterUser, $applicant, $job, $id, $tenantId) {
                         $posterFirst   = $posterUser->first_name ?? $posterUser->name ?? __('emails.common.fallback_name');
                         $community     = TenantContext::getName();
                         $jobTitle      = htmlspecialchars($job->title, ENT_QUOTES, 'UTF-8');
@@ -598,7 +599,8 @@ class JobVacanciesController extends BaseApiController
                             null,
                             null,
                             null,
-                            'job_application'
+                            'job_application',
+                            ['tenant_id' => $tenantId]
                         )) {
                             Log::warning('[JobVacanciesController] employer alert email returned false', [
                                 'job_id' => $id,

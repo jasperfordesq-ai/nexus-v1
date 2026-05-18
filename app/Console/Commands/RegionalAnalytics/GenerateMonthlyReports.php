@@ -9,14 +9,16 @@ declare(strict_types=1);
 namespace App\Console\Commands\RegionalAnalytics;
 
 use App\Core\TenantContext;
+use App\Services\EmailDispatchService;
 use App\Services\RegionalAnalytics\RegionalAnalyticsService;
 use App\Services\RegionalAnalytics\RegionalReportPdfGenerator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
- * AG59 — Generate monthly regional analytics reports for active subscriptions.
+ * AG59 - Generate monthly regional analytics reports for active subscriptions.
  *
  * Runs on the 1st of each month at 06:00 (registered in bootstrap/app.php).
  * Per active subscription:
@@ -49,7 +51,7 @@ class GenerateMonthlyReports extends Command
         }
 
         $subs = $query->get();
-        $this->info(sprintf('Generating reports for %d subscription(s) — period %s', $subs->count(), $periodLabel));
+        $this->info(sprintf('Generating reports for %d subscription(s) - period %s', $subs->count(), $periodLabel));
 
         foreach ($subs as $sub) {
             try {
@@ -91,14 +93,20 @@ class GenerateMonthlyReports extends Command
                     'updated_at' => now(),
                 ]);
 
-                $this->maybeMail($sub, $fileUrl, $periodLabel);
+                $mailResult = $this->mailReport($sub, $fileUrl, $periodLabel);
 
                 DB::table('regional_analytics_reports')->where('id', $reportId)->update([
-                    'status' => 'sent',
+                    'status' => $mailResult['sent'] ? 'sent' : 'failed',
+                    'error_message' => $mailResult['sent'] ? null : $mailResult['error'],
                     'updated_at' => now(),
                 ]);
 
-                $this->info(sprintf('  - subscription %d: report %d generated', $sub->id, $reportId));
+                $this->info(sprintf(
+                    '  - subscription %d: report %d generated%s',
+                    $sub->id,
+                    $reportId,
+                    $mailResult['sent'] ? ' and emailed' : ' but email failed'
+                ));
             } catch (\Throwable $e) {
                 $this->error(sprintf('  - subscription %d failed: %s', $sub->id, $e->getMessage()));
                 if (isset($reportId)) {
@@ -109,31 +117,33 @@ class GenerateMonthlyReports extends Command
                     ]);
                 }
             } finally {
-                TenantContext::clear();
+                TenantContext::reset();
             }
         }
 
         return self::SUCCESS;
     }
 
-    private function maybeMail(object $sub, string $fileUrl, string $periodLabel): void
+    /**
+     * @return array{sent:bool,error:string|null}
+     */
+    private function mailReport(object $sub, string $fileUrl, string $periodLabel): array
     {
         try {
             $email = (string) ($sub->contact_email ?? '');
             if ($email === '') {
-                return;
+                return ['sent' => false, 'error' => 'missing_recipient_email'];
             }
-            // Route through the platform Mailer (SendGrid). The default
-            // Laravel Mail::raw() uses SMTP which isn't configured in prod;
-            // emails to subscribers would silently fail.
-            $body = "<p>Your regional analytics report for "
-                . htmlspecialchars($periodLabel, ENT_QUOTES, 'UTF-8')
-                . " is ready.</p>"
-                . '<p><a href="' . htmlspecialchars($fileUrl, ENT_QUOTES, 'UTF-8') . '">Download report</a></p>'
-                . "<p>All figures are bucketed per the Project NEXUS privacy guarantees.</p>";
-            if (!\App\Services\EmailDispatchService::sendRaw(
+
+            // Route through the platform Mailer. The Laravel Mail facade uses
+            // SMTP in production and does not create unified audit evidence.
+            $body = '<p>' . e(__('emails.regional_analytics.report_ready', ['period' => $periodLabel])) . '</p>'
+                . '<p><a href="' . e($fileUrl) . '">' . e(__('emails.regional_analytics.download_report')) . '</a></p>'
+                . '<p>' . e(__('emails.regional_analytics.privacy_note')) . '</p>';
+
+            if (!EmailDispatchService::sendRaw(
                 $email,
-                "Regional analytics report — {$periodLabel}",
+                (string) __('emails.regional_analytics.subject', ['period' => $periodLabel]),
                 $body,
                 null,
                 null,
@@ -141,16 +151,19 @@ class GenerateMonthlyReports extends Command
                 'regional_analytics',
                 ['tenant_id' => $sub->tenant_id ?? null]
             )) {
-                \Illuminate\Support\Facades\Log::warning('Regional analytics report email send returned false', [
+                Log::warning('Regional analytics report email send returned false', [
                     'tenant_id' => $sub->tenant_id ?? null,
                 ]);
+                return ['sent' => false, 'error' => 'email_dispatch_returned_false'];
             }
+
+            return ['sent' => true, 'error' => null];
         } catch (\Throwable $e) {
-            // Mail errors should not fail the run.
-            \Illuminate\Support\Facades\Log::warning('Regional analytics report email exception', [
+            Log::warning('Regional analytics report email exception', [
                 'tenant_id' => $sub->tenant_id ?? null,
                 'error' => $e->getMessage(),
             ]);
+            return ['sent' => false, 'error' => $e->getMessage()];
         }
     }
 }

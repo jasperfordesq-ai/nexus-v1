@@ -1128,7 +1128,8 @@ class ListingService
                         null,
                         null,
                         null,
-                        'listing'
+                        'listing',
+                        ['tenant_id' => $creator->tenant_id ?? \App\Core\TenantContext::currentId()]
                     )) {
                         Log::warning('[ListingService] creation email send returned false', ['listing_id' => $listing->id]);
                     }
@@ -1240,7 +1241,8 @@ class ListingService
                                 null,
                                 null,
                                 null,
-                                'listing_update'
+                                'listing_update',
+                                ['tenant_id' => $savedUser->tenant_id ?? \App\Core\TenantContext::currentId()]
                             )) {
                                 Log::warning('[ListingService] listing updated email send returned false', ['listing_id' => $id]);
                             }

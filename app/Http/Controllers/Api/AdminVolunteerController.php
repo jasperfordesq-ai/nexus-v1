@@ -419,7 +419,7 @@ class AdminVolunteerController extends BaseApiController
                 );
 
                 if ($volDetail && !empty($volDetail->email)) {
-                    LocaleContext::withLocale($volDetail, function () use ($volDetail, $newStatus) {
+                    LocaleContext::withLocale($volDetail, function () use ($volDetail, $newStatus, $tenantId) {
                         $firstName = $volDetail->first_name ?? $volDetail->name ?? __('emails.common.fallback_name');
                         $oppTitle = htmlspecialchars($volDetail->opportunity_title ?? 'your volunteering', ENT_QUOTES, 'UTF-8');
                         $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteering';
@@ -441,7 +441,8 @@ class AdminVolunteerController extends BaseApiController
                             null,
                             null,
                             null,
-                            'volunteering'
+                            'volunteering',
+                            ['tenant_id' => $tenantId]
                         )) {
                             Log::warning('AdminVolunteerController: hours status email returned false', [
                                 'vol_log_id' => $id,
@@ -877,7 +878,7 @@ class AdminVolunteerController extends BaseApiController
                 $oppTitle = htmlspecialchars($app->opportunity_title ?? 'the opportunity', ENT_QUOTES, 'UTF-8');
 
                 if ($applicant && !empty($applicant->email)) {
-                    LocaleContext::withLocale($applicant, function () use ($applicant, $oppTitle) {
+                    LocaleContext::withLocale($applicant, function () use ($applicant, $oppTitle, $tenantId) {
                         $firstName = $applicant->first_name ?? $applicant->name ?? __('emails.common.fallback_name');
                         $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteering';
 
@@ -897,7 +898,8 @@ class AdminVolunteerController extends BaseApiController
                             null,
                             null,
                             null,
-                            'volunteering'
+                            'volunteering',
+                            ['tenant_id' => $tenantId]
                         )) {
                             Log::warning('AdminVolunteerController: approval email returned false', [
                                 'application_id' => $id,

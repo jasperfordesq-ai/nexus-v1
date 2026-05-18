@@ -389,7 +389,8 @@ class GroupService
                         null,
                         null,
                         null,
-                        'group'
+                        'group',
+                        ['tenant_id' => $creator->tenant_id ?? \App\Core\TenantContext::currentId()]
                     )) {
                         Log::warning('[GroupService] creation email send returned false', ['group_id' => $group->id]);
                     }
@@ -940,7 +941,8 @@ class GroupService
                             null,
                             null,
                             null,
-                            'group'
+                            'group',
+                            ['tenant_id' => $member->tenant_id ?? \App\Core\TenantContext::currentId()]
                         )) {
                             Log::warning('[GroupService] group_promoted email send returned false', ['group_id' => $groupId]);
                         }
@@ -1040,7 +1042,8 @@ class GroupService
                             null,
                             null,
                             null,
-                            'group'
+                            'group',
+                            ['tenant_id' => $member->tenant_id ?? \App\Core\TenantContext::currentId()]
                         )) {
                             Log::warning('[GroupService] group_removed email send returned false', ['group_id' => $group->id]);
                         }

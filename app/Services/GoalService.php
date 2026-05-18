@@ -234,7 +234,8 @@ class GoalService
                         null,
                         null,
                         null,
-                        'goal'
+                        'goal',
+                        ['tenant_id' => $user->tenant_id ?? \App\Core\TenantContext::currentId()]
                     )) {
                         Log::warning('[GoalService] created email send returned false', ['goal_id' => $goal->id]);
                     }
@@ -319,7 +320,8 @@ class GoalService
                             null,
                             null,
                             null,
-                            'goal'
+                            'goal',
+                            ['tenant_id' => $user->tenant_id ?? \App\Core\TenantContext::currentId()]
                         )) {
                             Log::warning('[GoalService] abandoned email send returned false');
                         }
@@ -439,7 +441,8 @@ class GoalService
                         null,
                         null,
                         null,
-                        'goal'
+                        'goal',
+                        ['tenant_id' => $user->tenant_id ?? \App\Core\TenantContext::currentId()]
                     )) {
                         Log::warning('[GoalService] completed email send returned false', ['goal_id' => $goal->id]);
                     }

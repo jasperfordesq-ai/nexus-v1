@@ -9556,6 +9556,10 @@
         "title": "Legacy direct email paths remain",
         "body": "{{count}} raw email send paths still bypass the unified notification dispatcher. Keep hardening these paths until every module routes through the auditable dispatcher."
       },
+      "email_dispatch_missing_explicit_tenant": {
+        "title": "Dispatcher email missing explicit tenant",
+        "body": "{{count}} email dispatcher call sites still rely on inferred tenant context. Pass tenant_id or tenantId explicitly so every queued, cron, webhook, and cross-tenant send is auditable."
+      },
       "email_trigger_audit_failed": {
         "title": "Email trigger audit failed",
         "body": "The email trigger audit could not complete."

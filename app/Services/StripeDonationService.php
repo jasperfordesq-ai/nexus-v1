@@ -293,7 +293,8 @@ class StripeDonationService
                             null,
                             null,
                             null,
-                            'donation_receipt'
+                            'donation_receipt',
+                            ['tenant_id' => $tenantId ?? \App\Core\TenantContext::currentId()]
                         )) {
                             Log::warning('[StripeDonationService] donation receipt email returned false', [
                                 'donation_id' => $donation->id ?? null,

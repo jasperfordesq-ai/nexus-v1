@@ -50,6 +50,13 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertSame([], $surface);
     }
 
+    public function test_dispatcher_send_surface_requires_explicit_tenant_options(): void
+    {
+        $surface = app(EmailTriggerAuditService::class)->tenantlessDispatcherSendSurface();
+
+        $this->assertSame([], $surface);
+    }
+
     public function test_run_detects_sent_newsletter_queue_without_successful_email_log(): void
     {
         if (!Schema::hasTable('newsletters') || !Schema::hasTable('newsletter_queue') || !Schema::hasTable('email_log')) {

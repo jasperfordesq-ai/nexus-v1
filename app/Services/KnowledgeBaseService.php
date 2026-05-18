@@ -434,7 +434,8 @@ class KnowledgeBaseService
                     null,
                     null,
                     null,
-                    'knowledge_base'
+                    'knowledge_base',
+                    ['tenant_id' => $author->tenant_id ?? \App\Core\TenantContext::currentId()]
                 )) {
                     Log::warning('[KnowledgeBaseService] publication email send returned false', ['author_id' => $authorId, 'article_id' => $articleId]);
                 }

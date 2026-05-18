@@ -257,7 +257,8 @@ class AdminBillingController extends BaseApiController
                     null,
                     null,
                     null,
-                    'billing'
+                    'billing',
+                    ['tenant_id' => $tenantId]
                 )) {
                     Log::warning('BillingController: upgrade request email send returned false', ['tenant_id' => $tenantId]);
                 }

@@ -545,6 +545,12 @@
     "cta_view": "View my dues",
     "cta_receipt": "View Stripe receipt"
   },
+  "regional_analytics": {
+    "subject": "Regional analytics report - :period",
+    "report_ready": "Your regional analytics report for :period is ready.",
+    "download_report": "Download report",
+    "privacy_note": "All figures are bucketed per the Project NEXUS privacy guarantees."
+  },
   "appreciation": {
     "subject": "{{sender}} sent you a thank-you",
     "preview": "{{sender}} appreciates what you did",

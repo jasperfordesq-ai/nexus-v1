@@ -623,7 +623,8 @@ class UsersController extends BaseApiController
                         null,
                         null,
                         null,
-                        'account_deleted'
+                        'account_deleted',
+                        ['tenant_id' => $user->tenant_id ?? \App\Core\TenantContext::currentId()]
                     )) {
                         Log::warning('[UsersController] deleteAccount farewell email returned false', [
                             'user_id' => $userRow->id ?? null,

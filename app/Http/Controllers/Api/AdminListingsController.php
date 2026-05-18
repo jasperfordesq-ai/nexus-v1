@@ -217,7 +217,7 @@ class AdminListingsController extends BaseApiController
         // Send approval email to listing creator
         try {
             if ($owner && !empty($owner->email)) {
-                LocaleContext::withLocale($owner, function () use ($owner, $item, $id) {
+                LocaleContext::withLocale($owner, function () use ($owner, $item, $id, $tenantId) {
                     $firstName  = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_name');
                     $safeTitle  = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
                     $listingUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/listings/{$id}";
@@ -235,7 +235,8 @@ class AdminListingsController extends BaseApiController
                         null,
                         null,
                         null,
-                        'listing_moderation'
+                        'listing_moderation',
+                        ['tenant_id' => $tenantId]
                     )) {
                         Log::warning("[AdminListingsController] approve email returned false for listing #{$id}");
                     }
@@ -289,7 +290,7 @@ class AdminListingsController extends BaseApiController
                 ->select(['email', 'first_name', 'name', 'preferred_language'])
                 ->first();
 
-            LocaleContext::withLocale($user, function () use ($user, $item, $id) {
+            LocaleContext::withLocale($user, function () use ($user, $item, $id, $tenantId) {
                 $title = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
                 Notification::create([
                     'user_id' => (int) $item->user_id,
@@ -315,7 +316,8 @@ class AdminListingsController extends BaseApiController
                         null,
                         null,
                         null,
-                        'listing_moderation'
+                        'listing_moderation',
+                        ['tenant_id' => $tenantId]
                     )) {
                         Log::warning("[AdminListingsController] destroy email returned false for listing #{$id}");
                     }

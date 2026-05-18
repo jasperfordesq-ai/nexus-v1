@@ -85,7 +85,8 @@ class EmailTriggerAuditService
                 $this->checkNotificationStoreHealth($tenantId),
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
                 $this->checkTenantProviderConfiguration($tenantId),
-                $this->checkDirectEmailSendSurface($tenantId)
+                $this->checkDirectEmailSendSurface($tenantId),
+                $this->checkTenantlessDispatcherSendSurface($tenantId)
             );
         } catch (\Throwable $e) {
             Log::warning('EmailTriggerAuditService::run failed', ['error' => $e->getMessage()]);
@@ -503,6 +504,34 @@ class EmailTriggerAuditService
     }
 
     /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkTenantlessDispatcherSendSurface(?int $tenantId): array
+    {
+        $surface = $this->tenantlessDispatcherSendSurface();
+        if ($surface === []) {
+            return [];
+        }
+
+        return [
+            $this->issue(
+                'email_dispatch_missing_explicit_tenant',
+                'critical',
+                $tenantId,
+                'architecture',
+                'dispatcher_tenant_contract',
+                [
+                    'count' => count($surface),
+                    'samples' => array_slice(array_map(
+                        fn (array $row): string => $row['path'] . ':' . $row['line'],
+                        $surface
+                    ), 0, 8),
+                ]
+            ),
+        ];
+    }
+
+    /**
      * Find legacy raw email send call sites that still bypass the central
      * business-event dispatcher. This is intentionally advisory today; once
      * the migration is complete it can become a CI-blocking assertion.
@@ -567,6 +596,83 @@ class EmailTriggerAuditService
                         break;
                     }
                 }
+            }
+        }
+
+        usort($surface, fn (array $a, array $b): int => [$a['path'], $a['line']] <=> [$b['path'], $b['line']]);
+
+        return $surface;
+    }
+
+    /**
+     * Find EmailDispatchService send calls that still rely on implicit tenant
+     * inference. Tenant inference remains as a defensive fallback, but audited
+     * production send roots must pass tenant_id/tenantId explicitly.
+     *
+     * @return list<array{path:string,line:int,pattern:string}>
+     */
+    public function tenantlessDispatcherSendSurface(): array
+    {
+        $appPath = app_path();
+        if (!is_dir($appPath)) {
+            return [];
+        }
+
+        $allowed = array_filter(array_map('realpath', [
+            app_path('Services/EmailDispatchService.php'),
+            app_path('Services/EmailTriggerAuditService.php'),
+        ]));
+
+        $surface = [];
+        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($appPath));
+        foreach ($iterator as $file) {
+            if (!$file->isFile() || $file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $path = $file->getPathname();
+            $realPath = realpath($path);
+            if ($realPath !== false && in_array($realPath, $allowed, true)) {
+                continue;
+            }
+
+            $relativePath = str_replace($appPath . DIRECTORY_SEPARATOR, '', $path);
+            $lines = file($path, FILE_IGNORE_NEW_LINES);
+            if ($lines === false) {
+                continue;
+            }
+
+            $inBlockComment = false;
+            $count = count($lines);
+            for ($index = 0; $index < $count; $index++) {
+                $codeLine = $this->stripPhpCommentsFromLine((string) $lines[$index], $inBlockComment);
+                if (!str_contains($codeLine, 'EmailDispatchService::sendRaw(')
+                    && !str_contains($codeLine, 'EmailDispatchService::sendWithOptions(')
+                    && !str_contains($codeLine, '\\App\\Services\\EmailDispatchService::sendRaw(')
+                    && !str_contains($codeLine, '\\App\\Services\\EmailDispatchService::sendWithOptions(')
+                ) {
+                    continue;
+                }
+
+                $call = $codeLine;
+                $parenBalance = substr_count($codeLine, '(') - substr_count($codeLine, ')');
+                $end = $index;
+                while ($parenBalance > 0 && $end + 1 < $count) {
+                    $end++;
+                    $nextLine = $this->stripPhpCommentsFromLine((string) $lines[$end], $inBlockComment);
+                    $call .= "\n" . $nextLine;
+                    $parenBalance += substr_count($nextLine, '(') - substr_count($nextLine, ')');
+                }
+
+                if (!preg_match('/[\'"]tenant_id[\'"]|[\'"]tenantId[\'"]/', $call)) {
+                    $surface[] = [
+                        'path' => $relativePath,
+                        'line' => $index + 1,
+                        'pattern' => str_contains($call, 'sendWithOptions') ? 'send_with_options_missing_tenant' : 'send_raw_missing_tenant',
+                    ];
+                }
+
+                $index = max($index, $end);
             }
         }
 

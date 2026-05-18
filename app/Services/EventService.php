@@ -303,7 +303,8 @@ class EventService
                         null,
                         null,
                         null,
-                        'event'
+                        'event',
+                        ['tenant_id' => $creator->tenant_id ?? \App\Core\TenantContext::currentId()]
                     )) {
                         Log::warning('[EventService] creation email send returned false', ['event_id' => $event->id]);
                     }

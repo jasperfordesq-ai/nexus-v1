@@ -217,7 +217,7 @@ class NewsletterController extends BaseApiController
                     $recipient = !empty($subscriber->user_id)
                         ? User::select('id', 'preferred_language')->find($subscriber->user_id)
                         : null;
-                    LocaleContext::withLocale($recipient, function () use ($email, $community) {
+                    LocaleContext::withLocale($recipient, function () use ($email, $community, $subscriber) {
                         $html = EmailTemplateBuilder::make()
                             ->title(__('emails.newsletter.unsubscribed_title'))
                             ->paragraph(__('emails.newsletter.unsubscribed_body', ['community' => $community]))
@@ -230,7 +230,8 @@ class NewsletterController extends BaseApiController
                             null,
                             null,
                             null,
-                            'newsletter_unsubscribe'
+                            'newsletter_unsubscribe',
+                            ['tenant_id' => $subscriber->tenant_id ?? \App\Core\TenantContext::currentId()]
                         )) {
                             Log::warning('[NewsletterController] unsubscribe confirmation email returned false', [
                                 'email' => $email,
