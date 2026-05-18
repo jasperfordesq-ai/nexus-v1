@@ -2526,6 +2526,7 @@ Route::post('/v2/notifications/unsubscribe', [\App\Http\Controllers\Api\Notifica
 
 // Admin email deliverability dashboard endpoints (auth + admin middleware required).
 Route::get('/v2/admin/email-deliverability/summary',          [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'summary'])->middleware(['auth:sanctum', 'admin']);
+Route::get('/v2/admin/email-deliverability/trigger-audit',    [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'triggerAudit'])->middleware(['auth:sanctum', 'admin']);
 Route::get('/v2/admin/email-deliverability/logs',             [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'logs'])->middleware(['auth:sanctum', 'admin']);
 Route::get('/v2/admin/email-deliverability/suppressions',     [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'suppressions'])->middleware(['auth:sanctum', 'admin']);
 Route::delete('/v2/admin/email-deliverability/suppressions/{id}', [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'removeSuppression'])->middleware(['auth:sanctum', 'admin']);

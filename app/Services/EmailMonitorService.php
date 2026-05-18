@@ -440,6 +440,24 @@ class EmailMonitorService
                     ];
                 }
             }
+
+            if (class_exists(EmailTriggerAuditService::class)) {
+                $triggerAudit = app(EmailTriggerAuditService::class)->run($tenantId, 24);
+                foreach (($triggerAudit['issues'] ?? []) as $issue) {
+                    if (($issue['severity'] ?? 'info') === 'info') {
+                        continue;
+                    }
+                    $warnings[] = [
+                        'code' => (string) ($issue['code'] ?? 'email_trigger_issue'),
+                        'severity' => (string) ($issue['severity'] ?? 'warning'),
+                        'message_key' => (string) ($issue['message_key'] ?? 'email_health.warnings.email_trigger_issue'),
+                        'params' => (array) ($issue['params'] ?? []),
+                        'tenant_id' => $issue['tenant_id'] ?? $tenantId,
+                        'module' => $issue['module'] ?? null,
+                        'event' => $issue['event'] ?? null,
+                    ];
+                }
+            }
         } catch (\Throwable $e) {
             Log::warning('EmailMonitorService::getWarnings error', ['error' => $e->getMessage()]);
             $warnings[] = [

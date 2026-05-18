@@ -1,0 +1,456 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+declare(strict_types=1);
+
+namespace App\Services;
+
+use App\Models\EmailSettings;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Audits whether business events that should produce emails are actually
+ * creating tenant-scoped send attempts.
+ *
+ * email_log proves dispatch/acceptance/delivery. This service covers the
+ * earlier enterprise reliability layer: "the domain event happened, but did
+ * any email path fire for the right tenant and recipient?"
+ */
+class EmailTriggerAuditService
+{
+    /**
+     * Enterprise notification contract. Keep entries machine-readable so admin
+     * UI can render translated labels around module/event/category codes.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function eventMatrix(): array
+    {
+        return [
+            ['module' => 'auth', 'event' => 'password_reset_requested', 'category' => 'password_reset', 'critical' => true, 'source_table' => 'password_resets'],
+            ['module' => 'auth', 'event' => 'password_changed', 'category' => 'security_alert', 'critical' => true, 'source_table' => 'users'],
+            ['module' => 'registration', 'event' => 'email_verification_required', 'category' => 'email_verification', 'critical' => true, 'source_table' => 'users'],
+            ['module' => 'registration', 'event' => 'welcome_or_activation', 'category' => 'welcome', 'critical' => true, 'source_table' => 'users'],
+            ['module' => 'admin_users', 'event' => 'admin_welcome_or_activation', 'category' => 'admin_welcome', 'critical' => true, 'source_table' => 'users'],
+            ['module' => 'security', 'event' => 'two_factor_or_passkey_changed', 'category' => 'security_alert', 'critical' => true, 'source_table' => 'users'],
+            ['module' => 'groups', 'event' => 'group_email_invite', 'category' => 'group_invite', 'critical' => true, 'source_table' => 'group_invites'],
+            ['module' => 'groups', 'event' => 'membership_or_role_change', 'category' => 'group', 'critical' => false, 'source_table' => 'group_members'],
+            ['module' => 'connections', 'event' => 'request_or_response', 'category' => 'connection', 'critical' => true, 'source_table' => 'notifications'],
+            ['module' => 'messages', 'event' => 'direct_or_voice_message', 'category' => 'message', 'critical' => true, 'source_table' => 'notification_queue'],
+            ['module' => 'listings', 'event' => 'approval_expiry_saved_search', 'category' => 'listing', 'critical' => true, 'source_table' => 'notification_queue'],
+            ['module' => 'events', 'event' => 'rsvp_change_or_reminder', 'category' => 'event_reminder', 'critical' => true, 'source_table' => 'notification_queue'],
+            ['module' => 'volunteering', 'event' => 'application_shift_reminder_hours_expense', 'category' => 'volunteering', 'critical' => true, 'source_table' => 'notification_queue'],
+            ['module' => 'goals', 'event' => 'goal_reminder', 'category' => 'goal_reminder', 'critical' => true, 'source_table' => 'notification_queue'],
+            ['module' => 'marketplace', 'event' => 'order_offer_payment_rating_report', 'category' => 'marketplace', 'critical' => true, 'source_table' => 'notification_queue'],
+            ['module' => 'safeguarding', 'event' => 'incident_flag_vetting_guardian_training', 'category' => 'safeguarding', 'critical' => true, 'source_table' => 'notifications'],
+            ['module' => 'newsletter', 'event' => 'newsletter_queue_dispatch', 'category' => 'newsletter', 'critical' => false, 'source_table' => 'newsletter_queue'],
+            ['module' => 'digests', 'event' => 'notification_digest_dispatch', 'category' => 'notification_digest', 'critical' => false, 'source_table' => 'notification_queue'],
+            ['module' => 'billing', 'event' => 'upgrade_or_billing_notice', 'category' => 'billing', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'federation', 'event' => 'cross_tenant_connection_or_transaction', 'category' => 'federation', 'critical' => true, 'source_table' => 'notifications'],
+        ];
+    }
+
+    /**
+     * @return array{
+     *   checked_at:string,
+     *   window_hours:int,
+     *   tenant_id:int|null,
+     *   score:int,
+     *   matrix_count:int,
+     *   issue_count:int,
+     *   issues_by_severity:array<string,int>,
+     *   issues:list<array<string,mixed>>,
+     *   matrix:list<array<string,mixed>>
+     * }
+     */
+    public function run(?int $tenantId = null, int $windowHours = 24): array
+    {
+        $windowHours = max(1, min($windowHours, 168));
+        $since = now()->subHours($windowHours);
+        $issues = [];
+
+        try {
+            $issues = array_merge(
+                $issues,
+                $this->checkNewUsersWithoutAccountEmail($tenantId, $since, $windowHours),
+                $this->checkPasswordResetsWithoutEmail($tenantId, $since, $windowHours),
+                $this->checkGroupInvitesWithoutEmail($tenantId, $since, $windowHours),
+                $this->checkNotificationQueueHealth($tenantId, $since, $windowHours),
+                $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
+                $this->checkTenantProviderConfiguration($tenantId)
+            );
+        } catch (\Throwable $e) {
+            Log::warning('EmailTriggerAuditService::run failed', ['error' => $e->getMessage()]);
+            $issues[] = $this->issue(
+                'email_trigger_audit_failed',
+                'warning',
+                $tenantId,
+                'platform',
+                'audit',
+                ['error' => $e->getMessage()]
+            );
+        }
+
+        $issuesBySeverity = ['critical' => 0, 'warning' => 0, 'info' => 0];
+        foreach ($issues as $issue) {
+            $severity = (string) ($issue['severity'] ?? 'info');
+            $issuesBySeverity[$severity] = ($issuesBySeverity[$severity] ?? 0) + 1;
+        }
+
+        $score = max(0, 1000
+            - ($issuesBySeverity['critical'] * 90)
+            - ($issuesBySeverity['warning'] * 35)
+            - ($issuesBySeverity['info'] * 10));
+
+        return [
+            'checked_at' => now()->toIso8601String(),
+            'window_hours' => $windowHours,
+            'tenant_id' => $tenantId,
+            'score' => $score,
+            'matrix_count' => count($this->eventMatrix()),
+            'issue_count' => count($issues),
+            'issues_by_severity' => $issuesBySeverity,
+            'issues' => $issues,
+            'matrix' => $this->eventMatrix(),
+        ];
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkNewUsersWithoutAccountEmail(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (!$this->hasTables(['users', 'email_log'])) {
+            return [];
+        }
+
+        $q = DB::table('users')
+            ->select('users.tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('users.created_at', '>=', $since)
+            ->whereNull('users.deleted_at')
+            ->whereNotExists(function ($sub) {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereColumn('email_log.user_id', 'users.id')
+                    ->whereColumn('email_log.tenant_id', 'users.tenant_id')
+                    ->whereColumn('email_log.created_at', '>=', 'users.created_at')
+                    ->whereIn('email_log.category', [
+                        'activation',
+                        'admin_welcome',
+                        'approval',
+                        'email_verification',
+                        'identity_verification',
+                        'welcome',
+                    ]);
+            })
+            ->groupBy('users.tenant_id');
+
+        if ($tenantId !== null) {
+            $q->where('users.tenant_id', $tenantId);
+        }
+
+        return $this->rowsToIssues(
+            $q->get(),
+            'new_users_without_account_email_attempt',
+            'critical',
+            'registration',
+            'welcome_or_activation',
+            ['window_hours' => $windowHours]
+        );
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkPasswordResetsWithoutEmail(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (!$this->hasTables(['password_resets', 'email_log'])) {
+            return [];
+        }
+
+        $q = DB::table('password_resets as pr')
+            ->select('pr.tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('pr.created_at', '>=', $since)
+            ->whereNotExists(function ($sub) {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereRaw('email_log.recipient_email COLLATE utf8mb4_unicode_ci = pr.email COLLATE utf8mb4_unicode_ci')
+                    ->whereColumn('email_log.tenant_id', 'pr.tenant_id')
+                    ->whereColumn('email_log.created_at', '>=', 'pr.created_at')
+                    ->where('email_log.category', 'password_reset');
+            })
+            ->groupBy('pr.tenant_id');
+
+        if ($tenantId !== null) {
+            $q->where('pr.tenant_id', $tenantId);
+        }
+
+        return $this->rowsToIssues(
+            $q->get(),
+            'password_resets_without_email_attempt',
+            'critical',
+            'auth',
+            'password_reset_requested',
+            ['window_hours' => $windowHours]
+        );
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkGroupInvitesWithoutEmail(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (!$this->hasTables(['group_invites', 'email_log'])) {
+            return [];
+        }
+
+        $q = DB::table('group_invites as gi')
+            ->select('gi.tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('gi.invite_type', 'email')
+            ->where('gi.created_at', '>=', $since)
+            ->whereNotNull('gi.email')
+            ->whereNotExists(function ($sub) {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereColumn('email_log.recipient_email', 'gi.email')
+                    ->whereColumn('email_log.tenant_id', 'gi.tenant_id')
+                    ->whereColumn('email_log.created_at', '>=', 'gi.created_at')
+                    ->where('email_log.category', 'group_invite');
+            })
+            ->groupBy('gi.tenant_id');
+
+        if ($tenantId !== null) {
+            $q->where('gi.tenant_id', $tenantId);
+        }
+
+        return $this->rowsToIssues(
+            $q->get(),
+            'group_invites_without_email_attempt',
+            'critical',
+            'groups',
+            'group_email_invite',
+            ['window_hours' => $windowHours]
+        );
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkNotificationQueueHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (!$this->hasTables(['notification_queue'])) {
+            return [];
+        }
+
+        $issues = [];
+        $queueHasTenantId = Schema::hasColumn('notification_queue', 'tenant_id');
+        $tenantExpr = $queueHasTenantId ? 'notification_queue.tenant_id' : 'users.tenant_id';
+
+        $instantPending = DB::table('notification_queue')
+            ->when(!$queueHasTenantId, fn ($q) => $q->join('users', 'users.id', '=', 'notification_queue.user_id'))
+            ->selectRaw("{$tenantExpr} as tenant_id, COUNT(*) as count")
+            ->where('notification_queue.frequency', 'instant')
+            ->where('notification_queue.status', 'pending')
+            ->where('notification_queue.created_at', '<', now()->subMinutes(5))
+            ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$tenantExpr} = ?", [$tenantId]))
+            ->groupByRaw($tenantExpr)
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($instantPending, 'instant_notifications_stuck_pending', 'critical', 'notifications', 'instant_queue_dispatch', ['minutes' => 5]));
+
+        $processing = DB::table('notification_queue')
+            ->when(!$queueHasTenantId, fn ($q) => $q->join('users', 'users.id', '=', 'notification_queue.user_id'))
+            ->selectRaw("{$tenantExpr} as tenant_id, COUNT(*) as count")
+            ->where('notification_queue.status', 'processing')
+            ->where('notification_queue.created_at', '<', now()->subMinutes(15))
+            ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$tenantExpr} = ?", [$tenantId]))
+            ->groupByRaw($tenantExpr)
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($processing, 'notification_queue_stale_processing', 'critical', 'notifications', 'queue_dispatch', ['minutes' => 15]));
+
+        $failed = DB::table('notification_queue')
+            ->when(!$queueHasTenantId, fn ($q) => $q->join('users', 'users.id', '=', 'notification_queue.user_id'))
+            ->selectRaw("{$tenantExpr} as tenant_id, COUNT(*) as count")
+            ->where('notification_queue.status', 'failed')
+            ->where('notification_queue.created_at', '>=', $since)
+            ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$tenantExpr} = ?", [$tenantId]))
+            ->groupByRaw($tenantExpr)
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($failed, 'notification_queue_failed_recently', 'warning', 'notifications', 'queue_dispatch', ['window_hours' => $windowHours]));
+
+        if ($this->hasTables(['email_log', 'users'])) {
+            $queuedTenantExpr = $queueHasTenantId ? 'nq.tenant_id' : 'u.tenant_id';
+            $sentWithoutLog = DB::table('notification_queue as nq')
+                ->join('users as u', 'u.id', '=', 'nq.user_id')
+                ->selectRaw("{$queuedTenantExpr} as tenant_id, COUNT(*) as count")
+                ->where('nq.status', 'sent')
+                ->where('nq.sent_at', '>=', $since)
+                ->whereNotExists(function ($sub) use ($queuedTenantExpr) {
+                    $sub->select(DB::raw(1))
+                        ->from('email_log')
+                        ->whereColumn('email_log.user_id', 'nq.user_id')
+                        ->whereRaw("email_log.tenant_id = {$queuedTenantExpr}")
+                        ->whereColumn('email_log.created_at', '>=', 'nq.created_at')
+                        ->whereIn('email_log.category', ['notification_queue', 'notification_digest']);
+                })
+                ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$queuedTenantExpr} = ?", [$tenantId]))
+                ->groupByRaw($queuedTenantExpr)
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($sentWithoutLog, 'notification_queue_marked_sent_without_email_log', 'critical', 'notifications', 'queue_dispatch', ['window_hours' => $windowHours]));
+        }
+
+        return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkTenantContextAndWebhookHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (!$this->hasTables(['email_log'])) {
+            return [];
+        }
+
+        $issues = [];
+        $criticalCategories = [
+            'activation',
+            'admin_welcome',
+            'approval',
+            'email_verification',
+            'group_invite',
+            'identity_verification',
+            'password_reset',
+            'security_alert',
+            'welcome',
+        ];
+
+        if ($tenantId === null) {
+            $nullTenantCritical = DB::table('email_log')
+                ->whereNull('tenant_id')
+                ->where('created_at', '>=', $since)
+                ->whereIn('category', $criticalCategories)
+                ->count();
+            if ($nullTenantCritical > 0) {
+                $issues[] = $this->issue('critical_email_attempts_missing_tenant_context', 'critical', null, 'platform', 'tenant_context', [
+                    'count' => $nullTenantCritical,
+                    'window_hours' => $windowHours,
+                ]);
+            }
+        }
+
+        $unconfirmed = DB::table('email_log')
+            ->select('tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('provider', 'sendgrid')
+            ->where('status', 'sent')
+            ->whereNotNull('provider_message_id')
+            ->where('created_at', '<', now()->subHours(6))
+            ->where('created_at', '>=', now()->subDays(7))
+            ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId))
+            ->groupBy('tenant_id')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($unconfirmed, 'sendgrid_events_not_confirming_delivery', 'warning', 'deliverability', 'provider_webhook', ['hours' => 6]));
+
+        return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkTenantProviderConfiguration(?int $tenantId): array
+    {
+        if (!$this->hasTables(['tenants', 'email_settings'])) {
+            return [];
+        }
+
+        $tenantIds = DB::table('tenants')
+            ->where('is_active', 1)
+            ->when($tenantId !== null, fn ($q) => $q->where('id', $tenantId))
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        $issues = [];
+        foreach ($tenantIds as $id) {
+            try {
+                $provider = EmailSettings::get($id, 'email_provider') ?: 'platform_default';
+                if ($provider === 'sendgrid' && !EmailSettings::get($id, 'sendgrid_api_key')) {
+                    $issues[] = $this->issue('tenant_sendgrid_override_missing_api_key', 'info', $id, 'deliverability', 'provider_config', ['provider' => 'sendgrid']);
+                }
+                if ($provider === 'gmail_api') {
+                    $missing = [];
+                    foreach (['gmail_client_id', 'gmail_client_secret', 'gmail_refresh_token'] as $key) {
+                        if (!EmailSettings::get($id, $key)) {
+                            $missing[] = $key;
+                        }
+                    }
+                    if ($missing !== []) {
+                        $issues[] = $this->issue('tenant_gmail_override_incomplete', 'warning', $id, 'deliverability', 'provider_config', ['missing' => implode(',', $missing)]);
+                    }
+                }
+                if ($provider === 'smtp') {
+                    $host = EmailSettings::get($id, 'smtp_host');
+                    $from = EmailSettings::get($id, 'smtp_from_email');
+                    if (!$host || !$from) {
+                        $issues[] = $this->issue('tenant_smtp_override_incomplete', 'warning', $id, 'deliverability', 'provider_config', ['provider' => 'smtp']);
+                    }
+                }
+            } catch (\Throwable $e) {
+                $issues[] = $this->issue('tenant_provider_config_check_failed', 'warning', $id, 'deliverability', 'provider_config', ['error' => $e->getMessage()]);
+            }
+        }
+
+        return $issues;
+    }
+
+    /**
+     * @param iterable<object> $rows
+     * @param array<string,mixed> $extraParams
+     * @return list<array<string,mixed>>
+     */
+    private function rowsToIssues(iterable $rows, string $code, string $severity, string $module, string $event, array $extraParams = []): array
+    {
+        $issues = [];
+        foreach ($rows as $row) {
+            $count = (int) ($row->count ?? 0);
+            if ($count <= 0) {
+                continue;
+            }
+            $issues[] = $this->issue($code, $severity, isset($row->tenant_id) ? (int) $row->tenant_id : null, $module, $event, array_merge($extraParams, ['count' => $count]));
+        }
+        return $issues;
+    }
+
+    /**
+     * @param array<string,mixed> $params
+     * @return array<string,mixed>
+     */
+    private function issue(string $code, string $severity, ?int $tenantId, string $module, string $event, array $params = []): array
+    {
+        return [
+            'code' => $code,
+            'severity' => $severity,
+            'tenant_id' => $tenantId,
+            'module' => $module,
+            'event' => $event,
+            'message_key' => "email_deliverability.warnings.{$code}.body",
+            'params' => $params,
+        ];
+    }
+
+    /**
+     * @param list<string> $tables
+     */
+    private function hasTables(array $tables): bool
+    {
+        foreach ($tables as $table) {
+            if (!Schema::hasTable($table)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}

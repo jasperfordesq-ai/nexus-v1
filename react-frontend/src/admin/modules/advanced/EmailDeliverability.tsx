@@ -48,6 +48,11 @@ interface SummaryData {
   unconfirmed_sent?: number;
   bounced_pct: number | null;
   warnings?: EmailWarning[];
+  trigger_audit?: {
+    score: number;
+    issue_count: number;
+    matrix_count: number;
+  };
 }
 
 interface LogRow {
@@ -223,10 +228,26 @@ export default function EmailDeliverability() {
           {loadingSummary ? (
             <Spinner />
           ) : summary ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div>
                 <div className="text-xs text-theme-subtle uppercase">Total</div>
                 <div className="text-2xl font-bold">{summary.total}</div>
+              </div>
+              <div>
+                <div className="text-xs text-theme-subtle uppercase">
+                  {t('email_deliverability.trigger_score')}
+                </div>
+                <div className="text-2xl font-bold">
+                  {summary.trigger_audit ? `${summary.trigger_audit.score}/1000` : '-'}
+                </div>
+                {summary.trigger_audit && (
+                  <div className="text-xs text-theme-subtle">
+                    {t('email_deliverability.trigger_coverage', {
+                      issues: summary.trigger_audit.issue_count,
+                      count: summary.trigger_audit.matrix_count,
+                    })}
+                  </div>
+                )}
               </div>
               <div>
                 <div className="text-xs text-theme-subtle uppercase">Delivered</div>

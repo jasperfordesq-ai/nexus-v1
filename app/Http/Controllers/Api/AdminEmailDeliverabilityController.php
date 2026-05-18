@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
 use App\Services\EmailMonitorService;
+use App\Services\EmailTriggerAuditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -68,7 +69,25 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'unconfirmed_sent' => $sent,
             'bounced_pct'     => $bouncedRate,
             'warnings'        => app(EmailMonitorService::class)->getWarnings($tenantId),
+            'trigger_audit'    => app(EmailTriggerAuditService::class)->run($tenantId, $windowDays * 24),
         ]);
+    }
+
+    /**
+     * GET /api/v2/admin/email-deliverability/trigger-audit
+     *
+     * Reconciles business events against email_log so admins can see missing
+     * triggers, not just failed send attempts.
+     */
+    public function triggerAudit(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $windowHours = max(1, min((int) ($this->input('hours', 24) ?: 24), 168));
+
+        return $this->respondWithData(
+            app(EmailTriggerAuditService::class)->run($tenantId, $windowHours)
+        );
     }
 
     /**

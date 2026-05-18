@@ -9319,6 +9319,8 @@
     }
   },
   "email_deliverability": {
+    "trigger_score": "Trigger score",
+    "trigger_coverage": "{{issues}} issues across {{count}} monitored flows",
     "warnings": {
       "default_title": "Email warning",
       "default_body": "Email delivery needs attention.",
@@ -9349,6 +9351,58 @@
       "new_users_without_activation_email_log": {
         "title": "Activation email log missing",
         "body": "{{count}} new users have no activation, verification, approval, or welcome email log in the last {{window_hours}} hours."
+      },
+      "new_users_without_account_email_attempt": {
+        "title": "Account email did not trigger",
+        "body": "{{count}} new users have no account activation, verification, approval, or welcome email attempt in the last {{window_hours}} hours."
+      },
+      "password_resets_without_email_attempt": {
+        "title": "Password reset email did not trigger",
+        "body": "{{count}} password reset tokens have no matching password reset email attempt in the last {{window_hours}} hours."
+      },
+      "group_invites_without_email_attempt": {
+        "title": "Group invite email did not trigger",
+        "body": "{{count}} email group invites have no matching group invite email attempt in the last {{window_hours}} hours."
+      },
+      "instant_notifications_stuck_pending": {
+        "title": "Instant emails are stuck",
+        "body": "{{count}} instant notification emails have been pending for more than {{minutes}} minutes."
+      },
+      "notification_queue_failed_recently": {
+        "title": "Notification emails failed",
+        "body": "{{count}} queued notification emails failed in the last {{window_hours}} hours."
+      },
+      "notification_queue_marked_sent_without_email_log": {
+        "title": "Notification marked sent without email evidence",
+        "body": "{{count}} queued notifications were marked sent without a matching email log entry in the last {{window_hours}} hours."
+      },
+      "critical_email_attempts_missing_tenant_context": {
+        "title": "Critical email missing tenant context",
+        "body": "{{count}} critical email attempts were logged without tenant context in the last {{window_hours}} hours."
+      },
+      "sendgrid_events_not_confirming_delivery": {
+        "title": "SendGrid delivery events missing",
+        "body": "{{count}} SendGrid emails remain accepted but unconfirmed after more than {{hours}} hours."
+      },
+      "tenant_gmail_override_incomplete": {
+        "title": "Tenant Gmail configuration incomplete",
+        "body": "This tenant has an incomplete Gmail email provider override."
+      },
+      "tenant_smtp_override_incomplete": {
+        "title": "Tenant SMTP configuration incomplete",
+        "body": "This tenant has an incomplete SMTP email provider override."
+      },
+      "tenant_sendgrid_override_missing_api_key": {
+        "title": "Tenant SendGrid override missing API key",
+        "body": "This tenant is set to use a SendGrid override but has no tenant API key, so the platform fallback will be used."
+      },
+      "tenant_provider_config_check_failed": {
+        "title": "Tenant provider check failed",
+        "body": "The email provider configuration audit could not complete for this tenant."
+      },
+      "email_trigger_audit_failed": {
+        "title": "Email trigger audit failed",
+        "body": "The email trigger audit could not complete."
       },
       "email_health_unavailable": {
         "title": "Email health unavailable",
