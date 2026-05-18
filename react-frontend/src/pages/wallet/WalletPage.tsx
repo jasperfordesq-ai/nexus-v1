@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Papa from 'papaparse';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Tabs, Tab, Skeleton } from '@heroui/react';
+import { Button, Chip, Tabs, Tab, Skeleton } from '@heroui/react';
 import Wallet from 'lucide-react/icons/wallet';
 import ArrowUpRight from 'lucide-react/icons/arrow-up-right';
 import ArrowDownLeft from 'lucide-react/icons/arrow-down-left';
@@ -162,7 +162,7 @@ export function WalletPage() {
 
     toast.success(
       t('toast.transfer_success'),
-      t('toast.transfer_desc', { amount: transaction.amount, recipient: transaction.other_user?.name || 'recipient' })
+      t('toast.transfer_desc', { amount: transaction.amount, recipient: transaction.other_user?.name || t('recipient') })
     );
   }
 
@@ -218,24 +218,41 @@ export function WalletPage() {
   return (
     <>
     <PageMeta
-      title={t("title")}
-      description={t("subtitle")}
+      title={t('title')}
+      description={t('subtitle')}
       noIndex
     />
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6 px-1 sm:px-0">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-        <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-          <Wallet className="w-7 h-7 text-amber-400" />
-          {t('title')}
-        </h1>
-        <p className="text-theme-muted mt-1">{t('subtitle')}</p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-theme-default bg-theme-elevated">
+              <Wallet className="h-6 w-6 text-amber-500" aria-hidden="true" />
+            </div>
+            <h1 className="text-2xl font-bold text-theme-primary sm:text-3xl">
+              {t('title')}
+            </h1>
+            <p className="mt-1 max-w-2xl text-sm text-theme-muted sm:text-base">{t('subtitle')}</p>
+          </div>
+          <Button
+            variant="flat"
+            size="sm"
+            className="w-full bg-theme-elevated text-theme-muted sm:w-auto"
+            startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
+            onPress={() => loadWalletData()}
+            isDisabled={isLoading}
+            aria-label={t('aria.refresh_wallet')}
+          >
+            {t('refresh')}
+          </Button>
+        </div>
       </motion.div>
 
       {/* Error State */}
       {error && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-          <GlassCard className="p-8 text-center">
+          <GlassCard className="p-6 text-center sm:p-8">
             <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
             <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h3>
             <p className="text-theme-muted mb-4">{error}</p>
@@ -253,53 +270,57 @@ export function WalletPage() {
       {/* Balance Card */}
       {!error && (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-        <GlassCard className="p-8 text-center relative overflow-hidden">
-          {/* Background decoration */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full blur-3xl" />
-          </div>
+        <GlassCard className="overflow-hidden p-5 sm:p-7">
+          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-theme-subtle">{t('your_balance')}</p>
 
-          <div className="relative z-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
-              <Wallet className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+              {isLoading ? (
+                <div className="mt-3" aria-label={t('aria.loading_balance')} aria-busy="true">
+                  <Skeleton className="rounded-xl">
+                    <div className="h-16 w-48 rounded-xl bg-default-300" />
+                  </Skeleton>
+                </div>
+              ) : (
+                <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1" aria-live="polite">
+                  <span className="text-5xl font-bold leading-none text-theme-primary sm:text-6xl">
+                    {balance?.balance ?? 0}
+                  </span>
+                  <span className="text-xl font-semibold text-theme-muted">{t('hours')}</span>
+                </div>
+              )}
+
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  className="bg-amber-500/10 text-amber-600 dark:text-amber-300"
+                  startContent={<Clock className="h-3.5 w-3.5" aria-hidden="true" />}
+                >
+                  {(balance?.pending_in || balance?.pending_incoming) ? t('pending_in', { count: balance?.pending_in ?? balance?.pending_incoming ?? 0 }) : t('no_pending')}
+                </Chip>
+              </div>
             </div>
 
-            <p className="text-theme-muted text-sm mb-2">{t('your_balance')}</p>
-
-            {isLoading ? (
-              <Skeleton className="rounded-lg mx-auto">
-                <div className="h-12 w-32 rounded-lg bg-default-300 mx-auto" />
-              </Skeleton>
-            ) : (
-              <h1 className="text-3xl sm:text-5xl font-bold text-theme-primary mb-2">
-                {balance?.balance ?? 0}
-                <span className="text-2xl text-theme-muted ml-2">{t('hours')}</span>
-              </h1>
-            )}
-
-            <p className="text-theme-subtle text-sm mb-4">
-              {(balance?.pending_in || balance?.pending_incoming) ? t('pending_in', { count: balance?.pending_in ?? balance?.pending_incoming ?? 0 }) : t('no_pending')}
-            </p>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3 justify-center flex-wrap">
+            <div className="flex flex-col gap-3 sm:flex-row lg:w-56 lg:flex-col">
               <Button
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium px-8"
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 px-8 font-medium text-white"
                 size="lg"
-                startContent={<Send className="w-5 h-5" />}
+                startContent={<Send className="h-5 w-5" aria-hidden="true" />}
                 onPress={() => setIsTransferModalOpen(true)}
                 isDisabled={isLoading || !balance || balance.balance <= 0}
+                aria-label={t('aria.send_credits')}
               >
                 {t('send_credits')}
               </Button>
               <Button
                 variant="flat"
                 size="lg"
-                className="bg-rose-500/10 text-rose-400 font-medium px-6"
-                startContent={<ArrowDownLeft className="w-5 h-5" />}
+                className="w-full bg-rose-500/10 px-6 font-medium text-rose-500 dark:text-rose-300"
+                startContent={<ArrowDownLeft className="h-5 w-5" aria-hidden="true" />}
                 onPress={() => setIsDonateModalOpen(true)}
                 isDisabled={isLoading || !balance || balance.balance <= 0}
+                aria-label={t('aria.donate_credits')}
               >
                 {t('donate')}
               </Button>
@@ -321,25 +342,25 @@ export function WalletPage() {
 
       {/* Stats Grid */}
       {!error && (
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <StatCard
           icon={<ArrowDownLeft className="w-5 h-5" aria-hidden="true" />}
           label={t('stats.earned')}
-          value={`+${stats.earned}h`}
+          value={t('signed_hours_value', { sign: '+', count: stats.earned })}
           color="emerald"
           isLoading={isLoading}
         />
         <StatCard
           icon={<ArrowUpRight className="w-5 h-5" aria-hidden="true" />}
           label={t('stats.spent')}
-          value={`-${stats.spent}h`}
+          value={t('signed_hours_value', { sign: '-', count: stats.spent })}
           color="rose"
           isLoading={isLoading}
         />
         <StatCard
           icon={<Clock className="w-5 h-5" aria-hidden="true" />}
           label={t('stats.pending')}
-          value={`${stats.pending}h`}
+          value={t('hours_value', { count: stats.pending })}
           color="amber"
           isLoading={isLoading}
         />
@@ -349,10 +370,10 @@ export function WalletPage() {
       {/* Transactions */}
       {!error && (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-        <GlassCard className="p-6">
+        <GlassCard className="p-4 sm:p-6">
           <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <TrendingUp className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
               {t('history')}
             </h2>
 
@@ -371,6 +392,7 @@ export function WalletPage() {
 
           {/* Filter Tabs */}
           <Tabs
+            aria-label={t('aria.transaction_filters')}
             selectedKey={filter}
             onSelectionChange={(key) => { setFilter(key as TransactionFilter); setTxCursor(null); setHasMoreTransactions(true); }}
             classNames={{
@@ -405,8 +427,9 @@ export function WalletPage() {
               ) : filteredTransactions.length === 0 ? (
               <EmptyState
                 icon={<Wallet className="w-12 h-12" />}
-                title={t('no_transactions')}
-                description={t('no_transactions_desc')}
+                title={filter === 'all' ? t('no_transactions') : t('no_filtered_transactions')}
+                description={filter === 'all' ? t('no_transactions_desc') : t('no_filtered_transactions_desc')}
+                action={filter === 'all' ? undefined : { label: t('filter.all'), onClick: () => setFilter('all'), variant: 'bordered' }}
               />
             ) : (
               <>
@@ -421,6 +444,7 @@ export function WalletPage() {
                       className="bg-theme-elevated text-theme-muted"
                       onPress={loadMoreTransactions}
                       isLoading={isLoadingMore}
+                      aria-label={t('aria.load_more_transactions')}
                     >
                       {t('load_more')}
                     </Button>
@@ -464,21 +488,21 @@ interface StatCardProps {
 
 function StatCard({ icon, label, value, color, isLoading }: StatCardProps) {
   const colorClasses = {
-    emerald: 'from-emerald-500/20 to-teal-500/20 text-emerald-400',
-    rose: 'from-rose-500/20 to-pink-500/20 text-rose-400',
-    amber: 'from-amber-500/20 to-orange-500/20 text-amber-400',
+    emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300',
+    rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-300',
+    amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-300',
   };
 
   return (
-    <GlassCard className="p-4 text-center">
-      <div className={`inline-flex p-2 rounded-lg bg-gradient-to-br ${colorClasses[color]} mb-2`}>
+    <GlassCard className="min-h-28 p-4">
+      <div className={`mb-3 inline-flex rounded-lg p-2 ${colorClasses[color]}`}>
         {icon}
       </div>
-      <div className="text-theme-subtle text-xs mb-1">{label}</div>
+      <div className="mb-1 text-xs font-medium text-theme-subtle">{label}</div>
       {isLoading ? (
-        <Skeleton className="rounded-lg mx-auto"><div className="h-6 w-12 rounded-lg bg-default-300 mx-auto" /></Skeleton>
+        <Skeleton className="rounded-lg"><div className="h-7 w-16 rounded-lg bg-default-300" /></Skeleton>
       ) : (
-        <div className="text-xl font-bold text-theme-primary">{value}</div>
+        <div className="text-2xl font-bold text-theme-primary">{value}</div>
       )}
     </GlassCard>
   );
@@ -492,15 +516,16 @@ function TransactionCard({ transaction }: TransactionCardProps) {
   const { t } = useTranslation('wallet');
   const isCredit = transaction.type === 'credit';
   const otherPartyName = transaction.other_user?.name || transaction.other_party?.name;
+  const description = transaction.description || t('transaction_fallback');
 
   return (
     <article
-      className="p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors"
+      className="rounded-xl border border-theme-default bg-theme-elevated p-4 transition-colors hover:bg-theme-hover"
       aria-label={t('aria.transaction_detail', { direction: isCredit ? t('csv.received') : t('csv.sent'), amount: transaction.amount, name: otherPartyName || '' })}
     >
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
         <div className={`
-          p-2.5 rounded-full self-start shrink-0
+          p-2.5 rounded-xl self-start shrink-0
           ${isCredit ? 'bg-emerald-500/20' : 'bg-rose-500/20'}
         `}>
           {isCredit ? (
@@ -512,18 +537,18 @@ function TransactionCard({ transaction }: TransactionCardProps) {
 
         <div className="flex-1 min-w-0">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <h4 className="font-medium text-theme-primary truncate">{transaction.description}</h4>
+            <h4 className="font-semibold text-theme-primary">{description}</h4>
             {transaction.status === 'pending' && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">
+              <Chip size="sm" variant="flat" className="bg-amber-500/10 text-amber-600 dark:text-amber-300">
                 {t('filter.pending')}
-              </span>
+              </Chip>
             )}
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-theme-subtle mt-1">
-            {transaction.other_user && (
+            {otherPartyName && (
               <span className="flex min-w-0 items-center gap-1">
                 <User className="w-3 h-3 shrink-0" aria-hidden="true" />
-                <span className="truncate">{transaction.other_user.name}</span>
+                <span className="truncate">{otherPartyName}</span>
               </span>
             )}
             <span className="flex items-center gap-1">
@@ -535,8 +560,8 @@ function TransactionCard({ transaction }: TransactionCardProps) {
           </div>
         </div>
 
-        <div className={`shrink-0 text-lg font-semibold sm:text-right ${isCredit ? 'text-emerald-400' : 'text-rose-400'}`}>
-          {isCredit ? '+' : '-'}{transaction.amount}h
+        <div className={`shrink-0 text-xl font-bold sm:text-right ${isCredit ? 'text-emerald-500 dark:text-emerald-300' : 'text-rose-500 dark:text-rose-300'}`}>
+          {t('signed_hours_value', { sign: isCredit ? '+' : '-', count: transaction.amount })}
         </div>
       </div>
     </article>

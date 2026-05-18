@@ -139,5 +139,7 @@
     "valid_amount": "Bitte geben Sie einen gültigen Betrag ein",
     "insufficient_balance": "Unzureichendes Guthaben",
     "max_transfer": "Maximale Überweisung beträgt {{max}} Stunden"
-  }
+  },
+  "hours_value": "{{count}}h",
+  "signed_hours_value": "{{sign}}{{count}}h"
 }

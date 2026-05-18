@@ -15,7 +15,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Input, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab, Skeleton } from '@heroui/react';
+import { Input, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab, Skeleton, Chip } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Circle from 'lucide-react/icons/circle';
@@ -54,7 +54,7 @@ function getOtherUser(conv: Conversation) {
   }
   // Fallback to participant (deprecated)
   const p = conv.participant;
-  if (!p) return { id: 0, name: 'Unknown User', avatar: null, is_online: false };
+  if (!p) return { id: 0, name: '', avatar: null, is_online: false };
   return {
     id: p.id,
     name: p.name || `${p.first_name || ''} ${p.last_name || ''}`.trim(),
@@ -385,6 +385,18 @@ export function MessagesPage() {
     }),
     [conversations, searchQuery]
   );
+  const filteredArchivedConversations = useMemo(
+    () => archivedConversations.filter((conv) => {
+      const otherUser = getOtherUser(conv);
+      return otherUser.name.toLowerCase().includes(searchQuery.toLowerCase());
+    }),
+    [archivedConversations, searchQuery]
+  );
+  const totalUnread = useMemo(
+    () => conversations.reduce((sum, conv) => sum + (conv.unread_count || 0), 0),
+    [conversations]
+  );
+  const hasSearchQuery = searchQuery.trim().length > 0;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -400,8 +412,8 @@ export function MessagesPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <PageMeta title={t('page_meta.list.title')} noIndex />
+    <div className="mx-auto max-w-4xl space-y-5 sm:space-y-6">
+      <PageMeta title={t('page_meta.list.title')} description={t('page_subtitle')} noIndex />
       {/* Messaging Disabled Notice (feature flag) */}
       {!isDirectMessagingEnabled && (
         <GlassCard className="p-4 border-l-4 border-amber-500 bg-amber-500/10">
@@ -441,18 +453,20 @@ export function MessagesPage() {
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <MessageSquare className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="flex items-center gap-3 text-2xl font-bold text-theme-primary sm:text-3xl">
+            <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 ring-1 ring-indigo-500/20 dark:text-indigo-300">
+              <MessageSquare className="h-6 w-6" aria-hidden="true" />
+            </span>
             {t('title')}
           </h1>
-          <p className="text-theme-muted mt-1">{t('page_subtitle')}</p>
+          <p className="mt-2 max-w-2xl text-sm text-theme-muted sm:text-base">{t('page_subtitle')}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-shrink-0">
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-            startContent={<Plus className="w-4 h-4" />}
+            className="min-w-0 bg-gradient-to-r from-indigo-500 to-purple-600 font-medium text-white"
+            startContent={<Plus className="h-4 w-4 flex-shrink-0" aria-hidden="true" />}
             onPress={() => setIsNewMessageOpen(true)}
             isDisabled={!isDirectMessagingEnabled || messagingRestricted}
           >
@@ -460,56 +474,65 @@ export function MessagesPage() {
           </Button>
           <Button
             variant="flat"
-            className="bg-theme-elevated text-theme-primary"
-            startContent={<UsersIcon className="w-4 h-4" />}
+            className="min-w-0 bg-theme-elevated text-theme-primary"
+            startContent={<UsersIcon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />}
             onPress={() => setIsCreateGroupOpen(true)}
             isDisabled={!isDirectMessagingEnabled || messagingRestricted}
           >
-            {t('new_group', 'New Group')}
+            {t('new_group')}
           </Button>
         </div>
       </div>
 
       {/* Tabs and Search */}
-      <GlassCard className="p-4 space-y-4">
-        <Tabs
-          selectedKey={activeTab}
-          onSelectionChange={(key) => setActiveTab(key as 'inbox' | 'archived')}
-          classNames={{
-            tabList: 'gap-4 bg-theme-elevated p-1 rounded-lg',
-            cursor: 'bg-theme-hover',
-            tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
-            tabContent: 'group-data-[selected=true]:text-theme-primary',
-          }}
-        >
-          <Tab
-            key="inbox"
-            title={
-              <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4" />
-                <span>{t('tab_inbox')}</span>
-              </div>
-            }
-          />
-          <Tab
-            key="archived"
-            title={
-              <div className="flex items-center gap-2">
-                <Archive className="w-4 h-4" />
-                <span>{t('tab_archived')}</span>
-              </div>
-            }
-          />
-        </Tabs>
+      <GlassCard className="space-y-4 p-3 sm:p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <Tabs
+            selectedKey={activeTab}
+            onSelectionChange={(key) => setActiveTab(key as 'inbox' | 'archived')}
+            aria-label={t('title')}
+            classNames={{
+              base: 'w-full sm:w-auto',
+              tabList: 'w-full gap-1 rounded-xl bg-theme-elevated p-1 sm:w-auto',
+              cursor: 'bg-theme-hover shadow-sm',
+              tab: 'h-10 flex-1 px-3 text-theme-muted data-[selected=true]:text-theme-primary sm:flex-none',
+              tabContent: 'group-data-[selected=true]:text-theme-primary',
+            }}
+          >
+            <Tab
+              key="inbox"
+              title={
+                <div className="flex min-w-0 items-center gap-2">
+                  <MessageSquare className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                  <span className="truncate">{t('tab_inbox')}</span>
+                  {totalUnread > 0 && (
+                    <Chip size="sm" color="primary" variant="flat" className="h-5 min-w-5 px-1.5">
+                      {totalUnread > 99 ? '99+' : totalUnread}
+                    </Chip>
+                  )}
+                </div>
+              }
+            />
+            <Tab
+              key="archived"
+              title={
+                <div className="flex min-w-0 items-center gap-2">
+                  <Archive className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                  <span className="truncate">{t('tab_archived')}</span>
+                </div>
+              }
+            />
+          </Tabs>
+        </div>
         <Input
           placeholder={t('search_placeholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          startContent={<Search className="w-4 h-4 text-theme-subtle" />}
+          startContent={<Search className="h-4 w-4 text-theme-subtle" aria-hidden="true" />}
           aria-label={t('search_placeholder')}
           classNames={{
             input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
-            inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+            inputWrapper: 'min-h-11 bg-theme-elevated border-theme-default hover:bg-theme-hover',
           }}
         />
       </GlassCard>
@@ -535,9 +558,9 @@ export function MessagesPage() {
               placeholder={t('member_search_placeholder')}
               value={userSearchQuery}
               onChange={(e) => setUserSearchQuery(e.target.value)}
-              startContent={<Search className="w-4 h-4 text-theme-subtle" />}
+              startContent={<Search className="h-4 w-4 text-theme-subtle" aria-hidden="true" />}
               aria-label={t('member_search_placeholder')}
-              endContent={isSearchingUsers && <Loader2 className="w-4 h-4 text-theme-subtle animate-spin" />}
+              endContent={isSearchingUsers && <Loader2 className="h-4 w-4 animate-spin text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
@@ -564,7 +587,7 @@ export function MessagesPage() {
                   <Button
                     key={user.id}
                     variant="light"
-                    className="w-full flex items-center gap-3 p-3 rounded-lg bg-theme-elevated h-auto text-left justify-start"
+                    className="flex h-auto w-full items-center justify-start gap-3 rounded-xl bg-theme-elevated p-3 text-left"
                     onPress={() => handleSelectUser(user)}
                   >
                     <Avatar
@@ -613,46 +636,29 @@ export function MessagesPage() {
             <p className="text-theme-muted mb-4">{error}</p>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={<RefreshCw className="w-4 h-4" />}
+              startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
               onPress={() => loadConversations()}
             >
               {t('try_again')}
             </Button>
           </GlassCard>
         ) : isLoading ? (
-          <div className="space-y-3" aria-label={t('aria_loading_conversations')} aria-busy="true">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <GlassCard key={i} className="p-4">
-                <div className="flex items-center gap-4">
-                  <Skeleton className="w-12 h-12 rounded-full">
-                    <div className="w-12 h-12 rounded-full bg-default-300" />
-                  </Skeleton>
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="rounded-lg w-1/3">
-                      <div className="h-4 rounded-lg bg-default-300" />
-                    </Skeleton>
-                    <Skeleton className="rounded-lg w-2/3">
-                      <div className="h-3 rounded-lg bg-default-200" />
-                    </Skeleton>
-                  </div>
-                </div>
-              </GlassCard>
-            ))}
-          </div>
+          <ConversationListSkeleton label={t('aria_loading_conversations')} count={5} />
         ) : filteredConversations.length === 0 ? (
           <EmptyState
             icon={<MessageSquare className="w-12 h-12" />}
-            title={t('empty')}
-            description={t('empty_subtitle')}
-            action={
+            title={hasSearchQuery ? t('search_empty') : t('empty')}
+            description={hasSearchQuery ? t('search_empty_subtitle') : t('empty_subtitle')}
+            action={!hasSearchQuery && (
               <Button
                 className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                startContent={<Plus className="w-4 h-4" />}
+                startContent={<Plus className="h-4 w-4" aria-hidden="true" />}
                 onPress={() => setIsNewMessageOpen(true)}
+                isDisabled={!isDirectMessagingEnabled || messagingRestricted}
               >
                 {t('new_message')}
               </Button>
-            }
+            )}
           />
         ) : (
           <motion.div
@@ -671,32 +677,12 @@ export function MessagesPage() {
       ) : (
         // Archived view
         isLoadingArchived ? (
-          <div className="space-y-3" aria-label={t('aria_loading_archived')} aria-busy="true">
-            {[1, 2, 3].map((i) => (
-              <GlassCard key={i} className="p-4">
-                <div className="flex items-center gap-4">
-                  <Skeleton className="w-12 h-12 rounded-full">
-                    <div className="w-12 h-12 rounded-full bg-default-300" />
-                  </Skeleton>
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="rounded-lg w-1/3">
-                      <div className="h-4 rounded-lg bg-default-300" />
-                    </Skeleton>
-                    <Skeleton className="rounded-lg w-2/3">
-                      <div className="h-3 rounded-lg bg-default-200" />
-                    </Skeleton>
-                  </div>
-                </div>
-              </GlassCard>
-            ))}
-          </div>
-        ) : archivedConversations.filter((conv) =>
-            getOtherUser(conv).name.toLowerCase().includes(searchQuery.toLowerCase())
-          ).length === 0 ? (
+          <ConversationListSkeleton label={t('aria_loading_archived')} count={3} />
+        ) : filteredArchivedConversations.length === 0 ? (
           <EmptyState
             icon={<Archive className="w-12 h-12" />}
-            title={t('archived_empty')}
-            description={t('archived_empty_subtitle')}
+            title={hasSearchQuery ? t('archived_search_empty') : t('archived_empty')}
+            description={hasSearchQuery ? t('search_empty_subtitle') : t('archived_empty_subtitle')}
           />
         ) : (
           <motion.div
@@ -705,18 +691,14 @@ export function MessagesPage() {
             animate="visible"
             className="space-y-3"
           >
-            {archivedConversations
-              .filter((conv) =>
-                getOtherUser(conv).name.toLowerCase().includes(searchQuery.toLowerCase())
-              )
-              .map((conversation) => (
-                <motion.div key={conversation.id} variants={itemVariants}>
-                  <ArchivedConversationCard
-                    conversation={conversation}
-                    onRestore={() => restoreConversation(conversation.id)}
-                  />
-                </motion.div>
-              ))}
+            {filteredArchivedConversations.map((conversation) => (
+              <motion.div key={conversation.id} variants={itemVariants}>
+                <ArchivedConversationCard
+                  conversation={conversation}
+                  onRestore={() => restoreConversation(conversation.id)}
+                />
+              </motion.div>
+            ))}
           </motion.div>
         )
       )}
@@ -733,14 +715,18 @@ function ConversationCard({ conversation }: ConversationCardProps) {
   const { tenantPath } = useTenant();
   const other_user = getOtherUser(conversation);
   const { last_message, unread_count } = conversation;
+  const displayName = other_user.name || t('unknown_user');
+  const lastMessageText = last_message?.body || last_message?.content || '';
+  const lastMessageTime = last_message ? formatRelativeTime(last_message.created_at || last_message.sent_at || '') : null;
 
   return (
     <Link
       to={tenantPath(`/messages/${conversation.id}`)}
-      aria-label={unread_count > 0 ? t('aria_conversation_unread', { name: other_user.name, count: unread_count }) : t('aria_conversation', { name: other_user.name })}
+      aria-label={unread_count > 0 ? t('aria_conversation_unread', { name: displayName, count: unread_count }) : t('aria_conversation', { name: displayName })}
+      className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      <GlassCard className="p-4 hover:bg-theme-hover transition-colors">
-        <div className="flex items-center gap-4">
+      <GlassCard className={`p-4 transition-colors hover:bg-theme-hover sm:p-5 ${unread_count > 0 ? 'border-l-4 border-l-indigo-500' : ''}`}>
+        <div className="flex items-center gap-3 sm:gap-4">
           <Badge
             content={unread_count > 9 ? '9+' : unread_count}
             color="primary"
@@ -751,7 +737,7 @@ function ConversationCard({ conversation }: ConversationCardProps) {
             <div className="relative">
               <Avatar
                 src={resolveAvatarUrl(other_user.avatar)}
-                name={other_user.name}
+                name={displayName}
                 size="lg"
                 className="ring-2 ring-theme-default"
               />
@@ -759,21 +745,21 @@ function ConversationCard({ conversation }: ConversationCardProps) {
             </div>
           </Badge>
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2">
-              <h3 className={`font-semibold truncate ${unread_count > 0 ? 'text-theme-primary' : 'text-theme-muted'}`}>
-                {other_user.name}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className={`min-w-0 truncate font-semibold ${unread_count > 0 ? 'text-theme-primary' : 'text-theme-muted'}`}>
+                {displayName}
               </h3>
-              {last_message && (
-                <span className="text-xs text-theme-subtle truncate">
-                  {formatRelativeTime(last_message.created_at || last_message.sent_at || '')}
+              {lastMessageTime && (
+                <span className="max-w-[6.5rem] flex-shrink-0 truncate text-right text-xs text-theme-subtle sm:max-w-none">
+                  {lastMessageTime}
                 </span>
               )}
             </div>
 
-            {last_message && (
+            {lastMessageText && (
               <p className={`text-sm line-clamp-1 ${unread_count > 0 ? 'text-theme-muted' : 'text-theme-subtle'}`}>
-                {last_message.body || last_message.content}
+                {lastMessageText}
               </p>
             )}
           </div>
@@ -796,32 +782,35 @@ function ArchivedConversationCard({ conversation, onRestore }: ArchivedConversat
   const { t } = useTranslation('messages');
   const other_user = getOtherUser(conversation);
   const { last_message } = conversation;
+  const displayName = other_user.name || t('unknown_user');
+  const lastMessageText = last_message?.body || last_message?.content || '';
+  const lastMessageTime = last_message ? formatRelativeTime(last_message.created_at || last_message.sent_at || '') : null;
 
   return (
-    <GlassCard className="p-4">
-      <div className="flex items-center gap-4">
+    <GlassCard className="p-4 sm:p-5">
+      <div className="flex items-center gap-3 sm:gap-4">
         <Avatar
           src={resolveAvatarUrl(other_user.avatar)}
-          name={other_user.name}
+          name={displayName}
           size="lg"
           className="ring-2 ring-theme-default opacity-60"
         />
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="font-semibold truncate text-theme-muted">
-              {other_user.name}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="min-w-0 truncate font-semibold text-theme-muted">
+              {displayName}
             </h3>
-            {last_message && (
-              <span className="text-xs text-theme-subtle truncate">
-                {formatRelativeTime(last_message.created_at || last_message.sent_at || '')}
+            {lastMessageTime && (
+              <span className="max-w-[6.5rem] flex-shrink-0 truncate text-right text-xs text-theme-subtle sm:max-w-none">
+                {lastMessageTime}
               </span>
             )}
           </div>
 
-          {last_message && (
+          {lastMessageText && (
             <p className="text-sm line-clamp-1 text-theme-subtle">
-              {last_message.body || last_message.content}
+              {lastMessageText}
             </p>
           )}
         </div>
@@ -829,14 +818,39 @@ function ArchivedConversationCard({ conversation, onRestore }: ArchivedConversat
         <Button
           size="sm"
           variant="flat"
-          className="bg-theme-hover text-theme-muted hover:bg-theme-elevated"
-          startContent={<RotateCcw className="w-3 h-3" />}
+          className="flex-shrink-0 bg-theme-hover text-theme-muted hover:bg-theme-elevated"
+          startContent={<RotateCcw className="h-3 w-3" aria-hidden="true" />}
           onPress={onRestore}
+          aria-label={t('restore')}
         >
-          {t('restore')}
+          <span className="hidden sm:inline">{t('restore')}</span>
         </Button>
       </div>
     </GlassCard>
+  );
+}
+
+function ConversationListSkeleton({ label, count }: { label: string; count: number }) {
+  return (
+    <div className="space-y-3" aria-label={label} aria-busy="true" role="status">
+      {Array.from({ length: count }, (_, index) => (
+        <GlassCard key={index} className="p-4 sm:p-5">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Skeleton className="h-12 w-12 flex-shrink-0 rounded-full">
+              <div className="h-12 w-12 rounded-full bg-default-300" />
+            </Skeleton>
+            <div className="min-w-0 flex-1 space-y-2">
+              <Skeleton className="w-2/5 rounded-lg">
+                <div className="h-4 rounded-lg bg-default-300" />
+              </Skeleton>
+              <Skeleton className="w-4/5 rounded-lg">
+                <div className="h-3 rounded-lg bg-default-200" />
+              </Skeleton>
+            </div>
+          </div>
+        </GlassCard>
+      ))}
+    </div>
   );
 }
 

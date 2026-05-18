@@ -3,6 +3,8 @@
   "balance": "Balance",
   "time_credits": "Time Credits",
   "hours": "Hours",
+  "hours_value": "{{count}}h",
+  "signed_hours_value": "{{sign}}{{count}}h",
   "transactions": "Transactions",
   "pending": "Pending",
   "completed": "Completed",
@@ -15,6 +17,7 @@
   "subtitle": "Track your time credits and transactions",
   "unable_to_load": "Unable to Load Wallet",
   "try_again": "Try Again",
+  "refresh": "Refresh",
   "your_balance": "Your Balance",
   "pending_in": "+{{count}}h pending",
   "no_pending": "No pending transactions",
@@ -24,6 +27,9 @@
   "load_more": "Load More",
   "no_transactions": "No transactions",
   "no_transactions_desc": "Your transaction history will appear here",
+  "no_filtered_transactions": "No matching transactions",
+  "no_filtered_transactions_desc": "Try a different filter to see more wallet activity.",
+  "transaction_fallback": "Wallet transaction",
   "stats": {
     "earned": "Earned",
     "spent": "Spent",
@@ -119,7 +125,13 @@
   },
   "aria": {
     "export_csv": "Export transactions to CSV",
+    "refresh_wallet": "Refresh wallet data",
+    "send_credits": "Send time credits",
+    "donate_credits": "Donate time credits",
+    "loading_balance": "Loading wallet balance",
     "loading_transactions": "Loading transactions",
+    "load_more_transactions": "Load more transactions",
+    "transaction_filters": "Transaction filters",
     "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
   },
   "validation": {

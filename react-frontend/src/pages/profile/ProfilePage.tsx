@@ -563,6 +563,9 @@ export function ProfilePage() {
   const metaDescription = t('page_meta.description', { name: profileName });
   const earnedBadgeCount = gamification?.total_badges ?? gamification?.badges.length ?? 0;
   const visibleSkills = profile.skills ? (showAllSkills ? profile.skills : profile.skills.slice(0, 8)) : [];
+  const taglineText = profile.tagline
+    ? profile.tagline.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
+    : '';
 
   return (
     <motion.div
@@ -581,16 +584,16 @@ export function ProfilePage() {
       {/* Profile Header */}
       <motion.div variants={itemVariants}>
         <GlassCard className="overflow-hidden">
-          <div className="h-20 bg-[linear-gradient(135deg,var(--color-primary),var(--color-secondary,var(--color-primary)))] opacity-90" aria-hidden="true" />
-          <div className="px-4 pb-5 sm:px-8 sm:pb-8">
-          <div className="-mt-12 flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
+          <div className="h-1.5 bg-[linear-gradient(90deg,var(--color-primary),var(--color-secondary,var(--color-primary)))]" aria-hidden="true" />
+          <div className="p-5 sm:p-8">
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               <Avatar
                 src={profileAvatar ? resolveAvatarUrl(profileAvatar) : undefined}
                 name={profileName}
                 showFallback
-                className="w-24 h-24 sm:w-32 sm:h-32 ring-4 ring-[var(--color-surface)] shadow-lg"
+                className="w-24 h-24 sm:w-32 sm:h-32 ring-4 ring-theme-default shadow-lg"
               />
               {hasGamification && profile.level && (
                 <div className="absolute -bottom-2 -right-2 px-2 py-1 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary,var(--color-primary))] text-white text-xs font-bold">
@@ -634,8 +637,8 @@ export function ProfilePage() {
                   </div>
                 </div>
               </div>
-              {profile.tagline && (
-                <p className="mt-1 max-w-2xl text-sm text-theme-muted sm:text-base line-clamp-2">{profile.tagline}</p>
+              {taglineText && (
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-theme-muted sm:text-base sm:leading-7 line-clamp-2">{taglineText}</p>
               )}
 
               {/* Meta */}

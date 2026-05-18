@@ -11,7 +11,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Button, Input, Textarea, Select, SelectItem, Radio, RadioGroup } from '@heroui/react';
+import { Button, Input, Textarea, Select, SelectItem, Radio, RadioGroup, Chip } from '@heroui/react';
 import Save from 'lucide-react/icons/save';
 import Clock from 'lucide-react/icons/clock';
 import Tag from 'lucide-react/icons/tag';
@@ -66,13 +66,14 @@ const initialFormData: FormData = {
 
 export function CreateListingPage() {
   const { t } = useTranslation('listings');
-  usePageTitle(t('create'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { tenantPath, listingConfig } = useTenant();
   const { user } = useAuth();
   const toast = useToast();
   const isEditing = !!id;
+  const pageTitle = isEditing ? t('page_meta.edit.title') : t('page_meta.create.title');
+  usePageTitle(pageTitle);
 
   const [formData, setFormData] = useState<FormData>(() => ({
     ...initialFormData,
@@ -93,6 +94,7 @@ export function CreateListingPage() {
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const selectedCategoryName = categories.find((c) => c.id.toString() === formData.category_id)?.name;
 
   // Cleanup object URL on unmount or when preview changes
   useEffect(() => {
@@ -170,9 +172,7 @@ export function CreateListingPage() {
     const stripped = title
       .replace(/^(i can help with|help with|looking for help with|need help with)\s+/i, '')
       .trim();
-    const categoryName = categories
-      .find((c) => c.id.toString() === formData.category_id)?.name?.toLowerCase()
-      .trim() || '';
+    const categoryName = selectedCategoryName?.toLowerCase().trim() || '';
     if (categoryName && (title === categoryName || stripped === categoryName)) return true;
     // Bare category-style titles with no qualifier beyond a couple of words.
     return stripped.length > 0 && stripped !== title && stripped.split(/\s+/).length <= 2;
@@ -319,10 +319,9 @@ export function CreateListingPage() {
     if (!formData.title.trim()) return;
     setIsGenerating(true);
     try {
-      const categoryName = categories.find((c) => c.id.toString() === formData.category_id)?.name || '';
       const response = await api.post<{ description: string }>('/v2/listings/generate-description', {
         title: formData.title,
-        category: categoryName,
+        category: selectedCategoryName || '',
         type: formData.type,
         notes: formData.description, // Use existing description as context
       });
@@ -349,58 +348,101 @@ export function CreateListingPage() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-2xl mx-auto space-y-6"
+      className="mx-auto max-w-5xl space-y-6"
     >
-      <PageMeta title={t('page_meta.create.title')} noIndex />
+      <PageMeta title={pageTitle} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('title'), href: tenantPath('/listings') },
         { label: isEditing ? t('form.edit_title') : t('form.new_title') },
       ]} />
 
-      {/* Form */}
-      <GlassCard className="p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-theme-primary mb-6">
-          {isEditing ? t('form.edit_title') : t('form.create_title')}
-        </h1>
+      <header className="overflow-hidden rounded-2xl border border-theme-default bg-theme-elevated">
+        <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl space-y-3">
+            <Chip size="sm" variant="flat" color={formData.type === 'offer' ? 'success' : 'warning'} className="font-medium">
+              {formData.type === 'offer' ? t('form.offer_badge') : t('form.request_badge')}
+            </Chip>
+            <div>
+              <h1 className="text-3xl font-bold tracking-normal text-theme-primary sm:text-4xl">
+                {isEditing ? t('form.edit_title') : t('form.create_title')}
+              </h1>
+              <p className="mt-2 text-sm leading-6 text-theme-muted sm:text-base">
+                {t('form.create_intro')}
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 text-sm sm:min-w-64">
+            <div className="rounded-xl border border-theme-default bg-theme-surface px-4 py-3">
+              <span className="block text-xs font-medium uppercase tracking-wide text-theme-subtle">{t('form.summary_type')}</span>
+              <span className="mt-1 block font-semibold text-theme-primary">
+                {formData.type === 'offer' ? t('form.offer_title') : t('form.request_title')}
+              </span>
+            </div>
+            <div className="rounded-xl border border-theme-default bg-theme-surface px-4 py-3">
+              <span className="block text-xs font-medium uppercase tracking-wide text-theme-subtle">{t('form.summary_category')}</span>
+              <span className="mt-1 block truncate font-semibold text-theme-primary">
+                {selectedCategoryName || t('form.summary_not_set')}
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
 
-        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+      {/* Form */}
+      <GlassCard className="p-5 sm:p-8">
+
+        <form onSubmit={handleSubmit} className="space-y-8" noValidate>
           {/* Type Selection */}
-          <div>
-            <label className="block text-sm font-medium text-theme-muted mb-3">
-              {t('form.type_question')}
-            </label>
+          <section className="space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold text-theme-primary">{t('form.intent_section')}</h2>
+              <p className="mt-1 text-sm text-theme-muted">{t('form.intent_section_hint')}</p>
+            </div>
             <RadioGroup
+              aria-label={t('form.type_question')}
               value={formData.type}
               onValueChange={(value) => updateField('type', value as 'offer' | 'request')}
-              classNames={{ wrapper: 'sm:flex-row gap-3' }}
+              classNames={{ wrapper: 'gap-3 sm:flex-row' }}
             >
               <Radio
                 value="offer"
                 classNames={{
-                  base: 'p-4 border border-theme-default rounded-lg data-[selected=true]:border-emerald-500 sm:flex-1',
+                  base: 'm-0 max-w-none rounded-xl border border-theme-default bg-theme-elevated p-4 data-[selected=true]:border-emerald-500 data-[selected=true]:bg-emerald-500/10 sm:flex-1',
                   label: 'text-theme-primary',
                 }}
               >
-                <div>
-                  <div className="font-medium">{t('form.offer_title')}</div>
-                  <div className="text-xs text-theme-subtle">{t('form.offer_subtitle')}</div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" aria-hidden="true" />
+                  <div>
+                    <div className="font-semibold">{t('form.offer_title')}</div>
+                    <div className="text-xs leading-5 text-theme-subtle">{t('form.offer_subtitle')}</div>
+                  </div>
                 </div>
               </Radio>
               <Radio
                 value="request"
                 classNames={{
-                  base: 'p-4 border border-theme-default rounded-lg data-[selected=true]:border-amber-500 sm:flex-1',
+                  base: 'm-0 max-w-none rounded-xl border border-theme-default bg-theme-elevated p-4 data-[selected=true]:border-amber-500 data-[selected=true]:bg-amber-500/10 sm:flex-1',
                   label: 'text-theme-primary',
                 }}
               >
-                <div>
-                  <div className="font-medium">{t('form.request_title')}</div>
-                  <div className="text-xs text-theme-subtle">{t('form.request_subtitle')}</div>
+                <div className="flex items-start gap-3">
+                  <HelpCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" aria-hidden="true" />
+                  <div>
+                    <div className="font-semibold">{t('form.request_title')}</div>
+                    <div className="text-xs leading-5 text-theme-subtle">{t('form.request_subtitle')}</div>
+                  </div>
                 </div>
               </Radio>
             </RadioGroup>
-          </div>
+          </section>
+
+          <section className="space-y-4 border-t border-theme-default pt-8">
+            <div>
+              <h2 className="text-lg font-semibold text-theme-primary">{t('form.essentials_section')}</h2>
+              <p className="mt-1 text-sm text-theme-muted">{t('form.essentials_section_hint')}</p>
+            </div>
 
           {/* Title */}
           <div>
@@ -413,12 +455,13 @@ export function CreateListingPage() {
               isInvalid={!!errors.title}
               errorMessage={errors.title}
               maxLength={255}
-              description={`${formData.title.length}/255`}
-              startContent={<FileText className="w-4 h-4 text-theme-subtle" />}
+              description={t('form.character_count', { count: formData.title.length, max: 255 })}
+              startContent={<FileText className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
                 label: 'text-theme-muted',
+                description: 'text-theme-subtle',
               }}
             />
             {/* Soft nudge when the title is just the category name or a generic
@@ -426,7 +469,7 @@ export function CreateListingPage() {
                 submits. Aimed at the SERP/discovery quality regression where
                 titles like "I can help with Events" indexed as thin content. */}
             {isGenericTitle && (
-              <p className="mt-1.5 text-xs text-amber-600 dark:text-amber-400 flex items-start gap-1.5">
+              <p className="mt-2 flex items-start gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs leading-5 text-amber-700 dark:text-amber-300">
                 <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" aria-hidden="true" />
                 <span>{t('form.title_too_generic_hint')}</span>
               </p>
@@ -440,16 +483,17 @@ export function CreateListingPage() {
               placeholder={t('form.description_placeholder')}
               value={formData.description}
               onChange={(e) => updateField('description', e.target.value)}
-              minRows={4}
+              minRows={6}
               isRequired
               isInvalid={!!errors.description}
               errorMessage={errors.description}
               maxLength={10000}
-              description={`${formData.description.length}/10000`}
+              description={t('form.character_count', { count: formData.description.length, max: 10000 })}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
                 label: 'text-theme-muted',
+                description: 'text-theme-subtle',
               }}
             />
             <div className="flex flex-col items-stretch gap-2 mt-2 sm:flex-row sm:items-center">
@@ -457,7 +501,7 @@ export function CreateListingPage() {
                 size="sm"
                 variant="flat"
                 className="bg-theme-elevated text-theme-primary"
-                startContent={<Sparkles className="w-3.5 h-3.5" />}
+                startContent={<Sparkles className="w-3.5 h-3.5" aria-hidden="true" />}
                 onPress={handleGenerateDescription}
                 isLoading={isGenerating}
                 isDisabled={!formData.title.trim() || isGenerating}
@@ -473,14 +517,19 @@ export function CreateListingPage() {
               )}
             </div>
           </div>
+          </section>
 
           {/* Optional Service Details */}
-          <details className="group">
-            <summary className="cursor-pointer text-sm font-medium text-theme-muted hover:text-theme-primary flex items-center gap-2 select-none">
-              <Info className="w-4 h-4" />
-              {t('form.service_details_toggle')}
+          <section className="space-y-4 border-t border-theme-default pt-8">
+          <details className="group rounded-xl border border-theme-default bg-theme-surface p-4 open:bg-theme-elevated">
+            <summary className="flex cursor-pointer select-none items-center justify-between gap-3 text-sm font-semibold text-theme-primary">
+              <span className="flex items-center gap-2">
+                <Info className="w-4 h-4" aria-hidden="true" />
+                {t('form.service_details_toggle')}
+              </span>
+              <span className="text-xs font-medium text-theme-subtle group-open:hidden">{t('form.optional_label')}</span>
             </summary>
-            <div className="mt-3 space-y-4 pl-0 sm:pl-6">
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
               {/* Experience Level */}
               <Select
                 label={t('form.experience_label')}
@@ -542,84 +591,103 @@ export function CreateListingPage() {
                 isInvalid={!!errors.accessibility_notes}
                 errorMessage={errors.accessibility_notes}
                 maxLength={200}
+                description={t('form.character_count', { count: formData.accessibility_notes?.length || 0, max: 200 })}
+                className="md:col-span-2"
                 classNames={{
                   input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
+                  description: 'text-theme-subtle',
                 }}
               />
             </div>
           </details>
+          </section>
 
           {/* Service Delivery Mode */}
-          <div>
-            <label className="block text-sm font-medium text-theme-muted mb-3">
-              {t('form.service_type_label')}
-            </label>
+          <section className="space-y-4 border-t border-theme-default pt-8">
+            <div>
+              <h2 className="text-lg font-semibold text-theme-primary">{t('form.logistics_section')}</h2>
+              <p className="mt-1 text-sm text-theme-muted">{t('form.logistics_section_hint')}</p>
+            </div>
             <RadioGroup
+              label={t('form.service_type_label')}
               value={formData.service_type}
               onValueChange={(value) => updateField('service_type', value as FormData['service_type'])}
-              classNames={{ wrapper: 'grid grid-cols-1 sm:grid-cols-2 gap-3' }}
+              classNames={{
+                label: 'text-sm font-medium text-theme-muted',
+                wrapper: 'grid grid-cols-1 sm:grid-cols-2 gap-3',
+              }}
             >
               <Radio
                 value="physical_only"
                 classNames={{
-                  base: 'p-3 border border-theme-default rounded-lg data-[selected=true]:border-emerald-500',
+                  base: 'm-0 max-w-none p-3 border border-theme-default rounded-xl bg-theme-elevated data-[selected=true]:border-emerald-500 data-[selected=true]:bg-emerald-500/10',
                   label: 'text-theme-primary',
                 }}
               >
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-emerald-500 shrink-0" />
+                <div className="flex items-start gap-2">
+                  <MapPin className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
-                    <div className="font-medium text-sm">{t('form.service_type_physical')}</div>
+                    <div className="font-semibold text-sm">{t('form.service_type_physical')}</div>
+                    <div className="text-xs leading-5 text-theme-subtle">{t('form.service_type_physical_hint')}</div>
                   </div>
                 </div>
               </Radio>
               <Radio
                 value="remote_only"
                 classNames={{
-                  base: 'p-3 border border-theme-default rounded-lg data-[selected=true]:border-blue-500',
+                  base: 'm-0 max-w-none p-3 border border-theme-default rounded-xl bg-theme-elevated data-[selected=true]:border-blue-500 data-[selected=true]:bg-blue-500/10',
                   label: 'text-theme-primary',
                 }}
               >
-                <div className="flex items-center gap-2">
-                  <Monitor className="w-4 h-4 text-[var(--color-info)] shrink-0" />
+                <div className="flex items-start gap-2">
+                  <Monitor className="w-4 h-4 text-[var(--color-info)] shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
-                    <div className="font-medium text-sm">{t('form.service_type_remote')}</div>
+                    <div className="font-semibold text-sm">{t('form.service_type_remote')}</div>
+                    <div className="text-xs leading-5 text-theme-subtle">{t('form.service_type_remote_hint')}</div>
                   </div>
                 </div>
               </Radio>
               <Radio
                 value="hybrid"
                 classNames={{
-                  base: 'p-3 border border-theme-default rounded-lg data-[selected=true]:border-teal-500',
+                  base: 'm-0 max-w-none p-3 border border-theme-default rounded-xl bg-theme-elevated data-[selected=true]:border-teal-500 data-[selected=true]:bg-teal-500/10',
                   label: 'text-theme-primary',
                 }}
               >
-                <div className="flex items-center gap-2">
-                  <ArrowRightLeft className="w-4 h-4 text-teal-500 shrink-0" />
+                <div className="flex items-start gap-2">
+                  <ArrowRightLeft className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
-                    <div className="font-medium text-sm">{t('form.service_type_hybrid')}</div>
+                    <div className="font-semibold text-sm">{t('form.service_type_hybrid')}</div>
+                    <div className="text-xs leading-5 text-theme-subtle">{t('form.service_type_hybrid_hint')}</div>
                   </div>
                 </div>
               </Radio>
               <Radio
                 value="location_dependent"
                 classNames={{
-                  base: 'p-3 border border-theme-default rounded-lg data-[selected=true]:border-gray-500',
+                  base: 'm-0 max-w-none p-3 border border-theme-default rounded-xl bg-theme-elevated data-[selected=true]:border-slate-500 data-[selected=true]:bg-slate-500/10',
                   label: 'text-theme-primary',
                 }}
               >
-                <div className="flex items-center gap-2">
-                  <HelpCircle className="w-4 h-4 text-gray-500 shrink-0" />
+                <div className="flex items-start gap-2">
+                  <HelpCircle className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
-                    <div className="font-medium text-sm">{t('form.service_type_depends')}</div>
+                    <div className="font-semibold text-sm">{t('form.service_type_depends')}</div>
+                    <div className="text-xs leading-5 text-theme-subtle">{t('form.service_type_depends_hint')}</div>
                   </div>
                 </div>
               </Radio>
             </RadioGroup>
-          </div>
+          </section>
 
+          <section className="space-y-4 border-t border-theme-default pt-8">
+            <div>
+              <h2 className="text-lg font-semibold text-theme-primary">{t('form.organise_section')}</h2>
+              <p className="mt-1 text-sm text-theme-muted">{t('form.organise_section_hint')}</p>
+            </div>
+            <div className="grid gap-5 md:grid-cols-2">
           {/* Category */}
           <div>
             <Select
@@ -630,7 +698,7 @@ export function CreateListingPage() {
               isRequired
               isInvalid={!!errors.category_id}
               errorMessage={errors.category_id}
-              startContent={<Tag className="w-4 h-4 text-theme-subtle" />}
+              startContent={<Tag className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               popoverProps={{
                 placement: 'bottom',
                 shouldFlip: false,
@@ -659,8 +727,11 @@ export function CreateListingPage() {
             tags={formData.skill_tags}
             onChange={(tags) => setFormData((prev) => ({ ...prev, skill_tags: tags }))}
           />
+            </div>
+          </section>
 
           {/* Hours & Location */}
+          <section className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <Input
@@ -674,7 +745,7 @@ export function CreateListingPage() {
                 step={0.5}
                 isInvalid={!!errors.hours_estimate}
                 errorMessage={errors.hours_estimate}
-                startContent={<Clock className="w-4 h-4 text-theme-subtle" />}
+                startContent={<Clock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                 classNames={{
                   input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -694,43 +765,47 @@ export function CreateListingPage() {
                   input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
+                  description: 'text-theme-subtle',
                 }}
               />
             </div>
           </div>
+          </section>
 
           {/* Image Upload */}
-          <div>
-            <label className="block text-sm font-medium text-theme-muted mb-2">
-              {t('form.image_label')}
-            </label>
+          <section className="space-y-4 border-t border-theme-default pt-8">
+            <div>
+              <h2 className="text-lg font-semibold text-theme-primary">{t('form.media_section')}</h2>
+              <p className="mt-1 text-sm text-theme-muted">{t('form.media_section_hint')}</p>
+            </div>
             {(imagePreview || existingImageUrl) ? (
               <div className="relative inline-block">
                 <img
                   src={imagePreview || resolveAssetUrl(existingImageUrl) || ''}
                   alt={t('form.image_preview_alt')}
-                  className="w-full max-w-sm h-48 object-cover rounded-xl border border-theme-default"
+                  className="h-56 w-full max-w-md rounded-xl border border-theme-default object-cover"
                 />
                 <Button
                   isIconOnly
                   size="sm"
                   variant="flat"
                   onPress={() => { setImageFile(null); setImagePreview(null); if (existingImageUrl) setRemoveExistingImage(true); setExistingImageUrl(null); }}
-                  className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors min-w-0 w-auto h-auto"
+                  className="absolute right-2 top-2 h-auto w-auto min-w-0 rounded-full bg-black/60 p-1.5 text-white transition-colors hover:bg-black/80"
                   aria-label={t('form.aria_remove_image')}
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4" aria-hidden="true" />
                 </Button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center w-full h-40 rounded-xl border-2 border-dashed border-theme-default hover:border-indigo-500/50 bg-theme-elevated hover:bg-theme-hover transition-colors cursor-pointer">
-                <ImagePlus className="w-8 h-8 text-theme-subtle mb-2" />
+              <label className="flex h-44 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-theme-default bg-theme-elevated transition-colors hover:border-teal-500/60 hover:bg-theme-hover focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/30">
+                <ImagePlus className="mb-2 h-8 w-8 text-theme-subtle" aria-hidden="true" />
                 <span className="text-sm text-theme-muted">{t('form.image_upload_hint')}</span>
                 <span className="text-xs text-theme-subtle mt-1">{t('form.image_formats')}</span>
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
                   className="hidden"
+                  aria-label={t('form.image_label')}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
@@ -745,27 +820,28 @@ export function CreateListingPage() {
                 />
               </label>
             )}
-          </div>
+          </section>
 
           {/* Submit */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="submit"
-              className="flex-1 bg-linear-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={isEditing ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
-              isLoading={isSubmitting}
-            >
-              {isEditing ? t('form.update') : t('create')}
-            </Button>
-            <Link to={tenantPath("/listings")}>
+          <div className="flex flex-col-reverse gap-3 border-t border-theme-default pt-6 sm:flex-row sm:items-center sm:justify-end">
+            <Link to={tenantPath("/listings")} className="sm:mr-auto">
               <Button
                 type="button"
                 variant="flat"
-                className="bg-theme-elevated text-theme-primary min-w-[80px]"
+                className="w-full bg-theme-elevated text-theme-primary sm:w-auto sm:min-w-24"
               >
                 {t('form.cancel')}
               </Button>
             </Link>
+            <Button
+              type="submit"
+              color="primary"
+              className="w-full font-semibold text-white sm:w-auto sm:min-w-44"
+              startContent={isEditing ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
+              isLoading={isSubmitting}
+            >
+              {isEditing ? t('form.update') : t('create')}
+            </Button>
           </div>
         </form>
       </GlassCard>

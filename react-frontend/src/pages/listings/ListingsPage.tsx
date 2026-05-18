@@ -125,6 +125,11 @@ export function ListingsPage() {
   // Key used to force-remount ProximityFilter when cleared externally (resets internal radiusKm state)
   const [proximityKey, setProximityKey] = useState(0);
 
+  const hasActiveFilters = useMemo(
+    () => !!(searchQuery || selectedType !== 'all' || selectedCategory || hoursRange !== 'any' || serviceMode !== 'any' || postedWithin !== 'any' || proximityParams),
+    [searchQuery, selectedType, selectedCategory, hoursRange, serviceMode, postedWithin, proximityParams],
+  );
+
   // Count of active advanced filters (shown as badge on the toggle button)
   const activeFilterCount = useMemo(() => {
     let count = 0;
@@ -333,6 +338,18 @@ export function ListingsPage() {
     setSearchQuery(searchInput); // Immediately apply (bypass debounce)
   }
 
+  const resetFilters = useCallback(() => {
+    setSearchInput('');
+    setSearchQuery('');
+    setSelectedType('all');
+    setSelectedCategory('');
+    setHoursRange('any');
+    setServiceMode('any');
+    setPostedWithin('any');
+    setProximityParams(null);
+    setProximityKey((k) => k + 1);
+  }, []);
+
   /**
    * Toggle save/unsave a listing with optimistic UI update.
    * Reverts on failure.
@@ -378,8 +395,8 @@ export function ListingsPage() {
     <>
       <PageMeta
         title={t('title')}
-        description={t("page_meta_description")}
-        keywords={t("page_meta_keywords")}
+        description={t('page_meta_description')}
+        keywords={t('page_meta_keywords')}
       />
       <div className="space-y-5">
       <PublicPageHero
@@ -408,24 +425,45 @@ export function ListingsPage() {
       />
 
       {/* Filters */}
-      <GlassCard className="p-4">
+      <GlassCard className="p-4 sm:p-5">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="text-base font-semibold text-theme-primary">{t('browse')}</h2>
+            <p className="mt-1 text-sm text-theme-muted">{t('filters_intro')}</p>
+          </div>
+          <div className="flex items-center gap-2 rounded-full bg-theme-elevated px-3 py-1 text-xs font-medium text-theme-muted">
+            <ListTodo className="h-3.5 w-3.5 text-emerald-500" aria-hidden="true" />
+            {totalItems != null ? t('results_count', { count: totalItems }) : t('results_loading')}
+          </div>
+        </div>
+
         {/* Row 1: Search + primary filters */}
-        <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-4">
-          <div className="flex-1 min-w-0">
+        <form onSubmit={handleSearch} className="flex flex-col gap-3 xl:flex-row">
+          <div className="flex min-w-0 flex-1 gap-2">
             <Input
+              size="lg"
               placeholder={t('search_placeholder')}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" />}
-              aria-label={t('search_placeholder')}
+              aria-label={t('search_label')}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
-                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover shadow-sm',
               }}
             />
+            <Button
+              isIconOnly
+              type="submit"
+              color="primary"
+              className="min-h-[48px] min-w-[48px] shrink-0 shadow-sm"
+              aria-label={t('search_action')}
+            >
+              <Search className="h-4 w-4" aria-hidden="true" />
+            </Button>
           </div>
 
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-center">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:flex xl:items-center">
             <Select
               aria-label={t('filter_type_label')}
               placeholder={t('filter_type_label')}
@@ -435,7 +473,7 @@ export function ListingsPage() {
                 const val = keys instanceof Set ? ([...keys][0] as string) : 'all';
                 setSelectedType((val || 'all') as ListingType);
               }}
-              className="w-full sm:w-36"
+              className="w-full xl:w-36"
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 value: 'text-theme-primary',
@@ -457,7 +495,7 @@ export function ListingsPage() {
                 const val = keys instanceof Set ? ([...keys][0] as string) : 'all';
                 setSelectedCategory(val === 'all' ? '' : (val || ''));
               }}
-              className="w-full sm:w-44"
+              className="w-full xl:w-44"
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 value: 'text-theme-primary',
@@ -477,7 +515,7 @@ export function ListingsPage() {
                 const val = keys instanceof Set ? ([...keys][0] as string) : 'recommended';
                 setSortMode((val === 'newest' ? 'newest' : 'recommended') as SortMode);
               }}
-              className="w-full sm:w-44"
+              className="w-full xl:w-44"
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 value: 'text-theme-primary',
@@ -492,8 +530,8 @@ export function ListingsPage() {
             <Button
               variant={showAdvancedFilters ? 'solid' : 'flat'}
               className={showAdvancedFilters
-                ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white min-h-[40px]'
-                : 'bg-theme-elevated text-theme-primary min-h-[40px]'}
+                ? 'min-h-[40px] bg-emerald-600 text-white shadow-sm hover:bg-emerald-700'
+                : 'min-h-[40px] bg-theme-elevated text-theme-primary'}
               startContent={<SlidersHorizontal className="w-4 h-4" aria-hidden="true" />}
               onPress={() => setShowAdvancedFilters((prev) => !prev)}
               aria-expanded={showAdvancedFilters}
@@ -507,11 +545,11 @@ export function ListingsPage() {
               )}
             </Button>
 
-            <div className="flex rounded-xl overflow-hidden border border-theme-default" role="group" aria-label={t('aria.view_mode')}>
+            <div className="flex overflow-hidden rounded-xl border border-theme-default bg-theme-elevated" role="group" aria-label={t('aria.view_mode')}>
               <Button
                 isIconOnly
                 variant="light"
-                className={`rounded-none min-w-[44px] min-h-[44px] transition-colors ${viewMode === 'grid' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
+                className={`min-h-[44px] min-w-[44px] rounded-none transition-colors ${viewMode === 'grid' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'text-theme-muted'}`}
                 aria-label={t('aria_grid_view')}
                 aria-pressed={viewMode === 'grid'}
                 onPress={() => setViewMode('grid')}
@@ -521,7 +559,7 @@ export function ListingsPage() {
               <Button
                 isIconOnly
                 variant="light"
-                className={`rounded-none rounded-r-xl min-w-[44px] min-h-[44px] transition-colors ${viewMode === 'list' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
+                className={`min-h-[44px] min-w-[44px] rounded-none rounded-r-xl transition-colors ${viewMode === 'list' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'text-theme-muted'}`}
                 aria-label={t('aria_list_view')}
                 aria-pressed={viewMode === 'list'}
                 onPress={() => setViewMode('list')}
@@ -534,7 +572,7 @@ export function ListingsPage() {
 
         {/* Row 2: Advanced filters (toggled) */}
         {showAdvancedFilters && (
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-3 pt-3 border-t border-theme-default">
+          <div className="mt-4 grid grid-cols-1 gap-3 border-t border-theme-default pt-4 sm:grid-cols-2 lg:grid-cols-4">
             <Select
               aria-label={t('filter_hours')}
               placeholder={t('filter_hours')}
@@ -544,7 +582,7 @@ export function ListingsPage() {
                 const val = keys instanceof Set ? ([...keys][0] as string) : 'any';
                 setHoursRange(val || 'any');
               }}
-              className="w-full sm:w-40"
+              className="w-full"
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 value: 'text-theme-primary',
@@ -567,7 +605,7 @@ export function ListingsPage() {
                 const val = keys instanceof Set ? ([...keys][0] as string) : 'any';
                 setServiceMode(val || 'any');
               }}
-              className="w-full sm:w-44"
+              className="w-full"
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 value: 'text-theme-primary',
@@ -588,7 +626,7 @@ export function ListingsPage() {
                 const val = keys instanceof Set ? ([...keys][0] as string) : 'any';
                 setPostedWithin(val || 'any');
               }}
-              className="w-full sm:w-36"
+              className="w-full"
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 value: 'text-theme-primary',
@@ -606,15 +644,9 @@ export function ListingsPage() {
             {activeFilterCount > 0 && (
               <Button
                 variant="light"
-                className="text-theme-muted hover:text-theme-primary min-h-[40px]"
+                className="min-h-[40px] text-theme-muted hover:text-theme-primary"
                 startContent={<X className="w-4 h-4" aria-hidden="true" />}
-                onPress={() => {
-                  setHoursRange('any');
-                  setServiceMode('any');
-                  setPostedWithin('any');
-                  setProximityParams(null);
-                  setProximityKey((k) => k + 1);
-                }}
+                onPress={resetFilters}
                 aria-label={t('clear_filters')}
               >
                 {t('clear_filters')}
@@ -639,12 +671,14 @@ export function ListingsPage() {
           ))}
         </div>
       ) : loadError ? (
-        <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
+        <GlassCard className="p-8 text-center sm:p-10">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-warning/15 text-[var(--color-warning)]">
+            <AlertTriangle className="h-7 w-7" aria-hidden="true" />
+          </div>
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('load_error_title')}</h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
-            className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+            color="primary"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadListings(true)}
           >
@@ -652,9 +686,7 @@ export function ListingsPage() {
           </Button>
         </GlassCard>
       ) : listings.length === 0 ? (
-        (() => {
-          const hasActiveFilters = !!(searchQuery || selectedType !== 'all' || selectedCategory || hoursRange !== 'any' || serviceMode !== 'any' || postedWithin !== 'any' || proximityParams);
-          return (
+        (
             <PublicEmptyState
               icon={<Search className="w-12 h-12" />}
               title={t('empty')}
@@ -664,32 +696,22 @@ export function ListingsPage() {
               action={
                 hasActiveFilters ? (
                   <Button
-                    className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+                    color="primary"
                     startContent={<X className="w-4 h-4" aria-hidden="true" />}
-                    onPress={() => {
-                      setSearchInput('');
-                      setSearchQuery('');
-                      setSelectedType('all');
-                      setSelectedCategory('');
-                      setHoursRange('any');
-                      setServiceMode('any');
-                      setPostedWithin('any');
-                      setProximityParams(null);
-                    }}
+                    onPress={resetFilters}
                   >
                     {t('clear_filters')}
                   </Button>
                 ) : isAuthenticated ? (
                   <Link to={tenantPath('/listings/create')}>
-                    <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
+                    <Button color="primary" startContent={<Plus className="h-4 w-4" aria-hidden="true" />}>
                       {t('create')}
                     </Button>
                   </Link>
                 ) : undefined
               }
             />
-          );
-        })()
+        )
       ) : (
         <>
           {viewMode === 'map' ? (
@@ -745,7 +767,7 @@ export function ListingsPage() {
                 variants={listingContainerVariants}
                 initial="hidden"
                 animate="visible"
-                className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}
+                className={viewMode === 'grid' ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3' : 'space-y-4'}
               >
                 {listings.map((listing) => (
                   <motion.div key={listing.id} variants={listingItemVariants}>
@@ -772,7 +794,7 @@ export function ListingsPage() {
                   </div>
                   <div className="h-1.5 rounded-full bg-theme-elevated overflow-hidden">
                     <motion.div
-                      className="h-full rounded-full bg-linear-to-r from-indigo-500 to-purple-600"
+                      className="h-full rounded-full bg-emerald-500"
                       initial={{ width: '0%' }}
                       animate={{ width: `${Math.round((listings.length / totalItems) * 100)}%` }}
                       transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -821,6 +843,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
   const isFavorited = listing.is_favorited === true;
   const fallbackUserName = t('user_fallback');
   const imageAlt = listing.title || t('listing_image_alt');
+  const authorName = listing.author_name || fallbackUserName;
   const formatDistance = (distanceKm: number) =>
     distanceKm < 1
       ? t('distance_meters', { distance: Math.round(distanceKm * 1000) })
@@ -842,16 +865,20 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
   if (!isGrid) {
     // ─── List View ───
     return (
-      <Link to={tenantPath(`/listings/${listing.id}`)}>
-        <GlassCard className={`cursor-pointer p-4 hover:bg-theme-hover hover:shadow-md transition-all duration-200 border-l-4 ${listing.type === 'offer' ? 'border-l-emerald-500/60' : 'border-l-amber-500/60'}`}>
+      <Link
+        to={tenantPath(`/listings/${listing.id}`)}
+        className="block rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        aria-label={t('open_listing_aria', { title: listing.title })}
+      >
+        <GlassCard className={`cursor-pointer p-4 transition-all duration-200 hover:-translate-y-0.5 hover:bg-theme-hover hover:shadow-md border-l-4 ${listing.type === 'offer' ? 'border-l-emerald-500/70' : 'border-l-amber-500/70'}`}>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
             {imageUrl && !imgError ? (
               <img
                 src={imageUrl}
                 alt={imageAlt}
-                className="w-16 h-16 rounded-lg object-cover shrink-0"
-                width={64}
-                height={64}
+                className="h-36 w-full shrink-0 rounded-lg object-cover sm:h-20 sm:w-20"
+                width={160}
+                height={160}
                 loading="lazy"
                 decoding="async"
                 onError={() => setImgError(true)}
@@ -859,9 +886,9 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             ) : (
               <Avatar
                 src={avatarSrc}
-                name={listing.author_name || fallbackUserName}
+                name={authorName}
                 size="md"
-                className="shrink-0 ring-2 ring-theme-muted/20"
+                className="h-14 w-14 shrink-0 ring-2 ring-theme-muted/20 sm:h-16 sm:w-16"
               />
             )}
             <div className="flex-1 min-w-0">
@@ -901,10 +928,10 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                   </span>
                 )}
               </div>
-              <h3 className="font-semibold text-theme-primary truncate">{listing.title}</h3>
-              <p className="text-theme-muted text-sm line-clamp-1 mt-0.5">{listing.description}</p>
+              <h3 className="truncate text-base font-semibold text-theme-primary sm:text-lg">{listing.title}</h3>
+              <p className="mt-1 line-clamp-2 text-sm leading-6 text-theme-muted sm:line-clamp-1">{listing.description}</p>
             </div>
-            <div className="flex flex-row items-center justify-between gap-3 text-xs text-theme-subtle sm:flex-col sm:items-end sm:justify-start sm:gap-1 sm:shrink-0">
+            <div className="flex flex-row flex-wrap items-center justify-between gap-3 text-xs text-theme-subtle sm:flex-col sm:items-end sm:justify-start sm:gap-1 sm:shrink-0">
               {hours && (
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" aria-hidden="true" />
@@ -950,8 +977,12 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
 
   // ─── Grid View ───
   return (
-    <Link to={tenantPath(`/listings/${listing.id}`)} className="group">
-      <GlassCard className="cursor-pointer hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 h-full flex flex-col overflow-hidden">
+    <Link
+      to={tenantPath(`/listings/${listing.id}`)}
+      className="group block h-full rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      aria-label={t('open_listing_aria', { title: listing.title })}
+    >
+      <GlassCard className="flex h-full cursor-pointer flex-col overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
         {/* Listing Image with hover overlay and floating save button */}
         <div className="relative aspect-video overflow-hidden bg-theme-elevated">
           {imageUrl && !imgError ? (
@@ -994,7 +1025,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
           )}
         </div>
 
-        <div className="p-4 flex flex-col flex-1">
+        <div className="flex flex-1 flex-col p-4">
         {/* Type + Category Badges */}
         <div className="flex items-center gap-1.5 mb-3 flex-wrap">
           <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
@@ -1041,19 +1072,19 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
         </div>
 
         {/* Title & Description */}
-        <h3 className="font-semibold text-theme-primary text-lg mb-2 line-clamp-2">{listing.title}</h3>
-        <p className="text-theme-muted text-sm line-clamp-2 mb-4 flex-1">{listing.description}</p>
+        <h3 className="mb-2 line-clamp-2 text-lg font-semibold leading-6 text-theme-primary">{listing.title}</h3>
+        <p className="mb-4 line-clamp-3 flex-1 text-sm leading-6 text-theme-muted">{listing.description}</p>
 
         {/* Footer: Author + Meta */}
-        <div className="flex items-center justify-between pt-3 border-t border-theme-default">
+        <div className="flex flex-col gap-3 border-t border-theme-default pt-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 min-w-0">
             <Avatar
               src={avatarSrc}
-              name={listing.author_name || fallbackUserName}
+              name={authorName}
               size="sm"
               className="shrink-0 w-8 h-8"
             />
-            <span className="text-sm text-theme-subtle truncate">{listing.author_name}</span>
+            <span className="truncate text-sm text-theme-subtle">{authorName}</span>
             {listing.author_rating != null && listing.author_rating > 0 && (
               <span className="flex items-center gap-0.5 text-[11px] text-[var(--color-warning)] shrink-0">
                 <Star className="w-3 h-3 fill-amber-500" aria-hidden="true" />
@@ -1061,7 +1092,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 text-xs text-theme-subtle min-w-0 overflow-hidden">
+          <div className="flex min-w-0 flex-wrap items-center gap-2 text-xs text-theme-subtle sm:justify-end">
             {hours && (
               <span className="flex items-center gap-1 shrink-0" aria-label={t('aria_hours_estimated', { hours })}>
                 <Clock className="w-3 h-3" aria-hidden="true" />

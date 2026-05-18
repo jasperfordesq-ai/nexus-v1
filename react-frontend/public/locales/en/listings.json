@@ -35,6 +35,24 @@
     "edit_title": "Edit Listing",
     "new_title": "New Listing",
     "create_title": "Create New Listing",
+    "create_intro": "Share a useful offer or ask for help with enough detail for the right community members to respond.",
+    "offer_badge": "Offering help",
+    "request_badge": "Requesting help",
+    "summary_type": "Type",
+    "summary_category": "Category",
+    "summary_not_set": "Not set",
+    "intent_section": "Start with intent",
+    "intent_section_hint": "Choose whether this listing is something you can offer or something you need.",
+    "essentials_section": "Describe the listing",
+    "essentials_section_hint": "A specific title and clear description make the listing easier to find and trust.",
+    "organise_section": "Organise discovery",
+    "organise_section_hint": "Help members find this listing through categories and skill tags.",
+    "logistics_section": "Set delivery details",
+    "logistics_section_hint": "Clarify how the help can happen and how much time it may take.",
+    "media_section": "Add a photo",
+    "media_section_hint": "A relevant image can make the listing easier to recognise in the community feed.",
+    "optional_label": "Optional",
+    "character_count": "{{count}}/{{max}}",
     "type_question": "What would you like to do?",
     "offer_title": "Offer Help",
     "offer_subtitle": "I want to help others",
@@ -85,15 +103,22 @@
     "tags_save_failed": "Skill tags could not be saved. You can edit the listing to try again.",
     "service_details_toggle": "Optional service details",
     "service_type_depends": "Depends on service",
+    "service_type_depends_hint": "The best format can be agreed later",
     "service_type_hybrid": "Remote available",
+    "service_type_hybrid_hint": "Works either in person or online",
     "service_type_label": "Service delivery",
     "service_type_physical": "In-person only",
-    "service_type_remote": "Remote only"
+    "service_type_physical_hint": "Needs a shared physical place",
+    "service_type_remote": "Remote only",
+    "service_type_remote_hint": "Can happen by phone, chat, or video"
   },
   "page_subtitle": "Browse services and requests from the community",
   "hero_eyebrow": "Community exchange board",
   "hero_results_label": "Visible listings",
+  "filters_intro": "Search, sort, and refine community offers and requests.",
   "search_placeholder": "Search by title, description, location or name...",
+  "search_label": "Search listings",
+  "search_action": "Search listings",
   "filter_type_label": "Type",
   "filter_all_types": "All Types",
   "filter_category_label": "Category",
@@ -242,6 +267,7 @@
   "filter_this_month": "This month",
   "clear_filters": "Clear filters",
   "results_count": "{{count}} listings found",
+  "results_loading": "Finding listings",
   "radius_5": "5 km",
   "radius_10": "10 km",
   "radius_25": "25 km",
@@ -250,6 +276,9 @@
   "page_meta": {
     "create": {
       "title": "Create Listing"
+    },
+    "edit": {
+      "title": "Edit Listing"
     }
   },
   "delivery_mode": "Delivery Mode",
@@ -291,6 +320,7 @@
   "comments_error": "Comments could not be loaded.",
   "user_fallback": "User",
   "listing_image_alt": "Listing image",
+  "open_listing_aria": "Open listing: {{title}}",
   "distance_meters": "{{distance}} m",
   "distance_kilometers": "{{distance}} km"
 }

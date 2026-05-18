@@ -139,5 +139,7 @@
     "valid_amount": "Please enter a valid amount",
     "insufficient_balance": "Insufficient balance",
     "max_transfer": "Maximum transfer is {{max}} hours"
-  }
+  },
+  "hours_value": "{{count}}h",
+  "signed_hours_value": "{{sign}}{{count}}h"
 }
