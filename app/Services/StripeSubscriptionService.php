@@ -674,13 +674,10 @@ class StripeSubscriptionService
                     continue;
                 }
 
-                // Mark as sent before sending to prevent duplicate sends on retry
-                Cache::put($cacheKey, true, now()->addHours(24));
-
                 $planName = $assignment->plan_name ?? '';
                 $dateFormatted = date('F j, Y', strtotime($assignment->stripe_current_period_end));
 
-                static::sendTenantAdminEmail(
+                $sentEmail = static::sendTenantAdminEmail(
                     (int) $assignment->tenant_id,
                     ['key' => 'emails_misc.stripe_subscription.renewal_reminder_subject'],
                     ['key' => 'emails_misc.stripe_subscription.renewal_reminder_title'],
@@ -692,7 +689,12 @@ class StripeSubscriptionService
                     ['key' => 'emails_misc.stripe_subscription.renewal_reminder_cta']
                 );
 
-                $sent++;
+                if ($sentEmail) {
+                    Cache::put($cacheKey, true, now()->addHours(24));
+                    $sent++;
+                } else {
+                    $errors++;
+                }
             } catch (\Throwable $e) {
                 Log::warning('[StripeSubscriptionService] sendRenewalReminders failed for tenant ' . $assignment->tenant_id . ': ' . $e->getMessage());
                 $errors++;
@@ -734,8 +736,7 @@ class StripeSubscriptionService
                 if ($daysUntilEnd >= 6 && $daysUntilEnd < 8) {
                     $cacheKey = 'trial_ending_reminder:' . $assignment->tenant_id . ':7d';
                     if (!Cache::has($cacheKey)) {
-                        Cache::put($cacheKey, true, now()->addHours(24));
-                        static::sendTenantAdminEmail(
+                        $sentEmail = static::sendTenantAdminEmail(
                             (int) $assignment->tenant_id,
                             ['key' => 'emails_misc.stripe_subscription.trial_ending_7d_subject'],
                             ['key' => 'emails_misc.stripe_subscription.trial_ending_7d_title'],
@@ -746,7 +747,12 @@ class StripeSubscriptionService
                             '/admin/billing',
                             ['key' => 'emails_misc.stripe_subscription.trial_ending_7d_cta']
                         );
-                        $sent++;
+                        if ($sentEmail) {
+                            Cache::put($cacheKey, true, now()->addHours(24));
+                            $sent++;
+                        } else {
+                            $errors++;
+                        }
                     }
                 }
 
@@ -754,8 +760,7 @@ class StripeSubscriptionService
                 if ($daysUntilEnd >= 0 && $daysUntilEnd < 2) {
                     $cacheKey = 'trial_ending_reminder:' . $assignment->tenant_id . ':1d';
                     if (!Cache::has($cacheKey)) {
-                        Cache::put($cacheKey, true, now()->addHours(24));
-                        static::sendTenantAdminEmail(
+                        $sentEmail = static::sendTenantAdminEmail(
                             (int) $assignment->tenant_id,
                             ['key' => 'emails_misc.stripe_subscription.trial_ending_1d_subject'],
                             ['key' => 'emails_misc.stripe_subscription.trial_ending_1d_title'],
@@ -766,7 +771,12 @@ class StripeSubscriptionService
                             '/admin/billing',
                             ['key' => 'emails_misc.stripe_subscription.trial_ending_1d_cta']
                         );
-                        $sent++;
+                        if ($sentEmail) {
+                            Cache::put($cacheKey, true, now()->addHours(24));
+                            $sent++;
+                        } else {
+                            $errors++;
+                        }
                     }
                 }
             } catch (\Throwable $e) {
@@ -787,7 +797,7 @@ class StripeSubscriptionService
      * @param array{key:string,params?:array} $body
      * @param array{key:string,params?:array} $ctaText
      */
-    private static function sendTenantAdminEmail(int $tenantId, array $subject, array $title, array $body, string $link, array $ctaText, string $theme = 'default'): void
+    private static function sendTenantAdminEmail(int $tenantId, array $subject, array $title, array $body, string $link, array $ctaText, string $theme = 'default'): bool
     {
         $previousTenantId = TenantContext::currentId();
         TenantContext::setById($tenantId);
@@ -801,10 +811,10 @@ class StripeSubscriptionService
                 ->first();
 
             if (!$admin || empty($admin->email)) {
-                return;
+                return false;
             }
 
-            LocaleContext::withLocale($admin, function () use ($admin, $subject, $title, $body, $link, $ctaText, $theme, $tenantId) {
+            return (bool) LocaleContext::withLocale($admin, function () use ($admin, $subject, $title, $body, $link, $ctaText, $theme, $tenantId): bool {
                 $firstName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
                 $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
@@ -822,7 +832,10 @@ class StripeSubscriptionService
 
                 if (!\App\Services\EmailDispatchService::sendRaw($admin->email, __($subject['key'], $subject['params'] ?? []), $html, null, null, null, 'billing', ['tenant_id' => $tenantId])) {
                     Log::warning('[StripeSubscriptionService] tenant admin email failed', ['tenant_id' => $tenantId]);
+                    return false;
                 }
+
+                return true;
             });
         } finally {
             if ($previousTenantId !== null) {

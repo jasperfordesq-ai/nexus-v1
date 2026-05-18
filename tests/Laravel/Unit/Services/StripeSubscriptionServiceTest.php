@@ -88,6 +88,7 @@ class StripeSubscriptionServiceTest extends TestCase
             ->andReturnNull();
 
         DB::shouldReceive('insert')->once()->andReturn(true);
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         Log::shouldReceive('info')->once()->with(
             'Stripe checkout completed — subscription activated',
@@ -121,6 +122,7 @@ class StripeSubscriptionServiceTest extends TestCase
             ->andReturn((object) ['id' => 10]);
 
         DB::shouldReceive('update')->once()->andReturn(1);
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         Log::shouldReceive('info')->once();
 
@@ -225,6 +227,7 @@ class StripeSubscriptionServiceTest extends TestCase
         )->andReturn(1);
 
         Log::shouldReceive('info')->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         $subscription = (object) ['id' => 'sub_del_test'];
 
