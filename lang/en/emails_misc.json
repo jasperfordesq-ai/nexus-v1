@@ -560,6 +560,23 @@
     "trial_ending_1d_body": "Your free trial for :community ends tomorrow on :date. Add a payment method now to avoid any disruption.",
     "trial_ending_1d_cta": "Add Payment Method Now"
   },
+  "member_premium": {
+    "payment_failed_subject": "Action required - premium payment failed",
+    "payment_failed_title": "Premium Payment Failed",
+    "payment_failed_body": "We were unable to process the payment for your :tier membership. Please update your payment method to keep your premium access active.",
+    "payment_failed_cta": "Update Payment Method",
+    "payment_failed_bell": "Payment failed for your :tier membership. Please update your payment method.",
+    "paid_subject": "Premium payment confirmed",
+    "paid_title": "Premium Payment Confirmed",
+    "paid_body": "Your payment for :tier has been received. Your premium access is active.",
+    "paid_cta": "Manage Premium",
+    "paid_bell": "Your :tier payment was received.",
+    "cancelled_subject": "Your premium subscription was cancelled",
+    "cancelled_title": "Premium Subscription Cancelled",
+    "cancelled_body": "Your :tier premium subscription has been cancelled. You can manage or restart premium access from your account.",
+    "cancelled_cta": "Manage Premium",
+    "cancelled_bell": "Your :tier premium subscription was cancelled."
+  },
   "identity_payment": {
     "success_subject": "Verification fee payment confirmed",
     "success_title": "Payment Confirmed",

@@ -97,6 +97,8 @@ class StripeWebhookControllerTest extends TestCase
         if (!class_exists(\Stripe\Webhook::class)) {
             $this->markTestSkipped('Stripe SDK not installed in this test environment');
         }
+        config(['services.stripe.webhook_secret' => 'whsec_test_secret']);
+
         $response = $this->apiPost(
             '/v2/webhooks/stripe',
             ['id' => 'evt_bogus', 'type' => 'charge.succeeded'],
