@@ -6,7 +6,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\I18n\LocaleContext;
 use App\Services\ReviewService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
@@ -153,42 +152,6 @@ class ReviewsController extends BaseApiController
             \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['leave_review'], 'leave_review', 'Left a review');
         } catch (\Throwable $e) {
             \Log::warning('Gamification XP award failed', ['action' => 'leave_review', 'user' => $userId, 'error' => $e->getMessage()]);
-        }
-
-        // Notify review receiver (in-app + email)
-        try {
-            $receiverId = (int) ($review['receiver_id'] ?? 0);
-            if ($receiverId > 0 && $receiverId !== $userId) {
-                $reviewer = \App\Models\User::find($userId);
-                $receiver = \App\Models\User::find($receiverId);
-                LocaleContext::withLocale($receiver, function () use ($reviewer, $receiverId, $review) {
-                    $reviewerName = $reviewer->first_name ?? $reviewer->name ?? __('emails.common.fallback_someone');
-                    $rating = (int) ($review['rating'] ?? 5);
-
-                    // In-app notification
-                    \App\Models\Notification::createNotification(
-                        $receiverId,
-                        __('notifications.review_received_in_app', ['name' => $reviewerName, 'rating' => $rating]),
-                        '/reviews',
-                        'review'
-                    );
-
-                    // Email notification (respects user preference)
-                    $prefs = \App\Models\User::getNotificationPreferences($receiverId);
-                    $emailPref = $prefs['email_reviews'] ?? 1;
-
-                    if ((int) $emailPref === 1) {
-                        \App\Services\NotificationDispatcher::sendReviewEmail(
-                            $receiverId,
-                            $reviewerName,
-                            $rating,
-                            $review['comment'] ?? null
-                        );
-                    }
-                });
-            }
-        } catch (\Throwable $e) {
-            \Log::warning('Review notification failed', ['review_id' => $review['id'] ?? 0, 'error' => $e->getMessage()]);
         }
 
         // Record feed activity

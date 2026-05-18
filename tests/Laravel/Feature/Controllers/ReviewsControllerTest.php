@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\Review;
 use App\Models\User;
+use App\Services\EmailDispatchService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
@@ -128,6 +129,49 @@ class ReviewsControllerTest extends TestCase
         $this->assertContains($response->getStatusCode(), [200, 201]);
     }
 
+    public function test_create_review_sends_one_receiver_email_and_bell(): void
+    {
+        $user = $this->authenticatedUser([
+            'first_name' => 'Reviewer',
+        ]);
+        $other = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'review-receiver-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+
+        $mailer = new class extends EmailDispatchService {
+            public array $calls = [];
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->calls[] = compact('to', 'subject', 'body', 'options');
+
+                return true;
+            }
+        };
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $response = $this->apiPost('/v2/reviews', [
+            'receiver_id' => $other->id,
+            'rating' => 5,
+            'comment' => 'Excellent exchange! Very helpful.',
+        ]);
+
+        $this->assertContains($response->getStatusCode(), [200, 201]);
+
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $other->id,
+            'type' => 'review',
+            'link' => '/reviews',
+        ]);
+
+        $this->assertCount(1, $mailer->calls);
+        $this->assertSame($other->email, $mailer->calls[0]['to']);
+        $this->assertSame('review', $mailer->calls[0]['options']['category']);
+        $this->assertSame($this->testTenantId, $mailer->calls[0]['options']['tenant_id']);
+    }
+
     public function test_create_requires_authentication(): void
     {
         $response = $this->apiPost('/v2/reviews', [
@@ -183,6 +227,8 @@ class ReviewsControllerTest extends TestCase
         Review::factory()->forTenant($this->testTenantId)->create([
             'reviewer_id' => $user->id,
             'receiver_id' => $other->id,
+            'transaction_id' => null,
+            'created_at' => now(),
         ]);
 
         $response = $this->apiPost('/v2/reviews', [
