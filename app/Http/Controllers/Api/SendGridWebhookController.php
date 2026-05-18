@@ -110,6 +110,8 @@ class SendGridWebhookController extends BaseApiController
                 continue;
             }
 
+            $previousTenantId = TenantContext::getId();
+
             // Validate tenant exists AND is active before accepting the tenant_id from payload
             if ($tenantId > 0) {
                 $tenant = DB::selectOne(
@@ -125,6 +127,7 @@ class SendGridWebhookController extends BaseApiController
                 }
             }
 
+            try {
             // Also update the new email_log + email_suppression tables so
             // the deliverability dashboard at /admin/email-deliverability
             // reflects real-time SendGrid status. These updates are
@@ -161,6 +164,14 @@ class SendGridWebhookController extends BaseApiController
 
                 default:
                     break;
+            }
+
+            } finally {
+                if ($previousTenantId !== null) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
             }
         }
 
