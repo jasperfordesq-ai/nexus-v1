@@ -254,15 +254,9 @@ class ExploreService
                 JOIN users u ON u.id = l.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE l.tenant_id = ?
                     AND l.status = 'active'
-                    AND l.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-                    -- Quality floor for public discovery: skip thin listings
-                    -- (no real description) and titles that are just the
-                    -- category name. Keeps them out of /explore's Popular
-                    -- widget, where they appeared as low-quality content in
-                    -- the 2026-05-13 SEO audit. They still show in
-                    -- /listings, search, and inside the platform.
+                    AND l.created_at >= DATE_SUB(NOW(), INTERVAL 365 DAY)
                     AND CHAR_LENGTH(COALESCE(l.description, '')) >= 30
-                    AND (cat.name IS NULL OR LOWER(TRIM(l.title)) <> LOWER(TRIM(cat.name)))
+                    AND (cat.name IS NULL OR LOWER(TRIM(l.title)) <> LOWER(TRIM(CONVERT(cat.name USING utf8mb4) COLLATE utf8mb4_unicode_ci)))
                 ORDER BY (COALESCE(l.view_count, 0) + COALESCE(l.save_count, 0)) DESC
                 LIMIT 8
             ", [$tenantId, $tenantId]);
