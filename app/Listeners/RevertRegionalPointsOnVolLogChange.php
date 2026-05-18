@@ -69,6 +69,8 @@ class RevertRegionalPointsOnVolLogChange
             // Restore prior tenant context so we don't leak across listeners.
             if ($previousTenantId > 0) {
                 TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
             }
         }
     }

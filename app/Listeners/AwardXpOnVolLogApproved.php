@@ -101,6 +101,8 @@ class AwardXpOnVolLogApproved
         } finally {
             if ($previousTenantId > 0) {
                 TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
             }
         }
     }

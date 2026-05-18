@@ -37,7 +37,16 @@ class JobAlertEmailService
                 $subject = __('emails.job_alert.subject_single', ['title' => $vacancy->title]);
                 $bodyHtml = self::buildAlertEmailHtml($recipient, [$vacancy]);
 
-                return EmailDispatchService::sendRaw($recipient->email, $subject, $bodyHtml, null, null, null, 'job_alert');
+                return EmailDispatchService::sendRaw(
+                    $recipient->email,
+                    $subject,
+                    $bodyHtml,
+                    null,
+                    null,
+                    null,
+                    'job_alert',
+                    ['tenant_id' => $recipient->tenant_id ?? TenantContext::currentId()]
+                );
             });
         } catch (\Throwable $e) {
             Log::warning('JobAlertEmailService::sendImmediateAlert failed', [

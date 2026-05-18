@@ -7,7 +7,9 @@
 namespace Tests\Laravel\Unit\Services;
 
 use App\Models\Newsletter;
+use App\Models\Tenant;
 use App\Models\User;
+use App\Core\TenantContext;
 use App\Services\NewsletterService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -22,12 +24,26 @@ class NewsletterServiceTest extends TestCase
 
     private NewsletterService $service;
     private $mockNewsletter;
+    private int $isolatedTenantSeq = 0;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->mockNewsletter = Mockery::mock(Newsletter::class)->makePartial();
         $this->service = new NewsletterService($this->mockNewsletter);
+    }
+
+    private function useIsolatedTenant(): int
+    {
+        $this->isolatedTenantSeq++;
+        $tenant = Tenant::factory()->create([
+            'slug' => 'newsletter-test-' . uniqid('', true) . '-' . $this->isolatedTenantSeq,
+            'domain' => null,
+        ]);
+
+        $this->withTenant((int) $tenant->id);
+
+        return (int) $tenant->id;
     }
 
     public function test_getAll_returns_paginated_structure(): void
@@ -88,11 +104,11 @@ class NewsletterServiceTest extends TestCase
 
     public function test_recipient_count_excludes_suppressed_subscribers(): void
     {
-        $this->withTenant(999);
+        $tenantId = $this->useIsolatedTenant();
 
         DB::table('newsletter_subscribers')->insert([
             [
-                'tenant_id' => $this->testTenantId,
+                'tenant_id' => $tenantId,
                 'email' => 'allowed@example.test',
                 'status' => 'active',
                 'confirmation_token' => Str::random(64),
@@ -104,7 +120,7 @@ class NewsletterServiceTest extends TestCase
                 'updated_at' => now(),
             ],
             [
-                'tenant_id' => $this->testTenantId,
+                'tenant_id' => $tenantId,
                 'email' => 'suppressed@example.test',
                 'status' => 'active',
                 'confirmation_token' => Str::random(64),
@@ -118,23 +134,23 @@ class NewsletterServiceTest extends TestCase
         ]);
 
         DB::table('newsletter_suppression_list')->insert([
-            'tenant_id' => $this->testTenantId,
+            'tenant_id' => $tenantId,
             'email' => 'suppressed@example.test',
             'reason' => 'manual',
             'bounce_count' => 0,
             'suppressed_at' => now(),
         ]);
 
-        $this->assertSame(1, NewsletterService::getRecipientCount('subscribers_only'));
+        $this->assertSame(1, TenantContext::runForTenant($tenantId, fn () => NewsletterService::getRecipientCount('subscribers_only')));
     }
 
     public function test_process_queue_skips_suppressed_pending_rows(): void
     {
-        $this->withTenant(999);
+        $tenantId = $this->useIsolatedTenant();
 
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = User::factory()->forTenant($tenantId)->admin()->create();
         $newsletterId = DB::table('newsletters')->insertGetId([
-            'tenant_id' => $this->testTenantId,
+            'tenant_id' => $tenantId,
             'name' => 'Suppression send guard',
             'subject' => 'Suppression send guard',
             'content' => '<p>Hello</p>',
@@ -146,7 +162,7 @@ class NewsletterServiceTest extends TestCase
         ]);
 
         DB::table('newsletter_queue')->insert([
-            'tenant_id' => $this->testTenantId,
+            'tenant_id' => $tenantId,
             'newsletter_id' => $newsletterId,
             'email' => 'suppressed-pending@example.test',
             'status' => 'pending',
@@ -155,18 +171,18 @@ class NewsletterServiceTest extends TestCase
             'created_at' => now(),
         ]);
         DB::table('newsletter_suppression_list')->insert([
-            'tenant_id' => $this->testTenantId,
+            'tenant_id' => $tenantId,
             'email' => 'suppressed-pending@example.test',
             'reason' => 'manual',
             'bounce_count' => 0,
             'suppressed_at' => now(),
         ]);
 
-        $result = NewsletterService::processQueue($newsletterId, 10);
+        $result = TenantContext::runForTenant($tenantId, fn () => NewsletterService::processQueue($newsletterId, 10));
 
         $this->assertSame(['sent' => 0, 'failed' => 1], $result);
         $this->assertDatabaseHas('newsletter_queue', [
-            'tenant_id' => $this->testTenantId,
+            'tenant_id' => $tenantId,
             'newsletter_id' => $newsletterId,
             'email' => 'suppressed-pending@example.test',
             'status' => 'failed',
@@ -175,7 +191,7 @@ class NewsletterServiceTest extends TestCase
 
     public function test_all_members_recipient_count_includes_active_approved_members(): void
     {
-        $this->withTenant(999);
+        $tenantId = $this->useIsolatedTenant();
 
         $memberWithOptInData = [
             'email' => 'member-opt-in@example.test',
@@ -199,22 +215,22 @@ class NewsletterServiceTest extends TestCase
             $pendingMemberData['newsletter_opt_in'] = 1;
         }
 
-        User::factory()->forTenant($this->testTenantId)->create($memberWithOptInData);
-        User::factory()->forTenant($this->testTenantId)->create($memberWithoutOptInData);
-        User::factory()->forTenant($this->testTenantId)->create([
+        User::factory()->forTenant($tenantId)->create($memberWithOptInData);
+        User::factory()->forTenant($tenantId)->create($memberWithoutOptInData);
+        User::factory()->forTenant($tenantId)->create([
             ...$pendingMemberData,
         ]);
 
-        $this->assertSame(2, NewsletterService::getRecipientCount('all_members'));
+        $this->assertSame(2, TenantContext::runForTenant($tenantId, fn () => NewsletterService::getRecipientCount('all_members')));
     }
 
     public function test_recurring_newsletters_can_queue_same_email_again(): void
     {
-        $this->withTenant(999);
+        $tenantId = $this->useIsolatedTenant();
 
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = User::factory()->forTenant($tenantId)->admin()->create();
         $newsletterId = DB::table('newsletters')->insertGetId([
-            'tenant_id' => $this->testTenantId,
+            'tenant_id' => $tenantId,
             'name' => 'Recurring test',
             'subject' => 'Recurring test',
             'content' => '<p>Hello</p>',
@@ -242,7 +258,7 @@ class NewsletterServiceTest extends TestCase
         $this->assertSame(1, $method->invoke(null, $newsletterId, [$recipient]));
 
         DB::table('newsletter_queue')
-            ->where('tenant_id', $this->testTenantId)
+            ->where('tenant_id', $tenantId)
             ->where('newsletter_id', $newsletterId)
             ->update(['status' => 'sent', 'sent_at' => now()]);
 

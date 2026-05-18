@@ -140,7 +140,16 @@ class JobExpiryNotificationService
         HTML;
 
         $subject = __('notifications.job_expiry_email_subject', ['title' => $title]);
-        if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'job_expiry')) {
+        if (!EmailDispatchService::sendRaw(
+            $user->email,
+            $subject,
+            $html,
+            null,
+            null,
+            null,
+            'job_expiry',
+            ['tenant_id' => $vacancy->tenant_id ?? TenantContext::currentId()]
+        )) {
             Log::warning('JobExpiryNotificationService: failed to send expiry email', ['user_id' => $user->id, 'vacancy_id' => $vacancy->id]);
             return false;
         }

@@ -132,7 +132,16 @@ class GoalReminderService
                             ->render();
 
                         $subject = __('emails_misc.goals.reminder_subject', ['title' => $goalTitle]);
-                        if (!\App\Services\EmailDispatchService::sendRaw($reminder->email, $subject, $html, null, null, null, 'goal_reminder')) {
+                        if (!\App\Services\EmailDispatchService::sendRaw(
+                            $reminder->email,
+                            $subject,
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'goal_reminder',
+                            ['tenant_id' => $tenantId]
+                        )) {
                             Log::warning('[GoalReminderService] Email failed', ['user_id' => $reminder->user_id, 'reminder_id' => $reminder->id]);
                             $emailOk = false;
                         }

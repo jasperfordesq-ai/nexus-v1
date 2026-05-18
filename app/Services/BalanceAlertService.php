@@ -303,7 +303,16 @@ class BalanceAlertService
             ->render();
 
         $subject = __($subjectKey, ['org' => $orgName]);
-        if (!\App\Services\EmailDispatchService::sendRaw($owner->email, $subject, $html, null, null, null, 'balance_alert')) {
+        if (!\App\Services\EmailDispatchService::sendRaw(
+            $owner->email,
+            $subject,
+            $html,
+            null,
+            null,
+            null,
+            'balance_alert',
+            ['tenant_id' => $owner->tenant_id ?? TenantContext::currentId()]
+        )) {
             Log::warning('BalanceAlertService: email failed to send', [
                 'owner_id'  => $owner->id,
                 'org_name'  => $orgName,
