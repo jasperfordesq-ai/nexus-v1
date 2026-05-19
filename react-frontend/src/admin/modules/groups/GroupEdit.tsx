@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Button,
@@ -39,6 +40,7 @@ import { PageHeader } from '../../components';
 import type { AdminGroup, GroupType } from '../../api/types';
 
 export function GroupEdit() {
+  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();
@@ -460,7 +462,15 @@ export function GroupEdit() {
                     className="flex-1"
                   />
                   {primaryColor && (
-                    <Button size="sm" variant="light" isIconOnly onPress={() => setPrimaryColor('')}>×</Button>
+                    <Button
+                      size="sm"
+                      variant="light"
+                      isIconOnly
+                      onPress={() => setPrimaryColor('')}
+                      aria-label={t('clear_primary_color')}
+                    >
+                      ×
+                    </Button>
                   )}
                 </div>
               </div>
@@ -484,7 +494,15 @@ export function GroupEdit() {
                     className="flex-1"
                   />
                   {accentColor && (
-                    <Button size="sm" variant="light" isIconOnly onPress={() => setAccentColor('')}>×</Button>
+                    <Button
+                      size="sm"
+                      variant="light"
+                      isIconOnly
+                      onPress={() => setAccentColor('')}
+                      aria-label={t('clear_accent_color')}
+                    >
+                      ×
+                    </Button>
                   )}
                 </div>
               </div>

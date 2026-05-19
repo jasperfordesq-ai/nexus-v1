@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -103,6 +104,7 @@ function formatDate(value: string | null): string {
 }
 
 export default function ResearchPartnershipsAdminPage() {
+  const { t } = useTranslation('caring_community', { keyPrefix: 'admin_a11y' });
   usePageTitle('Research Partnerships');
   const { showToast } = useToast();
 
@@ -288,7 +290,14 @@ export default function ResearchPartnershipsAdminPage() {
         actions={
           <div className="flex items-center gap-2">
             <Tooltip content="Refresh">
-              <Button isIconOnly size="sm" variant="flat" onPress={() => void load()} isLoading={loading}>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="flat"
+                onPress={() => void load()}
+                isLoading={loading}
+                aria-label={t('refresh_research_partnerships')}
+              >
                 <RefreshCw size={15} />
               </Button>
             </Tooltip>

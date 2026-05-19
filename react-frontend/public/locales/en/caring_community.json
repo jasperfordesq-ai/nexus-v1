@@ -1062,5 +1062,10 @@
         "recompute_failed": "Failed to recompute tiers."
       }
     }
+  },
+  "admin_a11y": {
+    "refresh_federation_peers": "Refresh federation peers",
+    "refresh_kpi_baselines": "Refresh KPI baselines",
+    "refresh_research_partnerships": "Refresh research partnerships"
   }
 }

@@ -1,5 +1,7 @@
 {
   "active": "Active",
+  "clear_accent_color": "Clear accent color",
+  "clear_primary_color": "Clear primary color",
   "enabled": "Enabled",
   "disabled": "Disabled",
   "agents": {

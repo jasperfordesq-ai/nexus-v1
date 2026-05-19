@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -211,6 +212,7 @@ function ComparisonPanel({ result, onClose }: { result: ComparisonResult; onClos
 // ---------------------------------------------------------------------------
 
 export default function KpiBaselineAdminPage() {
+  const { t } = useTranslation('caring_community', { keyPrefix: 'admin_a11y' });
   usePageTitle('Community KPI Baselines');
   const { showToast } = useToast();
 
@@ -299,7 +301,14 @@ export default function KpiBaselineAdminPage() {
         actions={
           <div className="flex items-center gap-2">
             <Tooltip content="Refresh">
-              <Button isIconOnly size="sm" variant="flat" onPress={loadBaselines} isLoading={loading}>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="flat"
+                onPress={loadBaselines}
+                isLoading={loading}
+                aria-label={t('refresh_kpi_baselines')}
+              >
                 <RefreshCw size={15} />
               </Button>
             </Tooltip>

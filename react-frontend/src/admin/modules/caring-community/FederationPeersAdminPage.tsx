@@ -15,6 +15,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -76,6 +77,7 @@ const STATUS_COLOR: Record<PeerStatus, 'default' | 'success' | 'warning' | 'dang
 };
 
 export default function FederationPeersAdminPage() {
+  const { t } = useTranslation('caring_community', { keyPrefix: 'admin_a11y' });
   usePageTitle('Federation Peers — Admin');
   const { showToast } = useToast();
 
@@ -223,7 +225,14 @@ export default function FederationPeersAdminPage() {
         actions={
           <div className="flex items-center gap-2">
             <Tooltip content="Refresh">
-              <Button isIconOnly size="sm" variant="flat" onPress={() => void fetchPeers()} isLoading={loading}>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="flat"
+                onPress={() => void fetchPeers()}
+                isLoading={loading}
+                aria-label={t('refresh_federation_peers')}
+              >
                 <RefreshCw size={15} />
               </Button>
             </Tooltip>
