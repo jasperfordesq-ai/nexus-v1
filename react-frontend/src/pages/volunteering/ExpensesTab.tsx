@@ -122,12 +122,12 @@ export function ExpensesTab() {
         const data = response.data;
         setItems(Array.isArray(data.items) ? data.items : []);
       } else {
-        setError(tRef.current('expenses.load_error', 'Unable to load expenses. Please try again.'));
+        setError(tRef.current('expenses.load_error'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load expenses', err);
-      setError(tRef.current('expenses.load_error', 'Unable to load expenses. Please try again.'));
+      setError(tRef.current('expenses.load_error'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
@@ -176,7 +176,7 @@ export function ExpensesTab() {
   const handleSubmit = async (onClose: () => void) => {
     if (isSubmitting) return;
     if (!formOrgId || !formAmount || !formDescription) {
-      toast.error(t('expenses.fill_required', 'Please fill in all required fields.'));
+      toast.error(t('expenses.fill_required'));
       return;
     }
     try {
@@ -189,16 +189,16 @@ export function ExpensesTab() {
         description: formDescription,
       });
       if (response.success) {
-        toast.success(t('expenses.submit_success', 'Expense submitted successfully.'));
+        toast.success(t('expenses.submit_success'));
         resetForm();
         onClose();
         load();
       } else {
-        toast.error(response.error || t('expenses.submit_error', 'Failed to submit expense.'));
+        toast.error(response.error || t('expenses.submit_error'));
       }
     } catch (err) {
       logError('Failed to submit expense', err);
-      toast.error(t('expenses.submit_error', 'Failed to submit expense.'));
+      toast.error(t('expenses.submit_error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -210,10 +210,10 @@ export function ExpensesTab() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Receipt className="w-5 h-5 text-rose-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">{t('expenses.heading', 'My Expenses')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('expenses.heading')}</h2>
         </div>
         <Button
           size="sm"
@@ -221,7 +221,7 @@ export function ExpensesTab() {
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={onOpen}
         >
-          {t('expenses.submit', 'Submit Expense')}
+          {t('expenses.submit')}
         </Button>
       </div>
 
@@ -229,9 +229,9 @@ export function ExpensesTab() {
       {!error && !isLoading && items.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
-            { label: t('expenses.stats.total_claimed', 'Total Claimed'), value: stats.claimed, color: 'text-theme-primary' },
-            { label: t('expenses.stats.approved', 'Approved'), value: stats.approved, color: 'text-rose-500' },
-            { label: t('expenses.stats.paid', 'Paid'), value: stats.paid, color: 'text-[var(--color-info)]' },
+            { label: t('expenses.stats.total_claimed'), value: stats.claimed, color: 'text-theme-primary' },
+            { label: t('expenses.stats.approved'), value: stats.approved, color: 'text-rose-500' },
+            { label: t('expenses.stats.paid'), value: stats.paid, color: 'text-[var(--color-info)]' },
           ].map((s) => (
             <GlassCard key={s.label} className="p-3 text-center">
               <p className="text-xs text-theme-muted">{s.label}</p>
@@ -247,7 +247,7 @@ export function ExpensesTab() {
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
-            {t('expenses.try_again', 'Try Again')}
+            {t('expenses.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -269,8 +269,8 @@ export function ExpensesTab() {
       {!error && !isLoading && items.length === 0 && (
         <EmptyState
           icon={<Receipt className="w-12 h-12" aria-hidden="true" />}
-          title={t('expenses.empty_title', 'No expenses yet')}
-          description={t('expenses.empty_description', 'You have not submitted any expense claims. Click Submit Expense to get started.')}
+          title={t('expenses.empty_title')}
+          description={t('expenses.empty_description')}
         />
       )}
 
@@ -280,11 +280,11 @@ export function ExpensesTab() {
           {items.map((expense) => (
             <motion.div key={expense.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
               <GlassCard className="p-4">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <Chip size="sm" variant="flat" color="default">
-                        {t(`expenses.types.${expense.expense_type}`, expense.expense_type)}
+                        {t(`expenses.types.${expense.expense_type}`)}
                       </Chip>
                       <span className="font-bold text-theme-primary text-lg">
                         {expense.currency} {fmt(parseFloat(expense.amount || '0'))}
@@ -297,12 +297,12 @@ export function ExpensesTab() {
                     </div>
                     {expense.review_notes && (
                       <p className="text-xs text-theme-subtle mt-1 italic">
-                        {t('expenses.note_prefix', 'Note:')} {expense.review_notes}
+                        {t('expenses.note_prefix')} {expense.review_notes}
                       </p>
                     )}
                   </div>
                   <Chip size="sm" variant="flat" color={STATUS_COLOR[expense.status]}>
-                    {t(`expenses.status.${expense.status}`, expense.status)}
+                    {t(`expenses.status.${expense.status}`)}
                   </Chip>
                 </div>
               </GlassCard>
@@ -327,16 +327,16 @@ export function ExpensesTab() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="text-theme-primary">{t('expenses.modal_title', 'Submit Expense')}</ModalHeader>
+              <ModalHeader className="text-theme-primary">{t('expenses.modal_title')}</ModalHeader>
               <ModalBody className="gap-4">
                 {organisations.length === 0 && (
                   <p className="text-sm text-danger">
-                    {t('expenses.no_organisation', 'You must belong to an organisation to submit expenses.')}
+                    {t('expenses.no_organisation')}
                   </p>
                 )}
                 {organisations.length > 1 && (
                   <Select
-                    label={t('expenses.form.organisation', 'Organisation')}
+                    label={t('expenses.form.organisation')}
                     selectedKeys={formOrgId ? [formOrgId] : []}
                     onSelectionChange={(keys) => {
                       const val = Array.from(keys)[0] as string;
@@ -351,7 +351,7 @@ export function ExpensesTab() {
                   </Select>
                 )}
                 <Select
-                  label={t('expenses.form.type', 'Expense Type')}
+                  label={t('expenses.form.type')}
                   selectedKeys={[formType]}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0] as ExpenseType;
@@ -365,28 +365,28 @@ export function ExpensesTab() {
                     </SelectItem>
                   ))}
                 </Select>
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <Input
-                    label={t('expenses.form.amount', 'Amount')}
+                    label={t('expenses.form.amount')}
                     type="number"
                     min="0.01"
                     step="0.01"
                     value={formAmount}
                     onValueChange={setFormAmount}
                     variant="bordered"
-                    className="flex-1"
+                    className="sm:flex-1"
                     isRequired
                   />
                   <Input
-                    label={t('expenses.form.currency', 'Currency')}
+                    label={t('expenses.form.currency')}
                     value={formCurrency}
                     onValueChange={setFormCurrency}
                     variant="bordered"
-                    className="w-24"
+                    className="sm:w-28"
                   />
                 </div>
                 <Textarea
-                  label={t('expenses.form.description', 'Description')}
+                  label={t('expenses.form.description')}
                   value={formDescription}
                   onValueChange={setFormDescription}
                   variant="bordered"
@@ -396,14 +396,14 @@ export function ExpensesTab() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('expenses.cancel', 'Cancel')}</Button>
+                <Button variant="flat" onPress={onClose}>{t('expenses.cancel')}</Button>
                 <Button
                   className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                   onPress={() => handleSubmit(onClose)}
                   isLoading={isSubmitting}
                   isDisabled={organisations.length === 0}
                 >
-                  {t('expenses.submit_button', 'Submit')}
+                  {t('expenses.submit_button')}
                 </Button>
               </ModalFooter>
             </>
