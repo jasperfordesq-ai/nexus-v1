@@ -26,6 +26,12 @@ import {
   CardHeader,
   Accordion,
   AccordionItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
 } from '@heroui/react';
 import DollarSign from 'lucide-react/icons/dollar-sign';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -520,44 +526,37 @@ export function VolunteerExpenses() {
           </CardHeader>
           <CardBody>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-divider text-left">
-                    <th className="py-2 px-3 font-medium text-default-500">
-                      {t('volunteering.col_organization')}
-                    </th>
-                    <th className="py-2 px-3 font-medium text-default-500 text-right">
-                      {t('volunteering.col_claims')}
-                    </th>
-                    <th className="py-2 px-3 font-medium text-default-500 text-right">
-                      {t('volunteering.col_pending_amount')}
-                    </th>
-                    <th className="py-2 px-3 font-medium text-default-500 text-right">
-                      {t('volunteering.col_approved_amount')}
-                    </th>
-                    <th className="py-2 px-3 font-medium text-default-500 text-right">
-                      {t('volunteering.col_total_amount')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
+              <Table
+                aria-label={t('volunteering.expense_org_breakdown_title')}
+                removeWrapper
+              >
+                <TableHeader>
+                  <TableColumn>{t('volunteering.col_organization')}</TableColumn>
+                  <TableColumn className="text-right">{t('volunteering.col_claims')}</TableColumn>
+                  <TableColumn className="text-right">{t('volunteering.col_pending_amount')}</TableColumn>
+                  <TableColumn className="text-right">{t('volunteering.col_approved_amount')}</TableColumn>
+                  <TableColumn className="text-right">{t('volunteering.col_total_amount')}</TableColumn>
+                </TableHeader>
+                <TableBody>
                   {orgBreakdown.map((org) => (
-                    <tr key={org.name} className="border-b border-divider/50 hover:bg-default-50">
-                      <td className="py-2 px-3 font-medium">{org.name}</td>
-                      <td className="py-2 px-3 text-right font-mono">{org.count}</td>
-                      <td className="py-2 px-3 text-right font-mono text-warning">
+                    <TableRow key={org.name}>
+                      <TableCell>
+                        <span className="font-medium">{org.name}</span>
+                      </TableCell>
+                      <TableCell className="text-right font-mono">{org.count}</TableCell>
+                      <TableCell className="text-right font-mono text-warning">
                         {org.pending > 0 ? org.pending.toFixed(2) : '--'}
-                      </td>
-                      <td className="py-2 px-3 text-right font-mono text-success">
+                      </TableCell>
+                      <TableCell className="text-right font-mono text-success">
                         {org.approved > 0 ? org.approved.toFixed(2) : '--'}
-                      </td>
-                      <td className="py-2 px-3 text-right font-mono font-semibold">
+                      </TableCell>
+                      <TableCell className="text-right font-mono font-semibold">
                         {org.total.toFixed(2)}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           </CardBody>
         </Card>

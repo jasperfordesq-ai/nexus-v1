@@ -21,6 +21,12 @@ import {
   CardHeader,
   Tab,
   Tabs,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
 } from '@heroui/react';
 import Clock from 'lucide-react/icons/clock';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -551,58 +557,46 @@ export function VolunteerHoursAudit() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-divider text-left">
-                      <th className="py-2 px-3 font-medium text-default-500">
-                        {t('volunteering.col_volunteer')}
-                      </th>
-                      <th className="py-2 px-3 font-medium text-default-500">
-                        {t('volunteering.col_organization')}
-                      </th>
-                      <th className="py-2 px-3 font-medium text-default-500">
-                        {t('volunteering.col_hours')}
-                      </th>
-                      <th className="py-2 px-3 font-medium text-default-500">
-                        {t('volunteering.col_amount_paid')}
-                      </th>
-                      <th className="py-2 px-3 font-medium text-default-500">
-                        {t('volunteering.col_date')}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <Table
+                  aria-label={t('volunteering.payment_reconciliation_title')}
+                  removeWrapper
+                >
+                  <TableHeader>
+                    <TableColumn>{t('volunteering.col_volunteer')}</TableColumn>
+                    <TableColumn>{t('volunteering.col_organization')}</TableColumn>
+                    <TableColumn>{t('volunteering.col_hours')}</TableColumn>
+                    <TableColumn>{t('volunteering.col_amount_paid')}</TableColumn>
+                    <TableColumn>{t('volunteering.col_date')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
                     {paidEntries.map((entry) => (
-                      <tr key={entry.id} className="border-b border-divider/50 hover:bg-default-50">
-                        <td className="py-2 px-3 font-medium">
-                          {entry.first_name} {entry.last_name}
-                        </td>
-                        <td className="py-2 px-3">{entry.org_name || '--'}</td>
-                        <td className="py-2 px-3 font-mono">{entry.hours}</td>
-                        <td className="py-2 px-3 font-mono text-success">
+                      <TableRow key={entry.id}>
+                        <TableCell>
+                          <span className="font-medium">
+                            {entry.first_name} {entry.last_name}
+                          </span>
+                        </TableCell>
+                        <TableCell>{entry.org_name || '--'}</TableCell>
+                        <TableCell className="font-mono">{entry.hours}</TableCell>
+                        <TableCell className="font-mono text-success">
                           {entry.paid_amount > 0 ? entry.paid_amount.toFixed(2) : '--'}
-                        </td>
-                        <td className="py-2 px-3 text-default-500">
+                        </TableCell>
+                        <TableCell className="text-default-500">
                           {entry.created_at ? new Date(entry.created_at).toLocaleDateString() : '--'}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="border-t-2 border-divider font-semibold">
-                      <td className="py-2 px-3" colSpan={2}>
-                        {t('volunteering.total')}
-                      </td>
-                      <td className="py-2 px-3 font-mono">
-                        {paidEntries.reduce((sum, e) => sum + e.hours, 0)}
-                      </td>
-                      <td className="py-2 px-3 font-mono text-success">
-                        {paidEntries.reduce((sum, e) => sum + (e.paid_amount || 0), 0).toFixed(2)}
-                      </td>
-                      <td />
-                    </tr>
-                  </tfoot>
-                </table>
+                  </TableBody>
+                </Table>
+                <div className="mt-3 grid grid-cols-1 gap-2 border-t border-divider pt-3 text-sm sm:grid-cols-[1fr_auto_auto] sm:items-center">
+                  <span className="font-semibold">{t('volunteering.total')}</span>
+                  <span className="font-mono font-semibold">
+                    {paidEntries.reduce((sum, e) => sum + e.hours, 0)}
+                  </span>
+                  <span className="font-mono font-semibold text-success">
+                    {paidEntries.reduce((sum, e) => sum + (e.paid_amount || 0), 0).toFixed(2)}
+                  </span>
+                </div>
               </div>
             )}
           </CardBody>
