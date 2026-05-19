@@ -10,9 +10,9 @@ use App\Core\TenantContext;
 use App\Events\UserRegistered;
 use App\Listeners\SendWelcomeNotification;
 use App\Models\User;
+use App\Services\EmailDispatchService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Tests\Laravel\TestCase;
 
@@ -59,6 +59,7 @@ class WelcomeEmailCrossTenantTest extends TestCase
 
         // Re-leak the context to tenant 2 to maximally stress the listener.
         TenantContext::setById(2);
+        app()->instance(EmailDispatchService::class, new WelcomeSuccessfulEmailDispatchService());
 
         // Fire the listener directly (skipping the queue) so the test runs
         // synchronously. The handler is the production handler — same
@@ -100,6 +101,35 @@ class WelcomeEmailCrossTenantTest extends TestCase
         }
     }
 
+    public function test_pending_welcome_email_failure_preserves_existing_verification_token(): void
+    {
+        $otherTenantId = 999;
+        $userId = $this->seedActiveUserOnTenant($otherTenantId);
+
+        TenantContext::setById($otherTenantId);
+        $user = User::query()->where('id', $userId)->where('tenant_id', $otherTenantId)->first();
+        $this->assertNotNull($user);
+
+        $oldTokenId = DB::table('email_verification_tokens')->insertGetId([
+            'user_id' => $userId,
+            'tenant_id' => $otherTenantId,
+            'token' => password_hash('previous-token', PASSWORD_DEFAULT),
+            'expires_at' => now()->addDay(),
+            'created_at' => now(),
+        ]);
+
+        app()->instance(EmailDispatchService::class, new WelcomeFailingEmailDispatchService());
+
+        $listener = new SendWelcomeNotification();
+        $listener->handle(new UserRegistered($user, $otherTenantId));
+
+        $this->assertSame(1, DB::table('email_verification_tokens')
+            ->where('user_id', $userId)
+            ->where('tenant_id', $otherTenantId)
+            ->count());
+        $this->assertTrue(DB::table('email_verification_tokens')->where('id', $oldTokenId)->exists());
+    }
+
     private function seedActiveUserOnTenant(int $tenantId): int
     {
         $email = 'welcome-test-' . uniqid() . '@example.test';
@@ -118,5 +148,40 @@ class WelcomeEmailCrossTenantTest extends TestCase
             'created_at'         => now(),
             'updated_at'         => now(),
         ]);
+    }
+}
+
+class WelcomeFailingEmailDispatchService extends EmailDispatchService
+{
+    public function send(string $to, string $subject, string $body, array $options = []): bool
+    {
+        return false;
+    }
+}
+
+class WelcomeSuccessfulEmailDispatchService extends EmailDispatchService
+{
+    public function send(string $to, string $subject, string $body, array $options = []): bool
+    {
+        $tenantId = (int) ($options['tenant_id'] ?? 0);
+        $userId = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('email', $to)
+            ->value('id');
+
+        DB::table('email_log')->insert([
+            'tenant_id' => $tenantId,
+            'user_id' => $userId,
+            'recipient_email' => $to,
+            'category' => $options['category'] ?? null,
+            'subject' => $subject,
+            'provider' => 'smtp',
+            'status' => 'sent',
+            'sent_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return true;
     }
 }

@@ -35,9 +35,9 @@ use Illuminate\Support\Facades\Log;
  *   - the suppression cache skips known-bad addresses
  *   - the unsubscribe header is auto-attached
  *
- * Idempotent: each invocation regenerates fresh tokens and overwrites any
- * existing pending tokens in `email_verification_tokens` so the new link
- * supersedes the old.
+ * Idempotent: each successful resend regenerates a fresh token and overwrites
+ * any existing pending tokens in `email_verification_tokens` so the new link
+ * supersedes the old. Failed/suppressed sends preserve the previous token.
  */
 class ResendStuckVerificationEmails extends Command
 {
@@ -128,22 +128,12 @@ class ResendStuckVerificationEmails extends Command
     {
         $tenantId = (int) $user->tenant_id;
 
-        // Fresh token: superseed any older pending token.
+        $this->ensureVerificationTokenTableExists();
+
+        // Fresh token: supersede any older pending token only after send acceptance.
         $token = bin2hex(random_bytes(32));
         $hashed = password_hash($token, PASSWORD_DEFAULT);
         $expiresAt = date('Y-m-d H:i:s', time() + self::TOKEN_TTL_SECONDS);
-
-        DB::table('email_verification_tokens')
-            ->where('user_id', $user->id)
-            ->where('tenant_id', $tenantId)
-            ->delete();
-        DB::table('email_verification_tokens')->insert([
-            'user_id'    => $user->id,
-            'tenant_id'  => $tenantId,
-            'token'      => $hashed,
-            'expires_at' => $expiresAt,
-            'created_at' => now(),
-        ]);
 
         $appUrl  = TenantContext::getFrontendUrl();
         $basePath = TenantContext::getSlugPrefix();
@@ -151,7 +141,7 @@ class ResendStuckVerificationEmails extends Command
 
         $tenantName = (string) (DB::table('tenants')->where('id', $tenantId)->value('name') ?? 'Project NEXUS');
 
-        return LocaleContext::withLocale(
+        $sent = LocaleContext::withLocale(
             $user->preferred_language ?? null,
             function () use ($user, $tenantName, $verifyUrl, $tenantId) {
                 $firstName = (string) ($user->first_name ?? '');
@@ -174,6 +164,42 @@ class ResendStuckVerificationEmails extends Command
                 return \App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'email_verification', ['tenant_id' => $tenantId]);
             }
         );
+
+        if (!$sent) {
+            return false;
+        }
+
+        DB::table('email_verification_tokens')
+            ->where('user_id', $user->id)
+            ->where('tenant_id', $tenantId)
+            ->delete();
+        DB::table('email_verification_tokens')->insert([
+            'user_id'    => $user->id,
+            'tenant_id'  => $tenantId,
+            'token'      => $hashed,
+            'expires_at' => $expiresAt,
+            'created_at' => now(),
+        ]);
+
+        return true;
+    }
+
+    private function ensureVerificationTokenTableExists(): void
+    {
+        DB::statement("
+            CREATE TABLE IF NOT EXISTS `email_verification_tokens` (
+                `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                `user_id` INT UNSIGNED NOT NULL,
+                `tenant_id` INT(11) NOT NULL,
+                `token` VARCHAR(255) NOT NULL,
+                `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                `expires_at` TIMESTAMP NOT NULL,
+                INDEX `idx_user_id` (`user_id`),
+                INDEX `idx_tenant_id` (`tenant_id`),
+                INDEX `idx_tenant_user` (`tenant_id`, `user_id`),
+                INDEX `idx_expires_at` (`expires_at`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
     }
 
     private function resolveSince(string $raw): string

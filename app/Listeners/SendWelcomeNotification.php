@@ -74,7 +74,8 @@ class SendWelcomeNotification implements ShouldQueue
                           || empty($event->user->email_verified_at);
 
                 if ($isPending) {
-                    $verifyUrl = $this->generateVerificationToken($event->user->id, $event->tenantId);
+                    $verificationToken = $this->buildVerificationToken();
+                    $verifyUrl = $this->buildVerificationUrl($verificationToken['token']);
 
                     $html = EmailTemplateBuilder::make()
                         ->theme('success')
@@ -95,7 +96,10 @@ class SendWelcomeNotification implements ShouldQueue
 
                     if (!EmailDispatchService::sendRaw($userEmail, __('emails.welcome.pending_subject', ['community' => $tenantName]), $html, null, null, null, 'activation', ['tenant_id' => $event->tenantId])) {
                         Log::warning('SendWelcomeNotification: pending welcome email failed to send', ['user_email' => $userEmail, 'tenant_id' => $event->tenantId]);
+                        return;
                     }
+
+                    $this->storeVerificationToken($event->user->id, $event->tenantId, $verificationToken);
                 } else {
                     // Already active user (admin-created) â€” generic welcome only
                     $html = EmailTemplateBuilder::make()
@@ -132,16 +136,37 @@ class SendWelcomeNotification implements ShouldQueue
     }
 
     /**
-     * Generate a verification token using the email_verification_tokens table
-     * (the same system that EmailVerificationController::verifyEmail() checks).
+     * @return array{token:string, hashed_token:string, expires_at:string}
      */
-    private function generateVerificationToken(int $userId, int $tenantId): string
+    private function buildVerificationToken(): array
     {
         $token = bin2hex(random_bytes(32));
-        $hashedToken = password_hash($token, PASSWORD_DEFAULT);
-        $expiresAt = date('Y-m-d H:i:s', time() + 86400); // 24 hours
 
-        // Ensure table exists
+        return [
+            'token' => $token,
+            'hashed_token' => password_hash($token, PASSWORD_DEFAULT),
+            'expires_at' => date('Y-m-d H:i:s', time() + 86400), // 24 hours
+        ];
+    }
+
+    private function storeVerificationToken(int $userId, int $tenantId, array $verificationToken): void
+    {
+        $this->ensureVerificationTokenTableExists();
+
+        // Clean up old tokens for this user only after send acceptance.
+        DB::delete(
+            "DELETE FROM email_verification_tokens WHERE user_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        );
+
+        DB::insert(
+            "INSERT INTO email_verification_tokens (user_id, tenant_id, token, expires_at) VALUES (?, ?, ?, ?)",
+            [$userId, $tenantId, $verificationToken['hashed_token'], $verificationToken['expires_at']]
+        );
+    }
+
+    private function ensureVerificationTokenTableExists(): void
+    {
         DB::statement("
             CREATE TABLE IF NOT EXISTS `email_verification_tokens` (
                 `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -156,20 +181,10 @@ class SendWelcomeNotification implements ShouldQueue
                 INDEX `idx_expires_at` (`expires_at`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         ");
+    }
 
-        // Clean up old tokens for this user
-        DB::delete(
-            "DELETE FROM email_verification_tokens WHERE user_id = ? AND tenant_id = ?",
-            [$userId, $tenantId]
-        );
-
-        // Store hashed token
-        DB::insert(
-            "INSERT INTO email_verification_tokens (user_id, tenant_id, token, expires_at) VALUES (?, ?, ?, ?)",
-            [$userId, $tenantId, $hashedToken, $expiresAt]
-        );
-
-        // Build the verification URL
+    private function buildVerificationUrl(string $token): string
+    {
         $appUrl = TenantContext::getFrontendUrl();
         $basePath = TenantContext::getSlugPrefix();
 
