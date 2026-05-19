@@ -102,6 +102,7 @@ class EmailTriggerAuditService
             ['module' => 'federation', 'event' => 'federated_transaction_source', 'category' => 'federation_transaction', 'critical' => true, 'source_table' => 'federation_transactions'],
             ['module' => 'federation', 'event' => 'federated_connection_source', 'category' => 'federation_connection', 'critical' => true, 'source_table' => 'federation_inbound_connections'],
             ['module' => 'federation', 'event' => 'federated_message_source', 'category' => 'federation_message', 'critical' => true, 'source_table' => 'federation_messages'],
+            ['module' => 'federation', 'event' => 'federated_review_source', 'category' => 'federation_review', 'critical' => true, 'source_table' => 'reviews'],
             ['module' => 'messages', 'event' => 'direct_message_received', 'category' => 'message', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'broadcasts', 'event' => 'newsletter_broadcast', 'category' => 'newsletter', 'critical' => false, 'source_table' => 'newsletter_queue'],
             ['module' => 'digests', 'event' => 'civic_digest', 'category' => 'civic_digest', 'critical' => false, 'source_table' => 'email_log'],
@@ -153,6 +154,7 @@ class EmailTriggerAuditService
                 $this->checkFederationMessageDeliveryHealth($tenantId, $since, $windowHours),
                 $this->checkFederationTransactionDeliveryHealth($tenantId, $since, $windowHours),
                 $this->checkFederationConnectionDeliveryHealth($tenantId, $since, $windowHours),
+                $this->checkFederationReviewDeliveryHealth($tenantId, $since, $windowHours),
                 $this->checkDirectEmailSendSurface($tenantId),
                 $this->checkTenantlessDispatcherSendSurface($tenantId)
             );
@@ -213,6 +215,7 @@ class EmailTriggerAuditService
             'federation_inbound_connections' => 'checkFederationConnectionDeliveryHealth',
             'federation_messages' => 'checkFederationMessageDeliveryHealth',
             'federation_transactions' => 'checkFederationTransactionDeliveryHealth',
+            'reviews' => 'checkFederationReviewDeliveryHealth',
             'group_invites' => 'checkGroupInvitesWithoutEmail',
             'group_members' => 'checkGroupMembershipNotificationHealth',
             'marketplace_report_notifications' => 'checkMarketplaceReportNotificationHealth',
@@ -1412,6 +1415,48 @@ class EmailTriggerAuditService
         return array_merge(
             $this->rowsToIssues($withoutEmail, 'federation_connection_without_email_evidence', 'critical', 'federation', 'federated_connection_request_accepted', ['window_hours' => $windowHours]),
             $this->rowsToIssues($withoutBell, 'federation_connection_without_bell_evidence', 'warning', 'federation', 'federated_connection_request_accepted', ['window_hours' => $windowHours])
+        );
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkFederationReviewDeliveryHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (
+            !$this->hasTables(['reviews'])
+            || !Schema::hasColumn('reviews', 'external_partner_id')
+            || !Schema::hasColumn('reviews', 'external_id')
+            || !Schema::hasColumn('reviews', 'email_sent_at')
+            || !Schema::hasColumn('reviews', 'email_skipped_at')
+            || !Schema::hasColumn('reviews', 'notification_sent_at')
+        ) {
+            return [];
+        }
+
+        $base = DB::table('reviews')
+            ->where('review_type', 'federated')
+            ->whereNotNull('external_partner_id')
+            ->whereNotNull('external_id')
+            ->where('created_at', '>=', $since)
+            ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId));
+
+        $withoutEmail = (clone $base)
+            ->select('tenant_id', DB::raw('COUNT(*) as count'))
+            ->whereNull('email_sent_at')
+            ->whereNull('email_skipped_at')
+            ->groupBy('tenant_id')
+            ->get();
+
+        $withoutBell = (clone $base)
+            ->select('tenant_id', DB::raw('COUNT(*) as count'))
+            ->whereNull('notification_sent_at')
+            ->groupBy('tenant_id')
+            ->get();
+
+        return array_merge(
+            $this->rowsToIssues($withoutEmail, 'federation_review_without_email_evidence', 'critical', 'federation', 'federated_review_source', ['window_hours' => $windowHours]),
+            $this->rowsToIssues($withoutBell, 'federation_review_without_bell_evidence', 'warning', 'federation', 'federated_review_source', ['window_hours' => $windowHours])
         );
     }
 

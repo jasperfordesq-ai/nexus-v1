@@ -33,6 +33,7 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('insurance:insurance_certificate_verified_or_rejected:insurance_certificate', $keys);
         $this->assertContains('messages:direct_message_received:message', $keys);
         $this->assertContains('federation:federated_message_received:federation_message', $keys);
+        $this->assertContains('federation:federated_review_source:federation_review', $keys);
         $this->assertContains('marketplace:offer_order_refund_rating_report_dispute:marketplace_order', $keys);
         $this->assertContains('verein:verein_dues_invoice_reminder_paid:verein_dues', $keys);
         $this->assertContains('events:event_created_update_cancellation_rsvp_reminder:event_notification', $keys);
@@ -62,6 +63,7 @@ class EmailTriggerAuditServiceTest extends TestCase
             'federation_inbound_connections',
             'federation_messages',
             'federation_transactions',
+            'reviews',
             'group_members',
             'marketplace_report_notifications',
             'marketplace_reports',
@@ -602,6 +604,64 @@ class EmailTriggerAuditServiceTest extends TestCase
 
         $this->assertContains('federation_connection_without_email_evidence', $codes);
         $this->assertContains('federation_connection_without_bell_evidence', $codes);
+    }
+
+    public function test_run_detects_federation_review_without_delivery_evidence(): void
+    {
+        if (
+            !Schema::hasTable('reviews')
+            || !Schema::hasColumn('reviews', 'external_partner_id')
+            || !Schema::hasColumn('reviews', 'email_sent_at')
+            || !Schema::hasColumn('reviews', 'email_skipped_at')
+        ) {
+            $this->markTestSkipped('Federation review delivery evidence columns are not available.');
+        }
+
+        $reviewerId = DB::table('users')->insertGetId([
+            'tenant_id' => 999,
+            'name' => 'Federation Review Audit Reviewer',
+            'email' => 'federation-review-audit-reviewer@example.test',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $receiverId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Federation Review Audit Receiver',
+            'email' => 'federation-review-audit-receiver@example.test',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('reviews')->insert([
+            'tenant_id' => 2,
+            'external_partner_id' => 987654,
+            'external_id' => 'audit-fed-review-' . uniqid('', true),
+            'reviewer_id' => $reviewerId,
+            'reviewer_tenant_id' => 999,
+            'receiver_id' => $receiverId,
+            'receiver_tenant_id' => 2,
+            'rating' => 5,
+            'comment' => 'Audit federated review',
+            'review_type' => 'federated',
+            'status' => 'approved',
+            'show_cross_tenant' => 1,
+            'notification_sent_at' => null,
+            'email_sent_at' => null,
+            'email_skipped_at' => null,
+            'email_failed_at' => now()->subMinute(),
+            'email_last_error' => 'simulated failure',
+            'created_at' => now()->subMinutes(2),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('federation_review_without_email_evidence', $codes);
+        $this->assertContains('federation_review_without_bell_evidence', $codes);
     }
 
     public function test_run_detects_event_reminder_source_delivery_gaps(): void
