@@ -413,4 +413,46 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         $this->assertSame('failed', $rows->first()['status'] ?? null);
         $this->assertSame('member-subscription-event-queue@example.test', $rows->first()['email'] ?? null);
     }
+
+    public function test_queues_endpoint_surfaces_stripe_donation_receipt_delivery_failures(): void
+    {
+        if (
+            !Schema::hasTable('vol_donations')
+            || !Schema::hasColumn('vol_donations', 'receipt_email_sent_at')
+            || !Schema::hasColumn('vol_donations', 'receipt_email_failed_at')
+        ) {
+            $this->markTestSkipped('Donation receipt email evidence columns are not available.');
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        DB::table('vol_donations')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => null,
+            'amount' => 50.00,
+            'currency' => 'EUR',
+            'payment_method' => 'stripe',
+            'payment_reference' => 'Donation queue diagnostics',
+            'donor_name' => 'Donation Queue Donor',
+            'donor_email' => 'donation-receipt-queue@example.test',
+            'status' => 'completed',
+            'stripe_payment_intent_id' => 'pi_donation_queue_' . uniqid(),
+            'receipt_email_sent_at' => null,
+            'receipt_email_failed_at' => now()->subMinutes(2),
+            'created_at' => now()->subMinutes(20),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/email-deliverability/queues?source=vol_donations&limit=10');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.diagnostics.vol_donations.available', true);
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.vol_donations.failed_recent'));
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.vol_donations.status_counts.failed'));
+
+        $rows = collect($response->json('data.rows'));
+        $this->assertSame(['vol_donations'], $rows->pluck('source')->unique()->values()->all());
+        $this->assertSame('failed', $rows->first()['status'] ?? null);
+        $this->assertSame('donation-receipt-queue@example.test', $rows->first()['email'] ?? null);
+    }
 }

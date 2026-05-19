@@ -35,6 +35,7 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('federation:federated_message_received:federation_message', $keys);
         $this->assertContains('federation:federated_review_source:federation_review', $keys);
         $this->assertContains('billing:member_premium_billing:billing', $keys);
+        $this->assertContains('donations:stripe_donation_receipt_source:donation_receipt', $keys);
         $this->assertContains('marketplace:offer_order_refund_rating_report_dispute:marketplace_order', $keys);
         $this->assertContains('verein:verein_dues_invoice_reminder_paid:verein_dues', $keys);
         $this->assertContains('events:event_created_update_cancellation_rsvp_reminder:event_notification', $keys);
@@ -73,6 +74,7 @@ class EmailTriggerAuditServiceTest extends TestCase
             'notification_queue',
             'stripe_webhook_events',
             'verein_member_dues',
+            'vol_donations',
         ] as $table) {
             $this->assertTrue($byTable->has($table), "Expected {$table} in email trigger source coverage.");
             $this->assertTrue((bool) $byTable[$table]['audited'], "Expected {$table} to be marked audited.");
@@ -514,6 +516,38 @@ class EmailTriggerAuditServiceTest extends TestCase
         $codes = array_column($result['issues'], 'code');
 
         $this->assertContains('member_subscription_event_without_email_evidence', $codes);
+    }
+
+    public function test_run_detects_stripe_donation_without_receipt_email_evidence(): void
+    {
+        if (
+            !Schema::hasTable('vol_donations')
+            || !Schema::hasColumn('vol_donations', 'receipt_email_sent_at')
+            || !Schema::hasColumn('vol_donations', 'receipt_email_failed_at')
+        ) {
+            $this->markTestSkipped('Donation receipt email evidence columns are not available.');
+        }
+
+        DB::table('vol_donations')->insert([
+            'tenant_id' => 2,
+            'user_id' => null,
+            'amount' => 25.00,
+            'currency' => 'EUR',
+            'payment_method' => 'stripe',
+            'payment_reference' => 'Donation audit',
+            'donor_name' => 'Donation Audit Donor',
+            'donor_email' => 'donation-audit@example.test',
+            'status' => 'completed',
+            'stripe_payment_intent_id' => 'pi_donation_audit_' . uniqid('', true),
+            'receipt_email_sent_at' => null,
+            'receipt_email_failed_at' => now()->subMinute(),
+            'created_at' => now()->subMinutes(2),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('stripe_donation_without_receipt_email_evidence', $codes);
     }
 
     public function test_run_detects_federation_message_without_delivery_evidence(): void

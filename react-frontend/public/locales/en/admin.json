@@ -11553,7 +11553,8 @@
         "member_subscription_events": "Member subscription billing",
         "newsletter_queue": "Newsletter",
         "notification_queue": "Notification",
-        "reviews": "Federated review"
+        "reviews": "Federated review",
+        "vol_donations": "Donation receipt"
       }
     },
     "logs": {
@@ -11769,6 +11770,10 @@
       "member_subscription_event_without_email_evidence": {
         "title": "Member subscription email evidence missing",
         "body": "{{count}} member subscription billing events have no successful email delivery evidence in the last {{window_hours}} hours."
+      },
+      "stripe_donation_without_receipt_email_evidence": {
+        "title": "Donation receipt email evidence missing",
+        "body": "{{count}} completed Stripe donations have no successful receipt email evidence in the last {{window_hours}} hours."
       },
       "critical_email_attempts_missing_tenant_context": {
         "title": "Critical email missing tenant context",

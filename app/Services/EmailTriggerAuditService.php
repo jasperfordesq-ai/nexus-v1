@@ -78,6 +78,7 @@ class EmailTriggerAuditService
             ['module' => 'wallet', 'event' => 'credit_received_sent_review_request', 'category' => 'transaction', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'wallet', 'event' => 'wallet_low_empty_org_wallet_alerts', 'category' => 'wallet_alert', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'donations', 'event' => 'donation_sent_received', 'category' => 'donation', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'donations', 'event' => 'stripe_donation_receipt_source', 'category' => 'donation_receipt', 'critical' => true, 'source_table' => 'vol_donations'],
             ['module' => 'social', 'event' => 'post_liked_commented_shared', 'category' => 'social_notification', 'critical' => false, 'source_table' => 'email_log'],
             ['module' => 'listings', 'event' => 'listing_created_updated_expiry_expired', 'category' => 'listing_expiry', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'matching', 'event' => 'job_alert_or_hot_match', 'category' => 'job_alert', 'critical' => false, 'source_table' => 'notification_queue'],
@@ -150,6 +151,7 @@ class EmailTriggerAuditService
                 $this->checkTenantProviderConfiguration($tenantId),
                 $this->checkBillingAndStripeHealth($tenantId, $since, $windowHours),
                 $this->checkMemberPremiumBillingEmailHealth($tenantId, $since, $windowHours),
+                $this->checkStripeDonationReceiptEmailHealth($tenantId, $since, $windowHours),
                 $this->checkVereinDuesEmailHealth($tenantId, $since, $windowHours),
                 $this->checkMarketplaceReportNotificationHealth($tenantId, $since, $windowHours),
                 $this->checkFederationMessageDeliveryHealth($tenantId, $since, $windowHours),
@@ -229,6 +231,7 @@ class EmailTriggerAuditService
             'stripe_webhook_events' => 'checkBillingAndStripeHealth',
             'users' => 'checkNewUsersWithoutAccountEmail',
             'verein_member_dues' => 'checkVereinDuesEmailHealth',
+            'vol_donations' => 'checkStripeDonationReceiptEmailHealth',
         ];
 
         $coverage = [];
@@ -1241,6 +1244,32 @@ class EmailTriggerAuditService
             ->get();
 
         return $this->rowsToIssues($withoutNotification, 'member_subscription_event_without_email_evidence', 'critical', 'billing', 'member_premium_billing', ['window_hours' => $windowHours]);
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkStripeDonationReceiptEmailHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (
+            !$this->hasTables(['vol_donations'])
+            || !Schema::hasColumn('vol_donations', 'receipt_email_sent_at')
+            || !Schema::hasColumn('vol_donations', 'receipt_email_failed_at')
+        ) {
+            return [];
+        }
+
+        $withoutReceipt = DB::table('vol_donations')
+            ->select('tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('status', 'completed')
+            ->whereNotNull('stripe_payment_intent_id')
+            ->where('created_at', '>=', $since)
+            ->whereNull('receipt_email_sent_at')
+            ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId))
+            ->groupBy('tenant_id')
+            ->get();
+
+        return $this->rowsToIssues($withoutReceipt, 'stripe_donation_without_receipt_email_evidence', 'critical', 'donations', 'stripe_donation_receipt_source', ['window_hours' => $windowHours]);
     }
 
     /**

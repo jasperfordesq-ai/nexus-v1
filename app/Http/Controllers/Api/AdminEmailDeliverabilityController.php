@@ -173,6 +173,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'marketplace_report_notifications' => $this->queueSourceDiagnostics('marketplace_report_notifications', $tenantId),
             'event_reminders' => $this->queueSourceDiagnostics('event_reminders', $tenantId),
             'member_subscription_events' => $this->queueSourceDiagnostics('member_subscription_events', $tenantId),
+            'vol_donations' => $this->queueSourceDiagnostics('vol_donations', $tenantId),
             'federation_messages' => $this->queueSourceDiagnostics('federation_messages', $tenantId),
             'federation_transactions' => $this->queueSourceDiagnostics('federation_transactions', $tenantId),
             'federation_inbound_connections' => $this->queueSourceDiagnostics('federation_inbound_connections', $tenantId),
@@ -381,6 +382,42 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->map(fn ($row) => $this->queueRow('member_subscription_events', $row));
         }
 
+        $volDonationRows = collect();
+        if (($source === '' || $source === 'vol_donations') && $this->hasVolDonationReceiptDeliveryColumns()) {
+            $volDonationQuery = DB::table('vol_donations as vd')
+                ->leftJoin('users as u', function ($join): void {
+                    $join->on('u.id', '=', 'vd.user_id')
+                        ->on('u.tenant_id', '=', 'vd.tenant_id');
+                })
+                ->where('vd.status', 'completed')
+                ->whereNotNull('vd.stripe_payment_intent_id')
+                ->when($tenantId !== null, fn ($q) => $q->where('vd.tenant_id', $tenantId));
+
+            $this->applyVolDonationReceiptStatusFilter($volDonationQuery, $statuses);
+
+            $volDonationRows = $volDonationQuery
+                ->orderByDesc('vd.id')
+                ->limit($limit)
+                ->get([
+                    'vd.id',
+                    'vd.tenant_id',
+                    'vd.user_id',
+                    DB::raw('COALESCE(vd.donor_email, u.email) as email'),
+                    DB::raw("'donation_receipt' as category"),
+                    'vd.stripe_payment_intent_id as subject',
+                    DB::raw($this->volDonationReceiptStatusExpression() . ' as status'),
+                    DB::raw('NULL as frequency'),
+                    DB::raw('0 as attempts'),
+                    'vd.receipt_email_failed_at as last_attempted_at',
+                    DB::raw('NULL as error'),
+                    DB::raw('NULL as processing_batch_id'),
+                    DB::raw('NULL as processing_started_at'),
+                    'vd.receipt_email_sent_at as sent_at',
+                    'vd.created_at',
+                ])
+                ->map(fn ($row) => $this->queueRow('vol_donations', $row));
+        }
+
         $federationSourceRows = collect();
         foreach (array_keys($this->federationDeliverySourceConfigs()) as $federationSource) {
             if (($source !== '' && $source !== $federationSource) || !$this->hasFederationDeliverySourceColumns($federationSource)) {
@@ -469,6 +506,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ->merge($marketplaceReportRows)
             ->merge($eventReminderRows)
             ->merge($memberSubscriptionRows)
+            ->merge($volDonationRows)
             ->merge($federationSourceRows)
             ->merge($reviewRows)
             ->sortByDesc('created_at')
@@ -685,6 +723,40 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ];
         }
 
+        if ($source === 'vol_donations') {
+            if (!$this->hasVolDonationReceiptDeliveryColumns()) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $base = DB::table('vol_donations as vd')
+                ->where('vd.status', 'completed')
+                ->whereNotNull('vd.stripe_payment_intent_id')
+                ->when($tenantId !== null, fn ($q) => $q->where('vd.tenant_id', $tenantId));
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => $this->queueStatusCounts($base, $this->volDonationReceiptStatusExpression()),
+                'stale_pending' => (clone $base)
+                    ->whereNull('vd.receipt_email_sent_at')
+                    ->whereNull('vd.receipt_email_failed_at')
+                    ->where('vd.created_at', '<', now()->subMinutes(15))
+                    ->count(),
+                'stale_processing' => 0,
+                'failed_recent' => (clone $base)
+                    ->whereNull('vd.receipt_email_sent_at')
+                    ->whereNotNull('vd.receipt_email_failed_at')
+                    ->where('vd.receipt_email_failed_at', '>=', now()->subDay())
+                    ->count(),
+                'suppressed_recent' => 0,
+                'oldest_pending_at' => (clone $base)
+                    ->whereNull('vd.receipt_email_sent_at')
+                    ->whereNull('vd.receipt_email_failed_at')
+                    ->min('vd.created_at'),
+                'returned' => 0,
+            ];
+        }
+
         if (array_key_exists($source, $this->federationDeliverySourceConfigs())) {
             if (!$this->hasFederationDeliverySourceColumns($source)) {
                 return $this->unavailableQueueDiagnostics($source);
@@ -824,6 +896,52 @@ class AdminEmailDeliverabilityController extends BaseApiController
         return "CASE
             WHEN mse.notification_sent_at IS NOT NULL THEN 'sent'
             WHEN mse.notification_failed_at IS NOT NULL THEN 'failed'
+            ELSE 'pending'
+        END";
+    }
+
+    private function hasVolDonationReceiptDeliveryColumns(): bool
+    {
+        return Schema::hasTable('vol_donations')
+            && Schema::hasColumn('vol_donations', 'receipt_email_sent_at')
+            && Schema::hasColumn('vol_donations', 'receipt_email_failed_at');
+    }
+
+    /**
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param list<string> $statuses
+     */
+    private function applyVolDonationReceiptStatusFilter($query, array $statuses): void
+    {
+        $relevantStatuses = array_intersect($statuses, ['pending', 'failed']);
+        if ($relevantStatuses === []) {
+            $query->whereRaw('1 = 0');
+            return;
+        }
+
+        $query->where(function ($q) use ($statuses): void {
+            if (in_array('failed', $statuses, true)) {
+                $q->orWhere(function ($status): void {
+                    $status->whereNull('vd.receipt_email_sent_at')
+                        ->whereNotNull('vd.receipt_email_failed_at');
+                });
+            }
+
+            if (in_array('pending', $statuses, true)) {
+                $q->orWhere(function ($status): void {
+                    $status->whereNull('vd.receipt_email_sent_at')
+                        ->whereNull('vd.receipt_email_failed_at')
+                        ->where('vd.created_at', '<', now()->subMinutes(15));
+                });
+            }
+        });
+    }
+
+    private function volDonationReceiptStatusExpression(): string
+    {
+        return "CASE
+            WHEN vd.receipt_email_sent_at IS NOT NULL THEN 'sent'
+            WHEN vd.receipt_email_failed_at IS NOT NULL THEN 'failed'
             ELSE 'pending'
         END";
     }
