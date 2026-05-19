@@ -29,37 +29,48 @@ class VereinCrossInvitationReceived
             return;
         }
 
-        LocaleContext::withLocale($recipient->preferred_language ?? null, function () use ($recipient, $invitationId, $sourceName, $targetName, $message): void {
+        $tenantId = (int) ($recipient->tenant_id ?? TenantContext::currentId() ?? 0);
+        if ($tenantId <= 0) {
+            Log::warning('[VereinCrossInvitationReceived] missing recipient tenant', [
+                'recipient_id' => $recipient->id ?? null,
+                'invitation_id' => $invitationId,
+            ]);
+            return;
+        }
+
+        LocaleContext::withLocale($recipient->preferred_language ?? null, function () use ($recipient, $invitationId, $sourceName, $targetName, $message, $tenantId): void {
             try {
-                $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/me/verein-invitations';
+                TenantContext::runForTenant($tenantId, function () use ($recipient, $invitationId, $sourceName, $targetName, $message): void {
+                    $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/me/verein-invitations';
 
-                $name = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
-                $builder = EmailTemplateBuilder::make()
-                    ->theme('info')
-                    ->title(__('emails.verein_federation.invitation_received_title'))
-                    ->previewText(__('emails.verein_federation.invitation_received_preview', ['target' => $targetName]))
-                    ->greeting($name !== '' ? $name : __('emails.common.fallback_name'))
-                    ->paragraph(__('emails.verein_federation.invitation_received_body', [
-                        'source' => $sourceName,
-                        'target' => $targetName,
-                    ]));
+                    $name = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
+                    $builder = EmailTemplateBuilder::make()
+                        ->theme('info')
+                        ->title(__('emails.verein_federation.invitation_received_title'))
+                        ->previewText(__('emails.verein_federation.invitation_received_preview', ['target' => $targetName]))
+                        ->greeting($name !== '' ? $name : __('emails.common.fallback_name'))
+                        ->paragraph(__('emails.verein_federation.invitation_received_body', [
+                            'source' => $sourceName,
+                            'target' => $targetName,
+                        ]));
 
-                if ($message !== null && $message !== '') {
-                    $builder->infoCard([
-                        __('emails.verein_federation.message_label') => $message,
-                    ]);
-                }
+                    if ($message !== null && $message !== '') {
+                        $builder->infoCard([
+                            __('emails.verein_federation.message_label') => $message,
+                        ]);
+                    }
 
-                $builder->button(__('emails.verein_federation.cta_respond'), $url);
+                    $builder->button(__('emails.verein_federation.cta_respond'), $url);
 
-                $subject = __('emails.verein_federation.invitation_received_subject', ['target' => $targetName]);
+                    $subject = __('emails.verein_federation.invitation_received_subject', ['target' => $targetName]);
 
-                if (!EmailDispatchService::sendRaw($recipient->email, $subject, $builder->render(), null, null, null, 'verein_federation', ['tenant_id' => $recipient->tenant_id ?? TenantContext::currentId()])) {
-                    Log::warning('[VereinCrossInvitationReceived] email returned false', [
-                        'recipient_id' => $recipient->id ?? null,
-                        'invitation_id' => $invitationId,
-                    ]);
-                }
+                    if (!EmailDispatchService::sendRaw($recipient->email, $subject, $builder->render(), null, null, null, 'verein_federation', ['tenant_id' => $tenantId])) {
+                        Log::warning('[VereinCrossInvitationReceived] email returned false', [
+                            'recipient_id' => $recipient->id ?? null,
+                            'invitation_id' => $invitationId,
+                        ]);
+                    }
+                });
             } catch (Throwable $e) {
                 Log::warning('[VereinCrossInvitationReceived] email failed', [
                     'recipient_id' => $recipient->id ?? null,

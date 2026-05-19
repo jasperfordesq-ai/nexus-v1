@@ -298,4 +298,36 @@ class EmailMailerRoutingTest extends TestCase
             'EventNotificationService must preserve granular event email_log categories instead of collapsing all sends to event_notification.'
         );
     }
+
+    public function test_mail_helpers_render_inside_explicit_recipient_tenant_context(): void
+    {
+        $helpers = [
+            app_path('Mail/AppreciationReceived.php'),
+            app_path('Mail/CivicDigestMail.php'),
+            app_path('Mail/VereinCrossInvitationAccepted.php'),
+            app_path('Mail/VereinCrossInvitationReceived.php'),
+        ];
+
+        foreach ($helpers as $helper) {
+            $source = file_get_contents($helper);
+
+            $this->assertStringContainsString(
+                '$tenantId = (int) ($recipient->tenant_id ?? TenantContext::currentId() ?? 0);',
+                $source,
+                basename($helper) . ' must resolve an explicit recipient tenant before rendering tenant URLs.'
+            );
+
+            $this->assertStringContainsString(
+                'TenantContext::runForTenant($tenantId',
+                $source,
+                basename($helper) . ' must render and dispatch inside the recipient tenant context.'
+            );
+
+            $this->assertStringContainsString(
+                "['tenant_id' => \$tenantId]",
+                $source,
+                basename($helper) . ' must pass the same explicit tenant to EmailDispatchService.'
+            );
+        }
+    }
 }

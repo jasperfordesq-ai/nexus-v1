@@ -59,9 +59,17 @@ class CivicDigestMail
             return false;
         }
         $cadence = $cadence === 'monthly' || $cadence === 'weekly' ? 'monthly' : 'daily';
+        $tenantId = (int) ($recipient->tenant_id ?? TenantContext::currentId() ?? 0);
+        if ($tenantId <= 0) {
+            \Illuminate\Support\Facades\Log::warning('CivicDigestMail::dispatchDigest missing recipient tenant', [
+                'user_id' => $recipient->id ?? null,
+            ]);
+            return false;
+        }
 
-        return (bool) LocaleContext::withLocale($recipient->preferred_language ?? null, function () use ($recipient, $cadence, $items): bool {
+        return (bool) LocaleContext::withLocale($recipient->preferred_language ?? null, function () use ($recipient, $cadence, $items, $tenantId): bool {
             try {
+                return TenantContext::runForTenant($tenantId, function () use ($recipient, $cadence, $items, $tenantId): bool {
                 $tenantData = TenantContext::get();
                 $community = (string) ($tenantData['name'] ?? 'Project NEXUS');
 
@@ -156,9 +164,10 @@ class CivicDigestMail
                     null,
                     $prefsUrl,
                     'civic_digest',
-                    ['tenant_id' => $recipient->tenant_id ?? TenantContext::currentId()]
+                    ['tenant_id' => $tenantId]
                 );
                 return $sent === true;
+                });
             } catch (Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning('CivicDigestMail::dispatchDigest failed', [
                     'user_id' => $recipient->id ?? null,
