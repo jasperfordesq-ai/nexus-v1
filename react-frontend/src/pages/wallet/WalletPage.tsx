@@ -523,7 +523,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
       className="rounded-xl border border-theme-default bg-theme-elevated p-4 transition-colors hover:bg-theme-hover"
       aria-label={t('aria.transaction_detail', { direction: isCredit ? t('csv.received') : t('csv.sent'), amount: transaction.amount, name: otherPartyName || '' })}
     >
-      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+      <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:gap-4">
         <div className={`
           p-2.5 rounded-xl self-start shrink-0
           ${isCredit ? 'bg-emerald-500/20' : 'bg-rose-500/20'}
@@ -535,18 +535,20 @@ function TransactionCard({ transaction }: TransactionCardProps) {
           )}
         </div>
 
-        <div className="flex-1 min-w-0">
-          <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <h4 className="font-semibold text-theme-primary">{description}</h4>
+        <div className="min-w-0">
+          <div className="flex min-w-0 flex-wrap items-start gap-2">
+            <h4 className="min-w-0 flex-1 basis-48 break-words font-semibold text-theme-primary [overflow-wrap:anywhere]">
+              {description}
+            </h4>
             {transaction.status === 'pending' && (
-              <Chip size="sm" variant="flat" className="bg-amber-500/10 text-amber-600 dark:text-amber-300">
+              <Chip size="sm" variant="flat" className="shrink-0 bg-amber-500/10 text-amber-600 dark:text-amber-300">
                 {t('filter.pending')}
               </Chip>
             )}
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-theme-subtle mt-1">
             {otherPartyName && (
-              <span className="flex min-w-0 items-center gap-1">
+              <span className="flex min-w-0 max-w-full items-center gap-1">
                 <User className="w-3 h-3 shrink-0" aria-hidden="true" />
                 <span className="truncate">{otherPartyName}</span>
               </span>
@@ -560,7 +562,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
           </div>
         </div>
 
-        <div className={`shrink-0 text-xl font-bold sm:text-right ${isCredit ? 'text-emerald-500 dark:text-emerald-300' : 'text-rose-500 dark:text-rose-300'}`}>
+        <div className={`col-span-2 max-w-full justify-self-end break-words text-right text-lg font-bold leading-tight [overflow-wrap:anywhere] sm:col-span-1 sm:text-xl ${isCredit ? 'text-emerald-500 dark:text-emerald-300' : 'text-rose-500 dark:text-rose-300'}`}>
           {t('signed_hours_value', { sign: isCredit ? '+' : '-', count: transaction.amount })}
         </div>
       </div>

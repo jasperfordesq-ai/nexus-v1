@@ -18,6 +18,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, fallback?: string | Record<string, unknown>) => {
       if (typeof fallback === 'string') return fallback;
+      if (key === 'saved_result_count') return `(${String(fallback?.count)} results)`;
       return key;
     },
     i18n: { language: 'en', changeLanguage: vi.fn() },

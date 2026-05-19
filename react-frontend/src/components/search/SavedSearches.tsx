@@ -135,7 +135,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
       {currentQuery && (
         <div>
           {showSaveForm ? (
-            <div className="flex gap-2">
+            <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
               <Input
                 size="sm"
                 placeholder={t('save_search_name')}
@@ -149,26 +149,31 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
                   input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                 }}
+                className="w-full min-w-0 sm:flex-1"
               />
-              <Button
-                size="sm"
-                color="primary"
-                isLoading={isSaving}
-                onPress={handleSave}
-                isDisabled={!saveName.trim()}
-              >
-                {t('save')}
-              </Button>
-              <Button
-                size="sm"
-                variant="light"
-                onPress={() => {
-                  setShowSaveForm(false);
-                  setSaveName('');
-                }}
-              >
-                {t('cancel')}
-              </Button>
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:shrink-0">
+                <Button
+                  size="sm"
+                  color="primary"
+                  isLoading={isSaving}
+                  onPress={handleSave}
+                  isDisabled={!saveName.trim()}
+                  className="min-w-0"
+                >
+                  {t('save')}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="light"
+                  onPress={() => {
+                    setShowSaveForm(false);
+                    setSaveName('');
+                  }}
+                  className="min-w-0"
+                >
+                  {t('cancel')}
+                </Button>
+              </div>
             </div>
           ) : (
             <Button
@@ -205,7 +210,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
                   {search.query_params.q || t('no_query')}
                   {search.last_result_count !== null && (
                     <span className="ml-1">
-                      ({search.last_result_count} results)
+                      {t('saved_result_count', { count: search.last_result_count })}
                     </span>
                   )}
                 </div>

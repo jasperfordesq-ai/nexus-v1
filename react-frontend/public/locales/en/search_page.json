@@ -46,6 +46,8 @@
   "save": "Save",
   "cancel": "Cancel",
   "no_query": "No query",
+  "saved_result_count_one": "({{count}} result)",
+  "saved_result_count_other": "({{count}} results)",
   "toast_search_saved": "Search saved",
   "toast_search_save_failed": "Failed to save search",
   "toast_search_deleted": "Saved search removed",
