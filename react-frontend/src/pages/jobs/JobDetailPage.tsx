@@ -750,6 +750,9 @@ export function JobDetailPage() {
           title={vacancy.title}
           description={vacancy.description?.substring(0, 160)}
           image={vacancy.organization?.logo_url || undefined}
+          type="article"
+          publishedTime={vacancy.created_at}
+          modifiedTime={vacancy.renewed_at || vacancy.created_at}
         />
 
         {/* Back nav */}

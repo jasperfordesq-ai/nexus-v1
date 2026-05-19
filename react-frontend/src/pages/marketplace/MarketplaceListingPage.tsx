@@ -527,6 +527,10 @@ export function MarketplaceListingPage() {
       <PageMeta
         title={`${listing.title} - ${t('page_title', 'Marketplace')}`}
         description={listing.description?.slice(0, 160)}
+        image={listing.images.find((image) => image.is_primary)?.url || listing.images[0]?.url}
+        type="article"
+        publishedTime={listing.created_at}
+        modifiedTime={listing.updated_at}
       />
 
       <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
