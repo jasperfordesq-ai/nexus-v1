@@ -426,14 +426,16 @@ export default function PlatformInfrastructure({ config, onConfigChange }: Platf
                   autoComplete="off"
                   isDisabled={savingKeys}
                   endContent={
-                    <button
-                      type="button"
-                      onClick={() => setShowGoogleKey((v) => !v)}
-                      className="text-default-400 hover:text-default-600"
-                      aria-label={showGoogleKey ? 'Hide key' : 'Show key'}
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      className="text-default-500"
+                      aria-label={showGoogleKey ? t('tenant_features.hide_key') : t('tenant_features.show_key')}
+                      onPress={() => setShowGoogleKey((v) => !v)}
                     >
                       {showGoogleKey ? <EyeOff size={14} /> : <Eye size={14} />}
-                    </button>
+                    </Button>
                   }
                 />
                 {googleMapsKeySet && (
@@ -496,14 +498,16 @@ export default function PlatformInfrastructure({ config, onConfigChange }: Platf
                   autoComplete="off"
                   isDisabled={savingKeys}
                   endContent={
-                    <button
-                      type="button"
-                      onClick={() => setShowMaptilerKey((v) => !v)}
-                      className="text-default-400 hover:text-default-600"
-                      aria-label={showMaptilerKey ? 'Hide key' : 'Show key'}
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      className="text-default-500"
+                      aria-label={showMaptilerKey ? t('tenant_features.hide_key') : t('tenant_features.show_key')}
+                      onPress={() => setShowMaptilerKey((v) => !v)}
                     >
                       {showMaptilerKey ? <EyeOff size={14} /> : <Eye size={14} />}
-                    </button>
+                    </Button>
                   }
                 />
                 {maptilerKeySet && (
