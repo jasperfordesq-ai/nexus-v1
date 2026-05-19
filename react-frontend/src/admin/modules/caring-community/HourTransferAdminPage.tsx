@@ -33,6 +33,12 @@ import {
   ModalHeader,
   Spinner,
   Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
   Tabs,
   Textarea,
 } from '@heroui/react';
@@ -89,6 +95,14 @@ const STATUS_COLOR: Record<TransferStatus, 'default' | 'primary' | 'success' | '
   completed: 'success',
   rejected: 'danger',
 };
+
+function formatAdminDate(value: string): string {
+  return new Intl.DateTimeFormat(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(value));
+}
 
 export default function HourTransferAdminPage() {
   const toast = useToast();
@@ -245,8 +259,7 @@ export default function HourTransferAdminPage() {
             <CardHeader className="flex flex-col items-start gap-1">
               <span className="text-base font-semibold">{t('admin.hour_transfers.pending.title')}</span>
               <p className="text-sm text-default-500">
-                Each transfer must be manually approved by an admin. Check that the destination member email
-                matches the member&rsquo;s new account before approving.
+                {t('admin.hour_transfers.pending.description')}
               </p>
             </CardHeader>
             <Divider />
@@ -260,45 +273,39 @@ export default function HourTransferAdminPage() {
                   {t('admin.hour_transfers.pending.empty')}
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-default-50">
-                      <tr className="text-left text-xs uppercase tracking-wide text-default-500">
-                        <th className="px-4 py-3">Date</th>
-                        <th className="px-4 py-3">Member</th>
-                        <th className="px-4 py-3">Destination</th>
-                        <th className="px-4 py-3 text-right">Hours</th>
-                        <th className="px-4 py-3">Reason</th>
-                        <th className="px-4 py-3 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {pending.map((row) => (
-                        <tr
-                          key={row.id}
-                          className="border-t border-default-200 hover:bg-default-50"
-                        >
-                          <td className="px-4 py-3 whitespace-nowrap text-default-500">
-                            {new Date(row.created_at).toLocaleDateString()}
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="font-medium">{row.member_name || '—'}</div>
-                            <div className="text-xs text-default-500">{row.member_email}</div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="font-medium">{row.destination_tenant_slug}</div>
-                            <div className="text-xs text-default-500">
-                              {row.destination_member_email}
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-right tabular-nums">
-                            {row.hours.toFixed(2)}
-                          </td>
-                          <td className="px-4 py-3 text-default-600">
-                            {row.reason || '—'}
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            {canManage ? (
+                <Table aria-label={t('admin.hour_transfers.pending.table_aria')} removeWrapper>
+                  <TableHeader>
+                    <TableColumn>{t('admin.hour_transfers.table.date')}</TableColumn>
+                    <TableColumn>{t('admin.hour_transfers.table.member')}</TableColumn>
+                    <TableColumn>{t('admin.hour_transfers.table.destination')}</TableColumn>
+                    <TableColumn align="end">{t('admin.hour_transfers.table.hours')}</TableColumn>
+                    <TableColumn>{t('admin.hour_transfers.table.reason')}</TableColumn>
+                    <TableColumn align="end">{t('admin.hour_transfers.table.actions')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {pending.map((row) => (
+                      <TableRow key={row.id}>
+                        <TableCell className="whitespace-nowrap text-default-500">
+                          {formatAdminDate(row.created_at)}
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-medium">{row.member_name || t('admin.common.empty_dash')}</div>
+                          <div className="text-xs text-default-500">{row.member_email}</div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-medium">{row.destination_tenant_slug}</div>
+                          <div className="text-xs text-default-500">
+                            {row.destination_member_email}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">
+                          {row.hours.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-default-600">
+                          {row.reason || t('admin.common.empty_dash')}
+                        </TableCell>
+                        <TableCell>
+                          {canManage ? (
                             <div className="flex justify-end gap-2">
                               <Button
                                 size="sm"
@@ -321,15 +328,14 @@ export default function HourTransferAdminPage() {
                                 {t('admin.hour_transfers.actions.reject')}
                               </Button>
                             </div>
-                            ) : (
-                              <span className="text-default-400">{t('admin.common.empty_dash')}</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                          ) : (
+                            <span className="block text-right text-default-400">{t('admin.common.empty_dash')}</span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               )}
             </CardBody>
           </Card>
@@ -351,8 +357,7 @@ export default function HourTransferAdminPage() {
             <CardHeader className="flex flex-col items-start gap-1">
               <span className="text-base font-semibold">{t('admin.hour_transfers.inbound.title')}</span>
               <p className="text-sm text-default-500">
-                This is an audit log only — inbound transfers are processed automatically when the source
-                cooperative approves them. No action is required here.
+                {t('admin.hour_transfers.inbound.description')}
               </p>
             </CardHeader>
             <Divider />
@@ -366,50 +371,43 @@ export default function HourTransferAdminPage() {
                   {t('admin.hour_transfers.inbound.empty')}
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-default-50">
-                      <tr className="text-left text-xs uppercase tracking-wide text-default-500">
-                        <th className="px-4 py-3">Date</th>
-                        <th className="px-4 py-3">Source</th>
-                        <th className="px-4 py-3">Member credited</th>
-                        <th className="px-4 py-3 text-right">Hours</th>
-                        <th className="px-4 py-3">Status</th>
-                        <th className="px-4 py-3">Reason</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {inbound.map((row) => (
-                        <tr
-                          key={row.id}
-                          className="border-t border-default-200 hover:bg-default-50"
-                        >
-                          <td className="px-4 py-3 whitespace-nowrap text-default-500">
-                            {new Date(row.created_at).toLocaleDateString()}
-                          </td>
-                          <td className="px-4 py-3 font-medium">
-                            {row.source_tenant_slug}
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="font-medium">{row.member_name || '—'}</div>
-                            <div className="text-xs text-default-500">{row.member_email}</div>
-                          </td>
-                          <td className="px-4 py-3 text-right tabular-nums">
-                            {row.hours.toFixed(2)}
-                          </td>
-                          <td className="px-4 py-3">
-                            <Chip size="sm" variant="flat" color={STATUS_COLOR[row.status] ?? 'default'}>
-                              {row.status}
-                            </Chip>
-                          </td>
-                          <td className="px-4 py-3 text-default-600">
-                            {row.reason || '—'}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <Table aria-label={t('admin.hour_transfers.inbound.table_aria')} removeWrapper>
+                  <TableHeader>
+                    <TableColumn>{t('admin.hour_transfers.table.date')}</TableColumn>
+                    <TableColumn>{t('admin.hour_transfers.table.source')}</TableColumn>
+                    <TableColumn>{t('admin.hour_transfers.table.member_credited')}</TableColumn>
+                    <TableColumn align="end">{t('admin.hour_transfers.table.hours')}</TableColumn>
+                    <TableColumn>{t('admin.hour_transfers.table.status')}</TableColumn>
+                    <TableColumn>{t('admin.hour_transfers.table.reason')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {inbound.map((row) => (
+                      <TableRow key={row.id}>
+                        <TableCell className="whitespace-nowrap text-default-500">
+                          {formatAdminDate(row.created_at)}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {row.source_tenant_slug}
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-medium">{row.member_name || t('admin.common.empty_dash')}</div>
+                          <div className="text-xs text-default-500">{row.member_email}</div>
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">
+                          {row.hours.toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          <Chip size="sm" variant="flat" color={STATUS_COLOR[row.status] ?? 'default'}>
+                            {t(`admin.hour_transfers.status.${row.status}`)}
+                          </Chip>
+                        </TableCell>
+                        <TableCell className="text-default-600">
+                          {row.reason || t('admin.common.empty_dash')}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               )}
             </CardBody>
           </Card>

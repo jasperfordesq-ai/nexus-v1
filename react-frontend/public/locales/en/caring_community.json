@@ -500,7 +500,8 @@
         "status": "Status",
         "actions": "Actions",
         "reverse": "Reverse",
-        "empty_value": "-"
+        "empty_value": "-",
+        "aria": "Recent loyalty redemptions"
       },
       "reverse_modal": {
         "title": "Reverse redemption",
@@ -525,6 +526,11 @@
         "discount_range": "Max discount percent must be between 0 and 100",
         "save_settings": "Failed to save settings",
         "reverse": "Failed to reverse redemption"
+      },
+      "status": {
+        "pending": "Pending",
+        "applied": "Applied",
+        "reversed": "Reversed"
       }
     },
     "hour_transfers": {
@@ -537,11 +543,34 @@
       },
       "pending": {
         "title": "Awaiting your approval",
-        "empty": "No pending transfers."
+        "description": "Each transfer must be manually approved by an admin. Check that the destination member email matches the member's new account before approving.",
+        "empty": "No pending transfers.",
+        "table_aria": "Pending outbound hour transfers"
       },
       "inbound": {
         "title": "Received from other cooperatives (last 90 days)",
-        "empty": "No transfers received in the last 90 days."
+        "description": "This is an audit log only - inbound transfers are processed automatically when the source cooperative approves them. No action is required here.",
+        "empty": "No transfers received in the last 90 days.",
+        "table_aria": "Inbound hour transfers"
+      },
+      "table": {
+        "actions": "Actions",
+        "date": "Date",
+        "destination": "Destination",
+        "hours": "Hours",
+        "member": "Member",
+        "member_credited": "Member credited",
+        "reason": "Reason",
+        "source": "Source",
+        "status": "Status"
+      },
+      "status": {
+        "approved_by_source": "Approved by source",
+        "completed": "Completed",
+        "pending": "Pending",
+        "received": "Received",
+        "rejected": "Rejected",
+        "sent": "Sent"
       },
       "actions": {
         "approve": "Approve",
@@ -1060,6 +1089,79 @@
       "errors": {
         "save_failed": "Failed to save configuration.",
         "recompute_failed": "Failed to recompute tiers."
+      }
+    },
+    "regional_points": {
+      "title": "Regional Points",
+      "description": "Third-currency programme - runs alongside time credits and the marketplace currency. Disabled by default.",
+      "about": {
+        "title": "About this page",
+        "body": "Regional Points are supplementary credits used to recognise contributions that don't fit the standard hour exchange model - for example, attending community events, participating in surveys, or completing training. They are distinct from time credits (care hours) and cannot be converted to them. Use them to encourage broader community participation beyond direct care.",
+        "secondary": "Allocate points manually to individual members using the issue or adjust tools below. Points appear in the member's wallet alongside their time credit balance. Members can redeem Regional Points for local rewards defined in the Loyalty programme. Points expire after 12 months unless the expiry setting is set to 0 (never expire)."
+      },
+      "stats": {
+        "total_balance": "Total balance issued",
+        "lifetime_issued": "Lifetime issued",
+        "lifetime_spent": "Lifetime spent",
+        "member_accounts": "Member accounts"
+      },
+      "config": {
+        "title": "Programme configuration",
+        "enabled": "Programme enabled",
+        "enabled_hint": "When off, the third currency is hidden from members and admin endpoints return 403.",
+        "display_label": "Display label",
+        "display_label_description": "Shown in the wallet (e.g. 'Regional Points', 'Stadtmuenze')",
+        "symbol": "Symbol",
+        "symbol_description": "Short suffix shown next to amounts (e.g. 'pts', 'SM')",
+        "auto_issue": "Auto-issue on approved hours",
+        "auto_issue_hint": "When a verified hour is logged, automatically award this many regional points.",
+        "points_per_hour": "Points per approved hour",
+        "member_transfers": "Member-to-member transfers",
+        "member_transfers_hint": "Allow members to send points to each other.",
+        "marketplace_redemption": "Marketplace redemption",
+        "marketplace_redemption_hint": "Allow members to redeem points as a CHF discount on participating sellers.",
+        "save": "Save configuration"
+      },
+      "member_balance": {
+        "title": "Issue / adjust member balance",
+        "member": "Member",
+        "member_placeholder": "Search by name or email",
+        "no_matching_members": "No matching members",
+        "clear": "Clear",
+        "tabs_aria": "Regional points balance actions",
+        "issue_tab": "Issue points",
+        "points_to_issue": "Points to issue",
+        "description": "Description",
+        "issue": "Issue points",
+        "adjust_tab": "Adjust (+/-)",
+        "points_delta": "Points delta (positive or negative)",
+        "apply_adjustment": "Apply adjustment"
+      },
+      "ledger": {
+        "title": "Recent ledger entries",
+        "aria": "Recent regional points ledger entries",
+        "empty": "No ledger entries yet.",
+        "date": "Date",
+        "member": "Member",
+        "type": "Type",
+        "description": "Description",
+        "points": "Points",
+        "balance": "Balance",
+        "user_fallback": "#{{id}}"
+      },
+      "messages": {
+        "config_saved": "Configuration saved",
+        "issued": "Issued {{amount}} points to {{member}}",
+        "adjusted": "Adjusted {{member}} by {{delta}} points"
+      },
+      "errors": {
+        "load": "Failed to load regional points",
+        "save_config": "Failed to save configuration",
+        "pick_member": "Pick a member first",
+        "positive_amount": "Enter a positive amount",
+        "issue": "Failed to issue points",
+        "non_zero_delta": "Enter a non-zero delta (positive or negative)",
+        "adjust": "Failed to adjust points"
       }
     }
   },
