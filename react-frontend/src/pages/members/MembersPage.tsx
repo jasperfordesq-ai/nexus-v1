@@ -524,14 +524,16 @@ export function MembersPage() {
                 variant="flat"
                 className="bg-theme-elevated text-theme-secondary"
                 endContent={
-                  <button
-                    type="button"
-                    className="ml-1 rounded-full p-0.5 text-theme-subtle transition-colors hover:bg-theme-hover hover:text-theme-primary"
-                    onClick={resetSearch}
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="light"
+                    className="ml-1 h-5 min-w-5 text-theme-subtle"
+                    onPress={resetSearch}
                     aria-label={t('members.clear_search')}
                   >
                     <X className="h-3 w-3" aria-hidden="true" />
-                  </button>
+                  </Button>
                 }
               >
                 {t('members.search_filter', { query: debouncedQuery })}

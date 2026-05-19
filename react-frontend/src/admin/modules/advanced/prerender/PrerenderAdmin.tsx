@@ -1414,13 +1414,16 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
           return (
             <TableRow key={r.slug}>
               <TableCell>
-                <button
-                  className="font-medium text-primary hover:underline"
-                  onClick={() => onDrillDown(r.slug)}
+                <Button
+                  size="sm"
+                  variant="light"
+                  color="primary"
+                  className="h-auto min-h-0 justify-start px-0 font-medium"
+                  onPress={() => onDrillDown(r.slug)}
                   title={t('actions.open_in_inventory')}
                 >
                   {r.slug}
-                </button>
+                </Button>
               </TableCell>
               <TableCell className="text-xs">{r.host}</TableCell>
               <TableCell>
@@ -1431,27 +1434,27 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
               <TableCell>
                 {r.stale_routes.length > 0 ? (
                   <Tooltip content={r.stale_routes.join(', ')}>
-                    <button onClick={() => onDrillDown(r.slug)} className="cursor-pointer">
-                      <Chip color="warning" variant="flat" size="sm">{r.stale_routes.length}</Chip>
-                    </button>
+                    <Button size="sm" color="warning" variant="flat" onPress={() => onDrillDown(r.slug)}>
+                      {r.stale_routes.length}
+                    </Button>
                   </Tooltip>
                 ) : <span className="text-default-400 text-xs">—</span>}
               </TableCell>
               <TableCell>
                 {r.asset_invalid_routes.length > 0 ? (
                   <Tooltip content={r.asset_invalid_routes.join(', ')}>
-                    <button onClick={() => onDrillDown(r.slug)} className="cursor-pointer">
-                      <Chip color="danger" variant="flat" size="sm">{r.asset_invalid_routes.length}</Chip>
-                    </button>
+                    <Button size="sm" color="danger" variant="flat" onPress={() => onDrillDown(r.slug)}>
+                      {r.asset_invalid_routes.length}
+                    </Button>
                   </Tooltip>
                 ) : <span className="text-default-400 text-xs">—</span>}
               </TableCell>
               <TableCell>
                 {r.missing_routes.length > 0 ? (
                   <Tooltip content={r.missing_routes.join(', ')}>
-                    <button onClick={() => onDrillDown(r.slug)} className="cursor-pointer">
-                      <Chip color="danger" variant="flat" size="sm">{r.missing_routes.length}</Chip>
-                    </button>
+                    <Button size="sm" color="danger" variant="flat" onPress={() => onDrillDown(r.slug)}>
+                      {r.missing_routes.length}
+                    </Button>
                   </Tooltip>
                 ) : <span className="text-default-400 text-xs">—</span>}
               </TableCell>
@@ -2075,9 +2078,9 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
       <div className="mb-3 flex items-center gap-2 text-sm text-default-500">
         <CheckCircle size={14} className="text-success" />
         {t('engine_healthy')}
-        <button type="button" className="ml-auto text-xs hover:underline" onClick={() => setExpanded((v) => !v)}>
+        <Button size="sm" variant="light" className="ml-auto h-7 text-xs" onPress={() => setExpanded((v) => !v)}>
           {expanded ? t('actions.hide_details') : t('actions.details')}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -2090,9 +2093,9 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
       <div className="flex items-center gap-2">
         <Chip size="sm" color={tone} variant="flat">{health.status.toUpperCase()}</Chip>
         <span className="font-medium">{t('issue_count', { count: failing.length })}</span>
-        <button type="button" className="ml-auto text-xs hover:underline" onClick={() => setExpanded((v) => !v)}>
+        <Button size="sm" variant="light" className="ml-auto h-7 text-xs" onPress={() => setExpanded((v) => !v)}>
           {expanded ? t('actions.hide') : t('actions.details')}
-        </button>
+        </Button>
         {isSuperAdmin && (
           <Button
             size="sm"
