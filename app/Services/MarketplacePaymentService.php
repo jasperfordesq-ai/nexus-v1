@@ -17,6 +17,7 @@ use App\Models\MarketplaceSellerProfile;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\QueryException;
 
 /**
  * MarketplacePaymentService — Stripe Connect integration for the marketplace.
@@ -332,12 +333,23 @@ class MarketplacePaymentService
             throw new \RuntimeException("Payment has not succeeded. Current status: {$paymentIntent->status}");
         }
 
-        // Find the order by payment_intent_id
-        $orderId = (int) ($paymentIntent->metadata->nexus_order_id ?? 0);
-        $order = MarketplaceOrder::find($orderId);
+        $order = MarketplaceOrder::where('payment_intent_id', $paymentIntentId)
+            ->where('tenant_id', $tenantId)
+            ->first();
 
         if (!$order) {
             throw new \RuntimeException('Order not found for this payment intent.');
+        }
+
+        $metadataOrderId = (int) ($paymentIntent->metadata->nexus_order_id ?? 0);
+        if ($metadataOrderId > 0 && $metadataOrderId !== (int) $order->id) {
+            Log::warning('MarketplacePayment: Stripe metadata order mismatch', [
+                'payment_intent_id' => $paymentIntentId,
+                'local_order_id' => $order->id,
+                'metadata_order_id' => $metadataOrderId,
+                'tenant_id' => $tenantId,
+            ]);
+            throw new \RuntimeException('Payment intent does not match the local order.');
         }
 
         // Idempotency: check if payment already recorded (scoped by tenant)
@@ -365,13 +377,32 @@ class MarketplacePaymentService
                 : ($paymentIntent->latest_charge->id ?? null);
         }
 
-        $payment = DB::transaction(function () use (
-            $order, $paymentIntentId, $chargeId, $totalAmount,
-            $platformFee, $sellerPayout, $paymentIntent, $tenantId
-        ) {
+        $createdPayment = false;
+        try {
+            $payment = DB::transaction(function () use (
+                $order, $paymentIntentId, $chargeId, $totalAmount,
+                $platformFee, $sellerPayout, $paymentIntent, $tenantId, &$createdPayment
+            ) {
+            $lockedOrder = MarketplaceOrder::where('id', $order->id)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$lockedOrder) {
+                throw new \RuntimeException('Order not found for this payment intent.');
+            }
+
+            $existingPayment = MarketplacePayment::where('stripe_payment_intent_id', $paymentIntentId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+            if ($existingPayment) {
+                return $existingPayment;
+            }
+
             $payment = new MarketplacePayment();
             $payment->tenant_id = $tenantId;
-            $payment->order_id = $order->id;
+            $payment->order_id = $lockedOrder->id;
             $payment->stripe_payment_intent_id = $paymentIntentId;
             $payment->stripe_charge_id = $chargeId;
             $payment->amount = $totalAmount;
@@ -384,11 +415,28 @@ class MarketplacePaymentService
             $payment->save();
 
             // Transition order to 'paid'
-            $order->status = 'paid';
-            $order->save();
+            $lockedOrder->status = 'paid';
+            $lockedOrder->save();
 
+            $createdPayment = true;
             return $payment;
-        });
+            });
+        } catch (QueryException $e) {
+            $duplicatePayment = MarketplacePayment::where('stripe_payment_intent_id', $paymentIntentId)
+                ->where('tenant_id', $tenantId)
+                ->first();
+            if ($duplicatePayment) {
+                return $duplicatePayment;
+            }
+
+            throw $e;
+        }
+
+        if (!$createdPayment) {
+            return $payment;
+        }
+
+        $order = $order->fresh() ?? $order;
 
         // Create escrow hold if escrow is enabled
         $escrowEnabled = (bool) MarketplaceConfigurationService::get(
@@ -407,6 +455,16 @@ class MarketplacePaymentService
                 ]);
                 // Payment still succeeded — escrow is supplementary
             }
+        }
+
+        try {
+            MarketplaceOrderService::sendPaidNotifications($order, $payment);
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplacePaymentService] paid notification failed', [
+                'order_id' => $order->id,
+                'payment_id' => $payment->id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         Log::info('MarketplacePayment: payment confirmed', [

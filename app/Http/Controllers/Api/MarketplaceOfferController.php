@@ -11,6 +11,7 @@ use App\Models\MarketplaceListing;
 use App\Models\MarketplaceOffer;
 use App\Services\MarketplaceOfferService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 /**
  * MarketplaceOfferController — Offer/negotiation lifecycle for the marketplace module.
@@ -60,6 +61,20 @@ class MarketplaceOfferController extends BaseApiController
             'amount' => 'required|numeric|min:0.01',
             'message' => 'nullable|string|max:500',
         ]);
+
+        $tenantId = TenantContext::getId();
+        $listing = MarketplaceListing::where('id', $listingId)->first();
+        if (!$listing) {
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_2.marketplace_offer.listing_not_found'), null, 404);
+        }
+
+        $buyerBelongsToTenant = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+        if (!$buyerBelongsToTenant) {
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.marketplace_offer.buyer_tenant_mismatch'), null, 403);
+        }
 
         try {
             $offer = MarketplaceOfferService::create($userId, $listingId, $validated);

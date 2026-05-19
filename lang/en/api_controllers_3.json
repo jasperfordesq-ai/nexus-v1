@@ -110,12 +110,18 @@
     "marketplace_order": {
         "confirmed_buyer": "Order #{{order_number}} confirmed — \"{{title}}\"",
         "confirmed_seller": "You have a new order #{{order_number}} for \"{{title}}\"",
+        "paid_buyer": "Payment received for order #{{order_number}}: {{amount}}",
+        "paid_seller": "Order #{{order_number}} has been paid: {{amount}}",
         "shipped": "Your order #{{order_number}} has been shipped!",
         "delivered": "Order #{{order_number}} — buyer confirmed delivery",
         "cancelled": "Order #{{order_number}} has been cancelled",
         "completed": "Order #{{order_number}} has been completed!",
         "refunded": "Refund of {{amount}} {{currency}} processed for order #{{order_number}}",
         "partially_refunded": "Partial refund of {{amount}} {{currency}} processed for order #{{order_number}}"
+    },
+    "marketplace_payment": {
+        "local_order_not_found": "No local order was found for this payment.",
+        "only_buyer_confirm": "Only the buyer can confirm payment."
     },
     "admin_bells": {
         "comment_hidden": "Your comment has been hidden by a moderator.",

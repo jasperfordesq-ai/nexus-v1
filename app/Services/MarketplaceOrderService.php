@@ -430,6 +430,55 @@ class MarketplaceOrderService
         return $order;
     }
 
+    public static function sendPaidNotifications(MarketplaceOrder $order, \App\Models\MarketplacePayment $payment): void
+    {
+        self::withOrderTenant($order, function () use ($order, $payment): void {
+            $listing = MarketplaceListing::find($order->marketplace_listing_id);
+            $title = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
+            $link = '/marketplace/orders/' . $order->id;
+            $currency = strtoupper($payment->currency ?? $order->currency ?? TenantContext::getCurrency() ?? 'EUR');
+            $amount = number_format((float) $payment->amount, 2) . ' ' . $currency;
+
+            try {
+                self::sendOrderEmail(
+                    (int) $order->buyer_id,
+                    'emails_misc.marketplace_order.paid_buyer_subject',
+                    ['order_number' => $order->order_number],
+                    'emails_misc.marketplace_order.paid_buyer_title',
+                    'emails_misc.marketplace_order.paid_buyer_body',
+                    ['order_number' => $order->order_number, 'title' => $title, 'amount' => $amount],
+                    $link
+                );
+                self::sendOrderEmail(
+                    (int) $order->seller_id,
+                    'emails_misc.marketplace_order.paid_seller_subject',
+                    ['order_number' => $order->order_number],
+                    'emails_misc.marketplace_order.paid_seller_title',
+                    'emails_misc.marketplace_order.paid_seller_body',
+                    ['order_number' => $order->order_number, 'title' => $title, 'amount' => $amount],
+                    $link
+                );
+            } catch (\Throwable $e) {
+                Log::warning('[MarketplaceOrderService] paid email failed: ' . $e->getMessage());
+            }
+
+            self::createOrderBell([
+                'user_id' => $order->buyer_id,
+                'message' => __('api_controllers_3.marketplace_order.paid_buyer', ['order_number' => $order->order_number, 'amount' => $amount]),
+                'link' => $link,
+                'type' => 'marketplace_order',
+                'created_at' => now(),
+            ]);
+            self::createOrderBell([
+                'user_id' => $order->seller_id,
+                'message' => __('api_controllers_3.marketplace_order.paid_seller', ['order_number' => $order->order_number, 'amount' => $amount]),
+                'link' => $link,
+                'type' => 'marketplace_order',
+                'created_at' => now(),
+            ]);
+        });
+    }
+
     // -----------------------------------------------------------------
     //  Read
     // -----------------------------------------------------------------

@@ -93,6 +93,45 @@ class MarketplacePaymentControllerTest extends TestCase
         $response->assertStatus(422);
     }
 
+    public function test_confirm_rejects_non_buyer_before_payment_mutation(): void
+    {
+        $this->enableMarketplaceFeature($this->testTenantId);
+
+        $seller = User::factory()->forTenant($this->testTenantId)->create();
+        $buyer = User::factory()->forTenant($this->testTenantId)->create();
+        $otherUser = User::factory()->forTenant($this->testTenantId)->create();
+        $listingId = $this->createListing($this->testTenantId, (int) $seller->id);
+        $orderId = $this->createOrder($this->testTenantId, (int) $buyer->id, (int) $seller->id, $listingId, 'pi_non_buyer_guard');
+
+        Sanctum::actingAs($otherUser);
+
+        $response = $this->apiPost('/v2/marketplace/payments/confirm', [
+            'payment_intent_id' => 'pi_non_buyer_guard',
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseMissing('marketplace_payments', [
+            'tenant_id' => $this->testTenantId,
+            'order_id' => $orderId,
+            'stripe_payment_intent_id' => 'pi_non_buyer_guard',
+        ]);
+        $this->assertSame('pending_payment', DB::table('marketplace_orders')->where('id', $orderId)->value('status'));
+    }
+
+    public function test_confirm_rejects_unknown_local_payment_intent_before_stripe_lookup(): void
+    {
+        $this->enableMarketplaceFeature($this->testTenantId);
+
+        $buyer = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($buyer);
+
+        $response = $this->apiPost('/v2/marketplace/payments/confirm', [
+            'payment_intent_id' => 'pi_missing_local_order',
+        ]);
+
+        $response->assertStatus(404);
+    }
+
     public function test_status_returns_404_for_unknown_payment(): void
     {
         if (! \Schema::hasTable('marketplace_payments')) {
@@ -125,5 +164,47 @@ class MarketplacePaymentControllerTest extends TestCase
         $response = $this->apiGet('/v2/marketplace/seller/payouts');
 
         $this->assertContains($response->getStatusCode(), [401, 403]);
+    }
+
+    private function createListing(int $tenantId, int $sellerId): int
+    {
+        return (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => $sellerId,
+            'title' => 'Payment guard listing',
+            'description' => 'A listing used to verify payment confirmation auth.',
+            'price' => 15.00,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'quantity' => 1,
+            'shipping_available' => 0,
+            'local_pickup' => 1,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'private',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function createOrder(int $tenantId, int $buyerId, int $sellerId, int $listingId, string $paymentIntentId): int
+    {
+        return (int) DB::table('marketplace_orders')->insertGetId([
+            'tenant_id' => $tenantId,
+            'order_number' => 'MKT-PAY-' . uniqid(),
+            'buyer_id' => $buyerId,
+            'seller_id' => $sellerId,
+            'marketplace_listing_id' => $listingId,
+            'marketplace_offer_id' => null,
+            'quantity' => 1,
+            'unit_price' => 15.00,
+            'total_price' => 15.00,
+            'currency' => 'EUR',
+            'status' => 'pending_payment',
+            'payment_intent_id' => $paymentIntentId,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

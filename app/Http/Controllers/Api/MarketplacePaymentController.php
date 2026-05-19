@@ -80,14 +80,17 @@ class MarketplacePaymentController extends BaseApiController
             'payment_intent_id' => 'required|string|max:255',
         ]);
 
+        $order = MarketplaceOrder::where('payment_intent_id', $data['payment_intent_id'])->first();
+        if (!$order) {
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_3.marketplace_payment.local_order_not_found'), null, 404);
+        }
+
+        if ((int) $order->buyer_id !== (int) $userId) {
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_3.marketplace_payment.only_buyer_confirm'), null, 403);
+        }
+
         try {
             $payment = MarketplacePaymentService::confirmPayment($data['payment_intent_id']);
-
-            // Verify the buyer is the one confirming
-            $order = $payment->order;
-            if ($order && $order->buyer_id !== $userId) {
-                return $this->respondWithError('FORBIDDEN', 'Only the buyer can confirm payment.', null, 403);
-            }
 
             return $this->respondWithData([
                 'payment_id' => $payment->id,

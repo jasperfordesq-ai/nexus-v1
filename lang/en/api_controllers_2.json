@@ -60,6 +60,8 @@
   "marketplace_listing.csv_missing_column": "CSV file must contain a ':col' column.",
   "marketplace_listing.imported_as_drafts": ":count listing(s) imported as drafts.",
   "marketplace_offer.feature_disabled": "The marketplace feature is not enabled for this community.",
+  "marketplace_offer.listing_not_found": "Listing not found.",
+  "marketplace_offer.buyer_tenant_mismatch": "You can only make offers from your current community.",
   "marketplace_offer.not_own_listing": "You do not own this listing.",
   "marketplace_offer.only_seller_accept": "Only the seller can accept this offer.",
   "marketplace_offer.only_seller_decline": "Only the seller can decline this offer.",
