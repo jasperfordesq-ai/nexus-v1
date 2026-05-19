@@ -1928,7 +1928,9 @@ function EventsTab() {
                 <TableRow key={idx}>
                   <TableCell className="text-xs">{ts ? formatTs(ts) : '—'}</TableCell>
                   <TableCell>
-                    <Chip color={color} variant="flat" size="sm">{ev || '—'}</Chip>
+                    <Chip color={color} variant="flat" size="sm">
+                      {ev ? t(`types.${ev}`, { defaultValue: ev }) : '—'}
+                    </Chip>
                   </TableCell>
                   <TableCell className="text-xs font-mono">{commit || '—'}</TableCell>
                   <TableCell className="text-xs">

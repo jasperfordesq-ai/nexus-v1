@@ -2019,7 +2019,13 @@
           "limit": "Limit"
         },
         "summary": "{{count}} events",
-        "table_aria": "Events"
+        "table_aria": "Events",
+        "types": {
+          "fail": "Fail",
+          "partial": "Partial",
+          "success": "Success",
+          "supersede": "Supersede"
+        }
       },
       "failures": {
         "columns": {
