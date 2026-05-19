@@ -95,7 +95,7 @@ const CONDITION_COLORS: Record<string, 'success' | 'primary' | 'warning' | 'dang
 
 export function MarketplaceSearchPage() {
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('search.page_title', 'Search Marketplace'));
+  usePageTitle(t('search.page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -200,7 +200,7 @@ export function MarketplaceSearchPage() {
     } catch (err) {
       logError('Failed to search marketplace', err);
       if (!append) {
-        toast.error(t('search.search_failed', 'Search failed. Please try again.'));
+        toast.error(t('search.search_failed'));
       }
     } finally {
       setIsLoading(false);
@@ -256,7 +256,7 @@ export function MarketplaceSearchPage() {
   // Save / Unsave
   const handleSave = async (id: number) => {
     if (!isAuthenticated) {
-      toast.error(t('common.sign_in_to_save', 'Please sign in to save listings'));
+      toast.error(t('common.sign_in_to_save'));
       return;
     }
     try {
@@ -264,16 +264,16 @@ export function MarketplaceSearchPage() {
       setListings((prev) =>
         prev.map((l) => (l.id === id ? { ...l, is_saved: true } : l))
       );
-      toast.success(t('common.saved_for_later', 'Saved for later'));
+      toast.success(t('common.saved_for_later'));
     } catch (err) {
       logError('Failed to save listing', err);
-      toast.error(t('common.save_failed', 'Failed to update saved status'));
+      toast.error(t('common.save_failed'));
     }
   };
 
   const handleUnsave = async (id: number) => {
     if (!isAuthenticated) {
-      toast.error(t('common.sign_in_to_save', 'Please sign in to save listings'));
+      toast.error(t('common.sign_in_to_save'));
       return;
     }
     try {
@@ -281,10 +281,10 @@ export function MarketplaceSearchPage() {
       setListings((prev) =>
         prev.map((l) => (l.id === id ? { ...l, is_saved: false } : l))
       );
-      toast.success(t('common.removed_from_saved', 'Removed from saved'));
+      toast.success(t('common.removed_from_saved'));
     } catch (err) {
       logError('Failed to unsave listing', err);
-      toast.error(t('common.save_failed', 'Failed to update saved status'));
+      toast.error(t('common.save_failed'));
     }
   };
 
@@ -293,9 +293,9 @@ export function MarketplaceSearchPage() {
     <div className="space-y-5">
       {/* Category */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.category_label', 'Category')}</label>
+        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.category_label')}</label>
         <Select
-          placeholder={t('search.all_categories', 'All Categories')}
+          placeholder={t('search.all_categories')}
           selectedKeys={categoryId ? [categoryId] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];
@@ -313,12 +313,12 @@ export function MarketplaceSearchPage() {
 
       {/* Price range */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.price_range', 'Price Range')}</label>
+        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.price_range')}</label>
         <div className="flex gap-2 items-center">
           <Input
             size="sm"
             type="number"
-            placeholder={t('search.price_min', 'Min')}
+            placeholder={t('search.price_min')}
             min={0}
             value={priceMin}
             onValueChange={setPriceMin}
@@ -327,7 +327,7 @@ export function MarketplaceSearchPage() {
           <Input
             size="sm"
             type="number"
-            placeholder={t('search.price_max', 'Max')}
+            placeholder={t('search.price_max')}
             min={0}
             value={priceMax}
             onValueChange={setPriceMax}
@@ -337,7 +337,7 @@ export function MarketplaceSearchPage() {
 
       {/* Condition */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.condition_label', 'Condition')}</label>
+        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.condition_label')}</label>
         <CheckboxGroup
           value={selectedConditions}
           onValueChange={setSelectedConditions}
@@ -353,9 +353,9 @@ export function MarketplaceSearchPage() {
 
       {/* Seller type */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.seller_type_label', 'Seller Type')}</label>
+        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.seller_type_label')}</label>
         <Select
-          placeholder={t('search.all_sellers', 'All Sellers')}
+          placeholder={t('search.all_sellers')}
           selectedKeys={sellerType ? [sellerType] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];
@@ -363,16 +363,16 @@ export function MarketplaceSearchPage() {
           }}
           size="sm"
         >
-          <SelectItem key="private">{t('search.private', 'Private')}</SelectItem>
-          <SelectItem key="business">{t('search.business', 'Business')}</SelectItem>
+          <SelectItem key="private">{t('search.private')}</SelectItem>
+          <SelectItem key="business">{t('search.business')}</SelectItem>
         </Select>
       </div>
 
       {/* Delivery method */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.delivery_label', 'Delivery')}</label>
+        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.delivery_label')}</label>
         <Select
-          placeholder={t('search.any_delivery', 'Any Delivery')}
+          placeholder={t('search.any_delivery')}
           selectedKeys={deliveryMethod ? [deliveryMethod] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];
@@ -380,17 +380,17 @@ export function MarketplaceSearchPage() {
           }}
           size="sm"
         >
-          <SelectItem key="pickup">{t('search.delivery_pickup', 'Pickup Only')}</SelectItem>
-          <SelectItem key="shipping">{t('search.delivery_shipping', 'Shipping Only')}</SelectItem>
-          <SelectItem key="both">{t('search.delivery_both', 'Pickup or Shipping')}</SelectItem>
+          <SelectItem key="pickup">{t('search.delivery_pickup')}</SelectItem>
+          <SelectItem key="shipping">{t('search.delivery_shipping')}</SelectItem>
+          <SelectItem key="both">{t('search.delivery_both')}</SelectItem>
         </Select>
       </div>
 
       {/* Posted within */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.posted_within', 'Posted Within')}</label>
+        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.posted_within')}</label>
         <Select
-          placeholder={t('search.any_time', 'Any Time')}
+          placeholder={t('search.any_time')}
           selectedKeys={postedWithin ? [postedWithin] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];
@@ -414,7 +414,7 @@ export function MarketplaceSearchPage() {
           startContent={<RotateCcw className="w-3.5 h-3.5" />}
           onPress={resetFilters}
         >
-          {t('search.reset_filters', 'Reset Filters ({{count}})', { count: activeFilterCount })}
+          {t('search.reset_filters', { count: activeFilterCount })}
         </Button>
       )}
     </div>
@@ -423,8 +423,8 @@ export function MarketplaceSearchPage() {
   return (
     <>
       <PageMeta
-        title={t('search.page_title', 'Search Marketplace')}
-        description={t('search.meta_description', 'Search and filter items in the community marketplace.')}
+        title={t('search.page_title')}
+        description={t('search.meta_description')}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
@@ -437,16 +437,16 @@ export function MarketplaceSearchPage() {
               variant="light"
               size="sm"
             >
-              {t('page_title', 'Marketplace')}
+              {t('page_title')}
             </Button>
             <span className="text-default-300">/</span>
-            <span className="text-foreground font-medium">{t('search.breadcrumb_search', 'Search')}</span>
+            <span className="text-foreground font-medium">{t('search.breadcrumb_search')}</span>
           </div>
 
           {/* Search bar + sort */}
-          <div className="flex gap-3 items-end">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <Input
-              placeholder={t('search.search_placeholder', 'Search marketplace...')}
+              placeholder={t('search.search_placeholder')}
               value={searchQuery}
               onValueChange={setSearchQuery}
               startContent={<Search className="w-4 h-4 text-default-400" />}
@@ -455,7 +455,7 @@ export function MarketplaceSearchPage() {
               classNames={{ inputWrapper: 'bg-background' }}
               isClearable
               onClear={() => setSearchQuery('')}
-              className="flex-1"
+              className="w-full sm:flex-1"
             />
             <Select
               selectedKeys={[sortBy]}
@@ -465,7 +465,7 @@ export function MarketplaceSearchPage() {
               }}
               size="lg"
               className="w-48 shrink-0 hidden sm:block"
-              aria-label={t('common.sort_by', 'Sort by')}
+              aria-label={t('common.sort_by')}
             >
               {SORT_OPTIONS.map((opt) => (
                 <SelectItem key={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
@@ -476,11 +476,11 @@ export function MarketplaceSearchPage() {
             <Button
               variant="bordered"
               size="lg"
-              className="lg:hidden shrink-0"
+              className="w-full shrink-0 sm:w-auto lg:hidden"
               startContent={<SlidersHorizontal className="w-4 h-4" />}
               onPress={() => setShowFilters(!showFilters)}
             >
-              {t('search.filters', 'Filters')}
+              {t('search.filters')}
               {activeFilterCount > 0 && (
                 <Chip size="sm" color="primary" variant="solid" className="ml-1">
                   {activeFilterCount}
@@ -508,7 +508,7 @@ export function MarketplaceSearchPage() {
                   size="sm"
                 >
                   {priceMin && priceMax ? `${priceMin} - ${priceMax}` :
-                    priceMin ? t('search.price_from', 'From {{min}}', { min: priceMin }) : t('search.price_up_to', 'Up to {{max}}', { max: priceMax })}
+                    priceMin ? t('search.price_from', { min: priceMin }) : t('search.price_up_to', { max: priceMax })}
                 </Chip>
               )}
               {selectedConditions.map((c) => (
@@ -524,7 +524,7 @@ export function MarketplaceSearchPage() {
               ))}
               {sellerType && (
                 <Chip onClose={() => setSellerType('')} variant="flat" size="sm">
-                  {sellerType === 'business' ? t('search.business', 'Business') : t('search.private', 'Private')}
+                  {sellerType === 'business' ? t('search.business') : t('search.private')}
                 </Chip>
               )}
               {deliveryMethod && (
@@ -562,7 +562,7 @@ export function MarketplaceSearchPage() {
             <GlassCard className="p-5 sticky top-24">
               <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-primary" />
-                {t('search.filters_title', 'Filters')}
+                {t('search.filters_title')}
               </h3>
               {filterContent}
             </GlassCard>
@@ -575,11 +575,11 @@ export function MarketplaceSearchPage() {
             ) : listings.length === 0 ? (
               <EmptyState
                 icon={<Search className="w-8 h-8" />}
-                title={t('search.no_results_title', 'No Results Found')}
-                description={t('search.no_results_description', "Try adjusting your search or filters to find what you're looking for.")}
+                title={t('search.no_results_title')}
+                description={t('search.no_results_description')}
                 action={
                   activeFilterCount > 0
-                    ? { label: t('search.clear_filters', 'Clear Filters'), onClick: resetFilters }
+                    ? { label: t('search.clear_filters'), onClick: resetFilters }
                     : undefined
                 }
               />
@@ -587,9 +587,9 @@ export function MarketplaceSearchPage() {
               <>
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm text-default-500">
-                    {t('search.results_count', '{{count}} result', { count: listings.length })}{listings.length !== 1 ? 's' : ''}
+                    {t('search.results_count', { count: listings.length })}
                     {debouncedQuery && (
-                      <> {t('search.results_for', 'for')} &quot;<span className="font-medium text-foreground">{debouncedQuery}</span>&quot;</>
+                      <> {t('search.results_for')} &quot;<span className="font-medium text-foreground">{debouncedQuery}</span>&quot;</>
                     )}
                   </p>
                   {/* Mobile sort */}
@@ -601,7 +601,7 @@ export function MarketplaceSearchPage() {
                     }}
                     size="sm"
                     className="w-44 sm:hidden"
-                    aria-label={t('common.sort_by', 'Sort by')}
+                    aria-label={t('common.sort_by')}
                   >
                     {SORT_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
@@ -624,7 +624,7 @@ export function MarketplaceSearchPage() {
                       onPress={() => loadListings(true)}
                       isLoading={isLoadingMore}
                     >
-                      {t('search.load_more', 'Load More')}
+                      {t('search.load_more')}
                     </Button>
                   </div>
                 )}
