@@ -172,6 +172,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'newsletter_queue' => $this->queueSourceDiagnostics('newsletter_queue', $tenantId),
             'marketplace_report_notifications' => $this->queueSourceDiagnostics('marketplace_report_notifications', $tenantId),
             'event_reminders' => $this->queueSourceDiagnostics('event_reminders', $tenantId),
+            'reviews' => $this->queueSourceDiagnostics('reviews', $tenantId),
         ];
 
         $notificationRows = collect();
@@ -337,10 +338,48 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->map(fn ($row) => $this->queueRow('event_reminders', $row));
         }
 
+        $reviewRows = collect();
+        if (($source === '' || $source === 'reviews') && $this->hasFederationReviewDeliveryColumns()) {
+            $reviewQuery = DB::table('reviews as r')
+                ->leftJoin('users as u', function ($join) {
+                    $join->on('u.id', '=', 'r.receiver_id')
+                        ->on('u.tenant_id', '=', 'r.tenant_id');
+                })
+                ->where('r.review_type', 'federated')
+                ->whereNotNull('r.external_partner_id')
+                ->whereNotNull('r.external_id')
+                ->when($tenantId !== null, fn ($q) => $q->where('r.tenant_id', $tenantId));
+
+            $this->applyFederationReviewDeliveryStatusFilter($reviewQuery, $statuses);
+
+            $reviewRows = $reviewQuery
+                ->orderByDesc('r.id')
+                ->limit($limit)
+                ->get([
+                    'r.id',
+                    'r.tenant_id',
+                    'r.receiver_id as user_id',
+                    'u.email',
+                    DB::raw("'federation_review' as category"),
+                    'r.external_id as subject',
+                    DB::raw($this->federationReviewDeliveryStatusExpression() . ' as status'),
+                    DB::raw('NULL as frequency'),
+                    DB::raw('0 as attempts'),
+                    'r.email_claimed_at as last_attempted_at',
+                    'r.email_last_error as error',
+                    DB::raw('NULL as processing_batch_id'),
+                    'r.email_claimed_at as processing_started_at',
+                    'r.email_sent_at as sent_at',
+                    'r.created_at',
+                ])
+                ->map(fn ($row) => $this->queueRow('reviews', $row));
+        }
+
         $rows = $notificationRows
             ->merge($newsletterRows)
             ->merge($marketplaceReportRows)
             ->merge($eventReminderRows)
+            ->merge($reviewRows)
             ->sortByDesc('created_at')
             ->values()
             ->take($limit);
@@ -522,7 +561,114 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ];
         }
 
+        if ($source === 'reviews') {
+            if (!$this->hasFederationReviewDeliveryColumns()) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $base = DB::table('reviews as r')
+                ->where('r.review_type', 'federated')
+                ->whereNotNull('r.external_partner_id')
+                ->whereNotNull('r.external_id')
+                ->when($tenantId !== null, fn ($q) => $q->where('r.tenant_id', $tenantId));
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => $this->queueStatusCounts($base, $this->federationReviewDeliveryStatusExpression()),
+                'stale_pending' => (clone $base)
+                    ->whereNull('r.email_sent_at')
+                    ->whereNull('r.email_skipped_at')
+                    ->whereNull('r.email_claimed_at')
+                    ->where('r.created_at', '<', now()->subMinutes(15))
+                    ->count(),
+                'stale_processing' => (clone $base)
+                    ->whereNull('r.email_sent_at')
+                    ->whereNull('r.email_skipped_at')
+                    ->whereNotNull('r.email_claimed_at')
+                    ->where('r.email_claimed_at', '<', now()->subMinutes(15))
+                    ->count(),
+                'failed_recent' => (clone $base)
+                    ->whereNull('r.email_sent_at')
+                    ->whereNull('r.email_skipped_at')
+                    ->whereNotNull('r.email_failed_at')
+                    ->where('r.email_failed_at', '>=', now()->subDay())
+                    ->count(),
+                'suppressed_recent' => (clone $base)
+                    ->whereNotNull('r.email_skipped_at')
+                    ->where('r.email_skipped_at', '>=', now()->subDay())
+                    ->count(),
+                'oldest_pending_at' => (clone $base)
+                    ->whereNull('r.email_sent_at')
+                    ->whereNull('r.email_skipped_at')
+                    ->min('r.created_at'),
+                'returned' => 0,
+            ];
+        }
+
         return $this->unavailableQueueDiagnostics($source);
+    }
+
+    private function hasFederationReviewDeliveryColumns(): bool
+    {
+        return Schema::hasTable('reviews')
+            && Schema::hasColumn('reviews', 'external_partner_id')
+            && Schema::hasColumn('reviews', 'external_id')
+            && Schema::hasColumn('reviews', 'email_sent_at')
+            && Schema::hasColumn('reviews', 'email_claimed_at')
+            && Schema::hasColumn('reviews', 'email_skipped_at')
+            && Schema::hasColumn('reviews', 'email_failed_at')
+            && Schema::hasColumn('reviews', 'email_last_error');
+    }
+
+    /**
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param list<string> $statuses
+     */
+    private function applyFederationReviewDeliveryStatusFilter($query, array $statuses): void
+    {
+        $query->where(function ($q) use ($statuses): void {
+            if (in_array('failed', $statuses, true)) {
+                $q->orWhere(function ($status) {
+                    $status->whereNull('r.email_sent_at')
+                        ->whereNull('r.email_skipped_at')
+                        ->whereNotNull('r.email_failed_at');
+                });
+            }
+
+            if (in_array('suppressed', $statuses, true)) {
+                $q->orWhereNotNull('r.email_skipped_at');
+            }
+
+            if (in_array('processing', $statuses, true)) {
+                $q->orWhere(function ($status) {
+                    $status->whereNull('r.email_sent_at')
+                        ->whereNull('r.email_skipped_at')
+                        ->whereNotNull('r.email_claimed_at')
+                        ->where('r.email_claimed_at', '<', now()->subMinutes(15));
+                });
+            }
+
+            if (in_array('pending', $statuses, true)) {
+                $q->orWhere(function ($status) {
+                    $status->whereNull('r.email_sent_at')
+                        ->whereNull('r.email_skipped_at')
+                        ->whereNull('r.email_claimed_at')
+                        ->where('r.created_at', '<', now()->subMinutes(15));
+                });
+            }
+        });
+    }
+
+    private function federationReviewDeliveryStatusExpression(): string
+    {
+        return "CASE
+            WHEN r.email_sent_at IS NOT NULL THEN 'sent'
+            WHEN r.email_skipped_at IS NOT NULL THEN 'suppressed'
+            WHEN r.email_failed_at IS NOT NULL THEN 'failed'
+            WHEN r.email_claimed_at IS NOT NULL THEN 'processing'
+            ELSE 'pending'
+        END";
     }
 
     /**

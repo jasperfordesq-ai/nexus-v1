@@ -200,4 +200,61 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         $sources = collect($response->json('data.rows'))->pluck('source')->unique()->values()->all();
         $this->assertSame(['event_reminders'], $sources);
     }
+
+    public function test_queues_endpoint_surfaces_federated_review_delivery_failures(): void
+    {
+        if (
+            !Schema::hasTable('reviews')
+            || !Schema::hasColumn('reviews', 'external_partner_id')
+            || !Schema::hasColumn('reviews', 'external_id')
+            || !Schema::hasColumn('reviews', 'email_claimed_at')
+            || !Schema::hasColumn('reviews', 'email_sent_at')
+            || !Schema::hasColumn('reviews', 'email_skipped_at')
+            || !Schema::hasColumn('reviews', 'email_failed_at')
+            || !Schema::hasColumn('reviews', 'email_last_error')
+        ) {
+            $this->markTestSkipped('Federated review delivery columns are not available.');
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $reviewer = User::factory()->forTenant(999)->create();
+        $receiver = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'federated-review-queue@example.test',
+        ]);
+        Sanctum::actingAs($admin);
+
+        DB::table('reviews')->insert([
+            'tenant_id' => $this->testTenantId,
+            'external_partner_id' => 876543,
+            'external_id' => 'admin-queue-fed-review-' . uniqid(),
+            'reviewer_id' => $reviewer->id,
+            'reviewer_tenant_id' => 999,
+            'receiver_id' => $receiver->id,
+            'receiver_tenant_id' => $this->testTenantId,
+            'rating' => 5,
+            'comment' => 'Federated review delivery diagnostics',
+            'review_type' => 'federated',
+            'status' => 'approved',
+            'show_cross_tenant' => 1,
+            'notification_sent_at' => null,
+            'email_sent_at' => null,
+            'email_skipped_at' => null,
+            'email_failed_at' => now()->subMinutes(2),
+            'email_last_error' => 'simulated federated review mail failure',
+            'created_at' => now()->subMinutes(20),
+            'updated_at' => now()->subMinutes(2),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/email-deliverability/queues?source=reviews&limit=10');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.diagnostics.reviews.available', true);
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.reviews.failed_recent'));
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.reviews.status_counts.failed'));
+
+        $rows = collect($response->json('data.rows'));
+        $this->assertSame(['reviews'], $rows->pluck('source')->unique()->values()->all());
+        $this->assertSame('failed', $rows->first()['status'] ?? null);
+        $this->assertSame('federated-review-queue@example.test', $rows->first()['email'] ?? null);
+    }
 }

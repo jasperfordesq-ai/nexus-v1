@@ -11548,7 +11548,8 @@
         "event_reminders": "Event reminder",
         "marketplace_report_notifications": "Marketplace report",
         "newsletter_queue": "Newsletter",
-        "notification_queue": "Notification"
+        "notification_queue": "Notification",
+        "reviews": "Federated review"
       }
     },
     "logs": {
@@ -11744,6 +11745,22 @@
       "marketplace_report_appeal_resolved_without_notification_outbox": {
         "title": "Marketplace report appeal resolution email did not queue",
         "body": "{{count}} marketplace report appeals were resolved without a matching final decision email notification row in the last {{window_hours}} hours."
+      },
+      "federation_connection_without_email_evidence": {
+        "title": "Federation connection email evidence missing",
+        "body": "{{count}} federated connection events have no successful email delivery evidence in the last {{window_hours}} hours."
+      },
+      "federation_connection_without_bell_evidence": {
+        "title": "Federation connection notification evidence missing",
+        "body": "{{count}} federated connection events have no in-app notification evidence in the last {{window_hours}} hours."
+      },
+      "federation_review_without_email_evidence": {
+        "title": "Federation review email evidence missing",
+        "body": "{{count}} federated reviews have no successful or intentionally skipped email evidence in the last {{window_hours}} hours."
+      },
+      "federation_review_without_bell_evidence": {
+        "title": "Federation review notification evidence missing",
+        "body": "{{count}} federated reviews have no in-app notification evidence in the last {{window_hours}} hours."
       },
       "critical_email_attempts_missing_tenant_context": {
         "title": "Critical email missing tenant context",

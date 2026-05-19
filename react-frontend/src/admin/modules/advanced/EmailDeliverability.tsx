@@ -101,7 +101,7 @@ interface SuppressionRow {
 }
 
 interface QueueDiagnosticRow {
-  source: 'notification_queue' | 'newsletter_queue' | 'marketplace_report_notifications' | 'event_reminders';
+  source: 'notification_queue' | 'newsletter_queue' | 'marketplace_report_notifications' | 'event_reminders' | 'reviews';
   id: number;
   email: string | null;
   category: string | null;
