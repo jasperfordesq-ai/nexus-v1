@@ -54,9 +54,10 @@ class NotifyJobAlertSubscribers implements ShouldQueue
                 try {
                     $alertUserId = (int) $alert->user_id;
                     $user = \App\Models\User::find($alert->user_id);
+                    $emailSent = false;
 
                     // Bell + push + email all render in the subscriber's language.
-                    LocaleContext::withLocale($user, function () use ($alertUserId, $vacancy, $user, $alert) {
+                    LocaleContext::withLocale($user, function () use ($alertUserId, $vacancy, $user, $alert, &$emailSent) {
                         Notification::createNotification(
                             $alertUserId,
                             __('svc_notifications.job_alert.match_bell', ['title' => $vacancy->title]),
@@ -74,14 +75,22 @@ class NotifyJobAlertSubscribers implements ShouldQueue
                         // Send email alert
                         try {
                             if ($user && $user->email) {
-                                \App\Services\JobAlertEmailService::sendImmediateAlert($user, $vacancy, $alert);
+                                $emailSent = \App\Services\JobAlertEmailService::sendImmediateAlert($user, $vacancy, $alert);
                             }
                         } catch (\Throwable $e) {
                             \Illuminate\Support\Facades\Log::warning('NotifyJobAlertSubscribers: email dispatch failed: ' . $e->getMessage());
                         }
                     });
 
-                    $alert->update(['last_notified_at' => now()]);
+                    if ($emailSent) {
+                        $alert->update(['last_notified_at' => now()]);
+                    } else {
+                        Log::warning('NotifyJobAlertSubscribers: email returned false; alert not marked notified', [
+                            'alert_id' => $alert->id,
+                            'user_id' => $alertUserId,
+                            'vacancy_id' => $vacancy->id,
+                        ]);
+                    }
                 } catch (\Throwable $e) {
                     Log::warning('NotifyJobAlertSubscribers: failed for alert ' . $alert->id, [
                         'error' => $e->getMessage(),

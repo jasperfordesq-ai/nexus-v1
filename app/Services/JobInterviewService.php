@@ -399,7 +399,8 @@ class JobInterviewService
      * Send interview reminders for upcoming interviews across all tenants.
      *
      * Sends reminders at two windows: 24 hours before and 1 hour before.
-     * Uses a `reminder_sent_at` check to avoid duplicate reminders.
+     * Uses separate sent markers so the 24h reminder does not suppress the
+     * later 1h reminder.
      * Called from the Laravel scheduler (bootstrap/app.php).
      *
      * @return array{reminders_sent: int, errors: int}
@@ -412,12 +413,32 @@ class JobInterviewService
         try {
             $now = now();
 
-            // Find interviews scheduled in the next 24h that haven't been reminded
-            $upcoming = JobInterview::with(['application.applicant:id,first_name,last_name', 'vacancy:id,title,user_id'])
+            // Find interviews in either reminder window. Each window has its
+            // own marker because users naturally expect both 24h and 1h emails.
+            $upcoming = JobInterview::withoutGlobalScopes()
+                ->with([
+                    'application' => function ($query) {
+                        $query->withoutGlobalScopes()
+                            ->select(['id', 'tenant_id', 'vacancy_id', 'user_id']);
+                    },
+                    'vacancy' => function ($query) {
+                        $query->withoutGlobalScopes()
+                            ->select(['id', 'tenant_id', 'title', 'user_id']);
+                    },
+                ])
                 ->whereIn('status', ['proposed', 'accepted'])
+                ->whereNotNull('tenant_id')
                 ->where('scheduled_at', '>', $now)
                 ->where('scheduled_at', '<=', $now->copy()->addHours(24))
-                ->whereNull('reminder_sent_at')
+                ->where(function ($query) use ($now) {
+                    $query->where(function ($q) use ($now) {
+                        $q->where('scheduled_at', '<=', $now->copy()->addHour())
+                            ->whereNull('reminder_1h_sent_at');
+                    })->orWhere(function ($q) use ($now) {
+                        $q->where('scheduled_at', '>', $now->copy()->addHour())
+                            ->whereNull('reminder_24h_sent_at');
+                    });
+                })
                 ->get();
 
             foreach ($upcoming as $interview) {
@@ -430,7 +451,13 @@ class JobInterviewService
                     TenantContext::setById($tenantId);
 
                     $scheduledAt = $interview->scheduled_at->format('M j, g:i A');
-                    $hoursUntil = (int) $now->diffInHours($interview->scheduled_at);
+                    $isOneHourWindow = $interview->scheduled_at->lessThanOrEqualTo($now->copy()->addHour());
+                    $hoursUntil = max(1, (int) ceil($now->diffInMinutes($interview->scheduled_at) / 60));
+                    $windowColumn = $isOneHourWindow ? 'reminder_1h_sent_at' : 'reminder_24h_sent_at';
+
+                    if ($interview->{$windowColumn} !== null) {
+                        continue;
+                    }
 
                     // Notify the candidate (render message in candidate's locale)
                     $candidateId = $interview->application->user_id ?? null;
@@ -441,23 +468,10 @@ class JobInterviewService
                             ->select(['id', 'preferred_language'])
                             ->first();
 
-                        LocaleContext::withLocale($candidate, function () use (&$emailOk, $interview, $candidateId, $hoursUntil, $scheduledAt) {
+                        LocaleContext::withLocale($candidate, function () use (&$emailOk, $interview, $candidateId, $isOneHourWindow, $hoursUntil, $scheduledAt) {
                             $jobTitle  = $interview->vacancy->title ?? __('emails.common.fallback_job');
-                            $timeLabel = $hoursUntil <= 1 ? __('emails_misc.jobs.interview_in_1_hour') : __('emails_misc.jobs.interview_in_hours', ['hours' => $hoursUntil]);
+                            $timeLabel = $isOneHourWindow ? __('emails_misc.jobs.interview_in_1_hour') : __('emails_misc.jobs.interview_in_hours', ['hours' => $hoursUntil]);
                             $message   = __('emails_misc.jobs.interview_reminder', ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt]);
-                            Notification::createNotification(
-                                (int) $candidateId,
-                                $message,
-                                "/jobs/{$interview->vacancy_id}",
-                                'job_interview_proposed'
-                            );
-                            RealtimeService::broadcastAndPush((int) $candidateId, __('emails_misc.jobs.interview_reminder_push_title'), [
-                                'type'      => 'job_interview_reminder',
-                                'job_id'    => (int) $interview->vacancy_id,
-                                'job_title' => $jobTitle,
-                                'message'   => $message,
-                                'url'       => "/jobs/{$interview->vacancy_id}",
-                            ]);
                             if (!static::sendInterviewEmail(
                                 (int) $candidateId,
                                 'emails_misc.jobs.interview_email_subject_reminder',
@@ -466,6 +480,29 @@ class JobInterviewService
                                 "/jobs/{$interview->vacancy_id}"
                             )) {
                                 $emailOk = false;
+                                return;
+                            }
+
+                            try {
+                                Notification::createNotification(
+                                    (int) $candidateId,
+                                    $message,
+                                    "/jobs/{$interview->vacancy_id}",
+                                    'job_interview_proposed'
+                                );
+                                RealtimeService::broadcastAndPush((int) $candidateId, __('emails_misc.jobs.interview_reminder_push_title'), [
+                                    'type'      => 'job_interview_reminder',
+                                    'job_id'    => (int) $interview->vacancy_id,
+                                    'job_title' => $jobTitle,
+                                    'message'   => $message,
+                                    'url'       => "/jobs/{$interview->vacancy_id}",
+                                ]);
+                            } catch (\Throwable $e) {
+                                Log::warning('JobInterviewService::sendReminders candidate bell/push failed after email send', [
+                                    'interview_id' => $interview->id,
+                                    'user_id' => (int) $candidateId,
+                                    'error' => $e->getMessage(),
+                                ]);
                             }
                         });
                     }
@@ -479,23 +516,10 @@ class JobInterviewService
                             ->select(['id', 'preferred_language'])
                             ->first();
 
-                        LocaleContext::withLocale($poster, function () use (&$emailOk, $interview, $posterId, $hoursUntil, $scheduledAt) {
+                        LocaleContext::withLocale($poster, function () use (&$emailOk, $interview, $posterId, $isOneHourWindow, $hoursUntil, $scheduledAt) {
                             $jobTitle  = $interview->vacancy->title ?? __('emails.common.fallback_job');
-                            $timeLabel = $hoursUntil <= 1 ? __('emails_misc.jobs.interview_in_1_hour') : __('emails_misc.jobs.interview_in_hours', ['hours' => $hoursUntil]);
+                            $timeLabel = $isOneHourWindow ? __('emails_misc.jobs.interview_in_1_hour') : __('emails_misc.jobs.interview_in_hours', ['hours' => $hoursUntil]);
                             $message   = __('emails_misc.jobs.interview_reminder', ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt]);
-                            Notification::createNotification(
-                                (int) $posterId,
-                                $message,
-                                "/jobs/{$interview->vacancy_id}/applications",
-                                'job_interview_proposed'
-                            );
-                            RealtimeService::broadcastAndPush((int) $posterId, __('emails_misc.jobs.interview_reminder_push_title'), [
-                                'type'      => 'job_interview_reminder',
-                                'job_id'    => (int) $interview->vacancy_id,
-                                'job_title' => $jobTitle,
-                                'message'   => $message,
-                                'url'       => "/jobs/{$interview->vacancy_id}/applications",
-                            ]);
                             if (!static::sendInterviewEmail(
                                 (int) $posterId,
                                 'emails_misc.jobs.interview_email_subject_reminder',
@@ -504,12 +528,38 @@ class JobInterviewService
                                 "/jobs/{$interview->vacancy_id}/applications"
                             )) {
                                 $emailOk = false;
+                                return;
+                            }
+
+                            try {
+                                Notification::createNotification(
+                                    (int) $posterId,
+                                    $message,
+                                    "/jobs/{$interview->vacancy_id}/applications",
+                                    'job_interview_proposed'
+                                );
+                                RealtimeService::broadcastAndPush((int) $posterId, __('emails_misc.jobs.interview_reminder_push_title'), [
+                                    'type'      => 'job_interview_reminder',
+                                    'job_id'    => (int) $interview->vacancy_id,
+                                    'job_title' => $jobTitle,
+                                    'message'   => $message,
+                                    'url'       => "/jobs/{$interview->vacancy_id}/applications",
+                                ]);
+                            } catch (\Throwable $e) {
+                                Log::warning('JobInterviewService::sendReminders poster bell/push failed after email send', [
+                                    'interview_id' => $interview->id,
+                                    'user_id' => (int) $posterId,
+                                    'error' => $e->getMessage(),
+                                ]);
                             }
                         });
                     }
 
                     if ($emailOk) {
-                        $interview->update(['reminder_sent_at' => $now]);
+                        $interview->update([
+                            $windowColumn => $now,
+                            'reminder_sent_at' => $now,
+                        ]);
                         $sent++;
                     } else {
                         $errors++;

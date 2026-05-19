@@ -30,6 +30,8 @@ class JobInterview extends Model
         'candidate_notes',
         'interviewer_notes',
         'reminder_sent_at',
+        'reminder_24h_sent_at',
+        'reminder_1h_sent_at',
     ];
 
     protected $casts = [
@@ -40,6 +42,8 @@ class JobInterview extends Model
         'duration_mins'   => 'integer',
         'scheduled_at'    => 'datetime',
         'reminder_sent_at' => 'datetime',
+        'reminder_24h_sent_at' => 'datetime',
+        'reminder_1h_sent_at' => 'datetime',
     ];
 
     public function vacancy(): BelongsTo

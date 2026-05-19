@@ -6,163 +6,124 @@
 
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
-use App\Services\JobExpiryNotificationService;
+use App\Core\TenantContext;
 use App\Models\JobVacancy;
-use App\Models\Notification;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use Mockery;
+use App\Services\EmailDispatchService;
+use App\Services\JobExpiryNotificationService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
+use Tests\Laravel\TestCase;
 
-/**
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- */
 class JobExpiryNotificationServiceTest extends TestCase
 {
-    // ── notifyExpiringSoon ───────────────────────────────────────
+    use DatabaseTransactions;
 
-    public function test_notifyExpiringSoon_returns_zero_when_no_expiring_vacancies(): void
+    public function test_notifyExpiringSoon_sends_email_bell_and_idempotency_record(): void
     {
-        $builder = Mockery::mock();
-        $builder->shouldReceive('where')->andReturnSelf();
-        $builder->shouldReceive('whereNotNull')->andReturnSelf();
-        $builder->shouldReceive('whereBetween')->andReturnSelf();
-        $builder->shouldReceive('whereNull')->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect([]));
-
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
-        $mock->shouldReceive('with')->andReturn($builder);
+        [$poster, $vacancy] = $this->makeExpiringVacancy('Neighbourhood Coordinator');
+        $mailer = $this->fakeEmailDispatchService();
+        TenantContext::reset();
 
         $result = JobExpiryNotificationService::notifyExpiringSoon();
-        $this->assertSame(0, $result);
-    }
 
-    public function test_notifyExpiringSoon_sends_in_app_notification(): void
-    {
-        $creator = new User();
-        $creator->id = 5;
-        $creator->first_name = 'John';
-        $creator->last_name = 'Doe';
-        $creator->email = 'john@example.com';
-
-        $vacancy = Mockery::mock();
-        $vacancy->id = 10;
-        $vacancy->title = 'Developer';
-        $vacancy->user_id = 5;
-        $vacancy->creator = $creator;
-        $vacancy->deadline = now()->addDays(3);
-        $vacancy->shouldReceive('getAttribute')->with('deadline')->andReturn(now()->addDays(3));
-
-        $builder = Mockery::mock();
-        $builder->shouldReceive('where')->andReturnSelf();
-        $builder->shouldReceive('whereNotNull')->andReturnSelf();
-        $builder->shouldReceive('whereBetween')->andReturnSelf();
-        $builder->shouldReceive('whereNull')->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect([$vacancy]));
-
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
-        $mock->shouldReceive('with')->andReturn($builder);
-
-        $notifMock = Mockery::mock('alias:' . Notification::class);
-        $notifMock->shouldReceive('createNotification')->once()->with(
-            5,
-            Mockery::on(fn($msg) => str_contains($msg, 'Developer') && str_contains($msg, 'expires')),
-            '/jobs/10',
-            'job_application'
-        );
-
-        Mail::shouldReceive('html')->once();
-
-        $result = JobExpiryNotificationService::notifyExpiringSoon();
         $this->assertSame(1, $result);
+        $this->assertCount(1, $mailer->sends);
+        $this->assertSame($poster->email, $mailer->sends[0]['to']);
+        $this->assertStringContainsString('Neighbourhood Coordinator', $mailer->sends[0]['subject']);
+        $this->assertSame('job_expiry', $mailer->sends[0]['options']['category']);
+        $this->assertSame($this->testTenantId, $mailer->sends[0]['options']['tenant_id']);
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $poster->id,
+            'type' => 'job_expiry',
+            'link' => "/jobs/{$vacancy->id}",
+        ]);
+        $this->assertDatabaseHas('job_expiry_notifications', [
+            'tenant_id' => $this->testTenantId,
+            'vacancy_id' => $vacancy->id,
+            'notification_type' => 'expiring_soon',
+        ]);
     }
 
-    public function test_notifyExpiringSoon_sends_email_to_creator(): void
+    public function test_notifyExpiringSoon_does_not_duplicate_previous_send(): void
     {
-        $creator = new User();
-        $creator->id = 5;
-        $creator->first_name = 'John';
-        $creator->last_name = 'Doe';
-        $creator->email = 'john@example.com';
+        [, $vacancy] = $this->makeExpiringVacancy('Community Designer');
+        $mailer = $this->fakeEmailDispatchService();
+        TenantContext::reset();
 
-        $vacancy = Mockery::mock();
-        $vacancy->id = 10;
-        $vacancy->title = 'Designer';
-        $vacancy->user_id = 5;
-        $vacancy->creator = $creator;
-        $vacancy->deadline = now()->addDays(5);
-        $vacancy->shouldReceive('getAttribute')->with('deadline')->andReturn(now()->addDays(5));
+        $first = JobExpiryNotificationService::notifyExpiringSoon();
+        $second = JobExpiryNotificationService::notifyExpiringSoon();
 
-        $builder = Mockery::mock();
-        $builder->shouldReceive('where')->andReturnSelf();
-        $builder->shouldReceive('whereNotNull')->andReturnSelf();
-        $builder->shouldReceive('whereBetween')->andReturnSelf();
-        $builder->shouldReceive('whereNull')->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect([$vacancy]));
-
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
-        $mock->shouldReceive('with')->andReturn($builder);
-
-        $notifMock = Mockery::mock('alias:' . Notification::class);
-        $notifMock->shouldReceive('createNotification')->once();
-
-        Mail::shouldReceive('html')->once()->withArgs(function ($html, $callback) {
-            $message = Mockery::mock();
-            $message->shouldReceive('to')->with('john@example.com', Mockery::type('string'))->andReturnSelf();
-            $message->shouldReceive('subject')->with(Mockery::on(fn($s) => str_contains($s, 'Designer')))->andReturnSelf();
-            $callback($message);
-            return str_contains($html, 'expiring soon');
-        });
-
-        $result = JobExpiryNotificationService::notifyExpiringSoon();
-        $this->assertSame(1, $result);
+        $this->assertSame(1, $first);
+        $this->assertSame(0, $second);
+        $this->assertCount(1, $mailer->sends);
+        $this->assertSame(1, DB::table('job_expiry_notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('vacancy_id', $vacancy->id)
+            ->where('notification_type', 'expiring_soon')
+            ->count());
     }
 
-    public function test_notifyExpiringSoon_returns_zero_on_outer_exception(): void
+    public function test_notifyExpiringSoon_does_not_mark_sent_when_email_fails(): void
     {
-        Log::shouldReceive('error')->once();
-
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
-        $mock->shouldReceive('with')->andThrow(new \Exception('DB error'));
+        [, $vacancy] = $this->makeExpiringVacancy('Volunteer Lead');
+        $this->fakeEmailDispatchService(sendResult: false);
+        TenantContext::reset();
 
         $result = JobExpiryNotificationService::notifyExpiringSoon();
+
         $this->assertSame(0, $result);
+        $this->assertDatabaseMissing('job_expiry_notifications', [
+            'tenant_id' => $this->testTenantId,
+            'vacancy_id' => $vacancy->id,
+            'notification_type' => 'expiring_soon',
+        ]);
     }
 
-    public function test_notifyExpiringSoon_continues_on_individual_vacancy_failure(): void
+    private function makeExpiringVacancy(string $title): array
     {
-        Log::shouldReceive('warning')->once();
+        TenantContext::setById($this->testTenantId);
+        $poster = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => uniqid('job-expiry-', true) . '@example.test',
+            'first_name' => 'Jordan',
+        ]);
+        $vacancy = JobVacancy::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $poster->id,
+            'title' => $title,
+            'status' => 'open',
+            'deadline' => now()->addDays(5),
+            'expired_at' => null,
+        ]);
 
-        $vacancy = Mockery::mock();
-        $vacancy->id = 10;
-        $vacancy->title = 'Developer';
-        $vacancy->user_id = 5; // triggers Notification call
-        $vacancy->creator = null;
-        $vacancy->deadline = now()->addDays(3);
-
-        $builder = Mockery::mock();
-        $builder->shouldReceive('where')->andReturnSelf();
-        $builder->shouldReceive('whereNotNull')->andReturnSelf();
-        $builder->shouldReceive('whereBetween')->andReturnSelf();
-        $builder->shouldReceive('whereNull')->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect([$vacancy]));
-
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
-        $mock->shouldReceive('with')->andReturn($builder);
-
-        // Notification throws — inner catch logs warning and continues
-        $notifMock = Mockery::mock('alias:' . Notification::class);
-        $notifMock->shouldReceive('createNotification')->andThrow(new \RuntimeException('DB error'));
-
-        $result = JobExpiryNotificationService::notifyExpiringSoon();
-        $this->assertIsInt($result);
+        return [$poster, $vacancy];
     }
 
-    public function test_notifyExpiringSoon_returns_integer_type(): void
+    private function fakeEmailDispatchService(bool $sendResult = true): EmailDispatchService
     {
-        $result = JobExpiryNotificationService::notifyExpiringSoon();
-        $this->assertIsInt($result);
+        $mailer = new class($sendResult) extends EmailDispatchService {
+            /** @var list<array{to:string,subject:string,body:string,options:array<string,mixed>}> */
+            public array $sends = [];
+
+            public function __construct(private readonly bool $sendResult)
+            {
+            }
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->sends[] = [
+                    'to' => $to,
+                    'subject' => $subject,
+                    'body' => $body,
+                    'options' => $options,
+                ];
+
+                return $this->sendResult;
+            }
+        };
+
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        return $mailer;
     }
 }

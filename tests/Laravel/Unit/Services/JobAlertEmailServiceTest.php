@@ -7,13 +7,13 @@
 namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
+use App\Core\TenantContext;
+use App\Services\EmailDispatchService;
 use App\Services\JobAlertEmailService;
 use App\Models\JobAlert;
 use App\Models\JobVacancy;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use Mockery;
 
 /**
  * @runTestsInSeparateProcesses
@@ -25,43 +25,35 @@ class JobAlertEmailServiceTest extends TestCase
 
     public function test_sendImmediateAlert_sends_email_and_returns_true(): void
     {
-        Mail::shouldReceive('html')->once()->withArgs(function ($html, $callback) {
-            return is_string($html) && is_callable($callback);
-        });
-
+        $mailer = $this->fakeEmailDispatchService();
         $recipient = $this->makeUser(5, 'jane@example.com', 'Jane', 'Doe');
         $vacancy = $this->makeVacancy(10, 'Senior Developer');
         $alert = $this->makeAlert();
 
         $result = JobAlertEmailService::sendImmediateAlert($recipient, $vacancy, $alert);
         $this->assertTrue($result);
+        $this->assertCount(1, $mailer->sends);
+        $this->assertSame('jane@example.com', $mailer->sends[0]['to']);
+        $this->assertSame('job_alert', $mailer->sends[0]['options']['category']);
+        $this->assertSame($this->testTenantId, $mailer->sends[0]['options']['tenant_id']);
     }
 
     public function test_sendImmediateAlert_subject_includes_job_title(): void
     {
-        Mail::shouldReceive('html')->once()->withArgs(function ($html, $callback) {
-            // Execute the callback to verify subject is set
-            $message = Mockery::mock();
-            $message->shouldReceive('to')->andReturnSelf();
-            $message->shouldReceive('subject')->with(Mockery::on(function ($subject) {
-                return str_contains($subject, 'Backend Engineer');
-            }))->andReturnSelf();
-            $callback($message);
-            return true;
-        });
-
+        $mailer = $this->fakeEmailDispatchService();
         $recipient = $this->makeUser(5, 'jane@example.com', 'Jane');
         $vacancy = $this->makeVacancy(10, 'Backend Engineer');
         $alert = $this->makeAlert();
 
         $result = JobAlertEmailService::sendImmediateAlert($recipient, $vacancy, $alert);
         $this->assertTrue($result);
+        $this->assertStringContainsString('Backend Engineer', $mailer->sends[0]['subject']);
     }
 
     public function test_sendImmediateAlert_returns_false_on_mail_exception(): void
     {
         Log::shouldReceive('warning')->once();
-        Mail::shouldReceive('html')->andThrow(new \Exception('SMTP error'));
+        $this->fakeEmailDispatchService(throws: true);
 
         $recipient = $this->makeUser(5, 'jane@example.com', 'Jane');
         $vacancy = $this->makeVacancy(10, 'Dev');
@@ -159,6 +151,7 @@ class JobAlertEmailServiceTest extends TestCase
         $user->email = $email;
         $user->first_name = $firstName;
         $user->last_name = $lastName;
+        $user->tenant_id = $this->testTenantId;
         return $user;
     }
 
@@ -180,5 +173,39 @@ class JobAlertEmailServiceTest extends TestCase
         $a = new JobAlert();
         $a->id = 1;
         return $a;
+    }
+
+    private function fakeEmailDispatchService(bool $throws = false): EmailDispatchService
+    {
+        TenantContext::setById($this->testTenantId);
+
+        $mailer = new class($throws) extends EmailDispatchService {
+            /** @var list<array{to:string,subject:string,body:string,options:array<string,mixed>}> */
+            public array $sends = [];
+
+            public function __construct(private readonly bool $throws)
+            {
+            }
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                if ($this->throws) {
+                    throw new \RuntimeException('SMTP error');
+                }
+
+                $this->sends[] = [
+                    'to' => $to,
+                    'subject' => $subject,
+                    'body' => $body,
+                    'options' => $options,
+                ];
+
+                return true;
+            }
+        };
+
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        return $mailer;
     }
 }
