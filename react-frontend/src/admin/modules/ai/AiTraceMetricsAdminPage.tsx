@@ -3,19 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-/**
- * AI Trace Metrics — admin dashboard.
- *
- * Shows aggregate cost, latency, tool usage, and a feed of "unanswered"
- * (downvoted) turns from the last N days. The unanswered list is the
- * feedback loop into AI Module Docs — admins should write a doc covering
- * any pattern they see here.
- *
- * ADMIN IS ENGLISH-ONLY — NO t() calls.
- */
-
 import { useCallback, useEffect, useState } from 'react';
-import { Card, CardBody, Chip, Select, SelectItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
+import { Card, CardBody, Chip, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import Clock from 'lucide-react/icons/clock';
 import DollarSign from 'lucide-react/icons/dollar-sign';
@@ -53,14 +43,11 @@ interface Metrics {
   unanswered: Unanswered[];
 }
 
-const WINDOWS = [
-  { value: '7', label: 'Last 7 days' },
-  { value: '30', label: 'Last 30 days' },
-  { value: '90', label: 'Last 90 days' },
-] as const;
+const WINDOWS = ['7', '30', '90'] as const;
 
 export default function AiTraceMetricsAdminPage() {
-  usePageTitle('AI Trace Metrics');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('ai.trace_metrics.meta.title'));
   const toast = useToast();
   const [days, setDays] = useState('30');
   const [metrics, setMetrics] = useState<Metrics | null>(null);
@@ -72,11 +59,11 @@ export default function AiTraceMetricsAdminPage() {
       const res = await api.get<Metrics>(`/v2/admin/ai-traces/metrics?days=${window}`);
       setMetrics(res.data ?? null);
     } catch {
-      toast.error('Failed to load metrics');
+      toast.error(t('ai.trace_metrics.toasts.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     void load(days);
@@ -87,47 +74,52 @@ export default function AiTraceMetricsAdminPage() {
       <div className="flex items-center gap-3">
         <BarChart3 size={28} className="text-primary" />
         <div>
-          <h1 className="text-2xl font-bold">AI Trace Metrics</h1>
+          <h1 className="text-2xl font-bold">{t('ai.trace_metrics.meta.title')}</h1>
           <p className="text-sm text-default-500">
-            Cost, latency, tool usage, and unanswered questions for the AI chat assistant.
+            {t('ai.trace_metrics.meta.description')}
           </p>
         </div>
         <div className="ml-auto">
           <Select
             size="sm"
-            aria-label="Window"
+            aria-label={t('ai.trace_metrics.filters.window')}
             selectedKeys={new Set([days])}
             onSelectionChange={(keys) => setDays(String(Array.from(keys)[0] ?? '30'))}
             className="w-44"
           >
             {WINDOWS.map((w) => (
-              <SelectItem key={w.value}>{w.label}</SelectItem>
+              <SelectItem key={w}>{t(`ai.trace_metrics.windows.${w}`)}</SelectItem>
             ))}
           </Select>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        <Stat icon={MessageSquare} label="Turns" value={metrics?.turns.toLocaleString() ?? '—'} loading={loading} />
-        <Stat icon={DollarSign} label="Cost (USD)" value={metrics ? `$${metrics.cost_usd.toFixed(2)}` : '—'} loading={loading} />
-        <Stat icon={Clock} label="Avg latency" value={metrics ? `${metrics.avg_latency_ms} ms` : '—'} loading={loading} />
-        <Stat icon={ThumbsUp} label="Thumbs up" value={metrics?.thumbs_up.toLocaleString() ?? '—'} loading={loading} color="success" />
-        <Stat icon={ThumbsDown} label="Thumbs down" value={metrics?.thumbs_down.toLocaleString() ?? '—'} loading={loading} color="danger" />
+        <Stat icon={MessageSquare} label={t('ai.trace_metrics.stats.turns')} value={metrics?.turns.toLocaleString() ?? t('ai.common.empty_dash')} loading={loading} />
+        <Stat icon={DollarSign} label={t('ai.trace_metrics.stats.cost')} value={metrics ? `$${metrics.cost_usd.toFixed(2)}` : t('ai.common.empty_dash')} loading={loading} />
+        <Stat icon={Clock} label={t('ai.trace_metrics.stats.avg_latency')} value={metrics ? t('ai.trace_metrics.stats.latency_value', { value: metrics.avg_latency_ms }) : t('ai.common.empty_dash')} loading={loading} />
+        <Stat icon={ThumbsUp} label={t('ai.trace_metrics.stats.thumbs_up')} value={metrics?.thumbs_up.toLocaleString() ?? t('ai.common.empty_dash')} loading={loading} color="success" />
+        <Stat icon={ThumbsDown} label={t('ai.trace_metrics.stats.thumbs_down')} value={metrics?.thumbs_down.toLocaleString() ?? t('ai.common.empty_dash')} loading={loading} color="danger" />
       </div>
 
       <Card>
         <CardBody className="p-4 gap-3">
-          <p className="font-semibold">Top tools called</p>
+          <p className="font-semibold">{t('ai.trace_metrics.tools.title')}</p>
           {metrics && metrics.top_tools.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {metrics.top_tools.map((t) => (
                 <Chip key={t.name} variant="flat" color="primary">
-                  {t.name} — {t.calls}
+                  {t.name} - {t.calls}
                 </Chip>
               ))}
             </div>
+          ) : loading ? (
+            <div className="flex items-center gap-2 text-sm text-default-500">
+              <Spinner size="sm" />
+              {t('ai.trace_metrics.empty.loading_tools')}
+            </div>
           ) : (
-            <p className="text-sm text-default-400">No tool calls in this window.</p>
+            <p className="text-sm text-default-400">{t('ai.trace_metrics.empty.no_tools')}</p>
           )}
         </CardBody>
       </Card>
@@ -135,23 +127,23 @@ export default function AiTraceMetricsAdminPage() {
       <Card>
         <CardBody className="p-4 gap-3">
           <div>
-            <p className="font-semibold">Unanswered questions (thumbs-down)</p>
+            <p className="font-semibold">{t('ai.trace_metrics.unanswered.title')}</p>
             <p className="text-xs text-default-500">
-              These are turns members gave a thumbs-down on. Write a new AI Module Doc to cover any recurring patterns.
+              {t('ai.trace_metrics.unanswered.description')}
             </p>
           </div>
-          <Table aria-label="Unanswered" isStriped removeWrapper>
+          <Table aria-label={t('ai.trace_metrics.unanswered.table_aria')} isStriped removeWrapper>
             <TableHeader>
-              <TableColumn>When</TableColumn>
-              <TableColumn>User question</TableColumn>
-              <TableColumn>Assistant reply (excerpt)</TableColumn>
-              <TableColumn>Note</TableColumn>
+              <TableColumn>{t('ai.trace_metrics.unanswered.columns.when')}</TableColumn>
+              <TableColumn>{t('ai.trace_metrics.unanswered.columns.user_question')}</TableColumn>
+              <TableColumn>{t('ai.trace_metrics.unanswered.columns.assistant_reply')}</TableColumn>
+              <TableColumn>{t('ai.trace_metrics.unanswered.columns.note')}</TableColumn>
             </TableHeader>
-            <TableBody emptyContent={loading ? 'Loading…' : 'No downvotes — nothing to improve right now.'}>
+            <TableBody emptyContent={loading ? t('ai.common.loading') : t('ai.trace_metrics.empty.no_downvotes')}>
               {(metrics?.unanswered ?? []).map((u) => (
                 <TableRow key={u.id}>
                   <TableCell>
-                    <span className="text-xs">{u.at ? new Date(u.at).toLocaleString() : '—'}</span>
+                    <span className="text-xs">{u.at ? new Date(u.at).toLocaleString() : t('ai.common.empty_dash')}</span>
                   </TableCell>
                   <TableCell>
                     <span className="text-sm line-clamp-2 max-w-[20rem] block">{u.user_text}</span>
@@ -160,7 +152,7 @@ export default function AiTraceMetricsAdminPage() {
                     <span className="text-xs text-default-500 line-clamp-2 max-w-[24rem] block">{u.assistant_text}</span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-xs italic">{u.note ?? '—'}</span>
+                    <span className="text-xs italic">{u.note ?? t('ai.common.empty_dash')}</span>
                   </TableCell>
                 </TableRow>
               ))}

@@ -3,19 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-/**
- * AI Module Docs — admin page.
- *
- * Per-tenant, plain-language "how each module works" content. Each doc is
- * matched against incoming chat messages by keyword; when a doc's keyword
- * appears in the user's message, the doc's body is injected into the AI
- * chat system prompt as canonical grounding (preferred over the model's
- * training-data knowledge).
- *
- * ADMIN IS ENGLISH-ONLY — NO t() calls.
- */
-
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -27,6 +16,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Spinner,
   Switch,
   Textarea,
   Table,
@@ -73,7 +63,8 @@ const EMPTY_FORM: DocForm = {
 };
 
 export default function AiModuleDocsAdminPage() {
-  usePageTitle('AI Module Docs');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('ai.module_docs.meta.title'));
   const toast = useToast();
 
   const [docs, setDocs] = useState<ModuleDoc[]>([]);
@@ -90,11 +81,11 @@ export default function AiModuleDocsAdminPage() {
       const res = await api.get<ModuleDoc[]>('/v2/admin/ai-module-docs');
       setDocs(res.data ?? []);
     } catch {
-      toast.error('Failed to load module docs');
+      toast.error(t('ai.module_docs.toasts.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     void load();
@@ -130,15 +121,15 @@ export default function AiModuleDocsAdminPage() {
       };
       if (editing) {
         await api.put(`/v2/admin/ai-module-docs/${editing.id}`, payload);
-        toast.success('Doc updated');
+        toast.success(t('ai.module_docs.toasts.updated'));
       } else {
         await api.post('/v2/admin/ai-module-docs', payload);
-        toast.success('Doc created');
+        toast.success(t('ai.module_docs.toasts.created'));
       }
       setEditorOpen(false);
       void load();
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Save failed';
+      const msg = e instanceof Error ? e.message : t('ai.module_docs.toasts.save_failed');
       toast.error(msg);
     } finally {
       setSaving(false);
@@ -146,13 +137,13 @@ export default function AiModuleDocsAdminPage() {
   }
 
   async function handleDelete(doc: ModuleDoc) {
-    if (!confirm(`Delete "${doc.title}"? This cannot be undone.`)) return;
+    if (!confirm(t('ai.module_docs.confirm_delete', { title: doc.title }))) return;
     try {
       await api.delete(`/v2/admin/ai-module-docs/${doc.id}`);
-      toast.success('Doc deleted');
+      toast.success(t('ai.module_docs.toasts.deleted'));
       void load();
     } catch {
-      toast.error('Delete failed');
+      toast.error(t('ai.module_docs.toasts.delete_failed'));
     }
   }
 
@@ -160,10 +151,10 @@ export default function AiModuleDocsAdminPage() {
     setSeeding(true);
     try {
       const res = await api.post<{ inserted: number }>('/v2/admin/ai-module-docs/seed-defaults', {});
-      toast.success(`Seeded ${res.data?.inserted ?? 0} default doc(s)`);
+      toast.success(t('ai.module_docs.toasts.seeded', { count: res.data?.inserted ?? 0 }));
       void load();
     } catch {
-      toast.error('Seed failed');
+      toast.error(t('ai.module_docs.toasts.seed_failed'));
     } finally {
       setSeeding(false);
     }
@@ -174,10 +165,9 @@ export default function AiModuleDocsAdminPage() {
       <div className="flex items-center gap-3">
         <BookOpen size={28} className="text-primary" />
         <div>
-          <h1 className="text-2xl font-bold">AI Module Docs</h1>
+          <h1 className="text-2xl font-bold">{t('ai.module_docs.meta.title')}</h1>
           <p className="text-sm text-default-500">
-            Plain-language descriptions of each module. The AI chat assistant uses these as canonical
-            grounding when answering member questions.
+            {t('ai.module_docs.meta.description')}
           </p>
         </div>
         <div className="ml-auto flex gap-2">
@@ -187,10 +177,10 @@ export default function AiModuleDocsAdminPage() {
             onPress={handleSeedDefaults}
             isLoading={seeding}
           >
-            Seed defaults
+            {t('ai.module_docs.actions.seed_defaults')}
           </Button>
           <Button color="primary" startContent={<Plus size={16} />} onPress={openCreate}>
-            New doc
+            {t('ai.module_docs.actions.new_doc')}
           </Button>
         </div>
       </div>
@@ -200,30 +190,31 @@ export default function AiModuleDocsAdminPage() {
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
           <div className="space-y-1 text-sm text-default-600">
             <p>
-              When a member's chat message contains any of a doc's keywords (case-insensitive,
-              substring match), that doc's body is appended to the AI's system prompt. Up to 3 docs
-              are injected per turn. Write in plain language — what the feature does, how to use it,
-              and what's <em>not</em> possible.
+              {t('ai.module_docs.about.body')}
             </p>
             <p>
-              <strong>Tip:</strong> click "Seed defaults" to start with 10 pre-written docs covering
-              the core modules. They won't overwrite anything you've customised.
+              <strong>{t('ai.module_docs.about.tip_label')}</strong> {t('ai.module_docs.about.tip_body')}
             </p>
           </div>
         </CardBody>
       </Card>
 
-      <Table aria-label="AI module docs" isStriped removeWrapper>
+      <Table aria-label={t('ai.module_docs.table_aria')} isStriped removeWrapper>
         <TableHeader>
-          <TableColumn>Slug</TableColumn>
-          <TableColumn>Title</TableColumn>
-          <TableColumn>Keywords</TableColumn>
-          <TableColumn>Status</TableColumn>
-          <TableColumn>Updated</TableColumn>
-          <TableColumn>Actions</TableColumn>
+          <TableColumn>{t('ai.module_docs.columns.slug')}</TableColumn>
+          <TableColumn>{t('ai.module_docs.columns.title')}</TableColumn>
+          <TableColumn>{t('ai.module_docs.columns.keywords')}</TableColumn>
+          <TableColumn>{t('ai.module_docs.columns.status')}</TableColumn>
+          <TableColumn>{t('ai.module_docs.columns.updated')}</TableColumn>
+          <TableColumn>{t('ai.module_docs.columns.actions')}</TableColumn>
         </TableHeader>
         <TableBody
-          emptyContent={loading ? 'Loading…' : 'No module docs yet. Click "Seed defaults" or "New doc" to start.'}
+          emptyContent={loading ? (
+            <span className="inline-flex items-center gap-2">
+              <Spinner size="sm" />
+              {t('ai.common.loading')}
+            </span>
+          ) : t('ai.module_docs.empty.no_docs')}
         >
           {docs.map((doc) => (
             <TableRow key={doc.id}>
@@ -247,7 +238,7 @@ export default function AiModuleDocsAdminPage() {
               </TableCell>
               <TableCell>
                 <Chip size="sm" color={doc.is_active ? 'success' : 'default'}>
-                  {doc.is_active ? 'active' : 'disabled'}
+                  {doc.is_active ? t('ai.module_docs.status.active') : t('ai.module_docs.status.disabled')}
                 </Chip>
               </TableCell>
               <TableCell>
@@ -255,7 +246,7 @@ export default function AiModuleDocsAdminPage() {
               </TableCell>
               <TableCell>
                 <div className="flex gap-1">
-                  <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(doc)} aria-label="Edit">
+                  <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(doc)} aria-label={t('ai.module_docs.actions.edit')}>
                     <Pencil size={14} />
                   </Button>
                   <Button
@@ -264,7 +255,7 @@ export default function AiModuleDocsAdminPage() {
                     variant="flat"
                     isIconOnly
                     onPress={() => void handleDelete(doc)}
-                    aria-label="Delete"
+                    aria-label={t('ai.module_docs.actions.delete')}
                   >
                     <Trash2 size={14} />
                   </Button>
@@ -279,36 +270,36 @@ export default function AiModuleDocsAdminPage() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>{editing ? `Edit "${editing.title}"` : 'New module doc'}</ModalHeader>
+              <ModalHeader>{editing ? t('ai.module_docs.editor.edit_title', { title: editing.title }) : t('ai.module_docs.editor.create_title')}</ModalHeader>
               <ModalBody>
                 <div className="flex flex-col gap-4">
                   <Input
-                    label="Module slug"
-                    placeholder="e.g. listings, wallet, events"
+                    label={t('ai.module_docs.editor.fields.module_slug')}
+                    placeholder={t('ai.module_docs.editor.placeholders.module_slug')}
                     value={form.module_slug}
                     onValueChange={(v) => setForm((f) => ({ ...f, module_slug: v }))}
                     variant="bordered"
                     isDisabled={Boolean(editing)}
-                    description="Lowercase letters, numbers, underscores, dashes. Cannot be changed after creation."
+                    description={t('ai.module_docs.editor.hints.module_slug')}
                   />
                   <Input
-                    label="Title"
-                    placeholder="e.g. How time credits work"
+                    label={t('ai.module_docs.editor.fields.title')}
+                    placeholder={t('ai.module_docs.editor.placeholders.title')}
                     value={form.title}
                     onValueChange={(v) => setForm((f) => ({ ...f, title: v }))}
                     variant="bordered"
                   />
                   <Input
-                    label="Trigger keywords (comma-separated)"
-                    placeholder="e.g. timebank, hours, credits, exchange"
+                    label={t('ai.module_docs.editor.fields.keywords')}
+                    placeholder={t('ai.module_docs.editor.placeholders.keywords')}
                     value={form.keywords}
                     onValueChange={(v) => setForm((f) => ({ ...f, keywords: v }))}
                     variant="bordered"
-                    description="When ANY of these words appears in a chat message, this doc will be injected into the AI prompt."
+                    description={t('ai.module_docs.editor.hints.keywords')}
                   />
                   <Textarea
-                    label="Body"
-                    placeholder="Plain-language description of this module. What it does, how to use it, what's not possible."
+                    label={t('ai.module_docs.editor.fields.body')}
+                    placeholder={t('ai.module_docs.editor.placeholders.body')}
                     value={form.body}
                     onValueChange={(v) => setForm((f) => ({ ...f, body: v }))}
                     variant="bordered"
@@ -317,8 +308,8 @@ export default function AiModuleDocsAdminPage() {
                   />
                   <div className="flex items-center justify-between rounded-xl border border-default-200 p-3">
                     <div>
-                      <p className="text-sm font-medium">Active</p>
-                      <p className="text-xs text-default-400">Inactive docs are never injected into the AI prompt.</p>
+                      <p className="text-sm font-medium">{t('ai.module_docs.editor.fields.active')}</p>
+                      <p className="text-xs text-default-400">{t('ai.module_docs.editor.hints.active')}</p>
                     </div>
                     <Switch
                       isSelected={form.is_active}
@@ -330,10 +321,10 @@ export default function AiModuleDocsAdminPage() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
-                  Cancel
+                  {t('ai.common.cancel')}
                 </Button>
                 <Button color="primary" onPress={handleSave} isLoading={saving}>
-                  {editing ? 'Save changes' : 'Create doc'}
+                  {editing ? t('ai.common.save_changes') : t('ai.module_docs.actions.create_doc')}
                 </Button>
               </ModalFooter>
             </>

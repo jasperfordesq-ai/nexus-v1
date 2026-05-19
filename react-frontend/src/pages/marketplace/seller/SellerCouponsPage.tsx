@@ -29,6 +29,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useTenant, useToast } from '@/contexts';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { usePageTitle } from '@/hooks';
 import { logError } from '@/lib/logger';
 
@@ -82,11 +83,13 @@ export default function SellerCouponsPage() {
   const formatDiscount = (c: Coupon): string => {
     if (c.discount_type === 'percent') return `${c.discount_value}%`;
     if (c.discount_type === 'fixed') return `€${(c.discount_value / 100).toFixed(2)}`;
-    return 'BOGO';
+    return t('coupon.type_bogo');
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <>
+      <PageMeta title={t('coupon.seller.page_title')} noIndex />
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">{t('coupon.seller.page_title')}</h1>
         <Button
@@ -113,7 +116,7 @@ export default function SellerCouponsPage() {
       ) : (
         <Card>
           <CardBody>
-            <Table aria-label="Coupons">
+            <Table aria-label={t('coupon.seller.table_aria')}>
               <TableHeader>
                 <TableColumn>{t('coupon.code')}</TableColumn>
                 <TableColumn>{t('coupon.title')}</TableColumn>
@@ -135,7 +138,7 @@ export default function SellerCouponsPage() {
                         color={c.status === 'active' ? 'success' : c.status === 'paused' ? 'warning' : 'default'}
                         variant="flat"
                       >
-                        {c.status}
+                      {t(`coupon.seller.status_${c.status}`, c.status)}
                       </Chip>
                     </TableCell>
                     <TableCell>{c.usage_count}</TableCell>
@@ -173,6 +176,7 @@ export default function SellerCouponsPage() {
           </CardBody>
         </Card>
       )}
-    </div>
+      </div>
+    </>
   );
 }

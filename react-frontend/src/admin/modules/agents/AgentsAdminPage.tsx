@@ -3,18 +3,15 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-/**
- * AG61 — Agent Definitions admin page.
- * ADMIN IS ENGLISH-ONLY — NO t() calls.
- */
-
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
   CardBody,
   CardHeader,
   Chip,
+  Input,
   Modal,
   ModalBody,
   ModalContent,
@@ -30,6 +27,9 @@ import Play from 'lucide-react/icons/play';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { useAdminPageMeta } from '../../AdminMetaContext';
+import { EmptyState } from '../../components/EmptyState';
+import { PageHeader } from '../../components/PageHeader';
 
 interface AgentDefinition {
   id: number;
@@ -44,7 +44,12 @@ interface AgentDefinition {
 }
 
 export default function AgentsAdminPage() {
-  usePageTitle('AI Agents');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('agents.definitions.meta.title'));
+  useAdminPageMeta({
+    title: t('agents.definitions.meta.title'),
+    description: t('agents.definitions.meta.description'),
+  });
   const toast = useToast();
 
   const [items, setItems] = useState<AgentDefinition[]>([]);
@@ -60,11 +65,11 @@ export default function AgentsAdminPage() {
       const res = await api.get<{ items: AgentDefinition[] }>('/v2/admin/agents');
       setItems(res.data?.items ?? []);
     } catch {
-      toast.error('Failed to load agent definitions');
+      toast.error(t('agents.definitions.toasts.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     void fetchItems();
@@ -74,10 +79,12 @@ export default function AgentsAdminPage() {
     setBusyId(def.id);
     try {
       await api.post(`/v2/admin/agents/${def.id}/toggle`, {});
-      toast.success(def.is_enabled ? `${def.name} disabled` : `${def.name} enabled`);
+      toast.success(t(def.is_enabled ? 'agents.definitions.toasts.disabled' : 'agents.definitions.toasts.enabled', {
+        name: def.name,
+      }));
       await fetchItems();
     } catch {
-      toast.error('Failed to toggle agent');
+      toast.error(t('agents.definitions.toasts.toggle_failed'));
     } finally {
       setBusyId(null);
     }
@@ -92,13 +99,16 @@ export default function AgentsAdminPage() {
       );
       const data = res.data;
       if (data?.error) {
-        toast.error(`Run failed: ${data.error}`);
+        toast.error(t('agents.definitions.toasts.run_failed_with_error', { error: data.error }));
       } else {
-        toast.success(`Run #${data?.run_id} created ${data?.proposals_created ?? 0} proposal(s)`);
+        toast.success(t('agents.definitions.toasts.run_created', {
+          runId: data?.run_id ?? t('agents.common.empty_dash'),
+          count: data?.proposals_created ?? 0,
+        }));
       }
       await fetchItems();
     } catch {
-      toast.error('Failed to run agent');
+      toast.error(t('agents.definitions.toasts.run_failed'));
     } finally {
       setBusyId(null);
     }
@@ -116,7 +126,7 @@ export default function AgentsAdminPage() {
     try {
       parsedConfig = JSON.parse(editConfig);
     } catch {
-      toast.error('Config is not valid JSON');
+      toast.error(t('agents.definitions.toasts.invalid_json'));
       return;
     }
     try {
@@ -124,36 +134,36 @@ export default function AgentsAdminPage() {
         name: editName,
         config: parsedConfig,
       });
-      toast.success('Agent updated');
+      toast.success(t('agents.definitions.toasts.updated'));
       setEditing(null);
       await fetchItems();
     } catch {
-      toast.error('Failed to update agent');
+      toast.error(t('agents.definitions.toasts.update_failed'));
     }
   };
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <Bot className="w-7 h-7 text-primary" />
-        <div>
-          <h1 className="text-2xl font-bold">AI Agents</h1>
-          <p className="text-sm text-default-500">
-            AG61 — autonomous agents that draft proposals for admin approval. All actions remain proposals
-            until you approve them.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title={t('agents.definitions.title')}
+        description={t('agents.definitions.subtitle')}
+        icon={<Bot className="h-5 w-5" />}
+      />
 
-      {loading && <p className="text-default-500">Loading…</p>}
-
-      {!loading && items.length === 0 && (
-        <Card>
-          <CardBody className="text-default-500">
-            No agent definitions yet. Run <code>php artisan tenant:seed-agents</code> to create the four
-            default agents for this tenant.
+      {loading && (
+        <Card shadow="sm" className="border border-divider/70 bg-content1">
+          <CardBody className="py-8 text-sm text-default-500">
+            {t('agents.definitions.loading')}
           </CardBody>
         </Card>
+      )}
+
+      {!loading && items.length === 0 && (
+        <EmptyState
+          icon={Bot}
+          title={t('agents.definitions.empty.title')}
+          description={t('agents.definitions.empty.description')}
+        />
       )}
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -179,12 +189,14 @@ export default function AgentsAdminPage() {
               )}
               <div className="flex flex-wrap gap-2 text-xs">
                 <Chip size="sm" variant="flat" color={def.is_enabled ? 'success' : 'default'}>
-                  {def.is_enabled ? 'Enabled' : 'Disabled'}
+                  {t(def.is_enabled ? 'agents.status.enabled' : 'agents.status.disabled')}
                 </Chip>
                 <Chip size="sm" variant="flat">{def.agent_type}</Chip>
                 {def.last_run_at && (
                   <Chip size="sm" variant="flat" color="primary">
-                    Last run: {new Date(def.last_run_at).toLocaleString()}
+                    {t('agents.definitions.last_run', {
+                      date: new Date(def.last_run_at).toLocaleString(),
+                    })}
                   </Chip>
                 )}
               </div>
@@ -197,7 +209,7 @@ export default function AgentsAdminPage() {
                   isDisabled={!def.is_enabled || busyId === def.id}
                   isLoading={busyId === def.id}
                 >
-                  Run now
+                  {t('agents.definitions.actions.run_now')}
                 </Button>
                 <Button
                   size="sm"
@@ -205,7 +217,7 @@ export default function AgentsAdminPage() {
                   startContent={<Edit3 className="w-4 h-4" />}
                   onPress={() => openEdit(def)}
                 >
-                  Edit config
+                  {t('agents.definitions.actions.edit_config')}
                 </Button>
               </div>
             </CardBody>
@@ -215,29 +227,24 @@ export default function AgentsAdminPage() {
 
       <Modal isOpen={!!editing} onClose={() => setEditing(null)} size="2xl">
         <ModalContent>
-          <ModalHeader>Edit {editing?.name}</ModalHeader>
+          <ModalHeader>{t('agents.definitions.edit_modal.title', { name: editing?.name ?? '' })}</ModalHeader>
           <ModalBody className="space-y-3">
-            <div>
-              <label className="text-sm font-medium">Name</label>
-              <input
-                className="w-full mt-1 px-3 py-2 border border-default-200 rounded-md bg-background"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Config (JSON)</label>
-              <Textarea
-                value={editConfig}
-                onValueChange={setEditConfig}
-                minRows={10}
-                className="font-mono text-xs"
-              />
-            </div>
+            <Input
+              label={t('agents.definitions.edit_modal.name')}
+              value={editName}
+              onValueChange={setEditName}
+            />
+            <Textarea
+              label={t('agents.definitions.edit_modal.config_json')}
+              value={editConfig}
+              onValueChange={setEditConfig}
+              minRows={10}
+              className="font-mono text-xs"
+            />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setEditing(null)}>Cancel</Button>
-            <Button color="primary" onPress={handleSaveEdit}>Save</Button>
+            <Button variant="flat" onPress={() => setEditing(null)}>{t('agents.actions.cancel')}</Button>
+            <Button color="primary" onPress={handleSaveEdit}>{t('agents.actions.save')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

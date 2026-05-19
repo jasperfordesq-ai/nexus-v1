@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import { Card, CardBody } from '@heroui/react';
 import Bell from 'lucide-react/icons/bell';
 import Clock from 'lucide-react/icons/clock';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 export function EventReminderSettings() {
@@ -24,10 +25,12 @@ export function EventReminderSettings() {
   usePageTitle(t('reminder_settings', 'Event Reminder Settings'));
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
+    <>
+      <PageMeta title={t('reminder_settings', 'Event Reminder Settings')} noIndex />
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
       <Card className="bg-theme-card border border-theme-default shadow-sm">
         <CardBody className="p-6 text-center space-y-4">
           <div className="flex justify-center">
@@ -58,7 +61,8 @@ export function EventReminderSettings() {
           </div>
         </CardBody>
       </Card>
-    </motion.div>
+      </motion.div>
+    </>
   );
 }
 

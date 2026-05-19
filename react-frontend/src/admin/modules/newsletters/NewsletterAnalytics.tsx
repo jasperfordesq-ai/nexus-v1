@@ -519,9 +519,9 @@ export function NewsletterAnalytics() {
             <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-default-100">
               <BarChart3 size={40} className="text-default-300" />
             </div>
-            <h3 className="text-lg font-semibold">{"No no analytics found"}</h3>
+            <h3 className="text-lg font-semibold">{t('newsletters.empty_no_analytics')}</h3>
             <p className="mt-1 text-default-500">
-              {"Empty No Analytics."}
+              {t('newsletters.empty_no_analytics_desc')}
             </p>
           </CardBody>
         </Card>

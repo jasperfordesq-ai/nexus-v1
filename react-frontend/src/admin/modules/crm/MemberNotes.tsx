@@ -357,11 +357,11 @@ export function MemberNotes() {
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
             <StickyNote size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">{"No notes found"}</p>
+            <p className="text-default-500 text-lg font-medium">{t('crm.no_notes_found')}</p>
             <p className="text-default-400 text-sm mt-1">
               {filterCategory || filterUserId
-                ? "No notes match your current filters"
-                : "No notes have been added yet. Add one above."}
+                ? t('crm.no_notes_hint_filtered')
+                : t('crm.no_notes_hint_default')}
             </p>
           </CardBody>
         </Card>

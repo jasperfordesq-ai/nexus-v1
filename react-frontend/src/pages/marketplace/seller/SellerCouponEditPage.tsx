@@ -23,6 +23,7 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useTenant, useToast } from '@/contexts';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { usePageTitle } from '@/hooks';
 import { logError } from '@/lib/logger';
 
@@ -144,14 +145,19 @@ export default function SellerCouponEditPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-16">
-        <Spinner />
-      </div>
+      <>
+        <PageMeta title={isEdit ? t('coupon.seller.edit_title') : t('coupon.seller.create_title')} noIndex />
+        <div className="flex justify-center py-16">
+          <Spinner />
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <>
+      <PageMeta title={isEdit ? t('coupon.seller.edit_title') : t('coupon.seller.create_title')} noIndex />
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
       <Button
         as={Link}
         to={tenantPath('/marketplace/seller/coupons')}
@@ -246,10 +252,10 @@ export default function SellerCouponEditPage() {
                 selectedKeys={[form.status]}
                 onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as Status }))}
               >
-                <SelectItem key="draft">draft</SelectItem>
-                <SelectItem key="active">active</SelectItem>
-                <SelectItem key="paused">paused</SelectItem>
-                <SelectItem key="expired">expired</SelectItem>
+                <SelectItem key="draft">{t('coupon.seller.status_draft')}</SelectItem>
+                <SelectItem key="active">{t('coupon.seller.status_active')}</SelectItem>
+                <SelectItem key="paused">{t('coupon.seller.status_paused')}</SelectItem>
+                <SelectItem key="expired">{t('coupon.seller.status_expired')}</SelectItem>
               </Select>
               <Select
                 label={t('coupon.seller.applies_to')}
@@ -266,7 +272,7 @@ export default function SellerCouponEditPage() {
             <Input
               type="number"
               label={t('coupon.min_order')}
-              description="cents"
+              description={t('coupon.seller.amount_cents_help')}
               value={form.min_order_cents}
               onValueChange={(v) => setForm((f) => ({ ...f, min_order_cents: v }))}
             />
@@ -281,6 +287,7 @@ export default function SellerCouponEditPage() {
           </form>
         </CardBody>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }

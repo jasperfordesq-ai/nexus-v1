@@ -18,6 +18,7 @@ import Loader2 from 'lucide-react/icons/loader-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { tokenManager } from '@/lib/api';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -56,30 +57,36 @@ export function OauthCallbackPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <GlassCard className="p-6 max-w-md w-full">
-          <h1 className="text-xl font-bold text-theme-primary mb-3">{t('oauth.callback_failed')}</h1>
-          <p className="text-theme-muted text-sm mb-6">{error}</p>
-          <Button
-            as={Link}
-            to={tenantPath('/login')}
-            variant="bordered"
-            startContent={<ArrowLeft className="w-4 h-4" />}
-          >
-            {t('back_to_login', { defaultValue: 'Back to login' })}
-          </Button>
-        </GlassCard>
-      </div>
+      <>
+        <PageMeta title={t('oauth.callback_failed')} noIndex />
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <GlassCard className="p-6 max-w-md w-full">
+            <h1 className="text-xl font-bold text-theme-primary mb-3">{t('oauth.callback_failed')}</h1>
+            <p className="text-theme-muted text-sm mb-6">{error}</p>
+            <Button
+              as={Link}
+              to={tenantPath('/login')}
+              variant="bordered"
+              startContent={<ArrowLeft className="w-4 h-4" />}
+            >
+              {t('back_to_login', { defaultValue: 'Back to login' })}
+            </Button>
+          </GlassCard>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="text-center">
-        <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-500" aria-hidden="true" />
-        <p className="text-theme-muted mt-3">{t('oauth.callback_signing_in')}</p>
+    <>
+      <PageMeta title={t('oauth.callback_signing_in')} noIndex />
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-500" aria-hidden="true" />
+          <p className="text-theme-muted mt-3">{t('oauth.callback_signing_in')}</p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

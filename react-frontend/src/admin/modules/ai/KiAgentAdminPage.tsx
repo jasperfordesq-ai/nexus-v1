@@ -3,15 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-/**
- * AG61 — KI-Agenten Autonomous Agent Framework — Admin Page
- *
- * ADMIN IS ENGLISH-ONLY — NO t() calls.
- */
-
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
+  Card,
+  CardBody,
   Chip,
   Input,
   Modal,
@@ -29,6 +26,7 @@ import {
   TableHeader,
   TableRow,
   Tabs,
+  Spinner,
 } from '@heroui/react';
 import Bot from 'lucide-react/icons/bot';
 import Brain from 'lucide-react/icons/brain';
@@ -144,13 +142,13 @@ function confidenceColor(score: number | null): 'success' | 'warning' | 'danger'
   return 'danger';
 }
 
-function fmtDate(s: string | null): string {
-  if (!s) return '—';
+function fmtDate(s: string | null, empty: string): string {
+  if (!s) return empty;
   return new Date(s).toLocaleString();
 }
 
-function durationMs(run: AgentRun): string {
-  if (!run.started_at || !run.completed_at) return '—';
+function durationMs(run: AgentRun, empty: string): string {
+  if (!run.started_at || !run.completed_at) return empty;
   const ms = new Date(run.completed_at).getTime() - new Date(run.started_at).getTime();
   if (ms < 1000) return `${ms}ms`;
   if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
@@ -166,7 +164,8 @@ function agentTypeLabel(t: string): string {
 // ---------------------------------------------------------------------------
 
 export default function KiAgentAdminPage() {
-  usePageTitle('KI-Agenten');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('ai.ki_agents.meta.title'));
   const toast = useToast();
 
   const [config, setConfig] = useState<AgentConfig | null>(null);
@@ -197,9 +196,9 @@ export default function KiAgentAdminPage() {
       const res = await api.get<AgentConfig>('/v2/admin/ki-agents/config');
       setConfig(res.data ?? null);
     } catch {
-      toast.error('Failed to load agent config');
+      toast.error(t('ai.ki_agents.toasts.config_load_failed'));
     }
-  }, [toast]);
+  }, [t, toast]);
 
   const fetchRuns = useCallback(async () => {
     setLoadingRuns(true);
@@ -207,11 +206,11 @@ export default function KiAgentAdminPage() {
       const res = await api.get<AgentRun[]>('/v2/admin/ki-agents/runs?limit=50');
       setRuns(res.data ?? []);
     } catch {
-      toast.error('Failed to load runs');
+      toast.error(t('ai.ki_agents.toasts.runs_load_failed'));
     } finally {
       setLoadingRuns(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   const fetchProposals = useCallback(async () => {
     setLoadingProposals(true);
@@ -222,11 +221,11 @@ export default function KiAgentAdminPage() {
       const res = await api.get<AgentProposal[]>(url);
       setProposals(res.data ?? []);
     } catch {
-      toast.error('Failed to load proposals');
+      toast.error(t('ai.ki_agents.toasts.proposals_load_failed'));
     } finally {
       setLoadingProposals(false);
     }
-  }, [proposalFilter, toast]);
+  }, [proposalFilter, t, toast]);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -265,9 +264,9 @@ export default function KiAgentAdminPage() {
       const res = await api.put<AgentConfig>('/v2/admin/ki-agents/config', mergedConfig);
       setConfig(res.data ?? null);
       setConfigDirty({});
-      toast.success('Agent config saved');
+      toast.success(t('ai.ki_agents.toasts.config_saved'));
     } catch {
-      toast.error('Failed to save config');
+      toast.error(t('ai.ki_agents.toasts.config_save_failed'));
     } finally {
       setSavingConfig(false);
     }
@@ -281,12 +280,12 @@ export default function KiAgentAdminPage() {
     setTriggering(true);
     try {
       const res = await api.post<AgentRun>('/v2/admin/ki-agents/trigger', { agent_type: triggerType });
-      toast.success(`Run triggered: ${res.data?.proposals_generated ?? 0} proposals generated`);
+      toast.success(t('ai.ki_agents.toasts.run_triggered', { count: res.data?.proposals_generated ?? 0 }));
       void fetchRuns();
       void fetchProposals();
       void fetchStats();
     } catch {
-      toast.error('Failed to trigger run');
+      toast.error(t('ai.ki_agents.toasts.run_trigger_failed'));
     } finally {
       setTriggering(false);
     }
@@ -298,7 +297,7 @@ export default function KiAgentAdminPage() {
       setSelectedRun(res.data ?? null);
       setRunModalOpen(true);
     } catch {
-      toast.error('Failed to load run details');
+      toast.error(t('ai.ki_agents.toasts.run_details_load_failed'));
     }
   }
 
@@ -309,20 +308,20 @@ export default function KiAgentAdminPage() {
   async function handleApprove(id: number) {
     try {
       await api.post(`/v2/admin/ki-agents/proposals/${id}/approve`, {});
-      toast.success('Proposal approved and applied');
+      toast.success(t('ai.ki_agents.toasts.proposal_approved'));
       void fetchProposals();
     } catch {
-      toast.error('Failed to approve proposal');
+      toast.error(t('ai.ki_agents.toasts.proposal_approve_failed'));
     }
   }
 
   async function handleReject(id: number) {
     try {
       await api.post(`/v2/admin/ki-agents/proposals/${id}/reject`, {});
-      toast.success('Proposal rejected');
+      toast.success(t('ai.ki_agents.toasts.proposal_rejected'));
       void fetchProposals();
     } catch {
-      toast.error('Failed to reject proposal');
+      toast.error(t('ai.ki_agents.toasts.proposal_reject_failed'));
     }
   }
 
@@ -333,13 +332,15 @@ export default function KiAgentAdminPage() {
         '/v2/admin/ki-agents/proposals/approve-eligible',
         {},
       );
-      toast.success(
-        `Approved ${res.data?.approved ?? 0} proposals (${res.data?.failed ?? 0} failed, threshold ${((res.data?.threshold ?? 0) * 100).toFixed(0)}%)`,
-      );
+      toast.success(t('ai.ki_agents.toasts.approved_eligible', {
+        approved: res.data?.approved ?? 0,
+        failed: res.data?.failed ?? 0,
+        threshold: ((res.data?.threshold ?? 0) * 100).toFixed(0),
+      }));
       void fetchProposals();
       void fetchStats();
     } catch {
-      toast.error('Failed to approve eligible proposals');
+      toast.error(t('ai.ki_agents.toasts.approve_eligible_failed'));
     } finally {
       setApprovingAll(false);
     }
@@ -350,6 +351,11 @@ export default function KiAgentAdminPage() {
   // -------------------------------------------------------------------------
 
   const pendingCount = proposals.filter((p) => p.status === 'pending_review').length;
+  const empty = t('ai.common.empty_dash');
+  const agentTypeText = (value: string) => t(`ai.ki_agents.agent_types.${value}`, agentTypeLabel(value));
+  const statusText = (value: string) => t(`ai.ki_agents.status.${value}`, value.replace(/_/g, ' '));
+  const triggeredByText = (value: string) => t(`ai.ki_agents.triggered_by.${value}`, value);
+  const proposalFilters = ['pending_review', 'approved', 'auto_applied', 'rejected', 'expired', ''] as const;
 
   return (
     <div className="space-y-6 p-6">
@@ -357,23 +363,22 @@ export default function KiAgentAdminPage() {
       <div className="flex items-center gap-3">
         <Brain size={28} className="text-primary" />
         <div>
-          <h1 className="text-2xl font-bold">KI-Agenten</h1>
+          <h1 className="text-2xl font-bold">{t('ai.ki_agents.meta.title')}</h1>
           <p className="text-sm text-default-500">
-            AG61 — Autonomous Agent Framework. Agents propose actions; humans approve before
-            anything is applied.
+            {t('ai.ki_agents.meta.description')}
           </p>
         </div>
         {stats && (
           <div className="ml-auto flex gap-4 text-sm">
             <span className="text-default-500">
-              <strong>{stats.total_runs}</strong> total runs
+              <strong>{stats.total_runs}</strong> {t('ai.ki_agents.stats.total_runs')}
             </span>
             <span className="text-default-500">
-              <strong>{stats.total_proposals}</strong> total proposals
+              <strong>{stats.total_proposals}</strong> {t('ai.ki_agents.stats.total_proposals')}
             </span>
             {pendingCount > 0 && (
               <Chip color="warning" size="sm" startContent={<Clock size={12} />}>
-                {pendingCount} pending review
+                {t('ai.ki_agents.stats.pending_review', { count: pendingCount })}
               </Chip>
             )}
           </div>
@@ -384,30 +389,22 @@ export default function KiAgentAdminPage() {
         <div className="flex gap-3">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
           <div className="space-y-1 text-sm">
-            <p className="font-semibold text-primary-800 dark:text-primary-200">About KI-Agenten</p>
+            <p className="font-semibold text-primary-800 dark:text-primary-200">{t('ai.ki_agents.about.title')}</p>
             <p className="text-default-600">
-              KI-Agenten (AI Agents) automate routine coordination tasks — finding good care pairings, nudging
-              inactive members, summarising coordinator workloads, and routing open help requests. Every agent
-              works on a <strong>propose-then-approve</strong> model: agents generate proposals, but nothing is
-              applied until a human approves it (unless the proposal's confidence score exceeds the auto-apply
-              threshold you configure). Use the <strong>Config</strong> tab to enable agents and set thresholds,
-              the <strong>Runs</strong> tab to see execution history, and the <strong>Proposals</strong> tab to
-              review and approve or reject pending suggestions.
+              {t('ai.ki_agents.about.body')}
             </p>
             <p className="text-default-500">
-              <strong>Tandem Matching</strong> — suggests <Abbr term="KISS">KISS</Abbr>-style one-to-one care pairings based on skills,
-              location, and availability.{' '}
-              <strong>Nudge Dispatch</strong> — sends targeted prompts to members who have been inactive or
-              have unmatched requests.{' '}
-              <strong>Demand Forecast</strong> — predicts upcoming care demand from historical patterns.{' '}
-              <strong>Help Routing</strong> — automatically suggests the best coordinator for open help requests.{' '}
-              <strong>Activity Summary</strong> — emails coordinators a weekly digest of volunteer activity.
+              <strong>{t('ai.ki_agents.agent_types.tandem_matching')}</strong> - {t('ai.ki_agents.about.tandem_prefix')} <Abbr term="KISS">KISS</Abbr>{t('ai.ki_agents.about.tandem_suffix')}{' '}
+              <strong>{t('ai.ki_agents.agent_types.nudge_dispatch')}</strong> - {t('ai.ki_agents.about.nudge')}{' '}
+              <strong>{t('ai.ki_agents.agent_types.demand_forecast')}</strong> - {t('ai.ki_agents.about.demand')}{' '}
+              <strong>{t('ai.ki_agents.agent_types.help_routing')}</strong> - {t('ai.ki_agents.about.help')}{' '}
+              <strong>{t('ai.ki_agents.agent_types.activity_summary')}</strong> - {t('ai.ki_agents.about.activity')}
             </p>
           </div>
         </div>
       </div>
 
-      <Tabs aria-label="KI-Agenten tabs" variant="underlined" color="primary">
+      <Tabs aria-label={t('ai.ki_agents.tabs.aria')} variant="underlined" color="primary">
         {/* ================================================================ */}
         {/* CONFIG TAB                                                        */}
         {/* ================================================================ */}
@@ -416,7 +413,7 @@ export default function KiAgentAdminPage() {
           title={
             <div className="flex items-center gap-2">
               <Zap size={16} />
-              <span>Config</span>
+              <span>{t('ai.ki_agents.tabs.config')}</span>
             </div>
           }
         >
@@ -425,9 +422,9 @@ export default function KiAgentAdminPage() {
               {/* Master switch */}
               <div className="col-span-full flex items-center justify-between rounded-xl border border-default-200 p-4">
                 <div>
-                  <p className="font-semibold">Enable KI-Agenten</p>
+                  <p className="font-semibold">{t('ai.ki_agents.config.enable_title')}</p>
                   <p className="text-sm text-default-500">
-                    Master on/off. When off, no agents will run on schedule.
+                    {t('ai.ki_agents.config.enable_description')}
                   </p>
                 </div>
                 <Switch
@@ -439,14 +436,14 @@ export default function KiAgentAdminPage() {
 
               {/* Agent toggles */}
               <div className="rounded-xl border border-default-200 p-4 space-y-4">
-                <p className="font-semibold text-sm text-default-700">Agent Types</p>
+                <p className="font-semibold text-sm text-default-700">{t('ai.ki_agents.config.agent_types_title')}</p>
                 {(
                   [
-                    ['tandem_matching_enabled', 'Tandem Matching', <><Abbr term="KISS">KISS</Abbr>-style support pairings</>],
-                    ['nudge_dispatch_enabled', 'Nudge Dispatch', 'Smart engagement nudges to members'],
-                    ['activity_summary_enabled', 'Activity Summary', 'Weekly vol-log summary to coordinators'],
-                    ['demand_forecast_enabled', 'Demand Forecast', 'Predict care demand from vol-log trends'],
-                    ['help_routing_enabled', 'Help Routing', 'Auto-route open help requests'],
+                    ['tandem_matching_enabled', t('ai.ki_agents.agent_types.tandem_matching'), <><Abbr term="KISS">KISS</Abbr>{t('ai.ki_agents.config.tandem_description')}</>],
+                    ['nudge_dispatch_enabled', t('ai.ki_agents.agent_types.nudge_dispatch'), t('ai.ki_agents.config.nudge_description')],
+                    ['activity_summary_enabled', t('ai.ki_agents.agent_types.activity_summary'), t('ai.ki_agents.config.activity_description')],
+                    ['demand_forecast_enabled', t('ai.ki_agents.agent_types.demand_forecast'), t('ai.ki_agents.config.demand_description')],
+                    ['help_routing_enabled', t('ai.ki_agents.agent_types.help_routing'), t('ai.ki_agents.config.help_description')],
                   ] as [keyof AgentConfig, string, React.ReactNode][]
                 ).map(([key, label, desc]) => (
                   <div key={key} className="flex items-center justify-between">
@@ -466,11 +463,11 @@ export default function KiAgentAdminPage() {
 
               {/* Thresholds */}
               <div className="rounded-xl border border-default-200 p-4 space-y-5">
-                <p className="font-semibold text-sm text-default-700">Thresholds & Schedule</p>
+                <p className="font-semibold text-sm text-default-700">{t('ai.ki_agents.config.thresholds_title')}</p>
 
                 <div>
                   <p className="text-sm mb-2">
-                    Auto-apply threshold:{' '}
+                    {t('ai.ki_agents.config.auto_apply_threshold')}{' '}
                     <strong>{(mergedConfig.auto_apply_threshold * 100).toFixed(0)}%</strong>
                   </p>
                   <Slider
@@ -481,16 +478,16 @@ export default function KiAgentAdminPage() {
                     onChange={(v) =>
                       patchConfig('auto_apply_threshold', typeof v === 'number' ? v : (v[0] ?? 0))
                     }
-                    aria-label="Auto-apply threshold"
+                    aria-label={t('ai.ki_agents.config.auto_apply_threshold_aria')}
                     color="success"
                   />
                   <p className="text-xs text-default-400 mt-1">
-                    Proposals above this confidence are applied automatically without review.
+                    {t('ai.ki_agents.config.auto_apply_threshold_help')}
                   </p>
                 </div>
 
                 <Input
-                  label="Max proposals per run"
+                  label={t('ai.ki_agents.config.max_proposals')}
                   type="number"
                   value={String(mergedConfig.max_proposals_per_run)}
                   onValueChange={(v) => patchConfig('max_proposals_per_run', parseInt(v, 10) || 50)}
@@ -501,7 +498,7 @@ export default function KiAgentAdminPage() {
                 />
 
                 <Input
-                  label="Schedule hour (0–23, server local time)"
+                  label={t('ai.ki_agents.config.schedule_hour')}
                   type="number"
                   value={String(mergedConfig.schedule_hour)}
                   onValueChange={(v) => patchConfig('schedule_hour', parseInt(v, 10) || 2)}
@@ -512,11 +509,11 @@ export default function KiAgentAdminPage() {
                 />
 
                 <Input
-                  label="Notification email"
+                  label={t('ai.ki_agents.config.notification_email')}
                   type="email"
                   value={mergedConfig.notification_email ?? ''}
                   onValueChange={(v) => patchConfig('notification_email', v || null)}
-                  placeholder="admin@example.org"
+                  placeholder={t('ai.ki_agents.config.notification_email_placeholder')}
                   variant="bordered"
                   size="sm"
                 />
@@ -530,12 +527,17 @@ export default function KiAgentAdminPage() {
                   isLoading={savingConfig}
                   startContent={<CheckCircle size={16} />}
                 >
-                  Save Config
+                  {t('ai.ki_agents.actions.save_config')}
                 </Button>
               </div>
             </div>
           ) : (
-            <p className="mt-6 text-default-400">Loading config…</p>
+            <Card className="mt-4 border border-default-200">
+              <CardBody className="flex flex-row items-center gap-3 text-sm text-default-500">
+                <Spinner size="sm" />
+                {t('ai.ki_agents.empty.loading_config')}
+              </CardBody>
+            </Card>
           )}
         </Tab>
 
@@ -548,7 +550,7 @@ export default function KiAgentAdminPage() {
             <div className="flex items-center gap-2">
               <Activity size={16} />
               <span>
-                Proposals{pendingCount > 0 && ` (${pendingCount})`}
+                {t('ai.ki_agents.tabs.proposals')}{pendingCount > 0 && ` (${pendingCount})`}
               </span>
             </div>
           }
@@ -557,7 +559,7 @@ export default function KiAgentAdminPage() {
             {/* Filter + Approve All */}
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex gap-2">
-                {['pending_review', 'approved', 'auto_applied', 'rejected', 'expired', ''].map(
+                {proposalFilters.map(
                   (s) => (
                     <Chip
                       key={s || 'all'}
@@ -566,7 +568,7 @@ export default function KiAgentAdminPage() {
                       className="cursor-pointer"
                       onClick={() => setProposalFilter(s)}
                     >
-                      {s || 'All'}
+                      {s ? statusText(s) : t('ai.ki_agents.status.all')}
                     </Chip>
                   ),
                 )}
@@ -579,57 +581,57 @@ export default function KiAgentAdminPage() {
                   onPress={handleApproveAllEligible}
                   isLoading={approvingAll}
                 >
-                  Approve All Eligible
+                  {t('ai.ki_agents.actions.approve_all_eligible')}
                 </Button>
                 <p className="text-xs text-default-400">
-                  Approves all <em>pending_review</em> proposals whose confidence meets the auto-apply threshold.
+                  {t('ai.ki_agents.proposals.approve_all_help')}
                 </p>
               </div>
             </div>
 
             {/* Status + confidence legend */}
             <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-default-200 bg-default-50 px-3 py-2 text-xs text-default-500">
-              <span className="font-medium text-default-700">Status:</span>
-              <span><Chip size="sm" color="warning" variant="flat" className="mr-1">pending review</Chip>awaiting your decision</span>
-              <span><Chip size="sm" color="success" variant="flat" className="mr-1">approved</Chip>human-approved &amp; applied</span>
-              <span><Chip size="sm" color="success" variant="flat" className="mr-1">auto applied</Chip>applied automatically (exceeded threshold)</span>
-              <span><Chip size="sm" color="danger" variant="flat" className="mr-1">rejected</Chip>discarded, not applied</span>
-              <span className="ml-2 font-medium text-default-700">Confidence:</span>
-              <span className="text-success-600">■ ≥80% safe to auto-apply</span>
-              <span className="text-warning-600">■ 50–79% review recommended</span>
-              <span className="text-danger-600">■ &lt;50% low confidence</span>
+              <span className="font-medium text-default-700">{t('ai.ki_agents.legend.status')}</span>
+              <span><Chip size="sm" color="warning" variant="flat" className="mr-1">{statusText('pending_review')}</Chip>{t('ai.ki_agents.legend.awaiting_decision')}</span>
+              <span><Chip size="sm" color="success" variant="flat" className="mr-1">{statusText('approved')}</Chip>{t('ai.ki_agents.legend.human_approved')}</span>
+              <span><Chip size="sm" color="success" variant="flat" className="mr-1">{statusText('auto_applied')}</Chip>{t('ai.ki_agents.legend.auto_applied')}</span>
+              <span><Chip size="sm" color="danger" variant="flat" className="mr-1">{statusText('rejected')}</Chip>{t('ai.ki_agents.legend.rejected')}</span>
+              <span className="ml-2 font-medium text-default-700">{t('ai.ki_agents.legend.confidence')}</span>
+              <span className="text-success-600">{t('ai.ki_agents.legend.confidence_high')}</span>
+              <span className="text-warning-600">{t('ai.ki_agents.legend.confidence_medium')}</span>
+              <span className="text-danger-600">{t('ai.ki_agents.legend.confidence_low')}</span>
             </div>
 
             <Table
-              aria-label="Agent proposals"
+              aria-label={t('ai.ki_agents.proposals.table_aria')}
               isStriped
               removeWrapper
             >
               <TableHeader>
-                <TableColumn>Type</TableColumn>
-                <TableColumn>Subject User</TableColumn>
-                <TableColumn>Target User</TableColumn>
-                <TableColumn>Confidence</TableColumn>
-                <TableColumn>Proposal Data</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Created</TableColumn>
-                <TableColumn>Actions</TableColumn>
+                <TableColumn>{t('ai.ki_agents.proposals.columns.type')}</TableColumn>
+                <TableColumn>{t('ai.ki_agents.proposals.columns.subject_user')}</TableColumn>
+                <TableColumn>{t('ai.ki_agents.proposals.columns.target_user')}</TableColumn>
+                <TableColumn>{t('ai.ki_agents.proposals.columns.confidence')}</TableColumn>
+                <TableColumn>{t('ai.ki_agents.proposals.columns.proposal_data')}</TableColumn>
+                <TableColumn>{t('ai.ki_agents.proposals.columns.status')}</TableColumn>
+                <TableColumn>{t('ai.ki_agents.proposals.columns.created')}</TableColumn>
+                <TableColumn>{t('ai.ki_agents.proposals.columns.actions')}</TableColumn>
               </TableHeader>
-              <TableBody emptyContent={proposalFilter === 'pending_review' ? 'No proposals awaiting review. Run an agent from the Runs tab to generate proposals.' : 'No proposals match this filter.'}>
+              <TableBody emptyContent={loadingProposals ? t('ai.ki_agents.empty.loading_proposals') : proposalFilter === 'pending_review' ? t('ai.ki_agents.empty.no_pending_proposals') : t('ai.ki_agents.empty.no_filtered_proposals')}>
                 {proposals.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell>
                       <span className="font-mono text-xs">{p.proposal_type}</span>
                     </TableCell>
-                    <TableCell>{p.subject_user_id ?? '—'}</TableCell>
-                    <TableCell>{p.target_user_id ?? '—'}</TableCell>
+                    <TableCell>{p.subject_user_id ?? empty}</TableCell>
+                    <TableCell>{p.target_user_id ?? empty}</TableCell>
                     <TableCell>
                       {p.confidence_score !== null ? (
                         <Chip size="sm" color={confidenceColor(p.confidence_score)}>
                           {(p.confidence_score * 100).toFixed(0)}%
                         </Chip>
                       ) : (
-                        '—'
+                        empty
                       )}
                     </TableCell>
                     <TableCell>
@@ -640,11 +642,11 @@ export default function KiAgentAdminPage() {
                     </TableCell>
                     <TableCell>
                       <Chip size="sm" color={statusColor(p.status)}>
-                        {p.status.replace(/_/g, ' ')}
+                        {statusText(p.status)}
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs">{fmtDate(p.created_at)}</span>
+                      <span className="text-xs">{fmtDate(p.created_at, empty)}</span>
                     </TableCell>
                     <TableCell>
                       {p.status === 'pending_review' && (
@@ -655,7 +657,7 @@ export default function KiAgentAdminPage() {
                             variant="flat"
                             isIconOnly
                             onPress={() => handleApprove(p.id)}
-                            aria-label="Approve"
+                            aria-label={t('ai.ki_agents.actions.approve')}
                           >
                             <CheckCircle size={14} />
                           </Button>
@@ -665,7 +667,7 @@ export default function KiAgentAdminPage() {
                             variant="flat"
                             isIconOnly
                             onPress={() => handleReject(p.id)}
-                            aria-label="Reject"
+                            aria-label={t('ai.ki_agents.actions.reject')}
                           >
                             <XCircle size={14} />
                           </Button>
@@ -687,7 +689,7 @@ export default function KiAgentAdminPage() {
           title={
             <div className="flex items-center gap-2">
               <BarChart3 size={16} />
-              <span>Runs</span>
+              <span>{t('ai.ki_agents.tabs.runs')}</span>
             </div>
           }
         >
@@ -695,17 +697,17 @@ export default function KiAgentAdminPage() {
             {/* Trigger run */}
             <div className="flex items-center gap-3 rounded-xl border border-default-200 p-4 flex-wrap">
               <Bot size={20} className="text-primary" />
-              <p className="font-semibold text-sm">Trigger a run now</p>
+              <p className="font-semibold text-sm">{t('ai.ki_agents.runs.trigger_title')}</p>
               <select
                 value={triggerType}
                 onChange={(e) => setTriggerType(e.target.value as AgentType)}
                 className="rounded-lg border border-default-300 bg-default-50 px-3 py-1.5 text-sm"
-                aria-label="Agent type to trigger"
-                title="Agent type"
+                aria-label={t('ai.ki_agents.runs.agent_type_aria')}
+                title={t('ai.ki_agents.runs.agent_type_title')}
               >
                 {AGENT_TYPES.map((t) => (
                   <option key={t} value={t}>
-                    {agentTypeLabel(t)}
+                    {agentTypeText(t)}
                   </option>
                 ))}
               </select>
@@ -716,44 +718,44 @@ export default function KiAgentAdminPage() {
                 onPress={handleTriggerRun}
                 isLoading={triggering}
               >
-                Trigger
+                {t('ai.ki_agents.actions.trigger')}
               </Button>
             </div>
 
             <Table
-              aria-label="Agent runs"
+              aria-label={t('ai.ki_agents.runs.table_aria')}
               isStriped
               removeWrapper
             >
               <TableHeader>
-                <TableColumn>Agent Type</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Proposals</TableColumn>
-                <TableColumn>Applied</TableColumn>
-                <TableColumn>Started</TableColumn>
-                <TableColumn>Duration</TableColumn>
-                <TableColumn title="'manual' = triggered by an admin from this page; 'scheduled' = run automatically on the configured schedule hour">Triggered by</TableColumn>
-                <TableColumn>Actions</TableColumn>
+                <TableColumn>{t('ai.ki_agents.runs.columns.agent_type')}</TableColumn>
+                <TableColumn>{t('ai.ki_agents.runs.columns.status')}</TableColumn>
+                <TableColumn>{t('ai.ki_agents.runs.columns.proposals')}</TableColumn>
+                <TableColumn>{t('ai.ki_agents.runs.columns.applied')}</TableColumn>
+                <TableColumn>{t('ai.ki_agents.runs.columns.started')}</TableColumn>
+                <TableColumn>{t('ai.ki_agents.runs.columns.duration')}</TableColumn>
+                <TableColumn title={t('ai.ki_agents.runs.triggered_by_help')}>{t('ai.ki_agents.runs.columns.triggered_by')}</TableColumn>
+                <TableColumn>{t('ai.ki_agents.runs.columns.actions')}</TableColumn>
               </TableHeader>
-              <TableBody emptyContent="No runs yet. Use the 'Trigger a run now' panel above to kick off your first agent run.">
+              <TableBody emptyContent={loadingRuns ? t('ai.ki_agents.empty.loading_runs') : t('ai.ki_agents.empty.no_runs')}>
                 {runs.map((r) => (
                   <TableRow key={r.id}>
                     <TableCell>
-                      <span className="font-medium">{agentTypeLabel(r.agent_type)}</span>
+                      <span className="font-medium">{agentTypeText(r.agent_type)}</span>
                     </TableCell>
                     <TableCell>
                       <Chip size="sm" color={statusColor(r.status)}>
-                        {r.status}
+                        {statusText(r.status)}
                       </Chip>
                     </TableCell>
                     <TableCell>{r.proposals_generated}</TableCell>
                     <TableCell>{r.proposals_applied}</TableCell>
                     <TableCell>
-                      <span className="text-xs">{fmtDate(r.started_at)}</span>
+                      <span className="text-xs">{fmtDate(r.started_at, empty)}</span>
                     </TableCell>
-                    <TableCell>{durationMs(r)}</TableCell>
+                    <TableCell>{durationMs(r, empty)}</TableCell>
                     <TableCell>
-                      <span className="text-xs capitalize">{r.triggered_by}</span>
+                      <span className="text-xs capitalize">{triggeredByText(r.triggered_by)}</span>
                     </TableCell>
                     <TableCell>
                       <Button
@@ -761,7 +763,7 @@ export default function KiAgentAdminPage() {
                         variant="flat"
                         onPress={() => handleOpenRunDetail(r.id)}
                       >
-                        Details
+                        {t('ai.ki_agents.actions.details')}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -786,7 +788,7 @@ export default function KiAgentAdminPage() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <Bot size={18} />
-                Run #{selectedRun?.id} — {selectedRun ? agentTypeLabel(selectedRun.agent_type) : ''}
+                {t('ai.ki_agents.run_detail.title', { id: selectedRun?.id ?? empty, type: selectedRun ? agentTypeText(selectedRun.agent_type) : '' })}
               </ModalHeader>
               <ModalBody>
                 {selectedRun && (
@@ -794,29 +796,29 @@ export default function KiAgentAdminPage() {
                     {/* Meta */}
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <span className="text-default-500">Status: </span>
+                        <span className="text-default-500">{t('ai.ki_agents.run_detail.status')} </span>
                         <Chip size="sm" color={statusColor(selectedRun.status)}>
-                          {selectedRun.status}
+                          {statusText(selectedRun.status)}
                         </Chip>
                       </div>
                       <div>
-                        <span className="text-default-500">Triggered by: </span>
-                        <span className="capitalize">{selectedRun.triggered_by}</span>
+                        <span className="text-default-500">{t('ai.ki_agents.run_detail.triggered_by')} </span>
+                        <span className="capitalize">{triggeredByText(selectedRun.triggered_by)}</span>
                       </div>
                       <div>
-                        <span className="text-default-500">Started: </span>
-                        {fmtDate(selectedRun.started_at)}
+                        <span className="text-default-500">{t('ai.ki_agents.run_detail.started')} </span>
+                        {fmtDate(selectedRun.started_at, empty)}
                       </div>
                       <div>
-                        <span className="text-default-500">Duration: </span>
-                        {durationMs(selectedRun)}
+                        <span className="text-default-500">{t('ai.ki_agents.run_detail.duration')} </span>
+                        {durationMs(selectedRun, empty)}
                       </div>
                       <div>
-                        <span className="text-default-500">Proposals generated: </span>
+                        <span className="text-default-500">{t('ai.ki_agents.run_detail.proposals_generated')} </span>
                         {selectedRun.proposals_generated}
                       </div>
                       <div>
-                        <span className="text-default-500">Proposals applied: </span>
+                        <span className="text-default-500">{t('ai.ki_agents.run_detail.proposals_applied')} </span>
                         {selectedRun.proposals_applied}
                       </div>
                     </div>
@@ -837,14 +839,14 @@ export default function KiAgentAdminPage() {
                     {selectedRun.proposals && selectedRun.proposals.length > 0 && (
                       <div>
                         <p className="font-semibold text-sm mb-2">
-                          Proposals ({selectedRun.proposals.length})
+                          {t('ai.ki_agents.run_detail.proposals_count', { count: selectedRun.proposals.length })}
                         </p>
-                        <Table aria-label="Run proposals" removeWrapper>
+                        <Table aria-label={t('ai.ki_agents.run_detail.proposals_table_aria')} removeWrapper>
                           <TableHeader>
-                            <TableColumn>Type</TableColumn>
-                            <TableColumn>Subject</TableColumn>
-                            <TableColumn>Confidence</TableColumn>
-                            <TableColumn>Status</TableColumn>
+                            <TableColumn>{t('ai.ki_agents.proposals.columns.type')}</TableColumn>
+                            <TableColumn>{t('ai.ki_agents.run_detail.columns.subject')}</TableColumn>
+                            <TableColumn>{t('ai.ki_agents.proposals.columns.confidence')}</TableColumn>
+                            <TableColumn>{t('ai.ki_agents.proposals.columns.status')}</TableColumn>
                           </TableHeader>
                           <TableBody>
                             {selectedRun.proposals.map((p) => (
@@ -852,19 +854,19 @@ export default function KiAgentAdminPage() {
                                 <TableCell>
                                   <span className="font-mono text-xs">{p.proposal_type}</span>
                                 </TableCell>
-                                <TableCell>{p.subject_user_id ?? '—'}</TableCell>
+                                <TableCell>{p.subject_user_id ?? empty}</TableCell>
                                 <TableCell>
                                   {p.confidence_score !== null ? (
                                     <Chip size="sm" color={confidenceColor(p.confidence_score)}>
                                       {(p.confidence_score * 100).toFixed(0)}%
                                     </Chip>
                                   ) : (
-                                    '—'
+                                    empty
                                   )}
                                 </TableCell>
                                 <TableCell>
                                   <Chip size="sm" color={statusColor(p.status)}>
-                                    {p.status.replace(/_/g, ' ')}
+                                    {statusText(p.status)}
                                   </Chip>
                                 </TableCell>
                               </TableRow>
@@ -878,7 +880,7 @@ export default function KiAgentAdminPage() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
-                  Close
+                  {t('ai.common.close')}
                 </Button>
               </ModalFooter>
             </>
