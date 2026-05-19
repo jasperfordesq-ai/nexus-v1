@@ -956,7 +956,8 @@
       "title": "Talent Search"
     },
     "my_applications": {
-      "title": "My Applications"
+      "title": "My Applications",
+      "description": "Track job, volunteering, and timebanking applications from one private dashboard."
     },
     "analytics": {
       "title": "Job Analytics"
