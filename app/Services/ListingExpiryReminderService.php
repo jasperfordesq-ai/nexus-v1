@@ -84,7 +84,7 @@ class ListingExpiryReminderService
                 ->where('l.expires_at', '<=', now()->addDays($daysBefore))
                 ->whereNull('lers.id')
                 ->select([
-                    'l.id', 'l.title', 'l.type', 'l.user_id', 'l.expires_at',
+                    'l.id', 'l.tenant_id', 'l.title', 'l.type', 'l.user_id', 'l.expires_at',
                     'u.name', 'u.first_name', 'u.last_name', 'u.email', 'u.preferred_language',
                 ])
                 ->get();
@@ -96,15 +96,18 @@ class ListingExpiryReminderService
         foreach ($listings as $listing) {
             $userId = (int) $listing->user_id;
             $listingId = (int) $listing->id;
+            $listingTenantId = (int) $listing->tenant_id;
 
             try {
                 // Cron default is 'en' — switch to the owner's preferred_language.
-                $handled = LocaleContext::withLocale($listing, function () use ($userId, $listing, $daysBefore, $tenantId, $listingId): bool {
+                $handled = TenantContext::runForTenant($listingTenantId, function () use ($userId, $listing, $daysBefore, $listingTenantId, $listingId): bool {
+                    return (bool) LocaleContext::withLocale($listing, function () use ($userId, $listing, $daysBefore, $listingTenantId, $listingId): bool {
                     if (!$this->sendReminder($userId, $listing, $daysBefore)) {
                         return false;
                     }
-                    $this->markReminderSent($tenantId, $listingId, $userId, $daysBefore);
+                    $this->markReminderSent($listingTenantId, $listingId, $userId, $daysBefore);
                     return true;
+                    });
                 });
                 if (!$handled) {
                     continue;
@@ -148,7 +151,7 @@ class ListingExpiryReminderService
                 ->whereBetween('l.expires_at', [now()->subDay(), now()])
                 ->whereNull('lers.id')
                 ->select([
-                    'l.id', 'l.title', 'l.type', 'l.user_id', 'l.expires_at',
+                    'l.id', 'l.tenant_id', 'l.title', 'l.type', 'l.user_id', 'l.expires_at',
                     'u.name', 'u.first_name', 'u.last_name', 'u.email', 'u.preferred_language',
                 ])
                 ->get();
@@ -160,14 +163,17 @@ class ListingExpiryReminderService
         foreach ($listings as $listing) {
             $userId = (int) $listing->user_id;
             $listingId = (int) $listing->id;
+            $listingTenantId = (int) $listing->tenant_id;
 
             try {
-                $handled = LocaleContext::withLocale($listing, function () use ($userId, $listing, $tenantId, $listingId): bool {
+                $handled = TenantContext::runForTenant($listingTenantId, function () use ($userId, $listing, $listingTenantId, $listingId): bool {
+                    return (bool) LocaleContext::withLocale($listing, function () use ($userId, $listing, $listingTenantId, $listingId): bool {
                     if (!$this->sendExpiredNotification($userId, $listing)) {
                         return false;
                     }
-                    $this->markReminderSent($tenantId, $listingId, $userId, 0);
+                    $this->markReminderSent($listingTenantId, $listingId, $userId, 0);
                     return true;
+                    });
                 });
                 if (!$handled) {
                     continue;
@@ -213,7 +219,6 @@ class ListingExpiryReminderService
         try {
             $email = $listing->email ?? null;
             if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
                 $frontendUrl = TenantContext::getFrontendUrl();
                 $basePath = TenantContext::getSlugPrefix();
                 $listingUrl = $frontendUrl . $basePath . $link;

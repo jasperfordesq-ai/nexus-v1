@@ -199,11 +199,17 @@ class VereinDuesService
     /**
      * Mark dues as paid + write payment ledger. Idempotent on stripe_payment_intent_id.
      */
-    public function markPaid(int $duesId, string $stripePaymentIntentId, ?string $paymentMethod = null, ?string $receiptUrl = null): array
+    public function markPaid(
+        int $duesId,
+        string $stripePaymentIntentId,
+        ?string $paymentMethod = null,
+        ?string $receiptUrl = null,
+        bool $requirePaidEmailEvidence = false
+    ): array
     {
         $tenantId = TenantContext::getId();
 
-        return DB::transaction(function () use ($duesId, $stripePaymentIntentId, $paymentMethod, $receiptUrl, $tenantId) {
+        $result = DB::transaction(function () use ($duesId, $stripePaymentIntentId, $paymentMethod, $receiptUrl, $tenantId) {
             $dues = DB::table('verein_member_dues')
                 ->where('id', $duesId)
                 ->where('tenant_id', $tenantId)
@@ -220,10 +226,11 @@ class VereinDuesService
                 ->where('tenant_id', $tenantId)
                 ->first();
             if ($existing) {
-                if (empty($dues->paid_email_sent_at)) {
-                    $this->markPaidEmailAttempt($dues, $receiptUrl);
+                $paidEmailSent = !empty($dues->paid_email_sent_at);
+                if (!$paidEmailSent) {
+                    $paidEmailSent = $this->markPaidEmailAttempt($dues, $receiptUrl);
                 }
-                return ['dues_id' => $duesId, 'payment_id' => (int) $existing->id, 'idempotent' => true];
+                return ['dues_id' => $duesId, 'payment_id' => (int) $existing->id, 'idempotent' => true, 'paid_email_sent' => $paidEmailSent];
             }
 
             DB::table('verein_member_dues')->where('id', $duesId)->update([
@@ -251,12 +258,21 @@ class VereinDuesService
                 ->where('id', $duesId)
                 ->where('tenant_id', $tenantId)
                 ->first();
+            $paidEmailSent = false;
             if ($dues) {
-                $this->markPaidEmailAttempt($dues, $receiptUrl);
+                $paidEmailSent = $this->markPaidEmailAttempt($dues, $receiptUrl);
             }
 
-            return ['dues_id' => $duesId, 'payment_id' => (int) $paymentId, 'idempotent' => false];
+            return ['dues_id' => $duesId, 'payment_id' => (int) $paymentId, 'idempotent' => false, 'paid_email_sent' => $paidEmailSent];
         });
+
+        if ($requirePaidEmailEvidence && empty($result['paid_email_sent'])) {
+            throw new \RuntimeException('Verein dues paid email failed');
+        }
+
+        unset($result['paid_email_sent']);
+
+        return $result;
     }
 
     public function waive(int $duesId, int $adminId, string $reason): array
@@ -541,7 +557,7 @@ class VereinDuesService
             $paymentMethod = $eventData->payment_method_types[0] ?? 'card';
 
             try {
-                (new self())->markPaid($duesId, (string) $piId, $paymentMethod, $receiptUrl);
+                (new self())->markPaid($duesId, (string) $piId, $paymentMethod, $receiptUrl, true);
             } catch (\Throwable $e) {
                 Log::error('VereinDues webhook: markPaid failed', [
                     'dues_id' => $duesId,

@@ -37,13 +37,13 @@ class AdminEmailDeliverabilityController extends BaseApiController
     public function summary(): JsonResponse
     {
         $this->requireAdmin();
-        $tenantId = $this->getTenantId();
+        $tenantId = $this->resolveAdminTenantFilter($this->isSuperAdmin(), $this->getTenantId());
 
         $windowDays = (int) ($this->input('days', 7) ?: 7);
         $windowDays = max(1, min($windowDays, 90));
 
         $rows = DB::table('email_log')
-            ->where('tenant_id', $tenantId)
+            ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId))
             ->where('created_at', '>=', now()->subDays($windowDays))
             ->select('status', DB::raw('COUNT(*) as count'))
             ->groupBy('status')
@@ -82,7 +82,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
     public function triggerAudit(): JsonResponse
     {
         $this->requireAdmin();
-        $tenantId = $this->getTenantId();
+        $tenantId = $this->resolveAdminTenantFilter($this->isSuperAdmin(), $this->getTenantId());
         $windowHours = max(1, min((int) ($this->input('hours', 24) ?: 24), 168));
 
         return $this->respondWithData(
@@ -99,12 +99,13 @@ class AdminEmailDeliverabilityController extends BaseApiController
     public function logs(): JsonResponse
     {
         $this->requireAdmin();
-        $tenantId = $this->getTenantId();
+        $tenantId = $this->resolveAdminTenantFilter($this->isSuperAdmin(), $this->getTenantId());
 
         $limit = max(1, min((int) ($this->input('limit', 50) ?: 50), 200));
         $offset = max(0, (int) ($this->input('offset', 0)));
 
-        $q = DB::table('email_log')->where('tenant_id', $tenantId);
+        $q = DB::table('email_log')
+            ->when($tenantId !== null, fn ($query) => $query->where('tenant_id', $tenantId));
 
         if ($userId = (int) ($this->input('user_id', 0))) {
             $q->where('user_id', $userId);
@@ -154,7 +155,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
     public function queues(): JsonResponse
     {
         $this->requireAdmin();
-        $tenantId = $this->getTenantId();
+        $tenantId = $this->resolveAdminTenantFilter($this->isSuperAdmin(), $this->getTenantId());
 
         $limit = max(1, min((int) ($this->input('limit', 50) ?: 50), 100));
         $status = trim((string) $this->input('status', ''));
@@ -171,7 +172,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
                     $join->on('u.id', '=', 'nq.user_id')
                         ->on('u.tenant_id', '=', 'nq.tenant_id');
                 })
-                ->where('nq.tenant_id', $tenantId)
+                ->when($tenantId !== null, fn ($q) => $q->where('nq.tenant_id', $tenantId))
                 ->whereIn('nq.status', $statuses)
                 ->where(function ($q) {
                     $q->whereIn('nq.status', ['failed', 'suppressed'])
@@ -210,7 +211,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
         if ($source === '' || $source === 'newsletter_queue') {
             $newsletterRows = DB::table('newsletter_queue as nq')
                 ->join('newsletters as n', 'n.id', '=', 'nq.newsletter_id')
-                ->whereRaw('COALESCE(nq.tenant_id, n.tenant_id) = ?', [$tenantId])
+                ->when($tenantId !== null, fn ($q) => $q->whereRaw('COALESCE(nq.tenant_id, n.tenant_id) = ?', [$tenantId]))
                 ->whereIn('nq.status', $statuses)
                 ->where(function ($q) {
                     $q->whereIn('nq.status', ['failed', 'suppressed'])

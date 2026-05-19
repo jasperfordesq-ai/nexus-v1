@@ -29,6 +29,7 @@ class ListingExpiryReminderServiceTest extends TestCase
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('whereNotNull')->andReturnSelf();
         DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('whereBetween')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('get')->andReturn(collect([]));
 
@@ -40,11 +41,11 @@ class ListingExpiryReminderServiceTest extends TestCase
     public function test_sendDueReminders_handles_query_error(): void
     {
         DB::shouldReceive('table')->andThrow(new \Exception('Error'));
-        Log::shouldReceive('error')->once();
+        Log::shouldReceive('error')->times(4);
 
         $result = $this->service->sendDueReminders();
         $this->assertSame(0, $result['sent']);
-        $this->assertSame(1, $result['errors']);
+        $this->assertSame(4, $result['errors']);
     }
 
     public function test_cleanupOldRecords_returns_count(): void

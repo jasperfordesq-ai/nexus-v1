@@ -289,6 +289,44 @@ class VereinDuesServiceTest extends TestCase
         $this->assertSame(1, DB::table('verein_dues_payments')->where('stripe_payment_intent_id', $piId)->count());
     }
 
+    public function test_webhook_paid_email_failure_is_not_treated_as_processed(): void
+    {
+        app()->instance(EmailDispatchService::class, new class extends EmailDispatchService {
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                return false;
+            }
+        });
+
+        $user = $this->makeUser();
+        $this->joinOrg($user);
+        $this->configureFee(6000);
+        $year = (int) date('Y');
+        $this->service->generateAnnualDues($this->organizationId, $year);
+        $duesId = (int) DB::table('verein_member_dues')->where('organization_id', $this->organizationId)->value('id');
+        $piId = 'pi_webhook_failure_' . uniqid('', true);
+
+        try {
+            VereinDuesService::handleWebhookEvent('payment_intent.succeeded', (object) [
+                'id' => $piId,
+                'metadata' => (object) [
+                    'nexus_type' => 'verein_dues',
+                    'nexus_dues_id' => (string) $duesId,
+                ],
+                'payment_method_types' => ['card'],
+            ]);
+            $this->fail('Expected failed Verein paid email to fail webhook processing for retry.');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Verein dues paid email failed', $e->getMessage());
+        }
+
+        $failed = DB::table('verein_member_dues')->where('id', $duesId)->first();
+        $this->assertSame('paid', $failed->status);
+        $this->assertNull($failed->paid_email_sent_at);
+        $this->assertNotNull($failed->paid_email_failed_at);
+        $this->assertSame(1, DB::table('verein_dues_payments')->where('stripe_payment_intent_id', $piId)->count());
+    }
+
     public function test_get_membership_status_returns_year_history(): void
     {
         $user = $this->makeUser(); $this->joinOrg($user);

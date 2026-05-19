@@ -860,8 +860,8 @@ class MemberPremiumService
                 'subscription_id' => $subscriptionId,
                 'event' => $event,
             ]);
-            self::markSubscriptionEventNotification($eventRecordId, true, null);
-            return true;
+            self::markSubscriptionEventNotification($eventRecordId, false, 'Missing recipient email');
+            return false;
         }
 
         $keys = [

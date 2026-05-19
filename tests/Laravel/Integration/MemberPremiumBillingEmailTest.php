@@ -172,6 +172,40 @@ class MemberPremiumBillingEmailTest extends TestCase
             ->count());
     }
 
+    public function test_missing_member_premium_recipient_is_failed_not_sent(): void
+    {
+        $tenantId = 999;
+        [$user, , $stripeSubId] = $this->createMemberSubscription($tenantId);
+        DB::table('users')->where('id', $user->id)->where('tenant_id', $tenantId)->update(['email' => null]);
+
+        $mailer = $this->fakeMailer();
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $eventId = 'evt_member_missing_recipient_' . uniqid();
+
+        try {
+            MemberPremiumService::applyWebhookEvent((object) [
+                'id' => $eventId,
+                'type' => 'invoice.paid',
+                'data' => (object) [
+                    'object' => (object) [
+                        'subscription' => $stripeSubId,
+                    ],
+                ],
+            ]);
+            $this->fail('Expected missing member premium recipient to fail webhook processing for retry.');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Member premium paid email failed', $e->getMessage());
+        }
+
+        $this->assertCount(0, $mailer->calls);
+        $eventRow = DB::table('member_subscription_events')->where('stripe_event_id', $eventId)->first();
+        $this->assertNotNull($eventRow);
+        $this->assertNull($eventRow->notification_sent_at);
+        $this->assertNotNull($eventRow->notification_failed_at);
+        $this->assertSame('Missing recipient email', $eventRow->notification_last_error);
+    }
+
     /**
      * @return array{0:User,1:int,2:string}
      */
