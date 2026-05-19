@@ -1193,9 +1193,8 @@ class SafeguardingService
                     ->first();
 
                 if ($reporter && !empty($reporter->email)) {
-                    TenantContext::setById($tenantId);
-
-                    LocaleContext::withLocale($reporter, function () use ($reporter, $incidentId, $label, $newStatus) {
+                    TenantContext::runForTenant($tenantId, function () use ($reporter, $incidentId, $label, $newStatus, $tenantId, $reporterId) {
+                        LocaleContext::withLocale($reporter, function () use ($reporter, $incidentId, $label, $newStatus, $tenantId, $reporterId) {
                         $firstName = $reporter->first_name ?? $reporter->name ?? __('emails.common.fallback_name');
                         $safeLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
 
@@ -1216,6 +1215,7 @@ class SafeguardingService
                                 'incident_id' => $incidentId,
                             ]);
                         }
+                        });
                     });
                 }
             } catch (\Throwable $emailEx) {

@@ -7,8 +7,10 @@
 namespace Tests\Laravel\Integration;
 
 use App\Core\TenantContext;
+use App\Models\SafeguardingAssignment;
 use App\Models\User;
 use App\Services\EmailDispatchService;
+use App\Services\SafeguardingService;
 use App\Services\VolunteerReminderService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -112,6 +114,39 @@ class VolunteerEmailReliabilityTest extends TestCase
         $this->assertStringContainsString("\$paymentOutcome === 'paid'", $method);
         $this->assertStringContainsString('Notification::createNotification', $method);
         $this->assertStringContainsString('NotificationDispatcher::dispatch', $method);
+    }
+
+    public function test_safeguarding_status_email_restores_previous_tenant_context(): void
+    {
+        $tenantId = 999;
+        $reporter = User::factory()->forTenant($tenantId)->create([
+            'email' => 'safeguarding-status-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $incidentId = (int) DB::table('vol_safeguarding_incidents')->insertGetId([
+            'tenant_id' => $tenantId,
+            'reported_by' => $reporter->id,
+            'incident_type' => 'concern',
+            'severity' => 'low',
+            'description' => 'Status context regression test.',
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $mailer = $this->fakeMailer();
+        app()->instance(EmailDispatchService::class, $mailer);
+        TenantContext::setById(2);
+
+        $service = new SafeguardingService(new SafeguardingAssignment());
+        $method = new \ReflectionMethod($service, 'notifyIncidentStatusChange');
+        $method->setAccessible(true);
+        $method->invoke($service, $tenantId, $incidentId, (int) $reporter->id, null, 'resolved');
+
+        $this->assertSame(2, TenantContext::currentId());
+        $this->assertCount(1, $mailer->calls);
+        $this->assertSame($tenantId, $mailer->calls[0]['options']['tenant_id']);
+        $this->assertSame('safeguarding', $mailer->calls[0]['options']['category']);
     }
 
     /**

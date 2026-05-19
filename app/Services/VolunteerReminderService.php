@@ -110,6 +110,7 @@ class VolunteerReminderService
             // Fetch the opportunity title for this shift once per shift
             $opportunity = DB::table('vol_opportunities')
                 ->where('id', $shift->opportunity_id)
+                ->where('tenant_id', $tenantId)
                 ->first(['title', 'location']);
 
             $opportunityTitle = htmlspecialchars($opportunity->title ?? '', ENT_QUOTES, 'UTF-8');
@@ -455,6 +456,7 @@ class VolunteerReminderService
                     // Fetch opportunity once per shift
                     $opportunity = DB::table('vol_opportunities')
                         ->where('id', $shift->opportunity_id)
+                        ->where('tenant_id', $tenantId)
                         ->first(['title', 'location']);
 
                     $opportunityTitle    = htmlspecialchars($opportunity->title ?? '', ENT_QUOTES, 'UTF-8');
@@ -620,6 +622,7 @@ class VolunteerReminderService
                 foreach ($shifts as $shift) {
                     $opportunity = DB::table('vol_opportunities')
                         ->where('id', $shift->opportunity_id)
+                        ->where('tenant_id', $tenantId)
                         ->first(['title']);
 
                     $opportunityTitle = htmlspecialchars($opportunity->title ?? '', ENT_QUOTES, 'UTF-8');
