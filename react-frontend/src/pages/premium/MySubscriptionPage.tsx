@@ -10,6 +10,7 @@ import Crown from 'lucide-react/icons/crown';
 import ExternalLink from 'lucide-react/icons/external-link';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
 
@@ -114,6 +115,7 @@ export function MySubscriptionPage() {
   if (loading) {
     return (
       <div className="flex justify-center py-16">
+        <PageMeta title={t('premium.manage_title', 'My Subscription')} noIndex />
         <Spinner size="lg" />
       </div>
     );
@@ -124,6 +126,7 @@ export function MySubscriptionPage() {
   if (!sub) {
     return (
       <div className="max-w-xl mx-auto px-4 py-12">
+        <PageMeta title={t('premium.manage_title', 'My Subscription')} noIndex />
         <Card>
           <CardBody className="text-center py-10 flex flex-col items-center gap-4">
             <Crown size={48} className="text-yellow-500" />
@@ -144,6 +147,7 @@ export function MySubscriptionPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
+      <PageMeta title={t('premium.manage_title', 'My Subscription')} noIndex />
       <Card>
         <CardHeader className="flex items-center gap-3">
           <Crown className="text-yellow-500" size={24} />

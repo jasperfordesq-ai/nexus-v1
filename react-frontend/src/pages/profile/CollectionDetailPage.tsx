@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { PageMeta } from '@/components/seo';
 import { useTenant, useToast } from '@/contexts';
 
 interface SavedItem {
@@ -99,6 +100,7 @@ export default function CollectionDetailPage() {
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
+      <PageMeta title={data?.collection.name ?? t('collections.detail_title')} noIndex />
       <Link to={tenantPath('/me/collections')} className="inline-flex items-center gap-2 mb-4 text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)]">
         <ArrowLeft className="w-4 h-4" />
         {t('collections.back_to_my')}

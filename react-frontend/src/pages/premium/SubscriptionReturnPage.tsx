@@ -10,6 +10,7 @@ import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import XCircle from 'lucide-react/icons/x-circle';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import api from '@/lib/api';
 
@@ -79,6 +80,7 @@ export function SubscriptionReturnPage() {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-16">
+      <PageMeta title={t('premium.return_title', 'Activating Subscription')} noIndex />
       <Card>
         <CardBody className="text-center py-10 flex flex-col items-center gap-4">
           {status === 'pending' && (

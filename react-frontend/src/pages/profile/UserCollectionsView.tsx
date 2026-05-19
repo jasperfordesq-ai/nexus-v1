@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 
 interface Collection {
@@ -56,6 +57,7 @@ export default function UserCollectionsView() {
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-5xl">
+      <PageMeta title={t('collections.public_title')} noIndex />
       <h1 className="text-2xl font-bold flex items-center gap-2 mb-6">
         <Bookmark className="w-6 h-6 text-[var(--color-warning)]" />
         {t('collections.public_title')}

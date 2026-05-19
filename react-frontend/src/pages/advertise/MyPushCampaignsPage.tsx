@@ -39,6 +39,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { PageMeta } from '@/components/seo';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -202,6 +203,7 @@ export function MyPushCampaignsPage() {
   if (!hasFeature('local_advertising')) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
+        <PageMeta title={t('push_campaign.page_title')} noIndex />
         <BellRing size={48} className="mb-4 text-default-300" aria-hidden="true" />
         <p className="text-default-500">{t('push_campaign.feature_disabled')}</p>
       </div>
@@ -210,6 +212,7 @@ export function MyPushCampaignsPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+      <PageMeta title={t('push_campaign.page_title')} noIndex />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">

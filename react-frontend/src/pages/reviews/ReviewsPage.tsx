@@ -30,6 +30,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { PageMeta } from '@/components/seo';
 import { ReviewModal } from '@/components/reviews/ReviewModal';
 import { SocialInteractionPanel } from '@/components/social';
 import type { JSX } from 'react';
@@ -265,6 +266,7 @@ export default function ReviewsPage(): JSX.Element {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
+      <PageMeta title={t('page_title')} noIndex />
       <h1 className="text-2xl font-bold text-[var(--color-text)] mb-6">{t('page_title')}</h1>
 
       <Tabs

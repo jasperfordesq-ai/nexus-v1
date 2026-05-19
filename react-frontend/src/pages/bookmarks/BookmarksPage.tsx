@@ -44,6 +44,7 @@ import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Inbox from 'lucide-react/icons/inbox';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { api } from '@/lib/api';
@@ -239,6 +240,7 @@ export default function BookmarksPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+      <PageMeta title={t('bookmarks.page_title', 'Saved')} noIndex />
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>

@@ -18,6 +18,7 @@ import Crown from 'lucide-react/icons/crown';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
 
@@ -78,6 +79,7 @@ export function PricingPage() {
   if (!hasFeature('member_premium')) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12 text-center">
+        <PageMeta title={t('premium.pricing_title', 'Premium')} noIndex />
         <h1 className="text-2xl font-semibold mb-2">
           {t('premium.unavailable_title', 'Premium tiers are not available in this community yet')}
         </h1>
@@ -116,6 +118,7 @@ export function PricingPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
+      <PageMeta title={t('premium.pricing_title', 'Premium')} noIndex />
       <div className="text-center mb-10">
         <Crown className="mx-auto mb-3 text-yellow-500" size={48} />
         <h1 className="text-3xl font-bold mb-2">
