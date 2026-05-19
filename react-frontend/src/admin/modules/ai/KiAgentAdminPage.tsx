@@ -16,6 +16,8 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Select,
+  SelectItem,
   Slider,
   Switch,
   Tab,
@@ -698,19 +700,26 @@ export default function KiAgentAdminPage() {
             <div className="flex items-center gap-3 rounded-xl border border-default-200 p-4 flex-wrap">
               <Bot size={20} className="text-primary" />
               <p className="font-semibold text-sm">{t('ai.ki_agents.runs.trigger_title')}</p>
-              <select
-                value={triggerType}
-                onChange={(e) => setTriggerType(e.target.value as AgentType)}
-                className="rounded-lg border border-default-300 bg-default-50 px-3 py-1.5 text-sm"
+              <Select
+                size="sm"
+                className="w-full sm:w-56"
+                selectedKeys={[triggerType]}
+                onSelectionChange={(keys) => {
+                  const next = Array.from(keys)[0];
+                  if (next) {
+                    setTriggerType(next as AgentType);
+                  }
+                }}
                 aria-label={t('ai.ki_agents.runs.agent_type_aria')}
-                title={t('ai.ki_agents.runs.agent_type_title')}
+                label={t('ai.ki_agents.runs.agent_type_title')}
+                labelPlacement="outside-left"
               >
                 {AGENT_TYPES.map((t) => (
-                  <option key={t} value={t}>
+                  <SelectItem key={t}>
                     {agentTypeText(t)}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
+              </Select>
               <Button
                 color="primary"
                 size="sm"
