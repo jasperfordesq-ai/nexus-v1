@@ -63,26 +63,18 @@ interface PlatformStats {
 const steps = [
   {
     icon: UserPlus,
-    title: 'Create Your Profile',
-    description: 'Sign up for free and list the skills you can offer to your community.',
     color: 'from-indigo-500 to-blue-500',
   },
   {
     icon: Search,
-    title: 'Find What You Need',
-    description: 'Browse listings to discover services offered by members near you.',
     color: 'from-purple-500 to-pink-500',
   },
   {
     icon: Handshake,
-    title: 'Exchange Services',
-    description: 'Connect with members and arrange skill exchanges that work for both of you.',
     color: 'from-cyan-500 to-teal-500',
   },
   {
     icon: Coins,
-    title: 'Earn & Spend Credits',
-    description: 'Earn one time credit for every hour you give, and spend them on services you need.',
     color: 'from-amber-500 to-orange-500',
   },
 ];
@@ -90,29 +82,21 @@ const steps = [
 const values = [
   {
     icon: Scale,
-    title: 'Equality',
-    description: "Every person's time is valued equally. One hour of gardening is worth the same as one hour of tutoring.",
     color: 'text-indigo-500 dark:text-indigo-400',
     bg: 'bg-indigo-500/15',
   },
   {
     icon: Heart,
-    title: 'Community',
-    description: 'We believe in building strong local connections. Every exchange strengthens the fabric of your neighbourhood.',
     color: 'text-rose-500 dark:text-rose-400',
     bg: 'bg-rose-500/15',
   },
   {
     icon: Shield,
-    title: 'Trust & Safety',
-    description: 'Reviews, ratings, and broker oversight ensure a safe environment for all members to participate.',
     color: 'text-emerald-500 dark:text-emerald-400',
     bg: 'bg-emerald-500/15',
   },
   {
     icon: Sprout,
-    title: 'Sustainability',
-    description: 'By sharing skills locally, we reduce waste, support circular economies, and strengthen local resilience.',
     color: 'text-teal-500 dark:text-teal-400',
     bg: 'bg-teal-500/15',
   },
