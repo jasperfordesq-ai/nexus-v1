@@ -173,8 +173,16 @@ class EmailVerificationController extends BaseApiController
             ]);
         }
 
-        // Generate and send new verification email
-        $this->sendVerificationEmail($user);
+        // Generate and send new verification email. Do not report success or
+        // rotate tokens unless the dispatcher accepts the message.
+        if (!$this->sendVerificationEmail($user)) {
+            return $this->respondWithError(
+                'EMAIL_SEND_FAILED',
+                __('api.verification_email_send_failed'),
+                null,
+                503
+            );
+        }
 
         return $this->respondWithData([
             'message' => __('api_controllers_1.email_verification.verification_sent')
@@ -228,6 +236,9 @@ class EmailVerificationController extends BaseApiController
     {
         $tenantId = $user['tenant_id'] ?? TenantContext::getId();
 
+        // Ensure the table exists (create if not)
+        $this->ensureTokenTableExists();
+
         // Generate a secure random token
         $token = bin2hex(random_bytes(32));
 
@@ -236,18 +247,6 @@ class EmailVerificationController extends BaseApiController
 
         // Calculate expiry time
         $expiresAt = date('Y-m-d H:i:s', time() + self::TOKEN_EXPIRY_SECONDS);
-
-        // Delete any existing tokens for this user in this tenant
-        $this->cleanupVerificationTokens($user['id'], $tenantId);
-
-        // Ensure the table exists (create if not)
-        $this->ensureTokenTableExists();
-
-        // Store the hashed token with tenant_id
-        DB::insert(
-            "INSERT INTO email_verification_tokens (user_id, tenant_id, token, expires_at) VALUES (?, ?, ?, ?)",
-            [$user['id'], $tenantId, $hashedToken, $expiresAt]
-        );
 
         // Build verification URL — include tenant base path for correct routing
         $appUrl = TenantContext::getFrontendUrl();
@@ -274,7 +273,7 @@ class EmailVerificationController extends BaseApiController
 
             // Render in the recipient's preferred_language so the verification
             // email arrives in their locale rather than the request caller's.
-            return LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($tenantId, $user, $tenantName, $verifyUrl) {
+            $sent = LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($tenantId, $user, $tenantName, $verifyUrl) {
                 $firstName = $user['first_name'] ?? '';
                 $greeting = $firstName !== ''
                     ? __('emails_misc.auth.verify_email_greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8'), 'community' => $tenantName])
@@ -299,6 +298,25 @@ class EmailVerificationController extends BaseApiController
                     ['tenant_id' => $tenantId]
                 );
             });
+
+            if (!$sent) {
+                Log::warning('[EmailVerification] Verification email dispatch returned false', [
+                    'user_id' => $user['id'],
+                    'tenant_id' => $tenantId,
+                ]);
+                return false;
+            }
+
+            // Only replace verification tokens after send acceptance. This
+            // preserves any previous valid link if the resend fails.
+            $this->cleanupVerificationTokens($user['id'], $tenantId);
+
+            DB::insert(
+                "INSERT INTO email_verification_tokens (user_id, tenant_id, token, expires_at) VALUES (?, ?, ?, ?)",
+                [$user['id'], $tenantId, $hashedToken, $expiresAt]
+            );
+
+            return true;
         } catch (\Throwable $e) {
             Log::warning('[EmailVerification] Verification email failed for user: ' . $e->getMessage(), ['user_id' => $user['id']]);
             return false;

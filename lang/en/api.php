@@ -561,6 +561,7 @@ return [
     'email_already_verified'               => 'Email address is already verified',
     'email_verified'                       => 'Email address verified successfully',
     'verification_email_sent'              => 'Verification email sent',
+    'verification_email_send_failed'       => 'We could not send the verification email right now. Please try again later.',
     'verification_email_sent_if_exists'    => 'If an account with that email exists and is unverified, a new verification email has been sent.',
 
     // ============================================
