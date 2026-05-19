@@ -172,6 +172,9 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'newsletter_queue' => $this->queueSourceDiagnostics('newsletter_queue', $tenantId),
             'marketplace_report_notifications' => $this->queueSourceDiagnostics('marketplace_report_notifications', $tenantId),
             'event_reminders' => $this->queueSourceDiagnostics('event_reminders', $tenantId),
+            'federation_messages' => $this->queueSourceDiagnostics('federation_messages', $tenantId),
+            'federation_transactions' => $this->queueSourceDiagnostics('federation_transactions', $tenantId),
+            'federation_inbound_connections' => $this->queueSourceDiagnostics('federation_inbound_connections', $tenantId),
             'reviews' => $this->queueSourceDiagnostics('reviews', $tenantId),
         ];
 
@@ -338,6 +341,52 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->map(fn ($row) => $this->queueRow('event_reminders', $row));
         }
 
+        $federationSourceRows = collect();
+        foreach (array_keys($this->federationDeliverySourceConfigs()) as $federationSource) {
+            if (($source !== '' && $source !== $federationSource) || !$this->hasFederationDeliverySourceColumns($federationSource)) {
+                continue;
+            }
+
+            $config = $this->federationDeliverySourceConfigs()[$federationSource];
+            $alias = $config['alias'];
+            $tenantColumn = $config['tenant_column'];
+            $userColumn = $config['user_column'];
+            $subjectColumn = $config['subject_column'];
+
+            $query = DB::table("{$federationSource} as {$alias}")
+                ->leftJoin('users as u', function ($join) use ($alias, $tenantColumn, $userColumn): void {
+                    $join->on('u.id', '=', "{$alias}.{$userColumn}")
+                        ->on('u.tenant_id', '=', "{$alias}.{$tenantColumn}");
+                })
+                ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.{$tenantColumn}", $tenantId));
+
+            $this->applyFederationDeliveryStatusFilter($query, $statuses, $alias);
+
+            $federationSourceRows = $federationSourceRows->merge(
+                $query
+                    ->orderByDesc("{$alias}.id")
+                    ->limit($limit)
+                    ->get([
+                        "{$alias}.id",
+                        DB::raw("{$alias}.{$tenantColumn} as tenant_id"),
+                        DB::raw("{$alias}.{$userColumn} as user_id"),
+                        'u.email',
+                        DB::raw("'" . $config['category'] . "' as category"),
+                        DB::raw("{$alias}.{$subjectColumn} as subject"),
+                        DB::raw($this->federationDeliveryStatusExpression($alias) . ' as status'),
+                        DB::raw('NULL as frequency'),
+                        DB::raw('0 as attempts'),
+                        "{$alias}.email_failed_at as last_attempted_at",
+                        "{$alias}.email_last_error as error",
+                        DB::raw('NULL as processing_batch_id'),
+                        DB::raw('NULL as processing_started_at'),
+                        "{$alias}.email_sent_at as sent_at",
+                        "{$alias}.created_at",
+                    ])
+                    ->map(fn ($row) => $this->queueRow($federationSource, $row))
+            );
+        }
+
         $reviewRows = collect();
         if (($source === '' || $source === 'reviews') && $this->hasFederationReviewDeliveryColumns()) {
             $reviewQuery = DB::table('reviews as r')
@@ -379,6 +428,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ->merge($newsletterRows)
             ->merge($marketplaceReportRows)
             ->merge($eventReminderRows)
+            ->merge($federationSourceRows)
             ->merge($reviewRows)
             ->sortByDesc('created_at')
             ->values()
@@ -561,6 +611,41 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ];
         }
 
+        if (array_key_exists($source, $this->federationDeliverySourceConfigs())) {
+            if (!$this->hasFederationDeliverySourceColumns($source)) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $config = $this->federationDeliverySourceConfigs()[$source];
+            $alias = $config['alias'];
+            $tenantColumn = $config['tenant_column'];
+            $base = DB::table("{$source} as {$alias}")
+                ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.{$tenantColumn}", $tenantId));
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => $this->queueStatusCounts($base, $this->federationDeliveryStatusExpression($alias)),
+                'stale_pending' => (clone $base)
+                    ->whereNull("{$alias}.email_sent_at")
+                    ->whereNull("{$alias}.email_failed_at")
+                    ->where("{$alias}.created_at", '<', now()->subMinutes(15))
+                    ->count(),
+                'stale_processing' => 0,
+                'failed_recent' => (clone $base)
+                    ->whereNull("{$alias}.email_sent_at")
+                    ->whereNotNull("{$alias}.email_failed_at")
+                    ->where("{$alias}.email_failed_at", '>=', now()->subDay())
+                    ->count(),
+                'suppressed_recent' => 0,
+                'oldest_pending_at' => (clone $base)
+                    ->whereNull("{$alias}.email_sent_at")
+                    ->whereNull("{$alias}.email_failed_at")
+                    ->min("{$alias}.created_at"),
+                'returned' => 0,
+            ];
+        }
+
         if ($source === 'reviews') {
             if (!$this->hasFederationReviewDeliveryColumns()) {
                 return $this->unavailableQueueDiagnostics($source);
@@ -619,6 +704,85 @@ class AdminEmailDeliverabilityController extends BaseApiController
             && Schema::hasColumn('reviews', 'email_skipped_at')
             && Schema::hasColumn('reviews', 'email_failed_at')
             && Schema::hasColumn('reviews', 'email_last_error');
+    }
+
+    /**
+     * @return array<string,array{alias:string,tenant_column:string,user_column:string,subject_column:string,category:string}>
+     */
+    private function federationDeliverySourceConfigs(): array
+    {
+        return [
+            'federation_messages' => [
+                'alias' => 'fm',
+                'tenant_column' => 'receiver_tenant_id',
+                'user_column' => 'receiver_user_id',
+                'subject_column' => 'subject',
+                'category' => 'federation_message',
+            ],
+            'federation_transactions' => [
+                'alias' => 'ft',
+                'tenant_column' => 'receiver_tenant_id',
+                'user_column' => 'receiver_user_id',
+                'subject_column' => 'description',
+                'category' => 'federation_transaction',
+            ],
+            'federation_inbound_connections' => [
+                'alias' => 'fic',
+                'tenant_column' => 'tenant_id',
+                'user_column' => 'local_user_id',
+                'subject_column' => 'message',
+                'category' => 'federation_connection',
+            ],
+        ];
+    }
+
+    private function hasFederationDeliverySourceColumns(string $source): bool
+    {
+        return Schema::hasTable($source)
+            && Schema::hasColumn($source, 'notification_sent_at')
+            && Schema::hasColumn($source, 'email_sent_at')
+            && Schema::hasColumn($source, 'email_failed_at')
+            && Schema::hasColumn($source, 'email_last_error')
+            && array_key_exists($source, $this->federationDeliverySourceConfigs());
+    }
+
+    /**
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param list<string> $statuses
+     */
+    private function applyFederationDeliveryStatusFilter($query, array $statuses, string $alias): void
+    {
+        $relevantStatuses = array_intersect($statuses, ['pending', 'failed']);
+        if ($relevantStatuses === []) {
+            $query->whereRaw('1 = 0');
+            return;
+        }
+
+        $query->where(function ($q) use ($statuses, $alias): void {
+            if (in_array('failed', $statuses, true)) {
+                $q->orWhere(function ($status) use ($alias): void {
+                    $status->whereNull("{$alias}.email_sent_at")
+                        ->whereNotNull("{$alias}.email_failed_at");
+                });
+            }
+
+            if (in_array('pending', $statuses, true)) {
+                $q->orWhere(function ($status) use ($alias): void {
+                    $status->whereNull("{$alias}.email_sent_at")
+                        ->whereNull("{$alias}.email_failed_at")
+                        ->where("{$alias}.created_at", '<', now()->subMinutes(15));
+                });
+            }
+        });
+    }
+
+    private function federationDeliveryStatusExpression(string $alias): string
+    {
+        return "CASE
+            WHEN {$alias}.email_sent_at IS NOT NULL THEN 'sent'
+            WHEN {$alias}.email_failed_at IS NOT NULL THEN 'failed'
+            ELSE 'pending'
+        END";
     }
 
     /**

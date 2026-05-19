@@ -257,4 +257,92 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         $this->assertSame('failed', $rows->first()['status'] ?? null);
         $this->assertSame('federated-review-queue@example.test', $rows->first()['email'] ?? null);
     }
+
+    public function test_queues_endpoint_surfaces_federation_source_delivery_failures(): void
+    {
+        foreach (['federation_messages', 'federation_transactions', 'federation_inbound_connections'] as $table) {
+            if (
+                !Schema::hasTable($table)
+                || !Schema::hasColumn($table, 'notification_sent_at')
+                || !Schema::hasColumn($table, 'email_sent_at')
+                || !Schema::hasColumn($table, 'email_failed_at')
+                || !Schema::hasColumn($table, 'email_last_error')
+            ) {
+                $this->markTestSkipped("{$table} delivery columns are not available.");
+            }
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $receiver = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'federation-source-queue@example.test',
+        ]);
+        Sanctum::actingAs($admin);
+
+        DB::table('federation_messages')->insert([
+            'sender_tenant_id' => 0,
+            'sender_user_id' => 123456,
+            'receiver_tenant_id' => $this->testTenantId,
+            'receiver_user_id' => $receiver->id,
+            'subject' => 'Admin federation message diagnostic',
+            'body' => 'Admin federation message diagnostic body',
+            'direction' => 'inbound',
+            'status' => 'pending',
+            'external_partner_id' => 987654,
+            'external_receiver_name' => 'Remote Sender',
+            'external_message_id' => 'admin-fed-msg-' . uniqid(),
+            'notification_sent_at' => null,
+            'email_sent_at' => null,
+            'email_failed_at' => now()->subMinutes(2),
+            'email_last_error' => 'simulated federation message failure',
+            'created_at' => now()->subMinutes(20),
+        ]);
+
+        DB::table('federation_transactions')->insert([
+            'sender_tenant_id' => 0,
+            'sender_user_id' => 123456,
+            'receiver_tenant_id' => $this->testTenantId,
+            'receiver_user_id' => $receiver->id,
+            'amount' => 2.5,
+            'description' => 'Admin federation transaction diagnostic',
+            'status' => 'completed',
+            'completed_at' => now()->subMinute(),
+            'external_partner_id' => 987654,
+            'external_receiver_name' => 'Remote Sender',
+            'external_transaction_id' => 'admin-fed-tx-' . uniqid(),
+            'notification_sent_at' => null,
+            'email_sent_at' => null,
+            'email_failed_at' => now()->subMinutes(2),
+            'email_last_error' => 'simulated federation transaction failure',
+            'created_at' => now()->subMinutes(20),
+        ]);
+
+        DB::table('federation_inbound_connections')->insert([
+            'tenant_id' => $this->testTenantId,
+            'external_partner_id' => 987654,
+            'local_user_id' => $receiver->id,
+            'external_user_id' => 'admin-remote-user-' . uniqid(),
+            'status' => 'pending',
+            'message' => 'Admin federation connection diagnostic',
+            'notification_sent_at' => null,
+            'email_sent_at' => null,
+            'email_failed_at' => now()->subMinutes(2),
+            'email_last_error' => 'simulated federation connection failure',
+            'created_at' => now()->subMinutes(20),
+            'updated_at' => now()->subMinutes(2),
+        ]);
+
+        foreach (['federation_messages', 'federation_transactions', 'federation_inbound_connections'] as $source) {
+            $response = $this->apiGet("/v2/admin/email-deliverability/queues?source={$source}&limit=10");
+
+            $response->assertOk();
+            $response->assertJsonPath("data.diagnostics.{$source}.available", true);
+            $this->assertGreaterThanOrEqual(1, $response->json("data.diagnostics.{$source}.failed_recent"));
+            $this->assertGreaterThanOrEqual(1, $response->json("data.diagnostics.{$source}.status_counts.failed"));
+
+            $rows = collect($response->json('data.rows'));
+            $this->assertSame([$source], $rows->pluck('source')->unique()->values()->all());
+            $this->assertSame('failed', $rows->first()['status'] ?? null);
+            $this->assertSame('federation-source-queue@example.test', $rows->first()['email'] ?? null);
+        }
+    }
 }

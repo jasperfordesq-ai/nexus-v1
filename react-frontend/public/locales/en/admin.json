@@ -11546,6 +11546,9 @@
       },
       "sources": {
         "event_reminders": "Event reminder",
+        "federation_inbound_connections": "Federation connection",
+        "federation_messages": "Federation message",
+        "federation_transactions": "Federation transaction",
         "marketplace_report_notifications": "Marketplace report",
         "newsletter_queue": "Newsletter",
         "notification_queue": "Notification",
