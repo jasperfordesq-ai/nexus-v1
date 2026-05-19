@@ -40,9 +40,76 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+interface AcceptableUseSectionConfig {
+  icon?: React.ReactNode;
+  titleKey: string;
+  paragraphs?: string[];
+  listKey?: string;
+  listCount?: number;
+}
+
+const ACCEPTABLE_USE_SECTIONS: AcceptableUseSectionConfig[] = [
+  { titleKey: 'acceptable_use.sections.scope.title', paragraphs: ['acceptable_use.sections.scope.body'] },
+  {
+    icon: <Scale className="w-5 h-5" aria-hidden="true" />,
+    titleKey: 'acceptable_use.sections.illegal.title',
+    paragraphs: ['acceptable_use.sections.illegal.body'],
+    listKey: 'acceptable_use.sections.illegal.items',
+    listCount: 4,
+  },
+  {
+    icon: <UserX className="w-5 h-5" aria-hidden="true" />,
+    titleKey: 'acceptable_use.sections.fraud.title',
+    listKey: 'acceptable_use.sections.fraud.items',
+    listCount: 4,
+  },
+  {
+    icon: <AlertTriangle className="w-5 h-5" aria-hidden="true" />,
+    titleKey: 'acceptable_use.sections.harm.title',
+    listKey: 'acceptable_use.sections.harm.items',
+    listCount: 6,
+  },
+  {
+    icon: <Ban className="w-5 h-5" aria-hidden="true" />,
+    titleKey: 'acceptable_use.sections.content.title',
+    listKey: 'acceptable_use.sections.content.items',
+    listCount: 4,
+  },
+  {
+    icon: <Bot className="w-5 h-5" aria-hidden="true" />,
+    titleKey: 'acceptable_use.sections.misuse.title',
+    listKey: 'acceptable_use.sections.misuse.items',
+    listCount: 5,
+  },
+  {
+    icon: <Bug className="w-5 h-5" aria-hidden="true" />,
+    titleKey: 'acceptable_use.sections.interference.title',
+    listKey: 'acceptable_use.sections.interference.items',
+    listCount: 5,
+  },
+  {
+    icon: <Lock className="w-5 h-5" aria-hidden="true" />,
+    titleKey: 'acceptable_use.sections.account.title',
+    listKey: 'acceptable_use.sections.account.items',
+    listCount: 4,
+  },
+  {
+    titleKey: 'acceptable_use.sections.enforcement.title',
+    paragraphs: ['acceptable_use.sections.enforcement.body', 'acceptable_use.sections.enforcement.appeal'],
+  },
+  {
+    titleKey: 'acceptable_use.sections.reporting.title',
+    paragraphs: ['acceptable_use.sections.reporting.body'],
+  },
+  {
+    titleKey: 'acceptable_use.sections.changes.title',
+    paragraphs: ['acceptable_use.sections.changes.body'],
+  },
+];
+
 export function AcceptableUsePage() {
   const { t } = useTranslation('legal');
-  usePageTitle(t('acceptable_use.page_title', 'Acceptable Use Policy'));
+  usePageTitle(t('acceptable_use.page_title'));
   const { branding } = useTenant();
   const { document: customDoc, loading } = useLegalDocument('acceptable_use');
 
@@ -66,7 +133,7 @@ export function AcceptableUsePage() {
     );
   }
 
-  const platformName = branding?.name || 'the platform';
+  const platformName = branding?.name || t('acceptable_use.default_platform_name');
 
   return (
     <>
@@ -85,166 +152,30 @@ export function AcceptableUsePage() {
             <ShieldCheck className="w-10 h-10 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-3">
-            Acceptable Use Policy
+            {t('acceptable_use.heading')}
           </h1>
           <p className="text-theme-muted text-base sm:text-lg max-w-2xl mx-auto">
-            The specific behaviours that are not allowed on {platformName}. This sits alongside
-            the Terms of Service and the Community Guidelines and applies to every account.
+            {t('acceptable_use.subtitle', { platformName })}
           </p>
-          <p className="text-xs text-theme-subtle mt-3">Version 1.0 · Last updated 2026-05-13</p>
+          <p className="text-xs text-theme-subtle mt-3">{t('acceptable_use.version')}</p>
         </motion.div>
 
         <motion.div variants={itemVariants}>
           <GlassCard className="p-6 sm:p-8 space-y-6 legal-content">
-            <Section title="1. Scope">
-              <p>
-                This policy applies to anyone using {platformName} — members, organisations,
-                visitors, API users, and integrators — and to all activity on the platform,
-                including profiles, listings, messages, events, posts, polls, jobs, files, and
-                outbound communications sent through the platform.
-              </p>
-            </Section>
-
-            <Section
-              icon={<Scale className="w-5 h-5" aria-hidden="true" />}
-              title="2. No illegal activity"
-            >
-              <p>You must not use the platform to:</p>
-              <ul>
-                <li>Carry out, plan, or facilitate anything illegal in Ireland or in the
-                  jurisdiction where you or the other person is located.</li>
-                <li>Offer or solicit services that require professional licensing or regulation
-                  you don't hold (e.g. unlicensed medical, legal, financial, electrical,
-                  gas, or childcare work).</li>
-                <li>Trade in regulated or restricted goods (alcohol, tobacco, prescription
-                  medicines, firearms, controlled drugs, etc.).</li>
-                <li>Launder money or evade tax obligations.</li>
-              </ul>
-            </Section>
-
-            <Section
-              icon={<UserX className="w-5 h-5" aria-hidden="true" />}
-              title="3. No fraud or impersonation"
-            >
-              <ul>
-                <li>Don't impersonate another person, organisation, or official body.</li>
-                <li>Don't create fake accounts, sock-puppets, or duplicate accounts to manipulate
-                  ratings, reviews, polls, or matching.</li>
-                <li>Don't misrepresent your identity, credentials, qualifications, or vetting
-                  status.</li>
-                <li>Don't manipulate time-credit balances through fake exchanges, collusion, or
-                  staged transactions.</li>
-              </ul>
-            </Section>
-
-            <Section
-              icon={<AlertTriangle className="w-5 h-5" aria-hidden="true" />}
-              title="4. No harm to people"
-            >
-              <ul>
-                <li>No harassment, bullying, stalking, doxxing, or coordinated targeting.</li>
-                <li>No hate speech, slurs, or content that demeans people on the basis of
-                  protected characteristics.</li>
-                <li>No threats, incitement, or glorification of violence.</li>
-                <li>No content that sexualises children, in any form.</li>
-                <li>No non-consensual sexual content, intimate-image abuse, or content posted to
-                  shame or extort.</li>
-                <li>No promotion of self-harm or suicide. If you or someone you know is in
-                  crisis, contact emergency services (112/999 in Ireland) or a recognised
-                  helpline.</li>
-              </ul>
-            </Section>
-
-            <Section
-              icon={<Ban className="w-5 h-5" aria-hidden="true" />}
-              title="5. No prohibited content"
-            >
-              <ul>
-                <li>Sexually explicit content, gratuitous violence, or shock content.</li>
-                <li>Content that infringes someone else's copyright, trademark, or other
-                  intellectual property.</li>
-                <li>Confidential information you're not entitled to share (employer secrets,
-                  protected health information, etc.).</li>
-                <li>Personal data about others posted without their consent.</li>
-              </ul>
-            </Section>
-
-            <Section
-              icon={<Bot className="w-5 h-5" aria-hidden="true" />}
-              title="6. No spam, abuse, or platform misuse"
-            >
-              <ul>
-                <li>No unsolicited bulk messaging, repeated identical posts, or promotional
-                  blasts.</li>
-                <li>No scraping, mass-downloading, or automated harvesting of profiles, listings,
-                  or other data, except via documented APIs and within their rate limits.</li>
-                <li>No artificial inflation of engagement (fake likes, reviews, endorsements,
-                  matches, badges, or leaderboard positions).</li>
-                <li>No referral, MLM, pyramid, or "get-paid-to-click" schemes.</li>
-                <li>No using the platform primarily to drive traffic to an external site or
-                  service unrelated to community exchange.</li>
-              </ul>
-            </Section>
-
-            <Section
-              icon={<Bug className="w-5 h-5" aria-hidden="true" />}
-              title="7. No interference with the platform"
-            >
-              <ul>
-                <li>No probing, scanning, or testing for vulnerabilities without prior written
-                  permission. Coordinated disclosure is welcomed via the Contact page.</li>
-                <li>No malware, viruses, worms, or other malicious code.</li>
-                <li>No attempts to bypass authentication, rate limits, paywalls, feature gates,
-                  or moderation tools.</li>
-                <li>No denial-of-service attempts or activity that materially degrades service
-                  for others.</li>
-                <li>No reverse engineering, decompiling, or extracting source code, except where
-                  the AGPL-3.0 licence expressly permits it.</li>
-              </ul>
-            </Section>
-
-            <Section
-              icon={<Lock className="w-5 h-5" aria-hidden="true" />}
-              title="8. Account hygiene"
-            >
-              <ul>
-                <li>Don't share your account credentials. You're responsible for activity under
-                  your account.</li>
-                <li>Notify us promptly if you believe your account has been compromised.</li>
-                <li>Don't transfer or sell your account to anyone else.</li>
-                <li>Use the platform's tools to delete or export your data — don't try to
-                  extract it through automation.</li>
-              </ul>
-            </Section>
-
-            <Section title="9. Enforcement">
-              <p>
-                Breaches may result in content removal, warnings, temporary suspension, or
-                permanent removal of access — proportionate to severity and history. Serious
-                breaches may be reported to An Garda Síochána, the Data Protection Commission,
-                or other competent authorities, and we may be legally obliged to do so.
-              </p>
-              <p>
-                You can appeal an enforcement decision via the Contact page. Appeals are
-                reviewed by someone not involved in the original decision.
-              </p>
-            </Section>
-
-            <Section title="10. Reporting violations">
-              <p>
-                If you spot something that breaches this policy, use the in-product report tool
-                on the relevant profile, listing, message, post, or event, or email the team via
-                the Contact page. For safeguarding concerns about a child or vulnerable adult,
-                follow the dedicated route on the Trust &amp; Safety page.
-              </p>
-            </Section>
-
-            <Section title="11. Changes">
-              <p>
-                We may update this policy as the platform and the regulatory environment evolve.
-                Material changes will be announced and recorded in the legal version history.
-              </p>
-            </Section>
+            {ACCEPTABLE_USE_SECTIONS.map((section) => (
+              <Section key={section.titleKey} icon={section.icon} title={t(section.titleKey)}>
+                {section.paragraphs?.map((key) => (
+                  <p key={key}>{t(key, { platformName })}</p>
+                ))}
+                {section.listKey && section.listCount ? (
+                  <ul>
+                    {Array.from({ length: section.listCount }, (_, index) => (
+                      <li key={index}>{t(`${section.listKey}.${index}`)}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </Section>
+            ))}
           </GlassCard>
         </motion.div>
       </motion.div>

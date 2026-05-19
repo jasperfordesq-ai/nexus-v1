@@ -449,6 +449,185 @@
     "fadp_decline": "Use basic features only",
     "fadp_learn_more": "Learn more about your rights"
   },
+  "community_guidelines": {
+    "default_community_name": "this community",
+    "heading": "Community Guidelines",
+    "page_title": "Community Guidelines",
+    "subtitle": "How we expect everyone in {{communityName}} to treat each other. Short, plain-English, and applies to every exchange, message, post, and event.",
+    "version": "Version 1.0 - Last updated 2026-05-13",
+    "sections": {
+      "kind": {
+        "title": "1. Be kind and respectful",
+        "body": "Treat other members the way you would treat a neighbour. Disagreement is fine; contempt, name-calling, mockery, and personal attacks are not.",
+        "items": {
+          "0": "No harassment, bullying, stalking, or intimidation.",
+          "1": "No hate speech, slurs, or content that demeans people because of who they are, including race, ethnicity, nationality, religion, gender, sexuality, disability, age, or background.",
+          "2": "No threats of violence, real or implied."
+        }
+      },
+      "honest": {
+        "title": "2. Be honest",
+        "body": "Trust is what makes a timebank work. Misrepresenting yourself or what you're offering damages the whole community.",
+        "items": {
+          "0": "Use your real name and a real photo on your profile.",
+          "1": "Describe skills, listings, and requests accurately. Don't exaggerate what you can do or how long something takes.",
+          "2": "Log hours honestly. Don't claim time you didn't give.",
+          "3": "One person, one account."
+        }
+      },
+      "relevant": {
+        "title": "3. Keep it relevant",
+        "body": "This is a space for community exchange, not a marketplace, billboard, or political platform.",
+        "items": {
+          "0": "No spam, repeated promotion, or off-topic blasts.",
+          "1": "No commercial selling, recruiting, or fundraising outside the features designed for it, such as jobs, organisations, or marketplace where enabled.",
+          "2": "No campaign material, partisan organising, or content designed to inflame political conflict. Civic engagement is welcome; partisan combat is not."
+        }
+      },
+      "privacy": {
+        "title": "4. Protect privacy",
+        "body": "What members share inside the community stays inside the community.",
+        "items": {
+          "0": "Don't share another member's personal information, such as address, phone, photos, health details, or family situation, without their clear permission.",
+          "1": "Don't post screenshots of private messages.",
+          "2": "Don't take photos at community events without asking the people in them.",
+          "3": "Use the platform's messaging for exchange-related communication; don't push people onto outside channels before they're comfortable."
+        }
+      },
+      "in_person": {
+        "title": "5. Look after each other in person",
+        "body": "Exchanges often involve meeting in person, sometimes in someone's home. Use ordinary common sense.",
+        "items": {
+          "0": "Read the member's profile and reviews before a first exchange.",
+          "1": "Meet in a public place for the first exchange when you can.",
+          "2": "Tell someone you trust where you're going and when you expect to be back.",
+          "3": "Stop the exchange and leave if something feels wrong. You don't owe anyone an explanation in the moment.",
+          "4": "If someone is unsafe, themselves or with others, see Trust & Safety for how to report. In an emergency, contact local emergency services first."
+        }
+      },
+      "report": {
+        "title": "6. Report concerns",
+        "body_before": "If you see something that breaks these guidelines, or that worries you, tell us. You can:",
+        "items": {
+          "0": "Use the report button on any profile, listing, message, post, or event.",
+          "1": "Email the community team via the Contact page.",
+          "2": "For safeguarding concerns, such as a child or vulnerable adult at risk, see the Trust & Safety page for the dedicated reporting route."
+        },
+        "body_after": "Reports are reviewed by moderators and treated confidentially. We don't share your identity with the person you reported unless you've asked us to or the law requires it."
+      },
+      "enforcement": {
+        "title": "7. What happens when guidelines are broken",
+        "body_before": "Most issues are small misunderstandings and a quiet word fixes them. For clearer breaches we use proportionate steps:",
+        "items": {
+          "0": "A reminder, for first-time, minor issues.",
+          "1": "Removal of content, such as a post, listing, or message taken down.",
+          "2": "A warning, recorded on your account.",
+          "3": "Temporary suspension, for repeated or serious issues.",
+          "4": "Permanent removal, for harassment, safeguarding breaches, fraud, threats, hate speech, or repeated suspensions."
+        },
+        "body_serious": "Serious matters, including abuse, threats, fraud, or exploitation, may be reported to appropriate law enforcement or a competent authority regardless of the platform action.",
+        "body_appeal": "If you think a decision was wrong, you can appeal via the Contact page. We'll review it with a moderator who wasn't involved in the original decision."
+      },
+      "changes": {
+        "title": "Changes to these guidelines",
+        "body": "We may update these guidelines as the community grows. Material changes will be announced in the platform and recorded in the legal version history."
+      }
+    }
+  },
+  "acceptable_use": {
+    "default_platform_name": "the platform",
+    "heading": "Acceptable Use Policy",
+    "page_title": "Acceptable Use Policy",
+    "subtitle": "The specific behaviours that are not allowed on {{platformName}}. This sits alongside the Terms of Service and the Community Guidelines and applies to every account.",
+    "version": "Version 1.0 - Last updated 2026-05-13",
+    "sections": {
+      "scope": {
+        "title": "1. Scope",
+        "body": "This policy applies to anyone using {{platformName}}: members, organisations, visitors, API users, and integrators. It applies to all activity on the platform, including profiles, listings, messages, events, posts, polls, jobs, files, and outbound communications sent through the platform."
+      },
+      "illegal": {
+        "title": "2. No illegal activity",
+        "body": "You must not use the platform to:",
+        "items": {
+          "0": "Carry out, plan, or facilitate anything illegal where you, the other person, or the activity is located.",
+          "1": "Offer or solicit services that require professional licensing or regulation you don't hold, such as unlicensed medical, legal, financial, electrical, gas, or childcare work.",
+          "2": "Trade in regulated or restricted goods, including alcohol, tobacco, prescription medicines, firearms, controlled drugs, or similar restricted items.",
+          "3": "Launder money or evade tax obligations."
+        }
+      },
+      "fraud": {
+        "title": "3. No fraud or impersonation",
+        "items": {
+          "0": "Don't impersonate another person, organisation, or official body.",
+          "1": "Don't create fake accounts, sock-puppets, or duplicate accounts to manipulate ratings, reviews, polls, or matching.",
+          "2": "Don't misrepresent your identity, credentials, qualifications, or vetting status.",
+          "3": "Don't manipulate time-credit balances through fake exchanges, collusion, or staged transactions."
+        }
+      },
+      "harm": {
+        "title": "4. No harm to people",
+        "items": {
+          "0": "No harassment, bullying, stalking, doxxing, or coordinated targeting.",
+          "1": "No hate speech, slurs, or content that demeans people on the basis of protected characteristics.",
+          "2": "No threats, incitement, or glorification of violence.",
+          "3": "No content that sexualises children, in any form.",
+          "4": "No non-consensual sexual content, intimate-image abuse, or content posted to shame or extort.",
+          "5": "No promotion of self-harm or suicide. If you or someone you know is in crisis, contact local emergency services or a recognised helpline."
+        }
+      },
+      "content": {
+        "title": "5. No prohibited content",
+        "items": {
+          "0": "Sexually explicit content, gratuitous violence, or shock content.",
+          "1": "Content that infringes someone else's copyright, trademark, or other intellectual property.",
+          "2": "Confidential information you're not entitled to share, such as employer secrets or protected health information.",
+          "3": "Personal data about others posted without their consent."
+        }
+      },
+      "misuse": {
+        "title": "6. No spam, abuse, or platform misuse",
+        "items": {
+          "0": "No unsolicited bulk messaging, repeated identical posts, or promotional blasts.",
+          "1": "No scraping, mass-downloading, or automated harvesting of profiles, listings, or other data, except via documented APIs and within their rate limits.",
+          "2": "No artificial inflation of engagement, including fake likes, reviews, endorsements, matches, badges, or leaderboard positions.",
+          "3": "No referral, MLM, pyramid, or get-paid-to-click schemes.",
+          "4": "No using the platform primarily to drive traffic to an external site or service unrelated to community exchange."
+        }
+      },
+      "interference": {
+        "title": "7. No interference with the platform",
+        "items": {
+          "0": "No probing, scanning, or testing for vulnerabilities without prior written permission. Coordinated disclosure is welcomed via the Contact page.",
+          "1": "No malware, viruses, worms, or other malicious code.",
+          "2": "No attempts to bypass authentication, rate limits, paywalls, feature gates, or moderation tools.",
+          "3": "No denial-of-service attempts or activity that materially degrades service for others.",
+          "4": "No reverse engineering, decompiling, or extracting source code, except where the AGPL-3.0 licence expressly permits it."
+        }
+      },
+      "account": {
+        "title": "8. Account hygiene",
+        "items": {
+          "0": "Don't share your account credentials. You're responsible for activity under your account.",
+          "1": "Notify us promptly if you believe your account has been compromised.",
+          "2": "Don't transfer or sell your account to anyone else.",
+          "3": "Use the platform's tools to delete or export your data; don't try to extract it through automation."
+        }
+      },
+      "enforcement": {
+        "title": "9. Enforcement",
+        "body": "Breaches may result in content removal, warnings, temporary suspension, or permanent removal of access, proportionate to severity and history. Serious breaches may be reported to appropriate law enforcement, the relevant data protection regulator, or other competent authorities, and we may be legally obliged to do so.",
+        "appeal": "You can appeal an enforcement decision via the Contact page. Appeals are reviewed by someone not involved in the original decision."
+      },
+      "reporting": {
+        "title": "10. Reporting violations",
+        "body": "If you spot something that breaches this policy, use the in-product report tool on the relevant profile, listing, message, post, or event, or email the team via the Contact page. For safeguarding concerns about a child or vulnerable adult, follow the dedicated route on the Trust & Safety page."
+      },
+      "changes": {
+        "title": "11. Changes",
+        "body": "We may update this policy as the platform and the regulatory environment evolve. Material changes will be announced and recorded in the legal version history."
+      }
+    }
+  },
   "page_meta": {
     "platform_terms": {
       "title": "Platform Terms of Service",
@@ -492,7 +671,7 @@
     "safeguarding_body": "If you’re worried about a member, an exchange, or something you’ve seen on the platform, please tell us. We respond to safeguarding reports within one working day.",
     "safeguarding_step_1": "Use the Report button on the relevant listing, message, or profile.",
     "safeguarding_step_2": "Or email us via the Contact page — mark the subject as “Safeguarding”.",
-    "safeguarding_step_3": "If anyone is in immediate danger, contact An Garda Síochána on 999 or 112 first.",
+    "safeguarding_step_3": "If anyone is in immediate danger, contact local emergency services first.",
     "how_exchanges_title": "How an exchange works",
     "how_exchanges_intro": "Every exchange follows the same simple flow. There is no money involved — just time credits.",
     "how_exchanges_steps": {
@@ -509,7 +688,7 @@
       "2": "Asks every member to accept our Community Guidelines and Acceptable Use Policy at signup, and to keep to them while they’re here.",
       "3": "Gives every listing, message, and profile a Report button that goes straight to coordinators.",
       "4": "Has human coordinators who can mediate, support, and step in when something goes wrong.",
-      "5": "Connects with other timebanks across Ireland and Europe through federation, so reputation travels with you."
+      "5": "Connects with other timebanks across regions through federation, so reputation can travel with you."
     },
     "what_we_dont_title": "What the platform doesn’t do",
     "what_we_dont_intro": "Timebanking is built on neighbours helping neighbours, not on us standing between you. That’s a feature, not a bug — but it does mean we need to be clear about our limits.",
@@ -524,11 +703,11 @@
     "precautions_items": {
       "0": "Meet in a public place the first time, or bring a friend if you’re inviting someone to your home.",
       "1": "Read the other member’s reviews and check how long they’ve been on the platform.",
-      "2": "For services involving children, vulnerable adults, or work inside your home, ask about Garda vetting before agreeing.",
+      "2": "For services involving children, vulnerable adults, or work inside your home, ask about any background checks or vetting required in your jurisdiction before agreeing.",
       "3": "Trust your instincts. You can say no, end an exchange, or report a concern at any time."
     },
     "vetting_title": "Background checks and vetting",
-    "vetting_body": "Some exchanges — for example childcare, elderly care, or support for vulnerable adults — may legally require a background check or vetting under local law (such as Garda vetting in Ireland, an enhanced DBS check in the UK, or equivalent schemes elsewhere). Members offering these kinds of services are responsible for holding current, valid vetting where their jurisdiction requires it, and you’re entitled to ask to see it before you agree to an exchange. The platform doesn’t hold vetting on members’ behalf and doesn’t verify it.",
+    "vetting_body": "Some exchanges, for example childcare, elderly care, or support for vulnerable adults, may legally require a background check or vetting under local law. Members offering these kinds of services are responsible for holding current, valid vetting where their jurisdiction requires it, and you're entitled to ask to see it before you agree to an exchange. The platform doesn't hold vetting on members' behalf and doesn't verify it.",
     "insurance_title": "Insurance and liability",
     "insurance_items": {
       "0": "{{name}} does not provide insurance for exchanges between members. The platform is a connection service — it does not insure, indemnify, or underwrite the work members do for each other.",
