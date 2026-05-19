@@ -54,7 +54,7 @@ import { PageMeta } from '@/components/seo/PageMeta';
 
 export function MarketplaceCollectionsPage() {
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('collections.page_title', 'My Collections'));
+  usePageTitle(t('collections.page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();
@@ -94,7 +94,7 @@ export function MarketplaceCollectionsPage() {
       }
     } catch (err) {
       logError('Failed to load collections', err);
-      toast.error(t('collections.load_error', 'Failed to load collections'));
+      toast.error(t('collections.load_error'));
     } finally {
       setIsLoadingCollections(false);
     }
@@ -137,11 +137,11 @@ export function MarketplaceCollectionsPage() {
         setNewName('');
         setNewDescription('');
         setNewIsPublic(false);
-        toast.success(t('collections.created', 'Collection created'));
+        toast.success(t('collections.created'));
       }
     } catch (err) {
       logError('Failed to create collection', err);
-      toast.error(t('collections.create_error', 'Failed to create collection'));
+      toast.error(t('collections.create_error'));
     } finally {
       setIsCreating(false);
     }
@@ -160,7 +160,7 @@ export function MarketplaceCollectionsPage() {
       }
     } catch (err) {
       logError('Failed to load collection items', err);
-      toast.error(t('collections.items_load_error', 'Failed to load items'));
+      toast.error(t('collections.items_load_error'));
     } finally {
       setIsLoadingItems(false);
     }
@@ -189,7 +189,7 @@ export function MarketplaceCollectionsPage() {
       );
     } catch (err) {
       logError('Failed to remove item', err);
-      toast.error(t('collections.remove_item_error', 'Failed to remove item'));
+      toast.error(t('collections.remove_item_error'));
     }
   };
 
@@ -198,10 +198,10 @@ export function MarketplaceCollectionsPage() {
     try {
       await api.delete(`/v2/marketplace/saved-searches/${id}`);
       setSavedSearches((prev) => prev.filter((s) => s.id !== id));
-      toast.success(t('saved_searches.deleted', 'Saved search deleted'));
+      toast.success(t('saved_searches.deleted'));
     } catch (err) {
       logError('Failed to delete saved search', err);
-      toast.error(t('saved_searches.delete_error', 'Failed to delete'));
+      toast.error(t('saved_searches.delete_error'));
     }
   };
 
@@ -218,8 +218,8 @@ export function MarketplaceCollectionsPage() {
       <div className="max-w-5xl mx-auto px-4 py-12">
         <EmptyState
           icon={<ShoppingBag className="w-8 h-8" />}
-          title={t('hub_feature_gate.title', 'Marketplace Not Available')}
-          description={t('hub_feature_gate.description', 'The marketplace feature is not enabled for this community.')}
+          title={t('hub_feature_gate.title')}
+          description={t('hub_feature_gate.description')}
         />
       </div>
     );
@@ -230,8 +230,8 @@ export function MarketplaceCollectionsPage() {
       <div className="max-w-5xl mx-auto px-4 py-12">
         <EmptyState
           icon={<FolderHeart className="w-8 h-8" />}
-          title={t('collections.sign_in_title', 'Sign In Required')}
-          description={t('collections.sign_in_description', 'Sign in to manage your collections and saved searches.')}
+          title={t('collections.sign_in_title')}
+          description={t('collections.sign_in_description')}
         />
       </div>
     );
@@ -243,10 +243,11 @@ export function MarketplaceCollectionsPage() {
       <>
         <PageMeta title={selectedCollection.name} noIndex={true} />
         <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-          <div className="flex items-center gap-3">
+          <div className="flex items-start gap-3">
             <Button
               isIconOnly
               variant="light"
+              aria-label={t('common.go_back')}
               onPress={() => {
                 setSelectedCollection(null);
                 setCollectionItems([]);
@@ -254,14 +255,14 @@ export function MarketplaceCollectionsPage() {
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <div>
+            <div className="min-w-0">
               <h1 className="text-2xl font-bold text-foreground">{selectedCollection.name}</h1>
               {selectedCollection.description && (
                 <p className="text-sm text-default-500 mt-1">{selectedCollection.description}</p>
               )}
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex flex-wrap items-center gap-2 mt-1">
                 <Chip size="sm" variant="flat">
-                  {t('collections.item_count', '{{count}} items', { count: selectedCollection.item_count })}
+                  {t('collections.item_count', { count: selectedCollection.item_count })}
                 </Chip>
                 <Chip
                   size="sm"
@@ -269,8 +270,8 @@ export function MarketplaceCollectionsPage() {
                   color={selectedCollection.is_public ? 'success' : 'default'}
                 >
                   {selectedCollection.is_public
-                    ? t('collections.public', 'Public')
-                    : t('collections.private', 'Private')}
+                    ? t('collections.public')
+                    : t('collections.private')}
                 </Chip>
               </div>
             </div>
@@ -283,10 +284,10 @@ export function MarketplaceCollectionsPage() {
           ) : collectionItems.length === 0 ? (
             <EmptyState
               icon={<Package className="w-8 h-8" />}
-              title={t('collections.empty_title', 'No Items Yet')}
-              description={t('collections.empty_description', 'Add items from marketplace listings to this collection.')}
+              title={t('collections.empty_title')}
+              description={t('collections.empty_description')}
               action={{
-                label: t('collections.browse_marketplace', 'Browse Marketplace'),
+                label: t('collections.browse_marketplace'),
                 onClick: () => { window.location.href = tenantPath('/marketplace'); },
               }}
             />
@@ -319,7 +320,7 @@ export function MarketplaceCollectionsPage() {
                     </Link>
                     <p className="text-sm font-semibold text-primary mt-1">
                       {item.listing.price_type === 'free'
-                        ? t('common.free', 'Free')
+                        ? t('common.free')
                         : item.listing.price != null
                           ? `${item.listing.price_currency} ${Number(item.listing.price).toFixed(2)}`
                           : ''}
@@ -335,7 +336,7 @@ export function MarketplaceCollectionsPage() {
                       startContent={<Trash2 className="w-3.5 h-3.5" />}
                       onPress={() => handleRemoveItem(item.listing.id)}
                     >
-                      {t('collections.remove_item', 'Remove')}
+                      {t('collections.remove_item')}
                     </Button>
                   </div>
                 </GlassCard>
@@ -351,8 +352,8 @@ export function MarketplaceCollectionsPage() {
   return (
     <>
       <PageMeta
-        title={t('collections.page_title', 'My Collections')}
-        description={t('collections.meta_description', 'Manage your marketplace collections and saved searches.')}
+        title={t('collections.page_title')}
+        description={t('collections.meta_description')}
         noIndex={true}
       />
 
@@ -362,10 +363,10 @@ export function MarketplaceCollectionsPage() {
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               <FolderHeart className="w-7 h-7 text-primary" />
-              {t('collections.page_title', 'My Collections')}
+              {t('collections.page_title')}
             </h1>
             <p className="text-default-500 text-sm mt-1">
-              {t('collections.subtitle', 'Organize and track your favorite marketplace items')}
+              {t('collections.subtitle')}
             </p>
           </div>
           <Button
@@ -373,7 +374,7 @@ export function MarketplaceCollectionsPage() {
             startContent={<Plus className="w-4 h-4" />}
             onPress={() => setShowCreateModal(true)}
           >
-            {t('collections.create', 'New Collection')}
+            {t('collections.create')}
           </Button>
         </div>
 
@@ -389,7 +390,7 @@ export function MarketplaceCollectionsPage() {
             title={
               <div className="flex items-center gap-2">
                 <FolderHeart className="w-4 h-4" />
-                {t('collections.tab_collections', 'Collections')}
+                {t('collections.tab_collections')}
                 {collections.length > 0 && (
                   <Chip size="sm" variant="flat">{collections.length}</Chip>
                 )}
@@ -403,10 +404,10 @@ export function MarketplaceCollectionsPage() {
             ) : collections.length === 0 ? (
               <EmptyState
                 icon={<FolderHeart className="w-8 h-8" />}
-                title={t('collections.empty_collections_title', 'No Collections Yet')}
-                description={t('collections.empty_collections_description', 'Create a collection to organize your favorite marketplace items.')}
+                title={t('collections.empty_collections_title')}
+                description={t('collections.empty_collections_description')}
                 action={{
-                  label: t('collections.create', 'New Collection'),
+                  label: t('collections.create'),
                   onClick: () => setShowCreateModal(true),
                 }}
               />
@@ -428,7 +429,7 @@ export function MarketplaceCollectionsPage() {
             title={
               <div className="flex items-center gap-2">
                 <Search className="w-4 h-4" />
-                {t('saved_searches.tab_title', 'Saved Searches')}
+                {t('saved_searches.tab_title')}
                 {savedSearches.length > 0 && (
                   <Chip size="sm" variant="flat">{savedSearches.length}</Chip>
                 )}
@@ -442,10 +443,10 @@ export function MarketplaceCollectionsPage() {
             ) : savedSearches.length === 0 ? (
               <EmptyState
                 icon={<Search className="w-8 h-8" />}
-                title={t('saved_searches.empty_title', 'No Saved Searches')}
-                description={t('saved_searches.empty_description', 'Save a search from the marketplace to get alerts when new matching items are listed.')}
+                title={t('saved_searches.empty_title')}
+                description={t('saved_searches.empty_description')}
                 action={{
-                  label: t('saved_searches.browse', 'Search Marketplace'),
+                  label: t('saved_searches.browse'),
                   onClick: () => { window.location.href = tenantPath('/marketplace/search'); },
                 }}
               />
@@ -468,11 +469,11 @@ export function MarketplaceCollectionsPage() {
       {/* Create Collection Modal */}
       <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)}>
         <ModalContent>
-          <ModalHeader>{t('collections.create_title', 'Create Collection')}</ModalHeader>
+          <ModalHeader>{t('collections.create_title')}</ModalHeader>
           <ModalBody>
             <Input
-              label={t('collections.name_label', 'Name')}
-              placeholder={t('collections.name_placeholder', 'e.g. Gift Ideas, Home Decor...')}
+              label={t('collections.name_label')}
+              placeholder={t('collections.name_placeholder')}
               value={newName}
               onValueChange={setNewName}
               maxLength={100}
@@ -480,16 +481,16 @@ export function MarketplaceCollectionsPage() {
               variant="bordered"
             />
             <Textarea
-              label={t('collections.description_label', 'Description (optional)')}
-              placeholder={t('collections.description_placeholder', 'What is this collection for?')}
+              label={t('collections.description_label')}
+              placeholder={t('collections.description_placeholder')}
               value={newDescription}
               onValueChange={setNewDescription}
               maxLength={500}
               variant="bordered"
             />
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <span className="text-sm text-foreground">
-                {t('collections.make_public', 'Make this collection public')}
+                {t('collections.make_public')}
               </span>
               <Switch
                 isSelected={newIsPublic}
@@ -500,7 +501,7 @@ export function MarketplaceCollectionsPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setShowCreateModal(false)}>
-              {t('common.cancel', 'Cancel')}
+              {t('common.cancel')}
             </Button>
             <Button
               color="primary"
@@ -508,7 +509,7 @@ export function MarketplaceCollectionsPage() {
               isLoading={isCreating}
               onPress={handleCreateCollection}
             >
-              {t('collections.create', 'New Collection')}
+              {t('collections.create')}
             </Button>
           </ModalFooter>
         </ModalContent>
