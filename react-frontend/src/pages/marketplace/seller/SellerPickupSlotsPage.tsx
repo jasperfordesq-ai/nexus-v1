@@ -45,7 +45,7 @@ interface PickupSlot {
 
 export function SellerPickupSlotsPage() {
   const { t } = useTranslation('common');
-  usePageTitle(t('marketplace.pickup.slots_title', 'Pickup Slots'));
+  usePageTitle(t('marketplace.pickup.slots_title'));
   const { isAuthenticated } = useAuth();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -79,7 +79,7 @@ export function SellerPickupSlotsPage() {
 
   const handleCreate = async () => {
     if (!slotStart || !slotEnd) {
-      toast.error(t('marketplace.pickup.slot_times_required', 'Start and end times are required'));
+      toast.error(t('marketplace.pickup.slot_times_required'));
       return;
     }
     setSaving(true);
@@ -92,7 +92,7 @@ export function SellerPickupSlotsPage() {
         is_active: true,
       });
       if (res.success) {
-        toast.success(t('marketplace.pickup.slot_created', 'Pickup slot created'));
+        toast.success(t('marketplace.pickup.slot_created'));
         onClose();
         setSlotStart('');
         setSlotEnd('');
@@ -100,11 +100,11 @@ export function SellerPickupSlotsPage() {
         setIsRecurring(false);
         load();
       } else {
-        toast.error(res.error || t('marketplace.pickup.slot_create_failed', 'Failed to create slot'));
+        toast.error(res.error || t('marketplace.pickup.slot_create_failed'));
       }
     } catch (err) {
       logError('SellerPickupSlotsPage: create failed', err);
-      toast.error(t('marketplace.pickup.slot_create_failed', 'Failed to create slot'));
+      toast.error(t('marketplace.pickup.slot_create_failed'));
     } finally {
       setSaving(false);
     }
@@ -114,7 +114,7 @@ export function SellerPickupSlotsPage() {
     try {
       const res = await api.delete(`/v2/marketplace/seller/pickup-slots/${id}`);
       if (res.success) {
-        toast.success(t('marketplace.pickup.slot_deleted', 'Slot deleted'));
+        toast.success(t('marketplace.pickup.slot_deleted'));
         setSlots((prev) => prev.filter((s) => s.id !== id));
       }
     } catch (err) {
@@ -134,20 +134,20 @@ export function SellerPickupSlotsPage() {
 
   return (
     <>
-      <PageMeta title={t('marketplace.pickup.slots_title', 'Pickup Slots')} noIndex />
+      <PageMeta title={t('marketplace.pickup.slots_title')} noIndex />
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Calendar className="w-7 h-7 text-primary" />
-            {t('marketplace.pickup.slots_title', 'Pickup Slots')}
+            {t('marketplace.pickup.slots_title')}
           </h1>
           <p className="text-default-500 text-sm mt-1">
-            {t('marketplace.pickup.slots_subtitle', 'Offer click-and-collect pickup windows for buyers.')}
+            {t('marketplace.pickup.slots_subtitle')}
           </p>
         </div>
         <Button color="primary" startContent={<Plus className="w-4 h-4" />} onPress={onOpen}>
-          {t('marketplace.pickup.new_slot', 'New Slot')}
+          {t('marketplace.pickup.new_slot')}
         </Button>
       </div>
 
@@ -158,7 +158,7 @@ export function SellerPickupSlotsPage() {
       ) : slots.length === 0 ? (
         <GlassCard className="p-8 text-center">
           <p className="text-default-500">
-            {t('marketplace.pickup.no_slots', 'No pickup slots yet. Create one to enable click-and-collect.')}
+            {t('marketplace.pickup.no_slots')}
           </p>
         </GlassCard>
       ) : (
@@ -169,16 +169,16 @@ export function SellerPickupSlotsPage() {
                 <p className="font-semibold text-foreground">{formatRange(s.slot_start, s.slot_end)}</p>
                 <div className="flex gap-2 mt-1 flex-wrap">
                   <Chip size="sm" variant="flat" color="primary">
-                    {t('marketplace.pickup.capacity', 'Capacity')}: {s.booked_count}/{s.capacity}
+                    {t('marketplace.pickup.capacity')}: {s.booked_count}/{s.capacity}
                   </Chip>
                   {s.is_recurring && (
                     <Chip size="sm" variant="flat" color="secondary">
-                      {t('marketplace.pickup.recurring', 'Recurring')}
+                      {t('marketplace.pickup.recurring')}
                     </Chip>
                   )}
                   {!s.is_active && (
                     <Chip size="sm" variant="flat" color="warning">
-                      {t('marketplace.pickup.inactive', 'Inactive')}
+                      {t('marketplace.pickup.inactive')}
                     </Chip>
                   )}
                 </div>
@@ -189,7 +189,7 @@ export function SellerPickupSlotsPage() {
                 color="danger"
                 isIconOnly
                 onPress={() => handleDelete(s.id)}
-                aria-label={t('common.delete', 'Delete')}
+                aria-label={t('common.delete')}
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
@@ -200,37 +200,37 @@ export function SellerPickupSlotsPage() {
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalContent>
-          <ModalHeader>{t('marketplace.pickup.new_slot', 'New Pickup Slot')}</ModalHeader>
+          <ModalHeader>{t('marketplace.pickup.new_slot')}</ModalHeader>
           <ModalBody className="space-y-3">
             <Input
               type="datetime-local"
-              label={t('marketplace.pickup.slot_start', 'Start')}
+              label={t('marketplace.pickup.slot_start')}
               value={slotStart}
               onValueChange={setSlotStart}
             />
             <Input
               type="datetime-local"
-              label={t('marketplace.pickup.slot_end', 'End')}
+              label={t('marketplace.pickup.slot_end')}
               value={slotEnd}
               onValueChange={setSlotEnd}
             />
             <Input
               type="number"
-              label={t('marketplace.pickup.capacity', 'Capacity')}
+              label={t('marketplace.pickup.capacity')}
               value={String(capacity)}
               onValueChange={(v) => setCapacity(Math.max(1, parseInt(v) || 1))}
               min={1}
             />
             <Switch isSelected={isRecurring} onValueChange={setIsRecurring}>
-              {t('marketplace.pickup.recurring_weekly', 'Repeat weekly')}
+              {t('marketplace.pickup.recurring_weekly')}
             </Switch>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onClose}>
-              {t('common.cancel', 'Cancel')}
+              {t('common.cancel')}
             </Button>
             <Button color="primary" onPress={handleCreate} isLoading={saving}>
-              {t('common.create', 'Create')}
+              {t('common.create')}
             </Button>
           </ModalFooter>
         </ModalContent>

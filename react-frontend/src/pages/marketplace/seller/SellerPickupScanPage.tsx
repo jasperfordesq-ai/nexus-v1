@@ -31,7 +31,7 @@ interface ScanResult {
 
 export function SellerPickupScanPage() {
   const { t } = useTranslation('common');
-  usePageTitle(t('marketplace.pickup.scan_title', 'Pickup Scan'));
+  usePageTitle(t('marketplace.pickup.scan_title'));
   const toast = useToast();
 
   const [code, setCode] = useState('');
@@ -48,13 +48,13 @@ export function SellerPickupScanPage() {
       if (res.success && res.data) {
         setLast(res.data);
         setCode('');
-        toast.success(t('marketplace.pickup.scan_success', 'Pickup confirmed'));
+        toast.success(t('marketplace.pickup.scan_success'));
       } else {
-        toast.error(res.error || t('marketplace.pickup.scan_failed', 'Scan failed'));
+        toast.error(res.error || t('marketplace.pickup.scan_failed'));
       }
     } catch (err) {
       logError('SellerPickupScanPage: scan failed', err);
-      toast.error(t('marketplace.pickup.scan_failed', 'Scan failed'));
+      toast.error(t('marketplace.pickup.scan_failed'));
     } finally {
       setSubmitting(false);
     }
@@ -62,21 +62,21 @@ export function SellerPickupScanPage() {
 
   return (
     <>
-      <PageMeta title={t('marketplace.pickup.scan_title', 'Pickup Scan')} noIndex />
+      <PageMeta title={t('marketplace.pickup.scan_title')} noIndex />
       <div className="max-w-xl mx-auto px-4 py-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <QrCode className="w-7 h-7 text-primary" />
-          {t('marketplace.pickup.scan_title', 'Pickup Scan')}
+          {t('marketplace.pickup.scan_title')}
         </h1>
         <p className="text-default-500 text-sm mt-1">
-          {t('marketplace.pickup.scan_subtitle', 'Enter the buyer\'s pickup code to confirm collection.')}
+          {t('marketplace.pickup.scan_subtitle')}
         </p>
       </div>
 
       <GlassCard className="p-6 space-y-4">
         <Input
-          label={t('marketplace.pickup.qr_code', 'Pickup Code')}
+          label={t('marketplace.pickup.qr_code')}
           value={code}
           onValueChange={setCode}
           placeholder="01HXXXXXXXXXXXXXXXXXXXXXXX"
@@ -90,18 +90,18 @@ export function SellerPickupScanPage() {
           isDisabled={!code.trim()}
           startContent={<CheckCircle2 className="w-4 h-4" />}
         >
-          {t('marketplace.pickup.confirm_pickup', 'Confirm Pickup')}
+          {t('marketplace.pickup.confirm_pickup')}
         </Button>
       </GlassCard>
 
       {last && (
         <GlassCard className="p-4 border-l-4 border-success">
           <p className="font-semibold text-success">
-            {t('marketplace.pickup.last_scan', 'Last scan')}
+            {t('marketplace.pickup.last_scan')}
           </p>
           <p className="text-sm text-default-700 mt-1">
-            {t('marketplace.pickup.order_n', 'Order #{{id}}', { id: last.order_id })} —{' '}
-            {t('marketplace.pickup.status_picked_up', 'Picked up')}
+            {t('marketplace.pickup.order_n', { id: last.order_id })} —{' '}
+            {t('marketplace.pickup.status_picked_up')}
           </p>
         </GlassCard>
       )}
