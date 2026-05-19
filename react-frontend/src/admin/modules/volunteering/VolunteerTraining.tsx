@@ -62,14 +62,6 @@ const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'default'
   rejected: 'default',
 };
 
-const TYPE_LABELS: Record<string, string> = {
-  children_first: 'Children First',
-  vulnerable_adults: 'Vulnerable Adults',
-  first_aid: 'First Aid',
-  manual_handling: 'Manual Handling',
-  other: 'Other',
-};
-
 function parsePayload<T>(raw: unknown): T {
   if (raw && typeof raw === 'object' && 'data' in raw) {
     return (raw as { data: T }).data;
@@ -81,7 +73,7 @@ function parsePayload<T>(raw: unknown): T {
 
 export function VolunteerTraining() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('volunteering.training_page_title', 'Volunteer Training'));
+  usePageTitle(t('volunteering.training_page_title'));
   const toast = useToast();
 
   const [records, setRecords] = useState<TrainingRecord[]>([]);
@@ -110,12 +102,12 @@ export function VolunteerTraining() {
         setStats(Array.isArray(payload) ? null : payload.stats || null);
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_training', 'Failed to load training records'));
+      toast.error(t('volunteering.failed_to_load_training'));
       setRecords([]);
       setStats(null);
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t]);
 
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -127,32 +119,32 @@ export function VolunteerTraining() {
     try {
       const res = await adminVolunteering.verifyTraining(id);
       if (res.success) {
-        toast.success(t('volunteering.training_verified', 'Training record verified'));
+        toast.success(t('volunteering.training_verified'));
         loadData();
       } else {
-        toast.error(t('volunteering.failed_to_verify_training', 'Failed to verify training'));
+        toast.error(t('volunteering.failed_to_verify_training'));
       }
     } catch {
-      toast.error(t('volunteering.failed_to_verify_training', 'Failed to verify training'));
+      toast.error(t('volunteering.failed_to_verify_training'));
     }
     setActionId(null);
   };
 
   const handleReject = async (id: number) => {
-    const reason = window.prompt(t('volunteering.reject_training_reason_prompt', 'Reason for rejecting this training record'))?.trim();
+    const reason = window.prompt(t('volunteering.reject_training_reason_prompt'))?.trim();
     if (!reason) return;
 
     setActionId(id);
     try {
       const res = await adminVolunteering.rejectTraining(id, reason);
       if (res.success) {
-        toast.success(t('volunteering.training_rejected', 'Training record rejected'));
+        toast.success(t('volunteering.training_rejected'));
         loadData();
       } else {
-        toast.error(t('volunteering.failed_to_reject_training', 'Failed to reject training'));
+        toast.error(t('volunteering.failed_to_reject_training'));
       }
     } catch {
-      toast.error(t('volunteering.failed_to_reject_training', 'Failed to reject training'));
+      toast.error(t('volunteering.failed_to_reject_training'));
     }
     setActionId(null);
   };
@@ -175,12 +167,12 @@ export function VolunteerTraining() {
     }
     if (successCount > 0) {
       toast.success(
-        t('volunteering.bulk_verify_success', '{{count}} record(s) verified successfully', { count: successCount })
+        t('volunteering.bulk_verify_success', { count: successCount })
       );
     }
     if (failCount > 0) {
       toast.error(
-        t('volunteering.bulk_verify_fail', '{{count}} record(s) failed to verify', { count: failCount })
+        t('volunteering.bulk_verify_fail', { count: failCount })
       );
     }
     setSelectedIds(new Set());
@@ -245,7 +237,7 @@ export function VolunteerTraining() {
           isSelected={allPendingSelected}
           onValueChange={toggleSelectAll}
           size="sm"
-          aria-label={t('volunteering.select_all', 'Select all pending')}
+          aria-label={t('volunteering.select_all')}
         />
       ) : '',
       render: (item) => {
@@ -255,29 +247,29 @@ export function VolunteerTraining() {
             isSelected={selectedIds.has(item.id)}
             onValueChange={() => toggleSelection(item.id)}
             size="sm"
-            aria-label={t('volunteering.select_record', 'Select {{name}}', { name: item.volunteer_name })}
+            aria-label={t('volunteering.select_record', { name: item.volunteer_name })}
           />
         );
       },
     },
     {
       key: 'volunteer_name',
-      label: t('volunteering.col_volunteer', 'Volunteer'),
+      label: t('volunteering.col_volunteer'),
       sortable: true,
     },
     {
       key: 'training_type',
-      label: t('volunteering.col_training_type', 'Training Type'),
+      label: t('volunteering.col_training_type'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat">
-          {TYPE_LABELS[item.training_type] || item.training_type}
+          {t(`volunteering.type_${item.training_type}`)}
         </Chip>
       ),
     },
     {
       key: 'completed_date',
-      label: t('volunteering.col_completed', 'Completed'),
+      label: t('volunteering.col_completed'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -287,7 +279,7 @@ export function VolunteerTraining() {
     },
     {
       key: 'expires_date',
-      label: t('volunteering.col_expires', 'Expires'),
+      label: t('volunteering.col_expires'),
       sortable: true,
       render: (item) => {
         if (!item.expires_date) return <span className="text-sm text-default-400">--</span>;
@@ -301,7 +293,7 @@ export function VolunteerTraining() {
     },
     {
       key: 'certificate_ref',
-      label: t('volunteering.col_certificate_ref', 'Certificate Ref'),
+      label: t('volunteering.col_certificate_ref'),
       render: (item) => (
         <span className="text-sm font-mono text-default-500">
           {item.certificate_ref || '--'}
@@ -310,17 +302,17 @@ export function VolunteerTraining() {
     },
     {
       key: 'status',
-      label: t('volunteering.col_status', 'Status'),
+      label: t('volunteering.col_status'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" color={STATUS_COLORS[item.status] || 'default'} variant="flat">
-          {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+          {t(`volunteering.status_${item.status}`)}
         </Chip>
       ),
     },
     {
       key: 'actions',
-      label: t('volunteering.col_actions', 'Actions'),
+      label: t('volunteering.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           {(item.status === 'pending') && (
@@ -334,7 +326,7 @@ export function VolunteerTraining() {
                 isLoading={actionId === item.id}
                 isDisabled={actionId !== null && actionId !== item.id}
               >
-                {t('volunteering.verify', 'Verify')}
+                {t('volunteering.verify')}
               </Button>
               <Button
                 size="sm"
@@ -345,23 +337,23 @@ export function VolunteerTraining() {
                 isLoading={actionId === item.id}
                 isDisabled={actionId !== null && actionId !== item.id}
               >
-                {t('volunteering.reject', 'Reject')}
+                {t('volunteering.reject')}
               </Button>
             </>
           )}
           {item.status === 'verified' && (
             <Chip size="sm" color="success" variant="flat" startContent={<ShieldCheck size={12} />}>
-              {t('volunteering.verified', 'Verified')}
+              {t('volunteering.verified')}
             </Chip>
           )}
           {item.status === 'expired' && (
             <Chip size="sm" color="danger" variant="flat" startContent={<AlertTriangle size={12} />}>
-              {t('volunteering.expired', 'Expired')}
+              {t('volunteering.expired')}
             </Chip>
           )}
           {item.status === 'rejected' && (
             <Chip size="sm" color="default" variant="flat">
-              {t('volunteering.rejected', 'Rejected')}
+              {t('volunteering.rejected')}
             </Chip>
           )}
         </div>
@@ -372,10 +364,10 @@ export function VolunteerTraining() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title={t('volunteering.training_title', 'Training Verification')}
-        description={t('volunteering.training_desc', 'Review and verify volunteer training certifications')}
+        title={t('volunteering.training_title')}
+        description={t('volunteering.training_desc')}
         actions={
           <Button
             variant="flat"
@@ -383,36 +375,36 @@ export function VolunteerTraining() {
             onPress={loadData}
             isLoading={loading}
           >
-            {t('common.refresh', 'Refresh')}
+            {t('volunteering.refresh')}
           </Button>
         }
       />
 
       {/* Stats Row */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label={t('volunteering.stat_total_submissions', 'Total Submissions')}
+          label={t('volunteering.stat_total_submissions')}
           value={stats?.total_submissions ?? 0}
           icon={GraduationCap}
           color="default"
           loading={loading}
         />
         <StatCard
-          label={t('volunteering.stat_pending_verification', 'Pending Verification')}
+          label={t('volunteering.stat_pending_verification')}
           value={stats?.pending_verification ?? 0}
           icon={Clock}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label={t('volunteering.stat_verified', 'Verified')}
+          label={t('volunteering.stat_verified')}
           value={stats?.verified ?? 0}
           icon={CheckCircle}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={t('volunteering.stat_expired', 'Expired')}
+          label={t('volunteering.stat_expired')}
           value={stats?.expired ?? 0}
           icon={AlertTriangle}
           color="danger"
@@ -422,22 +414,22 @@ export function VolunteerTraining() {
 
       {/* Expiry alerts */}
       {expiringRecords.length > 0 && (
-        <Card className="mb-4 border-warning/50 bg-warning-50/50">
+        <Card className="border border-warning/40 bg-warning-50/50 shadow-sm shadow-warning/10">
           <CardBody className="py-3 px-4">
             <div className="flex items-start gap-2">
               <AlertTriangle size={18} className="text-warning mt-0.5 shrink-0" />
               <div>
                 <p className="font-semibold text-sm text-warning-700">
-                  {t('volunteering.expiry_alert_title', '{{count}} training record(s) expiring within 30 days', { count: expiringRecords.length })}
+                  {t('volunteering.expiry_alert_title', { count: expiringRecords.length })}
                 </p>
                 <ul className="mt-1.5 space-y-0.5">
                   {expiringRecords.map((r) => (
                     <li key={r.id} className="text-xs text-warning-600">
                       <span className="font-medium">{r.volunteer_name}</span>
                       {' — '}
-                      {TYPE_LABELS[r.training_type] || r.training_type}
+                      {t(`volunteering.type_${r.training_type}`)}
                       {' — '}
-                      {t('volunteering.expires_on', 'expires {{date}}', {
+                      {t('volunteering.expires_on', {
                         date: new Date(r.expires_date!).toLocaleDateString(),
                       })}
                     </li>
@@ -451,10 +443,10 @@ export function VolunteerTraining() {
 
       {/* Bulk verify bar */}
       {selectedIds.size > 0 && (
-        <div className="flex items-center gap-3 mb-4 p-3 rounded-lg bg-primary-50 border border-primary/20">
+        <div className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary-50 p-3 shadow-sm shadow-primary/10">
           <ListChecks size={18} className="text-primary" />
           <span className="text-sm font-medium text-primary-700">
-            {t('volunteering.bulk_selected', '{{count}} pending record(s) selected', { count: selectedIds.size })}
+            {t('volunteering.bulk_selected', { count: selectedIds.size })}
           </span>
           <Button
             size="sm"
@@ -464,46 +456,46 @@ export function VolunteerTraining() {
             onPress={handleBulkVerify}
             isLoading={bulkVerifying}
           >
-            {t('volunteering.bulk_verify', 'Bulk Verify')}
+            {t('volunteering.bulk_verify')}
           </Button>
           <Button
             size="sm"
             variant="light"
             onPress={() => setSelectedIds(new Set())}
           >
-            {t('common.clear_selection', 'Clear')}
+            {t('volunteering.clear_selection')}
           </Button>
         </div>
       )}
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-3 mb-4">
+      <div className="flex flex-wrap gap-3 rounded-2xl border border-divider/70 bg-content1 p-3 shadow-sm shadow-black/[0.03]">
         <Select
-          label={t('volunteering.filter_status', 'Status')}
+          label={t('volunteering.filter_status')}
           size="sm"
           className="w-48"
           selectedKeys={[statusFilter]}
           onSelectionChange={(keys) => setStatusFilter(Array.from(keys)[0] as string)}
         >
-          <SelectItem key="all">{t('common.all', 'All')}</SelectItem>
-          <SelectItem key="pending">{t('volunteering.status_pending', 'Pending')}</SelectItem>
-          <SelectItem key="verified">{t('volunteering.status_verified', 'Verified')}</SelectItem>
-          <SelectItem key="expired">{t('volunteering.status_expired', 'Expired')}</SelectItem>
-          <SelectItem key="rejected">{t('volunteering.status_rejected', 'Rejected')}</SelectItem>
+          <SelectItem key="all">{t('volunteering.tab_all')}</SelectItem>
+          <SelectItem key="pending">{t('volunteering.status_pending')}</SelectItem>
+          <SelectItem key="verified">{t('volunteering.status_verified')}</SelectItem>
+          <SelectItem key="expired">{t('volunteering.status_expired')}</SelectItem>
+          <SelectItem key="rejected">{t('volunteering.status_rejected')}</SelectItem>
         </Select>
         <Select
-          label={t('volunteering.filter_type', 'Training Type')}
+          label={t('volunteering.filter_type')}
           size="sm"
           className="w-48"
           selectedKeys={[typeFilter]}
           onSelectionChange={(keys) => setTypeFilter(Array.from(keys)[0] as string)}
         >
-          <SelectItem key="all">{t('common.all', 'All')}</SelectItem>
-          <SelectItem key="children_first">{t('volunteering.type_children_first', 'Children First')}</SelectItem>
-          <SelectItem key="vulnerable_adults">{t('volunteering.type_vulnerable_adults', 'Vulnerable Adults')}</SelectItem>
-          <SelectItem key="first_aid">{t('volunteering.type_first_aid', 'First Aid')}</SelectItem>
-          <SelectItem key="manual_handling">{t('volunteering.type_manual_handling', 'Manual Handling')}</SelectItem>
-          <SelectItem key="other">{t('volunteering.type_other', 'Other')}</SelectItem>
+          <SelectItem key="all">{t('volunteering.tab_all')}</SelectItem>
+          <SelectItem key="children_first">{t('volunteering.type_children_first')}</SelectItem>
+          <SelectItem key="vulnerable_adults">{t('volunteering.type_vulnerable_adults')}</SelectItem>
+          <SelectItem key="first_aid">{t('volunteering.type_first_aid')}</SelectItem>
+          <SelectItem key="manual_handling">{t('volunteering.type_manual_handling')}</SelectItem>
+          <SelectItem key="other">{t('volunteering.type_other')}</SelectItem>
         </Select>
       </div>
 
@@ -511,8 +503,8 @@ export function VolunteerTraining() {
       {!loading && filteredRecords.length === 0 ? (
         <EmptyState
           icon={GraduationCap}
-          title={t('volunteering.no_training', 'No training records')}
-          description={t('volunteering.no_training_desc', 'There are no training submissions matching the current filters.')}
+          title={t('volunteering.no_training')}
+          description={t('volunteering.no_training_desc')}
         />
       ) : (
         <DataTable columns={columns} data={filteredRecords} isLoading={loading} onRefresh={loadData} />

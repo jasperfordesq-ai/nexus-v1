@@ -70,7 +70,7 @@ const reviewStatuses = ['approved', 'rejected', 'under_review'] as const;
 
 export default function VolunteerProjects() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('volunteering.projects_title', 'Community Projects'));
+  usePageTitle(t('volunteering.projects_title'));
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -122,7 +122,7 @@ export default function VolunteerProjects() {
         throw new Error('community_projects_load_failed');
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_projects', 'Failed to load community projects'));
+      toast.error(t('volunteering.failed_to_load_projects'));
       if (!append) setProjects([]);
     }
     setLoading(false);
@@ -141,7 +141,7 @@ export default function VolunteerProjects() {
 
   const handleReview = async () => {
     if (!reviewingProject || !reviewStatus) {
-      toast.error(t('volunteering.select_status', 'Please select a review status'));
+      toast.error(t('volunteering.select_status'));
       return;
     }
     setSaving(true);
@@ -153,11 +153,11 @@ export default function VolunteerProjects() {
       if (!res.success) {
         throw new Error((res as { message?: string; error?: string }).message || 'community_project_review_failed');
       }
-      toast.success(t('volunteering.project_reviewed', 'Project review submitted'));
+      toast.success(t('volunteering.project_reviewed'));
       onClose();
       loadData();
     } catch {
-      toast.error(t('volunteering.review_failed', 'Failed to submit review'));
+      toast.error(t('volunteering.review_failed'));
     }
     setSaving(false);
   };
@@ -173,42 +173,42 @@ export default function VolunteerProjects() {
   const columns: Column<CommunityProject>[] = [
     {
       key: 'title',
-      label: t('volunteering.col_title', 'Title'),
+      label: t('volunteering.col_title'),
       sortable: true,
     },
     {
       key: 'proposer_name',
-      label: t('volunteering.col_proposer', 'Proposer'),
+      label: t('volunteering.col_proposer'),
       sortable: true,
     },
     {
       key: 'category',
-      label: t('volunteering.col_category', 'Category'),
+      label: t('volunteering.col_category'),
       sortable: true,
     },
     {
       key: 'target_volunteers',
-      label: t('volunteering.col_target_volunteers', 'Target Volunteers'),
+      label: t('volunteering.col_target_volunteers'),
       sortable: true,
     },
     {
       key: 'status',
-      label: t('volunteering.col_status', 'Status'),
+      label: t('volunteering.col_status'),
       sortable: true,
       render: (row) => (
         <Chip size="sm" color={statusColorMap[row.status] || 'default'} variant="flat">
-          {t(`volunteering.project_status_${row.status}`, row.status.replace(/_/g, ' '))}
+          {t(`volunteering.project_status_${row.status}`)}
         </Chip>
       ),
     },
     {
       key: 'supporters_count',
-      label: t('volunteering.col_supporters', 'Supporters'),
+      label: t('volunteering.col_supporters'),
       sortable: true,
     },
     {
       key: 'created_at',
-      label: t('volunteering.col_date', 'Date'),
+      label: t('volunteering.col_date'),
       sortable: true,
       render: (row) => (
         <span>{row.created_at ? new Date(row.created_at).toLocaleDateString() : '-'}</span>
@@ -216,7 +216,7 @@ export default function VolunteerProjects() {
     },
     {
       key: 'actions' as keyof CommunityProject,
-      label: t('common.actions', 'Actions'),
+      label: t('volunteering.col_actions'),
       render: (row) => (
         <div className="flex items-center gap-1">
           <Button
@@ -226,7 +226,7 @@ export default function VolunteerProjects() {
             startContent={<ClipboardCheck size={14} />}
             onPress={() => openReview(row)}
           >
-            {t('volunteering.review', 'Review')}
+            {t('volunteering.review')}
           </Button>
           {row.status === 'approved' && (
             <Button
@@ -236,7 +236,7 @@ export default function VolunteerProjects() {
               startContent={<PlusCircle size={14} />}
               onPress={() => handleCreateOpportunity(row)}
             >
-              {t('volunteering.create_opportunity', 'Create Opportunity')}
+              {t('volunteering.create_opportunity')}
             </Button>
           )}
         </div>
@@ -245,50 +245,50 @@ export default function VolunteerProjects() {
   ];
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title={t('volunteering.projects_title', 'Community Projects')}
-        description={t('volunteering.projects_desc', 'Review and manage community-proposed volunteer projects')}
+        title={t('volunteering.projects_title')}
+        description={t('volunteering.projects_desc')}
         actions={
           <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
-            {t('common.refresh', 'Refresh')}
+            {t('volunteering.refresh')}
           </Button>
         }
       />
 
       {/* Project Analytics Stats */}
       {stats.total > 0 && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard
-            label={t('volunteering.total_projects', 'Total Projects')}
+            label={t('volunteering.total_projects')}
             value={stats.total}
             icon={FolderKanban}
             color="default"
             loading={loading}
           />
           <StatCard
-            label={t('volunteering.approved_projects', 'Approved')}
+            label={t('volunteering.approved_projects')}
             value={stats.approved}
             icon={CheckCircle}
             color="success"
             loading={loading}
           />
           <StatCard
-            label={t('volunteering.active_projects', 'Active')}
+            label={t('volunteering.active_projects')}
             value={stats.active}
             icon={Play}
             color="primary"
             loading={loading}
           />
           <StatCard
-            label={t('volunteering.completed_projects', 'Completed')}
+            label={t('volunteering.completed_projects')}
             value={stats.completed}
             icon={Flag}
             color="secondary"
             loading={loading}
           />
           <StatCard
-            label={t('volunteering.total_supporters', 'Total Supporters')}
+            label={t('volunteering.total_supporters')}
             value={stats.total_supporters}
             icon={Users}
             color="warning"
@@ -300,16 +300,16 @@ export default function VolunteerProjects() {
       {projects.length === 0 && !loading ? (
         <EmptyState
           icon={FolderKanban}
-          title={t('volunteering.no_projects', 'No community projects')}
-          description={t('volunteering.no_projects_desc', 'No community projects have been proposed yet.')}
+          title={t('volunteering.no_projects')}
+          description={t('volunteering.no_projects_desc')}
         />
       ) : (
         <>
           <DataTable columns={columns} data={projects} isLoading={loading} />
           {hasMore && (
-            <div className="mt-4 flex justify-center">
+            <div className="flex justify-center">
               <Button variant="flat" onPress={() => loadData(true, cursor)} isLoading={loadingMore}>
-                {t('common.load_more', 'Load More')}
+                {t('volunteering.load_more')}
               </Button>
             </div>
           )}
@@ -320,12 +320,12 @@ export default function VolunteerProjects() {
       <Modal isOpen={isOpen} onClose={onClose} size="lg">
         <ModalContent>
           <ModalHeader>
-            {t('volunteering.review_project', 'Review Project')}: {reviewingProject?.title}
+            {t('volunteering.review_project')}: {reviewingProject?.title}
           </ModalHeader>
           <ModalBody>
             <div className="flex flex-col gap-4">
               <Select
-                label={t('volunteering.review_decision', 'Decision')}
+                label={t('volunteering.review_decision')}
                 selectedKeys={reviewStatus ? [reviewStatus] : []}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0];
@@ -341,19 +341,19 @@ export default function VolunteerProjects() {
                 ))}
               </Select>
               <Textarea
-                label={t('volunteering.review_notes', 'Review Notes')}
+                label={t('volunteering.review_notes')}
                 value={reviewNotes}
                 onValueChange={setReviewNotes}
                 variant="bordered"
-                placeholder={t('volunteering.review_notes_placeholder', 'Optional notes about your decision...')}
+                placeholder={t('volunteering.review_notes_placeholder')}
                 minRows={3}
               />
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose}>{t('common.cancel', 'Cancel')}</Button>
+            <Button variant="flat" onPress={onClose}>{t('volunteering.cancel')}</Button>
             <Button color="primary" onPress={handleReview} isLoading={saving}>
-              {t('volunteering.submit_review', 'Submit Review')}
+              {t('volunteering.submit_review')}
             </Button>
           </ModalFooter>
         </ModalContent>
