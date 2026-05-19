@@ -172,7 +172,7 @@ export function DonationsTab() {
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load donations data', err);
-      setError(tRef.current('donations.load_error', 'Unable to load donations data.'));
+      setError(tRef.current('donations.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -200,7 +200,7 @@ export function DonationsTab() {
 
   const handleSubmit = async (onClose: () => void) => {
     if (!form.amount || parseFloat(form.amount) <= 0) {
-      toastRef.current.error(tRef.current('donations.invalid_amount', 'Please enter a valid amount.'));
+      toastRef.current.error(tRef.current('donations.invalid_amount'));
       return;
     }
 
@@ -216,15 +216,15 @@ export function DonationsTab() {
       });
 
       if (response.success) {
-        toastRef.current.success(tRef.current('donations.submit_success', 'Offline pledge recorded.'));
+        toastRef.current.success(tRef.current('donations.submit_success'));
         onClose();
         load();
       } else {
-        toastRef.current.error(response.error || tRef.current('donations.submit_error', 'Failed to record donation.'));
+        toastRef.current.error(response.error || tRef.current('donations.submit_error'));
       }
     } catch (err) {
       logError('Failed to submit donation', err);
-      toastRef.current.error(tRef.current('donations.submit_error_retry', 'Failed to record donation. Please try again.'));
+      toastRef.current.error(tRef.current('donations.submit_error_retry'));
     } finally {
       setIsSubmitting(false);
     }
@@ -243,12 +243,12 @@ export function DonationsTab() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Heart className="w-5 h-5 text-rose-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">{t('donations.heading', 'Donations')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('donations.heading')}</h2>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Button
             size="sm"
             variant="flat"
@@ -257,7 +257,7 @@ export function DonationsTab() {
             onPress={load}
             isDisabled={isLoading}
           >
-            {t('donations.refresh', 'Refresh')}
+            {t('donations.refresh')}
           </Button>
           <Button
             size="sm"
@@ -265,7 +265,7 @@ export function DonationsTab() {
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             onPress={() => openDonateModal()}
           >
-            {t('donations.donate', 'Donate')}
+            {t('donations.donate')}
           </Button>
           <Button
             size="sm"
@@ -274,7 +274,7 @@ export function DonationsTab() {
             startContent={<CreditCard className="w-4 h-4" aria-hidden="true" />}
             onPress={() => openStripeCheckout()}
           >
-            {t('donations.donate_with_card', 'Donate with Card')}
+            {t('donations.donate_with_card')}
           </Button>
         </div>
       </div>
@@ -283,17 +283,17 @@ export function DonationsTab() {
       {!error && !isLoading && stats && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <GlassCard className="p-3 text-center">
-            <p className="text-xs text-theme-muted">{t('donations.stats.total_raised', 'Total Raised')}</p>
+            <p className="text-xs text-theme-muted">{t('donations.stats.total_raised')}</p>
             <p className="text-lg font-bold text-theme-primary">
               {stats.total_raised.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </GlassCard>
           <GlassCard className="p-3 text-center">
-            <p className="text-xs text-theme-muted">{t('donations.stats.total_donors', 'Total Donors')}</p>
+            <p className="text-xs text-theme-muted">{t('donations.stats.total_donors')}</p>
             <p className="text-lg font-bold text-rose-500">{stats.total_donors}</p>
           </GlassCard>
           <GlassCard className="p-3 text-center">
-            <p className="text-xs text-theme-muted">{t('donations.stats.active_campaigns', 'Active Campaigns')}</p>
+            <p className="text-xs text-theme-muted">{t('donations.stats.active_campaigns')}</p>
             <p className="text-lg font-bold text-[var(--color-info)]">{stats.active_campaigns}</p>
           </GlassCard>
         </div>
@@ -305,7 +305,7 @@ export function DonationsTab() {
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
-            {t('donations.try_again', 'Try Again')}
+            {t('donations.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -327,14 +327,14 @@ export function DonationsTab() {
       {!error && !isLoading && givingDays.length === 0 && donations.length === 0 && (
         <EmptyState
           icon={<Heart className="w-12 h-12" aria-hidden="true" />}
-          title={t('donations.empty_title', 'No giving days or donations')}
-          description={t('donations.empty_description', 'When a giving day is active, you can make donations to support your community.')}
+          title={t('donations.empty_title')}
+          description={t('donations.empty_description')}
           action={
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={() => openDonateModal()}
             >
-              {t('donations.make_donation', 'Make a Donation')}
+              {t('donations.make_donation')}
             </Button>
           }
         />
@@ -344,7 +344,7 @@ export function DonationsTab() {
       {!error && !isLoading && givingDays.length > 0 && (
         <div className="space-y-4">
           <h3 className="text-sm font-semibold text-theme-secondary uppercase tracking-wide">
-            {t('donations.active_giving_days', 'Active Giving Days')}
+            {t('donations.active_giving_days')}
           </h3>
           <motion.div
             variants={containerVariants}
@@ -357,12 +357,12 @@ export function DonationsTab() {
               return (
                 <motion.div key={day.id} variants={itemVariants}>
                   <GlassCard className="p-5">
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
                           <h4 className="font-semibold text-theme-primary text-lg">{day.title}</h4>
                           <Chip size="sm" color={(day.status === 'active' || day.is_active) ? 'success' : 'default'} variant="flat">
-                            {t(`donations.day_status.${day.status ?? (day.is_active ? 'active' : 'ended')}`, day.status ?? (day.is_active ? 'Active' : 'Ended'))}
+                            {t(`donations.day_status.${day.status ?? (day.is_active ? 'active' : 'ended')}`)}
                           </Chip>
                         </div>
                         {day.description && (
@@ -382,7 +382,7 @@ export function DonationsTab() {
                           </span>
                           <span className="flex items-center gap-1">
                             <Users className="w-3 h-3" aria-hidden="true" />
-                            {t('donations.donors_count', '{{count}} donors', { count: day.donor_count ?? 0 })}
+                            {t('donations.donors_count', { count: day.donor_count ?? 0 })}
                           </span>
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" aria-hidden="true" />
@@ -390,14 +390,14 @@ export function DonationsTab() {
                           </span>
                         </div>
                       </div>
-                      <div className="flex flex-col gap-2 flex-shrink-0">
+                      <div className="flex flex-col gap-2 sm:flex-shrink-0">
                         <Button
                           size="sm"
                           className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                           startContent={<Heart className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => openDonateModal(day.id)}
                         >
-                          {t('donations.donate', 'Donate')}
+                          {t('donations.donate')}
                         </Button>
                         <Button
                           size="sm"
@@ -406,7 +406,7 @@ export function DonationsTab() {
                           startContent={<CreditCard className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => openStripeCheckout(day.id)}
                         >
-                          {t('donations.donate_with_card', 'Donate with Card')}
+                          {t('donations.donate_with_card')}
                         </Button>
                       </div>
                     </div>
@@ -422,7 +422,7 @@ export function DonationsTab() {
       {!error && !isLoading && donations.length > 0 && (
         <div className="space-y-4">
           <h3 className="text-sm font-semibold text-theme-secondary uppercase tracking-wide">
-            {t('donations.my_donations', 'My Donations')}
+            {t('donations.my_donations')}
           </h3>
           <motion.div
             variants={containerVariants}
@@ -440,11 +440,11 @@ export function DonationsTab() {
                           {d.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                         <Chip size="sm" color={STATUS_COLOR[d.status] || 'default'} variant="flat">
-                          {t(`donations.status.${d.status}`, d.status)}
+                          {t(`donations.status.${d.status}`)}
                         </Chip>
                         {(d.anonymous ?? d.is_anonymous) && (
                           <Chip size="sm" variant="flat" startContent={<EyeOff className="w-3 h-3" />}>
-                            {t('donations.anonymous', 'Anonymous')}
+                            {t('donations.anonymous')}
                           </Chip>
                         )}
                       </div>
@@ -452,7 +452,7 @@ export function DonationsTab() {
                         {d.giving_day_title && <span>{d.giving_day_title}</span>}
                         <span className="flex items-center gap-1">
                           <CreditCard className="w-3 h-3" aria-hidden="true" />
-                          {t(`donations.payment_methods.${d.payment_method}`, d.payment_method.replace('_', ' '))}
+                          {t(`donations.payment_methods.${d.payment_method}`)}
                         </span>
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" aria-hidden="true" />
@@ -492,10 +492,10 @@ export function DonationsTab() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="text-theme-primary">{t('donations.modal_title', 'Record an Offline Pledge')}</ModalHeader>
+              <ModalHeader className="text-theme-primary">{t('donations.modal_title')}</ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label={t('donations.form.amount', 'Amount')}
+                  label={t('donations.form.amount')}
                   type="number"
                   min="0.01"
                   max="1000000"
@@ -507,19 +507,19 @@ export function DonationsTab() {
                   isRequired
                 />
                 <RadioGroup
-                  label={t('donations.form.payment_method', 'Payment method')}
+                  label={t('donations.form.payment_method')}
                   orientation="horizontal"
                   value={form.payment_method}
                   onValueChange={(value) => setForm((f) => ({ ...f, payment_method: value as typeof PAYMENT_METHODS[number] }))}
                 >
                   {PAYMENT_METHODS.map((pm) => (
                     <Radio key={pm} value={pm}>
-                      {t(`donations.payment_methods.${pm}`, pm.replace('_', ' '))}
+                      {t(`donations.payment_methods.${pm}`)}
                     </Radio>
                   ))}
                 </RadioGroup>
                 <Textarea
-                  label={t('donations.form.message', 'Message (optional)')}
+                  label={t('donations.form.message')}
                   variant="bordered"
                   value={form.message}
                   onValueChange={(v) => setForm((f) => ({ ...f, message: v }))}
@@ -532,17 +532,17 @@ export function DonationsTab() {
                   startContent={<EyeOff className="w-4 h-4" aria-hidden="true" />}
                   onPress={() => setForm((f) => ({ ...f, anonymous: !f.anonymous }))}
                 >
-                  {form.anonymous ? t('donations.anonymous_toggle_on', 'Donating anonymously') : t('donations.anonymous_toggle_off', 'Donate anonymously')}
+                  {form.anonymous ? t('donations.anonymous_toggle_on') : t('donations.anonymous_toggle_off')}
                 </Button>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('donations.cancel', 'Cancel')}</Button>
+                <Button variant="flat" onPress={onClose}>{t('donations.cancel')}</Button>
                 <Button
                   className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                   onPress={() => handleSubmit(onClose)}
                   isLoading={isSubmitting}
                 >
-                  {t('donations.confirm', 'Confirm Donation')}
+                  {t('donations.confirm')}
                 </Button>
               </ModalFooter>
             </>
