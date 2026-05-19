@@ -129,14 +129,16 @@ class EventReminderService
      */
     public function sendDueReminders(int $tenantId): int
     {
-        $sent = 0;
+        return (int) TenantContext::runForTenant($tenantId, function () use ($tenantId): int {
+            $sent = 0;
 
-        foreach (self::REMINDER_INTERVALS as $type => $hoursBeforeEvent) {
-            $result = $this->processReminderType($tenantId, $type, $hoursBeforeEvent);
-            $sent += $result['sent'];
-        }
+            foreach (self::REMINDER_INTERVALS as $type => $hoursBeforeEvent) {
+                $result = $this->processReminderType($tenantId, $type, $hoursBeforeEvent);
+                $sent += $result['sent'];
+            }
 
-        return $sent;
+            return $sent;
+        });
     }
 
     /**

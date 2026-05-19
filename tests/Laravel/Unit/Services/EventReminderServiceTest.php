@@ -20,6 +20,27 @@ class EventReminderServiceTest extends TestCase
         $this->service = new EventReminderService();
     }
 
+    private function expectTenantLookup(int $tenantId): void
+    {
+        $tenantQuery = \Mockery::mock();
+        $tenantQuery->shouldReceive('where')
+            ->once()
+            ->with('id', $tenantId)
+            ->andReturnSelf();
+        $tenantQuery->shouldReceive('first')
+            ->once()
+            ->andReturn((object) [
+                'id' => $tenantId,
+                'slug' => 'tenant-' . $tenantId,
+                'name' => 'Tenant ' . $tenantId,
+            ]);
+
+        DB::shouldReceive('table')
+            ->once()
+            ->with('tenants')
+            ->andReturn($tenantQuery);
+    }
+
     // =========================================================================
     // scheduleReminder()
     // =========================================================================
@@ -66,6 +87,7 @@ class EventReminderServiceTest extends TestCase
 
     public function test_sendDueReminders_returns_zero_when_no_events(): void
     {
+        $this->expectTenantLookup(2);
         DB::shouldReceive('select')->andReturn([]);
 
         $result = $this->service->sendDueReminders(2);
@@ -75,9 +97,19 @@ class EventReminderServiceTest extends TestCase
     public function test_sendDueReminders_processes_both_reminder_types(): void
     {
         // For both 24h and 1h reminder types, returns empty events
+        $this->expectTenantLookup(2);
         DB::shouldReceive('select')->twice()->andReturn([]);
 
         $result = $this->service->sendDueReminders(2);
         $this->assertEquals(0, $result);
+    }
+
+    public function test_sendDueReminders_sets_tenant_context_itself(): void
+    {
+        $source = file_get_contents(app_path('Services/EventReminderService.php'));
+
+        $this->assertStringContainsString('TenantContext::runForTenant($tenantId', $source);
+        $this->assertStringContainsString('TenantContext::getFrontendUrl()', $source);
+        $this->assertStringContainsString('TenantContext::getSlugPrefix()', $source);
     }
 }
