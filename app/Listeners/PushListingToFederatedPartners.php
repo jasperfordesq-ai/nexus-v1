@@ -36,6 +36,8 @@ class PushListingToFederatedPartners implements ShouldQueue
 
     public function handle(ListingCreated|ListingUpdated $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             // Ensure tenant context is set for queued execution
             TenantContext::setById($event->tenantId);
@@ -106,7 +108,7 @@ class PushListingToFederatedPartners implements ShouldQueue
                 'error'      => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 

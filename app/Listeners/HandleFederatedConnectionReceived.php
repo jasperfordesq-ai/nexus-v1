@@ -35,6 +35,8 @@ class HandleFederatedConnectionReceived implements ShouldQueue
 
     public function handle(FederatedConnectionReceived $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             TenantContext::setById($event->tenantId);
 
@@ -104,7 +106,7 @@ class HandleFederatedConnectionReceived implements ShouldQueue
                 'error'      => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

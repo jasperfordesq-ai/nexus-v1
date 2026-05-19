@@ -37,6 +37,8 @@ class PushMessageToFederatedPartner implements ShouldQueue
 
     public function handle(MessageSent $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             TenantContext::setById($event->tenantId);
 
@@ -116,7 +118,7 @@ class PushMessageToFederatedPartner implements ShouldQueue
                 'error'      => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

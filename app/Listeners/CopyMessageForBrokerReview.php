@@ -6,6 +6,7 @@
 
 namespace App\Listeners;
 
+use App\Core\TenantContext;
 use App\Events\MessageSent;
 use App\Services\BrokerMessageVisibilityService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -33,6 +34,8 @@ class CopyMessageForBrokerReview implements ShouldQueue
 
     public function handle(MessageSent $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             $message = $event->message;
             $senderId = (int) $message->sender_id;
@@ -42,7 +45,7 @@ class CopyMessageForBrokerReview implements ShouldQueue
             // Set tenant context for the queued job â€” required for HasTenantScope
             // trait and any service that reads TenantContext::getId()
             if ($event->tenantId) {
-                \App\Core\TenantContext::setById($event->tenantId);
+                TenantContext::setById($event->tenantId);
             }
 
             /** @var BrokerMessageVisibilityService $visibilityService */
@@ -60,7 +63,7 @@ class CopyMessageForBrokerReview implements ShouldQueue
                 'error' => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

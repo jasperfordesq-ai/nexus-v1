@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
+use App\Core\TenantContext;
 use App\Events\FederatedVolunteeringReceived;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
@@ -42,7 +43,7 @@ use Illuminate\Support\Facades\Schema;
  *   (is_federated / external_partner_id / external_id, added by migration
  *   2026_05_08_000002), the listener also mirrors the opportunity into
  *   `vol_opportunities` so federated content surfaces in normal listing/search.
- *   The mirror is idempotent via UNIQUE KEY (external_partner_id, external_id).
+ *   The mirror is idempotent via UNIQUE KEY (tenant_id, external_partner_id, external_id).
  *   On older schemas without those columns, the listener falls back to
  *   shadow-only persistence.
  */
@@ -53,7 +54,11 @@ class IngestFederatedVolunteerOpportunity implements ShouldQueue
 
     public function handle(FederatedVolunteeringReceived $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
+            TenantContext::setById($event->tenantId);
+
             // Defensive: confirm the shadow row still exists. If the controller
             // upsert was rolled back for any reason, log and bail.
             $exists = DB::table('federation_volunteering')
@@ -92,12 +97,14 @@ class IngestFederatedVolunteerOpportunity implements ShouldQueue
                 'local_id'            => $event->localId,
                 'error'               => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 
     /**
      * Mirror the federated opportunity into vol_opportunities, idempotent on
-     * (external_partner_id, external_id) via UNIQUE KEY uk_vol_opp_partner_ext.
+     * (tenant_id, external_partner_id, external_id) via UNIQUE KEY uk_vol_opp_tenant_partner_ext.
      * Skips silently if the federation columns aren't present (older schema).
      */
     private function mirrorIntoVolOpportunities(FederatedVolunteeringReceived $event): void
@@ -133,12 +140,16 @@ class IngestFederatedVolunteerOpportunity implements ShouldQueue
         ];
 
         $existing = DB::table('vol_opportunities')
+            ->where('tenant_id', $event->tenantId)
             ->where('external_partner_id', $event->externalPartnerId)
             ->where('external_id', $externalId)
             ->first(['id']);
 
         if ($existing) {
-            DB::table('vol_opportunities')->where('id', $existing->id)->update($row);
+            DB::table('vol_opportunities')
+                ->where('id', $existing->id)
+                ->where('tenant_id', $event->tenantId)
+                ->update($row);
         } else {
             DB::table('vol_opportunities')->insert(array_merge($row, ['created_at' => $now]));
         }

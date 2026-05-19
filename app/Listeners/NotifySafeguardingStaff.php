@@ -125,11 +125,7 @@ class NotifySafeguardingStaff implements ShouldQueue
             // Re-throw so Laravel queue retries (safeguarding notifications are legally critical)
             throw $e;
         } finally {
-            if ($previousTenantId !== null) {
-                TenantContext::setById($previousTenantId);
-            } else {
-                TenantContext::reset(); // Prevent context leaking to next queued job
-            }
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 

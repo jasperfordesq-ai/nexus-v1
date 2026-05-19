@@ -39,6 +39,7 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
     {
         $connection = $event->connectionModel;
         $tenantId   = $event->tenantId;
+        $previousTenantId = TenantContext::currentId();
 
         try {
             TenantContext::setById($tenantId);
@@ -118,7 +119,7 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
                 'error'         => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

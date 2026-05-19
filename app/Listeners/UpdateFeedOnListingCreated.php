@@ -30,6 +30,8 @@ class UpdateFeedOnListingCreated implements ShouldQueue
      */
     public function handle(ListingCreated $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             // Ensure tenant context is set (required when running via async queue)
             TenantContext::setById($event->tenantId);
@@ -61,7 +63,7 @@ class UpdateFeedOnListingCreated implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

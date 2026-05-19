@@ -38,6 +38,7 @@ class PushCommunityEventToFederatedPartners implements ShouldQueue
         $action = $event instanceof CommunityEventCreated ? 'created' : 'updated';
         $eventModel = $event->event;
         $tenantId   = $event->tenantId;
+        $previousTenantId = TenantContext::currentId();
 
         try {
             TenantContext::setById($tenantId);
@@ -91,7 +92,7 @@ class PushCommunityEventToFederatedPartners implements ShouldQueue
                 'error'     => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 

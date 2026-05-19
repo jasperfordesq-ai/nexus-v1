@@ -34,6 +34,7 @@ class PushGroupToFederatedPartners implements ShouldQueue
     {
         $group    = $event->group;
         $tenantId = $event->tenantId;
+        $previousTenantId = TenantContext::currentId();
 
         try {
             TenantContext::setById($tenantId);
@@ -101,7 +102,7 @@ class PushGroupToFederatedPartners implements ShouldQueue
                 'error'     => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

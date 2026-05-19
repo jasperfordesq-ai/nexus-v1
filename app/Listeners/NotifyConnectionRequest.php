@@ -84,11 +84,7 @@ class NotifyConnectionRequest implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
         } finally {
-            if ($previousTenantId !== null) {
-                TenantContext::setById($previousTenantId);
-            } else {
-                TenantContext::reset(); // Prevent context leaking to next queued job
-            }
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

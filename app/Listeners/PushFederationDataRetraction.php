@@ -38,6 +38,7 @@ class PushFederationDataRetraction implements ShouldQueue
     {
         $userId   = $event->userId;
         $tenantId = $event->tenantId;
+        $previousTenantId = TenantContext::currentId();
 
         try {
             TenantContext::setById($tenantId);
@@ -88,7 +89,7 @@ class PushFederationDataRetraction implements ShouldQueue
                 'error'     => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

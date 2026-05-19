@@ -23,6 +23,8 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
 {
     public function handle(UserRegistered $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             if (!TenantContext::setById($event->tenantId)) {
                 throw new \RuntimeException("Tenant {$event->tenantId} not found — cannot send admin registration notification.");
@@ -90,7 +92,7 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                 }
             }
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

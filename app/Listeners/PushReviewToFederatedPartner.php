@@ -42,6 +42,8 @@ class PushReviewToFederatedPartner implements ShouldQueue
 
     public function handle(ReviewCreated $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             // Restore tenant context for the queued worker (no tenant is set
             // on queue boot â€” all DB reads below must be scoped correctly).
@@ -93,7 +95,7 @@ class PushReviewToFederatedPartner implements ShouldQueue
                 'error'     => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 

@@ -33,6 +33,7 @@ class PushGroupMembershipToFederatedPartners implements ShouldQueue
     public function handle(GroupMemberJoined $event): void
     {
         $tenantId = $event->tenantId;
+        $previousTenantId = TenantContext::currentId();
 
         try {
             TenantContext::setById($tenantId);
@@ -102,7 +103,7 @@ class PushGroupMembershipToFederatedPartners implements ShouldQueue
                 'error'     => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

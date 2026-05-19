@@ -35,6 +35,8 @@ class SendWelcomeNotification implements ShouldQueue
      */
     public function handle(UserRegistered $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             // Tenant context for any notifications/emails below.
             // Search-index upserts are handled by UserObserver (queued + retried)
@@ -125,7 +127,7 @@ class SendWelcomeNotification implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 

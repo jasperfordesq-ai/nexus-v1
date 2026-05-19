@@ -117,11 +117,7 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
                 'error'          => $e->getMessage(),
             ]);
         } finally {
-            if ($previousTenantId !== null) {
-                TenantContext::setById($previousTenantId);
-            } else {
-                TenantContext::reset();
-            }
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

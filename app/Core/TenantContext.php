@@ -370,6 +370,29 @@ class TenantContext
     }
 
     /**
+     * Restore tenant state after a listener/job temporarily switched tenants.
+     *
+     * Console queue workers must finish each job with no tenant state so a
+     * leaked previous job cannot poison the next one. Inline web execution
+     * must restore the caller's tenant so later listeners/controller work in
+     * the same request keep their original scope.
+     */
+    public static function restoreAfterScopedListener(?int $previousTenantId): void
+    {
+        if (function_exists('app') && app()->runningInConsole()) {
+            self::reset();
+            return;
+        }
+
+        if ($previousTenantId !== null) {
+            self::setById($previousTenantId);
+            return;
+        }
+
+        self::reset();
+    }
+
+    /**
      * Run a callback under an explicit tenant context and restore the previous
      * request state afterwards. This is for queued jobs, webhooks, and batch
      * email paths where the current HTTP tenant cannot be trusted.

@@ -40,6 +40,8 @@ class HandleFederatedReviewReceived implements ShouldQueue
 
     public function handle(FederatedReviewReceived $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             TenantContext::setById($event->tenantId);
 
@@ -120,7 +122,7 @@ class HandleFederatedReviewReceived implements ShouldQueue
                 'error'      => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

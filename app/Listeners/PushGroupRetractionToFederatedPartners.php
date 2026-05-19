@@ -40,6 +40,7 @@ class PushGroupRetractionToFederatedPartners implements ShouldQueue
     public function handle(GroupDeleted|GroupMemberLeft $event): void
     {
         $tenantId = $event->tenantId;
+        $previousTenantId = TenantContext::currentId();
 
         try {
             TenantContext::setById($tenantId);
@@ -104,7 +105,7 @@ class PushGroupRetractionToFederatedPartners implements ShouldQueue
                 'error'     => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

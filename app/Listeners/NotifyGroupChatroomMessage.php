@@ -40,6 +40,8 @@ class NotifyGroupChatroomMessage implements ShouldQueue
 
     public function handle(GroupChatroomMessagePosted $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             TenantContext::setById($event->tenantId);
 
@@ -136,7 +138,7 @@ class NotifyGroupChatroomMessage implements ShouldQueue
                 'error'       => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

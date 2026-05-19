@@ -30,6 +30,8 @@ class HandleFederatedCommunityEventReceived implements ShouldQueue
 
     public function handle(FederatedCommunityEventReceived $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             TenantContext::setById($event->tenantId);
 
@@ -61,7 +63,7 @@ class HandleFederatedCommunityEventReceived implements ShouldQueue
                 'error'      => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

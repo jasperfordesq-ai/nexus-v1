@@ -99,11 +99,7 @@ class AwardXpOnVolLogApproved
                 'error'      => $e->getMessage(),
             ]);
         } finally {
-            if ($previousTenantId > 0) {
-                TenantContext::setById($previousTenantId);
-            } else {
-                TenantContext::reset();
-            }
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

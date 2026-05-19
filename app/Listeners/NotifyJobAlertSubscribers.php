@@ -33,6 +33,8 @@ class NotifyJobAlertSubscribers implements ShouldQueue
      */
     public function handle(JobVacancyCreated $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             // Ensure tenant context is set (required when running via async queue)
             TenantContext::setById($event->tenantId);
@@ -93,7 +95,7 @@ class NotifyJobAlertSubscribers implements ShouldQueue
                 'trace'      => $e->getTraceAsString(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 

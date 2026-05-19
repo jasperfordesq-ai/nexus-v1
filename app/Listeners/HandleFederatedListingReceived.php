@@ -35,6 +35,8 @@ class HandleFederatedListingReceived implements ShouldQueue
 
     public function handle(FederatedListingReceived $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             TenantContext::setById($event->tenantId);
 
@@ -66,7 +68,7 @@ class HandleFederatedListingReceived implements ShouldQueue
                 'error'      => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
 }

@@ -126,18 +126,45 @@ class NotificationQueueTenantIntegrityTest extends TestCase
             'NotifyAdminOfNewCommunityEvent.php',
             'NotifyAdminOfNewGroup.php',
             'NotifyAdminOfNewListing.php',
+            'NotifyAdminOfNewRegistration.php',
             'NotifyAdminOfNewVolunteerOpportunity.php',
             'NotifyConnectionAccepted.php',
             'NotifyConnectionRequest.php',
+            'NotifyGroupChatroomMessage.php',
             'NotifyGroupMemberJoined.php',
+            'NotifyJobAlertSubscribers.php',
             'NotifyMessageReceived.php',
             'NotifySafeguardingStaff.php',
             'NotifyTransactionCompleted.php',
+            'SendOnboardingCompletionEmail.php',
+            'SendWelcomeNotification.php',
+            'CopyMessageForBrokerReview.php',
+            'UpdateFeedOnListingCreated.php',
+            'UpdateWalletBalance.php',
+            'HandleFederatedCommunityEventReceived.php',
+            'HandleFederatedConnectionReceived.php',
+            'HandleFederatedListingReceived.php',
+            'HandleFederatedMemberUpdated.php',
+            'HandleFederatedReviewReceived.php',
+            'IngestFederatedVolunteerOpportunity.php',
+            'PushCommunityEventToFederatedPartners.php',
+            'PushConnectionAcceptedToFederatedPartner.php',
+            'PushFederationDataRetraction.php',
+            'PushGroupMembershipToFederatedPartners.php',
+            'PushGroupRetractionToFederatedPartners.php',
+            'PushGroupToFederatedPartners.php',
+            'PushListingToFederatedPartners.php',
+            'PushMemberProfileUpdateToFederatedPartners.php',
+            'PushMessageToFederatedPartner.php',
+            'PushReviewToFederatedPartner.php',
+            'PushTransactionToFederatedPartner.php',
+            'PushVolunteerOpportunityToFederatedPartners.php',
         ];
 
         foreach ($listenerFiles as $listenerFile) {
             $source = file_get_contents(app_path('Listeners/' . $listenerFile));
             $restoresTenant = str_contains($source, 'TenantContext::runForTenant(')
+                || str_contains($source, 'TenantContext::restoreAfterScopedListener($previousTenantId)')
                 || (
                     str_contains($source, 'TenantContext::currentId()')
                     && str_contains($source, 'TenantContext::setById($previousTenantId)')
@@ -153,6 +180,16 @@ class NotificationQueueTenantIntegrityTest extends TestCase
                 "{$listenerFile} must not blindly reset tenant context in finally."
             );
         }
+    }
+
+    public function test_federated_volunteer_mirror_is_tenant_scoped(): void
+    {
+        $listenerSource = file_get_contents(app_path('Listeners/IngestFederatedVolunteerOpportunity.php'));
+        $migrationSource = file_get_contents(database_path('migrations/2026_05_19_000001_scope_vol_opportunity_federation_unique_index_by_tenant.php'));
+
+        $this->assertStringContainsString("->where('tenant_id', \$event->tenantId)", $listenerSource);
+        $this->assertStringContainsString("`tenant_id`, `external_partner_id`, `external_id`", $migrationSource);
+        $this->assertStringContainsString("dropIndexIfExists('vol_opportunities', 'uk_vol_opp_partner_ext')", $migrationSource);
     }
 
     public function test_email_dispatcher_allows_intentional_platform_send_without_leaked_context(): void
