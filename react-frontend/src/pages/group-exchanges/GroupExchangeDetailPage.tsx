@@ -126,20 +126,19 @@ interface SearchResult {
 }
 
 interface StatusConfig {
-  label: string;
   color: 'default' | 'warning' | 'secondary' | 'primary' | 'success' | 'danger';
   bgClass: string;
 }
 
 const STATUS_CONFIGS: Record<GroupExchangeStatus, StatusConfig> = {
-  draft: { label: 'Draft', color: 'default', bgClass: 'bg-gray-500/20 text-gray-400' },
-  pending_participants: { label: 'Pending Participants', color: 'warning', bgClass: 'bg-amber-500/20 text-amber-400' },
-  pending_broker: { label: 'Pending Broker Approval', color: 'secondary', bgClass: 'bg-purple-500/20 text-purple-400' },
-  active: { label: 'Active', color: 'primary', bgClass: 'bg-indigo-500/20 text-indigo-400' },
-  pending_confirmation: { label: 'Pending Confirmation', color: 'warning', bgClass: 'bg-amber-500/20 text-amber-400' },
-  completed: { label: 'Completed', color: 'success', bgClass: 'bg-emerald-500/20 text-emerald-400' },
-  cancelled: { label: 'Cancelled', color: 'danger', bgClass: 'bg-red-500/20 text-red-400' },
-  disputed: { label: 'Disputed', color: 'danger', bgClass: 'bg-red-500/20 text-red-400' },
+  draft: { color: 'default', bgClass: 'bg-gray-500/20 text-gray-400' },
+  pending_participants: { color: 'warning', bgClass: 'bg-amber-500/20 text-amber-400' },
+  pending_broker: { color: 'secondary', bgClass: 'bg-purple-500/20 text-purple-400' },
+  active: { color: 'primary', bgClass: 'bg-indigo-500/20 text-indigo-400' },
+  pending_confirmation: { color: 'warning', bgClass: 'bg-amber-500/20 text-amber-400' },
+  completed: { color: 'success', bgClass: 'bg-emerald-500/20 text-emerald-400' },
+  cancelled: { color: 'danger', bgClass: 'bg-red-500/20 text-red-400' },
+  disputed: { color: 'danger', bgClass: 'bg-red-500/20 text-red-400' },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -724,7 +723,7 @@ export function GroupExchangeDetailPage() {
                     <ArrowRight className="w-4 h-4 inline" aria-label={t('detail.gives_to')} />
                   </TableCell>
                   <TableCell className="text-amber-400">{row.receiverName}</TableCell>
-                  <TableCell className="text-right font-medium text-theme-primary">{row.amount}h</TableCell>
+                  <TableCell className="text-right font-medium text-theme-primary">{t('detail.hours_amount', { count: row.amount })}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

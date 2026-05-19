@@ -74,19 +74,18 @@ type GroupExchangeStatus =
   | 'disputed';
 
 interface StatusConfig {
-  label: string;
   color: 'default' | 'warning' | 'secondary' | 'primary' | 'success' | 'danger';
 }
 
 const STATUS_CONFIGS: Record<GroupExchangeStatus, StatusConfig> = {
-  draft: { label: 'Draft', color: 'default' },
-  pending_participants: { label: 'Pending Participants', color: 'warning' },
-  pending_broker: { label: 'Pending Broker', color: 'secondary' },
-  active: { label: 'Active', color: 'primary' },
-  pending_confirmation: { label: 'Pending Confirmation', color: 'warning' },
-  completed: { label: 'Completed', color: 'success' },
-  cancelled: { label: 'Cancelled', color: 'danger' },
-  disputed: { label: 'Disputed', color: 'danger' },
+  draft: { color: 'default' },
+  pending_participants: { color: 'warning' },
+  pending_broker: { color: 'secondary' },
+  active: { color: 'primary' },
+  pending_confirmation: { color: 'warning' },
+  completed: { color: 'success' },
+  cancelled: { color: 'danger' },
+  disputed: { color: 'danger' },
 };
 
 const ITEMS_PER_PAGE = 20;

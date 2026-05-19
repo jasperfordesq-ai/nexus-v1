@@ -67,6 +67,7 @@
     "col_name": "Name",
     "col_role": "Role",
     "col_hours": "Hours",
+    "hours_amount": "{{count}}h",
     "col_weight": "Weight",
     "col_confirmed": "Confirmed",
     "col_provider": "Provider",
