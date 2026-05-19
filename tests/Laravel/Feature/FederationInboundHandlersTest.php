@@ -552,6 +552,12 @@ class FederationInboundHandlersTest extends TestCase
 
         $this->postWebhook('message.sent', $payload)->assertStatus(500);
 
+        $this->assertDatabaseHas('federation_external_partner_logs', [
+            'partner_id' => $this->partnerId,
+            'response_code' => 500,
+            'success' => 0,
+        ]);
+
         $message = DB::table('federation_messages')
             ->where('external_partner_id', $this->partnerId)
             ->where('external_message_id', 'ext-msg-repair-1')
@@ -665,6 +671,12 @@ class FederationInboundHandlersTest extends TestCase
 
         $failingMailer = $this->fakeEmailDispatchService(false);
         $this->postWebhook('transaction.completed', $payload)->assertStatus(500);
+
+        $this->assertDatabaseHas('federation_external_partner_logs', [
+            'partner_id' => $this->partnerId,
+            'response_code' => 500,
+            'success' => 0,
+        ]);
 
         $transaction = DB::table('federation_transactions')
             ->where('external_partner_id', $this->partnerId)

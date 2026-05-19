@@ -176,6 +176,7 @@ class FederationExternalWebhookController extends BaseApiController
         // ---- Dispatch event ----
         try {
             $result = $this->handleEvent($event, $data, $partner);
+            $this->assertWebhookResultCanBeAcknowledged($result);
 
             DB::table('federation_external_partner_logs')
                 ->where('id', $logId)
@@ -203,6 +204,30 @@ class FederationExternalWebhookController extends BaseApiController
                 ->update(['response_code' => 500, 'success' => false, 'error_message' => substr($e->getMessage(), 0, 1000)]);
 
             return $this->respondWithError('PROCESSING_FAILED', __('api.federation.webhook_processing_failed'), null, 500);
+        }
+    }
+
+    /**
+     * A webhook can only be acknowledged once the handler has either fully
+     * succeeded, cleanly rejected the partner payload, or identified a true
+     * duplicate. Internal processing errors must stay retryable for the
+     * sending partner instead of being hidden behind HTTP 200.
+     *
+     * @param array<string,mixed> $result
+     */
+    private function assertWebhookResultCanBeAcknowledged(array $result): void
+    {
+        if (($result['status'] ?? null) === 'error') {
+            throw new \RuntimeException((string) ($result['reason'] ?? 'Federation webhook processing failed'));
+        }
+
+        if (($result['success'] ?? true) === false) {
+            $message = (string) ($result['error'] ?? 'Federation webhook processing failed');
+            if (($result['retryable'] ?? false) === true) {
+                throw new \RuntimeException($message);
+            }
+
+            throw new InboundValidationException($message);
         }
     }
 
