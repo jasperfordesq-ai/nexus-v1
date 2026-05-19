@@ -121,9 +121,9 @@ export default function CreateOpportunityPage() {
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = t('form_desc_required', 'Description is required');
+      newErrors.description = t('form_desc_required');
     } else if (formData.description.trim().length < 20) {
-      newErrors.description = t('form_desc_min_length', 'Description must be at least 20 characters');
+      newErrors.description = t('form_desc_min_length');
     }
 
     setErrors(newErrors);
@@ -194,7 +194,7 @@ export default function CreateOpportunityPage() {
           <p className="text-theme-muted mb-6">
             {t('no_approved_orgs_description')}
           </p>
-          <div className="flex justify-center gap-3">
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
             <Link to={tenantPath('/organisations/register')}>
               <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
                 {t('register_org_link')}
@@ -370,7 +370,7 @@ export default function CreateOpportunityPage() {
           </fieldset>
 
           {/* Submit buttons */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col gap-3 pt-4 sm:flex-row">
             <Button
               type="submit"
               className="flex-1 bg-gradient-to-r from-rose-500 to-pink-600 text-white"
