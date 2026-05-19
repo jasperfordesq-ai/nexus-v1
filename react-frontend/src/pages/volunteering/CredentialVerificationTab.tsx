@@ -92,12 +92,12 @@ function getStatusIcon(status: string) {
   }
 }
 
-function getStatusLabel(status: string, t: (key: string, defaultValue: string) => string): string {
+function getStatusLabel(status: string, t: (key: string) => string): string {
   switch (status) {
-    case 'pending': return t('credentials.status_pending', 'Pending Review');
-    case 'verified': return t('credentials.status_verified', 'Verified');
-    case 'expired': return t('credentials.status_expired', 'Expired');
-    case 'rejected': return t('credentials.status_rejected', 'Rejected');
+    case 'pending': return t('credentials.status_pending');
+    case 'verified': return t('credentials.status_verified');
+    case 'expired': return t('credentials.status_expired');
+    case 'rejected': return t('credentials.status_rejected');
     default: return status;
   }
 }
@@ -148,12 +148,12 @@ export function CredentialVerificationTab() {
         const items = Array.isArray(payload) ? payload : (payload.credentials ?? []);
         setCredentials(items);
       } else {
-        setError(tRef.current('credentials.load_failed', 'Failed to load credentials.'));
+        setError(tRef.current('credentials.load_failed'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load credentials', err);
-      setError(tRef.current('credentials.load_error', 'Unable to load credentials. Please try again.'));
+      setError(tRef.current('credentials.load_error'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
@@ -170,14 +170,14 @@ export function CredentialVerificationTab() {
     if (file) {
       // Validate file size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
-        setUploadError(t('credentials.file_too_large', 'File size must be under 10MB.'));
+        setUploadError(t('credentials.file_too_large'));
         setSelectedFile(null);
         return;
       }
       // Validate file type
       const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
       if (!allowed.includes(file.type)) {
-        setUploadError(t('credentials.invalid_file_type', 'Please upload a PDF or image file (JPG, PNG, WebP).'));
+        setUploadError(t('credentials.invalid_file_type'));
         setSelectedFile(null);
         return;
       }
@@ -203,16 +203,16 @@ export function CredentialVerificationTab() {
       const response = await api.upload('/v2/volunteering/credentials', formData);
 
       if (response.success) {
-        toastRef.current.success(tRef.current('credentials.upload_success', 'Credential uploaded successfully!'));
+        toastRef.current.success(tRef.current('credentials.upload_success'));
         onClose();
         resetUploadForm();
         load();
       } else {
-        setUploadError(tRef.current('credentials.upload_failed', 'Failed to upload credential. Please try again.'));
+        setUploadError(tRef.current('credentials.upload_failed'));
       }
     } catch (err) {
       logError('Failed to upload credential', err);
-      setUploadError(tRef.current('credentials.upload_error', 'An error occurred while uploading. Please try again.'));
+      setUploadError(tRef.current('credentials.upload_error'));
     } finally {
       setIsUploading(false);
     }
@@ -256,10 +256,10 @@ export function CredentialVerificationTab() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-5 h-5 text-emerald-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">{t('credentials.heading', 'Credential Verification')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('credentials.heading')}</h2>
         </div>
         <Button
           size="sm"
@@ -267,7 +267,7 @@ export function CredentialVerificationTab() {
           startContent={<Upload className="w-4 h-4" aria-hidden="true" />}
           onPress={onOpen}
         >
-          {t('credentials.upload_new', 'Upload New Credential')}
+          {t('credentials.upload_new')}
         </Button>
       </div>
 
@@ -281,7 +281,7 @@ export function CredentialVerificationTab() {
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={load}
           >
-            {t('credentials.try_again', 'Try Again')}
+            {t('credentials.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -311,15 +311,15 @@ export function CredentialVerificationTab() {
       {!error && !isLoading && credentials.length === 0 && (
         <EmptyState
           icon={<ShieldCheck className="w-12 h-12" aria-hidden="true" />}
-          title={t('credentials.no_credentials_title', 'No credentials uploaded')}
-          description={t('credentials.no_credentials_desc', 'Upload your volunteer credentials to get them verified and boost your profile.')}
+          title={t('credentials.no_credentials_title')}
+          description={t('credentials.no_credentials_desc')}
           action={
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               startContent={<Upload className="w-4 h-4" aria-hidden="true" />}
               onPress={onOpen}
             >
-              {t('credentials.upload_new', 'Upload New Credential')}
+              {t('credentials.upload_new')}
             </Button>
           }
         />
@@ -342,7 +342,7 @@ export function CredentialVerificationTab() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-theme-primary">{verified.length}</p>
-                  <p className="text-xs text-theme-muted">{t('credentials.status_verified', 'Verified')}</p>
+                  <p className="text-xs text-theme-muted">{t('credentials.status_verified')}</p>
                 </div>
               </div>
             </GlassCard>
@@ -354,7 +354,7 @@ export function CredentialVerificationTab() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-theme-primary">{pending.length}</p>
-                  <p className="text-xs text-theme-muted">{t('credentials.status_pending', 'Pending Review')}</p>
+                  <p className="text-xs text-theme-muted">{t('credentials.status_pending')}</p>
                 </div>
               </div>
             </GlassCard>
@@ -366,7 +366,7 @@ export function CredentialVerificationTab() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-theme-primary">{expiring.length}</p>
-                  <p className="text-xs text-theme-muted">{t('credentials.expiring_soon', 'Expiring Soon')}</p>
+                  <p className="text-xs text-theme-muted">{t('credentials.expiring_soon')}</p>
                 </div>
               </div>
             </GlassCard>
@@ -379,9 +379,9 @@ export function CredentialVerificationTab() {
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
-                    <p className="text-sm font-medium text-theme-primary">{t('credentials.expiring_soon_title', 'Credentials Expiring Soon')}</p>
+                    <p className="text-sm font-medium text-theme-primary">{t('credentials.expiring_soon_title')}</p>
                     <p className="text-sm text-theme-muted">
-                      {t('credentials.expiring_soon_desc', '{{count}} credential(s) will expire within 30 days. Consider renewing them to maintain your verified status.', { count: expiring.length })}
+                      {t('credentials.expiring_soon_desc', { count: expiring.length })}
                     </p>
                   </div>
                 </div>
@@ -404,7 +404,7 @@ export function CredentialVerificationTab() {
                         variant="flat"
                         startContent={getStatusIcon(credential.status)}
                       >
-                        {getStatusLabel(credential.status, (key, defaultValue) => t(key, { defaultValue }))}
+                        {getStatusLabel(credential.status, t)}
                       </Chip>
                     </div>
 
@@ -415,12 +415,12 @@ export function CredentialVerificationTab() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" aria-hidden="true" />
-                        {t('credentials.uploaded', 'Uploaded')} {new Date(credential.upload_date).toLocaleDateString()}
+                        {t('credentials.uploaded')} {new Date(credential.upload_date).toLocaleDateString()}
                       </span>
                       {credential.expiry_date && (
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" aria-hidden="true" />
-                          {t('credentials.expires', 'Expires')} {new Date(credential.expiry_date).toLocaleDateString()}
+                          {t('credentials.expires')} {new Date(credential.expiry_date).toLocaleDateString()}
                         </span>
                       )}
                     </div>
@@ -428,14 +428,14 @@ export function CredentialVerificationTab() {
                     {credential.status === 'rejected' && credential.rejection_reason && (
                       <div className="mt-2 p-2 rounded-lg bg-rose-500/10">
                         <p className="text-xs text-rose-400">
-                          <strong>{t('credentials.reason', 'Reason')}:</strong> {credential.rejection_reason}
+                          <strong>{t('credentials.reason')}:</strong> {credential.rejection_reason}
                         </p>
                       </div>
                     )}
                   </div>
 
                   {/* Actions */}
-                  <div className="flex flex-col gap-2 flex-shrink-0">
+                  <div className="flex flex-col gap-2 sm:flex-shrink-0">
                     {(credential.status === 'expired' || credential.status === 'rejected') && (
                       <Button
                         size="sm"
@@ -446,7 +446,7 @@ export function CredentialVerificationTab() {
                           onOpen();
                         }}
                       >
-                        {t('credentials.re_upload', 'Re-upload')}
+                        {t('credentials.re_upload')}
                       </Button>
                     )}
                   </div>
@@ -465,18 +465,18 @@ export function CredentialVerificationTab() {
           <ModalHeader className="text-theme-primary">
             <div className="flex items-center gap-2">
               <Upload className="w-5 h-5 text-rose-400" aria-hidden="true" />
-              {t('credentials.upload_new', 'Upload New Credential')}
+              {t('credentials.upload_new')}
             </div>
           </ModalHeader>
           <ModalBody className="space-y-4">
             <p className="text-sm text-theme-muted">
-              {t('credentials.upload_instructions', 'Upload a document to verify your credential. Accepted formats: PDF, JPG, PNG, WebP (max 10MB).')}
+              {t('credentials.upload_instructions')}
             </p>
 
             {/* Credential Type */}
             <Select
-              label={t('credentials.type_label', 'Credential Type')}
-              placeholder={t('credentials.type_placeholder', 'Select credential type')}
+              label={t('credentials.type_label')}
+              placeholder={t('credentials.type_placeholder')}
               selectedKeys={uploadForm.type ? new Set([uploadForm.type]) : new Set()}
               onSelectionChange={(keys) => { const val = Array.from(keys)[0] as string; if (val) setUploadForm((prev) => ({ ...prev, type: val })); }}
               isRequired
@@ -494,7 +494,7 @@ export function CredentialVerificationTab() {
             {/* File Upload */}
             <div>
               <label className="block text-sm font-medium text-theme-primary mb-2">
-                {t('credentials.document_label', 'Document')} <span className="text-rose-400">*</span>
+                {t('credentials.document_label')} <span className="text-rose-400">*</span>
               </label>
               <div
                 className={`relative overflow-hidden border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
@@ -521,7 +521,7 @@ export function CredentialVerificationTab() {
                         setSelectedFile(null);
                         if (fileInputRef.current) fileInputRef.current.value = '';
                       }}
-                      aria-label={t('credentials.aria_remove_file', 'Remove selected file')}
+                      aria-label={t('credentials.aria_remove_file')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -529,8 +529,8 @@ export function CredentialVerificationTab() {
                 ) : (
                   <div>
                     <Upload className="w-8 h-8 text-theme-muted mx-auto mb-2" aria-hidden="true" />
-                    <p className="text-sm text-theme-muted mb-2">{t('credentials.click_to_browse', 'Click to browse or drag and drop')}</p>
-                    <p className="text-xs text-theme-subtle">{t('credentials.file_types', 'PDF, JPG, PNG, or WebP up to 10MB')}</p>
+                    <p className="text-sm text-theme-muted mb-2">{t('credentials.click_to_browse')}</p>
+                    <p className="text-xs text-theme-subtle">{t('credentials.file_types')}</p>
                   </div>
                 )}
                 <input
@@ -539,7 +539,7 @@ export function CredentialVerificationTab() {
                   accept=".pdf,.jpg,.jpeg,.png,.webp"
                   onChange={handleFileChange}
                   className={selectedFile ? 'hidden' : 'absolute inset-0 w-full h-full opacity-0 cursor-pointer'}
-                  aria-label={t('credentials.aria_upload_document', 'Upload credential document')}
+                  aria-label={t('credentials.aria_upload_document')}
                 />
               </div>
             </div>
@@ -547,8 +547,8 @@ export function CredentialVerificationTab() {
             {/* Expiry Date */}
             <Input
               type="date"
-              label={t('credentials.expiry_label', 'Expiry Date (optional)')}
-              placeholder={t('credentials.expiry_placeholder', 'Leave blank if no expiry')}
+              label={t('credentials.expiry_label')}
+              placeholder={t('credentials.expiry_placeholder')}
               value={uploadForm.expiry_date}
               onChange={(e) => setUploadForm((prev) => ({ ...prev, expiry_date: e.target.value }))}
               classNames={{
@@ -565,7 +565,7 @@ export function CredentialVerificationTab() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={handleModalClose} className="text-theme-muted">{t('credentials.cancel', 'Cancel')}</Button>
+            <Button variant="flat" onPress={handleModalClose} className="text-theme-muted">{t('credentials.cancel')}</Button>
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleUpload}
@@ -573,7 +573,7 @@ export function CredentialVerificationTab() {
               isDisabled={!uploadForm.type || !selectedFile}
               startContent={!isUploading ? <Upload className="w-4 h-4" aria-hidden="true" /> : undefined}
             >
-              {t('credentials.upload_credential', 'Upload Credential')}
+              {t('credentials.upload_credential')}
             </Button>
           </ModalFooter>
         </ModalContent>
