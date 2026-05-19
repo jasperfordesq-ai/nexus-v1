@@ -51,12 +51,12 @@ const fadeInUp = {
 /* ───────────────────────── Table of Contents ───────────────────────── */
 
 const tocSections = [
-  { id: 'executive-summary', label: 'Executive Summary' },
-  { id: 'vision-mission', label: 'Vision & Mission' },
-  { id: 'swot', label: 'SWOT Analysis' },
-  { id: 'pillars', label: 'Strategic Pillars' },
-  { id: 'roadmap', label: 'Year 1 Roadmap' },
-  { id: 'risks', label: 'Risk & Mitigation' },
+  { id: 'executive-summary' },
+  { id: 'vision-mission' },
+  { id: 'swot' },
+  { id: 'pillars' },
+  { id: 'roadmap' },
+  { id: 'risks' },
 ];
 
 /* ───────────────────────── Component ───────────────────────── */
@@ -169,7 +169,7 @@ export function StrategicPlanPage() {
                     <span className="flex-shrink-0 w-6 h-6 rounded-md bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">
                       {index + 1}
                     </span>
-                    <span>{t(`strategic_plan.toc_${section.id}`, section.label)}</span>
+                    <span>{t(`strategic_plan.toc_${section.id}`)}</span>
                   </Button>
                 ))}
               </div>

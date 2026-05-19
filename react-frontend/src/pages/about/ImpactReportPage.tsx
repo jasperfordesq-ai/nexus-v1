@@ -58,13 +58,13 @@ const fadeInUp = {
 /* ───────────────────────── Table of Contents ───────────────────────── */
 
 const tocSections = [
-  { id: 'introduction', label: 'Introduction & Context', icon: BookOpen },
-  { id: 'literature', label: 'Literature Review', icon: FileText },
-  { id: 'activity', label: 'TBI Activity 2021\u201322', icon: Activity },
-  { id: 'impact', label: 'Impact & Demographics', icon: Users },
-  { id: 'sroi', label: 'SROI Calculation', icon: Calculator },
-  { id: 'discussion', label: 'Discussion & Learning', icon: MessageSquare },
-  { id: 'recommendations', label: 'Recommendations', icon: Lightbulb },
+  { id: 'introduction', icon: BookOpen },
+  { id: 'literature', icon: FileText },
+  { id: 'activity', icon: Activity },
+  { id: 'impact', icon: Users },
+  { id: 'sroi', icon: Calculator },
+  { id: 'discussion', icon: MessageSquare },
+  { id: 'recommendations', icon: Lightbulb },
 ];
 
 /* ───────────────────────── Component ───────────────────────── */
@@ -216,7 +216,7 @@ export function ImpactReportPage() {
                     <span className="flex-shrink-0 w-6 h-6 rounded-md bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center text-xs font-bold text-emerald-600 dark:text-emerald-400">
                       {index + 1}
                     </span>
-                    <span className="truncate">{t(`impact_report.toc_${section.id}`, section.label)}</span>
+                    <span className="truncate">{t(`impact_report.toc_${section.id}`)}</span>
                   </Button>
                 ))}
               </div>
@@ -467,7 +467,7 @@ export function ImpactReportPage() {
                   </div>
                   <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('impact_report.sroi_heading')}</h3>
                   <p className="text-5xl sm:text-6xl font-extrabold text-gradient mb-3">
-                    &euro;16 : &euro;1
+                    {t('impact_report.sroi_result_value')}
                   </p>
                   <p className="text-theme-muted text-sm max-w-md mx-auto">
                     {t('impact_report.sroi_description')}
@@ -488,19 +488,19 @@ export function ImpactReportPage() {
                   <TableBody>
                     <TableRow>
                       <TableCell className="text-theme-muted">{t('impact_report.sroi_total_investment')}</TableCell>
-                      <TableCell className="text-right font-semibold text-theme-primary">&euro;50,000</TableCell>
+                      <TableCell className="text-right font-semibold text-theme-primary">{t('impact_report.sroi_total_investment_value')}</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell className="text-theme-muted">{t('impact_report.sroi_total_present_value')}</TableCell>
-                      <TableCell className="text-right font-semibold text-emerald-600 dark:text-emerald-400">&euro;803,184</TableCell>
+                      <TableCell className="text-right font-semibold text-emerald-600 dark:text-emerald-400">{t('impact_report.sroi_total_present_value_amount')}</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell className="font-semibold text-theme-primary">{t('impact_report.sroi_net_social_value')}</TableCell>
-                      <TableCell className="text-right font-bold text-emerald-600 dark:text-emerald-400">&euro;753,184</TableCell>
+                      <TableCell className="text-right font-bold text-emerald-600 dark:text-emerald-400">{t('impact_report.sroi_net_social_value_amount')}</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell className="font-bold text-theme-primary">{t('impact_report.sroi_ratio_label')}</TableCell>
-                      <TableCell className="text-right font-extrabold text-emerald-600 dark:text-emerald-400 text-lg">&euro;16.06 : &euro;1</TableCell>
+                      <TableCell className="text-right font-extrabold text-emerald-600 dark:text-emerald-400 text-lg">{t('impact_report.sroi_ratio_value')}</TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
