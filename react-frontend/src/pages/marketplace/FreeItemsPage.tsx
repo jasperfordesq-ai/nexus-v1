@@ -31,7 +31,7 @@ const ITEMS_PER_PAGE = 24;
 
 export function FreeItemsPage() {
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('free.page_title', 'Free Items'));
+  usePageTitle(t('free.page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();
@@ -74,14 +74,14 @@ export function FreeItemsPage() {
         cursorRef.current = response.meta?.cursor ?? response.meta?.next_cursor ?? null;
         setHasMore(response.meta?.has_more ?? response.data.length >= ITEMS_PER_PAGE);
       } else if (!append) {
-        setError(t('free.unable_to_load', 'Unable to load free items'));
+        setError(t('free.unable_to_load'));
       }
     } catch (err) {
       logError('Failed to load free items', err);
       if (!append) {
-        setError(t('free.unable_to_load', 'Unable to load free items'));
+        setError(t('free.unable_to_load'));
       } else {
-        toast.error(t('free.load_more_failed', 'Failed to load more items'));
+        toast.error(t('free.load_more_failed'));
       }
     } finally {
       setIsLoading(false);
@@ -99,16 +99,16 @@ export function FreeItemsPage() {
   // Save / unsave handlers
   const handleSave = async (id: number) => {
     if (!isAuthenticated) {
-      toast.error(t('common.sign_in_to_save', 'Please sign in to save listings'));
+      toast.error(t('common.sign_in_to_save'));
       return;
     }
     try {
       await api.post(`/v2/marketplace/listings/${id}/save`);
       setListings((prev) => prev.map((l) => (l.id === id ? { ...l, is_saved: true } : l)));
-      toast.success(t('common.saved_for_later', 'Saved for later'));
+      toast.success(t('common.saved_for_later'));
     } catch (err) {
       logError('Failed to save listing', err);
-      toast.error(t('common.save_failed', 'Failed to update saved status'));
+      toast.error(t('common.save_failed'));
     }
   };
 
@@ -117,10 +117,10 @@ export function FreeItemsPage() {
     try {
       await api.delete(`/v2/marketplace/listings/${id}/save`);
       setListings((prev) => prev.map((l) => (l.id === id ? { ...l, is_saved: false } : l)));
-      toast.success(t('common.removed_from_saved', 'Removed from saved'));
+      toast.success(t('common.removed_from_saved'));
     } catch (err) {
       logError('Failed to unsave listing', err);
-      toast.error(t('common.save_failed', 'Failed to update saved status'));
+      toast.error(t('common.save_failed'));
     }
   };
 
@@ -129,8 +129,8 @@ export function FreeItemsPage() {
       <div className="max-w-5xl mx-auto px-4 py-12">
         <EmptyState
           icon={<ShoppingBag className="w-8 h-8" />}
-          title={t('hub_feature_gate.title', 'Marketplace Not Available')}
-          description={t('hub_feature_gate.description', 'The marketplace feature is not enabled for this community.')}
+          title={t('hub_feature_gate.title')}
+          description={t('hub_feature_gate.description')}
         />
       </div>
     );
@@ -139,8 +139,8 @@ export function FreeItemsPage() {
   return (
     <>
       <PageMeta
-        title={t('free.page_title', 'Free Items')}
-        description={t('free.meta_description', 'Browse free items available in your community marketplace.')}
+        title={t('free.page_title')}
+        description={t('free.meta_description')}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
@@ -149,10 +149,10 @@ export function FreeItemsPage() {
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               <Gift className="w-7 h-7 text-success" />
-              {t('free.page_title', 'Free Items')}
+              {t('free.page_title')}
             </h1>
             <p className="text-default-500 text-sm mt-1">
-              {t('free.subtitle', 'Items available for free from your community')}
+              {t('free.subtitle')}
             </p>
           </div>
           {isAuthenticated && (
@@ -163,21 +163,21 @@ export function FreeItemsPage() {
               variant="flat"
               startContent={<Plus className="w-4 h-4" />}
             >
-              {t('free.give_away', 'Give Something Away')}
+              {t('free.give_away')}
             </Button>
           )}
         </div>
 
         {/* CTA banner */}
         {isAuthenticated && (
-          <GlassCard className="p-5 flex items-center gap-4 border border-success/30 bg-success/5">
+          <GlassCard className="p-5 flex flex-col gap-4 border border-success/30 bg-success/5 sm:flex-row sm:items-center">
             <Gift className="w-10 h-10 text-success shrink-0" />
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-foreground">
-                {t('free.cta_title', 'Declutter and help your community')}
+                {t('free.cta_title')}
               </h3>
               <p className="text-sm text-default-500">
-                {t('free.cta_description', 'List items you no longer need as free and give them a new home.')}
+                {t('free.cta_description')}
               </p>
             </div>
             <Button
@@ -185,8 +185,9 @@ export function FreeItemsPage() {
               to={tenantPath('/marketplace/sell')}
               color="success"
               size="sm"
+              className="w-full sm:w-auto sm:shrink-0"
             >
-              {t('free.give_away', 'Give Something Away')}
+              {t('free.give_away')}
             </Button>
           </GlassCard>
         )}
@@ -200,18 +201,18 @@ export function FreeItemsPage() {
           <GlassCard className="p-8 text-center">
             <p className="text-danger mb-4">{error}</p>
             <Button color="primary" variant="flat" onPress={() => loadListings()}>
-              {t('common.try_again', 'Try Again')}
+              {t('common.try_again')}
             </Button>
           </GlassCard>
         ) : listings.length === 0 ? (
           <EmptyState
             icon={<Gift className="w-8 h-8" />}
-            title={t('free.no_items_title', 'No Free Items')}
-            description={t('free.no_items_description', 'There are no free items available right now. Check back later or be the first to give something away!')}
+            title={t('free.no_items_title')}
+            description={t('free.no_items_description')}
             action={
               isAuthenticated
                 ? {
-                    label: t('free.give_away', 'Give Something Away'),
+                    label: t('free.give_away'),
                     onClick: () => { window.location.href = tenantPath('/marketplace/sell'); },
                   }
                 : undefined
@@ -233,7 +234,7 @@ export function FreeItemsPage() {
                   onPress={() => loadListings(true)}
                   isLoading={isLoadingMore}
                 >
-                  {t('common.load_more', 'Load More')}
+                  {t('common.load_more')}
                 </Button>
               </div>
             )}
