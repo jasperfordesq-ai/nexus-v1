@@ -6,9 +6,11 @@
 
 namespace Tests\Laravel\Integration;
 
+use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use App\Services\EventReminderService;
+use App\Services\EventService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
@@ -85,6 +87,48 @@ class EventEmailReliabilityTest extends TestCase
             ->count());
     }
 
+    public function test_stale_event_reminder_claim_is_reclaimed_for_retry(): void
+    {
+        $attendee = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'event-reminder-stale-claim-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $eventId = $this->createUpcomingEvent();
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'status' => 'going',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('event_reminder_delivery_claims')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'reminder_type' => '24h',
+            'status' => 'claimed',
+            'claimed_at' => now()->subHours(2),
+            'created_at' => now()->subHours(2),
+            'updated_at' => now()->subHours(2),
+        ]);
+
+        $mailer = $this->fakeMailer(true);
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $sent = (new EventReminderService())->sendDueReminders($this->testTenantId);
+
+        $this->assertSame(1, $sent);
+        $this->assertCount(1, $mailer->calls);
+        $this->assertDatabaseHas('event_reminder_delivery_claims', [
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'reminder_type' => '24h',
+            'status' => 'delivered',
+        ]);
+    }
+
     public function test_configured_event_email_reminder_is_sent_and_marked(): void
     {
         $attendee = User::factory()->forTenant($this->testTenantId)->create([
@@ -92,6 +136,14 @@ class EventEmailReliabilityTest extends TestCase
             'preferred_language' => 'en',
         ]);
         $eventId = $this->createUpcomingEvent(168);
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'status' => 'going',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         DB::table('event_reminders')->insert([
             'tenant_id' => $this->testTenantId,
             'event_id' => $eventId,
@@ -134,6 +186,14 @@ class EventEmailReliabilityTest extends TestCase
             'preferred_language' => 'en',
         ]);
         $eventId = $this->createUpcomingEvent(168);
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'status' => 'going',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         DB::table('event_reminders')->insert([
             'tenant_id' => $this->testTenantId,
             'event_id' => $eventId,
@@ -162,6 +222,56 @@ class EventEmailReliabilityTest extends TestCase
             'event_id' => $eventId,
             'user_id' => $attendee->id,
             'reminder_type' => '7d',
+        ]);
+    }
+
+    public function test_configured_event_reminder_is_cancelled_when_rsvp_declined(): void
+    {
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $attendee = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'event-reminder-declined-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $eventId = $this->createUpcomingEvent(168);
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'status' => 'going',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('event_reminders')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'remind_before_minutes' => 10080,
+            'reminder_type' => 'email',
+            'scheduled_for' => now()->subMinute(),
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->assertTrue(
+            TenantContext::runForTenant($this->testTenantId, fn (): bool => EventService::rsvp($eventId, $attendee->id, 'declined')),
+            json_encode(EventService::getErrors())
+        );
+
+        $mailer = $this->fakeMailer(true);
+        app()->instance(EmailDispatchService::class, $mailer);
+        $sent = (new EventReminderService())->sendDueReminders($this->testTenantId);
+
+        $this->assertSame(0, $sent);
+        $this->assertCount(0, $mailer->calls);
+        $this->assertDatabaseHas('event_reminders', [
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'status' => 'cancelled',
         ]);
     }
 

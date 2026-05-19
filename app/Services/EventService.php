@@ -622,6 +622,10 @@ class EventService
                     [$eventId, $userId, $tenantId, $status]
                 );
 
+                if (!in_array($status, ['going', 'interested'], true)) {
+                    self::cancelPendingRemindersForRsvp($eventId, $userId, $tenantId);
+                }
+
                 self::removeFromWaitlist($eventId, $userId);
                 self::$lastRsvpChanged = true;
 
@@ -632,6 +636,9 @@ class EventService
         try {
             $currentUserStatus = self::getUserRsvp($eventId, $userId);
             if ($currentUserStatus === $status) {
+                if (!in_array($status, ['going', 'interested'], true)) {
+                    self::cancelPendingRemindersForRsvp($eventId, $userId, $tenantId);
+                }
                 self::removeFromWaitlist($eventId, $userId);
                 return true;
             }
@@ -644,6 +651,10 @@ class EventService
                 [$eventId, $userId, $tenantId, $status]
             );
 
+            if (!in_array($status, ['going', 'interested'], true)) {
+                self::cancelPendingRemindersForRsvp($eventId, $userId, $tenantId);
+            }
+
             self::removeFromWaitlist($eventId, $userId);
             self::$lastRsvpChanged = true;
 
@@ -653,6 +664,19 @@ class EventService
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.event_rsvp_update_failed')];
             return false;
         }
+    }
+
+    private static function cancelPendingRemindersForRsvp(int $eventId, int $userId, int $tenantId): void
+    {
+        DB::table('event_reminders')
+            ->where('tenant_id', $tenantId)
+            ->where('event_id', $eventId)
+            ->where('user_id', $userId)
+            ->where('status', 'pending')
+            ->update([
+                'status' => 'cancelled',
+                'updated_at' => now(),
+            ]);
     }
 
     public static function wasLastRsvpChanged(): bool

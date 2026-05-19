@@ -44,6 +44,8 @@ class EventReminderService
     public static function claimReminderDelivery(int $tenantId, int $eventId, int $userId, string $reminderType): bool
     {
         try {
+            self::releaseStaleReminderDeliveryClaim($tenantId, $eventId, $userId, $reminderType);
+
             $inserted = DB::table('event_reminder_delivery_claims')->insertOrIgnore([
                 'tenant_id' => $tenantId,
                 'event_id' => $eventId,
@@ -67,6 +69,19 @@ class EventReminderService
 
             return false;
         }
+    }
+
+    private static function releaseStaleReminderDeliveryClaim(int $tenantId, int $eventId, int $userId, string $reminderType): void
+    {
+        DB::table('event_reminder_delivery_claims')
+            ->where('tenant_id', $tenantId)
+            ->where('event_id', $eventId)
+            ->where('user_id', $userId)
+            ->where('reminder_type', $reminderType)
+            ->where('status', 'claimed')
+            ->whereNull('delivered_at')
+            ->where('claimed_at', '<', now()->subHour())
+            ->delete();
     }
 
     public static function releaseReminderDeliveryClaim(int $tenantId, int $eventId, int $userId, string $reminderType): void
@@ -330,6 +345,10 @@ class EventReminderService
                  FROM event_reminders er
                  JOIN events e ON e.id = er.event_id AND e.tenant_id = er.tenant_id
                  JOIN users u ON u.id = er.user_id AND u.tenant_id = er.tenant_id
+                 JOIN event_rsvps r ON r.event_id = er.event_id
+                    AND r.user_id = er.user_id
+                    AND r.tenant_id = er.tenant_id
+                    AND r.status IN ('going', 'interested')
                  WHERE er.tenant_id = ?
                    AND er.status = 'pending'
                    AND er.scheduled_for <= NOW()
