@@ -116,7 +116,7 @@ function bucketToNumber(b: string | null): number {
 
 export default function PartnerDashboardPage() {
   const { t } = useTranslation('common');
-  usePageTitle(t('regional_analytics.partner_dashboard_title', 'Regional Analytics'));
+  usePageTitle(t('regional_analytics.partner_dashboard_title'));
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') ?? '';
 
@@ -176,8 +176,8 @@ export default function PartnerDashboardPage() {
 
   const pageMeta = (
     <PageMeta
-      title={t('regional_analytics.partner_dashboard_title', 'Regional Analytics')}
-      description={t('regional_analytics.partner_dashboard_meta_description', 'Private regional analytics dashboard for authorised partners.')}
+      title={t('regional_analytics.partner_dashboard_title')}
+      description={t('regional_analytics.partner_dashboard_meta_description')}
       noIndex
     />
   );
@@ -190,13 +190,10 @@ export default function PartnerDashboardPage() {
           <Card>
             <CardBody className="text-center p-10">
               <h1 className="text-xl font-semibold mb-2">
-                {t('partner_analytics.no_token_title', 'Subscription token required')}
+                {t('partner_analytics.no_token_title')}
               </h1>
               <p className="text-[var(--color-text-muted)]">
-                {t(
-                  'partner_analytics.no_token_body',
-                  'Please use the secure link supplied by your account manager. The link includes a unique subscription token.',
-                )}
+                {t('partner_analytics.no_token_body')}
               </p>
             </CardBody>
           </Card>
@@ -224,15 +221,15 @@ export default function PartnerDashboardPage() {
           <Card>
             <CardBody className="text-center p-10">
               <h1 className="text-xl font-semibold mb-2">
-                {t('partner_analytics.error_title', 'Unable to load analytics')}
+                {t('partner_analytics.error_title')}
               </h1>
               <p className="text-[var(--color-text-muted)]">
                 {error === 'unauthorized'
-                  ? t('partner_analytics.error_unauthorized', 'Your subscription token is invalid or expired.')
-                  : t('partner_analytics.error_generic', 'Something went wrong fetching your analytics. Please retry.')}
+                  ? t('partner_analytics.error_unauthorized')
+                  : t('partner_analytics.error_generic')}
               </p>
               <Button color="primary" className="mt-4" onPress={() => void load()}>
-                {t('partner_analytics.retry', 'Retry')}
+                {t('partner_analytics.retry')}
               </Button>
             </CardBody>
           </Card>
@@ -244,52 +241,49 @@ export default function PartnerDashboardPage() {
   return (
     <>
       {pageMeta}
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="max-w-7xl mx-auto space-y-6 p-4 sm:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold flex items-center gap-2">
-            <BarChart3 size={24} /> {t('partner_analytics.title', 'Regional analytics')}
+            <BarChart3 size={24} /> {t('partner_analytics.title')}
           </h1>
           <p className="text-sm text-[var(--color-text-muted)]">
-            {t(
-              'partner_analytics.subtitle',
-              'Privacy-bucketed insights for your region. Refreshed daily.',
-            )}
+            {t('partner_analytics.subtitle')}
           </p>
         </div>
         <Select
-          label={t('partner_analytics.period_label', 'Period')}
+          label={t('partner_analytics.period_label')}
           selectedKeys={new Set([period])}
           onSelectionChange={(keys) => {
             const v = Array.from(keys as Set<string>)[0] as Period | undefined;
             if (v) setPeriod(v);
           }}
-          className="max-w-[220px]"
+          className="w-full sm:max-w-[220px]"
         >
-          <SelectItem key="last_30d">{t('partner_analytics.period_30d', 'Last 30 days')}</SelectItem>
-          <SelectItem key="last_90d">{t('partner_analytics.period_90d', 'Last 90 days')}</SelectItem>
-          <SelectItem key="last_year">{t('partner_analytics.period_year', 'Last year')}</SelectItem>
+          <SelectItem key="last_30d">{t('partner_analytics.period_30d')}</SelectItem>
+          <SelectItem key="last_90d">{t('partner_analytics.period_90d')}</SelectItem>
+          <SelectItem key="last_year">{t('partner_analytics.period_year')}</SelectItem>
         </Select>
       </div>
 
-      <Tabs aria-label="Analytics tabs">
+      <Tabs aria-label={t('partner_analytics.tabs_aria')}>
         {enabled.has('trends') && (
-          <Tab key="trends" title={<span className="flex items-center gap-2"><TrendingUp size={14} /> {t('partner_analytics.tab_trends', 'Trends')}</span>}>
+          <Tab key="trends" title={<span className="flex items-center gap-2"><TrendingUp size={14} /> {t('partner_analytics.tab_trends')}</span>}>
             <TrendsTab data={data} t={t} />
           </Tab>
         )}
         {enabled.has('demand_supply') && (
-          <Tab key="ds" title={<span className="flex items-center gap-2"><MapPin size={14} /> {t('partner_analytics.tab_demand_supply', 'Demand & Supply')}</span>}>
+          <Tab key="ds" title={<span className="flex items-center gap-2"><MapPin size={14} /> {t('partner_analytics.tab_demand_supply')}</span>}>
             <DemandSupplyTab data={data} t={t} />
           </Tab>
         )}
         {enabled.has('demographics') && (
-          <Tab key="demo" title={<span className="flex items-center gap-2"><Users size={14} /> {t('partner_analytics.tab_demographics', 'Demographics')}</span>}>
+          <Tab key="demo" title={<span className="flex items-center gap-2"><Users size={14} /> {t('partner_analytics.tab_demographics')}</span>}>
             <DemographicsTab data={data} t={t} />
           </Tab>
         )}
         {enabled.has('footfall') && (
-          <Tab key="ff" title={<span className="flex items-center gap-2"><BarChart3 size={14} /> {t('partner_analytics.tab_footfall', 'Footfall')}</span>}>
+          <Tab key="ff" title={<span className="flex items-center gap-2"><BarChart3 size={14} /> {t('partner_analytics.tab_footfall')}</span>}>
             <FootfallTab data={data} t={t} />
           </Tab>
         )}
@@ -297,20 +291,23 @@ export default function PartnerDashboardPage() {
 
       <Card>
         <CardHeader className="flex items-center gap-2">
-          <Download size={16} /> {t('partner_analytics.reports_title', 'Monthly reports')}
+          <Download size={16} /> {t('partner_analytics.reports_title')}
         </CardHeader>
         <CardBody>
           {reports.length === 0 ? (
             <p className="text-sm text-[var(--color-text-muted)]">
-              {t('partner_analytics.no_reports', 'No reports generated yet.')}
+              {t('partner_analytics.no_reports')}
             </p>
           ) : (
             <div className="space-y-2">
               {reports.map((r) => (
-                <div key={r.id} className="flex items-center justify-between border-b border-[var(--color-border)] py-2 last:border-0">
+                <div
+                  key={r.id}
+                  className="flex flex-col gap-3 border-b border-[var(--color-border)] py-3 last:border-0 sm:flex-row sm:items-center sm:justify-between"
+                >
                   <div>
                     <div className="text-sm font-medium">
-                      {r.period_start} – {r.period_end}
+                      {r.period_start} - {r.period_end}
                     </div>
                     <div className="text-xs text-[var(--color-text-muted)]">
                       {r.report_type} · <Chip size="sm" variant="flat">{r.status}</Chip>
@@ -325,8 +322,9 @@ export default function PartnerDashboardPage() {
                     variant="flat"
                     startContent={<Download size={14} />}
                     isDisabled={!r.file_url || r.status !== 'generated'}
+                    className="w-full sm:w-auto"
                   >
-                    {t('partner_analytics.download_pdf', 'Download PDF')}
+                    {t('partner_analytics.download_pdf')}
                   </Button>
                 </div>
               ))}
@@ -336,10 +334,7 @@ export default function PartnerDashboardPage() {
       </Card>
 
       <p className="text-xs text-[var(--color-text-muted)] text-center pt-4">
-        {t(
-          'partner_analytics.privacy_footer',
-          'All metrics are bucketed and anonymised. Segments with N<10 are suppressed.',
-        )}
+        {t('partner_analytics.privacy_footer')}
       </p>
       </div>
     </>
@@ -350,12 +345,20 @@ export default function PartnerDashboardPage() {
 
 type T = ReturnType<typeof useTranslation>['t'];
 
-function StatCard({ label, value }: { label: string; value: string | number | null }) {
+function StatCard({
+  label,
+  value,
+  emptyValue,
+}: {
+  label: string;
+  value: string | number | null;
+  emptyValue: string;
+}) {
   return (
     <Card shadow="sm">
       <CardBody>
         <div className="text-xs text-[var(--color-text-muted)]">{label}</div>
-        <div className="text-2xl font-semibold mt-1">{value ?? '—'}</div>
+        <div className="mt-1 text-2xl font-semibold">{value ?? emptyValue}</div>
       </CardBody>
     </Card>
   );
@@ -366,22 +369,38 @@ function TrendsTab({ data, t }: { data: DashboardPayload; t: T }) {
   // Synthesize a single-point trend from the bucketed values for visualization.
   const series = e
     ? [
-        { name: t('partner_analytics.metric_active_members', 'Active members'), value: bucketToNumber(e.active_members_bucket) },
-        { name: t('partner_analytics.metric_categories', 'Categories'), value: bucketToNumber(e.categories_active_bucket) },
-        { name: t('partner_analytics.metric_partner_orgs', 'Partner orgs'), value: bucketToNumber(e.partner_orgs_bucket) },
-        { name: t('partner_analytics.metric_event_participation', 'Event participation'), value: bucketToNumber(e.event_participation_bucket) },
+        { name: t('partner_analytics.metric_active_members'), value: bucketToNumber(e.active_members_bucket) },
+        { name: t('partner_analytics.metric_categories'), value: bucketToNumber(e.categories_active_bucket) },
+        { name: t('partner_analytics.metric_partner_orgs'), value: bucketToNumber(e.partner_orgs_bucket) },
+        { name: t('partner_analytics.metric_event_participation'), value: bucketToNumber(e.event_participation_bucket) },
       ]
     : [];
   return (
     <div className="space-y-4 pt-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard label={t('partner_analytics.metric_active_members', 'Active members')} value={e?.active_members_bucket ?? null} />
-        <StatCard label={t('partner_analytics.metric_categories', 'Categories')} value={e?.categories_active_bucket ?? null} />
-        <StatCard label={t('partner_analytics.metric_partner_orgs', 'Partner orgs')} value={e?.partner_orgs_bucket ?? null} />
-        <StatCard label={t('partner_analytics.metric_volunteer_hours', 'Volunteer hours')} value={e?.volunteer_hours_rounded ?? null} />
+        <StatCard
+          label={t('partner_analytics.metric_active_members')}
+          value={e?.active_members_bucket ?? null}
+          emptyValue={t('partner_analytics.suppressed_value')}
+        />
+        <StatCard
+          label={t('partner_analytics.metric_categories')}
+          value={e?.categories_active_bucket ?? null}
+          emptyValue={t('partner_analytics.suppressed_value')}
+        />
+        <StatCard
+          label={t('partner_analytics.metric_partner_orgs')}
+          value={e?.partner_orgs_bucket ?? null}
+          emptyValue={t('partner_analytics.suppressed_value')}
+        />
+        <StatCard
+          label={t('partner_analytics.metric_volunteer_hours')}
+          value={e?.volunteer_hours_rounded ?? null}
+          emptyValue={t('partner_analytics.suppressed_value')}
+        />
       </div>
       <Card>
-        <CardHeader>{t('partner_analytics.engagement_overview', 'Engagement overview (bucket midpoints)')}</CardHeader>
+        <CardHeader>{t('partner_analytics.engagement_overview')}</CardHeader>
         <CardBody>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={series}>
@@ -413,11 +432,11 @@ function DemandSupplyTab({ data, t }: { data: DashboardPayload; t: T }) {
   return (
     <div className="space-y-4 pt-4">
       <Card>
-        <CardHeader>{t('partner_analytics.ds_by_postcode', 'Offers vs requests by postcode (3-digit)')}</CardHeader>
+        <CardHeader>{t('partner_analytics.ds_by_postcode')}</CardHeader>
         <CardBody>
           {barData.length === 0 ? (
             <p className="text-sm text-[var(--color-text-muted)]">
-              {t('partner_analytics.no_data', 'No data available.')}
+              {t('partner_analytics.no_data')}
             </p>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
@@ -427,15 +446,15 @@ function DemandSupplyTab({ data, t }: { data: DashboardPayload; t: T }) {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="offers" fill="#10b981" name={t('partner_analytics.offers', 'Offers')} />
-                <Bar dataKey="requests" fill="#f59e0b" name={t('partner_analytics.requests', 'Requests')} />
+                <Bar dataKey="offers" fill="#10b981" name={t('partner_analytics.offers')} />
+                <Bar dataKey="requests" fill="#f59e0b" name={t('partner_analytics.requests')} />
               </BarChart>
             </ResponsiveContainer>
           )}
         </CardBody>
       </Card>
       <Card>
-        <CardHeader>{t('partner_analytics.match_heatmap', 'Match-rate cells')}</CardHeader>
+        <CardHeader>{t('partner_analytics.match_heatmap')}</CardHeader>
         <CardBody>
           <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
             {cells.slice(0, 24).map((c, i) => (
@@ -449,9 +468,13 @@ function DemandSupplyTab({ data, t }: { data: DashboardPayload; t: T }) {
                       : `rgba(59,130,246,${(c.match_rate_bucket ?? 0) / 100})`,
                 }}
               >
-                <div className="font-mono">{c.postcode_3 || '—'}</div>
-                <div className="text-[10px]">{t('partner_analytics.category_short', 'cat')} {c.category_id}</div>
-                <div className="font-semibold">{c.match_rate_bucket === null ? '—' : `${c.match_rate_bucket}%`}</div>
+                <div className="font-mono">{c.postcode_3 || t('partner_analytics.suppressed_short')}</div>
+                <div className="text-[10px]">{t('partner_analytics.category_short')} {c.category_id}</div>
+                <div className="font-semibold">
+                  {c.match_rate_bucket === null
+                    ? t('partner_analytics.suppressed_short')
+                    : `${c.match_rate_bucket}%`}
+                </div>
               </div>
             ))}
           </div>
@@ -474,7 +497,7 @@ function DemographicsTab({ data, t }: { data: DashboardPayload; t: T }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
       <Card>
-        <CardHeader>{t('partner_analytics.age_distribution', 'Age distribution')}</CardHeader>
+        <CardHeader>{t('partner_analytics.age_distribution')}</CardHeader>
         <CardBody>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
@@ -490,7 +513,7 @@ function DemographicsTab({ data, t }: { data: DashboardPayload; t: T }) {
         </CardBody>
       </Card>
       <Card>
-        <CardHeader>{t('partner_analytics.gender_distribution', 'Gender distribution')}</CardHeader>
+        <CardHeader>{t('partner_analytics.gender_distribution')}</CardHeader>
         <CardBody>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={genderData}>
@@ -516,7 +539,7 @@ function FootfallTab({ data, t }: { data: DashboardPayload; t: T }) {
   return (
     <div className="space-y-4 pt-4">
       <Card>
-        <CardHeader>{t('partner_analytics.footfall_by_area', 'Page views by area')}</CardHeader>
+        <CardHeader>{t('partner_analytics.footfall_by_area')}</CardHeader>
         <CardBody>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={rows}>
@@ -525,8 +548,8 @@ function FootfallTab({ data, t }: { data: DashboardPayload; t: T }) {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Area type="monotone" dataKey="page_views" stroke="#06b6d4" fill="#06b6d4" name={t('partner_analytics.page_views', 'Page views')} />
-              <Area type="monotone" dataKey="visitors" stroke="#10b981" fill="#10b981" name={t('partner_analytics.distinct_visitors', 'Distinct visitors')} />
+              <Area type="monotone" dataKey="page_views" stroke="#06b6d4" fill="#06b6d4" name={t('partner_analytics.page_views')} />
+              <Area type="monotone" dataKey="visitors" stroke="#10b981" fill="#10b981" name={t('partner_analytics.distinct_visitors')} />
             </AreaChart>
           </ResponsiveContainer>
         </CardBody>
