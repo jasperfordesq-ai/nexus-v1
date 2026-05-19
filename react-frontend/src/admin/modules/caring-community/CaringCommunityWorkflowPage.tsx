@@ -655,34 +655,30 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: Predict
                     </Chip>
                   )}
                 </div>
-                <div className="overflow-x-auto rounded-lg border border-default-200">
-                  <table className="w-full text-xs">
-                    <thead className="bg-default-50 text-default-500">
-                      <tr>
-                        <th className="px-3 py-2 text-left">Sub-region</th>
-                        <th className="px-3 py-2 text-right">Requested (90d)</th>
-                        <th className="px-3 py-2 text-right">Fulfilled (90d)</th>
-                        <th className="px-3 py-2 text-right">Coverage</th>
-                        <th className="px-3 py-2 text-left">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {forecast.sub_region_demand.sub_regions.map((r) => (
-                        <tr key={r.id} className="border-t border-default-200">
-                          <td className="px-3 py-2">{r.name}</td>
-                          <td className="px-3 py-2 text-right tabular-nums">{r.requested_90d.toFixed(1)}</td>
-                          <td className="px-3 py-2 text-right tabular-nums">{r.fulfilled_90d.toFixed(1)}</td>
-                          <td className="px-3 py-2 text-right tabular-nums">{(r.coverage_ratio_90d * 100).toFixed(0)}%</td>
-                          <td className="px-3 py-2">
-                            <Chip size="sm" variant="flat" color={r.flagged ? 'warning' : 'default'}>
-                              {r.flagged ? 'Under-supplied' : 'OK'}
-                            </Chip>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <Table aria-label="Sub-region coverage" removeWrapper>
+                  <TableHeader>
+                    <TableColumn>Sub-region</TableColumn>
+                    <TableColumn align="end">Requested (90d)</TableColumn>
+                    <TableColumn align="end">Fulfilled (90d)</TableColumn>
+                    <TableColumn align="end">Coverage</TableColumn>
+                    <TableColumn>Status</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {forecast.sub_region_demand.sub_regions.map((r) => (
+                      <TableRow key={r.id}>
+                        <TableCell>{r.name}</TableCell>
+                        <TableCell className="text-right tabular-nums">{r.requested_90d.toFixed(1)}</TableCell>
+                        <TableCell className="text-right tabular-nums">{r.fulfilled_90d.toFixed(1)}</TableCell>
+                        <TableCell className="text-right tabular-nums">{(r.coverage_ratio_90d * 100).toFixed(0)}%</TableCell>
+                        <TableCell>
+                          <Chip size="sm" variant="flat" color={r.flagged ? 'warning' : 'default'}>
+                            {r.flagged ? 'Under-supplied' : 'OK'}
+                          </Chip>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             )}
 
@@ -704,31 +700,24 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: Predict
                   active helpers haven't logged hours recently.
                 </p>
                 {forecast.helper_churn.by_category.length > 0 && (
-                  <div className="overflow-x-auto rounded-lg border border-default-200">
-                    <table className="w-full text-xs">
-                      <thead className="bg-default-50 text-default-500">
-                        <tr>
-                          <th className="px-3 py-2 text-left">Category</th>
-                          <th className="px-3 py-2 text-right">Prior active</th>
-                          <th className="px-3 py-2 text-right">Lapsed</th>
-                          <th className="px-3 py-2 text-right">Churn rate</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {forecast.helper_churn.by_category.map((c) => (
-                          <tr
-                            key={`${c.category_id ?? 'none'}-${c.category_name}`}
-                            className="border-t border-default-200"
-                          >
-                            <td className="px-3 py-2">{c.category_name}</td>
-                            <td className="px-3 py-2 text-right tabular-nums">{c.prior_active}</td>
-                            <td className="px-3 py-2 text-right tabular-nums">{c.lapsed}</td>
-                            <td className="px-3 py-2 text-right tabular-nums">{(c.churn_rate * 100).toFixed(0)}%</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  <Table aria-label="Helper churn by category" removeWrapper>
+                    <TableHeader>
+                      <TableColumn>Category</TableColumn>
+                      <TableColumn align="end">Prior active</TableColumn>
+                      <TableColumn align="end">Lapsed</TableColumn>
+                      <TableColumn align="end">Churn rate</TableColumn>
+                    </TableHeader>
+                    <TableBody>
+                      {forecast.helper_churn.by_category.map((c) => (
+                        <TableRow key={`${c.category_id ?? 'none'}-${c.category_name}`}>
+                          <TableCell>{c.category_name}</TableCell>
+                          <TableCell className="text-right tabular-nums">{c.prior_active}</TableCell>
+                          <TableCell className="text-right tabular-nums">{c.lapsed}</TableCell>
+                          <TableCell className="text-right tabular-nums">{(c.churn_rate * 100).toFixed(0)}%</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </div>
             )}
@@ -748,36 +737,32 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: Predict
                   Categories with absolute drift &gt; {(forecast.coefficient_drift.threshold * 100).toFixed(0)}% are
                   flagged. Review baseline coefficients in the category coefficient editor.
                 </p>
-                <div className="overflow-x-auto rounded-lg border border-default-200">
-                  <table className="w-full text-xs">
-                    <thead className="bg-default-50 text-default-500">
-                      <tr>
-                        <th className="px-3 py-2 text-left">Category</th>
-                        <th className="px-3 py-2 text-right">Baseline</th>
-                        <th className="px-3 py-2 text-right">Expected hrs</th>
-                        <th className="px-3 py-2 text-right">Observed hrs</th>
-                        <th className="px-3 py-2 text-right">Drift</th>
-                        <th className="px-3 py-2 text-right">Sample</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {forecast.coefficient_drift.categories.map((c) => (
-                        <tr key={c.category_id} className="border-t border-default-200">
-                          <td className="px-3 py-2">{c.category_name}</td>
-                          <td className="px-3 py-2 text-right tabular-nums">{c.baseline_coefficient.toFixed(2)}</td>
-                          <td className="px-3 py-2 text-right tabular-nums">{c.expected_session_hours.toFixed(2)}</td>
-                          <td className="px-3 py-2 text-right tabular-nums">{c.observed_session_hours.toFixed(2)}</td>
-                          <td className="px-3 py-2 text-right tabular-nums">
-                            <Chip size="sm" variant="flat" color={c.flagged ? 'warning' : 'default'}>
-                              {(c.drift * 100).toFixed(0)}%
-                            </Chip>
-                          </td>
-                          <td className="px-3 py-2 text-right tabular-nums">{c.sample_size}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <Table aria-label="Category coefficient drift" removeWrapper>
+                  <TableHeader>
+                    <TableColumn>Category</TableColumn>
+                    <TableColumn align="end">Baseline</TableColumn>
+                    <TableColumn align="end">Expected hrs</TableColumn>
+                    <TableColumn align="end">Observed hrs</TableColumn>
+                    <TableColumn align="end">Drift</TableColumn>
+                    <TableColumn align="end">Sample</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {forecast.coefficient_drift.categories.map((c) => (
+                      <TableRow key={c.category_id}>
+                        <TableCell>{c.category_name}</TableCell>
+                        <TableCell className="text-right tabular-nums">{c.baseline_coefficient.toFixed(2)}</TableCell>
+                        <TableCell className="text-right tabular-nums">{c.expected_session_hours.toFixed(2)}</TableCell>
+                        <TableCell className="text-right tabular-nums">{c.observed_session_hours.toFixed(2)}</TableCell>
+                        <TableCell className="text-right tabular-nums">
+                          <Chip size="sm" variant="flat" color={c.flagged ? 'warning' : 'default'}>
+                            {(c.drift * 100).toFixed(0)}%
+                          </Chip>
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">{c.sample_size}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             )}
 
