@@ -45,9 +45,11 @@ class EmailTriggerAuditService
             ['module' => 'connections', 'event' => 'request_or_response', 'category' => 'connection', 'critical' => true, 'source_table' => 'notifications'],
             ['module' => 'messages', 'event' => 'direct_or_voice_message', 'category' => 'message', 'critical' => true, 'source_table' => 'notification_queue'],
             ['module' => 'listings', 'event' => 'approval_expiry_saved_search', 'category' => 'listing', 'critical' => true, 'source_table' => 'notification_queue'],
+            ['module' => 'listings', 'event' => 'listing_expiry_reminder_source', 'category' => 'listing_expiry', 'critical' => true, 'source_table' => 'listing_expiry_reminders_sent'],
             ['module' => 'events', 'event' => 'rsvp_change_or_reminder', 'category' => 'event_reminder', 'critical' => true, 'source_table' => 'notification_queue'],
             ['module' => 'events', 'event' => 'scheduled_event_reminder', 'category' => 'event_reminder', 'critical' => true, 'source_table' => 'event_reminders'],
             ['module' => 'volunteering', 'event' => 'application_shift_reminder_hours_expense', 'category' => 'volunteering', 'critical' => true, 'source_table' => 'notification_queue'],
+            ['module' => 'volunteering', 'event' => 'volunteer_reminder_source', 'category' => 'volunteer_reminder', 'critical' => true, 'source_table' => 'vol_reminders_sent'],
             ['module' => 'goals', 'event' => 'goal_reminder', 'category' => 'goal_reminder', 'critical' => true, 'source_table' => 'notification_queue'],
             ['module' => 'goals', 'event' => 'goal_reminder_source', 'category' => 'goal_reminder', 'critical' => true, 'source_table' => 'goal_reminders'],
             ['module' => 'marketplace', 'event' => 'order_offer_payment_rating_report', 'category' => 'marketplace', 'critical' => true, 'source_table' => 'notification_queue'],
@@ -173,8 +175,10 @@ class EmailTriggerAuditService
                 $this->checkGroupMembershipNotificationHealth($tenantId, $since, $windowHours),
                 $this->checkNotificationQueueHealth($tenantId, $since, $windowHours),
                 $this->checkNewsletterQueueHealth($tenantId, $since, $windowHours),
+                $this->checkListingExpiryReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkEventReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkGoalReminderSourceHealth($tenantId, $since, $windowHours),
+                $this->checkVolunteerReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkNotificationStoreHealth($tenantId),
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
                 $this->checkTenantProviderConfiguration($tenantId),
@@ -251,6 +255,7 @@ class EmailTriggerAuditService
             'goal_reminders' => 'checkGoalReminderSourceHealth',
             'group_invites' => 'checkGroupInvitesWithoutEmail',
             'group_members' => 'checkGroupMembershipNotificationHealth',
+            'listing_expiry_reminders_sent' => 'checkListingExpiryReminderSourceHealth',
             'marketplace_report_notifications' => 'checkMarketplaceReportNotificationHealth',
             'marketplace_reports' => 'checkMarketplaceReportSourceOutboxHealth',
             'member_subscription_events' => 'checkMemberPremiumBillingEmailHealth',
@@ -262,6 +267,7 @@ class EmailTriggerAuditService
             'users' => 'checkNewUsersWithoutAccountEmail',
             'verein_member_dues' => 'checkVereinDuesEmailHealth',
             'vol_donations' => 'checkStripeDonationReceiptEmailHealth',
+            'vol_reminders_sent' => 'checkVolunteerReminderSourceHealth',
         ];
 
         $coverage = [];
@@ -1048,6 +1054,37 @@ class EmailTriggerAuditService
     /**
      * @return list<array<string,mixed>>
      */
+    private function checkListingExpiryReminderSourceHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (
+            !$this->hasTables(['listing_expiry_reminders_sent', 'email_log'])
+            || !Schema::hasColumn('listing_expiry_reminders_sent', 'sent_at')
+        ) {
+            return [];
+        }
+
+        $sentWithoutEmail = DB::table('listing_expiry_reminders_sent as lers')
+            ->select('lers.tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('lers.sent_at', '>=', $since)
+            ->whereNotExists(function ($sub): void {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereColumn('email_log.user_id', 'lers.user_id')
+                    ->whereColumn('email_log.tenant_id', 'lers.tenant_id')
+                    ->where('email_log.category', 'listing_expiry')
+                    ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                    ->whereRaw('email_log.created_at BETWEEN DATE_SUB(lers.sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(lers.sent_at, INTERVAL 10 MINUTE)');
+            })
+            ->when($tenantId !== null, fn ($q) => $q->where('lers.tenant_id', $tenantId))
+            ->groupBy('lers.tenant_id')
+            ->get();
+
+        return $this->rowsToIssues($sentWithoutEmail, 'listing_expiry_reminder_marked_sent_without_email_log', 'critical', 'listings', 'listing_expiry_reminder_source', ['window_hours' => $windowHours]);
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
     private function checkGoalReminderSourceHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
     {
         if (
@@ -1106,6 +1143,38 @@ class EmailTriggerAuditService
         $issues = array_merge($issues, $this->rowsToIssues($sentWithoutEmail->get(), 'goal_reminders_marked_sent_without_email_log', 'critical', 'goals', 'goal_reminder_source', ['window_hours' => $windowHours]));
 
         return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkVolunteerReminderSourceHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (
+            !$this->hasTables(['vol_reminders_sent', 'email_log'])
+            || !Schema::hasColumn('vol_reminders_sent', 'sent_at')
+        ) {
+            return [];
+        }
+
+        $sentWithoutEmail = DB::table('vol_reminders_sent as vrs')
+            ->select('vrs.tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('vrs.channel', 'email')
+            ->where('vrs.sent_at', '>=', $since)
+            ->whereNotExists(function ($sub): void {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereColumn('email_log.user_id', 'vrs.user_id')
+                    ->whereColumn('email_log.tenant_id', 'vrs.tenant_id')
+                    ->where('email_log.category', 'volunteer_reminder')
+                    ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                    ->whereRaw('email_log.created_at BETWEEN DATE_SUB(vrs.sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(vrs.sent_at, INTERVAL 10 MINUTE)');
+            })
+            ->when($tenantId !== null, fn ($q) => $q->where('vrs.tenant_id', $tenantId))
+            ->groupBy('vrs.tenant_id')
+            ->get();
+
+        return $this->rowsToIssues($sentWithoutEmail, 'volunteer_reminder_marked_sent_without_email_log', 'critical', 'volunteering', 'volunteer_reminder_source', ['window_hours' => $windowHours]);
     }
 
     /**

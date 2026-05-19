@@ -35,6 +35,8 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('federation:federated_message_received:federation_message', $keys);
         $this->assertContains('federation:federated_review_source:federation_review', $keys);
         $this->assertContains('goals:goal_reminder_source:goal_reminder', $keys);
+        $this->assertContains('listings:listing_expiry_reminder_source:listing_expiry', $keys);
+        $this->assertContains('volunteering:volunteer_reminder_source:volunteer_reminder', $keys);
         $this->assertContains('billing:member_premium_billing:billing', $keys);
         $this->assertContains('donations:stripe_donation_receipt_source:donation_receipt', $keys);
         $this->assertContains('marketplace:offer_order_refund_rating_report_dispute:marketplace_order', $keys);
@@ -69,6 +71,7 @@ class EmailTriggerAuditServiceTest extends TestCase
             'reviews',
             'goal_reminders',
             'group_members',
+            'listing_expiry_reminders_sent',
             'marketplace_report_notifications',
             'marketplace_reports',
             'member_subscription_events',
@@ -77,6 +80,7 @@ class EmailTriggerAuditServiceTest extends TestCase
             'stripe_webhook_events',
             'verein_member_dues',
             'vol_donations',
+            'vol_reminders_sent',
         ] as $table) {
             $this->assertTrue($byTable->has($table), "Expected {$table} in email trigger source coverage.");
             $this->assertTrue((bool) $byTable[$table]['audited'], "Expected {$table} to be marked audited.");
@@ -819,5 +823,60 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('event_reminders_overdue_pending', $codes);
         $this->assertContains('event_reminders_failed_recently', $codes);
         $this->assertContains('event_reminders_marked_sent_without_email_log', $codes);
+    }
+
+    public function test_run_detects_listing_and_volunteer_reminder_sent_rows_without_email_log(): void
+    {
+        if (
+            !Schema::hasTable('listing_expiry_reminders_sent')
+            || !Schema::hasTable('vol_reminders_sent')
+            || !Schema::hasTable('listings')
+            || !Schema::hasTable('email_log')
+        ) {
+            $this->markTestSkipped('Reminder source audit tables are not available.');
+        }
+
+        $userId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Reminder Source Audit User',
+            'email' => 'reminder-source-audit@example.com',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $listingId = DB::table('listings')->insertGetId([
+            'tenant_id' => 2,
+            'user_id' => $userId,
+            'title' => 'Audit Listing Reminder Source',
+            'status' => 'active',
+            'expires_at' => now()->addDays(3),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('listing_expiry_reminders_sent')->insert([
+            'tenant_id' => 2,
+            'listing_id' => $listingId,
+            'user_id' => $userId,
+            'days_before_expiry' => 3,
+            'sent_at' => now()->subMinutes(5),
+        ]);
+
+        DB::table('vol_reminders_sent')->insert([
+            'tenant_id' => 2,
+            'user_id' => $userId,
+            'reminder_type' => 'pre_shift',
+            'reference_id' => 123456,
+            'channel' => 'email',
+            'sent_at' => now()->subMinutes(5),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('listing_expiry_reminder_marked_sent_without_email_log', $codes);
+        $this->assertContains('volunteer_reminder_marked_sent_without_email_log', $codes);
     }
 }

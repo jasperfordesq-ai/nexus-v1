@@ -201,6 +201,49 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         $this->assertSame(['event_reminders'], $sources);
     }
 
+    public function test_queues_endpoint_surfaces_listing_expiry_sent_rows_without_email_evidence(): void
+    {
+        if (!Schema::hasTable('listing_expiry_reminders_sent') || !Schema::hasTable('listings') || !Schema::hasTable('email_log')) {
+            $this->markTestSkipped('Listing expiry reminder evidence tables are not available.');
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'listing-expiry-evidence@example.com',
+        ]);
+        Sanctum::actingAs($admin);
+
+        $listingId = DB::table('listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'title' => 'Listing Expiry Evidence Gap',
+            'status' => 'active',
+            'expires_at' => now()->addDays(3),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('listing_expiry_reminders_sent')->insert([
+            'tenant_id' => $this->testTenantId,
+            'listing_id' => $listingId,
+            'user_id' => $member->id,
+            'days_before_expiry' => 3,
+            'sent_at' => now()->subMinutes(5),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/email-deliverability/queues?source=listing_expiry_reminders_sent&limit=10');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.diagnostics.listing_expiry_reminders_sent.available', true);
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.listing_expiry_reminders_sent.failed_recent'));
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.listing_expiry_reminders_sent.status_counts.failed'));
+
+        $rows = collect($response->json('data.rows'));
+        $this->assertSame(['listing_expiry_reminders_sent'], $rows->pluck('source')->unique()->values()->all());
+        $this->assertSame('failed', $rows->first()['status'] ?? null);
+        $this->assertSame('listing-expiry-evidence@example.com', $rows->first()['email'] ?? null);
+    }
+
     public function test_queues_endpoint_surfaces_goal_reminders(): void
     {
         if (!Schema::hasTable('goal_reminders') || !Schema::hasTable('goals')) {
@@ -245,6 +288,40 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         $this->assertSame(['goal_reminders'], $rows->pluck('source')->unique()->values()->all());
         $this->assertSame('pending', $rows->first()['status'] ?? null);
         $this->assertSame('goal-reminder-queue@example.test', $rows->first()['email'] ?? null);
+    }
+
+    public function test_queues_endpoint_surfaces_volunteer_reminder_sent_rows_without_email_evidence(): void
+    {
+        if (!Schema::hasTable('vol_reminders_sent') || !Schema::hasTable('email_log')) {
+            $this->markTestSkipped('Volunteer reminder evidence tables are not available.');
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'volunteer-reminder-evidence@example.com',
+        ]);
+        Sanctum::actingAs($admin);
+
+        DB::table('vol_reminders_sent')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'reminder_type' => 'pre_shift',
+            'reference_id' => 123456,
+            'channel' => 'email',
+            'sent_at' => now()->subMinutes(5),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/email-deliverability/queues?source=vol_reminders_sent&limit=10');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.diagnostics.vol_reminders_sent.available', true);
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.vol_reminders_sent.failed_recent'));
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.vol_reminders_sent.status_counts.failed'));
+
+        $rows = collect($response->json('data.rows'));
+        $this->assertSame(['vol_reminders_sent'], $rows->pluck('source')->unique()->values()->all());
+        $this->assertSame('failed', $rows->first()['status'] ?? null);
+        $this->assertSame('volunteer-reminder-evidence@example.com', $rows->first()['email'] ?? null);
     }
 
     public function test_queues_endpoint_surfaces_federated_review_delivery_failures(): void

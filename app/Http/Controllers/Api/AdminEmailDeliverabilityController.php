@@ -170,9 +170,11 @@ class AdminEmailDeliverabilityController extends BaseApiController
         $diagnostics = [
             'notification_queue' => $this->queueSourceDiagnostics('notification_queue', $tenantId),
             'newsletter_queue' => $this->queueSourceDiagnostics('newsletter_queue', $tenantId),
+            'listing_expiry_reminders_sent' => $this->queueSourceDiagnostics('listing_expiry_reminders_sent', $tenantId),
             'marketplace_report_notifications' => $this->queueSourceDiagnostics('marketplace_report_notifications', $tenantId),
             'event_reminders' => $this->queueSourceDiagnostics('event_reminders', $tenantId),
             'goal_reminders' => $this->queueSourceDiagnostics('goal_reminders', $tenantId),
+            'vol_reminders_sent' => $this->queueSourceDiagnostics('vol_reminders_sent', $tenantId),
             'member_subscription_events' => $this->queueSourceDiagnostics('member_subscription_events', $tenantId),
             'vol_donations' => $this->queueSourceDiagnostics('vol_donations', $tenantId),
             'federation_messages' => $this->queueSourceDiagnostics('federation_messages', $tenantId),
@@ -305,6 +307,50 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->map(fn ($row) => $this->queueRow('marketplace_report_notifications', $row));
         }
 
+        $listingExpiryReminderRows = collect();
+        if (($source === '' || $source === 'listing_expiry_reminders_sent') && $this->hasListingExpiryReminderEvidenceColumns()) {
+            $listingExpiryReminderRows = DB::table('listing_expiry_reminders_sent as lers')
+                ->leftJoin('users as u', function ($join): void {
+                    $join->on('u.id', '=', 'lers.user_id')
+                        ->whereColumn('u.tenant_id', '=', 'lers.tenant_id');
+                })
+                ->leftJoin('listings as l', function ($join): void {
+                    $join->on('l.id', '=', 'lers.listing_id')
+                        ->whereColumn('l.tenant_id', '=', 'lers.tenant_id');
+                })
+                ->when($tenantId !== null, fn ($q) => $q->where('lers.tenant_id', $tenantId))
+                ->where('lers.sent_at', '>=', now()->subDay())
+                ->whereNotExists(function ($sub): void {
+                    $sub->select(DB::raw(1))
+                        ->from('email_log')
+                        ->whereColumn('email_log.user_id', 'lers.user_id')
+                        ->whereColumn('email_log.tenant_id', 'lers.tenant_id')
+                        ->where('email_log.category', 'listing_expiry')
+                        ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                        ->whereRaw('email_log.created_at BETWEEN DATE_SUB(lers.sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(lers.sent_at, INTERVAL 10 MINUTE)');
+                })
+                ->orderByDesc('lers.id')
+                ->limit($limit)
+                ->get([
+                    'lers.id',
+                    'lers.tenant_id',
+                    'lers.user_id',
+                    'u.email',
+                    DB::raw("'listing_expiry' as category"),
+                    'l.title as subject',
+                    DB::raw("'failed' as status"),
+                    'lers.days_before_expiry as frequency',
+                    DB::raw('0 as attempts'),
+                    'lers.sent_at as last_attempted_at',
+                    DB::raw("'marked sent without email_log evidence' as error"),
+                    DB::raw('NULL as processing_batch_id'),
+                    DB::raw('NULL as processing_started_at'),
+                    'lers.sent_at',
+                    'lers.sent_at as created_at',
+                ])
+                ->map(fn ($row) => $this->queueRow('listing_expiry_reminders_sent', $row));
+        }
+
         $eventReminderRows = collect();
         if (($source === '' || $source === 'event_reminders') && Schema::hasTable('event_reminders')) {
             $eventReminderRows = DB::table('event_reminders as er')
@@ -380,6 +426,47 @@ class AdminEmailDeliverabilityController extends BaseApiController
                     'gr.created_at',
                 ])
                 ->map(fn ($row) => $this->queueRow('goal_reminders', $row));
+        }
+
+        $volunteerReminderRows = collect();
+        if (($source === '' || $source === 'vol_reminders_sent') && $this->hasVolunteerReminderEvidenceColumns()) {
+            $volunteerReminderRows = DB::table('vol_reminders_sent as vrs')
+                ->leftJoin('users as u', function ($join): void {
+                    $join->on('u.id', '=', 'vrs.user_id')
+                        ->whereColumn('u.tenant_id', '=', 'vrs.tenant_id');
+                })
+                ->when($tenantId !== null, fn ($q) => $q->where('vrs.tenant_id', $tenantId))
+                ->where('vrs.channel', 'email')
+                ->where('vrs.sent_at', '>=', now()->subDay())
+                ->whereNotExists(function ($sub): void {
+                    $sub->select(DB::raw(1))
+                        ->from('email_log')
+                        ->whereColumn('email_log.user_id', 'vrs.user_id')
+                        ->whereColumn('email_log.tenant_id', 'vrs.tenant_id')
+                        ->where('email_log.category', 'volunteer_reminder')
+                        ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                        ->whereRaw('email_log.created_at BETWEEN DATE_SUB(vrs.sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(vrs.sent_at, INTERVAL 10 MINUTE)');
+                })
+                ->orderByDesc('vrs.id')
+                ->limit($limit)
+                ->get([
+                    'vrs.id',
+                    'vrs.tenant_id',
+                    'vrs.user_id',
+                    'u.email',
+                    'vrs.reminder_type as category',
+                    DB::raw('NULL as subject'),
+                    DB::raw("'failed' as status"),
+                    'vrs.channel as frequency',
+                    DB::raw('0 as attempts'),
+                    'vrs.sent_at as last_attempted_at',
+                    DB::raw("'marked sent without email_log evidence' as error"),
+                    DB::raw('NULL as processing_batch_id'),
+                    DB::raw('NULL as processing_started_at'),
+                    'vrs.sent_at',
+                    'vrs.sent_at as created_at',
+                ])
+                ->map(fn ($row) => $this->queueRow('vol_reminders_sent', $row));
         }
 
         $memberSubscriptionRows = collect();
@@ -542,9 +629,11 @@ class AdminEmailDeliverabilityController extends BaseApiController
 
         $rows = $notificationRows
             ->merge($newsletterRows)
+            ->merge($listingExpiryReminderRows)
             ->merge($marketplaceReportRows)
             ->merge($eventReminderRows)
             ->merge($goalReminderRows)
+            ->merge($volunteerReminderRows)
             ->merge($memberSubscriptionRows)
             ->merge($volDonationRows)
             ->merge($federationSourceRows)
@@ -702,6 +791,30 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ];
         }
 
+        if ($source === 'listing_expiry_reminders_sent') {
+            if (!$this->hasListingExpiryReminderEvidenceColumns()) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $base = DB::table('listing_expiry_reminders_sent as lers')
+                ->when($tenantId !== null, fn ($q) => $q->where('lers.tenant_id', $tenantId));
+            $missingEvidence = $this->listingExpiryReminderMissingEmailEvidenceQuery($base);
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => [
+                    'failed' => (clone $missingEvidence)->where('lers.sent_at', '>=', now()->subDay())->count(),
+                ],
+                'stale_pending' => 0,
+                'stale_processing' => 0,
+                'failed_recent' => (clone $missingEvidence)->where('lers.sent_at', '>=', now()->subDay())->count(),
+                'suppressed_recent' => 0,
+                'oldest_pending_at' => null,
+                'returned' => 0,
+            ];
+        }
+
         if ($source === 'event_reminders') {
             if (!Schema::hasTable('event_reminders')) {
                 return $this->unavailableQueueDiagnostics($source);
@@ -758,6 +871,31 @@ class AdminEmailDeliverabilityController extends BaseApiController
                     ->whereNotNull('gr.next_reminder_at')
                     ->where('gr.next_reminder_at', '<', now())
                     ->min('gr.next_reminder_at'),
+                'returned' => 0,
+            ];
+        }
+
+        if ($source === 'vol_reminders_sent') {
+            if (!$this->hasVolunteerReminderEvidenceColumns()) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $base = DB::table('vol_reminders_sent as vrs')
+                ->where('vrs.channel', 'email')
+                ->when($tenantId !== null, fn ($q) => $q->where('vrs.tenant_id', $tenantId));
+            $missingEvidence = $this->volunteerReminderMissingEmailEvidenceQuery($base);
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => [
+                    'failed' => (clone $missingEvidence)->where('vrs.sent_at', '>=', now()->subDay())->count(),
+                ],
+                'stale_pending' => 0,
+                'stale_processing' => 0,
+                'failed_recent' => (clone $missingEvidence)->where('vrs.sent_at', '>=', now()->subDay())->count(),
+                'suppressed_recent' => 0,
+                'oldest_pending_at' => null,
                 'returned' => 0,
             ];
         }
@@ -940,6 +1078,47 @@ class AdminEmailDeliverabilityController extends BaseApiController
             WHEN gr.last_sent_at IS NOT NULL THEN 'sent'
             ELSE 'scheduled'
         END";
+    }
+
+    private function hasListingExpiryReminderEvidenceColumns(): bool
+    {
+        return Schema::hasTable('listing_expiry_reminders_sent')
+            && Schema::hasTable('email_log')
+            && Schema::hasColumn('listing_expiry_reminders_sent', 'sent_at');
+    }
+
+    private function listingExpiryReminderMissingEmailEvidenceQuery($query)
+    {
+        return $query->whereNotExists(function ($sub): void {
+            $sub->select(DB::raw(1))
+                ->from('email_log')
+                ->whereColumn('email_log.user_id', 'lers.user_id')
+                ->whereColumn('email_log.tenant_id', 'lers.tenant_id')
+                ->where('email_log.category', 'listing_expiry')
+                ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                ->whereRaw('email_log.created_at BETWEEN DATE_SUB(lers.sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(lers.sent_at, INTERVAL 10 MINUTE)');
+        });
+    }
+
+    private function hasVolunteerReminderEvidenceColumns(): bool
+    {
+        return Schema::hasTable('vol_reminders_sent')
+            && Schema::hasTable('email_log')
+            && Schema::hasColumn('vol_reminders_sent', 'sent_at')
+            && Schema::hasColumn('vol_reminders_sent', 'channel');
+    }
+
+    private function volunteerReminderMissingEmailEvidenceQuery($query)
+    {
+        return $query->whereNotExists(function ($sub): void {
+            $sub->select(DB::raw(1))
+                ->from('email_log')
+                ->whereColumn('email_log.user_id', 'vrs.user_id')
+                ->whereColumn('email_log.tenant_id', 'vrs.tenant_id')
+                ->where('email_log.category', 'volunteer_reminder')
+                ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                ->whereRaw('email_log.created_at BETWEEN DATE_SUB(vrs.sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(vrs.sent_at, INTERVAL 10 MINUTE)');
+        });
     }
 
     private function hasMemberSubscriptionEventDeliveryColumns(): bool
