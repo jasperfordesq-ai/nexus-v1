@@ -172,6 +172,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'newsletter_queue' => $this->queueSourceDiagnostics('newsletter_queue', $tenantId),
             'marketplace_report_notifications' => $this->queueSourceDiagnostics('marketplace_report_notifications', $tenantId),
             'event_reminders' => $this->queueSourceDiagnostics('event_reminders', $tenantId),
+            'goal_reminders' => $this->queueSourceDiagnostics('goal_reminders', $tenantId),
             'member_subscription_events' => $this->queueSourceDiagnostics('member_subscription_events', $tenantId),
             'vol_donations' => $this->queueSourceDiagnostics('vol_donations', $tenantId),
             'federation_messages' => $this->queueSourceDiagnostics('federation_messages', $tenantId),
@@ -343,6 +344,44 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->map(fn ($row) => $this->queueRow('event_reminders', $row));
         }
 
+        $goalReminderRows = collect();
+        if (($source === '' || $source === 'goal_reminders') && $this->hasGoalReminderDeliveryColumns()) {
+            $goalReminderRows = DB::table('goal_reminders as gr')
+                ->join('goals as g', function ($join): void {
+                    $join->on('g.id', '=', 'gr.goal_id')
+                        ->whereColumn('g.tenant_id', '=', 'gr.tenant_id');
+                })
+                ->leftJoin('users as u', function ($join): void {
+                    $join->on('u.id', '=', 'gr.user_id')
+                        ->whereColumn('u.tenant_id', '=', 'gr.tenant_id');
+                })
+                ->when($tenantId !== null, fn ($q) => $q->where('gr.tenant_id', $tenantId))
+                ->where('gr.enabled', 1)
+                ->where('g.status', 'active')
+                ->whereIn(DB::raw($this->goalReminderStatusExpression()), $statuses)
+                ->where('gr.next_reminder_at', '<', now()->subMinutes(15))
+                ->orderByDesc('gr.id')
+                ->limit($limit)
+                ->get([
+                    'gr.id',
+                    'gr.tenant_id',
+                    'gr.user_id',
+                    'u.email',
+                    DB::raw("'goal_reminder' as category"),
+                    'g.title as subject',
+                    DB::raw($this->goalReminderStatusExpression() . ' as status'),
+                    'gr.frequency',
+                    DB::raw('0 as attempts'),
+                    'gr.last_sent_at as last_attempted_at',
+                    DB::raw('NULL as error'),
+                    DB::raw('NULL as processing_batch_id'),
+                    DB::raw('NULL as processing_started_at'),
+                    'gr.last_sent_at as sent_at',
+                    'gr.created_at',
+                ])
+                ->map(fn ($row) => $this->queueRow('goal_reminders', $row));
+        }
+
         $memberSubscriptionRows = collect();
         if (($source === '' || $source === 'member_subscription_events') && $this->hasMemberSubscriptionEventDeliveryColumns()) {
             $memberSubscriptionQuery = DB::table('member_subscription_events as mse')
@@ -505,6 +544,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ->merge($newsletterRows)
             ->merge($marketplaceReportRows)
             ->merge($eventReminderRows)
+            ->merge($goalReminderRows)
             ->merge($memberSubscriptionRows)
             ->merge($volDonationRows)
             ->merge($federationSourceRows)
@@ -690,6 +730,38 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ];
         }
 
+        if ($source === 'goal_reminders') {
+            if (!$this->hasGoalReminderDeliveryColumns()) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $base = DB::table('goal_reminders as gr')
+                ->join('goals as g', function ($join): void {
+                    $join->on('g.id', '=', 'gr.goal_id')
+                        ->whereColumn('g.tenant_id', '=', 'gr.tenant_id');
+                })
+                ->where('gr.enabled', 1)
+                ->where('g.status', 'active')
+                ->when($tenantId !== null, fn ($q) => $q->where('gr.tenant_id', $tenantId));
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => $this->queueStatusCounts($base, $this->goalReminderStatusExpression()),
+                'stale_pending' => (clone $base)
+                    ->where('gr.next_reminder_at', '<', now()->subMinutes(15))
+                    ->count(),
+                'stale_processing' => 0,
+                'failed_recent' => 0,
+                'suppressed_recent' => 0,
+                'oldest_pending_at' => (clone $base)
+                    ->whereNotNull('gr.next_reminder_at')
+                    ->where('gr.next_reminder_at', '<', now())
+                    ->min('gr.next_reminder_at'),
+                'returned' => 0,
+            ];
+        }
+
         if ($source === 'member_subscription_events') {
             if (!$this->hasMemberSubscriptionEventDeliveryColumns()) {
                 return $this->unavailableQueueDiagnostics($source);
@@ -850,6 +922,24 @@ class AdminEmailDeliverabilityController extends BaseApiController
             && Schema::hasColumn('reviews', 'email_skipped_at')
             && Schema::hasColumn('reviews', 'email_failed_at')
             && Schema::hasColumn('reviews', 'email_last_error');
+    }
+
+    private function hasGoalReminderDeliveryColumns(): bool
+    {
+        return Schema::hasTable('goal_reminders')
+            && Schema::hasTable('goals')
+            && Schema::hasTable('users')
+            && Schema::hasColumn('goal_reminders', 'next_reminder_at')
+            && Schema::hasColumn('goal_reminders', 'last_sent_at');
+    }
+
+    private function goalReminderStatusExpression(): string
+    {
+        return "CASE
+            WHEN gr.next_reminder_at IS NOT NULL AND gr.next_reminder_at < NOW() THEN 'pending'
+            WHEN gr.last_sent_at IS NOT NULL THEN 'sent'
+            ELSE 'scheduled'
+        END";
     }
 
     private function hasMemberSubscriptionEventDeliveryColumns(): bool

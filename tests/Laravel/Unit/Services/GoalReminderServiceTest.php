@@ -50,4 +50,22 @@ class GoalReminderServiceTest extends TestCase
 
         $this->assertFalse($this->service->deleteReminder(999, 1));
     }
+
+    public function test_send_due_reminders_creates_bell_only_after_email_send_succeeds(): void
+    {
+        $code = file_get_contents(base_path('app/Services/GoalReminderService.php'));
+
+        $this->assertIsString($code);
+        $this->assertStringContainsString("__('emails.common.fallback_goal')", $code);
+
+        $emailFailureGuard = strpos($code, 'if (!$emailOk) {');
+        $notificationInsert = strpos($code, "INSERT INTO notifications (user_id, tenant_id, message, link, type, created_at)");
+        $lastSentUpdate = strpos($code, "'last_sent_at'    => now()");
+
+        $this->assertNotFalse($emailFailureGuard);
+        $this->assertNotFalse($notificationInsert);
+        $this->assertNotFalse($lastSentUpdate);
+        $this->assertLessThan($notificationInsert, $emailFailureGuard);
+        $this->assertLessThan($lastSentUpdate, $notificationInsert);
+    }
 }

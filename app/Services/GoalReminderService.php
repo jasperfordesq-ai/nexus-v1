@@ -107,17 +107,10 @@ class GoalReminderService
             try {
                 // Render notification + email in the recipient's language (cron default = 'en').
                 LocaleContext::withLocale($reminder, function () use ($reminder, $tenantId, &$sent) {
-                    $goalTitle = htmlspecialchars($reminder->goal_title ?? 'your goal', ENT_QUOTES, 'UTF-8');
+                    $goalTitle = htmlspecialchars($reminder->goal_title ?? __('emails.common.fallback_goal'), ENT_QUOTES, 'UTF-8');
                     $firstName = $reminder->first_name ?? $reminder->user_name ?? __('emails.common.fallback_name');
                     $link = '/goals/' . $reminder->goal_id;
 
-                    // In-app notification
-                    DB::insert(
-                        "INSERT INTO notifications (user_id, tenant_id, message, link, type, created_at) VALUES (?, ?, ?, ?, 'goal_reminder', NOW())",
-                        [$reminder->user_id, $tenantId, __('svc_notifications.goal.reminder_bell', ['title' => $goalTitle]), $link]
-                    );
-
-                    // Email notification
                     $emailOk = true;
                     if (!empty($reminder->email)) {
                         $goalUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
@@ -150,6 +143,11 @@ class GoalReminderService
                     if (!$emailOk) {
                         return;
                     }
+
+                    DB::insert(
+                        "INSERT INTO notifications (user_id, tenant_id, message, link, type, created_at) VALUES (?, ?, ?, ?, 'goal_reminder', NOW())",
+                        [$reminder->user_id, $tenantId, __('svc_notifications.goal.reminder_bell', ['title' => $goalTitle]), $link]
+                    );
 
                     // Advance next_reminder_at
                     DB::table('goal_reminders')

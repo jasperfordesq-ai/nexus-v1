@@ -201,6 +201,52 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         $this->assertSame(['event_reminders'], $sources);
     }
 
+    public function test_queues_endpoint_surfaces_goal_reminders(): void
+    {
+        if (!Schema::hasTable('goal_reminders') || !Schema::hasTable('goals')) {
+            $this->markTestSkipped('Goal reminder tables are not available.');
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'goal-reminder-queue@example.test',
+        ]);
+        Sanctum::actingAs($admin);
+
+        $goalId = DB::table('goals')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'title' => 'Email Queue Diagnostic Goal',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('goal_reminders')->insert([
+            'tenant_id' => $this->testTenantId,
+            'goal_id' => $goalId,
+            'user_id' => $member->id,
+            'frequency' => 'weekly',
+            'next_reminder_at' => now()->subHour(),
+            'last_sent_at' => null,
+            'enabled' => 1,
+            'created_at' => now()->subHours(2),
+            'updated_at' => now()->subHour(),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/email-deliverability/queues?source=goal_reminders&limit=10');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.diagnostics.goal_reminders.available', true);
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.goal_reminders.stale_pending'));
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.goal_reminders.status_counts.pending'));
+
+        $rows = collect($response->json('data.rows'));
+        $this->assertSame(['goal_reminders'], $rows->pluck('source')->unique()->values()->all());
+        $this->assertSame('pending', $rows->first()['status'] ?? null);
+        $this->assertSame('goal-reminder-queue@example.test', $rows->first()['email'] ?? null);
+    }
+
     public function test_queues_endpoint_surfaces_federated_review_delivery_failures(): void
     {
         if (

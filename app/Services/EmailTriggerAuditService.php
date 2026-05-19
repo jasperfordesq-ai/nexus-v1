@@ -49,6 +49,7 @@ class EmailTriggerAuditService
             ['module' => 'events', 'event' => 'scheduled_event_reminder', 'category' => 'event_reminder', 'critical' => true, 'source_table' => 'event_reminders'],
             ['module' => 'volunteering', 'event' => 'application_shift_reminder_hours_expense', 'category' => 'volunteering', 'critical' => true, 'source_table' => 'notification_queue'],
             ['module' => 'goals', 'event' => 'goal_reminder', 'category' => 'goal_reminder', 'critical' => true, 'source_table' => 'notification_queue'],
+            ['module' => 'goals', 'event' => 'goal_reminder_source', 'category' => 'goal_reminder', 'critical' => true, 'source_table' => 'goal_reminders'],
             ['module' => 'marketplace', 'event' => 'order_offer_payment_rating_report', 'category' => 'marketplace', 'critical' => true, 'source_table' => 'notification_queue'],
             ['module' => 'marketplace', 'event' => 'marketplace_report_outbox', 'category' => 'marketplace_report', 'critical' => true, 'source_table' => 'marketplace_report_notifications'],
             ['module' => 'marketplace', 'event' => 'marketplace_report_source', 'category' => 'marketplace_report', 'critical' => true, 'source_table' => 'marketplace_reports'],
@@ -173,6 +174,7 @@ class EmailTriggerAuditService
                 $this->checkNotificationQueueHealth($tenantId, $since, $windowHours),
                 $this->checkNewsletterQueueHealth($tenantId, $since, $windowHours),
                 $this->checkEventReminderSourceHealth($tenantId, $since, $windowHours),
+                $this->checkGoalReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkNotificationStoreHealth($tenantId),
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
                 $this->checkTenantProviderConfiguration($tenantId),
@@ -246,6 +248,7 @@ class EmailTriggerAuditService
             'federation_messages' => 'checkFederationMessageDeliveryHealth',
             'federation_transactions' => 'checkFederationTransactionDeliveryHealth',
             'reviews' => 'checkFederationReviewDeliveryHealth',
+            'goal_reminders' => 'checkGoalReminderSourceHealth',
             'group_invites' => 'checkGroupInvitesWithoutEmail',
             'group_members' => 'checkGroupMembershipNotificationHealth',
             'marketplace_report_notifications' => 'checkMarketplaceReportNotificationHealth',
@@ -1038,6 +1041,69 @@ class EmailTriggerAuditService
                 ->get();
             $issues = array_merge($issues, $this->rowsToIssues($sentWithoutEmail, 'event_reminders_marked_sent_without_email_log', 'critical', 'events', 'event_created_update_cancellation_rsvp_reminder', ['window_hours' => $windowHours]));
         }
+
+        return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkGoalReminderSourceHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (
+            !$this->hasTables(['goal_reminders', 'goals', 'users'])
+            || !Schema::hasColumn('goal_reminders', 'next_reminder_at')
+            || !Schema::hasColumn('goal_reminders', 'last_sent_at')
+        ) {
+            return [];
+        }
+
+        $issues = [];
+
+        $overdue = DB::table('goal_reminders as gr')
+            ->join('goals as g', function ($join): void {
+                $join->on('gr.goal_id', '=', 'g.id')
+                    ->whereColumn('g.tenant_id', '=', 'gr.tenant_id');
+            })
+            ->select('gr.tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('gr.enabled', 1)
+            ->whereNotNull('gr.next_reminder_at')
+            ->where('gr.next_reminder_at', '>=', $since)
+            ->where('gr.next_reminder_at', '<=', now()->subMinutes(15))
+            ->where('g.status', 'active')
+            ->when($tenantId !== null, fn ($q) => $q->where('gr.tenant_id', $tenantId))
+            ->groupBy('gr.tenant_id')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($overdue, 'goal_reminders_overdue_pending', 'critical', 'goals', 'goal_reminder_source', ['window_hours' => $windowHours, 'minutes' => 15]));
+
+        if (!$this->hasTables(['email_log'])) {
+            return $issues;
+        }
+
+        $sentWithoutEmail = DB::table('goal_reminders as gr')
+            ->join('users as u', function ($join): void {
+                $join->on('gr.user_id', '=', 'u.id')
+                    ->whereColumn('u.tenant_id', '=', 'gr.tenant_id');
+            })
+            ->select('gr.tenant_id', DB::raw('COUNT(*) as count'))
+            ->whereNotNull('gr.last_sent_at')
+            ->where('gr.last_sent_at', '>=', $since)
+            ->whereNotNull('u.email')
+            ->where('u.email', '<>', '')
+            ->whereNotExists(function ($sub): void {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereColumn('email_log.user_id', 'gr.user_id')
+                    ->whereColumn('email_log.tenant_id', 'gr.tenant_id')
+                    ->where('email_log.category', 'goal_reminder')
+                    ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                    ->whereRaw('email_log.created_at BETWEEN DATE_SUB(gr.last_sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(gr.last_sent_at, INTERVAL 10 MINUTE)');
+            })
+            ->when($tenantId !== null, fn ($q) => $q->where('gr.tenant_id', $tenantId))
+            ->groupBy('gr.tenant_id');
+        $this->excludeReservedEmailDomains($sentWithoutEmail, 'u.email');
+
+        $issues = array_merge($issues, $this->rowsToIssues($sentWithoutEmail->get(), 'goal_reminders_marked_sent_without_email_log', 'critical', 'goals', 'goal_reminder_source', ['window_hours' => $windowHours]));
 
         return $issues;
     }
