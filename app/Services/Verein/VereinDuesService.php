@@ -496,36 +496,36 @@ class VereinDuesService
             return;
         }
 
-        TenantContext::setById((int) $row->tenant_id);
-
-        $chargeId = null;
-        if (!empty($eventData->latest_charge)) {
-            $chargeId = is_string($eventData->latest_charge)
-                ? $eventData->latest_charge
-                : ($eventData->latest_charge->id ?? null);
-        }
-
-        $receiptUrl = null;
-        if ($chargeId) {
-            try {
-                $charge = StripeService::client()->charges->retrieve($chargeId);
-                $receiptUrl = $charge->receipt_url ?? null;
-            } catch (\Throwable $e) {
-                // Non-fatal — receipt URL is optional
+        TenantContext::runForTenant((int) $row->tenant_id, function () use ($eventData, $duesId, $piId): void {
+            $chargeId = null;
+            if (!empty($eventData->latest_charge)) {
+                $chargeId = is_string($eventData->latest_charge)
+                    ? $eventData->latest_charge
+                    : ($eventData->latest_charge->id ?? null);
             }
-        }
 
-        $paymentMethod = $eventData->payment_method_types[0] ?? 'card';
+            $receiptUrl = null;
+            if ($chargeId) {
+                try {
+                    $charge = StripeService::client()->charges->retrieve($chargeId);
+                    $receiptUrl = $charge->receipt_url ?? null;
+                } catch (\Throwable $e) {
+                // Non-fatal — receipt URL is optional
+                }
+            }
 
-        try {
-            (new self())->markPaid($duesId, (string) $piId, $paymentMethod, $receiptUrl);
-        } catch (\Throwable $e) {
-            Log::error('VereinDues webhook: markPaid failed', [
-                'dues_id' => $duesId,
-                'payment_intent_id' => $piId,
-                'error' => $e->getMessage(),
-            ]);
-        }
+            $paymentMethod = $eventData->payment_method_types[0] ?? 'card';
+
+            try {
+                (new self())->markPaid($duesId, (string) $piId, $paymentMethod, $receiptUrl);
+            } catch (\Throwable $e) {
+                Log::error('VereinDues webhook: markPaid failed', [
+                    'dues_id' => $duesId,
+                    'payment_intent_id' => $piId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        });
     }
 
     /**
