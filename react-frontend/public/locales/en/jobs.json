@@ -316,10 +316,21 @@
     "ai_score": "AI: {{score}}/100",
     "download_cv": "Download CV",
     "drop_here": "Drop here",
+    "ai_rank": "AI Rank",
+    "ai_ranked": "Candidates ranked by AI",
+    "ai_rank_failed": "AI ranking failed",
+    "tab_pipeline": "Pipeline",
+    "tab_activity": "Activity Log",
+    "no_activity": "No activity yet",
+    "no_activity_hint": "Events will appear here as the hiring process progresses.",
+    "previous": "Previous",
+    "next": "Next",
     "duration_90": "1.5 hours",
     "salary_monthly": "Monthly",
     "personal_message": "Personal Message",
-    "personal_message_placeholder": "A note to the candidate..."
+    "personal_message_placeholder": "A note to the candidate...",
+    "interview_location_placeholder": "https://meet.google.com/...",
+    "offer_salary_placeholder": "e.g. 45000"
   },
   "apply": {
     "button": "Apply Now",

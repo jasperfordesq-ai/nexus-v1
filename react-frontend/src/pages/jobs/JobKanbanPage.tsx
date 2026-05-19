@@ -108,6 +108,31 @@ const STATUS_TO_COLUMN: Record<string, string> = {
   rejected:  'Rejected',
 };
 
+function getApplicationStatusLabel(t: (key: string) => string, status: string): string {
+  switch (status) {
+    case 'applied':
+      return t('application_status.applied');
+    case 'pending':
+      return t('application_status.pending');
+    case 'screening':
+      return t('application_status.screening');
+    case 'reviewed':
+      return t('application_status.reviewed');
+    case 'interview':
+      return t('application_status.interview');
+    case 'offer':
+      return t('application_status.offer');
+    case 'accepted':
+      return t('application_status.accepted');
+    case 'rejected':
+      return t('application_status.rejected');
+    case 'withdrawn':
+      return t('application_status.withdrawn');
+    default:
+      return t('application_status.pending');
+  }
+}
+
 // ---------------------------------------------------------------------------
 // ApplicationKanbanCard
 // ---------------------------------------------------------------------------
@@ -138,7 +163,7 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
       exit={{ opacity: 0, scale: 0.9 }}
       draggable
       role="listitem"
-      aria-label={`${application.applicant.name} — ${t(`application_status.${stage}`, { defaultValue: stage })}`}
+      aria-label={`${application.applicant.name} - ${getApplicationStatusLabel(t, stage)}`}
       aria-grabbed={isDragging}
       onDragStart={() => { setIsDragging(true); onDragStart(application.id); }}
       onDragEnd={() => setIsDragging(false)}
@@ -213,7 +238,7 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
             startContent={<Download size={12} aria-hidden="true" />}
             onPress={() => onDownloadCv(application.id, application.applicant.name)}
           >
-            {t('kanban.download_cv', 'Download CV')}
+            {t('kanban.download_cv')}
           </Button>
         )}
 
@@ -227,7 +252,7 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
             startContent={<Calendar size={14} aria-hidden="true" />}
             onPress={() => onScheduleInterview(application)}
           >
-            {t('interview.schedule', 'Schedule Interview')}
+            {t('interview.schedule')}
           </Button>
         )}
 
@@ -241,7 +266,7 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
             startContent={<DollarSign size={14} aria-hidden="true" />}
             onPress={() => onSendOffer(application)}
           >
-            {t('offer.send', 'Send Offer')}
+            {t('offer.send')}
           </Button>
         )}
 
@@ -254,7 +279,7 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
             startContent={<Star size={12} aria-hidden="true" />}
             onPress={() => onScoreApplicant(application)}
           >
-            {t('scorecard.title', 'Score')}
+            {t('scorecard.title')}
           </Button>
         )}
       </GlassCard>
@@ -304,7 +329,7 @@ function KanbanColumn({ column, applications, onDragStart, onDrop, onDownloadCv,
       {/* Column header */}
       <div className="flex items-center gap-2 mb-3">
         <Chip size="sm" color={column.color} variant="flat" className="font-medium">
-          {column.id}
+          {getApplicationStatusLabel(t, column.status)}
         </Chip>
         <span className="text-xs text-theme-subtle font-medium bg-theme-elevated rounded-full px-2 py-0.5">
           {applications.length}
@@ -314,7 +339,7 @@ function KanbanColumn({ column, applications, onDragStart, onDrop, onDownloadCv,
       {/* Drop zone */}
       <div
         role="list"
-        aria-label={column.id}
+        aria-label={getApplicationStatusLabel(t, column.status)}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -327,7 +352,7 @@ function KanbanColumn({ column, applications, onDragStart, onDrop, onDownloadCv,
         {applications.length === 0 ? (
           <div className="flex items-center justify-center h-24 text-theme-subtle text-xs">
             <FileText size={16} className="mr-1" aria-hidden="true" />
-            {t('kanban.drop_here', 'Drop here')}
+            {t('kanban.drop_here')}
           </div>
         ) : (
           applications.map((app) => (
@@ -416,7 +441,7 @@ export function JobKanbanPage() {
   const [auditPage, setAuditPage] = useState(1);
   const [auditTotal, setAuditTotal] = useState(0);
 
-  usePageTitle(vacancy ? `${t('kanban.pipeline_title', 'Kanban Pipeline')} — ${vacancy.title}` : t('kanban.pipeline_title', 'Kanban Pipeline'));
+  usePageTitle(vacancy ? `${t('kanban.pipeline_title')} — ${vacancy.title}` : t('kanban.pipeline_title'));
 
   const abortRef = useRef<AbortController | null>(null);
   const tRef = useRef(t);
@@ -553,7 +578,7 @@ export function JobKanbanPage() {
     try {
       const response = await api.post(`/v2/jobs/applications/${appId}/interview`, interviewForm);
       if (response.success) {
-        toastRef.current.success(tRef.current('interview.send_request', 'Interview request sent'));
+        toastRef.current.success(tRef.current('interview.send_request'));
         setInterviewModalApp(null);
         await handleMoveCard(appId, 'interview');
       } else {
@@ -575,7 +600,7 @@ export function JobKanbanPage() {
     try {
       const response = await api.post(`/v2/jobs/applications/${appId}/offer`, offerForm);
       if (response.success) {
-        toastRef.current.success(tRef.current('offer.send', 'Offer sent'));
+        toastRef.current.success(tRef.current('offer.send'));
         setOfferModalApp(null);
         setOfferForm({ salary_offered: '', salary_currency: 'EUR', salary_type: 'annual', start_date: '', message: '' });
         await handleMoveCard(appId, 'offer');
@@ -603,15 +628,15 @@ export function JobKanbanPage() {
       };
       const response = await api.put(`/v2/jobs/applications/${appId}/scorecard`, payload);
       if (response.success) {
-        toastRef.current.success(tRef.current('scorecard.saved', 'Scorecard saved'));
+        toastRef.current.success(tRef.current('scorecard.saved'));
         setScorecardModalApp(null);
         setScorecardNotes('');
         setScorecardCriteria([
-          { label: tRef.current('scorecard.communication', 'Communication'), score: 5 },
-          { label: tRef.current('scorecard.technical', 'Technical Skills'), score: 5 },
-          { label: tRef.current('scorecard.cultural_fit', 'Cultural Fit'), score: 5 },
-          { label: tRef.current('scorecard.experience', 'Experience'), score: 5 },
-          { label: tRef.current('scorecard.motivation', 'Motivation'), score: 5 },
+          { label: tRef.current('scorecard.communication'), score: 5 },
+          { label: tRef.current('scorecard.technical'), score: 5 },
+          { label: tRef.current('scorecard.cultural_fit'), score: 5 },
+          { label: tRef.current('scorecard.experience'), score: 5 },
+          { label: tRef.current('scorecard.motivation'), score: 5 },
         ]);
       } else {
         toastRef.current.error(tRef.current('detail.status_update_error'));
@@ -646,13 +671,13 @@ export function JobKanbanPage() {
         application_ids: Array.from(selectedAppIds),
         status: bulkStatus,
       });
-      toastRef.current.success(tRef.current('bulk.success', `${selectedAppIds.size} applications updated`));
+      toastRef.current.success(tRef.current('bulk.success'));
       setSelectedAppIds(new Set());
       setBulkStatus('');
       await loadData();
     } catch (err) {
       logError('JobKanbanPage: bulk update failed', err);
-      toastRef.current.error(tRef.current('bulk.error', 'Bulk update failed'));
+      toastRef.current.error(tRef.current('bulk.error'));
     } finally {
       setIsBulkUpdating(false);
     }
@@ -671,12 +696,12 @@ export function JobKanbanPage() {
           map[r.application_id] = r;
         }
         setAiRankings(map);
-        toast.success(t('kanban.ai_ranked', { defaultValue: 'Candidates ranked by AI' }));
+        toast.success(t('kanban.ai_ranked'));
       } else {
-        toast.error((res as { error?: string }).error || t('kanban.ai_rank_failed', { defaultValue: 'AI ranking failed' }));
+        toast.error((res as { error?: string }).error || t('kanban.ai_rank_failed'));
       }
     } catch {
-      toast.error(t('kanban.ai_rank_failed', { defaultValue: 'AI ranking failed' }));
+      toast.error(t('kanban.ai_rank_failed'));
     } finally {
       setIsRanking(false);
     }
@@ -751,7 +776,7 @@ export function JobKanbanPage() {
     return (
       <div className="text-center py-16 space-y-4">
         <Briefcase className="w-12 h-12 mx-auto text-theme-subtle" aria-hidden="true" />
-        <p className="text-theme-muted">{t('kanban.not_authorized', 'You are not authorized to view this pipeline.')}</p>
+        <p className="text-theme-muted">{t('kanban.not_authorized')}</p>
         <Link to={tenantPath(`/jobs/${id}`)}>
           <Button variant="flat" className="bg-theme-elevated text-theme-muted">
             {t('detail.browse_vacancies')}
@@ -776,20 +801,21 @@ export function JobKanbanPage() {
           </Link>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <Briefcase className="w-7 h-7 text-indigo-400" aria-hidden="true" />
-            {t('kanban.pipeline_title', 'Kanban Pipeline')}
+            {t('kanban.pipeline_title')}
           </h1>
           <p className="text-theme-muted text-sm mt-1">{vacancy.title}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <Button
             variant="flat"
             color="secondary"
+            className="w-full sm:w-auto"
             startContent={!isRanking && <Sparkles size={16} />}
             isLoading={isRanking}
             onPress={handleAiRank}
             isDisabled={applications.length === 0}
           >
-            {t('kanban.ai_rank', { defaultValue: 'AI Rank' })}
+            {t('kanban.ai_rank')}
           </Button>
           <Chip variant="flat" color="default">
             {t('applications', { count: applications.length })}
@@ -799,8 +825,8 @@ export function JobKanbanPage() {
 
       {/* Tab navigation */}
       <Tabs selectedKey={activeTab} onSelectionChange={(k) => setActiveTab(k as 'pipeline' | 'activity')} variant="underlined" className="mb-4">
-        <Tab key="pipeline" title={<div className="flex items-center gap-2"><Briefcase size={15} /><span>{t('kanban.tab_pipeline', { defaultValue: 'Pipeline' })}</span></div>} />
-        <Tab key="activity" title={<div className="flex items-center gap-2"><ScrollText size={15} /><span>{t('kanban.tab_activity', { defaultValue: 'Activity Log' })}</span></div>} />
+        <Tab key="pipeline" title={<div className="flex items-center gap-2"><Briefcase size={15} /><span>{t('kanban.tab_pipeline')}</span></div>} />
+        <Tab key="activity" title={<div className="flex items-center gap-2"><ScrollText size={15} /><span>{t('kanban.tab_activity')}</span></div>} />
       </Tabs>
 
       {/* Pipeline tab */}
@@ -808,34 +834,36 @@ export function JobKanbanPage() {
 
       {/* Bulk action bar */}
       {selectedAppIds.size > 0 && (
-        <div className="sticky top-0 z-20 flex items-center gap-3 p-3 mb-4 bg-primary/10 border border-primary/30 rounded-xl backdrop-blur-sm">
-          <span className="text-sm font-medium text-primary">{t('bulk.selected_count', '{{count}} selected', { count: selectedAppIds.size })}</span>
+        <div className="sticky top-0 z-20 flex flex-col gap-3 p-3 mb-4 bg-primary/10 border border-primary/30 rounded-xl backdrop-blur-sm sm:flex-row sm:items-center">
+          <span className="text-sm font-medium text-primary">{t('bulk.selected_count', { count: selectedAppIds.size })}</span>
           <Select
             size="sm"
-            placeholder={t('bulk.select_action', 'Move to stage...')}
-            className="w-48"
+            placeholder={t('bulk.select_action')}
+            className="w-full sm:w-48"
             selectedKeys={bulkStatus ? [bulkStatus] : []}
             onSelectionChange={(keys) => setBulkStatus(Array.from(keys)[0] as string ?? '')}
           >
             {(['screening', 'reviewed', 'interview', 'rejected'] as const).map((s) => (
-              <SelectItem key={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</SelectItem>
+              <SelectItem key={s}>{getApplicationStatusLabel(t, s)}</SelectItem>
             ))}
           </Select>
           <Button
             size="sm"
             color="primary"
+            className="w-full sm:w-auto"
             isLoading={isBulkUpdating}
             isDisabled={!bulkStatus}
             onPress={handleBulkStatusUpdate}
           >
-            {t('bulk.apply', 'Apply')}
+            {t('bulk.apply')}
           </Button>
           <Button
             size="sm"
             variant="flat"
+            className="w-full sm:w-auto"
             onPress={() => { setSelectedAppIds(new Set()); setBulkStatus(''); }}
           >
-            {t('bulk.clear', 'Clear')}
+            {t('bulk.clear')}
           </Button>
         </div>
       )}
@@ -872,8 +900,8 @@ export function JobKanbanPage() {
           ) : auditEvents.length === 0 ? (
             <div className="text-center py-12 text-default-400">
               <ScrollText size={32} className="mx-auto mb-3" />
-              <p className="font-medium">{t('kanban.no_activity', { defaultValue: 'No activity yet' })}</p>
-              <p className="text-sm mt-1">{t('kanban.no_activity_hint', { defaultValue: 'Events will appear here as the hiring process progresses.' })}</p>
+              <p className="font-medium">{t('kanban.no_activity')}</p>
+              <p className="text-sm mt-1">{t('kanban.no_activity_hint')}</p>
             </div>
           ) : (
             <div className="relative pl-6 border-l-2 border-default-200 space-y-4">
@@ -904,8 +932,8 @@ export function JobKanbanPage() {
           )}
           {auditTotal > 50 && (
             <div className="flex justify-center gap-2 pt-2">
-              <Button size="sm" variant="flat" isDisabled={auditPage <= 1} onPress={() => setAuditPage(p => p - 1)}>{t('common.previous', { defaultValue: 'Previous' })}</Button>
-              <Button size="sm" variant="flat" onPress={() => setAuditPage(p => p + 1)}>{t('common.next', { defaultValue: 'Next' })}</Button>
+              <Button size="sm" variant="flat" isDisabled={auditPage <= 1} onPress={() => setAuditPage(p => p - 1)}>{t('kanban.previous')}</Button>
+              <Button size="sm" variant="flat" onPress={() => setAuditPage(p => p + 1)}>{t('kanban.next')}</Button>
             </div>
           )}
         </div>
@@ -914,43 +942,43 @@ export function JobKanbanPage() {
       {/* Feature 1: Interview Scheduling Modal */}
       <Modal isOpen={!!interviewModalApp} onClose={() => setInterviewModalApp(null)} size="md">
         <ModalContent>
-          <ModalHeader>{t('interview.schedule', 'Schedule Interview')} — {interviewModalApp?.applicant.name}</ModalHeader>
+          <ModalHeader>{t('interview.schedule')} — {interviewModalApp?.applicant.name}</ModalHeader>
           <ModalBody className="space-y-4">
             <Select
-              label={t('interview.type_video', 'Interview Type')}
+              label={t('interview.type_video')}
               selectedKeys={[interviewForm.interview_type]}
               onSelectionChange={(keys) => {
                 const key = [...keys][0] as 'video' | 'phone' | 'in_person';
                 setInterviewForm((f) => ({ ...f, interview_type: key }));
               }}
             >
-              <SelectItem key="video">{t('interview.type_video', 'Video Call')}</SelectItem>
-              <SelectItem key="phone">{t('interview.type_phone', 'Phone Call')}</SelectItem>
-              <SelectItem key="in_person">{t('interview.type_in_person', 'In Person')}</SelectItem>
+              <SelectItem key="video">{t('interview.type_video')}</SelectItem>
+              <SelectItem key="phone">{t('interview.type_phone')}</SelectItem>
+              <SelectItem key="in_person">{t('interview.type_in_person')}</SelectItem>
             </Select>
             <Input
               type="datetime-local"
-              label={t('interview.datetime', 'Date & Time')}
+              label={t('interview.datetime')}
               isRequired
               value={interviewForm.scheduled_at}
               onChange={(e) => setInterviewForm((f) => ({ ...f, scheduled_at: e.target.value }))}
             />
             <Select
-              label={t('interview.duration', 'Duration')}
+              label={t('interview.duration')}
               selectedKeys={[String(interviewForm.duration_mins)]}
               onSelectionChange={(keys) => {
                 const val = Number([...keys][0]);
                 setInterviewForm((f) => ({ ...f, duration_mins: val }));
               }}
             >
-              <SelectItem key="30">{t('self_scheduling.duration_30', '30 minutes')}</SelectItem>
-              <SelectItem key="45">{t('self_scheduling.duration_45', '45 minutes')}</SelectItem>
-              <SelectItem key="60">{t('self_scheduling.duration_60', '1 hour')}</SelectItem>
-              <SelectItem key="90">{t('kanban.duration_90', '1.5 hours')}</SelectItem>
+              <SelectItem key="30">{t('self_scheduling.duration_30')}</SelectItem>
+              <SelectItem key="45">{t('self_scheduling.duration_45')}</SelectItem>
+              <SelectItem key="60">{t('self_scheduling.duration_60')}</SelectItem>
+              <SelectItem key="90">{t('kanban.duration_90')}</SelectItem>
             </Select>
             <Input
-              label={t('interview.location', 'Meeting Link / Location')}
-              placeholder="https://meet.google.com/..."
+              label={t('interview.location')}
+              placeholder={t('kanban.interview_location_placeholder')}
               value={interviewForm.location_notes}
               onChange={(e) => setInterviewForm((f) => ({ ...f, location_notes: e.target.value }))}
             />
@@ -960,7 +988,7 @@ export function JobKanbanPage() {
               {t('apply.cancel')}
             </Button>
             <Button color="primary" isLoading={isSubmittingInterview} onPress={handleProposeInterview}>
-              {t('interview.send_request', 'Send Interview Request')}
+              {t('interview.send_request')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -972,14 +1000,14 @@ export function JobKanbanPage() {
           <ModalHeader>
             <span className="flex items-center gap-2">
               <Star size={16} aria-hidden="true" />
-              {t('scorecard.title', 'Score Applicant')}: {scorecardModalApp?.applicant.name}
+              {t('scorecard.title')}: {scorecardModalApp?.applicant.name}
             </span>
           </ModalHeader>
           <ModalBody className="space-y-4">
-            <p className="text-sm font-medium text-theme-primary">{t('scorecard.criteria', 'Scoring Criteria')}</p>
+            <p className="text-sm font-medium text-theme-primary">{t('scorecard.criteria')}</p>
             {scorecardCriteria.map((criterion, idx) => (
-              <div key={idx} className="flex items-center gap-3">
-                <span className="text-sm text-theme-secondary w-36 flex-shrink-0">{criterion.label}</span>
+              <div key={idx} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                <span className="text-sm text-theme-secondary sm:w-36 sm:flex-shrink-0">{criterion.label}</span>
                 <Input
                   type="number"
                   min={1}
@@ -991,7 +1019,7 @@ export function JobKanbanPage() {
                       prev.map((c, i) => (i === idx ? { ...c, score: val } : c))
                     );
                   }}
-                  className="w-24"
+                  className="w-full sm:w-24"
                   classNames={{
                     input: 'bg-transparent text-theme-primary',
                     inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -1017,7 +1045,7 @@ export function JobKanbanPage() {
               {t('apply.cancel')}
             </Button>
             <Button color="primary" isLoading={isSubmittingScorecard} onPress={handleSubmitScorecard}>
-              {t('scorecard.save', 'Save Scorecard')}
+              {t('scorecard.save')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -1026,48 +1054,48 @@ export function JobKanbanPage() {
       {/* Feature 2: Send Offer Modal */}
       <Modal isOpen={!!offerModalApp} onClose={() => setOfferModalApp(null)} size="md">
         <ModalContent>
-          <ModalHeader>{t('offer.modal_title', 'Send Job Offer')} — {offerModalApp?.applicant.name}</ModalHeader>
+          <ModalHeader>{t('offer.modal_title')} — {offerModalApp?.applicant.name}</ModalHeader>
           <ModalBody className="space-y-4">
             <Input
               type="number"
-              label={t('offer.salary', 'Salary Offered')}
-              placeholder="e.g. 45000"
+              label={t('offer.salary')}
+              placeholder={t('kanban.offer_salary_placeholder')}
               value={offerForm.salary_offered}
               onChange={(e) => setOfferForm((f) => ({ ...f, salary_offered: e.target.value }))}
             />
             <Select
-              label={t('salary.form_currency_label', 'Currency')}
+              label={t('salary.form_currency_label')}
               selectedKeys={[offerForm.salary_currency]}
               onSelectionChange={(keys) => {
                 const key = [...keys][0] as string;
                 setOfferForm((f) => ({ ...f, salary_currency: key }));
               }}
             >
-              <SelectItem key="EUR">{t('salary.currency_eur', 'EUR')}</SelectItem>
-              <SelectItem key="GBP">{t('salary.currency_gbp', 'GBP')}</SelectItem>
-              <SelectItem key="USD">{t('salary.currency_usd', 'USD')}</SelectItem>
+              <SelectItem key="EUR">{t('salary.currency_eur')}</SelectItem>
+              <SelectItem key="GBP">{t('salary.currency_gbp')}</SelectItem>
+              <SelectItem key="USD">{t('salary.currency_usd')}</SelectItem>
             </Select>
             <Select
-              label={t('salary.form_type_label', 'Pay Type')}
+              label={t('salary.form_type_label')}
               selectedKeys={[offerForm.salary_type]}
               onSelectionChange={(keys) => {
                 const key = [...keys][0] as 'hourly' | 'monthly' | 'annual';
                 setOfferForm((f) => ({ ...f, salary_type: key }));
               }}
             >
-              <SelectItem key="hourly">{t('salary.hourly', 'per hour')}</SelectItem>
-              <SelectItem key="monthly">{t('kanban.salary_monthly', 'Monthly')}</SelectItem>
-              <SelectItem key="annual">{t('salary.annual', 'per year')}</SelectItem>
+              <SelectItem key="hourly">{t('salary.hourly')}</SelectItem>
+              <SelectItem key="monthly">{t('kanban.salary_monthly')}</SelectItem>
+              <SelectItem key="annual">{t('salary.annual')}</SelectItem>
             </Select>
             <Input
               type="date"
-              label={t('offer.start_date', 'Start Date')}
+              label={t('offer.start_date')}
               value={offerForm.start_date}
               onChange={(e) => setOfferForm((f) => ({ ...f, start_date: e.target.value }))}
             />
             <Textarea
-              label={t('kanban.personal_message', 'Personal Message')}
-              placeholder={t('kanban.personal_message_placeholder', 'A note to the candidate...')}
+              label={t('kanban.personal_message')}
+              placeholder={t('kanban.personal_message_placeholder')}
               value={offerForm.message}
               onValueChange={(val) => setOfferForm((f) => ({ ...f, message: val }))}
               minRows={3}
@@ -1082,7 +1110,7 @@ export function JobKanbanPage() {
               {t('apply.cancel')}
             </Button>
             <Button color="warning" isLoading={isSubmittingOffer} onPress={handleSendOffer}>
-              {t('offer.send', 'Send Offer')}
+              {t('offer.send')}
             </Button>
           </ModalFooter>
         </ModalContent>
