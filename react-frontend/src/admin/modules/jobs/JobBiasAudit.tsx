@@ -21,6 +21,12 @@ import {
   Spinner,
   Input,
   Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
 } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Clock from 'lucide-react/icons/clock';
@@ -111,9 +117,12 @@ function JobBiasAudit() {
   }, [fetchReport]);
 
   const formatStage = (stage: string): string =>
-    stage
-      .replace(/_/g, ' ')
-      .replace(/\b\w/g, (c) => c.toUpperCase());
+    t(
+      `jobs.stage_${stage}`,
+      stage
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase())
+    );
 
   const maxFunnel = report
     ? Math.max(...Object.values(report.funnel), 1)
@@ -218,7 +227,7 @@ function JobBiasAudit() {
               value={
                 report.hiring_velocity_days !== null
                   ? `${report.hiring_velocity_days}d`
-                  : 'N/A'
+                  : t('jobs.bias_not_available', 'N/A')
               }
               icon={Clock}
               color="secondary"
@@ -285,22 +294,23 @@ function JobBiasAudit() {
               </CardHeader>
               <Divider />
               <CardBody>
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-default-500 border-b border-default-200">
-                      <th className="py-2 pr-4">{t('jobs.bias_stage', 'Stage')}</th>
-                      <th className="py-2 pr-4 text-right">{t('jobs.bias_rejected', 'Rejected')}</th>
-                      <th className="py-2 pr-4 text-right">{t('jobs.bias_total', 'Total')}</th>
-                      <th className="py-2 text-right">{t('jobs.bias_rate', 'Rate')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <Table
+                  aria-label={t('jobs.bias_rejection_rates_table', 'Rejection rates by stage')}
+                  removeWrapper
+                >
+                  <TableHeader>
+                    <TableColumn>{t('jobs.bias_stage', 'Stage')}</TableColumn>
+                    <TableColumn className="text-right">{t('jobs.bias_rejected', 'Rejected')}</TableColumn>
+                    <TableColumn className="text-right">{t('jobs.bias_total', 'Total')}</TableColumn>
+                    <TableColumn className="text-right">{t('jobs.bias_rate', 'Rate')}</TableColumn>
+                  </TableHeader>
+                  <TableBody emptyContent={t('jobs.bias_no_rejection_data', 'No rejection data available')}>
                     {Object.entries(report.rejection_rates).map(([stage, data]) => (
-                      <tr key={stage} className="border-b border-default-100">
-                        <td className="py-2 pr-4 font-medium">{formatStage(stage)}</td>
-                        <td className="py-2 pr-4 text-right">{data.rejected}</td>
-                        <td className="py-2 pr-4 text-right">{data.total}</td>
-                        <td className="py-2 text-right">
+                      <TableRow key={stage}>
+                        <TableCell className="font-medium">{formatStage(stage)}</TableCell>
+                        <TableCell className="text-right">{data.rejected}</TableCell>
+                        <TableCell className="text-right">{data.total}</TableCell>
+                        <TableCell className="text-right">
                           <Chip
                             size="sm"
                             variant="flat"
@@ -308,18 +318,11 @@ function JobBiasAudit() {
                           >
                             {data.rate.toFixed(1)}%
                           </Chip>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                    {Object.keys(report.rejection_rates).length === 0 && (
-                      <tr>
-                        <td colSpan={4} className="py-4 text-center text-default-400">
-                          {t('jobs.bias_no_rejection_data', 'No rejection data available')}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </CardBody>
             </Card>
 
@@ -333,18 +336,19 @@ function JobBiasAudit() {
               </CardHeader>
               <Divider />
               <CardBody>
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-default-500 border-b border-default-200">
-                      <th className="py-2 pr-4">{t('jobs.bias_stage', 'Stage')}</th>
-                      <th className="py-2 text-right">{t('jobs.bias_days', 'Days')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <Table
+                  aria-label={t('jobs.bias_avg_time_stage_table', 'Average time in stage')}
+                  removeWrapper
+                >
+                  <TableHeader>
+                    <TableColumn>{t('jobs.bias_stage', 'Stage')}</TableColumn>
+                    <TableColumn className="text-right">{t('jobs.bias_days', 'Days')}</TableColumn>
+                  </TableHeader>
+                  <TableBody emptyContent={t('jobs.bias_no_time_data', 'No time data available')}>
                     {Object.entries(report.avg_time_in_stage).map(([stage, days]) => (
-                      <tr key={stage} className="border-b border-default-100">
-                        <td className="py-2 pr-4 font-medium">{formatStage(stage)}</td>
-                        <td className="py-2 text-right">
+                      <TableRow key={stage}>
+                        <TableCell className="font-medium">{formatStage(stage)}</TableCell>
+                        <TableCell className="text-right">
                           <Chip
                             size="sm"
                             variant="flat"
@@ -352,18 +356,11 @@ function JobBiasAudit() {
                           >
                             {days.toFixed(1)}
                           </Chip>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                    {Object.keys(report.avg_time_in_stage).length === 0 && (
-                      <tr>
-                        <td colSpan={2} className="py-4 text-center text-default-400">
-                          {t('jobs.bias_no_time_data', 'No time data available')}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </CardBody>
             </Card>
           </div>
