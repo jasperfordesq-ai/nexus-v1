@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 // Define rate limit constant globally for cron/test access
 if (!defined('NEWSLETTER_EMAIL_DELAY_MICROSECONDS')) {
@@ -253,9 +254,13 @@ class NewsletterService
         //         threshold (MAX_SEND_ATTEMPTS).
         // Step 2: SELECT only 'processing' items (ours) — safe from races.
         do {
+            $batchId = (string) Str::uuid();
+
             $claimed = DB::update(
                 "UPDATE newsletter_queue
                  SET status = 'processing',
+                     processing_batch_id = ?,
+                     processing_started_at = NOW(),
                      last_attempted_at = NOW()
                  WHERE newsletter_id = ?
                    AND tenant_id = ?
@@ -273,7 +278,7 @@ class NewsletterService
                         )
                    )
                  ORDER BY id ASC LIMIT ?",
-                [$newsletterId, $tenantId, self::MAX_SEND_ATTEMPTS, $batchSize]
+                [$batchId, $newsletterId, $tenantId, self::MAX_SEND_ATTEMPTS, $batchSize]
             );
 
             if ($claimed === 0) {
@@ -287,6 +292,7 @@ class NewsletterService
                 ->where('nq.newsletter_id', $newsletterId)
                 ->where('nq.tenant_id', $tenantId)
                 ->where('nq.status', 'processing')
+                ->where('nq.processing_batch_id', $batchId)
                 ->limit($batchSize)
                 ->select('nq.*', 'u.preferred_language as subscriber_locale')
                 ->get();
@@ -340,10 +346,14 @@ class NewsletterService
                         DB::table('newsletter_queue')
                             ->where('id', $item->id)
                             ->where('tenant_id', $tenantId)
+                            ->where('processing_batch_id', $batchId)
                             ->update([
                                 'status' => 'sent',
                                 'sent_at' => now(),
                                 'last_attempted_at' => now(),
+                                'processing_batch_id' => null,
+                                'processing_started_at' => null,
+                                'error_message' => null,
                             ]);
                         // Bump attempts counter via raw statement so column stays accurate
                         DB::statement(
@@ -352,13 +362,13 @@ class NewsletterService
                         );
                         $sent++;
                     } else {
-                        self::markAttemptFailed((int) $item->id, $tenantId, 'Email send failed');
+                        self::markAttemptFailed((int) $item->id, $tenantId, 'Email send failed', $batchId);
                         $failed++;
                     }
 
                     usleep(self::EMAIL_DELAY_MICROSECONDS);
                 } catch (\Exception $e) {
-                    self::markAttemptFailed((int) $item->id, $tenantId, $e->getMessage());
+                    self::markAttemptFailed((int) $item->id, $tenantId, $e->getMessage(), $batchId);
                     $failed++;
                     Log::error("Newsletter send error for {$item->email}: " . $e->getMessage());
                 }
@@ -412,16 +422,24 @@ class NewsletterService
      * `attempts >= MAX_SEND_ATTEMPTS`, at which point processQueue() stops
      * re-claiming them (permanent failure).
      */
-    private static function markAttemptFailed(int $queueId, int $tenantId, string $error): void
+    private static function markAttemptFailed(int $queueId, int $tenantId, string $error, ?string $batchId = null): void
     {
+        $batchWhere = $batchId !== null ? ' AND processing_batch_id = ?' : '';
+        $params = [mb_substr($error, 0, 2000), $queueId, $tenantId];
+        if ($batchId !== null) {
+            $params[] = $batchId;
+        }
+
         DB::statement(
             "UPDATE newsletter_queue
              SET status = 'failed',
                  attempts = attempts + 1,
                  last_attempted_at = NOW(),
+                 processing_batch_id = NULL,
+                 processing_started_at = NULL,
                  error_message = ?
-             WHERE id = ? AND tenant_id = ?",
-            [mb_substr($error, 0, 2000), $queueId, $tenantId]
+             WHERE id = ? AND tenant_id = ?{$batchWhere}",
+            $params
         );
     }
 
@@ -434,6 +452,8 @@ class NewsletterService
                 'status' => 'failed',
                 'attempts' => self::MAX_SEND_ATTEMPTS,
                 'last_attempted_at' => now(),
+                'processing_batch_id' => null,
+                'processing_started_at' => null,
                 'error_message' => 'Recipient is suppressed',
             ]);
     }

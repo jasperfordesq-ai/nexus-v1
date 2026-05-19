@@ -265,4 +265,21 @@ class NewsletterServiceTest extends TestCase
         $this->assertSame(1, $method->invoke(null, $newsletterId, [$recipient]));
         $this->assertSame(2, DB::table('newsletter_queue')->where('newsletter_id', $newsletterId)->count());
     }
+
+    public function test_process_queue_claims_newsletter_rows_by_batch_before_sending(): void
+    {
+        $source = file_get_contents(app_path('Services/NewsletterService.php'));
+        $migration = file_get_contents(database_path('migrations/2026_05_19_072000_add_batch_columns_to_newsletter_queue.php'));
+
+        $this->assertStringContainsString('$batchId = (string) Str::uuid();', $source);
+        $this->assertStringContainsString('processing_batch_id = ?', $source);
+        $this->assertStringContainsString("->where('nq.processing_batch_id', \$batchId)", $source);
+        $this->assertStringContainsString("->where('processing_batch_id', \$batchId)", $source);
+        $this->assertStringContainsString('processing_started_at', $source);
+        $this->assertStringContainsString('markAttemptFailed((int) $item->id, $tenantId, $e->getMessage(), $batchId)', $source);
+
+        $this->assertStringContainsString('processing_batch_id', $migration);
+        $this->assertStringContainsString('processing_started_at', $migration);
+        $this->assertStringContainsString('idx_newsletter_queue_processing_batch', $migration);
+    }
 }

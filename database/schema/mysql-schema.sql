@@ -8607,6 +8607,8 @@ CREATE TABLE `newsletter_queue` (
   `first_name` varchar(100) NOT NULL DEFAULT '',
   `last_name` varchar(100) NOT NULL DEFAULT '',
   `status` enum('pending','processing','sent','failed','suppressed') NOT NULL DEFAULT 'pending',
+  `processing_batch_id` char(36) DEFAULT NULL,
+  `processing_started_at` timestamp NULL DEFAULT NULL,
   `error_message` text DEFAULT NULL,
   `attempts` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `last_attempted_at` timestamp NULL DEFAULT NULL,
@@ -8630,6 +8632,7 @@ CREATE TABLE `newsletter_queue` (
   KEY `idx_newsletter_queue_sent_at` (`sent_at`),
   KEY `idx_newsletter_queue_retry` (`newsletter_id`,`status`,`last_attempted_at`),
   KEY `idx_newsletter_queue_tenant` (`tenant_id`),
+  KEY `idx_newsletter_queue_processing_batch` (`newsletter_id`,`tenant_id`,`status`,`processing_batch_id`),
   CONSTRAINT `newsletter_queue_ibfk_1` FOREIGN KEY (`newsletter_id`) REFERENCES `newsletters` (`id`) ON DELETE CASCADE,
   CONSTRAINT `newsletter_queue_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=1160 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -13658,7 +13661,8 @@ INSERT INTO `laravel_migrations` VALUES
 (235,'2026_05_17_120000_create_email_log_and_suppression_tables',104),
 (236,'2026_05_17_130000_backfill_newsletter_templates_for_all_tenants',104),
 (237,'2026_05_17_140000_drop_dead_email_preferences_column',104),
-(238,'2026_05_19_071000_add_batch_retry_columns_to_notification_queue',105);
+(238,'2026_05_19_071000_add_batch_retry_columns_to_notification_queue',105),
+(239,'2026_05_19_072000_add_batch_columns_to_newsletter_queue',105);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
