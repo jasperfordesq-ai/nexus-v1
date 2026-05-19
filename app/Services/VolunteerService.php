@@ -197,7 +197,9 @@ class VolunteerService
         $fresh = $opportunity->fresh(['creator', 'organization', 'category']);
 
         try {
-            VolunteerOpportunityCreated::dispatch($fresh ?? $opportunity, (int) TenantContext::getId());
+            TenantContext::runForTenant($tenantId, function () use ($fresh, $opportunity, $tenantId): void {
+                VolunteerOpportunityCreated::dispatch($fresh ?? $opportunity, (int) $tenantId);
+            });
         } catch (\Throwable $e) {
             Log::warning('Failed to dispatch VolunteerOpportunityCreated', [
                 'opportunity_id' => $opportunity->id ?? null,
@@ -732,7 +734,9 @@ class VolunteerService
             try {
                 $updated = VolOpportunity::query()->find($id);
                 if ($updated) {
-                    VolunteerOpportunityUpdated::dispatch($updated, (int) $tenantId);
+                    TenantContext::runForTenant($tenantId, function () use ($updated, $tenantId): void {
+                        VolunteerOpportunityUpdated::dispatch($updated, (int) $tenantId);
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('Failed to dispatch VolunteerOpportunityUpdated', [

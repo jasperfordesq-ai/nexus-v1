@@ -24,74 +24,74 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
     public function handle(VolunteerOpportunityCreated $event): void
     {
         try {
-            TenantContext::setById($event->tenantId);
+            TenantContext::runForTenant((int) $event->tenantId, function () use ($event): void {
+                $opportunity = $event->opportunity;
+                $tenantName  = TenantContext::get()['name'] ?? __('emails.common.platform_name');
+                $baseUrl     = TenantContext::getFrontendUrl();
+                $basePath    = TenantContext::getSlugPrefix();
+                $oppPath     = '/volunteering/opportunities/' . $opportunity->id;
+                $oppUrl      = $baseUrl . $basePath . $oppPath;
 
-            $opportunity = $event->opportunity;
-            $tenantName  = TenantContext::get()['name'] ?? __('emails.common.platform_name');
-            $baseUrl     = TenantContext::getFrontendUrl();
-            $basePath    = TenantContext::getSlugPrefix();
-            $oppPath     = '/volunteering/opportunities/' . $opportunity->id;
-            $oppUrl      = $baseUrl . $basePath . $oppPath;
+                $oppTitle = $opportunity->title ?? __('emails_misc.admin_notify.new_vol_opp_fallback_title');
 
-            $oppTitle = $opportunity->title ?? __('emails_misc.admin_notify.new_vol_opp_fallback_title');
-
-            // Load the poster's name
-            $posterName = __('emails.common.fallback_member_name');
-            if (!empty($opportunity->user_id)) {
-                $poster = DB::table('users')
-                    ->where('id', $opportunity->user_id)
-                    ->where('tenant_id', $event->tenantId)
-                    ->select(['first_name', 'last_name', 'name'])
-                    ->first();
-                if ($poster) {
-                    $posterName = trim(($poster->first_name ?? '') . ' ' . ($poster->last_name ?? ''))
-                        ?: ($poster->name ?? __('emails.common.fallback_member_name'));
-                }
-            }
-
-            $admins = DB::table('users')
-                ->where('tenant_id', $event->tenantId)
-                ->whereIn('role', ['super_admin', 'admin', 'tenant_admin', 'broker', 'coordinator'])
-                ->where('status', 'active')
-                ->select(['id', 'email', 'first_name', 'name', 'preferred_language'])
-                ->get();
-
-            if ($admins->isEmpty()) {
-                return;
-            }
-
-            foreach ($admins as $admin) {
-                $adminEmail = $admin->email ?? null;
-                if (!$adminEmail) {
-                    continue;
-                }
-
-                LocaleContext::withLocale($admin, function () use ($admin, $opportunity, $oppTitle, $oppUrl, $oppPath, $posterName, $tenantName, $adminEmail, $event) {
-                    $adminName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
-
-                    $bellContent = __('emails_misc.admin_notify.new_vol_opp_bell', ['title' => $oppTitle]);
-                    Notification::createNotification((int) $admin->id, $bellContent, $oppPath, 'new_vol_opp_created');
-
-                    $subject = __('emails_misc.admin_notify.new_vol_opp_subject', ['community' => $tenantName]);
-
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('info')
-                        ->title(__('emails_misc.admin_notify.new_vol_opp_title'))
-                        ->previewText(__('emails_misc.admin_notify.new_vol_opp_preview', ['community' => $tenantName]))
-                        ->greeting($adminName)
-                        ->paragraph(__('emails_misc.admin_notify.new_vol_opp_body', ['community' => htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8')]))
-                        ->highlight(htmlspecialchars($oppTitle, ENT_QUOTES, 'UTF-8'))
-                        ->bulletList([
-                            __('emails_misc.admin_notify.new_vol_opp_by_label') . ': ' . htmlspecialchars($posterName, ENT_QUOTES, 'UTF-8'),
-                        ])
-                        ->button(__('emails_misc.admin_notify.new_vol_opp_cta'), $oppUrl)
-                        ->render();
-
-                    if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_volunteer_opportunity', ['tenant_id' => $event->tenantId])) {
-                        Log::warning('NotifyAdminOfNewVolunteerOpportunity: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
+                // Load the poster's name
+                $posterName = __('emails.common.fallback_member_name');
+                if (!empty($opportunity->user_id)) {
+                    $poster = DB::table('users')
+                        ->where('id', $opportunity->user_id)
+                        ->where('tenant_id', $event->tenantId)
+                        ->select(['first_name', 'last_name', 'name'])
+                        ->first();
+                    if ($poster) {
+                        $posterName = trim(($poster->first_name ?? '') . ' ' . ($poster->last_name ?? ''))
+                            ?: ($poster->name ?? __('emails.common.fallback_member_name'));
                     }
-                });
-            }
+                }
+
+                $admins = DB::table('users')
+                    ->where('tenant_id', $event->tenantId)
+                    ->whereIn('role', ['super_admin', 'admin', 'tenant_admin', 'broker', 'coordinator'])
+                    ->where('status', 'active')
+                    ->select(['id', 'email', 'first_name', 'name', 'preferred_language'])
+                    ->get();
+
+                if ($admins->isEmpty()) {
+                    return;
+                }
+
+                foreach ($admins as $admin) {
+                    $adminEmail = $admin->email ?? null;
+                    if (!$adminEmail) {
+                        continue;
+                    }
+
+                    LocaleContext::withLocale($admin, function () use ($admin, $opportunity, $oppTitle, $oppUrl, $oppPath, $posterName, $tenantName, $adminEmail, $event) {
+                        $adminName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
+
+                        $bellContent = __('emails_misc.admin_notify.new_vol_opp_bell', ['title' => $oppTitle]);
+                        Notification::createNotification((int) $admin->id, $bellContent, $oppPath, 'new_vol_opp_created');
+
+                        $subject = __('emails_misc.admin_notify.new_vol_opp_subject', ['community' => $tenantName]);
+
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('info')
+                            ->title(__('emails_misc.admin_notify.new_vol_opp_title'))
+                            ->previewText(__('emails_misc.admin_notify.new_vol_opp_preview', ['community' => $tenantName]))
+                            ->greeting($adminName)
+                            ->paragraph(__('emails_misc.admin_notify.new_vol_opp_body', ['community' => htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8')]))
+                            ->highlight(htmlspecialchars($oppTitle, ENT_QUOTES, 'UTF-8'))
+                            ->bulletList([
+                                __('emails_misc.admin_notify.new_vol_opp_by_label') . ': ' . htmlspecialchars($posterName, ENT_QUOTES, 'UTF-8'),
+                            ])
+                            ->button(__('emails_misc.admin_notify.new_vol_opp_cta'), $oppUrl)
+                            ->render();
+
+                        if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_volunteer_opportunity', ['tenant_id' => $event->tenantId])) {
+                            Log::warning('NotifyAdminOfNewVolunteerOpportunity: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
+                        }
+                    });
+                }
+            });
         } catch (\Throwable $e) {
             Log::error('NotifyAdminOfNewVolunteerOpportunity listener failed', [
                 'opportunity_id' => $event->opportunity->id ?? null,
@@ -99,8 +99,6 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
                 'error'          => $e->getMessage(),
                 'trace'          => $e->getTraceAsString(),
             ]);
-        } finally {
-            TenantContext::reset(); // Prevent context leaking to next queued job
         }
     }
 }

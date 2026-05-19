@@ -38,6 +38,8 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
         $opportunity = $event->opportunity;
         $tenantId    = $event->tenantId;
 
+        $previousTenantId = TenantContext::currentId();
+
         try {
             TenantContext::setById($tenantId);
 
@@ -115,7 +117,11 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
                 'error'          => $e->getMessage(),
             ]);
         } finally {
-            TenantContext::reset();
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
     }
 }
