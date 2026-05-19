@@ -41,6 +41,69 @@ class EventReminderService
     {
     }
 
+    public static function claimReminderDelivery(int $tenantId, int $eventId, int $userId, string $reminderType): bool
+    {
+        try {
+            $inserted = DB::table('event_reminder_delivery_claims')->insertOrIgnore([
+                'tenant_id' => $tenantId,
+                'event_id' => $eventId,
+                'user_id' => $userId,
+                'reminder_type' => $reminderType,
+                'status' => 'claimed',
+                'claimed_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return (int) $inserted > 0;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('[EventReminderService] reminder delivery claim failed', [
+                'tenant_id' => $tenantId,
+                'event_id' => $eventId,
+                'user_id' => $userId,
+                'reminder_type' => $reminderType,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
+    }
+
+    public static function releaseReminderDeliveryClaim(int $tenantId, int $eventId, int $userId, string $reminderType): void
+    {
+        DB::table('event_reminder_delivery_claims')
+            ->where('tenant_id', $tenantId)
+            ->where('event_id', $eventId)
+            ->where('user_id', $userId)
+            ->where('reminder_type', $reminderType)
+            ->whereNull('delivered_at')
+            ->delete();
+    }
+
+    public static function markReminderDeliverySent(int $tenantId, int $eventId, int $userId, string $reminderType): bool
+    {
+        $inserted = DB::table('event_reminder_sent')->insertOrIgnore([
+            'tenant_id' => $tenantId,
+            'event_id' => $eventId,
+            'user_id' => $userId,
+            'reminder_type' => $reminderType,
+            'sent_at' => now(),
+        ]);
+
+        DB::table('event_reminder_delivery_claims')
+            ->where('tenant_id', $tenantId)
+            ->where('event_id', $eventId)
+            ->where('user_id', $userId)
+            ->where('reminder_type', $reminderType)
+            ->update([
+                'status' => 'delivered',
+                'delivered_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        return (int) $inserted > 0;
+    }
+
     /**
      * Schedule a reminder for an event.
      */
@@ -143,9 +206,14 @@ class EventReminderService
                 $userId = (int) $attendee->user_id;
 
                 try {
+                    if (!self::claimReminderDelivery($tenantId, $eventId, $userId, $reminderType)) {
+                        continue;
+                    }
+
+                    $emailAccepted = false;
                     // Render notification + email in the RECIPIENT's language — cron
                     // workers default to config('app.locale') = 'en' otherwise.
-                    LocaleContext::withLocale($attendee, function () use ($tenantId, $eventId, $reminderType, $event, $attendee, $userId, &$sent) {
+                    LocaleContext::withLocale($attendee, function () use ($tenantId, $eventId, $reminderType, $event, $attendee, $userId, &$sent, &$emailAccepted) {
                         $title = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
                         $when = date('l, M j \\a\\t g:i A', strtotime($event->start_time));
 
@@ -196,8 +264,12 @@ class EventReminderService
                         }
 
                         if (!$emailOk) {
+                            self::releaseReminderDeliveryClaim($tenantId, $eventId, $userId, $reminderType);
                             return;
                         }
+
+                        $emailAccepted = true;
+                        $markedSent = self::markReminderDeliverySent($tenantId, $eventId, $userId, $reminderType);
 
                         // Create in-app notification after email acceptance so
                         // retrying a transient mail failure cannot duplicate bells.
@@ -206,15 +278,14 @@ class EventReminderService
                             [$userId, $tenantId, $message, $link]
                         );
 
-                        // Mark reminder as sent
-                        DB::statement(
-                            "INSERT IGNORE INTO event_reminder_sent (tenant_id, event_id, user_id, reminder_type, sent_at) VALUES (?, ?, ?, ?, NOW())",
-                            [$tenantId, $eventId, $userId, $reminderType]
-                        );
-
-                        $sent++;
+                        if ($markedSent) {
+                            $sent++;
+                        }
                     });
                 } catch (\Exception $e) {
+                    if (empty($emailAccepted)) {
+                        self::releaseReminderDeliveryClaim($tenantId, $eventId, $userId, $reminderType);
+                    }
                     \Illuminate\Support\Facades\Log::warning("[EventReminderService] Failed: event={$eventId}, user={$userId}: " . $e->getMessage());
                     $errors++;
                 }

@@ -164,10 +164,16 @@ class EventNotificationService
                     $userId = (int) $attendee->user_id;
 
                     try {
+                        if (!EventReminderService::claimReminderDelivery($tenantId, $eventId, $userId, $type)) {
+                            continue;
+                        }
+
+                        $emailAccepted = false;
+
                         // Wrap the bell + email render under the recipient's locale so
                         // the stored bell text AND email subject/body both render in
                         // THEIR preferred_language, not the caller's.
-                        LocaleContext::withLocale($attendee, function () use ($attendee, $event, $type, $userId, $tenantId, $eventId, &$sent) {
+                        LocaleContext::withLocale($attendee, function () use ($attendee, $event, $type, $userId, $tenantId, $eventId, &$sent, &$emailAccepted) {
                             $message = $this->buildReminderMessage($event, $type);
 
                             // Send reminder email
@@ -187,10 +193,14 @@ class EventNotificationService
                                 );
 
                                 if ($emailOk) {
+                                    $emailAccepted = true;
+                                    $markedSent = EventReminderService::markReminderDeliverySent($tenantId, $eventId, $userId, $type);
                                     $this->createReminderNotification($tenantId, $userId, $event, $message);
-                                    $this->markReminderSent($tenantId, $eventId, $userId, $type);
-                                    $sent++;
+                                    if ($markedSent) {
+                                        $sent++;
+                                    }
                                 } else {
+                                    EventReminderService::releaseReminderDeliveryClaim($tenantId, $eventId, $userId, $type);
                                     Log::warning("[EventNotificationService] Reminder email returned false; reminder not marked sent", [
                                         'event_id' => $eventId,
                                         'user_id' => $userId,
@@ -198,10 +208,16 @@ class EventNotificationService
                                     ]);
                                 }
                             } catch (\Throwable $e) {
+                                if (!$emailAccepted) {
+                                    EventReminderService::releaseReminderDeliveryClaim($tenantId, $eventId, $userId, $type);
+                                }
                                 Log::warning("[EventNotificationService] Reminder email failed for user {$userId}: " . $e->getMessage());
                             }
                         });
                     } catch (\Throwable $e) {
+                        if (empty($emailAccepted)) {
+                            EventReminderService::releaseReminderDeliveryClaim($tenantId, $eventId, $userId, $type);
+                        }
                         Log::error("[EventNotificationService] Reminder failed: event={$eventId}, user={$userId}, type={$type}: " . $e->getMessage());
                     }
                 }
@@ -846,21 +862,6 @@ class EventNotificationService
             'type' => 'event_reminder',
             'created_at' => now(),
         ]);
-    }
-
-    /**
-     * Record that a reminder was sent for idempotency.
-     */
-    private function markReminderSent(int $tenantId, int $eventId, int $userId, string $reminderType): void
-    {
-        try {
-            DB::statement(
-                "INSERT IGNORE INTO event_reminder_sent (tenant_id, event_id, user_id, reminder_type, sent_at) VALUES (?, ?, ?, ?, NOW())",
-                [$tenantId, $eventId, $userId, $reminderType]
-            );
-        } catch (\Throwable $e) {
-            Log::error("[EventNotificationService] markReminderSent error: " . $e->getMessage());
-        }
     }
 
     // =========================================================================
