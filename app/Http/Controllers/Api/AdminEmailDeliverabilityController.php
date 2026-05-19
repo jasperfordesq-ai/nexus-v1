@@ -145,6 +145,142 @@ class AdminEmailDeliverabilityController extends BaseApiController
     }
 
     /**
+     * GET /api/v2/admin/email-deliverability/queues
+     *
+     * Read-only diagnostics for rows that can explain why an expected email
+     * has not left the platform yet: stale pending/processing rows, failures,
+     * and suppressions in both notification and newsletter queues.
+     */
+    public function queues(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $limit = max(1, min((int) ($this->input('limit', 50) ?: 50), 100));
+        $status = trim((string) $this->input('status', ''));
+        $source = trim((string) $this->input('source', ''));
+        $statuses = ['pending', 'processing', 'failed', 'suppressed'];
+        if ($status !== '' && in_array($status, $statuses, true)) {
+            $statuses = [$status];
+        }
+
+        $notificationRows = collect();
+        if ($source === '' || $source === 'notification_queue') {
+            $notificationRows = DB::table('notification_queue as nq')
+                ->leftJoin('users as u', function ($join) {
+                    $join->on('u.id', '=', 'nq.user_id')
+                        ->on('u.tenant_id', '=', 'nq.tenant_id');
+                })
+                ->where('nq.tenant_id', $tenantId)
+                ->whereIn('nq.status', $statuses)
+                ->where(function ($q) {
+                    $q->whereIn('nq.status', ['failed', 'suppressed'])
+                        ->orWhere(function ($stale) {
+                            $stale->where('nq.status', 'processing')
+                                ->whereRaw('COALESCE(nq.processing_started_at, nq.last_attempted_at, nq.created_at) < ?', [now()->subMinutes(15)]);
+                        })
+                        ->orWhere(function ($stale) {
+                            $stale->where('nq.status', 'pending')
+                                ->where('nq.created_at', '<', now()->subMinutes(15));
+                        });
+                })
+                ->orderByDesc('nq.id')
+                ->limit($limit)
+                ->get([
+                    'nq.id',
+                    'nq.tenant_id',
+                    'nq.user_id',
+                    'u.email',
+                    'nq.activity_type as category',
+                    'nq.content_snippet as subject',
+                    'nq.status',
+                    'nq.frequency',
+                    'nq.attempts',
+                    'nq.last_attempted_at',
+                    'nq.last_error as error',
+                    'nq.processing_batch_id',
+                    'nq.processing_started_at',
+                    'nq.sent_at',
+                    'nq.created_at',
+                ])
+                ->map(fn ($row) => $this->queueRow('notification_queue', $row));
+        }
+
+        $newsletterRows = collect();
+        if ($source === '' || $source === 'newsletter_queue') {
+            $newsletterRows = DB::table('newsletter_queue as nq')
+                ->join('newsletters as n', 'n.id', '=', 'nq.newsletter_id')
+                ->whereRaw('COALESCE(nq.tenant_id, n.tenant_id) = ?', [$tenantId])
+                ->whereIn('nq.status', $statuses)
+                ->where(function ($q) {
+                    $q->whereIn('nq.status', ['failed', 'suppressed'])
+                        ->orWhere(function ($stale) {
+                            $stale->where('nq.status', 'processing')
+                                ->whereRaw('COALESCE(nq.processing_started_at, nq.last_attempted_at, nq.created_at) < ?', [now()->subMinutes(15)]);
+                        })
+                        ->orWhere(function ($stale) {
+                            $stale->where('nq.status', 'pending')
+                                ->where('nq.created_at', '<', now()->subMinutes(15));
+                        });
+                })
+                ->orderByDesc('nq.id')
+                ->limit($limit)
+                ->get([
+                    'nq.id',
+                    DB::raw('COALESCE(nq.tenant_id, n.tenant_id) as tenant_id'),
+                    'nq.user_id',
+                    'nq.email',
+                    DB::raw("'newsletter' as category"),
+                    'n.subject',
+                    'nq.status',
+                    DB::raw('NULL as frequency'),
+                    'nq.attempts',
+                    'nq.last_attempted_at',
+                    'nq.error_message as error',
+                    'nq.processing_batch_id',
+                    'nq.processing_started_at',
+                    'nq.sent_at',
+                    'nq.created_at',
+                ])
+                ->map(fn ($row) => $this->queueRow('newsletter_queue', $row));
+        }
+
+        return $this->respondWithData([
+            'rows' => $notificationRows->merge($newsletterRows)->sortByDesc('created_at')->values()->take($limit),
+            'limit' => $limit,
+            'filters' => [
+                'source' => $source !== '' ? $source : null,
+                'status' => $status !== '' ? $status : null,
+            ],
+        ]);
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private function queueRow(string $source, object $row): array
+    {
+        return [
+            'source' => $source,
+            'id' => (int) $row->id,
+            'tenant_id' => (int) $row->tenant_id,
+            'user_id' => isset($row->user_id) ? (int) $row->user_id : null,
+            'email' => $row->email ?? null,
+            'category' => $row->category ?? null,
+            'subject' => $row->subject ?? null,
+            'status' => (string) $row->status,
+            'frequency' => $row->frequency ?? null,
+            'attempts' => (int) ($row->attempts ?? 0),
+            'last_attempted_at' => $row->last_attempted_at ?? null,
+            'error' => $row->error ?? null,
+            'processing_batch_id' => $row->processing_batch_id ?? null,
+            'processing_started_at' => $row->processing_started_at ?? null,
+            'sent_at' => $row->sent_at ?? null,
+            'created_at' => $row->created_at ?? null,
+        ];
+    }
+
+    /**
      * GET /api/v2/admin/email-deliverability/suppressions
      *
      * Returns the current suppression cache (filtered by reason / email).

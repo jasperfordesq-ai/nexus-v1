@@ -100,6 +100,21 @@ interface SuppressionRow {
   suppressed_at: string;
 }
 
+interface QueueDiagnosticRow {
+  source: 'notification_queue' | 'newsletter_queue';
+  id: number;
+  email: string | null;
+  category: string | null;
+  subject: string | null;
+  status: string;
+  frequency: string | null;
+  attempts: number;
+  last_attempted_at: string | null;
+  error: string | null;
+  processing_started_at: string | null;
+  created_at: string | null;
+}
+
 const STATUS_COLORS: Record<string, 'default' | 'success' | 'warning' | 'danger' | 'primary'> = {
   queued: 'default',
   sent: 'primary',
@@ -146,6 +161,9 @@ export default function EmailDeliverability() {
   const [suppSearch, setSuppSearch] = useState('');
   const [suppReason, setSuppReason] = useState('');
   const [loadingSupp, setLoadingSupp] = useState(false);
+
+  const [queueRows, setQueueRows] = useState<QueueDiagnosticRow[]>([]);
+  const [loadingQueues, setLoadingQueues] = useState(false);
 
   const logOffset = (logPage - 1) * logLimit;
   const suppOffset = (suppPage - 1) * suppLimit;
@@ -204,9 +222,22 @@ export default function EmailDeliverability() {
     }
   }, [suppLimit, suppOffset, suppReason, suppSearch]);
 
+  const loadQueues = useCallback(async () => {
+    setLoadingQueues(true);
+    try {
+      const r = await api.get<{ rows: QueueDiagnosticRow[] }>('/v2/admin/email-deliverability/queues?limit=50');
+      if (r.success && r.data) {
+        setQueueRows(r.data.rows ?? []);
+      }
+    } finally {
+      setLoadingQueues(false);
+    }
+  }, []);
+
   useEffect(() => { loadSummary(); }, [loadSummary]);
   useEffect(() => { loadLogs(); }, [loadLogs]);
   useEffect(() => { loadSuppressions(); }, [loadSuppressions]);
+  useEffect(() => { loadQueues(); }, [loadQueues]);
 
   const removeSuppression = async (id: number, email: string) => {
     if (!window.confirm(t('email_deliverability.suppressions.confirm_remove', { email }))) return;
@@ -469,6 +500,58 @@ export default function EmailDeliverability() {
               ))}
             </TableBody>
           </Table>
+        </CardBody>
+      </Card>
+
+      <Card className="border border-[var(--color-border)]">
+        <CardHeader className="flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-theme-primary">{t('email_deliverability.queues.title')}</h2>
+            <p className="text-sm text-theme-secondary">{t('email_deliverability.queues.subtitle')}</p>
+          </div>
+          <Tooltip content={t('email_deliverability.actions.refresh')}>
+            <Button size="sm" variant="flat" onPress={loadQueues} isIconOnly aria-label={t('email_deliverability.actions.refresh')}>
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          </Tooltip>
+        </CardHeader>
+        <Divider />
+        <CardBody>
+          {loadingQueues ? <Spinner /> : (
+            <Table aria-label={t('email_deliverability.queues.table_label')} removeWrapper>
+              <TableHeader>
+                <TableColumn>{t('email_deliverability.queues.columns.source')}</TableColumn>
+                <TableColumn>{t('email_deliverability.queues.columns.recipient')}</TableColumn>
+                <TableColumn>{t('email_deliverability.queues.columns.category')}</TableColumn>
+                <TableColumn>{t('email_deliverability.queues.columns.status')}</TableColumn>
+                <TableColumn>{t('email_deliverability.queues.columns.attempts')}</TableColumn>
+                <TableColumn>{t('email_deliverability.queues.columns.last_attempt')}</TableColumn>
+                <TableColumn>{t('email_deliverability.queues.columns.error')}</TableColumn>
+              </TableHeader>
+              <TableBody emptyContent={t('email_deliverability.queues.empty')}>
+                {queueRows.map((row) => (
+                  <TableRow key={`${row.source}-${row.id}`}>
+                    <TableCell>
+                      <Chip size="sm" variant="flat">
+                        {t(`email_deliverability.queues.sources.${row.source}`)}
+                      </Chip>
+                    </TableCell>
+                    <TableCell className="font-mono text-xs">{row.email ?? '-'}</TableCell>
+                    <TableCell>
+                      <div className="max-w-xs">
+                        <div className="font-mono text-xs">{row.category ?? '-'}</div>
+                        <div className="truncate text-xs text-theme-secondary">{row.subject ?? ''}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{statusChip(row.status)}</TableCell>
+                    <TableCell className="text-xs">{row.attempts}</TableCell>
+                    <TableCell className="text-xs">{row.last_attempted_at ?? row.processing_started_at ?? row.created_at ?? '-'}</TableCell>
+                    <TableCell className="max-w-xs truncate text-xs text-[var(--color-error)]">{row.error ?? ''}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardBody>
       </Card>
 

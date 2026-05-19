@@ -2528,6 +2528,7 @@ Route::post('/v2/notifications/unsubscribe', [\App\Http\Controllers\Api\Notifica
 Route::get('/v2/admin/email-deliverability/summary',          [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'summary'])->middleware(['auth:sanctum', 'admin']);
 Route::get('/v2/admin/email-deliverability/trigger-audit',    [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'triggerAudit'])->middleware(['auth:sanctum', 'admin']);
 Route::get('/v2/admin/email-deliverability/logs',             [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'logs'])->middleware(['auth:sanctum', 'admin']);
+Route::get('/v2/admin/email-deliverability/queues',           [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'queues'])->middleware(['auth:sanctum', 'admin']);
 Route::get('/v2/admin/email-deliverability/suppressions',     [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'suppressions'])->middleware(['auth:sanctum', 'admin']);
 Route::delete('/v2/admin/email-deliverability/suppressions/{id}', [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'removeSuppression'])->middleware(['auth:sanctum', 'admin']);
 Route::get('/v2/admin/email-deliverability/user/{userId}',    [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'userHistory'])->middleware(['auth:sanctum', 'admin']);

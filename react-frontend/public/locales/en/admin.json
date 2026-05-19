@@ -10824,6 +10824,8 @@
       "bounced": "Bounced",
       "delivered": "Delivered",
       "failed": "Failed",
+      "pending": "Pending",
+      "processing": "Processing",
       "queued": "Queued",
       "sent": "Sent",
       "suppressed": "Suppressed"
@@ -10855,6 +10857,25 @@
         "params": "Evidence",
         "severity": "Severity",
         "tenant": "Tenant"
+      }
+    },
+    "queues": {
+      "title": "Queue Diagnostics",
+      "subtitle": "Failed, suppressed, or stale pending email queue rows for this tenant.",
+      "table_label": "Email queue diagnostics",
+      "empty": "No failed, suppressed, or stale email queue rows.",
+      "columns": {
+        "attempts": "Attempts",
+        "category": "Category",
+        "error": "Error",
+        "last_attempt": "Last attempt",
+        "recipient": "Recipient",
+        "source": "Source",
+        "status": "Status"
+      },
+      "sources": {
+        "newsletter_queue": "Newsletter",
+        "notification_queue": "Notification"
       }
     },
     "logs": {
