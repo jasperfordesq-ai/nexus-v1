@@ -288,4 +288,33 @@ class EmailTriggerAuditServiceTest extends TestCase
 
         $this->assertContains('billing_audit_event_without_email_log', $codes);
     }
+
+    public function test_run_detects_failed_marketplace_report_notifications(): void
+    {
+        if (!Schema::hasTable('marketplace_report_notifications')) {
+            $this->markTestSkipped('Marketplace report notification outbox table is not available.');
+        }
+
+        DB::table('marketplace_report_notifications')->insert([
+            'tenant_id' => 2,
+            'marketplace_report_id' => 987654,
+            'recipient_user_id' => 123456,
+            'event_type' => 'resolved',
+            'channel' => 'email',
+            'dedupe_key' => 'marketplace_report:987654:resolved',
+            'status' => 'failed',
+            'attempts' => 1,
+            'last_error' => 'simulated failure',
+            'last_attempted_at' => now()->subMinute(),
+            'next_retry_at' => now()->addMinutes(5),
+            'payload' => json_encode(['subject_key' => 'emails_misc.marketplace_report.resolved_subject']),
+            'created_at' => now()->subMinutes(2),
+            'updated_at' => now()->subMinute(),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('marketplace_report_notifications_failed_recently', $codes);
+    }
 }

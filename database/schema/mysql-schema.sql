@@ -7460,6 +7460,32 @@ CREATE TABLE `marketplace_reports` (
   CONSTRAINT `marketplace_reports_marketplace_listing_id_foreign` FOREIGN KEY (`marketplace_listing_id`) REFERENCES `marketplace_listings` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_report_notifications`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_report_notifications` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `marketplace_report_id` bigint(20) unsigned NOT NULL,
+  `recipient_user_id` bigint(20) unsigned NOT NULL,
+  `event_type` varchar(40) NOT NULL,
+  `channel` varchar(20) NOT NULL,
+  `dedupe_key` varchar(191) NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'pending',
+  `attempts` int(10) unsigned NOT NULL DEFAULT 0,
+  `last_error` text DEFAULT NULL,
+  `last_attempted_at` timestamp NULL DEFAULT NULL,
+  `sent_at` timestamp NULL DEFAULT NULL,
+  `next_retry_at` timestamp NULL DEFAULT NULL,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`payload`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `mrn_tenant_dedupe_channel_unique` (`tenant_id`,`dedupe_key`,`channel`),
+  KEY `mrn_tenant_status_retry_idx` (`tenant_id`,`status`,`next_retry_at`),
+  KEY `mrn_tenant_report_idx` (`tenant_id`,`marketplace_report_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `marketplace_saved_listings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;

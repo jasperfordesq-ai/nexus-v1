@@ -6,9 +6,12 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceReport;
 use App\Services\MarketplaceReportService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Mockery;
 use Tests\Laravel\TestCase;
 
@@ -18,10 +21,11 @@ use Tests\Laravel\TestCase;
  */
 class MarketplaceReportServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     public function test_createReport_throws_when_listing_not_found(): void
     {
-        $listingMock = Mockery::mock('alias:' . MarketplaceListing::class);
-        $listingMock->shouldReceive('find')->with(999)->andReturnNull();
+        TenantContext::setById($this->testTenantId);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Marketplace listing not found.');
@@ -34,24 +38,55 @@ class MarketplaceReportServiceTest extends TestCase
 
     public function test_createReport_throws_on_duplicate_active_report(): void
     {
-        $listingMock = Mockery::mock('alias:' . MarketplaceListing::class);
-        $listingMock->shouldReceive('find')->with(10)->andReturn(new \stdClass());
+        TenantContext::setById($this->testTenantId);
 
-        $existingReport = new \stdClass();
+        $sellerId = DB::table('users')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Marketplace Seller',
+            'email' => 'marketplace-seller@example.test',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
-        $builder = Mockery::mock();
-        $builder->shouldReceive('where')->andReturnSelf();
-        $builder->shouldReceive('whereNotIn')->andReturnSelf();
-        $builder->shouldReceive('first')->andReturn($existingReport);
+        $reporterId = DB::table('users')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Marketplace Reporter',
+            'email' => 'marketplace-reporter@example.test',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
-        $reportMock = Mockery::mock('alias:' . MarketplaceReport::class);
-        $reportMock->shouldReceive('where')->andReturn($builder);
+        $listingId = DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $sellerId,
+            'title' => 'Audit Listing',
+            'description' => 'Audit listing description',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('marketplace_reports')->insert([
+            'tenant_id' => $this->testTenantId,
+            'marketplace_listing_id' => $listingId,
+            'reporter_id' => $reporterId,
+            'reason' => 'other',
+            'description' => 'Existing active report',
+            'status' => 'received',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('You already have an active report for this listing.');
 
-        MarketplaceReportService::createReport(1, 10, [
-            'reason' => 'spam',
+        MarketplaceReportService::createReport($reporterId, $listingId, [
+            'reason' => 'other',
             'description' => 'test',
         ]);
     }

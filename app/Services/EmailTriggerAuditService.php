@@ -135,6 +135,7 @@ class EmailTriggerAuditService
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
                 $this->checkTenantProviderConfiguration($tenantId),
                 $this->checkBillingAndStripeHealth($tenantId, $since, $windowHours),
+                $this->checkMarketplaceReportNotificationHealth($tenantId, $since, $windowHours),
                 $this->checkDirectEmailSendSurface($tenantId),
                 $this->checkTenantlessDispatcherSendSurface($tenantId)
             );
@@ -918,6 +919,69 @@ class EmailTriggerAuditService
                 ->get();
 
             $issues = array_merge($issues, $this->rowsToIssues($withoutEmailLog, 'billing_audit_event_without_email_log', 'critical', 'billing', 'billing_notice', ['window_hours' => $windowHours]));
+        }
+
+        return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkMarketplaceReportNotificationHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (!$this->hasTables(['marketplace_report_notifications'])) {
+            return [];
+        }
+
+        $issues = [];
+
+        $pending = DB::table('marketplace_report_notifications')
+            ->select('tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('status', 'pending')
+            ->where('created_at', '<', now()->subMinutes(10))
+            ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId))
+            ->groupBy('tenant_id')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($pending, 'marketplace_report_notifications_stuck_pending', 'warning', 'marketplace', 'marketplace_report_notice', ['minutes' => 10]));
+
+        $processing = DB::table('marketplace_report_notifications')
+            ->select('tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('status', 'processing')
+            ->where('last_attempted_at', '<', now()->subMinutes(15))
+            ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId))
+            ->groupBy('tenant_id')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($processing, 'marketplace_report_notifications_stale_processing', 'critical', 'marketplace', 'marketplace_report_notice', ['minutes' => 15]));
+
+        $failed = DB::table('marketplace_report_notifications')
+            ->select('tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('status', 'failed')
+            ->where('updated_at', '>=', $since)
+            ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId))
+            ->groupBy('tenant_id')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($failed, 'marketplace_report_notifications_failed_recently', 'warning', 'marketplace', 'marketplace_report_notice', ['window_hours' => $windowHours]));
+
+        if ($this->hasTables(['email_log'])) {
+            $sentEmailWithoutLog = DB::table('marketplace_report_notifications as mrn')
+                ->select('mrn.tenant_id', DB::raw('COUNT(*) as count'))
+                ->where('mrn.channel', 'email')
+                ->where('mrn.status', 'sent')
+                ->where('mrn.sent_at', '>=', $since)
+                ->whereNotExists(function ($sub): void {
+                    $sub->select(DB::raw(1))
+                        ->from('email_log')
+                        ->whereColumn('email_log.tenant_id', 'mrn.tenant_id')
+                        ->whereColumn('email_log.user_id', 'mrn.recipient_user_id')
+                        ->whereColumn('email_log.created_at', '>=', 'mrn.created_at')
+                        ->where('email_log.category', 'marketplace_report')
+                        ->whereIn('email_log.status', ['sent', 'delivered', 'bounced']);
+                })
+                ->when($tenantId !== null, fn ($q) => $q->where('mrn.tenant_id', $tenantId))
+                ->groupBy('mrn.tenant_id')
+                ->get();
+
+            $issues = array_merge($issues, $this->rowsToIssues($sentEmailWithoutLog, 'marketplace_report_notification_sent_without_email_log', 'critical', 'marketplace', 'marketplace_report_notice', ['window_hours' => $windowHours]));
         }
 
         return $issues;
