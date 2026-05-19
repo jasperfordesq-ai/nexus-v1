@@ -9,6 +9,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button, Card, CardBody, CardHeader, Select, SelectItem, Chip,
 } from '@heroui/react';
@@ -21,7 +22,8 @@ import { PageHeader } from '../../components';
 import type { SendTimeData } from '../../api/types';
 
 export function NewsletterSendTimeOptimizer() {
-  usePageTitle("Newsletters");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('newsletters.page_title'));
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<SendTimeData | null>(null);
   const [days, setDays] = useState(30);
@@ -41,7 +43,15 @@ export function NewsletterSendTimeOptimizer() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dayNames = [
+    t('newsletter_send_time.day_sunday'),
+    t('newsletter_send_time.day_monday'),
+    t('newsletter_send_time.day_tuesday'),
+    t('newsletter_send_time.day_wednesday'),
+    t('newsletter_send_time.day_thursday'),
+    t('newsletter_send_time.day_friday'),
+    t('newsletter_send_time.day_saturday'),
+  ];
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
   // Build heatmap matrix
@@ -84,21 +94,21 @@ export function NewsletterSendTimeOptimizer() {
   return (
     <div>
       <PageHeader
-        title={"Send Time Optimiser"}
-        description={"Find the best time to send to maximise open rates"}
+        title={t('newsletter_send_time.title')}
+        description={t('newsletter_send_time.description')}
         actions={
           <div className="flex gap-2">
             <Select
-              label={"Time Period"}
+              label={t('newsletter_send_time.time_period')}
               selectedKeys={[String(days)]}
               onSelectionChange={(keys) => setDays(Number(Array.from(keys)[0]))}
               className="w-32"
               size="sm"
             >
-              <SelectItem key="7">{"Days 7"}</SelectItem>
-              <SelectItem key="30">{"Days 30"}</SelectItem>
-              <SelectItem key="60">{"Days 60"}</SelectItem>
-              <SelectItem key="90">{"Days 90"}</SelectItem>
+              <SelectItem key="7">{t('newsletter_send_time.days', { count: 7 })}</SelectItem>
+              <SelectItem key="30">{t('newsletter_send_time.days', { count: 30 })}</SelectItem>
+              <SelectItem key="60">{t('newsletter_send_time.days', { count: 60 })}</SelectItem>
+              <SelectItem key="90">{t('newsletter_send_time.days', { count: 90 })}</SelectItem>
             </Select>
             <Button
               variant="flat"
@@ -106,7 +116,7 @@ export function NewsletterSendTimeOptimizer() {
               onPress={loadData}
               isLoading={loading}
             >
-              Refresh
+              {t('newsletters.refresh')}
             </Button>
           </div>
         }
@@ -118,13 +128,16 @@ export function NewsletterSendTimeOptimizer() {
           <Card>
             <CardHeader className="flex gap-2 items-center">
               <TrendingUp size={20} className="text-success" />
-              <span>{"Top Recommended"}</span>
+              <span>{t('newsletter_send_time.top_recommended')}</span>
             </CardHeader>
             <CardBody>
               <div className="grid gap-3 md:grid-cols-3">
                 {data.recommendations.map((rec, idx) => (
-                  <Card key={idx} className="bg-success-50 dark:bg-success-50/10">
-                    <CardBody className="gap-2">
+                  <div
+                    key={idx}
+                    className="rounded-xl border border-success-200/70 bg-success-50/80 p-4 shadow-sm dark:border-success-400/20 dark:bg-success-50/10"
+                  >
+                    <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <Chip size="sm" color="success" variant="flat">
                           #{idx + 1}
@@ -133,10 +146,10 @@ export function NewsletterSendTimeOptimizer() {
                       </div>
                       <div className="flex items-baseline gap-2">
                         <span className="text-2xl font-bold text-success">{rec.score}</span>
-                        <span className="text-sm text-default-500">engagements</span>
+                        <span className="text-sm text-default-500">{t('newsletter_send_time.engagements')}</span>
                       </div>
-                    </CardBody>
-                  </Card>
+                    </div>
+                  </div>
                 ))}
               </div>
             </CardBody>
@@ -147,12 +160,12 @@ export function NewsletterSendTimeOptimizer() {
         <Card>
           <CardHeader className="flex gap-2 items-center">
             <Clock size={20} />
-            <span>{"Engagement Heatmap"}</span>
+            <span>{t('newsletter_send_time.engagement_heatmap')}</span>
           </CardHeader>
           <CardBody>
             {loading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="text-default-400">Loading heatmap...</div>
+                <div className="text-default-400">{t('newsletter_send_time.loading_heatmap')}</div>
               </div>
             ) : data && data.heatmap.length > 0 ? (
               <div className="overflow-x-auto">
@@ -178,7 +191,11 @@ export function NewsletterSendTimeOptimizer() {
                             <div
                               key={`${day}-${hour}`}
                               className={`aspect-square rounded ${getHeatColor(score)} cursor-pointer transition-transform hover:scale-110 flex items-center justify-center`}
-                              title={`${dayNames[day - 1]} ${formatHour(hour)}: ${score} engagements`}
+                              title={t('newsletter_send_time.heatmap_cell_title', {
+                                day: dayNames[day - 1],
+                                hour: formatHour(hour),
+                                count: score,
+                              })}
                             >
                               {score > 0 && (
                                 <span className="text-xs font-bold text-white drop-shadow">
@@ -194,7 +211,7 @@ export function NewsletterSendTimeOptimizer() {
 
                   {/* Legend */}
                   <div className="flex items-center gap-2 mt-6 justify-center">
-                    <span className="text-sm text-default-500">{"Low"}</span>
+                    <span className="text-sm text-default-500">{t('newsletter_send_time.low')}</span>
                     <div className="flex gap-1">
                       <div className="w-4 h-4 rounded bg-default-100 dark:bg-default-50"></div>
                       <div className="w-4 h-4 rounded bg-success-100"></div>
@@ -202,15 +219,15 @@ export function NewsletterSendTimeOptimizer() {
                       <div className="w-4 h-4 rounded bg-success-300"></div>
                       <div className="w-4 h-4 rounded bg-success-500"></div>
                     </div>
-                    <span className="text-sm text-default-500">{"High"}</span>
+                    <span className="text-sm text-default-500">{t('newsletter_send_time.high')}</span>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2 py-12 text-default-400">
                 <Clock size={40} />
-                <p>{data?.insights || 'Not enough engagement data yet.'}</p>
-                <p className="text-xs">Send a few newsletters to see engagement patterns.</p>
+                <p>{data?.insights || t('newsletter_send_time.not_enough_data')}</p>
+                <p className="text-xs">{t('newsletter_send_time.empty_hint')}</p>
               </div>
             )}
           </CardBody>

@@ -9,6 +9,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button, Card, CardBody, CardHeader, Tabs, Tab, Chip, Input,
   Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
@@ -30,7 +31,8 @@ import { PageHeader, ConfirmModal } from '../../components';
 import type { NewsletterBounce, SuppressionListEntry, BounceTrendsData, BounceReasonSummary } from '../../api/types';
 
 export function NewsletterBounces() {
-  usePageTitle("Newsletters");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('newsletters.page_title'));
   const toast = useToast();
   const [activeTab, setActiveTab] = useState('bounces');
   const [bounces, setBounces] = useState<NewsletterBounce[]>([]);
@@ -133,14 +135,14 @@ export function NewsletterBounces() {
     try {
       const res = await adminNewsletters.unsuppress(unsuppressTarget);
       if (res.success) {
-        toast.success(`Email Unsuppressed`);
+        toast.success(t('newsletter_bounces.email_unsuppressed'));
         setUnsuppressTarget(null);
         loadSuppressionList();
       } else {
-        toast.error("Failed to unsuppress email");
+        toast.error(t('newsletter_bounces.failed_to_unsuppress_email'));
       }
     } catch {
-      toast.error("Failed to unsuppress email");
+      toast.error(t('newsletter_bounces.failed_to_unsuppress_email'));
     }
     setProcessing(false);
   };
@@ -153,7 +155,13 @@ export function NewsletterBounces() {
 
   const exportBounces = () => {
     const csv = [
-      ['Email', 'Bounce Type', 'Reason', 'Campaign', 'Date'].join(','),
+      [
+        t('newsletter_activity.col_email'),
+        t('newsletter_bounces.bounce_type'),
+        t('newsletter_bounces.col_reason'),
+        t('newsletter_bounces.col_campaign'),
+        t('newsletter_bounces.col_date'),
+      ].join(','),
       ...bounces.map(b =>
         [b.email, b.bounce_type, b.bounce_reason || '', b.newsletter_subject || '', b.bounced_at]
           .map(escapeCsvField).join(',')
@@ -188,8 +196,8 @@ export function NewsletterBounces() {
   return (
     <div>
       <PageHeader
-        title={"Newsletter Bounces"}
-        description={"View and manage bounced emails and suppression lists"}
+        title={t('newsletter_bounces.title')}
+        description={t('newsletter_bounces.description')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -198,7 +206,7 @@ export function NewsletterBounces() {
               onPress={() => activeTab === 'bounces' ? loadBounces() : loadSuppressionList()}
               isLoading={loading}
             >
-              {"Refresh"}
+              {t('newsletters.refresh')}
             </Button>
             {activeTab === 'bounces' && (
               <Button
@@ -207,7 +215,7 @@ export function NewsletterBounces() {
                 onPress={exportBounces}
                 isDisabled={bounces.length === 0}
               >
-                {"Export CSV"}
+                {t('newsletters.export_csv')}
               </Button>
             )}
           </div>
@@ -218,7 +226,7 @@ export function NewsletterBounces() {
         <Card>
           <CardBody className="gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-default-500">{"Stat Total Bounces 7d"}</span>
+              <span className="text-sm text-default-500">{t('newsletter_bounces.stat_total_bounces_7d')}</span>
               <AlertTriangle size={20} className="text-warning" />
             </div>
             <p className="text-2xl font-bold">{totalBounces7d.toLocaleString()}</p>
@@ -228,7 +236,7 @@ export function NewsletterBounces() {
         <Card>
           <CardBody className="gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-default-500">{"Stat Hard Bounces"}</span>
+              <span className="text-sm text-default-500">{t('newsletter_bounces.stat_hard_bounces')}</span>
               <AlertTriangle size={20} className="text-danger" />
             </div>
             <p className="text-2xl font-bold">{hardBounces.toLocaleString()}</p>
@@ -238,7 +246,7 @@ export function NewsletterBounces() {
         <Card>
           <CardBody className="gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-default-500">{"Stat Suppressed Emails"}</span>
+              <span className="text-sm text-default-500">{t('newsletter_bounces.stat_suppressed_emails')}</span>
               <Trash2 size={20} className="text-default-400" />
             </div>
             <p className="text-2xl font-bold">{suppressedCount.toLocaleString()}</p>
@@ -252,7 +260,7 @@ export function NewsletterBounces() {
           <Card className="md:col-span-2">
             <CardHeader className="flex gap-2 items-center">
               <TrendingUp size={20} />
-              <span>{"Bounce Trends"}</span>
+              <span>{t('newsletter_bounces.bounce_trends')}</span>
             </CardHeader>
             <CardBody>
               <ResponsiveContainer width="100%" height={260}>
@@ -262,9 +270,9 @@ export function NewsletterBounces() {
                   <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="hard" name={"Bounce Type Hard"} fill={CHART_COLOR_MAP.dangerAlt} stackId="a" radius={[0, 0, 0, 0]} />
-                  <Bar dataKey="soft" name={"Bounce Type Soft"} fill={CHART_COLOR_MAP.warningAlt} stackId="a" radius={[0, 0, 0, 0]} />
-                  <Bar dataKey="complaint" name={"Bounce Type Complaint"} fill={CHART_COLOR_MAP.purple} stackId="a" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="hard" name={t('newsletter_bounces.bounce_type_hard')} fill={CHART_COLOR_MAP.dangerAlt} stackId="a" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="soft" name={t('newsletter_bounces.bounce_type_soft')} fill={CHART_COLOR_MAP.warningAlt} stackId="a" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="complaint" name={t('newsletter_bounces.bounce_type_complaint')} fill={CHART_COLOR_MAP.purple} stackId="a" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardBody>
@@ -273,11 +281,11 @@ export function NewsletterBounces() {
           <Card>
             <CardHeader className="flex gap-2 items-center">
               <AlertTriangle size={20} />
-              <span>{"Top Bounce Reasons"}</span>
+              <span>{t('newsletter_bounces.top_bounce_reasons')}</span>
             </CardHeader>
             <CardBody>
               {reasonSummary.length === 0 ? (
-                <p className="text-sm text-default-400">{"No data available"}</p>
+                <p className="text-sm text-default-400">{t('shared.no_data_available')}</p>
               ) : (
                 <div className="space-y-2">
                   {reasonSummary.map((r) => (
@@ -303,16 +311,16 @@ export function NewsletterBounces() {
           <Tabs
             selectedKey={activeTab}
             onSelectionChange={(key) => setActiveTab(key as string)}
-            aria-label={"Bounces"}
+            aria-label={t('newsletter_bounces.title')}
           >
-            <Tab key="bounces" title={"Recent Bounces"} />
-            <Tab key="suppression" title={"Suppression List"} />
+            <Tab key="bounces" title={t('newsletter_bounces.recent_bounces')} />
+            <Tab key="suppression" title={t('newsletter_bounces.suppression_list')} />
           </Tabs>
 
           <div className="flex gap-2 w-full">
             <Input type="search" name="admin-search" autoComplete="off"
-              placeholder={"Search by Email..."}
-              aria-label={"Search bounced emails..."}
+              placeholder={t('newsletter_bounces.search_placeholder')}
+              aria-label={t('newsletter_bounces.search_aria')}
               value={searchQuery}
               onValueChange={setSearchQuery}
               startContent={<Search size={16} />}
@@ -320,32 +328,32 @@ export function NewsletterBounces() {
             />
             {activeTab === 'bounces' && (
               <Select
-                label={"Bounce Type"}
+                label={t('newsletter_bounces.bounce_type')}
                 selectedKeys={[typeFilter]}
                 onSelectionChange={(keys) => setTypeFilter(Array.from(keys)[0] as string)}
                 className="w-40"
               >
-                <SelectItem key="all">{"Bounce Type All"}</SelectItem>
-                <SelectItem key="hard">{"Bounce Type Hard"}</SelectItem>
-                <SelectItem key="soft">{"Bounce Type Soft"}</SelectItem>
-                <SelectItem key="complaint">{"Bounce Type Complaint"}</SelectItem>
+                <SelectItem key="all">{t('newsletter_bounces.bounce_type_all')}</SelectItem>
+                <SelectItem key="hard">{t('newsletter_bounces.bounce_type_hard')}</SelectItem>
+                <SelectItem key="soft">{t('newsletter_bounces.bounce_type_soft')}</SelectItem>
+                <SelectItem key="complaint">{t('newsletter_bounces.bounce_type_complaint')}</SelectItem>
               </Select>
             )}
           </div>
         </CardHeader>
         <CardBody>
           {activeTab === 'bounces' ? (
-            <Table aria-label={"Bounce Log"} isStriped>
+            <Table aria-label={t('newsletter_bounces.bounce_log')} isStriped>
               <TableHeader>
-                <TableColumn>{"Email"}</TableColumn>
-                <TableColumn>{"Type"}</TableColumn>
-                <TableColumn>{"Reason"}</TableColumn>
-                <TableColumn>{"Campaign"}</TableColumn>
-                <TableColumn>{"Date"}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_email')}</TableColumn>
+                <TableColumn>{t('newsletter_bounces.col_type')}</TableColumn>
+                <TableColumn>{t('newsletter_bounces.col_reason')}</TableColumn>
+                <TableColumn>{t('newsletter_bounces.col_campaign')}</TableColumn>
+                <TableColumn>{t('newsletter_bounces.col_date')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={filteredBounces}
-                emptyContent={loading ? "Loading" : "No no bounces found"}
+                emptyContent={loading ? t('newsletter_form.loading') : t('newsletter_bounces.no_bounces_found')}
               >
                 {(bounce) => (
                   <TableRow key={bounce.id}>
@@ -373,17 +381,17 @@ export function NewsletterBounces() {
               </TableBody>
             </Table>
           ) : (
-            <Table aria-label={"Suppression List"} isStriped>
+            <Table aria-label={t('newsletter_bounces.suppression_list')} isStriped>
               <TableHeader>
-                <TableColumn>{"Email"}</TableColumn>
-                <TableColumn>{"Reason"}</TableColumn>
-                <TableColumn>{"Bounce Count"}</TableColumn>
-                <TableColumn>{"Suppressed at"}</TableColumn>
-                <TableColumn>{"Actions"}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_email')}</TableColumn>
+                <TableColumn>{t('newsletter_bounces.col_reason')}</TableColumn>
+                <TableColumn>{t('newsletter_bounces.col_bounce_count')}</TableColumn>
+                <TableColumn>{t('newsletter_bounces.col_suppressed_at')}</TableColumn>
+                <TableColumn>{t('newsletters.col_actions')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={filteredSuppression}
-                emptyContent={loading ? "Loading" : "No no suppressed found"}
+                emptyContent={loading ? t('newsletter_form.loading') : t('newsletter_bounces.no_suppressed_found')}
               >
                 {(entry) => (
                   <TableRow key={entry.email}>
@@ -408,7 +416,7 @@ export function NewsletterBounces() {
                         color="primary"
                         onPress={() => setUnsuppressTarget(entry.email)}
                       >
-                        {"Unsuppress"}
+                        {t('newsletter_bounces.unsuppress')}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -424,9 +432,9 @@ export function NewsletterBounces() {
           isOpen={!!unsuppressTarget}
           onClose={() => setUnsuppressTarget(null)}
           onConfirm={handleUnsuppress}
-          title={"Unsuppress Email"}
-          message={`Unsuppress Confirm`}
-          confirmLabel={"Unsuppress"}
+          title={t('newsletter_bounces.unsuppress_title')}
+          message={t('newsletter_bounces.unsuppress_confirm', { email: unsuppressTarget })}
+          confirmLabel={t('newsletter_bounces.unsuppress')}
           confirmColor="primary"
           isLoading={processing}
         />

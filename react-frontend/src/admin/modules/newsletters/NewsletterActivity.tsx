@@ -13,8 +13,9 @@
  *  - Opened, No Click (opened but didn't click)
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, type ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Card, CardBody, Button, Chip, Tabs, Tab, Skeleton, Pagination,
   Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
@@ -129,11 +130,12 @@ function downloadCsv(rows: string[][], filename: string) {
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function NewsletterActivity() {
+  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
-  usePageTitle("Newsletters");
+  usePageTitle(t('newsletters.page_title'));
 
   const [activeTab, setActiveTab] = useState<ViewTab>('activity');
   const [page, setPage] = useState(1);
@@ -199,10 +201,10 @@ export function NewsletterActivity() {
         }
       }
     } catch {
-      toast.error("Failed to load data");
+      toast.error(t('newsletter_activity.failed_to_load_data'));
     }
     setLoading(false);
-  }, [id, activeTab, page, activityFilter, toast])
+  }, [id, activeTab, page, activityFilter, toast, t])
 
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -245,8 +247,8 @@ export function NewsletterActivity() {
   return (
     <div>
       <PageHeader
-        title={"Newsletter Activity"}
-        description={totalCount > 0 ? `Total Records` : undefined}
+        title={t('newsletter_activity.title')}
+        description={totalCount > 0 ? t('newsletter_activity.total_records', { count: totalCount }) : undefined}
         actions={
           <div className="flex gap-2">
             {showExport && currentData.length > 0 && (
@@ -255,7 +257,7 @@ export function NewsletterActivity() {
                 startContent={<Download size={16} />}
                 onPress={handleExport}
               >
-                {"Export CSV"}
+                {t('newsletters.export_csv')}
               </Button>
             )}
             <Button
@@ -263,7 +265,7 @@ export function NewsletterActivity() {
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(backPath)}
             >
-              {"Back to Stats"}
+              {t('newsletter_activity.back_to_stats')}
             </Button>
           </div>
         }
@@ -275,7 +277,7 @@ export function NewsletterActivity() {
           <Tabs
             selectedKey={activeTab}
             onSelectionChange={(key) => setActiveTab(key as ViewTab)}
-            aria-label={"Engagement"}
+            aria-label={t('newsletter_activity.engagement')}
             color="primary"
             variant="underlined"
             classNames={{ tabList: 'flex-wrap' }}
@@ -285,7 +287,7 @@ export function NewsletterActivity() {
               title={
                 <div className="flex items-center gap-2">
                   <Activity size={16} />
-                  <span>{"Activity Log"}</span>
+                  <span>{t('newsletters.activity_log')}</span>
                 </div>
               }
             />
@@ -294,7 +296,7 @@ export function NewsletterActivity() {
               title={
                 <div className="flex items-center gap-2">
                   <Eye size={16} />
-                  <span>{"Who Opened"}</span>
+                  <span>{t('newsletter_activity.who_opened')}</span>
                 </div>
               }
             />
@@ -303,7 +305,7 @@ export function NewsletterActivity() {
               title={
                 <div className="flex items-center gap-2">
                   <MousePointer size={16} />
-                  <span>{"Who Clicked"}</span>
+                  <span>{t('newsletter_activity.who_clicked')}</span>
                 </div>
               }
             />
@@ -312,7 +314,7 @@ export function NewsletterActivity() {
               title={
                 <div className="flex items-center gap-2">
                   <UserX size={16} />
-                  <span>{"Non Openers"}</span>
+                  <span>{t('newsletter_activity.non_openers')}</span>
                 </div>
               }
             />
@@ -321,7 +323,7 @@ export function NewsletterActivity() {
               title={
                 <div className="flex items-center gap-2">
                   <UserCheck size={16} />
-                  <span>{"Opened No Click"}</span>
+                  <span>{t('newsletter_activity.opened_no_click')}</span>
                 </div>
               }
             />
@@ -339,7 +341,7 @@ export function NewsletterActivity() {
                   className="cursor-pointer"
                   onClick={() => setActivityFilter(f)}
                 >
-                  {f === 'all' ? "All Events" : f === 'open' ? "Opens Only" : "Clicks Only"}
+                  {f === 'all' ? t('newsletter_activity.all_events') : f === 'open' ? t('newsletter_activity.opens_only') : t('newsletter_activity.clicks_only')}
                 </Chip>
               ))}
             </div>
@@ -353,22 +355,22 @@ export function NewsletterActivity() {
           {/* ── Activity Log Table ── */}
           {activeTab === 'activity' && !loading && (
             <Table
-              aria-label={"Activity Log"}
+              aria-label={t('newsletters.activity_log')}
               isStriped
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
               <TableHeader>
-                <TableColumn>{"Email"}</TableColumn>
-                <TableColumn>{"Col"}</TableColumn>
-                <TableColumn>{"URL"}</TableColumn>
-                <TableColumn>{"Time"}</TableColumn>
-                <TableColumn>{"User Agent"}</TableColumn>
-                <TableColumn>{"IP"}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_email')}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_event')}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_url')}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_time')}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_user_agent')}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_ip')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={activityEvents}
                 emptyContent={
-                  <EmptyState message={"No no events found"} />
+                  <EmptyState title={t('shared.no_data_available')} message={t('newsletter_activity.no_events_found')} />
                 }
               >
                 {(event) => (
@@ -403,18 +405,18 @@ export function NewsletterActivity() {
           {/* ── Openers Table ── */}
           {activeTab === 'openers' && !loading && (
             <Table
-              aria-label={"Openers"}
+              aria-label={t('newsletter_activity.openers')}
               isStriped
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
               <TableHeader>
-                <TableColumn>{"Email"}</TableColumn>
-                <TableColumn align="center">{"Open Count"}</TableColumn>
-                <TableColumn>{"First Opened"}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_email')}</TableColumn>
+                <TableColumn align="center">{t('newsletter_activity.col_open_count')}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_first_opened')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={openers}
-                emptyContent={<EmptyState message={"No no openers found"} />}
+                emptyContent={<EmptyState title={t('shared.no_data_available')} message={t('newsletter_activity.no_openers_found')} />}
               >
                 {(row) => (
                   <TableRow key={row.email}>
@@ -434,19 +436,19 @@ export function NewsletterActivity() {
           {/* ── Clickers Table ── */}
           {activeTab === 'clickers' && !loading && (
             <Table
-              aria-label={"Clickers"}
+              aria-label={t('newsletter_activity.clickers')}
               isStriped
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
               <TableHeader>
-                <TableColumn>{"Email"}</TableColumn>
-                <TableColumn align="center">{"Click Count"}</TableColumn>
-                <TableColumn align="center">{"Unique Links"}</TableColumn>
-                <TableColumn>{"First Clicked"}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_email')}</TableColumn>
+                <TableColumn align="center">{t('newsletter_activity.col_click_count')}</TableColumn>
+                <TableColumn align="center">{t('newsletter_activity.col_unique_links')}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_first_clicked')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={clickers}
-                emptyContent={<EmptyState message={"No no clickers found"} />}
+                emptyContent={<EmptyState title={t('shared.no_data_available')} message={t('newsletter_activity.no_clickers_found')} />}
               >
                 {(row) => (
                   <TableRow key={row.email}>
@@ -471,18 +473,18 @@ export function NewsletterActivity() {
           {/* ── Non-Openers Table ── */}
           {activeTab === 'non-openers' && !loading && (
             <Table
-              aria-label={"Newsletter Non Openers"}
+              aria-label={t('newsletter_activity.non_openers')}
               isStriped
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
               <TableHeader>
-                <TableColumn>{"Email"}</TableColumn>
-                <TableColumn>{"Name"}</TableColumn>
-                <TableColumn>{"Sent at"}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_email')}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_name')}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_sent_at')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={nonOpeners}
-                emptyContent={<EmptyState message={"No all opened found"} icon={<Users size={48} className="text-success-300" />} />}
+                emptyContent={<EmptyState title={t('newsletter_activity.all_recipients_opened_title')} message={t('newsletter_activity.all_recipients_opened')} icon={<Users size={48} className="text-success-300" />} />}
               >
                 {(row) => (
                   <TableRow key={row.email}>
@@ -498,19 +500,19 @@ export function NewsletterActivity() {
           {/* ── Opened No Click Table ── */}
           {activeTab === 'opened-no-click' && !loading && (
             <Table
-              aria-label={"Opened No Click"}
+              aria-label={t('newsletter_activity.opened_no_click')}
               isStriped
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
               <TableHeader>
-                <TableColumn>{"Email"}</TableColumn>
-                <TableColumn>{"Name"}</TableColumn>
-                <TableColumn align="center">{"Open Count"}</TableColumn>
-                <TableColumn>{"First Opened"}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_email')}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_name')}</TableColumn>
+                <TableColumn align="center">{t('newsletter_activity.col_open_count')}</TableColumn>
+                <TableColumn>{t('newsletter_activity.col_first_opened')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={openedNoClick}
-                emptyContent={<EmptyState message={"No all clicked found"} icon={<MousePointer size={48} className="text-success-300" />} />}
+                emptyContent={<EmptyState title={t('newsletter_activity.all_openers_clicked_title')} message={t('newsletter_activity.all_openers_clicked')} icon={<MousePointer size={48} className="text-success-300" />} />}
               >
                 {(row) => (
                   <TableRow key={row.email}>
@@ -548,11 +550,11 @@ export function NewsletterActivity() {
 
 // ─── Sub-Components ─────────────────────────────────────────────────────────
 
-function EmptyState({ message, icon }: { message: string; icon?: React.ReactNode }) {
+function EmptyState({ title, message, icon }: { title: string; message: string; icon?: ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-3 py-12 text-center">
       {icon || <Inbox size={48} className="text-default-300" />}
-      <p className="text-lg font-semibold text-default-500">{"No data available"}</p>
+      <p className="text-lg font-semibold text-default-500">{title}</p>
       <p className="text-sm text-default-400">{message}</p>
     </div>
   );

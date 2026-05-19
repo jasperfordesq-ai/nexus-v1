@@ -11,6 +11,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Chip,
@@ -63,12 +64,13 @@ const CATEGORY_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'war
 };
 
 export function Templates() {
-  usePageTitle("Newsletters");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('newsletters.page_title'));
 
   const CATEGORY_LABELS: Record<string, string> = {
-    starter: "Category Starter",
-    saved: "Category saved",
-    custom: "Category Custom",
+    starter: t('newsletter_templates.category_starter'),
+    saved: t('newsletter_templates.category_saved'),
+    custom: t('newsletter_templates.category_custom'),
   };
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
@@ -116,13 +118,13 @@ export function Templates() {
     try {
       const res = await adminNewsletters.duplicateTemplate(template.id);
       if (res.success) {
-        toast.success(`Template Duplicated as`);
+        toast.success(t('newsletter_templates.template_duplicated'));
         loadData();
       } else {
-        toast.error(res.error || "Failed to duplicate template");
+        toast.error(res.error || t('newsletter_templates.failed_to_duplicate_template'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('newsletters.an_unexpected_error_occurred'));
     }
   }
 
@@ -132,14 +134,14 @@ export function Templates() {
     try {
       const res = await adminNewsletters.deleteTemplate(deleteTarget.id);
       if (res.success) {
-        toast.success(`Template deleted`);
+        toast.success(t('newsletter_templates.template_deleted'));
         setDeleteTarget(null);
         loadData();
       } else {
-        toast.error(res.error || "Failed to delete template");
+        toast.error(res.error || t('newsletter_templates.failed_to_delete_template'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('newsletters.an_unexpected_error_occurred'));
     } finally {
       setDeleting(false);
     }
@@ -149,12 +151,12 @@ export function Templates() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={"Actions"}>
+          <Button isIconOnly size="sm" variant="light" aria-label={t('newsletters.col_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
         <DropdownMenu
-          aria-label={"Actions"}
+          aria-label={t('newsletters.col_actions')}
           onAction={(key) => {
             switch (key) {
               case 'edit':
@@ -173,13 +175,13 @@ export function Templates() {
           }}
         >
           <DropdownItem key="edit" startContent={<Pencil size={14} />}>
-            {"Edit"}
+            {t('newsletters.edit')}
           </DropdownItem>
           <DropdownItem key="duplicate" startContent={<Copy size={14} />}>
-            {"Duplicate"}
+            {t('newsletters.duplicate')}
           </DropdownItem>
           <DropdownItem key="preview" startContent={<Eye size={14} />}>
-            {"Preview"}
+            {t('newsletters.preview')}
           </DropdownItem>
           <DropdownItem
             key="delete"
@@ -187,7 +189,7 @@ export function Templates() {
             className="text-danger"
             color="danger"
           >
-            {"Delete"}
+            {t('newsletters.delete')}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -197,7 +199,7 @@ export function Templates() {
   const columns: Column<Template>[] = [
     {
       key: 'name',
-      label: "Template Name",
+      label: t('newsletter_templates.col_template_name'),
       sortable: true,
       render: (item) => (
         <div>
@@ -210,7 +212,7 @@ export function Templates() {
     },
     {
       key: 'category',
-      label: "Category",
+      label: t('template_form.label_category'),
       render: (item) => (
         <Chip
           size="sm"
@@ -223,7 +225,7 @@ export function Templates() {
     },
     {
       key: 'subject',
-      label: "Default Subject",
+      label: t('template_form.label_default_subject_line'),
       render: (item) => (
         <span className="text-sm text-default-600 line-clamp-1">
           {item.subject || '--'}
@@ -232,20 +234,20 @@ export function Templates() {
     },
     {
       key: 'is_active',
-      label: "Status",
+      label: t('newsletter_templates.col_status'),
       render: (item) => (
         <Chip
           size="sm"
           variant="dot"
           color={item.is_active ? 'success' : 'default'}
         >
-          {item.is_active ? "Active" : "Inactive"}
+          {item.is_active ? t('template_form.active') : t('template_form.inactive')}
         </Chip>
       ),
     },
     {
       key: 'created_at',
-      label: "Created",
+      label: t('newsletter_templates.col_created'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -273,23 +275,23 @@ export function Templates() {
     return (
       <div>
         <PageHeader
-          title={"Templates"}
-          description={"Create and manage reusable email templates"}
+          title={t('newsletter_templates.title')}
+          description={t('newsletter_templates.description')}
           actions={
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/templates/create'))}
             >
-              {"Create Template"}
+              {t('template_form.create_template')}
             </Button>
           }
         />
         <EmptyState
           icon={FileText}
-          title={"No Templates created"}
-          description={"Create reusable email templates to speed up campaign creation"}
-          actionLabel={"Create Template"}
+          title={t('newsletter_templates.empty_title')}
+          description={t('newsletter_templates.empty_description')}
+          actionLabel={t('template_form.create_template')}
           onAction={() => navigate(tenantPath('/admin/newsletters/templates/create'))}
         />
       </div>
@@ -299,8 +301,8 @@ export function Templates() {
   return (
     <div>
       <PageHeader
-        title={"Templates"}
-        description={"Create and manage reusable email templates"}
+        title={t('newsletter_templates.title')}
+        description={t('newsletter_templates.description')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -309,14 +311,14 @@ export function Templates() {
               onPress={loadData}
               isLoading={loading}
             >
-              {"Refresh"}
+              {t('newsletters.refresh')}
             </Button>
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/templates/create'))}
             >
-              {"Create Template"}
+              {t('template_form.create_template')}
             </Button>
           </div>
         }
@@ -330,7 +332,7 @@ export function Templates() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={`All`} />
+          <Tab key="all" title={t('newsletters.tab_all')} />
           {Object.entries(categoryCounts).map(([cat, count]) => (
             <Tab key={cat} title={`${CATEGORY_LABELS[cat] || cat} (${count})`} />
           ))}
@@ -349,9 +351,9 @@ export function Templates() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title={"Delete Template"}
-        message={`Delete Template Confirm`}
-        confirmLabel={"Confirm Delete"}
+        title={t('newsletter_templates.delete_title')}
+        message={t('newsletter_templates.delete_confirm', { name: deleteTarget?.name })}
+        confirmLabel={t('newsletter_templates.delete_confirm_label')}
         confirmColor="danger"
         isLoading={deleting}
       />

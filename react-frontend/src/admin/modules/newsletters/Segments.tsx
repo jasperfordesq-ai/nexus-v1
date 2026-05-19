@@ -10,6 +10,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Chip,
@@ -44,8 +45,9 @@ interface Segment {
 }
 
 export function Segments() {
+  const { t } = useTranslation('admin');
   const { tenantPath } = useTenant();
-  usePageTitle("Newsletters");
+  usePageTitle(t('newsletters.page_title'));
   const navigate = useNavigate();
   const [items, setItems] = useState<Segment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -90,7 +92,7 @@ export function Segments() {
   const columns: Column<Segment>[] = [
     {
       key: 'name',
-      label: 'Segment Name',
+      label: t('segment_form.label_segment_name'),
       sortable: true,
       render: (item) => (
         <div>
@@ -103,29 +105,29 @@ export function Segments() {
     },
     {
       key: 'is_active',
-      label: 'Status',
+      label: t('newsletter_segments.col_status'),
       render: (item) => (
         <Chip
           size="sm"
           variant="flat"
           color={item.is_active ? 'success' : 'default'}
         >
-          {item.is_active ? 'Active' : 'Inactive'}
+          {item.is_active ? t('segment_form.status_active') : t('segment_form.status_inactive')}
         </Chip>
       ),
     },
     {
       key: 'match_type',
-      label: 'Match Type',
+      label: t('segment_form.label_match_logic'),
       render: (item) => (
         <Chip size="sm" variant="flat" color="primary">
-          {item.match_type === 'any' ? 'ANY (OR)' : 'ALL (AND)'}
+          {item.match_type === 'any' ? t('newsletter_segments.match_any') : t('newsletter_segments.match_all')}
         </Chip>
       ),
     },
     {
       key: 'subscriber_count',
-      label: 'Members',
+      label: t('newsletter_segments.col_members'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1.5">
@@ -136,7 +138,7 @@ export function Segments() {
     },
     {
       key: 'created_at',
-      label: 'Created',
+      label: t('newsletter_segments.col_created'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -151,17 +153,17 @@ export function Segments() {
         <div className="flex justify-end">
           <Dropdown>
             <DropdownTrigger>
-              <Button isIconOnly size="sm" variant="light" aria-label={"Actions"}>
+              <Button isIconOnly size="sm" variant="light" aria-label={t('newsletters.col_actions')}>
                 <MoreVertical size={16} />
               </Button>
             </DropdownTrigger>
-            <DropdownMenu aria-label={"Actions"}>
+            <DropdownMenu aria-label={t('newsletters.col_actions')}>
               <DropdownItem
                 key="edit"
                 startContent={<Pencil size={14} />}
                 onPress={() => navigate(tenantPath(`/admin/newsletters/segments/edit/${item.id}`))}
               >
-                Edit
+                {t('newsletters.edit')}
               </DropdownItem>
               <DropdownItem
                 key="delete"
@@ -173,7 +175,7 @@ export function Segments() {
                   onDeleteOpen();
                 }}
               >
-                Delete
+                {t('newsletters.delete')}
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
@@ -186,23 +188,23 @@ export function Segments() {
     return (
       <div>
         <PageHeader
-          title={"Segments"}
-          description={"Create audience segments to target specific groups of members"}
+          title={t('newsletter_segments.title')}
+          description={t('newsletter_segments.description')}
           actions={
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/segments/create'))}
             >
-              Create Segment
+              {t('segment_form.btn_create_segment')}
             </Button>
           }
         />
         <EmptyState
           icon={Filter}
-          title={"No Segments created"}
-          description={"Create audience segments to target specific groups of members"}
-          actionLabel="Create Your First Segment"
+          title={t('newsletter_segments.empty_title')}
+          description={t('newsletter_segments.empty_description')}
+          actionLabel={t('newsletter_segments.create_first_segment')}
           onAction={() => navigate(tenantPath('/admin/newsletters/segments/create'))}
         />
       </div>
@@ -212,8 +214,8 @@ export function Segments() {
   return (
     <div>
       <PageHeader
-        title={"Segments"}
-        description={"Create audience segments to target specific groups of members"}
+        title={t('newsletter_segments.title')}
+        description={t('newsletter_segments.description')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -222,14 +224,14 @@ export function Segments() {
               onPress={loadData}
               isLoading={loading}
             >
-              Refresh
+              {t('newsletters.refresh')}
             </Button>
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/segments/create'))}
             >
-              Create Segment
+              {t('segment_form.btn_create_segment')}
             </Button>
           </div>
         }
@@ -243,9 +245,9 @@ export function Segments() {
           setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title={"Delete Segment"}
-        message={`Delete Segment Confirm`}
-        confirmLabel={"Confirm Delete Segment"}
+        title={t('newsletter_segments.delete_title')}
+        message={t('newsletter_segments.delete_confirm', { name: deleteTarget?.name })}
+        confirmLabel={t('newsletter_segments.delete_confirm_label')}
         confirmColor="danger"
         isLoading={deleting}
       />
