@@ -108,7 +108,7 @@ function formatCurrency(amount: number, currency: string): string {
 export function MyListingsPage() {
   const navigate = useNavigate();
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('my_listings.page_title', 'My Listings - Marketplace'));
+  usePageTitle(t('my_listings.page_title'));
   const { isAuthenticated, user } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -220,7 +220,7 @@ export function MyListingsPage() {
     } catch (err) {
       logError('Failed to load my listings', err);
       if (!append) {
-        toast.error(t('my_listings.load_error', 'Failed to load your listings'));
+        toast.error(t('my_listings.load_error'));
       }
     } finally {
       setIsLoading(false);
@@ -241,16 +241,16 @@ export function MyListingsPage() {
     try {
       const response = await api.post(`/v2/marketplace/listings/${listingId}/renew`);
       if (response.success) {
-        toast.success(t('my_listings.renewed_success', 'Listing renewed successfully'));
+        toast.success(t('my_listings.renewed_success'));
         // Refresh listings
         cursorRef.current = null;
         loadListings();
       } else {
-        toast.error(response.error || t('my_listings.renewed_error', 'Failed to renew listing'));
+        toast.error(response.error || t('my_listings.renewed_error'));
       }
     } catch (err) {
       logError('Failed to renew listing', err);
-      toast.error(t('my_listings.renewed_error', 'Failed to renew listing'));
+      toast.error(t('my_listings.renewed_error'));
     }
   }, [toast, loadListings, t])
 
@@ -266,7 +266,7 @@ export function MyListingsPage() {
     try {
       const response = await api.delete(`/v2/marketplace/listings/${removeTargetId}`);
       if (response.success) {
-        toast.success(t('my_listings.removed_success', 'Listing removed'));
+        toast.success(t('my_listings.removed_success'));
         setListings((prev) => prev.filter((l) => l.id !== removeTargetId));
         // Update stats
         if (stats) {
@@ -274,11 +274,11 @@ export function MyListingsPage() {
         }
         onRemoveClose();
       } else {
-        toast.error(response.error || t('my_listings.removed_error', 'Failed to remove listing'));
+        toast.error(response.error || t('my_listings.removed_error'));
       }
     } catch (err) {
       logError('Failed to remove listing', err);
-      toast.error(t('my_listings.removed_error', 'Failed to remove listing'));
+      toast.error(t('my_listings.removed_error'));
     } finally {
       setIsRemoving(false);
     }
@@ -288,7 +288,7 @@ export function MyListingsPage() {
 
   return (
     <>
-      <PageMeta title={t('my_listings.page_title', 'My Listings - Marketplace')} noIndex={true} />
+      <PageMeta title={t('my_listings.page_title')} noIndex={true} />
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         {/* Header */}
@@ -296,10 +296,10 @@ export function MyListingsPage() {
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               <ShoppingBag className="w-7 h-7 text-primary" />
-              {t('my_listings.title', 'My Listings')}
+              {t('my_listings.title')}
             </h1>
             <p className="text-default-500 text-sm mt-1">
-              {t('my_listings.subtitle', 'Manage your marketplace listings')}
+              {t('my_listings.subtitle')}
             </p>
           </div>
           <Button
@@ -308,29 +308,29 @@ export function MyListingsPage() {
             color="primary"
             startContent={<Plus className="w-4 h-4" />}
           >
-            {t('hub.sell_something', 'Sell Something')}
+            {t('hub.sell_something')}
           </Button>
         </div>
 
         {/* AG48 — Onboarding nudge */}
         {!onboardingDone && !onboardingDismissed && (
-          <GlassCard className="p-4 flex items-center justify-between gap-4 flex-wrap border-l-4 border-primary">
-            <div>
+          <GlassCard className="flex flex-col gap-4 border-l-4 border-primary p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <p className="font-semibold text-foreground">
-                {t('marketplace.onboarding.nudge_title', 'Complete your merchant onboarding')}
+                {t('onboarding.nudge_title')}
               </p>
               <p className="text-sm text-default-500">
-                {t('marketplace.onboarding.nudge_description', 'Add business details, branding and payouts to unlock the Marketplace Partner badge.')}
+                {t('onboarding.nudge_description')}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Button
                 size="sm"
                 color="primary"
                 as={Link}
                 to={tenantPath('/marketplace/seller/onboarding')}
               >
-                {t('marketplace.onboarding.start_cta', 'Start onboarding')}
+                {t('onboarding.start_cta')}
               </Button>
               <Button
                 size="sm"
@@ -344,7 +344,7 @@ export function MyListingsPage() {
                   }
                 }}
               >
-                {t('common.dismiss', 'Dismiss')}
+                {t('common.dismiss')}
               </Button>
             </div>
           </GlassCard>
@@ -356,17 +356,17 @@ export function MyListingsPage() {
             <GlassCard className="p-4 text-center">
               <Package className="w-5 h-5 text-primary mx-auto mb-1" />
               <p className="text-2xl font-bold text-foreground">{stats.active_listings}</p>
-              <p className="text-xs text-default-500">{t('my_listings.stat_active', 'Active')}</p>
+              <p className="text-xs text-default-500">{t('my_listings.stat_active')}</p>
             </GlassCard>
             <GlassCard className="p-4 text-center">
               <DollarSign className="w-5 h-5 text-success mx-auto mb-1" />
               <p className="text-2xl font-bold text-foreground">{stats.sold_listings}</p>
-              <p className="text-xs text-default-500">{t('my_listings.stat_sold', 'Sold')}</p>
+              <p className="text-xs text-default-500">{t('my_listings.stat_sold')}</p>
             </GlassCard>
             <GlassCard className="p-4 text-center">
               <Eye className="w-5 h-5 text-secondary mx-auto mb-1" />
               <p className="text-2xl font-bold text-foreground">{stats.total_views}</p>
-              <p className="text-xs text-default-500">{t('my_listings.stat_views', 'Total Views')}</p>
+              <p className="text-xs text-default-500">{t('my_listings.stat_views')}</p>
             </GlassCard>
             <GlassCard className="p-4 text-center">
               <BarChart3 className="w-5 h-5 text-warning mx-auto mb-1" />
@@ -375,7 +375,7 @@ export function MyListingsPage() {
                   ? formatCurrency(stats.total_revenue, stats.revenue_currency || 'EUR')
                   : '0'}
               </p>
-              <p className="text-xs text-default-500">{t('my_listings.stat_revenue', 'Revenue')}</p>
+              <p className="text-xs text-default-500">{t('my_listings.stat_revenue')}</p>
             </GlassCard>
           </div>
         )}
@@ -386,7 +386,7 @@ export function MyListingsPage() {
           onSelectionChange={(key) => setActiveTab(key as ListingTab)}
           color="primary"
           variant="underlined"
-          classNames={{ tabList: 'gap-4' }}
+          classNames={{ base: 'w-full overflow-x-auto', tabList: 'gap-2 sm:gap-4' }}
         >
           {TABS.map((tab) => (
             <Tab
@@ -414,12 +414,12 @@ export function MyListingsPage() {
         ) : listings.length === 0 ? (
           <EmptyState
             icon={<Package className="w-8 h-8" />}
-            title={t(`my_listings.empty_${activeTab}_title`, 'No Listings')}
-            description={t(`my_listings.empty_${activeTab}_description`, 'You don\'t have any listings in this category yet.')}
+            title={t(`my_listings.empty_${activeTab}_title`)}
+            description={t(`my_listings.empty_${activeTab}_description`)}
             action={
               activeTab === 'active' || activeTab === 'draft'
                 ? {
-                    label: t('hub.sell_something', 'Sell Something'),
+                    label: t('hub.sell_something'),
                     onClick: () => navigate(tenantPath('/marketplace/sell')),
                   }
                 : undefined
@@ -428,7 +428,7 @@ export function MyListingsPage() {
         ) : (
           <>
             {/* Listing cards with action overlays */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {listings.map((listing) => (
                 <GlassCard key={listing.id} className="overflow-hidden">
                   {/* Image */}
@@ -463,11 +463,14 @@ export function MyListingsPage() {
                       </p>
                     ) : (
                       <p className="text-sm font-bold text-success mt-1">
-                        {t('common.free', 'Free')}
+                        {t('common.free')}
                       </p>
                     )}
 
-                    <div className="flex items-center gap-1 text-xs text-default-400 mt-1">
+                    <div
+                      className="flex items-center gap-1 text-xs text-default-400 mt-1"
+                      aria-label={t('my_listings.views_count_aria', { count: listing.views_count })}
+                    >
                       <Eye className="w-3 h-3" />
                       <span>{listing.views_count}</span>
                     </div>
@@ -480,26 +483,26 @@ export function MyListingsPage() {
                       if (inv === 0) {
                         return (
                           <span className="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded bg-danger-100 text-danger-700">
-                            {t('marketplace.inventory.sold_out', 'Sold out')}
+                            {t('inventory.sold_out')}
                           </span>
                         );
                       }
                       if (threshold != null && inv <= threshold) {
                         return (
                           <span className="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded bg-warning-100 text-warning-700">
-                            {t('marketplace.inventory.low_chip', 'Inventory: {{count}} (Low)', { count: inv })}
+                            {t('inventory.low_chip', { count: inv })}
                           </span>
                         );
                       }
                       return (
                         <span className="inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded bg-default-100 text-default-600">
-                          {t('marketplace.inventory.count_chip', 'Inventory: {{count}}', { count: inv })}
+                          {t('inventory.count_chip', { count: inv })}
                         </span>
                       );
                     })()}
 
                     {/* Actions */}
-                    <div className="flex gap-2 mt-3">
+                    <div className="flex flex-wrap gap-2 mt-3">
                       <Button
                         as={Link}
                         to={tenantPath(`/marketplace/${listing.id}/edit`)}
@@ -509,7 +512,7 @@ export function MyListingsPage() {
                         startContent={<Edit3 className="w-3.5 h-3.5" />}
                         className="flex-1"
                       >
-                        {t('my_listings.action_edit', 'Edit')}
+                        {t('my_listings.action_edit')}
                       </Button>
 
                       {activeTab === 'expired' && (
@@ -520,7 +523,7 @@ export function MyListingsPage() {
                           startContent={<RefreshCw className="w-3.5 h-3.5" />}
                           onPress={() => handleRenew(listing.id)}
                         >
-                          {t('my_listings.action_renew', 'Renew')}
+                          {t('my_listings.action_renew')}
                         </Button>
                       )}
 
@@ -530,7 +533,7 @@ export function MyListingsPage() {
                         color="danger"
                         isIconOnly
                         onPress={() => confirmRemove(listing.id)}
-                        aria-label={t('my_listings.action_remove', 'Remove')}
+                        aria-label={t('my_listings.action_remove')}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
@@ -549,7 +552,7 @@ export function MyListingsPage() {
                   onPress={() => loadListings(true)}
                   isLoading={isLoadingMore}
                 >
-                  {t('common.load_more', 'Load More')}
+                  {t('common.load_more')}
                 </Button>
               </div>
             )}
@@ -560,22 +563,22 @@ export function MyListingsPage() {
       {/* Remove confirmation modal */}
       <Modal isOpen={isRemoveOpen} onClose={onRemoveClose} size="sm">
         <ModalContent>
-          <ModalHeader>{t('my_listings.remove_confirm_title', 'Remove Listing')}</ModalHeader>
+          <ModalHeader>{t('my_listings.remove_confirm_title')}</ModalHeader>
           <ModalBody>
             <p className="text-default-600">
-              {t('my_listings.remove_confirm_description', 'Are you sure you want to remove this listing? This action cannot be undone.')}
+              {t('my_listings.remove_confirm_description')}
             </p>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onRemoveClose}>
-              {t('common.cancel', 'Cancel')}
+              {t('common.cancel')}
             </Button>
             <Button
               color="danger"
               onPress={handleRemove}
               isLoading={isRemoving}
             >
-              {t('my_listings.action_remove', 'Remove')}
+              {t('my_listings.action_remove')}
             </Button>
           </ModalFooter>
         </ModalContent>

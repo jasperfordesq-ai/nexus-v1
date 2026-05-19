@@ -282,6 +282,7 @@
     "load_more": "Load More",
     "try_again": "Try Again",
     "go_back": "Go back",
+    "dismiss": "Dismiss",
     "cancel": "Cancel",
     "sort_by": "Sort by"
   },
@@ -389,6 +390,7 @@
     "action_edit": "Edit",
     "action_renew": "Renew",
     "action_remove": "Remove",
+    "views_count_aria": "{{count}} views",
     "renewed_success": "Listing renewed successfully",
     "renewed_error": "Failed to renew listing",
     "removed_success": "Listing removed",
@@ -564,7 +566,10 @@
     "unlimited": "Unlimited stock",
     "count": "Stock count",
     "low_stock_threshold": "Low-stock alert at",
-    "oversold_protected": "Reject orders that would oversell"
+    "oversold_protected": "Reject orders that would oversell",
+    "sold_out": "Sold out",
+    "low_chip": "Inventory: {{count}} (Low)",
+    "count_chip": "Inventory: {{count}}"
   },
   "ai_reply": {
     "suggest": "Suggest Reply",
@@ -745,6 +750,9 @@
     "incomplete_description": "Your Stripe account setup is not yet complete. Please finish the onboarding process to start receiving payments.",
     "continue_onboarding": "Continue Onboarding",
     "check_status": "Check Status",
+    "nudge_title": "Complete your merchant onboarding",
+    "nudge_description": "Add business details, branding and payouts to unlock the Marketplace Partner badge.",
+    "start_cta": "Start onboarding",
     "start_error": "Failed to start onboarding"
   }
 }
