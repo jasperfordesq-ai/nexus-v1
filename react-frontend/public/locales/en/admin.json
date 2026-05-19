@@ -1684,6 +1684,43 @@
     "provider_smtp": "SMTP",
     "prerender": {
       "description": "Bot-only server-rendered snapshots. Monitor coverage, detect staleness, and force refreshes.",
+      "freshness": {
+        "actions": {
+          "apply": "Apply",
+          "dry_run": "Dry run"
+        },
+        "auto_recache": {
+          "description": "Scans every snapshot. Enqueues low-priority recaches for routes whose source content has changed or whose TTL has expired. Runs on cron every 15-30 minutes; use this to trigger one immediately.",
+          "title": "Auto-recache (TTL + content drift)"
+        },
+        "drift": {
+          "description": "Walks each tenant sitemap, compares lastmod against snapshot mtimes, and catches stale pages from raw writes, migrations, or queued jobs. Runs every 2 minutes and enqueues high-priority recaches.",
+          "title": "Detect drift (sitemap vs snapshots)"
+        },
+        "errors": {
+          "auto_recache": "Failed to trigger auto-recache",
+          "drift_detection": "Failed to trigger drift detection",
+          "purge_unexpected": "Purge-unexpected failed"
+        },
+        "messages": {
+          "auto_recache_applied": "Auto-recache applied",
+          "auto_recache_dry_run": "Auto-recache dry-run complete",
+          "drift_applied": "Drift detection applied",
+          "drift_dry_run": "Drift dry-run complete",
+          "purge_dry_run": "Dry run: {{count}} snapshots would be purged",
+          "purged_ungated": "Purged {{count}} ungated snapshots across {{tenants}} tenants"
+        },
+        "no_output": "(no output)",
+        "purge_ungated": {
+          "description": "Sweep snapshots whose route is not in a tenant expected set. Common after toggling a feature off, or for cleanup of static routes prerendered without feature flags. Dynamic content routes are left alone.",
+          "title": "Purge ungated snapshots (per-tenant 404 cleanup)"
+        },
+        "result": {
+          "deleted": "Deleted {{count}} snapshots across {{tenants}} tenants",
+          "would_delete": "Would delete {{count}} snapshots across {{tenants}} tenants"
+        },
+        "title": "Freshness automation"
+      },
       "inventory": {
         "actions": {
           "inspect": "Inspect",
@@ -1762,6 +1799,38 @@
         "super_admin_only": "Super admin only"
       },
       "polling_fallback": "Polling fallback",
+      "purge": {
+        "actions": {
+          "auto_recache": "Auto-recache after purge",
+          "dry_run": "Dry run",
+          "preview_purge": "Preview purge",
+          "purge_now": "Purge now"
+        },
+        "description_middle": "for one path segment,",
+        "description_prefix": "Delete snapshots matching a glob pattern. Use",
+        "description_suffix": "for any descendant. Examples:",
+        "errors": {
+          "pattern_required": "Pattern is required (e.g. /blog/*)",
+          "purge_failed": "Purge failed"
+        },
+        "fields": {
+          "pattern": "Pattern",
+          "tenant_slug": "Tenant slug"
+        },
+        "messages": {
+          "dry_run": "Dry run: {{count}} snapshots would be purged",
+          "purged": "Purged {{count}} snapshots{{job}}"
+        },
+        "placeholders": {
+          "pattern": "/blog/* or /listings/**",
+          "tenant_slug": "optional - leave blank for all"
+        },
+        "result": {
+          "deleted": "Deleted {{count}} snapshots",
+          "would_delete": "Would delete {{count}} snapshots"
+        },
+        "title": "Wildcard cache purge"
+      },
       "readonly": {
         "prefix": "Read-only view - action buttons are disabled because the prerender engine operates across every tenant. Sign in with a",
         "role": "platform super-admin",

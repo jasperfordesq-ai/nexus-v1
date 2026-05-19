@@ -463,6 +463,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
 function FreshnessControls({
   isSuperAdmin, toast, onActed,
 }: { isSuperAdmin: boolean; toast: ToastShape; onActed: () => void }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.freshness' });
   const [autoRecLoading, setAutoRecLoading] = useState(false);
   const [autoRecOutput, setAutoRecOutput] = useState<string>('');
   const [driftLoading, setDriftLoading] = useState(false);
@@ -477,15 +478,13 @@ function FreshnessControls({
       const res = await adminPrerender.purgeUnexpected(apply);
       if (res.data) {
         setPurgeOutput(res.data);
-        toast.success(
-          apply
-            ? `Purged ${res.data.deleted_total} ungated snapshots across ${Object.keys(res.data.by_tenant).length} tenants`
-            : `Dry run: ${res.data.deleted_total} snapshots would be purged`
-        );
+        toast.success(apply
+          ? t('messages.purged_ungated', { count: res.data.deleted_total, tenants: Object.keys(res.data.by_tenant).length })
+          : t('messages.purge_dry_run', { count: res.data.deleted_total }));
         if (apply) onActed();
       }
     } catch {
-      toast.error('Purge-unexpected failed');
+      toast.error(t('errors.purge_unexpected'));
     } finally {
       setPurgeLoading(false);
     }
@@ -497,12 +496,12 @@ function FreshnessControls({
     try {
       const res = await adminPrerender.triggerAutoRecache(apply);
       if (res.data) {
-        setAutoRecOutput(res.data.output || '(no output)');
-        toast.success(apply ? 'Auto-recache applied' : 'Auto-recache dry-run complete');
+        setAutoRecOutput(res.data.output || t('no_output'));
+        toast.success(apply ? t('messages.auto_recache_applied') : t('messages.auto_recache_dry_run'));
         if (apply) onActed();
       }
     } catch {
-      toast.error('Failed to trigger auto-recache');
+      toast.error(t('errors.auto_recache'));
     } finally {
       setAutoRecLoading(false);
     }
@@ -514,12 +513,12 @@ function FreshnessControls({
     try {
       const res = await adminPrerender.triggerDetectDrift(apply);
       if (res.data) {
-        setDriftOutput(res.data.output || '(no output)');
-        toast.success(apply ? 'Drift detection applied' : 'Drift dry-run complete');
+        setDriftOutput(res.data.output || t('no_output'));
+        toast.success(apply ? t('messages.drift_applied') : t('messages.drift_dry_run'));
         if (apply) onActed();
       }
     } catch {
-      toast.error('Failed to trigger drift detection');
+      toast.error(t('errors.drift_detection'));
     } finally {
       setDriftLoading(false);
     }
@@ -529,21 +528,19 @@ function FreshnessControls({
     <Card shadow="sm">
       <CardHeader>
         <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Zap size={18} />Freshness automation
+          <Zap size={18} />{t('title')}
         </h3>
       </CardHeader>
       <CardBody className="gap-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <p className="font-medium flex items-center gap-2">
-              <Gauge size={16} className="text-warning" />Auto-recache (TTL + content drift)
+              <Gauge size={16} className="text-warning" />{t('auto_recache.title')}
             </p>
             <p className="text-sm text-default-500">
-              Scans every snapshot. Enqueues low-priority recaches for routes whose source content
-              has changed (DB updated_at &gt; snapshot mtime) or whose TTL has expired. Runs on cron
-              every 15–30 min; use this to trigger one immediately.
+              {t('auto_recache.description')}
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="flat"
                 onPress={() => runAutoRecache(false)}
@@ -551,7 +548,7 @@ function FreshnessControls({
                 isDisabled={!isSuperAdmin}
                 size="sm"
               >
-                Dry run
+                {t('actions.dry_run')}
               </Button>
               <Button
                 color="primary"
@@ -561,7 +558,7 @@ function FreshnessControls({
                 size="sm"
                 startContent={<Play size={14} />}
               >
-                Apply
+                {t('actions.apply')}
               </Button>
             </div>
             {autoRecOutput && (
@@ -573,14 +570,12 @@ function FreshnessControls({
 
           <div className="space-y-2">
             <p className="font-medium flex items-center gap-2">
-              <Search size={16} className="text-primary" />Detect drift (sitemap vs snapshots)
+              <Search size={16} className="text-primary" />{t('drift.title')}
             </p>
             <p className="text-sm text-default-500">
-              Walks each tenant&apos;s sitemap, compares &lt;lastmod&gt; against snapshot mtimes.
-              Catches stale pages from code paths that bypass Eloquent observers (raw DB writes,
-              migrations, queued jobs). Runs every 2 min. Enqueues HIGH-priority recaches.
+              {t('drift.description')}
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="flat"
                 onPress={() => runDriftDetect(false)}
@@ -588,7 +583,7 @@ function FreshnessControls({
                 isDisabled={!isSuperAdmin}
                 size="sm"
               >
-                Dry run
+                {t('actions.dry_run')}
               </Button>
               <Button
                 color="primary"
@@ -598,7 +593,7 @@ function FreshnessControls({
                 size="sm"
                 startContent={<Play size={14} />}
               >
-                Apply
+                {t('actions.apply')}
               </Button>
             </div>
             {driftOutput && (
@@ -613,16 +608,12 @@ function FreshnessControls({
 
         <div className="space-y-2">
           <p className="font-medium flex items-center gap-2">
-            <Trash size={16} className="text-danger" />Purge ungated snapshots (per-tenant 404 cleanup)
+            <Trash size={16} className="text-danger" />{t('purge_ungated.title')}
           </p>
           <p className="text-sm text-default-500">
-            Sweep snapshots whose route isn&apos;t in a tenant&apos;s expected set. Common after toggling
-            a feature off, or for the one-time cleanup of 404s left from the era when every tenant
-            was prerendered against the global route list regardless of feature flags. Dynamic
-            content routes (blog posts, listings, events, etc.) are left alone — only static routes
-            that shouldn&apos;t exist for the tenant get deleted.
+            {t('purge_ungated.description')}
           </p>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant="flat"
               onPress={() => runPurgeUnexpected(false)}
@@ -630,7 +621,7 @@ function FreshnessControls({
               isDisabled={!isSuperAdmin}
               size="sm"
             >
-              Dry run
+              {t('actions.dry_run')}
             </Button>
             <Button
               color="danger"
@@ -640,14 +631,15 @@ function FreshnessControls({
               size="sm"
               startContent={<Trash size={14} />}
             >
-              Apply
+              {t('actions.apply')}
             </Button>
           </div>
           {purgeOutput && (
             <div className="space-y-1">
               <p className="text-sm font-medium">
-                {purgeOutput.dry_run ? 'Would delete' : 'Deleted'} {purgeOutput.deleted_total}{' '}
-                snapshots across {Object.keys(purgeOutput.by_tenant).length} tenants
+                {purgeOutput.dry_run
+                  ? t('result.would_delete', { count: purgeOutput.deleted_total, tenants: Object.keys(purgeOutput.by_tenant).length })
+                  : t('result.deleted', { count: purgeOutput.deleted_total, tenants: Object.keys(purgeOutput.by_tenant).length })}
               </p>
               {Object.keys(purgeOutput.by_tenant).length > 0 && (
                 <Code className="text-xs whitespace-pre-wrap block max-h-64 overflow-auto">
@@ -667,6 +659,7 @@ function FreshnessControls({
 function PurgeControls({
   isSuperAdmin, toast, onActed,
 }: { isSuperAdmin: boolean; toast: ToastShape; onActed: () => void }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.purge' });
   const [pattern, setPattern] = useState('');
   const [tenant, setTenant] = useState('');
   const [dryRun, setDryRun] = useState(true);
@@ -676,7 +669,7 @@ function PurgeControls({
 
   const submit = async () => {
     if (!pattern.trim()) {
-      toast.error('Pattern is required (e.g. /blog/*)');
+      toast.error(t('errors.pattern_required'));
       return;
     }
     setLoading(true);
@@ -690,15 +683,13 @@ function PurgeControls({
       });
       if (res.data) {
         setResult(res.data);
-        toast.success(
-          dryRun
-            ? `Dry run: ${res.data.deleted_count} snapshots would be purged`
-            : `Purged ${res.data.deleted_count} snapshots${res.data.recache_job_id ? ` (job #${res.data.recache_job_id})` : ''}`
-        );
+        toast.success(dryRun
+          ? t('messages.dry_run', { count: res.data.deleted_count })
+          : t('messages.purged', { count: res.data.deleted_count, job: res.data.recache_job_id ? ` #${res.data.recache_job_id}` : '' }));
         if (!dryRun) onActed();
       }
     } catch {
-      toast.error('Purge failed');
+      toast.error(t('errors.purge_failed'));
     } finally {
       setLoading(false);
     }
@@ -708,39 +699,39 @@ function PurgeControls({
     <Card shadow="sm">
       <CardHeader>
         <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Trash size={18} />Wildcard cache purge
+          <Trash size={18} />{t('title')}
         </h3>
       </CardHeader>
       <CardBody className="gap-3">
         <p className="text-sm text-default-500">
-          Delete snapshots matching a glob pattern. Use <code>*</code> for one path segment,
-          <code className="ml-1">**</code> for any descendant. Examples: <code>/blog/*</code>,
-          <code className="ml-1">/listings/**</code>, <code className="ml-1">/</code> (homepage only).
+          {t('description_prefix')} <code>*</code> {t('description_middle')}
+          <code className="ml-1">**</code> {t('description_suffix')} <code>/blog/*</code>,
+          <code className="ml-1">/listings/**</code>, <code className="ml-1">/</code>.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
-            label="Pattern"
-            placeholder="/blog/* or /listings/**"
+            label={t('fields.pattern')}
+            placeholder={t('placeholders.pattern')}
             variant="bordered"
             value={pattern}
             onValueChange={setPattern}
             isDisabled={!isSuperAdmin}
           />
           <Input
-            label="Tenant slug"
-            placeholder="optional — leave blank for all"
+            label={t('fields.tenant_slug')}
+            placeholder={t('placeholders.tenant_slug')}
             variant="bordered"
             value={tenant}
             onValueChange={setTenant}
             isDisabled={!isSuperAdmin}
           />
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
           <Switch isSelected={dryRun} onValueChange={setDryRun} isDisabled={!isSuperAdmin}>
-            <span className="text-sm">Dry run</span>
+            <span className="text-sm">{t('actions.dry_run')}</span>
           </Switch>
           <Switch isSelected={recache} onValueChange={setRecache} isDisabled={!isSuperAdmin}>
-            <span className="text-sm">Auto-recache after purge</span>
+            <span className="text-sm">{t('actions.auto_recache')}</span>
           </Switch>
         </div>
         <div className="flex justify-end">
@@ -751,13 +742,13 @@ function PurgeControls({
             isLoading={loading}
             isDisabled={!isSuperAdmin}
           >
-            {dryRun ? 'Preview purge' : 'Purge now'}
+            {dryRun ? t('actions.preview_purge') : t('actions.purge_now')}
           </Button>
         </div>
         {result && (
           <div className="space-y-1">
             <p className="text-sm font-medium">
-              {result.dry_run ? 'Would delete' : 'Deleted'} {result.deleted_count} snapshots
+              {result.dry_run ? t('result.would_delete', { count: result.deleted_count }) : t('result.deleted', { count: result.deleted_count })}
             </p>
             {result.deleted.length > 0 && (
               <Code className="text-xs whitespace-pre-wrap block max-h-48 overflow-auto">
