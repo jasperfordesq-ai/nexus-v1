@@ -96,9 +96,9 @@ class EventReminderServiceTest extends TestCase
 
     public function test_sendDueReminders_processes_both_reminder_types(): void
     {
-        // For both 24h and 1h reminder types, returns empty events
+        // For both fixed reminder types plus configured-reminder scan, returns empty rows.
         $this->expectTenantLookup(2);
-        DB::shouldReceive('select')->twice()->andReturn([]);
+        DB::shouldReceive('select')->times(3)->andReturn([]);
 
         $result = $this->service->sendDueReminders(2);
         $this->assertEquals(0, $result);

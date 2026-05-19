@@ -2984,7 +2984,7 @@ CREATE TABLE `event_reminder_sent` (
   `tenant_id` int(10) unsigned NOT NULL,
   `event_id` int(10) unsigned NOT NULL,
   `user_id` int(10) unsigned NOT NULL,
-  `reminder_type` enum('24h','1h') NOT NULL DEFAULT '24h',
+  `reminder_type` enum('24h','1h','7d') NOT NULL DEFAULT '24h',
   `sent_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_event_reminder` (`tenant_id`,`event_id`,`user_id`,`reminder_type`),

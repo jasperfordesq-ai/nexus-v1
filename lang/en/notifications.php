@@ -117,6 +117,7 @@ return [
     'event_rsvp_interested'      => ':name is interested in your event: :title',
     'event_reminder_24h'         => 'Reminder: ":title" is tomorrow — :when:location',
     'event_reminder_1h'          => 'Starting soon: ":title" begins in 1 hour — :when:location',
+    'event_reminder_subject_7d'  => 'Reminder: ":title" is in 7 days',
     'event_reminder_subject_24h' => 'Reminder: ":title" is tomorrow',
     'event_reminder_subject_1h'  => 'Starting soon: ":title" begins in 1 hour',
     'event_update_subject'       => 'Update: ":title"',

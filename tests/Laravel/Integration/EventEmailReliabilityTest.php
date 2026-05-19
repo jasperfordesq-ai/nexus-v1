@@ -85,7 +85,87 @@ class EventEmailReliabilityTest extends TestCase
             ->count());
     }
 
-    private function createUpcomingEvent(): int
+    public function test_configured_event_email_reminder_is_sent_and_marked(): void
+    {
+        $attendee = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'event-configured-reminder-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $eventId = $this->createUpcomingEvent(168);
+        DB::table('event_reminders')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'remind_before_minutes' => 10080,
+            'reminder_type' => 'email',
+            'scheduled_for' => now()->subMinute(),
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $mailer = $this->fakeMailer(true);
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $sent = (new EventReminderService())->sendDueReminders($this->testTenantId);
+
+        $this->assertSame(1, $sent);
+        $this->assertCount(1, $mailer->calls);
+        $this->assertSame('event_reminder', $mailer->calls[0]['options']['category']);
+        $this->assertSame($this->testTenantId, $mailer->calls[0]['options']['tenant_id']);
+        $this->assertDatabaseHas('event_reminders', [
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'status' => 'sent',
+        ]);
+        $this->assertDatabaseHas('event_reminder_sent', [
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'reminder_type' => '7d',
+        ]);
+    }
+
+    public function test_configured_event_email_reminder_stays_pending_after_email_failure(): void
+    {
+        $attendee = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'event-configured-reminder-fail-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $eventId = $this->createUpcomingEvent(168);
+        DB::table('event_reminders')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'remind_before_minutes' => 10080,
+            'reminder_type' => 'email',
+            'scheduled_for' => now()->subMinute(),
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        app()->instance(EmailDispatchService::class, $this->fakeMailer(false));
+
+        $sent = (new EventReminderService())->sendDueReminders($this->testTenantId);
+
+        $this->assertSame(0, $sent);
+        $this->assertDatabaseHas('event_reminders', [
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'status' => 'pending',
+        ]);
+        $this->assertDatabaseMissing('event_reminder_sent', [
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'reminder_type' => '7d',
+        ]);
+    }
+
+    private function createUpcomingEvent(int $hoursFromNow = 24): int
     {
         $organizer = User::factory()->forTenant($this->testTenantId)->create([
             'email' => 'event-reminder-organizer-' . uniqid('', true) . '@example.test',
@@ -97,8 +177,8 @@ class EventEmailReliabilityTest extends TestCase
             'title' => 'Reminder Reliability Event',
             'description' => 'A reminder reliability regression test event.',
             'status' => 'active',
-            'start_time' => now()->addHours(24),
-            'end_time' => now()->addHours(26),
+            'start_time' => now()->addHours($hoursFromNow),
+            'end_time' => now()->addHours($hoursFromNow + 2),
             'created_at' => now(),
             'updated_at' => now(),
         ]);

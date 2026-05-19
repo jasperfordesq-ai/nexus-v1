@@ -137,6 +137,9 @@ class EventReminderService
                 $sent += $result['sent'];
             }
 
+            $configured = $this->processConfiguredReminders($tenantId);
+            $sent += $configured['sent'];
+
             return $sent;
         });
     }
@@ -200,8 +203,17 @@ class EventReminderService
                      AND ers.tenant_id = ?
                  WHERE r.event_id = ?
                    AND r.status IN ('going', 'interested')
+                   AND NOT EXISTS (
+                       SELECT 1
+                       FROM event_reminders er
+                       WHERE er.event_id = r.event_id
+                         AND er.user_id = r.user_id
+                         AND er.tenant_id = ?
+                         AND er.status = 'pending'
+                         AND er.remind_before_minutes = ?
+                   )
                    AND ers.id IS NULL",
-                [$tenantId, $reminderType, $tenantId, $eventId]
+                [$tenantId, $reminderType, $tenantId, $eventId, $tenantId, $hoursBeforeEvent * 60]
             );
 
             foreach ($attendees as $attendee) {
@@ -295,5 +307,152 @@ class EventReminderService
         }
 
         return ['sent' => $sent, 'errors' => $errors];
+    }
+
+    /**
+     * Process user-configured reminders from event_reminders.
+     *
+     * The React/Laravel event settings allow 60, 1440, and 10080 minute
+     * reminders with platform/email/both delivery. These rows are the user's
+     * explicit schedule, so they are handled separately from the legacy fixed
+     * 24h/1h fallback scan above.
+     */
+    private function processConfiguredReminders(int $tenantId): array
+    {
+        $sent = 0;
+        $errors = 0;
+
+        try {
+            $reminders = DB::select(
+                "SELECT er.id AS reminder_id, er.remind_before_minutes, er.reminder_type AS delivery_type,
+                        e.id AS event_id, e.title, e.start_time, e.location, e.is_online,
+                        u.id AS user_id, u.name, u.first_name, u.last_name, u.email, u.preferred_language
+                 FROM event_reminders er
+                 JOIN events e ON e.id = er.event_id AND e.tenant_id = er.tenant_id
+                 JOIN users u ON u.id = er.user_id AND u.tenant_id = er.tenant_id
+                 WHERE er.tenant_id = ?
+                   AND er.status = 'pending'
+                   AND er.scheduled_for <= NOW()
+                   AND e.start_time > NOW()
+                 ORDER BY er.scheduled_for ASC
+                 LIMIT 200",
+                [$tenantId]
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('[EventReminderService] configured reminder query error: ' . $e->getMessage());
+            return ['sent' => 0, 'errors' => 1];
+        }
+
+        foreach ($reminders as $reminder) {
+            $eventId = (int) $reminder->event_id;
+            $userId = (int) $reminder->user_id;
+            $deliveryType = (string) $reminder->delivery_type;
+            $reminderType = $this->reminderTypeForMinutes((int) $reminder->remind_before_minutes);
+            $emailAccepted = false;
+
+            try {
+                if (!self::claimReminderDelivery($tenantId, $eventId, $userId, $reminderType)) {
+                    continue;
+                }
+
+                LocaleContext::withLocale($reminder, function () use ($tenantId, $eventId, $userId, $reminder, $deliveryType, $reminderType, &$sent, &$emailAccepted): void {
+                    $title = htmlspecialchars($reminder->title, ENT_QUOTES, 'UTF-8');
+                    $when = date('l, M j \\a\\t g:i A', strtotime($reminder->start_time));
+                    $message = match ((int) $reminder->remind_before_minutes) {
+                        10080 => __('svc_notifications_2.event.reminder_7d', ['title' => $title, 'when' => $when]),
+                        1440 => __('svc_notifications_2.event.reminder_tomorrow', ['title' => $title, 'when' => $when]),
+                        default => __('svc_notifications_2.event.reminder_1h', ['title' => $title, 'when' => $when]),
+                    };
+                    $link = "/events/{$eventId}";
+
+                    $needsEmail = in_array($deliveryType, ['email', 'both'], true);
+                    $needsPlatform = in_array($deliveryType, ['platform', 'both'], true);
+                    $emailOk = true;
+
+                    if ($needsEmail && !empty($reminder->email)) {
+                        $subjectKey = match ((int) $reminder->remind_before_minutes) {
+                            10080 => 'notifications.event_reminder_subject_7d',
+                            1440 => 'notifications.event_reminder_subject_24h',
+                            default => 'notifications.event_reminder_subject_1h',
+                        };
+                        $subject = __($subjectKey, ['title' => $title]);
+                        $eventUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+                        $name = $reminder->first_name ?? $reminder->name ?? __('emails.common.fallback_name');
+
+                        $html = EmailTemplateBuilder::make()
+                            ->title(__('emails_misc.events.reminder_email_title'))
+                            ->previewText($message)
+                            ->greeting($name)
+                            ->paragraph($message)
+                            ->button(__('emails_misc.events.reminder_email_cta'), $eventUrl)
+                            ->render();
+
+                        $emailOk = \App\Services\EmailDispatchService::sendRaw(
+                            $reminder->email,
+                            $subject,
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'event_reminder',
+                            ['tenant_id' => $tenantId]
+                        );
+                    }
+
+                    if (!$emailOk) {
+                        self::releaseReminderDeliveryClaim($tenantId, $eventId, $userId, $reminderType);
+                        return;
+                    }
+
+                    $emailAccepted = true;
+                    $markedSent = self::markReminderDeliverySent($tenantId, $eventId, $userId, $reminderType);
+
+                    if ($needsPlatform) {
+                        DB::insert(
+                            "INSERT INTO notifications (user_id, tenant_id, message, link, type, created_at) VALUES (?, ?, ?, ?, 'event_reminder', NOW())",
+                            [$userId, $tenantId, $message, $link]
+                        );
+                    }
+
+                    if ($markedSent) {
+                        $sent++;
+                    }
+                });
+
+                if ($emailAccepted) {
+                    DB::table('event_reminders')
+                        ->where('id', $reminder->reminder_id)
+                        ->where('tenant_id', $tenantId)
+                        ->update(['status' => 'sent', 'sent_at' => now(), 'updated_at' => now()]);
+                }
+            } catch (\Throwable $e) {
+                if (!$emailAccepted) {
+                    self::releaseReminderDeliveryClaim($tenantId, $eventId, $userId, $reminderType);
+                    DB::table('event_reminders')
+                        ->where('id', $reminder->reminder_id)
+                        ->where('tenant_id', $tenantId)
+                        ->update(['status' => 'failed', 'updated_at' => now()]);
+                }
+
+                \Illuminate\Support\Facades\Log::warning('[EventReminderService] configured reminder failed', [
+                    'tenant_id' => $tenantId,
+                    'event_id' => $eventId,
+                    'user_id' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
+                $errors++;
+            }
+        }
+
+        return ['sent' => $sent, 'errors' => $errors];
+    }
+
+    private function reminderTypeForMinutes(int $minutes): string
+    {
+        return match ($minutes) {
+            10080 => '7d',
+            1440 => '24h',
+            default => '1h',
+        };
     }
 }

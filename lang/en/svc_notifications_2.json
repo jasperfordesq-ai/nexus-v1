@@ -82,6 +82,7 @@
   "safeguarding.assignment_created": "Safeguarding assignment created",
   "review.submitted_successfully": "Review submitted successfully",
   "event.added_to_waitlist": "This event is full. You have been added to the waitlist.",
+  "event.reminder_7d": "Reminder: \"{{title}}\" is in 7 days — {{when}}",
   "event.reminder_tomorrow": "Reminder: \"{{title}}\" is tomorrow — {{when}}",
   "event.reminder_1h": "Starting soon: \"{{title}}\" begins in 1 hour — {{when}}",
   "event.cancelled_notification": "The event \"{{title}}\" has been cancelled.",
