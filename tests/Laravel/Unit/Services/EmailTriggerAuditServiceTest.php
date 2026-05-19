@@ -348,4 +348,28 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('verein_dues_generated_without_email_evidence', $codes);
         $this->assertContains('verein_dues_paid_without_email_evidence', $codes);
     }
+
+    public function test_run_detects_member_premium_billing_event_without_email_evidence(): void
+    {
+        if (!Schema::hasTable('member_subscription_events') || !Schema::hasColumn('member_subscription_events', 'notification_sent_at')) {
+            $this->markTestSkipped('Member subscription event notification evidence columns are not available.');
+        }
+
+        DB::table('member_subscription_events')->insert([
+            'subscription_id' => 987654,
+            'tenant_id' => 2,
+            'event_type' => 'invoice.paid',
+            'stripe_event_id' => 'evt_member_premium_audit_' . uniqid('', true),
+            'payload' => json_encode(['object' => 'invoice']),
+            'notification_sent_at' => null,
+            'notification_failed_at' => now()->subMinute(),
+            'notification_last_error' => 'simulated failure',
+            'created_at' => now()->subMinutes(2),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('member_subscription_event_without_email_evidence', $codes);
+    }
 }

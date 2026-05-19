@@ -27,8 +27,9 @@ class MemberPremiumBillingEmailTest extends TestCase
 
         TenantContext::setById(2);
 
+        $eventId = 'evt_member_failed_' . uniqid();
         MemberPremiumService::applyWebhookEvent((object) [
-            'id' => 'evt_member_failed_' . uniqid(),
+            'id' => $eventId,
             'type' => 'invoice.payment_failed',
             'data' => (object) [
                 'object' => (object) [
@@ -52,6 +53,10 @@ class MemberPremiumBillingEmailTest extends TestCase
             'user_id' => $user->id,
             'type' => 'member_premium_billing',
         ]);
+        $eventRow = DB::table('member_subscription_events')->where('stripe_event_id', $eventId)->first();
+        $this->assertNotNull($eventRow);
+        $this->assertNotNull($eventRow->notification_sent_at);
+        $this->assertNull($eventRow->notification_failed_at);
     }
 
     public function test_invoice_paid_recovery_notifies_member_and_clears_grace(): void
@@ -66,8 +71,9 @@ class MemberPremiumBillingEmailTest extends TestCase
 
         TenantContext::setById(2);
 
+        $eventId = 'evt_member_paid_' . uniqid();
         MemberPremiumService::applyWebhookEvent((object) [
-            'id' => 'evt_member_paid_' . uniqid(),
+            'id' => $eventId,
             'type' => 'invoice.paid',
             'data' => (object) [
                 'object' => (object) [
@@ -91,6 +97,10 @@ class MemberPremiumBillingEmailTest extends TestCase
             'user_id' => $user->id,
             'type' => 'member_premium_billing',
         ]);
+        $eventRow = DB::table('member_subscription_events')->where('stripe_event_id', $eventId)->first();
+        $this->assertNotNull($eventRow);
+        $this->assertNotNull($eventRow->notification_sent_at);
+        $this->assertNull($eventRow->notification_failed_at);
     }
 
     public function test_replayed_member_premium_event_does_not_duplicate_email_or_bell(): void
@@ -115,6 +125,47 @@ class MemberPremiumBillingEmailTest extends TestCase
 
         $this->assertCount(1, $mailer->calls);
         $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $user->id)
+            ->where('type', 'member_premium_billing')
+            ->count());
+        $this->assertSame(1, DB::table('member_subscription_events')
+            ->where('stripe_event_id', $event->id)
+            ->whereNotNull('notification_sent_at')
+            ->count());
+    }
+
+    public function test_failed_member_premium_email_keeps_event_retryable_without_bell(): void
+    {
+        $tenantId = 999;
+        [$user, , $stripeSubId] = $this->createMemberSubscription($tenantId);
+        $mailer = $this->fakeMailer(false);
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $eventId = 'evt_member_email_failure_' . uniqid();
+
+        try {
+            MemberPremiumService::applyWebhookEvent((object) [
+                'id' => $eventId,
+                'type' => 'invoice.payment_failed',
+                'data' => (object) [
+                    'object' => (object) [
+                        'subscription' => $stripeSubId,
+                    ],
+                ],
+            ]);
+            $this->fail('Expected failed member premium email to fail webhook processing for retry.');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Member premium payment failed email failed', $e->getMessage());
+        }
+
+        $this->assertCount(1, $mailer->calls);
+        $eventRow = DB::table('member_subscription_events')->where('stripe_event_id', $eventId)->first();
+        $this->assertNotNull($eventRow);
+        $this->assertNull($eventRow->notification_sent_at);
+        $this->assertNotNull($eventRow->notification_failed_at);
+        $this->assertSame('Email dispatch returned false', $eventRow->notification_last_error);
+        $this->assertSame(0, DB::table('notifications')
             ->where('tenant_id', $tenantId)
             ->where('user_id', $user->id)
             ->where('type', 'member_premium_billing')
@@ -160,16 +211,20 @@ class MemberPremiumBillingEmailTest extends TestCase
         return [$user, $subscriptionId, $stripeSubId];
     }
 
-    private function fakeMailer(): EmailDispatchService
+    private function fakeMailer(bool $sendResult = true): EmailDispatchService
     {
-        return new class extends EmailDispatchService {
+        return new class($sendResult) extends EmailDispatchService {
             public array $calls = [];
+
+            public function __construct(private bool $sendResult)
+            {
+            }
 
             public function send(string $to, string $subject, string $body, array $options = []): bool
             {
                 $this->calls[] = compact('to', 'subject', 'body', 'options');
 
-                return true;
+                return $this->sendResult;
             }
         };
     }

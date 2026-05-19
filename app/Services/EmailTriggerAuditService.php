@@ -135,6 +135,7 @@ class EmailTriggerAuditService
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
                 $this->checkTenantProviderConfiguration($tenantId),
                 $this->checkBillingAndStripeHealth($tenantId, $since, $windowHours),
+                $this->checkMemberPremiumBillingEmailHealth($tenantId, $since, $windowHours),
                 $this->checkVereinDuesEmailHealth($tenantId, $since, $windowHours),
                 $this->checkMarketplaceReportNotificationHealth($tenantId, $since, $windowHours),
                 $this->checkDirectEmailSendSurface($tenantId),
@@ -1023,6 +1024,27 @@ class EmailTriggerAuditService
         }
 
         return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkMemberPremiumBillingEmailHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (!$this->hasTables(['member_subscription_events']) || !Schema::hasColumn('member_subscription_events', 'notification_sent_at')) {
+            return [];
+        }
+
+        $withoutNotification = DB::table('member_subscription_events')
+            ->select('tenant_id', DB::raw('COUNT(*) as count'))
+            ->whereIn('event_type', ['subscription.deleted', 'invoice.paid', 'invoice.payment_failed'])
+            ->where('created_at', '>=', $since)
+            ->whereNull('notification_sent_at')
+            ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId))
+            ->groupBy('tenant_id')
+            ->get();
+
+        return $this->rowsToIssues($withoutNotification, 'member_subscription_event_without_email_evidence', 'critical', 'billing', 'member_premium_billing', ['window_hours' => $windowHours]);
     }
 
     /**
