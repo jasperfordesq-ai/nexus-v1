@@ -96,6 +96,9 @@
   "volunteer.shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
   "volunteer.shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
   "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled",
+  "credit_donation.transaction_description": "Donation: :message",
+  "credit_donation.no_message": "(none)",
+  "credit_donation.community_fund": "Community Fund",
   "federation": {
     "notify_partnership_reactivated": "Partnership reactivated with {{partner}}."
   }

@@ -44,7 +44,7 @@ class StripeDonationService
     public static function createPaymentIntent(int $userId, int $tenantId, array $data): array
     {
         $amount = (float) ($data['amount'] ?? 0);
-        $currency = strtolower(trim($data['currency'] ?? TenantContext::getCurrency()));
+        $currency = strtolower(trim($data['currency'] ?? TenantContext::runForTenant($tenantId, fn() => TenantContext::getCurrency())));
 
         if ($amount < 0.50) {
             throw new \InvalidArgumentException('Donation amount must be at least 0.50.');
@@ -93,9 +93,7 @@ class StripeDonationService
             }
         }
 
-        // Build tenant name for description
-        $tenant = TenantContext::get();
-        $tenantName = $tenant['name'] ?? 'Community';
+        $tenantName = (string) (DB::table('tenants')->where('id', $tenantId)->value('name') ?? 'Community');
 
         // Create PaymentIntent
         try {
@@ -126,6 +124,7 @@ class StripeDonationService
             $tenantId, $userId, $data, $amount, $currency, $paymentIntent, $user
         ) {
             return VolDonation::create([
+                'tenant_id' => $tenantId,
                 'user_id' => $userId,
                 'opportunity_id' => isset($data['opportunity_id']) ? (int) $data['opportunity_id'] : null,
                 'community_project_id' => isset($data['community_project_id']) ? (int) $data['community_project_id'] : null,
@@ -294,7 +293,7 @@ class StripeDonationService
                             null,
                             null,
                             'donation_receipt',
-                            ['tenant_id' => $tenantId ?? \App\Core\TenantContext::currentId()]
+                            ['tenant_id' => (int) $donation->tenant_id]
                         )) {
                             Log::warning('[StripeDonationService] donation receipt email returned false', [
                                 'donation_id' => $donation->id ?? null,
@@ -468,6 +467,7 @@ class StripeDonationService
         DB::transaction(function () use ($donation) {
             DB::table('vol_donations')
                 ->where('id', $donation->id)
+                ->where('tenant_id', $donation->tenant_id)
                 ->update(['status' => 'refunded']);
 
             if (!empty($donation->giving_day_id)) {

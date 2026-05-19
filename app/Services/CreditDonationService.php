@@ -38,12 +38,12 @@ class CreditDonationService
             return false;
         }
 
-        $donor = User::find($fromUserId);
+        $donor = User::where('tenant_id', $tenantId)->where('id', $fromUserId)->first();
         if (!$donor || (float) ($donor->balance ?? 0) < $amount) {
             return false;
         }
 
-        $recipient = User::find($toUserId);
+        $recipient = User::where('tenant_id', $tenantId)->where('id', $toUserId)->first();
         if (!$recipient) {
             return false;
         }
@@ -70,7 +70,9 @@ class CreditDonationService
                 'sender_id' => $fromUserId,
                 'receiver_id' => $toUserId,
                 'amount' => $amount,
-                'description' => 'Donation' . ($message ? ": $message" : ''),
+                'description' => __('svc_notifications_2.credit_donation.transaction_description', [
+                    'message' => $message ?: __('svc_notifications_2.credit_donation.no_message'),
+                ]),
                 'transaction_type' => 'donation',
                 'status' => 'completed',
                 'created_at' => now(),
@@ -206,9 +208,13 @@ class CreditDonationService
             ->count();
 
         $rows = DB::table('credit_donations as cd')
-            ->leftJoin('users as donor', 'cd.donor_id', '=', 'donor.id')
+            ->leftJoin('users as donor', function ($join) {
+                $join->on('cd.donor_id', '=', 'donor.id')
+                    ->whereColumn('cd.tenant_id', '=', 'donor.tenant_id');
+            })
             ->leftJoin('users as recipient', function ($join) {
                 $join->on('cd.recipient_id', '=', 'recipient.id')
+                     ->whereColumn('cd.tenant_id', '=', 'recipient.tenant_id')
                      ->where('cd.recipient_type', '=', 'user');
             })
             ->where('cd.tenant_id', $tenantId)
@@ -250,7 +256,7 @@ class CreditDonationService
                 'donor_name' => trim($row->donor_name ?? ''),
                 'donor_avatar' => $row->donor_avatar ?? '',
                 'recipient_name' => $row->recipient_type === 'community_fund'
-                    ? 'Community Fund'
+                    ? __('svc_notifications_2.credit_donation.community_fund')
                     : trim($row->recipient_name ?? ''),
                 'recipient_avatar' => $row->recipient_avatar ?? '',
             ];

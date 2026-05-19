@@ -216,4 +216,13 @@ class StripeDonationServiceTest extends TestCase
 
         $this->assertNull($result);
     }
+
+    public function test_donation_state_changes_keep_explicit_tenant_scope(): void
+    {
+        $source = file_get_contents(app_path('Services/StripeDonationService.php'));
+
+        $this->assertStringContainsString("'tenant_id' => \$tenantId", $source);
+        $this->assertStringContainsString("['tenant_id' => (int) \$donation->tenant_id]", $source);
+        $this->assertStringContainsString("->where('tenant_id', \$donation->tenant_id)", $source);
+    }
 }

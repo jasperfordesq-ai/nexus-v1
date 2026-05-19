@@ -127,7 +127,7 @@ class BalanceAlertServiceTest extends TestCase
         $result = $this->service->checkBalance(1, 10.0, 'Test Org');
 
         $this->assertSame('critical', $result['alert_type']);
-        $this->assertTrue($result['alert_sent']);
+        $this->assertFalse($result['alert_sent']);
     }
 
     public function test_checkBalance_triggers_low_when_balance_between_critical_and_low(): void
@@ -144,7 +144,7 @@ class BalanceAlertServiceTest extends TestCase
         $result = $this->service->checkBalance(1, 25.0, 'Test Org');
 
         $this->assertSame('low', $result['alert_type']);
-        $this->assertTrue($result['alert_sent']);
+        $this->assertFalse($result['alert_sent']);
     }
 
     public function test_checkBalance_does_not_alert_when_balance_above_low_threshold(): void

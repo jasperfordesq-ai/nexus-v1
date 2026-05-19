@@ -446,7 +446,8 @@
     "received_greeting": "Great news!",
     "received_body": ":donor has donated :amount time credits to your wallet.",
     "received_message_label": "Their message",
-    "received_cta": "View Your Wallet"
+    "received_cta": "View Your Wallet",
+    "no_message": "(none)"
   },
   "identity_verification": {
     "passed_subject": "Your identity has been verified",

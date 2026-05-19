@@ -105,12 +105,10 @@ class BalanceAlertService
 
         if ($balance <= $thresholds['critical'] && !$alertedToday['critical']) {
             $alertType = 'critical';
-            $this->recordAlert($organizationId, 'critical');
-            $alertSent = true;
+            $alertSent = $this->sendAndRecordAlert($organizationId, 'critical');
         } elseif ($balance <= $thresholds['low'] && $balance > $thresholds['critical'] && !$alertedToday['low']) {
             $alertType = 'low';
-            $this->recordAlert($organizationId, 'low');
-            $alertSent = true;
+            $alertSent = $this->sendAndRecordAlert($organizationId, 'low');
         }
 
         return [
@@ -229,9 +227,9 @@ class BalanceAlertService
     }
 
     /**
-     * Record that an alert was sent and email the org owner.
+     * Send the alert first, then record it for daily idempotency only on success.
      */
-    private function recordAlert(int $organizationId, string $alertType): void
+    private function sendAndRecordAlert(int $organizationId, string $alertType): bool
     {
         $tenantId = TenantContext::getId();
 
@@ -241,19 +239,8 @@ class BalanceAlertService
             ->first();
         $balance = $wallet ? (float) $wallet->balance : 0.0;
 
-        try {
-            DB::table('org_balance_alerts')->insert([
-                'tenant_id'       => $tenantId,
-                'organization_id' => $organizationId,
-                'alert_type'      => $alertType,
-                'balance_at_alert' => $balance,
-                'created_at'      => now(),
-            ]);
-        } catch (\Exception $e) {
-            Log::warning('BalanceAlertService::recordAlert DB insert failed: ' . $e->getMessage());
-        }
+        $sent = false;
 
-        // Email the org owner
         try {
             $org = DB::table('vol_organizations')
                 ->where('id', $organizationId)
@@ -269,15 +256,41 @@ class BalanceAlertService
                     ->first();
 
                 if ($owner && !empty($owner->email)) {
-                    LocaleContext::withLocale($owner, fn() => $this->sendBalanceAlertEmail($owner, $org->name, $balance, $alertType));
+                    $sent = (bool) LocaleContext::withLocale($owner, fn() => $this->sendBalanceAlertEmail($owner, $org->name, $balance, $alertType));
                 }
             }
         } catch (\Exception $e) {
-            Log::warning('BalanceAlertService::recordAlert email failed: ' . $e->getMessage());
+            Log::warning('BalanceAlertService::sendAndRecordAlert email failed: ' . $e->getMessage());
         }
+
+        if (!$sent) {
+            Log::warning('BalanceAlertService: alert email not recorded because send did not succeed', [
+                'tenant_id' => $tenantId,
+                'organization_id' => $organizationId,
+                'alert_type' => $alertType,
+            ]);
+
+            return false;
+        }
+
+        try {
+            DB::table('org_balance_alerts')->insert([
+                'tenant_id'       => $tenantId,
+                'organization_id' => $organizationId,
+                'alert_type'      => $alertType,
+                'balance_at_alert' => $balance,
+                'created_at'      => now(),
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('BalanceAlertService::sendAndRecordAlert DB insert failed: ' . $e->getMessage());
+
+            return false;
+        }
+
+        return true;
     }
 
-    private function sendBalanceAlertEmail(object $owner, string $orgName, float $balance, string $alertType): void
+    private function sendBalanceAlertEmail(object $owner, string $orgName, float $balance, string $alertType): bool
     {
         $ownerName       = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_manager');
         $balanceFormatted = number_format($balance, 2);
@@ -303,7 +316,7 @@ class BalanceAlertService
             ->render();
 
         $subject = __($subjectKey, ['org' => $orgName]);
-        if (!\App\Services\EmailDispatchService::sendRaw(
+        $sent = \App\Services\EmailDispatchService::sendRaw(
             $owner->email,
             $subject,
             $html,
@@ -312,12 +325,16 @@ class BalanceAlertService
             null,
             'balance_alert',
             ['tenant_id' => $owner->tenant_id ?? TenantContext::currentId()]
-        )) {
+        );
+
+        if (!$sent) {
             Log::warning('BalanceAlertService: email failed to send', [
                 'owner_id'  => $owner->id,
                 'org_name'  => $orgName,
                 'alert_type' => $alertType,
             ]);
         }
+
+        return $sent;
     }
 }
