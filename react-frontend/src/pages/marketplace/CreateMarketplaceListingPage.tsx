@@ -115,7 +115,7 @@ const MAX_IMAGES = 20;
 export function CreateMarketplaceListingPage() {
   const navigate = useNavigate();
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('create.page_title', 'Sell Something - Marketplace'));
+  usePageTitle(t('create.page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -229,7 +229,7 @@ export function CreateMarketplaceListingPage() {
     if (!files) return;
     const remaining = MAX_IMAGES - images.length;
     if (remaining <= 0) {
-      toast.error(t('create.max_images_error', 'Maximum {{max}} images allowed', { max: MAX_IMAGES }));
+      toast.error(t('create.max_images_error', { max: MAX_IMAGES }));
       return;
     }
 
@@ -238,11 +238,11 @@ export function CreateMarketplaceListingPage() {
 
     for (const file of fileArray) {
       if (!file.type.startsWith('image/')) {
-        toast.error(t('create.not_image_error', '{{name}} is not an image', { name: file.name }));
+        toast.error(t('create.not_image_error', { name: file.name }));
         continue;
       }
       if (file.size > 10 * 1024 * 1024) {
-        toast.error(t('create.size_limit_error', '{{name}} exceeds 10MB limit', { name: file.name }));
+        toast.error(t('create.size_limit_error', { name: file.name }));
         continue;
       }
       newImages.push({
@@ -272,11 +272,11 @@ export function CreateMarketplaceListingPage() {
     const file = files[0] as File;
 
     if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
-      toast.error(t('create.video_type_error', 'Only MP4, WebM, and MOV video files are allowed.'));
+      toast.error(t('create.video_type_error'));
       return;
     }
     if (file.size > MAX_VIDEO_SIZE) {
-      toast.error(t('create.video_size_error', '{{name}} exceeds the 50MB video size limit.', { name: file.name }));
+      toast.error(t('create.video_size_error', { name: file.name }));
       return;
     }
 
@@ -306,7 +306,7 @@ export function CreateMarketplaceListingPage() {
   // AI description generation
   const handleGenerateDescription = useCallback(async () => {
     if (!title) {
-      toast.error(t('create.enter_title_first', 'Enter a title first'));
+      toast.error(t('create.enter_title_first'));
       return;
     }
     setIsGeneratingDesc(true);
@@ -319,13 +319,13 @@ export function CreateMarketplaceListingPage() {
       });
       if (response.success && response.data?.description) {
         setDescription(response.data.description);
-        toast.success(t('create.description_generated', 'Description generated'));
+        toast.success(t('create.description_generated'));
       } else {
-        toast.error(t('create.description_generate_failed', 'Failed to generate description'));
+        toast.error(t('create.description_generate_failed'));
       }
     } catch (err) {
       logError('Failed to generate description', err);
-      toast.error(t('create.description_generate_failed', 'Failed to generate description'));
+      toast.error(t('create.description_generate_failed'));
     } finally {
       setIsGeneratingDesc(false);
     }
@@ -334,10 +334,10 @@ export function CreateMarketplaceListingPage() {
   // Submit
   const handleSubmit = useCallback(async () => {
     // Validation
-    if (!title.trim()) { toast.error(t('create.title_required', 'Title is required')); return; }
-    if (!description.trim()) { toast.error(t('create.description_required', 'Description is required')); return; }
+    if (!title.trim()) { toast.error(t('create.title_required')); return; }
+    if (!description.trim()) { toast.error(t('create.description_required')); return; }
     if (priceType !== 'free' && (!price || parseFloat(price) <= 0)) {
-      toast.error(t('create.price_invalid', 'Please enter a valid price'));
+      toast.error(t('create.price_invalid'));
       return;
     }
 
@@ -371,7 +371,7 @@ export function CreateMarketplaceListingPage() {
 
       const response = await api.post<{ id: number }>('/v2/marketplace/listings', body);
       if (!response.success || !response.data?.id) {
-        toast.error(response.error || t('create.created_error', 'Failed to create listing'));
+        toast.error(response.error || t('create.created_error'));
         return;
       }
 
@@ -393,7 +393,7 @@ export function CreateMarketplaceListingPage() {
         await api.upload(`/v2/marketplace/listings/${listingId}/video`, videoFormData);
       }
 
-      toast.success(t('create.created_success', 'Listing created successfully!'));
+      toast.success(t('create.created_success'));
       clearDraft();
       // Cleanup blob URLs
       images.forEach((img) => URL.revokeObjectURL(img.url));
@@ -401,7 +401,7 @@ export function CreateMarketplaceListingPage() {
       navigate(tenantPath(`/marketplace/${listingId}`));
     } catch (err) {
       logError('Failed to create marketplace listing', err);
-      toast.error(t('create.created_error_retry', 'Failed to create listing. Please try again.'));
+      toast.error(t('create.created_error_retry'));
     } finally {
       setIsSubmitting(false);
     }
@@ -414,27 +414,27 @@ export function CreateMarketplaceListingPage() {
 
   return (
     <>
-      <PageMeta title={t('create.page_title', 'Sell Something - Marketplace')} noIndex={true} />
+      <PageMeta title={t('create.page_title')} noIndex={true} />
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-start gap-3">
           <Button
             as={Link}
             to={tenantPath('/marketplace')}
             variant="light"
             isIconOnly
             size="sm"
-            aria-label={t('common.go_back', 'Go back')}
+            aria-label={t('common.go_back')}
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">{t('create.title', 'Sell Something')}</h1>
-            <p className="text-sm text-default-500">{t('create.subtitle', 'Create a new marketplace listing')}</p>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-foreground">{t('create.title')}</h1>
+            <p className="text-sm text-default-500">{t('create.subtitle')}</p>
             {(draft.title || draft.description) && (
               <p className="text-xs text-default-400 mt-1">
-                {t('create.draft_saved', 'Draft saved')}
+                {t('create.draft_saved')}
               </p>
             )}
           </div>
@@ -442,11 +442,11 @@ export function CreateMarketplaceListingPage() {
 
         {/* Section 1: Photos */}
         <GlassCard className="p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-foreground flex flex-wrap items-center gap-2">
             <Camera className="w-5 h-5 text-primary" />
-            {t('create.photos', 'Photos')}
+            {t('create.photos')}
             <span className="text-sm font-normal text-default-400">
-              {t('create.photos_count', '({{current}}/{{max}})', { current: images.length, max: MAX_IMAGES })}
+              {t('create.photos_count', { current: images.length, max: MAX_IMAGES })}
             </span>
           </h2>
 
@@ -463,10 +463,10 @@ export function CreateMarketplaceListingPage() {
           >
             <Upload className="w-10 h-10 text-default-300 mx-auto mb-3" />
             <p className="text-sm text-default-500">
-              {t('create.drop_zone_text', 'Drag and drop images here, or click to browse')}
+              {t('create.drop_zone_text')}
             </p>
             <p className="text-xs text-default-400 mt-1">
-              {t('create.drop_zone_limits', 'Up to {{max}} images, max 10MB each. JPG, PNG, WebP.', { max: MAX_IMAGES })}
+              {t('create.drop_zone_limits', { max: MAX_IMAGES })}
             </p>
             <input
               ref={fileInputRef}
@@ -486,13 +486,13 @@ export function CreateMarketplaceListingPage() {
                 <div key={img.id} className="relative aspect-square rounded-lg overflow-hidden group">
                   <img
                     src={img.url}
-                    alt={`Upload ${idx + 1}`}
+                    alt={t('create.image_alt', { number: idx + 1 })}
                     className="w-full h-full object-cover"
                   />
                   {idx === 0 && (
                     <div className="absolute top-1 left-1">
                       <Chip size="sm" color="primary" variant="solid" className="text-[10px]">
-                        {t('create.cover', 'Cover')}
+                        {t('create.cover')}
                       </Chip>
                     </div>
                   )}
@@ -502,7 +502,7 @@ export function CreateMarketplaceListingPage() {
                     size="sm"
                     onPress={() => removeImage(img.id)}
                     className="absolute top-1 right-1 p-1 rounded-full bg-danger/90 text-white opacity-0 group-hover:opacity-100 transition-opacity min-w-0 w-auto h-auto"
-                    aria-label={t('create.remove_image', 'Remove image')}
+                    aria-label={t('create.remove_image')}
                   >
                     <X className="w-3 h-3" />
                   </Button>
@@ -516,7 +516,7 @@ export function CreateMarketplaceListingPage() {
                   className="aspect-square rounded-lg border-2 border-dashed border-default-300 flex flex-col items-center justify-center hover:border-primary hover:bg-primary/5 transition-colors h-auto min-w-0"
                 >
                   <Plus className="w-5 h-5 text-default-400" />
-                  <span className="text-xs text-default-400 mt-1">{t('create.add', 'Add')}</span>
+                  <span className="text-xs text-default-400 mt-1">{t('create.add')}</span>
                 </Button>
               )}
             </div>
@@ -527,9 +527,9 @@ export function CreateMarketplaceListingPage() {
         <GlassCard className="p-6 space-y-4">
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <Video className="w-5 h-5 text-primary" />
-            {t('create.video', 'Video')}
+            {t('create.video')}
             <span className="text-sm font-normal text-default-400">
-              {t('create.video_optional', '(optional, max 1 video, 50MB)')}
+              {t('create.video_optional')}
             </span>
           </h2>
 
@@ -546,7 +546,7 @@ export function CreateMarketplaceListingPage() {
                 variant="flat"
                 onPress={removeVideo}
                 className="absolute top-2 right-2 p-1.5 rounded-full bg-danger/90 text-white hover:bg-danger transition-colors min-w-0 w-auto h-auto"
-                aria-label={t('create.remove_video', 'Remove video')}
+                aria-label={t('create.remove_video')}
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -562,10 +562,10 @@ export function CreateMarketplaceListingPage() {
             >
               <Video className="w-8 h-8 text-default-300 mx-auto mb-2" />
               <p className="text-sm text-default-500">
-                {t('create.video_drop_zone', 'Click to add a video')}
+                {t('create.video_drop_zone')}
               </p>
               <p className="text-xs text-default-400 mt-1">
-                {t('create.video_limits', 'MP4, WebM, or MOV. Max 50MB.')}
+                {t('create.video_limits')}
               </p>
               <input
                 ref={videoInputRef}
@@ -583,23 +583,23 @@ export function CreateMarketplaceListingPage() {
         <GlassCard className="p-6 space-y-4">
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <FileText className="w-5 h-5 text-primary" />
-            {t('create.details', 'Details')}
+            {t('create.details')}
           </h2>
 
           <Input
-            label={t('create.title_label', 'Title')}
-            placeholder={t('create.title_placeholder', 'What are you selling?')}
+            label={t('create.title_label')}
+            placeholder={t('create.title_placeholder')}
             value={title}
             onValueChange={setTitle}
             isRequired
             maxLength={120}
-            description={t('create.title_char_count', '{{count}}/120 characters', { count: title.length })}
+            description={t('create.title_char_count', { count: title.length })}
           />
 
           <div className="space-y-2">
             <Textarea
-              label={t('create.description_label', 'Description')}
-              placeholder={t('create.description_placeholder', 'Describe your item in detail...')}
+              label={t('create.description_label')}
+              placeholder={t('create.description_placeholder')}
               value={description}
               onValueChange={setDescription}
               isRequired
@@ -615,14 +615,14 @@ export function CreateMarketplaceListingPage() {
                 isLoading={isGeneratingDesc}
                 isDisabled={!title.trim()}
               >
-                {t('create.generate_with_ai', 'Generate with AI')}
+                {t('create.generate_with_ai')}
               </Button>
             </div>
           </div>
 
           <Select
-            label={t('create.category_label', 'Category')}
-            placeholder={t('create.category_placeholder', 'Select a category')}
+            label={t('create.category_label')}
+            placeholder={t('create.category_placeholder')}
             selectedKeys={categoryId ? [categoryId] : []}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0];
@@ -638,8 +638,8 @@ export function CreateMarketplaceListingPage() {
           </Select>
 
           <Select
-            label={t('create.condition_label', 'Condition')}
-            placeholder={t('create.condition_placeholder', 'Select condition')}
+            label={t('create.condition_label')}
+            placeholder={t('create.condition_placeholder')}
             selectedKeys={[condition]}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0];
@@ -655,7 +655,7 @@ export function CreateMarketplaceListingPage() {
           </Select>
 
           <Input
-            label={t('create.quantity_label', 'Quantity')}
+            label={t('create.quantity_label')}
             type="number"
             min={1}
             value={quantity}
@@ -667,19 +667,19 @@ export function CreateMarketplaceListingPage() {
           {isLoadingTemplate && (
             <div className="flex items-center gap-2 py-2">
               <Spinner size="sm" />
-              <span className="text-sm text-default-400">{t('create.loading_category_fields', 'Loading category fields...')}</span>
+              <span className="text-sm text-default-400">{t('create.loading_category_fields')}</span>
             </div>
           )}
           {categoryTemplate.length > 0 && (
             <div className="space-y-3 pt-2">
-              <p className="text-sm font-medium text-default-500">{t('create.category_specific_details', 'Category-specific details')}</p>
+              <p className="text-sm font-medium text-default-500">{t('create.category_specific_details')}</p>
               {categoryTemplate.map((field) => {
                 if (field.type === 'select' && field.options) {
                   return (
                     <Select
                       key={field.key}
                       label={field.label}
-                      placeholder={`Select ${field.label.toLowerCase()}`}
+                      placeholder={t('create.select_field_placeholder', { field: field.label.toLowerCase() })}
                       selectedKeys={templateFields[field.key] ? [templateFields[field.key]].filter(Boolean) as string[] : []}
                       onSelectionChange={(keys) => {
                         const selected = Array.from(keys)[0];
@@ -700,7 +700,7 @@ export function CreateMarketplaceListingPage() {
                   <Input
                     key={field.key}
                     label={field.label}
-                    placeholder={`Enter ${field.label.toLowerCase()}`}
+                    placeholder={t('create.enter_field_placeholder', { field: field.label.toLowerCase() })}
                     type={field.type === 'number' ? 'number' : 'text'}
                     value={templateFields[field.key] || ''}
                     onValueChange={(val) =>
@@ -718,11 +718,11 @@ export function CreateMarketplaceListingPage() {
         <GlassCard className="p-6 space-y-4">
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <DollarSign className="w-5 h-5 text-primary" />
-            {t('create.pricing', 'Pricing')}
+            {t('create.pricing')}
           </h2>
 
           <RadioGroup
-            label={t('create.price_type_label', 'Price Type')}
+            label={t('create.price_type_label')}
             value={priceType}
             onValueChange={setPriceType}
             orientation="horizontal"
@@ -735,9 +735,9 @@ export function CreateMarketplaceListingPage() {
           </RadioGroup>
 
           {priceType !== 'free' && (
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <Input
-                label={t('create.price_label', 'Price')}
+                label={t('create.price_label')}
                 placeholder="0.00"
                 type="number"
                 min={0}
@@ -745,19 +745,19 @@ export function CreateMarketplaceListingPage() {
                 value={price}
                 onValueChange={setPrice}
                 isRequired
-                className="flex-1"
+                className="w-full sm:flex-1"
                 startContent={
                   <span className="text-default-400 text-sm">{currency}</span>
                 }
               />
               <Select
-                label={t('create.currency_label', 'Currency')}
+                label={t('create.currency_label')}
                 selectedKeys={[currency]}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0];
                   if (selected) setCurrency(String(selected));
                 }}
-                className="w-32"
+                className="w-full sm:w-32"
               >
                 <SelectItem key="EUR">EUR</SelectItem>
                 <SelectItem key="GBP">GBP</SelectItem>
@@ -780,12 +780,12 @@ export function CreateMarketplaceListingPage() {
         <GlassCard className="p-6 space-y-4">
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <Truck className="w-5 h-5 text-primary" />
-            {t('create.location_delivery', 'Location & Delivery')}
+            {t('create.location_delivery')}
           </h2>
 
           <PlaceAutocompleteInput
-            label={t('create.location_label', 'Location')}
-            placeholder={t('create.location_placeholder', 'City, town, or area')}
+            label={t('create.location_label')}
+            placeholder={t('create.location_placeholder')}
             value={location}
             onChange={setLocation}
             onPlaceSelect={(place) => {
@@ -805,7 +805,7 @@ export function CreateMarketplaceListingPage() {
           />
 
           <RadioGroup
-            label={t('create.delivery_method_label', 'Delivery Method')}
+            label={t('create.delivery_method_label')}
             value={deliveryMethod}
             onValueChange={setDeliveryMethod}
             orientation="horizontal"
@@ -819,13 +819,13 @@ export function CreateMarketplaceListingPage() {
         </GlassCard>
 
         {/* Submit */}
-        <div className="flex gap-3 justify-end pb-8">
+        <div className="flex flex-col-reverse gap-3 pb-8 sm:flex-row sm:justify-end">
           <Button
             variant="flat"
             as={Link}
             to={tenantPath('/marketplace')}
           >
-            {t('create.cancel', 'Cancel')}
+            {t('create.cancel')}
           </Button>
           <Button
             color="primary"
@@ -834,7 +834,7 @@ export function CreateMarketplaceListingPage() {
             isLoading={isSubmitting}
             startContent={!isSubmitting ? <Package className="w-4 h-4" /> : undefined}
           >
-            {t('create.publish', 'Publish Listing')}
+            {t('create.publish')}
           </Button>
         </div>
       </div>
