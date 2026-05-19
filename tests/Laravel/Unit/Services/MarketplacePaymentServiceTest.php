@@ -72,6 +72,17 @@ class MarketplacePaymentServiceTest extends TestCase
         MarketplacePaymentService::processRefund($order, null, 'test');
     }
 
+    public function test_processRefund_uses_refund_email_category_for_webhook_dedupe(): void
+    {
+        $source = file_get_contents(app_path('Services/MarketplacePaymentService.php'));
+        $start = strpos($source, 'public static function processRefund');
+        $end = strpos($source, 'private static function handleChargeRefunded', $start);
+        $method = substr($source, $start, $end - $start);
+
+        $this->assertStringContainsString("'marketplace_refund'", $method);
+        $this->assertStringNotContainsString("'marketplace_payment'", $method);
+    }
+
     // -----------------------------------------------------------------
     //  Fee calculation verification
     // -----------------------------------------------------------------

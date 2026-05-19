@@ -472,11 +472,15 @@ class JobInterviewService
                             $jobTitle  = $interview->vacancy->title ?? __('emails.common.fallback_job');
                             $timeLabel = $isOneHourWindow ? __('emails_misc.jobs.interview_in_1_hour') : __('emails_misc.jobs.interview_in_hours', ['hours' => $hoursUntil]);
                             $message   = __('emails_misc.jobs.interview_reminder', ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt]);
+                            $params = ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt];
+                            if (static::interviewReminderEmailAlreadySent((int) $candidateId, 'emails_misc.jobs.interview_email_subject_reminder', $params)) {
+                                return;
+                            }
                             if (!static::sendInterviewEmail(
                                 (int) $candidateId,
                                 'emails_misc.jobs.interview_email_subject_reminder',
                                 'emails_misc.jobs.interview_reminder',
-                                ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt],
+                                $params,
                                 "/jobs/{$interview->vacancy_id}"
                             )) {
                                 $emailOk = false;
@@ -520,11 +524,15 @@ class JobInterviewService
                             $jobTitle  = $interview->vacancy->title ?? __('emails.common.fallback_job');
                             $timeLabel = $isOneHourWindow ? __('emails_misc.jobs.interview_in_1_hour') : __('emails_misc.jobs.interview_in_hours', ['hours' => $hoursUntil]);
                             $message   = __('emails_misc.jobs.interview_reminder', ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt]);
+                            $params = ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt];
+                            if (static::interviewReminderEmailAlreadySent((int) $posterId, 'emails_misc.jobs.interview_email_subject_reminder', $params)) {
+                                return;
+                            }
                             if (!static::sendInterviewEmail(
                                 (int) $posterId,
                                 'emails_misc.jobs.interview_email_subject_reminder',
                                 'emails_misc.jobs.interview_reminder',
-                                ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt],
+                                $params,
                                 "/jobs/{$interview->vacancy_id}/applications"
                             )) {
                                 $emailOk = false;
@@ -600,6 +608,30 @@ class JobInterviewService
      * @param array  $params     Translation params (must include 'title')
      * @param string $jobLink    URL to include as CTA
      */
+    private static function interviewReminderEmailAlreadySent(int $userId, string $subjectKey, array $params): bool
+    {
+        $tenantId = TenantContext::getId();
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['email', 'preferred_language'])
+            ->first();
+
+        if (!$user || empty($user->email)) {
+            return false;
+        }
+
+        $subject = LocaleContext::withLocale($user, fn () => __($subjectKey, $params));
+
+        return DB::table('email_log')
+            ->where('tenant_id', $tenantId)
+            ->where('recipient_email', $user->email)
+            ->where('category', 'job_interview')
+            ->where('subject', $subject)
+            ->whereIn('status', ['sent', 'delivered'])
+            ->exists();
+    }
+
     private static function sendInterviewEmail(int $userId, string $subjectKey, string $messageKey, array $params, string $jobLink): bool
     {
         try {

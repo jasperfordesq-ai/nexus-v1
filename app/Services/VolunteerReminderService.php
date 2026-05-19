@@ -107,6 +107,21 @@ class VolunteerReminderService
             ->delete();
     }
 
+    private static function releaseReminderDeliveryClaims(int $tenantId, int $userId, string $reminderType, int $referenceId, array $channels): void
+    {
+        foreach ($channels as $channel) {
+            self::releaseReminderDeliveryClaim($tenantId, $userId, $reminderType, $referenceId, (string) $channel);
+        }
+    }
+
+    public static function releaseStaleReminderDeliveryClaims(int $olderThanMinutes = 30): int
+    {
+        return DB::table('vol_reminder_delivery_claims')
+            ->whereNull('delivered_at')
+            ->where('claimed_at', '<', now()->subMinutes(max(1, $olderThanMinutes)))
+            ->delete();
+    }
+
     private static function markReminderDeliverySent(int $tenantId, int $userId, string $reminderType, int $referenceId, string $channel): bool
     {
         $inserted = DB::table('vol_reminders_sent')->insertOrIgnore([
@@ -144,6 +159,8 @@ class VolunteerReminderService
      */
     public static function sendReminders(int $tenantId, int $opportunityId): int
     {
+        self::releaseStaleReminderDeliveryClaims();
+
         // Get the pre_shift reminder setting for this tenant
         $setting = DB::table('vol_reminder_settings')
             ->where('tenant_id', $tenantId)
@@ -198,6 +215,7 @@ class VolunteerReminderService
                 }
 
                 // Record the reminder as sent
+                $claimedChannels = [];
                 try {
                     // This service currently sends email only. Do not stamp
                     // push/SMS rows as sent without provider delivery evidence.
@@ -210,7 +228,6 @@ class VolunteerReminderService
                         continue;
                     }
 
-                    $claimedChannels = [];
                     foreach ($channels as $channel) {
                         if (self::claimReminderDelivery($tenantId, (int) $userId, 'pre_shift', (int) $shift->id, $channel)) {
                             $claimedChannels[] = $channel;
@@ -302,6 +319,7 @@ class VolunteerReminderService
                         $sentCount++;
                     }
                 } catch (\Throwable $e) {
+                    self::releaseReminderDeliveryClaims($tenantId, (int) $userId, 'pre_shift', (int) $shift->id, $claimedChannels);
                     \Illuminate\Support\Facades\Log::warning("VolunteerReminderService::sendReminders error for user {$userId}: " . $e->getMessage());
                 }
             }
@@ -484,6 +502,8 @@ class VolunteerReminderService
      */
     public static function sendPreShiftReminders(): int
     {
+        self::releaseStaleReminderDeliveryClaims();
+
         $totalSent = 0;
 
         // Collect all distinct tenant IDs that have reminder settings enabled,
@@ -555,6 +575,7 @@ class VolunteerReminderService
                             continue;
                         }
 
+                        $claimedChannels = [];
                         try {
                             // This service currently sends email only. Do not stamp
                             // push/SMS rows as sent without provider delivery evidence.
@@ -566,7 +587,6 @@ class VolunteerReminderService
                                 continue;
                             }
 
-                            $claimedChannels = [];
                             foreach ($channels as $channel) {
                                 if (self::claimReminderDelivery((int) $tenantId, (int) $userId, 'pre_shift', (int) $shift->id, $channel)) {
                                     $claimedChannels[] = $channel;
@@ -647,6 +667,7 @@ class VolunteerReminderService
                                 $totalSent++;
                             }
                         } catch (\Throwable $e) {
+                            self::releaseReminderDeliveryClaims((int) $tenantId, (int) $userId, 'pre_shift', (int) $shift->id, $claimedChannels);
                             Log::warning('[VolunteerReminderService] sendPreShiftReminders error for user ' . $userId . ': ' . $e->getMessage());
                         }
                     }
@@ -670,6 +691,8 @@ class VolunteerReminderService
      */
     public static function sendPostShiftFeedback(): int
     {
+        self::releaseStaleReminderDeliveryClaims();
+
         $totalSent = 0;
 
         // Collect tenants that have post_shift_feedback enabled
@@ -729,6 +752,7 @@ class VolunteerReminderService
                             continue;
                         }
 
+                        $claimedChannels = [];
                         try {
                             // This service currently sends email only. Do not stamp
                             // push/SMS rows as sent without provider delivery evidence.
@@ -740,7 +764,6 @@ class VolunteerReminderService
                                 continue;
                             }
 
-                            $claimedChannels = [];
                             foreach ($channels as $channel) {
                                 if (self::claimReminderDelivery((int) $tenantId, (int) $userId, 'post_shift_feedback', (int) $shift->id, $channel)) {
                                     $claimedChannels[] = $channel;
@@ -810,6 +833,7 @@ class VolunteerReminderService
                                 $totalSent++;
                             }
                         } catch (\Throwable $e) {
+                            self::releaseReminderDeliveryClaims((int) $tenantId, (int) $userId, 'post_shift_feedback', (int) $shift->id, $claimedChannels);
                             Log::warning('[VolunteerReminderService] sendPostShiftFeedback error for user ' . $userId . ': ' . $e->getMessage());
                         }
                     }

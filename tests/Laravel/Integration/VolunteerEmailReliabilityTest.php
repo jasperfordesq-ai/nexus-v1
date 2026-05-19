@@ -164,6 +164,61 @@ class VolunteerEmailReliabilityTest extends TestCase
         ]);
     }
 
+    public function test_stale_pre_shift_claim_is_reaped_and_later_run_can_send(): void
+    {
+        $tenantId = 999;
+        $volunteer = User::factory()->forTenant($tenantId)->create([
+            'email' => 'vol-stale-claim-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        [, , $shiftId] = $this->createVolunteerShift($tenantId, (int) $volunteer->id);
+
+        DB::table('vol_reminder_settings')->insert([
+            'tenant_id' => $tenantId,
+            'reminder_type' => 'pre_shift',
+            'enabled' => 1,
+            'hours_before' => 24,
+            'email_enabled' => 1,
+            'push_enabled' => 0,
+            'sms_enabled' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('vol_reminder_delivery_claims')->insert([
+            'tenant_id' => $tenantId,
+            'user_id' => $volunteer->id,
+            'reminder_type' => 'pre_shift',
+            'reference_id' => $shiftId,
+            'channel' => 'email',
+            'status' => 'claimed',
+            'claimed_at' => now()->subHours(2),
+            'created_at' => now()->subHours(2),
+            'updated_at' => now()->subHours(2),
+        ]);
+
+        $mailer = $this->fakeMailer(true);
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $sent = VolunteerReminderService::sendPreShiftReminders();
+
+        $this->assertSame(1, $sent);
+        $this->assertCount(1, $mailer->calls);
+        $this->assertDatabaseHas('vol_reminders_sent', [
+            'tenant_id' => $tenantId,
+            'user_id' => $volunteer->id,
+            'reference_id' => $shiftId,
+            'channel' => 'email',
+        ]);
+        $this->assertSame(1, DB::table('vol_reminder_delivery_claims')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $volunteer->id)
+            ->where('reference_id', $shiftId)
+            ->where('channel', 'email')
+            ->where('status', 'delivered')
+            ->count());
+    }
+
     public function test_admin_hours_verification_no_longer_sends_duplicate_raw_email_after_wallet_payment(): void
     {
         $source = file_get_contents(app_path('Http/Controllers/Api/AdminVolunteerController.php'));

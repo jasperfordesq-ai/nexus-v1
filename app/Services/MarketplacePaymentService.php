@@ -645,7 +645,7 @@ class MarketplacePaymentService
                         ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
                         ->render();
 
-                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_payment', ['tenant_id' => $tenantId])) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_refund', ['tenant_id' => $tenantId])) {
                         Log::warning('[MarketplacePaymentService] refund email failed', ['user_id' => $userId]);
                     }
                 });

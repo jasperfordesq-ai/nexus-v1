@@ -1335,11 +1335,22 @@ HTML;
         }
 
         try {
+            $tenantId = TenantContext::getId();
             $row = DB::table('exchange_requests as e')
-                ->join('listings as l', 'e.listing_id', '=', 'l.id')
-                ->join('users as req', 'e.requester_id', '=', 'req.id')
-                ->join('users as prov', 'e.provider_id', '=', 'prov.id')
+                ->join('listings as l', function ($join) {
+                    $join->on('e.listing_id', '=', 'l.id')
+                        ->on('e.tenant_id', '=', 'l.tenant_id');
+                })
+                ->join('users as req', function ($join) {
+                    $join->on('e.requester_id', '=', 'req.id')
+                        ->on('e.tenant_id', '=', 'req.tenant_id');
+                })
+                ->join('users as prov', function ($join) {
+                    $join->on('e.provider_id', '=', 'prov.id')
+                        ->on('e.tenant_id', '=', 'prov.tenant_id');
+                })
                 ->where('e.id', $exchangeId)
+                ->where('e.tenant_id', $tenantId)
                 ->select([
                     'e.*',
                     'l.title as listing_title',
