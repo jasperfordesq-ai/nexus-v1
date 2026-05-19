@@ -232,10 +232,10 @@ function ShiftCheckinPanel({ shifts }: ShiftCheckinPanelProps) {
       <GlassCard className="p-6 space-y-4">
         <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
           <QrCode className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-          {t('check_in.title', 'Shift Check-in')}
+          {t('check_in.title')}
         </h2>
         <p className="text-sm text-theme-muted">
-          {t('check_in.instructions', 'Show this QR code to your shift coordinator when you arrive.')}
+          {t('check_in.instructions')}
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {checkinEntries.map(([shiftIdStr, checkin]) => {
@@ -243,10 +243,10 @@ function ShiftCheckinPanel({ shifts }: ShiftCheckinPanelProps) {
             const shift = shifts.find((s) => s.id === shiftId);
             const statusLabel =
               checkin.status === 'checked_in'
-                ? t('check_in.status_checked_in', 'Checked In')
+                ? t('check_in.status_checked_in')
                 : checkin.status === 'checked_out'
-                  ? t('check_in.status_checked_out', 'Checked Out')
-                  : t('check_in.status_pending', 'Pending');
+                  ? t('check_in.status_checked_out')
+                  : t('check_in.status_pending');
 
             return (
               <Card key={shiftId} className="p-4">
@@ -258,7 +258,7 @@ function ShiftCheckinPanel({ shifts }: ShiftCheckinPanelProps) {
                 <div className="flex flex-col items-center gap-3">
                   <img
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(checkin.qr_url)}`}
-                    alt={t('check_in.qr_alt', 'QR code for check-in')}
+                    alt={t('check_in.qr_alt')}
                     className="w-48 h-48 rounded-lg bg-white p-1"
                     loading="lazy"
                   />
@@ -267,12 +267,12 @@ function ShiftCheckinPanel({ shifts }: ShiftCheckinPanelProps) {
                   </Chip>
                   {checkin.checked_in_at && (
                     <p className="text-sm text-theme-muted">
-                      {t('check_in.checked_in_at', 'Checked in: {{time}}', { time: formatTime(checkin.checked_in_at) })}
+                      {t('check_in.checked_in_at', { time: formatTime(checkin.checked_in_at) })}
                     </p>
                   )}
                   {checkin.checked_out_at && (
                     <p className="text-sm text-theme-muted">
-                      {t('check_in.checked_out_at', 'Checked out: {{time}}', { time: formatTime(checkin.checked_out_at) })}
+                      {t('check_in.checked_out_at', { time: formatTime(checkin.checked_out_at) })}
                     </p>
                   )}
                 </div>
@@ -282,7 +282,7 @@ function ShiftCheckinPanel({ shifts }: ShiftCheckinPanelProps) {
         </div>
         {errorShifts.size > 0 && errorShifts.size < shifts.length && (
           <p className="text-xs text-theme-subtle">
-            {t('check_in.some_unavailable', 'Check-in QR codes are not yet available for some shifts.')}
+            {t('check_in.some_unavailable')}
           </p>
         )}
       </GlassCard>
@@ -339,12 +339,12 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
         setCursor(newCursor);
         setHasMore(has_more);
       } else {
-        toastRef.current.error(response.error || tRef.current('applications.load_failed', 'Failed to load applications.'));
+        toastRef.current.error(response.error || tRef.current('applications.load_failed'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load applications', err);
-      toastRef.current.error(tRef.current('applications.load_failed', 'Failed to load applications.'));
+      toastRef.current.error(tRef.current('applications.load_failed'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
@@ -368,7 +368,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
     try {
       const response = await api.put(`/v2/volunteering/applications/${applicationId}`, { action });
       if (response.success) {
-        toast.success(action === 'approve' ? t('applications.approved', 'Application approved.') : t('applications.declined', 'Application declined.'));
+        toast.success(action === 'approve' ? t('applications.approved') : t('applications.declined'));
         setApplications((prev) =>
           prev.map((a) =>
             a.id === applicationId
@@ -377,21 +377,21 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
           )
         );
       } else {
-        toast.error(response.error || t('applications.action_failed', `Failed to ${action} application.`));
+        toast.error(response.error || t('applications.action_failed'));
       }
     } catch (err) {
       logError(`Failed to ${action} application`, err);
-      toast.error(t('something_wrong', 'Something went wrong.'));
+      toast.error(t('something_wrong'));
     } finally {
       setActionLoading((prev) => ({ ...prev, [applicationId]: false }));
     }
   }
 
   const filters: { key: AppStatusFilter; label: string }[] = [
-    { key: 'all', label: t('applications.filter_all', 'All') },
-    { key: 'pending', label: t('applications.filter_pending', 'Pending') },
-    { key: 'approved', label: t('applications.filter_approved', 'Approved') },
-    { key: 'declined', label: t('applications.filter_declined', 'Declined') },
+    { key: 'all', label: t('applications.filter_all') },
+    { key: 'pending', label: t('applications.filter_pending') },
+    { key: 'approved', label: t('applications.filter_approved') },
+    { key: 'declined', label: t('applications.filter_declined') },
   ];
 
   const pendingCount = applications.filter((a) => a.status === 'pending').length;
@@ -423,9 +423,9 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
         <div className="flex items-center gap-3 flex-wrap">
           <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
             <ClipboardList className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-            {t('applications.heading', 'Applications')}
+            {t('applications.heading')}
             {pendingCount > 0 && statusFilter === 'all' && (
-              <Chip size="sm" color="warning" variant="flat">{t('applications.pending_count', '{{count}} pending', { count: pendingCount })}</Chip>
+              <Chip size="sm" color="warning" variant="flat">{t('applications.pending_count', { count: pendingCount })}</Chip>
             )}
           </h2>
           {pendingFiltered.length > 0 && (
@@ -440,9 +440,9 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                   setSelected(new Set());
                 }
               }}
-              aria-label={t('applications.aria_select_all', 'Select all visible pending applications')}
+              aria-label={t('applications.aria_select_all')}
             >
-              <span className="text-xs text-theme-muted">{t('applications.select_all', 'Select all')}</span>
+              <span className="text-xs text-theme-muted">{t('applications.select_all')}</span>
             </Checkbox>
           )}
         </div>
@@ -466,17 +466,17 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
 
         <Input
           size="sm"
-          placeholder={t('opportunity.search_placeholder', 'Search by name...')}
+          placeholder={t('opportunity.search_placeholder')}
           value={nameSearch}
           onValueChange={setNameSearch}
           startContent={<Search className="w-3.5 h-3.5 text-theme-subtle" />}
-          aria-label={t('applications.aria_search_volunteers', 'Search volunteers by name')}
-          classNames={{ base: 'max-w-xs', inputWrapper: 'bg-theme-elevated' }}
+          aria-label={t('applications.aria_search_volunteers')}
+          classNames={{ base: 'w-full sm:max-w-xs', inputWrapper: 'bg-theme-elevated' }}
         />
 
         {selected.size > 0 && (
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30">
-            <span className="text-sm text-indigo-400 font-medium">{t('applications.selected_count', '{{count}} selected', { count: selected.size })}</span>
+          <div className="flex flex-col gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 sm:flex-row sm:items-center">
+            <span className="text-sm text-indigo-400 font-medium">{t('applications.selected_count', { count: selected.size })}</span>
             <Button
               size="sm"
               color="success"
@@ -484,7 +484,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
               startContent={<CheckCircle className="w-3.5 h-3.5" />}
               onPress={() => handleBulkAction('approve')}
             >
-              {t('applications.approve_all', 'Approve All')}
+              {t('applications.approve_all')}
             </Button>
             <Button
               size="sm"
@@ -493,10 +493,10 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
               startContent={<XCircle className="w-3.5 h-3.5" />}
               onPress={() => handleBulkAction('decline')}
             >
-              {t('applications.decline_all', 'Decline All')}
+              {t('applications.decline_all')}
             </Button>
             <Button size="sm" variant="light" onPress={() => setSelected(new Set())}>
-              {t('applications.clear', 'Clear')}
+              {t('applications.clear')}
             </Button>
           </div>
         )}
@@ -510,10 +510,10 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
             <Users className="w-10 h-10 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
             <p className="text-sm text-theme-muted">
               {nameSearch.trim()
-                ? t('applications.none_matching_search', 'No applications match your search.')
+                ? t('applications.none_matching_search')
                 : statusFilter === 'all'
-                  ? t('applications.none_yet', 'No applications yet.')
-                  : t('applications.none_filtered', 'No {{status}} applications.', { status: statusFilter })}
+                  ? t('applications.none_yet')
+                  : t('applications.none_filtered', { status: statusFilter })}
             </p>
           </div>
         ) : (
@@ -549,7 +549,11 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium text-theme-primary text-sm">{app.user.name}</span>
                     <Chip size="sm" variant="flat" color={statusColor(app.status)}>
-                      {t('status_' + app.status, app.status)}
+                      {app.status === 'approved'
+                        ? t('status_approved')
+                        : app.status === 'declined'
+                          ? t('status_declined')
+                          : t('status_pending')}
                     </Chip>
                   </div>
                   {app.message && (
@@ -564,7 +568,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                       {formatShortDate(app.shift.start_time)} · {formatTime(app.shift.start_time)}–{formatTime(app.shift.end_time)}
                     </p>
                   )}
-                  <p className="text-xs text-theme-subtle">{t('applications.applied_date', 'Applied {{date}}', { date: formatDate(app.created_at) })}</p>
+                  <p className="text-xs text-theme-subtle">{t('applications.applied_date', { date: formatDate(app.created_at) })}</p>
                 </div>
 
                 {app.status === 'pending' && (
@@ -577,7 +581,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                       isLoading={actionLoading[app.id]}
                       onPress={() => handleAction(app.id, 'approve')}
                     >
-                      {t('applications.approve', 'Approve')}
+                      {t('applications.approve')}
                     </Button>
                     <Button
                       size="sm"
@@ -587,7 +591,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                       isLoading={actionLoading[app.id]}
                       onPress={() => handleAction(app.id, 'decline')}
                     >
-                      {t('applications.decline', 'Decline')}
+                      {t('applications.decline')}
                     </Button>
                   </div>
                 )}
@@ -606,7 +610,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
               isDisabled={isLoadingMore}
               onPress={() => loadApplications(statusFilter, cursor)}
             >
-              {t('applications.load_more', 'Load more')}
+              {t('applications.load_more')}
             </Button>
           </div>
         )}
@@ -624,7 +628,7 @@ export function OpportunityDetailPage() {
   const toast = useToast();
   const { t } = useTranslation('volunteering');
 
-  usePageTitle(t('opportunity.page_title', 'Opportunity Details'));
+  usePageTitle(t('opportunity.page_title'));
 
   const [opportunity, setOpportunity] = useState<OpportunityDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -653,12 +657,12 @@ export function OpportunityDetailPage() {
       if (response.success && response.data) {
         setOpportunity(response.data);
       } else {
-        setError(tRef.current('opportunity.not_found', 'Opportunity not found.'));
+        setError(tRef.current('opportunity.not_found'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load opportunity', err);
-      setError(tRef.current('opportunity.load_error', 'Unable to load this opportunity. Please try again.'));
+      setError(tRef.current('opportunity.load_error'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
@@ -683,17 +687,17 @@ export function OpportunityDetailPage() {
 
       const response = await api.post(`/v2/volunteering/opportunities/${id}/apply`, body);
       if (response.success) {
-        toast.success(t('opportunity.application_submitted', 'Application submitted.'));
+        toast.success(t('opportunity.application_submitted'));
         applyModal.onClose();
         setApplyMessage('');
         setSelectedShiftId(null);
         load(); // Refresh to show applied state
       } else {
-        toast.error(response.error || t('opportunity.apply_failed', 'Failed to apply.'));
+        toast.error(response.error || t('opportunity.apply_failed'));
       }
     } catch (err) {
       logError('Failed to apply', err);
-      toast.error(t('something_wrong', 'Something went wrong.'));
+      toast.error(t('something_wrong'));
     } finally {
       setIsApplying(false);
     }
@@ -707,13 +711,13 @@ export function OpportunityDetailPage() {
       <div className="max-w-3xl mx-auto px-4 py-8">
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
-          <p className="text-theme-muted mb-4">{error || t('opportunity.not_found', 'Opportunity not found.')}</p>
+          <p className="text-theme-muted mb-4">{error || t('opportunity.not_found')}</p>
           <Button
             className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={load}
           >
-            {t('opportunity.try_again', 'Try Again')}
+            {t('opportunity.try_again')}
           </Button>
         </GlassCard>
       </div>
@@ -722,12 +726,14 @@ export function OpportunityDetailPage() {
 
   const opp = opportunity;
   const upcomingShifts = (opp.shifts || []).filter((s) => new Date(s.start_time) >= new Date());
+  const seoDescription = opp.description?.replace(/\s+/g, ' ').trim().slice(0, 160);
+  const structuredDescription = opp.description?.replace(/\s+/g, ' ').trim().slice(0, 300);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
       <PageMeta
         title={opp.title}
-        description={opp.description?.substring(0, 160)}
+        description={seoDescription}
         image={opp.organization?.logo_url || undefined}
       />
       <Helmet>
@@ -736,16 +742,18 @@ export function OpportunityDetailPage() {
             '@context': 'https://schema.org',
             '@type': 'VolunteerAction',
             name: opp.title,
-            ...(opp.description ? { description: opp.description.substring(0, 300) } : {}),
+            ...(structuredDescription ? { description: structuredDescription } : {}),
             ...(opp.location ? { location: { '@type': 'Place', name: opp.location } } : {}),
             ...(opp.organization ? { agent: { '@type': 'Organization', name: opp.organization.name } } : {}),
+            ...(opp.start_date ? { startTime: opp.start_date } : {}),
+            ...(opp.end_date ? { endTime: opp.end_date } : {}),
           })}
         </script>
       </Helmet>
 
       <Breadcrumbs
         items={[
-          { label: t('breadcrumb_volunteering', 'Volunteering'), href: tenantPath('/volunteering') },
+          { label: t('breadcrumb_volunteering'), href: tenantPath('/volunteering') },
           { label: opp.title },
         ]}
       />
@@ -753,7 +761,7 @@ export function OpportunityDetailPage() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
         {/* Header Card */}
         <GlassCard className="p-6 space-y-5">
-          <div className="flex items-start gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
             <Avatar
               src={opp.organization.logo_url || undefined}
               name={opp.organization.name}
@@ -780,11 +788,11 @@ export function OpportunityDetailPage() {
               variant="flat"
               color={opp.is_active ? 'success' : 'danger'}
             >
-              {opp.is_active ? t('opportunity.status_active', 'Active') : t('opportunity.status_closed', 'Closed')}
+              {opp.is_active ? t('opportunity.status_active') : t('opportunity.status_closed')}
             </Chip>
             {opp.is_remote && (
               <Chip size="sm" variant="flat" color="secondary" startContent={<Wifi className="w-3 h-3" />}>
-                {t('opportunity.remote', 'Remote')}
+                {t('opportunity.remote')}
               </Chip>
             )}
             {opp.category && (
@@ -794,12 +802,12 @@ export function OpportunityDetailPage() {
             )}
             {opp.has_applied && (
               <Chip size="sm" variant="flat" color="success" startContent={<CheckCircle className="w-3 h-3" />}>
-                {t('opportunity.applied', 'Applied')}
+                {t('opportunity.applied')}
               </Chip>
             )}
             {opp.is_owner && (
               <Chip size="sm" variant="flat" color="secondary" startContent={<ClipboardList className="w-3 h-3" />}>
-                {t('opportunity.your_opportunity', 'Your opportunity')}
+                {t('opportunity.your_opportunity')}
               </Chip>
             )}
           </div>
@@ -841,7 +849,7 @@ export function OpportunityDetailPage() {
               startContent={<Send className="w-4 h-4" aria-hidden="true" />}
               onPress={applyModal.onOpen}
             >
-              {t('opportunity.apply_now', 'Apply Now')}
+              {t('opportunity.apply_now')}
             </Button>
           )}
 
@@ -850,10 +858,10 @@ export function OpportunityDetailPage() {
               <CheckCircle className="w-5 h-5 text-emerald-400" aria-hidden="true" />
               <div>
                 <p className="text-sm font-medium text-emerald-400">
-                  {t('opportunity.you_have_applied', 'You have applied')}
+                  {t('opportunity.you_have_applied')}
                 </p>
                 <p className="text-xs text-theme-subtle">
-                  {t('opportunity.application_status', 'Status: {{status}}', { status: opp.application.status })} &middot; {t('opportunity.applied_on', 'Applied {{date}}', { date: formatDate(opp.application.created_at) })}
+                  {t('opportunity.application_status', { status: opp.application.status })} &middot; {t('opportunity.applied_on', { date: formatDate(opp.application.created_at) })}
                 </p>
               </div>
             </div>
@@ -878,13 +886,13 @@ export function OpportunityDetailPage() {
           <GlassCard className="p-6 space-y-4">
             <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
               <Clock className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-              {t('opportunity.upcoming_shifts', 'Upcoming Shifts')}
+              {t('opportunity.upcoming_shifts')}
             </h2>
             <div className="space-y-2">
               {upcomingShifts.map((shift) => (
                 <div
                   key={shift.id}
-                  className="flex items-center justify-between p-3 rounded-xl bg-theme-elevated border border-theme-default"
+                  className="flex flex-col gap-3 p-3 rounded-xl bg-theme-elevated border border-theme-default sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="flex items-center gap-3">
                     <Calendar className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
@@ -897,15 +905,15 @@ export function OpportunityDetailPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 sm:justify-end">
                     <Users className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
                     <span className="text-xs text-theme-muted">
                       {shift.signup_count}{shift.capacity ? `/${shift.capacity}` : ''}
                     </span>
                     {(shift.spots_available === null || shift.spots_available > 0) ? (
-                      <Chip size="sm" variant="flat" color="success">{t('opportunity.shift_open', 'Open')}</Chip>
+                      <Chip size="sm" variant="flat" color="success">{t('opportunity.shift_open')}</Chip>
                     ) : (
-                      <Chip size="sm" variant="flat" color="danger">{t('opportunity.shift_full', 'Full')}</Chip>
+                      <Chip size="sm" variant="flat" color="danger">{t('opportunity.shift_full')}</Chip>
                     )}
                   </div>
                 </div>
@@ -928,18 +936,18 @@ export function OpportunityDetailPage() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>{t('opportunity.apply_to', 'Apply to {{title}}', { title: opp.title })}</ModalHeader>
+              <ModalHeader>{t('opportunity.apply_to', { title: opp.title })}</ModalHeader>
               <ModalBody>
                 <Textarea
-                  label={t('opportunity.apply_message_label', 'Message (optional)')}
-                  placeholder={t('opportunity.apply_message_placeholder', "Tell the organiser why you'd like to volunteer...")}
+                  label={t('opportunity.apply_message_label')}
+                  placeholder={t('opportunity.apply_message_placeholder')}
                   value={applyMessage}
                   onValueChange={setApplyMessage}
                   minRows={3}
                 />
                 {upcomingShifts.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-theme-muted">{t('opportunity.select_shift', 'Select a shift (optional)')}</p>
+                    <p className="text-sm font-medium text-theme-muted">{t('opportunity.select_shift')}</p>
                     {upcomingShifts.filter((s) => s.spots_available === null || s.spots_available > 0).map((shift) => (
                       <Button
                         key={shift.id}
@@ -960,13 +968,13 @@ export function OpportunityDetailPage() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('opportunity.cancel', 'Cancel')}</Button>
+                <Button variant="flat" onPress={onClose}>{t('opportunity.cancel')}</Button>
                 <Button
                   className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                   onPress={handleApply}
                   isLoading={isApplying}
                 >
-                  {t('opportunity.submit_application', 'Submit Application')}
+                  {t('opportunity.submit_application')}
                 </Button>
               </ModalFooter>
             </>
