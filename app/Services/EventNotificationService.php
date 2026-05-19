@@ -219,7 +219,10 @@ class EventNotificationService
      *
      * @return int Number of notifications sent
      */
-    public function notifyCancellation(int $tenantId, int $eventId, ?string $reason = null): int
+    /**
+     * @param array<int> $recipientUserIds
+     */
+    public function notifyCancellation(int $tenantId, int $eventId, ?string $reason = null, array $recipientUserIds = []): int
     {
         try {
             $event = DB::table('events')
@@ -232,36 +235,52 @@ class EventNotificationService
                 return 0;
             }
 
-            // Get all RSVP users (going, interested, invited) with email info
-            $rsvpUsers = DB::table('event_rsvps as r')
-                ->join('users as u', function ($join) use ($tenantId) {
-                    $join->on('r.user_id', '=', 'u.id')
-                        ->where('u.tenant_id', '=', $tenantId);
-                })
-                ->where('r.event_id', $eventId)
-                ->where('r.tenant_id', $tenantId)
-                ->whereIn('r.status', ['going', 'interested', 'invited'])
-                ->select(['r.user_id', 'u.email', 'u.name', 'u.first_name', 'u.preferred_language'])
-                ->distinct()
-                ->get()
-                ->keyBy('user_id');
+            $recipientUserIds = collect($recipientUserIds)
+                ->map(fn ($id) => (int) $id)
+                ->filter(fn (int $id) => $id > 0)
+                ->unique()
+                ->values()
+                ->all();
 
-            // Get waitlisted users with email info
-            $waitlistedUsers = DB::table('event_waitlist as w')
-                ->join('users as u', function ($join) use ($tenantId) {
-                    $join->on('w.user_id', '=', 'u.id')
-                        ->where('u.tenant_id', '=', $tenantId);
-                })
-                ->where('w.event_id', $eventId)
-                ->where('w.tenant_id', $tenantId)
-                ->where('w.status', 'waiting')
-                ->select(['w.user_id', 'u.email', 'u.name', 'u.first_name', 'u.preferred_language'])
-                ->distinct()
-                ->get()
-                ->keyBy('user_id');
+            if ($recipientUserIds !== []) {
+                $allUsers = DB::table('users')
+                    ->where('tenant_id', $tenantId)
+                    ->whereIn('id', $recipientUserIds)
+                    ->select(['id as user_id', 'tenant_id', 'email', 'name', 'first_name', 'preferred_language'])
+                    ->get()
+                    ->keyBy('user_id');
+            } else {
+                // Get all RSVP users (going, interested, invited) with email info
+                $rsvpUsers = DB::table('event_rsvps as r')
+                    ->join('users as u', function ($join) use ($tenantId) {
+                        $join->on('r.user_id', '=', 'u.id')
+                            ->where('u.tenant_id', '=', $tenantId);
+                    })
+                    ->where('r.event_id', $eventId)
+                    ->where('r.tenant_id', $tenantId)
+                    ->whereIn('r.status', ['going', 'interested', 'invited'])
+                    ->select(['r.user_id', 'u.email', 'u.name', 'u.first_name', 'u.preferred_language'])
+                    ->distinct()
+                    ->get()
+                    ->keyBy('user_id');
 
-            // Merge all users (RSVP + waitlisted), deduplicated by user_id
-            $allUsers = $rsvpUsers->union($waitlistedUsers);
+                // Get waitlisted users with email info
+                $waitlistedUsers = DB::table('event_waitlist as w')
+                    ->join('users as u', function ($join) use ($tenantId) {
+                        $join->on('w.user_id', '=', 'u.id')
+                            ->where('u.tenant_id', '=', $tenantId);
+                    })
+                    ->where('w.event_id', $eventId)
+                    ->where('w.tenant_id', $tenantId)
+                    ->where('w.status', 'waiting')
+                    ->select(['w.user_id', 'u.email', 'u.name', 'u.first_name', 'u.preferred_language'])
+                    ->distinct()
+                    ->get()
+                    ->keyBy('user_id');
+
+                // Merge all users (RSVP + waitlisted), deduplicated by user_id
+                $allUsers = $rsvpUsers->union($waitlistedUsers);
+            }
 
             if ($allUsers->isEmpty()) {
                 return 0;

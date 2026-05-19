@@ -634,7 +634,12 @@ class EventsController extends BaseApiController
         // Notify all attendees and waitlisted users of the cancellation
         try {
             $tenantId = TenantContext::getId();
-            $this->eventNotificationService->notifyCancellation($tenantId, $id, $reason);
+            $this->eventNotificationService->notifyCancellation(
+                $tenantId,
+                $id,
+                $reason,
+                $this->eventService->getLastCancellationRecipientIds()
+            );
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("Event cancellation notification error: " . $e->getMessage());
         }

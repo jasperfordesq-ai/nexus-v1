@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\ActivityLog;
 use App\Models\Notification;
+use App\Services\EventNotificationService;
 use App\Services\EventService;
 
 /**
@@ -24,6 +25,7 @@ class AdminEventsController extends BaseApiController
 
     public function __construct(
         private readonly EventService $eventService,
+        private readonly EventNotificationService $eventNotificationService,
     ) {}
 
     /**
@@ -176,11 +178,34 @@ class AdminEventsController extends BaseApiController
     public function cancel(int $id): JsonResponse
     {
         $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
 
         $reason = $this->input('reason', 'Cancelled by admin');
+        $event = DB::table('events')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->select(['id', 'user_id'])
+            ->first();
+
         $cancelled = $this->eventService->cancelEvent($id, $adminId, $reason);
 
         if ($cancelled) {
+            try {
+                $recipientIds = $this->eventService->getLastCancellationRecipientIds();
+                if ($event && (int) $event->user_id > 0 && (int) $event->user_id !== (int) $adminId) {
+                    $recipientIds[] = (int) $event->user_id;
+                }
+
+                $this->eventNotificationService->notifyCancellation(
+                    $tenantId,
+                    $id,
+                    $reason,
+                    array_values(array_unique($recipientIds))
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Admin event cancellation notification error: ' . $e->getMessage());
+            }
+
             ActivityLog::log($adminId, 'admin_cancel_event', "Cancelled event #{$id}: {$reason}");
             return $this->respondWithData(['cancelled' => true, 'id' => $id]);
         }

@@ -66,6 +66,16 @@ class EventsControllerTest extends TestCase
         ], $overrides));
     }
 
+    private function setDailyNotificationPreference(int $userId): void
+    {
+        DB::table('notification_settings')->insert([
+            'user_id' => $userId,
+            'context_type' => 'global',
+            'context_id' => 0,
+            'frequency' => 'daily',
+        ]);
+    }
+
     // ================================================================
     // INDEX — Happy path
     // ================================================================
@@ -348,6 +358,50 @@ class EventsControllerTest extends TestCase
         $response = $this->apiPost('/v2/events/999999/cancel');
 
         $this->assertContains($response->getStatusCode(), [400, 404]);
+    }
+
+    public function test_cancel_notifies_rsvp_and_waitlisted_users_after_statuses_change(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $attendee = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'email' => 'event-cancel-attendee-' . uniqid('', true) . '@example.test',
+        ]);
+        $waitlisted = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'email' => 'event-cancel-waitlisted-' . uniqid('', true) . '@example.test',
+        ]);
+        $eventId = $this->createEvent((int) $organizer->id);
+
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'status' => 'going',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('event_waitlist')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $waitlisted->id,
+            'position' => 1,
+            'status' => 'waiting',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->setDailyNotificationPreference((int) $attendee->id);
+        $this->setDailyNotificationPreference((int) $waitlisted->id);
+
+        $response = $this->apiPost("/v2/events/{$eventId}/cancel", [
+            'reason' => 'Weather',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertSame('cancelled', DB::table('event_rsvps')->where('event_id', $eventId)->where('user_id', $attendee->id)->value('status'));
+        $this->assertSame('cancelled', DB::table('event_waitlist')->where('event_id', $eventId)->where('user_id', $waitlisted->id)->value('status'));
+        $this->assertSame(2, DB::table('notifications')->where('tenant_id', $this->testTenantId)->where('link', "/events/{$eventId}")->where('type', 'event')->count());
+        $this->assertSame(2, DB::table('notification_queue')->where('tenant_id', $this->testTenantId)->where('link', "/events/{$eventId}")->where('activity_type', 'event_cancellation')->count());
     }
 
     // ================================================================

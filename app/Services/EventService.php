@@ -27,6 +27,9 @@ class EventService
     /** @var array<string,mixed> */
     private static array $lastMeaningfulUpdateChanges = [];
 
+    /** @var array<int> */
+    private static array $lastCancellationRecipientIds = [];
+
     public function __construct(
         private readonly Event $event,
         private readonly EventRsvp $rsvp,
@@ -495,6 +498,14 @@ class EventService
     public static function getErrors(): array
     {
         return self::$errors;
+    }
+
+    /**
+     * @return array<int>
+     */
+    public static function getLastCancellationRecipientIds(): array
+    {
+        return self::$lastCancellationRecipientIds;
     }
 
     /**
@@ -977,6 +988,7 @@ class EventService
     public static function cancelEvent(int $eventId, int $userId, string $reason = ''): bool
     {
         self::$errors = [];
+        self::$lastCancellationRecipientIds = [];
         $tenantId = \App\Core\TenantContext::getId();
 
         $event = DB::selectOne("SELECT * FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
@@ -1000,6 +1012,24 @@ class EventService
         }
 
         try {
+            $rsvpUserIds = DB::select(
+                "SELECT DISTINCT user_id FROM event_rsvps WHERE event_id = ? AND tenant_id = ? AND status IN ('going', 'interested', 'invited')",
+                [$eventId, $tenantId]
+            );
+
+            $waitlistUserIds = DB::select(
+                "SELECT DISTINCT user_id FROM event_waitlist WHERE event_id = ? AND tenant_id = ? AND status = 'waiting'",
+                [$eventId, $tenantId]
+            );
+
+            self::$lastCancellationRecipientIds = collect($rsvpUserIds)->pluck('user_id')
+                ->merge(collect($waitlistUserIds)->pluck('user_id'))
+                ->map(fn ($id) => (int) $id)
+                ->filter(fn (int $id) => $id > 0)
+                ->unique()
+                ->values()
+                ->all();
+
             // Update event status
             DB::update(
                 "UPDATE events SET status = 'cancelled', cancellation_reason = ?, cancelled_at = NOW(), cancelled_by = ? WHERE id = ? AND tenant_id = ?",
@@ -1018,44 +1048,11 @@ class EventService
                 [$eventId, $tenantId]
             );
 
-            // Collect RSVP'd users BEFORE updating statuses (for notifications)
-            $rsvpUserIds = DB::select(
-                "SELECT DISTINCT user_id FROM event_rsvps WHERE event_id = ? AND tenant_id = ? AND status IN ('going', 'interested', 'invited')",
-                [$eventId, $tenantId]
-            );
-
             // Mark all active RSVPs as cancelled
             DB::update(
                 "UPDATE event_rsvps SET status = 'cancelled' WHERE event_id = ? AND tenant_id = ? AND status IN ('going', 'interested', 'invited')",
                 [$eventId, $tenantId]
             );
-
-            // Notify all RSVPs (going + interested) and waitlisted users
-            $waitlistUserIds = DB::select(
-                "SELECT DISTINCT user_id FROM event_waitlist WHERE event_id = ? AND tenant_id = ? AND status = 'waiting'",
-                [$eventId, $tenantId]
-            );
-
-            $allUserIds = collect($rsvpUserIds)->pluck('user_id')
-                ->merge(collect($waitlistUserIds)->pluck('user_id'))
-                ->unique();
-
-            $message = __('svc_notifications_2.event.cancelled_notification', ['title' => $event->title]);
-            if (!empty($reason)) {
-                $message .= __('svc_notifications_2.event.cancelled_reason_suffix', ['reason' => $reason]);
-            }
-
-            foreach ($allUserIds as $uid) {
-                try {
-                    DB::statement(
-                        "INSERT INTO notifications (user_id, tenant_id, message, link, type, is_actionable, created_at)
-                         VALUES (?, ?, ?, ?, 'event', 0, NOW())",
-                        [(int) $uid, $tenantId, $message, '/events/' . $eventId]
-                    );
-                } catch (\Exception $e) {
-                    Log::error("Failed to notify user {$uid} of event cancellation: " . $e->getMessage());
-                }
-            }
 
             return true;
         } catch (\Exception $e) {
