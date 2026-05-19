@@ -116,14 +116,6 @@ interface SellerListing {
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CONDITION_LABELS: Record<string, string> = {
-  new: 'New',
-  like_new: 'Like New',
-  good: 'Good',
-  fair: 'Fair',
-  poor: 'Poor',
-};
-
 const CONDITION_COLORS: Record<string, 'success' | 'primary' | 'warning' | 'danger' | 'default'> = {
   new: 'success',
   like_new: 'primary',
@@ -136,8 +128,8 @@ const CONDITION_COLORS: Record<string, 'success' | 'primary' | 'warning' | 'dang
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-function formatPrice(price: number | null, priceType: string, currency: string): string {
-  if (priceType === 'free' || price === null || price === 0) return 'Free';
+function formatPrice(price: number | null, priceType: string, currency: string, freeLabel: string): string {
+  if (priceType === 'free' || price === null || price === 0) return freeLabel;
   return new Intl.NumberFormat(undefined, {
     style: 'currency',
     currency: currency || 'EUR',
@@ -207,6 +199,13 @@ function buildProductSchema(
   return JSON.stringify(schema);
 }
 
+function getDeliveryMethodKey(method: string): string {
+  if (method === 'pickup' || method === 'shipping' || method === 'both' || method === 'community_delivery') {
+    return `delivery_method.${method}`;
+  }
+  return 'delivery_method.other';
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Image Gallery
 // ─────────────────────────────────────────────────────────────────────────────
@@ -233,9 +232,9 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
             controls
             preload="metadata"
             className="w-full h-full object-contain"
-            aria-label={t('listing.video', 'Listing video')}
+            aria-label={t('listing.video')}
           >
-            {t('listing.video_unsupported', 'Your browser does not support the video tag.')}
+            {t('listing.video_unsupported')}
           </video>
         </div>
       )}
@@ -248,7 +247,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
           <motion.img
             key={activeIndex}
             src={images[activeIndex]?.url}
-            alt={t('listing.image_alt', 'Image {{number}}', { number: activeIndex + 1 })}
+            alt={images[activeIndex]?.alt_text || t('listing.image_alt', { number: activeIndex + 1 })}
             className="w-full h-full object-contain"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -266,7 +265,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
               size="sm"
               onPress={() => setActiveIndex((i) => (i - 1 + images.length) % images.length)}
               className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm"
-              aria-label={t('listing.previous_image', 'Previous image')}
+              aria-label={t('listing.previous_image')}
             >
               <ChevronLeft className="w-5 h-5" />
             </Button>
@@ -276,7 +275,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
               size="sm"
               onPress={() => setActiveIndex((i) => (i + 1) % images.length)}
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm"
-              aria-label={t('listing.next_image', 'Next image')}
+              aria-label={t('listing.next_image')}
             >
               <ChevronRight className="w-5 h-5" />
             </Button>
@@ -291,7 +290,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
                   className={`w-2 h-2 min-w-0 min-h-0 rounded-full p-0 ${
                     idx === activeIndex ? 'bg-primary' : 'bg-white/50'
                   }`}
-                  aria-label={t('listing.view_image', 'View image {{number}}', { number: idx + 1 })}
+                  aria-label={t('listing.view_image', { number: idx + 1 })}
                 />
               ))}
             </div>
@@ -309,14 +308,14 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
               variant="light"
               size="sm"
               onPress={() => setActiveIndex(idx)}
-              aria-label={t('listing.thumbnail_label', 'View image {{n}}', { n: idx + 1 })}
+              aria-label={t('listing.thumbnail_label', { n: idx + 1 })}
               className={`shrink-0 w-16 h-16 min-w-0 rounded-lg overflow-hidden border-2 transition-colors p-0 ${
                 idx === activeIndex ? 'border-primary' : 'border-transparent'
               }`}
             >
               <img
                 src={img.thumbnail_url || img.url}
-                alt={t('listing.thumbnail_alt', 'Thumbnail {{number}}', { number: idx + 1 })}
+                alt={t('listing.thumbnail_alt', { number: idx + 1 })}
                 className="w-full h-full object-cover"
                 loading="lazy"
                 decoding="async"
@@ -339,11 +338,12 @@ export function MarketplaceListingPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('page_title', 'Marketplace'));
+  usePageTitle(t('page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath, branding } = useTenant();
   const toast = useToast();
   const offerModal = useDisclosure();
+  const freeLabel = t('price.free');
 
   // State
   const [listing, setListing] = useState<ListingDetail | null>(null);
@@ -355,6 +355,7 @@ export function MarketplaceListingPage() {
   const [isSubmittingOffer, setIsSubmittingOffer] = useState(false);
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportReason, setReportReason] = useState('');
+  const sellerId = listing?.user?.id;
 
   // Load listing
   useEffect(() => {
@@ -370,12 +371,12 @@ export function MarketplaceListingPage() {
         if (response.success && response.data) {
           setListing(response.data);
         } else {
-          setError(response.error || t('listing.not_found_title', 'Listing not found'));
+          setError(response.error || t('listing.not_found_title'));
         }
       } catch (err) {
         if (!cancelled) {
           logError('Failed to load marketplace listing', err);
-          setError(t('hub.unable_to_load', 'Unable to load listing'));
+          setError(t('hub.unable_to_load'));
         }
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -389,7 +390,7 @@ export function MarketplaceListingPage() {
   // Update page title when listing loads
   useEffect(() => {
     if (listing?.title) {
-      document.title = `${listing.title} - ${t('page_title', 'Marketplace')}`;
+      document.title = `${listing.title} - ${t('page_title')}`;
     }
   }, [listing?.title, t])
 
@@ -406,13 +407,13 @@ export function MarketplaceListingPage() {
 
   // Load seller listings
   useEffect(() => {
-    if (!listing?.user?.id) return;
+    if (!sellerId || !listing?.id) return;
     let cancelled = false;
 
     const load = async () => {
       try {
         const response = await api.get<SellerListing[]>(
-          `/v2/marketplace/sellers/${listing.user!.id}/listings?limit=4`
+          `/v2/marketplace/sellers/${sellerId}/listings?limit=4`
         );
         if (!cancelled && response.success && response.data) {
           setSellerListings(response.data.filter((l) => l.id !== listing.id));
@@ -424,12 +425,12 @@ export function MarketplaceListingPage() {
 
     load();
     return () => { cancelled = true; };
-  }, [listing?.user?.id, listing?.id]);
+  }, [sellerId, listing?.id]);
 
   // Toggle save
   const handleToggleSave = useCallback(async () => {
     if (!listing || !isAuthenticated) {
-      toast.error(t('common.sign_in_to_save', 'Please sign in to save listings'));
+      toast.error(t('common.sign_in_to_save'));
       return;
     }
     try {
@@ -439,10 +440,10 @@ export function MarketplaceListingPage() {
         await api.post(`/v2/marketplace/listings/${listing.id}/save`);
       }
       setListing((prev) => prev ? { ...prev, is_saved: !prev.is_saved } : prev);
-      toast.success(listing.is_saved ? t('common.removed_from_saved', 'Removed from saved') : t('common.saved_for_later', 'Saved for later'));
+      toast.success(listing.is_saved ? t('common.removed_from_saved') : t('common.saved_for_later'));
     } catch (err) {
       logError('Failed to toggle save', err);
-      toast.error(t('common.save_failed', 'Failed to update saved status'));
+      toast.error(t('common.save_failed'));
     }
   }, [listing, isAuthenticated, toast, t])
 
@@ -457,7 +458,7 @@ export function MarketplaceListingPage() {
       }
     } else {
       await navigator.clipboard.writeText(url);
-      toast.success(t('listing.link_copied', 'Link copied to clipboard'));
+      toast.success(t('listing.link_copied'));
     }
   }, [listing?.title, toast, t])
 
@@ -466,9 +467,9 @@ export function MarketplaceListingPage() {
     if (!listing || !reportReason.trim()) return;
     try {
       await api.post(`/v2/marketplace/listings/${listing.id}/report`, { reason: 'other', description: reportReason.trim() });
-      toast.success(t('listing.report_submitted', 'Report submitted. Thank you.'));
+      toast.success(t('listing.report_submitted'));
     } catch {
-      toast.error(t('listing.report_error', 'Failed to submit report'));
+      toast.error(t('listing.report_error'));
     } finally {
       setReportModalOpen(false);
       setReportReason('');
@@ -480,7 +481,7 @@ export function MarketplaceListingPage() {
     if (!listing || !offerAmount) return;
     const parsedOffer = Math.round(parseFloat(offerAmount) * 100) / 100;
     if (parsedOffer <= 0 || parsedOffer > 999999) {
-      toast.error(t('offer.amount_invalid', 'Please enter a valid offer amount'));
+      toast.error(t('offer.amount_invalid'));
       return;
     }
     setIsSubmittingOffer(true);
@@ -489,13 +490,13 @@ export function MarketplaceListingPage() {
         amount: parsedOffer,
         message: offerMessage || undefined,
       });
-      toast.success(t('offer.sent_success', 'Offer sent successfully!'));
+      toast.success(t('offer.sent_success'));
       offerModal.onClose();
       setOfferAmount('');
       setOfferMessage('');
     } catch (err) {
       logError('Failed to make offer', err);
-      toast.error(t('offer.sent_error', 'Failed to send offer'));
+      toast.error(t('offer.sent_error'));
     } finally {
       setIsSubmittingOffer(false);
     }
@@ -512,21 +513,25 @@ export function MarketplaceListingPage() {
       <div className="max-w-3xl mx-auto px-4 py-12">
         <EmptyState
           icon={<ShoppingBag className="w-8 h-8" />}
-          title={t('listing.not_found_title', 'Listing Not Found')}
-          description={error || t('listing.not_found_description', 'This listing may have been removed or is no longer available.')}
-          action={{ label: t('listing.back_to_marketplace', 'Back to Marketplace'), onClick: () => navigate(tenantPath('/marketplace')) }}
+          title={t('listing.not_found_title')}
+          description={error || t('listing.not_found_description')}
+          action={{ label: t('listing.back_to_marketplace'), onClick: () => navigate(tenantPath('/marketplace')) }}
         />
       </div>
     );
   }
 
-  const priceDisplay = formatPrice(listing.price, listing.price_type, listing.price_currency);
+  const priceDisplay = formatPrice(listing.price, listing.price_type, listing.price_currency, freeLabel);
+  const metaDescription = (listing.tagline || listing.description || t('listing.meta_description_fallback'))
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 160);
 
   return (
     <>
       <PageMeta
-        title={`${listing.title} - ${t('page_title', 'Marketplace')}`}
-        description={listing.description?.slice(0, 160)}
+        title={`${listing.title} - ${t('page_title')}`}
+        description={metaDescription}
         image={listing.images.find((image) => image.is_primary)?.url || listing.images[0]?.url}
         type="article"
         publishedTime={listing.created_at}
@@ -543,7 +548,7 @@ export function MarketplaceListingPage() {
             size="sm"
             startContent={<ArrowLeft className="w-4 h-4" />}
           >
-            {t('listing.marketplace', 'Marketplace')}
+            {t('listing.marketplace')}
           </Button>
           {listing.category?.name && listing.category?.slug && (
             <>
@@ -574,12 +579,12 @@ export function MarketplaceListingPage() {
                   <span className="text-3xl font-bold text-foreground">{priceDisplay}</span>
                   {listing.price_type === 'negotiable' && (
                     <Chip size="sm" color="warning" variant="flat" className="ml-2">
-                      {t('listing.negotiable', 'Negotiable')}
+                      {t('listing.negotiable')}
                     </Chip>
                   )}
                   {listing.price_type === 'free' && (
                     <Chip size="sm" color="success" variant="flat" className="ml-2">
-                      {t('listing.free', 'Free')}
+                      {t('listing.free')}
                     </Chip>
                   )}
                 </div>
@@ -589,7 +594,7 @@ export function MarketplaceListingPage() {
                     variant="flat"
                     size="sm"
                     onPress={handleShare}
-                    aria-label={t('listing.share_aria', 'Share')}
+                    aria-label={t('listing.share_aria')}
                   >
                     <Share2 className="w-4 h-4" />
                   </Button>
@@ -599,7 +604,7 @@ export function MarketplaceListingPage() {
                     size="sm"
                     color={listing.is_saved ? 'danger' : 'default'}
                     onPress={handleToggleSave}
-                    aria-label={listing.is_saved ? t('listing.unsave_aria', 'Unsave') : t('listing.save_aria', 'Save')}
+                    aria-label={listing.is_saved ? t('listing.unsave_aria') : t('listing.save_aria')}
                   >
                     <Heart className={`w-4 h-4 ${listing.is_saved ? 'fill-current' : ''}`} />
                   </Button>
@@ -615,22 +620,22 @@ export function MarketplaceListingPage() {
                     variant="flat"
                     color={CONDITION_COLORS[listing.condition] || 'default'}
                   >
-                    {t(`condition.${listing.condition}`, CONDITION_LABELS[listing.condition] || listing.condition)}
+                    {t(`condition.${listing.condition}`)}
                   </Chip>
                 )}
                 {listing.quantity > 1 && (
                   <Chip size="sm" variant="flat" startContent={<Package className="w-3 h-3" />}>
-                    {t('listing.available_count', '{{count}} available', { count: listing.quantity })}
+                    {t('listing.available_count', { count: listing.quantity })}
                   </Chip>
                 )}
                 {listing.is_promoted && (
                   <Chip size="sm" color="warning" variant="flat" startContent={<Star className="w-3 h-3" />}>
-                    {t('listing.featured', 'Featured')}
+                    {t('listing.featured')}
                   </Chip>
                 )}
               </div>
 
-              <div className="flex items-center gap-4 text-xs text-default-400">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-default-400">
                 {listing.location && (
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
@@ -639,7 +644,7 @@ export function MarketplaceListingPage() {
                 )}
                 <span className="flex items-center gap-1">
                   <Eye className="w-3 h-3" />
-                  {t('listing.views_count', '{{count}} views', { count: listing.views_count })}
+                  {t('listing.views_count', { count: listing.views_count })}
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
@@ -664,12 +669,12 @@ export function MarketplaceListingPage() {
                       currency={listing.price_currency}
                       sellerId={listing.user?.id ?? 0}
                       onSuccess={() => {
-                        toast.success(t('listing.order_created', 'Order created!'));
+                        toast.success(t('listing.order_created'));
                       }}
                     />
                   </>
                 )}
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   {listing.price_type !== 'free' && (
                     <Button
                       color="primary"
@@ -678,7 +683,7 @@ export function MarketplaceListingPage() {
                       onPress={offerModal.onOpen}
                       isDisabled={!isAuthenticated}
                     >
-                      {t('listing.make_offer', 'Make Offer')}
+                      {t('listing.make_offer')}
                     </Button>
                   )}
                   <Button
@@ -686,10 +691,10 @@ export function MarketplaceListingPage() {
                     fullWidth
                     startContent={<MessageCircle className="w-4 h-4" />}
                     as={listing.user ? Link : undefined}
-                    to={listing.user ? tenantPath(`/messages?to=${listing.user.id}&ref=marketplace&listing_id=${listing.id}&listing_title=${encodeURIComponent(listing.title)}&body=${encodeURIComponent(t('listing.message_template', 'Hi, I\'m interested in your listing: {{title}}', { title: listing.title }))}`) : undefined}
+                    to={listing.user ? tenantPath(`/messages?to=${listing.user.id}&ref=marketplace&listing_id=${listing.id}&listing_title=${encodeURIComponent(listing.title)}&body=${encodeURIComponent(t('listing.message_template', { title: listing.title }))}`) : undefined}
                     isDisabled={!isAuthenticated || !listing.user}
                   >
-                    {t('listing.message_seller', 'Message Seller')}
+                    {t('listing.message_seller')}
                   </Button>
                 </div>
               </div>
@@ -697,9 +702,9 @@ export function MarketplaceListingPage() {
               {!isAuthenticated && (
                 <p className="text-xs text-default-400 text-center">
                   <Link to={tenantPath('/login')} className="text-primary hover:underline">
-                    {t('listing.sign_in', 'Sign in')}
+                    {t('listing.sign_in')}
                   </Link>
-                  {' '}{t('listing.sign_in_to_contact', 'to contact the seller')}
+                  {' '}{t('listing.sign_in_to_contact')}
                 </p>
               )}
             </GlassCard>
@@ -708,7 +713,7 @@ export function MarketplaceListingPage() {
             {listing.user && (
             <GlassCard className="p-5 space-y-3">
               <h3 className="text-sm font-semibold text-default-500 uppercase tracking-wide">
-                {t('listing.user', 'Seller')}
+                {t('listing.seller')}
               </h3>
               <div className="flex items-center gap-3">
                 <Avatar
@@ -726,12 +731,12 @@ export function MarketplaceListingPage() {
                   <VerificationBadgeRow userId={listing.user.id} size="sm" />
                   <div className="flex items-center gap-3 text-xs text-default-400 mt-0.5">
                     {listing.user.member_since && (
-                      <span>{t('listing.member_since', 'Member since {{date}}', { date: new Date(listing.user.member_since).getFullYear() })}</span>
+                      <span>{t('listing.member_since', { date: new Date(listing.user.member_since).getFullYear() })}</span>
                     )}
                   </div>
                   {listing.seller_type === 'business' && (
                     <Chip size="sm" variant="flat" color="secondary" className="mt-1">
-                      {t('listing.seller_type_business', 'Business')}
+                      {t('listing.seller_type_business')}
                     </Chip>
                   )}
                 </div>
@@ -744,7 +749,7 @@ export function MarketplaceListingPage() {
                 size="sm"
                 endContent={<ExternalLink className="w-3.5 h-3.5" />}
               >
-                {t('listing.view_profile', 'View Profile')}
+                {t('listing.view_profile')}
               </Button>
             </GlassCard>
             )}
@@ -753,13 +758,10 @@ export function MarketplaceListingPage() {
             {listing.delivery_method && (
               <GlassCard className="p-5">
                 <h3 className="text-sm font-semibold text-default-500 uppercase tracking-wide mb-2">
-                  {t('listing.delivery', 'Delivery')}
+                  {t('listing.delivery')}
                 </h3>
                 <p className="text-sm text-foreground">
-                  {listing.delivery_method === 'pickup' ? t('delivery_method.pickup', 'Pickup Only')
-                    : listing.delivery_method === 'shipping' ? t('delivery_method.shipping', 'Shipping Only')
-                    : listing.delivery_method === 'both' ? t('delivery_method.both', 'Pickup or Shipping')
-                    : listing.delivery_method.replace(/_/g, ' ')}
+                  {t(getDeliveryMethodKey(listing.delivery_method))}
                 </p>
               </GlassCard>
             )}
@@ -768,7 +770,7 @@ export function MarketplaceListingPage() {
 
         {/* Description */}
         <GlassCard className="p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-foreground">{t('listing.description', 'Description')}</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('listing.description')}</h2>
           <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90 whitespace-pre-wrap">
             {listing.description}
           </div>
@@ -777,12 +779,12 @@ export function MarketplaceListingPage() {
           {listing.template_data && Object.keys(listing.template_data).length > 0 && (
             <>
               <Divider />
-              <h3 className="text-md font-semibold text-foreground">{t('listing.details', 'Details')}</h3>
-              <div className="grid grid-cols-2 gap-3">
+              <h3 className="text-md font-semibold text-foreground">{t('listing.details')}</h3>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {Object.entries(listing.template_data).map(([key, value]) => (
                   <div key={key} className="space-y-0.5">
                     <span className="text-xs text-default-400 capitalize">
-                      {key.replace(/_/g, ' ')}
+                      {t('listing.detail_field_label', { field: key.replace(/_/g, ' ') })}
                     </span>
                     <p className="text-sm text-foreground">{String(value)}</p>
                   </div>
@@ -798,7 +800,7 @@ export function MarketplaceListingPage() {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <User className="w-5 h-5 text-default-400" />
-                {t('listing.more_from_seller', 'More from {{name}}', { name: listing.user?.name ?? '' })}
+                {t('listing.more_from_seller', { name: listing.user?.name ?? '' })}
               </h2>
               <Button
                 as={Link}
@@ -807,7 +809,7 @@ export function MarketplaceListingPage() {
                 size="sm"
                 endContent={<ChevronRight className="w-4 h-4" />}
               >
-                {t('listing.view_all', 'View All')}
+                {t('listing.view_all')}
               </Button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -839,7 +841,7 @@ export function MarketplaceListingPage() {
                         {item.title}
                       </p>
                       <p className="text-sm font-semibold text-primary mt-0.5">
-                        {formatPrice(item.price, item.price_type, item.price_currency)}
+                        {formatPrice(item.price, item.price_type, item.price_currency, freeLabel)}
                       </p>
                     </div>
                   </GlassCard>
@@ -857,11 +859,11 @@ export function MarketplaceListingPage() {
             color="danger"
             startContent={<Flag className="w-3.5 h-3.5" />}
             onPress={() => {
-              if (!isAuthenticated) { toast.error(t('listing.sign_in_to_report', 'Sign in to report')); return; }
+              if (!isAuthenticated) { toast.error(t('listing.sign_in_to_report')); return; }
               setReportModalOpen(true);
             }}
           >
-            {t('listing.report_listing', 'Report this listing')}
+            {t('listing.report_listing')}
           </Button>
         </div>
       </div>
@@ -871,11 +873,11 @@ export function MarketplaceListingPage() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>{t('listing.report_modal_title', 'Report Listing')}</ModalHeader>
+              <ModalHeader>{t('listing.report_modal_title')}</ModalHeader>
               <ModalBody>
                 <Textarea
-                  label={t('listing.report_reason_label', 'Reason')}
-                  placeholder={t('listing.report_reason_placeholder', 'Please describe why you are reporting this listing...')}
+                  label={t('listing.report_reason_label')}
+                  placeholder={t('listing.report_reason_placeholder')}
                   value={reportReason}
                   onValueChange={setReportReason}
                   minRows={3}
@@ -885,14 +887,14 @@ export function MarketplaceListingPage() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {t('offer.cancel', 'Cancel')}
+                  {t('offer.cancel')}
                 </Button>
                 <Button
                   color="danger"
                   onPress={handleSubmitReport}
                   isDisabled={!reportReason.trim()}
                 >
-                  {t('listing.report_submit', 'Submit Report')}
+                  {t('listing.report_submit')}
                 </Button>
               </ModalFooter>
             </>
@@ -905,16 +907,16 @@ export function MarketplaceListingPage() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>{t('offer.modal_title', 'Make an Offer')}</ModalHeader>
+              <ModalHeader>{t('offer.modal_title')}</ModalHeader>
               <ModalBody className="space-y-4">
                 <div>
                   <p className="text-sm text-default-500 mb-3">
-                    {t('offer.asking_price', 'Asking price:')}{' '}
+                    {t('offer.asking_price')}{' '}
                     <span className="font-semibold text-foreground">{priceDisplay}</span>
                   </p>
                   <Input
-                    label={t('offer.your_offer', 'Your Offer')}
-                    placeholder="0.00"
+                    label={t('offer.your_offer')}
+                    placeholder={t('offer.amount_placeholder')}
                     type="number"
                     min={0}
                     max={999999}
@@ -930,8 +932,8 @@ export function MarketplaceListingPage() {
                   />
                 </div>
                 <Textarea
-                  label={t('offer.message_label', 'Message (optional)')}
-                  placeholder={t('offer.message_placeholder', 'Add a message for the seller...')}
+                  label={t('offer.message_label')}
+                  placeholder={t('offer.message_placeholder')}
                   value={offerMessage}
                   onValueChange={setOfferMessage}
                   minRows={2}
@@ -940,7 +942,7 @@ export function MarketplaceListingPage() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {t('offer.cancel', 'Cancel')}
+                  {t('offer.cancel')}
                 </Button>
                 <Button
                   color="primary"
@@ -948,7 +950,7 @@ export function MarketplaceListingPage() {
                   isLoading={isSubmittingOffer}
                   isDisabled={!offerAmount || parseFloat(offerAmount) <= 0}
                 >
-                  {t('offer.send', 'Send Offer')}
+                  {t('offer.send')}
                 </Button>
               </ModalFooter>
             </>
