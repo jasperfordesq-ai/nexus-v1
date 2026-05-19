@@ -83,12 +83,12 @@ export function CertificatesTab() {
               : [];
         setCertificates(items);
       } else {
-        setError(tRef.current('certificates.error_load', 'Failed to load certificates'));
+        setError(tRef.current('certificates.error_load'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load certificates', err);
-      setError(tRef.current('certificates.error_load_generic', 'Unable to load certificates.'));
+      setError(tRef.current('certificates.error_load_generic'));
     } finally {
       setIsLoading(false);
     }
@@ -105,17 +105,17 @@ export function CertificatesTab() {
       const response = await api.post('/v2/volunteering/certificates', {});
 
       if (response.success) {
-        toastRef.current.success(tRef.current('certificates.generated_success', 'Certificate generated!'));
+        toastRef.current.success(tRef.current('certificates.generated_success'));
         load();
       } else {
         toastRef.current.error(
           response.error ||
-          tRef.current('certificates.no_verified_hours', 'No verified volunteer hours found. Hours must be approved before generating a certificate.')
+          tRef.current('certificates.no_verified_hours')
         );
       }
     } catch (err) {
       logError('Failed to generate certificate', err);
-      toastRef.current.error(tRef.current('certificates.generated_error', 'Failed to generate certificate. Please try again.'));
+      toastRef.current.error(tRef.current('certificates.generated_error'));
     } finally {
       setIsGenerating(false);
     }
@@ -137,32 +137,32 @@ export function CertificatesTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Award className="w-5 h-5 text-amber-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">{t('certificates.title', 'Impact Certificates')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('certificates.title')}</h2>
         </div>
         <Button
           size="sm"
-          className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+          className="bg-gradient-to-r from-rose-500 to-pink-600 text-white sm:shrink-0"
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={handleGenerate}
           isLoading={isGenerating}
         >
-          {t('certificates.generate', 'Generate Certificate')}
+          {t('certificates.generate')}
         </Button>
       </div>
 
 
       <p className="text-sm text-theme-muted">
-        {t('certificates.description', 'Certificates include all of your approved volunteer hours across every organization.')}
+        {t('certificates.description')}
       </p>
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
-            {t('common.try_again', 'Try Again')}
+            {t('common.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -182,14 +182,14 @@ export function CertificatesTab() {
       {!error && !isLoading && certificates.length === 0 && (
         <EmptyState
           icon={<Award className="w-12 h-12" aria-hidden="true" />}
-          title={t('certificates.empty_title', 'No certificates yet')}
-          description={t('certificates.empty_description', 'Generate a certificate to showcase your volunteer hours.')}
+          title={t('certificates.empty_title')}
+          description={t('certificates.empty_description')}
           action={
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleGenerate}
             >
-              {t('certificates.generate', 'Generate Certificate')}
+              {t('certificates.generate')}
             </Button>
           }
         />
@@ -205,12 +205,12 @@ export function CertificatesTab() {
           {certificates.map((cert) => (
             <motion.div key={cert.id} variants={itemVariants}>
               <GlassCard className="p-5">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <Award className="w-5 h-5 text-amber-400" aria-hidden="true" />
                       <h3 className="font-semibold text-theme-primary text-lg">
-                        {t('certificates.verified_hours', '{{count}} Verified Hours', { count: cert.total_hours })}
+                        {t('certificates.verified_hours', { count: cert.total_hours })}
                       </h3>
                     </div>
 
@@ -221,7 +221,7 @@ export function CertificatesTab() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" aria-hidden="true" />
-                        {t('certificates.generated_on', 'Generated')} {new Date(cert.generated_at).toLocaleDateString()}
+                        {t('certificates.generated_on')} {new Date(cert.generated_at).toLocaleDateString()}
                       </span>
                       <span className="flex items-center gap-1">
                         <QrCode className="w-3 h-3" aria-hidden="true" />
@@ -233,21 +233,21 @@ export function CertificatesTab() {
                       <div className="flex flex-wrap gap-2">
                         {cert.organizations.map((org, i) => (
                           <Chip key={i} size="sm" variant="flat" startContent={<Building2 className="w-3 h-3" />}>
-                            {t('certificates.organization_hours', '{{name}} ({{hours}}h)', { name: org.name, hours: org.hours })}
+                            {t('certificates.organization_hours', { name: org.name, hours: org.hours })}
                           </Chip>
                         ))}
                       </div>
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-2 flex-shrink-0">
+                  <div className="flex flex-col gap-2 sm:flex-shrink-0">
                     <Button
                       size="sm"
                       className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                       startContent={<Download className="w-4 h-4" aria-hidden="true" />}
                       onPress={() => handleDownload(cert.verification_code)}
                     >
-                      {t('certificates.download', 'Download')}
+                      {t('certificates.download')}
                     </Button>
                     <Button
                       size="sm"
@@ -256,7 +256,7 @@ export function CertificatesTab() {
                       startContent={<ExternalLink className="w-4 h-4" aria-hidden="true" />}
                       onPress={() => window.open(cert.verification_url, '_blank')}
                     >
-                      {t('certificates.verify', 'Verify')}
+                      {t('certificates.verify')}
                     </Button>
                   </div>
                 </div>
