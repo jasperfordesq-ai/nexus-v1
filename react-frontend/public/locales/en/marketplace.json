@@ -531,6 +531,14 @@
     "delivery_confirmed": "Delivery confirmed! Time credits awarded.",
     "confirm_failed": "Failed to confirm delivery"
   },
+  "inventory": {
+    "section_title": "Inventory",
+    "section_subtitle": "Track stock and prevent over-selling.",
+    "unlimited": "Unlimited stock",
+    "count": "Stock count",
+    "low_stock_threshold": "Low-stock alert at",
+    "oversold_protected": "Reject orders that would oversell"
+  },
   "ai_reply": {
     "suggest": "Suggest Reply",
     "suggested_reply": "AI Suggested Reply",
