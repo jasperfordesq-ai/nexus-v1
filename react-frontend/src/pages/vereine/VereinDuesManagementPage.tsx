@@ -48,6 +48,7 @@ import Receipt from 'lucide-react/icons/receipt';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import Bell from 'lucide-react/icons/bell';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -277,7 +278,9 @@ export function VereinDuesManagementPage() {
   }, [organizationId, waiveDuesId, waiveReason, toast, t, loadDues]);
 
   return (
-    <div className="container max-w-6xl mx-auto p-4 md:p-6 space-y-6">
+    <>
+      <PageMeta title={t('verein_dues.admin_page_title', 'Membership dues')} noIndex />
+      <div className="container max-w-6xl mx-auto p-4 md:p-6 space-y-6">
       <div className="flex items-center gap-3">
         <Receipt className="w-7 h-7 text-primary" />
         <h1 className="text-2xl md:text-3xl font-bold text-foreground">
@@ -474,7 +477,8 @@ export function VereinDuesManagementPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </div>
+      </div>
+    </>
   );
 }
 

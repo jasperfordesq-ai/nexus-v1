@@ -20,6 +20,7 @@ import {
 import Inbox from 'lucide-react/icons/inbox';
 import MessageSquare from 'lucide-react/icons/message-square';
 import { useTranslation } from 'react-i18next';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -138,7 +139,9 @@ export default function MunicipalityFeedbackPage() {
   }, [category, subject, body, sentimentTag, isAnonymous, isPublic, loadMine, showToast, t]);
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <>
+      <PageMeta title={t('page_title')} noIndex />
+      <div className="mx-auto max-w-3xl space-y-6">
       <Card>
         <CardBody className="space-y-2">
           <div className="flex items-center gap-3">
@@ -288,6 +291,7 @@ export default function MunicipalityFeedbackPage() {
           )}
         </CardBody>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }

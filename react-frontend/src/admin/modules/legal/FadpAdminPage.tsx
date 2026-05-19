@@ -3,26 +3,31 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-/**
- * FadpAdminPage — AG42 Swiss FADP / nDSG Compliance Admin
- *
- * English-only admin panel page (NO t() calls — admin is English-only by design).
- * Four sections accessible via HeroUI Tabs:
- *   1. Processing Register  — table of processing activities + CSV export
- *   2. Retention Config     — per-class retention periods + data residency
- *   3. Consent Ledger       — searchable consent audit log + CSV export
- *   4. Data Residency       — summary card of declared storage location
- *
- * Route: /admin/enterprise/fadp
- */
-
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
-  Card, CardBody, CardHeader,
-  Button, Chip, Input, Select, SelectItem, Spinner,
-  Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
-  Tabs, Tab,
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
+  Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Chip,
+  Input,
+  Select,
+  SelectItem,
+  Spinner,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Tabs,
+  Tab,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
   Switch,
   Textarea,
 } from '@heroui/react';
@@ -37,10 +42,7 @@ import FileText from 'lucide-react/icons/file-text';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import api from '@/lib/api';
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+import { ConfirmModal } from '../../components';
 
 interface ProcessingActivity {
   id: number;
@@ -81,10 +83,6 @@ interface ConsentRecord {
   created_at: string;
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 function downloadCsv(rows: Record<string, unknown>[], filename: string) {
   if (rows.length === 0) return;
   const headers = Object.keys(rows[0] ?? {});
@@ -116,10 +114,6 @@ const legalBasisColor: Record<string, 'primary' | 'success' | 'warning' | 'secon
   legitimate_interest: 'secondary',
 };
 
-// ---------------------------------------------------------------------------
-// Empty activity form
-// ---------------------------------------------------------------------------
-
 const emptyActivity = {
   id: undefined as number | undefined,
   activity_name: '',
@@ -132,22 +126,54 @@ const emptyActivity = {
   sort_order: '0',
 };
 
-// ---------------------------------------------------------------------------
-// Main component
-// ---------------------------------------------------------------------------
+const retentionFields: Array<{
+  key: keyof RetentionConfig['config'];
+  labelKey: string;
+  hintKey: string;
+}> = [
+  {
+    key: 'member_data_years',
+    labelKey: 'fadp.retention.fields.member_data_years',
+    hintKey: 'fadp.retention.hints.member_data_years',
+  },
+  {
+    key: 'transaction_data_years',
+    labelKey: 'fadp.retention.fields.transaction_data_years',
+    hintKey: 'fadp.retention.hints.transaction_data_years',
+  },
+  {
+    key: 'activity_logs_years',
+    labelKey: 'fadp.retention.fields.activity_logs_years',
+    hintKey: 'fadp.retention.hints.activity_logs_years',
+  },
+  {
+    key: 'messages_years',
+    labelKey: 'fadp.retention.fields.messages_years',
+    hintKey: 'fadp.retention.hints.messages_years',
+  },
+  {
+    key: 'ai_embeddings_years',
+    labelKey: 'fadp.retention.fields.ai_embeddings_years',
+    hintKey: 'fadp.retention.hints.ai_embeddings_years',
+  },
+];
+
+const dataResidencyOptions: RetentionConfig['data_residency'][] = ['Switzerland', 'EU', 'International'];
+const legalBasisOptions = ['consent', 'contract', 'legal_obligation', 'legitimate_interest'];
 
 export function FadpAdminPage() {
-  usePageTitle('FADP Compliance');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('fadp.meta.page_title'));
   const toast = useToast();
 
-  // ---- Processing Activities ----
   const [activities, setActivities] = useState<ProcessingActivity[]>([]);
   const [activitiesLoading, setActivitiesLoading] = useState(true);
   const [activityModalOpen, setActivityModalOpen] = useState(false);
   const [activityForm, setActivityForm] = useState({ ...emptyActivity });
   const [activitySaving, setActivitySaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<ProcessingActivity | null>(null);
+  const [activityDeleting, setActivityDeleting] = useState(false);
 
-  // ---- Retention Config ----
   const [retention, setRetention] = useState<RetentionConfig>({
     config: {
       member_data_years: 7,
@@ -162,14 +188,9 @@ export function FadpAdminPage() {
   const [retentionLoading, setRetentionLoading] = useState(true);
   const [retentionSaving, setRetentionSaving] = useState(false);
 
-  // ---- Consent Ledger ----
   const [consentRecords, setConsentRecords] = useState<ConsentRecord[]>([]);
   const [consentLoading, setConsentLoading] = useState(true);
   const [registerData, setRegisterData] = useState<Record<string, unknown> | null>(null);
-
-  // ---------------------------------------------------------------------------
-  // Data loaders
-  // ---------------------------------------------------------------------------
 
   const loadActivities = useCallback(async () => {
     setActivitiesLoading(true);
@@ -177,11 +198,11 @@ export function FadpAdminPage() {
       const res = await api.get<ProcessingActivity[]>('/v2/admin/fadp/processing-activities');
       setActivities(res.data ?? []);
     } catch {
-      toast.showToast('Failed to load processing activities', 'error');
+      toast.showToast(t('fadp.toasts.activities_load_failed'), 'error');
     } finally {
       setActivitiesLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   const loadRetention = useCallback(async () => {
     setRetentionLoading(true);
@@ -189,11 +210,11 @@ export function FadpAdminPage() {
       const res = await api.get<RetentionConfig>('/v2/admin/fadp/retention-config');
       if (res.data) setRetention(res.data);
     } catch {
-      toast.showToast('Failed to load retention config', 'error');
+      toast.showToast(t('fadp.toasts.retention_load_failed'), 'error');
     } finally {
       setRetentionLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   const loadConsentLedger = useCallback(async () => {
     setConsentLoading(true);
@@ -201,18 +222,18 @@ export function FadpAdminPage() {
       const res = await api.get<ConsentRecord[]>('/v2/admin/fadp/consent-ledger');
       setConsentRecords(res.data ?? []);
     } catch {
-      toast.showToast('Failed to load consent ledger', 'error');
+      toast.showToast(t('fadp.toasts.consent_load_failed'), 'error');
     } finally {
       setConsentLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   const loadRegister = useCallback(async () => {
     try {
       const res = await api.get<Record<string, unknown>>('/v2/admin/fadp/processing-register');
       setRegisterData(res.data ?? null);
     } catch {
-      // non-critical
+      setRegisterData(null);
     }
   }, []);
 
@@ -222,10 +243,6 @@ export function FadpAdminPage() {
     void loadConsentLedger();
     void loadRegister();
   }, [loadActivities, loadRetention, loadConsentLedger, loadRegister]);
-
-  // ---------------------------------------------------------------------------
-  // Processing activity handlers
-  // ---------------------------------------------------------------------------
 
   function openAddActivity() {
     setActivityForm({ ...emptyActivity });
@@ -249,9 +266,10 @@ export function FadpAdminPage() {
 
   async function saveActivity() {
     if (!activityForm.activity_name.trim() || !activityForm.purpose.trim()) {
-      toast.showToast('Activity name and purpose are required', 'error');
+      toast.showToast(t('fadp.toasts.activity_required'), 'error');
       return;
     }
+
     setActivitySaving(true);
     try {
       const payload = {
@@ -274,47 +292,46 @@ export function FadpAdminPage() {
         sort_order: parseInt(activityForm.sort_order, 10) || 0,
       };
       await api.post('/v2/admin/fadp/processing-activities', payload);
-      toast.showToast('Processing activity saved', 'success');
+      toast.showToast(t('fadp.toasts.activity_saved'), 'success');
       setActivityModalOpen(false);
       void loadActivities();
+      void loadRegister();
     } catch {
-      toast.showToast('Failed to save activity', 'error');
+      toast.showToast(t('fadp.toasts.activity_save_failed'), 'error');
     } finally {
       setActivitySaving(false);
     }
   }
 
-  async function deleteActivity(id: number) {
-    if (!confirm('Delete this processing activity? This cannot be undone.')) return;
+  async function deleteActivity() {
+    if (!deleteTarget) return;
+
+    setActivityDeleting(true);
     try {
-      await api.delete(`/v2/admin/fadp/processing-activities/${id}`);
-      toast.showToast('Activity deleted', 'success');
+      await api.delete(`/v2/admin/fadp/processing-activities/${deleteTarget.id}`);
+      toast.showToast(t('fadp.toasts.activity_deleted'), 'success');
+      setDeleteTarget(null);
       void loadActivities();
+      void loadRegister();
     } catch {
-      toast.showToast('Failed to delete activity', 'error');
+      toast.showToast(t('fadp.toasts.activity_delete_failed'), 'error');
+    } finally {
+      setActivityDeleting(false);
     }
   }
-
-  // ---------------------------------------------------------------------------
-  // Retention config handler
-  // ---------------------------------------------------------------------------
 
   async function saveRetention() {
     setRetentionSaving(true);
     try {
       await api.put('/v2/admin/fadp/retention-config', retention);
-      toast.showToast('Retention configuration saved', 'success');
+      toast.showToast(t('fadp.toasts.retention_saved'), 'success');
       void loadRegister();
     } catch {
-      toast.showToast('Failed to save retention config', 'error');
+      toast.showToast(t('fadp.toasts.retention_save_failed'), 'error');
     } finally {
       setRetentionSaving(false);
     }
   }
-
-  // ---------------------------------------------------------------------------
-  // CSV export handlers
-  // ---------------------------------------------------------------------------
 
   async function exportRegisterCsv() {
     try {
@@ -331,7 +348,7 @@ export function FadpAdminPage() {
       }));
       downloadCsv(rows as Record<string, unknown>[], 'fadp-processing-register.csv');
     } catch {
-      toast.showToast('Failed to export register', 'error');
+      toast.showToast(t('fadp.toasts.register_export_failed'), 'error');
     }
   }
 
@@ -340,45 +357,54 @@ export function FadpAdminPage() {
       const res = await api.get<ConsentRecord[]>('/v2/admin/fadp/consent-ledger');
       downloadCsv(res.data as unknown as Record<string, unknown>[], 'fadp-consent-ledger.csv');
     } catch {
-      toast.showToast('Failed to export consent ledger', 'error');
+      toast.showToast(t('fadp.toasts.consent_export_failed'), 'error');
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Render
-  // ---------------------------------------------------------------------------
+  const renderedGeneratedAt = (registerData as { generated_at?: string } | null)?.generated_at
+    ? new Date((registerData as { generated_at: string }).generated_at).toLocaleString()
+    : t('fadp.common.empty_dash');
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)] flex items-center gap-2">
+      <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-default-200 bg-content1 p-5 shadow-sm">
+        <div className="min-w-0">
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-[var(--color-text)]">
             <ShieldCheck className="text-danger-500" size={24} />
-            Swiss FADP Compliance (nDSG)
+            {t('fadp.header.title')}
           </h1>
-          <p className="text-sm text-default-500 mt-1">
-            Federal Act on Data Protection — processing register, retention configuration, and consent audit
+          <p className="mt-1 max-w-3xl text-sm text-default-500">
+            {t('fadp.header.description')}
           </p>
         </div>
+        <Button
+          size="sm"
+          variant="bordered"
+          startContent={<RefreshCw size={14} />}
+          onPress={() => {
+            void loadActivities();
+            void loadRetention();
+            void loadConsentLedger();
+            void loadRegister();
+          }}
+        >
+          {t('fadp.actions.refresh')}
+        </Button>
       </div>
 
-      <Tabs aria-label="FADP sections" color="primary" variant="underlined">
-        {/* ================================================================
-            TAB 1 — Processing Register
-        ================================================================ */}
-        <Tab key="register" title={<span className="flex items-center gap-2"><FileText size={14} />Processing Register</span>}>
+      <Tabs aria-label={t('fadp.tabs.aria')} color="primary" variant="underlined">
+        <Tab key="register" title={<span className="flex items-center gap-2"><FileText size={14} />{t('fadp.tabs.register')}</span>}>
           <div className="space-y-4 pt-4">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <p className="text-sm text-default-500">
-                Article 12 nDSG requires a record of all processing activities. Add all activities where personal data is processed.
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="max-w-3xl text-sm text-default-500">
+                {t('fadp.register.description')}
               </p>
               <div className="flex gap-2">
                 <Button size="sm" variant="bordered" startContent={<Download size={14} />} onPress={() => void exportRegisterCsv()}>
-                  Export CSV
+                  {t('fadp.actions.export_csv')}
                 </Button>
                 <Button size="sm" color="primary" startContent={<Plus size={14} />} onPress={openAddActivity}>
-                  Add Activity
+                  {t('fadp.actions.add_activity')}
                 </Button>
               </div>
             </div>
@@ -386,131 +412,123 @@ export function FadpAdminPage() {
             {activitiesLoading ? (
               <div className="flex justify-center py-12"><Spinner /></div>
             ) : (
-              <Table aria-label="Processing activities" removeWrapper>
-                <TableHeader>
-                  <TableColumn>Activity</TableColumn>
-                  <TableColumn>Legal Basis</TableColumn>
-                  <TableColumn>Automated Profiling</TableColumn>
-                  <TableColumn>Retention</TableColumn>
-                  <TableColumn>Actions</TableColumn>
-                </TableHeader>
-                <TableBody emptyContent="No processing activities yet. Click 'Add Activity' to create one.">
-                  {activities.map(a => (
-                    <TableRow key={a.id}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium text-sm">{a.activity_name}</p>
-                          <p className="text-xs text-default-400 line-clamp-2">{a.purpose}</p>
-                          {a.data_categories.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {a.data_categories.map(c => (
-                                <Chip key={c} size="sm" variant="flat" className="text-xs">{c}</Chip>
-                              ))}
+              <Card shadow="sm">
+                <CardBody className="p-0">
+                  <Table aria-label={t('fadp.register.table_aria')} removeWrapper>
+                    <TableHeader>
+                      <TableColumn>{t('fadp.register.columns.activity')}</TableColumn>
+                      <TableColumn>{t('fadp.register.columns.legal_basis')}</TableColumn>
+                      <TableColumn>{t('fadp.register.columns.automated_profiling')}</TableColumn>
+                      <TableColumn>{t('fadp.register.columns.retention')}</TableColumn>
+                      <TableColumn>{t('fadp.register.columns.actions')}</TableColumn>
+                    </TableHeader>
+                    <TableBody emptyContent={t('fadp.register.empty')}>
+                      {activities.map(a => (
+                        <TableRow key={a.id}>
+                          <TableCell>
+                            <div>
+                              <p className="text-sm font-medium">{a.activity_name}</p>
+                              <p className="line-clamp-2 text-xs text-default-400">{a.purpose}</p>
+                              {a.data_categories.length > 0 && (
+                                <div className="mt-2 flex flex-wrap gap-1">
+                                  {a.data_categories.map(c => (
+                                    <Chip key={c} size="sm" variant="flat" className="text-xs">{c}</Chip>
+                                  ))}
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          size="sm"
-                          color={legalBasisColor[a.legal_basis] ?? 'default'}
-                          variant="flat"
-                        >
-                          {a.legal_basis.replace('_', ' ')}
-                        </Chip>
-                      </TableCell>
-                      <TableCell>
-                        {a.is_automated_profiling ? (
-                          <Chip size="sm" color="danger" variant="flat">Yes — consent required</Chip>
-                        ) : (
-                          <Chip size="sm" color="default" variant="flat">No</Chip>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-default-600">{a.retention_period}</span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="light"
-                            isIconOnly
-                            onPress={() => openEditActivity(a)}
-                            aria-label="Edit"
-                          >
-                            <RefreshCw size={14} />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="light"
-                            color="danger"
-                            isIconOnly
-                            onPress={() => void deleteActivity(a.id)}
-                            aria-label="Delete"
-                          >
-                            <Trash2 size={14} />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              size="sm"
+                              color={legalBasisColor[a.legal_basis] ?? 'default'}
+                              variant="flat"
+                            >
+                              {t(`fadp.legal_basis.${a.legal_basis}`, { defaultValue: a.legal_basis.replace('_', ' ') })}
+                            </Chip>
+                          </TableCell>
+                          <TableCell>
+                            {a.is_automated_profiling ? (
+                              <Chip size="sm" color="danger" variant="flat">{t('fadp.register.profiling_yes')}</Chip>
+                            ) : (
+                              <Chip size="sm" color="default" variant="flat">{t('fadp.common.no')}</Chip>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-default-600">{a.retention_period}</span>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="light"
+                                isIconOnly
+                                onPress={() => openEditActivity(a)}
+                                aria-label={t('fadp.actions.edit')}
+                              >
+                                <RefreshCw size={14} />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="light"
+                                color="danger"
+                                isIconOnly
+                                onPress={() => setDeleteTarget(a)}
+                                aria-label={t('fadp.actions.delete')}
+                              >
+                                <Trash2 size={14} />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardBody>
+              </Card>
             )}
           </div>
         </Tab>
 
-        {/* ================================================================
-            TAB 2 — Retention Config
-        ================================================================ */}
-        <Tab key="retention" title={<span className="flex items-center gap-2"><Database size={14} />Retention Config</span>}>
-          <div className="space-y-6 pt-4 max-w-xl">
+        <Tab key="retention" title={<span className="flex items-center gap-2"><Database size={14} />{t('fadp.tabs.retention')}</span>}>
+          <div className="max-w-2xl space-y-6 pt-4">
             {retentionLoading ? (
               <div className="flex justify-center py-12"><Spinner /></div>
             ) : (
               <>
-                <Card>
+                <Card shadow="sm">
                   <CardHeader>
-                    <h3 className="text-base font-semibold">Retention Periods</h3>
+                    <h3 className="text-base font-semibold">{t('fadp.retention.periods_title')}</h3>
                   </CardHeader>
                   <CardBody className="space-y-4">
-                    {(
-                      [
-                        ['member_data_years', 'Member data (years)', 'Registration, profiles, authentication'],
-                        ['transaction_data_years', 'Transaction data (years)', 'Time-credit exchange records'],
-                        ['activity_logs_years', 'Activity logs (years)', 'Platform activity and audit logs'],
-                        ['messages_years', 'Messages (years)', 'Direct and group messages'],
-                        ['ai_embeddings_years', 'AI embeddings (years)', 'Matching embeddings — requires consent'],
-                      ] as [keyof RetentionConfig['config'], string, string][]
-                    ).map(([key, label, hint]) => (
-                      <div key={key}>
-                        <Input
-                          type="number"
-                          label={label}
-                          description={hint}
-                          min={1}
-                          max={50}
-                          value={String(retention.config[key])}
-                          onValueChange={v =>
-                            setRetention(r => ({
-                              ...r,
-                              config: { ...r.config, [key]: parseInt(v, 10) || 1 },
-                            }))
-                          }
-                          variant="bordered"
-                        />
-                      </div>
+                    {retentionFields.map(({ key, labelKey, hintKey }) => (
+                      <Input
+                        key={key}
+                        type="number"
+                        label={t(labelKey)}
+                        description={t(hintKey)}
+                        min={1}
+                        max={50}
+                        value={String(retention.config[key])}
+                        onValueChange={v =>
+                          setRetention(r => ({
+                            ...r,
+                            config: { ...r.config, [key]: parseInt(v, 10) || 1 },
+                          }))
+                        }
+                        variant="bordered"
+                      />
                     ))}
                   </CardBody>
                 </Card>
 
-                <Card>
+                <Card shadow="sm">
                   <CardHeader>
-                    <h3 className="text-base font-semibold">Data Residency & DPA Contact</h3>
+                    <h3 className="text-base font-semibold">{t('fadp.retention.residency_title')}</h3>
                   </CardHeader>
                   <CardBody className="space-y-4">
                     <Select
-                      label="Data Residency Declaration"
+                      label={t('fadp.retention.data_residency_label')}
                       selectedKeys={new Set([retention.data_residency])}
                       onSelectionChange={keys => {
                         const v = Array.from(keys)[0] as RetentionConfig['data_residency'];
@@ -518,13 +536,13 @@ export function FadpAdminPage() {
                       }}
                       variant="bordered"
                     >
-                      <SelectItem key="Switzerland">Switzerland</SelectItem>
-                      <SelectItem key="EU">EU (EEA)</SelectItem>
-                      <SelectItem key="International">International (outside EU/Switzerland)</SelectItem>
+                      {dataResidencyOptions.map(option => (
+                        <SelectItem key={option}>{t(`fadp.data_residency.${option}`)}</SelectItem>
+                      ))}
                     </Select>
                     <Input
-                      label="DPA Contact Email (optional)"
-                      description="Data Protection Officer or responsible person email"
+                      label={t('fadp.retention.dpa_contact_label')}
+                      description={t('fadp.retention.dpa_contact_description')}
                       type="email"
                       value={retention.dpa_contact_email ?? ''}
                       onValueChange={v => setRetention(r => ({ ...r, dpa_contact_email: v || null }))}
@@ -538,95 +556,93 @@ export function FadpAdminPage() {
                   isLoading={retentionSaving}
                   onPress={() => void saveRetention()}
                 >
-                  Save Configuration
+                  {t('fadp.actions.save_configuration')}
                 </Button>
               </>
             )}
           </div>
         </Tab>
 
-        {/* ================================================================
-            TAB 3 — Consent Ledger
-        ================================================================ */}
-        <Tab key="ledger" title={<span className="flex items-center gap-2"><ShieldCheck size={14} />Consent Ledger</span>}>
+        <Tab key="ledger" title={<span className="flex items-center gap-2"><ShieldCheck size={14} />{t('fadp.tabs.ledger')}</span>}>
           <div className="space-y-4 pt-4">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <p className="text-sm text-default-500">
-                Immutable audit log of all member consent decisions. Required by Art. 6 nDSG to demonstrate lawfulness.
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="max-w-3xl text-sm text-default-500">
+                {t('fadp.ledger.description')}
               </p>
               <Button size="sm" variant="bordered" startContent={<Download size={14} />} onPress={() => void exportConsentCsv()}>
-                Export full ledger CSV
+                {t('fadp.actions.export_ledger_csv')}
               </Button>
             </div>
 
             {consentLoading ? (
               <div className="flex justify-center py-12"><Spinner /></div>
             ) : (
-              <Table aria-label="Consent records" removeWrapper>
-                <TableHeader>
-                  <TableColumn>Member ID</TableColumn>
-                  <TableColumn>Consent Type</TableColumn>
-                  <TableColumn>Action</TableColumn>
-                  <TableColumn>IP Address</TableColumn>
-                  <TableColumn>Date</TableColumn>
-                </TableHeader>
-                <TableBody emptyContent="No consent records yet.">
-                  {consentRecords.slice(0, 200).map(r => (
-                    <TableRow key={r.id}>
-                      <TableCell>
-                        <span className="text-sm font-mono text-default-600">{r.user_id}</span>
-                      </TableCell>
-                      <TableCell>
-                        <Chip size="sm" variant="flat">{r.consent_type}</Chip>
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          size="sm"
-                          color={r.action === 'granted' ? 'success' : r.action === 'withdrawn' ? 'danger' : 'warning'}
-                          variant="flat"
-                        >
-                          {r.action}
-                        </Chip>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-xs text-default-400 font-mono">{r.ip_address ?? '—'}</span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-default-600">
-                          {new Date(r.created_at).toLocaleString()}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <Card shadow="sm">
+                <CardBody className="p-0">
+                  <Table aria-label={t('fadp.ledger.table_aria')} removeWrapper>
+                    <TableHeader>
+                      <TableColumn>{t('fadp.ledger.columns.member_id')}</TableColumn>
+                      <TableColumn>{t('fadp.ledger.columns.consent_type')}</TableColumn>
+                      <TableColumn>{t('fadp.ledger.columns.action')}</TableColumn>
+                      <TableColumn>{t('fadp.ledger.columns.ip_address')}</TableColumn>
+                      <TableColumn>{t('fadp.ledger.columns.date')}</TableColumn>
+                    </TableHeader>
+                    <TableBody emptyContent={t('fadp.ledger.empty')}>
+                      {consentRecords.slice(0, 200).map(r => (
+                        <TableRow key={r.id}>
+                          <TableCell>
+                            <span className="font-mono text-sm text-default-600">{r.user_id}</span>
+                          </TableCell>
+                          <TableCell>
+                            <Chip size="sm" variant="flat">{r.consent_type}</Chip>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              size="sm"
+                              color={r.action === 'granted' ? 'success' : r.action === 'withdrawn' ? 'danger' : 'warning'}
+                              variant="flat"
+                            >
+                              {t(`fadp.consent_actions.${r.action}`, { defaultValue: r.action })}
+                            </Chip>
+                          </TableCell>
+                          <TableCell>
+                            <span className="font-mono text-xs text-default-400">{r.ip_address ?? t('fadp.common.empty_dash')}</span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-default-600">
+                              {new Date(r.created_at).toLocaleString()}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardBody>
+              </Card>
             )}
             {consentRecords.length > 200 && (
-              <p className="text-xs text-default-400 text-center">
-                Showing most recent 200 records. Use "Export full ledger CSV" to download all {consentRecords.length} records.
+              <p className="text-center text-xs text-default-400">
+                {t('fadp.ledger.truncated', { count: consentRecords.length })}
               </p>
             )}
           </div>
         </Tab>
 
-        {/* ================================================================
-            TAB 4 — Data Residency
-        ================================================================ */}
-        <Tab key="residency" title={<span className="flex items-center gap-2"><Globe size={14} />Data Residency</span>}>
-          <div className="space-y-4 pt-4 max-w-2xl">
-            <Card>
+        <Tab key="residency" title={<span className="flex items-center gap-2"><Globe size={14} />{t('fadp.tabs.residency')}</span>}>
+          <div className="max-w-2xl space-y-4 pt-4">
+            <Card shadow="sm">
               <CardBody className="space-y-4 p-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
                     <Globe size={22} className="text-primary-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[var(--color-text)]">Declared Data Residency</h3>
-                    <p className="text-sm text-default-500">Where tenant member data is stored and processed</p>
+                    <h3 className="font-semibold text-[var(--color-text)]">{t('fadp.residency.title')}</h3>
+                    <p className="text-sm text-default-500">{t('fadp.residency.description')}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-4 rounded-lg bg-default-50">
+                <div className="flex items-start gap-3 rounded-lg bg-default-50 p-4">
                   <Chip
                     size="lg"
                     color={
@@ -638,21 +654,16 @@ export function FadpAdminPage() {
                     }
                     variant="flat"
                   >
-                    {retention.data_residency}
+                    {t(`fadp.data_residency.${retention.data_residency}`)}
                   </Chip>
                   <div className="text-sm text-default-600">
-                    {retention.data_residency === 'Switzerland' &&
-                      'Data is stored entirely within Switzerland. Maximum FADP compliance — no cross-border transfer provisions required.'}
-                    {retention.data_residency === 'EU' &&
-                      'Data is stored within the EU/EEA. Switzerland recognises EU data protection as adequate — no additional FADP safeguards needed for transfers.'}
-                    {retention.data_residency === 'International' &&
-                      'Data is stored outside Switzerland and the EU. Art. 16–17 nDSG safeguards required: standard contractual clauses or explicit member consent for each transfer.'}
+                    {t(`fadp.residency.copy.${retention.data_residency}`)}
                   </div>
                 </div>
 
                 {retention.dpa_contact_email && (
                   <div className="text-sm text-default-600">
-                    <span className="font-medium">DPA Contact:</span>{' '}
+                    <span className="font-medium">{t('fadp.residency.dpa_contact')}:</span>{' '}
                     <a
                       href={`mailto:${retention.dpa_contact_email}`}
                       className="text-primary hover:underline"
@@ -662,44 +673,46 @@ export function FadpAdminPage() {
                   </div>
                 )}
 
-                <div className="border-t border-default-100 pt-4 space-y-2 text-xs text-default-500">
+                <div className="space-y-2 border-t border-default-100 pt-4 text-xs text-default-500">
                   <p>
-                    <span className="font-medium">FADP Art. 16:</span> Cross-border disclosure of personal data is permitted if the destination country ensures adequate data protection (recognised by the Federal Council). Switzerland, EU/EEA member states, and a small list of other countries qualify.
+                    <span className="font-medium">{t('fadp.residency.article_16_label')}:</span>{' '}
+                    {t('fadp.residency.article_16')}
                   </p>
                   <p>
-                    <span className="font-medium">FADP Art. 17:</span> If the destination does not qualify, appropriate safeguards must be in place (e.g., standard data protection clauses approved by the FDPIC, binding corporate rules, or member consent).
+                    <span className="font-medium">{t('fadp.residency.article_17_label')}:</span>{' '}
+                    {t('fadp.residency.article_17')}
                   </p>
                   <p>
-                    To update the declared residency, use the <strong>Retention Config</strong> tab.
+                    {t('fadp.residency.update_hint_prefix')}{' '}
+                    <strong>{t('fadp.tabs.retention')}</strong>{' '}
+                    {t('fadp.residency.update_hint_suffix')}
                   </p>
                 </div>
               </CardBody>
             </Card>
 
             {registerData && (
-              <Card>
-                <CardBody className="p-6 space-y-2">
-                  <h4 className="font-semibold text-sm">Register Summary</h4>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
+              <Card shadow="sm">
+                <CardBody className="space-y-2 p-6">
+                  <h4 className="text-sm font-semibold">{t('fadp.summary.title')}</h4>
+                  <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                     <div>
-                      <span className="text-default-500">Total activities:</span>{' '}
+                      <span className="text-default-500">{t('fadp.summary.total_activities')}:</span>{' '}
                       <span className="font-medium">{(registerData as { total_activities?: number }).total_activities ?? 0}</span>
                     </div>
                     <div>
-                      <span className="text-default-500">Automated profiling:</span>{' '}
+                      <span className="text-default-500">{t('fadp.summary.automated_profiling')}:</span>{' '}
                       <span className="font-medium text-danger-600">
                         {(registerData as { automated_profiling_count?: number }).automated_profiling_count ?? 0}
                       </span>
                     </div>
                     <div>
-                      <span className="text-default-500">Tenant:</span>{' '}
-                      <span className="font-medium">{(registerData as { tenant_name?: string }).tenant_name ?? '—'}</span>
+                      <span className="text-default-500">{t('fadp.summary.tenant')}:</span>{' '}
+                      <span className="font-medium">{(registerData as { tenant_name?: string }).tenant_name ?? t('fadp.common.empty_dash')}</span>
                     </div>
                     <div>
-                      <span className="text-default-500">Generated:</span>{' '}
-                      <span className="font-medium">
-                        {new Date((registerData as { generated_at?: string }).generated_at ?? '').toLocaleString()}
-                      </span>
+                      <span className="text-default-500">{t('fadp.summary.generated')}:</span>{' '}
+                      <span className="font-medium">{renderedGeneratedAt}</span>
                     </div>
                   </div>
                 </CardBody>
@@ -709,9 +722,6 @@ export function FadpAdminPage() {
         </Tab>
       </Tabs>
 
-      {/* ================================================================
-          Activity Modal
-      ================================================================ */}
       <Modal
         isOpen={activityModalOpen}
         onOpenChange={setActivityModalOpen}
@@ -722,48 +732,48 @@ export function FadpAdminPage() {
           {(onClose) => (
             <>
               <ModalHeader>
-                {activityForm.id ? 'Edit Processing Activity' : 'Add Processing Activity'}
+                {activityForm.id ? t('fadp.activity_modal.edit_title') : t('fadp.activity_modal.add_title')}
               </ModalHeader>
               <ModalBody className="space-y-4">
                 <Input
-                  label="Activity Name"
+                  label={t('fadp.activity_modal.fields.activity_name')}
                   isRequired
                   value={activityForm.activity_name}
                   onValueChange={v => setActivityForm(f => ({ ...f, activity_name: v }))}
                   variant="bordered"
                 />
                 <Textarea
-                  label="Purpose"
+                  label={t('fadp.activity_modal.fields.purpose')}
                   isRequired
-                  description="Why is this data processed? Be specific about the legitimate purpose."
+                  description={t('fadp.activity_modal.hints.purpose')}
                   value={activityForm.purpose}
                   onValueChange={v => setActivityForm(f => ({ ...f, purpose: v }))}
                   variant="bordered"
                   minRows={2}
                 />
                 <Input
-                  label="Data Categories (comma-separated)"
-                  description='e.g. "name, email, phone, address"'
+                  label={t('fadp.activity_modal.fields.data_categories')}
+                  description={t('fadp.activity_modal.hints.data_categories')}
                   value={activityForm.data_categories}
                   onValueChange={v => setActivityForm(f => ({ ...f, data_categories: v }))}
                   variant="bordered"
                 />
                 <Input
-                  label="Recipients (comma-separated, optional)"
-                  description="Who receives or accesses this data (internal teams, processors, etc.)"
+                  label={t('fadp.activity_modal.fields.recipients')}
+                  description={t('fadp.activity_modal.hints.recipients')}
                   value={activityForm.recipients}
                   onValueChange={v => setActivityForm(f => ({ ...f, recipients: v }))}
                   variant="bordered"
                 />
                 <Input
-                  label="Retention Period"
-                  description='e.g. "7 years after membership ends" or "Until consent withdrawn"'
+                  label={t('fadp.activity_modal.fields.retention_period')}
+                  description={t('fadp.activity_modal.hints.retention_period')}
                   value={activityForm.retention_period}
                   onValueChange={v => setActivityForm(f => ({ ...f, retention_period: v }))}
                   variant="bordered"
                 />
                 <Select
-                  label="Legal Basis"
+                  label={t('fadp.activity_modal.fields.legal_basis')}
                   isRequired
                   selectedKeys={new Set([activityForm.legal_basis])}
                   onSelectionChange={keys => {
@@ -772,26 +782,26 @@ export function FadpAdminPage() {
                   }}
                   variant="bordered"
                 >
-                  <SelectItem key="consent">Consent</SelectItem>
-                  <SelectItem key="contract">Contract</SelectItem>
-                  <SelectItem key="legal_obligation">Legal Obligation</SelectItem>
-                  <SelectItem key="legitimate_interest">Legitimate Interest</SelectItem>
+                  {legalBasisOptions.map(option => (
+                    <SelectItem key={option}>{t(`fadp.legal_basis.${option}`)}</SelectItem>
+                  ))}
                 </Select>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-4 rounded-lg border border-default-200 p-3">
                   <div>
-                    <p className="text-sm font-medium">Automated Profiling</p>
+                    <p className="text-sm font-medium">{t('fadp.activity_modal.fields.automated_profiling')}</p>
                     <p className="text-xs text-default-500">
-                      Art. 21 nDSG: automated individual decision-making requires explicit consent and transparency.
+                      {t('fadp.activity_modal.hints.automated_profiling')}
                     </p>
                   </div>
                   <Switch
                     isSelected={activityForm.is_automated_profiling}
                     onValueChange={v => setActivityForm(f => ({ ...f, is_automated_profiling: v }))}
                     color="danger"
+                    aria-label={t('fadp.activity_modal.fields.automated_profiling')}
                   />
                 </div>
                 <Input
-                  label="Sort Order"
+                  label={t('fadp.activity_modal.fields.sort_order')}
                   type="number"
                   value={activityForm.sort_order}
                   onValueChange={v => setActivityForm(f => ({ ...f, sort_order: v }))}
@@ -800,19 +810,31 @@ export function FadpAdminPage() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={onClose}>Cancel</Button>
+                <Button variant="light" onPress={onClose}>{t('fadp.actions.cancel')}</Button>
                 <Button
                   color="primary"
                   isLoading={activitySaving}
                   onPress={() => void saveActivity()}
                 >
-                  {activityForm.id ? 'Save Changes' : 'Add Activity'}
+                  {activityForm.id ? t('fadp.actions.save_changes') : t('fadp.actions.add_activity')}
                 </Button>
               </ModalFooter>
             </>
           )}
         </ModalContent>
       </Modal>
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => void deleteActivity()}
+        title={t('fadp.delete_modal.title')}
+        message={t('fadp.delete_modal.message')}
+        confirmLabel={t('fadp.actions.delete')}
+        cancelLabel={t('fadp.actions.cancel')}
+        confirmColor="danger"
+        isLoading={activityDeleting}
+      />
     </div>
   );
 }

@@ -160,7 +160,7 @@ const TYPE_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'warning
 
 export function ModerationQueuePage() {
   const { t } = useTranslation('admin');
-  usePageTitle("Reports");
+  usePageTitle(t('reports.page_title'));
 
   const toast = useToast();
 
@@ -263,12 +263,12 @@ export function ModerationQueuePage() {
         decision: 'approved',
       });
       if (res.data) {
-        toast.success("Content Approved");
+        toast.success(t('reports.content_approved'));
         await loadQueue();
         await loadStats();
       }
     } catch {
-      toast.error("Failed to approve content");
+      toast.error(t('reports.failed_to_approve_content'));
     } finally {
       setActionLoading(null);
     }
@@ -285,7 +285,7 @@ export function ModerationQueuePage() {
   const handleReject = async () => {
     if (!rejectItemId) return;
     if (!rejectReason.trim()) {
-      toast.warning("Please Provide a Rejection Reason");
+      toast.warning(t('reports.please_provide_a_rejection_reason'));
       return;
     }
 
@@ -296,13 +296,13 @@ export function ModerationQueuePage() {
         rejection_reason: rejectReason.trim(),
       });
       if (res.data) {
-        toast.success("Content Rejected");
+        toast.success(t('reports.content_rejected'));
         onRejectClose();
         await loadQueue();
         await loadStats();
       }
     } catch {
-      toast.error("Failed to reject content");
+      toast.error(t('reports.failed_to_reject_content'));
     } finally {
       setActionLoading(null);
     }
@@ -315,12 +315,12 @@ export function ModerationQueuePage() {
     try {
       const res = await api.put('/v2/admin/moderation/settings', localSettings);
       if (res.data) {
-        toast.success("Moderation settings updated");
+        toast.success(t('reports.moderation_settings_updated'));
         await loadSettings();
         onSettingsClose();
       }
     } catch {
-      toast.error("Failed to update settings");
+      toast.error(t('reports.failed_to_update_settings'));
     } finally {
       setSavingSettings(false);
     }
@@ -329,14 +329,14 @@ export function ModerationQueuePage() {
   // Truncate preview text
   const truncate = (text: string | null, len: number) => {
     if (!text) return '';
-    return text.length > len ? text.substring(0, len) + '...' : text;
+    return text.length > len ? text.substring(0, len) + t('reports.ellipsis') : text;
   };
 
   return (
     <div>
       <PageHeader
-        title={"Moderation Queue Page"}
-        description={"Review content pending moderation approval"}
+        title={t('reports.moderation_queue_page_title')}
+        description={t('reports.moderation_queue_page_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -348,7 +348,7 @@ export function ModerationQueuePage() {
               }}
               size="sm"
             >
-              {"Settings"}
+              {t('reports.settings')}
             </Button>
             <Button
               variant="flat"
@@ -358,7 +358,7 @@ export function ModerationQueuePage() {
               isDisabled={loading}
               size="sm"
             >
-              {"Refresh"}
+              {t('reports.refresh')}
             </Button>
           </div>
         }
@@ -367,35 +367,35 @@ export function ModerationQueuePage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
         <StatCard
-          label={"Pending Review"}
+          label={t('reports.label_pending_review')}
           value={stats?.pending ?? '\u2014'}
           icon={Clock}
           color="warning"
           loading={!stats}
         />
         <StatCard
-          label={"Flagged"}
+          label={t('reports.label_flagged')}
           value={stats?.flagged ?? '\u2014'}
           icon={AlertTriangle}
           color="danger"
           loading={!stats}
         />
         <StatCard
-          label={"Approved"}
+          label={t('reports.label_approved')}
           value={stats?.approved ?? '\u2014'}
           icon={CheckCircle}
           color="success"
           loading={!stats}
         />
         <StatCard
-          label={"Rejected"}
+          label={t('reports.label_rejected')}
           value={stats?.rejected ?? '\u2014'}
           icon={XCircle}
           color="default"
           loading={!stats}
         />
         <StatCard
-          label={"Auto Flagged"}
+          label={t('reports.auto_flagged')}
           value={stats?.auto_flagged_total ?? '\u2014'}
           icon={Shield}
           color="secondary"
@@ -408,30 +408,28 @@ export function ModerationQueuePage() {
         <Card shadow="sm" className="mb-6">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Filter size={18} className="text-primary" />
-            <h3 className="font-semibold">{"By Content Type"}</h3>
+            <h3 className="font-semibold">{t('reports.by_content_type')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {Object.entries(stats.by_type).map(([type, counts]) => (
-                <Card key={type} shadow="none" className="border border-divider">
-                  <CardBody className="p-3">
+                <div key={type} className="rounded-lg border border-divider p-3">
                     <div className="flex items-center gap-2 mb-2">
                       <Chip size="sm" variant="flat" color={TYPE_COLORS[type] ?? 'default'}>
-                        {type}
+                        {t(`reports.content_type_${type}`, { defaultValue: type })}
                       </Chip>
                     </div>
                     <div className="grid grid-cols-2 gap-1 text-xs">
-                      <span className="text-default-400">{"Pending"}</span>
+                      <span className="text-default-400">{t('reports.moderation_pending')}</span>
                       <span className="text-warning font-medium">{counts.pending}</span>
-                      <span className="text-default-400">{"Flagged"}</span>
+                      <span className="text-default-400">{t('reports.label_flagged')}</span>
                       <span className="text-danger font-medium">{counts.flagged}</span>
-                      <span className="text-default-400">{"Approved"}</span>
+                      <span className="text-default-400">{t('reports.label_approved')}</span>
                       <span className="text-success font-medium">{counts.approved}</span>
-                      <span className="text-default-400">{"Rejected"}</span>
+                      <span className="text-default-400">{t('reports.label_rejected')}</span>
                       <span className="text-default-600 font-medium">{counts.rejected}</span>
                     </div>
-                  </CardBody>
-                </Card>
+                </div>
               ))}
             </div>
           </CardBody>
@@ -448,7 +446,7 @@ export function ModerationQueuePage() {
             setStatusFilter(v !== undefined ? String(v) : '');
           }}
           className="w-32"
-          aria-label={"Status Filter"}
+          aria-label={t('reports.label_status_filter')}
         >
           {STATUS_OPTION_KEYS.map((opt) => (
             <SelectItem key={opt.key}>{t(opt.i18nKey)}</SelectItem>
@@ -462,7 +460,7 @@ export function ModerationQueuePage() {
             setTypeFilter(v !== undefined ? String(v) : '');
           }}
           className="w-32"
-          aria-label={"Content Type Filter"}
+          aria-label={t('reports.label_content_type_filter')}
         >
           {CONTENT_TYPE_OPTION_KEYS.map((opt) => (
             <SelectItem key={opt.key}>{t(opt.i18nKey)}</SelectItem>
@@ -470,8 +468,8 @@ export function ModerationQueuePage() {
         </Select>
         <Input type="search" name="admin-search" autoComplete="off"
           size="sm"
-          placeholder={"Search Content..."}
-          aria-label={"Search Moderation Queue"}
+          placeholder={t('reports.placeholder_search_content')}
+          aria-label={t('reports.label_search_moderation_queue')}
           value={search}
           onValueChange={setSearch}
           className="w-48"
@@ -481,17 +479,17 @@ export function ModerationQueuePage() {
       </div>
 
       {/* Queue Table */}
-      <Table aria-label={"Moderation Queue"} shadow="sm">
+      <Table aria-label={t('reports.label_moderation_queue')} shadow="sm">
         <TableHeader>
-          <TableColumn>{"Content"}</TableColumn>
-          <TableColumn>{"Type"}</TableColumn>
-          <TableColumn>{"Author"}</TableColumn>
-          <TableColumn>{"Status"}</TableColumn>
-          <TableColumn>{"Submitted"}</TableColumn>
-          <TableColumn>{"Actions"}</TableColumn>
+          <TableColumn>{t('reports.col_content')}</TableColumn>
+          <TableColumn>{t('reports.col_type')}</TableColumn>
+          <TableColumn>{t('reports.col_author')}</TableColumn>
+          <TableColumn>{t('reports.col_status')}</TableColumn>
+          <TableColumn>{t('reports.col_submitted')}</TableColumn>
+          <TableColumn>{t('reports.col_actions')}</TableColumn>
         </TableHeader>
         <TableBody
-          emptyContent={"No items in queue"}
+          emptyContent={t('reports.no_items_in_queue')}
           isLoading={loading}
           loadingContent={<Spinner />}
         >
@@ -499,20 +497,20 @@ export function ModerationQueuePage() {
             <TableRow key={item.id}>
               <TableCell>
                 <div className="max-w-xs">
-                  <p className="text-sm font-medium text-foreground truncate">{item.title || "Untitled"}</p>
+                  <p className="text-sm font-medium text-foreground truncate">{item.title || t('reports.untitled')}</p>
                   {item.body && (
                     <p className="text-xs text-default-400 truncate">{truncate(item.body, 80)}</p>
                   )}
                   {item.auto_flagged && item.auto_flag_reason && (
                     <p className="text-xs text-danger mt-1">
-                      {`Auto-flagged reason`}
+                      {t('reports.auto_flagged_reason', { reason: item.auto_flag_reason })}
                     </p>
                   )}
                 </div>
               </TableCell>
               <TableCell>
                 <Chip size="sm" variant="flat" color={TYPE_COLORS[item.content_type] ?? 'default'}>
-                  {item.content_type}
+                  {t(`reports.content_type_${item.content_type}`, { defaultValue: item.content_type })}
                 </Chip>
               </TableCell>
               <TableCell>
@@ -523,7 +521,7 @@ export function ModerationQueuePage() {
               </TableCell>
               <TableCell>
                 <Chip size="sm" variant="flat" color={STATUS_COLORS[item.status] ?? 'default'}>
-                  {item.status}
+                  {t(`reports.status_${item.status}`, { defaultValue: item.status })}
                 </Chip>
                 {item.rejection_reason && (
                   <p className="text-xs text-danger mt-1 max-w-[120px] truncate">
@@ -545,7 +543,7 @@ export function ModerationQueuePage() {
                       onPress={() => handleApprove(item.id)}
                       isLoading={actionLoading === item.id}
                       isDisabled={actionLoading !== null}
-                      aria-label={"Approve"}
+                      aria-label={t('reports.label_approve')}
                     >
                       <CheckCircle size={16} />
                     </Button>
@@ -557,17 +555,17 @@ export function ModerationQueuePage() {
                       onPress={() => openRejectModal(item.id)}
                       isLoading={actionLoading === item.id}
                       isDisabled={actionLoading !== null}
-                      aria-label={"Reject"}
+                      aria-label={t('reports.label_reject')}
                     >
                       <XCircle size={16} />
                     </Button>
                   </div>
                 )}
                 {item.status === 'approved' && (
-                  <span className="text-xs text-success">{"Approved"}</span>
+                  <span className="text-xs text-success">{t('reports.label_approved')}</span>
                 )}
                 {item.status === 'rejected' && (
-                  <span className="text-xs text-default-400">{"Rejected"}</span>
+                  <span className="text-xs text-default-400">{t('reports.label_rejected')}</span>
                 )}
               </TableCell>
             </TableRow>
@@ -584,14 +582,14 @@ export function ModerationQueuePage() {
       {/* Reject Modal */}
       <Modal isOpen={isRejectOpen} onClose={onRejectClose} size="md">
         <ModalContent>
-          <ModalHeader>{"Reject Content"}</ModalHeader>
+          <ModalHeader>{t('reports.reject_content')}</ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-500 mb-3">
-              {"Provide a reason for rejecting this content"}
+              {t('reports.reject_content_description')}
             </p>
             <Textarea
-              label={"Rejection Reason"}
-              placeholder={"Explain Why This Content Was Rejected..."}
+              label={t('reports.label_rejection_reason')}
+              placeholder={t('reports.placeholder_explain_why_this_content_was_rejected')}
               value={rejectReason}
               onValueChange={setRejectReason}
               variant="bordered"
@@ -599,9 +597,9 @@ export function ModerationQueuePage() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onRejectClose}>{"Cancel"}</Button>
+            <Button variant="flat" onPress={onRejectClose}>{t('reports.cancel')}</Button>
             <Button color="danger" onPress={handleReject} isLoading={actionLoading !== null} isDisabled={actionLoading !== null}>
-              {"Reject Content"}
+              {t('reports.reject_content')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -610,10 +608,10 @@ export function ModerationQueuePage() {
       {/* Settings Modal */}
       <Modal isOpen={isSettingsOpen} onClose={onSettingsClose} size="lg">
         <ModalContent>
-          <ModalHeader>{"Moderation Settings"}</ModalHeader>
+          <ModalHeader>{t('reports.moderation_settings')}</ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-500 mb-4">
-              {"Configure auto-flagging rules and moderation preferences"}
+              {t('reports.settings_description')}
             </p>
             {localSettings && (
               <div className="space-y-4">
@@ -621,12 +619,12 @@ export function ModerationQueuePage() {
                   isSelected={localSettings.enabled}
                   onValueChange={(v) => setLocalSettings({ ...localSettings, enabled: v })}
                 >
-                  <span className="text-sm font-medium">{"Enable Moderation"}</span>
+                  <span className="text-sm font-medium">{t('reports.enable_moderation')}</span>
                 </Switch>
 
                 <Divider />
 
-                <p className="text-sm font-medium text-foreground">{"Require Moderation for"}</p>
+                <p className="text-sm font-medium text-foreground">{t('reports.require_moderation_for')}</p>
 
                 <div className="space-y-3 pl-2">
                   <Switch
@@ -634,28 +632,28 @@ export function ModerationQueuePage() {
                     onValueChange={(v) => setLocalSettings({ ...localSettings, require_post: v })}
                     isDisabled={!localSettings.enabled}
                   >
-                    <span className="text-sm">{"Feed Posts"}</span>
+                    <span className="text-sm">{t('reports.feed_posts')}</span>
                   </Switch>
                   <Switch
                     isSelected={localSettings.require_listing}
                     onValueChange={(v) => setLocalSettings({ ...localSettings, require_listing: v })}
                     isDisabled={!localSettings.enabled}
                   >
-                    <span className="text-sm">{"Listings"}</span>
+                    <span className="text-sm">{t('reports.content_type_listing')}</span>
                   </Switch>
                   <Switch
                     isSelected={localSettings.require_event}
                     onValueChange={(v) => setLocalSettings({ ...localSettings, require_event: v })}
                     isDisabled={!localSettings.enabled}
                   >
-                    <span className="text-sm">{"Events"}</span>
+                    <span className="text-sm">{t('reports.content_type_event')}</span>
                   </Switch>
                   <Switch
                     isSelected={localSettings.require_comment}
                     onValueChange={(v) => setLocalSettings({ ...localSettings, require_comment: v })}
                     isDisabled={!localSettings.enabled}
                   >
-                    <span className="text-sm">{"Comments"}</span>
+                    <span className="text-sm">{t('reports.content_type_comment')}</span>
                   </Switch>
                 </div>
 
@@ -667,9 +665,9 @@ export function ModerationQueuePage() {
                   isDisabled={!localSettings.enabled}
                 >
                   <div>
-                    <span className="text-sm font-medium">{"Auto-flag suspicious content"}</span>
+                    <span className="text-sm font-medium">{t('reports.auto_flag_suspicious_content')}</span>
                     <p className="text-xs text-default-400">
-                      {"Automatically flag suspicious content for review"}
+                      {t('reports.auto_flag_suspicious_content_desc')}
                     </p>
                   </div>
                 </Switch>
@@ -677,9 +675,9 @@ export function ModerationQueuePage() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onSettingsClose}>{"Cancel"}</Button>
+            <Button variant="flat" onPress={onSettingsClose}>{t('reports.cancel')}</Button>
             <Button color="primary" onPress={handleSaveSettings} isLoading={savingSettings} isDisabled={savingSettings}>
-              {"Save Settings"}
+              {t('reports.save_settings')}
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -10,6 +10,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardBody, CardHeader, Spinner, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import {
   BarChart,
@@ -43,6 +44,7 @@ import api from '@/lib/api';
 import { LocationMap } from '@/components/location';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { StatCard, PageHeader } from '../../components';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -106,41 +108,54 @@ const PIE_COLORS = CHART_COLORS;
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CommunityAnalytics() {
-  usePageTitle("Analytics");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('analytics.page_title'));
+  useAdminPageMeta({
+    title: t('analytics.community_analytics_title'),
+    description: t('analytics.community_analytics_desc'),
+  });
 
   const [data, setData] = useState<CommunityAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [geoData, setGeoData] = useState<GeographyData | null>(null);
   const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await api.get('/v2/admin/community-analytics');
       if (res.success && res.data) {
         setData(res.data as CommunityAnalyticsData);
+      } else {
+        setError(t('analytics.errors.load_community_failed'));
       }
     } catch {
-      // Silently handle — charts will show empty state
+      setError(t('analytics.errors.load_community_failed'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const loadGeoData = useCallback(async () => {
     if (!MAPS_ENABLED) return;
     setGeoLoading(true);
+    setGeoError(null);
     try {
       const res = await api.get('/v2/admin/community-analytics/geography');
       if (res.success && res.data) {
         setGeoData(res.data as GeographyData);
+      } else {
+        setGeoError(t('analytics.errors.load_geography_failed'));
       }
     } catch {
-      // Silently fail — geography section won't render
+      setGeoError(t('analytics.errors.load_geography_failed'));
     } finally {
       setGeoLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadData();
@@ -153,7 +168,7 @@ export function CommunityAnalytics() {
         filename: 'community-analytics.csv',
       });
     } catch {
-      // Export failed silently
+      setError(t('analytics.errors.export_failed'));
     }
   };
 
@@ -164,8 +179,8 @@ export function CommunityAnalytics() {
   return (
     <div>
       <PageHeader
-        title={"Community Analytics"}
-        description={"View graphs and statistics for member growth, exchanges, and community health"}
+        title={t('analytics.community_analytics_title')}
+        description={t('analytics.community_analytics_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -174,7 +189,7 @@ export function CommunityAnalytics() {
               onPress={handleExport}
               size="sm"
             >
-              {"Export CSV"}
+              {t('analytics.export_csv')}
             </Button>
             <Button
               variant="flat"
@@ -184,7 +199,7 @@ export function CommunityAnalytics() {
               isDisabled={loading}
               size="sm"
             >
-              {"Refresh"}
+              {t('analytics.refresh')}
             </Button>
           </div>
         }
@@ -193,36 +208,36 @@ export function CommunityAnalytics() {
       {/* Stat Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={"Hours Exchanged 30d"}
+          label={t('analytics.label_hours_exchanged_30d')}
           value={
             data
               ? Number(data.overview.transaction_volume_30d).toFixed(1)
-              : '—'
+              : t('analytics.empty_value')
           }
           icon={Clock}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label={"Active Traders 30d"}
-          value={data?.overview.active_traders_30d ?? '—'}
+          label={t('analytics.label_active_traders_30d')}
+          value={data?.overview.active_traders_30d ?? t('analytics.empty_value')}
           icon={Users}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={"New Users 30d"}
-          value={data?.overview.new_users_30d ?? '—'}
+          label={t('analytics.label_new_users_30d')}
+          value={data?.overview.new_users_30d ?? t('analytics.empty_value')}
           icon={TrendingUp}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={"Engagement Rate"}
+          label={t('analytics.label_engagement_rate')}
           value={
             data
               ? `${(data.engagement_rate * 100).toFixed(1)}%`
-              : '—'
+              : t('analytics.empty_value')
           }
           icon={Activity}
           color="secondary"
@@ -234,12 +249,12 @@ export function CommunityAnalytics() {
       <Card shadow="sm" className="mb-6">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <BarChart3 size={18} className="text-primary" />
-          <h3 className="font-semibold">{"Exchange Trends"}</h3>
+          <h3 className="font-semibold">{t('analytics.exchange_trends_title')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           {loading ? (
             <div className="flex h-[350px] items-center justify-center">
-              <Spinner />
+              <Spinner label={t('analytics.loading')} />
             </div>
           ) : data && data.monthly_trends.length > 0 ? (
             <ResponsiveContainer width="100%" height={350}>
@@ -275,7 +290,7 @@ export function CommunityAnalytics() {
                   tick={{ fontSize: 12 }}
                   className="text-default-500"
                   label={{
-                    value: "Hours",
+                    value: t('analytics.chart_hours'),
                     angle: -90,
                     position: 'insideLeft',
                     style: { fontSize: 12 },
@@ -287,7 +302,7 @@ export function CommunityAnalytics() {
                   tick={{ fontSize: 12 }}
                   className="text-default-500"
                   label={{
-                    value: "Transactions",
+                    value: t('analytics.chart_transactions'),
                     angle: 90,
                     position: 'insideRight',
                     style: { fontSize: 12 },
@@ -307,7 +322,7 @@ export function CommunityAnalytics() {
                   yAxisId="volume"
                   type="monotone"
                   dataKey="total_volume"
-                  name={"Hours Exchanged"}
+                  name={t('analytics.chart_hours_exchanged')}
                   stroke={CHART_COLOR_MAP.primary}
                   fill="url(#volumeGradient)"
                   strokeWidth={2}
@@ -316,7 +331,7 @@ export function CommunityAnalytics() {
                   yAxisId="count"
                   type="monotone"
                   dataKey="transaction_count"
-                  name={"Transactions"}
+                  name={t('analytics.chart_transactions')}
                   stroke={CHART_COLOR_MAP.success}
                   strokeWidth={2}
                   dot={{ r: 3 }}
@@ -326,7 +341,7 @@ export function CommunityAnalytics() {
             </ResponsiveContainer>
           ) : (
             <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
-              {"No exchange trend data"}
+              {error ?? t('analytics.no_exchange_trend_data')}
             </p>
           )}
         </CardBody>
@@ -338,12 +353,12 @@ export function CommunityAnalytics() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Users size={18} className="text-success" />
-            <h3 className="font-semibold">{"Member Growth"}</h3>
+            <h3 className="font-semibold">{t('analytics.member_growth_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
               <div className="flex h-[300px] items-center justify-center">
-                <Spinner />
+                <Spinner label={t('analytics.loading')} />
               </div>
             ) : data && data.monthly_trends.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
@@ -376,7 +391,7 @@ export function CommunityAnalytics() {
                   />
                   <Bar
                     dataKey="new_users"
-                    name={"New Users"}
+                    name={t('analytics.chart_new_users')}
                     fill={CHART_COLOR_MAP.success}
                     radius={[4, 4, 0, 0]}
                     fillOpacity={0.8}
@@ -385,7 +400,7 @@ export function CommunityAnalytics() {
               </ResponsiveContainer>
             ) : (
               <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
-                {"No member growth data"}
+                {error ?? t('analytics.no_member_growth_data')}
               </p>
             )}
           </CardBody>
@@ -395,12 +410,12 @@ export function CommunityAnalytics() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <PieChartIcon size={18} className="text-secondary" />
-            <h3 className="font-semibold">{"Category Demand"}</h3>
+            <h3 className="font-semibold">{t('analytics.category_demand_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
               <div className="flex h-[300px] items-center justify-center">
-                <Spinner />
+                <Spinner label={t('analytics.loading')} />
               </div>
             ) : data && data.category_demand.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
@@ -439,14 +454,14 @@ export function CommunityAnalytics() {
                       color: 'hsl(var(--heroui-foreground))',
                     }}
                     formatter={(_value, name) =>
-                      ['Listings', String(name ?? '')] as [string, string]
+                      [t('analytics.listings_count'), String(name ?? '')] as [string, string]
                     }
                   />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
               <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
-                {"No category data"}
+                {error ?? t('analytics.no_category_data')}
               </p>
             )}
           </CardBody>
@@ -459,19 +474,19 @@ export function CommunityAnalytics() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <TrendingUp size={18} className="text-success" />
-            <h3 className="font-semibold">{"Top Earners"}</h3>
+            <h3 className="font-semibold">{t('analytics.top_earners_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
-            <Table aria-label={"Top Earners"} shadow="sm" isStriped>
+            <Table aria-label={t('analytics.top_earners_title')} shadow="sm" isStriped>
               <TableHeader>
-                <TableColumn>{"Rank"}</TableColumn>
-                <TableColumn>{"Name"}</TableColumn>
-                <TableColumn className="text-right">{"Hours Earned"}</TableColumn>
+                <TableColumn>{t('analytics.col_rank')}</TableColumn>
+                <TableColumn>{t('analytics.col_name')}</TableColumn>
+                <TableColumn className="text-right">{t('analytics.col_hours_earned')}</TableColumn>
               </TableHeader>
               <TableBody
-                emptyContent={"No earner data"}
+                emptyContent={error ?? t('analytics.no_earner_data')}
                 isLoading={loading}
-                loadingContent={<Spinner />}
+                loadingContent={<Spinner label={t('analytics.loading')} />}
               >
                 {(data?.top_earners ?? []).map((earner, index) => (
                   <TableRow key={earner.id}>
@@ -489,19 +504,19 @@ export function CommunityAnalytics() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Clock size={18} className="text-warning" />
-            <h3 className="font-semibold">{"Top Spenders"}</h3>
+            <h3 className="font-semibold">{t('analytics.top_spenders_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
-            <Table aria-label={"Top Spenders"} shadow="sm" isStriped>
+            <Table aria-label={t('analytics.top_spenders_title')} shadow="sm" isStriped>
               <TableHeader>
-                <TableColumn>{"Rank"}</TableColumn>
-                <TableColumn>{"Name"}</TableColumn>
-                <TableColumn className="text-right">{"Hours Spent"}</TableColumn>
+                <TableColumn>{t('analytics.col_rank')}</TableColumn>
+                <TableColumn>{t('analytics.col_name')}</TableColumn>
+                <TableColumn className="text-right">{t('analytics.col_hours_spent')}</TableColumn>
               </TableHeader>
               <TableBody
-                emptyContent={"No spender data"}
+                emptyContent={error ?? t('analytics.no_spender_data')}
                 isLoading={loading}
-                loadingContent={<Spinner />}
+                loadingContent={<Spinner label={t('analytics.loading')} />}
               >
                 {(data?.top_spenders ?? []).map((spender, index) => (
                   <TableRow key={spender.id}>
@@ -521,32 +536,32 @@ export function CommunityAnalytics() {
         <Card shadow="sm" className="mt-6">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Globe size={18} className="text-primary" />
-            <h3 className="font-semibold">{"Geographic Distribution"}</h3>
+            <h3 className="font-semibold">{t('analytics.geographic_distribution_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {geoLoading ? (
               <div className="flex h-[400px] items-center justify-center">
-                <Spinner />
+                <Spinner label={t('analytics.loading')} />
               </div>
             ) : geoData ? (
               <>
                 {/* Stats row */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
                   <StatCard
-                    label={"Members with Location"}
+                    label={t('analytics.label_members_with_location')}
                     value={`${geoData.total_with_location} / ${geoData.total_members}`}
                     icon={MapPin}
                     color="primary"
                   />
                   <StatCard
-                    label={"Location Coverage"}
+                    label={t('analytics.label_location_coverage')}
                     value={`${geoData.coverage_percentage}%`}
                     icon={Globe}
                     color={geoData.coverage_percentage > 50 ? 'success' : 'warning'}
                   />
                   <StatCard
-                    label={"Top Area"}
-                    value={geoData.top_areas[0]?.area || 'N/A'}
+                    label={t('analytics.label_top_area')}
+                    value={geoData.top_areas[0]?.area || t('analytics.not_available')}
                     icon={MapPin}
                     color="secondary"
                   />
@@ -559,13 +574,13 @@ export function CommunityAnalytics() {
                       id: `cluster-${i}`,
                       lat: Number(loc.lat),
                       lng: Number(loc.lng),
-                      title: `${loc.area}: ${loc.count} member${loc.count > 1 ? 's' : ''}`,
+                      title: t('analytics.location_marker_title', { area: loc.area, count: loc.count }),
                       pinGlyph: String(loc.count),
                       infoContent: (
                         <div className="p-2">
                           <h4 className="font-semibold text-sm text-gray-900">{loc.area}</h4>
                           <p className="text-xs text-gray-600">
-                            {loc.count} member{loc.count > 1 ? 's' : ''}
+                            {t('analytics.member_count', { count: loc.count })}
                           </p>
                         </div>
                       ),
@@ -579,14 +594,14 @@ export function CommunityAnalytics() {
                 {/* Top Areas list */}
                 {geoData.top_areas.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-semibold text-foreground mb-3">{"Top Areas"}</h4>
+                    <h4 className="text-sm font-semibold text-foreground mb-3">{t('analytics.top_areas_title')}</h4>
                     <div className="space-y-2">
                       {geoData.top_areas.map((area, i) => (
                         <div key={area.area} className="flex items-center gap-3">
                           <span className="text-xs text-default-400 w-6">{i + 1}.</span>
                           <span className="text-sm text-foreground flex-1">{area.area}</span>
                           <span className="text-xs text-default-500">
-                            {area.count} member{area.count !== 1 ? 's' : ''}
+                            {t('analytics.member_count', { count: area.count })}
                           </span>
                           <div className="w-24 h-1.5 rounded-full bg-default-100 overflow-hidden">
                             <div
@@ -602,13 +617,13 @@ export function CommunityAnalytics() {
 
                 {geoData.member_locations.length === 0 && geoData.top_areas.length === 0 && (
                   <p className="py-8 text-center text-sm text-default-400">
-                    {"No location data"}
+                    {geoError ?? t('analytics.no_location_data')}
                   </p>
                 )}
               </>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">
-                {"Geographic data unavailable"}
+                {geoError ?? t('analytics.geographic_data_unavailable')}
               </p>
             )}
           </CardBody>

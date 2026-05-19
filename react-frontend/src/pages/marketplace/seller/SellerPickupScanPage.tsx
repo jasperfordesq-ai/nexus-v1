@@ -15,6 +15,7 @@ import QrCode from 'lucide-react/icons/qr-code';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -60,7 +61,9 @@ export function SellerPickupScanPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-6 space-y-6">
+    <>
+      <PageMeta title={t('marketplace.pickup.scan_title', 'Pickup Scan')} noIndex />
+      <div className="max-w-xl mx-auto px-4 py-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <QrCode className="w-7 h-7 text-primary" />
@@ -102,7 +105,8 @@ export function SellerPickupScanPage() {
           </p>
         </GlassCard>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 

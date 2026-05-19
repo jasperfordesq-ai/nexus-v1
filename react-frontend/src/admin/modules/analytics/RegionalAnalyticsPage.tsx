@@ -9,10 +9,11 @@
  * Shows geographic density, demand/supply heatmaps, demographics,
  * engagement trends, volunteer breakdowns, and help-request analysis.
  *
- * ADMIN IS ENGLISH-ONLY — NO t() CALLS.
+ * User-facing admin copy is routed through translations.
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardBody,
@@ -36,6 +37,9 @@ import Heart from 'lucide-react/icons/heart';
 import { usePageTitle } from '@/hooks';
 import api from '@/lib/api';
 import { StatCard, PageHeader } from '../../components';
+import { useAdminPageMeta } from '../../AdminMetaContext';
+
+type AdminT = ReturnType<typeof useTranslation<'admin'>>['t'];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -117,19 +121,14 @@ function isError(data: unknown): data is { error: string } {
   return typeof data === 'object' && data !== null && 'error' in data;
 }
 
-function pct(value: number, total: number): string {
-  if (total === 0) return '0%';
-  return `${Math.round((value / total) * 100)}%`;
-}
-
-const AGE_GROUP_LABELS: Record<string, string> = {
-  under_25: 'Under 25',
-  '25_34': '25–34',
-  '35_44': '35–44',
-  '45_54': '45–54',
-  '55_64': '55–64',
-  '65_plus': '65+',
-  unknown: 'Unknown',
+const AGE_GROUP_LABEL_KEYS: Record<string, string> = {
+  under_25: 'analytics.regional.age_groups.under_25',
+  '25_34': 'analytics.regional.age_groups.25_34',
+  '35_44': 'analytics.regional.age_groups.35_44',
+  '45_54': 'analytics.regional.age_groups.45_54',
+  '55_64': 'analytics.regional.age_groups.55_64',
+  '65_plus': 'analytics.regional.age_groups.65_plus',
+  unknown: 'analytics.regional.age_groups.unknown',
 };
 
 const AGE_GROUP_ORDER = ['under_25', '25_34', '35_44', '45_54', '55_64', '65_plus', 'unknown'];
@@ -138,11 +137,11 @@ const AGE_GROUP_ORDER = ['under_25', '25_34', '35_44', '45_54', '55_64', '65_plu
 // Sub-components
 // ─────────────────────────────────────────────────────────────────────────────
 
-function TabPanel({ loading, error, children }: { loading: boolean; error: string | null; children: React.ReactNode }) {
+function TabPanel({ loading, error, t, children }: { loading: boolean; error: string | null; t: AdminT; children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Spinner size="lg" />
+        <Spinner label={t('analytics.regional.loading.section')} size="lg" />
       </div>
     );
   }
@@ -150,8 +149,8 @@ function TabPanel({ loading, error, children }: { loading: boolean; error: strin
     return (
       <div className="rounded-lg bg-danger-50 p-4 text-sm text-danger">
         {error === 'data_unavailable'
-          ? 'Data is not available for this section — the required tables may not be populated yet.'
-          : `Error loading data: ${error}`}
+          ? t('analytics.regional.errors.data_unavailable')
+          : t('analytics.regional.errors.load_data', { error })}
       </div>
     );
   }
@@ -178,24 +177,24 @@ function PercentBar({ label, value, total, color = 'bg-primary' }: { label: stri
 // Tab panels
 // ─────────────────────────────────────────────────────────────────────────────
 
-function HeatmapTab({ data }: { data: HeatmapCell[] }) {
+function HeatmapTab({ data, t }: { data: HeatmapCell[]; t: AdminT }) {
   const top10 = data.slice(0, 10);
   const maxCount = top10[0]?.count ?? 1;
 
   return (
     <div className="space-y-4">
       <p className="text-sm text-default-500">
-        Showing the top 10 most active grid cells (~1 km resolution). For a full interactive map, use the Export button to download GeoJSON.
+        {t('analytics.regional.heatmap.description')}
       </p>
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-              <th className="pb-2 pr-4">#</th>
-              <th className="pb-2 pr-4">Latitude</th>
-              <th className="pb-2 pr-4">Longitude</th>
-              <th className="pb-2 pr-4">Members</th>
-              <th className="pb-2">Density</th>
+              <th className="pb-2 pr-4">{t('analytics.regional.columns.rank')}</th>
+              <th className="pb-2 pr-4">{t('analytics.regional.columns.latitude')}</th>
+              <th className="pb-2 pr-4">{t('analytics.regional.columns.longitude')}</th>
+              <th className="pb-2 pr-4">{t('analytics.regional.columns.members')}</th>
+              <th className="pb-2">{t('analytics.regional.columns.density')}</th>
             </tr>
           </thead>
           <tbody>
@@ -219,13 +218,13 @@ function HeatmapTab({ data }: { data: HeatmapCell[] }) {
         </table>
       </div>
       {data.length === 0 && (
-        <p className="text-sm text-default-400">No geographic data available — members may not have set their location.</p>
+        <p className="text-sm text-default-400">{t('analytics.regional.empty.no_geographic_data')}</p>
       )}
     </div>
   );
 }
 
-function DemographicsTab({ data }: { data: DemographicsData }) {
+function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
   const totalAge = Object.values(data.age_groups).reduce((a, b) => a + b, 0);
   const totalLang = data.languages.reduce((a, b) => a + b.count, 0);
 
@@ -234,7 +233,7 @@ function DemographicsTab({ data }: { data: DemographicsData }) {
       {/* Age distribution */}
       <Card shadow="sm">
         <CardHeader>
-          <h3 className="text-base font-semibold">Age Distribution</h3>
+          <h3 className="text-base font-semibold">{t('analytics.regional.demographics.age_distribution')}</h3>
         </CardHeader>
         <CardBody>
           {AGE_GROUP_ORDER.map((key) => {
@@ -242,21 +241,21 @@ function DemographicsTab({ data }: { data: DemographicsData }) {
             return (
               <PercentBar
                 key={key}
-                label={AGE_GROUP_LABELS[key] ?? key}
+                label={t(AGE_GROUP_LABEL_KEYS[key] ?? key)}
                 value={count}
                 total={totalAge}
                 color="bg-primary"
               />
             );
           })}
-          <p className="mt-3 text-xs text-default-400">Total with data: {totalAge.toLocaleString()}</p>
+          <p className="mt-3 text-xs text-default-400">{t('analytics.regional.demographics.total_with_data', { total: totalAge.toLocaleString() })}</p>
         </CardBody>
       </Card>
 
       {/* Language distribution */}
       <Card shadow="sm">
         <CardHeader>
-          <h3 className="text-base font-semibold">Language Distribution</h3>
+          <h3 className="text-base font-semibold">{t('analytics.regional.demographics.language_distribution')}</h3>
         </CardHeader>
         <CardBody>
           {data.languages.slice(0, 12).map((l) => (
@@ -268,23 +267,23 @@ function DemographicsTab({ data }: { data: DemographicsData }) {
               color="bg-secondary"
             />
           ))}
-          <p className="mt-3 text-xs text-default-400">Total active members: {totalLang.toLocaleString()}</p>
+          <p className="mt-3 text-xs text-default-400">{t('analytics.regional.demographics.total_active_members', { total: totalLang.toLocaleString() })}</p>
         </CardBody>
       </Card>
 
       {/* Monthly growth table */}
       <Card shadow="sm" className="lg:col-span-2">
         <CardHeader>
-          <h3 className="text-base font-semibold">Member Growth — Last 12 Months</h3>
+          <h3 className="text-base font-semibold">{t('analytics.regional.demographics.member_growth_12m')}</h3>
         </CardHeader>
         <CardBody>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-                  <th className="pb-2 pr-6">Month</th>
-                  <th className="pb-2 pr-6">New Members</th>
-                  <th className="pb-2">Cumulative Total</th>
+                  <th className="pb-2 pr-6">{t('analytics.regional.columns.month')}</th>
+                  <th className="pb-2 pr-6">{t('analytics.regional.columns.new_members')}</th>
+                  <th className="pb-2">{t('analytics.regional.columns.cumulative_total')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -304,17 +303,17 @@ function DemographicsTab({ data }: { data: DemographicsData }) {
   );
 }
 
-function DemandSupplyTab({ data }: { data: DemandSupplyRow[] }) {
+function DemandSupplyTab({ data, t }: { data: DemandSupplyRow[]; t: AdminT }) {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full text-sm">
         <thead>
           <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-            <th className="pb-2 pr-4">Category</th>
-            <th className="pb-2 pr-4">Requests</th>
-            <th className="pb-2 pr-4">Offers</th>
-            <th className="pb-2 pr-4">Ratio (R/O)</th>
-            <th className="pb-2">Trend</th>
+            <th className="pb-2 pr-4">{t('analytics.regional.columns.category')}</th>
+            <th className="pb-2 pr-4">{t('analytics.regional.columns.requests')}</th>
+            <th className="pb-2 pr-4">{t('analytics.regional.columns.offers')}</th>
+            <th className="pb-2 pr-4">{t('analytics.regional.columns.ratio')}</th>
+            <th className="pb-2">{t('analytics.regional.columns.trend')}</th>
           </tr>
         </thead>
         <tbody>
@@ -329,7 +328,7 @@ function DemandSupplyTab({ data }: { data: DemandSupplyRow[] }) {
                   color={row.ratio >= 2 ? 'danger' : row.ratio >= 1 ? 'warning' : 'success'}
                   variant="flat"
                 >
-                  {row.ratio === 999 ? '∞' : row.ratio.toFixed(2)}
+                  {row.ratio === 999 ? t('analytics.regional.empty.infinity') : row.ratio.toFixed(2)}
                 </Chip>
               </td>
               <td className="py-2 text-lg">{row.trend}</td>
@@ -338,13 +337,13 @@ function DemandSupplyTab({ data }: { data: DemandSupplyRow[] }) {
         </tbody>
       </table>
       {data.length === 0 && (
-        <p className="mt-4 text-sm text-default-400">No listing data available for this period.</p>
+        <p className="mt-4 text-sm text-default-400">{t('analytics.regional.empty.no_listing_data')}</p>
       )}
     </div>
   );
 }
 
-function EngagementTab({ data }: { data: EngagementRow[] }) {
+function EngagementTab({ data, t }: { data: EngagementRow[]; t: AdminT }) {
   const maxActive = Math.max(...data.map((r) => r.active_members), 1);
 
   return (
@@ -352,12 +351,12 @@ function EngagementTab({ data }: { data: EngagementRow[] }) {
       <table className="min-w-full text-sm">
         <thead>
           <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-            <th className="pb-2 pr-4">Month</th>
-            <th className="pb-2 pr-4">Active Members</th>
-            <th className="pb-2 pr-4">Vol Hours</th>
-            <th className="pb-2 pr-4">New Listings</th>
-            <th className="pb-2 pr-4">New Events</th>
-            <th className="pb-2">Help Requests</th>
+            <th className="pb-2 pr-4">{t('analytics.regional.columns.month')}</th>
+            <th className="pb-2 pr-4">{t('analytics.regional.columns.active_members')}</th>
+            <th className="pb-2 pr-4">{t('analytics.regional.columns.vol_hours')}</th>
+            <th className="pb-2 pr-4">{t('analytics.regional.columns.new_listings')}</th>
+            <th className="pb-2 pr-4">{t('analytics.regional.columns.new_events')}</th>
+            <th className="pb-2">{t('analytics.regional.columns.help_requests')}</th>
           </tr>
         </thead>
         <tbody>
@@ -384,51 +383,51 @@ function EngagementTab({ data }: { data: EngagementRow[] }) {
         </tbody>
       </table>
       {data.length === 0 && (
-        <p className="mt-4 text-sm text-default-400">No engagement data available for this period.</p>
+        <p className="mt-4 text-sm text-default-400">{t('analytics.regional.empty.no_engagement_data')}</p>
       )}
     </div>
   );
 }
 
-function VolunteerTab({ data }: { data: VolunteerData }) {
+function VolunteerTab({ data, t }: { data: VolunteerData; t: AdminT }) {
   return (
     <div className="space-y-6">
       {/* Summary stats */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Card shadow="sm">
           <CardBody className="p-4">
-            <p className="text-xs text-default-500">Total Hours</p>
+            <p className="text-xs text-default-500">{t('analytics.regional.volunteer.total_hours')}</p>
             <p className="text-2xl font-bold text-primary">{data.total_hours.toLocaleString()}</p>
           </CardBody>
         </Card>
         <Card shadow="sm">
           <CardBody className="p-4">
-            <p className="text-xs text-default-500">Avg Hours / Volunteer</p>
+            <p className="text-xs text-default-500">{t('analytics.regional.volunteer.avg_hours_per_volunteer')}</p>
             <p className="text-2xl font-bold text-success">{data.avg_hours_per_volunteer.toLocaleString()}</p>
           </CardBody>
         </Card>
         <Card shadow="sm">
           <CardBody className="p-4">
-            <p className="text-xs text-default-500">Reciprocity Ratio</p>
+            <p className="text-xs text-default-500">{t('analytics.regional.volunteer.reciprocity_ratio')}</p>
             <p className="text-2xl font-bold text-secondary">
               {(data.reciprocity_ratio * 100).toFixed(1)}%
             </p>
-            <p className="text-xs text-default-400">Volunteers who also post listings</p>
+            <p className="text-xs text-default-400">{t('analytics.regional.volunteer.reciprocity_description')}</p>
           </CardBody>
         </Card>
       </div>
 
       {/* Top orgs table */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-default-600">Top Organisations by Volunteer Hours</h3>
+        <h3 className="mb-3 text-sm font-semibold text-default-600">{t('analytics.regional.volunteer.top_orgs_title')}</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
               <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-                <th className="pb-2 pr-4">#</th>
-                <th className="pb-2 pr-4">Organisation</th>
-                <th className="pb-2 pr-4">Total Hours</th>
-                <th className="pb-2">Volunteers</th>
+                <th className="pb-2 pr-4">{t('analytics.regional.columns.rank')}</th>
+                <th className="pb-2 pr-4">{t('analytics.regional.columns.organisation')}</th>
+                <th className="pb-2 pr-4">{t('analytics.regional.volunteer.total_hours')}</th>
+                <th className="pb-2">{t('analytics.regional.columns.volunteers')}</th>
               </tr>
             </thead>
             <tbody>
@@ -443,7 +442,7 @@ function VolunteerTab({ data }: { data: VolunteerData }) {
             </tbody>
           </table>
           {data.top_orgs.length === 0 && (
-            <p className="mt-4 text-sm text-default-400">No organisation volunteer data available.</p>
+            <p className="mt-4 text-sm text-default-400">{t('analytics.regional.empty.no_organisation_data')}</p>
           )}
         </div>
       </div>
@@ -451,21 +450,21 @@ function VolunteerTab({ data }: { data: VolunteerData }) {
   );
 }
 
-function HelpRequestsTab({ data }: { data: HelpRequestData }) {
+function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
   return (
     <div className="space-y-6">
       {/* By category */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-default-600">By Category</h3>
+        <h3 className="mb-3 text-sm font-semibold text-default-600">{t('analytics.regional.help.by_category')}</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
               <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-                <th className="pb-2 pr-4">Category</th>
-                <th className="pb-2 pr-4">Total</th>
-                <th className="pb-2 pr-4">Resolved</th>
-                <th className="pb-2 pr-4">Resolution Rate</th>
-                <th className="pb-2">Avg Days to Resolve</th>
+                <th className="pb-2 pr-4">{t('analytics.regional.columns.category')}</th>
+                <th className="pb-2 pr-4">{t('analytics.regional.columns.total')}</th>
+                <th className="pb-2 pr-4">{t('analytics.regional.columns.resolved')}</th>
+                <th className="pb-2 pr-4">{t('analytics.regional.columns.resolution_rate')}</th>
+                <th className="pb-2">{t('analytics.regional.columns.avg_days_to_resolve')}</th>
               </tr>
             </thead>
             <tbody>
@@ -484,29 +483,31 @@ function HelpRequestsTab({ data }: { data: HelpRequestData }) {
                     </Chip>
                   </td>
                   <td className="py-2">
-                    {row.avg_resolution_days != null ? `${row.avg_resolution_days} days` : '—'}
+                    {row.avg_resolution_days != null
+                      ? t('analytics.regional.units.days_count', { count: row.avg_resolution_days })
+                      : t('analytics.regional.empty_value')}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
           {data.by_category.length === 0 && (
-            <p className="mt-4 text-sm text-default-400">No help request data available for this period.</p>
+            <p className="mt-4 text-sm text-default-400">{t('analytics.regional.empty.no_help_request_data')}</p>
           )}
         </div>
       </div>
 
       {/* Resolution trend */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-default-600">Resolution Rate Trend — Last 6 Months</h3>
+        <h3 className="mb-3 text-sm font-semibold text-default-600">{t('analytics.regional.help.resolution_trend_6m')}</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
               <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-                <th className="pb-2 pr-4">Month</th>
-                <th className="pb-2 pr-4">Total</th>
-                <th className="pb-2 pr-4">Resolved</th>
-                <th className="pb-2">Resolution Rate</th>
+                <th className="pb-2 pr-4">{t('analytics.regional.columns.month')}</th>
+                <th className="pb-2 pr-4">{t('analytics.regional.columns.total')}</th>
+                <th className="pb-2 pr-4">{t('analytics.regional.columns.resolved')}</th>
+                <th className="pb-2">{t('analytics.regional.columns.resolution_rate')}</th>
               </tr>
             </thead>
             <tbody>
@@ -539,7 +540,12 @@ function HelpRequestsTab({ data }: { data: HelpRequestData }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function RegionalAnalyticsPage() {
-  usePageTitle('Regional Analytics');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('analytics.regional.meta.title'));
+  useAdminPageMeta({
+    title: t('analytics.regional.meta.title'),
+    description: t('analytics.regional.meta.description'),
+  });
 
   const [period, setPeriod] = useState<Period>('last_30d');
   const [overviewData, setOverviewData] = useState<OverviewData | null>(null);
@@ -570,11 +576,11 @@ export default function RegionalAnalyticsPage() {
         setOverviewData(data as OverviewData);
       }
     } catch {
-      setOverviewError('Failed to load overview');
+      setOverviewError(t('analytics.regional.errors.load_overview'));
     } finally {
       setOverviewLoading(false);
     }
-  }, []);
+  }, [t]);
 
   // Load a specific tab's data
   const loadTab = useCallback(async (tabKey: string) => {
@@ -606,16 +612,16 @@ export default function RegionalAnalyticsPage() {
         setTabData((prev) => ({ ...prev, [tabKey]: data as TabData }));
       }
     } catch {
-      setTabError((prev) => ({ ...prev, [tabKey]: 'Failed to load data' }));
+      setTabError((prev) => ({ ...prev, [tabKey]: t('analytics.regional.errors.failed_to_load_data') }));
     } finally {
       setTabLoading((prev) => ({ ...prev, [tabKey]: false }));
     }
-  }, [period]);
+  }, [period, t]);
 
   // Initial load
-  useState(() => {
+  useEffect(() => {
     loadOverview();
-  });
+  }, [loadOverview]);
 
   // Handle period change — clear tab cache
   const handlePeriodChange = (newPeriod: Period) => {
@@ -671,15 +677,15 @@ export default function RegionalAnalyticsPage() {
   return (
     <div className="space-y-6 p-6">
       <PageHeader
-        title="Regional Analytics"
-        subtitle="Sellable analytics product for municipalities and SME partners — geographic density, engagement trends, and community insights."
+        title={t('analytics.regional.meta.title')}
+        subtitle={t('analytics.regional.meta.description')}
         icon={<BarChart3 size={24} />}
       />
 
       {/* Controls bar */}
       <div className="flex flex-wrap items-center gap-3">
         <Select
-          label="Period"
+          label={t('analytics.regional.controls.period')}
           selectedKeys={[period]}
           onSelectionChange={(keys) => {
             const val = Array.from(keys)[0] as Period;
@@ -689,10 +695,10 @@ export default function RegionalAnalyticsPage() {
           size="sm"
           variant="bordered"
         >
-          <SelectItem key="last_30d">Last 30 days</SelectItem>
-          <SelectItem key="last_90d">Last 90 days</SelectItem>
-          <SelectItem key="last_12m">Last 12 months</SelectItem>
-          <SelectItem key="all_time">All time</SelectItem>
+          <SelectItem key="last_30d">{t('analytics.regional.periods.last_30d')}</SelectItem>
+          <SelectItem key="last_90d">{t('analytics.regional.periods.last_90d')}</SelectItem>
+          <SelectItem key="last_12m">{t('analytics.regional.periods.last_12m')}</SelectItem>
+          <SelectItem key="all_time">{t('analytics.regional.periods.all_time')}</SelectItem>
         </Select>
 
         <Button
@@ -702,7 +708,7 @@ export default function RegionalAnalyticsPage() {
           isLoading={invalidating}
           onPress={handleInvalidate}
         >
-          Refresh Cache
+          {t('analytics.regional.actions.refresh_cache')}
         </Button>
 
         <Button
@@ -712,51 +718,59 @@ export default function RegionalAnalyticsPage() {
           startContent={<Download size={14} />}
           onPress={handleExport}
         >
-          Export Report
+          {t('analytics.regional.actions.export_report')}
         </Button>
       </div>
 
       {/* Hero stat cards */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatCard
-          label="Active Members"
-          value={overviewData?.active_members ?? '—'}
+          label={t('analytics.regional.stats.active_members')}
+          value={overviewData?.active_members ?? t('analytics.regional.empty_value')}
           icon={Users}
           color="primary"
           loading={overviewLoading}
-          description="Last 30 days (with vol activity)"
+          description={t('analytics.regional.stats.active_members_description')}
         />
         <StatCard
-          label="Vol Hours This Month"
-          value={overviewData?.vol_hours_this_month ?? '—'}
+          label={t('analytics.regional.stats.vol_hours_this_month')}
+          value={overviewData?.vol_hours_this_month ?? t('analytics.regional.empty_value')}
           icon={Activity}
           color="success"
           loading={overviewLoading}
-          description="Approved volunteer hours"
+          description={t('analytics.regional.stats.vol_hours_description')}
         />
         <StatCard
-          label="Help Requests This Month"
-          value={overviewData?.help_requests_this_month ?? '—'}
+          label={t('analytics.regional.stats.help_requests_this_month')}
+          value={overviewData?.help_requests_this_month ?? t('analytics.regional.empty_value')}
           icon={Heart}
           color="warning"
           loading={overviewLoading}
-          description="New requests this calendar month"
+          description={t('analytics.regional.stats.help_requests_description')}
         />
         <StatCard
-          label="Most Needed Category"
-          value={overviewData?.most_needed_category ?? '—'}
+          label={t('analytics.regional.stats.most_needed_category')}
+          value={overviewData?.most_needed_category ?? t('analytics.regional.empty_value')}
           icon={TrendingUp}
           color="secondary"
           loading={overviewLoading}
-          description="By request volume (last 30d)"
+          description={t('analytics.regional.stats.most_needed_description')}
         />
       </div>
+
+      {overviewError && (
+        <div className="rounded-lg bg-danger-50 p-4 text-sm text-danger">
+          {overviewError === 'data_unavailable'
+            ? t('analytics.regional.errors.data_unavailable')
+            : overviewError}
+        </div>
+      )}
 
       {/* Section tabs */}
       <Card shadow="sm">
         <CardBody className="p-0">
           <Tabs
-            aria-label="Regional Analytics Sections"
+            aria-label={t('analytics.regional.tabs.aria')}
             variant="underlined"
             className="px-4 pt-4"
             onSelectionChange={handleTabChange}
@@ -767,18 +781,18 @@ export default function RegionalAnalyticsPage() {
               title={
                 <div className="flex items-center gap-1.5">
                   <Map size={14} />
-                  <span>Member Heatmap</span>
+                  <span>{t('analytics.regional.tabs.heatmap')}</span>
                 </div>
               }
             >
               <div className="p-4">
-                <h2 className="mb-4 text-base font-semibold">Geographic Activity Density</h2>
-                <TabPanel loading={!!tabLoading['heatmap']} error={tabError['heatmap'] ?? null}>
+                <h2 className="mb-4 text-base font-semibold">{t('analytics.regional.sections.geographic_activity_density')}</h2>
+                <TabPanel loading={!!tabLoading['heatmap']} error={tabError['heatmap'] ?? null} t={t}>
                   {tabData['heatmap'] && !isError(tabData['heatmap']) && (
-                    <HeatmapTab data={tabData['heatmap'] as HeatmapCell[]} />
+                    <HeatmapTab data={tabData['heatmap'] as HeatmapCell[]} t={t} />
                   )}
                   {!tabData['heatmap'] && !tabLoading['heatmap'] && !tabError['heatmap'] && (
-                    <p className="text-sm text-default-400">Select this tab to load data.</p>
+                    <p className="text-sm text-default-400">{t('analytics.regional.empty.select_tab_to_load')}</p>
                   )}
                 </TabPanel>
               </div>
@@ -790,15 +804,15 @@ export default function RegionalAnalyticsPage() {
               title={
                 <div className="flex items-center gap-1.5">
                   <Users size={14} />
-                  <span>Demographics</span>
+                  <span>{t('analytics.regional.tabs.demographics')}</span>
                 </div>
               }
             >
               <div className="p-4">
-                <h2 className="mb-4 text-base font-semibold">Member Demographics</h2>
-                <TabPanel loading={!!tabLoading['demographics']} error={tabError['demographics'] ?? null}>
+                <h2 className="mb-4 text-base font-semibold">{t('analytics.regional.sections.member_demographics')}</h2>
+                <TabPanel loading={!!tabLoading['demographics']} error={tabError['demographics'] ?? null} t={t}>
                   {tabData['demographics'] && !isError(tabData['demographics']) && (
-                    <DemographicsTab data={tabData['demographics'] as DemographicsData} />
+                    <DemographicsTab data={tabData['demographics'] as DemographicsData} t={t} />
                   )}
                 </TabPanel>
               </div>
@@ -810,18 +824,18 @@ export default function RegionalAnalyticsPage() {
               title={
                 <div className="flex items-center gap-1.5">
                   <BarChart3 size={14} />
-                  <span>Demand &amp; Supply</span>
+                  <span>{t('analytics.regional.tabs.demand_supply')}</span>
                 </div>
               }
             >
               <div className="p-4">
-                <h2 className="mb-4 text-base font-semibold">Demand vs Supply by Category</h2>
+                <h2 className="mb-4 text-base font-semibold">{t('analytics.regional.sections.demand_supply_by_category')}</h2>
                 <p className="mb-4 text-sm text-default-500">
-                  Ratio = Requests ÷ Offers. {'>'} 1 means more demand than supply. ↑ = ratio rose vs prior period.
+                  {t('analytics.regional.sections.demand_supply_note')}
                 </p>
-                <TabPanel loading={!!tabLoading['demand']} error={tabError['demand'] ?? null}>
+                <TabPanel loading={!!tabLoading['demand']} error={tabError['demand'] ?? null} t={t}>
                   {tabData['demand'] && !isError(tabData['demand']) && (
-                    <DemandSupplyTab data={tabData['demand'] as DemandSupplyRow[]} />
+                    <DemandSupplyTab data={tabData['demand'] as DemandSupplyRow[]} t={t} />
                   )}
                 </TabPanel>
               </div>
@@ -833,15 +847,15 @@ export default function RegionalAnalyticsPage() {
               title={
                 <div className="flex items-center gap-1.5">
                   <TrendingUp size={14} />
-                  <span>Engagement Trends</span>
+                  <span>{t('analytics.regional.tabs.engagement')}</span>
                 </div>
               }
             >
               <div className="p-4">
-                <h2 className="mb-4 text-base font-semibold">Monthly Engagement Metrics</h2>
-                <TabPanel loading={!!tabLoading['engagement']} error={tabError['engagement'] ?? null}>
+                <h2 className="mb-4 text-base font-semibold">{t('analytics.regional.sections.monthly_engagement_metrics')}</h2>
+                <TabPanel loading={!!tabLoading['engagement']} error={tabError['engagement'] ?? null} t={t}>
                   {tabData['engagement'] && !isError(tabData['engagement']) && (
-                    <EngagementTab data={tabData['engagement'] as EngagementRow[]} />
+                    <EngagementTab data={tabData['engagement'] as EngagementRow[]} t={t} />
                   )}
                 </TabPanel>
               </div>
@@ -853,15 +867,15 @@ export default function RegionalAnalyticsPage() {
               title={
                 <div className="flex items-center gap-1.5">
                   <Activity size={14} />
-                  <span>Volunteer Breakdown</span>
+                  <span>{t('analytics.regional.tabs.volunteer')}</span>
                 </div>
               }
             >
               <div className="p-4">
-                <h2 className="mb-4 text-base font-semibold">Volunteer Activity</h2>
-                <TabPanel loading={!!tabLoading['volunteer']} error={tabError['volunteer'] ?? null}>
+                <h2 className="mb-4 text-base font-semibold">{t('analytics.regional.sections.volunteer_activity')}</h2>
+                <TabPanel loading={!!tabLoading['volunteer']} error={tabError['volunteer'] ?? null} t={t}>
                   {tabData['volunteer'] && !isError(tabData['volunteer']) && (
-                    <VolunteerTab data={tabData['volunteer'] as VolunteerData} />
+                    <VolunteerTab data={tabData['volunteer'] as VolunteerData} t={t} />
                   )}
                 </TabPanel>
               </div>
@@ -873,15 +887,15 @@ export default function RegionalAnalyticsPage() {
               title={
                 <div className="flex items-center gap-1.5">
                   <Heart size={14} />
-                  <span>Help Requests</span>
+                  <span>{t('analytics.regional.columns.help_requests')}</span>
                 </div>
               }
             >
               <div className="p-4">
-                <h2 className="mb-4 text-base font-semibold">Help Request Analysis</h2>
-                <TabPanel loading={!!tabLoading['help']} error={tabError['help'] ?? null}>
+                <h2 className="mb-4 text-base font-semibold">{t('analytics.regional.sections.help_request_analysis')}</h2>
+                <TabPanel loading={!!tabLoading['help']} error={tabError['help'] ?? null} t={t}>
                   {tabData['help'] && !isError(tabData['help']) && (
-                    <HelpRequestsTab data={tabData['help'] as HelpRequestData} />
+                    <HelpRequestsTab data={tabData['help'] as HelpRequestData} t={t} />
                   )}
                 </TabPanel>
               </div>

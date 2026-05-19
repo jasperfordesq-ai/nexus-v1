@@ -81,10 +81,6 @@ interface ApiResponseWithMeta {
   meta?: { total_pages?: number };
 }
 
-interface DetectionResult {
-  flagged?: number;
-}
-
 interface NotifyResult {
   message?: string;
   updated?: number;
@@ -143,21 +139,21 @@ async function exportCsv(days: string) {
 
 export function InactiveMembersPage() {
   const { t } = useTranslation('admin');
-  usePageTitle("Reports");
+  usePageTitle(t('reports.page_title'));
 
   const DAYS_OPTIONS = [
-    { key: '30', label: "30 Days" },
-    { key: '60', label: "60 Days" },
-    { key: '90', label: "90 Days" },
-    { key: '180', label: "180 Days" },
-    { key: '365', label: "365 Days" },
+    { key: '30', label: t('reports.period_30_days') },
+    { key: '60', label: t('reports.period_60_days') },
+    { key: '90', label: t('reports.period_90_days') },
+    { key: '180', label: t('reports.period_180_days') },
+    { key: '365', label: t('reports.period_365_days') },
   ];
 
   const FLAG_TYPE_OPTIONS = [
-    { key: '', label: "All Types" },
-    { key: 'inactive', label: "Flag Inactive" },
-    { key: 'dormant', label: "Flag Dormant" },
-    { key: 'at_risk', label: "Flag at Risk" },
+    { key: '', label: t('reports.flag_all_types') },
+    { key: 'inactive', label: t('reports.flag_inactive') },
+    { key: 'dormant', label: t('reports.flag_dormant') },
+    { key: 'at_risk', label: t('reports.flag_at_risk') },
   ];
 
   const toast = useToast();
@@ -195,11 +191,11 @@ export function InactiveMembersPage() {
         setTotalPages(Math.max(1, tp));
       }
     } catch {
-      toast.error("Failed to load inactive members");
+      toast.error(t('reports.failed_to_load_inactive_members'));
     } finally {
       setLoading(false);
     }
-  }, [days, flagType, page, toast]);
+  }, [days, flagType, page, t, toast]);
 
 
   useEffect(() => {
@@ -219,12 +215,11 @@ export function InactiveMembersPage() {
         threshold_days: parseInt(days, 10),
       });
       if (res.data) {
-        const result = res.data as DetectionResult;
-        toast.success(`Detection Complete`);
+        toast.success(t('reports.detection_complete'));
         await loadData();
       }
     } catch {
-      toast.error("Detection Failed");
+      toast.error(t('reports.detection_failed'));
     } finally {
       setDetecting(false);
     }
@@ -233,7 +228,7 @@ export function InactiveMembersPage() {
   // Mark notified
   const handleNotify = async () => {
     if (selectedIds.size === 0) {
-      toast.warning("Select Members to Mark as Notified");
+      toast.warning(t('reports.select_members_to_mark_as_notified'));
       return;
     }
 
@@ -243,12 +238,12 @@ export function InactiveMembersPage() {
       const res = await api.post('/v2/admin/members/inactive/notify', { user_ids: userIds });
       if (res.data) {
         const result = res.data as NotifyResult;
-        toast.success(result.message || `Members marked as notified`);
+        toast.success(result.message || t('reports.members_marked_notified'));
         setSelectedIds(new Set());
         await loadData();
       }
     } catch {
-      toast.error("Failed to mark members as notified");
+      toast.error(t('reports.failed_to_mark_members_as_notified'));
     } finally {
       setNotifying(false);
     }
@@ -278,8 +273,8 @@ export function InactiveMembersPage() {
   return (
     <div>
       <PageHeader
-        title={"Inactive Members Page"}
-        description={"Identify and manage members who have not been active recently"}
+        title={t('reports.inactive_members_page_title')}
+        description={t('reports.inactive_members_page_desc')}
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Select
@@ -290,7 +285,7 @@ export function InactiveMembersPage() {
                 if (v) setDays(String(v));
               }}
               className="w-32"
-              aria-label={"Days Threshold"}
+              aria-label={t('reports.label_days_threshold')}
             >
               {DAYS_OPTIONS.map((opt) => (
                 <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -304,7 +299,7 @@ export function InactiveMembersPage() {
                 setFlagType(v !== undefined ? String(v) : '');
               }}
               className="w-32"
-              aria-label={"Flag Type"}
+              aria-label={t('reports.label_flag_type')}
             >
               {FLAG_TYPE_OPTIONS.map((opt) => (
                 <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -319,17 +314,17 @@ export function InactiveMembersPage() {
               isDisabled={detecting}
               size="sm"
             >
-              {"Run Detection"}
+              {t('reports.run_detection')}
             </Button>
             <Button
               variant="flat"
               startContent={<Download size={16} />}
               onPress={async () => {
-                try { await exportCsv(days); } catch { toast.error("Failed to export CSV"); }
+                try { await exportCsv(days); } catch { toast.error(t('reports.failed_to_export_c_s_v')); }
               }}
               size="sm"
             >
-              {"Export CSV"}
+              {t('reports.export_csv')}
             </Button>
             <Button
               variant="flat"
@@ -339,7 +334,7 @@ export function InactiveMembersPage() {
               isDisabled={loading}
               size="sm"
             >
-              {"Refresh"}
+              {t('reports.refresh')}
             </Button>
           </div>
         }
@@ -348,28 +343,28 @@ export function InactiveMembersPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={"Total Flagged"}
+          label={t('reports.label_total_flagged')}
           value={stats?.total_flagged ?? '\u2014'}
           icon={AlertTriangle}
           color="danger"
           loading={!stats}
         />
         <StatCard
-          label={"Inactive"}
+          label={t('reports.label_inactive')}
           value={stats?.inactive_count ?? '\u2014'}
           icon={UserX}
           color="warning"
           loading={!stats}
         />
         <StatCard
-          label={"Dormant"}
+          label={t('reports.label_dormant')}
           value={stats?.dormant_count ?? '\u2014'}
           icon={Clock}
           color="danger"
           loading={!stats}
         />
         <StatCard
-          label={"Inactivity Rate"}
+          label={t('reports.label_inactivity_rate')}
           value={stats ? `${(stats.inactivity_rate * 100).toFixed(1)}%` : '\u2014'}
           icon={Activity}
           color="secondary"
@@ -381,7 +376,7 @@ export function InactiveMembersPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
         <Card shadow="sm">
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">{"Active Members"}</p>
+            <p className="text-sm text-default-500">{t('reports.label_active_members')}</p>
             <p className="text-2xl font-bold text-foreground">
               {stats?.total_active_members?.toLocaleString() ?? '\u2014'}
             </p>
@@ -389,7 +384,7 @@ export function InactiveMembersPage() {
         </Card>
         <Card shadow="sm">
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">{"At Risk"}</p>
+            <p className="text-sm text-default-500">{t('reports.at_risk')}</p>
             <p className="text-2xl font-bold text-warning">
               {stats?.at_risk_count?.toLocaleString() ?? '\u2014'}
             </p>
@@ -397,7 +392,7 @@ export function InactiveMembersPage() {
         </Card>
         <Card shadow="sm">
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">{"Already Notified"}</p>
+            <p className="text-sm text-default-500">{t('reports.already_notified')}</p>
             <p className="text-2xl font-bold text-foreground">
               {stats?.notified_count?.toLocaleString() ?? '\u2014'}
             </p>
@@ -410,7 +405,7 @@ export function InactiveMembersPage() {
         <Card shadow="sm" className="mb-4">
           <CardBody className="flex flex-row items-center gap-4 p-3">
             <span className="text-sm font-medium text-foreground">
-              {`Members Selected`}
+              {t('reports.members_selected_count', { count: selectedIds.size })}
             </span>
             <Button
               color="primary"
@@ -420,39 +415,39 @@ export function InactiveMembersPage() {
               isLoading={notifying}
               isDisabled={notifying}
             >
-              {"Mark as Notified"}
+              {t('reports.mark_as_notified')}
             </Button>
             <Button
               variant="flat"
               size="sm"
               onPress={() => setSelectedIds(new Set())}
             >
-              {"Clear Selection"}
+              {t('reports.clear_selection')}
             </Button>
           </CardBody>
         </Card>
       )}
 
       {/* Members Table */}
-      <Table aria-label={"Inactive Members"} shadow="sm">
+      <Table aria-label={t('reports.label_inactive_members')} shadow="sm">
         <TableHeader>
           <TableColumn width={40}>
             <Checkbox
               isSelected={selectedIds.size === members.length && members.length > 0}
               isIndeterminate={selectedIds.size > 0 && selectedIds.size < members.length}
               onValueChange={toggleSelectAll}
-              aria-label={"Select All"}
+              aria-label={t('reports.label_select_all')}
             />
           </TableColumn>
-          <TableColumn>{"Member"}</TableColumn>
-          <TableColumn>{"Flag Type"}</TableColumn>
-          <TableColumn>{"Days Inactive"}</TableColumn>
-          <TableColumn>{"Last Activity"}</TableColumn>
-          <TableColumn>{"Last Login"}</TableColumn>
-          <TableColumn>{"Notified"}</TableColumn>
+          <TableColumn>{t('reports.col_member')}</TableColumn>
+          <TableColumn>{t('reports.col_flag_type')}</TableColumn>
+          <TableColumn>{t('reports.col_days_inactive')}</TableColumn>
+          <TableColumn>{t('reports.col_last_activity')}</TableColumn>
+          <TableColumn>{t('reports.col_last_login')}</TableColumn>
+          <TableColumn>{t('reports.col_notified')}</TableColumn>
         </TableHeader>
         <TableBody
-          emptyContent={"No inactive members found. Run detection to identify them."}
+          emptyContent={t('reports.no_inactive_members_run_detection')}
           isLoading={loading}
           loadingContent={<Spinner />}
         >
@@ -462,7 +457,7 @@ export function InactiveMembersPage() {
                 <Checkbox
                   isSelected={selectedIds.has(m.user_id)}
                   onValueChange={() => toggleSelect(m.user_id)}
-                  aria-label={`Select ${m.name}`}
+                  aria-label={t('reports.select_member_aria', { name: m.name })}
                 />
               </TableCell>
               <TableCell>
@@ -485,14 +480,14 @@ export function InactiveMembersPage() {
               </TableCell>
               <TableCell>
                 <span className={`text-sm font-medium ${m.days_inactive > 180 ? 'text-danger' : m.days_inactive > 90 ? 'text-warning' : 'text-default-600'}`}>
-                  {`Days`}
+                  {t('reports.days_count', { count: m.days_inactive })}
                 </span>
               </TableCell>
               <TableCell className="text-sm text-default-600">
-                {m.last_activity ? new Date(m.last_activity).toLocaleDateString() : "Never"}
+                {m.last_activity ? new Date(m.last_activity).toLocaleDateString() : t('reports.never')}
               </TableCell>
               <TableCell className="text-sm text-default-600">
-                {m.last_login ? new Date(m.last_login).toLocaleDateString() : "Never"}
+                {m.last_login ? new Date(m.last_login).toLocaleDateString() : t('reports.never')}
               </TableCell>
               <TableCell>
                 {m.notified_at ? (
@@ -500,7 +495,7 @@ export function InactiveMembersPage() {
                     {new Date(m.notified_at).toLocaleDateString()}
                   </Chip>
                 ) : (
-                  <Chip size="sm" variant="flat" color="default">{"Not Yet"}</Chip>
+                  <Chip size="sm" variant="flat" color="default">{t('reports.not_yet')}</Chip>
                 )}
               </TableCell>
             </TableRow>

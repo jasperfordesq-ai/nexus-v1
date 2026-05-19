@@ -5,6 +5,7 @@
 
 import { useParams } from 'react-router-dom';
 import { DonationReceipt } from '@/components/donations/DonationReceipt';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { usePageTitle } from '@/hooks';
 import { useTranslation } from 'react-i18next';
 
@@ -14,8 +15,11 @@ export default function DonationReceiptPage() {
   usePageTitle(t('donations.receipt_title', 'Donation Receipt'));
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <DonationReceipt donationId={Number(id ?? 0)} />
-    </div>
+    <>
+      <PageMeta title={t('donations.receipt_title', 'Donation Receipt')} noIndex />
+      <div className="mx-auto max-w-3xl px-4 py-8">
+        <DonationReceipt donationId={Number(id ?? 0)} />
+      </div>
+    </>
   );
 }

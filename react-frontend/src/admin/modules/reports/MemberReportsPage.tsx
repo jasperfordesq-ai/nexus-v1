@@ -174,21 +174,21 @@ async function exportCsv(reportType: string) {
 
 export function MemberReportsPage() {
   const { t } = useTranslation('admin');
-  usePageTitle("Reports");
+  usePageTitle(t('reports.page_title'));
   const toast = useToast();
 
   const GROUP_BY_OPTIONS = [
-    { key: 'daily', label: "Group by Daily" },
-    { key: 'weekly', label: "Group by Weekly" },
-    { key: 'monthly', label: "Group by Monthly" },
+    { key: 'daily', label: t('reports.group_by_daily') },
+    { key: 'weekly', label: t('reports.group_by_weekly') },
+    { key: 'monthly', label: t('reports.group_by_monthly') },
   ];
 
   const PERIOD_OPTIONS = [
-    { key: '30', label: "30 Days" },
-    { key: '60', label: "60 Days" },
-    { key: '90', label: "90 Days" },
-    { key: '180', label: "180 Days" },
-    { key: '365', label: "365 Days" },
+    { key: '30', label: t('reports.period_30_days') },
+    { key: '60', label: t('reports.period_60_days') },
+    { key: '90', label: t('reports.period_90_days') },
+    { key: '180', label: t('reports.period_180_days') },
+    { key: '365', label: t('reports.period_365_days') },
   ];
 
   const [reportType, setReportType] = useState('active');
@@ -233,17 +233,17 @@ export function MemberReportsPage() {
 
     return (
       <>
-        <Table aria-label={"Active Members"} shadow="sm">
+        <Table aria-label={t('reports.active_members')} shadow="sm">
           <TableHeader>
-            <TableColumn>{"Member"}</TableColumn>
-            <TableColumn>{"Last Login"}</TableColumn>
-            <TableColumn>{"Transactions"}</TableColumn>
-            <TableColumn>{"Hours Given"}</TableColumn>
-            <TableColumn>{"Hours Received"}</TableColumn>
-            <TableColumn>{"Joined"}</TableColumn>
+            <TableColumn>{t('reports.col_member')}</TableColumn>
+            <TableColumn>{t('reports.col_last_login')}</TableColumn>
+            <TableColumn>{t('reports.col_transactions')}</TableColumn>
+            <TableColumn>{t('reports.col_hours_given')}</TableColumn>
+            <TableColumn>{t('reports.col_hours_received')}</TableColumn>
+            <TableColumn>{t('reports.col_joined')}</TableColumn>
           </TableHeader>
           <TableBody
-            emptyContent={"No active members found"}
+            emptyContent={t('reports.no_active_members_found')}
             isLoading={loading}
             loadingContent={<Spinner />}
           >
@@ -260,7 +260,7 @@ export function MemberReportsPage() {
                 </TableCell>
                 <TableCell>
                   <span className="text-sm text-default-600">
-                    {m.last_login ? new Date(m.last_login).toLocaleDateString() : "Never"}
+                    {m.last_login ? new Date(m.last_login).toLocaleDateString() : t('reports.never')}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -291,7 +291,7 @@ export function MemberReportsPage() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <TrendingUp size={18} className="text-success" />
-          <h3 className="font-semibold">{"Registration Trends"}</h3>
+          <h3 className="font-semibold">{t('reports.registration_trends')}</h3>
           <div className="ml-auto">
             <Select
               size="sm"
@@ -301,7 +301,7 @@ export function MemberReportsPage() {
                 if (v) setGroupBy(String(v));
               }}
               className="w-32"
-              aria-label={"Group by"}
+              aria-label={t('reports.label_group_by')}
             >
               {GROUP_BY_OPTIONS.map((opt) => (
                 <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -320,12 +320,12 @@ export function MemberReportsPage() {
                 <YAxis tick={{ fontSize: 12 }} tickLine={false} allowDecimals={false} />
                 <Tooltip contentStyle={tooltipStyle} />
                 <Legend />
-                <Bar dataKey="count" name={"New Registrations"} fill={CHART_COLOR_MAP.success} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="count" name={t('reports.new_registrations')} fill={CHART_COLOR_MAP.success} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
             <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
-              {"No registration data"}
+              {t('reports.no_registration_data')}
             </p>
           )}
         </CardBody>
@@ -340,21 +340,21 @@ export function MemberReportsPage() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <UserCheck size={18} className="text-primary" />
-          <h3 className="font-semibold">{"Retention Cohorts"}</h3>
+          <h3 className="font-semibold">{t('reports.retention_cohorts')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
-          <Table aria-label={"Retention Cohorts"} shadow="sm" isStriped>
+          <Table aria-label={t('reports.label_retention_cohorts')} shadow="sm" isStriped>
             <TableHeader>
-              <TableColumn>{"Cohort"}</TableColumn>
-              <TableColumn className="text-center">{"Initial"}</TableColumn>
-              <TableColumn className="text-center">{"Month 1"}</TableColumn>
-              <TableColumn className="text-center">{"Month 2"}</TableColumn>
-              <TableColumn className="text-center">{"Month 3"}</TableColumn>
-              <TableColumn className="text-center">{"Month 6"}</TableColumn>
-              <TableColumn className="text-center">{"Month 12"}</TableColumn>
+              <TableColumn>{t('reports.col_cohort')}</TableColumn>
+              <TableColumn className="text-center">{t('reports.col_initial')}</TableColumn>
+              <TableColumn className="text-center">{t('reports.col_month_1')}</TableColumn>
+              <TableColumn className="text-center">{t('reports.col_month_2')}</TableColumn>
+              <TableColumn className="text-center">{t('reports.col_month_3')}</TableColumn>
+              <TableColumn className="text-center">{t('reports.col_month_6')}</TableColumn>
+              <TableColumn className="text-center">{t('reports.col_month_12')}</TableColumn>
             </TableHeader>
             <TableBody
-              emptyContent={"No retention data"}
+              emptyContent={t('reports.no_retention_data')}
               isLoading={loading}
               loadingContent={<Spinner />}
             >
@@ -395,28 +395,28 @@ export function MemberReportsPage() {
       <div className="space-y-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            label={"Login Rate"}
+            label={t('reports.label_login_rate')}
             value={metrics ? `${(Number(metrics.login_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={Users}
             color="primary"
             loading={loading}
           />
           <StatCard
-            label={"Trading Rate"}
+            label={t('reports.label_trading_rate')}
             value={metrics ? `${(Number(metrics.trading_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={TrendingUp}
             color="success"
             loading={loading}
           />
           <StatCard
-            label={"Listing Rate"}
+            label={t('reports.label_listing_rate')}
             value={metrics ? `${(Number(metrics.listing_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={BarChart3}
             color="warning"
             loading={loading}
           />
           <StatCard
-            label={"Messaging Rate"}
+            label={t('reports.label_messaging_rate')}
             value={metrics ? `${(Number(metrics.messaging_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={Activity}
             color="secondary"
@@ -427,7 +427,7 @@ export function MemberReportsPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Card shadow="sm">
             <CardBody className="p-4">
-              <p className="text-sm text-default-500">{"Active (30 days)"}</p>
+              <p className="text-sm text-default-500">{t('reports.active_30d_total')}</p>
               {loading ? (
                 <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
               ) : (
@@ -439,7 +439,7 @@ export function MemberReportsPage() {
           </Card>
           <Card shadow="sm">
             <CardBody className="p-4">
-              <p className="text-sm text-default-500">{"Avg Sessions per User"}</p>
+              <p className="text-sm text-default-500">{t('reports.avg_sessions_per_user')}</p>
               {loading ? (
                 <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
               ) : (
@@ -451,7 +451,7 @@ export function MemberReportsPage() {
           </Card>
           <Card shadow="sm">
             <CardBody className="p-4">
-              <p className="text-sm text-default-500">{"Avg Transactions per User"}</p>
+              <p className="text-sm text-default-500">{t('reports.avg_transactions_per_user')}</p>
               {loading ? (
                 <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
               ) : (
@@ -473,20 +473,20 @@ export function MemberReportsPage() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <Trophy size={18} className="text-warning" />
-          <h3 className="font-semibold">{"Top Contributors"}</h3>
+          <h3 className="font-semibold">{t('reports.top_contributors')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
-          <Table aria-label={"Top Contributors"} shadow="sm" isStriped>
+          <Table aria-label={t('reports.label_top_contributors')} shadow="sm" isStriped>
             <TableHeader>
-              <TableColumn>{"Rank"}</TableColumn>
-              <TableColumn>{"Member"}</TableColumn>
-              <TableColumn className="text-right">{"Given"}</TableColumn>
-              <TableColumn className="text-right">{"Received"}</TableColumn>
-              <TableColumn className="text-right">{"Transactions"}</TableColumn>
-              <TableColumn className="text-right">{"Listings"}</TableColumn>
+              <TableColumn>{t('reports.col_rank')}</TableColumn>
+              <TableColumn>{t('reports.col_member')}</TableColumn>
+              <TableColumn className="text-right">{t('reports.col_given')}</TableColumn>
+              <TableColumn className="text-right">{t('reports.col_received')}</TableColumn>
+              <TableColumn className="text-right">{t('reports.col_transactions')}</TableColumn>
+              <TableColumn className="text-right">{t('reports.col_listings')}</TableColumn>
             </TableHeader>
             <TableBody
-              emptyContent={"No contributor data"}
+              emptyContent={t('reports.no_contributor_data')}
               isLoading={loading}
               loadingContent={<Spinner />}
             >
@@ -523,15 +523,15 @@ export function MemberReportsPage() {
 
     return (
       <>
-        <Table aria-label={"Least Active Members"} shadow="sm">
+        <Table aria-label={t('reports.label_least_active_members')} shadow="sm">
           <TableHeader>
-            <TableColumn>{"Member"}</TableColumn>
-            <TableColumn>{"Last Login"}</TableColumn>
-            <TableColumn>{"Transactions"}</TableColumn>
-            <TableColumn>{"Joined"}</TableColumn>
+            <TableColumn>{t('reports.col_member')}</TableColumn>
+            <TableColumn>{t('reports.col_last_login')}</TableColumn>
+            <TableColumn>{t('reports.col_transactions')}</TableColumn>
+            <TableColumn>{t('reports.col_joined')}</TableColumn>
           </TableHeader>
           <TableBody
-            emptyContent={"No inactive members found"}
+            emptyContent={t('reports.no_inactive_members_found')}
             isLoading={loading}
             loadingContent={<Spinner />}
           >
@@ -552,7 +552,7 @@ export function MemberReportsPage() {
                     variant="flat"
                     color={m.last_login ? 'default' : 'danger'}
                   >
-                    {m.last_login ? new Date(m.last_login).toLocaleDateString() : "Never"}
+                    {m.last_login ? new Date(m.last_login).toLocaleDateString() : t('reports.never')}
                   </Chip>
                 </TableCell>
                 <TableCell className="text-sm">{m.transaction_count}</TableCell>
@@ -579,8 +579,8 @@ export function MemberReportsPage() {
   return (
     <div>
       <PageHeader
-        title={"Member Reports Page"}
-        description={"View engagement statistics and activity reports for members"}
+        title={t('reports.member_reports_page_title')}
+        description={t('reports.member_reports_page_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Select
@@ -591,7 +591,7 @@ export function MemberReportsPage() {
                 if (v) setPeriod(String(v));
               }}
               className="w-32"
-              aria-label={"Period"}
+              aria-label={t('reports.label_period')}
             >
               {PERIOD_OPTIONS.map((opt) => (
                 <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -601,11 +601,11 @@ export function MemberReportsPage() {
               variant="flat"
               startContent={<Download size={16} />}
               onPress={async () => {
-                try { await exportCsv(reportType); } catch { toast.error("Failed to export CSV"); }
+                try { await exportCsv(reportType); } catch { toast.error(t('reports.failed_to_export_c_s_v')); }
               }}
               size="sm"
             >
-              {"Export CSV"}
+              {t('reports.export_csv')}
             </Button>
             <Button
               variant="flat"
@@ -614,7 +614,7 @@ export function MemberReportsPage() {
               isLoading={loading}
               size="sm"
             >
-              {"Refresh"}
+              {t('reports.refresh')}
             </Button>
           </div>
         }
@@ -627,12 +627,12 @@ export function MemberReportsPage() {
         color="primary"
         classNames={{ tabList: 'mb-4' }}
       >
-        <Tab key="active" title={<span className="flex items-center gap-1.5"><Users size={14} /> {"Active"}</span>} />
-        <Tab key="registrations" title={<span className="flex items-center gap-1.5"><TrendingUp size={14} /> {"Registrations"}</span>} />
-        <Tab key="retention" title={<span className="flex items-center gap-1.5"><UserCheck size={14} /> {"Retention"}</span>} />
-        <Tab key="engagement" title={<span className="flex items-center gap-1.5"><Activity size={14} /> {"Engagement"}</span>} />
-        <Tab key="top_contributors" title={<span className="flex items-center gap-1.5"><Trophy size={14} /> {"Top Contributors"}</span>} />
-        <Tab key="least_active" title={<span className="flex items-center gap-1.5"><UserX size={14} /> {"Least Active"}</span>} />
+        <Tab key="active" title={<span className="flex items-center gap-1.5"><Users size={14} /> {t('reports.tab_active')}</span>} />
+        <Tab key="registrations" title={<span className="flex items-center gap-1.5"><TrendingUp size={14} /> {t('reports.tab_registrations')}</span>} />
+        <Tab key="retention" title={<span className="flex items-center gap-1.5"><UserCheck size={14} /> {t('reports.tab_retention')}</span>} />
+        <Tab key="engagement" title={<span className="flex items-center gap-1.5"><Activity size={14} /> {t('reports.tab_engagement')}</span>} />
+        <Tab key="top_contributors" title={<span className="flex items-center gap-1.5"><Trophy size={14} /> {t('reports.tab_top_contributors')}</span>} />
+        <Tab key="least_active" title={<span className="flex items-center gap-1.5"><UserX size={14} /> {t('reports.tab_least_active')}</span>} />
       </Tabs>
 
       {reportType === 'active' && renderActiveMembers()}

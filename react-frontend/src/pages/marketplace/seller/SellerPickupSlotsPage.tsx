@@ -26,6 +26,7 @@ import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -132,7 +133,9 @@ export function SellerPickupSlotsPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+    <>
+      <PageMeta title={t('marketplace.pickup.slots_title', 'Pickup Slots')} noIndex />
+      <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
@@ -232,7 +235,8 @@ export function SellerPickupSlotsPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </div>
+      </div>
+    </>
   );
 }
 

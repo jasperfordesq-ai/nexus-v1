@@ -25,6 +25,7 @@ import Settings from 'lucide-react/icons/settings';
 import Building2 from 'lucide-react/icons/building-2';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
 import { useAuth, useTenant } from '@/contexts';
@@ -153,24 +154,27 @@ export default function VolOrgDashboardPage() {
 
   if (accessDenied || !org) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30 flex items-center justify-center mb-4">
-          <Building2 className="w-8 h-8 text-[var(--color-error)]" aria-hidden="true" />
+      <>
+        <PageMeta title={t('org_dashboard.title', 'Organization Dashboard')} noIndex />
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30 flex items-center justify-center mb-4">
+            <Building2 className="w-8 h-8 text-[var(--color-error)]" aria-hidden="true" />
+          </div>
+          <h2 className="text-xl font-semibold text-theme-primary mb-2">
+            {t('org_dashboard.access_denied', 'Access Denied')}
+          </h2>
+          <p className="text-theme-muted max-w-sm mb-4">
+            {t('org_dashboard.access_denied_desc', 'You do not have permission to manage this organization, or it does not exist.')}
+          </p>
+          <Button
+            variant="flat"
+            startContent={<ArrowLeft className="w-4 h-4" />}
+            onPress={() => navigate(tenantPath('/volunteering'))}
+          >
+            {t('org_dashboard.back_to_volunteering', 'Back to Volunteering')}
+          </Button>
         </div>
-        <h2 className="text-xl font-semibold text-theme-primary mb-2">
-          {t('org_dashboard.access_denied', 'Access Denied')}
-        </h2>
-        <p className="text-theme-muted max-w-sm mb-4">
-          {t('org_dashboard.access_denied_desc', 'You do not have permission to manage this organization, or it does not exist.')}
-        </p>
-        <Button
-          variant="flat"
-          startContent={<ArrowLeft className="w-4 h-4" />}
-          onPress={() => navigate(tenantPath('/volunteering'))}
-        >
-          {t('org_dashboard.back_to_volunteering', 'Back to Volunteering')}
-        </Button>
-      </div>
+      </>
     );
   }
 
@@ -184,7 +188,9 @@ export default function VolOrgDashboardPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+    <>
+      <PageMeta title={`${org.name} ${t('dashboard')}`} noIndex />
+      <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
@@ -282,6 +288,7 @@ export default function VolOrgDashboardPage() {
           />
         )}
       </Suspense>
-    </div>
+      </div>
+    </>
   );
 }

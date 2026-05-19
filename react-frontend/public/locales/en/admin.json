@@ -2,6 +2,161 @@
   "active": "Active",
   "enabled": "Enabled",
   "disabled": "Disabled",
+  "fadp": {
+    "meta": {
+      "page_title": "FADP Compliance"
+    },
+    "header": {
+      "title": "Swiss FADP Compliance (nDSG)",
+      "description": "Federal Act on Data Protection: processing register, retention configuration, consent audit, and residency controls."
+    },
+    "actions": {
+      "add_activity": "Add activity",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "export_csv": "Export CSV",
+      "export_ledger_csv": "Export full ledger CSV",
+      "refresh": "Refresh",
+      "save_changes": "Save changes",
+      "save_configuration": "Save configuration"
+    },
+    "common": {
+      "empty_dash": "—",
+      "no": "No"
+    },
+    "tabs": {
+      "aria": "FADP sections",
+      "ledger": "Consent ledger",
+      "register": "Processing register",
+      "residency": "Data residency",
+      "retention": "Retention config"
+    },
+    "register": {
+      "description": "Article 12 nDSG requires a record of processing activities. Add each activity where personal data is collected, used, shared, or retained.",
+      "empty": "No processing activities yet. Add an activity to create the register.",
+      "profiling_yes": "Yes: consent required",
+      "table_aria": "Processing activities",
+      "columns": {
+        "actions": "Actions",
+        "activity": "Activity",
+        "automated_profiling": "Automated profiling",
+        "legal_basis": "Legal basis",
+        "retention": "Retention"
+      }
+    },
+    "retention": {
+      "data_residency_label": "Data residency declaration",
+      "dpa_contact_description": "Data Protection Officer or responsible person email.",
+      "dpa_contact_label": "DPA contact email (optional)",
+      "periods_title": "Retention periods",
+      "residency_title": "Data residency and DPA contact",
+      "fields": {
+        "activity_logs_years": "Activity logs (years)",
+        "ai_embeddings_years": "AI embeddings (years)",
+        "member_data_years": "Member data (years)",
+        "messages_years": "Messages (years)",
+        "transaction_data_years": "Transaction data (years)"
+      },
+      "hints": {
+        "activity_logs_years": "Platform activity and audit logs.",
+        "ai_embeddings_years": "Matching embeddings. Consent is required.",
+        "member_data_years": "Registration, profiles, and authentication data.",
+        "messages_years": "Direct and group messages.",
+        "transaction_data_years": "Time-credit exchange records."
+      }
+    },
+    "ledger": {
+      "description": "Immutable audit log of member consent decisions. Required by Art. 6 nDSG to demonstrate lawfulness.",
+      "empty": "No consent records yet.",
+      "table_aria": "Consent records",
+      "truncated": "Showing the most recent 200 records. Export the full ledger CSV to download all {{count}} records.",
+      "columns": {
+        "action": "Action",
+        "consent_type": "Consent type",
+        "date": "Date",
+        "ip_address": "IP address",
+        "member_id": "Member ID"
+      }
+    },
+    "residency": {
+      "article_16": "Cross-border disclosure of personal data is permitted if the destination country ensures adequate data protection recognised by the Federal Council. Switzerland, EU/EEA member states, and a small list of other countries qualify.",
+      "article_16_label": "FADP Art. 16",
+      "article_17": "If the destination does not qualify, appropriate safeguards must be in place, such as standard data protection clauses approved by the FDPIC, binding corporate rules, or member consent.",
+      "article_17_label": "FADP Art. 17",
+      "description": "Where tenant member data is stored and processed.",
+      "dpa_contact": "DPA contact",
+      "title": "Declared data residency",
+      "update_hint_prefix": "To update the declared residency, use the",
+      "update_hint_suffix": "tab.",
+      "copy": {
+        "EU": "Data is stored within the EU/EEA. Switzerland recognises EU data protection as adequate, so no additional FADP safeguards are needed for these transfers.",
+        "International": "Data is stored outside Switzerland and the EU. Art. 16-17 nDSG safeguards are required, such as standard contractual clauses or explicit member consent for each transfer.",
+        "Switzerland": "Data is stored entirely within Switzerland. Cross-border transfer provisions are not required for this declaration."
+      }
+    },
+    "summary": {
+      "automated_profiling": "Automated profiling",
+      "generated": "Generated",
+      "tenant": "Tenant",
+      "title": "Register summary",
+      "total_activities": "Total activities"
+    },
+    "activity_modal": {
+      "add_title": "Add processing activity",
+      "edit_title": "Edit processing activity",
+      "fields": {
+        "activity_name": "Activity name",
+        "automated_profiling": "Automated profiling",
+        "data_categories": "Data categories (comma-separated)",
+        "legal_basis": "Legal basis",
+        "purpose": "Purpose",
+        "recipients": "Recipients (comma-separated, optional)",
+        "retention_period": "Retention period",
+        "sort_order": "Sort order"
+      },
+      "hints": {
+        "automated_profiling": "Art. 21 nDSG: automated individual decision-making requires explicit consent and transparency.",
+        "data_categories": "For example: name, email, phone, address.",
+        "purpose": "Why is this data processed? Be specific about the legitimate purpose.",
+        "recipients": "Who receives or accesses this data, such as internal teams or processors.",
+        "retention_period": "For example: 7 years after membership ends, or until consent is withdrawn."
+      }
+    },
+    "delete_modal": {
+      "message": "Delete this processing activity? This cannot be undone.",
+      "title": "Delete processing activity"
+    },
+    "legal_basis": {
+      "consent": "Consent",
+      "contract": "Contract",
+      "legal_obligation": "Legal obligation",
+      "legitimate_interest": "Legitimate interest"
+    },
+    "data_residency": {
+      "EU": "EU (EEA)",
+      "International": "International (outside EU/Switzerland)",
+      "Switzerland": "Switzerland"
+    },
+    "consent_actions": {
+      "granted": "Granted",
+      "withdrawn": "Withdrawn"
+    },
+    "toasts": {
+      "activities_load_failed": "Failed to load processing activities.",
+      "activity_delete_failed": "Failed to delete activity.",
+      "activity_deleted": "Activity deleted.",
+      "activity_required": "Activity name and purpose are required.",
+      "activity_save_failed": "Failed to save activity.",
+      "activity_saved": "Processing activity saved.",
+      "consent_export_failed": "Failed to export consent ledger.",
+      "consent_load_failed": "Failed to load consent ledger.",
+      "register_export_failed": "Failed to export register.",
+      "retention_load_failed": "Failed to load retention config.",
+      "retention_save_failed": "Failed to save retention config.",
+      "retention_saved": "Retention configuration saved."
+    }
+  },
   "advertising": {
     "status": {
       "all": "All",
@@ -1055,7 +1210,143 @@
     "refresh": "Refresh",
     "top_areas_title": "Top Areas",
     "top_earners_title": "Top Earners",
-    "top_spenders_title": "Top Spenders"
+    "top_spenders_title": "Top Spenders",
+    "empty_value": "-",
+    "loading": "Loading analytics",
+    "location_marker_title": "{{area}}: {{count}} members",
+    "member_count_one": "{{count}} member",
+    "member_count_other": "{{count}} members",
+    "not_available": "Not available",
+    "errors": {
+      "export_failed": "Failed to export analytics.",
+      "load_community_failed": "Failed to load community analytics.",
+      "load_geography_failed": "Failed to load geographic analytics."
+    },
+    "regional": {
+      "meta": {
+        "title": "Regional Analytics",
+        "description": "Geographic, demographic, engagement, volunteer, and help-request insights for regional partners."
+      },
+      "controls": {
+        "period": "Period"
+      },
+      "periods": {
+        "last_30d": "Last 30 days",
+        "last_90d": "Last 90 days",
+        "last_12m": "Last 12 months",
+        "all_time": "All time"
+      },
+      "actions": {
+        "refresh_cache": "Refresh cache",
+        "export_report": "Export report"
+      },
+      "stats": {
+        "active_members": "Active members",
+        "active_members_description": "Members active in the selected reporting period",
+        "vol_hours_this_month": "Volunteer hours",
+        "vol_hours_description": "Volunteer hours recorded this month",
+        "help_requests_this_month": "Help requests",
+        "help_requests_description": "Help requests opened this month",
+        "most_needed_category": "Most needed category",
+        "most_needed_description": "Category with the highest recent demand"
+      },
+      "tabs": {
+        "aria": "Regional analytics sections",
+        "heatmap": "Member heatmap",
+        "demographics": "Demographics",
+        "demand_supply": "Demand and supply",
+        "engagement": "Engagement",
+        "help_requests": "Help requests",
+        "volunteer": "Volunteer"
+      },
+      "sections": {
+        "geographic_activity_density": "Geographic activity density",
+        "member_demographics": "Member demographics",
+        "demand_supply_by_category": "Demand vs supply by category",
+        "demand_supply_note": "A ratio above 1.0 means demand is higher than available offers in that category.",
+        "monthly_engagement_metrics": "Monthly engagement metrics",
+        "volunteer_activity": "Volunteer activity",
+        "help_request_analysis": "Help-request analysis"
+      },
+      "columns": {
+        "rank": "Rank",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "members": "Members",
+        "density": "Density",
+        "month": "Month",
+        "new_members": "New members",
+        "cumulative_total": "Cumulative total",
+        "category": "Category",
+        "requests": "Requests",
+        "offers": "Offers",
+        "ratio": "Ratio",
+        "trend": "Trend",
+        "active_members": "Active members",
+        "vol_hours": "Volunteer hours",
+        "new_listings": "New listings",
+        "new_events": "New events",
+        "help_requests": "Help requests",
+        "organisation": "Organisation",
+        "volunteers": "Volunteers",
+        "total": "Total",
+        "resolved": "Resolved",
+        "resolution_rate": "Resolution rate",
+        "avg_days_to_resolve": "Avg. days to resolve"
+      },
+      "heatmap": {
+        "description": "Top locations by member activity and density."
+      },
+      "demographics": {
+        "age_distribution": "Age distribution",
+        "language_distribution": "Language distribution",
+        "member_growth_12m": "Member growth, last 12 months",
+        "total_with_data": "{{total}} members with demographic data",
+        "total_active_members": "{{total}} active members"
+      },
+      "volunteer": {
+        "total_hours": "Total hours",
+        "avg_hours_per_volunteer": "Avg. hours per volunteer",
+        "reciprocity_ratio": "Reciprocity ratio",
+        "reciprocity_description": "Balance between hours given and hours received across the region.",
+        "top_orgs_title": "Top volunteer organisations"
+      },
+      "help": {
+        "by_category": "Help requests by category",
+        "resolution_trend_6m": "Resolution trend, last 6 months"
+      },
+      "empty": {
+        "infinity": "∞",
+        "no_geographic_data": "No geographic data is available for this period.",
+        "no_listing_data": "No listing demand data is available for this period.",
+        "no_engagement_data": "No engagement data is available for this period.",
+        "no_organisation_data": "No organisation activity is available for this period.",
+        "no_help_request_data": "No help-request data is available for this period.",
+        "select_tab_to_load": "Select this tab to load data."
+      },
+      "empty_value": "-",
+      "loading": {
+        "section": "Loading analytics"
+      },
+      "errors": {
+        "data_unavailable": "Data is unavailable for this period.",
+        "load_data": "Could not load this analytics section: {{error}}",
+        "load_overview": "Could not load the regional analytics overview.",
+        "failed_to_load_data": "Could not load analytics data."
+      },
+      "units": {
+        "days_count": "{{count}} days"
+      },
+      "age_groups": {
+        "under_25": "Under 25",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
+        "65_plus": "65+",
+        "unknown": "Unknown"
+      }
+    }
   },
   "billing": {
     "actions": "Actions",
@@ -5756,14 +6047,23 @@
     "view_listings": "View Listings"
   },
   "reports": {
-    "active_30d_total": "Active (30 days)",
+    "active_30d_total": "Active in 30 days",
     "active_members": "Active Members",
     "already_notified": "Already Notified",
     "at_risk": "At Risk",
+    "auto_flag_suspicious_content": "Auto-flag suspicious content",
+    "auto_flag_suspicious_content_desc": "Automatically flag suspicious content for review",
+    "auto_flagged": "Auto Flagged",
+    "auto_flagged_reason": "Auto-flagged: {{reason}}",
     "avg_sessions_per_user": "Avg Sessions per User",
     "avg_transactions_per_user": "Avg Transactions per User",
+    "by_content_type": "By Content Type",
+    "cancel": "Cancel",
     "clear_selection": "Clear Selection",
+    "col_actions": "Actions",
+    "col_author": "Author",
     "col_cohort": "Cohort",
+    "col_content": "Content",
     "col_days_inactive": "Days Inactive",
     "col_flag_type": "Flag Type",
     "col_given": "Given",
@@ -5783,12 +6083,21 @@
     "col_notified": "Notified",
     "col_rank": "Rank",
     "col_received": "Received",
+    "col_status": "Status",
+    "col_submitted": "Submitted",
     "col_transactions": "Transactions",
+    "col_type": "Type",
+    "content_type_comment": "Comment",
+    "content_type_event": "Event",
+    "content_type_listing": "Listing",
+    "content_type_post": "Post",
     "content_approved": "Content Approved",
     "content_rejected": "Content Rejected",
-    "days_count": "Days",
+    "days_count": "{{count}} days",
     "detection_complete": "Detection Complete",
     "detection_failed": "Detection Failed",
+    "ellipsis": "...",
+    "enable_moderation": "Enable Moderation",
     "export_csv": "Export CSV",
     "failed_to_approve_content": "Failed to approve content",
     "failed_to_export_c_s_v": "Failed to export CSV",
@@ -5803,13 +6112,16 @@
     "flag_at_risk": "Flag at Risk",
     "flag_dormant": "Flag Dormant",
     "flag_inactive": "Flag Inactive",
+    "feed_posts": "Feed Posts",
     "group_by_daily": "Group by Daily",
     "group_by_monthly": "Group by Monthly",
     "group_by_weekly": "Group by Weekly",
-    "hours_reports_page_desc": "View detailed reports on time credit exchanges and hours traded",
-    "hours_reports_page_title": "Hours Reports Page",
-    "inactive_members_page_desc": "Identify and manage members who have not been active recently",
-    "inactive_members_page_title": "Inactive Members Page",
+    "hours": "Hours",
+    "hours_reports_page_desc": "Analyse time credit exchange volume, member balances, and category trends.",
+    "hours_reports_page_title": "Hours reports",
+    "hours_value": "{{value}} hours",
+    "inactive_members_page_desc": "Identify members at risk of disengaging and manage follow-up notifications.",
+    "inactive_members_page_title": "Inactive members",
     "label_active_members": "Active Members",
     "label_approve": "Approve",
     "label_approved": "Approved",
@@ -5860,12 +6172,15 @@
     "label_unique_categories": "Unique Categories",
     "label_unique_givers": "Unique Givers",
     "mark_as_notified": "Mark as Notified",
-    "member_reports_page_desc": "View engagement statistics and activity reports for members",
-    "member_reports_page_title": "Member Reports Page",
+    "member_reports_page_desc": "Track member activity, retention, engagement, and contribution patterns.",
+    "member_reports_page_title": "Member reports",
     "members_marked_notified": "Members marked as notified",
     "members_selected": "Members Selected",
-    "moderation_queue_page_desc": "Review content pending moderation approval",
-    "moderation_queue_page_title": "Moderation Queue Page",
+    "members_selected_count": "{{count}} selected",
+    "moderation_pending": "Pending",
+    "moderation_queue_page_desc": "Review pending and flagged content before it appears in the community.",
+    "moderation_queue_page_title": "Moderation queue",
+    "moderation_settings": "Moderation Settings",
     "moderation_settings_updated": "Moderation settings updated",
     "never": "Never",
     "new_registrations": "New Registrations",
@@ -5873,6 +6188,7 @@
     "no_contributor_data": "No contributor data",
     "no_inactive_members_found": "No inactive members found",
     "no_inactive_members_run_detection": "No inactive members found. Run detection to identify them.",
+    "no_items_in_queue": "No items in queue",
     "no_registration_data": "No registration data",
     "no_retention_data": "No retention data",
     "not_yet": "Not Yet",
@@ -5886,10 +6202,17 @@
     "placeholder_search_content": "Search Content...",
     "please_provide_a_rejection_reason": "Please Provide a Rejection Reason",
     "refresh": "Refresh",
+    "reject_content": "Reject Content",
+    "reject_content_description": "Provide a reason for rejecting this content",
     "registration_trends": "Registration Trends",
+    "require_moderation_for": "Require Moderation for",
     "retention_cohorts": "Retention Cohorts",
     "run_detection": "Run Detection",
+    "save_settings": "Save Settings",
     "select_members_to_mark_as_notified": "Select Members to Mark as Notified",
+    "select_member_aria": "Select {{name}}",
+    "settings": "Settings",
+    "settings_description": "Configure auto-flagging rules and moderation preferences",
     "social_value_page_desc": "Calculate and view the social return on investment for your community",
     "social_value_page_title": "Social Value Page",
     "tab_active": "Active",
@@ -5899,6 +6222,7 @@
     "tab_retention": "Retention",
     "tab_top_contributors": "Top Contributors",
     "top_contributors": "Top Contributors",
+    "untitled": "Untitled",
     "btn_export_csv": "Export CSV",
     "btn_refresh": "Refresh",
     "chart_category_distribution": "Chart Category Distribution",
@@ -5913,6 +6237,10 @@
     "sort_hours_given": "Sort Hours Given",
     "sort_hours_received": "Sort Hours Received",
     "sort_total_hours": "Sort Total Hours",
+    "status_approved": "Approved",
+    "status_flagged": "Flagged",
+    "status_pending": "Pending",
+    "status_rejected": "Rejected",
     "tab_by_category": "By Category",
     "tab_by_member": "By Member",
     "tab_monthly_trend": "Monthly Trend"

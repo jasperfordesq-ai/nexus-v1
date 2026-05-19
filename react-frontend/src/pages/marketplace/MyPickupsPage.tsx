@@ -13,6 +13,7 @@ import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import QrCode from 'lucide-react/icons/qr-code';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -67,7 +68,9 @@ export function MyPickupsPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+    <>
+      <PageMeta title={t('marketplace.pickup.my_pickups_title', 'My Pickups')} noIndex />
+      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <ShoppingBag className="w-7 h-7 text-primary" />
@@ -121,7 +124,8 @@ export function MyPickupsPage() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 

@@ -22,6 +22,7 @@ import Receipt from 'lucide-react/icons/receipt';
 import CreditCard from 'lucide-react/icons/credit-card';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -128,7 +129,9 @@ export function MyVereinDuesPage() {
     new Intl.NumberFormat(undefined, { style: 'currency', currency: currency || 'CHF' }).format(cents / 100);
 
   return (
-    <div className="container max-w-4xl mx-auto p-4 md:p-6 space-y-6">
+    <>
+      <PageMeta title={t('verein_dues.my_page_title')} noIndex />
+      <div className="container max-w-4xl mx-auto p-4 md:p-6 space-y-6">
       <div className="flex items-center gap-3">
         <Receipt className="w-7 h-7 text-primary" />
         <div>
@@ -215,7 +218,8 @@ export function MyVereinDuesPage() {
           onClose={onPaymentClose}
         />
       )}
-    </div>
+      </div>
+    </>
   );
 }
 

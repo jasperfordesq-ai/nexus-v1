@@ -18,6 +18,7 @@ import Building2 from 'lucide-react/icons/building-2';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import Plus from 'lucide-react/icons/plus';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -78,7 +79,9 @@ export default function MyOrganisationsPage() {
   const pendingOrgs = orgs.filter(o => o.status === 'pending');
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+    <>
+      <PageMeta title={t('my_organisations_title', 'My Organisations')} noIndex />
+      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
       <Breadcrumbs
         items={[
           { label: t('breadcrumb_volunteering', 'Volunteering'), href: tenantPath('/volunteering') },
@@ -202,6 +205,7 @@ export default function MyOrganisationsPage() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
