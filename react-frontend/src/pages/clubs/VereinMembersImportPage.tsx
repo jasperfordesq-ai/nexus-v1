@@ -29,6 +29,12 @@ import {
   Divider,
   Input,
   Spinner,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
   Textarea,
 } from '@heroui/react';
 import Upload from 'lucide-react/icons/upload';
@@ -173,10 +179,10 @@ export default function VereinMembersImportPage() {
   }, [csv, orgId, preview, toast, t]);
 
   const actionChip = (action: string) => {
-    if (action === 'create') return <Chip size="sm" color="success" variant="flat">create</Chip>;
-    if (action === 'link_existing') return <Chip size="sm" color="primary" variant="flat">link</Chip>;
-    if (action === 'already_member') return <Chip size="sm" color="warning" variant="flat">already</Chip>;
-    return <Chip size="sm" color="danger" variant="flat">invalid</Chip>;
+    if (action === 'create') return <Chip size="sm" color="success" variant="flat">{t('verein_import.actions.create')}</Chip>;
+    if (action === 'link_existing') return <Chip size="sm" color="primary" variant="flat">{t('verein_import.actions.link')}</Chip>;
+    if (action === 'already_member') return <Chip size="sm" color="warning" variant="flat">{t('verein_import.actions.already')}</Chip>;
+    return <Chip size="sm" color="danger" variant="flat">{t('verein_import.actions.invalid')}</Chip>;
   };
 
   return (
@@ -301,46 +307,36 @@ export default function VereinMembersImportPage() {
               </div>
             )}
 
-            {/* Row table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-default-50">
-                  <tr className="text-xs text-default-500 uppercase tracking-wide">
-                    <th className="text-left px-3 py-2">{t('verein_import.row.row', 'Row')}</th>
-                    <th className="text-left px-3 py-2">{t('verein_import.row.action', 'Action')}</th>
-                    <th className="text-left px-3 py-2">{t('verein_import.row.email', 'Email')}</th>
-                    <th className="text-left px-3 py-2 hidden md:table-cell">{t('verein_import.row.name', 'Name')}</th>
-                    <th className="text-left px-3 py-2 hidden md:table-cell">{t('verein_import.row.role', 'Role')}</th>
-                    <th className="text-left px-3 py-2">{t('verein_import.row.errors', 'Errors')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {preview.items.map((row) => (
-                    <tr
-                      key={row.row}
-                      className={`border-t border-default-200 ${
-                        row.errors.length ? 'bg-danger-50/40' : ''
-                      }`}
-                    >
-                      <td className="px-3 py-2 text-default-500 tabular-nums">{row.row}</td>
-                      <td className="px-3 py-2">{actionChip(row.action)}</td>
-                      <td className="px-3 py-2">{row.email || '—'}</td>
-                      <td className="px-3 py-2 hidden md:table-cell">
-                        {[row.first_name, row.last_name].filter(Boolean).join(' ') || '—'}
-                      </td>
-                      <td className="px-3 py-2 hidden md:table-cell">{row.role}</td>
-                      <td className="px-3 py-2 text-danger-700">
-                        {row.errors.length > 0 ? row.errors.join('; ') : ''}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Table aria-label={t('verein_import.row.table_aria')} removeWrapper isStriped>
+              <TableHeader>
+                <TableColumn>{t('verein_import.row.row')}</TableColumn>
+                <TableColumn>{t('verein_import.row.action')}</TableColumn>
+                <TableColumn>{t('verein_import.row.email')}</TableColumn>
+                <TableColumn className="hidden md:table-cell">{t('verein_import.row.name')}</TableColumn>
+                <TableColumn className="hidden md:table-cell">{t('verein_import.row.role')}</TableColumn>
+                <TableColumn>{t('verein_import.row.errors')}</TableColumn>
+              </TableHeader>
+              <TableBody>
+                {preview.items.map((row) => (
+                  <TableRow key={row.row} className={row.errors.length ? 'bg-danger-50/40' : ''}>
+                    <TableCell className="text-default-500 tabular-nums">{row.row}</TableCell>
+                    <TableCell>{actionChip(row.action)}</TableCell>
+                    <TableCell>{row.email || t('empty_dash')}</TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {[row.first_name, row.last_name].filter(Boolean).join(' ') || t('empty_dash')}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">{row.role}</TableCell>
+                    <TableCell className="text-danger-700">
+                      {row.errors.length > 0 ? row.errors.join('; ') : ''}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
             <div className="flex justify-end gap-2">
               <Button variant="flat" onPress={() => setPreview(null)}>
-                {t('common.cancel', 'Cancel')}
+                {t('cancel')}
               </Button>
               <Button
                 color="primary"

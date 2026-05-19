@@ -1,5 +1,6 @@
 {
   "back": "Back",
+  "empty_dash": "-",
   "hours_short": "{{count}}h",
   "error_title": "Something went wrong",
   "nav": {
@@ -1424,6 +1425,12 @@
     "preview": "Preview",
     "confirm": "Import members",
     "success": "Import complete: {{created}} created, {{linked}} linked",
+    "actions": {
+      "already": "already",
+      "create": "create",
+      "invalid": "invalid",
+      "link": "link"
+    },
     "summary": {
       "total": "Total",
       "create": "Create",
@@ -1437,7 +1444,8 @@
       "email": "Email",
       "name": "Name",
       "role": "Role",
-      "errors": "Errors"
+      "errors": "Errors",
+      "table_aria": "Member import preview"
     },
     "result": {
       "title": "Import complete",
