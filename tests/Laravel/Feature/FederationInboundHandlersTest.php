@@ -453,6 +453,76 @@ class FederationInboundHandlersTest extends TestCase
         $this->assertSame('federation-message-recipient@example.test', $mailer->sends[0]['to']);
         $this->assertSame('federation_message', $mailer->sends[0]['options']['category']);
         $this->assertSame($this->testTenantId, $mailer->sends[0]['options']['tenant_id']);
+        $message = DB::table('federation_messages')
+            ->where('external_partner_id', $this->partnerId)
+            ->where('external_message_id', 'ext-msg-email-1')
+            ->first();
+        $this->assertNotNull($message);
+        $this->assertNotNull($message->notification_sent_at);
+        $this->assertNotNull($message->email_sent_at);
+        $this->assertNull($message->email_failed_at);
+    }
+
+    public function test_external_message_replay_repairs_failed_email_without_duplicate_message(): void
+    {
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'federation-message-repair@example.test',
+        ]);
+        DB::table('federation_user_settings')->insert([
+            'user_id' => $recipient->id,
+            'federation_optin' => 1,
+            'messaging_enabled_federated' => 1,
+            'email_notifications' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $failingMailer = $this->fakeEmailDispatchService(false);
+        $payload = [
+            'external_message_id' => 'ext-msg-repair-1',
+            'recipient_id' => $recipient->id,
+            'sender_id' => 'remote-123',
+            'sender_name' => 'Remote Sender',
+            'subject' => 'Hello across the bridge',
+            'body' => 'This is a federated message body.',
+        ];
+
+        $this->postWebhook('message.sent', $payload)->assertStatus(500);
+
+        $message = DB::table('federation_messages')
+            ->where('external_partner_id', $this->partnerId)
+            ->where('external_message_id', 'ext-msg-repair-1')
+            ->first();
+        $this->assertNotNull($message);
+        $this->assertNotNull($message->notification_sent_at);
+        $this->assertNull($message->email_sent_at);
+        $this->assertNotNull($message->email_failed_at);
+        $this->assertSame('Email dispatch returned false', $message->email_last_error);
+        $this->assertCount(1, $failingMailer->sends);
+
+        $repairMailer = $this->fakeEmailDispatchService(true);
+        $this->postWebhook('message.sent', $payload)
+            ->assertStatus(200)
+            ->assertJsonPath('data.result.duplicate', true);
+
+        $this->assertSame(1, DB::table('federation_messages')
+            ->where('external_partner_id', $this->partnerId)
+            ->where('external_message_id', 'ext-msg-repair-1')
+            ->count());
+        $repaired = DB::table('federation_messages')
+            ->where('external_partner_id', $this->partnerId)
+            ->where('external_message_id', 'ext-msg-repair-1')
+            ->first();
+        $this->assertNotNull($repaired->email_sent_at);
+        $this->assertNull($repaired->email_failed_at);
+        $this->assertNull($repaired->email_last_error);
+        $this->assertCount(1, $repairMailer->sends);
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $recipient->id)
+            ->where('type', 'federation_message')
+            ->where('link', '/federation/messages')
+            ->count());
     }
 
     public function test_transaction_completed_is_idempotent_and_sends_one_email(): void
@@ -624,11 +694,15 @@ class FederationInboundHandlersTest extends TestCase
         ]);
     }
 
-    private function fakeEmailDispatchService(): EmailDispatchService
+    private function fakeEmailDispatchService(bool $sendResult = true): EmailDispatchService
     {
-        $mailer = new class extends EmailDispatchService {
+        $mailer = new class($sendResult) extends EmailDispatchService {
             /** @var list<array{to:string,subject:string,body:string,options:array<string,mixed>}> */
             public array $sends = [];
+
+            public function __construct(private bool $sendResult)
+            {
+            }
 
             public function send(string $to, string $subject, string $body, array $options = []): bool
             {
@@ -639,7 +713,7 @@ class FederationInboundHandlersTest extends TestCase
                     'options' => $options,
                 ];
 
-                return true;
+                return $this->sendResult;
             }
         };
 

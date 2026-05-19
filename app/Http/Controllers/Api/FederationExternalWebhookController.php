@@ -968,6 +968,10 @@ class FederationExternalWebhookController extends BaseApiController
             externalMessageId: $externalMessageId ? (string) $externalMessageId : null
         );
 
+        if (($result['success'] ?? false) === false && ($result['retryable'] ?? false) === true) {
+            throw new \RuntimeException((string) ($result['error'] ?? 'Federated message delivery failed'));
+        }
+
         // Update last_message_at on the partner
         DB::table('federation_external_partners')
             ->where('id', $partner->id)

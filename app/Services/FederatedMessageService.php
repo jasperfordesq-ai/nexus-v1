@@ -204,6 +204,16 @@ class FederatedMessageService
                     ->where('receiver_tenant_id', $receiver->tenant_id)
                     ->first();
                 if ($existing) {
+                    $delivery = self::ensureExternalMessageDelivery($existing, $senderName, $partnerName, $body);
+                    if (!$delivery['success']) {
+                        return [
+                            'success' => false,
+                            'message_id' => (int) $existing->id,
+                            'retryable' => true,
+                            'error' => $delivery['error'] ?? 'Federated message delivery failed',
+                        ];
+                    }
+
                     return ['success' => true, 'message_id' => $existing->id, 'duplicate' => true];
                 }
             }
@@ -224,13 +234,64 @@ class FederatedMessageService
             ]);
 
             if (!$messageInsert['created']) {
+                $existingMessage = DB::table('federation_messages')->where('id', $messageInsert['id'])->first();
+                if ($existingMessage) {
+                    $delivery = self::ensureExternalMessageDelivery($existingMessage, $senderName, $partnerName, $body);
+                    if (!$delivery['success']) {
+                        return [
+                            'success' => false,
+                            'message_id' => (int) $messageInsert['id'],
+                            'retryable' => true,
+                            'error' => $delivery['error'] ?? 'Federated message delivery failed',
+                        ];
+                    }
+                }
+
                 return ['success' => true, 'message_id' => $messageInsert['id'], 'duplicate' => true];
             }
 
-            try {
-                // Render the bell in the RECIPIENT's preferred language.
+            $message = DB::table('federation_messages')->where('id', $messageInsert['id'])->first();
+            $delivery = $message
+                ? self::ensureExternalMessageDelivery($message, $senderName, $partnerName, $body)
+                : ['success' => false, 'error' => 'Federated message row missing after insert'];
+            if (!$delivery['success']) {
+                return [
+                    'success' => false,
+                    'message_id' => $messageInsert['id'],
+                    'retryable' => true,
+                    'error' => $delivery['error'] ?? 'Federated message delivery failed',
+                ];
+            }
+
+            return ['success' => true, 'message_id' => $messageInsert['id']];
+        } catch (\Throwable $e) {
+            Log::warning('Failed to store external message', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Ensure duplicate partner deliveries can repair missing recipient side
+     * effects without inserting a duplicate message row.
+     *
+     * @return array{success:bool,error?:string}
+     */
+    private static function ensureExternalMessageDelivery(object $message, string $senderName, string $partnerName, string $body): array
+    {
+        try {
+            $messageId = (int) $message->id;
+            $receiverUserId = (int) $message->receiver_user_id;
+            $receiverTenantId = (int) $message->receiver_tenant_id;
+
+            if (empty($message->notification_sent_at)) {
+                $receiver = DB::table('users')
+                    ->where('id', $receiverUserId)
+                    ->where('tenant_id', $receiverTenantId)
+                    ->select(['preferred_language'])
+                    ->first();
+
                 $recipientLocale = $receiver->preferred_language ?? null;
-                LocaleContext::withLocale($recipientLocale, function () use ($receiverUserId, $senderName, $partnerName, $receiver) {
+                LocaleContext::withLocale($recipientLocale, function () use ($receiverUserId, $senderName, $partnerName, $receiverTenantId) {
                     $notifyMessage = __('svc_notifications.federation.message_received', [
                         'sender' => $senderName,
                         'partner' => $partnerName,
@@ -241,32 +302,51 @@ class FederatedMessageService
                         '/federation/messages',
                         'federation_message',
                         false,
-                        (int) $receiver->tenant_id
+                        $receiverTenantId
                     );
                 });
-            } catch (\Throwable $e) {
-                Log::warning('Failed to dispatch federation message notification', ['error' => $e->getMessage()]);
+
+                DB::table('federation_messages')
+                    ->where('id', $messageId)
+                    ->whereNull('notification_sent_at')
+                    ->update(['notification_sent_at' => now()]);
+            }
+
+            if (!empty($message->email_sent_at)) {
+                return ['success' => true];
             }
 
             $emailSent = FederationEmailService::sendExternalMessageNotification(
                 $receiverUserId,
-                (int) $receiver->tenant_id,
+                $receiverTenantId,
                 $senderName,
                 $partnerName,
                 $body
             );
+
+            DB::table('federation_messages')
+                ->where('id', $messageId)
+                ->update([
+                    'email_sent_at' => $emailSent ? now() : null,
+                    'email_failed_at' => $emailSent ? null : now(),
+                    'email_last_error' => $emailSent ? null : 'Email dispatch returned false',
+                ]);
+
             if (!$emailSent) {
                 Log::warning('External federation message email returned false', [
                     'receiver_user_id' => $receiverUserId,
-                    'tenant_id' => (int) $receiver->tenant_id,
-                    'external_partner_id' => $externalPartnerId,
-                    'external_message_id' => $externalMessageId,
+                    'tenant_id' => $receiverTenantId,
+                    'external_partner_id' => $message->external_partner_id ?? null,
+                    'external_message_id' => $message->external_message_id ?? null,
                 ]);
+
+                return ['success' => false, 'error' => 'Email dispatch returned false'];
             }
 
-            return ['success' => true, 'message_id' => $messageInsert['id']];
+            return ['success' => true];
         } catch (\Throwable $e) {
-            Log::warning('Failed to store external message', ['error' => $e->getMessage()]);
+            Log::warning('Failed to dispatch federation message delivery side effects', ['error' => $e->getMessage()]);
+
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }

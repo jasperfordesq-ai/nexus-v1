@@ -138,6 +138,7 @@ class EmailTriggerAuditService
                 $this->checkMemberPremiumBillingEmailHealth($tenantId, $since, $windowHours),
                 $this->checkVereinDuesEmailHealth($tenantId, $since, $windowHours),
                 $this->checkMarketplaceReportNotificationHealth($tenantId, $since, $windowHours),
+                $this->checkFederationMessageDeliveryHealth($tenantId, $since, $windowHours),
                 $this->checkDirectEmailSendSurface($tenantId),
                 $this->checkTenantlessDispatcherSendSurface($tenantId)
             );
@@ -1045,6 +1046,43 @@ class EmailTriggerAuditService
             ->get();
 
         return $this->rowsToIssues($withoutNotification, 'member_subscription_event_without_email_evidence', 'critical', 'billing', 'member_premium_billing', ['window_hours' => $windowHours]);
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkFederationMessageDeliveryHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (
+            !$this->hasTables(['federation_messages'])
+            || !Schema::hasColumn('federation_messages', 'email_sent_at')
+            || !Schema::hasColumn('federation_messages', 'notification_sent_at')
+        ) {
+            return [];
+        }
+
+        $withoutEmail = DB::table('federation_messages')
+            ->select('receiver_tenant_id as tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('direction', 'inbound')
+            ->where('created_at', '>=', $since)
+            ->whereNull('email_sent_at')
+            ->when($tenantId !== null, fn ($q) => $q->where('receiver_tenant_id', $tenantId))
+            ->groupBy('receiver_tenant_id')
+            ->get();
+
+        $withoutBell = DB::table('federation_messages')
+            ->select('receiver_tenant_id as tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('direction', 'inbound')
+            ->where('created_at', '>=', $since)
+            ->whereNull('notification_sent_at')
+            ->when($tenantId !== null, fn ($q) => $q->where('receiver_tenant_id', $tenantId))
+            ->groupBy('receiver_tenant_id')
+            ->get();
+
+        return array_merge(
+            $this->rowsToIssues($withoutEmail, 'federation_message_without_email_evidence', 'critical', 'federation', 'federated_message_received', ['window_hours' => $windowHours]),
+            $this->rowsToIssues($withoutBell, 'federation_message_without_bell_evidence', 'warning', 'federation', 'federated_message_received', ['window_hours' => $windowHours])
+        );
     }
 
     /**
