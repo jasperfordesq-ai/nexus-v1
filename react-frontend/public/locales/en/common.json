@@ -2,6 +2,7 @@
   "back": "Back",
   "empty_dash": "-",
   "hours_short": "{{count}}h",
+  "not_available": "Not available",
   "error_title": "Something went wrong",
   "nav": {
     "dashboard": "Dashboard",
@@ -1023,6 +1024,7 @@
       "subtitle": "See how you've used your earned hours at local businesses.",
       "back": "Back to Community Hub",
       "table": {
+        "aria": "Loyalty redemption history",
         "date": "Date",
         "merchant": "Merchant",
         "item": "Item",

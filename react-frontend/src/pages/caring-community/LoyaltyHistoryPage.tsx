@@ -13,7 +13,16 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Skeleton, Chip } from '@heroui/react';
+import {
+  Chip,
+  Skeleton,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Coins from 'lucide-react/icons/coins';
 import { GlassCard } from '@/components/ui';
@@ -51,6 +60,14 @@ function formatHoursShort(
   t: (key: string, opts?: Record<string, unknown>) => string,
 ): string {
   return t('hours_short', { count: hours.toFixed(2) });
+}
+
+function formatDate(value: string): string {
+  return new Intl.DateTimeFormat(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(value));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -138,30 +155,28 @@ export function LoyaltyHistoryPage() {
 
       {!loading && items && items.length > 0 && (
         <GlassCard className="overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-default-100/50">
-              <tr className="text-xs text-default-500 uppercase tracking-wide">
-                <th className="text-left px-4 py-3">{t('loyalty.history.table.date')}</th>
-                <th className="text-left px-4 py-3">{t('loyalty.history.table.merchant')}</th>
-                <th className="text-left px-4 py-3 hidden sm:table-cell">
-                  {t('loyalty.history.table.item')}
-                </th>
-                <th className="text-right px-4 py-3">{t('loyalty.history.table.credits')}</th>
-                <th className="text-right px-4 py-3">{t('loyalty.history.table.discount')}</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table aria-label={t('loyalty.history.table.aria')} removeWrapper>
+            <TableHeader>
+              <TableColumn>{t('loyalty.history.table.date')}</TableColumn>
+              <TableColumn>{t('loyalty.history.table.merchant')}</TableColumn>
+              <TableColumn className="hidden sm:table-cell">
+                {t('loyalty.history.table.item')}
+              </TableColumn>
+              <TableColumn align="end">{t('loyalty.history.table.credits')}</TableColumn>
+              <TableColumn align="end">{t('loyalty.history.table.discount')}</TableColumn>
+            </TableHeader>
+            <TableBody>
               {items.map((row) => (
-                <tr key={row.id} className="border-t border-default-200 hover:bg-default-50/50">
-                  <td className="px-4 py-3 text-sm text-default-600">
-                    {new Date(row.redeemed_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-foreground">
+                <TableRow key={row.id}>
+                  <TableCell className="text-default-600">
+                    {formatDate(row.redeemed_at)}
+                  </TableCell>
+                  <TableCell className="text-foreground">
                     {row.merchant_name || (
-                      <span aria-label={t('common.not_available')}>—</span>
+                      <span aria-label={t('not_available')}>{t('empty_dash')}</span>
                     )}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-default-600 hidden sm:table-cell">
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell text-default-600">
                     {row.marketplace_listing_id && row.listing_title ? (
                       <Link
                         to={tenantPath(`/marketplace/${row.marketplace_listing_id}`)}
@@ -170,21 +185,21 @@ export function LoyaltyHistoryPage() {
                         {row.listing_title}
                       </Link>
                     ) : (
-                      <span aria-label={t('common.not_available')}>—</span>
+                      <span aria-label={t('not_available')}>{t('empty_dash')}</span>
                     )}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-right tabular-nums">
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
                     {formatHoursShort(row.credits_used, t)}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-right tabular-nums">
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
                     <Chip variant="flat" color="success" size="sm">
                       CHF {row.discount_chf.toFixed(2)}
                     </Chip>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </GlassCard>
       )}
 
