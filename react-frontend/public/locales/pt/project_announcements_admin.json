@@ -42,7 +42,8 @@
     "update_title": "Update title",
     "update_body": "Update body",
     "milestone": "Milestone",
-    "publish_update_now": "Publish update now"
+    "publish_update_now": "Publish update now",
+    "current_stage": "Current stage"
   },
   "create_modal": {
     "title": "Create community project",
@@ -58,5 +59,18 @@
     "update": "Could not save the update.",
     "publish": "Could not publish the project.",
     "status": "Could not change project status."
+  },
+  "meta_title": "Project Announcements",
+  "about": {
+    "title": "About this page",
+    "body": "Project announcements are non-urgent updates posted to the community feed and member notification centre. Use them for programme news, volunteer recruitment, event notices, and impact updates. Unlike emergency alerts, announcements are queued and delivered on the platform's normal notification schedule.",
+    "draft": "Not visible to members; edit freely before publishing.",
+    "active": "Published and visible in the community feed. Use add update to post milestone updates to subscribers.",
+    "paused_completed_label": "Paused / completed",
+    "paused_completed": "Archived from the active feed. Subscribers are notified on completion."
+  },
+  "list": {
+    "title": "Project announcements",
+    "subtitle": "Publish initiatives and milestone updates that members can subscribe to."
   }
 }
