@@ -44,8 +44,6 @@ import { RelatedPages } from './RelatedPages';
 const outcomeStats = [
   {
     value: '100%',
-    label: 'Improved Wellbeing',
-    description: 'Every participant reports improved mental health and personal wellbeing',
     icon: HeartPulse,
     color: 'from-emerald-500 to-teal-500',
     bgAccent: 'bg-emerald-500/10',
@@ -53,8 +51,6 @@ const outcomeStats = [
   },
   {
     value: '95%',
-    label: 'Increased Connection',
-    description: 'Participants feel significantly more socially connected after engagement',
     icon: Users,
     color: 'from-blue-500 to-indigo-500',
     bgAccent: 'bg-blue-500/10',
@@ -62,8 +58,6 @@ const outcomeStats = [
   },
   {
     value: '16:1',
-    label: 'Social Return',
-    description: 'Independent SROI analysis validates exceptional value for public investment',
     icon: TrendingUp,
     color: 'from-amber-500 to-orange-500',
     bgAccent: 'bg-amber-500/10',
@@ -74,49 +68,31 @@ const outcomeStats = [
 const referralSteps = [
   {
     icon: ClipboardList,
-    title: 'Formal Referral',
-    description:
-      'A GP, social prescriber, or community health worker submits a structured referral through our secure pathway. No self-referral barriers \u2014 the link worker initiates contact.',
     color: 'from-blue-500 to-indigo-500',
     bgAccent: 'bg-blue-500/10',
     textAccent: 'text-blue-600 dark:text-blue-400',
   },
   {
     icon: UserPlus,
-    title: 'Onboarding',
-    description:
-      'Our Hub Coordinator personally welcomes the participant, explains how timebanking works, and creates a profile highlighting their strengths and interests.',
     color: 'from-emerald-500 to-teal-500',
     bgAccent: 'bg-emerald-500/10',
     textAccent: 'text-emerald-600 dark:text-emerald-400',
   },
   {
     icon: Link2,
-    title: 'Connection',
-    description:
-      'The coordinator matches the participant with suitable exchanges, group activities, or community events \u2014 building confidence through meaningful, supported engagement.',
     color: 'from-purple-500 to-pink-500',
     bgAccent: 'bg-purple-500/10',
     textAccent: 'text-purple-600 dark:text-purple-400',
   },
   {
     icon: CalendarCheck,
-    title: 'Follow-Up',
-    description:
-      'Regular check-ins track progress against wellbeing indicators. Outcomes data is shared with the referrer, closing the feedback loop and demonstrating impact.',
     color: 'from-amber-500 to-orange-500',
     bgAccent: 'bg-amber-500/10',
     textAccent: 'text-amber-600 dark:text-amber-400',
   },
 ];
 
-const strategicFitPoints = [
-  'Aligned with Sl\u00e1intecare community-based care objectives',
-  'Supports HSE Social Prescribing Framework delivery',
-  'Addresses social isolation and loneliness at community level',
-  'Provides structured outcomes data for public health reporting',
-  'Scalable model through federated community network',
-];
+const strategicFitPoints = Array.from({ length: 5 }, (_, index) => index);
 
 /* ───────────────────────── Animations ───────────────────────── */
 
@@ -209,7 +185,7 @@ export function SocialPrescribingPage() {
             className="grid sm:grid-cols-3 gap-6"
           >
             {outcomeStats.map((stat, index) => (
-              <motion.div key={stat.label} variants={fadeInUp}>
+              <motion.div key={stat.value} variants={fadeInUp}>
                 <GlassCard className="p-6 text-center h-full relative overflow-hidden group hover:scale-[1.02] transition-transform">
                   {/* Gradient top bar */}
                   <div
@@ -248,8 +224,8 @@ export function SocialPrescribingPage() {
                 </h3>
               </div>
               <ul className="space-y-3 ml-1">
-                {strategicFitPoints.map((point, index) => (
-                  <li key={point} className="flex items-start gap-3">
+                {strategicFitPoints.map((index) => (
+                  <li key={index} className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <span className="text-theme-muted text-sm leading-relaxed">{t(`social_prescribing.strategic_fit_${index}`)}</span>
                   </li>
@@ -320,7 +296,7 @@ export function SocialPrescribingPage() {
           <div className="grid sm:grid-cols-2 gap-6">
             {referralSteps.map((step, index) => (
               <motion.div
-                key={step.title}
+                key={`referral-step-${index}`}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
