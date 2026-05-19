@@ -1036,8 +1036,16 @@ class AppServiceProvider extends ServiceProvider
         // Cloudflare terminates TLS and proxies to origin as HTTP. Without this,
         // route()/url() emit http:// URLs that the browser blocks via CSP
         // (form-action 'self') because the page is loaded over https://.
+        //
+        // Use resolving() to defer the forceScheme() call until the url service
+        // is actually being constructed. Calling URL::forceScheme() eagerly in
+        // boot() resolves the url binding immediately, which tries to inject
+        // $app['request'] — null in console/queue contexts and crashes with
+        // "Argument #2 ($request) must be of type Illuminate\Http\Request, null given".
         if (str_starts_with((string) config('app.url'), 'https://') || $this->app->environment('production')) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
+            $this->app->resolving('url', function ($url) {
+                $url->forceScheme('https');
+            });
         }
 
         // Initialise the custom JSON translator so __() resolves lang/{locale}/*.json
