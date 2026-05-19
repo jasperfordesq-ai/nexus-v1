@@ -1684,6 +1684,96 @@
     "provider_smtp": "SMTP",
     "prerender": {
       "description": "Bot-only server-rendered snapshots. Monitor coverage, detect staleness, and force refreshes.",
+      "analytics": {
+        "actions": {
+          "reload": "Reload"
+        },
+        "columns": {
+          "crawler": "CRAWLER",
+          "hits": "HITS",
+          "host": "HOST",
+          "ip": "IP",
+          "status": "STATUS",
+          "time": "TIME",
+          "uri": "URI",
+          "url": "URL"
+        },
+        "empty": "No analytics available. Bot access log may be empty.",
+        "empty_bot_traffic": "No bot traffic yet",
+        "empty_no_data": "No data",
+        "empty_recent_hits": "No recent hits",
+        "errors": {
+          "load": "Failed to load analytics"
+        },
+        "filters": {
+          "window": "Window"
+        },
+        "hints": {
+          "spoofed": "claimed major bot, failed IP range",
+          "top_50_cap": "from top-50 cap",
+          "verified_of_total": "{{verified}} of {{total}}"
+        },
+        "kpi": {
+          "ip_verified": "IP-verified",
+          "spoofed": "Spoofed (suspicious)",
+          "total_bot_hits": "Total bot hits",
+          "unique_uris": "Unique URIs"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} spoofed"
+        },
+        "log_summary": "Log: {{size}} - since {{time}}",
+        "sections": {
+          "hits_by_crawler": "Hits by crawler",
+          "hits_by_status": "Hits by HTTP status",
+          "recent_activity": "Recent activity (newest first, last {{count}})",
+          "top_uris": "Top URIs (top 50 by hit count)"
+        },
+        "tables": {
+          "recent_hits_aria": "Recent bot hits",
+          "top_uris_aria": "Top URIs"
+        },
+        "windows": {
+          "1": "Last 24h",
+          "7": "Last 7 days",
+          "30": "Last 30 days"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "Open in inventory",
+          "refresh": "Refresh",
+          "refresh_all_stale": "Refresh all stale ({{count}})"
+        },
+        "columns": {
+          "actions": "ACTIONS",
+          "asset": "ASSET",
+          "coverage": "COVERAGE",
+          "host": "HOST",
+          "missing": "MISSING",
+          "stale": "STALE",
+          "tenant": "TENANT"
+        },
+        "confirm": {
+          "queue_recache": "Queue recache for {{count}} tenants?"
+        },
+        "empty": "No tenants",
+        "errors": {
+          "bulk_enqueue": "Bulk enqueue failed (some tenants may have queued)",
+          "enqueue": "Failed to enqueue",
+          "load": "Failed to load coverage"
+        },
+        "messages": {
+          "bulk_queued": "Queued recache for {{count}} tenants",
+          "no_stale": "No stale tenants - coverage is healthy",
+          "tenant_queued": "Queued #{{id}} for {{slug}}"
+        },
+        "summary": {
+          "healthy": "All {{count}} tenants healthy.",
+          "needs_work": "{{needing}} of {{total}} tenants have missing, stale, or asset-broken routes."
+        },
+        "table_aria": "Coverage"
+      },
       "freshness": {
         "actions": {
           "apply": "Apply",
@@ -1721,8 +1811,37 @@
         },
         "title": "Freshness automation"
       },
+      "health_banner": {
+        "actions": {
+          "cancel": "Cancel",
+          "close_breaker_now": "Close breaker now",
+          "details": "Details",
+          "emergency_reset": "Emergency reset",
+          "hide": "Hide",
+          "hide_details": "Hide details",
+          "reset_queue": "Reset queue"
+        },
+        "engine_healthy": "Engine healthy",
+        "issue_count_one": "{{count}} issue",
+        "issue_count_other": "{{count}} issues",
+        "modal": {
+          "body_middle": "or",
+          "body_prefix": "This will requeue every",
+          "body_suffix": "row whose worker has been silent for >30 min, and clear the circuit breaker.",
+          "title": "Emergency: reset stuck queue",
+          "warning": "Only use this if you've confirmed the queue is stuck. If a healthy worker is still running, this will create duplicate work."
+        },
+        "toasts": {
+          "breaker_reset": "Circuit breaker reset",
+          "queue_reset_one": "Reset {{count}} stuck row; breaker cleared",
+          "queue_reset_other": "Reset {{count}} stuck rows; breaker cleared",
+          "queue_reset_failed": "Queue reset failed",
+          "reset_failed": "Reset failed"
+        }
+      },
       "inventory": {
         "actions": {
+          "close": "Close",
           "inspect": "Inspect",
           "inspect_snapshot": "Inspect {{path}}",
           "open_rendered_url": "Open rendered URL",
@@ -1766,6 +1885,39 @@
         "messages": {
           "bulk_recache": "Invalidated {{count}} snapshots and queued recache"
         },
+        "inspect": {
+          "age": "Age",
+          "all_valid": "all valid",
+          "asset_references": "Asset references ({{count}})",
+          "canonical": "Canonical",
+          "dead_assets": "{{count}} dead",
+          "flags": "Flags",
+          "h1_count": "H1 (count)",
+          "html_parse_warnings": "HTML parse warnings",
+          "html_preview": "HTML preview (first 12KB, scripts stripped)",
+          "integrity_mismatch": "bytes changed since render - expected sha256 {{expected}}..., got {{actual}}...",
+          "integrity_missing": "no sha256 sidecar - snapshot predates integrity verification or was hand-edited",
+          "integrity_ok": "bytes match the sha256 written at render time",
+          "integrity_status": "integrity: {{status}}",
+          "integrity_unreadable": "sha256 sidecar exists but is malformed",
+          "invalid_present": "INVALID PRESENT",
+          "json_ld": "JSON-LD ({{blocks}} blocks, {{status}})",
+          "meta_description": "Meta description",
+          "missing": "- missing -",
+          "modal_title": "Snapshot inspection",
+          "modified": "Modified",
+          "must_fix": "Must fix ({{count}})",
+          "no_structured_data": "No structured data",
+          "no_type": "(no @type)",
+          "none": "(none)",
+          "old": "{{age}} old",
+          "open_graph": "Open Graph",
+          "path": "Path",
+          "seo_score": "SEO score",
+          "size": "Size",
+          "tips": "Tips ({{count}})",
+          "title": "Title"
+        },
         "selected": "{{count}} selected",
         "status": {
           "asset": "asset",
@@ -1778,12 +1930,150 @@
       "jobs": {
         "actions": {
           "cancel_job": "Cancel job #{{id}}",
+          "close": "Close",
+          "reload": "Reload",
           "retry_job": "Retry job #{{id}}",
           "retry_same_parameters": "Retry with the same parameters",
           "view_details": "View job #{{id}} details"
-        }
+        },
+        "columns": {
+          "actions": "Actions",
+          "by": "By",
+          "flags": "Flags",
+          "id": "#",
+          "priority": "Priority",
+          "queued": "Queued",
+          "result": "Result",
+          "scope": "Scope",
+          "status": "Status"
+        },
+        "detail": {
+          "all": "all",
+          "claimed_by": "Claimed by",
+          "duration": "Duration",
+          "error": "Error",
+          "exit_code": "Exit code",
+          "finished_at": "Finished at",
+          "log_tail": "Log (tail)",
+          "queued_at": "Queued at",
+          "requested_by": "Requested by",
+          "routes": "Routes",
+          "started_at": "Started at",
+          "status": "Status",
+          "tenant": "Tenant",
+          "title": "Job #{{id}}"
+        },
+        "empty": "No jobs",
+        "errors": {
+          "cancel": "Could not cancel - job may have started",
+          "load": "Failed to load jobs",
+          "retry": "Retry failed - original job may still be in flight"
+        },
+        "filters": {
+          "all": "All",
+          "cancelled": "Cancelled",
+          "failed": "Failed",
+          "partial": "Partial",
+          "queued": "Queued",
+          "running": "Running",
+          "status": "Status",
+          "succeeded": "Succeeded"
+        },
+        "flags": {
+          "dry_run": "dry-run",
+          "force": "force"
+        },
+        "messages": {
+          "cancelled": "Cancelled job #{{id}}",
+          "retry_queued": "Queued retry #{{retryId}} (from #{{id}})"
+        },
+        "priority": {
+          "high": "High",
+          "low": "Low",
+          "normal": "Normal",
+          "tooltip": "priority={{priority}} (lower wins)"
+        },
+        "result": {
+          "invalid": "{{count}} invalid"
+        },
+        "scope": {
+          "all_tenants": "all tenants"
+        },
+        "table_aria": "Jobs"
+      },
+      "events": {
+        "actions": {
+          "reload": "Reload"
+        },
+        "columns": {
+          "commit": "Commit",
+          "details": "Details",
+          "event": "Event",
+          "time": "Time"
+        },
+        "empty": "No events",
+        "errors": {
+          "load": "Failed to load events"
+        },
+        "filters": {
+          "limit": "Limit"
+        },
+        "summary": "{{count}} events",
+        "table_aria": "Events"
+      },
+      "failures": {
+        "columns": {
+          "age": "Age",
+          "cache_path": "Cache path",
+          "failed_at": "Failed at"
+        },
+        "description_action": "Force refresh",
+        "description_middle": "Routes in this list are skipped automatically during the failure-backoff window (default 6h). Use",
+        "description_prefix": "Cache paths that failed during a recent prerender run.",
+        "description_suffix": "on the Overview tab to retry immediately.",
+        "empty": "No recent failures",
+        "errors": {
+          "load": "Failed to load failures"
+        },
+        "table_aria": "Failures"
       },
       "live_connected": "Live updates connected",
+      "audit": {
+        "actions": {
+          "auto_recache": "auto_recache",
+          "cancel": "cancel",
+          "detect_drift": "detect_drift",
+          "enqueue": "enqueue",
+          "invalidate": "invalidate",
+          "purge": "purge",
+          "purge_unexpected": "purge_unexpected",
+          "reset_breaker": "reset_breaker",
+          "reset_queue": "reset_queue"
+        },
+        "buttons": {
+          "export_csv": "Export CSV",
+          "refresh": "Refresh"
+        },
+        "columns": {
+          "action": "Action",
+          "actor": "Actor",
+          "details": "Details",
+          "job": "Job",
+          "outcome": "Outcome",
+          "tenant": "Tenant",
+          "when": "When"
+        },
+        "empty": "No audit entries.",
+        "fallbacks": {
+          "all": "all",
+          "system": "system"
+        },
+        "filters": {
+          "action": "Action filter",
+          "all": "All"
+        },
+        "table_aria": "Audit history"
+      },
       "overview": {
         "actions": {
           "queue_job": "Queue job",
@@ -1877,6 +2167,58 @@
           "would_delete": "Would delete {{count}} snapshots"
         },
         "title": "Wildcard cache purge"
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "Inspect"
+        },
+        "description_prefix": "See which",
+        "description_suffix": "pattern owns a route and what TTL it gets, without grepping config. Used to tune the freshness policy.",
+        "error": "Lookup failed - check the route format (must start with \"/\")",
+        "fields": {
+          "route": "Route"
+        },
+        "path_only": "Path only - no scheme or host",
+        "placeholders": {
+          "route": "/blog/my-post"
+        },
+        "result": {
+          "match": "match: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (specificity {{specificity}})",
+          "other_patterns": "Other patterns that match this route:",
+          "ttl": "TTL: {{ttl}} ({{seconds}}s)"
+        },
+        "title": "TTL inspector",
+        "units": {
+          "days": "{{count}} d",
+          "hours": "{{count}} h",
+          "minutes": "{{count}} min"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "Explore"
+        },
+        "counts": {
+          "dynamic": "{{count}} dynamic",
+          "static": "{{count}} static",
+          "total": "{{count}} total"
+        },
+        "description_prefix": "See exactly which routes the engine plans to render for a tenant - static floor (feature/module gated) plus the dynamic URLs from",
+        "description_suffix": "The Playwright worker visits this list.",
+        "error": "Lookup failed - check the tenant slug",
+        "fields": {
+          "tenant_slug": "Tenant slug"
+        },
+        "none": "(none)",
+        "placeholders": {
+          "tenant_slug": "hour-timebank"
+        },
+        "sections": {
+          "dynamic_routes": "Dynamic routes (capped at 1,000)",
+          "static_routes": "Static routes"
+        },
+        "title": "Sitemap explorer"
       },
       "readonly": {
         "prefix": "Read-only view - action buttons are disabled because the prerender engine operates across every tenant. Sign in with a",

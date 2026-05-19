@@ -1109,7 +1109,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>Snapshot inspection</ModalHeader>
+              <ModalHeader>{t('inspect.modal_title')}</ModalHeader>
               <ModalBody>
                 {inspectLoading || !inspecting ? (
                   <Spinner />
@@ -1121,7 +1121,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                         {inspecting.seo.grade}
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm text-default-500">SEO score</p>
+                        <p className="text-sm text-default-500">{t('inspect.seo_score')}</p>
                         <p className="text-2xl font-semibold">{inspecting.seo.score}<span className="text-base text-default-400">/100</span></p>
                       </div>
                       <div className="flex flex-col items-end gap-1">
@@ -1131,12 +1131,15 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                         {inspecting.integrity && (
                           <Tooltip content={
                             inspecting.integrity.status === 'mismatch'
-                              ? `bytes changed since render — expected sha256 ${inspecting.integrity.expected?.slice(0, 12)}…, got ${inspecting.integrity.actual?.slice(0, 12)}…`
+                              ? t('inspect.integrity_mismatch', {
+                                  expected: inspecting.integrity.expected?.slice(0, 12),
+                                  actual: inspecting.integrity.actual?.slice(0, 12),
+                                })
                               : inspecting.integrity.status === 'missing'
-                                ? 'no sha256 sidecar — snapshot predates integrity verification or was hand-edited'
+                                ? t('inspect.integrity_missing')
                                 : inspecting.integrity.status === 'unreadable'
-                                  ? 'sha256 sidecar exists but is malformed'
-                                  : 'bytes match the sha256 written at render time'
+                                  ? t('inspect.integrity_unreadable')
+                                  : t('inspect.integrity_ok')
                           }>
                             <Chip
                               size="sm"
@@ -1147,11 +1150,11 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                                 : 'default'
                               }
                             >
-                              integrity: {inspecting.integrity.status}
+                              {t('inspect.integrity_status', { status: inspecting.integrity.status })}
                             </Chip>
                           </Tooltip>
                         )}
-                        <span className="text-xs text-default-400">{formatAge(inspecting.age_s)} old</span>
+                        <span className="text-xs text-default-400">{t('inspect.old', { age: formatAge(inspecting.age_s) })}</span>
                       </div>
                     </div>
                     {(inspecting.seo.issues.length > 0 || inspecting.seo.tips.length > 0) && (
@@ -1159,7 +1162,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                         {inspecting.seo.issues.length > 0 && (
                           <div>
                             <p className="font-semibold mb-1 text-danger flex items-center gap-1">
-                              <AlertOctagon size={14} />Must fix ({inspecting.seo.issues.length})
+                              <AlertOctagon size={14} />{t('inspect.must_fix', { count: inspecting.seo.issues.length })}
                             </p>
                             <ul className="text-xs space-y-0.5 list-disc list-inside">
                               {inspecting.seo.issues.map((s, i) => <li key={i}>{s}</li>)}
@@ -1169,7 +1172,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                         {inspecting.seo.tips.length > 0 && (
                           <div>
                             <p className="font-semibold mb-1 text-warning flex items-center gap-1">
-                              <Activity size={14} />Tips ({inspecting.seo.tips.length})
+                              <Activity size={14} />{t('inspect.tips', { count: inspecting.seo.tips.length })}
                             </p>
                             <ul className="text-xs space-y-0.5 list-disc list-inside">
                               {inspecting.seo.tips.map((s, i) => <li key={i}>{s}</li>)}
@@ -1180,18 +1183,18 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                     )}
                     <Divider />
                     <div className="grid grid-cols-2 gap-2">
-                      <Info label="Path" value={inspecting.cache_path} mono />
-                      <Info label="Size" value={formatBytes(inspecting.size_bytes)} />
-                      <Info label="Age" value={formatAge(inspecting.age_s)} />
-                      <Info label="Modified" value={formatTs(inspecting.mtime)} />
-                      <Info label="Title" value={inspecting.title || '— missing —'} />
-                      <Info label="Canonical" value={inspecting.canonical || '— missing —'} mono />
-                      <Info label="Meta description" value={inspecting.meta_description || '— missing —'} />
-                      <Info label="H1 (count)" value={`${inspecting.h1_texts.length}${inspecting.h1_texts.length > 0 ? ` — "${inspecting.h1_texts[0]}"` : ''}`} />
+                      <Info label={t('inspect.path')} value={inspecting.cache_path} mono />
+                      <Info label={t('inspect.size')} value={formatBytes(inspecting.size_bytes)} />
+                      <Info label={t('inspect.age')} value={formatAge(inspecting.age_s)} />
+                      <Info label={t('inspect.modified')} value={formatTs(inspecting.mtime)} />
+                      <Info label={t('inspect.title')} value={inspecting.title || t('inspect.missing')} />
+                      <Info label={t('inspect.canonical')} value={inspecting.canonical || t('inspect.missing')} mono />
+                      <Info label={t('inspect.meta_description')} value={inspecting.meta_description || t('inspect.missing')} />
+                      <Info label={t('inspect.h1_count')} value={`${inspecting.h1_texts.length}${inspecting.h1_texts.length > 0 ? ` - "${inspecting.h1_texts[0]}"` : ''}`} />
                     </div>
                     <Divider />
                     <div>
-                      <p className="font-semibold mb-1">Flags</p>
+                      <p className="font-semibold mb-1">{t('inspect.flags')}</p>
                       <div className="flex flex-wrap gap-2">
                         {Object.entries(inspecting.flags).map(([k, v]) => {
                           const isBad = k === 'multiple_h1';
@@ -1208,7 +1211,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                       <>
                         <Divider />
                         <div>
-                          <p className="font-semibold mb-1 text-warning">HTML parse warnings</p>
+                          <p className="font-semibold mb-1 text-warning">{t('inspect.html_parse_warnings')}</p>
                           <Code className="text-xs whitespace-pre-wrap block">
                             {inspecting.parse_warnings.join('\n')}
                           </Code>
@@ -1218,11 +1221,13 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                     <Divider />
                     <div>
                       <p className="font-semibold mb-1">
-                        JSON-LD ({inspecting.json_ld.blocks_count} blocks
-                        {inspecting.json_ld.all_valid ? ', all valid' : ', INVALID PRESENT'})
+                        {t('inspect.json_ld', {
+                          blocks: inspecting.json_ld.blocks_count,
+                          status: inspecting.json_ld.all_valid ? t('inspect.all_valid') : t('inspect.invalid_present'),
+                        })}
                       </p>
                       {inspecting.json_ld.blocks.length === 0 ? (
-                        <p className="text-xs text-default-400">No structured data</p>
+                        <p className="text-xs text-default-400">{t('inspect.no_structured_data')}</p>
                       ) : (
                         <div className="space-y-1">
                           {inspecting.json_ld.blocks.map((b, i) => (
@@ -1231,7 +1236,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                                 {b.valid ? '✓' : '✗'}
                               </Chip>
                               <span className="font-mono">{b.size}B</span>
-                              <span>{b.types.join(', ') || '(no @type)'}</span>
+                              <span>{b.types.join(', ') || t('inspect.no_type')}</span>
                             </div>
                           ))}
                         </div>
@@ -1241,7 +1246,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                       <>
                         <Divider />
                         <div>
-                          <p className="font-semibold mb-1">Open Graph</p>
+                          <p className="font-semibold mb-1">{t('inspect.open_graph')}</p>
                           <div className="text-xs space-y-0.5">
                             {Object.entries(inspecting.og_tags).map(([k, v]) => (
                               <div key={k} className="flex gap-2">
@@ -1256,20 +1261,20 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                     <Divider />
                     <div>
                       <p className="font-semibold mb-1">
-                        Asset references ({inspecting.asset_refs.length})
+                        {t('inspect.asset_references', { count: inspecting.asset_refs.length })}
                         {inspecting.asset_issues.length > 0 && (
                           <Chip color="danger" variant="flat" size="sm" className="ml-2">
-                            {inspecting.asset_issues.length} dead
+                            {t('inspect.dead_assets', { count: inspecting.asset_issues.length })}
                           </Chip>
                         )}
                       </p>
                       <Code className="text-xs whitespace-pre-wrap block">
-                        {inspecting.asset_refs.map((r) => `${inspecting.asset_issues.includes(r) ? '✗ ' : '  '}${r}`).join('\n') || '(none)'}
+                        {inspecting.asset_refs.map((r) => `${inspecting.asset_issues.includes(r) ? 'x ' : '  '}${r}`).join('\n') || t('inspect.none')}
                       </Code>
                     </div>
                     <Divider />
                     <div>
-                      <p className="font-semibold mb-1">HTML preview (first 12KB, scripts stripped)</p>
+                      <p className="font-semibold mb-1">{t('inspect.html_preview')}</p>
                       <Code className="text-xs whitespace-pre-wrap block max-h-96 overflow-auto">
                         {inspecting.preview}
                       </Code>
@@ -1278,7 +1283,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={onClose}>Close</Button>
+                <Button variant="light" onPress={onClose}>{t('actions.close')}</Button>
               </ModalFooter>
             </>
           )}
@@ -1300,6 +1305,7 @@ function Info({ label, value, mono = false }: { label: string; value: string; mo
 // ─── Coverage ──────────────────────────────────────────────────────────────
 
 function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boolean; toast: ToastShape; onDrillDown: (slug: string) => void }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.coverage' });
   const [rows, setRows] = useState<PrerenderCoverageRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [enqueuingFor, setEnqueuingFor] = useState<string | null>(null);
@@ -1309,9 +1315,9 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
     setLoading(true);
     adminPrerender.getCoverage()
       .then((r) => { if (r.data) setRows(r.data.rows); })
-      .catch(() => toast.error('Failed to load coverage'))
+      .catch(() => toast.error(t('errors.load')))
       .finally(() => setLoading(false));
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -1319,9 +1325,9 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
     setEnqueuingFor(slug);
     try {
       const res = await adminPrerender.enqueueJob({ tenant_slug: slug, force: true });
-      if (res.data) toast.success(`Queued #${res.data.job_id} for ${slug}`);
+      if (res.data) toast.success(t('messages.tenant_queued', { id: res.data.job_id, slug }));
     } catch {
-      toast.error('Failed to enqueue');
+      toast.error(t('errors.enqueue'));
     } finally {
       setEnqueuingFor(null);
     }
@@ -1337,10 +1343,10 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
       (r) => r.missing_routes.length > 0 || r.stale_routes.length > 0 || r.asset_invalid_routes.length > 0,
     );
     if (needsWork.length === 0) {
-      toast.success('No stale tenants — coverage is healthy');
+      toast.success(t('messages.no_stale'));
       return;
     }
-    if (!confirm(`Queue recache for ${needsWork.length} tenants?`)) return;
+    if (!confirm(t('confirm.queue_recache', { count: needsWork.length }))) return;
     setBulkLoading(true);
     let queued = 0;
     try {
@@ -1357,10 +1363,10 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
         });
         queued++;
       }
-      toast.success(`Queued recache for ${queued} tenants`);
+      toast.success(t('messages.bulk_queued', { count: queued }));
       load();
     } catch {
-      toast.error('Bulk enqueue failed (some tenants may have queued)');
+      toast.error(t('errors.bulk_enqueue'));
     } finally {
       setBulkLoading(false);
     }
@@ -1377,8 +1383,8 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
       <div className="flex items-center justify-between">
         <p className="text-sm text-default-500">
           {totalNeedingWork === 0
-            ? <>All {rows.length} tenants healthy.</>
-            : <>{totalNeedingWork} of {rows.length} tenants have missing, stale, or asset-broken routes.</>}
+            ? t('summary.healthy', { count: rows.length })
+            : t('summary.needs_work', { needing: totalNeedingWork, total: rows.length })}
         </p>
         <Button
           color="primary"
@@ -1388,20 +1394,20 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
           isLoading={bulkLoading}
           isDisabled={!isSuperAdmin || totalNeedingWork === 0}
         >
-          Refresh all stale ({totalNeedingWork})
+          {t('actions.refresh_all_stale', { count: totalNeedingWork })}
         </Button>
       </div>
-    <Table aria-label="Coverage" removeWrapper isStriped>
+    <Table aria-label={t('table_aria')} removeWrapper isStriped>
       <TableHeader>
-        <TableColumn>TENANT</TableColumn>
-        <TableColumn>HOST</TableColumn>
-        <TableColumn>COVERAGE</TableColumn>
-        <TableColumn>STALE</TableColumn>
-        <TableColumn>ASSET</TableColumn>
-        <TableColumn>MISSING</TableColumn>
-        <TableColumn>ACTIONS</TableColumn>
+        <TableColumn>{t('columns.tenant')}</TableColumn>
+        <TableColumn>{t('columns.host')}</TableColumn>
+        <TableColumn>{t('columns.coverage')}</TableColumn>
+        <TableColumn>{t('columns.stale')}</TableColumn>
+        <TableColumn>{t('columns.asset')}</TableColumn>
+        <TableColumn>{t('columns.missing')}</TableColumn>
+        <TableColumn>{t('columns.actions')}</TableColumn>
       </TableHeader>
-      <TableBody emptyContent="No tenants">
+      <TableBody emptyContent={t('empty')}>
         {rows.map((r) => {
           const pct = r.expected > 0 ? Math.round((r.rendered / r.expected) * 100) : 0;
           const color = pct >= 95 ? 'success' : pct >= 70 ? 'warning' : 'danger';
@@ -1411,7 +1417,7 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
                 <button
                   className="font-medium text-primary hover:underline"
                   onClick={() => onDrillDown(r.slug)}
-                  title="Open in inventory"
+                  title={t('actions.open_in_inventory')}
                 >
                   {r.slug}
                 </button>
@@ -1458,7 +1464,7 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
                   isLoading={enqueuingFor === r.slug}
                   isDisabled={!isSuperAdmin}
                 >
-                  Refresh
+                  {t('actions.refresh')}
                 </Button>
               </TableCell>
             </TableRow>
@@ -1479,6 +1485,7 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
  * IP-range verification — the spoofing signal.
  */
 function AnalyticsTab() {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.analytics' });
   const toast = useToast();
   const [data, setData] = useState<PrerenderAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1489,14 +1496,14 @@ function AnalyticsTab() {
     const sinceIso = new Date(Date.now() - parseInt(windowDays, 10) * 86400_000).toISOString();
     adminPrerender.getAnalytics({ since: sinceIso, limit: 300 })
       .then((res) => { if (res.data) setData(res.data); })
-      .catch(() => toast.error('Failed to load analytics'))
+      .catch(() => toast.error(t('errors.load')))
       .finally(() => setLoading(false));
-  }, [toast, windowDays]);
+  }, [t, toast, windowDays]);
 
   useEffect(() => { load(); }, [load]);
 
   if (loading && !data) return <div className="flex justify-center py-8"><Spinner /></div>;
-  if (!data) return <p className="text-default-500">No analytics available. Bot access log may be empty.</p>;
+  if (!data) return <p className="text-default-500">{t('empty')}</p>;
 
   const verifiedPct = data.total_hits > 0 ? Math.round((data.verified_hits / data.total_hits) * 100) : 0;
   const totalSpoofed = Object.values(data.spoofed_by_crawler).reduce((a, b) => a + b, 0);
@@ -1505,62 +1512,62 @@ function AnalyticsTab() {
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <Select
-          label="Window"
+          label={t('filters.window')}
           variant="bordered"
           selectedKeys={[windowDays]}
           onSelectionChange={(s) => setWindowDays(Array.from(s)[0] as string)}
           className="max-w-[150px]"
         >
-          <SelectItem key="1">Last 24h</SelectItem>
-          <SelectItem key="7">Last 7 days</SelectItem>
-          <SelectItem key="30">Last 30 days</SelectItem>
+          <SelectItem key="1">{t('windows.1')}</SelectItem>
+          <SelectItem key="7">{t('windows.7')}</SelectItem>
+          <SelectItem key="30">{t('windows.30')}</SelectItem>
         </Select>
-        <Button variant="flat" onPress={load} startContent={<RefreshCw size={14} />} className="self-end">Reload</Button>
+        <Button variant="flat" onPress={load} startContent={<RefreshCw size={14} />} className="self-end">{t('actions.reload')}</Button>
         <span className="text-sm text-default-500 ml-auto self-end">
-          Log: {formatBytes(data.log_size_bytes)} · since {formatTs(data.window_started_at)}
+          {t('log_summary', { size: formatBytes(data.log_size_bytes), time: formatTs(data.window_started_at) })}
         </span>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KpiCard label="Total bot hits" value={data.total_hits} />
+        <KpiCard label={t('kpi.total_bot_hits')} value={data.total_hits} />
         <KpiCard
-          label="IP-verified"
+          label={t('kpi.ip_verified')}
           value={`${verifiedPct}%`}
-          hint={`${data.verified_hits} of ${data.total_hits}`}
+          hint={t('hints.verified_of_total', { verified: data.verified_hits, total: data.total_hits })}
           tone={verifiedPct >= 80 ? 'default' : 'warning'}
         />
         <KpiCard
-          label="Spoofed (suspicious)"
+          label={t('kpi.spoofed')}
           value={totalSpoofed}
-          hint="claimed major bot, failed IP range"
+          hint={t('hints.spoofed')}
           tone={totalSpoofed > 0 ? 'danger' : 'default'}
         />
         <KpiCard
-          label="Unique URIs"
+          label={t('kpi.unique_uris')}
           value={data.top_uris.length}
-          hint="from top-50 cap"
+          hint={t('hints.top_50_cap')}
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card shadow="sm">
-          <CardHeader><h3 className="font-semibold">Hits by crawler</h3></CardHeader>
+          <CardHeader><h3 className="font-semibold">{t('sections.hits_by_crawler')}</h3></CardHeader>
           <CardBody className="text-xs space-y-1">
             {Object.entries(data.hits_by_crawler).map(([k, n]) => (
               <div key={k} className="flex items-center gap-2">
                 <Chip size="sm" variant="flat">{k}</Chip>
                 <span className="font-mono ml-auto">{n}</span>
                 {data.spoofed_by_crawler[k] && (
-                  <Chip size="sm" variant="flat" color="danger">{data.spoofed_by_crawler[k]} spoofed</Chip>
+                  <Chip size="sm" variant="flat" color="danger">{t('labels.spoofed_count', { count: data.spoofed_by_crawler[k] })}</Chip>
                 )}
               </div>
             ))}
-            {Object.keys(data.hits_by_crawler).length === 0 && <p className="text-default-400">No data</p>}
+            {Object.keys(data.hits_by_crawler).length === 0 && <p className="text-default-400">{t('empty_no_data')}</p>}
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="font-semibold">Hits by HTTP status</h3></CardHeader>
+          <CardHeader><h3 className="font-semibold">{t('sections.hits_by_status')}</h3></CardHeader>
           <CardBody className="text-xs space-y-1">
             {Object.entries(data.hits_by_status).map(([k, n]) => (
               <div key={k} className="flex items-center gap-2">
@@ -1568,20 +1575,20 @@ function AnalyticsTab() {
                 <span className="font-mono ml-auto">{n}</span>
               </div>
             ))}
-            {Object.keys(data.hits_by_status).length === 0 && <p className="text-default-400">No data</p>}
+            {Object.keys(data.hits_by_status).length === 0 && <p className="text-default-400">{t('empty_no_data')}</p>}
           </CardBody>
         </Card>
       </div>
 
       <Card shadow="sm">
-        <CardHeader><h3 className="font-semibold">Top URIs (top 50 by hit count)</h3></CardHeader>
+        <CardHeader><h3 className="font-semibold">{t('sections.top_uris')}</h3></CardHeader>
         <CardBody className="p-0">
-          <Table aria-label="Top URIs" removeWrapper isStriped>
+          <Table aria-label={t('tables.top_uris_aria')} removeWrapper isStriped>
             <TableHeader>
-              <TableColumn>URL</TableColumn>
-              <TableColumn>HITS</TableColumn>
+              <TableColumn>{t('columns.url')}</TableColumn>
+              <TableColumn>{t('columns.hits')}</TableColumn>
             </TableHeader>
-            <TableBody emptyContent="No bot traffic yet">
+            <TableBody emptyContent={t('empty_bot_traffic')}>
               {data.top_uris.map((u, i) => (
                 <TableRow key={i}>
                   <TableCell className="text-xs font-mono">{u.url}</TableCell>
@@ -1594,18 +1601,18 @@ function AnalyticsTab() {
       </Card>
 
       <Card shadow="sm">
-        <CardHeader><h3 className="font-semibold">Recent activity (newest first, last {data.recent.length})</h3></CardHeader>
+        <CardHeader><h3 className="font-semibold">{t('sections.recent_activity', { count: data.recent.length })}</h3></CardHeader>
         <CardBody className="p-0">
-          <Table aria-label="Recent bot hits" removeWrapper isStriped>
+          <Table aria-label={t('tables.recent_hits_aria')} removeWrapper isStriped>
             <TableHeader>
-              <TableColumn>TIME</TableColumn>
-              <TableColumn>CRAWLER</TableColumn>
-              <TableColumn>HOST</TableColumn>
-              <TableColumn>URI</TableColumn>
-              <TableColumn>STATUS</TableColumn>
-              <TableColumn>IP</TableColumn>
+              <TableColumn>{t('columns.time')}</TableColumn>
+              <TableColumn>{t('columns.crawler')}</TableColumn>
+              <TableColumn>{t('columns.host')}</TableColumn>
+              <TableColumn>{t('columns.uri')}</TableColumn>
+              <TableColumn>{t('columns.status')}</TableColumn>
+              <TableColumn>{t('columns.ip')}</TableColumn>
             </TableHeader>
-            <TableBody emptyContent="No recent hits">
+            <TableBody emptyContent={t('empty_recent_hits')}>
               {data.recent.map((r, i) => (
                 <TableRow key={i}>
                   <TableCell className="text-xs">{formatTs(r.ts ?? null)}</TableCell>
@@ -1642,9 +1649,9 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
     setLoading(true);
     adminPrerender.listJobs({ status: status === 'all' ? undefined : status, limit: 100 })
       .then((r) => { if (r.data) setJobs(r.data.items); })
-      .catch(() => toast.error('Failed to load jobs'))
+      .catch(() => toast.error(t('errors.load')))
       .finally(() => setLoading(false));
-  }, [status, toast]);
+  }, [status, t, toast]);
 
   useEffect(() => { load(); }, [load]);
   // Realtime reload on Pusher event. Polling fallback kicks in only when
@@ -1662,20 +1669,20 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
   const cancelJob = async (id: number) => {
     try {
       await adminPrerender.cancelJob(id);
-      toast.success(`Cancelled job #${id}`);
+      toast.success(t('messages.cancelled', { id }));
       load();
     } catch {
-      toast.error('Could not cancel — job may have started');
+      toast.error(t('errors.cancel'));
     }
   };
 
   const retryJob = async (id: number) => {
     try {
       const res = await adminPrerender.retryJob(id);
-      if (res.data) toast.success(`Queued retry #${res.data.job_id} (from #${id})`);
+      if (res.data) toast.success(t('messages.retry_queued', { retryId: res.data.job_id, id }));
       load();
     } catch {
-      toast.error('Retry failed — original job may still be in flight');
+      toast.error(t('errors.retry'));
     }
   };
 
@@ -1689,22 +1696,22 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
       <Card shadow="sm">
         <CardBody className="flex-row gap-3 items-end">
           <Select
-            label="Status"
+            label={t('filters.status')}
             variant="bordered"
             selectedKeys={[status]}
             onSelectionChange={(s) => setStatus(Array.from(s)[0] as string)}
             className="max-w-[180px]"
           >
-            <SelectItem key="all">All</SelectItem>
-            <SelectItem key="queued">Queued</SelectItem>
-            <SelectItem key="running">Running</SelectItem>
-            <SelectItem key="succeeded">Succeeded</SelectItem>
-            <SelectItem key="partial">Partial</SelectItem>
-            <SelectItem key="failed">Failed</SelectItem>
-            <SelectItem key="cancelled">Cancelled</SelectItem>
+            <SelectItem key="all">{t('filters.all')}</SelectItem>
+            <SelectItem key="queued">{t('filters.queued')}</SelectItem>
+            <SelectItem key="running">{t('filters.running')}</SelectItem>
+            <SelectItem key="succeeded">{t('filters.succeeded')}</SelectItem>
+            <SelectItem key="partial">{t('filters.partial')}</SelectItem>
+            <SelectItem key="failed">{t('filters.failed')}</SelectItem>
+            <SelectItem key="cancelled">{t('filters.cancelled')}</SelectItem>
           </Select>
           <Button variant="flat" startContent={<RefreshCw size={14} />} onPress={load}>
-            Reload
+            {t('actions.reload')}
           </Button>
         </CardBody>
       </Card>
@@ -1712,19 +1719,19 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
       {loading ? (
         <div className="flex justify-center py-8"><Spinner /></div>
       ) : (
-        <Table aria-label="Jobs" removeWrapper isStriped>
+        <Table aria-label={t('table_aria')} removeWrapper isStriped>
           <TableHeader>
-            <TableColumn>#</TableColumn>
-            <TableColumn>STATUS</TableColumn>
-            <TableColumn>PRIORITY</TableColumn>
-            <TableColumn>SCOPE</TableColumn>
-            <TableColumn>FLAGS</TableColumn>
-            <TableColumn>RESULT</TableColumn>
-            <TableColumn>QUEUED</TableColumn>
-            <TableColumn>BY</TableColumn>
-            <TableColumn>ACTIONS</TableColumn>
+            <TableColumn>{t('columns.id')}</TableColumn>
+            <TableColumn>{t('columns.status')}</TableColumn>
+            <TableColumn>{t('columns.priority')}</TableColumn>
+            <TableColumn>{t('columns.scope')}</TableColumn>
+            <TableColumn>{t('columns.flags')}</TableColumn>
+            <TableColumn>{t('columns.result')}</TableColumn>
+            <TableColumn>{t('columns.queued')}</TableColumn>
+            <TableColumn>{t('columns.by')}</TableColumn>
+            <TableColumn>{t('columns.actions')}</TableColumn>
           </TableHeader>
-          <TableBody emptyContent="No jobs">
+          <TableBody emptyContent={t('empty')}>
             {jobs.map((j) => (
               <TableRow key={j.id}>
                 <TableCell className="text-xs font-mono">{j.id}</TableCell>
@@ -1737,28 +1744,28 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                   {(() => {
                     const p = j.priority ?? 5;
                     // Match service constants: 3=HIGH, 5=NORMAL, 7=LOW.
-                    const label = p <= 3 ? 'HIGH' : p >= 7 ? 'LOW' : 'NORMAL';
+                    const label = p <= 3 ? t('priority.high') : p >= 7 ? t('priority.low') : t('priority.normal');
                     const color: 'danger' | 'primary' | 'default' = p <= 3 ? 'danger' : p >= 7 ? 'default' : 'primary';
                     return (
-                      <Tooltip content={`priority=${p} (lower wins)`}>
+                      <Tooltip content={t('priority.tooltip', { priority: p })}>
                         <Chip size="sm" variant="flat" color={color}>{label}</Chip>
                       </Tooltip>
                     );
                   })()}
                 </TableCell>
                 <TableCell className="text-xs">
-                  {j.tenant_slug ? <Chip size="sm" variant="flat">{j.tenant_slug}</Chip> : <span className="text-default-400">all tenants</span>}
+                  {j.tenant_slug ? <Chip size="sm" variant="flat">{j.tenant_slug}</Chip> : <span className="text-default-400">{t('scope.all_tenants')}</span>}
                   {j.routes && <div className="font-mono mt-1">{j.routes}</div>}
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    {j.force && <Chip size="sm" color="warning" variant="flat">force</Chip>}
-                    {j.dry_run && <Chip size="sm" variant="flat">dry-run</Chip>}
+                    {j.force && <Chip size="sm" color="warning" variant="flat">{t('flags.force')}</Chip>}
+                    {j.dry_run && <Chip size="sm" variant="flat">{t('flags.dry_run')}</Chip>}
                   </div>
                 </TableCell>
                 <TableCell className="text-xs">
                   {j.rendered_count != null
-                    ? `${j.rendered_count}/${j.planned_count ?? '?'}${j.invalid_count ? ` (${j.invalid_count} invalid)` : ''}${j.duration_s != null ? ` • ${j.duration_s}s` : ''}`
+                    ? `${j.rendered_count}/${j.planned_count ?? '?'}${j.invalid_count ? ` (${t('result.invalid', { count: j.invalid_count })})` : ''}${j.duration_s != null ? ` | ${j.duration_s}s` : ''}`
                     : '—'}
                 </TableCell>
                 <TableCell className="text-xs">{formatTs(j.queued_at)}</TableCell>
@@ -1808,33 +1815,33 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>Job #{expanded?.id}</ModalHeader>
+              <ModalHeader>{t('detail.title', { id: expanded?.id })}</ModalHeader>
               <ModalBody>
                 {expanded && (
                   <div className="space-y-2 text-sm">
                     <div className="grid grid-cols-2 gap-2">
-                      <Info label="Status" value={expanded.status} />
-                      <Info label="Tenant" value={expanded.tenant_slug || 'all'} />
-                      <Info label="Routes" value={expanded.routes || 'all'} mono />
-                      <Info label="Exit code" value={String(expanded.exit_code ?? '—')} />
-                      <Info label="Duration" value={expanded.duration_s != null ? `${expanded.duration_s}s` : '—'} />
-                      <Info label="Claimed by" value={expanded.claimed_by || '—'} />
-                      <Info label="Queued at" value={formatTs(expanded.queued_at)} />
-                      <Info label="Started at" value={formatTs(expanded.started_at)} />
-                      <Info label="Finished at" value={formatTs(expanded.finished_at)} />
-                      <Info label="Requested by" value={expanded.requested_by?.name || '—'} />
+                      <Info label={t('detail.status')} value={expanded.status} />
+                      <Info label={t('detail.tenant')} value={expanded.tenant_slug || t('detail.all')} />
+                      <Info label={t('detail.routes')} value={expanded.routes || t('detail.all')} mono />
+                      <Info label={t('detail.exit_code')} value={String(expanded.exit_code ?? '—')} />
+                      <Info label={t('detail.duration')} value={expanded.duration_s != null ? `${expanded.duration_s}s` : '—'} />
+                      <Info label={t('detail.claimed_by')} value={expanded.claimed_by || '—'} />
+                      <Info label={t('detail.queued_at')} value={formatTs(expanded.queued_at)} />
+                      <Info label={t('detail.started_at')} value={formatTs(expanded.started_at)} />
+                      <Info label={t('detail.finished_at')} value={formatTs(expanded.finished_at)} />
+                      <Info label={t('detail.requested_by')} value={expanded.requested_by?.name || '—'} />
                     </div>
                     {expanded.error_message && (
                       <>
                         <Divider />
-                        <p className="font-semibold text-danger">Error</p>
+                        <p className="font-semibold text-danger">{t('detail.error')}</p>
                         <Code className="text-xs whitespace-pre-wrap block">{expanded.error_message}</Code>
                       </>
                     )}
                     {expanded.log_excerpt && (
                       <>
                         <Divider />
-                        <p className="font-semibold">Log (tail)</p>
+                        <p className="font-semibold">{t('detail.log_tail')}</p>
                         <Code className="text-xs whitespace-pre-wrap block max-h-96 overflow-auto">
                           {expanded.log_excerpt}
                         </Code>
@@ -1844,7 +1851,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={onClose}>Close</Button>
+                <Button variant="light" onPress={onClose}>{t('actions.close')}</Button>
               </ModalFooter>
             </>
           )}
@@ -1857,6 +1864,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
 // ─── Events ────────────────────────────────────────────────────────────────
 
 function EventsTab() {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.events' });
   const toast = useToast();
   const [events, setEvents] = useState<PrerenderEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1866,9 +1874,9 @@ function EventsTab() {
     setLoading(true);
     adminPrerender.getEvents(limit)
       .then((r) => { if (r.data) setEvents(r.data.events); })
-      .catch(() => toast.error('Failed to load events'))
+      .catch(() => toast.error(t('errors.load')))
       .finally(() => setLoading(false));
-  }, [limit, toast]);
+  }, [limit, t, toast]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -1877,7 +1885,7 @@ function EventsTab() {
       <Card shadow="sm">
         <CardBody className="flex-row gap-3 items-end">
           <Select
-            label="Limit"
+            label={t('filters.limit')}
             variant="bordered"
             selectedKeys={[String(limit)]}
             onSelectionChange={(s) => setLimit(parseInt(Array.from(s)[0] as string, 10))}
@@ -1889,10 +1897,10 @@ function EventsTab() {
             <SelectItem key="2000">2000</SelectItem>
           </Select>
           <Button variant="flat" startContent={<RefreshCw size={14} />} onPress={load}>
-            Reload
+            {t('actions.reload')}
           </Button>
           <span className="text-sm text-default-500 ml-auto self-center">
-            {events.length} events
+            {t('summary', { count: events.length })}
           </span>
         </CardBody>
       </Card>
@@ -1900,14 +1908,14 @@ function EventsTab() {
       {loading ? (
         <div className="flex justify-center py-8"><Spinner /></div>
       ) : (
-        <Table aria-label="Events" removeWrapper isStriped>
+        <Table aria-label={t('table_aria')} removeWrapper isStriped>
           <TableHeader>
-            <TableColumn>TIME</TableColumn>
-            <TableColumn>EVENT</TableColumn>
-            <TableColumn>COMMIT</TableColumn>
-            <TableColumn>DETAILS</TableColumn>
+            <TableColumn>{t('columns.time')}</TableColumn>
+            <TableColumn>{t('columns.event')}</TableColumn>
+            <TableColumn>{t('columns.commit')}</TableColumn>
+            <TableColumn>{t('columns.details')}</TableColumn>
           </TableHeader>
-          <TableBody emptyContent="No events">
+          <TableBody emptyContent={t('empty')}>
             {events.map((e, idx) => {
               const ev = String(e.event ?? '');
               const color =
@@ -1939,6 +1947,7 @@ function EventsTab() {
 // ─── Failures ──────────────────────────────────────────────────────────────
 
 function FailuresTab() {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.failures' });
   const toast = useToast();
   const [items, setItems] = useState<PrerenderFailure[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1947,9 +1956,9 @@ function FailuresTab() {
     setLoading(true);
     adminPrerender.getFailures()
       .then((r) => { if (r.data) setItems(r.data.items); })
-      .catch(() => toast.error('Failed to load failures'))
+      .catch(() => toast.error(t('errors.load')))
       .finally(() => setLoading(false));
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -1958,9 +1967,10 @@ function FailuresTab() {
       <Card shadow="sm">
         <CardBody>
           <p className="text-sm text-default-500">
-            Cache paths that failed during a recent prerender run. Routes in this list
-            are skipped automatically during the failure-backoff window (default 6h).
-            Use <strong>Force refresh</strong> on the Overview tab to retry immediately.
+            {t('description_prefix')}{' '}
+            {t('description_middle')}{' '}
+            <strong>{t('description_action')}</strong>{' '}
+            {t('description_suffix')}
           </p>
         </CardBody>
       </Card>
@@ -1970,15 +1980,15 @@ function FailuresTab() {
         <Card shadow="sm">
           <CardBody className="text-center py-8 flex flex-col items-center gap-2">
             <CheckCircle className="text-success" size={32} />
-            <p className="font-medium">No recent failures</p>
+            <p className="font-medium">{t('empty')}</p>
           </CardBody>
         </Card>
       ) : (
-        <Table aria-label="Failures" removeWrapper isStriped>
+        <Table aria-label={t('table_aria')} removeWrapper isStriped>
           <TableHeader>
-            <TableColumn>CACHE PATH</TableColumn>
-            <TableColumn>FAILED AT</TableColumn>
-            <TableColumn>AGE</TableColumn>
+            <TableColumn>{t('columns.cache_path')}</TableColumn>
+            <TableColumn>{t('columns.failed_at')}</TableColumn>
+            <TableColumn>{t('columns.age')}</TableColumn>
           </TableHeader>
           <TableBody>
             {items.map((it) => (
@@ -2016,6 +2026,7 @@ const HEALTH_DOT_CLASSES: Record<ReturnType<typeof statusToColor>, string> = {
 };
 
 function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.health_banner' });
   const [health, setHealth] = useState<PrerenderHealth | null>(null);
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -2038,9 +2049,9 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
     setBusy(true);
     try {
       await adminPrerender.resetBreaker();
-      toast.success('Circuit breaker reset');
+      toast.success(t('toasts.breaker_reset'));
       load();
-    } catch { toast.error('Reset failed'); }
+    } catch { toast.error(t('toasts.reset_failed')); }
     finally { setBusy(false); }
   };
 
@@ -2048,10 +2059,10 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
     setBusy(true);
     try {
       const res = await adminPrerender.resetQueue();
-      if (res.data) toast.success(`Reset ${res.data.rows_reset} stuck row(s); breaker cleared`);
+      if (res.data) toast.success(t('toasts.queue_reset', { count: res.data.rows_reset }));
       load();
       onClose();
-    } catch { toast.error('Queue reset failed'); }
+    } catch { toast.error(t('toasts.queue_reset_failed')); }
     finally { setBusy(false); }
   };
 
@@ -2061,9 +2072,9 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
     return (
       <div className="mb-3 flex items-center gap-2 text-sm text-default-500">
         <CheckCircle size={14} className="text-success" />
-        Engine healthy
+        {t('engine_healthy')}
         <button type="button" className="ml-auto text-xs hover:underline" onClick={() => setExpanded((v) => !v)}>
-          {expanded ? 'Hide details' : 'Details'}
+          {expanded ? t('actions.hide_details') : t('actions.details')}
         </button>
       </div>
     );
@@ -2076,9 +2087,9 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
     <div className={`mb-3 rounded-md border px-3 py-2 text-sm ${HEALTH_BANNER_CLASSES[tone]}`}>
       <div className="flex items-center gap-2">
         <Chip size="sm" color={tone} variant="flat">{health.status.toUpperCase()}</Chip>
-        <span className="font-medium">{failing.length} issue{failing.length === 1 ? '' : 's'}</span>
+        <span className="font-medium">{t('issue_count', { count: failing.length })}</span>
         <button type="button" className="ml-auto text-xs hover:underline" onClick={() => setExpanded((v) => !v)}>
-          {expanded ? 'Hide' : 'Details'}
+          {expanded ? t('actions.hide') : t('actions.details')}
         </button>
         {isSuperAdmin && (
           <Button
@@ -2089,7 +2100,7 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
             startContent={<StopCircle size={14} />}
             onPress={onOpen}
           >
-            Emergency reset
+            {t('actions.emergency_reset')}
           </Button>
         )}
       </div>
@@ -2105,7 +2116,7 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
           {health.breaker_until && isSuperAdmin && (
             <li className="pt-1">
               <Button size="sm" variant="flat" onPress={resetBreaker} isDisabled={busy}>
-                Close breaker now
+                {t('actions.close_breaker_now')}
               </Button>
             </li>
           )}
@@ -2114,21 +2125,19 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalContent>
-          <ModalHeader>Emergency: reset stuck queue</ModalHeader>
+          <ModalHeader>{t('modal.title')}</ModalHeader>
           <ModalBody>
             <p>
-              This will requeue every <code>claimed</code> or <code>running</code> row whose
-              worker has been silent for &gt;30 min, and clear the circuit breaker.
+              {t('modal.body_prefix')} <code>claimed</code> {t('modal.body_middle')} <code>running</code> {t('modal.body_suffix')}
             </p>
             <p className="text-warning-700 text-sm">
-              Only use this if you&apos;ve confirmed the queue is stuck. If a healthy
-              worker is still running, this will create duplicate work.
+              {t('modal.warning')}
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} isDisabled={busy}>Cancel</Button>
+            <Button variant="flat" onPress={onClose} isDisabled={busy}>{t('actions.cancel')}</Button>
             <Button color="danger" onPress={resetQueue} isDisabled={busy}>
-              Reset queue
+              {t('actions.reset_queue')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -2140,6 +2149,7 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
 // ─── Audit history tab ─────────────────────────────────────────────────────
 
 function AuditTab() {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.audit' });
   const [items, setItems] = useState<PrerenderAuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
@@ -2158,24 +2168,24 @@ function AuditTab() {
       <div className="flex items-center gap-2">
         <Select
           size="sm"
-          label="Action filter"
+          label={t('filters.action')}
           className="max-w-xs"
           selectedKeys={filter ? [filter] : []}
           onChange={(e) => setFilter(e.target.value || '')}
         >
-          <SelectItem key="">All</SelectItem>
-          <SelectItem key="enqueue">enqueue</SelectItem>
-          <SelectItem key="cancel">cancel</SelectItem>
-          <SelectItem key="purge">purge</SelectItem>
-          <SelectItem key="purge_unexpected">purge_unexpected</SelectItem>
-          <SelectItem key="invalidate">invalidate</SelectItem>
-          <SelectItem key="auto_recache">auto_recache</SelectItem>
-          <SelectItem key="detect_drift">detect_drift</SelectItem>
-          <SelectItem key="reset_breaker">reset_breaker</SelectItem>
-          <SelectItem key="reset_queue">reset_queue</SelectItem>
+          <SelectItem key="">{t('filters.all')}</SelectItem>
+          <SelectItem key="enqueue">{t('actions.enqueue')}</SelectItem>
+          <SelectItem key="cancel">{t('actions.cancel')}</SelectItem>
+          <SelectItem key="purge">{t('actions.purge')}</SelectItem>
+          <SelectItem key="purge_unexpected">{t('actions.purge_unexpected')}</SelectItem>
+          <SelectItem key="invalidate">{t('actions.invalidate')}</SelectItem>
+          <SelectItem key="auto_recache">{t('actions.auto_recache')}</SelectItem>
+          <SelectItem key="detect_drift">{t('actions.detect_drift')}</SelectItem>
+          <SelectItem key="reset_breaker">{t('actions.reset_breaker')}</SelectItem>
+          <SelectItem key="reset_queue">{t('actions.reset_queue')}</SelectItem>
         </Select>
         <Button size="sm" variant="flat" onPress={load} isDisabled={loading} startContent={<RefreshCw size={14} />}>
-          Refresh
+          {t('buttons.refresh')}
         </Button>
         <Button
           size="sm"
@@ -2184,23 +2194,23 @@ function AuditTab() {
           href={`/api/v2/admin/prerender/export/audit.csv${filter ? `?action=${encodeURIComponent(filter)}` : ''}`}
           startContent={<ExternalLink size={14} />}
         >
-          Export CSV
+          {t('buttons.export_csv')}
         </Button>
       </div>
       {loading && items.length === 0 ? (
         <div className="flex justify-center py-8"><Spinner /></div>
       ) : items.length === 0 ? (
-        <p className="text-default-500">No audit entries.</p>
+        <p className="text-default-500">{t('empty')}</p>
       ) : (
-        <Table aria-label="Audit history" removeWrapper>
+        <Table aria-label={t('table_aria')} removeWrapper>
           <TableHeader>
-            <TableColumn>When</TableColumn>
-            <TableColumn>Actor</TableColumn>
-            <TableColumn>Action</TableColumn>
-            <TableColumn>Outcome</TableColumn>
-            <TableColumn>Tenant</TableColumn>
-            <TableColumn>Job</TableColumn>
-            <TableColumn>Details</TableColumn>
+            <TableColumn>{t('columns.when')}</TableColumn>
+            <TableColumn>{t('columns.actor')}</TableColumn>
+            <TableColumn>{t('columns.action')}</TableColumn>
+            <TableColumn>{t('columns.outcome')}</TableColumn>
+            <TableColumn>{t('columns.tenant')}</TableColumn>
+            <TableColumn>{t('columns.job')}</TableColumn>
+            <TableColumn>{t('columns.details')}</TableColumn>
           </TableHeader>
           <TableBody>
             {items.map((row) => (
@@ -2209,7 +2219,7 @@ function AuditTab() {
                 <TableCell>
                   {row.actor_email
                     ? <Tooltip content={`#${row.actor_user_id ?? '?'}`}><span>{row.actor_first} {row.actor_last}</span></Tooltip>
-                    : <span className="text-default-400">system</span>}
+                    : <span className="text-default-400">{t('fallbacks.system')}</span>}
                 </TableCell>
                 <TableCell><Code size="sm">{row.action}</Code></TableCell>
                 <TableCell>
@@ -2221,7 +2231,7 @@ function AuditTab() {
                     {row.outcome}
                   </Chip>
                 </TableCell>
-                <TableCell>{row.tenant_slug ?? <span className="text-default-400">all</span>}</TableCell>
+                <TableCell>{row.tenant_slug ?? <span className="text-default-400">{t('fallbacks.all')}</span>}</TableCell>
                 <TableCell>{row.job_id ?? '—'}</TableCell>
                 <TableCell className="max-w-md">
                   {row.details ? (
@@ -2242,6 +2252,7 @@ function AuditTab() {
 // ─── TTL inspector (Overview tab card) ─────────────────────────────────────
 
 function TtlInspector() {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.ttl_inspector' });
   const [route, setRoute] = useState('/');
   const [result, setResult] = useState<PrerenderTtlInspect | null>(null);
   const [loading, setLoading] = useState(false);
@@ -2254,42 +2265,41 @@ function TtlInspector() {
       const res = await adminPrerender.ttlInspector(route);
       if (res.data) setResult(res.data as PrerenderTtlInspect);
     } catch {
-      setError('Lookup failed — check the route format (must start with "/")');
+      setError(t('error'));
     } finally {
       setLoading(false);
     }
   };
 
   const fmt = (s: number): string => {
-    if (s < 3600) return `${Math.round(s / 60)} min`;
-    if (s < 86400) return `${Math.round(s / 3600)} h`;
-    return `${Math.round(s / 86400)} d`;
+    if (s < 3600) return t('units.minutes', { count: Math.round(s / 60) });
+    if (s < 86400) return t('units.hours', { count: Math.round(s / 3600) });
+    return t('units.days', { count: Math.round(s / 86400) });
   };
 
   return (
     <Card shadow="sm">
       <CardHeader>
         <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Clock size={18} />TTL inspector
+          <Clock size={18} />{t('title')}
         </h3>
       </CardHeader>
       <CardBody className="space-y-3">
         <p className="text-sm text-default-500">
-          See which <code>config/prerender.php</code> pattern owns a route and what TTL it gets,
-          without grepping config. Used to tune the freshness policy.
+          {t('description_prefix')} <code>config/prerender.php</code> {t('description_suffix')}
         </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
           <Input
-            label="Route"
-            placeholder="/blog/my-post"
+            label={t('fields.route')}
+            placeholder={t('placeholders.route')}
             variant="bordered"
             value={route}
             onChange={(e) => setRoute(e.target.value)}
             className="max-w-sm"
-            description="Path only — no scheme or host"
+            description={t('path_only')}
           />
           <Button color="primary" onPress={submit} isLoading={loading}>
-            Inspect
+            {t('actions.inspect')}
           </Button>
         </div>
         {error && <p className="text-danger text-sm">{error}</p>}
@@ -2297,22 +2307,22 @@ function TtlInspector() {
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-3">
               <Chip color="primary" variant="flat" size="sm">
-                TTL: {fmt(result.ttl_seconds)} ({result.ttl_seconds}s)
+                {t('result.ttl', { ttl: fmt(result.ttl_seconds), seconds: result.ttl_seconds })}
               </Chip>
               <Chip variant="flat" size="sm" color={result.source === 'pattern' ? 'success' : 'default'}>
                 {result.source}
               </Chip>
               {result.matched_pattern && (
-                <Code size="sm">match: {result.matched_pattern}</Code>
+                <Code size="sm">{t('result.match', { pattern: result.matched_pattern })}</Code>
               )}
             </div>
             {result.all_matches.length > 1 && (
               <div>
-                <p className="text-xs font-medium mb-1">Other patterns that match this route:</p>
+                <p className="text-xs font-medium mb-1">{t('result.other_patterns')}</p>
                 <ul className="text-xs space-y-1 ml-2">
                   {result.all_matches.slice(1).map((m) => (
                     <li key={m.pattern} className="font-mono text-default-500">
-                      {m.pattern} → {fmt(m.ttl)} (specificity {m.specificity})
+                      {t('result.other_pattern_item', { pattern: m.pattern, ttl: fmt(m.ttl), specificity: m.specificity })}
                     </li>
                   ))}
                 </ul>
@@ -2328,6 +2338,7 @@ function TtlInspector() {
 // ─── Sitemap explorer (Overview tab card) ──────────────────────────────────
 
 function SitemapExplorer() {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.sitemap_explorer' });
   const [slug, setSlug] = useState('');
   const [data, setData] = useState<{
     tenant_slug: string;
@@ -2347,7 +2358,7 @@ function SitemapExplorer() {
       const res = await adminPrerender.sitemapExplorer(slug.trim());
       if (res.data) setData(res.data);
     } catch {
-      setError('Lookup failed — check the tenant slug');
+      setError(t('error'));
     } finally {
       setLoading(false);
     }
@@ -2357,47 +2368,45 @@ function SitemapExplorer() {
     <Card shadow="sm">
       <CardHeader>
         <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Search size={18} />Sitemap explorer
+          <Search size={18} />{t('title')}
         </h3>
       </CardHeader>
       <CardBody className="space-y-3">
         <p className="text-sm text-default-500">
-          See exactly which routes the engine plans to render for a tenant — static floor
-          (feature/module gated) plus the dynamic URLs from <code>SitemapService</code>.
-          The Playwright worker visits this list.
+          {t('description_prefix')} <code>SitemapService</code>. {t('description_suffix')}
         </p>
         <div className="flex gap-2 items-end">
           <Input
-            label="Tenant slug"
-            placeholder="hour-timebank"
+            label={t('fields.tenant_slug')}
+            placeholder={t('placeholders.tenant_slug')}
             variant="bordered"
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
             className="max-w-sm"
           />
           <Button color="primary" onPress={submit} isLoading={loading}>
-            Explore
+            {t('actions.explore')}
           </Button>
         </div>
         {error && <p className="text-danger text-sm">{error}</p>}
         {data && (
           <div className="space-y-3">
             <div className="flex gap-2">
-              <Chip color="primary" variant="flat" size="sm">{data.static_routes.length} static</Chip>
-              <Chip color="secondary" variant="flat" size="sm">{data.dynamic_routes.length} dynamic</Chip>
-              <Chip variant="flat" size="sm">{data.total_count} total</Chip>
+              <Chip color="primary" variant="flat" size="sm">{t('counts.static', { count: data.static_routes.length })}</Chip>
+              <Chip color="secondary" variant="flat" size="sm">{t('counts.dynamic', { count: data.dynamic_routes.length })}</Chip>
+              <Chip variant="flat" size="sm">{t('counts.total', { count: data.total_count })}</Chip>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <p className="text-xs font-medium mb-1">Static routes</p>
+                <p className="text-xs font-medium mb-1">{t('sections.static_routes')}</p>
                 <Code className="text-xs whitespace-pre-wrap block max-h-64 overflow-auto">
                   {data.static_routes.join('\n')}
                 </Code>
               </div>
               <div>
-                <p className="text-xs font-medium mb-1">Dynamic routes (capped at 1,000)</p>
+                <p className="text-xs font-medium mb-1">{t('sections.dynamic_routes')}</p>
                 <Code className="text-xs whitespace-pre-wrap block max-h-64 overflow-auto">
-                  {data.dynamic_routes.length > 0 ? data.dynamic_routes.join('\n') : '(none)'}
+                  {data.dynamic_routes.length > 0 ? data.dynamic_routes.join('\n') : t('none')}
                 </Code>
               </div>
             </div>
