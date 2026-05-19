@@ -592,6 +592,7 @@
     "action_error": "Action failed",
     "tracking_number": "Tracking:",
     "track": "Track",
+    "quantity_multiplier": "x{{count}}",
     "tab_all": "All",
     "tab_active": "Active",
     "tab_completed": "Completed",

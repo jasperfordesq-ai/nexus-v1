@@ -70,11 +70,11 @@ const TAB_STATUS_MAP: Record<OrderTab, string | undefined> = {
 };
 
 const SHIPPING_METHODS = [
-  { key: 'standard', label: 'Standard Post' },
-  { key: 'express', label: 'Express / Courier' },
-  { key: 'tracked', label: 'Tracked Post' },
-  { key: 'hand_delivery', label: 'Hand Delivery' },
-  { key: 'other', label: 'Other' },
+  { key: 'standard' },
+  { key: 'express' },
+  { key: 'tracked' },
+  { key: 'hand_delivery' },
+  { key: 'other' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -160,7 +160,7 @@ function SellerOrderCard({
               </span>
               {order.quantity > 1 && (
                 <span className="text-xs text-default-400 ml-1">
-                  x{order.quantity}
+                  {t('orders.quantity_multiplier', { count: order.quantity })}
                 </span>
               )}
             </div>
@@ -459,7 +459,7 @@ export function SellerOrdersPage() {
             >
               {SHIPPING_METHODS.map((method) => (
                 <SelectItem key={method.key}>
-                  {t(`orders.seller.shipping_method_${method.key}`, method.label)}
+                  {t(`orders.seller.shipping_method_${method.key}`)}
                 </SelectItem>
               ))}
             </Select>
