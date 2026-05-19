@@ -820,9 +820,9 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
     setLoading(true);
     adminPrerender.getInventory(tenant.trim() || undefined)
       .then((res) => { if (res.data) setItems(res.data.items); })
-      .catch(() => toast.error('Failed to load inventory'))
+      .catch(() => toast.error(t('errors.load')))
       .finally(() => setLoading(false));
-  }, [tenant, toast]);
+  }, [t, tenant, toast]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -884,11 +884,11 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
         invalidated += res.data?.invalidated ?? 0;
       }
 
-      toast.success(`Invalidated ${invalidated} snapshots and queued recache`);
+      toast.success(t('messages.bulk_recache', { count: invalidated }));
       setSelected(new Set());
       load();
     } catch {
-      toast.error('Bulk recache failed');
+      toast.error(t('errors.bulk_recache'));
     } finally {
       setBulkLoading(false);
     }
@@ -924,7 +924,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
       const res = await adminPrerender.inspect(item.cache_path);
       if (res.data) setInspecting(res.data as PrerenderInspect);
     } catch {
-      toast.error('Failed to inspect snapshot');
+      toast.error(t('errors.inspect'));
     } finally {
       setInspectLoading(false);
     }
@@ -935,8 +935,8 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
       <Card shadow="sm">
         <CardBody className="gap-3 flex-row flex-wrap items-end">
           <Input
-            label="Filter"
-            placeholder="route or host substring"
+            label={t('filters.filter')}
+            placeholder={t('filters.filter_placeholder')}
             variant="bordered"
             value={filter}
             onValueChange={setFilter}
@@ -944,49 +944,49 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
             className="max-w-xs"
           />
           <Select
-            label="Staleness"
+            label={t('filters.staleness')}
             variant="bordered"
             selectedKeys={[stalenessFilter]}
             onSelectionChange={(s) => setStalenessFilter(Array.from(s)[0] as string)}
             className="max-w-[180px]"
           >
-            <SelectItem key="all">All</SelectItem>
-            <SelectItem key="fresh">Fresh</SelectItem>
-            <SelectItem key="warn">Aging</SelectItem>
-            <SelectItem key="stale">Stale</SelectItem>
+            <SelectItem key="all">{t('filters.all')}</SelectItem>
+            <SelectItem key="fresh">{t('filters.fresh')}</SelectItem>
+            <SelectItem key="warn">{t('filters.aging')}</SelectItem>
+            <SelectItem key="stale">{t('filters.stale')}</SelectItem>
           </Select>
           <Select
-            label="Issue"
+            label={t('filters.issue')}
             variant="bordered"
             selectedKeys={[issueFilter]}
             onSelectionChange={(s) => setIssueFilter(Array.from(s)[0] as string)}
             className="max-w-[180px]"
           >
-            <SelectItem key="all">All</SelectItem>
-            <SelectItem key="content_stale">Content drifted</SelectItem>
-            <SelectItem key="asset_invalid">Asset broken</SelectItem>
+            <SelectItem key="all">{t('filters.all')}</SelectItem>
+            <SelectItem key="content_stale">{t('filters.content_drifted')}</SelectItem>
+            <SelectItem key="asset_invalid">{t('filters.asset_broken')}</SelectItem>
           </Select>
           <Select
-            label="Status"
+            label={t('filters.status')}
             variant="bordered"
             selectedKeys={[statusFilter]}
             onSelectionChange={(s) => setStatusFilter(Array.from(s)[0] as string)}
             className="max-w-[150px]"
           >
-            <SelectItem key="all">All</SelectItem>
-            <SelectItem key="200">200 only</SelectItem>
-            <SelectItem key="non-200">Non-200</SelectItem>
+            <SelectItem key="all">{t('filters.all')}</SelectItem>
+            <SelectItem key="200">{t('filters.status_200')}</SelectItem>
+            <SelectItem key="non-200">{t('filters.status_non_200')}</SelectItem>
           </Select>
           <Input
-            label="Tenant slug"
-            placeholder="optional"
+            label={t('filters.tenant_slug')}
+            placeholder={t('filters.tenant_placeholder')}
             variant="bordered"
             value={tenant}
             onValueChange={setTenant}
             className="max-w-xs"
           />
           <Button variant="flat" onPress={load} startContent={<RefreshCw size={14} />}>
-            Reload
+            {t('actions.reload')}
           </Button>
           <span className="text-sm text-default-500 ml-auto self-center">
             {filtered.length} of {items.length} snapshots
@@ -999,7 +999,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
               onPress={bulkRecache}
               isLoading={bulkLoading}
             >
-              Recache selected ({selected.size})
+              {t('actions.recache_selected', { count: selected.size })}
             </Button>
           )}
         </CardBody>
@@ -1008,7 +1008,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
       {loading ? (
         <div className="flex justify-center py-8"><Spinner /></div>
       ) : (
-        <Table aria-label="Snapshot inventory" removeWrapper isStriped>
+        <Table aria-label={t('table_aria')} removeWrapper isStriped>
           <TableHeader>
             <TableColumn>
               {isSuperAdmin ? (
@@ -1019,19 +1019,19 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                     filtered.slice(0, 500).every((r) => selected.has(r.cache_path))
                   }
                   onValueChange={toggleAllVisible}
-                  aria-label="Select all visible"
+                  aria-label={t('actions.select_all_visible')}
                 />
               ) : ''}
             </TableColumn>
-            <TableColumn>HOST</TableColumn>
-            <TableColumn>ROUTE</TableColumn>
-            <TableColumn>HTTP</TableColumn>
-            <TableColumn>SIZE</TableColumn>
-            <TableColumn>AGE</TableColumn>
-            <TableColumn>STATUS</TableColumn>
-            <TableColumn>ACTIONS</TableColumn>
+            <TableColumn>{t('columns.host')}</TableColumn>
+            <TableColumn>{t('columns.route')}</TableColumn>
+            <TableColumn>{t('columns.http')}</TableColumn>
+            <TableColumn>{t('columns.size')}</TableColumn>
+            <TableColumn>{t('columns.age')}</TableColumn>
+            <TableColumn>{t('columns.status')}</TableColumn>
+            <TableColumn>{t('columns.actions')}</TableColumn>
           </TableHeader>
-          <TableBody emptyContent="No snapshots match filters">
+          <TableBody emptyContent={t('empty')}>
             {filtered.slice(0, 500).map((it) => (
               <TableRow key={it.cache_path}>
                 <TableCell>
@@ -1040,7 +1040,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                       size="sm"
                       isSelected={selected.has(it.cache_path)}
                       onValueChange={() => toggleSelect(it.cache_path)}
-                      aria-label={`Select ${it.cache_path}`}
+                      aria-label={t('actions.select_snapshot', { path: it.cache_path })}
                     />
                   ) : null}
                 </TableCell>

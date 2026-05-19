@@ -1725,8 +1725,50 @@
         "actions": {
           "inspect": "Inspect",
           "inspect_snapshot": "Inspect {{path}}",
-          "open_rendered_url": "Open rendered URL"
-        }
+          "open_rendered_url": "Open rendered URL",
+          "recache_selected": "Recache selected ({{count}})",
+          "reload": "Reload",
+          "select_all_visible": "Select all visible",
+          "select_snapshot": "Select {{path}}"
+        },
+        "columns": {
+          "actions": "Actions",
+          "age": "Age",
+          "host": "Host",
+          "http": "HTTP",
+          "route": "Route",
+          "size": "Size",
+          "status": "Status"
+        },
+        "empty": "No snapshots match filters",
+        "errors": {
+          "bulk_recache": "Bulk recache failed",
+          "inspect": "Failed to inspect snapshot",
+          "load": "Failed to load inventory"
+        },
+        "filters": {
+          "aging": "Aging",
+          "all": "All",
+          "asset_broken": "Asset broken",
+          "content_drifted": "Content drifted",
+          "filter": "Filter",
+          "filter_placeholder": "route or host substring",
+          "fresh": "Fresh",
+          "issue": "Issue",
+          "stale": "Stale",
+          "staleness": "Staleness",
+          "status": "Status",
+          "status_200": "200 only",
+          "status_non_200": "Non-200",
+          "tenant_placeholder": "optional",
+          "tenant_slug": "Tenant slug"
+        },
+        "messages": {
+          "bulk_recache": "Invalidated {{count}} snapshots and queued recache"
+        },
+        "selected": "{{count}} selected",
+        "summary": "{{filtered}} of {{total}} snapshots",
+        "table_aria": "Snapshot inventory"
       },
       "jobs": {
         "actions": {
