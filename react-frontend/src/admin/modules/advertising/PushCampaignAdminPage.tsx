@@ -561,12 +561,15 @@ export default function PushCampaignAdminPage() {
                 {campaigns.map((c) => (
                   <TableRow key={c.id}>
                     <TableCell>
-                      <button
-                        className="text-primary text-sm font-medium hover:underline text-left"
-                        onClick={() => openDetailModal(c)}
+                      <Button
+                        size="sm"
+                        variant="light"
+                        color="primary"
+                        className="h-auto min-h-0 justify-start px-0 text-left font-medium"
+                        onPress={() => openDetailModal(c)}
                       >
                         {c.name}
-                      </button>
+                      </Button>
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">

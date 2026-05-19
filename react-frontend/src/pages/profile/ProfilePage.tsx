@@ -957,13 +957,15 @@ export function ProfilePage() {
                     className={`text-theme-muted whitespace-pre-wrap prose prose-sm max-w-none dark:prose-invert${!isOwnProfile && !bioExpanded && profile.bio.length > 300 ? ' line-clamp-4' : ''}`}
                   />
                   {!isOwnProfile && profile.bio.length > 300 && (
-                    <button
-                      type="button"
-                      className="mt-1 text-xs text-indigo-500 hover:underline focus:outline-none"
-                      onClick={() => setBioExpanded((v) => !v)}
+                    <Button
+                      size="sm"
+                      variant="light"
+                      color="primary"
+                      className="mt-1 h-auto min-h-0 px-0 text-xs"
+                      onPress={() => setBioExpanded((v) => !v)}
                     >
                       {bioExpanded ? t('read_less') : t('read_more')}
-                    </button>
+                    </Button>
                   )}
                   <TranslateButton
                     contentType="profile_bio"

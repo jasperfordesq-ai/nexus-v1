@@ -207,30 +207,34 @@ function MessageBubble({ message, userName, userAvatar, onFeedback }: MessageBub
           <span className="text-xs text-[var(--color-text-muted)]">{time}</span>
           {!isUser && !message.isError && onFeedback && (message.traceId || message.messageId) && (
             <div className="flex items-center gap-1">
-              <button
-                type="button"
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
                 aria-label={t('thumbs_up_aria')}
-                onClick={() => onFeedback(message.id, 'up')}
-                className={`p-0.5 rounded transition-colors ${
+                onPress={() => onFeedback(message.id, 'up')}
+                className={`h-6 min-w-6 ${
                   message.feedback === 'up'
                     ? 'text-green-600 dark:text-green-400'
                     : 'text-[var(--color-text-muted)] hover:text-green-600 dark:hover:text-green-400'
                 }`}
               >
                 <ThumbsUp className="w-3.5 h-3.5" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
                 aria-label={t('thumbs_down_aria')}
-                onClick={() => onFeedback(message.id, 'down')}
-                className={`p-0.5 rounded transition-colors ${
+                onPress={() => onFeedback(message.id, 'down')}
+                className={`h-6 min-w-6 ${
                   message.feedback === 'down'
                     ? 'text-red-600 dark:text-red-400'
                     : 'text-[var(--color-text-muted)] hover:text-red-600 dark:hover:text-red-400'
                 }`}
               >
                 <ThumbsDown className="w-3.5 h-3.5" aria-hidden="true" />
-              </button>
+              </Button>
             </div>
           )}
         </div>
