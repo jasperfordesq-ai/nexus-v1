@@ -62,15 +62,6 @@ const STATUS_COLORS: Record<Project['status'], StatusColor> = {
   completed: 'success',
   cancelled: 'default',
 };
-const STATUS_LABELS: Record<Project['status'], string> = {
-  proposed: 'Proposed',
-  under_review: 'Under Review',
-  approved: 'Approved',
-  rejected: 'Rejected',
-  active: 'Active',
-  completed: 'Completed',
-  cancelled: 'Cancelled',
-};
 
 /* ─────────────────────────── Component ─────────────────────────── */
 export function CommunityProjectsTab() {
@@ -115,12 +106,12 @@ export function CommunityProjectsTab() {
             : [];
         setProjects(items);
       } else {
-        setError(tRef.current('community_projects.load_error', 'Unable to load community projects.'));
+        setError(tRef.current('community_projects.load_error'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load community projects', err);
-      setError(tRef.current('community_projects.load_error', 'Unable to load community projects.'));
+      setError(tRef.current('community_projects.load_error'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
@@ -164,7 +155,7 @@ export function CommunityProjectsTab() {
               : p,
           ),
         );
-        toast.error(t('community_projects.support_failed', 'Failed to update support.'));
+        toast.error(t('community_projects.support_failed'));
       }
     } catch (err) {
       logError('Failed to toggle project support', err);
@@ -176,7 +167,7 @@ export function CommunityProjectsTab() {
             : p,
         ),
       );
-      toast.error(t('community_projects.support_failed', 'Failed to update support.'));
+      toast.error(t('community_projects.support_failed'));
     } finally {
       setTogglingId(null);
     }
@@ -184,7 +175,7 @@ export function CommunityProjectsTab() {
 
   const handleSubmit = async (onClose: () => void) => {
     if (!form.title.trim() || !form.description.trim()) {
-      toast.error(t('community_projects.title_required', 'Title and description are required.'));
+      toast.error(t('community_projects.title_required'));
       return;
     }
     try {
@@ -199,16 +190,16 @@ export function CommunityProjectsTab() {
       if (form.proposed_date) payload.proposed_date = form.proposed_date;
       const res = await api.post('/v2/volunteering/community-projects', payload);
       if (res.success) {
-        toast.success(t('community_projects.propose_success', 'Project proposed successfully!'));
+        toast.success(t('community_projects.propose_success'));
         setForm({ title: '', description: '', category: '', location: '', target_volunteers: '', proposed_date: '' });
         onClose();
         load();
       } else {
-        toast.error(t('community_projects.propose_error', 'Failed to propose project.'));
+        toast.error(t('community_projects.propose_error'));
       }
     } catch (err) {
       logError('Failed to propose community project', err);
-      toast.error(t('community_projects.propose_error', 'Failed to propose project.'));
+      toast.error(t('community_projects.propose_error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -220,7 +211,7 @@ export function CommunityProjectsTab() {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <Lightbulb className="w-5 h-5 text-amber-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">{t('community_projects.heading', 'Community Projects')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('community_projects.heading')}</h2>
         </div>
         <Button
           className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
@@ -228,7 +219,7 @@ export function CommunityProjectsTab() {
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={onOpen}
         >
-          {t('community_projects.propose', 'Propose a Project')}
+          {t('community_projects.propose')}
         </Button>
       </div>
 
@@ -238,7 +229,7 @@ export function CommunityProjectsTab() {
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
-            {t('community_projects.try_again', 'Try Again')}
+            {t('community_projects.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -261,8 +252,8 @@ export function CommunityProjectsTab() {
       {!error && !isLoading && projects.length === 0 && (
         <EmptyState
           icon={<Lightbulb className="w-12 h-12" aria-hidden="true" />}
-          title={t('community_projects.empty_title', 'No community projects yet')}
-          description={t('community_projects.empty_description', 'Be the first to propose a volunteer project for the community!')}
+          title={t('community_projects.empty_title')}
+          description={t('community_projects.empty_description')}
         />
       )}
 
@@ -273,12 +264,12 @@ export function CommunityProjectsTab() {
             <motion.div key={project.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
               <GlassCard className="p-5 flex flex-col h-full">
                 {/* Title + Status */}
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className="text-base font-semibold text-theme-primary line-clamp-2">
+                <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
+                  <h3 className="min-w-0 flex-1 text-base font-semibold text-theme-primary line-clamp-2">
                     {project.title}
                   </h3>
-                  <Chip size="sm" variant="flat" color={STATUS_COLORS[project.status]}>
-                    {t(`community_projects.status.${project.status}`, STATUS_LABELS[project.status])}
+                  <Chip size="sm" variant="flat" color={STATUS_COLORS[project.status]} className="shrink-0">
+                    {t(`community_projects.status.${project.status}`)}
                   </Chip>
                 </div>
 
@@ -311,7 +302,7 @@ export function CommunityProjectsTab() {
                   {project.target_volunteers != null && (
                     <span className="flex items-center gap-1">
                       <Users className="w-3 h-3" aria-hidden="true" />
-                      {t('community_projects.volunteers_needed', '{{count}} needed', { count: project.target_volunteers })}
+                      {t('community_projects.volunteers_needed', { count: project.target_volunteers })}
                     </span>
                   )}
                 </div>
@@ -356,19 +347,19 @@ export function CommunityProjectsTab() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="text-theme-primary">{t('community_projects.modal_title', 'Propose a Project')}</ModalHeader>
+              <ModalHeader className="text-theme-primary">{t('community_projects.modal_title')}</ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label={t('community_projects.form.title', 'Title')}
-                  placeholder={t('community_projects.form.title_placeholder', 'Project title')}
+                  label={t('community_projects.form.title')}
+                  placeholder={t('community_projects.form.title_placeholder')}
                   variant="bordered"
                   isRequired
                   value={form.title}
                   onValueChange={(v) => setForm((f) => ({ ...f, title: v }))}
                 />
                 <Textarea
-                  label={t('community_projects.form.description', 'Description')}
-                  placeholder={t('community_projects.form.description_placeholder', 'Describe the project and its goals')}
+                  label={t('community_projects.form.description')}
+                  placeholder={t('community_projects.form.description_placeholder')}
                   variant="bordered"
                   isRequired
                   minRows={3}
@@ -377,29 +368,29 @@ export function CommunityProjectsTab() {
                 />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
-                    label={t('community_projects.form.category', 'Category')}
-                    placeholder={t('community_projects.form.category_placeholder', 'e.g. Environment, Education')}
+                    label={t('community_projects.form.category')}
+                    placeholder={t('community_projects.form.category_placeholder')}
                     variant="bordered"
                     value={form.category}
                     onValueChange={(v) => setForm((f) => ({ ...f, category: v }))}
                   />
                   <Input
-                    label={t('community_projects.form.location', 'Location')}
-                    placeholder={t('community_projects.form.location_placeholder', 'Where will this take place?')}
+                    label={t('community_projects.form.location')}
+                    placeholder={t('community_projects.form.location_placeholder')}
                     variant="bordered"
                     value={form.location}
                     onValueChange={(v) => setForm((f) => ({ ...f, location: v }))}
                   />
                   <Input
-                    label={t('community_projects.form.target_volunteers', 'Target Volunteers')}
-                    placeholder={t('community_projects.form.target_volunteers_placeholder', 'Number of volunteers needed')}
+                    label={t('community_projects.form.target_volunteers')}
+                    placeholder={t('community_projects.form.target_volunteers_placeholder')}
                     type="number"
                     variant="bordered"
                     value={form.target_volunteers}
                     onValueChange={(v) => setForm((f) => ({ ...f, target_volunteers: v }))}
                   />
                   <Input
-                    label={t('community_projects.form.proposed_date', 'Proposed Date')}
+                    label={t('community_projects.form.proposed_date')}
                     type="date"
                     variant="bordered"
                     value={form.proposed_date}
@@ -408,13 +399,13 @@ export function CommunityProjectsTab() {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('community_projects.cancel', 'Cancel')}</Button>
+                <Button variant="flat" onPress={onClose}>{t('community_projects.cancel')}</Button>
                 <Button
                   className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                   isLoading={isSubmitting}
                   onPress={() => handleSubmit(onClose)}
                 >
-                  {t('community_projects.propose_button', 'Propose')}
+                  {t('community_projects.propose_button')}
                 </Button>
               </ModalFooter>
             </>
