@@ -44,6 +44,38 @@ class MarketplaceOfferTenantEmailTest extends TestCase
         $this->assertSame(2, TenantContext::getId());
     }
 
+    public function test_create_offer_rejects_buyer_from_different_tenant_before_email_and_bell(): void
+    {
+        $tenantId = 999;
+        [$seller, , $listingId] = $this->createSellerBuyerAndListing($tenantId);
+        $crossTenantBuyer = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'email' => 'offer-cross-buyer-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $mailer = $this->fakeMailer();
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        TenantContext::setById($this->testTenantId);
+
+        try {
+            MarketplaceOfferService::create((int) $crossTenantBuyer->id, $listingId, [
+                'amount' => 12.50,
+                'currency' => 'EUR',
+                'message' => 'Wrong tenant offer attempt.',
+            ]);
+            $this->fail('Cross-tenant marketplace offer was not rejected.');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame(__('api_controllers_2.marketplace_offer.buyer_tenant_mismatch'), $e->getMessage());
+        }
+
+        $this->assertCount(0, $mailer->calls);
+        $this->assertSame(0, DB::table('marketplace_offers')->where('marketplace_listing_id', $listingId)->count());
+        $this->assertSame(0, DB::table('notifications')->where('tenant_id', $tenantId)->where('user_id', $seller->id)->count());
+        $this->assertSame($this->testTenantId, TenantContext::getId());
+    }
+
     public function test_accept_offer_uses_offer_tenant_not_ambient_context_for_email_bell_and_other_offers(): void
     {
         $tenantId = 999;

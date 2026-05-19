@@ -32,6 +32,14 @@ class MarketplaceOfferService
         $tenantId = (int) $listing->tenant_id;
 
         return TenantContext::runForTenant($tenantId, function () use ($buyerId, $listingId, $data, $listing, $tenantId): MarketplaceOffer {
+            $buyerBelongsToTenant = DB::table('users')
+                ->where('id', $buyerId)
+                ->where('tenant_id', $tenantId)
+                ->exists();
+            if (!$buyerBelongsToTenant) {
+                throw new \InvalidArgumentException(__('api_controllers_2.marketplace_offer.buyer_tenant_mismatch'));
+            }
+
             // Prevent self-offers
             if ($listing->user_id === $buyerId) {
                 throw new \InvalidArgumentException('Cannot make an offer on your own listing.');
