@@ -65,6 +65,74 @@ class VolunteerReminderService
         return TenantContext::runForTenant($tenantId, $callback);
     }
 
+    private static function claimReminderDelivery(int $tenantId, int $userId, string $reminderType, int $referenceId, string $channel): bool
+    {
+        try {
+            $inserted = DB::table('vol_reminder_delivery_claims')->insertOrIgnore([
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'reminder_type' => $reminderType,
+                'reference_id' => $referenceId,
+                'channel' => $channel,
+                'status' => 'claimed',
+                'claimed_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return (int) $inserted > 0;
+        } catch (\Throwable $e) {
+            Log::warning('[VolunteerReminderService] reminder delivery claim failed', [
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'reminder_type' => $reminderType,
+                'reference_id' => $referenceId,
+                'channel' => $channel,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
+    }
+
+    private static function releaseReminderDeliveryClaim(int $tenantId, int $userId, string $reminderType, int $referenceId, string $channel): void
+    {
+        DB::table('vol_reminder_delivery_claims')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->where('reminder_type', $reminderType)
+            ->where('reference_id', $referenceId)
+            ->where('channel', $channel)
+            ->whereNull('delivered_at')
+            ->delete();
+    }
+
+    private static function markReminderDeliverySent(int $tenantId, int $userId, string $reminderType, int $referenceId, string $channel): bool
+    {
+        $inserted = DB::table('vol_reminders_sent')->insertOrIgnore([
+            'tenant_id' => $tenantId,
+            'user_id' => $userId,
+            'reminder_type' => $reminderType,
+            'reference_id' => $referenceId,
+            'channel' => $channel,
+            'sent_at' => now(),
+        ]);
+
+        DB::table('vol_reminder_delivery_claims')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->where('reminder_type', $reminderType)
+            ->where('reference_id', $referenceId)
+            ->where('channel', $channel)
+            ->update([
+                'status' => 'delivered',
+                'delivered_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        return (int) $inserted > 0;
+    }
+
     /**
      * Send reminders for an opportunity's upcoming shifts.
      *
@@ -142,9 +210,19 @@ class VolunteerReminderService
                         continue;
                     }
 
+                    $claimedChannels = [];
+                    foreach ($channels as $channel) {
+                        if (self::claimReminderDelivery($tenantId, (int) $userId, 'pre_shift', (int) $shift->id, $channel)) {
+                            $claimedChannels[] = $channel;
+                        }
+                    }
+                    if (empty($claimedChannels)) {
+                        continue;
+                    }
+
                     // Send email if the email channel is enabled
                     $emailOk = true;
-                    if (in_array('email', $channels, true)) {
+                    if (in_array('email', $claimedChannels, true)) {
                         $user = DB::table('users')
                             ->where('id', $userId)
                             ->where('tenant_id', $tenantId)
@@ -209,21 +287,20 @@ class VolunteerReminderService
                     }
 
                     if (!$emailOk) {
+                        foreach ($claimedChannels as $channel) {
+                            self::releaseReminderDeliveryClaim($tenantId, (int) $userId, 'pre_shift', (int) $shift->id, $channel);
+                        }
                         continue;
                     }
 
-                    foreach ($channels as $channel) {
-                        DB::table('vol_reminders_sent')->insert([
-                            'tenant_id' => $tenantId,
-                            'user_id' => $userId,
-                            'reminder_type' => 'pre_shift',
-                            'reference_id' => (int) $shift->id,
-                            'channel' => $channel,
-                            'sent_at' => now(),
-                        ]);
+                    $recorded = false;
+                    foreach ($claimedChannels as $channel) {
+                        $recorded = self::markReminderDeliverySent($tenantId, (int) $userId, 'pre_shift', (int) $shift->id, $channel) || $recorded;
                     }
 
-                    $sentCount++;
+                    if ($recorded) {
+                        $sentCount++;
+                    }
                 } catch (\Throwable $e) {
                     \Illuminate\Support\Facades\Log::warning("VolunteerReminderService::sendReminders error for user {$userId}: " . $e->getMessage());
                 }
@@ -489,9 +566,19 @@ class VolunteerReminderService
                                 continue;
                             }
 
+                            $claimedChannels = [];
+                            foreach ($channels as $channel) {
+                                if (self::claimReminderDelivery((int) $tenantId, (int) $userId, 'pre_shift', (int) $shift->id, $channel)) {
+                                    $claimedChannels[] = $channel;
+                                }
+                            }
+                            if (empty($claimedChannels)) {
+                                continue;
+                            }
+
                             // Send email
                             $emailOk = true;
-                            if ($emailEnabled) {
+                            if ($emailEnabled && in_array('email', $claimedChannels, true)) {
                                 $user = DB::table('users')
                                     ->where('id', $userId)
                                     ->where('tenant_id', $tenantId)
@@ -544,22 +631,21 @@ class VolunteerReminderService
                             }
 
                             if (!$emailOk) {
+                                foreach ($claimedChannels as $channel) {
+                                    self::releaseReminderDeliveryClaim((int) $tenantId, (int) $userId, 'pre_shift', (int) $shift->id, $channel);
+                                }
                                 continue;
                             }
 
                             // Record reminder attempt for each successfully handled channel.
-                            foreach ($channels as $channel) {
-                                DB::table('vol_reminders_sent')->insert([
-                                    'tenant_id'     => $tenantId,
-                                    'user_id'       => $userId,
-                                    'reminder_type' => 'pre_shift',
-                                    'reference_id'  => (int) $shift->id,
-                                    'channel'       => $channel,
-                                    'sent_at'       => now(),
-                                ]);
+                            $recorded = false;
+                            foreach ($claimedChannels as $channel) {
+                                $recorded = self::markReminderDeliverySent((int) $tenantId, (int) $userId, 'pre_shift', (int) $shift->id, $channel) || $recorded;
                             }
 
-                            $totalSent++;
+                            if ($recorded) {
+                                $totalSent++;
+                            }
                         } catch (\Throwable $e) {
                             Log::warning('[VolunteerReminderService] sendPreShiftReminders error for user ' . $userId . ': ' . $e->getMessage());
                         }
@@ -654,9 +740,19 @@ class VolunteerReminderService
                                 continue;
                             }
 
+                            $claimedChannels = [];
+                            foreach ($channels as $channel) {
+                                if (self::claimReminderDelivery((int) $tenantId, (int) $userId, 'post_shift_feedback', (int) $shift->id, $channel)) {
+                                    $claimedChannels[] = $channel;
+                                }
+                            }
+                            if (empty($claimedChannels)) {
+                                continue;
+                            }
+
                             // Send email
                             $emailOk = true;
-                            if ($emailEnabled) {
+                            if ($emailEnabled && in_array('email', $claimedChannels, true)) {
                                 $user = DB::table('users')
                                     ->where('id', $userId)
                                     ->where('tenant_id', $tenantId)
@@ -698,22 +794,21 @@ class VolunteerReminderService
                             }
 
                             if (!$emailOk) {
+                                foreach ($claimedChannels as $channel) {
+                                    self::releaseReminderDeliveryClaim((int) $tenantId, (int) $userId, 'post_shift_feedback', (int) $shift->id, $channel);
+                                }
                                 continue;
                             }
 
                             // Record feedback request for each successfully handled channel.
-                            foreach ($channels as $channel) {
-                                DB::table('vol_reminders_sent')->insert([
-                                    'tenant_id'     => $tenantId,
-                                    'user_id'       => $userId,
-                                    'reminder_type' => 'post_shift_feedback',
-                                    'reference_id'  => (int) $shift->id,
-                                    'channel'       => $channel,
-                                    'sent_at'       => now(),
-                                ]);
+                            $recorded = false;
+                            foreach ($claimedChannels as $channel) {
+                                $recorded = self::markReminderDeliverySent((int) $tenantId, (int) $userId, 'post_shift_feedback', (int) $shift->id, $channel) || $recorded;
                             }
 
-                            $totalSent++;
+                            if ($recorded) {
+                                $totalSent++;
+                            }
                         } catch (\Throwable $e) {
                             Log::warning('[VolunteerReminderService] sendPostShiftFeedback error for user ' . $userId . ': ' . $e->getMessage());
                         }
