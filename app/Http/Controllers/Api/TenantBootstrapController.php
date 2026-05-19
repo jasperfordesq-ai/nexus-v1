@@ -569,7 +569,13 @@ class TenantBootstrapController extends BaseApiController
 
     private function buildBrandingData(array $tenant, ?array $config): array
     {
-        $branding = [];
+        $branding = [
+            'name' => $tenant['name'] ?? '',
+        ];
+
+        if (!empty($tenant['tagline'])) {
+            $branding['tagline'] = $tenant['tagline'];
+        }
 
         if (!empty($tenant['logo_url'])) {
             $branding['logo_url'] = UrlHelper::absolute($tenant['logo_url']);
