@@ -24,6 +24,12 @@ import {
   Select,
   SelectItem,
   Chip,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
 } from '@heroui/react';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -396,46 +402,34 @@ export function BiasAuditPage() {
               {t('bias_audit.rejection_rates_title')}
             </h2>
             <p className="text-sm text-theme-muted mb-4">{t('bias_audit.rejection_rates_description')}</p>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--color-border)]">
-                    <th className="text-left py-2 px-3 text-theme-muted font-medium">
-                      {t('bias_audit.stage.applied', 'Stage')}
-                    </th>
-                    <th className="text-right py-2 px-3 text-theme-muted font-medium">
-                      {t('bias_audit.total_at_stage')}
-                    </th>
-                    <th className="text-right py-2 px-3 text-theme-muted font-medium">
-                      {t('bias_audit.rejections')}
-                    </th>
-                    <th className="text-right py-2 px-3 text-theme-muted font-medium">
-                      {t('bias_audit.rate')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(report.rejection_rates).map(([stage, data]) => (
-                    <tr key={stage} className="border-b border-[var(--color-border)] last:border-b-0">
-                      <td className="py-2 px-3 text-theme-primary font-medium">
-                        {t(`bias_audit.stage.${stage}`, stage)}
-                      </td>
-                      <td className="py-2 px-3 text-right text-theme-muted">{data.total_at_stage}</td>
-                      <td className="py-2 px-3 text-right text-theme-muted">{data.rejections}</td>
-                      <td className="py-2 px-3 text-right">
-                        <Chip
-                          size="sm"
-                          variant="flat"
-                          color={data.rate > 50 ? 'danger' : data.rate > 25 ? 'warning' : 'success'}
-                        >
-                          {data.rate}%
-                        </Chip>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Table aria-label={t('bias_audit.rejection_rates_table_aria')} removeWrapper>
+              <TableHeader>
+                <TableColumn>{t('bias_audit.stage.applied', 'Stage')}</TableColumn>
+                <TableColumn align="end">{t('bias_audit.total_at_stage')}</TableColumn>
+                <TableColumn align="end">{t('bias_audit.rejections')}</TableColumn>
+                <TableColumn align="end">{t('bias_audit.rate')}</TableColumn>
+              </TableHeader>
+              <TableBody>
+                {Object.entries(report.rejection_rates).map(([stage, data]) => (
+                  <TableRow key={stage}>
+                    <TableCell className="font-medium text-theme-primary">
+                      {t(`bias_audit.stage.${stage}`, stage)}
+                    </TableCell>
+                    <TableCell className="text-right text-theme-muted">{data.total_at_stage}</TableCell>
+                    <TableCell className="text-right text-theme-muted">{data.rejections}</TableCell>
+                    <TableCell className="text-right">
+                      <Chip
+                        size="sm"
+                        variant="flat"
+                        color={data.rate > 50 ? 'danger' : data.rate > 25 ? 'warning' : 'success'}
+                      >
+                        {data.rate}%
+                      </Chip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </GlassCard>
 
           {/* Time in Stage */}

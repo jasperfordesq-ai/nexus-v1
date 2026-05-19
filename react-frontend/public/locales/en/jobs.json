@@ -729,6 +729,7 @@
     "funnel_description": "How candidates progress through pipeline stages",
     "rejection_rates_title": "Rejection Rates by Stage",
     "rejection_rates_description": "Percentage of candidates rejected at each stage",
+    "rejection_rates_table_aria": "Rejection rates by hiring stage",
     "time_in_stage_title": "Average Time in Stage",
     "time_in_stage_description": "Average number of days candidates spend in each pipeline stage",
     "skills_match_title": "Skills Match Correlation",
