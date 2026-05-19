@@ -244,6 +244,8 @@
     "price_max": "Max",
     "condition_label": "Condition",
     "category_details": "{{name}} Details",
+    "any_field": "Any {{field}}",
+    "filter_by_field": "Filter by {{field}}",
     "reset_filters": "Reset Filters ({{count}})",
     "no_listings_title": "No Listings Found",
     "no_listings_filtered": "Try adjusting your search or filters.",

@@ -97,7 +97,7 @@ export function MarketplaceCategoryPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('page_title', 'Marketplace'));
+  usePageTitle(t('page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -160,15 +160,15 @@ export function MarketplaceCategoryPage() {
               // No template fields -- that is fine
             }
           } else {
-            setCategoryError(t('category.not_found_title', 'Category not found'));
+            setCategoryError(t('category.not_found_title'));
           }
         } else {
-          setCategoryError(t('category.not_found_description', 'Unable to load category'));
+          setCategoryError(t('category.not_found_description'));
         }
       } catch (err) {
         if (!cancelled) {
           logError('Failed to load category', err);
-          setCategoryError(t('category.not_found_description', 'Unable to load category'));
+          setCategoryError(t('category.not_found_description'));
         }
       } finally {
         if (!cancelled) setIsCategoryLoading(false);
@@ -182,7 +182,7 @@ export function MarketplaceCategoryPage() {
   // Update page title
   useEffect(() => {
     if (category?.name) {
-      document.title = `${category.name} - ${t('page_title', 'Marketplace')}`;
+      document.title = `${category.name} - ${t('page_title')}`;
     }
   }, [category?.name, t])
 
@@ -241,7 +241,7 @@ export function MarketplaceCategoryPage() {
       }
     } catch (err) {
       logError('Failed to load category listings', err);
-      if (!append) toast.error(t('hub.unable_to_load', 'Failed to load listings'));
+      if (!append) toast.error(t('hub.unable_to_load'));
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -287,7 +287,7 @@ export function MarketplaceCategoryPage() {
   // Save / Unsave
   const handleSave = async (id: number) => {
     if (!isAuthenticated) {
-      toast.error(t('common.sign_in_to_save', 'Please sign in to save listings'));
+      toast.error(t('common.sign_in_to_save'));
       return;
     }
     try {
@@ -295,16 +295,16 @@ export function MarketplaceCategoryPage() {
       setListings((prev) =>
         prev.map((l) => (l.id === id ? { ...l, is_saved: true } : l))
       );
-      toast.success(t('common.saved_for_later', 'Saved for later'));
+      toast.success(t('common.saved_for_later'));
     } catch (err) {
       logError('Failed to save listing', err);
-      toast.error(t('common.save_failed', 'Failed to update saved status'));
+      toast.error(t('common.save_failed'));
     }
   };
 
   const handleUnsave = async (id: number) => {
     if (!isAuthenticated) {
-      toast.error(t('common.sign_in_to_save', 'Please sign in to save listings'));
+      toast.error(t('common.sign_in_to_save'));
       return;
     }
     try {
@@ -312,10 +312,10 @@ export function MarketplaceCategoryPage() {
       setListings((prev) =>
         prev.map((l) => (l.id === id ? { ...l, is_saved: false } : l))
       );
-      toast.success(t('common.removed_from_saved', 'Removed from saved'));
+      toast.success(t('common.removed_from_saved'));
     } catch (err) {
       logError('Failed to unsave listing', err);
-      toast.error(t('common.save_failed', 'Failed to update saved status'));
+      toast.error(t('common.save_failed'));
     }
   };
 
@@ -333,9 +333,9 @@ export function MarketplaceCategoryPage() {
       <div className="max-w-3xl mx-auto px-4 py-12">
         <EmptyState
           icon={<Tag className="w-8 h-8" />}
-          title={t('category.not_found_title', 'Category Not Found')}
-          description={categoryError || t('category.not_found_description', 'This category does not exist.')}
-          action={{ label: t('category.back_to_marketplace', 'Back to Marketplace'), onClick: () => navigate(tenantPath('/marketplace')) }}
+          title={t('category.not_found_title')}
+          description={categoryError || t('category.not_found_description')}
+          action={{ label: t('category.back_to_marketplace'), onClick: () => navigate(tenantPath('/marketplace')) }}
         />
       </div>
     );
@@ -346,12 +346,12 @@ export function MarketplaceCategoryPage() {
     <div className="space-y-5">
       {/* Price range */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('category.price_range', 'Price Range')}</label>
+        <label className="text-sm font-medium text-foreground mb-2 block">{t('category.price_range')}</label>
         <div className="flex gap-2 items-center">
           <Input
             size="sm"
             type="number"
-            placeholder={t('category.price_min', 'Min')}
+            placeholder={t('category.price_min')}
             min={0}
             value={priceMin}
             onValueChange={setPriceMin}
@@ -360,7 +360,7 @@ export function MarketplaceCategoryPage() {
           <Input
             size="sm"
             type="number"
-            placeholder={t('category.price_max', 'Max')}
+            placeholder={t('category.price_max')}
             min={0}
             value={priceMax}
             onValueChange={setPriceMax}
@@ -370,7 +370,7 @@ export function MarketplaceCategoryPage() {
 
       {/* Condition */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('category.condition_label', 'Condition')}</label>
+        <label className="text-sm font-medium text-foreground mb-2 block">{t('category.condition_label')}</label>
         <CheckboxGroup
           value={selectedConditions}
           onValueChange={setSelectedConditions}
@@ -388,14 +388,14 @@ export function MarketplaceCategoryPage() {
       {templateFields.length > 0 && (
         <div className="space-y-3">
           <Divider />
-          <p className="text-sm font-medium text-default-500">{t('category.category_details', '{{name}} Details', { name: category.name })}</p>
+          <p className="text-sm font-medium text-default-500">{t('category.category_details', { name: category.name })}</p>
           {templateFields.map((field) => {
             if (field.type === 'select' && field.options) {
               return (
                 <Select
                   key={field.key}
                   label={field.label}
-                  placeholder={`Any ${field.label}`}
+                  placeholder={t('category.any_field', { field: field.label })}
                   size="sm"
                   selectedKeys={templateFilterValues[field.key] ? [templateFilterValues[field.key]].filter(Boolean) as string[] : []}
                   onSelectionChange={(keys) => {
@@ -416,7 +416,7 @@ export function MarketplaceCategoryPage() {
               <Input
                 key={field.key}
                 label={field.label}
-                placeholder={`Filter by ${field.label.toLowerCase()}`}
+                placeholder={t('category.filter_by_field', { field: field.label.toLowerCase() })}
                 size="sm"
                 type={field.type === 'number' ? 'number' : 'text'}
                 value={templateFilterValues[field.key] || ''}
@@ -439,7 +439,7 @@ export function MarketplaceCategoryPage() {
           startContent={<RotateCcw className="w-3.5 h-3.5" />}
           onPress={resetFilters}
         >
-          {t('category.reset_filters', 'Reset Filters ({{count}})', { count: activeFilterCount })}
+          {t('category.reset_filters', { count: activeFilterCount })}
         </Button>
       )}
     </div>
@@ -448,8 +448,8 @@ export function MarketplaceCategoryPage() {
   return (
     <>
       <PageMeta
-        title={`${category.name} - ${t('page_title', 'Marketplace')}`}
-        description={category.description || t('category.browse_description', 'Browse {{name}} listings in the marketplace.', { name: category.name })}
+        title={`${category.name} - ${t('page_title')}`}
+        description={category.description || t('category.browse_description', { name: category.name })}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
@@ -459,7 +459,7 @@ export function MarketplaceCategoryPage() {
             to={tenantPath('/marketplace')}
             className="text-default-500 hover:text-primary transition-colors"
           >
-            {t('category.marketplace', 'Marketplace')}
+            {t('category.marketplace')}
           </Link>
           <ChevronRight className="w-3.5 h-3.5 text-default-300" />
           <span className="text-foreground font-medium">{category.name}</span>
@@ -467,7 +467,7 @@ export function MarketplaceCategoryPage() {
 
         {/* Category header */}
         <GlassCard className="p-6">
-          <div className="flex items-center gap-4">
+          <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
               {category.icon ? (
                 <span className="text-2xl">{category.icon}</span>
@@ -481,16 +481,16 @@ export function MarketplaceCategoryPage() {
                 <p className="text-sm text-default-500 mt-1">{category.description}</p>
               )}
               <p className="text-xs text-default-400 mt-1">
-                {t('category.listing_count', '{{count}} listing', { count: category.listing_count })}{category.listing_count !== 1 ? 's' : ''}
+                {t('category.listings_count', { count: category.listing_count })}
               </p>
             </div>
           </div>
         </GlassCard>
 
         {/* Search + Sort */}
-        <div className="flex gap-3 items-end">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <Input
-            placeholder={t('category.search_placeholder', 'Search in {{name}}...', { name: category.name })}
+            placeholder={t('category.search_placeholder', { name: category.name })}
             value={searchQuery}
             onValueChange={setSearchQuery}
             startContent={<Search className="w-4 h-4 text-default-400" />}
@@ -499,7 +499,7 @@ export function MarketplaceCategoryPage() {
             classNames={{ inputWrapper: 'bg-background' }}
             isClearable
             onClear={() => setSearchQuery('')}
-            className="flex-1"
+            className="w-full sm:flex-1"
           />
           <Select
             selectedKeys={[sortBy]}
@@ -509,7 +509,7 @@ export function MarketplaceCategoryPage() {
             }}
             size="lg"
             className="w-48 shrink-0 hidden sm:block"
-            aria-label={t('common.sort_by', 'Sort by')}
+            aria-label={t('common.sort_by')}
           >
             {SORT_OPTIONS.map((opt) => (
               <SelectItem key={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
@@ -518,11 +518,11 @@ export function MarketplaceCategoryPage() {
           <Button
             variant="bordered"
             size="lg"
-            className="lg:hidden shrink-0"
+            className="w-full shrink-0 sm:w-auto lg:hidden"
             startContent={<SlidersHorizontal className="w-4 h-4" />}
             onPress={() => setShowFilters(!showFilters)}
           >
-            {t('category.filters', 'Filters')}
+            {t('category.filters')}
             {activeFilterCount > 0 && (
               <Chip size="sm" color="primary" variant="solid" className="ml-1">
                 {activeFilterCount}
@@ -552,7 +552,7 @@ export function MarketplaceCategoryPage() {
             <GlassCard className="p-5 sticky top-24">
               <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-primary" />
-                {t('category.filters_title', 'Filters')}
+                {t('category.filters_title')}
               </h3>
               {filterContent}
             </GlassCard>
@@ -565,17 +565,17 @@ export function MarketplaceCategoryPage() {
             ) : listings.length === 0 ? (
               <EmptyState
                 icon={<ShoppingBag className="w-8 h-8" />}
-                title={t('category.no_listings_title', 'No Listings Found')}
+                title={t('category.no_listings_title')}
                 description={
                   debouncedQuery || activeFilterCount > 0
-                    ? t('category.no_listings_filtered', 'Try adjusting your search or filters.')
-                    : t('category.no_listings_empty', 'No listings in {{name}} yet. Be the first to list something!', { name: category.name })
+                    ? t('category.no_listings_filtered')
+                    : t('category.no_listings_empty', { name: category.name })
                 }
                 action={
                   activeFilterCount > 0
-                    ? { label: t('category.clear_filters', 'Clear Filters'), onClick: resetFilters }
+                    ? { label: t('category.clear_filters'), onClick: resetFilters }
                     : isAuthenticated
-                      ? { label: t('category.sell_something', 'Sell Something'), onClick: () => navigate(tenantPath('/marketplace/sell')) }
+                      ? { label: t('category.sell_something'), onClick: () => navigate(tenantPath('/marketplace/sell')) }
                       : undefined
                 }
               />
@@ -583,7 +583,7 @@ export function MarketplaceCategoryPage() {
               <>
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm text-default-500">
-                    {t('category.results_count', '{{count}} result', { count: listings.length })}{listings.length !== 1 ? 's' : ''}
+                    {t('category.results_count', { count: listings.length })}
                   </p>
                   <Select
                     selectedKeys={[sortBy]}
@@ -593,7 +593,7 @@ export function MarketplaceCategoryPage() {
                     }}
                     size="sm"
                     className="w-44 sm:hidden"
-                    aria-label={t('common.sort_by', 'Sort by')}
+                    aria-label={t('common.sort_by')}
                   >
                     {SORT_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
@@ -616,7 +616,7 @@ export function MarketplaceCategoryPage() {
                       onPress={() => loadListings(true)}
                       isLoading={isLoadingMore}
                     >
-                      {t('category.load_more', 'Load More')}
+                      {t('category.load_more')}
                     </Button>
                   </div>
                 )}
