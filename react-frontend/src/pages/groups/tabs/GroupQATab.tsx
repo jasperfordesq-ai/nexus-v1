@@ -20,6 +20,8 @@ import {
   ModalBody,
   ModalFooter,
   Chip,
+  Tab,
+  Tabs,
   useDisclosure,
 } from '@heroui/react';
 import HelpCircle from 'lucide-react/icons/circle-help';
@@ -183,7 +185,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
         setExpandedDetail(resp.data as QuestionDetail);
       } catch (err) {
         logError('GroupQATab.loadDetail', err);
-        toast.error(t('qa.load_error', 'Failed to load question'));
+        toast.error(t('qa.load_error'));
         setExpandedId(null);
       } finally {
         setLoadingDetail(false);
@@ -206,14 +208,14 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
         body: askBody.trim(),
       });
 
-      toast.success(t('qa.ask_success', 'Question posted'));
+      toast.success(t('qa.ask_success'));
       setAskTitle('');
       setAskBody('');
       askModal.onClose();
       loadQuestions(true);
     } catch (err) {
       logError('GroupQATab.ask', err);
-      toast.error(t('qa.ask_error', 'Failed to post question'));
+      toast.error(t('qa.ask_error'));
     } finally {
       setAsking(false);
     }
@@ -232,14 +234,14 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
         body: answerBody.trim(),
       });
 
-      toast.success(t('qa.answer_success', 'Answer posted'));
+      toast.success(t('qa.answer_success'));
       setAnswerBody('');
       // Refresh expanded detail and list counts
       toggleExpand(expandedId);
       loadQuestions(true);
     } catch (err) {
       logError('GroupQATab.answer', err);
-      toast.error(t('qa.answer_error', 'Failed to post answer'));
+      toast.error(t('qa.answer_error'));
     } finally {
       setSubmittingAnswer(false);
     }
@@ -311,7 +313,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
       }
     } catch (err) {
       logError('GroupQATab.vote', err);
-      toast.error(t('qa.vote_error', 'Failed to register vote'));
+      toast.error(t('qa.vote_error'));
     } finally {
       setVotingIds((prev) => {
         const next = new Set(prev);
@@ -331,7 +333,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
     try {
       await api.post(`/v2/groups/${groupId}/answers/${answerId}/accept`);
 
-      toast.success(t('qa.accept_success', 'Answer accepted'));
+      toast.success(t('qa.accept_success'));
 
       // Update local state
       setExpandedDetail((prev) =>
@@ -355,7 +357,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
       );
     } catch (err) {
       logError('GroupQATab.accept', err);
-      toast.error(t('qa.accept_error', 'Failed to accept answer'));
+      toast.error(t('qa.accept_error'));
     }
   };
 
@@ -364,9 +366,9 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
   // ─────────────────────────────────────────────────────────────────────
 
   const sortOptions: { key: SortOption; label: string }[] = [
-    { key: 'newest', label: t('qa.sort_newest', 'Newest') },
-    { key: 'most_voted', label: t('qa.sort_most_voted', 'Most Voted') },
-    { key: 'unanswered', label: t('qa.sort_unanswered', 'Unanswered') },
+    { key: 'newest', label: t('qa.sort_newest') },
+    { key: 'most_voted', label: t('qa.sort_most_voted') },
+    { key: 'unanswered', label: t('qa.sort_unanswered') },
   ];
 
   // ─────────────────────────────────────────────────────────────────────
@@ -395,7 +397,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
           className={userVote === 1 ? 'text-success' : 'text-default-400'}
           onPress={() => handleVote(type, targetId, 1)}
           isDisabled={isVoting || !isMember}
-          aria-label={t('qa.upvote_aria', 'Upvote')}
+          aria-label={t('qa.upvote_aria')}
         >
           <ArrowUp className="w-4 h-4" />
         </Button>
@@ -418,7 +420,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
           className={userVote === -1 ? 'text-danger' : 'text-default-400'}
           onPress={() => handleVote(type, targetId, -1)}
           isDisabled={isVoting || !isMember}
-          aria-label={t('qa.downvote_aria', 'Downvote')}
+          aria-label={t('qa.downvote_aria')}
         >
           <ArrowDown className="w-4 h-4" />
         </Button>
@@ -434,7 +436,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
     return (
       <div
         className="flex justify-center py-12"
-        aria-label={t('qa.loading', 'Loading questions')}
+        aria-label={t('qa.loading')}
         aria-busy="true"
       >
         <Spinner size="lg" />
@@ -447,13 +449,13 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <Input
-          placeholder={t('qa.search_placeholder', 'Search questions...')}
+          placeholder={t('qa.search_placeholder')}
           value={search}
           onValueChange={setSearch}
           startContent={<Search className="w-4 h-4 text-default-400" aria-hidden="true" />}
           className="flex-1"
           size="sm"
-          aria-label={t('qa.search_aria', 'Search questions')}
+          aria-label={t('qa.search_aria')}
         />
         {isMember && (
           <Button
@@ -462,37 +464,37 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             onPress={askModal.onOpen}
           >
-            {t('qa.ask_question', 'Ask Question')}
+            {t('qa.ask_question')}
           </Button>
         )}
       </div>
 
       {/* Sort tabs */}
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label={t('qa.sort_aria', 'Sort questions')}>
+      <Tabs
+        aria-label={t('qa.sort_aria')}
+        selectedKey={sort}
+        onSelectionChange={(key) => setSort(key as SortOption)}
+        variant="underlined"
+        color="primary"
+        classNames={{
+          tabList: 'w-full gap-2 overflow-x-auto rounded-lg border border-default-200 bg-content1 px-2',
+          tab: 'h-10 px-3',
+        }}
+      >
         {sortOptions.map((opt) => (
-          <Chip
-            key={opt.key}
-            variant={sort === opt.key ? 'solid' : 'bordered'}
-            color="primary"
-            className="cursor-pointer"
-            onClick={() => setSort(opt.key)}
-            role="tab"
-            aria-selected={sort === opt.key}
-          >
-            {opt.label}
-          </Chip>
+          <Tab key={opt.key} title={opt.label} />
         ))}
-      </div>
+      </Tabs>
 
       {/* Question list */}
       {questions.length === 0 ? (
         <EmptyState
           icon={<HelpCircle className="w-12 h-12" aria-hidden="true" />}
-          title={t('qa.empty_title', 'No questions yet')}
+          title={t('qa.empty_title')}
           description={
             search
-              ? t('qa.no_results', 'No questions match your search')
-              : t('qa.empty_description', 'Be the first to ask a question in this group')
+              ? t('qa.no_results')
+              : t('qa.empty_description')
           }
         />
       ) : (
@@ -507,7 +509,6 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                 aria-expanded={expandedId === question.id}
                 aria-label={t('qa.expand_aria', {
                   title: question.title,
-                  defaultValue: `Toggle question: ${question.title}`,
                 })}
               >
                 <div className="flex items-start gap-3 w-full">
@@ -548,9 +549,9 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                         color="success"
                         variant="flat"
                         startContent={<CheckCircle className="w-3 h-3" aria-hidden="true" />}
-                        aria-label={t('qa.accepted_badge', 'Has accepted answer')}
+                        aria-label={t('qa.accepted_badge')}
                       >
-                        {t('qa.accepted', 'Accepted')}
+                        {t('qa.accepted')}
                       </Chip>
                     )}
                     <Chip
@@ -559,7 +560,6 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                       startContent={<MessageSquare className="w-3 h-3" aria-hidden="true" />}
                       aria-label={t('qa.answer_count_aria', {
                         count: question.answer_count,
-                        defaultValue: `${question.answer_count} answers`,
                       })}
                     >
                       {question.answer_count}
@@ -586,7 +586,6 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                           <h4 className="text-sm font-semibold text-theme-primary">
                             {t('qa.answers_heading', {
                               count: expandedDetail.answers.length,
-                              defaultValue: `${expandedDetail.answers.length} Answer(s)`,
                             })}
                           </h4>
 
@@ -619,7 +618,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                                       <span aria-hidden="true">&#183;</span>
                                       <span className="text-success font-medium flex items-center gap-1">
                                         <CheckCircle className="w-3 h-3" aria-hidden="true" />
-                                        {t('qa.accepted_answer', 'Accepted Answer')}
+                                        {t('qa.accepted_answer')}
                                       </span>
                                     </>
                                   )}
@@ -637,7 +636,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                                     size="sm"
                                     color="success"
                                     onPress={() => handleAccept(answer.id)}
-                                    aria-label={t('qa.accept_aria', 'Accept this answer')}
+                                    aria-label={t('qa.accept_aria')}
                                     className="flex-shrink-0"
                                   >
                                     <Check className="w-4 h-4" />
@@ -652,12 +651,12 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                       {isMember && (
                         <div className="space-y-2 pt-2 border-t border-default-200">
                           <Textarea
-                            placeholder={t('qa.answer_placeholder', 'Write your answer...')}
+                            placeholder={t('qa.answer_placeholder')}
                             value={answerBody}
                             onValueChange={setAnswerBody}
                             minRows={3}
                             size="sm"
-                            aria-label={t('qa.answer_input_aria', 'Your answer')}
+                            aria-label={t('qa.answer_input_aria')}
                           />
                           <div className="flex justify-end">
                             <Button
@@ -667,7 +666,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                               isLoading={submittingAnswer}
                               isDisabled={!answerBody.trim()}
                             >
-                              {t('qa.post_answer', 'Post Answer')}
+                              {t('qa.post_answer')}
                             </Button>
                           </div>
                         </div>
@@ -685,7 +684,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
       {hasMore && (
         <div className="flex justify-center pt-4">
           <Button variant="flat" size="sm" onPress={() => loadQuestions(false)} isLoading={loading}>
-            {t('qa.load_more', 'Load More')}
+            {t('qa.load_more')}
           </Button>
         </div>
       )}
@@ -693,36 +692,33 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
       {/* Ask Question modal */}
       <Modal isOpen={askModal.isOpen} onClose={askModal.onClose} size="lg">
         <ModalContent>
-          <ModalHeader>{t('qa.ask_title', 'Ask a Question')}</ModalHeader>
+          <ModalHeader>{t('qa.ask_title')}</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Input
-                label={t('qa.question_title_label', 'Title')}
-                placeholder={t('qa.question_title_placeholder', 'What is your question?')}
+                label={t('qa.question_title_label')}
+                placeholder={t('qa.question_title_placeholder')}
                 value={askTitle}
                 onValueChange={setAskTitle}
                 size="sm"
                 isRequired
-                aria-label={t('qa.question_title_aria', 'Question title')}
+                aria-label={t('qa.question_title_aria')}
               />
               <Textarea
-                label={t('qa.question_body_label', 'Details')}
-                placeholder={t(
-                  'qa.question_body_placeholder',
-                  'Provide more context or details about your question...',
-                )}
+                label={t('qa.question_body_label')}
+                placeholder={t('qa.question_body_placeholder')}
                 value={askBody}
                 onValueChange={setAskBody}
                 minRows={4}
                 size="sm"
                 isRequired
-                aria-label={t('qa.question_body_aria', 'Question details')}
+                aria-label={t('qa.question_body_aria')}
               />
             </div>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={askModal.onClose}>
-              {t('qa.cancel', 'Cancel')}
+              {t('qa.cancel')}
             </Button>
             <Button
               color="primary"
@@ -730,7 +726,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
               isLoading={asking}
               isDisabled={!askTitle.trim() || !askBody.trim()}
             >
-              {t('qa.submit_question', 'Post Question')}
+              {t('qa.submit_question')}
             </Button>
           </ModalFooter>
         </ModalContent>
