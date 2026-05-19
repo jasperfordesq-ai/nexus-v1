@@ -137,7 +137,7 @@ export default function SellerCouponEditPage() {
       navigate(tenantPath('/marketplace/seller/coupons'));
     } catch (err) {
       logError('SellerCouponEditPage.save', err);
-      toast.error(t('errors.unexpected', 'Something went wrong'));
+      toast.error(t('errors.unexpected'));
     } finally {
       setSaving(false);
     }
@@ -276,9 +276,9 @@ export default function SellerCouponEditPage() {
               value={form.min_order_cents}
               onValueChange={(v) => setForm((f) => ({ ...f, min_order_cents: v }))}
             />
-            <div className="flex justify-end gap-2 mt-2">
+            <div className="flex flex-col justify-end gap-2 mt-2 sm:flex-row">
               <Button as={Link} to={tenantPath('/marketplace/seller/coupons')} variant="light">
-                {t('common.cancel', 'Cancel')}
+                {t('common.cancel')}
               </Button>
               <Button color="primary" type="submit" isLoading={saving}>
                 {t('coupon.seller.save')}
