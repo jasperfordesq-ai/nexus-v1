@@ -9,15 +9,28 @@
  * All admin pages render inside this layout.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AdminSidebar } from './components/AdminSidebar';
 import { AdminHeader } from './components/AdminHeader';
 import { AdminBreadcrumbs } from './components/AdminBreadcrumbs';
-import { PageMeta } from '@/components/seo';
+import { AdminMetaProvider, AdminMetaTags } from './AdminMetaContext';
 export function AdminLayout() {
   const { t } = useTranslation('admin_nav');
+  const defaultMeta = useMemo(() => ({
+    title: t('admin'),
+    description: t('admin_meta_description'),
+  }), [t]);
+
+  return (
+    <AdminMetaProvider defaultMeta={defaultMeta}>
+      <AdminLayoutShell />
+    </AdminMetaProvider>
+  );
+}
+
+function AdminLayoutShell() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const location = useLocation();
@@ -28,7 +41,7 @@ export function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-background">
-      <PageMeta title={t('admin')} noIndex />
+      <AdminMetaTags />
       {/* Sidebar — hidden on mobile, shown on md+ */}
       <div className="hidden md:block">
         <AdminSidebar

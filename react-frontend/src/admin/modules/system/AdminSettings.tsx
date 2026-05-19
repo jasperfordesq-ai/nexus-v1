@@ -16,8 +16,9 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import Scale from 'lucide-react/icons/scale';
 import Lock from 'lucide-react/icons/lock';
 import { Link } from 'react-router-dom';
-import { usePageTitle } from '@/hooks';
+import { useTranslation } from 'react-i18next';
 import { useToast, useTenant, useAuth } from '@/contexts';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 import type { AdminSettingsResponse } from '../../api/types';
@@ -74,7 +75,8 @@ const DEFAULT_SETTINGS: SettingsForm = {
 };
 
 export function AdminSettings() {
-  usePageTitle("System");
+  const { t } = useTranslation('admin_nav');
+  useAdminPageMeta({ title: t('system') });
   const toast = useToast();
   const { tenant, tenantPath } = useTenant();
   const { user } = useAuth();

@@ -46,16 +46,16 @@ import Settings from 'lucide-react/icons/settings';
 import Rocket from 'lucide-react/icons/rocket';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
-import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { useOnboardingConfig } from '@/hooks/useOnboardingConfig';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { adminDashboard } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { AdminDashboardStats, ActivityLogEntry, MonthlyTrend } from '../../api/types';
 
 export function AdminDashboard() {
   const { t } = useTranslation('admin_dashboard');
-  usePageTitle(t('title'));
+  useAdminPageMeta({ title: t('title'), description: t('subtitle') });
   const { tenantPath } = useTenant();
   const toast = useToast();
 

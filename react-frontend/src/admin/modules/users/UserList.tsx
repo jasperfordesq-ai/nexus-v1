@@ -47,16 +47,16 @@ import AlertCircle from 'lucide-react/icons/circle-alert';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';
-import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { adminUsers, type BulkActionResult } from '../../api/adminApi';
 import { DataTable, StatusBadge, PageHeader, ConfirmModal, BulkActionToolbar, type BulkAction, type Column } from '../../components';
 import type { AdminUser, UserListParams } from '../../api/types';
 
 export function UserList() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('users.title'));
+  useAdminPageMeta({ title: t('users.title') });
   const { tenantPath, tenant } = useTenant();
   const toast = useToast();
   const { user: currentUser } = useAuth();

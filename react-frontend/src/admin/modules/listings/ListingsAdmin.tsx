@@ -30,8 +30,8 @@ import StarOff from 'lucide-react/icons/star-off';
 import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';
 import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { adminListings } from '../../api/adminApi';
 import { DataTable, StatusBadge, PageHeader, ConfirmModal, type Column } from '../../components';
 import type { AdminListing, FeaturedListing } from '../../api/types';
@@ -311,7 +311,10 @@ function FeaturedListingsPanel() {
 
 export function ListingsAdmin() {
   const { t } = useTranslation('admin');
-  usePageTitle("Listings");
+  useAdminPageMeta({
+    title: t('listings.listings_admin_title'),
+    description: t('listings.listings_admin_desc'),
+  });
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState('content');

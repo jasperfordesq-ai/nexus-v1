@@ -14,8 +14,9 @@ import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@heroui/react
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import Play from 'lucide-react/icons/play';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
-import { usePageTitle } from '@/hooks';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
@@ -33,7 +34,8 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default
 };
 
 export function SeoAudit() {
-  usePageTitle("Advanced");
+  const { t } = useTranslation('admin_nav');
+  useAdminPageMeta({ title: t('advanced') });
   const toast = useToast();
 
   const [checks, setChecks] = useState<AuditCheck[]>([]);

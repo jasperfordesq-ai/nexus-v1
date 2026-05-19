@@ -216,5 +216,6 @@
   "warmth_pass": "Warmth Pass",
   "care_recipient_circle": "Care Recipient Circle",
   "municipal_roi": "Municipal ROI",
-  "federation_aggregates": "Aggregates"
+  "federation_aggregates": "Aggregates",
+  "admin_meta_description": "Private Admin-Werkzeuge zur Verwaltung dieser Community."
 }

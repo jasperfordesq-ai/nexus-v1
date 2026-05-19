@@ -33,8 +33,9 @@ import CheckCircle from 'lucide-react/icons/circle-check-big';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import XCircle from 'lucide-react/icons/circle-x';
 import BarChart3 from 'lucide-react/icons/chart-column';
-import { usePageTitle } from '@/hooks';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader } from '../../components';
 import { adminSettings, adminTools } from '../../api/adminApi';
 // Keys that map to the backend's seo_* tenant_settings rows
@@ -68,7 +69,8 @@ interface ServerAuditResult {
 }
 
 export function SeoOverview() {
-  usePageTitle("Advanced");
+  const { t } = useTranslation('admin_nav');
+  useAdminPageMeta({ title: t('advanced') });
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -185,7 +187,7 @@ export function SeoOverview() {
         const error = (res as { error?: string }).error || "Save failed";
         toast.error(error);
       }
-    } catch (err) {
+    } catch {
       toast.error("Failed to save SEO settings");
     } finally {
       setSaving(false);
