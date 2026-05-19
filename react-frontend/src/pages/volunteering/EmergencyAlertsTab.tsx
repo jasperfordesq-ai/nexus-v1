@@ -90,12 +90,12 @@ export function EmergencyAlertsTab() {
         const payload = response.data as { alerts?: EmergencyAlert[] } | EmergencyAlert[];
         setAlerts(Array.isArray(payload) ? payload : Array.isArray(payload.alerts) ? payload.alerts : []);
       } else {
-        setError(tRef.current('emergency.error_load', 'Failed to load alerts'));
+        setError(tRef.current('emergency.error_load'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load emergency alerts', err);
-      setError(tRef.current('emergency.error_load_generic', 'Unable to load alerts.'));
+      setError(tRef.current('emergency.error_load_generic'));
     } finally {
       setIsLoading(false);
     }
@@ -110,23 +110,23 @@ export function EmergencyAlertsTab() {
       setRespondingTo({ id: alertId, action: response });
       const result = await api.put(`/v2/volunteering/emergency-alerts/${alertId}`, { response });
       if (result.success) {
-        toastRef.current.success(response === 'accepted' ? tRef.current('emergency.alert_accepted', 'Alert accepted.') : tRef.current('emergency.alert_declined', 'Alert declined.'));
+        toastRef.current.success(response === 'accepted' ? tRef.current('emergency.alert_accepted') : tRef.current('emergency.alert_declined'));
         load();
       } else {
-        toastRef.current.error(result.error || tRef.current('emergency.respond_error', 'Failed to respond to alert.'));
+        toastRef.current.error(result.error || tRef.current('emergency.respond_error'));
       }
     } catch (err) {
       logError('Failed to respond to alert', err);
-      toastRef.current.error(tRef.current('emergency.respond_error_generic', 'Failed to respond to alert. Please try again.'));
+      toastRef.current.error(tRef.current('emergency.respond_error_generic'));
     } finally {
       setRespondingTo(null);
     }
   };
 
   const priorityConfig = {
-    critical: { color: 'danger' as const, label: t('emergency.priority_critical', 'CRITICAL'), bgClass: 'border-red-500/30 bg-red-500/5' },
-    urgent: { color: 'warning' as const, label: t('emergency.priority_urgent', 'URGENT'), bgClass: 'border-amber-500/30 bg-amber-500/5' },
-    normal: { color: 'primary' as const, label: t('emergency.priority_normal', 'NORMAL'), bgClass: '' },
+    critical: { color: 'danger' as const, label: t('emergency.priority_critical'), bgClass: 'border-red-500/30 bg-red-500/5' },
+    urgent: { color: 'warning' as const, label: t('emergency.priority_urgent'), bgClass: 'border-amber-500/30 bg-amber-500/5' },
+    normal: { color: 'primary' as const, label: t('emergency.priority_normal'), bgClass: '' },
   };
 
   const containerVariants = {
@@ -141,13 +141,13 @@ export function EmergencyAlertsTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2">
           <Siren className="w-5 h-5 text-red-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">{t('emergency.title', 'Emergency Alerts')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('emergency.title')}</h2>
           {alerts.filter(a => a.my_response === 'pending').length > 0 && (
             <Chip size="sm" color="danger" variant="flat">
-              {t('emergency.pending_count', '{{count}} pending', { count: alerts.filter(a => a.my_response === 'pending').length })}
+              {t('emergency.pending_count', { count: alerts.filter(a => a.my_response === 'pending').length })}
             </Chip>
           )}
         </div>
@@ -159,7 +159,7 @@ export function EmergencyAlertsTab() {
           onPress={load}
           isLoading={isLoading}
         >
-          {t('common.refresh', 'Refresh')}
+          {t('common.refresh')}
         </Button>
       </div>
 
@@ -168,7 +168,7 @@ export function EmergencyAlertsTab() {
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
-            {t('common.try_again', 'Try Again')}
+            {t('common.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -188,8 +188,8 @@ export function EmergencyAlertsTab() {
       {!error && !isLoading && alerts.length === 0 && (
         <EmptyState
           icon={<Bell className="w-12 h-12" aria-hidden="true" />}
-          title={t('emergency.empty_title', 'No emergency alerts')}
-          description={t('emergency.empty_description', "You don't have any emergency shift requests at the moment.")}
+          title={t('emergency.empty_title')}
+          description={t('emergency.empty_description')}
         />
       )}
 
@@ -205,7 +205,7 @@ export function EmergencyAlertsTab() {
             return (
               <motion.div key={alert.id} variants={itemVariants}>
                 <GlassCard className={`p-5 border ${config.bgClass}`}>
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <Chip size="sm" color={config.color} variant="flat">
@@ -247,13 +247,14 @@ export function EmergencyAlertsTab() {
                         </div>
                       )}
 
-                      <p className="text-xs text-theme-subtle mt-2">
-                        {t('emergency.from', 'From')} {alert.coordinator.name} -- {t('emergency.expires', 'Expires')} {new Date(alert.expires_at).toLocaleString()}
-                      </p>
+                      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-theme-subtle">
+                        <span>{t('emergency.from')} {alert.coordinator.name}</span>
+                        <span>{t('emergency.expires')} {new Date(alert.expires_at).toLocaleString()}</span>
+                      </div>
                     </div>
 
                     {alert.my_response === 'pending' && (
-                      <div className="flex flex-col gap-2 flex-shrink-0">
+                      <div className="flex flex-col gap-2 sm:flex-shrink-0">
                         <Button
                           size="sm"
                           className="bg-gradient-to-r from-emerald-500 to-green-600 text-white"
@@ -262,7 +263,7 @@ export function EmergencyAlertsTab() {
                           isLoading={respondingTo?.id === alert.id && respondingTo?.action === 'accepted'}
                           isDisabled={respondingTo?.id === alert.id}
                         >
-                          {t('emergency.accept', 'Accept')}
+                          {t('emergency.accept')}
                         </Button>
                         <Button
                           size="sm"
@@ -273,7 +274,7 @@ export function EmergencyAlertsTab() {
                           isLoading={respondingTo?.id === alert.id && respondingTo?.action === 'declined'}
                           isDisabled={respondingTo?.id === alert.id}
                         >
-                          {t('emergency.decline', 'Decline')}
+                          {t('emergency.decline')}
                         </Button>
                       </div>
                     )}
@@ -284,7 +285,7 @@ export function EmergencyAlertsTab() {
                         color={alert.my_response === 'accepted' ? 'success' : 'danger'}
                         variant="flat"
                       >
-                        {alert.my_response === 'accepted' ? t('emergency.accepted', 'Accepted') : t('emergency.declined', 'Declined')}
+                        {alert.my_response === 'accepted' ? t('emergency.accepted') : t('emergency.declined')}
                       </Chip>
                     )}
                   </div>
