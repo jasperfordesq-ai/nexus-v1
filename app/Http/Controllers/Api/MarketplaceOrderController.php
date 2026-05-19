@@ -238,7 +238,7 @@ class MarketplaceOrderController extends BaseApiController
         }
 
         try {
-            $rating = MarketplaceRatingService::rateOrder($id, $userId, $role, $data);
+            $rating = MarketplaceRatingService::rateOrder($id, $userId, $role, $data, TenantContext::getId());
             return $this->respondWithData($rating->toArray(), null, 201);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
@@ -277,7 +277,7 @@ class MarketplaceOrderController extends BaseApiController
         ]);
 
         try {
-            $dispute = MarketplaceRatingService::openDispute($id, $userId, $data);
+            $dispute = MarketplaceRatingService::openDispute($id, $userId, $data, TenantContext::getId());
             return $this->respondWithData($dispute->toArray(), null, 201);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);

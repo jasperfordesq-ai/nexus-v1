@@ -34,13 +34,13 @@ class MarketplaceRatingService
      * Validates: order exists, user participated, order is completed,
      * and user hasn't already rated for this role.
      */
-    public static function rateOrder(int $orderId, int $raterId, string $role, array $data): MarketplaceSellerRating
+    public static function rateOrder(int $orderId, int $raterId, string $role, array $data, ?int $expectedTenantId = null): MarketplaceSellerRating
     {
         if (!in_array($role, ['buyer', 'seller'], true)) {
             throw new \InvalidArgumentException('Role must be buyer or seller.');
         }
 
-        $order = MarketplaceOrder::withoutGlobalScopes()->findOrFail($orderId);
+        $order = self::findOrderForTenant($orderId, $expectedTenantId);
         $tenantId = (int) ($order->tenant_id ?: TenantContext::getId());
 
         return TenantContext::runForTenant($tenantId, function () use ($order, $orderId, $raterId, $role, $data, $tenantId): MarketplaceSellerRating {
@@ -183,9 +183,9 @@ class MarketplaceRatingService
     /**
      * Open a dispute on an order.
      */
-    public static function openDispute(int $orderId, int $userId, array $data): MarketplaceDispute
+    public static function openDispute(int $orderId, int $userId, array $data, ?int $expectedTenantId = null): MarketplaceDispute
     {
-        $order = MarketplaceOrder::withoutGlobalScopes()->findOrFail($orderId);
+        $order = self::findOrderForTenant($orderId, $expectedTenantId);
         $tenantId = (int) ($order->tenant_id ?: TenantContext::getId());
 
         return TenantContext::runForTenant($tenantId, function () use ($order, $orderId, $userId, $data, $tenantId): MarketplaceDispute {
@@ -261,6 +261,22 @@ class MarketplaceRatingService
         return MarketplaceDispute::with('openedBy:id,first_name,last_name,avatar_url')
             ->where('order_id', $orderId)
             ->first();
+    }
+
+    private static function findOrderForTenant(int $orderId, ?int $expectedTenantId = null): MarketplaceOrder
+    {
+        $tenantId = $expectedTenantId ?? TenantContext::getId();
+        $query = MarketplaceOrder::withoutGlobalScopes()->whereKey($orderId);
+
+        if ($tenantId !== null) {
+            $query->where('tenant_id', (int) $tenantId);
+        } else {
+            Log::warning('[MarketplaceRatingService] order lookup without tenant context', [
+                'order_id' => $orderId,
+            ]);
+        }
+
+        return $query->firstOrFail();
     }
 
     // -----------------------------------------------------------------
