@@ -446,29 +446,25 @@ export default function MunicipalImpactReportsPage() {
       <Card className="mb-4" shadow="sm">
         <CardBody className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs font-medium uppercase text-default-500">Audience</p>
+            <p className="text-xs font-medium uppercase text-default-500">{t('municipal_reports.audience_selector.title')}</p>
             <p className="text-sm text-default-600">
-              Switch the narrative framing. Only the selected audience section is included in the PDF/CSV export.
+              {t('municipal_reports.audience_selector.description')}
             </p>
           </div>
           <div className="inline-flex rounded-lg border border-default-200 bg-default-50 p-1">
             {(['canton', 'municipality', 'cooperative'] as const).map((mode) => {
               const active = audienceMode === mode;
               return (
-                <button
+                <Button
                   key={mode}
-                  type="button"
-                  onClick={() => setAudienceMode(mode)}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition ${
-                    active
-                      ? 'bg-primary text-primary-foreground shadow'
-                      : 'text-default-600 hover:bg-default-100'
-                  }`}
+                  size="sm"
+                  color={active ? 'primary' : 'default'}
+                  variant={active ? 'solid' : 'light'}
+                  aria-pressed={active}
+                  onPress={() => setAudienceMode(mode)}
                 >
-                  {mode === 'canton' && 'Canton'}
-                  {mode === 'municipality' && 'Municipality'}
-                  {mode === 'cooperative' && 'Cooperative'}
-                </button>
+                  {t(`municipal_reports.templates.audiences.${mode}`)}
+                </Button>
               );
             })}
           </div>

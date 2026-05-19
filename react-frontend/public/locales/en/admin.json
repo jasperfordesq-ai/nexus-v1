@@ -1172,6 +1172,10 @@
       "export_csv": "Export CSV",
       "export_pdf": "Export PDF"
     },
+    "audience_selector": {
+      "title": "Audience",
+      "description": "Switch the narrative framing. Only the selected audience section is included in the PDF/CSV export."
+    },
     "stats": {
       "report_pack": "Report pack",
       "ready": "Ready",
