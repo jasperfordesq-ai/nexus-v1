@@ -12,11 +12,11 @@ import { useTranslation } from 'react-i18next';
 export default function DonationReceiptPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation('volunteering');
-  usePageTitle(t('donations.receipt_title', 'Donation Receipt'));
+  usePageTitle(t('donations.receipt_title'));
 
   return (
     <>
-      <PageMeta title={t('donations.receipt_title', 'Donation Receipt')} noIndex />
+      <PageMeta title={t('donations.receipt_title')} noIndex />
       <div className="mx-auto max-w-3xl px-4 py-8">
         <DonationReceipt donationId={Number(id ?? 0)} />
       </div>
