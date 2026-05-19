@@ -360,14 +360,14 @@ export function Partnerships() {
         message: counterMessage || undefined,
       });
       if (res.success) {
-        toast.success(`Counter proposal sent`);
+        toast.success(t('federation.counter_proposal_sent'));
         counterModal.onClose();
         loadData();
       } else {
-        toast.error("Failed to counter propose");
+        toast.error(t('federation.failed_to_counter_propose'));
       }
     } catch {
-      toast.error("Failed to counter propose");
+      toast.error(t('federation.failed_to_counter_propose'));
     } finally {
       setCounterLoading(false);
     }
