@@ -53,6 +53,19 @@ class VolunteerReminderService
     }
 
     /**
+     * Render/send a reminder under an explicit tenant and restore the worker
+     * context afterwards. Reminder jobs can run cross-tenant from cron.
+     *
+     * @template T
+     * @param callable():T $callback
+     * @return T
+     */
+    private static function withTenantContext(int $tenantId, callable $callback)
+    {
+        return TenantContext::runForTenant($tenantId, $callback);
+    }
+
+    /**
      * Send reminders for an opportunity's upcoming shifts.
      *
      * Finds confirmed volunteers for shifts belonging to the given opportunity
@@ -117,20 +130,15 @@ class VolunteerReminderService
 
                 // Record the reminder as sent
                 try {
-                    // Determine which channels are enabled
+                    // This service currently sends email only. Do not stamp
+                    // push/SMS rows as sent without provider delivery evidence.
                     $channels = [];
-                    if ($setting->push_enabled ?? true) {
-                        $channels[] = 'push';
-                    }
                     if ($setting->email_enabled ?? true) {
                         $channels[] = 'email';
                     }
-                    if ($setting->sms_enabled ?? false) {
-                        $channels[] = 'sms';
-                    }
 
                     if (empty($channels)) {
-                        $channels = ['push']; // default fallback
+                        continue;
                     }
 
                     // Send email if the email channel is enabled
@@ -143,8 +151,9 @@ class VolunteerReminderService
 
                         if ($user && !empty($user->email)) {
                             try {
-                                // Cron → render in recipient's language, not 'en' default.
-                                $emailOk = LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $userId, $tenantId): bool {
+                                // Cron → render in recipient's language and tenant, not leaked worker defaults.
+                                $emailOk = self::withTenantContext($tenantId, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $userId, $tenantId): bool {
+                                    return LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $userId, $tenantId): bool {
                                     $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                                     $shiftTime = $shift->start_time
                                         ? date('D, d M Y H:i', strtotime($shift->start_time))
@@ -186,6 +195,7 @@ class VolunteerReminderService
                                     }
 
                                     return true;
+                                    });
                                 });
                             } catch (\Throwable $e) {
                                 Log::warning('[VolunteerReminderService] sendReminders email exception: ' . $e->getMessage(), [
@@ -433,8 +443,6 @@ class VolunteerReminderService
 
                 $hoursBefore  = (int) ($setting->hours_before ?? 24);
                 $emailEnabled = (bool) ($setting->email_enabled ?? true);
-                $pushEnabled  = (bool) ($setting->push_enabled ?? true);
-                $smsEnabled   = (bool) ($setting->sms_enabled ?? false);
 
                 // Find shifts within the reminder window for this tenant
                 $shifts = DB::table('vol_shifts')
@@ -469,19 +477,14 @@ class VolunteerReminderService
                         }
 
                         try {
-                            // Build channel list
+                            // This service currently sends email only. Do not stamp
+                            // push/SMS rows as sent without provider delivery evidence.
                             $channels = [];
-                            if ($pushEnabled) {
-                                $channels[] = 'push';
-                            }
                             if ($emailEnabled) {
                                 $channels[] = 'email';
                             }
-                            if ($smsEnabled) {
-                                $channels[] = 'sms';
-                            }
                             if (empty($channels)) {
-                                $channels = ['push'];
+                                continue;
                             }
 
                             // Send email
@@ -493,10 +496,8 @@ class VolunteerReminderService
                                     ->first(['email', 'first_name', 'name', 'preferred_language']);
 
                                 if ($user && !empty($user->email)) {
-                                    // Set tenant context so Mailer and translations use the right tenant
-                                    TenantContext::setById($tenantId);
-
-                                    $emailOk = LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $tenantId, $userId): bool {
+                                    $emailOk = self::withTenantContext((int) $tenantId, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $tenantId, $userId): bool {
+                                        return LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $tenantId, $userId): bool {
                                         $firstName    = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                                         $shiftTime    = $shift->start_time
                                             ? date('D, d M Y H:i', strtotime($shift->start_time))
@@ -535,6 +536,7 @@ class VolunteerReminderService
                                         }
 
                                         return true;
+                                        });
                                     });
                                 }
                             }
@@ -607,8 +609,6 @@ class VolunteerReminderService
                 $setting      = $settingsByTenant->get($tenantId);
                 $hoursAfter   = (int) ($setting->hours_after ?? 2);
                 $emailEnabled = (bool) ($setting->email_enabled ?? true);
-                $pushEnabled  = (bool) ($setting->push_enabled ?? true);
-                $smsEnabled   = (bool) ($setting->sms_enabled ?? false);
 
                 // Find shifts that ended within the feedback window
                 $shifts = DB::table('vol_shifts')
@@ -641,19 +641,14 @@ class VolunteerReminderService
                         }
 
                         try {
-                            // Build channel list
+                            // This service currently sends email only. Do not stamp
+                            // push/SMS rows as sent without provider delivery evidence.
                             $channels = [];
-                            if ($pushEnabled) {
-                                $channels[] = 'push';
-                            }
                             if ($emailEnabled) {
                                 $channels[] = 'email';
                             }
-                            if ($smsEnabled) {
-                                $channels[] = 'sms';
-                            }
                             if (empty($channels)) {
-                                $channels = ['push'];
+                                continue;
                             }
 
                             // Send email
@@ -665,9 +660,8 @@ class VolunteerReminderService
                                     ->first(['email', 'first_name', 'name', 'preferred_language']);
 
                                 if ($user && !empty($user->email)) {
-                                    TenantContext::setById($tenantId);
-
-                                    $emailOk = LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $tenantId, $userId): bool {
+                                    $emailOk = self::withTenantContext((int) $tenantId, function () use ($user, $shift, $opportunityTitle, $tenantId, $userId): bool {
+                                        return LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $tenantId, $userId): bool {
                                         $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                                         $logHoursUrl = TenantContext::getFrontendUrl()
                                             . TenantContext::getSlugPrefix()
@@ -695,6 +689,7 @@ class VolunteerReminderService
                                         }
 
                                         return true;
+                                        });
                                     });
                                 }
                             }

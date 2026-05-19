@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Schema;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
+use App\Services\NotificationDispatcher;
 
 /**
  * AdminVolunteerController -- Admin volunteer management.
@@ -407,53 +408,65 @@ class AdminVolunteerController extends BaseApiController
                 $paymentOutcome = !empty($payResult['success']) ? 'paid' : 'insufficient';
             });
 
-            // Send hours approved/declined email notification
+            // Send hours approved/declined notification after the data mutation.
+            // If auto-pay succeeded, VolOrgWalletService already sent the wallet
+            // payment email, so create only the bell entry here to avoid duplicate
+            // volunteer emails for the same approval.
             try {
                 $volDetail = DB::selectOne(
-                    "SELECT u.email, u.first_name, u.name, u.preferred_language, vl.hours, vo.title as opportunity_title
+                    "SELECT u.id as user_id, u.email, u.first_name, u.name, u.preferred_language, vl.hours, vo.title as opportunity_title, org.name as organization_name
                      FROM vol_logs vl
                      LEFT JOIN users u ON vl.user_id = u.id AND u.tenant_id = ?
-                     LEFT JOIN vol_opportunities vo ON vl.opportunity_id = vo.id
+                     LEFT JOIN vol_opportunities vo ON vl.opportunity_id = vo.id AND vo.tenant_id = vl.tenant_id
+                     LEFT JOIN vol_organizations org ON vl.organization_id = org.id AND org.tenant_id = vl.tenant_id
                      WHERE vl.id = ? AND vl.tenant_id = ?",
                     [$tenantId, $id, $tenantId]
                 );
 
-                if ($volDetail && !empty($volDetail->email)) {
-                    LocaleContext::withLocale($volDetail, function () use ($volDetail, $newStatus, $tenantId) {
-                        $firstName = $volDetail->first_name ?? $volDetail->name ?? __('emails.common.fallback_name');
-                        $oppTitle = htmlspecialchars($volDetail->opportunity_title ?? 'your volunteering', ENT_QUOTES, 'UTF-8');
-                        $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteering';
-                        $emailKey = $newStatus === 'approved' ? 'hours_approved' : 'hours_declined';
+                if ($volDetail && !empty($volDetail->user_id)) {
+                    LocaleContext::withLocale($volDetail, function () use ($volDetail, $newStatus, $paymentOutcome, $tenantId) {
+                        $userId = (int) $volDetail->user_id;
+                        $hours = (float) ($volDetail->hours ?? 0);
+                        $orgName = (string) ($volDetail->organization_name ?? __('emails.common.fallback_organization'));
 
-                        $html = \App\Core\EmailTemplateBuilder::make()
-                            ->theme($newStatus === 'approved' ? 'success' : 'brand')
-                            ->title(__("emails.volunteer_approval.{$emailKey}_title"))
-                            ->previewText(__("emails.volunteer_approval.{$emailKey}_preview"))
-                            ->greeting($firstName)
-                            ->paragraph(__("emails.volunteer_approval.{$emailKey}_body", ['opportunity' => $oppTitle]))
-                            ->button(__("emails.volunteer_approval.{$emailKey}_cta"), $url)
-                            ->render();
-
-                        if (!\App\Services\EmailDispatchService::sendRaw(
-                            $volDetail->email,
-                            __("emails.volunteer_approval.{$emailKey}_subject"),
-                            $html,
-                            null,
-                            null,
-                            null,
-                            'volunteering',
-                            ['tenant_id' => $tenantId]
-                        )) {
-                            Log::warning('AdminVolunteerController: hours status email returned false', [
-                                'vol_log_id' => $id,
-                                'user_id' => $volDetail->user_id ?? null,
-                                'status' => $newStatus,
-                            ]);
+                        if ($newStatus === 'approved' && $paymentOutcome === 'paid') {
+                            Notification::createNotification(
+                                $userId,
+                                __('notifications.vol_hours_approved_paid_body', ['hours' => $hours]),
+                                '/wallet',
+                                'vol_hours_approved',
+                                true,
+                                $tenantId
+                            );
+                            return;
                         }
+
+                        if ($newStatus === 'approved') {
+                            NotificationDispatcher::dispatch(
+                                $userId,
+                                'global',
+                                0,
+                                'vol_hours_approved',
+                                __('notifications.vol_hours_approved_body', ['hours' => $hours]),
+                                '/volunteering?tab=hours',
+                                NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
+                            );
+                            return;
+                        }
+
+                        NotificationDispatcher::dispatch(
+                            $userId,
+                            'global',
+                            0,
+                            'vol_hours_declined',
+                            __('notifications.vol_hours_declined_body', ['hours' => $hours]),
+                            '/volunteering?tab=hours',
+                            NotificationDispatcher::buildVolHoursDeclinedEmail($hours, $orgName)
+                        );
                     });
                 }
             } catch (\Throwable $emailEx) {
-                Log::warning('AdminVolunteerController: hours status email failed: ' . $emailEx->getMessage());
+                Log::warning('AdminVolunteerController: hours status notification failed: ' . $emailEx->getMessage());
             }
 
             return $this->respondWithData([
