@@ -83,7 +83,7 @@ function toSharedCategory(cat: ApiCategory): MarketplaceCategory {
 
 export function MarketplacePage() {
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('page_title', 'Marketplace'));
+  usePageTitle(t('page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();
@@ -182,14 +182,14 @@ export function MarketplacePage() {
         cursorRef.current = response.meta?.cursor ?? response.meta?.next_cursor ?? null;
         setHasMore(response.meta?.has_more ?? response.data.length >= ITEMS_PER_PAGE);
       } else if (!append) {
-        setError(t('hub.unable_to_load', 'Unable to load listings'));
+        setError(t('hub.unable_to_load'));
       }
     } catch (err) {
       logError('Failed to load marketplace listings', err);
       if (!append) {
-        setError(t('hub.unable_to_load', 'Unable to load listings'));
+        setError(t('hub.unable_to_load'));
       } else {
-        toast.error(t('hub.load_more_failed', 'Failed to load more listings'));
+        toast.error(t('hub.load_more_failed'));
       }
     } finally {
       setIsLoading(false);
@@ -216,7 +216,7 @@ export function MarketplacePage() {
   // Save / Unsave handlers (separate for MarketplaceListingGrid onSave/onUnsave props)
   const handleSave = async (id: number) => {
     if (!isAuthenticated) {
-      toast.error(t('common.sign_in_to_save', 'Please sign in to save listings'));
+      toast.error(t('common.sign_in_to_save'));
       return;
     }
     try {
@@ -225,16 +225,16 @@ export function MarketplacePage() {
         list.map((l) => (l.id === id ? { ...l, is_saved: true } : l));
       setListings(updateSaved);
       setFeaturedListings(updateSaved);
-      toast.success(t('common.saved_for_later', 'Saved for later'));
+      toast.success(t('common.saved_for_later'));
     } catch (err) {
       logError('Failed to save listing', err);
-      toast.error(t('common.save_failed', 'Failed to update saved status'));
+      toast.error(t('common.save_failed'));
     }
   };
 
   const handleUnsave = async (id: number) => {
     if (!isAuthenticated) {
-      toast.error(t('common.sign_in_to_save', 'Please sign in to save listings'));
+      toast.error(t('common.sign_in_to_save'));
       return;
     }
     try {
@@ -243,10 +243,10 @@ export function MarketplacePage() {
         list.map((l) => (l.id === id ? { ...l, is_saved: false } : l));
       setListings(updateSaved);
       setFeaturedListings(updateSaved);
-      toast.success(t('common.removed_from_saved', 'Removed from saved'));
+      toast.success(t('common.removed_from_saved'));
     } catch (err) {
       logError('Failed to unsave listing', err);
-      toast.error(t('common.save_failed', 'Failed to update saved status'));
+      toast.error(t('common.save_failed'));
     }
   };
 
@@ -256,8 +256,8 @@ export function MarketplacePage() {
       <div className="max-w-5xl mx-auto px-4 py-12">
         <EmptyState
           icon={<ShoppingBag className="w-8 h-8" />}
-          title={t('hub_feature_gate.title', 'Marketplace Not Available')}
-          description={t('hub_feature_gate.description', 'The marketplace feature is not enabled for this community.')}
+          title={t('hub_feature_gate.title')}
+          description={t('hub_feature_gate.description')}
         />
       </div>
     );
@@ -266,15 +266,15 @@ export function MarketplacePage() {
   return (
     <>
       <PageMeta
-        title={t('page_title', 'Marketplace')}
-        description={t('meta_description', 'Buy, sell, and trade items in your community marketplace.')}
+        title={t('page_title')}
+        description={t('meta_description')}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         <PublicPageHero
           eyebrow={t('hub.eyebrow')}
-          title={t('page_title', 'Marketplace')}
-          description={t('hub.subtitle', 'Buy, sell, and trade items in your community')}
+          title={t('page_title')}
+          description={t('hub.subtitle')}
           icon={<ShoppingBag className="h-6 w-6" aria-hidden="true" />}
           accent="emerald"
           stats={[
@@ -291,16 +291,16 @@ export function MarketplacePage() {
                 className="shrink-0"
                 startContent={<Plus className="w-4 h-4" />}
               >
-                {t('hub.sell_something', 'Sell Something')}
+                {t('hub.sell_something')}
               </Button>
             ) : null
           }
         />
 
         {/* Search bar */}
-        <div className="max-w-2xl">
+        <div className="max-w-3xl">
           <Input
-            placeholder={t('hub.search_placeholder', 'Search marketplace...')}
+            placeholder={t('hub.search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
             startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -330,7 +330,7 @@ export function MarketplacePage() {
               <div className="mb-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                   <Star className="w-5 h-5 text-warning" />
-                  {t('hub.featured_listings', 'Featured Listings')}
+                  {t('hub.featured_listings')}
                 </h2>
                 <MarketplaceListingGrid
                   listings={featuredListings.slice(0, 4)}
@@ -347,21 +347,21 @@ export function MarketplacePage() {
               <GlassCard className="p-8 text-center">
                 <p className="text-danger mb-4">{error}</p>
                 <Button color="primary" variant="flat" onPress={() => loadListings()}>
-                  {t('common.try_again', 'Try Again')}
+                  {t('common.try_again')}
                 </Button>
               </GlassCard>
             ) : listings.length === 0 ? (
               <EmptyState
                 icon={<ShoppingBag className="w-8 h-8" />}
-                title={t('hub.no_listings_title', 'No Listings Found')}
+                title={t('hub.no_listings_title')}
                 description={
                   debouncedQuery || selectedCategoryId != null
-                    ? t('hub.no_listings_filtered', 'Try adjusting your search or filters.')
-                    : t('hub.no_listings_empty', 'Be the first to list something for sale!')
+                    ? t('hub.no_listings_filtered')
+                    : t('hub.no_listings_empty')
                 }
                 action={
                   isAuthenticated
-                    ? { label: t('hub.sell_something', 'Sell Something'), onClick: () => window.location.href = tenantPath('/marketplace/sell') }
+                    ? { label: t('hub.sell_something'), onClick: () => window.location.href = tenantPath('/marketplace/sell') }
                     : undefined
                 }
               />
@@ -369,7 +369,7 @@ export function MarketplacePage() {
               <>
                 <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                   <Grid3X3 className="w-5 h-5 text-default-400" />
-                  {debouncedQuery || selectedCategoryId != null ? t('hub.search_results', 'Search Results') : t('hub.latest_listings', 'Latest Listings')}
+                  {debouncedQuery || selectedCategoryId != null ? t('hub.search_results') : t('hub.latest_listings')}
                 </h2>
                 <MarketplaceListingGrid
                   listings={listings}
@@ -386,7 +386,7 @@ export function MarketplacePage() {
                       onPress={() => loadListings(true)}
                       isLoading={isLoadingMore}
                     >
-                      {t('hub.load_more', 'Load More')}
+                      {t('hub.load_more')}
                     </Button>
                   </div>
                 )}
@@ -400,9 +400,9 @@ export function MarketplacePage() {
             {isAuthenticated && (
               <GlassCard className="p-5 text-center space-y-3">
                 <ShoppingBag className="w-10 h-10 text-primary mx-auto" />
-                <h3 className="font-semibold text-theme-primary">{t('hub.sidebar_cta_title', 'Got something to sell?')}</h3>
+                <h3 className="font-semibold text-theme-primary">{t('hub.sidebar_cta_title')}</h3>
                 <p className="text-sm text-theme-muted">
-                  {t('hub.sidebar_cta_description', 'List your items and reach your community.')}
+                  {t('hub.sidebar_cta_description')}
                 </p>
                 <Button
                   as={Link}
@@ -411,21 +411,21 @@ export function MarketplacePage() {
                   fullWidth
                   startContent={<Plus className="w-4 h-4" />}
                 >
-                  {t('hub.sell_something', 'Sell Something')}
+                  {t('hub.sell_something')}
                 </Button>
               </GlassCard>
             )}
 
             {/* Quick links */}
             <GlassCard className="p-5">
-              <h3 className="font-semibold text-theme-primary mb-3">{t('hub.quick_links', 'Quick Links')}</h3>
+              <h3 className="font-semibold text-theme-primary mb-3">{t('hub.quick_links')}</h3>
               <div className="space-y-2">
                 <Link
                   to={tenantPath('/marketplace/search')}
                   className="flex items-center gap-2 text-sm text-default-600 hover:text-primary transition-colors"
                 >
                   <Search className="w-4 h-4" />
-                  {t('hub.advanced_search', 'Advanced Search')}
+                  {t('hub.advanced_search')}
                 </Link>
                 {isAuthenticated && (
                   <>
@@ -434,28 +434,28 @@ export function MarketplacePage() {
                       className="flex items-center gap-2 text-sm text-default-600 hover:text-primary transition-colors"
                     >
                       <Package className="w-4 h-4" />
-                      {t('hub.my_listings', 'My Listings')}
+                      {t('hub.my_listings')}
                     </Link>
                     <Link
                       to={tenantPath('/marketplace/my-offers')}
                       className="flex items-center gap-2 text-sm text-default-600 hover:text-primary transition-colors"
                     >
                       <HandCoins className="w-4 h-4" />
-                      {t('hub.my_offers', 'My Offers')}
+                      {t('hub.my_offers')}
                     </Link>
                     <Link
                       to={tenantPath('/marketplace/orders')}
                       className="flex items-center gap-2 text-sm text-default-600 hover:text-primary transition-colors"
                     >
                       <ShoppingBag className="w-4 h-4" />
-                      {t('hub.my_orders', 'My Orders')}
+                      {t('hub.my_orders')}
                     </Link>
                     <Link
                       to={tenantPath('/marketplace/collections')}
                       className="flex items-center gap-2 text-sm text-default-600 hover:text-primary transition-colors"
                     >
                       <Heart className="w-4 h-4" />
-                      {t('hub.saved_items', 'Saved Items')}
+                      {t('hub.saved_items')}
                     </Link>
                   </>
                 )}
