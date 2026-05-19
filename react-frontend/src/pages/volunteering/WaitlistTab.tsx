@@ -97,12 +97,12 @@ export function WaitlistTab() {
         const items = Array.isArray(response.data) ? response.data : [];
         setEntries(items);
       } else {
-        setError(tRef.current('waitlist.load_error', 'Unable to load your waitlist entries. Please try again.'));
+        setError(tRef.current('waitlist.load_error'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load waitlists', err);
-      setError(tRef.current('waitlist.load_error', 'Unable to load your waitlist entries. Please try again.'));
+      setError(tRef.current('waitlist.load_error'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
@@ -122,13 +122,13 @@ export function WaitlistTab() {
       const response = await api.delete(`/v2/volunteering/shifts/${leaveTarget}/waitlist`);
       if (response.success) {
         setEntries((prev) => prev.filter((e) => e.shift.id !== leaveTarget));
-        toastRef.current.success(tRef.current('waitlist.leave_success', 'You have left the waitlist.'));
+        toastRef.current.success(tRef.current('waitlist.leave_success'));
       } else {
-        toastRef.current.error(tRef.current('waitlist.leave_failed', 'Failed to leave waitlist.'));
+        toastRef.current.error(tRef.current('waitlist.leave_failed'));
       }
     } catch (err) {
       logError('Failed to leave waitlist', err);
-      toastRef.current.error(tRef.current('waitlist.leave_failed', 'Failed to leave waitlist.'));
+      toastRef.current.error(tRef.current('waitlist.leave_failed'));
     } finally {
       setRemovingId(null);
       setLeaveTarget(null);
@@ -151,7 +151,7 @@ export function WaitlistTab() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Clock className="w-5 h-5 text-amber-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">{t('waitlist.heading', 'My Waitlists')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('waitlist.heading')}</h2>
         </div>
         <Button
           size="sm"
@@ -161,7 +161,7 @@ export function WaitlistTab() {
           onPress={load}
           isDisabled={isLoading}
         >
-          {t('waitlist.refresh', 'Refresh')}
+          {t('waitlist.refresh')}
         </Button>
       </div>
 
@@ -171,7 +171,7 @@ export function WaitlistTab() {
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
-            {t('waitlist.try_again', 'Try Again')}
+            {t('waitlist.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -193,8 +193,8 @@ export function WaitlistTab() {
       {!error && !isLoading && entries.length === 0 && (
         <EmptyState
           icon={<Clock className="w-12 h-12" aria-hidden="true" />}
-          title={t('waitlist.no_entries_title', 'No waitlist entries')}
-          description={t('waitlist.no_entries_desc', 'You are not currently on any shift waitlists. When a shift is full, you can join the waitlist and be notified when a spot opens up.')}
+          title={t('waitlist.no_entries_title')}
+          description={t('waitlist.no_entries_desc')}
         />
       )}
 
@@ -221,7 +221,7 @@ export function WaitlistTab() {
                         variant="flat"
                         startContent={<Hash className="w-3 h-3" />}
                       >
-                        {t('waitlist.position', 'Position {{position}}', { position: entry.position })}
+                        {t('waitlist.position', { position: entry.position })}
                       </Chip>
                     </div>
 
@@ -249,13 +249,13 @@ export function WaitlistTab() {
                       {entry.shift.capacity != null && (
                         <span className="flex items-center gap-1">
                           <Users className="w-3 h-3" aria-hidden="true" />
-                          {t('waitlist.spots', '{{count}} spots', { count: entry.shift.capacity })}
+                          {t('waitlist.spots', { count: entry.shift.capacity })}
                         </span>
                       )}
                     </div>
 
                     <p className="text-xs text-theme-subtle">
-                      {t('waitlist.joined', 'Joined waitlist')} {new Date(entry.joined_at).toLocaleDateString()}
+                      {t('waitlist.joined')} {new Date(entry.joined_at).toLocaleDateString()}
                     </p>
                   </div>
 
@@ -267,7 +267,7 @@ export function WaitlistTab() {
                     onPress={() => setLeaveTarget(entry.shift.id)}
                     isLoading={removingId === entry.shift.id}
                   >
-                    {t('waitlist.leave', 'Leave')}
+                    {t('waitlist.leave')}
                   </Button>
                 </div>
               </GlassCard>
@@ -288,15 +288,15 @@ export function WaitlistTab() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="text-theme-primary">{t('waitlist.leave', 'Leave')}</ModalHeader>
+              <ModalHeader className="text-theme-primary">{t('waitlist.leave')}</ModalHeader>
               <ModalBody>
                 <p className="text-theme-secondary">
-                  {t('waitlist.leave_confirm', 'Are you sure you want to leave this waitlist? You will lose your position.')}
+                  {t('waitlist.leave_confirm')}
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('cancel', 'Cancel')}</Button>
-                <Button color="danger" onPress={handleLeaveWaitlist}>{t('waitlist.leave', 'Leave')}</Button>
+                <Button variant="flat" onPress={onClose}>{t('cancel')}</Button>
+                <Button color="danger" onPress={handleLeaveWaitlist}>{t('waitlist.leave')}</Button>
               </ModalFooter>
             </>
           )}

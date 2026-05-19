@@ -75,21 +75,21 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
   if (!stats) {
     return (
       <GlassCard className="p-8 text-center">
-        <p className="text-theme-muted">{t('org_dashboard.stats_unavailable', 'Unable to load organization stats.')}</p>
+        <p className="text-theme-muted">{t('org_dashboard.stats_unavailable')}</p>
       </GlassCard>
     );
   }
 
   const statCards = [
     {
-      label: t('org_dashboard.total_volunteers', 'Volunteers'),
+      label: t('org_dashboard.total_volunteers'),
       value: stats.total_volunteers,
       icon: Users,
       color: 'from-blue-500 to-cyan-500',
       tab: 'volunteers',
     },
     {
-      label: t('org_dashboard.pending_applications', 'Pending Applications'),
+      label: t('org_dashboard.pending_applications'),
       value: stats.pending_applications,
       icon: ClipboardList,
       color: 'from-amber-500 to-orange-500',
@@ -97,7 +97,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
       badge: stats.pending_applications > 0,
     },
     {
-      label: t('org_dashboard.pending_hours', 'Hours Pending Review'),
+      label: t('org_dashboard.pending_hours'),
       value: stats.pending_hours,
       icon: Clock,
       color: 'from-violet-500 to-purple-500',
@@ -105,20 +105,20 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
       badge: stats.pending_hours > 0,
     },
     {
-      label: t('org_dashboard.wallet_balance', 'Wallet Balance'),
+      label: t('org_dashboard.wallet_balance'),
       value: `${stats.wallet_balance}h`,
       icon: Wallet,
       color: 'from-emerald-500 to-teal-500',
       tab: 'wallet',
     },
     {
-      label: t('org_dashboard.total_approved_hours', 'Total Approved Hours'),
+      label: t('org_dashboard.total_approved_hours'),
       value: stats.total_approved_hours,
       icon: Clock,
       color: 'from-rose-500 to-pink-500',
     },
     {
-      label: t('org_dashboard.active_opportunities', 'Active Opportunities'),
+      label: t('org_dashboard.active_opportunities'),
       value: stats.active_opportunities,
       icon: Briefcase,
       color: 'from-indigo-500 to-blue-500',
@@ -144,7 +144,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
                 </div>
                 {card.badge && (
                   <Chip size="sm" color="warning" variant="flat">
-                    {t('org_dashboard.needs_review', 'Needs Review')}
+                    {t('org_dashboard.needs_review')}
                   </Chip>
                 )}
               </div>
@@ -158,7 +158,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
       {/* Quick Actions */}
       <GlassCard className="p-6">
         <h3 className="text-lg font-semibold text-theme-primary mb-4">
-          {t('org_dashboard.quick_actions', 'Quick Actions')}
+          {t('org_dashboard.quick_actions')}
         </h3>
         <div className="flex flex-wrap gap-3">
           {stats.pending_applications > 0 && (
@@ -169,7 +169,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
               endContent={<ArrowRight className="w-4 h-4" />}
               onPress={() => onTabChange('applications')}
             >
-              {t('org_dashboard.review_applications', 'Review {{count}} Applications', { count: stats.pending_applications })}
+              {t('org_dashboard.review_applications', { count: stats.pending_applications })}
             </Button>
           )}
           {stats.pending_hours > 0 && (
@@ -180,7 +180,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
               endContent={<ArrowRight className="w-4 h-4" />}
               onPress={() => onTabChange('hours-review')}
             >
-              {t('org_dashboard.review_hours', 'Review {{count}} Hours', { count: stats.pending_hours })}
+              {t('org_dashboard.review_hours', { count: stats.pending_hours })}
             </Button>
           )}
           <Button
@@ -189,7 +189,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
             startContent={<Wallet className="w-4 h-4" />}
             onPress={() => onTabChange('wallet')}
           >
-            {t('org_dashboard.fund_wallet', 'Fund Wallet')}
+            {t('org_dashboard.fund_wallet')}
           </Button>
           <Button
             variant="flat"
@@ -197,7 +197,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
             startContent={<Briefcase className="w-4 h-4" />}
             onPress={() => navigate(tenantPath('/volunteering/create'))}
           >
-            {t('org_dashboard.post_opportunity', 'Post Opportunity')}
+            {t('org_dashboard.post_opportunity')}
           </Button>
         </div>
       </GlassCard>
@@ -209,13 +209,13 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
           <div>
             <p className="text-sm font-medium text-theme-primary">
               {stats.auto_pay_enabled
-                ? t('org_dashboard.autopay_on', 'Auto-pay is enabled')
-                : t('org_dashboard.autopay_off', 'Auto-pay is disabled')}
+                ? t('org_dashboard.autopay_on')
+                : t('org_dashboard.autopay_off')}
             </p>
             <p className="text-xs text-theme-muted">
               {stats.auto_pay_enabled
-                ? t('org_dashboard.autopay_on_desc', 'Volunteers are automatically paid time credits when their hours are approved.')
-                : t('org_dashboard.autopay_off_desc', 'Hours are approved but volunteers are not automatically paid. Enable auto-pay in the Wallet tab.')}
+                ? t('org_dashboard.autopay_on_desc')
+                : t('org_dashboard.autopay_off_desc')}
             </p>
           </div>
           <Button
@@ -224,7 +224,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
             className="ml-auto"
             onPress={() => onTabChange('wallet')}
           >
-            {t('org_dashboard.configure', 'Configure')}
+            {t('org_dashboard.configure')}
           </Button>
         </div>
       </GlassCard>

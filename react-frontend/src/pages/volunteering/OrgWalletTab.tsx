@@ -73,13 +73,6 @@ const TYPE_COLOR: Record<WalletTransaction['type'], 'success' | 'warning' | 'dan
   admin_adjustment: 'primary',
 };
 
-const TYPE_LABELS: Record<WalletTransaction['type'], string> = {
-  deposit: 'Deposit',
-  volunteer_payment: 'Volunteer Payment',
-  withdrawal: 'Withdrawal',
-  admin_adjustment: 'Admin Adjustment',
-};
-
 /* ───────────────────────── Component ───────────────────────── */
 
 export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWalletTabProps) {
@@ -155,12 +148,12 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
         setCursor(newCursor);
         setHasMore(hasMoreData);
       } else {
-        setError(tRef.current('org_wallet.load_error', 'Unable to load transactions.'));
+        setError(tRef.current('org_wallet.load_error'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load transactions', err);
-      setError(tRef.current('org_wallet.load_error', 'Unable to load transactions.'));
+      setError(tRef.current('org_wallet.load_error'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
@@ -191,19 +184,19 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
       if (response.success) {
         toastRef.current.success(
           enabled
-            ? tRef.current('org_wallet.auto_pay_enabled', 'Auto-pay enabled.')
-            : tRef.current('org_wallet.auto_pay_disabled', 'Auto-pay disabled.')
+            ? tRef.current('org_wallet.auto_pay_enabled')
+            : tRef.current('org_wallet.auto_pay_disabled')
         );
         onBalanceChange();
       } else {
         // Revert on failure
         setAutoPayEnabled(!enabled);
-        toastRef.current.error(response.error || tRef.current('org_wallet.auto_pay_error', 'Failed to update auto-pay.'));
+        toastRef.current.error(response.error || tRef.current('org_wallet.auto_pay_error'));
       }
     } catch (err) {
       setAutoPayEnabled(!enabled);
       logError('Failed to toggle auto-pay', err);
-      toastRef.current.error(tRef.current('org_wallet.auto_pay_error', 'Failed to update auto-pay.'));
+      toastRef.current.error(tRef.current('org_wallet.auto_pay_error'));
     } finally {
       setIsTogglingAutoPay(false);
     }
@@ -221,11 +214,11 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
 
     const amount = parseFloat(depositAmount);
     if (!depositAmount || isNaN(amount) || amount <= 0) {
-      toastRef.current.error(tRef.current('org_wallet.invalid_amount', 'Please enter a valid amount.'));
+      toastRef.current.error(tRef.current('org_wallet.invalid_amount'));
       return;
     }
     if (amount > 9999) {
-      toastRef.current.error(tRef.current('org_wallet.deposit_amount_too_large', 'Deposit amount cannot exceed 9,999 hours.'));
+      toastRef.current.error(tRef.current('org_wallet.deposit_amount_too_large'));
       return;
     }
 
@@ -238,17 +231,17 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
       });
 
       if (response.success) {
-        toastRef.current.success(tRef.current('org_wallet.deposit_success', 'Credits deposited successfully.'));
+        toastRef.current.success(tRef.current('org_wallet.deposit_success'));
         resetDepositForm();
         onClose();
         onBalanceChange();
         loadTransactions();
       } else {
-        toastRef.current.error(response.error || tRef.current('org_wallet.deposit_error', 'Failed to deposit credits.'));
+        toastRef.current.error(response.error || tRef.current('org_wallet.deposit_error'));
       }
     } catch (err) {
       logError('Failed to deposit credits', err);
-      toastRef.current.error(tRef.current('org_wallet.deposit_error', 'Failed to deposit credits.'));
+      toastRef.current.error(tRef.current('org_wallet.deposit_error'));
     } finally {
       setIsDepositing(false);
     }
@@ -287,32 +280,32 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
     <div className="space-y-6">
       {/* Balance Card */}
       <GlassCard className="p-6 space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <Wallet className="w-5 h-5 text-emerald-400" aria-hidden="true" />
             <h2 className="text-lg font-semibold text-theme-primary">
-              {t('org_wallet.heading', 'Organisation Wallet')}
+              {t('org_wallet.heading')}
             </h2>
           </div>
           <Button
             size="sm"
             variant="flat"
-            className="bg-theme-elevated text-theme-muted"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => {
               onBalanceChange();
               loadTransactions();
             }}
             isDisabled={isLoading}
+            className="bg-theme-elevated text-theme-muted sm:shrink-0"
           >
-            {t('org_wallet.refresh', 'Refresh')}
+            {t('org_wallet.refresh')}
           </Button>
         </div>
 
         <div className="text-center py-4">
           <p className={`text-5xl font-bold ${getBalanceColor()}`}>{balance}</p>
           <p className="text-sm text-theme-muted mt-1">
-            {t('org_wallet.hours_label', 'hours')}
+            {t('org_wallet.hours_label')}
           </p>
         </div>
 
@@ -321,7 +314,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
           startContent={<ArrowDownToLine className="w-4 h-4" aria-hidden="true" />}
           onPress={onOpen}
         >
-          {t('org_wallet.deposit', 'Deposit Credits')}
+          {t('org_wallet.deposit')}
         </Button>
       </GlassCard>
 
@@ -330,20 +323,17 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-theme-primary">
-              {t('org_wallet.auto_pay_title', 'Auto-pay Volunteers')}
+              {t('org_wallet.auto_pay_title')}
             </h3>
             <p className="text-sm text-theme-muted mt-1">
-              {t(
-                'org_wallet.auto_pay_description',
-                'Automatically pay volunteers from this wallet when their hours are approved.'
-              )}
+              {t('org_wallet.auto_pay_description')}
             </p>
           </div>
           <Switch
             isSelected={autoPayEnabled}
             onValueChange={handleAutoPayToggle}
             isDisabled={isTogglingAutoPay}
-            aria-label={t('org_wallet.auto_pay_toggle', 'Toggle auto-pay')}
+            aria-label={t('org_wallet.auto_pay_toggle')}
           />
         </div>
       </GlassCard>
@@ -353,7 +343,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
         <div className="flex items-center gap-2">
           <Clock className="w-5 h-5 text-theme-muted" aria-hidden="true" />
           <h3 className="text-sm font-semibold text-theme-secondary uppercase tracking-wide">
-            {t('org_wallet.transaction_history', 'Transaction History')}
+            {t('org_wallet.transaction_history')}
           </h3>
         </div>
 
@@ -366,7 +356,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
               className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
               onPress={() => loadTransactions()}
             >
-              {t('org_wallet.try_again', 'Try Again')}
+              {t('org_wallet.try_again')}
             </Button>
           </GlassCard>
         )}
@@ -388,11 +378,8 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
         {!error && !isLoading && transactions.length === 0 && (
           <EmptyState
             icon={<Wallet className="w-12 h-12" aria-hidden="true" />}
-            title={t('org_wallet.empty_title', 'No transactions yet')}
-            description={t(
-              'org_wallet.empty_description',
-              'Transactions will appear here when credits are deposited, withdrawn, or paid to volunteers.'
-            )}
+            title={t('org_wallet.empty_title')}
+            description={t('org_wallet.empty_description')}
           />
         )}
 
@@ -411,7 +398,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <Chip size="sm" variant="flat" color={TYPE_COLOR[tx.type]}>
-                          {t(`org_wallet.types.${tx.type}`, TYPE_LABELS[tx.type])}
+                          {t(`org_wallet.types.${tx.type}`)}
                         </Chip>
                         <span className={`font-bold text-lg ${getAmountColor(tx.amount)}`}>
                           {formatAmount(tx.amount)}
@@ -432,7 +419,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
                           {new Date(tx.created_at).toLocaleDateString()}
                         </span>
                         <span className="text-theme-muted">
-                          {t('org_wallet.balance_after', 'Balance: {{balance}}', {
+                          {t('org_wallet.balance_after', {
                             balance: tx.balance_after,
                           })}
                         </span>
@@ -467,8 +454,8 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
                   isDisabled={isLoadingMore}
                 >
                   {isLoadingMore
-                    ? t('org_wallet.loading_more', 'Loading...')
-                    : t('org_wallet.load_more', 'Load More')}
+                    ? t('org_wallet.loading_more')
+                    : t('org_wallet.load_more')}
                 </Button>
               </div>
             )}
@@ -493,11 +480,11 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
           {(onClose) => (
             <>
               <ModalHeader className="text-theme-primary">
-                {t('org_wallet.deposit_modal_title', 'Deposit Credits')}
+                {t('org_wallet.deposit_modal_title')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label={t('org_wallet.form.amount', 'Amount (hours)')}
+                  label={t('org_wallet.form.amount')}
                   type="number"
                   min="0.25"
                   max="9999"
@@ -510,7 +497,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
                   isRequired
                 />
                 <Textarea
-                  label={t('org_wallet.form.note', 'Note (optional)')}
+                  label={t('org_wallet.form.note')}
                   value={depositNote}
                   onValueChange={setDepositNote}
                   variant="bordered"
@@ -521,14 +508,14 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {t('org_wallet.cancel', 'Cancel')}
+                  {t('org_wallet.cancel')}
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
                   onPress={() => handleDeposit(onClose)}
                   isLoading={isDepositing}
                 >
-                  {t('org_wallet.deposit_button', 'Deposit')}
+                  {t('org_wallet.deposit_button')}
                 </Button>
               </ModalFooter>
             </>

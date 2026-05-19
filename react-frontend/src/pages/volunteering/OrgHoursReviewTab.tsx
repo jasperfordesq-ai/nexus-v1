@@ -134,17 +134,17 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
         if (action === 'approve') {
           if (autoPay) {
             toastRef.current.success(
-              tRef.current('org_hours_approved_paid', 'Hours approved — time credits paid to volunteer'),
+              tRef.current('org_hours_approved_paid'),
             );
           } else {
             toastRef.current.success(
-              tRef.current('org_hours_approved', 'Hours approved'),
+              tRef.current('org_hours_approved'),
             );
           }
           onBalanceChange();
         } else {
           toastRef.current.success(
-            tRef.current('org_hours_declined', 'Hours declined'),
+            tRef.current('org_hours_declined'),
           );
         }
       } else {
@@ -192,10 +192,10 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
           <Clock className="w-7 h-7 text-emerald-400" aria-hidden="true" />
         </div>
         <p className="text-theme-primary font-semibold text-lg">
-          {t('no_pending_hours', 'No pending hours')}
+          {t('no_pending_hours')}
         </p>
         <p className="text-theme-muted text-sm max-w-xs">
-          {t('org_all_hours_reviewed', 'All volunteer hours have been reviewed.')}
+          {t('org_all_hours_reviewed')}
         </p>
       </GlassCard>
     );
@@ -218,10 +218,10 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
               aria-hidden="true"
             />
             <span className="text-theme-primary font-semibold">
-              {t('org_wallet_balance', 'Wallet balance:')}
+              {t('org_wallet_balance')}
             </span>
             <span className={`font-bold text-lg ${isBalanceLow ? 'text-[var(--color-warning)]' : 'text-emerald-500'}`}>
-              {balance} {balance === 1 ? t('hour', 'hour') : t('hours', 'hours')}
+              {balance} {balance === 1 ? t('hour') : t('hours')}
             </span>
           </div>
 
@@ -231,8 +231,8 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
             color={autoPay ? 'success' : 'default'}
           >
             {autoPay
-              ? t('auto_pay_on', 'Auto-pay ON')
-              : t('auto_pay_off', 'Auto-pay OFF')}
+              ? t('auto_pay_on')
+              : t('auto_pay_off')}
           </Chip>
 
           {isBalanceLow && (
@@ -241,7 +241,6 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
               <span>
                 {t(
                   'org_balance_low_warning',
-                  'Balance may be insufficient for {{count}} pending hours',
                   { count: totalPendingHours },
                 )}
               </span>
@@ -274,7 +273,7 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
               <div className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-emerald-500 shrink-0" aria-hidden="true" />
                 <span className="text-xl font-bold text-theme-primary">
-                  {entry.hours} {entry.hours === 1 ? t('hour', 'hour') : t('hours', 'hours')}
+                  {entry.hours} {entry.hours === 1 ? t('hour') : t('hours')}
                 </span>
               </div>
 
@@ -303,9 +302,9 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
                 isLoading={inFlight}
                 startContent={!inFlight ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : undefined}
                 onPress={() => handleAction(entry.id, 'approve')}
-                aria-label={t('hours_review.approve_aria', 'Approve hours for {{name}}', { name: entry.user.name })}
+                aria-label={t('hours_review.approve_aria', { name: entry.user.name })}
               >
-                {t('hours_review.approve', 'Approve')}
+                {t('hours_review.approve')}
               </Button>
               <Button
                 size="sm"
@@ -315,9 +314,9 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
                 isLoading={inFlight}
                 startContent={!inFlight ? <XCircle className="w-4 h-4" aria-hidden="true" /> : undefined}
                 onPress={() => handleAction(entry.id, 'decline')}
-                aria-label={t('hours_review.decline_aria', 'Decline hours for {{name}}', { name: entry.user.name })}
+                aria-label={t('hours_review.decline_aria', { name: entry.user.name })}
               >
-                {t('hours_review.decline', 'Decline')}
+                {t('hours_review.decline')}
               </Button>
             </div>
           </div>
@@ -333,7 +332,7 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
             startContent={!isLoadingMore ? <ChevronDown className="w-4 h-4" aria-hidden="true" /> : undefined}
             onPress={() => loadEntries(true)}
           >
-            {t('load_more', 'Load more')}
+            {t('load_more')}
           </Button>
         </div>
       )}

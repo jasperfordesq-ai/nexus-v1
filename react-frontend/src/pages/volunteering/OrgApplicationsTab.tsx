@@ -118,13 +118,13 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
           setHasMore(has_more);
         } else {
           toastRef.current.error(
-            response.error || tRef.current('applications.load_failed', 'Failed to load applications.'),
+            response.error || tRef.current('applications.load_failed'),
           );
         }
       } catch (err) {
         if (controller.signal.aborted) return;
         logError('Failed to load org applications', err);
-        toastRef.current.error(tRef.current('applications.load_failed', 'Failed to load applications.'));
+        toastRef.current.error(tRef.current('applications.load_failed'));
       } finally {
         if (!controller.signal.aborted) {
           setIsLoading(false);
@@ -162,15 +162,15 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
       if (response.success) {
         toast.success(
           action === 'approve'
-            ? t('applications.approved', 'Application approved.')
-            : t('applications.declined', 'Application declined.'),
+            ? t('applications.approved')
+            : t('applications.declined'),
         );
       } else {
         // Revert optimistic update
         setApplications((prev) =>
           prev.map((a) => (a.id === applicationId ? { ...a, status: 'pending' } : a)),
         );
-        toast.error(response.error || t('applications.action_failed', `Failed to ${action} application.`));
+        toast.error(response.error || t('applications.action_failed'));
       }
     } catch (err) {
       // Revert optimistic update
@@ -178,7 +178,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
         prev.map((a) => (a.id === applicationId ? { ...a, status: 'pending' } : a)),
       );
       logError(`Failed to ${action} application`, err);
-      toast.error(t('something_wrong', 'Something went wrong.'));
+      toast.error(t('something_wrong'));
     } finally {
       setActionLoading((prev) => ({ ...prev, [applicationId]: false }));
     }
@@ -198,10 +198,10 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
   /* ---- Derived state ---- */
 
   const filters: { key: StatusFilter; label: string }[] = [
-    { key: 'all', label: t('applications.filter_all', 'All') },
-    { key: 'pending', label: t('applications.filter_pending', 'Pending') },
-    { key: 'approved', label: t('applications.filter_approved', 'Approved') },
-    { key: 'declined', label: t('applications.filter_declined', 'Declined') },
+    { key: 'all', label: t('applications.filter_all') },
+    { key: 'pending', label: t('applications.filter_pending') },
+    { key: 'approved', label: t('applications.filter_approved') },
+    { key: 'declined', label: t('applications.filter_declined') },
   ];
 
   const pendingCount = applications.filter((a) => a.status === 'pending').length;
@@ -224,10 +224,10 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
       <div className="flex items-center gap-3 flex-wrap">
         <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
           <ClipboardList className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-          {t('applications.heading', 'Applications')}
+          {t('applications.heading')}
           {pendingCount > 0 && (
             <Chip size="sm" color="warning" variant="flat">
-              {t('applications.pending_count', '{{count}} pending', { count: pendingCount })}
+              {t('applications.pending_count', { count: pendingCount })}
             </Chip>
           )}
         </h2>
@@ -243,9 +243,9 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
                 setSelected(new Set());
               }
             }}
-            aria-label={t('applications.aria_select_all', 'Select all visible pending applications')}
+            aria-label={t('applications.aria_select_all')}
           >
-            <span className="text-xs text-theme-muted">{t('applications.select_all', 'Select all')}</span>
+            <span className="text-xs text-theme-muted">{t('applications.select_all')}</span>
           </Checkbox>
         )}
       </div>
@@ -272,19 +272,19 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
       {/* Search by name */}
       <Input
         size="sm"
-        placeholder={t('applications.search_placeholder', 'Search by name...')}
+        placeholder={t('applications.search_placeholder')}
         value={nameSearch}
         onValueChange={setNameSearch}
         startContent={<Search className="w-3.5 h-3.5 text-theme-subtle" />}
-        aria-label={t('applications.aria_search_volunteers', 'Search volunteers by name')}
-        classNames={{ base: 'max-w-xs', inputWrapper: 'bg-theme-elevated' }}
+        aria-label={t('applications.aria_search_volunteers')}
+        classNames={{ base: 'w-full sm:max-w-xs', inputWrapper: 'bg-theme-elevated' }}
       />
 
       {/* Bulk action bar */}
       {selected.size > 0 && (
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30">
+        <div className="flex flex-col gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 sm:flex-row sm:items-center">
           <span className="text-sm text-indigo-400 font-medium">
-            {t('applications.selected_count', '{{count}} selected', { count: selected.size })}
+            {t('applications.selected_count', { count: selected.size })}
           </span>
           <Button
             size="sm"
@@ -293,7 +293,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
             startContent={<CheckCircle className="w-3.5 h-3.5" />}
             onPress={() => handleBulkAction('approve')}
           >
-            {t('applications.approve_all', 'Approve All')}
+            {t('applications.approve_all')}
           </Button>
           <Button
             size="sm"
@@ -302,7 +302,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
             startContent={<XCircle className="w-3.5 h-3.5" />}
             onPress={() => handleBulkAction('decline')}
           >
-            {t('applications.decline_all', 'Decline All')}
+            {t('applications.decline_all')}
           </Button>
         </div>
       )}
@@ -318,7 +318,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
       {!isLoading && filteredApplications.length === 0 && (
         <div className="flex flex-col items-center gap-2 py-8 text-theme-muted">
           <Users className="w-10 h-10 opacity-40" />
-          <p className="text-sm">{t('applications.empty', 'No applications found.')}</p>
+          <p className="text-sm">{t('applications.empty')}</p>
         </div>
       )}
 
@@ -343,7 +343,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
                       return next;
                     });
                   }}
-                  aria-label={t('applications.aria_select_application', 'Select application from {{name}}', {
+                  aria-label={t('applications.aria_select_application', {
                     name: app.user.name,
                   })}
                   className="mt-1"
@@ -363,14 +363,18 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-medium text-theme-primary">{app.user.name}</span>
                   <span className="text-xs text-theme-muted">{app.user.email}</span>
-                  <Chip size="sm" color={statusColor(app.status)} variant="flat" className="capitalize">
-                    {app.status}
+                  <Chip size="sm" color={statusColor(app.status)} variant="flat">
+                    {app.status === 'approved'
+                      ? t('status_approved')
+                      : app.status === 'declined'
+                        ? t('status_declined')
+                        : t('status_pending')}
                   </Chip>
                 </div>
 
                 {/* Opportunity title */}
                 <p className="text-sm text-theme-secondary">
-                  {t('applications.for_opportunity', 'For: {{title}}', { title: app.opportunity.title })}
+                  {t('applications.for_opportunity', { title: app.opportunity.title })}
                 </p>
 
                 {/* Application message */}
@@ -393,13 +397,13 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
 
                 {/* Applied date */}
                 <p className="text-xs text-theme-subtle">
-                  {t('applications.applied_on', 'Applied {{date}}', { date: formatDate(app.created_at) })}
+                  {t('applications.applied_on', { date: formatDate(app.created_at) })}
                 </p>
               </div>
 
               {/* Actions */}
               {app.status === 'pending' && (
-                <div className="flex gap-2 sm:flex-col sm:items-end shrink-0">
+                <div className="flex gap-2 sm:flex-col sm:items-end sm:shrink-0">
                   <Button
                     size="sm"
                     color="success"
@@ -408,7 +412,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
                     startContent={!actionLoading[app.id] ? <CheckCircle className="w-3.5 h-3.5" /> : undefined}
                     onPress={() => handleAction(app.id, 'approve')}
                   >
-                    {t('applications.approve', 'Approve')}
+                    {t('applications.approve')}
                   </Button>
                   <Button
                     size="sm"
@@ -418,7 +422,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
                     startContent={!actionLoading[app.id] ? <XCircle className="w-3.5 h-3.5" /> : undefined}
                     onPress={() => handleAction(app.id, 'decline')}
                   >
-                    {t('applications.decline', 'Decline')}
+                    {t('applications.decline')}
                   </Button>
                 </div>
               )}
@@ -438,7 +442,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
             startContent={!isLoadingMore ? <ChevronDown className="w-4 h-4" /> : undefined}
             onPress={() => loadApplications(statusFilter, cursor)}
           >
-            {t('applications.load_more', 'Load More')}
+            {t('applications.load_more')}
           </Button>
         </div>
       )}

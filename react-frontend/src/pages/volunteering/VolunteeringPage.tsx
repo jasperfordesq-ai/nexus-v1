@@ -250,9 +250,9 @@ export function VolunteeringPage() {
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-100 to-orange-100 dark:from-rose-900/30 dark:to-orange-900/30 flex items-center justify-center mb-4">
           <Heart className="w-8 h-8 text-rose-500" aria-hidden="true" />
         </div>
-        <h2 className="text-xl font-semibold text-theme-primary mb-2">{t('feature_not_available', 'Volunteering Not Available')}</h2>
+        <h2 className="text-xl font-semibold text-theme-primary mb-2">{t('feature_not_available')}</h2>
         <p className="text-[var(--color-text-muted)] max-w-sm">
-          {t('feature_not_available_desc', 'The volunteering feature is not enabled for this community. Contact your timebank administrator to learn more.')}
+          {t('feature_not_available_desc')}
         </p>
       </div>
     );
@@ -263,7 +263,7 @@ export function VolunteeringPage() {
     <div className="space-y-6">
       <PageMeta
         title={t('page_title')}
-        description={t('page_description', { defaultValue: 'Discover volunteering opportunities in your community.' })}
+        description={t('page_description')}
       />
 
       {/* Hero Banner */}
@@ -278,11 +278,12 @@ export function VolunteeringPage() {
             </div>
             <p className="text-sm text-theme-muted">{t('subtitle')}</p>
           </div>
-          <div className="flex gap-2 flex-wrap shrink-0">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:shrink-0">
             {hasApprovedOrg && (
-              <Link to={tenantPath('/volunteering/create')}>
+              <Link to={tenantPath('/volunteering/create')} className="w-full sm:w-auto">
                 <Button
                   color="primary"
+                  className="w-full sm:w-auto"
                   startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                 >
                   {t('post_opportunity')}
@@ -290,21 +291,23 @@ export function VolunteeringPage() {
               </Link>
             )}
             {hasApprovedOrg && (
-              <Link to={tenantPath('/volunteering/my-organisations')}>
+              <Link to={tenantPath('/volunteering/my-organisations')} className="w-full sm:w-auto">
                 <Button
                   variant="flat"
+                  className="w-full sm:w-auto"
                   startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
                 >
-                  {t('my_organisations', 'My Organisations')}
+                  {t('my_organisations')}
                 </Button>
               </Link>
             )}
-            <Link to={tenantPath('/organisations')}>
+            <Link to={tenantPath('/organisations')} className="w-full sm:w-auto">
               <Button
                 variant="flat"
+                className="w-full sm:w-auto"
                 startContent={<Globe className="w-4 h-4" aria-hidden="true" />}
               >
-                {t('browse_organisations', 'Browse Organisations')}
+                {t('browse_organisations')}
               </Button>
             </Link>
           </div>
@@ -319,20 +322,20 @@ export function VolunteeringPage() {
           { key: 'opportunities', icon: Briefcase, label: t('tab_opportunities') },
           { key: 'applications', icon: Send, label: t('tab_applications'), authOnly: true },
           { key: 'hours', icon: Timer, label: t('tab_hours'), authOnly: true },
-          { key: 'recommended', icon: Sparkles, label: t('tab_for_you', 'For You'), authOnly: true },
-          { key: 'certificates', icon: Award, label: t('tab_certificates', 'Certificates'), authOnly: true },
-          { key: 'alerts', icon: Siren, label: t('tab_alerts', 'Alerts'), authOnly: true },
-          { key: 'wellbeing', icon: Smile, label: t('tab_wellbeing', 'Wellbeing'), authOnly: true },
-          { key: 'credentials', icon: ShieldCheck, label: t('tab_credentials', 'Credentials'), authOnly: true },
-          { key: 'waitlist', icon: Clock, label: t('tab_waitlist', 'Waitlist'), authOnly: true },
-          { key: 'swaps', icon: ArrowLeftRight, label: t('tab_swap_requests', 'Swap Requests'), authOnly: true },
-          { key: 'group-signups', icon: Users, label: t('tab_group_signups', 'Group Sign-ups'), authOnly: true },
-          { key: 'hours-review', icon: ClipboardCheck, label: t('tab_hours_review', 'Hours Review'), authOnly: true },
-          { key: 'expenses', icon: Receipt, label: t('tab_expenses', 'Expenses'), authOnly: true },
-          { key: 'safeguarding', icon: Shield, label: t('tab_safeguarding', 'Safeguarding'), authOnly: true },
-          { key: 'community-projects', icon: Lightbulb, label: t('tab_community_projects', 'Projects'), authOnly: true },
-          { key: 'donations', icon: HandHeart, label: t('tab_donations', 'Donations'), authOnly: true },
-          { key: 'accessibility', icon: Accessibility, label: t('tab_accessibility', 'Accessibility'), authOnly: true },
+          { key: 'recommended', icon: Sparkles, label: t('tab_for_you'), authOnly: true },
+          { key: 'certificates', icon: Award, label: t('tab_certificates'), authOnly: true },
+          { key: 'alerts', icon: Siren, label: t('tab_alerts'), authOnly: true },
+          { key: 'wellbeing', icon: Smile, label: t('tab_wellbeing'), authOnly: true },
+          { key: 'credentials', icon: ShieldCheck, label: t('tab_credentials'), authOnly: true },
+          { key: 'waitlist', icon: Clock, label: t('tab_waitlist'), authOnly: true },
+          { key: 'swaps', icon: ArrowLeftRight, label: t('tab_swap_requests'), authOnly: true },
+          { key: 'group-signups', icon: Users, label: t('tab_group_signups'), authOnly: true },
+          { key: 'hours-review', icon: ClipboardCheck, label: t('tab_hours_review'), authOnly: true },
+          { key: 'expenses', icon: Receipt, label: t('tab_expenses'), authOnly: true },
+          { key: 'safeguarding', icon: Shield, label: t('tab_safeguarding'), authOnly: true },
+          { key: 'community-projects', icon: Lightbulb, label: t('tab_community_projects'), authOnly: true },
+          { key: 'donations', icon: HandHeart, label: t('tab_donations'), authOnly: true },
+          { key: 'accessibility', icon: Accessibility, label: t('tab_accessibility'), authOnly: true },
         ];
 
         const visibleTabs = allTabs.filter(t => {
@@ -348,11 +351,11 @@ export function VolunteeringPage() {
             {visibleTabs.length === 0 && (
               <EmptyState
                 icon={<Heart className="w-12 h-12" aria-hidden="true" />}
-                title={t('no_tabs_available', 'No volunteering sections are available')}
-                description={t('no_tabs_available_desc', 'Volunteering is enabled, but all sections are disabled for this community.')}
+                title={t('no_tabs_available')}
+                description={t('no_tabs_available_desc')}
               />
             )}
-            <div className="flex gap-2 flex-wrap" role="tablist" aria-label={t('aria.volunteering_sections', 'Volunteering sections')}>
+            <div className="flex gap-2 flex-wrap" role="tablist" aria-label={t('aria.volunteering_sections')}>
               {visibleTabs.map(({ key, icon: Icon, label }) => (
                 <Button
                   key={key}
@@ -498,17 +501,17 @@ function OpportunitiesTab() {
       });
 
       if (response.success) {
-        toast.success(t('applied_success', 'Successfully applied!'));
+        toast.success(t('applied_success'));
         onClose();
         setApplyMessage('');
         setSelectedOpportunity(null);
         loadOpportunities();
       } else {
-        toast.error(response.error || t('apply_error', 'Failed to apply'));
+        toast.error(response.error || t('apply_error'));
       }
     } catch (err) {
       logError('Failed to apply', err);
-      toast.error(t('apply_error', 'Something went wrong. Please try again.'));
+      toast.error(t('apply_error'));
     } finally {
       setIsApplying(false);
     }
@@ -748,7 +751,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
             onPress={() => navigate(tenantPath(`/volunteering/opportunities/${opportunity.id}`))}
             endContent={<ChevronRight className="w-4 h-4" aria-hidden="true" />}
           >
-            {t('view_details', 'View Details')}
+            {t('view_details')}
           </Button>
           {onApply && (
             <Button
@@ -845,14 +848,14 @@ function ApplicationsTab() {
     try {
       const response = await api.delete(`/v2/volunteering/applications/${applicationId}`);
       if (response.success) {
-        toast.success(t('withdraw_success', 'Application withdrawn.'));
+        toast.success(t('withdraw_success'));
         loadApplications();
       } else {
-        toast.error(response.error || t('withdraw_failed', 'Failed to withdraw application.'));
+        toast.error(response.error || t('withdraw_failed'));
       }
     } catch (err) {
       logError('Failed to withdraw application', err);
-      toast.error(t('withdraw_failed', 'Failed to withdraw application.'));
+      toast.error(t('withdraw_failed'));
     }
   };
 
@@ -884,7 +887,13 @@ function ApplicationsTab() {
             className={statusFilter === s ? VOL_GRADIENT : 'bg-theme-elevated text-theme-muted'}
             onPress={() => setStatusFilter(s)}
           >
-            {s ? t('status_' + s) : t('filter_all')}
+            {s === 'pending'
+              ? t('status_pending')
+              : s === 'approved'
+                ? t('status_approved')
+                : s === 'declined'
+                  ? t('status_declined')
+                  : t('filter_all')}
           </Button>
         ))}
       </div>
@@ -928,7 +937,7 @@ function ApplicationsTab() {
               {applications.map((app) => (
                 <motion.div key={app.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                   <GlassCard className="p-5">
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <Link to={tenantPath(`/volunteering/opportunities/${app.opportunity.id}`)} className="font-semibold text-theme-primary hover:text-indigo-400 transition-colors">{app.opportunity.title}</Link>
@@ -938,7 +947,11 @@ function ApplicationsTab() {
                             variant="flat"
                             startContent={statusIcon(app.status)}
                           >
-                            {t('status_' + app.status)}
+                            {app.status === 'approved'
+                              ? t('status_approved')
+                              : app.status === 'declined'
+                                ? t('status_declined')
+                                : t('status_pending')}
                           </Chip>
                         </div>
 
@@ -967,7 +980,7 @@ function ApplicationsTab() {
                         {(app.status === 'approved' || app.status === 'declined') && app.org_note && (
                           <p className="text-xs text-theme-muted flex items-start gap-1 mt-1">
                             <MessageSquare className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-theme-subtle" aria-hidden="true" />
-                            <span><span className="text-theme-subtle">{t('organiser_note', "Organiser's note:")} </span>{app.org_note}</span>
+                            <span><span className="text-theme-subtle">{t('organiser_note')} </span>{app.org_note}</span>
                           </p>
                         )}
 
@@ -1120,16 +1133,16 @@ function HoursTab() {
       });
 
       if (response.success) {
-        toast.success(t('hours_logged_success', 'Hours logged successfully!'));
+        toast.success(t('hours_logged_success'));
         onClose();
         setLogForm({ organization_id: '', date: new Date().toISOString().split('T')[0], hours: '', description: '' });
         loadSummary();
       } else {
-        toast.error(response.error || t('hours_log_failed', 'Failed to log hours. Please try again.'));
+        toast.error(response.error || t('hours_log_failed'));
       }
     } catch (err) {
       logError('Failed to log hours', err);
-      toast.error(t('hours_log_failed', 'Failed to log hours. Please try again.'));
+      toast.error(t('hours_log_failed'));
     } finally {
       setIsLogging(false);
     }
