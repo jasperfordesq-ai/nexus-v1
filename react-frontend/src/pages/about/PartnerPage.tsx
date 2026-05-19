@@ -46,10 +46,6 @@ import { RelatedPages } from './RelatedPages';
 const impactCards = [
   {
     icon: TrendingUp,
-    title: 'Exceptional Social Value',
-    highlight: '\u20AC16 for every \u20AC1',
-    description:
-      'Independent research confirms a 16:1 Social Return on Investment. Your support directly translates into measurable community wellbeing.',
     color: 'from-emerald-500 to-teal-500',
     bgAccent: 'bg-emerald-500/10',
     textAccent: 'text-emerald-600 dark:text-emerald-400',
@@ -57,10 +53,6 @@ const impactCards = [
   },
   {
     icon: ShieldCheck,
-    title: 'Proof and Transparency',
-    highlight: 'Independent 2023 Study',
-    description:
-      'Our impact figures come from a rigorous, independent evaluation. We provide full transparency on outcomes, spend, and social metrics.',
     color: 'from-blue-500 to-indigo-500',
     bgAccent: 'bg-blue-500/10',
     textAccent: 'text-blue-600 dark:text-blue-400',
@@ -68,10 +60,6 @@ const impactCards = [
   },
   {
     icon: Rocket,
-    title: 'Strategic Growth',
-    highlight: '2,500+ Members by 2029',
-    description:
-      'A 5-year roadmap to scale nationally with federated communities, corporate partnerships, and digital-first engagement.',
     color: 'from-purple-500 to-pink-500',
     bgAccent: 'bg-purple-500/10',
     textAccent: 'text-purple-600 dark:text-purple-400',
@@ -82,47 +70,29 @@ const impactCards = [
 const partnershipTypes = [
   {
     icon: Building2,
-    title: 'Corporate Partnership',
-    description:
-      'Align your CSR goals with tangible social outcomes. Employee volunteering, matched funding, and branded community projects.',
   },
   {
     icon: HeartHandshake,
-    title: 'Sponsorship',
-    description:
-      'Fund a hub coordinator, sponsor community events, or support our digital platform. Every contribution amplifies social return.',
   },
   {
     icon: Laptop,
-    title: 'Technology Partnership',
-    description:
-      'Collaborate on our open-source platform, provide technical expertise, or support our digital inclusion programmes.',
   },
   {
     icon: GraduationCap,
-    title: 'Research Partnership',
-    description:
-      'Access a living lab for social innovation research. Study community resilience, wellbeing metrics, and mutual aid dynamics.',
   },
 ];
 
 const learnMoreLinks = [
   {
     icon: FileText,
-    title: 'Impact Summary',
-    description: 'See our full SROI report and outcomes data',
     to: '/impact-summary',
   },
   {
     icon: Target,
-    title: 'Strategic Plan',
-    description: 'Our 5-year vision for growth and federation',
     to: '/strategic-plan',
   },
   {
     icon: BookOpen,
-    title: 'Timebanking Guide',
-    description: 'Learn how timebanking works',
     to: '/timebanking-guide',
   },
 ];
@@ -277,7 +247,7 @@ export function PartnerPage() {
             className="grid sm:grid-cols-3 gap-6"
           >
             {impactCards.map((card, index) => (
-              <motion.div key={card.title} variants={fadeInUp}>
+              <motion.div key={`impact-card-${index}`} variants={fadeInUp}>
                 <GlassCard className="p-6 h-full text-center relative overflow-hidden group hover:scale-[1.02] transition-transform">
                   {/* Gradient top bar */}
                   <div
@@ -321,7 +291,7 @@ export function PartnerPage() {
           <div className="grid sm:grid-cols-2 gap-6">
             {partnershipTypes.map((type, index) => (
               <motion.div
-                key={type.title}
+                key={`partnership-type-${index}`}
                 initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -361,7 +331,7 @@ export function PartnerPage() {
           <div className="grid gap-4">
             {learnMoreLinks.map((link, linkIndex) => (
               <motion.div
-                key={link.title}
+                key={link.to}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
