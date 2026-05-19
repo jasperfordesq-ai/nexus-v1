@@ -27,6 +27,12 @@ import {
   ModalFooter,
   useDisclosure,
   Spinner,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
 } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import Megaphone from 'lucide-react/icons/megaphone';
@@ -195,6 +201,9 @@ export function MyAdCampaignsPage() {
   const formatCtr = (ctr: number) =>
     `${(ctr * 100).toFixed(2)}%`;
 
+  const formatMetric = (value: number | undefined) =>
+    value == null ? t('empty_dash') : value.toLocaleString();
+
   if (!hasFeature('local_advertising')) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -247,51 +256,47 @@ export function MyAdCampaignsPage() {
             </Button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-divider text-left text-default-400 text-xs uppercase tracking-wider">
-                  <th className="px-4 py-3">{t('advertise.col_name')}</th>
-                  <th className="px-4 py-3">{t('advertise.col_type')}</th>
-                  <th className="px-4 py-3">{t('advertise.col_status')}</th>
-                  <th className="px-4 py-3">{t('advertise.col_budget')}</th>
-                  <th className="px-4 py-3">{t('advertise.col_dates')}</th>
-                  <th className="px-4 py-3">{t('advertise.col_impressions')}</th>
-                  <th className="px-4 py-3">{t('advertise.col_clicks')}</th>
-                  <th className="px-4 py-3">{t('advertise.col_ctr')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {campaigns.map((campaign) => {
-                  const s = stats[campaign.id];
-                  return (
-                    <tr key={campaign.id} className="border-b border-divider/50 hover:bg-default-50 transition-colors">
-                      <td className="px-4 py-3 font-medium text-theme-primary">{campaign.name}</td>
-                      <td className="px-4 py-3 capitalize text-default-500">
-                        {t(`advertise.type_${campaign.type}`)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <Chip
-                          size="sm"
-                          color={STATUS_COLOR[campaign.status] ?? 'default'}
-                          variant="flat"
-                        >
-                          {t(`advertise.status_${campaign.status}`)}
-                        </Chip>
-                      </td>
-                      <td className="px-4 py-3 text-default-600">{formatBudget(campaign.budget_cents)}</td>
-                      <td className="px-4 py-3 text-default-500 whitespace-nowrap">
-                        {campaign.start_date} → {campaign.end_date}
-                      </td>
-                      <td className="px-4 py-3 text-default-600">{s ? s.impressions.toLocaleString() : '—'}</td>
-                      <td className="px-4 py-3 text-default-600">{s ? s.clicks.toLocaleString() : '—'}</td>
-                      <td className="px-4 py-3 text-default-600">{s ? formatCtr(s.ctr) : '—'}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <Table aria-label={t('advertise.table_aria')} removeWrapper>
+            <TableHeader>
+              <TableColumn>{t('advertise.col_name')}</TableColumn>
+              <TableColumn>{t('advertise.col_type')}</TableColumn>
+              <TableColumn>{t('advertise.col_status')}</TableColumn>
+              <TableColumn>{t('advertise.col_budget')}</TableColumn>
+              <TableColumn>{t('advertise.col_dates')}</TableColumn>
+              <TableColumn>{t('advertise.col_impressions')}</TableColumn>
+              <TableColumn>{t('advertise.col_clicks')}</TableColumn>
+              <TableColumn>{t('advertise.col_ctr')}</TableColumn>
+            </TableHeader>
+            <TableBody>
+              {campaigns.map((campaign) => {
+                const s = stats[campaign.id];
+                return (
+                  <TableRow key={campaign.id}>
+                    <TableCell className="font-medium text-theme-primary">{campaign.name}</TableCell>
+                    <TableCell className="capitalize text-default-500">
+                      {t(`advertise.type_${campaign.type}`)}
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        size="sm"
+                        color={STATUS_COLOR[campaign.status] ?? 'default'}
+                        variant="flat"
+                      >
+                        {t(`advertise.status_${campaign.status}`)}
+                      </Chip>
+                    </TableCell>
+                    <TableCell className="text-default-600">{formatBudget(campaign.budget_cents)}</TableCell>
+                    <TableCell className="text-default-500 whitespace-nowrap">
+                      {t('advertise.date_range', { start: campaign.start_date, end: campaign.end_date })}
+                    </TableCell>
+                    <TableCell className="text-default-600">{formatMetric(s?.impressions)}</TableCell>
+                    <TableCell className="text-default-600">{formatMetric(s?.clicks)}</TableCell>
+                    <TableCell className="text-default-600">{s ? formatCtr(s.ctr) : t('empty_dash')}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         )}
       </GlassCard>
 
