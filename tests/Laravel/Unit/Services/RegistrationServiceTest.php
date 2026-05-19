@@ -11,6 +11,7 @@ use App\Services\DisposableEmailService;
 use App\Services\MxRecordValidator;
 use App\Services\PwnedPasswordService;
 use App\Services\RegistrationService;
+use App\Services\EmailDispatchService;
 use App\Services\TenantSettingsService;
 use App\Models\User;
 use Mockery;
@@ -113,8 +114,19 @@ class RegistrationServiceTest extends TestCase
 
     public function test_resendVerification_returns_token_for_pending_user(): void
     {
-        $user = Mockery::mock(User::class);
+        $user = Mockery::mock(User::class)->makePartial();
+        $user->setRawAttributes([
+            'id' => 42,
+            'email' => 'pending@example.com',
+            'first_name' => 'Pending',
+            'preferred_language' => 'en',
+        ]);
+        $user->shouldReceive('getAttribute')->with('id')->andReturn(42)->byDefault();
+        $user->shouldReceive('getAttribute')->with('email')->andReturn('pending@example.com')->byDefault();
+        $user->shouldReceive('getAttribute')->with('first_name')->andReturn('Pending')->byDefault();
+        $user->shouldReceive('getAttribute')->with('preferred_language')->andReturn('en')->byDefault();
         $user->shouldReceive('update')->once();
+        app()->instance(EmailDispatchService::class, new RegistrationSuccessfulEmailDispatchService());
 
         $mockQuery = Mockery::mock();
         $mockQuery->shouldReceive('where')->andReturnSelf();
@@ -124,5 +136,46 @@ class RegistrationServiceTest extends TestCase
         $result = $this->service->resendVerification('pending@example.com');
         $this->assertNotNull($result);
         $this->assertEquals(64, strlen($result));
+    }
+
+    public function test_resendVerification_returns_null_and_does_not_update_when_send_fails(): void
+    {
+        $user = Mockery::mock(User::class)->makePartial();
+        $user->setRawAttributes([
+            'id' => 42,
+            'email' => 'pending@example.com',
+            'first_name' => 'Pending',
+            'preferred_language' => 'en',
+        ]);
+        $user->shouldReceive('getAttribute')->with('id')->andReturn(42)->byDefault();
+        $user->shouldReceive('getAttribute')->with('email')->andReturn('pending@example.com')->byDefault();
+        $user->shouldReceive('getAttribute')->with('first_name')->andReturn('Pending')->byDefault();
+        $user->shouldReceive('getAttribute')->with('preferred_language')->andReturn('en')->byDefault();
+        $user->shouldNotReceive('update');
+        app()->instance(EmailDispatchService::class, new RegistrationFailingEmailDispatchService());
+
+        $mockQuery = Mockery::mock();
+        $mockQuery->shouldReceive('where')->andReturnSelf();
+        $mockQuery->shouldReceive('first')->andReturn($user);
+        $this->mockUser->shouldReceive('newQuery')->andReturn($mockQuery);
+
+        $result = $this->service->resendVerification('pending@example.com', $this->testTenantId);
+        $this->assertNull($result);
+    }
+}
+
+class RegistrationSuccessfulEmailDispatchService extends EmailDispatchService
+{
+    public function send(string $to, string $subject, string $body, array $options = []): bool
+    {
+        return true;
+    }
+}
+
+class RegistrationFailingEmailDispatchService extends EmailDispatchService
+{
+    public function send(string $to, string $subject, string $body, array $options = []): bool
+    {
+        return false;
     }
 }

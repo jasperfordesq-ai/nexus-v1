@@ -530,9 +530,9 @@ class RegistrationService
     }
 
     /**
-     * Resend verification email by regenerating the token.
+     * Resend verification email by regenerating the token after send acceptance.
      *
-     * @return string|null The new verification token, or null if user not found.
+     * @return string|null The new verification token, or null if user not found or send failed.
      */
     public function resendVerification(string $email, int $tenantId = 0): ?string
     {
@@ -549,18 +549,18 @@ class RegistrationService
             return null;
         }
 
-        $token = Str::random(64);
-        $user->update(['verification_token' => $token]);
-
         if ($tenantId <= 0) {
-            return $token;
+            return null;
         }
+
+        $token = Str::random(64);
+        $sent = false;
 
         // Send the verification email
         $previousTenantId = TenantContext::currentId();
         try {
             TenantContext::setById($tenantId);
-            LocaleContext::withLocale($user, function () use ($user, $token, $tenantId) {
+            $sent = (bool) LocaleContext::withLocale($user, function () use ($user, $token, $tenantId) {
                 $appUrl = TenantContext::getFrontendUrl();
                 $basePath = TenantContext::getSlugPrefix();
                 $verifyUrl = $appUrl . $basePath . '/verify-email?token=' . $token;
@@ -583,12 +583,15 @@ class RegistrationService
                     ->button(__('emails_misc.registration.verify_cta'), $verifyUrl)
                     ->render();
 
-                if (!EmailDispatchService::sendRaw($user->email, __('emails_misc.registration.verify_subject', ['tenant' => $tenantName]), $html, null, null, null, 'email_verification', ['tenant_id' => $tenantId])) {
+                $sent = EmailDispatchService::sendRaw($user->email, __('emails_misc.registration.verify_subject', ['tenant' => $tenantName]), $html, null, null, null, 'email_verification', ['tenant_id' => $tenantId]);
+                if (!$sent) {
                     Log::warning('RegistrationService: verification email send returned false', [
                         'user_id' => $user->id ?? null,
                         'tenant_id' => $tenantId,
                     ]);
                 }
+
+                return $sent;
             });
         } catch (\Throwable $e) {
             Log::warning('RegistrationService: Failed to send verification email', [
@@ -602,6 +605,12 @@ class RegistrationService
                 TenantContext::reset();
             }
         }
+
+        if (!$sent) {
+            return null;
+        }
+
+        $user->update(['verification_token' => $token]);
 
         return $token;
     }
