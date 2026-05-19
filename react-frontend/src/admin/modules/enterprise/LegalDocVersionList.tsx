@@ -33,7 +33,7 @@ import Calendar from 'lucide-react/icons/calendar';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Pencil from 'lucide-react/icons/pencil';
-import { usePageTitle } from '@/hooks/usePageTitle';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts/ToastContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';
@@ -41,9 +41,11 @@ import type { LegalDocumentVersion } from '@/admin/api/types';
 import LegalDocVersionForm from './LegalDocVersionForm';
 import LegalDocVersionComparison from './LegalDocVersionComparison';
 import { sanitizeRichText } from '@/lib/sanitize';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 
 export default function LegalDocVersionList() {
-  usePageTitle("Enterprise");
+  const { t } = useTranslation('admin');
+  useAdminPageMeta({ title: t('enterprise.legal_versions_title') });
 
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -80,14 +82,14 @@ export default function LegalDocVersionList() {
       if (response.success && response.data) {
         setVersions(response.data);
       } else {
-        error(response.error || "Failed to load versions");
+        error(response.error || t('enterprise.failed_to_load_versions'));
       }
     } catch {
-      error("Failed to load versions");
+      error(t('enterprise.failed_to_load_versions'));
     } finally {
       setLoading(false);
     }
-  }, [documentId, error])
+  }, [documentId, error, t])
 
 
   useEffect(() => {
@@ -102,15 +104,15 @@ export default function LegalDocVersionList() {
       const response = await adminLegalDocs.publishVersion(selectedVersion.id);
 
       if (response.success) {
-        success("Version Published");
+        success(t('enterprise.version_published'));
         setShowPublishModal(false);
         setSelectedVersion(null);
         loadVersions();
       } else {
-        error(response.error || "Failed to publish version");
+        error(response.error || t('enterprise.failed_to_publish_version'));
       }
     } catch {
-      error("Failed to publish version");
+      error(t('enterprise.failed_to_publish_version'));
     } finally {
       setSubmitting(false);
     }
@@ -124,15 +126,15 @@ export default function LegalDocVersionList() {
       const response = await adminLegalDocs.deleteVersion(documentId, deleteTarget.id);
 
       if (response.success) {
-        success("Draft Version deleted");
+        success(t('enterprise.draft_version_deleted'));
         setShowDeleteModal(false);
         setDeleteTarget(null);
         loadVersions();
       } else {
-        error(response.error || "Failed to delete version");
+        error(response.error || t('enterprise.failed_to_delete_version'));
       }
     } catch {
-      error("Failed to delete version");
+      error(t('enterprise.failed_to_delete_version'));
     } finally {
       setSubmitting(false);
     }
@@ -146,14 +148,14 @@ export default function LegalDocVersionList() {
       const response = await adminLegalDocs.notifyUsers(documentId, selectedVersion.id, { target: notifyTarget });
 
       if (response.success) {
-        success(notifyTarget === 'all' ? "Notification Sent All" : "Notification Sent Non Accepted");
+        success(notifyTarget === 'all' ? t('enterprise.notification_sent_all') : t('enterprise.notification_sent_non_accepted'));
         setShowNotifyModal(false);
         setSelectedVersion(null);
       } else {
-        error(response.error || "Failed to send notifications");
+        error(response.error || t('enterprise.failed_to_send_notifications'));
       }
     } catch {
-      error("Failed to send notifications");
+      error(t('enterprise.failed_to_send_notifications'));
     } finally {
       setSubmitting(false);
     }
@@ -193,9 +195,9 @@ export default function LegalDocVersionList() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{"Title"}</h1>
+          <h1 className="text-3xl font-bold">{t('enterprise.legal_versions_title')}</h1>
           <p className="text-[var(--color-text-secondary)] mt-1">
-            {"Subtitle"}
+            {t('enterprise.legal_versions_desc')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -204,13 +206,13 @@ export default function LegalDocVersionList() {
             startContent={<Plus size={18} />}
             onPress={() => setShowFormModal(true)}
           >
-            {"Create New Version"}
+            {t('enterprise.create_new_version')}
           </Button>
           <Button
             variant="bordered"
             onPress={() => navigate(tenantPath('/admin/legal-documents/compliance'))}
           >
-            {"Compliance Dashboard"}
+            {t('legal_versions.compliance_dashboard')}
           </Button>
         </div>
       </div>
@@ -221,9 +223,9 @@ export default function LegalDocVersionList() {
           <Card>
             <CardBody className="text-center py-12">
               <FileText size={48} className="mx-auto text-[var(--color-text-tertiary)] mb-4" />
-              <p className="text-lg text-[var(--color-text-secondary)]">{"No versions found found"}</p>
+              <p className="text-lg text-[var(--color-text-secondary)]">{t('enterprise.no_versions_found')}</p>
               <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
-                {"Create New Version."}
+                {t('enterprise.create_new_version_hint')}
               </p>
             </CardBody>
           </Card>
@@ -235,7 +237,7 @@ export default function LegalDocVersionList() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-xl font-semibold">
-                        {`Version Prefix`}
+                        {t('enterprise.version_number_label', { version: version.version_number })}
                       </h3>
                       {version.version_label && (
                         <Chip size="sm" color="default">
@@ -244,12 +246,12 @@ export default function LegalDocVersionList() {
                       )}
                       {version.is_current && (
                         <Chip size="sm" color="success" startContent={<CheckCircle2 size={14} />}>
-                          {"Current"}
+                          {t('enterprise.version_list.current')}
                         </Chip>
                       )}
                       {version.is_draft && (
                         <Chip size="sm" color="warning">
-                          {"Draft"}
+                          {t('enterprise.chip_draft')}
                         </Chip>
                       )}
                     </div>
@@ -257,7 +259,7 @@ export default function LegalDocVersionList() {
                     <div className="flex flex-wrap gap-4 text-sm text-[var(--color-text-secondary)]">
                       <div className="flex items-center gap-1">
                         <User size={14} />
-                        <span>{`Created by`}</span>
+                        <span>{t('enterprise.created_by')}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar size={14} />
@@ -266,20 +268,20 @@ export default function LegalDocVersionList() {
                       {version.effective_date && (
                         <div className="flex items-center gap-1">
                           <Clock size={14} />
-                          <span>{"Effective Date"} {new Date(version.effective_date).toLocaleDateString()}</span>
+                          <span>{t('enterprise.effective_date_label')} {new Date(version.effective_date).toLocaleDateString()}</span>
                         </div>
                       )}
                       {version.published_at && (
                         <div className="flex items-center gap-1">
                           <CheckCircle2 size={14} />
-                          <span>{"Published Date"} {new Date(version.published_at).toLocaleDateString()}</span>
+                          <span>{t('enterprise.published_date_label')} {new Date(version.published_at).toLocaleDateString()}</span>
                         </div>
                       )}
                     </div>
 
                     {version.summary_of_changes && (
                       <div className="mt-3 p-3 bg-[var(--color-surface)] rounded-lg">
-                        <p className="text-sm font-medium mb-1">{"Summary of Changes"}</p>
+                        <p className="text-sm font-medium mb-1">{t('enterprise.summary_of_changes')}</p>
                         <p className="text-sm text-[var(--color-text-secondary)]">
                           {version.summary_of_changes}
                         </p>
@@ -291,7 +293,7 @@ export default function LegalDocVersionList() {
                 <div className="flex gap-2">
                   {version.is_draft && (
                     <>
-                      <Tooltip content={"Publish"}>
+                      <Tooltip content={t('enterprise.btn_publish')}>
                         <Button
                           size="sm"
                           color="success"
@@ -302,10 +304,10 @@ export default function LegalDocVersionList() {
                             setShowPublishModal(true);
                           }}
                         >
-                          {"Publish"}
+                          {t('enterprise.btn_publish')}
                         </Button>
                       </Tooltip>
-                      <Tooltip content={"Edit Draft"}>
+                      <Tooltip content={t('enterprise.tooltip_edit_draft')}>
                         <Button
                           size="sm"
                           variant="flat"
@@ -315,10 +317,10 @@ export default function LegalDocVersionList() {
                             setShowEditModal(true);
                           }}
                         >
-                          {"Edit"}
+                          {t('enterprise.btn_edit')}
                         </Button>
                       </Tooltip>
-                      <Tooltip content={"Delete Draft"}>
+                      <Tooltip content={t('enterprise.tooltip_delete_draft')}>
                         <Button
                           size="sm"
                           color="danger"
@@ -329,14 +331,14 @@ export default function LegalDocVersionList() {
                             setShowDeleteModal(true);
                           }}
                         >
-                          {"Delete"}
+                          {t('enterprise.btn_delete')}
                         </Button>
                       </Tooltip>
                     </>
                   )}
 
                   {!version.is_draft && (
-                    <Tooltip content={"Notify"}>
+                    <Tooltip content={t('enterprise.btn_notify')}>
                       <Button
                         size="sm"
                         color="primary"
@@ -344,30 +346,30 @@ export default function LegalDocVersionList() {
                         startContent={<Send size={16} />}
                         onPress={() => openNotifyModal(version)}
                       >
-                        {"Notify"}
+                        {t('enterprise.btn_notify')}
                       </Button>
                     </Tooltip>
                   )}
 
                   {index < versions.length - 1 && (
-                    <Tooltip content={"Compare"}>
+                    <Tooltip content={t('enterprise.btn_compare')}>
                       <Button
                         size="sm"
                         variant="bordered"
                         startContent={<GitCompare size={16} />}
                         onPress={() => { const prev = versions[index + 1]; if (prev) openCompareModal(version, prev); }}
                       >
-                        {"Compare"}
+                        {t('enterprise.btn_compare')}
                       </Button>
                     </Tooltip>
                   )}
 
-                  <Tooltip content={"View Content"}>
+                  <Tooltip content={t('enterprise.tooltip_view_content')}>
                     <Button
                       size="sm"
                       variant="bordered"
                       isIconOnly
-                      aria-label={"View Full Content"}
+                      aria-label={t('enterprise.label_view_full_content')}
                       onPress={() => {
                         setViewingVersion(version);
                         setShowViewModal(true);
@@ -455,34 +457,34 @@ export default function LegalDocVersionList() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>{"Publish Version"}</ModalHeader>
+              <ModalHeader>{t('legal_versions.publish_version')}</ModalHeader>
               <ModalBody>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 p-3 bg-warning-50 dark:bg-warning-900/20 rounded-lg">
                     <AlertCircle size={20} className="text-warning flex-shrink-0 mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-medium mb-1">{"This Will"}:</p>
+                      <p className="font-medium mb-1">{t('legal_versions.this_will')}:</p>
                       <ul className="list-disc list-inside space-y-1 text-[var(--color-text-secondary)]">
-                        <li>{"Publish Step 1"}</li>
-                        <li>{"Publish Step 2"}</li>
-                        <li>{"Publish Step 3"}</li>
-                        <li>{"Publish Step 4"}</li>
+                        <li>{t('legal_versions.publish_step_1')}</li>
+                        <li>{t('legal_versions.publish_step_2')}</li>
+                        <li>{t('legal_versions.publish_step_3')}</li>
+                        <li>{t('legal_versions.publish_step_4')}</li>
                       </ul>
                     </div>
                   </div>
-                  <p>{`Publish Version Confirm`}</p>
+                  <p>{t('enterprise.publish_version_confirm')}</p>
                 </div>
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {"Cancel"}
+                  {t('enterprise.cancel')}
                 </Button>
                 <Button
                   color="success"
                   onPress={handlePublish}
                   isLoading={submitting}
                 >
-                  {"Publish Version"}
+                  {t('legal_versions.publish_version')}
                 </Button>
               </ModalFooter>
             </>
@@ -504,30 +506,30 @@ export default function LegalDocVersionList() {
                 <div className="flex items-center gap-2">
                   <FileText size={20} />
                   <span>
-                    {`Version Prefix`}
+                    {viewingVersion ? t('enterprise.version_number_label', { version: viewingVersion.version_number }) : t('enterprise.label_version')}
                     {viewingVersion?.version_label ? ` — ${viewingVersion.version_label}` : ''}
                   </span>
                 </div>
               </ModalHeader>
               <ModalBody className="space-y-4">
-                <div className="flex flex-wrap gap-4 text-sm text-(--color-text-secondary)">
+                <div className="flex flex-wrap gap-4 text-sm text-[var(--color-text-secondary)]">
                   {viewingVersion?.effective_date && (
                     <div className="flex items-center gap-1">
                       <Clock size={14} />
-                      <span>{"Effective Date"} {new Date(viewingVersion.effective_date).toLocaleDateString()}</span>
+                      <span>{t('enterprise.effective_date_label')} {new Date(viewingVersion.effective_date).toLocaleDateString()}</span>
                     </div>
                   )}
                   {viewingVersion?.published_at && (
                     <div className="flex items-center gap-1">
                       <CheckCircle2 size={14} />
-                      <span>{"Published Date"} {new Date(viewingVersion.published_at).toLocaleDateString()}</span>
+                      <span>{t('enterprise.published_date_label')} {new Date(viewingVersion.published_at).toLocaleDateString()}</span>
                     </div>
                   )}
                 </div>
                 {viewingVersion?.summary_of_changes && (
-                  <div className="p-3 bg-(--color-surface) rounded-lg">
-                    <p className="text-sm font-medium mb-1">{"Summary of Changes"}</p>
-                    <p className="text-sm text-(--color-text-secondary)">
+                  <div className="p-3 bg-[var(--color-surface)] rounded-lg">
+                    <p className="text-sm font-medium mb-1">{t('enterprise.summary_of_changes')}</p>
+                    <p className="text-sm text-[var(--color-text-secondary)]">
                       {viewingVersion.summary_of_changes}
                     </p>
                   </div>
@@ -539,7 +541,7 @@ export default function LegalDocVersionList() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {"Close"}
+                  {t('enterprise.btn_close')}
                 </Button>
               </ModalFooter>
             </>
@@ -552,17 +554,17 @@ export default function LegalDocVersionList() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>{"Send Notification"}</ModalHeader>
+              <ModalHeader>{t('legal_versions.send_notification')}</ModalHeader>
               <ModalBody>
                 <div className="space-y-4">
                   <p className="text-sm text-[var(--color-text-secondary)]">
-                    {`Notify Modal Intro`}
+                    {t('enterprise.notify_modal_intro')}
                   </p>
 
                   <RadioGroup
                     value={notifyTarget}
                     onValueChange={(val) => setNotifyTarget(val as 'all' | 'non_accepted')}
-                    aria-label={"Notification Target"}
+                    aria-label={t('enterprise.label_notification_target')}
                     classNames={{ wrapper: 'gap-3' }}
                   >
                     <Radio
@@ -571,9 +573,9 @@ export default function LegalDocVersionList() {
                         base: 'flex items-start gap-3 p-3 border border-[var(--color-border)] rounded-lg cursor-pointer hover:bg-[var(--color-surface)] max-w-full',
                         label: 'flex-1',
                       }}
-                      description={pendingCount > 0 ? `Pending Users Count` : "Loading pending users..."}
+                      description={pendingCount > 0 ? t('enterprise.pending_users_count', { count: pendingCount }) : t('enterprise.loading_pending_users')}
                     >
-                      <span className="font-medium">{"Notify Non Accepted"}</span>
+                      <span className="font-medium">{t('enterprise.notify_non_accepted')}</span>
                     </Radio>
 
                     <Radio
@@ -582,16 +584,16 @@ export default function LegalDocVersionList() {
                         base: 'flex items-start gap-3 p-3 border border-[var(--color-border)] rounded-lg cursor-pointer hover:bg-[var(--color-surface)] max-w-full',
                         label: 'flex-1',
                       }}
-                      description={"Sending to everyone may be redundant if members are already subscribed"}
+                      description={t('enterprise.desc_send_to_everyone_may_be_redundant')}
                     >
-                      <span className="font-medium">{"Notify All Active"}</span>
+                      <span className="font-medium">{t('enterprise.notify_all_active')}</span>
                     </Radio>
                   </RadioGroup>
                 </div>
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {"Cancel"}
+                  {t('enterprise.cancel')}
                 </Button>
                 <Button
                   color="primary"
@@ -599,7 +601,7 @@ export default function LegalDocVersionList() {
                   isLoading={submitting}
                   startContent={<Send size={16} />}
                 >
-                  {"Send Notification"}
+                  {t('legal_versions.send_notification')}
                 </Button>
               </ModalFooter>
             </>
@@ -612,15 +614,15 @@ export default function LegalDocVersionList() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>{"Delete Draft Version"}</ModalHeader>
+              <ModalHeader>{t('legal_versions.delete_draft_version')}</ModalHeader>
               <ModalBody>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 p-3 bg-danger-50 dark:bg-danger-900/20 rounded-lg">
                     <AlertCircle size={20} className="text-danger shrink-0 mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-medium mb-1">{"Cannot Be Undone"}</p>
+                      <p className="font-medium mb-1">{t('enterprise.action_cannot_be_undone')}</p>
                       <p className="text-[var(--color-text-secondary)]">
-                        {`Draft Will Be deleted`}
+                        {t('enterprise.draft_will_be_deleted')}
                       </p>
                     </div>
                   </div>
@@ -628,7 +630,7 @@ export default function LegalDocVersionList() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {"Cancel"}
+                  {t('enterprise.cancel')}
                 </Button>
                 <Button
                   color="danger"
@@ -636,7 +638,7 @@ export default function LegalDocVersionList() {
                   isLoading={submitting}
                   startContent={<Trash2 size={16} />}
                 >
-                  {"Delete Draft"}
+                  {t('legal_versions.delete_draft')}
                 </Button>
               </ModalFooter>
             </>

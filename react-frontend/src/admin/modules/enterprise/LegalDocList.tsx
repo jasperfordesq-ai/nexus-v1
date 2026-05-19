@@ -16,12 +16,12 @@ import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
 import FileText from 'lucide-react/icons/file-text';
 import GitBranch from 'lucide-react/icons/git-branch';
-import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminLegalDocs } from '../../api/adminApi';
 import { PageHeader, DataTable, ConfirmModal, StatusBadge } from '../../components';
 import type { Column } from '../../components';
 import type { LegalDocument } from '../../api/types';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 
 import { useTranslation } from 'react-i18next';
 /** Human-friendly labels for legal document types */
@@ -36,7 +36,7 @@ const DOC_TYPE_KEYS: Record<string, string> = {
 
 export function LegalDocList() {
   const { t } = useTranslation('admin');
-  usePageTitle("Enterprise");
+  useAdminPageMeta({ title: t('enterprise.legal_doc_list_title') });
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -55,11 +55,11 @@ export function LegalDocList() {
         setDocs(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error("Failed to load legal documents");
+      toast.error(t('enterprise.failed_to_load_legal_documents'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -73,15 +73,15 @@ export function LegalDocList() {
       const res = await adminLegalDocs.delete(deleteTarget.id);
 
       if (res.success) {
-        toast.success("Document Deleted");
+        toast.success(t('enterprise.document_deleted'));
         setDeleteTarget(null);
         loadData();
       } else {
-        const error = (res as { error?: string }).error || "Failed to delete document";
+        const error = (res as { error?: string }).error || t('enterprise.failed_to_delete_document');
         toast.error(error);
       }
-    } catch (err) {
-      toast.error("Failed to delete document");
+    } catch {
+      toast.error(t('enterprise.failed_to_delete_document'));
     } finally {
       setDeleting(false);
     }
@@ -90,7 +90,7 @@ export function LegalDocList() {
   const columns: Column<LegalDocument>[] = [
     {
       key: 'title',
-      label: "Title",
+      label: t('enterprise.label_title'),
       sortable: true,
       render: (doc) => (
         <div className="flex items-center gap-2">
@@ -101,7 +101,7 @@ export function LegalDocList() {
     },
     {
       key: 'type',
-      label: "Type",
+      label: t('enterprise.label_type'),
       sortable: true,
       render: (doc) => (
         <Chip size="sm" variant="flat" color="primary">
@@ -109,22 +109,22 @@ export function LegalDocList() {
         </Chip>
       ),
     },
-    { key: 'version', label: "Version", render: (doc) => doc.version || '1.0' },
+    { key: 'version', label: t('enterprise.label_version'), render: (doc) => doc.version || '1.0' },
     {
       key: 'status',
-      label: "Status",
+      label: t('enterprise.label_status'),
       sortable: true,
       render: (doc) => <StatusBadge status={doc.status} />,
     },
     {
       key: 'updated_at',
-      label: "Last Updated",
+      label: t('enterprise.label_last_updated'),
       sortable: true,
       render: (doc) => doc.updated_at ? new Date(doc.updated_at).toLocaleDateString() : '---',
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('enterprise.label_actions'),
       render: (doc) => (
         <div className="flex items-center gap-1">
           <Button
@@ -132,7 +132,7 @@ export function LegalDocList() {
             size="sm"
             variant="light"
             onPress={() => navigate(tenantPath(`/admin/legal-documents/${doc.id}/versions`))}
-            aria-label={"Manage Versions"}
+            aria-label={t('enterprise.label_manage_versions')}
           >
             <GitBranch size={14} />
           </Button>
@@ -141,7 +141,7 @@ export function LegalDocList() {
             size="sm"
             variant="light"
             onPress={() => navigate(tenantPath(`/admin/legal-documents/${doc.id}/edit`))}
-            aria-label={"Edit Document"}
+            aria-label={t('enterprise.label_edit_document')}
           >
             <Pencil size={14} />
           </Button>
@@ -151,7 +151,7 @@ export function LegalDocList() {
             variant="light"
             color="danger"
             onPress={() => setDeleteTarget(doc)}
-            aria-label={"Delete Document"}
+            aria-label={t('enterprise.label_delete_document')}
           >
             <Trash2 size={14} />
           </Button>
@@ -163,8 +163,8 @@ export function LegalDocList() {
   return (
     <div>
       <PageHeader
-        title={"Legal Doc List"}
-        description={"Manage legal documents including Terms, Privacy Policy, and Cookie Policy"}
+        title={t('enterprise.legal_doc_list_title')}
+        description={t('enterprise.legal_doc_list_desc')}
         actions={
           <Button
             as={Link}
@@ -173,7 +173,7 @@ export function LegalDocList() {
             startContent={<Plus size={16} />}
             size="sm"
           >
-            {"Create Document"}
+            {t('legal_doc_form.create_document')}
           </Button>
         }
       />
@@ -184,16 +184,16 @@ export function LegalDocList() {
         isLoading={loading}
         onRefresh={loadData}
         searchable={false}
-        emptyContent={"No legal documents"}
+        emptyContent={t('enterprise.no_legal_documents')}
       />
 
       <ConfirmModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title={"Delete Document"}
-        message={`Are you sure you want to delete this document? This cannot be undone.`}
-        confirmLabel={"Delete"}
+        title={t('enterprise.label_delete_document')}
+        message={t('enterprise.delete_document_confirm')}
+        confirmLabel={t('enterprise.delete')}
         confirmColor="danger"
         isLoading={deleting}
       />

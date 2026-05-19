@@ -22,32 +22,34 @@ import {
 } from '@heroui/react';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
-import { usePageTitle } from '@/hooks';
+import { useTranslation } from 'react-i18next';
 import { useTenant, useToast } from '@/contexts';
 import { adminLegalDocs } from '../../api/adminApi';
 import { PageHeader } from '../../components';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 
 
 export function LegalDocForm() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const isEdit = !!id;
 
   const DOC_TYPES = [
-    { value: 'terms', label: "Doc Type Terms" },
-    { value: 'privacy', label: "Doc Type Privacy" },
-    { value: 'cookies', label: "Doc Type Cookies" },
-    { value: 'accessibility', label: "Doc Type Accessibility" },
-    { value: 'community_guidelines', label: "Doc Type Community Guidelines" },
-    { value: 'acceptable_use', label: "Doc Type Acceptable Use" },
+    { value: 'terms', label: t('legal_doc_form.doc_type_terms') },
+    { value: 'privacy', label: t('legal_doc_form.doc_type_privacy') },
+    { value: 'cookies', label: t('legal_doc_form.doc_type_cookies') },
+    { value: 'accessibility', label: t('legal_doc_form.doc_type_accessibility') },
+    { value: 'community_guidelines', label: t('legal_doc_form.doc_type_community_guidelines') },
+    { value: 'acceptable_use', label: t('legal_doc_form.doc_type_acceptable_use') },
   ];
 
   const STATUS_OPTIONS = [
-    { value: 'draft', label: "Draft" },
-    { value: 'published', label: "Published" },
-    { value: 'archived', label: "Archived" },
+    { value: 'draft', label: t('legal_doc_form.status_draft') },
+    { value: 'published', label: t('legal_doc_form.status_published') },
+    { value: 'archived', label: t('legal_doc_form.status_archived') },
   ];
 
-  usePageTitle(isEdit ? "Title Edit" : "Title Create");
+  useAdminPageMeta({ title: isEdit ? t('legal_doc_form.page_title_edit') : t('legal_doc_form.page_title_create') });
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -80,11 +82,11 @@ export function LegalDocForm() {
         setStatus(doc.status || 'draft');
       }
     } catch {
-      toast.error("Failed to load document");
+      toast.error(t('legal_doc_form.failed_to_load_document'));
     } finally {
       setLoading(false);
     }
-  }, [id, isEdit, toast])
+  }, [id, isEdit, t, toast])
 
 
   useEffect(() => {
@@ -93,7 +95,7 @@ export function LegalDocForm() {
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      toast.error("Title is Required");
+      toast.error(t('legal_doc_form.title_required'));
       return;
     }
 
@@ -115,14 +117,14 @@ export function LegalDocForm() {
       }
 
       if (res.success) {
-        toast.success(isEdit ? "Document updated" : "Document created");
+        toast.success(isEdit ? t('legal_doc_form.document_updated') : t('legal_doc_form.document_created'));
         navigate(tenantPath('/admin/legal-documents'));
       } else {
-        const error = (res as { error?: string }).error || "Save Failed Generic";
+        const error = (res as { error?: string }).error || t('legal_doc_form.save_failed_generic');
         toast.error(error);
       }
-    } catch (err) {
-      toast.error("Failed to save document");
+    } catch {
+      toast.error(t('legal_doc_form.failed_to_save_document'));
     } finally {
       setSaving(false);
     }
@@ -139,8 +141,8 @@ export function LegalDocForm() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? "Edit" : "Create"}
-        description={isEdit ? "Edit." : "Create."}
+        title={isEdit ? t('legal_doc_form.edit_title') : t('legal_doc_form.create_title')}
+        description={isEdit ? t('legal_doc_form.edit_description') : t('legal_doc_form.create_description')}
         actions={
           <Button
             variant="flat"
@@ -148,7 +150,7 @@ export function LegalDocForm() {
             onPress={() => navigate(tenantPath('/admin/legal-documents'))}
             size="sm"
           >
-            {"Back to Documents"}
+            {t('legal_doc_form.back_to_documents')}
           </Button>
         }
       />
@@ -157,18 +159,18 @@ export function LegalDocForm() {
         {/* Metadata */}
         <Card shadow="sm">
           <CardBody className="p-4 space-y-4">
-            <h3 className="text-lg font-semibold">{"Document Details"}</h3>
+            <h3 className="text-lg font-semibold">{t('legal_doc_form.document_details')}</h3>
             <Input
-              label={"Title"}
+              label={t('enterprise.label_title')}
               value={title}
               onValueChange={setTitle}
               variant="bordered"
               isRequired
-              placeholder={"Enter title..."}
+              placeholder={t('legal_doc_form.title_placeholder')}
             />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <Select
-                label={"Type"}
+                label={t('enterprise.label_type')}
                 selectedKeys={new Set([type])}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string;
@@ -181,14 +183,14 @@ export function LegalDocForm() {
                 ))}
               </Select>
               <Input
-                label={"Version"}
+                label={t('enterprise.label_version')}
                 value={version}
                 onValueChange={setVersion}
                 variant="bordered"
                 placeholder="1.0"
               />
               <Select
-                label={"Status"}
+                label={t('enterprise.label_status')}
                 selectedKeys={new Set([status])}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string;
@@ -207,14 +209,14 @@ export function LegalDocForm() {
         {/* Content */}
         <Card shadow="sm">
           <CardBody className="p-4">
-            <h3 className="text-lg font-semibold mb-3">{"Content"}</h3>
+            <h3 className="text-lg font-semibold mb-3">{t('legal_doc_form.content')}</h3>
             <Textarea
-              label={"Document Content"}
+              label={t('legal_doc_form.document_content')}
               value={content}
               onValueChange={setContent}
               variant="bordered"
               minRows={12}
-              placeholder={"Enter document content..."}
+              placeholder={t('legal_doc_form.content_placeholder')}
             />
           </CardBody>
         </Card>
@@ -225,7 +227,7 @@ export function LegalDocForm() {
             variant="flat"
             onPress={() => navigate(tenantPath('/admin/legal-documents'))}
           >
-            {"Cancel"}
+            {t('legal_doc_form.cancel')}
           </Button>
           <Button
             color="primary"
@@ -233,7 +235,7 @@ export function LegalDocForm() {
             onPress={handleSubmit}
             isLoading={saving}
           >
-            {isEdit ? "Update Document" : "Create Document"}
+            {isEdit ? t('legal_doc_form.update_document') : t('legal_doc_form.create_document')}
           </Button>
         </div>
       </div>
