@@ -42,8 +42,6 @@ import { RelatedPages } from './RelatedPages';
 const impactStats = [
   {
     value: '16:1',
-    label: 'Social Return on Investment',
-    description: 'For every \u20AC1 invested, \u20AC16 of social value is created',
     color: 'from-indigo-500 to-blue-500',
     bgAccent: 'bg-indigo-500/10',
     textAccent: 'text-indigo-600 dark:text-indigo-400',
@@ -51,8 +49,6 @@ const impactStats = [
   },
   {
     value: '100%',
-    label: 'Improved Wellbeing',
-    description: 'Members report feeling better connected and supported',
     color: 'from-emerald-500 to-teal-500',
     bgAccent: 'bg-emerald-500/10',
     textAccent: 'text-emerald-600 dark:text-emerald-400',
@@ -60,8 +56,6 @@ const impactStats = [
   },
   {
     value: '95%',
-    label: 'Socially Connected',
-    description: 'Members feel more integrated in their community',
     color: 'from-amber-500 to-orange-500',
     bgAccent: 'bg-amber-500/10',
     textAccent: 'text-amber-600 dark:text-amber-400',
@@ -72,23 +66,14 @@ const impactStats = [
 const steps = [
   {
     icon: Handshake,
-    title: 'Give an Hour',
-    description:
-      'Share a skill you love \u2014 from practical help to a friendly chat or a lift to the shops.',
     color: 'from-indigo-500 to-purple-500',
   },
   {
     icon: Clock,
-    title: 'Earn a Credit',
-    description:
-      'You automatically earn one Time Credit for every hour you spend helping another member.',
     color: 'from-emerald-500 to-teal-500',
   },
   {
     icon: Users,
-    title: 'Get Help',
-    description:
-      'Spend your credit to get support, learn a new skill, or join a community work day.',
     color: 'from-amber-500 to-orange-500',
   },
 ];
@@ -96,33 +81,21 @@ const steps = [
 const values = [
   {
     icon: Gem,
-    title: 'We Are All Assets',
-    description:
-      'Everyone has something valuable to offer. Timebanking recognises the unique contributions of every member, regardless of background or circumstance.',
     color: 'text-indigo-500 dark:text-indigo-400',
     bg: 'bg-indigo-500/15',
   },
   {
     icon: RefreshCw,
-    title: 'Redefining Work',
-    description:
-      'Raising children, caring for elders, volunteering, and community building \u2014 timebanking values the essential work that keeps communities strong.',
     color: 'text-emerald-500 dark:text-emerald-400',
     bg: 'bg-emerald-500/15',
   },
   {
     icon: Sparkles,
-    title: 'Reciprocity',
-    description:
-      'Giving and receiving go hand in hand. When you help someone, you create a ripple of goodwill that comes back to strengthen the whole community.',
     color: 'text-[var(--color-warning)]',
     bg: 'bg-amber-500/15',
   },
   {
     icon: Network,
-    title: 'Social Networks',
-    description:
-      'Timebanking weaves a web of trust and mutual support. Every exchange builds social capital and creates lasting connections between neighbours.',
     color: 'text-rose-500 dark:text-rose-400',
     bg: 'bg-rose-500/15',
   },
@@ -220,7 +193,7 @@ export function TimebankingGuidePage() {
             className="grid sm:grid-cols-3 gap-6"
           >
             {impactStats.map((stat) => (
-              <motion.div key={stat.label} variants={fadeInUp}>
+              <motion.div key={stat.value} variants={fadeInUp}>
                 <GlassCard className="p-6 text-center h-full relative overflow-hidden group hover:scale-[1.02] transition-transform">
                   {/* Gradient top bar */}
                   <div
@@ -264,7 +237,7 @@ export function TimebankingGuidePage() {
           <div className="grid sm:grid-cols-3 gap-8">
             {steps.map((step, index) => (
               <motion.div
-                key={step.title}
+                key={`step-${index}`}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -311,7 +284,7 @@ export function TimebankingGuidePage() {
           <div className="grid sm:grid-cols-2 gap-6">
             {values.map((value, index) => (
               <motion.div
-                key={value.title}
+                key={`value-${index}`}
                 initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}

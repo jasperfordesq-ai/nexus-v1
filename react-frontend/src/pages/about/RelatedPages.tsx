@@ -23,24 +23,22 @@ import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 
 interface AboutLink {
-  label: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
-  description: string;
 }
 
 // Universal about pages — shown for all tenants
 const universalAboutPages: AboutLink[] = [
-  { label: 'Timebanking Guide', href: '/timebanking-guide', icon: BookOpen, description: 'How timebanking works' },
+  { href: '/timebanking-guide', icon: BookOpen },
 ];
 
 // Tenant 2 (hOUR Timebank) specific pages — contain hardcoded org content
 const hourTimebankAboutPages: AboutLink[] = [
-  { label: 'Partner With Us', href: '/partner', icon: Handshake, description: 'Partnership opportunities' },
-  { label: 'Social Prescribing', href: '/social-prescribing', icon: Stethoscope, description: 'Evidence-based referral pathway' },
-  { label: 'Our Impact', href: '/impact-summary', icon: TrendingUp, description: 'Social return on investment' },
-  { label: 'Impact Report', href: '/impact-report', icon: BarChart3, description: 'Full 2023 SROI study' },
-  { label: 'Strategic Plan', href: '/strategic-plan', icon: Compass, description: '2026–2030 roadmap' },
+  { href: '/partner', icon: Handshake },
+  { href: '/social-prescribing', icon: Stethoscope },
+  { href: '/impact-summary', icon: TrendingUp },
+  { href: '/impact-report', icon: BarChart3 },
+  { href: '/strategic-plan', icon: Compass },
 ];
 
 interface RelatedPagesProps {
