@@ -7,8 +7,6 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
-use App\I18n\LocaleContext;
-use App\Models\Notification;
 use App\Support\FeedItemTables;
 use Illuminate\Support\Facades\DB;
 
@@ -267,36 +265,22 @@ class ShareService
 
     private function notifyOwner(int $sharerId, int $ownerId, string $type, int $id, int $tenantId): void
     {
-        try {
-            $sharer = DB::table('users')
-                ->where('id', $sharerId)
-                ->where('tenant_id', $tenantId)
-                ->select('first_name', 'last_name')
-                ->first();
+        $previousTenantId = TenantContext::currentId();
 
-            if (!$sharer) {
+        try {
+            if (!TenantContext::setById($tenantId)) {
                 return;
             }
 
-            $sharerName = trim($sharer->first_name . ' ' . $sharer->last_name);
-            $linkPath = SocialNotificationService::getContentLink($type, $id);
-
-            $owner = DB::table('users')
-                ->where('id', $ownerId)
-                ->where('tenant_id', $tenantId)
-                ->select('id', 'preferred_language')
-                ->first();
-
-            LocaleContext::withLocale($owner, function () use ($ownerId, $sharerName, $linkPath) {
-                Notification::createNotification(
-                    $ownerId,
-                    __('api_controllers_3.feed.post_shared', ['name' => $sharerName]),
-                    $linkPath,
-                    'post_shared'
-                );
-            });
+            SocialNotificationService::notifyShare($ownerId, $sharerId, $type, $id);
         } catch (\Throwable $e) {
             // Never let a notification failure block the share.
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById((int) $previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
     }
 }
