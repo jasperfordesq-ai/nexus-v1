@@ -776,6 +776,9 @@
   },
   "skills": {
     "browse_title": "Community Skills Directory",
+    "explainer": "Browse skills shared by members in your community, find people offering help, and discover members who want to learn.",
+    "unable_to_load": "Unable to load",
+    "try_again": "Try Again",
     "load_failed": "Failed to load skill categories",
     "load_failed_retry": "Failed to load skill categories. Please try again.",
     "offering_label": "Offering",
@@ -845,7 +848,8 @@
   "radius_100": "100 km",
   "page_meta": {
     "skills_browse": {
-      "title": "Browse Skills"
+      "title": "Browse Skills",
+      "description": "Browse community skills, find members offering help, and discover learning requests across your timebank."
     },
     "members": {
       "title": "Members",
