@@ -24,9 +24,9 @@ import Lock from 'lucide-react/icons/lock';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Search from 'lucide-react/icons/search';
 import type { LucideIcon } from 'lucide-react';
-import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminEnterprise, adminUsers } from '../../api/adminApi';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader } from '../../components';
 import type { AdminUser } from '../../api/types';
 
@@ -52,7 +52,7 @@ const PRIORITY_KEYS = ['low', 'normal', 'high', 'urgent'] as const;
 
 export function GdprRequestCreate() {
   const { t } = useTranslation('admin');
-  usePageTitle("GDPR Create Request Page");
+  useAdminPageMeta({ title: t('enterprise.gdpr_create_request_title') });
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -118,11 +118,11 @@ export function GdprRequestCreate() {
   const handleSubmit = async () => {
     const parsedUserId = parseInt(userId, 10);
     if (!parsedUserId || isNaN(parsedUserId)) {
-      toast.error("GDPR Enter Valid User ID");
+      toast.error(t('enterprise.gdpr_enter_valid_user_id'));
       return;
     }
     if (!selectedType) {
-      toast.error("GDPR Select Request");
+      toast.error(t('enterprise.gdpr_select_request_type'));
       return;
     }
 
@@ -135,14 +135,14 @@ export function GdprRequestCreate() {
         notes: notes.trim() || undefined,
       });
       if (res.success) {
-        toast.success("GDPR Request created");
+        toast.success(t('enterprise.gdpr_request_created'));
         navigate(tenantPath('/admin/enterprise/gdpr/requests'));
       } else {
-        const error = (res as { error?: string }).error || "GDPR Failed Create Request";
+        const error = (res as { error?: string }).error || t('enterprise.gdpr_failed_create_request');
         toast.error(error);
       }
-    } catch (err) {
-      toast.error("GDPR Failed Create Request");
+    } catch {
+      toast.error(t('enterprise.gdpr_failed_create_request'));
     } finally {
       setSaving(false);
     }
@@ -151,8 +151,8 @@ export function GdprRequestCreate() {
   return (
     <div>
       <PageHeader
-        title={"GDPR Create Request"}
-        description={"GDPR Create Request."}
+        title={t('enterprise.gdpr_create_request_title')}
+        description={t('enterprise.gdpr_create_request_desc')}
         actions={
           <Button
             variant="flat"
@@ -160,7 +160,7 @@ export function GdprRequestCreate() {
             onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests'))}
             size="sm"
           >
-            {"GDPR Back to Requests"}
+            {t('enterprise.gdpr_back_to_requests')}
           </Button>
         }
       />
@@ -172,7 +172,7 @@ export function GdprRequestCreate() {
             {selectedUser ? (
               <div className="space-y-2">
                 <p className="text-sm font-medium text-default-700">
-                  {"GDPR User"} <span className="text-danger">*</span>
+                  {t('enterprise.gdpr_user')} <span className="text-danger">*</span>
                 </p>
                 <Chip
                   onClose={handleDeselectUser}
@@ -186,8 +186,8 @@ export function GdprRequestCreate() {
             ) : (
               <div className="relative">
                 <Input
-                  label={"GDPR Search User"}
-                  placeholder={"Search user..."}
+                  label={t('enterprise.gdpr_search_user')}
+                  placeholder={t('enterprise.gdpr_search_user_placeholder')}
                   value={userSearch}
                   onValueChange={(val) => {
                     setUserSearch(val);
@@ -223,7 +223,7 @@ export function GdprRequestCreate() {
                   </div>
                 )}
                 {searchDone && !searchLoading && userResults.length === 0 && userSearch.length >= 2 && (
-                  <p className="text-xs text-default-400 mt-1">{`No users found for this search`}</p>
+                  <p className="text-xs text-default-400 mt-1">{t('enterprise.gdpr_no_users_found_for')}</p>
                 )}
               </div>
             )}
@@ -232,7 +232,7 @@ export function GdprRequestCreate() {
           {/* Request Type - Card Selector */}
           <div>
             <p className="text-sm font-medium text-default-700 mb-3">
-              {"GDPR Request"} <span className="text-danger">*</span>
+              {t('enterprise.gdpr_request_type')} <span className="text-danger">*</span>
             </p>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {REQUEST_TYPES.map((type) => {
@@ -272,7 +272,7 @@ export function GdprRequestCreate() {
 
           {/* Priority */}
           <Select
-            label={"GDPR Priority"}
+            label={t('enterprise.gdpr_priority')}
             selectedKeys={[priority]}
             onSelectionChange={(keys) => {
               const val = Array.from(keys)[0] as string;
@@ -283,15 +283,15 @@ export function GdprRequestCreate() {
           >
             {PRIORITY_KEYS.map((key) => (
               <SelectItem key={key} className="capitalize">
-                {key.charAt(0).toUpperCase() + key.slice(1)}
+                {t(`enterprise.priority_${key}`)}
               </SelectItem>
             ))}
           </Select>
 
           {/* Notes */}
           <Textarea
-            label={"GDPR Notes"}
-            placeholder={"Enter notes..."}
+            label={t('enterprise.gdpr_notes')}
+            placeholder={t('enterprise.gdpr_notes_placeholder')}
             value={notes}
             onValueChange={setNotes}
             variant="bordered"
@@ -304,7 +304,7 @@ export function GdprRequestCreate() {
               variant="flat"
               onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests'))}
             >
-              {"GDPR Cancel"}
+              {t('enterprise.gdpr_cancel')}
             </Button>
             <Button
               color="primary"
@@ -312,7 +312,7 @@ export function GdprRequestCreate() {
               onPress={handleSubmit}
               isLoading={saving}
             >
-              {"GDPR Create Request"}
+              {t('enterprise.gdpr_create_request')}
             </Button>
           </div>
         </CardBody>

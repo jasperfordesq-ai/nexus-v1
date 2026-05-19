@@ -14,10 +14,11 @@
  *   - View Details modal (campaign info + creatives + 30d stats)
  *   - Create Campaign modal
  *
- * ADMIN IS ENGLISH-ONLY — NO t() CALLS.
+ * User-facing admin copy is routed through translations.
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Chip,
@@ -132,12 +133,12 @@ const STATUS_COLORS: Record<AdCampaign['status'], 'warning' | 'success' | 'defau
   rejected:       'danger',
 };
 
-const STATUS_LABELS: Record<AdCampaign['status'], string> = {
-  pending_review: 'Pending Review',
-  active:         'Active',
-  paused:         'Paused',
-  completed:      'Completed',
-  rejected:       'Rejected',
+const STATUS_LABEL_KEYS: Record<AdCampaign['status'], string> = {
+  pending_review: 'advertising.status.pending_review',
+  active:         'advertising.status.active',
+  paused:         'advertising.status.paused',
+  completed:      'advertising.status.completed',
+  rejected:       'advertising.status.rejected',
 };
 
 function formatCents(cents: number): string {
@@ -169,7 +170,8 @@ const EMPTY_FORM: CreateCampaignForm = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function AdCampaignAdminPage() {
-  usePageTitle('Ad Campaigns');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('advertising.ad.page_title', 'Ad Campaigns'));
   const toast = useToast();
 
   // ── Data state ──────────────────────────────────────────────────────────────
@@ -230,11 +232,11 @@ export function AdCampaignAdminPage() {
         setTotal(res.meta?.total ?? items.length);
       }
     } catch {
-      toast.error('Failed to load ad campaigns');
+      toast.error(t('advertising.ad.toasts.load_failed', 'Failed to load ad campaigns'));
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, toast]);
+  }, [page, statusFilter, t, toast]);
 
   useEffect(() => {
     void loadStats();
@@ -251,14 +253,14 @@ export function AdCampaignAdminPage() {
     try {
       const res = await api.post(`/v2/admin/ad-campaigns/${campaign.id}/approve`);
       if (res.data) {
-        toast.success(`Campaign "${campaign.name}" approved`);
+        toast.success(t('advertising.ad.toasts.approved', { name: campaign.name }));
         void loadCampaigns();
         void loadStats();
       } else {
-        toast.error('Failed to approve campaign');
+        toast.error(t('advertising.ad.toasts.approve_failed', 'Failed to approve campaign'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('advertising.shared.unexpected_error', 'An unexpected error occurred'));
     } finally {
       setActionLoading(null);
     }
@@ -270,16 +272,16 @@ export function AdCampaignAdminPage() {
     try {
       const res = await api.post(`/v2/admin/ad-campaigns/${rejectTarget.id}/reject`, { reason: rejectReason.trim() });
       if (res.data) {
-        toast.success(`Campaign "${rejectTarget.name}" rejected`);
+        toast.success(t('advertising.ad.toasts.rejected', { name: rejectTarget.name }));
         setRejectTarget(null);
         setRejectReason('');
         void loadCampaigns();
         void loadStats();
       } else {
-        toast.error('Failed to reject campaign');
+        toast.error(t('advertising.ad.toasts.reject_failed', 'Failed to reject campaign'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('advertising.shared.unexpected_error', 'An unexpected error occurred'));
     } finally {
       setRejectLoading(false);
     }
@@ -290,14 +292,14 @@ export function AdCampaignAdminPage() {
     try {
       const res = await api.post(`/v2/admin/ad-campaigns/${campaign.id}/pause`);
       if (res.data) {
-        toast.success(`Campaign "${campaign.name}" paused`);
+        toast.success(t('advertising.ad.toasts.paused', { name: campaign.name }));
         void loadCampaigns();
         void loadStats();
       } else {
-        toast.error('Failed to pause campaign');
+        toast.error(t('advertising.ad.toasts.pause_failed', 'Failed to pause campaign'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('advertising.shared.unexpected_error', 'An unexpected error occurred'));
     } finally {
       setActionLoading(null);
     }
@@ -312,7 +314,7 @@ export function AdCampaignAdminPage() {
         setDetailCampaign(res.data as AdCampaign);
       }
     } catch {
-      toast.error('Failed to load campaign details');
+      toast.error(t('advertising.ad.toasts.details_failed', 'Failed to load campaign details'));
     } finally {
       setDetailLoading(false);
     }
@@ -320,7 +322,7 @@ export function AdCampaignAdminPage() {
 
   const handleCreateSubmit = async () => {
     if (!createForm.name.trim()) {
-      toast.error('Campaign name is required');
+      toast.error(t('advertising.ad.toasts.name_required', 'Campaign name is required'));
       return;
     }
     setCreateLoading(true);
@@ -338,7 +340,7 @@ export function AdCampaignAdminPage() {
         try {
           payload.audience_filters = JSON.parse(createForm.audience_filters);
         } catch {
-          toast.error('Audience filters must be valid JSON');
+          toast.error(t('advertising.ad.toasts.audience_json_invalid', 'Audience filters must be valid JSON'));
           setCreateLoading(false);
           return;
         }
@@ -346,16 +348,16 @@ export function AdCampaignAdminPage() {
 
       const res = await api.post('/v2/me/ad-campaigns', payload);
       if (res.data) {
-        toast.success('Campaign created and submitted for review');
+        toast.success(t('advertising.ad.toasts.created', 'Campaign created and submitted for review'));
         setCreateOpen(false);
         setCreateForm(EMPTY_FORM);
         void loadCampaigns();
         void loadStats();
       } else {
-        toast.error('Failed to create campaign');
+        toast.error(t('advertising.ad.toasts.create_failed', 'Failed to create campaign'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('advertising.shared.unexpected_error', 'An unexpected error occurred'));
     } finally {
       setCreateLoading(false);
     }
@@ -366,12 +368,12 @@ export function AdCampaignAdminPage() {
   const columns: Column<AdCampaign>[] = [
     {
       key: 'id',
-      label: 'ID',
+      label: t('advertising.shared.columns.id', 'ID'),
       render: (item) => <span className="text-xs text-default-400">#{item.id}</span>,
     },
     {
       key: 'name',
-      label: 'Campaign',
+      label: t('advertising.shared.columns.campaign', 'Campaign'),
       sortable: true,
       render: (item) => (
         <div>
@@ -382,7 +384,7 @@ export function AdCampaignAdminPage() {
     },
     {
       key: 'advertiser_name',
-      label: 'Advertiser',
+      label: t('advertising.shared.columns.advertiser', 'Advertiser'),
       render: (item) => (
         <div>
           <p className="text-sm text-default-700">{item.advertiser_name ?? '—'}</p>
@@ -392,17 +394,17 @@ export function AdCampaignAdminPage() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('advertising.shared.columns.status', 'Status'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color={STATUS_COLORS[item.status]}>
-          {STATUS_LABELS[item.status]}
+          {t(STATUS_LABEL_KEYS[item.status])}
         </Chip>
       ),
     },
     {
       key: 'budget_cents',
-      label: 'Budget / Spent',
+      label: t('advertising.ad.columns.budget_spent', 'Budget / Spent'),
       render: (item) => (
         <div className="text-sm">
           <span className="text-default-700">{formatCents(item.budget_cents)}</span>
@@ -413,7 +415,7 @@ export function AdCampaignAdminPage() {
     },
     {
       key: 'impression_count',
-      label: 'Impressions',
+      label: t('advertising.shared.columns.impressions', 'Impressions'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">{item.impression_count.toLocaleString()}</span>
@@ -421,7 +423,7 @@ export function AdCampaignAdminPage() {
     },
     {
       key: 'click_count',
-      label: 'Clicks',
+      label: t('advertising.shared.columns.clicks', 'Clicks'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">{item.click_count.toLocaleString()}</span>
@@ -429,14 +431,14 @@ export function AdCampaignAdminPage() {
     },
     {
       key: 'ctr',
-      label: 'CTR',
+      label: t('advertising.shared.columns.ctr', 'CTR'),
       render: (item) => (
         <span className="text-sm text-default-600">{ctr(item.impression_count, item.click_count)}</span>
       ),
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('advertising.shared.columns.actions', 'Actions'),
       render: (item) => (
         <div className="flex items-center gap-1 flex-wrap">
           <Button
@@ -445,7 +447,7 @@ export function AdCampaignAdminPage() {
             variant="flat"
             color="primary"
             onPress={() => void handleViewDetails(item)}
-            aria-label="View Details"
+            aria-label={t('advertising.shared.actions.view_details', 'View details')}
           >
             <BarChart3 size={14} />
           </Button>
@@ -459,7 +461,7 @@ export function AdCampaignAdminPage() {
                 color="success"
                 onPress={() => void handleApprove(item)}
                 isLoading={actionLoading === item.id}
-                aria-label="Approve"
+                aria-label={t('advertising.shared.actions.approve', 'Approve')}
               >
                 <CheckCircle size={14} />
               </Button>
@@ -469,7 +471,7 @@ export function AdCampaignAdminPage() {
                 variant="flat"
                 color="danger"
                 onPress={() => { setRejectTarget(item); setRejectReason(''); }}
-                aria-label="Reject"
+                aria-label={t('advertising.shared.actions.reject', 'Reject')}
               >
                 <XCircle size={14} />
               </Button>
@@ -484,7 +486,7 @@ export function AdCampaignAdminPage() {
               color="warning"
               onPress={() => void handlePause(item)}
               isLoading={actionLoading === item.id}
-              aria-label="Pause"
+              aria-label={t('advertising.shared.actions.pause', 'Pause')}
             >
               <Pause size={14} />
             </Button>
@@ -499,15 +501,15 @@ export function AdCampaignAdminPage() {
   return (
     <div>
       <PageHeader
-        title="Local Advertising"
-        description="Manage local ad campaigns from SMEs, Vereine, and Gemeinden"
+        title={t('advertising.ad.header.title', 'Local Advertising')}
+        description={t('advertising.ad.header.description', 'Manage local ad campaigns from SMEs, associations, and municipalities')}
         actions={
           <Button
             color="primary"
             startContent={<Plus size={16} />}
             onPress={() => { setCreateForm(EMPTY_FORM); setCreateOpen(true); }}
           >
-            Create Campaign
+            {t('advertising.shared.actions.create_campaign', 'Create campaign')}
           </Button>
         }
       />
@@ -515,28 +517,28 @@ export function AdCampaignAdminPage() {
       {/* ── Overview stat cards ── */}
       <div className="grid grid-cols-2 gap-4 mb-6 sm:grid-cols-4">
         <StatCard
-          label="Active Campaigns"
+          label={t('advertising.ad.stats.active_campaigns', 'Active campaigns')}
           value={overviewStats?.active_campaigns ?? 0}
           icon={Megaphone}
           color="primary"
           loading={statsLoading}
         />
         <StatCard
-          label="Impressions Today"
+          label={t('advertising.ad.stats.impressions_today', 'Impressions today')}
           value={overviewStats?.impressions_today ?? 0}
           icon={Eye}
           color="secondary"
           loading={statsLoading}
         />
         <StatCard
-          label="Clicks Today"
+          label={t('advertising.ad.stats.clicks_today', 'Clicks today')}
           value={overviewStats?.clicks_today ?? 0}
           icon={MousePointer}
           color="warning"
           loading={statsLoading}
         />
         <StatCard
-          label="Total Revenue"
+          label={t('advertising.ad.stats.total_revenue', 'Total revenue')}
           value={overviewStats ? formatCents(overviewStats.total_revenue_cents) : '—'}
           icon={DollarSign}
           color="success"
@@ -552,12 +554,12 @@ export function AdCampaignAdminPage() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all"            title="All" />
-          <Tab key="pending_review" title="Pending Review" />
-          <Tab key="active"         title="Active" />
-          <Tab key="paused"         title="Paused" />
-          <Tab key="completed"      title="Completed" />
-          <Tab key="rejected"       title="Rejected" />
+          <Tab key="all"            title={t('advertising.status.all', 'All')} />
+          <Tab key="pending_review" title={t('advertising.status.pending_review', 'Pending Review')} />
+          <Tab key="active"         title={t('advertising.status.active', 'Active')} />
+          <Tab key="paused"         title={t('advertising.status.paused', 'Paused')} />
+          <Tab key="completed"      title={t('advertising.status.completed', 'Completed')} />
+          <Tab key="rejected"       title={t('advertising.status.rejected', 'Rejected')} />
         </Tabs>
       </div>
 
@@ -566,7 +568,7 @@ export function AdCampaignAdminPage() {
         columns={columns}
         data={campaigns}
         isLoading={loading}
-        searchPlaceholder="Search campaigns..."
+        searchPlaceholder={t('advertising.shared.search_campaigns', 'Search campaigns...')}
         onRefresh={loadCampaigns}
         totalItems={total}
         page={page}
@@ -588,7 +590,7 @@ export function AdCampaignAdminPage() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <TrendingUp size={20} className="text-primary" />
-                {detailCampaign?.name ?? 'Campaign Details'}
+                {detailCampaign?.name ?? t('advertising.shared.campaign_details', 'Campaign details')}
               </ModalHeader>
 
               <ModalBody>
@@ -601,32 +603,32 @@ export function AdCampaignAdminPage() {
                     {/* Campaign metadata */}
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <p className="text-default-400 text-xs uppercase tracking-wide mb-0.5">Advertiser</p>
+                        <p className="text-default-400 text-xs uppercase tracking-wide mb-0.5">{t('advertising.shared.columns.advertiser', 'Advertiser')}</p>
                         <p className="text-foreground font-medium">{detailCampaign.advertiser_name ?? '—'}</p>
                         <p className="text-default-400 text-xs">{detailCampaign.advertiser_email ?? ''}</p>
                       </div>
                       <div>
-                        <p className="text-default-400 text-xs uppercase tracking-wide mb-0.5">Status</p>
+                        <p className="text-default-400 text-xs uppercase tracking-wide mb-0.5">{t('advertising.shared.columns.status', 'Status')}</p>
                         <Chip size="sm" variant="flat" color={STATUS_COLORS[detailCampaign.status]}>
-                          {STATUS_LABELS[detailCampaign.status]}
+                          {t(STATUS_LABEL_KEYS[detailCampaign.status])}
                         </Chip>
                       </div>
                       <div>
-                        <p className="text-default-400 text-xs uppercase tracking-wide mb-0.5">Budget / Spent</p>
+                        <p className="text-default-400 text-xs uppercase tracking-wide mb-0.5">{t('advertising.ad.columns.budget_spent', 'Budget / Spent')}</p>
                         <p className="text-foreground">
                           {formatCents(detailCampaign.budget_cents)} / {formatCents(detailCampaign.spent_cents)}
                         </p>
                       </div>
                       <div>
-                        <p className="text-default-400 text-xs uppercase tracking-wide mb-0.5">Placement</p>
+                        <p className="text-default-400 text-xs uppercase tracking-wide mb-0.5">{t('advertising.ad.fields.placement', 'Placement')}</p>
                         <p className="text-foreground capitalize">{detailCampaign.placement}</p>
                       </div>
                       <div>
-                        <p className="text-default-400 text-xs uppercase tracking-wide mb-0.5">Start Date</p>
+                        <p className="text-default-400 text-xs uppercase tracking-wide mb-0.5">{t('advertising.ad.fields.start_date', 'Start date')}</p>
                         <p className="text-foreground">{formatDate(detailCampaign.start_date)}</p>
                       </div>
                       <div>
-                        <p className="text-default-400 text-xs uppercase tracking-wide mb-0.5">End Date</p>
+                        <p className="text-default-400 text-xs uppercase tracking-wide mb-0.5">{t('advertising.ad.fields.end_date', 'End date')}</p>
                         <p className="text-foreground">{formatDate(detailCampaign.end_date)}</p>
                       </div>
                     </div>
@@ -634,7 +636,7 @@ export function AdCampaignAdminPage() {
                     {/* Rejection reason */}
                     {detailCampaign.rejection_reason && (
                       <div className="rounded-lg bg-danger-50 border border-danger-200 p-3">
-                        <p className="text-xs font-semibold text-danger uppercase tracking-wide mb-1">Rejection Reason</p>
+                        <p className="text-xs font-semibold text-danger uppercase tracking-wide mb-1">{t('advertising.shared.rejection_reason', 'Rejection reason')}</p>
                         <p className="text-sm text-danger-700">{detailCampaign.rejection_reason}</p>
                       </div>
                     )}
@@ -642,19 +644,19 @@ export function AdCampaignAdminPage() {
                     {/* Stats summary */}
                     {detailCampaign.stats && (
                       <div>
-                        <p className="text-sm font-semibold text-foreground mb-2">Performance (30 days)</p>
+                        <p className="text-sm font-semibold text-foreground mb-2">{t('advertising.ad.performance_30_days', 'Performance (30 days)')}</p>
                         <div className="grid grid-cols-3 gap-3">
                           <div className="rounded-lg bg-default-100 p-3 text-center">
                             <p className="text-2xl font-bold text-foreground">{detailCampaign.stats.impressions.toLocaleString()}</p>
-                            <p className="text-xs text-default-400 mt-0.5">Impressions</p>
+                            <p className="text-xs text-default-400 mt-0.5">{t('advertising.shared.columns.impressions', 'Impressions')}</p>
                           </div>
                           <div className="rounded-lg bg-default-100 p-3 text-center">
                             <p className="text-2xl font-bold text-foreground">{detailCampaign.stats.clicks.toLocaleString()}</p>
-                            <p className="text-xs text-default-400 mt-0.5">Clicks</p>
+                            <p className="text-xs text-default-400 mt-0.5">{t('advertising.shared.columns.clicks', 'Clicks')}</p>
                           </div>
                           <div className="rounded-lg bg-default-100 p-3 text-center">
                             <p className="text-2xl font-bold text-foreground">{detailCampaign.stats.ctr_percent.toFixed(2)}%</p>
-                            <p className="text-xs text-default-400 mt-0.5">CTR</p>
+                            <p className="text-xs text-default-400 mt-0.5">{t('advertising.shared.columns.ctr', 'CTR')}</p>
                           </div>
                         </div>
                       </div>
@@ -664,7 +666,7 @@ export function AdCampaignAdminPage() {
                     {(detailCampaign.creatives ?? []).length > 0 && (
                       <div>
                         <p className="text-sm font-semibold text-foreground mb-2">
-                          Creatives ({detailCampaign.creatives!.length})
+                          {t('advertising.ad.creatives_count', { count: detailCampaign.creatives!.length })}
                         </p>
                         <div className="space-y-3">
                           {detailCampaign.creatives!.map((creative) => (
@@ -689,7 +691,7 @@ export function AdCampaignAdminPage() {
                               {creative.image_url && (
                                 <img
                                   src={creative.image_url}
-                                  alt="Creative"
+                                  alt={t('advertising.ad.creative_alt', 'Creative')}
                                   className="mt-2 max-h-32 rounded object-contain"
                                 />
                               )}
@@ -700,7 +702,7 @@ export function AdCampaignAdminPage() {
                     )}
 
                     {(detailCampaign.creatives ?? []).length === 0 && (
-                      <p className="text-sm text-default-400 italic">No creatives attached to this campaign yet.</p>
+                      <p className="text-sm text-default-400 italic">{t('advertising.ad.no_creatives', 'No creatives attached to this campaign yet.')}</p>
                     )}
                   </div>
                 ) : null}
@@ -708,7 +710,7 @@ export function AdCampaignAdminPage() {
 
               <ModalFooter>
                 <Button variant="light" onPress={() => setDetailCampaign(null)}>
-                  Close
+                  {t('advertising.shared.actions.close', 'Close')}
                 </Button>
               </ModalFooter>
             </>
@@ -729,16 +731,15 @@ export function AdCampaignAdminPage() {
             <>
               <ModalHeader className="flex items-center gap-2 text-danger">
                 <XCircle size={20} />
-                Reject Campaign
+                {t('advertising.shared.actions.reject_campaign', 'Reject campaign')}
               </ModalHeader>
               <ModalBody>
                 <p className="text-sm text-default-600 mb-3">
-                  You are rejecting <strong>{rejectTarget?.name}</strong>. Please provide a reason
-                  so the advertiser knows how to improve their submission.
+                  {t('advertising.ad.reject_intro_prefix', 'You are rejecting')} <strong>{rejectTarget?.name}</strong>. {t('advertising.ad.reject_intro_suffix', 'Please provide a reason so the advertiser knows how to improve their submission.')}
                 </p>
                 <Textarea
-                  label="Rejection Reason"
-                  placeholder="e.g. Content violates community guidelines — please revise the headline."
+                  label={t('advertising.shared.rejection_reason', 'Rejection reason')}
+                  placeholder={t('advertising.ad.rejection_placeholder', 'e.g. Content violates community guidelines - please revise the headline.')}
                   value={rejectReason}
                   onValueChange={setRejectReason}
                   minRows={3}
@@ -748,7 +749,7 @@ export function AdCampaignAdminPage() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={() => { setRejectTarget(null); setRejectReason(''); }}>
-                  Cancel
+                  {t('advertising.shared.actions.cancel', 'Cancel')}
                 </Button>
                 <Button
                   color="danger"
@@ -756,7 +757,7 @@ export function AdCampaignAdminPage() {
                   isLoading={rejectLoading}
                   isDisabled={!rejectReason.trim()}
                 >
-                  Reject Campaign
+                  {t('advertising.shared.actions.reject_campaign', 'Reject campaign')}
                 </Button>
               </ModalFooter>
             </>
@@ -778,12 +779,12 @@ export function AdCampaignAdminPage() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <Plus size={20} className="text-primary" />
-                Create Ad Campaign
+                {t('advertising.ad.create_title', 'Create ad campaign')}
               </ModalHeader>
               <ModalBody className="space-y-4">
                 <Input
-                  label="Campaign Name"
-                  placeholder="Summer Sale — Café Helvetia"
+                  label={t('advertising.shared.fields.campaign_name', 'Campaign name')}
+                  placeholder={t('advertising.ad.placeholders.campaign_name', 'Summer Sale - Cafe Helvetia')}
                   value={createForm.name}
                   onValueChange={(v) => setCreateForm((f) => ({ ...f, name: v }))}
                   variant="bordered"
@@ -791,7 +792,7 @@ export function AdCampaignAdminPage() {
                 />
 
                 <Select
-                  label="Advertiser Type"
+                  label={t('advertising.shared.fields.advertiser_type', 'Advertiser type')}
                   selectedKeys={[createForm.advertiser_type]}
                   onSelectionChange={(keys) => {
                     const v = Array.from(keys)[0] as string;
@@ -799,14 +800,14 @@ export function AdCampaignAdminPage() {
                   }}
                   variant="bordered"
                 >
-                  <SelectItem key="sme">SME (Local Business)</SelectItem>
-                  <SelectItem key="verein">Verein (Association)</SelectItem>
-                  <SelectItem key="gemeinde">Gemeinde (Municipality)</SelectItem>
-                  <SelectItem key="private">Private</SelectItem>
+                  <SelectItem key="sme">{t('advertising.advertiser.sme_local', 'SME (local business)')}</SelectItem>
+                  <SelectItem key="verein">{t('advertising.advertiser.verein', 'Association')}</SelectItem>
+                  <SelectItem key="gemeinde">{t('advertising.advertiser.gemeinde', 'Municipality')}</SelectItem>
+                  <SelectItem key="private">{t('advertising.advertiser.private', 'Private')}</SelectItem>
                 </Select>
 
                 <Select
-                  label="Placement"
+                  label={t('advertising.ad.fields.placement', 'Placement')}
                   selectedKeys={[createForm.placement]}
                   onSelectionChange={(keys) => {
                     const v = Array.from(keys)[0] as string;
@@ -814,33 +815,33 @@ export function AdCampaignAdminPage() {
                   }}
                   variant="bordered"
                 >
-                  <SelectItem key="feed">Feed</SelectItem>
-                  <SelectItem key="discovery">Discovery</SelectItem>
-                  <SelectItem key="markt">Markt</SelectItem>
-                  <SelectItem key="all">All Placements</SelectItem>
+                  <SelectItem key="feed">{t('advertising.ad.placement.feed', 'Feed')}</SelectItem>
+                  <SelectItem key="discovery">{t('advertising.ad.placement.discovery', 'Discovery')}</SelectItem>
+                  <SelectItem key="markt">{t('advertising.ad.placement.market', 'Market')}</SelectItem>
+                  <SelectItem key="all">{t('advertising.ad.placement.all', 'All placements')}</SelectItem>
                 </Select>
 
                 <Input
-                  label="Total Budget (in cents)"
-                  placeholder="e.g. 5000 = €50.00"
+                  label={t('advertising.ad.fields.total_budget_cents', 'Total budget (in cents)')}
+                  placeholder={t('advertising.ad.placeholders.budget', 'e.g. 5000 = EUR 50.00')}
                   value={createForm.budget_cents}
                   onValueChange={(v) => setCreateForm((f) => ({ ...f, budget_cents: v }))}
                   type="number"
                   min="0"
                   variant="bordered"
-                  description="Enter 0 for unlimited budget"
+                  description={t('advertising.ad.budget_description', 'Enter 0 for unlimited budget')}
                 />
 
                 <div className="grid grid-cols-2 gap-3">
                   <Input
-                    label="Start Date"
+                    label={t('advertising.ad.fields.start_date', 'Start date')}
                     type="date"
                     value={createForm.start_date}
                     onValueChange={(v) => setCreateForm((f) => ({ ...f, start_date: v }))}
                     variant="bordered"
                   />
                   <Input
-                    label="End Date"
+                    label={t('advertising.ad.fields.end_date', 'End date')}
                     type="date"
                     value={createForm.end_date}
                     onValueChange={(v) => setCreateForm((f) => ({ ...f, end_date: v }))}
@@ -849,18 +850,18 @@ export function AdCampaignAdminPage() {
                 </div>
 
                 <Textarea
-                  label="Audience Filters (JSON, optional)"
+                  label={t('advertising.ad.fields.audience_filters', 'Audience filters (JSON, optional)')}
                   placeholder={`{"radius_km": 5, "lat": 47.1758, "lng": 8.4622, "interests": ["gardening"]}`}
                   value={createForm.audience_filters}
                   onValueChange={(v) => setCreateForm((f) => ({ ...f, audience_filters: v }))}
                   variant="bordered"
                   minRows={3}
-                  description="Leave blank to target all community members"
+                  description={t('advertising.ad.audience_description', 'Leave blank to target all community members')}
                 />
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={() => { setCreateOpen(false); setCreateForm(EMPTY_FORM); }}>
-                  Cancel
+                  {t('advertising.shared.actions.cancel', 'Cancel')}
                 </Button>
                 <Button
                   color="primary"
@@ -868,7 +869,7 @@ export function AdCampaignAdminPage() {
                   isLoading={createLoading}
                   isDisabled={!createForm.name.trim()}
                 >
-                  Submit for Review
+                  {t('advertising.shared.actions.submit_for_review', 'Submit for review')}
                 </Button>
               </ModalFooter>
             </>

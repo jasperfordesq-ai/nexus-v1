@@ -23,12 +23,13 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader, DataTable, ConfirmModal } from '../../components';
 import type { Column } from '../../components';
 import type { ConsentType, ConsentTypeUser } from '../../api/types';
+import { useTranslation } from 'react-i18next';
 
 const CATEGORY_OPTIONS = ['essential', 'functional', 'analytics', 'marketing', 'communications', 'other'] as const;
 
@@ -45,7 +46,8 @@ const emptyFormData = {
 };
 
 export function GdprConsentTypes() {
-  usePageTitle("GDPR Consent Types Page");
+  const { t } = useTranslation('admin');
+  useAdminPageMeta({ title: t('enterprise.gdpr_consent_types_title') });
   const toast = useToast();
 
   const [consentTypes, setConsentTypes] = useState<ConsentType[]>([]);
@@ -78,11 +80,11 @@ export function GdprConsentTypes() {
         setConsentTypes(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error("GDPR Failed Load Consent Types");
+      toast.error(t('enterprise.gdpr_failed_load_consent_types'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -113,7 +115,7 @@ export function GdprConsentTypes() {
 
   const handleFormSubmit = async () => {
     if (!formData.slug.trim() || !formData.name.trim()) {
-      toast.error("GDPR Slug Name Required");
+      toast.error(t('enterprise.gdpr_slug_name_required'));
       return;
     }
     setFormLoading(true);
@@ -138,14 +140,14 @@ export function GdprConsentTypes() {
       }
 
       if (res.success) {
-        toast.success(editingId ? "GDPR Consent Type updated" : "GDPR Consent Type created");
+        toast.success(editingId ? t('enterprise.gdpr_consent_type_updated') : t('enterprise.gdpr_consent_type_created'));
         setFormOpen(false);
         loadData();
       } else {
-        toast.error(editingId ? "GDPR Failed Update Consent" : "GDPR Failed Create Consent");
+        toast.error(editingId ? t('enterprise.gdpr_failed_update_consent_type') : t('enterprise.gdpr_failed_create_consent_type'));
       }
     } catch {
-      toast.error("GDPR Failed Save Consent");
+      toast.error(t('enterprise.gdpr_failed_save_consent_type'));
     } finally {
       setFormLoading(false);
     }
@@ -168,7 +170,7 @@ export function GdprConsentTypes() {
         }
       }
     } catch {
-      toast.error("GDPR Failed Load Users");
+      toast.error(t('enterprise.gdpr_failed_load_users'));
     } finally {
       setUsersLoading(false);
     }
@@ -180,15 +182,15 @@ export function GdprConsentTypes() {
     try {
       const res = await adminEnterprise.deleteConsentType(deleteId);
       if (res.success) {
-        toast.success("GDPR Consent Type deleted");
+        toast.success(t('enterprise.gdpr_consent_type_deleted'));
         setDeleteOpen(false);
         setDeleteId(null);
         loadData();
       } else {
-        toast.error("GDPR Failed Delete Consent");
+        toast.error(t('enterprise.gdpr_failed_delete_consent_type'));
       }
     } catch {
-      toast.error("GDPR Failed Delete Consent");
+      toast.error(t('enterprise.gdpr_failed_delete_consent_type'));
     } finally {
       setDeleteLoading(false);
     }
@@ -200,33 +202,33 @@ export function GdprConsentTypes() {
   };
 
   const userColumns: Column<ConsentTypeUser>[] = [
-    { key: 'user_name', label: "GDPR Col User Name", sortable: true },
-    { key: 'user_email', label: "GDPR Col Email", sortable: true },
+    { key: 'user_name', label: t('enterprise.gdpr_col_user_name'), sortable: true },
+    { key: 'user_email', label: t('enterprise.gdpr_col_email'), sortable: true },
     {
       key: 'consent_given',
-      label: "GDPR Col Consent",
+      label: t('enterprise.gdpr_col_consent'),
       render: (u) =>
         u.consent_given ? (
           <div className="flex items-center gap-1 text-success">
             <CheckCircle size={14} />
-            <span className="text-sm">{"GDPR Granted"}</span>
+            <span className="text-sm">{t('enterprise.gdpr_granted')}</span>
           </div>
         ) : (
           <div className="flex items-center gap-1 text-danger">
             <XCircle size={14} />
-            <span className="text-sm">{"GDPR Denied"}</span>
+            <span className="text-sm">{t('enterprise.gdpr_denied')}</span>
           </div>
         ),
     },
     {
       key: 'given_at',
-      label: "GDPR Col Date",
+      label: t('enterprise.gdpr_col_date'),
       sortable: true,
       render: (u) => u.given_at ? new Date(u.given_at).toLocaleDateString() : '---',
     },
     {
       key: 'ip_address',
-      label: "GDPR Col IP Address",
+      label: t('enterprise.gdpr_col_ip_address'),
       render: (u) => u.ip_address || '---',
     },
   ];
@@ -242,8 +244,8 @@ export function GdprConsentTypes() {
   return (
     <div>
       <PageHeader
-        title={"GDPR Consent Types"}
-        description={"GDPR Consent Types."}
+        title={t('enterprise.gdpr_consent_types_title')}
+        description={t('enterprise.gdpr_consent_types_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -253,7 +255,7 @@ export function GdprConsentTypes() {
               isLoading={loading}
               size="sm"
             >
-              {"Refresh"}
+              {t('enterprise.refresh')}
             </Button>
             <Button
               color="primary"
@@ -261,7 +263,7 @@ export function GdprConsentTypes() {
               onPress={openCreateModal}
               size="sm"
             >
-              {"GDPR Create Consent"}
+              {t('enterprise.gdpr_create_consent_type')}
             </Button>
           </div>
         }
@@ -283,10 +285,10 @@ export function GdprConsentTypes() {
                   </div>
                   <div className="flex gap-1 shrink-0">
                     {ct.is_required && (
-                      <Chip size="sm" variant="flat" color="warning">{"GDPR Required"}</Chip>
+                      <Chip size="sm" variant="flat" color="warning">{t('enterprise.gdpr_required')}</Chip>
                     )}
                     <Chip size="sm" variant="flat" color={ct.is_active ? 'success' : 'default'}>
-                      {ct.is_active ? "GDPR Active" : "GDPR Inactive"}
+                      {ct.is_active ? t('enterprise.gdpr_active') : t('enterprise.gdpr_inactive')}
                     </Chip>
                   </div>
                 </div>
@@ -302,14 +304,14 @@ export function GdprConsentTypes() {
                 {/* Consent Rate Progress */}
                 <div>
                   <div className="flex justify-between text-xs text-default-500 mb-1">
-                    <span>{"GDPR Consent Rate"}</span>
+                    <span>{t('enterprise.gdpr_consent_rate')}</span>
                     <span>{consentRate.toFixed(1)}% ({ct.granted_count}/{totalResponses})</span>
                   </div>
                   <Progress
                     value={consentRate}
                     color="success"
                     size="sm"
-                    aria-label="Consent rate"
+                    aria-label={t('enterprise.gdpr_consent_rate')}
                   />
                 </div>
 
@@ -321,7 +323,7 @@ export function GdprConsentTypes() {
                     startContent={<Edit size={12} />}
                     onPress={() => openEditModal(ct)}
                   >
-                    {"GDPR Edit"}
+                    {t('enterprise.gdpr_edit')}
                   </Button>
                   <Button
                     size="sm"
@@ -329,14 +331,14 @@ export function GdprConsentTypes() {
                     startContent={<Users size={12} />}
                     onPress={() => openUsersModal(ct.slug, ct.name)}
                   >
-                    {"GDPR Users"}
+                    {t('enterprise.gdpr_users')}
                   </Button>
                   <Button
                     size="sm"
                     variant="flat"
                     color="danger"
                     isIconOnly
-                    aria-label="Delete"
+                    aria-label={t('enterprise.gdpr_delete')}
                     onPress={() => { setDeleteId(ct.id); setDeleteOpen(true); }}
                   >
                     <Trash2 size={12} />
@@ -349,7 +351,7 @@ export function GdprConsentTypes() {
 
         {consentTypes.length === 0 && (
           <div className="col-span-full text-center py-12 text-default-400">
-            {"GDPR No Consent Types"}
+            {t('enterprise.gdpr_no_consent_types')}
           </div>
         )}
       </div>
@@ -357,12 +359,12 @@ export function GdprConsentTypes() {
       {/* Create/Edit Modal */}
       <Modal isOpen={formOpen} onClose={() => setFormOpen(false)} size="2xl" scrollBehavior="inside">
         <ModalContent>
-          <ModalHeader>{editingId ? "GDPR Edit Consent" : "GDPR Create Consent"}</ModalHeader>
+          <ModalHeader>{editingId ? t('enterprise.gdpr_edit_consent_type') : t('enterprise.gdpr_create_consent_type')}</ModalHeader>
           <ModalBody className="gap-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
-                label={"GDPR Slug"}
-                placeholder={"Enter GDPR slug..."}
+                label={t('enterprise.gdpr_slug')}
+                placeholder={t('enterprise.gdpr_slug_placeholder')}
                 value={formData.slug}
                 onValueChange={(val) => setFormData({ ...formData, slug: val })}
                 variant="bordered"
@@ -370,8 +372,8 @@ export function GdprConsentTypes() {
                 isDisabled={!!editingId}
               />
               <Input
-                label={"GDPR Name"}
-                placeholder={"Enter name..."}
+                label={t('enterprise.gdpr_name')}
+                placeholder={t('enterprise.gdpr_name_placeholder')}
                 value={formData.name}
                 onValueChange={(val) => setFormData({ ...formData, name: val })}
                 variant="bordered"
@@ -379,8 +381,8 @@ export function GdprConsentTypes() {
               />
             </div>
             <Textarea
-              label={"GDPR."}
-              placeholder={"Enter description..."}
+              label={t('enterprise.gdpr_description')}
+              placeholder={t('enterprise.gdpr_description_placeholder')}
               value={formData.description}
               onValueChange={(val) => setFormData({ ...formData, description: val })}
               variant="bordered"
@@ -388,7 +390,7 @@ export function GdprConsentTypes() {
             />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Select
-                label={"GDPR Category"}
+                label={t('enterprise.gdpr_category')}
                 selectedKeys={[formData.category]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
@@ -397,12 +399,12 @@ export function GdprConsentTypes() {
                 variant="bordered"
               >
                 {CATEGORY_OPTIONS.map((key) => (
-                  <SelectItem key={key} className="capitalize">{key}</SelectItem>
+                  <SelectItem key={key} className="capitalize">{t(`enterprise.gdpr_category_${key}`)}</SelectItem>
                 ))}
               </Select>
               <Input
-                label={"GDPR Legal Basis"}
-                placeholder={"Enter legal basis..."}
+                label={t('enterprise.gdpr_legal_basis')}
+                placeholder={t('enterprise.gdpr_legal_basis_placeholder')}
                 value={formData.legal_basis}
                 onValueChange={(val) => setFormData({ ...formData, legal_basis: val })}
                 variant="bordered"
@@ -410,15 +412,15 @@ export function GdprConsentTypes() {
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
-                label={"GDPR Retention Days"}
-                placeholder={"Enter retention period in days..."}
+                label={t('enterprise.gdpr_retention_days')}
+                placeholder={t('enterprise.gdpr_retention_days_placeholder')}
                 type="number"
                 value={formData.retention_days}
                 onValueChange={(val) => setFormData({ ...formData, retention_days: val })}
                 variant="bordered"
               />
               <Input
-                label={"GDPR Display Order"}
+                label={t('enterprise.gdpr_display_order')}
                 type="number"
                 value={formData.display_order}
                 onValueChange={(val) => setFormData({ ...formData, display_order: val })}
@@ -430,22 +432,22 @@ export function GdprConsentTypes() {
                 isSelected={formData.is_required}
                 onValueChange={(val) => setFormData({ ...formData, is_required: val })}
               >
-                {"GDPR Required"}
+                {t('enterprise.gdpr_required')}
               </Switch>
               <Switch
                 isSelected={formData.is_active}
                 onValueChange={(val) => setFormData({ ...formData, is_active: val })}
               >
-                {"GDPR Active"}
+                {t('enterprise.gdpr_active')}
               </Switch>
             </div>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setFormOpen(false)} isDisabled={formLoading}>
-              {"GDPR Cancel"}
+              {t('enterprise.gdpr_cancel')}
             </Button>
             <Button color="primary" onPress={handleFormSubmit} isLoading={formLoading}>
-              {editingId ? "GDPR Update" : "GDPR Create"}
+              {editingId ? t('enterprise.gdpr_update') : t('enterprise.gdpr_create')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -455,14 +457,14 @@ export function GdprConsentTypes() {
       <Modal isOpen={usersOpen} onClose={() => setUsersOpen(false)} size="4xl" scrollBehavior="inside">
         <ModalContent>
           <ModalHeader className="flex justify-between items-center gap-4">
-            <span>Users &mdash; {usersName}</span>
+            <span>{t('enterprise.gdpr_users_modal_title', { name: usersName })}</span>
             <Button
               size="sm"
               variant="flat"
               startContent={<ExternalLink size={14} />}
               onPress={() => handleExportUsers(usersSlug)}
             >
-              {"GDPR Export CSV"}
+              {t('enterprise.gdpr_export_csv')}
             </Button>
           </ModalHeader>
           <ModalBody>
@@ -471,11 +473,11 @@ export function GdprConsentTypes() {
               data={users}
               isLoading={usersLoading}
               searchable={false}
-              emptyContent={"GDPR No Users for Consent"}
+              emptyContent={t('enterprise.gdpr_no_users_for_consent_type')}
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setUsersOpen(false)}>{"GDPR Close"}</Button>
+            <Button variant="flat" onPress={() => setUsersOpen(false)}>{t('enterprise.gdpr_close')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -483,9 +485,9 @@ export function GdprConsentTypes() {
       {/* Delete Confirm */}
       <ConfirmModal
         isOpen={deleteOpen}
-        title={"GDPR Delete Consent"}
-        message={"GDPR Delete Consent Type Confirm"}
-        confirmLabel={"GDPR Delete"}
+        title={t('enterprise.gdpr_delete_consent_type')}
+        message={t('enterprise.gdpr_delete_consent_type_confirm')}
+        confirmLabel={t('enterprise.gdpr_delete')}
         confirmColor="danger"
         isLoading={deleteLoading}
         onConfirm={handleDelete}

@@ -13,15 +13,17 @@ import { Button, Chip } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
-import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader, DataTable } from '../../components';
 import type { Column } from '../../components';
 import type { GdprConsent } from '../../api/types';
+import { useTranslation } from 'react-i18next';
 
 export function GdprConsents() {
-  usePageTitle("Enterprise");
+  const { t } = useTranslation('admin');
+  useAdminPageMeta({ title: t('enterprise.gdpr_consents_title') });
   const toast = useToast();
 
   const [consents, setConsents] = useState<GdprConsent[]>([]);
@@ -36,11 +38,11 @@ export function GdprConsents() {
         setConsents(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error("Failed to load consent records");
+      toast.error(t('enterprise.gdpr_failed_load_consent_records'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -48,11 +50,11 @@ export function GdprConsents() {
   }, [loadData]);
 
   const columns: Column<GdprConsent>[] = [
-    { key: 'id', label: "ID", sortable: true },
-    { key: 'user_name', label: "User", sortable: true },
+    { key: 'id', label: t('enterprise.gdpr_id'), sortable: true },
+    { key: 'user_name', label: t('enterprise.gdpr_user'), sortable: true },
     {
       key: 'consent_type',
-      label: "Type",
+      label: t('enterprise.gdpr_type'),
       sortable: true,
       render: (c) => (
         <Chip size="sm" variant="flat" color="primary" className="capitalize">
@@ -62,23 +64,23 @@ export function GdprConsents() {
     },
     {
       key: 'consented',
-      label: "Consented",
+      label: t('enterprise.gdpr_consented'),
       render: (c) =>
         c.consented ? (
           <div className="flex items-center gap-1 text-success">
             <CheckCircle size={14} />
-            <span className="text-sm">{"Yes"}</span>
+            <span className="text-sm">{t('enterprise.gdpr_yes')}</span>
           </div>
         ) : (
           <div className="flex items-center gap-1 text-danger">
             <XCircle size={14} />
-            <span className="text-sm">{"No"}</span>
+            <span className="text-sm">{t('enterprise.gdpr_no')}</span>
           </div>
         ),
     },
     {
       key: 'created_at',
-      label: "Date",
+      label: t('enterprise.gdpr_date'),
       sortable: true,
       render: (c) => new Date(c.consented_at || c.created_at).toLocaleDateString(),
     },
@@ -87,8 +89,8 @@ export function GdprConsents() {
   return (
     <div>
       <PageHeader
-        title={"GDPR Consents"}
-        description={"View member consent records for all legal documents"}
+        title={t('enterprise.gdpr_consents_title')}
+        description={t('enterprise.gdpr_consents_desc')}
         actions={
           <Button
             variant="flat"
@@ -97,7 +99,7 @@ export function GdprConsents() {
             isLoading={loading}
             size="sm"
           >
-            {"Refresh"}
+            {t('enterprise.refresh')}
           </Button>
         }
       />
@@ -107,7 +109,7 @@ export function GdprConsents() {
         data={consents}
         isLoading={loading}
         searchable={false}
-        emptyContent={"No consent records"}
+        emptyContent={t('enterprise.gdpr_no_consent_records')}
       />
     </div>
   );

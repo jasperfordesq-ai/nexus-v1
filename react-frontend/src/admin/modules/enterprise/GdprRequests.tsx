@@ -23,9 +23,9 @@ import {
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Plus from 'lucide-react/icons/plus';
-import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader, DataTable, StatusBadge } from '../../components';
 import type { Column } from '../../components';
 import type { GdprRequest } from '../../api/types';
@@ -44,27 +44,27 @@ function SlaChip({ createdAt, t }: { createdAt: string; t: (key: string, opts?: 
     const days = Math.abs(daysRemaining);
     return (
       <Chip size="sm" variant="flat" color="danger">
-        {days === 1 ? `SLA Overdue` : `SLA Overdue Plural`}
+        {t('enterprise.gdpr_sla_overdue', { count: days })}
       </Chip>
     );
   }
   if (daysRemaining <= 7) {
     return (
       <Chip size="sm" variant="flat" color="warning">
-        {daysRemaining === 1 ? `SLA Days Left` : `SLA Days Left Plural`}
+        {t('enterprise.gdpr_sla_days_left', { count: daysRemaining })}
       </Chip>
     );
   }
   return (
     <Chip size="sm" variant="flat" color="success">
-      {`SLA Days Left Plural`}
+      {t('enterprise.gdpr_sla_days_left', { count: daysRemaining })}
     </Chip>
   );
 }
 
 export function GdprRequests() {
   const { t } = useTranslation('admin');
-  usePageTitle("Enterprise");
+  useAdminPageMeta({ title: t('enterprise.gdpr_requests_title') });
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -94,11 +94,11 @@ export function GdprRequests() {
         }
       }
     } catch {
-      toast.error("Failed to load GDPR requests");
+      toast.error(t('enterprise.failed_to_load_g_d_p_r_requests'));
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, toast])
+  }, [page, statusFilter, t, toast])
 
 
   useEffect(() => {
@@ -110,66 +110,66 @@ export function GdprRequests() {
       const res = await adminEnterprise.updateGdprRequest(id, { status: newStatus });
 
       if (res.success) {
-        toast.success(`Request Updated`);
+        toast.success(t('enterprise.gdpr_request_status_updated'));
         loadData();
       } else {
-        const error = (res as { error?: string }).error || "Update Failed";
+        const error = (res as { error?: string }).error || t('enterprise.gdpr_failed_update_request_status');
         toast.error(error);
       }
     } catch (err) {
-      toast.error("Failed to update request");
+      toast.error(t('enterprise.gdpr_failed_update_request_status'));
       console.error('GDPR request update error:', err);
     }
   };
 
   const columns: Column<GdprRequest>[] = [
-    { key: 'id', label: "ID", sortable: true },
-    { key: 'user_name', label: "User", sortable: true },
+    { key: 'id', label: t('enterprise.gdpr_id'), sortable: true },
+    { key: 'user_name', label: t('enterprise.gdpr_user'), sortable: true },
     {
       key: 'type',
-      label: "Type",
+      label: t('enterprise.gdpr_type'),
       sortable: true,
       render: (r) => <span className="capitalize">{r.type}</span>,
     },
     {
       key: 'status',
-      label: "Status",
+      label: t('enterprise.gdpr_status'),
       sortable: true,
       render: (r) => <StatusBadge status={r.status} />,
     },
     {
       key: 'sla',
-      label: "SLA",
+      label: t('enterprise.gdpr_sla'),
       render: (r) => <SlaChip createdAt={r.created_at} t={(key, opts) => t(key, opts)} />,
     },
     {
       key: 'created_at',
-      label: "Created",
+      label: t('enterprise.gdpr_created_at'),
       sortable: true,
       render: (r) => new Date(r.created_at).toLocaleDateString(),
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('enterprise.gdpr_actions'),
       render: (r) => (
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light" aria-label={"Actions"}>
+            <Button isIconOnly size="sm" variant="light" aria-label={t('enterprise.gdpr_actions')}>
               <MoreVertical size={14} />
             </Button>
           </DropdownTrigger>
-          <DropdownMenu aria-label={"Request Actions"}>
+          <DropdownMenu aria-label={t('enterprise.gdpr_request_actions')}>
             <DropdownItem key="view" onPress={() => navigate(tenantPath(`/admin/enterprise/gdpr/requests/${r.id}`))}>
-              {"View Details"}
+              {t('enterprise.gdpr_view_details')}
             </DropdownItem>
             <DropdownItem key="processing" onPress={() => handleStatusUpdate(r.id, 'processing')}>
-              {"Mark Processing"}
+              {t('enterprise.gdpr_mark_processing')}
             </DropdownItem>
             <DropdownItem key="completed" onPress={() => handleStatusUpdate(r.id, 'completed')}>
-              {"Mark Completed"}
+              {t('enterprise.gdpr_mark_completed')}
             </DropdownItem>
             <DropdownItem key="rejected" className="text-danger" color="danger" onPress={() => handleStatusUpdate(r.id, 'rejected')}>
-              {"Reject"}
+              {t('enterprise.gdpr_reject')}
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
@@ -180,8 +180,8 @@ export function GdprRequests() {
   return (
     <div>
       <PageHeader
-        title={"GDPR Requests"}
-        description={"View and manage GDPR data requests (access, deletion, portability)"}
+        title={t('enterprise.gdpr_requests_title')}
+        description={t('enterprise.gdpr_requests_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -191,7 +191,7 @@ export function GdprRequests() {
               isLoading={loading}
               size="sm"
             >
-              {"Refresh"}
+              {t('enterprise.refresh')}
             </Button>
             <Button
               color="primary"
@@ -199,7 +199,7 @@ export function GdprRequests() {
               onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests/create'))}
               size="sm"
             >
-              {"Create Request"}
+              {t('enterprise.gdpr_create_request')}
             </Button>
           </div>
         }
@@ -207,7 +207,7 @@ export function GdprRequests() {
 
       <div className="mb-4">
         <Select
-          label={"Filter by Status"}
+          label={t('enterprise.gdpr_filter_by_status')}
           selectedKeys={new Set([statusFilter])}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0] as string;
@@ -232,7 +232,7 @@ export function GdprRequests() {
         page={page}
         onPageChange={setPage}
         searchable={false}
-        emptyContent={"No GDPR requests"}
+        emptyContent={t('enterprise.no_gdpr_requests')}
       />
     </div>
   );

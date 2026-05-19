@@ -28,12 +28,13 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Download from 'lucide-react/icons/download';
 import Filter from 'lucide-react/icons/filter';
 import Eye from 'lucide-react/icons/eye';
-import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader, DataTable } from '../../components';
 import type { Column } from '../../components';
 import type { GdprAuditEntry } from '../../api/types';
+import { useTranslation } from 'react-i18next';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -69,7 +70,8 @@ const EMPTY_FILTERS: AuditFilters = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function GdprAuditLog() {
-  usePageTitle("Enterprise");
+  const { t } = useTranslation('admin');
+  useAdminPageMeta({ title: t('enterprise.gdpr_audit_log_title') });
   const toast = useToast();
 
   const [entries, setEntries] = useState<GdprAuditEntry[]>([]);
@@ -127,11 +129,11 @@ export function GdprAuditLog() {
         }
       }
     } catch {
-      toast.error("Failed to load GDPR audit log");
+      toast.error(t('enterprise.failed_to_load_g_d_p_r_audit_log'));
     } finally {
       setLoading(false);
     }
-  }, [page, appliedFilters, toast]);
+  }, [page, appliedFilters, t, toast]);
 
 
   useEffect(() => {
@@ -173,11 +175,11 @@ export function GdprAuditLog() {
 
   const columns: Column<GdprAuditEntry>[] = useMemo(
     () => [
-      { key: 'id', label: "ID", sortable: true },
-      { key: 'user_name', label: "User", sortable: true },
+      { key: 'id', label: t('enterprise.gdpr_id'), sortable: true },
+      { key: 'user_name', label: t('enterprise.gdpr_user'), sortable: true },
       {
         key: 'action',
-        label: "Action",
+        label: t('enterprise.gdpr_action'),
         sortable: true,
         render: (e) => (
           <Chip size="sm" variant="flat" color={getActionColor(e.action)}>
@@ -187,24 +189,24 @@ export function GdprAuditLog() {
       },
       {
         key: 'entity_type',
-        label: "GDPR Col Entity",
+        label: t('enterprise.gdpr_col_entity_type'),
         render: (e) => (
           <Chip size="sm" variant="flat" color="default">
             {e.entity_type}
           </Chip>
         ),
       },
-      { key: 'entity_id', label: "GDPR Col Entity ID" },
+      { key: 'entity_id', label: t('enterprise.gdpr_col_entity_id') },
       {
         key: 'ip_address',
-        label: "GDPR Col IP Address",
+        label: t('enterprise.gdpr_col_ip_address'),
         render: (e) => (
           <span className="font-mono text-xs">{e.ip_address || '-'}</span>
         ),
       },
       {
         key: 'created_at',
-        label: "Date",
+        label: t('enterprise.gdpr_date'),
         sortable: true,
         render: (e) => new Date(e.created_at).toLocaleString(),
       },
@@ -217,14 +219,14 @@ export function GdprAuditLog() {
             variant="light"
             size="sm"
             onPress={() => handleViewEntry(e)}
-            aria-label="View detail"
+            aria-label={t('enterprise.gdpr_view_details')}
           >
             <Eye size={16} />
           </Button>
         ),
       },
     ],
-    [handleViewEntry]
+    [handleViewEntry, t]
   );
 
   // ─── Render ─────────────────────────────────────────────────────────
@@ -232,8 +234,8 @@ export function GdprAuditLog() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title={"GDPR Audit Log"}
-        description={"Audit trail of all GDPR-related actions taken on this platform"}
+        title={t('enterprise.gdpr_audit_log_title')}
+        description={t('enterprise.gdpr_audit_log_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -242,7 +244,7 @@ export function GdprAuditLog() {
               onPress={handleExportCsv}
               size="sm"
             >
-              {"GDPR Export CSV"}
+              {t('enterprise.gdpr_export_csv')}
             </Button>
             <Button
               variant="flat"
@@ -251,7 +253,7 @@ export function GdprAuditLog() {
               isLoading={loading}
               size="sm"
             >
-              {"Refresh"}
+              {t('enterprise.refresh')}
             </Button>
           </div>
         }
@@ -262,7 +264,7 @@ export function GdprAuditLog() {
         <CardBody>
           <div className="flex flex-wrap items-end gap-3">
             <Select
-              label={"GDPR Filter"}
+              label={t('enterprise.gdpr_filter_action')}
               size="sm"
               className="w-40"
               selectedKeys={filters.action ? [filters.action] : []}
@@ -277,7 +279,7 @@ export function GdprAuditLog() {
             </Select>
 
             <Select
-              label={"GDPR Filter Entity"}
+              label={t('enterprise.gdpr_filter_entity_type')}
               size="sm"
               className="w-40"
               selectedKeys={filters.entity_type ? [filters.entity_type] : []}
@@ -292,7 +294,7 @@ export function GdprAuditLog() {
             </Select>
 
             <Input
-              label={"From Date"}
+              label={t('enterprise.gdpr_filter_date_from')}
               type="date"
               size="sm"
               className="w-40"
@@ -301,7 +303,7 @@ export function GdprAuditLog() {
             />
 
             <Input
-              label={"To Date"}
+              label={t('enterprise.gdpr_filter_date_to')}
               type="date"
               size="sm"
               className="w-40"
@@ -316,7 +318,7 @@ export function GdprAuditLog() {
               startContent={<Filter size={16} />}
               onPress={handleApplyFilters}
             >
-              {"GDPR Apply"}
+              {t('enterprise.gdpr_apply')}
             </Button>
 
             {hasActiveFilters && (
@@ -325,7 +327,7 @@ export function GdprAuditLog() {
                 size="sm"
                 onPress={handleClearFilters}
               >
-                {"GDPR Clear"}
+                {t('enterprise.gdpr_clear')}
               </Button>
             )}
           </div>
@@ -338,7 +340,7 @@ export function GdprAuditLog() {
         data={entries}
         isLoading={loading}
         searchable={false}
-        emptyContent={"No GDPR audit entries"}
+        emptyContent={t('enterprise.no_gdpr_audit_entries')}
         totalItems={total}
         page={page}
         pageSize={perPage}
@@ -351,7 +353,7 @@ export function GdprAuditLog() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {`GDPR Audit Entry`}
+                {t('enterprise.gdpr_audit_entry')}
               </ModalHeader>
               <ModalBody>
                 {selectedEntry ? (
@@ -359,31 +361,31 @@ export function GdprAuditLog() {
                     {/* Top metadata grid */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-xs text-default-400">{"GDPR Detail"}</p>
+                        <p className="text-xs text-default-400">{t('enterprise.gdpr_detail_action')}</p>
                         <Chip size="sm" variant="flat" color={getActionColor(selectedEntry.action)}>
                           {selectedEntry.action}
                         </Chip>
                       </div>
                       <div>
-                        <p className="text-xs text-default-400">{"GDPR Detail Entity"}</p>
+                        <p className="text-xs text-default-400">{t('enterprise.gdpr_detail_entity_type')}</p>
                         <Chip size="sm" variant="flat" color="default">
                           {selectedEntry.entity_type}
                         </Chip>
                       </div>
                       <div>
-                        <p className="text-xs text-default-400">{"GDPR Detail Entity ID"}</p>
+                        <p className="text-xs text-default-400">{t('enterprise.gdpr_detail_entity_id')}</p>
                         <p className="text-sm">{selectedEntry.entity_id}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-default-400">{"GDPR Detail Admin User"}</p>
+                        <p className="text-xs text-default-400">{t('enterprise.gdpr_detail_admin_user')}</p>
                         <p className="text-sm">{selectedEntry.user_name || `ID ${selectedEntry.admin_id}`}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-default-400">{"GDPR Detail IP Address"}</p>
+                        <p className="text-xs text-default-400">{t('enterprise.gdpr_detail_ip_address')}</p>
                         <p className="text-sm font-mono">{selectedEntry.ip_address || '-'}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-default-400">{"GDPR Detail Timestamp"}</p>
+                        <p className="text-xs text-default-400">{t('enterprise.gdpr_detail_timestamp')}</p>
                         <p className="text-sm">{new Date(selectedEntry.created_at).toLocaleString()}</p>
                       </div>
                     </div>
@@ -393,7 +395,7 @@ export function GdprAuditLog() {
                       <div className={`grid gap-4 ${selectedEntry.old_value && selectedEntry.new_value ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
                         {selectedEntry.old_value && (
                           <div>
-                            <p className="text-xs text-default-400 mb-1">{"GDPR Old Value"}</p>
+                            <p className="text-xs text-default-400 mb-1">{t('enterprise.gdpr_old_value')}</p>
                             <pre className="text-xs bg-default-100 border border-default-200 rounded-lg p-3 overflow-auto max-h-60 whitespace-pre-wrap break-all">
                               {selectedEntry.old_value}
                             </pre>
@@ -401,7 +403,7 @@ export function GdprAuditLog() {
                         )}
                         {selectedEntry.new_value && (
                           <div>
-                            <p className="text-xs text-default-400 mb-1">{"GDPR New Value"}</p>
+                            <p className="text-xs text-default-400 mb-1">{t('enterprise.gdpr_new_value')}</p>
                             <pre className="text-xs bg-default-100 border border-default-200 rounded-lg p-3 overflow-auto max-h-60 whitespace-pre-wrap break-all">
                               {selectedEntry.new_value}
                             </pre>
@@ -418,7 +420,7 @@ export function GdprAuditLog() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
-                  {"GDPR Close"}
+                  {t('enterprise.gdpr_close')}
                 </Button>
               </ModalFooter>
             </>
