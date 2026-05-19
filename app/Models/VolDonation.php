@@ -36,12 +36,16 @@ class VolDonation extends Model
         'status',
         'created_at',
         'stripe_payment_intent_id',
+        'receipt_email_sent_at',
+        'receipt_email_failed_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'is_anonymous' => 'boolean',
         'created_at' => 'datetime',
+        'receipt_email_sent_at' => 'datetime',
+        'receipt_email_failed_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

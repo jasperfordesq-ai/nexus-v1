@@ -91,6 +91,7 @@ class StripeDonationServiceTest extends TestCase
             'id' => 1,
             'status' => 'completed',
             'stripe_payment_intent_id' => 'pi_test_123',
+            'receipt_email_sent_at' => now(),
         ];
 
         DB::shouldReceive('table->where->first')->once()->andReturn($donation);

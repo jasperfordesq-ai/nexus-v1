@@ -202,6 +202,9 @@ class StripeDonationService
                 'donation_id' => $donation->id,
                 'payment_intent_id' => $piId,
             ]);
+            if (empty($donation->receipt_email_sent_at) && !self::sendDonationReceiptEmail($donation)) {
+                throw new \RuntimeException('Donation receipt email was not sent.');
+            }
             return;
         }
 
@@ -226,7 +229,13 @@ class StripeDonationService
             'amount' => $donation->amount,
         ]);
 
-        // Send donation receipt email to the donor
+        if (!self::sendDonationReceiptEmail($donation)) {
+            throw new \RuntimeException('Donation receipt email was not sent.');
+        }
+    }
+
+    private static function sendDonationReceiptEmail(object $donation): bool
+    {
         try {
             $donorEmail = $donation->donor_email ?? null;
             $donorName  = $donation->donor_name ?? null;
@@ -249,7 +258,11 @@ class StripeDonationService
                 }
             }
 
-            if (!empty($donorEmail)) {
+            if (empty($donorEmail)) {
+                self::markDonationReceiptEmailAttempt($donation, false);
+                return false;
+            }
+
                 // Set tenant context if running from webhook (no active context)
                 $previousTenantId = TenantContext::currentId();
 
@@ -261,7 +274,8 @@ class StripeDonationService
                     // Render the receipt in the donor's preferred_language so subject,
                     // CTA, info card labels, and body all match THEIR locale rather
                     // than the queue worker's default.
-                    LocaleContext::withLocale($donorLocale, function () use ($donation, $donorEmail, $donorName) {
+                    $sent = false;
+                    LocaleContext::withLocale($donorLocale, function () use (&$sent, $donation, $donorEmail, $donorName) {
                         $tenantName    = TenantContext::getSetting('site_name', 'Project NEXUS');
                         $baseUrl       = TenantContext::getFrontendUrl();
                         $basePath      = TenantContext::getSlugPrefix();
@@ -285,7 +299,7 @@ class StripeDonationService
                             ->button(__('emails_created.donation.cta'), $accountUrl)
                             ->render();
 
-                        if (!\App\Services\EmailDispatchService::sendRaw(
+                        $sent = \App\Services\EmailDispatchService::sendRaw(
                             $donorEmail,
                             __('emails_created.donation.subject', ['community' => $tenantName]),
                             $html,
@@ -294,12 +308,18 @@ class StripeDonationService
                             null,
                             'donation_receipt',
                             ['tenant_id' => (int) $donation->tenant_id]
-                        )) {
+                        );
+
+                        if (!$sent) {
                             Log::warning('[StripeDonationService] donation receipt email returned false', [
                                 'donation_id' => $donation->id ?? null,
                             ]);
                         }
                     });
+
+                    self::markDonationReceiptEmailAttempt($donation, $sent);
+
+                    return $sent;
                 } finally {
                     if ($previousTenantId !== null) {
                         TenantContext::setById($previousTenantId);
@@ -307,10 +327,23 @@ class StripeDonationService
                         TenantContext::reset();
                     }
                 }
-            }
         } catch (\Throwable $e) {
+            self::markDonationReceiptEmailAttempt($donation, false);
             Log::warning('[StripeDonationService] donation receipt email failed: ' . $e->getMessage());
         }
+
+        return false;
+    }
+
+    private static function markDonationReceiptEmailAttempt(object $donation, bool $sent): void
+    {
+        DB::table('vol_donations')
+            ->where('id', $donation->id)
+            ->where('tenant_id', $donation->tenant_id)
+            ->update([
+                'receipt_email_sent_at' => $sent ? now() : null,
+                'receipt_email_failed_at' => $sent ? null : now(),
+            ]);
     }
 
     /**
