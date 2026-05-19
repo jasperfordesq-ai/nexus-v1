@@ -83,23 +83,23 @@ interface ImagePreview {
 }
 
 const CONDITIONS = [
-  { value: 'new', label: 'New', tKey: 'condition.new' },
-  { value: 'like_new', label: 'Like New', tKey: 'condition.like_new' },
-  { value: 'good', label: 'Good', tKey: 'condition.good' },
-  { value: 'fair', label: 'Fair', tKey: 'condition.fair' },
-  { value: 'poor', label: 'Poor', tKey: 'condition.poor' },
+  { value: 'new', tKey: 'condition.new' },
+  { value: 'like_new', tKey: 'condition.like_new' },
+  { value: 'good', tKey: 'condition.good' },
+  { value: 'fair', tKey: 'condition.fair' },
+  { value: 'poor', tKey: 'condition.poor' },
 ] as const;
 
 const PRICE_TYPES = [
-  { value: 'fixed', label: 'Fixed Price', tKey: 'price_type.fixed' },
-  { value: 'negotiable', label: 'Negotiable', tKey: 'price_type.negotiable' },
-  { value: 'free', label: 'Free', tKey: 'price_type.free' },
+  { value: 'fixed', tKey: 'price_type.fixed' },
+  { value: 'negotiable', tKey: 'price_type.negotiable' },
+  { value: 'free', tKey: 'price_type.free' },
 ] as const;
 
 const DELIVERY_METHODS = [
-  { value: 'pickup', label: 'Pickup Only', tKey: 'delivery_method.pickup' },
-  { value: 'shipping', label: 'Shipping Only', tKey: 'delivery_method.shipping' },
-  { value: 'both', label: 'Pickup or Shipping', tKey: 'delivery_method.both' },
+  { value: 'pickup', tKey: 'delivery_method.pickup' },
+  { value: 'shipping', tKey: 'delivery_method.shipping' },
+  { value: 'both', tKey: 'delivery_method.both' },
 ] as const;
 
 const MAX_IMAGES = 20;
@@ -684,7 +684,7 @@ export function EditMarketplaceListingPage() {
           >
             {CONDITIONS.map((c) => (
               <SelectItem key={c.value}>
-                {t(c.tKey, c.label)}
+                {t(c.tKey)}
               </SelectItem>
             ))}
           </Select>
@@ -802,7 +802,7 @@ export function EditMarketplaceListingPage() {
           >
             {PRICE_TYPES.map((pt) => (
               <Radio key={pt.value} value={pt.value}>
-                {t(pt.tKey, pt.label)}
+                {t(pt.tKey)}
               </Radio>
             ))}
           </RadioGroup>
@@ -885,7 +885,7 @@ export function EditMarketplaceListingPage() {
           >
             {DELIVERY_METHODS.map((dm) => (
               <Radio key={dm.value} value={dm.value}>
-                {t(dm.tKey, dm.label)}
+                {t(dm.tKey)}
               </Radio>
             ))}
           </RadioGroup>

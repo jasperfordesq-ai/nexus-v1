@@ -77,11 +77,11 @@ interface OnboardingStatus {
 
 const ITEMS_PER_PAGE = 24;
 
-const TABS: { key: ListingTab; tKey: string; label: string; icon: typeof Package }[] = [
-  { key: 'active', tKey: 'my_listings.tab_active', label: 'Active', icon: Package },
-  { key: 'draft', tKey: 'my_listings.tab_draft', label: 'Drafts', icon: Edit3 },
-  { key: 'sold', tKey: 'my_listings.tab_sold', label: 'Sold', icon: DollarSign },
-  { key: 'expired', tKey: 'my_listings.tab_expired', label: 'Expired', icon: Clock },
+const TABS: { key: ListingTab; tKey: string; icon: typeof Package }[] = [
+  { key: 'active', tKey: 'my_listings.tab_active', icon: Package },
+  { key: 'draft', tKey: 'my_listings.tab_draft', icon: Edit3 },
+  { key: 'sold', tKey: 'my_listings.tab_sold', icon: DollarSign },
+  { key: 'expired', tKey: 'my_listings.tab_expired', icon: Clock },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -394,7 +394,7 @@ export function MyListingsPage() {
               title={
                 <div className="flex items-center gap-1.5">
                   <tab.icon className="w-4 h-4" />
-                  <span>{t(tab.tKey, tab.label)}</span>
+                  <span>{t(tab.tKey)}</span>
                   {stats && (
                     <span className="text-xs text-default-400">
                       ({stats[`${tab.key}_listings`] ?? 0})
