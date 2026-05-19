@@ -1884,19 +1884,16 @@ export default function CaringCommunityWorkflowPage() {
                   {safeguardingSummary.recent.length === 0 ? (
                     <p className="text-sm text-default-500 py-4 text-center">No reports yet.</p>
                   ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead className="text-left text-xs uppercase text-default-500">
-                          <tr>
-                            <th className="py-2 pr-3">Severity</th>
-                            <th className="py-2 pr-3">Category</th>
-                            <th className="py-2 pr-3">Subject</th>
-                            <th className="py-2 pr-3">Status</th>
-                            <th className="py-2 pr-3">Age</th>
-                            <th className="py-2 pr-3 text-right">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
+                    <Table aria-label="Recent safeguarding reports" removeWrapper>
+                      <TableHeader>
+                        <TableColumn>Severity</TableColumn>
+                        <TableColumn>Category</TableColumn>
+                        <TableColumn>Subject</TableColumn>
+                        <TableColumn>Status</TableColumn>
+                        <TableColumn>Age</TableColumn>
+                        <TableColumn align="end">Action</TableColumn>
+                      </TableHeader>
+                      <TableBody>
                           {safeguardingSummary.recent.slice(0, 10).map((r) => {
                             const severityColor: Record<typeof r.severity, 'danger' | 'warning' | 'default' | 'success'> = {
                               critical: 'danger',
@@ -1917,17 +1914,17 @@ export default function CaringCommunityWorkflowPage() {
                             );
                             const ageLabel = ageHours < 24 ? `${ageHours}h` : `${Math.floor(ageHours / 24)}d`;
                             return (
-                              <tr key={r.id} className="border-t border-default-200">
-                                <td className="py-2 pr-3">
+                              <TableRow key={r.id}>
+                                <TableCell>
                                   <Chip size="sm" color={severityColor[r.severity]} variant="flat">
                                     {r.severity}
                                   </Chip>
-                                </td>
-                                <td className="py-2 pr-3">{r.category}</td>
-                                <td className="py-2 pr-3">
+                                </TableCell>
+                                <TableCell>{r.category}</TableCell>
+                                <TableCell>
                                   {r.subject_user_name ?? (r.subject_organisation_id ? `Org #${r.subject_organisation_id}` : '—')}
-                                </td>
-                                <td className="py-2 pr-3">
+                                </TableCell>
+                                <TableCell>
                                   <Chip size="sm" color={statusColor[r.status]} variant="flat">
                                     {r.status}
                                   </Chip>
@@ -1936,24 +1933,25 @@ export default function CaringCommunityWorkflowPage() {
                                       Overdue
                                     </Chip>
                                   )}
-                                </td>
-                                <td className="py-2 pr-3">{ageLabel}</td>
-                                <td className="py-2 pr-3 text-right">
-                                  <Button
-                                    as={Link}
-                                    to={tenantPath('/caring/safeguarding')}
-                                    size="sm"
-                                    variant="flat"
-                                  >
-                                    Open
-                                  </Button>
-                                </td>
-                              </tr>
+                                </TableCell>
+                                <TableCell>{ageLabel}</TableCell>
+                                <TableCell>
+                                  <div className="flex justify-end">
+                                    <Button
+                                      as={Link}
+                                      to={tenantPath('/caring/safeguarding')}
+                                      size="sm"
+                                      variant="flat"
+                                    >
+                                      Open
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
                             );
                           })}
-                        </tbody>
-                      </table>
-                    </div>
+                      </TableBody>
+                    </Table>
                   )}
                 </>
               )}
@@ -2706,24 +2704,21 @@ export default function CaringCommunityWorkflowPage() {
 
           {/* Recent codes table */}
           {inviteCodes.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-default-200 text-left text-xs text-default-500">
-                    <th className="pb-2 pr-4 font-medium">Code</th>
-                    <th className="pb-2 pr-4 font-medium">Label</th>
-                    <th className="pb-2 pr-4 font-medium">Expires</th>
-                    <th className="pb-2 pr-4 font-medium">Status</th>
-                    <th className="pb-2 font-medium">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-default-100">
+            <Table aria-label="Invite codes" removeWrapper>
+              <TableHeader>
+                <TableColumn>Code</TableColumn>
+                <TableColumn>Label</TableColumn>
+                <TableColumn>Expires</TableColumn>
+                <TableColumn>Status</TableColumn>
+                <TableColumn>Actions</TableColumn>
+              </TableHeader>
+              <TableBody>
                   {inviteCodes.map((ic) => (
-                    <tr key={ic.id} className="text-xs">
-                      <td className="py-2 pr-4 font-mono font-semibold tracking-wider text-default-900">{ic.code}</td>
-                      <td className="py-2 pr-4 text-default-600">{ic.label ?? '—'}</td>
-                      <td className="py-2 pr-4 text-default-500">{new Date(ic.expires_at).toLocaleDateString()}</td>
-                      <td className="py-2 pr-4">
+                    <TableRow key={ic.id}>
+                      <TableCell className="font-mono font-semibold tracking-wider text-default-900">{ic.code}</TableCell>
+                      <TableCell className="text-default-600">{ic.label ?? '-'}</TableCell>
+                      <TableCell className="text-default-500">{new Date(ic.expires_at).toLocaleDateString()}</TableCell>
+                      <TableCell>
                         <Chip
                           size="sm"
                           variant="flat"
@@ -2731,8 +2726,8 @@ export default function CaringCommunityWorkflowPage() {
                         >
                           {ic.status === 'active' ? 'Active' : ic.status === 'used' ? `Used${ic.used_by ? ` by ${ic.used_by}` : ''}` : 'Expired'}
                         </Chip>
-                      </td>
-                      <td className="py-2">
+                      </TableCell>
+                      <TableCell>
                         <div className="flex gap-1">
                           <Button
                             size="sm"
@@ -2766,12 +2761,11 @@ export default function CaringCommunityWorkflowPage() {
                             />
                           </div>
                         )}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
+              </TableBody>
+            </Table>
           )}
 
           {inviteCodes.length === 0 && !loadingInviteCodes && (
