@@ -131,6 +131,7 @@ class EmailTriggerAuditService
                 $this->checkGroupInvitesWithoutEmail($tenantId, $since, $windowHours),
                 $this->checkNotificationQueueHealth($tenantId, $since, $windowHours),
                 $this->checkNewsletterQueueHealth($tenantId, $since, $windowHours),
+                $this->checkEventReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkNotificationStoreHealth($tenantId),
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
                 $this->checkTenantProviderConfiguration($tenantId),
@@ -874,6 +875,59 @@ class EmailTriggerAuditService
             } catch (\Throwable $e) {
                 $issues[] = $this->issue('tenant_provider_config_check_failed', 'warning', $id, 'deliverability', 'provider_config', ['error' => $e->getMessage()]);
             }
+        }
+
+        return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkEventReminderSourceHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (!$this->hasTables(['event_reminders'])) {
+            return [];
+        }
+
+        $issues = [];
+
+        $overduePending = DB::table('event_reminders')
+            ->select('tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('status', 'pending')
+            ->where('scheduled_for', '<', now()->subMinutes(15))
+            ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId))
+            ->groupBy('tenant_id')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($overduePending, 'event_reminders_overdue_pending', 'critical', 'events', 'event_created_update_cancellation_rsvp_reminder', ['minutes' => 15]));
+
+        $failed = DB::table('event_reminders')
+            ->select('tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('status', 'failed')
+            ->where('updated_at', '>=', $since)
+            ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId))
+            ->groupBy('tenant_id')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($failed, 'event_reminders_failed_recently', 'warning', 'events', 'event_created_update_cancellation_rsvp_reminder', ['window_hours' => $windowHours]));
+
+        if ($this->hasTables(['email_log'])) {
+            $sentWithoutEmail = DB::table('event_reminders as er')
+                ->select('er.tenant_id', DB::raw('COUNT(*) as count'))
+                ->where('er.status', 'sent')
+                ->whereIn('er.reminder_type', ['email', 'both'])
+                ->where('er.sent_at', '>=', $since)
+                ->whereNotExists(function ($sub) {
+                    $sub->select(DB::raw(1))
+                        ->from('email_log')
+                        ->whereColumn('email_log.user_id', 'er.user_id')
+                        ->whereColumn('email_log.tenant_id', 'er.tenant_id')
+                        ->whereColumn('email_log.created_at', '>=', 'er.created_at')
+                        ->where('email_log.category', 'event_reminder')
+                        ->whereIn('email_log.status', ['sent', 'delivered', 'bounced']);
+                })
+                ->when($tenantId !== null, fn ($q) => $q->where('er.tenant_id', $tenantId))
+                ->groupBy('er.tenant_id')
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($sentWithoutEmail, 'event_reminders_marked_sent_without_email_log', 'critical', 'events', 'event_created_update_cancellation_rsvp_reminder', ['window_hours' => $windowHours]));
         }
 
         return $issues;

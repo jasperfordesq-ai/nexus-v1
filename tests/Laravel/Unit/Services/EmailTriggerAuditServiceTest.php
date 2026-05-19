@@ -464,4 +464,82 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('federation_connection_without_email_evidence', $codes);
         $this->assertContains('federation_connection_without_bell_evidence', $codes);
     }
+
+    public function test_run_detects_event_reminder_source_delivery_gaps(): void
+    {
+        if (!Schema::hasTable('event_reminders') || !Schema::hasTable('events') || !Schema::hasTable('email_log')) {
+            $this->markTestSkipped('Event reminder audit tables are not available.');
+        }
+
+        $userId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Event Reminder Audit User',
+            'email' => 'event-reminder-audit@example.test',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $eventId = DB::table('events')->insertGetId([
+            'tenant_id' => 2,
+            'user_id' => $userId,
+            'title' => 'Audit Event Reminder',
+            'description' => 'Audit event reminder source rows',
+            'location' => 'Online',
+            'start_time' => now()->addDay(),
+            'start_date' => now()->addDay(),
+            'end_time' => now()->addDay()->addHour(),
+            'is_online' => 1,
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('event_reminders')->insert([
+            [
+                'tenant_id' => 2,
+                'event_id' => $eventId,
+                'user_id' => $userId,
+                'remind_before_minutes' => 60,
+                'reminder_type' => 'email',
+                'sent_at' => null,
+                'scheduled_for' => now()->subHour(),
+                'status' => 'pending',
+                'created_at' => now()->subHours(2),
+                'updated_at' => now()->subHour(),
+            ],
+            [
+                'tenant_id' => 2,
+                'event_id' => $eventId,
+                'user_id' => $userId,
+                'remind_before_minutes' => 1440,
+                'reminder_type' => 'both',
+                'sent_at' => null,
+                'scheduled_for' => now()->subMinutes(30),
+                'status' => 'failed',
+                'created_at' => now()->subHour(),
+                'updated_at' => now()->subMinutes(10),
+            ],
+            [
+                'tenant_id' => 2,
+                'event_id' => $eventId,
+                'user_id' => $userId,
+                'remind_before_minutes' => 10080,
+                'reminder_type' => 'email',
+                'sent_at' => now()->subMinutes(5),
+                'scheduled_for' => now()->subMinutes(10),
+                'status' => 'sent',
+                'created_at' => now()->subHour(),
+                'updated_at' => now()->subMinutes(5),
+            ],
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('event_reminders_overdue_pending', $codes);
+        $this->assertContains('event_reminders_failed_recently', $codes);
+        $this->assertContains('event_reminders_marked_sent_without_email_log', $codes);
+    }
 }
