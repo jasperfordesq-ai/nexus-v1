@@ -335,16 +335,19 @@ class StripeSubscriptionService
         // Email tenant admin — subscription is now active
         try {
             $plan = DB::selectOne("SELECT name FROM pay_plans WHERE id = ?", [$planId]);
-            static::sendTenantAdminEmail(
+            static::sendRequiredTenantAdminEmail(
                 $tenantId,
                 ['key' => 'emails_misc.stripe_subscription.activated_subject', 'params' => ['plan' => $plan->name ?? '']],
                 ['key' => 'emails_misc.stripe_subscription.activated_title'],
                 ['key' => 'emails_misc.stripe_subscription.activated_body', 'params' => ['plan' => htmlspecialchars($plan->name ?? '', ENT_QUOTES, 'UTF-8')]],
                 '/admin/billing',
-                ['key' => 'emails_misc.stripe_subscription.activated_cta']
+                ['key' => 'emails_misc.stripe_subscription.activated_cta'],
+                'default',
+                'checkout completed'
             );
         } catch (\Throwable $e) {
             Log::warning('[StripeSubscriptionService] handleCheckoutCompleted email failed: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -433,16 +436,19 @@ class StripeSubscriptionService
                     $oldPlanName = $currentAssignment->plan_name ?? 'Previous Plan';
 
                     try {
-                        static::sendTenantAdminEmail(
+                        static::sendRequiredTenantAdminEmail(
                             $tenantId,
                             ['key' => 'emails_misc.stripe_subscription.plan_changed_subject', 'params' => ['new_plan' => $newPlanName]],
                             ['key' => 'emails_misc.stripe_subscription.plan_changed_title'],
                             ['key' => 'emails_misc.stripe_subscription.plan_changed_body', 'params' => ['old_plan' => $oldPlanName, 'new_plan' => $newPlanName]],
                             '/admin/billing',
-                            ['key' => 'emails_misc.stripe_subscription.plan_changed_cta']
+                            ['key' => 'emails_misc.stripe_subscription.plan_changed_cta'],
+                            'default',
+                            'plan changed'
                         );
                     } catch (\Throwable $e) {
                         Log::warning('[StripeSubscriptionService] plan_changed email failed: ' . $e->getMessage());
+                        throw $e;
                     }
                 }
             }
@@ -451,29 +457,35 @@ class StripeSubscriptionService
         // Notify tenant admin on actionable status transitions
         if ($stripeStatus === 'past_due') {
             try {
-                static::sendTenantAdminEmail(
+                static::sendRequiredTenantAdminEmail(
                     $tenantId,
                     ['key' => 'emails_misc.stripe_subscription.past_due_subject'],
                     ['key' => 'emails_misc.stripe_subscription.past_due_title'],
                     ['key' => 'emails_misc.stripe_subscription.past_due_body'],
                     '/admin/billing',
-                    ['key' => 'emails_misc.stripe_subscription.past_due_cta']
+                    ['key' => 'emails_misc.stripe_subscription.past_due_cta'],
+                    'default',
+                    'past due'
                 );
             } catch (\Throwable $e) {
                 Log::warning('[StripeSubscriptionService] past_due email failed: ' . $e->getMessage());
+                throw $e;
             }
         } elseif (in_array($stripeStatus, ['unpaid', 'incomplete_expired', 'paused'], true)) {
             try {
-                static::sendTenantAdminEmail(
+                static::sendRequiredTenantAdminEmail(
                     $tenantId,
                     ['key' => 'emails_misc.stripe_subscription.expired_subject'],
                     ['key' => 'emails_misc.stripe_subscription.expired_title'],
                     ['key' => 'emails_misc.stripe_subscription.expired_body'],
                     '/admin/billing',
-                    ['key' => 'emails_misc.stripe_subscription.expired_cta']
+                    ['key' => 'emails_misc.stripe_subscription.expired_cta'],
+                    'default',
+                    'expired'
                 );
             } catch (\Throwable $e) {
                 Log::warning('[StripeSubscriptionService] expired email failed: ' . $e->getMessage());
+                throw $e;
             }
         }
     }
@@ -520,16 +532,19 @@ class StripeSubscriptionService
 
         // Email tenant admin — subscription cancelled
         try {
-            static::sendTenantAdminEmail(
+            static::sendRequiredTenantAdminEmail(
                 (int) $assignment->tenant_id,
                 ['key' => 'emails_misc.stripe_subscription.cancelled_subject'],
                 ['key' => 'emails_misc.stripe_subscription.cancelled_title'],
                 ['key' => 'emails_misc.stripe_subscription.cancelled_body'],
                 '/admin/billing',
-                ['key' => 'emails_misc.stripe_subscription.cancelled_cta']
+                ['key' => 'emails_misc.stripe_subscription.cancelled_cta'],
+                'default',
+                'subscription deleted'
             );
         } catch (\Throwable $e) {
             Log::warning('[StripeSubscriptionService] handleSubscriptionDeleted email failed: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -588,16 +603,19 @@ class StripeSubscriptionService
                 [$assignment->id]
             );
             $planName = $plan->name ?? '';
-            static::sendTenantAdminEmail(
+            static::sendRequiredTenantAdminEmail(
                 (int) $assignment->tenant_id,
                 ['key' => 'emails_misc.stripe_subscription.renewed_subject'],
                 ['key' => 'emails_misc.stripe_subscription.renewed_title'],
                 ['key' => 'emails_misc.stripe_subscription.renewed_body', 'params' => ['plan' => htmlspecialchars($planName, ENT_QUOTES, 'UTF-8')]],
                 '/admin/billing',
-                ['key' => 'emails_misc.stripe_subscription.renewed_cta']
+                ['key' => 'emails_misc.stripe_subscription.renewed_cta'],
+                'default',
+                'invoice paid'
             );
         } catch (\Throwable $e) {
             Log::warning('[StripeSubscriptionService] handleInvoicePaid email failed: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -627,17 +645,19 @@ class StripeSubscriptionService
         // Urgent email to tenant admin — payment failed, action required
         if ($assignment && !empty($assignment->tenant_id)) {
             try {
-                static::sendTenantAdminEmail(
+                static::sendRequiredTenantAdminEmail(
                     (int) $assignment->tenant_id,
                     ['key' => 'emails_misc.stripe_subscription.payment_failed_subject'],
                     ['key' => 'emails_misc.stripe_subscription.payment_failed_title'],
                     ['key' => 'emails_misc.stripe_subscription.payment_failed_body'],
                     '/admin/billing',
                     ['key' => 'emails_misc.stripe_subscription.payment_failed_cta'],
-                    'danger'
+                    'danger',
+                    'invoice payment failed'
                 );
             } catch (\Throwable $e) {
                 Log::warning('[StripeSubscriptionService] handleInvoicePaymentFailed email failed: ' . $e->getMessage());
+                throw $e;
             }
         }
     }
@@ -844,6 +864,21 @@ class StripeSubscriptionService
                 TenantContext::reset();
             }
         }
+    }
+
+    /**
+     * @param array{key:string,params?:array} $subject
+     * @param array{key:string,params?:array} $title
+     * @param array{key:string,params?:array} $body
+     * @param array{key:string,params?:array} $ctaText
+     */
+    private static function sendRequiredTenantAdminEmail(int $tenantId, array $subject, array $title, array $body, string $link, array $ctaText, string $theme, string $event): void
+    {
+        if (static::sendTenantAdminEmail($tenantId, $subject, $title, $body, $link, $ctaText, $theme)) {
+            return;
+        }
+
+        throw new \RuntimeException('Stripe subscription admin email failed for ' . $event);
     }
 
     /**

@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Integration;
 
+use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use App\Services\StripeSubscriptionService;
@@ -165,6 +166,58 @@ class StripeSubscriptionReminderEmailTest extends TestCase
         }
     }
 
+    public function test_payment_failed_webhook_email_failure_throws_for_retry(): void
+    {
+        $tenantId = $this->createBillingTenant('webhook-payment-fail');
+        $admin = $this->createBillingAdmin($tenantId);
+        $stripeSubId = $this->createPlanAssignment($tenantId, 'active', now()->addMonth());
+        $mailer = $this->fakeBillingMailer(false);
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        TenantContext::setById(2);
+
+        try {
+            StripeSubscriptionService::handleInvoicePaymentFailed((object) [
+                'id' => 'in_payment_failed_' . uniqid(),
+                'subscription' => $stripeSubId,
+                'customer' => 'cus_' . uniqid(),
+                'amount_due' => 1000,
+            ]);
+            $this->fail('Expected tenant billing webhook email failure to throw for Stripe retry.');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Stripe subscription admin email failed for invoice payment failed', $e->getMessage());
+        }
+
+        $this->assertSame(2, TenantContext::currentId());
+        $this->assertCount(1, $mailer->calls);
+        $this->assertSame($admin->email, $mailer->calls[0]['to']);
+        $this->assertSame('billing', $mailer->calls[0]['options']['category']);
+        $this->assertSame($tenantId, $mailer->calls[0]['options']['tenant_id']);
+    }
+
+    public function test_subscription_deleted_email_failure_throws_after_idempotent_state_update(): void
+    {
+        $tenantId = $this->createBillingTenant('webhook-delete-fail');
+        $this->createBillingAdmin($tenantId);
+        $stripeSubId = $this->createPlanAssignment($tenantId, 'active', now()->addMonth());
+        $mailer = $this->fakeBillingMailer(false);
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Stripe subscription admin email failed for subscription deleted');
+
+        try {
+            StripeSubscriptionService::handleSubscriptionDeleted((object) [
+                'id' => $stripeSubId,
+            ]);
+        } finally {
+            $assignment = DB::table('tenant_plan_assignments')->where('stripe_subscription_id', $stripeSubId)->first();
+            $this->assertNotNull($assignment);
+            $this->assertSame('cancelled', $assignment->status);
+            $this->assertCount(1, $mailer->calls);
+        }
+    }
+
     private function createBillingTenant(string $slugSuffix): int
     {
         $slug = 'billing-reminder-' . $slugSuffix . '-' . uniqid();
@@ -190,7 +243,7 @@ class StripeSubscriptionReminderEmailTest extends TestCase
         ]);
     }
 
-    private function createPlanAssignment(int $tenantId, string $status, \DateTimeInterface $periodEnd): void
+    private function createPlanAssignment(int $tenantId, string $status, \DateTimeInterface $periodEnd): string
     {
         $planId = (int) DB::table('pay_plans')->insertGetId([
             'name' => 'Billing Reminder Plan',
@@ -203,15 +256,37 @@ class StripeSubscriptionReminderEmailTest extends TestCase
             'updated_at' => now(),
         ]);
 
+        $stripeSubId = 'sub_billing_reminder_' . uniqid();
+
         DB::table('tenant_plan_assignments')->insert([
             'tenant_id' => $tenantId,
             'pay_plan_id' => $planId,
             'status' => $status,
             'starts_at' => now(),
             'stripe_current_period_end' => $periodEnd,
-            'stripe_subscription_id' => 'sub_billing_reminder_' . uniqid(),
+            'stripe_subscription_id' => $stripeSubId,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        return $stripeSubId;
+    }
+
+    private function fakeBillingMailer(bool $sendResult): EmailDispatchService
+    {
+        return new class($sendResult) extends EmailDispatchService {
+            public array $calls = [];
+
+            public function __construct(private bool $sendResult)
+            {
+            }
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->calls[] = compact('to', 'subject', 'body', 'options');
+
+                return $this->sendResult;
+            }
+        };
     }
 }
