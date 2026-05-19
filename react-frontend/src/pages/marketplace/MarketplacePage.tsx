@@ -29,6 +29,7 @@ import HandCoins from 'lucide-react/icons/hand-coins';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { PublicPageHero } from '@/components/public/PublicPageHero';
 import {
   MarketplaceListingGrid,
   MarketplaceListingGridSkeleton,
@@ -270,19 +271,19 @@ export function MarketplacePage() {
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {/* Hero Banner */}
-        <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6">
-          <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="rounded-lg bg-teal-500/10 p-2 text-teal-600 dark:text-teal-400">
-                  <ShoppingBag className="w-5 h-5" aria-hidden="true" />
-                </div>
-                <h1 className="text-xl font-bold text-theme-primary">{t('page_title', 'Marketplace')}</h1>
-              </div>
-              <p className="text-sm text-theme-muted">{t('hub.subtitle', 'Buy, sell, and trade items in your community')}</p>
-            </div>
-            {isAuthenticated && (
+        <PublicPageHero
+          eyebrow={t('hub.eyebrow')}
+          title={t('page_title', 'Marketplace')}
+          description={t('hub.subtitle', 'Buy, sell, and trade items in your community')}
+          icon={<ShoppingBag className="h-6 w-6" aria-hidden="true" />}
+          accent="emerald"
+          stats={[
+            { label: t('hub.categories_stat'), value: categories.length.toLocaleString() },
+            { label: t('hub.listings_stat'), value: listings.length.toLocaleString() },
+            { label: t('hub.featured_stat'), value: featuredListings.length.toLocaleString() },
+          ]}
+          action={
+            isAuthenticated ? (
               <Button
                 as={Link}
                 to={tenantPath('/marketplace/sell')}
@@ -292,9 +293,9 @@ export function MarketplacePage() {
               >
                 {t('hub.sell_something', 'Sell Something')}
               </Button>
-            )}
-          </div>
-        </div>
+            ) : null
+          }
+        />
 
         {/* Search bar */}
         <div className="max-w-2xl">

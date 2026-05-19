@@ -26,7 +26,7 @@ import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
 import FolderTree from 'lucide-react/icons/folder-tree';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
@@ -66,7 +66,7 @@ const EMPTY_FORM: CategoryFormData = {
 
 export function ResourceCategoriesAdmin() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('resources.categories_page_title', 'Resource Categories'));
+  useAdminPageMeta({ title: t('resources.categories_page_title', 'Resource Categories') });
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();

@@ -130,7 +130,8 @@
     "no_roles": "No open roles at this time",
     "error": "Unable to load employer profile",
     "employer_jobs": "Employer Jobs",
-    "employees": "{{size}} employees"
+    "employees": "{{size}} employees",
+    "meta_description": "View this employer profile, open roles, and community reviews across {{count}} current opportunities."
   },
   "bulk": {
     "select_action": "Move to stage...",

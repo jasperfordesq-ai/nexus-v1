@@ -913,10 +913,10 @@ export function ProfilePage() {
               onSelectionChange={(key) => setActiveTab(String(key))}
               variant="light"
               classNames={{
-                base: 'w-full overflow-x-auto',
-                tabList: 'w-max max-w-full bg-theme-elevated p-1 rounded-lg gap-1',
+                base: 'w-full overflow-x-auto pb-1',
+                tabList: 'w-max min-w-max max-w-none bg-theme-elevated p-1 rounded-lg gap-1',
                 cursor: 'bg-theme-hover shadow-sm',
-                tab: 'h-auto min-w-0 px-3 py-2 text-xs sm:text-sm',
+                tab: 'h-auto min-w-0 shrink-0 px-3 py-2 text-xs sm:text-sm',
                 tabContent: 'group-data-[selected=true]:text-theme-primary text-theme-muted',
               }}
             >
@@ -930,9 +930,9 @@ export function ProfilePage() {
                     title={(
                       <span className="flex min-w-0 items-center gap-1.5 whitespace-nowrap">
                         <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                        <span className="max-w-[7rem] truncate sm:max-w-none">{tab.label}</span>
+                        <span className="max-w-[9rem] truncate sm:max-w-[12rem] md:max-w-none">{tab.label}</span>
                         {typeof tab.count === 'number' && (
-                          <span className="rounded-full bg-theme-default px-1.5 py-0.5 text-[10px] font-semibold leading-none text-theme-subtle">
+                          <span className="shrink-0 rounded-full bg-theme-default px-1.5 py-0.5 text-[10px] font-semibold leading-none text-theme-subtle">
                             {tab.count}
                           </span>
                         )}

@@ -13,7 +13,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Input, Button, Spinner } from '@heroui/react';
 import Stethoscope from 'lucide-react/icons/stethoscope';
 import Search from 'lucide-react/icons/search';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useToast } from '@/contexts';
 import { adminDiagnostics } from '../../api/adminApi';
 import { PageHeader } from '../../components';
@@ -32,7 +32,7 @@ interface EngineStatus {
 }
 
 export function MatchingDiagnostic() {
-  usePageTitle("Diagnostics");
+  useAdminPageMeta({ title: "Diagnostics" });
   const toast = useToast();
 
   const [userId, setUserId] = useState('');

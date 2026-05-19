@@ -37,7 +37,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import FolderOpen from 'lucide-react/icons/folder-open';
 import Tag from 'lucide-react/icons/tag';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useToast } from '@/contexts';
 import { adminCategories } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
@@ -69,7 +69,7 @@ const COLOR_OPTIONS = [
 
 export function CategoriesAdmin() {
   const { t } = useTranslation('admin');
-  usePageTitle("Categories");
+  useAdminPageMeta({ title: "Categories" });
   const toast = useToast();
 
   // Translated category type labels (derived from i18n)

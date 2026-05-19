@@ -17,7 +17,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import XCircle from 'lucide-react/icons/circle-x';
 import MapPin from 'lucide-react/icons/map-pin';
 import Users from 'lucide-react/icons/users';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
@@ -91,7 +91,7 @@ function normalizeAdminEvent(item: RawAdminEvent): AdminEvent {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function EventsAdmin() {
-  usePageTitle("Events");
+  useAdminPageMeta({ title: "Events" });
   const { tenantPath } = useTenant();
   const toast = useToast();
 

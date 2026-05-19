@@ -19,7 +19,7 @@ import ThumbsUp from 'lucide-react/icons/thumbs-up';
 import Plus from 'lucide-react/icons/plus';
 import Pencil from 'lucide-react/icons/pencil';
 import FolderTree from 'lucide-react/icons/folder-tree';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
@@ -60,7 +60,7 @@ const PAGE_SIZE = 50;
 
 export function ResourcesAdmin() {
   const { t } = useTranslation('admin');
-  usePageTitle("Resources");
+  useAdminPageMeta({ title: "Resources" });
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();

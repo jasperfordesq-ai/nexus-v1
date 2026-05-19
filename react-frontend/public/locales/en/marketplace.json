@@ -2,8 +2,12 @@
   "page_title": "Marketplace",
   "meta_description": "Buy, sell, or share items locally with neighbours — community marketplace listings, free items, group buys, and deliveries within your timebank.",
   "hub": {
+    "eyebrow": "Community marketplace",
     "subtitle": "Buy, sell, and trade items in your community",
     "sell_something": "Sell Something",
+    "categories_stat": "Categories",
+    "listings_stat": "Visible listings",
+    "featured_stat": "Featured",
     "search_placeholder": "Search marketplace...",
     "all": "All",
     "featured_listings": "Featured Listings",
