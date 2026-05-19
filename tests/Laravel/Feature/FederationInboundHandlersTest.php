@@ -364,6 +364,7 @@ class FederationInboundHandlersTest extends TestCase
     public function test_connection_accepted_sets_accepted_status(): void
     {
         $localUser = User::factory()->forTenant($this->testTenantId)->create();
+        $this->fakeEmailDispatchService();
 
         $this->postWebhook('connection.accepted', [
             'local_user_id'    => $localUser->id,
@@ -399,6 +400,68 @@ class FederationInboundHandlersTest extends TestCase
         $this->assertSame('federation_connection', $mailer->sends[0]['options']['category']);
         $this->assertSame($this->testTenantId, $mailer->sends[0]['options']['tenant_id']);
 
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $localUser->id)
+            ->where('type', 'federation_connection')
+            ->where('link', '/network')
+            ->count());
+        $connection = DB::table('federation_inbound_connections')
+            ->where('external_partner_id', $this->partnerId)
+            ->where('local_user_id', $localUser->id)
+            ->where('external_user_id', 'ext-usr-retry')
+            ->first();
+        $this->assertNotNull($connection);
+        $this->assertNotNull($connection->notification_sent_at);
+        $this->assertNotNull($connection->email_sent_at);
+        $this->assertNull($connection->email_failed_at);
+    }
+
+    public function test_connection_requested_replay_repairs_failed_email_without_duplicate_bell(): void
+    {
+        $localUser = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'federation-connection-repair@example.test',
+        ]);
+
+        $payload = [
+            'local_user_id' => $localUser->id,
+            'external_user_id' => 'ext-usr-repair',
+            'external_user_name' => 'Remote Member',
+            'message' => 'Hi, let\'s connect!',
+        ];
+
+        $failingMailer = $this->fakeEmailDispatchService(false);
+        $this->postWebhook('connection.requested', $payload)->assertStatus(500);
+
+        $connection = DB::table('federation_inbound_connections')
+            ->where('external_partner_id', $this->partnerId)
+            ->where('local_user_id', $localUser->id)
+            ->where('external_user_id', 'ext-usr-repair')
+            ->first();
+        $this->assertNotNull($connection);
+        $this->assertNotNull($connection->notification_sent_at);
+        $this->assertNull($connection->email_sent_at);
+        $this->assertNotNull($connection->email_failed_at);
+        $this->assertSame('Email dispatch returned false', $connection->email_last_error);
+        $this->assertCount(1, $failingMailer->sends);
+
+        $repairMailer = $this->fakeEmailDispatchService(true);
+        $this->postWebhook('connection.requested', $payload)->assertStatus(200);
+
+        $this->assertSame(1, DB::table('federation_inbound_connections')
+            ->where('external_partner_id', $this->partnerId)
+            ->where('local_user_id', $localUser->id)
+            ->where('external_user_id', 'ext-usr-repair')
+            ->count());
+        $repaired = DB::table('federation_inbound_connections')
+            ->where('external_partner_id', $this->partnerId)
+            ->where('local_user_id', $localUser->id)
+            ->where('external_user_id', 'ext-usr-repair')
+            ->first();
+        $this->assertNotNull($repaired->email_sent_at);
+        $this->assertNull($repaired->email_failed_at);
+        $this->assertNull($repaired->email_last_error);
+        $this->assertCount(1, $repairMailer->sends);
         $this->assertSame(1, DB::table('notifications')
             ->where('tenant_id', $this->testTenantId)
             ->where('user_id', $localUser->id)

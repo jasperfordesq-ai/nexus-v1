@@ -72,6 +72,14 @@ class HandleFederatedConnectionReceived implements ShouldQueue
             }
 
             $status = (string) ($event->shadowRow['status'] ?? 'pending');
+            $connection = DB::table('federation_inbound_connections')
+                ->where('id', $event->localId)
+                ->where('tenant_id', $event->tenantId)
+                ->first(['id', 'notification_sent_at', 'email_sent_at']);
+            if (!$connection) {
+                return;
+            }
+
             $externalUserName = trim((string) (
                 $event->shadowRow['external_user_name']
                 ?? $event->shadowRow['sender_name']
@@ -88,35 +96,47 @@ class HandleFederatedConnectionReceived implements ShouldQueue
                 ->value('name') ?: __('emails.common.fallback_partner_community');
 
             // Render the bell preview in the recipient's locale.
-            LocaleContext::withLocale($localUser, function () use ($event, $localUserId, $status, $externalUserName, $partnerName) {
-                $key = $status === 'accepted'
-                    ? 'svc_notifications.federation.connection_accepted'
-                    : 'svc_notifications.federation.connection_request';
-                $message = __($key, [
-                    'name' => $externalUserName,
-                    'sender' => $externalUserName,
-                    'community' => $partnerName,
-                ]);
+            if (empty($connection->notification_sent_at)) {
+                LocaleContext::withLocale($localUser, function () use ($event, $localUserId, $status, $externalUserName, $partnerName) {
+                    $key = $status === 'accepted'
+                        ? 'svc_notifications.federation.connection_accepted'
+                        : 'svc_notifications.federation.connection_request';
+                    $message = __($key, [
+                        'name' => $externalUserName,
+                        'sender' => $externalUserName,
+                        'community' => $partnerName,
+                    ]);
 
-                $exists = DB::table('notifications')
+                    $exists = DB::table('notifications')
+                        ->where('tenant_id', $event->tenantId)
+                        ->where('user_id', $localUserId)
+                        ->where('type', 'federation_connection')
+                        ->where('link', '/network')
+                        ->where('message', $message)
+                        ->exists();
+
+                    if (! $exists) {
+                        Notification::createNotification(
+                            $localUserId,
+                            $message,
+                            '/network',
+                            'federation_connection',
+                            false,
+                            $event->tenantId
+                        );
+                    }
+                });
+
+                DB::table('federation_inbound_connections')
+                    ->where('id', $event->localId)
                     ->where('tenant_id', $event->tenantId)
-                    ->where('user_id', $localUserId)
-                    ->where('type', 'federation_connection')
-                    ->where('link', '/network')
-                    ->where('message', $message)
-                    ->exists();
+                    ->whereNull('notification_sent_at')
+                    ->update(['notification_sent_at' => now()]);
+            }
 
-                if (! $exists) {
-                    Notification::createNotification(
-                        $localUserId,
-                        $message,
-                        '/network',
-                        'federation_connection',
-                        false,
-                        $event->tenantId
-                    );
-                }
-            });
+            if (!empty($connection->email_sent_at)) {
+                return;
+            }
 
             $sent = FederationEmailService::sendExternalConnectionNotification(
                 $localUserId,
@@ -126,6 +146,15 @@ class HandleFederatedConnectionReceived implements ShouldQueue
                 $status
             );
 
+            DB::table('federation_inbound_connections')
+                ->where('id', $event->localId)
+                ->where('tenant_id', $event->tenantId)
+                ->update([
+                    'email_sent_at' => $sent ? now() : null,
+                    'email_failed_at' => $sent ? null : now(),
+                    'email_last_error' => $sent ? null : 'Email dispatch returned false',
+                ]);
+
             if (! $sent) {
                 Log::warning('[HandleFederatedConnectionReceived] external connection email returned false', [
                     'tenant_id'     => $event->tenantId,
@@ -133,6 +162,7 @@ class HandleFederatedConnectionReceived implements ShouldQueue
                     'local_user_id' => $localUserId,
                     'status'        => $status,
                 ]);
+                throw new \RuntimeException('Federated connection email dispatch returned false');
             }
 
             Log::info('[HandleFederatedConnectionReceived] notified local user', [
@@ -148,6 +178,7 @@ class HandleFederatedConnectionReceived implements ShouldQueue
                 'local_id'   => $event->localId ?? null,
                 'error'      => $e->getMessage(),
             ]);
+            throw $e;
         } finally {
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
