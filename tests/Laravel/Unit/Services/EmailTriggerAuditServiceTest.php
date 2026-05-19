@@ -34,6 +34,7 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('messages:direct_message_received:message', $keys);
         $this->assertContains('federation:federated_message_received:federation_message', $keys);
         $this->assertContains('federation:federated_review_source:federation_review', $keys);
+        $this->assertContains('billing:member_premium_billing:billing', $keys);
         $this->assertContains('marketplace:offer_order_refund_rating_report_dispute:marketplace_order', $keys);
         $this->assertContains('verein:verein_dues_invoice_reminder_paid:verein_dues', $keys);
         $this->assertContains('events:event_created_update_cancellation_rsvp_reminder:event_notification', $keys);
@@ -67,6 +68,7 @@ class EmailTriggerAuditServiceTest extends TestCase
             'group_members',
             'marketplace_report_notifications',
             'marketplace_reports',
+            'member_subscription_events',
             'newsletter_queue',
             'notification_queue',
             'stripe_webhook_events',

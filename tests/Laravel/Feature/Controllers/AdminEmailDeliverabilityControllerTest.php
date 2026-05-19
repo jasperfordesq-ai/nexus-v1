@@ -345,4 +345,72 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
             $this->assertSame('federation-source-queue@example.test', $rows->first()['email'] ?? null);
         }
     }
+
+    public function test_queues_endpoint_surfaces_member_subscription_event_delivery_failures(): void
+    {
+        if (
+            !Schema::hasTable('member_subscription_events')
+            || !Schema::hasTable('member_subscriptions')
+            || !Schema::hasTable('member_premium_tiers')
+            || !Schema::hasColumn('member_subscription_events', 'notification_sent_at')
+            || !Schema::hasColumn('member_subscription_events', 'notification_failed_at')
+            || !Schema::hasColumn('member_subscription_events', 'notification_last_error')
+        ) {
+            $this->markTestSkipped('Member subscription event delivery columns are not available.');
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'member-subscription-event-queue@example.test',
+        ]);
+        Sanctum::actingAs($admin);
+
+        $tierId = DB::table('member_premium_tiers')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'slug' => 'audit-tier-' . uniqid(),
+            'name' => 'Audit Tier',
+            'monthly_price_cents' => 500,
+            'yearly_price_cents' => 5000,
+            'features' => json_encode(['audit']),
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $subscriptionId = DB::table('member_subscriptions')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'tier_id' => $tierId,
+            'stripe_subscription_id' => 'sub_audit_' . uniqid(),
+            'stripe_customer_id' => 'cus_audit_' . uniqid(),
+            'status' => 'active',
+            'billing_interval' => 'monthly',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('member_subscription_events')->insert([
+            'subscription_id' => $subscriptionId,
+            'tenant_id' => $this->testTenantId,
+            'event_type' => 'invoice.payment_failed',
+            'stripe_event_id' => 'evt_member_subscription_queue_' . uniqid(),
+            'payload' => json_encode(['object' => 'invoice']),
+            'notification_sent_at' => null,
+            'notification_failed_at' => now()->subMinutes(2),
+            'notification_last_error' => 'simulated member subscription notification failure',
+            'created_at' => now()->subMinutes(20),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/email-deliverability/queues?source=member_subscription_events&limit=10');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.diagnostics.member_subscription_events.available', true);
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.member_subscription_events.failed_recent'));
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.member_subscription_events.status_counts.failed'));
+
+        $rows = collect($response->json('data.rows'));
+        $this->assertSame(['member_subscription_events'], $rows->pluck('source')->unique()->values()->all());
+        $this->assertSame('failed', $rows->first()['status'] ?? null);
+        $this->assertSame('member-subscription-event-queue@example.test', $rows->first()['email'] ?? null);
+    }
 }

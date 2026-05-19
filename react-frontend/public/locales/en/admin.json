@@ -11550,6 +11550,7 @@
         "federation_messages": "Federation message",
         "federation_transactions": "Federation transaction",
         "marketplace_report_notifications": "Marketplace report",
+        "member_subscription_events": "Member subscription billing",
         "newsletter_queue": "Newsletter",
         "notification_queue": "Notification",
         "reviews": "Federated review"
@@ -11764,6 +11765,10 @@
       "federation_review_without_bell_evidence": {
         "title": "Federation review notification evidence missing",
         "body": "{{count}} federated reviews have no in-app notification evidence in the last {{window_hours}} hours."
+      },
+      "member_subscription_event_without_email_evidence": {
+        "title": "Member subscription email evidence missing",
+        "body": "{{count}} member subscription billing events have no successful email delivery evidence in the last {{window_hours}} hours."
       },
       "critical_email_attempts_missing_tenant_context": {
         "title": "Critical email missing tenant context",

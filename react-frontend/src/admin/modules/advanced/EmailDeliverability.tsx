@@ -106,6 +106,7 @@ interface QueueDiagnosticRow {
     | 'newsletter_queue'
     | 'marketplace_report_notifications'
     | 'event_reminders'
+    | 'member_subscription_events'
     | 'federation_messages'
     | 'federation_transactions'
     | 'federation_inbound_connections'

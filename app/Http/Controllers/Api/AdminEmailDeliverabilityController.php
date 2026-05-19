@@ -172,6 +172,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'newsletter_queue' => $this->queueSourceDiagnostics('newsletter_queue', $tenantId),
             'marketplace_report_notifications' => $this->queueSourceDiagnostics('marketplace_report_notifications', $tenantId),
             'event_reminders' => $this->queueSourceDiagnostics('event_reminders', $tenantId),
+            'member_subscription_events' => $this->queueSourceDiagnostics('member_subscription_events', $tenantId),
             'federation_messages' => $this->queueSourceDiagnostics('federation_messages', $tenantId),
             'federation_transactions' => $this->queueSourceDiagnostics('federation_transactions', $tenantId),
             'federation_inbound_connections' => $this->queueSourceDiagnostics('federation_inbound_connections', $tenantId),
@@ -341,6 +342,45 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->map(fn ($row) => $this->queueRow('event_reminders', $row));
         }
 
+        $memberSubscriptionRows = collect();
+        if (($source === '' || $source === 'member_subscription_events') && $this->hasMemberSubscriptionEventDeliveryColumns()) {
+            $memberSubscriptionQuery = DB::table('member_subscription_events as mse')
+                ->leftJoin('member_subscriptions as ms', function ($join): void {
+                    $join->on('ms.id', '=', 'mse.subscription_id')
+                        ->on('ms.tenant_id', '=', 'mse.tenant_id');
+                })
+                ->leftJoin('users as u', function ($join): void {
+                    $join->on('u.id', '=', 'ms.user_id')
+                        ->on('u.tenant_id', '=', 'mse.tenant_id');
+                })
+                ->whereIn('mse.event_type', ['subscription.deleted', 'invoice.paid', 'invoice.payment_failed'])
+                ->when($tenantId !== null, fn ($q) => $q->where('mse.tenant_id', $tenantId));
+
+            $this->applyMemberSubscriptionEventStatusFilter($memberSubscriptionQuery, $statuses);
+
+            $memberSubscriptionRows = $memberSubscriptionQuery
+                ->orderByDesc('mse.id')
+                ->limit($limit)
+                ->get([
+                    'mse.id',
+                    'mse.tenant_id',
+                    'ms.user_id',
+                    'u.email',
+                    DB::raw("'billing' as category"),
+                    'mse.event_type as subject',
+                    DB::raw($this->memberSubscriptionEventStatusExpression() . ' as status'),
+                    DB::raw('NULL as frequency'),
+                    DB::raw('0 as attempts'),
+                    'mse.notification_failed_at as last_attempted_at',
+                    'mse.notification_last_error as error',
+                    DB::raw('NULL as processing_batch_id'),
+                    DB::raw('NULL as processing_started_at'),
+                    'mse.notification_sent_at as sent_at',
+                    'mse.created_at',
+                ])
+                ->map(fn ($row) => $this->queueRow('member_subscription_events', $row));
+        }
+
         $federationSourceRows = collect();
         foreach (array_keys($this->federationDeliverySourceConfigs()) as $federationSource) {
             if (($source !== '' && $source !== $federationSource) || !$this->hasFederationDeliverySourceColumns($federationSource)) {
@@ -428,6 +468,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ->merge($newsletterRows)
             ->merge($marketplaceReportRows)
             ->merge($eventReminderRows)
+            ->merge($memberSubscriptionRows)
             ->merge($federationSourceRows)
             ->merge($reviewRows)
             ->sortByDesc('created_at')
@@ -611,6 +652,39 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ];
         }
 
+        if ($source === 'member_subscription_events') {
+            if (!$this->hasMemberSubscriptionEventDeliveryColumns()) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $base = DB::table('member_subscription_events as mse')
+                ->whereIn('mse.event_type', ['subscription.deleted', 'invoice.paid', 'invoice.payment_failed'])
+                ->when($tenantId !== null, fn ($q) => $q->where('mse.tenant_id', $tenantId));
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => $this->queueStatusCounts($base, $this->memberSubscriptionEventStatusExpression()),
+                'stale_pending' => (clone $base)
+                    ->whereNull('mse.notification_sent_at')
+                    ->whereNull('mse.notification_failed_at')
+                    ->where('mse.created_at', '<', now()->subMinutes(15))
+                    ->count(),
+                'stale_processing' => 0,
+                'failed_recent' => (clone $base)
+                    ->whereNull('mse.notification_sent_at')
+                    ->whereNotNull('mse.notification_failed_at')
+                    ->where('mse.notification_failed_at', '>=', now()->subDay())
+                    ->count(),
+                'suppressed_recent' => 0,
+                'oldest_pending_at' => (clone $base)
+                    ->whereNull('mse.notification_sent_at')
+                    ->whereNull('mse.notification_failed_at')
+                    ->min('mse.created_at'),
+                'returned' => 0,
+            ];
+        }
+
         if (array_key_exists($source, $this->federationDeliverySourceConfigs())) {
             if (!$this->hasFederationDeliverySourceColumns($source)) {
                 return $this->unavailableQueueDiagnostics($source);
@@ -704,6 +778,54 @@ class AdminEmailDeliverabilityController extends BaseApiController
             && Schema::hasColumn('reviews', 'email_skipped_at')
             && Schema::hasColumn('reviews', 'email_failed_at')
             && Schema::hasColumn('reviews', 'email_last_error');
+    }
+
+    private function hasMemberSubscriptionEventDeliveryColumns(): bool
+    {
+        return Schema::hasTable('member_subscription_events')
+            && Schema::hasTable('member_subscriptions')
+            && Schema::hasColumn('member_subscription_events', 'notification_sent_at')
+            && Schema::hasColumn('member_subscription_events', 'notification_failed_at')
+            && Schema::hasColumn('member_subscription_events', 'notification_last_error');
+    }
+
+    /**
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param list<string> $statuses
+     */
+    private function applyMemberSubscriptionEventStatusFilter($query, array $statuses): void
+    {
+        $relevantStatuses = array_intersect($statuses, ['pending', 'failed']);
+        if ($relevantStatuses === []) {
+            $query->whereRaw('1 = 0');
+            return;
+        }
+
+        $query->where(function ($q) use ($statuses): void {
+            if (in_array('failed', $statuses, true)) {
+                $q->orWhere(function ($status): void {
+                    $status->whereNull('mse.notification_sent_at')
+                        ->whereNotNull('mse.notification_failed_at');
+                });
+            }
+
+            if (in_array('pending', $statuses, true)) {
+                $q->orWhere(function ($status): void {
+                    $status->whereNull('mse.notification_sent_at')
+                        ->whereNull('mse.notification_failed_at')
+                        ->where('mse.created_at', '<', now()->subMinutes(15));
+                });
+            }
+        });
+    }
+
+    private function memberSubscriptionEventStatusExpression(): string
+    {
+        return "CASE
+            WHEN mse.notification_sent_at IS NOT NULL THEN 'sent'
+            WHEN mse.notification_failed_at IS NOT NULL THEN 'failed'
+            ELSE 'pending'
+        END";
     }
 
     /**
