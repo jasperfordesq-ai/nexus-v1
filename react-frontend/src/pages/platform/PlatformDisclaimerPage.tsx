@@ -23,7 +23,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 1. No Warranty ── */
   {
     id: 'no-warranty',
-    title: 'No Warranty',
+    title: '',
     content: (
       <>
         <p>
@@ -88,7 +88,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 2. No Legal, Financial, or Regulatory Advice ── */
   {
     id: 'no-advice',
-    title: 'No Legal, Financial, or Regulatory Advice',
+    title: '',
     content: (
       <>
         <p>
@@ -150,7 +150,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 3. Community Operator Independence ── */
   {
     id: 'operator-independence',
-    title: 'Community Operator Independence',
+    title: '',
     content: (
       <>
         <p>
@@ -213,7 +213,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 4. Member Interactions ── */
   {
     id: 'member-interactions',
-    title: 'Member Interactions',
+    title: '',
     content: (
       <>
         <p>
@@ -268,7 +268,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 5. Content and Uploads ── */
   {
     id: 'content-uploads',
-    title: 'Content and Uploads',
+    title: '',
     content: (
       <>
         <p>
@@ -328,7 +328,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 6. Identity Verification ── */
   {
     id: 'identity-verification',
-    title: 'Identity Verification',
+    title: '',
     content: (
       <>
         <p>
@@ -395,7 +395,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 7. Third-Party Services ── */
   {
     id: 'third-party',
-    title: 'Third-Party Services',
+    title: '',
     content: (
       <>
         <p>
@@ -473,7 +473,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 8. Limitation of Liability ── */
   {
     id: 'limitation-of-liability',
-    title: 'Limitation of Liability',
+    title: '',
     content: (
       <>
         <p>
@@ -560,6 +560,11 @@ const sections: PlatformLegalSection[] = [
 export function PlatformDisclaimerPage() {
   const { t } = useTranslation('legal');
   usePageTitle(t('platform_disclaimer.page_title'));
+  const localizedSections = sections.map((section) => ({
+    ...section,
+    title: t(`platform_disclaimer.sections.${section.id}`),
+  }));
+
   return (
     <>
       <PageMeta title={t('page_meta.platform_disclaimer.title')} description={t('page_meta.platform_disclaimer.description')} />
@@ -568,7 +573,7 @@ export function PlatformDisclaimerPage() {
         subtitle={t('platform_disclaimer.subtitle')}
         icon={AlertTriangle}
         effectiveDate="1 March 2026"
-        sections={sections}
+        sections={localizedSections}
         crossLinks={[
           { label: t('platform_disclaimer.link_terms'), to: '/platform/terms' },
           { label: t('platform_disclaimer.link_privacy'), to: '/platform/privacy' },

@@ -401,21 +401,57 @@
     "title": "Platform Disclaimer",
     "subtitle": "Important disclaimers and liability limitations for the Project NEXUS platform",
     "link_terms": "Platform Terms of Service",
-    "link_privacy": "Platform Privacy Policy"
+    "link_privacy": "Platform Privacy Policy",
+    "sections": {
+      "no-warranty": "No Warranty",
+      "no-advice": "No Legal, Financial, or Regulatory Advice",
+      "operator-independence": "Community Operator Independence",
+      "member-interactions": "Member Interactions",
+      "content-uploads": "Content and Uploads",
+      "identity-verification": "Identity Verification",
+      "third-party": "Third-Party Services",
+      "limitation-of-liability": "Limitation of Liability"
+    }
   },
   "platform_privacy": {
     "page_title": "Platform Privacy Policy",
     "title": "Platform Privacy Policy",
     "subtitle": "How Project NEXUS handles data at the platform infrastructure level",
     "link_terms": "Platform Terms of Service",
-    "link_disclaimer": "Platform Disclaimer"
+    "link_disclaimer": "Platform Disclaimer",
+    "sections": {
+      "introduction": "Introduction",
+      "controller-processor": "Data Controller vs Data Processor",
+      "data-collected": "Data We Collect at Platform Level",
+      "legal-basis": "Legal Basis for Processing",
+      "data-sharing": "Data Sharing",
+      "international-transfers": "International Data Transfers",
+      "retention": "Data Retention",
+      "your-rights": "Your Rights Under GDPR",
+      "security": "Security Measures",
+      "contact": "Contact"
+    }
   },
   "platform_terms": {
     "page_title": "Platform Terms of Service",
     "title": "Platform Terms of Service",
     "subtitle": "The terms governing the Project NEXUS platform infrastructure",
     "link_privacy": "Platform Privacy Policy",
-    "link_disclaimer": "Platform Disclaimer"
+    "link_disclaimer": "Platform Disclaimer",
+    "sections": {
+      "introduction": "Introduction & Acceptance",
+      "provider": "Platform Provider Identity",
+      "definitions": "Definitions",
+      "operator-responsibilities": "Operator Responsibilities",
+      "acceptable-use": "Acceptable Use",
+      "intellectual-property": "Intellectual Property",
+      "limitation-of-liability": "Limitation of Liability",
+      "indemnification": "Indemnification",
+      "data-processing": "Data Processing",
+      "termination": "Termination",
+      "changes": "Changes to Terms",
+      "governing-law": "Governing Law"
+    }
   },
   "gate": {
     "title": "Updated legal documents",

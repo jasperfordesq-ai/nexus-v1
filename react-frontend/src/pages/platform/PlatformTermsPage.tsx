@@ -23,7 +23,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 1. Introduction & Acceptance ── */
   {
     id: 'introduction',
-    title: 'Introduction & Acceptance',
+    title: '',
     content: (
       <>
         <p>
@@ -64,7 +64,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 2. Platform Provider Identity ── */
   {
     id: 'provider',
-    title: 'Platform Provider Identity',
+    title: '',
     content: (
       <>
         <p>
@@ -112,7 +112,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 3. Definitions ── */
   {
     id: 'definitions',
-    title: 'Definitions',
+    title: '',
     content: (
       <>
         <p>
@@ -155,7 +155,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 4. Operator Responsibilities ── */
   {
     id: 'operator-responsibilities',
-    title: 'Operator Responsibilities',
+    title: '',
     content: (
       <>
         <p>
@@ -225,7 +225,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 5. Acceptable Use ── */
   {
     id: 'acceptable-use',
-    title: 'Acceptable Use',
+    title: '',
     content: (
       <>
         <p>
@@ -281,7 +281,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 6. Intellectual Property ── */
   {
     id: 'intellectual-property',
-    title: 'Intellectual Property',
+    title: '',
     content: (
       <>
         <p>
@@ -319,7 +319,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 7. Limitation of Liability ── */
   {
     id: 'limitation-of-liability',
-    title: 'Limitation of Liability',
+    title: '',
     content: (
       <>
         <p>
@@ -392,7 +392,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 8. Indemnification ── */
   {
     id: 'indemnification',
-    title: 'Indemnification',
+    title: '',
     content: (
       <>
         <p>
@@ -437,7 +437,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 9. Data Processing ── */
   {
     id: 'data-processing',
-    title: 'Data Processing',
+    title: '',
     content: (
       <>
         <p>
@@ -482,7 +482,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 10. Termination ── */
   {
     id: 'termination',
-    title: 'Termination',
+    title: '',
     content: (
       <>
         <p>
@@ -529,7 +529,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 11. Changes to Terms ── */
   {
     id: 'changes',
-    title: 'Changes to Terms',
+    title: '',
     content: (
       <>
         <p>
@@ -562,7 +562,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 12. Governing Law ── */
   {
     id: 'governing-law',
-    title: 'Governing Law',
+    title: '',
     content: (
       <>
         <p>
@@ -605,6 +605,10 @@ export function PlatformTermsPage() {
     { label: t('platform_terms.link_privacy'), to: '/platform/privacy' },
     { label: t('platform_terms.link_disclaimer'), to: '/platform/disclaimer' },
   ];
+  const localizedSections = sections.map((section) => ({
+    ...section,
+    title: t(`platform_terms.sections.${section.id}`),
+  }));
 
   return (
     <>
@@ -614,7 +618,7 @@ export function PlatformTermsPage() {
         subtitle={t('platform_terms.subtitle')}
         icon={FileText}
         effectiveDate="1 March 2026"
-        sections={sections}
+        sections={localizedSections}
         crossLinks={crossLinks}
       />
     </>

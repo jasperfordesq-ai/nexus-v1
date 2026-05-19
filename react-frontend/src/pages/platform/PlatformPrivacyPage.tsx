@@ -30,7 +30,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 1. Introduction ── */
   {
     id: 'introduction',
-    title: 'Introduction',
+    title: '',
     content: (
       <>
         <p>
@@ -71,7 +71,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 2. Data Controller vs Data Processor ── */
   {
     id: 'controller-processor',
-    title: 'Data Controller vs Data Processor',
+    title: '',
     content: (
       <>
         <p>
@@ -108,7 +108,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 3. Data We Collect at Platform Level ── */
   {
     id: 'data-collected',
-    title: 'Data We Collect at Platform Level',
+    title: '',
     content: (
       <>
         <p>
@@ -156,7 +156,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 4. Legal Basis for Processing ── */
   {
     id: 'legal-basis',
-    title: 'Legal Basis for Processing',
+    title: '',
     content: (
       <>
         <p>
@@ -192,7 +192,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 5. Data Sharing ── */
   {
     id: 'data-sharing',
-    title: 'Data Sharing',
+    title: '',
     content: (
       <>
         <p>
@@ -238,7 +238,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 6. International Data Transfers ── */
   {
     id: 'international-transfers',
-    title: 'International Data Transfers',
+    title: '',
     content: (
       <>
         <p>
@@ -275,7 +275,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 7. Data Retention ── */
   {
     id: 'retention',
-    title: 'Data Retention',
+    title: '',
     content: (
       <>
         <p>
@@ -316,7 +316,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 8. Your Rights Under GDPR ── */
   {
     id: 'your-rights',
-    title: 'Your Rights Under GDPR',
+    title: '',
     content: (
       <>
         <p>
@@ -377,7 +377,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 9. Security Measures ── */
   {
     id: 'security',
-    title: 'Security Measures',
+    title: '',
     content: (
       <>
         <p>
@@ -433,7 +433,7 @@ const sections: PlatformLegalSection[] = [
   /* ── 10. Contact ── */
   {
     id: 'contact',
-    title: 'Contact',
+    title: '',
     content: (
       <>
         <p>
@@ -496,6 +496,11 @@ const sections: PlatformLegalSection[] = [
 export function PlatformPrivacyPage() {
   const { t } = useTranslation('legal');
   usePageTitle(t('platform_privacy.page_title'));
+  const localizedSections = sections.map((section) => ({
+    ...section,
+    title: t(`platform_privacy.sections.${section.id}`),
+  }));
+
   return (
     <>
       <PageMeta title={t('page_meta.platform_privacy.title')} description={t('page_meta.platform_privacy.description')} />
@@ -504,7 +509,7 @@ export function PlatformPrivacyPage() {
         subtitle={t('platform_privacy.subtitle')}
         icon={Shield}
         effectiveDate="1 March 2026"
-        sections={sections}
+        sections={localizedSections}
         crossLinks={[
           { label: t('platform_privacy.link_terms'), to: '/platform/terms' },
           { label: t('platform_privacy.link_disclaimer'), to: '/platform/disclaimer' },
