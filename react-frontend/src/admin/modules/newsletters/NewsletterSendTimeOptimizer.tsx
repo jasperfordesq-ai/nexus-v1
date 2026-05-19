@@ -76,13 +76,16 @@ export function NewsletterSendTimeOptimizer() {
     ? Math.max(...data.heatmap.map(c => c.engagement_score), 1)
     : 1;
 
-  const getHeatColor = (score: number) => {
-    if (score === 0) return 'bg-default-100 dark:bg-default-50';
+  const getHeatCellClass = (score: number) => {
+    if (score === 0) {
+      return 'border-default-300 bg-default-100 text-default-700 dark:border-default-500 dark:bg-default-200 dark:text-default-900';
+    }
+
     const intensity = Math.min(score / maxScore, 1);
-    if (intensity > 0.7) return 'bg-success-500 dark:bg-success-400';
-    if (intensity > 0.4) return 'bg-success-300 dark:bg-success-300';
-    if (intensity > 0.2) return 'bg-success-200 dark:bg-success-200';
-    return 'bg-success-100 dark:bg-success-100';
+    if (intensity > 0.7) return 'border-success-700 bg-success-500 text-success-950';
+    if (intensity > 0.4) return 'border-success-500 bg-success-300 text-success-950';
+    if (intensity > 0.2) return 'border-success-400 bg-success-200 text-success-950';
+    return 'border-success-300 bg-success-100 text-success-950';
   };
 
   const formatHour = (hour: number) => {
@@ -170,38 +173,43 @@ export function NewsletterSendTimeOptimizer() {
             ) : data && data.heatmap.length > 0 ? (
               <div className="overflow-x-auto">
                 <div className="inline-block min-w-full">
-                  <div className="grid gap-1" style={{ gridTemplateColumns: 'auto repeat(24, 1fr)' }}>
+                  <div
+                    className="grid gap-1"
+                    role="grid"
+                    aria-label={t('newsletter_send_time.engagement_heatmap')}
+                    style={{ gridTemplateColumns: 'auto repeat(24, 1fr)' }}
+                  >
                     {/* Header row - hours */}
                     <div></div>
                     {hours.map(h => (
-                      <div key={h} className="text-center text-xs text-default-500 font-medium py-1">
+                      <div key={h} role="columnheader" className="text-center text-xs text-default-500 font-medium py-1">
                         {formatHour(h)}
                       </div>
                     ))}
 
                     {/* Data rows - days */}
                     {[1, 2, 3, 4, 5, 6, 7].map(day => (
-                      <div key={day} className="contents">
-                        <div className="flex items-center justify-end pr-2 text-sm font-medium text-default-600">
+                      <div key={day} role="row" className="contents">
+                        <div role="rowheader" className="flex items-center justify-end pr-2 text-sm font-medium text-default-600">
                           {dayNames[day - 1]}
                         </div>
                         {hours.map(hour => {
                           const score = heatmapMatrix[day]?.[hour] || 0;
+                          const cellLabel = t('newsletter_send_time.heatmap_cell_title', {
+                            day: dayNames[day - 1],
+                            hour: formatHour(hour),
+                            count: score,
+                          });
                           return (
                             <div
                               key={`${day}-${hour}`}
-                              className={`aspect-square rounded ${getHeatColor(score)} cursor-pointer transition-transform hover:scale-110 flex items-center justify-center`}
-                              title={t('newsletter_send_time.heatmap_cell_title', {
-                                day: dayNames[day - 1],
-                                hour: formatHour(hour),
-                                count: score,
-                              })}
+                              role="gridcell"
+                              tabIndex={0}
+                              aria-label={cellLabel}
+                              className={`flex aspect-square cursor-pointer items-center justify-center rounded border text-xs font-bold transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${getHeatCellClass(score)}`}
+                              title={cellLabel}
                             >
-                              {score > 0 && (
-                                <span className="text-xs font-bold text-white drop-shadow">
-                                  {score}
-                                </span>
-                              )}
+                              {score > 0 && <span>{score}</span>}
                             </div>
                           );
                         })}
@@ -213,11 +221,11 @@ export function NewsletterSendTimeOptimizer() {
                   <div className="flex items-center gap-2 mt-6 justify-center">
                     <span className="text-sm text-default-500">{t('newsletter_send_time.low')}</span>
                     <div className="flex gap-1">
-                      <div className="w-4 h-4 rounded bg-default-100 dark:bg-default-50"></div>
-                      <div className="w-4 h-4 rounded bg-success-100"></div>
-                      <div className="w-4 h-4 rounded bg-success-200"></div>
-                      <div className="w-4 h-4 rounded bg-success-300"></div>
-                      <div className="w-4 h-4 rounded bg-success-500"></div>
+                      <div className="w-4 h-4 rounded border border-default-300 bg-default-100 dark:border-default-500 dark:bg-default-200"></div>
+                      <div className="w-4 h-4 rounded border border-success-300 bg-success-100"></div>
+                      <div className="w-4 h-4 rounded border border-success-400 bg-success-200"></div>
+                      <div className="w-4 h-4 rounded border border-success-500 bg-success-300"></div>
+                      <div className="w-4 h-4 rounded border border-success-700 bg-success-500"></div>
                     </div>
                     <span className="text-sm text-default-500">{t('newsletter_send_time.high')}</span>
                   </div>
