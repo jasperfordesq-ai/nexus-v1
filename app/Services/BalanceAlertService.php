@@ -256,7 +256,10 @@ class BalanceAlertService
                     ->first();
 
                 if ($owner && !empty($owner->email)) {
-                    $sent = (bool) LocaleContext::withLocale($owner, fn() => $this->sendBalanceAlertEmail($owner, $org->name, $balance, $alertType));
+                    $sent = (bool) TenantContext::runForTenant(
+                        $tenantId,
+                        fn() => LocaleContext::withLocale($owner, fn() => $this->sendBalanceAlertEmail($owner, $org->name, $balance, $alertType))
+                    );
                 }
             }
         } catch (\Exception $e) {
@@ -324,7 +327,7 @@ class BalanceAlertService
             null,
             null,
             'balance_alert',
-            ['tenant_id' => $owner->tenant_id ?? TenantContext::currentId()]
+            ['tenant_id' => (int) $owner->tenant_id]
         );
 
         if (!$sent) {

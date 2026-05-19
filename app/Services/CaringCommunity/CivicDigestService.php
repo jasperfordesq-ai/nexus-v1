@@ -30,8 +30,10 @@ class CivicDigestService
 {
     public const SETTING_TENANT_DEFAULT = 'caring.civic_digest.tenant_default_cadence';
     public const SETTING_USER_PREFIX    = 'caring.civic_digest.user_prefs.';
+    public const DELIVERY_CLAIMS_TABLE  = 'civic_digest_delivery_claims';
 
     private const ALLOWED_CADENCES = ['off', 'daily', 'monthly'];
+    private const CLAIM_STALE_AFTER_DAYS = 35;
 
     private const SOURCE_WEIGHTS = [
         'safety_alert'  => 10,
@@ -311,15 +313,146 @@ class CivicDigestService
         );
     }
 
+    public function deliveryWindowKey(string $cadence, ?int $timestamp = null): string
+    {
+        $timestamp ??= time();
+        $cadence = $cadence === 'monthly' || $cadence === 'weekly' ? 'monthly' : 'daily';
+
+        return $cadence === 'monthly'
+            ? date('Y-m', $timestamp)
+            : date('Y-m-d', $timestamp);
+    }
+
+    public function claimDelivery(int $tenantId, int $userId, string $cadence, string $windowKey): bool
+    {
+        if ($tenantId <= 0 || $userId <= 0 || $windowKey === '') {
+            return false;
+        }
+
+        if (!Schema::hasTable(self::DELIVERY_CLAIMS_TABLE)) {
+            return true;
+        }
+
+        $this->releaseStaleDeliveryClaims();
+
+        try {
+            $inserted = DB::table(self::DELIVERY_CLAIMS_TABLE)->insertOrIgnore([
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'cadence' => $cadence === 'monthly' || $cadence === 'weekly' ? 'monthly' : 'daily',
+                'window_key' => $windowKey,
+                'status' => 'claimed',
+                'claimed_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return (int) $inserted > 0;
+        } catch (\Throwable $e) {
+            Log::warning('[CivicDigestService] delivery claim failed', [
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'cadence' => $cadence,
+                'window_key' => $windowKey,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
+    }
+
+    public function releaseDeliveryClaim(int $tenantId, int $userId, string $cadence, string $windowKey): void
+    {
+        if (!Schema::hasTable(self::DELIVERY_CLAIMS_TABLE)) {
+            return;
+        }
+
+        DB::table(self::DELIVERY_CLAIMS_TABLE)
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->where('cadence', $cadence === 'monthly' || $cadence === 'weekly' ? 'monthly' : 'daily')
+            ->where('window_key', $windowKey)
+            ->whereNull('sent_at')
+            ->delete();
+    }
+
+    /**
+     * Reap only abandoned old-window claims. A claimed row in the active window
+     * is a durable no-duplicate marker because a worker can crash after SMTP
+     * acceptance but before it records sent_at.
+     */
+    public function releaseStaleDeliveryClaims(): int
+    {
+        if (!Schema::hasTable(self::DELIVERY_CLAIMS_TABLE)) {
+            return 0;
+        }
+
+        return DB::table(self::DELIVERY_CLAIMS_TABLE)
+            ->where('status', 'claimed')
+            ->whereNull('sent_at')
+            ->where('claimed_at', '<', now()->subDays(self::CLAIM_STALE_AFTER_DAYS))
+            ->delete();
+    }
+
+    /**
+     * @param array<string, mixed> $evidence
+     */
+    public function markDeliverySent(int $tenantId, int $userId, string $cadence, string $windowKey, array $evidence): bool
+    {
+        if (!Schema::hasTable(self::DELIVERY_CLAIMS_TABLE)) {
+            $this->markSentNow($tenantId, $userId);
+            return true;
+        }
+
+        $updated = DB::table(self::DELIVERY_CLAIMS_TABLE)
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->where('cadence', $cadence === 'monthly' || $cadence === 'weekly' ? 'monthly' : 'daily')
+            ->where('window_key', $windowKey)
+            ->whereNull('sent_at')
+            ->update([
+                'status' => 'sent',
+                'sent_at' => now(),
+                'delivery_evidence' => json_encode($evidence, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                'updated_at' => now(),
+            ]);
+
+        if ((int) $updated > 0) {
+            $this->markSentNow($tenantId, $userId);
+        }
+
+        return (int) $updated > 0;
+    }
+
     /**
      * Read the last_sent_at timestamp for a user (epoch seconds), or null if
      * never sent.
      */
     public function getLastSentAt(int $tenantId, int $userId): ?int
     {
-        if ($tenantId <= 0 || $userId <= 0 || !Schema::hasTable('tenant_settings')) {
+        if ($tenantId <= 0 || $userId <= 0) {
             return null;
         }
+
+        if (Schema::hasTable(self::DELIVERY_CLAIMS_TABLE)) {
+            $sentAt = DB::table(self::DELIVERY_CLAIMS_TABLE)
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->whereNotNull('sent_at')
+                ->max('sent_at');
+
+            if (is_string($sentAt) && $sentAt !== '') {
+                $timestamp = strtotime($sentAt);
+                if ($timestamp !== false) {
+                    return $timestamp;
+                }
+            }
+        }
+
+        if (!Schema::hasTable('tenant_settings')) {
+            return null;
+        }
+
         $row = DB::table('tenant_settings')
             ->where('tenant_id', $tenantId)
             ->where('setting_key', self::SETTING_USER_PREFIX . $userId)

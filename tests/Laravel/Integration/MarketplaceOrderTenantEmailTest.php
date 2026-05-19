@@ -144,6 +144,89 @@ class MarketplaceOrderTenantEmailTest extends TestCase
         $this->assertSame(2, TenantContext::getId());
     }
 
+    public function test_shipped_notifications_retry_failed_email_without_duplicate_bell(): void
+    {
+        $marketplaceTenantId = 999;
+        $seller = User::factory()->forTenant($marketplaceTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'email' => 'ship-seller-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $buyer = User::factory()->forTenant($marketplaceTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'email' => 'ship-buyer-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $listingId = $this->createListing($marketplaceTenantId, (int) $seller->id);
+        $orderId = $this->createPaidOrder($marketplaceTenantId, $listingId, (int) $buyer->id, (int) $seller->id);
+
+        $mailer = new class extends EmailDispatchService {
+            public array $calls = [];
+            public int $attempts = 0;
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->attempts++;
+                $this->calls[] = compact('to', 'subject', 'body', 'options');
+
+                return $this->attempts > 1;
+            }
+        };
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        TenantContext::setById(2);
+
+        MarketplaceOrderService::markShipped(
+            MarketplaceOrder::withoutGlobalScopes()->findOrFail($orderId),
+            ['tracking_number' => 'TRACK-ONE']
+        );
+
+        $this->assertCount(1, $mailer->calls);
+        $this->assertSame(1, DB::table('notifications')->where('tenant_id', $marketplaceTenantId)->where('type', 'marketplace_order')->count());
+        $this->assertSame('failed', DB::table('marketplace_order_notification_deliveries')
+            ->where('tenant_id', $marketplaceTenantId)
+            ->where('order_id', $orderId)
+            ->where('event', 'shipped')
+            ->where('user_id', $buyer->id)
+            ->where('channel', 'email')
+            ->value('status'));
+        $this->assertSame('delivered', DB::table('marketplace_order_notification_deliveries')
+            ->where('tenant_id', $marketplaceTenantId)
+            ->where('order_id', $orderId)
+            ->where('event', 'shipped')
+            ->where('user_id', $buyer->id)
+            ->where('channel', 'bell')
+            ->value('status'));
+
+        MarketplaceOrderService::markShipped(
+            MarketplaceOrder::withoutGlobalScopes()->findOrFail($orderId),
+            ['tracking_number' => 'TRACK-TWO']
+        );
+
+        $emailDelivery = DB::table('marketplace_order_notification_deliveries')
+            ->where('tenant_id', $marketplaceTenantId)
+            ->where('order_id', $orderId)
+            ->where('event', 'shipped')
+            ->where('user_id', $buyer->id)
+            ->where('channel', 'email')
+            ->first();
+
+        $this->assertCount(2, $mailer->calls);
+        $this->assertSame('delivered', $emailDelivery->status);
+        $this->assertSame(2, (int) $emailDelivery->attempts);
+        $this->assertSame(1, DB::table('notifications')->where('tenant_id', $marketplaceTenantId)->where('type', 'marketplace_order')->count());
+        $this->assertSame(1, DB::table('marketplace_order_notification_deliveries')
+            ->where('tenant_id', $marketplaceTenantId)
+            ->where('order_id', $orderId)
+            ->where('event', 'shipped')
+            ->where('user_id', $buyer->id)
+            ->where('channel', 'bell')
+            ->count());
+        $this->assertSame(2, TenantContext::getId());
+    }
+
     private function createListing(int $tenantId, int $sellerId): int
     {
         return (int) DB::table('marketplace_listings')->insertGetId([
@@ -177,6 +260,26 @@ class MarketplaceOrderTenantEmailTest extends TestCase
             'currency' => 'EUR',
             'status' => 'accepted',
             'accepted_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function createPaidOrder(int $tenantId, int $listingId, int $buyerId, int $sellerId): int
+    {
+        return (int) DB::table('marketplace_orders')->insertGetId([
+            'tenant_id' => $tenantId,
+            'order_number' => 'MKT-SHIP-' . uniqid(),
+            'buyer_id' => $buyerId,
+            'seller_id' => $sellerId,
+            'marketplace_listing_id' => $listingId,
+            'marketplace_offer_id' => null,
+            'quantity' => 1,
+            'unit_price' => 10.00,
+            'total_price' => 10.00,
+            'currency' => 'EUR',
+            'status' => 'paid',
+            'payment_intent_id' => 'pi_ship_notify_' . uniqid(),
             'created_at' => now(),
             'updated_at' => now(),
         ]);

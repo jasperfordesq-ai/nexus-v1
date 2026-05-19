@@ -12,7 +12,9 @@ use App\Core\TenantContext;
 use App\Services\EmailMonitorService;
 use App\Services\EmailTriggerAuditService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Read-only admin telemetry over the email_log + email_suppression tables.
@@ -165,8 +167,13 @@ class AdminEmailDeliverabilityController extends BaseApiController
             $statuses = [$status];
         }
 
+        $diagnostics = [
+            'notification_queue' => $this->queueSourceDiagnostics('notification_queue', $tenantId),
+            'newsletter_queue' => $this->queueSourceDiagnostics('newsletter_queue', $tenantId),
+        ];
+
         $notificationRows = collect();
-        if ($source === '' || $source === 'notification_queue') {
+        if (($source === '' || $source === 'notification_queue') && Schema::hasTable('notification_queue')) {
             $notificationRows = DB::table('notification_queue as nq')
                 ->leftJoin('users as u', function ($join) {
                     $join->on('u.id', '=', 'nq.user_id')
@@ -208,7 +215,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
         }
 
         $newsletterRows = collect();
-        if ($source === '' || $source === 'newsletter_queue') {
+        if (($source === '' || $source === 'newsletter_queue') && Schema::hasTable('newsletter_queue') && Schema::hasTable('newsletters')) {
             $newsletterRows = DB::table('newsletter_queue as nq')
                 ->join('newsletters as n', 'n.id', '=', 'nq.newsletter_id')
                 ->when($tenantId !== null, fn ($q) => $q->whereRaw('COALESCE(nq.tenant_id, n.tenant_id) = ?', [$tenantId]))
@@ -246,13 +253,18 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->map(fn ($row) => $this->queueRow('newsletter_queue', $row));
         }
 
+        $rows = $notificationRows->merge($newsletterRows)->sortByDesc('created_at')->values()->take($limit);
+        $diagnostics['notification_queue']['returned'] = $rows->where('source', 'notification_queue')->count();
+        $diagnostics['newsletter_queue']['returned'] = $rows->where('source', 'newsletter_queue')->count();
+
         return $this->respondWithData([
-            'rows' => $notificationRows->merge($newsletterRows)->sortByDesc('created_at')->values()->take($limit),
+            'rows' => $rows,
             'limit' => $limit,
             'filters' => [
                 'source' => $source !== '' ? $source : null,
                 'status' => $status !== '' ? $status : null,
             ],
+            'diagnostics' => $diagnostics,
         ]);
     }
 
@@ -279,6 +291,126 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'sent_at' => $row->sent_at ?? null,
             'created_at' => $row->created_at ?? null,
         ];
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private function queueSourceDiagnostics(string $source, ?int $tenantId): array
+    {
+        if ($source === 'notification_queue') {
+            if (!Schema::hasTable('notification_queue')) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $base = DB::table('notification_queue as nq')
+                ->when($tenantId !== null, fn ($q) => $q->where('nq.tenant_id', $tenantId));
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => $this->queueStatusCounts($base, 'nq.status'),
+                'stale_pending' => (clone $base)
+                    ->where('nq.status', 'pending')
+                    ->where('nq.created_at', '<', now()->subMinutes(15))
+                    ->count(),
+                'stale_processing' => (clone $base)
+                    ->where('nq.status', 'processing')
+                    ->whereRaw('COALESCE(nq.processing_started_at, nq.last_attempted_at, nq.created_at) < ?', [now()->subMinutes(15)])
+                    ->count(),
+                'failed_recent' => (clone $base)
+                    ->where('nq.status', 'failed')
+                    ->where('nq.created_at', '>=', now()->subDay())
+                    ->count(),
+                'suppressed_recent' => (clone $base)
+                    ->where('nq.status', 'suppressed')
+                    ->where('nq.created_at', '>=', now()->subDay())
+                    ->count(),
+                'oldest_pending_at' => (clone $base)->where('nq.status', 'pending')->min('nq.created_at'),
+                'returned' => 0,
+            ];
+        }
+
+        if (!Schema::hasTable('newsletter_queue') || !Schema::hasTable('newsletters')) {
+            return $this->unavailableQueueDiagnostics($source);
+        }
+
+        $tenantExpr = Schema::hasColumn('newsletter_queue', 'tenant_id')
+            ? 'COALESCE(nq.tenant_id, n.tenant_id)'
+            : 'n.tenant_id';
+        $base = DB::table('newsletter_queue as nq')
+            ->join('newsletters as n', 'n.id', '=', 'nq.newsletter_id')
+            ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$tenantExpr} = ?", [$tenantId]));
+
+        return [
+            'source' => $source,
+            'available' => true,
+            'status_counts' => $this->queueStatusCounts($base, 'nq.status'),
+            'stale_pending' => (clone $base)
+                ->where('nq.status', 'pending')
+                ->where('nq.created_at', '<', now()->subMinutes(15))
+                ->count(),
+            'stale_processing' => (clone $base)
+                ->where('nq.status', 'processing')
+                ->whereRaw('COALESCE(nq.processing_started_at, nq.last_attempted_at, nq.created_at) < ?', [now()->subMinutes(15)])
+                ->count(),
+            'failed_recent' => (clone $base)
+                ->where('nq.status', 'failed')
+                ->where('nq.created_at', '>=', now()->subDay())
+                ->count(),
+            'suppressed_recent' => (clone $base)
+                ->where('nq.status', 'suppressed')
+                ->where('nq.created_at', '>=', now()->subDay())
+                ->count(),
+            'oldest_pending_at' => (clone $base)->where('nq.status', 'pending')->min('nq.created_at'),
+            'returned' => 0,
+        ];
+    }
+
+    /**
+     * @param \Illuminate\Database\Query\Builder $query
+     * @return array<string,int>
+     */
+    private function queueStatusCounts($query, string $statusColumn): array
+    {
+        return (clone $query)
+            ->selectRaw("{$statusColumn} as status, COUNT(*) as count")
+            ->groupByRaw($statusColumn)
+            ->pluck('count', 'status')
+            ->map(fn ($count): int => (int) $count)
+            ->all();
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private function unavailableQueueDiagnostics(string $source): array
+    {
+        return [
+            'source' => $source,
+            'available' => false,
+            'status_counts' => [],
+            'stale_pending' => 0,
+            'stale_processing' => 0,
+            'failed_recent' => 0,
+            'suppressed_recent' => 0,
+            'oldest_pending_at' => null,
+            'returned' => 0,
+        ];
+    }
+
+    private function isSuperAdmin(): bool
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return false;
+        }
+
+        $role = (string) ($user->role ?? 'member');
+
+        return in_array($role, ['super_admin', 'god'], true)
+            || (bool) ($user->is_super_admin ?? false)
+            || (bool) ($user->is_god ?? false);
     }
 
     /**

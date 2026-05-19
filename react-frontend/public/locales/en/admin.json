@@ -11629,6 +11629,14 @@
         "title": "Group invite email did not trigger",
         "body": "{{count}} email group invites have no matching group invite email attempt in the last {{window_hours}} hours."
       },
+      "group_members_tenant_mismatch": {
+        "title": "Group membership tenant mismatch",
+        "body": "{{count}} group memberships belong to a different tenant than their group. These rows risk wrong-tenant role and notification routing."
+      },
+      "group_member_joined_without_owner_notification_queue": {
+        "title": "Group join notification did not queue",
+        "body": "{{count}} group memberships became active without a matching owner notification queue row in the last {{window_hours}} hours."
+      },
       "instant_notifications_stuck_pending": {
         "title": "Instant emails are stuck",
         "body": "{{count}} instant notification emails have been pending for more than {{minutes}} minutes."

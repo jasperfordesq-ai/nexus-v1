@@ -50,6 +50,32 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertLessThanOrEqual(1000, $result['score']);
     }
 
+    public function test_source_table_coverage_reports_audited_backend_sources(): void
+    {
+        $coverage = app(EmailTriggerAuditService::class)->sourceTableCoverage();
+        $byTable = collect($coverage)->keyBy('source_table');
+
+        foreach ([
+            'billing_audit_log',
+            'email_log',
+            'event_reminders',
+            'federation_inbound_connections',
+            'federation_messages',
+            'federation_transactions',
+            'group_members',
+            'marketplace_report_notifications',
+            'marketplace_reports',
+            'newsletter_queue',
+            'notification_queue',
+            'stripe_webhook_events',
+            'verein_member_dues',
+        ] as $table) {
+            $this->assertTrue($byTable->has($table), "Expected {$table} in email trigger source coverage.");
+            $this->assertTrue((bool) $byTable[$table]['audited'], "Expected {$table} to be marked audited.");
+            $this->assertNotEmpty($byTable[$table]['check'], "Expected {$table} to include the auditing check name.");
+        }
+    }
+
     public function test_direct_email_send_surface_is_empty_outside_dispatchers(): void
     {
         $surface = app(EmailTriggerAuditService::class)->directEmailSendSurface();
@@ -187,6 +213,61 @@ class EmailTriggerAuditServiceTest extends TestCase
         $codes = array_column($result['issues'], 'code');
 
         $this->assertContains('notification_queue_marked_sent_without_email_log', $codes);
+    }
+
+    public function test_run_detects_recent_group_join_without_owner_notification_queue(): void
+    {
+        if (!Schema::hasTable('groups') || !Schema::hasTable('group_members') || !Schema::hasTable('notification_queue')) {
+            $this->markTestSkipped('Group membership notification audit tables are not available.');
+        }
+
+        $ownerId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Group Audit Owner',
+            'email' => 'group-audit-owner@example.test',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $memberId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Group Audit Member',
+            'email' => 'group-audit-member@example.test',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $groupId = DB::table('groups')->insertGetId([
+            'tenant_id' => 2,
+            'owner_id' => $ownerId,
+            'name' => 'Group Audit Fixture',
+            'slug' => 'group-audit-fixture-' . uniqid(),
+            'visibility' => 'public',
+            'status' => 'active',
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('group_members')->insert([
+            'tenant_id' => 2,
+            'group_id' => $groupId,
+            'user_id' => $memberId,
+            'role' => 'member',
+            'status' => 'active',
+            'joined_at' => now()->subMinutes(4),
+            'created_at' => now()->subMinutes(4),
+            'updated_at' => now()->subMinutes(4),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('group_member_joined_without_owner_notification_queue', $codes);
     }
 
     public function test_run_detects_new_user_with_only_failed_account_email_log(): void

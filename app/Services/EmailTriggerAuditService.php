@@ -44,13 +44,18 @@ class EmailTriggerAuditService
             ['module' => 'messages', 'event' => 'direct_or_voice_message', 'category' => 'message', 'critical' => true, 'source_table' => 'notification_queue'],
             ['module' => 'listings', 'event' => 'approval_expiry_saved_search', 'category' => 'listing', 'critical' => true, 'source_table' => 'notification_queue'],
             ['module' => 'events', 'event' => 'rsvp_change_or_reminder', 'category' => 'event_reminder', 'critical' => true, 'source_table' => 'notification_queue'],
+            ['module' => 'events', 'event' => 'scheduled_event_reminder', 'category' => 'event_reminder', 'critical' => true, 'source_table' => 'event_reminders'],
             ['module' => 'volunteering', 'event' => 'application_shift_reminder_hours_expense', 'category' => 'volunteering', 'critical' => true, 'source_table' => 'notification_queue'],
             ['module' => 'goals', 'event' => 'goal_reminder', 'category' => 'goal_reminder', 'critical' => true, 'source_table' => 'notification_queue'],
             ['module' => 'marketplace', 'event' => 'order_offer_payment_rating_report', 'category' => 'marketplace', 'critical' => true, 'source_table' => 'notification_queue'],
+            ['module' => 'marketplace', 'event' => 'marketplace_report_outbox', 'category' => 'marketplace_report', 'critical' => true, 'source_table' => 'marketplace_report_notifications'],
+            ['module' => 'marketplace', 'event' => 'marketplace_report_source', 'category' => 'marketplace_report', 'critical' => true, 'source_table' => 'marketplace_reports'],
             ['module' => 'safeguarding', 'event' => 'incident_flag_vetting_guardian_training', 'category' => 'safeguarding', 'critical' => true, 'source_table' => 'notifications'],
             ['module' => 'newsletter', 'event' => 'newsletter_queue_dispatch', 'category' => 'newsletter', 'critical' => false, 'source_table' => 'newsletter_queue'],
             ['module' => 'digests', 'event' => 'notification_digest_dispatch', 'category' => 'notification_digest', 'critical' => false, 'source_table' => 'notification_queue'],
             ['module' => 'billing', 'event' => 'upgrade_or_billing_notice', 'category' => 'billing', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'billing', 'event' => 'billing_audit_notice', 'category' => 'billing', 'critical' => true, 'source_table' => 'billing_audit_log'],
+            ['module' => 'billing', 'event' => 'stripe_webhook_processing', 'category' => 'billing', 'critical' => true, 'source_table' => 'stripe_webhook_events'],
             ['module' => 'federation', 'event' => 'cross_tenant_connection_or_transaction', 'category' => 'federation', 'critical' => true, 'source_table' => 'notifications'],
             ['module' => 'auth', 'event' => 'email_verification_resend', 'category' => 'email_verification', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'security', 'event' => 'email_address_changed', 'category' => 'security_alert', 'critical' => true, 'source_table' => 'email_log'],
@@ -88,11 +93,15 @@ class EmailTriggerAuditService
             ['module' => 'onboarding', 'event' => 'onboarding_completed', 'category' => 'onboarding_completed', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 're_engagement', 'event' => 'inactive_member', 'category' => 'inactive_member', 'critical' => false, 'source_table' => 'email_log'],
             ['module' => 'verein', 'event' => 'verein_dues_invoice_reminder_paid', 'category' => 'verein_dues', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'verein', 'event' => 'verein_dues_source', 'category' => 'verein_dues', 'critical' => true, 'source_table' => 'verein_member_dues'],
             ['module' => 'verein', 'event' => 'cross_invitation_received_accepted', 'category' => 'verein_federation', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'appreciation', 'event' => 'appreciation_received', 'category' => 'appreciation', 'critical' => false, 'source_table' => 'email_log'],
             ['module' => 'federation', 'event' => 'federated_transaction_received_sent', 'category' => 'federation_transaction', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'federation', 'event' => 'federated_connection_request_accepted', 'category' => 'federation_connection', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'federation', 'event' => 'federated_message_received', 'category' => 'federation_message', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'federation', 'event' => 'federated_transaction_source', 'category' => 'federation_transaction', 'critical' => true, 'source_table' => 'federation_transactions'],
+            ['module' => 'federation', 'event' => 'federated_connection_source', 'category' => 'federation_connection', 'critical' => true, 'source_table' => 'federation_inbound_connections'],
+            ['module' => 'federation', 'event' => 'federated_message_source', 'category' => 'federation_message', 'critical' => true, 'source_table' => 'federation_messages'],
             ['module' => 'messages', 'event' => 'direct_message_received', 'category' => 'message', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'broadcasts', 'event' => 'newsletter_broadcast', 'category' => 'newsletter', 'critical' => false, 'source_table' => 'newsletter_queue'],
             ['module' => 'digests', 'event' => 'civic_digest', 'category' => 'civic_digest', 'critical' => false, 'source_table' => 'email_log'],
@@ -114,7 +123,8 @@ class EmailTriggerAuditService
      *   issue_count:int,
      *   issues_by_severity:array<string,int>,
      *   issues:list<array<string,mixed>>,
-     *   matrix:list<array<string,mixed>>
+     *   matrix:list<array<string,mixed>>,
+     *   source_tables:list<array<string,mixed>>
      * }
      */
     public function run(?int $tenantId = null, int $windowHours = 24): array
@@ -129,6 +139,7 @@ class EmailTriggerAuditService
                 $this->checkNewUsersWithoutAccountEmail($tenantId, $since, $windowHours),
                 $this->checkPasswordResetsWithoutEmail($tenantId, $since, $windowHours),
                 $this->checkGroupInvitesWithoutEmail($tenantId, $since, $windowHours),
+                $this->checkGroupMembershipNotificationHealth($tenantId, $since, $windowHours),
                 $this->checkNotificationQueueHealth($tenantId, $since, $windowHours),
                 $this->checkNewsletterQueueHealth($tenantId, $since, $windowHours),
                 $this->checkEventReminderSourceHealth($tenantId, $since, $windowHours),
@@ -178,7 +189,70 @@ class EmailTriggerAuditService
             'issues_by_severity' => $issuesBySeverity,
             'issues' => $issues,
             'matrix' => $this->eventMatrix(),
+            'source_tables' => $this->sourceTableCoverage(),
         ];
+    }
+
+    /**
+     * @return list<array{
+     *   source_table:string,
+     *   matrix_count:int,
+     *   available:bool,
+     *   audited:bool,
+     *   check:string|null,
+     *   modules:list<string>,
+     *   events:list<string>
+     * }>
+     */
+    public function sourceTableCoverage(): array
+    {
+        $checks = [
+            'billing_audit_log' => 'checkBillingAndStripeHealth',
+            'email_log' => 'checkTenantContextAndWebhookHealth',
+            'event_reminders' => 'checkEventReminderSourceHealth',
+            'federation_inbound_connections' => 'checkFederationConnectionDeliveryHealth',
+            'federation_messages' => 'checkFederationMessageDeliveryHealth',
+            'federation_transactions' => 'checkFederationTransactionDeliveryHealth',
+            'group_invites' => 'checkGroupInvitesWithoutEmail',
+            'group_members' => 'checkGroupMembershipNotificationHealth',
+            'marketplace_report_notifications' => 'checkMarketplaceReportNotificationHealth',
+            'marketplace_reports' => 'checkMarketplaceReportSourceOutboxHealth',
+            'newsletter_queue' => 'checkNewsletterQueueHealth',
+            'notification_queue' => 'checkNotificationQueueHealth',
+            'notifications' => 'checkNotificationStoreHealth',
+            'password_resets' => 'checkPasswordResetsWithoutEmail',
+            'stripe_webhook_events' => 'checkBillingAndStripeHealth',
+            'users' => 'checkNewUsersWithoutAccountEmail',
+            'verein_member_dues' => 'checkVereinDuesEmailHealth',
+        ];
+
+        $coverage = [];
+        foreach ($this->eventMatrix() as $row) {
+            $table = (string) $row['source_table'];
+            $coverage[$table] ??= [
+                'source_table' => $table,
+                'matrix_count' => 0,
+                'available' => Schema::hasTable($table),
+                'audited' => isset($checks[$table]),
+                'check' => $checks[$table] ?? null,
+                'modules' => [],
+                'events' => [],
+            ];
+
+            $coverage[$table]['matrix_count']++;
+            $coverage[$table]['modules'][] = (string) $row['module'];
+            $coverage[$table]['events'][] = (string) $row['event'];
+        }
+
+        foreach ($coverage as &$row) {
+            $row['modules'] = array_values(array_unique($row['modules']));
+            $row['events'] = array_values(array_unique($row['events']));
+        }
+        unset($row);
+
+        usort($coverage, fn (array $a, array $b): int => $a['source_table'] <=> $b['source_table']);
+
+        return array_values($coverage);
     }
 
     /**
@@ -1199,6 +1273,70 @@ class EmailTriggerAuditService
             $this->rowsToIssues($withoutEmail, 'federation_message_without_email_evidence', 'critical', 'federation', 'federated_message_received', ['window_hours' => $windowHours]),
             $this->rowsToIssues($withoutBell, 'federation_message_without_bell_evidence', 'warning', 'federation', 'federated_message_received', ['window_hours' => $windowHours])
         );
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkGroupMembershipNotificationHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (!$this->hasTables(['group_members', 'groups'])) {
+            return [];
+        }
+
+        $issues = [];
+
+        if (Schema::hasColumn('group_members', 'tenant_id')) {
+            $tenantMismatch = DB::table('group_members as gm')
+                ->join('groups as g', 'g.id', '=', 'gm.group_id')
+                ->selectRaw('g.tenant_id as tenant_id, COUNT(*) as count')
+                ->whereRaw('gm.tenant_id <> g.tenant_id')
+                ->when($tenantId !== null, fn ($q) => $q->where('g.tenant_id', $tenantId))
+                ->groupBy('g.tenant_id')
+                ->get();
+
+            $issues = array_merge($issues, $this->rowsToIssues(
+                $tenantMismatch,
+                'group_members_tenant_mismatch',
+                'critical',
+                'groups',
+                'membership_or_role_change'
+            ));
+        }
+
+        if (!$this->hasTables(['notification_queue']) || !Schema::hasColumn('group_members', 'created_at')) {
+            return $issues;
+        }
+
+        $recentJoinsWithoutOwnerQueue = DB::table('group_members as gm')
+            ->join('groups as g', 'g.id', '=', 'gm.group_id')
+            ->selectRaw('g.tenant_id as tenant_id, COUNT(*) as count')
+            ->where('gm.status', 'active')
+            ->where('gm.created_at', '>=', $since)
+            ->whereRaw('g.owner_id <> gm.user_id')
+            ->whereNotExists(function ($sub) {
+                $sub->select(DB::raw(1))
+                    ->from('notification_queue as nq')
+                    ->whereColumn('nq.user_id', 'g.owner_id')
+                    ->whereColumn('nq.tenant_id', 'g.tenant_id')
+                    ->whereColumn('nq.created_at', '>=', 'gm.created_at')
+                    ->where('nq.activity_type', 'group_member_joined')
+                    ->whereIn('nq.status', ['pending', 'processing', 'sent', 'suppressed']);
+            })
+            ->when($tenantId !== null, fn ($q) => $q->where('g.tenant_id', $tenantId))
+            ->groupBy('g.tenant_id')
+            ->get();
+
+        $issues = array_merge($issues, $this->rowsToIssues(
+            $recentJoinsWithoutOwnerQueue,
+            'group_member_joined_without_owner_notification_queue',
+            'warning',
+            'groups',
+            'membership_or_role_change',
+            ['window_hours' => $windowHours]
+        ));
+
+        return $issues;
     }
 
     /**

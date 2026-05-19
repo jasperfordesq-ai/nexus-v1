@@ -16,6 +16,8 @@ use App\Models\MarketplaceOrder;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Carbon;
 
 /**
  * MarketplaceOrderService — Order lifecycle management for the marketplace module.
@@ -24,6 +26,13 @@ use Illuminate\Support\Facades\Log;
  */
 class MarketplaceOrderService
 {
+    private const DELIVERY_CHANNEL_EMAIL = 'email';
+    private const DELIVERY_CHANNEL_BELL = 'bell';
+    private const DELIVERY_STATUS_CLAIMED = 'claimed';
+    private const DELIVERY_STATUS_DELIVERED = 'delivered';
+    private const DELIVERY_STATUS_FAILED = 'failed';
+    private const DELIVERY_STATUS_SKIPPED = 'skipped';
+
     // -----------------------------------------------------------------
     //  Create
     // -----------------------------------------------------------------
@@ -200,20 +209,22 @@ class MarketplaceOrderService
      */
     public static function markShipped(MarketplaceOrder $order, array $data): MarketplaceOrder
     {
-        if ($order->status !== 'paid') {
+        if (!in_array($order->status, ['paid', 'shipped'], true)) {
             throw new \InvalidArgumentException('Order must be paid before marking as shipped.');
         }
 
-        $order->status = 'shipped';
-        $order->seller_confirmed_at = now();
-        $order->shipping_method = $data['shipping_method'] ?? $order->shipping_method;
-        $order->tracking_number = $data['tracking_number'] ?? null;
-        $order->tracking_url = $data['tracking_url'] ?? null;
-        $order->save();
+        if ($order->status === 'paid') {
+            $order->status = 'shipped';
+            $order->seller_confirmed_at = now();
+            $order->shipping_method = $data['shipping_method'] ?? $order->shipping_method;
+            $order->tracking_number = $data['tracking_number'] ?? null;
+            $order->tracking_url = $data['tracking_url'] ?? null;
+            $order->save();
+        }
 
         self::withOrderTenant($order, function () use ($order): void {
             // Notify buyer their order has shipped
-            try {
+            self::deliverOrderEmail($order, 'shipped', (int) $order->buyer_id, function () use ($order): string {
                 $listing = MarketplaceListing::find($order->marketplace_listing_id);
                 $title   = $listing->title ?? '';
                 $extraLines = [];
@@ -223,7 +234,7 @@ class MarketplaceOrderService
                         'params' => ['tracking' => htmlspecialchars($order->tracking_number, ENT_QUOTES, 'UTF-8')],
                     ];
                 }
-                self::sendOrderEmail(
+                return self::sendOrderEmail(
                     (int) $order->buyer_id,
                     'emails_misc.marketplace_order.shipped_subject',
                     ['order_number' => $order->order_number],
@@ -233,12 +244,10 @@ class MarketplaceOrderService
                     '/marketplace/orders/' . $order->id,
                     $extraLines
                 );
-            } catch (\Throwable $e) {
-                Log::warning('[MarketplaceOrderService] markShipped email failed: ' . $e->getMessage());
-            }
+            });
 
             // In-app bell to buyer
-            self::createOrderBell([
+            self::deliverOrderBell($order, 'shipped', (int) $order->buyer_id, [
                 'user_id'    => $order->buyer_id,
                 'message'    => __('api_controllers_3.marketplace_order.shipped', ['order_number' => $order->order_number]),
                 'link'       => '/marketplace/orders/' . $order->id,
@@ -255,19 +264,21 @@ class MarketplaceOrderService
      */
     public static function confirmDelivery(MarketplaceOrder $order): MarketplaceOrder
     {
-        if (!in_array($order->status, ['shipped', 'paid'], true)) {
+        if (!in_array($order->status, ['shipped', 'paid', 'delivered'], true)) {
             throw new \InvalidArgumentException('Order must be shipped or paid to confirm delivery.');
         }
 
-        $order->status = 'delivered';
-        $order->buyer_confirmed_at = now();
-        $order->auto_complete_at = now()->addDays(14);
-        $order->save();
+        if ($order->status !== 'delivered') {
+            $order->status = 'delivered';
+            $order->buyer_confirmed_at = now();
+            $order->auto_complete_at = now()->addDays(14);
+            $order->save();
+        }
 
         self::withOrderTenant($order, function () use ($order): void {
             // Notify seller delivery was confirmed
-            try {
-                self::sendOrderEmail(
+            self::deliverOrderEmail($order, 'delivered', (int) $order->seller_id, function () use ($order): string {
+                return self::sendOrderEmail(
                     (int) $order->seller_id,
                     'emails_misc.marketplace_order.delivered_subject',
                     ['order_number' => $order->order_number],
@@ -276,12 +287,10 @@ class MarketplaceOrderService
                     ['order_number' => $order->order_number],
                     '/marketplace/orders/' . $order->id
                 );
-            } catch (\Throwable $e) {
-                Log::warning('[MarketplaceOrderService] confirmDelivery email failed: ' . $e->getMessage());
-            }
+            });
 
             // In-app bell to seller
-            self::createOrderBell([
+            self::deliverOrderBell($order, 'delivered', (int) $order->seller_id, [
                 'user_id'    => $order->seller_id,
                 'message'    => __('api_controllers_3.marketplace_order.delivered', ['order_number' => $order->order_number]),
                 'link'       => '/marketplace/orders/' . $order->id,
@@ -329,33 +338,29 @@ class MarketplaceOrderService
 
         self::withOrderTenant($order, function () use ($order, $reason): void {
             // Notify both parties of the cancellation
-            try {
-                $listing = MarketplaceListing::find($order->marketplace_listing_id);
-                $title   = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
-                $extraLines = [];
-                if (!empty($reason)) {
-                    $extraLines[] = [
-                        'key'    => 'emails_misc.marketplace_order.cancelled_reason',
-                        'params' => ['reason' => htmlspecialchars($reason, ENT_QUOTES, 'UTF-8')],
-                    ];
-                }
-                $subjectKey    = 'emails_misc.marketplace_order.cancelled_subject';
-                $subjectParams = ['order_number' => $order->order_number];
-                $titleKey      = 'emails_misc.marketplace_order.cancelled_title';
-                $bodyKey       = 'emails_misc.marketplace_order.cancelled_body';
-                $bodyParams    = ['order_number' => $order->order_number, 'title' => $title];
-                $link          = '/marketplace/orders/' . $order->id;
-                self::sendOrderEmail((int) $order->buyer_id,  $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $link, $extraLines);
-                self::sendOrderEmail((int) $order->seller_id, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $link, $extraLines);
-            } catch (\Throwable $e) {
-                Log::warning('[MarketplaceOrderService] cancel email failed: ' . $e->getMessage());
+            $listing = MarketplaceListing::find($order->marketplace_listing_id);
+            $title   = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
+            $extraLines = [];
+            if (!empty($reason)) {
+                $extraLines[] = [
+                    'key'    => 'emails_misc.marketplace_order.cancelled_reason',
+                    'params' => ['reason' => htmlspecialchars($reason, ENT_QUOTES, 'UTF-8')],
+                ];
             }
+            $subjectKey    = 'emails_misc.marketplace_order.cancelled_subject';
+            $subjectParams = ['order_number' => $order->order_number];
+            $titleKey      = 'emails_misc.marketplace_order.cancelled_title';
+            $bodyKey       = 'emails_misc.marketplace_order.cancelled_body';
+            $bodyParams    = ['order_number' => $order->order_number, 'title' => $title];
+            $link          = '/marketplace/orders/' . $order->id;
+            self::deliverOrderEmail($order, 'cancelled', (int) $order->buyer_id, fn (): string => self::sendOrderEmail((int) $order->buyer_id, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $link, $extraLines));
+            self::deliverOrderEmail($order, 'cancelled', (int) $order->seller_id, fn (): string => self::sendOrderEmail((int) $order->seller_id, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $link, $extraLines));
 
             // In-app bells to both parties
             $cancelLink = '/marketplace/orders/' . $order->id;
             $cancelBell = __('api_controllers_3.marketplace_order.cancelled', ['order_number' => $order->order_number]);
-            self::createOrderBell(['user_id' => $order->buyer_id,  'message' => $cancelBell, 'link' => $cancelLink, 'type' => 'marketplace_order', 'created_at' => now()]);
-            self::createOrderBell(['user_id' => $order->seller_id, 'message' => $cancelBell, 'link' => $cancelLink, 'type' => 'marketplace_order', 'created_at' => now()]);
+            self::deliverOrderBell($order, 'cancelled', (int) $order->buyer_id, ['user_id' => $order->buyer_id,  'message' => $cancelBell, 'link' => $cancelLink, 'type' => 'marketplace_order', 'created_at' => now()]);
+            self::deliverOrderBell($order, 'cancelled', (int) $order->seller_id, ['user_id' => $order->seller_id, 'message' => $cancelBell, 'link' => $cancelLink, 'type' => 'marketplace_order', 'created_at' => now()]);
         });
 
         return $order;
@@ -368,6 +373,7 @@ class MarketplaceOrderService
     {
         // Prevent double-completion (and double stat increment)
         if ($order->status === 'completed') {
+            self::sendCompletedNotifications($order);
             return $order;
         }
 
@@ -393,41 +399,46 @@ class MarketplaceOrderService
             });
         });
 
+        self::sendCompletedNotifications($order);
+
+        return $order;
+    }
+
+    private static function sendCompletedNotifications(MarketplaceOrder $order): void
+    {
         self::withOrderTenant($order, function () use ($order): void {
             // Notify both parties of completion
-            try {
-                $listing = MarketplaceListing::find($order->marketplace_listing_id);
-                $title   = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
-                $subjectKey    = 'emails_misc.marketplace_order.completed_subject';
-                $subjectParams = ['order_number' => $order->order_number];
-                $titleKey      = 'emails_misc.marketplace_order.completed_title';
-                $link          = '/marketplace/orders/' . $order->id;
-                self::sendOrderEmail(
+            $listing = MarketplaceListing::find($order->marketplace_listing_id);
+            $title   = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
+            $subjectKey    = 'emails_misc.marketplace_order.completed_subject';
+            $subjectParams = ['order_number' => $order->order_number];
+            $titleKey      = 'emails_misc.marketplace_order.completed_title';
+            $link          = '/marketplace/orders/' . $order->id;
+            self::deliverOrderEmail($order, 'completed', (int) $order->buyer_id, function () use ($order, $subjectKey, $subjectParams, $titleKey, $title, $link): string {
+                return self::sendOrderEmail(
                     (int) $order->buyer_id, $subjectKey, $subjectParams,
                     $titleKey,
                     'emails_misc.marketplace_order.completed_buyer_body',
                     ['order_number' => $order->order_number, 'title' => $title],
                     $link
                 );
-                self::sendOrderEmail(
+            });
+            self::deliverOrderEmail($order, 'completed', (int) $order->seller_id, function () use ($order, $subjectKey, $subjectParams, $titleKey, $title, $link): string {
+                return self::sendOrderEmail(
                     (int) $order->seller_id, $subjectKey, $subjectParams,
                     $titleKey,
                     'emails_misc.marketplace_order.completed_seller_body',
                     ['order_number' => $order->order_number, 'title' => $title],
                     $link
                 );
-            } catch (\Throwable $e) {
-                Log::warning('[MarketplaceOrderService] complete email failed: ' . $e->getMessage());
-            }
+            });
 
             // In-app bells to both parties
             $completeLink = '/marketplace/orders/' . $order->id;
             $completeBell = __('api_controllers_3.marketplace_order.completed', ['order_number' => $order->order_number]);
-            self::createOrderBell(['user_id' => $order->buyer_id,  'message' => $completeBell, 'link' => $completeLink, 'type' => 'marketplace_order', 'created_at' => now()]);
-            self::createOrderBell(['user_id' => $order->seller_id, 'message' => $completeBell, 'link' => $completeLink, 'type' => 'marketplace_order', 'created_at' => now()]);
+            self::deliverOrderBell($order, 'completed', (int) $order->buyer_id, ['user_id' => $order->buyer_id,  'message' => $completeBell, 'link' => $completeLink, 'type' => 'marketplace_order', 'created_at' => now()]);
+            self::deliverOrderBell($order, 'completed', (int) $order->seller_id, ['user_id' => $order->seller_id, 'message' => $completeBell, 'link' => $completeLink, 'type' => 'marketplace_order', 'created_at' => now()]);
         });
-
-        return $order;
     }
 
     public static function sendPaidNotifications(MarketplaceOrder $order, \App\Models\MarketplacePayment $payment): void
@@ -439,8 +450,8 @@ class MarketplaceOrderService
             $currency = strtoupper($payment->currency ?? $order->currency ?? TenantContext::getCurrency() ?? 'EUR');
             $amount = number_format((float) $payment->amount, 2) . ' ' . $currency;
 
-            try {
-                self::sendOrderEmail(
+            self::deliverOrderEmail($order, 'paid', (int) $order->buyer_id, function () use ($order, $title, $amount, $link): string {
+                return self::sendOrderEmail(
                     (int) $order->buyer_id,
                     'emails_misc.marketplace_order.paid_buyer_subject',
                     ['order_number' => $order->order_number],
@@ -449,7 +460,9 @@ class MarketplaceOrderService
                     ['order_number' => $order->order_number, 'title' => $title, 'amount' => $amount],
                     $link
                 );
-                self::sendOrderEmail(
+            });
+            self::deliverOrderEmail($order, 'paid', (int) $order->seller_id, function () use ($order, $title, $amount, $link): string {
+                return self::sendOrderEmail(
                     (int) $order->seller_id,
                     'emails_misc.marketplace_order.paid_seller_subject',
                     ['order_number' => $order->order_number],
@@ -458,18 +471,16 @@ class MarketplaceOrderService
                     ['order_number' => $order->order_number, 'title' => $title, 'amount' => $amount],
                     $link
                 );
-            } catch (\Throwable $e) {
-                Log::warning('[MarketplaceOrderService] paid email failed: ' . $e->getMessage());
-            }
+            });
 
-            self::createOrderBell([
+            self::deliverOrderBell($order, 'paid', (int) $order->buyer_id, [
                 'user_id' => $order->buyer_id,
                 'message' => __('api_controllers_3.marketplace_order.paid_buyer', ['order_number' => $order->order_number, 'amount' => $amount]),
                 'link' => $link,
                 'type' => 'marketplace_order',
                 'created_at' => now(),
             ]);
-            self::createOrderBell([
+            self::deliverOrderBell($order, 'paid', (int) $order->seller_id, [
                 'user_id' => $order->seller_id,
                 'message' => __('api_controllers_3.marketplace_order.paid_seller', ['order_number' => $order->order_number, 'amount' => $amount]),
                 'link' => $link,
@@ -590,18 +601,18 @@ class MarketplaceOrderService
      *
      * @param array<int, array{key: string, params?: array}> $extraLines
      */
-    private static function sendOrderEmail(int $userId, string $subjectKey, array $subjectParams, string $titleKey, string $bodyKey, array $bodyParams, string $link, array $extraLines = []): void
+    private static function sendOrderEmail(int $userId, string $subjectKey, array $subjectParams, string $titleKey, string $bodyKey, array $bodyParams, string $link, array $extraLines = []): string
     {
         $tenantId = TenantContext::getId();
         $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language', 'tenant_id'])->first();
 
         if (!$user || empty($user->email)) {
-            return;
+            return self::DELIVERY_STATUS_SKIPPED;
         }
 
         $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $fullUrl, $userId, $extraLines, $tenantId): void {
+        return LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $fullUrl, $userId, $extraLines, $tenantId): string {
             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
             $body = __($bodyKey, $bodyParams);
@@ -618,7 +629,10 @@ class MarketplaceOrderService
 
             if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_order', ['tenant_id' => $tenantId])) {
                 Log::warning('[MarketplaceOrderService] email failed', ['user_id' => $userId]);
+                return self::DELIVERY_STATUS_FAILED;
             }
+
+            return self::DELIVERY_STATUS_DELIVERED;
         });
     }
 
@@ -630,7 +644,7 @@ class MarketplaceOrderService
         $title      = htmlspecialchars($listingTitle, ENT_QUOTES, 'UTF-8');
         $link       = '/marketplace/orders/' . $order->id;
 
-        self::sendOrderEmail(
+        self::deliverOrderEmail($order, 'confirmed', (int) $order->buyer_id, fn (): string => self::sendOrderEmail(
             (int) $order->buyer_id,
             'emails_misc.marketplace_order.confirmed_buyer_subject',
             ['order_number' => $order->order_number],
@@ -638,9 +652,9 @@ class MarketplaceOrderService
             'emails_misc.marketplace_order.confirmed_buyer_body',
             ['order_number' => $order->order_number, 'title' => $title],
             $link
-        );
+        ));
 
-        self::sendOrderEmail(
+        self::deliverOrderEmail($order, 'confirmed', (int) $order->seller_id, fn (): string => self::sendOrderEmail(
             (int) $order->seller_id,
             'emails_misc.marketplace_order.confirmed_seller_subject',
             ['order_number' => $order->order_number],
@@ -648,17 +662,17 @@ class MarketplaceOrderService
             'emails_misc.marketplace_order.confirmed_seller_body',
             ['order_number' => $order->order_number, 'title' => $title],
             $link
-        );
+        ));
 
         // In-app bells
-        self::createOrderBell([
+        self::deliverOrderBell($order, 'confirmed', (int) $order->buyer_id, [
             'user_id'    => $order->buyer_id,
             'message'    => __('api_controllers_3.marketplace_order.confirmed_buyer', ['order_number' => $order->order_number, 'title' => $title]),
             'link'       => $link,
             'type'       => 'marketplace_order',
             'created_at' => now(),
         ]);
-        self::createOrderBell([
+        self::deliverOrderBell($order, 'confirmed', (int) $order->seller_id, [
             'user_id'    => $order->seller_id,
             'message'    => __('api_controllers_3.marketplace_order.confirmed_seller', ['order_number' => $order->order_number, 'title' => $title]),
             'link'       => $link,
@@ -685,17 +699,165 @@ class MarketplaceOrderService
     /**
      * @param array<string,mixed> $attributes
      */
-    private static function createOrderBell(array $attributes): void
+    private static function deliverOrderEmail(MarketplaceOrder $order, string $event, int $userId, callable $send): void
+    {
+        if (!self::claimOrderNotificationDelivery($order, $event, $userId, self::DELIVERY_CHANNEL_EMAIL)) {
+            return;
+        }
+
+        try {
+            $status = $send();
+            if ($status === self::DELIVERY_STATUS_DELIVERED || $status === self::DELIVERY_STATUS_SKIPPED) {
+                self::markOrderNotificationDelivered($order, $event, $userId, self::DELIVERY_CHANNEL_EMAIL, $status);
+                return;
+            }
+
+            self::markOrderNotificationFailed($order, $event, $userId, self::DELIVERY_CHANNEL_EMAIL, __('emails_misc.marketplace_order.delivery_failed'));
+        } catch (\Throwable $e) {
+            self::markOrderNotificationFailed($order, $event, $userId, self::DELIVERY_CHANNEL_EMAIL, $e->getMessage());
+            Log::warning('[MarketplaceOrderService] order email delivery failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * @param array<string,mixed> $attributes
+     */
+    private static function deliverOrderBell(MarketplaceOrder $order, string $event, int $userId, array $attributes): void
+    {
+        if (!self::claimOrderNotificationDelivery($order, $event, $userId, self::DELIVERY_CHANNEL_BELL)) {
+            return;
+        }
+
+        try {
+            $notificationId = self::createOrderBell($attributes);
+            if ($notificationId === null) {
+                self::markOrderNotificationDelivered($order, $event, $userId, self::DELIVERY_CHANNEL_BELL, self::DELIVERY_STATUS_SKIPPED);
+                return;
+            }
+
+            self::markOrderNotificationDelivered($order, $event, $userId, self::DELIVERY_CHANNEL_BELL, self::DELIVERY_STATUS_DELIVERED, (string) $notificationId);
+        } catch (\Throwable $e) {
+            self::markOrderNotificationFailed($order, $event, $userId, self::DELIVERY_CHANNEL_BELL, $e->getMessage());
+            Log::warning('[MarketplaceOrderService] order bell delivery failed: ' . $e->getMessage());
+        }
+    }
+
+    private static function claimOrderNotificationDelivery(MarketplaceOrder $order, string $event, int $userId, string $channel): bool
+    {
+        if ((int) ($order->id ?? 0) <= 0 || $userId <= 0 || !Schema::hasTable('marketplace_order_notification_deliveries')) {
+            return $userId > 0;
+        }
+
+        $tenantId = (int) ($order->tenant_id ?: TenantContext::getId());
+        $now = now();
+        $staleBefore = $now->copy()->subMinutes(10);
+
+        return DB::transaction(function () use ($tenantId, $order, $event, $userId, $channel, $now, $staleBefore): bool {
+            $record = DB::table('marketplace_order_notification_deliveries')
+                ->where('tenant_id', $tenantId)
+                ->where('order_id', (int) $order->id)
+                ->where('event', $event)
+                ->where('user_id', $userId)
+                ->where('channel', $channel)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$record) {
+                DB::table('marketplace_order_notification_deliveries')->insert([
+                    'tenant_id' => $tenantId,
+                    'order_id' => (int) $order->id,
+                    'event' => $event,
+                    'user_id' => $userId,
+                    'channel' => $channel,
+                    'status' => self::DELIVERY_STATUS_CLAIMED,
+                    'attempts' => 1,
+                    'claimed_at' => $now,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+
+                return true;
+            }
+
+            if (in_array($record->status, [self::DELIVERY_STATUS_DELIVERED, self::DELIVERY_STATUS_SKIPPED], true)) {
+                return false;
+            }
+
+            if ($record->status === self::DELIVERY_STATUS_CLAIMED && $record->claimed_at !== null && Carbon::parse($record->claimed_at)->greaterThan($staleBefore)) {
+                return false;
+            }
+
+            DB::table('marketplace_order_notification_deliveries')
+                ->where('id', $record->id)
+                ->update([
+                    'status' => self::DELIVERY_STATUS_CLAIMED,
+                    'attempts' => DB::raw('attempts + 1'),
+                    'claimed_at' => $now,
+                    'failed_at' => null,
+                    'last_error' => null,
+                    'updated_at' => $now,
+                ]);
+
+            return true;
+        });
+    }
+
+    private static function markOrderNotificationDelivered(MarketplaceOrder $order, string $event, int $userId, string $channel, string $status, ?string $evidenceId = null): void
+    {
+        if ((int) ($order->id ?? 0) <= 0 || $userId <= 0 || !Schema::hasTable('marketplace_order_notification_deliveries')) {
+            return;
+        }
+
+        DB::table('marketplace_order_notification_deliveries')
+            ->where('tenant_id', (int) ($order->tenant_id ?: TenantContext::getId()))
+            ->where('order_id', (int) $order->id)
+            ->where('event', $event)
+            ->where('user_id', $userId)
+            ->where('channel', $channel)
+            ->update([
+                'status' => $status,
+                'delivered_at' => $status === self::DELIVERY_STATUS_DELIVERED ? now() : null,
+                'failed_at' => null,
+                'evidence_id' => $evidenceId,
+                'last_error' => null,
+                'updated_at' => now(),
+            ]);
+    }
+
+    private static function markOrderNotificationFailed(MarketplaceOrder $order, string $event, int $userId, string $channel, string $error): void
+    {
+        if ((int) ($order->id ?? 0) <= 0 || $userId <= 0 || !Schema::hasTable('marketplace_order_notification_deliveries')) {
+            return;
+        }
+
+        DB::table('marketplace_order_notification_deliveries')
+            ->where('tenant_id', (int) ($order->tenant_id ?: TenantContext::getId()))
+            ->where('order_id', (int) $order->id)
+            ->where('event', $event)
+            ->where('user_id', $userId)
+            ->where('channel', $channel)
+            ->update([
+                'status' => self::DELIVERY_STATUS_FAILED,
+                'failed_at' => now(),
+                'last_error' => mb_substr($error, 0, 2000),
+                'updated_at' => now(),
+            ]);
+    }
+
+    /**
+     * @param array<string,mixed> $attributes
+     */
+    private static function createOrderBell(array $attributes): ?int
     {
         if ((int) ($attributes['user_id'] ?? 0) <= 0) {
             Log::warning('[MarketplaceOrderService] skipped marketplace bell without recipient', [
                 'type' => $attributes['type'] ?? null,
                 'link' => $attributes['link'] ?? null,
             ]);
-            return;
+            return null;
         }
 
-        Notification::create($attributes);
+        return (int) Notification::create($attributes)->id;
     }
 
     /**

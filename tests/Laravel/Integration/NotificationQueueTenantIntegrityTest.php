@@ -63,6 +63,54 @@ class NotificationQueueTenantIntegrityTest extends TestCase
             ->count());
     }
 
+    public function test_failed_queue_insert_rolls_back_new_bell_for_retry(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'email' => 'dispatch-queue-fail-' . uniqid('', true) . '@example.test',
+        ]);
+        Cache::flush();
+        TenantContext::setById($this->testTenantId);
+
+        DB::unprepared('DROP TRIGGER IF EXISTS notification_queue_force_failure');
+        DB::unprepared(
+            "CREATE TRIGGER notification_queue_force_failure
+             BEFORE INSERT ON notification_queue
+             FOR EACH ROW
+             BEGIN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'forced queue failure';
+             END"
+        );
+
+        try {
+            $result = NotificationDispatcher::dispatch(
+                $user->id,
+                'global',
+                0,
+                'new_message',
+                'Queue failure message',
+                '/messages/queue-failure',
+                '<p>Queue failure message</p>'
+            );
+        } finally {
+            DB::unprepared('DROP TRIGGER IF EXISTS notification_queue_force_failure');
+        }
+
+        $this->assertFalse($result);
+        $this->assertSame(0, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('type', 'new_message')
+            ->where('link', '/messages/queue-failure')
+            ->count());
+        $this->assertSame(0, DB::table('notification_queue')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('activity_type', 'new_message')
+            ->where('link', '/messages/queue-failure')
+            ->count());
+    }
+
     public function test_message_listener_uses_atomic_claim_before_queueing_email(): void
     {
         $source = file_get_contents(app_path('Listeners/NotifyMessageReceived.php'));
@@ -315,6 +363,7 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         $ideationSource = file_get_contents(app_path('Services/IdeationChallengeService.php'));
         $balanceSource = file_get_contents(app_path('Services/BalanceAlertService.php'));
         $brokerSource = file_get_contents(app_path('Services/BrokerMessageVisibilityService.php'));
+        $socialSource = file_get_contents(app_path('Services/SocialNotificationService.php'));
         $appreciationSource = file_get_contents(app_path('Services/Social/AppreciationService.php'));
 
         $this->assertStringContainsString("'preferred_language', 'tenant_id'", $ideationSource);
@@ -323,11 +372,20 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         $this->assertStringNotContainsString("'Project NEXUS'", $ideationSource);
 
         $this->assertStringContainsString("'preferred_language', 'tenant_id'", $balanceSource);
-        $this->assertStringContainsString('$owner->tenant_id ?? TenantContext::currentId()', $balanceSource);
+        $this->assertStringContainsString('TenantContext::runForTenant(', $balanceSource);
+        $this->assertStringContainsString("'tenant_id' => (int) \$owner->tenant_id", $balanceSource);
+        $this->assertStringNotContainsString('$owner->tenant_id ?? TenantContext::currentId()', $balanceSource);
 
         $this->assertStringContainsString("'preferred_language', 'tenant_id'", $brokerSource);
-        $this->assertStringContainsString('$broker->tenant_id ?? TenantContext::currentId()', $brokerSource);
+        $this->assertStringContainsString('TenantContext::runForTenant($tenantId', $brokerSource);
+        $this->assertStringContainsString("'tenant_id' => (int) \$broker->tenant_id", $brokerSource);
+        $this->assertStringNotContainsString('$broker->tenant_id ?? TenantContext::currentId()', $brokerSource);
         $this->assertStringContainsString("__('emails.common.fallback_manager')", $brokerSource);
+
+        $this->assertStringContainsString("'preferred_language', 'tenant_id'", $socialSource);
+        $this->assertGreaterThanOrEqual(4, substr_count($socialSource, 'TenantContext::runForTenant((int) $owner->tenant_id'));
+        $this->assertStringContainsString("'tenant_id' => \$tenantId", $socialSource);
+        $this->assertStringNotContainsString('$owner->tenant_id ?? TenantContext::currentId()', $socialSource);
 
         $this->assertStringContainsString("'preferred_language', 'tenant_id'", $appreciationSource);
         $this->assertStringContainsString("'tenant_id' => \$receiver->tenant_id ?? \$tenantId", $appreciationSource);

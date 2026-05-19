@@ -105,6 +105,7 @@ class NotificationDispatcher
         $dedupKey = "notif_dedup:{$tenantId}:{$userId}:{$activityType}:" . md5($link ?? '');
         $isDuplicateBell = false;
         $bellCreated = false;
+        $bellId = null;
 
         if (Cache::has($dedupKey)) {
             // Duplicate within 60s window — skip in-app creation but still process email
@@ -112,7 +113,7 @@ class NotificationDispatcher
             $isDuplicateBell = true;
         } else {
             try {
-                Notification::createNotification((int) $userId, $content, $link, $activityType);
+                $bellId = Notification::createNotification((int) $userId, $content, $link, $activityType);
                 $bellCreated = true;
             } catch (\Throwable $e) {
                 Log::warning('NotificationDispatcher: bell creation failed', [
@@ -230,6 +231,13 @@ class NotificationDispatcher
         }
 
         if (!$queueSucceeded) {
+            if (!$isDuplicateBell && $bellCreated && $bellId !== null) {
+                DB::table('notifications')
+                    ->where('id', (int) $bellId)
+                    ->where('tenant_id', $tenantId)
+                    ->where('user_id', (int) $userId)
+                    ->delete();
+            }
             Log::warning('NotificationDispatcher: queue insert failed', [
                 'user_id' => (int) $userId,
                 'type' => $activityType,

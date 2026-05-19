@@ -89,8 +89,10 @@ class SocialNotificationService
 
                 // 2. Send email notification (if user has email and hasn't opted out)
                 if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'like')) {
-                    $emailLink = TenantContext::getSlugPrefix() . $link;
-                    self::sendLikeEmail($owner, $liker, $contentType, $contentId, $contentPreview, $emailLink);
+                    TenantContext::runForTenant((int) $owner->tenant_id, function () use ($owner, $liker, $contentType, $contentId, $contentPreview, $link) {
+                        $emailLink = TenantContext::getSlugPrefix() . $link;
+                        self::sendLikeEmail($owner, $liker, $contentType, $contentId, $contentPreview, $emailLink);
+                    });
                 }
             });
         } catch (\Throwable $e) {
@@ -142,8 +144,10 @@ class SocialNotificationService
 
                 // 2. Send email notification (if user has email and hasn't opted out)
                 if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'comment')) {
-                    $emailLink = TenantContext::getSlugPrefix() . $link;
-                    self::sendCommentEmail($owner, $commenter, $contentType, $contentId, $commentText, $emailLink);
+                    TenantContext::runForTenant((int) $owner->tenant_id, function () use ($owner, $commenter, $contentType, $contentId, $commentText, $link) {
+                        $emailLink = TenantContext::getSlugPrefix() . $link;
+                        self::sendCommentEmail($owner, $commenter, $contentType, $contentId, $commentText, $emailLink);
+                    });
                 }
             });
         } catch (\Throwable $e) {
@@ -195,8 +199,10 @@ class SocialNotificationService
                 Notification::createNotification((int) $commentOwnerId, $message, $link, 'comment_reply');
 
                 if ($ownerEmail && self::shouldSendEmail($commentOwnerId, 'comment')) {
-                    $emailLink = TenantContext::getSlugPrefix() . $link;
-                    self::sendCommentReplyEmail($owner, $replier, $contentType, $replyText, $emailLink);
+                    TenantContext::runForTenant((int) $owner->tenant_id, function () use ($owner, $replier, $contentType, $replyText, $link) {
+                        $emailLink = TenantContext::getSlugPrefix() . $link;
+                        self::sendCommentReplyEmail($owner, $replier, $contentType, $replyText, $emailLink);
+                    });
                 }
             });
         } catch (\Throwable $e) {
@@ -245,8 +251,10 @@ class SocialNotificationService
 
                 // 2. Send email notification (if user has email and hasn't opted out)
                 if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'share')) {
-                    $emailLink = TenantContext::getSlugPrefix() . $link;
-                    self::sendShareEmail($owner, $sharer, $contentType, $contentId, $emailLink);
+                    TenantContext::runForTenant((int) $owner->tenant_id, function () use ($owner, $sharer, $contentType, $contentId, $link) {
+                        $emailLink = TenantContext::getSlugPrefix() . $link;
+                        self::sendShareEmail($owner, $sharer, $contentType, $contentId, $emailLink);
+                    });
                 }
             });
         } catch (\Throwable $e) {
@@ -398,7 +406,7 @@ class SocialNotificationService
             $tenant = TenantContext::get();
             $tenantName = $tenant['name'] ?? __('emails.common.platform_name');
             $fullLink = TenantContext::getFrontendUrl() . $link;
-            $tenantId = (int) ($owner->tenant_id ?? TenantContext::currentId() ?? 0);
+            $tenantId = (int) $owner->tenant_id;
 
             $likerName = $liker->name ?? __('emails.common.fallback_someone');
             $contentLabel = self::getContentLabel($contentType);
@@ -437,7 +445,7 @@ class SocialNotificationService
             $tenant = TenantContext::get();
             $tenantName = $tenant['name'] ?? __('emails.common.platform_name');
             $fullLink = TenantContext::getFrontendUrl() . $link;
-            $tenantId = (int) ($owner->tenant_id ?? TenantContext::currentId() ?? 0);
+            $tenantId = (int) $owner->tenant_id;
 
             $commenterName = $commenter->name ?? __('emails.common.fallback_someone');
             $contentLabel = self::getContentLabel($contentType);
@@ -476,7 +484,7 @@ class SocialNotificationService
             $tenant = TenantContext::get();
             $tenantName = $tenant['name'] ?? __('emails.common.platform_name');
             $fullLink = TenantContext::getFrontendUrl() . $link;
-            $tenantId = (int) ($owner->tenant_id ?? TenantContext::currentId() ?? 0);
+            $tenantId = (int) $owner->tenant_id;
 
             $replierName = $replier->name ?? __('emails.common.fallback_someone');
             $contentLabel = self::getContentLabel($contentType);
@@ -514,7 +522,7 @@ class SocialNotificationService
             $tenant = TenantContext::get();
             $tenantName = $tenant['name'] ?? __('emails.common.platform_name');
             $fullLink = TenantContext::getFrontendUrl() . $link;
-            $tenantId = (int) ($owner->tenant_id ?? TenantContext::currentId() ?? 0);
+            $tenantId = (int) $owner->tenant_id;
 
             $sharerName = $sharer->name ?? __('emails.common.fallback_someone');
             $contentLabel = self::getContentLabel($contentType);

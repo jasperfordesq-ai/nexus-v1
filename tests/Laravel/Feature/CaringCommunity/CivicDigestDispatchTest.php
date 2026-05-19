@@ -10,7 +10,7 @@ namespace Tests\Laravel\Feature\CaringCommunity;
 
 use App\Core\TenantContext;
 use App\Services\CaringCommunity\CivicDigestService;
-use App\Services\EmailService;
+use App\Services\EmailDispatchService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Mockery;
@@ -85,9 +85,8 @@ class CivicDigestDispatchTest extends TestCase
         $this->app->instance(CivicDigestService::class, $stub);
 
         // EmailService MUST NOT be called for empty digests
-        $emailMock = Mockery::mock(EmailService::class);
-        $emailMock->shouldNotReceive('send');
-        $this->app->instance(EmailService::class, $emailMock);
+        $emailMock = $this->fakeEmailDispatcher();
+        $this->app->instance(EmailDispatchService::class, $emailMock);
 
         $exitCode = $this->artisan('caring:civic-digest-dispatch', [
             '--cadence' => 'daily',
@@ -121,16 +120,8 @@ class CivicDigestDispatchTest extends TestCase
         ]);
         $this->app->instance(CivicDigestService::class, $stub);
 
-        $emailMock = Mockery::mock(EmailService::class);
-        $emailMock->shouldReceive('send')
-            ->atLeast()->once()
-            ->withArgs(function ($to, $subject, $html) {
-                return is_string($to) && str_contains((string) $to, '@')
-                    && is_string($subject) && $subject !== ''
-                    && is_string($html) && $html !== '';
-            })
-            ->andReturn(true);
-        $this->app->instance(EmailService::class, $emailMock);
+        $emailMock = $this->fakeEmailDispatcher();
+        $this->app->instance(EmailDispatchService::class, $emailMock);
 
         $exitCode = $this->artisan('caring:civic-digest-dispatch', [
             '--cadence' => 'daily',
@@ -143,6 +134,14 @@ class CivicDigestDispatchTest extends TestCase
         $lastSent = $stub->getLastSentAt(self::TENANT_ID, $userId);
         $this->assertNotNull($lastSent);
         $this->assertGreaterThanOrEqual(time() - 60, $lastSent);
+        $this->assertCount(1, $emailMock->calls);
+        $this->assertDatabaseHas(CivicDigestService::DELIVERY_CLAIMS_TABLE, [
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $userId,
+            'cadence' => 'daily',
+            'window_key' => $stub->deliveryWindowKey('daily'),
+            'status' => 'sent',
+        ]);
     }
 
     public function test_skips_user_whose_cadence_does_not_match(): void
@@ -156,9 +155,8 @@ class CivicDigestDispatchTest extends TestCase
         });
         $this->app->instance(CivicDigestService::class, $stub);
 
-        $emailMock = Mockery::mock(EmailService::class);
-        $emailMock->shouldNotReceive('send');
-        $this->app->instance(EmailService::class, $emailMock);
+        $emailMock = $this->fakeEmailDispatcher();
+        $this->app->instance(EmailDispatchService::class, $emailMock);
 
         // Force tenant default to 'off' so the weekly user isn't covered by tenant default
         $stub->setTenantCadence(self::TENANT_ID, 'off');
@@ -200,9 +198,8 @@ class CivicDigestDispatchTest extends TestCase
         });
         $this->app->instance(CivicDigestService::class, $stub);
 
-        $emailMock = Mockery::mock(EmailService::class);
-        $emailMock->shouldReceive('send')->once()->andReturn(true);
-        $this->app->instance(EmailService::class, $emailMock);
+        $emailMock = $this->fakeEmailDispatcher();
+        $this->app->instance(EmailDispatchService::class, $emailMock);
 
         $exitCode = $this->artisan('caring:civic-digest-dispatch', [
             '--cadence' => 'monthly',
@@ -210,6 +207,96 @@ class CivicDigestDispatchTest extends TestCase
         ])->run();
 
         $this->assertSame(0, $exitCode);
+        $this->assertCount(1, $emailMock->calls);
         $this->assertNotNull($stub->getLastSentAt(self::TENANT_ID, $userId));
+    }
+
+    public function test_existing_delivery_claim_blocks_duplicate_dispatch_for_window(): void
+    {
+        $userId = $this->makeUser('daily');
+        $service = app(CivicDigestService::class);
+
+        DB::table(CivicDigestService::DELIVERY_CLAIMS_TABLE)->insert([
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $userId,
+            'cadence' => 'daily',
+            'window_key' => $service->deliveryWindowKey('daily'),
+            'status' => 'claimed',
+            'claimed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $stub = Mockery::mock(CivicDigestService::class . '[digestForMember]', [])->makePartial();
+        $stub->shouldNotReceive('digestForMember');
+        $this->app->instance(CivicDigestService::class, $stub);
+
+        $emailMock = $this->fakeEmailDispatcher();
+        $this->app->instance(EmailDispatchService::class, $emailMock);
+
+        $exitCode = $this->artisan('caring:civic-digest-dispatch', [
+            '--cadence' => 'daily',
+            '--tenant' => self::TENANT_ID,
+        ])->run();
+
+        $this->assertSame(0, $exitCode);
+        $this->assertCount(0, $emailMock->calls);
+        $this->assertNull($stub->getLastSentAt(self::TENANT_ID, $userId));
+    }
+
+    public function test_email_failure_releases_delivery_claim_without_sent_marker(): void
+    {
+        $userId = $this->makeUser('daily');
+
+        $stub = Mockery::mock(CivicDigestService::class . '[digestForMember]', [])->makePartial();
+        $stub->shouldReceive('digestForMember')->andReturn([
+            [
+                'id' => 'announcement:1',
+                'source' => 'announcement',
+                'title' => 'Retry announcement',
+                'summary' => 'Try again later',
+                'occurred_at' => now()->toDateTimeString(),
+                'sub_region_id' => null,
+                'audience_match_score' => 7,
+                'link_path' => '/caring-community/projects/1',
+            ],
+        ]);
+        $this->app->instance(CivicDigestService::class, $stub);
+
+        $emailMock = $this->fakeEmailDispatcher(false);
+        $this->app->instance(EmailDispatchService::class, $emailMock);
+
+        $exitCode = $this->artisan('caring:civic-digest-dispatch', [
+            '--cadence' => 'daily',
+            '--tenant' => self::TENANT_ID,
+        ])->run();
+
+        $this->assertSame(0, $exitCode);
+        $this->assertCount(1, $emailMock->calls);
+        $this->assertNull($stub->getLastSentAt(self::TENANT_ID, $userId));
+        $this->assertDatabaseMissing(CivicDigestService::DELIVERY_CLAIMS_TABLE, [
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $userId,
+            'cadence' => 'daily',
+            'window_key' => $stub->deliveryWindowKey('daily'),
+        ]);
+    }
+
+    private function fakeEmailDispatcher(bool $result = true): EmailDispatchService
+    {
+        return new class($result) extends EmailDispatchService {
+            public array $calls = [];
+
+            public function __construct(private bool $result)
+            {
+            }
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->calls[] = compact('to', 'subject', 'body', 'options');
+
+                return $this->result;
+            }
+        };
     }
 }

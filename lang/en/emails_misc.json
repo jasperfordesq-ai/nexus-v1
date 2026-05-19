@@ -287,6 +287,7 @@
     "paid_seller_title": "Order Paid",
     "paid_seller_body": "Payment of <strong>{{amount}}</strong> has been received for order <strong>{{order_number}}</strong> (<strong>{{title}}</strong>). You can now prepare the order.",
     "order_cta": "View Order",
+    "delivery_failed": "Marketplace order notification delivery failed.",
     "shipped_subject": "Your order has been shipped — {{order_number}}",
     "shipped_title": "Order Shipped",
     "shipped_preview": "Your order {{order_number}} is on its way",

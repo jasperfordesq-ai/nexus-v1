@@ -259,9 +259,15 @@ class CivicDigestDispatch extends Command
                 continue;
             }
 
+            $windowKey = $this->service->deliveryWindowKey($cadence, $now);
+            if (! $this->service->claimDelivery($tenantId, $userId, $cadence, $windowKey)) {
+                continue;
+            }
+
             try {
                 $items = $this->service->digestForMember($tenantId, $userId, $limit);
             } catch (Throwable $e) {
+                $this->service->releaseDeliveryClaim($tenantId, $userId, $cadence, $windowKey);
                 Log::warning('[CivicDigestDispatch] digest build failed', [
                     'tenant_id' => $tenantId,
                     'user_id' => $userId,
@@ -271,6 +277,7 @@ class CivicDigestDispatch extends Command
             }
 
             if (empty($items)) {
+                $this->service->releaseDeliveryClaim($tenantId, $userId, $cadence, $windowKey);
                 // Skip silently — never send empty digests
                 continue;
             }
@@ -284,6 +291,17 @@ class CivicDigestDispatch extends Command
                     'user_id' => $userId,
                     'error' => $e->getMessage(),
                 ]);
+            }
+
+            if ($emailSent) {
+                $this->service->markDeliverySent($tenantId, $userId, $cadence, $windowKey, [
+                    'channel' => 'email',
+                    'accepted' => true,
+                    'item_count' => count($items),
+                    'marked_at' => now()->toISOString(),
+                ]);
+            } else {
+                $this->service->releaseDeliveryClaim($tenantId, $userId, $cadence, $windowKey);
             }
 
             $pushSent = false;
@@ -322,9 +340,6 @@ class CivicDigestDispatch extends Command
                 }
             }
 
-            if ($emailSent) {
-                $this->service->markSentNow($tenantId, $userId);
-            }
         }
 
         return $stats;

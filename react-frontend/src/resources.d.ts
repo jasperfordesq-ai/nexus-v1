@@ -960,7 +960,15 @@ export default interface Resources {
       "algorithm_health_title": "Algorithm Health",
       "algorithm_settings_desc": "Configure algorithm weights and parameters for content ranking",
       "algorithm_settings_title": "Algorithm Settings",
+      "area_feed_ranking": "Feed Ranking (EdgeRank)",
+      "area_feed_ranking_desc": "How posts are ranked in the activity feed",
+      "area_listings_ranking": "Listings Ranking (MatchRank)",
+      "area_listings_ranking_desc": "How listings are scored and ranked for each user",
+      "area_member_ranking": "Member Ranking (CommunityRank)",
+      "area_member_ranking_desc": "How members are scored and ranked in directories and recommendations",
       "area_settings_saved": "Area settings saved",
+      "area_smart_matching": "Smart Matching",
+      "area_smart_matching_desc": "How users are matched to listings for personalised recommendations",
       "audit_results": "Audit Results",
       "auto_generate_sitemap": "Auto-generate Sitemap",
       "auto_generate_sitemap_desc": "Automatically generate an XML sitemap for search engines",
@@ -1015,6 +1023,7 @@ export default interface Resources {
       "desc_title_suffix": "Title Suffix.",
       "desc_when_visitors_hit_missing_pages_they_wi": "When visitors hit missing pages, they will see a 404 error tracked here",
       "desc_your_a_i_provider_a_p_i_key_stored_encrypt": "Your AI provider API key, stored encrypted",
+      "direct_referrer": "Direct",
       "disabled": "Disabled",
       "dismiss": "Dismiss",
       "dismiss_404_entry": "Dismiss",
@@ -1027,6 +1036,7 @@ export default interface Resources {
       "email_settings_title": "Email Settings",
       "enable_ai_features": "Enable AI Features",
       "enable_ai_features_desc": "Enable or disable AI-powered features across the platform",
+      "enable_area": "Enable {{area}}",
       "enabled": "Enabled",
       "encryption_none": "Encryption None",
       "encryption_ssl": "Encryption SSL",
@@ -1058,12 +1068,24 @@ export default interface Resources {
       "failed_to_save_feed_algorithm_settings": "Failed to save feed algorithm settings",
       "failed_to_save_s_e_o_settings": "Failed to save SEO settings",
       "failed_to_send_test_email": "Failed to send test email",
+      "feature_ai_analytics": "AI Analytics",
+      "feature_ai_analytics_desc": "AI-generated insights from community activity",
+      "feature_ai_chat": "AI Chat Assistant",
+      "feature_ai_chat_desc": "In-platform AI chat for members",
+      "feature_ai_moderation": "AI Moderation",
+      "feature_ai_moderation_desc": "Automated content moderation and toxicity detection",
+      "feature_ai_recommendations": "AI Recommendations",
+      "feature_ai_recommendations_desc": "Personalised listing, member, and content recommendations",
+      "feature_content_generation": "Content Generation",
+      "feature_content_generation_desc": "AI-assisted drafting of posts, listings, and messages",
       "feed_algorithm_desc": "Configure how posts are ranked and surfaced in the community feed",
       "feed_algorithm_settings_saved_successful": "Feed algorithm settings saved successfully",
       "feed_algorithm_title": "Feed Algorithm",
       "feed_options": "Feed Options",
       "feed_ranking_weights": "Feed Ranking Weights",
       "fulltext_indexes_title": "Fulltext Indexes",
+      "generate_embeddings_hint_prefix": "Run",
+      "generate_embeddings_hint_suffix": "to generate embeddings.",
       "global_meta_description_count": "{{count}}/160 global meta description characters",
       "gmail_api_configuration": "Gmail API Configuration",
       "health_auto_sitemap_active_count": "Active — {{count}} URLs indexed",
@@ -1152,6 +1174,8 @@ export default interface Resources {
       "last_run_label": "Last Run",
       "listing_saves": "Listing Saves",
       "loading_match_scores": "Loading match scores...",
+      "match_count_one": "{{count}} match",
+      "match_count_other": "{{count}} matches",
       "match_debug_panel_desc": "Inspect match scores and reasoning for any two members",
       "match_debug_panel_title": "Match Debug Panel",
       "match_reasons": "Match Reasons",
@@ -1160,6 +1184,8 @@ export default interface Resources {
       "member_transactions": "Member Transactions",
       "meta_description_count": "{{count}}/160 meta description characters",
       "meta_tags_heading": "Meta Tags",
+      "missing_indexes_hint_prefix": "Run",
+      "missing_indexes_hint_suffix": "to create missing indexes.",
       "no_404_errors": "No 404 errors found",
       "no_audit_results": "No audit results",
       "no_audit_results_desc": "Run an audit to see SEO results",
@@ -1176,15 +1202,61 @@ export default interface Resources {
       "open_graph_tags": "Open Graph Tags",
       "open_graph_tags_desc": "Configure Open Graph meta tags for social sharing",
       "overall_match_score": "Overall Match Score",
+      "overall_match_score_aria": "Overall match score: {{score}}%",
       "page_title": "Advanced",
+      "param_activity_weight": "Activity Weight",
+      "param_activity_weight_desc": "How strongly recent activity boosts ranking",
+      "param_affinity_weight": "Affinity Weight",
+      "param_affinity_weight_desc": "How strongly user-to-author relationships influence ranking",
+      "param_availability_weight": "Availability Weight",
+      "param_availability_weight_desc": "How strongly overlapping availability influences match scores",
+      "param_connectivity_weight": "Connection Weight",
+      "param_connectivity_weight_desc": "How strongly accepted member connections should influence CommunityRank",
+      "param_content_type_weight": "Content Type Weight",
+      "param_content_type_weight_desc": "How strongly the type of content is weighted",
+      "param_contribution_weight": "Contribution Weight",
+      "param_contribution_weight_desc": "How strongly the member's contribution history is weighted",
+      "param_engagement_weight": "Engagement Weight",
+      "param_engagement_weight_desc": "How strongly likes, comments, and shares boost ranking",
+      "param_freshness_minimum": "Freshness Floor",
+      "param_freshness_minimum_desc": "Minimum freshness score regardless of age",
+      "param_freshness_weight": "Freshness Weight",
+      "param_freshness_weight_desc": "How strongly newer listings are favoured",
+      "param_half_life_hours": "Half-Life (hours)",
+      "param_half_life_hours_desc": "Hours after which a post drops to half its initial freshness score",
+      "param_listing_engagement_weight": "Engagement Weight",
+      "param_listing_engagement_weight_desc": "How strongly listing views, saves, and enquiries boost ranking",
+      "param_listings_ranking": "Listings Ranking",
+      "param_location_weight": "Location Weight",
+      "param_location_weight_desc": "How strongly geographic proximity influences ranking",
+      "param_match_location_weight": "Location Weight",
+      "param_match_location_weight_desc": "How strongly geographic proximity influences match scores",
+      "param_member_reputation_weight": "Reputation Weight",
+      "param_member_reputation_weight_desc": "How strongly member ratings and reviews are weighted",
+      "param_proximity_weight": "Proximity Weight",
+      "param_proximity_weight_desc": "How strongly geographic proximity influences ranking",
+      "param_quality_weight": "Quality Weight",
+      "param_quality_weight_desc": "How strongly listing completeness and quality signals are weighted",
+      "param_rating_weight": "Rating Weight",
+      "param_rating_weight_desc": "How strongly past ratings between users influence match scores",
+      "param_reputation_weight": "Reputation Weight",
+      "param_reputation_weight_desc": "How strongly the lister's reputation influences ranking",
+      "param_skill_match_weight": "Skill Match Weight",
+      "param_skill_match_weight_desc": "How strongly listing-to-user skill overlap influences ranking",
+      "param_skill_weight": "Skill Weight",
+      "param_skill_weight_desc": "How strongly skill overlap influences match scores",
+      "param_time_decay_weight": "Time Decay Weight",
+      "param_time_decay_weight_desc": "How strongly post age reduces ranking",
       "passed_count": "Passed",
       "passed_count_with_value": "{{count}} passed",
       "placeholder_a_short_description_of_your_timebank": "A Short Description of Your Timebank...",
       "placeholder_community_timebanking_platform": "Community Timebanking Platform...",
       "placeholder_current": "Enter current...",
+      "placeholder_current_key": "Enter current: {{masked}}",
       "placeholder_enter_api_key": "Enter API key...",
       "placeholder_exchange_skills_and_time_with_your_community": "Exchange Skills and Time with Your Community...",
       "placeholder_my_timebank": "My Timebank...",
+      "placeholder_robots_txt": "User-agent: *\nDisallow: /admin/",
       "placeholder_s_gxxxxx": "S Gxxxxx...",
       "placeholder_search_users_by_name_or_email": "Search Users by Name or Email...",
       "placeholder_smtpexamplecom": "Smtpexamplecom...",
@@ -1195,8 +1267,574 @@ export default interface Resources {
       "platform_default_heading": "Platform Default",
       "platform_default_hint": "Use the platform default",
       "please_enter_a_test_email_address": "Please enter a test email address",
+      "prerender": {
+        "analytics": {
+          "actions": {
+            "reload": "Reload"
+          },
+          "columns": {
+            "crawler": "CRAWLER",
+            "hits": "HITS",
+            "host": "HOST",
+            "ip": "IP",
+            "status": "STATUS",
+            "time": "TIME",
+            "uri": "URI",
+            "url": "URL"
+          },
+          "empty": "No analytics available. Bot access log may be empty.",
+          "empty_bot_traffic": "No bot traffic yet",
+          "empty_no_data": "No data",
+          "empty_recent_hits": "No recent hits",
+          "errors": {
+            "load": "Failed to load analytics"
+          },
+          "filters": {
+            "window": "Window"
+          },
+          "hints": {
+            "spoofed": "claimed major bot, failed IP range",
+            "top_50_cap": "from top-50 cap",
+            "verified_of_total": "{{verified}} of {{total}}"
+          },
+          "kpi": {
+            "ip_verified": "IP-verified",
+            "spoofed": "Spoofed (suspicious)",
+            "total_bot_hits": "Total bot hits",
+            "unique_uris": "Unique URIs"
+          },
+          "labels": {
+            "spoofed_count": "{{count}} spoofed"
+          },
+          "log_summary": "Log: {{size}} - since {{time}}",
+          "sections": {
+            "hits_by_crawler": "Hits by crawler",
+            "hits_by_status": "Hits by HTTP status",
+            "recent_activity": "Recent activity (newest first, last {{count}})",
+            "top_uris": "Top URIs (top 50 by hit count)"
+          },
+          "tables": {
+            "recent_hits_aria": "Recent bot hits",
+            "top_uris_aria": "Top URIs"
+          },
+          "windows": {
+            "1": "Last 24h",
+            "30": "Last 30 days",
+            "7": "Last 7 days"
+          }
+        },
+        "audit": {
+          "actions": {
+            "auto_recache": "auto_recache",
+            "cancel": "cancel",
+            "detect_drift": "detect_drift",
+            "enqueue": "enqueue",
+            "invalidate": "invalidate",
+            "purge": "purge",
+            "purge_unexpected": "purge_unexpected",
+            "reset_breaker": "reset_breaker",
+            "reset_queue": "reset_queue"
+          },
+          "buttons": {
+            "export_csv": "Export CSV",
+            "refresh": "Refresh"
+          },
+          "columns": {
+            "action": "Action",
+            "actor": "Actor",
+            "details": "Details",
+            "job": "Job",
+            "outcome": "Outcome",
+            "tenant": "Tenant",
+            "when": "When"
+          },
+          "empty": "No audit entries.",
+          "fallbacks": {
+            "all": "all",
+            "system": "system"
+          },
+          "filters": {
+            "action": "Action filter",
+            "all": "All"
+          },
+          "table_aria": "Audit history"
+        },
+        "coverage": {
+          "actions": {
+            "open_in_inventory": "Open in inventory",
+            "refresh": "Refresh",
+            "refresh_all_stale": "Refresh all stale ({{count}})"
+          },
+          "columns": {
+            "actions": "ACTIONS",
+            "asset": "ASSET",
+            "coverage": "COVERAGE",
+            "host": "HOST",
+            "missing": "MISSING",
+            "stale": "STALE",
+            "tenant": "TENANT"
+          },
+          "confirm": {
+            "queue_recache": "Queue recache for {{count}} tenants?"
+          },
+          "empty": "No tenants",
+          "errors": {
+            "bulk_enqueue": "Bulk enqueue failed (some tenants may have queued)",
+            "enqueue": "Failed to enqueue",
+            "load": "Failed to load coverage"
+          },
+          "messages": {
+            "bulk_queued": "Queued recache for {{count}} tenants",
+            "no_stale": "No stale tenants - coverage is healthy",
+            "tenant_queued": "Queued #{{id}} for {{slug}}"
+          },
+          "summary": {
+            "healthy": "All {{count}} tenants healthy.",
+            "needs_work": "{{needing}} of {{total}} tenants have missing, stale, or asset-broken routes."
+          },
+          "table_aria": "Coverage"
+        },
+        "description": "Bot-only server-rendered snapshots. Monitor coverage, detect staleness, and force refreshes.",
+        "events": {
+          "actions": {
+            "reload": "Reload"
+          },
+          "columns": {
+            "commit": "Commit",
+            "details": "Details",
+            "event": "Event",
+            "time": "Time"
+          },
+          "empty": "No events",
+          "errors": {
+            "load": "Failed to load events"
+          },
+          "filters": {
+            "limit": "Limit"
+          },
+          "summary": "{{count}} events",
+          "table_aria": "Events",
+          "types": {
+            "fail": "Fail",
+            "partial": "Partial",
+            "success": "Success",
+            "supersede": "Supersede"
+          }
+        },
+        "failures": {
+          "columns": {
+            "age": "Age",
+            "cache_path": "Cache path",
+            "failed_at": "Failed at"
+          },
+          "description_action": "Force refresh",
+          "description_middle": "Routes in this list are skipped automatically during the failure-backoff window (default 6h). Use",
+          "description_prefix": "Cache paths that failed during a recent prerender run.",
+          "description_suffix": "on the Overview tab to retry immediately.",
+          "empty": "No recent failures",
+          "errors": {
+            "load": "Failed to load failures"
+          },
+          "table_aria": "Failures"
+        },
+        "freshness": {
+          "actions": {
+            "apply": "Apply",
+            "dry_run": "Dry run"
+          },
+          "auto_recache": {
+            "description": "Scans every snapshot. Enqueues low-priority recaches for routes whose source content has changed or whose TTL has expired. Runs on cron every 15-30 minutes; use this to trigger one immediately.",
+            "title": "Auto-recache (TTL + content drift)"
+          },
+          "drift": {
+            "description": "Walks each tenant sitemap, compares lastmod against snapshot mtimes, and catches stale pages from raw writes, migrations, or queued jobs. Runs every 2 minutes and enqueues high-priority recaches.",
+            "title": "Detect drift (sitemap vs snapshots)"
+          },
+          "errors": {
+            "auto_recache": "Failed to trigger auto-recache",
+            "drift_detection": "Failed to trigger drift detection",
+            "purge_unexpected": "Purge-unexpected failed"
+          },
+          "messages": {
+            "auto_recache_applied": "Auto-recache applied",
+            "auto_recache_dry_run": "Auto-recache dry-run complete",
+            "drift_applied": "Drift detection applied",
+            "drift_dry_run": "Drift dry-run complete",
+            "purge_dry_run": "Dry run: {{count}} snapshots would be purged",
+            "purged_ungated": "Purged {{count}} ungated snapshots across {{tenants}} tenants"
+          },
+          "no_output": "(no output)",
+          "purge_ungated": {
+            "description": "Sweep snapshots whose route is not in a tenant expected set. Common after toggling a feature off, or for cleanup of static routes prerendered without feature flags. Dynamic content routes are left alone.",
+            "title": "Purge ungated snapshots (per-tenant 404 cleanup)"
+          },
+          "result": {
+            "deleted": "Deleted {{count}} snapshots across {{tenants}} tenants",
+            "would_delete": "Would delete {{count}} snapshots across {{tenants}} tenants"
+          },
+          "title": "Freshness automation"
+        },
+        "health_banner": {
+          "actions": {
+            "cancel": "Cancel",
+            "close_breaker_now": "Close breaker now",
+            "details": "Details",
+            "emergency_reset": "Emergency reset",
+            "hide": "Hide",
+            "hide_details": "Hide details",
+            "reset_queue": "Reset queue"
+          },
+          "engine_healthy": "Engine healthy",
+          "issue_count_one": "{{count}} issue",
+          "issue_count_other": "{{count}} issues",
+          "modal": {
+            "body_middle": "or",
+            "body_prefix": "This will requeue every",
+            "body_suffix": "row whose worker has been silent for >30 min, and clear the circuit breaker.",
+            "title": "Emergency: reset stuck queue",
+            "warning": "Only use this if you've confirmed the queue is stuck. If a healthy worker is still running, this will create duplicate work."
+          },
+          "toasts": {
+            "breaker_reset": "Circuit breaker reset",
+            "queue_reset_failed": "Queue reset failed",
+            "queue_reset_one": "Reset {{count}} stuck row; breaker cleared",
+            "queue_reset_other": "Reset {{count}} stuck rows; breaker cleared",
+            "reset_failed": "Reset failed"
+          }
+        },
+        "inventory": {
+          "actions": {
+            "close": "Close",
+            "inspect": "Inspect",
+            "inspect_snapshot": "Inspect {{path}}",
+            "open_rendered_url": "Open rendered URL",
+            "recache_selected": "Recache selected ({{count}})",
+            "reload": "Reload",
+            "select_all_visible": "Select all visible",
+            "select_snapshot": "Select {{path}}"
+          },
+          "columns": {
+            "actions": "Actions",
+            "age": "Age",
+            "host": "Host",
+            "http": "HTTP",
+            "route": "Route",
+            "size": "Size",
+            "status": "Status"
+          },
+          "empty": "No snapshots match filters",
+          "errors": {
+            "bulk_recache": "Bulk recache failed",
+            "inspect": "Failed to inspect snapshot",
+            "load": "Failed to load inventory"
+          },
+          "filters": {
+            "aging": "Aging",
+            "all": "All",
+            "asset_broken": "Asset broken",
+            "content_drifted": "Content drifted",
+            "filter": "Filter",
+            "filter_placeholder": "route or host substring",
+            "fresh": "Fresh",
+            "issue": "Issue",
+            "stale": "Stale",
+            "staleness": "Staleness",
+            "status": "Status",
+            "status_200": "200 only",
+            "status_non_200": "Non-200",
+            "tenant_placeholder": "optional",
+            "tenant_slug": "Tenant slug"
+          },
+          "inspect": {
+            "age": "Age",
+            "all_valid": "all valid",
+            "asset_references": "Asset references ({{count}})",
+            "canonical": "Canonical",
+            "dead_assets": "{{count}} dead",
+            "flags": "Flags",
+            "h1_count": "H1 (count)",
+            "html_parse_warnings": "HTML parse warnings",
+            "html_preview": "HTML preview (first 12KB, scripts stripped)",
+            "integrity_mismatch": "bytes changed since render - expected sha256 {{expected}}..., got {{actual}}...",
+            "integrity_missing": "no sha256 sidecar - snapshot predates integrity verification or was hand-edited",
+            "integrity_ok": "bytes match the sha256 written at render time",
+            "integrity_status": "integrity: {{status}}",
+            "integrity_unreadable": "sha256 sidecar exists but is malformed",
+            "invalid_present": "INVALID PRESENT",
+            "json_ld": "JSON-LD ({{blocks}} blocks, {{status}})",
+            "meta_description": "Meta description",
+            "missing": "- missing -",
+            "modal_title": "Snapshot inspection",
+            "modified": "Modified",
+            "must_fix": "Must fix ({{count}})",
+            "no_structured_data": "No structured data",
+            "no_type": "(no @type)",
+            "none": "(none)",
+            "old": "{{age}} old",
+            "open_graph": "Open Graph",
+            "path": "Path",
+            "seo_score": "SEO score",
+            "size": "Size",
+            "tips": "Tips ({{count}})",
+            "title": "Title"
+          },
+          "messages": {
+            "bulk_recache": "Invalidated {{count}} snapshots and queued recache"
+          },
+          "selected": "{{count}} selected",
+          "status": {
+            "asset": "asset",
+            "content": "content",
+            "content_drifted": "content drifted"
+          },
+          "summary": "{{filtered}} of {{total}} snapshots",
+          "table_aria": "Snapshot inventory"
+        },
+        "jobs": {
+          "actions": {
+            "cancel_job": "Cancel job #{{id}}",
+            "close": "Close",
+            "reload": "Reload",
+            "retry_job": "Retry job #{{id}}",
+            "retry_same_parameters": "Retry with the same parameters",
+            "view_details": "View job #{{id}} details"
+          },
+          "columns": {
+            "actions": "Actions",
+            "by": "By",
+            "flags": "Flags",
+            "id": "#",
+            "priority": "Priority",
+            "queued": "Queued",
+            "result": "Result",
+            "scope": "Scope",
+            "status": "Status"
+          },
+          "detail": {
+            "all": "all",
+            "claimed_by": "Claimed by",
+            "duration": "Duration",
+            "error": "Error",
+            "exit_code": "Exit code",
+            "finished_at": "Finished at",
+            "log_tail": "Log (tail)",
+            "queued_at": "Queued at",
+            "requested_by": "Requested by",
+            "routes": "Routes",
+            "started_at": "Started at",
+            "status": "Status",
+            "tenant": "Tenant",
+            "title": "Job #{{id}}"
+          },
+          "empty": "No jobs",
+          "errors": {
+            "cancel": "Could not cancel - job may have started",
+            "load": "Failed to load jobs",
+            "retry": "Retry failed - original job may still be in flight"
+          },
+          "filters": {
+            "all": "All",
+            "cancelled": "Cancelled",
+            "failed": "Failed",
+            "partial": "Partial",
+            "queued": "Queued",
+            "running": "Running",
+            "status": "Status",
+            "succeeded": "Succeeded"
+          },
+          "flags": {
+            "dry_run": "dry-run",
+            "force": "force"
+          },
+          "messages": {
+            "cancelled": "Cancelled job #{{id}}",
+            "retry_queued": "Queued retry #{{retryId}} (from #{{id}})"
+          },
+          "priority": {
+            "high": "High",
+            "low": "Low",
+            "normal": "Normal",
+            "tooltip": "priority={{priority}} (lower wins)"
+          },
+          "result": {
+            "invalid": "{{count}} invalid"
+          },
+          "scope": {
+            "all_tenants": "all tenants"
+          },
+          "table_aria": "Jobs"
+        },
+        "live_connected": "Live updates connected",
+        "overview": {
+          "actions": {
+            "queue_job": "Queue job",
+            "refresh": "Refresh"
+          },
+          "empty_summary": "No summary available.",
+          "errors": {
+            "enqueue_job": "Failed to enqueue job",
+            "load_summary": "Failed to load summary"
+          },
+          "fields": {
+            "routes": "Routes",
+            "tenant_slug": "Tenant slug"
+          },
+          "force_refresh": {
+            "description": "Queue a re-render. Leave both fields empty to refresh every tenant and route. The host processor picks the job up within about 60 seconds.",
+            "dry_run": "Dry run (plan only)",
+            "force": "Force (ignore cache)",
+            "title": "Force refresh"
+          },
+          "health": {
+            "cache_unreachable": "Cache unreachable",
+            "healthy": "Healthy",
+            "missing": "{{count}} missing",
+            "stale": "{{count}} stale"
+          },
+          "hints": {
+            "active_jobs": "{{count}} active",
+            "aging": "{{count}} aging (>7d)",
+            "asset_broken": "References dead /assets/*",
+            "backoff_window": "In 6h backoff window",
+            "cache_age": "Oldest {{oldest}} / newest {{newest}}",
+            "content_stale": "Source content newer than snapshot",
+            "event_at": "Event {{time}}",
+            "no_events": "No events",
+            "prometheus": "Prometheus text format",
+            "tenants_routes": "{{tenants}} tenants x {{routes}} routes"
+          },
+          "kpi": {
+            "age_stale": "Age stale (>14d)",
+            "asset_broken": "Asset-broken",
+            "build_commit": "Build commit",
+            "cache_size": "Cache size",
+            "content_stale": "Content stale",
+            "coverage": "Coverage",
+            "metrics": "Metrics",
+            "missing": "Missing",
+            "queued_jobs": "Queued jobs",
+            "recent_failures": "Recent failures",
+            "status": "Status"
+          },
+          "last_run": "Last completed run",
+          "messages": {
+            "job_queued": "Queued job #{{id}}"
+          },
+          "placeholders": {
+            "routes": "/about,/blog (blank = all)",
+            "tenant_slug": "e.g. hour-timebank (blank = all)"
+          },
+          "super_admin_only": "Super admin only"
+        },
+        "polling_fallback": "Polling fallback",
+        "purge": {
+          "actions": {
+            "auto_recache": "Auto-recache after purge",
+            "dry_run": "Dry run",
+            "preview_purge": "Preview purge",
+            "purge_now": "Purge now"
+          },
+          "description_middle": "for one path segment,",
+          "description_prefix": "Delete snapshots matching a glob pattern. Use",
+          "description_suffix": "for any descendant. Examples:",
+          "errors": {
+            "pattern_required": "Pattern is required (e.g. /blog/*)",
+            "purge_failed": "Purge failed"
+          },
+          "fields": {
+            "pattern": "Pattern",
+            "tenant_slug": "Tenant slug"
+          },
+          "messages": {
+            "dry_run": "Dry run: {{count}} snapshots would be purged",
+            "purged": "Purged {{count}} snapshots{{job}}"
+          },
+          "placeholders": {
+            "pattern": "/blog/* or /listings/**",
+            "tenant_slug": "optional - leave blank for all"
+          },
+          "result": {
+            "deleted": "Deleted {{count}} snapshots",
+            "would_delete": "Would delete {{count}} snapshots"
+          },
+          "title": "Wildcard cache purge"
+        },
+        "readonly": {
+          "prefix": "Read-only view - action buttons are disabled because the prerender engine operates across every tenant. Sign in with a",
+          "role": "platform super-admin",
+          "suffix": "account to enqueue jobs, purge snapshots, or trigger drift detection."
+        },
+        "sitemap_explorer": {
+          "actions": {
+            "explore": "Explore"
+          },
+          "counts": {
+            "dynamic": "{{count}} dynamic",
+            "static": "{{count}} static",
+            "total": "{{count}} total"
+          },
+          "description_prefix": "See exactly which routes the engine plans to render for a tenant - static floor (feature/module gated) plus the dynamic URLs from",
+          "description_suffix": "The Playwright worker visits this list.",
+          "error": "Lookup failed - check the tenant slug",
+          "fields": {
+            "tenant_slug": "Tenant slug"
+          },
+          "none": "(none)",
+          "placeholders": {
+            "tenant_slug": "hour-timebank"
+          },
+          "sections": {
+            "dynamic_routes": "Dynamic routes (capped at 1,000)",
+            "static_routes": "Static routes"
+          },
+          "title": "Sitemap explorer"
+        },
+        "tabs": {
+          "analytics": "Analytics",
+          "coverage": "Coverage",
+          "events": "Events",
+          "failures": "Failures",
+          "history": "History",
+          "inventory": "Inventory",
+          "jobs": "Jobs",
+          "overview": "Overview"
+        },
+        "tabs_aria": "Prerender tabs",
+        "title": "Prerender Engine",
+        "ttl_inspector": {
+          "actions": {
+            "inspect": "Inspect"
+          },
+          "description_prefix": "See which",
+          "description_suffix": "pattern owns a route and what TTL it gets, without grepping config. Used to tune the freshness policy.",
+          "error": "Lookup failed - check the route format (must start with \"/\")",
+          "fields": {
+            "route": "Route"
+          },
+          "path_only": "Path only - no scheme or host",
+          "placeholders": {
+            "route": "/blog/my-post"
+          },
+          "result": {
+            "match": "match: {{pattern}}",
+            "other_pattern_item": "{{pattern}} -> {{ttl}} (specificity {{specificity}})",
+            "other_patterns": "Other patterns that match this route:",
+            "ttl": "TTL: {{ttl}} ({{seconds}}s)"
+          },
+          "title": "TTL inspector",
+          "units": {
+            "days": "{{count}} d",
+            "hours": "{{count}} h",
+            "minutes": "{{count}} min"
+          }
+        }
+      },
+      "provider_anthropic": "Anthropic (Claude)",
       "provider_configuration_heading": "Provider Configuration",
+      "provider_gemini": "Google Gemini",
       "provider_gmail_api": "Gmail API",
+      "provider_ollama": "Ollama (Self-hosted)",
+      "provider_openai": "OpenAI",
       "provider_platform_default": "Platform Default",
       "provider_sendgrid": "SendGrid",
       "provider_smtp": "SMTP",
@@ -1253,16 +1891,23 @@ export default interface Resources {
       "sitemap_urls_by_type": "URLs by Type",
       "smtp_configuration": "SMTP Configuration",
       "social_sharing_image_heading": "Social Sharing Image",
+      "source_group": "Group",
+      "source_job": "Job",
+      "source_listing": "Listing",
+      "source_volunteering": "Volunteering",
       "status_301": "301 Permanent Redirect",
       "status_302": "302 Temporary Redirect",
       "status_fail": "Fail",
       "status_pass": "Pass",
       "status_warning": "Warning",
+      "sync_search_hint_prefix": "Run",
+      "sync_search_hint_suffix": "after Meilisearch starts.",
       "tenant_meta_heading": "Tenant Meta",
       "test_email_heading": "Test Email",
       "test_email_hint": "Enter an email address to send a test message to",
       "test_email_sent": "Test email sent",
       "test_email_sent_via": "Test email sent via",
+      "test_email_sent_via_provider": "Test email sent via {{provider}}",
       "total_count": "Total",
       "twitter_cards": "Twitter Cards",
       "twitter_cards_desc": "Configure Twitter Card meta tags for rich link previews on Twitter",
@@ -3467,6 +4112,8 @@ export default interface Resources {
     },
     "checking_permissions": "Checking Permissions",
     "clear": "Clear",
+    "clear_accent_color": "Clear accent color",
+    "clear_primary_color": "Clear primary color",
     "close": "Close",
     "common": {
       "actions": "Actions",
@@ -4405,10 +5052,36 @@ export default interface Resources {
         "page_size": "Rows per page",
         "summary": "{{from}}-{{to}} of {{total}}"
       },
+      "queues": {
+        "columns": {
+          "attempts": "Attempts",
+          "category": "Category",
+          "error": "Error",
+          "last_attempt": "Last attempt",
+          "recipient": "Recipient",
+          "source": "Source",
+          "status": "Status"
+        },
+        "empty": "No failed, suppressed, or stale email queue rows.",
+        "sources": {
+          "newsletter_queue": "Newsletter",
+          "notification_queue": "Notification"
+        },
+        "subtitle": "Failed, suppressed, or stale pending email queue rows for this tenant.",
+        "table_label": "Email queue diagnostics",
+        "title": "Queue Diagnostics"
+      },
+      "severity": {
+        "critical": "Critical",
+        "info": "Info",
+        "warning": "Warning"
+      },
       "status": {
         "bounced": "Bounced",
         "delivered": "Delivered",
         "failed": "Failed",
+        "pending": "Pending",
+        "processing": "Processing",
         "queued": "Queued",
         "sent": "Sent",
         "suppressed": "Suppressed"
@@ -4449,6 +5122,21 @@ export default interface Resources {
         "monitored": "Monitored flows",
         "warning": "Warning trigger issues"
       },
+      "trigger_issues": {
+        "all_tenants": "All tenants",
+        "columns": {
+          "event": "Event",
+          "issue": "Issue",
+          "module": "Module",
+          "params": "Evidence",
+          "severity": "Severity",
+          "tenant": "Tenant"
+        },
+        "empty": "No trigger audit issues for the selected window.",
+        "subtitle": "Source rows where an email or notification should have fired, but the audit does not have reliable delivery evidence.",
+        "table_label": "Email trigger audit issues",
+        "title": "Trigger Audit Issues"
+      },
       "trigger_score": "Trigger score",
       "warnings": {
         "critical_email_attempts_missing_tenant_context": {
@@ -4485,13 +5173,53 @@ export default interface Resources {
           "body": "Email warning checks could not complete.",
           "title": "Warning check failed"
         },
+        "event_reminders_failed_recently": {
+          "body": "{{count}} event reminders failed in the last {{window_hours}} hours.",
+          "title": "Event reminders failed"
+        },
+        "event_reminders_marked_sent_without_email_log": {
+          "body": "{{count}} email event reminders were marked sent without a matching successful email log entry in the last {{window_hours}} hours.",
+          "title": "Event reminders marked sent without email evidence"
+        },
+        "event_reminders_overdue_pending": {
+          "body": "{{count}} event reminders are still pending more than {{minutes}} minutes after their scheduled send time.",
+          "title": "Event reminders overdue"
+        },
         "group_invites_without_email_attempt": {
           "body": "{{count}} email group invites have no matching group invite email attempt in the last {{window_hours}} hours.",
           "title": "Group invite email did not trigger"
         },
+        "group_member_joined_without_owner_notification_queue": {
+          "body": "{{count}} group memberships became active without a matching owner notification queue row in the last {{window_hours}} hours.",
+          "title": "Group join notification did not queue"
+        },
+        "group_members_tenant_mismatch": {
+          "body": "{{count}} group memberships belong to a different tenant than their group. These rows risk wrong-tenant role and notification routing.",
+          "title": "Group membership tenant mismatch"
+        },
         "instant_notifications_stuck_pending": {
           "body": "{{count}} instant notification emails have been pending for more than {{minutes}} minutes.",
           "title": "Instant emails are stuck"
+        },
+        "marketplace_report_acknowledged_without_notification_outbox": {
+          "body": "{{count}} marketplace reports were acknowledged without a matching acknowledgement email notification row in the last {{window_hours}} hours.",
+          "title": "Marketplace report acknowledgement email did not queue"
+        },
+        "marketplace_report_appeal_resolved_without_notification_outbox": {
+          "body": "{{count}} marketplace report appeals were resolved without a matching final decision email notification row in the last {{window_hours}} hours.",
+          "title": "Marketplace report appeal resolution email did not queue"
+        },
+        "marketplace_report_appealed_without_notification_outbox": {
+          "body": "{{count}} marketplace report appeals were filed without a matching appeal receipt email notification row in the last {{window_hours}} hours.",
+          "title": "Marketplace report appeal email did not queue"
+        },
+        "marketplace_report_received_without_notification_outbox": {
+          "body": "{{count}} marketplace reports were received without a matching receipt email notification row in the last {{window_hours}} hours.",
+          "title": "Marketplace report receipt email did not queue"
+        },
+        "marketplace_report_resolved_without_notification_outbox": {
+          "body": "{{count}} marketplace reports were resolved without a matching resolution email notification row in the last {{window_hours}} hours.",
+          "title": "Marketplace report resolution email did not queue"
         },
         "new_users_without_account_email_attempt": {
           "body": "{{count}} new users have no account activation, verification, approval, or welcome email attempt in the last {{window_hours}} hours.",
@@ -6675,6 +7403,8 @@ export default interface Resources {
       "tab_open": "Open",
       "tab_voting": "Voting",
       "title": "Ideation",
+      "top_matches_for_user_one": "Top {{count}} match for {{name}}",
+      "top_matches_for_user_other": "Top {{count}} matches for {{name}}",
       "total_count": "Total",
       "unknown": "Unknown",
       "view_details": "View Details"
@@ -12562,6 +13292,9 @@ export default interface Resources {
         "special": "At least one special character",
         "uppercase": "At least one uppercase letter"
       },
+      "password_tip": "Tip: a passphrase like <strongExample>{{strongExample}}</strongExample> is easier to remember and stronger than <weakExample>{{weakExample}}</weakExample>",
+      "password_tip_strong_example": "CoffeeMugSunday2026",
+      "password_tip_weak_example": "P@ssw0rd!",
       "passwords_match": "Passwords match",
       "passwords_must_match": "Passwords must match",
       "phone_admin_note": "Required for account verification. Only visible to administrators.",
@@ -14561,6 +15294,11 @@ export default interface Resources {
         "verified": "Verified"
       }
     },
+    "admin_a11y": {
+      "refresh_federation_peers": "Refresh federation peers",
+      "refresh_kpi_baselines": "Refresh KPI baselines",
+      "refresh_research_partnerships": "Refresh research partnerships"
+    },
     "caregiver": {
       "burnout_high": "High caregiver load: {{hours}} hours this week",
       "burnout_moderate": "Moderate load: {{hours}} hours this week",
@@ -15540,6 +16278,7 @@ export default interface Resources {
       "webhooks_intro": "Subscribe to events with HTTPS callback URLs. Each delivery includes an X-Partner-Signature header — an HMAC-SHA256 of the raw body, keyed by the subscription secret returned at creation time.",
       "webhooks_meta_title": "API Webhooks"
     },
+    "empty_dash": "-",
     "error_boundary": {
       "component_stack": "Component Stack",
       "description": "An unexpected error occurred. Please try again or go back to the home page.",
@@ -15852,6 +16591,7 @@ export default interface Resources {
         },
         "subtitle": "See how you've used your earned hours at local businesses.",
         "table": {
+          "aria": "Loyalty redemption history",
           "credits": "Hours Used",
           "date": "Date",
           "discount": "Discount",
@@ -16167,6 +16907,7 @@ export default interface Resources {
       "volunteering": "Volunteer opportunities",
       "wallet": "Time credit balance & history"
     },
+    "not_available": "Not available",
     "oauth": {
       "callback_failed": "Sign-in failed. Please try again.",
       "callback_signing_in": "Signing you in…",
@@ -16980,6 +17721,12 @@ export default interface Resources {
       "withdraw_share_done": "Event share withdrawn."
     },
     "verein_import": {
+      "actions": {
+        "already": "already",
+        "create": "create",
+        "invalid": "invalid",
+        "link": "link"
+      },
       "confirm": "Import members",
       "csv_format": "Required header row: email,first_name,last_name,phone,role",
       "csv_label": "Or paste CSV",
@@ -17005,7 +17752,8 @@ export default interface Resources {
         "errors": "Errors",
         "name": "Name",
         "role": "Role",
-        "row": "Row"
+        "row": "Row",
+        "table_aria": "Member import preview"
       },
       "step1": "1. Upload CSV",
       "step2": "2. Review and confirm",
@@ -23382,6 +24130,100 @@ export default interface Resources {
     "views_other": "{{count}} views"
   },
   "legal": {
+    "acceptable_use": {
+      "default_platform_name": "the platform",
+      "heading": "Acceptable Use Policy",
+      "page_title": "Acceptable Use Policy",
+      "sections": {
+        "account": {
+          "items": {
+            "0": "Don't share your account credentials. You're responsible for activity under your account.",
+            "1": "Notify us promptly if you believe your account has been compromised.",
+            "2": "Don't transfer or sell your account to anyone else.",
+            "3": "Use the platform's tools to delete or export your data; don't try to extract it through automation."
+          },
+          "title": "8. Account hygiene"
+        },
+        "changes": {
+          "body": "We may update this policy as the platform and the regulatory environment evolve. Material changes will be announced and recorded in the legal version history.",
+          "title": "11. Changes"
+        },
+        "content": {
+          "items": {
+            "0": "Sexually explicit content, gratuitous violence, or shock content.",
+            "1": "Content that infringes someone else's copyright, trademark, or other intellectual property.",
+            "2": "Confidential information you're not entitled to share, such as employer secrets or protected health information.",
+            "3": "Personal data about others posted without their consent."
+          },
+          "title": "5. No prohibited content"
+        },
+        "enforcement": {
+          "appeal": "You can appeal an enforcement decision via the Contact page. Appeals are reviewed by someone not involved in the original decision.",
+          "body": "Breaches may result in content removal, warnings, temporary suspension, or permanent removal of access, proportionate to severity and history. Serious breaches may be reported to appropriate law enforcement, the relevant data protection regulator, or other competent authorities, and we may be legally obliged to do so.",
+          "title": "9. Enforcement"
+        },
+        "fraud": {
+          "items": {
+            "0": "Don't impersonate another person, organisation, or official body.",
+            "1": "Don't create fake accounts, sock-puppets, or duplicate accounts to manipulate ratings, reviews, polls, or matching.",
+            "2": "Don't misrepresent your identity, credentials, qualifications, or vetting status.",
+            "3": "Don't manipulate time-credit balances through fake exchanges, collusion, or staged transactions."
+          },
+          "title": "3. No fraud or impersonation"
+        },
+        "harm": {
+          "items": {
+            "0": "No harassment, bullying, stalking, doxxing, or coordinated targeting.",
+            "1": "No hate speech, slurs, or content that demeans people on the basis of protected characteristics.",
+            "2": "No threats, incitement, or glorification of violence.",
+            "3": "No content that sexualises children, in any form.",
+            "4": "No non-consensual sexual content, intimate-image abuse, or content posted to shame or extort.",
+            "5": "No promotion of self-harm or suicide. If you or someone you know is in crisis, contact local emergency services or a recognised helpline."
+          },
+          "title": "4. No harm to people"
+        },
+        "illegal": {
+          "body": "You must not use the platform to:",
+          "items": {
+            "0": "Carry out, plan, or facilitate anything illegal where you, the other person, or the activity is located.",
+            "1": "Offer or solicit services that require professional licensing or regulation you don't hold, such as unlicensed medical, legal, financial, electrical, gas, or childcare work.",
+            "2": "Trade in regulated or restricted goods, including alcohol, tobacco, prescription medicines, firearms, controlled drugs, or similar restricted items.",
+            "3": "Launder money or evade tax obligations."
+          },
+          "title": "2. No illegal activity"
+        },
+        "interference": {
+          "items": {
+            "0": "No probing, scanning, or testing for vulnerabilities without prior written permission. Coordinated disclosure is welcomed via the Contact page.",
+            "1": "No malware, viruses, worms, or other malicious code.",
+            "2": "No attempts to bypass authentication, rate limits, paywalls, feature gates, or moderation tools.",
+            "3": "No denial-of-service attempts or activity that materially degrades service for others.",
+            "4": "No reverse engineering, decompiling, or extracting source code, except where the AGPL-3.0 licence expressly permits it."
+          },
+          "title": "7. No interference with the platform"
+        },
+        "misuse": {
+          "items": {
+            "0": "No unsolicited bulk messaging, repeated identical posts, or promotional blasts.",
+            "1": "No scraping, mass-downloading, or automated harvesting of profiles, listings, or other data, except via documented APIs and within their rate limits.",
+            "2": "No artificial inflation of engagement, including fake likes, reviews, endorsements, matches, badges, or leaderboard positions.",
+            "3": "No referral, MLM, pyramid, or get-paid-to-click schemes.",
+            "4": "No using the platform primarily to drive traffic to an external site or service unrelated to community exchange."
+          },
+          "title": "6. No spam, abuse, or platform misuse"
+        },
+        "reporting": {
+          "body": "If you spot something that breaches this policy, use the in-product report tool on the relevant profile, listing, message, post, or event, or email the team via the Contact page. For safeguarding concerns about a child or vulnerable adult, follow the dedicated route on the Trust & Safety page.",
+          "title": "10. Reporting violations"
+        },
+        "scope": {
+          "body": "This policy applies to anyone using {{platformName}}: members, organisations, visitors, API users, and integrators. It applies to all activity on the platform, including profiles, listings, messages, events, posts, polls, jobs, files, and outbound communications sent through the platform.",
+          "title": "1. Scope"
+        }
+      },
+      "subtitle": "The specific behaviours that are not allowed on {{platformName}}. This sits alongside the Terms of Service and the Community Guidelines and applies to every account.",
+      "version": "Version 1.0 - Last updated 2026-05-13"
+    },
     "accessibility": {
       "commitment_body_1": "We believe that the internet should be accessible to everyone, regardless of ability or disability. {{name}} strives to ensure that our platform meets or exceeds the requirements of the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA.",
       "commitment_body_2": "We are continually improving the user experience for everyone and applying the relevant accessibility standards to ensure we provide equal access to all of our users.",
@@ -23428,6 +24270,91 @@ export default interface Resources {
       "tech_recommendation": "These technologies are relied upon for conformance with the accessibility standards used. We recommend using the latest version of your browser with up-to-date assistive technology for the best experience.",
       "tech_svg": "SVG with appropriate alternatives",
       "tech_title": "Technical Specifications"
+    },
+    "community_guidelines": {
+      "default_community_name": "this community",
+      "heading": "Community Guidelines",
+      "page_title": "Community Guidelines",
+      "sections": {
+        "changes": {
+          "body": "We may update these guidelines as the community grows. Material changes will be announced in the platform and recorded in the legal version history.",
+          "title": "Changes to these guidelines"
+        },
+        "enforcement": {
+          "body_appeal": "If you think a decision was wrong, you can appeal via the Contact page. We'll review it with a moderator who wasn't involved in the original decision.",
+          "body_before": "Most issues are small misunderstandings and a quiet word fixes them. For clearer breaches we use proportionate steps:",
+          "body_serious": "Serious matters, including abuse, threats, fraud, or exploitation, may be reported to appropriate law enforcement or a competent authority regardless of the platform action.",
+          "items": {
+            "0": "A reminder, for first-time, minor issues.",
+            "1": "Removal of content, such as a post, listing, or message taken down.",
+            "2": "A warning, recorded on your account.",
+            "3": "Temporary suspension, for repeated or serious issues.",
+            "4": "Permanent removal, for harassment, safeguarding breaches, fraud, threats, hate speech, or repeated suspensions."
+          },
+          "title": "7. What happens when guidelines are broken"
+        },
+        "honest": {
+          "body": "Trust is what makes a timebank work. Misrepresenting yourself or what you're offering damages the whole community.",
+          "items": {
+            "0": "Use your real name and a real photo on your profile.",
+            "1": "Describe skills, listings, and requests accurately. Don't exaggerate what you can do or how long something takes.",
+            "2": "Log hours honestly. Don't claim time you didn't give.",
+            "3": "One person, one account."
+          },
+          "title": "2. Be honest"
+        },
+        "in_person": {
+          "body": "Exchanges often involve meeting in person, sometimes in someone's home. Use ordinary common sense.",
+          "items": {
+            "0": "Read the member's profile and reviews before a first exchange.",
+            "1": "Meet in a public place for the first exchange when you can.",
+            "2": "Tell someone you trust where you're going and when you expect to be back.",
+            "3": "Stop the exchange and leave if something feels wrong. You don't owe anyone an explanation in the moment.",
+            "4": "If someone is unsafe, themselves or with others, see Trust & Safety for how to report. In an emergency, contact local emergency services first."
+          },
+          "title": "5. Look after each other in person"
+        },
+        "kind": {
+          "body": "Treat other members the way you would treat a neighbour. Disagreement is fine; contempt, name-calling, mockery, and personal attacks are not.",
+          "items": {
+            "0": "No harassment, bullying, stalking, or intimidation.",
+            "1": "No hate speech, slurs, or content that demeans people because of who they are, including race, ethnicity, nationality, religion, gender, sexuality, disability, age, or background.",
+            "2": "No threats of violence, real or implied."
+          },
+          "title": "1. Be kind and respectful"
+        },
+        "privacy": {
+          "body": "What members share inside the community stays inside the community.",
+          "items": {
+            "0": "Don't share another member's personal information, such as address, phone, photos, health details, or family situation, without their clear permission.",
+            "1": "Don't post screenshots of private messages.",
+            "2": "Don't take photos at community events without asking the people in them.",
+            "3": "Use the platform's messaging for exchange-related communication; don't push people onto outside channels before they're comfortable."
+          },
+          "title": "4. Protect privacy"
+        },
+        "relevant": {
+          "body": "This is a space for community exchange, not a marketplace, billboard, or political platform.",
+          "items": {
+            "0": "No spam, repeated promotion, or off-topic blasts.",
+            "1": "No commercial selling, recruiting, or fundraising outside the features designed for it, such as jobs, organisations, or marketplace where enabled.",
+            "2": "No campaign material, partisan organising, or content designed to inflame political conflict. Civic engagement is welcome; partisan combat is not."
+          },
+          "title": "3. Keep it relevant"
+        },
+        "report": {
+          "body_after": "Reports are reviewed by moderators and treated confidentially. We don't share your identity with the person you reported unless you've asked us to or the law requires it.",
+          "body_before": "If you see something that breaks these guidelines, or that worries you, tell us. You can:",
+          "items": {
+            "0": "Use the report button on any profile, listing, message, post, or event.",
+            "1": "Email the community team via the Contact page.",
+            "2": "For safeguarding concerns, such as a child or vulnerable adult at risk, see the Trust & Safety page for the dedicated reporting route."
+          },
+          "title": "6. Report concerns"
+        }
+      },
+      "subtitle": "How we expect everyone in {{communityName}} to treat each other. Short, plain-English, and applies to every exchange, message, post, and event.",
+      "version": "Version 1.0 - Last updated 2026-05-13"
     },
     "cookies": {
       "always_active": "Always Active",
@@ -23885,7 +24812,7 @@ export default interface Resources {
       "precautions_items": {
         "0": "Meet in a public place the first time, or bring a friend if you’re inviting someone to your home.",
         "1": "Read the other member’s reviews and check how long they’ve been on the platform.",
-        "2": "For services involving children, vulnerable adults, or work inside your home, ask about Garda vetting before agreeing.",
+        "2": "For services involving children, vulnerable adults, or work inside your home, ask about any background checks or vetting required in your jurisdiction before agreeing.",
         "3": "Trust your instincts. You can say no, end an exchange, or report a concern at any time."
       },
       "precautions_title": "Sensible precautions for a first exchange",
@@ -23908,10 +24835,10 @@ export default interface Resources {
       "safeguarding_body": "If you’re worried about a member, an exchange, or something you’ve seen on the platform, please tell us. We respond to safeguarding reports within one working day.",
       "safeguarding_step_1": "Use the Report button on the relevant listing, message, or profile.",
       "safeguarding_step_2": "Or email us via the Contact page — mark the subject as “Safeguarding”.",
-      "safeguarding_step_3": "If anyone is in immediate danger, contact An Garda Síochána on 999 or 112 first.",
+      "safeguarding_step_3": "If anyone is in immediate danger, contact local emergency services first.",
       "safeguarding_title": "Report a safeguarding concern",
       "subtitle": "{{name}} connects neighbours so they can share skills using time credits. This page explains how that works in practice — what the platform does, what it doesn’t, and how you can stay safe.",
-      "vetting_body": "Some exchanges — for example childcare, elderly care, or support for vulnerable adults — may legally require a background check or vetting under local law (such as Garda vetting in Ireland, an enhanced DBS check in the UK, or equivalent schemes elsewhere). Members offering these kinds of services are responsible for holding current, valid vetting where their jurisdiction requires it, and you’re entitled to ask to see it before you agree to an exchange. The platform doesn’t hold vetting on members’ behalf and doesn’t verify it.",
+      "vetting_body": "Some exchanges, for example childcare, elderly care, or support for vulnerable adults, may legally require a background check or vetting under local law. Members offering these kinds of services are responsible for holding current, valid vetting where their jurisdiction requires it, and you're entitled to ask to see it before you agree to an exchange. The platform doesn't hold vetting on members' behalf and doesn't verify it.",
       "vetting_title": "Background checks and vetting",
       "what_we_do_items": {
         "0": "Verifies every member’s email address at registration; offers optional photo-ID verification with a Verified Member badge for those who want extra trust signals.",
@@ -23919,7 +24846,7 @@ export default interface Resources {
         "2": "Asks every member to accept our Community Guidelines and Acceptable Use Policy at signup, and to keep to them while they’re here.",
         "3": "Gives every listing, message, and profile a Report button that goes straight to coordinators.",
         "4": "Has human coordinators who can mediate, support, and step in when something goes wrong.",
-        "5": "Connects with other timebanks across Ireland and Europe through federation, so reputation travels with you."
+        "5": "Connects with other timebanks across regions through federation, so reputation can travel with you."
       },
       "what_we_do_title": "What the platform does",
       "what_we_dont_intro": "Timebanking is built on neighbours helping neighbours, not on us standing between you. That’s a feature, not a bug — but it does mean we need to be clear about our limits.",
@@ -26333,6 +27260,31 @@ export default interface Resources {
       "subtitle_after_link": "for detailed guides.",
       "subtitle_before_link": "Can't find what you're looking for? Visit our",
       "title": "Frequently Asked Questions"
+    },
+    "features_page": {
+      "chips": {
+        "beta": "Beta",
+        "preview": "Preview"
+      },
+      "security_email": "jasper@hour-timebank.ie",
+      "tech_stack": {
+        "ai_label": "AI",
+        "ai_value": "OpenAI text-embedding-3-small",
+        "backend_label": "Backend",
+        "backend_value": "Laravel 12 + PHP 8.2+",
+        "database_label": "Database",
+        "database_value": "MariaDB 10.11",
+        "frontend_label": "Frontend",
+        "frontend_value": "React 18 + TypeScript + HeroUI + Tailwind CSS 4",
+        "infrastructure_label": "Infrastructure",
+        "infrastructure_value": "Docker, Redis, full PWA",
+        "mobile_label": "Mobile",
+        "mobile_value": "Capacitor (iOS + Android)",
+        "realtime_label": "Real-Time",
+        "realtime_value": "Pusher WebSockets, Firebase Cloud Messaging",
+        "search_label": "Search",
+        "search_value": "Meilisearch v1.7"
+      }
     },
     "home": {
       "audience_cards": {

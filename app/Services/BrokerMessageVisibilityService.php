@@ -162,32 +162,34 @@ class BrokerMessageVisibilityService
             // (BrokerRoute redirects them to /dashboard). Use the broker panel
             // path which all four notified roles (admin, tenant_admin, broker,
             // super_admin) can reach.
-            $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/broker/messages';
+            TenantContext::runForTenant($tenantId, function () use ($brokerUsers, $message, $tenantId, $senderDisplayName, $reason) {
+                $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/broker/messages';
 
-            foreach ($brokerUsers as $broker) {
-                if ((int) $broker->id === (int) $message->sender_id) {
-                    continue;
-                }
+                foreach ($brokerUsers as $broker) {
+                    if ((int) $broker->id === (int) $message->sender_id) {
+                        continue;
+                    }
 
-                // Render bell + email in each broker's preferred language.
-                LocaleContext::withLocale($broker, function () use ($broker, $tenantId, $senderDisplayName, $reason, $reviewUrl) {
-                    Notification::create([
-                        'tenant_id' => $tenantId,
-                        'user_id'   => $broker->id,
-                        'message'   => __('svc_notifications.broker.message_for_review', ['sender' => $senderDisplayName]),
-                        'link'      => '/broker/messages',
-                        'type'      => 'broker_review',
-                    ]);
+                    // Render bell + email in each broker's preferred language.
+                    LocaleContext::withLocale($broker, function () use ($broker, $tenantId, $senderDisplayName, $reason, $reviewUrl) {
+                        Notification::create([
+                            'tenant_id' => $tenantId,
+                            'user_id'   => $broker->id,
+                            'message'   => __('svc_notifications.broker.message_for_review', ['sender' => $senderDisplayName]),
+                            'link'      => '/broker/messages',
+                            'type'      => 'broker_review',
+                        ]);
 
                     // Email notification — only for high-priority reasons that affect monitored/vulnerable members
-                    if (
-                        in_array($reason, [self::REASON_FLAGGED_USER, self::REASON_HIGH_RISK_LISTING], true)
-                        && !empty($broker->email)
-                    ) {
-                        $this->sendBrokerReviewEmail($broker, $senderDisplayName, $reason, $reviewUrl);
-                    }
-                });
-            }
+                        if (
+                            in_array($reason, [self::REASON_FLAGGED_USER, self::REASON_HIGH_RISK_LISTING], true)
+                            && !empty($broker->email)
+                        ) {
+                            $this->sendBrokerReviewEmail($broker, $senderDisplayName, $reason, $reviewUrl);
+                        }
+                    });
+                }
+            });
         } catch (\Throwable $e) {
             Log::warning('[BrokerMessageVisibilityService] Admin notification error: ' . $e->getMessage());
         }
@@ -467,7 +469,7 @@ class BrokerMessageVisibilityService
 
             $subject = __('emails_misc.safeguarding.broker_message_flagged_subject', ['sender' => $senderDisplayName]);
 
-            if (!EmailDispatchService::sendRaw($broker->email, $subject, $html, null, null, null, 'safeguarding', ['tenant_id' => $broker->tenant_id ?? TenantContext::currentId()])) {
+            if (!EmailDispatchService::sendRaw($broker->email, $subject, $html, null, null, null, 'safeguarding', ['tenant_id' => (int) $broker->tenant_id])) {
                 Log::warning('[BrokerMessageVisibilityService] Broker review email failed to send', [
                     'broker_id'    => $broker->id,
                     'broker_email' => $broker->email,
