@@ -53,9 +53,11 @@ import Plus from 'lucide-react/icons/plus';
 import Users from 'lucide-react/icons/users';
 import XCircle from 'lucide-react/icons/x-circle';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import api from '@/lib/api';
+import { EmptyState, PageHeader } from '../../components';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -125,33 +127,21 @@ interface SurveyDetail {
 // Constants
 // ---------------------------------------------------------------------------
 
-const QUESTION_TYPES: Array<{ key: QuestionType; label: string }> = [
-  { key: 'single_choice', label: 'Single choice' },
-  { key: 'multi_choice', label: 'Multiple choice' },
-  { key: 'likert', label: 'Likert scale (1–5)' },
-  { key: 'yes_no', label: 'Yes / No' },
-  { key: 'open_text', label: 'Open text' },
-];
+const QUESTION_TYPES: QuestionType[] = ['single_choice', 'multi_choice', 'likert', 'yes_no', 'open_text'];
+const STATUS_FILTERS: Array<SurveyStatus | ''> = ['', 'draft', 'active', 'closed'];
 
-const STATUS_FILTERS = [
-  { key: '', label: 'All statuses' },
-  { key: 'draft', label: 'Draft' },
-  { key: 'active', label: 'Active' },
-  { key: 'closed', label: 'Closed' },
-];
-
-function statusChip(status: SurveyStatus) {
-  const map: Record<SurveyStatus, { color: 'default' | 'success' | 'secondary'; label: string }> = {
-    draft:  { color: 'default',   label: 'Draft'  },
-    active: { color: 'success',   label: 'Active' },
-    closed: { color: 'secondary', label: 'Closed' },
+function statusChip(status: SurveyStatus, label: string) {
+  const map: Record<SurveyStatus, { color: 'default' | 'success' | 'secondary' }> = {
+    draft:  { color: 'default' },
+    active: { color: 'success' },
+    closed: { color: 'secondary' },
   };
-  const { color, label } = map[status] ?? { color: 'default', label: status };
+  const { color } = map[status] ?? { color: 'default' };
   return <Chip size="sm" color={color} variant="flat">{label}</Chip>;
 }
 
-function formatDate(ts: string | null): string {
-  if (!ts) return '—';
+function formatDate(ts: string | null, fallback: string): string {
+  if (!ts) return fallback;
   return new Date(ts).toLocaleDateString();
 }
 
@@ -169,18 +159,20 @@ function emptyQuestion(idx: number): QuestionDraft {
 // Analytics Modal Content
 // ---------------------------------------------------------------------------
 
-function AnalyticsView({ analytics }: { analytics: Analytics }) {
+function AnalyticsView({ analytics, t }: { analytics: Analytics; t: TFunction<'caring_community'> }) {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center gap-2 text-sm text-default-500">
         <Users size={14} />
-        <span>Total responses: <strong>{analytics.response_count}</strong></span>
+        <span>{t('admin.surveys.analytics.total_responses')}: <strong>{analytics.response_count}</strong></span>
       </div>
 
       {analytics.questions.map((q) => (
         <div key={q.question_id} className="flex flex-col gap-2">
           <p className="font-medium text-sm">{q.question_text}</p>
-          <p className="text-xs text-default-400 capitalize">{q.question_type.replace('_', ' ')} · {q.answer_count} answer{q.answer_count !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-default-400">
+            {t(`admin.surveys.question_types.${q.question_type}`)} - {t('admin.surveys.analytics.answer_count', { count: q.answer_count })}
+          </p>
 
           {q.question_type === 'open_text' && q.verbatims && (
             <ul className="list-disc list-inside flex flex-col gap-1">
@@ -188,21 +180,21 @@ function AnalyticsView({ analytics }: { analytics: Analytics }) {
                 <li key={i} className="text-sm text-default-700">{v}</li>
               ))}
               {q.verbatims.length === 0 && (
-                <li className="text-sm text-default-400">No open-text responses yet.</li>
+                <li className="text-sm text-default-400">{t('admin.surveys.analytics.no_open_text')}</li>
               )}
             </ul>
           )}
 
           {q.breakdown && q.breakdown.map((b) => (
-            <div key={b.option} className="flex items-center gap-3">
-              <span className="text-xs w-40 shrink-0 truncate">{b.option}</span>
+            <div key={b.option} className="grid gap-2 sm:grid-cols-[minmax(0,10rem)_1fr_5rem] sm:items-center">
+              <span className="min-w-0 truncate text-xs">{b.option}</span>
               <Progress
                 aria-label={`${b.option}: ${b.percentage}%`}
                 value={b.percentage}
-                className="flex-1"
+                className="min-w-0"
                 classNames={{ indicator: 'bg-primary' }}
               />
-              <span className="text-xs text-default-500 w-20 text-right shrink-0">
+              <span className="text-xs text-default-500 sm:text-right">
                 {b.percentage}% ({b.count})
               </span>
             </div>
@@ -220,7 +212,7 @@ function AnalyticsView({ analytics }: { analytics: Analytics }) {
 export default function MunicipalSurveyAdminPage() {
   const { t } = useTranslation('caring_community');
   const { showToast } = useToast();
-  usePageTitle(t('panel.sidebar.items.surveys'));
+  usePageTitle(t('admin.surveys.meta_title'));
   const createModal    = useDisclosure();
   const analyticsModal = useDisclosure();
 
@@ -248,7 +240,7 @@ export default function MunicipalSurveyAdminPage() {
   // Per-row action state
   const [actionId, setActionId] = useState<number | null>(null);
 
-  // ── Fetch surveys ──────────────────────────────────────────────────────────
+  // Fetch surveys
 
   const fetchSurveys = useCallback(async () => {
     setLoading(true);
@@ -266,15 +258,15 @@ export default function MunicipalSurveyAdminPage() {
             : []);
       setSurveys(list);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to load surveys');
+      setError(e instanceof Error ? e.message : t('admin.surveys.errors.load'));
     } finally {
       setLoading(false);
     }
-  }, [statusFilter]);
+  }, [statusFilter, t]);
 
   useEffect(() => { void fetchSurveys(); }, [fetchSurveys]);
 
-  // ── Create survey ──────────────────────────────────────────────────────────
+  // Create survey
 
   const openCreate = () => {
     setCreateStep(1);
@@ -315,13 +307,13 @@ export default function MunicipalSurveyAdminPage() {
       createModal.onClose();
       await fetchSurveys();
     } catch (e: unknown) {
-      setCreateError(e instanceof Error ? e.message : 'Failed to create survey');
+      setCreateError(e instanceof Error ? e.message : t('admin.surveys.errors.create'));
     } finally {
       setCreating(false);
     }
   };
 
-  // ── Question builder helpers ───────────────────────────────────────────────
+  // Question builder helpers
 
   const addQuestion = () =>
     setQuestions((prev) => [...prev, emptyQuestion(prev.length)]);
@@ -338,7 +330,7 @@ export default function MunicipalSurveyAdminPage() {
       prev.map((q, i) => (i === idx ? { ...q, [key]: value } : q))
     );
 
-  // ── Publish / Close ────────────────────────────────────────────────────────
+  // Publish and close
 
   const handlePublish = async (id: number) => {
     setActionId(id);
@@ -360,7 +352,7 @@ export default function MunicipalSurveyAdminPage() {
     }
   };
 
-  // ── Analytics ──────────────────────────────────────────────────────────────
+  // Analytics
 
   const openAnalytics = async (survey: SurveyRow) => {
     setAnalyticsTitle(survey.title);
@@ -382,7 +374,7 @@ export default function MunicipalSurveyAdminPage() {
     }
   };
 
-  // ── CSV export ─────────────────────────────────────────────────────────────
+  // CSV export
 
   const handleExport = async (id: number, surveyTitle: string) => {
     try {
@@ -394,69 +386,72 @@ export default function MunicipalSurveyAdminPage() {
       showToast(t('admin.surveys.errors.export_failed'), 'error');
     }
   };
-  // Render ─────────────────────────────────────────────────────────────────
+  // Render
 
   return (
-    <>
+    <div className="space-y-6">
+      <PageHeader
+        title={t('admin.surveys.title')}
+        subtitle={t('admin.surveys.subtitle')}
+        icon={<ClipboardList size={20} />}
+        actions={(
+          <Button
+            color="primary"
+            startContent={<Plus size={16} aria-hidden="true" />}
+            onPress={openCreate}
+          >
+            {t('admin.surveys.actions.create')}
+          </Button>
+        )}
+      />
       {/* Intro card */}
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20 mb-4" shadow="none">
+      <Card className="border border-primary/30 bg-primary-50/70 shadow-sm shadow-primary/10 dark:bg-primary-900/20" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
-              <p className="text-default-600">
-                Municipal Surveys collect structured feedback from residents, municipal contacts, and
-                partners about the community care programme. Use surveys to measure resident
-                satisfaction, coordinator workload, and municipal partner sentiment. Survey responses
-                feed directly into the Pilot Scoreboard and KPI metrics. Results are anonymous unless
-                the respondent opts to be identified.
-              </p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('admin.surveys.about.title')}</p>
+              <p className="text-default-600">{t('admin.surveys.about.body')}</p>
               <div className="space-y-0.5 pt-1 text-default-500">
-                <p><strong>Draft:</strong> Not yet sent — you can still edit questions.</p>
-                <p><strong>Active:</strong> Live — respondents can submit responses.</p>
-                <p><strong>Closed:</strong> No longer accepting responses — results are finalised.</p>
+                <p><strong>{t('admin.surveys.status.draft')}:</strong> {t('admin.surveys.about.draft')}</p>
+                <p><strong>{t('admin.surveys.status.active')}:</strong> {t('admin.surveys.about.active')}</p>
+                <p><strong>{t('admin.surveys.status.closed')}:</strong> {t('admin.surveys.about.closed')}</p>
               </div>
-              <p className="text-default-500 pt-1">
-                Response data can be exported as CSV for analysis in Excel or statistical tools. The
-                platform calculates average scores and sentiment breakdowns automatically.
-              </p>
+              <p className="text-default-500 pt-1">{t('admin.surveys.about.export_note')}</p>
             </div>
           </div>
         </CardBody>
       </Card>
 
-      <Card>
+      <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
         <CardHeader className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <ClipboardList size={20} className="text-primary" />
-            <h2 className="text-lg font-semibold">Municipality Surveys (AG62)</h2>
+            <ClipboardList size={20} className="text-primary" aria-hidden="true" />
+            <div>
+              <h2 className="text-lg font-semibold">{t('admin.surveys.list.title')}</h2>
+              <p className="text-sm text-default-500">{t('admin.surveys.list.subtitle')}</p>
+            </div>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
             <Select
               size="sm"
-              aria-label="Filter by status"
+              aria-label={t('admin.surveys.filters.status')}
+              label={t('admin.surveys.filters.status')}
+              placeholder={t('admin.surveys.filters.all_statuses')}
               selectedKeys={[statusFilter]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as string ?? '';
                 setStatusFilter(val);
               }}
-              className="w-40"
+              className="w-48"
               variant="bordered"
             >
               {STATUS_FILTERS.map((f) => (
-                <SelectItem key={f.key} textValue={f.label}>
-                  {f.label}
+                <SelectItem key={f} textValue={f === '' ? t('admin.surveys.filters.all_statuses') : t(`admin.surveys.status.${f}`)}>
+                  {f === '' ? t('admin.surveys.filters.all_statuses') : t(`admin.surveys.status.${f}`)}
                 </SelectItem>
               ))}
             </Select>
-            <Button
-              color="primary"
-              startContent={<Plus size={16} />}
-              onPress={openCreate}
-            >
-              Create Survey
-            </Button>
           </div>
         </CardHeader>
         <Divider />
@@ -470,27 +465,32 @@ export default function MunicipalSurveyAdminPage() {
             <p className="text-danger text-sm">{error}</p>
           )}
           {!loading && !error && surveys.length === 0 && (
-            <p className="text-default-400 text-sm py-4">No surveys yet.</p>
+            <EmptyState
+              icon={ClipboardList}
+              title={t('admin.surveys.empty')}
+              actionLabel={t('admin.surveys.actions.create')}
+              onAction={openCreate}
+            />
           )}
           {!loading && !error && surveys.length > 0 && (
-            <Table aria-label="Municipality surveys" removeWrapper>
+            <Table aria-label={t('admin.surveys.table.aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>Title</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Questions</TableColumn>
-                <TableColumn>Responses</TableColumn>
-                <TableColumn>Anonymous</TableColumn>
-                <TableColumn>Ends</TableColumn>
-                <TableColumn>Actions</TableColumn>
+                <TableColumn>{t('admin.surveys.table.title')}</TableColumn>
+                <TableColumn>{t('admin.surveys.table.status')}</TableColumn>
+                <TableColumn>{t('admin.surveys.table.questions')}</TableColumn>
+                <TableColumn>{t('admin.surveys.table.responses')}</TableColumn>
+                <TableColumn>{t('admin.surveys.table.anonymous')}</TableColumn>
+                <TableColumn>{t('admin.surveys.table.ends')}</TableColumn>
+                <TableColumn>{t('admin.surveys.table.actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {surveys.map((survey) => (
                   <TableRow key={survey.id}>
                     <TableCell>
                       <p className="font-medium text-sm">{survey.title}</p>
-                      <p className="text-xs text-default-400">{formatDate(survey.created_at)}</p>
+                      <p className="text-xs text-default-400">{formatDate(survey.created_at, t('admin.surveys.common.date_unknown'))}</p>
                     </TableCell>
-                    <TableCell>{statusChip(survey.status)}</TableCell>
+                    <TableCell>{statusChip(survey.status, t(`admin.surveys.status.${survey.status}`))}</TableCell>
                     <TableCell>
                       <span className="text-sm">{survey.question_count}</span>
                     </TableCell>
@@ -502,13 +502,13 @@ export default function MunicipalSurveyAdminPage() {
                     </TableCell>
                     <TableCell>
                       {survey.is_anonymous ? (
-                        <Chip size="sm" color="default" variant="flat">Yes</Chip>
+                        <Chip size="sm" color="default" variant="flat">{t('admin.surveys.common.yes')}</Chip>
                       ) : (
-                        <span className="text-xs text-default-400">No</span>
+                        <span className="text-xs text-default-400">{t('admin.surveys.common.no')}</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs">{formatDate(survey.ends_at)}</span>
+                      <span className="text-xs">{formatDate(survey.ends_at, t('admin.surveys.common.date_unknown'))}</span>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2 flex-wrap">
@@ -521,7 +521,7 @@ export default function MunicipalSurveyAdminPage() {
                             isLoading={actionId === survey.id}
                             onPress={() => void handlePublish(survey.id)}
                           >
-                            Publish
+                            {t('admin.surveys.actions.publish')}
                           </Button>
                         )}
                         {survey.status === 'active' && (
@@ -533,7 +533,7 @@ export default function MunicipalSurveyAdminPage() {
                             isLoading={actionId === survey.id}
                             onPress={() => void handleClose(survey.id)}
                           >
-                            Close
+                            {t('admin.surveys.actions.close')}
                           </Button>
                         )}
                         <Button
@@ -542,7 +542,7 @@ export default function MunicipalSurveyAdminPage() {
                           startContent={<Eye size={12} />}
                           onPress={() => void openAnalytics(survey)}
                         >
-                          Analytics
+                          {t('admin.surveys.actions.analytics')}
                         </Button>
                         <Button
                           size="sm"
@@ -550,7 +550,7 @@ export default function MunicipalSurveyAdminPage() {
                           startContent={<Download size={12} />}
                           onPress={() => void handleExport(survey.id, survey.title)}
                         >
-                          CSV
+                          {t('admin.surveys.actions.csv')}
                         </Button>
                       </div>
                     </TableCell>
@@ -562,7 +562,7 @@ export default function MunicipalSurveyAdminPage() {
         </CardBody>
       </Card>
 
-      {/* ── Create Survey Modal ────────────────────────────────────────────── */}
+      {/* Create survey modal */}
       <Modal
         isOpen={createModal.isOpen}
         onClose={createModal.onClose}
@@ -573,14 +573,14 @@ export default function MunicipalSurveyAdminPage() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <ClipboardList size={18} className="text-primary" />
-            Create Survey — Step {createStep} of 2
+            {t('admin.surveys.create_modal.title', { step: createStep })}
           </ModalHeader>
           <ModalBody>
             {createStep === 1 && (
               <div className="flex flex-col gap-4">
                 <Input
-                  label="Survey title"
-                  placeholder="e.g. Satisfaction with local cycling lanes"
+                  label={t('admin.surveys.fields.title')}
+                  placeholder={t('admin.surveys.fields.title_placeholder')}
                   value={title}
                   onValueChange={setTitle}
                   isRequired
@@ -588,8 +588,8 @@ export default function MunicipalSurveyAdminPage() {
                   maxLength={255}
                 />
                 <Textarea
-                  label="Description (optional)"
-                  placeholder="Briefly explain what this survey is about and why it matters."
+                  label={t('admin.surveys.fields.description')}
+                  placeholder={t('admin.surveys.fields.description_placeholder')}
                   value={description}
                   onValueChange={setDescription}
                   variant="bordered"
@@ -603,28 +603,26 @@ export default function MunicipalSurveyAdminPage() {
                     size="sm"
                   />
                   <div>
-                    <p className="text-sm font-medium">Anonymous responses</p>
+                    <p className="text-sm font-medium">{t('admin.surveys.fields.anonymous')}</p>
                     <p className="text-xs text-default-400">
-                      When enabled, respondent identities are NOT stored.
+                      {t('admin.surveys.fields.anonymous_help')}
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-3">
+                <div className="grid gap-3 sm:grid-cols-2">
                   <Input
-                    label="Opens at (optional)"
+                    label={t('admin.surveys.fields.starts_at')}
                     type="datetime-local"
                     value={startsAt}
                     onValueChange={setStartsAt}
                     variant="bordered"
-                    className="flex-1"
                   />
                   <Input
-                    label="Closes at (optional)"
+                    label={t('admin.surveys.fields.ends_at')}
                     type="datetime-local"
                     value={endsAt}
                     onValueChange={setEndsAt}
                     variant="bordered"
-                    className="flex-1"
                   />
                 </div>
               </div>
@@ -633,14 +631,14 @@ export default function MunicipalSurveyAdminPage() {
             {createStep === 2 && (
               <div className="flex flex-col gap-6">
                 <p className="text-sm text-default-500">
-                  Add the questions respondents will see. At least one question required to publish.
+                  {t('admin.surveys.create_modal.questions_intro')}
                 </p>
                 {questions.map((q, idx) => (
                   <Card key={idx} className="border border-default-200" shadow="none">
                     <CardBody className="flex flex-col gap-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-default-500 uppercase tracking-wide">
-                          Question {idx + 1}
+                          {t('admin.surveys.create_modal.question_number', { number: idx + 1 })}
                         </span>
                         {questions.length > 1 && (
                           <Button
@@ -649,12 +647,12 @@ export default function MunicipalSurveyAdminPage() {
                             variant="light"
                             onPress={() => removeQuestion(idx)}
                           >
-                            Remove
+                            {t('admin.surveys.actions.remove')}
                           </Button>
                         )}
                       </div>
                       <Input
-                        label="Question text"
+                        label={t('admin.surveys.fields.question_text')}
                         value={q.question_text}
                         onValueChange={(v) => updateQuestion(idx, 'question_text', v)}
                         variant="bordered"
@@ -662,7 +660,7 @@ export default function MunicipalSurveyAdminPage() {
                         isRequired
                       />
                       <Select
-                        label="Question type"
+                        label={t('admin.surveys.fields.question_type')}
                         selectedKeys={[q.question_type]}
                         onSelectionChange={(keys) => {
                           const val = Array.from(keys)[0] as QuestionType;
@@ -671,25 +669,25 @@ export default function MunicipalSurveyAdminPage() {
                         variant="bordered"
                       >
                         {QUESTION_TYPES.map((qt) => (
-                          <SelectItem key={qt.key} textValue={qt.label}>
-                            {qt.label}
+                          <SelectItem key={qt} textValue={t(`admin.surveys.question_types.${qt}`)}>
+                            {t(`admin.surveys.question_types.${qt}`)}
                           </SelectItem>
                         ))}
                       </Select>
                       {['single_choice', 'multi_choice'].includes(q.question_type) && (
                         <Textarea
-                          label="Options (one per line)"
-                          placeholder={"Option A\nOption B\nOption C"}
+                          label={t('admin.surveys.fields.options')}
+                          placeholder={t('admin.surveys.fields.options_placeholder')}
                           value={q.options}
                           onValueChange={(v) => updateQuestion(idx, 'options', v)}
                           variant="bordered"
                           minRows={3}
-                          description="Each line becomes one selectable option."
+                          description={t('admin.surveys.fields.options_help')}
                         />
                       )}
                       {q.question_type === 'likert' && (
                         <p className="text-xs text-default-400">
-                          Likert scale uses the standard 5-point scale (Very dissatisfied → Very satisfied).
+                          {t('admin.surveys.fields.likert_help')}
                         </p>
                       )}
                       <div className="flex items-center gap-2">
@@ -698,7 +696,7 @@ export default function MunicipalSurveyAdminPage() {
                           onValueChange={(v) => updateQuestion(idx, 'is_required', v)}
                           size="sm"
                         />
-                        <span className="text-sm">Required</span>
+                        <span className="text-sm">{t('admin.surveys.fields.required')}</span>
                       </div>
                     </CardBody>
                   </Card>
@@ -709,7 +707,7 @@ export default function MunicipalSurveyAdminPage() {
                   onPress={addQuestion}
                   className="w-full"
                 >
-                  Add question
+                  {t('admin.surveys.actions.add_question')}
                 </Button>
                 {createError && <p className="text-danger text-sm">{createError}</p>}
               </div>
@@ -722,7 +720,7 @@ export default function MunicipalSurveyAdminPage() {
                 onPress={() => setCreateStep(1)}
                 isDisabled={creating}
               >
-                Back
+                {t('admin.surveys.actions.back')}
               </Button>
             )}
             <Button
@@ -730,7 +728,7 @@ export default function MunicipalSurveyAdminPage() {
               onPress={createModal.onClose}
               isDisabled={creating}
             >
-              Cancel
+              {t('admin.surveys.actions.cancel')}
             </Button>
             {createStep === 1 && (
               <Button
@@ -738,7 +736,7 @@ export default function MunicipalSurveyAdminPage() {
                 onPress={() => setCreateStep(2)}
                 isDisabled={!title.trim()}
               >
-                Next: Questions
+                {t('admin.surveys.actions.next_questions')}
               </Button>
             )}
             {createStep === 2 && (
@@ -749,14 +747,14 @@ export default function MunicipalSurveyAdminPage() {
                 isLoading={creating}
                 isDisabled={creating}
               >
-                Create Survey
+                {t('admin.surveys.actions.create')}
               </Button>
             )}
           </ModalFooter>
         </ModalContent>
       </Modal>
 
-      {/* ── Analytics Modal ────────────────────────────────────────────────── */}
+      {/* Analytics modal */}
       <Modal
         isOpen={analyticsModal.isOpen}
         onClose={analyticsModal.onClose}
@@ -766,7 +764,7 @@ export default function MunicipalSurveyAdminPage() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <BarChart3 size={18} className="text-primary" />
-            Analytics — {analyticsTitle}
+            {t('admin.surveys.analytics.modal_title', { title: analyticsTitle })}
           </ModalHeader>
           <ModalBody>
             {analyticsLoading && (
@@ -775,17 +773,17 @@ export default function MunicipalSurveyAdminPage() {
               </div>
             )}
             {!analyticsLoading && analyticsData && (
-              <AnalyticsView analytics={analyticsData} />
+              <AnalyticsView analytics={analyticsData} t={t} />
             )}
             {!analyticsLoading && !analyticsData && (
-              <p className="text-default-400 text-sm py-4">No analytics data available yet.</p>
+              <p className="text-default-400 text-sm py-4">{t('admin.surveys.analytics.empty')}</p>
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={analyticsModal.onClose}>Close</Button>
+            <Button variant="flat" onPress={analyticsModal.onClose}>{t('admin.surveys.actions.close_modal')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </>
+    </div>
   );
 }

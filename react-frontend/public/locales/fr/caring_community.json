@@ -612,7 +612,99 @@
     },
     "surveys": {
       "errors": {
-        "export_failed": "Failed to export survey responses."
+        "export_failed": "Failed to export survey responses.",
+        "load": "Failed to load surveys",
+        "create": "Failed to create survey"
+      },
+      "meta_title": "Municipality Surveys",
+      "title": "Municipality Surveys",
+      "subtitle": "Collect structured feedback from residents, municipal partners, and programme teams.",
+      "empty": "No surveys yet.",
+      "about": {
+        "title": "About this page",
+        "body": "Municipal surveys collect structured feedback from residents, municipal contacts, and partners about the community care programme. Use surveys to measure resident satisfaction, coordinator workload, and municipal partner sentiment. Survey responses feed directly into the pilot scoreboard and KPI metrics. Results are anonymous unless the respondent opts to be identified.",
+        "draft": "Not yet sent; you can still edit questions.",
+        "active": "Live; respondents can submit responses.",
+        "closed": "No longer accepting responses; results are finalised.",
+        "export_note": "Response data can be exported as CSV for analysis in Excel or statistical tools. The platform calculates average scores and sentiment breakdowns automatically."
+      },
+      "list": {
+        "title": "Municipality surveys",
+        "subtitle": "Manage survey launches, response counts, analytics, and exports."
+      },
+      "filters": {
+        "status": "Filter by status",
+        "all_statuses": "All statuses"
+      },
+      "status": {
+        "draft": "Draft",
+        "active": "Active",
+        "closed": "Closed"
+      },
+      "question_types": {
+        "single_choice": "Single choice",
+        "multi_choice": "Multiple choice",
+        "likert": "Likert scale (1-5)",
+        "yes_no": "Yes / No",
+        "open_text": "Open text"
+      },
+      "table": {
+        "aria": "Municipality surveys",
+        "title": "Title",
+        "status": "Status",
+        "questions": "Questions",
+        "responses": "Responses",
+        "anonymous": "Anonymous",
+        "ends": "Ends",
+        "actions": "Actions"
+      },
+      "actions": {
+        "create": "Create survey",
+        "publish": "Publish",
+        "close": "Close",
+        "analytics": "Analytics",
+        "csv": "CSV",
+        "remove": "Remove",
+        "add_question": "Add question",
+        "back": "Back",
+        "cancel": "Cancel",
+        "next_questions": "Next: questions",
+        "close_modal": "Close"
+      },
+      "fields": {
+        "title": "Survey title",
+        "title_placeholder": "e.g. Satisfaction with local cycling lanes",
+        "description": "Description (optional)",
+        "description_placeholder": "Briefly explain what this survey is about and why it matters.",
+        "anonymous": "Anonymous responses",
+        "anonymous_help": "When enabled, respondent identities are not stored.",
+        "starts_at": "Opens at (optional)",
+        "ends_at": "Closes at (optional)",
+        "question_text": "Question text",
+        "question_type": "Question type",
+        "options": "Options (one per line)",
+        "options_placeholder": "Option A\nOption B\nOption C",
+        "options_help": "Each line becomes one selectable option.",
+        "likert_help": "Likert scale uses the standard 5-point scale from very dissatisfied to very satisfied.",
+        "required": "Required"
+      },
+      "create_modal": {
+        "title": "Create survey - step {{step}} of 2",
+        "questions_intro": "Add the questions respondents will see. At least one question is required to publish.",
+        "question_number": "Question {{number}}"
+      },
+      "analytics": {
+        "total_responses": "Total responses",
+        "answer_count_one": "{{count}} answer",
+        "answer_count_other": "{{count}} answers",
+        "no_open_text": "No open-text responses yet.",
+        "modal_title": "Analytics - {{title}}",
+        "empty": "No analytics data available yet."
+      },
+      "common": {
+        "yes": "Yes",
+        "no": "No",
+        "date_unknown": "Not set"
       }
     },
     "feedback": {
