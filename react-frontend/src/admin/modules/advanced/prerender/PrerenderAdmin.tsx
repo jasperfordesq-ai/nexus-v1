@@ -1913,7 +1913,7 @@ function EventsTab() {
                 ev === 'partial' ? 'warning' :
                 ev === 'fail' ? 'danger' :
                 ev === 'supersede' ? 'warning' : 'default';
-              const { ts, event, commit, pid, host, ...rest } = e;
+              const { ts, commit, pid, host, ...rest } = e;
               return (
                 <TableRow key={idx}>
                   <TableCell className="text-xs">{ts ? formatTs(ts) : '—'}</TableCell>
