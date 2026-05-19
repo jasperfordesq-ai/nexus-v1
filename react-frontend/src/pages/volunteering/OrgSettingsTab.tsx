@@ -35,7 +35,7 @@ export default function OrgSettingsTab({ orgId, orgData, onOrgUpdate }: OrgSetti
 
   async function handleSave() {
     if (!name.trim()) {
-      toast.error(t('org_settings.name_required', 'Organization name is required.'));
+      toast.error(t('org_settings.name_required'));
       return;
     }
     setIsSaving(true);
@@ -47,14 +47,14 @@ export default function OrgSettingsTab({ orgId, orgData, onOrgUpdate }: OrgSetti
         website: website.trim(),
       });
       if (response.success) {
-        toast.success(t('org_settings.saved', 'Organization settings saved.'));
+        toast.success(t('org_settings.saved'));
         onOrgUpdate();
       } else {
-        toast.error(response.error || t('org_settings.save_failed', 'Failed to save settings.'));
+        toast.error(response.error || t('org_settings.save_failed'));
       }
     } catch (err) {
       logError('Failed to save org settings', err);
-      toast.error(t('org_settings.save_failed', 'Failed to save settings.'));
+      toast.error(t('org_settings.save_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -68,12 +68,12 @@ export default function OrgSettingsTab({ orgId, orgData, onOrgUpdate }: OrgSetti
             <Building2 className="w-5 h-5 text-white" aria-hidden="true" />
           </div>
           <h2 className="text-lg font-semibold text-theme-primary">
-            {t('org_settings.heading', 'Organization Settings')}
+            {t('org_settings.heading')}
           </h2>
         </div>
 
         <Input
-          label={t('org_settings.name', 'Organization Name')}
+          label={t('org_settings.name')}
           value={name}
           onValueChange={setName}
           isRequired
@@ -82,7 +82,7 @@ export default function OrgSettingsTab({ orgId, orgData, onOrgUpdate }: OrgSetti
         />
 
         <Textarea
-          label={t('org_settings.description', 'Description')}
+          label={t('org_settings.description')}
           value={description}
           onValueChange={setDescription}
           variant="bordered"
@@ -92,7 +92,7 @@ export default function OrgSettingsTab({ orgId, orgData, onOrgUpdate }: OrgSetti
         />
 
         <Input
-          label={t('org_settings.contact_email', 'Contact Email')}
+          label={t('org_settings.contact_email')}
           value={contactEmail}
           onValueChange={setContactEmail}
           type="email"
@@ -101,7 +101,7 @@ export default function OrgSettingsTab({ orgId, orgData, onOrgUpdate }: OrgSetti
         />
 
         <Input
-          label={t('org_settings.website', 'Website')}
+          label={t('org_settings.website')}
           value={website}
           onValueChange={setWebsite}
           type="url"
@@ -113,11 +113,12 @@ export default function OrgSettingsTab({ orgId, orgData, onOrgUpdate }: OrgSetti
         <div className="flex justify-end pt-2">
           <Button
             color="primary"
+            className="w-full sm:w-auto"
             isLoading={isSaving}
             startContent={!isSaving ? <Save className="w-4 h-4" /> : undefined}
             onPress={handleSave}
           >
-            {t('org_settings.save', 'Save Changes')}
+            {t('org_settings.save')}
           </Button>
         </div>
       </GlassCard>

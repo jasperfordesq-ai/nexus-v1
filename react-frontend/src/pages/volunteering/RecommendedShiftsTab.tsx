@@ -147,12 +147,12 @@ export function RecommendedShiftsTab() {
         const items = Array.isArray(payload) ? payload : (payload.shifts ?? []);
         setShifts(items.map(normalizeRecommendedShift));
       } else {
-        setError(tRef.current('recommendations.error_load', 'Failed to load recommendations'));
+        setError(tRef.current('recommendations.error_load'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load recommended shifts', err);
-      setError(tRef.current('recommendations.error_load_generic', 'Unable to load recommendations. Please try again.'));
+      setError(tRef.current('recommendations.error_load_generic'));
     } finally {
       setIsLoading(false);
     }
@@ -181,10 +181,10 @@ export function RecommendedShiftsTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-amber-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">{t('recommendations.title', 'Recommended for You')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('recommendations.title')}</h2>
         </div>
         <Button
           size="sm"
@@ -194,7 +194,7 @@ export function RecommendedShiftsTab() {
           onPress={load}
           isLoading={isLoading}
         >
-          {t('common.refresh', 'Refresh')}
+          {t('common.refresh')}
         </Button>
       </div>
 
@@ -206,7 +206,7 @@ export function RecommendedShiftsTab() {
             className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
             onPress={load}
           >
-            {t('common.try_again', 'Try Again')}
+            {t('common.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -226,8 +226,8 @@ export function RecommendedShiftsTab() {
       {!error && !isLoading && shifts.length === 0 && (
         <EmptyState
           icon={<Target className="w-12 h-12" aria-hidden="true" />}
-          title={t('recommendations.empty_title', 'No recommendations yet')}
-          description={t('recommendations.empty_description', 'Add skills to your profile to get personalized shift recommendations.')}
+          title={t('recommendations.empty_title')}
+          description={t('recommendations.empty_description')}
         />
       )}
 
@@ -241,7 +241,7 @@ export function RecommendedShiftsTab() {
           {shifts.map((item) => (
             <motion.div key={item.shift.id} variants={itemVariants}>
               <GlassCard className="p-5">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <h3 className="font-semibold text-theme-primary">{item.opportunity.title}</h3>
@@ -251,7 +251,7 @@ export function RecommendedShiftsTab() {
                         variant="flat"
                         startContent={<Zap className="w-3 h-3" />}
                       >
-                        {t('recommendations.match_score', '{{score}}% match', { score: item.match_score })}
+                        {t('recommendations.match_score', { score: item.match_score })}
                       </Chip>
                     </div>
 
@@ -300,7 +300,7 @@ export function RecommendedShiftsTab() {
                     )}
                   </div>
 
-                  <div className="flex-shrink-0 flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-stretch gap-2 sm:flex-shrink-0 sm:items-center">
                     <div className="w-14 h-14 relative">
                       <Progress
                         value={item.match_score}
@@ -322,7 +322,7 @@ export function RecommendedShiftsTab() {
                       endContent={<ExternalLink className="w-3 h-3" aria-hidden="true" />}
                       onPress={() => navigate(tenantPath(`/volunteering/opportunities/${item.opportunity.id}`))}
                     >
-                      {t('recommendations.view_opportunity', 'View')}
+                      {t('recommendations.view_opportunity')}
                     </Button>
                   </div>
                 </div>

@@ -77,12 +77,12 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
         cursorRef.current = cursor;
         setHasMore(has_more);
       } else {
-        toastRef.current.error(t('org_volunteers.load_failed', 'Failed to load volunteers.'));
+        toastRef.current.error(t('org_volunteers.load_failed'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load volunteers', err);
-      toastRef.current.error(t('org_volunteers.load_failed', 'Failed to load volunteers.'));
+      toastRef.current.error(t('org_volunteers.load_failed'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
@@ -111,8 +111,8 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center mx-auto mb-4">
           <Users className="w-7 h-7 text-[var(--color-info)]" aria-hidden="true" />
         </div>
-        <p className="text-theme-muted">{t('org_volunteers.none', 'No approved volunteers yet.')}</p>
-        <p className="text-sm text-theme-subtle mt-1">{t('org_volunteers.none_desc', 'Volunteers will appear here after their applications are approved.')}</p>
+        <p className="text-theme-muted">{t('org_volunteers.none')}</p>
+        <p className="text-sm text-theme-subtle mt-1">{t('org_volunteers.none_desc')}</p>
       </GlassCard>
     );
   }
@@ -123,7 +123,7 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
         <div className="flex items-center gap-3 mb-4">
           <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
             <Users className="w-5 h-5 text-blue-400" aria-hidden="true" />
-            {t('org_volunteers.heading', 'Volunteer Roster')}
+            {t('org_volunteers.heading')}
           </h2>
           <span className="text-sm text-theme-muted">({volunteers.length}{hasMore ? '+' : ''})</span>
         </div>
@@ -147,11 +147,11 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
               <div className="flex items-center gap-4 text-sm">
                 <div className="text-center">
                   <p className="font-semibold text-theme-primary">{t('hours_abbrev', { hours: vol.total_hours })}</p>
-                  <p className="text-xs text-theme-subtle">{t('org_volunteers.hours', 'Hours')}</p>
+                  <p className="text-xs text-theme-subtle">{t('org_volunteers.hours')}</p>
                 </div>
                 <div className="text-center">
                   <p className="font-semibold text-theme-primary">{vol.applications_count}</p>
-                  <p className="text-xs text-theme-subtle">{t('org_volunteers.roles', 'Roles')}</p>
+                  <p className="text-xs text-theme-subtle">{t('org_volunteers.roles')}</p>
                 </div>
               </div>
             </div>
@@ -168,7 +168,7 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
               isDisabled={isLoadingMore}
               onPress={() => loadVolunteers(true)}
             >
-              {t('load_more', 'Load more')}
+              {t('load_more')}
             </Button>
           </div>
         )}
