@@ -893,7 +893,7 @@ class NotificationDispatcher
     /**
      * Send review received email to a user.
      */
-    public static function sendReviewEmail(int $receiverUserId, string $reviewerName, int $rating, ?string $comment = null, bool $isAnonymous = false): void
+    public static function sendReviewEmail(int $receiverUserId, string $reviewerName, int $rating, ?string $comment = null, bool $isAnonymous = false): ?bool
     {
         try {
             $tenantId = TenantContext::getId();
@@ -905,7 +905,7 @@ class NotificationDispatcher
                 ->first();
 
             if (!$user || empty($user->email)) {
-                return;
+                return null;
             }
 
             // Honour `email_reviews`. ReviewsController used to call this
@@ -915,7 +915,7 @@ class NotificationDispatcher
             try {
                 $prefs = \App\Models\User::getNotificationPreferences($receiverUserId);
                 if (!(bool) ($prefs['email_reviews'] ?? true)) {
-                    return;
+                    return null;
                 }
             } catch (\Throwable $prefError) {
                 Log::debug('sendReviewEmail: could not read email_reviews pref', [
@@ -925,7 +925,7 @@ class NotificationDispatcher
             }
 
             // Render subject + body under the receiver's preferred locale.
-            LocaleContext::withLocale($user, function () use ($user, $receiverUserId, $reviewerName, $rating, $comment, $isAnonymous, $tenantId) {
+            return (bool) LocaleContext::withLocale($user, function () use ($user, $receiverUserId, $reviewerName, $rating, $comment, $isAnonymous, $tenantId): bool {
                 $recipientName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $baseUrl = TenantContext::getFrontendUrl();
@@ -948,10 +948,14 @@ class NotificationDispatcher
                     Log::warning('NotificationDispatcher::sendReviewEmail mailer returned false', [
                         'user_id' => $receiverUserId,
                     ]);
+                    return false;
                 }
+
+                return true;
             });
         } catch (\Exception $e) {
             Log::warning("NotificationDispatcher::sendReviewEmail failed: " . $e->getMessage());
+            return false;
         }
     }
 

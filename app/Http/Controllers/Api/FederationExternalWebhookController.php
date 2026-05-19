@@ -464,14 +464,24 @@ class FederationExternalWebhookController extends BaseApiController
             throw new InboundValidationException("Receiver user #{$receiverId} not found in this tenant", 'receiver_id');
         }
 
-        // Dedup by (external_partner_id, external_id) stored in comment-tagged pattern —
-        // since reviews has no external_id column, we dedup via federation_transaction_id
-        // when provided, otherwise via comment prefix or just allow multiple.
+        // Dedup by durable external identity. Older schemas did not have these
+        // columns, so retain the transaction-based fallback until every env has
+        // run the migration.
         $externalTxId = $this->optionalString($data, 'external_transaction_id', 128);
         $reviewerExternalId = (int) ($data['reviewer_external_id'] ?? $data['reviewer_id'] ?? 0);
         $reviewerTenantId = (int) ($data['reviewer_tenant_id'] ?? 0);
 
         $existing = null;
+        $hasExternalIdentity = Schema::hasColumn('reviews', 'external_partner_id')
+            && Schema::hasColumn('reviews', 'external_id');
+        if ($hasExternalIdentity) {
+            $existing = DB::table('reviews')
+                ->where('tenant_id', $tenantId)
+                ->where('external_partner_id', (int) $partner->id)
+                ->where('external_id', $externalId)
+                ->first(['id']);
+        }
+
         if ($externalTxId) {
             $tx = DB::table('federation_transactions')
                 ->where('external_transaction_id', $externalTxId)
@@ -492,7 +502,7 @@ class FederationExternalWebhookController extends BaseApiController
 
         $comment = $this->optionalString($data, 'comment', 5000);
 
-        $localId = DB::table('reviews')->insertGetId([
+        $reviewRow = [
             'tenant_id'          => $tenantId,
             'reviewer_id'        => $reviewerExternalId,
             'reviewer_tenant_id' => $reviewerTenantId ?: null,
@@ -504,7 +514,30 @@ class FederationExternalWebhookController extends BaseApiController
             'review_type'        => 'federated',
             'show_cross_tenant'  => 1,
             'created_at'         => now(),
-        ]);
+        ];
+
+        if ($hasExternalIdentity) {
+            $reviewRow['external_partner_id'] = (int) $partner->id;
+            $reviewRow['external_id'] = $externalId;
+        }
+
+        try {
+            $localId = DB::table('reviews')->insertGetId($reviewRow);
+        } catch (QueryException $e) {
+            if ($hasExternalIdentity && $this->isDuplicateKeyException($e)) {
+                $duplicate = DB::table('reviews')
+                    ->where('tenant_id', $tenantId)
+                    ->where('external_partner_id', (int) $partner->id)
+                    ->where('external_id', $externalId)
+                    ->first(['id']);
+
+                if ($duplicate) {
+                    return ['status' => 'duplicate', 'local_id' => (int) $duplicate->id];
+                }
+            }
+
+            throw $e;
+        }
 
         $shadowRow = [
             'id' => $localId,

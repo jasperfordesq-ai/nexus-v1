@@ -12,9 +12,11 @@ use App\Core\TenantContext;
 use App\Events\FederatedReviewReceived;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
+use App\Services\NotificationDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * HandleFederatedReviewReceived — notify a local user when a partner federation
@@ -37,9 +39,12 @@ class HandleFederatedReviewReceived implements ShouldQueue
 
     public array $backoff = [30, 120, 300];
 
+    private int $currentReviewId = 0;
+
     public function handle(FederatedReviewReceived $event): void
     {
         $previousTenantId = TenantContext::currentId();
+        $this->currentReviewId = $event->localId;
 
         try {
             if (!TenantContext::setById($event->tenantId)) {
@@ -92,25 +97,44 @@ class HandleFederatedReviewReceived implements ShouldQueue
             // the external user id but not their name. Use the locale-aware
             // "Someone" fallback in the email body via $isAnonymous = true.
             LocaleContext::withLocale($receiver, function () use ($receiver, $receiverId, $rating, $comment) {
-                Notification::createNotification(
-                    $receiverId,
-                    __('notifications.review_received_in_app', [
-                        'name'   => __('emails.notification.someone'),
-                        'rating' => $rating,
-                    ]),
-                    '/profile/' . $receiverId . '/reviews',
-                    'federation_review'
-                );
+                if ($this->claimReviewSideEffect('notification_sent_at', 'notification_claimed_at')) {
+                    Notification::createNotification(
+                        $receiverId,
+                        __('notifications.review_received_in_app', [
+                            'name'   => __('emails.notification.someone'),
+                            'rating' => $rating,
+                        ]),
+                        '/profile/' . $receiverId . '/reviews',
+                        'federation_review'
+                    );
+                    $this->markReviewSideEffectSent('notification_sent_at');
+                }
 
                 // Email honours $prefs['email_reviews']. Anonymous flag flips
                 // the rendered name to a locale-aware "Someone".
-                \App\Services\NotificationDispatcher::sendReviewEmail(
-                    $receiverId,
-                    '', // reviewer name unknown — sendReviewEmail handles anonymous
-                    $rating,
-                    is_string($comment) ? $comment : null,
-                    true
-                );
+                if ($this->claimReviewSideEffect('email_sent_at', 'email_claimed_at', 'email_skipped_at')) {
+                    $emailSent = NotificationDispatcher::sendReviewEmail(
+                        $receiverId,
+                        '', // reviewer name unknown — sendReviewEmail handles anonymous
+                        $rating,
+                        is_string($comment) ? $comment : null,
+                        true
+                    );
+
+                    if ($emailSent === true) {
+                        $this->markReviewSideEffectSent('email_sent_at', [
+                            'email_failed_at' => null,
+                            'email_last_error' => null,
+                        ]);
+                    } elseif ($emailSent === null) {
+                        $this->markReviewSideEffectSent('email_skipped_at', [
+                            'email_failed_at' => null,
+                            'email_last_error' => null,
+                        ]);
+                    } else {
+                        $this->markReviewEmailFailed('Email dispatch returned false');
+                    }
+                }
             });
 
             Log::info('[HandleFederatedReviewReceived] notified reviewee', [
@@ -128,7 +152,84 @@ class HandleFederatedReviewReceived implements ShouldQueue
                 'error'      => $e->getMessage(),
             ]);
         } finally {
+            $this->currentReviewId = 0;
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
+    }
+
+    private function claimReviewSideEffect(string $sentColumn, string $claimColumn, ?string $skipColumn = null): bool
+    {
+        if (!Schema::hasColumn('reviews', $sentColumn) || !Schema::hasColumn('reviews', $claimColumn)) {
+            return true;
+        }
+
+        $reviewId = $this->currentReviewId();
+        if ($reviewId <= 0) {
+            return true;
+        }
+
+        $query = DB::table('reviews')
+            ->where('tenant_id', TenantContext::getId())
+            ->where('id', $reviewId)
+            ->whereNull($sentColumn)
+            ->where(function ($claim) use ($claimColumn) {
+                $claim->whereNull($claimColumn)
+                    ->orWhere($claimColumn, '<', now()->subMinutes(10));
+            });
+
+        if ($skipColumn !== null && Schema::hasColumn('reviews', $skipColumn)) {
+            $query->whereNull($skipColumn);
+        }
+
+        return $query->update([
+            $claimColumn => now(),
+            'updated_at' => now(),
+        ]) === 1;
+    }
+
+    /**
+     * @param array<string, mixed> $extra
+     */
+    private function markReviewSideEffectSent(string $sentColumn, array $extra = []): void
+    {
+        if (!Schema::hasColumn('reviews', $sentColumn)) {
+            return;
+        }
+
+        $reviewId = $this->currentReviewId();
+        if ($reviewId <= 0) {
+            return;
+        }
+
+        DB::table('reviews')
+            ->where('tenant_id', TenantContext::getId())
+            ->where('id', $reviewId)
+            ->update(array_merge($extra, [
+                $sentColumn => now(),
+                'updated_at' => now(),
+            ]));
+    }
+
+    private function markReviewEmailFailed(string $error): void
+    {
+        $reviewId = $this->currentReviewId();
+        if ($reviewId <= 0 || !Schema::hasColumn('reviews', 'email_failed_at')) {
+            return;
+        }
+
+        DB::table('reviews')
+            ->where('tenant_id', TenantContext::getId())
+            ->where('id', $reviewId)
+            ->update([
+                'email_failed_at' => now(),
+                'email_last_error' => mb_substr($error, 0, 2000),
+                'email_claimed_at' => null,
+                'updated_at' => now(),
+            ]);
+    }
+
+    private function currentReviewId(): int
+    {
+        return $this->currentReviewId;
     }
 }

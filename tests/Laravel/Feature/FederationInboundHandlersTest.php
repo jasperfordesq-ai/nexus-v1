@@ -16,6 +16,7 @@ use App\Events\FederatedListingReceived;
 use App\Events\FederatedMemberUpdated;
 use App\Events\FederatedReviewReceived;
 use App\Events\FederatedVolunteeringReceived;
+use App\Listeners\HandleFederatedReviewReceived;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -149,6 +150,89 @@ class FederationInboundHandlersTest extends TestCase
         ]);
 
         Event::assertDispatched(FederatedReviewReceived::class);
+    }
+
+    public function test_review_created_replay_is_idempotent_without_transaction_match(): void
+    {
+        Event::fake([FederatedReviewReceived::class]);
+
+        $receiver = User::factory()->forTenant($this->testTenantId)->create();
+        $reviewerStub = User::factory()->forTenant(999)->create();
+
+        $payload = [
+            'external_id' => 'ext-review-retry-' . uniqid(),
+            'external_transaction_id' => 'unknown-federated-tx-' . uniqid(),
+            'rating' => 5,
+            'receiver_id' => $receiver->id,
+            'reviewer_external_id' => $reviewerStub->id,
+            'reviewer_tenant_id' => 999,
+            'comment' => 'Great federated work',
+        ];
+
+        $this->postWebhook('review.created', $payload)
+            ->assertStatus(200)
+            ->assertJsonPath('data.result.status', 'handled');
+
+        $this->postWebhook('review.created', $payload)
+            ->assertStatus(200)
+            ->assertJsonPath('data.result.status', 'duplicate');
+
+        $this->assertSame(1, DB::table('reviews')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('external_partner_id', $this->partnerId)
+            ->where('external_id', $payload['external_id'])
+            ->count());
+        Event::assertDispatchedTimes(FederatedReviewReceived::class, 1);
+    }
+
+    public function test_federated_review_listener_is_idempotent_for_bell_and_email_skip(): void
+    {
+        $receiver = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'federated-review-recipient@example.test',
+        ]);
+        DB::table('users')
+            ->where('id', $receiver->id)
+            ->where('tenant_id', $this->testTenantId)
+            ->update(['notification_preferences' => json_encode(['email_reviews' => 0])]);
+        $reviewerStub = User::factory()->forTenant(999)->create();
+
+        $reviewId = DB::table('reviews')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'external_partner_id' => $this->partnerId,
+            'external_id' => 'ext-review-listener-' . uniqid(),
+            'reviewer_id' => $reviewerStub->id,
+            'reviewer_tenant_id' => 999,
+            'receiver_id' => $receiver->id,
+            'receiver_tenant_id' => $this->testTenantId,
+            'rating' => 4,
+            'comment' => 'Kind federated feedback',
+            'status' => 'approved',
+            'review_type' => 'federated',
+            'show_cross_tenant' => 1,
+            'created_at' => now(),
+        ]);
+
+        $event = new FederatedReviewReceived($this->testTenantId, $this->partnerId, (int) $reviewId, [
+            'receiver_id' => $receiver->id,
+            'rating' => 4,
+            'comment' => 'Kind federated feedback',
+        ]);
+
+        $listener = new HandleFederatedReviewReceived();
+        $listener->handle($event);
+        $listener->handle($event);
+
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $receiver->id)
+            ->where('type', 'federation_review')
+            ->count());
+
+        $review = DB::table('reviews')->where('id', $reviewId)->first();
+        $this->assertNotNull($review->notification_sent_at);
+        $this->assertNull($review->email_sent_at);
+        $this->assertNotNull($review->email_skipped_at);
+        $this->assertNull($review->email_failed_at);
     }
 
     public function test_review_missing_fields_returns_400(): void

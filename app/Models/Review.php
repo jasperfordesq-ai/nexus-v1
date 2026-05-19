@@ -25,6 +25,10 @@ class Review extends Model
         'review_type', 'dimensions',
         // Federated review fields — required for reputation portability
         'receiver_tenant_id', 'reviewer_tenant_id', 'show_cross_tenant',
+        'external_partner_id', 'external_id',
+        'notification_sent_at', 'notification_claimed_at',
+        'email_sent_at', 'email_claimed_at', 'email_skipped_at',
+        'email_failed_at', 'email_last_error',
     ];
 
     /**
