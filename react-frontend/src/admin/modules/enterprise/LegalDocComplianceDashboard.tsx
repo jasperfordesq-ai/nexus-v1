@@ -30,13 +30,15 @@ import AlertCircle from 'lucide-react/icons/circle-alert';
 import Download from 'lucide-react/icons/download';
 import Eye from 'lucide-react/icons/eye';
 import TrendingUp from 'lucide-react/icons/trending-up';
-import { usePageTitle } from '@/hooks/usePageTitle';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts/ToastContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';
 import type { ComplianceStats, UserAcceptance } from '@/admin/api/types';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 
 export default function LegalDocComplianceDashboard() {
-  usePageTitle("Enterprise");
+  const { t } = useTranslation('admin');
+  useAdminPageMeta({ title: t('enterprise.legal_compliance_dashboard') });
 
   const { success, error } = useToast();
 
@@ -57,14 +59,14 @@ export default function LegalDocComplianceDashboard() {
       if (response.success && response.data) {
         setStats(response.data);
       } else {
-        error(response.error || "Failed to load compliance stats");
+        error(response.error || t('enterprise.failed_to_load_compliance_stats'));
       }
     } catch {
-      error("Failed to load compliance stats");
+      error(t('enterprise.failed_to_load_compliance_stats'));
     } finally {
       setLoading(false);
     }
-  }, [error])
+  }, [error, t])
 
 
   useEffect(() => {
@@ -81,10 +83,10 @@ export default function LegalDocComplianceDashboard() {
         setSelectedDocId(docId);
         setShowAcceptancesModal(true);
       } else {
-        error(response.error || "Failed to load acceptances");
+        error(response.error || t('enterprise.failed_to_load_acceptances'));
       }
     } catch {
-      error("Failed to load acceptances");
+      error(t('enterprise.failed_to_load_acceptances'));
     } finally {
       setLoadingAcceptances(false);
     }
@@ -115,12 +117,12 @@ export default function LegalDocComplianceDashboard() {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
 
-        success("Export Downloaded Successfully");
+        success(t('enterprise.export_downloaded_successfully'));
       } else {
-        error(response.error || "Failed to export acceptances");
+        error(response.error || t('enterprise.failed_to_export_acceptances'));
       }
     } catch {
-      error("Failed to export acceptances");
+      error(t('enterprise.failed_to_export_acceptances'));
     } finally {
       setExportingDocId(null);
     }
@@ -144,7 +146,7 @@ export default function LegalDocComplianceDashboard() {
     return (
       <div className="text-center py-12">
         <AlertCircle size={48} className="mx-auto text-[var(--color-text-tertiary)] mb-4" />
-        <p className="text-[var(--color-text-secondary)]">{"Failed to load compliance data"}</p>
+        <p className="text-[var(--color-text-secondary)]">{t('enterprise.failed_to_load_compliance_data')}</p>
       </div>
     );
   }
@@ -153,9 +155,9 @@ export default function LegalDocComplianceDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">{"Legal Compliance Dashboard"}</h1>
+        <h1 className="text-3xl font-bold">{t('enterprise.legal_compliance_dashboard')}</h1>
         <p className="text-[var(--color-text-secondary)] mt-1">
-          {"Track Compliance."}
+          {t('enterprise.track_compliance_description')}
         </p>
       </div>
 
@@ -168,7 +170,7 @@ export default function LegalDocComplianceDashboard() {
                 <Users size={24} className="text-primary" />
               </div>
               <div>
-                <p className="text-sm text-[var(--color-text-secondary)]">{"Total Users"}</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">{t('enterprise.label_total_users')}</p>
                 <p className="text-2xl font-bold">{stats.total_users.toLocaleString()}</p>
               </div>
             </div>
@@ -182,7 +184,7 @@ export default function LegalDocComplianceDashboard() {
                 <CheckCircle2 size={24} className="text-success" />
               </div>
               <div>
-                <p className="text-sm text-[var(--color-text-secondary)]">{"Fully Compliant"}</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">{t('enterprise.fully_compliant')}</p>
                 <p className="text-2xl font-bold">
                   {(stats.total_users - stats.users_pending_acceptance).toLocaleString()}
                 </p>
@@ -198,7 +200,7 @@ export default function LegalDocComplianceDashboard() {
                 <AlertCircle size={24} className="text-warning" />
               </div>
               <div>
-                <p className="text-sm text-[var(--color-text-secondary)]">{"Stat Pending"}</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">{t('enterprise.stat_pending')}</p>
                 <p className="text-2xl font-bold">
                   {stats.users_pending_acceptance.toLocaleString()}
                 </p>
@@ -214,7 +216,7 @@ export default function LegalDocComplianceDashboard() {
                 <TrendingUp size={24} className="text-primary" />
               </div>
               <div>
-                <p className="text-sm text-[var(--color-text-secondary)]">{"Overall Compliance"}</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">{t('enterprise.overall_compliance')}</p>
                 <p className="text-2xl font-bold">{stats.overall_compliance_rate.toFixed(1)}%</p>
               </div>
             </div>
@@ -225,24 +227,24 @@ export default function LegalDocComplianceDashboard() {
       {/* Per-Document Breakdown */}
       <Card>
         <CardHeader>
-          <h2 className="text-xl font-semibold">{"Document Acceptance Rates"}</h2>
+          <h2 className="text-xl font-semibold">{t('enterprise.document_acceptance_rates')}</h2>
         </CardHeader>
         <CardBody>
           {stats.documents.length === 0 ? (
             <div className="text-center py-8">
               <AlertCircle size={40} className="mx-auto text-[var(--color-text-tertiary)] mb-3" />
-              <p className="text-[var(--color-text-secondary)]">{"No legal documents found found"}</p>
+              <p className="text-[var(--color-text-secondary)]">{t('enterprise.no_legal_documents')}</p>
             </div>
           ) : (
-            <Table aria-label={"Document Compliance Table"}>
+            <Table aria-label={t('enterprise.label_document_compliance_table')}>
               <TableHeader>
-                <TableColumn>{"Document"}</TableColumn>
-                <TableColumn>{"Version"}</TableColumn>
-                <TableColumn>{"Effective Date"}</TableColumn>
-                <TableColumn>{"Acceptance Rate"}</TableColumn>
-                <TableColumn>{"Users Accepted"}</TableColumn>
-                <TableColumn>{"Users Pending"}</TableColumn>
-                <TableColumn>{"Actions"}</TableColumn>
+                <TableColumn>{t('enterprise.col_document')}</TableColumn>
+                <TableColumn>{t('enterprise.label_version')}</TableColumn>
+                <TableColumn>{t('enterprise.col_effective_date')}</TableColumn>
+                <TableColumn>{t('enterprise.col_acceptance_rate')}</TableColumn>
+                <TableColumn>{t('enterprise.col_users_accepted')}</TableColumn>
+                <TableColumn>{t('enterprise.col_users_pending')}</TableColumn>
+                <TableColumn>{t('enterprise.label_actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {stats.documents.map((doc) => (
@@ -255,11 +257,11 @@ export default function LegalDocComplianceDashboard() {
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell>{doc.version_number || 'N/A'}</TableCell>
+                    <TableCell>{doc.version_number || t('enterprise.not_available')}</TableCell>
                     <TableCell>
                       {doc.effective_date
                         ? new Date(doc.effective_date).toLocaleDateString()
-                        : 'N/A'}
+                        : t('enterprise.not_available')}
                     </TableCell>
                     <TableCell>
                       <div className="space-y-2">
@@ -300,7 +302,7 @@ export default function LegalDocComplianceDashboard() {
                           isDisabled={!doc.current_version_id}
                           isLoading={loadingAcceptances && selectedDocId === doc.id}
                         >
-                          {"View"}
+                          {t('enterprise.btn_view')}
                         </Button>
                         <Button
                           size="sm"
@@ -309,7 +311,7 @@ export default function LegalDocComplianceDashboard() {
                           onPress={() => handleExport(doc.id)}
                           isLoading={exportingDocId === doc.id}
                         >
-                          {"Export"}
+                          {t('enterprise.btn_export')}
                         </Button>
                       </div>
                     </TableCell>
@@ -324,20 +326,20 @@ export default function LegalDocComplianceDashboard() {
       {/* Date Range Filter */}
       <Card>
         <CardHeader>
-          <h2 className="text-xl font-semibold">{"Export Options"}</h2>
+          <h2 className="text-xl font-semibold">{t('enterprise.export_options_title')}</h2>
         </CardHeader>
         <CardBody>
           <div className="flex items-end gap-4">
             <Input
               type="date"
-              label={"Start Date"}
+              label={t('enterprise.label_start_date')}
               value={dateRange.start}
               onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
               className="flex-1"
             />
             <Input
               type="date"
-              label={"End Date"}
+              label={t('enterprise.label_end_date')}
               value={dateRange.end}
               onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
               className="flex-1"
@@ -347,11 +349,11 @@ export default function LegalDocComplianceDashboard() {
               variant="flat"
               onPress={() => setDateRange({ start: '', end: '' })}
             >
-              {"Clear"}
+              {t('enterprise.btn_clear')}
             </Button>
           </div>
           <p className="text-sm text-[var(--color-text-secondary)] mt-2">
-            {"Export Filter."}
+            {t('enterprise.export_filter_description')}
           </p>
         </CardBody>
       </Card>
@@ -366,22 +368,22 @@ export default function LegalDocComplianceDashboard() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>{"Modal User Acceptances"}</ModalHeader>
+              <ModalHeader>{t('enterprise.modal_user_acceptances')}</ModalHeader>
               <ModalBody>
                 {acceptances.length === 0 ? (
                   <div className="text-center py-8">
                     <AlertCircle size={40} className="mx-auto text-[var(--color-text-tertiary)] mb-3" />
-                    <p className="text-[var(--color-text-secondary)]">{"No acceptances found found"}</p>
+                    <p className="text-[var(--color-text-secondary)]">{t('enterprise.no_acceptances_found')}</p>
                   </div>
                 ) : (
-                  <Table aria-label={"User Acceptances"}>
+                  <Table aria-label={t('enterprise.label_user_acceptances')}>
                     <TableHeader>
-                      <TableColumn>{"User Name"}</TableColumn>
-                      <TableColumn>{"Email"}</TableColumn>
-                      <TableColumn>{"Version Number"}</TableColumn>
-                      <TableColumn>{"Accepted at"}</TableColumn>
-                      <TableColumn>{"Acceptance Method"}</TableColumn>
-                      <TableColumn>{"IP Address"}</TableColumn>
+                      <TableColumn>{t('enterprise.col_user_name')}</TableColumn>
+                      <TableColumn>{t('enterprise.col_email')}</TableColumn>
+                      <TableColumn>{t('enterprise.col_version_number')}</TableColumn>
+                      <TableColumn>{t('enterprise.col_accepted_at')}</TableColumn>
+                      <TableColumn>{t('enterprise.col_acceptance_method')}</TableColumn>
+                      <TableColumn>{t('enterprise.col_ip_address')}</TableColumn>
                     </TableHeader>
                     <TableBody>
                       {acceptances.map((acceptance, idx) => (
@@ -395,7 +397,7 @@ export default function LegalDocComplianceDashboard() {
                           <TableCell>{acceptance.acceptance_method}</TableCell>
                           <TableCell>
                             <span className="font-mono text-xs">
-                              {acceptance.ip_address || 'N/A'}
+                              {acceptance.ip_address || t('enterprise.not_available')}
                             </span>
                           </TableCell>
                         </TableRow>
@@ -406,7 +408,7 @@ export default function LegalDocComplianceDashboard() {
               </ModalBody>
               <ModalFooter>
                 <Button color="primary" onPress={onClose}>
-                  {"Close"}
+                  {t('enterprise.btn_close')}
                 </Button>
               </ModalFooter>
             </>
