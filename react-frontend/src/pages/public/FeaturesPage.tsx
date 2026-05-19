@@ -40,10 +40,11 @@ import { RELEASE_STATUS } from '@/config/releaseStatus';
 type Maturity = 'ga' | 'beta' | 'preview';
 
 function MaturityChip({ level }: { level: Maturity }) {
+  const { t } = useTranslation('public');
   if (level === 'ga') return null;
   const config: Record<Exclude<Maturity, 'ga'>, { color: 'warning' | 'secondary'; label: string }> = {
-    beta: { color: 'warning', label: 'Beta' },
-    preview: { color: 'secondary', label: 'Preview' },
+    beta: { color: 'warning', label: t('features_page.chips.beta') },
+    preview: { color: 'secondary', label: t('features_page.chips.preview') },
   };
   const { color, label } = config[level];
   return (
@@ -73,7 +74,7 @@ function FeatureList({ items }: { items: FeatureItem[] }) {
           <div className="text-sm">
             <span className="font-semibold text-foreground">{item.title}</span>
             <MaturityChip level={item.maturity ?? 'ga'} />
-            <span className="text-foreground-600"> — {item.description}</span>
+            <span className="text-foreground-600"> - {item.description}</span>
             {item.note && (
               <p className="text-xs text-foreground-500 mt-1 italic">{item.note}</p>
             )}
@@ -296,7 +297,9 @@ export function FeaturesPage() {
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <Chip color="warning" variant="flat" size="sm" className="shrink-0">Beta</Chip>
+              <Chip color="warning" variant="flat" size="sm" className="shrink-0">
+                {t('features_page.chips.beta')}
+              </Chip>
               <span className="text-foreground-600">
                 {t('features_page.maturity_beta', {
                   defaultValue: 'Working in production today, but the public surface or wire protocol is still being hardened.',
@@ -304,7 +307,9 @@ export function FeaturesPage() {
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <Chip color="secondary" variant="flat" size="sm" className="shrink-0">Preview</Chip>
+              <Chip color="secondary" variant="flat" size="sm" className="shrink-0">
+                {t('features_page.chips.preview')}
+              </Chip>
               <span className="text-foreground-600">
                 {t('features_page.maturity_preview', {
                   defaultValue: 'Recently shipped and available to opt in. Expect rapid iteration — the API and UX may change.',
@@ -340,14 +345,14 @@ export function FeaturesPage() {
         <Divider />
         <CardBody className="text-sm text-foreground-600">
           <ul className="grid sm:grid-cols-2 gap-y-1.5 gap-x-6 list-none">
-            <li><strong>Frontend:</strong> React 18 + TypeScript + HeroUI + Tailwind CSS 4</li>
-            <li><strong>Backend:</strong> Laravel 12 + PHP 8.2+</li>
-            <li><strong>Database:</strong> MariaDB 10.11</li>
-            <li><strong>Search:</strong> Meilisearch v1.7</li>
-            <li><strong>AI:</strong> OpenAI text-embedding-3-small</li>
-            <li><strong>Real-Time:</strong> Pusher WebSockets, Firebase Cloud Messaging</li>
-            <li><strong>Mobile:</strong> Capacitor (iOS + Android)</li>
-            <li><strong>Infrastructure:</strong> Docker, Redis, full PWA</li>
+            <li><strong>{t('features_page.tech_stack.frontend_label')}:</strong> {t('features_page.tech_stack.frontend_value')}</li>
+            <li><strong>{t('features_page.tech_stack.backend_label')}:</strong> {t('features_page.tech_stack.backend_value')}</li>
+            <li><strong>{t('features_page.tech_stack.database_label')}:</strong> {t('features_page.tech_stack.database_value')}</li>
+            <li><strong>{t('features_page.tech_stack.search_label')}:</strong> {t('features_page.tech_stack.search_value')}</li>
+            <li><strong>{t('features_page.tech_stack.ai_label')}:</strong> {t('features_page.tech_stack.ai_value')}</li>
+            <li><strong>{t('features_page.tech_stack.realtime_label')}:</strong> {t('features_page.tech_stack.realtime_value')}</li>
+            <li><strong>{t('features_page.tech_stack.mobile_label')}:</strong> {t('features_page.tech_stack.mobile_value')}</li>
+            <li><strong>{t('features_page.tech_stack.infrastructure_label')}:</strong> {t('features_page.tech_stack.infrastructure_value')}</li>
           </ul>
         </CardBody>
       </Card>
@@ -423,7 +428,7 @@ export function FeaturesPage() {
               href="mailto:jasper@hour-timebank.ie"
               className="text-primary underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
             >
-              jasper@hour-timebank.ie
+              {t('features_page.security_email')}
             </a>
             {t('features_page.security_body_after', {
               defaultValue:

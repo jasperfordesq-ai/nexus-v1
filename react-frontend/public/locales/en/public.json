@@ -1,4 +1,29 @@
 {
+  "features_page": {
+    "chips": {
+      "beta": "Beta",
+      "preview": "Preview"
+    },
+    "security_email": "jasper@hour-timebank.ie",
+    "tech_stack": {
+      "ai_label": "AI",
+      "ai_value": "OpenAI text-embedding-3-small",
+      "backend_label": "Backend",
+      "backend_value": "Laravel 12 + PHP 8.2+",
+      "database_label": "Database",
+      "database_value": "MariaDB 10.11",
+      "frontend_label": "Frontend",
+      "frontend_value": "React 18 + TypeScript + HeroUI + Tailwind CSS 4",
+      "infrastructure_label": "Infrastructure",
+      "infrastructure_value": "Docker, Redis, full PWA",
+      "mobile_label": "Mobile",
+      "mobile_value": "Capacitor (iOS + Android)",
+      "realtime_label": "Real-Time",
+      "realtime_value": "Pusher WebSockets, Firebase Cloud Messaging",
+      "search_label": "Search",
+      "search_value": "Meilisearch v1.7"
+    }
+  },
   "home": {
     "meta_title": "Community Timebanking Platform",
     "meta_description": "Exchange skills using time credits — every hour is valued equally. Join a community where neighbours share help, build trust, and strengthen local connections.",
