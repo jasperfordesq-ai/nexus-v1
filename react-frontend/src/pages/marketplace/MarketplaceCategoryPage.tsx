@@ -75,18 +75,18 @@ const ITEMS_PER_PAGE = 24;
 const SEARCH_DEBOUNCE_MS = 300;
 
 const CONDITION_OPTIONS = [
-  { value: 'new', label: 'New' },
-  { value: 'like_new', label: 'Like New' },
-  { value: 'good', label: 'Good' },
-  { value: 'fair', label: 'Fair' },
-  { value: 'poor', label: 'Poor' },
+  { value: 'new' },
+  { value: 'like_new' },
+  { value: 'good' },
+  { value: 'fair' },
+  { value: 'poor' },
 ];
 
 const SORT_OPTIONS = [
-  { value: 'newest', label: 'Newest First' },
-  { value: 'price_asc', label: 'Price: Low to High' },
-  { value: 'price_desc', label: 'Price: High to Low' },
-  { value: 'popular', label: 'Most Popular' },
+  { value: 'newest' },
+  { value: 'price_asc' },
+  { value: 'price_desc' },
+  { value: 'popular' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -378,7 +378,7 @@ export function MarketplaceCategoryPage() {
         >
           {CONDITION_OPTIONS.map((opt) => (
             <Checkbox key={opt.value} value={opt.value}>
-              {t(`condition.${opt.value}`, opt.label)}
+              {t(`condition.${opt.value}`)}
             </Checkbox>
           ))}
         </CheckboxGroup>
@@ -512,7 +512,7 @@ export function MarketplaceCategoryPage() {
             aria-label={t('common.sort_by', 'Sort by')}
           >
             {SORT_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value}>{t(`sort.${opt.value}`, opt.label)}</SelectItem>
+              <SelectItem key={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
             ))}
           </Select>
           <Button
@@ -596,7 +596,7 @@ export function MarketplaceCategoryPage() {
                     aria-label={t('common.sort_by', 'Sort by')}
                   >
                     {SORT_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value}>{t(`sort.${opt.value}`, opt.label)}</SelectItem>
+                      <SelectItem key={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
                     ))}
                   </Select>
                 </div>

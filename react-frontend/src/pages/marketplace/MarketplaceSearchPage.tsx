@@ -59,26 +59,26 @@ const ITEMS_PER_PAGE = 24;
 const SEARCH_DEBOUNCE_MS = 300;
 
 const CONDITION_OPTIONS = [
-  { value: 'new', label: 'New' },
-  { value: 'like_new', label: 'Like New' },
-  { value: 'good', label: 'Good' },
-  { value: 'fair', label: 'Fair' },
-  { value: 'poor', label: 'Poor' },
+  { value: 'new' },
+  { value: 'like_new' },
+  { value: 'good' },
+  { value: 'fair' },
+  { value: 'poor' },
 ];
 
 const SORT_OPTIONS = [
-  { value: 'newest', label: 'Newest First' },
-  { value: 'price_asc', label: 'Price: Low to High' },
-  { value: 'price_desc', label: 'Price: High to Low' },
-  { value: 'popular', label: 'Most Popular' },
+  { value: 'newest' },
+  { value: 'price_asc' },
+  { value: 'price_desc' },
+  { value: 'popular' },
 ];
 
 const POSTED_WITHIN_OPTIONS = [
-  { value: '', label: 'Any Time' },
-  { value: '1', label: 'Today' },
-  { value: '3', label: 'Last 3 Days' },
-  { value: '7', label: 'Last 7 Days' },
-  { value: '30', label: 'Last 30 Days' },
+  { value: '', tKey: 'filters.posted_any_time' },
+  { value: '1', tKey: 'filters.posted_today' },
+  { value: '3', tKey: 'filters.posted_last_days', count: 3 },
+  { value: '7', tKey: 'filters.posted_last_days', count: 7 },
+  { value: '30', tKey: 'filters.posted_last_days', count: 30 },
 ];
 
 const CONDITION_COLORS: Record<string, 'success' | 'primary' | 'warning' | 'danger' | 'default'> = {
@@ -87,14 +87,6 @@ const CONDITION_COLORS: Record<string, 'success' | 'primary' | 'warning' | 'dang
   good: 'warning',
   fair: 'danger',
   poor: 'default',
-};
-
-const CONDITION_LABELS: Record<string, string> = {
-  new: 'New',
-  like_new: 'Like New',
-  good: 'Good',
-  fair: 'Fair',
-  poor: 'Poor',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -123,6 +115,12 @@ export function MarketplaceSearchPage() {
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
   const [postedWithin, setPostedWithin] = useState(searchParams.get('posted_within') || '');
   const [showFilters, setShowFilters] = useState(false);
+
+  const getPostedWithinLabel = useCallback((value: string) => {
+    const option = POSTED_WITHIN_OPTIONS.find((opt) => opt.value === value);
+    if (!option) return value;
+    return t(option.tKey, { count: option.count });
+  }, [t]);
 
   // Data state
   const [listings, setListings] = useState<MarketplaceListingItem[]>([]);
@@ -347,7 +345,7 @@ export function MarketplaceSearchPage() {
         >
           {CONDITION_OPTIONS.map((opt) => (
             <Checkbox key={opt.value} value={opt.value}>
-              {t(`condition.${opt.value}`, opt.label)}
+              {t(`condition.${opt.value}`)}
             </Checkbox>
           ))}
         </CheckboxGroup>
@@ -401,7 +399,7 @@ export function MarketplaceSearchPage() {
           size="sm"
         >
           {POSTED_WITHIN_OPTIONS.filter((o) => o.value).map((opt) => (
-            <SelectItem key={opt.value}>{opt.label}</SelectItem>
+            <SelectItem key={opt.value}>{getPostedWithinLabel(opt.value)}</SelectItem>
           ))}
         </Select>
       </div>
@@ -470,7 +468,7 @@ export function MarketplaceSearchPage() {
               aria-label={t('common.sort_by', 'Sort by')}
             >
               {SORT_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value}>{t(`sort.${opt.value}`, opt.label)}</SelectItem>
+                <SelectItem key={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
               ))}
             </Select>
 
@@ -500,7 +498,7 @@ export function MarketplaceSearchPage() {
                   variant="flat"
                   size="sm"
                 >
-                  {categories.find((c) => String(c.id) === categoryId)?.name || 'Category'}
+                  {categories.find((c) => String(c.id) === categoryId)?.name || t('filters.category')}
                 </Chip>
               )}
               {(priceMin || priceMax) && (
@@ -521,7 +519,7 @@ export function MarketplaceSearchPage() {
                   size="sm"
                   color={CONDITION_COLORS[c] || 'default'}
                 >
-                  {t(`condition.${c}`, CONDITION_LABELS[c] || c)}
+                  {t(`condition.${c}`)}
                 </Chip>
               ))}
               {sellerType && (
@@ -531,12 +529,12 @@ export function MarketplaceSearchPage() {
               )}
               {deliveryMethod && (
                 <Chip onClose={() => setDeliveryMethod('')} variant="flat" size="sm">
-                  {deliveryMethod.charAt(0).toUpperCase() + deliveryMethod.slice(1)}
+                  {t(`delivery_method.${deliveryMethod}`)}
                 </Chip>
               )}
               {postedWithin && (
                 <Chip onClose={() => setPostedWithin('')} variant="flat" size="sm">
-                  Last {postedWithin} day{postedWithin !== '1' ? 's' : ''}
+                  {getPostedWithinLabel(postedWithin)}
                 </Chip>
               )}
             </div>
@@ -606,7 +604,7 @@ export function MarketplaceSearchPage() {
                     aria-label={t('common.sort_by', 'Sort by')}
                   >
                     {SORT_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value}>{t(`sort.${opt.value}`, opt.label)}</SelectItem>
+                      <SelectItem key={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
                     ))}
                   </Select>
                 </div>

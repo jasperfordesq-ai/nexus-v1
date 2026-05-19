@@ -312,6 +312,9 @@
     "delivery_both": "Both",
     "sort": "Sort By",
     "posted_within": "Posted Within",
+    "posted_any_time": "Any time",
+    "posted_today": "Today",
+    "posted_last_days": "Last {{count}} days",
     "apply": "Apply Filters",
     "clear": "Clear All",
     "title": "Filters"
