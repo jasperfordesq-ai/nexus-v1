@@ -108,12 +108,12 @@ export function ShiftSwapsTab() {
           : [];
         setSwaps(items);
       } else {
-        setError(tRef.current('swaps.load_error', 'Unable to load shift swap requests. Please try again.'));
+        setError(tRef.current('swaps.load_error'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load shift swaps', err);
-      setError(tRef.current('swaps.load_error', 'Unable to load shift swap requests. Please try again.'));
+      setError(tRef.current('swaps.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -131,13 +131,13 @@ export function ShiftSwapsTab() {
         setSwaps((prev) =>
           prev.map((s) => (s.id === swapId ? { ...s, status: 'accepted' as const } : s))
         );
-        toastRef.current.success(tRef.current('swaps.accept_success', 'Swap request accepted.'));
+        toastRef.current.success(tRef.current('swaps.accept_success'));
       } else {
-        toastRef.current.error(tRef.current('swaps.accept_failed', 'Failed to accept swap request.'));
+        toastRef.current.error(tRef.current('swaps.accept_failed'));
       }
     } catch (err) {
       logError('Failed to accept shift swap', err);
-      toastRef.current.error(tRef.current('swaps.accept_failed', 'Failed to accept swap request.'));
+      toastRef.current.error(tRef.current('swaps.accept_failed'));
     } finally {
       setActioningId(null);
     }
@@ -149,13 +149,13 @@ export function ShiftSwapsTab() {
       const response = await api.delete(`/v2/volunteering/swaps/${swapId}`);
       if (response.success) {
         setSwaps((prev) => prev.filter((s) => s.id !== swapId));
-        toastRef.current.success(tRef.current('swaps.cancel_success', 'Swap request cancelled.'));
+        toastRef.current.success(tRef.current('swaps.cancel_success'));
       } else {
-        toastRef.current.error(tRef.current('swaps.cancel_failed', 'Failed to cancel swap request.'));
+        toastRef.current.error(tRef.current('swaps.cancel_failed'));
       }
     } catch (err) {
       logError('Failed to cancel shift swap', err);
-      toastRef.current.error(tRef.current('swaps.cancel_failed', 'Failed to cancel swap request.'));
+      toastRef.current.error(tRef.current('swaps.cancel_failed'));
     } finally {
       setActioningId(null);
     }
@@ -171,13 +171,13 @@ export function ShiftSwapsTab() {
         setSwaps((prev) =>
           prev.map((s) => (s.id === rejectTarget ? { ...s, status: 'rejected' as const } : s))
         );
-        toastRef.current.success(tRef.current('swaps.reject_success', 'Swap request rejected.'));
+        toastRef.current.success(tRef.current('swaps.reject_success'));
       } else {
-        toastRef.current.error(tRef.current('swaps.reject_failed', 'Failed to reject swap request.'));
+        toastRef.current.error(tRef.current('swaps.reject_failed'));
       }
     } catch (err) {
       logError('Failed to reject shift swap', err);
-      toastRef.current.error(tRef.current('swaps.reject_failed', 'Failed to reject swap request.'));
+      toastRef.current.error(tRef.current('swaps.reject_failed'));
     } finally {
       setActioningId(null);
       setRejectTarget(null);
@@ -229,20 +229,20 @@ export function ShiftSwapsTab() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <ArrowLeftRight className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">{t('swaps.heading', 'Shift Swaps')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('swaps.heading')}</h2>
         </div>
         <Button
           size="sm"
           variant="flat"
-          className="bg-theme-elevated text-theme-muted"
           startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
           onPress={load}
           isDisabled={isLoading}
+          className="bg-theme-elevated text-theme-muted sm:shrink-0"
         >
-          {t('swaps.refresh', 'Refresh')}
+          {t('swaps.refresh')}
         </Button>
       </div>
 
@@ -254,7 +254,7 @@ export function ShiftSwapsTab() {
           className={view === 'all' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
           onPress={() => setView('all')}
         >
-          {t('swaps.all', 'All')} ({swaps.length})
+          {t('swaps.all')} ({swaps.length})
         </Button>
         <Button
           size="sm"
@@ -263,7 +263,7 @@ export function ShiftSwapsTab() {
           onPress={() => setView('sent')}
           startContent={<Send className="w-3 h-3" aria-hidden="true" />}
         >
-          {t('swaps.sent', 'Sent')} ({sentCount})
+          {t('swaps.sent')} ({sentCount})
         </Button>
         <Button
           size="sm"
@@ -272,7 +272,7 @@ export function ShiftSwapsTab() {
           onPress={() => setView('received')}
           startContent={<Inbox className="w-3 h-3" aria-hidden="true" />}
         >
-          {t('swaps.received', 'Received')} ({receivedCount})
+          {t('swaps.received')} ({receivedCount})
         </Button>
       </div>
 
@@ -282,7 +282,7 @@ export function ShiftSwapsTab() {
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
-            {t('swaps.try_again', 'Try Again')}
+            {t('swaps.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -304,13 +304,13 @@ export function ShiftSwapsTab() {
       {!error && !isLoading && filteredSwaps.length === 0 && (
         <EmptyState
           icon={<ArrowLeftRight className="w-12 h-12" aria-hidden="true" />}
-          title={t('swaps.no_swaps_title', 'No swap requests')}
+          title={t('swaps.no_swaps_title')}
           description={
             view === 'sent'
-              ? t('swaps.no_sent', 'You have not sent any shift swap requests yet.')
+              ? t('swaps.no_sent')
               : view === 'received'
-                ? t('swaps.no_received', 'You have not received any shift swap requests.')
-                : t('swaps.no_swaps_desc', 'No shift swap requests found. You can request a swap from the shift details page.')
+                ? t('swaps.no_received')
+                : t('swaps.no_swaps_desc')
           }
         />
       )}
@@ -326,7 +326,7 @@ export function ShiftSwapsTab() {
           {filteredSwaps.map((swap) => (
             <motion.div key={swap.id} variants={itemVariants}>
               <GlassCard className="p-5">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1 min-w-0">
                     {/* Header with status */}
                     <div className="flex items-center gap-2 mb-3 flex-wrap">
@@ -339,23 +339,23 @@ export function ShiftSwapsTab() {
                           : <Inbox className="w-3 h-3" />
                         }
                       >
-                        {swap.direction === 'sent' ? t('swaps.sent', 'Sent') : t('swaps.received', 'Received')}
+                        {swap.direction === 'sent' ? t('swaps.sent') : t('swaps.received')}
                       </Chip>
                       <Chip
                         size="sm"
                         variant="flat"
                         color={statusColor(swap.status)}
                       >
-                        {t('swaps.status_' + swap.status, swap.status.charAt(0).toUpperCase() + swap.status.slice(1))}
+                        {t(`swaps.status_${swap.status}`)}
                       </Chip>
                       {swap.direction === 'sent' && (
                         <span className="text-xs text-theme-subtle">
-                          {t('swaps.to', 'To:')} {swap.recipient.name}
+                          {t('swaps.to')} {swap.recipient.name}
                         </span>
                       )}
                       {swap.direction === 'received' && (
                         <span className="text-xs text-theme-subtle">
-                          {t('swaps.from', 'From:')} {swap.requester.name}
+                          {t('swaps.from')} {swap.requester.name}
                         </span>
                       )}
                     </div>
@@ -364,7 +364,7 @@ export function ShiftSwapsTab() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                       {/* Original shift */}
                       <div className="rounded-lg bg-theme-hover/50 p-3">
-                        <p className="text-xs font-medium text-theme-muted mb-1">{t('swaps.your_shift', 'Your Shift')}</p>
+                        <p className="text-xs font-medium text-theme-muted mb-1">{t('swaps.your_shift')}</p>
                         <p className="text-sm font-semibold text-theme-primary">
                           {swap.original_shift.opportunity_title}
                         </p>
@@ -382,7 +382,7 @@ export function ShiftSwapsTab() {
 
                       {/* Proposed shift */}
                       <div className="rounded-lg bg-theme-hover/50 p-3">
-                        <p className="text-xs font-medium text-theme-muted mb-1">{t('swaps.proposed_shift', 'Proposed Shift')}</p>
+                        <p className="text-xs font-medium text-theme-muted mb-1">{t('swaps.proposed_shift')}</p>
                         <p className="text-sm font-semibold text-theme-primary">
                           {swap.proposed_shift.opportunity_title}
                         </p>
@@ -406,13 +406,13 @@ export function ShiftSwapsTab() {
                     )}
 
                     <p className="text-xs text-theme-subtle">
-                      {t('swaps.requested', 'Requested')} {new Date(swap.created_at).toLocaleDateString()}
+                      {t('swaps.requested')} {new Date(swap.created_at).toLocaleDateString()}
                     </p>
                   </div>
 
                   {/* Action buttons for received pending swaps */}
                   {swap.direction === 'received' && swap.status === 'pending' && (
-                    <div className="flex flex-col gap-2 flex-shrink-0">
+                    <div className="flex flex-col gap-2 sm:flex-shrink-0">
                       <Button
                         size="sm"
                         className="bg-gradient-to-r from-emerald-500 to-green-600 text-white"
@@ -420,7 +420,7 @@ export function ShiftSwapsTab() {
                         onPress={() => handleAccept(swap.id)}
                         isLoading={actioningId === swap.id}
                       >
-                        {t('swaps.accept', 'Accept')}
+                        {t('swaps.accept')}
                       </Button>
                       <Button
                         size="sm"
@@ -430,14 +430,14 @@ export function ShiftSwapsTab() {
                         onPress={() => setRejectTarget(swap.id)}
                         isLoading={actioningId === swap.id}
                       >
-                        {t('swaps.reject', 'Reject')}
+                        {t('swaps.reject')}
                       </Button>
                     </div>
                   )}
 
                   {/* Cancel button for sent pending swaps */}
                   {swap.direction === 'sent' && swap.status === 'pending' && (
-                    <div className="flex flex-col gap-2 flex-shrink-0">
+                    <div className="flex flex-col gap-2 sm:flex-shrink-0">
                       <Button
                         size="sm"
                         variant="flat"
@@ -446,7 +446,7 @@ export function ShiftSwapsTab() {
                         onPress={() => handleCancel(swap.id)}
                         isLoading={actioningId === swap.id}
                       >
-                        {t('swaps.cancel', 'Cancel')}
+                        {t('swaps.cancel')}
                       </Button>
                     </div>
                   )}
@@ -469,15 +469,15 @@ export function ShiftSwapsTab() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="text-theme-primary">{t('swaps.reject', 'Reject')}</ModalHeader>
+              <ModalHeader className="text-theme-primary">{t('swaps.reject')}</ModalHeader>
               <ModalBody>
                 <p className="text-theme-secondary">
-                  {t('swaps.reject_confirm', 'Are you sure you want to reject this swap request?')}
+                  {t('swaps.reject_confirm')}
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('cancel', 'Cancel')}</Button>
-                <Button color="danger" onPress={handleReject}>{t('swaps.reject', 'Reject')}</Button>
+                <Button variant="flat" onPress={onClose}>{t('cancel')}</Button>
+                <Button color="danger" onPress={handleReject}>{t('swaps.reject')}</Button>
               </ModalFooter>
             </>
           )}

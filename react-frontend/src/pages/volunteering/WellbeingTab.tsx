@@ -63,14 +63,14 @@ interface MoodCheckin {
 
 /* ───────────────────────── Mood Helpers ───────────────────────── */
 
-type TranslateFn = (key: string, defaultValue: string) => string;
+type TranslateFn = (key: string) => string;
 
 const getMoodOptions = (t: TranslateFn) => [
-  { value: 1, label: t('wellbeing.mood_struggling', 'Struggling'), emoji: '😞' },
-  { value: 2, label: t('wellbeing.mood_low', 'Low'), emoji: '😔' },
-  { value: 3, label: t('wellbeing.mood_okay', 'Okay'), emoji: '😐' },
-  { value: 4, label: t('wellbeing.mood_good', 'Good'), emoji: '😊' },
-  { value: 5, label: t('wellbeing.mood_great', 'Great'), emoji: '😄' },
+  { value: 1, label: t('wellbeing.mood_struggling'), emoji: '😞' },
+  { value: 2, label: t('wellbeing.mood_low'), emoji: '😔' },
+  { value: 3, label: t('wellbeing.mood_okay'), emoji: '😐' },
+  { value: 4, label: t('wellbeing.mood_good'), emoji: '😊' },
+  { value: 5, label: t('wellbeing.mood_great'), emoji: '😄' },
 ];
 
 function getMoodEmoji(value: number, t: TranslateFn): string {
@@ -78,7 +78,7 @@ function getMoodEmoji(value: number, t: TranslateFn): string {
 }
 
 function getMoodLabel(value: number, t: TranslateFn): string {
-  return getMoodOptions(t).find((m) => m.value === value)?.label ?? t('wellbeing.mood_unknown', 'Unknown');
+  return getMoodOptions(t).find((m) => m.value === value)?.label ?? t('wellbeing.mood_unknown');
 }
 
 /* ───────────────────────── Score Color ───────────────────────── */
@@ -90,11 +90,11 @@ function getScoreColor(score: number): { text: string; bg: string; indicator: st
 }
 
 function getScoreLabel(score: number, t: TranslateFn): string {
-  if (score >= 80) return t('wellbeing.score_excellent', 'Excellent');
-  if (score >= 70) return t('wellbeing.score_good', 'Good');
-  if (score >= 50) return t('wellbeing.score_fair', 'Fair');
-  if (score >= 30) return t('wellbeing.score_needs_attention', 'Needs Attention');
-  return t('wellbeing.score_critical', 'Critical');
+  if (score >= 80) return t('wellbeing.score_excellent');
+  if (score >= 70) return t('wellbeing.score_good');
+  if (score >= 50) return t('wellbeing.score_fair');
+  if (score >= 30) return t('wellbeing.score_needs_attention');
+  return t('wellbeing.score_critical');
 }
 
 function getRiskColor(risk: string): 'success' | 'warning' | 'danger' {
@@ -111,7 +111,7 @@ function getRiskColor(risk: string): 'success' | 'warning' | 'danger' {
 export function WellbeingTab() {
   const { t } = useTranslation('volunteering');
   const toast = useToast();
-  const moodOptions = getMoodOptions((key, defaultValue) => t(key, defaultValue));
+  const moodOptions = getMoodOptions((key) => t(key));
   const [data, setData] = useState<WellbeingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -148,12 +148,12 @@ export function WellbeingTab() {
       if (response.success && response.data) {
         setData(response.data as WellbeingData);
       } else {
-        setError(tRef.current('wellbeing.load_error', 'Unable to load wellbeing data. Please try again.'));
+        setError(tRef.current('wellbeing.load_error'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load wellbeing data', err);
-      setError(tRef.current('wellbeing.load_error', 'Unable to load wellbeing data. Please try again.'));
+      setError(tRef.current('wellbeing.load_error'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
@@ -175,17 +175,17 @@ export function WellbeingTab() {
       });
 
       if (response.success) {
-        toastRef.current.success(tRef.current('wellbeing.checkin_success', 'Mood check-in recorded!'));
+        toastRef.current.success(tRef.current('wellbeing.checkin_success'));
         onClose();
         setSelectedMood(3);
         setCheckinNote('');
         load();
       } else {
-        toastRef.current.error(tRef.current('wellbeing.checkin_failed', 'Failed to submit check-in. Please try again.'));
+        toastRef.current.error(tRef.current('wellbeing.checkin_failed'));
       }
     } catch (err) {
       logError('Failed to submit wellbeing check-in', err);
-      toastRef.current.error(tRef.current('wellbeing.checkin_failed', 'Failed to submit check-in. Please try again.'));
+      toastRef.current.error(tRef.current('wellbeing.checkin_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -204,18 +204,18 @@ export function WellbeingTab() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Heart className="w-5 h-5 text-rose-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">{t('wellbeing.heading', 'Volunteer Wellbeing')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('wellbeing.heading')}</h2>
         </div>
         <Button
           size="sm"
-          className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
           startContent={<Smile className="w-4 h-4" aria-hidden="true" />}
           onPress={onOpen}
+          className="bg-gradient-to-r from-rose-500 to-pink-600 text-white sm:shrink-0"
         >
-          {t('wellbeing.log_feeling', "Log How I'm Feeling")}
+          {t('wellbeing.log_feeling')}
         </Button>
       </div>
 
@@ -229,7 +229,7 @@ export function WellbeingTab() {
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={load}
           >
-            {t('wellbeing.try_again', 'Try Again')}
+            {t('wellbeing.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -256,14 +256,14 @@ export function WellbeingTab() {
       {!error && !isLoading && !data && (
         <EmptyState
           icon={<Heart className="w-12 h-12" aria-hidden="true" />}
-          title={t('wellbeing.no_data_title', 'No wellbeing data yet')}
-          description={t('wellbeing.no_data_desc', 'Start logging your mood and tracking your volunteer wellness.')}
+          title={t('wellbeing.no_data_title')}
+          description={t('wellbeing.no_data_desc')}
           action={
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={onOpen}
             >
-              {t('wellbeing.log_mood', "Log How I'm Feeling")}
+              {t('wellbeing.log_mood')}
             </Button>
           }
         />
@@ -287,7 +287,7 @@ export function WellbeingTab() {
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${getScoreColor(data.score).text}`}>{data.score}</p>
-                  <p className="text-xs text-theme-muted">{t('wellbeing.score_label', 'Wellbeing Score')}</p>
+                  <p className="text-xs text-theme-muted">{t('wellbeing.score_label')}</p>
                 </div>
               </div>
             </GlassCard>
@@ -300,7 +300,7 @@ export function WellbeingTab() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-theme-primary">{t('hours_abbrev', { hours: data.hours_this_week })}</p>
-                  <p className="text-xs text-theme-muted">{t('wellbeing.this_week', 'This Week')}</p>
+                  <p className="text-xs text-theme-muted">{t('wellbeing.this_week')}</p>
                 </div>
               </div>
             </GlassCard>
@@ -313,7 +313,7 @@ export function WellbeingTab() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-theme-primary">{t('hours_abbrev', { hours: data.hours_this_month })}</p>
-                  <p className="text-xs text-theme-muted">{t('wellbeing.this_month', 'This Month')}</p>
+                  <p className="text-xs text-theme-muted">{t('wellbeing.this_month')}</p>
                 </div>
               </div>
             </GlassCard>
@@ -326,7 +326,7 @@ export function WellbeingTab() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-theme-primary">{data.streak_days}</p>
-                  <p className="text-xs text-theme-muted">{t('wellbeing.day_streak', 'Day Streak')}</p>
+                  <p className="text-xs text-theme-muted">{t('wellbeing.day_streak')}</p>
                 </div>
               </div>
             </GlassCard>
@@ -335,19 +335,19 @@ export function WellbeingTab() {
           {/* Wellbeing Score Bar */}
           <motion.div variants={itemVariants}>
             <GlassCard className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-3 mb-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-wrap items-center gap-2">
                   <Heart className="w-4 h-4 text-rose-400" aria-hidden="true" />
-                  <span className="text-sm font-medium text-theme-primary">{t('wellbeing.score_label', 'Wellbeing Score')}</span>
+                  <span className="text-sm font-medium text-theme-primary">{t('wellbeing.score_label')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Chip size="sm" color={getRiskColor(data.burnout_risk)} variant="flat">
-                    {data.burnout_risk === 'low' ? t('wellbeing.risk_low', 'Low Risk') : data.burnout_risk === 'moderate' ? t('wellbeing.risk_moderate', 'Moderate Risk') : t('wellbeing.risk_high', 'High Risk')}
+                    {data.burnout_risk === 'low' ? t('wellbeing.risk_low') : data.burnout_risk === 'moderate' ? t('wellbeing.risk_moderate') : t('wellbeing.risk_high')}
                   </Chip>
                   <span className={`text-sm font-semibold ${getScoreColor(data.score).text}`}>
-                    {t('wellbeing.score_out_of_100', '{{score}}/100 - {{label}}', {
+                    {t('wellbeing.score_out_of_100', {
                       score: data.score,
-                      label: getScoreLabel(data.score, (key, defaultValue) => t(key, defaultValue)),
+                      label: getScoreLabel(data.score, (key) => t(key)),
                     })}
                   </span>
                 </div>
@@ -360,7 +360,7 @@ export function WellbeingTab() {
                   track: 'bg-theme-hover',
                 }}
                 size="lg"
-                aria-label={t('wellbeing.score_aria', 'Wellbeing score: {{score}} out of 100', { score: data.score })}
+                aria-label={t('wellbeing.score_aria', { score: data.score })}
               />
             </GlassCard>
           </motion.div>
@@ -373,7 +373,7 @@ export function WellbeingTab() {
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div>
-                      <p className="text-sm font-medium text-theme-primary">{t('wellbeing.burnout_warning', 'Burnout Warning')}</p>
+                      <p className="text-sm font-medium text-theme-primary">{t('wellbeing.burnout_warning')}</p>
                       <p className="text-sm text-theme-muted">{warning}</p>
                     </div>
                   </div>
@@ -388,10 +388,10 @@ export function WellbeingTab() {
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <Coffee className="w-4 h-4 text-teal-400" aria-hidden="true" />
-                  <h3 className="font-semibold text-theme-primary">{t('wellbeing.suggested_rest_days', 'Suggested Rest Days')}</h3>
+                  <h3 className="font-semibold text-theme-primary">{t('wellbeing.suggested_rest_days')}</h3>
                 </div>
                 <p className="text-sm text-theme-muted mb-3">
-                  {t('wellbeing.rest_days_desc', 'Based on your recent activity, we recommend taking a break on these days:')}
+                  {t('wellbeing.rest_days_desc')}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {data.suggested_rest_days.map((day, i) => (
@@ -416,17 +416,17 @@ export function WellbeingTab() {
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <Smile className="w-4 h-4 text-rose-400" aria-hidden="true" />
-                  <h3 className="font-semibold text-theme-primary">{t('wellbeing.recent_checkins', 'Recent Mood Check-ins')}</h3>
+                  <h3 className="font-semibold text-theme-primary">{t('wellbeing.recent_checkins')}</h3>
                 </div>
                 <div className="space-y-3">
                   {data.recent_checkins.map((checkin) => (
                     <div key={checkin.id} className="flex items-center gap-3 p-3 rounded-xl bg-theme-elevated">
-                      <span className="text-2xl" role="img" aria-label={getMoodLabel(checkin.mood, (key, defaultValue) => t(key, defaultValue))}>
-                        {getMoodEmoji(checkin.mood, (key, defaultValue) => t(key, defaultValue))}
+                      <span className="text-2xl" role="img" aria-label={getMoodLabel(checkin.mood, (key) => t(key))}>
+                        {getMoodEmoji(checkin.mood, (key) => t(key))}
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-theme-primary">{getMoodLabel(checkin.mood, (key, defaultValue) => t(key, defaultValue))}</span>
+                          <span className="text-sm font-medium text-theme-primary">{getMoodLabel(checkin.mood, (key) => t(key))}</span>
                           <span className="text-xs text-theme-subtle">
                             {new Date(checkin.created_at).toLocaleDateString(undefined, {
                               month: 'short',
@@ -454,9 +454,9 @@ export function WellbeingTab() {
                 <div className="flex items-start gap-3">
                   <TrendingDown className="w-6 h-6 text-rose-400 flex-shrink-0" aria-hidden="true" />
                   <div>
-                    <h3 className="font-semibold text-theme-primary mb-1">{t('wellbeing.needs_attention_title', 'Your Wellbeing Needs Attention')}</h3>
+                    <h3 className="font-semibold text-theme-primary mb-1">{t('wellbeing.needs_attention_title')}</h3>
                     <p className="text-sm text-theme-muted mb-3">
-                      {t('wellbeing.needs_attention_desc', 'Your wellbeing score is below the healthy threshold. Consider taking some time off and reaching out to your community coordinator if you need support.')}
+                      {t('wellbeing.needs_attention_desc')}
                     </p>
                     <Button
                       size="sm"
@@ -465,15 +465,15 @@ export function WellbeingTab() {
                       startContent={<Coffee className="w-4 h-4" aria-hidden="true" />}
                       onPress={() => setShowTips(!showTips)}
                     >
-                      {showTips ? t('wellbeing.hide_tips', 'Hide Self-Care Tips') : t('wellbeing.view_tips', 'View Self-Care Tips')}
+                      {showTips ? t('wellbeing.hide_tips') : t('wellbeing.view_tips')}
                     </Button>
                     {showTips && (
                       <div className="mt-4 space-y-2">
-                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_breaks', 'Take regular breaks between volunteer shifts')}</p>
-                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_boundaries', 'Set boundaries on your availability')}</p>
-                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_connect', 'Connect with fellow volunteers for support')}</p>
-                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_celebrate', 'Celebrate your impact -- every hour counts')}</p>
-                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_reduce', 'Consider reducing frequency if feeling overwhelmed')}</p>
+                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_breaks')}</p>
+                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_boundaries')}</p>
+                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_connect')}</p>
+                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_celebrate')}</p>
+                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_reduce')}</p>
                       </div>
                     )}
                   </div>
@@ -492,17 +492,17 @@ export function WellbeingTab() {
           <ModalHeader className="text-theme-primary">
             <div className="flex items-center gap-2">
               <Smile className="w-5 h-5 text-rose-400" aria-hidden="true" />
-              {t('wellbeing.how_feeling', 'How Are You Feeling?')}
+              {t('wellbeing.how_feeling')}
             </div>
           </ModalHeader>
           <ModalBody className="space-y-6">
             <p className="text-sm text-theme-muted">
-              {t('wellbeing.checkin_desc', 'Take a moment to check in with yourself. Your responses help us suggest when you might need a break.')}
+              {t('wellbeing.checkin_desc')}
             </p>
 
             {/* Mood Selector */}
             <div>
-              <p className="text-sm font-medium text-theme-primary mb-3">{t('wellbeing.select_mood', 'Select your mood')}</p>
+              <p className="text-sm font-medium text-theme-primary mb-3">{t('wellbeing.select_mood')}</p>
               <div className="flex justify-center gap-3">
                 {moodOptions.map((mood) => (
                   <Button
@@ -526,8 +526,8 @@ export function WellbeingTab() {
 
             {/* Optional Note */}
             <Textarea
-              label={t('wellbeing.note_label', 'Add a note (optional)')}
-              placeholder={t('wellbeing.note_placeholder', "How's your energy level? Anything on your mind?")}
+              label={t('wellbeing.note_label')}
+              placeholder={t('wellbeing.note_placeholder')}
               value={checkinNote}
               onChange={(e) => setCheckinNote(e.target.value)}
               maxLength={500}
@@ -538,14 +538,14 @@ export function WellbeingTab() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('wellbeing.cancel', 'Cancel')}</Button>
+            <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('wellbeing.cancel')}</Button>
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleCheckin}
               isLoading={isSubmitting}
               startContent={!isSubmitting ? <Heart className="w-4 h-4" aria-hidden="true" /> : undefined}
             >
-              {t('wellbeing.submit_checkin', 'Submit Check-in')}
+              {t('wellbeing.submit_checkin')}
             </Button>
           </ModalFooter>
         </ModalContent>
