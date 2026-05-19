@@ -594,6 +594,7 @@
     },
     "history": {
       "title": "Your transfer history",
+      "aria": "Hour transfer history",
       "date": "Date",
       "destination": "Destination",
       "hours": "Hours",

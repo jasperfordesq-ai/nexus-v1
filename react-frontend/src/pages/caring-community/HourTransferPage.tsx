@@ -5,7 +5,19 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Button, Chip, Input, Spinner, Textarea } from '@heroui/react';
+import {
+  Button,
+  Chip,
+  Input,
+  Spinner,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  Textarea,
+} from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import CheckCircle from 'lucide-react/icons/circle-check';
@@ -58,6 +70,14 @@ const STATUS_COLOR: Record<TransferStatus, 'default' | 'primary' | 'success' | '
   completed: 'success',
   rejected: 'danger',
 };
+
+function formatDate(value: string): string {
+  return new Intl.DateTimeFormat(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(value));
+}
 
 export function HourTransferPage() {
   const { t } = useTranslation('common');
@@ -337,40 +357,36 @@ export function HourTransferPage() {
           ) : history.length === 0 ? (
             <p className="text-sm text-theme-muted">{t('hour_transfer.history.empty')}</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-xs uppercase tracking-wide text-theme-muted">
-                    <th className="py-2 pr-4">{t('hour_transfer.history.date')}</th>
-                    <th className="py-2 pr-4">{t('hour_transfer.history.destination')}</th>
-                    <th className="py-2 pr-4 text-right">{t('hour_transfer.history.hours')}</th>
-                    <th className="py-2 pr-4">{t('hour_transfer.history.status')}</th>
-                    <th className="py-2">{t('hour_transfer.history.reason')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {history.map((row) => (
-                    <tr key={row.id} className="border-t border-default-200">
-                      <td className="py-3 pr-4 whitespace-nowrap text-theme-muted">
-                        {new Date(row.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="py-3 pr-4">{row.destination_tenant_slug}</td>
-                      <td className="py-3 pr-4 text-right tabular-nums">
-                        {row.hours.toFixed(2)}
-                      </td>
-                      <td className="py-3 pr-4">
-                        <Chip size="sm" variant="flat" color={STATUS_COLOR[row.status] ?? 'default'}>
-                          {t(`hour_transfer.status.${row.status}`)}
-                        </Chip>
-                      </td>
-                      <td className="py-3 text-theme-muted">
-                        {row.reason ? row.reason : '—'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Table aria-label={t('hour_transfer.history.aria')} removeWrapper>
+              <TableHeader>
+                <TableColumn>{t('hour_transfer.history.date')}</TableColumn>
+                <TableColumn>{t('hour_transfer.history.destination')}</TableColumn>
+                <TableColumn align="end">{t('hour_transfer.history.hours')}</TableColumn>
+                <TableColumn>{t('hour_transfer.history.status')}</TableColumn>
+                <TableColumn>{t('hour_transfer.history.reason')}</TableColumn>
+              </TableHeader>
+              <TableBody>
+                {history.map((row) => (
+                  <TableRow key={row.id}>
+                    <TableCell className="whitespace-nowrap text-theme-muted">
+                      {formatDate(row.created_at)}
+                    </TableCell>
+                    <TableCell>{row.destination_tenant_slug}</TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {row.hours.toFixed(2)}
+                    </TableCell>
+                    <TableCell>
+                      <Chip size="sm" variant="flat" color={STATUS_COLOR[row.status] ?? 'default'}>
+                        {t(`hour_transfer.status.${row.status}`)}
+                      </Chip>
+                    </TableCell>
+                    <TableCell className="text-theme-muted">
+                      {row.reason ? row.reason : t('empty_dash')}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </GlassCard>
       </div>
