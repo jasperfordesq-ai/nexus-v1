@@ -575,6 +575,7 @@
     "refresh": "Refresh",
     "map_view": "Map view",
     "list_view": "List view",
+    "location_required": "Set your location in your profile to use this feature",
     "search_failed": "Map search failed. Please try again.",
     "not_available_title": "Map View Not Available",
     "not_available_description": "The map library is not configured. Listings are shown in the list view.",

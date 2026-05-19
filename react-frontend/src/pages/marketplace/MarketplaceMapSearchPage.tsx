@@ -82,7 +82,7 @@ const RADIUS_OPTIONS = [
 
 export function MarketplaceMapSearchPage() {
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('map.page_title', 'Map Search - Marketplace'));
+  usePageTitle(t('map.page_title'));
   const { isAuthenticated, user } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -173,7 +173,7 @@ export function MarketplaceMapSearchPage() {
       }
     } catch (err) {
       logError('Failed to load nearby listings', err);
-      toast.error(t('map.search_failed', 'Map search failed. Please try again.'));
+      toast.error(t('map.search_failed'));
     } finally {
       setIsLoading(false);
     }
@@ -202,14 +202,14 @@ export function MarketplaceMapSearchPage() {
     if (user?.latitude != null && user?.longitude != null) {
       setMapCenter({ lat: user.latitude, lng: user.longitude });
     } else {
-      toast.error(t('members.near_me_no_location', 'Set your location in your profile to use this feature'));
+      toast.error(t('map.location_required'));
     }
   }, [user?.latitude, user?.longitude, toast, t]);
 
   // Save / Unsave handlers
   const handleSave = useCallback(async (id: number) => {
     if (!isAuthenticated) {
-      toast.error(t('common.sign_in_to_save', 'Please sign in to save listings'));
+      toast.error(t('common.sign_in_to_save'));
       return;
     }
     try {
@@ -217,10 +217,10 @@ export function MarketplaceMapSearchPage() {
       setListings((prev) =>
         prev.map((l) => (l.id === id ? { ...l, is_saved: true } : l))
       );
-      toast.success(t('common.saved_for_later', 'Saved for later'));
+      toast.success(t('common.saved_for_later'));
     } catch (err) {
       logError('Failed to save listing', err);
-      toast.error(t('common.save_failed', 'Failed to update saved status'));
+      toast.error(t('common.save_failed'));
     }
   }, [isAuthenticated, toast, t]);
 
@@ -231,10 +231,10 @@ export function MarketplaceMapSearchPage() {
       setListings((prev) =>
         prev.map((l) => (l.id === id ? { ...l, is_saved: false } : l))
       );
-      toast.success(t('common.removed_from_saved', 'Removed from saved'));
+      toast.success(t('common.removed_from_saved'));
     } catch (err) {
       logError('Failed to unsave listing', err);
-      toast.error(t('common.save_failed', 'Failed to update saved status'));
+      toast.error(t('common.save_failed'));
     }
   }, [isAuthenticated, toast, t]);
 
@@ -244,8 +244,8 @@ export function MarketplaceMapSearchPage() {
   return (
     <>
       <PageMeta
-        title={t('map.page_title', 'Map Search - Marketplace')}
-        description={t('map.meta_description', 'Find marketplace listings near you on the map.')}
+        title={t('map.page_title')}
+        description={t('map.meta_description')}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-4">
@@ -257,16 +257,16 @@ export function MarketplaceMapSearchPage() {
             variant="light"
             size="sm"
           >
-            {t('page_title', 'Marketplace')}
+            {t('page_title')}
           </Button>
           <span className="text-default-300">/</span>
-          <span className="text-foreground font-medium">{t('map.breadcrumb', 'Map Search')}</span>
+          <span className="text-foreground font-medium">{t('map.breadcrumb')}</span>
         </div>
 
         {/* Search bar + controls */}
-        <div className="flex gap-3 items-end flex-wrap">
+        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem] lg:grid-cols-[minmax(0,1fr)_8rem_12rem_auto]">
           <Input
-            placeholder={t('map.search_placeholder', 'Search nearby listings...')}
+            placeholder={t('map.search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
             startContent={<Search className="w-4 h-4 text-default-400" />}
@@ -275,7 +275,7 @@ export function MarketplaceMapSearchPage() {
             classNames={{ inputWrapper: 'bg-background' }}
             isClearable
             onClear={() => setSearchQuery('')}
-            className="flex-1 min-w-[200px]"
+            className="min-w-0"
           />
 
           <Select
@@ -285,8 +285,8 @@ export function MarketplaceMapSearchPage() {
               if (selected) setRadiusKm(String(selected));
             }}
             size="lg"
-            className="w-32 shrink-0"
-            aria-label={t('map.radius_label', 'Search radius')}
+            className="min-w-0"
+            aria-label={t('map.radius_label')}
           >
             {RADIUS_OPTIONS.map((opt) => (
               <SelectItem key={opt.value}>{t('map.radius_option', { km: opt.value })}</SelectItem>
@@ -294,15 +294,15 @@ export function MarketplaceMapSearchPage() {
           </Select>
 
           <Select
-            placeholder={t('search.all_categories', 'All Categories')}
+            placeholder={t('search.all_categories')}
             selectedKeys={categoryId ? [categoryId] : []}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0];
               setCategoryId(selected ? String(selected) : '');
             }}
             size="lg"
-            className="w-48 shrink-0 hidden sm:block"
-            aria-label={t('search.category_label', 'Category')}
+            className="hidden min-w-0 lg:block"
+            aria-label={t('search.category_label')}
           >
             {categories.map((cat) => (
               <SelectItem key={String(cat.id)}>
@@ -312,14 +312,14 @@ export function MarketplaceMapSearchPage() {
           </Select>
 
           {/* Mobile view toggle */}
-          <div className="flex gap-1 lg:hidden shrink-0">
+          <div className="flex gap-1 lg:hidden">
             <Button
               isIconOnly
               variant={viewMode === 'map' ? 'solid' : 'bordered'}
               color={viewMode === 'map' ? 'primary' : 'default'}
               size="lg"
               onPress={() => setViewMode('map')}
-              aria-label={t('map.map_view', 'Map view')}
+              aria-label={t('map.map_view')}
             >
               <MapIcon className="w-4 h-4" />
             </Button>
@@ -329,7 +329,7 @@ export function MarketplaceMapSearchPage() {
               color={viewMode === 'list' ? 'primary' : 'default'}
               size="lg"
               onPress={() => setViewMode('list')}
-              aria-label={t('map.list_view', 'List view')}
+              aria-label={t('map.list_view')}
             >
               <List className="w-4 h-4" />
             </Button>
@@ -345,7 +345,7 @@ export function MarketplaceMapSearchPage() {
                 variant="flat"
                 size="sm"
               >
-                {categories.find((c) => String(c.id) === categoryId)?.name || 'Category'}
+                {categories.find((c) => String(c.id) === categoryId)?.name || t('search.category_label')}
               </Chip>
             )}
             {radiusKm !== String(DEFAULT_RADIUS_KM) && (
@@ -354,7 +354,7 @@ export function MarketplaceMapSearchPage() {
                 variant="flat"
                 size="sm"
               >
-                {t('map.radius_chip', '{{km}} km radius', { km: radiusKm })}
+                {t('map.radius_chip', { km: radiusKm })}
               </Chip>
             )}
           </div>
@@ -364,7 +364,7 @@ export function MarketplaceMapSearchPage() {
         {!isLoading && listings.length > 0 && (
           <div className="flex items-center justify-between">
             <p className="text-sm text-default-500">
-              {t('map.results_count', '{{count}} listings found nearby', { count: listings.length })}
+              {t('map.results_count', { count: listings.length })}
             </p>
             <Button
               variant="flat"
@@ -372,7 +372,7 @@ export function MarketplaceMapSearchPage() {
               startContent={<RefreshCw className="w-3.5 h-3.5" />}
               onPress={loadListings}
             >
-              {t('map.refresh', 'Refresh')}
+              {t('map.refresh')}
             </Button>
           </div>
         )}
@@ -390,8 +390,8 @@ export function MarketplaceMapSearchPage() {
               ) : listings.length === 0 ? (
                 <EmptyState
                   icon={<Search className="w-6 h-6" />}
-                  title={t('map.no_results_title', 'No Nearby Listings')}
-                  description={t('map.no_results_description', 'Try expanding your search radius or moving the map.')}
+                  title={t('map.no_results_title')}
+                  description={t('map.no_results_description')}
                 />
               ) : (
                 <div className="space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto pr-1 scrollbar-hide">
@@ -425,7 +425,7 @@ export function MarketplaceMapSearchPage() {
                             </p>
                             <p className="text-sm font-bold text-primary mt-0.5">
                               {listing.price_type === 'free' || listing.price === null || listing.price === 0
-                                ? t('price.free', 'Free')
+                                ? t('price.free')
                                 : new Intl.NumberFormat(undefined, {
                                     style: 'currency',
                                     currency: listing.price_currency || 'EUR',
@@ -436,8 +436,8 @@ export function MarketplaceMapSearchPage() {
                             {listing.distance_km != null && (
                               <p className="text-xs text-default-400 mt-0.5">
                                 {listing.distance_km < 1
-                                  ? t('map.distance_meters', '{{m}}m away', { m: Math.round(listing.distance_km * 1000) })
-                                  : t('map.distance_km', '{{km}} km away', { km: listing.distance_km.toFixed(1) })}
+                                  ? t('map.distance_meters', { m: Math.round(listing.distance_km * 1000) })
+                                  : t('map.distance_km', { km: listing.distance_km.toFixed(1) })}
                               </p>
                             )}
                           </div>
@@ -474,8 +474,8 @@ export function MarketplaceMapSearchPage() {
               ) : listings.length === 0 ? (
                 <EmptyState
                   icon={<Search className="w-6 h-6" />}
-                  title={t('map.no_results_title', 'No Nearby Listings')}
-                  description={t('map.no_results_description', 'Try expanding your search radius or moving the map.')}
+                  title={t('map.no_results_title')}
+                  description={t('map.no_results_description')}
                 />
               ) : (
                 <MarketplaceListingGrid
