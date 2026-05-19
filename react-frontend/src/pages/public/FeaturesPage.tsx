@@ -59,35 +59,39 @@ function MaturityChip({ level }: { level: Maturity }) {
 // ---------------------------------------------------------------------------
 
 interface FeatureItem {
-  title: string;
-  description: string;
+  key: string;
   maturity?: Maturity;
-  note?: string;
 }
 
-function FeatureList({ items }: { items: FeatureItem[] }) {
+function FeatureList({ groupKey, items }: { groupKey: string; items: FeatureItem[] }) {
+  const { t } = useTranslation('public');
+
   return (
     <ul className="space-y-3 list-none">
-      {items.map((item, idx) => (
-        <li key={idx} className="flex items-start gap-2">
+      {items.map((item) => {
+        const copyKey = `features_page.groups.${groupKey}.items.${item.key}`;
+        const note = t(`${copyKey}.note`, { defaultValue: '' });
+
+        return (
+        <li key={item.key} className="flex items-start gap-2">
           <CheckCircle className="w-4 h-4 text-success shrink-0 mt-1" aria-hidden="true" />
           <div className="text-sm">
-            <span className="font-semibold text-foreground">{item.title}</span>
+            <span className="font-semibold text-foreground">{t(`${copyKey}.title`)}</span>
             <MaturityChip level={item.maturity ?? 'ga'} />
-            <span className="text-foreground-600"> - {item.description}</span>
-            {item.note && (
-              <p className="text-xs text-foreground-500 mt-1 italic">{item.note}</p>
+            <span className="text-foreground-600"> {t(`${copyKey}.description`)}</span>
+            {note && (
+              <p className="text-xs text-foreground-500 mt-1 italic">{note}</p>
             )}
           </div>
         </li>
-      ))}
+        );
+      })}
     </ul>
   );
 }
 
 interface FeatureGroup {
-  title: string;
-  intro?: string;
+  key: string;
   items: FeatureItem[];
 }
 
@@ -98,16 +102,20 @@ function FeatureSection({
   group: FeatureGroup;
   icon?: ReactNode;
 }) {
+  const { t } = useTranslation('public');
+  const groupKey = `features_page.groups.${group.key}`;
+  const intro = t(`${groupKey}.intro`, { defaultValue: '' });
+
   return (
     <Card>
       <CardHeader className="flex gap-2 items-center">
         {icon}
-        <h2 className="text-lg font-semibold">{group.title}</h2>
+        <h2 className="text-lg font-semibold">{t(`${groupKey}.title`)}</h2>
       </CardHeader>
       <Divider />
       <CardBody className="space-y-3">
-        {group.intro && <p className="text-sm text-foreground-600">{group.intro}</p>}
-        <FeatureList items={group.items} />
+        {intro && <p className="text-sm text-foreground-600">{intro}</p>}
+        <FeatureList groupKey={group.key} items={group.items} />
       </CardBody>
     </Card>
   );
@@ -119,129 +127,306 @@ function FeatureSection({
 
 const GROUPS: FeatureGroup[] = [
   {
-    title: 'Core Platform',
+    key: 'core_platform',
     items: [
-      { title: 'Timebanking Engine', description: 'Full credit exchange system with wallet, transactions, and broker controls.' },
-      { title: 'Multi-Tenancy', description: 'Host unlimited communities on a single platform, each with their own branding, configuration, and feature set.' },
-      { title: 'Tenant Hierarchy', description: 'Parent–child tenant relationships with feature toggling and federation scoping.' },
-      { title: 'Smart Matching', description: 'AI-powered matching with semantic embeddings, collaborative filtering, availability scheduling, and learned preferences.' },
-      { title: 'Real-Time Messaging', description: 'Private conversations with Pusher WebSocket integration and real-time presence.' },
-      { title: 'Progressive Web App', description: 'Install as a PWA on any device — offline shell, push notifications, NetworkFirst update flow.' },
-      { title: 'Native Mobile App', description: 'iOS and Android builds from the same React codebase via Capacitor.', maturity: 'beta', note: 'Web is the primary distribution channel; native builds are tested but not yet under continuous release.' },
-    ],
+      {
+        key: 'timebanking_engine'
+      },
+      {
+        key: 'multi_tenancy'
+      },
+      {
+        key: 'tenant_hierarchy'
+      },
+      {
+        key: 'smart_matching'
+      },
+      {
+        key: 'real_time_messaging'
+      },
+      {
+        key: 'progressive_web_app'
+      },
+      {
+        key: 'native_mobile_app',
+        maturity: 'beta'
+      }
+    ]
   },
   {
-    title: 'Federation',
-    intro: 'A four-protocol federation layer for cross-community exchange — Nexus (native), Komunitin (15 endpoints), Credit Commons Protocol (11 endpoints, CEN-compatible), and TimeOverflow.',
+    key: 'federation',
     items: [
-      { title: 'Federation Network', description: 'Connect multiple NEXUS communities into a network for cross-community discovery, listings, events, and messaging.' },
-      { title: 'External Partner Federation', description: 'Live with external timebanking platforms — partnerships established, messages flowing, credit exchange under active testing.', maturity: 'beta', note: 'Real partnerships exist and exchange data daily. The wire protocols are still being hardened against edge cases — treat external credit transfers as supervised, not automated.' },
-      { title: 'Multi-Protocol Adapters', description: 'Two-way sync across 9 entity types: members, listings, events, groups, connections, volunteering, reviews, transfers, messages.', maturity: 'beta' },
-      { title: 'Federation Neighborhoods', description: 'Geographically grouped clusters of federated communities for regional coordination.', maturity: 'beta' },
-      { title: 'Credit Agreements', description: 'Negotiated exchange-rate terms between federated communities.', maturity: 'beta' },
-      { title: 'Federation Analytics', description: 'Live admin dashboards for partner activity, sync health, and federated transaction volume.' },
-    ],
+      {
+        key: 'federation_network'
+      },
+      {
+        key: 'external_partner_federation',
+        maturity: 'beta'
+      },
+      {
+        key: 'multi_protocol_adapters',
+        maturity: 'beta'
+      },
+      {
+        key: 'federation_neighborhoods',
+        maturity: 'beta'
+      },
+      {
+        key: 'credit_agreements',
+        maturity: 'beta'
+      },
+      {
+        key: 'federation_analytics'
+      }
+    ]
   },
   {
-    title: 'Member Experience',
+    key: 'member_experience',
     items: [
-      { title: 'Service Listings', description: 'Post offers and requests, browse and smart-match listings.' },
-      { title: 'Marketplace', description: 'Standalone classifieds module with Stripe Connect payouts, orders, seller profiles, and AI-powered reply suggestions.', maturity: 'beta' },
-      { title: 'Donations', description: 'One-off and recurring donations via Stripe with full dashboards and receipts for organisations.' },
-      { title: 'Identity Verification', description: 'Optional Stripe Identity flow (document + selfie + name/DOB matching) with a verified-member badge.', maturity: 'beta' },
-      { title: 'Exchange Workflow', description: 'Structured service-exchange lifecycle with broker approval and dispute handling.' },
-      { title: 'Group Exchanges', description: 'Bulk community service exchanges across multiple members.' },
-      { title: 'Social Feed', description: 'Posts, comments, likes, polls, hashtags, voice messages, media attachments, link previews, and @mentions.' },
-      { title: 'Stories', description: 'Ephemeral 24-hour photo and video stories with reactions, polls, and highlights.', maturity: 'beta' },
-      { title: 'Presence System', description: 'Real-time online/offline status with privacy controls and custom status messages.' },
-      { title: 'Events & Groups', description: 'Community gatherings, interest-based groups, and event reminders.' },
-      { title: 'Connections', description: 'Follow and connect with other community members.' },
-      { title: 'Members Directory', description: 'Browse, filter, and discover people in your community.' },
-      { title: 'Gamification', description: 'Verification badges, journeys, XP, leaderboards, achievements, challenges, streaks, XP shop rewards, community dashboard, and seasonal competitions.' },
-      { title: 'Goals & Impact', description: 'Track personal goals and community impact with mentoring and deliverables tracking.' },
-      { title: 'Ideation Challenges', description: 'Innovation hub with campaigns, ideas, voting, and outcomes tracking.' },
-      { title: 'Volunteering', description: 'Volunteer opportunities, hours tracking, check-ins, expenses, certificates, wellbeing monitoring, emergency alerts, and a volunteer-organisation wallet that pays out time credits on approved hours.' },
-      { title: 'Job Vacancies', description: 'Full recruitment module with alerts, analytics, and a public RSS/JSON job feed for aggregators.' },
-      { title: 'Organisations', description: 'Company and employer profiles with sub-accounts and a dedicated organisation wallet.' },
-      { title: 'Sub-Accounts / Family Accounts', description: 'Parent–child account relationships for household and family management.' },
-      { title: 'Reviews & Ratings', description: 'Build trust through structured member feedback.' },
-      { title: 'Endorsements', description: 'Peer skill and experience endorsements.' },
-      { title: 'Polls', description: 'Community voting and surveys with multiple question types.' },
-      { title: 'Skills Browse', description: 'Explore the skill taxonomy and discover expertise.' },
-      { title: 'Availability Scheduling', description: 'Timezone-aware time-slot scheduling for smart matching and bookings.' },
-    ],
+      {
+        key: 'service_listings'
+      },
+      {
+        key: 'marketplace',
+        maturity: 'beta'
+      },
+      {
+        key: 'donations'
+      },
+      {
+        key: 'identity_verification',
+        maturity: 'beta'
+      },
+      {
+        key: 'exchange_workflow'
+      },
+      {
+        key: 'group_exchanges'
+      },
+      {
+        key: 'social_feed'
+      },
+      {
+        key: 'stories',
+        maturity: 'beta'
+      },
+      {
+        key: 'presence_system'
+      },
+      {
+        key: 'events_and_groups'
+      },
+      {
+        key: 'connections'
+      },
+      {
+        key: 'members_directory'
+      },
+      {
+        key: 'gamification'
+      },
+      {
+        key: 'goals_and_impact'
+      },
+      {
+        key: 'ideation_challenges'
+      },
+      {
+        key: 'volunteering'
+      },
+      {
+        key: 'job_vacancies'
+      },
+      {
+        key: 'organisations'
+      },
+      {
+        key: 'sub_accounts_family_accounts'
+      },
+      {
+        key: 'reviews_and_ratings'
+      },
+      {
+        key: 'endorsements'
+      },
+      {
+        key: 'polls'
+      },
+      {
+        key: 'skills_browse'
+      },
+      {
+        key: 'availability_scheduling'
+      }
+    ]
   },
   {
-    title: 'Content & Communication',
+    key: 'content_and_communication',
     items: [
-      { title: 'Blog', description: 'Tenant-managed content management and community news.' },
-      { title: 'Resources & Knowledge Base', description: 'Structured articles and a shared resource library.' },
-      { title: 'Help Center', description: 'Documentation hub and FAQ.' },
-      { title: 'Custom Pages', description: 'Tenant-managed CMS pages for community content.' },
-      { title: 'Newsletter System', description: 'Email campaign manager with A/B testing, smart segments, geo targeting, recurring sends, templates, send-time optimisation, and full open/click analytics.' },
-      { title: 'AI Chat', description: 'OpenAI-powered assistant for platform guidance.', maturity: 'beta' },
-      { title: 'Legal Hub', description: 'Versioned legal documents with acceptance gates and audit trail.' },
-      { title: 'Impact Reports', description: 'SROI analysis, member outcome reports, and social impact case studies.' },
-      { title: 'Social Prescribing', description: 'Information and tooling for community health integration workflows.', maturity: 'preview' },
-    ],
+      {
+        key: 'blog'
+      },
+      {
+        key: 'resources_and_knowledge_base'
+      },
+      {
+        key: 'help_center'
+      },
+      {
+        key: 'custom_pages'
+      },
+      {
+        key: 'newsletter_system'
+      },
+      {
+        key: 'ai_chat',
+        maturity: 'beta'
+      },
+      {
+        key: 'legal_hub'
+      },
+      {
+        key: 'impact_reports'
+      },
+      {
+        key: 'social_prescribing',
+        maturity: 'preview'
+      }
+    ]
   },
   {
-    title: 'Trust, Reputation & Safety',
+    key: 'trust_reputation_and_safety',
     items: [
-      { title: 'Member Verification Badges', description: 'Verified status indicators on member profiles.' },
-      { title: 'NexusScore', description: 'Proprietary reputation and trustworthiness scoring.' },
-      { title: 'Streaks', description: 'Consecutive activity tracking to reward consistent engagement.' },
-      { title: 'Personal Insights Dashboard', description: 'Individual engagement metrics, hours given/received, skills breakdown, monthly charts, and personalised recommendations.' },
-      { title: 'Safeguarding Module', description: 'Flagged content review workflow, incident reporting, safeguarding assignment tracking, and a community safety dashboard.' },
-      { title: 'CRM', description: 'Admin contact management with notes, tasks, tags, activity timelines, and export.' },
-    ],
+      {
+        key: 'member_verification_badges'
+      },
+      {
+        key: 'nexusscore'
+      },
+      {
+        key: 'streaks'
+      },
+      {
+        key: 'personal_insights_dashboard'
+      },
+      {
+        key: 'safeguarding_module'
+      },
+      {
+        key: 'crm'
+      }
+    ]
   },
   {
-    title: 'AI & Recommendation Engine',
+    key: 'ai_and_recommendation_engine',
     items: [
-      { title: 'Semantic Search', description: 'Meilisearch-powered full-text search across listings, members, events, and groups with typo tolerance, synonyms, and per-tenant isolation.' },
-      { title: 'Collaborative Filtering', description: 'Item-based recommendations from real community interaction data.' },
-      { title: 'Semantic Embeddings', description: 'OpenAI-powered content matching for listings, members, and requests.' },
-      { title: 'EdgeRank Feed', description: 'Time-decay, affinity, and engagement-weighted feed ranking.' },
-      { title: 'MatchRank & CommunityRank', description: 'Bayesian quality scoring with Wilson confidence intervals.' },
-      { title: 'Group Recommendations', description: 'Trending and affinity-based group discovery.' },
-      { title: 'Match Learning', description: 'Feedback loop that improves recommendations from user interactions.' },
-      { title: 'Algorithm Health Dashboard', description: 'Live admin monitoring and tuning of all ranking systems.' },
-    ],
+      {
+        key: 'semantic_search'
+      },
+      {
+        key: 'collaborative_filtering'
+      },
+      {
+        key: 'semantic_embeddings'
+      },
+      {
+        key: 'edgerank_feed'
+      },
+      {
+        key: 'matchrank_and_communityrank'
+      },
+      {
+        key: 'group_recommendations'
+      },
+      {
+        key: 'match_learning'
+      },
+      {
+        key: 'algorithm_health_dashboard'
+      }
+    ]
   },
   {
-    title: 'Caring Community Layer',
-    intro: 'A pilot-readiness governance layer for civic and caring-community deployments — most modules shipped April–May 2026.',
+    key: 'caring_community_layer',
     items: [
-      { title: 'Civic Digest', description: 'Periodic summary of community activity and outcomes for stakeholders.', maturity: 'preview' },
-      { title: 'Success Stories', description: 'Curated case studies of member-led outcomes.', maturity: 'preview' },
-      { title: 'Feedback Inbox', description: 'Centralised pilot-feedback capture with admin triage.', maturity: 'preview' },
-      { title: 'Integration Showcase', description: 'Public surface for connected partners and integrations.', maturity: 'preview' },
-      { title: 'Lead Nurture', description: 'Workflow tooling for pilot-stakeholder follow-up.', maturity: 'preview' },
-      { title: 'Copilot', description: 'In-context AI helper for community administrators.', maturity: 'preview' },
-    ],
+      {
+        key: 'civic_digest',
+        maturity: 'preview'
+      },
+      {
+        key: 'success_stories',
+        maturity: 'preview'
+      },
+      {
+        key: 'feedback_inbox',
+        maturity: 'preview'
+      },
+      {
+        key: 'integration_showcase',
+        maturity: 'preview'
+      },
+      {
+        key: 'lead_nurture',
+        maturity: 'preview'
+      },
+      {
+        key: 'copilot',
+        maturity: 'preview'
+      }
+    ]
   },
   {
-    title: 'Built for Production',
+    key: 'built_for_production',
     items: [
-      { title: 'Enterprise Security', description: 'CSRF, rate limiting, TOTP 2FA, WebAuthn passkeys, CSP nonces, a CORS allowlist, Form Request validation, email verification gates, and invite-code registration.' },
-      { title: 'Stripe Payments Layer', description: 'Subscriptions, donations, marketplace (Connect), and identity verification, with idempotent webhook handling and deep money-flow test coverage.' },
-      { title: 'GDPR Compliance Suite', description: 'Data requests, consent management, cookie consent, breach tracking, and a full audit log.' },
-      { title: 'Fraud & Abuse Detection', description: 'Automated suspicious-activity alerts and content moderation.' },
-      { title: 'Insurance Certificate Tracking', description: 'Volunteer insurance management and verification.' },
-      { title: 'Enterprise RBAC', description: 'Role-based access control across 13+ modules with a full permission matrix.' },
-      { title: 'WCAG 2.1 AA Accessibility', description: 'Audited accessibility compliance across the user-facing surface.' },
-      { title: 'Multi-Language Support', description: '11 languages: English, Irish, German, French, Italian, Portuguese, Spanish, Dutch, Polish, Japanese, and Arabic (full RTL).' },
-      { title: 'Self-Hosted Prerendering', description: 'Bot-only Playwright snapshots served to SEO crawlers; users always get the live SPA.' },
-      { title: 'Guided Onboarding', description: 'Wizard for new members with smart defaults.' },
-      { title: 'Admin Panel', description: 'Algorithm controls, diagnostics, cron-job monitoring, and email-deliverability monitoring.' },
-      { title: 'Email Webhook Processing', description: 'SendGrid bounce, complaint, and delivery event handling.' },
-      { title: '500+ PHPUnit Tests', description: 'Money flow, webhooks, federation, groups, marketplace — plus Vitest frontend suites.' },
-      { title: 'OpenAPI 3.0 Specification', description: 'Full API spec with Swagger UI docs.' },
-      { title: 'Fully Dockerized', description: 'Production and development run from the same Docker Compose foundations.' },
-    ],
-  },
+      {
+        key: 'enterprise_security'
+      },
+      {
+        key: 'stripe_payments_layer'
+      },
+      {
+        key: 'gdpr_compliance_suite'
+      },
+      {
+        key: 'fraud_and_abuse_detection'
+      },
+      {
+        key: 'insurance_certificate_tracking'
+      },
+      {
+        key: 'enterprise_rbac'
+      },
+      {
+        key: 'wcag_2_1_aa_accessibility'
+      },
+      {
+        key: 'multi_language_support'
+      },
+      {
+        key: 'self_hosted_prerendering'
+      },
+      {
+        key: 'guided_onboarding'
+      },
+      {
+        key: 'admin_panel'
+      },
+      {
+        key: 'email_webhook_processing'
+      },
+      {
+        key: '500plus_phpunit_tests'
+      },
+      {
+        key: 'openapi_3_0_specification'
+      },
+      {
+        key: 'fully_dockerized'
+      }
+    ]
+  }
 ];
+
 
 // ---------------------------------------------------------------------------
 // Page
@@ -332,7 +517,7 @@ export function FeaturesPage() {
           <Sparkles className="w-5 h-5 text-secondary" aria-hidden="true" />,
           <Shield className="w-5 h-5 text-primary" aria-hidden="true" />,
         ];
-        return <FeatureSection key={group.title} group={group} icon={icons[index]} />;
+        return <FeatureSection key={group.key} group={group} icon={icons[index]} />;
       })}
 
       {/* Modern Tech Stack */}
