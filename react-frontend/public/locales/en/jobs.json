@@ -945,7 +945,12 @@
       "title": "Bias Audit"
     },
     "create": {
-      "title": "Post a Job"
+      "title": "Post a Job",
+      "description": "Create a job, volunteering, or timebanking vacancy for your community."
+    },
+    "edit": {
+      "title": "Edit Job",
+      "description": "Update vacancy details, compensation, team settings, and publishing options."
     },
     "talent_search": {
       "title": "Talent Search"

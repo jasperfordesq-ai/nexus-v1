@@ -367,19 +367,19 @@ export function CreateJobPage() {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       if (deadlineDate < today) {
-        newErrors.deadline = t('form.validation.deadline_past', 'Deadline must be a future date');
+        newErrors.deadline = t('form.validation.deadline_past');
       }
     }
 
     // Salary min cannot exceed max
     if (form.salary_min && form.salary_max && Number(form.salary_min) > Number(form.salary_max)) {
-      newErrors.salary_range = t('form.validation.salary_range_invalid', 'Minimum salary cannot exceed maximum salary');
+      newErrors.salary_range = t('form.validation.salary_range_invalid');
     }
 
     // EU Pay Transparency: salary range required for paid jobs unless negotiable
     if (mode === 'publish' && form.type === 'paid' && !form.salary_negotiable) {
       if (!form.salary_min && !form.salary_max) {
-        newErrors.salary_range = t('form.validation.salary_required', "Salary range required. You may check 'Salary negotiable' to omit.");
+        newErrors.salary_range = t('form.validation.salary_required');
       }
     }
 
@@ -563,13 +563,13 @@ export function CreateJobPage() {
         const templateData = response.data as JobTemplate | { template?: JobTemplate };
         const savedTemplate = 'template' in templateData && templateData.template ? templateData.template : (templateData as JobTemplate);
         setTemplates((prev) => [...prev, savedTemplate]);
-        toast.success(t('templates.saved', 'Template saved'));
+        toast.success(t('templates.saved'));
       } else {
-        toast.error(t('template.save_error', 'Failed to save template'));
+        toast.error(t('template.save_error'));
       }
     } catch (err) {
       logError('Failed to save template', err);
-      toast.error(t('template.save_error', 'Failed to save template'));
+      toast.error(t('template.save_error'));
     } finally {
       setIsSavingTemplate(false);
       setSaveTemplateOpen(false);
@@ -585,7 +585,7 @@ export function CreateJobPage() {
       if (res.success) {
         setTemplates((prev) => prev.filter((t) => t.id !== templateId));
         if (selectedTemplate === String(templateId)) setSelectedTemplate('');
-        toastRef.current.success(tRef.current('templates.deleted', 'Template deleted'));
+        toastRef.current.success(tRef.current('templates.deleted'));
       }
     } catch (err) {
       logError('Failed to delete template', err);
@@ -628,7 +628,7 @@ export function CreateJobPage() {
       const res = await api.post(`/v2/jobs/${jobId}/team`, { user_id: userId, role: newMemberRole });
       if (res.success && res.data) {
         setTeamMembers((prev) => [...prev, res.data as TeamMember]);
-        toastRef.current.success(tRef.current('team.added', 'Team member added'));
+        toastRef.current.success(tRef.current('team.added'));
         setTeamSearchInput('');
         setMemberSearchResults([]);
         setAddMemberModalOpen(false);
@@ -649,7 +649,7 @@ export function CreateJobPage() {
       const res = await api.delete(`/v2/jobs/${jobId}/team/${memberId}`);
       if (res.success) {
         setTeamMembers((prev) => prev.filter((m) => m.id !== memberId));
-        toastRef.current.success(tRef.current('team.removed', 'Team member removed'));
+        toastRef.current.success(tRef.current('team.removed'));
       }
     } catch (err) {
       logError('Failed to remove team member', err);
@@ -673,7 +673,11 @@ export function CreateJobPage() {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
-      <PageMeta title={t('page_meta.create.title')} noIndex />
+      <PageMeta
+        title={isEditing ? t('page_meta.edit.title') : t('page_meta.create.title')}
+        description={isEditing ? t('page_meta.edit.description') : t('page_meta.create.description')}
+        noIndex
+      />
       {/* Back nav */}
       <Link
         to={isEditing ? tenantPath(`/jobs/${id}`) : tenantPath('/jobs')}
@@ -702,21 +706,21 @@ export function CreateJobPage() {
                   startContent={<FileText className="w-4 h-4" aria-hidden="true" />}
                   endContent={<ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />}
                 >
-                  {t('templates.title', 'Templates')}
+                  {t('templates.title')}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
-                aria-label={t('templates.title', 'Templates')}
+                aria-label={t('templates.title')}
                 onAction={(key) => {
                   const keyStr = String(key);
                   if (keyStr === 'empty') return;
                   applyTemplate(keyStr);
-                  toastRef.current.success(tRef.current('templates.loaded', 'Template loaded'));
+                  toastRef.current.success(tRef.current('templates.loaded'));
                 }}
               >
                 {templates.length === 0 ? (
                   <DropdownItem key="empty" isReadOnly className="text-theme-subtle italic">
-                    {t('templates.empty', 'No saved templates')}
+                    {t('templates.empty')}
                   </DropdownItem>
                 ) : (
                   templates.map((tpl) => (
@@ -732,7 +736,7 @@ export function CreateJobPage() {
                           onPress={() => {
                             void handleDeleteTemplate(tpl.id);
                           }}
-                          aria-label={t('templates.delete_confirm', 'Delete this template?')}
+                          aria-label={t('templates.delete_confirm')}
                         >
                           <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                         </Button>
@@ -1064,7 +1068,7 @@ export function CreateJobPage() {
                   startContent={<Info size={12} aria-hidden="true" />}
                   className="text-xs"
                 >
-                  {t('form.salary_transparency_hint', 'Required under EU Pay Transparency Directive (June 2026)')}
+                  {t('form.salary_transparency_hint')}
                 </Chip>
               </div>
 
@@ -1257,7 +1261,7 @@ export function CreateJobPage() {
               >
                 <span className="font-semibold text-theme-primary text-sm flex items-center gap-2">
                   <Users size={15} aria-hidden="true" />
-                  {t('team.title', 'Hiring Team')}
+                  {t('team.title')}
                   {teamMembers.length > 0 && (
                     <Chip size="sm" variant="flat" color="primary" className="ml-1">{teamMembers.length}</Chip>
                   )}
@@ -1308,7 +1312,7 @@ export function CreateJobPage() {
                     startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                     onPress={() => setAddMemberModalOpen(true)}
                   >
-                    {t('team.add_member', 'Add Member')}
+                    {t('team.add_member')}
                   </Button>
                 </div>
               )}
@@ -1318,7 +1322,7 @@ export function CreateJobPage() {
             <div className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated border border-theme-default">
               <Users size={16} className="text-theme-subtle shrink-0" aria-hidden="true" />
               <p className="text-sm text-theme-subtle">
-                {t('team.title', 'Hiring Team')} — {t('team.edit_only', 'Available after saving the job')}
+                {t('team.title')} — {t('team.edit_only')}
               </p>
             </div>
           )}
@@ -1333,7 +1337,7 @@ export function CreateJobPage() {
                 startContent={<FileText className="w-3.5 h-3.5" aria-hidden="true" />}
                 onPress={() => setSaveTemplateOpen(true)}
               >
-                {t('templates.save', 'Save as Template')}
+                {t('templates.save')}
               </Button>
             </div>
           )}
@@ -1392,7 +1396,7 @@ export function CreateJobPage() {
                     const response = await api.post('/v2/jobs', payload);
                     if (response.success) {
                       formDirtyRef.current = false;
-                      toastRef.current.success(tRef.current('form.draft_saved', 'Draft saved'));
+                      toastRef.current.success(tRef.current('form.draft_saved'));
                       const newId = (response.data as Record<string, unknown>)?.id;
                       if (newId) {
                         setCreatedJobId(String(newId));
@@ -1413,7 +1417,7 @@ export function CreateJobPage() {
                 isLoading={isSubmitting}
                 isDisabled={!form.title.trim() || !form.description.trim()}
               >
-                {t('form.save_draft', 'Save as Draft')}
+                {t('form.save_draft')}
               </Button>
             )}
             <Button
@@ -1439,12 +1443,12 @@ export function CreateJobPage() {
       >
         <ModalContent>
           <ModalHeader className="text-theme-primary">
-            {t('templates.save_title', 'Save Template')}
+            {t('templates.save_title')}
           </ModalHeader>
           <ModalBody className="space-y-4">
             <Input
-              label={t('templates.name_label', 'Template Name')}
-              placeholder={t('templates.name_placeholder', 'Enter a name for this template')}
+              label={t('templates.name_label')}
+              placeholder={t('templates.name_placeholder')}
               value={templateName}
               onChange={(e) => setTemplateName(e.target.value)}
               isRequired
@@ -1458,7 +1462,7 @@ export function CreateJobPage() {
               onValueChange={setTemplateIsPublic}
               classNames={{ label: 'text-theme-primary text-sm' }}
             >
-              {t('template.share_with_team', 'Share with team (public template)')}
+              {t('template.share_with_team')}
             </Switch>
           </ModalBody>
           <ModalFooter>
@@ -1476,8 +1480,8 @@ export function CreateJobPage() {
               isDisabled={!templateName.trim()}
             >
               {isSavingTemplate
-                ? t('template.saving', 'Saving...')
-                : t('templates.save_button', 'Save')}
+                ? t('template.saving')
+                : t('templates.save_button')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -1592,13 +1596,13 @@ export function CreateJobPage() {
       >
         <ModalContent>
           <ModalHeader className="text-theme-primary">
-            {t('team.add_member', 'Add Member')}
+            {t('team.add_member')}
           </ModalHeader>
           <ModalBody className="space-y-4">
             {/* Search input */}
             <Input
-              label={t('team.search_placeholder', 'Search members...')}
-              placeholder={t('team.search_placeholder', 'Search members...')}
+              label={t('team.search_placeholder')}
+              placeholder={t('team.search_placeholder')}
               value={teamSearchInput}
               onChange={(e) => handleMemberSearch(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -1610,7 +1614,7 @@ export function CreateJobPage() {
 
             {/* Role selector */}
             <Select
-              label={t('team.role', 'Role')}
+              label={t('team.role')}
               selectedKeys={[newMemberRole]}
               onChange={(e) => setNewMemberRole(e.target.value)}
               classNames={{
@@ -1618,14 +1622,14 @@ export function CreateJobPage() {
                 value: 'text-theme-primary',
               }}
             >
-              <SelectItem key="reviewer">{t('team.role_reviewer', 'Reviewer')}</SelectItem>
-              <SelectItem key="interviewer">{t('team.role_interviewer', 'Interviewer')}</SelectItem>
-              <SelectItem key="hiring_manager">{t('team.role_hiring_manager', 'Hiring Manager')}</SelectItem>
+              <SelectItem key="reviewer">{t('team.role_reviewer')}</SelectItem>
+              <SelectItem key="interviewer">{t('team.role_interviewer')}</SelectItem>
+              <SelectItem key="hiring_manager">{t('team.role_hiring_manager')}</SelectItem>
             </Select>
 
             {/* Search results */}
             {isMemberSearching && (
-              <p className="text-sm text-theme-subtle">{t('detail.loading', 'Loading...')}</p>
+              <p className="text-sm text-theme-subtle">{t('detail.loading')}</p>
             )}
             {memberSearchResults.length > 0 && (
               <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -1651,7 +1655,7 @@ export function CreateJobPage() {
               </div>
             )}
             {teamSearchInput.trim() && !isMemberSearching && memberSearchResults.length === 0 && (
-              <p className="text-sm text-theme-subtle italic">{t('empty_search', 'No members match your search')}</p>
+              <p className="text-sm text-theme-subtle italic">{t('empty_search')}</p>
             )}
           </ModalBody>
           <ModalFooter>
