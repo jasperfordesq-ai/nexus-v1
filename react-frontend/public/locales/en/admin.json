@@ -1767,6 +1767,11 @@
           "bulk_recache": "Invalidated {{count}} snapshots and queued recache"
         },
         "selected": "{{count}} selected",
+        "status": {
+          "asset": "asset",
+          "content": "content",
+          "content_drifted": "content drifted"
+        },
         "summary": "{{filtered}} of {{total}} snapshots",
         "table_aria": "Snapshot inventory"
       },

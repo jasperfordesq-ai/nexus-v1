@@ -989,8 +989,14 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
             {t('actions.reload')}
           </Button>
           <span className="text-sm text-default-500 ml-auto self-center">
-            {filtered.length} of {items.length} snapshots
-            {selected.size > 0 && <> · <span className="text-primary">{selected.size} selected</span></>}
+            {t('summary', { filtered: filtered.length, total: items.length })}
+            {selected.size > 0 && (
+              <>
+                {' '}
+                <span aria-hidden="true">&middot;</span>{' '}
+                <span className="text-primary">{t('selected', { count: selected.size })}</span>
+              </>
+            )}
           </span>
           {selected.size > 0 && isSuperAdmin && (
             <Button
@@ -1059,13 +1065,13 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                       {it.staleness}
                     </Chip>
                     {it.content_stale && (
-                      <Tooltip content={it.content_stale_reason ?? 'content drifted'}>
-                        <Chip color="warning" variant="flat" size="sm">content</Chip>
+                      <Tooltip content={it.content_stale_reason ?? t('status.content_drifted')}>
+                        <Chip color="warning" variant="flat" size="sm">{t('status.content')}</Chip>
                       </Tooltip>
                     )}
                     {it.asset_issues.length > 0 && (
                       <Tooltip content={it.asset_issues.join(', ')}>
-                        <Chip color="danger" variant="flat" size="sm">asset</Chip>
+                        <Chip color="danger" variant="flat" size="sm">{t('status.asset')}</Chip>
                       </Tooltip>
                     )}
                   </div>
