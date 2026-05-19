@@ -98,6 +98,14 @@ function seoGradeColor(g: 'A' | 'B' | 'C' | 'D' | 'F'): 'success' | 'primary' | 
   }
 }
 
+const SEO_GRADE_TEXT_CLASSES: Record<ReturnType<typeof seoGradeColor>, string> = {
+  success: 'text-success',
+  primary: 'text-primary',
+  warning: 'text-warning',
+  danger: 'text-danger',
+  default: 'text-default-500',
+};
+
 function httpStatusColor(n: number): 'default' | 'success' | 'warning' | 'danger' {
   if (n === 200) return 'success';
   if (n >= 300 && n < 400) return 'default';
@@ -411,7 +419,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
               isDisabled={!isSuperAdmin}
             />
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
             <Switch isSelected={force} onValueChange={setForce} isDisabled={!isSuperAdmin}>
               <span className="text-sm">Force (ignore cache)</span>
             </Switch>
@@ -1109,7 +1117,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                   <div className="space-y-3 text-sm">
                     {/* SEO score header — at the top so it's the first thing reviewers see. */}
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-default-50 border border-default-200">
-                      <div className={`text-4xl font-bold text-${seoGradeColor(inspecting.seo.grade)}`}>
+                      <div className={`text-4xl font-bold ${SEO_GRADE_TEXT_CLASSES[seoGradeColor(inspecting.seo.grade)]}`}>
                         {inspecting.seo.grade}
                       </div>
                       <div className="flex-1">
@@ -1992,6 +2000,18 @@ function statusToColor(s: 'green' | 'yellow' | 'red'): 'success' | 'warning' | '
   return s === 'green' ? 'success' : s === 'yellow' ? 'warning' : 'danger';
 }
 
+const HEALTH_BANNER_CLASSES: Record<ReturnType<typeof statusToColor>, string> = {
+  success: 'border-success-200 bg-success-50 text-success-800 dark:border-success-900/40 dark:bg-success-950/20 dark:text-success-200',
+  warning: 'border-warning-200 bg-warning-50 text-warning-800 dark:border-warning-900/40 dark:bg-warning-950/20 dark:text-warning-200',
+  danger: 'border-danger-200 bg-danger-50 text-danger-800 dark:border-danger-900/40 dark:bg-danger-950/20 dark:text-danger-200',
+};
+
+const HEALTH_DOT_CLASSES: Record<ReturnType<typeof statusToColor>, string> = {
+  success: 'bg-success',
+  warning: 'bg-warning',
+  danger: 'bg-danger',
+};
+
 function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number }) {
   const [health, setHealth] = useState<PrerenderHealth | null>(null);
   const [busy, setBusy] = useState(false);
@@ -2050,7 +2070,7 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
   const failing = health.checks.filter((c) => c.status !== 'green');
 
   return (
-    <div className={`mb-3 rounded-md border px-3 py-2 text-sm border-${tone}-200 bg-${tone}-50 text-${tone}-800`}>
+    <div className={`mb-3 rounded-md border px-3 py-2 text-sm ${HEALTH_BANNER_CLASSES[tone]}`}>
       <div className="flex items-center gap-2">
         <Chip size="sm" color={tone} variant="flat">{health.status.toUpperCase()}</Chip>
         <span className="font-medium">{failing.length} issue{failing.length === 1 ? '' : 's'}</span>
@@ -2074,7 +2094,7 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
         <ul className="mt-2 ml-2 space-y-1 list-disc list-inside">
           {health.checks.map((c) => (
             <li key={c.name}>
-              <span className={`inline-block w-2 h-2 rounded-full mr-2 align-middle bg-${statusToColor(c.status)}`} />
+              <span className={`inline-block w-2 h-2 rounded-full mr-2 align-middle ${HEALTH_DOT_CLASSES[statusToColor(c.status)]}`} />
               <strong>{c.name}:</strong> {c.detail}
               {c.action && <span className="block ml-4 text-xs opacity-80">→ {c.action}</span>}
             </li>
@@ -2255,7 +2275,7 @@ function TtlInspector() {
           See which <code>config/prerender.php</code> pattern owns a route and what TTL it gets,
           without grepping config. Used to tune the freshness policy.
         </p>
-        <div className="flex gap-2 items-end">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
           <Input
             label="Route"
             placeholder="/blog/my-post"
