@@ -5,6 +5,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import {
   Button,
   Card,
@@ -38,7 +39,7 @@ import { usePageTitle } from '@/hooks';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { canManageCaring } from '@/caring/access';
-import { PageHeader } from '../../components';
+import { EmptyState, PageHeader } from '../../components';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -103,8 +104,8 @@ const CATEGORY_COLOR: Record<FeedbackCategory, 'default' | 'primary' | 'secondar
   sentiment: 'default',
 };
 
-function fmtDate(iso: string): string {
-  if (!iso) return '—';
+function fmtDate(iso: string, fallback: string): string {
+  if (!iso) return fallback;
   return new Date(iso).toLocaleString(undefined, {
     year: 'numeric',
     month: 'short',
@@ -114,18 +115,18 @@ function fmtDate(iso: string): string {
   });
 }
 
-function relativeTime(iso: string): string {
-  if (!iso) return '—';
+function relativeTime(iso: string, t: TFunction<'caring_community'>): string {
+  if (!iso) return t('admin.feedback.common.date_unknown');
   const diff = Date.now() - new Date(iso).getTime();
   const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1) return t('admin.feedback.relative.just_now');
+  if (minutes < 60) return t('admin.feedback.relative.minutes_ago', { count: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return t('admin.feedback.relative.hours_ago', { count: hours });
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
+  if (days < 30) return t('admin.feedback.relative.days_ago', { count: days });
   const months = Math.floor(days / 30);
-  return `${months}mo ago`;
+  return t('admin.feedback.relative.months_ago', { count: months });
 }
 
 // ---------------------------------------------------------------------------
@@ -138,6 +139,27 @@ export default function MunicipalityFeedbackAdminPage() {
   const canManage = canManageCaring(user);
   usePageTitle(t('admin.feedback.title'));
   const { showToast } = useToast();
+  const dateFallback = t('admin.feedback.common.date_unknown');
+  const statusLabel = useCallback((status: FeedbackStatus | string) => t(`admin.feedback.status.${status}`), [t]);
+  const categoryLabel = useCallback((category: FeedbackCategory | string) => t(`admin.feedback.categories.${category}`), [t]);
+  const sentimentLabel = useCallback((sentiment: string | null) => (
+    sentiment ? t(`admin.feedback.sentiments.${sentiment}`) : dateFallback
+  ), [dateFallback, t]);
+  const yesNo = useCallback((value: boolean) => (
+    value ? t('admin.feedback.common.yes') : t('admin.feedback.common.no')
+  ), [t]);
+  const submitterLabel = useCallback((row: FeedbackRow) => {
+    if (row.is_anonymous) {
+      return t('admin.feedback.submitter.anonymous');
+    }
+    return t('admin.feedback.submitter.user', { id: row.submitter_user_id ?? '?' });
+  }, [t]);
+  const adminSubmitterLabel = useCallback((row: FeedbackRow) => {
+    if (row.is_anonymous) {
+      return t('admin.feedback.submitter.anonymous_admin', { id: row.submitter_user_id ?? '?' });
+    }
+    return t('admin.feedback.submitter.user', { id: row.submitter_user_id ?? '?' });
+  }, [t]);
 
   const [items, setItems] = useState<FeedbackRow[]>([]);
   const [meta, setMeta] = useState<PaginatedMeta | null>(null);
@@ -294,7 +316,7 @@ export default function MunicipalityFeedbackAdminPage() {
         subtitle={t('admin.feedback.subtitle')}
         icon={<Inbox size={20} />}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             <Button
               size="sm"
               variant="flat"
@@ -305,7 +327,7 @@ export default function MunicipalityFeedbackAdminPage() {
               }}
               isLoading={loading}
             >
-              Refresh
+              {t('admin.feedback.actions.refresh')}
             </Button>
             {canManage && (
               <Button
@@ -314,25 +336,21 @@ export default function MunicipalityFeedbackAdminPage() {
                 startContent={<Download size={14} />}
                 onPress={handleExport}
               >
-                Export CSV
+                {t('admin.feedback.actions.export_csv')}
               </Button>
             )}
           </div>
         }
       />
 
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+      <Card className="border border-primary/30 bg-primary-50/70 shadow-sm shadow-primary/10 dark:bg-primary-900/20" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
-              <p className="text-default-600">
-                This inbox collects feedback submitted by residents through the platform. Each item is categorised (question, idea, issue, complaint) and assigned a sentiment score. Use the triage controls to assign ownership, add internal notes, and track resolution. Items visible to all residents are marked as public — replies may be seen by the submitter and other members.
-              </p>
-              <p className="text-default-500 text-xs pt-1">
-                Status workflow — <span className="font-medium">submitted</span>: received, not yet reviewed; <span className="font-medium">triaged</span>: reviewed and assigned to an owner; <span className="font-medium">in_progress</span>: actively being worked on; <span className="font-medium">resolved</span>: closed with a documented resolution; <span className="font-medium">closed</span>: closed without resolution (with reason).
-              </p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('admin.feedback.about.title')}</p>
+              <p className="text-default-600">{t('admin.feedback.about.body')}</p>
+              <p className="text-default-500 text-xs pt-1">{t('admin.feedback.about.workflow')}</p>
             </div>
           </div>
         </CardBody>
@@ -344,38 +362,38 @@ export default function MunicipalityFeedbackAdminPage() {
           <CardBody className="space-y-3">
             <div className="flex flex-wrap items-center gap-3">
               <Chip color="primary" variant="flat">
-                Total open: <span className="font-semibold ml-1">{stats.total_open}</span>
+                {t('admin.feedback.stats.total_open')}: <span className="font-semibold ml-1">{stats.total_open}</span>
               </Chip>
               <Chip color="default" variant="flat">
-                Last 7 days: <span className="font-semibold ml-1">{stats.recent_count_7d}</span>
+                {t('admin.feedback.stats.last_7_days')}: <span className="font-semibold ml-1">{stats.recent_count_7d}</span>
               </Chip>
             </div>
             <Divider />
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs uppercase tracking-wide text-default-500 mr-2">By status:</span>
+              <span className="text-xs uppercase tracking-wide text-default-500 mr-2">{t('admin.feedback.stats.by_status')}</span>
               {Object.entries(stats.by_status).map(([k, v]) => (
                 <Chip key={k} size="sm" variant="flat">
-                  {k}: {v}
+                  {statusLabel(k)}: {v}
                 </Chip>
               ))}
               {Object.keys(stats.by_status).length === 0 && (
-                <span className="text-sm text-default-500">No submissions yet.</span>
+                <span className="text-sm text-default-500">{t('admin.feedback.empty.stats')}</span>
               )}
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs uppercase tracking-wide text-default-500 mr-2">By category:</span>
+              <span className="text-xs uppercase tracking-wide text-default-500 mr-2">{t('admin.feedback.stats.by_category')}</span>
               {Object.entries(stats.by_category).map(([k, v]) => (
                 <Chip key={k} size="sm" variant="flat" color={CATEGORY_COLOR[k as FeedbackCategory] ?? 'default'}>
-                  {k}: {v}
+                  {categoryLabel(k)}: {v}
                 </Chip>
               ))}
             </div>
             {Object.keys(stats.sentiment_distribution).length > 0 && (
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs uppercase tracking-wide text-default-500 mr-2">Sentiment:</span>
+                <span className="text-xs uppercase tracking-wide text-default-500 mr-2">{t('admin.feedback.stats.sentiment')}</span>
                 {Object.entries(stats.sentiment_distribution).map(([k, v]) => (
                   <Chip key={k} size="sm" variant="flat">
-                    {k}: {v}
+                    {sentimentLabel(k)}: {v}
                   </Chip>
                 ))}
               </div>
@@ -388,8 +406,8 @@ export default function MunicipalityFeedbackAdminPage() {
       <Card>
         <CardBody className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Select
-            label="Status"
-            placeholder="All statuses"
+            label={t('admin.feedback.filters.status')}
+            placeholder={t('admin.feedback.filters.all_statuses')}
             selectedKeys={statusFilter ? [statusFilter] : []}
             onChange={(e) => {
               setStatusFilter(e.target.value);
@@ -399,12 +417,12 @@ export default function MunicipalityFeedbackAdminPage() {
             size="sm"
           >
             {STATUS_OPTIONS.map((s) => (
-              <SelectItem key={s}>{s}</SelectItem>
+              <SelectItem key={s}>{statusLabel(s)}</SelectItem>
             ))}
           </Select>
           <Select
-            label="Category"
-            placeholder="All categories"
+            label={t('admin.feedback.filters.category')}
+            placeholder={t('admin.feedback.filters.all_categories')}
             selectedKeys={categoryFilter ? [categoryFilter] : []}
             onChange={(e) => {
               setCategoryFilter(e.target.value);
@@ -414,12 +432,12 @@ export default function MunicipalityFeedbackAdminPage() {
             size="sm"
           >
             {CATEGORY_OPTIONS.map((c) => (
-              <SelectItem key={c}>{c}</SelectItem>
+              <SelectItem key={c}>{categoryLabel(c)}</SelectItem>
             ))}
           </Select>
           <Input
-            label="Sub-region ID"
-            placeholder="e.g. 12"
+            label={t('admin.feedback.filters.sub_region')}
+            placeholder={t('admin.feedback.filters.sub_region_placeholder')}
             value={subRegionFilter}
             onValueChange={(v) => {
               setSubRegionFilter(v);
@@ -439,31 +457,34 @@ export default function MunicipalityFeedbackAdminPage() {
               <Spinner size="lg" />
             </div>
           ) : items.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 py-12 text-default-500">
-              <Inbox size={40} className="opacity-30" />
-              <p className="text-sm">No feedback submissions match these filters.</p>
-            </div>
+            <EmptyState
+              icon={Inbox}
+              title={t('admin.feedback.empty.title')}
+              description={t('admin.feedback.empty.description')}
+            />
           ) : (
+            <div className="overflow-x-auto">
             <Table
-              aria-label="Feedback submissions"
+              aria-label={t('admin.feedback.table.aria')}
               removeWrapper
               classNames={{ th: 'bg-default-100 text-xs font-semibold uppercase tracking-wide' }}
             >
               <TableHeader>
-                <TableColumn>ID</TableColumn>
-                <TableColumn>Category</TableColumn>
-                <TableColumn>Subject</TableColumn>
-                <TableColumn>Submitter</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Created</TableColumn>
+                <TableColumn>{t('admin.feedback.table.id')}</TableColumn>
+                <TableColumn>{t('admin.feedback.table.category')}</TableColumn>
+                <TableColumn>{t('admin.feedback.table.subject')}</TableColumn>
+                <TableColumn>{t('admin.feedback.table.submitter')}</TableColumn>
+                <TableColumn>{t('admin.feedback.table.status')}</TableColumn>
+                <TableColumn>{t('admin.feedback.table.created')}</TableColumn>
+                <TableColumn>{t('admin.feedback.table.actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {items.map((row) => (
-                  <TableRow key={row.id} className="cursor-pointer hover:bg-default-50">
+                  <TableRow key={row.id}>
                     <TableCell className="text-xs font-mono text-default-500">#{row.id}</TableCell>
                     <TableCell>
                       <Chip size="sm" variant="flat" color={CATEGORY_COLOR[row.category]}>
-                        {row.category}
+                        {categoryLabel(row.category)}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -476,29 +497,31 @@ export default function MunicipalityFeedbackAdminPage() {
                       </button>
                     </TableCell>
                     <TableCell className="text-xs text-default-500">
-                      {row.is_anonymous ? (
-                        <span className="italic">anonymous</span>
-                      ) : (
-                        <span>user #{row.submitter_user_id ?? '?'}</span>
-                      )}
+                      <span className={row.is_anonymous ? 'italic' : undefined}>{submitterLabel(row)}</span>
                     </TableCell>
                     <TableCell>
                       <Chip size="sm" variant="flat" color={STATUS_COLOR[row.status]}>
-                        {row.status}
+                        {statusLabel(row.status)}
                       </Chip>
                     </TableCell>
                     <TableCell className="text-xs text-default-500 whitespace-nowrap">
-                      {relativeTime(row.created_at)}
+                      {relativeTime(row.created_at, t)}
+                    </TableCell>
+                    <TableCell>
+                      <Button size="sm" variant="flat" onPress={() => openDetail(row)}>
+                        {t('admin.feedback.actions.view')}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
           {meta && meta.total_pages > 1 && (
             <div className="flex items-center justify-between p-3 border-t border-default-200">
               <span className="text-xs text-default-500">
-                Page {meta.current_page} of {meta.total_pages} ({meta.total} total)
+                {t('admin.feedback.pagination.summary', { page: meta.current_page, totalPages: meta.total_pages, total: meta.total })}
               </span>
               <div className="flex gap-2">
                 <Button
@@ -507,7 +530,7 @@ export default function MunicipalityFeedbackAdminPage() {
                   isDisabled={meta.current_page <= 1}
                   onPress={() => setPage((p) => Math.max(1, p - 1))}
                 >
-                  Previous
+                  {t('admin.feedback.pagination.previous')}
                 </Button>
                 <Button
                   size="sm"
@@ -515,7 +538,7 @@ export default function MunicipalityFeedbackAdminPage() {
                   isDisabled={!meta.has_more}
                   onPress={() => setPage((p) => p + 1)}
                 >
-                  Next
+                  {t('admin.feedback.pagination.next')}
                 </Button>
               </div>
             </div>
@@ -531,10 +554,10 @@ export default function MunicipalityFeedbackAdminPage() {
               <ModalHeader className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <Inbox size={18} className="text-primary" />
-                  <span className="text-base">Feedback #{selected?.id}</span>
+                  <span className="text-base">{t('admin.feedback.modal.title', { id: selected?.id ?? '' })}</span>
                   {selected && (
                     <Chip size="sm" variant="flat" color={STATUS_COLOR[selected.status]} className="ml-2">
-                      {selected.status}
+                      {statusLabel(selected.status)}
                     </Chip>
                   )}
                 </div>
@@ -543,98 +566,105 @@ export default function MunicipalityFeedbackAdminPage() {
               <ModalBody className="gap-4">
                 {selected && (
                   <>
-                    <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                       <div>
-                        <span className="text-default-500">Category: </span>
+                        <span className="text-default-500">{t('admin.feedback.modal.category')}: </span>
                         <Chip size="sm" variant="flat" color={CATEGORY_COLOR[selected.category]}>
-                          {selected.category}
+                          {categoryLabel(selected.category)}
                         </Chip>
                       </div>
                       <div>
-                        <span className="text-default-500">Submitter: </span>
+                        <span className="text-default-500">{t('admin.feedback.modal.submitter')}: </span>
                         {selected.is_anonymous ? (
-                          <span className="italic">anonymous (id #{selected.submitter_user_id ?? '?'} — admin only)</span>
+                          <span className="italic">{adminSubmitterLabel(selected)}</span>
                         ) : (
-                          <span>user #{selected.submitter_user_id ?? '?'}</span>
+                          <span>{submitterLabel(selected)}</span>
                         )}
                       </div>
                       <div>
-                        <span className="text-default-500">Sentiment: </span>
-                        <span>{selected.sentiment_tag ?? '—'}</span>
+                        <span className="text-default-500">{t('admin.feedback.modal.sentiment')}: </span>
+                        <span>{sentimentLabel(selected.sentiment_tag)}</span>
                       </div>
                       <div>
-                        <span className="text-default-500">Sub-region: </span>
-                        <span>{selected.sub_region_id ?? '—'}</span>
+                        <span className="text-default-500">{t('admin.feedback.modal.sub_region')}: </span>
+                        <span>{selected.sub_region_id ?? dateFallback}</span>
                       </div>
-                      <div className="col-span-2">
-                        <span className="text-default-500">Public visible: </span>
-                        <span>{selected.is_public ? 'yes' : 'no'}</span>
+                      <div className="sm:col-span-2">
+                        <span className="text-default-500">{t('admin.feedback.modal.public_visible')}: </span>
+                        <span>{yesNo(selected.is_public)}</span>
                       </div>
-                      <div className="col-span-2 text-xs text-default-500">
-                        Submitted {fmtDate(selected.created_at)} · Updated {fmtDate(selected.updated_at)}
+                      <div className="text-xs text-default-500 sm:col-span-2">
+                        {t('admin.feedback.modal.timestamps', {
+                          created: fmtDate(selected.created_at, dateFallback),
+                          updated: fmtDate(selected.updated_at, dateFallback),
+                        })}
                       </div>
                     </div>
-                    <Divider />
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-default-500 mb-1">Body</p>
+                      <p className="text-xs uppercase tracking-wide text-default-500 mb-1">{t('admin.feedback.modal.body')}</p>
                       <p className="text-sm whitespace-pre-wrap leading-relaxed">{selected.body}</p>
                     </div>
                     <Divider />
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <Select
-                        label="Status"
+                        label={t('admin.feedback.filters.status')}
                         selectedKeys={[triageStatus]}
                         onChange={(e) => setTriageStatus(e.target.value as FeedbackStatus)}
                         variant="bordered"
                         size="sm"
+                        isDisabled={!canManage}
                       >
                         {STATUS_OPTIONS.map((s) => (
-                          <SelectItem key={s}>{s}</SelectItem>
+                          <SelectItem key={s}>{statusLabel(s)}</SelectItem>
                         ))}
                       </Select>
                       <Input
-                        label="Assigned User ID"
-                        placeholder="Numeric user ID"
+                        label={t('admin.feedback.fields.assigned_user_id')}
+                        placeholder={t('admin.feedback.fields.assigned_user_id_placeholder')}
                         value={triageAssignedUserId}
                         onValueChange={setTriageAssignedUserId}
                         variant="bordered"
                         size="sm"
+                        isDisabled={!canManage}
                       />
                       <Input
-                        label="Assigned Role"
-                        placeholder="e.g. coordinator, municipality_announcer"
+                        label={t('admin.feedback.fields.assigned_role')}
+                        placeholder={t('admin.feedback.fields.assigned_role_placeholder')}
                         value={triageAssignedRole}
                         onValueChange={setTriageAssignedRole}
                         variant="bordered"
                         size="sm"
+                        isDisabled={!canManage}
                       />
                     </div>
                     <Textarea
-                      label="Triage Notes"
-                      placeholder="Internal notes for the triage team"
-                      description="Internal only — not visible to the submitter. Use for team coordination, links to related issues, or escalation context."
+                      label={t('admin.feedback.fields.triage_notes')}
+                      placeholder={t('admin.feedback.fields.triage_notes_placeholder')}
+                      description={t('admin.feedback.fields.triage_notes_description')}
                       value={triageNotes}
                       onValueChange={setTriageNotes}
                       variant="bordered"
                       size="sm"
                       minRows={2}
+                      isDisabled={!canManage}
                     />
                     <Textarea
-                      label="Resolution Notes (required for Resolve)"
-                      placeholder="What was done to address this?"
-                      description="Required when resolving. Summarise what action was taken. May be shown to the submitter depending on the item's public visibility setting."
+                      label={t('admin.feedback.fields.resolution_notes')}
+                      placeholder={t('admin.feedback.fields.resolution_notes_placeholder')}
+                      description={t('admin.feedback.fields.resolution_notes_description')}
                       value={resolutionNotes}
                       onValueChange={setResolutionNotes}
                       variant="bordered"
                       size="sm"
                       minRows={2}
+                      isDisabled={!canManage}
                     />
                   </>
                 )}
               </ModalBody>
               <ModalFooter className="flex-wrap gap-2">
                 <Button variant="flat" onPress={onClose} isDisabled={savingTriage}>
-                  Cancel
+                  {t('admin.feedback.actions.cancel')}
                 </Button>
                 {canManage && (
                   <>
@@ -645,7 +675,7 @@ export default function MunicipalityFeedbackAdminPage() {
                       onPress={handleClose}
                       isLoading={savingTriage}
                     >
-                      Close (no resolution)
+                      {t('admin.feedback.actions.close_no_resolution')}
                     </Button>
                     <Button
                       color="success"
@@ -653,10 +683,10 @@ export default function MunicipalityFeedbackAdminPage() {
                       onPress={handleResolve}
                       isLoading={savingTriage}
                     >
-                      Resolve
+                      {t('admin.feedback.actions.resolve')}
                     </Button>
                     <Button color="primary" onPress={handleSaveTriage} isLoading={savingTriage}>
-                      Save Triage
+                      {t('admin.feedback.actions.save_triage')}
                     </Button>
                   </>
                 )}

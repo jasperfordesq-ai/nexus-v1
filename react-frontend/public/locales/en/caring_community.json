@@ -663,6 +663,117 @@
     "feedback": {
       "title": "Municipality Feedback Inbox",
       "subtitle": "Receive, triage, and resolve resident feedback: questions, ideas, issues, and complaints routed to the municipality or community team.",
+      "about": {
+        "title": "About this page",
+        "body": "This inbox collects feedback submitted by residents through the platform. Each item is categorised as a question, idea, issue report, or sentiment note and assigned a sentiment score. Use the triage controls to assign ownership, add internal notes, and track resolution. Items visible to all residents are marked as public; replies may be seen by the submitter and other members.",
+        "workflow": "Status workflow: new means received and not yet reviewed; triaging means reviewed and assigned to an owner; in progress means actively being worked on; resolved means closed with a documented resolution; closed means closed without resolution."
+      },
+      "actions": {
+        "refresh": "Refresh",
+        "export_csv": "Export CSV",
+        "view": "View",
+        "cancel": "Cancel",
+        "close_no_resolution": "Close (no resolution)",
+        "resolve": "Resolve",
+        "save_triage": "Save triage"
+      },
+      "stats": {
+        "total_open": "Total open",
+        "last_7_days": "Last 7 days",
+        "by_status": "By status:",
+        "by_category": "By category:",
+        "sentiment": "Sentiment:"
+      },
+      "filters": {
+        "status": "Status",
+        "all_statuses": "All statuses",
+        "category": "Category",
+        "all_categories": "All categories",
+        "sub_region": "Sub-region ID",
+        "sub_region_placeholder": "e.g. 12"
+      },
+      "status": {
+        "new": "New",
+        "triaging": "Triaging",
+        "in_progress": "In progress",
+        "resolved": "Resolved",
+        "closed": "Closed"
+      },
+      "categories": {
+        "question": "Question",
+        "idea": "Idea",
+        "issue_report": "Issue report",
+        "sentiment": "Sentiment"
+      },
+      "sentiments": {
+        "positive": "Positive",
+        "neutral": "Neutral",
+        "negative": "Negative",
+        "concerned": "Concerned"
+      },
+      "empty": {
+        "title": "No feedback submissions match these filters.",
+        "description": "Try widening the filters or refreshing the inbox.",
+        "stats": "No submissions yet."
+      },
+      "table": {
+        "aria": "Feedback submissions",
+        "id": "ID",
+        "category": "Category",
+        "subject": "Subject",
+        "submitter": "Submitter",
+        "status": "Status",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "pagination": {
+        "summary": "Page {{page}} of {{totalPages}} ({{total}} total)",
+        "previous": "Previous",
+        "next": "Next"
+      },
+      "modal": {
+        "title": "Feedback #{{id}}",
+        "category": "Category",
+        "submitter": "Submitter",
+        "sentiment": "Sentiment",
+        "sub_region": "Sub-region",
+        "public_visible": "Public visible",
+        "timestamps": "Submitted {{created}} · Updated {{updated}}",
+        "body": "Body"
+      },
+      "fields": {
+        "assigned_user_id": "Assigned user ID",
+        "assigned_user_id_placeholder": "Numeric user ID",
+        "assigned_role": "Assigned role",
+        "assigned_role_placeholder": "e.g. coordinator, municipality_announcer",
+        "triage_notes": "Triage notes",
+        "triage_notes_placeholder": "Internal notes for the triage team",
+        "triage_notes_description": "Internal only; not visible to the submitter. Use for team coordination, links to related issues, or escalation context.",
+        "resolution_notes": "Resolution notes (required for resolve)",
+        "resolution_notes_placeholder": "What was done to address this?",
+        "resolution_notes_description": "Required when resolving. Summarise what action was taken. May be shown to the submitter depending on the item's public visibility setting."
+      },
+      "submitter": {
+        "anonymous": "Anonymous",
+        "anonymous_admin": "Anonymous (ID #{{id}}, admin only)",
+        "user": "User #{{id}}"
+      },
+      "common": {
+        "yes": "Yes",
+        "no": "No",
+        "date_unknown": "Not set"
+      },
+      "relative": {
+        "just_now": "Just now",
+        "minutes_ago_one": "{{count}}m ago",
+        "minutes_ago_other": "{{count}}m ago",
+        "hours_ago_one": "{{count}}h ago",
+        "hours_ago_other": "{{count}}h ago",
+        "days_ago_one": "{{count}}d ago",
+        "days_ago_other": "{{count}}d ago",
+        "months_ago_one": "{{count}}mo ago",
+        "months_ago_other": "{{count}}mo ago"
+      },
       "messages": {
         "triage_saved": "Triage saved",
         "resolved": "Marked as resolved",
