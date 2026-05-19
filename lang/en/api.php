@@ -2347,6 +2347,12 @@ return [
     'vol_alert_inactive' => 'This alert is no longer active.',
     'vol_alert_not_invited_or_responded' => 'You were not invited for this alert or have already responded.',
     'vol_alert_response_failed' => 'Failed to process response.',
+    'partner_api_invalid_partner' => 'Partner credentials could not be resolved.',
+    'partner_api_user_not_found' => 'User not found.',
+    'partner_wallet_credit_required' => 'user_id, positive hours, and reference are required.',
+    'partner_wallet_credit_reference_conflict' => 'This partner reference has already been used for a different wallet credit.',
+    'partner_wallet_credit_default_note' => 'Partner wallet credit',
+    'partner_wallet_credit_description' => 'Partner credit from :partner, reference :reference. :note',
 
     // ============================================
     // ACTIVITY LOG

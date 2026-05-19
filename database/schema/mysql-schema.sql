@@ -562,6 +562,27 @@ CREATE TABLE `api_partner_credentials` (
   KEY `api_partner_credentials_tenant_id_index` (`tenant_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `api_partner_wallet_credits`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `api_partner_wallet_credits` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `partner_id` bigint(20) unsigned NOT NULL,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `reference` varchar(191) NOT NULL,
+  `transaction_id` int(10) unsigned DEFAULT NULL,
+  `hours` decimal(10,2) NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'processing',
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_partner_wallet_credit_reference` (`tenant_id`,`partner_id`,`reference`),
+  KEY `idx_partner_wallet_credit_user` (`tenant_id`,`user_id`,`completed_at`),
+  KEY `idx_partner_wallet_credit_transaction` (`transaction_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `api_partners`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;

@@ -10,8 +10,9 @@ namespace App\Http\Controllers\Api\PartnerApi;
 
 use App\Core\TenantContext;
 use App\Http\Controllers\Api\BaseApiController;
+use App\Models\Notification;
+use App\Services\NotificationDispatcher;
 use App\Services\PartnerApi\PartnerWebhookDispatcher;
-use App\Services\WebhookDispatchService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -136,25 +137,9 @@ class PartnerV1Controller extends BaseApiController
             return $this->respondNotFound('User not found.', 'USER_NOT_FOUND');
         }
 
-        // Sum credits-debits from time_transactions when present, else
-        // fall back to a direct column on users if the schema has one.
-        $balance = 0.0;
-        if (\Illuminate\Support\Facades\Schema::hasTable('time_transactions')) {
-            $balance = (float) DB::table('time_transactions')
-                ->where('tenant_id', $tenantId)
-                ->where(function ($q) use ($userId) {
-                    $q->where('to_user_id', $userId)->orWhere('from_user_id', $userId);
-                })
-                ->selectRaw(
-                    'COALESCE(SUM(CASE WHEN to_user_id = ? THEN hours WHEN from_user_id = ? THEN -hours ELSE 0 END), 0) AS balance',
-                    [$userId, $userId]
-                )
-                ->value('balance');
-        }
-
         return $this->respondWithData([
             'user_id' => $userId,
-            'balance_hours' => round($balance, 4),
+            'balance_hours' => round((float) ($user->balance ?? 0), 4),
             'currency' => 'time_credits',
         ]);
     }
@@ -165,13 +150,17 @@ class PartnerV1Controller extends BaseApiController
      * Body: { user_id, hours, reference, note? }
      *
      * Used by bank integrations to credit time/cash from settled transfers.
-     * Records a row in `time_transactions` with `system_origin = 'partner_api'`
-     * and the partner's id baked into the note for audit.
+     * Records a live `transactions` row and updates users.balance; the
+     * partner/reference idempotency row is financial delivery evidence, not an
+     * email-sent marker.
      */
     public function walletCredit(Request $request): JsonResponse
     {
         $tenantId = TenantContext::getId();
         $partner = $request->attributes->get('partner', []);
+        $partnerId = (int) ($partner['id'] ?? 0);
+        $partnerSlug = (string) ($partner['slug'] ?? 'partner');
+        $partnerName = (string) ($partner['name'] ?? $partnerSlug);
 
         $userId = (int) $request->input('user_id', 0);
         $hours = (float) $request->input('hours', 0);
@@ -179,8 +168,11 @@ class PartnerV1Controller extends BaseApiController
         $note = trim((string) $request->input('note', ''));
 
         if ($userId <= 0 || $hours <= 0 || $reference === '') {
-            return $this->respondWithError('invalid_request',
-                'user_id, positive hours, and reference are required.', null, 422);
+            return $this->respondWithError('invalid_request', __('api.partner_wallet_credit_required'), null, 422);
+        }
+
+        if ($partnerId <= 0) {
+            return $this->respondWithError('invalid_partner', __('api.partner_api_invalid_partner'), null, 403);
         }
 
         $user = DB::table('users')
@@ -188,39 +180,136 @@ class PartnerV1Controller extends BaseApiController
             ->where('id', $userId)
             ->first();
         if (! $user) {
-            return $this->respondNotFound('User not found.', 'USER_NOT_FOUND');
+            return $this->respondNotFound(__('api.partner_api_user_not_found'), 'USER_NOT_FOUND');
         }
 
-        if (! \Illuminate\Support\Facades\Schema::hasTable('time_transactions')) {
-            return $this->respondWithError('not_supported',
-                'Wallet writes are not available on this tenant.', null, 503);
+        $createdCredit = false;
+
+        try {
+            $credit = DB::transaction(function () use ($tenantId, $partnerId, $partnerSlug, $userId, $hours, $reference, $note, &$createdCredit): object {
+            DB::table('api_partner_wallet_credits')->insertOrIgnore([
+                'tenant_id' => $tenantId,
+                'partner_id' => $partnerId,
+                'user_id' => $userId,
+                'reference' => $reference,
+                'hours' => round($hours, 2),
+                'status' => 'processing',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $credit = DB::table('api_partner_wallet_credits')
+                ->where('tenant_id', $tenantId)
+                ->where('partner_id', $partnerId)
+                ->where('reference', $reference)
+                ->lockForUpdate()
+                ->first();
+
+            if ($credit && $credit->transaction_id) {
+                if (
+                    (int) ($credit->user_id ?? 0) !== $userId
+                    || (float) ($credit->hours ?? 0) !== round($hours, 2)
+                ) {
+                    throw new \InvalidArgumentException('partner_wallet_credit_reference_conflict');
+                }
+
+                return $credit;
+            }
+
+            if (
+                (int) ($credit->user_id ?? 0) !== $userId
+                || (float) ($credit->hours ?? 0) !== round($hours, 2)
+            ) {
+                throw new \InvalidArgumentException('partner_wallet_credit_reference_conflict');
+            }
+
+            DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->where('id', $userId)
+                ->lockForUpdate()
+                ->first();
+
+            $description = __('api.partner_wallet_credit_description', [
+                'partner' => $partnerSlug,
+                'reference' => $reference,
+                'note' => $note !== '' ? $note : __('api.partner_wallet_credit_default_note'),
+            ]);
+
+            $transactionId = (int) DB::table('transactions')->insertGetId([
+                'tenant_id' => $tenantId,
+                'sender_id' => 0,
+                'receiver_id' => $userId,
+                'amount' => round($hours, 2),
+                'description' => $description,
+                'status' => 'completed',
+                'transaction_type' => 'other',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->where('id', $userId)
+                ->update([
+                    'balance' => DB::raw('balance + ' . round($hours, 2)),
+                    'updated_at' => now(),
+                ]);
+
+            DB::table('api_partner_wallet_credits')
+                ->where('id', $credit->id)
+                ->update([
+                    'transaction_id' => $transactionId,
+                    'hours' => round($hours, 2),
+                    'status' => 'completed',
+                    'completed_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+            $createdCredit = true;
+            return DB::table('api_partner_wallet_credits')->where('id', $credit->id)->first();
+            });
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('idempotency_conflict', __('api.partner_wallet_credit_reference_conflict'), null, 409);
         }
 
-        $txId = DB::table('time_transactions')->insertGetId([
-            'tenant_id' => $tenantId,
-            'from_user_id' => null,
-            'to_user_id' => $userId,
-            'hours' => $hours,
-            'note' => "[partner:{$partner['slug']}] ref={$reference} {$note}",
-            'status' => 'completed',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $txId = (int) $credit->transaction_id;
+        $isReplay = !$createdCredit;
 
-        // Fan out to any subscribed partner webhooks
-        PartnerWebhookDispatcher::dispatch('wallet.credited', [
-            'transaction_id' => $txId,
-            'user_id' => $userId,
-            'hours' => $hours,
-            'reference' => $reference,
-        ]);
+        if ($createdCredit) {
+            try {
+                Notification::createNotification(
+                    $userId,
+                    __('notifications.credit_received', ['name' => $partnerName, 'amount' => round($hours, 2)]),
+                    '/wallet',
+                    'transaction',
+                    false,
+                    $tenantId
+                );
+                NotificationDispatcher::sendCreditEmail($userId, $partnerName, round($hours, 2), $note);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Partner wallet credit notification failed', [
+                    'tenant_id' => $tenantId,
+                    'partner_id' => $partnerId,
+                    'transaction_id' => $txId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            PartnerWebhookDispatcher::dispatch('wallet.credited', [
+                'transaction_id' => $txId,
+                'user_id' => $userId,
+                'hours' => round($hours, 2),
+                'reference' => $reference,
+            ], $partnerId);
+        }
 
         return $this->respondWithData([
             'transaction_id' => $txId,
             'user_id' => $userId,
-            'hours' => $hours,
+            'hours' => round($hours, 2),
             'reference' => $reference,
-        ], null, 201);
+            'replayed' => $isReplay,
+        ], null, $isReplay ? 200 : 201);
     }
 
     /* ─── Aggregates ───────────────────────────────────────────────────── */

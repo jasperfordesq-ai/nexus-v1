@@ -79,13 +79,18 @@ class PartnerWebhookDispatcher
     /**
      * Dispatch an event to all active partner subscriptions matching the type.
      */
-    public static function dispatch(string $eventType, array $payload): void
+    public static function dispatch(string $eventType, array $payload, ?int $partnerId = null): void
     {
         $tenantId = TenantContext::getId();
-        $subs = DB::table('api_webhook_subscriptions')
+        $query = DB::table('api_webhook_subscriptions')
             ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
-            ->get();
+            ->where('status', 'active');
+
+        if ($partnerId !== null) {
+            $query->where('partner_id', $partnerId);
+        }
+
+        $subs = $query->get();
 
         foreach ($subs as $sub) {
             $events = json_decode((string) $sub->event_types, true) ?: [];
