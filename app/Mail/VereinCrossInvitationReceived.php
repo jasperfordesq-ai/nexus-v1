@@ -40,7 +40,7 @@ class VereinCrossInvitationReceived
 
         LocaleContext::withLocale($recipient->preferred_language ?? null, function () use ($recipient, $invitationId, $sourceName, $targetName, $message, $tenantId): void {
             try {
-                TenantContext::runForTenant($tenantId, function () use ($recipient, $invitationId, $sourceName, $targetName, $message): void {
+                TenantContext::runForTenant($tenantId, function () use ($recipient, $invitationId, $sourceName, $targetName, $message, $tenantId): void {
                     $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/me/verein-invitations';
 
                     $name = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));

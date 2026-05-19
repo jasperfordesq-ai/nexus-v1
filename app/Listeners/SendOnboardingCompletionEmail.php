@@ -13,7 +13,9 @@ use App\I18n\LocaleContext;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Sends a confirmation email to the member when they finish the onboarding wizard.
@@ -37,6 +39,14 @@ class SendOnboardingCompletionEmail implements ShouldQueue
 
             $user = User::find($event->userId);
             if (!$user || empty($user->email)) {
+                return;
+            }
+
+            if ($this->hasSuccessfulCompletionEmail($event->tenantId, $event->userId, $user->email)) {
+                Log::info('SendOnboardingCompletionEmail: already sent, skipping duplicate event', [
+                    'user_id' => $event->userId,
+                    'tenant_id' => $event->tenantId,
+                ]);
                 return;
             }
 
@@ -89,6 +99,33 @@ class SendOnboardingCompletionEmail implements ShouldQueue
             ]);
         } finally {
             TenantContext::restoreAfterScopedListener($previousTenantId);
+        }
+    }
+
+    private function hasSuccessfulCompletionEmail(int $tenantId, int $userId, string $email): bool
+    {
+        try {
+            if (!Schema::hasTable('email_log')) {
+                return false;
+            }
+
+            return DB::table('email_log')
+                ->where('tenant_id', $tenantId)
+                ->where('category', 'onboarding_completed')
+                ->whereIn('status', ['sent', 'delivered'])
+                ->where(function ($query) use ($userId, $email) {
+                    $query->where('user_id', $userId)
+                        ->orWhereRaw('LOWER(recipient_email) = ?', [mb_strtolower($email)]);
+                })
+                ->exists();
+        } catch (\Throwable $e) {
+            Log::debug('SendOnboardingCompletionEmail: sent-check failed', [
+                'user_id' => $userId,
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
         }
     }
 }

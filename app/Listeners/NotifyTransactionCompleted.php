@@ -13,7 +13,10 @@ use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Sends in-app + email notifications to the receiver when a time-credit
@@ -21,6 +24,13 @@ use Illuminate\Support\Facades\Log;
  */
 class NotifyTransactionCompleted implements ShouldQueue
 {
+    private const CHANNEL_BELL = 'bell';
+    private const CHANNEL_EMAIL = 'email';
+    private const STATUS_CLAIMED = 'claimed';
+    private const STATUS_DELIVERED = 'delivered';
+    private const STATUS_FAILED = 'failed';
+    private const STATUS_SKIPPED = 'skipped';
+
     public function __construct()
     {
         //
@@ -51,7 +61,7 @@ class NotifyTransactionCompleted implements ShouldQueue
             $description = $transaction->description ?? '';
 
             // 1. RECEIVER-side: bell notification + email (render in receiver's locale).
-            LocaleContext::withLocale($receiver, function () use ($sender, $receiver, $amount, $description) {
+            LocaleContext::withLocale($receiver, function () use ($sender, $receiver, $transaction, $amount, $description) {
                 $senderName = $sender->first_name ?? $sender->name ?? __('emails.common.fallback_someone');
 
                 $content = __('notifications.credit_received', ['name' => $senderName, 'amount' => $amount]);
@@ -59,12 +69,14 @@ class NotifyTransactionCompleted implements ShouldQueue
                     $content .= ' ' . __('notifications.credit_received_for', ['description' => $description]);
                 }
 
-                Notification::createNotification(
-                    $receiver->id,
-                    $content,
-                    '/wallet',
-                    'transaction'
-                );
+                self::deliverTransactionBell((int) $transaction->id, (int) $receiver->id, 'credit_received', function () use ($receiver, $content): int {
+                    return Notification::createNotification(
+                        $receiver->id,
+                        $content,
+                        '/wallet',
+                        'transaction'
+                    );
+                });
 
                 $emailEnabled = true;
                 try {
@@ -78,17 +90,19 @@ class NotifyTransactionCompleted implements ShouldQueue
                 }
 
                 if ($emailEnabled) {
-                    NotificationDispatcher::sendCreditEmail(
-                        $receiver->id,
-                        $senderName,
-                        $amount,
-                        $description
-                    );
+                    self::deliverTransactionEmail((int) $transaction->id, (int) $receiver->id, 'credit_received', function () use ($receiver, $senderName, $amount, $description): ?bool {
+                        return NotificationDispatcher::sendCreditEmail(
+                            $receiver->id,
+                            $senderName,
+                            $amount,
+                            $description
+                        );
+                    });
                 }
             });
 
             // 2. SENDER-side: confirmation email (render in sender's locale).
-            LocaleContext::withLocale($sender, function () use ($sender, $receiver, $amount, $description) {
+            LocaleContext::withLocale($sender, function () use ($sender, $receiver, $transaction, $amount, $description) {
                 $senderEmailEnabled = true;
                 try {
                     $senderPrefs = \App\Models\User::getNotificationPreferences($sender->id);
@@ -102,12 +116,14 @@ class NotifyTransactionCompleted implements ShouldQueue
 
                 if ($senderEmailEnabled) {
                     $recipientName = $receiver->first_name ?? $receiver->name ?? 'someone';
-                    NotificationDispatcher::sendCreditSentEmail(
-                        $sender->id,
-                        $recipientName,
-                        $amount,
-                        $description
-                    );
+                    self::deliverTransactionEmail((int) $transaction->id, (int) $sender->id, 'credit_sent', function () use ($sender, $recipientName, $amount, $description): ?bool {
+                        return NotificationDispatcher::sendCreditSentEmail(
+                            $sender->id,
+                            $recipientName,
+                            $amount,
+                            $description
+                        );
+                    });
                 }
             });
 
@@ -116,10 +132,14 @@ class NotifyTransactionCompleted implements ShouldQueue
                 $senderName = $sender->first_name ?? $sender->name ?? __('emails.common.fallback_someone');
                 $recipientNameForReview = $receiver->first_name ?? $receiver->name ?? 'someone';
                 LocaleContext::withLocale($receiver, fn () =>
-                    NotificationDispatcher::sendReviewRequestEmail($receiver->id, $senderName, $transaction->id)
+                    self::deliverTransactionEmail((int) $transaction->id, (int) $receiver->id, 'review_request', fn (): ?bool =>
+                        NotificationDispatcher::sendReviewRequestEmail($receiver->id, $senderName, $transaction->id)
+                    )
                 );
                 LocaleContext::withLocale($sender, fn () =>
-                    NotificationDispatcher::sendReviewRequestEmail($sender->id, $recipientNameForReview, $transaction->id)
+                    self::deliverTransactionEmail((int) $transaction->id, (int) $sender->id, 'review_request', fn (): ?bool =>
+                        NotificationDispatcher::sendReviewRequestEmail($sender->id, $recipientNameForReview, $transaction->id)
+                    )
                 );
             } catch (\Throwable $reviewError) {
                 Log::warning('NotifyTransactionCompleted: sendReviewRequestEmail failed', [
@@ -139,5 +159,156 @@ class NotifyTransactionCompleted implements ShouldQueue
         } finally {
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
+    }
+
+    /**
+     * @param callable():int $createBell
+     */
+    private static function deliverTransactionBell(int $transactionId, int $userId, string $event, callable $createBell): void
+    {
+        if (!self::claimDelivery($transactionId, $userId, $event, self::CHANNEL_BELL)) {
+            return;
+        }
+
+        try {
+            $notificationId = $createBell();
+            self::markDelivery($transactionId, $userId, $event, self::CHANNEL_BELL, self::STATUS_DELIVERED, (string) $notificationId);
+        } catch (\Throwable $e) {
+            self::markFailed($transactionId, $userId, $event, self::CHANNEL_BELL, $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * @param callable():bool|null $sendEmail
+     */
+    private static function deliverTransactionEmail(int $transactionId, int $userId, string $event, callable $sendEmail): void
+    {
+        if (!self::claimDelivery($transactionId, $userId, $event, self::CHANNEL_EMAIL)) {
+            return;
+        }
+
+        try {
+            $result = $sendEmail();
+            if ($result === null) {
+                self::markDelivery($transactionId, $userId, $event, self::CHANNEL_EMAIL, self::STATUS_SKIPPED);
+                return;
+            }
+
+            if ($result === false) {
+                self::markFailed($transactionId, $userId, $event, self::CHANNEL_EMAIL, 'Email dispatch returned false');
+                return;
+            }
+
+            self::markDelivery($transactionId, $userId, $event, self::CHANNEL_EMAIL, self::STATUS_DELIVERED);
+        } catch (\Throwable $e) {
+            self::markFailed($transactionId, $userId, $event, self::CHANNEL_EMAIL, $e->getMessage());
+            throw $e;
+        }
+    }
+
+    private static function claimDelivery(int $transactionId, int $userId, string $event, string $channel): bool
+    {
+        $tenantId = TenantContext::getId();
+        if ($transactionId <= 0 || $userId <= 0 || $tenantId === null || !Schema::hasTable('transaction_notification_deliveries')) {
+            return $userId > 0;
+        }
+
+        $tenantId = (int) $tenantId;
+        $now = now();
+        $staleBefore = $now->copy()->subMinutes(10);
+
+        return DB::transaction(function () use ($tenantId, $transactionId, $userId, $event, $channel, $now, $staleBefore): bool {
+            $record = DB::table('transaction_notification_deliveries')
+                ->where('tenant_id', $tenantId)
+                ->where('transaction_id', $transactionId)
+                ->where('event', $event)
+                ->where('user_id', $userId)
+                ->where('channel', $channel)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$record) {
+                DB::table('transaction_notification_deliveries')->insert([
+                    'tenant_id' => $tenantId,
+                    'transaction_id' => $transactionId,
+                    'event' => $event,
+                    'user_id' => $userId,
+                    'channel' => $channel,
+                    'status' => self::STATUS_CLAIMED,
+                    'attempts' => 1,
+                    'claimed_at' => $now,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+
+                return true;
+            }
+
+            if (in_array($record->status, [self::STATUS_DELIVERED, self::STATUS_SKIPPED], true)) {
+                return false;
+            }
+
+            if ($record->status === self::STATUS_CLAIMED && $record->claimed_at !== null && Carbon::parse($record->claimed_at)->greaterThan($staleBefore)) {
+                return false;
+            }
+
+            DB::table('transaction_notification_deliveries')
+                ->where('id', $record->id)
+                ->update([
+                    'status' => self::STATUS_CLAIMED,
+                    'attempts' => DB::raw('attempts + 1'),
+                    'claimed_at' => $now,
+                    'failed_at' => null,
+                    'last_error' => null,
+                    'updated_at' => $now,
+                ]);
+
+            return true;
+        });
+    }
+
+    private static function markDelivery(int $transactionId, int $userId, string $event, string $channel, string $status, ?string $evidenceId = null): void
+    {
+        $tenantId = TenantContext::getId();
+        if ($transactionId <= 0 || $userId <= 0 || $tenantId === null || !Schema::hasTable('transaction_notification_deliveries')) {
+            return;
+        }
+
+        DB::table('transaction_notification_deliveries')
+            ->where('tenant_id', (int) $tenantId)
+            ->where('transaction_id', $transactionId)
+            ->where('event', $event)
+            ->where('user_id', $userId)
+            ->where('channel', $channel)
+            ->update([
+                'status' => $status,
+                'delivered_at' => $status === self::STATUS_DELIVERED ? now() : null,
+                'failed_at' => null,
+                'evidence_id' => $evidenceId,
+                'last_error' => null,
+                'updated_at' => now(),
+            ]);
+    }
+
+    private static function markFailed(int $transactionId, int $userId, string $event, string $channel, string $error): void
+    {
+        $tenantId = TenantContext::getId();
+        if ($transactionId <= 0 || $userId <= 0 || $tenantId === null || !Schema::hasTable('transaction_notification_deliveries')) {
+            return;
+        }
+
+        DB::table('transaction_notification_deliveries')
+            ->where('tenant_id', (int) $tenantId)
+            ->where('transaction_id', $transactionId)
+            ->where('event', $event)
+            ->where('user_id', $userId)
+            ->where('channel', $channel)
+            ->update([
+                'status' => self::STATUS_FAILED,
+                'failed_at' => now(),
+                'last_error' => mb_substr($error, 0, 2000),
+                'updated_at' => now(),
+            ]);
     }
 }

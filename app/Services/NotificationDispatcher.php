@@ -675,7 +675,7 @@ class NotificationDispatcher
     /**
      * Send credit received email to a user.
      */
-    public static function sendCreditEmail(int $recipientUserId, string $senderName, float $amount, string $description = ''): void
+    public static function sendCreditEmail(int $recipientUserId, string $senderName, float $amount, string $description = ''): ?bool
     {
         try {
             $tenantId = TenantContext::getId();
@@ -687,7 +687,7 @@ class NotificationDispatcher
                 ->first();
 
             if (!$user || empty($user->email)) {
-                return;
+                return null;
             }
 
             // Defence-in-depth: honour `email_transactions` even if the caller
@@ -697,7 +697,7 @@ class NotificationDispatcher
             try {
                 $prefs = \App\Models\User::getNotificationPreferences($recipientUserId);
                 if (!(bool) ($prefs['email_transactions'] ?? true)) {
-                    return;
+                    return null;
                 }
             } catch (\Throwable $prefError) {
                 Log::debug('sendCreditEmail: could not read email_transactions pref', [
@@ -707,7 +707,7 @@ class NotificationDispatcher
             }
 
             // Render subject + body under the recipient's preferred locale.
-            LocaleContext::withLocale($user, function () use ($user, $recipientUserId, $senderName, $amount, $description, $tenantId) {
+            return (bool) LocaleContext::withLocale($user, function () use ($user, $recipientUserId, $senderName, $amount, $description, $tenantId): bool {
                 $recipientName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $baseUrl = TenantContext::getFrontendUrl();
@@ -729,17 +729,21 @@ class NotificationDispatcher
                     Log::warning('NotificationDispatcher::sendCreditEmail mailer returned false', [
                         'user_id' => $recipientUserId,
                     ]);
+                    return false;
                 }
+
+                return true;
             });
         } catch (\Exception $e) {
             Log::warning("NotificationDispatcher::sendCreditEmail failed: " . $e->getMessage());
+            return false;
         }
     }
 
     /**
      * Send credit sent confirmation email to the SENDER of a time-credit transfer.
      */
-    public static function sendCreditSentEmail(int $senderUserId, string $recipientName, float $amount, string $description = ''): void
+    public static function sendCreditSentEmail(int $senderUserId, string $recipientName, float $amount, string $description = ''): ?bool
     {
         try {
             $tenantId = TenantContext::getId();
@@ -751,7 +755,7 @@ class NotificationDispatcher
                 ->first();
 
             if (!$user || empty($user->email)) {
-                return;
+                return null;
             }
 
             // Defence-in-depth: honour `email_transactions` even if the caller
@@ -759,7 +763,7 @@ class NotificationDispatcher
             try {
                 $prefs = \App\Models\User::getNotificationPreferences($senderUserId);
                 if (!(bool) ($prefs['email_transactions'] ?? true)) {
-                    return;
+                    return null;
                 }
             } catch (\Throwable $prefError) {
                 Log::debug('sendCreditSentEmail: could not read email_transactions pref', [
@@ -769,7 +773,7 @@ class NotificationDispatcher
             }
 
             // The "sender" is the recipient of this confirmation email — render in their locale.
-            LocaleContext::withLocale($user, function () use ($user, $senderUserId, $recipientName, $amount, $description, $tenantId) {
+            return (bool) LocaleContext::withLocale($user, function () use ($user, $senderUserId, $recipientName, $amount, $description, $tenantId): bool {
                 $senderFirstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $tenantName      = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $baseUrl         = TenantContext::getFrontendUrl();
@@ -805,10 +809,14 @@ class NotificationDispatcher
                     Log::warning('NotificationDispatcher::sendCreditSentEmail mailer returned false', [
                         'user_id' => $senderUserId,
                     ]);
+                    return false;
                 }
+
+                return true;
             });
         } catch (\Exception $e) {
             Log::warning("NotificationDispatcher::sendCreditSentEmail failed: " . $e->getMessage());
+            return false;
         }
     }
 
@@ -819,7 +827,7 @@ class NotificationDispatcher
      * @param string $otherPersonName The name of the person they exchanged with
      * @param int    $transactionId   The completed transaction ID (for the CTA link)
      */
-    public static function sendReviewRequestEmail(int $userId, string $otherPersonName, int $transactionId): void
+    public static function sendReviewRequestEmail(int $userId, string $otherPersonName, int $transactionId): ?bool
     {
         try {
             $tenantId = TenantContext::getId();
@@ -831,7 +839,7 @@ class NotificationDispatcher
                 ->first();
 
             if (!$user || empty($user->email)) {
-                return;
+                return null;
             }
 
             // Review-request emails are reviews-related, so honour
@@ -841,7 +849,7 @@ class NotificationDispatcher
             try {
                 $prefs = \App\Models\User::getNotificationPreferences($userId);
                 if (!(bool) ($prefs['email_reviews'] ?? true)) {
-                    return;
+                    return null;
                 }
             } catch (\Throwable $prefError) {
                 Log::debug('sendReviewRequestEmail: could not read email_reviews pref', [
@@ -851,7 +859,7 @@ class NotificationDispatcher
             }
 
             // Render subject + body under the recipient's preferred locale.
-            LocaleContext::withLocale($user, function () use ($user, $otherPersonName, $transactionId, $tenantId) {
+            return (bool) LocaleContext::withLocale($user, function () use ($user, $otherPersonName, $transactionId, $tenantId): bool {
                 $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $baseUrl    = TenantContext::getFrontendUrl();
                 $basePath   = TenantContext::getSlugPrefix();
@@ -871,10 +879,14 @@ class NotificationDispatcher
                     Log::warning('NotificationDispatcher::sendReviewRequestEmail mailer returned false', [
                         'user_id' => $userId,
                     ]);
+                    return false;
                 }
+
+                return true;
             });
         } catch (\Exception $e) {
             Log::warning('NotificationDispatcher::sendReviewRequestEmail failed: ' . $e->getMessage());
+            return false;
         }
     }
 

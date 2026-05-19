@@ -11545,6 +11545,8 @@
         "status": "Status"
       },
       "sources": {
+        "event_reminders": "Event reminder",
+        "marketplace_report_notifications": "Marketplace report",
         "newsletter_queue": "Newsletter",
         "notification_queue": "Notification"
       }

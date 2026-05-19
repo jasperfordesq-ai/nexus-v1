@@ -6,12 +6,17 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
-use Tests\Laravel\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Facades\DB;
-use Laravel\Sanctum\Sanctum;
+use App\Events\OnboardingCompleted;
+use App\Listeners\SendOnboardingCompletionEmail;
 use App\Models\TenantSafeguardingOption;
 use App\Models\User;
+use App\Services\EmailDispatchService;
+use App\Services\OnboardingService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Laravel\Sanctum\Sanctum;
+use Tests\Laravel\TestCase;
 
 /**
  * Feature tests for OnboardingController — onboarding status, categories, completion.
@@ -99,6 +104,61 @@ class OnboardingControllerTest extends TestCase
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);
+    }
+
+    public function test_complete_onboarding_dispatches_completion_event_once(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'onboarding_completed' => false,
+        ]);
+
+        Event::fake([OnboardingCompleted::class]);
+
+        $this->assertTrue(OnboardingService::completeOnboarding($user->id));
+        $this->assertFalse(OnboardingService::completeOnboarding($user->id));
+
+        Event::assertDispatchedTimes(OnboardingCompleted::class, 1);
+    }
+
+    public function test_completion_email_listener_skips_when_successful_email_log_exists(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'email' => 'already-onboarded@example.com',
+            'onboarding_completed' => true,
+        ]);
+
+        DB::table('email_log')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'recipient_email' => $user->email,
+            'category' => 'onboarding_completed',
+            'subject' => 'Onboarding complete',
+            'provider' => 'smtp',
+            'status' => 'sent',
+            'sent_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $mailer = new class extends EmailDispatchService {
+            public int $calls = 0;
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->calls++;
+
+                return true;
+            }
+        };
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        (new SendOnboardingCompletionEmail())->handle(new OnboardingCompleted($user->id, $this->testTenantId));
+
+        $this->assertSame(0, $mailer->calls);
     }
 
     public function test_complete_rejects_unauthenticated(): void

@@ -300,13 +300,22 @@ class OnboardingService
     /**
      * Mark onboarding as complete.
      */
-    public static function completeOnboarding(int $userId): void
+    public static function completeOnboarding(int $userId): bool
     {
         $tenantId = TenantContext::getId();
 
-        User::where('id', $userId)
+        $updated = DB::table('users')
+            ->where('id', $userId)
             ->where('tenant_id', $tenantId)
+            ->where(function ($query) {
+                $query->where('onboarding_completed', 0)
+                    ->orWhereNull('onboarding_completed');
+            })
             ->update(['onboarding_completed' => true]);
+
+        if ($updated <= 0) {
+            return false;
+        }
 
         // Send confirmation email — queued, never delays the wizard response
         try {
@@ -318,6 +327,8 @@ class OnboardingService
                 'error'     => $e->getMessage(),
             ]);
         }
+
+        return true;
     }
 
     /**

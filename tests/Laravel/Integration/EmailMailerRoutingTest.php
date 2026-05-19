@@ -310,23 +310,36 @@ class EmailMailerRoutingTest extends TestCase
 
         foreach ($helpers as $helper) {
             $source = file_get_contents($helper);
+            $basename = basename($helper);
 
             $this->assertStringContainsString(
-                '$tenantId = (int) ($recipient->tenant_id ?? TenantContext::currentId() ?? 0);',
+                '$tenantId = (int) ($recipient->tenant_id ?? 0);',
                 $source,
-                basename($helper) . ' must resolve an explicit recipient tenant before rendering tenant URLs.'
+                $basename . ' must resolve tenant only from the recipient before rendering tenant URLs.'
+            );
+
+            $this->assertStringContainsString(
+                'missing recipient tenant',
+                $source,
+                $basename . ' must refuse missing recipient tenant instead of falling back to ambient context.'
+            );
+
+            $this->assertStringNotContainsString(
+                'TenantContext::currentId()',
+                $source,
+                $basename . ' must not fall back to ambient tenant context for recipient-scoped email.'
             );
 
             $this->assertStringContainsString(
                 'TenantContext::runForTenant($tenantId',
                 $source,
-                basename($helper) . ' must render and dispatch inside the recipient tenant context.'
+                $basename . ' must render and dispatch inside the recipient tenant context.'
             );
 
             $this->assertStringContainsString(
                 "['tenant_id' => \$tenantId]",
                 $source,
-                basename($helper) . ' must pass the same explicit tenant to EmailDispatchService.'
+                $basename . ' must pass the same explicit tenant to EmailDispatchService.'
             );
         }
     }

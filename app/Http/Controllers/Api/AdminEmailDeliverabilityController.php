@@ -152,7 +152,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
      *
      * Read-only diagnostics for rows that can explain why an expected email
      * has not left the platform yet: stale pending/processing rows, failures,
-     * and suppressions in both notification and newsletter queues.
+     * and suppressions in email-backed queues and scheduled reminder sources.
      */
     public function queues(): JsonResponse
     {
@@ -170,6 +170,8 @@ class AdminEmailDeliverabilityController extends BaseApiController
         $diagnostics = [
             'notification_queue' => $this->queueSourceDiagnostics('notification_queue', $tenantId),
             'newsletter_queue' => $this->queueSourceDiagnostics('newsletter_queue', $tenantId),
+            'marketplace_report_notifications' => $this->queueSourceDiagnostics('marketplace_report_notifications', $tenantId),
+            'event_reminders' => $this->queueSourceDiagnostics('event_reminders', $tenantId),
         ];
 
         $notificationRows = collect();
@@ -253,9 +255,99 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->map(fn ($row) => $this->queueRow('newsletter_queue', $row));
         }
 
-        $rows = $notificationRows->merge($newsletterRows)->sortByDesc('created_at')->values()->take($limit);
-        $diagnostics['notification_queue']['returned'] = $rows->where('source', 'notification_queue')->count();
-        $diagnostics['newsletter_queue']['returned'] = $rows->where('source', 'newsletter_queue')->count();
+        $marketplaceReportRows = collect();
+        if (($source === '' || $source === 'marketplace_report_notifications') && Schema::hasTable('marketplace_report_notifications')) {
+            $marketplaceReportRows = DB::table('marketplace_report_notifications as mrn')
+                ->leftJoin('users as u', function ($join) {
+                    $join->on('u.id', '=', 'mrn.recipient_user_id')
+                        ->on('u.tenant_id', '=', 'mrn.tenant_id');
+                })
+                ->when($tenantId !== null, fn ($q) => $q->where('mrn.tenant_id', $tenantId))
+                ->where('mrn.channel', 'email')
+                ->whereIn('mrn.status', $statuses)
+                ->where(function ($q) {
+                    $q->whereIn('mrn.status', ['failed', 'suppressed'])
+                        ->orWhere(function ($stale) {
+                            $stale->where('mrn.status', 'processing')
+                                ->whereRaw('COALESCE(mrn.last_attempted_at, mrn.updated_at, mrn.created_at) < ?', [now()->subMinutes(15)]);
+                        })
+                        ->orWhere(function ($stale) {
+                            $stale->where('mrn.status', 'pending')
+                                ->where('mrn.created_at', '<', now()->subMinutes(10));
+                        });
+                })
+                ->orderByDesc('mrn.id')
+                ->limit($limit)
+                ->get([
+                    'mrn.id',
+                    'mrn.tenant_id',
+                    'mrn.recipient_user_id as user_id',
+                    'u.email',
+                    'mrn.event_type as category',
+                    DB::raw('NULL as subject'),
+                    'mrn.status',
+                    DB::raw('NULL as frequency'),
+                    'mrn.attempts',
+                    'mrn.last_attempted_at',
+                    'mrn.last_error as error',
+                    DB::raw('NULL as processing_batch_id'),
+                    DB::raw('NULL as processing_started_at'),
+                    'mrn.sent_at',
+                    'mrn.created_at',
+                ])
+                ->map(fn ($row) => $this->queueRow('marketplace_report_notifications', $row));
+        }
+
+        $eventReminderRows = collect();
+        if (($source === '' || $source === 'event_reminders') && Schema::hasTable('event_reminders')) {
+            $eventReminderRows = DB::table('event_reminders as er')
+                ->leftJoin('users as u', function ($join) {
+                    $join->on('u.id', '=', 'er.user_id')
+                        ->on('u.tenant_id', '=', 'er.tenant_id');
+                })
+                ->when($tenantId !== null, fn ($q) => $q->where('er.tenant_id', $tenantId))
+                ->whereIn('er.status', array_values(array_intersect($statuses, ['pending', 'failed'])))
+                ->whereIn('er.reminder_type', ['email', 'both'])
+                ->where(function ($q) {
+                    $q->where('er.status', 'failed')
+                        ->orWhere(function ($stale) {
+                            $stale->where('er.status', 'pending')
+                                ->where('er.scheduled_for', '<', now()->subMinutes(15));
+                        });
+                })
+                ->orderByDesc('er.id')
+                ->limit($limit)
+                ->get([
+                    'er.id',
+                    'er.tenant_id',
+                    'er.user_id',
+                    'u.email',
+                    DB::raw("'event_reminder' as category"),
+                    DB::raw('NULL as subject'),
+                    'er.status',
+                    'er.reminder_type as frequency',
+                    DB::raw('0 as attempts'),
+                    DB::raw('NULL as last_attempted_at'),
+                    DB::raw('NULL as error'),
+                    DB::raw('NULL as processing_batch_id'),
+                    DB::raw('NULL as processing_started_at'),
+                    'er.sent_at',
+                    'er.created_at',
+                ])
+                ->map(fn ($row) => $this->queueRow('event_reminders', $row));
+        }
+
+        $rows = $notificationRows
+            ->merge($newsletterRows)
+            ->merge($marketplaceReportRows)
+            ->merge($eventReminderRows)
+            ->sortByDesc('created_at')
+            ->values()
+            ->take($limit);
+
+        foreach (array_keys($diagnostics) as $diagnosticSource) {
+            $diagnostics[$diagnosticSource]['returned'] = $rows->where('source', $diagnosticSource)->count();
+        }
 
         return $this->respondWithData([
             'rows' => $rows,
@@ -331,40 +423,106 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ];
         }
 
-        if (!Schema::hasTable('newsletter_queue') || !Schema::hasTable('newsletters')) {
-            return $this->unavailableQueueDiagnostics($source);
+        if ($source === 'newsletter_queue') {
+            if (!Schema::hasTable('newsletter_queue') || !Schema::hasTable('newsletters')) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $tenantExpr = Schema::hasColumn('newsletter_queue', 'tenant_id')
+                ? 'COALESCE(nq.tenant_id, n.tenant_id)'
+                : 'n.tenant_id';
+            $base = DB::table('newsletter_queue as nq')
+                ->join('newsletters as n', 'n.id', '=', 'nq.newsletter_id')
+                ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$tenantExpr} = ?", [$tenantId]));
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => $this->queueStatusCounts($base, 'nq.status'),
+                'stale_pending' => (clone $base)
+                    ->where('nq.status', 'pending')
+                    ->where('nq.created_at', '<', now()->subMinutes(15))
+                    ->count(),
+                'stale_processing' => (clone $base)
+                    ->where('nq.status', 'processing')
+                    ->whereRaw('COALESCE(nq.processing_started_at, nq.last_attempted_at, nq.created_at) < ?', [now()->subMinutes(15)])
+                    ->count(),
+                'failed_recent' => (clone $base)
+                    ->where('nq.status', 'failed')
+                    ->where('nq.created_at', '>=', now()->subDay())
+                    ->count(),
+                'suppressed_recent' => (clone $base)
+                    ->where('nq.status', 'suppressed')
+                    ->where('nq.created_at', '>=', now()->subDay())
+                    ->count(),
+                'oldest_pending_at' => (clone $base)->where('nq.status', 'pending')->min('nq.created_at'),
+                'returned' => 0,
+            ];
         }
 
-        $tenantExpr = Schema::hasColumn('newsletter_queue', 'tenant_id')
-            ? 'COALESCE(nq.tenant_id, n.tenant_id)'
-            : 'n.tenant_id';
-        $base = DB::table('newsletter_queue as nq')
-            ->join('newsletters as n', 'n.id', '=', 'nq.newsletter_id')
-            ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$tenantExpr} = ?", [$tenantId]));
+        if ($source === 'marketplace_report_notifications') {
+            if (!Schema::hasTable('marketplace_report_notifications')) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
 
-        return [
-            'source' => $source,
-            'available' => true,
-            'status_counts' => $this->queueStatusCounts($base, 'nq.status'),
-            'stale_pending' => (clone $base)
-                ->where('nq.status', 'pending')
-                ->where('nq.created_at', '<', now()->subMinutes(15))
-                ->count(),
-            'stale_processing' => (clone $base)
-                ->where('nq.status', 'processing')
-                ->whereRaw('COALESCE(nq.processing_started_at, nq.last_attempted_at, nq.created_at) < ?', [now()->subMinutes(15)])
-                ->count(),
-            'failed_recent' => (clone $base)
-                ->where('nq.status', 'failed')
-                ->where('nq.created_at', '>=', now()->subDay())
-                ->count(),
-            'suppressed_recent' => (clone $base)
-                ->where('nq.status', 'suppressed')
-                ->where('nq.created_at', '>=', now()->subDay())
-                ->count(),
-            'oldest_pending_at' => (clone $base)->where('nq.status', 'pending')->min('nq.created_at'),
-            'returned' => 0,
-        ];
+            $base = DB::table('marketplace_report_notifications as mrn')
+                ->where('mrn.channel', 'email')
+                ->when($tenantId !== null, fn ($q) => $q->where('mrn.tenant_id', $tenantId));
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => $this->queueStatusCounts($base, 'mrn.status'),
+                'stale_pending' => (clone $base)
+                    ->where('mrn.status', 'pending')
+                    ->where('mrn.created_at', '<', now()->subMinutes(10))
+                    ->count(),
+                'stale_processing' => (clone $base)
+                    ->where('mrn.status', 'processing')
+                    ->whereRaw('COALESCE(mrn.last_attempted_at, mrn.updated_at, mrn.created_at) < ?', [now()->subMinutes(15)])
+                    ->count(),
+                'failed_recent' => (clone $base)
+                    ->where('mrn.status', 'failed')
+                    ->where('mrn.updated_at', '>=', now()->subDay())
+                    ->count(),
+                'suppressed_recent' => (clone $base)
+                    ->where('mrn.status', 'suppressed')
+                    ->where('mrn.updated_at', '>=', now()->subDay())
+                    ->count(),
+                'oldest_pending_at' => (clone $base)->where('mrn.status', 'pending')->min('mrn.created_at'),
+                'returned' => 0,
+            ];
+        }
+
+        if ($source === 'event_reminders') {
+            if (!Schema::hasTable('event_reminders')) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $base = DB::table('event_reminders as er')
+                ->whereIn('er.reminder_type', ['email', 'both'])
+                ->when($tenantId !== null, fn ($q) => $q->where('er.tenant_id', $tenantId));
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => $this->queueStatusCounts($base, 'er.status'),
+                'stale_pending' => (clone $base)
+                    ->where('er.status', 'pending')
+                    ->where('er.scheduled_for', '<', now()->subMinutes(15))
+                    ->count(),
+                'stale_processing' => 0,
+                'failed_recent' => (clone $base)
+                    ->where('er.status', 'failed')
+                    ->where('er.updated_at', '>=', now()->subDay())
+                    ->count(),
+                'suppressed_recent' => 0,
+                'oldest_pending_at' => (clone $base)->where('er.status', 'pending')->min('er.scheduled_for'),
+                'returned' => 0,
+            ];
+        }
+
+        return $this->unavailableQueueDiagnostics($source);
     }
 
     /**
