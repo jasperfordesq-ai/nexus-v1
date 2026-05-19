@@ -203,4 +203,16 @@ class StripeWebhookControllerTest extends TestCase
         // Note: test schema may lag behind the latest Laravel migration.
         // Only assert event_id is present — that's the core idempotency key.
     }
+
+    public function test_failed_stripe_webhook_rows_are_reclaimable_for_retry(): void
+    {
+        $source = file_get_contents(app_path('Http/Controllers/Api/StripeWebhookController.php'));
+
+        $this->assertStringContainsString("->where('status', 'failed')", $source);
+        $this->assertStringContainsString("->where('status', 'processing')", $source);
+        $this->assertStringContainsString("->where('processed_at', '<', now()->subMinutes(10))", $source);
+        $this->assertStringContainsString("'status' => 'processing'", $source);
+        $this->assertStringContainsString('retry delivery reclaimed failed or stale event', $source);
+        $this->assertStringContainsString("'processed_at' => now()", $source);
+    }
 }

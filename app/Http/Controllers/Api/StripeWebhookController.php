@@ -102,11 +102,33 @@ class StripeWebhookController extends BaseApiController
                 ->where('event_id', $eventId)
                 ->first();
 
-            Log::info('Stripe webhook: duplicate delivery suppressed', [
-                'event_id' => $eventId,
-                'existing_status' => $existing->status ?? null,
-            ]);
-            return $this->respondWithData(['received' => true]);
+            $reclaimed = DB::table('stripe_webhook_events')
+                ->where('event_id', $eventId)
+                ->where(function ($query) {
+                    $query->where('status', 'failed')
+                        ->orWhere(function ($nested) {
+                            $nested->where('status', 'processing')
+                                ->where('processed_at', '<', now()->subMinutes(10));
+                        });
+                })
+                ->update([
+                    'event_type' => $event->type,
+                    'status' => 'processing',
+                    'processed_at' => $nowTs,
+                ]);
+
+            if ($reclaimed > 0) {
+                Log::info('Stripe webhook: retry delivery reclaimed failed or stale event', [
+                    'event_id' => $eventId,
+                    'previous_status' => $existing->status ?? null,
+                ]);
+            } else {
+                Log::info('Stripe webhook: duplicate delivery suppressed', [
+                    'event_id' => $eventId,
+                    'existing_status' => $existing->status ?? null,
+                ]);
+                return $this->respondWithData(['received' => true]);
+            }
         }
 
         // Dispatch to the appropriate handler
@@ -144,7 +166,10 @@ class StripeWebhookController extends BaseApiController
             // Mark as failed so Stripe retries can be re-processed
             DB::table('stripe_webhook_events')
                 ->where('event_id', $eventId)
-                ->update(['status' => 'failed']);
+                ->update([
+                    'status' => 'failed',
+                    'processed_at' => now(),
+                ]);
 
             Log::error("Stripe webhook handler error for {$event->type}", [
                 'event_id' => $eventId,
@@ -161,7 +186,10 @@ class StripeWebhookController extends BaseApiController
         // Mark as successfully processed
         DB::table('stripe_webhook_events')
             ->where('event_id', $eventId)
-            ->update(['status' => 'processed']);
+            ->update([
+                'status' => 'processed',
+                'processed_at' => now(),
+            ]);
 
         return $this->respondWithData(['received' => true]);
     }
