@@ -97,7 +97,7 @@ const STATUS_COLORS: Record<string, 'success' | 'danger' | 'warning' | 'default'
 
 export function VolunteerOrganizations() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('volunteering.volunteer_organizations_title', 'Volunteer Organizations'));
+  usePageTitle(t('volunteering.volunteer_organizations_title'));
   const toast = useToast();
   const { user } = useAuth();
   const canManageOrgWallet = Boolean(
@@ -158,11 +158,11 @@ export function VolunteerOrganizations() {
         }
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_organizations', 'Failed to load organizations'));
+      toast.error(t('volunteering.failed_to_load_organizations'));
       setItems([]);
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t]);
 
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -192,25 +192,25 @@ export function VolunteerOrganizations() {
     if (!adjustOrg) return;
     const amount = parseFloat(adjustAmount);
     if (isNaN(amount) || amount === 0) {
-      toast.error(t('volunteering.amount_nonzero', 'Amount must be a non-zero number'));
+      toast.error(t('volunteering.amount_nonzero'));
       return;
     }
     if (!adjustReason.trim()) {
-      toast.error(t('volunteering.reason_required', 'Reason is required'));
+      toast.error(t('volunteering.reason_required'));
       return;
     }
     setAdjustSubmitting(true);
     try {
       const res = await adminVolunteering.adjustOrgWallet(adjustOrg.id, amount, adjustReason.trim());
       if (res.success) {
-        toast.success(t('volunteering.balance_adjusted', 'Balance adjusted successfully'));
+        toast.success(t('volunteering.balance_adjusted'));
         adjustModal.onClose();
         loadData();
       } else {
-        toast.error((res as { message?: string }).message || t('volunteering.adjust_failed', 'Failed to adjust balance'));
+        toast.error((res as { message?: string }).message || t('volunteering.adjust_failed'));
       }
     } catch {
-      toast.error(t('volunteering.adjust_failed', 'Failed to adjust balance'));
+      toast.error(t('volunteering.adjust_failed'));
     }
     setAdjustSubmitting(false);
   }, [adjustOrg, adjustAmount, adjustReason, toast, t, adjustModal, loadData]);
@@ -239,13 +239,13 @@ export function VolunteerOrganizations() {
         }
       }
       if (!res.success) {
-        toast.error((res as { message?: string; error?: string }).message || t('volunteering.failed_load_transactions', 'Failed to load transactions'));
+        toast.error((res as { message?: string; error?: string }).message || t('volunteering.failed_load_transactions'));
       }
     } catch {
-      toast.error(t('volunteering.failed_load_transactions', 'Failed to load transactions'));
+      toast.error(t('volunteering.failed_load_transactions'));
     }
     setTxLoading(false);
-  }, [txModal, toast]);
+  }, [txModal, toast, t]);
 
 
   const loadMoreTx = useCallback(async () => {
@@ -267,13 +267,13 @@ export function VolunteerOrganizations() {
         }
       }
       if (!res.success) {
-        toast.error((res as { message?: string; error?: string }).message || t('volunteering.failed_load_transactions', 'Failed to load transactions'));
+        toast.error((res as { message?: string; error?: string }).message || t('volunteering.failed_load_transactions'));
       }
     } catch {
-      toast.error(t('volunteering.failed_load_transactions', 'Failed to load transactions'));
+      toast.error(t('volunteering.failed_load_transactions'));
     }
     setTxLoading(false);
-  }, [txOrg, txCursor, toast]);
+  }, [txOrg, txCursor, toast, t]);
 
 
   // --- Status Toggle ---
@@ -282,13 +282,13 @@ export function VolunteerOrganizations() {
     try {
       const res = await adminVolunteering.updateOrgStatus(org.id, newStatus);
       if (res.success) {
-        toast.success(t('volunteering.status_updated', `Organization ${newStatus}`));
+        toast.success(t('volunteering.status_updated', { status: t(`volunteering.status_${newStatus}`) }));
         loadData();
       } else {
-        toast.error((res as { message?: string }).message || t('volunteering.status_update_failed', 'Failed to update status'));
+        toast.error((res as { message?: string }).message || t('volunteering.status_update_failed'));
       }
     } catch {
-      toast.error(t('volunteering.status_update_failed', 'Failed to update status'));
+      toast.error(t('volunteering.status_update_failed'));
     }
   }, [toast, t, loadData]);
 
@@ -309,15 +309,15 @@ export function VolunteerOrganizations() {
   const handleEditSubmit = useCallback(async () => {
     if (!editOrg) return;
     if (!editForm.name.trim()) {
-      toast.error(t('volunteering.name_required', 'Organization name is required'));
+      toast.error(t('volunteering.name_required'));
       return;
     }
     if (editForm.description.trim().length < 20) {
-      toast.error(t('volunteering.description_min_length', 'Description must be at least 20 characters'));
+      toast.error(t('volunteering.description_min_length'));
       return;
     }
     if (!EMAIL_PATTERN.test(editForm.contact_email.trim())) {
-      toast.error(t('volunteering.contact_email_required', 'A valid contact email is required'));
+      toast.error(t('volunteering.contact_email_required'));
       return;
     }
     setEditSubmitting(true);
@@ -331,14 +331,14 @@ export function VolunteerOrganizations() {
         meeting_schedule: editForm.meeting_schedule.trim() || undefined,
       });
       if (res.success) {
-        toast.success(t('volunteering.org_updated', 'Organization updated'));
+        toast.success(t('volunteering.org_updated'));
         editModal.onClose();
         loadData();
       } else {
-        toast.error((res as { message?: string }).message || t('volunteering.org_update_failed', 'Failed to update organization'));
+        toast.error((res as { message?: string }).message || t('volunteering.org_update_failed'));
       }
     } catch {
-      toast.error(t('volunteering.org_update_failed', 'Failed to update organization'));
+      toast.error(t('volunteering.org_update_failed'));
     }
     setEditSubmitting(false);
   }, [editOrg, editForm, toast, t, editModal, loadData]);
@@ -360,10 +360,10 @@ export function VolunteerOrganizations() {
         }
       }
     } catch {
-      toast.error(t('volunteering.failed_load_members', 'Failed to load members'));
+      toast.error(t('volunteering.failed_load_members'));
     }
     setMembersLoading(false);
-  }, [membersModal, toast]);
+  }, [membersModal, toast, t]);
 
 
   // --- Create Organization ---
@@ -374,15 +374,15 @@ export function VolunteerOrganizations() {
 
   const handleCreateSubmit = useCallback(async () => {
     if (!createForm.name.trim()) {
-      toast.error(t('volunteering.name_required', 'Organization name is required'));
+      toast.error(t('volunteering.name_required'));
       return;
     }
     if (createForm.description.trim().length < 20) {
-      toast.error(t('volunteering.description_min_length', 'Description must be at least 20 characters'));
+      toast.error(t('volunteering.description_min_length'));
       return;
     }
     if (!EMAIL_PATTERN.test(createForm.contact_email.trim())) {
-      toast.error(t('volunteering.contact_email_required', 'A valid contact email is required'));
+      toast.error(t('volunteering.contact_email_required'));
       return;
     }
     setCreateSubmitting(true);
@@ -396,57 +396,57 @@ export function VolunteerOrganizations() {
         meeting_schedule: createForm.meeting_schedule.trim() || undefined,
       });
       if (res.success) {
-        toast.success(t('volunteering.org_created', 'Organization created'));
+        toast.success(t('volunteering.org_created'));
         createModal.onClose();
         loadData();
       } else {
-        toast.error((res as { message?: string }).message || t('volunteering.org_create_failed', 'Failed to create organization'));
+        toast.error((res as { message?: string }).message || t('volunteering.org_create_failed'));
       }
     } catch {
-      toast.error(t('volunteering.org_create_failed', 'Failed to create organization'));
+      toast.error(t('volunteering.org_create_failed'));
     }
     setCreateSubmitting(false);
   }, [createForm, toast, t, createModal, loadData]);
 
   const columns: Column<VolOrg>[] = [
-    { key: 'org_name', label: t('volunteering.col_organization', 'Organization'), sortable: true },
+    { key: 'org_name', label: t('volunteering.col_organization'), sortable: true },
     {
       key: 'status',
-      label: t('volunteering.col_status', 'Status'),
+      label: t('volunteering.col_status'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color={STATUS_COLORS[item.status] || 'default'} className="capitalize">
-          {item.status || 'unknown'}
+          {t(`volunteering.status_${item.status || 'unknown'}`)}
         </Chip>
       ),
     },
     {
       key: 'balance',
-      label: t('volunteering.col_balance', 'Balance'),
+      label: t('volunteering.col_balance'),
       sortable: true,
-      render: (item) => <span className="font-mono">{(item.balance ?? 0).toLocaleString()} hrs</span>,
+      render: (item) => <span className="font-mono">{t('volunteering.hours_value', { value: (item.balance ?? 0).toLocaleString() })}</span>,
     },
     {
       key: 'opportunity_count',
-      label: t('volunteering.col_opportunities', 'Opportunities'),
+      label: t('volunteering.col_opportunities'),
       sortable: true,
       render: (item) => <span>{item.opportunity_count ?? 0}</span>,
     },
     {
       key: 'member_count',
-      label: t('volunteering.col_volunteers', 'Volunteers'),
+      label: t('volunteering.col_volunteers'),
       sortable: true,
       render: (item) => <span>{item.member_count ?? 0}</span>,
     },
     {
       key: 'total_hours',
-      label: t('volunteering.col_total_hours', 'Total Hours'),
+      label: t('volunteering.col_total_hours'),
       sortable: true,
       render: (item) => <span className="font-mono">{(item.total_hours ?? 0).toLocaleString()}</span>,
     },
     {
       key: 'created_at',
-      label: t('volunteering.col_created', 'Created'),
+      label: t('volunteering.col_created'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -456,7 +456,7 @@ export function VolunteerOrganizations() {
     },
     {
       key: 'actions',
-      label: t('common.actions', 'Actions'),
+      label: t('volunteering.col_actions'),
       render: (item) => (
         <div className="flex gap-1 flex-wrap">
           <Button
@@ -466,7 +466,7 @@ export function VolunteerOrganizations() {
             startContent={<Pencil size={14} />}
             onPress={() => openEditModal(item)}
           >
-            {t('common.edit', 'Edit')}
+            {t('volunteering.edit')}
           </Button>
           <Button
             size="sm"
@@ -475,7 +475,7 @@ export function VolunteerOrganizations() {
             startContent={<Users size={14} />}
             onPress={() => openMembersModal(item)}
           >
-            {t('volunteering.members', 'Members')}
+            {t('volunteering.members')}
           </Button>
           {canManageOrgWallet && (
             <>
@@ -486,7 +486,7 @@ export function VolunteerOrganizations() {
                 startContent={<Wallet size={14} />}
                 onPress={() => openAdjustModal(item)}
               >
-                {t('volunteering.adjust_balance', 'Adjust')}
+                {t('volunteering.adjust_balance')}
               </Button>
               <Button
                 size="sm"
@@ -495,7 +495,7 @@ export function VolunteerOrganizations() {
                 startContent={<ArrowLeftRight size={14} />}
                 onPress={() => openTxModal(item)}
               >
-                {t('volunteering.transactions', 'Txns')}
+                {t('volunteering.transactions')}
               </Button>
             </>
           )}
@@ -507,8 +507,8 @@ export function VolunteerOrganizations() {
             onPress={() => handleStatusToggle(item)}
           >
             {item.status === 'active'
-              ? t('volunteering.suspend', 'Suspend')
-              : t('volunteering.activate', 'Activate')}
+              ? t('volunteering.suspend')
+              : t('volunteering.activate')}
           </Button>
         </div>
       ),
@@ -517,10 +517,10 @@ export function VolunteerOrganizations() {
 
   // Top content: search + filter
   const topContent = useMemo(() => (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-4 rounded-2xl border border-divider/70 bg-content1 p-3 shadow-sm shadow-black/[0.03] sm:flex-row sm:items-center sm:justify-between">
       <Input type="search" name="admin-search" autoComplete="off"
         className="max-w-xs"
-        placeholder={t('volunteering.search_organizations', 'Search organizations...')}
+        placeholder={t('volunteering.search_organizations')}
         startContent={<Search size={16} className="text-default-400" />}
         value={searchQuery}
         onValueChange={setSearchQuery}
@@ -529,7 +529,7 @@ export function VolunteerOrganizations() {
       />
       <Select
         className="max-w-[180px]"
-        label={t('volunteering.filter_status', 'Status')}
+        label={t('volunteering.filter_status')}
         size="sm"
         selectedKeys={new Set([statusFilter])}
         onSelectionChange={(keys) => {
@@ -537,42 +537,42 @@ export function VolunteerOrganizations() {
           setStatusFilter(val || 'all');
         }}
       >
-        <SelectItem key="all">{t('common.all', 'All')}</SelectItem>
-        <SelectItem key="active">{t('common.active', 'Active')}</SelectItem>
-        <SelectItem key="suspended">{t('volunteering.suspended', 'Suspended')}</SelectItem>
-        <SelectItem key="pending">{t('common.pending', 'Pending')}</SelectItem>
+        <SelectItem key="all">{t('volunteering.tab_all')}</SelectItem>
+        <SelectItem key="active">{t('volunteering.status_active')}</SelectItem>
+        <SelectItem key="suspended">{t('volunteering.status_suspended')}</SelectItem>
+        <SelectItem key="pending">{t('volunteering.tab_pending')}</SelectItem>
       </Select>
     </div>
-  ), [searchQuery, statusFilter]);
+  ), [searchQuery, statusFilter, t]);
 
   if (!loading && items.length === 0) {
     return (
-      <div>
+      <div className="space-y-6">
         <PageHeader
-          title={t('volunteering.volunteer_organizations_title', 'Volunteer Organizations')}
-          description={t('volunteering.volunteer_organizations_desc', 'Manage volunteer organizations, wallets, and statuses')}
+          title={t('volunteering.volunteer_organizations_title')}
+          description={t('volunteering.volunteer_organizations_desc')}
         />
         <EmptyState
           icon={Building2}
-          title={t('volunteering.no_organizations', 'No organizations')}
-          description={t('volunteering.desc_no_volunteer_organizations_have_cre', 'No volunteer organizations have been created yet.')}
+          title={t('volunteering.no_organizations')}
+          description={t('volunteering.desc_no_volunteer_organizations_have_cre')}
         />
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title={t('volunteering.volunteer_organizations_title', 'Volunteer Organizations')}
-        description={t('volunteering.volunteer_organizations_desc', 'Manage volunteer organizations, wallets, and statuses')}
+        title={t('volunteering.volunteer_organizations_title')}
+        description={t('volunteering.volunteer_organizations_desc')}
         actions={
           <div className="flex gap-2">
             <Button variant="flat" color="primary" startContent={<Plus size={16} />} onPress={openCreateModal}>
-              {t('volunteering.create_organization', 'Create Organization')}
+              {t('volunteering.create_organization')}
             </Button>
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
-              {t('common.refresh', 'Refresh')}
+              {t('volunteering.refresh')}
             </Button>
           </div>
         }
@@ -593,37 +593,37 @@ export function VolunteerOrganizations() {
           {(onClose) => (
             <>
               <ModalHeader>
-                {t('volunteering.adjust_wallet_title', 'Adjust Wallet Balance')}
+                {t('volunteering.adjust_wallet_title')}
                 {adjustOrg && (
                   <span className="block text-sm font-normal text-default-500 mt-1">
-                    {adjustOrg.org_name} — {t('volunteering.current_balance', 'Current balance')}: {adjustOrg.balance ?? 0} hrs
+                    {adjustOrg.org_name} - {t('volunteering.current_balance')}: {t('volunteering.hours_value', { value: adjustOrg.balance ?? 0 })}
                   </span>
                 )}
               </ModalHeader>
               <ModalBody>
                 <Input
-                  label={t('volunteering.amount_label', 'Amount (positive = top-up, negative = deduct)')}
+                  label={t('volunteering.amount_label')}
                   type="number"
                   value={adjustAmount}
                   onValueChange={setAdjustAmount}
-                  placeholder="e.g. 50 or -20"
+                  placeholder={t('volunteering.amount_placeholder')}
                   variant="bordered"
                 />
                 <Textarea
-                  label={t('volunteering.reason_label', 'Reason')}
+                  label={t('volunteering.reason_label')}
                   value={adjustReason}
                   onValueChange={setAdjustReason}
-                  placeholder={t('volunteering.reason_placeholder', 'Explain the adjustment...')}
+                  placeholder={t('volunteering.reason_placeholder')}
                   variant="bordered"
                   minRows={2}
                 />
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {t('common.cancel', 'Cancel')}
+                  {t('volunteering.cancel')}
                 </Button>
                 <Button color="primary" onPress={handleAdjustSubmit} isLoading={adjustSubmitting}>
-                  {t('volunteering.submit_adjustment', 'Submit Adjustment')}
+                  {t('volunteering.submit_adjustment')}
                 </Button>
               </ModalFooter>
             </>
@@ -637,7 +637,7 @@ export function VolunteerOrganizations() {
           {(onClose) => (
             <>
               <ModalHeader>
-                {t('volunteering.transaction_history', 'Transaction History')}
+                {t('volunteering.transaction_history')}
                 {txOrg && (
                   <span className="block text-sm font-normal text-default-500 mt-1">{txOrg.org_name}</span>
                 )}
@@ -645,25 +645,25 @@ export function VolunteerOrganizations() {
               <ModalBody>
                 {txLoading && transactions.length === 0 ? (
                   <div className="flex justify-center py-8">
-                    <span className="text-default-400">{t('common.loading', 'Loading...')}</span>
+                    <span className="text-default-400">{t('volunteering.loading')}</span>
                   </div>
                 ) : transactions.length === 0 ? (
                   <div className="flex flex-col items-center py-8 text-default-400">
                     <ArrowLeftRight size={40} className="mb-2" />
-                    <p>{t('volunteering.no_transactions', 'No transactions found')}</p>
+                    <p>{t('volunteering.no_transactions')}</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     {transactions.map((tx) => (
                       <div
                         key={tx.id}
-                        className="flex items-center justify-between rounded-lg border border-default-200 p-3"
+                        className="flex items-center justify-between rounded-xl border border-divider/70 bg-content2/30 p-3"
                       >
                         <div>
                           <p className="text-sm font-medium">{tx.description || tx.type}</p>
                           <p className="text-xs text-default-400">
                             {tx.created_at ? new Date(tx.created_at).toLocaleString() : '--'}
-                            {tx.admin_name && t('volunteering.transaction_by_admin', ' by {{name}}', { name: tx.admin_name })}
+                            {tx.admin_name && t('volunteering.transaction_by_admin', { name: tx.admin_name })}
                           </p>
                         </div>
                         <span
@@ -678,7 +678,7 @@ export function VolunteerOrganizations() {
                     {txHasMore && (
                       <div className="flex justify-center pt-2">
                         <Button size="sm" variant="flat" onPress={loadMoreTx} isLoading={txLoading}>
-                          {t('common.load_more', 'Load More')}
+                          {t('volunteering.load_more')}
                         </Button>
                       </div>
                     )}
@@ -687,7 +687,7 @@ export function VolunteerOrganizations() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {t('common.close', 'Close')}
+                  {t('volunteering.close')}
                 </Button>
               </ModalFooter>
             </>
@@ -701,48 +701,48 @@ export function VolunteerOrganizations() {
           {(onClose) => (
             <>
               <ModalHeader>
-                {t('volunteering.edit_organization', 'Edit Organization')}
+                {t('volunteering.edit_organization')}
                 {editOrg && (
                   <span className="block text-sm font-normal text-default-500 mt-1">{editOrg.org_name}</span>
                 )}
               </ModalHeader>
               <ModalBody className="flex flex-col gap-3">
                 <Input
-                  label={t('volunteering.org_name_label', 'Organization Name')}
+                  label={t('volunteering.org_name_label')}
                   value={editForm.name}
                   onValueChange={(v) => setEditForm(prev => ({ ...prev, name: v }))}
                   variant="bordered"
                   isRequired
                 />
                 <Textarea
-                  label={t('volunteering.org_description_label', 'Description')}
+                  label={t('volunteering.org_description_label')}
                   value={editForm.description}
                   onValueChange={(v) => setEditForm(prev => ({ ...prev, description: v }))}
                   variant="bordered"
                   minRows={3}
                 />
                 <Input
-                  label={t('volunteering.org_email_label', 'Contact Email')}
+                  label={t('volunteering.org_email_label')}
                   type="email"
                   value={editForm.contact_email}
                   onValueChange={(v) => setEditForm(prev => ({ ...prev, contact_email: v }))}
                   variant="bordered"
                 />
                 <Input
-                  label={t('volunteering.org_website_label', 'Website')}
+                  label={t('volunteering.org_website_label')}
                   type="url"
                   value={editForm.website}
                   onValueChange={(v) => setEditForm(prev => ({ ...prev, website: v }))}
                   variant="bordered"
-                  placeholder="https://"
+                  placeholder={t('volunteering.website_placeholder')}
                 />
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {t('common.cancel', 'Cancel')}
+                  {t('volunteering.cancel')}
                 </Button>
                 <Button color="primary" onPress={handleEditSubmit} isLoading={editSubmitting}>
-                  {t('common.save', 'Save')}
+                  {t('volunteering.save')}
                 </Button>
               </ModalFooter>
             </>
@@ -756,29 +756,29 @@ export function VolunteerOrganizations() {
           {(onClose) => (
             <>
               <ModalHeader>
-                {t('volunteering.organization_members', 'Organization Members')}
+                {t('volunteering.organization_members')}
                 {membersOrg && (
                   <span className="block text-sm font-normal text-default-500 mt-1">
-                    {membersOrg.org_name} — {membersOrg.member_count ?? 0} {t('volunteering.members', 'members')}
+                    {membersOrg.org_name} - {t('volunteering.members_count', { count: membersOrg.member_count ?? 0 })}
                   </span>
                 )}
               </ModalHeader>
               <ModalBody>
                 {membersLoading ? (
                   <div className="flex justify-center py-8">
-                    <span className="text-default-400">{t('common.loading', 'Loading...')}</span>
+                    <span className="text-default-400">{t('volunteering.loading')}</span>
                   </div>
                 ) : members.length === 0 ? (
                   <div className="flex flex-col items-center py-8 text-default-400">
                     <Users size={40} className="mb-2" />
-                    <p>{t('volunteering.no_members', 'No members found')}</p>
+                    <p>{t('volunteering.no_members')}</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     {members.map((m) => (
                       <div
                         key={m.id || m.user_id}
-                        className="flex items-center justify-between rounded-lg border border-default-200 p-3"
+                        className="flex items-center justify-between rounded-xl border border-divider/70 bg-content2/30 p-3"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-default-100 flex items-center justify-center text-xs font-semibold text-default-600">
@@ -786,11 +786,11 @@ export function VolunteerOrganizations() {
                           </div>
                           <div>
                             <p className="text-sm font-medium">{m.first_name} {m.last_name}</p>
-                            <p className="text-xs text-default-400 capitalize">{m.role || t('volunteering.volunteer', 'Volunteer')}</p>
+                            <p className="text-xs text-default-500 capitalize">{m.role || t('volunteering.volunteer')}</p>
                           </div>
                         </div>
                         <span className="text-sm font-mono text-default-500">
-                          {(m.total_hours ?? 0).toLocaleString()} {t('volunteering.hrs', 'hrs')}
+                          {t('volunteering.hours_value', { value: (m.total_hours ?? 0).toLocaleString() })}
                         </span>
                       </div>
                     ))}
@@ -799,7 +799,7 @@ export function VolunteerOrganizations() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {t('common.close', 'Close')}
+                  {t('volunteering.close')}
                 </Button>
               </ModalFooter>
             </>
@@ -813,40 +813,40 @@ export function VolunteerOrganizations() {
           {(onClose) => (
             <>
               <ModalHeader>
-                {t('volunteering.create_organization', 'Create Organization')}
+                {t('volunteering.create_organization')}
               </ModalHeader>
               <ModalBody className="flex flex-col gap-3">
                 <Input
-                  label={t('volunteering.org_name_label', 'Organization Name')}
+                  label={t('volunteering.org_name_label')}
                   value={createForm.name}
                   onValueChange={(v) => setCreateForm(prev => ({ ...prev, name: v }))}
                   variant="bordered"
                   isRequired
                 />
                 <Textarea
-                  label={t('volunteering.org_description_label', 'Description')}
+                  label={t('volunteering.org_description_label')}
                   value={createForm.description}
                   onValueChange={(v) => setCreateForm(prev => ({ ...prev, description: v }))}
                   variant="bordered"
                   minRows={3}
                 />
                 <Input
-                  label={t('volunteering.org_email_label', 'Contact Email')}
+                  label={t('volunteering.org_email_label')}
                   type="email"
                   value={createForm.contact_email}
                   onValueChange={(v) => setCreateForm(prev => ({ ...prev, contact_email: v }))}
                   variant="bordered"
                 />
                 <Input
-                  label={t('volunteering.org_website_label', 'Website')}
+                  label={t('volunteering.org_website_label')}
                   type="url"
                   value={createForm.website}
                   onValueChange={(v) => setCreateForm(prev => ({ ...prev, website: v }))}
                   variant="bordered"
-                  placeholder="https://"
+                  placeholder={t('volunteering.website_placeholder')}
                 />
                 <Select
-                  label={t('volunteering.org_type_label', 'Type')}
+                  label={t('volunteering.org_type_label')}
                   selectedKeys={new Set([createForm.org_type])}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0] as 'organisation' | 'club';
@@ -854,25 +854,25 @@ export function VolunteerOrganizations() {
                   }}
                   variant="bordered"
                 >
-                  <SelectItem key="organisation">{t('volunteering.org_type_organisation', 'Organisation')}</SelectItem>
-                  <SelectItem key="club">{t('volunteering.org_type_club', 'Club')}</SelectItem>
+                  <SelectItem key="organisation">{t('volunteering.org_type_organisation')}</SelectItem>
+                  <SelectItem key="club">{t('volunteering.org_type_club')}</SelectItem>
                 </Select>
                 {createForm.org_type === 'club' && (
                   <Input
-                    label={t('volunteering.meeting_schedule_label', 'Meeting Schedule')}
+                    label={t('volunteering.meeting_schedule_label')}
                     value={createForm.meeting_schedule}
                     onValueChange={(v) => setCreateForm(prev => ({ ...prev, meeting_schedule: v }))}
                     variant="bordered"
-                    placeholder={t('volunteering.meeting_schedule_placeholder', 'e.g. Every Tuesday 19:00')}
+                    placeholder={t('volunteering.meeting_schedule_placeholder')}
                   />
                 )}
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {t('common.cancel', 'Cancel')}
+                  {t('volunteering.cancel')}
                 </Button>
                 <Button color="primary" onPress={handleCreateSubmit} isLoading={createSubmitting}>
-                  {t('volunteering.create', 'Create')}
+                  {t('volunteering.create')}
                 </Button>
               </ModalFooter>
             </>

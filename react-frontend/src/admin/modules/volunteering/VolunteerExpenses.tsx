@@ -90,15 +90,6 @@ const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'primary'
   paid: 'primary',
 };
 
-const TYPE_LABELS: Record<string, string> = {
-  travel: 'Travel',
-  meals: 'Meals',
-  supplies: 'Supplies',
-  equipment: 'Equipment',
-  parking: 'Parking',
-  other: 'Other',
-};
-
 function parsePayload<T>(raw: unknown): T {
   if (raw && typeof raw === 'object' && 'data' in raw) {
     return (raw as { data: T }).data;
@@ -110,7 +101,7 @@ function parsePayload<T>(raw: unknown): T {
 
 export function VolunteerExpenses() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('volunteering.expenses_page_title', 'Volunteer Expenses'));
+  usePageTitle(t('volunteering.expenses_page_title'));
   const toast = useToast();
 
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -159,12 +150,12 @@ export function VolunteerExpenses() {
         setStats(Array.isArray(payload) ? null : payload.stats || null);
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_expenses', 'Failed to load expenses'));
+      toast.error(t('volunteering.failed_to_load_expenses'));
       setExpenses([]);
       setStats(null);
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t]);
 
 
   const loadPolicies = useCallback(async () => {
@@ -176,10 +167,10 @@ export function VolunteerExpenses() {
         setPolicies(Array.isArray(payload) ? payload : (payload as { policies: ExpensePolicy[] }).policies || []);
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_policies', 'Failed to load expense policies'));
+      toast.error(t('volunteering.failed_to_load_policies'));
     }
     setPoliciesLoading(false);
-  }, [toast]);
+  }, [toast, t]);
 
 
   useEffect(() => { loadData(); loadPolicies(); }, [loadData, loadPolicies]);
@@ -207,7 +198,7 @@ export function VolunteerExpenses() {
   const orgBreakdown = useMemo(() => {
     const map = new Map<string, { total: number; count: number; pending: number; approved: number }>();
     filteredExpenses.forEach((item) => {
-      const orgName = item.organization_name || t('volunteering.unknown_org', 'Unknown');
+      const orgName = item.organization_name || t('volunteering.unknown_org');
       if (!map.has(orgName)) map.set(orgName, { total: 0, count: 0, pending: 0, approved: 0 });
       const entry = map.get(orgName)!;
       entry.total += item.amount;
@@ -218,7 +209,7 @@ export function VolunteerExpenses() {
     return Array.from(map.entries())
       .map(([name, data]) => ({ name, ...data }))
       .sort((a, b) => b.total - a.total);
-  }, [filteredExpenses]);
+  }, [filteredExpenses, t]);
 
 
   // ── Actions ────────────────────────────────────────────────────────────────
@@ -256,14 +247,14 @@ export function VolunteerExpenses() {
       }
       const res = await adminVolunteering.reviewExpense(reviewExpense.id, data);
       if (res.success) {
-        toast.success(t('volunteering.expense_updated', 'Expense updated successfully'));
+        toast.success(t('volunteering.expense_updated'));
         setReviewModal(false);
         loadData();
       } else {
-        toast.error(t('volunteering.failed_to_update_expense', 'Failed to update expense'));
+        toast.error(t('volunteering.failed_to_update_expense'));
       }
     } catch {
-      toast.error(t('volunteering.failed_to_update_expense', 'Failed to update expense'));
+      toast.error(t('volunteering.failed_to_update_expense'));
     }
     setActionLoading(false);
   };
@@ -279,7 +270,7 @@ export function VolunteerExpenses() {
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      toast.error(t('volunteering.export_failed', 'Failed to export expenses'));
+      toast.error(t('volunteering.export_failed'));
     }
   };
 
@@ -307,14 +298,14 @@ export function VolunteerExpenses() {
         requires_approval: policyForm.requires_approval,
       });
       if (res.success) {
-        toast.success(t('volunteering.policy_updated', 'Policy updated successfully'));
+        toast.success(t('volunteering.policy_updated'));
         setPolicyModal(false);
         loadPolicies();
       } else {
-        toast.error(t('volunteering.failed_to_update_policy', 'Failed to update policy'));
+        toast.error(t('volunteering.failed_to_update_policy'));
       }
     } catch {
-      toast.error(t('volunteering.failed_to_update_policy', 'Failed to update policy'));
+      toast.error(t('volunteering.failed_to_update_policy'));
     }
     setActionLoading(false);
   };
@@ -324,17 +315,17 @@ export function VolunteerExpenses() {
   const columns: Column<Expense>[] = [
     {
       key: 'volunteer_name',
-      label: t('volunteering.col_volunteer', 'Volunteer'),
+      label: t('volunteering.col_volunteer'),
       sortable: true,
     },
     {
       key: 'organization_name',
-      label: t('volunteering.col_organization', 'Organization'),
+      label: t('volunteering.col_organization'),
       sortable: true,
     },
     {
       key: 'amount',
-      label: t('volunteering.col_amount', 'Amount'),
+      label: t('volunteering.col_amount'),
       sortable: true,
       render: (item) => (
         <span className="font-semibold">
@@ -344,27 +335,27 @@ export function VolunteerExpenses() {
     },
     {
       key: 'type',
-      label: t('volunteering.col_type', 'Type'),
+      label: t('volunteering.col_type'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat">
-          {TYPE_LABELS[item.type] || item.type}
+          {t(`volunteering.expense_type_${item.type}`)}
         </Chip>
       ),
     },
     {
       key: 'status',
-      label: t('volunteering.col_status', 'Status'),
+      label: t('volunteering.col_status'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" color={STATUS_COLORS[item.status] || 'default'} variant="flat">
-          {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+          {t(`volunteering.status_${item.status}`)}
         </Chip>
       ),
     },
     {
       key: 'submitted_at',
-      label: t('volunteering.col_submitted', 'Submitted'),
+      label: t('volunteering.col_submitted'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -374,12 +365,12 @@ export function VolunteerExpenses() {
     },
     {
       key: 'has_receipt',
-      label: t('volunteering.col_receipt', 'Receipt?'),
+      label: t('volunteering.col_receipt'),
       render: (item) =>
         item.has_receipt ? (
           <div className="flex items-center gap-1.5">
             <Chip size="sm" color="success" variant="flat" startContent={<FileText size={12} />}>
-              {t('common.yes', 'Yes')}
+              {t('volunteering.yes')}
             </Chip>
             {item.receipt_path && (
               <Button
@@ -390,17 +381,17 @@ export function VolunteerExpenses() {
                 onPress={() => openReceipt(item)}
                 className="min-w-0 px-2"
               >
-                {t('volunteering.view_receipt', 'View')}
+                {t('volunteering.view_receipt')}
               </Button>
             )}
           </div>
         ) : (
-          <span className="text-sm text-default-400">{t('common.no', 'No')}</span>
+          <span className="text-sm text-default-400">{t('volunteering.no')}</span>
         ),
     },
     {
       key: 'actions',
-      label: t('volunteering.col_actions', 'Actions'),
+      label: t('volunteering.col_actions'),
       render: (item) => (
         <Button
           size="sm"
@@ -408,7 +399,7 @@ export function VolunteerExpenses() {
           color="primary"
           onPress={() => openReview(item)}
         >
-          {t('volunteering.review', 'Review')}
+          {t('volunteering.review')}
         </Button>
       ),
     },
@@ -417,10 +408,10 @@ export function VolunteerExpenses() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title={t('volunteering.expenses_title', 'Volunteer Expenses')}
-        description={t('volunteering.expenses_desc', 'Review and manage volunteer expense claims')}
+        title={t('volunteering.expenses_title')}
+        description={t('volunteering.expenses_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -428,7 +419,7 @@ export function VolunteerExpenses() {
               startContent={<Download size={16} />}
               onPress={handleExport}
             >
-              {t('volunteering.export_csv', 'Export CSV')}
+              {t('volunteering.export_csv')}
             </Button>
             <Button
               variant="flat"
@@ -436,37 +427,37 @@ export function VolunteerExpenses() {
               onPress={loadData}
               isLoading={loading}
             >
-              {t('common.refresh', 'Refresh')}
+              {t('volunteering.refresh')}
             </Button>
           </div>
         }
       />
 
       {/* Stats Row */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label={t('volunteering.stat_total_submitted', 'Total Submitted')}
+          label={t('volunteering.stat_total_submitted')}
           value={stats?.total_submitted ?? 0}
           icon={FileText}
           color="default"
           loading={loading}
         />
         <StatCard
-          label={t('volunteering.stat_pending_review', 'Pending Review')}
+          label={t('volunteering.stat_pending_review')}
           value={stats?.pending_review ?? 0}
           icon={Clock}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label={t('volunteering.stat_approved_total', 'Approved Total')}
+          label={t('volunteering.stat_approved_total')}
           value={stats?.approved_total ?? 0}
           icon={CheckCircle}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={t('volunteering.stat_paid_total', 'Paid Total')}
+          label={t('volunteering.stat_paid_total')}
           value={stats?.paid_total ?? 0}
           icon={CreditCard}
           color="primary"
@@ -475,10 +466,10 @@ export function VolunteerExpenses() {
       </div>
 
       {/* Date range filter */}
-      <div className="flex flex-wrap items-end gap-3 mb-4">
+      <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-divider/70 bg-content1 p-3 shadow-sm shadow-black/[0.03]">
         <Input
           type="date"
-          label={t('volunteering.date_from', 'From')}
+          label={t('volunteering.date_from')}
           size="sm"
           className="w-44"
           value={dateFrom}
@@ -487,7 +478,7 @@ export function VolunteerExpenses() {
         />
         <Input
           type="date"
-          label={t('volunteering.date_to', 'To')}
+          label={t('volunteering.date_to')}
           size="sm"
           className="w-44"
           value={dateTo}
@@ -500,7 +491,7 @@ export function VolunteerExpenses() {
             variant="light"
             onPress={() => { setDateFrom(''); setDateTo(''); }}
           >
-            {t('common.clear_filters', 'Clear dates')}
+            {t('volunteering.clear_dates')}
           </Button>
         )}
       </div>
@@ -509,8 +500,8 @@ export function VolunteerExpenses() {
       {!loading && filteredExpenses.length === 0 ? (
         <EmptyState
           icon={DollarSign}
-          title={t('volunteering.no_expenses', 'No expenses submitted')}
-          description={t('volunteering.no_expenses_desc', 'There are no volunteer expense claims to review.')}
+          title={t('volunteering.no_expenses')}
+          description={t('volunteering.no_expenses_desc')}
         />
       ) : (
         <DataTable columns={columns} data={filteredExpenses} isLoading={loading} onRefresh={loadData} />
@@ -518,12 +509,12 @@ export function VolunteerExpenses() {
 
       {/* Per-org expense breakdown */}
       {orgBreakdown.length > 0 && (
-        <Card className="mt-6">
+        <Card className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Building2 size={18} />
               <span className="font-semibold">
-                {t('volunteering.expense_org_breakdown_title', 'Expenses by Organization')}
+                {t('volunteering.expense_org_breakdown_title')}
               </span>
             </div>
           </CardHeader>
@@ -533,19 +524,19 @@ export function VolunteerExpenses() {
                 <thead>
                   <tr className="border-b border-divider text-left">
                     <th className="py-2 px-3 font-medium text-default-500">
-                      {t('volunteering.col_organization', 'Organization')}
+                      {t('volunteering.col_organization')}
                     </th>
                     <th className="py-2 px-3 font-medium text-default-500 text-right">
-                      {t('volunteering.col_claims', 'Claims')}
+                      {t('volunteering.col_claims')}
                     </th>
                     <th className="py-2 px-3 font-medium text-default-500 text-right">
-                      {t('volunteering.col_pending_amount', 'Pending')}
+                      {t('volunteering.col_pending_amount')}
                     </th>
                     <th className="py-2 px-3 font-medium text-default-500 text-right">
-                      {t('volunteering.col_approved_amount', 'Approved/Paid')}
+                      {t('volunteering.col_approved_amount')}
                     </th>
                     <th className="py-2 px-3 font-medium text-default-500 text-right">
-                      {t('volunteering.col_total_amount', 'Total')}
+                      {t('volunteering.col_total_amount')}
                     </th>
                   </tr>
                 </thead>
@@ -573,21 +564,21 @@ export function VolunteerExpenses() {
       )}
 
       {/* Expense Policies (collapsible) */}
-      <Card className="mt-6">
+      <Card className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Settings size={18} />
             <span className="font-semibold">
-              {t('volunteering.expense_policies_title', 'Expense Policies')}
+              {t('volunteering.expense_policies_title')}
             </span>
           </div>
         </CardHeader>
         <CardBody>
           {policiesLoading ? (
-            <p className="text-default-400 text-sm">{t('common.loading', 'Loading...')}</p>
+            <p className="text-default-400 text-sm">{t('volunteering.loading')}</p>
           ) : policies.length === 0 ? (
             <p className="text-default-400 text-sm">
-              {t('volunteering.no_policies', 'No expense policies configured.')}
+              {t('volunteering.no_policies')}
             </p>
           ) : (
             <Accordion variant="splitted">
@@ -596,35 +587,35 @@ export function VolunteerExpenses() {
                   key={policy.type}
                   title={
                     <span className="font-medium">
-                      {TYPE_LABELS[policy.type] || policy.type}
+                      {t(`volunteering.expense_type_${policy.type}`)}
                     </span>
                   }
                 >
                   <div className="grid grid-cols-2 gap-4 text-sm mb-3">
                     <div>
                       <span className="text-default-400">
-                        {t('volunteering.policy_max_amount', 'Max Amount')}:
+                        {t('volunteering.policy_max_amount')}:
                       </span>{' '}
                       <span className="font-medium">{policy.max_amount}</span>
                     </div>
                     <div>
                       <span className="text-default-400">
-                        {t('volunteering.policy_max_monthly', 'Max Monthly')}:
+                        {t('volunteering.policy_max_monthly')}:
                       </span>{' '}
                       <span className="font-medium">{policy.max_monthly}</span>
                     </div>
                     <div>
                       <span className="text-default-400">
-                        {t('volunteering.policy_receipt_threshold', 'Receipt Required Above')}:
+                        {t('volunteering.policy_receipt_threshold')}:
                       </span>{' '}
                       <span className="font-medium">{policy.requires_receipt_above}</span>
                     </div>
                     <div>
                       <span className="text-default-400">
-                        {t('volunteering.policy_requires_approval', 'Requires Approval')}:
+                        {t('volunteering.policy_requires_approval')}:
                       </span>{' '}
                       <span className="font-medium">
-                        {policy.requires_approval ? t('common.yes', 'Yes') : t('common.no', 'No')}
+                        {policy.requires_approval ? t('volunteering.yes') : t('volunteering.no')}
                       </span>
                     </div>
                   </div>
@@ -634,7 +625,7 @@ export function VolunteerExpenses() {
                     color="primary"
                     onPress={() => openPolicyEdit(policy)}
                   >
-                    {t('common.edit', 'Edit')}
+                    {t('volunteering.edit')}
                   </Button>
                 </AccordionItem>
               ))}
@@ -647,61 +638,61 @@ export function VolunteerExpenses() {
       <Modal isOpen={reviewModal} onClose={() => setReviewModal(false)} size="lg">
         <ModalContent>
           <ModalHeader>
-            {t('volunteering.review_expense', 'Review Expense')}
+            {t('volunteering.review_expense')}
           </ModalHeader>
           <ModalBody>
             {reviewExpense && (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <span className="text-default-400">{t('volunteering.col_volunteer', 'Volunteer')}:</span>
+                    <span className="text-default-400">{t('volunteering.col_volunteer')}:</span>
                     <p className="font-medium">{reviewExpense.volunteer_name}</p>
                   </div>
                   <div>
-                    <span className="text-default-400">{t('volunteering.col_organization', 'Organization')}:</span>
+                    <span className="text-default-400">{t('volunteering.col_organization')}:</span>
                     <p className="font-medium">{reviewExpense.organization_name}</p>
                   </div>
                   <div>
-                    <span className="text-default-400">{t('volunteering.col_amount', 'Amount')}:</span>
+                    <span className="text-default-400">{t('volunteering.col_amount')}:</span>
                     <p className="font-semibold">{reviewExpense.currency || '\u20AC'}{reviewExpense.amount.toFixed(2)}</p>
                   </div>
                   <div>
-                    <span className="text-default-400">{t('volunteering.col_type', 'Type')}:</span>
-                    <p className="font-medium">{TYPE_LABELS[reviewExpense.type] || reviewExpense.type}</p>
+                    <span className="text-default-400">{t('volunteering.col_type')}:</span>
+                    <p className="font-medium">{t(`volunteering.expense_type_${reviewExpense.type}`)}</p>
                   </div>
                 </div>
 
                 {reviewExpense.description && (
                   <div>
-                    <span className="text-default-400 text-sm">{t('volunteering.description', 'Description')}:</span>
+                    <span className="text-default-400 text-sm">{t('volunteering.description')}:</span>
                     <p className="text-sm">{reviewExpense.description}</p>
                   </div>
                 )}
 
                 <Select
-                  label={t('volunteering.action', 'Action')}
+                  label={t('volunteering.action')}
                   selectedKeys={[reviewAction]}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0] as string;
                     setReviewAction(val as 'approved' | 'rejected' | 'paid');
                   }}
                 >
-                  <SelectItem key="approved">{t('volunteering.approve', 'Approve')}</SelectItem>
-                  <SelectItem key="rejected">{t('volunteering.reject', 'Reject')}</SelectItem>
-                  <SelectItem key="paid">{t('volunteering.mark_as_paid', 'Mark as Paid')}</SelectItem>
+                  <SelectItem key="approved">{t('volunteering.approve')}</SelectItem>
+                  <SelectItem key="rejected">{t('volunteering.reject')}</SelectItem>
+                  <SelectItem key="paid">{t('volunteering.mark_as_paid')}</SelectItem>
                 </Select>
 
                 <Textarea
-                  label={t('volunteering.review_notes', 'Review Notes')}
-                  placeholder={t('volunteering.review_notes_placeholder', 'Optional notes about this decision...')}
+                  label={t('volunteering.review_notes')}
+                  placeholder={t('volunteering.review_notes_placeholder')}
                   value={reviewNotes}
                   onValueChange={setReviewNotes}
                 />
 
                 {reviewAction === 'paid' && (
                   <Input
-                    label={t('volunteering.payment_reference', 'Payment Reference')}
-                    placeholder={t('volunteering.payment_reference_placeholder', 'e.g. bank transfer ref, cheque number...')}
+                    label={t('volunteering.payment_reference')}
+                    placeholder={t('volunteering.payment_reference_placeholder')}
                     value={paymentReference}
                     onValueChange={setPaymentReference}
                   />
@@ -711,7 +702,7 @@ export function VolunteerExpenses() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setReviewModal(false)}>
-              {t('common.cancel', 'Cancel')}
+              {t('volunteering.cancel')}
             </Button>
             <Button
               color={reviewAction === 'rejected' ? 'danger' : 'primary'}
@@ -723,9 +714,9 @@ export function VolunteerExpenses() {
                 <CheckCircle size={16} />
               }
             >
-              {reviewAction === 'approved' && t('volunteering.approve', 'Approve')}
-              {reviewAction === 'rejected' && t('volunteering.reject', 'Reject')}
-              {reviewAction === 'paid' && t('volunteering.mark_as_paid', 'Mark as Paid')}
+              {reviewAction === 'approved' && t('volunteering.approve')}
+              {reviewAction === 'rejected' && t('volunteering.reject')}
+              {reviewAction === 'paid' && t('volunteering.mark_as_paid')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -735,18 +726,18 @@ export function VolunteerExpenses() {
       <Modal isOpen={receiptModal} onClose={() => setReceiptModal(false)} size="lg">
         <ModalContent>
           <ModalHeader>
-            {t('volunteering.receipt_preview', 'Receipt Preview')}
+            {t('volunteering.receipt_preview')}
           </ModalHeader>
           <ModalBody>
             {receiptUrl && !receiptIsPdf && (
               <div className="flex justify-center">
                 <img
                   src={receiptUrl}
-                  alt={t('volunteering.receipt_image', 'Receipt')}
+                  alt={t('volunteering.receipt_image')}
                   className="max-h-[500px] object-contain rounded-lg"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'data:image/svg+xml,' + encodeURIComponent(
-                      '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect fill="#f4f4f5" width="200" height="200"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#a1a1aa" font-size="14">Image unavailable</text></svg>'
+                      `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect fill="#f4f4f5" width="200" height="200"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#a1a1aa" font-size="14">${t('volunteering.image_unavailable')}</text></svg>`
                     );
                   }}
                 />
@@ -755,7 +746,7 @@ export function VolunteerExpenses() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setReceiptModal(false)}>
-              {t('common.close', 'Close')}
+              {t('volunteering.close')}
             </Button>
             <Button
               color="primary"
@@ -763,7 +754,7 @@ export function VolunteerExpenses() {
               startContent={<ExternalLink size={14} />}
               onPress={() => window.open(receiptUrl, '_blank')}
             >
-              {t('volunteering.open_full_size', 'Open Full Size')}
+              {t('volunteering.open_full_size')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -773,47 +764,47 @@ export function VolunteerExpenses() {
       <Modal isOpen={policyModal} onClose={() => setPolicyModal(false)} size="md">
         <ModalContent>
           <ModalHeader>
-            {t('volunteering.edit_policy', 'Edit Expense Policy')} — {editingPolicy ? (TYPE_LABELS[editingPolicy.type] || editingPolicy.type) : ''}
+            {t('volunteering.edit_policy')} - {editingPolicy ? t(`volunteering.expense_type_${editingPolicy.type}`) : ''}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Input
-                label={t('volunteering.policy_max_amount', 'Max Amount')}
+                label={t('volunteering.policy_max_amount')}
                 type="number"
                 value={policyForm.max_amount}
                 onValueChange={(v) => setPolicyForm({ ...policyForm, max_amount: v })}
               />
               <Input
-                label={t('volunteering.policy_max_monthly', 'Max Monthly')}
+                label={t('volunteering.policy_max_monthly')}
                 type="number"
                 value={policyForm.max_monthly}
                 onValueChange={(v) => setPolicyForm({ ...policyForm, max_monthly: v })}
               />
               <Input
-                label={t('volunteering.policy_receipt_threshold', 'Receipt Required Above')}
+                label={t('volunteering.policy_receipt_threshold')}
                 type="number"
                 value={policyForm.requires_receipt_above}
                 onValueChange={(v) => setPolicyForm({ ...policyForm, requires_receipt_above: v })}
               />
               <Select
-                label={t('volunteering.policy_requires_approval', 'Requires Approval')}
+                label={t('volunteering.policy_requires_approval')}
                 selectedKeys={[policyForm.requires_approval ? 'yes' : 'no']}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
                   setPolicyForm({ ...policyForm, requires_approval: val === 'yes' });
                 }}
               >
-                <SelectItem key="yes">{t('common.yes', 'Yes')}</SelectItem>
-                <SelectItem key="no">{t('common.no', 'No')}</SelectItem>
+                <SelectItem key="yes">{t('volunteering.yes')}</SelectItem>
+                <SelectItem key="no">{t('volunteering.no')}</SelectItem>
               </Select>
             </div>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setPolicyModal(false)}>
-              {t('common.cancel', 'Cancel')}
+              {t('volunteering.cancel')}
             </Button>
             <Button color="primary" onPress={handlePolicySave} isLoading={actionLoading}>
-              {t('common.save', 'Save')}
+              {t('volunteering.save')}
             </Button>
           </ModalFooter>
         </ModalContent>

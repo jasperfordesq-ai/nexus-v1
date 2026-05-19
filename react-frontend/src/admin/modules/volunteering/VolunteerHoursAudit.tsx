@@ -86,7 +86,7 @@ const STATUS_COLORS: Record<string, 'success' | 'danger' | 'warning' | 'default'
 
 export function VolunteerHoursAudit() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('volunteering.hours_audit_title', 'Hours Audit'));
+  usePageTitle(t('volunteering.hours_audit_title'));
   const toast = useToast();
 
   const [stats, setStats] = useState<HoursStats>({
@@ -162,7 +162,7 @@ export function VolunteerHoursAudit() {
         setHasMore(meta?.has_more || false);
       }
     } catch {
-      toast.error(t('volunteering.failed_load_hours', 'Failed to load hours'));
+      toast.error(t('volunteering.failed_load_hours'));
       if (!appendCursor) {
         setItems([]);
       }
@@ -180,16 +180,16 @@ export function VolunteerHoursAudit() {
       if (res.success) {
         toast.success(
           action === 'approve'
-            ? t('volunteering.hours_approved', 'Hours approved')
-            : t('volunteering.hours_declined', 'Hours declined')
+            ? t('volunteering.hours_approved')
+            : t('volunteering.hours_declined')
         );
         // Refresh all data to update stats
         loadData();
       } else {
-        toast.error((res as { message?: string }).message || t('volunteering.verify_failed', 'Verification failed'));
+        toast.error((res as { message?: string }).message || t('volunteering.verify_failed'));
       }
     } catch {
-      toast.error(t('volunteering.verify_failed', 'Verification failed'));
+      toast.error(t('volunteering.verify_failed'));
     }
     setActionInProgress(null);
   }, [toast, t, loadData]);
@@ -217,7 +217,7 @@ export function VolunteerHoursAudit() {
   const orgBreakdown = useMemo(() => {
     const map = new Map<string, { approved: number; pending: number }>();
     filteredItems.forEach((item) => {
-      const orgName = item.org_name || t('volunteering.unknown_org', 'Unknown');
+      const orgName = item.org_name || t('volunteering.unknown_org');
       if (!map.has(orgName)) map.set(orgName, { approved: 0, pending: 0 });
       const entry = map.get(orgName)!;
       const hours = Number.parseFloat(String(item.hours)) || 0;
@@ -246,7 +246,7 @@ export function VolunteerHoursAudit() {
       hours: item.hours,
       status: item.status,
       date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
-      paid: (item.paid === 1 || item.paid === true) ? t('common.yes', 'Yes') : t('common.no', 'No'),
+      paid: (item.paid === 1 || item.paid === true) ? t('volunteering.yes') : t('volunteering.no'),
       paid_amount: item.paid_amount || 0,
     }));
     exportToCsv(exportData, `volunteer-hours-${new Date().toISOString().split('T')[0]}.csv`);
@@ -255,7 +255,7 @@ export function VolunteerHoursAudit() {
   const columns: Column<HourLog>[] = useMemo(() => [
     {
       key: 'volunteer',
-      label: t('volunteering.col_volunteer', 'Volunteer'),
+      label: t('volunteering.col_volunteer'),
       sortable: true,
       render: (item) => (
         <span className="font-medium">
@@ -265,19 +265,19 @@ export function VolunteerHoursAudit() {
     },
     {
       key: 'org_name',
-      label: t('volunteering.col_organization', 'Organization'),
+      label: t('volunteering.col_organization'),
       sortable: true,
       render: (item) => <span>{item.org_name || '--'}</span>,
     },
     {
       key: 'hours',
-      label: t('volunteering.col_hours', 'Hours'),
+      label: t('volunteering.col_hours'),
       sortable: true,
       render: (item) => <span className="font-mono">{item.hours}</span>,
     },
     {
       key: 'created_at',
-      label: t('volunteering.col_date', 'Date'),
+      label: t('volunteering.col_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -287,23 +287,23 @@ export function VolunteerHoursAudit() {
     },
     {
       key: 'status',
-      label: t('volunteering.col_status', 'Status'),
+      label: t('volunteering.col_status'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color={STATUS_COLORS[item.status] || 'default'} className="capitalize">
-          {item.status}
+          {t(`volunteering.status_${item.status}`)}
         </Chip>
       ),
     },
     {
       key: 'paid',
-      label: t('volunteering.col_paid', 'Paid?'),
+      label: t('volunteering.col_paid'),
       render: (item) => {
         const isPaid = item.paid === 1 || item.paid === true;
         return (
           <div className="flex items-center gap-1">
             <Chip size="sm" variant="flat" color={isPaid ? 'success' : 'default'}>
-              {isPaid ? t('common.yes', 'Yes') : t('common.no', 'No')}
+              {isPaid ? t('volunteering.yes') : t('volunteering.no')}
             </Chip>
             {isPaid && item.paid_amount > 0 && (
               <span className="text-xs text-default-400 font-mono">{item.paid_amount}</span>
@@ -314,7 +314,7 @@ export function VolunteerHoursAudit() {
     },
     {
       key: 'actions',
-      label: t('common.actions', 'Actions'),
+      label: t('volunteering.col_actions'),
       render: (item) => {
         if (item.status !== 'pending') return null;
         const isThisItem = actionInProgress === item.id;
@@ -328,7 +328,7 @@ export function VolunteerHoursAudit() {
               isLoading={isThisItem}
               onPress={() => handleVerify(item.id, 'approve')}
             >
-              {t('volunteering.approve', 'Approve')}
+              {t('volunteering.approve')}
             </Button>
             <Button
               size="sm"
@@ -338,7 +338,7 @@ export function VolunteerHoursAudit() {
               isLoading={isThisItem}
               onPress={() => handleVerify(item.id, 'decline')}
             >
-              {t('volunteering.decline', 'Decline')}
+              {t('volunteering.decline')}
             </Button>
           </div>
         );
@@ -347,11 +347,11 @@ export function VolunteerHoursAudit() {
   ], [actionInProgress, handleVerify, t]);
 
   const topContent = useMemo(() => (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4 rounded-2xl border border-divider/70 bg-content1 p-3 shadow-sm shadow-black/[0.03]">
       <div className="flex flex-wrap items-end gap-3">
         <Select
           className="w-48"
-          label={t('volunteering.filter_by_status', 'Filter by status')}
+          label={t('volunteering.filter_by_status')}
           size="sm"
           selectedKeys={new Set([statusFilter])}
           onSelectionChange={(keys) => {
@@ -359,14 +359,14 @@ export function VolunteerHoursAudit() {
             setStatusFilter(val || 'all');
           }}
         >
-          <SelectItem key="all">{t('common.all', 'All')}</SelectItem>
-          <SelectItem key="pending">{t('common.pending', 'Pending')}</SelectItem>
-          <SelectItem key="approved">{t('common.approved', 'Approved')}</SelectItem>
-          <SelectItem key="declined">{t('common.declined', 'Declined')}</SelectItem>
+          <SelectItem key="all">{t('volunteering.tab_all')}</SelectItem>
+          <SelectItem key="pending">{t('volunteering.tab_pending')}</SelectItem>
+          <SelectItem key="approved">{t('volunteering.tab_approved')}</SelectItem>
+          <SelectItem key="declined">{t('volunteering.declined')}</SelectItem>
         </Select>
         <Input
           type="date"
-          label={t('volunteering.date_from', 'From')}
+          label={t('volunteering.date_from')}
           size="sm"
           className="w-44"
           value={dateFrom}
@@ -375,7 +375,7 @@ export function VolunteerHoursAudit() {
         />
         <Input
           type="date"
-          label={t('volunteering.date_to', 'To')}
+          label={t('volunteering.date_to')}
           size="sm"
           className="w-44"
           value={dateTo}
@@ -388,7 +388,7 @@ export function VolunteerHoursAudit() {
             variant="light"
             onPress={() => { setDateFrom(''); setDateTo(''); }}
           >
-            {t('common.clear_filters', 'Clear dates')}
+            {t('volunteering.clear_dates')}
           </Button>
         )}
         <Button
@@ -398,11 +398,11 @@ export function VolunteerHoursAudit() {
           onPress={handleExportCsv}
           isDisabled={filteredItems.length === 0}
         >
-          {t('volunteering.export_csv', 'Export CSV')}
+          {t('volunteering.export_csv')}
         </Button>
         {hasMore && (
           <Button size="sm" variant="flat" onPress={() => loadData(cursor ?? undefined)} isLoading={loading}>
-            {t('common.load_more', 'Load More')}
+            {t('volunteering.load_more')}
           </Button>
         )}
       </div>
@@ -410,42 +410,42 @@ export function VolunteerHoursAudit() {
   ), [statusFilter, hasMore, cursor, loading, t, loadData, dateFrom, dateTo, handleExportCsv, filteredItems.length]);
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title={t('volunteering.hours_audit_title', 'Volunteer Hours Audit')}
-        description={t('volunteering.hours_audit_desc', 'Audit logged hours, approve/decline pending entries, and review payments')}
+        title={t('volunteering.hours_audit_title')}
+        description={t('volunteering.hours_audit_desc')}
         actions={
           <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
-            {t('common.refresh', 'Refresh')}
+            {t('volunteering.refresh')}
           </Button>
         }
       />
 
       {/* Stats row */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label={t('volunteering.stat_total_hours', 'Total Hours Logged')}
+          label={t('volunteering.stat_total_hours')}
           value={stats.total_hours}
           icon={Clock}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={t('volunteering.stat_approved_hours', 'Hours Approved')}
+          label={t('volunteering.stat_approved_hours')}
           value={stats.approved_hours}
           icon={CheckCircle}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={t('volunteering.stat_pending_hours', 'Hours Pending')}
+          label={t('volunteering.stat_pending_hours')}
           value={stats.pending_hours}
           icon={Hourglass}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label={t('volunteering.stat_total_paid', 'Total Credits Paid')}
+          label={t('volunteering.stat_total_paid')}
           value={stats.total_paid}
           icon={CreditCard}
           color="secondary"
@@ -455,12 +455,12 @@ export function VolunteerHoursAudit() {
 
       {/* Per-org breakdown */}
       {orgBreakdown.length > 0 && (
-        <Card className="mb-6">
+        <Card className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Building2 size={18} />
               <span className="font-semibold">
-                {t('volunteering.org_breakdown_title', 'Hours by Organization')}
+                {t('volunteering.org_breakdown_title')}
               </span>
             </div>
           </CardHeader>
@@ -469,16 +469,16 @@ export function VolunteerHoursAudit() {
               {orgBreakdown.map((org) => (
                 <div
                   key={org.name}
-                  className="flex items-center justify-between p-3 rounded-lg bg-default-50"
+                  className="flex items-center justify-between rounded-xl border border-divider/70 bg-content2/30 p-3"
                 >
                   <span className="font-medium text-sm truncate mr-2">{org.name}</span>
                   <div className="flex gap-3 text-xs shrink-0">
                     <span className="text-success">
-                      {org.approved} {t('volunteering.approved_abbr', 'approved')}
+                      {org.approved} {t('volunteering.approved_abbr')}
                     </span>
                     {org.pending > 0 && (
                       <span className="text-warning">
-                        {org.pending} {t('volunteering.pending_abbr', 'pending')}
+                        {org.pending} {t('volunteering.pending_abbr')}
                       </span>
                     )}
                   </div>
@@ -494,15 +494,14 @@ export function VolunteerHoursAudit() {
         selectedKey={activeTab}
         onSelectionChange={(key) => setActiveTab(key as string)}
         variant="underlined"
-        className="mb-4"
       >
-        <Tab key="hours" title={t('volunteering.tab_hours', 'Hours Log')} />
+        <Tab key="hours" title={t('volunteering.tab_hours')} />
         <Tab
           key="payments"
           title={
             <div className="flex items-center gap-1.5">
               <Banknote size={14} />
-              {t('volunteering.tab_payments', 'Payment Reconciliation')}
+              {t('volunteering.tab_payments')}
             </div>
           }
         />
@@ -513,8 +512,8 @@ export function VolunteerHoursAudit() {
           {!loading && filteredItems.length === 0 ? (
             <EmptyState
               icon={Clock}
-              title={t('volunteering.no_hours', 'No hours logged')}
-              description={t('volunteering.no_hours_desc', 'No volunteer hours have been logged yet.')}
+              title={t('volunteering.no_hours')}
+              description={t('volunteering.no_hours_desc')}
             />
           ) : (
             <DataTable
@@ -530,12 +529,12 @@ export function VolunteerHoursAudit() {
       )}
 
       {activeTab === 'payments' && (
-        <Card>
+        <Card className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Banknote size={18} />
               <span className="font-semibold">
-                {t('volunteering.payment_reconciliation_title', 'Payment Reconciliation')}
+                {t('volunteering.payment_reconciliation_title')}
               </span>
             </div>
           </CardHeader>
@@ -544,10 +543,10 @@ export function VolunteerHoursAudit() {
               <div className="text-center py-8">
                 <CreditCard size={40} className="mx-auto mb-3 text-default-300" />
                 <p className="text-default-500 text-sm">
-                  {t('volunteering.no_paid_entries', 'No paid entries found.')}
+                  {t('volunteering.no_paid_entries')}
                 </p>
                 <p className="text-default-400 text-xs mt-1">
-                  {t('volunteering.payment_tracking_note', 'Payment tracking is available when auto-pay is enabled and hours are marked as paid.')}
+                  {t('volunteering.payment_tracking_note')}
                 </p>
               </div>
             ) : (
@@ -556,19 +555,19 @@ export function VolunteerHoursAudit() {
                   <thead>
                     <tr className="border-b border-divider text-left">
                       <th className="py-2 px-3 font-medium text-default-500">
-                        {t('volunteering.col_volunteer', 'Volunteer')}
+                        {t('volunteering.col_volunteer')}
                       </th>
                       <th className="py-2 px-3 font-medium text-default-500">
-                        {t('volunteering.col_organization', 'Organization')}
+                        {t('volunteering.col_organization')}
                       </th>
                       <th className="py-2 px-3 font-medium text-default-500">
-                        {t('volunteering.col_hours', 'Hours')}
+                        {t('volunteering.col_hours')}
                       </th>
                       <th className="py-2 px-3 font-medium text-default-500">
-                        {t('volunteering.col_amount_paid', 'Amount Paid')}
+                        {t('volunteering.col_amount_paid')}
                       </th>
                       <th className="py-2 px-3 font-medium text-default-500">
-                        {t('volunteering.col_date', 'Date')}
+                        {t('volunteering.col_date')}
                       </th>
                     </tr>
                   </thead>
@@ -592,7 +591,7 @@ export function VolunteerHoursAudit() {
                   <tfoot>
                     <tr className="border-t-2 border-divider font-semibold">
                       <td className="py-2 px-3" colSpan={2}>
-                        {t('volunteering.total', 'Total')}
+                        {t('volunteering.total')}
                       </td>
                       <td className="py-2 px-3 font-mono">
                         {paidEntries.reduce((sum, e) => sum + e.hours, 0)}
