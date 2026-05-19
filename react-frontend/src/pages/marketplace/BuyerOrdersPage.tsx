@@ -150,7 +150,7 @@ function OrderCard({
               </span>
               {order.quantity > 1 && (
                 <span className="text-xs text-default-400 ml-1">
-                  x{order.quantity}
+                  {t('orders.quantity_multiplier', { count: order.quantity })}
                 </span>
               )}
             </div>
@@ -163,7 +163,7 @@ function OrderCard({
           {order.tracking_number && (order.status === 'shipped' || order.status === 'delivered') && (
             <div className="flex items-center gap-2 mt-2 text-xs text-default-500">
               <Truck className="w-3.5 h-3.5" />
-              <span>{t('orders.tracking_number', 'Tracking:')} {order.tracking_number}</span>
+              <span>{t('orders.tracking_number')} {order.tracking_number}</span>
               {order.tracking_url && (
                 <a
                   href={order.tracking_url}
@@ -171,7 +171,7 @@ function OrderCard({
                   rel="noopener noreferrer"
                   className="text-primary hover:underline inline-flex items-center gap-0.5"
                 >
-                  {t('orders.track', 'Track')}
+                  {t('orders.track')}
                   <ExternalLink className="w-3 h-3" />
                 </a>
               )}
@@ -182,7 +182,7 @@ function OrderCard({
           <div className="flex items-center gap-2 mt-3">
             {order.status === 'paid' && (
               <Button size="sm" variant="flat" isDisabled startContent={<Package className="w-3.5 h-3.5" />}>
-                {t('orders.buyer.waiting_shipment', 'Waiting for Shipment')}
+                {t('orders.buyer.waiting_shipment')}
               </Button>
             )}
             {order.status === 'shipped' && (
@@ -192,7 +192,7 @@ function OrderCard({
                 onPress={() => onRequestConfirmDelivery(order.id)}
                 startContent={<CheckCircle2 className="w-3.5 h-3.5" />}
               >
-                {t('orders.buyer.confirm_delivery', 'Confirm Delivery')}
+                {t('orders.buyer.confirm_delivery')}
               </Button>
             )}
             {order.status === 'delivered' && !hasRating && (
@@ -203,7 +203,7 @@ function OrderCard({
                 onPress={() => onRate(order.id)}
                 startContent={<Star className="w-3.5 h-3.5" />}
               >
-                {t('orders.buyer.rate_order', 'Rate Order')}
+                {t('orders.buyer.rate_order')}
               </Button>
             )}
             {order.status === 'completed' && !hasRating && (
@@ -214,18 +214,18 @@ function OrderCard({
                 onPress={() => onRate(order.id)}
                 startContent={<Star className="w-3.5 h-3.5" />}
               >
-                {t('orders.buyer.leave_rating', 'Leave Rating')}
+                {t('orders.buyer.leave_rating')}
               </Button>
             )}
             {order.status === 'completed' && hasRating && (
               <span className="text-xs text-success flex items-center gap-1">
                 <Star className="w-3 h-3 fill-success" />
-                {t('orders.buyer.rated', 'Rated')}
+                {t('orders.buyer.rated')}
               </span>
             )}
             {order.status === 'disputed' && (
               <Button size="sm" variant="flat" color="danger" isDisabled>
-                {t('orders.buyer.dispute_open', 'Dispute Open')}
+                {t('orders.buyer.dispute_open')}
               </Button>
             )}
           </div>
@@ -242,7 +242,7 @@ function OrderCard({
 export function BuyerOrdersPage() {
   const navigate = useNavigate();
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('orders.buyer.page_title', 'My Orders - Marketplace'));
+  usePageTitle(t('orders.buyer.page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -306,7 +306,7 @@ export function BuyerOrdersPage() {
     } catch (err) {
       logError('Failed to load buyer orders', err);
       if (!append) {
-        toast.error(t('orders.load_error', 'Failed to load orders'));
+        toast.error(t('orders.load_error'));
       }
     } finally {
       setIsLoading(false);
@@ -327,16 +327,16 @@ export function BuyerOrdersPage() {
     try {
       const response = await api.put(`/v2/marketplace/orders/${orderId}/confirm-delivery`);
       if (response.success) {
-        toast.success(t('orders.buyer.delivery_confirmed', 'Delivery confirmed!'));
+        toast.success(t('orders.buyer.delivery_confirmed'));
         setOrders((prev) =>
           prev.map((o) => (o.id === orderId ? { ...o, status: 'delivered' } : o)),
         );
       } else {
-        toast.error(response.error || t('orders.action_error', 'Action failed'));
+        toast.error(response.error || t('orders.action_error'));
       }
     } catch (err) {
       logError('Failed to confirm delivery', err);
-      toast.error(t('orders.action_error', 'Action failed'));
+      toast.error(t('orders.action_error'));
     }
   }, [toast, t])
 
@@ -355,17 +355,17 @@ export function BuyerOrdersPage() {
 
   return (
     <>
-      <PageMeta title={t('orders.buyer.page_title', 'My Orders - Marketplace')} noIndex={true} />
+      <PageMeta title={t('orders.buyer.page_title')} noIndex={true} />
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <ShoppingBag className="w-7 h-7 text-primary" />
-            {t('orders.buyer.title', 'My Orders')}
+            {t('orders.buyer.title')}
           </h1>
           <p className="text-default-500 text-sm mt-1">
-            {t('orders.buyer.subtitle', 'Track your marketplace purchases')}
+            {t('orders.buyer.subtitle')}
           </p>
         </div>
 
@@ -377,10 +377,10 @@ export function BuyerOrdersPage() {
           variant="underlined"
           classNames={{ tabList: 'gap-4' }}
         >
-          <Tab key="all" title={t('orders.tab_all', 'All')} />
-          <Tab key="active" title={t('orders.tab_active', 'Active')} />
-          <Tab key="completed" title={t('orders.tab_completed', 'Completed')} />
-          <Tab key="cancelled" title={t('orders.tab_cancelled', 'Cancelled / Refunded')} />
+          <Tab key="all" title={t('orders.tab_all')} />
+          <Tab key="active" title={t('orders.tab_active')} />
+          <Tab key="completed" title={t('orders.tab_completed')} />
+          <Tab key="cancelled" title={t('orders.tab_cancelled')} />
         </Tabs>
 
         {/* Orders list */}
@@ -391,10 +391,10 @@ export function BuyerOrdersPage() {
         ) : orders.length === 0 ? (
           <EmptyState
             icon={<ShoppingBag className="w-10 h-10 text-default-400" />}
-            title={t('orders.buyer.empty_title', 'No Orders Yet')}
-            description={t('orders.buyer.empty_description', 'You haven\'t purchased anything yet. Browse the marketplace to find items you like.')}
+            title={t('orders.buyer.empty_title')}
+            description={t('orders.buyer.empty_description')}
             action={{
-              label: t('orders.buyer.browse_marketplace', 'Browse Marketplace'),
+              label: t('orders.buyer.browse_marketplace'),
               onClick: () => navigate(tenantPath('/marketplace')),
             }}
           />
@@ -418,7 +418,7 @@ export function BuyerOrdersPage() {
                   onPress={() => loadOrders(true)}
                   isLoading={isLoadingMore}
                 >
-                  {t('common.load_more', 'Load More')}
+                  {t('common.load_more')}
                 </Button>
               </div>
             )}
@@ -435,15 +435,15 @@ export function BuyerOrdersPage() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>{t('orders.buyer.confirm_delivery_modal_title', 'Confirm Delivery')}</ModalHeader>
+              <ModalHeader>{t('orders.buyer.confirm_delivery_modal_title')}</ModalHeader>
               <ModalBody>
                 <p className="text-sm text-default-600">
-                  {t('orders.buyer.confirm_delivery_modal_body', 'Mark this order as delivered? This cannot be undone.')}
+                  {t('orders.buyer.confirm_delivery_modal_body')}
                 </p>
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {t('common.cancel', 'Cancel')}
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   color="primary"
@@ -454,7 +454,7 @@ export function BuyerOrdersPage() {
                     setConfirmDeliveryId(null);
                   }}
                 >
-                  {t('orders.buyer.confirm_delivery', 'Confirm Delivery')}
+                  {t('orders.buyer.confirm_delivery')}
                 </Button>
               </ModalFooter>
             </>

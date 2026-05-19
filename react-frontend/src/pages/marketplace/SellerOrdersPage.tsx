@@ -146,7 +146,7 @@ function SellerOrderCard({
                   className="w-5 h-5"
                 />
                 <span className="text-xs text-default-500">
-                  {t('orders.seller.buyer_label', 'Buyer:')} {order.buyer.name}
+                  {t('orders.seller.buyer_label')} {order.buyer.name}
                 </span>
               </div>
             </div>
@@ -173,7 +173,7 @@ function SellerOrderCard({
           {order.tracking_number && (order.status === 'shipped' || order.status === 'delivered') && (
             <div className="flex items-center gap-2 mt-2 text-xs text-default-500">
               <Truck className="w-3.5 h-3.5" />
-              <span>{t('orders.tracking_number', 'Tracking:')} {order.tracking_number}</span>
+              <span>{t('orders.tracking_number')} {order.tracking_number}</span>
               {order.tracking_url && (
                 <a
                   href={order.tracking_url}
@@ -181,7 +181,7 @@ function SellerOrderCard({
                   rel="noopener noreferrer"
                   className="text-primary hover:underline inline-flex items-center gap-0.5"
                 >
-                  {t('orders.track', 'Track')}
+                  {t('orders.track')}
                   <ExternalLink className="w-3 h-3" />
                 </a>
               )}
@@ -197,28 +197,28 @@ function SellerOrderCard({
                 onPress={() => onMarkShipped(order.id)}
                 startContent={<Truck className="w-3.5 h-3.5" />}
               >
-                {t('orders.seller.mark_shipped', 'Mark Shipped')}
+                {t('orders.seller.mark_shipped')}
               </Button>
             )}
             {order.status === 'shipped' && (
               <Button size="sm" variant="flat" isDisabled startContent={<Clock className="w-3.5 h-3.5" />}>
-                {t('orders.seller.awaiting_confirmation', 'Awaiting Buyer Confirmation')}
+                {t('orders.seller.awaiting_confirmation')}
               </Button>
             )}
             {order.status === 'delivered' && (
               <Button size="sm" variant="flat" isDisabled startContent={<Clock className="w-3.5 h-3.5" />}>
-                {t('orders.seller.awaiting_completion', 'Awaiting Auto-Complete')}
+                {t('orders.seller.awaiting_completion')}
               </Button>
             )}
             {order.status === 'completed' && hasRating && (
               <span className="text-xs text-success flex items-center gap-1">
                 <Star className="w-3 h-3 fill-success" />
-                {t('orders.seller.buyer_rated', 'Buyer Rated')}
+                {t('orders.seller.buyer_rated')}
               </span>
             )}
             {order.status === 'disputed' && (
               <Button size="sm" variant="flat" color="danger" isDisabled>
-                {t('orders.seller.dispute_open', 'Dispute Open')}
+                {t('orders.seller.dispute_open')}
               </Button>
             )}
           </div>
@@ -235,7 +235,7 @@ function SellerOrderCard({
 export function SellerOrdersPage() {
   const navigate = useNavigate();
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('orders.seller.page_title', 'My Sales - Marketplace'));
+  usePageTitle(t('orders.seller.page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -300,7 +300,7 @@ export function SellerOrdersPage() {
     } catch (err) {
       logError('Failed to load seller orders', err);
       if (!append) {
-        toast.error(t('orders.load_error', 'Failed to load orders'));
+        toast.error(t('orders.load_error'));
       }
     } finally {
       setIsLoading(false);
@@ -338,7 +338,7 @@ export function SellerOrdersPage() {
       });
 
       if (response.success) {
-        toast.success(t('orders.seller.shipped_success', 'Order marked as shipped!'));
+        toast.success(t('orders.seller.shipped_success'));
         setOrders((prev) =>
           prev.map((o) =>
             o.id === shipOrderId
@@ -354,11 +354,11 @@ export function SellerOrdersPage() {
         );
         shipModal.onClose();
       } else {
-        toast.error(response.error || t('orders.action_error', 'Action failed'));
+        toast.error(response.error || t('orders.action_error'));
       }
     } catch (err) {
       logError('Failed to mark order as shipped', err);
-      toast.error(t('orders.action_error', 'Action failed'));
+      toast.error(t('orders.action_error'));
     } finally {
       setIsSubmittingShip(false);
     }
@@ -368,17 +368,17 @@ export function SellerOrdersPage() {
 
   return (
     <>
-      <PageMeta title={t('orders.seller.page_title', 'My Sales - Marketplace')} noIndex={true} />
+      <PageMeta title={t('orders.seller.page_title')} noIndex={true} />
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Store className="w-7 h-7 text-primary" />
-            {t('orders.seller.title', 'My Sales')}
+            {t('orders.seller.title')}
           </h1>
           <p className="text-default-500 text-sm mt-1">
-            {t('orders.seller.subtitle', 'Manage orders from your marketplace sales')}
+            {t('orders.seller.subtitle')}
           </p>
         </div>
 
@@ -390,10 +390,10 @@ export function SellerOrdersPage() {
           variant="underlined"
           classNames={{ tabList: 'gap-4' }}
         >
-          <Tab key="all" title={t('orders.tab_all', 'All')} />
-          <Tab key="active" title={t('orders.tab_active', 'Active')} />
-          <Tab key="completed" title={t('orders.tab_completed', 'Completed')} />
-          <Tab key="cancelled" title={t('orders.tab_cancelled', 'Cancelled / Refunded')} />
+          <Tab key="all" title={t('orders.tab_all')} />
+          <Tab key="active" title={t('orders.tab_active')} />
+          <Tab key="completed" title={t('orders.tab_completed')} />
+          <Tab key="cancelled" title={t('orders.tab_cancelled')} />
         </Tabs>
 
         {/* Orders list */}
@@ -404,10 +404,10 @@ export function SellerOrdersPage() {
         ) : orders.length === 0 ? (
           <EmptyState
             icon={<Store className="w-10 h-10 text-default-400" />}
-            title={t('orders.seller.empty_title', 'No Sales Yet')}
-            description={t('orders.seller.empty_description', 'You haven\'t received any orders yet. List items for sale to start selling.')}
+            title={t('orders.seller.empty_title')}
+            description={t('orders.seller.empty_description')}
             action={{
-              label: t('orders.seller.create_listing', 'Create Listing'),
+              label: t('orders.seller.create_listing'),
               onClick: () => navigate(tenantPath('/marketplace/sell')),
             }}
           />
@@ -430,7 +430,7 @@ export function SellerOrdersPage() {
                   onPress={() => loadOrders(true)}
                   isLoading={isLoadingMore}
                 >
-                  {t('common.load_more', 'Load More')}
+                  {t('common.load_more')}
                 </Button>
               </div>
             )}
@@ -443,14 +443,14 @@ export function SellerOrdersPage() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Truck className="w-5 h-5 text-primary" />
-            {t('orders.seller.ship_modal_title', 'Mark as Shipped')}
+            {t('orders.seller.ship_modal_title')}
           </ModalHeader>
           <ModalBody className="space-y-4">
             <p className="text-sm text-default-500">
-              {t('orders.seller.ship_modal_description', 'Enter shipping details for this order. Tracking information will be shared with the buyer.')}
+              {t('orders.seller.ship_modal_description')}
             </p>
             <Select
-              label={t('orders.seller.shipping_method', 'Shipping Method')}
+              label={t('orders.seller.shipping_method')}
               selectedKeys={[shippingMethod]}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -464,14 +464,14 @@ export function SellerOrdersPage() {
               ))}
             </Select>
             <Input
-              label={t('orders.seller.tracking_number', 'Tracking Number (optional)')}
-              placeholder={t('orders.seller.tracking_number_placeholder', 'e.g. 1Z999AA10123456784')}
+              label={t('orders.seller.tracking_number')}
+              placeholder={t('orders.seller.tracking_number_placeholder')}
               value={trackingNumber}
               onValueChange={setTrackingNumber}
             />
             <Input
-              label={t('orders.seller.tracking_url_label', 'Tracking URL (optional)')}
-              placeholder={t('orders.seller.tracking_url_placeholder', 'e.g. https://track.example.com/...')}
+              label={t('orders.seller.tracking_url_label')}
+              placeholder={t('orders.seller.tracking_url_placeholder')}
               value={trackingUrl}
               onValueChange={setTrackingUrl}
               type="url"
@@ -479,7 +479,7 @@ export function SellerOrdersPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={shipModal.onClose} isDisabled={isSubmittingShip}>
-              {t('common.cancel', 'Cancel')}
+              {t('common.cancel')}
             </Button>
             <Button
               color="primary"
@@ -487,7 +487,7 @@ export function SellerOrdersPage() {
               isLoading={isSubmittingShip}
               startContent={!isSubmittingShip ? <Truck className="w-4 h-4" /> : undefined}
             >
-              {t('orders.seller.confirm_shipped', 'Confirm Shipped')}
+              {t('orders.seller.confirm_shipped')}
             </Button>
           </ModalFooter>
         </ModalContent>
