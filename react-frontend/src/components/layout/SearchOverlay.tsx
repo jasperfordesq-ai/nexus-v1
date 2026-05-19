@@ -177,18 +177,18 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const quickActions = useMemo(() => {
     const actions: { label: string; icon: typeof Search; action: () => void }[] = [];
     if (isAuthenticated) {
-      actions.push({ label: t('create.new_listing', 'New Listing'), icon: ListTodo, action: () => navigate(tenantPath('/listings/create')) });
+      actions.push({ label: t('create.new_listing'), icon: ListTodo, action: () => navigate(tenantPath('/listings/create')) });
       if (hasFeature('events')) {
-        actions.push({ label: t('create.new_event', 'New Event'), icon: Calendar, action: () => navigate(tenantPath('/events/create')) });
+        actions.push({ label: t('create.new_event'), icon: Calendar, action: () => navigate(tenantPath('/events/create')) });
       }
       actions.push(
-        { label: t('user_menu.my_profile', 'My Profile'), icon: UserCircle, action: () => navigate(tenantPath('/profile')) },
-        { label: t('user_menu.settings', 'Settings'), icon: Settings, action: () => navigate(tenantPath('/settings')) }
+        { label: t('user_menu.my_profile'), icon: UserCircle, action: () => navigate(tenantPath('/profile')) },
+        { label: t('user_menu.settings'), icon: Settings, action: () => navigate(tenantPath('/settings')) }
       );
     }
     actions.push(
-      { label: resolvedTheme === 'dark' ? t('user_menu.light_mode', 'Light Mode') : t('user_menu.dark_mode', 'Dark Mode'), icon: resolvedTheme === 'dark' ? Sun : Moon, action: toggleTheme },
-      { label: t('support.help_center', 'Help Center'), icon: HelpCircle, action: () => navigate(tenantPath('/help')) }
+      { label: resolvedTheme === 'dark' ? t('user_menu.light_mode') : t('user_menu.dark_mode'), icon: resolvedTheme === 'dark' ? Sun : Moon, action: toggleTheme },
+      { label: t('support.help_center'), icon: HelpCircle, action: () => navigate(tenantPath('/help')) }
     );
     return actions;
   }, [isAuthenticated, t, navigate, tenantPath, hasFeature, resolvedTheme, toggleTheme]);
@@ -250,10 +250,10 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
   // ─── Type badges ───────────────────────────────────────────────────────
   const typeLabels: Record<string, { label: string; color: string }> = {
-    listing: { label: t('search.type_listing', 'Listing'), color: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
-    user: { label: t('search.type_member', 'Member'), color: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' },
-    event: { label: t('search.type_event', 'Event'), color: 'bg-amber-500/20 text-amber-600 dark:text-amber-400' },
-    group: { label: t('search.type_group', 'Group'), color: 'bg-purple-500/20 text-purple-600 dark:text-purple-400' },
+    listing: { label: t('search.type_listing'), color: 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300' },
+    user: { label: t('search.type_member'), color: 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300' },
+    event: { label: t('search.type_event'), color: 'bg-warning-100 text-warning-700 dark:bg-warning-900/30 dark:text-warning-300' },
+    group: { label: t('search.type_group'), color: 'bg-secondary-100 text-secondary-700 dark:bg-secondary-900/30 dark:text-secondary-300' },
   };
 
   // ─── Don't render if not open ──────────────────────────────────────────
@@ -274,19 +274,19 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         className="absolute top-[calc(var(--safe-area-top)+1rem)] sm:top-[calc(var(--safe-area-top)+4.5rem)] left-1/2 -translate-x-1/2 w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right)-1rem)] max-w-xl"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex max-h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-2rem)] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
+        <div className="flex max-h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-2rem)] flex-col overflow-hidden rounded-xl border border-divider bg-content1 shadow-large">
           {/* Search input row */}
-          <div className="flex shrink-0 items-center gap-2 px-3 sm:px-4 py-3 border-b border-zinc-200 dark:border-zinc-700">
-            <Search className="w-5 h-5 text-zinc-400 flex-shrink-0" />
+          <div className="flex shrink-0 items-center gap-2 px-3 sm:px-4 py-3 border-b border-divider">
+            <Search className="w-5 h-5 text-default-400 flex-shrink-0" />
             <input
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={t('search.placeholder', 'Search...')}
-              aria-label={t('search.placeholder', 'Search...')}
+              placeholder={t('search.placeholder')}
+              aria-label={t('search.placeholder')}
               autoFocus
-              className="min-w-0 flex-1 bg-transparent text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 text-base outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              className="min-w-0 flex-1 bg-transparent text-foreground placeholder:text-default-400 text-base outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             />
             {query && (
               <Button
@@ -294,7 +294,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 variant="light"
                 size="sm"
                 onPress={() => setQuery('')}
-                className="p-1 h-auto min-w-0 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                className="p-1 h-auto min-w-0 text-default-400 hover:text-default-700"
                 aria-label={t('aria.clear')}
               >
                 <X className="w-4 h-4" />
@@ -304,7 +304,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               variant="flat"
               size="sm"
               onPress={handleClose}
-              className="hidden min-[360px]:flex items-center gap-1.5 px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 text-xs border border-zinc-200 dark:border-zinc-600 h-auto"
+              className="hidden min-[360px]:flex items-center gap-1.5 px-2 py-1 rounded-md text-xs h-auto"
               aria-label={t('accessibility.close')}
             >
               <X className="w-3.5 h-3.5" />
@@ -317,7 +317,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             {/* Action mode */}
             {isActionMode ? (
               <div>
-                <p className="text-xs text-zinc-500 mb-2">{t('search.actions', 'Actions')}</p>
+                <p className="text-xs text-default-500 mb-2">{t('search.actions')}</p>
                 {filteredActions.length > 0 ? (
                   <div className="space-y-1">
                     {filteredActions.map((action, i) => {
@@ -331,27 +331,27 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                           onFocus={() => setSelectedIndex(i)}
                           className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-start h-auto justify-start min-w-0 ${
                             i === selectedIndex
-                              ? 'bg-indigo-50 dark:bg-indigo-500/10'
-                              : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                              ? 'bg-primary-50 dark:bg-primary-500/10'
+                              : 'hover:bg-default-100'
                           }`}
                         >
-                          <Icon className="w-4 h-4 shrink-0 text-zinc-500" />
-                          <span className="min-w-0 truncate text-sm text-zinc-800 dark:text-zinc-200">{action.label}</span>
+                          <Icon className="w-4 h-4 shrink-0 text-default-500" />
+                          <span className="min-w-0 truncate text-sm text-foreground">{action.label}</span>
                         </Button>
                       );
                     })}
                   </div>
                 ) : (
-                  <p className="text-sm text-zinc-500">{t('search.no_actions', 'No matching actions')}</p>
+                  <p className="text-sm text-default-500">{t('search.no_actions')}</p>
                 )}
               </div>
             ) : suggestions.length > 0 ? (
               /* Suggestions */
               <div>
-                <p className="text-xs text-zinc-500 mb-2">{t('search.suggestions', 'Suggestions')}</p>
+                <p className="text-xs text-default-500 mb-2">{t('search.suggestions')}</p>
                 <div className="space-y-1">
                   {suggestions.map((s, i) => {
-                    const type = typeLabels[s.type] || { label: s.type, color: 'bg-zinc-200 text-zinc-600' };
+                    const type = typeLabels[s.type] || { label: s.type, color: 'bg-default-100 text-default-600' };
                     return (
                       <Button
                         key={`${s.type}-${s.id}`}
@@ -360,11 +360,11 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                         onMouseEnter={() => setSelectedIndex(i)}
                         className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-start h-auto min-w-0 ${
                           i === selectedIndex
-                            ? 'bg-indigo-50 dark:bg-indigo-500/10'
-                            : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                            ? 'bg-primary-50 dark:bg-primary-500/10'
+                            : 'hover:bg-default-100'
                         }`}
                       >
-                        <span className="min-w-0 truncate text-sm text-zinc-800 dark:text-zinc-200">{s.title || s.name}</span>
+                        <span className="min-w-0 truncate text-sm text-foreground">{s.title || s.name}</span>
                         <span className={`text-[10px] px-2 py-0.5 rounded-full ${type.color} ms-2 flex-shrink-0`}>{type.label}</span>
                       </Button>
                     );
@@ -373,30 +373,30 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 <Button
                   variant="light"
                   onPress={goToSearch}
-                  className="w-full flex items-center justify-center gap-2 mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-700 text-indigo-600 dark:text-indigo-400 hover:underline text-sm h-auto rounded-none"
+                  className="w-full flex items-center justify-center gap-2 mt-3 pt-3 border-t border-divider text-primary hover:underline text-sm h-auto rounded-none"
                 >
                   <Search className="w-4 h-4" />
-                  {t('search.view_all', 'View all results')}
+                  {t('search.view_all')}
                   <ArrowRight className="w-3 h-3" />
                 </Button>
               </div>
             ) : isLoading ? (
               /* Loading */
               <div className="flex items-center gap-2 py-4">
-                <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm text-zinc-500">{t('search.searching', 'Searching...')}</span>
+                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                <span className="text-sm text-default-500">{t('search.searching')}</span>
               </div>
             ) : query.trim().length >= 2 ? (
               /* No results */
               <div className="py-4 text-center">
-                <p className="text-sm text-zinc-500 mb-2">{t('search.no_suggestions', 'No quick matches')}</p>
+                <p className="text-sm text-default-500 mb-2">{t('search.no_suggestions')}</p>
                 <Button
                   variant="light"
                   onPress={goToSearch}
-                  className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline text-sm h-auto"
+                  className="inline-flex items-center gap-2 text-primary hover:underline text-sm h-auto"
                 >
                   <Search className="w-4 h-4" />
-                  {t('search.search_for', 'Search for')} "{query.trim()}"
+                  {t('search.search_for')} "{query.trim()}"
                 </Button>
               </div>
             ) : (
@@ -405,14 +405,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 {recentSearches.length > 0 && (
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs text-zinc-500">{t('search.recent', 'Recent')}</p>
+                      <p className="text-xs text-default-500">{t('search.recent')}</p>
                       <Button
                         variant="light"
                         size="sm"
                         onPress={clearRecent}
-                        className="text-[10px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 h-auto p-0 min-w-0"
+                        className="text-[10px] text-default-400 hover:text-default-700 h-auto p-0 min-w-0"
                       >
-                        {t('search.clear', 'Clear')}
+                        {t('search.clear')}
                       </Button>
                     </div>
                     <div className="space-y-1">
@@ -425,38 +425,38 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                             navigate(tenantPath(`/search?q=${encodeURIComponent(q)}`));
                             handleClose();
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-start hover:bg-zinc-50 dark:hover:bg-zinc-800 h-auto justify-start min-w-0"
+                          className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-start hover:bg-default-100 h-auto justify-start min-w-0"
                         >
-                          <Clock className="w-3.5 h-3.5 shrink-0 text-zinc-400" />
-                          <span className="min-w-0 truncate text-sm text-zinc-600 dark:text-zinc-400">{q}</span>
+                          <Clock className="w-3.5 h-3.5 shrink-0 text-default-400" />
+                          <span className="min-w-0 truncate text-sm text-default-600">{q}</span>
                         </Button>
                       ))}
                     </div>
                   </div>
                 )}
 
-                <p className="text-xs text-zinc-500 mb-2">{t('search.quick_links', 'Quick Links')}</p>
+                <p className="text-xs text-default-500 mb-2">{t('search.quick_links')}</p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {[
-                    { label: t('nav.listings', 'Listings'), path: tenantPath('/listings') },
-                    ...(hasFeature('connections') ? [{ label: t('nav.members', 'Members'), path: tenantPath('/members') }] : []),
-                    { label: t('nav.events', 'Events'), path: tenantPath('/events') },
-                    { label: t('support.help_center', 'Help'), path: tenantPath('/help') },
+                    { label: t('nav.listings'), path: tenantPath('/listings') },
+                    ...(hasFeature('connections') ? [{ label: t('nav.members'), path: tenantPath('/members') }] : []),
+                    { label: t('nav.events'), path: tenantPath('/events') },
+                    { label: t('support.help_center'), path: tenantPath('/help') },
                   ].map(link => (
                     <Button
                       key={link.path}
                       variant="flat"
                       size="sm"
                       onPress={() => { navigate(link.path); handleClose(); }}
-                      className="px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 h-auto"
+                      className="px-3 py-1.5 rounded-lg text-sm h-auto"
                     >
                       {link.label}
                     </Button>
                   ))}
                 </div>
 
-                <p className="text-[11px] text-zinc-400 pt-2 border-t border-zinc-200 dark:border-zinc-700">
-                  {t('search.actions_hint', 'Type > for quick actions')}
+                <p className="text-[11px] text-default-400 pt-2 border-t border-divider">
+                  {t('search.actions_hint')}
                 </p>
               </div>
             )}
