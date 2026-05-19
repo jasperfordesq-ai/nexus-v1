@@ -24,6 +24,12 @@ import {
   Divider,
   Input,
   Spinner,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
   Textarea,
 } from '@heroui/react';
 import Coins from 'lucide-react/icons/coins';
@@ -76,6 +82,14 @@ interface PointTransaction {
 
 interface HistoryResponse {
   items: PointTransaction[];
+}
+
+function formatActivityDate(value: string): string {
+  return new Intl.DateTimeFormat(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(value));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -322,26 +336,21 @@ export default function RegionalPointsPage() {
               {t('regional_points.history.empty', 'No transactions yet.')}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-default-50">
-                  <tr className="text-xs text-default-500 uppercase tracking-wide">
-                    <th className="text-left px-4 py-3">{t('regional_points.history.date', 'Date')}</th>
-                    <th className="text-left px-4 py-3">{t('regional_points.history.type', 'Type')}</th>
-                    <th className="text-left px-4 py-3">{t('regional_points.history.description', 'Description')}</th>
-                    <th className="text-right px-4 py-3">{t('regional_points.history.amount', 'Amount')}</th>
-                    <th className="text-right px-4 py-3 hidden md:table-cell">{t('regional_points.history.balance_after', 'Balance')}</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <Table aria-label={t('regional_points.history.table_aria')} removeWrapper>
+              <TableHeader>
+                <TableColumn>{t('regional_points.history.date', 'Date')}</TableColumn>
+                <TableColumn>{t('regional_points.history.type', 'Type')}</TableColumn>
+                <TableColumn>{t('regional_points.history.description', 'Description')}</TableColumn>
+                <TableColumn align="end">{t('regional_points.history.amount', 'Amount')}</TableColumn>
+                <TableColumn align="end">{t('regional_points.history.balance_after', 'Balance')}</TableColumn>
+              </TableHeader>
+              <TableBody>
                   {history.map((row) => {
                     const inbound = row.direction === 'in';
                     return (
-                      <tr key={row.id} className="border-t border-default-200 hover:bg-default-50">
-                        <td className="px-4 py-3 text-sm">
-                          {new Date(row.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-4 py-3 text-sm">
+                      <TableRow key={row.id}>
+                        <TableCell>{formatActivityDate(row.created_at)}</TableCell>
+                        <TableCell>
                           <span className="inline-flex items-center gap-1">
                             {inbound ? (
                               <ArrowDownCircle className="w-4 h-4 text-success" />
@@ -350,21 +359,20 @@ export default function RegionalPointsPage() {
                             )}
                             {row.type}
                           </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-default-600">{row.description || '—'}</td>
-                        <td className={`px-4 py-3 text-sm text-right tabular-nums ${inbound ? 'text-success' : 'text-danger'}`}>
-                          {inbound ? '+' : '−'}
+                        </TableCell>
+                        <TableCell className="text-default-600">{row.description || t('empty_dash')}</TableCell>
+                        <TableCell className={`text-right tabular-nums ${inbound ? 'text-success' : 'text-danger'}`}>
+                          {inbound ? '+' : '-'}
                           {row.points.toFixed(2)} {symbol}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-right tabular-nums hidden md:table-cell text-default-500">
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums text-default-500">
                           {row.balance_after.toFixed(2)}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     );
                   })}
-                </tbody>
-              </table>
-            </div>
+              </TableBody>
+            </Table>
           )}
         </CardBody>
       </Card>

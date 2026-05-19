@@ -1414,7 +1414,8 @@
       "type": "Type",
       "description": "Description",
       "amount": "Amount",
-      "balance_after": "Balance"
+      "balance_after": "Balance",
+      "table_aria": "Regional points activity"
     },
     "errors": {
       "load_failed": "Failed to load regional points",
