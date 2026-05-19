@@ -244,6 +244,22 @@ class FederatedMessageService
                 Log::warning('Failed to dispatch federation message notification', ['error' => $e->getMessage()]);
             }
 
+            $emailSent = FederationEmailService::sendExternalMessageNotification(
+                $receiverUserId,
+                (int) $receiver->tenant_id,
+                $senderName,
+                $partnerName,
+                $body
+            );
+            if (!$emailSent) {
+                Log::warning('External federation message email returned false', [
+                    'receiver_user_id' => $receiverUserId,
+                    'tenant_id' => (int) $receiver->tenant_id,
+                    'external_partner_id' => $externalPartnerId,
+                    'external_message_id' => $externalMessageId,
+                ]);
+            }
+
             return ['success' => true, 'message_id' => $messageId];
         } catch (\Throwable $e) {
             Log::warning('Failed to store external message', ['error' => $e->getMessage()]);

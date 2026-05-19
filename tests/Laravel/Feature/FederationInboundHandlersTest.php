@@ -17,6 +17,7 @@ use App\Events\FederatedMemberUpdated;
 use App\Events\FederatedReviewReceived;
 use App\Events\FederatedVolunteeringReceived;
 use App\Models\User;
+use App\Services\EmailDispatchService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -393,6 +394,98 @@ class FederationInboundHandlersTest extends TestCase
             ->assertStatus(400);
     }
 
+    public function test_external_message_sends_tenant_scoped_federation_email(): void
+    {
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'federation-message-recipient@example.test',
+        ]);
+        DB::table('federation_user_settings')->insert([
+            'user_id' => $recipient->id,
+            'federation_optin' => 1,
+            'messaging_enabled_federated' => 1,
+            'email_notifications' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $mailer = $this->fakeEmailDispatchService();
+
+        $response = $this->postWebhook('message.sent', [
+            'external_message_id' => 'ext-msg-email-1',
+            'recipient_id' => $recipient->id,
+            'sender_id' => 'remote-123',
+            'sender_name' => 'Remote Sender',
+            'subject' => 'Hello across the bridge',
+            'body' => 'This is a federated message body.',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $mailer->sends);
+        $this->assertSame('federation-message-recipient@example.test', $mailer->sends[0]['to']);
+        $this->assertSame('federation_message', $mailer->sends[0]['options']['category']);
+        $this->assertSame($this->testTenantId, $mailer->sends[0]['options']['tenant_id']);
+    }
+
+    public function test_transaction_completed_is_idempotent_and_sends_one_email(): void
+    {
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'federation-credit-recipient@example.test',
+            'balance' => 0,
+        ]);
+        DB::table('federation_user_settings')->insert([
+            'user_id' => $recipient->id,
+            'federation_optin' => 1,
+            'messaging_enabled_federated' => 1,
+            'email_notifications' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $mailer = $this->fakeEmailDispatchService();
+
+        $payload = [
+            'external_transaction_id' => 'ext-tx-email-1',
+            'recipient_id' => $recipient->id,
+            'sender_id' => 'remote-42',
+            'sender_name' => 'Remote Sender',
+            'amount' => 2.0,
+            'description' => 'Federated help',
+        ];
+
+        $this->postWebhook('transaction.completed', $payload)
+            ->assertStatus(200)
+            ->assertJsonPath('data.result.status', 'acknowledged');
+
+        $this->postWebhook('transaction.completed', $payload)
+            ->assertStatus(200)
+            ->assertJsonPath('data.result.status', 'duplicate');
+
+        $this->assertSame(1, DB::table('federation_transactions')
+            ->where('external_partner_id', $this->partnerId)
+            ->where('external_transaction_id', 'ext-tx-email-1')
+            ->count());
+        $this->assertEquals(2.0, (float) DB::table('users')->where('id', $recipient->id)->value('balance'));
+        $this->assertCount(1, $mailer->sends);
+        $this->assertSame('federation_transaction', $mailer->sends[0]['options']['category']);
+        $this->assertSame($this->testTenantId, $mailer->sends[0]['options']['tenant_id']);
+    }
+
+    public function test_transaction_completed_without_external_transaction_id_is_rejected_before_credit(): void
+    {
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'balance' => 0,
+        ]);
+
+        $this->postWebhook('transaction.completed', [
+            'recipient_id' => $recipient->id,
+            'sender_id' => 'remote-42',
+            'amount' => 2.5,
+            'description' => 'Federated help',
+        ])->assertStatus(200)
+            ->assertJsonPath('data.result.status', 'rejected');
+
+        $this->assertEquals(0.0, (float) DB::table('users')->where('id', $recipient->id)->value('balance'));
+        $this->assertSame(0, DB::table('federation_transactions')->where('receiver_user_id', $recipient->id)->count());
+    }
+
     // ------------------------------------------------------------------
     // 7. Volunteering inbound
     // ------------------------------------------------------------------
@@ -499,5 +592,29 @@ class FederationInboundHandlersTest extends TestCase
             'response_code' => 200,
             'success'       => 1,
         ]);
+    }
+
+    private function fakeEmailDispatchService(): EmailDispatchService
+    {
+        $mailer = new class extends EmailDispatchService {
+            /** @var list<array{to:string,subject:string,body:string,options:array<string,mixed>}> */
+            public array $sends = [];
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->sends[] = [
+                    'to' => $to,
+                    'subject' => $subject,
+                    'body' => $body,
+                    'options' => $options,
+                ];
+
+                return true;
+            }
+        };
+
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        return $mailer;
     }
 }

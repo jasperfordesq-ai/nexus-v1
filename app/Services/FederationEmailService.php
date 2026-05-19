@@ -178,6 +178,128 @@ class FederationEmailService
     }
 
     /**
+     * Send an inbound external partner message notification.
+     */
+    public static function sendExternalMessageNotification(
+        int $recipientUserId,
+        int $recipientTenantId,
+        string $senderName,
+        string $partnerName,
+        string $messagePreview
+    ): bool {
+        try {
+            $recipient = self::getUserWithEmail($recipientUserId, $recipientTenantId);
+            if (!$recipient || empty($recipient->email)) {
+                return false;
+            }
+
+            $previousTenantId = TenantContext::currentId();
+            TenantContext::setById($recipientTenantId);
+
+            $sent = false;
+            try {
+                LocaleContext::withLocale($recipient, function () use (&$sent, $recipient, $recipientTenantId, $senderName, $partnerName, $messagePreview) {
+                    $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
+                    $preview = mb_substr(strip_tags($messagePreview), 0, 200);
+                    $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
+                    $safePartnerName = htmlspecialchars($partnerName, ENT_QUOTES, 'UTF-8');
+                    $safePreview = htmlspecialchars($preview, ENT_QUOTES, 'UTF-8');
+
+                    $subject = __('emails.federation.message_subject', ['sender' => $senderName]);
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('federation')
+                        ->title(__('emails.federation.message_title'))
+                        ->previewText(__('emails.federation.message_preview', ['sender' => $senderName, 'community' => $partnerName]))
+                        ->greeting($recipientName)
+                        ->paragraph(__('emails.federation.message_body', ['sender' => $safeSenderName, 'community' => $safePartnerName]))
+                        ->infoCard([
+                            __('emails.federation.label_from') => $safeSenderName,
+                            __('emails.federation.label_community') => $safePartnerName,
+                        ])
+                        ->blockquote($safePreview)
+                        ->button(__('emails.federation.read_reply'), EmailTemplateBuilder::tenantUrl('/federation/messages'))
+                        ->render();
+
+                    $sent = EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'federation_message', ['tenant_id' => $recipientTenantId]);
+                });
+            } finally {
+                if ($previousTenantId !== null) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
+            }
+
+            return $sent;
+        } catch (\Throwable $e) {
+            Log::error('[FederationEmail] sendExternalMessageNotification failed', ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * Send an inbound external partner transaction notification.
+     */
+    public static function sendExternalTransactionNotification(
+        int $recipientUserId,
+        int $recipientTenantId,
+        string $senderName,
+        string $partnerName,
+        float $amount,
+        string $description
+    ): bool {
+        try {
+            $recipient = self::getUserWithEmail($recipientUserId, $recipientTenantId);
+            if (!$recipient || empty($recipient->email)) {
+                return false;
+            }
+
+            $previousTenantId = TenantContext::currentId();
+            TenantContext::setById($recipientTenantId);
+
+            $sent = false;
+            try {
+                LocaleContext::withLocale($recipient, function () use (&$sent, $recipient, $recipientTenantId, $senderName, $partnerName, $amount, $description) {
+                    $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
+                    $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
+                    $safePartnerName = htmlspecialchars($partnerName, ENT_QUOTES, 'UTF-8');
+                    $safeDescription = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
+
+                    $subject = __('emails.federation.transaction_received_subject', ['amount' => $amount]);
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails.federation.transaction_received_title'))
+                        ->previewText(__('emails.federation.transaction_received_preview', ['amount' => $amount, 'sender' => $senderName]))
+                        ->greeting($recipientName)
+                        ->paragraph(__('emails.federation.transaction_received_body', ['sender' => $safeSenderName, 'community' => $safePartnerName]))
+                        ->infoCard([
+                            __('emails.federation.label_from') => "{$safeSenderName} ({$safePartnerName})",
+                            __('emails.federation.label_amount') => __('emails.federation.hours', ['amount' => $amount]),
+                            __('emails.federation.label_description') => $safeDescription,
+                        ])
+                        ->button(__('emails.federation.view_wallet'), EmailTemplateBuilder::tenantUrl('/wallet'))
+                        ->render();
+
+                    $sent = EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'federation_transaction', ['tenant_id' => $recipientTenantId]);
+                });
+            } finally {
+                if ($previousTenantId !== null) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
+            }
+
+            return $sent;
+        } catch (\Throwable $e) {
+            Log::error('[FederationEmail] sendExternalTransactionNotification failed', ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
      * Send a transaction confirmation to the sender.
      */
     public static function sendTransactionConfirmation(int $senderUserId, int $recipientUserId, int $recipientTenantId, float $amount, string $description, float $newBalance): bool

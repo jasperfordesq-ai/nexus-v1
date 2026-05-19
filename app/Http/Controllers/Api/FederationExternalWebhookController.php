@@ -19,13 +19,16 @@ use App\Events\FederatedVolunteeringReceived;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Services\FederatedMessageService;
+use App\Services\FederationEmailService;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * FederationExternalWebhookController — Receives webhook events from
@@ -213,11 +216,19 @@ class FederationExternalWebhookController extends BaseApiController
      */
     private function decryptSecret(string $encrypted): ?string
     {
+        if (!str_starts_with($encrypted, 'eyJpdiI6')) {
+            return $encrypted;
+        }
+
         try {
             return \Illuminate\Support\Facades\Crypt::decryptString($encrypted);
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            // Value is plaintext (not encrypted) — use as-is
             return $encrypted;
+        } catch (\RuntimeException $e) {
+            Log::warning('[FederationExternalWebhook] Unable to initialize encrypter while reading partner secret', [
+                'error' => $e->getMessage(),
+            ]);
+            return null;
         }
     }
 
@@ -980,6 +991,10 @@ class FederationExternalWebhookController extends BaseApiController
         $description = $data['description'] ?? '';
 
         if ($recipientId && $amount > 0) {
+            if (!is_string($externalTxId) || trim($externalTxId) === '') {
+                return ['status' => 'rejected', 'reason' => 'Missing external_transaction_id'];
+            }
+
             $receiverUserId = (int) $recipientId;
 
             // Validate receiver exists in this tenant
@@ -993,23 +1008,15 @@ class FederationExternalWebhookController extends BaseApiController
                 return ['status' => 'rejected', 'reason' => "Recipient user #{$recipientId} not found in this tenant"];
             }
 
-            // Prevent duplicate recording using external_transaction_id
-            if ($externalTxId) {
-                $exists = DB::table('federation_transactions')
-                    ->where('external_transaction_id', $externalTxId)
-                    ->where('external_partner_id', $partner->id)
-                    ->exists();
-                if ($exists) {
-                    return ['status' => 'duplicate', 'reason' => 'Transaction already recorded'];
-                }
+            $idempotencyKey = $this->externalTransactionIdempotencyKey($partner, $externalTxId);
+            if ($this->externalTransactionAlreadyRecorded($partner, $externalTxId, $idempotencyKey)) {
+                return ['status' => 'duplicate', 'reason' => 'Transaction already recorded'];
             }
 
             // Credit the receiver's balance and record the transaction
             DB::beginTransaction();
             try {
-                DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?", [$amount, $receiverUserId, TenantContext::getId()]);
-
-                DB::table('federation_transactions')->insert([
+                $transactionRow = [
                     'sender_tenant_id'       => 0, // External origin
                     'sender_user_id'         => (int) $senderId,
                     'receiver_tenant_id'     => TenantContext::getId(),
@@ -1022,9 +1029,29 @@ class FederationExternalWebhookController extends BaseApiController
                     'external_receiver_name' => $data['sender_name'] ?? 'External User',
                     'external_transaction_id' => $externalTxId,
                     'created_at'             => now(),
-                ]);
+                ];
+
+                if ($idempotencyKey !== null && $this->federationTransactionsSupportsIdempotencyKey()) {
+                    $transactionRow['external_idempotency_key'] = $idempotencyKey;
+                }
+
+                DB::table('federation_transactions')->insert($transactionRow);
+
+                DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?", [$amount, $receiverUserId, TenantContext::getId()]);
 
                 DB::commit();
+            } catch (QueryException $e) {
+                DB::rollBack();
+                if ($this->isDuplicateKeyException($e)) {
+                    return ['status' => 'duplicate', 'reason' => 'Transaction already recorded'];
+                }
+
+                Log::error('[FederationExternalWebhook] Failed to record transaction', [
+                    'error' => $e->getMessage(),
+                    'partner' => $partner->name,
+                    'external_transaction_id' => $externalTxId,
+                ]);
+                return ['status' => 'error', 'reason' => 'Failed to record transaction'];
             } catch (\Throwable $e) {
                 DB::rollBack();
                 Log::error('[FederationExternalWebhook] Failed to record transaction', [
@@ -1059,6 +1086,23 @@ class FederationExternalWebhookController extends BaseApiController
                 });
             } catch (\Throwable $e) {
                 Log::warning('Failed to dispatch federation transaction notification', ['error' => $e->getMessage()]);
+            }
+
+            $emailSent = FederationEmailService::sendExternalTransactionNotification(
+                $receiverUserId,
+                (int) TenantContext::getId(),
+                (string) ($data['sender_name'] ?? __('api.external_user_fallback')),
+                (string) ($partner->name ?? __('api.external_partner_fallback')),
+                $amount,
+                (string) $description
+            );
+            if (!$emailSent) {
+                Log::warning('[FederationExternalWebhook] External transaction email returned false', [
+                    'receiver_user_id' => $receiverUserId,
+                    'tenant_id' => TenantContext::getId(),
+                    'external_partner_id' => $partner->id,
+                    'external_transaction_id' => $externalTxId,
+                ]);
             }
         }
 
@@ -1176,6 +1220,10 @@ class FederationExternalWebhookController extends BaseApiController
             return ['status' => 'rejected', 'reason' => 'Missing recipient_id or invalid amount'];
         }
 
+        if (!is_string($externalTxId) || trim($externalTxId) === '') {
+            return ['status' => 'rejected', 'reason' => 'Missing external_transaction_id'];
+        }
+
         // Validate receiver exists
         $receiverUserId = (int) $recipientId;
         $receiver = DB::table('users')
@@ -1188,21 +1236,15 @@ class FederationExternalWebhookController extends BaseApiController
             return ['status' => 'rejected', 'reason' => "Recipient user #{$recipientId} not found in this tenant"];
         }
 
-        // Prevent duplicate
-        if ($externalTxId) {
-            $exists = DB::table('federation_transactions')
-                ->where('external_transaction_id', $externalTxId)
-                ->where('external_partner_id', $partner->id)
-                ->exists();
-            if ($exists) {
-                return ['status' => 'duplicate', 'reason' => 'Transaction already recorded'];
-            }
+        $idempotencyKey = $this->externalTransactionIdempotencyKey($partner, $externalTxId);
+        if ($this->externalTransactionAlreadyRecorded($partner, $externalTxId, $idempotencyKey)) {
+            return ['status' => 'duplicate', 'reason' => 'Transaction already recorded'];
         }
 
         // Record the transaction AND credit the user immediately — atomically
         DB::beginTransaction();
         try {
-            DB::table('federation_transactions')->insert([
+            $transactionRow = [
                 'sender_tenant_id'        => 0,
                 'sender_user_id'          => (int) ($data['sender_id'] ?? 0),
                 'receiver_tenant_id'      => TenantContext::getId(),
@@ -1214,7 +1256,13 @@ class FederationExternalWebhookController extends BaseApiController
                 'external_receiver_name'  => $data['sender_name'] ?? $data['source_organization_name'] ?? 'External User',
                 'external_transaction_id' => $externalTxId,
                 'created_at'              => now(),
-            ]);
+            ];
+
+            if ($idempotencyKey !== null && $this->federationTransactionsSupportsIdempotencyKey()) {
+                $transactionRow['external_idempotency_key'] = $idempotencyKey;
+            }
+
+            DB::table('federation_transactions')->insert($transactionRow);
 
             // Auto-credit the recipient's balance
             $creditedRows = DB::table('users')
@@ -1227,6 +1275,18 @@ class FederationExternalWebhookController extends BaseApiController
             }
 
             DB::commit();
+        } catch (QueryException $e) {
+            DB::rollBack();
+            if ($this->isDuplicateKeyException($e)) {
+                return ['status' => 'duplicate', 'reason' => 'Transaction already recorded'];
+            }
+
+            Log::error('[FederationExternalWebhook] Failed to record transaction request', [
+                'error' => $e->getMessage(),
+                'partner' => $partner->name,
+                'external_transaction_id' => $externalTxId,
+            ]);
+            return ['status' => 'error', 'reason' => 'Failed to record transaction'];
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('[FederationExternalWebhook] Failed to record transaction request', [
@@ -1246,11 +1306,95 @@ class FederationExternalWebhookController extends BaseApiController
                 ->value('balance'),
         ]);
 
+        try {
+            LocaleContext::withLocale($receiver, function () use ($data, $partner, $amountInHours, $receiverUserId) {
+                $senderName = $data['sender_name'] ?? $data['source_organization_name'] ?? __('api.external_user_fallback');
+                $partnerName = $partner->name ?? __('api.external_partner_fallback');
+                $notifyMessage = __('svc_notifications.federation.transaction_received', [
+                    'amount' => rtrim(rtrim(number_format($amountInHours, 2), '0'), '.'),
+                    'sender' => $senderName,
+                    'partner' => $partnerName,
+                ]);
+                Notification::createNotification(
+                    $receiverUserId,
+                    $notifyMessage,
+                    '/wallet',
+                    'federation_transaction',
+                    false,
+                    (int) TenantContext::getId()
+                );
+            });
+        } catch (\Throwable $e) {
+            Log::warning('Failed to dispatch federation requested-transaction notification', ['error' => $e->getMessage()]);
+        }
+
+        $emailSent = FederationEmailService::sendExternalTransactionNotification(
+            $receiverUserId,
+            (int) TenantContext::getId(),
+            (string) ($data['sender_name'] ?? $data['source_organization_name'] ?? __('api.external_user_fallback')),
+            (string) ($partner->name ?? __('api.external_partner_fallback')),
+            $amountInHours,
+            (string) ($data['reason'] ?? $data['description'] ?? '')
+        );
+        if (!$emailSent) {
+            Log::warning('[FederationExternalWebhook] External requested-transaction email returned false', [
+                'receiver_user_id' => $receiverUserId,
+                'tenant_id' => TenantContext::getId(),
+                'external_partner_id' => $partner->id,
+                'external_transaction_id' => $externalTxId,
+            ]);
+        }
+
         return [
             'status' => 'completed',
             'amount_credited' => $amountInHours,
             'recipient_id' => $receiverUserId,
         ];
+    }
+
+    private function externalTransactionIdempotencyKey(object $partner, mixed $externalTxId): ?string
+    {
+        if (!is_string($externalTxId) || trim($externalTxId) === '') {
+            return null;
+        }
+
+        return 'external-partner:' . (int) $partner->id . ':transaction:' . trim($externalTxId);
+    }
+
+    private function externalTransactionAlreadyRecorded(object $partner, mixed $externalTxId, ?string $idempotencyKey): bool
+    {
+        if ($idempotencyKey !== null && $this->federationTransactionsSupportsIdempotencyKey()) {
+            return DB::table('federation_transactions')
+                ->where('external_idempotency_key', $idempotencyKey)
+                ->exists();
+        }
+
+        if (!is_string($externalTxId) || trim($externalTxId) === '') {
+            return false;
+        }
+
+        return DB::table('federation_transactions')
+            ->where('external_transaction_id', trim($externalTxId))
+            ->where('external_partner_id', $partner->id)
+            ->exists();
+    }
+
+    private function federationTransactionsSupportsIdempotencyKey(): bool
+    {
+        static $supports = null;
+
+        if ($supports === null) {
+            $supports = Schema::hasColumn('federation_transactions', 'external_idempotency_key');
+        }
+
+        return $supports;
+    }
+
+    private function isDuplicateKeyException(QueryException $e): bool
+    {
+        return $e->getCode() === '23000'
+            || str_contains($e->getMessage(), '1062')
+            || str_contains($e->getMessage(), 'Duplicate entry');
     }
 
     // ----------------------------------------------------------------
