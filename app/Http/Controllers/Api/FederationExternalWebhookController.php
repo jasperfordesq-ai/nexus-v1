@@ -1023,7 +1023,20 @@ class FederationExternalWebhookController extends BaseApiController
             }
 
             $idempotencyKey = $this->externalTransactionIdempotencyKey($partner, $externalTxId);
-            if ($this->externalTransactionAlreadyRecorded($partner, $externalTxId, $idempotencyKey)) {
+            $existingTransaction = $this->findExternalTransaction($partner, $externalTxId, $idempotencyKey);
+            if ($existingTransaction) {
+                $delivery = $this->ensureExternalTransactionDelivery(
+                    $existingTransaction,
+                    $receiver,
+                    $partner,
+                    (string) ($data['sender_name'] ?? __('api.external_user_fallback')),
+                    (float) $existingTransaction->amount,
+                    (string) ($existingTransaction->description ?? '')
+                );
+                if (!$delivery['success']) {
+                    throw new \RuntimeException((string) ($delivery['error'] ?? 'Federated transaction delivery failed'));
+                }
+
                 return ['status' => 'duplicate', 'reason' => 'Transaction already recorded'];
             }
 
@@ -1076,47 +1089,21 @@ class FederationExternalWebhookController extends BaseApiController
                 return ['status' => 'error', 'reason' => 'Failed to record transaction'];
             }
 
-            try {
-                // Render the transaction-received bell (including its two
-                // fallback strings) under the receiver's preferred_language.
-                // Webhook caller is an external partner server; its locale
-                // has no bearing on the recipient's bell text.
-                LocaleContext::withLocale($receiver, function () use ($data, $partner, $amount, $receiverUserId) {
-                    $senderName = $data['sender_name'] ?? __('api.external_user_fallback');
-                    $partnerName = $partner->name ?? __('api.external_partner_fallback');
-                    $notifyMessage = __('svc_notifications.federation.transaction_received', [
-                        'amount' => rtrim(rtrim(number_format($amount, 2), '0'), '.'),
-                        'sender' => $senderName,
-                        'partner' => $partnerName,
-                    ]);
-                    Notification::createNotification(
-                        $receiverUserId,
-                        $notifyMessage,
-                        '/wallet',
-                        'federation_transaction',
-                        false,
-                        (int) TenantContext::getId()
-                    );
-                });
-            } catch (\Throwable $e) {
-                Log::warning('Failed to dispatch federation transaction notification', ['error' => $e->getMessage()]);
+            $transaction = $this->findExternalTransaction($partner, $externalTxId, $idempotencyKey);
+            if (!$transaction) {
+                throw new \RuntimeException('Federated transaction row missing after insert');
             }
 
-            $emailSent = FederationEmailService::sendExternalTransactionNotification(
-                $receiverUserId,
-                (int) TenantContext::getId(),
+            $delivery = $this->ensureExternalTransactionDelivery(
+                $transaction,
+                $receiver,
+                $partner,
                 (string) ($data['sender_name'] ?? __('api.external_user_fallback')),
-                (string) ($partner->name ?? __('api.external_partner_fallback')),
                 $amount,
                 (string) $description
             );
-            if (!$emailSent) {
-                Log::warning('[FederationExternalWebhook] External transaction email returned false', [
-                    'receiver_user_id' => $receiverUserId,
-                    'tenant_id' => TenantContext::getId(),
-                    'external_partner_id' => $partner->id,
-                    'external_transaction_id' => $externalTxId,
-                ]);
+            if (!$delivery['success']) {
+                throw new \RuntimeException((string) ($delivery['error'] ?? 'Federated transaction delivery failed'));
             }
         }
 
@@ -1251,7 +1238,20 @@ class FederationExternalWebhookController extends BaseApiController
         }
 
         $idempotencyKey = $this->externalTransactionIdempotencyKey($partner, $externalTxId);
-        if ($this->externalTransactionAlreadyRecorded($partner, $externalTxId, $idempotencyKey)) {
+        $existingTransaction = $this->findExternalTransaction($partner, $externalTxId, $idempotencyKey);
+        if ($existingTransaction) {
+            $delivery = $this->ensureExternalTransactionDelivery(
+                $existingTransaction,
+                $receiver,
+                $partner,
+                (string) ($data['sender_name'] ?? $data['source_organization_name'] ?? __('api.external_user_fallback')),
+                (float) $existingTransaction->amount,
+                (string) ($existingTransaction->description ?? '')
+            );
+            if (!$delivery['success']) {
+                throw new \RuntimeException((string) ($delivery['error'] ?? 'Federated transaction delivery failed'));
+            }
+
             return ['status' => 'duplicate', 'reason' => 'Transaction already recorded'];
         }
 
@@ -1320,43 +1320,21 @@ class FederationExternalWebhookController extends BaseApiController
                 ->value('balance'),
         ]);
 
-        try {
-            LocaleContext::withLocale($receiver, function () use ($data, $partner, $amountInHours, $receiverUserId) {
-                $senderName = $data['sender_name'] ?? $data['source_organization_name'] ?? __('api.external_user_fallback');
-                $partnerName = $partner->name ?? __('api.external_partner_fallback');
-                $notifyMessage = __('svc_notifications.federation.transaction_received', [
-                    'amount' => rtrim(rtrim(number_format($amountInHours, 2), '0'), '.'),
-                    'sender' => $senderName,
-                    'partner' => $partnerName,
-                ]);
-                Notification::createNotification(
-                    $receiverUserId,
-                    $notifyMessage,
-                    '/wallet',
-                    'federation_transaction',
-                    false,
-                    (int) TenantContext::getId()
-                );
-            });
-        } catch (\Throwable $e) {
-            Log::warning('Failed to dispatch federation requested-transaction notification', ['error' => $e->getMessage()]);
+        $transaction = $this->findExternalTransaction($partner, $externalTxId, $idempotencyKey);
+        if (!$transaction) {
+            throw new \RuntimeException('Federated transaction row missing after insert');
         }
 
-        $emailSent = FederationEmailService::sendExternalTransactionNotification(
-            $receiverUserId,
-            (int) TenantContext::getId(),
+        $delivery = $this->ensureExternalTransactionDelivery(
+            $transaction,
+            $receiver,
+            $partner,
             (string) ($data['sender_name'] ?? $data['source_organization_name'] ?? __('api.external_user_fallback')),
-            (string) ($partner->name ?? __('api.external_partner_fallback')),
             $amountInHours,
             (string) ($data['reason'] ?? $data['description'] ?? '')
         );
-        if (!$emailSent) {
-            Log::warning('[FederationExternalWebhook] External requested-transaction email returned false', [
-                'receiver_user_id' => $receiverUserId,
-                'tenant_id' => TenantContext::getId(),
-                'external_partner_id' => $partner->id,
-                'external_transaction_id' => $externalTxId,
-            ]);
+        if (!$delivery['success']) {
+            throw new \RuntimeException((string) ($delivery['error'] ?? 'Federated transaction delivery failed'));
         }
 
         return [
@@ -1377,20 +1355,99 @@ class FederationExternalWebhookController extends BaseApiController
 
     private function externalTransactionAlreadyRecorded(object $partner, mixed $externalTxId, ?string $idempotencyKey): bool
     {
+        return $this->findExternalTransaction($partner, $externalTxId, $idempotencyKey) !== null;
+    }
+
+    private function findExternalTransaction(object $partner, mixed $externalTxId, ?string $idempotencyKey): ?object
+    {
         if ($idempotencyKey !== null && $this->federationTransactionsSupportsIdempotencyKey()) {
             return DB::table('federation_transactions')
                 ->where('external_idempotency_key', $idempotencyKey)
-                ->exists();
+                ->first();
         }
 
         if (!is_string($externalTxId) || trim($externalTxId) === '') {
-            return false;
+            return null;
         }
 
         return DB::table('federation_transactions')
             ->where('external_transaction_id', trim($externalTxId))
             ->where('external_partner_id', $partner->id)
-            ->exists();
+            ->first();
+    }
+
+    /**
+     * @return array{success:bool,error?:string}
+     */
+    private function ensureExternalTransactionDelivery(object $transaction, object $receiver, object $partner, string $senderName, float $amount, string $description): array
+    {
+        try {
+            $transactionId = (int) $transaction->id;
+            $receiverUserId = (int) $transaction->receiver_user_id;
+            $receiverTenantId = (int) $transaction->receiver_tenant_id;
+
+            if (empty($transaction->notification_sent_at)) {
+                LocaleContext::withLocale($receiver, function () use ($partner, $amount, $receiverUserId, $receiverTenantId, $senderName) {
+                    $partnerName = $partner->name ?? __('api.external_partner_fallback');
+                    $notifyMessage = __('svc_notifications.federation.transaction_received', [
+                        'amount' => rtrim(rtrim(number_format($amount, 2), '0'), '.'),
+                        'sender' => $senderName,
+                        'partner' => $partnerName,
+                    ]);
+                    Notification::createNotification(
+                        $receiverUserId,
+                        $notifyMessage,
+                        '/wallet',
+                        'federation_transaction',
+                        false,
+                        $receiverTenantId
+                    );
+                });
+
+                DB::table('federation_transactions')
+                    ->where('id', $transactionId)
+                    ->whereNull('notification_sent_at')
+                    ->update(['notification_sent_at' => now()]);
+            }
+
+            if (!empty($transaction->email_sent_at)) {
+                return ['success' => true];
+            }
+
+            $emailSent = FederationEmailService::sendExternalTransactionNotification(
+                $receiverUserId,
+                $receiverTenantId,
+                $senderName,
+                (string) ($partner->name ?? __('api.external_partner_fallback')),
+                $amount,
+                $description
+            );
+
+            DB::table('federation_transactions')
+                ->where('id', $transactionId)
+                ->update([
+                    'email_sent_at' => $emailSent ? now() : null,
+                    'email_failed_at' => $emailSent ? null : now(),
+                    'email_last_error' => $emailSent ? null : 'Email dispatch returned false',
+                ]);
+
+            if (!$emailSent) {
+                Log::warning('[FederationExternalWebhook] External transaction email returned false', [
+                    'receiver_user_id' => $receiverUserId,
+                    'tenant_id' => $receiverTenantId,
+                    'external_partner_id' => $partner->id,
+                    'external_transaction_id' => $transaction->external_transaction_id ?? null,
+                ]);
+
+                return ['success' => false, 'error' => 'Email dispatch returned false'];
+            }
+
+            return ['success' => true];
+        } catch (\Throwable $e) {
+            Log::warning('Failed to dispatch federation transaction delivery side effects', ['error' => $e->getMessage()]);
+
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
     }
 
     private function federationTransactionsSupportsIdempotencyKey(): bool

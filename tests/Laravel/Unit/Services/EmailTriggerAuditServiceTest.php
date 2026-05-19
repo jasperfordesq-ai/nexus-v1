@@ -404,4 +404,36 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('federation_message_without_email_evidence', $codes);
         $this->assertContains('federation_message_without_bell_evidence', $codes);
     }
+
+    public function test_run_detects_federation_transaction_without_delivery_evidence(): void
+    {
+        if (!Schema::hasTable('federation_transactions') || !Schema::hasColumn('federation_transactions', 'email_sent_at')) {
+            $this->markTestSkipped('Federation transaction delivery evidence columns are not available.');
+        }
+
+        DB::table('federation_transactions')->insert([
+            'sender_tenant_id' => 0,
+            'sender_user_id' => 123456,
+            'receiver_tenant_id' => 2,
+            'receiver_user_id' => 654321,
+            'amount' => 2.5,
+            'description' => 'Audit federation transaction',
+            'status' => 'completed',
+            'completed_at' => now()->subMinute(),
+            'external_partner_id' => 987654,
+            'external_receiver_name' => 'Remote Sender',
+            'external_transaction_id' => 'audit-fed-tx-' . uniqid('', true),
+            'notification_sent_at' => null,
+            'email_sent_at' => null,
+            'email_failed_at' => now()->subMinute(),
+            'email_last_error' => 'simulated failure',
+            'created_at' => now()->subMinutes(2),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('federation_transaction_without_email_evidence', $codes);
+        $this->assertContains('federation_transaction_without_bell_evidence', $codes);
+    }
 }

@@ -566,6 +566,79 @@ class FederationInboundHandlersTest extends TestCase
         $this->assertCount(1, $mailer->sends);
         $this->assertSame('federation_transaction', $mailer->sends[0]['options']['category']);
         $this->assertSame($this->testTenantId, $mailer->sends[0]['options']['tenant_id']);
+        $transaction = DB::table('federation_transactions')
+            ->where('external_partner_id', $this->partnerId)
+            ->where('external_transaction_id', 'ext-tx-email-1')
+            ->first();
+        $this->assertNotNull($transaction);
+        $this->assertNotNull($transaction->notification_sent_at);
+        $this->assertNotNull($transaction->email_sent_at);
+        $this->assertNull($transaction->email_failed_at);
+    }
+
+    public function test_transaction_completed_replay_repairs_failed_email_without_double_credit(): void
+    {
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'federation-credit-repair@example.test',
+            'balance' => 0,
+        ]);
+        DB::table('federation_user_settings')->insert([
+            'user_id' => $recipient->id,
+            'federation_optin' => 1,
+            'messaging_enabled_federated' => 1,
+            'email_notifications' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $payload = [
+            'external_transaction_id' => 'ext-tx-repair-1',
+            'recipient_id' => $recipient->id,
+            'sender_id' => 'remote-42',
+            'sender_name' => 'Remote Sender',
+            'amount' => 2.0,
+            'description' => 'Federated help',
+        ];
+
+        $failingMailer = $this->fakeEmailDispatchService(false);
+        $this->postWebhook('transaction.completed', $payload)->assertStatus(500);
+
+        $transaction = DB::table('federation_transactions')
+            ->where('external_partner_id', $this->partnerId)
+            ->where('external_transaction_id', 'ext-tx-repair-1')
+            ->first();
+        $this->assertNotNull($transaction);
+        $this->assertNotNull($transaction->notification_sent_at);
+        $this->assertNull($transaction->email_sent_at);
+        $this->assertNotNull($transaction->email_failed_at);
+        $this->assertSame('Email dispatch returned false', $transaction->email_last_error);
+        $this->assertEquals(2.0, (float) DB::table('users')->where('id', $recipient->id)->value('balance'));
+        $this->assertCount(1, $failingMailer->sends);
+
+        $repairMailer = $this->fakeEmailDispatchService(true);
+        $this->postWebhook('transaction.completed', $payload)
+            ->assertStatus(200)
+            ->assertJsonPath('data.result.status', 'duplicate');
+
+        $this->assertSame(1, DB::table('federation_transactions')
+            ->where('external_partner_id', $this->partnerId)
+            ->where('external_transaction_id', 'ext-tx-repair-1')
+            ->count());
+        $this->assertEquals(2.0, (float) DB::table('users')->where('id', $recipient->id)->value('balance'));
+        $repaired = DB::table('federation_transactions')
+            ->where('external_partner_id', $this->partnerId)
+            ->where('external_transaction_id', 'ext-tx-repair-1')
+            ->first();
+        $this->assertNotNull($repaired->email_sent_at);
+        $this->assertNull($repaired->email_failed_at);
+        $this->assertNull($repaired->email_last_error);
+        $this->assertCount(1, $repairMailer->sends);
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $recipient->id)
+            ->where('type', 'federation_transaction')
+            ->where('link', '/wallet')
+            ->count());
     }
 
     public function test_transaction_completed_without_external_transaction_id_is_rejected_before_credit(): void

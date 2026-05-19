@@ -139,6 +139,7 @@ class EmailTriggerAuditService
                 $this->checkVereinDuesEmailHealth($tenantId, $since, $windowHours),
                 $this->checkMarketplaceReportNotificationHealth($tenantId, $since, $windowHours),
                 $this->checkFederationMessageDeliveryHealth($tenantId, $since, $windowHours),
+                $this->checkFederationTransactionDeliveryHealth($tenantId, $since, $windowHours),
                 $this->checkDirectEmailSendSurface($tenantId),
                 $this->checkTenantlessDispatcherSendSurface($tenantId)
             );
@@ -1082,6 +1083,45 @@ class EmailTriggerAuditService
         return array_merge(
             $this->rowsToIssues($withoutEmail, 'federation_message_without_email_evidence', 'critical', 'federation', 'federated_message_received', ['window_hours' => $windowHours]),
             $this->rowsToIssues($withoutBell, 'federation_message_without_bell_evidence', 'warning', 'federation', 'federated_message_received', ['window_hours' => $windowHours])
+        );
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkFederationTransactionDeliveryHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (
+            !$this->hasTables(['federation_transactions'])
+            || !Schema::hasColumn('federation_transactions', 'email_sent_at')
+            || !Schema::hasColumn('federation_transactions', 'notification_sent_at')
+        ) {
+            return [];
+        }
+
+        $withoutEmail = DB::table('federation_transactions')
+            ->select('receiver_tenant_id as tenant_id', DB::raw('COUNT(*) as count'))
+            ->whereNotNull('external_partner_id')
+            ->where('status', 'completed')
+            ->where('created_at', '>=', $since)
+            ->whereNull('email_sent_at')
+            ->when($tenantId !== null, fn ($q) => $q->where('receiver_tenant_id', $tenantId))
+            ->groupBy('receiver_tenant_id')
+            ->get();
+
+        $withoutBell = DB::table('federation_transactions')
+            ->select('receiver_tenant_id as tenant_id', DB::raw('COUNT(*) as count'))
+            ->whereNotNull('external_partner_id')
+            ->where('status', 'completed')
+            ->where('created_at', '>=', $since)
+            ->whereNull('notification_sent_at')
+            ->when($tenantId !== null, fn ($q) => $q->where('receiver_tenant_id', $tenantId))
+            ->groupBy('receiver_tenant_id')
+            ->get();
+
+        return array_merge(
+            $this->rowsToIssues($withoutEmail, 'federation_transaction_without_email_evidence', 'critical', 'federation', 'federated_transaction_received_sent', ['window_hours' => $windowHours]),
+            $this->rowsToIssues($withoutBell, 'federation_transaction_without_bell_evidence', 'warning', 'federation', 'federated_transaction_received_sent', ['window_hours' => $windowHours])
         );
     }
 
