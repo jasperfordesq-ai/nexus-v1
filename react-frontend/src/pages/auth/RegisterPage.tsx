@@ -61,12 +61,9 @@ interface Tenant {
 
 type ProfileType = 'individual' | 'organisation';
 
-const STEPS = [
-  { id: 1, title: 'Community', shortTitle: 'Community' },
-  { id: 2, title: 'Your Details', shortTitle: 'Details' },
-  { id: 3, title: 'Account', shortTitle: 'Account' },
-  { id: 4, title: 'Terms', shortTitle: 'Terms' },
-];
+const STEP_KEYS = ['community', 'details', 'account', 'terms'] as const;
+
+const STEPS = STEP_KEYS.map((key, index) => ({ id: index + 1, key }));
 
 export function RegisterPage() {
   const { t } = useTranslation('auth');
@@ -429,6 +426,7 @@ export function RegisterPage() {
 
   // Step progress percentage
   const progressPercent = (currentStep / STEPS.length) * 100;
+  const getStepLabel = (stepId: number) => t(`register.step_${STEPS[stepId - 1]?.key ?? STEP_KEYS[0]}`);
 
   // Render step content
   const renderStepContent = (step: number) => {
@@ -932,13 +930,13 @@ export function RegisterPage() {
             <span className="text-sm font-medium text-theme-primary">
               {t('register.step_indicator', { step: currentStep, total: STEPS.length })}
             </span>
-            <span className="text-sm text-theme-muted">{t(`register.step_${['community','details','account','terms'][currentStep - 1]}`)}</span>
+            <span className="text-sm text-theme-muted">{getStepLabel(currentStep)}</span>
           </div>
           <Progress
             value={progressPercent}
             color="primary"
             size="sm"
-            aria-label={`Registration progress: step ${currentStep} of ${STEPS.length}`}
+            aria-label={t('register.progress_aria', { step: currentStep, total: STEPS.length })}
           />
           {/* Step dots */}
           <div className="flex justify-between mt-2">
@@ -956,7 +954,7 @@ export function RegisterPage() {
                 }`}
                 onPress={() => step.id < currentStep && setCurrentStep(step.id)}
                 isDisabled={step.id > currentStep}
-                aria-label={`Go to step ${step.id}: ${t(`register.step_${['community','details','account','terms'][step.id - 1]}`)}`}
+                aria-label={t('register.step_button_aria', { step: step.id, label: getStepLabel(step.id) })}
               >
                 <div
                   className={`w-2.5 h-2.5 rounded-full ${
@@ -967,7 +965,7 @@ export function RegisterPage() {
                         : 'bg-theme-elevated'
                   }`}
                 />
-                <span className="text-[10px] mt-1 hidden xs:block">{t(`register.step_${['community','details','account','terms'][step.id - 1]}`)}</span>
+                <span className="text-[10px] mt-1 hidden xs:block">{getStepLabel(step.id)}</span>
               </Button>
             ))}
           </div>
