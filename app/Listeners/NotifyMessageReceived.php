@@ -46,11 +46,12 @@ class NotifyMessageReceived implements ShouldQueue
     {
         // Idempotency guard. The in-app bell has its own 60s dedup in
         // NotificationDispatcher, but the notification_queue insert does not —
-        // a re-delivered job would queue a second email. Cache::add() is atomic.
+        // a re-delivered job would queue a second email. Mark handled only after
+        // the dispatcher reports durable queue/bell handling.
         $messageId = $event->message->id ?? null;
         if ($messageId) {
             $lockKey = 'notify_message_received:' . (int) $messageId;
-            if (!Cache::add($lockKey, 1, now()->addHour())) {
+            if (Cache::has($lockKey)) {
                 Log::info('NotifyMessageReceived: duplicate delivery suppressed', [
                     'message_id' => $messageId,
                     'tenant_id'  => $event->tenantId ?? null,
@@ -94,7 +95,7 @@ class NotifyMessageReceived implements ShouldQueue
                 ->where('tenant_id', $event->tenantId)
                 ->value('preferred_language');
 
-            LocaleContext::withLocale($recipientLocale, function () use ($event, $senderId, $recipientId) {
+            $handled = LocaleContext::withLocale($recipientLocale, function () use ($event, $senderId, $recipientId): bool {
                 $senderName = $event->sender->first_name ?? $event->sender->name ?? __('emails.message.fallback_sender_name');
                 $link = '/messages/' . $senderId;
                 $content = __('emails.message.in_app_content', ['sender' => $senderName]);
@@ -113,7 +114,7 @@ class NotifyMessageReceived implements ShouldQueue
                 }
 
                 if ($emailEnabled) {
-                    NotificationDispatcher::dispatch(
+                    return NotificationDispatcher::dispatch(
                         $recipientId,
                         'global',
                         null,
@@ -124,8 +125,13 @@ class NotifyMessageReceived implements ShouldQueue
                     );
                 } else {
                     Notification::createNotification($recipientId, $content, $link, 'new_message');
+                    return true;
                 }
             });
+
+            if ($handled && $messageId) {
+                Cache::put('notify_message_received:' . (int) $messageId, 1, now()->addHour());
+            }
         } catch (\Throwable $e) {
             Log::error('NotifyMessageReceived listener failed', [
                 'message_id' => $event->message->id ?? null,

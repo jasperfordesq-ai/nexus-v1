@@ -57,7 +57,7 @@ class NotificationDispatcher
      * @param bool        $isOrganizer If true, applies strict Organizer Priority rules
      * @param int|null    $fromUserId  The actor sending this notification (used for mute check)
      */
-    public static function dispatch($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer = false, ?int $fromUserId = null): void
+    public static function dispatch($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer = false, ?int $fromUserId = null): bool
     {
         $recipientTenantId = self::resolveTenantIdForQueue((int) $userId);
         if ($recipientTenantId === null) {
@@ -65,15 +65,15 @@ class NotificationDispatcher
                 'user_id' => (int) $userId,
                 'activity_type' => $activityType,
             ]);
-            return;
+            return false;
         }
 
-        TenantContext::runForTenant($recipientTenantId, function () use ($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer, $fromUserId): void {
-            self::dispatchForResolvedTenant($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer, $fromUserId);
+        return TenantContext::runForTenant($recipientTenantId, function () use ($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer, $fromUserId): bool {
+            return self::dispatchForResolvedTenant($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer, $fromUserId);
         });
     }
 
-    private static function dispatchForResolvedTenant($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer = false, ?int $fromUserId = null): void
+    private static function dispatchForResolvedTenant($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer = false, ?int $fromUserId = null): bool
     {
         // 1. Create In-App Notification (The "Bell") with 60-second deduplication window
         $tenantId = TenantContext::currentId();
@@ -82,7 +82,7 @@ class NotificationDispatcher
                 'user_id' => (int) $userId,
                 'activity_type' => $activityType,
             ]);
-            return;
+            return false;
         }
 
         // Fix 9: Skip notification if the sending user is muted by the recipient.
@@ -99,18 +99,28 @@ class NotificationDispatcher
                     'actor'     => $fromUserId,
                     'type'      => $activityType,
                 ]);
-                return;
+                return true;
             }
         }
         $dedupKey = "notif_dedup:{$tenantId}:{$userId}:{$activityType}:" . md5($link ?? '');
+        $isDuplicateBell = false;
+        $bellCreated = false;
 
         if (Cache::has($dedupKey)) {
             // Duplicate within 60s window — skip in-app creation but still process email
             Log::debug('NotificationDispatcher: deduplicated', ['user' => $userId, 'type' => $activityType]);
-            return;
+            $isDuplicateBell = true;
         } else {
-            Cache::put($dedupKey, 1, now()->addSeconds(60));
-            Notification::createNotification((int) $userId, $content, $link, $activityType);
+            try {
+                Notification::createNotification((int) $userId, $content, $link, $activityType);
+                $bellCreated = true;
+            } catch (\Throwable $e) {
+                Log::warning('NotificationDispatcher: bell creation failed', [
+                    'user_id' => (int) $userId,
+                    'type' => $activityType,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         // 2. CHECK Notification Settings Hierarchy
@@ -156,9 +166,13 @@ class NotificationDispatcher
         }
 
         // 6. TRAFFIC LIGHT LOGIC
+        $queueSucceeded = true;
         switch ($frequency) {
             case 'instant':
-                self::queueNotification($userId, $activityType, $content, $link, 'instant', $htmlContent);
+                $queueSucceeded = self::queueNotification($userId, $activityType, $content, $link, 'instant', $htmlContent);
+                if (!$queueSucceeded) {
+                    break;
+                }
                 // Also dispatch a real-time web push notification.
                 // Runs AFTER the HTTP response is sent so a slow WebPush POST
                 // (VAPID endpoints can block 5–30s) never delays the caller.
@@ -207,13 +221,28 @@ class NotificationDispatcher
             case 'daily':
             case 'weekly':
             case 'monthly':
-                self::queueNotification($userId, $activityType, $content, $link, $frequency);
+                $queueSucceeded = self::queueNotification($userId, $activityType, $content, $link, $frequency);
                 break;
 
             case 'off':
                 // Do nothing
                 break;
         }
+
+        if (!$queueSucceeded) {
+            Log::warning('NotificationDispatcher: queue insert failed', [
+                'user_id' => (int) $userId,
+                'type' => $activityType,
+                'frequency' => $frequency,
+            ]);
+            return false;
+        }
+
+        if (!$isDuplicateBell && $bellCreated) {
+            Cache::put($dedupKey, 1, now()->addSeconds(60));
+        }
+
+        return true;
     }
 
     // =========================================================================
@@ -302,17 +331,29 @@ class NotificationDispatcher
             return false;
         }
 
-        DB::table('notification_queue')->insert([
-            'user_id'        => $userId,
-            'tenant_id'      => $tenantId,
-            'activity_type'  => $activityType,
-            'content_snippet' => $snippet,
-            'link'           => $link,
-            'frequency'      => $frequency,
-            'email_body'     => $emailBody,
-            'created_at'     => now(),
-            'status'         => 'pending',
-        ]);
+        try {
+            DB::table('notification_queue')->insert([
+                'user_id'        => $userId,
+                'tenant_id'      => $tenantId,
+                'activity_type'  => $activityType,
+                'content_snippet' => $snippet,
+                'link'           => $link,
+                'frequency'      => $frequency,
+                'email_body'     => $emailBody,
+                'created_at'     => now(),
+                'status'         => 'pending',
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('NotificationDispatcher::queueNotification insert failed', [
+                'user_id' => (int) $userId,
+                'tenant_id' => $tenantId,
+                'activity_type' => $activityType,
+                'frequency' => $frequency,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
 
         return true;
     }

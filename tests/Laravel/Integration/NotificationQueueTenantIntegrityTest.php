@@ -14,12 +14,63 @@ use App\Services\EventNotificationService;
 use App\Services\Identity\RegistrationOrchestrationService;
 use App\Services\NotificationDispatcher;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
 class NotificationQueueTenantIntegrityTest extends TestCase
 {
     use DatabaseTransactions;
+
+    public function test_duplicate_dispatch_suppresses_bell_but_still_queues_email(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'email' => 'dispatch-duplicate-' . uniqid('', true) . '@example.test',
+        ]);
+        Cache::flush();
+        TenantContext::setById($this->testTenantId);
+
+        NotificationDispatcher::dispatch(
+            $user->id,
+            'global',
+            0,
+            'new_message',
+            'First direct message',
+            '/messages/123',
+            '<p>First direct message</p>'
+        );
+        NotificationDispatcher::dispatch(
+            $user->id,
+            'global',
+            0,
+            'new_message',
+            'Second direct message',
+            '/messages/123',
+            '<p>Second direct message</p>'
+        );
+
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('type', 'new_message')
+            ->count());
+        $this->assertSame(2, DB::table('notification_queue')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('activity_type', 'new_message')
+            ->where('frequency', 'instant')
+            ->count());
+    }
+
+    public function test_message_listener_marks_cache_after_dispatch_result_not_before(): void
+    {
+        $source = file_get_contents(app_path('Listeners/NotifyMessageReceived.php'));
+
+        $this->assertStringNotContainsString('Cache::add($lockKey', $source);
+        $this->assertStringContainsString('$handled = LocaleContext::withLocale', $source);
+        $this->assertStringContainsString('if ($handled && $messageId)', $source);
+    }
 
     public function test_queue_notification_resolves_tenant_from_recipient_when_context_is_missing(): void
     {
