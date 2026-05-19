@@ -61,7 +61,7 @@ export function StripeOnboardingPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('onboarding.page_title', 'Seller Onboarding - Marketplace'));
+  usePageTitle(t('onboarding.page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -105,7 +105,7 @@ export function StripeOnboardingPage() {
   useEffect(() => {
     if (isReturn && status) {
       if (status.stripe_onboarding_complete) {
-        toast.success(t('onboarding.complete_toast', 'Stripe onboarding complete! You can now receive payments.'));
+        toast.success(t('onboarding.complete_toast'));
       }
     }
   }, [isReturn, status?.stripe_onboarding_complete]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -119,10 +119,10 @@ export function StripeOnboardingPage() {
         window.location.href = response.data.url;
         return;
       }
-      toast.error(response.error || t('onboarding.start_error', 'Failed to start onboarding'));
+      toast.error(response.error || t('onboarding.start_error'));
     } catch (err) {
       logError('Failed to start Stripe onboarding', err);
-      toast.error(t('onboarding.start_error', 'Failed to start onboarding'));
+      toast.error(t('onboarding.start_error'));
     } finally {
       setIsStarting(false);
     }
@@ -144,7 +144,7 @@ export function StripeOnboardingPage() {
 
   return (
     <>
-      <PageMeta title={t('onboarding.page_title', 'Seller Onboarding - Marketplace')} />
+      <PageMeta title={t('onboarding.page_title')} />
 
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         {/* Header */}
@@ -153,10 +153,10 @@ export function StripeOnboardingPage() {
             <CreditCard className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">
-            {t('onboarding.title', 'Seller Payment Setup')}
+            {t('onboarding.title')}
           </h1>
           <p className="text-default-500 text-sm max-w-md mx-auto">
-            {t('onboarding.subtitle', 'Set up Stripe Connect to receive payments from marketplace sales.')}
+            {t('onboarding.subtitle')}
           </p>
         </div>
 
@@ -168,21 +168,21 @@ export function StripeOnboardingPage() {
             </div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">
-                {t('onboarding.complete_title', "You're All Set!")}
+                {t('onboarding.complete_title')}
               </h2>
               <p className="text-default-500 text-sm mt-1">
-                {t('onboarding.complete_description', 'Your Stripe account is connected and you can now receive payments from marketplace sales.')}
+                {t('onboarding.complete_description')}
               </p>
             </div>
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-3">
               {status?.charges_enabled && (
                 <Chip size="sm" color="success" variant="flat">
-                  {t('onboarding.charges_enabled', 'Charges Enabled')}
+                  {t('onboarding.charges_enabled')}
                 </Chip>
               )}
               {status?.payouts_enabled && (
                 <Chip size="sm" color="success" variant="flat">
-                  {t('onboarding.payouts_enabled', 'Payouts Enabled')}
+                  {t('onboarding.payouts_enabled')}
                 </Chip>
               )}
             </div>
@@ -191,7 +191,7 @@ export function StripeOnboardingPage() {
               variant="flat"
               onPress={() => navigate(tenantPath('/marketplace/my-listings'))}
             >
-              {t('onboarding.go_to_listings', 'Go to My Listings')}
+              {t('onboarding.go_to_listings')}
             </Button>
           </GlassCard>
         )}
@@ -204,27 +204,27 @@ export function StripeOnboardingPage() {
             </div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">
-                {t('onboarding.incomplete_title', 'Complete Your Onboarding')}
+                {t('onboarding.incomplete_title')}
               </h2>
               <p className="text-default-500 text-sm mt-1">
-                {t('onboarding.incomplete_description', 'Your Stripe account setup is not yet complete. Please finish the onboarding process to start receiving payments.')}
+                {t('onboarding.incomplete_description')}
               </p>
             </div>
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-3">
               <Button
                 color="primary"
                 onPress={handleStartOnboarding}
                 isLoading={isStarting}
                 startContent={!isStarting ? <RefreshCw className="w-4 h-4" /> : undefined}
               >
-                {t('onboarding.continue_onboarding', 'Continue Onboarding')}
+                {t('onboarding.continue_onboarding')}
               </Button>
               <Button
                 variant="flat"
                 onPress={loadStatus}
                 startContent={<RefreshCw className="w-4 h-4" />}
               >
-                {t('onboarding.check_status', 'Check Status')}
+                {t('onboarding.check_status')}
               </Button>
             </div>
           </GlassCard>
@@ -236,17 +236,17 @@ export function StripeOnboardingPage() {
             {/* What is Stripe Connect */}
             <GlassCard className="p-6 space-y-4">
               <h2 className="text-lg font-semibold text-foreground">
-                {t('onboarding.what_is_stripe_title', 'What is Stripe Connect?')}
+                {t('onboarding.what_is_stripe_title')}
               </h2>
               <p className="text-sm text-default-600">
-                {t('onboarding.what_is_stripe_description', 'Stripe Connect is a secure payment platform that allows you to receive payments directly to your bank account when buyers purchase your marketplace listings. Your financial information is handled entirely by Stripe and is never stored on our servers.')}
+                {t('onboarding.what_is_stripe_description')}
               </p>
             </GlassCard>
 
             {/* What you need */}
             <GlassCard className="p-6 space-y-4">
               <h2 className="text-lg font-semibold text-foreground">
-                {t('onboarding.what_you_need_title', 'What You\'ll Need')}
+                {t('onboarding.what_you_need_title')}
               </h2>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
@@ -255,10 +255,10 @@ export function StripeOnboardingPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-foreground">
-                      {t('onboarding.need_bank', 'Bank Account Details')}
+                      {t('onboarding.need_bank')}
                     </p>
                     <p className="text-xs text-default-500">
-                      {t('onboarding.need_bank_desc', 'Your bank account or debit card to receive payouts.')}
+                      {t('onboarding.need_bank_desc')}
                     </p>
                   </div>
                 </div>
@@ -268,10 +268,10 @@ export function StripeOnboardingPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-foreground">
-                      {t('onboarding.need_id', 'Identity Verification')}
+                      {t('onboarding.need_id')}
                     </p>
                     <p className="text-xs text-default-500">
-                      {t('onboarding.need_id_desc', 'A government-issued ID to verify your identity (required by financial regulations).')}
+                      {t('onboarding.need_id_desc')}
                     </p>
                   </div>
                 </div>
@@ -288,13 +288,13 @@ export function StripeOnboardingPage() {
                 endContent={!isStarting ? <ArrowRight className="w-5 h-5" /> : undefined}
                 className="min-w-[240px]"
               >
-                {t('onboarding.start_button', 'Start Onboarding')}
+                {t('onboarding.start_button')}
               </Button>
             </div>
 
             {/* Security note */}
             <p className="text-center text-xs text-default-400">
-              {t('onboarding.security_note', 'You will be redirected to Stripe\'s secure website to complete the setup. Your financial information is never stored on our servers.')}
+              {t('onboarding.security_note')}
             </p>
           </>
         )}
