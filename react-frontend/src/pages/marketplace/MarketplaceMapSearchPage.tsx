@@ -69,11 +69,11 @@ const DEFAULT_RADIUS_KM = 25;
 const SEARCH_DEBOUNCE_MS = 400;
 
 const RADIUS_OPTIONS = [
-  { value: '5', label: '5 km' },
-  { value: '10', label: '10 km' },
-  { value: '25', label: '25 km' },
-  { value: '50', label: '50 km' },
-  { value: '100', label: '100 km' },
+  { value: '5' },
+  { value: '10' },
+  { value: '25' },
+  { value: '50' },
+  { value: '100' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -204,7 +204,7 @@ export function MarketplaceMapSearchPage() {
     } else {
       toast.error(t('members.near_me_no_location', 'Set your location in your profile to use this feature'));
     }
-  }, [user?.latitude, user?.longitude, toast, t]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [user?.latitude, user?.longitude, toast, t]);
 
   // Save / Unsave handlers
   const handleSave = useCallback(async (id: number) => {
@@ -289,7 +289,7 @@ export function MarketplaceMapSearchPage() {
             aria-label={t('map.radius_label', 'Search radius')}
           >
             {RADIUS_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value}>{opt.label}</SelectItem>
+              <SelectItem key={opt.value}>{t('map.radius_option', { km: opt.value })}</SelectItem>
             ))}
           </Select>
 

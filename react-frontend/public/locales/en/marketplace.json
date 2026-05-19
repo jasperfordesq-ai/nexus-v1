@@ -535,6 +535,7 @@
     "breadcrumb": "Map Search",
     "search_placeholder": "Search nearby listings...",
     "radius_label": "Search radius",
+    "radius_option": "{{km}} km",
     "radius_chip": "{{km}} km radius",
     "results_count": "{{count}} listings found nearby",
     "refresh": "Refresh",
