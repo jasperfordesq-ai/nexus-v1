@@ -37,6 +37,7 @@ use App\Services\JobVacancyService;
 use App\Services\RecurringShiftService;
 use App\Services\StoryService;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 /**
  * Executes scheduled cron jobs (digests, newsletters, cleanup, matching, etc.).
@@ -312,13 +313,7 @@ class CronJobRunner
 
         $this->repairNotificationQueueTenantIds();
 
-        DB::update(
-            "UPDATE notification_queue
-                SET status = 'pending'
-              WHERE frequency = ? AND status = 'processing'
-                AND created_at < DATE_SUB(NOW(), INTERVAL 30 MINUTE)",
-            [$frequency]
-        );
+        $this->releaseStaleNotificationQueueRows($frequency, 30);
 
         // 1. Find users with pending items for this frequency
         $sql = "SELECT q.user_id, q.tenant_id, COUNT(*) as count
@@ -413,11 +408,19 @@ class CronJobRunner
 
             echo "Processing User: {$user['name']} ($count items)...\n";
 
-            // Race condition fix: atomically claim items by setting status='processing'
+            $batchId = (string) Str::uuid();
+
+            // Race condition fix: atomically claim this digest batch, then
+            // fetch only rows carrying the batch id.
             $claimSql = "UPDATE notification_queue
-                         SET status = 'processing'
+                         SET status = 'processing',
+                             processing_batch_id = ?,
+                             processing_started_at = NOW(),
+                             attempts = attempts + 1,
+                             last_attempted_at = NOW(),
+                             last_error = NULL
                          WHERE user_id = ? AND tenant_id = ? AND frequency = ? AND status = 'pending'";
-            $claimed = DB::update($claimSql, [$userId, $userTenantId, $frequency]);
+            $claimed = DB::update($claimSql, [$batchId, $userId, $userTenantId, $frequency]);
 
             if ($claimed === 0) {
                 echo " - Items already claimed by another runner, skipping.\n";
@@ -427,8 +430,9 @@ class CronJobRunner
             // Fetch the items we just claimed
             $itemsSql = "SELECT * FROM notification_queue
                          WHERE user_id = ? AND tenant_id = ? AND frequency = ? AND status = 'processing'
+                           AND processing_batch_id = ?
                          ORDER BY created_at ASC";
-            $items = array_map(fn($r) => (array) $r, DB::select($itemsSql, [$userId, $userTenantId, $frequency]));
+            $items = array_map(fn($r) => (array) $r, DB::select($itemsSql, [$userId, $userTenantId, $frequency, $batchId]));
 
             // Render digest in the RECIPIENT's preferred language — cron workers
             // default to config('app.locale') = 'en' otherwise.
@@ -451,8 +455,13 @@ class CronJobRunner
                 $ids = array_column($items, 'id');
                 if (!empty($ids)) {
                     $inQuery = implode(',', array_fill(0, count($ids), '?'));
-                    $updateSql = "UPDATE notification_queue SET status = 'sent', sent_at = NOW()
-                                  WHERE id IN ($inQuery) AND tenant_id = ?";
+                    $updateSql = "UPDATE notification_queue
+                                     SET status = 'sent',
+                                         sent_at = NOW(),
+                                         processing_batch_id = NULL,
+                                         processing_started_at = NULL,
+                                         last_error = NULL
+                                   WHERE id IN ($inQuery) AND tenant_id = ?";
                     DB::update($updateSql, array_merge($ids, [$userTenantId]));
                     echo " - Queue updated (Marked as sent).\n";
                 }
@@ -463,9 +472,13 @@ class CronJobRunner
                 $ids = array_column($items, 'id');
                 if (!empty($ids)) {
                     $inQuery = implode(',', array_fill(0, count($ids), '?'));
-                    $revertSql = "UPDATE notification_queue SET status = 'pending'
-                                  WHERE id IN ($inQuery) AND tenant_id = ?";
-                    DB::update($revertSql, array_merge($ids, [$userTenantId]));
+                    $revertSql = "UPDATE notification_queue
+                                     SET status = CASE WHEN attempts >= 3 THEN 'failed' ELSE 'pending' END,
+                                         processing_batch_id = NULL,
+                                         processing_started_at = NULL,
+                                         last_error = ?
+                                   WHERE id IN ($inQuery) AND tenant_id = ?";
+                    DB::update($revertSql, array_merge(['notification digest send returned false'], $ids, [$userTenantId]));
                 }
             }
         }
@@ -527,6 +540,39 @@ class CronJobRunner
         }
     }
 
+    private function releaseStaleNotificationQueueRows(string $frequency, int $minutes): void
+    {
+        $minutes = max(1, $minutes);
+
+        DB::update(
+            "UPDATE notification_queue
+                SET status = CASE WHEN attempts >= 3 THEN 'failed' ELSE 'pending' END,
+                    processing_batch_id = NULL,
+                    processing_started_at = NULL,
+                    last_error = COALESCE(last_error, 'stale processing batch released')
+              WHERE frequency = ?
+                AND status = 'processing'
+                AND (
+                    processing_started_at < DATE_SUB(NOW(), INTERVAL {$minutes} MINUTE)
+                    OR (processing_started_at IS NULL AND created_at < DATE_SUB(NOW(), INTERVAL {$minutes} MINUTE))
+                )",
+            [$frequency]
+        );
+    }
+
+    private function markNotificationQueueAttemptFailed(int $id, int $tenantId, string $batchId, string $error): void
+    {
+        DB::update(
+            "UPDATE notification_queue
+                SET status = CASE WHEN attempts >= 3 THEN 'failed' ELSE 'pending' END,
+                    processing_batch_id = NULL,
+                    processing_started_at = NULL,
+                    last_error = ?
+              WHERE id = ? AND tenant_id = ? AND processing_batch_id = ?",
+            [mb_substr($error, 0, 4000), $id, $tenantId, $batchId]
+        );
+    }
+
     public function runInstantQueue()
     {
         $this->checkAccess();
@@ -549,14 +595,22 @@ class CronJobRunner
             }
 
             $this->repairNotificationQueueTenantIds();
+            $this->releaseStaleNotificationQueueRows('instant', 10);
+            $batchId = (string) Str::uuid();
 
             // Race condition fix: atomically claim up to 50 pending items
             $claimSql = "UPDATE notification_queue
-                         SET status = 'processing'
+                         SET status = 'processing',
+                             processing_batch_id = ?,
+                             processing_started_at = NOW(),
+                             attempts = attempts + 1,
+                             last_attempted_at = NOW(),
+                             last_error = NULL
                          WHERE frequency = 'instant' AND status = 'pending' AND tenant_id IS NOT NULL
+                           AND attempts < 3
                          ORDER BY created_at ASC
                          LIMIT 50";
-            $claimed = DB::update($claimSql);
+            $claimed = DB::update($claimSql, [$batchId]);
 
             if ($claimed === 0) {
                 echo "No pending instant notifications.\n";
@@ -567,10 +621,11 @@ class CronJobRunner
                         FROM notification_queue q
                         JOIN users u ON q.user_id = u.id AND q.tenant_id = u.tenant_id
                         WHERE q.frequency = 'instant' AND q.status = 'processing'
+                          AND q.processing_batch_id = ?
                         ORDER BY q.created_at ASC
                         LIMIT 50";
 
-                $items = array_map(fn($r) => (array) $r, DB::select($sql));
+                $items = array_map(fn($r) => (array) $r, DB::select($sql, [$batchId]));
 
                 foreach ($items as $item) {
                     // Per-item exception handling: one bad item must never affect others
@@ -610,17 +665,32 @@ class CronJobRunner
 
                         $itemTenantId = (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0);
                         if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, null, 'notification_queue', ['tenant_id' => $itemTenantId])) {
-                            DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ? AND tenant_id = ?", [$item['id'], $itemTenantId]);
+                            DB::update(
+                                "UPDATE notification_queue
+                                    SET status = 'sent',
+                                        sent_at = NOW(),
+                                        processing_batch_id = NULL,
+                                        processing_started_at = NULL,
+                                        last_error = NULL
+                                  WHERE id = ? AND tenant_id = ? AND processing_batch_id = ?",
+                                [$item['id'], $itemTenantId, $batchId]
+                            );
                             echo "OK.\n";
                         } else {
-                            DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ? AND tenant_id = ?", [$item['id'], $itemTenantId]);
+                            $this->markNotificationQueueAttemptFailed((int) $item['id'], $itemTenantId, $batchId, 'notification queue send returned false');
                             echo "FAILED.\n";
                         }
                     } catch (\Throwable $itemError) {
-                        // Mark this individual item as failed — do NOT revert to pending
+                        // Release this individual item for a capped retry without
+                        // affecting the rest of the claimed batch.
                         echo "ERROR: {$itemError->getMessage()}\n";
                         try {
-                            DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ? AND tenant_id = ?", [$item['id'], (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0)]);
+                            $this->markNotificationQueueAttemptFailed(
+                                (int) $item['id'],
+                                (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0),
+                                $batchId,
+                                $itemError->getMessage()
+                            );
                         } catch (\Throwable $dbError) {
                             echo "Could not mark item {$item['id']} as failed: {$dbError->getMessage()}\n";
                         }
@@ -628,8 +698,9 @@ class CronJobRunner
                 }
             }
 
-            // Clean up any stale 'processing' items older than 10 minutes (from crashed runs)
-            DB::update("UPDATE notification_queue SET status = 'failed' WHERE frequency = 'instant' AND status = 'processing' AND created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)");
+            // Clean up stale rows from crashed runs without touching another
+            // active runner's current batch.
+            $this->releaseStaleNotificationQueueRows('instant', 10);
             Cache::forget($lockKey);
 
             echo "Done.\n";
@@ -640,9 +711,20 @@ class CronJobRunner
             echo "\nError: " . $e->getMessage() . "\n";
             $status = 'error';
 
-            // Mark any remaining processing items as failed — NEVER revert to pending
-            // (reverting to pending causes duplicate sends when items were already emailed)
-            DB::update("UPDATE notification_queue SET status = 'failed' WHERE frequency = 'instant' AND status = 'processing'");
+            // Release only this runner's batch. Per-item send failures are retried
+            // up to the attempts cap; another runner's active batch is untouched.
+            if (isset($batchId)) {
+                DB::update(
+                    "UPDATE notification_queue
+                        SET status = CASE WHEN attempts >= 3 THEN 'failed' ELSE 'pending' END,
+                            processing_batch_id = NULL,
+                            processing_started_at = NULL,
+                            last_error = ?
+                      WHERE frequency = 'instant' AND status = 'processing'
+                        AND processing_batch_id = ?",
+                    [mb_substr($e->getMessage(), 0, 4000), $batchId]
+                );
+            }
         }
 
         $output = ob_get_clean();
@@ -1406,14 +1488,22 @@ class CronJobRunner
 
         try {
         $this->repairNotificationQueueTenantIds();
+        $this->releaseStaleNotificationQueueRows('instant', 10);
+        $batchId = (string) Str::uuid();
 
         // Race condition fix: atomically claim up to 50 pending items
         $claimSql = "UPDATE notification_queue
-                     SET status = 'processing'
+                     SET status = 'processing',
+                         processing_batch_id = ?,
+                         processing_started_at = NOW(),
+                         attempts = attempts + 1,
+                         last_attempted_at = NOW(),
+                         last_error = NULL
                      WHERE frequency = 'instant' AND status = 'pending' AND tenant_id IS NOT NULL
+                       AND attempts < 3
                      ORDER BY created_at ASC
                      LIMIT 50";
-        $claimed = DB::update($claimSql);
+        $claimed = DB::update($claimSql, [$batchId]);
 
         if ($claimed === 0) {
             echo "   No pending instant notifications.\n";
@@ -1428,10 +1518,11 @@ class CronJobRunner
                 FROM notification_queue q
                 JOIN users u ON q.user_id = u.id AND q.tenant_id = u.tenant_id
                 WHERE q.frequency = 'instant' AND q.status = 'processing'
+                  AND q.processing_batch_id = ?
                 ORDER BY q.created_at ASC
                 LIMIT 50";
 
-        $items = array_map(fn($r) => (array) $r, DB::select($sql));
+        $items = array_map(fn($r) => (array) $r, DB::select($sql, [$batchId]));
 
         $sent = 0;
         foreach ($items as $item) {
@@ -1465,24 +1556,40 @@ class CronJobRunner
 
                 $itemTenantId = (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0);
                 if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, null, 'notification_queue', ['tenant_id' => $itemTenantId])) {
-                    DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ? AND tenant_id = ?", [$item['id'], $itemTenantId]);
+                    DB::update(
+                        "UPDATE notification_queue
+                            SET status = 'sent',
+                                sent_at = NOW(),
+                                processing_batch_id = NULL,
+                                processing_started_at = NULL,
+                                last_error = NULL
+                          WHERE id = ? AND tenant_id = ? AND processing_batch_id = ?",
+                        [$item['id'], $itemTenantId, $batchId]
+                    );
                     $sent++;
                 } else {
-                    DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ? AND tenant_id = ?", [$item['id'], $itemTenantId]);
+                    $this->markNotificationQueueAttemptFailed((int) $item['id'], $itemTenantId, $batchId, 'notification queue send returned false');
                 }
             } catch (\Throwable $itemError) {
-                // Mark this individual item as failed — do NOT leave in 'processing' state
+                // Release this individual item for a capped retry without leaving
+                // it stuck in processing.
                 echo "   ERROR on item {$item['id']}: {$itemError->getMessage()}\n";
                 try {
-                    DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ? AND tenant_id = ?", [$item['id'], (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0)]);
+                    $this->markNotificationQueueAttemptFailed(
+                        (int) $item['id'],
+                        (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0),
+                        $batchId,
+                        $itemError->getMessage()
+                    );
                 } catch (\Throwable $dbError) {
                     // Last resort — log but don't crash the batch
                 }
             }
         }
 
-        // Clean up any stale 'processing' items older than 10 minutes (from crashed runs)
-        DB::update("UPDATE notification_queue SET status = 'failed' WHERE frequency = 'instant' AND status = 'processing' AND created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)");
+        // Clean up stale rows from crashed runs without touching another
+        // active runner's current batch.
+        $this->releaseStaleNotificationQueueRows('instant', 10);
 
         echo "   Sent $sent instant notifications.\n";
         } finally {

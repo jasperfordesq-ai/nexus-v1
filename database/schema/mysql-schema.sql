@@ -8884,18 +8884,25 @@ DROP TABLE IF EXISTS `notification_queue`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `notification_queue` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tenant_id` int(11) DEFAULT NULL,
+  `tenant_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `activity_type` varchar(50) NOT NULL,
   `content_snippet` text DEFAULT NULL,
   `link` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `status` enum('pending','processing','sent','failed') NOT NULL DEFAULT 'pending',
+  `status` enum('pending','processing','sent','failed','suppressed') NOT NULL DEFAULT 'pending',
+  `processing_batch_id` char(36) DEFAULT NULL,
+  `processing_started_at` timestamp NULL DEFAULT NULL,
+  `attempts` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `last_attempted_at` timestamp NULL DEFAULT NULL,
+  `last_error` text DEFAULT NULL,
   `sent_at` datetime DEFAULT NULL,
   `frequency` enum('instant','daily','weekly','monthly') DEFAULT 'daily',
   `email_body` longtext DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `notification_queue_tenant_status_frequency_idx` (`tenant_id`,`status`,`frequency`),
+  KEY `notification_queue_frequency_status_batch_idx` (`frequency`,`status`,`processing_batch_id`),
+  KEY `notification_queue_retry_idx` (`frequency`,`status`,`last_attempted_at`,`attempts`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `notification_queue_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -13650,7 +13657,8 @@ INSERT INTO `laravel_migrations` VALUES
 (234,'2026_05_17_000001_enhance_goals_accountability',104),
 (235,'2026_05_17_120000_create_email_log_and_suppression_tables',104),
 (236,'2026_05_17_130000_backfill_newsletter_templates_for_all_tenants',104),
-(237,'2026_05_17_140000_drop_dead_email_preferences_column',104);
+(237,'2026_05_17_140000_drop_dead_email_preferences_column',104),
+(238,'2026_05_19_071000_add_batch_retry_columns_to_notification_queue',105);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

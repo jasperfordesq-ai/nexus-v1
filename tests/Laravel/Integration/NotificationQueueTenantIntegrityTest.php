@@ -343,10 +343,29 @@ class NotificationQueueTenantIntegrityTest extends TestCase
             'Instant queue cleanup must not mark digest processing rows as failed.'
         );
 
-        $this->assertGreaterThanOrEqual(
-            2,
-            substr_count($source, "WHERE frequency = 'instant' AND status = 'processing' AND created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)")
-        );
+        $this->assertStringContainsString('releaseStaleNotificationQueueRows(string $frequency, int $minutes)', $source);
+        $this->assertStringContainsString("status = CASE WHEN attempts >= 3 THEN 'failed' ELSE 'pending' END", $source);
+        $this->assertStringContainsString('processing_started_at < DATE_SUB(NOW(), INTERVAL {$minutes} MINUTE)', $source);
+        $this->assertStringContainsString("releaseStaleNotificationQueueRows('instant', 10)", $source);
+    }
+
+    public function test_notification_queue_runner_claims_rows_by_batch_before_sending(): void
+    {
+        $source = file_get_contents(app_path('Services/CronJobRunner.php'));
+        $migration = file_get_contents(database_path('migrations/2026_05_19_071000_add_batch_retry_columns_to_notification_queue.php'));
+
+        $this->assertStringContainsString('processing_batch_id = ?', $source);
+        $this->assertStringContainsString('$batchId = (string) Str::uuid();', $source);
+        $this->assertStringContainsString('AND q.processing_batch_id = ?', $source);
+        $this->assertStringContainsString('markNotificationQueueAttemptFailed', $source);
+        $this->assertStringContainsString('attempts = attempts + 1', $source);
+        $this->assertStringContainsString("WHERE id = ? AND tenant_id = ? AND processing_batch_id = ?", $source);
+
+        $this->assertStringContainsString("processing_batch_id", $migration);
+        $this->assertStringContainsString("processing_started_at", $migration);
+        $this->assertStringContainsString("attempts", $migration);
+        $this->assertStringContainsString("last_attempted_at", $migration);
+        $this->assertStringContainsString("last_error", $migration);
     }
 
     public function test_hot_match_cron_scopes_candidates_and_dedupe_by_tenant(): void
