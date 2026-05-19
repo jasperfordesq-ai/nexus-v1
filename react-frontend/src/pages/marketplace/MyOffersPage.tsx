@@ -64,7 +64,7 @@ const ITEMS_PER_PAGE = 20;
 export function MyOffersPage() {
   const navigate = useNavigate();
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('my_offers.page_title', 'My Offers - Marketplace'));
+  usePageTitle(t('my_offers.page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -126,7 +126,7 @@ export function MyOffersPage() {
     } catch (err) {
       logError('Failed to load offers', err);
       if (!append) {
-        toast.error(t('my_offers.load_error', 'Failed to load offers'));
+        toast.error(t('my_offers.load_error'));
       }
     } finally {
       setIsLoading(false);
@@ -158,14 +158,14 @@ export function MyOffersPage() {
     try {
       const response = await api.put(`/v2/marketplace/offers/${offerId}/accept`);
       if (response.success) {
-        toast.success(t('my_offers.accepted_success', 'Offer accepted'));
+        toast.success(t('my_offers.accepted_success'));
         updateOfferLocally(offerId, { status: 'accepted' });
       } else {
-        toast.error(response.error || t('my_offers.action_error', 'Action failed'));
+        toast.error(response.error || t('my_offers.action_error'));
       }
     } catch (err) {
       logError('Failed to accept offer', err);
-      toast.error(t('my_offers.action_error', 'Action failed'));
+      toast.error(t('my_offers.action_error'));
     }
   }, [toast, updateOfferLocally, t])
 
@@ -174,14 +174,14 @@ export function MyOffersPage() {
     try {
       const response = await api.put(`/v2/marketplace/offers/${offerId}/decline`);
       if (response.success) {
-        toast.success(t('my_offers.declined_success', 'Offer declined'));
+        toast.success(t('my_offers.declined_success'));
         updateOfferLocally(offerId, { status: 'declined' });
       } else {
-        toast.error(response.error || t('my_offers.action_error', 'Action failed'));
+        toast.error(response.error || t('my_offers.action_error'));
       }
     } catch (err) {
       logError('Failed to decline offer', err);
-      toast.error(t('my_offers.action_error', 'Action failed'));
+      toast.error(t('my_offers.action_error'));
     }
   }, [toast, updateOfferLocally, t])
 
@@ -190,14 +190,14 @@ export function MyOffersPage() {
     try {
       const response = await api.delete(`/v2/marketplace/offers/${offerId}`);
       if (response.success) {
-        toast.success(t('my_offers.withdrawn_success', 'Offer withdrawn'));
+        toast.success(t('my_offers.withdrawn_success'));
         removeOfferLocally(offerId);
       } else {
-        toast.error(response.error || t('my_offers.action_error', 'Action failed'));
+        toast.error(response.error || t('my_offers.action_error'));
       }
     } catch (err) {
       logError('Failed to withdraw offer', err);
-      toast.error(t('my_offers.action_error', 'Action failed'));
+      toast.error(t('my_offers.action_error'));
     }
   }, [toast, removeOfferLocally, t])
 
@@ -206,14 +206,14 @@ export function MyOffersPage() {
     try {
       const response = await api.put(`/v2/marketplace/offers/${offerId}/accept-counter`);
       if (response.success) {
-        toast.success(t('my_offers.counter_accepted_success', 'Counter-offer accepted'));
+        toast.success(t('my_offers.counter_accepted_success'));
         updateOfferLocally(offerId, { status: 'accepted' });
       } else {
-        toast.error(response.error || t('my_offers.action_error', 'Action failed'));
+        toast.error(response.error || t('my_offers.action_error'));
       }
     } catch (err) {
       logError('Failed to accept counter-offer', err);
-      toast.error(t('my_offers.action_error', 'Action failed'));
+      toast.error(t('my_offers.action_error'));
     }
   }, [toast, updateOfferLocally, t])
 
@@ -231,7 +231,7 @@ export function MyOffersPage() {
 
     const amount = parseFloat(counterAmount);
     if (!counterAmount || isNaN(amount) || amount <= 0) {
-      toast.error(t('my_offers.counter_amount_required', 'Please enter a valid counter amount'));
+      toast.error(t('my_offers.counter_amount_required'));
       return;
     }
 
@@ -242,7 +242,7 @@ export function MyOffersPage() {
         message: counterMessage.trim() || undefined,
       });
       if (response.success) {
-        toast.success(t('my_offers.counter_sent_success', 'Counter-offer sent'));
+        toast.success(t('my_offers.counter_sent_success'));
         updateOfferLocally(counterTargetId, {
           status: 'countered',
           counter_amount: amount,
@@ -250,11 +250,11 @@ export function MyOffersPage() {
         });
         onCounterClose();
       } else {
-        toast.error(response.error || t('my_offers.action_error', 'Action failed'));
+        toast.error(response.error || t('my_offers.action_error'));
       }
     } catch (err) {
       logError('Failed to send counter-offer', err);
-      toast.error(t('my_offers.action_error', 'Action failed'));
+      toast.error(t('my_offers.action_error'));
     } finally {
       setIsSubmittingCounter(false);
     }
@@ -266,17 +266,17 @@ export function MyOffersPage() {
 
   return (
     <>
-      <PageMeta title={t('my_offers.page_title', 'My Offers - Marketplace')} noIndex={true} />
+      <PageMeta title={t('my_offers.page_title')} noIndex={true} />
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
         {/* Header */}
-        <div>
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <HandCoins className="w-7 h-7 text-primary" />
-            {t('my_offers.title', 'My Offers')}
+            {t('my_offers.title')}
           </h1>
           <p className="text-default-500 text-sm mt-1">
-            {t('my_offers.subtitle', 'Track offers you\'ve sent and received')}
+            {t('my_offers.subtitle')}
           </p>
         </div>
 
@@ -293,7 +293,7 @@ export function MyOffersPage() {
             title={
               <div className="flex items-center gap-1.5">
                 <Send className="w-4 h-4" />
-                <span>{t('my_offers.tab_sent', 'Sent')}</span>
+                <span>{t('my_offers.tab_sent')}</span>
               </div>
             }
           />
@@ -302,7 +302,7 @@ export function MyOffersPage() {
             title={
               <div className="flex items-center gap-1.5">
                 <Inbox className="w-4 h-4" />
-                <span>{t('my_offers.tab_received', 'Received')}</span>
+                <span>{t('my_offers.tab_received')}</span>
               </div>
             }
           />
@@ -318,13 +318,13 @@ export function MyOffersPage() {
             icon={activeTab === 'sent' ? <Send className="w-8 h-8" /> : <Inbox className="w-8 h-8" />}
             title={
               activeTab === 'sent'
-                ? t('my_offers.empty_sent_title', 'No Offers Sent')
-                : t('my_offers.empty_received_title', 'No Offers Received')
+                ? t('my_offers.empty_sent_title')
+                : t('my_offers.empty_received_title')
             }
             description={
               activeTab === 'sent'
-                ? t('my_offers.empty_sent_description', 'You haven\'t made any offers yet. Browse the marketplace to find items you like.')
-                : t('my_offers.empty_received_description', 'You haven\'t received any offers yet. List items for sale to start receiving offers.')
+                ? t('my_offers.empty_sent_description')
+                : t('my_offers.empty_received_description')
             }
           />
         ) : (
@@ -351,7 +351,7 @@ export function MyOffersPage() {
                   onPress={() => loadOffers(true)}
                   isLoading={isLoadingMore}
                 >
-                  {t('common.load_more', 'Load More')}
+                  {t('common.load_more')}
                 </Button>
               </div>
             )}
@@ -364,11 +364,11 @@ export function MyOffersPage() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <RotateCcw className="w-5 h-5 text-secondary" />
-            {t('my_offers.counter_modal_title', 'Counter Offer')}
+            {t('my_offers.counter_modal_title')}
           </ModalHeader>
           <ModalBody>
             <Input
-              label={t('my_offers.counter_amount_label', 'Counter Amount')}
+              label={t('my_offers.counter_amount_label')}
               placeholder="0.00"
               type="number"
               min={0}
@@ -378,8 +378,8 @@ export function MyOffersPage() {
               isRequired
             />
             <Textarea
-              label={t('my_offers.counter_message_label', 'Message (optional)')}
-              placeholder={t('my_offers.counter_message_placeholder', 'Explain your counter-offer...')}
+              label={t('my_offers.counter_message_label')}
+              placeholder={t('my_offers.counter_message_placeholder')}
               value={counterMessage}
               onValueChange={setCounterMessage}
               minRows={2}
@@ -388,7 +388,7 @@ export function MyOffersPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onCounterClose}>
-              {t('common.cancel', 'Cancel')}
+              {t('common.cancel')}
             </Button>
             <Button
               color="secondary"
@@ -396,7 +396,7 @@ export function MyOffersPage() {
               isLoading={isSubmittingCounter}
               startContent={!isSubmittingCounter ? <RotateCcw className="w-4 h-4" /> : undefined}
             >
-              {t('my_offers.send_counter', 'Send Counter')}
+              {t('my_offers.send_counter')}
             </Button>
           </ModalFooter>
         </ModalContent>
