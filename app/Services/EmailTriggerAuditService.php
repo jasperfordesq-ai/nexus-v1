@@ -135,6 +135,7 @@ class EmailTriggerAuditService
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
                 $this->checkTenantProviderConfiguration($tenantId),
                 $this->checkBillingAndStripeHealth($tenantId, $since, $windowHours),
+                $this->checkVereinDuesEmailHealth($tenantId, $since, $windowHours),
                 $this->checkMarketplaceReportNotificationHealth($tenantId, $since, $windowHours),
                 $this->checkDirectEmailSendSurface($tenantId),
                 $this->checkTenantlessDispatcherSendSurface($tenantId)
@@ -982,6 +983,43 @@ class EmailTriggerAuditService
                 ->get();
 
             $issues = array_merge($issues, $this->rowsToIssues($sentEmailWithoutLog, 'marketplace_report_notification_sent_without_email_log', 'critical', 'marketplace', 'marketplace_report_notice', ['window_hours' => $windowHours]));
+        }
+
+        return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkVereinDuesEmailHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (!$this->hasTables(['verein_member_dues'])) {
+            return [];
+        }
+
+        $issues = [];
+
+        if (Schema::hasColumn('verein_member_dues', 'generated_email_sent_at')) {
+            $generatedWithoutEmail = DB::table('verein_member_dues')
+                ->select('tenant_id', DB::raw('COUNT(*) as count'))
+                ->where('created_at', '>=', $since)
+                ->whereNull('generated_email_sent_at')
+                ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId))
+                ->groupBy('tenant_id')
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($generatedWithoutEmail, 'verein_dues_generated_without_email_evidence', 'critical', 'verein', 'verein_dues', ['window_hours' => $windowHours]));
+        }
+
+        if (Schema::hasColumn('verein_member_dues', 'paid_email_sent_at')) {
+            $paidWithoutEmail = DB::table('verein_member_dues')
+                ->select('tenant_id', DB::raw('COUNT(*) as count'))
+                ->where('status', 'paid')
+                ->where('paid_at', '>=', $since)
+                ->whereNull('paid_email_sent_at')
+                ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId))
+                ->groupBy('tenant_id')
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($paidWithoutEmail, 'verein_dues_paid_without_email_evidence', 'critical', 'verein', 'verein_dues', ['window_hours' => $windowHours]));
         }
 
         return $issues;

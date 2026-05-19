@@ -146,11 +146,20 @@ class VereinDuesService
                 ->exists();
 
             if ($exists) {
+                $existingDue = DB::table('verein_member_dues')
+                    ->where('organization_id', $organizationId)
+                    ->where('user_id', $userId)
+                    ->where('membership_year', $year)
+                    ->where('tenant_id', $tenantId)
+                    ->first();
+                if ($existingDue && empty($existingDue->generated_email_sent_at)) {
+                    $this->markGeneratedEmailAttempt($existingDue);
+                }
                 $skipped++;
                 continue;
             }
 
-            DB::table('verein_member_dues')->insert([
+            $duesId = (int) DB::table('verein_member_dues')->insertGetId([
                 'organization_id' => $organizationId,
                 'tenant_id' => $tenantId,
                 'user_id' => $userId,
@@ -167,7 +176,13 @@ class VereinDuesService
             $generated++;
 
             // Notify the member their dues are now due.
-            $this->sendDuesGeneratedEmail($userId, $organizationId, $year, (int) $config['fee_amount_cents'], (string) $config['currency']);
+            $dues = DB::table('verein_member_dues')
+                ->where('id', $duesId)
+                ->where('tenant_id', $tenantId)
+                ->first();
+            if ($dues) {
+                $this->markGeneratedEmailAttempt($dues);
+            }
         }
 
         Log::info('VereinDues: annual generation complete', [
@@ -205,6 +220,9 @@ class VereinDuesService
                 ->where('tenant_id', $tenantId)
                 ->first();
             if ($existing) {
+                if (empty($dues->paid_email_sent_at)) {
+                    $this->markPaidEmailAttempt($dues, $receiptUrl);
+                }
                 return ['dues_id' => $duesId, 'payment_id' => (int) $existing->id, 'idempotent' => true];
             }
 
@@ -229,7 +247,13 @@ class VereinDuesService
             ]);
 
             // Notify the member their payment was received.
-            $this->sendDuesPaidEmail((int) $dues->user_id, (int) $dues->organization_id, (int) $dues->membership_year, (int) $dues->amount_cents, (string) $dues->currency, $receiptUrl);
+            $dues = DB::table('verein_member_dues')
+                ->where('id', $duesId)
+                ->where('tenant_id', $tenantId)
+                ->first();
+            if ($dues) {
+                $this->markPaidEmailAttempt($dues, $receiptUrl);
+            }
 
             return ['dues_id' => $duesId, 'payment_id' => (int) $paymentId, 'idempotent' => false];
         });
@@ -524,6 +548,7 @@ class VereinDuesService
                     'payment_intent_id' => $piId,
                     'error' => $e->getMessage(),
                 ]);
+                throw $e;
             }
         });
     }
@@ -609,9 +634,54 @@ class VereinDuesService
     // Email helpers (each wraps render+send in LocaleContext::withLocale)
     // ─────────────────────────────────────────────────────────────────────
 
-    private function sendDuesGeneratedEmail(int $userId, int $organizationId, int $year, int $amountCents, string $currency): void
+    private function markGeneratedEmailAttempt(object $dues): bool
     {
-        $this->sendEmail(
+        $sent = $this->sendDuesGeneratedEmail(
+            (int) $dues->user_id,
+            (int) $dues->organization_id,
+            (int) $dues->membership_year,
+            (int) $dues->amount_cents,
+            (string) $dues->currency
+        );
+
+        DB::table('verein_member_dues')
+            ->where('id', (int) $dues->id)
+            ->where('tenant_id', (int) $dues->tenant_id)
+            ->update([
+                'generated_email_sent_at' => $sent ? now() : null,
+                'generated_email_failed_at' => $sent ? null : now(),
+                'updated_at' => now(),
+            ]);
+
+        return $sent;
+    }
+
+    private function markPaidEmailAttempt(object $dues, ?string $receiptUrl): bool
+    {
+        $sent = $this->sendDuesPaidEmail(
+            (int) $dues->user_id,
+            (int) $dues->organization_id,
+            (int) $dues->membership_year,
+            (int) $dues->amount_cents,
+            (string) $dues->currency,
+            $receiptUrl
+        );
+
+        DB::table('verein_member_dues')
+            ->where('id', (int) $dues->id)
+            ->where('tenant_id', (int) $dues->tenant_id)
+            ->update([
+                'paid_email_sent_at' => $sent ? now() : null,
+                'paid_email_failed_at' => $sent ? null : now(),
+                'updated_at' => now(),
+            ]);
+
+        return $sent;
+    }
+
+    private function sendDuesGeneratedEmail(int $userId, int $organizationId, int $year, int $amountCents, string $currency): bool
+    {
+        return $this->sendEmail(
             $userId,
             $organizationId,
             'emails.verein_dues.generated_subject',
@@ -637,9 +707,9 @@ class VereinDuesService
         );
     }
 
-    private function sendDuesPaidEmail(int $userId, int $organizationId, int $year, int $amountCents, string $currency, ?string $receiptUrl): void
+    private function sendDuesPaidEmail(int $userId, int $organizationId, int $year, int $amountCents, string $currency, ?string $receiptUrl): bool
     {
-        $this->sendEmail(
+        return $this->sendEmail(
             $userId,
             $organizationId,
             'emails.verein_dues.paid_subject',

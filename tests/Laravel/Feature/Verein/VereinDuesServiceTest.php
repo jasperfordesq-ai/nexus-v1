@@ -248,6 +248,47 @@ class VereinDuesServiceTest extends TestCase
         $this->assertSame(1, $payCount);
     }
 
+    public function test_mark_paid_records_failed_email_and_idempotent_replay_repairs_it(): void
+    {
+        app()->instance(EmailDispatchService::class, new class extends EmailDispatchService {
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                return false;
+            }
+        });
+
+        $user = $this->makeUser();
+        $this->joinOrg($user);
+        $this->configureFee(6000);
+        $year = (int) date('Y');
+        $this->service->generateAnnualDues($this->organizationId, $year);
+        $duesId = (int) DB::table('verein_member_dues')->where('organization_id', $this->organizationId)->value('id');
+
+        $piId = 'pi_repair_' . uniqid('', true);
+        $first = $this->service->markPaid($duesId, $piId, 'card', null);
+
+        $this->assertFalse($first['idempotent']);
+        $failed = DB::table('verein_member_dues')->where('id', $duesId)->first();
+        $this->assertSame('paid', $failed->status);
+        $this->assertNull($failed->paid_email_sent_at);
+        $this->assertNotNull($failed->paid_email_failed_at);
+
+        app()->instance(EmailDispatchService::class, new class extends EmailDispatchService {
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                return true;
+            }
+        });
+
+        $second = $this->service->markPaid($duesId, $piId, 'card', null);
+
+        $this->assertTrue($second['idempotent']);
+        $repaired = DB::table('verein_member_dues')->where('id', $duesId)->first();
+        $this->assertNotNull($repaired->paid_email_sent_at);
+        $this->assertNull($repaired->paid_email_failed_at);
+        $this->assertSame(1, DB::table('verein_dues_payments')->where('stripe_payment_intent_id', $piId)->count());
+    }
+
     public function test_get_membership_status_returns_year_history(): void
     {
         $user = $this->makeUser(); $this->joinOrg($user);

@@ -317,4 +317,35 @@ class EmailTriggerAuditServiceTest extends TestCase
 
         $this->assertContains('marketplace_report_notifications_failed_recently', $codes);
     }
+
+    public function test_run_detects_verein_dues_without_email_evidence(): void
+    {
+        if (!Schema::hasTable('verein_member_dues') || !Schema::hasColumn('verein_member_dues', 'generated_email_sent_at')) {
+            $this->markTestSkipped('Verein dues email evidence columns are not available.');
+        }
+
+        DB::table('verein_member_dues')->insert([
+            'organization_id' => 987654,
+            'tenant_id' => 2,
+            'user_id' => 123456,
+            'membership_year' => (int) date('Y'),
+            'amount_cents' => 5000,
+            'currency' => 'CHF',
+            'status' => 'paid',
+            'due_date' => now()->toDateString(),
+            'paid_at' => now()->subMinute(),
+            'stripe_payment_intent_id' => 'pi_audit_' . uniqid('', true),
+            'reminder_count' => 0,
+            'generated_email_sent_at' => null,
+            'paid_email_sent_at' => null,
+            'created_at' => now()->subMinutes(2),
+            'updated_at' => now()->subMinute(),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('verein_dues_generated_without_email_evidence', $codes);
+        $this->assertContains('verein_dues_paid_without_email_evidence', $codes);
+    }
 }
