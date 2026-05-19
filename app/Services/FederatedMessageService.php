@@ -79,7 +79,7 @@ class FederatedMessageService
                 return ['success' => false, 'error' => 'No active federation partnership between tenants'];
             }
 
-            $messageId = self::insertExternalMessage([
+            $messageInsert = self::insertExternalMessage([
                 'sender_user_id'    => $senderId,
                 'sender_tenant_id'  => $sender->tenant_id,
                 'receiver_user_id'  => $receiverId,
@@ -91,7 +91,7 @@ class FederatedMessageService
                 'created_at'        => now(),
             ]);
 
-            return ['success' => true, 'message_id' => $messageId];
+            return ['success' => true, 'message_id' => $messageInsert['id']];
         } catch (\Throwable $e) {
             Log::warning('Failed to send federated message', ['error' => $e->getMessage()]);
             return ['success' => false, 'error' => $e->getMessage()];
@@ -208,7 +208,7 @@ class FederatedMessageService
                 }
             }
 
-            $messageId = self::insertExternalMessage([
+            $messageInsert = self::insertExternalMessage([
                 'sender_user_id'         => $externalSenderId,
                 'sender_tenant_id'       => 0, // External origin — not a real tenant ID
                 'receiver_user_id'       => $receiverUserId,
@@ -222,6 +222,10 @@ class FederatedMessageService
                 'status'                 => 'pending',
                 'created_at'             => now(),
             ]);
+
+            if (!$messageInsert['created']) {
+                return ['success' => true, 'message_id' => $messageInsert['id'], 'duplicate' => true];
+            }
 
             try {
                 // Render the bell in the RECIPIENT's preferred language.
@@ -260,7 +264,7 @@ class FederatedMessageService
                 ]);
             }
 
-            return ['success' => true, 'message_id' => $messageId];
+            return ['success' => true, 'message_id' => $messageInsert['id']];
         } catch (\Throwable $e) {
             Log::warning('Failed to store external message', ['error' => $e->getMessage()]);
             return ['success' => false, 'error' => $e->getMessage()];
@@ -272,17 +276,21 @@ class FederatedMessageService
      * external partner messages with a stable external_message_id.
      *
      * @param array<string, mixed> $payload
+     * @return array{id:int, created:bool}
      */
-    private static function insertExternalMessage(array $payload): int
+    private static function insertExternalMessage(array $payload): array
     {
         $externalMessageId = $payload['external_message_id'] ?? null;
         $externalPartnerId = $payload['external_partner_id'] ?? null;
 
         if (!$externalMessageId || !$externalPartnerId) {
-            return (int) DB::table('federation_messages')->insertGetId($payload);
+            return [
+                'id' => (int) DB::table('federation_messages')->insertGetId($payload),
+                'created' => true,
+            ];
         }
 
-        DB::table('federation_messages')->insertOrIgnore($payload);
+        $created = DB::table('federation_messages')->insertOrIgnore($payload) > 0;
 
         $existing = DB::table('federation_messages')
             ->where('external_partner_id', $externalPartnerId)
@@ -290,6 +298,9 @@ class FederatedMessageService
             ->where('receiver_tenant_id', $payload['receiver_tenant_id'])
             ->first(['id']);
 
-        return (int) ($existing->id ?? 0);
+        return [
+            'id' => (int) ($existing->id ?? 0),
+            'created' => $created,
+        ];
     }
 }

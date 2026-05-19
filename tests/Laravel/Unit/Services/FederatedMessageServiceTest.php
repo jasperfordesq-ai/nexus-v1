@@ -91,4 +91,19 @@ class FederatedMessageServiceTest extends TestCase
         $this->assertTrue($result['success']);
         $this->assertEquals(10, $result['message_id']);
     }
+
+    public function test_duplicate_external_message_returns_before_notification_and_email(): void
+    {
+        $source = file_get_contents(app_path('Services/FederatedMessageService.php'));
+
+        $duplicateReturn = strpos($source, "if (!\$messageInsert['created'])");
+        $bellDispatch = strpos($source, 'Notification::createNotification');
+        $emailDispatch = strpos($source, 'FederationEmailService::sendExternalMessageNotification');
+
+        $this->assertNotFalse($duplicateReturn);
+        $this->assertNotFalse($bellDispatch);
+        $this->assertNotFalse($emailDispatch);
+        $this->assertLessThan($bellDispatch, $duplicateReturn);
+        $this->assertLessThan($emailDispatch, $duplicateReturn);
+    }
 }
