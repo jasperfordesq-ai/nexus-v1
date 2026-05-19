@@ -213,4 +213,4 @@ EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost/health.php || exit 1
 
-CMD ["sh", "-c", "php artisan optimize || { echo '[FATAL] artisan optimize failed'; exit 1; }; php artisan horizon:publish 2>/dev/null || true && apache2-foreground"]
+CMD ["sh", "-c", "umask 0002; chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true; chmod -R ug+rwX /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true; find /var/www/html/storage -type d -exec chmod g+s {} + 2>/dev/null || true; php artisan optimize || { echo '[FATAL] artisan optimize failed'; exit 1; }; php artisan horizon:publish 2>/dev/null || true; chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true; chmod -R ug+rwX /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true; exec apache2-foreground"]

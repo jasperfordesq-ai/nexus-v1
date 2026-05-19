@@ -259,9 +259,11 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 # re-mounts that reset ownership) then start Apache.
 # =============================================================================
 CMD ["sh", "-c", "\
+    umask 0002; \
     mkdir -p /var/www/html/storage/logs /var/www/html/storage/framework/cache /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/storage/app/public /var/www/html/bootstrap/cache; \
     chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache; \
-    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache; \
+    chmod -R ug+rwX /var/www/html/storage /var/www/html/bootstrap/cache; \
+    find /var/www/html/storage -type d -exec chmod g+s {} + 2>/dev/null || true; \
     chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/public/uploads 2>/dev/null; \
     chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/public/uploads 2>/dev/null; \
     if [ -f /var/www/html/artisan ]; then \
@@ -269,4 +271,6 @@ CMD ["sh", "-c", "\
         php /var/www/html/artisan horizon:publish 2>/dev/null || true; \
         ln -sf /var/www/html/storage/app/public /var/www/html/httpdocs/storage 2>/dev/null || true; \
     fi; \
-    apache2-foreground"]
+    chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true; \
+    chmod -R ug+rwX /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true; \
+    exec apache2-foreground"]
