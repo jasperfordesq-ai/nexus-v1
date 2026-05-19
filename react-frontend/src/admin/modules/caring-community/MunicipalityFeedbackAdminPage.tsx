@@ -488,13 +488,15 @@ export default function MunicipalityFeedbackAdminPage() {
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <button
-                        type="button"
-                        className="text-left text-sm font-medium text-primary hover:underline"
-                        onClick={() => openDetail(row)}
+                      <Button
+                        size="sm"
+                        variant="light"
+                        color="primary"
+                        className="h-auto min-h-0 justify-start px-0 text-left font-medium"
+                        onPress={() => openDetail(row)}
                       >
                         {row.subject}
-                      </button>
+                      </Button>
                     </TableCell>
                     <TableCell className="text-xs text-default-500">
                       <span className={row.is_anonymous ? 'italic' : undefined}>{submitterLabel(row)}</span>

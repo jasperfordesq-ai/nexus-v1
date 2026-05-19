@@ -236,11 +236,15 @@ function LivePreview({ items }: { items: MenuItemData[] }) {
               if (item.type === 'dropdown' || children.length > 0) {
                 return (
                   <div key={item.id} className="relative group/preview">
-                    <button className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium text-default-600 hover:bg-default-100 transition-colors">
+                    <Button
+                      size="sm"
+                      variant="light"
+                      className="h-8 min-w-0 gap-1.5 px-3 text-xs font-medium text-default-600"
+                    >
                       <DynamicIcon name={item.icon} className="w-3.5 h-3.5 shrink-0" />
                       <span>{item.label}</span>
                       <ChevronDown size={11} />
-                    </button>
+                    </Button>
                     {children.length > 0 && (
                       <div className="hidden group-hover/preview:block absolute top-full left-0 z-20 bg-white dark:bg-default-800 border border-default-200 rounded-lg shadow-lg p-1 min-w-[150px]">
                         {children.map((child) => (
