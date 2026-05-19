@@ -25,6 +25,7 @@ import Key from 'lucide-react/icons/key';
 import Cpu from 'lucide-react/icons/cpu';
 import Sliders from 'lucide-react/icons/sliders-vertical';
 import Shield from 'lucide-react/icons/shield';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
@@ -87,11 +88,11 @@ interface FormState {
 // Constants
 // ---------------------------------------------------------------------------
 
-const PROVIDERS: { key: ProviderId; label: string; keyField: keyof FormState; modelField: keyof FormState }[] = [
-  { key: 'openai', label: 'OpenAI', keyField: 'openai_api_key', modelField: 'openai_model' },
-  { key: 'anthropic', label: 'Anthropic (Claude)', keyField: 'anthropic_api_key', modelField: 'claude_model' },
-  { key: 'gemini', label: 'Google Gemini', keyField: 'gemini_api_key', modelField: 'gemini_model' },
-  { key: 'ollama', label: 'Ollama (Self-Hosted)', keyField: 'ollama_host' as keyof FormState, modelField: 'ollama_model' },
+const PROVIDERS: { key: ProviderId; labelKey: string; keyField: keyof FormState; modelField: keyof FormState }[] = [
+  { key: 'openai', labelKey: 'provider_openai', keyField: 'openai_api_key', modelField: 'openai_model' },
+  { key: 'anthropic', labelKey: 'provider_anthropic', keyField: 'anthropic_api_key', modelField: 'claude_model' },
+  { key: 'gemini', labelKey: 'provider_gemini', keyField: 'gemini_api_key', modelField: 'gemini_model' },
+  { key: 'ollama', labelKey: 'provider_ollama', keyField: 'ollama_host' as keyof FormState, modelField: 'ollama_model' },
 ];
 
 const MODEL_SUGGESTIONS: Record<ProviderId, string[]> = {
@@ -101,12 +102,12 @@ const MODEL_SUGGESTIONS: Record<ProviderId, string[]> = {
   ollama: ['llama2', 'llama3', 'mistral', 'codellama'],
 };
 
-const FEATURE_TOGGLES: { key: keyof FormState; label: string; desc: string }[] = [
-  { key: 'ai_chat_enabled', label: 'AI Chat Assistant', desc: 'In-platform AI chat for members' },
-  { key: 'ai_content_gen_enabled', label: 'Content Generation', desc: 'AI-assisted drafting of posts, listings, and messages' },
-  { key: 'ai_recommendations_enabled', label: 'AI Recommendations', desc: 'Personalized listing, member, and content recommendations' },
-  { key: 'ai_analytics_enabled', label: 'AI Analytics', desc: 'AI-generated insights from community activity' },
-  { key: 'ai_moderation_enabled', label: 'AI Moderation', desc: 'Automated content moderation and toxicity detection' },
+const FEATURE_TOGGLES: { key: keyof FormState; labelKey: string; descKey: string }[] = [
+  { key: 'ai_chat_enabled', labelKey: 'feature_ai_chat', descKey: 'feature_ai_chat_desc' },
+  { key: 'ai_content_gen_enabled', labelKey: 'feature_content_generation', descKey: 'feature_content_generation_desc' },
+  { key: 'ai_recommendations_enabled', labelKey: 'feature_ai_recommendations', descKey: 'feature_ai_recommendations_desc' },
+  { key: 'ai_analytics_enabled', labelKey: 'feature_ai_analytics', descKey: 'feature_ai_analytics_desc' },
+  { key: 'ai_moderation_enabled', labelKey: 'feature_ai_moderation', descKey: 'feature_ai_moderation_desc' },
 ];
 
 const DEFAULT_FORM: FormState = {
@@ -134,7 +135,9 @@ const DEFAULT_FORM: FormState = {
 // ---------------------------------------------------------------------------
 
 export function AiSettings() {
-  usePageTitle("Advanced");
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced' });
+  const { t: tNav } = useTranslation('admin_nav');
+  usePageTitle(tNav('advanced'));
   const toast = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -190,9 +193,9 @@ export function AiSettings() {
           );
         }
       })
-      .catch(() => toast.error("Failed to load AI settings"))
+      .catch(() => toast.error(t('failed_to_load_a_i_settings')))
       .finally(() => setLoading(false));
-  }, [toast, mapResponseToForm]);
+  }, [t, toast, mapResponseToForm]);
 
   const updateField = (key: keyof FormState, value: unknown) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -243,7 +246,7 @@ export function AiSettings() {
       const res = await adminSettings.updateAiConfig(payload);
 
       if (res.success) {
-        toast.success("AI Settings Saved Successfully");
+        toast.success(t('a_i_settings_saved_successfully'));
         // Refresh to get updated masked keys & key-set status
         const refreshed = await adminSettings.getAiConfig();
         if (refreshed.data) {
@@ -258,11 +261,11 @@ export function AiSettings() {
           setDirtyKeys(new Set());
         }
       } else {
-        const error = (res as { error?: string }).error || "Save failed";
+        const error = (res as { error?: string }).error || t('save_failed');
         toast.error(error);
       }
-    } catch (err) {
-      toast.error("Failed to save AI settings");
+    } catch {
+      toast.error(t('failed_to_save_a_i_settings'));
     } finally {
       setSaving(false);
     }
@@ -279,41 +282,42 @@ export function AiSettings() {
 
   return (
     <div>
-      <PageHeader title={"AI Settings"} description={"Configure AI provider, API key, and features for your platform"} />
+      <PageHeader title={t('ai_settings_title')} description={t('ai_settings_desc')} />
 
       <div className="space-y-4">
         {/* Master Enable + Provider Selection */}
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Bot size={20} /> {"AI Integration"}
+              <Bot size={20} /> {t('ai_integration_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">{"Enable AI Features"}</p>
-                <p className="text-sm text-default-500">{"Enable or disable AI-powered features across the platform"}</p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <p className="font-medium">{t('enable_ai_features')}</p>
+                <p className="text-sm text-default-500">{t('enable_ai_features_desc')}</p>
               </div>
               <Switch
+                className="shrink-0"
                 isSelected={form.ai_enabled}
                 onValueChange={(v) => updateField('ai_enabled', v)}
-                aria-label={"Enable AI"}
+                aria-label={t('label_enable_a_i')}
               />
             </div>
 
             <Select
-              label={"AI Provider"}
+              label={t('label_a_i_provider')}
               selectedKeys={[form.ai_provider]}
               onSelectionChange={(keys) => {
                 const v = Array.from(keys)[0];
                 if (v) updateField('ai_provider', String(v));
               }}
               variant="bordered"
-              description={"Select AI Provider."}
+              description={t('desc_select_ai_provider')}
             >
               {PROVIDERS.map(p => (
-                <SelectItem key={p.key}>{p.label}</SelectItem>
+                <SelectItem key={p.key}>{t(p.labelKey)}</SelectItem>
               ))}
             </Select>
           </CardBody>
@@ -323,7 +327,7 @@ export function AiSettings() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Key size={20} /> {"Provider Configuration"}
+              <Key size={20} /> {t('provider_configuration_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-6">
@@ -336,49 +340,49 @@ export function AiSettings() {
               const userTyped = dirtyKeys.has(apiKeyField) && (form[apiKeyField] as string).trim() !== '';
 
               return (
-                <div key={provider.key} className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium">{provider.label}</p>
-                    {isActive && <Chip size="sm" color="primary" variant="flat">{"Active"}</Chip>}
+                <div key={provider.key} className={`space-y-3 ${isActive ? '' : 'opacity-75'}`}>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium">{t(provider.labelKey)}</p>
+                    {isActive && <Chip size="sm" color="primary" variant="flat">{t('chip_active')}</Chip>}
                     {!isOllama && hasKeySet && !userTyped && (
-                      <Chip size="sm" color="success" variant="flat">{"Key Configured"}</Chip>
+                      <Chip size="sm" color="success" variant="flat">{t('chip_key_configured')}</Chip>
                     )}
                   </div>
 
                   {!isOllama ? (
                     <Input
-                      label={"API Key"}
+                      label={t('label_a_p_i_key')}
                       type="password"
-                      placeholder={hasKeySet ? `${"Enter current..."}: ${masked}` : "Enter API key..."}
+                      placeholder={hasKeySet ? t('placeholder_current_key', { masked }) : t('placeholder_enter_api_key')}
                       variant="bordered"
                       description={
                         hasKeySet
-                          ? "API Key Replace."
-                          : "API Key New."
+                          ? t('desc_api_key_replace')
+                          : t('desc_api_key_new')
                       }
                       value={form[apiKeyField] as string}
                       onValueChange={(v) => updateApiKey(apiKeyField, v)}
                     />
                   ) : (
                     <Input
-                      label={"Ollama Host URL"}
+                      label={t('label_ollama_host_url')}
                       placeholder="http://localhost:11434"
                       variant="bordered"
-                      description={"Ollama Host."}
+                      description={t('desc_ollama_host')}
                       value={form.ollama_host}
                       onValueChange={(v) => updateField('ollama_host', v)}
                     />
                   )}
 
                   <Select
-                    label={"Model"}
+                    label={t('label_model')}
                     selectedKeys={[form[provider.modelField] as string]}
                     onSelectionChange={(keys) => {
                       const v = Array.from(keys)[0];
                       if (v) updateField(provider.modelField, String(v));
                     }}
                     variant="bordered"
-                    description={"Select Model."}
+                    description={t('desc_select_model')}
                   >
                     {MODEL_SUGGESTIONS[provider.key].map(m => (
                       <SelectItem key={m}>{m}</SelectItem>
@@ -396,21 +400,22 @@ export function AiSettings() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Cpu size={20} /> {"AI Features"}
+              <Cpu size={20} /> {t('ai_features_heading')}
             </h3>
           </CardHeader>
           <CardBody className="space-y-3">
             {FEATURE_TOGGLES.map(feat => (
-              <div key={feat.key} className="flex items-center justify-between py-1">
-                <div>
-                  <p className="text-sm font-medium">{feat.label}</p>
-                  <p className="text-xs text-default-400">{feat.desc}</p>
+              <div key={feat.key} className="flex flex-col gap-3 py-1 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">{t(feat.labelKey)}</p>
+                  <p className="text-xs text-default-400">{t(feat.descKey)}</p>
                 </div>
                 <Switch
+                  className="shrink-0"
                   size="sm"
                   isSelected={!!form[feat.key]}
                   onValueChange={(v) => updateField(feat.key, v)}
-                  aria-label={feat.label}
+                  aria-label={t(feat.labelKey)}
                 />
               </div>
             ))}
@@ -418,28 +423,28 @@ export function AiSettings() {
         </Card>
 
         {/* Usage Limits */}
-        <Card shadow="sm">
+        <Card shadow="sm" className="border border-warning-200/60 bg-warning-50/70 dark:border-warning-900/40 dark:bg-warning-950/20">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Sliders size={20} /> {"Usage Limits"}
+              <Sliders size={20} /> {t('usage_limits_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={"Default Daily Limit"}
+              label={t('label_default_daily_limit')}
               type="number"
               placeholder="50"
               variant="bordered"
-              description={"Default Daily Limit."}
+              description={t('desc_default_daily_limit')}
               value={form.default_daily_limit}
               onValueChange={(v) => updateField('default_daily_limit', v)}
             />
             <Input
-              label={"Default Monthly Limit"}
+              label={t('label_default_monthly_limit')}
               type="number"
               placeholder="1000"
               variant="bordered"
-              description={"Default Monthly Limit."}
+              description={t('desc_default_monthly_limit')}
               value={form.default_monthly_limit}
               onValueChange={(v) => updateField('default_monthly_limit', v)}
             />
@@ -452,9 +457,9 @@ export function AiSettings() {
             <div className="flex items-start gap-3">
               <Shield size={20} className="text-default-400 mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm font-medium">{"Security"}</p>
+                <p className="text-sm font-medium">{t('security_heading')}</p>
                 <p className="text-xs text-default-400">
-                  {"Security"}
+                  {t('security_note')}
                 </p>
               </div>
             </div>
@@ -470,7 +475,7 @@ export function AiSettings() {
             isLoading={saving}
             isDisabled={saving}
           >
-            {"Save Settings"}
+            {t('save_settings')}
           </Button>
         </div>
       </div>

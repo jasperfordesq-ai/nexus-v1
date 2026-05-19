@@ -23,6 +23,7 @@ import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Search from 'lucide-react/icons/search';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
@@ -36,8 +37,8 @@ interface AlgorithmWeights {
 
 interface AlgorithmArea {
   area: string;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   enabled: boolean;
   weights: AlgorithmWeights;
   params: SliderParam[];
@@ -45,8 +46,8 @@ interface AlgorithmArea {
 
 interface SliderParam {
   key: string;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   min: number;
   max: number;
   step: number;
@@ -78,51 +79,51 @@ interface HealthStatus {
 const ALGORITHM_AREAS: Omit<AlgorithmArea, 'enabled' | 'weights'>[] = [
   {
     area: 'feed',
-    label: 'Feed Ranking (EdgeRank)',
-    description: 'How posts are ranked in the activity feed',
+    labelKey: 'area_feed_ranking',
+    descriptionKey: 'area_feed_ranking_desc',
     params: [
-      { key: 'affinity_weight',     label: 'Affinity Weight',      description: 'How strongly user-to-author relationships influence ranking',         min: 0, max: 1,    step: 0.05 },
-      { key: 'content_type_weight', label: 'Content Type Weight',  description: 'How strongly the type of content (post, photo, video) is weighted',  min: 0, max: 1,    step: 0.05 },
-      { key: 'time_decay_weight',   label: 'Time Decay Weight',    description: 'How strongly post age reduces ranking',                               min: 0, max: 1,    step: 0.05 },
-      { key: 'engagement_weight',   label: 'Engagement Weight',    description: 'How strongly likes, comments, and shares boost ranking',              min: 0, max: 1,    step: 0.05 },
-      { key: 'freshness_minimum',   label: 'Freshness Floor',      description: 'Minimum freshness score regardless of age (prevents 0 scores)',       min: 0, max: 0.5,  step: 0.05 },
-      { key: 'half_life_hours',     label: 'Half-Life (hours)',    description: 'Hours after which a post drops to half its initial freshness score', min: 1, max: 168,  step: 1    },
+      { key: 'affinity_weight',     labelKey: 'param_affinity_weight',      descriptionKey: 'param_affinity_weight_desc',      min: 0, max: 1,    step: 0.05 },
+      { key: 'content_type_weight', labelKey: 'param_content_type_weight',  descriptionKey: 'param_content_type_weight_desc',  min: 0, max: 1,    step: 0.05 },
+      { key: 'time_decay_weight',   labelKey: 'param_time_decay_weight',    descriptionKey: 'param_time_decay_weight_desc',    min: 0, max: 1,    step: 0.05 },
+      { key: 'engagement_weight',   labelKey: 'param_engagement_weight',    descriptionKey: 'param_engagement_weight_desc',    min: 0, max: 1,    step: 0.05 },
+      { key: 'freshness_minimum',   labelKey: 'param_freshness_minimum',    descriptionKey: 'param_freshness_minimum_desc',    min: 0, max: 0.5,  step: 0.05 },
+      { key: 'half_life_hours',     labelKey: 'param_half_life_hours',      descriptionKey: 'param_half_life_hours_desc',      min: 1, max: 168,  step: 1    },
     ],
   },
   {
     area: 'listings',
-    label: 'Listings Ranking (MatchRank)',
-    description: 'How listings are scored and ranked for each user',
+    labelKey: 'area_listings_ranking',
+    descriptionKey: 'area_listings_ranking_desc',
     params: [
-      { key: 'skill_match_weight',  label: 'Skill Match Weight',   description: 'How strongly listing-to-user skill overlap influences ranking',       min: 0, max: 1, step: 0.05 },
-      { key: 'location_weight',     label: 'Location Weight',      description: 'How strongly geographic proximity influences ranking',                min: 0, max: 1, step: 0.05 },
-      { key: 'quality_weight',      label: 'Quality Weight',       description: 'How strongly listing completeness and quality signals are weighted',  min: 0, max: 1, step: 0.05 },
-      { key: 'freshness_weight',    label: 'Freshness Weight',     description: 'How strongly newer listings are favored',                             min: 0, max: 1, step: 0.05 },
-      { key: 'engagement_weight',   label: 'Engagement Weight',    description: 'How strongly listing views, saves, and inquiries boost ranking',      min: 0, max: 1, step: 0.05 },
-      { key: 'reputation_weight',   label: 'Reputation Weight',    description: 'How strongly the lister\'s reputation influences ranking',            min: 0, max: 1, step: 0.05 },
+      { key: 'skill_match_weight',  labelKey: 'param_skill_match_weight',   descriptionKey: 'param_skill_match_weight_desc',   min: 0, max: 1, step: 0.05 },
+      { key: 'location_weight',     labelKey: 'param_location_weight',      descriptionKey: 'param_location_weight_desc',      min: 0, max: 1, step: 0.05 },
+      { key: 'quality_weight',      labelKey: 'param_quality_weight',       descriptionKey: 'param_quality_weight_desc',       min: 0, max: 1, step: 0.05 },
+      { key: 'freshness_weight',    labelKey: 'param_freshness_weight',     descriptionKey: 'param_freshness_weight_desc',     min: 0, max: 1, step: 0.05 },
+      { key: 'engagement_weight',   labelKey: 'param_listing_engagement_weight', descriptionKey: 'param_listing_engagement_weight_desc', min: 0, max: 1, step: 0.05 },
+      { key: 'reputation_weight',   labelKey: 'param_reputation_weight',    descriptionKey: 'param_reputation_weight_desc',    min: 0, max: 1, step: 0.05 },
     ],
   },
   {
     area: 'members',
-    label: 'Member Ranking (CommunityRank)',
-    description: 'How members are scored and ranked in directories and recommendations',
+    labelKey: 'area_member_ranking',
+    descriptionKey: 'area_member_ranking_desc',
     params: [
-      { key: 'reputation_weight',   label: 'Reputation Weight',    description: 'How strongly member ratings and reviews are weighted',                min: 0, max: 1, step: 0.05 },
-      { key: 'contribution_weight', label: 'Contribution Weight',  description: 'How strongly the member\'s contribution history is weighted',         min: 0, max: 1, step: 0.05 },
-      { key: 'activity_weight',     label: 'Activity Weight',      description: 'How strongly recent activity boosts ranking',                         min: 0, max: 1, step: 0.05 },
-      { key: 'connectivity_weight', label: 'Connection Weight',    description: 'How strongly accepted member connections should influence CommunityRank', min: 0, max: 1, step: 0.05 },
-      { key: 'proximity_weight',    label: 'Proximity Weight',     description: 'How strongly geographic proximity influences ranking',                min: 0, max: 1, step: 0.05 },
+      { key: 'reputation_weight',   labelKey: 'param_member_reputation_weight',    descriptionKey: 'param_member_reputation_weight_desc',    min: 0, max: 1, step: 0.05 },
+      { key: 'contribution_weight', labelKey: 'param_contribution_weight',         descriptionKey: 'param_contribution_weight_desc',         min: 0, max: 1, step: 0.05 },
+      { key: 'activity_weight',     labelKey: 'param_activity_weight',             descriptionKey: 'param_activity_weight_desc',             min: 0, max: 1, step: 0.05 },
+      { key: 'connectivity_weight', labelKey: 'param_connectivity_weight',         descriptionKey: 'param_connectivity_weight_desc',         min: 0, max: 1, step: 0.05 },
+      { key: 'proximity_weight',    labelKey: 'param_proximity_weight',            descriptionKey: 'param_proximity_weight_desc',            min: 0, max: 1, step: 0.05 },
     ],
   },
   {
     area: 'matching',
-    label: 'Smart Matching',
-    description: 'How users are matched to listings for personalized recommendations',
+    labelKey: 'area_smart_matching',
+    descriptionKey: 'area_smart_matching_desc',
     params: [
-      { key: 'skill_weight',        label: 'Skill Weight',         description: 'How strongly skill overlap influences match scores',                  min: 0, max: 1, step: 0.05 },
-      { key: 'location_weight',     label: 'Location Weight',      description: 'How strongly geographic proximity influences match scores',           min: 0, max: 1, step: 0.05 },
-      { key: 'rating_weight',       label: 'Rating Weight',        description: 'How strongly past ratings between users influence match scores',      min: 0, max: 1, step: 0.05 },
-      { key: 'availability_weight', label: 'Availability Weight',  description: 'How strongly overlapping availability influences match scores',       min: 0, max: 1, step: 0.05 },
+      { key: 'skill_weight',        labelKey: 'param_skill_weight',        descriptionKey: 'param_skill_weight_desc',        min: 0, max: 1, step: 0.05 },
+      { key: 'location_weight',     labelKey: 'param_match_location_weight', descriptionKey: 'param_match_location_weight_desc', min: 0, max: 1, step: 0.05 },
+      { key: 'rating_weight',       labelKey: 'param_rating_weight',       descriptionKey: 'param_rating_weight_desc',       min: 0, max: 1, step: 0.05 },
+      { key: 'availability_weight', labelKey: 'param_availability_weight', descriptionKey: 'param_availability_weight_desc', min: 0, max: 1, step: 0.05 },
     ],
   },
 ];
@@ -130,7 +131,9 @@ const ALGORITHM_AREAS: Omit<AlgorithmArea, 'enabled' | 'weights'>[] = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function AlgorithmSettings() {
-  usePageTitle("Advanced");
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced' });
+  const { t: tNav } = useTranslation('admin_nav');
+  usePageTitle(tNav('advanced'));
   const toast = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -160,7 +163,7 @@ export function AlgorithmSettings() {
         };
       }));
     } catch {
-      toast.error("Failed to load algorithm settings");
+      toast.error(t('failed_to_load_algorithm_settings'));
       // Initialise with defaults
       setAreas(ALGORITHM_AREAS.map(def => ({
         ...def,
@@ -170,7 +173,7 @@ export function AlgorithmSettings() {
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   const loadHealth = useCallback(async () => {
@@ -232,12 +235,12 @@ export function AlgorithmSettings() {
       const payload = { enabled: areaData.enabled, ...areaData.weights };
       const res = await adminSettings.updateAlgorithmConfig(areaData.area, payload);
       if ((res as { success?: boolean }).success) {
-        toast.success(`Area settings saved`);
+        toast.success(t('area_settings_saved'));
       } else {
-        toast.error("Save failed");
+        toast.error(t('save_failed'));
       }
     } catch {
-      toast.error(`Failed to save area`);
+      toast.error(t('failed_to_save_area'));
     } finally {
       setSaving(null);
     }
@@ -254,8 +257,8 @@ export function AlgorithmSettings() {
   return (
     <div>
       <PageHeader
-        title={"Algorithm Settings"}
-        description={"Configure algorithm weights and parameters for content ranking"}
+        title={t('algorithm_settings_title')}
+        description={t('algorithm_settings_desc')}
       />
 
       <div className="space-y-6">
@@ -263,21 +266,21 @@ export function AlgorithmSettings() {
         {/* ── Algorithm Cards ── */}
         {areas.map(areaData => (
           <Card key={areaData.area} shadow="sm">
-            <CardHeader className="flex items-start justify-between gap-4">
+            <CardHeader className="flex flex-col items-start justify-between gap-4 sm:flex-row">
               <div className="flex items-center gap-3">
                 <Cpu size={20} className="text-primary shrink-0" />
                 <div>
-                  <h3 className="text-base font-semibold">{areaData.label}</h3>
-                  <p className="text-sm text-foreground-500">{areaData.description}</p>
+                  <h3 className="text-base font-semibold">{t(areaData.labelKey)}</h3>
+                  <p className="text-sm text-foreground-500">{t(areaData.descriptionKey)}</p>
                 </div>
               </div>
               <Switch
                 isSelected={areaData.enabled}
                 onValueChange={v => toggleEnabled(areaData.area, v)}
                 size="sm"
-                aria-label={`Enable ${areaData.label}`}
+                aria-label={t('enable_area', { area: t(areaData.labelKey) })}
               >
-                {areaData.enabled ? "Enabled" : "Disabled"}
+                {areaData.enabled ? t('enabled') : t('disabled')}
               </Switch>
             </CardHeader>
 
@@ -286,8 +289,13 @@ export function AlgorithmSettings() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                   {areaData.params.map(param => (
                     <div key={param.key}>
-                      <p className="text-sm font-medium mb-1">{param.label}</p>
-                      <p className="text-xs text-foreground-500 mb-2">{param.description}</p>
+                      <div className="mb-1 flex items-center justify-between gap-3">
+                        <p className="text-sm font-medium">{t(param.labelKey)}</p>
+                        <Chip size="sm" variant="flat">
+                          {(areaData.weights[param.key] ?? param.min).toFixed(param.step < 1 ? 2 : 0)}
+                        </Chip>
+                      </div>
+                      <p className="text-xs text-foreground-500 mb-2">{t(param.descriptionKey)}</p>
                       <Slider
                         minValue={param.min}
                         maxValue={param.max}
@@ -295,12 +303,9 @@ export function AlgorithmSettings() {
                         value={areaData.weights[param.key] ?? param.min}
                         onChange={v => updateWeight(areaData.area, param.key, v as number)}
                         className="max-w-sm"
-                        aria-label={param.label}
+                        aria-label={t(param.labelKey)}
                         showTooltip
                       />
-                      <span className="text-xs text-foreground-500 mt-1 block">
-                        {(areaData.weights[param.key] ?? param.min).toFixed(param.step < 1 ? 2 : 0)}
-                      </span>
                     </div>
                   ))}
                 </div>
@@ -316,7 +321,7 @@ export function AlgorithmSettings() {
                     isLoading={saving === areaData.area}
                     isDisabled={saving === areaData.area}
                   >
-                    {`Save Area`}
+                    {t('save_area')}
                   </Button>
                 </div>
               </CardBody>
@@ -325,7 +330,7 @@ export function AlgorithmSettings() {
             {!areaData.enabled && (
               <CardBody>
                 <p className="text-sm text-foreground-400 italic">
-                  {"The algorithm is currently disabled"}
+                  {t('algorithm_disabled_msg')}
                 </p>
                 <div className="flex justify-end mt-3">
                   <Button
@@ -336,7 +341,7 @@ export function AlgorithmSettings() {
                     isLoading={saving === areaData.area}
                     isDisabled={saving === areaData.area}
                   >
-                    {`Save Area`}
+                    {t('save_area')}
                   </Button>
                 </div>
               </CardBody>
@@ -350,9 +355,9 @@ export function AlgorithmSettings() {
             <div className="flex items-center gap-3">
               <Activity size={20} className="text-primary" />
               <div>
-                <h3 className="text-base font-semibold">{"Algorithm Health"}</h3>
+                <h3 className="text-base font-semibold">{t('algorithm_health_title')}</h3>
                 <p className="text-sm text-foreground-500">
-                  {"View health status of the recommendation and matching algorithms"}
+                  {t('algorithm_health_desc')}
                 </p>
               </div>
             </div>
@@ -363,7 +368,7 @@ export function AlgorithmSettings() {
               onPress={loadHealth}
               isDisabled={healthLoading}
             >
-              {"Refresh"}
+              {t('btn_refresh')}
             </Button>
           </CardHeader>
 
@@ -377,7 +382,7 @@ export function AlgorithmSettings() {
                 {/* FULLTEXT */}
                 <div>
                   <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                    <Database size={14} /> {"Fulltext Indexes"}
+                    <Database size={14} /> {t('fulltext_indexes_title')}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {([
@@ -398,7 +403,7 @@ export function AlgorithmSettings() {
                   </div>
                   {(!health.fulltext.listings || !health.fulltext.users || !health.fulltext.feed_activity) && (
                     <p className="text-xs text-warning mt-2">
-                      Run <code className="bg-default-100 px-1 rounded">php scripts/safe_migrate.php</code> to create missing indexes.
+                      {t('missing_indexes_hint_prefix')} <code className="bg-default-100 px-1 rounded">php scripts/safe_migrate.php</code> {t('missing_indexes_hint_suffix')}
                     </p>
                   )}
                 </div>
@@ -408,21 +413,21 @@ export function AlgorithmSettings() {
                 {/* Collaborative Filtering */}
                 <div>
                   <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                    <Settings size={14} /> {"Collaborative Filtering"}
+                    <Settings size={14} /> {t('collaborative_filtering_title')}
                   </p>
                   <div className="flex flex-wrap gap-3 text-sm">
                     <span>
                       <span className="font-medium">{health.collaborative_filtering.listing_interactions.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">{"Listing Saves"}</span>
+                      <span className="text-foreground-500 ml-1">{t('listing_saves')}</span>
                     </span>
                     <span>
                       <span className="font-medium">{health.collaborative_filtering.member_interactions.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">{"Member Transactions"}</span>
+                      <span className="text-foreground-500 ml-1">{t('member_transactions')}</span>
                     </span>
                   </div>
                   {health.collaborative_filtering.listing_interactions < 10 && (
                     <p className="text-xs text-foreground-400 mt-1">
-                      {"Minimum collaborative filtering similarity threshold"}
+                      {t('cf_min_hint')}
                     </p>
                   )}
                 </div>
@@ -432,28 +437,28 @@ export function AlgorithmSettings() {
                 {/* Embeddings */}
                 <div>
                   <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                    <Cpu size={14} /> {"Semantic Embeddings"}
+                    <Cpu size={14} /> {t('semantic_embeddings_title')}
                   </p>
                   <div className="flex flex-wrap gap-3 text-sm">
                     <span>
                       <span className="font-medium">{health.embeddings.listing_count.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">{"Listings"}</span>
+                      <span className="text-foreground-500 ml-1">{t('label_listings')}</span>
                     </span>
                     <span>
                       <span className="font-medium">{health.embeddings.user_count.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">{"Users"}</span>
+                      <span className="text-foreground-500 ml-1">{t('label_users')}</span>
                     </span>
                     <Chip
                       size="sm"
                       color={health.embeddings.total > 0 ? 'success' : 'default'}
                       variant="flat"
                     >
-                      {`Total`}
+                      {t('total_count')}
                     </Chip>
                   </div>
                   {health.embeddings.total === 0 && (
                     <p className="text-xs text-foreground-400 mt-2">
-                      Run <code className="bg-default-100 px-1 rounded">php scripts/backfill_embeddings.php --tenant=&lt;id&gt;</code> to generate embeddings.
+                      {t('generate_embeddings_hint_prefix')} <code className="bg-default-100 px-1 rounded">php scripts/backfill_embeddings.php --tenant=&lt;id&gt;</code> {t('generate_embeddings_hint_suffix')}
                     </p>
                   )}
                 </div>
@@ -463,7 +468,7 @@ export function AlgorithmSettings() {
                     <Divider />
                     <div>
                       <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                        <Search size={14} /> {"Search Engine"}
+                        <Search size={14} /> {t('search_engine_title')}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         <Chip
@@ -472,12 +477,12 @@ export function AlgorithmSettings() {
                           variant="flat"
                           startContent={health.search.meilisearch_available ? <CheckCircle size={12} /> : <XCircle size={12} />}
                         >
-                          {health.search.meilisearch_available ? "Meilisearch Online" : "Meilisearch Offline"}
+                          {health.search.meilisearch_available ? t('meilisearch_online') : t('meilisearch_offline')}
                         </Chip>
                       </div>
                       {!health.search.meilisearch_available && (
                         <p className="text-xs text-foreground-400 mt-2">
-                          Run <code className="bg-default-100 px-1 rounded">php scripts/sync_search_index.php --all-tenants</code> after Meilisearch starts.
+                          {t('sync_search_hint_prefix')} <code className="bg-default-100 px-1 rounded">php scripts/sync_search_index.php --all-tenants</code> {t('sync_search_hint_suffix')}
                         </p>
                       )}
                     </div>
@@ -487,7 +492,7 @@ export function AlgorithmSettings() {
             )}
 
             {!health && !healthLoading && (
-              <p className="text-sm text-foreground-400">{"Health data unavailable"}</p>
+              <p className="text-sm text-foreground-400">{t('health_unavailable')}</p>
             )}
           </CardBody>
         </Card>
