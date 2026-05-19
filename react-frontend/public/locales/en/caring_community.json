@@ -223,6 +223,7 @@
     "error": "Could not load your Warmth Pass"
   },
   "panel": {
+    "meta_title": "Caring Community Admin",
     "header": {
       "toggle_sidebar": "Toggle sidebar",
       "back_to_site": "Back to site",
@@ -582,6 +583,126 @@
         "resolve": "Failed to resolve",
         "close": "Failed to close",
         "export": "Failed to export"
+      }
+    },
+    "civic_digest": {
+      "meta_title": "Civic Digest Cadence",
+      "title": "Civic Digest Cadence",
+      "subtitle": "Configure the default delivery cadence for the personalised civic digest that members receive. The digest aggregates relevant community content - safety alerts, project updates, event notices, and announcements - into a single summary.",
+      "preview_member_view": "Preview member view",
+      "reset": "Reset",
+      "save": "Save cadence",
+      "member_override": "Members can override cadence and opt out of individual sources from their own digest preferences page.",
+      "about": {
+        "title": "About this page",
+        "body": "The Civic Digest replaces the need for members to check multiple pages by delivering a personalised summary of what's relevant to them. You set the tenant default here. Members can override the cadence, or opt out entirely, from their own settings. Changing the tenant default only affects members who have never customised their preference."
+      },
+      "cadence": {
+        "title": "Tenant default cadence",
+        "description": "Controls the default delivery cadence for new members. Existing members keep whatever they have already chosen.",
+        "current": "Current: {{cadence}}"
+      },
+      "options": {
+        "off": {
+          "label": "Off",
+          "description": "No digest is sent. Members see updates only when they visit the platform."
+        },
+        "daily": {
+          "label": "Daily",
+          "description": "A digest is sent each morning with the previous day's activity."
+        },
+        "monthly": {
+          "label": "Monthly",
+          "description": "A digest is sent on the first day of each month covering recent activity."
+        }
+      },
+      "includes": {
+        "title": "What the digest includes",
+        "description": "Items are ranked per member by sub-region match, interest match, freshness, and source weight. Source mix:",
+        "sources": {
+          "safety_alerts": "Safety alerts",
+          "project_updates": "Project updates",
+          "municipality_announcements": "Municipality announcements",
+          "events": "Events",
+          "vereine": "Vereine",
+          "care_providers": "Care providers",
+          "marketplace": "Marketplace",
+          "help_requests": "Help requests",
+          "feed_posts": "Feed posts"
+        }
+      },
+      "messages": {
+        "saved": "Digest cadence saved"
+      },
+      "errors": {
+        "load": "Failed to load digest cadence",
+        "save": "Failed to save cadence"
+      }
+    },
+    "recipient_circle": {
+      "meta_title": "Care Recipient Circle",
+      "title": "Care Recipient Circle",
+      "subtitle": "View the full support network around any member",
+      "recipient": "Recipient",
+      "loading": "Loading recipient circle...",
+      "member_since": "Member since {{date}}",
+      "member_id_value": "ID {{id}}",
+      "safeguarding_flags_one": "{{count}} safeguarding flag",
+      "safeguarding_flags_other": "{{count}} safeguarding flags",
+      "about": {
+        "title": "About this page",
+        "body": "A Care Recipient Circle is a private support group around an individual who receives care. This view shows their full support network: all helpers, total hours received, open help requests, and any safeguarding flags. Enter the member's user ID to look up their circle.",
+        "trust_tiers_label": "Trust tiers:",
+        "trust_tiers_body": "Newcomer, Member, Trusted, Verified, Coordinator - shown for the recipient and each supporter.",
+        "safeguarding_label": "Safeguarding flags:",
+        "safeguarding_body": "A non-zero flag count indicates active safeguarding concerns recorded against this member. Review them in the Safeguarding section.",
+        "privacy_label": "Privacy:",
+        "privacy_body": "Circle data is visible only to circle members and tenant administrators. It is not included in community-wide reports or the member directory."
+      },
+      "lookup": {
+        "member_id": "Member ID",
+        "placeholder": "Enter member user ID...",
+        "button": "View circle"
+      },
+      "stats": {
+        "total_hours": "Total Hours Received",
+        "active_supporters": "Active Supporters",
+        "open_help_requests": "Open Help Requests"
+      },
+      "tiers": {
+        "newcomer": "Newcomer",
+        "member": "Member",
+        "trusted": "Trusted",
+        "verified": "Verified",
+        "coordinator": "Coordinator",
+        "fallback": "Tier {{tier}}"
+      },
+      "relationship_types": {
+        "care": "Care",
+        "support": "Support",
+        "family": "Family",
+        "friend": "Friend",
+        "neighbour": "Neighbour",
+        "professional": "Professional"
+      },
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "ended": "Ended"
+      },
+      "relationships": {
+        "title": "Support Relationships",
+        "empty": "No active support relationships",
+        "aria": "Support relationships",
+        "supporter": "Supporter",
+        "trust_tier": "Trust Tier",
+        "type": "Type",
+        "hours_logged": "Hours Logged",
+        "last_activity": "Last Activity",
+        "status": "Status"
+      },
+      "errors": {
+        "load": "Failed to load recipient circle. Check the member ID and try again."
       }
     },
     "safeguarding_reports": {

@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   Button,
@@ -33,26 +34,22 @@ interface CadenceResponse {
   cadence: Cadence | 'weekly';
 }
 
-const OPTIONS: { value: Cadence; label: string; description: string }[] = [
-  {
-    value: 'off',
-    label: 'Off',
-    description: 'No digest is sent. Members see updates only when they visit the platform.',
-  },
-  {
-    value: 'daily',
-    label: 'Daily',
-    description: 'A digest is sent each morning with the previous day\'s activity.',
-  },
-  {
-    value: 'monthly',
-    label: 'Monthly',
-    description: 'A digest is sent on the first day of each month covering recent activity.',
-  },
-];
+const OPTIONS: Cadence[] = ['off', 'daily', 'monthly'];
+const DIGEST_SOURCES = [
+  'safety_alerts',
+  'project_updates',
+  'municipality_announcements',
+  'events',
+  'vereine',
+  'care_providers',
+  'marketplace',
+  'help_requests',
+  'feed_posts',
+] as const;
 
 export default function CivicDigestAdminPage() {
-  usePageTitle('Civic Digest Cadence');
+  const { t } = useTranslation('caring_community');
+  usePageTitle(t('admin.civic_digest.meta_title'));
   const { showToast } = useToast();
   const { tenantPath } = useTenant();
 
@@ -70,11 +67,11 @@ export default function CivicDigestAdminPage() {
       setCadence(next);
       setDraft(next);
     } catch {
-      showToast('Failed to load digest cadence', 'error');
+      showToast(t('admin.civic_digest.errors.load'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     load();
@@ -91,9 +88,9 @@ export default function CivicDigestAdminPage() {
       const next: Cadence = raw === 'weekly' ? 'monthly' : raw;
       setCadence(next);
       setDraft(next);
-      showToast('Digest cadence saved', 'success');
+      showToast(t('admin.civic_digest.messages.saved'), 'success');
     } catch (err) {
-      const msg = (err as { message?: string })?.message ?? 'Failed to save cadence';
+      const msg = (err as { message?: string })?.message ?? t('admin.civic_digest.errors.save');
       showToast(msg, 'error');
     } finally {
       setSaving(false);
@@ -105,8 +102,8 @@ export default function CivicDigestAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Civic Digest Cadence"
-        subtitle="Configure the default delivery cadence for the personalised civic digest that members receive. The digest aggregates relevant community content — safety alerts, project updates, event notices, and announcements — into a single summary."
+        title={t('admin.civic_digest.title')}
+        subtitle={t('admin.civic_digest.subtitle')}
         icon={<Newspaper size={20} />}
         actions={
           <div className="flex items-center gap-2">
@@ -117,16 +114,16 @@ export default function CivicDigestAdminPage() {
               variant="flat"
               endContent={<ExternalLink size={14} />}
             >
-              Preview member view
+              {t('admin.civic_digest.preview_member_view')}
             </Button>
-            <Tooltip content="Refresh">
+            <Tooltip content={t('admin.common.refresh')}>
               <Button
                 isIconOnly
                 size="sm"
                 variant="flat"
                 onPress={load}
                 isLoading={loading}
-                aria-label="Refresh"
+                aria-label={t('admin.common.refresh')}
               >
                 <RefreshCw size={15} />
               </Button>
@@ -135,15 +132,13 @@ export default function CivicDigestAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+      <Card className="border border-primary/30 bg-primary-50/70 shadow-sm shadow-primary/10 dark:bg-primary-900/20" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
-              <p className="text-default-600">
-                The Civic Digest replaces the need for members to check multiple pages by delivering a personalised summary of what's relevant to them. You set the tenant default here. Members can override the cadence (or opt out entirely) from their own settings. Changing the tenant default only affects members who have never customised their preference.
-              </p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('admin.civic_digest.about.title')}</p>
+              <p className="text-default-600">{t('admin.civic_digest.about.body')}</p>
             </div>
           </div>
         </CardBody>
@@ -157,30 +152,33 @@ export default function CivicDigestAdminPage() {
 
       {!loading && (
         <>
-          <Card className="border border-[var(--color-border)]">
+          <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
             <CardHeader className="pb-2">
               <div className="flex flex-wrap items-center justify-between gap-3 w-full">
                 <div>
-                  <p className="text-sm font-semibold">Tenant default cadence</p>
+                  <p className="text-sm font-semibold">{t('admin.civic_digest.cadence.title')}</p>
                   <p className="text-xs text-default-500 mt-0.5">
-                    Controls the default delivery cadence for new members. Existing members keep
-                    whatever they have already chosen.
+                    {t('admin.civic_digest.cadence.description')}
                   </p>
                 </div>
                 <Chip size="sm" variant="flat" color={cadence === 'off' ? 'default' : 'primary'}>
-                  Current: {cadence}
+                  {t('admin.civic_digest.cadence.current', { cadence: t(`admin.civic_digest.options.${cadence}.label`) })}
                 </Chip>
               </div>
             </CardHeader>
             <CardBody className="pt-0 space-y-4">
               <RadioGroup
-                aria-label="Tenant default cadence"
+                aria-label={t('admin.civic_digest.cadence.title')}
                 value={draft}
                 onValueChange={(v) => setDraft(v as Cadence)}
               >
                 {OPTIONS.map((opt) => (
-                  <Radio key={opt.value} value={opt.value} description={opt.description}>
-                    {opt.label}
+                  <Radio
+                    key={opt}
+                    value={opt}
+                    description={t(`admin.civic_digest.options.${opt}.description`)}
+                  >
+                    {t(`admin.civic_digest.options.${opt}.label`)}
                   </Radio>
                 ))}
               </RadioGroup>
@@ -191,7 +189,7 @@ export default function CivicDigestAdminPage() {
                   onPress={() => setDraft(cadence)}
                   isDisabled={!isDirty || saving}
                 >
-                  Reset
+                  {t('admin.civic_digest.reset')}
                 </Button>
                 <Button
                   color="primary"
@@ -200,33 +198,22 @@ export default function CivicDigestAdminPage() {
                   isLoading={saving}
                   isDisabled={!isDirty}
                 >
-                  Save cadence
+                  {t('admin.civic_digest.save')}
                 </Button>
               </div>
             </CardBody>
           </Card>
 
-          <Card className="border border-[var(--color-border)]">
+          <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
             <CardBody className="space-y-2">
-              <p className="text-sm font-semibold">What the digest includes</p>
+              <p className="text-sm font-semibold">{t('admin.civic_digest.includes.title')}</p>
               <p className="text-xs text-default-500">
-                Items are ranked per member by sub-region match, interest match, freshness, and
-                source weight. Source mix:
+                {t('admin.civic_digest.includes.description')}
               </p>
               <div className="flex flex-wrap gap-1.5 mt-1">
-                {[
-                  'Safety alerts',
-                  'Project updates',
-                  'Municipality announcements',
-                  'Events',
-                  'Vereine',
-                  'Care providers',
-                  'Marketplace',
-                  'Help requests',
-                  'Feed posts',
-                ].map((tag) => (
+                {DIGEST_SOURCES.map((tag) => (
                   <Chip key={tag} size="sm" variant="flat" color="default">
-                    {tag}
+                    {t(`admin.civic_digest.includes.sources.${tag}`)}
                   </Chip>
                 ))}
               </div>
@@ -235,8 +222,7 @@ export default function CivicDigestAdminPage() {
 
           <Divider />
           <p className="text-xs text-default-500">
-            Members can override cadence and opt out of individual sources from their own digest
-            preferences page.
+            {t('admin.civic_digest.member_override')}
           </p>
         </>
       )}

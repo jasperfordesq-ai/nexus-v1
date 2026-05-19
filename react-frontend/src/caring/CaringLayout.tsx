@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { CaringPanelSidebar } from './components/CaringPanelSidebar';
 import { CaringPanelHeader } from './components/CaringPanelHeader';
 import { CaringPanelBreadcrumbs } from './components/CaringPanelBreadcrumbs';
+import { PageMeta } from '@/components/seo';
 
 export function CaringLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -106,6 +107,7 @@ export function CaringLayout() {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta title={t('panel.meta_title')} noIndex />
       {/* Desktop fixed sidebar — md+ only */}
       <div className="hidden md:block">
         <CaringPanelSidebar

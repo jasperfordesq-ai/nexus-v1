@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -67,14 +68,10 @@ function tierColor(tier: number): 'default' | 'warning' | 'success' | 'primary' 
   return 'default';
 }
 
-const TIER_LABELS = ['Newcomer', 'Member', 'Trusted', 'Verified', 'Coordinator'];
+const TIER_KEYS = ['newcomer', 'member', 'trusted', 'verified', 'coordinator'] as const;
 
-function tierLabel(tier: number): string {
-  return TIER_LABELS[Math.min(tier, TIER_LABELS.length - 1)] ?? String(tier);
-}
-
-function fmtDate(iso: string | null): string {
-  if (!iso) return '—';
+function fmtDate(iso: string | null, emptyValue: string): string {
+  if (!iso) return emptyValue;
   return new Date(iso).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'short',
@@ -87,7 +84,8 @@ function fmtDate(iso: string | null): string {
 // ---------------------------------------------------------------------------
 
 export default function CareRecipientCirclePage() {
-  usePageTitle('Care Recipient Circle');
+  const { t } = useTranslation('caring_community');
+  usePageTitle(t('admin.recipient_circle.meta_title'));
 
   const [userIdInput, setUserIdInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -108,11 +106,29 @@ export default function CareRecipientCirclePage() {
       );
       setCircle(res.data ?? null);
     } catch {
-      setError('Failed to load recipient circle. Check the member ID and try again.');
+      setError(t('admin.recipient_circle.errors.load'));
     } finally {
       setLoading(false);
     }
-  }, [userIdInput]);
+  }, [t, userIdInput]);
+
+  const tierLabel = useCallback(
+    (tier: number) => {
+      const key = TIER_KEYS[Math.min(tier, TIER_KEYS.length - 1)];
+      return key ? t(`admin.recipient_circle.tiers.${key}`) : t('admin.recipient_circle.tiers.fallback', { tier });
+    },
+    [t],
+  );
+
+  const statusLabel = useCallback(
+    (status: string) => t(`admin.recipient_circle.status.${status}`, { defaultValue: status.replace(/_/g, ' ') }),
+    [t],
+  );
+
+  const relationshipTypeLabel = useCallback(
+    (type: string) => t(`admin.recipient_circle.relationship_types.${type}`, { defaultValue: type.replace(/_/g, ' ') }),
+    [t],
+  );
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -126,28 +142,23 @@ export default function CareRecipientCirclePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Care Recipient Circle"
-        subtitle="View the full support network around any member"
+        title={t('admin.recipient_circle.title')}
+        subtitle={t('admin.recipient_circle.subtitle')}
         icon={<Users2 size={20} />}
       />
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+      <Card className="border border-primary/30 bg-primary-50/70 shadow-sm shadow-primary/10 dark:bg-primary-900/20" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
-              <p className="text-default-600">
-                A Care Recipient Circle is a private support group around an individual who receives
-                care. This view shows their full support network: all helpers, total hours received,
-                open help requests, and any safeguarding flags. Enter the member's user ID to look
-                up their circle.
-              </p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('admin.recipient_circle.about.title')}</p>
+              <p className="text-default-600">{t('admin.recipient_circle.about.body')}</p>
               <div className="space-y-0.5 pt-1 text-default-500">
-                <p><strong>Trust tiers:</strong> Newcomer, Member, Trusted, Verified, Coordinator — shown for the recipient and each supporter.</p>
-                <p><strong>Safeguarding flags:</strong> A non-zero flag count indicates active safeguarding concerns recorded against this member. Review them in the Safeguarding section.</p>
-                <p><strong>Privacy:</strong> Circle data is visible only to circle members and tenant administrators. It is not included in community-wide reports or the member directory.</p>
+                <p><strong>{t('admin.recipient_circle.about.trust_tiers_label')}</strong> {t('admin.recipient_circle.about.trust_tiers_body')}</p>
+                <p><strong>{t('admin.recipient_circle.about.safeguarding_label')}</strong> {t('admin.recipient_circle.about.safeguarding_body')}</p>
+                <p><strong>{t('admin.recipient_circle.about.privacy_label')}</strong> {t('admin.recipient_circle.about.privacy_body')}</p>
               </div>
             </div>
           </div>
@@ -155,12 +166,12 @@ export default function CareRecipientCirclePage() {
       </Card>
 
       {/* Lookup bar */}
-      <Card>
+      <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
         <CardBody>
-          <div className="flex items-end gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <Input
-              label="Member ID"
-              placeholder="Enter member user ID…"
+              label={t('admin.recipient_circle.lookup.member_id')}
+              placeholder={t('admin.recipient_circle.lookup.placeholder')}
               value={userIdInput}
               onValueChange={setUserIdInput}
               onKeyDown={handleKeyDown}
@@ -175,7 +186,7 @@ export default function CareRecipientCirclePage() {
               isLoading={loading}
               isDisabled={!userIdInput.trim()}
             >
-              View circle
+              {t('admin.recipient_circle.lookup.button')}
             </Button>
           </div>
         </CardBody>
@@ -184,7 +195,7 @@ export default function CareRecipientCirclePage() {
       {/* Loading */}
       {loading && (
         <div className="flex justify-center py-12">
-          <Spinner size="lg" />
+          <Spinner size="lg" label={t('admin.recipient_circle.loading')} />
         </div>
       )}
 
@@ -202,10 +213,10 @@ export default function CareRecipientCirclePage() {
       {circle && !loading && (
         <>
           {/* Recipient profile card */}
-          <Card>
+          <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
             <CardHeader className="pb-2">
               <span className="text-sm font-semibold text-default-600 uppercase tracking-wide">
-                Recipient
+                {t('admin.recipient_circle.recipient')}
               </span>
             </CardHeader>
             <CardBody className="pt-0">
@@ -213,7 +224,9 @@ export default function CareRecipientCirclePage() {
                 <div>
                   <p className="text-xl font-bold">{circle.recipient.name}</p>
                   <p className="text-sm text-default-500">
-                    Member since {fmtDate(circle.recipient.member_since)}
+                    {t('admin.recipient_circle.member_since', {
+                      date: fmtDate(circle.recipient.member_since, t('admin.common.empty_dash')),
+                    })}
                   </p>
                 </div>
                 <Chip
@@ -230,8 +243,7 @@ export default function CareRecipientCirclePage() {
                     size="sm"
                     startContent={<ShieldAlert size={12} />}
                   >
-                    {circle.safeguarding_flags} safeguarding flag
-                    {circle.safeguarding_flags !== 1 ? 's' : ''}
+                    {t('admin.recipient_circle.safeguarding_flags', { count: circle.safeguarding_flags })}
                   </Chip>
                 )}
               </div>
@@ -241,19 +253,19 @@ export default function CareRecipientCirclePage() {
           {/* Summary stat row */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <StatCard
-              label="Total Hours Received"
+              label={t('admin.recipient_circle.stats.total_hours')}
               value={circle.total_hours_received}
               icon={Clock}
               color="primary"
             />
             <StatCard
-              label="Active Supporters"
+              label={t('admin.recipient_circle.stats.active_supporters')}
               value={activeCount}
               icon={Heart}
               color="success"
             />
             <StatCard
-              label="Open Help Requests"
+              label={t('admin.recipient_circle.stats.open_help_requests')}
               value={circle.open_help_requests}
               icon={AlertTriangle}
               color={circle.open_help_requests > 0 ? 'warning' : 'default'}
@@ -263,38 +275,39 @@ export default function CareRecipientCirclePage() {
           <Divider />
 
           {/* Support Relationships table */}
-          <Card>
+          <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
             <CardHeader>
-              <span className="font-semibold text-sm">Support Relationships</span>
+              <span className="font-semibold text-sm">{t('admin.recipient_circle.relationships.title')}</span>
             </CardHeader>
             <CardBody className="p-0">
               {circle.support_relationships.length === 0 ? (
-                <div className="flex flex-col items-center gap-2 py-10 text-default-400">
+                <div className="flex flex-col items-center gap-2 py-10 text-default-500">
                   <Users2 size={36} className="opacity-30" />
-                  <p className="text-sm">No active support relationships</p>
+                  <p className="text-sm">{t('admin.recipient_circle.relationships.empty')}</p>
                 </div>
               ) : (
-                <Table
-                  aria-label="Support relationships"
-                  removeWrapper
-                  classNames={{
-                    th: 'bg-[var(--color-surface-alt)] text-xs font-semibold uppercase tracking-wide',
-                  }}
-                >
+                <div className="overflow-x-auto">
+                  <Table
+                    aria-label={t('admin.recipient_circle.relationships.aria')}
+                    removeWrapper
+                    classNames={{
+                      th: 'bg-content2 text-xs font-semibold uppercase tracking-wide',
+                    }}
+                  >
                   <TableHeader>
-                    <TableColumn>Supporter</TableColumn>
-                    <TableColumn>Trust Tier</TableColumn>
-                    <TableColumn>Type</TableColumn>
-                    <TableColumn>Hours Logged</TableColumn>
-                    <TableColumn>Last Activity</TableColumn>
-                    <TableColumn>Status</TableColumn>
+                    <TableColumn>{t('admin.recipient_circle.relationships.supporter')}</TableColumn>
+                    <TableColumn>{t('admin.recipient_circle.relationships.trust_tier')}</TableColumn>
+                    <TableColumn>{t('admin.recipient_circle.relationships.type')}</TableColumn>
+                    <TableColumn>{t('admin.recipient_circle.relationships.hours_logged')}</TableColumn>
+                    <TableColumn>{t('admin.recipient_circle.relationships.last_activity')}</TableColumn>
+                    <TableColumn>{t('admin.recipient_circle.relationships.status')}</TableColumn>
                   </TableHeader>
                   <TableBody>
                     {circle.support_relationships.map((rel) => (
                       <TableRow key={rel.id}>
                         <TableCell>
                           <div className="font-medium text-sm">{rel.supporter.name}</div>
-                          <div className="text-xs text-default-400">ID {rel.supporter.id}</div>
+                          <div className="text-xs text-default-400">{t('admin.recipient_circle.member_id_value', { id: rel.supporter.id })}</div>
                         </TableCell>
                         <TableCell>
                           <Chip
@@ -305,12 +318,12 @@ export default function CareRecipientCirclePage() {
                             {tierLabel(rel.supporter.trust_tier)}
                           </Chip>
                         </TableCell>
-                        <TableCell className="text-sm capitalize">{rel.type}</TableCell>
+                        <TableCell className="text-sm">{relationshipTypeLabel(rel.type)}</TableCell>
                         <TableCell className="text-sm font-mono">
                           {rel.hours_logged.toLocaleString()}
                         </TableCell>
                         <TableCell className="text-sm text-default-500 whitespace-nowrap">
-                          {fmtDate(rel.last_activity_at)}
+                          {fmtDate(rel.last_activity_at, t('admin.common.empty_dash'))}
                         </TableCell>
                         <TableCell>
                           <Chip
@@ -324,13 +337,14 @@ export default function CareRecipientCirclePage() {
                             variant="flat"
                             size="sm"
                           >
-                            {rel.status}
+                            {statusLabel(rel.status)}
                           </Chip>
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
-                </Table>
+                  </Table>
+                </div>
               )}
             </CardBody>
           </Card>
