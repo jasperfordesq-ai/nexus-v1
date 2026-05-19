@@ -100,7 +100,7 @@ export function SellerProfilePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation('marketplace');
-  usePageTitle(t('seller.page_title', 'Seller Profile'));
+  usePageTitle(t('seller.page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -127,12 +127,12 @@ export function SellerProfilePage() {
         if (response.success && response.data) {
           setSeller(response.data);
         } else {
-          setError(response.error || t('seller.not_found_title', 'Seller not found'));
+          setError(response.error || t('seller.not_found_title'));
         }
       } catch (err) {
         if (!cancelled) {
           logError('Failed to load seller profile', err);
-          setError(t('seller.not_found_description', 'Unable to load seller profile'));
+          setError(t('seller.not_found_description'));
         }
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -146,7 +146,7 @@ export function SellerProfilePage() {
   // Update page title
   useEffect(() => {
     if (seller?.display_name) {
-      document.title = `${seller.display_name} - ${t('seller.page_title', 'Seller Profile')}`;
+      document.title = `${seller.display_name} - ${t('seller.page_title')}`;
     }
   }, [seller?.display_name, t]);
 
@@ -178,7 +178,7 @@ export function SellerProfilePage() {
   // Save / Unsave
   const handleSave = useCallback(async (listingId: number) => {
     if (!isAuthenticated) {
-      toast.error(t('common.sign_in_to_save', 'Please sign in to save listings'));
+      toast.error(t('common.sign_in_to_save'));
       return;
     }
     try {
@@ -186,16 +186,16 @@ export function SellerProfilePage() {
       setListings((prev) =>
         prev.map((l) => (l.id === listingId ? { ...l, is_saved: true } : l))
       );
-      toast.success(t('common.saved_for_later', 'Saved for later'));
+      toast.success(t('common.saved_for_later'));
     } catch (err) {
       logError('Failed to save listing', err);
-      toast.error(t('common.save_failed', 'Failed to update saved status'));
+      toast.error(t('common.save_failed'));
     }
   }, [isAuthenticated, toast, t]);
 
   const handleUnsave = useCallback(async (listingId: number) => {
     if (!isAuthenticated) {
-      toast.error(t('common.sign_in_to_save', 'Please sign in to save listings'));
+      toast.error(t('common.sign_in_to_save'));
       return;
     }
     try {
@@ -203,10 +203,10 @@ export function SellerProfilePage() {
       setListings((prev) =>
         prev.map((l) => (l.id === listingId ? { ...l, is_saved: false } : l))
       );
-      toast.success(t('common.removed_from_saved', 'Removed from saved'));
+      toast.success(t('common.removed_from_saved'));
     } catch (err) {
       logError('Failed to unsave listing', err);
-      toast.error(t('common.save_failed', 'Failed to update saved status'));
+      toast.error(t('common.save_failed'));
     }
   }, [isAuthenticated, toast, t]);
 
@@ -225,9 +225,9 @@ export function SellerProfilePage() {
       <div className="max-w-3xl mx-auto px-4 py-12">
         <EmptyState
           icon={<User className="w-8 h-8" />}
-          title={t('seller.not_found_title', 'Seller Not Found')}
-          description={error || t('seller.not_found_description', 'This seller profile could not be found.')}
-          action={{ label: t('seller.back_to_marketplace', 'Back to Marketplace'), onClick: () => navigate(tenantPath('/marketplace')) }}
+          title={t('seller.not_found_title')}
+          description={error || t('seller.not_found_description')}
+          action={{ label: t('seller.back_to_marketplace'), onClick: () => navigate(tenantPath('/marketplace')) }}
         />
       </div>
     );
@@ -236,8 +236,8 @@ export function SellerProfilePage() {
   return (
     <>
       <PageMeta
-        title={`${seller.display_name} - ${t('seller.page_title', 'Seller Profile')}`}
-        description={seller.bio?.slice(0, 160) || t('seller.view_listings', "View {{name}}'s marketplace listings.", { name: seller.display_name })}
+        title={`${seller.display_name} - ${t('seller.page_title')}`}
+        description={(seller.bio || t('seller.view_listings', { name: seller.display_name })).replace(/\s+/g, ' ').trim().slice(0, 160)}
       />
 
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
@@ -249,7 +249,7 @@ export function SellerProfilePage() {
           size="sm"
           startContent={<ArrowLeft className="w-4 h-4" />}
         >
-          {t('seller.marketplace', 'Marketplace')}
+          {t('seller.marketplace')}
         </Button>
 
         {/* Seller header */}
@@ -272,12 +272,12 @@ export function SellerProfilePage() {
                     variant="flat"
                     startContent={<Shield className="w-3 h-3" />}
                   >
-                    {t('seller.verified', 'Verified')}
+                    {t('seller.verified')}
                   </Chip>
                 )}
                 {seller.seller_type && (
                   <Chip size="sm" variant="flat" color="secondary">
-                    {seller.seller_type === 'business' ? t('seller.seller_type_business', 'Business') : t('seller.seller_type_private', 'Private Seller')}
+                    {seller.seller_type === 'business' ? t('seller.seller_type_business') : t('seller.seller_type_private')}
                   </Chip>
                 )}
                 <MarketplacePartnerBadge grantedAt={seller.marketplace_partner_badge_at ?? null} />
@@ -296,14 +296,14 @@ export function SellerProfilePage() {
                 )}
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
-                  {t('seller.member_since', 'Member since {{date}}', { date: new Date(seller.member_since).toLocaleDateString(undefined, { month: 'long', year: 'numeric' }) })}
+                  {t('seller.member_since', { date: new Date(seller.member_since).toLocaleDateString(undefined, { month: 'long', year: 'numeric' }) })}
                 </span>
               </div>
 
               {/* Trust score */}
               {seller.community_trust_score !== null && seller.community_trust_score > 0 && (
                 <div className="flex items-center justify-center sm:justify-start gap-1.5">
-                  <span className="text-xs text-default-400">{t('seller.community_trust', 'Community Trust:')}</span>
+                  <span className="text-xs text-default-400">{t('seller.community_trust')}</span>
                   <div className="flex items-center gap-0.5">
                     {[1, 2, 3, 4, 5].map((level) => (
                       <Star
@@ -322,7 +322,7 @@ export function SellerProfilePage() {
             </div>
 
             {/* Actions */}
-            <div className="flex gap-2 shrink-0">
+            <div className="flex w-full gap-2 sm:w-auto sm:shrink-0">
               {isAuthenticated && (
                 <Button
                   variant="bordered"
@@ -330,7 +330,7 @@ export function SellerProfilePage() {
                   as={Link}
                   to={tenantPath(`/messages?to=${seller.user_id}`)}
                 >
-                  {t('seller.message', 'Message')}
+                  {t('seller.message')}
                 </Button>
               )}
             </div>
@@ -341,22 +341,22 @@ export function SellerProfilePage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <StatCard
               icon={ShoppingBag}
-              label={t('seller.total_sales', 'Total Sales')}
+              label={t('seller.total_sales')}
               value={seller.total_sales}
             />
             <StatCard
               icon={Star}
-              label={t('seller.avg_rating', 'Avg Rating')}
-              value={seller.avg_rating !== null ? seller.avg_rating.toFixed(1) : t('seller.na', 'N/A')}
+              label={t('seller.avg_rating')}
+              value={seller.avg_rating !== null ? seller.avg_rating.toFixed(1) : t('seller.na')}
             />
             <StatCard
               icon={Clock}
-              label={t('seller.response_time_avg', 'Response Time')}
-              value={seller.response_time_avg || t('seller.na', 'N/A')}
+              label={t('seller.response_time')}
+              value={seller.response_time || t('seller.na')}
             />
             <StatCard
               icon={Package}
-              label={t('seller.active_listings', 'Active Listings')}
+              label={t('seller.active_listings')}
               value={seller.active_listings}
             />
           </div>
@@ -374,7 +374,7 @@ export function SellerProfilePage() {
             title={
               <div className="flex items-center gap-2">
                 <ShoppingBag className="w-4 h-4" />
-                {t('seller.tab_listings', 'Listings')}
+                {t('seller.tab_listings')}
                 <Chip size="sm" variant="flat">{listings.length}</Chip>
               </div>
             }
@@ -384,7 +384,7 @@ export function SellerProfilePage() {
             title={
               <div className="flex items-center gap-2">
                 <Star className="w-4 h-4" />
-                {t('seller.tab_reviews', 'Reviews')}
+                {t('seller.tab_reviews')}
                 <Chip size="sm" variant="flat">{seller.total_ratings}</Chip>
               </div>
             }
@@ -401,8 +401,8 @@ export function SellerProfilePage() {
             ) : listings.length === 0 ? (
               <EmptyState
                 icon={<ShoppingBag className="w-8 h-8" />}
-                title={t('seller.no_listings_title', 'No Listings')}
-                description={t('seller.no_listings_description', "{{name}} doesn't have any active listings right now.", { name: seller.display_name })}
+                title={t('seller.no_listings_title')}
+                description={t('seller.no_listings_description', { name: seller.display_name })}
               />
             ) : (
               <MarketplaceListingGrid
@@ -417,9 +417,9 @@ export function SellerProfilePage() {
         {activeTab === 'reviews' && (
           <GlassCard className="p-8 text-center">
             <Star className="w-12 h-12 text-default-200 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">{t('seller.reviews_coming_soon_title', 'Reviews Coming Soon')}</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">{t('seller.reviews_coming_soon_title')}</h3>
             <p className="text-sm text-default-500 max-w-md mx-auto">
-              {t('seller.reviews_coming_soon_description', 'Buyer reviews will be available in Phase 2. Check back later to see what the community thinks about this seller.')}
+              {t('seller.reviews_coming_soon_description')}
             </p>
           </GlassCard>
         )}
