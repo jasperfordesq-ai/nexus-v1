@@ -117,26 +117,26 @@ export function FeedAlgorithm() {
         <Card shadow="sm">
           <CardHeader><h3 className="text-lg font-semibold">{t('feed_options')}</h3></CardHeader>
           <CardBody className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <p className="font-medium">{t('chronological_mode')}</p>
                 <p className="text-sm text-default-500">{t('chronological_mode_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.chronological_mode} onValueChange={(v) => updateField('chronological_mode', v)} aria-label={t('chronological_mode')} />
+              <Switch className="shrink-0" isSelected={!!formData.chronological_mode} onValueChange={(v) => updateField('chronological_mode', v)} aria-label={t('chronological_mode')} />
             </div>
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <p className="font-medium">{t('include_polls')}</p>
                 <p className="text-sm text-default-500">{t('include_polls_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.include_polls} onValueChange={(v) => updateField('include_polls', v)} aria-label={t('include_polls')} />
+              <Switch className="shrink-0" isSelected={!!formData.include_polls} onValueChange={(v) => updateField('include_polls', v)} aria-label={t('include_polls')} />
             </div>
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <p className="font-medium">{t('include_events')}</p>
                 <p className="text-sm text-default-500">{t('include_events_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.include_events} onValueChange={(v) => updateField('include_events', v)} aria-label={t('include_events')} />
+              <Switch className="shrink-0" isSelected={!!formData.include_events} onValueChange={(v) => updateField('include_events', v)} aria-label={t('include_events')} />
             </div>
           </CardBody>
         </Card>

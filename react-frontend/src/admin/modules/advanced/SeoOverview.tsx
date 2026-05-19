@@ -516,10 +516,10 @@ export function SeoOverview() {
               value={String(formData.seo_bing_verification || '')}
               onValueChange={(v) => updateField('seo_bing_verification', v)}
             />
-            <Textarea
-              label={t('custom_robots_txt')}
-              placeholder={"User-agent: *\nDisallow: /admin/"}
-              variant="bordered"
+              <Textarea
+                label={t('custom_robots_txt')}
+              placeholder={t('placeholder_robots_txt')}
+                variant="bordered"
               minRows={4}
               value={String(formData.seo_robots_txt || '')}
               onValueChange={(v) => updateField('seo_robots_txt', v)}

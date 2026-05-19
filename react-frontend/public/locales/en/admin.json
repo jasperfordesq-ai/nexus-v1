@@ -1496,6 +1496,7 @@
     "placeholder_community_timebanking_platform": "Community Timebanking Platform...",
     "placeholder_exchange_skills_and_time_with_your_community": "Exchange Skills and Time with Your Community...",
     "placeholder_my_timebank": "My Timebank...",
+    "placeholder_robots_txt": "User-agent: *\nDisallow: /admin/",
     "placeholder_s_gxxxxx": "S Gxxxxx...",
     "placeholder_search_users_by_name_or_email": "Search Users by Name or Email...",
     "placeholder_smtpexamplecom": "Smtpexamplecom...",
