@@ -83,7 +83,7 @@ export default function VolOrgDashboardPage() {
   const [accessDenied, setAccessDenied] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  usePageTitle(org ? `${org.name} ${t('dashboard')}` : t('org_dashboard.title', 'Organization Dashboard'));
+  usePageTitle(org ? `${org.name} ${t('dashboard')}` : t('org_dashboard.title'));
 
   const setTab = useCallback((newTab: OrgDashTab) => {
     setTabState(newTab);
@@ -155,23 +155,23 @@ export default function VolOrgDashboardPage() {
   if (accessDenied || !org) {
     return (
       <>
-        <PageMeta title={t('org_dashboard.title', 'Organization Dashboard')} noIndex />
+        <PageMeta title={t('org_dashboard.title')} noIndex />
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30 flex items-center justify-center mb-4">
             <Building2 className="w-8 h-8 text-[var(--color-error)]" aria-hidden="true" />
           </div>
           <h2 className="text-xl font-semibold text-theme-primary mb-2">
-            {t('org_dashboard.access_denied', 'Access Denied')}
+            {t('org_dashboard.access_denied')}
           </h2>
           <p className="text-theme-muted max-w-sm mb-4">
-            {t('org_dashboard.access_denied_desc', 'You do not have permission to manage this organization, or it does not exist.')}
+            {t('org_dashboard.access_denied_desc')}
           </p>
           <Button
             variant="flat"
             startContent={<ArrowLeft className="w-4 h-4" />}
             onPress={() => navigate(tenantPath('/volunteering'))}
           >
-            {t('org_dashboard.back_to_volunteering', 'Back to Volunteering')}
+            {t('org_dashboard.back_to_volunteering')}
           </Button>
         </div>
       </>
@@ -179,12 +179,12 @@ export default function VolOrgDashboardPage() {
   }
 
   const tabLabels: Record<OrgDashTab, string> = {
-    overview: t('org_dashboard.tab_overview', 'Overview'),
-    applications: t('org_dashboard.tab_applications', 'Applications'),
-    'hours-review': t('org_dashboard.tab_hours_review', 'Hours Review'),
-    volunteers: t('org_dashboard.tab_volunteers', 'Volunteers'),
-    wallet: t('org_dashboard.tab_wallet', 'Wallet'),
-    settings: t('org_dashboard.tab_settings', 'Settings'),
+    overview: t('org_dashboard.tab_overview'),
+    applications: t('org_dashboard.tab_applications'),
+    'hours-review': t('org_dashboard.tab_hours_review'),
+    volunteers: t('org_dashboard.tab_volunteers'),
+    wallet: t('org_dashboard.tab_wallet'),
+    settings: t('org_dashboard.tab_settings'),
   };
 
   return (
@@ -194,7 +194,7 @@ export default function VolOrgDashboardPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: t('breadcrumb_volunteering', 'Volunteering'), href: tenantPath('/volunteering') },
+          { label: t('breadcrumb_volunteering'), href: tenantPath('/volunteering') },
           { label: org.name },
         ]}
       />
@@ -217,9 +217,9 @@ export default function VolOrgDashboardPage() {
                 <p className="text-sm text-theme-muted mt-1 line-clamp-2">{org.description}</p>
               )}
             </div>
-            <div className="text-right flex-shrink-0">
+            <div className="text-left sm:text-right sm:flex-shrink-0">
               <p className="text-2xl font-bold text-emerald-500">{t('hours_abbrev', { hours: org.balance })}</p>
-              <p className="text-xs text-theme-muted">{t('org_dashboard.wallet_balance', 'Wallet Balance')}</p>
+              <p className="text-xs text-theme-muted">{t('org_dashboard.wallet_balance')}</p>
             </div>
           </div>
         </GlassCard>

@@ -46,7 +46,7 @@ export default function MyOrganisationsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
 
-  usePageTitle(t('my_organisations_title', 'My Organisations'));
+  usePageTitle(t('my_organisations_title'));
 
   useEffect(() => {
     abortRef.current?.abort();
@@ -80,12 +80,12 @@ export default function MyOrganisationsPage() {
 
   return (
     <>
-      <PageMeta title={t('my_organisations_title', 'My Organisations')} noIndex />
+      <PageMeta title={t('my_organisations_title')} noIndex />
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
       <Breadcrumbs
         items={[
-          { label: t('breadcrumb_volunteering', 'Volunteering'), href: tenantPath('/volunteering') },
-          { label: t('my_organisations', 'My Organisations') },
+          { label: t('breadcrumb_volunteering'), href: tenantPath('/volunteering') },
+          { label: t('my_organisations') },
         ]}
       />
 
@@ -94,18 +94,18 @@ export default function MyOrganisationsPage() {
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <Building2 className="w-7 h-7 text-rose-400" aria-hidden="true" />
-            {t('my_organisations', 'My Organisations')}
+            {t('my_organisations')}
           </h1>
           <p className="text-theme-muted mt-1">
-            {t('my_organisations_subtitle', 'Manage your volunteer organisations, review applications, and pay volunteers.')}
+            {t('my_organisations_subtitle')}
           </p>
         </div>
-        <Link to={tenantPath('/organisations/register')}>
+        <Link to={tenantPath('/organisations/register')} className="sm:shrink-0">
           <Button
             className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           >
-            {t('register_organisation', 'Register Organisation')}
+            {t('register_organisation')}
           </Button>
         </Link>
       </div>
@@ -120,17 +120,17 @@ export default function MyOrganisationsPage() {
             <Building2 className="w-8 h-8 text-rose-500" aria-hidden="true" />
           </div>
           <h2 className="text-xl font-semibold text-theme-primary mb-2">
-            {t('my_organisations_none', 'No Organisations Yet')}
+            {t('my_organisations_none')}
           </h2>
           <p className="text-theme-muted max-w-md mx-auto mb-6">
-            {t('my_organisations_none_desc', 'Register a volunteer organisation to start posting opportunities, managing volunteers, and awarding time credits.')}
+            {t('my_organisations_none_desc')}
           </p>
           <Link to={tenantPath('/organisations/register')}>
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               startContent={<Plus className="w-4 h-4" />}
             >
-              {t('register_organisation', 'Register Organisation')}
+              {t('register_organisation')}
             </Button>
           </Link>
         </GlassCard>
@@ -140,16 +140,16 @@ export default function MyOrganisationsPage() {
           {pendingOrgs.length > 0 && (
             <GlassCard className="p-4 border-amber-500/30">
               <p className="text-sm text-amber-400 font-medium mb-2">
-                {t('my_organisations_pending', 'Pending Approval')}
+                {t('my_organisations_pending')}
               </p>
               {pendingOrgs.map((org) => (
                 <div key={org.id} className="flex items-center gap-3 p-3 rounded-xl bg-theme-elevated">
                   <Building2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
                   <div className="flex-1">
                     <p className="font-medium text-theme-primary">{org.name}</p>
-                    <p className="text-xs text-theme-muted">{t('my_organisations_pending_desc', 'Awaiting admin approval')}</p>
+                    <p className="text-xs text-theme-muted">{t('my_organisations_pending_desc')}</p>
                   </div>
-                  <Chip size="sm" color="warning" variant="flat">{t('status_pending', 'Pending')}</Chip>
+                  <Chip size="sm" color="warning" variant="flat">{t('status_pending')}</Chip>
                 </div>
               ))}
             </GlassCard>
@@ -175,7 +175,7 @@ export default function MyOrganisationsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h2 className="text-lg font-bold text-theme-primary">{org.name}</h2>
-                        <Chip size="sm" color="success" variant="flat">{t('status_active', 'Active')}</Chip>
+                        <Chip size="sm" color="success" variant="flat">{t('status_active')}</Chip>
                         <Chip size="sm" variant="flat" className="bg-theme-elevated text-theme-muted capitalize">{org.member_role}</Chip>
                       </div>
                       {org.description && (
@@ -184,18 +184,18 @@ export default function MyOrganisationsPage() {
                     </div>
 
                     {/* Stats + CTA */}
-                    <div className="flex items-center gap-4 flex-shrink-0">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 sm:flex-shrink-0">
                       {org.balance !== undefined && (
                         <div className="text-center">
                           <p className="text-lg font-bold text-emerald-500">{t('hours_abbrev', { hours: org.balance })}</p>
-                          <p className="text-xs text-theme-subtle">{t('wallet', 'Wallet')}</p>
+                          <p className="text-xs text-theme-subtle">{t('wallet')}</p>
                         </div>
                       )}
                       <Button
                         className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                         endContent={<ArrowRight className="w-4 h-4" />}
                       >
-                        {t('manage', 'Manage')}
+                        {t('manage')}
                       </Button>
                     </div>
                   </div>
