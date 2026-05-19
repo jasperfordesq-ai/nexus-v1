@@ -473,6 +473,10 @@ class FederationEmailService
                 [$tenantId, $tenantId]
             )->cnt ?? 0);
 
+            if ($messageCount === 0 && $transactionCount === 0 && $connectionCount === 0) {
+                return false;
+            }
+
             $sent = false;
             LocaleContext::withLocale($user, function () use (&$sent, $user, $tenantId, $tenantName, $messageCount, $transactionCount, $connectionCount) {
                 $userName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
@@ -490,10 +494,6 @@ class FederationEmailService
                         ['value' => (string) $transactionCount, 'label' => __('emails.federation.label_transactions'), 'icon' => "\xF0\x9F\x92\xB0"],
                         ['value' => (string) $connectionCount, 'label' => __('emails.federation.label_connections'), 'icon' => "\xF0\x9F\xA4\x9D"],
                     ]);
-
-                if ($messageCount === 0 && $transactionCount === 0 && $connectionCount === 0) {
-                    $builder->paragraph(__('emails.federation.digest_quiet'));
-                }
 
                 $html = $builder
                     ->button(__('emails.federation.explore_federation'), EmailTemplateBuilder::tenantUrl('/federation'))
