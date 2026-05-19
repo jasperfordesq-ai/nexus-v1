@@ -73,6 +73,14 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         $this->assertStringContainsString('Cache::forget($claimKey)', $source);
     }
 
+    public function test_message_email_recipient_lookup_remains_tenant_scoped(): void
+    {
+        $source = file_get_contents(app_path('Listeners/NotifyMessageReceived.php'));
+
+        $this->assertStringContainsString("->where('tenant_id', \$event->tenantId)", $source);
+        $this->assertStringNotContainsString('User::withoutGlobalScopes()->find((int) $event->message->receiver_id)', $source);
+    }
+
     public function test_queue_notification_resolves_tenant_from_recipient_when_context_is_missing(): void
     {
         $user = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);

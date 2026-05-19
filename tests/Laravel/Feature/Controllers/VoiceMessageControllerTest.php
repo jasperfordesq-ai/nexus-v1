@@ -49,4 +49,13 @@ class VoiceMessageControllerTest extends TestCase
 
         $this->assertContains($response->getStatusCode(), [400, 422]);
     }
+
+    public function test_voice_messages_do_not_send_a_second_direct_email(): void
+    {
+        $source = file_get_contents(app_path('Http/Controllers/Api/VoiceMessageController.php'));
+
+        $this->assertStringContainsString('MessageService::send', $source);
+        $this->assertStringNotContainsString('EmailDispatchService::sendRaw', $source);
+        $this->assertStringNotContainsString('voice_message.email_subject', $source);
+    }
 }

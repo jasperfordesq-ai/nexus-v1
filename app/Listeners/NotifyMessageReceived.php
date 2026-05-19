@@ -178,7 +178,9 @@ class NotifyMessageReceived implements ShouldQueue
         // Get recipient name for greeting
         $recipientName = __('emails.message.fallback_recipient_name');
         try {
-            $recipient = User::withoutGlobalScopes()->find((int) $event->message->receiver_id);
+            $recipient = User::withoutGlobalScopes()
+                ->where('tenant_id', $event->tenantId)
+                ->find((int) $event->message->receiver_id);
             if ($recipient) {
                 $recipientName = $recipient->first_name ?? $recipient->name ?? __('emails.message.fallback_recipient_name');
             }
