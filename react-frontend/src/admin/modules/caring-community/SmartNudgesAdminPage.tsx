@@ -43,6 +43,12 @@ import {
   ModalHeader,
   Spinner,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
   useDisclosure,
 } from '@heroui/react';
 import Bell from 'lucide-react/icons/bell';
@@ -125,6 +131,14 @@ function buildChartData(recent: NudgeRecent[]) {
     }
   }
   return Object.values(days);
+}
+
+function formatAdminDate(value: string): string {
+  return new Intl.DateTimeFormat(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(value));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -420,26 +434,22 @@ export default function SmartNudgesAdminPage() {
             {!dryResult.candidates || dryResult.candidates.length === 0 ? (
               <p className="text-sm text-default-500">No eligible candidates right now.</p>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-default-50">
-                    <tr className="text-xs text-default-500 uppercase tracking-wide">
-                      <th className="text-left px-3 py-2">Target user</th>
-                      <th className="text-left px-3 py-2">Suggested partner</th>
-                      <th className="text-right px-3 py-2">Score</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dryResult.candidates.map((c, i) => (
-                      <tr key={i} className="border-t border-default-200">
-                        <td className="px-3 py-2">#{c.target_user_id}</td>
-                        <td className="px-3 py-2">#{c.related_user_id}</td>
-                        <td className="px-3 py-2 text-right tabular-nums">{c.score.toFixed(3)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <Table aria-label="Dry-run nudge candidates" removeWrapper>
+                <TableHeader>
+                  <TableColumn>Target user</TableColumn>
+                  <TableColumn>Suggested partner</TableColumn>
+                  <TableColumn align="end">Score</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {dryResult.candidates.map((c, i) => (
+                    <TableRow key={`${c.target_user_id}-${c.related_user_id}-${i}`}>
+                      <TableCell>#{c.target_user_id}</TableCell>
+                      <TableCell>#{c.related_user_id}</TableCell>
+                      <TableCell className="text-right tabular-nums">{c.score.toFixed(3)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             )}
           </CardBody>
         </Card>
@@ -459,38 +469,34 @@ export default function SmartNudgesAdminPage() {
           {data.recent.length === 0 ? (
             <div className="text-center py-12 text-sm text-default-500">No nudges sent yet.</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-default-50">
-                  <tr className="text-xs text-default-500 uppercase tracking-wide">
-                    <th className="text-left px-3 py-2">Sent</th>
-                    <th className="text-left px-3 py-2">Target</th>
-                    <th className="text-left px-3 py-2">Suggested partner</th>
-                    <th className="text-right px-3 py-2">Score</th>
-                    <th className="text-left px-3 py-2">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.recent.map((r) => (
-                    <tr key={r.id} className="border-t border-default-200">
-                      <td className="px-3 py-2">{new Date(r.sent_at).toLocaleDateString()}</td>
-                      <td className="px-3 py-2">{r.target_user.name || `#${r.target_user.id}`}</td>
-                      <td className="px-3 py-2">{r.related_user.name || `#${r.related_user.id}`}</td>
-                      <td className="px-3 py-2 text-right tabular-nums">{r.score.toFixed(3)}</td>
-                      <td className="px-3 py-2">
-                        <Chip
-                          size="sm"
-                          variant="flat"
-                          color={r.status === 'converted' ? 'success' : 'default'}
-                        >
-                          {r.status}
-                        </Chip>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Table aria-label="Recent smart nudges" removeWrapper>
+              <TableHeader>
+                <TableColumn>Sent</TableColumn>
+                <TableColumn>Target</TableColumn>
+                <TableColumn>Suggested partner</TableColumn>
+                <TableColumn align="end">Score</TableColumn>
+                <TableColumn>Status</TableColumn>
+              </TableHeader>
+              <TableBody>
+                {data.recent.map((r) => (
+                  <TableRow key={r.id}>
+                    <TableCell>{formatAdminDate(r.sent_at)}</TableCell>
+                    <TableCell>{r.target_user.name || `#${r.target_user.id}`}</TableCell>
+                    <TableCell>{r.related_user.name || `#${r.related_user.id}`}</TableCell>
+                    <TableCell className="text-right tabular-nums">{r.score.toFixed(3)}</TableCell>
+                    <TableCell>
+                      <Chip
+                        size="sm"
+                        variant="flat"
+                        color={r.status === 'converted' ? 'success' : 'default'}
+                      >
+                        {r.status}
+                      </Chip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </CardBody>
       </Card>
