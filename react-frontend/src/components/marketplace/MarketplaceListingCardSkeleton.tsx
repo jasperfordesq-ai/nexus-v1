@@ -14,9 +14,9 @@ import { Card, CardBody, Skeleton } from '@heroui/react';
 
 export function MarketplaceListingCardSkeleton() {
   return (
-    <Card className="bg-default-50 border border-default-200">
+    <Card className="overflow-hidden bg-default-50 border border-default-200">
       {/* Image area — matches aspect-video */}
-      <div className="relative aspect-video overflow-hidden rounded-t-lg">
+      <div className="relative aspect-video overflow-hidden">
         <Skeleton className="w-full h-full rounded-none" />
         {/* Price badge placeholder — bottom-left */}
         <div className="absolute bottom-2 left-2">

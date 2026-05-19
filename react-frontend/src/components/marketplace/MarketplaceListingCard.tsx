@@ -50,94 +50,99 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
 
   return (
     <Card
-      as={Link}
-      to={tenantPath(`/marketplace/${listing.id}`)}
-      className="group hover:shadow-lg transition-shadow duration-200 bg-default-50 border border-default-200"
-      isPressable
+      className="group relative overflow-hidden bg-default-50 border border-default-200 transition-shadow duration-200 hover:shadow-lg focus-within:ring-2 focus-within:ring-primary/45"
     >
-      {/* Image container */}
-      <div className="relative aspect-video overflow-hidden rounded-t-lg">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={listing.image?.alt_text || listing.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-          />
-        ) : (
-          <ImagePlaceholder className="w-full h-full" />
-        )}
+      <Link
+        to={tenantPath(`/marketplace/${listing.id}`)}
+        className="block h-full focus-visible:outline-none"
+      >
+        {/* Image container */}
+        <div className="relative aspect-video overflow-hidden">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={listing.image?.alt_text || listing.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+          ) : (
+            <ImagePlaceholder className="w-full h-full" />
+          )}
 
-        {/* Price badge - bottom-left */}
-        <div className="absolute bottom-2 left-2">
-          <PriceBadge
-            price={listing.price}
-            currency={listing.price_currency}
-            priceType={listing.price_type}
-            timeCreditPrice={listing.time_credit_price}
-          />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
+
+          {/* Price badge - bottom-left */}
+          <div className="absolute bottom-2 left-2 max-w-[calc(100%-1rem)]">
+            <PriceBadge
+              price={listing.price}
+              currency={listing.price_currency}
+              priceType={listing.price_type}
+              timeCreditPrice={listing.time_credit_price}
+              isOverlay
+            />
+          </div>
+
+          {/* Condition badge - top-left */}
+          {listing.condition && (
+            <div className="absolute top-2 left-2">
+              <ConditionBadge condition={listing.condition} />
+            </div>
+          )}
+
+          {/* Promoted badge */}
+          {listing.is_promoted && (
+            <div className="absolute bottom-2 right-2">
+              <Chip
+                size="sm"
+                variant="solid"
+                color="secondary"
+                startContent={<Megaphone className="w-3 h-3" aria-hidden="true" />}
+              >
+                {t('listing.promoted', 'Promoted')}
+              </Chip>
+            </div>
+          )}
         </div>
 
-        {/* Condition badge - top-right, offset for save button */}
-        {listing.condition && (
-          <div className="absolute top-2 left-2">
-            <ConditionBadge condition={listing.condition} />
-          </div>
-        )}
+        {/* Content */}
+        <CardBody className="p-3 gap-1.5">
+          <h3 className="text-sm font-semibold text-theme-primary line-clamp-2 leading-tight">
+            {listing.title}
+          </h3>
 
-        {/* Save/Heart button - top-right */}
-        <Button
-          isIconOnly
-          variant="flat"
-          size="sm"
-          onPress={handleToggleSave}
-          className="absolute top-2 right-2 bg-black/40 hover:bg-black/60 transition-colors"
-          aria-label={
-            isSaved
-              ? t('listing.unsave', 'Remove from saved')
-              : t('listing.save', 'Save listing')
-          }
-        >
-          <Heart
-            className={`w-4 h-4 ${isSaved ? 'fill-rose-500 text-rose-500' : 'text-white'}`}
-            aria-hidden="true"
-          />
-        </Button>
+          {listing.location && (
+            <div className="flex items-center gap-1 text-xs text-theme-muted">
+              <MapPin className="w-3 h-3 shrink-0" aria-hidden="true" />
+              <span className="truncate">{listing.location}</span>
+            </div>
+          )}
 
-        {/* Promoted badge */}
-        {listing.is_promoted && (
-          <div className="absolute bottom-2 right-2">
-            <Chip
-              size="sm"
-              variant="solid"
-              color="secondary"
-              startContent={<Megaphone className="w-3 h-3" aria-hidden="true" />}
-            >
-              {t('listing.promoted', 'Promoted')}
-            </Chip>
-          </div>
-        )}
-      </div>
+          {listing.user && (
+            <p className="text-xs text-theme-subtle truncate">
+              {listing.user.name}
+            </p>
+          )}
+        </CardBody>
+      </Link>
 
-      {/* Content */}
-      <CardBody className="p-3 gap-1.5">
-        <h3 className="text-sm font-semibold text-theme-primary line-clamp-2 leading-tight">
-          {listing.title}
-        </h3>
-
-        {listing.location && (
-          <div className="flex items-center gap-1 text-xs text-theme-muted">
-            <MapPin className="w-3 h-3 shrink-0" aria-hidden="true" />
-            <span className="truncate">{listing.location}</span>
-          </div>
-        )}
-
-        {listing.user && (
-          <p className="text-xs text-theme-subtle truncate">
-            {listing.user.name}
-          </p>
-        )}
-      </CardBody>
+      {/* Save/Heart button - separate from the listing link */}
+      <Button
+        isIconOnly
+        variant="flat"
+        size="sm"
+        onPress={handleToggleSave}
+        className="absolute top-2 right-2 z-20 bg-background/90 text-foreground shadow-lg ring-1 ring-black/10 backdrop-blur-md transition-colors hover:bg-background"
+        aria-label={
+          isSaved
+            ? t('listing.unsave', 'Remove from saved')
+            : t('listing.save', 'Save listing')
+        }
+      >
+        <Heart
+          className={`w-4 h-4 ${isSaved ? 'fill-rose-500 text-rose-500' : 'text-foreground'}`}
+          aria-hidden="true"
+        />
+      </Button>
     </Card>
   );
 }

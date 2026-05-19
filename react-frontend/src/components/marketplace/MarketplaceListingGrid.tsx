@@ -7,7 +7,7 @@
  * MarketplaceListingGrid - Responsive grid layout for marketplace listings
  *
  * Renders a CSS grid of MarketplaceListingCard components with responsive
- * column counts: 2 on mobile, 3 on tablet, 4 on desktop.
+ * column counts: 1 on narrow phones, 2 on larger phones, 3 on tablet, 4 on desktop.
  * Shows an empty state when no listings are available.
  */
 
@@ -27,7 +27,7 @@ export function MarketplaceListingGrid({ listings, onSave, onUnsave }: Marketpla
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
       {listings.map((listing) => (
         <MarketplaceListingCard
           key={listing.id}

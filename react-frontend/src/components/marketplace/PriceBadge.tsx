@@ -18,6 +18,7 @@ interface PriceBadgeProps {
   currency: string;
   priceType: string;
   timeCreditPrice?: number | null;
+  isOverlay?: boolean;
 }
 
 /**
@@ -38,12 +39,20 @@ function formatPrice(price: number, currency: string): string {
   }
 }
 
-export function PriceBadge({ price, currency, priceType, timeCreditPrice }: PriceBadgeProps) {
+export function PriceBadge({ price, currency, priceType, timeCreditPrice, isOverlay = false }: PriceBadgeProps) {
   const { t } = useTranslation('marketplace');
+  const priceClassName = isOverlay
+    ? 'inline-flex max-w-[calc(100vw-3rem)] items-center rounded-full bg-background/95 px-3 py-1 text-sm font-bold text-foreground shadow-lg ring-1 ring-black/10 backdrop-blur-md'
+    : 'text-lg font-bold text-theme-primary';
 
   if (priceType === 'free') {
     return (
-      <Chip color="success" variant="solid" size="sm" className="font-semibold">
+      <Chip
+        color="success"
+        variant="solid"
+        size="sm"
+        className={isOverlay ? 'font-semibold shadow-lg ring-1 ring-black/10' : 'font-semibold'}
+      >
         {t('price.free', 'Free')}
       </Chip>
     );
@@ -51,7 +60,12 @@ export function PriceBadge({ price, currency, priceType, timeCreditPrice }: Pric
 
   if (priceType === 'contact') {
     return (
-      <Chip color="default" variant="flat" size="sm">
+      <Chip
+        color="default"
+        variant={isOverlay ? 'solid' : 'flat'}
+        size="sm"
+        className={isOverlay ? 'bg-background/95 text-foreground shadow-lg ring-1 ring-black/10 backdrop-blur-md' : undefined}
+      >
         {t('price.contact', 'Contact for price')}
       </Chip>
     );
@@ -69,8 +83,8 @@ export function PriceBadge({ price, currency, priceType, timeCreditPrice }: Pric
 
   if (priceType === 'negotiable') {
     return (
-      <span className="inline-flex items-center gap-1.5">
-        <span className="text-lg font-bold text-theme-primary">
+      <span className="inline-flex max-w-full items-center gap-1.5">
+        <span className={priceClassName}>
           {formattedPrice}{timeCreditSuffix}
         </span>
         <Chip color="warning" variant="flat" size="sm">
@@ -82,7 +96,7 @@ export function PriceBadge({ price, currency, priceType, timeCreditPrice }: Pric
 
   // Fixed or auction pricing
   return (
-    <span className="text-lg font-bold text-theme-primary">
+    <span className={priceClassName}>
       {formattedPrice}{timeCreditSuffix}
     </span>
   );
