@@ -31,6 +31,10 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
     /** Process on the high-priority federation queue to minimise connection notification latency. */
     public string $queue = 'federation-high';
 
+    public int $tries = 3;
+
+    public array $backoff = [60, 300, 900];
+
     public function __construct(
         private readonly FederationFeatureService $federationFeatureService,
     ) {}
@@ -73,6 +77,7 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
             // Build the set of partner IDs that have allow_connections = 1
             $allowed = FederationExternalPartnerService::getActivePartnersWithFlag($tenantId, 'allow_connections');
             $allowedPartnerIds = array_flip(array_map(fn ($p) => (int) $p['id'], $allowed));
+            $retryableFailures = [];
 
             foreach ($identities as $identity) {
                 $partnerId = (int) $identity->partner_id;
@@ -90,6 +95,7 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
                     'tenant_id'            => $tenantId,
                     'accepted_at'          => $connection->updated_at?->toISOString()
                         ?? now()->toISOString(),
+                    'idempotency_key'      => "connection:{$tenantId}:{$connection->id}:accepted:{$partnerId}",
                 ];
 
                 try {
@@ -101,7 +107,12 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
                             'tenant_id'     => $tenantId,
                             'connection_id' => $connection->id,
                             'error'         => $result['error'] ?? null,
+                            'status_code'   => $result['status_code'] ?? null,
                         ]);
+
+                        if ($this->isRetryablePartnerFailure($result)) {
+                            $retryableFailures[] = $partnerId . ':' . ($result['error'] ?? 'unknown error');
+                        }
                     }
                 } catch (\Throwable $e) {
                     Log::warning('PushConnectionAcceptedToFederatedPartner: partner push failed', [
@@ -110,7 +121,12 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
                         'connection_id' => $connection->id,
                         'error'         => $e->getMessage(),
                     ]);
+                    $retryableFailures[] = $partnerId . ':' . $e->getMessage();
                 }
+            }
+
+            if (!empty($retryableFailures)) {
+                throw new \RuntimeException('Retryable federation connection accept push failure: ' . implode('; ', $retryableFailures));
             }
         } catch (\Throwable $e) {
             Log::error('PushConnectionAcceptedToFederatedPartner listener failed', [
@@ -118,8 +134,20 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
                 'connection_id' => $connection->id ?? null,
                 'error'         => $e->getMessage(),
             ]);
+
+            throw $e;
         } finally {
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
+    }
+
+    /**
+     * @param array<string,mixed> $result
+     */
+    private function isRetryablePartnerFailure(array $result): bool
+    {
+        $statusCode = (int) ($result['status_code'] ?? $result['code'] ?? 0);
+
+        return $statusCode === 0 || $statusCode >= 500;
     }
 }

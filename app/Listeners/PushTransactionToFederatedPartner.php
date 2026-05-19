@@ -27,6 +27,10 @@ class PushTransactionToFederatedPartner implements ShouldQueue
     /** Process on the high-priority federation queue to minimise transaction latency. */
     public string $queue = 'federation-high';
 
+    public int $tries = 3;
+
+    public array $backoff = [60, 300, 900];
+
     public function __construct(
         private readonly FederationFeatureService $federationFeatureService,
     ) {}
@@ -84,7 +88,12 @@ class PushTransactionToFederatedPartner implements ShouldQueue
                     'tenant_id'      => $event->tenantId,
                     'transaction_id' => $transaction->id,
                     'error'          => $result['error'] ?? null,
+                    'status_code'    => $result['status_code'] ?? null,
                 ]);
+
+                if ($this->isRetryablePartnerFailure($result)) {
+                    throw new \RuntimeException('Retryable federation transaction push failure: ' . ($result['error'] ?? 'unknown error'));
+                }
             }
         } catch (\Throwable $e) {
             Log::error('PushTransactionToFederatedPartner listener failed', [
@@ -92,8 +101,20 @@ class PushTransactionToFederatedPartner implements ShouldQueue
                 'transaction_id' => $event->transaction->id ?? null,
                 'error'          => $e->getMessage(),
             ]);
+
+            throw $e;
         } finally {
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
+    }
+
+    /**
+     * @param array<string,mixed> $result
+     */
+    private function isRetryablePartnerFailure(array $result): bool
+    {
+        $statusCode = (int) ($result['status_code'] ?? $result['code'] ?? 0);
+
+        return $statusCode === 0 || $statusCode >= 500;
     }
 }

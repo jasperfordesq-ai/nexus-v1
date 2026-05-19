@@ -123,6 +123,39 @@ class FederationListenersTest extends TestCase
         );
     }
 
+    public function test_federated_partner_push_listeners_retry_transient_failures(): void
+    {
+        foreach ([
+            PushMessageToFederatedPartner::class,
+            PushTransactionToFederatedPartner::class,
+            PushConnectionAcceptedToFederatedPartner::class,
+        ] as $listenerClass) {
+            $reflection = new \ReflectionClass($listenerClass);
+            $listener = $reflection->newInstanceWithoutConstructor();
+
+            $this->assertSame(3, $reflection->getProperty('tries')->getValue($listener));
+            $this->assertSame([60, 300, 900], $reflection->getProperty('backoff')->getValue($listener));
+
+            $source = file_get_contents($reflection->getFileName());
+
+            $this->assertIsString($source);
+            $this->assertStringContainsString('status_code', $source);
+            $this->assertStringContainsString('isRetryablePartnerFailure', $source);
+            $this->assertStringContainsString('throw $e;', $source);
+        }
+    }
+
+    public function test_connection_accept_push_uses_stable_idempotency_key(): void
+    {
+        $reflection = new \ReflectionClass(PushConnectionAcceptedToFederatedPartner::class);
+        $source = file_get_contents($reflection->getFileName());
+
+        $this->assertIsString($source);
+        $this->assertStringContainsString("'idempotency_key'", $source);
+        $this->assertStringContainsString('connection:', $source);
+        $this->assertStringContainsString(':accepted:', $source);
+    }
+
     // -------- CommunityEvent listener --------
 
     public function test_community_event_listener_skips_when_tenant_feature_disabled(): void
@@ -181,7 +214,7 @@ class FederationListenersTest extends TestCase
         $listener = new PushCommunityEventToFederatedPartners($featureService);
         $listener->handle(new CommunityEventCreated($model, $this->testTenantId));
 
-        $this->assertSame($this->testTenantId, TenantContext::getId());
+        $this->assertNull(TenantContext::currentId());
         Http::assertNothingSent();
     }
 
@@ -260,7 +293,7 @@ class FederationListenersTest extends TestCase
         $listener = new PushGroupMembershipToFederatedPartners($featureService);
         $listener->handle(new GroupMemberJoined(42, 99, $this->testTenantId));
 
-        $this->assertSame($this->testTenantId, TenantContext::getId());
+        $this->assertNull(TenantContext::currentId());
         Http::assertNothingSent();
     }
 
@@ -279,8 +312,14 @@ class FederationListenersTest extends TestCase
         $conn->requester_id = 1;
         $conn->receiver_id = 2;
 
+        $requester = new User();
+        $requester->id = 1;
+
+        $acceptor = new User();
+        $acceptor->id = 2;
+
         $listener = new PushConnectionAcceptedToFederatedPartner($featureService);
-        $listener->handle(new ConnectionAccepted($conn, $this->testTenantId));
+        $listener->handle(new ConnectionAccepted($conn, $requester, $acceptor, $this->testTenantId));
 
         Http::assertNothingSent();
     }
@@ -299,8 +338,14 @@ class FederationListenersTest extends TestCase
         $conn->requester_id = 9999998;
         $conn->receiver_id = 9999999;
 
+        $requester = new User();
+        $requester->id = 9999998;
+
+        $acceptor = new User();
+        $acceptor->id = 9999999;
+
         $listener = new PushConnectionAcceptedToFederatedPartner($featureService);
-        $listener->handle(new ConnectionAccepted($conn, $this->testTenantId));
+        $listener->handle(new ConnectionAccepted($conn, $requester, $acceptor, $this->testTenantId));
 
         Http::assertNothingSent();
     }
@@ -452,8 +497,8 @@ class FederationListenersTest extends TestCase
         $listener = new PushReviewToFederatedPartner($featureService);
         $listener->handle($event);
 
-        // After handle(), tenant context should have been restored
-        $this->assertSame($this->testTenantId, TenantContext::getId());
+        // PHPUnit runs in console mode, so scoped listeners reset instead of restoring a web request tenant.
+        $this->assertNull(TenantContext::currentId());
         Http::assertNothingSent();
     }
 
