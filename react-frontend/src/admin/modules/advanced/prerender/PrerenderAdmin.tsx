@@ -800,6 +800,7 @@ function KpiCard({
 // ─── Inventory ─────────────────────────────────────────────────────────────
 
 function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string | null; onPresetConsumed: () => void }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.inventory' });
   const toast = useToast();
   const { user } = useAuth();
   const isSuperAdmin = Boolean(user?.is_super_admin || user?.is_god || user?.role === 'super_admin');
@@ -1080,16 +1081,17 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Tooltip content="Inspect">
-                      <Button isIconOnly size="sm" variant="light" onPress={() => openInspect(it)}>
+                    <Tooltip content={t('actions.inspect')}>
+                      <Button isIconOnly size="sm" variant="light" onPress={() => openInspect(it)} aria-label={t('actions.inspect_snapshot', { path: it.cache_path })}>
                         <Search size={14} />
                       </Button>
                     </Tooltip>
-                    <Tooltip content="Open rendered URL">
+                    <Tooltip content={t('actions.open_rendered_url')}>
                       <Button
                         isIconOnly
                         size="sm"
                         variant="light"
+                        aria-label={t('actions.open_rendered_url')}
                         as="a"
                         href={`https://${it.host}${it.route === '/' ? '' : it.route}`}
                         target="_blank"
@@ -1632,6 +1634,7 @@ function AnalyticsTab() {
 // ─── Jobs ──────────────────────────────────────────────────────────────────
 
 function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number; live: boolean }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.jobs' });
   const [jobs, setJobs] = useState<PrerenderJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<string>('all');
@@ -1765,7 +1768,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                 <TableCell className="text-xs">{j.requested_by?.name || '—'}</TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Button size="sm" variant="light" isIconOnly onPress={() => openDetail(j)}>
+                    <Button size="sm" variant="light" isIconOnly onPress={() => openDetail(j)} aria-label={t('actions.view_details', { id: j.id })}>
                       <Search size={14} />
                     </Button>
                     {j.status === 'queued' && (
@@ -1774,6 +1777,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                         variant="light"
                         color="danger"
                         isIconOnly
+                        aria-label={t('actions.cancel_job', { id: j.id })}
                         onPress={() => cancelJob(j.id)}
                         isDisabled={!isSuperAdmin}
                       >
@@ -1781,12 +1785,13 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                       </Button>
                     )}
                     {(j.status === 'failed' || j.status === 'partial' || j.status === 'cancelled') && (
-                      <Tooltip content="Retry with the same parameters">
+                      <Tooltip content={t('actions.retry_same_parameters')}>
                         <Button
                           size="sm"
                           variant="light"
                           color="primary"
                           isIconOnly
+                          aria-label={t('actions.retry_job', { id: j.id })}
                           onPress={() => retryJob(j.id)}
                           isDisabled={!isSuperAdmin}
                         >

@@ -1684,6 +1684,21 @@
     "provider_smtp": "SMTP",
     "prerender": {
       "description": "Bot-only server-rendered snapshots. Monitor coverage, detect staleness, and force refreshes.",
+      "inventory": {
+        "actions": {
+          "inspect": "Inspect",
+          "inspect_snapshot": "Inspect {{path}}",
+          "open_rendered_url": "Open rendered URL"
+        }
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "Cancel job #{{id}}",
+          "retry_job": "Retry job #{{id}}",
+          "retry_same_parameters": "Retry with the same parameters",
+          "view_details": "View job #{{id}} details"
+        }
+      },
       "live_connected": "Live updates connected",
       "overview": {
         "actions": {
