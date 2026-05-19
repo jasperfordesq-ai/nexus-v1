@@ -163,7 +163,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
       setPages(items);
     } catch (err) {
       logError('GroupWikiTab.loadPages', err);
-      toast.error(t('wiki.load_failed', 'Failed to load wiki pages'));
+      toast.error(t('wiki.load_failed'));
     } finally {
       setLoading(false);
     }
@@ -185,7 +185,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
         setSelectedPage(res.data as WikiPageDetail);
       } catch (err) {
         logError('GroupWikiTab.loadPage', err);
-        toast.error(t('wiki.page_load_failed', 'Failed to load page'));
+        toast.error(t('wiki.page_load_failed'));
       } finally {
         setPageLoading(false);
       }
@@ -206,7 +206,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
 
       const res = await api.post<{ slug?: string }>(`/v2/groups/${groupId}/wiki`, body);
       if (res.success) {
-        toast.success(t('wiki.created', 'Page created'));
+        toast.success(t('wiki.created'));
         setNewTitle('');
         setNewContent('');
         setNewParentId(null);
@@ -219,7 +219,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
       }
     } catch (err) {
       logError('GroupWikiTab.create', err);
-      toast.error(t('wiki.create_failed', 'Failed to create page'));
+      toast.error(t('wiki.create_failed'));
     } finally {
       setCreating(false);
     }
@@ -235,7 +235,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
 
       const res = await api.put(`/v2/groups/${groupId}/wiki/${selectedPage.id}`, body);
       if (res.success) {
-        toast.success(t('wiki.saved', 'Page saved'));
+        toast.success(t('wiki.saved'));
         setEditing(false);
         setChangeSummary('');
         // Reload the page to reflect the saved content
@@ -244,7 +244,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
       }
     } catch (err) {
       logError('GroupWikiTab.save', err);
-      toast.error(t('wiki.save_failed', 'Failed to save page'));
+      toast.error(t('wiki.save_failed'));
     } finally {
       setSaving(false);
     }
@@ -256,7 +256,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
     setDeleting(true);
     try {
       await api.delete(`/v2/groups/${groupId}/wiki/${deleteTarget.id}`);
-      toast.success(t('wiki.deleted', 'Page deleted'));
+      toast.success(t('wiki.deleted'));
       setDeleteTarget(null);
       deleteModal.onClose();
       if (selectedPage?.id === deleteTarget.id) {
@@ -265,7 +265,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
       loadPages();
     } catch (err) {
       logError('GroupWikiTab.delete', err);
-      toast.error(t('wiki.delete_failed', 'Failed to delete page'));
+      toast.error(t('wiki.delete_failed'));
     } finally {
       setDeleting(false);
     }
@@ -283,7 +283,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
         setRevisionsOpen(true);
       } catch (err) {
         logError('GroupWikiTab.loadRevisions', err);
-        toast.error(t('wiki.revisions_failed', 'Failed to load revision history'));
+        toast.error(t('wiki.revisions_failed'));
       } finally {
         setRevisionsLoading(false);
       }
@@ -309,7 +309,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
     return (
       <div
         className="flex justify-center py-12"
-        aria-label={t('wiki.loading', 'Loading wiki')}
+        aria-label={t('wiki.loading')}
         aria-busy="true"
       >
         <Spinner size="lg" />
@@ -323,16 +323,16 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
           <BookOpen className="w-5 h-5" aria-hidden="true" />
-          {t('wiki.heading', 'Wiki')}
+          {t('wiki.heading')}
         </h2>
         {isMember && (
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white sm:shrink-0"
             size="sm"
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             onPress={createModal.onOpen}
           >
-            {t('wiki.new_page', 'New Page')}
+            {t('wiki.new_page')}
           </Button>
         )}
       </div>
@@ -341,14 +341,14 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
         {/* Sidebar: page list */}
         <GlassCard className="p-4 lg:w-72 lg:flex-shrink-0">
           <h3 className="text-sm font-semibold text-theme-secondary mb-3">
-            {t('wiki.pages', 'Pages')}
+            {t('wiki.pages')}
           </h3>
           {treePages.length === 0 ? (
             <p className="text-sm text-theme-subtle py-2">
-              {t('wiki.no_pages_sidebar', 'No pages yet')}
+              {t('wiki.no_pages_sidebar')}
             </p>
           ) : (
-            <nav aria-label={t('wiki.page_nav_aria', 'Wiki page navigation')}>
+            <nav aria-label={t('wiki.page_nav_aria')}>
               <ul className="space-y-1">
                 {treePages.map((page) => (
                   <li key={page.id}>
@@ -367,7 +367,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                       <span className="truncate">{page.title}</span>
                       {!page.is_published && (
                         <Chip size="sm" variant="flat" color="warning" className="ml-auto text-xs">
-                          {t('wiki.draft', 'Draft')}
+                          {t('wiki.draft')}
                         </Chip>
                       )}
                     </Button>
@@ -392,7 +392,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
               {breadcrumbs.length > 1 && (
                 <nav
                   className="flex items-center gap-1 text-sm text-theme-subtle mb-4 flex-wrap"
-                  aria-label={t('wiki.breadcrumb_aria', 'Wiki page breadcrumb')}
+                  aria-label={t('wiki.breadcrumb_aria')}
                 >
                   {breadcrumbs.map((crumb, idx) => (
                     <span key={crumb.id} className="flex items-center gap-1">
@@ -416,7 +416,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
               )}
 
               {/* Page header */}
-              <div className="flex items-start justify-between gap-3 mb-4">
+              <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <h3 className="text-xl font-bold text-theme-primary">{selectedPage.title}</h3>
                   <div className="flex items-center gap-2 mt-1 text-xs text-theme-subtle">
@@ -425,23 +425,23 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                     <span>{formatRelativeTime(selectedPage.updated_at)}</span>
                     {!selectedPage.is_published && (
                       <Chip size="sm" variant="flat" color="warning" className="text-xs">
-                        {t('wiki.draft', 'Draft')}
+                        {t('wiki.draft')}
                       </Chip>
                     )}
                   </div>
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex items-center gap-1 flex-shrink-0">
+                <div className="flex flex-wrap items-center gap-1 sm:flex-shrink-0">
                   {isMember && !editing && (
                     <Button
                       variant="light"
                       size="sm"
                       startContent={<Edit className="w-4 h-4" aria-hidden="true" />}
                       onPress={startEditing}
-                      aria-label={t('wiki.edit_aria', 'Edit page')}
+                      aria-label={t('wiki.edit_aria')}
                     >
-                      {t('wiki.edit', 'Edit')}
+                      {t('wiki.edit')}
                     </Button>
                   )}
                   <Button
@@ -450,9 +450,9 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                     startContent={<History className="w-4 h-4" aria-hidden="true" />}
                     onPress={() => loadRevisions(selectedPage.id)}
                     isLoading={revisionsLoading}
-                    aria-label={t('wiki.history_aria', 'View revision history')}
+                    aria-label={t('wiki.history_aria')}
                   >
-                    {t('wiki.history', 'History')}
+                    {t('wiki.history')}
                   </Button>
                   {isAdmin && (
                     <Button
@@ -464,9 +464,9 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                         setDeleteTarget(selectedPage);
                         deleteModal.onOpen();
                       }}
-                      aria-label={t('wiki.delete_aria', 'Delete page')}
+                      aria-label={t('wiki.delete_aria')}
                     >
-                      {t('wiki.delete', 'Delete')}
+                      {t('wiki.delete')}
                     </Button>
                   )}
                 </div>
@@ -480,16 +480,16 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                     onValueChange={setEditContent}
                     minRows={10}
                     maxRows={30}
-                    placeholder={t('wiki.content_placeholder', 'Write page content...')}
-                    aria-label={t('wiki.edit_content_aria', 'Edit page content')}
+                    placeholder={t('wiki.content_placeholder')}
+                    aria-label={t('wiki.edit_content_aria')}
                     classNames={{
                       input: 'bg-transparent text-theme-primary',
                       inputWrapper: 'bg-theme-elevated border-theme-default',
                     }}
                   />
                   <Input
-                    label={t('wiki.change_summary_label', 'Change summary (optional)')}
-                    placeholder={t('wiki.change_summary_placeholder', 'Briefly describe your changes')}
+                    label={t('wiki.change_summary_label')}
+                    placeholder={t('wiki.change_summary_placeholder')}
                     value={changeSummary}
                     onValueChange={setChangeSummary}
                     size="sm"
@@ -499,22 +499,23 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                       label: 'text-theme-muted',
                     }}
                   />
-                  <div className="flex items-center gap-2 justify-end">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
                     <Button
                       variant="flat"
                       size="sm"
+                      className="w-full sm:w-auto"
                       onPress={() => setEditing(false)}
                     >
-                      {t('wiki.cancel', 'Cancel')}
+                      {t('wiki.cancel')}
                     </Button>
                     <Button
-                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                       size="sm"
+                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white w-full sm:w-auto"
                       onPress={handleSave}
                       isLoading={saving}
                       isDisabled={!editContent.trim()}
                     >
-                      {t('wiki.save', 'Save')}
+                      {t('wiki.save')}
                     </Button>
                   </div>
                 </div>
@@ -529,14 +530,14 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                 <div className="mt-6 border-t border-theme-default pt-4">
                   <h4 className="text-sm font-semibold text-theme-primary flex items-center gap-2 mb-3">
                     <History className="w-4 h-4" aria-hidden="true" />
-                    {t('wiki.revision_history', 'Revision History')}
+                    {t('wiki.revision_history')}
                   </h4>
                   {revisions.length === 0 ? (
                     <p className="text-sm text-theme-subtle">
-                      {t('wiki.no_revisions', 'No revisions recorded yet')}
+                      {t('wiki.no_revisions')}
                     </p>
                   ) : (
-                    <ul className="space-y-2" aria-label={t('wiki.revisions_list_aria', 'Page revisions')}>
+                    <ul className="space-y-2" aria-label={t('wiki.revisions_list_aria')}>
                       {revisions.map((rev) => (
                         <li
                           key={rev.id}
@@ -570,7 +571,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                       size="sm"
                       onPress={() => setRevisionsOpen(false)}
                     >
-                      {t('wiki.close_history', 'Close History')}
+                      {t('wiki.close_history')}
                     </Button>
                   </div>
                 </div>
@@ -580,14 +581,11 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
             <GlassCard className="p-6">
               <EmptyState
                 icon={<BookOpen className="w-12 h-12" aria-hidden="true" />}
-                title={t('wiki.empty_title', 'No page selected')}
+                title={t('wiki.empty_title')}
                 description={
                   pages.length === 0
-                    ? t(
-                        'wiki.empty_no_pages',
-                        'Create your first wiki page to start building a knowledge base',
-                      )
-                    : t('wiki.empty_select', 'Select a page from the sidebar to view its content')
+                    ? t('wiki.empty_no_pages')
+                    : t('wiki.empty_select')
                 }
                 action={
                   isMember &&
@@ -597,7 +595,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                       startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                       onPress={createModal.onOpen}
                     >
-                      {t('wiki.create_first', 'Create First Page')}
+                      {t('wiki.create_first')}
                     </Button>
                   )
                 }
@@ -623,12 +621,12 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
             <>
               <ModalHeader className="text-theme-primary flex items-center gap-2">
                 <FileText className="w-5 h-5 text-purple-400" aria-hidden="true" />
-                {t('wiki.create_title', 'New Wiki Page')}
+                {t('wiki.create_title')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label={t('wiki.title_label', 'Page Title')}
-                  placeholder={t('wiki.title_placeholder', 'Enter page title')}
+                  label={t('wiki.title_label')}
+                  placeholder={t('wiki.title_placeholder')}
                   value={newTitle}
                   onValueChange={setNewTitle}
                   isRequired
@@ -641,7 +639,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                 {pages.length > 0 && (
                   <div>
                     <label className="text-sm text-theme-muted mb-2 block">
-                      {t('wiki.parent_label', 'Parent Page (optional)')}
+                      {t('wiki.parent_label')}
                     </label>
                     <div className="flex flex-wrap gap-2">
                       <Chip
@@ -650,7 +648,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                         className="cursor-pointer"
                         onClick={() => setNewParentId(null)}
                       >
-                        {t('wiki.no_parent', 'Top Level')}
+                        {t('wiki.no_parent')}
                       </Chip>
                       {pages.map((page) => (
                         <Chip
@@ -667,8 +665,8 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                   </div>
                 )}
                 <Textarea
-                  label={t('wiki.content_label', 'Content')}
-                  placeholder={t('wiki.content_placeholder', 'Write page content...')}
+                  label={t('wiki.content_label')}
+                  placeholder={t('wiki.content_placeholder')}
                   value={newContent}
                   onValueChange={setNewContent}
                   minRows={6}
@@ -682,7 +680,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onModalClose}>
-                  {t('wiki.cancel', 'Cancel')}
+                  {t('wiki.cancel')}
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -690,7 +688,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                   isDisabled={!newTitle.trim() || !newContent.trim()}
                   onPress={handleCreate}
                 >
-                  {t('wiki.create', 'Create Page')}
+                  {t('wiki.create')}
                 </Button>
               </ModalFooter>
             </>
@@ -717,26 +715,22 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
           {(onModalClose) => (
             <>
               <ModalHeader className="text-theme-primary">
-                {t('wiki.delete_title', 'Delete Wiki Page')}
+                {t('wiki.delete_title')}
               </ModalHeader>
               <ModalBody>
                 <div className="flex items-start gap-3">
                   <Trash2 className="w-5 h-5 text-danger flex-shrink-0 mt-0.5" aria-hidden="true" />
                   <p className="text-theme-secondary">
-                    {t(
-                      'wiki.delete_confirm',
-                      'Are you sure you want to delete "{{name}}"? This action cannot be undone.',
-                      { name: deleteTarget?.title },
-                    )}
+                    {t('wiki.delete_confirm', { name: deleteTarget?.title })}
                   </p>
                 </div>
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onModalClose}>
-                  {t('wiki.cancel', 'Cancel')}
+                  {t('wiki.cancel')}
                 </Button>
                 <Button color="danger" isLoading={deleting} onPress={handleDelete}>
-                  {t('wiki.delete', 'Delete')}
+                  {t('wiki.delete')}
                 </Button>
               </ModalFooter>
             </>
