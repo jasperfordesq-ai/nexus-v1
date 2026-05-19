@@ -6,19 +6,30 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Chip, Progress, Spinner } from '@heroui/react';
+import {
+  Button,
+  Chip,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Progress,
+  Spinner,
+} from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Bell from 'lucide-react/icons/bell';
 import BellOff from 'lucide-react/icons/bell-off';
 import CalendarDays from 'lucide-react/icons/calendar-days';
+import Link2 from 'lucide-react/icons/link-2';
 import Flag from 'lucide-react/icons/flag';
 import MapPin from 'lucide-react/icons/map-pin';
 import Megaphone from 'lucide-react/icons/megaphone';
 import Milestone from 'lucide-react/icons/milestone';
+import Share2 from 'lucide-react/icons/share-2';
 import Users from 'lucide-react/icons/users';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
-import { useAuth, useTenant } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -70,12 +81,18 @@ function statusColor(status: ProjectStatus): 'primary' | 'warning' | 'success' |
   return 'default';
 }
 
+function truncateMetaDescription(value: string, maxLength = 160): string {
+  const normalized = value.replace(/\s+/g, ' ').trim();
+  if (normalized.length <= maxLength) return normalized;
+  return `${normalized.slice(0, maxLength - 1).trimEnd()}...`;
+}
+
 export default function ProjectAnnouncementsPage() {
   const { id } = useParams<{ id?: string }>();
   const { t } = useTranslation('project_announcements');
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
-  usePageTitle(t('meta.title'));
+  const toast = useToast();
 
   const [projects, setProjects] = useState<ProjectAnnouncement[]>([]);
   const [project, setProject] = useState<ProjectAnnouncement | null>(null);
@@ -84,6 +101,24 @@ export default function ProjectAnnouncementsPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const isDetail = Boolean(id);
+  const pageTitle = isDetail && project ? t('meta.detail_title', { title: project.title }) : t('meta.title');
+  usePageTitle(pageTitle);
+
+  const projectShareUrl = project && typeof window !== 'undefined'
+    ? `${window.location.origin}${tenantPath(`/caring-community/projects/${project.id}`)}`
+    : '';
+
+  const getProjectMetaDescription = useCallback((item: ProjectAnnouncement) => {
+    const fallback = t('meta.detail_description_fallback', {
+      title: item.title,
+      status: t(`status.${item.status}`),
+      stage: item.current_stage ?? t('meta.stage_unknown'),
+      location: item.location ?? t('meta.location_unknown'),
+      progress: item.progress_percent,
+    });
+
+    return truncateMetaDescription(item.summary ?? fallback);
+  }, [t]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -141,6 +176,43 @@ export default function ProjectAnnouncementsPage() {
       setSubmitting(false);
     }
   };
+
+  const copyProjectLink = useCallback(async () => {
+    if (!projectShareUrl) return;
+    try {
+      await navigator.clipboard.writeText(projectShareUrl);
+      toast.success(t('share.link_copied'));
+    } catch (err) {
+      logError('ProjectAnnouncementsPage.copyProjectLink', err);
+      toast.error(t('share.copy_failed'));
+    }
+  }, [projectShareUrl, t, toast]);
+
+  const shareProject = useCallback(async () => {
+    if (!project || !projectShareUrl) return;
+
+    const shareData = {
+      title: t('meta.detail_title', { title: project.title }),
+      text: t('share.share_text', {
+        title: project.title,
+        description: getProjectMetaDescription(project),
+      }),
+      url: projectShareUrl,
+    };
+
+    try {
+      if (navigator.share && (!navigator.canShare || navigator.canShare(shareData))) {
+        await navigator.share(shareData);
+        return;
+      }
+      await copyProjectLink();
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        logError('ProjectAnnouncementsPage.shareProject', err);
+        toast.error(t('share.copy_failed'));
+      }
+    }
+  }, [copyProjectLink, getProjectMetaDescription, project, projectShareUrl, t, toast]);
 
   const renderProjectCard = (item: ProjectAnnouncement) => (
     <Link key={item.id} to={tenantPath(`/caring-community/projects/${item.id}`)} className="group">
@@ -201,9 +273,18 @@ export default function ProjectAnnouncementsPage() {
   }
 
   if (isDetail && project) {
+    const detailMetaTitle = t('meta.detail_title', { title: project.title });
+    const detailMetaDescription = getProjectMetaDescription(project);
+
     return (
       <>
-        <PageMeta title={project.title} description={project.summary ?? t('meta.description')} noIndex />
+        <PageMeta
+          title={detailMetaTitle}
+          description={detailMetaDescription}
+          type="article"
+          publishedTime={project.published_at ?? undefined}
+          modifiedTime={(project.last_update_at ?? project.published_at) ?? undefined}
+        />
         <div className="mx-auto flex max-w-4xl flex-col gap-6 px-4 py-8">
           <Link to={tenantPath('/caring-community/projects')} className="w-fit">
             <Button
@@ -232,19 +313,48 @@ export default function ProjectAnnouncementsPage() {
                     </p>
                   )}
                 </div>
-                {isAuthenticated && (
-                  <Button
-                    color={project.is_subscribed ? 'default' : 'primary'}
-                    variant={project.is_subscribed ? 'flat' : 'solid'}
-                    isLoading={submitting}
-                    startContent={project.is_subscribed
-                      ? <BellOff className="h-4 w-4" aria-hidden="true" />
-                      : <Bell className="h-4 w-4" aria-hidden="true" />}
-                    onPress={() => void toggleSubscription()}
-                  >
-                    {project.is_subscribed ? t('unsubscribe') : t('subscribe')}
-                  </Button>
-                )}
+                <div className="flex flex-wrap items-center gap-2">
+                  <Dropdown placement="bottom-end">
+                    <DropdownTrigger>
+                      <Button
+                        variant="flat"
+                        startContent={<Share2 className="h-4 w-4" aria-hidden="true" />}
+                      >
+                        {t('share.title')}
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu aria-label={t('share.title')}>
+                      <DropdownItem
+                        key="native"
+                        startContent={<Share2 className="h-4 w-4" aria-hidden="true" />}
+                        onPress={() => void shareProject()}
+                      >
+                        {t('share.native')}
+                      </DropdownItem>
+                      <DropdownItem
+                        key="copy"
+                        startContent={<Link2 className="h-4 w-4" aria-hidden="true" />}
+                        onPress={() => void copyProjectLink()}
+                      >
+                        {t('share.copy_link')}
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+
+                  {isAuthenticated && (
+                    <Button
+                      color={project.is_subscribed ? 'default' : 'primary'}
+                      variant={project.is_subscribed ? 'flat' : 'solid'}
+                      isLoading={submitting}
+                      startContent={project.is_subscribed
+                        ? <BellOff className="h-4 w-4" aria-hidden="true" />
+                        : <Bell className="h-4 w-4" aria-hidden="true" />}
+                      onPress={() => void toggleSubscription()}
+                    >
+                      {project.is_subscribed ? t('unsubscribe') : t('subscribe')}
+                    </Button>
+                  )}
+                </div>
               </div>
 
               <Progress
@@ -332,7 +442,7 @@ export default function ProjectAnnouncementsPage() {
 
   return (
     <>
-      <PageMeta title={t('meta.title')} description={t('meta.description')} noIndex />
+      <PageMeta title={t('meta.title')} description={t('meta.description')} />
       <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
         <div className="flex items-start gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10">

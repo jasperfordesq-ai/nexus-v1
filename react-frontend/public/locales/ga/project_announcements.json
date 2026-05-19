@@ -1,7 +1,11 @@
 {
   "meta": {
     "title": "Community Projects",
-    "description": "Follow municipality, cooperative, and neighbourhood projects from announcement to milestone."
+    "description": "Follow municipality, cooperative, and neighbourhood projects from announcement to milestone.",
+    "detail_title": "{{title}}",
+    "detail_description_fallback": "Ta {{title}} {{status}} ag dul chun cinn {{progress}}%. Ceim: {{stage}}. Suiomh: {{location}}.",
+    "stage_unknown": "Ceim le deimhniu",
+    "location_unknown": "Suiomh le deimhniu"
   },
   "status": {
     "draft": "Draft",
@@ -25,5 +29,13 @@
   "errors": {
     "load": "Could not load community projects.",
     "subscribe": "Could not update your project notifications."
+  },
+  "share": {
+    "title": "Roinn an tionscadal",
+    "copy_link": "Coipeail nasc",
+    "native": "Roinn",
+    "link_copied": "Nasc coipeailte",
+    "copy_failed": "Niorbh fheidir an nasc a choipeail",
+    "share_text": "{{title}} - {{description}}"
   }
 }

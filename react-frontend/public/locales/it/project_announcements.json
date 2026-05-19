@@ -1,7 +1,11 @@
 {
   "meta": {
     "title": "Community Projects",
-    "description": "Follow municipality, cooperative, and neighbourhood projects from announcement to milestone."
+    "description": "Follow municipality, cooperative, and neighbourhood projects from announcement to milestone.",
+    "detail_title": "{{title}}",
+    "detail_description_fallback": "{{title}} e {{status}} con avanzamento al {{progress}}%. Fase: {{stage}}. Luogo: {{location}}.",
+    "stage_unknown": "Fase in attesa",
+    "location_unknown": "Luogo in attesa"
   },
   "status": {
     "draft": "Draft",
@@ -25,5 +29,13 @@
   "errors": {
     "load": "Could not load community projects.",
     "subscribe": "Could not update your project notifications."
+  },
+  "share": {
+    "title": "Condividi progetto",
+    "copy_link": "Copia link",
+    "native": "Condividi",
+    "link_copied": "Link copiato",
+    "copy_failed": "Impossibile copiare il link",
+    "share_text": "{{title}} - {{description}}"
   }
 }
