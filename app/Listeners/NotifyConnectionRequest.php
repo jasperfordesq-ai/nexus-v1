@@ -30,6 +30,8 @@ class NotifyConnectionRequest implements ShouldQueue
      */
     public function handle(ConnectionRequested $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             // Ensure tenant context is set (required when running via async queue)
             TenantContext::setById($event->tenantId);
@@ -82,7 +84,11 @@ class NotifyConnectionRequest implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
         } finally {
-            TenantContext::reset(); // Prevent context leaking to next queued job
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset(); // Prevent context leaking to next queued job
+            }
         }
     }
 }

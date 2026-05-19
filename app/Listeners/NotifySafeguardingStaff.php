@@ -40,6 +40,8 @@ class NotifySafeguardingStaff implements ShouldQueue
 
     public function handle(SafeguardingFlaggedEvent $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             $tenantId      = $event->tenantId;
             $flaggedUserId = $event->userId;
@@ -123,7 +125,11 @@ class NotifySafeguardingStaff implements ShouldQueue
             // Re-throw so Laravel queue retries (safeguarding notifications are legally critical)
             throw $e;
         } finally {
-            TenantContext::reset(); // Prevent context leaking to next queued job
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset(); // Prevent context leaking to next queued job
+            }
         }
     }
 

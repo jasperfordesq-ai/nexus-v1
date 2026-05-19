@@ -59,6 +59,8 @@ class NotifyMessageReceived implements ShouldQueue
             }
         }
 
+        $previousTenantId = TenantContext::currentId();
+
         try {
             // Ensure tenant context is set (required when running via async queue).
             // setById returns false if the tenant no longer exists (e.g. deleted
@@ -134,7 +136,11 @@ class NotifyMessageReceived implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
         } finally {
-            TenantContext::reset(); // Prevent context leaking to next queued job
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset(); // Prevent context leaking to next queued job
+            }
         }
     }
 

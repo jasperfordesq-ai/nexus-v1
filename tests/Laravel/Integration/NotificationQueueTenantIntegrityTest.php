@@ -120,6 +120,41 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         $this->assertSame($this->testTenantId, TenantContext::currentId());
     }
 
+    public function test_email_notification_listeners_restore_previous_tenant_context(): void
+    {
+        $listenerFiles = [
+            'NotifyAdminOfNewCommunityEvent.php',
+            'NotifyAdminOfNewGroup.php',
+            'NotifyAdminOfNewListing.php',
+            'NotifyAdminOfNewVolunteerOpportunity.php',
+            'NotifyConnectionAccepted.php',
+            'NotifyConnectionRequest.php',
+            'NotifyGroupMemberJoined.php',
+            'NotifyMessageReceived.php',
+            'NotifySafeguardingStaff.php',
+            'NotifyTransactionCompleted.php',
+        ];
+
+        foreach ($listenerFiles as $listenerFile) {
+            $source = file_get_contents(app_path('Listeners/' . $listenerFile));
+            $restoresTenant = str_contains($source, 'TenantContext::runForTenant(')
+                || (
+                    str_contains($source, 'TenantContext::currentId()')
+                    && str_contains($source, 'TenantContext::setById($previousTenantId)')
+                );
+
+            $this->assertTrue(
+                $restoresTenant,
+                "{$listenerFile} must restore the caller tenant after synchronous listener execution."
+            );
+            $this->assertStringNotContainsString(
+                "finally {\n            TenantContext::reset();",
+                $source,
+                "{$listenerFile} must not blindly reset tenant context in finally."
+            );
+        }
+    }
+
     public function test_email_dispatcher_allows_intentional_platform_send_without_leaked_context(): void
     {
         $email = 'external-provisioning-' . uniqid('', true) . '@example.test';

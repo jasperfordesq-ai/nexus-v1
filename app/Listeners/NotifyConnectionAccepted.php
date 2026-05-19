@@ -23,6 +23,8 @@ class NotifyConnectionAccepted implements ShouldQueue
 {
     public function handle(ConnectionAccepted $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             TenantContext::setById($event->tenantId);
 
@@ -87,7 +89,11 @@ class NotifyConnectionAccepted implements ShouldQueue
                 'trace'         => $e->getTraceAsString(),
             ]);
         } finally {
-            TenantContext::reset(); // Prevent context leaking to next queued job
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset(); // Prevent context leaking to next queued job
+            }
         }
     }
 }

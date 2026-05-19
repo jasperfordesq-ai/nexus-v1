@@ -23,6 +23,8 @@ class NotifyAdminOfNewCommunityEvent implements ShouldQueue
 {
     public function handle(CommunityEventCreated $event): void
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             TenantContext::setById($event->tenantId);
 
@@ -99,7 +101,11 @@ class NotifyAdminOfNewCommunityEvent implements ShouldQueue
                 'trace'     => $e->getTraceAsString(),
             ]);
         } finally {
-            TenantContext::reset(); // Prevent context leaking to next queued job
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset(); // Prevent context leaking to next queued job
+            }
         }
     }
 }
