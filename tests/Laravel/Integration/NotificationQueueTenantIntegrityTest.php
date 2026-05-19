@@ -376,6 +376,11 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         $this->assertStringContainsString("TenantContext::reset();\n\n            // Clean up stale rows", $source);
         $this->assertStringContainsString("TenantContext::reset();\n\n        // Clean up stale rows", $source);
         $this->assertStringContainsString("finally {\n            TenantContext::reset();", $source);
+        $this->assertGreaterThanOrEqual(
+            2,
+            substr_count($source, "foreach (\$pending as \$row) {\n                TenantContext::reset();"),
+            'Newsletter queue processors must reset tenant context before each cross-tenant newsletter lookup.'
+        );
     }
 
     public function test_hot_match_cron_scopes_candidates_and_dedupe_by_tenant(): void

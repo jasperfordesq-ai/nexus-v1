@@ -899,9 +899,11 @@ class CronJobRunner
             $pending = array_map(fn($r) => (array) $r, DB::select($sql));
 
             foreach ($pending as $row) {
+                TenantContext::reset();
+
                 $newsletter = \App\Models\Newsletter::findById($row['newsletter_id']);
                 if ($newsletter && $newsletter['status'] === 'sending') {
-                    \App\Core\TenantContext::setById($newsletter['tenant_id']);
+                    TenantContext::setById($newsletter['tenant_id']);
 
                     // Process ALL pending items for this newsletter (loop until done)
                     // Use smaller batches and pauses to avoid overwhelming the server
@@ -939,9 +941,12 @@ class CronJobRunner
                 }
             }
 
+            TenantContext::reset();
+
             echo "Complete: Sent $totalSent emails, $totalFailed failed.\n";
             echo "Done.\n";
         } catch (\Exception $e) {
+            TenantContext::reset();
             echo "Error: " . $e->getMessage() . "\n";
             \Illuminate\Support\Facades\Log::warning("Newsletter queue cron error: " . $e->getMessage());
             $status = 'error';
@@ -1630,35 +1635,41 @@ class CronJobRunner
             return;
         }
 
-        foreach ($pending as $row) {
-            $newsletter = \App\Models\Newsletter::findById($row['newsletter_id']);
-            if ($newsletter && $newsletter['status'] === 'sending') {
-                \App\Core\TenantContext::setById($newsletter['tenant_id']);
+        try {
+            foreach ($pending as $row) {
+                TenantContext::reset();
 
-                // Process ALL pending items for this newsletter
-                // Smaller batches with pauses for stability
-                $batchSize = 25;
-                $newsletterSent = 0;
-                $newsletterFailed = 0;
+                $newsletter = \App\Models\Newsletter::findById($row['newsletter_id']);
+                if ($newsletter && $newsletter['status'] === 'sending') {
+                    TenantContext::setById($newsletter['tenant_id']);
 
-                do {
-                    $result = NewsletterService::processQueue($row['newsletter_id'], $batchSize);
-                    $batchSent = $result['sent'] ?? 0;
-                    $batchFailed = $result['failed'] ?? 0;
-                    $newsletterSent += $batchSent;
-                    $newsletterFailed += $batchFailed;
+                    // Process ALL pending items for this newsletter
+                    // Smaller batches with pauses for stability
+                    $batchSize = 25;
+                    $newsletterSent = 0;
+                    $newsletterFailed = 0;
 
-                    $stats = \App\Models\Newsletter::getQueueStats($row['newsletter_id']);
-                    $morePending = ($stats['pending'] ?? 0) > 0;
+                    do {
+                        $result = NewsletterService::processQueue($row['newsletter_id'], $batchSize);
+                        $batchSent = $result['sent'] ?? 0;
+                        $batchFailed = $result['failed'] ?? 0;
+                        $newsletterSent += $batchSent;
+                        $newsletterFailed += $batchFailed;
 
-                    // Pause between batches to prevent server overload
-                    if ($morePending && $batchSent > 0) {
-                        sleep(2);
-                    }
-                } while ($morePending && $batchSent > 0);
+                        $stats = \App\Models\Newsletter::getQueueStats($row['newsletter_id']);
+                        $morePending = ($stats['pending'] ?? 0) > 0;
 
-                echo "   Newsletter {$row['newsletter_id']}: Sent $newsletterSent, failed $newsletterFailed\n";
+                        // Pause between batches to prevent server overload
+                        if ($morePending && $batchSent > 0) {
+                            sleep(2);
+                        }
+                    } while ($morePending && $batchSent > 0);
+
+                    echo "   Newsletter {$row['newsletter_id']}: Sent $newsletterSent, failed $newsletterFailed\n";
+                }
             }
+        } finally {
+            TenantContext::reset();
         }
     }
 
