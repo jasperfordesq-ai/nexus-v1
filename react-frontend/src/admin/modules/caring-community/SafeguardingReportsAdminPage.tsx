@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -94,7 +95,8 @@ const ALL_STATUSES: Status[] = ['submitted', 'triaged', 'investigating', 'resolv
 const ALL_SEVERITIES: Severity[] = ['critical', 'high', 'medium', 'low'];
 
 export default function SafeguardingReportsAdminPage(): JSX.Element {
-  usePageTitle('Safeguarding Reports - Admin');
+  const { t } = useTranslation('caring_community');
+  usePageTitle(t('admin.safeguarding_reports.meta_title'));
   const { showToast } = useToast();
 
   const [reports, setReports] = useState<Report[]>([]);
@@ -131,12 +133,12 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
         setReports([]);
       }
     } catch {
-      showToast('Failed to load reports', 'error');
+      showToast(t('admin.safeguarding_reports.errors.load'), 'error');
       setReports([]);
     } finally {
       setLoading(false);
     }
-  }, [params, showToast]);
+  }, [params, showToast, t]);
 
   useEffect(() => {
     void load();
@@ -156,12 +158,12 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
           setDetail(res.data);
         }
       } catch {
-        showToast('Failed to load report detail', 'error');
+        showToast(t('admin.safeguarding_reports.errors.load_detail'), 'error');
       } finally {
         setDetailLoading(false);
       }
     },
-    [detailModal, showToast],
+    [detailModal, showToast, t],
   );
 
   const handleAssign = async () => {
@@ -172,12 +174,12 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
       await api.post(`/v2/admin/caring-community/safeguarding/reports/${selectedId}/assign`, {
         assignee_user_id: id,
       });
-      showToast('Assigned', 'success');
+      showToast(t('admin.safeguarding_reports.messages.assigned'), 'success');
       setAssigneeId('');
       await openDetail(selectedId);
       await load();
     } catch {
-      showToast('Assignment failed', 'error');
+      showToast(t('admin.safeguarding_reports.errors.assign'), 'error');
     }
   };
 
@@ -187,12 +189,12 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
       await api.post(`/v2/admin/caring-community/safeguarding/reports/${selectedId}/escalate`, {
         note: escalationNote.trim() || undefined,
       });
-      showToast('Escalated', 'success');
+      showToast(t('admin.safeguarding_reports.messages.escalated'), 'success');
       setEscalationNote('');
       await openDetail(selectedId);
       await load();
     } catch {
-      showToast('Escalation failed', 'error');
+      showToast(t('admin.safeguarding_reports.errors.escalate'), 'error');
     }
   };
 
@@ -203,12 +205,12 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
         status: statusToSet,
         notes: statusNotes.trim() || undefined,
       });
-      showToast('Status updated', 'success');
+      showToast(t('admin.safeguarding_reports.messages.status_updated'), 'success');
       setStatusNotes('');
       await openDetail(selectedId);
       await load();
     } catch {
-      showToast('Status change failed', 'error');
+      showToast(t('admin.safeguarding_reports.errors.status'), 'error');
     }
   };
 
@@ -220,104 +222,120 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
       await api.post(`/v2/admin/caring-community/safeguarding/reports/${selectedId}/note`, {
         note,
       });
-      showToast('Note added', 'success');
+      showToast(t('admin.safeguarding_reports.messages.note_added'), 'success');
       setNewNote('');
       await openDetail(selectedId);
     } catch {
-      showToast('Note failed', 'error');
+      showToast(t('admin.safeguarding_reports.errors.note'), 'error');
     }
   };
+
+  const statusLabel = useCallback(
+    (status: Status) => t(`admin.safeguarding_reports.status.${status}`),
+    [t],
+  );
+  const severityLabel = useCallback(
+    (severity: Severity) => t(`admin.safeguarding_reports.severity.${severity}`),
+    [t],
+  );
+  const actorLabel = useCallback(
+    (id: number) => t('admin.safeguarding_reports.actor_id', { id }),
+    [t],
+  );
+  const subjectLabel = useCallback(
+    (report: Pick<Report, 'subject_user_name' | 'subject_organisation_id'>) =>
+      report.subject_user_name ??
+      (report.subject_organisation_id
+        ? t('admin.safeguarding_reports.subject_org', { id: report.subject_organisation_id })
+        : t('admin.safeguarding_reports.empty_dash')),
+    [t],
+  );
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Safeguarding Reports"
-        description="Review, assign, and resolve safeguarding concerns raised by members."
+        title={t('admin.safeguarding_reports.title')}
+        description={t('admin.safeguarding_reports.subtitle')}
       />
 
       {/* About card */}
-      <Card className="border-l-4 border-l-danger bg-danger-50 dark:bg-danger-900/20" shadow="none">
+      <Card className="border border-danger/30 bg-danger-50/70 shadow-sm shadow-danger/10 dark:bg-danger-900/20" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-danger" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-danger-800 dark:text-danger-200">About this page</p>
-              <p className="text-default-600">
-                This page manages formal safeguarding incidents — situations where a member's welfare, safety, or
-                dignity may be at risk. Reports are submitted by members, coordinators, or administrators. All reports
-                must be triaged within the SLA configured in Operating Policy. Critical and High severity reports
-                require immediate attention. Reports are tenant-scoped and cannot be seen by other communities.
-              </p>
+              <p className="font-semibold text-danger-800 dark:text-danger-200">{t('admin.safeguarding_reports.about.title')}</p>
+              <p className="text-default-600">{t('admin.safeguarding_reports.about.body')}</p>
             </div>
           </div>
         </CardBody>
       </Card>
 
       {/* Severity legend */}
-      <Card shadow="none" className="border border-divider">
+      <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
         <CardHeader>
-          <p className="text-sm font-semibold">Severity levels</p>
+          <p className="text-sm font-semibold">{t('admin.safeguarding_reports.severity_legend.title')}</p>
         </CardHeader>
         <Divider />
         <CardBody className="py-3">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4 text-sm">
             <div className="flex items-start gap-2">
-              <Chip size="sm" color="danger" variant="flat" className="shrink-0 mt-0.5">Critical</Chip>
-              <p className="text-default-600">Immediate physical risk — escalate within 1 hour</p>
+              <Chip size="sm" color="danger" variant="flat" className="shrink-0 mt-0.5">{severityLabel('critical')}</Chip>
+              <p className="text-default-600">{t('admin.safeguarding_reports.severity_legend.critical')}</p>
             </div>
             <div className="flex items-start gap-2">
-              <Chip size="sm" color="warning" variant="flat" className="shrink-0 mt-0.5">High</Chip>
-              <p className="text-default-600">Serious concern — triage within 24 hours</p>
+              <Chip size="sm" color="warning" variant="flat" className="shrink-0 mt-0.5">{severityLabel('high')}</Chip>
+              <p className="text-default-600">{t('admin.safeguarding_reports.severity_legend.high')}</p>
             </div>
             <div className="flex items-start gap-2">
-              <Chip size="sm" color="default" variant="flat" className="shrink-0 mt-0.5">Medium</Chip>
-              <p className="text-default-600">Significant but non-urgent — triage within 72 hours</p>
+              <Chip size="sm" color="default" variant="flat" className="shrink-0 mt-0.5">{severityLabel('medium')}</Chip>
+              <p className="text-default-600">{t('admin.safeguarding_reports.severity_legend.medium')}</p>
             </div>
             <div className="flex items-start gap-2">
-              <Chip size="sm" color="success" variant="flat" className="shrink-0 mt-0.5">Low</Chip>
-              <p className="text-default-600">Minor concern — review at next coordinator meeting</p>
+              <Chip size="sm" color="success" variant="flat" className="shrink-0 mt-0.5">{severityLabel('low')}</Chip>
+              <p className="text-default-600">{t('admin.safeguarding_reports.severity_legend.low')}</p>
             </div>
           </div>
         </CardBody>
       </Card>
 
       {/* Status workflow guide */}
-      <Card shadow="none" className="border border-divider">
+      <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
         <CardHeader>
-          <p className="text-sm font-semibold">Status workflow</p>
+          <p className="text-sm font-semibold">{t('admin.safeguarding_reports.workflow.title')}</p>
         </CardHeader>
         <Divider />
         <CardBody className="py-3">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-5 text-sm">
             <div>
-              <Chip size="sm" color="primary" variant="flat" className="mb-1">Submitted</Chip>
-              <p className="text-xs text-default-500">Report received, not yet reviewed by a coordinator</p>
+              <Chip size="sm" color="primary" variant="flat" className="mb-1">{statusLabel('submitted')}</Chip>
+              <p className="text-xs text-default-500">{t('admin.safeguarding_reports.workflow.submitted')}</p>
             </div>
             <div>
-              <Chip size="sm" color="primary" variant="flat" className="mb-1">Triaged</Chip>
-              <p className="text-xs text-default-500">Coordinator has assessed severity and assigned ownership</p>
+              <Chip size="sm" color="primary" variant="flat" className="mb-1">{statusLabel('triaged')}</Chip>
+              <p className="text-xs text-default-500">{t('admin.safeguarding_reports.workflow.triaged')}</p>
             </div>
             <div>
-              <Chip size="sm" color="warning" variant="flat" className="mb-1">Investigating</Chip>
-              <p className="text-xs text-default-500">Active investigation or support intervention underway</p>
+              <Chip size="sm" color="warning" variant="flat" className="mb-1">{statusLabel('investigating')}</Chip>
+              <p className="text-xs text-default-500">{t('admin.safeguarding_reports.workflow.investigating')}</p>
             </div>
             <div>
-              <Chip size="sm" color="success" variant="flat" className="mb-1">Resolved</Chip>
-              <p className="text-xs text-default-500">Closed with documented resolution notes — action taken</p>
+              <Chip size="sm" color="success" variant="flat" className="mb-1">{statusLabel('resolved')}</Chip>
+              <p className="text-xs text-default-500">{t('admin.safeguarding_reports.workflow.resolved')}</p>
             </div>
             <div>
-              <Chip size="sm" color="default" variant="flat" className="mb-1">Dismissed</Chip>
-              <p className="text-xs text-default-500">Closed with no further action — a reason must be recorded</p>
+              <Chip size="sm" color="default" variant="flat" className="mb-1">{statusLabel('dismissed')}</Chip>
+              <p className="text-xs text-default-500">{t('admin.safeguarding_reports.workflow.dismissed')}</p>
             </div>
           </div>
         </CardBody>
       </Card>
 
-      <Card shadow="sm">
+      <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
         <CardHeader className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-end gap-3">
             <Select
-              label="Status"
+              label={t('admin.safeguarding_reports.filters.status')}
               size="sm"
               variant="bordered"
               className="w-44"
@@ -325,12 +343,12 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
               onChange={(e) => setStatusFilter(e.target.value)}
             >
               {[
-                <SelectItem key="">All</SelectItem>,
-                ...ALL_STATUSES.map((s) => <SelectItem key={s}>{s}</SelectItem>),
+                <SelectItem key="">{t('admin.common.all')}</SelectItem>,
+                ...ALL_STATUSES.map((s) => <SelectItem key={s}>{statusLabel(s)}</SelectItem>),
               ]}
             </Select>
             <Select
-              label="Severity"
+              label={t('admin.safeguarding_reports.filters.severity')}
               size="sm"
               variant="bordered"
               className="w-44"
@@ -338,8 +356,8 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
               onChange={(e) => setSeverityFilter(e.target.value)}
             >
               {[
-                <SelectItem key="">All</SelectItem>,
-                ...ALL_SEVERITIES.map((s) => <SelectItem key={s}>{s}</SelectItem>),
+                <SelectItem key="">{t('admin.common.all')}</SelectItem>,
+                ...ALL_SEVERITIES.map((s) => <SelectItem key={s}>{severityLabel(s)}</SelectItem>),
               ]}
             </Select>
           </div>
@@ -350,7 +368,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
             onPress={() => void load()}
             isLoading={loading}
           >
-            Refresh
+            {t('admin.common.refresh')}
           </Button>
         </CardHeader>
         <Divider />
@@ -360,54 +378,54 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
               <Spinner />
             </div>
           ) : reports.length === 0 ? (
-            <p className="py-10 text-center text-sm text-default-500">No reports.</p>
+            <p className="py-10 text-center text-sm text-default-500">
+              {t('admin.safeguarding_reports.empty')}
+            </p>
           ) : (
-            <Table aria-label="Safeguarding reports" removeWrapper>
+            <Table aria-label={t('admin.safeguarding_reports.table.aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>Severity</TableColumn>
-                <TableColumn>Category</TableColumn>
-                <TableColumn>Reporter</TableColumn>
-                <TableColumn>Subject</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Assigned</TableColumn>
-                <TableColumn><Abbr term="SLA">SLA</Abbr></TableColumn>
-                <TableColumn>Created</TableColumn>
-                <TableColumn>Actions</TableColumn>
+                <TableColumn>{t('admin.safeguarding_reports.table.severity')}</TableColumn>
+                <TableColumn>{t('admin.safeguarding_reports.table.category')}</TableColumn>
+                <TableColumn>{t('admin.safeguarding_reports.table.reporter')}</TableColumn>
+                <TableColumn>{t('admin.safeguarding_reports.table.subject')}</TableColumn>
+                <TableColumn>{t('admin.safeguarding_reports.table.status')}</TableColumn>
+                <TableColumn>{t('admin.safeguarding_reports.table.assigned')}</TableColumn>
+                <TableColumn><Abbr term={t('admin.safeguarding_reports.table.sla')}>SLA</Abbr></TableColumn>
+                <TableColumn>{t('admin.safeguarding_reports.table.created')}</TableColumn>
+                <TableColumn>{t('admin.safeguarding_reports.table.actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {reports.map((r) => (
                   <TableRow key={r.id}>
                     <TableCell>
                       <Chip size="sm" color={SEVERITY_COLOR[r.severity]} variant="flat">
-                        {r.severity}
+                        {severityLabel(r.severity)}
                       </Chip>
                     </TableCell>
                     <TableCell>{r.category}</TableCell>
-                    <TableCell>{r.reporter_name || `#${r.reporter_id}`}</TableCell>
-                    <TableCell>
-                      {r.subject_user_name ?? (r.subject_organisation_id ? `Org #${r.subject_organisation_id}` : '—')}
-                    </TableCell>
+                    <TableCell>{r.reporter_name || actorLabel(r.reporter_id)}</TableCell>
+                    <TableCell>{subjectLabel(r)}</TableCell>
                     <TableCell>
                       <Chip size="sm" color={STATUS_COLOR[r.status]} variant="flat">
-                        {r.status}
+                        {statusLabel(r.status)}
                       </Chip>
                     </TableCell>
-                    <TableCell>{r.assigned_to_name ?? '—'}</TableCell>
+                    <TableCell>{r.assigned_to_name ?? t('admin.safeguarding_reports.empty_dash')}</TableCell>
                     <TableCell>
                       {r.is_overdue ? (
                         <Chip size="sm" color="danger" variant="bordered" startContent={<TriangleAlert size={12} />}>
-                          Overdue
+                          {t('admin.safeguarding_reports.overdue')}
                         </Chip>
                       ) : r.review_due_at ? (
                         new Date(r.review_due_at).toLocaleString()
                       ) : (
-                        '—'
+                        t('admin.safeguarding_reports.empty_dash')
                       )}
                     </TableCell>
                     <TableCell>{new Date(r.created_at).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Button size="sm" variant="flat" onPress={() => void openDetail(r.id)}>
-                        Open
+                        {t('admin.safeguarding_reports.open')}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -421,7 +439,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
       <Modal isOpen={detailModal.isOpen} onClose={detailModal.onClose} size="3xl" scrollBehavior="inside">
         <ModalContent>
           <ModalHeader>
-            Report #{selectedId}
+            {t('admin.safeguarding_reports.report_title', { id: selectedId })}
           </ModalHeader>
           <ModalBody>
             {detailLoading || !detail ? (
@@ -432,48 +450,46 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
               <div className="space-y-5">
                 <div className="flex flex-wrap items-center gap-2">
                   <Chip size="sm" color={SEVERITY_COLOR[detail.severity]} variant="flat">
-                    {detail.severity}
+                    {severityLabel(detail.severity)}
                   </Chip>
                   <Chip size="sm" color={STATUS_COLOR[detail.status]} variant="flat">
-                    {detail.status}
+                    {statusLabel(detail.status)}
                   </Chip>
                   {detail.escalated && (
                     <Chip size="sm" color="danger" variant="bordered">
-                      Escalated
+                      {t('admin.safeguarding_reports.escalated')}
                     </Chip>
                   )}
                   {detail.is_overdue && (
                     <Chip size="sm" color="danger" variant="flat">
-                      Overdue
+                      {t('admin.safeguarding_reports.overdue')}
                     </Chip>
                   )}
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-default-500">Category</p>
+                  <p className="text-xs uppercase tracking-wide text-default-500">{t('admin.safeguarding_reports.fields.category')}</p>
                   <p className="text-sm">{detail.category}</p>
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-default-500">Reporter</p>
-                  <p className="text-sm">{detail.reporter_name || `#${detail.reporter_id}`}</p>
+                  <p className="text-xs uppercase tracking-wide text-default-500">{t('admin.safeguarding_reports.fields.reporter')}</p>
+                  <p className="text-sm">{detail.reporter_name || actorLabel(detail.reporter_id)}</p>
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-default-500">Subject</p>
-                  <p className="text-sm">
-                    {detail.subject_user_name ?? (detail.subject_organisation_id ? `Org #${detail.subject_organisation_id}` : '—')}
-                  </p>
+                  <p className="text-xs uppercase tracking-wide text-default-500">{t('admin.safeguarding_reports.fields.subject')}</p>
+                  <p className="text-sm">{subjectLabel(detail)}</p>
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-default-500">Description</p>
+                  <p className="text-xs uppercase tracking-wide text-default-500">{t('admin.safeguarding_reports.fields.description')}</p>
                   <p className="whitespace-pre-wrap text-sm">{detail.description}</p>
                 </div>
 
                 {detail.evidence_url && (
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-default-500">Evidence</p>
+                    <p className="text-xs uppercase tracking-wide text-default-500">{t('admin.safeguarding_reports.fields.evidence')}</p>
                     <a
                       href={detail.evidence_url}
                       target="_blank"
@@ -487,7 +503,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
 
                 {detail.resolution_notes && (
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-default-500">Resolution Notes</p>
+                    <p className="text-xs uppercase tracking-wide text-default-500">{t('admin.safeguarding_reports.fields.resolution_notes')}</p>
                     <p className="text-sm whitespace-pre-wrap">{detail.resolution_notes}</p>
                   </div>
                 )}
@@ -495,11 +511,11 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                 <Divider />
 
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold">Actions</h3>
+                  <h3 className="text-sm font-semibold">{t('admin.safeguarding_reports.actions.title')}</h3>
 
                   <div className="flex flex-wrap items-end gap-2">
                     <Input
-                      label="Assignee user ID"
+                      label={t('admin.safeguarding_reports.actions.assignee_user_id')}
                       size="sm"
                       variant="bordered"
                       value={assigneeId}
@@ -507,13 +523,13 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                       className="w-48"
                     />
                     <Button size="sm" color="primary" variant="flat" onPress={() => void handleAssign()}>
-                      Assign
+                      {t('admin.safeguarding_reports.actions.assign')}
                     </Button>
                   </div>
 
                   <div className="flex flex-wrap items-end gap-2">
                     <Input
-                      label="Escalation note (optional)"
+                      label={t('admin.safeguarding_reports.actions.escalation_note')}
                       size="sm"
                       variant="bordered"
                       value={escalationNote}
@@ -521,13 +537,13 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                       className="flex-1"
                     />
                     <Button size="sm" color="warning" variant="flat" onPress={() => void handleEscalate()}>
-                      Escalate
+                      {t('admin.safeguarding_reports.actions.escalate')}
                     </Button>
                   </div>
 
                   <div className="flex flex-wrap items-end gap-2">
                     <Select
-                      label="Set status"
+                      label={t('admin.safeguarding_reports.actions.set_status')}
                       size="sm"
                       variant="bordered"
                       selectedKeys={[statusToSet]}
@@ -535,11 +551,11 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                       className="w-44"
                     >
                       {ALL_STATUSES.map((s) => (
-                        <SelectItem key={s}>{s}</SelectItem>
+                        <SelectItem key={s}>{statusLabel(s)}</SelectItem>
                       ))}
                     </Select>
                     <Input
-                      label="Notes (optional)"
+                      label={t('admin.safeguarding_reports.actions.notes')}
                       size="sm"
                       variant="bordered"
                       value={statusNotes}
@@ -547,20 +563,20 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                       className="flex-1"
                     />
                     <Button size="sm" color="primary" onPress={() => void handleStatus()}>
-                      Update
+                      {t('admin.safeguarding_reports.actions.update')}
                     </Button>
                   </div>
                   {(statusToSet === 'resolved' || statusToSet === 'dismissed') && (
                     <p className="text-xs text-default-500 mt-1">
                       {statusToSet === 'resolved'
-                        ? '"Resolved" closes this report with documented resolution notes. Use when action has been taken.'
-                        : '"Dismissed" closes this report with no further action. A reason must be recorded in the notes above.'}
+                        ? t('admin.safeguarding_reports.actions.resolved_hint')
+                        : t('admin.safeguarding_reports.actions.dismissed_hint')}
                     </p>
                   )}
 
                   <div className="flex flex-col gap-2">
                     <Textarea
-                      label="Add note"
+                      label={t('admin.safeguarding_reports.actions.add_note')}
                       size="sm"
                       variant="bordered"
                       value={newNote}
@@ -569,7 +585,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                     />
                     <div className="flex justify-end">
                       <Button size="sm" variant="flat" onPress={() => void handleNote()}>
-                        Add note
+                        {t('admin.safeguarding_reports.actions.add_note')}
                       </Button>
                     </div>
                   </div>
@@ -578,20 +594,24 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                 <Divider />
 
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold">History</h3>
+                  <h3 className="text-sm font-semibold">{t('admin.safeguarding_reports.history.title')}</h3>
                   {detail.actions.length === 0 ? (
-                    <p className="text-sm text-default-500">No actions yet.</p>
+                    <p className="text-sm text-default-500">{t('admin.safeguarding_reports.history.empty')}</p>
                   ) : (
                     <ul className="space-y-2">
                       {detail.actions.map((a) => (
-                        <li key={a.id} className="rounded-lg border border-default-200 p-3">
+                        <li key={a.id} className="rounded-2xl border border-divider/70 bg-content2/40 p-3">
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-medium">{a.action}</p>
                             <p className="text-xs text-default-500">
                               {new Date(a.created_at).toLocaleString()}
                             </p>
                           </div>
-                          <p className="mt-1 text-xs text-default-500">by {a.actor_name || `#${a.actor_id}`}</p>
+                          <p className="mt-1 text-xs text-default-500">
+                            {t('admin.safeguarding_reports.history.by_actor', {
+                              name: a.actor_name || actorLabel(a.actor_id),
+                            })}
+                          </p>
                           {a.notes && <p className="mt-1 text-sm whitespace-pre-wrap">{a.notes}</p>}
                         </li>
                       ))}
@@ -603,7 +623,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={detailModal.onClose}>
-              Close
+              {t('admin.common.close')}
             </Button>
           </ModalFooter>
         </ModalContent>

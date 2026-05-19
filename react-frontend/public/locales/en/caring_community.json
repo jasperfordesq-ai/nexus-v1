@@ -342,6 +342,8 @@
     "common": {
       "refresh": "Refresh",
       "cancel": "Cancel",
+      "all": "All",
+      "close": "Close",
       "empty_dash": "-"
     },
     "providers": {
@@ -580,6 +582,107 @@
         "resolve": "Failed to resolve",
         "close": "Failed to close",
         "export": "Failed to export"
+      }
+    },
+    "safeguarding_reports": {
+      "meta_title": "Safeguarding Reports - Admin",
+      "title": "Safeguarding Reports",
+      "subtitle": "Review, assign, and resolve safeguarding concerns raised by members.",
+      "empty_dash": "-",
+      "actor_id": "#{{id}}",
+      "subject_org": "Organisation #{{id}}",
+      "overdue": "Overdue",
+      "escalated": "Escalated",
+      "open": "Open",
+      "report_title": "Report #{{id}}",
+      "empty": "No safeguarding reports match these filters.",
+      "about": {
+        "title": "About this page",
+        "body": "This page manages formal safeguarding incidents: situations where a member's welfare, safety, or dignity may be at risk. Reports are submitted by members, coordinators, or administrators. All reports must be triaged within the SLA configured in Operating Policy. Critical and high severity reports require immediate attention. Reports are tenant-scoped and cannot be seen by other communities."
+      },
+      "severity": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "status": {
+        "submitted": "Submitted",
+        "triaged": "Triaged",
+        "investigating": "Investigating",
+        "resolved": "Resolved",
+        "dismissed": "Dismissed"
+      },
+      "severity_legend": {
+        "title": "Severity levels",
+        "critical": "Immediate physical risk: escalate within 1 hour.",
+        "high": "Serious concern: triage within 24 hours.",
+        "medium": "Significant but non-urgent: triage within 72 hours.",
+        "low": "Minor concern: review at the next coordinator meeting."
+      },
+      "workflow": {
+        "title": "Status workflow",
+        "submitted": "Report received, not yet reviewed by a coordinator.",
+        "triaged": "Coordinator has assessed severity and assigned ownership.",
+        "investigating": "Active investigation or support intervention underway.",
+        "resolved": "Closed with documented resolution notes after action was taken.",
+        "dismissed": "Closed with no further action. A reason must be recorded."
+      },
+      "filters": {
+        "status": "Status",
+        "severity": "Severity"
+      },
+      "table": {
+        "aria": "Safeguarding reports",
+        "severity": "Severity",
+        "category": "Category",
+        "reporter": "Reporter",
+        "subject": "Subject",
+        "status": "Status",
+        "assigned": "Assigned",
+        "sla": "Service level agreement",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "fields": {
+        "category": "Category",
+        "reporter": "Reporter",
+        "subject": "Subject",
+        "description": "Description",
+        "evidence": "Evidence",
+        "resolution_notes": "Resolution notes"
+      },
+      "actions": {
+        "title": "Actions",
+        "assignee_user_id": "Assignee user ID",
+        "assign": "Assign",
+        "escalation_note": "Escalation note (optional)",
+        "escalate": "Escalate",
+        "set_status": "Set status",
+        "notes": "Notes (optional)",
+        "update": "Update",
+        "resolved_hint": "\"Resolved\" closes this report with documented resolution notes. Use when action has been taken.",
+        "dismissed_hint": "\"Dismissed\" closes this report with no further action. A reason must be recorded in the notes above.",
+        "add_note": "Add note"
+      },
+      "history": {
+        "title": "History",
+        "empty": "No actions yet.",
+        "by_actor": "by {{name}}"
+      },
+      "messages": {
+        "assigned": "Assigned",
+        "escalated": "Escalated",
+        "status_updated": "Status updated",
+        "note_added": "Note added"
+      },
+      "errors": {
+        "load": "Failed to load reports",
+        "load_detail": "Failed to load report detail",
+        "assign": "Assignment failed",
+        "escalate": "Escalation failed",
+        "status": "Status change failed",
+        "note": "Note failed"
       }
     },
     "warmth_pass": {
