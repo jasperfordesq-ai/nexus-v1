@@ -10828,6 +10828,11 @@
       "sent": "Sent",
       "suppressed": "Suppressed"
     },
+    "severity": {
+      "critical": "Critical",
+      "info": "Info",
+      "warning": "Warning"
+    },
     "status_breakdown": {
       "title": "Status Breakdown",
       "subtitle": "A compact view of the current tenant's send outcomes for the selected window."
@@ -10836,6 +10841,21 @@
       "critical": "Critical trigger issues",
       "monitored": "Monitored flows",
       "warning": "Warning trigger issues"
+    },
+    "trigger_issues": {
+      "title": "Trigger Audit Issues",
+      "subtitle": "Source rows where an email or notification should have fired, but the audit does not have reliable delivery evidence.",
+      "table_label": "Email trigger audit issues",
+      "empty": "No trigger audit issues for the selected window.",
+      "all_tenants": "All tenants",
+      "columns": {
+        "event": "Event",
+        "issue": "Issue",
+        "module": "Module",
+        "params": "Evidence",
+        "severity": "Severity",
+        "tenant": "Tenant"
+      }
     },
     "logs": {
       "title": "Email Attempt Log",
@@ -10990,6 +11010,18 @@
       "newsletter_queue_marked_sent_without_email_log": {
         "title": "Newsletter marked sent without email evidence",
         "body": "{{count}} newsletter recipients were marked sent without a matching successful email log entry in the last {{window_hours}} hours."
+      },
+      "event_reminders_overdue_pending": {
+        "title": "Event reminders overdue",
+        "body": "{{count}} event reminders are still pending more than {{minutes}} minutes after their scheduled send time."
+      },
+      "event_reminders_failed_recently": {
+        "title": "Event reminders failed",
+        "body": "{{count}} event reminders failed in the last {{window_hours}} hours."
+      },
+      "event_reminders_marked_sent_without_email_log": {
+        "title": "Event reminders marked sent without email evidence",
+        "body": "{{count}} email event reminders were marked sent without a matching successful email log entry in the last {{window_hours}} hours."
       },
       "critical_email_attempts_missing_tenant_context": {
         "title": "Critical email missing tenant context",

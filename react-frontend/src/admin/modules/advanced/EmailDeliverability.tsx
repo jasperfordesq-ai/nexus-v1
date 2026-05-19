@@ -51,6 +51,16 @@ interface TriggerAudit {
   issue_count: number;
   matrix_count: number;
   issues_by_severity?: Record<string, number>;
+  issues?: TriggerAuditIssue[];
+}
+
+interface TriggerAuditIssue {
+  code: string;
+  severity: 'info' | 'warning' | 'critical';
+  tenant_id: number | null;
+  module: string;
+  event: string;
+  params?: Record<string, unknown>;
 }
 
 interface SummaryData {
@@ -97,6 +107,12 @@ const STATUS_COLORS: Record<string, 'default' | 'success' | 'warning' | 'danger'
   failed: 'danger',
   bounced: 'danger',
   suppressed: 'warning',
+};
+
+const SEVERITY_COLORS: Record<TriggerAuditIssue['severity'], 'default' | 'warning' | 'danger' | 'primary'> = {
+  info: 'primary',
+  warning: 'warning',
+  critical: 'danger',
 };
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100];
@@ -243,6 +259,7 @@ export default function EmailDeliverability() {
   const summaryStatuses = useMemo(() => Object.keys(summary?.by_status ?? {}), [summary]);
   const warnings = summary?.warnings ?? [];
   const warningCounts = summary?.trigger_audit?.issues_by_severity ?? {};
+  const triggerIssues = summary?.trigger_audit?.issues ?? [];
 
   const metricCards = [
     {
@@ -400,6 +417,58 @@ export default function EmailDeliverability() {
               <div className="mt-1 text-xl font-semibold text-theme-primary">{summary?.trigger_audit?.matrix_count ?? '-'}</div>
             </div>
           </div>
+        </CardBody>
+      </Card>
+
+      <Card className="border border-[var(--color-border)]">
+        <CardHeader className="flex flex-col items-start gap-1">
+          <h2 className="text-lg font-semibold text-theme-primary">{t('email_deliverability.trigger_issues.title')}</h2>
+          <p className="text-sm text-theme-secondary">{t('email_deliverability.trigger_issues.subtitle')}</p>
+        </CardHeader>
+        <Divider />
+        <CardBody>
+          <Table aria-label={t('email_deliverability.trigger_issues.table_label')} removeWrapper>
+            <TableHeader>
+              <TableColumn>{t('email_deliverability.trigger_issues.columns.severity')}</TableColumn>
+              <TableColumn>{t('email_deliverability.trigger_issues.columns.module')}</TableColumn>
+              <TableColumn>{t('email_deliverability.trigger_issues.columns.event')}</TableColumn>
+              <TableColumn>{t('email_deliverability.trigger_issues.columns.issue')}</TableColumn>
+              <TableColumn>{t('email_deliverability.trigger_issues.columns.tenant')}</TableColumn>
+              <TableColumn>{t('email_deliverability.trigger_issues.columns.params')}</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent={t('email_deliverability.trigger_issues.empty')}>
+              {triggerIssues.map((issue, index) => (
+                <TableRow key={`${issue.code}-${issue.tenant_id ?? 'all'}-${index}`}>
+                  <TableCell>
+                    <Chip size="sm" color={SEVERITY_COLORS[issue.severity] ?? 'default'} variant="flat">
+                      {t(`email_deliverability.severity.${issue.severity}`)}
+                    </Chip>
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">{issue.module}</TableCell>
+                  <TableCell className="font-mono text-xs">{issue.event}</TableCell>
+                  <TableCell>
+                    <div className="max-w-sm">
+                      <div className="font-medium text-theme-primary">
+                        {t(`email_deliverability.warnings.${issue.code}.title`, {
+                          defaultValue: t('email_deliverability.warnings.default_title'),
+                        })}
+                      </div>
+                      <div className="text-xs text-theme-secondary">
+                        {t(`email_deliverability.warnings.${issue.code}.body`, {
+                          ...(issue.params ?? {}),
+                          defaultValue: t('email_deliverability.warnings.default_body'),
+                        })}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-xs">{issue.tenant_id ?? t('email_deliverability.trigger_issues.all_tenants')}</TableCell>
+                  <TableCell className="max-w-xs truncate font-mono text-xs">
+                    {issue.params && Object.keys(issue.params).length > 0 ? JSON.stringify(issue.params) : '-'}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardBody>
       </Card>
 
