@@ -134,6 +134,7 @@ class EmailTriggerAuditService
                 $this->checkNotificationStoreHealth($tenantId),
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
                 $this->checkTenantProviderConfiguration($tenantId),
+                $this->checkBillingAndStripeHealth($tenantId, $since, $windowHours),
                 $this->checkDirectEmailSendSurface($tenantId),
                 $this->checkTenantlessDispatcherSendSurface($tenantId)
             );
@@ -867,6 +868,56 @@ class EmailTriggerAuditService
             } catch (\Throwable $e) {
                 $issues[] = $this->issue('tenant_provider_config_check_failed', 'warning', $id, 'deliverability', 'provider_config', ['error' => $e->getMessage()]);
             }
+        }
+
+        return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkBillingAndStripeHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        $issues = [];
+
+        if ($this->hasTables(['stripe_webhook_events']) && Schema::hasColumn('stripe_webhook_events', 'status')) {
+            $failed = DB::table('stripe_webhook_events')
+                ->selectRaw('NULL as tenant_id, COUNT(*) as count')
+                ->where('status', 'failed')
+                ->where('processed_at', '>=', $since)
+                ->when($tenantId !== null, fn ($q) => $q->whereRaw('1 = 0'))
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($failed, 'stripe_webhook_events_failed_recently', 'critical', 'billing', 'stripe_webhook_processing', ['window_hours' => $windowHours]));
+
+            $stale = DB::table('stripe_webhook_events')
+                ->selectRaw('NULL as tenant_id, COUNT(*) as count')
+                ->where('status', 'processing')
+                ->where('processed_at', '<', now()->subMinutes(10))
+                ->when($tenantId !== null, fn ($q) => $q->whereRaw('1 = 0'))
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($stale, 'stripe_webhook_events_stale_processing', 'critical', 'billing', 'stripe_webhook_processing', ['minutes' => 10]));
+        }
+
+        if ($this->hasTables(['billing_audit_log', 'email_log'])) {
+            $billingActions = ['plan_assigned', 'upgrade_requested'];
+
+            $withoutEmailLog = DB::table('billing_audit_log as bal')
+                ->select('bal.tenant_id', DB::raw('COUNT(*) as count'))
+                ->whereIn('bal.action', $billingActions)
+                ->where('bal.created_at', '>=', $since)
+                ->whereNotExists(function ($sub) {
+                    $sub->select(DB::raw(1))
+                        ->from('email_log')
+                        ->whereColumn('email_log.tenant_id', 'bal.tenant_id')
+                        ->whereColumn('email_log.created_at', '>=', 'bal.created_at')
+                        ->where('email_log.category', 'billing')
+                        ->whereIn('email_log.status', ['sent', 'delivered', 'bounced']);
+                })
+                ->when($tenantId !== null, fn ($q) => $q->where('bal.tenant_id', $tenantId))
+                ->groupBy('bal.tenant_id')
+                ->get();
+
+            $issues = array_merge($issues, $this->rowsToIssues($withoutEmailLog, 'billing_audit_event_without_email_log', 'critical', 'billing', 'billing_notice', ['window_hours' => $windowHours]));
         }
 
         return $issues;

@@ -706,7 +706,7 @@ class EventNotificationService
                 // Send immediately
                 try {
                     $body   = $htmlBody ?? $this->buildDefaultEventEmailHtml($subject, $content, $link, $user);
-                    $sent   = EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, 'event_notification', ['tenant_id' => $tenantId]);
+                    $sent   = EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, $type, ['tenant_id' => $tenantId]);
                     if (!$sent) {
                         Log::warning("[EventNotificationService] Instant email send returned false", [
                             'user_id' => $userId,

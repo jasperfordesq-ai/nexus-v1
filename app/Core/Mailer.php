@@ -199,7 +199,7 @@ class Mailer
         }
 
         // Event notifications
-        if ($category === 'event_notification') {
+        if ($category === 'event_notification' || str_starts_with($category, 'event_')) {
             return self::CATEGORY_EVENTS;
         }
 

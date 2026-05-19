@@ -291,5 +291,11 @@ class EmailMailerRoutingTest extends TestCase
             $eventSource,
             'EventNotificationService reminder bells must use the explicit tenant passed to the scheduler.'
         );
+
+        $this->assertStringContainsString(
+            'EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, $type',
+            $eventSource,
+            'EventNotificationService must preserve granular event email_log categories instead of collapsing all sends to event_notification.'
+        );
     }
 }

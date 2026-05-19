@@ -65,6 +65,20 @@ class MailerTest extends TestCase
         $this->assertNull(TenantContext::currentId());
     }
 
+    public function test_event_subcategories_route_to_event_mailer_settings(): void
+    {
+        $mailer = new Mailer();
+        $method = new \ReflectionMethod(Mailer::class, 'resolveSendGridFromPrefix');
+        $method->setAccessible(true);
+
+        $this->assertSame('events', $method->invoke($mailer, 'event_notification'));
+        $this->assertSame('events', $method->invoke($mailer, 'event_update'));
+        $this->assertSame('events', $method->invoke($mailer, 'event_cancellation'));
+        $this->assertSame('events', $method->invoke($mailer, 'event_rsvp'));
+        $this->assertSame('events', $method->invoke($mailer, 'event_created'));
+        $this->assertSame('events', $method->invoke($mailer, 'event_reminder'));
+    }
+
     // -------------------------------------------------------
     // testGmailConnection()
     // -------------------------------------------------------

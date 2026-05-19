@@ -224,4 +224,68 @@ class EmailTriggerAuditServiceTest extends TestCase
 
         $this->assertContains('new_users_without_account_email_attempt', $codes);
     }
+
+    public function test_run_detects_failed_and_stale_stripe_webhook_events(): void
+    {
+        if (!Schema::hasTable('stripe_webhook_events') || !Schema::hasColumn('stripe_webhook_events', 'status')) {
+            $this->markTestSkipped('Stripe webhook audit table is not available.');
+        }
+
+        DB::table('stripe_webhook_events')->insert([
+            [
+                'event_id' => 'evt_audit_failed_' . uniqid(),
+                'event_type' => 'invoice.payment_failed',
+                'status' => 'failed',
+                'processed_at' => now()->subMinutes(3),
+            ],
+            [
+                'event_id' => 'evt_audit_stale_' . uniqid(),
+                'event_type' => 'invoice.paid',
+                'status' => 'processing',
+                'processed_at' => now()->subMinutes(15),
+            ],
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(null, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('stripe_webhook_events_failed_recently', $codes);
+        $this->assertContains('stripe_webhook_events_stale_processing', $codes);
+    }
+
+    public function test_run_detects_billing_audit_event_without_successful_email_log(): void
+    {
+        if (!Schema::hasTable('billing_audit_log') || !Schema::hasTable('email_log')) {
+            $this->markTestSkipped('Billing audit/email log tables are not available.');
+        }
+
+        DB::table('billing_audit_log')->insert([
+            'tenant_id' => 2,
+            'acted_by_user_id' => null,
+            'action' => 'upgrade_requested',
+            'old_value' => null,
+            'new_value' => json_encode(['message' => 'audit']),
+            'notes' => 'Audit fixture',
+            'created_at' => now()->subMinutes(4),
+            'updated_at' => now()->subMinutes(4),
+        ]);
+
+        DB::table('email_log')->insert([
+            'tenant_id' => 2,
+            'user_id' => null,
+            'recipient_email' => 'billing-audit@example.test',
+            'category' => 'billing',
+            'subject' => 'Billing audit',
+            'provider' => 'sendgrid',
+            'status' => 'failed',
+            'error' => 'simulated failure',
+            'created_at' => now()->subMinutes(3),
+            'updated_at' => now()->subMinutes(3),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('billing_audit_event_without_email_log', $codes);
+    }
 }
