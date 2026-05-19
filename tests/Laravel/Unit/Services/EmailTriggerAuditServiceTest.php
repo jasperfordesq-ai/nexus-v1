@@ -89,6 +89,47 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertSame([], $surface);
     }
 
+    public function test_dispatcher_categories_are_represented_in_audit_matrix(): void
+    {
+        $matrixCategories = collect(app(EmailTriggerAuditService::class)->eventMatrix())
+            ->pluck('category')
+            ->unique()
+            ->values()
+            ->all();
+
+        $allowedNonProduction = [
+            'email_test',
+            'newsletter_test',
+            'notification_queue',
+        ];
+
+        $categories = [];
+        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(base_path('app')));
+        foreach ($iterator as $file) {
+            if (!$file->isFile() || $file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $code = file_get_contents($file->getPathname());
+            if ($code === false || !str_contains($code, 'EmailDispatchService::send')) {
+                continue;
+            }
+
+            preg_match_all('/(?:\\\\App\\\\Services\\\\)?EmailDispatchService::send(?:Raw|WithOptions)\s*\((.*?)\);/s', $code, $calls);
+            foreach ($calls[1] as $call) {
+                preg_match_all("/'([a-z0-9_]+)'\\s*,\\s*\\[/", $call, $matches);
+                foreach ($matches[1] as $category) {
+                    $categories[$category] = true;
+                }
+            }
+        }
+
+        $uncovered = array_values(array_diff(array_keys($categories), $matrixCategories, $allowedNonProduction));
+        sort($uncovered);
+
+        $this->assertSame([], $uncovered, 'Every production EmailDispatchService category must be represented in the audit matrix.');
+    }
+
     public function test_dispatcher_send_surface_requires_explicit_tenant_options(): void
     {
         $surface = app(EmailTriggerAuditService::class)->tenantlessDispatcherSendSurface();
