@@ -34,10 +34,10 @@ interface Appreciation {
   my_reaction?: string | null;
 }
 
-const REACTIONS: Array<{ key: string; icon: React.ComponentType<{ className?: string }>; label: string }> = [
-  { key: 'heart', icon: Heart, label: 'Heart' },
-  { key: 'clap', icon: Sparkles, label: 'Clap' },
-  { key: 'star', icon: Star, label: 'Star' },
+const REACTIONS: Array<{ key: string; icon: React.ComponentType<{ className?: string }> }> = [
+  { key: 'heart', icon: Heart },
+  { key: 'clap', icon: Sparkles },
+  { key: 'star', icon: Star },
 ];
 
 export default function AppreciationWallPage() {
@@ -135,7 +135,7 @@ export default function AppreciationWallPage() {
                       onPress={() => react(a.id, key)}
                       isDisabled={!user}
                       startContent={<Icon className="w-4 h-4" />}
-                      aria-label={t(`appreciations.reaction_${key}`, key)}
+                      aria-label={t(`appreciations.reaction_${key}`)}
                     >
                       {key === 'heart' ? t('appreciations.react_heart') :
                        key === 'clap' ? t('appreciations.react_clap') :
