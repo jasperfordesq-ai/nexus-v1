@@ -143,29 +143,32 @@ const emptyWebhookForm = {
 
 export default function VolunteerConfig() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('volunteering.config_title', 'Volunteering Settings'));
+  usePageTitle(t('volunteering.config_title'));
 
   const [activeTab, setActiveTab] = useState('custom-fields');
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title={t('volunteering.config_title', 'Volunteering Settings')}
-        description={t('volunteering.config_desc', 'Configure custom fields, reminders, and webhooks for the volunteering module')}
+        title={t('volunteering.config_title')}
+        description={t('volunteering.config_desc')}
       />
 
       <Tabs
         selectedKey={activeTab}
         onSelectionChange={(key) => setActiveTab(String(key))}
         variant="underlined"
-        classNames={{ tabList: 'mb-6' }}
+        classNames={{
+          tabList: 'rounded-2xl border border-divider/70 bg-content1 p-1 shadow-sm shadow-black/[0.03]',
+          cursor: 'rounded-xl',
+        }}
       >
         <Tab
           key="custom-fields"
           title={
             <div className="flex items-center gap-2">
               <FormInput size={16} />
-              {t('volunteering.tab_custom_fields', 'Custom Fields')}
+              {t('volunteering.tab_custom_fields')}
             </div>
           }
         >
@@ -176,7 +179,7 @@ export default function VolunteerConfig() {
           title={
             <div className="flex items-center gap-2">
               <Bell size={16} />
-              {t('volunteering.tab_reminders', 'Reminders')}
+              {t('volunteering.tab_reminders')}
             </div>
           }
         >
@@ -187,7 +190,7 @@ export default function VolunteerConfig() {
           title={
             <div className="flex items-center gap-2">
               <Webhook size={16} />
-              {t('volunteering.tab_webhooks', 'Webhooks')}
+              {t('volunteering.tab_webhooks')}
             </div>
           }
         >
@@ -226,7 +229,7 @@ function FieldPreviewModal({
             type={field.field_type === 'phone' ? 'tel' : field.field_type}
             variant="bordered"
             isRequired={field.is_required}
-            placeholder={`Enter ${field.label.toLowerCase()}...`}
+            placeholder={t('volunteering.field_preview_input_placeholder', { label: field.label.toLowerCase() })}
             isReadOnly
           />
         );
@@ -236,7 +239,7 @@ function FieldPreviewModal({
             label={field.label}
             variant="bordered"
             isRequired={field.is_required}
-            placeholder={`Enter ${field.label.toLowerCase()}...`}
+            placeholder={t('volunteering.field_preview_input_placeholder', { label: field.label.toLowerCase() })}
             minRows={3}
             isReadOnly
           />
@@ -247,9 +250,13 @@ function FieldPreviewModal({
             label={field.label}
             variant="bordered"
             isRequired={field.is_required}
-            placeholder={`Select ${field.label.toLowerCase()}`}
+            placeholder={t('volunteering.field_preview_select_placeholder', { label: field.label.toLowerCase() })}
           >
-            {(field.options || ['Option 1', 'Option 2', 'Option 3']).map((opt) => (
+            {(field.options || [
+              t('volunteering.preview_option_one'),
+              t('volunteering.preview_option_two'),
+              t('volunteering.preview_option_three'),
+            ]).map((opt) => (
               <SelectItem key={opt}>{opt}</SelectItem>
             ))}
           </Select>
@@ -258,7 +265,10 @@ function FieldPreviewModal({
         return (
           <div className="flex flex-col gap-2">
             <span className="text-sm font-medium">{field.label} {field.is_required && '*'}</span>
-            {(field.options || ['Option 1', 'Option 2']).map((opt) => (
+            {(field.options || [
+              t('volunteering.preview_option_one'),
+              t('volunteering.preview_option_two'),
+            ]).map((opt) => (
               <Checkbox key={opt}>{opt}</Checkbox>
             ))}
           </div>
@@ -266,7 +276,10 @@ function FieldPreviewModal({
       case 'radio':
         return (
           <RadioGroup label={field.label} isRequired={field.is_required}>
-            {(field.options || ['Option 1', 'Option 2']).map((opt) => (
+            {(field.options || [
+              t('volunteering.preview_option_one'),
+              t('volunteering.preview_option_two'),
+            ]).map((opt) => (
               <Radio key={opt} value={opt}>{opt}</Radio>
             ))}
           </RadioGroup>
@@ -307,13 +320,13 @@ function FieldPreviewModal({
     <Modal isOpen={isOpen} onClose={onClose} size="md">
       <ModalContent>
         <ModalHeader>
-          {t('volunteering.field_preview', 'Field Preview')}: {field.label}
+          {t('volunteering.field_preview')}: {field.label}
         </ModalHeader>
         <ModalBody>
-          <Card className="bg-default-50">
+          <Card className="border border-divider/70 bg-content2/50">
             <CardBody className="p-4">
-              <p className="text-xs text-default-400 mb-3">
-                {t('volunteering.preview_description', 'This is how the field will appear to volunteers:')}
+              <p className="mb-3 text-xs text-default-400">
+                {t('volunteering.preview_description')}
               </p>
               {renderPreview()}
             </CardBody>
@@ -321,11 +334,11 @@ function FieldPreviewModal({
           <div className="mt-3 flex flex-wrap gap-2 text-xs text-default-500">
             <Chip size="sm" variant="flat">{field.field_type}</Chip>
             <Chip size="sm" variant="flat" color="primary">{field.applies_to}</Chip>
-            {field.is_required && <Chip size="sm" variant="flat" color="danger">{t('volunteering.required', 'Required')}</Chip>}
+            {field.is_required && <Chip size="sm" variant="flat" color="danger">{t('volunteering.required')}</Chip>}
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button variant="flat" onPress={onClose}>{t('common.close', 'Close')}</Button>
+          <Button variant="flat" onPress={onClose}>{t('volunteering.close')}</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
@@ -368,11 +381,11 @@ function CustomFieldsTab() {
         setOrderChanged(false);
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_fields', 'Failed to load custom fields'));
+      toast.error(t('volunteering.failed_to_load_fields'));
       setFields([]);
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t]);
 
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -418,7 +431,7 @@ function CustomFieldsTab() {
 
   const handleSave = async () => {
     if (!form.label.trim()) {
-      toast.error(t('volunteering.label_required', 'Label is required'));
+      toast.error(t('volunteering.label_required'));
       return;
     }
     setSaving(true);
@@ -435,16 +448,16 @@ function CustomFieldsTab() {
       if (editingId) {
         const res = await adminVolunteering.updateCustomField(editingId, payload);
         if (!res.success) throw new Error(apiErrorMessage(res) || 'update_failed');
-        toast.success(t('volunteering.field_updated', 'Custom field updated'));
+        toast.success(t('volunteering.field_updated'));
       } else {
         const res = await adminVolunteering.createCustomField(payload);
         if (!res.success) throw new Error(apiErrorMessage(res) || 'create_failed');
-        toast.success(t('volunteering.field_created', 'Custom field created'));
+        toast.success(t('volunteering.field_created'));
       }
       onClose();
       loadData();
     } catch {
-      toast.error(t('volunteering.failed_to_save_field', 'Failed to save custom field'));
+      toast.error(t('volunteering.failed_to_save_field'));
     }
     setSaving(false);
   };
@@ -454,36 +467,36 @@ function CustomFieldsTab() {
     try {
       const res = await adminVolunteering.deleteCustomField(deleteId);
       if (!res.success) throw new Error(apiErrorMessage(res) || 'delete_failed');
-      toast.success(t('volunteering.field_deleted', 'Custom field deleted'));
+      toast.success(t('volunteering.field_deleted'));
       onDeleteClose();
       loadData();
     } catch {
-      toast.error(t('volunteering.failed_to_delete_field', 'Failed to delete custom field'));
+      toast.error(t('volunteering.failed_to_delete_field'));
     }
   };
 
   const columns: Column<CustomField>[] = [
-    { key: 'label', label: t('volunteering.col_label', 'Label'), sortable: true },
+    { key: 'label', label: t('volunteering.col_label'), sortable: true },
     {
       key: 'field_type',
-      label: t('volunteering.col_field_type', 'Field Type'),
-      render: (row) => <Chip size="sm" variant="flat">{row.field_type}</Chip>,
+      label: t('volunteering.col_field_type'),
+      render: (row) => <Chip size="sm" variant="flat">{t(`volunteering.field_type_${row.field_type}`)}</Chip>,
     },
     {
       key: 'applies_to',
-      label: t('volunteering.col_applies_to', 'Applies To'),
-      render: (row) => <Chip size="sm" variant="flat" color="primary">{row.applies_to}</Chip>,
+      label: t('volunteering.col_applies_to'),
+      render: (row) => <Chip size="sm" variant="flat" color="primary">{t(`volunteering.applies_to_${row.applies_to}`)}</Chip>,
     },
     {
       key: 'is_required',
-      label: t('volunteering.col_required', 'Required'),
+      label: t('volunteering.col_required'),
       render: (row) => row.is_required
         ? <CheckCircle size={16} className="text-success" />
         : <XCircle size={16} className="text-default-400" />,
     },
     {
       key: 'options',
-      label: t('volunteering.col_options', 'Options'),
+      label: t('volunteering.col_options'),
       render: (row) => (
         <span className="text-sm text-default-500">
           {row.options?.length ? row.options.join(', ') : '-'}
@@ -492,7 +505,7 @@ function CustomFieldsTab() {
     },
     {
       key: 'actions' as keyof CustomField,
-      label: t('common.actions', 'Actions'),
+      label: t('volunteering.col_actions'),
       render: (row) => {
         const idx = sortedFields.findIndex((f) => f.id === row.id);
         return (
@@ -503,7 +516,7 @@ function CustomFieldsTab() {
               isIconOnly
               isDisabled={idx <= 0}
               onPress={() => moveField(idx, 'up')}
-              aria-label={t('volunteering.move_up', 'Move up')}
+              aria-label={t('volunteering.move_up')}
             >
               <ArrowUp size={14} />
             </Button>
@@ -513,14 +526,14 @@ function CustomFieldsTab() {
               isIconOnly
               isDisabled={idx >= sortedFields.length - 1}
               onPress={() => moveField(idx, 'down')}
-              aria-label={t('volunteering.move_down', 'Move down')}
+              aria-label={t('volunteering.move_down')}
             >
               <ArrowDown size={14} />
             </Button>
-            <Button size="sm" variant="flat" isIconOnly onPress={() => openPreview(row)} aria-label={t('volunteering.preview', 'Preview')}>
+            <Button size="sm" variant="flat" isIconOnly onPress={() => openPreview(row)} aria-label={t('volunteering.preview')}>
               <Eye size={14} />
             </Button>
-            <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={t('common.edit', 'Edit')}>
+            <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={t('volunteering.edit')}>
               <Edit2 size={14} />
             </Button>
             <Button
@@ -529,7 +542,7 @@ function CustomFieldsTab() {
               color="danger"
               isIconOnly
               onPress={() => { setDeleteId(row.id); onDeleteOpen(); }}
-              aria-label={t('common.delete', 'Delete')}
+              aria-label={t('volunteering.delete')}
             >
               <Trash2 size={14} />
             </Button>
@@ -540,24 +553,24 @@ function CustomFieldsTab() {
   ];
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">{t('volunteering.custom_fields_heading', 'Custom Fields')}</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-lg font-semibold">{t('volunteering.custom_fields_heading')}</h3>
         <div className="flex gap-2">
           <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
-            {t('common.refresh', 'Refresh')}
+            {t('volunteering.refresh')}
           </Button>
           <Button color="primary" startContent={<Plus size={16} />} onPress={openCreate}>
-            {t('volunteering.add_field', 'Add Field')}
+            {t('volunteering.add_field')}
           </Button>
         </div>
       </div>
 
       {orderChanged && (
-        <Card className="mb-4 border-primary/50 bg-primary-50/30">
+        <Card className="border border-primary/30 bg-primary-50/40 shadow-sm shadow-primary/10">
           <CardBody className="p-3 flex items-center justify-between">
             <p className="text-sm text-primary-700">
-              {t('volunteering.order_changed_note', 'Field order has been changed. Save to persist the new order.')}
+              {t('volunteering.order_changed_note')}
             </p>
             <Button
               size="sm"
@@ -569,16 +582,16 @@ function CustomFieldsTab() {
                 try {
                   const fieldIds = sortedFields.map((f) => f.id);
                   await adminVolunteering.reorderCustomFields(fieldIds);
-                  toast.success(t('volunteering.order_saved', 'Field order saved'));
+                  toast.success(t('volunteering.order_saved'));
                   setOrderChanged(false);
                   loadData();
                 } catch {
-                  toast.error(t('volunteering.order_save_failed', 'Failed to save field order'));
+                  toast.error(t('volunteering.order_save_failed'));
                 }
                 setSaving(false);
               }}
             >
-              {t('volunteering.save_order', 'Save Order')}
+              {t('volunteering.save_order')}
             </Button>
           </CardBody>
         </Card>
@@ -587,8 +600,8 @@ function CustomFieldsTab() {
       {sortedFields.length === 0 && !loading ? (
         <EmptyState
           icon={FormInput}
-          title={t('volunteering.no_custom_fields', 'No custom fields')}
-          description={t('volunteering.no_custom_fields_desc', 'Add custom fields to collect additional data from volunteers.')}
+          title={t('volunteering.no_custom_fields')}
+          description={t('volunteering.no_custom_fields_desc')}
         />
       ) : (
         <DataTable columns={columns} data={sortedFields} isLoading={loading} />
@@ -602,20 +615,20 @@ function CustomFieldsTab() {
         <ModalContent>
           <ModalHeader>
             {editingId
-              ? t('volunteering.edit_field', 'Edit Custom Field')
-              : t('volunteering.add_field', 'Add Custom Field')}
+              ? t('volunteering.edit_field')
+              : t('volunteering.add_field')}
           </ModalHeader>
           <ModalBody>
             <div className="flex flex-col gap-4">
               <Input
-                label={t('volunteering.field_label', 'Label')}
+                label={t('volunteering.field_label')}
                 value={form.label}
                 onValueChange={(v) => setForm((f) => ({ ...f, label: v }))}
                 isRequired
                 variant="bordered"
               />
               <Select
-                label={t('volunteering.field_type_label', 'Field Type')}
+                label={t('volunteering.field_type_label')}
                 selectedKeys={[form.field_type]}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0];
@@ -624,11 +637,11 @@ function CustomFieldsTab() {
                 variant="bordered"
               >
                 {fieldTypeOptions.map((ft) => (
-                  <SelectItem key={ft}>{ft}</SelectItem>
+                  <SelectItem key={ft}>{t(`volunteering.field_type_${ft}`)}</SelectItem>
                 ))}
               </Select>
               <Select
-                label={t('volunteering.field_applies_to', 'Applies To')}
+                label={t('volunteering.field_applies_to')}
                 selectedKeys={[form.applies_to]}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0];
@@ -637,28 +650,28 @@ function CustomFieldsTab() {
                 variant="bordered"
               >
                 {appliesToOptions.map((at) => (
-                  <SelectItem key={at}>{at}</SelectItem>
+                  <SelectItem key={at}>{t(`volunteering.applies_to_${at}`)}</SelectItem>
                 ))}
               </Select>
               <Switch
                 isSelected={form.is_required}
                 onValueChange={(v) => setForm((f) => ({ ...f, is_required: v }))}
               >
-                {t('volunteering.field_required', 'Required')}
+                {t('volunteering.field_required')}
               </Switch>
               <Input
-                label={t('volunteering.field_options_label', 'Options (comma-separated)')}
+                label={t('volunteering.field_options_label')}
                 value={form.options}
                 onValueChange={(v) => setForm((f) => ({ ...f, options: v }))}
                 variant="bordered"
-                description={t('volunteering.field_options_desc', 'Only for select, radio, and checkbox types')}
+                description={t('volunteering.field_options_desc')}
               />
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose}>{t('common.cancel', 'Cancel')}</Button>
+            <Button variant="flat" onPress={onClose}>{t('volunteering.cancel')}</Button>
             <Button color="primary" onPress={handleSave} isLoading={saving}>
-              {editingId ? t('common.save', 'Save') : t('common.create', 'Create')}
+              {editingId ? t('volunteering.save') : t('volunteering.create')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -669,9 +682,9 @@ function CustomFieldsTab() {
         isOpen={isDeleteOpen}
         onClose={onDeleteClose}
         onConfirm={handleDelete}
-        title={t('volunteering.delete_field_title', 'Delete Custom Field')}
-        message={t('volunteering.delete_field_confirm', 'Are you sure you want to delete this custom field? This action cannot be undone.')}
-        confirmLabel={t('common.delete', 'Delete')}
+        title={t('volunteering.delete_field_title')}
+        message={t('volunteering.delete_field_confirm')}
+        confirmLabel={t('volunteering.delete')}
         confirmColor="danger"
       />
     </div>
@@ -812,9 +825,9 @@ function RemindersTab() {
       if (results.some((res) => !res.success)) {
         throw new Error('reminder_settings_update_failed');
       }
-      toast.success(t('volunteering.reminders_saved', 'Reminder settings saved'));
+      toast.success(t('volunteering.reminders_saved'));
     } catch {
-      toast.error(t('volunteering.failed_to_save_reminders', 'Failed to save reminder settings'));
+      toast.error(t('volunteering.failed_to_save_reminders'));
     }
     setSaving(false);
   };
@@ -828,40 +841,40 @@ function RemindersTab() {
       }
       onTestClose();
       toast.success(
-        t('volunteering.reminder_job_sent', 'Reminder job sent {{count}} notification(s)', {
+        t('volunteering.reminder_job_sent', {
           count: (res.data as { reminders_sent?: number } | undefined)?.reminders_sent ?? 0,
         }),
       );
       loadDeliveryLogs();
     } catch {
-      toast.error(t('volunteering.reminder_job_failed', 'Failed to send reminder job'));
+      toast.error(t('volunteering.reminder_job_failed'));
     } finally {
       setRunningReminderJob(false);
     }
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">{t('volunteering.reminders_heading', 'Reminder Settings')}</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-lg font-semibold">{t('volunteering.reminders_heading')}</h3>
         <div className="flex gap-2">
           <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
-            {t('common.refresh', 'Refresh')}
+            {t('volunteering.refresh')}
           </Button>
           {canRunReminderJobs && (
             <Button variant="flat" color="primary" startContent={<Send size={16} />} onPress={onTestOpen} isLoading={runningReminderJob}>
-              {t('volunteering.run_due_reminders', 'Run Due Reminders')}
+              {t('volunteering.run_due_reminders')}
             </Button>
           )}
           <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>
-            {t('common.save', 'Save')}
+            {t('volunteering.save')}
           </Button>
         </div>
       </div>
 
       <div className="flex flex-col gap-4">
         {reminders.map((reminder, index) => (
-          <Card key={reminder.key} className="p-0">
+          <Card key={reminder.key} className="border border-divider/70 p-0 shadow-sm shadow-black/[0.03]">
             <CardBody className="p-4">
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
@@ -871,14 +884,14 @@ function RemindersTab() {
                       onValueChange={(v) => updateReminder(index, { enabled: v })}
                     />
                     <span className="font-medium">
-                      {t(`volunteering.reminder_${reminder.key}`, reminder.label)}
+                      {t(`volunteering.reminder_${reminder.key}`)}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Chip size="sm" variant="flat" color={reminder.enabled ? 'success' : 'default'}>
                       {reminder.enabled
-                        ? t('volunteering.enabled', 'Enabled')
-                        : t('volunteering.disabled', 'Disabled')}
+                        ? t('volunteering.enabled')
+                        : t('volunteering.disabled')}
                     </Chip>
                   </div>
                 </div>
@@ -887,7 +900,7 @@ function RemindersTab() {
                   <div className="flex flex-wrap items-center gap-4 ml-12">
                     <Input
                       type="number"
-                      label={t('volunteering.timing_value', 'Timing')}
+                      label={t('volunteering.timing_value')}
                       value={String(reminder.timing_value)}
                       onValueChange={(v) => updateReminder(index, { timing_value: Number(v) || 0 })}
                       variant="bordered"
@@ -895,7 +908,7 @@ function RemindersTab() {
                       size="sm"
                       endContent={
                         <span className="text-xs text-default-400 whitespace-nowrap">
-                          {reminder.timing_unit}
+                          {t(`volunteering.timing_unit_${reminder.key}`)}
                         </span>
                       }
                     />
@@ -905,21 +918,21 @@ function RemindersTab() {
                         isSelected={reminder.email_enabled}
                         onValueChange={(v) => updateReminder(index, { email_enabled: v })}
                       >
-                        {t('volunteering.channel_email', 'Email')}
+                        {t('volunteering.channel_email')}
                       </Switch>
                       <Switch
                         size="sm"
                         isSelected={reminder.push_enabled}
                         onValueChange={(v) => updateReminder(index, { push_enabled: v })}
                       >
-                        {t('volunteering.channel_push', 'Push')}
+                        {t('volunteering.channel_push')}
                       </Switch>
                       <Switch
                         size="sm"
                         isSelected={reminder.sms_enabled}
                         onValueChange={(v) => updateReminder(index, { sms_enabled: v })}
                       >
-                        {t('volunteering.channel_sms', 'SMS')}
+                        {t('volunteering.channel_sms')}
                       </Switch>
                     </div>
                   </div>
@@ -931,30 +944,30 @@ function RemindersTab() {
       </div>
 
       {/* Recent Deliveries */}
-      <div className="mt-8">
-        <h4 className="text-md font-semibold mb-3 flex items-center gap-2">
+      <div className="space-y-3 pt-2">
+        <h4 className="text-md flex items-center gap-2 font-semibold">
           <Clock size={16} />
-          {t('volunteering.recent_deliveries', 'Recent Deliveries')}
+          {t('volunteering.recent_deliveries')}
         </h4>
 
         {/* Stats summary */}
         {deliveryStats && (
-          <div className="flex flex-wrap gap-2 mb-3">
+          <div className="flex flex-wrap gap-2">
             {Object.entries(deliveryStats.by_channel).map(([ch, count]) => (
               <Chip key={ch} size="sm" variant="flat" color={ch === 'email' ? 'primary' : ch === 'push' ? 'secondary' : 'warning'}>
                 {count} {ch}
               </Chip>
             ))}
             <Chip size="sm" variant="flat" color="default">
-              {deliveryStats.total_sent} {t('volunteering.total_sent', 'total sent')}
+              {t('volunteering.delivery_total_sent', { count: deliveryStats.total_sent })}
             </Chip>
           </div>
         )}
 
         {/* Filters */}
-        <div className="flex gap-2 mb-3">
+        <div className="flex gap-2 rounded-2xl border border-divider/70 bg-content1 p-3 shadow-sm shadow-black/[0.03]">
           <Select
-            label={t('volunteering.filter_type', 'Type')}
+            label={t('volunteering.filter_type')}
             size="sm"
             variant="bordered"
             className="w-44"
@@ -965,15 +978,15 @@ function RemindersTab() {
               loadDeliveryLogs(val, deliveryFilterChannel);
             }}
           >
-            <SelectItem key="">{t('common.all', 'All')}</SelectItem>
-            <SelectItem key="pre_shift">{t('volunteering.reminder_pre_shift', 'Pre-shift Reminder')}</SelectItem>
-            <SelectItem key="post_shift_feedback">{t('volunteering.reminder_post_shift_feedback', 'Post-shift Feedback')}</SelectItem>
-            <SelectItem key="lapsed_volunteer">{t('volunteering.reminder_lapsed_volunteer', 'Lapsed Volunteer')}</SelectItem>
-            <SelectItem key="credential_expiry">{t('volunteering.reminder_credential_expiry', 'Credential Expiry')}</SelectItem>
-            <SelectItem key="training_expiry">{t('volunteering.reminder_training_expiry', 'Training Expiry')}</SelectItem>
+            <SelectItem key="">{t('volunteering.tab_all')}</SelectItem>
+            <SelectItem key="pre_shift">{t('volunteering.reminder_pre_shift')}</SelectItem>
+            <SelectItem key="post_shift_feedback">{t('volunteering.reminder_post_shift_feedback')}</SelectItem>
+            <SelectItem key="lapsed_volunteer">{t('volunteering.reminder_lapsed_volunteer')}</SelectItem>
+            <SelectItem key="credential_expiry">{t('volunteering.reminder_credential_expiry')}</SelectItem>
+            <SelectItem key="training_expiry">{t('volunteering.reminder_training_expiry')}</SelectItem>
           </Select>
           <Select
-            label={t('volunteering.filter_channel', 'Channel')}
+            label={t('volunteering.filter_channel')}
             size="sm"
             variant="bordered"
             className="w-36"
@@ -984,50 +997,50 @@ function RemindersTab() {
               loadDeliveryLogs(deliveryFilterType, val);
             }}
           >
-            <SelectItem key="">{t('common.all', 'All')}</SelectItem>
-            <SelectItem key="email">{t('volunteering.channel_email', 'Email')}</SelectItem>
-            <SelectItem key="push">{t('volunteering.channel_push', 'Push')}</SelectItem>
-            <SelectItem key="sms">{t('volunteering.channel_sms', 'SMS')}</SelectItem>
+            <SelectItem key="">{t('volunteering.tab_all')}</SelectItem>
+            <SelectItem key="email">{t('volunteering.channel_email')}</SelectItem>
+            <SelectItem key="push">{t('volunteering.channel_push')}</SelectItem>
+            <SelectItem key="sms">{t('volunteering.channel_sms')}</SelectItem>
           </Select>
         </div>
 
         {/* Log list */}
         {deliveryLoading ? (
-          <Card className="bg-default-50">
+          <Card className="border border-divider/70 bg-content2/50">
             <CardBody className="p-6 flex justify-center">
               <div className="flex items-center gap-2 text-default-400">
                 <RefreshCw size={16} className="animate-spin" />
-                <span className="text-sm">{t('common.loading', 'Loading...')}</span>
+                <span className="text-sm">{t('volunteering.loading')}</span>
               </div>
             </CardBody>
           </Card>
         ) : deliveryLogs.length === 0 ? (
-          <Card className="bg-default-50">
+          <Card className="border border-divider/70 bg-content2/50">
             <CardBody className="p-6 text-center">
               <Clock size={32} className="mx-auto mb-3 text-default-300" />
               <p className="text-default-500 text-sm">
-                {t('volunteering.no_delivery_logs', 'No delivery logs found.')}
+                {t('volunteering.no_delivery_logs')}
               </p>
             </CardBody>
           </Card>
         ) : (
           <div className="flex flex-col gap-1">
             {deliveryLogs.map((log) => (
-              <Card key={log.id} className="p-0">
+              <Card key={log.id} className="border border-divider/70 p-0 shadow-sm shadow-black/[0.02]">
                 <CardBody className="p-3">
                   <div className="flex items-center gap-3">
                     <div className="flex-1 min-w-0">
                       <span className="text-sm font-medium">{log.user_name}</span>
                     </div>
                     <Chip size="sm" variant="flat" color="primary">
-                      {log.reminder_type.replace(/_/g, ' ')}
+                      {t(`volunteering.reminder_${log.reminder_type}`)}
                     </Chip>
                     <Chip
                       size="sm"
                       variant="flat"
                       color={log.channel === 'email' ? 'default' : log.channel === 'push' ? 'secondary' : 'warning'}
                     >
-                      {log.channel}
+                      {t(`volunteering.channel_${log.channel}`)}
                     </Chip>
                     <span className="text-xs text-default-400 whitespace-nowrap">
                       {log.sent_at ? new Date(log.sent_at).toLocaleString() : ''}
@@ -1044,19 +1057,16 @@ function RemindersTab() {
       {canRunReminderJobs && (
         <Modal isOpen={isTestOpen} onClose={onTestClose} size="sm">
           <ModalContent>
-            <ModalHeader>{t('volunteering.run_reminder_job_title', 'Run Due Shift Reminders')}</ModalHeader>
+            <ModalHeader>{t('volunteering.run_reminder_job_title')}</ModalHeader>
             <ModalBody>
               <p className="text-default-600">
-                {t(
-                  'volunteering.run_reminder_job_confirm',
-                  'Send due shift reminders for active opportunities in this community?',
-                )}
+                {t('volunteering.run_reminder_job_confirm')}
               </p>
             </ModalBody>
             <ModalFooter>
-              <Button variant="flat" onPress={onTestClose}>{t('common.cancel', 'Cancel')}</Button>
+              <Button variant="flat" onPress={onTestClose}>{t('volunteering.cancel')}</Button>
               <Button color="primary" startContent={<Send size={14} />} onPress={handleTestSend} isLoading={runningReminderJob}>
-                {t('volunteering.confirm_run_reminders', 'Run Reminders')}
+                {t('volunteering.confirm_run_reminders')}
               </Button>
             </ModalFooter>
           </ModalContent>
@@ -1103,11 +1113,11 @@ function WebhooksTab() {
         }
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_webhooks', 'Failed to load webhooks'));
+      toast.error(t('volunteering.failed_to_load_webhooks'));
       setWebhooks([]);
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t]);
 
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -1131,7 +1141,7 @@ function WebhooksTab() {
 
   const handleSave = async () => {
     if (!form.name.trim() || !form.url.trim()) {
-      toast.error(t('volunteering.webhook_name_url_required', 'Name and URL are required'));
+      toast.error(t('volunteering.webhook_name_url_required'));
       return;
     }
     setSaving(true);
@@ -1145,16 +1155,16 @@ function WebhooksTab() {
       if (editingId) {
         const res = await adminVolunteering.updateWebhook(editingId, payload);
         if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_update_failed');
-        toast.success(t('volunteering.webhook_updated', 'Webhook updated'));
+        toast.success(t('volunteering.webhook_updated'));
       } else {
         const res = await adminVolunteering.createWebhook(payload);
         if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_create_failed');
-        toast.success(t('volunteering.webhook_created', 'Webhook created'));
+        toast.success(t('volunteering.webhook_created'));
       }
       onClose();
       loadData();
     } catch {
-      toast.error(t('volunteering.failed_to_save_webhook', 'Failed to save webhook'));
+      toast.error(t('volunteering.failed_to_save_webhook'));
     }
     setSaving(false);
   };
@@ -1164,11 +1174,11 @@ function WebhooksTab() {
     try {
       const res = await adminVolunteering.deleteWebhook(deleteId);
       if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_delete_failed');
-      toast.success(t('volunteering.webhook_deleted', 'Webhook deleted'));
+      toast.success(t('volunteering.webhook_deleted'));
       onDeleteClose();
       loadData();
     } catch {
-      toast.error(t('volunteering.failed_to_delete_webhook', 'Failed to delete webhook'));
+      toast.error(t('volunteering.failed_to_delete_webhook'));
     }
   };
 
@@ -1177,9 +1187,9 @@ function WebhooksTab() {
     try {
       const res = await adminVolunteering.testWebhook(id);
       if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_test_failed');
-      toast.success(t('volunteering.webhook_test_sent', 'Test webhook dispatched'));
+      toast.success(t('volunteering.webhook_test_sent'));
     } catch {
-      toast.error(t('volunteering.webhook_test_failed', 'Webhook test failed'));
+      toast.error(t('volunteering.webhook_test_failed'));
     }
     setTestingId(null);
   };
@@ -1189,10 +1199,10 @@ function WebhooksTab() {
     try {
       const res = await adminVolunteering.testWebhook(id);
       if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_retry_failed');
-      toast.success(t('volunteering.webhook_retry_sent', 'Retrying webhook...'));
+      toast.success(t('volunteering.webhook_retry_sent'));
       loadData();
     } catch {
-      toast.error(t('volunteering.webhook_retry_failed', 'Webhook retry failed'));
+      toast.error(t('volunteering.webhook_retry_failed'));
     }
     setRetryingId(null);
   };
@@ -1219,24 +1229,24 @@ function WebhooksTab() {
         }
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_logs', 'Failed to load webhook logs'));
+      toast.error(t('volunteering.failed_to_load_logs'));
       setLogs([]);
     }
     onLogsOpen();
   };
 
   const columns: Column<WebhookEntry>[] = [
-    { key: 'name', label: t('volunteering.col_name', 'Name'), sortable: true },
+    { key: 'name', label: t('volunteering.col_name'), sortable: true },
     {
       key: 'url',
-      label: t('volunteering.col_url', 'URL'),
+      label: t('volunteering.col_url'),
       render: (row) => (
         <span className="text-sm font-mono truncate max-w-[250px] block">{row.url}</span>
       ),
     },
     {
       key: 'events',
-      label: t('volunteering.col_events', 'Events'),
+      label: t('volunteering.col_events'),
       render: (row) => (
         <div className="flex flex-wrap gap-1">
           {row.events?.map((ev) => (
@@ -1247,16 +1257,16 @@ function WebhooksTab() {
     },
     {
       key: 'is_active',
-      label: t('volunteering.col_active', 'Active'),
+      label: t('volunteering.col_active'),
       render: (row) => (
         <Chip size="sm" color={row.is_active ? 'success' : 'default'} variant="flat">
-          {row.is_active ? t('volunteering.active', 'Active') : t('volunteering.inactive', 'Inactive')}
+          {row.is_active ? t('volunteering.active') : t('volunteering.inactive')}
         </Chip>
       ),
     },
     {
       key: 'failure_count',
-      label: t('volunteering.col_failures', 'Failures'),
+      label: t('volunteering.col_failures'),
       render: (row) => (
         <Chip size="sm" color={row.failure_count > 0 ? 'danger' : 'default'} variant="flat">
           {row.failure_count}
@@ -1265,10 +1275,10 @@ function WebhooksTab() {
     },
     {
       key: 'actions' as keyof WebhookEntry,
-      label: t('common.actions', 'Actions'),
+      label: t('volunteering.col_actions'),
       render: (row) => (
         <div className="flex items-center gap-1">
-          <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={t('common.edit', 'Edit')}>
+          <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={t('volunteering.edit')}>
             <Edit2 size={14} />
           </Button>
           <Button
@@ -1278,7 +1288,7 @@ function WebhooksTab() {
             isIconOnly
             isLoading={testingId === row.id}
             onPress={() => handleTest(row.id)}
-            aria-label={t('volunteering.test_webhook', 'Test webhook')}
+            aria-label={t('volunteering.test_webhook')}
           >
             <Play size={14} />
           </Button>
@@ -1290,7 +1300,7 @@ function WebhooksTab() {
               isIconOnly
               isLoading={retryingId === row.id}
               onPress={() => handleRetry(row.id)}
-              aria-label={t('volunteering.retry_webhook', 'Retry webhook')}
+              aria-label={t('volunteering.retry_webhook')}
             >
               <RotateCcw size={14} />
             </Button>
@@ -1300,7 +1310,7 @@ function WebhooksTab() {
             variant="flat"
             isIconOnly
             onPress={() => handleViewLogs(row.id)}
-            aria-label={t('volunteering.view_logs', 'View logs')}
+            aria-label={t('volunteering.view_logs')}
           >
             <FileText size={14} />
           </Button>
@@ -1310,7 +1320,7 @@ function WebhooksTab() {
             color="danger"
             isIconOnly
             onPress={() => { setDeleteId(row.id); onDeleteOpen(); }}
-            aria-label={t('common.delete', 'Delete')}
+            aria-label={t('volunteering.delete')}
           >
             <Trash2 size={14} />
           </Button>
@@ -1320,15 +1330,15 @@ function WebhooksTab() {
   ];
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">{t('volunteering.webhooks_heading', 'Webhooks')}</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-lg font-semibold">{t('volunteering.webhooks_heading')}</h3>
         <div className="flex gap-2">
           <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
-            {t('common.refresh', 'Refresh')}
+            {t('volunteering.refresh')}
           </Button>
           <Button color="primary" startContent={<Plus size={16} />} onPress={openCreate}>
-            {t('volunteering.add_webhook', 'Add Webhook')}
+            {t('volunteering.add_webhook')}
           </Button>
         </div>
       </div>
@@ -1336,8 +1346,8 @@ function WebhooksTab() {
       {webhooks.length === 0 && !loading ? (
         <EmptyState
           icon={Webhook}
-          title={t('volunteering.no_webhooks', 'No webhooks configured')}
-          description={t('volunteering.no_webhooks_desc', 'Set up webhooks to receive real-time notifications about volunteering events.')}
+          title={t('volunteering.no_webhooks')}
+          description={t('volunteering.no_webhooks_desc')}
         />
       ) : (
         <DataTable columns={columns} data={webhooks} isLoading={loading} />
@@ -1348,47 +1358,47 @@ function WebhooksTab() {
         <ModalContent>
           <ModalHeader>
             {editingId
-              ? t('volunteering.edit_webhook', 'Edit Webhook')
-              : t('volunteering.add_webhook', 'Add Webhook')}
+              ? t('volunteering.edit_webhook')
+              : t('volunteering.add_webhook')}
           </ModalHeader>
           <ModalBody>
             <div className="flex flex-col gap-4">
               <Input
-                label={t('volunteering.webhook_name', 'Name')}
+                label={t('volunteering.webhook_name')}
                 value={form.name}
                 onValueChange={(v) => setForm((f) => ({ ...f, name: v }))}
                 isRequired
                 variant="bordered"
               />
               <Input
-                label={t('volunteering.webhook_url', 'URL')}
+                label={t('volunteering.webhook_url')}
                 value={form.url}
                 onValueChange={(v) => setForm((f) => ({ ...f, url: v }))}
                 isRequired
                 variant="bordered"
                 type="url"
-                placeholder="https://example.com/webhook"
+                placeholder={t('volunteering.webhook_url_placeholder')}
               />
               <Textarea
-                label={t('volunteering.webhook_events', 'Events (comma-separated)')}
+                label={t('volunteering.webhook_events')}
                 value={form.events}
                 onValueChange={(v) => setForm((f) => ({ ...f, events: v }))}
                 variant="bordered"
-                placeholder="application.created, shift.completed, hours.logged"
-                description={t('volunteering.webhook_events_desc', 'Comma-separated list of event types to subscribe to')}
+                placeholder={t('volunteering.webhook_events_placeholder')}
+                description={t('volunteering.webhook_events_desc')}
               />
               <Switch
                 isSelected={form.is_active}
                 onValueChange={(v) => setForm((f) => ({ ...f, is_active: v }))}
               >
-                {t('volunteering.webhook_active', 'Active')}
+                {t('volunteering.webhook_active')}
               </Switch>
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose}>{t('common.cancel', 'Cancel')}</Button>
+            <Button variant="flat" onPress={onClose}>{t('volunteering.cancel')}</Button>
             <Button color="primary" onPress={handleSave} isLoading={saving}>
-              {editingId ? t('common.save', 'Save') : t('common.create', 'Create')}
+              {editingId ? t('volunteering.save') : t('volunteering.create')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -1399,9 +1409,9 @@ function WebhooksTab() {
         isOpen={isDeleteOpen}
         onClose={onDeleteClose}
         onConfirm={handleDelete}
-        title={t('volunteering.delete_webhook_title', 'Delete Webhook')}
-        message={t('volunteering.delete_webhook_confirm', 'Are you sure you want to delete this webhook? This action cannot be undone.')}
-        confirmLabel={t('common.delete', 'Delete')}
+        title={t('volunteering.delete_webhook_title')}
+        message={t('volunteering.delete_webhook_confirm')}
+        confirmLabel={t('volunteering.delete')}
         confirmColor="danger"
       />
 
@@ -1409,12 +1419,12 @@ function WebhooksTab() {
       <Modal isOpen={isLogsOpen} onClose={onLogsClose} size="2xl" scrollBehavior="inside">
         <ModalContent>
           <ModalHeader>
-            {t('volunteering.webhook_logs_title', 'Webhook Dispatch Logs')}
+            {t('volunteering.webhook_logs_title')}
           </ModalHeader>
           <ModalBody>
             {logs.length > 0 && (
               <Input
-                placeholder={t('volunteering.filter_logs', 'Filter by event or status code...')}
+                placeholder={t('volunteering.filter_logs')}
                 value={logFilter}
                 onValueChange={setLogFilter}
                 variant="bordered"
@@ -1428,8 +1438,8 @@ function WebhooksTab() {
             {filteredLogs.length === 0 ? (
               <p className="text-default-500 text-center py-8">
                 {logs.length === 0
-                  ? t('volunteering.no_webhook_logs', 'No dispatch logs for this webhook.')
-                  : t('volunteering.no_matching_logs', 'No logs match your filter.')}
+                  ? t('volunteering.no_webhook_logs')
+                  : t('volunteering.no_matching_logs')}
               </p>
             ) : (
               <div className="flex flex-col gap-3">
@@ -1463,7 +1473,7 @@ function WebhooksTab() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onLogsClose}>{t('common.close', 'Close')}</Button>
+            <Button variant="flat" onPress={onLogsClose}>{t('volunteering.close')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

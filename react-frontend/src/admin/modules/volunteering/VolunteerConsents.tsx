@@ -41,7 +41,7 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default
 
 export default function VolunteerConsents() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('volunteering.consents_title', 'Guardian Consents'));
+  usePageTitle(t('volunteering.consents_title'));
   const toast = useToast();
 
   const [consents, setConsents] = useState<GuardianConsent[]>([]);
@@ -60,11 +60,11 @@ export default function VolunteerConsents() {
         }
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_consents', 'Failed to load guardian consents'));
+      toast.error(t('volunteering.failed_to_load_consents'));
       setConsents([]);
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t]);
 
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -86,41 +86,41 @@ export default function VolunteerConsents() {
   const columns: Column<GuardianConsent>[] = [
     {
       key: 'minor_name',
-      label: t('volunteering.col_minor_name', 'Minor Name'),
+      label: t('volunteering.col_minor_name'),
       sortable: true,
     },
     {
       key: 'guardian_name',
-      label: t('volunteering.col_guardian_name', 'Guardian Name'),
+      label: t('volunteering.col_guardian_name'),
       sortable: true,
     },
     {
       key: 'guardian_email',
-      label: t('volunteering.col_guardian_email', 'Guardian Email'),
+      label: t('volunteering.col_guardian_email'),
       sortable: true,
     },
     {
       key: 'relationship',
-      label: t('volunteering.col_relationship', 'Relationship'),
+      label: t('volunteering.col_relationship'),
     },
     {
       key: 'opportunity_title',
-      label: t('volunteering.col_opportunity', 'Opportunity'),
+      label: t('volunteering.col_opportunity'),
       sortable: true,
     },
     {
       key: 'status',
-      label: t('volunteering.col_status', 'Status'),
+      label: t('volunteering.col_status'),
       sortable: true,
       render: (row) => (
         <Chip size="sm" color={statusColorMap[row.status] || 'default'} variant="flat">
-          {t(`volunteering.status_${row.status}`, row.status)}
+          {t(`volunteering.status_${row.status}`)}
         </Chip>
       ),
     },
     {
       key: 'consent_date',
-      label: t('volunteering.col_consent_date', 'Consent Date'),
+      label: t('volunteering.col_consent_date'),
       sortable: true,
       render: (row) => (
         <span>{row.consent_date ? new Date(row.consent_date).toLocaleDateString() : '-'}</span>
@@ -128,7 +128,7 @@ export default function VolunteerConsents() {
     },
     {
       key: 'expires_date',
-      label: t('volunteering.col_expires_date', 'Expires'),
+      label: t('volunteering.col_expires_date'),
       sortable: true,
       render: (row) => {
         if (!row.expires_date) return <span>-</span>;
@@ -143,17 +143,18 @@ export default function VolunteerConsents() {
     },
     {
       key: 'actions' as keyof GuardianConsent,
-      label: t('common.actions', 'Actions'),
+      label: t('volunteering.col_actions'),
       render: (row) => {
         if (row.status !== 'expired') return null;
         const subject = encodeURIComponent(
-          t('volunteering.consent_renewal_subject', 'Guardian Consent Renewal Required'),
+          t('volunteering.consent_renewal_subject'),
         );
         const body = encodeURIComponent(
-          t(
-            'volunteering.consent_renewal_body',
-            `Dear ${row.guardian_name},\n\nThe guardian consent for ${row.minor_name}'s participation in "${row.opportunity_title}" has expired. Please renew the consent at your earliest convenience.\n\nThank you.`,
-          ),
+          t('volunteering.consent_renewal_body', {
+            guardianName: row.guardian_name,
+            minorName: row.minor_name,
+            opportunityTitle: row.opportunity_title,
+          }),
         );
         return (
           <Button
@@ -164,7 +165,7 @@ export default function VolunteerConsents() {
             color="warning"
             startContent={<Mail size={14} />}
           >
-            {t('volunteering.re_request', 'Re-request')}
+            {t('volunteering.re_request')}
           </Button>
         );
       },
@@ -172,26 +173,26 @@ export default function VolunteerConsents() {
   ];
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title={t('volunteering.consents_title', 'Guardian Consents')}
-        description={t('volunteering.consents_desc', 'Monitor guardian consent records for minor volunteers. This is a read-only view.')}
+        title={t('volunteering.consents_title')}
+        description={t('volunteering.consents_desc')}
         actions={
           <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
-            {t('common.refresh', 'Refresh')}
+            {t('volunteering.refresh')}
           </Button>
         }
       />
 
       {/* Expiry Warning Banner */}
       {expiringConsents.length > 0 && (
-        <Card className="mb-6 border-warning/50 bg-warning-50/30">
+        <Card className="border border-warning/40 bg-warning-50/50 shadow-sm shadow-warning/10">
           <CardBody className="p-4">
             <div className="flex items-start gap-3">
               <AlertTriangle size={20} className="text-warning mt-0.5 shrink-0" />
               <div>
                 <p className="font-semibold text-warning-700">
-                  {t('volunteering.expiring_consents_warning', '{{count}} consent(s) expiring within 30 days', {
+                  {t('volunteering.expiring_consents_warning', {
                     count: expiringConsents.length,
                   })}
                 </p>
@@ -202,13 +203,13 @@ export default function VolunteerConsents() {
                       {' '}&mdash;{' '}
                       {c.opportunity_title}
                       {' '}&mdash;{' '}
-                      {t('volunteering.expires_on', 'expires')} {new Date(c.expires_date!).toLocaleDateString()}
+                      {t('volunteering.expires_on', { date: new Date(c.expires_date!).toLocaleDateString() })}
                       {' '}
                       <a
-                        href={`mailto:${c.guardian_email}?subject=${encodeURIComponent('Guardian Consent Renewal')}`}
+                        href={`mailto:${c.guardian_email}?subject=${encodeURIComponent(t('volunteering.consent_renewal_subject'))}`}
                         className="text-warning-600 underline hover:text-warning-700"
                       >
-                        ({t('volunteering.contact_guardian', 'contact guardian')})
+                        ({t('volunteering.contact_guardian')})
                       </a>
                     </li>
                   ))}
@@ -222,8 +223,8 @@ export default function VolunteerConsents() {
       {consents.length === 0 && !loading ? (
         <EmptyState
           icon={ShieldCheck}
-          title={t('volunteering.no_consents', 'No guardian consents')}
-          description={t('volunteering.no_consents_desc', 'No guardian consent records have been created yet.')}
+          title={t('volunteering.no_consents')}
+          description={t('volunteering.no_consents_desc')}
         />
       ) : (
         <DataTable columns={columns} data={consents} isLoading={loading} />

@@ -114,7 +114,7 @@ const emptyForm = {
 
 export default function VolunteerGivingDays() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('volunteering.giving_days_title', 'Giving Days'));
+  usePageTitle(t('volunteering.giving_days_title'));
   const toast = useToast();
 
   const [givingDays, setGivingDays] = useState<GivingDay[]>([]);
@@ -151,11 +151,11 @@ export default function VolunteerGivingDays() {
         if (d.donation_stats) setDonationStats(d.donation_stats);
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_giving_days', 'Failed to load giving days'));
+      toast.error(t('volunteering.failed_to_load_giving_days'));
       setGivingDays([]);
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t]);
 
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -181,7 +181,7 @@ export default function VolunteerGivingDays() {
 
   const handleSave = async () => {
     if (!form.name.trim()) {
-      toast.error(t('volunteering.name_required', 'Name is required'));
+      toast.error(t('volunteering.name_required'));
       return;
     }
     setSaving(true);
@@ -196,15 +196,15 @@ export default function VolunteerGivingDays() {
       };
       if (editingId) {
         await adminVolunteering.updateGivingDay(editingId, payload);
-        toast.success(t('volunteering.giving_day_updated', 'Giving day updated'));
+        toast.success(t('volunteering.giving_day_updated'));
       } else {
         await adminVolunteering.createGivingDay(payload);
-        toast.success(t('volunteering.giving_day_created', 'Giving day created'));
+        toast.success(t('volunteering.giving_day_created'));
       }
       onClose();
       loadData();
     } catch {
-      toast.error(t('volunteering.failed_to_save', 'Failed to save'));
+      toast.error(t('volunteering.failed_to_save'));
     }
     setSaving(false);
   };
@@ -213,20 +213,20 @@ export default function VolunteerGivingDays() {
     try {
       await adminVolunteering.updateGivingDay(day.id, { is_active: !day.is_active });
       toast.success(day.is_active
-        ? t('volunteering.giving_day_deactivated', 'Giving day deactivated')
-        : t('volunteering.giving_day_activated', 'Giving day activated'));
+        ? t('volunteering.giving_day_deactivated')
+        : t('volunteering.giving_day_activated'));
       loadData();
     } catch {
-      toast.error(t('volunteering.failed_to_update_status', 'Failed to update status'));
+      toast.error(t('volunteering.failed_to_update_status'));
     }
   };
 
   const handleExport = async () => {
     try {
       await adminVolunteering.exportDonations('volunteer-donations.csv');
-      toast.success(t('volunteering.export_started', 'Export started'));
+      toast.success(t('volunteering.export_started'));
     } catch {
-      toast.error(t('volunteering.export_failed', 'Export failed'));
+      toast.error(t('volunteering.export_failed'));
     }
   };
 
@@ -264,10 +264,10 @@ export default function VolunteerGivingDays() {
         setDonorHasMore(meta?.has_more || false);
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_donors', 'Failed to load donors'));
+      toast.error(t('volunteering.failed_to_load_donors'));
     }
     setDonorsLoading(false);
-  }, [toast]);
+  }, [toast, t]);
 
 
   const loadTrends = useCallback(async (givingDayId: number) => {
@@ -300,10 +300,10 @@ export default function VolunteerGivingDays() {
   const selectedDay = givingDays.find((d) => d.id === selectedDayId);
 
   const columns: Column<GivingDay>[] = [
-    { key: 'name', label: t('volunteering.col_name', 'Name'), sortable: true },
+    { key: 'name', label: t('volunteering.col_name'), sortable: true },
     {
       key: 'target_amount',
-      label: t('volunteering.col_target_amount', 'Target Amount'),
+      label: t('volunteering.col_target_amount'),
       sortable: true,
       render: (row) => {
         const target = row.target_amount || 0;
@@ -315,14 +315,14 @@ export default function VolunteerGivingDays() {
               <span>{raised.toLocaleString()}</span>
               <span className="text-default-400">/ {target.toLocaleString()}</span>
             </div>
-            <Progress size="sm" value={Math.min(pct, 100)} color={getProgressColor(pct)} aria-label={t('volunteering.amount_progress_aria', 'Amount progress')} />
+            <Progress size="sm" value={Math.min(pct, 100)} color={getProgressColor(pct)} aria-label={t('volunteering.amount_progress_aria')} />
           </div>
         );
       },
     },
     {
       key: 'target_hours',
-      label: t('volunteering.col_target_hours', 'Target Hours'),
+      label: t('volunteering.col_target_hours'),
       sortable: true,
       render: (row) => {
         const target = row.target_hours || 0;
@@ -334,38 +334,38 @@ export default function VolunteerGivingDays() {
               <span>{logged.toLocaleString()}h</span>
               <span className="text-default-400">/ {target.toLocaleString()}h</span>
             </div>
-            <Progress size="sm" value={Math.min(pct, 100)} color={getProgressColor(pct)} aria-label={t('volunteering.hours_progress_aria', 'Hours progress')} />
+            <Progress size="sm" value={Math.min(pct, 100)} color={getProgressColor(pct)} aria-label={t('volunteering.hours_progress_aria')} />
           </div>
         );
       },
     },
     {
       key: 'start_date',
-      label: t('volunteering.col_start_date', 'Start Date'),
+      label: t('volunteering.col_start_date'),
       sortable: true,
       render: (row) => <span>{row.start_date ? new Date(row.start_date).toLocaleDateString() : '-'}</span>,
     },
     {
       key: 'end_date',
-      label: t('volunteering.col_end_date', 'End Date'),
+      label: t('volunteering.col_end_date'),
       sortable: true,
       render: (row) => <span>{row.end_date ? new Date(row.end_date).toLocaleDateString() : '-'}</span>,
     },
     {
       key: 'is_active',
-      label: t('volunteering.col_status', 'Status'),
+      label: t('volunteering.col_status'),
       render: (row) => (
         <Chip size="sm" color={row.is_active ? 'success' : 'default'} variant="flat">
-          {row.is_active ? t('volunteering.active', 'Active') : t('volunteering.inactive', 'Inactive')}
+          {row.is_active ? t('volunteering.active') : t('volunteering.inactive')}
         </Chip>
       ),
     },
     {
       key: 'actions' as keyof GivingDay,
-      label: t('common.actions', 'Actions'),
+      label: t('volunteering.col_actions'),
       render: (row) => (
         <div className="flex items-center gap-1">
-          <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={t('common.edit', 'Edit')}>
+          <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={t('volunteering.edit')}>
             <Edit2 size={14} />
           </Button>
           <Button
@@ -373,7 +373,7 @@ export default function VolunteerGivingDays() {
             variant="flat"
             isIconOnly
             onPress={() => handleRowClick(row)}
-            aria-label={t('volunteering.view_donors', 'View donors')}
+            aria-label={t('volunteering.view_donors')}
           >
             <Users size={14} />
           </Button>
@@ -383,7 +383,7 @@ export default function VolunteerGivingDays() {
             color={row.is_active ? 'danger' : 'success'}
             isIconOnly
             onPress={() => handleDeactivate(row)}
-            aria-label={row.is_active ? t('volunteering.deactivate', 'Deactivate') : t('volunteering.activate', 'Activate')}
+            aria-label={row.is_active ? t('volunteering.deactivate') : t('volunteering.activate')}
           >
             <XCircle size={14} />
           </Button>
@@ -393,17 +393,17 @@ export default function VolunteerGivingDays() {
   ];
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title={t('volunteering.giving_days_title', 'Giving Days & Donations')}
-        description={t('volunteering.giving_days_desc', 'Manage giving day campaigns and view donation summaries')}
+        title={t('volunteering.giving_days_title')}
+        description={t('volunteering.giving_days_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
-              {t('common.refresh', 'Refresh')}
+              {t('volunteering.refresh')}
             </Button>
             <Button color="primary" startContent={<Plus size={16} />} onPress={openCreate}>
-              {t('volunteering.create_giving_day', 'Create Giving Day')}
+              {t('volunteering.create_giving_day')}
             </Button>
           </div>
         }
@@ -411,12 +411,12 @@ export default function VolunteerGivingDays() {
 
       {/* Campaign Analytics Chart */}
       {givingDays.length > 0 && (
-        <Card className="mb-6">
+        <Card className="border border-divider/70 shadow-sm shadow-black/[0.03]">
           <CardHeader className="pb-0">
             <div className="flex items-center gap-2">
               <BarChart3 size={18} className="text-primary" />
               <h3 className="text-lg font-semibold">
-                {t('volunteering.campaign_analytics', 'Campaign Analytics')}
+                {t('volunteering.campaign_analytics')}
               </h3>
             </div>
           </CardHeader>
@@ -430,13 +430,13 @@ export default function VolunteerGivingDays() {
                   <Tooltip />
                   <Bar
                     dataKey="raised_amount"
-                    name={t('volunteering.raised_amount', 'Raised Amount')}
+                    name={t('volunteering.raised_amount')}
                     fill="hsl(var(--heroui-primary))"
                     radius={[4, 4, 0, 0]}
                   />
                   <Bar
                     dataKey="donor_count"
-                    name={t('volunteering.donor_count', 'Donors')}
+                    name={t('volunteering.donor_count')}
                     fill="hsl(var(--heroui-success))"
                     radius={[4, 4, 0, 0]}
                   />
@@ -450,26 +450,26 @@ export default function VolunteerGivingDays() {
       {givingDays.length === 0 && !loading ? (
         <EmptyState
           icon={Gift}
-          title={t('volunteering.no_giving_days', 'No giving days yet')}
-          description={t('volunteering.no_giving_days_desc', 'Create your first giving day campaign to get started.')}
+          title={t('volunteering.no_giving_days')}
+          description={t('volunteering.no_giving_days_desc')}
         />
       ) : (
         <DataTable columns={columns} data={givingDays} isLoading={loading} />
       )}
 
       {/* Donations Summary */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold mb-4">{t('volunteering.donations_summary', 'Donations Summary')}</h3>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-4">
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">{t('volunteering.donations_summary')}</h3>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard
-            label={t('volunteering.total_donations', 'Total Donations')}
+            label={t('volunteering.total_donations')}
             value={donationStats.total_donations}
             icon={Gift}
             color="primary"
             loading={loading}
           />
           <StatCard
-            label={t('volunteering.total_amount', 'Total Amount')}
+            label={t('volunteering.total_amount')}
             value={donationStats.total_amount}
             icon={DollarSign}
             color="success"
@@ -477,7 +477,7 @@ export default function VolunteerGivingDays() {
           />
         </div>
         <Button variant="flat" startContent={<Download size={16} />} onPress={handleExport}>
-          {t('volunteering.export_donations', 'Export Donations')}
+          {t('volunteering.export_donations')}
         </Button>
       </div>
 
@@ -485,26 +485,26 @@ export default function VolunteerGivingDays() {
       <Modal isOpen={isDonorOpen} onClose={onDonorClose} size="2xl" scrollBehavior="inside">
         <ModalContent>
           <ModalHeader>
-            {t('volunteering.donors_for', 'Donors for')}: {selectedDay?.name || ''}
+            {t('volunteering.donors_for')}: {selectedDay?.name || ''}
           </ModalHeader>
           <ModalBody>
             {/* Stats summary */}
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              <Card className="bg-primary-50/30">
+            <div className="grid grid-cols-3 gap-3">
+              <Card className="border border-primary/20 bg-primary-50/30 shadow-sm shadow-primary/10">
                 <CardBody className="p-3 text-center">
-                  <p className="text-xs text-default-500">{t('volunteering.total_donors', 'Total Donors')}</p>
+                  <p className="text-xs text-default-500">{t('volunteering.total_donors')}</p>
                   <p className="text-lg font-bold text-primary">{donorStats.total_donors}</p>
                 </CardBody>
               </Card>
-              <Card className="bg-success-50/30">
+              <Card className="border border-success/20 bg-success-50/30 shadow-sm shadow-success/10">
                 <CardBody className="p-3 text-center">
-                  <p className="text-xs text-default-500">{t('volunteering.total_raised', 'Total Raised')}</p>
+                  <p className="text-xs text-default-500">{t('volunteering.total_raised')}</p>
                   <p className="text-lg font-bold text-success">{donorStats.total_raised.toLocaleString()}</p>
                 </CardBody>
               </Card>
-              <Card className="bg-default-50">
+              <Card className="border border-divider/70 bg-content2/50">
                 <CardBody className="p-3 text-center">
-                  <p className="text-xs text-default-500">{t('volunteering.anonymous_donors', 'Anonymous')}</p>
+                  <p className="text-xs text-default-500">{t('volunteering.anonymous_donors')}</p>
                   <p className="text-lg font-bold text-default-600">{donorStats.anonymous_count}</p>
                 </CardBody>
               </Card>
@@ -516,7 +516,7 @@ export default function VolunteerGivingDays() {
                 title={
                   <div className="flex items-center gap-2">
                     <Users size={14} />
-                    {t('volunteering.donor_list', 'Donors')}
+                    {t('volunteering.donor_list')}
                   </div>
                 }
               >
@@ -528,18 +528,18 @@ export default function VolunteerGivingDays() {
                   <div className="py-6 text-center">
                     <Users size={32} className="mx-auto mb-2 text-default-300" />
                     <p className="text-default-500 text-sm">
-                      {t('volunteering.no_donors_yet', 'No donors yet for this giving day.')}
+                      {t('volunteering.no_donors_yet')}
                     </p>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
                     {donors.map((donor) => {
                       const donorName = donor.is_anonymous
-                        ? t('volunteering.anonymous_donor', 'Anonymous Donor')
-                        : donor.name || t('volunteering.guest_donor', 'Guest Donor');
+                        ? t('volunteering.anonymous_donor')
+                        : donor.name || t('volunteering.guest_donor');
 
                       return (
-                        <div key={donor.id} className="flex items-center gap-3 p-3 rounded-lg bg-default-50 hover:bg-default-100 transition-colors">
+                        <div key={donor.id} className="flex items-center gap-3 rounded-2xl border border-divider/70 bg-content2/50 p-3 transition-colors hover:bg-content3">
                           {donor.is_anonymous ? (
                             <div className="w-9 h-9 rounded-full bg-default-200 flex items-center justify-center">
                               <EyeOff size={16} className="text-default-400" />
@@ -577,7 +577,7 @@ export default function VolunteerGivingDays() {
                         isLoading={donorsLoading}
                         onPress={() => selectedDayId && donorCursor && loadDonors(selectedDayId, donorCursor)}
                       >
-                        {t('common.load_more', 'Load More')}
+                        {t('volunteering.load_more')}
                       </Button>
                     )}
                   </div>
@@ -588,7 +588,7 @@ export default function VolunteerGivingDays() {
                 title={
                   <div className="flex items-center gap-2">
                     <TrendingUp size={14} />
-                    {t('volunteering.donation_trends', 'Trends')}
+                    {t('volunteering.donation_trends')}
                   </div>
                 }
               >
@@ -600,7 +600,7 @@ export default function VolunteerGivingDays() {
                   <div className="py-6 text-center">
                     <TrendingUp size={32} className="mx-auto mb-2 text-default-300" />
                     <p className="text-default-500 text-sm">
-                      {t('volunteering.no_trend_data', 'No trend data available yet.')}
+                      {t('volunteering.no_trend_data')}
                     </p>
                   </div>
                 ) : (
@@ -614,7 +614,7 @@ export default function VolunteerGivingDays() {
                         <Area
                           type="monotone"
                           dataKey="cumulative"
-                          name={t('volunteering.cumulative_amount', 'Cumulative Amount')}
+                          name={t('volunteering.cumulative_amount')}
                           stroke="hsl(var(--heroui-success))"
                           fill="hsl(var(--heroui-success))"
                           fillOpacity={0.2}
@@ -622,7 +622,7 @@ export default function VolunteerGivingDays() {
                         <Area
                           type="monotone"
                           dataKey="amount"
-                          name={t('volunteering.daily_amount', 'Daily Amount')}
+                          name={t('volunteering.daily_amount')}
                           stroke="hsl(var(--heroui-primary))"
                           fill="hsl(var(--heroui-primary))"
                           fillOpacity={0.1}
@@ -635,7 +635,7 @@ export default function VolunteerGivingDays() {
             </Tabs>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onDonorClose}>{t('common.close', 'Close')}</Button>
+            <Button variant="flat" onPress={onDonorClose}>{t('volunteering.close')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -645,27 +645,27 @@ export default function VolunteerGivingDays() {
         <ModalContent>
           <ModalHeader>
             {editingId
-              ? t('volunteering.edit_giving_day', 'Edit Giving Day')
-              : t('volunteering.create_giving_day', 'Create Giving Day')}
+              ? t('volunteering.edit_giving_day')
+              : t('volunteering.create_giving_day')}
           </ModalHeader>
           <ModalBody>
             <div className="flex flex-col gap-4">
               <Input
-                label={t('volunteering.field_name', 'Name')}
+                label={t('volunteering.field_name')}
                 value={form.name}
                 onValueChange={(v) => setForm((f) => ({ ...f, name: v }))}
                 isRequired
                 variant="bordered"
               />
               <Textarea
-                label={t('volunteering.field_description', 'Description')}
+                label={t('volunteering.field_description')}
                 value={form.description}
                 onValueChange={(v) => setForm((f) => ({ ...f, description: v }))}
                 variant="bordered"
               />
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label={t('volunteering.field_target_amount', 'Target Amount')}
+                  label={t('volunteering.field_target_amount')}
                   type="number"
                   value={form.target_amount}
                   onValueChange={(v) => setForm((f) => ({ ...f, target_amount: v }))}
@@ -673,7 +673,7 @@ export default function VolunteerGivingDays() {
                   startContent={<DollarSign size={14} className="text-default-400" />}
                 />
                 <Input
-                  label={t('volunteering.field_target_hours', 'Target Hours')}
+                  label={t('volunteering.field_target_hours')}
                   type="number"
                   value={form.target_hours}
                   onValueChange={(v) => setForm((f) => ({ ...f, target_hours: v }))}
@@ -683,14 +683,14 @@ export default function VolunteerGivingDays() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label={t('volunteering.field_start_date', 'Start Date')}
+                  label={t('volunteering.field_start_date')}
                   type="date"
                   value={form.start_date}
                   onValueChange={(v) => setForm((f) => ({ ...f, start_date: v }))}
                   variant="bordered"
                 />
                 <Input
-                  label={t('volunteering.field_end_date', 'End Date')}
+                  label={t('volunteering.field_end_date')}
                   type="date"
                   value={form.end_date}
                   onValueChange={(v) => setForm((f) => ({ ...f, end_date: v }))}
@@ -700,9 +700,9 @@ export default function VolunteerGivingDays() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose}>{t('common.cancel', 'Cancel')}</Button>
+            <Button variant="flat" onPress={onClose}>{t('volunteering.cancel')}</Button>
             <Button color="primary" onPress={handleSave} isLoading={saving}>
-              {editingId ? t('common.save', 'Save') : t('common.create', 'Create')}
+              {editingId ? t('volunteering.save') : t('volunteering.create')}
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -88,14 +88,6 @@ const SEVERITY_COLORS: Record<string, 'success' | 'warning' | 'danger'> = {
   critical: 'danger',
 };
 
-const TYPE_LABELS: Record<string, string> = {
-  concern: 'Concern',
-  allegation: 'Allegation',
-  disclosure: 'Disclosure',
-  near_miss: 'Near Miss',
-  other: 'Other',
-};
-
 function parsePayload<T>(raw: unknown): T {
   if (raw && typeof raw === 'object' && 'data' in raw) {
     return (raw as { data: T }).data;
@@ -107,7 +99,7 @@ function parsePayload<T>(raw: unknown): T {
 
 export function VolunteerSafeguarding() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('volunteering.safeguarding_page_title', 'Safeguarding & Incidents'));
+  usePageTitle(t('volunteering.safeguarding_page_title'));
   const toast = useToast();
 
   const [incidents, setIncidents] = useState<Incident[]>([]);
@@ -146,12 +138,12 @@ export function VolunteerSafeguarding() {
         setDlpAssignments(payload.dlp_assignments || []);
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_incidents', 'Failed to load incidents'));
+      toast.error(t('volunteering.failed_to_load_incidents'));
       setIncidents([]);
       setStats(null);
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t]);
 
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -178,14 +170,14 @@ export function VolunteerSafeguarding() {
 
       const res = await adminVolunteering.updateIncident(selectedIncident.id, data);
       if (res.success) {
-        toast.success(t('volunteering.incident_updated', 'Incident updated successfully'));
+        toast.success(t('volunteering.incident_updated'));
         setUpdateModal(false);
         loadData();
       } else {
-        toast.error(t('volunteering.failed_to_update_incident', 'Failed to update incident'));
+        toast.error(t('volunteering.failed_to_update_incident'));
       }
     } catch {
-      toast.error(t('volunteering.failed_to_update_incident', 'Failed to update incident'));
+      toast.error(t('volunteering.failed_to_update_incident'));
     }
     setActionLoading(false);
   };
@@ -200,21 +192,21 @@ export function VolunteerSafeguarding() {
     if (!selectedOrg) return;
     const userId = parseInt(dlpUserId, 10);
     if (isNaN(userId) || userId <= 0) {
-      toast.error(t('volunteering.invalid_user_id', 'Please enter a valid user ID'));
+      toast.error(t('volunteering.invalid_user_id'));
       return;
     }
     setDlpLoading(true);
     try {
       const res = await adminVolunteering.assignDlp(selectedOrg.organization_id, userId);
       if (res.success) {
-        toast.success(t('volunteering.dlp_assigned', 'DLP assigned successfully'));
+        toast.success(t('volunteering.dlp_assigned'));
         setDlpModal(false);
         loadData();
       } else {
-        toast.error(t('volunteering.failed_to_assign_dlp', 'Failed to assign DLP'));
+        toast.error(t('volunteering.failed_to_assign_dlp'));
       }
     } catch {
-      toast.error(t('volunteering.failed_to_assign_dlp', 'Failed to assign DLP'));
+      toast.error(t('volunteering.failed_to_assign_dlp'));
     }
     setDlpLoading(false);
   };
@@ -224,17 +216,17 @@ export function VolunteerSafeguarding() {
   const columns: Column<Incident>[] = [
     {
       key: 'type',
-      label: t('volunteering.col_incident_type', 'Type'),
+      label: t('volunteering.col_incident_type'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat">
-          {TYPE_LABELS[item.type] || item.type}
+          {t(`volunteering.incident_type_${item.type}`)}
         </Chip>
       ),
     },
     {
       key: 'severity',
-      label: t('volunteering.col_severity', 'Severity'),
+      label: t('volunteering.col_severity'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -243,40 +235,38 @@ export function VolunteerSafeguarding() {
           variant="flat"
           className={item.severity === 'critical' ? 'font-bold' : ''}
         >
-          {item.severity.charAt(0).toUpperCase() + item.severity.slice(1)}
+          {t(`volunteering.severity_${item.severity}`)}
         </Chip>
       ),
     },
     {
       key: 'reporter_name',
-      label: t('volunteering.col_reporter', 'Reporter'),
+      label: t('volunteering.col_reporter'),
       sortable: true,
     },
     {
       key: 'subject_name',
-      label: t('volunteering.col_subject', 'Subject'),
+      label: t('volunteering.col_subject'),
       sortable: true,
     },
     {
       key: 'organization_name',
-      label: t('volunteering.col_organization', 'Organization'),
+      label: t('volunteering.col_organization'),
       sortable: true,
     },
     {
       key: 'status',
-      label: t('volunteering.col_status', 'Status'),
+      label: t('volunteering.col_status'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" color={STATUS_COLORS[item.status] || 'default'} variant="flat">
-          {item.status === 'investigating'
-            ? 'Under Investigation'
-            : item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+          {t(`volunteering.status_${item.status}`)}
         </Chip>
       ),
     },
     {
       key: 'date',
-      label: t('volunteering.col_date', 'Date'),
+      label: t('volunteering.col_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -286,7 +276,7 @@ export function VolunteerSafeguarding() {
     },
     {
       key: 'actions',
-      label: t('volunteering.col_actions', 'Actions'),
+      label: t('volunteering.col_actions'),
       render: (item) => (
         <Button
           size="sm"
@@ -295,7 +285,7 @@ export function VolunteerSafeguarding() {
           startContent={<Eye size={14} />}
           onPress={() => openUpdate(item)}
         >
-          {t('volunteering.update_status', 'Update')}
+          {t('volunteering.update_status')}
         </Button>
       ),
     },
@@ -304,10 +294,10 @@ export function VolunteerSafeguarding() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title={t('volunteering.safeguarding_title', 'Safeguarding & Incidents')}
-        description={t('volunteering.safeguarding_desc', 'Track and manage safeguarding incidents and concerns')}
+        title={t('volunteering.safeguarding_title')}
+        description={t('volunteering.safeguarding_desc')}
         actions={
           <Button
             variant="flat"
@@ -315,36 +305,36 @@ export function VolunteerSafeguarding() {
             onPress={loadData}
             isLoading={loading}
           >
-            {t('common.refresh', 'Refresh')}
+            {t('volunteering.refresh')}
           </Button>
         }
       />
 
       {/* Stats Row */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label={t('volunteering.stat_total_incidents', 'Total Incidents')}
+          label={t('volunteering.stat_total_incidents')}
           value={stats?.total_incidents ?? 0}
           icon={ShieldAlert}
           color="default"
           loading={loading}
         />
         <StatCard
-          label={t('volunteering.stat_open', 'Open')}
+          label={t('volunteering.stat_open')}
           value={stats?.open ?? 0}
           icon={AlertTriangle}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label={t('volunteering.stat_under_investigation', 'Under Investigation')}
+          label={t('volunteering.stat_under_investigation')}
           value={stats?.under_investigation ?? 0}
           icon={Search}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={t('volunteering.stat_resolved', 'Resolved')}
+          label={t('volunteering.stat_resolved')}
           value={stats?.resolved ?? 0}
           icon={CheckCircle}
           color="success"
@@ -356,43 +346,43 @@ export function VolunteerSafeguarding() {
       {!loading && incidents.length === 0 ? (
         <EmptyState
           icon={ShieldAlert}
-          title={t('volunteering.no_incidents', 'No incidents reported')}
-          description={t('volunteering.no_incidents_desc', 'There are no safeguarding incidents to review.')}
+          title={t('volunteering.no_incidents')}
+          description={t('volunteering.no_incidents_desc')}
         />
       ) : (
         <DataTable columns={columns} data={incidents} isLoading={loading} onRefresh={loadData} />
       )}
 
       {/* DLP Assignments Section */}
-      <Card className="mt-6">
+      <Card className="border border-divider/70 shadow-sm shadow-black/[0.03]">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Users size={18} />
             <span className="font-semibold">
-              {t('volunteering.dlp_assignments_title', 'Designated Liaison Persons (DLP)')}
+              {t('volunteering.dlp_assignments_title')}
             </span>
           </div>
         </CardHeader>
         <CardBody>
           {dlpAssignments.length === 0 ? (
             <p className="text-default-400 text-sm">
-              {t('volunteering.no_dlp_assignments', 'No organizations loaded. DLP assignments will appear here once incidents data is loaded.')}
+              {t('volunteering.no_dlp_assignments')}
             </p>
           ) : (
             <div className="space-y-3">
               {dlpAssignments.map((assignment) => (
                 <div
                   key={assignment.organization_id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-default-50"
+                  className="flex items-center justify-between rounded-2xl border border-divider/70 bg-content2/50 p-3"
                 >
                   <div>
                     <p className="font-medium">{assignment.organization_name}</p>
                     <p className="text-sm text-default-400">
-                      {t('volunteering.dlp_label', 'DLP')}:{' '}
+                      {t('volunteering.dlp_label')}:{' '}
                       {assignment.dlp_user_name ? (
                         <span className="text-success font-medium">{assignment.dlp_user_name}</span>
                       ) : (
-                        <span className="text-warning">{t('volunteering.not_assigned', 'Not assigned')}</span>
+                        <span className="text-warning">{t('volunteering.not_assigned')}</span>
                       )}
                     </p>
                   </div>
@@ -403,8 +393,8 @@ export function VolunteerSafeguarding() {
                     onPress={() => openDlpAssign(assignment)}
                   >
                     {assignment.dlp_user_id
-                      ? t('volunteering.change_dlp', 'Change DLP')
-                      : t('volunteering.assign_dlp', 'Assign DLP')}
+                      ? t('volunteering.change_dlp')
+                      : t('volunteering.assign_dlp')}
                   </Button>
                 </div>
               ))}
@@ -415,12 +405,12 @@ export function VolunteerSafeguarding() {
 
       {/* Recent Actions / Audit Log */}
       {incidents.length > 0 && (
-        <Card className="mt-6">
+        <Card className="border border-divider/70 shadow-sm shadow-black/[0.03]">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Activity size={18} />
               <span className="font-semibold">
-                {t('volunteering.recent_actions_title', 'Recent Actions')}
+                {t('volunteering.recent_actions_title')}
               </span>
             </div>
           </CardHeader>
@@ -454,7 +444,7 @@ export function VolunteerSafeguarding() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm font-medium">
-                            {TYPE_LABELS[incident.type] || incident.type}
+                            {t(`volunteering.incident_type_${incident.type}`)}
                           </span>
                           <ArrowRight size={12} className="text-default-400" />
                           <Chip
@@ -462,23 +452,21 @@ export function VolunteerSafeguarding() {
                             color={STATUS_COLORS[incident.status] || 'default'}
                             variant="flat"
                           >
-                            {incident.status === 'investigating'
-                              ? 'Under Investigation'
-                              : incident.status.charAt(0).toUpperCase() + incident.status.slice(1)}
+                            {t(`volunteering.status_${incident.status}`)}
                           </Chip>
                           <Chip
                             size="sm"
                             color={SEVERITY_COLORS[incident.severity] || 'default'}
                             variant="dot"
                           >
-                            {incident.severity}
+                            {t(`volunteering.severity_${incident.severity}`)}
                           </Chip>
                         </div>
                         <p className="text-xs text-default-500 mt-0.5">
                           {incident.subject_name}
                           {incident.organization_name && ` — ${incident.organization_name}`}
                           {' | '}
-                          {t('volunteering.reported_by', 'Reported by {{name}}', { name: incident.reporter_name })}
+                          {t('volunteering.reported_by', { name: incident.reporter_name })}
                         </p>
                         {incident.action_taken && (
                           <p className="text-xs text-default-400 mt-0.5 italic">
@@ -501,18 +489,18 @@ export function VolunteerSafeguarding() {
       <Modal isOpen={updateModal} onClose={() => setUpdateModal(false)} size="lg">
         <ModalContent>
           <ModalHeader>
-            {t('volunteering.update_incident', 'Update Incident')}
+            {t('volunteering.update_incident')}
           </ModalHeader>
           <ModalBody>
             {selectedIncident && (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <span className="text-default-400">{t('volunteering.col_incident_type', 'Type')}:</span>
-                    <p className="font-medium">{TYPE_LABELS[selectedIncident.type] || selectedIncident.type}</p>
+                    <span className="text-default-400">{t('volunteering.col_incident_type')}:</span>
+                    <p className="font-medium">{t(`volunteering.incident_type_${selectedIncident.type}`)}</p>
                   </div>
                   <div>
-                    <span className="text-default-400">{t('volunteering.col_severity', 'Severity')}:</span>
+                    <span className="text-default-400">{t('volunteering.col_severity')}:</span>
                     <p>
                       <Chip
                         size="sm"
@@ -520,49 +508,49 @@ export function VolunteerSafeguarding() {
                         variant="flat"
                         className={selectedIncident.severity === 'critical' ? 'font-bold' : ''}
                       >
-                        {selectedIncident.severity.charAt(0).toUpperCase() + selectedIncident.severity.slice(1)}
+                        {t(`volunteering.severity_${selectedIncident.severity}`)}
                       </Chip>
                     </p>
                   </div>
                   <div>
-                    <span className="text-default-400">{t('volunteering.col_reporter', 'Reporter')}:</span>
+                    <span className="text-default-400">{t('volunteering.col_reporter')}:</span>
                     <p className="font-medium">{selectedIncident.reporter_name}</p>
                   </div>
                   <div>
-                    <span className="text-default-400">{t('volunteering.col_subject', 'Subject')}:</span>
+                    <span className="text-default-400">{t('volunteering.col_subject')}:</span>
                     <p className="font-medium">{selectedIncident.subject_name}</p>
                   </div>
                 </div>
 
                 {selectedIncident.description && (
                   <div>
-                    <span className="text-default-400 text-sm">{t('volunteering.description', 'Description')}:</span>
+                    <span className="text-default-400 text-sm">{t('volunteering.description')}:</span>
                     <p className="text-sm mt-1">{selectedIncident.description}</p>
                   </div>
                 )}
 
                 <Select
-                  label={t('volunteering.status', 'Status')}
+                  label={t('volunteering.status')}
                   selectedKeys={[updateStatus]}
                   onSelectionChange={(keys) => setUpdateStatus(Array.from(keys)[0] as string)}
                 >
-                  <SelectItem key="open">{t('volunteering.status_open', 'Open')}</SelectItem>
-                  <SelectItem key="investigating">{t('volunteering.status_investigating', 'Under Investigation')}</SelectItem>
-                  <SelectItem key="resolved">{t('volunteering.status_resolved', 'Resolved')}</SelectItem>
-                  <SelectItem key="escalated">{t('volunteering.status_escalated', 'Escalated')}</SelectItem>
-                  <SelectItem key="closed">{t('volunteering.status_closed', 'Closed')}</SelectItem>
+                  <SelectItem key="open">{t('volunteering.status_open')}</SelectItem>
+                  <SelectItem key="investigating">{t('volunteering.status_investigating')}</SelectItem>
+                  <SelectItem key="resolved">{t('volunteering.status_resolved')}</SelectItem>
+                  <SelectItem key="escalated">{t('volunteering.status_escalated')}</SelectItem>
+                  <SelectItem key="closed">{t('volunteering.status_closed')}</SelectItem>
                 </Select>
 
                 <Textarea
-                  label={t('volunteering.action_taken', 'Action Taken')}
-                  placeholder={t('volunteering.action_taken_placeholder', 'Describe what actions have been taken...')}
+                  label={t('volunteering.action_taken')}
+                  placeholder={t('volunteering.action_taken_placeholder')}
                   value={actionTaken}
                   onValueChange={setActionTaken}
                 />
 
                 <Textarea
-                  label={t('volunteering.resolution_notes', 'Resolution Notes')}
-                  placeholder={t('volunteering.resolution_notes_placeholder', 'Notes about the resolution or current status...')}
+                  label={t('volunteering.resolution_notes')}
+                  placeholder={t('volunteering.resolution_notes_placeholder')}
                   value={resolutionNotes}
                   onValueChange={setResolutionNotes}
                 />
@@ -571,7 +559,7 @@ export function VolunteerSafeguarding() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setUpdateModal(false)}>
-              {t('common.cancel', 'Cancel')}
+              {t('volunteering.cancel')}
             </Button>
             <Button
               color="primary"
@@ -579,7 +567,7 @@ export function VolunteerSafeguarding() {
               isLoading={actionLoading}
               startContent={<Clock size={16} />}
             >
-              {t('volunteering.update_incident', 'Update Incident')}
+              {t('volunteering.update_incident')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -589,38 +577,38 @@ export function VolunteerSafeguarding() {
       <Modal isOpen={dlpModal} onClose={() => setDlpModal(false)} size="md">
         <ModalContent>
           <ModalHeader>
-            {t('volunteering.assign_dlp_title', 'Assign Designated Liaison Person')}
+            {t('volunteering.assign_dlp_title')}
             {selectedOrg && ` — ${selectedOrg.organization_name}`}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <p className="text-sm text-default-500">
-                {t('volunteering.dlp_explanation', 'The Designated Liaison Person (DLP) is responsible for receiving and handling safeguarding concerns for this organization.')}
+                {t('volunteering.dlp_explanation')}
               </p>
               <Input
-                label={t('volunteering.dlp_user_id', 'User ID')}
+                label={t('volunteering.dlp_user_id')}
                 type="number"
-                placeholder={t('volunteering.dlp_user_id_placeholder', 'Enter the user ID of the DLP')}
+                placeholder={t('volunteering.dlp_user_id_placeholder')}
                 value={dlpUserId}
                 onValueChange={setDlpUserId}
               />
               {selectedOrg?.dlp_user_name && (
                 <p className="text-sm text-default-400">
-                  {t('volunteering.current_dlp', 'Current DLP')}: <span className="font-medium text-default-600">{selectedOrg.dlp_user_name}</span>
+                  {t('volunteering.current_dlp')}: <span className="font-medium text-default-600">{selectedOrg.dlp_user_name}</span>
                 </p>
               )}
             </div>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setDlpModal(false)}>
-              {t('common.cancel', 'Cancel')}
+              {t('volunteering.cancel')}
             </Button>
             <Button
               color="primary"
               onPress={handleDlpAssign}
               isLoading={dlpLoading}
             >
-              {t('volunteering.assign', 'Assign')}
+              {t('volunteering.assign')}
             </Button>
           </ModalFooter>
         </ModalContent>
