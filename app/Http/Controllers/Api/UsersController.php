@@ -606,7 +606,8 @@ class UsersController extends BaseApiController
         // anonymized by this point and has no locale we can query).
         try {
             if (!empty($userEmail) && filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
-                LocaleContext::withLocale($userLocale, function () use ($userRow, $userEmail) {
+                $tenantId = (int) ($user->tenant_id ?: TenantContext::getId());
+                LocaleContext::withLocale($userLocale, function () use ($userRow, $userEmail, $tenantId) {
                     $userName = $userRow->first_name ?? $userRow->name ?? __('emails.common.fallback_name');
                     $community = TenantContext::getName();
                     $html = EmailTemplateBuilder::make()
@@ -624,7 +625,7 @@ class UsersController extends BaseApiController
                         null,
                         null,
                         'account_deleted',
-                        ['tenant_id' => $user->tenant_id ?? \App\Core\TenantContext::currentId()]
+                        ['tenant_id' => $tenantId]
                     )) {
                         Log::warning('[UsersController] deleteAccount farewell email returned false', [
                             'user_id' => $userRow->id ?? null,

@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\User;
 use App\Models\VolApplication;
 use App\Models\VolEmergencyAlert;
@@ -62,37 +63,37 @@ class VolunteerEmergencyAlertService
         $expiresHours = (int) ($data['expires_hours'] ?? 24);
 
         if (!$shiftId) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Shift ID is required', 'field' => 'shift_id'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_alert_shift_id_required'), 'field' => 'shift_id'];
             return null;
         }
 
         if (!$message) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Message is required', 'field' => 'message'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_alert_message_required'), 'field' => 'message'];
             return null;
         }
 
         if (!in_array($priority, ['normal', 'urgent', 'critical'])) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Priority must be normal, urgent, or critical', 'field' => 'priority'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_alert_priority_invalid'), 'field' => 'priority'];
             return null;
         }
 
         // Verify shift exists
         $shift = VolShift::find($shiftId);
         if (!$shift) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.vol_alert_shift_not_found')];
             return null;
         }
 
         // Verify coordinator owns the opportunity's org
         $opportunity = VolOpportunity::with('organization')->find($shift->opportunity_id);
         if (!$opportunity || !$opportunity->organization) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.vol_alert_opportunity_not_found')];
             return null;
         }
 
         // Allow org owner or tenant admin
         if (!self::isAdminOrOrgOwner($createdBy, (int) $opportunity->organization->user_id)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only coordinators or admins can create emergency alerts'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.vol_alert_create_forbidden')];
             return null;
         }
 
@@ -128,7 +129,7 @@ class VolunteerEmergencyAlertService
             return $alert->id;
         } catch (\Exception $e) {
             Log::error('VolunteerEmergencyAlertService::createAlert error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create emergency alert'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.vol_alert_create_failed')];
             return null;
         }
     }
@@ -194,15 +195,18 @@ class VolunteerEmergencyAlertService
                     $user = User::where('tenant_id', $tenantId)->where('id', $userId)->first();
                     $userName = $user->name ?? __('api.vol_alert_volunteer_fallback');
 
-                    \App\Services\NotificationDispatcher::dispatch(
-                        (int) $alert->created_by,
-                        'global',
-                        0,
-                        'volunteer_emergency_filled',
-                        "{$userName} has accepted your emergency shift request!",
-                        '/volunteering',
-                        null
-                    );
+                    $coordinator = User::where('tenant_id', $tenantId)->where('id', (int) $alert->created_by)->first(['id', 'preferred_language']);
+                    TenantContext::runForTenant($tenantId, function () use ($alert, $coordinator, $userName): void {
+                        LocaleContext::withLocale($coordinator, function () use ($alert, $userName): void {
+                            \App\Models\Notification::createNotification(
+                                (int) $alert->created_by,
+                                __('api.vol_alert_filled_bell', ['name' => $userName]),
+                                '/volunteering',
+                                'volunteer_emergency_filled',
+                                true
+                            );
+                        });
+                    });
                 } catch (\Throwable $e) {
                     // Silent fail for notification
                 }
@@ -392,7 +396,7 @@ class VolunteerEmergencyAlertService
             ->first();
 
         if (!$alert) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Alert not found or cannot be cancelled'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.vol_alert_cancel_not_found')];
             return false;
         }
 
@@ -401,7 +405,7 @@ class VolunteerEmergencyAlertService
             return true;
         } catch (\Exception $e) {
             Log::error('VolunteerEmergencyAlertService::cancelAlert error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel alert'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.vol_alert_cancel_failed')];
             return false;
         }
     }
@@ -444,7 +448,7 @@ class VolunteerEmergencyAlertService
                     ->where('status', 'approved')
                     ->where('tenant_id', $tenantId);
             })
-            ->select('users.id as user_id', 'users.email', 'users.name', 'users.skills')
+            ->select('users.id as user_id', 'users.email', 'users.name', 'users.skills', 'users.preferred_language')
             ->distinct()
             ->limit(50)
             ->get();
@@ -457,7 +461,7 @@ class VolunteerEmergencyAlertService
 
         $notifiedCount = 0;
         $shift = VolShift::where('tenant_id', $tenantId)->where('id', $shiftId)->first();
-        $shiftDate = $shift ? $shift->start_time->format('M j, Y g:ia') : 'upcoming';
+        $shiftDate = $shift ? $shift->start_time->format('M j, Y g:ia') : __('api.vol_alert_shift_date_upcoming');
 
         foreach ($candidates as $candidate) {
             // If skills are required, check for match
@@ -485,6 +489,29 @@ class VolunteerEmergencyAlertService
             }
 
             try {
+                $priorityLabel = strtoupper($priority);
+                $bellCreated = TenantContext::runForTenant($tenantId, function () use ($candidate, $priorityLabel, $message, $shiftDate, $tenantId): bool {
+                    return (bool) LocaleContext::withLocale($candidate, function () use ($candidate, $priorityLabel, $message, $shiftDate, $tenantId): bool {
+                        return \App\Models\Notification::createNotification(
+                            (int) $candidate->user_id,
+                            __('api.vol_alert_request_bell', [
+                                'priority' => $priorityLabel,
+                                'message' => $message,
+                                'date' => $shiftDate,
+                            ]),
+                            '/volunteering',
+                            'volunteer_emergency',
+                            true,
+                            $tenantId
+                        );
+                    });
+                });
+
+                if (!$bellCreated) {
+                    Log::warning("Failed to create emergency alert notification for volunteer {$candidate->user_id}");
+                    continue;
+                }
+
                 VolEmergencyAlertRecipient::create([
                     'alert_id' => $alertId,
                     'tenant_id' => $tenantId,
@@ -492,18 +519,6 @@ class VolunteerEmergencyAlertService
                     'notified_at' => now(),
                     'response' => 'pending',
                 ]);
-
-                // Send notification (best-effort)
-                $priorityLabel = strtoupper($priority);
-                \App\Services\NotificationDispatcher::dispatch(
-                    (int) $candidate->user_id,
-                    'global',
-                    0,
-                    'volunteer_emergency',
-                    "[{$priorityLabel}] {$message} - Shift on {$shiftDate}. Can you help?",
-                    '/volunteering',
-                    null
-                );
 
                 $notifiedCount++;
             } catch (\Throwable $e) {

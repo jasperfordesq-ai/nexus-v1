@@ -265,6 +265,33 @@ class VolunteerEmailReliabilityTest extends TestCase
         $this->assertSame('safeguarding', $mailer->calls[0]['options']['category']);
     }
 
+    public function test_emergency_alert_recipients_are_recorded_only_after_dispatch_success(): void
+    {
+        $source = file_get_contents(app_path('Services/VolunteerEmergencyAlertService.php'));
+        $methodStart = strpos($source, 'private static function notifyQualifiedVolunteers');
+        $method = substr($source, $methodStart);
+
+        $bellCreatePos = strpos($method, 'Notification::createNotification');
+        $failureGuardPos = strpos($method, 'if (!$bellCreated)');
+        $recipientCreatePos = strpos($method, 'VolEmergencyAlertRecipient::create');
+
+        $this->assertNotFalse($bellCreatePos);
+        $this->assertNotFalse($failureGuardPos);
+        $this->assertNotFalse($recipientCreatePos);
+        $this->assertLessThan($recipientCreatePos, $bellCreatePos);
+        $this->assertLessThan($recipientCreatePos, $failureGuardPos);
+    }
+
+    public function test_safeguarding_notifications_use_explicit_tenant_scoped_recipients(): void
+    {
+        $source = file_get_contents(app_path('Services/SafeguardingService.php'));
+
+        $this->assertStringNotContainsString('User::find(', $source);
+        $this->assertStringContainsString("User::where('tenant_id', \$tenantId)", $source);
+        $this->assertStringContainsString('TenantContext::runForTenant($tenantId', $source);
+        $this->assertStringContainsString("'tenant_id' => \$tenantId", $source);
+    }
+
     /**
      * @return array{0:int,1:int,2:int}
      */

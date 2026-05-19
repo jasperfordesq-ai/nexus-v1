@@ -234,7 +234,7 @@ class EmailVerificationController extends BaseApiController
      */
     private function sendVerificationEmail(array $user): bool
     {
-        $tenantId = $user['tenant_id'] ?? TenantContext::getId();
+        $tenantId = (int) ($user['tenant_id'] ?? TenantContext::getId());
 
         // Ensure the table exists (create if not)
         $this->ensureTokenTableExists();
@@ -249,8 +249,12 @@ class EmailVerificationController extends BaseApiController
         $expiresAt = date('Y-m-d H:i:s', time() + self::TOKEN_EXPIRY_SECONDS);
 
         // Build verification URL — include tenant base path for correct routing
-        $appUrl = TenantContext::getFrontendUrl();
-        $basePath = TenantContext::getSlugPrefix();
+        $tenantRouting = TenantContext::runForTenant($tenantId, fn (): array => [
+            'frontend_url' => TenantContext::getFrontendUrl(),
+            'slug_prefix' => TenantContext::getSlugPrefix(),
+        ]);
+        $appUrl = $tenantRouting['frontend_url'];
+        $basePath = $tenantRouting['slug_prefix'];
         $verifyUrl = $appUrl . $basePath . "/verify-email?token=" . $token;
 
         // Send verification email

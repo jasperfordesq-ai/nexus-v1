@@ -360,7 +360,7 @@ class GroupService
             $creator = DB::table('users')
                 ->where('id', $userId)
                 ->where('tenant_id', TenantContext::getId())
-                ->select(['email', 'first_name', 'name', 'preferred_language'])
+                ->select(['email', 'first_name', 'name', 'preferred_language', 'tenant_id'])
                 ->first();
 
             if ($creator && !empty($creator->email)) {
@@ -368,7 +368,7 @@ class GroupService
                 // preferred_language so the confirmation lands in their language.
                 LocaleContext::withLocale($creator, function () use ($creator, $group) {
                     $firstName  = $creator->first_name ?? $creator->name ?? __('emails.common.fallback_name');
-                    $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+                    $tenantName = TenantContext::getName();
                     $groupUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/' . $group->id;
                     $groupName  = $group->name ?? '';
 
@@ -390,7 +390,7 @@ class GroupService
                         null,
                         null,
                         'group',
-                        ['tenant_id' => $creator->tenant_id ?? \App\Core\TenantContext::currentId()]
+                        ['tenant_id' => (int) $creator->tenant_id]
                     )) {
                         Log::warning('[GroupService] creation email send returned false', ['group_id' => $group->id]);
                     }
@@ -916,7 +916,7 @@ class GroupService
                 $member = DB::table('users')
                     ->where('id', $targetUserId)
                     ->where('tenant_id', $tenantId)
-                    ->select(['email', 'first_name', 'name', 'preferred_language'])
+                    ->select(['email', 'first_name', 'name', 'preferred_language', 'tenant_id'])
                     ->first();
                 if ($member && !empty($member->email)) {
                     // Render subject + body in the promoted member's locale.
@@ -942,7 +942,7 @@ class GroupService
                             null,
                             null,
                             'group',
-                            ['tenant_id' => $member->tenant_id ?? \App\Core\TenantContext::currentId()]
+                            ['tenant_id' => (int) $member->tenant_id]
                         )) {
                             Log::warning('[GroupService] group_promoted email send returned false', ['group_id' => $groupId]);
                         }
@@ -1016,10 +1016,10 @@ class GroupService
             $member = DB::table('users')
                 ->where('id', $targetUserId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'first_name', 'name', 'preferred_language'])
+                ->select(['email', 'first_name', 'name', 'preferred_language', 'tenant_id'])
                 ->first();
 
-            LocaleContext::withLocale($member, function () use ($member, $group, $targetUserId) {
+            LocaleContext::withLocale($member, function () use ($member, $group, $targetUserId, $tenantId) {
                 // Email (only if we have contact details)
                 if ($member && !empty($member->email)) {
                     try {
@@ -1043,7 +1043,7 @@ class GroupService
                             null,
                             null,
                             'group',
-                            ['tenant_id' => $member->tenant_id ?? \App\Core\TenantContext::currentId()]
+                            ['tenant_id' => (int) $tenantId]
                         )) {
                             Log::warning('[GroupService] group_removed email send returned false', ['group_id' => $group->id]);
                         }

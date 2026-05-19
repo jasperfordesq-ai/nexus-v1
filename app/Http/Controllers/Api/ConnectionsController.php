@@ -217,9 +217,10 @@ class ConnectionsController extends BaseApiController
             try {
                 $decliner  = User::find($userId);
                 $requester = User::find($requesterId);
-                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                $tenantId = (int) ($requester->tenant_id ?? TenantContext::getId());
+                $tenantName = TenantContext::get()['name'] ?? __('emails.common.platform_name');
 
-                LocaleContext::withLocale($requester, function () use ($decliner, $requester, $requesterId, $tenantName) {
+                LocaleContext::withLocale($requester, function () use ($decliner, $requester, $requesterId, $tenantName, $tenantId) {
                     $declinerName = trim(($decliner->first_name ?? '') . ' ' . ($decliner->last_name ?? ''))
                         ?: ($decliner->name ?? __('emails.common.fallback_someone'));
 
@@ -259,7 +260,7 @@ class ConnectionsController extends BaseApiController
                             ->render();
 
                         $subject = __('emails_security_alerts.connection_declined.subject', ['community' => $tenantName]);
-                        if (!EmailDispatchService::sendRaw($requester->email, $subject, $html, null, null, null, 'connection_declined', ['tenant_id' => $requester->tenant_id ?? TenantContext::currentId()])) {
+                        if (!EmailDispatchService::sendRaw($requester->email, $subject, $html, null, null, null, 'connection_declined', ['tenant_id' => $tenantId])) {
                             Log::warning('[ConnectionsController] connection declined email failed to send', [
                                 'requester_id' => $requesterId,
                             ]);

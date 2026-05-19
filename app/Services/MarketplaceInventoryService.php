@@ -33,7 +33,7 @@ class MarketplaceInventoryService
      */
     public static function decrementForOrder(int $listingId, int $quantity = 1): void
     {
-        $listing = MarketplaceListing::query()
+        $listing = MarketplaceListing::withoutGlobalScopes()
             ->where('id', $listingId)
             ->lockForUpdate()
             ->first();
@@ -47,7 +47,8 @@ class MarketplaceInventoryService
             return;
         }
 
-        $newCount = (int) $listing->inventory_count - max(1, $quantity);
+        $previousCount = (int) $listing->inventory_count;
+        $newCount = $previousCount - max(1, $quantity);
 
         if ($newCount < 0 && (bool) $listing->is_oversold_protected) {
             throw new \DomainException('OUT_OF_STOCK');
@@ -66,6 +67,7 @@ class MarketplaceInventoryService
         if (
             $newCount > 0
             && $listing->low_stock_threshold !== null
+            && $previousCount > (int) $listing->low_stock_threshold
             && $newCount <= (int) $listing->low_stock_threshold
         ) {
             self::notifyLowStock($listing);
@@ -77,7 +79,7 @@ class MarketplaceInventoryService
      */
     public static function incrementForCancellation(int $listingId, int $quantity = 1): void
     {
-        $listing = MarketplaceListing::query()
+        $listing = MarketplaceListing::withoutGlobalScopes()
             ->where('id', $listingId)
             ->lockForUpdate()
             ->first();
@@ -152,22 +154,41 @@ class MarketplaceInventoryService
     private static function notifyLowStock(MarketplaceListing $listing): void
     {
         try {
-            $seller = User::find($listing->user_id);
-            if (!$seller) {
-                return;
-            }
-            $title = $listing->title ?? '';
-            LocaleContext::withLocale($seller, function () use ($listing, $seller, $title) {
-                Notification::create([
-                    'user_id' => $seller->id,
-                    'message' => __('notifications.marketplace.low_stock', [
-                        'title' => $title,
+            $tenantId = (int) ($listing->tenant_id ?: TenantContext::getId());
+
+            TenantContext::runForTenant($tenantId, function () use ($listing, $tenantId): void {
+                $seller = User::where('tenant_id', $tenantId)->find($listing->user_id);
+                if (!$seller) {
+                    return;
+                }
+
+                LocaleContext::withLocale($seller, function () use ($listing, $seller, $tenantId): void {
+                    $message = __('notifications.marketplace.low_stock', [
+                        'title' => $listing->title ?? '',
                         'count' => (int) $listing->inventory_count,
-                    ]),
-                    'link' => '/marketplace/' . $listing->id . '/edit',
-                    'type' => 'marketplace_low_stock',
-                    'created_at' => now(),
-                ]);
+                    ]);
+                    $link = '/marketplace/' . $listing->id . '/edit';
+
+                    $exists = DB::table('notifications')
+                        ->where('tenant_id', $tenantId)
+                        ->where('user_id', $seller->id)
+                        ->where('type', 'marketplace_low_stock')
+                        ->where('link', $link)
+                        ->where('message', $message)
+                        ->exists();
+                    if ($exists) {
+                        return;
+                    }
+
+                    Notification::create([
+                        'tenant_id' => $tenantId,
+                        'user_id' => $seller->id,
+                        'message' => $message,
+                        'link' => $link,
+                        'type' => 'marketplace_low_stock',
+                        'created_at' => now(),
+                    ]);
+                });
             });
         } catch (\Throwable $e) {
             Log::warning('[MarketplaceInventoryService] notifyLowStock failed: ' . $e->getMessage());
@@ -185,39 +206,42 @@ class MarketplaceInventoryService
     private static function fanoutRestock(MarketplaceListing $listing): void
     {
         try {
-            $tenantId = TenantContext::getId();
+            $tenantId = (int) ($listing->tenant_id ?: TenantContext::getId());
 
-            $watchers = DB::table('marketplace_saved_searches')
-                ->where('tenant_id', $tenantId)
-                ->where('is_active', true)
-                ->where(function ($q) use ($listing) {
-                    if ($listing->title) {
-                        $q->orWhere('search_query', 'LIKE', '%' . $listing->title . '%');
-                    }
-                    if ($listing->category_id) {
-                        $q->orWhere('filters', 'LIKE', '%"category_id":' . (int) $listing->category_id . '%');
-                    }
-                })
-                ->limit(200)
-                ->get();
+            TenantContext::runForTenant($tenantId, function () use ($listing, $tenantId): void {
+                $watchers = DB::table('marketplace_saved_searches')
+                    ->where('tenant_id', $tenantId)
+                    ->where('is_active', true)
+                    ->where(function ($q) use ($listing) {
+                        if ($listing->title) {
+                            $q->orWhere('search_query', 'LIKE', '%' . $listing->title . '%');
+                        }
+                        if ($listing->category_id) {
+                            $q->orWhere('filters', 'LIKE', '%"category_id":' . (int) $listing->category_id . '%');
+                        }
+                    })
+                    ->limit(200)
+                    ->get();
 
-            foreach ($watchers as $w) {
-                $user = User::find($w->user_id);
-                if (!$user) {
-                    continue;
+                foreach ($watchers as $w) {
+                    $user = User::where('tenant_id', $tenantId)->find($w->user_id);
+                    if (!$user) {
+                        continue;
+                    }
+                    LocaleContext::withLocale($user, function () use ($user, $listing, $tenantId) {
+                        Notification::create([
+                            'tenant_id' => $tenantId,
+                            'user_id' => $user->id,
+                            'message' => __('notifications.marketplace.restocked', [
+                                'title' => $listing->title ?? '',
+                            ]),
+                            'link' => '/marketplace/' . $listing->id,
+                            'type' => 'marketplace_restocked',
+                            'created_at' => now(),
+                        ]);
+                    });
                 }
-                LocaleContext::withLocale($user, function () use ($user, $listing) {
-                    Notification::create([
-                        'user_id' => $user->id,
-                        'message' => __('notifications.marketplace.restocked', [
-                            'title' => $listing->title ?? '',
-                        ]),
-                        'link' => '/marketplace/' . $listing->id,
-                        'type' => 'marketplace_restocked',
-                        'created_at' => now(),
-                    ]);
-                });
-            }
+            });
         } catch (\Throwable $e) {
             Log::warning('[MarketplaceInventoryService] fanoutRestock failed: ' . $e->getMessage());
         }

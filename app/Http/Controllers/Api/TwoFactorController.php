@@ -154,23 +154,26 @@ class TwoFactorController extends BaseApiController
             });
 
             if ($user && $user->email) {
-                LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
-                    $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-                    $userName   = $user->first_name ?? $user->name ?? '';
+                $tenantId = (int) ($user->tenant_id ?? TenantContext::getId());
+                TenantContext::runForTenant($tenantId, function () use ($user, $userId, $userLocale, $tenantId): void {
+                    LocaleContext::withLocale($userLocale, function () use ($user, $userId, $tenantId) {
+                        $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                        $userName   = $user->first_name ?? $user->name ?? '';
 
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('success')
-                        ->title(__('emails_security_alerts.2fa_enabled.title'))
-                        ->previewText(__('emails_security_alerts.2fa_enabled.preview'))
-                        ->greeting($userName)
-                        ->paragraph(__('emails_security_alerts.2fa_enabled.body'))
-                        ->paragraph(__('emails_security_alerts.2fa_enabled.warning'))
-                        ->render();
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('success')
+                            ->title(__('emails_security_alerts.2fa_enabled.title'))
+                            ->previewText(__('emails_security_alerts.2fa_enabled.preview'))
+                            ->greeting($userName)
+                            ->paragraph(__('emails_security_alerts.2fa_enabled.body'))
+                            ->paragraph(__('emails_security_alerts.2fa_enabled.warning'))
+                            ->render();
 
-                    $subject = __('emails_security_alerts.2fa_enabled.subject', ['community' => $tenantName]);
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $user->tenant_id ?? TenantContext::currentId()])) {
-                        Log::warning('[2FA] Failed to send 2FA enabled email', ['user_id' => $userId]);
-                    }
+                        $subject = __('emails_security_alerts.2fa_enabled.subject', ['community' => $tenantName]);
+                        if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $tenantId])) {
+                            Log::warning('[2FA] Failed to send 2FA enabled email', ['user_id' => $userId]);
+                        }
+                    });
                 });
             }
         } catch (\Throwable $e) {
@@ -269,23 +272,26 @@ class TwoFactorController extends BaseApiController
             });
 
             if ($user && $user->email) {
-                LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
-                    $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-                    $userName   = $user->first_name ?? $user->name ?? '';
+                $tenantId = (int) ($user->tenant_id ?? TenantContext::getId());
+                TenantContext::runForTenant($tenantId, function () use ($user, $userId, $userLocale, $tenantId): void {
+                    LocaleContext::withLocale($userLocale, function () use ($user, $userId, $tenantId) {
+                        $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                        $userName   = $user->first_name ?? $user->name ?? '';
 
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('danger')
-                        ->title(__('emails_security_alerts.2fa_disabled.title'))
-                        ->previewText(__('emails_security_alerts.2fa_disabled.preview'))
-                        ->greeting($userName)
-                        ->paragraph(__('emails_security_alerts.2fa_disabled.body'))
-                        ->paragraph(__('emails_security_alerts.2fa_disabled.warning'))
-                        ->render();
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('danger')
+                            ->title(__('emails_security_alerts.2fa_disabled.title'))
+                            ->previewText(__('emails_security_alerts.2fa_disabled.preview'))
+                            ->greeting($userName)
+                            ->paragraph(__('emails_security_alerts.2fa_disabled.body'))
+                            ->paragraph(__('emails_security_alerts.2fa_disabled.warning'))
+                            ->render();
 
-                    $subject = __('emails_security_alerts.2fa_disabled.subject', ['community' => $tenantName]);
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $user->tenant_id ?? TenantContext::currentId()])) {
-                        Log::warning('[2FA] Failed to send 2FA disabled email', ['user_id' => $userId]);
-                    }
+                        $subject = __('emails_security_alerts.2fa_disabled.subject', ['community' => $tenantName]);
+                        if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $tenantId])) {
+                            Log::warning('[2FA] Failed to send 2FA disabled email', ['user_id' => $userId]);
+                        }
+                    });
                 });
             }
         } catch (\Throwable $e) {

@@ -211,7 +211,8 @@ class GoalService
                 ->first();
 
             if ($user && !empty($user->email)) {
-                LocaleContext::withLocale($user, function () use ($user, $goal) {
+                $tenantId = TenantContext::getId();
+                LocaleContext::withLocale($user, function () use ($user, $goal, $tenantId) {
                     $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                     $goalTitle = htmlspecialchars($goal->title ?? '', ENT_QUOTES, 'UTF-8');
                     $goalUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/goals/' . $goal->id;
@@ -235,7 +236,7 @@ class GoalService
                         null,
                         null,
                         'goal',
-                        ['tenant_id' => $user->tenant_id ?? \App\Core\TenantContext::currentId()]
+                        ['tenant_id' => $tenantId]
                     )) {
                         Log::warning('[GoalService] created email send returned false', ['goal_id' => $goal->id]);
                     }
@@ -293,11 +294,12 @@ class GoalService
                 $user = DB::table('users')
                     ->where('id', $userId)
                     ->where('tenant_id', TenantContext::getId())
-                    ->select(['email', 'name', 'first_name', 'preferred_language'])
+                    ->select(['email', 'name', 'first_name', 'preferred_language', 'tenant_id'])
                     ->first();
 
                 if ($user && !empty($user->email)) {
-                    LocaleContext::withLocale($user, function () use ($user, $goalTitle) {
+                    $tenantId = TenantContext::getId();
+                    LocaleContext::withLocale($user, function () use ($user, $goalTitle, $tenantId) {
                         $firstName     = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                         $safeTitle     = htmlspecialchars($goalTitle, ENT_QUOTES, 'UTF-8');
                         $newGoalUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/goals';
@@ -321,7 +323,7 @@ class GoalService
                             null,
                             null,
                             'goal',
-                            ['tenant_id' => $user->tenant_id ?? \App\Core\TenantContext::currentId()]
+                            ['tenant_id' => $tenantId]
                         )) {
                             Log::warning('[GoalService] abandoned email send returned false');
                         }
@@ -418,7 +420,8 @@ class GoalService
                 ->first();
 
             if ($user && !empty($user->email)) {
-                LocaleContext::withLocale($user, function () use ($user, $goal) {
+                $tenantId = TenantContext::getId();
+                LocaleContext::withLocale($user, function () use ($user, $goal, $tenantId) {
                     $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                     $goalTitle = htmlspecialchars($goal->title ?? '', ENT_QUOTES, 'UTF-8');
                     $goalUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/goals/' . $goal->id;
@@ -442,7 +445,7 @@ class GoalService
                         null,
                         null,
                         'goal',
-                        ['tenant_id' => $user->tenant_id ?? \App\Core\TenantContext::currentId()]
+                        ['tenant_id' => $tenantId]
                     )) {
                         Log::warning('[GoalService] completed email send returned false', ['goal_id' => $goal->id]);
                     }

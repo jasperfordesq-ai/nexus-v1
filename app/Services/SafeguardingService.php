@@ -140,7 +140,9 @@ class SafeguardingService
             }
 
             if ((int) $assignment->guardian_user_id !== $revokedBy && (int) $assignment->ward_user_id !== $revokedBy) {
-                $user = User::find($revokedBy);
+                $user = User::where('tenant_id', (int) $assignment->tenant_id)
+                    ->where('id', $revokedBy)
+                    ->first();
                 if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
                     throw new \Exception('Unauthorized to revoke this assignment');
                 }
@@ -348,35 +350,39 @@ class SafeguardingService
 
             // Notify the user whose training was verified (bell + email)
             try {
-                $trainingName = $record->training_name ?? 'safeguarding training';
-                $trainee = User::find($record->user_id);
+                $trainingName = $record->training_name ?? __('emails_misc.safeguarding.training_fallback_name');
+                $trainee = User::where('tenant_id', $tenantId)
+                    ->where('id', (int) $record->user_id)
+                    ->first();
 
-                LocaleContext::withLocale($trainee, function () use ($trainee, $record, $trainingName, $tenantId, $recordId) {
-                    \App\Models\Notification::createNotification(
-                        (int) $record->user_id,
-                        __('emails_misc.safeguarding.training_verified', ['training_name' => $trainingName]),
-                        '/dashboard',
-                        'moderation',
-                        true,
-                        $tenantId
-                    );
+                TenantContext::runForTenant($tenantId, function () use ($trainee, $record, $trainingName, $tenantId, $recordId): void {
+                    LocaleContext::withLocale($trainee, function () use ($trainee, $record, $trainingName, $tenantId): void {
+                        \App\Models\Notification::createNotification(
+                            (int) $record->user_id,
+                            __('emails_misc.safeguarding.training_verified', ['training_name' => $trainingName]),
+                            '/dashboard',
+                            'moderation',
+                            true,
+                            $tenantId
+                        );
 
-                    if ($trainee && !empty($trainee->email)) {
-                        $traineeName  = trim(($trainee->first_name ?? '') . ' ' . ($trainee->last_name ?? '')) ?: ($trainee->name ?? '');
-                        $safeTraining = htmlspecialchars($trainingName, ENT_QUOTES, 'UTF-8');
-                        $emailBody = EmailTemplateBuilder::make()
-                            ->theme('success')
-                            ->title(__('emails_misc.safeguarding.training_verified_title'))
-                            ->previewText(__('emails_misc.safeguarding.training_verified_preview', ['training' => $safeTraining]))
-                            ->greeting($traineeName)
-                            ->paragraph(__('emails_misc.safeguarding.training_verified_body', ['training' => $safeTraining]))
-                            ->button(__('emails_misc.safeguarding.training_verified_cta'), EmailTemplateBuilder::tenantUrl('/dashboard'))
-                            ->render();
-                        $subject = __('emails_misc.safeguarding.training_verified_subject', ['training' => $trainingName]);
-                        if (!EmailDispatchService::sendRaw($trainee->email, $subject, $emailBody, null, null, null, 'safeguarding', ['tenant_id' => $tenantId])) {
-                            Log::warning("SafeguardingService::verifyTraining email send failed for user #{$record->user_id}");
+                        if ($trainee && !empty($trainee->email)) {
+                            $traineeName  = trim(($trainee->first_name ?? '') . ' ' . ($trainee->last_name ?? '')) ?: ($trainee->name ?? '');
+                            $safeTraining = htmlspecialchars($trainingName, ENT_QUOTES, 'UTF-8');
+                            $emailBody = EmailTemplateBuilder::make()
+                                ->theme('success')
+                                ->title(__('emails_misc.safeguarding.training_verified_title'))
+                                ->previewText(__('emails_misc.safeguarding.training_verified_preview', ['training' => $safeTraining]))
+                                ->greeting($traineeName)
+                                ->paragraph(__('emails_misc.safeguarding.training_verified_body', ['training' => $safeTraining]))
+                                ->button(__('emails_misc.safeguarding.training_verified_cta'), EmailTemplateBuilder::tenantUrl('/dashboard'))
+                                ->render();
+                            $subject = __('emails_misc.safeguarding.training_verified_subject', ['training' => $trainingName]);
+                            if (!EmailDispatchService::sendRaw($trainee->email, $subject, $emailBody, null, null, null, 'safeguarding', ['tenant_id' => $tenantId])) {
+                                Log::warning("SafeguardingService::verifyTraining email send failed for user #{$record->user_id}");
+                            }
                         }
-                    }
+                    });
                 });
             } catch (\Throwable $notifError) {
                 Log::warning("SafeguardingService::verifyTraining notification failed for record #{$recordId}: " . $notifError->getMessage());
@@ -422,40 +428,44 @@ class SafeguardingService
 
             // Notify the user whose training was rejected (bell + email — rejection is critical)
             try {
-                $trainingName = $record->training_name ?? 'safeguarding training';
-                $trainee = User::find($record->user_id);
+                $trainingName = $record->training_name ?? __('emails_misc.safeguarding.training_fallback_name');
+                $trainee = User::where('tenant_id', $tenantId)
+                    ->where('id', (int) $record->user_id)
+                    ->first();
 
-                LocaleContext::withLocale($trainee, function () use ($trainee, $record, $trainingName, $reason, $tenantId, $recordId) {
-                    \App\Models\Notification::createNotification(
-                        (int) $record->user_id,
-                        __('emails_misc.safeguarding.training_not_approved', ['training_name' => $trainingName]),
-                        '/help',
-                        'moderation',
-                        true,
-                        $tenantId
-                    );
+                TenantContext::runForTenant($tenantId, function () use ($trainee, $record, $trainingName, $reason, $tenantId, $recordId): void {
+                    LocaleContext::withLocale($trainee, function () use ($trainee, $record, $trainingName, $reason, $tenantId): void {
+                        \App\Models\Notification::createNotification(
+                            (int) $record->user_id,
+                            __('emails_misc.safeguarding.training_not_approved', ['training_name' => $trainingName]),
+                            '/help',
+                            'moderation',
+                            true,
+                            $tenantId
+                        );
 
-                    if ($trainee && !empty($trainee->email)) {
-                        $traineeName  = trim(($trainee->first_name ?? '') . ' ' . ($trainee->last_name ?? '')) ?: ($trainee->name ?? '');
-                        $safeTraining = htmlspecialchars($trainingName, ENT_QUOTES, 'UTF-8');
-                        $safeReason   = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
-                        $emailBody = EmailTemplateBuilder::make()
-                            ->theme('warning')
-                            ->title(__('emails_misc.safeguarding.training_rejected_title'))
-                            ->previewText(__('emails_misc.safeguarding.training_rejected_preview', ['training' => $safeTraining]))
-                            ->greeting($traineeName)
-                            ->paragraph(__('emails_misc.safeguarding.training_rejected_body', ['training' => $safeTraining]))
-                            ->paragraph(__('emails_misc.safeguarding.training_rejected_next_steps'))
-                            ->infoCard([
-                                __('emails_misc.safeguarding.training_rejected_reason_label') => $safeReason,
-                            ])
-                            ->button(__('emails_misc.safeguarding.training_rejected_cta'), EmailTemplateBuilder::tenantUrl('/help'))
-                            ->render();
-                        $subject = __('emails_misc.safeguarding.training_rejected_subject', ['training' => $trainingName]);
-                        if (!EmailDispatchService::sendRaw($trainee->email, $subject, $emailBody, null, null, null, 'safeguarding', ['tenant_id' => $tenantId])) {
-                            Log::warning("SafeguardingService::rejectTraining email send failed for user #{$record->user_id}");
+                        if ($trainee && !empty($trainee->email)) {
+                            $traineeName  = trim(($trainee->first_name ?? '') . ' ' . ($trainee->last_name ?? '')) ?: ($trainee->name ?? '');
+                            $safeTraining = htmlspecialchars($trainingName, ENT_QUOTES, 'UTF-8');
+                            $safeReason   = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
+                            $emailBody = EmailTemplateBuilder::make()
+                                ->theme('warning')
+                                ->title(__('emails_misc.safeguarding.training_rejected_title'))
+                                ->previewText(__('emails_misc.safeguarding.training_rejected_preview', ['training' => $safeTraining]))
+                                ->greeting($traineeName)
+                                ->paragraph(__('emails_misc.safeguarding.training_rejected_body', ['training' => $safeTraining]))
+                                ->paragraph(__('emails_misc.safeguarding.training_rejected_next_steps'))
+                                ->infoCard([
+                                    __('emails_misc.safeguarding.training_rejected_reason_label') => $safeReason,
+                                ])
+                                ->button(__('emails_misc.safeguarding.training_rejected_cta'), EmailTemplateBuilder::tenantUrl('/help'))
+                                ->render();
+                            $subject = __('emails_misc.safeguarding.training_rejected_subject', ['training' => $trainingName]);
+                            if (!EmailDispatchService::sendRaw($trainee->email, $subject, $emailBody, null, null, null, 'safeguarding', ['tenant_id' => $tenantId])) {
+                                Log::warning("SafeguardingService::rejectTraining email send failed for user #{$record->user_id}");
+                            }
                         }
-                    }
+                    });
                 });
             } catch (\Throwable $notifError) {
                 Log::warning("SafeguardingService::rejectTraining notification failed for record #{$recordId}: " . $notifError->getMessage());
@@ -1060,8 +1070,10 @@ class SafeguardingService
     private function notifyAdminsOfIncident(int $tenantId, int $reporterId, int $incidentId, string $title, string $severity, string $type): void
     {
         try {
-            $reporter = User::find($reporterId);
-            $reporterName = $reporter ? trim(($reporter->first_name ?? '') . ' ' . ($reporter->last_name ?? '')) : 'A member';
+            $reporter = User::where('tenant_id', $tenantId)
+                ->where('id', $reporterId)
+                ->first(['first_name', 'last_name']);
+            $reporterName = $reporter ? trim(($reporter->first_name ?? '') . ' ' . ($reporter->last_name ?? '')) : __('emails_misc.safeguarding.reporter_fallback_name');
 
             $staffUsers = DB::select(
                 "SELECT id, email, preferred_language FROM users WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin', 'broker', 'super_admin') AND status = 'active'",
@@ -1157,7 +1169,9 @@ class SafeguardingService
             $label = $statusLabels[$newStatus] ?? $newStatus;
 
             // Notify reporter (bell) — render in reporter's locale
-            $reporterForBell = User::find($reporterId);
+            $reporterForBell = User::where('tenant_id', $tenantId)
+                ->where('id', $reporterId)
+                ->first(['id', 'preferred_language']);
             LocaleContext::withLocale($reporterForBell, function () use ($reporterForBell, $tenantId, $reporterId, $incidentId, $label) {
                 \App\Models\Notification::create([
                     'tenant_id' => $tenantId,
@@ -1171,7 +1185,9 @@ class SafeguardingService
 
             // Notify assigned DLP if different from reporter (bell) — render in DLP's locale
             if ($dlpUserId && $dlpUserId !== $reporterId) {
-                $dlpForBell = User::find($dlpUserId);
+                $dlpForBell = User::where('tenant_id', $tenantId)
+                    ->where('id', $dlpUserId)
+                    ->first(['id', 'preferred_language']);
                 LocaleContext::withLocale($dlpForBell, function () use ($dlpForBell, $tenantId, $dlpUserId, $incidentId, $label) {
                     \App\Models\Notification::create([
                         'tenant_id' => $tenantId,
@@ -1255,7 +1271,9 @@ class SafeguardingService
                 };
 
                 // Email the reporter — render in reporter's locale
-                $reporter = User::find($reporterId);
+                $reporter = User::where('tenant_id', $tenantId)
+                    ->where('id', $reporterId)
+                    ->first();
                 if ($reporter && !empty($reporter->email)) {
                     LocaleContext::withLocale($reporter, function () use ($reporter, $reporterId, $incidentId, $tenantId, $renderForRecipient) {
                         try {
@@ -1279,7 +1297,9 @@ class SafeguardingService
 
                 // Email the assigned DLP if different from reporter — render in DLP's locale
                 if ($dlpUserId && $dlpUserId !== $reporterId) {
-                    $dlpUser = User::find($dlpUserId);
+                    $dlpUser = User::where('tenant_id', $tenantId)
+                        ->where('id', $dlpUserId)
+                        ->first();
                     if ($dlpUser && !empty($dlpUser->email)) {
                         LocaleContext::withLocale($dlpUser, function () use ($dlpUser, $dlpUserId, $incidentId, $tenantId, $renderForRecipient) {
                             try {

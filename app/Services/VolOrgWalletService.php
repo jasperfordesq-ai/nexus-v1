@@ -425,7 +425,7 @@ class VolOrgWalletService
             DB::insert("
                 INSERT INTO vol_org_transactions (tenant_id, vol_organization_id, user_id, type, amount, balance_after, description, created_at)
                 VALUES (?, ?, ?, 'admin_adjustment', ?, ?, ?, NOW())
-            ", [$tenantId, $volOrgId, $adminId, $amount, $newBalance, "Admin adjustment: {$reason}"]);
+            ", [$tenantId, $volOrgId, $adminId, $amount, $newBalance, __('svc_notifications_2.vol_org_wallet.admin_adjustment_description', ['reason' => $reason])]);
 
             return ['success' => true, 'message' => __('svc_notifications_2.vol_org_wallet.adjustment_applied'), 'new_balance' => $newBalance];
         });

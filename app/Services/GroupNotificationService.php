@@ -308,7 +308,7 @@ class GroupNotificationService
             "SELECT gm.user_id, u.preferred_language
              FROM group_members gm
              JOIN `groups` g ON gm.group_id = g.id
-             JOIN users u ON u.id = gm.user_id
+             JOIN users u ON u.id = gm.user_id AND u.tenant_id = g.tenant_id
              WHERE gm.group_id = ? AND g.tenant_id = ?
              AND gm.role IN ('admin', 'owner')
              AND gm.status IN ('active', 'approved')",
@@ -327,10 +327,18 @@ class GroupNotificationService
             "SELECT gm.user_id, u.preferred_language
              FROM group_members gm
              JOIN `groups` g ON gm.group_id = g.id
-             JOIN users u ON u.id = gm.user_id
+             JOIN users u ON u.id = gm.user_id AND u.tenant_id = g.tenant_id
              WHERE gm.group_id = ? AND g.tenant_id = ?
              AND gm.status IN ('active', 'approved')",
             [$groupId, $tenantId]
         );
+    }
+
+    private function getUserLocale(int $userId, int $tenantId): ?string
+    {
+        return DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->value('preferred_language');
     }
 }

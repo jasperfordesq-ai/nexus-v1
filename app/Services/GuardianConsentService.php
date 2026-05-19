@@ -83,28 +83,28 @@ class GuardianConsentService
 
         // Validate required fields
         if (empty($guardianData['guardian_name'])) {
-            throw new \InvalidArgumentException('Guardian name is required.');
+            throw new \InvalidArgumentException(__('api.guardian_name_required'));
         }
         if (empty($guardianData['guardian_email'])) {
-            throw new \InvalidArgumentException('Guardian email is required.');
+            throw new \InvalidArgumentException(__('api.guardian_email_required'));
         }
         if (empty($guardianData['relationship'])) {
-            throw new \InvalidArgumentException('Relationship is required.');
+            throw new \InvalidArgumentException(__('api.guardian_relationship_required'));
         }
 
         // Validate email
         if (!filter_var($guardianData['guardian_email'], FILTER_VALIDATE_EMAIL)) {
-            throw new \InvalidArgumentException('Invalid guardian email address.');
+            throw new \InvalidArgumentException(__('api.guardian_email_invalid'));
         }
 
         // Validate relationship type
         if (!in_array($guardianData['relationship'], self::VALID_RELATIONSHIPS, true)) {
-            throw new \InvalidArgumentException('Invalid relationship type. Must be one of: ' . implode(', ', self::VALID_RELATIONSHIPS));
+            throw new \InvalidArgumentException(__('api.guardian_relationship_invalid', ['types' => implode(', ', self::VALID_RELATIONSHIPS)]));
         }
 
         // Validate user is a minor
         if (!self::isMinor($minorUserId)) {
-            throw new \InvalidArgumentException('User is not a minor and does not require guardian consent.');
+            throw new \InvalidArgumentException(__('api.guardian_consent_not_required'));
         }
 
         // Generate consent token

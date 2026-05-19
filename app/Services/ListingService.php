@@ -1101,11 +1101,12 @@ class ListingService
             $creator = DB::table('users')
                 ->where('id', $userId)
                 ->where('tenant_id', TenantContext::getId())
-                ->select(['email', 'first_name', 'name', 'preferred_language'])
+                ->select(['email', 'first_name', 'name', 'preferred_language', 'tenant_id'])
                 ->first();
 
             if ($creator && !empty($creator->email)) {
-                LocaleContext::withLocale($creator, function () use ($creator, $listing) {
+                $tenantId = TenantContext::getId();
+                LocaleContext::withLocale($creator, function () use ($creator, $listing, $tenantId) {
                     $firstName   = $creator->first_name ?? $creator->name ?? __('emails.common.fallback_name');
                     $tenantName  = TenantContext::getSetting('site_name', 'Project NEXUS');
                     $listingUrl  = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/listings/' . $listing->id;
@@ -1129,7 +1130,7 @@ class ListingService
                         null,
                         null,
                         'listing',
-                        ['tenant_id' => $creator->tenant_id ?? \App\Core\TenantContext::currentId()]
+                        ['tenant_id' => $tenantId]
                     )) {
                         Log::warning('[ListingService] creation email send returned false', ['listing_id' => $listing->id]);
                     }
@@ -1212,7 +1213,7 @@ class ListingService
                 ->where('u.tenant_id', $tenantId)
                 ->whereNotNull('u.email')
                 ->when($listingOwner > 0, fn ($q) => $q->where('usl.user_id', '!=', $listingOwner))
-                ->select(['u.email', 'u.first_name', 'u.name', 'u.preferred_language'])
+                ->select(['u.email', 'u.first_name', 'u.name', 'u.preferred_language', 'u.tenant_id'])
                 ->limit(50)
                 ->get();
 
@@ -1222,7 +1223,7 @@ class ListingService
 
                 foreach ($savedUsers as $savedUser) {
                     try {
-                        LocaleContext::withLocale($savedUser, function () use ($savedUser, $listingTitle, $tenantName, $listingUrl) {
+                        LocaleContext::withLocale($savedUser, function () use ($savedUser, $listingTitle, $tenantName, $listingUrl, $tenantId) {
                             $firstName = $savedUser->first_name ?? $savedUser->name ?? __('emails.common.fallback_name');
 
                             $html = EmailTemplateBuilder::make()
@@ -1242,7 +1243,7 @@ class ListingService
                                 null,
                                 null,
                                 'listing_update',
-                                ['tenant_id' => $savedUser->tenant_id ?? \App\Core\TenantContext::currentId()]
+                                ['tenant_id' => $tenantId]
                             )) {
                                 Log::warning('[ListingService] listing updated email send returned false', ['listing_id' => $id]);
                             }

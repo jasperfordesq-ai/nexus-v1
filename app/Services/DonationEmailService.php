@@ -29,6 +29,7 @@ class DonationEmailService
      * @param object $recipient Recipient User model instance
      * @param float $amount Amount donated
      * @param string|null $message Optional personal message from donor
+     * @return array{donor_sent:bool,recipient_sent:bool}
      */
     public static function sendDonationEmails(
         int $tenantId,
@@ -36,9 +37,13 @@ class DonationEmailService
         object $recipient,
         float $amount,
         ?string $message
-    ): void {
+    ): array {
         $previousTenantId = TenantContext::currentId();
         TenantContext::setById($tenantId);
+        $result = [
+            'donor_sent' => false,
+            'recipient_sent' => false,
+        ];
 
         try {
             $walletUrl = EmailTemplateBuilder::tenantUrl('/wallet');
@@ -46,7 +51,7 @@ class DonationEmailService
 
             try {
                 if (!empty($donor->email)) {
-                    LocaleContext::withLocale($donor, function () use ($tenantId, $donor, $recipient, $amount, $messageText, $walletUrl) {
+                    $result['donor_sent'] = (bool) LocaleContext::withLocale($donor, function () use ($tenantId, $donor, $recipient, $amount, $messageText, $walletUrl): bool {
                         $donorName = $donor->first_name ?? $donor->name ?? __('emails.common.fallback_name');
                         $recipientFullName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''))
                             ?: ($recipient->name ?? __('emails.common.fallback_member_name'));
@@ -77,7 +82,10 @@ class DonationEmailService
                             Log::warning('DonationEmailService: donor confirmation send returned false', [
                                 'donor_id' => $donor->id ?? null,
                             ]);
+                            return false;
                         }
+
+                        return true;
                     });
                 }
             } catch (\Throwable $e) {
@@ -90,7 +98,7 @@ class DonationEmailService
 
             try {
                 if (!empty($recipient->email)) {
-                    LocaleContext::withLocale($recipient, function () use ($tenantId, $donor, $recipient, $amount, $messageText, $walletUrl) {
+                    $result['recipient_sent'] = (bool) LocaleContext::withLocale($recipient, function () use ($tenantId, $donor, $recipient, $amount, $messageText, $walletUrl): bool {
                         $recipientName = $recipient->first_name ?? $recipient->name ?? __('emails.common.fallback_name');
                         $donorFullName = trim(($donor->first_name ?? '') . ' ' . ($donor->last_name ?? ''))
                             ?: ($donor->name ?? __('emails.common.fallback_member_name'));
@@ -121,7 +129,10 @@ class DonationEmailService
                             Log::warning('DonationEmailService: recipient notification send returned false', [
                                 'recipient_id' => $recipient->id ?? null,
                             ]);
+                            return false;
                         }
+
+                        return true;
                     });
                 }
             } catch (\Throwable $e) {
@@ -131,6 +142,8 @@ class DonationEmailService
                     'error' => $e->getMessage(),
                 ]);
             }
+
+            return $result;
         } finally {
             if ($previousTenantId !== null) {
                 TenantContext::setById((int) $previousTenantId);

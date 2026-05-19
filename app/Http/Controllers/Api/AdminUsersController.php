@@ -1422,9 +1422,8 @@ class AdminUsersController extends BaseApiController
                 if (!empty($welcomeConfig['body'])) {
                     $mainMessage = $welcomeConfig['body'];
                 } else {
-                    $mainMessage = "<p>Hello <strong>{$firstName}</strong>,</p>
-                    <p>Welcome to {$tenantNameSafe}! Your account is ready to use.</p>
-                    <p>Log in to start connecting with your community, browse available services, and offer your own skills.</p>";
+                    $mainMessage = '<p>' . __('emails_misc.admin_actions.welcome_resend_greeting', ['name' => $firstName]) . '</p>'
+                        . '<p>' . __('emails_misc.admin_actions.welcome_resend_body', ['community' => $tenantNameSafe]) . '</p>';
                 }
 
                 $loginLink = $resolvedTenant['frontend_url'] . $resolvedTenant['slug_prefix'] . "/login";

@@ -49,6 +49,8 @@
   "safeguarding": {
     "training_verified": "Your {{training_name}} record has been verified!",
     "training_not_approved": "Your {{training_name}} record was not approved. Please contact support for details.",
+    "training_fallback_name": "safeguarding training",
+    "reporter_fallback_name": "A member",
     "dlp_assigned_bell": "You have been assigned as the Designated Liaison Person for safeguarding incident #{{incident_id}}",
     "dlp_assigned_title": "DLP Assignment — Incident #{{incident_id}}",
     "dlp_assigned_preview": "[{{severity}}] You've been assigned as DLP for incident #{{incident_id}}",

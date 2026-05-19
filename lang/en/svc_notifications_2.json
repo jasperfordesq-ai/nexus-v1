@@ -28,6 +28,7 @@
   "vol_org_wallet.amount_cannot_be_zero": "Amount cannot be zero",
   "vol_org_wallet.adjustment_negative_balance": "Adjustment would result in negative balance",
   "vol_org_wallet.adjustment_applied": "Adjustment applied",
+  "vol_org_wallet.admin_adjustment_description": "Admin adjustment: {{reason}}",
   "registration.queued_for_review": "Your account has been queued for manual review.",
   "registration.complete": "Registration complete!",
   "registration.verification_unavailable": "Identity verification is currently unavailable.",

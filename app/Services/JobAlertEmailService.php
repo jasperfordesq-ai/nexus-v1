@@ -33,7 +33,17 @@ class JobAlertEmailService
     public static function sendImmediateAlert(User $recipient, JobVacancy $vacancy, JobAlert $alert): bool
     {
         try {
-            return LocaleContext::withLocale($recipient, function () use ($recipient, $vacancy) {
+            $tenantId = (int) ($recipient->tenant_id ?: $vacancy->tenant_id);
+            if ($tenantId <= 0) {
+                Log::warning('JobAlertEmailService::sendImmediateAlert missing tenant evidence', [
+                    'user_id'    => $recipient->id,
+                    'vacancy_id' => $vacancy->id,
+                    'alert_id'   => $alert->id,
+                ]);
+                return false;
+            }
+
+            return LocaleContext::withLocale($recipient, function () use ($recipient, $vacancy, $tenantId) {
                 $subject = __('emails.job_alert.subject_single', ['title' => $vacancy->title]);
                 $bodyHtml = self::buildAlertEmailHtml($recipient, [$vacancy]);
 
@@ -45,7 +55,7 @@ class JobAlertEmailService
                     null,
                     null,
                     'job_alert',
-                    ['tenant_id' => $recipient->tenant_id ?? TenantContext::currentId()]
+                    ['tenant_id' => $tenantId]
                 );
             });
         } catch (\Throwable $e) {

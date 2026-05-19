@@ -686,8 +686,9 @@ class AdminCaringCommunityController extends BaseApiController
             return $this->respondWithErrors($errors, 422);
         }
 
-        // Duplicate email check
-        if (User::findByEmail($email)) {
+        // Duplicate email check scoped to this tenant. The platform is
+        // multi-tenant, so the same email can legitimately belong elsewhere.
+        if (User::query()->where('tenant_id', $tenantId)->where('email', $email)->exists()) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.email_already_exists'), 'email', 422);
         }
 
@@ -717,34 +718,44 @@ class AdminCaringCommunityController extends BaseApiController
 
         // Send welcome email if the email looks real (skip dummy placeholder addresses)
         $isDummy = str_ends_with($email, '.invalid') || str_ends_with($email, '.placeholder');
+        $emailSent = false;
+        $emailSkipped = $isDummy;
         if (!$isDummy) {
             try {
                 $newUser = User::findById($newUserId, true);
-                LocaleContext::withLocale($newUser['preferred_language'] ?? null, function () use ($email, $tempPassword, $tenantId) {
-                    $tenant = TenantContext::get();
-                    $tenantName = $tenant['name'] ?? 'Project NEXUS';
-                    $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/login';
+                $emailSent = TenantContext::runForTenant($tenantId, function () use ($newUser, $email, $tempPassword, $tenantId): bool {
+                    return (bool) LocaleContext::withLocale($newUser['preferred_language'] ?? null, function () use ($email, $tempPassword, $tenantId) {
+                        $tenant = TenantContext::get();
+                        $tenantName = $tenant['name'] ?? 'Project NEXUS';
+                        $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/login';
 
-                    $html = EmailTemplateBuilder::make()
-                        ->title(__('emails_misc.admin_actions.welcome_created_title'))
-                        ->previewText(__('emails_misc.admin_actions.welcome_created_preview'))
-                        ->greeting(__('emails_misc.admin_actions.welcome_created_greeting', ['community' => $tenantName]))
-                        ->paragraph(__('emails_misc.admin_actions.welcome_created_body_intro', ['community' => $tenantName]))
-                        ->paragraph(__('emails_misc.admin_actions.welcome_created_body_credentials'))
-                        ->infoCard([
-                            __('emails_misc.admin_actions.welcome_created_info_email')    => htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
-                            __('emails_misc.admin_actions.welcome_created_info_password') => htmlspecialchars($tempPassword, ENT_QUOTES, 'UTF-8'),
-                        ])
-                        ->paragraph(__('emails_misc.admin_actions.welcome_created_body_change_pass'))
-                        ->button(__('emails_misc.admin_actions.welcome_created_cta'), $loginLink)
-                        ->render();
+                        $html = EmailTemplateBuilder::make()
+                            ->title(__('emails_misc.admin_actions.welcome_created_title'))
+                            ->previewText(__('emails_misc.admin_actions.welcome_created_preview'))
+                            ->greeting(__('emails_misc.admin_actions.welcome_created_greeting', ['community' => $tenantName]))
+                            ->paragraph(__('emails_misc.admin_actions.welcome_created_body_intro', ['community' => $tenantName]))
+                            ->paragraph(__('emails_misc.admin_actions.welcome_created_body_credentials'))
+                            ->infoCard([
+                                __('emails_misc.admin_actions.welcome_created_info_email')    => htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
+                                __('emails_misc.admin_actions.welcome_created_info_password') => htmlspecialchars($tempPassword, ENT_QUOTES, 'UTF-8'),
+                            ])
+                            ->paragraph(__('emails_misc.admin_actions.welcome_created_body_change_pass'))
+                            ->button(__('emails_misc.admin_actions.welcome_created_cta'), $loginLink)
+                            ->render();
 
-                    if (!EmailDispatchService::sendRaw($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html, null, null, null, 'admin_welcome', ['tenant_id' => $tenantId])) {
-                        Log::warning('[AdminCC] Assisted onboarding welcome email returned false', [
-                            'email' => $email,
-                        ]);
-                    }
+                        $sent = EmailDispatchService::sendRaw($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html, null, null, null, 'admin_welcome', ['tenant_id' => $tenantId]);
+                        if (!$sent) {
+                            return false;
+                        }
+
+                        return true;
+                    });
                 });
+                if (!$emailSent) {
+                    Log::warning('[AdminCC] Assisted onboarding welcome email returned false', [
+                        'email' => $email,
+                    ]);
+                }
             } catch (\Throwable $e) {
                 Log::warning('[AdminCC] Assisted onboarding welcome email failed: ' . $e->getMessage());
             }
@@ -758,6 +769,8 @@ class AdminCaringCommunityController extends BaseApiController
                 'email' => $email,
             ],
             'temp_password' => $tempPassword,
+            'email_sent' => $emailSent,
+            'email_skipped' => $emailSkipped,
         ], null, 201);
     }
 

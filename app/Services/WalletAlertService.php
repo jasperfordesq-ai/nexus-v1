@@ -38,8 +38,9 @@ class WalletAlertService
 
         $cacheKey = "wallet_low_balance:{$tenantId}:{$userId}";
 
-        // Skip if an alert was already sent within the last 24 hours
-        if (Cache::has($cacheKey)) {
+        // Atomically claim the 24-hour alert window before sending. Cache::has()
+        // followed by Cache::put() can double-send under concurrent balance updates.
+        if (!Cache::add($cacheKey, true, self::CACHE_TTL)) {
             return;
         }
 
@@ -50,6 +51,7 @@ class WalletAlertService
             ->first();
 
         if (!$user || empty($user->email)) {
+            Cache::forget($cacheKey);
             return;
         }
 
@@ -69,8 +71,13 @@ class WalletAlertService
             });
 
             if ($sent) {
-                Cache::put($cacheKey, true, self::CACHE_TTL);
+                return;
             }
+
+            Cache::forget($cacheKey);
+        } catch (\Throwable $e) {
+            Cache::forget($cacheKey);
+            throw $e;
         } finally {
             if ($previousTenantId !== null) {
                 TenantContext::setById((int) $previousTenantId);

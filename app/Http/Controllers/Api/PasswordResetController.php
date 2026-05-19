@@ -232,8 +232,8 @@ class PasswordResetController extends BaseApiController
                 );
             }
 
-            // Invalidate all existing refresh tokens for security
-            $this->invalidateUserTokens((int)$user['id']);
+            // Invalidate all existing refresh tokens for security.
+            $this->invalidateUserTokens((int) $user['id'], (int) $tokenTenantId);
         });
 
         // Log the password change
@@ -263,6 +263,7 @@ class PasswordResetController extends BaseApiController
             Log::warning('[PasswordReset] Failed to create password change notification: ' . $e->getMessage());
         }
 
+        $previousTenantId = TenantContext::currentId();
         try {
             TenantContext::setById($tokenTenantId);
             LocaleContext::withLocale($recipientLocale, function () use ($email, $tokenTenantId) {
@@ -284,7 +285,11 @@ class PasswordResetController extends BaseApiController
         } catch (\Throwable $e) {
             Log::warning('[PasswordReset] Failed to send password change email: ' . $e->getMessage());
         } finally {
-            TenantContext::reset();
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
 
         return $this->respondWithData([
@@ -322,26 +327,6 @@ class PasswordResetController extends BaseApiController
         $hashedToken = hash('sha256', $token);
 
         $userTenantId = isset($user['tenant_id']) ? (int) $user['tenant_id'] : null;
-
-        // Delete any existing tokens for this (email, tenant) pair so a request
-        // from one tenant cannot clobber a pending token in another.
-        if ($userTenantId !== null) {
-            DB::delete(
-                "DELETE FROM password_resets WHERE email = ? AND tenant_id <=> ?",
-                [$email, $userTenantId]
-            );
-        } else {
-            DB::delete(
-                "DELETE FROM password_resets WHERE email = ? AND tenant_id IS NULL",
-                [$email]
-            );
-        }
-
-        // Store the hashed token together with the originating tenant.
-        DB::insert(
-            "INSERT INTO password_resets (email, tenant_id, token, created_at) VALUES (?, ?, ?, NOW())",
-            [$email, $userTenantId, $hashedToken]
-        );
 
         // Build reset URL — include tenant base path for correct routing
         $resetUrl = null;
@@ -389,6 +374,26 @@ class PasswordResetController extends BaseApiController
                 return EmailDispatchService::sendRaw($email, $subject, $html, null, null, null, 'password_reset', ['tenant_id' => $userTenantId]);
             });
             if ($resetEmailSent) {
+                // Rotate reset tokens only after the dispatcher accepts the new
+                // email. If SMTP/Gmail fails, any previous valid link remains
+                // usable instead of being silently invalidated.
+                if ($userTenantId !== null) {
+                    DB::delete(
+                        "DELETE FROM password_resets WHERE email = ? AND tenant_id <=> ?",
+                        [$email, $userTenantId]
+                    );
+                } else {
+                    DB::delete(
+                        "DELETE FROM password_resets WHERE email = ? AND tenant_id IS NULL",
+                        [$email]
+                    );
+                }
+
+                DB::insert(
+                    "INSERT INTO password_resets (email, tenant_id, token, created_at) VALUES (?, ?, ?, NOW())",
+                    [$email, $userTenantId, $hashedToken]
+                );
+
                 Log::info('[PasswordReset] reset email dispatched', [
                     'email_masked' => $masked,
                     'user_id' => $user['id'] ?? null,
@@ -506,7 +511,7 @@ class PasswordResetController extends BaseApiController
     /**
      * Invalidate all tokens for a user after password change
      */
-    private function invalidateUserTokens(int $userId): void
+    private function invalidateUserTokens(int $userId, int $tenantId): void
     {
         try {
             $this->tokenService->revokeAllTokensForUser($userId);
@@ -522,7 +527,7 @@ class PasswordResetController extends BaseApiController
             if (!empty($columns)) {
                 DB::update(
                     "UPDATE users SET password_changed_at = NOW() WHERE id = ? AND tenant_id = ?",
-                    [$userId, $this->getTenantId()]
+                    [$userId, $tenantId]
                 );
             }
         } catch (\Throwable $e) {

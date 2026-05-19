@@ -143,6 +143,7 @@ class VereinDuesService
                 ->where('organization_id', $organizationId)
                 ->where('user_id', $userId)
                 ->where('membership_year', $year)
+                ->where('tenant_id', $tenantId)
                 ->exists();
 
             if ($exists) {
@@ -233,7 +234,10 @@ class VereinDuesService
                 return ['dues_id' => $duesId, 'payment_id' => (int) $existing->id, 'idempotent' => true, 'paid_email_sent' => $paidEmailSent];
             }
 
-            DB::table('verein_member_dues')->where('id', $duesId)->update([
+            DB::table('verein_member_dues')
+                ->where('id', $duesId)
+                ->where('tenant_id', $tenantId)
+                ->update([
                 'status' => 'paid',
                 'paid_at' => now(),
                 'stripe_payment_intent_id' => $stripePaymentIntentId,
@@ -292,7 +296,10 @@ class VereinDuesService
             throw new \InvalidArgumentException(__('verein_dues.errors.cannot_waive_paid'));
         }
 
-        DB::table('verein_member_dues')->where('id', $duesId)->update([
+        DB::table('verein_member_dues')
+            ->where('id', $duesId)
+            ->where('tenant_id', $tenantId)
+            ->update([
             'status' => 'waived',
             'waived_by_admin_id' => $adminId,
             'waived_reason' => $reason,
@@ -332,7 +339,10 @@ class VereinDuesService
             return ['dues_id' => $duesId, 'sent' => false];
         }
 
-        DB::table('verein_member_dues')->where('id', $duesId)->update([
+        DB::table('verein_member_dues')
+            ->where('id', $duesId)
+            ->where('tenant_id', $tenantId)
+            ->update([
             'reminder_count' => DB::raw('reminder_count + 1'),
             'last_reminder_at' => now(),
             'updated_at' => now(),
@@ -498,7 +508,10 @@ class VereinDuesService
             throw new \RuntimeException(__('verein_dues.errors.payment_intent_failed'));
         }
 
-        DB::table('verein_member_dues')->where('id', $duesId)->update([
+        DB::table('verein_member_dues')
+            ->where('id', $duesId)
+            ->where('tenant_id', $tenantId)
+            ->update([
             'stripe_payment_intent_id' => $intent->id,
             'updated_at' => now(),
         ]);
@@ -629,7 +642,10 @@ class VereinDuesService
                     continue;
                 }
 
-                DB::table('verein_member_dues')->where('id', $row->id)->update([
+                DB::table('verein_member_dues')
+                    ->where('id', $row->id)
+                    ->where('tenant_id', $row->tenant_id)
+                    ->update([
                     'reminder_count' => DB::raw('reminder_count + 1'),
                     'last_reminder_at' => now(),
                     'updated_at' => now(),
@@ -760,7 +776,10 @@ class VereinDuesService
             return false;
         }
 
-        $orgName = (string) (DB::table('vol_organizations')->where('id', $organizationId)->value('name') ?? '');
+        $orgName = (string) (DB::table('vol_organizations')
+            ->where('id', $organizationId)
+            ->where('tenant_id', $tenantId)
+            ->value('name') ?? '');
         $params['organization'] = $orgName;
 
         $url = $linkIsAbsolute

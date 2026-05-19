@@ -100,7 +100,7 @@ class GroupApprovalWorkflowService
         $request = DB::selectOne(
             "SELECT gar.submitted_by, g.name AS group_name, g.id AS group_id
              FROM group_approval_requests gar
-             LEFT JOIN `groups` g ON g.id = gar.group_id
+             LEFT JOIN `groups` g ON g.id = gar.group_id AND g.tenant_id = gar.tenant_id
              WHERE gar.id = ? AND gar.tenant_id = ? AND gar.status = ?",
             [$requestId, $tenantId, self::STATUS_PENDING]
         );
@@ -155,7 +155,7 @@ class GroupApprovalWorkflowService
         $request = DB::selectOne(
             "SELECT gar.submitted_by, g.name AS group_name
              FROM group_approval_requests gar
-             LEFT JOIN `groups` g ON g.id = gar.group_id
+             LEFT JOIN `groups` g ON g.id = gar.group_id AND g.tenant_id = gar.tenant_id
              WHERE gar.id = ? AND gar.tenant_id = ? AND gar.status = ?",
             [$requestId, $tenantId, self::STATUS_PENDING]
         );
@@ -211,7 +211,7 @@ class GroupApprovalWorkflowService
         $rows = DB::select(
             "SELECT gar.*, g.name AS group_name
              FROM group_approval_requests gar
-             LEFT JOIN `groups` g ON g.id = gar.group_id
+             LEFT JOIN `groups` g ON g.id = gar.group_id AND g.tenant_id = gar.tenant_id
              WHERE gar.tenant_id = ? AND gar.status = ?
              ORDER BY gar.created_at DESC",
             [$tenantId, self::STATUS_PENDING]

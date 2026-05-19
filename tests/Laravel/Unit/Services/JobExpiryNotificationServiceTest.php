@@ -67,7 +67,7 @@ class JobExpiryNotificationServiceTest extends TestCase
 
     public function test_notifyExpiringSoon_does_not_mark_sent_when_email_fails(): void
     {
-        [, $vacancy] = $this->makeExpiringVacancy('Volunteer Lead');
+        [$poster, $vacancy] = $this->makeExpiringVacancy('Volunteer Lead');
         $this->fakeEmailDispatchService(sendResult: false);
         TenantContext::reset();
 
@@ -78,6 +78,12 @@ class JobExpiryNotificationServiceTest extends TestCase
             'tenant_id' => $this->testTenantId,
             'vacancy_id' => $vacancy->id,
             'notification_type' => 'expiring_soon',
+        ]);
+        $this->assertDatabaseMissing('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $poster->id,
+            'type' => 'job_expiry',
+            'link' => "/jobs/{$vacancy->id}",
         ]);
     }
 

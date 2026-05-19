@@ -207,14 +207,6 @@ class ListingExpiryReminderService
         $message = __('emails_listings.listings.expiry_reminder.notification', ['title' => $title, 'days_text' => $daysText, 'expiry_date' => $expiryFormatted]);
         $link = "/listings/{$listingId}";
 
-        Notification::create([
-            'user_id' => $userId,
-            'message' => $message,
-            'link' => $link,
-            'type' => 'listing_expiry',
-            'created_at' => now(),
-        ]);
-
         // Send email notification to listing owner
         try {
             $email = $listing->email ?? null;
@@ -245,7 +237,7 @@ class ListingExpiryReminderService
                     ->button(__('emails_listings.listings.expiry_reminder.cta'), $listingUrl)
                     ->render();
 
-                if (!EmailDispatchService::sendRaw($email, __('emails_listings.listings.expiry_reminder.subject', ['days_text' => $daysText]), $html, null, null, null, 'listing_expiry', ['tenant_id' => (int) ($listing->tenant_id ?? TenantContext::getId())])) {
+                if (!EmailDispatchService::sendRaw($email, __('emails_listings.listings.expiry_reminder.subject', ['days_text' => $daysText]), $html, null, null, null, 'listing_expiry', ['tenant_id' => (int) $listing->tenant_id])) {
                     return false;
                 }
             }
@@ -253,6 +245,15 @@ class ListingExpiryReminderService
             Log::warning("[ListingExpiryReminderService] Email send failed for user={$userId}, listing={$listingId}: " . $e->getMessage());
             return false;
         }
+
+        Notification::create([
+            'tenant_id' => (int) $listing->tenant_id,
+            'user_id' => $userId,
+            'message' => $message,
+            'link' => $link,
+            'type' => 'listing_expiry',
+            'created_at' => now(),
+        ]);
 
         return true;
     }
@@ -265,14 +266,6 @@ class ListingExpiryReminderService
         $listingId = (int) $listing->id;
         $title = htmlspecialchars($listing->title, ENT_QUOTES, 'UTF-8');
         $link = "/listings/{$listingId}";
-
-        Notification::create([
-            'user_id' => $userId,
-            'message' => __('emails_listings.listings.expired.notification', ['title' => $title]),
-            'link' => $link,
-            'type' => 'listing_expired',
-            'created_at' => now(),
-        ]);
 
         try {
             $email = $listing->email ?? null;
@@ -302,7 +295,7 @@ class ListingExpiryReminderService
                     null,
                     null,
                     'listing_expiry',
-                    ['tenant_id' => (int) ($listing->tenant_id ?? TenantContext::getId())]
+                    ['tenant_id' => (int) $listing->tenant_id]
                 )) {
                     return false;
                 }
@@ -311,6 +304,15 @@ class ListingExpiryReminderService
             Log::warning("[ListingExpiryReminderService] Expired email failed for user={$userId}, listing={$listingId}: " . $e->getMessage());
             return false;
         }
+
+        Notification::create([
+            'tenant_id' => (int) $listing->tenant_id,
+            'user_id' => $userId,
+            'message' => __('emails_listings.listings.expired.notification', ['title' => $title]),
+            'link' => $link,
+            'type' => 'listing_expired',
+            'created_at' => now(),
+        ]);
 
         return true;
     }

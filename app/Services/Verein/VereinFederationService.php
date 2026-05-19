@@ -570,7 +570,11 @@ class VereinFederationService
 
     private function findInvitation(int $id): array
     {
-        $row = DB::table('verein_cross_invitations')->where('id', $id)->first();
+        $tenantId = TenantContext::getId();
+        $row = DB::table('verein_cross_invitations')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
         if (!$row) {
             throw new InvalidArgumentException(__('verein_federation.invitation_not_found'));
         }
@@ -608,8 +612,14 @@ class VereinFederationService
         if (!$user) {
             return;
         }
-        $sourceName = (string) (DB::table('vol_organizations')->where('id', $sourceOrgId)->value('name') ?? '');
-        $targetName = (string) (DB::table('vol_organizations')->where('id', $targetOrgId)->value('name') ?? '');
+        $sourceName = (string) (DB::table('vol_organizations')
+            ->where('id', $sourceOrgId)
+            ->where('tenant_id', $tenantId)
+            ->value('name') ?? '');
+        $targetName = (string) (DB::table('vol_organizations')
+            ->where('id', $targetOrgId)
+            ->where('tenant_id', $tenantId)
+            ->value('name') ?? '');
 
         LocaleContext::withLocale($user->preferred_language ?? null, function () use ($invitationId, $user, $sourceName, $targetName, $message, $tenantId, $inviteeUserId): void {
             // In-app notification
@@ -640,9 +650,15 @@ class VereinFederationService
         if (!$inviter) {
             return;
         }
-        $accepter = DB::table('users')->where('id', $accepterUserId)->first();
+        $accepter = DB::table('users')
+            ->where('id', $accepterUserId)
+            ->where('tenant_id', $tenantId)
+            ->first();
         $accepterName = $accepter ? trim(($accepter->first_name ?? '') . ' ' . ($accepter->last_name ?? '')) : '';
-        $targetName = (string) (DB::table('vol_organizations')->where('id', $targetOrgId)->value('name') ?? '');
+        $targetName = (string) (DB::table('vol_organizations')
+            ->where('id', $targetOrgId)
+            ->where('tenant_id', $tenantId)
+            ->value('name') ?? '');
 
         LocaleContext::withLocale($inviter->preferred_language ?? null, function () use ($inviter, $tenantId, $inviterUserId, $accepterName, $targetName): void {
             DB::table('notifications')->insert([

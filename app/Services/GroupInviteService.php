@@ -93,7 +93,10 @@ class GroupInviteService
             return null;
         }
 
-        $inviter = DB::table('users')->where('id', $inviterId)->first();
+        $inviter = DB::table('users')
+            ->where('id', $inviterId)
+            ->where('tenant_id', $tenantId)
+            ->first();
         $inviterName = $inviter->name ?? __('emails.common.fallback_member_name');
 
         $results = [];
@@ -226,7 +229,10 @@ class GroupInviteService
         }
 
         if ($invite->expires_at && now()->isAfter($invite->expires_at)) {
-            DB::table('group_invites')->where('id', $invite->id)->update(['status' => self::STATUS_EXPIRED]);
+            DB::table('group_invites')
+                ->where('id', $invite->id)
+                ->where('tenant_id', $tenantId)
+                ->update(['status' => self::STATUS_EXPIRED]);
             $this->errors[] = ['code' => 'EXPIRED', 'message' => __('api.group_invite_expired')];
             return null;
         }
@@ -275,6 +281,7 @@ class GroupInviteService
         if ($invite->invite_type === 'email') {
             DB::table('group_invites')
                 ->where('id', $invite->id)
+                ->where('tenant_id', $tenantId)
                 ->update(['status' => self::STATUS_ACCEPTED, 'accepted_by' => $userId, 'accepted_at' => now()]);
         }
 

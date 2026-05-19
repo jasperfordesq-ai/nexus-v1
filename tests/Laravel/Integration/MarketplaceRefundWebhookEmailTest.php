@@ -80,6 +80,60 @@ class MarketplaceRefundWebhookEmailTest extends TestCase
         $this->assertSame(2, DB::table('notifications')->where('tenant_id', $tenantId)->where('type', 'marketplace_order')->count());
     }
 
+    public function test_charge_refunded_webhook_recreates_missing_bells_without_resending_emails_with_evidence(): void
+    {
+        $tenantId = $this->testTenantId;
+        TenantContext::setById($tenantId);
+
+        $buyer = User::factory()->forTenant($tenantId)->create([
+            'email' => 'marketplace-refund-buyer-evidence@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $seller = User::factory()->forTenant($tenantId)->create([
+            'email' => 'marketplace-refund-seller-evidence@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $listingId = $this->createListing($tenantId, (int) $seller->id);
+        $orderId = $this->createOrder($tenantId, (int) $buyer->id, (int) $seller->id, $listingId);
+        $this->createPayment($tenantId, $orderId);
+
+        $orderNumber = DB::table('marketplace_orders')->where('id', $orderId)->value('order_number');
+        foreach ([$buyer->email, $seller->email] as $email) {
+            DB::table('email_log')->insert([
+                'tenant_id' => $tenantId,
+                'recipient_email' => $email,
+                'category' => 'marketplace_refund',
+                'subject' => 'Refund processed for order ' . $orderNumber,
+                'provider' => 'smtp',
+                'status' => 'sent',
+                'sent_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $mailer = new class extends EmailDispatchService {
+            public array $calls = [];
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->calls[] = compact('to', 'subject', 'body', 'options');
+
+                return true;
+            }
+        };
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        MarketplacePaymentService::handleWebhookEvent('charge.refunded', (object) [
+            'payment_intent' => 'pi_marketplace_refund_email',
+            'amount_refunded' => 1000,
+            'amount' => 1000,
+        ]);
+
+        $this->assertCount(0, $mailer->calls);
+        $this->assertSame(2, DB::table('notifications')->where('tenant_id', $tenantId)->where('type', 'marketplace_order')->count());
+    }
+
     private function createListing(int $tenantId, int $sellerId): int
     {
         return (int) DB::table('marketplace_listings')->insertGetId([

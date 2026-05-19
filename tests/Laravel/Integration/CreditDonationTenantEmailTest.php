@@ -12,7 +12,9 @@ use App\Services\BalanceAlertService;
 use App\Services\CreditDonationService;
 use App\Services\DonationEmailService;
 use App\Services\EmailDispatchService;
+use App\Services\WalletAlertService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
@@ -60,8 +62,9 @@ class CreditDonationTenantEmailTest extends TestCase
 
         TenantContext::setById(2);
 
-        DonationEmailService::sendDonationEmails($tenantId, $donor, $recipient, 3, null);
+        $result = DonationEmailService::sendDonationEmails($tenantId, $donor, $recipient, 3, null);
 
+        $this->assertSame(['donor_sent' => true, 'recipient_sent' => true], $result);
         $this->assertCount(2, $mailer->calls);
         foreach ($mailer->calls as $call) {
             $this->assertSame($tenantId, $call['options']['tenant_id']);
@@ -69,6 +72,77 @@ class CreditDonationTenantEmailTest extends TestCase
             $this->assertStringNotContainsString('/hour-timebank/wallet', $call['body']);
         }
         $this->assertSame(2, TenantContext::currentId());
+    }
+
+    public function test_donation_email_result_exposes_failed_recipient_send(): void
+    {
+        $tenantId = 999;
+        $donor = User::factory()->forTenant($tenantId)->create([
+            'first_name' => 'Donor',
+            'email' => 'credit-donor-fail-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $recipient = User::factory()->forTenant($tenantId)->create([
+            'first_name' => 'Recipient',
+            'email' => 'credit-recipient-fail-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $mailer = new class extends EmailDispatchService {
+            public array $calls = [];
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->calls[] = compact('to', 'subject', 'body', 'options');
+
+                return count($this->calls) === 1;
+            }
+        };
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $result = DonationEmailService::sendDonationEmails($tenantId, $donor, $recipient, 3, null);
+
+        $this->assertSame(['donor_sent' => true, 'recipient_sent' => false], $result);
+        $this->assertCount(2, $mailer->calls);
+    }
+
+    public function test_wallet_alert_claim_suppresses_duplicate_sends_after_success(): void
+    {
+        $tenantId = 999;
+        $user = User::factory()->forTenant($tenantId)->create([
+            'email' => 'wallet-alert-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        Cache::forget("wallet_low_balance:{$tenantId}:{$user->id}");
+        $mailer = $this->fakeMailer(true);
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        WalletAlertService::checkAndSendLowBalanceAlert($tenantId, (int) $user->id, 2.5);
+        WalletAlertService::checkAndSendLowBalanceAlert($tenantId, (int) $user->id, 2.5);
+
+        $this->assertCount(1, $mailer->calls);
+    }
+
+    public function test_wallet_alert_releases_claim_when_send_fails(): void
+    {
+        $tenantId = 999;
+        $user = User::factory()->forTenant($tenantId)->create([
+            'email' => 'wallet-alert-retry-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        Cache::forget("wallet_low_balance:{$tenantId}:{$user->id}");
+        $failingMailer = $this->fakeMailer(false);
+        app()->instance(EmailDispatchService::class, $failingMailer);
+
+        WalletAlertService::checkAndSendLowBalanceAlert($tenantId, (int) $user->id, 2.5);
+
+        $this->assertCount(1, $failingMailer->calls);
+
+        $successfulMailer = $this->fakeMailer(true);
+        app()->instance(EmailDispatchService::class, $successfulMailer);
+
+        WalletAlertService::checkAndSendLowBalanceAlert($tenantId, (int) $user->id, 2.5);
+
+        $this->assertCount(1, $successfulMailer->calls);
     }
 
     public function test_balance_alert_does_not_record_daily_alert_when_email_send_fails(): void

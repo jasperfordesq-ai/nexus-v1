@@ -223,23 +223,26 @@ class WebAuthnController extends BaseApiController
             });
 
             if ($user && $user->email) {
-                LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
-                    $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-                    $userName   = $user->first_name ?? $user->name ?? '';
+                $tenantId = (int) ($user->tenant_id ?? TenantContext::getId());
+                TenantContext::runForTenant($tenantId, function () use ($user, $userId, $userLocale, $tenantId): void {
+                    LocaleContext::withLocale($userLocale, function () use ($user, $userId, $tenantId) {
+                        $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                        $userName   = $user->first_name ?? $user->name ?? '';
 
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('warning')
-                        ->title(__('emails_security_alerts.passkey_registered.title'))
-                        ->previewText(__('emails_security_alerts.passkey_registered.preview'))
-                        ->greeting($userName)
-                        ->paragraph(__('emails_security_alerts.passkey_registered.body', ['community' => $tenantName]))
-                        ->paragraph(__('emails_security_alerts.passkey_registered.warning'))
-                        ->render();
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('warning')
+                            ->title(__('emails_security_alerts.passkey_registered.title'))
+                            ->previewText(__('emails_security_alerts.passkey_registered.preview'))
+                            ->greeting($userName)
+                            ->paragraph(__('emails_security_alerts.passkey_registered.body', ['community' => $tenantName]))
+                            ->paragraph(__('emails_security_alerts.passkey_registered.warning'))
+                            ->render();
 
-                    $subject = __('emails_security_alerts.passkey_registered.subject', ['community' => $tenantName]);
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $user->tenant_id ?? TenantContext::currentId()])) {
-                        \Illuminate\Support\Facades\Log::warning("Failed to send passkey registered email to user {$userId}");
-                    }
+                        $subject = __('emails_security_alerts.passkey_registered.subject', ['community' => $tenantName]);
+                        if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $tenantId])) {
+                            \Illuminate\Support\Facades\Log::warning("Failed to send passkey registered email to user {$userId}");
+                        }
+                    });
                 });
             }
         } catch (\Throwable $e) {
@@ -519,23 +522,26 @@ class WebAuthnController extends BaseApiController
             });
 
             if ($user && $user->email) {
-                LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
-                    $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-                    $userName   = $user->first_name ?? $user->name ?? '';
+                $tenantId = (int) ($user->tenant_id ?? TenantContext::getId());
+                TenantContext::runForTenant($tenantId, function () use ($user, $userId, $userLocale, $tenantId): void {
+                    LocaleContext::withLocale($userLocale, function () use ($user, $userId, $tenantId) {
+                        $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                        $userName   = $user->first_name ?? $user->name ?? '';
 
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('danger')
-                        ->title(__('emails_security_alerts.passkey_removed.title'))
-                        ->previewText(__('emails_security_alerts.passkey_removed.preview'))
-                        ->greeting($userName)
-                        ->paragraph(__('emails_security_alerts.passkey_removed.body', ['community' => $tenantName]))
-                        ->paragraph(__('emails_security_alerts.passkey_removed.warning'))
-                        ->render();
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('danger')
+                            ->title(__('emails_security_alerts.passkey_removed.title'))
+                            ->previewText(__('emails_security_alerts.passkey_removed.preview'))
+                            ->greeting($userName)
+                            ->paragraph(__('emails_security_alerts.passkey_removed.body', ['community' => $tenantName]))
+                            ->paragraph(__('emails_security_alerts.passkey_removed.warning'))
+                            ->render();
 
-                    $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $user->tenant_id ?? TenantContext::currentId()])) {
-                        Log::warning('[WebAuthn] Failed to send passkey removed email', ['user_id' => $userId]);
-                    }
+                        $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
+                        if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $tenantId])) {
+                            Log::warning('[WebAuthn] Failed to send passkey removed email', ['user_id' => $userId]);
+                        }
+                    });
                 });
             }
         } catch (\Throwable $e) {
@@ -613,23 +619,26 @@ class WebAuthnController extends BaseApiController
                 });
 
                 if ($user && $user->email) {
-                    LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
-                        $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-                        $userName   = $user->first_name ?? $user->name ?? '';
+                    $tenantId = (int) ($user->tenant_id ?? TenantContext::getId());
+                    TenantContext::runForTenant($tenantId, function () use ($user, $userId, $userLocale, $tenantId): void {
+                        LocaleContext::withLocale($userLocale, function () use ($user, $userId, $tenantId) {
+                            $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                            $userName   = $user->first_name ?? $user->name ?? '';
 
-                        $html = EmailTemplateBuilder::make()
-                            ->theme('danger')
-                            ->title(__('emails_security_alerts.passkey_removed.title'))
-                            ->previewText(__('emails_security_alerts.passkey_removed.preview'))
-                            ->greeting($userName)
-                            ->paragraph(__('emails_security_alerts.passkey_removed.body', ['community' => $tenantName]))
-                            ->paragraph(__('emails_security_alerts.passkey_removed.warning'))
-                            ->render();
+                            $html = EmailTemplateBuilder::make()
+                                ->theme('danger')
+                                ->title(__('emails_security_alerts.passkey_removed.title'))
+                                ->previewText(__('emails_security_alerts.passkey_removed.preview'))
+                                ->greeting($userName)
+                                ->paragraph(__('emails_security_alerts.passkey_removed.body', ['community' => $tenantName]))
+                                ->paragraph(__('emails_security_alerts.passkey_removed.warning'))
+                                ->render();
 
-                        $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
-                        if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $user->tenant_id ?? TenantContext::currentId()])) {
-                            Log::warning('[WebAuthn] Failed to send all-passkeys removed email', ['user_id' => $userId]);
-                        }
+                            $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
+                            if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $tenantId])) {
+                                Log::warning('[WebAuthn] Failed to send all-passkeys removed email', ['user_id' => $userId]);
+                            }
+                        });
                     });
                 }
             } catch (\Throwable $e) {
