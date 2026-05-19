@@ -1562,6 +1562,8 @@
   "regional_analytics": {
     "page_title": "Regional Analytics",
     "meta_description": "Discover privacy-first regional analytics for municipalities and SME partners using anonymised community trends and aggregate reporting.",
+    "partner_dashboard_title": "Regional Analytics",
+    "partner_dashboard_meta_description": "Private regional analytics dashboard for authorised partners.",
     "contact_subject": "Regional Analytics - Partner enquiry",
     "privacy_badge": "Privacy-first by design",
     "hero_title": "Understand your region. Without compromising privacy.",

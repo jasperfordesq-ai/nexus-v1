@@ -28,6 +28,8 @@ import CheckCircle2 from 'lucide-react/icons/circle-check';
 import XCircle from 'lucide-react/icons/circle-x';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import Flag from 'lucide-react/icons/flag';
+import { useTranslation } from 'react-i18next';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
@@ -39,22 +41,27 @@ import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminReport, ModerationStats } from '@/admin/api/types';
 
 export default function ReportsManagement() {
-  usePageTitle("Moderation");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('moderation.page_title'));
+  useAdminPageMeta({
+    title: t('moderation.reports_management_title'),
+    description: t('moderation.reports_meta_description'),
+  });
 
   const CONTENT_TYPES = [
-    { label: "All Types", value: '' },
-    { label: "Post", value: 'post' },
-    { label: "Comment", value: 'comment' },
-    { label: "Review", value: 'review' },
-    { label: "User", value: 'user' },
-    { label: "Listing", value: 'listing' },
+    { label: t('moderation.filter_all_types'), value: '' },
+    { label: t('moderation.content_type_post'), value: 'post' },
+    { label: t('moderation.content_type_comment'), value: 'comment' },
+    { label: t('moderation.content_type_review'), value: 'review' },
+    { label: t('moderation.content_type_user'), value: 'user' },
+    { label: t('moderation.content_type_listing'), value: 'listing' },
   ];
 
   const STATUS_FILTERS = [
-    { label: "All Statuses", value: '' },
-    { label: "Pending", value: 'pending' },
-    { label: "Resolved", value: 'resolved' },
-    { label: "Dismissed", value: 'dismissed' },
+    { label: t('moderation.filter_all_status'), value: '' },
+    { label: t('moderation.status_pending'), value: 'pending' },
+    { label: t('moderation.status_resolved'), value: 'resolved' },
+    { label: t('moderation.status_dismissed'), value: 'dismissed' },
   ];
 
   const toast = useToast();
@@ -86,15 +93,15 @@ export default function ReportsManagement() {
     if (!isSuperAdmin) return;
     adminSuper.listTenants().then((res) => {
       if (res.success && Array.isArray(res.data)) {
-        setTenants(res.data.map((t) => ({
-          id: Number(t.id),
-          name: String(t.name || 'Unknown'),
+        setTenants(res.data.map((tenant) => ({
+          id: Number(tenant.id),
+          name: String(tenant.name || t('moderation.unknown_tenant')),
         })));
       }
     }).catch(() => {
       // Tenant list is optional; silently fail
     });
-  }, [isSuperAdmin]);
+  }, [isSuperAdmin, t]);
 
   const { data: stats, execute: refetchStats } = useApi<ModerationStats>(
     '/v2/admin/reports/stats',
@@ -150,17 +157,17 @@ export default function ReportsManagement() {
       if (response.success) {
         toast.success(
           confirmAction.type === 'resolve'
-            ? "Report resolved successfully"
-            : "Report dismissed successfully"
+            ? t('moderation.report_resolved_successfully')
+            : t('moderation.report_dismissed_successfully')
         );
         setConfirmAction(null);
         execute();
         refetchStats();
       } else {
-        toast.error(response.error || "Failed");
+        toast.error(response.error || t('moderation.action_failed'));
       }
     } catch {
-      toast.error("An error occurred");
+      toast.error(t('moderation.an_error_occurred'));
     } finally {
       setActionLoading(false);
     }
@@ -182,7 +189,9 @@ export default function ReportsManagement() {
           />
           <div className="flex flex-col">
             <span className="text-sm font-medium">{report.reporter_name}</span>
-            <span className="text-xs text-default-400">ID: {report.reporter_id}</span>
+            <span className="text-xs text-default-400">
+              {t('moderation.member_id', { id: report.reporter_id })}
+            </span>
           </div>
         </div>
       </TableCell>,
@@ -205,20 +214,20 @@ export default function ReportsManagement() {
         </Chip>
       </TableCell>,
       <TableCell key="reason">
-        <span className="text-sm">{report.reason}</span>
+        <span className="text-sm font-medium text-foreground">{report.reason}</span>
       </TableCell>,
       <TableCell key="description">
-        <p className="text-sm line-clamp-2 max-w-md">{report.description}</p>
+        <p className="max-w-md text-sm text-default-600 line-clamp-2">{report.description}</p>
       </TableCell>,
       <TableCell key="status">
         {(report.status === 'open' || report.status === 'pending') && (
-          <Chip size="sm" color="warning" variant="flat">{"Pending"}</Chip>
+          <Chip size="sm" color="warning" variant="flat">{t('moderation.status_pending')}</Chip>
         )}
         {report.status === 'resolved' && (
-          <Chip size="sm" color="success" variant="flat">{"Resolved"}</Chip>
+          <Chip size="sm" color="success" variant="flat">{t('moderation.status_resolved')}</Chip>
         )}
         {report.status === 'dismissed' && (
-          <Chip size="sm" color="default" variant="flat">{"Dismissed"}</Chip>
+          <Chip size="sm" color="default" variant="flat">{t('moderation.status_dismissed')}</Chip>
         )}
       </TableCell>,
       <TableCell key="created">
@@ -236,7 +245,7 @@ export default function ReportsManagement() {
               startContent={<CheckCircle2 className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'resolve', report })}
             >
-              {"Resolve"}
+              {t('moderation.resolve')}
             </Button>
             <Button
               size="sm"
@@ -245,13 +254,13 @@ export default function ReportsManagement() {
               startContent={<XCircle className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'dismiss', report })}
             >
-              {"Dismiss"}
+              {t('moderation.dismiss')}
             </Button>
           </div>
         )}
         {report.status !== 'open' && report.status !== 'pending' && (
           <div className="text-sm text-default-400">
-            {report.resolved_by && `Resolved by`}
+            {report.resolved_by && t('moderation.resolved_by')}
           </div>
         )}
       </TableCell>
@@ -262,14 +271,31 @@ export default function ReportsManagement() {
 
   // Determine columns based on super admin status
   const columns = isSuperAdmin
-    ? ["Reporter", "Tenant", "Content Type", "Reason", "Description", "Status", "Created", "Actions"]
-    : ["Reporter", "Content Type", "Reason", "Description", "Status", "Created", "Actions"];
+    ? [
+      t('moderation.col_reporter'),
+      t('moderation.col_tenant'),
+      t('moderation.col_content_type'),
+      t('moderation.col_reason'),
+      t('moderation.col_description'),
+      t('moderation.col_status'),
+      t('moderation.col_created'),
+      t('moderation.col_actions'),
+    ]
+    : [
+      t('moderation.col_reporter'),
+      t('moderation.col_content_type'),
+      t('moderation.col_reason'),
+      t('moderation.col_description'),
+      t('moderation.col_status'),
+      t('moderation.col_created'),
+      t('moderation.col_actions'),
+    ];
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={"Reports Management"}
-        description={isSuperAdmin ? "Review content reports across all tenants" : "Review and resolve content reports submitted by members"}
+        title={t('moderation.reports_management_title')}
+        description={isSuperAdmin ? t('moderation.reports_desc_super') : t('moderation.reports_desc')}
         actions={
           <Button
             color="primary"
@@ -281,55 +307,55 @@ export default function ReportsManagement() {
             }}
             isLoading={isLoading}
           >
-            {"Refresh"}
+            {t('moderation.refresh')}
           </Button>
         }
       />
 
       {/* Stats Cards */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardBody className="flex flex-row items-center gap-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <Card shadow="sm" className="border border-default-200">
+            <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary-100 dark:bg-primary-900/30">
                 <Flag className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.total ?? ((stats.reports_pending ?? 0) + (stats.reports_resolved ?? 0) + (stats.reports_dismissed ?? 0))}</p>
-                <p className="text-sm text-default-500">{"Total Reports"}</p>
+                <p className="text-sm text-default-500">{t('moderation.total_reports')}</p>
               </div>
             </CardBody>
           </Card>
-          <Card>
-            <CardBody className="flex flex-row items-center gap-3">
+          <Card shadow="sm" className="border border-default-200">
+            <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-warning-100 dark:bg-warning-900/30">
                 <AlertCircle className="w-6 h-6 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.pending ?? stats.reports_pending ?? 0}</p>
-                <p className="text-sm text-default-500">{"Pending"}</p>
+                <p className="text-sm text-default-500">{t('moderation.status_pending')}</p>
               </div>
             </CardBody>
           </Card>
-          <Card>
-            <CardBody className="flex flex-row items-center gap-3">
+          <Card shadow="sm" className="border border-default-200">
+            <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-success-100 dark:bg-success-900/30">
                 <CheckCircle2 className="w-6 h-6 text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.resolved ?? stats.reports_resolved ?? 0}</p>
-                <p className="text-sm text-default-500">{"Resolved"}</p>
+                <p className="text-sm text-default-500">{t('moderation.status_resolved')}</p>
               </div>
             </CardBody>
           </Card>
-          <Card>
-            <CardBody className="flex flex-row items-center gap-3">
+          <Card shadow="sm" className="border border-default-200">
+            <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-default-100 dark:bg-default-900/30">
                 <XCircle className="w-6 h-6 text-default-500" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.dismissed ?? stats.reports_dismissed ?? 0}</p>
-                <p className="text-sm text-default-500">{"Dismissed"}</p>
+                <p className="text-sm text-default-500">{t('moderation.status_dismissed')}</p>
               </div>
             </CardBody>
           </Card>
@@ -337,84 +363,86 @@ export default function ReportsManagement() {
       )}
 
       {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <Input type="search" name="admin-search" autoComplete="off"
-          placeholder={"Search Reports..."}
-          aria-label={"Search Reports"}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          startContent={<Search className="w-4 h-4 text-default-400" />}
-          className="flex-1"
-        />
-        <Select
-          label={"Content Type"}
-          selectedKeys={typeFilter ? [typeFilter] : []}
-          onChange={(e) => setTypeFilter(e.target.value)}
-          className="w-full sm:w-48"
-        >
-          {CONTENT_TYPES.map((type) => (
-            <SelectItem key={type.value}>
-              {type.label}
-            </SelectItem>
-          ))}
-        </Select>
-        <Select
-          label={"Status"}
-          selectedKeys={statusFilter ? [statusFilter] : []}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="w-full sm:w-48"
-        >
-          {STATUS_FILTERS.map((status) => (
-            <SelectItem key={status.value}>
-              {status.label}
-            </SelectItem>
-          ))}
-        </Select>
-        {isSuperAdmin && (
+      <Card shadow="sm" className="border border-default-200">
+        <CardBody className="flex flex-col gap-3 p-4 lg:flex-row lg:items-end">
+          <Input type="search" name="admin-search" autoComplete="off"
+            placeholder={t('moderation.placeholder_search_reports')}
+            aria-label={t('moderation.label_search_reports')}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            startContent={<Search className="w-4 h-4 text-default-400" />}
+            className="w-full lg:flex-1"
+          />
           <Select
-            label={"Tenant"}
-            selectedKeys={tenantFilter ? [tenantFilter] : []}
-            onChange={(e) => setTenantFilter(e.target.value)}
-            className="w-full sm:w-56"
+            label={t('moderation.label_content_type')}
+            selectedKeys={typeFilter ? [typeFilter] : []}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="w-full lg:w-48"
           >
-            {[
-              <SelectItem key="all">{"All Tenants"}</SelectItem>,
-              ...tenants.map((t) => (
-                <SelectItem key={t.id.toString()}>
-                  {t.name}
-                </SelectItem>
-              )),
-            ]}
+            {CONTENT_TYPES.map((type) => (
+              <SelectItem key={type.value}>
+                {type.label}
+              </SelectItem>
+            ))}
           </Select>
-        )}
-        <div className="flex gap-2">
-          <Button color="primary" onPress={handleSearch}>
-            {"Apply"}
-          </Button>
-          <Button variant="flat" onPress={handleClear}>
-            {"Clear"}
-          </Button>
-        </div>
-      </div>
+          <Select
+            label={t('moderation.label_status')}
+            selectedKeys={statusFilter ? [statusFilter] : []}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full lg:w-48"
+          >
+            {STATUS_FILTERS.map((status) => (
+              <SelectItem key={status.value}>
+                {status.label}
+              </SelectItem>
+            ))}
+          </Select>
+          {isSuperAdmin && (
+            <Select
+              label={t('moderation.label_tenant')}
+              selectedKeys={tenantFilter ? [tenantFilter] : []}
+              onChange={(e) => setTenantFilter(e.target.value)}
+              className="w-full lg:w-56"
+            >
+              {[
+                <SelectItem key="all">{t('moderation.filter_all_tenants')}</SelectItem>,
+                ...tenants.map((tenant) => (
+                  <SelectItem key={tenant.id.toString()}>
+                    {tenant.name}
+                  </SelectItem>
+                )),
+              ]}
+            </Select>
+          )}
+          <div className="flex gap-2 lg:pb-0.5">
+            <Button color="primary" onPress={handleSearch}>
+              {t('moderation.apply')}
+            </Button>
+            <Button variant="flat" onPress={handleClear}>
+              {t('moderation.clear')}
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
 
       {/* Results Count */}
       {meta && (
         <div className="text-sm text-default-500">
-          {`Showing`}
-          {isSuperAdmin && !activeTenant && ` (${"All Tenants"})`}
+          {t('moderation.showing_count')}
+          {isSuperAdmin && !activeTenant && ` (${t('moderation.all_tenants')})`}
         </div>
       )}
 
       {/* Error State */}
       {error && (
         <div className="bg-danger-50 dark:bg-danger-950 text-danger border border-danger rounded-lg p-4">
-          {"Failed to load reports"}
+          {t('moderation.failed_to_load_reports')}
         </div>
       )}
 
       {/* Table */}
-      <Table aria-label={"Reports Table"}>
+      <Table aria-label={t('moderation.label_reports_table')} shadow="sm" isStriped>
         <TableHeader>
           {columns.map((col) => (
             <TableColumn key={col}>{col}</TableColumn>
@@ -427,8 +455,8 @@ export default function ReportsManagement() {
           emptyContent={
             <div className="text-center py-8 text-default-400">
               {activeSearch || activeType || activeStatus
-                ? "No reports match filters"
-                : "No reports to review"}
+                ? t('moderation.no_reports_match_filters')
+                : t('moderation.no_reports_to_review')}
             </div>
           }
         >
@@ -458,13 +486,13 @@ export default function ReportsManagement() {
         isOpen={!!confirmAction}
         onClose={() => setConfirmAction(null)}
         onConfirm={handleAction}
-        title={confirmAction?.type === 'resolve' ? "Resolve Report" : "Dismiss Report"}
+        title={confirmAction?.type === 'resolve' ? t('moderation.resolve_report') : t('moderation.dismiss_report')}
         message={
           confirmAction?.type === 'resolve'
-            ? `Are you sure you want to mark this report as resolved?`
-            : `Are you sure you want to dismiss this report?`
+            ? t('moderation.confirm_resolve_report')
+            : t('moderation.confirm_dismiss_report')
         }
-        confirmLabel={confirmAction?.type === 'resolve' ? "Resolve Report" : "Dismiss Report"}
+        confirmLabel={confirmAction?.type === 'resolve' ? t('moderation.resolve_report') : t('moderation.dismiss_report')}
         confirmColor={confirmAction?.type === 'resolve' ? 'primary' : 'warning'}
         isLoading={actionLoading}
       />

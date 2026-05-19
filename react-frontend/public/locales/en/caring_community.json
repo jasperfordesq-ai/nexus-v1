@@ -920,6 +920,8 @@
       "open": "Open",
       "report_title": "Report #{{id}}",
       "empty": "No safeguarding reports match these filters.",
+      "loading": "Loading safeguarding reports",
+      "loading_detail": "Loading safeguarding report details",
       "about": {
         "title": "About this page",
         "body": "This page manages formal safeguarding incidents: situations where a member's welfare, safety, or dignity may be at risk. Reports are submitted by members, coordinators, or administrators. All reports must be triaged within the SLA configured in Operating Policy. Critical and high severity reports require immediate attention. Reports are tenant-scoped and cannot be seen by other communities."
@@ -965,6 +967,7 @@
         "status": "Status",
         "assigned": "Assigned",
         "sla": "Service level agreement",
+        "sla_abbr": "SLA",
         "created": "Created",
         "actions": "Actions"
       },

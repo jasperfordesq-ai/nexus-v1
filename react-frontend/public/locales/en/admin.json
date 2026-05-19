@@ -5475,6 +5475,7 @@
     "report_resolved_successfully": "Report resolved successfully",
     "reports_desc": "Review and resolve content reports submitted by members",
     "reports_desc_super": "Review content reports across all tenants",
+    "reports_meta_description": "Review, resolve, and dismiss member-submitted moderation reports.",
     "reports_management_title": "Reports Management",
     "require_moderation_for": "Require Moderation for",
     "resolve": "Resolve",
@@ -5495,6 +5496,8 @@
     "status_resolved": "Resolved",
     "total_reports": "Total Reports",
     "untitled": "Untitled",
+    "unknown_tenant": "Unknown tenant",
+    "member_id": "ID: {{id}}",
     "visible": "Visible",
     "all_status": "All Status",
     "all_types": "All Types",
@@ -10083,15 +10086,204 @@
       }
     },
     "trust_tier": {
+      "title": "Trust Tier Configuration",
+      "subtitle": "Set the criteria thresholds for each trust level. Changes apply on the next recompute run.",
+      "loading": "Loading trust tier configuration",
+      "recompute_hint": "Use recompute when thresholds change and existing members need to be re-evaluated immediately. Runs in the background and may take 30-60 seconds.",
+      "meta": {
+        "title": "Trust Tier Configuration",
+        "description": "Configure trust tier thresholds, recompute member tiers, and review what each tier unlocks."
+      },
+      "actions": {
+        "recompute": "Recompute all tiers",
+        "save": "Save configuration"
+      },
+      "about": {
+        "title": "About this page",
+        "body": "Trust tiers are a reputation ladder that unlocks privileges as members become more active and verified. Members advance automatically when they meet the criteria thresholds below. Use recompute to force an immediate recalculation for all members. Tier progression affects the Warmth Pass, coordinator eligibility, and visibility in the member directory."
+      },
+      "criteria": {
+        "title": "Tier criteria thresholds"
+      },
+      "fields": {
+        "hours_logged": "Hours logged (minimum)",
+        "reviews_received": "Reviews received (minimum)",
+        "identity_verified": "Require identity verified"
+      },
+      "tiers": {
+        "member": {
+          "label": "Member",
+          "description": "Basic community member with at least 1 hour logged."
+        },
+        "trusted": {
+          "label": "Trusted",
+          "description": "Active member with several hours and reviews."
+        },
+        "verified": {
+          "label": "Verified",
+          "description": "Trusted member with confirmed identity."
+        },
+        "coordinator": {
+          "label": "Coordinator",
+          "description": "Highly active verified member eligible to coordinate."
+        }
+      },
+      "reference": {
+        "title": "Tier reference",
+        "aria": "Trust tier reference",
+        "columns": {
+          "tier": "Tier",
+          "level": "Level",
+          "color": "Color",
+          "description": "Description",
+          "unlocks": "What it unlocks"
+        },
+        "rows": {
+          "0": {
+            "name": "Newcomer",
+            "color": "Grey",
+            "description": "Just joined, no activity required.",
+            "unlocks": "Basic member access."
+          },
+          "1": {
+            "name": "Member",
+            "color": "Blue",
+            "description": "Has logged hours.",
+            "unlocks": "Can post help listings and receive care hours."
+          },
+          "2": {
+            "name": "Trusted",
+            "color": "Green",
+            "description": "Active with reviews.",
+            "unlocks": "Eligible for Warmth Pass and can be recommended for care."
+          },
+          "3": {
+            "name": "Verified",
+            "color": "Purple",
+            "description": "Identity verified.",
+            "unlocks": "Full care coordinator visibility and identity badge."
+          },
+          "4": {
+            "name": "Coordinator",
+            "color": "Amber",
+            "description": "Highly active with verified identity.",
+            "unlocks": "Eligible to approve hours and coordinate matches."
+          }
+        }
+      },
       "errors": {
+        "load_failed": "Failed to load trust tier configuration.",
         "recompute_failed": "Failed to recompute trust tiers.",
         "save_failed": "Failed to save trust tier settings."
       },
       "messages": {
-        "recomputed": "Trust tiers recomputed.",
-        "saved": "Trust tier settings saved."
+        "recomputed": "Trust tiers recomputed for {{count}} members.",
+        "saved": "Trust tier configuration saved. Changes apply on the next recompute run."
       },
       "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes."
+    },
+    "operating_policy": {
+      "title": "Operating Policy",
+      "subtitle": "KISS operating-policy workshop: rules software cannot guess.",
+      "loading": "Loading operating policy",
+      "last_updated": "Last updated {{date}}",
+      "meta": {
+        "title": "Operating Policy",
+        "description": "Configure approval, safeguarding, SLA, and social-value policy rules for the care programme."
+      },
+      "actions": {
+        "refresh": "Refresh",
+        "save": "Save changes"
+      },
+      "about": {
+        "title": "About this page",
+        "body": "Operating Policy defines the rules of your community care programme: who can approve hours, how quickly coordinators must respond, how social value is calculated, and what the reporting cycle looks like. Configure this before launching the pilot. Changes take effect immediately and are logged for audit purposes.",
+        "methodology_prefix": "The",
+        "methodology_middle": "hourly rate and prevention multiplier fields use the",
+        "methodology_suffix": "methodology (Koordination und Innovation fur Soziales, Schwyz) developed with Age-Stiftung. If you are not running a Swiss KISS/",
+        "methodology_tail": "pilot, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0."
+      },
+      "sections": {
+        "approvals": "Approvals and trust",
+        "sla": "SLA windows",
+        "hours": "Hour management",
+        "safeguarding": "Safeguarding",
+        "social_value": "social-value methodology",
+        "appendix": "Pilot policy appendix"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "Approval authority",
+          "help": "Who may finalise approved hours: tenant admin, coordinators, or both parties by mutual approval."
+        },
+        "trusted_reviewer_threshold": {
+          "label": "Trusted-reviewer threshold (hours logged)",
+          "help": "Minimum approved hours before a member becomes a trusted reviewer or reaches Trusted tier."
+        },
+        "sla_first_response_hours": {
+          "label": "SLA: first response (hours)",
+          "help": "Target time to first response on a new help request."
+        },
+        "sla_help_request_hours": {
+          "label": "SLA: help-request resolution (hours)",
+          "help": "Target time to close or match a help request."
+        },
+        "legacy_hour_settlement": {
+          "label": "Legacy-hour settlement policy",
+          "help": "How a deceased member's remaining hours are settled."
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "Reciprocal-balance intervention threshold (hours)",
+          "help": "When a member's give/receive imbalance triggers a coordinator check-in."
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "Safeguarding escalation owner (user ID)",
+          "help": "User ID receiving safeguarding escalations. Leave blank to use admins as a group."
+        },
+        "chf_hourly_rate": {
+          "label": "CHF social value per hour",
+          "help": "CHF value per care hour for ROI reporting using the Swiss formal-care assistant rate."
+        },
+        "chf_prevention_multiplier": {
+          "label": "CHF prevention multiplier",
+          "help": "Multiplier applied to formal-care offset for the Age-Stiftung and KISS methodology."
+        },
+        "statement_cadence": {
+          "label": "Member statement cadence",
+          "help": "How often members receive a per-member hour statement."
+        },
+        "policy_appendix_url": {
+          "label": "Signed policy appendix URL",
+          "help": "Paste the public URL of the signed policy agreement between your cooperative and the municipality. This appears in audit reports and the municipal reporting pack."
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "Admin",
+          "coordinator": "Coordinator",
+          "mutual": "Mutual"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "Donate to pool",
+          "expire": "Expire",
+          "transfer_to_nominee": "Transfer to nominee"
+        },
+        "statement_cadence": {
+          "monthly": "Monthly",
+          "quarterly": "Quarterly",
+          "annual": "Annual"
+        }
+      },
+      "placeholders": {
+        "url": "https://..."
+      },
+      "errors": {
+        "load_failed": "Failed to load operating policy.",
+        "save_failed": "Failed to save operating policy."
+      },
+      "messages": {
+        "saved": "Operating policy saved. Changes apply to all new exchanges immediately."
+      }
     },
     "warmth_pass": {
       "title": "Warmth Pass",

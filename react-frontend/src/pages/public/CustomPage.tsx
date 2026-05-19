@@ -110,6 +110,9 @@ export function CustomPage() {
       <PageMeta
         title={page.title}
         description={page.meta_description || undefined}
+        type="article"
+        publishedTime={page.created_at}
+        modifiedTime={page.updated_at || page.created_at}
       />
 
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">

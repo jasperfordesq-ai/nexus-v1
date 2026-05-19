@@ -36,6 +36,7 @@ import TriangleAlert from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { Abbr, PageHeader } from '../../components';
 
 type Severity = 'low' | 'medium' | 'high' | 'critical';
@@ -97,6 +98,10 @@ const ALL_SEVERITIES: Severity[] = ['critical', 'high', 'medium', 'low'];
 export default function SafeguardingReportsAdminPage(): JSX.Element {
   const { t } = useTranslation('caring_community');
   usePageTitle(t('admin.safeguarding_reports.meta_title'));
+  useAdminPageMeta({
+    title: t('admin.safeguarding_reports.meta_title'),
+    description: t('admin.safeguarding_reports.subtitle'),
+  });
   const { showToast } = useToast();
 
   const [reports, setReports] = useState<Report[]>([]);
@@ -256,6 +261,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
       <PageHeader
         title={t('admin.safeguarding_reports.title')}
         description={t('admin.safeguarding_reports.subtitle')}
+        icon={<TriangleAlert size={20} />}
       />
 
       {/* About card */}
@@ -375,7 +381,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
         <CardBody>
           {loading ? (
             <div className="flex justify-center py-12">
-              <Spinner />
+              <Spinner label={t('admin.safeguarding_reports.loading')} />
             </div>
           ) : reports.length === 0 ? (
             <p className="py-10 text-center text-sm text-default-500">
@@ -390,7 +396,11 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                 <TableColumn>{t('admin.safeguarding_reports.table.subject')}</TableColumn>
                 <TableColumn>{t('admin.safeguarding_reports.table.status')}</TableColumn>
                 <TableColumn>{t('admin.safeguarding_reports.table.assigned')}</TableColumn>
-                <TableColumn><Abbr term={t('admin.safeguarding_reports.table.sla')}>SLA</Abbr></TableColumn>
+                <TableColumn>
+                  <Abbr term={t('admin.safeguarding_reports.table.sla')}>
+                    {t('admin.safeguarding_reports.table.sla_abbr')}
+                  </Abbr>
+                </TableColumn>
                 <TableColumn>{t('admin.safeguarding_reports.table.created')}</TableColumn>
                 <TableColumn>{t('admin.safeguarding_reports.table.actions')}</TableColumn>
               </TableHeader>
@@ -444,7 +454,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
           <ModalBody>
             {detailLoading || !detail ? (
               <div className="flex justify-center py-12">
-                <Spinner />
+                <Spinner label={t('admin.safeguarding_reports.loading_detail')} />
               </div>
             ) : (
               <div className="space-y-5">

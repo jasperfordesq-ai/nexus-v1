@@ -13,6 +13,12 @@ import {
   Input,
   Spinner,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
 } from '@heroui/react';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -23,10 +29,8 @@ import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { useApi } from '@/hooks/useApi';
 import api from '@/lib/api';
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+import { useAdminPageMeta } from '../../AdminMetaContext';
+import { PageHeader } from '../../components';
 
 interface TierCriteria {
   hours_logged: number;
@@ -40,22 +44,8 @@ interface TierConfigResponse {
   criteria: Record<TierName, TierCriteria>;
 }
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const TIER_DISPLAY: Record<TierName, { label: string; description: string }> = {
-  member:      { label: 'Member',      description: 'Basic community member with at least 1 hour logged' },
-  trusted:     { label: 'Trusted',     description: 'Active member with several hours and reviews' },
-  verified:    { label: 'Verified',    description: 'Trusted member with confirmed identity' },
-  coordinator: { label: 'Coordinator', description: 'Highly active verified member eligible to coordinate' },
-};
-
 const TIER_ORDER: TierName[] = ['member', 'trusted', 'verified', 'coordinator'];
-
-// ---------------------------------------------------------------------------
-// Sub-component
-// ---------------------------------------------------------------------------
+const TIER_REFERENCE_LEVELS = [0, 1, 2, 3, 4] as const;
 
 interface TierRowProps {
   tierName: TierName;
@@ -64,18 +54,18 @@ interface TierRowProps {
 }
 
 function TierRow({ tierName, criteria, onChange }: TierRowProps) {
-  const { label, description } = TIER_DISPLAY[tierName];
+  const { t } = useTranslation('admin');
 
   return (
     <div className="space-y-3">
       <div>
-        <p className="font-semibold text-sm">{label}</p>
-        <p className="text-xs text-foreground-500">{description}</p>
+        <p className="font-semibold text-sm">{t(`admin.trust_tier.tiers.${tierName}.label`)}</p>
+        <p className="text-xs text-foreground-500">{t(`admin.trust_tier.tiers.${tierName}.description`)}</p>
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Input
           type="number"
-          label="Hours logged (min)"
+          label={t('admin.trust_tier.fields.hours_logged')}
           value={String(criteria.hours_logged)}
           min={0}
           onValueChange={(v) => onChange(tierName, 'hours_logged', Math.max(0, parseInt(v || '0', 10)))}
@@ -84,7 +74,7 @@ function TierRow({ tierName, criteria, onChange }: TierRowProps) {
         />
         <Input
           type="number"
-          label="Reviews received (min)"
+          label={t('admin.trust_tier.fields.reviews_received')}
           value={String(criteria.reviews_received)}
           min={0}
           onValueChange={(v) => onChange(tierName, 'reviews_received', Math.max(0, parseInt(v || '0', 10)))}
@@ -96,22 +86,22 @@ function TierRow({ tierName, criteria, onChange }: TierRowProps) {
             isSelected={criteria.identity_verified}
             onValueChange={(checked) => onChange(tierName, 'identity_verified', checked)}
             size="sm"
-            aria-label="Require identity verified"
+            aria-label={t('admin.trust_tier.fields.identity_verified')}
           />
-          <span className="text-sm">Require identity verified</span>
+          <span className="text-sm">{t('admin.trust_tier.fields.identity_verified')}</span>
         </div>
       </div>
     </div>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
-
 export function TrustTierAdminPage() {
-  const { t } = useTranslation('caring_community');
+  const { t } = useTranslation('admin');
   usePageTitle(t('panel.sidebar.items.trust_tier'));
+  useAdminPageMeta({
+    title: t('admin.trust_tier.meta.title'),
+    description: t('admin.trust_tier.meta.description'),
+  });
   const { showToast } = useToast();
 
   const { data, isLoading, error, refetch } = useApi<TierConfigResponse>(
@@ -123,7 +113,6 @@ export function TrustTierAdminPage() {
   const [saving, setSaving] = useState(false);
   const [recomputing, setRecomputing] = useState(false);
 
-  // Use local edits if present, otherwise fall back to server data
   const criteria = localCriteria ?? data?.criteria ?? null;
 
   function handleChange(tierName: TierName, field: keyof TierCriteria, value: number | boolean) {
@@ -173,88 +162,72 @@ export function TrustTierAdminPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <ShieldCheck className="h-6 w-6 text-primary" aria-hidden="true" />
-          <div>
-            <h1 className="text-xl font-bold">Trust Tier Configuration</h1>
-            <p className="text-sm text-foreground-500">
-              Set criteria thresholds for each trust level. Changes apply on next recompute.
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <div className="flex flex-col items-end gap-1">
+      <PageHeader
+        title={t('admin.trust_tier.title')}
+        description={t('admin.trust_tier.subtitle')}
+        icon={<ShieldCheck size={20} />}
+        actions={
+          <div className="flex flex-wrap items-start gap-2 sm:justify-end">
+            <div className="flex flex-col items-end gap-1">
+              <Button
+                color="default"
+                variant="bordered"
+                size="sm"
+                startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
+                onPress={() => void handleRecompute()}
+                isLoading={recomputing}
+                isDisabled={recomputing || saving}
+              >
+                {t('admin.trust_tier.actions.recompute')}
+              </Button>
+              <p className="max-w-xs text-right text-xs text-foreground-400">
+                {t('admin.trust_tier.recompute_hint')}
+              </p>
+            </div>
             <Button
-              color="default"
-              variant="bordered"
+              color="primary"
               size="sm"
-              startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
-              onPress={() => void handleRecompute()}
-              isLoading={recomputing}
-              isDisabled={recomputing || saving}
+              startContent={<Save className="h-4 w-4" aria-hidden="true" />}
+              onPress={() => void handleSave()}
+              isLoading={saving}
+              isDisabled={saving || recomputing || !localCriteria}
             >
-              Recompute All Tiers
+              {t('admin.trust_tier.actions.save')}
             </Button>
-            <p className="text-xs text-foreground-400 max-w-xs text-right">
-              Use Recompute when you change thresholds and want existing members re-evaluated immediately.
-              Runs in the background — may take 30–60 seconds.
-            </p>
           </div>
-          <Button
-            color="primary"
-            size="sm"
-            startContent={<Save className="h-4 w-4" aria-hidden="true" />}
-            onPress={() => void handleSave()}
-            isLoading={saving}
-            isDisabled={saving || recomputing || !localCriteria}
-          >
-            Save Configuration
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
-      {/* About card */}
       <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
-              <p className="text-default-600">
-                Trust Tiers are a reputation ladder that unlocks privileges as members become more active and verified.
-                Members advance automatically when they meet the criteria thresholds below — no manual action required
-                unless you run "Recompute All Tiers" to force an immediate recalculation for all members. Tier
-                progression affects the Warmth Pass (Trusted tier and above), coordinator eligibility (Coordinator
-                tier), and visibility in the member directory.
-              </p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('admin.trust_tier.about.title')}</p>
+              <p className="text-default-600">{t('admin.trust_tier.about.body')}</p>
             </div>
           </div>
         </CardBody>
       </Card>
 
-      {/* Loading */}
       {isLoading && (
         <div className="flex justify-center py-12">
-          <Spinner size="lg" />
+          <Spinner size="lg" label={t('admin.trust_tier.loading')} />
         </div>
       )}
 
-      {/* Error */}
       {!isLoading && error && (
         <Card>
           <CardBody>
-            <p className="text-danger text-sm">Failed to load trust tier configuration.</p>
+            <p className="text-danger text-sm">{t('admin.trust_tier.errors.load_failed')}</p>
           </CardBody>
         </Card>
       )}
 
-      {/* Tier criteria cards */}
       {!isLoading && !error && criteria && (
         <Card>
           <CardHeader>
-            <p className="font-semibold text-sm">Tier Criteria Thresholds</p>
+            <p className="font-semibold text-sm">{t('admin.trust_tier.criteria.title')}</p>
           </CardHeader>
           <Divider />
           <CardBody className="space-y-6 p-6">
@@ -272,41 +245,32 @@ export function TrustTierAdminPage() {
         </Card>
       )}
 
-      {/* Tier reference table */}
       <Card>
         <CardHeader>
-          <p className="font-semibold text-sm">Tier Reference</p>
+          <p className="font-semibold text-sm">{t('admin.trust_tier.reference.title')}</p>
         </CardHeader>
         <Divider />
         <CardBody className="p-0">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-divider bg-content2">
-                <th className="px-4 py-3 text-left font-semibold">Tier</th>
-                <th className="px-4 py-3 text-left font-semibold">Level</th>
-                <th className="px-4 py-3 text-left font-semibold">Color</th>
-                <th className="px-4 py-3 text-left font-semibold">Description</th>
-                <th className="px-4 py-3 text-left font-semibold">What it unlocks</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { level: 0, name: 'Newcomer',    color: 'Grey',   desc: 'Just joined, no activity required',      unlocks: 'Basic member access' },
-                { level: 1, name: 'Member',      color: 'Blue',   desc: 'Has logged hours',                        unlocks: 'Can post help listings, receive care hours' },
-                { level: 2, name: 'Trusted',     color: 'Green',  desc: 'Active with reviews',                     unlocks: 'Eligible for Warmth Pass, can be recommended for care' },
-                { level: 3, name: 'Verified',    color: 'Purple', desc: 'Identity verified',                       unlocks: 'Full care coordinator visibility, identity badge' },
-                { level: 4, name: 'Coordinator', color: 'Amber',  desc: 'Highly active, verified identity',        unlocks: 'Eligible to approve hours and coordinate matches' },
-              ].map((row) => (
-                <tr key={row.level} className="border-b border-divider last:border-0">
-                  <td className="px-4 py-3 font-mono text-xs">{row.level}</td>
-                  <td className="px-4 py-3 font-medium">{row.name}</td>
-                  <td className="px-4 py-3 text-foreground-500">{row.color}</td>
-                  <td className="px-4 py-3 text-foreground-500">{row.desc}</td>
-                  <td className="px-4 py-3 text-foreground-500">{row.unlocks}</td>
-                </tr>
+          <Table aria-label={t('admin.trust_tier.reference.aria')} removeWrapper>
+            <TableHeader>
+              <TableColumn>{t('admin.trust_tier.reference.columns.tier')}</TableColumn>
+              <TableColumn>{t('admin.trust_tier.reference.columns.level')}</TableColumn>
+              <TableColumn>{t('admin.trust_tier.reference.columns.color')}</TableColumn>
+              <TableColumn>{t('admin.trust_tier.reference.columns.description')}</TableColumn>
+              <TableColumn>{t('admin.trust_tier.reference.columns.unlocks')}</TableColumn>
+            </TableHeader>
+            <TableBody>
+              {TIER_REFERENCE_LEVELS.map((level) => (
+                <TableRow key={level}>
+                  <TableCell className="font-mono text-xs">{level}</TableCell>
+                  <TableCell className="font-medium">{t(`admin.trust_tier.reference.rows.${level}.name`)}</TableCell>
+                  <TableCell className="text-foreground-500">{t(`admin.trust_tier.reference.rows.${level}.color`)}</TableCell>
+                  <TableCell className="text-foreground-500">{t(`admin.trust_tier.reference.rows.${level}.description`)}</TableCell>
+                  <TableCell className="text-foreground-500">{t(`admin.trust_tier.reference.rows.${level}.unlocks`)}</TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </CardBody>
       </Card>
     </div>

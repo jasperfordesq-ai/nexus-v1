@@ -50,6 +50,7 @@ import Download from 'lucide-react/icons/download';
 import MapPin from 'lucide-react/icons/map-pin';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 
 // ─── Types ────────────────────────────────────────────────────────────────
@@ -115,7 +116,7 @@ function bucketToNumber(b: string | null): number {
 
 export default function PartnerDashboardPage() {
   const { t } = useTranslation('common');
-  usePageTitle('Regional Analytics');
+  usePageTitle(t('regional_analytics.partner_dashboard_title', 'Regional Analytics'));
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') ?? '';
 
@@ -173,58 +174,77 @@ export default function PartnerDashboardPage() {
     [data?.enabled_modules],
   );
 
+  const pageMeta = (
+    <PageMeta
+      title={t('regional_analytics.partner_dashboard_title', 'Regional Analytics')}
+      description={t('regional_analytics.partner_dashboard_meta_description', 'Private regional analytics dashboard for authorised partners.')}
+      noIndex
+    />
+  );
+
   if (!token) {
     return (
-      <div className="max-w-3xl mx-auto p-8">
-        <Card>
-          <CardBody className="text-center p-10">
-            <h1 className="text-xl font-semibold mb-2">
-              {t('partner_analytics.no_token_title', 'Subscription token required')}
-            </h1>
-            <p className="text-[var(--color-text-muted)]">
-              {t(
-                'partner_analytics.no_token_body',
-                'Please use the secure link supplied by your account manager. The link includes a unique subscription token.',
-              )}
-            </p>
-          </CardBody>
-        </Card>
-      </div>
+      <>
+        {pageMeta}
+        <div className="max-w-3xl mx-auto p-8">
+          <Card>
+            <CardBody className="text-center p-10">
+              <h1 className="text-xl font-semibold mb-2">
+                {t('partner_analytics.no_token_title', 'Subscription token required')}
+              </h1>
+              <p className="text-[var(--color-text-muted)]">
+                {t(
+                  'partner_analytics.no_token_body',
+                  'Please use the secure link supplied by your account manager. The link includes a unique subscription token.',
+                )}
+              </p>
+            </CardBody>
+          </Card>
+        </div>
+      </>
     );
   }
 
   if (loading) {
     return (
-      <div className="flex justify-center p-20">
-        <Spinner />
-      </div>
+      <>
+        {pageMeta}
+        <div className="flex justify-center p-20">
+          <Spinner />
+        </div>
+      </>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="max-w-3xl mx-auto p-8">
-        <Card>
-          <CardBody className="text-center p-10">
-            <h1 className="text-xl font-semibold mb-2">
-              {t('partner_analytics.error_title', 'Unable to load analytics')}
-            </h1>
-            <p className="text-[var(--color-text-muted)]">
-              {error === 'unauthorized'
-                ? t('partner_analytics.error_unauthorized', 'Your subscription token is invalid or expired.')
-                : t('partner_analytics.error_generic', 'Something went wrong fetching your analytics. Please retry.')}
-            </p>
-            <Button color="primary" className="mt-4" onPress={() => void load()}>
-              {t('partner_analytics.retry', 'Retry')}
-            </Button>
-          </CardBody>
-        </Card>
-      </div>
+      <>
+        {pageMeta}
+        <div className="max-w-3xl mx-auto p-8">
+          <Card>
+            <CardBody className="text-center p-10">
+              <h1 className="text-xl font-semibold mb-2">
+                {t('partner_analytics.error_title', 'Unable to load analytics')}
+              </h1>
+              <p className="text-[var(--color-text-muted)]">
+                {error === 'unauthorized'
+                  ? t('partner_analytics.error_unauthorized', 'Your subscription token is invalid or expired.')
+                  : t('partner_analytics.error_generic', 'Something went wrong fetching your analytics. Please retry.')}
+              </p>
+              <Button color="primary" className="mt-4" onPress={() => void load()}>
+                {t('partner_analytics.retry', 'Retry')}
+              </Button>
+            </CardBody>
+          </Card>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
+    <>
+      {pageMeta}
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-semibold flex items-center gap-2">
@@ -321,7 +341,8 @@ export default function PartnerDashboardPage() {
           'All metrics are bucketed and anonymised. Segments with N<10 are suppressed.',
         )}
       </p>
-    </div>
+      </div>
+    </>
   );
 }
 

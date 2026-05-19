@@ -79,6 +79,7 @@ PUBLIC_ROUTES=(
     "/platform/privacy"
     "/platform/disclaimer"
     "/resources"
+    "/kb"
     "/features"
     "/changelog"
     # Feature-gated public discovery routes. These were missing from the

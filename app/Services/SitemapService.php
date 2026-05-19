@@ -324,6 +324,13 @@ class SitemapService
         // Timebanking guide (public educational content)
         $urls[] = $this->url($baseUrl, '/timebanking-guide', $now, 'monthly', '0.5');
         $urls[] = $this->url($baseUrl, '/regional-analytics', $now, 'monthly', '0.5');
+        $urls[] = $this->url($baseUrl, '/features', $now, 'monthly', '0.5');
+        $urls[] = $this->url($baseUrl, '/changelog', $now, 'weekly', '0.4');
+
+        // Public Partner API developer documentation.
+        foreach (['developers', 'developers/auth', 'developers/endpoints', 'developers/webhooks'] as $page) {
+            $urls[] = $this->url($baseUrl, "/{$page}", $now, 'monthly', '0.5');
+        }
 
         // NOTE: /members and /leaderboard are PROTECTED routes (require auth).
         // Do NOT add them to the sitemap — crawlers cannot access them.

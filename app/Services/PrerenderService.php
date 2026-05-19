@@ -57,8 +57,8 @@ class PrerenderService
         '/legal', '/terms/versions', '/privacy/versions', '/accessibility/versions',
         '/cookies/versions', '/community-guidelines/versions', '/acceptable-use/versions',
         '/timebanking-guide', '/regional-analytics', '/platform/terms', '/platform/privacy',
-        '/platform/disclaimer', '/resources', '/features', '/changelog',
-        '/events', '/groups', '/jobs', '/marketplace', '/volunteering',
+        '/platform/disclaimer', '/resources', '/kb', '/features', '/changelog',
+        '/events', '/groups', '/jobs', '/coupons', '/marketplace', '/volunteering',
         '/pilot-inquiry', '/pilot-apply', '/developers', '/developers/auth',
         '/developers/endpoints', '/developers/webhooks',
         '/partner', '/social-prescribing', '/impact-report',
@@ -722,7 +722,13 @@ class PrerenderService
      */
     public function invalidateRoutes(int $tenantId, array $routes, bool $enqueueRecache = true): int
     {
-        $routes = array_values(array_unique(array_filter($routes, fn($r) => is_string($r) && $r !== '' && $r[0] === '/')));
+        $routes = array_values(array_unique(array_filter(
+            $routes,
+            fn($r) => is_string($r)
+                && $r !== ''
+                && $r[0] === '/'
+                && !$this->isUnsupportedPublicRoute($r)
+        )));
         if (empty($routes)) return 0;
 
         // Resolve tenant host + prefix.
@@ -1491,7 +1497,7 @@ class PrerenderService
         static $prefixes = [
             '/blog/', '/listings/', '/events/', '/jobs/', '/marketplace/',
             '/marketplace/category/', '/groups/', '/volunteering/',
-            '/volunteering/opportunities/', '/resources/', '/organisations/',
+            '/volunteering/opportunities/', '/organisations/',
             '/ideation/', '/kb/', '/page/',
         ];
         foreach ($prefixes as $p) {
@@ -1500,6 +1506,14 @@ class PrerenderService
             }
         }
         return false;
+    }
+
+    private function isUnsupportedPublicRoute(string $route): bool
+    {
+        // React has a public /resources listing and /resources/{id}/download API,
+        // but no visible /resources/{id} page. Keep resource changes scoped to
+        // the listing snapshot instead of queuing snapshots that can only 404.
+        return (bool) preg_match('#^/resources/[^/]+$#', $route);
     }
 
     private function frontendHost(): string
