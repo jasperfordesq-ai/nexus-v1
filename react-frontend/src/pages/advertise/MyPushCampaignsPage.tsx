@@ -28,6 +28,12 @@ import {
   ModalFooter,
   useDisclosure,
   Spinner,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
 } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import BellRing from 'lucide-react/icons/bell-ring';
@@ -84,6 +90,16 @@ const STATUS_COLOR: Record<CampaignStatus, 'default' | 'primary' | 'success' | '
   cancelled: 'default',
   failed: 'danger',
 };
+
+function formatDateTime(value: string): string {
+  return new Intl.DateTimeFormat(undefined, {
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(value));
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
@@ -252,48 +268,42 @@ export function MyPushCampaignsPage() {
             </Button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-divider text-left text-default-400 text-xs uppercase tracking-wider">
-                  <th className="px-4 py-3">{t('push_campaign.col_name')}</th>
-                  <th className="px-4 py-3">{t('push_campaign.col_title')}</th>
-                  <th className="px-4 py-3">{t('push_campaign.col_status')}</th>
-                  <th className="px-4 py-3">{t('push_campaign.col_scheduled')}</th>
-                  <th className="px-4 py-3">{t('push_campaign.col_radius')}</th>
-                  <th className="px-4 py-3">{t('push_campaign.col_trust_tier')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {campaigns.map((campaign) => (
-                  <tr key={campaign.id} className="border-b border-divider/50 hover:bg-default-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-theme-primary">{campaign.name}</td>
-                    <td className="px-4 py-3 text-default-600 max-w-[200px] truncate">{campaign.title}</td>
-                    <td className="px-4 py-3">
-                      <Chip
-                        size="sm"
-                        color={STATUS_COLOR[campaign.status] ?? 'default'}
-                        variant="flat"
-                      >
-                        {t(`push_campaign.status_${campaign.status}`)}
-                      </Chip>
-                    </td>
-                    <td className="px-4 py-3 text-default-500 whitespace-nowrap">
-                      {campaign.schedule_at
-                        ? new Date(campaign.schedule_at).toLocaleString()
-                        : '—'}
-                    </td>
-                    <td className="px-4 py-3 text-default-500">
-                      {campaign.audience_radius_km ? `${campaign.audience_radius_km} km` : '—'}
-                    </td>
-                    <td className="px-4 py-3 text-default-500 capitalize">
-                      {t(`push_campaign.tier_${campaign.audience_min_trust_tier}`)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table aria-label={t('push_campaign.table_aria')} removeWrapper>
+            <TableHeader>
+              <TableColumn>{t('push_campaign.col_name')}</TableColumn>
+              <TableColumn>{t('push_campaign.col_title')}</TableColumn>
+              <TableColumn>{t('push_campaign.col_status')}</TableColumn>
+              <TableColumn>{t('push_campaign.col_scheduled')}</TableColumn>
+              <TableColumn>{t('push_campaign.col_radius')}</TableColumn>
+              <TableColumn>{t('push_campaign.col_trust_tier')}</TableColumn>
+            </TableHeader>
+            <TableBody>
+              {campaigns.map((campaign) => (
+                <TableRow key={campaign.id}>
+                  <TableCell className="font-medium text-theme-primary">{campaign.name}</TableCell>
+                  <TableCell className="text-default-600 max-w-[200px] truncate">{campaign.title}</TableCell>
+                  <TableCell>
+                    <Chip
+                      size="sm"
+                      color={STATUS_COLOR[campaign.status] ?? 'default'}
+                      variant="flat"
+                    >
+                      {t(`push_campaign.status_${campaign.status}`)}
+                    </Chip>
+                  </TableCell>
+                  <TableCell className="text-default-500 whitespace-nowrap">
+                    {campaign.schedule_at ? formatDateTime(campaign.schedule_at) : t('empty_dash')}
+                  </TableCell>
+                  <TableCell className="text-default-500">
+                    {campaign.audience_radius_km ? t('push_campaign.radius_km', { radius: campaign.audience_radius_km }) : t('empty_dash')}
+                  </TableCell>
+                  <TableCell className="text-default-500 capitalize">
+                    {t(`push_campaign.tier_${campaign.audience_min_trust_tier}`)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
       </GlassCard>
 
