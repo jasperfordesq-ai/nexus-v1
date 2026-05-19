@@ -13,6 +13,8 @@ import { Link } from 'react-router-dom';
 import {
   Button,
   Chip,
+  Select,
+  SelectItem,
   Tabs,
   Tab,
   Card,
@@ -84,7 +86,7 @@ export default function BookmarksPage() {
   const { t } = useTranslation('social');
   const { tenantPath } = useTenant();
   const toast = useToast();
-  usePageTitle(t('bookmarks.page_title', 'Saved'));
+  usePageTitle(t('bookmarks.page_title'));
 
   const [activeTab, setActiveTab] = useState<ContentTab>('all');
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
@@ -101,6 +103,13 @@ export default function BookmarksPage() {
   const [newCollDesc, setNewCollDesc] = useState('');
   const [editingColl, setEditingColl] = useState<BookmarkCollectionData | null>(null);
   const [collSaving, setCollSaving] = useState(false);
+  const [deletingColl, setDeletingColl] = useState<BookmarkCollectionData | null>(null);
+  const [collDeleting, setCollDeleting] = useState(false);
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose,
+  } = useDisclosure();
 
   const loadBookmarks = useCallback(async (p = 1, type?: ContentTab, collId?: number | null) => {
     setLoading(true);
@@ -148,11 +157,11 @@ export default function BookmarksPage() {
       if (res.success) {
         setBookmarks((prev) => prev.filter((b) => b.id !== bookmark.id));
         setTotal((prev) => prev - 1);
-        toast.success(t('bookmarks.removed', 'Removed from saved'));
+        toast.success(t('bookmarks.removed'));
       }
     } catch (err) {
       logError('Failed to remove bookmark', err);
-      toast.error(t('bookmarks.remove_failed', 'Failed to remove'));
+      toast.error(t('bookmarks.remove_failed'));
     }
   };
 
@@ -166,13 +175,13 @@ export default function BookmarksPage() {
           name: newCollName.trim(),
           description: newCollDesc.trim() || null,
         });
-        toast.success(t('bookmarks.collection_updated', 'Collection updated'));
+        toast.success(t('bookmarks.collection_updated'));
       } else {
         await api.post('/v2/bookmark-collections', {
           name: newCollName.trim(),
           description: newCollDesc.trim() || null,
         });
-        toast.success(t('bookmarks.collection_created', 'Collection created'));
+        toast.success(t('bookmarks.collection_created'));
       }
       onCreateClose();
       setNewCollName('');
@@ -181,23 +190,32 @@ export default function BookmarksPage() {
       loadCollections();
     } catch (err) {
       logError('Failed to save collection', err);
-      toast.error(t('bookmarks.collection_save_failed', 'Failed to save collection'));
+      toast.error(t('bookmarks.collection_save_failed'));
     } finally {
       setCollSaving(false);
     }
   };
 
-  const handleDeleteCollection = async (coll: BookmarkCollectionData) => {
-    if (!window.confirm(t('bookmarks.delete_collection_confirm', 'Delete this collection? Bookmarks will be kept.'))) return;
+  const openDeleteCollection = (coll: BookmarkCollectionData) => {
+    setDeletingColl(coll);
+    onDeleteOpen();
+  };
 
+  const handleDeleteCollection = async () => {
+    if (!deletingColl) return;
+    setCollDeleting(true);
     try {
-      await api.delete(`/v2/bookmark-collections/${coll.id}`);
-      toast.success(t('bookmarks.collection_deleted', 'Collection deleted'));
-      if (selectedCollection === coll.id) setSelectedCollection(null);
+      await api.delete(`/v2/bookmark-collections/${deletingColl.id}`);
+      toast.success(t('bookmarks.collection_deleted'));
+      if (selectedCollection === deletingColl.id) setSelectedCollection(null);
+      onDeleteClose();
+      setDeletingColl(null);
       loadCollections();
     } catch (err) {
       logError('Failed to delete collection', err);
-      toast.error(t('bookmarks.collection_delete_failed', 'Failed to delete collection'));
+      toast.error(t('bookmarks.collection_delete_failed'));
+    } finally {
+      setCollDeleting(false);
     }
   };
 
@@ -216,12 +234,12 @@ export default function BookmarksPage() {
 
   const getTypeLabel = (type: string): string => {
     const labels: Record<string, string> = {
-      post: t('bookmarks.type_post', 'Post'),
-      listing: t('bookmarks.type_listing', 'Listing'),
-      event: t('bookmarks.type_event', 'Event'),
-      job: t('bookmarks.type_job', 'Job'),
-      blog: t('bookmarks.type_blog', 'Blog'),
-      discussion: t('bookmarks.type_discussion', 'Discussion'),
+      post: t('bookmarks.type_post'),
+      listing: t('bookmarks.type_listing'),
+      event: t('bookmarks.type_event'),
+      job: t('bookmarks.type_job'),
+      blog: t('bookmarks.type_blog'),
+      discussion: t('bookmarks.type_discussion'),
     };
     return labels[type] || type;
   };
@@ -240,50 +258,57 @@ export default function BookmarksPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-      <PageMeta title={t('bookmarks.page_title', 'Saved')} noIndex />
+      <PageMeta
+        title={t('bookmarks.page_title')}
+        description={t('bookmarks.meta_description')}
+        noIndex
+      />
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
             <Bookmark className="w-6 h-6 text-[var(--color-warning)]" aria-hidden="true" />
-            {t('bookmarks.title', 'Saved Items')}
+            {t('bookmarks.title')}
           </h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">
-            {t('bookmarks.subtitle', 'Your bookmarked content, organized your way.')}
+            {t('bookmarks.subtitle')}
           </p>
         </div>
         <Button
           color="primary"
           variant="flat"
           size="sm"
+          className="w-full sm:w-auto"
           startContent={<FolderPlus className="w-4 h-4" aria-hidden="true" />}
           onPress={onCreateOpen}
         >
-          {t('bookmarks.new_collection', 'New Collection')}
+          {t('bookmarks.new_collection')}
         </Button>
       </div>
 
       {/* Collections Bar */}
       {collections.length > 0 && (
-        <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2">
-          <Chip
-            variant={selectedCollection === null ? 'solid' : 'bordered'}
-            color="primary"
-            className="cursor-pointer shrink-0"
-            onClick={() => setSelectedCollection(null)}
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+          <Select
+            label={t('bookmarks.collection_filter_label')}
+            aria-label={t('bookmarks.collection_filter_label')}
+            selectedKeys={new Set([selectedCollection === null ? 'all' : String(selectedCollection)])}
+            onSelectionChange={(keys) => {
+              const key = Array.from(keys as Set<string>)[0];
+              setSelectedCollection(key === 'all' ? null : Number(key));
+            }}
+            className="w-full sm:max-w-xs"
+            size="sm"
           >
-            {t('bookmarks.all_items', 'All')}
-          </Chip>
+            <SelectItem key="all">{t('bookmarks.all_items')}</SelectItem>
+            {collections.map((coll) => (
+              <SelectItem key={String(coll.id)}>
+                {coll.name} {coll.bookmarks_count != null && `(${coll.bookmarks_count})`}
+              </SelectItem>
+            ))}
+          </Select>
           {collections.map((coll) => (
             <div key={coll.id} className="flex items-center gap-1 shrink-0">
-              <Chip
-                variant={selectedCollection === coll.id ? 'solid' : 'bordered'}
-                color="primary"
-                className="cursor-pointer"
-                onClick={() => setSelectedCollection(selectedCollection === coll.id ? null : coll.id)}
-              >
-                {coll.name} {coll.bookmarks_count != null && `(${coll.bookmarks_count})`}
-              </Chip>
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
                   <Button
@@ -291,7 +316,7 @@ export default function BookmarksPage() {
                     size="sm"
                     variant="light"
                     className="min-w-0 w-6 h-6"
-                    aria-label={t('bookmarks.collection_actions', 'Collection actions')}
+                    aria-label={t('bookmarks.collection_actions_named', { name: coll.name })}
                   >
                     <MoreHorizontal className="w-3 h-3" />
                   </Button>
@@ -307,16 +332,16 @@ export default function BookmarksPage() {
                       onCreateOpen();
                     }}
                   >
-                    {t('bookmarks.edit_collection', 'Edit')}
+                    {t('bookmarks.edit_collection')}
                   </DropdownItem>
                   <DropdownItem
                     key="delete"
                     startContent={<Trash2 className="w-3.5 h-3.5" />}
                     className="text-danger"
                     color="danger"
-                    onPress={() => handleDeleteCollection(coll)}
+                    onPress={() => openDeleteCollection(coll)}
                   >
-                    {t('bookmarks.delete_collection', 'Delete')}
+                    {t('bookmarks.delete_collection')}
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
@@ -333,7 +358,7 @@ export default function BookmarksPage() {
         classNames={{ tabList: 'gap-1', tab: 'text-sm' }}
         className="mb-6"
       >
-        {(['all', 'post', 'listing', 'event', 'job', 'blog'] as ContentTab[]).map((tab) => {
+        {(['all', 'post', 'listing', 'event', 'job', 'blog', 'discussion'] as ContentTab[]).map((tab) => {
           const Icon = TAB_ICONS[tab];
           return (
             <Tab
@@ -341,7 +366,7 @@ export default function BookmarksPage() {
               title={
                 <div className="flex items-center gap-1.5">
                   <Icon className="w-4 h-4" aria-hidden="true" />
-                  {tab === 'all' ? t('bookmarks.tab_all', 'All') : getTypeLabel(tab)}
+                  {tab === 'all' ? t('bookmarks.tab_all') : getTypeLabel(tab)}
                 </div>
               }
             />
@@ -352,7 +377,7 @@ export default function BookmarksPage() {
       {/* Count */}
       {!loading && (
         <p className="text-xs text-[var(--text-muted)] mb-4">
-          {t('bookmarks.count', '{{count}} saved items', { count: total })}
+          {t('bookmarks.count', { count: total })}
         </p>
       )}
 
@@ -365,10 +390,10 @@ export default function BookmarksPage() {
         <GlassCard className="text-center py-16">
           <Inbox className="w-12 h-12 mx-auto text-[var(--text-subtle)] mb-4" aria-hidden="true" />
           <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
-            {t('bookmarks.empty_title', 'No saved items yet')}
+            {t('bookmarks.empty_title')}
           </h3>
           <p className="text-sm text-[var(--text-muted)] max-w-sm mx-auto">
-            {t('bookmarks.empty_desc', 'Tap the bookmark icon on posts, listings, events, and more to save them here.')}
+            {t('bookmarks.empty_desc')}
           </p>
         </GlassCard>
       ) : (
@@ -397,7 +422,7 @@ export default function BookmarksPage() {
                     variant="light"
                     className="text-[var(--text-muted)] hover:text-danger shrink-0"
                     onPress={() => handleRemoveBookmark(bookmark)}
-                    aria-label={t('bookmarks.remove', 'Remove from saved')}
+                    aria-label={t('bookmarks.remove')}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -414,7 +439,7 @@ export default function BookmarksPage() {
                 onPress={() => loadBookmarks(page + 1, activeTab, selectedCollection)}
                 isLoading={loading}
               >
-                {t('bookmarks.load_more', 'Load More')}
+                {t('bookmarks.load_more')}
               </Button>
             </div>
           )}
@@ -426,13 +451,13 @@ export default function BookmarksPage() {
         <ModalContent>
           <ModalHeader>
             {editingColl
-              ? t('bookmarks.edit_collection_title', 'Edit Collection')
-              : t('bookmarks.create_collection_title', 'Create Collection')
+              ? t('bookmarks.edit_collection_title')
+              : t('bookmarks.create_collection_title')
             }
           </ModalHeader>
           <ModalBody>
             <Input
-              label={t('bookmarks.collection_name', 'Name')}
+              label={t('bookmarks.collection_name')}
               value={newCollName}
               onChange={(e) => setNewCollName(e.target.value)}
               maxLength={100}
@@ -440,7 +465,7 @@ export default function BookmarksPage() {
               variant="bordered"
             />
             <Input
-              label={t('bookmarks.collection_description', 'Description (optional)')}
+              label={t('bookmarks.collection_description')}
               value={newCollDesc}
               onChange={(e) => setNewCollDesc(e.target.value)}
               variant="bordered"
@@ -448,7 +473,7 @@ export default function BookmarksPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={() => { onCreateClose(); setEditingColl(null); }}>
-              {t('bookmarks.cancel', 'Cancel')}
+              {t('bookmarks.cancel')}
             </Button>
             <Button
               color="primary"
@@ -456,7 +481,41 @@ export default function BookmarksPage() {
               isLoading={collSaving}
               isDisabled={!newCollName.trim()}
             >
-              {editingColl ? t('bookmarks.save', 'Save') : t('bookmarks.create', 'Create')}
+              {editingColl ? t('bookmarks.save') : t('bookmarks.create')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Collection Modal */}
+      <Modal
+        isOpen={isDeleteOpen}
+        onClose={() => {
+          onDeleteClose();
+          setDeletingColl(null);
+        }}
+        size="sm"
+      >
+        <ModalContent>
+          <ModalHeader>{t('bookmarks.delete_collection_title')}</ModalHeader>
+          <ModalBody>
+            <p className="text-sm text-[var(--text-secondary)]">
+              {t('bookmarks.delete_collection_body', { name: deletingColl?.name ?? '' })}
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="light"
+              onPress={() => {
+                onDeleteClose();
+                setDeletingColl(null);
+              }}
+              isDisabled={collDeleting}
+            >
+              {t('bookmarks.cancel')}
+            </Button>
+            <Button color="danger" onPress={handleDeleteCollection} isLoading={collDeleting}>
+              {t('bookmarks.delete_collection_action')}
             </Button>
           </ModalFooter>
         </ModalContent>
