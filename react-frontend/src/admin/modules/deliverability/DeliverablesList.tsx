@@ -17,10 +17,11 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import Pencil from 'lucide-react/icons/pencil';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useNavigate } from 'react-router-dom';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { adminDeliverability } from '../../api/adminApi';
 import { PageHeader, DataTable, StatusBadge, EmptyState, ConfirmModal, type Column } from '../../components';
+import { useTranslation } from 'react-i18next';
 
 interface DeliverableItem {
   id: number;
@@ -34,7 +35,8 @@ interface DeliverableItem {
 }
 
 export function DeliverablesList() {
-  usePageTitle("Deliverability");
+  const { t: tNav } = useTranslation('admin_nav');
+  useAdminPageMeta({ title: tNav('deliverability') });
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();

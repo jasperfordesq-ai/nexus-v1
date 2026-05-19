@@ -24,7 +24,7 @@ import ChevronRight from 'lucide-react/icons/chevron-right';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Download from 'lucide-react/icons/download';
 import Tag from 'lucide-react/icons/tag';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
 import { adminCrm } from '../../api/adminApi';
@@ -53,8 +53,9 @@ const QUICK_ACTIONS = [
 ] as const;
 
 export function CrmDashboard() {
+  const { t: tNav } = useTranslation('admin_nav');
   const { t } = useTranslation('admin');
-  usePageTitle("CRM");
+  useAdminPageMeta({ title: tNav('crm') });
   const { tenantPath } = useTenant();
   const toast = useToast();
 

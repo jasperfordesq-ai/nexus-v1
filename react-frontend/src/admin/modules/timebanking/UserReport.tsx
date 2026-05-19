@@ -19,15 +19,17 @@ import Users from 'lucide-react/icons/users';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Download from 'lucide-react/icons/download';
 import PlusCircle from 'lucide-react/icons/circle-plus';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { UserFinancialReport as UserFinancialReportType } from '../../api/types';
+import { useTranslation } from 'react-i18next';
 
 export function UserReport() {
-  usePageTitle("Timebanking");
+  const { t: tNav } = useTranslation('admin_nav');
+  useAdminPageMeta({ title: tNav('timebanking') });
   const { tenantPath } = useTenant();
   const toast = useToast();
 

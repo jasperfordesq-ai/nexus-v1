@@ -25,7 +25,7 @@ import FileText from 'lucide-react/icons/file-text';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useSearchParams, Link } from 'react-router-dom';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
 import { PageHeader, MemberSearchPicker, type MemberSearchMember } from '../../components';
@@ -119,7 +119,7 @@ function formatDateTime(dateStr: string): string {
   });
 }
 
-function formatRelativeTime(dateStr: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
+function formatRelativeTime(dateStr: string): string {
   const now = new Date();
   const date = new Date(dateStr);
   const diffMs = now.getTime() - date.getTime();
@@ -135,8 +135,9 @@ function formatRelativeTime(dateStr: string, t: (key: string, opts?: Record<stri
 }
 
 export function ActivityTimeline() {
+  const { t: tNav } = useTranslation('admin_nav');
   const { t } = useTranslation('admin');
-  usePageTitle("CRM");
+  useAdminPageMeta({ title: tNav('crm') });
   const { tenantPath } = useTenant();
   const [searchParams] = useSearchParams();
 
@@ -361,7 +362,7 @@ export function ActivityTimeline() {
                         {/* Right: timestamp */}
                         <div className="text-right shrink-0">
                           <p className="text-xs text-default-400 whitespace-nowrap" title={formatDateTime(entry.created_at)}>
-                            {formatRelativeTime(entry.created_at, (key, opts) => t(key, opts))}
+                            {formatRelativeTime(entry.created_at)}
                           </p>
                           <p className="text-xs text-default-300 mt-0.5">
                             #{entry.user_id}

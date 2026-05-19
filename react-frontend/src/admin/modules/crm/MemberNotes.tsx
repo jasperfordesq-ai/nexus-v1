@@ -25,7 +25,7 @@ import Filter from 'lucide-react/icons/filter';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Search from 'lucide-react/icons/search';
 import { useSearchParams, Link } from 'react-router-dom';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
 import { PageHeader, ConfirmModal, MemberSearchPicker, type MemberSearchMember } from '../../components';
@@ -76,8 +76,9 @@ const CATEGORY_COLORS: Record<string, 'default' | 'primary' | 'warning' | 'succe
 const ITEMS_PER_PAGE = 20;
 
 export function MemberNotes() {
+  const { t: tNav } = useTranslation('admin_nav');
   const { t } = useTranslation('admin');
-  usePageTitle("CRM");
+  useAdminPageMeta({ title: tNav('crm') });
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams] = useSearchParams();

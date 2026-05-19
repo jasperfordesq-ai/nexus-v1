@@ -27,7 +27,7 @@ import Edit3 from 'lucide-react/icons/pen-line';
 import User from 'lucide-react/icons/user';
 import Search from 'lucide-react/icons/search';
 import { Link } from 'react-router-dom';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
 import { PageHeader, MemberSearchPicker, type MemberSearchMember } from '../../components';
@@ -115,7 +115,8 @@ function formatDateTime(dateStr: string): string {
 
 export default function CoordinatorTasks() {
   const { t } = useTranslation('admin');
-  usePageTitle("CRM");
+  const { t: tNav } = useTranslation('admin_nav');
+  useAdminPageMeta({ title: tNav('crm') });
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -300,7 +301,7 @@ export default function CoordinatorTasks() {
     <div className="max-w-6xl mx-auto space-y-6">
       <PageHeader
         title={"Coordinator Tasks"}
-        description={`Tasks Total`}
+        description={`${total} Tasks Total`}
         actions={
           <Button color="primary" startContent={<Plus className="w-4 h-4" />} onPress={openCreate}>
             {"Create Task"}

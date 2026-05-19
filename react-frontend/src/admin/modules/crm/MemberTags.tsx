@@ -24,7 +24,7 @@ import Users from 'lucide-react/icons/users';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
 import { PageHeader, ConfirmModal, MemberSearchPicker, type MemberSearchMember } from '../../components';
@@ -48,8 +48,9 @@ interface TagSummary {
 type ViewMode = 'summary' | 'members';
 
 export function MemberTags() {
+  const { t: tNav } = useTranslation('admin_nav');
   const { t } = useTranslation('admin');
-  usePageTitle("CRM");
+  useAdminPageMeta({ title: tNav('crm') });
   const { tenantPath } = useTenant();
   const toast = useToast();
 

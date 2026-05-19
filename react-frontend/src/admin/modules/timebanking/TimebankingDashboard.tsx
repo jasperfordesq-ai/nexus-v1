@@ -20,14 +20,16 @@ import Users from 'lucide-react/icons/users';
 import Building2 from 'lucide-react/icons/building-2';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ChevronRight from 'lucide-react/icons/chevron-right';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant } from '@/contexts';
 import { adminTimebanking } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { TimebankingStats } from '../../api/types';
+import { useTranslation } from 'react-i18next';
 
 export function TimebankingDashboard() {
-  usePageTitle("Timebanking");
+  const { t: tNav } = useTranslation('admin_nav');
+  useAdminPageMeta({ title: tNav('timebanking') });
   const { tenantPath } = useTenant();
 
   const [stats, setStats] = useState<TimebankingStats | null>(null);

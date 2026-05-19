@@ -15,10 +15,11 @@ import Target from 'lucide-react/icons/target';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import { useNavigate, useParams } from 'react-router-dom';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { adminDeliverability } from '../../api/adminApi';
 import { PageHeader } from '../../components';
+import { useTranslation } from 'react-i18next';
 
 interface DeliverableFormData {
   title: string;
@@ -30,7 +31,8 @@ interface DeliverableFormData {
 }
 
 export function EditDeliverable() {
-  usePageTitle("Edit");
+  const { t: tNav } = useTranslation('admin_nav');
+  useAdminPageMeta({ title: tNav('deliverability') });
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();

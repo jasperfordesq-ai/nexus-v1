@@ -34,7 +34,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
 import { useTranslation } from 'react-i18next';
@@ -213,7 +213,8 @@ function SnapshotCard({ eyebrow, value, body, accentClassName }: SnapshotCardPro
 
 export default function OnboardingFunnel() {
   const { t } = useTranslation('admin');
-  usePageTitle("CRM");
+  const { t: tNav } = useTranslation('admin_nav');
+  useAdminPageMeta({ title: tNav('crm') });
 
   const toast = useToast();
   const { tenantPath } = useTenant();

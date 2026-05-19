@@ -25,11 +25,12 @@ import Plus from 'lucide-react/icons/plus';
 import History from 'lucide-react/icons/history';
 import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useToast } from '@/contexts';
 import { adminUsers, adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { AdminUser, WalletGrant } from '../../api/types';
+import { useTranslation } from 'react-i18next';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Member Search + Grant Form
@@ -369,7 +370,8 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function StartingBalances() {
-  usePageTitle("Timebanking");
+  const { t: tNav } = useTranslation('admin_nav');
+  useAdminPageMeta({ title: tNav('timebanking') });
 
   // Key to trigger grant history refresh after new grant
   const [refreshKey, setRefreshKey] = useState(0);

@@ -15,10 +15,11 @@ import BarChart3 from 'lucide-react/icons/chart-column';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Clock from 'lucide-react/icons/clock';
 import TrendingUp from 'lucide-react/icons/trending-up';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useToast } from '@/contexts';
 import { adminDeliverability } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
+import { useTranslation } from 'react-i18next';
 
 interface AnalyticsData {
   completion_trends: Array<{ date: string; count: number }>;
@@ -28,7 +29,8 @@ interface AnalyticsData {
 }
 
 export function DeliverabilityAnalytics() {
-  usePageTitle("Deliverability");
+  const { t: tNav } = useTranslation('admin_nav');
+  useAdminPageMeta({ title: tNav('deliverability') });
   const toast = useToast();
 
   const [data, setData] = useState<AnalyticsData | null>(null);

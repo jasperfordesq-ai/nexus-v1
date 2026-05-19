@@ -24,7 +24,7 @@ import {
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
-import { usePageTitle } from '@/hooks';
+import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
@@ -48,8 +48,9 @@ const STATUS_COLOR_MAP: Record<string, 'default' | 'primary' | 'success' | 'warn
 const STATUS_TAB_KEYS = ['all', 'new', 'reviewing', 'resolved', 'dismissed'] as const;
 
 export function FraudAlerts() {
+  const { t: tNav } = useTranslation('admin_nav');
   const { t } = useTranslation('admin');
-  usePageTitle("Timebanking");
+  useAdminPageMeta({ title: tNav('timebanking') });
   const { tenantPath } = useTenant();
   const toast = useToast();
 
