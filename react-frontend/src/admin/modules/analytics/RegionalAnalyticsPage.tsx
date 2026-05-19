@@ -25,6 +25,12 @@ import {
   Tabs,
   Tab,
   Spinner,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
 } from '@heroui/react';
 import Map from 'lucide-react/icons/map';
 import TrendingUp from 'lucide-react/icons/trending-up';
@@ -186,37 +192,33 @@ function HeatmapTab({ data, t }: { data: HeatmapCell[]; t: AdminT }) {
       <p className="text-sm text-default-500">
         {t('analytics.regional.heatmap.description')}
       </p>
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-sm">
-          <thead>
-            <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-              <th className="pb-2 pr-4">{t('analytics.regional.columns.rank')}</th>
-              <th className="pb-2 pr-4">{t('analytics.regional.columns.latitude')}</th>
-              <th className="pb-2 pr-4">{t('analytics.regional.columns.longitude')}</th>
-              <th className="pb-2 pr-4">{t('analytics.regional.columns.members')}</th>
-              <th className="pb-2">{t('analytics.regional.columns.density')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {top10.map((cell, i) => {
-              const barWidth = Math.round((cell.count / maxCount) * 100);
-              return (
-                <tr key={i} className="border-b border-divider/50">
-                  <td className="py-2 pr-4 text-default-400">{i + 1}</td>
-                  <td className="py-2 pr-4 font-mono">{cell.lat.toFixed(2)}</td>
-                  <td className="py-2 pr-4 font-mono">{cell.lng.toFixed(2)}</td>
-                  <td className="py-2 pr-4 font-semibold">{cell.count}</td>
-                  <td className="py-2">
-                    <div className="h-3 w-32 rounded-full bg-default-100">
-                      <div className="h-full rounded-full bg-primary" style={{ width: `${barWidth}%` }} />
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      <Table aria-label={t('analytics.regional.sections.geographic_activity_density')} removeWrapper>
+        <TableHeader>
+          <TableColumn>{t('analytics.regional.columns.rank')}</TableColumn>
+          <TableColumn>{t('analytics.regional.columns.latitude')}</TableColumn>
+          <TableColumn>{t('analytics.regional.columns.longitude')}</TableColumn>
+          <TableColumn>{t('analytics.regional.columns.members')}</TableColumn>
+          <TableColumn>{t('analytics.regional.columns.density')}</TableColumn>
+        </TableHeader>
+        <TableBody>
+          {top10.map((cell, i) => {
+            const barWidth = Math.round((cell.count / maxCount) * 100);
+            return (
+              <TableRow key={`${cell.lat}-${cell.lng}-${i}`}>
+                <TableCell className="text-default-400">{i + 1}</TableCell>
+                <TableCell className="font-mono">{cell.lat.toFixed(2)}</TableCell>
+                <TableCell className="font-mono">{cell.lng.toFixed(2)}</TableCell>
+                <TableCell className="font-semibold">{cell.count}</TableCell>
+                <TableCell>
+                  <div className="h-3 w-32 rounded-full bg-default-100">
+                    <div className="h-full rounded-full bg-primary" style={{ width: `${barWidth}%` }} />
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
       {data.length === 0 && (
         <p className="text-sm text-default-400">{t('analytics.regional.empty.no_geographic_data')}</p>
       )}
@@ -277,26 +279,22 @@ function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
           <h3 className="text-base font-semibold">{t('analytics.regional.demographics.member_growth_12m')}</h3>
         </CardHeader>
         <CardBody>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-                  <th className="pb-2 pr-6">{t('analytics.regional.columns.month')}</th>
-                  <th className="pb-2 pr-6">{t('analytics.regional.columns.new_members')}</th>
-                  <th className="pb-2">{t('analytics.regional.columns.cumulative_total')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.monthly_growth.map((row) => (
-                  <tr key={row.month} className="border-b border-divider/50">
-                    <td className="py-2 pr-6 font-mono">{row.month}</td>
-                    <td className="py-2 pr-6 font-semibold text-success">{row.new_members.toLocaleString()}</td>
-                    <td className="py-2 text-default-600">{row.cumulative.toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table aria-label={t('analytics.regional.demographics.member_growth_12m')} removeWrapper>
+            <TableHeader>
+              <TableColumn>{t('analytics.regional.columns.month')}</TableColumn>
+              <TableColumn>{t('analytics.regional.columns.new_members')}</TableColumn>
+              <TableColumn>{t('analytics.regional.columns.cumulative_total')}</TableColumn>
+            </TableHeader>
+            <TableBody>
+              {data.monthly_growth.map((row) => (
+                <TableRow key={row.month}>
+                  <TableCell className="font-mono">{row.month}</TableCell>
+                  <TableCell className="font-semibold text-success">{row.new_members.toLocaleString()}</TableCell>
+                  <TableCell className="text-default-600">{row.cumulative.toLocaleString()}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardBody>
       </Card>
     </div>
@@ -305,24 +303,22 @@ function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
 
 function DemandSupplyTab({ data, t }: { data: DemandSupplyRow[]; t: AdminT }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full text-sm">
-        <thead>
-          <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-            <th className="pb-2 pr-4">{t('analytics.regional.columns.category')}</th>
-            <th className="pb-2 pr-4">{t('analytics.regional.columns.requests')}</th>
-            <th className="pb-2 pr-4">{t('analytics.regional.columns.offers')}</th>
-            <th className="pb-2 pr-4">{t('analytics.regional.columns.ratio')}</th>
-            <th className="pb-2">{t('analytics.regional.columns.trend')}</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div>
+      <Table aria-label={t('analytics.regional.sections.demand_supply_by_category')} removeWrapper>
+        <TableHeader>
+          <TableColumn>{t('analytics.regional.columns.category')}</TableColumn>
+          <TableColumn>{t('analytics.regional.columns.requests')}</TableColumn>
+          <TableColumn>{t('analytics.regional.columns.offers')}</TableColumn>
+          <TableColumn>{t('analytics.regional.columns.ratio')}</TableColumn>
+          <TableColumn>{t('analytics.regional.columns.trend')}</TableColumn>
+        </TableHeader>
+        <TableBody>
           {data.map((row) => (
-            <tr key={row.category_id} className="border-b border-divider/50">
-              <td className="py-2 pr-4 font-medium">{row.category_name}</td>
-              <td className="py-2 pr-4">{row.request_count.toLocaleString()}</td>
-              <td className="py-2 pr-4">{row.offer_count.toLocaleString()}</td>
-              <td className="py-2 pr-4">
+            <TableRow key={row.category_id}>
+              <TableCell className="font-medium">{row.category_name}</TableCell>
+              <TableCell>{row.request_count.toLocaleString()}</TableCell>
+              <TableCell>{row.offer_count.toLocaleString()}</TableCell>
+              <TableCell>
                 <Chip
                   size="sm"
                   color={row.ratio >= 2 ? 'danger' : row.ratio >= 1 ? 'warning' : 'success'}
@@ -330,12 +326,12 @@ function DemandSupplyTab({ data, t }: { data: DemandSupplyRow[]; t: AdminT }) {
                 >
                   {row.ratio === 999 ? t('analytics.regional.empty.infinity') : row.ratio.toFixed(2)}
                 </Chip>
-              </td>
-              <td className="py-2 text-lg">{row.trend}</td>
-            </tr>
+              </TableCell>
+              <TableCell className="text-lg">{row.trend}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
       {data.length === 0 && (
         <p className="mt-4 text-sm text-default-400">{t('analytics.regional.empty.no_listing_data')}</p>
       )}
@@ -347,41 +343,39 @@ function EngagementTab({ data, t }: { data: EngagementRow[]; t: AdminT }) {
   const maxActive = Math.max(...data.map((r) => r.active_members), 1);
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full text-sm">
-        <thead>
-          <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-            <th className="pb-2 pr-4">{t('analytics.regional.columns.month')}</th>
-            <th className="pb-2 pr-4">{t('analytics.regional.columns.active_members')}</th>
-            <th className="pb-2 pr-4">{t('analytics.regional.columns.vol_hours')}</th>
-            <th className="pb-2 pr-4">{t('analytics.regional.columns.new_listings')}</th>
-            <th className="pb-2 pr-4">{t('analytics.regional.columns.new_events')}</th>
-            <th className="pb-2">{t('analytics.regional.columns.help_requests')}</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div>
+      <Table aria-label={t('analytics.regional.sections.monthly_engagement_metrics')} removeWrapper>
+        <TableHeader>
+          <TableColumn>{t('analytics.regional.columns.month')}</TableColumn>
+          <TableColumn>{t('analytics.regional.columns.active_members')}</TableColumn>
+          <TableColumn>{t('analytics.regional.columns.vol_hours')}</TableColumn>
+          <TableColumn>{t('analytics.regional.columns.new_listings')}</TableColumn>
+          <TableColumn>{t('analytics.regional.columns.new_events')}</TableColumn>
+          <TableColumn>{t('analytics.regional.columns.help_requests')}</TableColumn>
+        </TableHeader>
+        <TableBody>
           {data.map((row) => {
             const barWidth = Math.round((row.active_members / maxActive) * 80);
             return (
-              <tr key={row.month} className="border-b border-divider/50">
-                <td className="py-2 pr-4 font-mono">{row.month}</td>
-                <td className="py-2 pr-4">
+              <TableRow key={row.month}>
+                <TableCell className="font-mono">{row.month}</TableCell>
+                <TableCell>
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-20 rounded-full bg-default-100">
                       <div className="h-full rounded-full bg-primary" style={{ width: `${barWidth}%` }} />
                     </div>
                     <span className="font-semibold">{row.active_members.toLocaleString()}</span>
                   </div>
-                </td>
-                <td className="py-2 pr-4">{row.vol_hours.toLocaleString()}</td>
-                <td className="py-2 pr-4">{row.new_listings.toLocaleString()}</td>
-                <td className="py-2 pr-4">{row.new_events.toLocaleString()}</td>
-                <td className="py-2">{row.help_requests.toLocaleString()}</td>
-              </tr>
+                </TableCell>
+                <TableCell>{row.vol_hours.toLocaleString()}</TableCell>
+                <TableCell>{row.new_listings.toLocaleString()}</TableCell>
+                <TableCell>{row.new_events.toLocaleString()}</TableCell>
+                <TableCell>{row.help_requests.toLocaleString()}</TableCell>
+              </TableRow>
             );
           })}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
       {data.length === 0 && (
         <p className="mt-4 text-sm text-default-400">{t('analytics.regional.empty.no_engagement_data')}</p>
       )}
@@ -420,27 +414,25 @@ function VolunteerTab({ data, t }: { data: VolunteerData; t: AdminT }) {
       {/* Top orgs table */}
       <div>
         <h3 className="mb-3 text-sm font-semibold text-default-600">{t('analytics.regional.volunteer.top_orgs_title')}</h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-                <th className="pb-2 pr-4">{t('analytics.regional.columns.rank')}</th>
-                <th className="pb-2 pr-4">{t('analytics.regional.columns.organisation')}</th>
-                <th className="pb-2 pr-4">{t('analytics.regional.volunteer.total_hours')}</th>
-                <th className="pb-2">{t('analytics.regional.columns.volunteers')}</th>
-              </tr>
-            </thead>
-            <tbody>
+        <div>
+          <Table aria-label={t('analytics.regional.volunteer.top_orgs_title')} removeWrapper>
+            <TableHeader>
+              <TableColumn>{t('analytics.regional.columns.rank')}</TableColumn>
+              <TableColumn>{t('analytics.regional.columns.organisation')}</TableColumn>
+              <TableColumn>{t('analytics.regional.volunteer.total_hours')}</TableColumn>
+              <TableColumn>{t('analytics.regional.columns.volunteers')}</TableColumn>
+            </TableHeader>
+            <TableBody>
               {data.top_orgs.map((org, i) => (
-                <tr key={org.org_id} className="border-b border-divider/50">
-                  <td className="py-2 pr-4 text-default-400">{i + 1}</td>
-                  <td className="py-2 pr-4 font-medium">{org.org_name}</td>
-                  <td className="py-2 pr-4 font-semibold">{org.total_hours.toLocaleString()}</td>
-                  <td className="py-2">{org.volunteers.toLocaleString()}</td>
-                </tr>
+                <TableRow key={org.org_id}>
+                  <TableCell className="text-default-400">{i + 1}</TableCell>
+                  <TableCell className="font-medium">{org.org_name}</TableCell>
+                  <TableCell className="font-semibold">{org.total_hours.toLocaleString()}</TableCell>
+                  <TableCell>{org.volunteers.toLocaleString()}</TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
           {data.top_orgs.length === 0 && (
             <p className="mt-4 text-sm text-default-400">{t('analytics.regional.empty.no_organisation_data')}</p>
           )}
@@ -456,24 +448,22 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
       {/* By category */}
       <div>
         <h3 className="mb-3 text-sm font-semibold text-default-600">{t('analytics.regional.help.by_category')}</h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-                <th className="pb-2 pr-4">{t('analytics.regional.columns.category')}</th>
-                <th className="pb-2 pr-4">{t('analytics.regional.columns.total')}</th>
-                <th className="pb-2 pr-4">{t('analytics.regional.columns.resolved')}</th>
-                <th className="pb-2 pr-4">{t('analytics.regional.columns.resolution_rate')}</th>
-                <th className="pb-2">{t('analytics.regional.columns.avg_days_to_resolve')}</th>
-              </tr>
-            </thead>
-            <tbody>
+        <div>
+          <Table aria-label={t('analytics.regional.help.by_category')} removeWrapper>
+            <TableHeader>
+              <TableColumn>{t('analytics.regional.columns.category')}</TableColumn>
+              <TableColumn>{t('analytics.regional.columns.total')}</TableColumn>
+              <TableColumn>{t('analytics.regional.columns.resolved')}</TableColumn>
+              <TableColumn>{t('analytics.regional.columns.resolution_rate')}</TableColumn>
+              <TableColumn>{t('analytics.regional.columns.avg_days_to_resolve')}</TableColumn>
+            </TableHeader>
+            <TableBody>
               {data.by_category.map((row) => (
-                <tr key={row.category} className="border-b border-divider/50">
-                  <td className="py-2 pr-4 font-medium capitalize">{row.category}</td>
-                  <td className="py-2 pr-4">{row.total.toLocaleString()}</td>
-                  <td className="py-2 pr-4">{row.resolved_count.toLocaleString()}</td>
-                  <td className="py-2 pr-4">
+                <TableRow key={row.category}>
+                  <TableCell className="font-medium capitalize">{row.category}</TableCell>
+                  <TableCell>{row.total.toLocaleString()}</TableCell>
+                  <TableCell>{row.resolved_count.toLocaleString()}</TableCell>
+                  <TableCell>
                     <Chip
                       size="sm"
                       color={row.resolution_rate >= 70 ? 'success' : row.resolution_rate >= 40 ? 'warning' : 'danger'}
@@ -481,16 +471,16 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
                     >
                       {row.resolution_rate}%
                     </Chip>
-                  </td>
-                  <td className="py-2">
+                  </TableCell>
+                  <TableCell>
                     {row.avg_resolution_days != null
                       ? t('analytics.regional.units.days_count', { count: row.avg_resolution_days })
                       : t('analytics.regional.empty_value')}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
           {data.by_category.length === 0 && (
             <p className="mt-4 text-sm text-default-400">{t('analytics.regional.empty.no_help_request_data')}</p>
           )}
@@ -500,23 +490,21 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
       {/* Resolution trend */}
       <div>
         <h3 className="mb-3 text-sm font-semibold text-default-600">{t('analytics.regional.help.resolution_trend_6m')}</h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="border-b border-divider text-left text-xs font-semibold uppercase text-default-500">
-                <th className="pb-2 pr-4">{t('analytics.regional.columns.month')}</th>
-                <th className="pb-2 pr-4">{t('analytics.regional.columns.total')}</th>
-                <th className="pb-2 pr-4">{t('analytics.regional.columns.resolved')}</th>
-                <th className="pb-2">{t('analytics.regional.columns.resolution_rate')}</th>
-              </tr>
-            </thead>
-            <tbody>
+        <div>
+          <Table aria-label={t('analytics.regional.help.resolution_trend_6m')} removeWrapper>
+            <TableHeader>
+              <TableColumn>{t('analytics.regional.columns.month')}</TableColumn>
+              <TableColumn>{t('analytics.regional.columns.total')}</TableColumn>
+              <TableColumn>{t('analytics.regional.columns.resolved')}</TableColumn>
+              <TableColumn>{t('analytics.regional.columns.resolution_rate')}</TableColumn>
+            </TableHeader>
+            <TableBody>
               {data.resolution_trend.map((row) => (
-                <tr key={row.month} className="border-b border-divider/50">
-                  <td className="py-2 pr-4 font-mono">{row.month}</td>
-                  <td className="py-2 pr-4">{row.total.toLocaleString()}</td>
-                  <td className="py-2 pr-4">{row.resolved.toLocaleString()}</td>
-                  <td className="py-2">
+                <TableRow key={row.month}>
+                  <TableCell className="font-mono">{row.month}</TableCell>
+                  <TableCell>{row.total.toLocaleString()}</TableCell>
+                  <TableCell>{row.resolved.toLocaleString()}</TableCell>
+                  <TableCell>
                     <Chip
                       size="sm"
                       color={row.resolution_rate >= 70 ? 'success' : row.resolution_rate >= 40 ? 'warning' : 'danger'}
@@ -524,11 +512,11 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
                     >
                       {row.resolution_rate}%
                     </Chip>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
     </div>
