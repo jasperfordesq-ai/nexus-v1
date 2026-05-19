@@ -229,7 +229,11 @@ export function HoursReviewTab() {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-semibold text-[var(--color-text)]">{entry.user.name}</span>
                 <Chip size="sm" color={statusColor(entry.status)} variant="flat">
-                  {t(`status_${entry.status}`, entry.status.charAt(0).toUpperCase() + entry.status.slice(1))}
+                  {entry.status === 'approved'
+                    ? t('status_approved')
+                    : entry.status === 'declined'
+                      ? t('status_declined')
+                      : t('status_pending')}
                 </Chip>
               </div>
 
@@ -246,7 +250,7 @@ export function HoursReviewTab() {
               <div className="flex flex-wrap items-center gap-3 text-sm">
                 <span className="flex items-center gap-1 text-rose-500 font-medium">
                   <Clock className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                  {entry.hours} {entry.hours === 1 ? t('hour', 'hour') : t('hours', 'hours')}
+                  {entry.hours} {entry.hours === 1 ? t('hour') : t('hours')}
                 </span>
                 <span className="text-[var(--color-text-muted)]">{formatDate(entry.date)}</span>
               </div>
@@ -258,7 +262,7 @@ export function HoursReviewTab() {
               )}
             </div>
 
-            <div className="flex gap-2 shrink-0 sm:flex-col">
+            <div className="flex gap-2 sm:shrink-0 sm:flex-col">
               <Button
                 size="sm"
                 color="success"
@@ -267,9 +271,9 @@ export function HoursReviewTab() {
                 isLoading={inFlight && entry.status === 'approved'}
                 startContent={!inFlight ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : undefined}
                 onPress={() => handleAction(entry.id, 'approve')}
-                aria-label={t('hours_review.approve_aria', 'Approve hours for {{name}}', { name: entry.user.name })}
+                aria-label={t('hours_review.approve_aria', { name: entry.user.name })}
               >
-                {t('hours_review.approve', 'Approve')}
+                {t('hours_review.approve')}
               </Button>
               <Button
                 size="sm"
@@ -279,9 +283,9 @@ export function HoursReviewTab() {
                 isLoading={inFlight && entry.status === 'declined'}
                 startContent={!inFlight ? <XCircle className="w-4 h-4" aria-hidden="true" /> : undefined}
                 onPress={() => handleAction(entry.id, 'decline')}
-                aria-label={t('hours_review.decline_aria', 'Decline hours for {{name}}', { name: entry.user.name })}
+                aria-label={t('hours_review.decline_aria', { name: entry.user.name })}
               >
-                {t('hours_review.decline', 'Decline')}
+                {t('hours_review.decline')}
               </Button>
             </div>
           </GlassCard>
