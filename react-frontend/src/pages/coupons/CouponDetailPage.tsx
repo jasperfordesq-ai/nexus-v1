@@ -17,7 +17,7 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
-import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { logError } from '@/lib/logger';
 
 interface CouponDetail {
@@ -42,7 +42,6 @@ export default function CouponDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation('common');
   const toast = useToast();
-  usePageTitle(t('coupon.details'));
 
   const [coupon, setCoupon] = useState<CouponDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -95,6 +94,7 @@ export default function CouponDetailPage() {
   if (loading) {
     return (
       <div className="flex justify-center py-16">
+        <PageMeta title={t('coupon.details')} noIndex />
         <Spinner />
       </div>
     );
@@ -103,6 +103,7 @@ export default function CouponDetailPage() {
   if (!coupon) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <PageMeta title={t('coupon.details')} noIndex />
         <Button as={Link} to="/coupons" variant="light" startContent={<ArrowLeft className="w-4 h-4" />}>
           {t('coupon.back_to_coupons')}
         </Button>
@@ -123,6 +124,10 @@ export default function CouponDetailPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <PageMeta
+        title={coupon.title}
+        description={coupon.description || t('coupon.detail_meta_description')}
+      />
       <Button
         as={Link}
         to="/coupons"

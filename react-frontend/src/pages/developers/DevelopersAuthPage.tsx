@@ -12,7 +12,7 @@
 import { useTranslation } from 'react-i18next';
 import { Card, CardBody, Tabs, Tab } from '@heroui/react';
 import Key from 'lucide-react/icons/key';
-import { usePageTitle } from '@/hooks/usePageTitle';
+import { PageMeta } from '@/components/seo';
 
 const CURL_SNIPPET = `# 1. Exchange credentials for an access token
 curl -X POST https://api.project-nexus.ie/api/partner/v1/oauth/token \\
@@ -53,7 +53,6 @@ async function listUsers(accessToken) {
 
 export default function DevelopersAuthPage() {
   const { t } = useTranslation('common');
-  usePageTitle(`${t('developers.nav.auth')} - ${t('developers.page_title')}`);
 
   const steps = [
     { titleKey: 'developers.auth_step1_title', bodyKey: 'developers.auth_step1_body' },
@@ -63,6 +62,7 @@ export default function DevelopersAuthPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
+      <PageMeta title={t('developers.auth_meta_title')} description={t('developers.auth_intro')} />
       <header className="mb-8">
         <div className="flex items-center gap-3 text-[var(--color-text-muted)] mb-3">
           <Key size={20} />

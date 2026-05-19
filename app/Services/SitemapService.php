@@ -268,7 +268,7 @@ class SitemapService
             $methods['ideation'] = fn (int $tid, string $base) => $this->getIdeationUrls($tid, $base);
         }
         if ($this->hasFeature($tenant, 'resources')) {
-            $methods['resources'] = fn (int $tid, string $base) => $this->getResourceUrls($tid, $base);
+            $methods['kb_articles'] = fn (int $tid, string $base) => $this->getKbArticleUrls($tid, $base);
         }
         if ($this->hasFeature($tenant, 'organisations')) {
             $methods['organisations'] = fn (int $tid, string $base) => $this->getOrganizationUrls($tid, $base);
@@ -278,7 +278,6 @@ class SitemapService
             $methods['marketplace_categories'] = fn (int $tid, string $base) => $this->getMarketplaceCategoryUrls($tid, $base);
         }
         $methods['cms_pages'] = fn (int $tid, string $base) => $this->getCmsPageUrls($tid, $base);
-        $methods['kb_articles'] = fn (int $tid, string $base) => $this->getKbArticleUrls($tid, $base);
 
         // EXCLUDED: profiles (personal data, requires per-user opt-in consent)
 
@@ -313,7 +312,9 @@ class SitemapService
         $urls[] = $this->url($baseUrl, '/trust-and-safety', $now, 'monthly', '0.6');
         // Legal hub & version history
         $urls[] = $this->url($baseUrl, '/legal', $now, 'monthly', '0.3');
-        $urls[] = $this->url($baseUrl, '/legal/history', $now, 'monthly', '0.2');
+        foreach (['terms', 'privacy', 'cookies', 'accessibility', 'acceptable-use', 'community-guidelines'] as $page) {
+            $urls[] = $this->url($baseUrl, "/{$page}/versions", $now, 'monthly', '0.2');
+        }
 
         // Platform-level legal pages
         foreach (['platform/terms', 'platform/privacy', 'platform/disclaimer'] as $page) {
@@ -322,12 +323,15 @@ class SitemapService
 
         // Timebanking guide (public educational content)
         $urls[] = $this->url($baseUrl, '/timebanking-guide', $now, 'monthly', '0.5');
+        $urls[] = $this->url($baseUrl, '/regional-analytics', $now, 'monthly', '0.5');
 
         // NOTE: /members and /leaderboard are PROTECTED routes (require auth).
         // Do NOT add them to the sitemap — crawlers cannot access them.
 
-        // Knowledge base listing
-        $urls[] = $this->url($baseUrl, '/kb', $now, 'weekly', '0.5');
+        // Knowledge base listing shares the React resources feature gate.
+        if ($this->hasFeature($tenant, 'resources')) {
+            $urls[] = $this->url($baseUrl, '/kb', $now, 'weekly', '0.5');
+        }
 
         // Public content listing pages (all now accessible without login)
         if ($this->hasModule($tenant, 'listings')) {
@@ -344,6 +348,9 @@ class SitemapService
         }
         if ($this->hasFeature($tenant, 'job_vacancies')) {
             $urls[] = $this->url($baseUrl, '/jobs', $now, 'daily', '0.8');
+        }
+        if ($this->hasFeature($tenant, 'merchant_coupons')) {
+            $urls[] = $this->url($baseUrl, '/coupons', $now, 'daily', '0.6');
         }
         if ($this->hasFeature($tenant, 'volunteering')) {
             $urls[] = $this->url($baseUrl, '/volunteering', $now, 'daily', '0.7');
@@ -481,22 +488,6 @@ class SitemapService
 
         return array_map(
             fn ($r) => $this->url($baseUrl, "/ideation/{$r->id}", $this->formatDate($r->lastmod), 'weekly', '0.6'),
-            $rows
-        );
-    }
-
-    private function getResourceUrls(int $tenantId, string $baseUrl): array
-    {
-        $rows = DB::select(
-            "SELECT id, created_at AS lastmod
-             FROM resources
-             WHERE tenant_id = ?
-             ORDER BY created_at DESC",
-            [$tenantId]
-        );
-
-        return array_map(
-            fn ($r) => $this->url($baseUrl, "/resources/{$r->id}", $this->formatDate($r->lastmod), 'monthly', '0.5'),
             $rows
         );
     }

@@ -13,7 +13,7 @@
 import { useTranslation } from 'react-i18next';
 import { Card, CardBody, Tabs, Tab } from '@heroui/react';
 import Webhook from 'lucide-react/icons/webhook';
-import { usePageTitle } from '@/hooks/usePageTitle';
+import { PageMeta } from '@/components/seo';
 
 const NODE_VERIFY = `// Verify an inbound NEXUS webhook (Node 18+)
 import crypto from 'crypto';
@@ -61,10 +61,10 @@ echo 'ok';`;
 
 export default function DevelopersWebhooksPage() {
   const { t } = useTranslation('common');
-  usePageTitle(`${t('developers.nav.webhooks')} - ${t('developers.page_title')}`);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
+      <PageMeta title={t('developers.webhooks_meta_title')} description={t('developers.webhooks_intro')} />
       <header className="mb-8">
         <div className="flex items-center gap-3 text-[var(--color-text-muted)] mb-3">
           <Webhook size={20} />

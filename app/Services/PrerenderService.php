@@ -54,10 +54,13 @@ class PrerenderService
         '/', '/about', '/faq', '/contact', '/help', '/explore', '/listings',
         '/blog', '/terms', '/privacy', '/accessibility', '/cookies',
         '/community-guidelines', '/trust-and-safety', '/acceptable-use',
-        '/legal', '/timebanking-guide', '/platform/terms', '/platform/privacy',
+        '/legal', '/terms/versions', '/privacy/versions', '/accessibility/versions',
+        '/cookies/versions', '/community-guidelines/versions', '/acceptable-use/versions',
+        '/timebanking-guide', '/regional-analytics', '/platform/terms', '/platform/privacy',
         '/platform/disclaimer', '/resources', '/features', '/changelog',
         '/events', '/groups', '/jobs', '/marketplace', '/volunteering',
-        '/pilot-inquiry', '/pilot-apply', '/developers',
+        '/pilot-inquiry', '/pilot-apply', '/developers', '/developers/auth',
+        '/developers/endpoints', '/developers/webhooks',
         '/partner', '/social-prescribing', '/impact-report',
         '/impact-summary', '/strategic-plan',
     ];
@@ -76,9 +79,12 @@ class PrerenderService
         '/', '/about', '/faq', '/contact', '/help', '/explore',
         '/terms', '/privacy', '/accessibility', '/cookies',
         '/community-guidelines', '/trust-and-safety', '/acceptable-use',
-        '/legal', '/legal/history', '/timebanking-guide',
+        '/legal', '/terms/versions', '/privacy/versions', '/accessibility/versions',
+        '/cookies/versions', '/community-guidelines/versions', '/acceptable-use/versions',
+        '/timebanking-guide', '/regional-analytics',
         '/platform/terms', '/platform/privacy', '/platform/disclaimer',
-        '/features', '/changelog', '/developers', '/development-status',
+        '/features', '/changelog', '/developers', '/developers/auth',
+        '/developers/endpoints', '/developers/webhooks', '/development-status',
         '/pilot-inquiry', '/pilot-apply',
         // Tenant-gated marketing pages — the React app's TenantSlugGate
         // decides whether to render the actual content or a fallback for the
@@ -100,12 +106,12 @@ class PrerenderService
         'events'              => ['/events'],
         'groups'              => ['/groups'],
         'job_vacancies'       => ['/jobs'],
+        'merchant_coupons'    => ['/coupons'],
         'volunteering'        => ['/volunteering'],
         'ideation_challenges' => ['/ideation'],
-        'resources'           => ['/resources'],
+        'resources'           => ['/resources', '/kb'],
         'organisations'       => ['/organisations'],
         'marketplace'         => ['/marketplace', '/marketplace/free', '/marketplace/map'],
-        'kb'                  => ['/kb'],
     ];
 
     /**

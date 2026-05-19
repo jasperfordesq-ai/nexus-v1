@@ -14,7 +14,7 @@ import Tag from 'lucide-react/icons/tag';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useTenant, useToast } from '@/contexts';
-import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { logError } from '@/lib/logger';
 
 interface CouponItem {
@@ -32,7 +32,6 @@ interface CouponItem {
 
 export default function CouponsPage() {
   const { t } = useTranslation('common');
-  usePageTitle(t('coupon.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const [items, setItems] = useState<CouponItem[]>([]);
@@ -64,6 +63,7 @@ export default function CouponsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <PageMeta title={t('coupon.page_title')} description={t('coupon.meta_description')} />
       <header className="mb-6">
         <h1 className="text-3xl font-bold mb-1">{t('coupon.page_title')}</h1>
         <p className="text-[var(--color-text-secondary)]">{t('coupon.page_subtitle')}</p>

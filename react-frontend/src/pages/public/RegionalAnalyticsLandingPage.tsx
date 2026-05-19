@@ -19,12 +19,11 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
 import { useTenant } from '@/contexts';
-import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 
 export default function RegionalAnalyticsLandingPage() {
   const { t } = useTranslation('common');
   const { tenantPath } = useTenant();
-  usePageTitle(t('regional_analytics.page_title'));
 
   const features = [
     {
@@ -93,6 +92,7 @@ export default function RegionalAnalyticsLandingPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12 space-y-16">
+      <PageMeta title={t('regional_analytics.page_title')} description={t('regional_analytics.meta_description')} />
       <section className="text-center space-y-4">
         <Chip color="primary" variant="flat" startContent={<ShieldCheck size={14} className="ml-1" aria-hidden="true" />}>
           {t('regional_analytics.privacy_badge')}

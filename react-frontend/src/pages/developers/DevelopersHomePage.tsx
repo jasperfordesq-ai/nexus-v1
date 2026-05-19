@@ -19,11 +19,10 @@ import Webhook from 'lucide-react/icons/webhook';
 import BookOpen from 'lucide-react/icons/book-open';
 import Gauge from 'lucide-react/icons/gauge';
 import ArrowRight from 'lucide-react/icons/arrow-right';
-import { usePageTitle } from '@/hooks/usePageTitle';
+import { PageMeta } from '@/components/seo';
 
 export default function DevelopersHomePage() {
   const { t } = useTranslation('common');
-  usePageTitle(t('developers.page_title'));
 
   const features = [
     { icon: Key, titleKey: 'developers.feature_oauth_title', bodyKey: 'developers.feature_oauth_body' },
@@ -39,7 +38,9 @@ export default function DevelopersHomePage() {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
+    <>
+      <PageMeta title={t('developers.page_title')} description={t('developers.meta_description')} />
+      <div className="max-w-5xl mx-auto px-4 py-10">
       <header className="mb-10">
         <div className="flex items-center gap-3 text-[var(--color-text-muted)] mb-3">
           <Code size={20} />
@@ -105,6 +106,7 @@ export default function DevelopersHomePage() {
           ))}
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

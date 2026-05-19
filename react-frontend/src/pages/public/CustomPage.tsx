@@ -23,7 +23,6 @@ import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
-import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -40,13 +39,11 @@ interface PageData {
 export function CustomPage() {
   const { t } = useTranslation('utility');
   const { slug } = useParams<{ slug: string }>();
-  const { tenantPath, branding, tenant, isLoading: tenantLoading } = useTenant();
+  const { tenantPath, tenant, isLoading: tenantLoading } = useTenant();
 
   const [page, setPage] = useState<PageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-
-  usePageTitle(page?.title || t('custom_page.default_title', 'Page'));
 
   // tenantId captured as primitive to avoid object reference churn in deps
   const tenantId = tenant?.id ?? null;
@@ -91,7 +88,7 @@ export function CustomPage() {
   if (notFound || !page) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-16 text-center">
-        <PageMeta title={t('not_found.page_title')} />
+        <PageMeta title={t('not_found.page_title')} noIndex />
         <GlassCard className="p-8">
           <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" aria-hidden="true" />
           <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('not_found.heading')}</h1>
@@ -111,7 +108,7 @@ export function CustomPage() {
   return (
     <>
       <PageMeta
-        title={`${page.title} | ${branding.name}`}
+        title={page.title}
         description={page.meta_description || undefined}
       />
 

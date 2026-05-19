@@ -1312,6 +1312,8 @@
   "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time.",
   "coupon": {
     "page_title": "Discount Coupons",
+    "meta_description": "Browse active community coupons, merchant discounts, and local offers available in your area.",
+    "detail_meta_description": "View this community coupon, copy the offer code, or generate an in-store redemption QR code.",
     "page_subtitle": "Browse merchant discounts available in your community",
     "code": "Code",
     "title": "Title",
@@ -1513,6 +1515,10 @@
   },
   "developers": {
     "page_title": "Developers",
+    "meta_description": "Explore the Project NEXUS partner API for OAuth2 authentication, scoped endpoints, signed webhooks, and integration access.",
+    "auth_meta_title": "API Authentication",
+    "endpoints_meta_title": "API Endpoints",
+    "webhooks_meta_title": "API Webhooks",
     "hero_title": "Build with NEXUS",
     "hero_subtitle": "A curated REST API for banking, payment, and municipal admin partners. OAuth2 client credentials, signed webhooks, and a sandbox you can hit in five minutes.",
     "request_access_cta": "Request access",
@@ -1555,6 +1561,7 @@
   },
   "regional_analytics": {
     "page_title": "Regional Analytics",
+    "meta_description": "Discover privacy-first regional analytics for municipalities and SME partners using anonymised community trends and aggregate reporting.",
     "contact_subject": "Regional Analytics - Partner enquiry",
     "privacy_badge": "Privacy-first by design",
     "hero_title": "Understand your region. Without compromising privacy.",

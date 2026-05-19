@@ -15,7 +15,7 @@
 import { useTranslation } from 'react-i18next';
 import { Card, CardBody, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import BookOpen from 'lucide-react/icons/book-open';
-import { usePageTitle } from '@/hooks/usePageTitle';
+import { PageMeta } from '@/components/seo';
 
 interface Endpoint {
   method: 'GET' | 'POST';
@@ -43,10 +43,10 @@ function methodColor(m: 'GET' | 'POST'): 'success' | 'primary' {
 
 export default function DevelopersEndpointsPage() {
   const { t } = useTranslation('common');
-  usePageTitle(`${t('developers.nav.endpoints')} - ${t('developers.page_title')}`);
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
+      <PageMeta title={t('developers.endpoints_meta_title')} description={t('developers.endpoints_intro')} />
       <header className="mb-8">
         <div className="flex items-center gap-3 text-[var(--color-text-muted)] mb-3">
           <BookOpen size={20} />
