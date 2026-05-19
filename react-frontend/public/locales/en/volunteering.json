@@ -660,7 +660,12 @@
     "no_member_found": "No member found with that email address.",
     "member_added": "Member added to the group.",
     "add_member_error": "Failed to add member. They may already be in the group or the email is invalid.",
-    "add_member_error_generic": "Unable to add member. Please check the email and try again."
+    "add_member_error_generic": "Unable to add member. Please check the email and try again.",
+    "status": {
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "cancelled": "Cancelled"
+    }
   },
   "recommendations": {
     "title": "Recommended for You",

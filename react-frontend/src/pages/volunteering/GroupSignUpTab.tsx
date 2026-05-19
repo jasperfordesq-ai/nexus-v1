@@ -125,12 +125,12 @@ export function GroupSignUpTab() {
         const items = Array.isArray(response.data) ? response.data : [];
         setReservations(items);
       } else {
-        setError(tRef.current('group_signup.error_load', 'Failed to load group reservations.'));
+        setError(tRef.current('group_signup.error_load'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load group reservations', err);
-      setError(tRef.current('group_signup.error_load_generic', 'Unable to load group reservations. Please try again.'));
+      setError(tRef.current('group_signup.error_load_generic'));
     } finally {
       setIsLoading(false);
     }
@@ -218,7 +218,7 @@ export function GroupSignUpTab() {
         );
 
         if (!searchRes.success || !Array.isArray(searchRes.data)) {
-          setAddError(tRef.current('group_signup.lookup_error', 'Unable to look up member. Please try again.'));
+          setAddError(tRef.current('group_signup.lookup_error'));
           return;
         }
 
@@ -226,7 +226,7 @@ export function GroupSignUpTab() {
       }
 
       if (!matchedUser) {
-        setAddError(tRef.current('group_signup.no_member_found', 'No member found with that email address.'));
+        setAddError(tRef.current('group_signup.no_member_found'));
         return;
       }
 
@@ -236,17 +236,17 @@ export function GroupSignUpTab() {
       );
 
       if (response.success) {
-        toastRef.current.success(tRef.current('group_signup.member_added', 'Member added to the group.'));
+        toastRef.current.success(tRef.current('group_signup.member_added'));
         onClose();
         setNewMemberEmail('');
         setSearchResults([]);
         load();
       } else {
-        setAddError(tRef.current('group_signup.add_member_error', 'Failed to add member. They may already be in the group or the email is invalid.'));
+        setAddError(tRef.current('group_signup.add_member_error'));
       }
     } catch (err) {
       logError('Failed to add member', err);
-      setAddError(tRef.current('group_signup.add_member_error_generic', 'Unable to add member. Please check the email and try again.'));
+      setAddError(tRef.current('group_signup.add_member_error_generic'));
     } finally {
       setIsAdding(false);
     }
@@ -281,10 +281,10 @@ export function GroupSignUpTab() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-violet-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">{t('group_signup.title', 'Group Sign-ups')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('group_signup.title')}</h2>
         </div>
         <Button
           size="sm"
@@ -294,7 +294,7 @@ export function GroupSignUpTab() {
           onPress={load}
           isDisabled={isLoading}
         >
-          {t('common.refresh', 'Refresh')}
+          {t('common.refresh')}
         </Button>
       </div>
 
@@ -304,7 +304,7 @@ export function GroupSignUpTab() {
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
-            {t('common.try_again', 'Try Again')}
+            {t('common.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -326,8 +326,8 @@ export function GroupSignUpTab() {
       {!error && !isLoading && reservations.length === 0 && (
         <EmptyState
           icon={<Users className="w-12 h-12" aria-hidden="true" />}
-          title={t('group_signup.empty_title', 'No group sign-ups')}
-          description={t('group_signup.empty_description', 'You are not part of any group shift reservations yet. Group sign-ups let you volunteer together with friends or team members.')}
+          title={t('group_signup.empty_title')}
+          description={t('group_signup.empty_description')}
         />
       )}
 
@@ -342,7 +342,7 @@ export function GroupSignUpTab() {
           {reservations.map((res) => (
             <motion.div key={res.id} variants={itemVariants}>
               <GlassCard className="p-5">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1 min-w-0">
                     {/* Header */}
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -354,7 +354,7 @@ export function GroupSignUpTab() {
                         variant="flat"
                         color={statusColor(res.status)}
                       >
-                        {res.status.charAt(0).toUpperCase() + res.status.slice(1)}
+                        {t(`group_signup.status.${res.status}`)}
                       </Chip>
                       {res.is_leader && (
                         <Chip
@@ -363,7 +363,7 @@ export function GroupSignUpTab() {
                           color="warning"
                           startContent={<Crown className="w-3 h-3" />}
                         >
-                          {t('group_signup.leader', 'Leader')}
+                          {t('group_signup.leader')}
                         </Chip>
                       )}
                     </div>
@@ -401,7 +401,7 @@ export function GroupSignUpTab() {
                       <div className="flex items-center justify-between">
                         <p className="text-xs font-medium text-theme-muted flex items-center gap-1">
                           <Users className="w-3 h-3" aria-hidden="true" />
-                          {t('group_signup.members', 'Members')} ({res.members.length}{res.max_members ? `/${res.max_members}` : ''})
+                          {t('group_signup.members')} ({res.members.length}{res.max_members ? `/${res.max_members}` : ''})
                         </p>
                       </div>
 
@@ -434,13 +434,13 @@ export function GroupSignUpTab() {
                     </div>
 
                     <p className="text-xs text-theme-subtle mt-2">
-                      {t('group_signup.created', 'Created')} {new Date(res.created_at).toLocaleDateString()}
+                      {t('group_signup.created')} {new Date(res.created_at).toLocaleDateString()}
                     </p>
                   </div>
 
                   {/* Add member button for leaders */}
                   {res.is_leader && res.status !== 'cancelled' && (
-                    <div className="flex-shrink-0">
+                    <div className="sm:flex-shrink-0">
                       <Button
                         size="sm"
                         className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
@@ -448,7 +448,7 @@ export function GroupSignUpTab() {
                         onPress={() => openAddMemberModal(res.id)}
                         isDisabled={res.max_members !== null && res.members.length >= res.max_members}
                       >
-                        {t('group_signup.add_member', 'Add Member')}
+                        {t('group_signup.add_member')}
                       </Button>
                     </div>
                   )}
@@ -464,15 +464,15 @@ export function GroupSignUpTab() {
         base: 'bg-content1 border border-theme-default',
       }}>
         <ModalContent>
-          <ModalHeader className="text-theme-primary">{t('group_signup.add_group_member', 'Add Group Member')}</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('group_signup.add_group_member')}</ModalHeader>
           <ModalBody className="space-y-4">
             <p className="text-sm text-theme-muted">
-              {t('group_signup.add_member_description', 'Enter the email address of the person you would like to add to this group reservation. They will receive an invitation to join.')}
+              {t('group_signup.add_member_description')}
             </p>
             <Input
               type="email"
-              label={t('group_signup.email_label', 'Email Address')}
-              placeholder={t('group_signup.email_placeholder', 'member@example.com')}
+              label={t('group_signup.email_label')}
+              placeholder={t('group_signup.email_placeholder')}
               value={newMemberEmail}
               onChange={(e) => {
                 const val = e.target.value;
@@ -486,7 +486,7 @@ export function GroupSignUpTab() {
               }}
             />
             {isSearching && (
-              <p className="text-xs text-theme-subtle">{t('group_signup.searching', 'Searching...')}</p>
+              <p className="text-xs text-theme-subtle">{t('group_signup.searching')}</p>
             )}
             {!isSearching && searchResults.length > 0 && (
               <div className="space-y-1">
@@ -511,7 +511,7 @@ export function GroupSignUpTab() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('common.cancel', 'Cancel')}</Button>
+            <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('common.cancel')}</Button>
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleAddMember}
@@ -519,7 +519,7 @@ export function GroupSignUpTab() {
               isDisabled={!newMemberEmail.trim()}
               startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('group_signup.add_member', 'Add Member')}
+              {t('group_signup.add_member')}
             </Button>
           </ModalFooter>
         </ModalContent>
