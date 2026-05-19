@@ -65,4 +65,13 @@ class FederationEmailServiceTest extends TestCase
 
         $this->assertFalse(FederationEmailService::sendWeeklyDigest(999, 1));
     }
+    public function test_v1_federation_message_passes_recipient_tenant_to_email_service(): void
+    {
+        $source = file_get_contents(app_path('Http/Controllers/Api/FederationController.php'));
+
+        $this->assertStringContainsString(
+            "substr(\$input['body'], 0, 200), (int) \$recipient['tenant_id']",
+            $source
+        );
+    }
 }

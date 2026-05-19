@@ -705,7 +705,7 @@ class FederationController extends BaseApiController
         }
 
         try {
-            if (!$this->federationEmailService->sendNewMessageNotification((int) $input['recipient_id'], (int) $input['sender_id'], (int) $partnerTenantId, substr($input['body'], 0, 200))) {
+            if (!$this->federationEmailService->sendNewMessageNotification((int) $input['recipient_id'], (int) $input['sender_id'], (int) $partnerTenantId, substr($input['body'], 0, 200), (int) $recipient['tenant_id'])) {
                 \Illuminate\Support\Facades\Log::warning('FederationV1: email service returned false', [
                     'recipient_id' => $input['recipient_id'] ?? null,
                     'sender_id' => $input['sender_id'] ?? null,
