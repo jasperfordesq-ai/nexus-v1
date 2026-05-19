@@ -100,12 +100,12 @@ export function AccessibilityTab() {
       if (response.success && response.data) {
         setNeeds(response.data as AccessibilityNeed[]);
       } else {
-        setError(tRef.current('accessibility.load_error', 'Unable to load accessibility needs.'));
+        setError(tRef.current('accessibility.load_error'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load accessibility needs', err);
-      setError(tRef.current('accessibility.load_error', 'Unable to load accessibility needs.'));
+      setError(tRef.current('accessibility.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -118,14 +118,14 @@ export function AccessibilityTab() {
       setIsSaving(true);
       const response = await api.put('/v2/volunteering/accessibility-needs', { needs });
       if (response.success) {
-        toastRef.current.success(tRef.current('accessibility.saved', 'Accessibility needs saved successfully.'));
+        toastRef.current.success(tRef.current('accessibility.saved'));
         load();
       } else {
-        toastRef.current.error(tRef.current('accessibility.save_error', 'Failed to save changes.'));
+        toastRef.current.error(tRef.current('accessibility.save_error'));
       }
     } catch (err) {
       logError('Failed to save accessibility needs', err);
-      toastRef.current.error(tRef.current('accessibility.save_error', 'Failed to save changes.'));
+      toastRef.current.error(tRef.current('accessibility.save_error'));
     } finally {
       setIsSaving(false);
     }
@@ -152,22 +152,22 @@ export function AccessibilityTab() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Accessibility className="w-5 h-5 text-rose-400" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary">
-            {t('accessibility.heading', 'Accessibility & Accommodations')}
+            {t('accessibility.heading')}
           </h2>
         </div>
         <Button
           size="sm"
-          className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+          className="bg-gradient-to-r from-rose-500 to-pink-600 text-white sm:shrink-0"
           startContent={<Save className="w-4 h-4" aria-hidden="true" />}
           onPress={handleSave}
           isLoading={isSaving}
           isDisabled={isLoading}
         >
-          {t('accessibility.save', 'Save Changes')}
+          {t('accessibility.save')}
         </Button>
       </div>
 
@@ -176,10 +176,7 @@ export function AccessibilityTab() {
         <div className="flex items-start gap-3">
           <Info className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-sm text-theme-muted">
-            {t(
-              'accessibility.info_banner',
-              'This information helps organizations provide appropriate support and accommodations for your volunteer activities. All data is kept confidential.',
-            )}
+            {t('accessibility.info_banner')}
           </p>
         </div>
       </GlassCard>
@@ -194,7 +191,7 @@ export function AccessibilityTab() {
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={load}
           >
-            {t('accessibility.try_again', 'Try Again')}
+            {t('accessibility.try_again')}
           </Button>
         </GlassCard>
       )}
@@ -218,15 +215,15 @@ export function AccessibilityTab() {
           {needs.length === 0 && (
             <EmptyState
               icon={<Accessibility className="w-12 h-12" aria-hidden="true" />}
-              title={t('accessibility.no_needs_title', 'No accessibility needs added')}
-              description={t('accessibility.no_needs_desc', 'Add your accessibility requirements so organizations can provide the right support.')}
+              title={t('accessibility.no_needs_title')}
+              description={t('accessibility.no_needs_desc')}
               action={
                 <Button
                   className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                   startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                   onPress={() => setNeeds([emptyNeed()])}
                 >
-                  {t('accessibility.add_first', 'Add Your First Need')}
+                  {t('accessibility.add_first')}
                 </Button>
               }
             />
@@ -235,16 +232,16 @@ export function AccessibilityTab() {
           {needs.map((need, index) => (
             <motion.div key={need.id ?? index} variants={itemVariants}>
               <GlassCard className="p-5 space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3">
                   <Chip size="sm" color={NEED_TYPE_COLORS[need.need_type] ?? 'default'} variant="flat">
-                    {t(`accessibility.types.${need.need_type}`, need.need_type)}
+                    {t(`accessibility.types.${need.need_type}`)}
                   </Chip>
                   <Button
                     size="sm"
                     variant="light"
                     color="danger"
                     isIconOnly
-                    aria-label={t('accessibility.remove', 'Remove need')}
+                    aria-label={t('accessibility.remove')}
                     onPress={() => removeNeed(index)}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -252,7 +249,7 @@ export function AccessibilityTab() {
                 </div>
 
                 <Select
-                  label={t('accessibility.need_type_label', 'Need Type')}
+                  label={t('accessibility.need_type_label')}
                   selectedKeys={new Set([need.need_type])}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0] as string;
@@ -261,21 +258,21 @@ export function AccessibilityTab() {
                   classNames={{ trigger: 'bg-theme-elevated border-theme-default' }}
                 >
                   {NEED_TYPES.map((type) => (
-                    <SelectItem key={type}>{t(`accessibility.types.${type}`, type)}</SelectItem>
+                    <SelectItem key={type}>{t(`accessibility.types.${type}`)}</SelectItem>
                   ))}
                 </Select>
 
                 <Textarea
-                  label={t('accessibility.description_label', 'Description')}
-                  placeholder={t('accessibility.description_placeholder', 'Describe your accessibility need...')}
+                  label={t('accessibility.description_label')}
+                  placeholder={t('accessibility.description_placeholder')}
                   value={need.description}
                   onChange={(e) => updateNeed(index, 'description', e.target.value)}
                   classNames={{ input: 'bg-transparent text-theme-primary', inputWrapper: 'bg-theme-elevated border-theme-default' }}
                 />
 
                 <Textarea
-                  label={t('accessibility.accommodations_label', 'Accommodations Required')}
-                  placeholder={t('accessibility.accommodations_placeholder', 'What accommodations would help you participate?')}
+                  label={t('accessibility.accommodations_label')}
+                  placeholder={t('accessibility.accommodations_placeholder')}
                   value={need.accommodations_required}
                   onChange={(e) => updateNeed(index, 'accommodations_required', e.target.value)}
                   classNames={{ input: 'bg-transparent text-theme-primary', inputWrapper: 'bg-theme-elevated border-theme-default' }}
@@ -283,13 +280,13 @@ export function AccessibilityTab() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
-                    label={t('accessibility.emergency_name', 'Emergency Contact Name')}
+                    label={t('accessibility.emergency_name')}
                     value={need.emergency_contact_name}
                     onChange={(e) => updateNeed(index, 'emergency_contact_name', e.target.value)}
                     classNames={{ input: 'bg-transparent text-theme-primary', inputWrapper: 'bg-theme-elevated border-theme-default' }}
                   />
                   <Input
-                    label={t('accessibility.emergency_phone', 'Emergency Contact Phone')}
+                    label={t('accessibility.emergency_phone')}
                     value={need.emergency_contact_phone}
                     onChange={(e) => updateNeed(index, 'emergency_contact_phone', e.target.value)}
                     classNames={{ input: 'bg-transparent text-theme-primary', inputWrapper: 'bg-theme-elevated border-theme-default' }}
@@ -306,7 +303,7 @@ export function AccessibilityTab() {
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               onPress={() => setNeeds((prev) => [...prev, emptyNeed()])}
             >
-              {t('accessibility.add_need', 'Add Another Need')}
+              {t('accessibility.add_need')}
             </Button>
           )}
         </motion.div>
