@@ -368,6 +368,16 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         $this->assertStringContainsString("last_error", $migration);
     }
 
+    public function test_notification_queue_runner_resets_tenant_context_after_batches(): void
+    {
+        $source = file_get_contents(app_path('Services/CronJobRunner.php'));
+
+        $this->assertStringContainsString("TenantContext::reset();\n\n        echo \"Done.\\n\";", $source);
+        $this->assertStringContainsString("TenantContext::reset();\n\n            // Clean up stale rows", $source);
+        $this->assertStringContainsString("TenantContext::reset();\n\n        // Clean up stale rows", $source);
+        $this->assertStringContainsString("finally {\n            TenantContext::reset();", $source);
+    }
+
     public function test_hot_match_cron_scopes_candidates_and_dedupe_by_tenant(): void
     {
         $source = file_get_contents(app_path('Services/CronJobRunner.php'));

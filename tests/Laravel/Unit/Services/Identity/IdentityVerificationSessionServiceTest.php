@@ -14,8 +14,7 @@ class IdentityVerificationSessionServiceTest extends TestCase
 {
     public function test_get_by_id_returns_null_when_not_found(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn(false);
+        DB::shouldReceive('select')->once()->andReturn([]);
 
         $result = IdentityVerificationSessionService::getById(999);
 
@@ -26,8 +25,7 @@ class IdentityVerificationSessionServiceTest extends TestCase
     {
         $row = ['id' => 1, 'tenant_id' => 2, 'user_id' => 5, 'status' => 'created'];
 
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn($row);
+        DB::shouldReceive('select')->once()->andReturn([(object) $row]);
 
         $result = IdentityVerificationSessionService::getById(1);
 
@@ -36,8 +34,7 @@ class IdentityVerificationSessionServiceTest extends TestCase
 
     public function test_find_by_provider_session_returns_null_when_not_found(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn(false);
+        DB::shouldReceive('select')->once()->andReturn([]);
 
         $result = IdentityVerificationSessionService::findByProviderSession('stripe_identity', 'vs_unknown');
 
@@ -46,8 +43,7 @@ class IdentityVerificationSessionServiceTest extends TestCase
 
     public function test_get_latest_for_user_returns_null_when_none(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn(false);
+        DB::shouldReceive('select')->once()->andReturn([]);
 
         $result = IdentityVerificationSessionService::getLatestForUser(2, 99);
 
@@ -118,9 +114,7 @@ class IdentityVerificationSessionServiceTest extends TestCase
 
     public function test_expire_abandoned_returns_row_count(): void
     {
-        $stmt = \Mockery::mock();
-        $stmt->shouldReceive('rowCount')->andReturn(3);
-        DB::shouldReceive('statement')->andReturn($stmt);
+        DB::shouldReceive('affectingStatement')->once()->andReturn(3);
 
         $count = IdentityVerificationSessionService::expireAbandoned(72);
 
@@ -129,9 +123,7 @@ class IdentityVerificationSessionServiceTest extends TestCase
 
     public function test_purge_old_sessions_returns_row_count(): void
     {
-        $stmt = \Mockery::mock();
-        $stmt->shouldReceive('rowCount')->andReturn(10);
-        DB::shouldReceive('statement')->andReturn($stmt);
+        DB::shouldReceive('affectingStatement')->once()->andReturn(10);
 
         $count = IdentityVerificationSessionService::purgeOldSessions(180);
 
@@ -145,11 +137,22 @@ class IdentityVerificationSessionServiceTest extends TestCase
             ['id' => 2, 'status' => 'failed'],
         ];
 
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetchAll')->andReturn($rows);
+        DB::shouldReceive('select')->once()->andReturn(array_map(fn (array $row): object => (object) $row, $rows));
 
         $result = IdentityVerificationSessionService::getAllForUser(2, 5);
 
         $this->assertCount(2, $result);
+    }
+
+    public function test_abandoned_reminder_queries_are_tenant_scoped(): void
+    {
+        $source = file_get_contents(app_path('Services/Identity/IdentityVerificationSessionService.php'));
+        $orchestrationSource = file_get_contents(app_path('Services/Identity/RegistrationOrchestrationService.php'));
+
+        $this->assertStringContainsString('SELECT ivs.*, u.first_name, u.last_name, u.email, ivs.tenant_id', $source);
+        $this->assertStringContainsString('JOIN users u ON u.id = ivs.user_id AND u.tenant_id = ivs.tenant_id', $source);
+        $this->assertStringContainsString('markReminderSent(int $sessionId, int $tenantId)', $source);
+        $this->assertStringContainsString('WHERE id = ? AND tenant_id = ?', $source);
+        $this->assertStringContainsString("markReminderSent((int) \$row['id'], (int) \$row['tenant_id'])", $orchestrationSource);
     }
 }

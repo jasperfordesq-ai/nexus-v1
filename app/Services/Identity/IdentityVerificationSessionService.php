@@ -267,9 +267,9 @@ class IdentityVerificationSessionService
     public static function getAbandoned(int $hoursOld = 24, int $limit = 100): array
     {
         $rows = DB::select(
-            "SELECT ivs.*, u.first_name, u.last_name, u.email, u.tenant_id
+            "SELECT ivs.*, u.first_name, u.last_name, u.email, ivs.tenant_id
              FROM identity_verification_sessions ivs
-             JOIN users u ON u.id = ivs.user_id
+             JOIN users u ON u.id = ivs.user_id AND u.tenant_id = ivs.tenant_id
              WHERE ivs.status IN ('created', 'started')
                AND ivs.created_at < DATE_SUB(NOW(), INTERVAL ? HOUR)
                AND ivs.reminder_sent_at IS NULL
@@ -284,11 +284,11 @@ class IdentityVerificationSessionService
     /**
      * Mark a session as having had a reminder sent.
      */
-    public static function markReminderSent(int $sessionId): void
+    public static function markReminderSent(int $sessionId, int $tenantId): void
     {
         DB::statement(
-            "UPDATE identity_verification_sessions SET reminder_sent_at = NOW() WHERE id = ?",
-            [$sessionId]
+            "UPDATE identity_verification_sessions SET reminder_sent_at = NOW() WHERE id = ? AND tenant_id = ?",
+            [$sessionId, $tenantId]
         );
     }
 

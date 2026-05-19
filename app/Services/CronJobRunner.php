@@ -483,6 +483,8 @@ class CronJobRunner
             }
         }
 
+        TenantContext::reset();
+
         echo "Done.\n";
     }
 
@@ -698,6 +700,8 @@ class CronJobRunner
                 }
             }
 
+            TenantContext::reset();
+
             // Clean up stale rows from crashed runs without touching another
             // active runner's current batch.
             $this->releaseStaleNotificationQueueRows('instant', 10);
@@ -708,6 +712,7 @@ class CronJobRunner
             if (isset($lockKey)) {
                 Cache::forget($lockKey);
             }
+            TenantContext::reset();
             echo "\nError: " . $e->getMessage() . "\n";
             $status = 'error';
 
@@ -1587,12 +1592,15 @@ class CronJobRunner
             }
         }
 
+        TenantContext::reset();
+
         // Clean up stale rows from crashed runs without touching another
         // active runner's current batch.
         $this->releaseStaleNotificationQueueRows('instant', 10);
 
         echo "   Sent $sent instant notifications.\n";
         } finally {
+            TenantContext::reset();
             Cache::forget($lockKey);
         }
     }
