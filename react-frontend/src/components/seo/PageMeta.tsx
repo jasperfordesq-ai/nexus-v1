@@ -76,6 +76,17 @@ function buildCanonicalUrl(origin: string, pathname: string): string {
   return `${origin}${cleanPath}`;
 }
 
+function toAbsoluteUrl(value: string | undefined, origin: string): string | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) return undefined;
+
+  try {
+    return new URL(trimmed, origin || undefined).href;
+  } catch {
+    return origin && trimmed.startsWith('/') ? `${origin}${trimmed}` : trimmed;
+  }
+}
+
 /** Read a string setting from tenant.settings safely. */
 function getSetting(settings: Record<string, unknown> | undefined, key: string): string {
   if (!settings || typeof settings[key] !== 'string') return '';
@@ -149,11 +160,11 @@ export function PageMeta({
 
   // Canonical: always clean pathname, never include query params or hash
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  const canonicalUrl = url || buildCanonicalUrl(origin, location.pathname);
+  const canonicalUrl = toAbsoluteUrl(url, origin) || buildCanonicalUrl(origin, location.pathname);
 
   // OG image fallback chain: explicit prop -> tenant og_image_url -> tenant logo -> platform default
-  const richCardImage = image || branding.og_image_url || branding.logo;
-  const ogImage = richCardImage || `${origin}/og-default.svg`;
+  const richCardImage = toAbsoluteUrl(image || branding.og_image_url || branding.logo, origin);
+  const ogImage = richCardImage || toAbsoluteUrl('/og-default.svg', origin) || '/og-default.svg';
   const twitterCard = richCardImage ? 'summary_large_image' : 'summary';
 
   return (

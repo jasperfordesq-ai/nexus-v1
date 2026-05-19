@@ -327,6 +327,15 @@ class SitemapService
         $urls[] = $this->url($baseUrl, '/features', $now, 'monthly', '0.5');
         $urls[] = $this->url($baseUrl, '/changelog', $now, 'weekly', '0.4');
 
+        // Public pilot and partner-facing pages are prerendered and should be
+        // discoverable from the tenant sitemap when enabled in React.
+        foreach (['pilot-inquiry', 'pilot-apply'] as $page) {
+            $urls[] = $this->url($baseUrl, "/{$page}", $now, 'monthly', '0.5');
+        }
+        foreach (['partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan'] as $page) {
+            $urls[] = $this->url($baseUrl, "/{$page}", $now, 'monthly', '0.5');
+        }
+
         // Public Partner API developer documentation.
         foreach (['developers', 'developers/auth', 'developers/endpoints', 'developers/webhooks'] as $page) {
             $urls[] = $this->url($baseUrl, "/{$page}", $now, 'monthly', '0.5');
