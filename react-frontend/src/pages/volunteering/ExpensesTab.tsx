@@ -66,13 +66,13 @@ interface Expense {
   payment_reference: string | null;
 }
 
-const EXPENSE_TYPE_OPTIONS: { key: ExpenseType; label: string; icon: React.ReactNode }[] = [
-  { key: 'travel', label: 'Travel', icon: <Car className="w-4 h-4" /> },
-  { key: 'meals', label: 'Meals', icon: <UtensilsCrossed className="w-4 h-4" /> },
-  { key: 'supplies', label: 'Supplies', icon: <Package className="w-4 h-4" /> },
-  { key: 'equipment', label: 'Equipment', icon: <Wrench className="w-4 h-4" /> },
-  { key: 'parking', label: 'Parking', icon: <ParkingCircle className="w-4 h-4" /> },
-  { key: 'other', label: 'Other', icon: <MoreHorizontal className="w-4 h-4" /> },
+const EXPENSE_TYPE_OPTIONS: { key: ExpenseType; icon: React.ReactNode }[] = [
+  { key: 'travel', icon: <Car className="w-4 h-4" /> },
+  { key: 'meals', icon: <UtensilsCrossed className="w-4 h-4" /> },
+  { key: 'supplies', icon: <Package className="w-4 h-4" /> },
+  { key: 'equipment', icon: <Wrench className="w-4 h-4" /> },
+  { key: 'parking', icon: <ParkingCircle className="w-4 h-4" /> },
+  { key: 'other', icon: <MoreHorizontal className="w-4 h-4" /> },
 ];
 
 const STATUS_COLOR: Record<ExpenseStatus, 'warning' | 'success' | 'danger' | 'primary'> = {
@@ -361,7 +361,7 @@ export function ExpensesTab() {
                 >
                   {EXPENSE_TYPE_OPTIONS.map((opt) => (
                     <SelectItem key={opt.key} startContent={opt.icon}>
-                      {t(`expenses.types.${opt.key}`, opt.label)}
+                      {t(`expenses.types.${opt.key}`)}
                     </SelectItem>
                   ))}
                 </Select>
