@@ -12,6 +12,7 @@ use App\Core\TenantContext;
 use App\Events\FederatedConnectionReceived;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
+use App\Services\FederationEmailService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -71,26 +72,68 @@ class HandleFederatedConnectionReceived implements ShouldQueue
             }
 
             $status = (string) ($event->shadowRow['status'] ?? 'pending');
+            $externalUserName = trim((string) (
+                $event->shadowRow['external_user_name']
+                ?? $event->shadowRow['sender_name']
+                ?? $event->shadowRow['name']
+                ?? $event->shadowRow['external_user_id']
+                ?? ''
+            ));
+            if ($externalUserName === '') {
+                $externalUserName = __('emails.common.fallback_federation_member');
+            }
+            $partnerName = DB::table('federation_external_partners')
+                ->where('id', $event->externalPartnerId)
+                ->where('tenant_id', $event->tenantId)
+                ->value('name') ?: __('emails.common.fallback_partner_community');
 
             // Render the bell preview in the recipient's locale.
-            LocaleContext::withLocale($localUser, function () use ($localUserId, $status) {
+            LocaleContext::withLocale($localUser, function () use ($event, $localUserId, $status, $externalUserName, $partnerName) {
                 $key = $status === 'accepted'
-                    ? 'notifications.federation_connection_accepted'
-                    : 'notifications.federation_connection_request';
-                $fallback = $status === 'accepted'
-                    ? 'A partner-platform member accepted your connection request.'
-                    : 'A partner-platform member sent you a connection request.';
-                $message = __($key);
-                if ($message === $key) {
-                    $message = $fallback;
+                    ? 'svc_notifications.federation.connection_accepted'
+                    : 'svc_notifications.federation.connection_request';
+                $message = __($key, [
+                    'name' => $externalUserName,
+                    'sender' => $externalUserName,
+                    'community' => $partnerName,
+                ]);
+
+                $exists = DB::table('notifications')
+                    ->where('tenant_id', $event->tenantId)
+                    ->where('user_id', $localUserId)
+                    ->where('type', 'federation_connection')
+                    ->where('link', '/network')
+                    ->where('message', $message)
+                    ->exists();
+
+                if (! $exists) {
+                    Notification::createNotification(
+                        $localUserId,
+                        $message,
+                        '/network',
+                        'federation_connection',
+                        false,
+                        $event->tenantId
+                    );
                 }
-                Notification::createNotification(
-                    $localUserId,
-                    $message,
-                    '/network',
-                    'federation_connection'
-                );
             });
+
+            $sent = FederationEmailService::sendExternalConnectionNotification(
+                $localUserId,
+                $event->tenantId,
+                $externalUserName,
+                $partnerName,
+                $status
+            );
+
+            if (! $sent) {
+                Log::warning('[HandleFederatedConnectionReceived] external connection email returned false', [
+                    'tenant_id'     => $event->tenantId,
+                    'partner_id'    => $event->externalPartnerId,
+                    'local_user_id' => $localUserId,
+                    'status'        => $status,
+                ]);
+            }
 
             Log::info('[HandleFederatedConnectionReceived] notified local user', [
                 'tenant_id'     => $event->tenantId,

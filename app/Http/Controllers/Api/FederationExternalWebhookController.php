@@ -686,7 +686,7 @@ class FederationExternalWebhookController extends BaseApiController
             ->where('external_partner_id', $partner->id)
             ->where('local_user_id', $localUserId)
             ->where('external_user_id', $externalUserId)
-            ->first(['id']);
+            ->first(['id', 'status']);
 
         $row = [
             'tenant_id' => $tenantId,
@@ -697,6 +697,11 @@ class FederationExternalWebhookController extends BaseApiController
             'message' => $message,
             'updated_at' => now(),
         ];
+        $externalUserName = $this->optionalString($data, 'external_user_name', 255)
+            ?? $this->optionalString($data, 'sender_name', 255)
+            ?? $this->optionalString($data, 'name', 255);
+
+        $shouldNotify = ! $existing || (string) $existing->status !== $status;
 
         if ($existing) {
             DB::table('federation_inbound_connections')->where('id', $existing->id)->update($row);
@@ -707,7 +712,12 @@ class FederationExternalWebhookController extends BaseApiController
         }
 
         $row['id'] = $localId;
-        event(new FederatedConnectionReceived($tenantId, (int) $partner->id, $localId, $row));
+        if ($externalUserName !== null) {
+            $row['external_user_name'] = $externalUserName;
+        }
+        if ($shouldNotify) {
+            event(new FederatedConnectionReceived($tenantId, (int) $partner->id, $localId, $row));
+        }
 
         return ['status' => 'handled', 'local_id' => $localId];
     }

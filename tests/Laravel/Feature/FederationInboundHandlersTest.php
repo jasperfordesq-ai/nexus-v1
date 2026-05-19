@@ -377,6 +377,36 @@ class FederationInboundHandlersTest extends TestCase
         ]);
     }
 
+    public function test_connection_requested_sends_one_email_and_bell_on_partner_retry(): void
+    {
+        $localUser = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'federation-connection-recipient@example.test',
+        ]);
+        $mailer = $this->fakeEmailDispatchService();
+
+        $payload = [
+            'local_user_id' => $localUser->id,
+            'external_user_id' => 'ext-usr-retry',
+            'external_user_name' => 'Remote Member',
+            'message' => 'Hi, let\'s connect!',
+        ];
+
+        $this->postWebhook('connection.requested', $payload)->assertStatus(200);
+        $this->postWebhook('connection.requested', $payload)->assertStatus(200);
+
+        $this->assertCount(1, $mailer->sends);
+        $this->assertSame('federation-connection-recipient@example.test', $mailer->sends[0]['to']);
+        $this->assertSame('federation_connection', $mailer->sends[0]['options']['category']);
+        $this->assertSame($this->testTenantId, $mailer->sends[0]['options']['tenant_id']);
+
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $localUser->id)
+            ->where('type', 'federation_connection')
+            ->where('link', '/network')
+            ->count());
+    }
+
     public function test_connection_cannot_target_foreign_tenant_user(): void
     {
         $foreignUser = User::factory()->forTenant(999)->create();

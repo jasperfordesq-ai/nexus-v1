@@ -300,6 +300,75 @@ class FederationEmailService
     }
 
     /**
+     * Send an inbound external partner connection notification.
+     */
+    public static function sendExternalConnectionNotification(
+        int $recipientUserId,
+        int $recipientTenantId,
+        string $externalUserName,
+        string $partnerName,
+        string $status
+    ): bool {
+        try {
+            $recipient = self::getUserWithEmail($recipientUserId, $recipientTenantId);
+            if (!$recipient || empty($recipient->email)) {
+                return false;
+            }
+
+            $previousTenantId = TenantContext::currentId();
+            TenantContext::setById($recipientTenantId);
+
+            $sent = false;
+            try {
+                LocaleContext::withLocale($recipient, function () use (&$sent, $recipient, $recipientTenantId, $externalUserName, $partnerName, $status) {
+                    $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
+                    $safeExternalUserName = htmlspecialchars($externalUserName, ENT_QUOTES, 'UTF-8');
+                    $safePartnerName = htmlspecialchars($partnerName, ENT_QUOTES, 'UTF-8');
+                    $isAccepted = $status === 'accepted';
+
+                    $subject = $isAccepted
+                        ? __('emails.federation.connection_accepted_subject', ['name' => $externalUserName])
+                        : __('emails.federation.connection_request_subject', ['community' => $partnerName]);
+                    $title = $isAccepted
+                        ? __('emails.federation.connection_accepted_heading')
+                        : __('emails.federation.connection_request_heading');
+                    $body = $isAccepted
+                        ? __('emails.federation.connection_accepted_body', ['name' => $safeExternalUserName, 'community' => $safePartnerName])
+                        : __('emails.federation.connection_request_body', ['name' => $safeExternalUserName, 'community' => $safePartnerName]);
+                    $preview = $isAccepted
+                        ? __('emails.federation.connection_accepted_body', ['name' => $externalUserName, 'community' => $partnerName])
+                        : __('emails.federation.connection_request_body', ['name' => $externalUserName, 'community' => $partnerName]);
+                    $cta = $isAccepted
+                        ? __('emails.federation.connection_accepted_cta')
+                        : __('emails.federation.connection_request_cta');
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('federation')
+                        ->title($title)
+                        ->previewText($preview)
+                        ->greeting($recipientName)
+                        ->paragraph($body)
+                        ->button($cta, EmailTemplateBuilder::tenantUrl('/network'))
+                        ->render();
+
+                    $sent = EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'federation_connection', ['tenant_id' => $recipientTenantId]);
+                });
+            } finally {
+                if ($previousTenantId !== null) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
+            }
+
+            return $sent;
+        } catch (\Throwable $e) {
+            Log::error('[FederationEmail] sendExternalConnectionNotification failed', ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
      * Send a transaction confirmation to the sender.
      */
     public static function sendTransactionConfirmation(int $senderUserId, int $recipientUserId, int $recipientTenantId, float $amount, string $description, float $newBalance): bool
