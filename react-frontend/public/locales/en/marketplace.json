@@ -533,6 +533,19 @@
     "delivery_confirmed": "Delivery confirmed! Time credits awarded.",
     "confirm_failed": "Failed to confirm delivery"
   },
+  "pickup": {
+    "my_pickups_title": "My Pickups",
+    "my_pickups_subtitle": "Show this code at the seller's location to collect your order.",
+    "no_pickups": "No upcoming pickups.",
+    "order_n": "Order #{{id}}",
+    "window": "Pickup window",
+    "show_this_code": "Show this code to the seller",
+    "status_reserved": "Reserved",
+    "status_picked_up": "Picked up",
+    "status_cancelled": "Cancelled",
+    "status_no_show": "No show",
+    "status_unknown": "Unknown"
+  },
   "inventory": {
     "section_title": "Inventory",
     "section_subtitle": "Track stock and prevent over-selling.",

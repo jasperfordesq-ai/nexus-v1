@@ -33,8 +33,8 @@ interface Reservation {
 }
 
 export function MyPickupsPage() {
-  const { t } = useTranslation('common');
-  usePageTitle(t('marketplace.pickup.my_pickups_title', 'My Pickups'));
+  const { t } = useTranslation('marketplace');
+  usePageTitle(t('pickup.my_pickups_title'));
   const { isAuthenticated } = useAuth();
 
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -69,15 +69,15 @@ export function MyPickupsPage() {
 
   return (
     <>
-      <PageMeta title={t('marketplace.pickup.my_pickups_title', 'My Pickups')} noIndex />
+      <PageMeta title={t('pickup.my_pickups_title')} noIndex />
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-      <div>
+      <div className="min-w-0">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <ShoppingBag className="w-7 h-7 text-primary" />
-          {t('marketplace.pickup.my_pickups_title', 'My Pickups')}
+          {t('pickup.my_pickups_title')}
         </h1>
         <p className="text-default-500 text-sm mt-1">
-          {t('marketplace.pickup.my_pickups_subtitle', 'Show this code at the seller\'s location to collect your order.')}
+          {t('pickup.my_pickups_subtitle')}
         </p>
       </div>
 
@@ -87,7 +87,7 @@ export function MyPickupsPage() {
         </div>
       ) : reservations.length === 0 ? (
         <GlassCard className="p-8 text-center text-default-500">
-          {t('marketplace.pickup.no_pickups', 'No upcoming pickups.')}
+          {t('pickup.no_pickups')}
         </GlassCard>
       ) : (
         <div className="grid gap-4">
@@ -96,14 +96,14 @@ export function MyPickupsPage() {
               <div className="flex justify-between items-start gap-4 flex-wrap">
                 <div>
                   <p className="font-semibold text-foreground">
-                    {r.listing_title || t('marketplace.pickup.order_n', 'Order #{{id}}', { id: r.order_id })}
+                    {r.listing_title || t('pickup.order_n', { id: r.order_id })}
                   </p>
                   <p className="text-sm text-default-500">
-                    {t('marketplace.pickup.window', 'Pickup window')}: {formatTime(r.slot?.slot_start ?? null)}
+                    {t('pickup.window')}: {formatTime(r.slot?.slot_start ?? null)}
                   </p>
                 </div>
                 <Chip color={statusColor(r.status)} variant="flat" size="sm">
-                  {t(`marketplace.pickup.status_${r.status}`, r.status)}
+                  {t(`pickup.status_${r.status}`, { defaultValue: t('pickup.status_unknown') })}
                 </Chip>
               </div>
 
@@ -112,7 +112,7 @@ export function MyPickupsPage() {
                   <QrCode className="w-10 h-10 text-primary shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-default-500">
-                      {t('marketplace.pickup.show_this_code', 'Show this code to the seller')}
+                      {t('pickup.show_this_code')}
                     </p>
                     <p className="font-mono text-sm font-semibold break-all text-foreground">
                       {r.qr_code}
