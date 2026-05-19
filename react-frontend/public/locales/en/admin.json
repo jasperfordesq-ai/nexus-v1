@@ -1681,6 +1681,89 @@
     "provider_platform_default": "Platform Default",
     "provider_sendgrid": "SendGrid",
     "provider_smtp": "SMTP",
+    "prerender": {
+      "description": "Bot-only server-rendered snapshots. Monitor coverage, detect staleness, and force refreshes.",
+      "live_connected": "Live updates connected",
+      "overview": {
+        "actions": {
+          "queue_job": "Queue job",
+          "refresh": "Refresh"
+        },
+        "empty_summary": "No summary available.",
+        "errors": {
+          "enqueue_job": "Failed to enqueue job",
+          "load_summary": "Failed to load summary"
+        },
+        "fields": {
+          "routes": "Routes",
+          "tenant_slug": "Tenant slug"
+        },
+        "force_refresh": {
+          "description": "Queue a re-render. Leave both fields empty to refresh every tenant and route. The host processor picks the job up within about 60 seconds.",
+          "dry_run": "Dry run (plan only)",
+          "force": "Force (ignore cache)",
+          "title": "Force refresh"
+        },
+        "health": {
+          "cache_unreachable": "Cache unreachable",
+          "healthy": "Healthy",
+          "missing": "{{count}} missing",
+          "stale": "{{count}} stale"
+        },
+        "hints": {
+          "active_jobs": "{{count}} active",
+          "aging": "{{count}} aging (>7d)",
+          "asset_broken": "References dead /assets/*",
+          "backoff_window": "In 6h backoff window",
+          "cache_age": "Oldest {{oldest}} / newest {{newest}}",
+          "content_stale": "Source content newer than snapshot",
+          "event_at": "Event {{time}}",
+          "no_events": "No events",
+          "prometheus": "Prometheus text format",
+          "tenants_routes": "{{tenants}} tenants x {{routes}} routes"
+        },
+        "kpi": {
+          "age_stale": "Age stale (>14d)",
+          "asset_broken": "Asset-broken",
+          "build_commit": "Build commit",
+          "cache_size": "Cache size",
+          "content_stale": "Content stale",
+          "coverage": "Coverage",
+          "metrics": "Metrics",
+          "missing": "Missing",
+          "queued_jobs": "Queued jobs",
+          "recent_failures": "Recent failures",
+          "status": "Status"
+        },
+        "last_run": "Last completed run",
+        "messages": {
+          "job_queued": "Queued job #{{id}}"
+        },
+        "placeholders": {
+          "routes": "/about,/blog (blank = all)",
+          "tenant_slug": "e.g. hour-timebank (blank = all)"
+        },
+        "super_admin_only": "Super admin only"
+      },
+      "polling_fallback": "Polling fallback",
+      "readonly": {
+        "prefix": "Read-only view - action buttons are disabled because the prerender engine operates across every tenant. Sign in with a",
+        "role": "platform super-admin",
+        "suffix": "account to enqueue jobs, purge snapshots, or trigger drift detection."
+      },
+      "tabs": {
+        "analytics": "Analytics",
+        "coverage": "Coverage",
+        "events": "Events",
+        "failures": "Failures",
+        "history": "History",
+        "inventory": "Inventory",
+        "jobs": "Jobs",
+        "overview": "Overview"
+      },
+      "tabs_aria": "Prerender tabs",
+      "title": "Prerender Engine"
+    },
     "running_audit": "Running Audit",
     "security_heading": "Security",
     "security_note": "Security",

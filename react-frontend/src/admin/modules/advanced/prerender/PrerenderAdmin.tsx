@@ -43,6 +43,7 @@ import Trash from 'lucide-react/icons/trash-2';
 import Bot from 'lucide-react/icons/bot';
 import Gauge from 'lucide-react/icons/gauge';
 import Zap from 'lucide-react/icons/zap';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useAuth, usePusherOptional } from '@/contexts';
 import { PageHeader } from '../../../components';
@@ -158,7 +159,8 @@ function useJobUpdates(): { lastUpdate: number; live: boolean } {
 }
 
 export function PrerenderAdmin() {
-  usePageTitle('Prerender Engine');
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender' });
+  usePageTitle(t('title'));
   const toast = useToast();
   const { user } = useAuth();
   // PLATFORM super-admin only — the engine runs cross-tenant operations.
@@ -190,16 +192,15 @@ export function PrerenderAdmin() {
   return (
     <div>
       <PageHeader
-        title="Prerender Engine"
-        description="Bot-only server-rendered snapshots. Monitor coverage, detect staleness, force refreshes."
+        title={t('title')}
+        description={t('description')}
       />
 
       {readOnly && (
         <div className="mb-3 rounded-md border border-warning-200 bg-warning-50 text-warning-800 px-3 py-2 text-sm">
-          Read-only view — action buttons are disabled because the prerender
-          engine operates across every tenant. Sign in with a <strong>platform
-          super-admin</strong> account to enqueue jobs, purge snapshots, or
-          trigger drift detection.
+          {t('readonly.prefix')}{' '}
+          <strong>{t('readonly.role')}</strong>{' '}
+          {t('readonly.suffix')}
         </div>
       )}
 
@@ -212,12 +213,12 @@ export function PrerenderAdmin() {
           color={live ? 'success' : 'default'}
           startContent={<span className={`inline-block w-2 h-2 rounded-full ${live ? 'bg-success animate-pulse' : 'bg-default-400'}`} />}
         >
-          {live ? 'Live updates connected' : 'Polling fallback'}
+          {live ? t('live_connected') : t('polling_fallback')}
         </Chip>
       </div>
 
       <Tabs
-        aria-label="Prerender tabs"
+        aria-label={t('tabs_aria')}
         selectedKey={tab}
         onSelectionChange={(k) => setTab(String(k))}
         variant="underlined"
@@ -225,19 +226,19 @@ export function PrerenderAdmin() {
       >
         <Tab
           key="overview"
-          title={<span className="flex items-center gap-2"><Activity size={16} />Overview</span>}
+          title={<span className="flex items-center gap-2"><Activity size={16} />{t('tabs.overview')}</span>}
         >
           <OverviewTab isSuperAdmin={isSuperAdmin} toast={toast} lastUpdate={lastUpdate} live={live} />
         </Tab>
         <Tab
           key="inventory"
-          title={<span className="flex items-center gap-2"><HardDrive size={16} />Inventory</span>}
+          title={<span className="flex items-center gap-2"><HardDrive size={16} />{t('tabs.inventory')}</span>}
         >
           <InventoryTab presetTenant={coverageFilter} onPresetConsumed={() => setCoverageFilter(null)} />
         </Tab>
         <Tab
           key="coverage"
-          title={<span className="flex items-center gap-2"><LayoutGrid size={16} />Coverage</span>}
+          title={<span className="flex items-center gap-2"><LayoutGrid size={16} />{t('tabs.coverage')}</span>}
         >
           <CoverageTab
             isSuperAdmin={isSuperAdmin}
@@ -247,31 +248,31 @@ export function PrerenderAdmin() {
         </Tab>
         <Tab
           key="jobs"
-          title={<span className="flex items-center gap-2"><Briefcase size={16} />Jobs</span>}
+          title={<span className="flex items-center gap-2"><Briefcase size={16} />{t('tabs.jobs')}</span>}
         >
           <JobsTab isSuperAdmin={isSuperAdmin} toast={toast} lastUpdate={lastUpdate} live={live} />
         </Tab>
         <Tab
           key="analytics"
-          title={<span className="flex items-center gap-2"><Bot size={16} />Analytics</span>}
+          title={<span className="flex items-center gap-2"><Bot size={16} />{t('tabs.analytics')}</span>}
         >
           <AnalyticsTab />
         </Tab>
         <Tab
           key="events"
-          title={<span className="flex items-center gap-2"><Activity size={16} />Events</span>}
+          title={<span className="flex items-center gap-2"><Activity size={16} />{t('tabs.events')}</span>}
         >
           <EventsTab />
         </Tab>
         <Tab
           key="failures"
-          title={<span className="flex items-center gap-2"><AlertOctagon size={16} />Failures</span>}
+          title={<span className="flex items-center gap-2"><AlertOctagon size={16} />{t('tabs.failures')}</span>}
         >
           <FailuresTab />
         </Tab>
         <Tab
           key="history"
-          title={<span className="flex items-center gap-2"><Clock size={16} />History</span>}
+          title={<span className="flex items-center gap-2"><Clock size={16} />{t('tabs.history')}</span>}
         >
           <AuditTab />
         </Tab>
@@ -290,6 +291,7 @@ interface ToastShape {
 }
 
 function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number; live: boolean }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.overview' });
   const [summary, setSummary] = useState<PrerenderSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [enqueuing, setEnqueuing] = useState(false);
@@ -302,9 +304,9 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
     setLoading(true);
     adminPrerender.getSummary()
       .then((res) => { if (res.data) setSummary(res.data as PrerenderSummary); })
-      .catch(() => toast.error('Failed to load summary'))
+      .catch(() => toast.error(t('errors.load_summary')))
       .finally(() => setLoading(false));
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => { load(); }, [load]);
   // Reload on Pusher signal; fall back to 30s poll ONLY when realtime is down,
@@ -326,13 +328,13 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
         dry_run: dryRun,
       });
       if (res.data) {
-        toast.success(`Queued job #${res.data.job_id}`);
+        toast.success(t('messages.job_queued', { id: res.data.job_id }));
         setTenantSlug('');
         setRoutes('');
         load();
       }
     } catch {
-      toast.error('Failed to enqueue job');
+      toast.error(t('errors.enqueue_job'));
     } finally {
       setEnqueuing(false);
     }
@@ -341,34 +343,34 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
   if (loading && !summary) {
     return <div className="flex justify-center py-8"><Spinner /></div>;
   }
-  if (!summary) return <p className="text-default-500">No summary available.</p>;
+  if (!summary) return <p className="text-default-500">{t('empty_summary')}</p>;
 
   const healthBadge = !summary.cache_readable
-    ? <Chip color="danger" variant="flat">Cache unreachable</Chip>
+    ? <Chip color="danger" variant="flat">{t('health.cache_unreachable')}</Chip>
     : summary.missing_count > 0
-      ? <Chip color="warning" variant="flat">{summary.missing_count} missing</Chip>
+      ? <Chip color="warning" variant="flat">{t('health.missing', { count: summary.missing_count })}</Chip>
       : summary.stale_count > 0
-        ? <Chip color="warning" variant="flat">{summary.stale_count} stale</Chip>
-        : <Chip color="success" variant="flat">Healthy</Chip>;
+        ? <Chip color="warning" variant="flat">{t('health.stale', { count: summary.stale_count })}</Chip>
+        : <Chip color="success" variant="flat">{t('health.healthy')}</Chip>;
 
   return (
     <div className="space-y-4">
       {/* KPI grid — 11 cards, breakpoints chosen so every row fills cleanly. */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 gap-3">
-        <KpiCard label="Coverage" value={`${summary.coverage_pct}%`} hint={`${summary.total_snapshots} / ${summary.expected_count}`} />
-        <KpiCard label="Missing" value={summary.missing_count} hint={`${summary.tenant_count} tenants × ${summary.expected_routes.length} routes`} tone={summary.missing_count > 0 ? 'warning' : 'default'} />
-        <KpiCard label="Age stale (>14d)" value={summary.stale_count} hint={`${summary.warn_count} aging (>7d)`} tone={summary.stale_count > 0 ? 'warning' : 'default'} />
-        <KpiCard label="Content stale" value={summary.content_stale_count} hint="source content newer than snapshot" tone={summary.content_stale_count > 0 ? 'warning' : 'default'} />
-        <KpiCard label="Asset-broken" value={summary.asset_invalid_count} hint="references dead /assets/*" tone={summary.asset_invalid_count > 0 ? 'danger' : 'default'} />
-        <KpiCard label="Cache size" value={formatBytes(summary.total_size_bytes)} hint={`oldest ${formatAge(summary.oldest_age_s)} • newest ${formatAge(summary.newest_age_s)}`} />
-        <KpiCard label="Queued jobs" value={summary.queued_jobs} hint={`${summary.active_jobs} active`} tone={summary.active_jobs > 0 ? 'primary' : 'default'} />
-        <KpiCard label="Recent failures" value={summary.recent_failures} hint="in 6h backoff window" tone={summary.recent_failures > 0 ? 'danger' : 'default'} />
-        <KpiCard label="Build commit" value={summary.build_commit || '—'} hint={summary.last_event_at ? `event ${formatTs(summary.last_event_at)}` : 'no events'} />
-        <KpiCard label="Status" value={healthBadge} hint={summary.cache_path} />
+        <KpiCard label={t('kpi.coverage')} value={`${summary.coverage_pct}%`} hint={`${summary.total_snapshots} / ${summary.expected_count}`} />
+        <KpiCard label={t('kpi.missing')} value={summary.missing_count} hint={t('hints.tenants_routes', { tenants: summary.tenant_count, routes: summary.expected_routes.length })} tone={summary.missing_count > 0 ? 'warning' : 'default'} />
+        <KpiCard label={t('kpi.age_stale')} value={summary.stale_count} hint={t('hints.aging', { count: summary.warn_count })} tone={summary.stale_count > 0 ? 'warning' : 'default'} />
+        <KpiCard label={t('kpi.content_stale')} value={summary.content_stale_count} hint={t('hints.content_stale')} tone={summary.content_stale_count > 0 ? 'warning' : 'default'} />
+        <KpiCard label={t('kpi.asset_broken')} value={summary.asset_invalid_count} hint={t('hints.asset_broken')} tone={summary.asset_invalid_count > 0 ? 'danger' : 'default'} />
+        <KpiCard label={t('kpi.cache_size')} value={formatBytes(summary.total_size_bytes)} hint={t('hints.cache_age', { oldest: formatAge(summary.oldest_age_s), newest: formatAge(summary.newest_age_s) })} />
+        <KpiCard label={t('kpi.queued_jobs')} value={summary.queued_jobs} hint={t('hints.active_jobs', { count: summary.active_jobs })} tone={summary.active_jobs > 0 ? 'primary' : 'default'} />
+        <KpiCard label={t('kpi.recent_failures')} value={summary.recent_failures} hint={t('hints.backoff_window')} tone={summary.recent_failures > 0 ? 'danger' : 'default'} />
+        <KpiCard label={t('kpi.build_commit')} value={summary.build_commit || '—'} hint={summary.last_event_at ? t('hints.event_at', { time: formatTs(summary.last_event_at) }) : t('hints.no_events')} />
+        <KpiCard label={t('kpi.status')} value={healthBadge} hint={summary.cache_path} />
         <KpiCard
-          label="Metrics"
+          label={t('kpi.metrics')}
           value={<a href="/api/v2/admin/prerender/metrics" target="_blank" rel="noopener noreferrer" className="text-primary text-sm hover:underline">/metrics</a>}
-          hint="Prometheus text format"
+          hint={t('hints.prometheus')}
         />
       </div>
 
@@ -376,7 +378,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
       {summary.last_run && (
         <Card shadow="sm">
           <CardHeader>
-            <h3 className="text-lg font-semibold">Last completed run</h3>
+            <h3 className="text-lg font-semibold">{t('last_run')}</h3>
           </CardHeader>
           <CardBody>
             <Code className="text-xs whitespace-pre-wrap block">
@@ -390,29 +392,28 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
       <Card shadow="sm">
         <CardHeader className="flex items-center justify-between">
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Play size={18} />Force refresh
+            <Play size={18} />{t('force_refresh.title')}
           </h3>
           {!isSuperAdmin && (
-            <Chip color="warning" variant="flat" size="sm">Super admin only</Chip>
+            <Chip color="warning" variant="flat" size="sm">{t('super_admin_only')}</Chip>
           )}
         </CardHeader>
         <CardBody className="gap-3">
           <p className="text-sm text-default-500">
-            Queue a re-render. Leave both fields empty to refresh every tenant and route.
-            The host processor picks the job up within ~60 seconds.
+            {t('force_refresh.description')}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Input
-              label="Tenant slug"
-              placeholder="e.g. hour-timebank (blank = all)"
+              label={t('fields.tenant_slug')}
+              placeholder={t('placeholders.tenant_slug')}
               variant="bordered"
               value={tenantSlug}
               onValueChange={setTenantSlug}
               isDisabled={!isSuperAdmin}
             />
             <Input
-              label="Routes"
-              placeholder="/about,/blog (blank = all)"
+              label={t('fields.routes')}
+              placeholder={t('placeholders.routes')}
               variant="bordered"
               value={routes}
               onValueChange={setRoutes}
@@ -421,10 +422,10 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
             <Switch isSelected={force} onValueChange={setForce} isDisabled={!isSuperAdmin}>
-              <span className="text-sm">Force (ignore cache)</span>
+              <span className="text-sm">{t('force_refresh.force')}</span>
             </Switch>
             <Switch isSelected={dryRun} onValueChange={setDryRun} isDisabled={!isSuperAdmin}>
-              <span className="text-sm">Dry run (plan only)</span>
+              <span className="text-sm">{t('force_refresh.dry_run')}</span>
             </Switch>
           </div>
           <div className="flex justify-end gap-2">
@@ -434,7 +435,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
               onPress={load}
               isDisabled={loading}
             >
-              Refresh
+              {t('actions.refresh')}
             </Button>
             <Button
               color="primary"
@@ -443,7 +444,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
               isLoading={enqueuing}
               isDisabled={!isSuperAdmin}
             >
-              Queue job
+              {t('actions.queue_job')}
             </Button>
           </div>
         </CardBody>
