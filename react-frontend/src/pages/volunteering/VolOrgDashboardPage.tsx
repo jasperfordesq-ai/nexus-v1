@@ -55,13 +55,13 @@ interface OrgDetails {
   auto_pay_enabled: boolean;
 }
 
-const TAB_DEFS: { key: OrgDashTab; icon: typeof LayoutDashboard; label: string }[] = [
-  { key: 'overview', icon: LayoutDashboard, label: 'Overview' },
-  { key: 'applications', icon: ClipboardList, label: 'Applications' },
-  { key: 'hours-review', icon: Clock, label: 'Hours Review' },
-  { key: 'volunteers', icon: Users, label: 'Volunteers' },
-  { key: 'wallet', icon: Wallet, label: 'Wallet' },
-  { key: 'settings', icon: Settings, label: 'Settings' },
+const TAB_DEFS: { key: OrgDashTab; icon: typeof LayoutDashboard }[] = [
+  { key: 'overview', icon: LayoutDashboard },
+  { key: 'applications', icon: ClipboardList },
+  { key: 'hours-review', icon: Clock },
+  { key: 'volunteers', icon: Users },
+  { key: 'wallet', icon: Wallet },
+  { key: 'settings', icon: Settings },
 ];
 
 const ORG_DASH_TABS = TAB_DEFS.map((tab) => tab.key);
