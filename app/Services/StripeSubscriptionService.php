@@ -647,7 +647,7 @@ class StripeSubscriptionService
      */
     /**
      * Send 7-day renewal reminder emails to tenant admins.
-     * Deduped via a 24h cache key per tenant+period to prevent duplicate sends.
+     * Deduped per tenant+period for the full eligibility window to prevent duplicate sends.
      *
      * @return array{sent: int, errors: int}
      */
@@ -690,7 +690,7 @@ class StripeSubscriptionService
                 );
 
                 if ($sentEmail) {
-                    Cache::put($cacheKey, true, now()->addHours(24));
+                    Cache::put($cacheKey, true, now()->addDays(8));
                     $sent++;
                 } else {
                     $errors++;
@@ -706,7 +706,7 @@ class StripeSubscriptionService
 
     /**
      * Send trial-ending reminder emails (7-day and 1-day windows).
-     * Deduped via a 24h cache key per tenant+window to prevent duplicate sends.
+     * Deduped per tenant+window for the full eligibility window to prevent duplicate sends.
      *
      * @return array{sent: int, errors: int}
      */
@@ -748,7 +748,7 @@ class StripeSubscriptionService
                             ['key' => 'emails_misc.stripe_subscription.trial_ending_7d_cta']
                         );
                         if ($sentEmail) {
-                            Cache::put($cacheKey, true, now()->addHours(24));
+                            Cache::put($cacheKey, true, now()->addDays(8));
                             $sent++;
                         } else {
                             $errors++;
@@ -772,7 +772,7 @@ class StripeSubscriptionService
                             ['key' => 'emails_misc.stripe_subscription.trial_ending_1d_cta']
                         );
                         if ($sentEmail) {
-                            Cache::put($cacheKey, true, now()->addHours(24));
+                            Cache::put($cacheKey, true, now()->addDays(3));
                             $sent++;
                         } else {
                             $errors++;

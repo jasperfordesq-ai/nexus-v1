@@ -9,6 +9,7 @@ namespace Tests\Laravel\Integration;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use App\Services\StripeSubscriptionService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -73,6 +74,41 @@ class StripeSubscriptionReminderEmailTest extends TestCase
         $this->assertSame($tenantId, $mailer->calls[0]['options']['tenant_id']);
     }
 
+    public function test_renewal_reminder_stays_deduped_past_twenty_four_hours(): void
+    {
+        $tenantId = $this->createBillingTenant('renewal-window');
+        $periodEnd = now()->addDays(4)->setSecond(0);
+        $this->createBillingAdmin($tenantId);
+        $this->createPlanAssignment($tenantId, 'active', $periodEnd);
+
+        $cacheKey = 'subscription_renewal_reminder:' . $tenantId . ':' . $periodEnd->format('Y-m-d');
+        Cache::forget($cacheKey);
+
+        $mailer = new class extends EmailDispatchService {
+            public array $calls = [];
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->calls[] = compact('to', 'subject', 'body', 'options');
+
+                return true;
+            }
+        };
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $this->assertSame(['sent' => 1, 'errors' => 0], StripeSubscriptionService::sendRenewalReminders());
+
+        try {
+            Carbon::setTestNow(now()->addHours(25));
+
+            $this->assertTrue(Cache::has($cacheKey));
+            $this->assertSame(['sent' => 0, 'errors' => 0], StripeSubscriptionService::sendRenewalReminders());
+            $this->assertCount(1, $mailer->calls);
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
     public function test_trial_reminder_does_not_count_or_cache_when_email_fails(): void
     {
         $tenantId = $this->createBillingTenant('trial-fail');
@@ -93,6 +129,40 @@ class StripeSubscriptionReminderEmailTest extends TestCase
 
         $this->assertSame(['sent' => 0, 'errors' => 1], $result);
         $this->assertFalse(Cache::has($cacheKey));
+    }
+
+    public function test_trial_reminder_stays_deduped_past_twenty_four_hours(): void
+    {
+        $tenantId = $this->createBillingTenant('trial-window');
+        $this->createBillingAdmin($tenantId);
+        $this->createPlanAssignment($tenantId, 'trial', now()->addDays(7)->setSecond(0));
+
+        $cacheKey = 'trial_ending_reminder:' . $tenantId . ':7d';
+        Cache::forget($cacheKey);
+
+        $mailer = new class extends EmailDispatchService {
+            public array $calls = [];
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->calls[] = compact('to', 'subject', 'body', 'options');
+
+                return true;
+            }
+        };
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $this->assertSame(['sent' => 1, 'errors' => 0], StripeSubscriptionService::sendTrialEndingReminders());
+
+        try {
+            Carbon::setTestNow(now()->addHours(25));
+
+            $this->assertTrue(Cache::has($cacheKey));
+            $this->assertSame(['sent' => 0, 'errors' => 0], StripeSubscriptionService::sendTrialEndingReminders());
+            $this->assertCount(1, $mailer->calls);
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
     private function createBillingTenant(string $slugSuffix): int
