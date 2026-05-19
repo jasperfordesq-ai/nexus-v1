@@ -10,6 +10,10 @@ return [
     'feedback' => 'Give feedback',
     'feedback_url' => 'mailto:feedback@project-nexus.ie?subject=NEXUS%20Alpha%20feedback',
     'skip_to_content' => 'Skip to main content',
+    'seo' => [
+        'description' => 'Use the accessible Project NEXUS alpha frontend for core community tasks with clear navigation, standard forms and progressive enhancement.',
+        'og_image_alt' => 'Project NEXUS open source timebanking and community platform',
+    ],
     'header' => [
         'community' => 'Community: :name',
         'links_label' => 'Service links',

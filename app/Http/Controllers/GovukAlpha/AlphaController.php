@@ -1646,6 +1646,10 @@ class AlphaController extends Controller
             'alphaFooterLinks' => $this->alphaFooterLinks(),
             'feedbackUrl' => $this->feedbackUrl(),
             'mainSiteUrl' => $this->mainSiteUrl(),
+            'metaDescription' => __('govuk_alpha.seo.description'),
+            'canonicalUrl' => request()->url(),
+            'robotsDirective' => 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+            'defaultOgImage' => 'https://project-nexus.ie/og-image.png',
         ];
     }
 

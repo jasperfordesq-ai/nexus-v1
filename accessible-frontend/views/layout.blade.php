@@ -5,9 +5,38 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="govuk-template">
 <head>
+    @php
+        $serviceName = __('govuk_alpha.service_name');
+        $pageTitle = $title ?? $serviceName;
+        $fullTitle = $pageTitle === $serviceName ? $serviceName : $pageTitle . ' - ' . $serviceName;
+    @endphp
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>{{ $title ?? __('govuk_alpha.service_name') }} - {{ __('govuk_alpha.service_name') }}</title>
+    <title>{{ $fullTitle }}</title>
+    @if (!empty($metaDescription))
+        <meta name="description" content="{{ $metaDescription }}">
+        <meta property="og:description" content="{{ $metaDescription }}">
+        <meta name="twitter:description" content="{{ $metaDescription }}">
+    @endif
+    @if (!empty($robotsDirective))
+        <meta name="robots" content="{{ $robotsDirective }}">
+    @endif
+    @if (!empty($canonicalUrl))
+        <link rel="canonical" href="{{ $canonicalUrl }}">
+        <meta property="og:url" content="{{ $canonicalUrl }}">
+    @endif
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $fullTitle }}">
+    <meta property="og:site_name" content="{{ $serviceName }}">
+    @if (!empty($defaultOgImage))
+        <meta property="og:image" content="{{ $defaultOgImage }}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:alt" content="{{ __('govuk_alpha.seo.og_image_alt') }}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="{{ $defaultOgImage }}">
+        <meta name="twitter:image:alt" content="{{ __('govuk_alpha.seo.og_image_alt') }}">
+    @endif
     @foreach (($assetEntrypoint['css'] ?? []) as $stylesheet)
         <link rel="stylesheet" href="{{ $stylesheet }}">
     @endforeach
