@@ -49,10 +49,24 @@ class NotifyMessageReceived implements ShouldQueue
         // a re-delivered job would queue a second email. Mark handled only after
         // the dispatcher reports durable queue/bell handling.
         $messageId = $event->message->id ?? null;
+        $handledKey = null;
+        $claimKey = null;
+        $claimAcquired = false;
+        $handled = false;
         if ($messageId) {
-            $lockKey = 'notify_message_received:' . (int) $messageId;
-            if (Cache::has($lockKey)) {
+            $handledKey = 'notify_message_received:done:' . (int) $event->tenantId . ':' . (int) $messageId;
+            $claimKey = 'notify_message_received:claim:' . (int) $event->tenantId . ':' . (int) $messageId;
+            if (Cache::has($handledKey)) {
                 Log::info('NotifyMessageReceived: duplicate delivery suppressed', [
+                    'message_id' => $messageId,
+                    'tenant_id'  => $event->tenantId ?? null,
+                ]);
+                return;
+            }
+
+            $claimAcquired = Cache::add($claimKey, 1, now()->addMinutes(5));
+            if (!$claimAcquired) {
+                Log::info('NotifyMessageReceived: concurrent delivery suppressed', [
                     'message_id' => $messageId,
                     'tenant_id'  => $event->tenantId ?? null,
                 ]);
@@ -129,8 +143,8 @@ class NotifyMessageReceived implements ShouldQueue
                 }
             });
 
-            if ($handled && $messageId) {
-                Cache::put('notify_message_received:' . (int) $messageId, 1, now()->addHour());
+            if ($handled && $handledKey !== null) {
+                Cache::put($handledKey, 1, now()->addHour());
             }
         } catch (\Throwable $e) {
             Log::error('NotifyMessageReceived listener failed', [
@@ -142,6 +156,9 @@ class NotifyMessageReceived implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
         } finally {
+            if ($claimAcquired && $claimKey !== null) {
+                Cache::forget($claimKey);
+            }
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }

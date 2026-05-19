@@ -63,13 +63,14 @@ class NotificationQueueTenantIntegrityTest extends TestCase
             ->count());
     }
 
-    public function test_message_listener_marks_cache_after_dispatch_result_not_before(): void
+    public function test_message_listener_uses_atomic_claim_before_queueing_email(): void
     {
         $source = file_get_contents(app_path('Listeners/NotifyMessageReceived.php'));
 
-        $this->assertStringNotContainsString('Cache::add($lockKey', $source);
+        $this->assertStringContainsString('Cache::add($claimKey', $source);
         $this->assertStringContainsString('$handled = LocaleContext::withLocale', $source);
-        $this->assertStringContainsString('if ($handled && $messageId)', $source);
+        $this->assertStringContainsString('Cache::put($handledKey', $source);
+        $this->assertStringContainsString('Cache::forget($claimKey)', $source);
     }
 
     public function test_queue_notification_resolves_tenant_from_recipient_when_context_is_missing(): void
