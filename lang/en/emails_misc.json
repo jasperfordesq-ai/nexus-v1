@@ -638,6 +638,26 @@
     "readme_support": "For questions about this export, please contact support.",
     "readme_expiry": "This export will expire in 7 days."
   },
+  "insurance": {
+    "verified_subject": "Insurance certificate verified - {{type}}",
+    "verified_title": "Insurance Certificate Verified",
+    "verified_preview": "Your {{type}} insurance certificate has been verified for {{community}}",
+    "verified_body": "Your <strong>{{type}}</strong> insurance certificate has been verified for <strong>{{community}}</strong>.",
+    "rejected_subject": "Insurance certificate not approved - {{type}}",
+    "rejected_title": "Insurance Certificate Not Approved",
+    "rejected_preview": "Your {{type}} insurance certificate was not approved for {{community}}",
+    "rejected_body": "Your <strong>{{type}}</strong> insurance certificate was not approved for <strong>{{community}}</strong>.",
+    "reason_label": "Reason",
+    "cta": "View Dashboard",
+    "type": {
+      "public_liability": "public liability",
+      "professional_indemnity": "professional indemnity",
+      "employers_liability": "employer's liability",
+      "product_liability": "product liability",
+      "personal_accident": "personal accident",
+      "other": "insurance"
+    }
+  },
   "billing": {
     "plan_assigned_subject": "Your Project NEXUS plan has been updated",
     "plan_assigned_title": "Plan Updated",

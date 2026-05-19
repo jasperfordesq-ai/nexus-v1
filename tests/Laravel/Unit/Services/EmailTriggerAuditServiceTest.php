@@ -30,6 +30,7 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('safeguarding:incident_flag_vetting_guardian_training:safeguarding', $keys);
         $this->assertContains('newsletter:newsletter_queue_dispatch:newsletter', $keys);
         $this->assertContains('security:account_suspended_banned_deleted_reactivated:admin_user_status', $keys);
+        $this->assertContains('insurance:insurance_certificate_verified_or_rejected:insurance_certificate', $keys);
         $this->assertContains('messages:direct_message_received:message', $keys);
         $this->assertContains('federation:federated_message_received:federation_message', $keys);
         $this->assertContains('marketplace:offer_order_refund_rating_report_dispute:marketplace_order', $keys);

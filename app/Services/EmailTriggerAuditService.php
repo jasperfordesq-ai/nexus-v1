@@ -57,6 +57,7 @@ class EmailTriggerAuditService
             ['module' => 'security', 'event' => 'account_suspended_banned_deleted_reactivated', 'category' => 'admin_user_status', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'security', 'event' => 'two_factor_reset', 'category' => 'security_alert', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'legal', 'event' => 'legal_document_updated', 'category' => 'legal_document', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'insurance', 'event' => 'insurance_certificate_verified_or_rejected', 'category' => 'insurance_certificate', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'identity', 'event' => 'identity_verification_payment_result', 'category' => 'identity_payment', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'identity', 'event' => 'identity_verification_result_or_reminder', 'category' => 'identity_verification', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'tenant_provisioning', 'event' => 'tenant_provisioning_rejected', 'category' => 'tenant_provisioning', 'critical' => true, 'source_table' => 'email_log'],

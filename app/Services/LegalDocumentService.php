@@ -655,7 +655,7 @@ class LegalDocumentService
                             null,
                             null,
                             null,
-                            'legal_update',
+                            'legal_document',
                             ['tenant_id' => $tenantId]
                         )) {
                             Log::warning('[LegalDocumentService] email returned false for user ' . $user->id);

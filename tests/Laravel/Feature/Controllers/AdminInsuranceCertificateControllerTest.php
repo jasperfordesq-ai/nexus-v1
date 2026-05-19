@@ -7,7 +7,9 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
+use App\Services\EmailDispatchService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -134,6 +136,49 @@ class AdminInsuranceCertificateControllerTest extends TestCase
         $response->assertStatus(422);
     }
 
+    public function test_verify_sends_insurance_certificate_email_with_tenant_evidence(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'insurance-verified@example.test',
+        ]);
+        $mailer = $this->fakeEmailDispatchService();
+        $certificateId = $this->createCertificateForUser($member);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/insurance/' . $certificateId . '/verify');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.email_sent', true);
+        $this->assertCount(1, $mailer->sends);
+        $this->assertSame('insurance-verified@example.test', $mailer->sends[0]['to']);
+        $this->assertSame('insurance_certificate', $mailer->sends[0]['options']['category']);
+        $this->assertSame($this->testTenantId, $mailer->sends[0]['options']['tenant_id']);
+    }
+
+    public function test_reject_sends_insurance_certificate_email_with_reason_and_tenant_evidence(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'insurance-rejected@example.test',
+        ]);
+        $mailer = $this->fakeEmailDispatchService();
+        $certificateId = $this->createCertificateForUser($member);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/insurance/' . $certificateId . '/reject', [
+            'reason' => 'Need updated expiry date',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.email_sent', true);
+        $this->assertCount(1, $mailer->sends);
+        $this->assertSame('insurance-rejected@example.test', $mailer->sends[0]['to']);
+        $this->assertSame('insurance_certificate', $mailer->sends[0]['options']['category']);
+        $this->assertSame($this->testTenantId, $mailer->sends[0]['options']['tenant_id']);
+        $this->assertStringContainsString('Need updated expiry date', $mailer->sends[0]['body']);
+    }
+
     // ================================================================
     // DELETE — DELETE /v2/admin/insurance/{id}
     // ================================================================
@@ -172,5 +217,43 @@ class AdminInsuranceCertificateControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/insurance/user/1');
 
         $response->assertStatus(403);
+    }
+
+    private function createCertificateForUser(User $user, array $overrides = []): int
+    {
+        return (int) DB::table('insurance_certificates')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'insurance_type' => 'public_liability',
+            'provider_name' => 'Audit Insurance Co',
+            'policy_number' => 'AUDIT-123',
+            'status' => 'submitted',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $overrides));
+    }
+
+    private function fakeEmailDispatchService(): EmailDispatchService
+    {
+        $mailer = new class extends EmailDispatchService {
+            /** @var list<array{to:string,subject:string,body:string,options:array<string,mixed>}> */
+            public array $sends = [];
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->sends[] = [
+                    'to' => $to,
+                    'subject' => $subject,
+                    'body' => $body,
+                    'options' => $options,
+                ];
+
+                return true;
+            }
+        };
+
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        return $mailer;
     }
 }

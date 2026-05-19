@@ -6,14 +6,16 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 use App\Models\Notification;
+use App\Services\EmailDispatchService;
 use App\Services\InsuranceCertificateService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * AdminInsuranceCertificateController -- Admin insurance certificate management.
@@ -218,11 +220,12 @@ class AdminInsuranceCertificateController extends BaseApiController
             // Wrapped in LocaleContext so the bell renders in the recipient's
             // preferred_language, not the broker's. See CLAUDE.md
             // "EMAIL & NOTIFICATION LOCALE — MUST WRAP IN LocaleContext".
+            $emailSent = false;
             try {
                 if (!empty($existing['user_id'])) {
                     $userId = (int) $existing['user_id'];
                     $recipient = DB::selectOne(
-                        "SELECT id, preferred_language FROM users WHERE id = ? AND tenant_id = ?",
+                        "SELECT id, email, first_name, name, preferred_language FROM users WHERE id = ? AND tenant_id = ?",
                         [$userId, TenantContext::getId()]
                     );
                     LocaleContext::withLocale($recipient, function () use ($userId) {
@@ -234,6 +237,10 @@ class AdminInsuranceCertificateController extends BaseApiController
                             true
                         );
                     });
+                    $emailSent = (bool) LocaleContext::withLocale(
+                        $recipient,
+                        fn () => $this->sendInsuranceDecisionEmail($recipient, $existing, 'verified')
+                    );
                 }
             } catch (\Throwable $e) {
                 Log::warning("AdminInsuranceCertificateController::verify notification failed for cert #{$id}: " . $e->getMessage());
@@ -241,6 +248,7 @@ class AdminInsuranceCertificateController extends BaseApiController
 
             $record = $this->insuranceCertificateService->getById($id);
 
+            $record['email_sent'] = $emailSent;
             return $this->respondWithData($record);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', __('api.insurance_cert_verify_failed'), null, 500);
@@ -270,11 +278,12 @@ class AdminInsuranceCertificateController extends BaseApiController
             // Notify the user that their insurance certificate was not
             // approved — wrapped in LocaleContext so the bell renders in
             // the recipient's preferred_language.
+            $emailSent = false;
             try {
                 if (!empty($existing['user_id'])) {
                     $userId = (int) $existing['user_id'];
                     $recipient = DB::selectOne(
-                        "SELECT id, preferred_language FROM users WHERE id = ? AND tenant_id = ?",
+                        "SELECT id, email, first_name, name, preferred_language FROM users WHERE id = ? AND tenant_id = ?",
                         [$userId, TenantContext::getId()]
                     );
                     LocaleContext::withLocale($recipient, function () use ($userId) {
@@ -286,6 +295,10 @@ class AdminInsuranceCertificateController extends BaseApiController
                             true
                         );
                     });
+                    $emailSent = (bool) LocaleContext::withLocale(
+                        $recipient,
+                        fn () => $this->sendInsuranceDecisionEmail($recipient, $existing, 'rejected', $reason)
+                    );
                 }
             } catch (\Throwable $e) {
                 Log::warning("AdminInsuranceCertificateController::reject notification failed for cert #{$id}: " . $e->getMessage());
@@ -293,6 +306,7 @@ class AdminInsuranceCertificateController extends BaseApiController
 
             $record = $this->insuranceCertificateService->getById($id);
 
+            $record['email_sent'] = $emailSent;
             return $this->respondWithData($record);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', __('api.insurance_cert_reject_failed'), null, 500);
@@ -332,5 +346,47 @@ class AdminInsuranceCertificateController extends BaseApiController
         } catch (\Exception $e) {
             return $this->respondWithData([]);
         }
+    }
+
+    private function sendInsuranceDecisionEmail(?object $recipient, array $certificate, string $decision, ?string $reason = null): bool
+    {
+        if (!$recipient || empty($recipient->email)) {
+            return false;
+        }
+
+        $tenantId = TenantContext::getId();
+        $community = TenantContext::getName();
+        $firstName = $recipient->first_name ?? $recipient->name ?? __('emails.common.fallback_name');
+        $type = (string) ($certificate['insurance_type'] ?? 'other');
+        $typeLabel = __("emails_misc.insurance.type.{$type}");
+        if ($typeLabel === "emails_misc.insurance.type.{$type}") {
+            $typeLabel = __('emails_misc.insurance.type.other');
+        }
+
+        $builder = EmailTemplateBuilder::make()
+            ->theme($decision === 'verified' ? 'success' : 'warning')
+            ->title(__("emails_misc.insurance.{$decision}_title"))
+            ->previewText(__("emails_misc.insurance.{$decision}_preview", ['type' => $typeLabel, 'community' => $community]))
+            ->greeting($firstName)
+            ->paragraph(__("emails_misc.insurance.{$decision}_body", ['type' => $typeLabel, 'community' => $community]));
+
+        if ($decision === 'rejected' && $reason !== null && $reason !== '') {
+            $builder->paragraph('<strong>' . __('emails_misc.insurance.reason_label') . ':</strong> ' . htmlspecialchars($reason, ENT_QUOTES, 'UTF-8'));
+        }
+
+        $html = $builder
+            ->button(__('emails_misc.insurance.cta'), TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/dashboard')
+            ->render();
+
+        return EmailDispatchService::sendRaw(
+            (string) $recipient->email,
+            __("emails_misc.insurance.{$decision}_subject", ['type' => $typeLabel, 'community' => $community]),
+            $html,
+            null,
+            null,
+            null,
+            'insurance_certificate',
+            ['tenant_id' => $tenantId]
+        );
     }
 }
