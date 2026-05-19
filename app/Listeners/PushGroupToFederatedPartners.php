@@ -37,7 +37,13 @@ class PushGroupToFederatedPartners implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            TenantContext::setById($tenantId);
+            if (!TenantContext::setById($tenantId)) {
+                Log::warning('PushGroupToFederatedPartners: tenant not found, skipping', [
+                    'tenant_id' => $tenantId,
+                    'group_id'  => $group->id ?? null,
+                ]);
+                return;
+            }
 
             if (!TenantContext::hasFeature('federation')) {
                 return;

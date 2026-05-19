@@ -54,8 +54,27 @@ class GenerateMonthlyReports extends Command
         $this->info(sprintf('Generating reports for %d subscription(s) - period %s', $subs->count(), $periodLabel));
 
         foreach ($subs as $sub) {
+            $reportId = null;
             try {
                 TenantContext::setById((int) $sub->tenant_id);
+
+                $existingSentReport = DB::table('regional_analytics_reports')
+                    ->where('subscription_id', $sub->id)
+                    ->where('tenant_id', $sub->tenant_id)
+                    ->where('report_type', 'monthly_summary')
+                    ->where('period_start', $periodStart->toDateString())
+                    ->where('status', 'sent')
+                    ->first(['id']);
+
+                if ($existingSentReport) {
+                    $this->info(sprintf(
+                        '  - subscription %d: report %d already sent for %s, skipping',
+                        $sub->id,
+                        $existingSentReport->id,
+                        $periodLabel
+                    ));
+                    continue;
+                }
 
                 $modules = is_string($sub->enabled_modules ?? null)
                     ? (json_decode($sub->enabled_modules, true) ?: [])
@@ -109,7 +128,7 @@ class GenerateMonthlyReports extends Command
                 ));
             } catch (\Throwable $e) {
                 $this->error(sprintf('  - subscription %d failed: %s', $sub->id, $e->getMessage()));
-                if (isset($reportId)) {
+                if ($reportId !== null) {
                     DB::table('regional_analytics_reports')->where('id', $reportId)->update([
                         'status' => 'failed',
                         'error_message' => $e->getMessage(),
@@ -134,6 +153,10 @@ class GenerateMonthlyReports extends Command
             if ($email === '') {
                 return ['sent' => false, 'error' => 'missing_recipient_email'];
             }
+            $tenantId = (int) ($sub->tenant_id ?? 0);
+            if ($tenantId <= 0) {
+                return ['sent' => false, 'error' => 'missing_subscription_tenant'];
+            }
 
             // Route through the platform Mailer. The Laravel Mail facade uses
             // SMTP in production and does not create unified audit evidence.
@@ -149,10 +172,10 @@ class GenerateMonthlyReports extends Command
                 null,
                 null,
                 'regional_analytics',
-                ['tenant_id' => $sub->tenant_id ?? null]
+                ['tenant_id' => $tenantId]
             )) {
                 Log::warning('Regional analytics report email send returned false', [
-                    'tenant_id' => $sub->tenant_id ?? null,
+                    'tenant_id' => $tenantId,
                 ]);
                 return ['sent' => false, 'error' => 'email_dispatch_returned_false'];
             }

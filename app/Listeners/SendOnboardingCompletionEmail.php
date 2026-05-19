@@ -27,7 +27,13 @@ class SendOnboardingCompletionEmail implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            TenantContext::setById($event->tenantId);
+            if (!TenantContext::setById($event->tenantId)) {
+                Log::warning('SendOnboardingCompletionEmail: tenant not found, skipping', [
+                    'user_id' => $event->userId,
+                    'tenant_id' => $event->tenantId,
+                ]);
+                return;
+            }
 
             $user = User::find($event->userId);
             if (!$user || empty($user->email)) {

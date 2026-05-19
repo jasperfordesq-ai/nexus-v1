@@ -43,7 +43,12 @@ class PushGroupRetractionToFederatedPartners implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            TenantContext::setById($tenantId);
+            if (!TenantContext::setById($tenantId)) {
+                Log::warning('PushGroupRetractionToFederatedPartners: tenant not found, skipping', [
+                    'tenant_id' => $tenantId,
+                ]);
+                return;
+            }
 
             if (!TenantContext::hasFeature('federation')) {
                 return;

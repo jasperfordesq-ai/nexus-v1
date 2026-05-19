@@ -39,7 +39,14 @@ class HandleFederatedConnectionReceived implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            TenantContext::setById($event->tenantId);
+            if (!TenantContext::setById($event->tenantId)) {
+                Log::warning('[HandleFederatedConnectionReceived] tenant not found, skipping', [
+                    'tenant_id'  => $event->tenantId,
+                    'partner_id' => $event->externalPartnerId,
+                    'local_id'   => $event->localId,
+                ]);
+                return;
+            }
 
             $localUserId = (int) ($event->shadowRow['local_user_id'] ?? 0);
             if ($localUserId <= 0) {

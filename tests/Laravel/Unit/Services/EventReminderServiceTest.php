@@ -112,4 +112,14 @@ class EventReminderServiceTest extends TestCase
         $this->assertStringContainsString('TenantContext::getFrontendUrl()', $source);
         $this->assertStringContainsString('TenantContext::getSlugPrefix()', $source);
     }
+
+    public function test_configured_email_reminders_with_invalid_email_are_failed_not_left_pending(): void
+    {
+        $source = file_get_contents(app_path('Services/EventReminderService.php'));
+
+        $this->assertStringContainsString('failConfiguredReminder', $source);
+        $this->assertStringContainsString('filter_var($reminder->email, FILTER_VALIDATE_EMAIL)', $source);
+        $this->assertStringContainsString("->where('status', 'pending')", $source);
+        $this->assertStringContainsString("'status' => 'failed'", $source);
+    }
 }

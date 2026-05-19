@@ -95,6 +95,15 @@ class EventReminderService
             ->delete();
     }
 
+    private static function failConfiguredReminder(int $tenantId, int $reminderId): void
+    {
+        DB::table('event_reminders')
+            ->where('id', $reminderId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'pending')
+            ->update(['status' => 'failed', 'updated_at' => now()]);
+    }
+
     public static function markReminderDeliverySent(int $tenantId, int $eventId, int $userId, string $reminderType): bool
     {
         $inserted = DB::table('event_reminder_sent')->insertOrIgnore([
@@ -388,7 +397,9 @@ class EventReminderService
                     $needsPlatform = in_array($deliveryType, ['platform', 'both'], true);
                     $emailOk = true;
 
-                    if ($needsEmail && !empty($reminder->email)) {
+                    $hasValidEmail = !empty($reminder->email) && filter_var($reminder->email, FILTER_VALIDATE_EMAIL);
+
+                    if ($needsEmail && $hasValidEmail) {
                         $subjectKey = match ((int) $reminder->remind_before_minutes) {
                             10080 => 'notifications.event_reminder_subject_7d',
                             1440 => 'notifications.event_reminder_subject_24h',
@@ -416,10 +427,21 @@ class EventReminderService
                             'event_reminder',
                             ['tenant_id' => $tenantId]
                         );
+                    } elseif ($needsEmail) {
+                        \Illuminate\Support\Facades\Log::warning('[EventReminderService] configured email reminder has no valid recipient email', [
+                            'tenant_id' => $tenantId,
+                            'event_id' => $eventId,
+                            'user_id' => $userId,
+                            'reminder_id' => $reminder->reminder_id,
+                        ]);
+                        $emailOk = false;
                     }
 
                     if (!$emailOk) {
                         self::releaseReminderDeliveryClaim($tenantId, $eventId, $userId, $reminderType);
+                        if ($needsEmail && !$hasValidEmail) {
+                            self::failConfiguredReminder($tenantId, (int) $reminder->reminder_id);
+                        }
                         return;
                     }
 

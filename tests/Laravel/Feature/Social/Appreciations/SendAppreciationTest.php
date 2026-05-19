@@ -61,4 +61,30 @@ class SendAppreciationTest extends TestCase
         $this->expectException(\DomainException::class);
         $svc->send($user->id, $user->id, 'Thanks me');
     }
+
+    public function test_cannot_send_appreciation_to_user_in_another_tenant(): void
+    {
+        if (!Schema::hasTable('appreciations')) {
+            $this->markTestSkipped('appreciations schema not present.');
+        }
+        Cache::flush();
+
+        $sender = User::factory()->forTenant($this->testTenantId)->create();
+        $receiver = User::factory()->forTenant(999)->create();
+        $svc = new AppreciationService();
+
+        $caught = null;
+        try {
+            $svc->send($sender->id, $receiver->id, 'Thanks across the boundary');
+        } catch (\DomainException $e) {
+            $caught = $e->getMessage();
+        }
+
+        $this->assertSame('receiver_not_found', $caught);
+        $this->assertDatabaseMissing('appreciations', [
+            'sender_id' => $sender->id,
+            'receiver_id' => $receiver->id,
+            'tenant_id' => $this->testTenantId,
+        ]);
+    }
 }

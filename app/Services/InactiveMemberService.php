@@ -201,11 +201,7 @@ class InactiveMemberService
             return 0;
         }
 
-        $updated = DB::table('member_activity_flags')
-            ->where('tenant_id', $tenantId)
-            ->whereIn('user_id', $userIds)
-            ->whereNull('resolved_at')
-            ->update(['notified_at' => now()]);
+        $notified = 0;
 
         // Send re-engagement emails
         $previousTenantId = TenantContext::currentId();
@@ -226,7 +222,7 @@ class InactiveMemberService
             foreach ($users as $user) {
                 try {
                     // Re-engagement emails are cron-dispatched → render in recipient's language.
-                    LocaleContext::withLocale($user, function () use ($user, $tenantId, $safeCommunity, $communityName, $feedUrl) {
+                    $sent = LocaleContext::withLocale($user, function () use ($user, $tenantId, $safeCommunity, $communityName, $feedUrl) {
                         $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
                         $html = EmailTemplateBuilder::make()
@@ -240,8 +236,19 @@ class InactiveMemberService
                         $subject = __('emails_misc.inactive_member.subject', ['community' => $communityName]);
                         if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'inactive_member', ['tenant_id' => $tenantId])) {
                             Log::warning('[InactiveMemberService] Re-engagement email failed', ['user_id' => $user->id]);
+                            return false;
                         }
+
+                        return true;
                     });
+                    if ($sent) {
+                        $updated = DB::table('member_activity_flags')
+                            ->where('tenant_id', $tenantId)
+                            ->where('user_id', $user->id)
+                            ->whereNull('resolved_at')
+                            ->update(['notified_at' => now()]);
+                        $notified += (int) $updated;
+                    }
                 } catch (\Throwable $e) {
                     Log::warning('[InactiveMemberService] markNotified email error for user ' . $user->id . ': ' . $e->getMessage());
                 }
@@ -249,14 +256,16 @@ class InactiveMemberService
         } catch (\Throwable $e) {
             Log::warning('[InactiveMemberService] markNotified email batch failed: ' . $e->getMessage());
         } finally {
-            if ($previousTenantId !== null) {
+            if (app()->runningInConsole()) {
+                TenantContext::reset();
+            } elseif ($previousTenantId !== null) {
                 TenantContext::setById($previousTenantId);
             } else {
                 TenantContext::reset();
             }
         }
 
-        return $updated;
+        return $notified;
     }
 
     private function upsertFlag(int $userId, int $tenantId, array $data): void

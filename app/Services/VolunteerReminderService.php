@@ -245,7 +245,7 @@ class VolunteerReminderService
                             ->where('tenant_id', $tenantId)
                             ->first(['email', 'first_name', 'name', 'preferred_language']);
 
-                        if ($user && !empty($user->email)) {
+                        if ($user && !empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
                             try {
                                 // Cron → render in recipient's language and tenant, not leaked worker defaults.
                                 $emailOk = self::withTenantContext($tenantId, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $userId, $tenantId): bool {
@@ -300,6 +300,13 @@ class VolunteerReminderService
                                 ]);
                                 $emailOk = false;
                             }
+                        } else {
+                            Log::warning('[VolunteerReminderService] sendReminders email channel claimed without valid recipient email', [
+                                'tenant_id' => $tenantId,
+                                'user_id' => $userId,
+                                'shift_id' => $shift->id,
+                            ]);
+                            $emailOk = false;
                         }
                     }
 
@@ -604,7 +611,7 @@ class VolunteerReminderService
                                     ->where('tenant_id', $tenantId)
                                     ->first(['email', 'first_name', 'name', 'preferred_language']);
 
-                                if ($user && !empty($user->email)) {
+                                if ($user && !empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
                                     $emailOk = self::withTenantContext((int) $tenantId, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $tenantId, $userId): bool {
                                         return LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $tenantId, $userId): bool {
                                         $firstName    = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
@@ -647,6 +654,13 @@ class VolunteerReminderService
                                         return true;
                                         });
                                     });
+                                } else {
+                                    Log::warning('[VolunteerReminderService] sendPreShiftReminders email channel claimed without valid recipient email', [
+                                        'tenant_id' => $tenantId,
+                                        'user_id'   => $userId,
+                                        'shift_id'  => $shift->id,
+                                    ]);
+                                    $emailOk = false;
                                 }
                             }
 
@@ -781,7 +795,7 @@ class VolunteerReminderService
                                     ->where('tenant_id', $tenantId)
                                     ->first(['email', 'first_name', 'name', 'preferred_language']);
 
-                                if ($user && !empty($user->email)) {
+                                if ($user && !empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
                                     $emailOk = self::withTenantContext((int) $tenantId, function () use ($user, $shift, $opportunityTitle, $tenantId, $userId): bool {
                                         return LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $tenantId, $userId): bool {
                                         $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
@@ -813,6 +827,13 @@ class VolunteerReminderService
                                         return true;
                                         });
                                     });
+                                } else {
+                                    Log::warning('[VolunteerReminderService] sendPostShiftFeedback email channel claimed without valid recipient email', [
+                                        'tenant_id' => $tenantId,
+                                        'user_id'   => $userId,
+                                        'shift_id'  => $shift->id,
+                                    ]);
+                                    $emailOk = false;
                                 }
                             }
 

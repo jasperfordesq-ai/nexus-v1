@@ -40,7 +40,13 @@ class PushTransactionToFederatedPartner implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            TenantContext::setById($event->tenantId);
+            if (!TenantContext::setById($event->tenantId)) {
+                Log::warning('PushTransactionToFederatedPartner: tenant not found, skipping', [
+                    'tenant_id'      => $event->tenantId,
+                    'transaction_id' => $event->transaction->id ?? null,
+                ]);
+                return;
+            }
 
             if (!TenantContext::hasFeature('federation')) {
                 return;

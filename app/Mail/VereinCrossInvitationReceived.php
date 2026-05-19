@@ -29,7 +29,7 @@ class VereinCrossInvitationReceived
             return;
         }
 
-        $tenantId = (int) ($recipient->tenant_id ?? TenantContext::currentId() ?? 0);
+        $tenantId = (int) ($recipient->tenant_id ?? 0);
         if ($tenantId <= 0) {
             Log::warning('[VereinCrossInvitationReceived] missing recipient tenant', [
                 'recipient_id' => $recipient->id ?? null,

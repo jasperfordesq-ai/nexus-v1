@@ -47,8 +47,12 @@ class PushReviewToFederatedPartner implements ShouldQueue
         try {
             // Restore tenant context for the queued worker (no tenant is set
             // on queue boot â€” all DB reads below must be scoped correctly).
-            if ($event->tenantId > 0) {
-                TenantContext::setById($event->tenantId);
+            if ($event->tenantId <= 0 || !TenantContext::setById($event->tenantId)) {
+                Log::warning('PushReviewToFederatedPartner: tenant not found, skipping', [
+                    'tenant_id' => $event->tenantId,
+                    'review_id' => $event->review->id ?? null,
+                ]);
+                return;
             }
 
             // 1. Tenant-level feature gate

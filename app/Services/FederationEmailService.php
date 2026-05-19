@@ -46,7 +46,13 @@ class FederationEmailService
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
             $previousTenantId = TenantContext::currentId();
-            TenantContext::setById($recipientTenantId);
+            if (!TenantContext::setById($recipientTenantId)) {
+                Log::warning('[FederationEmail] Recipient tenant not found for message notification', [
+                    'recipient' => $recipientUserId,
+                    'tenant_id' => $recipientTenantId,
+                ]);
+                return false;
+            }
 
             $sent = false;
             try {
@@ -79,11 +85,7 @@ class FederationEmailService
                 $sent = EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'federation_message', ['tenant_id' => $recipientTenantId]);
                 });
             } finally {
-                if ($previousTenantId) {
-                    TenantContext::setById($previousTenantId);
-                } else {
-                    TenantContext::reset();
-                }
+                self::restorePreviousTenant($previousTenantId);
             }
 
             if (!$sent) {
@@ -125,7 +127,13 @@ class FederationEmailService
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
             $previousTenantId = TenantContext::currentId();
-            TenantContext::setById($recipientTenantId);
+            if (!TenantContext::setById($recipientTenantId)) {
+                Log::warning('[FederationEmail] Recipient tenant not found for transaction notification', [
+                    'recipient' => $recipientUserId,
+                    'tenant_id' => $recipientTenantId,
+                ]);
+                return false;
+            }
             $sent = false;
             try {
                 LocaleContext::withLocale($recipient, function () use (&$sent, $recipient, $recipientTenantId, $sender, $senderTenant, $amount, $description) {
@@ -156,11 +164,7 @@ class FederationEmailService
                 $sent = EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'federation_transaction', ['tenant_id' => $recipientTenantId]);
                 });
             } finally {
-                if ($previousTenantId) {
-                    TenantContext::setById($previousTenantId);
-                } else {
-                    TenantContext::reset();
-                }
+                self::restorePreviousTenant($previousTenantId);
             }
 
             if (!$sent) {
@@ -194,7 +198,13 @@ class FederationEmailService
             }
 
             $previousTenantId = TenantContext::currentId();
-            TenantContext::setById($recipientTenantId);
+            if (!TenantContext::setById($recipientTenantId)) {
+                Log::warning('[FederationEmail] Recipient tenant not found for external message notification', [
+                    'recipient' => $recipientUserId,
+                    'tenant_id' => $recipientTenantId,
+                ]);
+                return false;
+            }
 
             $sent = false;
             try {
@@ -224,11 +234,7 @@ class FederationEmailService
                     $sent = EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'federation_message', ['tenant_id' => $recipientTenantId]);
                 });
             } finally {
-                if ($previousTenantId !== null) {
-                    TenantContext::setById($previousTenantId);
-                } else {
-                    TenantContext::reset();
-                }
+                self::restorePreviousTenant($previousTenantId);
             }
 
             return $sent;
@@ -256,7 +262,13 @@ class FederationEmailService
             }
 
             $previousTenantId = TenantContext::currentId();
-            TenantContext::setById($recipientTenantId);
+            if (!TenantContext::setById($recipientTenantId)) {
+                Log::warning('[FederationEmail] Recipient tenant not found for external transaction notification', [
+                    'recipient' => $recipientUserId,
+                    'tenant_id' => $recipientTenantId,
+                ]);
+                return false;
+            }
 
             $sent = false;
             try {
@@ -285,11 +297,7 @@ class FederationEmailService
                     $sent = EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'federation_transaction', ['tenant_id' => $recipientTenantId]);
                 });
             } finally {
-                if ($previousTenantId !== null) {
-                    TenantContext::setById($previousTenantId);
-                } else {
-                    TenantContext::reset();
-                }
+                self::restorePreviousTenant($previousTenantId);
             }
 
             return $sent;
@@ -316,7 +324,13 @@ class FederationEmailService
             }
 
             $previousTenantId = TenantContext::currentId();
-            TenantContext::setById($recipientTenantId);
+            if (!TenantContext::setById($recipientTenantId)) {
+                Log::warning('[FederationEmail] Recipient tenant not found for external connection notification', [
+                    'recipient' => $recipientUserId,
+                    'tenant_id' => $recipientTenantId,
+                ]);
+                return false;
+            }
 
             $sent = false;
             try {
@@ -354,11 +368,7 @@ class FederationEmailService
                     $sent = EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'federation_connection', ['tenant_id' => $recipientTenantId]);
                 });
             } finally {
-                if ($previousTenantId !== null) {
-                    TenantContext::setById($previousTenantId);
-                } else {
-                    TenantContext::reset();
-                }
+                self::restorePreviousTenant($previousTenantId);
             }
 
             return $sent;
@@ -439,12 +449,18 @@ class FederationEmailService
         $previousTenantId = TenantContext::currentId();
 
         try {
-            // Must set tenant context before any tenant-specific call (mailer, URLs, branding).
-            // Without this, whatever tenant was last active bleeds into this email.
-            TenantContext::setById($tenantId);
-
             $user = self::getUserWithEmail($userId, $tenantId);
             if (!$user || empty($user->email)) {
+                return false;
+            }
+
+            // Must set tenant context before any tenant-specific call (mailer, URLs, branding).
+            // Without this, whatever tenant was last active bleeds into this email.
+            if (!TenantContext::setById($tenantId)) {
+                Log::warning('[FederationEmail] Tenant not found for weekly digest', [
+                    'user' => $userId,
+                    'tenant_id' => $tenantId,
+                ]);
                 return false;
             }
 
@@ -514,11 +530,7 @@ class FederationEmailService
             Log::error('[FederationEmail] sendWeeklyDigest failed', ['error' => $e->getMessage()]);
             return false;
         } finally {
-            if ($previousTenantId !== null) {
-                TenantContext::setById($previousTenantId);
-            } else {
-                TenantContext::reset();
-            }
+            self::restorePreviousTenant($previousTenantId);
         }
     }
 
@@ -600,11 +612,7 @@ class FederationEmailService
                     });
                 }
             } finally {
-                if ($previousTenantId) {
-                    TenantContext::setById($previousTenantId);
-                } else {
-                    TenantContext::reset();
-                }
+                self::restorePreviousTenant($previousTenantId);
             }
 
             Log::info('[FederationEmail] Partnership notification sent', [
@@ -640,7 +648,13 @@ class FederationEmailService
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
             $previousTenantId = TenantContext::currentId();
-            TenantContext::setById($recipientTenantId);
+            if (!TenantContext::setById($recipientTenantId)) {
+                Log::warning('[FederationEmail] Recipient tenant not found for connection request notification', [
+                    'recipient' => $recipientUserId,
+                    'tenant_id' => $recipientTenantId,
+                ]);
+                return false;
+            }
             $sent = false;
             try {
                 LocaleContext::withLocale($recipient, function () use (&$sent, $recipient, $recipientTenantId, $sender, $senderTenant, $senderUserId) {
@@ -665,11 +679,7 @@ class FederationEmailService
                 $sent = EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'federation_connection', ['tenant_id' => $recipientTenantId]);
                 });
             } finally {
-                if ($previousTenantId) {
-                    TenantContext::setById($previousTenantId);
-                } else {
-                    TenantContext::reset();
-                }
+                self::restorePreviousTenant($previousTenantId);
             }
 
             if (!$sent) {
@@ -713,7 +723,13 @@ class FederationEmailService
             $recipientTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$recipientTenantId]);
 
             $previousTenantId = TenantContext::currentId();
-            TenantContext::setById($senderTenantId);
+            if (!TenantContext::setById($senderTenantId)) {
+                Log::warning('[FederationEmail] Sender tenant not found for connection accepted notification', [
+                    'sender' => $senderUserId,
+                    'tenant_id' => $senderTenantId,
+                ]);
+                return false;
+            }
             $sent = false;
             try {
                 LocaleContext::withLocale($sender, function () use (&$sent, $sender, $senderTenantId, $recipient, $recipientTenant, $recipientUserId) {
@@ -738,11 +754,7 @@ class FederationEmailService
                 $sent = EmailDispatchService::sendRaw($sender->email, $subject, $html, null, null, null, 'federation_connection', ['tenant_id' => $senderTenantId]);
                 });
             } finally {
-                if ($previousTenantId) {
-                    TenantContext::setById($previousTenantId);
-                } else {
-                    TenantContext::reset();
-                }
+                self::restorePreviousTenant($previousTenantId);
             }
 
             if (!$sent) {
@@ -792,5 +804,22 @@ class FederationEmailService
             "SELECT id, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
             [$userId, $tenantId]
         );
+    }
+
+    private static function restorePreviousTenant(?int $previousTenantId): void
+    {
+        try {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+                return;
+            }
+        } catch (\Throwable $e) {
+            Log::debug('[FederationEmail] Previous tenant restore failed; resetting context', [
+                'previous_tenant_id' => $previousTenantId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        TenantContext::reset();
     }
 }

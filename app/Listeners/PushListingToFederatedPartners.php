@@ -39,8 +39,14 @@ class PushListingToFederatedPartners implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            // Ensure tenant context is set for queued execution
-            TenantContext::setById($event->tenantId);
+            // Ensure tenant context is set for queued execution.
+            if (!TenantContext::setById($event->tenantId)) {
+                Log::warning('PushListingToFederatedPartners: tenant not found, skipping', [
+                    'tenant_id'  => $event->tenantId,
+                    'listing_id' => $event->listing->id ?? null,
+                ]);
+                return;
+            }
 
             // 1. Tenant-level feature gate â€” CLAUDE.md mandates TenantContext::hasFeature
             if (!TenantContext::hasFeature('federation')) {

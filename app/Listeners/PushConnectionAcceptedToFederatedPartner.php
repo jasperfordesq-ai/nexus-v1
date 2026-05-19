@@ -46,7 +46,13 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            TenantContext::setById($tenantId);
+            if (!TenantContext::setById($tenantId)) {
+                Log::warning('PushConnectionAcceptedToFederatedPartner: tenant not found, skipping', [
+                    'tenant_id'     => $tenantId,
+                    'connection_id' => $connection->id ?? null,
+                ]);
+                return;
+            }
 
             if (!TenantContext::hasFeature('federation')) {
                 return;

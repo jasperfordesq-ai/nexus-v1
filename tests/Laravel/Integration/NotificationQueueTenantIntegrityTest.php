@@ -426,6 +426,16 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         $this->assertStringContainsString("last_error", $migration);
     }
 
+    public function test_instant_notification_queue_marks_suppressed_recipients_without_retry_churn(): void
+    {
+        $source = file_get_contents(app_path('Services/CronJobRunner.php'));
+
+        $this->assertStringContainsString('logSuppressedNotificationQueueEmail', $source);
+        $this->assertStringContainsString('markNotificationQueueSuppressed', $source);
+        $this->assertStringContainsString("SET status = 'suppressed'", $source);
+        $this->assertGreaterThanOrEqual(2, substr_count($source, "isEmailSuppressed((string) (\$item['email'] ?? ''))"));
+    }
+
     public function test_notification_queue_runner_resets_tenant_context_after_batches(): void
     {
         $source = file_get_contents(app_path('Services/CronJobRunner.php'));

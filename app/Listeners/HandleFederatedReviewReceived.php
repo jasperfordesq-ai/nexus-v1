@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\FederatedReviewReceived;
 use App\I18n\LocaleContext;
@@ -43,7 +42,14 @@ class HandleFederatedReviewReceived implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            TenantContext::setById($event->tenantId);
+            if (!TenantContext::setById($event->tenantId)) {
+                Log::warning('[HandleFederatedReviewReceived] tenant not found, skipping', [
+                    'tenant_id'  => $event->tenantId,
+                    'partner_id' => $event->externalPartnerId,
+                    'review_id'  => $event->localId,
+                ]);
+                return;
+            }
 
             $receiverId = (int) ($event->shadowRow['receiver_id'] ?? 0);
             if ($receiverId <= 0) {

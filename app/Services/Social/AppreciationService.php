@@ -40,7 +40,23 @@ class AppreciationService
         if ($contextType !== null && !in_array($contextType, self::ALLOWED_CONTEXTS, true)) {
             throw new \DomainException('invalid_context');
         }
-        $tenantId = TenantContext::getId();
+        $participants = DB::table('users')
+            ->whereIn('id', [$senderId, $receiverId])
+            ->select(['id', 'tenant_id'])
+            ->get()
+            ->keyBy('id');
+
+        $senderTenantId = $participants->get($senderId)?->tenant_id;
+        if ($senderTenantId === null) {
+            throw new \DomainException('sender_not_found');
+        }
+
+        $tenantId = (int) $senderTenantId;
+        $receiverTenantId = $participants->get($receiverId)?->tenant_id;
+        if ($receiverTenantId === null || (int) $receiverTenantId !== $tenantId) {
+            throw new \DomainException('receiver_not_found');
+        }
+
         $today = now()->toDateString();
         $rateKey = "appreciation_sent:{$tenantId}:{$senderId}:{$today}";
         $count = (int) Cache::get($rateKey, 0);
@@ -269,8 +285,10 @@ class AppreciationService
     private function attachSenderInfo(array $items): void
     {
         if (empty($items)) return;
+        $tenantId = TenantContext::getId();
         $senderIds = array_unique(array_map(fn ($a) => $a->sender_id, $items));
         $rows = DB::table('users')
+            ->where('tenant_id', $tenantId)
             ->whereIn('id', $senderIds)
             ->select(['id', 'name', 'avatar_url'])
             ->get()

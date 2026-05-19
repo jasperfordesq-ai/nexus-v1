@@ -52,7 +52,13 @@ class PushMemberProfileUpdateToFederatedPartners implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            TenantContext::setById($tenantId);
+            if (!TenantContext::setById($tenantId)) {
+                Log::warning('PushMemberProfileUpdateToFederatedPartners: tenant not found, skipping', [
+                    'tenant_id' => $tenantId,
+                    'user_id'   => $event->user->id ?? null,
+                ]);
+                return;
+            }
 
             if (!TenantContext::hasFeature('federation')) {
                 return;

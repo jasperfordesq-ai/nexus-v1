@@ -59,7 +59,7 @@ class CivicDigestMail
             return false;
         }
         $cadence = $cadence === 'monthly' || $cadence === 'weekly' ? 'monthly' : 'daily';
-        $tenantId = (int) ($recipient->tenant_id ?? TenantContext::currentId() ?? 0);
+        $tenantId = (int) ($recipient->tenant_id ?? 0);
         if ($tenantId <= 0) {
             \Illuminate\Support\Facades\Log::warning('CivicDigestMail::dispatchDigest missing recipient tenant', [
                 'user_id' => $recipient->id ?? null,

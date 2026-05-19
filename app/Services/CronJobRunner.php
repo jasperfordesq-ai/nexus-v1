@@ -523,6 +523,50 @@ class CronJobRunner
         }
     }
 
+    private function logSuppressedNotificationQueueEmail(array $item, string $subject, int $tenantId): void
+    {
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('email_log')) {
+                return;
+            }
+
+            DB::table('email_log')->insert([
+                'tenant_id' => $tenantId,
+                'user_id' => (int) ($item['user_id'] ?? 0),
+                'recipient_email' => (string) ($item['email'] ?? ''),
+                'category' => 'notification_queue',
+                'subject' => mb_substr($subject, 0, 255),
+                'provider' => null,
+                'status' => 'suppressed',
+                'provider_message_id' => null,
+                'error' => 'recipient on local suppression list',
+                'sent_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::debug('instant notification_queue: suppressed email_log insert failed', [
+                'queue_id' => $item['id'] ?? null,
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function markNotificationQueueSuppressed(int $id, int $tenantId, string $batchId): void
+    {
+        DB::update(
+            "UPDATE notification_queue
+                SET status = 'suppressed',
+                    sent_at = NULL,
+                    processing_batch_id = NULL,
+                    processing_started_at = NULL,
+                    last_error = ?
+              WHERE id = ? AND tenant_id = ? AND processing_batch_id = ?",
+            ['recipient on local suppression list', $id, $tenantId, $batchId]
+        );
+    }
+
     private function isEmailSuppressed(string $email): bool
     {
         try {
@@ -666,6 +710,13 @@ class CronJobRunner
                         }
 
                         $itemTenantId = (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0);
+                        if ($this->isEmailSuppressed((string) ($item['email'] ?? ''))) {
+                            $this->logSuppressedNotificationQueueEmail($item, $subject, $itemTenantId);
+                            $this->markNotificationQueueSuppressed((int) $item['id'], $itemTenantId, $batchId);
+                            echo "SUPPRESSED.\n";
+                            continue;
+                        }
+
                         if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, null, 'notification_queue', ['tenant_id' => $itemTenantId])) {
                             DB::update(
                                 "UPDATE notification_queue
@@ -1565,6 +1616,12 @@ class CronJobRunner
                 }
 
                 $itemTenantId = (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0);
+                if ($this->isEmailSuppressed((string) ($item['email'] ?? ''))) {
+                    $this->logSuppressedNotificationQueueEmail($item, $subject, $itemTenantId);
+                    $this->markNotificationQueueSuppressed((int) $item['id'], $itemTenantId, $batchId);
+                    continue;
+                }
+
                 if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, null, 'notification_queue', ['tenant_id' => $itemTenantId])) {
                     DB::update(
                         "UPDATE notification_queue

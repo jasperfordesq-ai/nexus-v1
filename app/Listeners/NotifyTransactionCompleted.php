@@ -34,8 +34,14 @@ class NotifyTransactionCompleted implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            // Ensure tenant context is set (required when running via async queue)
-            TenantContext::setById($event->tenantId);
+            // Ensure tenant context is set (required when running via async queue).
+            if (!TenantContext::setById($event->tenantId)) {
+                Log::warning('NotifyTransactionCompleted: tenant not found, skipping', [
+                    'tenant_id' => $event->tenantId,
+                    'transaction_id' => $event->transaction->id ?? null,
+                ]);
+                return;
+            }
 
             $sender = $event->sender;
             $receiver = $event->receiver;

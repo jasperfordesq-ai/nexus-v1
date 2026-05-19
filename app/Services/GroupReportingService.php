@@ -51,31 +51,32 @@ class GroupReportingService
 
         $digestSince = now()->subDays(30);
 
-        foreach ($tenants as $tenant) {
-            try {
-                TenantContext::setById($tenant->id);
-            } catch (\Throwable $e) {
-                Log::warning('GroupReportingService: Failed to set tenant context', [
-                    'tenant_id' => $tenant->id,
-                    'error' => $e->getMessage(),
-                ]);
-                continue;
-            }
-
-            // Skip tenants without the groups feature
-            try {
-                if (!TenantContext::hasFeature('groups')) {
+        try {
+            foreach ($tenants as $tenant) {
+                try {
+                    TenantContext::setById($tenant->id);
+                } catch (\Throwable $e) {
+                    Log::warning('GroupReportingService: Failed to set tenant context', [
+                        'tenant_id' => $tenant->id,
+                        'error' => $e->getMessage(),
+                    ]);
                     continue;
                 }
-            } catch (\Throwable $e) {
-                Log::debug('GroupReportingService: Could not check groups feature', [
-                    'tenant_id' => $tenant->id,
-                    'error' => $e->getMessage(),
-                ]);
-                continue;
-            }
 
-            try {
+                // Skip tenants without the groups feature
+                try {
+                    if (!TenantContext::hasFeature('groups')) {
+                        continue;
+                    }
+                } catch (\Throwable $e) {
+                    Log::debug('GroupReportingService: Could not check groups feature', [
+                        'tenant_id' => $tenant->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    continue;
+                }
+
+                try {
                 // Find all active groups for this tenant
                 $groups = DB::table('groups')
                     ->where('tenant_id', $tenant->id)
@@ -83,7 +84,7 @@ class GroupReportingService
                         $q->where('is_active', 1)
                           ->orWhereNull('is_active');
                     })
-                    ->select(['id', 'name', 'owner_id', 'cached_member_count'])
+                    ->select(['id', 'tenant_id', 'name', 'owner_id', 'cached_member_count'])
                     ->get();
 
                 if ($groups->isEmpty()) {
@@ -108,18 +109,21 @@ class GroupReportingService
                         ]);
                     }
                 }
-            } catch (\Throwable $e) {
-                Log::error('GroupReportingService: Error processing tenant', [
-                    'tenant_id' => $tenant->id,
-                    'error' => $e->getMessage(),
-                ]);
+                } catch (\Throwable $e) {
+                    Log::error('GroupReportingService: Error processing tenant', [
+                        'tenant_id' => $tenant->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
-        }
-
-        if ($previousTenantId !== null) {
-            TenantContext::setById($previousTenantId);
-        } else {
-            TenantContext::reset();
+        } finally {
+            if (app()->runningInConsole()) {
+                TenantContext::reset();
+            } elseif ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
 
         return ['sent' => $sent, 'total_groups' => $totalGroups];
@@ -156,6 +160,7 @@ class GroupReportingService
             // Fallback: count active members directly
             try {
                 $totalMembers = (int) DB::table('group_members')
+                    ->where('tenant_id', $tenantId)
                     ->where('group_id', $group->id)
                     ->where('status', 'active')
                     ->count();
@@ -195,10 +200,11 @@ class GroupReportingService
                 }
 
                 $user = User::where('id', $userId)
+                    ->where('tenant_id', $tenant->id)
                     ->where('status', 'active')
                     ->whereNotNull('email')
                     ->where('email', '!=', '')
-                    ->first(['id', 'email', 'first_name', 'last_name', 'preferred_language']);
+                    ->first(['id', 'tenant_id', 'email', 'first_name', 'last_name', 'preferred_language']);
 
                 if (!$user) {
                     continue;
@@ -247,6 +253,7 @@ class GroupReportingService
         // Include group admins from group_members
         try {
             $adminIds = DB::table('group_members')
+                ->where('tenant_id', $group->tenant_id ?? TenantContext::getId())
                 ->where('group_id', $group->id)
                 ->where('status', 'active')
                 ->whereIn('role', ['admin', 'owner'])
@@ -273,6 +280,7 @@ class GroupReportingService
     {
         try {
             return (int) DB::table('group_members')
+                ->where('tenant_id', $tenantId)
                 ->where('group_id', $groupId)
                 ->where('status', 'active')
                 ->where('created_at', '>=', $since)

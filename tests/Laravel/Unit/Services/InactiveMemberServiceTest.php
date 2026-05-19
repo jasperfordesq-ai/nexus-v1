@@ -6,7 +6,9 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Services\EmailDispatchService;
 use App\Services\InactiveMemberService;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
@@ -19,7 +21,7 @@ class InactiveMemberServiceTest extends TestCase
         parent::setUp();
         $this->service = new InactiveMemberService();
         // Service methods use DB::raw() for aggregate SQL expressions
-        DB::shouldReceive('raw')->andReturnUsing(fn ($v) => new \Illuminate\Database\Query\Expression($v));
+        DB::shouldReceive('raw')->andReturnUsing(fn ($v) => new Expression($v));
     }
 
     public function test_detectInactive_returns_summary(): void
@@ -27,6 +29,7 @@ class InactiveMemberServiceTest extends TestCase
         DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
+        DB::shouldReceive('selectRaw')->andReturnSelf();
         DB::shouldReceive('get')->andReturn(collect([]));
 
         $result = $this->service->detectInactive(2, 90);
@@ -105,13 +108,43 @@ class InactiveMemberServiceTest extends TestCase
         $this->assertSame(0, $result);
     }
 
-    public function test_markNotified_updates_records(): void
+    public function test_markNotified_updates_records_after_email_success(): void
     {
-        DB::shouldReceive('table')->with('member_activity_flags')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('whereIn')->andReturnSelf();
-        DB::shouldReceive('whereNull')->andReturnSelf();
-        DB::shouldReceive('update')->andReturn(3);
+        app()->instance(EmailDispatchService::class, new class extends EmailDispatchService {
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                return true;
+            }
+        });
+
+        DB::shouldReceive('table')->with('tenants')->once()->andReturnSelf();
+        DB::shouldReceive('where')->with('id', 2)->once()->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturn((object) [
+            'id' => 2,
+            'name' => 'Test Tenant',
+            'slug' => 'test-tenant',
+            'domain' => null,
+            'configuration' => null,
+            'is_active' => 1,
+        ]);
+
+        DB::shouldReceive('table')->with('users')->once()->andReturnSelf();
+        DB::shouldReceive('where')->with('tenant_id', 2)->once()->andReturnSelf();
+        DB::shouldReceive('whereIn')->with('id', [1, 2, 3])->once()->andReturnSelf();
+        DB::shouldReceive('where')->with('status', 'active')->once()->andReturnSelf();
+        DB::shouldReceive('whereNotNull')->with('email')->once()->andReturnSelf();
+        DB::shouldReceive('select')->with(['id', 'email', 'first_name', 'name', 'preferred_language'])->once()->andReturnSelf();
+        DB::shouldReceive('get')->once()->andReturn(collect([
+            (object) ['id' => 1, 'email' => 'one@example.test', 'first_name' => 'One', 'name' => 'One', 'preferred_language' => 'en'],
+            (object) ['id' => 2, 'email' => 'two@example.test', 'first_name' => 'Two', 'name' => 'Two', 'preferred_language' => 'en'],
+            (object) ['id' => 3, 'email' => 'three@example.test', 'first_name' => 'Three', 'name' => 'Three', 'preferred_language' => 'en'],
+        ]));
+
+        DB::shouldReceive('table')->with('member_activity_flags')->times(3)->andReturnSelf();
+        DB::shouldReceive('where')->with('tenant_id', 2)->times(3)->andReturnSelf();
+        DB::shouldReceive('where')->with('user_id', \Mockery::type('int'))->times(3)->andReturnSelf();
+        DB::shouldReceive('whereNull')->with('resolved_at')->times(3)->andReturnSelf();
+        DB::shouldReceive('update')->times(3)->andReturn(1);
 
         $result = $this->service->markNotified(2, [1, 2, 3]);
         $this->assertSame(3, $result);

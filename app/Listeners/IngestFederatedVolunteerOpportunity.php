@@ -57,7 +57,14 @@ class IngestFederatedVolunteerOpportunity implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            TenantContext::setById($event->tenantId);
+            if (!TenantContext::setById($event->tenantId)) {
+                Log::warning('[IngestFederatedVolunteerOpportunity] tenant not found, skipping', [
+                    'tenant_id'           => $event->tenantId,
+                    'external_partner_id' => $event->externalPartnerId,
+                    'local_id'            => $event->localId,
+                ]);
+                return;
+            }
 
             // Defensive: confirm the shadow row still exists. If the controller
             // upsert was rolled back for any reason, log and bail.

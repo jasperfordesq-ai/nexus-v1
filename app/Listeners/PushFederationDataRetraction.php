@@ -41,7 +41,13 @@ class PushFederationDataRetraction implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            TenantContext::setById($tenantId);
+            if (!TenantContext::setById($tenantId)) {
+                Log::warning('PushFederationDataRetraction: tenant not found, skipping', [
+                    'tenant_id' => $tenantId,
+                    'user_id'   => $userId,
+                ]);
+                return;
+            }
 
             if (!TenantContext::hasFeature('federation')) {
                 return;

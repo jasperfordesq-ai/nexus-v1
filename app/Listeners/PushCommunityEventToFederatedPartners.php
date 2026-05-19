@@ -41,7 +41,13 @@ class PushCommunityEventToFederatedPartners implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            TenantContext::setById($tenantId);
+            if (!TenantContext::setById($tenantId)) {
+                Log::warning('PushCommunityEventToFederatedPartners: tenant not found, skipping', [
+                    'tenant_id' => $tenantId,
+                    'event_id'  => $eventModel->id ?? null,
+                ]);
+                return;
+            }
 
             if (!TenantContext::hasFeature('federation')) {
                 return;

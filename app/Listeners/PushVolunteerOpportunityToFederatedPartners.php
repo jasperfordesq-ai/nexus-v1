@@ -41,7 +41,13 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
         $previousTenantId = TenantContext::currentId();
 
         try {
-            TenantContext::setById($tenantId);
+            if (!TenantContext::setById($tenantId)) {
+                Log::warning('PushVolunteerOpportunityToFederatedPartners: tenant not found, skipping', [
+                    'tenant_id'      => $tenantId,
+                    'opportunity_id' => $opportunity->id ?? null,
+                ]);
+                return;
+            }
 
             if (!TenantContext::hasFeature('federation')) {
                 return;

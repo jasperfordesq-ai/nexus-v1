@@ -203,6 +203,7 @@ class AdminEmailController extends BaseApiController
     public function test(): JsonResponse
     {
         $this->requireAdmin();
+        $tenantId = TenantContext::getId();
         $to = $this->input('to', '');
 
         if (empty($to) || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
@@ -227,7 +228,7 @@ class AdminEmailController extends BaseApiController
             null,
             null,
             'email_test',
-            ['tenant_id' => \App\Core\TenantContext::currentId()]
+            ['tenant_id' => $tenantId]
         );
 
         if ($result) {
@@ -255,6 +256,7 @@ class AdminEmailController extends BaseApiController
     public function testProvider(): JsonResponse
     {
         $this->requireAdmin();
+        $tenantId = TenantContext::getId();
         $to = $this->input('to', '');
 
         if (empty($to) || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
@@ -274,7 +276,7 @@ class AdminEmailController extends BaseApiController
             null,
             null,
             'email_test',
-            ['tenant_id' => \App\Core\TenantContext::currentId()]
+            ['tenant_id' => $tenantId]
         );
 
         if ($result) {

@@ -12,8 +12,17 @@ use Illuminate\Support\Facades\DB;
 
 class VolunteerReminderServiceTest extends TestCase
 {
+    private function expectStaleClaimCleanup(): void
+    {
+        DB::shouldReceive('table')->with('vol_reminder_delivery_claims')->andReturnSelf();
+        DB::shouldReceive('whereNull')->with('delivered_at')->andReturnSelf();
+        DB::shouldReceive('where')->with('claimed_at', '<', \Mockery::any())->andReturnSelf();
+        DB::shouldReceive('delete')->andReturn(0);
+    }
+
     public function test_sendReminders_returns_zero_when_no_setting(): void
     {
+        $this->expectStaleClaimCleanup();
         DB::shouldReceive('table')->with('vol_reminder_settings')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('first')->andReturn(null);
@@ -23,6 +32,7 @@ class VolunteerReminderServiceTest extends TestCase
 
     public function test_sendReminders_returns_zero_when_no_shifts(): void
     {
+        $this->expectStaleClaimCleanup();
         $setting = (object) ['hours_before' => 24, 'push_enabled' => true, 'email_enabled' => true, 'sms_enabled' => false];
         DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
@@ -77,5 +87,15 @@ class VolunteerReminderServiceTest extends TestCase
         $this->assertCount(5, $result);
         $this->assertEquals('pre_shift', $result[0]['reminder_type']);
         $this->assertNull($result[0]['id']);
+    }
+
+    public function test_email_channel_claims_are_released_when_recipient_email_is_not_valid(): void
+    {
+        $source = file_get_contents(app_path('Services/VolunteerReminderService.php'));
+
+        $this->assertGreaterThanOrEqual(3, substr_count($source, 'filter_var($user->email, FILTER_VALIDATE_EMAIL)'));
+        $this->assertStringContainsString('sendReminders email channel claimed without valid recipient email', $source);
+        $this->assertStringContainsString('sendPreShiftReminders email channel claimed without valid recipient email', $source);
+        $this->assertStringContainsString('sendPostShiftFeedback email channel claimed without valid recipient email', $source);
     }
 }

@@ -288,7 +288,10 @@ class NewsletterService
             // Join with users so we can render emails in the subscriber's preferred_language.
             // Unregistered subscribers (user_id NULL) fall back to app default locale.
             $pending = DB::table('newsletter_queue as nq')
-                ->leftJoin('users as u', 'nq.user_id', '=', 'u.id')
+                ->leftJoin('users as u', function ($join) use ($tenantId) {
+                    $join->on('nq.user_id', '=', 'u.id')
+                        ->where('u.tenant_id', '=', $tenantId);
+                })
                 ->where('nq.newsletter_id', $newsletterId)
                 ->where('nq.tenant_id', $tenantId)
                 ->where('nq.status', 'processing')
@@ -1795,6 +1798,8 @@ HTML;
      */
     public static function resendToNonOpeners(int $newsletterId, ?string $newSubject = null, int $waitDays = 3): int
     {
+        $previousTenantId = TenantContext::currentId();
+
         try {
             $newsletter = DB::table('newsletters')->where('id', $newsletterId)->first();
             if (!$newsletter || $newsletter->status !== 'sent') {
@@ -1803,6 +1808,7 @@ HTML;
 
             $tenantId = (int) $newsletter->tenant_id;
             TenantContext::setById($tenantId);
+            $suppressedEmails = self::getSuppressedEmails($tenantId);
 
             // Check if enough time has passed
             if ($newsletter->sent_at) {
@@ -1829,7 +1835,7 @@ HTML;
             $queuedEmails = [];
             foreach ($nonOpeners as $item) {
                 $email = strtolower(trim((string) $item->email));
-                if ($email === '' || isset($queuedEmails[$email])) {
+                if ($email === '' || isset($queuedEmails[$email]) || isset($suppressedEmails[$email])) {
                     continue;
                 }
                 $queuedEmails[$email] = true;
@@ -1857,6 +1863,12 @@ HTML;
         } catch (\Exception $e) {
             Log::error('resendToNonOpeners error: ' . $e->getMessage());
             return 0;
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
     }
 

@@ -54,19 +54,20 @@ class GamificationEmailService
             return ['sent' => 0, 'skipped' => 0, 'errors' => 1];
         }
 
-        foreach ($tenants as $tenant) {
-            try {
-                TenantContext::setById($tenant->id);
-            } catch (\Throwable $e) {
-                Log::warning('GamificationEmailService: Failed to set tenant context', [
-                    'tenant_id' => $tenant->id,
-                    'error' => $e->getMessage(),
-                ]);
-                $errors++;
-                continue;
-            }
+        try {
+            foreach ($tenants as $tenant) {
+                try {
+                    TenantContext::setById($tenant->id);
+                } catch (\Throwable $e) {
+                    Log::warning('GamificationEmailService: Failed to set tenant context', [
+                        'tenant_id' => $tenant->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    $errors++;
+                    continue;
+                }
 
-            try {
+                try {
                 // Find users with XP activity in the past 30 days
                 $activeUserIds = DB::table('user_xp_log')
                     ->where('tenant_id', $tenant->id)
@@ -81,10 +82,11 @@ class GamificationEmailService
 
                 // Get active users with email addresses
                 $users = User::whereIn('id', $activeUserIds)
+                    ->where('tenant_id', $tenant->id)
                     ->where('status', 'active')
                     ->whereNotNull('email')
                     ->where('email', '!=', '')
-                    ->get(['id', 'email', 'first_name', 'last_name', 'preferred_language']);
+                    ->get(['id', 'tenant_id', 'email', 'first_name', 'last_name', 'preferred_language']);
 
                 foreach ($users as $user) {
                     try {
@@ -132,19 +134,22 @@ class GamificationEmailService
                         $errors++;
                     }
                 }
-            } catch (\Throwable $e) {
-                Log::error('GamificationEmailService: Error processing tenant', [
-                    'tenant_id' => $tenant->id,
-                    'error' => $e->getMessage(),
-                ]);
-                $errors++;
+                } catch (\Throwable $e) {
+                    Log::error('GamificationEmailService: Error processing tenant', [
+                        'tenant_id' => $tenant->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    $errors++;
+                }
             }
-        }
-
-        if ($previousTenantId !== null) {
-            TenantContext::setById($previousTenantId);
-        } else {
-            TenantContext::reset();
+        } finally {
+            if (app()->runningInConsole()) {
+                TenantContext::reset();
+            } elseif ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
 
         return ['sent' => $sent, 'skipped' => $skipped, 'errors' => $errors];
@@ -244,17 +249,35 @@ class GamificationEmailService
                 // Default to sending on error
             }
 
-            $user = User::find($userId, ['id', 'tenant_id', 'email', 'first_name', 'last_name', 'preferred_language']);
+            $user = User::withoutGlobalScopes()
+                ->where('id', $userId)
+                ->where('status', 'active')
+                ->first(['id', 'tenant_id', 'email', 'first_name', 'last_name', 'preferred_language']);
 
             if (!$user || empty($user->email)) {
                 return false;
             }
+
+            return TenantContext::runForTenant((int) $user->tenant_id, function () use ($user, $type, $data): bool {
+                try {
+                    $prefs = User::getNotificationPreferences((int) $user->id);
+                    if (!((bool) ($prefs['email_gamification_milestones'] ?? true))) {
+                        return false;
+                    }
+                } catch (\Throwable $prefError) {
+                    Log::debug('GamificationEmailService: could not read email_gamification_milestones pref', [
+                        'user_id' => $user->id,
+                        'tenant_id' => $user->tenant_id,
+                        'error' => $prefError->getMessage(),
+                    ]);
+                }
 
             return LocaleContext::withLocale($user, function () use ($user, $type, $data) {
                 $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
                 [$subject, $body] = $this->buildMilestoneEmail($name, $type, $data);
 
                 return EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, 'gamification_milestone', ['tenant_id' => (int) $user->tenant_id]);
+            });
             });
         } catch (\Throwable $e) {
             Log::error('GamificationEmailService: Failed to send milestone email', [
