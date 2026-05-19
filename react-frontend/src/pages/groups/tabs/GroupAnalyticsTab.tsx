@@ -163,7 +163,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
       }
     } catch (err) {
       logError('GroupAnalyticsTab.loadAnalytics', err);
-      toast.error(t('analytics.load_error', 'Failed to load analytics'));
+      toast.error(t('analytics.load_error'));
     } finally {
       setLoading(false);
     }
@@ -183,7 +183,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
     return (
       <GlassCard className="p-6">
         <p className="text-center text-theme-subtle">
-          {t('analytics.admin_only', 'Analytics are only available to group admins.')}
+          {t('analytics.admin_only')}
         </p>
       </GlassCard>
     );
@@ -197,7 +197,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
     return (
       <div
         className="flex justify-center py-12"
-        aria-label={t('analytics.loading', 'Loading analytics')}
+        aria-label={t('analytics.loading')}
         aria-busy="true"
       >
         <Spinner size="lg" />
@@ -228,7 +228,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
       {/* Header: Date Range + Export Buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         {/* Date range selector */}
-        <div className="flex items-center gap-2" role="group" aria-label={t('analytics.date_range_aria', 'Date range selector')}>
+        <div className="flex items-center gap-2" role="group" aria-label={t('analytics.date_range_aria')}>
           {([7, 30, 90] as DaysRange[]).map((d) => (
             <Button
               key={d}
@@ -238,7 +238,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               onPress={() => setDays(d)}
               aria-pressed={days === d}
             >
-              {t(`analytics.days_${d}`, `${d}d`)}
+              {t(`analytics.days_${d}`)}
             </Button>
           ))}
         </div>
@@ -250,18 +250,18 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
             variant="flat"
             startContent={<Download className="w-4 h-4" aria-hidden="true" />}
             onPress={handleExportMembers}
-            aria-label={t('analytics.export_members_aria', 'Export members CSV')}
+            aria-label={t('analytics.export_members_aria')}
           >
-            {t('analytics.export_members', 'Export Members CSV')}
+            {t('analytics.export_members')}
           </Button>
           <Button
             size="sm"
             variant="flat"
             startContent={<Download className="w-4 h-4" aria-hidden="true" />}
             onPress={handleExportActivity}
-            aria-label={t('analytics.export_activity_aria', 'Export activity CSV')}
+            aria-label={t('analytics.export_activity_aria')}
           >
-            {t('analytics.export_activity', 'Export Activity CSV')}
+            {t('analytics.export_activity')}
           </Button>
         </div>
       </div>
@@ -274,7 +274,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               <Users className="w-5 h-5 text-primary" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-xs text-theme-subtle">{t('analytics.total_members', 'Total Members')}</p>
+              <p className="text-xs text-theme-subtle">{t('analytics.total_members')}</p>
               <p className="text-xl font-bold text-theme-primary">
                 {loading ? <Spinner size="sm" /> : (kpi?.total_members ?? 0)}
               </p>
@@ -288,7 +288,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               <TrendingUp className="w-5 h-5 text-success" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-xs text-theme-subtle">{t('analytics.active_members', 'Active Members')}</p>
+              <p className="text-xs text-theme-subtle">{t('analytics.active_members')}</p>
               <p className="text-xl font-bold text-theme-primary">
                 {loading ? <Spinner size="sm" /> : (kpi?.active_members ?? 0)}
               </p>
@@ -302,7 +302,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               <BarChart3 className="w-5 h-5 text-warning" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-xs text-theme-subtle">{t('analytics.participation_rate', 'Participation Rate')}</p>
+              <p className="text-xs text-theme-subtle">{t('analytics.participation_rate')}</p>
               <p className="text-xl font-bold text-theme-primary">
                 {loading ? <Spinner size="sm" /> : `${(kpi?.participation_rate ?? 0).toFixed(1)}%`}
               </p>
@@ -316,7 +316,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               <Award className="w-5 h-5 text-secondary" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-xs text-theme-subtle">{t('analytics.avg_posts_day', 'Avg Posts/Day')}</p>
+              <p className="text-xs text-theme-subtle">{t('analytics.avg_posts_day')}</p>
               <p className="text-xl font-bold text-theme-primary">
                 {loading ? <Spinner size="sm" /> : (kpi?.avg_posts_per_day ?? 0).toFixed(1)}
               </p>
@@ -329,9 +329,10 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <Users className="w-[18px] h-[18px] text-success" aria-hidden="true" />
-          <h3 className="font-semibold">{t('analytics.member_growth', 'Member Growth')}</h3>
+          <h3 className="font-semibold">{t('analytics.member_growth')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
+          <p className="sr-only">{t('analytics.member_growth_summary')}</p>
           {loading ? (
             <div className="flex h-[300px] items-center justify-center">
               <Spinner />
@@ -361,7 +362,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                 <Line
                   type="monotone"
                   dataKey="total_members"
-                  name={t('analytics.chart_total_members', 'Total Members')}
+                  name={t('analytics.chart_total_members')}
                   stroke={CHART_COLOR_MAP.primary}
                   strokeWidth={2}
                   dot={{ r: 3 }}
@@ -370,7 +371,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                 <Line
                   type="monotone"
                   dataKey="new_members"
-                  name={t('analytics.chart_new_members', 'New Members')}
+                  name={t('analytics.chart_new_members')}
                   stroke={CHART_COLOR_MAP.success}
                   strokeWidth={2}
                   dot={{ r: 3 }}
@@ -380,7 +381,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
             </ResponsiveContainer>
           ) : (
             <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
-              {t('analytics.no_growth_data', 'No member growth data available.')}
+              {t('analytics.no_growth_data')}
             </p>
           )}
         </CardBody>
@@ -390,9 +391,10 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <BarChart3 className="w-[18px] h-[18px] text-primary" aria-hidden="true" />
-          <h3 className="font-semibold">{t('analytics.engagement_timeline', 'Engagement Timeline')}</h3>
+          <h3 className="font-semibold">{t('analytics.engagement_timeline')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
+          <p className="sr-only">{t('analytics.engagement_summary')}</p>
           {loading ? (
             <div className="flex h-[300px] items-center justify-center">
               <Spinner />
@@ -421,14 +423,14 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                 <Tooltip contentStyle={tooltipStyle} labelStyle={{ fontWeight: 600 }} />
                 <Bar
                   dataKey="posts"
-                  name={t('analytics.chart_posts', 'Posts')}
+                  name={t('analytics.chart_posts')}
                   fill={CHART_COLOR_MAP.primary}
                   radius={[4, 4, 0, 0]}
                   fillOpacity={0.8}
                 />
                 <Bar
                   dataKey="discussions"
-                  name={t('analytics.chart_discussions', 'Discussions')}
+                  name={t('analytics.chart_discussions')}
                   fill={CHART_COLOR_MAP.secondary}
                   radius={[4, 4, 0, 0]}
                   fillOpacity={0.8}
@@ -436,7 +438,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                 <Line
                   type="monotone"
                   dataKey="active_members"
-                  name={t('analytics.chart_active_members', 'Active Members')}
+                  name={t('analytics.chart_active_members')}
                   stroke={CHART_COLOR_MAP.success}
                   strokeWidth={2}
                   dot={{ r: 3 }}
@@ -445,7 +447,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
             </ResponsiveContainer>
           ) : (
             <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
-              {t('analytics.no_engagement_data', 'No engagement data available.')}
+              {t('analytics.no_engagement_data')}
             </p>
           )}
         </CardBody>
@@ -457,7 +459,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Award className="w-[18px] h-[18px] text-warning" aria-hidden="true" />
-            <h3 className="font-semibold">{t('analytics.top_contributors', 'Top Contributors')}</h3>
+            <h3 className="font-semibold">{t('analytics.top_contributors')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -484,14 +486,14 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                       {contributor.name}
                     </span>
                     <Chip size="sm" variant="flat" color="primary">
-                      {contributor.post_count} {t('analytics.posts', 'posts')}
+                      {contributor.post_count} {t('analytics.posts')}
                     </Chip>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
-                {t('analytics.no_contributors', 'No contributor data available.')}
+                {t('analytics.no_contributors')}
               </p>
             )}
           </CardBody>
@@ -501,9 +503,10 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <BarChart3 className="w-[18px] h-[18px] text-secondary" aria-hidden="true" />
-            <h3 className="font-semibold">{t('analytics.activity_breakdown', 'Activity Breakdown')}</h3>
+            <h3 className="font-semibold">{t('analytics.activity_breakdown')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
+            <p className="sr-only">{t('analytics.activity_breakdown_summary')}</p>
             {loading ? (
               <div className="flex h-[300px] items-center justify-center">
                 <Spinner />
@@ -544,7 +547,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               </ResponsiveContainer>
             ) : (
               <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
-                {t('analytics.no_activity_data', 'No activity breakdown data available.')}
+                {t('analytics.no_activity_data')}
               </p>
             )}
           </CardBody>
@@ -555,9 +558,10 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <TrendingUp className="w-[18px] h-[18px] text-info" aria-hidden="true" />
-          <h3 className="font-semibold">{t('analytics.retention_cohorts', 'Retention Cohorts')}</h3>
+          <h3 className="font-semibold">{t('analytics.retention_cohorts')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
+          <p className="sr-only">{t('analytics.retention_summary')}</p>
           {loading ? (
             <div className="flex h-[200px] items-center justify-center">
               <Spinner />
@@ -597,7 +601,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
             </Table>
           ) : (
             <p className="flex h-[200px] items-center justify-center text-sm text-default-400">
-              {t('analytics.no_retention_data', 'No retention data available.')}
+              {t('analytics.no_retention_data')}
             </p>
           )}
         </CardBody>
@@ -608,20 +612,21 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <BarChart3 className="w-[18px] h-[18px] text-primary" aria-hidden="true" />
-            <h3 className="font-semibold">{t('analytics.comparative_stats', 'Comparative Stats')}</h3>
+            <h3 className="font-semibold">{t('analytics.comparative_stats')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
+            <p className="sr-only">{t('analytics.comparative_summary')}</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Members comparison */}
               <div className="p-4 rounded-lg bg-theme-elevated text-center">
                 <p className="text-xs text-theme-subtle mb-1">
-                  {t('analytics.your_members', 'Your Members')}
+                  {t('analytics.your_members')}
                 </p>
                 <p className="text-2xl font-bold text-theme-primary">
                   {data.comparative.your_members}
                 </p>
                 <p className="text-xs text-theme-subtle mt-1">
-                  {t('analytics.vs_average', 'vs avg')}{' '}
+                  {t('analytics.vs_average')}{' '}
                   <span className="font-semibold text-default-600">
                     {data.comparative.avg_members}
                   </span>
@@ -631,13 +636,13 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               {/* Activity comparison */}
               <div className="p-4 rounded-lg bg-theme-elevated text-center">
                 <p className="text-xs text-theme-subtle mb-1">
-                  {t('analytics.your_activity', 'Your Activity')}
+                  {t('analytics.your_activity')}
                 </p>
                 <p className="text-2xl font-bold text-theme-primary">
                   {data.comparative.your_activity}
                 </p>
                 <p className="text-xs text-theme-subtle mt-1">
-                  {t('analytics.vs_average', 'vs avg')}{' '}
+                  {t('analytics.vs_average')}{' '}
                   <span className="font-semibold text-default-600">
                     {data.comparative.avg_activity}
                   </span>
@@ -647,10 +652,10 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               {/* Percentile rank */}
               <div className="p-4 rounded-lg bg-theme-elevated text-center">
                 <p className="text-xs text-theme-subtle mb-1">
-                  {t('analytics.percentile_rank', 'Percentile Rank')}
+                  {t('analytics.percentile_rank')}
                 </p>
                 <p className="text-2xl font-bold text-theme-primary">
-                  {t('analytics.percentile_value', 'Top {{pct}}%', {
+                  {t('analytics.percentile_value', {
                     pct: (100 - data.comparative.percentile_rank).toFixed(0),
                   })}
                 </p>
@@ -667,10 +672,10 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                   className="mt-2"
                 >
                   {data.comparative.percentile_rank >= 75
-                    ? t('analytics.excellent', 'Excellent')
+                    ? t('analytics.excellent')
                     : data.comparative.percentile_rank >= 50
-                      ? t('analytics.good', 'Good')
-                      : t('analytics.below_average', 'Below Average')}
+                      ? t('analytics.good')
+                      : t('analytics.below_average')}
                 </Chip>
               </div>
             </div>
