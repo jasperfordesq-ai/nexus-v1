@@ -41,7 +41,6 @@ import {
   type OnboardingChoice,
 } from '@/components/caring-community/OnboardingChoiceModal';
 import { useTenant } from '@/contexts';
-import { usePageTitle } from '@/hooks';
 import type { TenantFeatures, TenantModules } from '@/types/api';
 
 interface ActionDef {
@@ -124,7 +123,6 @@ function applyChoiceFilter(
 export function CaringCommunityPage() {
   const { t } = useTranslation('common');
   const { branding, hasFeature, hasModule, tenant, tenantPath, tenantSlug } = useTenant();
-  usePageTitle(t('caring_community.meta.title'));
 
   const onboardingTenantScope = tenant?.slug ?? tenantSlug ?? (tenant?.id ? String(tenant.id) : null);
   const [choice, setChoice] = useState<OnboardingChoice | null>(() => readStoredOnboardingChoice(onboardingTenantScope));
@@ -174,7 +172,6 @@ export function CaringCommunityPage() {
       <PageMeta
         title={t('caring_community.meta.title')}
         description={t('caring_community.meta.description')}
-        noIndex
       />
 
       <OnboardingChoiceModal
