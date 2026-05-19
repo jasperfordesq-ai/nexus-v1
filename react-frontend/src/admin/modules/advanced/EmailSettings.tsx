@@ -17,6 +17,7 @@ import Shield from 'lucide-react/icons/shield';
 import Globe from 'lucide-react/icons/globe';
 import Copy from 'lucide-react/icons/copy';
 import Check from 'lucide-react/icons/check';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
@@ -75,14 +76,16 @@ const INITIAL_FORM: EmailSettingsForm = {
 };
 
 export function EmailSettings() {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced' });
+  const { t: tNav } = useTranslation('admin_nav');
   const PROVIDERS = [
-    { key: 'platform_default', label: "Platform Default" },
-    { key: 'sendgrid', label: "SendGrid" },
-    { key: 'gmail_api', label: "Gmail API" },
-    { key: 'smtp', label: "SMTP" },
+    { key: 'platform_default', labelKey: 'provider_platform_default' },
+    { key: 'sendgrid', labelKey: 'provider_sendgrid' },
+    { key: 'gmail_api', labelKey: 'provider_gmail_api' },
+    { key: 'smtp', labelKey: 'provider_smtp' },
   ];
 
-  usePageTitle("Advanced");
+  usePageTitle(tNav('advanced'));
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -129,9 +132,9 @@ export function EmailSettings() {
           });
         }
       })
-      .catch(() => toast.error("Failed to load email settings"))
+      .catch(() => toast.error(t('failed_to_load_email_settings')))
       .finally(() => setLoading(false));
-  }, [toast])
+  }, [t, toast])
 
 
   const handleSave = async () => {
@@ -164,12 +167,12 @@ export function EmailSettings() {
       const res = await adminSettings.updateEmailConfig(payload) as ApiResponse<Record<string, unknown>>;
 
       if (res.data?.success) {
-        toast.success("Email settings saved successfully");
+        toast.success(t('email_settings_saved_successfully'));
       } else {
-        toast.error(res.error || "Save failed");
+        toast.error(res.error || t('save_failed'));
       }
     } catch {
-      toast.error("Failed to save email settings");
+      toast.error(t('failed_to_save_email_settings'));
     } finally {
       setSaving(false);
     }
@@ -177,7 +180,7 @@ export function EmailSettings() {
 
   const handleTestEmail = async () => {
     if (!testEmail) {
-      toast.error("Please enter a test email address");
+      toast.error(t('please_enter_a_test_email_address'));
       return;
     }
     setTesting(true);
@@ -185,13 +188,13 @@ export function EmailSettings() {
       const res = await adminSettings.testEmailProvider({ to: testEmail }) as ApiResponse<Record<string, unknown>>;
 
       if (res.data?.success) {
-        const provider = res.data.provider ? String(res.data.provider).toUpperCase() : '';
-        toast.success(provider ? `Test email sent via` : "Test email sent");
+        const providerName = res.data.provider ? String(res.data.provider).toUpperCase() : '';
+        toast.success(providerName ? t('test_email_sent_via_provider', { provider: providerName }) : t('test_email_sent'));
       } else {
-        toast.error(res.error || "Save failed");
+        toast.error(res.error || t('save_failed'));
       }
     } catch {
-      toast.error("Failed to send test email");
+      toast.error(t('failed_to_send_test_email'));
     } finally {
       setTesting(false);
     }
@@ -201,10 +204,10 @@ export function EmailSettings() {
     try {
       await navigator.clipboard.writeText(formData.webhook_url);
       setCopied(true);
-      toast.success("Webhook URL copied");
+      toast.success(t('webhook_u_r_l_copied'));
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error("Failed to copy");
+      toast.error(t('failed_to_copy'));
     }
   };
 
@@ -213,7 +216,7 @@ export function EmailSettings() {
   };
 
   const secretHint = (isSet: boolean) =>
-    isSet ? "Secret already saved" : undefined;
+    isSet ? t('secret_already_saved') : undefined;
 
   const { provider } = formData;
 
@@ -227,25 +230,25 @@ export function EmailSettings() {
 
   return (
     <div>
-      <PageHeader title={"Email Settings"} description={"Configure the email provider used to send notifications and newsletters"} />
+      <PageHeader title={t('email_settings_title')} description={t('email_settings_desc')} />
 
       <div className="space-y-4">
         {/* Provider Selection */}
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Mail size={20} /> {"Email Provider"}
+              <Mail size={20} /> {t('email_provider_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-default-500">{"Active Provider"}</span>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm text-default-500">{t('active_provider')}</span>
               <Chip color="primary" variant="flat">
-                {PROVIDERS.find(p => p.key === provider)?.label || provider}
+                {PROVIDERS.find(p => p.key === provider)?.labelKey ? t(PROVIDERS.find(p => p.key === provider)!.labelKey) : provider}
               </Chip>
             </div>
             <Select
-              label={"Email Provider"}
+              label={t('label_email_provider')}
               selectedKeys={[provider]}
               onSelectionChange={(keys) => {
                 const v = Array.from(keys)[0];
@@ -254,7 +257,7 @@ export function EmailSettings() {
               variant="bordered"
             >
               {PROVIDERS.map(p => (
-                <SelectItem key={p.key}>{p.label}</SelectItem>
+                <SelectItem key={p.key}>{t(p.labelKey)}</SelectItem>
               ))}
             </Select>
           </CardBody>
@@ -265,53 +268,54 @@ export function EmailSettings() {
           <Card shadow="sm">
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Shield size={20} /> {"SendGrid Configuration"}
+                <Shield size={20} /> {t('sendgrid_configuration')}
               </h3>
             </CardHeader>
             <CardBody className="gap-4">
               <Input
-                label={"API Key"}
+                label={t('label_a_p_i_key')}
                 type="password"
-                placeholder={"S Gxxxxx..."}
+                placeholder={t('placeholder_s_gxxxxx')}
                 variant="bordered"
-                description={secretHint(formData._sendgrid_api_key_set) || "Enter your SendGrid API key to enable email delivery via SendGrid"}
+                description={secretHint(formData._sendgrid_api_key_set) || t('sendgrid_api_key_desc')}
                 value={formData.sendgrid_api_key}
                 onValueChange={(v) => updateField('sendgrid_api_key', v)}
               />
               <Input
-                label={"From Email"}
+                label={t('label_from_email')}
                 placeholder="noreply@example.com"
                 variant="bordered"
                 value={formData.sendgrid_from_email}
                 onValueChange={(v) => updateField('sendgrid_from_email', v)}
               />
               <Input
-                label={"From Name"}
-                placeholder={"My Timebank..."}
+                label={t('label_from_name')}
+                placeholder={t('placeholder_my_timebank')}
                 variant="bordered"
                 value={formData.sendgrid_from_name}
                 onValueChange={(v) => updateField('sendgrid_from_name', v)}
               />
               {formData.webhook_url && (
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-default-700">
-                      {"Webhook URL"} <span className="text-xs text-default-400 ml-1">{"Webhook URL for receiving notifications"}</span>
-                    </p>
+                <Input
+                  isReadOnly
+                  label={t('webhook_url_label')}
+                  description={t('webhook_url_hint')}
+                  value={formData.webhook_url}
+                  variant="bordered"
+                  classNames={{ input: 'font-mono text-xs' }}
+                  endContent={
                     <Button
                       size="sm"
                       variant="flat"
-                      startContent={copied ? <Check size={14} /> : <Copy size={14} />}
+                      isIconOnly
+                      aria-label={copied ? t('copied') : t('copy')}
                       onPress={handleCopyWebhook}
                       color={copied ? 'success' : 'default'}
                     >
-                      {copied ? "Copied" : "Copy"}
+                      {copied ? <Check size={14} /> : <Copy size={14} />}
                     </Button>
-                  </div>
-                  <p className="text-sm text-default-500 bg-default-100 rounded-lg px-3 py-2 font-mono break-all select-all">
-                    {formData.webhook_url}
-                  </p>
-                </div>
+                  }
+                />
               )}
             </CardBody>
           </Card>
@@ -322,19 +326,19 @@ export function EmailSettings() {
           <Card shadow="sm">
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Globe size={20} /> {"Gmail API Configuration"}
+                <Globe size={20} /> {t('gmail_api_configuration')}
               </h3>
             </CardHeader>
             <CardBody className="gap-4">
               <Input
-                label={"Client ID"}
-                placeholder={"Xxxxappsgoogleusercontentcom..."}
+                label={t('label_client_i_d')}
+                placeholder={t('placeholder_xxxxappsgoogleusercontentcom')}
                 variant="bordered"
                 value={formData.gmail_client_id}
                 onValueChange={(v) => updateField('gmail_client_id', v)}
               />
               <Input
-                label={"Client Secret"}
+                label={t('label_client_secret')}
                 type="password"
                 placeholder="GOCSPX-xxxxx"
                 variant="bordered"
@@ -343,7 +347,7 @@ export function EmailSettings() {
                 onValueChange={(v) => updateField('gmail_client_secret', v)}
               />
               <Input
-                label={"Refresh Token"}
+                label={t('label_refresh_token')}
                 type="password"
                 variant="bordered"
                 description={secretHint(formData._gmail_refresh_token_set)}
@@ -351,15 +355,15 @@ export function EmailSettings() {
                 onValueChange={(v) => updateField('gmail_refresh_token', v)}
               />
               <Input
-                label={"Sender Email"}
+                label={t('label_sender_email')}
                 placeholder="noreply@example.com"
                 variant="bordered"
                 value={formData.gmail_sender_email}
                 onValueChange={(v) => updateField('gmail_sender_email', v)}
               />
               <Input
-                label={"Sender Name"}
-                placeholder={"My Timebank..."}
+                label={t('label_sender_name')}
+                placeholder={t('placeholder_my_timebank')}
                 variant="bordered"
                 value={formData.gmail_sender_name}
                 onValueChange={(v) => updateField('gmail_sender_name', v)}
@@ -373,33 +377,33 @@ export function EmailSettings() {
           <Card shadow="sm">
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Globe size={20} /> {"SMTP Configuration"}
+                <Globe size={20} /> {t('smtp_configuration')}
               </h3>
             </CardHeader>
             <CardBody className="gap-4">
               <Input
-                label={"Host"}
-                placeholder={"Smtpexamplecom..."}
+                label={t('label_host')}
+                placeholder={t('placeholder_smtpexamplecom')}
                 variant="bordered"
                 value={formData.smtp_host}
                 onValueChange={(v) => updateField('smtp_host', v)}
               />
               <Input
-                label={"Port"}
+                label={t('label_port')}
                 placeholder="587"
                 variant="bordered"
                 value={formData.smtp_port}
                 onValueChange={(v) => updateField('smtp_port', v)}
               />
               <Input
-                label={"Username"}
+                label={t('label_username')}
                 placeholder="user@example.com"
                 variant="bordered"
                 value={formData.smtp_user}
                 onValueChange={(v) => updateField('smtp_user', v)}
               />
               <Input
-                label={"Password"}
+                label={t('label_password')}
                 type="password"
                 variant="bordered"
                 description={secretHint(formData._smtp_password_set)}
@@ -407,7 +411,7 @@ export function EmailSettings() {
                 onValueChange={(v) => updateField('smtp_password', v)}
               />
               <Select
-                label={"Encryption"}
+                label={t('label_encryption')}
                 selectedKeys={[formData.smtp_encryption]}
                 onSelectionChange={(keys) => {
                   const v = Array.from(keys)[0];
@@ -415,20 +419,20 @@ export function EmailSettings() {
                 }}
                 variant="bordered"
               >
-                <SelectItem key="tls">{"Encryption TLS"}</SelectItem>
-                <SelectItem key="ssl">{"Encryption SSL"}</SelectItem>
-                <SelectItem key="none">{"Encryption None"}</SelectItem>
+                <SelectItem key="tls">{t('encryption_tls')}</SelectItem>
+                <SelectItem key="ssl">{t('encryption_ssl')}</SelectItem>
+                <SelectItem key="none">{t('encryption_none')}</SelectItem>
               </Select>
               <Input
-                label={"From Email"}
+                label={t('label_from_email')}
                 placeholder="noreply@example.com"
                 variant="bordered"
                 value={formData.smtp_from_email}
                 onValueChange={(v) => updateField('smtp_from_email', v)}
               />
               <Input
-                label={"From Name"}
-                placeholder={"My Timebank..."}
+                label={t('label_from_name')}
+                placeholder={t('placeholder_my_timebank')}
                 variant="bordered"
                 value={formData.smtp_from_name}
                 onValueChange={(v) => updateField('smtp_from_name', v)}
@@ -442,18 +446,18 @@ export function EmailSettings() {
           <Card shadow="sm">
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Globe size={20} /> {"Platform Default"}
+                <Globe size={20} /> {t('platform_default_heading')}
               </h3>
             </CardHeader>
             <CardBody>
               <p className="text-sm text-default-500">
-                {"Use the platform default provider settings"}{' '}
+                {t('platform_default_desc')}{' '}
                 <Chip size="sm" variant="flat" color="secondary">
-                  {formData.platform_default.provider || "Not Configured"}
+                  {formData.platform_default.provider || t('not_configured')}
                 </Chip>
               </p>
               <p className="text-sm text-default-400 mt-2">
-                {"Use the platform default"}
+                {t('platform_default_hint')}
               </p>
             </CardBody>
           </Card>
@@ -463,15 +467,15 @@ export function EmailSettings() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Send size={20} /> {"Test Email"}
+              <Send size={20} /> {t('test_email_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <p className="text-sm text-default-400">
-              {"Enter an email address to send a test message to"}
+              {t('test_email_hint')}
             </p>
             <Input
-              label={"Test Email Address"}
+              label={t('label_test_email_address')}
               placeholder="test@example.com"
               variant="bordered"
               value={testEmail}
@@ -483,7 +487,7 @@ export function EmailSettings() {
               onPress={handleTestEmail}
               isLoading={testing}
             >
-              {"Send Test Email"}
+              {t('send_test_email')}
             </Button>
           </CardBody>
         </Card>
@@ -497,7 +501,7 @@ export function EmailSettings() {
             isLoading={saving}
             isDisabled={saving}
           >
-            {"Save Settings"}
+            {t('save_settings')}
           </Button>
         </div>
       </div>

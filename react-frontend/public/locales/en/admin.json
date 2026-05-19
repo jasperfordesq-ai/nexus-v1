@@ -1546,6 +1546,7 @@
     "test_email_hint": "Enter an email address to send a test message to",
     "test_email_sent": "Test email sent",
     "test_email_sent_via": "Test email sent via",
+    "test_email_sent_via_provider": "Test email sent via {{provider}}",
     "total_count": "Total",
     "twitter_cards": "Twitter Cards",
     "twitter_cards_desc": "Configure Twitter Card meta tags for rich link previews on Twitter",
