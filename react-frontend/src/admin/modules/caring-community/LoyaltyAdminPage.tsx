@@ -32,6 +32,12 @@ import {
   ModalHeader,
   Spinner,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
   Textarea,
 } from '@heroui/react';
 import Coins from 'lucide-react/icons/coins';
@@ -433,84 +439,74 @@ export default function LoyaltyAdminPage() {
         </CardHeader>
         <Divider />
         <CardBody className="p-0">
-          {redemptions.length === 0 ? (
-            <div className="text-center py-12 text-sm text-default-500">
-              {t('admin.loyalty.ledger.empty')}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-default-50">
-                  <tr className="text-xs text-default-500 uppercase tracking-wide">
-                    <th className="text-left px-4 py-3">{t('admin.loyalty.ledger.date')}</th>
-                    <th className="text-left px-4 py-3">{t('admin.loyalty.ledger.member')}</th>
-                    <th className="text-left px-4 py-3">{t('admin.loyalty.ledger.merchant')}</th>
-                    <th className="text-left px-4 py-3 hidden md:table-cell">{t('admin.loyalty.ledger.item')}</th>
-                    <th className="text-right px-4 py-3">{t('admin.loyalty.ledger.hours')}</th>
-                    <th className="text-right px-4 py-3">{t('admin.loyalty.ledger.rate')}</th>
-                    <th className="text-right px-4 py-3">{t('admin.loyalty.ledger.discount')}</th>
-                    <th className="text-left px-4 py-3">{t('admin.loyalty.ledger.status')}</th>
-                    <th className="text-right px-4 py-3">{t('admin.loyalty.ledger.actions')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {redemptions.map((row) => (
-                    <tr key={row.id} className="border-t border-default-200 hover:bg-default-50">
-                      <td className="px-4 py-3 text-sm">
-                        {new Date(row.redeemed_at).toLocaleDateString()}
-                      </td>
-                      <td className="px-4 py-3 text-sm">{row.member_name || '—'}</td>
-                      <td className="px-4 py-3 text-sm">{row.merchant_name || '—'}</td>
-                      <td className="px-4 py-3 text-sm hidden md:table-cell">
-                        {row.listing_title || '—'}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-right tabular-nums">
-                        {row.credits_used.toFixed(2)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-right tabular-nums text-default-500">
-                        {row.exchange_rate_chf.toFixed(2)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-right tabular-nums">
-                        <Chip variant="flat" color="success" size="sm">
-                          CHF {row.discount_chf.toFixed(2)}
-                        </Chip>
-                      </td>
-                      <td className="px-4 py-3 text-sm">
-                        <Chip
-                          variant="flat"
-                          size="sm"
-                          color={
-                            row.status === 'applied'
-                              ? 'success'
-                              : row.status === 'reversed'
-                              ? 'danger'
-                              : 'warning'
-                          }
-                        >
-                          {row.status}
-                        </Chip>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-right">
-                        {canManage && row.status === 'applied' ? (
-                          <Button
-                            size="sm"
-                            color="danger"
-                            variant="flat"
-                            startContent={<Undo2 className="w-4 h-4" />}
-                            onPress={() => openReverseModal(row)}
-                          >
-                            {t('admin.loyalty.ledger.reverse')}
-                          </Button>
-                        ) : (
-                          <span className="text-default-400">—</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <Table removeWrapper aria-label={t('admin.loyalty.ledger.aria')}>
+            <TableHeader>
+              <TableColumn>{t('admin.loyalty.ledger.date')}</TableColumn>
+              <TableColumn>{t('admin.loyalty.ledger.member')}</TableColumn>
+              <TableColumn>{t('admin.loyalty.ledger.merchant')}</TableColumn>
+              <TableColumn className="hidden md:table-cell">{t('admin.loyalty.ledger.item')}</TableColumn>
+              <TableColumn className="text-right">{t('admin.loyalty.ledger.hours')}</TableColumn>
+              <TableColumn className="text-right">{t('admin.loyalty.ledger.rate')}</TableColumn>
+              <TableColumn className="text-right">{t('admin.loyalty.ledger.discount')}</TableColumn>
+              <TableColumn>{t('admin.loyalty.ledger.status')}</TableColumn>
+              <TableColumn className="text-right">{t('admin.loyalty.ledger.actions')}</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent={t('admin.loyalty.ledger.empty')}>
+              {redemptions.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell className="text-sm">
+                    {new Date(row.redeemed_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-sm">{row.member_name || t('admin.loyalty.ledger.empty_value')}</TableCell>
+                  <TableCell className="text-sm">{row.merchant_name || t('admin.loyalty.ledger.empty_value')}</TableCell>
+                  <TableCell className="hidden text-sm md:table-cell">
+                    {row.listing_title || t('admin.loyalty.ledger.empty_value')}
+                  </TableCell>
+                  <TableCell className="text-right text-sm tabular-nums">
+                    {row.credits_used.toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-right text-sm tabular-nums text-default-500">
+                    {row.exchange_rate_chf.toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-right text-sm tabular-nums">
+                    <Chip variant="flat" color="success" size="sm">
+                      CHF {row.discount_chf.toFixed(2)}
+                    </Chip>
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    <Chip
+                      variant="flat"
+                      size="sm"
+                      color={
+                        row.status === 'applied'
+                          ? 'success'
+                          : row.status === 'reversed'
+                          ? 'danger'
+                          : 'warning'
+                      }
+                    >
+                      {t(`admin.loyalty.status.${row.status}`)}
+                    </Chip>
+                  </TableCell>
+                  <TableCell className="text-right text-sm">
+                    {canManage && row.status === 'applied' ? (
+                      <Button
+                        size="sm"
+                        color="danger"
+                        variant="flat"
+                        startContent={<Undo2 className="w-4 h-4" />}
+                        onPress={() => openReverseModal(row)}
+                      >
+                        {t('admin.loyalty.ledger.reverse')}
+                      </Button>
+                    ) : (
+                      <span className="text-default-400">{t('admin.loyalty.ledger.empty_value')}</span>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardBody>
       </Card>
 

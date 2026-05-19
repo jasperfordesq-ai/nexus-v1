@@ -15,6 +15,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -25,6 +26,12 @@ import {
   Input,
   Spinner,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
   Tabs,
   Tab,
   Textarea,
@@ -84,7 +91,8 @@ interface LedgerResponse {
 
 export default function RegionalPointsAdminPage() {
   const toast = useToast();
-  usePageTitle('Regional Points');
+  const { t } = useTranslation('caring_community');
+  usePageTitle(t('admin.regional_points.title'));
 
   const [config, setConfig] = useState<RegionalPointsConfig | null>(null);
   const [ledger, setLedger] = useState<LedgerResponse | null>(null);
@@ -115,12 +123,12 @@ export default function RegionalPointsAdminPage() {
       // ledger may 403 if disabled — that's fine, show empty
     } catch (err) {
       logError('RegionalPointsAdminPage: load failed', err);
-      toast.error('Failed to load regional points');
+      toast.error(t('admin.regional_points.errors.load'));
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     void loadAll();
@@ -136,27 +144,27 @@ export default function RegionalPointsAdminPage() {
       );
       if (res.success && res.data) {
         setConfig(res.data);
-        toast.success('Configuration saved');
+        toast.success(t('admin.regional_points.messages.config_saved'));
         void loadAll();
       } else {
-        toast.error(res.error || 'Failed to save configuration');
+        toast.error(res.error || t('admin.regional_points.errors.save_config'));
       }
     } catch (err) {
       logError('RegionalPointsAdminPage: save config failed', err);
-      toast.error('Failed to save configuration');
+      toast.error(t('admin.regional_points.errors.save_config'));
     } finally {
       setSavingConfig(false);
     }
-  }, [config, toast, loadAll]);
+  }, [config, t, toast, loadAll]);
 
   const handleIssue = useCallback(async () => {
     if (!member) {
-      toast.error('Pick a member first');
+      toast.error(t('admin.regional_points.errors.pick_member'));
       return;
     }
     const amount = parseFloat(issuePoints);
     if (!amount || amount <= 0) {
-      toast.error('Enter a positive amount');
+      toast.error(t('admin.regional_points.errors.positive_amount'));
       return;
     }
     setSubmittingIssue(true);
@@ -167,29 +175,29 @@ export default function RegionalPointsAdminPage() {
         description: issueDescription.trim(),
       });
       if (res.success) {
-        toast.success(`Issued ${amount} points to ${member.name}`);
+        toast.success(t('admin.regional_points.messages.issued', { amount, member: member.name }));
         setIssuePoints('');
         setIssueDescription('');
         void loadAll();
       } else {
-        toast.error(res.error || 'Failed to issue points');
+        toast.error(res.error || t('admin.regional_points.errors.issue'));
       }
     } catch (err) {
       logError('RegionalPointsAdminPage: issue failed', err);
-      toast.error('Failed to issue points');
+      toast.error(t('admin.regional_points.errors.issue'));
     } finally {
       setSubmittingIssue(false);
     }
-  }, [member, issuePoints, issueDescription, toast, loadAll]);
+  }, [member, issuePoints, issueDescription, t, toast, loadAll]);
 
   const handleAdjust = useCallback(async () => {
     if (!member) {
-      toast.error('Pick a member first');
+      toast.error(t('admin.regional_points.errors.pick_member'));
       return;
     }
     const delta = parseFloat(adjustDelta);
     if (!delta || delta === 0) {
-      toast.error('Enter a non-zero delta (positive or negative)');
+      toast.error(t('admin.regional_points.errors.non_zero_delta'));
       return;
     }
     setSubmittingAdjust(true);
@@ -200,20 +208,20 @@ export default function RegionalPointsAdminPage() {
         description: adjustDescription.trim(),
       });
       if (res.success) {
-        toast.success(`Adjusted ${member.name} by ${delta} points`);
+        toast.success(t('admin.regional_points.messages.adjusted', { member: member.name, delta }));
         setAdjustDelta('');
         setAdjustDescription('');
         void loadAll();
       } else {
-        toast.error(res.error || 'Failed to adjust points');
+        toast.error(res.error || t('admin.regional_points.errors.adjust'));
       }
     } catch (err) {
       logError('RegionalPointsAdminPage: adjust failed', err);
-      toast.error('Failed to adjust points');
+      toast.error(t('admin.regional_points.errors.adjust'));
     } finally {
       setSubmittingAdjust(false);
     }
-  }, [member, adjustDelta, adjustDescription, toast, loadAll]);
+  }, [member, adjustDelta, adjustDescription, t, toast, loadAll]);
 
   if (loading || !config) {
     return (
@@ -229,8 +237,8 @@ export default function RegionalPointsAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Regional Points"
-        description="Third-currency programme — runs alongside time credits and the marketplace currency. Disabled by default."
+        title={t('admin.regional_points.title')}
+        description={t('admin.regional_points.description')}
         actions={
           <Button
             size="sm"
@@ -239,7 +247,7 @@ export default function RegionalPointsAdminPage() {
             onPress={() => void loadAll()}
             isDisabled={refreshing}
           >
-            Refresh
+            {t('admin.common.refresh')}
           </Button>
         }
       />
@@ -250,19 +258,12 @@ export default function RegionalPointsAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('admin.regional_points.about.title')}</p>
               <p className="text-default-600">
-                Regional Points are supplementary credits used to recognise contributions that don't
-                fit the standard hour exchange model — for example, attending community events,
-                participating in surveys, or completing training. They are distinct from time credits
-                (care hours) and cannot be converted to them. Use them to encourage broader community
-                participation beyond direct care.
+                {t('admin.regional_points.about.body')}
               </p>
               <p className="text-default-500">
-                Allocate points manually to individual members using the issue or adjust tools below.
-                Points appear in the member's wallet alongside their time credit balance. Members can
-                redeem Regional Points for local rewards defined in the Loyalty programme. Points
-                expire after 12 months unless the expiry setting is set to 0 (never expire).
+                {t('admin.regional_points.about.secondary')}
               </p>
             </div>
           </div>
@@ -273,25 +274,25 @@ export default function RegionalPointsAdminPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard
           icon={Coins}
-          label="Total balance issued"
+          label={t('admin.regional_points.stats.total_balance')}
           value={Number(stats.total_balance ?? 0).toFixed(2)}
           color="warning"
         />
         <StatCard
           icon={Plus}
-          label="Lifetime issued"
+          label={t('admin.regional_points.stats.lifetime_issued')}
           value={Number(stats.total_issued ?? 0).toFixed(2)}
           color="success"
         />
         <StatCard
           icon={SlidersHorizontal}
-          label="Lifetime spent"
+          label={t('admin.regional_points.stats.lifetime_spent')}
           value={Number(stats.total_spent ?? 0).toFixed(2)}
           color="primary"
         />
         <StatCard
           icon={Coins}
-          label="Member accounts"
+          label={t('admin.regional_points.stats.member_accounts')}
           value={String(stats.total_accounts ?? 0)}
           color="default"
         />
@@ -301,15 +302,15 @@ export default function RegionalPointsAdminPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <SlidersHorizontal className="w-5 h-5 text-primary" />
-          <h2 className="text-base font-semibold">Programme configuration</h2>
+          <h2 className="text-base font-semibold">{t('admin.regional_points.config.title')}</h2>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Programme enabled</p>
+              <p className="text-sm font-medium">{t('admin.regional_points.config.enabled')}</p>
               <p className="text-xs text-default-500">
-                When off, the third currency is hidden from members and admin endpoints return 403.
+                {t('admin.regional_points.config.enabled_hint')}
               </p>
             </div>
             <Switch
@@ -321,24 +322,24 @@ export default function RegionalPointsAdminPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="Display label"
+              label={t('admin.regional_points.config.display_label')}
               value={config.label}
               onValueChange={(v) => setConfig({ ...config, label: v })}
-              description="Shown in the wallet (e.g. 'Regional Points', 'Stadtmünze')"
+              description={t('admin.regional_points.config.display_label_description')}
             />
             <Input
-              label="Symbol"
+              label={t('admin.regional_points.config.symbol')}
               value={config.symbol}
               onValueChange={(v) => setConfig({ ...config, symbol: v })}
-              description="Short suffix shown next to amounts (e.g. 'pts', 'SM')"
+              description={t('admin.regional_points.config.symbol_description')}
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Auto-issue on approved hours</p>
+              <p className="text-sm font-medium">{t('admin.regional_points.config.auto_issue')}</p>
               <p className="text-xs text-default-500">
-                When a verified hour is logged, automatically award this many regional points.
+                {t('admin.regional_points.config.auto_issue_hint')}
               </p>
             </div>
             <Switch
@@ -349,7 +350,7 @@ export default function RegionalPointsAdminPage() {
           </div>
 
           <Input
-            label="Points per approved hour"
+            label={t('admin.regional_points.config.points_per_hour')}
             type="number"
             value={String(config.points_per_approved_hour)}
             onValueChange={(v) =>
@@ -364,8 +365,8 @@ export default function RegionalPointsAdminPage() {
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Member-to-member transfers</p>
-              <p className="text-xs text-default-500">Allow members to send points to each other.</p>
+              <p className="text-sm font-medium">{t('admin.regional_points.config.member_transfers')}</p>
+              <p className="text-xs text-default-500">{t('admin.regional_points.config.member_transfers_hint')}</p>
             </div>
             <Switch
               isSelected={config.member_transfers_enabled}
@@ -376,9 +377,9 @@ export default function RegionalPointsAdminPage() {
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Marketplace redemption</p>
+              <p className="text-sm font-medium">{t('admin.regional_points.config.marketplace_redemption')}</p>
               <p className="text-xs text-default-500">
-                Allow members to redeem points as a CHF discount on participating sellers.
+                {t('admin.regional_points.config.marketplace_redemption_hint')}
               </p>
             </div>
             <Switch
@@ -397,7 +398,7 @@ export default function RegionalPointsAdminPage() {
               onPress={() => void handleSaveConfig()}
               isLoading={savingConfig}
             >
-              Save configuration
+              {t('admin.regional_points.config.save')}
             </Button>
           </div>
         </CardBody>
@@ -407,27 +408,27 @@ export default function RegionalPointsAdminPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <Plus className="w-5 h-5 text-success" />
-          <h2 className="text-base font-semibold">Issue / adjust member balance</h2>
+          <h2 className="text-base font-semibold">{t('admin.regional_points.member_balance.title')}</h2>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-4">
           <MemberSearchPicker
-            label="Member"
-            placeholder="Search by name or email"
+            label={t('admin.regional_points.member_balance.member')}
+            placeholder={t('admin.regional_points.member_balance.member_placeholder')}
             value={memberQuery}
             onValueChange={setMemberQuery}
             selectedMember={member}
             onSelectedMemberChange={setMember}
-            noResultsText="No matching members"
-            clearText="Clear"
+            noResultsText={t('admin.regional_points.member_balance.no_matching_members')}
+            clearText={t('admin.regional_points.member_balance.clear')}
           />
 
           {member && (
-            <Tabs aria-label="Action">
-              <Tab key="issue" title="Issue points">
+            <Tabs aria-label={t('admin.regional_points.member_balance.tabs_aria')}>
+              <Tab key="issue" title={t('admin.regional_points.member_balance.issue_tab')}>
                 <div className="space-y-3 pt-3">
                   <Input
-                    label="Points to issue"
+                    label={t('admin.regional_points.member_balance.points_to_issue')}
                     type="number"
                     min="0"
                     step="0.5"
@@ -435,7 +436,7 @@ export default function RegionalPointsAdminPage() {
                     onValueChange={setIssuePoints}
                   />
                   <Textarea
-                    label="Description"
+                    label={t('admin.regional_points.member_balance.description')}
                     minRows={2}
                     value={issueDescription}
                     onValueChange={setIssueDescription}
@@ -446,22 +447,22 @@ export default function RegionalPointsAdminPage() {
                       onPress={() => void handleIssue()}
                       isLoading={submittingIssue}
                     >
-                      Issue points
+                      {t('admin.regional_points.member_balance.issue')}
                     </Button>
                   </div>
                 </div>
               </Tab>
-              <Tab key="adjust" title="Adjust (+/-)">
+              <Tab key="adjust" title={t('admin.regional_points.member_balance.adjust_tab')}>
                 <div className="space-y-3 pt-3">
                   <Input
-                    label="Points delta (positive or negative)"
+                    label={t('admin.regional_points.member_balance.points_delta')}
                     type="number"
                     step="0.5"
                     value={adjustDelta}
                     onValueChange={setAdjustDelta}
                   />
                   <Textarea
-                    label="Description"
+                    label={t('admin.regional_points.member_balance.description')}
                     minRows={2}
                     value={adjustDescription}
                     onValueChange={setAdjustDescription}
@@ -472,7 +473,7 @@ export default function RegionalPointsAdminPage() {
                       onPress={() => void handleAdjust()}
                       isLoading={submittingAdjust}
                     >
-                      Apply adjustment
+                      {t('admin.regional_points.member_balance.apply_adjustment')}
                     </Button>
                   </div>
                 </div>
@@ -486,64 +487,54 @@ export default function RegionalPointsAdminPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <Coins className="w-5 h-5 text-warning" />
-          <h2 className="text-base font-semibold">Recent ledger entries</h2>
+          <h2 className="text-base font-semibold">{t('admin.regional_points.ledger.title')}</h2>
           <Chip size="sm" variant="flat" className="ml-auto">
             {items.length}
           </Chip>
         </CardHeader>
         <Divider />
         <CardBody className="p-0">
-          {items.length === 0 ? (
-            <div className="text-center py-12 text-sm text-default-500">
-              No ledger entries yet.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-default-50">
-                  <tr className="text-xs text-default-500 uppercase tracking-wide">
-                    <th className="text-left px-4 py-3">Date</th>
-                    <th className="text-left px-4 py-3">Member</th>
-                    <th className="text-left px-4 py-3">Type</th>
-                    <th className="text-left px-4 py-3 hidden md:table-cell">Description</th>
-                    <th className="text-right px-4 py-3">Points</th>
-                    <th className="text-right px-4 py-3 hidden md:table-cell">Balance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((row) => (
-                    <tr key={row.id} className="border-t border-default-200 hover:bg-default-50">
-                      <td className="px-4 py-3 text-sm">
-                        {new Date(row.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="px-4 py-3 text-sm">
-                        {row.user_name || `#${row.user_id}`}
-                      </td>
-                      <td className="px-4 py-3 text-sm">
-                        <Chip size="sm" variant="flat">
-                          {row.type}
-                        </Chip>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-default-600 hidden md:table-cell">
-                        {row.description || '—'}
-                      </td>
-                      <td
-                        className={`px-4 py-3 text-sm text-right tabular-nums ${
-                          row.direction === 'in' ? 'text-success' : 'text-danger'
-                        }`}
-                      >
-                        {row.direction === 'in' ? '+' : '−'}
-                        {row.points.toFixed(2)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-right tabular-nums hidden md:table-cell text-default-500">
-                        {row.balance_after.toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <Table removeWrapper aria-label={t('admin.regional_points.ledger.aria')}>
+            <TableHeader>
+              <TableColumn>{t('admin.regional_points.ledger.date')}</TableColumn>
+              <TableColumn>{t('admin.regional_points.ledger.member')}</TableColumn>
+              <TableColumn>{t('admin.regional_points.ledger.type')}</TableColumn>
+              <TableColumn className="hidden md:table-cell">{t('admin.regional_points.ledger.description')}</TableColumn>
+              <TableColumn className="text-right">{t('admin.regional_points.ledger.points')}</TableColumn>
+              <TableColumn className="hidden text-right md:table-cell">{t('admin.regional_points.ledger.balance')}</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent={t('admin.regional_points.ledger.empty')}>
+              {items.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell className="text-sm">
+                    {new Date(row.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {row.user_name || t('admin.regional_points.ledger.user_fallback', { id: row.user_id })}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    <Chip size="sm" variant="flat">
+                      {row.type}
+                    </Chip>
+                  </TableCell>
+                  <TableCell className="hidden text-sm text-default-600 md:table-cell">
+                    {row.description || t('admin.common.empty_dash')}
+                  </TableCell>
+                  <TableCell
+                    className={`text-right text-sm tabular-nums ${
+                      row.direction === 'in' ? 'text-success' : 'text-danger'
+                    }`}
+                  >
+                    {row.direction === 'in' ? '+' : '-'}
+                    {row.points.toFixed(2)}
+                  </TableCell>
+                  <TableCell className="hidden text-right text-sm tabular-nums text-default-500 md:table-cell">
+                    {row.balance_after.toFixed(2)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardBody>
       </Card>
     </div>
