@@ -426,5 +426,12 @@
     "push_enabled": "Push notifications",
     "prefs_saved": "Notification preferences saved",
     "prefs_save_failed": "Failed to save preferences"
+  },
+  "analytics": {
+    "col_joined": "Joined",
+    "col_month": "Month",
+    "col_retention": "Retention %",
+    "col_still_active": "Still Active",
+    "retention_table_aria": "Retention cohorts table"
   }
 }

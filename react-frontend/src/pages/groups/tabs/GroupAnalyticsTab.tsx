@@ -18,6 +18,12 @@ import {
   CardHeader,
   Avatar,
   Chip,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
 } from '@heroui/react';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
@@ -557,56 +563,38 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               <Spinner />
             </div>
           ) : data && data.retention.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table
-                className="w-full text-sm"
-                aria-label={t('analytics.retention_table_aria', 'Retention cohorts table')}
-              >
-                <thead>
-                  <tr className="border-b border-default-200">
-                    <th className="text-left py-2 px-3 font-semibold text-theme-primary">
-                      {t('analytics.col_month', 'Month')}
-                    </th>
-                    <th className="text-right py-2 px-3 font-semibold text-theme-primary">
-                      {t('analytics.col_joined', 'Joined')}
-                    </th>
-                    <th className="text-right py-2 px-3 font-semibold text-theme-primary">
-                      {t('analytics.col_still_active', 'Still Active')}
-                    </th>
-                    <th className="text-right py-2 px-3 font-semibold text-theme-primary">
-                      {t('analytics.col_retention', 'Retention %')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.retention.map((cohort) => (
-                    <tr
-                      key={cohort.month}
-                      className="border-b border-default-100 hover:bg-theme-hover transition-colors"
-                    >
-                      <td className="py-2 px-3 text-theme-primary">{cohort.month}</td>
-                      <td className="py-2 px-3 text-right text-theme-subtle">{cohort.joined}</td>
-                      <td className="py-2 px-3 text-right text-theme-subtle">{cohort.still_active}</td>
-                      <td className="py-2 px-3 text-right">
-                        <Chip
-                          size="sm"
-                          variant="flat"
-                          color={
-                            cohort.retention_pct >= 70
-                              ? 'success'
-                              : cohort.retention_pct >= 40
-                                ? 'warning'
-                                : 'danger'
-                          }
-                        >
-                          {cohort.retention_pct.toFixed(1)}%
-                        </Chip>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Table aria-label={t('analytics.retention_table_aria')} removeWrapper>
+              <TableHeader>
+                <TableColumn>{t('analytics.col_month')}</TableColumn>
+                <TableColumn align="end">{t('analytics.col_joined')}</TableColumn>
+                <TableColumn align="end">{t('analytics.col_still_active')}</TableColumn>
+                <TableColumn align="end">{t('analytics.col_retention')}</TableColumn>
+              </TableHeader>
+              <TableBody>
+                {data.retention.map((cohort) => (
+                  <TableRow key={cohort.month}>
+                    <TableCell className="text-theme-primary">{cohort.month}</TableCell>
+                    <TableCell className="text-right text-theme-subtle">{cohort.joined}</TableCell>
+                    <TableCell className="text-right text-theme-subtle">{cohort.still_active}</TableCell>
+                    <TableCell className="text-right">
+                      <Chip
+                        size="sm"
+                        variant="flat"
+                        color={
+                          cohort.retention_pct >= 70
+                            ? 'success'
+                            : cohort.retention_pct >= 40
+                              ? 'warning'
+                              : 'danger'
+                        }
+                      >
+                        {cohort.retention_pct.toFixed(1)}%
+                      </Chip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           ) : (
             <p className="flex h-[200px] items-center justify-center text-sm text-default-400">
               {t('analytics.no_retention_data', 'No retention data available.')}
