@@ -69,8 +69,9 @@ interface ServerAuditResult {
 }
 
 export function SeoOverview() {
-  const { t } = useTranslation('admin_nav');
-  useAdminPageMeta({ title: t('advanced') });
+  const { t } = useTranslation('admin');
+  const { t: tNav } = useTranslation('admin_nav');
+  useAdminPageMeta({ title: tNav('advanced') });
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -106,7 +107,7 @@ export function SeoOverview() {
           setFormData(prev => ({ ...prev, ...seo }));
         }
       })
-      .catch(() => toast.error("Failed to load SEO settings"))
+      .catch(() => toast.error(t('failed_to_load_s_e_o_settings')))
       .finally(() => setLoading(false));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps -- load once on mount
 
@@ -118,9 +119,9 @@ export function SeoOverview() {
           setSitemapStats(res.data as unknown as SitemapStats);
         }
       })
-      .catch(() => toast.error("Failed to load sitemap stats"))
+      .catch(() => toast.error(t('failed_to_load_sitemap_stats')))
       .finally(() => setSitemapLoading(false));
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -149,10 +150,10 @@ export function SeoOverview() {
         if (freshRes.data) {
           setServerAudit(freshRes.data as unknown as ServerAuditResult);
         }
-        toast.success("SEO Audit Completed");
+        toast.success(t('seo_audit_completed'));
       }
     } catch {
-      toast.error("Failed to run SEO audit");
+      toast.error(t('failed_to_run_seo_audit'));
     } finally {
       setAuditRunning(false);
     }
@@ -162,10 +163,10 @@ export function SeoOverview() {
     setClearingCache(true);
     try {
       await adminSettings.clearSitemapCache();
-      toast.success("Sitemap Cache Cleared");
+      toast.success(t('sitemap_cache_cleared'));
       loadSitemapStats();
     } catch {
-      toast.error("Failed to clear sitemap cache");
+      toast.error(t('failed_to_clear_sitemap_cache'));
     } finally {
       setClearingCache(false);
     }
@@ -182,13 +183,13 @@ export function SeoOverview() {
       const res = await adminSettings.updateSeoSettings(payload);
 
       if (res.success) {
-        toast.success("SEO Settings Saved Successfully");
+        toast.success(t('s_e_o_settings_saved_successfully'));
       } else {
-        const error = (res as { error?: string }).error || "Save failed";
+        const error = (res as { error?: string }).error || t('save_failed');
         toast.error(error);
       }
     } catch {
-      toast.error("Failed to save SEO settings");
+      toast.error(t('failed_to_save_s_e_o_settings'));
     } finally {
       setSaving(false);
     }
@@ -205,87 +206,87 @@ export function SeoOverview() {
     // Title suffix
     const suffix = String(formData.seo_title_suffix || '');
     checks.push({
-      name: 'Title Suffix',
+      name: t('health_title_suffix'),
       status: suffix.length > 0 ? 'pass' : 'warning',
       detail: suffix.length > 0
-        ? `Configured: "${suffix}"`
-        : 'No title suffix set — pages will show "Page | NEXUS" as default',
+        ? t('health_title_suffix_configured', { suffix })
+        : t('health_title_suffix_missing'),
     });
 
     // Meta description
     const desc = String(formData.seo_meta_description || formData.tenant_meta_description || '');
     checks.push({
-      name: 'Meta Description',
+      name: t('health_meta_description'),
       status: desc.length >= 120 ? 'pass' : desc.length >= 50 ? 'warning' : 'fail',
       detail: desc.length > 0
-        ? `${desc.length} characters (ideal: 150–160)`
-        : 'No default meta description set',
+        ? t('health_meta_description_length', { count: desc.length })
+        : t('health_meta_description_missing'),
     });
 
     // OG Image
     const ogImage = String(formData.seo_og_image_url || '');
     checks.push({
-      name: 'Default OG Image',
+      name: t('health_default_og_image'),
       status: ogImage.length > 0 ? 'pass' : 'warning',
       detail: ogImage.length > 0
-        ? 'Default social sharing image is configured'
-        : 'No default OG image — social shares will use fallback',
+        ? t('health_og_image_configured')
+        : t('health_og_image_missing'),
     });
 
     // Open Graph
     checks.push({
-      name: 'Open Graph Tags',
+      name: t('open_graph_tags'),
       status: formData.seo_open_graph ? 'pass' : 'fail',
-      detail: formData.seo_open_graph ? 'Enabled' : 'Disabled — social media previews won\'t work',
+      detail: formData.seo_open_graph ? t('enabled') : t('health_open_graph_disabled'),
     });
 
     // Twitter Cards
     checks.push({
-      name: 'Twitter Cards',
+      name: t('twitter_cards'),
       status: formData.seo_twitter_cards ? 'pass' : 'fail',
-      detail: formData.seo_twitter_cards ? 'Enabled' : 'Disabled — X/Twitter previews won\'t work',
+      detail: formData.seo_twitter_cards ? t('enabled') : t('health_twitter_cards_disabled'),
     });
 
     // Canonical URLs
     checks.push({
-      name: 'Canonical URLs',
+      name: t('canonical_urls'),
       status: formData.seo_canonical_urls ? 'pass' : 'warning',
       detail: formData.seo_canonical_urls
-        ? 'Enabled — duplicate content prevented'
-        : 'Disabled — risk of duplicate content in search results',
+        ? t('health_canonical_enabled')
+        : t('health_canonical_disabled'),
     });
 
     // Sitemap
     checks.push({
-      name: 'Auto Sitemap',
+      name: t('label_auto_sitemap'),
       status: formData.seo_auto_sitemap ? 'pass' : 'fail',
       detail: formData.seo_auto_sitemap
-        ? `Active${sitemapStats ? ` — ${sitemapStats.total_urls} URLs indexed` : ''}`
-        : 'Disabled — search engines can\'t discover your pages',
+        ? sitemapStats ? t('health_auto_sitemap_active_count', { count: sitemapStats.total_urls }) : t('chip_active')
+        : t('health_auto_sitemap_disabled'),
     });
 
     // Google verification
     const gv = String(formData.seo_google_verification || '');
     checks.push({
-      name: 'Google Search Console',
+      name: t('label_google_search_console_verification'),
       status: gv.length > 0 ? 'pass' : 'warning',
-      detail: gv.length > 0 ? 'Verification tag configured' : 'Not configured — recommended for search insights',
+      detail: gv.length > 0 ? t('health_google_verification_configured') : t('health_google_verification_missing'),
     });
 
     // Tenant meta title
     const mt = String(formData.tenant_meta_title || '');
     checks.push({
-      name: 'Tenant Title',
+      name: t('health_tenant_title'),
       status: mt.length > 0 ? 'pass' : 'warning',
-      detail: mt.length > 0 ? `Set: "${mt}"` : 'Not set — using default "NEXUS"',
+      detail: mt.length > 0 ? t('health_tenant_title_set', { title: mt }) : t('health_tenant_title_missing'),
     });
 
     // H1 headline
     const h1 = String(formData.tenant_h1_headline || '');
     checks.push({
-      name: 'Homepage H1',
+      name: t('health_homepage_h1'),
       status: h1.length > 0 ? 'pass' : 'warning',
-      detail: h1.length > 0 ? `Set: "${h1}"` : 'Not set — homepage may be missing an H1 tag',
+      detail: h1.length > 0 ? t('health_homepage_h1_set', { headline: h1 }) : t('health_homepage_h1_missing'),
     });
 
     return checks;
@@ -306,7 +307,7 @@ export function SeoOverview() {
 
   return (
     <div>
-      <PageHeader title={"SEO Overview"} description={"Configure global SEO settings including meta tags and social sharing"} />
+      <PageHeader title={t('seo_overview_title')} description={t('seo_overview_desc')} />
 
       <div className="space-y-4">
         {/* SEO Health Score */}
@@ -314,12 +315,12 @@ export function SeoOverview() {
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <BarChart3 size={20} />
-              {"SEO Health Check"}
+              {t('seo_health_check_heading')}
             </h3>
             <div className="flex items-center gap-2">
-              <Chip color="success" variant="flat" size="sm">{passCount} {"Pass"}</Chip>
-              {warnCount > 0 && <Chip color="warning" variant="flat" size="sm">{warnCount} {"Warning"}</Chip>}
-              {failCount > 0 && <Chip color="danger" variant="flat" size="sm">{failCount} {"Fail"}</Chip>}
+              <Chip color="success" variant="flat" size="sm">{t('pass_count', { count: passCount })}</Chip>
+              {warnCount > 0 && <Chip color="warning" variant="flat" size="sm">{t('warning_count', { count: warnCount })}</Chip>}
+              {failCount > 0 && <Chip color="danger" variant="flat" size="sm">{t('fail_count', { count: failCount })}</Chip>}
             </div>
           </CardHeader>
           <CardBody>
@@ -344,37 +345,37 @@ export function SeoOverview() {
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Globe size={20} />
-              {"Tenant Meta"}
+              {t('tenant_meta_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={"Meta Title"}
-              placeholder={"Your Timebank Name..."}
+              label={t('label_meta_title')}
+              placeholder={t('placeholder_your_timebank_name')}
               variant="bordered"
               value={String(formData.tenant_meta_title || '')}
               onValueChange={(v) => updateField('tenant_meta_title', v)}
-              description={"Meta Title."}
+              description={t('desc_meta_title')}
             />
             <Input
-              label={"Meta Description"}
-              placeholder={"A Short Description of Your Timebank..."}
+              label={t('label_meta_description')}
+              placeholder={t('placeholder_a_short_description_of_your_timebank')}
               variant="bordered"
               value={String(formData.tenant_meta_description || '')}
               onValueChange={(v) => updateField('tenant_meta_description', v)}
-              description={`${String(formData.tenant_meta_description || '').length}/160 ${"Meta Description Chars."}`}
+              description={t('meta_description_count', { count: String(formData.tenant_meta_description || '').length })}
             />
             <Input
-              label={"H1 Headline"}
-              placeholder={"Welcome to Our Community..."}
+              label={t('label_h1_headline')}
+              placeholder={t('placeholder_welcome_to_our_community')}
               variant="bordered"
               value={String(formData.tenant_h1_headline || '')}
               onValueChange={(v) => updateField('tenant_h1_headline', v)}
-              description={"H1 Headline."}
+              description={t('desc_h1_headline')}
             />
             <Input
-              label={"Hero Intro Text"}
-              placeholder={"Exchange Skills and Time with Your Community..."}
+              label={t('label_hero_intro_text')}
+              placeholder={t('placeholder_exchange_skills_and_time_with_your_community')}
               variant="bordered"
               value={String(formData.tenant_hero_intro || '')}
               onValueChange={(v) => updateField('tenant_hero_intro', v)}
@@ -387,24 +388,24 @@ export function SeoOverview() {
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Image size={20} />
-              {"Social Sharing Image"}
+              {t('social_sharing_image_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={"OG Image URL"}
+              label={t('label_og_image_url')}
               placeholder="https://your-domain.com/images/og-default.png"
               variant="bordered"
               value={String(formData.seo_og_image_url || '')}
               onValueChange={(v) => updateField('seo_og_image_url', v)}
-              description={"OG Image URL."}
+              description={t('desc_og_image_url')}
             />
             {String(formData.seo_og_image_url || '') && (
               <div className="border border-default-200 rounded-lg p-3">
-                <p className="text-xs text-default-500 mb-2">{"OG Image Preview"}:</p>
+                <p className="text-xs text-default-500 mb-2">{t('og_image_preview')}:</p>
                 <img
                   src={String(formData.seo_og_image_url)}
-                  alt={"OG Image Preview"}
+                  alt={t('og_image_preview')}
                   className="max-w-xs rounded-md"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
@@ -418,33 +419,33 @@ export function SeoOverview() {
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Search size={20} />
-              {"Meta Tags"}
+              {t('meta_tags_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={"Default Title Suffix"}
+              label={t('label_default_title_suffix')}
               placeholder=" | My Timebank"
               variant="bordered"
               value={String(formData.seo_title_suffix || '')}
               onValueChange={(v) => updateField('seo_title_suffix', v)}
-              description={"Title Suffix."}
+              description={t('desc_title_suffix')}
             />
             <Input
-              label={"Global Meta Description"}
-              placeholder={"Community Timebanking Platform..."}
+              label={t('label_global_meta_description')}
+              placeholder={t('placeholder_community_timebanking_platform')}
               variant="bordered"
               value={String(formData.seo_meta_description || '')}
               onValueChange={(v) => updateField('seo_meta_description', v)}
-              description={`${String(formData.seo_meta_description || '').length}/160 ${"Global Meta Description Chars."}`}
+              description={t('global_meta_description_count', { count: String(formData.seo_meta_description || '').length })}
             />
             <Input
-              label={"Meta Keywords"}
+              label={t('label_meta_keywords')}
               placeholder="timebanking, community, exchange"
               variant="bordered"
               value={String(formData.seo_meta_keywords || '')}
               onValueChange={(v) => updateField('seo_meta_keywords', v)}
-              description={"Meta Keywords."}
+              description={t('desc_meta_keywords')}
             />
           </CardBody>
         </Card>
@@ -454,40 +455,40 @@ export function SeoOverview() {
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Share2 size={20} />
-              {"SEO Features"}
+              {t('seo_features_heading')}
             </h3>
           </CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{"Auto-generate Sitemap"}</p>
-                <p className="text-sm text-default-500">{"Automatically generate an XML sitemap for search engines"}</p>
+                <p className="font-medium">{t('auto_generate_sitemap')}</p>
+                <p className="text-sm text-default-500">{t('auto_generate_sitemap_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.seo_auto_sitemap} onValueChange={(v) => updateField('seo_auto_sitemap', v)} aria-label={"Auto Sitemap"} />
+              <Switch isSelected={!!formData.seo_auto_sitemap} onValueChange={(v) => updateField('seo_auto_sitemap', v)} aria-label={t('label_auto_sitemap')} />
             </div>
             <Divider />
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{"Canonical URLs"}</p>
-                <p className="text-sm text-default-500">{"Control canonical URL settings to avoid duplicate content"}</p>
+                <p className="font-medium">{t('canonical_urls')}</p>
+                <p className="text-sm text-default-500">{t('canonical_urls_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.seo_canonical_urls} onValueChange={(v) => updateField('seo_canonical_urls', v)} aria-label={"Canonical URLs"} />
+              <Switch isSelected={!!formData.seo_canonical_urls} onValueChange={(v) => updateField('seo_canonical_urls', v)} aria-label={t('canonical_urls')} />
             </div>
             <Divider />
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{"Open Graph Tags"}</p>
-                <p className="text-sm text-default-500">{"Configure Open Graph meta tags for social sharing"}</p>
+                <p className="font-medium">{t('open_graph_tags')}</p>
+                <p className="text-sm text-default-500">{t('open_graph_tags_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.seo_open_graph} onValueChange={(v) => updateField('seo_open_graph', v)} aria-label={"Open Graph"} />
+              <Switch isSelected={!!formData.seo_open_graph} onValueChange={(v) => updateField('seo_open_graph', v)} aria-label={t('label_open_graph')} />
             </div>
             <Divider />
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{"Twitter Cards"}</p>
-                <p className="text-sm text-default-500">{"Configure Twitter Card meta tags for rich link previews on Twitter"}</p>
+                <p className="font-medium">{t('twitter_cards')}</p>
+                <p className="text-sm text-default-500">{t('twitter_cards_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.seo_twitter_cards} onValueChange={(v) => updateField('seo_twitter_cards', v)} aria-label={"Twitter Cards"} />
+              <Switch isSelected={!!formData.seo_twitter_cards} onValueChange={(v) => updateField('seo_twitter_cards', v)} aria-label={t('twitter_cards')} />
             </div>
           </CardBody>
         </Card>
@@ -497,32 +498,32 @@ export function SeoOverview() {
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <FileText size={20} />
-              {"Verification Robots"}
+              {t('verification_robots_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={"Google Search Console Verification"}
+              label={t('label_google_search_console_verification')}
               placeholder="google-site-verification=..."
               variant="bordered"
               value={String(formData.seo_google_verification || '')}
               onValueChange={(v) => updateField('seo_google_verification', v)}
             />
             <Input
-              label={"Bing Webmaster Verification"}
+              label={t('label_bing_webmaster_verification')}
               placeholder="msvalidate.01=..."
               variant="bordered"
               value={String(formData.seo_bing_verification || '')}
               onValueChange={(v) => updateField('seo_bing_verification', v)}
             />
             <Textarea
-              label={"Custom Robots.txt"}
+              label={t('custom_robots_txt')}
               placeholder={"User-agent: *\nDisallow: /admin/"}
               variant="bordered"
               minRows={4}
               value={String(formData.seo_robots_txt || '')}
               onValueChange={(v) => updateField('seo_robots_txt', v)}
-              description={"Custom Robots Txt."}
+              description={t('desc_custom_robots_txt')}
             />
           </CardBody>
         </Card>
@@ -532,7 +533,7 @@ export function SeoOverview() {
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <FileText size={20} />
-              {"Sitemap"}
+              {t('sitemap_heading')}
             </h3>
             <div className="flex items-center gap-2">
               <Button
@@ -542,7 +543,7 @@ export function SeoOverview() {
                 onPress={loadSitemapStats}
                 isLoading={sitemapLoading}
               >
-                {"Refresh"}
+                {t('btn_refresh')}
               </Button>
               <Button
                 size="sm"
@@ -551,7 +552,7 @@ export function SeoOverview() {
                 onPress={handleClearSitemapCache}
                 isLoading={clearingCache}
               >
-                {"Clear Cache"}
+                {t('btn_clear_cache')}
               </Button>
             </div>
           </CardHeader>
@@ -561,7 +562,7 @@ export function SeoOverview() {
             ) : sitemapStats ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{"Sitemap URL"}</span>
+                  <span className="text-sm font-medium">{t('sitemap_url_label')}</span>
                   <a
                     href={sitemapStats.sitemap_url}
                     target="_blank"
@@ -574,12 +575,12 @@ export function SeoOverview() {
                 </div>
                 <Divider />
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{"Total URLs"}</span>
+                  <span className="text-sm font-medium">{t('sitemap_total_urls')}</span>
                   <Chip color="primary" variant="flat">{sitemapStats.total_urls}</Chip>
                 </div>
                 <Divider />
                 <div>
-                  <p className="text-sm font-medium mb-2">{"URLs by Type"}</p>
+                  <p className="text-sm font-medium mb-2">{t('sitemap_urls_by_type')}</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {Object.entries(sitemapStats.content_types).map(([type, count]) => (
                       <div key={type} className="flex items-center justify-between bg-default-100 rounded-lg px-3 py-2">
@@ -591,7 +592,7 @@ export function SeoOverview() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-default-500">{"Unable to Load Sitemap Stats"}</p>
+              <p className="text-sm text-default-500">{t('unable_to_load_sitemap_stats')}</p>
             )}
           </CardBody>
         </Card>
@@ -601,12 +602,12 @@ export function SeoOverview() {
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Search size={20} />
-              {"Server SEO Audit"}
+              {t('server_seo_audit_heading')}
             </h3>
             <div className="flex items-center gap-2">
               {serverAudit?.last_run_at && (
                 <span className="text-xs text-default-400">
-                  {"Last Run"}: {new Date(serverAudit.last_run_at).toLocaleDateString()}
+                  {t('last_run')}: {new Date(serverAudit.last_run_at).toLocaleDateString()}
                 </span>
               )}
               <Button
@@ -616,7 +617,7 @@ export function SeoOverview() {
                 onPress={handleRunAudit}
                 isLoading={auditRunning}
               >
-                {"Run Audit"}
+                {t('run_audit')}
               </Button>
             </div>
           </CardHeader>
@@ -638,7 +639,7 @@ export function SeoOverview() {
               </div>
             ) : (
               <p className="text-sm text-default-500">
-                {auditRunning ? "Running Audit" : "No audit results prompt found"}
+                {auditRunning ? t('running_audit') : t('no_audit_results_prompt')}
               </p>
             )}
           </CardBody>
@@ -654,7 +655,7 @@ export function SeoOverview() {
             isLoading={saving}
             isDisabled={saving}
           >
-            {"Save SEO Settings"}
+            {t('save_seo_settings')}
           </Button>
         </div>
       </div>

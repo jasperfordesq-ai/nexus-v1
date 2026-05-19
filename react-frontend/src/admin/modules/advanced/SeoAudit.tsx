@@ -34,8 +34,9 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default
 };
 
 export function SeoAudit() {
-  const { t } = useTranslation('admin_nav');
-  useAdminPageMeta({ title: t('advanced') });
+  const { t } = useTranslation('admin');
+  const { t: tNav } = useTranslation('admin_nav');
+  useAdminPageMeta({ title: tNav('advanced') });
   const toast = useToast();
 
   const [checks, setChecks] = useState<AuditCheck[]>([]);
@@ -90,21 +91,19 @@ export function SeoAudit() {
         const warnCount = newChecks.filter(c => c.status === 'warning').length;
         const failCount = newChecks.filter(c => c.status === 'fail').length;
 
-        const parts: string[] = [];
-        if (passCount > 0) parts.push(`Passed`);
-        if (warnCount > 0) parts.push(`Warnings`);
-        if (failCount > 0) parts.push(`Failed to count`);
-
-        toast.success("SEO audit complete", `SEO Audit Summary`);
+        toast.success(
+          t('seo_audit_complete'),
+          t('seo_audit_summary_counts', { passCount, warnCount, failCount })
+        );
       } else {
-        toast.error("SEO audit failed", "SEO audit returned no results");
+        toast.error(t('seo_audit_failed'), t('seo_audit_no_results'));
       }
     } catch {
-      toast.error("SEO audit failed", "SEO audit error");
+      toast.error(t('seo_audit_failed'), t('seo_audit_error'));
     } finally {
       setRunning(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   const passCount = checks.filter(c => c.status === 'pass').length;
@@ -116,8 +115,8 @@ export function SeoAudit() {
     return (
       <div>
         <PageHeader
-          title={"SEO Audit"}
-          description={"Run an automated SEO audit to identify issues with your site"}
+          title={t('seo_audit_title')}
+          description={t('seo_audit_desc')}
         />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
@@ -129,8 +128,8 @@ export function SeoAudit() {
   return (
     <div>
       <PageHeader
-        title={"SEO Audit"}
-        description={"Run an automated SEO audit to identify issues with your site"}
+        title={t('seo_audit_title')}
+        description={t('seo_audit_desc')}
         actions={
           <div className="flex items-center gap-2">
             {hasResults && (
@@ -140,7 +139,7 @@ export function SeoAudit() {
                 onPress={loadAudit}
                 size="sm"
               >
-                {"Reload Results"}
+                {t('reload_results')}
               </Button>
             )}
             <Button
@@ -149,7 +148,7 @@ export function SeoAudit() {
               onPress={handleRunAudit}
               isLoading={running}
             >
-              {"Run Audit"}
+              {t('run_audit')}
             </Button>
           </div>
         }
@@ -157,12 +156,12 @@ export function SeoAudit() {
 
       {hasResults && (
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          {passCount > 0 && <Chip color="success" variant="flat">{`Passed`}</Chip>}
-          {warnCount > 0 && <Chip color="warning" variant="flat">{`Warnings`}</Chip>}
-          {failCount > 0 && <Chip color="danger" variant="flat">{`Failed to count`}</Chip>}
+          {passCount > 0 && <Chip color="success" variant="flat">{t('passed_count_with_value', { count: passCount })}</Chip>}
+          {warnCount > 0 && <Chip color="warning" variant="flat">{t('warnings_count_with_value', { count: warnCount })}</Chip>}
+          {failCount > 0 && <Chip color="danger" variant="flat">{t('failed_count_with_value', { count: failCount })}</Chip>}
           {lastRunAt && (
             <span className="text-xs text-default-400 ml-2">
-              {`Last Run`}
+              {t('last_run')}
             </span>
           )}
         </div>
@@ -171,15 +170,15 @@ export function SeoAudit() {
       <Card shadow="sm">
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <ClipboardCheck size={20} /> {"Audit Results"}
+            <ClipboardCheck size={20} /> {t('audit_results')}
           </h3>
         </CardHeader>
         <CardBody>
           {!hasResults ? (
             <div className="flex flex-col items-center py-8 text-default-400">
               <ClipboardCheck size={40} className="mb-2" />
-              <p className="font-medium">{"No audit results"}</p>
-              <p className="text-sm mt-1">{"Run an audit to see SEO results"}</p>
+              <p className="font-medium">{t('no_audit_results')}</p>
+              <p className="text-sm mt-1">{t('no_audit_results_desc')}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -198,7 +197,7 @@ export function SeoAudit() {
                     color={statusColorMap[check.status] ?? 'default'}
                     className="capitalize shrink-0 ml-3"
                   >
-                    {check.status}
+                    {t(`status_${check.status}`)}
                   </Chip>
                 </div>
               ))}
