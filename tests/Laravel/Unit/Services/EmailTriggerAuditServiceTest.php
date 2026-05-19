@@ -318,6 +318,64 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('marketplace_report_notifications_failed_recently', $codes);
     }
 
+    public function test_run_detects_marketplace_report_source_without_notification_outbox(): void
+    {
+        if (
+            !Schema::hasTable('marketplace_reports')
+            || !Schema::hasTable('marketplace_report_notifications')
+            || !Schema::hasTable('marketplace_listings')
+        ) {
+            $this->markTestSkipped('Marketplace report audit tables are not available.');
+        }
+
+        $sellerId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Marketplace Audit Seller',
+            'email' => 'marketplace-audit-seller@example.test',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $reporterId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Marketplace Audit Reporter',
+            'email' => 'marketplace-audit-reporter@example.test',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $listingId = DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => 2,
+            'user_id' => $sellerId,
+            'title' => 'Marketplace report audit listing',
+            'description' => 'Marketplace report audit listing description',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('marketplace_reports')->insert([
+            'tenant_id' => 2,
+            'marketplace_listing_id' => $listingId,
+            'reporter_id' => $reporterId,
+            'reason' => 'other',
+            'description' => 'Source row without outbox evidence',
+            'status' => 'received',
+            'created_at' => now()->subMinutes(5),
+            'updated_at' => now()->subMinutes(5),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('marketplace_report_received_without_notification_outbox', $codes);
+    }
+
     public function test_run_detects_verein_dues_without_email_evidence(): void
     {
         if (!Schema::hasTable('verein_member_dues') || !Schema::hasColumn('verein_member_dues', 'generated_email_sent_at')) {

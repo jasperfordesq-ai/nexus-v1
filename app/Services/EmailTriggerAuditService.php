@@ -994,6 +994,10 @@ class EmailTriggerAuditService
 
         $issues = [];
 
+        if ($this->hasTables(['marketplace_reports'])) {
+            $issues = array_merge($issues, $this->checkMarketplaceReportSourceOutboxHealth($tenantId, $since, $windowHours));
+        }
+
         $pending = DB::table('marketplace_report_notifications')
             ->select('tenant_id', DB::raw('COUNT(*) as count'))
             ->where('status', 'pending')
@@ -1044,6 +1048,62 @@ class EmailTriggerAuditService
         }
 
         return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkMarketplaceReportSourceOutboxHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        $issues = [];
+
+        $received = $this->marketplaceReportsMissingEmailOutbox('created_at', ['received'], $since, $tenantId)
+            ->where('mr.status', 'received')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($received, 'marketplace_report_received_without_notification_outbox', 'critical', 'marketplace', 'marketplace_report_notice', ['window_hours' => $windowHours]));
+
+        $acknowledged = $this->marketplaceReportsMissingEmailOutbox('acknowledged_at', ['acknowledged', 'auto_acknowledged'], $since, $tenantId)
+            ->whereNotNull('mr.acknowledged_at')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($acknowledged, 'marketplace_report_acknowledged_without_notification_outbox', 'critical', 'marketplace', 'marketplace_report_notice', ['window_hours' => $windowHours]));
+
+        $resolved = $this->marketplaceReportsMissingEmailOutbox('resolved_at', ['resolved'], $since, $tenantId)
+            ->whereNotNull('mr.resolved_at')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($resolved, 'marketplace_report_resolved_without_notification_outbox', 'critical', 'marketplace', 'marketplace_report_notice', ['window_hours' => $windowHours]));
+
+        $appealed = $this->marketplaceReportsMissingEmailOutbox('updated_at', ['appeal_received'], $since, $tenantId)
+            ->where('mr.status', 'appealed')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($appealed, 'marketplace_report_appealed_without_notification_outbox', 'critical', 'marketplace', 'marketplace_report_notice', ['window_hours' => $windowHours]));
+
+        $appealResolved = $this->marketplaceReportsMissingEmailOutbox('appeal_resolved_at', ['appeal_resolved'], $since, $tenantId)
+            ->whereNotNull('mr.appeal_resolved_at')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($appealResolved, 'marketplace_report_appeal_resolved_without_notification_outbox', 'critical', 'marketplace', 'marketplace_report_notice', ['window_hours' => $windowHours]));
+
+        return $issues;
+    }
+
+    /**
+     * @param list<string> $eventTypes
+     * @return \Illuminate\Database\Query\Builder
+     */
+    private function marketplaceReportsMissingEmailOutbox(string $timestampColumn, array $eventTypes, \DateTimeInterface $since, ?int $tenantId)
+    {
+        return DB::table('marketplace_reports as mr')
+            ->select('mr.tenant_id', DB::raw('COUNT(*) as count'))
+            ->where("mr.{$timestampColumn}", '>=', $since)
+            ->whereNotExists(function ($sub) use ($eventTypes): void {
+                $sub->select(DB::raw(1))
+                    ->from('marketplace_report_notifications as mrn')
+                    ->whereColumn('mrn.tenant_id', 'mr.tenant_id')
+                    ->whereColumn('mrn.marketplace_report_id', 'mr.id')
+                    ->where('mrn.channel', 'email')
+                    ->whereIn('mrn.event_type', $eventTypes);
+            })
+            ->when($tenantId !== null, fn ($q) => $q->where('mr.tenant_id', $tenantId))
+            ->groupBy('mr.tenant_id');
     }
 
     /**

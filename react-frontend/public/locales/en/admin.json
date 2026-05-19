@@ -11128,6 +11128,26 @@
         "title": "Event reminders marked sent without email evidence",
         "body": "{{count}} email event reminders were marked sent without a matching successful email log entry in the last {{window_hours}} hours."
       },
+      "marketplace_report_received_without_notification_outbox": {
+        "title": "Marketplace report receipt email did not queue",
+        "body": "{{count}} marketplace reports were received without a matching receipt email notification row in the last {{window_hours}} hours."
+      },
+      "marketplace_report_acknowledged_without_notification_outbox": {
+        "title": "Marketplace report acknowledgement email did not queue",
+        "body": "{{count}} marketplace reports were acknowledged without a matching acknowledgement email notification row in the last {{window_hours}} hours."
+      },
+      "marketplace_report_resolved_without_notification_outbox": {
+        "title": "Marketplace report resolution email did not queue",
+        "body": "{{count}} marketplace reports were resolved without a matching resolution email notification row in the last {{window_hours}} hours."
+      },
+      "marketplace_report_appealed_without_notification_outbox": {
+        "title": "Marketplace report appeal email did not queue",
+        "body": "{{count}} marketplace report appeals were filed without a matching appeal receipt email notification row in the last {{window_hours}} hours."
+      },
+      "marketplace_report_appeal_resolved_without_notification_outbox": {
+        "title": "Marketplace report appeal resolution email did not queue",
+        "body": "{{count}} marketplace report appeals were resolved without a matching final decision email notification row in the last {{window_hours}} hours."
+      },
       "critical_email_attempts_missing_tenant_context": {
         "title": "Critical email missing tenant context",
         "body": "{{count}} critical email attempts were logged without tenant context in the last {{window_hours}} hours."
