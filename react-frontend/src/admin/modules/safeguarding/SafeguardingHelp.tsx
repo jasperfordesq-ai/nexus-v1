@@ -15,7 +15,22 @@
  * system behaviour changes.
  */
 
-import { Card, CardBody, CardHeader, Accordion, AccordionItem, Divider, Chip } from '@heroui/react';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Accordion,
+  AccordionItem,
+  Divider,
+  Chip,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import BookOpen from 'lucide-react/icons/book-open';
 import Shield from 'lucide-react/icons/shield';
 import Flag from 'lucide-react/icons/flag';
@@ -28,6 +43,34 @@ import FileText from 'lucide-react/icons/file-text';
 import Eye from 'lucide-react/icons/eye';
 
 export function SafeguardingHelp() {
+  const { t } = useTranslation('admin');
+  const triggerRows = [
+    {
+      key: 'requires_broker_approval',
+      effect: t('safeguarding.help.triggers.effects.requires_broker_approval'),
+    },
+    {
+      key: 'restricts_messaging',
+      effect: t('safeguarding.help.triggers.effects.restricts_messaging'),
+    },
+    {
+      key: 'restricts_matching',
+      effect: t('safeguarding.help.triggers.effects.restricts_matching'),
+    },
+    {
+      key: 'requires_vetted_interaction',
+      effect: t('safeguarding.help.triggers.effects.requires_vetted_interaction'),
+    },
+    {
+      key: 'notify_admin_on_selection',
+      effect: t('safeguarding.help.triggers.effects.notify_admin_on_selection'),
+    },
+    {
+      key: 'vetting_type_required',
+      effect: t('safeguarding.help.triggers.effects.vetting_type_required'),
+    },
+  ];
+
   return (
     <section className="mt-10">
       <Card shadow="sm" className="border border-default-200">
@@ -144,40 +187,22 @@ export function SafeguardingHelp() {
                   a JSON block of triggers. When a member selects the option, the relevant triggers
                   activate:
                 </p>
-                <table className="w-full text-sm border-collapse">
-                  <thead>
-                    <tr className="border-b border-default-200 bg-default-100 dark:bg-default-800/40">
-                      <th className="text-left p-2 font-semibold">Trigger key</th>
-                      <th className="text-left p-2 font-semibold">Effect</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-default-200">
-                    <tr>
-                      <td className="p-2"><code>requires_broker_approval</code></td>
-                      <td className="p-2">All outgoing messages copied for broker review; matches need sign-off.</td>
-                    </tr>
-                    <tr>
-                      <td className="p-2"><code>restricts_messaging</code></td>
-                      <td className="p-2">Marks the member under monitoring (message copies begin).</td>
-                    </tr>
-                    <tr>
-                      <td className="p-2"><code>restricts_matching</code></td>
-                      <td className="p-2">Match approval workflow engages — no auto-introductions.</td>
-                    </tr>
-                    <tr>
-                      <td className="p-2"><code>requires_vetted_interaction</code></td>
-                      <td className="p-2">Non-vetted members are hidden from the member's discovery feed.</td>
-                    </tr>
-                    <tr>
-                      <td className="p-2"><code>notify_admin_on_selection</code></td>
-                      <td className="p-2">You get a real-time notification the moment the option is ticked.</td>
-                    </tr>
-                    <tr>
-                      <td className="p-2"><code>vetting_type_required</code></td>
-                      <td className="p-2">Specifies which vetting a contacting member must hold (e.g. <code>garda_vetting</code>).</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <Table aria-label={t('safeguarding.help.triggers.table_aria')} removeWrapper>
+                  <TableHeader>
+                    <TableColumn>{t('safeguarding.help.triggers.col_trigger_key')}</TableColumn>
+                    <TableColumn>{t('safeguarding.help.triggers.col_effect')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {triggerRows.map((row) => (
+                      <TableRow key={row.key}>
+                        <TableCell>
+                          <code>{row.key}</code>
+                        </TableCell>
+                        <TableCell>{row.effect}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
                 <p className="italic text-default-500">
                   When a member selects multiple options, triggers OR-merge: the most protective
                   combination wins. Revoking one option may release some protections but keep

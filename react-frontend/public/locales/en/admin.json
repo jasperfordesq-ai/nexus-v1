@@ -7467,6 +7467,21 @@
     "guardian": "Guardian",
     "guardian_assignment_created": "Guardian assignment created",
     "guardian_assignments": "Guardian Assignments",
+    "help": {
+      "triggers": {
+        "col_effect": "Effect",
+        "col_trigger_key": "Trigger key",
+        "effects": {
+          "notify_admin_on_selection": "You get a real-time notification the moment the option is ticked.",
+          "requires_broker_approval": "All outgoing messages copied for broker review; matches need sign-off.",
+          "requires_vetted_interaction": "Non-vetted members are hidden from the member's discovery feed.",
+          "restricts_matching": "Match approval workflow engages - no auto-introductions.",
+          "restricts_messaging": "Marks the member under monitoring; message copies begin.",
+          "vetting_type_required": "Specifies which vetting a contacting member must hold, for example garda_vetting."
+        },
+        "table_aria": "Safeguarding trigger effects"
+      }
+    },
     "inactive": "Inactive",
     "inactive_options": "Inactive Options",
     "inactive_options_desc": "Safeguarding options that have been deactivated",
