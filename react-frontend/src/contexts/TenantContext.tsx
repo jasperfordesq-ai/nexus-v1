@@ -636,7 +636,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       mapProvider,
       geocodingProvider,
     }),
-    [state, features, modules, branding, groupTabs, listingConfig, volunteeringConfig, jobConfig, landingPageConfig, hasFeature, hasModule, hasGroupTab, refreshTenant, effectiveTenantSlug, usePathBasedSlug, isParentDomainSubTenant, tenantPath, supportedLanguages, defaultLanguage, mapProvider, geocodingProvider]
+    [state, features, modules, branding, groupTabs, listingConfig, volunteeringConfig, jobConfig, landingPageConfig, hasFeature, hasModule, hasGroupTab, refreshTenant, effectiveTenantSlug, usePathBasedSlug, tenantPath, supportedLanguages, defaultLanguage, mapProvider, geocodingProvider]
   );
 
   return (

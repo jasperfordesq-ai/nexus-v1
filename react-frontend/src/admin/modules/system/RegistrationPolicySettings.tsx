@@ -40,7 +40,7 @@ import { VerificationReviewQueue } from './VerificationReviewQueue';
 import { ProviderHealthDashboard } from './ProviderHealthDashboard';
 import { RegistrationBreakerCard } from './RegistrationBreakerCard';
 import { usePageTitle } from '@/hooks';
-import { useToast, useTenant, useAuth } from '@/contexts';
+import { useToast, useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
 
@@ -100,7 +100,6 @@ const REGISTRATION_MODE_COLORS: Record<string, 'success' | 'primary' | 'secondar
 export function RegistrationPolicySettings() {
   usePageTitle("System");
   const toast = useToast();
-  const { tenant } = useTenant();
   const { user } = useAuth();
   const userRecord = user as Record<string, unknown> | null;
   const isGod =

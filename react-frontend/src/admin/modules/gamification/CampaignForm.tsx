@@ -141,7 +141,7 @@ export function CampaignForm() {
       }
     }
     setLoadingCampaign(false);
-  }, [id, toast, navigate]);
+  }, [id, toast, navigate, tenantPath]);
 
   useEffect(() => {
     if (isEdit) {

@@ -67,7 +67,7 @@ export function RoleList() {
         const error = (res as { error?: string }).error || "Failed to delete role";
         toast.error(error);
       }
-    } catch (err) {
+    } catch {
       toast.error("Failed to delete role");
     } finally {
       setDeleting(false);

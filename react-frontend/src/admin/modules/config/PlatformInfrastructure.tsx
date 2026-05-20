@@ -50,7 +50,7 @@ interface PlatformInfrastructureProps {
   onConfigChange: (updater: (prev: TenantConfig | null) => TenantConfig | null) => void;
 }
 
-export default function PlatformInfrastructure({ config, onConfigChange }: PlatformInfrastructureProps) {
+export default function PlatformInfrastructure({ config: _config, onConfigChange: _onConfigChange }: PlatformInfrastructureProps) {
   const { t } = useTranslation('admin');
   const toast = useToast();
   const { refreshTenant, supportedLanguages, defaultLanguage } = useTenant();

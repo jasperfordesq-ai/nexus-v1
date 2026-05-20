@@ -107,6 +107,8 @@ const DELIVERY_METHODS = [
 ] as const;
 
 const MAX_IMAGES = 20;
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Component
@@ -135,7 +137,7 @@ export function CreateMarketplaceListingPage() {
   const [currency, setCurrency] = useState('EUR');
 
   const setTitle = (v: string) => setDraft((prev) => ({ ...prev, title: v }));
-  const setDescription = (v: string) => setDraft((prev) => ({ ...prev, description: v }));
+  const setDescription = useCallback((v: string) => setDraft((prev) => ({ ...prev, description: v })), [setDraft]);
   const setCategoryId = (v: string) => setDraft((prev) => ({ ...prev, categoryId: v }));
   const setCondition = (v: string) => setDraft((prev) => ({ ...prev, condition: v }));
   const setPriceType = (v: string) => setDraft((prev) => ({ ...prev, priceType: v }));
@@ -264,9 +266,6 @@ export function CreateMarketplaceListingPage() {
   }, []);
 
   // Video handling
-  const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
-  const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
-
   const handleVideoSelect = useCallback((files: FileList | null) => {
     if (!files || files.length === 0) return;
     const file = files[0] as File;
@@ -329,7 +328,7 @@ export function CreateMarketplaceListingPage() {
     } finally {
       setIsGeneratingDesc(false);
     }
-  }, [title, categoryId, condition, toast]);
+  }, [title, categoryId, condition, categories, setDescription, t, toast]);
 
   // Submit
   const handleSubmit = useCallback(async () => {
@@ -407,7 +406,8 @@ export function CreateMarketplaceListingPage() {
     }
   }, [
     title, description, categoryId, condition, price, currency, priceType,
-    location, deliveryMethod, quantity, images, templateFields, toast, navigate, tenantPath,
+    location, latitude, longitude, deliveryMethod, quantity, images, templateFields,
+    clearDraft, t, toast, navigate, tenantPath, videoFile, videoPreviewUrl,
   ]);
 
   if (!isAuthenticated) return null;

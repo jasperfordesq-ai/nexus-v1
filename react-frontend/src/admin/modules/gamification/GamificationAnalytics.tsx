@@ -66,9 +66,6 @@ export function GamificationAnalytics() {
   }, [loadData]);
 
   const maxDistCount = stats?.badge_distribution?.reduce((max, b) => Math.max(max, b.count), 0) || 1;
-  const builtInBadges = badges.filter((b) => b.type === 'built_in');
-  const customBadges = badges.filter((b) => b.type === 'custom');
-
   return (
     <div>
       <PageHeader

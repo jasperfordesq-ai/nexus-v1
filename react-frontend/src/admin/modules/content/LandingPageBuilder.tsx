@@ -545,7 +545,7 @@ function FeaturePillsEditor({
           onPress={addItem}
           className="self-start"
         >
-          {"Add item"}
+          {t('content.landing_add_item')}
         </Button>
       )}
       <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
@@ -568,10 +568,10 @@ function StatsEditor({
         onValueChange={(val) => onChange({ ...content, show_live_stats: val })}
         size="sm"
       >
-        {"Show live community stats"}
+        {t('content.landing_show_live_stats')}
       </Switch>
       <p className="text-xs text-default-400">
-        {"Display real-time member and exchange counts"}
+        {t('content.landing_show_live_stats_desc')}
       </p>
     </div>
   );
@@ -991,7 +991,7 @@ function SectionCard({
 
 export function LandingPageBuilder() {
   const { t } = useTranslation('admin');
-  usePageTitle("Landing Page Builder");
+  usePageTitle(t('content.landing_page_title'));
   const toast = useToast();
 
   // State
@@ -1024,12 +1024,12 @@ export function LandingPageBuilder() {
         }
       }
     } catch {
-      toast.error("Failed to load landing page configuration");
+      toast.error(t('content.landing_failed_to_load'));
     } finally {
       setLoading(false);
       initialLoadDone.current = true;
     }
-  }, [toast]);
+  }, [t, toast]);
 
 
   useEffect(() => {
@@ -1068,10 +1068,10 @@ export function LandingPageBuilder() {
         setSavedConfig(cloneConfig(config));
         setIsDirty(false);
       } else {
-        toast.error("Failed to save landing page");
+        toast.error(t('content.landing_failed_to_save'));
       }
     } catch {
-      toast.error("Failed to save landing page");
+      toast.error(t('content.landing_failed_to_save'));
     } finally {
       setSaving(false);
     }
@@ -1090,10 +1090,10 @@ export function LandingPageBuilder() {
         setExpandedSections(new Set());
         toast.success("Landing page reset to defaults");
       } else {
-        toast.error("Failed to reset landing page");
+        toast.error(t('content.landing_failed_to_reset'));
       }
     } catch {
-      toast.error("Failed to reset landing page");
+      toast.error(t('content.landing_failed_to_reset'));
     } finally {
       setSaving(false);
       setConfirmReset(false);
@@ -1157,7 +1157,7 @@ export function LandingPageBuilder() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <Spinner size="lg" label={"Loading landing page"} />
+        <Spinner size="lg" label={t('content.landing_loading')} />
       </div>
     );
   }
@@ -1166,7 +1166,7 @@ export function LandingPageBuilder() {
     <div className="mx-auto max-w-4xl">
       <PageHeader
         title={"Landing Page Builder"}
-        description={"Design the public landing page for your community"}
+        description={t('content.landing_builder_description')}
         actions={
           <div className="flex items-center gap-2">
             {confirmReset ? (

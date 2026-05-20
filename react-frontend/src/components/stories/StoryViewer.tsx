@@ -406,7 +406,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
   };
 
   // Reactions
-  const handleReaction = async (reactionType: string) => {
+  const handleReaction = useCallback(async (reactionType: string) => {
     if (!currentStory || reactedWith) return;
     setReactedWith(reactionType);
     try {
@@ -415,7 +415,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
       logError('Failed to react to story', err);
       setReactedWith(null);
     }
-  };
+  }, [currentStory, reactedWith]);
 
   // Double-tap to react with heart
   const handleDoubleTap = useCallback(() => {

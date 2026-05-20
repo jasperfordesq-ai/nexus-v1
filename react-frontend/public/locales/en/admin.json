@@ -3560,7 +3560,10 @@
     "module_name_marketplace": "Marketplace",
     "module_desc_marketplace": "Commercial buy/sell marketplace for physical goods and paid services",
     "module_name_identity_verification": "Identity Verification",
-    "module_desc_identity_verification": "Stripe Identity verification with ID Verified badge, document + selfie matching, and configurable fee"
+    "module_desc_identity_verification": "Stripe Identity verification with ID Verified badge, document + selfie matching, and configurable fee",
+    "module_name_members": "Members",
+    "module_name_leaderboard": "Leaderboard",
+    "module_name_achievements": "Achievements"
   },
   "content": {
     "about_section": "About Section",
@@ -5493,6 +5496,12 @@
     "your_selected_topics": "Your Selected Topics",
     "analytics": {
       "title": "Federation Analytics"
+    },
+    "partnerships": {
+      "bulk_approved_count": "Approved {{count}} partnership request",
+      "bulk_approved_count_plural": "Approved {{count}} partnership requests",
+      "bulk_rejected_count": "Rejected {{count}} partnership request",
+      "bulk_rejected_count_plural": "Rejected {{count}} partnership requests"
     }
   },
   "gamification": {
@@ -5640,7 +5649,9 @@
     "failed_to_update_badge": "Failed to update badge",
     "schedule_daily": "Schedule Daily",
     "schedule_monthly": "Schedule Monthly",
-    "schedule_weekly": "Schedule Weekly"
+    "schedule_weekly": "Schedule Weekly",
+    "bulk_award_succeeded_count": "Awarded {{count}} badge",
+    "bulk_award_succeeded_count_plural": "Awarded {{count}} badges"
   },
   "goals": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -6444,7 +6455,9 @@
     "rejection_reason_label": "Rejection Reason",
     "reviewed_at": "Reviewed at",
     "reviewed_by": "Reviewed by",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "cache_cleared_count": "Cleared {{count}} cache entry",
+    "cache_cleared_count_plural": "Cleared {{count}} cache entries"
   },
   "moderation": {
     "action_failed": "Failed",
@@ -6974,7 +6987,9 @@
     "view_email_content": "View Email Content",
     "winner_selected": "Winner Selected",
     "winner_subject": "Winner Subject",
-    "winning_metric": "Winning Metric"
+    "winning_metric": "Winning Metric",
+    "resend_queued_count": "Queued {{count}} resend",
+    "resend_queued_count_plural": "Queued {{count}} resends"
   },
   "newsletter_activity": {
     "all_events": "All events",
@@ -9815,7 +9830,10 @@
     "group_features": "Features",
     "group_gamification": "Gamification",
     "group_info": "Info",
-    "placeholder_css": "Enter css..."
+    "placeholder_css": "Enter css...",
+    "route_about": "About",
+    "route_faq": "FAQ",
+    "route_explore": "Explore"
   },
   "verification": {
     "approve": "Approve",
@@ -10641,7 +10659,17 @@
     "remove_link": "Remove Link",
     "strikethrough": "Strikethrough",
     "underline": "Underline",
-    "undo": "Undo"
+    "undo": "Undo",
+    "content_html": "Content HTML",
+    "content_helper": "Content",
+    "content_placeholder": "Content...",
+    "editor_only": "Editor Only",
+    "notice_body_placeholder": "Enter notice body...",
+    "notice_box": "Notice Box",
+    "notice_title_placeholder": "Enter notice title...",
+    "preview": "Preview",
+    "preview_title_placeholder": "Enter preview title...",
+    "split_view": "Split View"
   },
   "seed_generator": {
     "count_aria_label": "Count Aria",

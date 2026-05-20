@@ -394,7 +394,7 @@ export function EditMarketplaceListingPage() {
     } finally {
       setIsGeneratingDesc(false);
     }
-  }, [title, categoryId, condition, toast]);
+  }, [title, categoryId, condition, categories, t, toast]);
 
   // Submit
   const handleSubmit = useCallback(async () => {

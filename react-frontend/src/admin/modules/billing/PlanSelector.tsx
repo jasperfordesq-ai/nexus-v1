@@ -62,7 +62,7 @@ export function PlanSelector() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
 
   useEffect(() => {

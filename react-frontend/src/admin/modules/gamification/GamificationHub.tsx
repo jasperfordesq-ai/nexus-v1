@@ -97,7 +97,7 @@ export function GamificationHub() {
     setAwarding(false);
     if (res.success) {
       const awarded = (res.data as { awarded?: number })?.awarded ?? ids.length;
-      toast.success(`Bulk Award succeeded`);
+      toast.success(t('gamification.bulk_award_succeeded_count', { count: awarded }));
       onBulkClose();
       setSelectedBadge('');
       setUserIdsText('');

@@ -280,10 +280,6 @@ export function RegisterPage() {
   // for tenant) lat/lng stay undefined — we still let the user submit and
   // let the server make the final call. Was a hard block; that silently
   // disabled the submit button when Places hadn't fired place_changed.
-  const isLocationVerified =
-    typeof latitude === 'number' &&
-    typeof longitude === 'number' &&
-    !(latitude === 0 && longitude === 0);
   const isStep2Valid =
     firstName.trim() &&
     lastName.trim() &&
@@ -400,7 +396,7 @@ export function RegisterPage() {
     formStartTime, clearError, password, passwordConfirm, tenants, selectedTenantId,
     tenant?.id, register, firstName, lastName, email, profileType, organizationName,
     location, latitude, longitude, phone, termsAccepted, newsletterOptIn,
-    requiresInviteCode, inviteCode, navigate, tenantPath,
+    requiresInviteCode, inviteCode, navigate, tenantPath, passwordCheck.isAcceptable,
   ]);
 
   const passwordValid = passwordCheck.isAcceptable;

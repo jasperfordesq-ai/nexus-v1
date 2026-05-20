@@ -49,32 +49,32 @@ function buildPolicySections(
   return [
     {
       category: 'features',
-      title: "Policy Features",
+      title: t('groups.policy_features'),
       policies: categoryMap.get('features') || [],
     },
     {
       category: 'moderation',
-      title: "Policy Moderation",
+      title: t('groups.policy_moderation'),
       policies: categoryMap.get('moderation') || [],
     },
     {
       category: 'membership',
-      title: "Policy Membership",
+      title: t('groups.policy_membership'),
       policies: categoryMap.get('membership') || [],
     },
     {
       category: 'creation',
-      title: "Policy Creation",
+      title: t('groups.policy_creation'),
       policies: categoryMap.get('creation') || [],
     },
     {
       category: 'content',
-      title: "Policy Content",
+      title: t('groups.policy_content'),
       policies: categoryMap.get('content') || [],
     },
     {
       category: 'notifications',
-      title: "Policy Notifications",
+      title: t('groups.policy_notifications'),
       policies: categoryMap.get('notifications') || [],
     },
   ].filter((section) => section.policies.length > 0);

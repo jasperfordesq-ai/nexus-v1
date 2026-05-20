@@ -16,6 +16,7 @@ import {
 import Mail from 'lucide-react/icons/mail';
 import Users from 'lucide-react/icons/users';
 import AlertCircle from 'lucide-react/icons/circle-alert';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import type { ResendInfo } from '../../api/types';
@@ -28,6 +29,7 @@ interface NewsletterResendProps {
 }
 
 export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: NewsletterResendProps) {
+  const { t } = useTranslation('admin');
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -67,7 +69,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
 
       if (res.success) {
         const data = res.data as { queued_count?: number };
-        toast.success(`Resend Queued`);
+        toast.success(t('newsletters.resend_queued_count', { count: data.queued_count ?? 0 }));
         onSuccess?.();
         onClose();
       } else {

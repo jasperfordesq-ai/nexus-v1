@@ -316,7 +316,7 @@ export function Partnerships() {
         if (res.success) successCount++;
       } catch { /* continue */ }
     }
-    toast.success(`Bulk Approved`);
+    toast.success(t('federation.partnerships.bulk_approved_count', { count: successCount }));
     setSelectedKeys(new Set());
     loadData();
     setActionLoading(false);
@@ -332,7 +332,7 @@ export function Partnerships() {
         if (res.success) successCount++;
       } catch { /* continue */ }
     }
-    toast.success(`Bulk Rejected`);
+    toast.success(t('federation.partnerships.bulk_rejected_count', { count: successCount }));
     setSelectedKeys(new Set());
     loadData();
     setActionLoading(false);

@@ -228,7 +228,7 @@ export function MyProfile() {
     } finally {
       setTopicsSaving(false);
     }
-  }, [selectedTopicIds, primaryTopicIds, toast]);
+  }, [selectedTopicIds, primaryTopicIds, t, toast]);
 
 
   // Group all topics by category

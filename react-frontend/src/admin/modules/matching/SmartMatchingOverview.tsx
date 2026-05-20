@@ -98,7 +98,7 @@ export function SmartMatchingOverview() {
       const res = await adminMatching.clearCache();
       if (res.success) {
         const cleared = (res.data as { entries_cleared?: number })?.entries_cleared ?? 0;
-        toast.success(`Cache Cleared`);
+        toast.success(t('matching.cache_cleared_count', { count: cleared }));
         setClearModalOpen(false);
         loadData();
       } else {
@@ -109,7 +109,7 @@ export function SmartMatchingOverview() {
     } finally {
       setClearing(false);
     }
-  }, [toast, loadData])
+  }, [t, toast, loadData])
 
 
   const overview = stats?.overview;

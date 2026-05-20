@@ -32,7 +32,6 @@ import {
   Textarea,
 } from '@heroui/react';
 import MapPin from 'lucide-react/icons/map-pin';
-import Building2 from 'lucide-react/icons/building-2';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ArrowRight from 'lucide-react/icons/arrow-right';

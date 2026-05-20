@@ -89,7 +89,7 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
 
     fetchAnalytics();
     return () => controller.abort();
-  }, [isOpen, postId]) // t is stable — excluded to avoid re-fetch on language changes
+  }, [isOpen, postId, t])
 
   const stats = data ? [
     { label: t('analytics.views'), value: data.views_count, icon: Eye, color: 'text-[var(--color-info)]', bg: 'bg-blue-500/10' },

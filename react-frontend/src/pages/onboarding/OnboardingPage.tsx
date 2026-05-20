@@ -220,7 +220,7 @@ export function OnboardingPage() {
     }).catch(() => {
       // Non-fatal: wizard still works, just starts with empty selections
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user]);
 
   // ── Move focus to step content on step change (screen reader accessibility) ──
@@ -255,7 +255,7 @@ export function OnboardingPage() {
       for (let i = 1; i <= nextAfterProfile; i++) visited.add(i);
       setVisitedSteps(visited);
     }
-  }, [user?.avatar_url, user?.bio, currentStep, profileStepIdx, nextAfterProfile]);
+  }, [user?.avatar_url, user?.bio, currentStep, profileStepIdx, nextAfterProfile, MIN_BIO_LENGTH]);
 
   // ── Load categories when reaching step 3 ───────────────────────────────
 
@@ -292,7 +292,7 @@ export function OnboardingPage() {
   const goNextAnimated = useCallback(() => {
     const next = Math.min(currentStep + 1, TOTAL_STEPS);
     goToStep(next);
-  }, [currentStep, goToStep]);
+  }, [currentStep, goToStep, TOTAL_STEPS]);
 
   const goBackAnimated = useCallback(() => {
     const prev = Math.max(currentStep - 1, 1);
@@ -394,7 +394,7 @@ export function OnboardingPage() {
     } finally {
       setIsSavingProfile(false);
     }
-  }, [bio, user?.avatar_url, toast, refreshUser, goNextAnimated, t]);
+  }, [bio, user?.avatar_url, toast, refreshUser, goNextAnimated, t, MIN_BIO_LENGTH]);
 
   // ── Save interests + proceed handler (Step 3) ──────────────────────────
 

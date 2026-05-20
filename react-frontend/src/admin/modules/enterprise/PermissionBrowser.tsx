@@ -40,8 +40,6 @@ export function PermissionBrowser() {
     loadData();
   }, [loadData]);
 
-  const totalCount = Object.values(permissions).reduce((acc, perms) => acc + perms.length, 0);
-
   return (
     <div>
       <PageHeader

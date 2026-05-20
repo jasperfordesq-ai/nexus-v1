@@ -70,7 +70,7 @@ export function BulkOperations() {
     });
     if (res?.success) {
       const result = res.data as BulkOperationResult | undefined;
-      toast.success(`Bulk Users Moved`);
+      toast.success(`Bulk Users Moved (${result?.moved_count ?? result?.updated_count ?? 0})`);
       setSelectedUserIds(new Set());
       loadUsersForTenant(sourceTenant);
     } else {
@@ -88,7 +88,7 @@ export function BulkOperations() {
     });
     if (res?.success) {
       const result = res.data as BulkOperationResult | undefined;
-      toast.success(`Bulk Tenants updated`);
+      toast.success(`Bulk Tenants updated (${result?.updated_count ?? 0})`);
       setSelectedTenantIds(new Set());
       loadTenants();
     } else {

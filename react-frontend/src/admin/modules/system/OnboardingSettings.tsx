@@ -125,7 +125,7 @@ export function OnboardingSettings() {
   const { t } = useTranslation('admin');
   usePageTitle("System");
   const toast = useToast();
-  const { tenant, tenantPath } = useTenant();
+  const { tenantPath } = useTenant();
   const navigate = useNavigate();
   const getCountryPresetLabel = (preset: string) =>
     t(COUNTRY_PRESET_LABEL_KEYS[preset] ?? DEFAULT_COUNTRY_PRESET_LABEL_KEY);

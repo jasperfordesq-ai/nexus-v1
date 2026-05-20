@@ -122,7 +122,7 @@ export function CronJobs() {
     setLoadingHealth(false);
   }, []);
 
-  const handleRunJob = async (id: number, jobName: string) => {
+  const handleRunJob = async (id: number, _jobName: string) => {
     setRunningJob(id);
     try {
       const res = await adminSystem.runCronJob(id);

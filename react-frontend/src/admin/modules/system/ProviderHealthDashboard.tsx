@@ -72,15 +72,15 @@ function formatRelativeTime(dateStr: string | null): string {
   if (diffSec < 60) return "Just now";
   if (diffSec < 3600) {
     const mins = Math.floor(diffSec / 60);
-    return `N Minutes Ago`;
+    return `${mins} minutes ago`;
   }
   if (diffSec < 86400) {
     const hours = Math.floor(diffSec / 3600);
-    return `N Hours Ago`;
+    return `${hours} hours ago`;
   }
   if (diffSec < 604800) {
     const days = Math.floor(diffSec / 86400);
-    return `N Days Ago`;
+    return `${days} days ago`;
   }
 
   return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });

@@ -157,7 +157,7 @@ export function MatchingConfig() {
     } finally {
       setSaving(false);
     }
-  }, [config, totalValid, totalPct, toast])
+  }, [config, totalValid, toast])
 
 
   /** Clear cache */
@@ -167,7 +167,7 @@ export function MatchingConfig() {
       const res = await adminMatching.clearCache();
       if (res.success) {
         const cleared = (res.data as { entries_cleared?: number })?.entries_cleared ?? 0;
-        toast.success(`Cache Cleared`);
+        toast.success(t('matching.cache_cleared_count', { count: cleared }));
         setClearModalOpen(false);
       } else {
         toast.error("Failed to clear cache");
@@ -177,7 +177,7 @@ export function MatchingConfig() {
     } finally {
       setClearing(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   /** Reset to defaults */

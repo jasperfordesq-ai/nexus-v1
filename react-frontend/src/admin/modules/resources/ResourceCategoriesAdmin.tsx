@@ -103,7 +103,7 @@ export function ResourceCategoriesAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
 
   useEffect(() => {

@@ -101,7 +101,7 @@ export function PlanForm() {
       })
       .catch(() => toast.error(t('content.failed_to_load_plans', 'Failed to load plan')))
       .finally(() => setLoading(false));
-  }, [id, isEdit, toast]);
+  }, [id, isEdit, t, toast]);
 
 
   const handleChange = (field: keyof PlanFormData, value: string | boolean) => {

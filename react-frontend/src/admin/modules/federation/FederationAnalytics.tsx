@@ -107,7 +107,7 @@ export function FederationAnalytics() {
       }
     }
     setLoading(false);
-  }, [range, t, toast]);
+  }, [range, toast]);
 
   useEffect(() => {
     loadData();

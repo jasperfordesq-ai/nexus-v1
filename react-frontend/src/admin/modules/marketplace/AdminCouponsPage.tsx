@@ -53,7 +53,7 @@ export default function AdminCouponsPage() {
     try {
       const res = await api.get<{ items: AdminCoupon[] }>('/v2/admin/marketplace/coupons');
       setItems(res.data?.items ?? []);
-    } catch (err) {
+    } catch {
       toast.error('Failed to load coupons');
     } finally {
       setLoading(false);

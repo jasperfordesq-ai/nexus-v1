@@ -68,7 +68,7 @@ export function FederationControls() {
       if (wlRes.success && wlRes.data) setWhitelist(Array.isArray(wlRes.data) ? wlRes.data : []);
       if (pRes.success && pRes.data) setPartnerships(Array.isArray(pRes.data) ? pRes.data : []);
       if (jwtRes.success && jwtRes.data) setJwtStatus(jwtRes.data);
-    } catch (err) {
+    } catch {
       toastRef.current.error(`Federation error`);
     }
     setLoading(false);
@@ -85,7 +85,7 @@ export function FederationControls() {
       } else {
         toastRef.current.error(t('super.failed_to_update_setting', 'Failed to update setting'));
       }
-    } catch (err) {
+    } catch {
       toastRef.current.error(`Failed to update setting detail`);
     } finally {
       setSaving(null);
@@ -107,7 +107,7 @@ export function FederationControls() {
         if (res?.success) { toastRef.current.success(t('super.lockdown_activated', 'Lockdown activated')); loadData(); }
         else toastRef.current.error(t('super.failed_to_activate_lockdown', 'Failed to activate lockdown'));
       }
-    } catch (err) {
+    } catch {
       toastRef.current.error(`Lockdown Action Failed Detail`);
     } finally {
       setLockdownConfirm(false);
@@ -184,8 +184,6 @@ export function FederationControls() {
   ];
 
   const activePartnerships = partnerships.filter(p => p.status === 'active').length;
-  const pendingPartnerships = partnerships.filter(p => p.status === 'pending').length;
-
   const colorClasses: Record<string, { bg: string; text: string }> = {
     primary: { bg: 'bg-primary/10', text: 'text-primary' },
     success: { bg: 'bg-success/10', text: 'text-success' },

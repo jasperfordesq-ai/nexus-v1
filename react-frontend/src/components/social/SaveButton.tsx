@@ -12,7 +12,7 @@
  * Parents typically issue a bulk-check on mount to set initial `isSaved`.
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Button,
   Popover,

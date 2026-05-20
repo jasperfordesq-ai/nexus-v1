@@ -308,7 +308,7 @@ export function MarktPage() {
         setIsLoadingMore(false);
       }
     }
-  }, [activeTab, page, radiusKm, user?.latitude, user?.longitude, subRegionId, t]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeTab, page, radiusKm, user?.latitude, user?.longitude, subRegionId, t]);  
 
   const loadRef = useRef(loadItems);
   loadRef.current = loadItems;

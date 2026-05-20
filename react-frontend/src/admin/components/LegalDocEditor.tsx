@@ -469,14 +469,14 @@ function LegalDocToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
       <Divider orientation="vertical" className="h-5 mx-1" />
 
       {/* Notice Box — amber when cursor is inside a legal-notice block */}
-      <Tooltip content={"Notice Box"} size="sm" delay={500}>
+      <Tooltip content={t('rte.notice_box')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
           variant={isInsideLegalNotice ? 'flat' : 'light'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(INSERT_LEGAL_NOTICE_COMMAND, undefined)}
-          aria-label={"Notice Box"}
+          aria-label={t('rte.notice_box')}
           className={`min-w-8 w-8 h-8 ${isInsideLegalNotice ? 'text-amber-500 bg-amber-500/10' : ''}`}
         >
           <Megaphone size={15} />
@@ -504,11 +504,11 @@ function LegalNoticePlugin() {
         const noticeNode = $createLegalNoticeNode();
         const heading = $createHeadingNode('h4');
         heading.append(
-          $createTextNode("Enter notice title..."),
+          $createTextNode(t('rte.notice_title_placeholder')),
         );
         const paragraph = $createParagraphNode();
         paragraph.append(
-          $createTextNode("Enter notice body..."),
+          $createTextNode(t('rte.notice_body_placeholder')),
         );
         noticeNode.append(heading, paragraph);
 
@@ -533,7 +533,7 @@ function LegalNoticePlugin() {
       },
       COMMAND_PRIORITY_NORMAL,
     );
-  }, [editor]);
+  }, [editor, t]);
 
 
   return null;
@@ -607,7 +607,6 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
 
   // LexicalComposer only reads initialConfig once — memoised to make that explicit
   // and avoid any reference-equality surprises with the nodes array.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const initialConfig = useMemo(() => ({
     namespace: 'NexusLegalDocEditor',
     theme: editorTheme,
@@ -644,14 +643,14 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
       id: 0,
       document_id: 0,
       type: 'terms',
-      title: "Enter preview title...",
+      title: t('rte.preview_title_placeholder'),
       content: currentHtml,
       version_number: '–',
       effective_date: '',
       summary_of_changes: null,
       has_previous_versions: false,
     }),
-    [currentHtml],
+    [currentHtml, t],
   );
 
   return (
@@ -659,13 +658,13 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
       {/* Label row with preview toggle */}
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium text-foreground">
-          {"Content HTML"}
+          {t('rte.content_html')}
           <span className="text-danger ml-0.5">*</span>
         </label>
         <Tooltip
           content={showPreview
-            ? "Editor Only"
-            : "Split View"}
+            ? t('rte.editor_only')
+            : t('rte.split_view')}
           size="sm"
           delay={300}
         >
@@ -675,8 +674,8 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
             variant="light"
             onPress={() => setShowPreview((v) => !v)}
             aria-label={showPreview
-              ? "Editor Only"
-              : "Split View"}
+              ? t('rte.editor_only')
+              : t('rte.split_view')}
             className="min-w-8 w-8 h-8"
           >
             {showPreview ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -704,12 +703,12 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
                   contentEditable={
                     <ContentEditable
                       className="min-h-[320px] sm:min-h-[400px] px-4 py-3 outline-none text-foreground rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
-                      aria-label={"Content HTML"}
+                      aria-label={t('rte.content_html')}
                     />
                   }
                   placeholder={
                     <div className="pointer-events-none absolute top-3 left-4 text-default-400">
-                      {"Content..."}
+                      {t('rte.content_placeholder')}
                     </div>
                   }
                   ErrorBoundary={LexicalErrorBoundary}
@@ -734,7 +733,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
         {showPreview && (
           <div className="w-full lg:w-1/2 overflow-y-auto max-h-[600px] rounded-lg border border-default-200 dark:border-default-100 bg-[var(--color-surface)] px-4 pt-3 pb-6">
             <p className="text-[0.7rem] font-semibold text-default-400 uppercase tracking-wider mb-4 sticky top-0 bg-[var(--color-surface)] py-1">
-              {"Preview"}
+              {t('rte.preview')}
             </p>
             {currentHtml ? (
               <div className="pointer-events-none">
@@ -742,7 +741,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
               </div>
             ) : (
               <p className="text-sm text-default-400 italic">
-                {"Content..."}
+                {t('rte.content_placeholder')}
               </p>
             )}
           </div>
@@ -756,7 +755,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
 
       {/* Helper description */}
       <p className="text-xs text-default-400">
-        {"Content"}
+        {t('rte.content_helper')}
       </p>
     </div>
   );

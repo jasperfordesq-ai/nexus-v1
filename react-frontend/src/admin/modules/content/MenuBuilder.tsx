@@ -105,27 +105,27 @@ type TFunction = (key: string, options?: Record<string, unknown>) => string;
 
 /** Route picker — labels from existing nav.* keys via cross-namespace lookup */
 const getAppRoutes = (t: TFunction): { value: string; label: string; group: string }[] => [
-  { value: '/dashboard', label: "Dashboard", group: "Core" },
-  { value: '/feed', label: "Feed", group: "Core" },
-  { value: '/listings', label: "Listings", group: "Core" },
-  { value: '/messages', label: "Messages", group: "Core" },
-  { value: '/wallet', label: "Wallet", group: "Core" },
-  { value: '/members', label: "Members", group: "Community" },
-  { value: '/groups', label: "Groups", group: "Community" },
-  { value: '/events', label: "Events", group: "Community" },
-  { value: '/connections', label: "Connections", group: "Community" },
-  { value: '/volunteering', label: "Volunteering", group: "Features" },
-  { value: '/organisations', label: "Organisations", group: "Features" },
-  { value: '/goals', label: "Goals", group: "Features" },
-  { value: '/blog', label: "Blog", group: "Features" },
-  { value: '/resources', label: "Resources", group: "Features" },
-  { value: '/jobs', label: "Jobs", group: "Features" },
-  { value: '/marketplace', label: "Marketplace", group: "Features" },
-  { value: '/leaderboard', label: "Leaderboard", group: "Gamification" },
-  { value: '/achievements', label: "Achievements", group: "Gamification" },
-  { value: '/about', label: "About", group: "Info" },
-  { value: '/faq', label: "FAQ", group: "Info" },
-  { value: '/explore', label: "Explore", group: "Info" },
+  { value: '/dashboard', label: t('config.module_name_dashboard'), group: t('menu_builder.group_core') },
+  { value: '/feed', label: t('config.module_name_feed'), group: t('menu_builder.group_core') },
+  { value: '/listings', label: t('config.module_name_listings'), group: t('menu_builder.group_core') },
+  { value: '/messages', label: t('config.module_name_messages'), group: t('menu_builder.group_core') },
+  { value: '/wallet', label: t('config.module_name_wallet'), group: t('menu_builder.group_core') },
+  { value: '/members', label: t('config.module_name_members'), group: t('menu_builder.group_community') },
+  { value: '/groups', label: t('config.module_name_groups'), group: t('menu_builder.group_community') },
+  { value: '/events', label: t('config.module_name_events'), group: t('menu_builder.group_community') },
+  { value: '/connections', label: t('config.module_name_connections'), group: t('menu_builder.group_community') },
+  { value: '/volunteering', label: t('config.module_name_volunteering'), group: t('menu_builder.group_features') },
+  { value: '/organisations', label: t('config.module_name_organisations'), group: t('menu_builder.group_features') },
+  { value: '/goals', label: t('config.module_name_goals'), group: t('menu_builder.group_features') },
+  { value: '/blog', label: t('config.module_name_blog'), group: t('menu_builder.group_features') },
+  { value: '/resources', label: t('config.module_name_resources'), group: t('menu_builder.group_features') },
+  { value: '/jobs', label: t('config.module_name_job_vacancies'), group: t('menu_builder.group_features') },
+  { value: '/marketplace', label: t('config.module_name_marketplace'), group: t('menu_builder.group_features') },
+  { value: '/leaderboard', label: t('config.module_name_leaderboard'), group: t('menu_builder.group_gamification') },
+  { value: '/achievements', label: t('config.module_name_achievements'), group: t('menu_builder.group_gamification') },
+  { value: '/about', label: t('menu_builder.route_about'), group: t('menu_builder.group_info') },
+  { value: '/faq', label: t('menu_builder.route_faq'), group: t('menu_builder.group_info') },
+  { value: '/explore', label: t('menu_builder.route_explore'), group: t('menu_builder.group_info') },
 ];
 
 /**
@@ -139,47 +139,47 @@ function getDefaultItems(t: TFunction): MenuItemData[] {
   const communityId = next();
   return [
     {
-      id: next(), label: "Feed", url: '/feed', type: 'link',
+      id: next(), label: t('config.module_name_feed'), url: '/feed', type: 'link',
       icon: 'Newspaper', target: '_self', sort_order: 0, parent_id: null,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: "Explore", url: '/explore', type: 'link',
+      id: next(), label: t('menu_builder.route_explore'), url: '/explore', type: 'link',
       icon: 'Compass', target: '_self', sort_order: 1, parent_id: null,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: "Listings", url: '/listings', type: 'link',
+      id: next(), label: t('config.module_name_listings'), url: '/listings', type: 'link',
       icon: 'ListTodo', target: '_self', sort_order: 2, parent_id: null,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: communityId, label: "Community", url: null, type: 'dropdown',
+      id: communityId, label: t('menu_builder.group_community'), url: null, type: 'dropdown',
       icon: 'Users', target: '_self', sort_order: 3, parent_id: null,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: "Members", url: '/members', type: 'link',
+      id: next(), label: t('config.module_name_members'), url: '/members', type: 'link',
       icon: 'Users', target: '_self', sort_order: 4, parent_id: communityId,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: "Events", url: '/events', type: 'link',
+      id: next(), label: t('config.module_name_events'), url: '/events', type: 'link',
       icon: 'Calendar', target: '_self', sort_order: 5, parent_id: communityId,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: "Groups", url: '/groups', type: 'link',
+      id: next(), label: t('config.module_name_groups'), url: '/groups', type: 'link',
       icon: 'Users', target: '_self', sort_order: 6, parent_id: communityId,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: "Volunteering", url: '/volunteering', type: 'link',
+      id: next(), label: t('config.module_name_volunteering'), url: '/volunteering', type: 'link',
       icon: 'Heart', target: '_self', sort_order: 7, parent_id: communityId,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: "Resources", url: '/resources', type: 'link',
+      id: next(), label: t('config.module_name_resources'), url: '/resources', type: 'link',
       icon: 'FolderOpen', target: '_self', sort_order: 8, parent_id: communityId,
       visibility_rules: null, is_active: 1, css_class: null,
     },
@@ -187,20 +187,20 @@ function getDefaultItems(t: TFunction): MenuItemData[] {
 }
 
 const getLocationOptions = (t: TFunction): { key: MenuLocation; label: string }[] => [
-  { key: 'header-main', label: "Main Header" },
-  { key: 'header-secondary', label: "Secondary Header" },
-  { key: 'footer', label: "Footer" },
-  { key: 'sidebar', label: "Sidebar" },
-  { key: 'mobile', label: "Mobile" },
+  { key: 'header-main', label: t('menu_builder.location_header_main') },
+  { key: 'header-secondary', label: t('menu_builder.location_header_secondary') },
+  { key: 'footer', label: t('menu_builder.location_footer') },
+  { key: 'sidebar', label: t('menu_builder.location_sidebar') },
+  { key: 'mobile', label: t('menu_builder.location_mobile') },
 ];
 
 const getTypeOptions = (t: TFunction): { key: MenuItemType; label: string; description: string }[] => [
-  { key: 'link', label: "Internal Link", description: "Link to a page within this platform" },
-  { key: 'external', label: "External Link", description: "Link to an external website" },
-  { key: 'dropdown', label: "Dropdown", description: "A dropdown menu containing child items" },
-  { key: 'page', label: "Custom Page", description: "Link to a custom page on this platform" },
-  { key: 'route', label: "Named Route", description: "Link using a named application route" },
-  { key: 'divider', label: "Divider", description: "A visual separator between menu items" },
+  { key: 'link', label: t('menu_builder.type_link_label'), description: t('menu_builder.type_link_desc') },
+  { key: 'external', label: t('menu_builder.type_external_label'), description: t('menu_builder.type_external_desc') },
+  { key: 'dropdown', label: t('menu_builder.type_dropdown_label'), description: t('menu_builder.type_dropdown_desc') },
+  { key: 'page', label: t('menu_builder.type_page_label'), description: t('menu_builder.type_page_desc') },
+  { key: 'route', label: t('menu_builder.type_route_label'), description: t('menu_builder.type_route_desc') },
+  { key: 'divider', label: t('menu_builder.type_divider_label'), description: t('menu_builder.type_divider_desc') },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────

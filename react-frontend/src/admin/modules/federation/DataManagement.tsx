@@ -67,7 +67,7 @@ export function DataManagement() {
       toast.error(t('federation.export_failed', 'Export failed'));
     }
     setExporting(false);
-  }, [toast]);
+  }, [t, toast]);
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -92,7 +92,7 @@ export function DataManagement() {
       toast.error("Import failed");
     }
     setImporting(false);
-  }, [importFile, dryRun, t, toast]);
+  }, [importFile, dryRun, toast]);
 
   const handlePurge = useCallback(async () => {
     setPurging(true);
@@ -108,7 +108,7 @@ export function DataManagement() {
       toast.error("Purge failed");
     }
     setPurging(false);
-  }, [purgeDays, t, toast, purgeModal]);
+  }, [purgeDays, toast, purgeModal]);
 
   return (
     <div>

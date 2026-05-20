@@ -377,10 +377,10 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span>{`Modal`}</span>
+              <span>{moduleName}</span>
               {!isEditable && (
                 <Chip size="sm" variant="flat" color="warning" startContent={<Construction size={12} />}>
-                  {"Beta"}
+                  {t('config.beta')}
                 </Chip>
               )}
             </div>
@@ -426,7 +426,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
               <CardBody className="flex flex-row items-center gap-3 py-3">
                 <Construction size={18} className="text-warning flex-shrink-0" />
                 <p className="text-sm text-warning-700 dark:text-warning-400">
-                  {"Modal Coming Soon Notice"}
+                  {t('config.modal_coming_soon_notice')}
                 </p>
               </CardBody>
             </Card>
@@ -544,7 +544,7 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-medium">{option.label}</span>
           {option.comingSoon && (
-            <Chip size="sm" variant="flat" color="warning">{"Coming Soon"}</Chip>
+            <Chip size="sm" variant="flat" color="warning">{t('config.coming_soon')}</Chip>
           )}
         </div>
         <p className="text-xs text-default-500 mt-1 leading-relaxed">{option.description}</p>
