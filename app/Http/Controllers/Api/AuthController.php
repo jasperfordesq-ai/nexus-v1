@@ -302,6 +302,9 @@ class AuthController extends BaseApiController
                 \Illuminate\Support\Facades\Log::warning('[AuthController] Sanctum token creation failed: ' . $e->getMessage());
             }
 
+            // Stamp last_login_at so member activity reports reflect real login times
+            DB::table('users')->where('id', $user['id'])->update(['last_login_at' => now()]);
+
             return response()->json([
                 'success' => true,
                 'user' => [

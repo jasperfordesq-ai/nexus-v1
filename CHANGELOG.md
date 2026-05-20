@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Member activity reports now show real data.** `AuthController::login()` never stamped `last_login_at` on successful login after the Laravel migration, so `/admin/reports/members` showed "No active members found" for all tenants. Fixed by adding `DB::table('users')->update(['last_login_at' => now()])` immediately after token creation. A backfill migration approximates past login dates from `personal_access_tokens.created_at` for all active users so reports are immediately useful.
+
 ---
 
 ## [1.5.1] - 2026-05-20

@@ -54,6 +54,8 @@ class AuthService
 
         $token = $this->createApiToken($user->id, $deviceType);
 
+        $user->update(['last_login_at' => now()]);
+
         return [
             'user'  => $user->only(['id', 'first_name', 'last_name', 'email', 'role', 'avatar_url']),
             'token' => $token,
