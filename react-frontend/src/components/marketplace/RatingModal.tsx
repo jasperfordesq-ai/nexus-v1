@@ -57,7 +57,7 @@ function StarRating({
   const [hovered, setHovered] = useState(0);
 
   return (
-    <div className="flex items-center gap-1" role="radiogroup" aria-label={t('orders.rating.stars_label', 'Rating')}>
+    <div className="flex items-center gap-1" role="radiogroup" aria-label={t('orders.rating.stars_label')}>
       {[1, 2, 3, 4, 5].map((star) => {
         const filled = star <= (hovered || value);
         return (
@@ -70,7 +70,7 @@ function StarRating({
             onMouseEnter={() => setHovered(star)}
             onMouseLeave={() => setHovered(0)}
             className="p-0.5 transition-transform hover:scale-110"
-            aria-label={t('orders.rating.star_n', '{{n}} stars', { n: star })}
+            aria-label={t('orders.rating.star_n', { n: star })}
             role="radio"
             aria-checked={star === value}
           >
@@ -103,7 +103,7 @@ export function RatingModal({ orderId, isOpen, onClose, onSuccess }: RatingModal
 
   const handleSubmit = useCallback(async () => {
     if (rating < 1 || rating > 5) {
-      toast.error(t('orders.rating.select_rating', 'Please select a rating'));
+      toast.error(t('orders.rating.select_rating'));
       return;
     }
 
@@ -116,18 +116,18 @@ export function RatingModal({ orderId, isOpen, onClose, onSuccess }: RatingModal
       });
 
       if (response.success) {
-        toast.success(t('orders.rating.success', 'Rating submitted successfully!'));
+        toast.success(t('orders.rating.success'));
         setRating(0);
         setComment('');
         setIsAnonymous(false);
         onSuccess();
         onClose();
       } else {
-        toast.error(response.error || t('orders.rating.error', 'Failed to submit rating'));
+        toast.error(response.error || t('orders.rating.error'));
       }
     } catch (err) {
       logError('Failed to submit order rating', err);
-      toast.error(t('orders.rating.error', 'Failed to submit rating'));
+      toast.error(t('orders.rating.error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -146,21 +146,21 @@ export function RatingModal({ orderId, isOpen, onClose, onSuccess }: RatingModal
     <Modal isOpen={isOpen} onClose={handleClose} size="md" placement="center">
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
-          <Star className="w-5 h-5 text-warning" />
-          {t('orders.rating.title', 'Rate Your Order')}
+          <Star className="w-5 h-5 text-warning" aria-hidden="true" />
+          {t('orders.rating.title')}
         </ModalHeader>
 
         <ModalBody className="space-y-4">
           <div>
             <p className="text-sm text-default-500 mb-2">
-              {t('orders.rating.how_was_experience', 'How was your experience?')}
+              {t('orders.rating.how_was_experience')}
             </p>
             <StarRating value={rating} onChange={setRating} />
           </div>
 
           <Textarea
-            label={t('orders.rating.comment_label', 'Comment (optional)')}
-            placeholder={t('orders.rating.comment_placeholder', 'Share details about your experience...')}
+            label={t('orders.rating.comment_label')}
+            placeholder={t('orders.rating.comment_placeholder')}
             value={comment}
             onValueChange={setComment}
             maxLength={1000}
@@ -174,13 +174,13 @@ export function RatingModal({ orderId, isOpen, onClose, onSuccess }: RatingModal
             onValueChange={setIsAnonymous}
             size="sm"
           >
-            {t('orders.rating.anonymous', 'Submit anonymously')}
+            {t('orders.rating.anonymous')}
           </Checkbox>
         </ModalBody>
 
         <ModalFooter>
           <Button variant="flat" onPress={handleClose} isDisabled={isSubmitting}>
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </Button>
           <Button
             color="primary"
@@ -188,7 +188,7 @@ export function RatingModal({ orderId, isOpen, onClose, onSuccess }: RatingModal
             isLoading={isSubmitting}
             isDisabled={rating < 1}
           >
-            {t('orders.rating.submit', 'Submit Rating')}
+            {t('orders.rating.submit')}
           </Button>
         </ModalFooter>
       </ModalContent>
