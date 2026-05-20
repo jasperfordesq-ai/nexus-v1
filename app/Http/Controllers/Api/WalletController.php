@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\TenantSettingsService;
 use App\Services\WalletService;
 use Illuminate\Http\JsonResponse;
 
@@ -13,6 +14,7 @@ use Illuminate\Http\JsonResponse;
  * WalletController - Time-credit wallet operations.
  *
  * Endpoints (v2):
+ *   GET    /api/v2/wallet/config               config()
  *   GET    /api/v2/wallet/balance              balance()
  *   GET    /api/v2/wallet/transactions         transactions()
  *   GET    /api/v2/wallet/transactions/{id}    showTransaction()
@@ -27,7 +29,27 @@ class WalletController extends BaseApiController
 
     public function __construct(
         private readonly WalletService $walletService,
+        private readonly TenantSettingsService $tenantSettingsService,
     ) {}
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/wallet/config
+    // -----------------------------------------------------------------
+
+    /**
+     * Get wallet configuration for the current tenant (e.g. transfer limits).
+     */
+    public function config(): JsonResponse
+    {
+        $this->requireAuth();
+        $this->rateLimit('wallet_config', 60, 60);
+
+        $maxTransfer = $this->tenantSettingsService->get('wallet.max_transfer', null);
+
+        return $this->respondWithData([
+            'max_transfer' => $maxTransfer !== null ? (int) $maxTransfer : null,
+        ]);
+    }
 
     // -----------------------------------------------------------------
     //  GET /api/v2/wallet/balance

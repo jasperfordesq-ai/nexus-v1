@@ -458,6 +458,7 @@ Route::get('/v2/users/me/sub-accounts/{childId}/activity', [\App\Http\Controller
 Route::get('/v2/realtime/config', [\App\Http\Controllers\Api\RealtimeController::class, 'config']);
 // ============================================
 // Wallet
+Route::get('/v2/wallet/config', [\App\Http\Controllers\Api\WalletController::class, 'config']);
 Route::get('/v2/wallet/balance', [\App\Http\Controllers\Api\WalletController::class, 'balance']);
 Route::get('/v2/wallet/transactions', [\App\Http\Controllers\Api\WalletController::class, 'transactions']);
 Route::get('/v2/wallet/transactions/{id}', [\App\Http\Controllers\Api\WalletController::class, 'showTransaction']);
