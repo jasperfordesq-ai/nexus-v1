@@ -75,18 +75,18 @@ export default function PersonalJourneyTab() {
         if (res.success && res.data) {
           setData(res.data);
         } else {
-          setError(res.error || 'Failed to load journey data');
+          setError(res.error || t('journey.load_error'));
         }
       } catch (err: unknown) {
         logError('PersonalJourneyTab', err);
-        setError('Failed to load journey data');
+        setError(t('journey.load_error'));
       } finally {
         setIsLoading(false);
       }
     };
 
     load();
-  }, []);
+  }, [t]);
 
   if (isLoading) {
     return (
@@ -120,36 +120,36 @@ export default function PersonalJourneyTab() {
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <SummaryCard
-          label={summary.level_name || `Level ${summary.level}`}
-          value={`${summary.xp.toLocaleString()} XP`}
-          icon={<TrendingUp className="w-4 h-4 text-purple-500" />}
+          label={summary.level_name || t('journey.level', { level: summary.level })}
+          value={t('journey.xp_value', { xp: summary.xp.toLocaleString() })}
+          icon={<TrendingUp aria-hidden="true" className="w-4 h-4 text-purple-500" />}
           isText
         />
         <SummaryCard
-          label={t('journey.badges', 'Badges')}
+          label={t('journey.badges')}
           value={summary.total_badges}
-          icon={<Award className="w-4 h-4 text-[var(--color-warning)]" />}
+          icon={<Award aria-hidden="true" className="w-4 h-4 text-[var(--color-warning)]" />}
         />
         <SummaryCard
-          label={t('journey.listings', 'Listings')}
+          label={t('journey.listings')}
           value={summary.total_listings}
-          icon={<Target className="w-4 h-4 text-[var(--color-info)]" />}
+          icon={<Target aria-hidden="true" className="w-4 h-4 text-[var(--color-info)]" />}
         />
         <SummaryCard
-          label={t('journey.volunteer_hours', 'Volunteer Hours')}
+          label={t('journey.volunteer_hours')}
           value={summary.volunteer_hours}
-          icon={<Target className="w-4 h-4 text-emerald-500" />}
+          icon={<Target aria-hidden="true" className="w-4 h-4 text-emerald-500" />}
         />
         <SummaryCard
-          label={t('journey.connections', 'Connections')}
+          label={t('journey.connections')}
           value={summary.total_connections}
-          icon={<Target className="w-4 h-4 text-pink-500" />}
+          icon={<Target aria-hidden="true" className="w-4 h-4 text-pink-500" />}
         />
         {summary.member_since && (
           <SummaryCard
-            label={t('journey.member_since', 'Member Since')}
+            label={t('journey.member_since')}
             value={summary.member_since}
-            icon={<Calendar className="w-4 h-4 text-default-400" />}
+            icon={<Calendar aria-hidden="true" className="w-4 h-4 text-default-400" />}
             isText
           />
         )}
@@ -159,7 +159,7 @@ export default function PersonalJourneyTab() {
       {monthly_activity.length > 0 && (
         <GlassCard className="p-6">
           <h3 className="text-lg font-semibold mb-4">
-            {t('journey.monthly_activity', 'Monthly Activity')}
+            {t('journey.monthly_activity')}
           </h3>
           <div className="flex items-end gap-1 h-32">
             {monthly_activity.map((month, i) => {
@@ -187,7 +187,11 @@ export default function PersonalJourneyTab() {
                   <div
                     className="w-full rounded-t bg-gradient-to-t from-primary-500 to-primary-300 min-h-1"
                     style={{ height: `${height}%` }}
-                    title={`${month.month}: ${month.xp_earned} XP, ${month.badges} badges`}
+                    title={t('journey.monthly_activity_bar_title', {
+                      month: month.month,
+                      xp: month.xp_earned,
+                      badges: month.badges,
+                    })}
                   />
                   <span className="text-[9px] text-default-400 truncate w-full text-center">
                     {month.month.split(' ')[0]?.slice(0, 3)}
@@ -203,7 +207,7 @@ export default function PersonalJourneyTab() {
       {badge_progression.length > 0 && (
         <GlassCard className="p-6">
           <h3 className="text-lg font-semibold mb-4">
-            {t('journey.badge_timeline', 'Badge Timeline')}
+            {t('journey.badge_timeline')}
           </h3>
           <div className="space-y-3">
             {badge_progression.slice(-10).map((badge, i) => (
@@ -231,8 +235,8 @@ export default function PersonalJourneyTab() {
       {milestones.length > 0 && (
         <GlassCard className="p-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Milestone className="w-5 h-5 text-[var(--color-warning)]" />
-            {t('journey.milestones', 'Milestones')}
+            <Milestone aria-hidden="true" className="w-5 h-5 text-[var(--color-warning)]" />
+            {t('journey.milestones')}
           </h3>
           <div className="space-y-2">
             {milestones.map((milestone, i) => (
