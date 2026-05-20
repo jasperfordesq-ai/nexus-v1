@@ -31,7 +31,7 @@ export function ManualInstallModal({ isOpen, onClose, browser }: ManualInstallMo
     <Modal isOpen={isOpen} onClose={onClose} placement="center" size="md" backdrop="blur">
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
-          <Download className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+          <Download className="w-5 h-5 text-primary" aria-hidden="true" />
           {title}
         </ModalHeader>
         <ModalBody>
@@ -39,7 +39,7 @@ export function ManualInstallModal({ isOpen, onClose, browser }: ManualInstallMo
           <ol className="space-y-3 mt-2">
             {steps.map((step, i) => (
               <li key={i} className="flex items-start gap-3">
-                <span className="shrink-0 w-6 h-6 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 text-xs font-semibold inline-flex items-center justify-center">
+                <span className="shrink-0 w-6 h-6 rounded-full bg-primary/15 text-primary text-xs font-semibold inline-flex items-center justify-center">
                   {i + 1}
                 </span>
                 <span className="text-sm flex flex-wrap items-center gap-1">
@@ -50,12 +50,12 @@ export function ManualInstallModal({ isOpen, onClose, browser }: ManualInstallMo
             ))}
           </ol>
           <p className="text-xs text-theme-muted mt-3">
-            {t('install.manual_note', "If you don't see the option, your browser may have already installed the app or your device may not support it.")}
+            {t('install.manual_note')}
           </p>
         </ModalBody>
         <ModalFooter>
           <Button variant="light" onPress={onClose}>
-            {t('install.got_it', 'Got it')}
+            {t('install.got_it')}
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -65,7 +65,7 @@ export function ManualInstallModal({ isOpen, onClose, browser }: ManualInstallMo
 
 function getInstructions(
   browser: BrowserKind,
-  t: (key: string, fallback: string) => string,
+  t: (key: string) => string,
 ): { title: string; intro: string; steps: Step[] } {
   const dots = <MoreVertical className="inline w-4 h-4" aria-hidden="true" />;
   const menu = <Menu className="inline w-4 h-4" aria-hidden="true" />;
@@ -74,72 +74,72 @@ function getInstructions(
   switch (browser) {
     case 'chrome-android':
       return {
-        title: t('install.android_chrome_title', 'Install on Android'),
-        intro: t('install.android_chrome_intro', 'Add NEXUS to your home screen from the Chrome menu:'),
+        title: t('install.android_chrome_title'),
+        intro: t('install.android_chrome_intro'),
         steps: [
-          { icon: dots, text: t('install.android_chrome_step_1', 'Tap the three-dot menu in the top-right of Chrome.') },
-          { text: t('install.android_chrome_step_2', 'Tap "Install app" or "Add to Home screen".') },
-          { text: t('install.android_chrome_step_3', 'Confirm. NEXUS will appear on your home screen as a standalone app.') },
+          { icon: dots, text: t('install.android_chrome_step_1') },
+          { text: t('install.android_chrome_step_2') },
+          { text: t('install.android_chrome_step_3') },
         ],
       };
     case 'samsung':
       return {
-        title: t('install.samsung_title', 'Install with Samsung Internet'),
-        intro: t('install.samsung_intro', 'Add NEXUS to your home screen from the Samsung Internet menu:'),
+        title: t('install.samsung_title'),
+        intro: t('install.samsung_intro'),
         steps: [
-          { icon: menu, text: t('install.samsung_step_1', 'Tap the menu icon at the bottom of Samsung Internet.') },
-          { text: t('install.samsung_step_2', 'Tap "Add page to" → "Home screen".') },
-          { text: t('install.samsung_step_3', 'Confirm. NEXUS will appear on your home screen.') },
+          { icon: menu, text: t('install.samsung_step_1') },
+          { text: t('install.samsung_step_2') },
+          { text: t('install.samsung_step_3') },
         ],
       };
     case 'firefox-android':
       return {
-        title: t('install.firefox_android_title', 'Install on Firefox for Android'),
-        intro: t('install.firefox_android_intro', 'Add NEXUS to your home screen from the Firefox menu:'),
+        title: t('install.firefox_android_title'),
+        intro: t('install.firefox_android_intro'),
         steps: [
-          { icon: dots, text: t('install.firefox_android_step_1', 'Tap the three-dot menu in Firefox.') },
-          { text: t('install.firefox_android_step_2', 'Tap "Install" or "Add to Home screen".') },
-          { text: t('install.firefox_android_step_3', 'Confirm to add NEXUS to your home screen.') },
+          { icon: dots, text: t('install.firefox_android_step_1') },
+          { text: t('install.firefox_android_step_2') },
+          { text: t('install.firefox_android_step_3') },
         ],
       };
     case 'chrome-desktop':
       return {
-        title: t('install.chrome_desktop_title', 'Install on your computer'),
-        intro: t('install.chrome_desktop_intro', "Chrome may not have offered the prompt yet. You can still install NEXUS from Chrome's menu:"),
+        title: t('install.chrome_desktop_title'),
+        intro: t('install.chrome_desktop_intro'),
         steps: [
-          { icon: dots, text: t('install.chrome_desktop_step_1', 'Click the three-dot menu in the top-right of Chrome.') },
-          { text: t('install.chrome_desktop_step_2', 'Click "Cast, save, and share" → "Install page as app…", or look for an install icon in the address bar.') },
-          { text: t('install.chrome_desktop_step_3', 'Click Install. NEXUS will open in its own window like a native app.') },
+          { icon: dots, text: t('install.chrome_desktop_step_1') },
+          { text: t('install.chrome_desktop_step_2') },
+          { text: t('install.chrome_desktop_step_3') },
         ],
       };
     case 'edge-desktop':
       return {
-        title: t('install.edge_desktop_title', 'Install on your computer'),
-        intro: t('install.edge_desktop_intro', 'Install NEXUS as a desktop app from the Edge menu:'),
+        title: t('install.edge_desktop_title'),
+        intro: t('install.edge_desktop_intro'),
         steps: [
-          { icon: dots, text: t('install.edge_desktop_step_1', 'Click the three-dot menu in the top-right of Edge.') },
-          { text: t('install.edge_desktop_step_2', 'Click "Apps" → "Install this site as an app".') },
-          { text: t('install.edge_desktop_step_3', 'Click Install. NEXUS will open in its own window.') },
+          { icon: dots, text: t('install.edge_desktop_step_1') },
+          { text: t('install.edge_desktop_step_2') },
+          { text: t('install.edge_desktop_step_3') },
         ],
       };
     case 'firefox-desktop':
       return {
-        title: t('install.firefox_desktop_title', 'Install on your computer'),
-        intro: t('install.firefox_desktop_intro', "Firefox on desktop doesn't currently support installing web apps. You can still pin NEXUS for quick access:"),
+        title: t('install.firefox_desktop_title'),
+        intro: t('install.firefox_desktop_intro'),
         steps: [
-          { text: t('install.firefox_desktop_step_1', 'Bookmark this page (Ctrl+D) or pin the tab via right-click → "Pin Tab".') },
-          { text: t('install.firefox_desktop_step_2', 'For a true installable app, try Chrome, Edge, or our mobile app.') },
+          { text: t('install.firefox_desktop_step_1') },
+          { text: t('install.firefox_desktop_step_2') },
         ],
       };
     case 'other':
     default:
       return {
-        title: t('install.generic_title', 'Install NEXUS'),
-        intro: t('install.generic_intro', "Look for an install option in your browser's menu:"),
+        title: t('install.generic_title'),
+        intro: t('install.generic_intro'),
         steps: [
-          { icon: dots, text: t('install.generic_step_1', 'Open your browser menu (usually a three-dot or three-line icon).') },
-          { icon: plus, text: t('install.generic_step_2', 'Look for "Install app", "Install this site", or "Add to Home screen".') },
-          { text: t('install.generic_step_3', 'Confirm to add NEXUS to your device.') },
+          { icon: dots, text: t('install.generic_step_1') },
+          { icon: plus, text: t('install.generic_step_2') },
+          { text: t('install.generic_step_3') },
         ],
       };
   }
