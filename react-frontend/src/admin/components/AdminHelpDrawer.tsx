@@ -3,11 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Divider, Chip } from '@heroui/react';
+import { Button, Divider, Chip } from '@heroui/react';
 import { Link } from 'react-router-dom';
 import X from 'lucide-react/icons/x';
 import LightbulbIcon from 'lucide-react/icons/lightbulb';
 import TriangleAlertIcon from 'lucide-react/icons/triangle-alert';
+import { useTranslation } from 'react-i18next';
 import type { HelpArticle } from '../data/helpContent';
 
 interface AdminHelpDrawerProps {
@@ -17,6 +18,8 @@ interface AdminHelpDrawerProps {
 }
 
 export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerProps) {
+  const { t } = useTranslation('admin');
+
   return (
     <>
       {/* Backdrop */}
@@ -32,7 +35,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
       <div
         role="dialog"
         aria-modal="true"
-        aria-label={`Help: ${article.title}`}
+        aria-label={t('help_drawer.aria_label', { title: article.title })}
         className={`fixed inset-y-0 right-0 z-50 flex w-full max-w-[min(24rem,calc(100dvw-var(--safe-area-left)-var(--safe-area-right)))] flex-col bg-content1 shadow-xl transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
@@ -41,20 +44,22 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
         <div className="flex shrink-0 items-start justify-between gap-3 px-5 py-4 border-b border-divider pt-[calc(var(--safe-area-top)+1rem)]">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-wider text-default-400 mb-0.5">
-              Help
+              {t('help_drawer.label')}
             </p>
             <h2 className="text-base font-bold text-foreground leading-snug">
               {article.title}
             </h2>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="mt-0.5 shrink-0 rounded-full p-1.5 text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
-            aria-label="Close help panel"
+          <Button
+            isIconOnly
+            size="sm"
+            variant="light"
+            onPress={onClose}
+            className="mt-0.5 shrink-0 text-default-400"
+            aria-label={t('help_drawer.close_panel')}
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
 
         {/* Scrollable body */}
@@ -71,7 +76,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
               <Divider />
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-default-400 mb-3">
-                  How to use this page
+                  {t('help_drawer.how_to_use')}
                 </h3>
                 <ol className="space-y-3">
                   {article.steps.map((step, idx) => (
@@ -102,7 +107,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
               <Divider />
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-default-400 mb-3">
-                  Tips &amp; gotchas
+                  {t('help_drawer.tips')}
                 </h3>
                 <ul className="space-y-2">
                   {article.tips.map((tip, idx) => (
@@ -144,7 +149,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
               <Divider />
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-default-400 mb-3">
-                  Related pages
+                  {t('help_drawer.related_pages')}
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {article.relatedPaths.map((rel) => (

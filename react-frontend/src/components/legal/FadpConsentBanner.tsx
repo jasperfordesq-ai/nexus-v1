@@ -87,13 +87,16 @@ export function FadpConsentBanner() {
               </div>
 
               {/* Dismiss (no preference recorded) */}
-              <button
-                onClick={dismiss}
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                onPress={dismiss}
                 aria-label={t('common:common.dismiss')}
-                className="flex-shrink-0 text-default-400 hover:text-default-600 transition-colors mt-0.5"
+                className="mt-0.5 flex-shrink-0 text-default-400"
               >
                 <X size={16} />
-              </button>
+              </Button>
             </div>
 
             {/* Action buttons */}

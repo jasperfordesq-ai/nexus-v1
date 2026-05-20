@@ -9898,5 +9898,13 @@
         "body": "Email warning checks could not complete."
       }
     }
+  },
+  "help_drawer": {
+    "aria_label": "Help: {{title}}",
+    "close_panel": "Close help panel",
+    "how_to_use": "How to use this page",
+    "label": "Help",
+    "related_pages": "Related pages",
+    "tips": "Tips & gotchas"
   }
 }
