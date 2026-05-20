@@ -4,6 +4,111 @@
   "clear_primary_color": "Clear primary color",
   "enabled": "Enabled",
   "disabled": "Disabled",
+  "api_partners": {
+    "meta": {
+      "title": "API Partners"
+    },
+    "header": {
+      "title": "API Partners",
+      "description": "Provision and manage external integrations (banks, payment processors, admin systems) that call the Partner API."
+    },
+    "actions": {
+      "activate": "Activate",
+      "cancel": "Cancel",
+      "close": "Close",
+      "new_partner": "New partner",
+      "regenerate_credentials": "Regenerate credentials",
+      "suspend": "Suspend",
+      "view_call_log": "View call log"
+    },
+    "call_log": {
+      "table_aria": "Recent calls",
+      "columns": {
+        "duration": "Duration",
+        "method": "Method",
+        "path": "Path",
+        "status": "Status",
+        "when": "When"
+      }
+    },
+    "columns": {
+      "actions": "Actions",
+      "name": "Name",
+      "rate_limit": "Rate limit",
+      "sandbox": "Sandbox",
+      "scopes": "Scopes",
+      "slug": "Slug",
+      "status": "Status"
+    },
+    "common": {
+      "any": "any",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ms",
+      "no": "No",
+      "per_minute": "{{value}}/min",
+      "yes": "Yes"
+    },
+    "confirm": {
+      "regenerate_credentials": "Regenerate credentials? The old client_id/client_secret will be revoked immediately."
+    },
+    "create_modal": {
+      "allowed_scopes": "Allowed scopes",
+      "contact_email": "Contact email",
+      "contact_email_placeholder": "integrations@partner.example",
+      "description": "Description",
+      "name": "Name",
+      "name_placeholder": "e.g. PostFinance Switzerland",
+      "rate_limit": "Rate limit (requests / minute)",
+      "sandbox_mode": "Sandbox mode (read-only — writes will be rejected)",
+      "submit": "Create & issue credentials",
+      "title": "New API partner"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "Copy client_id",
+      "copy_client_secret": "Copy client_secret",
+      "saved_button": "I have saved these",
+      "title": "Client credentials issued",
+      "warning_body": "The client secret will not be shown again. Hand them to your partner via a secure channel.",
+      "warning_title": "Save these now."
+    },
+    "detail": {
+      "call_log_tab": "Call log",
+      "contact": "Contact:",
+      "info_tab": "Info",
+      "ip_allowlist": "IP allowlist:",
+      "rate_limit": "Rate limit:",
+      "sandbox": "Sandbox:",
+      "scopes": "Scopes:",
+      "status": "Status:",
+      "tabs_aria": "Partner detail tabs"
+    },
+    "empty": {
+      "no_calls": "No calls yet.",
+      "no_partners": "No partners yet. Create one to issue client credentials."
+    },
+    "status": {
+      "active": "Active",
+      "pending": "Pending",
+      "suspended": "Suspended"
+    },
+    "toasts": {
+      "activate_failed": "Activate failed",
+      "activated": "Partner activated",
+      "copied": "{{label}} copied",
+      "copy_failed": "Copy failed — copy manually",
+      "create_failed": "Create failed",
+      "load_failed": "Failed to load partners",
+      "name_required": "Name is required",
+      "regenerate_failed": "Regenerate failed",
+      "suspend_failed": "Suspend failed",
+      "suspended": "Partner suspended"
+    },
+    "table": {
+      "aria": "API partners"
+    }
+  },
   "agents": {
     "actions": {
       "cancel": "Cancel",

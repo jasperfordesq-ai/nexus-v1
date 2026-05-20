@@ -11,12 +11,11 @@
  * activate them, regenerate client credentials, and inspect the
  * recent call log per partner.
  *
- * English-only by design — see project CLAUDE.md "ADMIN PANEL IS ENGLISH-ONLY".
- *
  * Backed by `/api/v2/admin/api-partners/*` (ApiPartnerAdminController).
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -98,7 +97,8 @@ const ALL_SCOPES = [
 // ─── Component ────────────────────────────────────────────────────────────
 
 export default function ApiPartnersAdminPage() {
-  usePageTitle('API Partners');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('api_partners.meta.title'));
   const toast = useToast();
 
   const [partners, setPartners] = useState<ApiPartner[]>([]);
@@ -115,11 +115,11 @@ export default function ApiPartnersAdminPage() {
       const res = await api.get<{ partners: ApiPartner[] }>('/v2/admin/api-partners');
       setPartners(res.data?.partners ?? []);
     } catch {
-      toast.error('Failed to load partners');
+      toast.error(t('api_partners.toasts.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     void load();
@@ -128,32 +128,32 @@ export default function ApiPartnersAdminPage() {
   const handleSuspend = async (id: number) => {
     try {
       await api.post(`/v2/admin/api-partners/${id}/suspend`);
-      toast.success('Partner suspended');
+      toast.success(t('api_partners.toasts.suspended'));
       void load();
     } catch {
-      toast.error('Suspend failed');
+      toast.error(t('api_partners.toasts.suspend_failed'));
     }
   };
 
   const handleActivate = async (id: number) => {
     try {
       await api.post(`/v2/admin/api-partners/${id}/activate`);
-      toast.success('Partner activated');
+      toast.success(t('api_partners.toasts.activated'));
       void load();
     } catch {
-      toast.error('Activate failed');
+      toast.error(t('api_partners.toasts.activate_failed'));
     }
   };
 
   const handleRegenerate = async (id: number) => {
-    if (!window.confirm('Regenerate credentials? The old client_id/client_secret will be revoked immediately.')) return;
+    if (!window.confirm(t('api_partners.confirm.regenerate_credentials'))) return;
     try {
       const res = await api.post<{ credentials: IssuedCredentials }>(
         `/v2/admin/api-partners/${id}/regenerate-credentials`,
       );
       if (res.data?.credentials) setCredsModal(res.data.credentials);
     } catch {
-      toast.error('Regenerate failed');
+      toast.error(t('api_partners.toasts.regenerate_failed'));
     }
   };
 
@@ -181,11 +181,11 @@ export default function ApiPartnersAdminPage() {
   return (
     <div className="p-6">
       <PageHeader
-        title="API Partners"
-        description="Provision and manage external integrations (banks, payment processors, admin systems) that call the Partner API."
+        title={t('api_partners.header.title')}
+        description={t('api_partners.header.description')}
         actions={
           <Button color="primary" startContent={<Plus size={16} />} onPress={() => setCreateOpen(true)}>
-            New partner
+            {t('api_partners.actions.new_partner')}
           </Button>
         }
       />
@@ -198,18 +198,18 @@ export default function ApiPartnersAdminPage() {
             </div>
           ) : partners.length === 0 ? (
             <div className="p-10 text-center text-[var(--color-text-muted)]">
-              No partners yet. Create one to issue client credentials.
+              {t('api_partners.empty.no_partners')}
             </div>
           ) : (
-            <Table aria-label="API partners" removeWrapper>
+            <Table aria-label={t('api_partners.table.aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>Name</TableColumn>
-                <TableColumn>Slug</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Sandbox</TableColumn>
-                <TableColumn>Rate limit</TableColumn>
-                <TableColumn>Scopes</TableColumn>
-                <TableColumn>Actions</TableColumn>
+                <TableColumn>{t('api_partners.columns.name')}</TableColumn>
+                <TableColumn>{t('api_partners.columns.slug')}</TableColumn>
+                <TableColumn>{t('api_partners.columns.status')}</TableColumn>
+                <TableColumn>{t('api_partners.columns.sandbox')}</TableColumn>
+                <TableColumn>{t('api_partners.columns.rate_limit')}</TableColumn>
+                <TableColumn>{t('api_partners.columns.scopes')}</TableColumn>
+                <TableColumn>{t('api_partners.columns.actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {partners.map((p) => (
@@ -218,19 +218,19 @@ export default function ApiPartnersAdminPage() {
                     <TableCell className="font-mono text-xs">{p.slug}</TableCell>
                     <TableCell>
                       <Chip size="sm" color={statusColor(p.status)} variant="flat">
-                        {p.status}
+                        {t(`api_partners.status.${p.status}`)}
                       </Chip>
                     </TableCell>
-                    <TableCell>{p.is_sandbox ? 'Yes' : 'No'}</TableCell>
-                    <TableCell>{p.rate_limit_per_minute}/min</TableCell>
-                    <TableCell className="text-xs">{p.allowed_scopes.join(', ') || '—'}</TableCell>
+                    <TableCell>{p.is_sandbox ? t('api_partners.common.yes') : t('api_partners.common.no')}</TableCell>
+                    <TableCell>{t('api_partners.common.per_minute', { value: p.rate_limit_per_minute })}</TableCell>
+                    <TableCell className="text-xs">{p.allowed_scopes.join(', ') || t('api_partners.common.empty_dash')}</TableCell>
                     <TableCell>
                       <div className="flex gap-1">
                         <Button
                           size="sm"
                           variant="light"
                           isIconOnly
-                          aria-label="View call log"
+                          aria-label={t('api_partners.actions.view_call_log')}
                           onPress={() => openDetail(p)}
                         >
                           <Eye size={16} />
@@ -239,7 +239,7 @@ export default function ApiPartnersAdminPage() {
                           size="sm"
                           variant="light"
                           isIconOnly
-                          aria-label="Regenerate credentials"
+                          aria-label={t('api_partners.actions.regenerate_credentials')}
                           onPress={() => handleRegenerate(p.id)}
                         >
                           <RefreshCw size={16} />
@@ -249,7 +249,7 @@ export default function ApiPartnersAdminPage() {
                             size="sm"
                             variant="light"
                             isIconOnly
-                            aria-label="Suspend"
+                            aria-label={t('api_partners.actions.suspend')}
                             onPress={() => handleSuspend(p.id)}
                           >
                             <Pause size={16} />
@@ -259,7 +259,7 @@ export default function ApiPartnersAdminPage() {
                             size="sm"
                             variant="light"
                             isIconOnly
-                            aria-label="Activate"
+                            aria-label={t('api_partners.actions.activate')}
                             onPress={() => handleActivate(p.id)}
                           >
                             <Play size={16} />
@@ -293,34 +293,34 @@ export default function ApiPartnersAdminPage() {
             {detailPartner?.name} <span className="text-sm text-[var(--color-text-muted)] ml-2">{detailPartner?.slug}</span>
           </ModalHeader>
           <ModalBody>
-            <Tabs aria-label="Partner detail tabs">
-              <Tab key="info" title="Info">
+            <Tabs aria-label={t('api_partners.detail.tabs_aria')}>
+              <Tab key="info" title={t('api_partners.detail.info_tab')}>
                 <div className="text-sm space-y-2">
-                  <div><strong>Status:</strong> {detailPartner?.status}</div>
-                  <div><strong>Sandbox:</strong> {detailPartner?.is_sandbox ? 'Yes' : 'No'}</div>
-                  <div><strong>Rate limit:</strong> {detailPartner?.rate_limit_per_minute}/min</div>
-                  <div><strong>Scopes:</strong> {detailPartner?.allowed_scopes.join(', ') || '—'}</div>
-                  <div><strong>IP allowlist:</strong> {detailPartner?.allowed_ip_cidrs.join(', ') || 'any'}</div>
-                  <div><strong>Contact:</strong> {detailPartner?.contact_email || '—'}</div>
+                  <div><strong>{t('api_partners.detail.status')}</strong> {detailPartner ? t(`api_partners.status.${detailPartner.status}`) : t('api_partners.common.empty_dash')}</div>
+                  <div><strong>{t('api_partners.detail.sandbox')}</strong> {detailPartner?.is_sandbox ? t('api_partners.common.yes') : t('api_partners.common.no')}</div>
+                  <div><strong>{t('api_partners.detail.rate_limit')}</strong> {t('api_partners.common.per_minute', { value: detailPartner?.rate_limit_per_minute ?? 0 })}</div>
+                  <div><strong>{t('api_partners.detail.scopes')}</strong> {detailPartner?.allowed_scopes.join(', ') || t('api_partners.common.empty_dash')}</div>
+                  <div><strong>{t('api_partners.detail.ip_allowlist')}</strong> {detailPartner?.allowed_ip_cidrs.join(', ') || t('api_partners.common.any')}</div>
+                  <div><strong>{t('api_partners.detail.contact')}</strong> {detailPartner?.contact_email || t('api_partners.common.empty_dash')}</div>
                 </div>
               </Tab>
-              <Tab key="log" title="Call log">
+              <Tab key="log" title={t('api_partners.detail.call_log_tab')}>
                 {callLogLoading ? (
                   <div className="p-6 flex justify-center">
                     <Spinner />
                   </div>
                 ) : callLog.length === 0 ? (
                   <div className="p-6 text-center text-[var(--color-text-muted)]">
-                    No calls yet.
+                    {t('api_partners.empty.no_calls')}
                   </div>
                 ) : (
-                  <Table aria-label="Recent calls" removeWrapper>
+                  <Table aria-label={t('api_partners.call_log.table_aria')} removeWrapper>
                     <TableHeader>
-                      <TableColumn>When</TableColumn>
-                      <TableColumn>Method</TableColumn>
-                      <TableColumn>Path</TableColumn>
-                      <TableColumn>Status</TableColumn>
-                      <TableColumn>Duration</TableColumn>
+                      <TableColumn>{t('api_partners.call_log.columns.when')}</TableColumn>
+                      <TableColumn>{t('api_partners.call_log.columns.method')}</TableColumn>
+                      <TableColumn>{t('api_partners.call_log.columns.path')}</TableColumn>
+                      <TableColumn>{t('api_partners.call_log.columns.status')}</TableColumn>
+                      <TableColumn>{t('api_partners.call_log.columns.duration')}</TableColumn>
                     </TableHeader>
                     <TableBody>
                       {callLog.map((c) => (
@@ -331,7 +331,7 @@ export default function ApiPartnersAdminPage() {
                           </TableCell>
                           <TableCell className="font-mono text-xs">{c.path}</TableCell>
                           <TableCell>{c.status_code}</TableCell>
-                          <TableCell>{c.response_time_ms} ms</TableCell>
+                          <TableCell>{t('api_partners.common.milliseconds', { value: c.response_time_ms })}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -342,7 +342,7 @@ export default function ApiPartnersAdminPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={() => setDetailPartner(null)}>
-              Close
+              {t('api_partners.actions.close')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -362,6 +362,7 @@ function CreatePartnerModal({
   onClose: () => void;
   onCreated: (creds: IssuedCredentials) => void;
 }) {
+  const { t } = useTranslation('admin');
   const toast = useToast();
   const [name, setName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
@@ -382,7 +383,7 @@ function CreatePartnerModal({
 
   const handleSubmit = async () => {
     if (!name.trim()) {
-      toast.error('Name is required');
+      toast.error(t('api_partners.toasts.name_required'));
       return;
     }
     setSubmitting(true);
@@ -399,13 +400,13 @@ function CreatePartnerModal({
         },
       );
       if (!res.data?.credentials) {
-        toast.error('Create failed');
+        toast.error(t('api_partners.toasts.create_failed'));
         return;
       }
       reset();
       onCreated(res.data.credentials);
     } catch {
-      toast.error('Create failed');
+      toast.error(t('api_partners.toasts.create_failed'));
     } finally {
       setSubmitting(false);
     }
@@ -420,31 +421,31 @@ function CreatePartnerModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl">
       <ModalContent>
-        <ModalHeader>New API partner</ModalHeader>
+        <ModalHeader>{t('api_partners.create_modal.title')}</ModalHeader>
         <ModalBody>
           <div className="space-y-4">
             <Input
-              label="Name"
+              label={t('api_partners.create_modal.name')}
               value={name}
               onValueChange={setName}
-              placeholder="e.g. PostFinance Switzerland"
+              placeholder={t('api_partners.create_modal.name_placeholder')}
               isRequired
             />
             <Input
-              label="Contact email"
+              label={t('api_partners.create_modal.contact_email')}
               value={contactEmail}
               onValueChange={setContactEmail}
-              placeholder="integrations@partner.example"
+              placeholder={t('api_partners.create_modal.contact_email_placeholder')}
               type="email"
             />
             <Textarea
-              label="Description"
+              label={t('api_partners.create_modal.description')}
               value={description}
               onValueChange={setDescription}
               minRows={2}
             />
             <div>
-              <label className="text-sm font-medium block mb-2">Allowed scopes</label>
+              <label className="text-sm font-medium block mb-2">{t('api_partners.create_modal.allowed_scopes')}</label>
               <div className="flex flex-wrap gap-2">
                 {ALL_SCOPES.map((s) => (
                   <Chip
@@ -460,7 +461,7 @@ function CreatePartnerModal({
               </div>
             </div>
             <Input
-              label="Rate limit (requests / minute)"
+              label={t('api_partners.create_modal.rate_limit')}
               value={rateLimit}
               onValueChange={setRateLimit}
               type="number"
@@ -468,16 +469,16 @@ function CreatePartnerModal({
               max={6000}
             />
             <Switch isSelected={sandbox} onValueChange={setSandbox}>
-              Sandbox mode (read-only — writes will be rejected)
+              {t('api_partners.create_modal.sandbox_mode')}
             </Switch>
           </div>
         </ModalBody>
         <ModalFooter>
           <Button variant="light" onPress={onClose} isDisabled={submitting}>
-            Cancel
+            {t('api_partners.actions.cancel')}
           </Button>
           <Button color="primary" onPress={handleSubmit} isLoading={submitting}>
-            Create &amp; issue credentials
+            {t('api_partners.create_modal.submit')}
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -494,14 +495,15 @@ function CredentialsModal({
   credentials: IssuedCredentials | null;
   onClose: () => void;
 }) {
+  const { t } = useTranslation('admin');
   const toast = useToast();
 
   const copy = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success(`${label} copied`);
+      toast.success(t('api_partners.toasts.copied', { label }));
     } catch {
-      toast.error('Copy failed — copy manually');
+      toast.error(t('api_partners.toasts.copy_failed'));
     }
   };
 
@@ -509,36 +511,36 @@ function CredentialsModal({
     <Modal isOpen={credentials !== null} onClose={onClose} size="2xl" isDismissable={false}>
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
-          <Key size={18} /> Client credentials issued
+          <Key size={18} /> {t('api_partners.credentials_modal.title')}
         </ModalHeader>
         <ModalBody>
           <div className="bg-warning-50 dark:bg-warning-100/10 border border-warning-200 rounded p-3 text-sm mb-4">
-            <strong>Save these now.</strong> The client secret will not be shown again. Hand them to your partner via a secure channel.
+            <strong>{t('api_partners.credentials_modal.warning_title')}</strong> {t('api_partners.credentials_modal.warning_body')}
           </div>
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-[var(--color-text-muted)] block mb-1">client_id</label>
+              <label className="text-xs text-[var(--color-text-muted)] block mb-1">{t('api_partners.credentials_modal.client_id')}</label>
               <div className="flex gap-2">
                 <Input value={credentials?.client_id ?? ''} readOnly className="font-mono" />
                 <Button
                   isIconOnly
                   variant="flat"
-                  aria-label="Copy client_id"
-                  onPress={() => credentials && copy(credentials.client_id, 'client_id')}
+                  aria-label={t('api_partners.credentials_modal.copy_client_id')}
+                  onPress={() => credentials && copy(credentials.client_id, t('api_partners.credentials_modal.client_id'))}
                 >
                   <Copy size={16} />
                 </Button>
               </div>
             </div>
             <div>
-              <label className="text-xs text-[var(--color-text-muted)] block mb-1">client_secret</label>
+              <label className="text-xs text-[var(--color-text-muted)] block mb-1">{t('api_partners.credentials_modal.client_secret')}</label>
               <div className="flex gap-2">
                 <Input value={credentials?.client_secret ?? ''} readOnly className="font-mono" />
                 <Button
                   isIconOnly
                   variant="flat"
-                  aria-label="Copy client_secret"
-                  onPress={() => credentials && copy(credentials.client_secret, 'client_secret')}
+                  aria-label={t('api_partners.credentials_modal.copy_client_secret')}
+                  onPress={() => credentials && copy(credentials.client_secret, t('api_partners.credentials_modal.client_secret'))}
                 >
                   <Copy size={16} />
                 </Button>
@@ -548,7 +550,7 @@ function CredentialsModal({
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onPress={onClose}>
-            I have saved these
+            {t('api_partners.credentials_modal.saved_button')}
           </Button>
         </ModalFooter>
       </ModalContent>
