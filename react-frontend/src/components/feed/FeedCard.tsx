@@ -1512,8 +1512,8 @@ const FeedCard = React.memo(function FeedCard({
         <Divider className="mb-1" />
 
         {/* Action Buttons — reactions + comment as primary; share + bookmark as ghost icon-only secondary actions */}
-        <div className="flex items-center justify-between gap-1 -mx-1">
-          <div className="flex items-center gap-1 min-w-0 flex-1">
+        <div className="flex flex-wrap items-center justify-between gap-1 -mx-1">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
             {/*
               ReactionPicker is shown for reactable feed item types only.
               Notification-style cards (level_up, badge_earned) are not user-authored
@@ -1566,7 +1566,7 @@ const FeedCard = React.memo(function FeedCard({
             )}
           </div>
 
-          <div className="flex items-center gap-0.5 flex-shrink-0">
+          <div className="ml-auto flex shrink-0 items-center gap-0.5">
             {/*
               Share button — polymorphic. Available for every type in SHAREABLE_TYPES
               (post, listing, event, poll, job, blog, discussion, goal, challenge, volunteer).

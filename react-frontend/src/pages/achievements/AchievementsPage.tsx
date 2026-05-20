@@ -1764,7 +1764,7 @@ export function AchievementsPage() {
                       {filteredBadges.map((badge) => (
                         <motion.div key={badge.badge_key} variants={itemVariants}>
                           <GlassCard
-                            className={`p-4 text-center hover:scale-105 transition-transform cursor-pointer ${
+                            className={`flex h-full min-h-[180px] flex-col p-4 text-center transition-transform motion-safe:hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer ${
                               !badge.earned_at && badge.earned === false ? 'opacity-40' : ''
                             }`}
                             role="button"
@@ -1781,7 +1781,7 @@ export function AchievementsPage() {
                             <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center text-2xl">
                               {badge.icon || <Medal className="w-7 h-7 text-amber-400" aria-hidden="true" />}
                             </div>
-                            <h3 className="font-semibold text-theme-primary text-sm mb-1 truncate">{badge.name}</h3>
+                            <h3 className="font-semibold text-theme-primary text-sm mb-1 line-clamp-2">{badge.name}</h3>
                             <p className="text-xs text-theme-muted line-clamp-2">{badge.description}</p>
                             {!!badge.is_showcased && (
                               <Chip size="sm" color="warning" variant="flat" className="mt-2">

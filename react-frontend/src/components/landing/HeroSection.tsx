@@ -69,7 +69,7 @@ export function HeroSection({ content }: HeroSectionProps) {
           <motion.h1
             id="hero-heading"
             variants={fadeInUp}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
           >
             <span className="text-theme-primary">{headline1}</span>
             <br />

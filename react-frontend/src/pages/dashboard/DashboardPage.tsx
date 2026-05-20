@@ -711,10 +711,10 @@ function QuickActionLink({ to, icon, label }: QuickActionLinkProps) {
       as={Link}
       to={to}
       variant="flat"
-      className="h-auto min-h-24 flex-col gap-2 rounded-lg border border-theme-default bg-theme-elevated px-3 py-3 text-center text-theme-secondary data-[hover=true]:border-theme-default data-[hover=true]:bg-theme-hover data-[hover=true]:text-theme-primary"
+      className="h-auto min-h-24 min-w-0 flex-col gap-2 rounded-lg border border-theme-default bg-theme-elevated px-3 py-3 text-center text-theme-secondary data-[hover=true]:border-theme-default data-[hover=true]:bg-theme-hover data-[hover=true]:text-theme-primary"
     >
       <span className="text-[var(--color-primary)] [&>svg]:h-5 [&>svg]:w-5">{icon}</span>
-      <span className="max-w-full text-xs font-medium leading-tight">{label}</span>
+      <span className="max-w-full whitespace-normal break-words text-center text-xs font-medium leading-tight">{label}</span>
     </Button>
   );
 }

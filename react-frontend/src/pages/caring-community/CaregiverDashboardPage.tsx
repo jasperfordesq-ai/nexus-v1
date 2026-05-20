@@ -256,20 +256,26 @@ function LinkCard({ link, t, tenantPath }: LinkCardProps) {
               <SchedulePanel caredForId={link.cared_for_id} t={t} />
             </AccordionItem>
           </Accordion>
-          <Link
+          <Button
+            as={Link}
             to={`${tenantPath('/caring-community/request-help')}?on_behalf_of=${link.cared_for_id}`}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-theme-default px-3 py-1.5 text-sm font-medium text-theme-primary hover:bg-theme-elevated transition-colors"
+            size="sm"
+            variant="bordered"
+            className="w-full justify-start sm:w-auto"
+            startContent={<HeartHandshake className="h-4 w-4" aria-hidden="true" />}
           >
-            <HeartHandshake className="h-4 w-4" aria-hidden="true" />
             {t('caregiver.request_on_behalf')}
-          </Link>
-          <Link
+          </Button>
+          <Button
+            as={Link}
             to={tenantPath('/caring-community/caregiver/cover')}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-theme-default px-3 py-1.5 text-sm font-medium text-theme-primary hover:bg-theme-elevated transition-colors"
+            size="sm"
+            variant="bordered"
+            className="w-full justify-start sm:w-auto"
+            startContent={<UserRoundCheck className="h-4 w-4" aria-hidden="true" />}
           >
-            <UserRoundCheck className="h-4 w-4" aria-hidden="true" />
             {t('cover.title')}
-          </Link>
+          </Button>
         </div>
       </div>
     </GlassCard>
