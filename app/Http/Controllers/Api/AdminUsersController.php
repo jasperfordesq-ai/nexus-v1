@@ -612,51 +612,7 @@ class AdminUsersController extends BaseApiController
         ActivityLog::log($adminId, 'admin_suspend_user', "Suspended user #{$id}: {$reason}");
         $this->auditLogService->logUserSuspended($adminId, $id, $reason);
 
-        // Notify the suspended user (bell + email — they may not be able to log in)
-        $recipientLocale = $user['preferred_language'] ?? null;
-        try {
-            LocaleContext::withLocale($recipientLocale, function () use ($id) {
-                Notification::createNotification(
-                    $id,
-                    __('emails_misc.admin_actions.suspension_bell'),
-                    null,
-                    'system',
-                    true
-                );
-            });
-        } catch (\Throwable $e) {
-            Log::warning("[AdminUsers] Failed to create suspension bell notification for user #{$id}: " . $e->getMessage());
-        }
-
-        try {
-            LocaleContext::withLocale($recipientLocale, function () use ($user, $id) {
-                $tenant = $this->resolveUserTenant($user);
-                $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
-                $tenantName = $tenant['name'];
-
-                $html = EmailTemplateBuilder::make()
-                    ->theme('warning')
-                    ->greeting(__('emails_misc.admin_actions.suspension_greeting', ['name' => $firstName]))
-                    ->paragraph(__('emails_misc.admin_actions.suspension_body', ['community' => $tenantName]))
-                    ->paragraph(__('emails_misc.admin_actions.suspension_help'))
-                    ->render();
-
-                if (!EmailDispatchService::sendRaw(
-                    $user['email'],
-                    __('emails_misc.admin_actions.suspension_subject', ['community' => $tenantName]),
-                    $html,
-                    null,
-                    null,
-                    null,
-                    'admin_user_status',
-                    ['tenant_id' => $tenant['tenant_id']]
-                )) {
-                    Log::warning("[AdminUsers] Suspension email send returned false for user #{$id}");
-                }
-            });
-        } catch (\Throwable $e) {
-            Log::warning("[AdminUsers] Failed to send suspension email to user #{$id}: " . $e->getMessage());
-        }
+        $this->notifySuspendedUser($user, $id);
 
         return $this->respondWithData(['suspended' => true, 'id' => $id]);
     }
@@ -1345,49 +1301,84 @@ class AdminUsersController extends BaseApiController
             $hashedToken = hash('sha256', $token);
             $userTenantId = (int) $user['tenant_id'];
 
-            // Store in password_resets table (same as user-initiated flow)
-            DB::delete("DELETE FROM password_resets WHERE email = ? AND tenant_id = ?", [$user['email'], $userTenantId]);
-            DB::insert(
-                "INSERT INTO password_resets (email, tenant_id, token, created_at) VALUES (?, ?, ?, NOW())",
-                [$user['email'], $userTenantId, $hashedToken]
-            );
+            $existingResetRows = DB::table('password_resets')
+                ->where('email', $user['email'])
+                ->where('tenant_id', $userTenantId)
+                ->get()
+                ->map(fn ($row): array => (array) $row)
+                ->all();
 
-            LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $adminId, $id, $token) {
-                $tenant = $this->resolveUserTenant($user);
-                $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
-
-                $resetLink = $tenant['frontend_url'] . $tenant['slug_prefix'] . "/password/reset?token={$token}";
-
-                $firstName = htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8');
-                $html = \App\Core\EmailTemplateBuilder::make()
-                    ->theme('warning')
-                    ->title(__('emails_misc.admin_actions.password_reset_title'))
-                    ->greeting(__('emails_misc.admin_actions.password_reset_greeting', ['name' => $firstName]))
-                    ->paragraph(__('emails_misc.admin_actions.password_reset_body'))
-                    ->button(__('emails_misc.admin_actions.password_reset_cta'), $resetLink)
-                    ->render();
-
-                if (!EmailDispatchService::sendRaw(
-                    $user['email'],
-                    __('emails_misc.admin_actions.password_reset_subject', ['community' => $tenantNameSafe]),
-                    $html,
-                    null,
-                    null,
-                    null,
-                    'password_reset',
-                    ['tenant_id' => $tenant['tenant_id']]
-                )) {
-                    throw new \RuntimeException('Password reset email send returned false');
-                }
-
-                ActivityLog::log($adminId, 'admin_send_password_reset', "Sent password reset email to user #{$id} ({$user['email']})");
+            DB::transaction(function () use ($user, $userTenantId, $hashedToken): void {
+                DB::delete("DELETE FROM password_resets WHERE email = ? AND tenant_id = ?", [$user['email'], $userTenantId]);
+                DB::insert(
+                    "INSERT INTO password_resets (email, tenant_id, token, created_at) VALUES (?, ?, ?, NOW())",
+                    [$user['email'], $userTenantId, $hashedToken]
+                );
             });
+
+            try {
+                $resetEmailSent = (bool) LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $id, $token) {
+                    $tenant = $this->resolveUserTenant($user);
+                    $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+
+                    $resetLink = $tenant['frontend_url'] . $tenant['slug_prefix'] . "/password/reset?token={$token}";
+
+                    $firstName = htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8');
+                    $html = \App\Core\EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('emails_misc.admin_actions.password_reset_title'))
+                        ->greeting(__('emails_misc.admin_actions.password_reset_greeting', ['name' => $firstName]))
+                        ->paragraph(__('emails_misc.admin_actions.password_reset_body'))
+                        ->button(__('emails_misc.admin_actions.password_reset_cta'), $resetLink)
+                        ->render();
+
+                    return EmailDispatchService::sendRaw(
+                        $user['email'],
+                        __('emails_misc.admin_actions.password_reset_subject', ['community' => $tenantNameSafe]),
+                        $html,
+                        null,
+                        null,
+                        null,
+                        'password_reset',
+                        ['tenant_id' => $tenant['tenant_id']]
+                    );
+                });
+            } catch (\Throwable $sendException) {
+                $this->restorePasswordResetRows($user['email'], $userTenantId, $existingResetRows);
+                throw $sendException;
+            }
+
+            if (!$resetEmailSent) {
+                $this->restorePasswordResetRows($user['email'], $userTenantId, $existingResetRows);
+                throw new \RuntimeException('Password reset email send returned false');
+            }
+
+            ActivityLog::log($adminId, 'admin_send_password_reset', "Sent password reset email to user #{$id} ({$user['email']})");
 
             return $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to send password reset email for user #{$id}: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'password reset email']), null, 500);
         }
+    }
+
+    /**
+     * @param list<array<string,mixed>> $rows
+     */
+    private function restorePasswordResetRows(string $email, int $tenantId, array $rows): void
+    {
+        DB::transaction(function () use ($email, $tenantId, $rows): void {
+            DB::delete("DELETE FROM password_resets WHERE email = ? AND tenant_id = ?", [$email, $tenantId]);
+
+            foreach ($rows as $row) {
+                DB::table('password_resets')->insert([
+                    'email' => $row['email'],
+                    'tenant_id' => $row['tenant_id'],
+                    'token' => $row['token'],
+                    'created_at' => $row['created_at'],
+                ]);
+            }
+        });
     }
 
     /** POST /api/v2/admin/users/{id}/send-welcome-email */
@@ -1722,6 +1713,54 @@ class AdminUsersController extends BaseApiController
             'slug_prefix'  => $slugPrefix,
             'frontend_url' => $frontendUrl,
         ];
+    }
+
+    private function notifySuspendedUser(array $user, int $id): void
+    {
+        $recipientLocale = $user['preferred_language'] ?? null;
+        try {
+            LocaleContext::withLocale($recipientLocale, function () use ($id) {
+                Notification::createNotification(
+                    $id,
+                    __('emails_misc.admin_actions.suspension_bell'),
+                    null,
+                    'system',
+                    true
+                );
+            });
+        } catch (\Throwable $e) {
+            Log::warning("[AdminUsers] Failed to create suspension bell notification for user #{$id}: " . $e->getMessage());
+        }
+
+        try {
+            LocaleContext::withLocale($recipientLocale, function () use ($user, $id) {
+                $tenant = $this->resolveUserTenant($user);
+                $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
+                $tenantName = $tenant['name'];
+
+                $html = EmailTemplateBuilder::make()
+                    ->theme('warning')
+                    ->greeting(__('emails_misc.admin_actions.suspension_greeting', ['name' => $firstName]))
+                    ->paragraph(__('emails_misc.admin_actions.suspension_body', ['community' => $tenantName]))
+                    ->paragraph(__('emails_misc.admin_actions.suspension_help'))
+                    ->render();
+
+                if (!EmailDispatchService::sendRaw(
+                    $user['email'],
+                    __('emails_misc.admin_actions.suspension_subject', ['community' => $tenantName]),
+                    $html,
+                    null,
+                    null,
+                    null,
+                    'admin_user_status',
+                    ['tenant_id' => $tenant['tenant_id']]
+                )) {
+                    Log::warning("[AdminUsers] Suspension email send returned false for user #{$id}");
+                }
+            });
+        } catch (\Throwable $e) {
+            Log::warning("[AdminUsers] Failed to send suspension email to user #{$id}: " . $e->getMessage());
+        }
     }
 
     /**
@@ -2110,11 +2149,11 @@ class AdminUsersController extends BaseApiController
         [$ids, $err] = $this->parseBulkIds('user_ids');
         if ($err) return $err;
 
-        $reason = (string) $this->input('reason', 'Suspended by admin (bulk)');
+        $reason = (string) $this->input('reason', __('svc_notifications.suspended_by_admin'));
 
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $eligible = DB::select(
-            "SELECT id, is_super_admin, is_tenant_super_admin
+            "SELECT id, tenant_id, email, first_name, preferred_language, is_super_admin, is_tenant_super_admin
              FROM users WHERE tenant_id = ? AND id IN ({$placeholders})",
             array_merge([$tenantId], $ids)
         );
@@ -2151,6 +2190,13 @@ class AdminUsersController extends BaseApiController
                     "UPDATE users SET status = 'suspended' WHERE id = ? AND tenant_id = ?",
                     [$id, $tenantId]
                 );
+                $this->notifySuspendedUser([
+                    'id' => (int) $row->id,
+                    'tenant_id' => (int) $row->tenant_id,
+                    'email' => (string) $row->email,
+                    'first_name' => $row->first_name ?? null,
+                    'preferred_language' => $row->preferred_language ?? null,
+                ], $id);
                 $touchedIds[] = $id;
                 $success++;
             } catch (\Throwable $e) {

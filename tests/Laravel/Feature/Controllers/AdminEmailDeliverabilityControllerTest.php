@@ -152,6 +152,152 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         $this->assertSame(['marketplace_report_notifications'], $sources);
     }
 
+    public function test_queues_endpoint_surfaces_marketplace_rating_and_dispute_email_evidence(): void
+    {
+        foreach (['marketplace_listings', 'marketplace_orders', 'marketplace_seller_ratings', 'marketplace_disputes'] as $table) {
+            if (!Schema::hasTable($table)) {
+                $this->markTestSkipped("{$table} table is not available.");
+            }
+        }
+
+        foreach (['marketplace_seller_ratings', 'marketplace_disputes'] as $table) {
+            if (
+                !Schema::hasColumn($table, 'notification_email_sent_at')
+                || !Schema::hasColumn($table, 'notification_email_failed_at')
+                || !Schema::hasColumn($table, 'notification_email_last_error')
+            ) {
+                $this->markTestSkipped("{$table} email evidence columns are not available.");
+            }
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $buyer = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'marketplace-rating-dispute-buyer@example.test',
+        ]);
+        $seller = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'marketplace-rating-dispute-seller@example.test',
+        ]);
+        $otherTenantUser = User::factory()->forTenant(999)->create([
+            'email' => 'other-tenant-marketplace-evidence@example.test',
+        ]);
+        Sanctum::actingAs($admin);
+
+        $orderId = $this->createMarketplaceOrder($buyer->id, $seller->id, $this->testTenantId, 'audit-main');
+        $sentOrderId = $this->createMarketplaceOrder($buyer->id, $seller->id, $this->testTenantId, 'audit-sent');
+        $otherOrderId = $this->createMarketplaceOrder($otherTenantUser->id, $otherTenantUser->id, 999, 'audit-other');
+
+        DB::table('marketplace_seller_ratings')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'order_id' => $orderId,
+                'rater_id' => $buyer->id,
+                'ratee_id' => $seller->id,
+                'rater_role' => 'buyer',
+                'rating' => 5,
+                'comment' => 'Pending rating evidence',
+                'is_anonymous' => 0,
+                'notification_email_sent_at' => null,
+                'notification_email_failed_at' => null,
+                'notification_email_last_error' => null,
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(20),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'order_id' => $sentOrderId,
+                'rater_id' => $seller->id,
+                'ratee_id' => $buyer->id,
+                'rater_role' => 'seller',
+                'rating' => 4,
+                'comment' => 'Sent rating evidence',
+                'is_anonymous' => 0,
+                'notification_email_sent_at' => now()->subMinutes(5),
+                'notification_email_failed_at' => null,
+                'notification_email_last_error' => null,
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(5),
+            ],
+            [
+                'tenant_id' => 999,
+                'order_id' => $otherOrderId,
+                'rater_id' => $otherTenantUser->id,
+                'ratee_id' => $otherTenantUser->id,
+                'rater_role' => 'buyer',
+                'rating' => 3,
+                'comment' => 'Other tenant rating evidence',
+                'is_anonymous' => 0,
+                'notification_email_sent_at' => null,
+                'notification_email_failed_at' => now()->subMinutes(2),
+                'notification_email_last_error' => 'other tenant failure',
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(2),
+            ],
+        ]);
+
+        DB::table('marketplace_disputes')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'order_id' => $orderId,
+                'opened_by' => $buyer->id,
+                'reason' => 'other',
+                'description' => 'Failed dispute evidence',
+                'status' => 'open',
+                'notification_email_sent_at' => null,
+                'notification_email_failed_at' => now()->subMinutes(2),
+                'notification_email_last_error' => 'simulated dispute mail failure',
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(2),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'order_id' => $sentOrderId,
+                'opened_by' => $seller->id,
+                'reason' => 'not_received',
+                'description' => 'Sent dispute evidence',
+                'status' => 'under_review',
+                'notification_email_sent_at' => now()->subMinutes(4),
+                'notification_email_failed_at' => null,
+                'notification_email_last_error' => null,
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(4),
+            ],
+        ]);
+
+        $ratingResponse = $this->apiGet('/v2/admin/email-deliverability/queues?source=marketplace_seller_ratings&limit=10');
+        $ratingResponse->assertOk();
+        $ratingResponse->assertJsonPath('data.diagnostics.marketplace_seller_ratings.available', true);
+        $this->assertGreaterThanOrEqual(1, $ratingResponse->json('data.diagnostics.marketplace_seller_ratings.stale_pending'));
+        $this->assertGreaterThanOrEqual(1, $ratingResponse->json('data.diagnostics.marketplace_seller_ratings.status_counts.pending'));
+        $this->assertGreaterThanOrEqual(1, $ratingResponse->json('data.diagnostics.marketplace_seller_ratings.status_counts.sent'));
+        $this->assertSame(
+            ['marketplace_seller_ratings'],
+            collect($ratingResponse->json('data.rows'))->pluck('source')->unique()->values()->all()
+        );
+        $this->assertNotContains(
+            'other-tenant-marketplace-evidence@example.test',
+            collect($ratingResponse->json('data.rows'))->pluck('email')->all()
+        );
+
+        $disputeResponse = $this->apiGet('/v2/admin/email-deliverability/queues?source=marketplace_disputes&limit=10');
+        $disputeResponse->assertOk();
+        $disputeResponse->assertJsonPath('data.diagnostics.marketplace_disputes.available', true);
+        $this->assertGreaterThanOrEqual(1, $disputeResponse->json('data.diagnostics.marketplace_disputes.failed_recent'));
+        $this->assertGreaterThanOrEqual(1, $disputeResponse->json('data.diagnostics.marketplace_disputes.status_counts.failed'));
+        $this->assertGreaterThanOrEqual(1, $disputeResponse->json('data.diagnostics.marketplace_disputes.status_counts.sent'));
+        $this->assertSame(
+            ['marketplace_disputes'],
+            collect($disputeResponse->json('data.rows'))->pluck('source')->unique()->values()->all()
+        );
+        $this->assertContains(
+            'marketplace-rating-dispute-seller@example.test',
+            collect($disputeResponse->json('data.rows'))->pluck('email')->all()
+        );
+        $this->assertNotContains(
+            'marketplace-rating-dispute-buyer@example.test',
+            collect($disputeResponse->json('data.rows'))->where('subject', 'Failed dispute evidence')->pluck('email')->all()
+        );
+    }
+
     public function test_queues_endpoint_surfaces_event_reminders(): void
     {
         if (!Schema::hasTable('event_reminders') || !Schema::hasTable('events')) {
@@ -997,5 +1143,38 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         $this->assertSame(['vol_donations'], $rows->pluck('source')->unique()->values()->all());
         $this->assertSame('failed', $rows->first()['status'] ?? null);
         $this->assertSame('donation-receipt-queue@example.test', $rows->first()['email'] ?? null);
+    }
+
+    private function createMarketplaceOrder(int $buyerId, int $sellerId, int $tenantId, string $suffix): int
+    {
+        $listingId = DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => $sellerId,
+            'title' => 'Email Evidence Listing ' . $suffix,
+            'description' => 'Marketplace email evidence diagnostic listing',
+            'price' => 10.00,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'quantity' => 1,
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return DB::table('marketplace_orders')->insertGetId([
+            'tenant_id' => $tenantId,
+            'order_number' => 'AUDIT-' . $suffix . '-' . uniqid(),
+            'buyer_id' => $buyerId,
+            'seller_id' => $sellerId,
+            'marketplace_listing_id' => $listingId,
+            'quantity' => 1,
+            'unit_price' => 10.00,
+            'total_price' => 10.00,
+            'currency' => 'EUR',
+            'status' => 'completed',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

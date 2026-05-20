@@ -42,6 +42,13 @@ class JobExpiryNotificationService
                 try {
                     TenantContext::setById($tenant->id);
 
+                    DB::table('job_expiry_notifications')
+                        ->where('tenant_id', $tenant->id)
+                        ->where('notification_type', 'expiring_soon')
+                        ->whereNull('sent_at')
+                        ->where('created_at', '<', now()->subHour())
+                        ->delete();
+
                     $vacancies = JobVacancy::with(['creator:id,first_name,last_name,email,preferred_language'])
                         ->where('status', 'open')
                         ->whereNotNull('deadline')
@@ -59,6 +66,20 @@ class JobExpiryNotificationService
                     foreach ($vacancies as $vacancy) {
                         try {
                             $daysLeft = (int) now()->diffInDays($vacancy->deadline);
+                            $claimTime = now();
+
+                            $inserted = DB::table('job_expiry_notifications')->insertOrIgnore([
+                                'tenant_id' => $vacancy->tenant_id,
+                                'vacancy_id' => $vacancy->id,
+                                'notification_type' => 'expiring_soon',
+                                'sent_at' => null,
+                                'created_at' => $claimTime,
+                                'updated_at' => $claimTime,
+                            ]);
+
+                            if ((int) $inserted === 0) {
+                                continue;
+                            }
 
                             // Render notification + email in the RECIPIENT's language, not
                             // the cron worker's default (which is always 'en' in queue context).
@@ -71,21 +92,24 @@ class JobExpiryNotificationService
                             });
 
                             if (!$emailOk) {
+                                DB::table('job_expiry_notifications')
+                                    ->where('tenant_id', $vacancy->tenant_id)
+                                    ->where('vacancy_id', $vacancy->id)
+                                    ->where('notification_type', 'expiring_soon')
+                                    ->whereNull('sent_at')
+                                    ->delete();
+
                                 continue;
                             }
 
-                            $inserted = DB::table('job_expiry_notifications')->insertOrIgnore([
-                                'tenant_id' => $vacancy->tenant_id,
-                                'vacancy_id' => $vacancy->id,
-                                'notification_type' => 'expiring_soon',
-                                'sent_at' => now(),
-                                'created_at' => now(),
-                                'updated_at' => now(),
-                            ]);
-
-                            if ((int) $inserted === 0) {
-                                continue;
-                            }
+                            DB::table('job_expiry_notifications')
+                                ->where('tenant_id', $vacancy->tenant_id)
+                                ->where('vacancy_id', $vacancy->id)
+                                ->where('notification_type', 'expiring_soon')
+                                ->update([
+                                    'sent_at' => now(),
+                                    'updated_at' => now(),
+                                ]);
 
                             LocaleContext::withLocale($vacancy->creator, function () use ($vacancy, $daysLeft): void {
                                 if ($vacancy->user_id) {

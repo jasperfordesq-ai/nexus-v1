@@ -162,7 +162,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
         $limit = max(1, min((int) ($this->input('limit', 50) ?: 50), 100));
         $status = trim((string) $this->input('status', ''));
         $source = trim((string) $this->input('source', ''));
-        $statuses = ['pending', 'processing', 'failed', 'suppressed'];
+        $statuses = ['pending', 'processing', 'failed', 'suppressed', 'sent'];
         if ($status !== '' && in_array($status, $statuses, true)) {
             $statuses = [$status];
         }
@@ -173,6 +173,8 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'civic_digest_delivery_claims' => $this->queueSourceDiagnostics('civic_digest_delivery_claims', $tenantId),
             'transaction_notification_deliveries' => $this->queueSourceDiagnostics('transaction_notification_deliveries', $tenantId),
             'marketplace_order_notification_deliveries' => $this->queueSourceDiagnostics('marketplace_order_notification_deliveries', $tenantId),
+            'marketplace_seller_ratings' => $this->queueSourceDiagnostics('marketplace_seller_ratings', $tenantId),
+            'marketplace_disputes' => $this->queueSourceDiagnostics('marketplace_disputes', $tenantId),
             'event_reminder_delivery_claims' => $this->queueSourceDiagnostics('event_reminder_delivery_claims', $tenantId),
             'vol_reminder_delivery_claims' => $this->queueSourceDiagnostics('vol_reminder_delivery_claims', $tenantId),
             'listing_expiry_reminders_sent' => $this->queueSourceDiagnostics('listing_expiry_reminders_sent', $tenantId),
@@ -769,6 +771,17 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->map(fn ($row) => $this->queueRow('vol_donations', $row));
         }
 
+        $marketplaceEmailEvidenceRows = collect();
+        foreach (array_keys($this->marketplaceEmailEvidenceSourceConfigs()) as $marketplaceSource) {
+            if (($source !== '' && $source !== $marketplaceSource) || !$this->hasMarketplaceEmailEvidenceColumns($marketplaceSource)) {
+                continue;
+            }
+
+            $marketplaceEmailEvidenceRows = $marketplaceEmailEvidenceRows->merge(
+                $this->marketplaceEmailEvidenceRows($marketplaceSource, $tenantId, $statuses, $limit)
+            );
+        }
+
         $federationSourceRows = collect();
         foreach (array_keys($this->federationDeliverySourceConfigs()) as $federationSource) {
             if (($source !== '' && $source !== $federationSource) || !$this->hasFederationDeliverySourceColumns($federationSource)) {
@@ -933,6 +946,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ->merge($volunteerReminderRows)
             ->merge($memberSubscriptionRows)
             ->merge($volDonationRows)
+            ->merge($marketplaceEmailEvidenceRows)
             ->merge($federationSourceRows)
             ->merge($reviewRows)
             ->merge($safeguardingReviewRows)
@@ -1364,6 +1378,40 @@ class AdminEmailDeliverabilityController extends BaseApiController
                     ->whereNull('vd.receipt_email_sent_at')
                     ->whereNull('vd.receipt_email_failed_at')
                     ->min('vd.created_at'),
+                'returned' => 0,
+            ];
+        }
+
+        if (array_key_exists($source, $this->marketplaceEmailEvidenceSourceConfigs())) {
+            if (!$this->hasMarketplaceEmailEvidenceColumns($source)) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $config = $this->marketplaceEmailEvidenceSourceConfigs()[$source];
+            $alias = $config['alias'];
+            $base = DB::table("{$source} as {$alias}")
+                ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.tenant_id", $tenantId));
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => $this->queueStatusCounts($base, $this->marketplaceEmailEvidenceStatusExpression($alias)),
+                'stale_pending' => (clone $base)
+                    ->whereNull("{$alias}.notification_email_sent_at")
+                    ->whereNull("{$alias}.notification_email_failed_at")
+                    ->where("{$alias}.created_at", '<', now()->subMinutes(15))
+                    ->count(),
+                'stale_processing' => 0,
+                'failed_recent' => (clone $base)
+                    ->whereNull("{$alias}.notification_email_sent_at")
+                    ->whereNotNull("{$alias}.notification_email_failed_at")
+                    ->where("{$alias}.notification_email_failed_at", '>=', now()->subDay())
+                    ->count(),
+                'suppressed_recent' => 0,
+                'oldest_pending_at' => (clone $base)
+                    ->whereNull("{$alias}.notification_email_sent_at")
+                    ->whereNull("{$alias}.notification_email_failed_at")
+                    ->min("{$alias}.created_at"),
                 'returned' => 0,
             ];
         }
@@ -2104,6 +2152,138 @@ class AdminEmailDeliverabilityController extends BaseApiController
         return "CASE
             WHEN vd.receipt_email_sent_at IS NOT NULL THEN 'sent'
             WHEN vd.receipt_email_failed_at IS NOT NULL THEN 'failed'
+            ELSE 'pending'
+        END";
+    }
+
+    /**
+     * @return array<string,array{alias:string,user_column:string,subject_column:string,category:string}>
+     */
+    private function marketplaceEmailEvidenceSourceConfigs(): array
+    {
+        return [
+            'marketplace_seller_ratings' => [
+                'alias' => 'msr',
+                'user_column' => 'ratee_id',
+                'subject_column' => 'comment',
+                'category' => 'marketplace_rating',
+            ],
+            'marketplace_disputes' => [
+                'alias' => 'md',
+                'user_column' => 'recipient_user_id',
+                'subject_column' => 'description',
+                'category' => 'marketplace_dispute',
+            ],
+        ];
+    }
+
+    private function hasMarketplaceEmailEvidenceColumns(string $source): bool
+    {
+        return Schema::hasTable($source)
+            && Schema::hasTable('users')
+            && Schema::hasColumn($source, 'tenant_id')
+            && Schema::hasColumn($source, 'notification_email_sent_at')
+            && Schema::hasColumn($source, 'notification_email_failed_at')
+            && Schema::hasColumn($source, 'notification_email_last_error')
+            && array_key_exists($source, $this->marketplaceEmailEvidenceSourceConfigs());
+    }
+
+    /**
+     * @param list<string> $statuses
+     */
+    private function marketplaceEmailEvidenceRows(string $source, ?int $tenantId, array $statuses, int $limit)
+    {
+        $config = $this->marketplaceEmailEvidenceSourceConfigs()[$source];
+        $alias = $config['alias'];
+        $userColumn = $config['user_column'];
+        $subjectColumn = $config['subject_column'];
+        $category = $config['category'];
+
+        $query = DB::table("{$source} as {$alias}")
+            ->when($source === 'marketplace_disputes', function ($q) use ($alias): void {
+                $q->leftJoin('marketplace_orders as mo', function ($join) use ($alias): void {
+                    $join->on('mo.id', '=', "{$alias}.order_id")
+                        ->on('mo.tenant_id', '=', "{$alias}.tenant_id");
+                });
+            })
+            ->leftJoin('users as u', function ($join) use ($source, $alias, $userColumn): void {
+                if ($source === 'marketplace_disputes') {
+                    $join->on('u.id', '=', DB::raw("CASE WHEN {$alias}.opened_by = mo.buyer_id THEN mo.seller_id ELSE mo.buyer_id END"))
+                        ->on('u.tenant_id', '=', "{$alias}.tenant_id");
+                    return;
+                }
+
+                $join->on('u.id', '=', "{$alias}.{$userColumn}")
+                    ->on('u.tenant_id', '=', "{$alias}.tenant_id");
+            })
+            ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.tenant_id", $tenantId));
+
+        $this->applyMarketplaceEmailEvidenceStatusFilter($query, $alias, $statuses);
+
+        return $query
+            ->orderByDesc("{$alias}.id")
+            ->limit($limit)
+            ->get([
+                "{$alias}.id",
+                "{$alias}.tenant_id",
+                DB::raw($source === 'marketplace_disputes'
+                    ? "CASE WHEN {$alias}.opened_by = mo.buyer_id THEN mo.seller_id ELSE mo.buyer_id END as user_id"
+                    : "{$alias}.{$userColumn} as user_id"),
+                'u.email',
+                DB::raw("'{$category}' as category"),
+                "{$alias}.{$subjectColumn} as subject",
+                DB::raw($this->marketplaceEmailEvidenceStatusExpression($alias) . ' as status'),
+                DB::raw('NULL as frequency'),
+                DB::raw('0 as attempts'),
+                DB::raw("COALESCE({$alias}.notification_email_failed_at, {$alias}.notification_email_sent_at, {$alias}.created_at) as last_attempted_at"),
+                "{$alias}.notification_email_last_error as error",
+                DB::raw('NULL as processing_batch_id'),
+                DB::raw('NULL as processing_started_at'),
+                "{$alias}.notification_email_sent_at as sent_at",
+                "{$alias}.created_at",
+            ])
+            ->map(fn ($row) => $this->queueRow($source, $row));
+    }
+
+    /**
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param list<string> $statuses
+     */
+    private function applyMarketplaceEmailEvidenceStatusFilter($query, string $alias, array $statuses): void
+    {
+        $relevantStatuses = array_intersect($statuses, ['pending', 'failed', 'sent']);
+        if ($relevantStatuses === []) {
+            $query->whereRaw('1 = 0');
+            return;
+        }
+
+        $query->where(function ($q) use ($statuses, $alias): void {
+            if (in_array('sent', $statuses, true)) {
+                $q->orWhereNotNull("{$alias}.notification_email_sent_at");
+            }
+
+            if (in_array('failed', $statuses, true)) {
+                $q->orWhere(function ($status) use ($alias): void {
+                    $status->whereNull("{$alias}.notification_email_sent_at")
+                        ->whereNotNull("{$alias}.notification_email_failed_at");
+                });
+            }
+
+            if (in_array('pending', $statuses, true)) {
+                $q->orWhere(function ($status) use ($alias): void {
+                    $status->whereNull("{$alias}.notification_email_sent_at")
+                        ->whereNull("{$alias}.notification_email_failed_at")
+                        ->where("{$alias}.created_at", '<', now()->subMinutes(15));
+                });
+            }
+        });
+    }
+
+    private function marketplaceEmailEvidenceStatusExpression(string $alias): string
+    {
+        return "CASE
+            WHEN {$alias}.notification_email_sent_at IS NOT NULL THEN 'sent'
+            WHEN {$alias}.notification_email_failed_at IS NOT NULL THEN 'failed'
             ELSE 'pending'
         END";
     }

@@ -534,7 +534,7 @@ class EmailTriggerAuditService
                         ->whereColumn('email_log.user_id', 'nq.user_id')
                         ->whereRaw("email_log.tenant_id = {$queuedTenantExpr}")
                         ->whereColumn('email_log.created_at', '>=', 'nq.created_at')
-                        ->whereIn('email_log.category', ['notification_queue', 'notification_digest'])
+                        ->whereIn('email_log.category', $this->notificationQueueEvidenceCategories())
                         ->whereIn('email_log.status', ['sent', 'delivered', 'bounced']);
                 })
                 ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$queuedTenantExpr} = ?", [$tenantId]))
@@ -544,6 +544,27 @@ class EmailTriggerAuditService
         }
 
         return $issues;
+    }
+
+    /**
+     * Categories that can prove a sent notification_queue row reached the
+     * central email dispatcher.
+     *
+     * @return list<string>
+     */
+    private function notificationQueueEvidenceCategories(): array
+    {
+        $categories = collect($this->eventMatrix())
+            ->filter(fn (array $entry) => ($entry['source_table'] ?? null) === 'notification_queue')
+            ->pluck('category')
+            ->push('notification_queue')
+            ->unique()
+            ->values()
+            ->all();
+
+        sort($categories);
+
+        return $categories;
     }
 
     /**

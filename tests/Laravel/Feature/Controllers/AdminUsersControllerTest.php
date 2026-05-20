@@ -7,8 +7,10 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
+use App\Services\EmailDispatchService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -163,6 +165,49 @@ class AdminUsersControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_bulk_suspend_notifies_each_suspended_user(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $first = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $second = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $mailer = new AdminUsersSuccessfulEmailDispatchService();
+        app()->instance(EmailDispatchService::class, $mailer);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/users/bulk-suspend', [
+            'user_ids' => [$first->id, $second->id],
+            'reason' => 'Policy review',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.success', 2);
+        $this->assertCount(2, $mailer->calls);
+        $this->assertEqualsCanonicalizing(
+            [$first->email, $second->email],
+            array_column($mailer->calls, 'to')
+        );
+        foreach ($mailer->calls as $call) {
+            $this->assertSame('admin_user_status', $call['options']['category']);
+            $this->assertSame($this->testTenantId, $call['options']['tenant_id']);
+        }
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $first->id)
+            ->where('type', 'system')
+            ->count());
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $second->id)
+            ->where('type', 'system')
+            ->count());
+    }
+
     // ================================================================
     // BAN — POST /v2/admin/users/{id}/ban
     // ================================================================
@@ -308,5 +353,94 @@ class AdminUsersControllerTest extends TestCase
         $response = $this->apiPost('/v2/admin/users/1/reset-2fa');
 
         $response->assertStatus(403);
+    }
+
+    public function test_send_password_reset_preserves_existing_token_when_email_send_fails(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'admin-reset-preserve-' . uniqid('', true) . '@example.test',
+            'status' => 'active',
+            'is_approved' => true,
+            'password_hash' => Hash::make('old-password-123'),
+        ]);
+        $oldToken = hash('sha256', 'previous-admin-reset-token');
+        DB::table('password_resets')->insert([
+            'email' => $user->email,
+            'tenant_id' => $this->testTenantId,
+            'token' => $oldToken,
+            'created_at' => now(),
+        ]);
+        app()->instance(EmailDispatchService::class, new AdminUsersFailingEmailDispatchService());
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/users/' . $user->id . '/send-password-reset');
+
+        $response->assertStatus(500);
+        $this->assertSame(1, DB::table('password_resets')
+            ->where('email', $user->email)
+            ->where('tenant_id', $this->testTenantId)
+            ->count());
+        $this->assertSame($oldToken, DB::table('password_resets')
+            ->where('email', $user->email)
+            ->where('tenant_id', $this->testTenantId)
+            ->value('token'));
+    }
+
+    public function test_send_password_reset_rotates_token_only_after_email_send_acceptance(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'admin-reset-rotate-' . uniqid('', true) . '@example.test',
+            'status' => 'active',
+            'is_approved' => true,
+            'password_hash' => Hash::make('old-password-123'),
+        ]);
+        $oldToken = hash('sha256', 'previous-admin-reset-token');
+        DB::table('password_resets')->insert([
+            'email' => $user->email,
+            'tenant_id' => $this->testTenantId,
+            'token' => $oldToken,
+            'created_at' => now(),
+        ]);
+        $mailer = new AdminUsersSuccessfulEmailDispatchService();
+        app()->instance(EmailDispatchService::class, $mailer);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/users/' . $user->id . '/send-password-reset');
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $mailer->calls);
+        $this->assertSame($user->email, $mailer->calls[0]['to']);
+        $this->assertSame('password_reset', $mailer->calls[0]['options']['category']);
+        $this->assertSame($this->testTenantId, $mailer->calls[0]['options']['tenant_id']);
+        $this->assertSame(1, DB::table('password_resets')
+            ->where('email', $user->email)
+            ->where('tenant_id', $this->testTenantId)
+            ->count());
+        $this->assertNotSame($oldToken, DB::table('password_resets')
+            ->where('email', $user->email)
+            ->where('tenant_id', $this->testTenantId)
+            ->value('token'));
+    }
+}
+
+class AdminUsersFailingEmailDispatchService extends EmailDispatchService
+{
+    public function send(string $to, string $subject, string $body, array $options = []): bool
+    {
+        return false;
+    }
+}
+
+class AdminUsersSuccessfulEmailDispatchService extends EmailDispatchService
+{
+    public array $calls = [];
+
+    public function send(string $to, string $subject, string $body, array $options = []): bool
+    {
+        $this->calls[] = compact('to', 'subject', 'body', 'options');
+
+        return true;
     }
 }

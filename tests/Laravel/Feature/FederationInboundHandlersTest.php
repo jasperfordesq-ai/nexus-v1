@@ -470,6 +470,8 @@ class FederationInboundHandlersTest extends TestCase
         $this->assertStringContainsString("->where('id', \$existing->id)\n                ->where('tenant_id', \$tenantId)", $source);
         $this->assertStringContainsString("->where('external_idempotency_key', \$idempotencyKey)\n                ->where('receiver_tenant_id', (int) \$partner->tenant_id)", $source);
         $this->assertStringContainsString("->where('external_partner_id', \$partner->id)\n            ->where('receiver_tenant_id', (int) \$partner->tenant_id)", $source);
+        $this->assertStringContainsString("->where('external_transaction_id', \$externalTxId)\n                ->where('external_partner_id', \$partner->id)\n                ->where('receiver_tenant_id', \$tenantId)", $source);
+        $this->assertStringContainsString("->where('id', \$tx->id)\n                            ->where('receiver_tenant_id', (int) \$tx->receiver_tenant_id)", $source);
         $this->assertStringContainsString("->where('id', \$transactionId)\n                    ->where('receiver_tenant_id', \$receiverTenantId)", $source);
     }
 
@@ -827,6 +829,42 @@ class FederationInboundHandlersTest extends TestCase
 
         $this->assertEquals(0.0, (float) DB::table('users')->where('id', $recipient->id)->value('balance'));
         $this->assertSame(0, DB::table('federation_transactions')->where('receiver_user_id', $recipient->id)->count());
+    }
+
+    public function test_transaction_cancelled_does_not_touch_foreign_receiver_tenant_row(): void
+    {
+        $foreignTenantId = 999;
+        $foreignRecipient = User::factory()->forTenant($foreignTenantId)->create([
+            'balance' => 3,
+        ]);
+
+        $transactionId = DB::table('federation_transactions')->insertGetId([
+            'sender_tenant_id' => 0,
+            'sender_user_id' => 42,
+            'receiver_tenant_id' => $foreignTenantId,
+            'receiver_user_id' => $foreignRecipient->id,
+            'amount' => 1,
+            'description' => 'Foreign tenant row',
+            'status' => 'completed',
+            'external_partner_id' => $this->partnerId,
+            'external_receiver_name' => 'Remote Sender',
+            'external_transaction_id' => 'ext-tx-foreign-cancel',
+            'created_at' => now(),
+        ]);
+
+        $this->postWebhook('transaction.cancelled', [
+            'external_transaction_id' => 'ext-tx-foreign-cancel',
+            'reason' => 'Remote cancellation',
+        ])->assertStatus(200)
+            ->assertJsonPath('data.result.status', 'acknowledged');
+
+        $transaction = DB::table('federation_transactions')->where('id', $transactionId)->first();
+        $this->assertSame('completed', $transaction->status);
+        $this->assertNull($transaction->cancelled_at);
+        $this->assertEquals(3.0, (float) DB::table('users')
+            ->where('id', $foreignRecipient->id)
+            ->where('tenant_id', $foreignTenantId)
+            ->value('balance'));
     }
 
     // ------------------------------------------------------------------

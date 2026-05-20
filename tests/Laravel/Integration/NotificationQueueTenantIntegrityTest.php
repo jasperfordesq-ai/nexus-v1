@@ -436,6 +436,51 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         $this->assertGreaterThanOrEqual(2, substr_count($source, "isEmailSuppressed((string) (\$item['email'] ?? ''))"));
     }
 
+    public function test_instant_notification_queue_sends_business_audit_categories_with_tenant_context(): void
+    {
+        $mailer = $this->fakeMailer(true);
+        app()->instance(EmailDispatchService::class, $mailer);
+        Cache::forget('notification_queue:instant:runner_lock');
+
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'email' => 'queue-category-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+
+        foreach (['new_message', 'connection_request', 'event_update', 'vol_application_approved'] as $activityType) {
+            DB::table('notification_queue')->insert([
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $user->id,
+                'activity_type' => $activityType,
+                'content_snippet' => 'Audit category check',
+                'link' => '/notifications',
+                'frequency' => 'instant',
+                'email_body' => '<p>Audit category check</p>',
+                'created_at' => now(),
+                'status' => 'pending',
+            ]);
+        }
+
+        $method = new \ReflectionMethod(\App\Services\CronJobRunner::class, 'runInstantQueueInternal');
+        $method->setAccessible(true);
+        ob_start();
+        try {
+            $method->invoke(new \App\Services\CronJobRunner());
+        } finally {
+            ob_end_clean();
+        }
+
+        $this->assertCount(4, $mailer->calls);
+        $this->assertSame(
+            ['message', 'connection', 'event_reminder', 'volunteering'],
+            array_column(array_column($mailer->calls, 'options'), 'category')
+        );
+        foreach ($mailer->calls as $call) {
+            $this->assertSame($this->testTenantId, (int) $call['options']['tenant_id']);
+        }
+    }
+
     public function test_notification_queue_runner_resets_tenant_context_after_batches(): void
     {
         $source = file_get_contents(app_path('Services/CronJobRunner.php'));

@@ -107,6 +107,8 @@ interface QueueDiagnosticRow {
     | 'civic_digest_delivery_claims'
     | 'transaction_notification_deliveries'
     | 'marketplace_order_notification_deliveries'
+    | 'marketplace_seller_ratings'
+    | 'marketplace_disputes'
     | 'event_reminder_delivery_claims'
     | 'vol_reminder_delivery_claims'
     | 'listing_expiry_reminders_sent'

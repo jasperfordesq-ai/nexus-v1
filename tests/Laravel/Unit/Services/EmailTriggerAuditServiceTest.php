@@ -282,6 +282,53 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('notification_queue_marked_sent_without_email_log', $codes);
     }
 
+    public function test_run_accepts_business_category_email_log_as_notification_queue_evidence(): void
+    {
+        if (!Schema::hasTable('notification_queue') || !Schema::hasTable('email_log')) {
+            $this->markTestSkipped('Notification queue/email log tables are not available.');
+        }
+
+        $userId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Mapped Queue Evidence User',
+            'email' => 'mapped-queue-evidence@example.test',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $createdAt = now()->subMinutes(3);
+        DB::table('notification_queue')->insert([
+            'tenant_id' => 2,
+            'user_id' => $userId,
+            'activity_type' => 'new_message',
+            'content_snippet' => 'Message audit row',
+            'link' => '/messages',
+            'status' => 'sent',
+            'frequency' => 'instant',
+            'sent_at' => now()->subMinute(),
+            'created_at' => $createdAt,
+        ]);
+
+        DB::table('email_log')->insert([
+            'tenant_id' => 2,
+            'user_id' => $userId,
+            'recipient_email' => 'mapped-queue-evidence@example.test',
+            'category' => 'message',
+            'subject' => 'Message audit row',
+            'provider' => 'sendgrid',
+            'status' => 'sent',
+            'created_at' => now()->subMinutes(2),
+            'updated_at' => now()->subMinutes(2),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertNotContains('notification_queue_marked_sent_without_email_log', $codes);
+    }
+
     public function test_run_detects_recent_group_join_without_owner_notification_queue(): void
     {
         if (!Schema::hasTable('groups') || !Schema::hasTable('group_members') || !Schema::hasTable('notification_queue')) {

@@ -717,7 +717,9 @@ class CronJobRunner
                             continue;
                         }
 
-                        if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, null, 'notification_queue', ['tenant_id' => $itemTenantId])) {
+                        $auditCategory = self::resolveNotificationQueueAuditCategory((string) ($item['activity_type'] ?? ''));
+
+                        if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, null, $auditCategory, ['tenant_id' => $itemTenantId])) {
                             DB::update(
                                 "UPDATE notification_queue
                                     SET status = 'sent',
@@ -786,6 +788,69 @@ class CronJobRunner
         $output = ob_get_clean();
         echo $output;
         $this->logJob($status, $output);
+    }
+
+    /**
+     * Map queued activity types to stable email audit matrix categories.
+     */
+    private static function resolveNotificationQueueAuditCategory(string $activityType): string
+    {
+        return match ($activityType) {
+            'new_message',
+            'message_received',
+            'voice_message' => 'message',
+
+            'connection_request',
+            'connection_accepted',
+            'friend_request',
+            'friend_accepted' => 'connection',
+
+            'event_update',
+            'event_cancellation',
+            'event_reminder',
+            'event_rsvp' => 'event_reminder',
+
+            'vol_application_received',
+            'vol_application_approved',
+            'vol_application_declined',
+            'vol_hours_approved',
+            'vol_shift_reminder',
+            'vol_expense_status' => 'volunteering',
+
+            'goal_reminder' => 'goal_reminder',
+
+            'marketplace_order',
+            'marketplace_offer',
+            'marketplace_payment',
+            'marketplace_rating',
+            'marketplace_report' => 'marketplace',
+
+            'listing_approved',
+            'listing_rejected',
+            'listing_expiry',
+            'listing_expiry_reminder',
+            'saved_search_match' => 'listing',
+
+            'hot_match',
+            'mutual_match',
+            'match_digest',
+            'match_approval_request',
+            'match_approved',
+            'match_rejected',
+            'job_alert' => 'job_alert',
+
+            'new_topic',
+            'new_reply',
+            'mention',
+            'group_member_joined',
+            'group_role_changed' => 'group',
+
+            'exchange_request',
+            'exchange_update',
+            'exchange_completed' => 'exchange',
+
+            default => 'notification_queue',
+        };
     }
 
     /**
@@ -1622,7 +1687,9 @@ class CronJobRunner
                     continue;
                 }
 
-                if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, null, 'notification_queue', ['tenant_id' => $itemTenantId])) {
+                $auditCategory = self::resolveNotificationQueueAuditCategory((string) ($item['activity_type'] ?? ''));
+
+                if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, null, $auditCategory, ['tenant_id' => $itemTenantId])) {
                     DB::update(
                         "UPDATE notification_queue
                             SET status = 'sent',

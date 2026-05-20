@@ -1191,11 +1191,13 @@ class FederationExternalWebhookController extends BaseApiController
 
         $externalTxId = $data['external_transaction_id'] ?? null;
         $reason = $data['reason'] ?? null;
+        $tenantId = (int) TenantContext::getId();
 
         Log::info('[FederationExternalWebhook] Transaction cancelled', [
             'partner' => $partner->name,
             'external_transaction_id' => $externalTxId,
             'reason' => $reason,
+            'tenant_id' => $tenantId,
         ]);
 
         // If we have a record of this transaction, mark it as cancelled and reverse the credit
@@ -1203,6 +1205,7 @@ class FederationExternalWebhookController extends BaseApiController
             $tx = DB::table('federation_transactions')
                 ->where('external_transaction_id', $externalTxId)
                 ->where('external_partner_id', $partner->id)
+                ->where('receiver_tenant_id', $tenantId)
                 ->first();
 
             if ($tx && $tx->status === 'completed') {
@@ -1220,6 +1223,7 @@ class FederationExternalWebhookController extends BaseApiController
                         // User has already spent the credits — mark as disputed instead
                         DB::table('federation_transactions')
                             ->where('id', $tx->id)
+                            ->where('receiver_tenant_id', (int) $tx->receiver_tenant_id)
                             ->update([
                                 'status'              => 'disputed',
                                 'cancellation_reason' => 'reversal_failed: insufficient_balance',
@@ -1240,6 +1244,7 @@ class FederationExternalWebhookController extends BaseApiController
 
                     DB::table('federation_transactions')
                         ->where('id', $tx->id)
+                        ->where('receiver_tenant_id', (int) $tx->receiver_tenant_id)
                         ->update([
                             'status'              => 'cancelled',
                             'cancelled_at'        => now(),

@@ -12,6 +12,7 @@ use App\Models\JobInterview;
 use App\Models\JobVacancy;
 use App\Models\User;
 use App\Services\EmailDispatchService;
+use App\Services\JobExpiryNotificationService;
 use App\Services\JobInterviewService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,207 @@ use Tests\Laravel\TestCase;
 class JobEmailReliabilityTest extends TestCase
 {
     use DatabaseTransactions;
+
+    public function test_job_expiry_reminder_is_claimed_before_email_send(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $poster = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'job-expiry-race@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $vacancy = JobVacancy::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $poster->id,
+            'title' => 'Expiry Race Coordinator',
+            'status' => 'open',
+            'deadline' => now()->addDays(3),
+            'expired_at' => null,
+        ]);
+
+        $mailer = new class extends EmailDispatchService {
+            /** @var list<array{to:string,subject:string,body:string,options:array<string,mixed>}> */
+            public array $sends = [];
+            private bool $nestedRunStarted = false;
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->sends[] = compact('to', 'subject', 'body', 'options');
+
+                if (!$this->nestedRunStarted) {
+                    $this->nestedRunStarted = true;
+                    JobExpiryNotificationService::notifyExpiringSoon();
+                }
+
+                return true;
+            }
+        };
+        app()->instance(EmailDispatchService::class, $mailer);
+        TenantContext::reset();
+
+        $notified = JobExpiryNotificationService::notifyExpiringSoon();
+
+        $this->assertSame(1, $notified);
+        $this->assertCount(1, $mailer->sends);
+        $this->assertDatabaseHas('job_expiry_notifications', [
+            'tenant_id' => $this->testTenantId,
+            'vacancy_id' => $vacancy->id,
+            'notification_type' => 'expiring_soon',
+        ]);
+    }
+
+    public function test_job_expiry_reminder_retries_stale_unsent_claim(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $poster = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'job-expiry-stale-claim@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $vacancy = JobVacancy::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $poster->id,
+            'title' => 'Expiry Stale Claim Coordinator',
+            'status' => 'open',
+            'deadline' => now()->addDays(3),
+            'expired_at' => null,
+        ]);
+        DB::table('job_expiry_notifications')->insert([
+            'tenant_id' => $this->testTenantId,
+            'vacancy_id' => $vacancy->id,
+            'notification_type' => 'expiring_soon',
+            'sent_at' => null,
+            'created_at' => now()->subHours(2),
+            'updated_at' => now()->subHours(2),
+        ]);
+
+        $mailer = $this->fakeEmailDispatchService();
+        TenantContext::reset();
+
+        $notified = JobExpiryNotificationService::notifyExpiringSoon();
+
+        $row = DB::table('job_expiry_notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('vacancy_id', $vacancy->id)
+            ->where('notification_type', 'expiring_soon')
+            ->first();
+
+        $this->assertSame(1, $notified);
+        $this->assertCount(1, $mailer->sends);
+        $this->assertNotNull($row->sent_at);
+    }
+
+    public function test_interview_reminder_window_is_claimed_before_email_send(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $poster = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'job-poster-race@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $candidate = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'job-candidate-race@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $vacancy = JobVacancy::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $poster->id,
+            'title' => 'Interview Race Coordinator',
+            'status' => 'open',
+        ]);
+        $application = JobApplication::factory()->forTenant($this->testTenantId)->create([
+            'vacancy_id' => $vacancy->id,
+            'user_id' => $candidate->id,
+        ]);
+        $interviewId = DB::table('job_interviews')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'vacancy_id' => $vacancy->id,
+            'application_id' => $application->id,
+            'proposed_by' => $poster->id,
+            'interview_type' => 'video',
+            'scheduled_at' => now()->addHours(2),
+            'duration_mins' => 30,
+            'status' => 'accepted',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $mailer = new class extends EmailDispatchService {
+            /** @var list<array{to:string,subject:string,body:string,options:array<string,mixed>}> */
+            public array $sends = [];
+            private bool $nestedRunStarted = false;
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->sends[] = compact('to', 'subject', 'body', 'options');
+
+                if (!$this->nestedRunStarted) {
+                    $this->nestedRunStarted = true;
+                    JobInterviewService::sendReminders();
+                }
+
+                return true;
+            }
+        };
+        app()->instance(EmailDispatchService::class, $mailer);
+        TenantContext::reset();
+
+        $result = JobInterviewService::sendReminders();
+
+        $row = DB::table('job_interviews')->where('id', $interviewId)->first();
+        $recipients = array_column($mailer->sends, 'to');
+        sort($recipients);
+        $expectedRecipients = [$candidate->email, $poster->email];
+        sort($expectedRecipients);
+
+        $this->assertSame(['reminders_sent' => 1, 'errors' => 0], $result);
+        $this->assertNotNull($row->reminder_24h_sent_at);
+        $this->assertCount(2, $mailer->sends);
+        $this->assertSame($expectedRecipients, $recipients);
+    }
+
+    public function test_interview_reminder_exception_does_not_mark_window_sent(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $poster = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'job-poster-exception@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $candidate = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'job-candidate-exception@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $vacancy = JobVacancy::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $poster->id,
+            'title' => 'Interview Exception Coordinator',
+            'status' => 'open',
+        ]);
+        $application = JobApplication::factory()->forTenant($this->testTenantId)->create([
+            'vacancy_id' => $vacancy->id,
+            'user_id' => $candidate->id,
+        ]);
+        $interviewId = DB::table('job_interviews')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'vacancy_id' => $vacancy->id,
+            'application_id' => $application->id,
+            'proposed_by' => $poster->id,
+            'interview_type' => 'video',
+            'scheduled_at' => now()->addHours(2),
+            'duration_mins' => 30,
+            'status' => 'accepted',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        app()->instance(EmailDispatchService::class, new class extends EmailDispatchService {
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                throw new \RuntimeException('simulated provider crash');
+            }
+        });
+        TenantContext::reset();
+
+        $result = JobInterviewService::sendReminders();
+        $row = DB::table('job_interviews')->where('id', $interviewId)->first();
+
+        $this->assertSame(['reminders_sent' => 0, 'errors' => 1], $result);
+        $this->assertNull($row->reminder_24h_sent_at);
+        $this->assertNull($row->reminder_sent_at);
+    }
 
     public function test_interview_reminders_send_separate_24h_and_1h_windows(): void
     {
