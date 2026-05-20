@@ -83,7 +83,7 @@ function ListingInfoContent({ listing }: { listing: MarketplaceListingItem }) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <ShoppingBag className="w-6 h-6 text-default-300" />
+              <ShoppingBag className="w-6 h-6 text-default-300" aria-hidden="true" />
             </div>
           )}
         </div>
@@ -151,13 +151,13 @@ export function MapSearchView({
   if (!MAPS_ENABLED) {
     return (
       <GlassCard className={`p-8 flex flex-col items-center justify-center gap-4 ${className}`}>
-        <MapPinOff className="w-14 h-14 text-default-300" />
+        <MapPinOff className="w-14 h-14 text-default-300" aria-hidden="true" />
         <div className="text-center space-y-1">
           <h3 className="text-lg font-semibold text-foreground">
-            {t('map.not_available_title', 'Map View Not Available')}
+            {t('map.not_available_title')}
           </h3>
           <p className="text-sm text-default-500">
-            {t('map.not_available_description', 'The map library is not configured. Listings are shown in the list view.')}
+            {t('map.not_available_description')}
           </p>
         </div>
       </GlassCard>
@@ -180,25 +180,25 @@ export function MapSearchView({
   if (markers.length === 0) {
     return (
       <GlassCard className={`flex flex-col items-center justify-center gap-4 p-8 ${className}`} style={{ minHeight: '300px' }}>
-        <MapPin className="w-12 h-12 text-default-300" />
+        <MapPin className="w-12 h-12 text-default-300" aria-hidden="true" />
         <div className="text-center space-y-1">
           <h3 className="font-semibold text-foreground">
-            {t('map.no_results_title', 'No Listings on Map')}
+            {t('map.no_results_title')}
           </h3>
           <p className="text-sm text-default-500">
-            {t('map.no_results_description', 'No listings with location data found. Try expanding your search area.')}
+            {t('map.no_results_description')}
           </p>
         </div>
         {onRequestLocation && (
           <Button
             variant="flat"
             color="primary"
-            startContent={<Navigation className="w-4 h-4" />}
+            startContent={<Navigation className="w-4 h-4" aria-hidden="true" />}
             onPress={onRequestLocation}
             isLoading={locationLoading}
             size="sm"
           >
-            {t('map.use_my_location', 'Use My Location')}
+            {t('map.use_my_location')}
           </Button>
         )}
       </GlassCard>
@@ -224,12 +224,12 @@ export function MapSearchView({
             variant="solid"
             color="default"
             size="sm"
-            startContent={<Navigation className="w-3.5 h-3.5" />}
+            startContent={<Navigation className="w-3.5 h-3.5" aria-hidden="true" />}
             onPress={onRequestLocation}
             isLoading={locationLoading}
             className="bg-background/90 backdrop-blur-sm shadow-md"
           >
-            {t('map.use_my_location', 'Use My Location')}
+            {t('map.use_my_location')}
           </Button>
         </div>
       )}
@@ -239,15 +239,15 @@ export function MapSearchView({
         <div className="bg-background/90 backdrop-blur-sm rounded-lg p-2 shadow-md space-y-1">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
-            <span className="text-xs text-default-600">{t('price_type.free', 'Free')}</span>
+            <span className="text-xs text-default-600">{t('price_type.free')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-            <span className="text-xs text-default-600">{t('price_type.fixed', 'Fixed Price')}</span>
+            <span className="text-xs text-default-600">{t('price_type.fixed')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
-            <span className="text-xs text-default-600">{t('price_type.negotiable', 'Negotiable')}</span>
+            <span className="text-xs text-default-600">{t('price_type.negotiable')}</span>
           </div>
         </div>
       </div>
