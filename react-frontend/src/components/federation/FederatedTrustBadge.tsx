@@ -64,17 +64,14 @@ export function FederatedTrustBadge({
   const tooltipContent = isFederated
     ? t('reputation.tooltip_federated', {
         count: safeCount,
-        defaultValue: 'Reputation aggregated across {{count}} partner communities',
       })
     : t('reputation.tooltip_local', {
         count: safeCount,
-        defaultValue: 'Based on {{count}} reviews in this community',
       });
 
   const label = t('reputation.chip_label', {
     score: safeScore.toFixed(1),
     count: safeCount,
-    defaultValue: '{{score}} ({{count}})',
   });
 
   return (
@@ -85,7 +82,6 @@ export function FederatedTrustBadge({
         aria-label={t('reputation.aria_label', {
           score: safeScore.toFixed(1),
           count: safeCount,
-          defaultValue: 'Federated reputation {{score}} from {{count}} reviews',
         })}
         className={`${TIER_CLASSES[tier]} font-medium`}
         startContent={<Shield className={ICON_SIZE[size]} aria-hidden="true" />}

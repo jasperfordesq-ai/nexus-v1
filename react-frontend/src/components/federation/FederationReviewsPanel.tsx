@@ -210,7 +210,7 @@ export function FederationReviewsPanel({ memberId, tenantId }: FederationReviews
         <CardBody className="items-center text-center gap-3 py-8">
           <MessageSquare className="w-10 h-10 text-theme-subtle" aria-hidden="true" />
           <p className="text-theme-muted max-w-md">
-            {t('reviews.unavailable', 'Reviews not yet available for this federated member')}
+            {t('reviews.unavailable')}
           </p>
         </CardBody>
       </Card>
@@ -247,10 +247,9 @@ export function FederationReviewsPanel({ memberId, tenantId }: FederationReviews
   return (
     <div className="space-y-3">
       {reviews.map((r) => {
-        const name = reviewerName(r.reviewer) || t('reviews.anonymous', 'Anonymous');
+        const name = reviewerName(r.reviewer) || t('reviews.anonymous');
         const ratingLabel = t('reviews.rating_label', {
           rating: r.rating,
-          defaultValue: 'Rated {{rating}} out of 5',
         });
         const formattedDate = (() => {
           try {
@@ -285,7 +284,6 @@ export function FederationReviewsPanel({ memberId, tenantId }: FederationReviews
                       >
                         {t('reviews.from_partner', {
                           partner: r.partner.name,
-                          defaultValue: 'via {{partner}}',
                         })}
                       </Chip>
                     )}

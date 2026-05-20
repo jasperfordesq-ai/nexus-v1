@@ -3,7 +3,6 @@
   "relay_no_route_to_node": "No route to node: {{node}}",
   "relay_url_blocked": "Relay target URL blocked by security filter",
   "external": "External",
-
   "hub": {
     "page_title": "Federation Hub",
     "breadcrumb_dashboard": "Dashboard",
@@ -81,7 +80,6 @@
     "toast_disable_error_description": "Could not disable federation. Please try again.",
     "toast_disable_error_generic": "An unexpected error occurred."
   },
-
   "partners": {
     "page_title": "Partner Communities",
     "breadcrumb_federation": "Federation",
@@ -115,7 +113,6 @@
     "close": "Close",
     "view_details": "View Details"
   },
-
   "members": {
     "page_title": "Federation Members",
     "federation_not_enabled": "Federation is not enabled for your account.",
@@ -154,7 +151,6 @@
     "external_member": "External Member",
     "member_fallback": "Member"
   },
-
   "messages": {
     "page_title": "Federation Messages",
     "breadcrumb_federation": "Federation",
@@ -221,7 +217,6 @@
     "cancel": "Cancel",
     "send_message": "Send Message"
   },
-
   "listings": {
     "page_title": "Federation Listings",
     "breadcrumb_federation": "Federation",
@@ -251,7 +246,6 @@
     "contact_author": "Contact",
     "close": "Close"
   },
-
   "settings": {
     "page_title": "Federation Settings",
     "breadcrumb_federation": "Federation",
@@ -308,7 +302,6 @@
     "save_failed_description": "Could not save settings. Please try again.",
     "save_failed_retry": "A network error occurred. Please try again."
   },
-
   "events": {
     "page_title": "Federation Events",
     "breadcrumb_federation": "Federation",
@@ -329,7 +322,6 @@
     "load_more_error": "Could not load more events.",
     "online": "Online"
   },
-
   "groups": {
     "page_title": "Federation Groups",
     "breadcrumb_federation": "Federation",
@@ -350,7 +342,6 @@
     "member_count_plural": "{{count}} members",
     "private": "Private"
   },
-
   "connections": {
     "page_title": "Federation Connections",
     "breadcrumb_federation": "Federation",
@@ -381,7 +372,6 @@
     "removed_success": "Connection removed",
     "action_failed": "Action failed. Please try again."
   },
-
   "partner_detail": {
     "page_title": "Partner Community",
     "breadcrumb_federation": "Federation",
@@ -399,7 +389,6 @@
     "browse_listings": "Browse Listings",
     "available_features": "Available Features"
   },
-
   "onboarding": {
     "page_title": "Federation Setup",
     "title": "Join the Federation",
@@ -471,7 +460,6 @@
     "toast_welcome": "Welcome to the federation network!",
     "toast_generic_error": "An unexpected error occurred. Please try again."
   },
-
   "member_profile": {
     "page_title": "Member Profile",
     "breadcrumb_federation": "Federation",
@@ -512,5 +500,17 @@
     "about": "About",
     "skills_interests": "Skills & Interests",
     "reviews": "Reviews"
+  },
+  "reputation": {
+    "tooltip_federated": "Reputation aggregated across {{count}} partner communities",
+    "tooltip_local": "Based on {{count}} reviews in this community",
+    "chip_label": "{{score}} ({{count}})",
+    "aria_label": "Federated reputation {{score}} from {{count}} reviews"
+  },
+  "reviews": {
+    "unavailable": "Reviews not yet available for this federated member",
+    "anonymous": "Anonymous",
+    "rating_label": "Rated {{rating}} out of 5",
+    "from_partner": "via {{partner}}"
   }
 }

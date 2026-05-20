@@ -500,5 +500,17 @@
     "about": "About",
     "skills_interests": "Skills & Interests",
     "reviews": "Reviews"
+  },
+  "reputation": {
+    "tooltip_federated": "Reputation aggregated across {{count}} partner communities",
+    "tooltip_local": "Based on {{count}} reviews in this community",
+    "chip_label": "{{score}} ({{count}})",
+    "aria_label": "Federated reputation {{score}} from {{count}} reviews"
+  },
+  "reviews": {
+    "unavailable": "Reviews not yet available for this federated member",
+    "anonymous": "Anonymous",
+    "rating_label": "Rated {{rating}} out of 5",
+    "from_partner": "via {{partner}}"
   }
 }
