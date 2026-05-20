@@ -92,13 +92,11 @@ export function TranslateButton({
         setTranslated(resp.data.translated_text);
         setShowing('translated');
       } else {
-        const message = resp.error?.trim()
-          ? resp.error
-          : t('translate.failed', 'Translation failed. Please try again.');
+        const message = resp.error?.trim() ? resp.error : t('translate.failed');
         toast.error(message);
       }
     } catch {
-      toast.showToast(t('translate.failed', 'Translation failed. Please try again.'), 'error');
+      toast.showToast(t('translate.failed'), 'error');
     } finally {
       setLoading(false);
     }
@@ -117,18 +115,24 @@ export function TranslateButton({
       isLoading={loading}
       onPress={handleClick}
       className={className}
-      startContent={loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Languages className="w-3.5 h-3.5" />}
+      startContent={
+        loading ? (
+          <RefreshCw aria-hidden="true" className="w-3.5 h-3.5 animate-spin" />
+        ) : (
+          <Languages aria-hidden="true" className="w-3.5 h-3.5" />
+        )
+      }
       aria-label={
         showing === 'translated'
-          ? t('translate.show_original', 'Show original')
-          : t('translate.translate', 'Translate')
+          ? t('translate.show_original')
+          : t('translate.translate')
       }
     >
       {showing === 'translated'
-        ? t('translate.show_original', 'Show original')
+        ? t('translate.show_original')
         : loading
-          ? t('translate.translating', 'Translating…')
-          : t('translate.translate', 'Translate')}
+          ? t('translate.translating')
+          : t('translate.translate')}
     </Button>
   );
 }
