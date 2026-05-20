@@ -50,5 +50,7 @@
   "errors": {
     "save_failed": "Échec de l'enregistrement. Veuillez réessayer.",
     "complete_failed": "Impossible de finaliser la configuration."
-  }
+  },
+  "open_time": "Opening time",
+  "close_time": "Closing time"
 }

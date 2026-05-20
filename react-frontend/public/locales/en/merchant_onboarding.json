@@ -50,5 +50,7 @@
   "errors": {
     "save_failed": "Failed to save. Please try again.",
     "complete_failed": "Failed to complete setup."
-  }
+  },
+  "open_time": "Opening time",
+  "close_time": "Closing time"
 }

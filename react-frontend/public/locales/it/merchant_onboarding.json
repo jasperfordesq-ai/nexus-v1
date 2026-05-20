@@ -50,5 +50,7 @@
   "errors": {
     "save_failed": "Salvataggio non riuscito. Riprova.",
     "complete_failed": "Impossibile completare la configurazione."
-  }
+  },
+  "open_time": "Opening time",
+  "close_time": "Closing time"
 }

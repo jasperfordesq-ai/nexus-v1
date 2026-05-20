@@ -50,5 +50,7 @@
   "errors": {
     "save_failed": "保存に失敗しました。もう一度お試しください。",
     "complete_failed": "設定を完了できませんでした。"
-  }
+  },
+  "open_time": "Opening time",
+  "close_time": "Closing time"
 }

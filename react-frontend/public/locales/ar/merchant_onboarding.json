@@ -50,5 +50,7 @@
   "errors": {
     "save_failed": "فشل الحفظ. يرجى المحاولة مرة أخرى.",
     "complete_failed": "تعذّر إكمال الإعداد."
-  }
+  },
+  "open_time": "Opening time",
+  "close_time": "Closing time"
 }

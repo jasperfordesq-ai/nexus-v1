@@ -50,5 +50,7 @@
   "errors": {
     "save_failed": "Error al guardar. Por favor, inténtelo de nuevo.",
     "complete_failed": "No se pudo completar la configuración."
-  }
+  },
+  "open_time": "Opening time",
+  "close_time": "Closing time"
 }

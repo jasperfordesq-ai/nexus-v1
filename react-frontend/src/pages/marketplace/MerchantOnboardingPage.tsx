@@ -612,19 +612,33 @@ export function MerchantOnboardingPage() {
                         {isOpen ? t('open') : t('closed')}
                       </span>
                       {isOpen && (
-                        <div className="flex items-center gap-2 flex-1">
-                          <input
+                        <div className="grid flex-1 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+                          <Input
                             type="time"
+                            size="sm"
+                            variant="bordered"
+                            aria-label={t('open_time')}
                             value={hours.open}
-                            onChange={e => setDayTime(day, 'open', e.target.value)}
-                            className="border border-default-300 rounded-lg px-2 py-1 text-sm bg-[var(--color-surface)] text-[var(--color-text)] w-28"
+                            onValueChange={value => setDayTime(day, 'open', value)}
+                            classNames={{
+                              base: 'min-w-0',
+                              inputWrapper: 'h-9 min-h-9 bg-[var(--color-surface)]',
+                              input: 'text-sm',
+                            }}
                           />
-                          <span className="text-default-400 text-xs">–</span>
-                          <input
+                          <span className="text-default-400 text-xs">-</span>
+                          <Input
                             type="time"
+                            size="sm"
+                            variant="bordered"
+                            aria-label={t('close_time')}
                             value={hours.close}
-                            onChange={e => setDayTime(day, 'close', e.target.value)}
-                            className="border border-default-300 rounded-lg px-2 py-1 text-sm bg-[var(--color-surface)] text-[var(--color-text)] w-28"
+                            onValueChange={value => setDayTime(day, 'close', value)}
+                            classNames={{
+                              base: 'min-w-0',
+                              inputWrapper: 'h-9 min-h-9 bg-[var(--color-surface)]',
+                              input: 'text-sm',
+                            }}
                           />
                         </div>
                       )}
