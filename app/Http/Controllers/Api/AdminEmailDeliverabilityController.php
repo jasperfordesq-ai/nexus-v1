@@ -187,6 +187,8 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'federation_transactions' => $this->queueSourceDiagnostics('federation_transactions', $tenantId),
             'federation_inbound_connections' => $this->queueSourceDiagnostics('federation_inbound_connections', $tenantId),
             'reviews' => $this->queueSourceDiagnostics('reviews', $tenantId),
+            'user_safeguarding_preferences' => $this->queueSourceDiagnostics('user_safeguarding_preferences', $tenantId),
+            'notifications' => $this->queueSourceDiagnostics('notifications', $tenantId),
         ];
 
         $notificationRows = collect();
@@ -850,6 +852,72 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->map(fn ($row) => $this->queueRow('reviews', $row));
         }
 
+        $safeguardingReviewRows = collect();
+        if (($source === '' || $source === 'user_safeguarding_preferences') && $this->hasSafeguardingReviewDeliveryColumns()) {
+            $safeguardingReviewRows = $this->safeguardingReviewMissingEmailEvidenceQuery(
+                DB::table('user_safeguarding_preferences as usp')
+                    ->join('users as u', function ($join): void {
+                        $join->on('u.id', '=', 'usp.user_id')
+                            ->whereColumn('u.tenant_id', '=', 'usp.tenant_id');
+                    })
+                    ->when($tenantId !== null, fn ($q) => $q->where('usp.tenant_id', $tenantId))
+                    ->where('usp.review_reminder_sent_at', '>=', now()->subDay())
+            )
+                ->orderByDesc('usp.id')
+                ->limit($limit)
+                ->get([
+                    'usp.id',
+                    'usp.tenant_id',
+                    'usp.user_id',
+                    'u.email',
+                    DB::raw("'safeguarding_review' as category"),
+                    DB::raw("'annual_review' as subject"),
+                    DB::raw("'failed' as status"),
+                    DB::raw('NULL as frequency'),
+                    DB::raw('0 as attempts'),
+                    'usp.review_reminder_sent_at as last_attempted_at',
+                    DB::raw("'marked sent without email_log evidence' as error"),
+                    DB::raw('NULL as processing_batch_id'),
+                    DB::raw('NULL as processing_started_at'),
+                    'usp.review_reminder_sent_at as sent_at',
+                    'usp.created_at',
+                ])
+                ->map(fn ($row) => $this->queueRow('user_safeguarding_preferences', $row));
+        }
+
+        $safeguardingNotificationRows = collect();
+        if (($source === '' || $source === 'notifications') && $this->hasSafeguardingNotificationDeliveryColumns()) {
+            $safeguardingNotificationRows = $this->safeguardingNotificationMissingEmailEvidenceQuery(
+                DB::table('notifications as n')
+                    ->join('users as u', function ($join): void {
+                        $join->on('u.id', '=', 'n.user_id')
+                            ->whereColumn('u.tenant_id', '=', 'n.tenant_id');
+                    })
+                    ->when($tenantId !== null, fn ($q) => $q->where('n.tenant_id', $tenantId))
+                    ->where('n.created_at', '>=', now()->subDay())
+            )
+                ->orderByDesc('n.id')
+                ->limit($limit)
+                ->get([
+                    'n.id',
+                    'n.tenant_id',
+                    'n.user_id',
+                    'u.email',
+                    DB::raw("'safeguarding' as category"),
+                    'n.type as subject',
+                    DB::raw("'failed' as status"),
+                    DB::raw('NULL as frequency'),
+                    DB::raw('0 as attempts'),
+                    'n.created_at as last_attempted_at',
+                    DB::raw("'notification without email_log evidence' as error"),
+                    DB::raw('NULL as processing_batch_id'),
+                    DB::raw('NULL as processing_started_at'),
+                    DB::raw('NULL as sent_at'),
+                    'n.created_at',
+                ])
+                ->map(fn ($row) => $this->queueRow('notifications', $row));
+        }
+
         $rows = $notificationRows
             ->merge($newsletterRows)
             ->merge($civicDigestRows)
@@ -867,6 +935,8 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ->merge($volDonationRows)
             ->merge($federationSourceRows)
             ->merge($reviewRows)
+            ->merge($safeguardingReviewRows)
+            ->merge($safeguardingNotificationRows)
             ->sortByDesc('created_at')
             ->values()
             ->take($limit);
@@ -1378,7 +1448,118 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ];
         }
 
+        if ($source === 'user_safeguarding_preferences') {
+            if (!$this->hasSafeguardingReviewDeliveryColumns()) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $base = DB::table('user_safeguarding_preferences as usp')
+                ->join('users as u', function ($join): void {
+                    $join->on('u.id', '=', 'usp.user_id')
+                        ->whereColumn('u.tenant_id', '=', 'usp.tenant_id');
+                })
+                ->when($tenantId !== null, fn ($q) => $q->where('usp.tenant_id', $tenantId));
+            $missingEvidence = $this->safeguardingReviewMissingEmailEvidenceQuery(
+                (clone $base)->where('usp.review_reminder_sent_at', '>=', now()->subDay())
+            );
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => [
+                    'failed' => (clone $missingEvidence)->count(),
+                ],
+                'stale_pending' => 0,
+                'stale_processing' => 0,
+                'failed_recent' => (clone $missingEvidence)->count(),
+                'suppressed_recent' => 0,
+                'oldest_pending_at' => null,
+                'returned' => 0,
+            ];
+        }
+
+        if ($source === 'notifications') {
+            if (!$this->hasSafeguardingNotificationDeliveryColumns()) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $base = DB::table('notifications as n')
+                ->join('users as u', function ($join): void {
+                    $join->on('u.id', '=', 'n.user_id')
+                        ->whereColumn('u.tenant_id', '=', 'n.tenant_id');
+                })
+                ->when($tenantId !== null, fn ($q) => $q->where('n.tenant_id', $tenantId));
+            $missingEvidence = $this->safeguardingNotificationMissingEmailEvidenceQuery(
+                (clone $base)->where('n.created_at', '>=', now()->subDay())
+            );
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => [
+                    'failed' => (clone $missingEvidence)->count(),
+                ],
+                'stale_pending' => 0,
+                'stale_processing' => 0,
+                'failed_recent' => (clone $missingEvidence)->count(),
+                'suppressed_recent' => 0,
+                'oldest_pending_at' => null,
+                'returned' => 0,
+            ];
+        }
+
         return $this->unavailableQueueDiagnostics($source);
+    }
+
+    private function hasSafeguardingReviewDeliveryColumns(): bool
+    {
+        return Schema::hasTable('user_safeguarding_preferences')
+            && Schema::hasTable('users')
+            && Schema::hasTable('email_log')
+            && Schema::hasColumn('user_safeguarding_preferences', 'review_reminder_sent_at');
+    }
+
+    private function safeguardingReviewMissingEmailEvidenceQuery($query)
+    {
+        return $query
+            ->whereNotNull('u.email')
+            ->where('u.email', '<>', '')
+            ->whereNotExists(function ($sub): void {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereColumn('email_log.tenant_id', 'usp.tenant_id')
+                    ->where('email_log.category', 'safeguarding_review')
+                    ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                    ->whereRaw('(email_log.user_id = usp.user_id OR email_log.recipient_email COLLATE utf8mb4_unicode_ci = u.email COLLATE utf8mb4_unicode_ci)')
+                    ->whereRaw('email_log.created_at BETWEEN DATE_SUB(usp.review_reminder_sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(usp.review_reminder_sent_at, INTERVAL 10 MINUTE)');
+            });
+    }
+
+    private function hasSafeguardingNotificationDeliveryColumns(): bool
+    {
+        return Schema::hasTable('notifications')
+            && Schema::hasTable('users')
+            && Schema::hasTable('email_log')
+            && Schema::hasColumn('notifications', 'tenant_id')
+            && Schema::hasColumn('notifications', 'type')
+            && Schema::hasColumn('notifications', 'created_at');
+    }
+
+    private function safeguardingNotificationMissingEmailEvidenceQuery($query)
+    {
+        return $query
+            ->whereIn('n.type', ['safeguarding_flag', 'safeguarding_assignment'])
+            ->whereNotNull('u.email')
+            ->where('u.email', '<>', '')
+            ->whereNotExists(function ($sub): void {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereColumn('email_log.tenant_id', 'n.tenant_id')
+                    ->where('email_log.category', 'safeguarding')
+                    ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                    ->whereRaw('(email_log.user_id = n.user_id OR email_log.recipient_email COLLATE utf8mb4_unicode_ci = u.email COLLATE utf8mb4_unicode_ci)')
+                    ->whereRaw('email_log.created_at BETWEEN n.created_at AND DATE_ADD(n.created_at, INTERVAL 10 MINUTE)');
+            });
     }
 
     private function hasFederationReviewDeliveryColumns(): bool

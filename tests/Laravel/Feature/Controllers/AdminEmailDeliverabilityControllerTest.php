@@ -817,6 +817,78 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         }
     }
 
+    public function test_queues_endpoint_surfaces_safeguarding_email_evidence_gaps(): void
+    {
+        if (
+            !Schema::hasTable('user_safeguarding_preferences')
+            || !Schema::hasTable('tenant_safeguarding_options')
+            || !Schema::hasTable('notifications')
+            || !Schema::hasTable('email_log')
+            || !Schema::hasColumn('user_safeguarding_preferences', 'review_reminder_sent_at')
+        ) {
+            $this->markTestSkipped('Safeguarding email evidence tables are not available.');
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'safeguarding-evidence-queue@example.test',
+        ]);
+        Sanctum::actingAs($admin);
+
+        $optionId = DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => 'admin_audit_review_' . uniqid(),
+            'label' => 'Admin audit review option',
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('user_safeguarding_preferences')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'option_id' => $optionId,
+            'selected_value' => '1',
+            'notes' => null,
+            'consent_given_at' => now()->subYear(),
+            'consent_ip' => '127.0.0.1',
+            'revoked_at' => null,
+            'review_reminder_sent_at' => now()->subMinutes(5),
+            'review_confirmed_at' => null,
+            'review_escalated_at' => null,
+            'created_at' => now()->subYear(),
+            'updated_at' => now()->subMinutes(5),
+        ]);
+
+        DB::table('notifications')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'type' => 'safeguarding_flag',
+            'message' => 'Safeguarding evidence queue',
+            'link' => '/broker/safeguarding',
+            'is_read' => 0,
+            'created_at' => now()->subMinutes(4),
+        ]);
+
+        $reviewResponse = $this->apiGet('/v2/admin/email-deliverability/queues?source=user_safeguarding_preferences&limit=10');
+        $reviewResponse->assertOk();
+        $reviewResponse->assertJsonPath('data.diagnostics.user_safeguarding_preferences.available', true);
+        $this->assertGreaterThanOrEqual(1, $reviewResponse->json('data.diagnostics.user_safeguarding_preferences.failed_recent'));
+        $this->assertSame(
+            ['user_safeguarding_preferences'],
+            collect($reviewResponse->json('data.rows'))->pluck('source')->unique()->values()->all()
+        );
+
+        $notificationResponse = $this->apiGet('/v2/admin/email-deliverability/queues?source=notifications&limit=10');
+        $notificationResponse->assertOk();
+        $notificationResponse->assertJsonPath('data.diagnostics.notifications.available', true);
+        $this->assertGreaterThanOrEqual(1, $notificationResponse->json('data.diagnostics.notifications.failed_recent'));
+        $this->assertSame(
+            ['notifications'],
+            collect($notificationResponse->json('data.rows'))->pluck('source')->unique()->values()->all()
+        );
+    }
+
     public function test_queues_endpoint_surfaces_member_subscription_event_delivery_failures(): void
     {
         if (

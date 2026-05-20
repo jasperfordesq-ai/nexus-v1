@@ -48,6 +48,7 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('events:event_created_update_cancellation_rsvp_reminder:event_notification', $keys);
         $this->assertContains('events:event_reminder_delivery_claim_source:event_reminder', $keys);
         $this->assertContains('volunteering:volunteer_reminder_delivery_claim_source:volunteer_reminder', $keys);
+        $this->assertContains('safeguarding:safeguarding_review_reminder_source:safeguarding_review', $keys);
     }
 
     public function test_run_returns_score_and_issue_structure(): void
@@ -89,6 +90,7 @@ class EmailTriggerAuditServiceTest extends TestCase
             'notification_queue',
             'stripe_webhook_events',
             'transaction_notification_deliveries',
+            'user_safeguarding_preferences',
             'verein_member_dues',
             'vol_donations',
             'vol_reminder_delivery_claims',
@@ -1228,5 +1230,69 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('event_reminder_delivery_claim_delivered_without_email_log', $codes);
         $this->assertContains('volunteer_reminder_delivery_claim_stale_claimed', $codes);
         $this->assertContains('volunteer_reminder_delivery_claim_delivered_without_email_log', $codes);
+    }
+
+    public function test_run_detects_safeguarding_review_and_notification_email_evidence_gaps(): void
+    {
+        if (
+            !Schema::hasTable('user_safeguarding_preferences')
+            || !Schema::hasTable('tenant_safeguarding_options')
+            || !Schema::hasTable('notifications')
+            || !Schema::hasTable('email_log')
+            || !Schema::hasColumn('user_safeguarding_preferences', 'review_reminder_sent_at')
+        ) {
+            $this->markTestSkipped('Safeguarding email evidence tables are not available.');
+        }
+
+        $userId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Safeguarding Evidence Audit User',
+            'email' => 'safeguarding-evidence-audit@example.com',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $optionId = DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id' => 2,
+            'option_key' => 'audit_review_' . uniqid(),
+            'label' => 'Audit review option',
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('user_safeguarding_preferences')->insert([
+            'tenant_id' => 2,
+            'user_id' => $userId,
+            'option_id' => $optionId,
+            'selected_value' => '1',
+            'notes' => null,
+            'consent_given_at' => now()->subYear(),
+            'consent_ip' => '127.0.0.1',
+            'revoked_at' => null,
+            'review_reminder_sent_at' => now()->subMinutes(5),
+            'review_confirmed_at' => null,
+            'review_escalated_at' => null,
+            'created_at' => now()->subYear(),
+            'updated_at' => now()->subMinutes(5),
+        ]);
+
+        DB::table('notifications')->insert([
+            'tenant_id' => 2,
+            'user_id' => $userId,
+            'type' => 'safeguarding_flag',
+            'message' => 'Safeguarding evidence audit',
+            'link' => '/broker/safeguarding',
+            'is_read' => 0,
+            'created_at' => now()->subMinutes(4),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('safeguarding_review_reminder_marked_sent_without_email_log', $codes);
+        $this->assertContains('safeguarding_notification_without_email_log', $codes);
     }
 }

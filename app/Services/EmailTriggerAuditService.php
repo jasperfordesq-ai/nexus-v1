@@ -58,6 +58,7 @@ class EmailTriggerAuditService
             ['module' => 'marketplace', 'event' => 'marketplace_report_outbox', 'category' => 'marketplace_report', 'critical' => true, 'source_table' => 'marketplace_report_notifications'],
             ['module' => 'marketplace', 'event' => 'marketplace_report_source', 'category' => 'marketplace_report', 'critical' => true, 'source_table' => 'marketplace_reports'],
             ['module' => 'safeguarding', 'event' => 'incident_flag_vetting_guardian_training', 'category' => 'safeguarding', 'critical' => true, 'source_table' => 'notifications'],
+            ['module' => 'safeguarding', 'event' => 'safeguarding_review_reminder_source', 'category' => 'safeguarding_review', 'critical' => true, 'source_table' => 'user_safeguarding_preferences'],
             ['module' => 'newsletter', 'event' => 'newsletter_queue_dispatch', 'category' => 'newsletter', 'critical' => false, 'source_table' => 'newsletter_queue'],
             ['module' => 'digests', 'event' => 'notification_digest_dispatch', 'category' => 'notification_digest', 'critical' => false, 'source_table' => 'notification_queue'],
             ['module' => 'billing', 'event' => 'upgrade_or_billing_notice', 'category' => 'billing', 'critical' => true, 'source_table' => 'email_log'],
@@ -190,6 +191,7 @@ class EmailTriggerAuditService
                 $this->checkJobInterviewReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkCivicDigestClaimSourceHealth($tenantId, $since, $windowHours),
                 $this->checkNotificationStoreHealth($tenantId),
+                $this->checkSafeguardingEmailEvidenceHealth($tenantId, $since, $windowHours),
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
                 $this->checkTenantProviderConfiguration($tenantId),
                 $this->checkBillingAndStripeHealth($tenantId, $since, $windowHours),
@@ -277,10 +279,11 @@ class EmailTriggerAuditService
             'member_subscription_events' => 'checkMemberPremiumBillingEmailHealth',
             'newsletter_queue' => 'checkNewsletterQueueHealth',
             'notification_queue' => 'checkNotificationQueueHealth',
-            'notifications' => 'checkNotificationStoreHealth',
+            'notifications' => 'checkNotificationStoreHealth/checkSafeguardingEmailEvidenceHealth',
             'password_resets' => 'checkPasswordResetsWithoutEmail',
             'stripe_webhook_events' => 'checkBillingAndStripeHealth',
             'transaction_notification_deliveries' => 'checkTransactionNotificationDeliveryHealth',
+            'user_safeguarding_preferences' => 'checkSafeguardingEmailEvidenceHealth',
             'users' => 'checkNewUsersWithoutAccountEmail',
             'verein_member_dues' => 'checkVereinDuesEmailHealth',
             'vol_donations' => 'checkStripeDonationReceiptEmailHealth',
@@ -670,6 +673,75 @@ class EmailTriggerAuditService
             $this->rowsToIssues($missingTenant, 'notifications_missing_tenant_id', 'critical', 'notifications', 'bell_dispatch'),
             $this->rowsToIssues($tenantMismatch, 'notifications_tenant_mismatch', 'critical', 'notifications', 'bell_dispatch')
         );
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkSafeguardingEmailEvidenceHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (!$this->hasTables(['email_log', 'users'])) {
+            return [];
+        }
+
+        $issues = [];
+
+        if (
+            $this->hasTables(['user_safeguarding_preferences'])
+            && Schema::hasColumn('user_safeguarding_preferences', 'review_reminder_sent_at')
+        ) {
+            $reviewReminders = DB::table('user_safeguarding_preferences as usp')
+                ->join('users as u', function ($join): void {
+                    $join->on('u.id', '=', 'usp.user_id')
+                        ->whereColumn('u.tenant_id', '=', 'usp.tenant_id');
+                })
+                ->select('usp.tenant_id', DB::raw('COUNT(*) as count'))
+                ->where('usp.review_reminder_sent_at', '>=', $since)
+                ->whereNotNull('u.email')
+                ->where('u.email', '<>', '')
+                ->whereNotExists(function ($sub): void {
+                    $sub->select(DB::raw(1))
+                        ->from('email_log')
+                        ->whereColumn('email_log.tenant_id', 'usp.tenant_id')
+                        ->where('email_log.category', 'safeguarding_review')
+                        ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                        ->whereRaw('(email_log.user_id = usp.user_id OR email_log.recipient_email COLLATE utf8mb4_unicode_ci = u.email COLLATE utf8mb4_unicode_ci)')
+                        ->whereRaw('email_log.created_at BETWEEN DATE_SUB(usp.review_reminder_sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(usp.review_reminder_sent_at, INTERVAL 10 MINUTE)');
+                })
+                ->when($tenantId !== null, fn ($q) => $q->where('usp.tenant_id', $tenantId))
+                ->groupBy('usp.tenant_id')
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($reviewReminders, 'safeguarding_review_reminder_marked_sent_without_email_log', 'critical', 'safeguarding', 'safeguarding_review_reminder_source', ['window_hours' => $windowHours]));
+        }
+
+        if ($this->hasTables(['notifications']) && Schema::hasColumn('notifications', 'tenant_id')) {
+            $emailBackedNotificationTypes = ['safeguarding_flag', 'safeguarding_assignment'];
+            $notificationsWithoutEmail = DB::table('notifications as n')
+                ->join('users as u', function ($join): void {
+                    $join->on('u.id', '=', 'n.user_id')
+                        ->whereColumn('u.tenant_id', '=', 'n.tenant_id');
+                })
+                ->select('n.tenant_id', DB::raw('COUNT(*) as count'))
+                ->whereIn('n.type', $emailBackedNotificationTypes)
+                ->where('n.created_at', '>=', $since)
+                ->whereNotNull('u.email')
+                ->where('u.email', '<>', '')
+                ->whereNotExists(function ($sub): void {
+                    $sub->select(DB::raw(1))
+                        ->from('email_log')
+                        ->whereColumn('email_log.tenant_id', 'n.tenant_id')
+                        ->where('email_log.category', 'safeguarding')
+                        ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                        ->whereRaw('(email_log.user_id = n.user_id OR email_log.recipient_email COLLATE utf8mb4_unicode_ci = u.email COLLATE utf8mb4_unicode_ci)')
+                        ->whereRaw('email_log.created_at BETWEEN n.created_at AND DATE_ADD(n.created_at, INTERVAL 10 MINUTE)');
+                })
+                ->when($tenantId !== null, fn ($q) => $q->where('n.tenant_id', $tenantId))
+                ->groupBy('n.tenant_id')
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($notificationsWithoutEmail, 'safeguarding_notification_without_email_log', 'critical', 'safeguarding', 'incident_flag_vetting_guardian_training', ['window_hours' => $windowHours]));
+        }
+
+        return $issues;
     }
 
     /**
