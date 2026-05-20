@@ -81,18 +81,9 @@ interface ComparisonResult {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const METRIC_LABELS: Record<string, string> = {
-  volunteer_hours: 'Volunteer Hours (90d)',
-  member_count: 'Active Members',
-  recipient_count: 'Recipients Reached',
-  active_relationships: 'Active Relationships',
-  total_exchanges: 'Total Exchanges',
-  avg_response_hours: 'Avg Response Time (hrs)',
-  engagement_rate_pct: 'Engagement Rate (%)',
-};
-
 const IMPACT_METRICS = new Set(['volunteer_hours', 'active_relationships', 'member_count']);
 const IMPACT_THRESHOLD = 25; // % change that counts as "impact achieved"
+type AdminT = (key: string, options?: Record<string, unknown>) => string;
 
 function fmt(val: number | null): string {
   if (val === null || val === undefined) return '—';
@@ -107,7 +98,7 @@ function fmtDate(iso: string): string {
 // Sub-component: Comparison Panel
 // ---------------------------------------------------------------------------
 
-function ComparisonPanel({ result, onClose }: { result: ComparisonResult; onClose: () => void }) {
+function ComparisonPanel({ result, onClose, t }: { result: ComparisonResult; onClose: () => void; t: AdminT }) {
   const { baseline, comparison } = result;
 
   return (
@@ -116,20 +107,20 @@ function ComparisonPanel({ result, onClose }: { result: ComparisonResult; onClos
         <div className="flex items-center gap-2">
           <BarChart2 size={18} className="text-primary" />
           <span className="font-semibold text-sm">
-            Comparing: <span className="text-primary">{baseline.label}</span>
+            {t('kpi_baselines.comparison.comparing')} <span className="text-primary">{baseline.label}</span>
             <span className="text-[var(--color-text-muted)] ml-2 font-normal">
-              (captured {fmtDate(baseline.captured_at)})
+              {t('kpi_baselines.comparison.captured', { date: fmtDate(baseline.captured_at) })}
             </span>
           </span>
         </div>
         <Button size="sm" variant="light" onPress={onClose}>
-          Close
+          {t('kpi_baselines.actions.close')}
         </Button>
       </CardHeader>
       <CardBody className="pt-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {Object.entries(comparison).map(([key, mc]) => {
-            const label = METRIC_LABELS[key] ?? key;
+            const label = t(`kpi_baselines.metrics.${key}`);
             const hasData = mc.baseline !== null || mc.current !== null;
             const pct = mc.pct_change;
             const isUp = pct !== null && pct > 0;
@@ -150,7 +141,7 @@ function ComparisonPanel({ result, onClose }: { result: ComparisonResult; onClos
                   <span className="text-xs text-[var(--color-text-muted)] font-medium">{label}</span>
                   {isImpact && (
                     <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle2 size={12} />}>
-                      Impact achieved
+                      {t('kpi_baselines.comparison.impact_achieved')}
                     </Chip>
                   )}
                 </div>
@@ -159,11 +150,11 @@ function ComparisonPanel({ result, onClose }: { result: ComparisonResult; onClos
                   <>
                     <div className="flex items-end gap-4">
                       <div>
-                        <div className="text-[10px] text-[var(--color-text-muted)]">Baseline</div>
+                        <div className="text-[10px] text-[var(--color-text-muted)]">{t('kpi_baselines.comparison.baseline')}</div>
                         <div className="text-base font-semibold">{fmt(mc.baseline)}</div>
                       </div>
                       <div>
-                        <div className="text-[10px] text-[var(--color-text-muted)]">Now</div>
+                        <div className="text-[10px] text-[var(--color-text-muted)]">{t('kpi_baselines.comparison.now')}</div>
                         <div className="text-base font-semibold">{fmt(mc.current)}</div>
                       </div>
                     </div>
@@ -189,7 +180,7 @@ function ComparisonPanel({ result, onClose }: { result: ComparisonResult; onClos
                     )}
                   </>
                 ) : (
-                  <span className="text-xs text-[var(--color-text-muted)] italic">No data available</span>
+                  <span className="text-xs text-[var(--color-text-muted)] italic">{t('kpi_baselines.empty.no_data')}</span>
                 )}
               </div>
             );
@@ -198,7 +189,7 @@ function ComparisonPanel({ result, onClose }: { result: ComparisonResult; onClos
 
         {baseline.notes && (
           <div className="mt-3 p-3 rounded-lg bg-[var(--color-surface-alt)] text-sm">
-            <span className="font-medium">Notes: </span>
+            <span className="font-medium">{t('kpi_baselines.fields.notes_label_prefix')} </span>
             <span className="text-[var(--color-text-muted)]">{baseline.notes}</span>
           </div>
         )}
@@ -212,8 +203,8 @@ function ComparisonPanel({ result, onClose }: { result: ComparisonResult; onClos
 // ---------------------------------------------------------------------------
 
 export default function KpiBaselineAdminPage() {
-  const { t } = useTranslation('caring_community', { keyPrefix: 'admin_a11y' });
-  usePageTitle('Community KPI Baselines');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('kpi_baselines.meta.page_title'));
   const { showToast } = useToast();
 
   const [baselines, setBaselines] = useState<KpiBaseline[]>([]);
@@ -240,11 +231,11 @@ export default function KpiBaselineAdminPage() {
       const res = await api.get<KpiBaseline[]>('/v2/admin/caring-community/kpi-baselines');
       setBaselines(Array.isArray(res.data) ? res.data : []);
     } catch {
-      showToast('Failed to load KPI baselines', 'error');
+      showToast(t('kpi_baselines.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     loadBaselines();
@@ -264,12 +255,12 @@ export default function KpiBaselineAdminPage() {
         setComparison(res.data ?? null);
         setSelectedBaselineId(id);
       } catch {
-        showToast('Failed to load comparison', 'error');
+        showToast(t('kpi_baselines.toasts.comparison_failed'), 'error');
       } finally {
         setComparingId(null);
       }
     },
-    [selectedBaselineId, showToast],
+    [selectedBaselineId, showToast, t],
   );
 
   const handleCapture = useCallback(async () => {
@@ -280,34 +271,34 @@ export default function KpiBaselineAdminPage() {
         period: { start: capturePeriodStart, end: capturePeriodEnd },
         notes: captureNotes.trim() || undefined,
       });
-      showToast('Baseline saved. Use it to compare future metrics against this snapshot.', 'success');
+      showToast(t('kpi_baselines.toasts.saved'), 'success');
       setCaptureModalOpen(false);
       setCaptureLabel('');
       setCaptureNotes('');
       await loadBaselines();
     } catch {
-      showToast('Failed to capture baseline', 'error');
+      showToast(t('kpi_baselines.toasts.capture_failed'), 'error');
     } finally {
       setCapturing(false);
     }
-  }, [captureLabel, captureNotes, capturePeriodStart, capturePeriodEnd, loadBaselines, showToast]);
+  }, [captureLabel, captureNotes, capturePeriodStart, capturePeriodEnd, loadBaselines, showToast, t]);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Community KPI Baselines"
-        subtitle={<>Capture snapshots of your community metrics to track before/after <Abbr term="KPI">KPI</Abbr> impact</>}
+        title={t('kpi_baselines.meta.title')}
+        subtitle={<>{t('kpi_baselines.meta.subtitle_prefix')} <Abbr term="KPI" /> {t('kpi_baselines.meta.subtitle_suffix')}</>}
         icon={<Database size={20} />}
         actions={
           <div className="flex items-center gap-2">
-            <Tooltip content="Refresh">
+            <Tooltip content={t('kpi_baselines.actions.refresh')}>
               <Button
                 isIconOnly
                 size="sm"
                 variant="flat"
                 onPress={loadBaselines}
                 isLoading={loading}
-                aria-label={t('refresh_kpi_baselines')}
+                aria-label={t('kpi_baselines.actions.refresh_aria')}
               >
                 <RefreshCw size={15} />
               </Button>
@@ -318,7 +309,7 @@ export default function KpiBaselineAdminPage() {
               startContent={<Plus size={15} />}
               onPress={() => setCaptureModalOpen(true)}
             >
-              Capture Baseline Now
+              {t('kpi_baselines.actions.capture_now')}
             </Button>
           </div>
         }
@@ -329,17 +320,12 @@ export default function KpiBaselineAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('kpi_baselines.about.title')}</p>
               <p className="text-default-600">
-                <Abbr term="KPI">KPI</Abbr> Baselines record the state of your community before the Caring Community
-                programme begins. They are compared against current metrics at each quarterly review
-                to demonstrate impact. Capture baselines for every <Abbr term="KPI">KPI</Abbr> before onboarding residents —
-                once the pilot starts, the baseline is frozen and cannot be backdated.
+                <Abbr term="KPI" /> {t('kpi_baselines.about.body_prefix')} <Abbr term="KPI" /> {t('kpi_baselines.about.body_suffix')}
               </p>
               <p className="text-default-600">
-                Click <strong>Compare</strong> on any baseline row to see a side-by-side comparison
-                against current platform data. Metrics showing 25%+ change on key impact indicators
-                are highlighted as 'Impact achieved'.
+                {t('kpi_baselines.about.compare_prefix')} <strong>{t('kpi_baselines.actions.compare')}</strong> {t('kpi_baselines.about.compare_suffix')}
               </p>
             </div>
           </div>
@@ -356,30 +342,30 @@ export default function KpiBaselineAdminPage() {
           ) : baselines.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-12 text-[var(--color-text-muted)]">
               <Database size={40} className="opacity-30" />
-              <p className="text-sm">No baselines captured yet.</p>
+              <p className="text-sm">{t('kpi_baselines.empty.no_baselines')}</p>
               <Button
                 color="primary"
                 size="sm"
                 startContent={<Plus size={14} />}
                 onPress={() => setCaptureModalOpen(true)}
               >
-                Capture your first baseline
+                {t('kpi_baselines.actions.capture_first')}
               </Button>
             </div>
           ) : (
             <Table
-              aria-label="KPI Baselines"
+              aria-label={t('kpi_baselines.table.aria')}
               removeWrapper
               classNames={{ th: 'bg-[var(--color-surface-alt)] text-xs font-semibold uppercase tracking-wide' }}
             >
               <TableHeader>
-                <TableColumn>Label</TableColumn>
-                <TableColumn>Captured</TableColumn>
-                <TableColumn>Members</TableColumn>
-                <TableColumn>Volunteer Hours</TableColumn>
-                <TableColumn>Active Relationships</TableColumn>
-                <TableColumn>Total Exchanges</TableColumn>
-                <TableColumn>Actions</TableColumn>
+                <TableColumn>{t('kpi_baselines.table.label')}</TableColumn>
+                <TableColumn>{t('kpi_baselines.table.captured')}</TableColumn>
+                <TableColumn>{t('kpi_baselines.table.members')}</TableColumn>
+                <TableColumn>{t('kpi_baselines.table.volunteer_hours')}</TableColumn>
+                <TableColumn>{t('kpi_baselines.table.active_relationships')}</TableColumn>
+                <TableColumn>{t('kpi_baselines.table.total_exchanges')}</TableColumn>
+                <TableColumn>{t('kpi_baselines.table.actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {baselines.map((b) => (
@@ -408,7 +394,7 @@ export default function KpiBaselineAdminPage() {
                         onPress={() => handleCompare(b.id)}
                         startContent={<BarChart2 size={13} />}
                       >
-                        {selectedBaselineId === b.id ? 'Close' : 'Compare'}
+                        {selectedBaselineId === b.id ? t('kpi_baselines.actions.close') : t('kpi_baselines.actions.compare')}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -423,6 +409,7 @@ export default function KpiBaselineAdminPage() {
       {comparison && selectedBaselineId !== null && (
         <ComparisonPanel
           result={comparison}
+          t={t}
           onClose={() => {
             setComparison(null);
             setSelectedBaselineId(null);
@@ -442,57 +429,55 @@ export default function KpiBaselineAdminPage() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <Database size={18} className="text-primary" />
-                Capture <Abbr term="KPI">KPI</Abbr> Baseline
+                {t('kpi_baselines.modal.title_prefix')} <Abbr term="KPI" /> {t('kpi_baselines.modal.title_suffix')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <p className="text-sm text-[var(--color-text-muted)]">
-                  This will take a live snapshot of your community metrics right now and save it
-                  as a named baseline for future comparisons.
+                  {t('kpi_baselines.modal.body')}
                 </p>
                 <Input
-                  label="Baseline Label"
-                  placeholder="e.g. Before NEXUS Launch"
+                  label={t('kpi_baselines.fields.baseline_label')}
+                  placeholder={t('kpi_baselines.fields.baseline_placeholder')}
                   value={captureLabel}
                   onValueChange={setCaptureLabel}
                   variant="bordered"
-                  description='A short name to identify this snapshot (e.g. "Q1 2025 Pre-launch")'
+                  description={t('kpi_baselines.fields.baseline_description')}
                 />
                 <div className="grid grid-cols-2 gap-3">
                   <Input
-                    label="Period Start"
+                    label={t('kpi_baselines.fields.period_start')}
                     type="date"
                     value={capturePeriodStart}
                     onValueChange={setCapturePeriodStart}
                     variant="bordered"
-                    description="Reference period start"
+                    description={t('kpi_baselines.fields.period_start_description')}
                   />
                   <Input
-                    label="Period End"
+                    label={t('kpi_baselines.fields.period_end')}
                     type="date"
                     value={capturePeriodEnd}
                     onValueChange={setCapturePeriodEnd}
                     variant="bordered"
-                    description="Reference period end"
+                    description={t('kpi_baselines.fields.period_end_description')}
                   />
                 </div>
                 <Textarea
-                  label="Notes / source (optional)"
-                  placeholder="e.g. 'GP referral data Q1 2026, member survey March 2026, captured before platform rollout to all Gemeinden'"
+                  label={t('kpi_baselines.fields.notes_source')}
+                  placeholder={t('kpi_baselines.fields.notes_placeholder')}
                   value={captureNotes}
                   onValueChange={setCaptureNotes}
                   variant="bordered"
                   minRows={2}
-                  description="Document where these numbers come from (e.g. 'GP referral data Q1 2026', 'member survey March 2026'). Cited sources make the baseline defensible in grant reporting."
+                  description={t('kpi_baselines.fields.notes_description')}
                 />
                 <Divider />
                 <p className="text-xs text-[var(--color-text-muted)]">
-                  Metrics captured: active member count, approved volunteer hours (last 90 days),
-                  active support relationships, distinct recipients, and total exchanges.
+                  {t('kpi_baselines.modal.metrics_captured')}
                 </p>
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose} isDisabled={capturing}>
-                  Cancel
+                  {t('kpi_baselines.actions.cancel')}
                 </Button>
                 <Button
                   color="primary"
@@ -500,7 +485,7 @@ export default function KpiBaselineAdminPage() {
                   isLoading={capturing}
                   startContent={!capturing ? <Database size={15} /> : undefined}
                 >
-                  Capture Now
+                  {t('kpi_baselines.actions.capture_now_short')}
                 </Button>
               </ModalFooter>
             </>

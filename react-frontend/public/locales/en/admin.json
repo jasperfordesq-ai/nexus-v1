@@ -3854,6 +3854,86 @@
       "reject_failed": "Failed to reject proposal"
     }
   },
+  "kpi_baselines": {
+    "meta": {
+      "page_title": "Community KPI Baselines",
+      "title": "Community KPI Baselines",
+      "subtitle_prefix": "Capture snapshots of your community metrics to track before/after",
+      "subtitle_suffix": "impact"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh KPI baselines",
+      "capture_now": "Capture Baseline Now",
+      "capture_now_short": "Capture Now",
+      "capture_first": "Capture your first baseline",
+      "compare": "Compare",
+      "close": "Close",
+      "cancel": "Cancel"
+    },
+    "about": {
+      "title": "About this page",
+      "body_prefix": "Baselines record the state of your community before the Caring Community programme begins. They are compared against current metrics at each quarterly review to demonstrate impact. Capture baselines for every",
+      "body_suffix": "before onboarding residents - once the pilot starts, the baseline is frozen and cannot be backdated.",
+      "compare_prefix": "Click",
+      "compare_suffix": "on any baseline row to see a side-by-side comparison against current platform data. Metrics showing 25%+ change on key impact indicators are highlighted as Impact achieved."
+    },
+    "metrics": {
+      "volunteer_hours": "Volunteer Hours (90d)",
+      "member_count": "Active Members",
+      "recipient_count": "Recipients Reached",
+      "active_relationships": "Active Relationships",
+      "total_exchanges": "Total Exchanges",
+      "avg_response_hours": "Avg Response Time (hrs)",
+      "engagement_rate_pct": "Engagement Rate (%)"
+    },
+    "comparison": {
+      "comparing": "Comparing:",
+      "captured": "(captured {{date}})",
+      "impact_achieved": "Impact achieved",
+      "baseline": "Baseline",
+      "now": "Now"
+    },
+    "empty": {
+      "no_data": "No data available",
+      "no_baselines": "No baselines captured yet."
+    },
+    "fields": {
+      "notes_label_prefix": "Notes:",
+      "baseline_label": "Baseline Label",
+      "baseline_placeholder": "e.g. Before NEXUS Launch",
+      "baseline_description": "A short name to identify this snapshot (e.g. \"Q1 2025 Pre-launch\")",
+      "period_start": "Period Start",
+      "period_start_description": "Reference period start",
+      "period_end": "Period End",
+      "period_end_description": "Reference period end",
+      "notes_source": "Notes / source (optional)",
+      "notes_placeholder": "e.g. 'GP referral data Q1 2026, member survey March 2026, captured before platform rollout to all Gemeinden'",
+      "notes_description": "Document where these numbers come from (e.g. 'GP referral data Q1 2026', 'member survey March 2026'). Cited sources make the baseline defensible in grant reporting."
+    },
+    "table": {
+      "aria": "KPI Baselines",
+      "label": "Label",
+      "captured": "Captured",
+      "members": "Members",
+      "volunteer_hours": "Volunteer Hours",
+      "active_relationships": "Active Relationships",
+      "total_exchanges": "Total Exchanges",
+      "actions": "Actions"
+    },
+    "modal": {
+      "title_prefix": "Capture",
+      "title_suffix": "Baseline",
+      "body": "This will take a live snapshot of your community metrics right now and save it as a named baseline for future comparisons.",
+      "metrics_captured": "Metrics captured: active member count, approved volunteer hours (last 90 days), active support relationships, distinct recipients, and total exchanges."
+    },
+    "toasts": {
+      "load_failed": "Failed to load KPI baselines",
+      "comparison_failed": "Failed to load comparison",
+      "saved": "Baseline saved. Use it to compare future metrics against this snapshot.",
+      "capture_failed": "Failed to capture baseline"
+    }
+  },
   "pilot_launch_readiness": {
     "meta": {
       "page_title": "Pilot Launch Readiness",
