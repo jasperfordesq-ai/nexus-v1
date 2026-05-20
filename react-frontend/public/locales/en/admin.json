@@ -946,7 +946,16 @@
   },
   "caring_emergency": {
     "title": "Emergency Alerts (AG70)",
+    "heading": "Emergency Alerts",
     "empty": "No emergency alerts yet.",
+    "intro": {
+      "title": "About this page - use with caution",
+      "body": "Emergency Alerts are urgent broadcasts sent to all members (or a targeted sub-group) immediately. Use this only for genuine emergencies - severe weather, community safety incidents, or urgent care coverage gaps. Alerts are sent as push notifications and in-app banners. They cannot be unsent once dispatched.",
+      "targeting_label": "Targeting",
+      "targeting_body": "Selecting severity \"Danger\" or \"Warning\" sends to all members. Draft carefully - there is no recall once broadcast.",
+      "delivery_label": "Delivery",
+      "delivery_body": "Alerts are delivered within 60 seconds of dispatch."
+    },
     "actions": {
       "open_send_modal": "Send emergency alert",
       "confirm_prompt": "Confirm?",
@@ -957,7 +966,8 @@
     },
     "errors": {
       "load_failed": "Failed to load alerts",
-      "send_failed": "Failed to send alert"
+      "send_failed": "Failed to send alert",
+      "deactivate_failed": "Failed to deactivate alert"
     },
     "severity": {
       "info": "Info",
@@ -979,6 +989,7 @@
       "sent": "Sent"
     },
     "status": {
+      "active": "Active",
       "inactive": "Inactive"
     },
     "modal": {
