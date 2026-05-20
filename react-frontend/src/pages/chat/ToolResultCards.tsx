@@ -113,6 +113,7 @@ function renderCardContent(cardType: string, item: Record<string, unknown>) {
 }
 
 function ListingCard({ item }: { item: Record<string, unknown> }) {
+  const { t } = useTranslation('common');
   const type = String(item.type ?? '');
   return (
     <>
@@ -125,7 +126,7 @@ function ListingCard({ item }: { item: Record<string, unknown> }) {
         {item.location ? (
           <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{String(item.location)}</span>
         ) : null}
-        {item.hours_estimate != null ? <span>{String(item.hours_estimate)}h</span> : null}
+        {item.hours_estimate != null ? <span>{t('hours_short', { count: Number(item.hours_estimate) })}</span> : null}
       </div>
       {item.excerpt ? <p className="text-xs text-[var(--color-text-muted)] line-clamp-2">{String(item.excerpt)}</p> : null}
     </>
@@ -189,6 +190,7 @@ function JobCard({ item }: { item: Record<string, unknown> }) {
 }
 
 function MarketplaceCard({ item }: { item: Record<string, unknown> }) {
+  const { t } = useTranslation('common');
   return (
     <>
       <div className="flex items-start gap-2">
@@ -197,7 +199,7 @@ function MarketplaceCard({ item }: { item: Record<string, unknown> }) {
       </div>
       <div className="flex flex-wrap items-center gap-1.5 text-xs text-[var(--color-text-muted)]">
         {item.price ? <span>{String(item.price)}</span> : null}
-        {item.time_credit_price != null ? <span>{String(item.time_credit_price)}h credits</span> : null}
+        {item.time_credit_price != null ? <span>{t('time_credits_short', { count: Number(item.time_credit_price) })}</span> : null}
         {item.condition ? <Chip size="sm" variant="flat">{String(item.condition)}</Chip> : null}
       </div>
     </>
@@ -224,7 +226,7 @@ function WalletCard({ item }: { item: Record<string, unknown> }) {
         <Wallet className="w-3.5 h-3.5 mt-0.5 text-indigo-500 shrink-0" />
         <p className="text-sm font-semibold text-[var(--color-text)]">{t('card_wallet_title')}</p>
       </div>
-      <p className="text-2xl font-bold text-[var(--color-text)]">{Number(item.balance ?? 0).toFixed(2)}h</p>
+      <p className="text-2xl font-bold text-[var(--color-text)]">{t('common:hours_short', { count: Number(Number(item.balance ?? 0).toFixed(2)) })}</p>
       <p className="text-xs text-[var(--color-text-muted)]">{t('card_wallet_transactions', { count: Number(item.recent_transactions_30d ?? 0) })}</p>
     </>
   );

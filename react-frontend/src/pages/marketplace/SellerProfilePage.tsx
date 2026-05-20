@@ -352,7 +352,7 @@ export function SellerProfilePage() {
             <StatCard
               icon={Clock}
               label={t('seller.response_time')}
-              value={seller.response_time || t('seller.na')}
+              value={seller.response_time_avg || t('seller.na')}
             />
             <StatCard
               icon={Package}

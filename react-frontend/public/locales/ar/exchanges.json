@@ -106,7 +106,8 @@
     },
     "prep_time": "وقت التحضير",
     "ratings": "Ratings",
-    "rate_exchange": "قيم هذا التبادل"
+    "rate_exchange": "قيم هذا التبادل",
+    "prep_time_value": "{{count}}h"
   },
   "modal": {
     "decline_title": "رفض طلب التبادل",

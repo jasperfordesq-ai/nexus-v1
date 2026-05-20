@@ -495,7 +495,7 @@ export function FederationSettingsPage() {
                     updateSetting('travel_radius_km', isNaN(num) ? 0 : Math.max(0, Math.min(500, num)));
                   }}
                   endContent={
-                    <span className="text-theme-subtle text-sm">km</span>
+                    <span className="text-theme-subtle text-sm">{t('settings.kilometers_short')}</span>
                   }
                   classNames={inputClassNames}
                   description={t('settings.travel_radius_description')}

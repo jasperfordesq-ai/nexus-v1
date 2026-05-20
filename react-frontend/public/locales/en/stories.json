@@ -130,7 +130,8 @@
     "resume_story": "Resume story",
     "story_options": "Story options",
     "reply_placeholder_generic": "Reply to story...",
-    "react_with": "React with {{type}}"
+    "react_with": "React with {{type}}",
+    "viewers_title_count": "Viewers ({{count}})"
   },
   "highlights": {
     "no_stories": "This highlight has no stories",

@@ -180,7 +180,7 @@ export function DataTable<T extends Record<string, any>>({
     return (
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-2 py-2">
         <span className="text-sm text-default-400">
-          {totalItems ? t('shared.total_count', { count: totalItems.toLocaleString() }) : ''}
+          {totalItems ? t('shared.total_count', { count: totalItems }) : ''}
         </span>
         <Pagination
           total={totalPages}

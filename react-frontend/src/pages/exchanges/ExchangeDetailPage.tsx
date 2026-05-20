@@ -535,7 +535,7 @@ export function ExchangeDetailPage() {
         {exchange.prep_time != null && exchange.prep_time > 0 && (
           <div className="bg-theme-elevated rounded-lg p-4 mb-6">
             <h3 className="text-sm font-medium text-theme-muted mb-1">{t('detail.prep_time')}</h3>
-            <p className="text-lg font-semibold text-theme-primary">{exchange.prep_time}h</p>
+            <p className="text-lg font-semibold text-theme-primary">{t('detail.prep_time_value', { count: exchange.prep_time })}</p>
           </div>
         )}
 

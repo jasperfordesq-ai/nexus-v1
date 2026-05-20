@@ -220,7 +220,8 @@
     "video_invalid_type": "Invalid video format. Use MP4, WebM, OGG, or MOV.",
     "video_too_large": "Video must be under {{size}}MB.",
     "video": "Video",
-    "video_remove": "Remove video"
+    "video_remove": "Remove video",
+    "file_size_mb": "{{name}} ({{size}}MB)"
   },
   "moderation": {
     "unauthorized": "Sie sind nicht berechtigt, diese Aktion auszuführen."

@@ -106,7 +106,8 @@
     },
     "prep_time": "Temps de préparation",
     "ratings": "Évaluations",
-    "rate_exchange": "Évaluer cet échange"
+    "rate_exchange": "Évaluer cet échange",
+    "prep_time_value": "{{count}}h"
   },
   "modal": {
     "decline_title": "Refuser la demande d'échange",

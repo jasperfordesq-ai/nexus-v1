@@ -12,6 +12,7 @@
 
 import { Chip, Tooltip } from '@heroui/react';
 import ShieldCheck from 'lucide-react/icons/shield-check';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   domain?: string | null;
@@ -21,13 +22,14 @@ interface Props {
 }
 
 export function VerifiedMunicipalityBadge({ domain, verifiedAt, size = 'sm', className }: Props) {
+  const { t } = useTranslation('common');
   const tooltipParts: string[] = [
-    'This community has been verified as a municipal partner.',
+    t('verified_municipality.tooltip'),
   ];
-  if (domain) tooltipParts.push(`Verified domain: ${domain}`);
+  if (domain) tooltipParts.push(t('verified_municipality.domain', { domain }));
   if (verifiedAt) {
     try {
-      tooltipParts.push(`Verified on ${new Date(verifiedAt).toLocaleDateString()}`);
+      tooltipParts.push(t('verified_municipality.verified_on', { date: new Date(verifiedAt).toLocaleDateString() }));
     } catch {
       /* ignore */
     }
@@ -42,7 +44,7 @@ export function VerifiedMunicipalityBadge({ domain, verifiedAt, size = 'sm', cla
         startContent={<ShieldCheck className="w-3.5 h-3.5" />}
         className={className}
       >
-        Verified municipality
+        {t('verified_municipality.label')}
       </Chip>
     </Tooltip>
   );

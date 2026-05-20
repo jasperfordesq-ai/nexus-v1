@@ -218,6 +218,22 @@ function stripRuntimeMapsAssets(html) {
 }
 
 // ─── Pre-render a single route ───────────────────────────────────────────────
+async function capturePageContent(page) {
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      if (attempt > 0) {
+        await page.waitForLoadState('domcontentloaded', { timeout: 3000 }).catch(() => {});
+        await page.waitForTimeout(500);
+      }
+      return await page.content();
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError;
+}
+
 async function prerenderRoute(page, route) {
   const url = `http://localhost:${PORT}${route}`;
 
@@ -237,7 +253,7 @@ async function prerenderRoute(page, route) {
     await page.waitForTimeout(1000);
 
     // Get the full rendered HTML
-    let html = await page.content();
+    let html = await capturePageContent(page);
 
     // Clean up: remove Vite HMR scripts that shouldn't be in static output
     html = html.replace(/<script[^>]*type="module"[^>]*src="\/src\/[^"]*"[^>]*><\/script>/g, '');

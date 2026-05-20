@@ -106,7 +106,8 @@
     },
     "prep_time": "Am Ullmhúcháin",
     "ratings": "Rátálacha",
-    "rate_exchange": "Rátáil an Malartú seo"
+    "rate_exchange": "Rátáil an Malartú seo",
+    "prep_time_value": "{{count}}h"
   },
   "modal": {
     "decline_title": "Diúltaigh d'Iarratas Malartaithe",

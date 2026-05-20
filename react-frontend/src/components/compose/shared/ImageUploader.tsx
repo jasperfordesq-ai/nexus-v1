@@ -94,7 +94,7 @@ export function ImageUploader({
         </Button>
         {file && (
           <span className="text-xs text-[var(--text-subtle)]">
-            {file.name} ({(file.size / 1024 / 1024).toFixed(1)}MB)
+            {t('compose.file_size_mb', { name: file.name, size: (file.size / 1024 / 1024).toFixed(1) })}
           </span>
         )}
       </div>

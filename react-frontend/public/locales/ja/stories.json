@@ -127,7 +127,8 @@
     "resume_story": "ストーリーを再開",
     "story_options": "ストーリーオプション",
     "reply_placeholder_generic": "ストーリーに返信...",
-    "react_with": "React with {{type}}"
+    "react_with": "React with {{type}}",
+    "viewers_title_count": "Viewers ({{count}})"
   },
   "empty": {
     "no_stories": "No stories available"

@@ -2011,5 +2011,20 @@
     "join_to_see_feed_title": "Join to see the feed",
     "feed_load_more": "Load More"
   },
-  "apply": "Apply"
+  "apply": "Apply",
+  "verified_municipality": {
+    "label": "Verified municipality",
+    "tooltip": "This community has been verified as a municipal partner.",
+    "domain": "Verified domain: {{domain}}",
+    "verified_on": "Verified on {{date}}"
+  },
+  "max_characters": "max {{count}} characters",
+  "map": {
+    "listings_here": "{{count}} listings here"
+  },
+  "time_credits_short": "{{count}}h credits",
+  "level_plain": "Level {{level}}",
+  "level_named": "Level {{level}} - {{name}}",
+  "xp_progress": "{{current}} / {{required}} XP",
+  "level_progress_aria": "Level {{level}} progress: {{percentage}}%"
 }

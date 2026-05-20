@@ -4,7 +4,26 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Divider, Input, Select, SelectItem, Spinner, Switch, Textarea } from '@heroui/react';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Divider,
+  Input,
+  Select,
+  SelectItem,
+  Spinner,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  Textarea,
+} from '@heroui/react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Building2 from 'lucide-react/icons/building-2';

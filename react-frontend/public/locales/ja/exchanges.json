@@ -106,7 +106,8 @@
     },
     "prep_time": "準備時間",
     "ratings": "Ratings",
-    "rate_exchange": "この交換を評価"
+    "rate_exchange": "この交換を評価",
+    "prep_time_value": "{{count}}h"
   },
   "modal": {
     "decline_title": "交換リクエストを拒否",

@@ -214,7 +214,7 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
         />
         <div className="flex items-center justify-between text-xs">
           <span className="text-default-500">
-            <strong>{credits.toFixed(2)} h</strong>
+            <strong>{t('hours_short', { count: Number(credits.toFixed(2)) })}</strong>
           </span>
           <span className="text-default-500">
             {t('loyalty.discount_preview', { discount: previewDiscount.toFixed(2) })}

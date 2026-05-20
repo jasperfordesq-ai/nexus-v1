@@ -3,6 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useTranslation } from 'react-i18next';
+
 /**
  * LevelProgress - Glassmorphic XP/level progress bar
  *
@@ -21,6 +23,7 @@ export interface LevelProgressProps {
 }
 
 export function LevelProgress({ currentXP, requiredXP, level, levelName, compact = false }: LevelProgressProps) {
+  const { t } = useTranslation('common');
   // Guard against negative or NaN values from malformed backend data
   const safeCurrentXP = Math.max(0, currentXP ?? 0);
   const safeRequiredXP = Math.max(0, requiredXP ?? 0);
@@ -31,10 +34,10 @@ export function LevelProgress({ currentXP, requiredXP, level, levelName, compact
       {!compact && (
         <div className="flex justify-between items-center">
           <span className="text-theme-primary font-medium">
-            Level {level}{levelName ? ` \u2014 ${levelName}` : ''}
+            {levelName ? t('level_named', { level, name: levelName }) : t('level_plain', { level })}
           </span>
           <span className="text-theme-subtle text-sm">
-            {safeCurrentXP.toLocaleString()} / {safeRequiredXP.toLocaleString()} XP
+            {t('xp_progress', { current: safeCurrentXP.toLocaleString(), required: safeRequiredXP.toLocaleString() })}
           </span>
         </div>
       )}
@@ -44,7 +47,7 @@ export function LevelProgress({ currentXP, requiredXP, level, levelName, compact
         aria-valuenow={percentage}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label={`Level ${level} progress: ${percentage}%`}
+        aria-label={t('level_progress_aria', { level, percentage })}
       >
         <div
           className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-500"
@@ -55,7 +58,7 @@ export function LevelProgress({ currentXP, requiredXP, level, levelName, compact
       {compact && (
         <div className="flex justify-between text-xs">
           <span className="text-theme-muted">
-            {safeCurrentXP.toLocaleString()} / {safeRequiredXP.toLocaleString()} XP
+            {t('xp_progress', { current: safeCurrentXP.toLocaleString(), required: safeRequiredXP.toLocaleString() })}
           </span>
           <span className="text-theme-primary font-medium">{percentage}%</span>
         </div>

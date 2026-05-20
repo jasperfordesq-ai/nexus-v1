@@ -24,6 +24,7 @@ import {
 } from '@heroui/react';
 import UserPlus from 'lucide-react/icons/user-plus';
 import UserCheck from 'lucide-react/icons/user-check';
+import Check from 'lucide-react/icons/check';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
@@ -253,7 +254,7 @@ export const UserHoverCard = memo(function UserHoverCard({
                   {displayName}
                   {userData.is_verified && (
                     <span className="ml-1 text-[var(--color-primary)]" title={t('verified')}>
-                      &#10003;
+                      <Check className="inline h-3.5 w-3.5" aria-hidden="true" />
                     </span>
                   )}
                 </Link>

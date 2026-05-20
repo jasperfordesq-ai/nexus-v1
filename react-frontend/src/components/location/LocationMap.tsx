@@ -36,6 +36,7 @@ import {
   type Renderer,
   type Cluster,
 } from '@googlemaps/markerclusterer';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { DARK_MAP_STYLES } from '@/lib/map-styles';
 import { GoogleMapsProvider, useGoogleMapsConfig } from './GoogleMapsProvider';
@@ -507,10 +508,11 @@ function ClusterChooser({
   markers: MapMarker[];
   onPick: (marker: MapMarker) => void;
 }) {
+  const { t } = useTranslation('common');
   return (
     <div className="max-w-[260px] max-h-[280px] overflow-y-auto">
       <div className="font-semibold text-[13px] mb-1.5 text-gray-900">
-        {markers.length} listings here
+        {t('map.listings_here', { count: markers.length })}
       </div>
       <ul className="list-none p-0 m-0">
         {markers.map((m) => (

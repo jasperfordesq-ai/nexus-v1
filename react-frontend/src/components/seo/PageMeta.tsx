@@ -160,7 +160,8 @@ export function PageMeta({
 
   // Canonical: always clean pathname, never include query params or hash
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  const canonicalUrl = toAbsoluteUrl(url, origin) || buildCanonicalUrl(origin, location.pathname);
+  const browserPathname = typeof window !== 'undefined' ? window.location.pathname : location.pathname;
+  const canonicalUrl = toAbsoluteUrl(url, origin) || buildCanonicalUrl(origin, browserPathname);
 
   // OG image fallback chain: explicit prop -> tenant og_image_url -> tenant logo -> platform default
   const richCardImage = toAbsoluteUrl(image || branding.og_image_url || branding.logo, origin);

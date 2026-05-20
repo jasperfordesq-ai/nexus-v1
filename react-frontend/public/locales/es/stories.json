@@ -127,7 +127,8 @@
     "resume_story": "Reanudar historia",
     "story_options": "Opciones de historia",
     "reply_placeholder_generic": "Responder a la historia...",
-    "react_with": "React with {{type}}"
+    "react_with": "React with {{type}}",
+    "viewers_title_count": "Viewers ({{count}})"
   },
   "empty": {
     "no_stories": "No stories available"

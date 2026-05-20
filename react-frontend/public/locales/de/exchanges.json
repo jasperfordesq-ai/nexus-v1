@@ -106,7 +106,8 @@
     },
     "prep_time": "Vorbereitungszeit",
     "ratings": "Bewertungen",
-    "rate_exchange": "Diesen Tausch bewerten"
+    "rate_exchange": "Diesen Tausch bewerten",
+    "prep_time_value": "{{count}}h"
   },
   "modal": {
     "decline_title": "Tauschanfrage ablehnen",

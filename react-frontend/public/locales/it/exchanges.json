@@ -106,7 +106,8 @@
     },
     "prep_time": "Tempo di Preparazione",
     "ratings": "Valutazioni",
-    "rate_exchange": "Valuta Questo Scambio"
+    "rate_exchange": "Valuta Questo Scambio",
+    "prep_time_value": "{{count}}h"
   },
   "modal": {
     "decline_title": "Rifiuta richiesta di scambio",

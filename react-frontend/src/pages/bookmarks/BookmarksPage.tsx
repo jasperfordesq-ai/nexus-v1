@@ -8,7 +8,7 @@
  * Tabs for content types, collection management, grid/list view.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { Fragment, useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Button,
@@ -300,12 +300,14 @@ export default function BookmarksPage() {
             className="w-full sm:max-w-xs"
             size="sm"
           >
-            <SelectItem key="all">{t('bookmarks.all_items')}</SelectItem>
-            {collections.map((coll) => (
-              <SelectItem key={String(coll.id)}>
-                {coll.name} {coll.bookmarks_count != null && `(${coll.bookmarks_count})`}
-              </SelectItem>
-            ))}
+            <Fragment>
+              <SelectItem key="all">{t('bookmarks.all_items')}</SelectItem>
+              {collections.map((coll) => (
+                <SelectItem key={String(coll.id)}>
+                  {coll.name} {coll.bookmarks_count != null && `(${coll.bookmarks_count})`}
+                </SelectItem>
+              ))}
+            </Fragment>
           </Select>
           {collections.map((coll) => (
             <div key={coll.id} className="flex items-center gap-1 shrink-0">

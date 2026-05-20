@@ -545,10 +545,11 @@ export const ComposeEditor = forwardRef<ComposeEditorHandle, ComposeEditorProps>
  * and conditionally show warnings.
  */
 function MaxLengthIndicator({ maxLength }: { maxLength: number }) {
+  const { t } = useTranslation('common');
   return (
     <div className="px-3 py-1 text-right">
       <span className="text-xs text-[var(--text-subtle)]">
-        max {maxLength} characters
+        {t('max_characters', { count: maxLength })}
       </span>
     </div>
   );

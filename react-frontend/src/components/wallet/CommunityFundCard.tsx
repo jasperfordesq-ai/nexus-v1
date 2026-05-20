@@ -99,7 +99,7 @@ export function CommunityFundCard({ onDonateClick, compact = false }: CommunityF
             </div>
             <div>
               <p className="text-xs text-theme-muted">{t('community_fund')}</p>
-              <p className="text-lg font-bold text-theme-primary">{fund.balance}h</p>
+              <p className="text-lg font-bold text-theme-primary">{t('hours_value', { count: fund.balance })}</p>
             </div>
           </div>
           {onDonateClick && (
@@ -139,17 +139,17 @@ export function CommunityFundCard({ onDonateClick, compact = false }: CommunityF
         <div className="text-center p-2 rounded-lg bg-theme-elevated">
           <TrendingUp className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
           <p className="text-xs text-theme-muted">{t('community_fund_deposited')}</p>
-          <p className="text-sm font-semibold text-theme-primary">{fund.total_deposited}h</p>
+          <p className="text-sm font-semibold text-theme-primary">{t('hours_value', { count: fund.total_deposited })}</p>
         </div>
         <div className="text-center p-2 rounded-lg bg-theme-elevated">
           <TrendingDown className="w-4 h-4 text-rose-400 mx-auto mb-1" />
           <p className="text-xs text-theme-muted">{t('community_fund_withdrawn')}</p>
-          <p className="text-sm font-semibold text-theme-primary">{fund.total_withdrawn}h</p>
+          <p className="text-sm font-semibold text-theme-primary">{t('hours_value', { count: fund.total_withdrawn })}</p>
         </div>
         <div className="text-center p-2 rounded-lg bg-theme-elevated">
           <Heart className="w-4 h-4 text-pink-400 mx-auto mb-1" />
           <p className="text-xs text-theme-muted">{t('donated')}</p>
-          <p className="text-sm font-semibold text-theme-primary">{fund.total_donated}h</p>
+          <p className="text-sm font-semibold text-theme-primary">{t('hours_value', { count: fund.total_donated })}</p>
         </div>
       </div>
 

@@ -507,7 +507,7 @@ export function FederationOnboardingPage() {
                           updateSetting('travel_radius_km', isNaN(num) ? 0 : Math.max(0, Math.min(500, num)));
                         }}
                         endContent={
-                          <span className="text-theme-subtle text-sm">km</span>
+                          <span className="text-theme-subtle text-sm">{t('onboarding.kilometers_short')}</span>
                         }
                         classNames={inputClassNames}
                         description={t('onboarding.travel_radius_description')}

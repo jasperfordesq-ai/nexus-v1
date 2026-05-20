@@ -76,7 +76,7 @@ interface ReviewStats {
 }
 
 /** Render 1-5 stars with filled/unfilled state */
-function StarRating({ rating, size = 16, interactive, onChange }: {
+function StarRating({ rating, size = 16, interactive, onChange, getStarLabel }: {
   rating: number;
   size?: number;
   interactive?: boolean;

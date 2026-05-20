@@ -127,7 +127,8 @@
     "resume_story": "استئناف القصة",
     "story_options": "خيارات القصة",
     "reply_placeholder_generic": "رد على القصة...",
-    "react_with": "React with {{type}}"
+    "react_with": "React with {{type}}",
+    "viewers_title_count": "Viewers ({{count}})"
   },
   "empty": {
     "no_stories": "No stories available"

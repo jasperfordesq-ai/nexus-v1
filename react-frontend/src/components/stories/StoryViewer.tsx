@@ -805,7 +805,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                       })}
                       {hasVoted && (
                         <p className="text-white/60 text-xs text-center mt-1">
-                          {(pollResults || currentStory.poll_results)?.total_votes || 0} votes
+                          {t('viewer.poll_votes', { count: (pollResults || currentStory.poll_results)?.total_votes || 0 })}
                         </p>
                       )}
                     </div>
@@ -1065,7 +1065,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-              <h3 className="text-white font-semibold">Viewers ({viewers.length})</h3>
+              <h3 className="text-white font-semibold">{t('viewer.viewers_title_count', { count: viewers.length })}</h3>
               <Button
                 isIconOnly
                 variant="flat"

@@ -106,7 +106,8 @@
     },
     "prep_time": "Czas przygotowania",
     "ratings": "Ratings",
-    "rate_exchange": "Oceń tę wymianę"
+    "rate_exchange": "Oceń tę wymianę",
+    "prep_time_value": "{{count}}h"
   },
   "modal": {
     "decline_title": "Odrzuć prośbę o wymianę",

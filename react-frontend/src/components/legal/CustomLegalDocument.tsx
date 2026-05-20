@@ -241,7 +241,7 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
             )}
             {doc.version_number && (
               <Chip size="sm" variant="flat" color="default" className="ml-2">
-                v{doc.version_number}
+                {t('version_history.version_number', { number: doc.version_number })}
               </Chip>
             )}
           </div>

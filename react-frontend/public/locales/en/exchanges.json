@@ -106,7 +106,8 @@
     },
     "prep_time": "Preparation Time",
     "ratings": "Ratings",
-    "rate_exchange": "Rate This Exchange"
+    "rate_exchange": "Rate This Exchange",
+    "prep_time_value": "{{count}}h"
   },
   "modal": {
     "decline_title": "Decline Exchange Request",

@@ -132,4 +132,21 @@ describe('PageMeta', () => {
       expect(twitterCard?.getAttribute('content')).toBe('summary');
     });
   });
+
+  it('uses the browser pathname for canonical URLs so tenant slugs are preserved', async () => {
+    const originalPath = window.location.pathname;
+    const originalSearch = window.location.search;
+
+    try {
+      window.history.pushState({}, '', '/hour-timebank/about?utm_source=test');
+      renderWithHelmet(<PageMeta title="About" />);
+
+      await waitFor(() => {
+        const canonical = document.querySelector('link[rel="canonical"]');
+        expect(canonical?.getAttribute('href')).toBe('http://localhost:3000/hour-timebank/about');
+      });
+    } finally {
+      window.history.pushState({}, '', `${originalPath}${originalSearch}`);
+    }
+  });
 });

@@ -300,7 +300,8 @@
     "save_success_description": "Your federation settings have been updated.",
     "save_failed_title": "Save Failed",
     "save_failed_description": "Could not save settings. Please try again.",
-    "save_failed_retry": "A network error occurred. Please try again."
+    "save_failed_retry": "A network error occurred. Please try again.",
+    "kilometers_short": "km"
   },
   "events": {
     "page_title": "Federation Events",
@@ -458,7 +459,8 @@
     "toast_enable_error": "Could not enable federation. Please try again.",
     "toast_enabled": "Federation Enabled",
     "toast_welcome": "Welcome to the federation network!",
-    "toast_generic_error": "An unexpected error occurred. Please try again."
+    "toast_generic_error": "An unexpected error occurred. Please try again.",
+    "kilometers_short": "km"
   },
   "member_profile": {
     "page_title": "Member Profile",
