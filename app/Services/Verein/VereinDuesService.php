@@ -390,6 +390,8 @@ class VereinDuesService
             ->select([
                 'd.id', 'd.user_id', 'd.membership_year', 'd.amount_cents', 'd.currency',
                 'd.status', 'd.due_date', 'd.paid_at', 'd.reminder_count', 'd.last_reminder_at',
+                'd.generated_email_sent_at', 'd.generated_email_failed_at',
+                'd.paid_email_sent_at', 'd.paid_email_failed_at',
                 'd.reminder_email_failed_at', 'd.reminder_email_last_error',
                 'd.waived_reason', 'u.first_name', 'u.last_name', 'u.email',
             ])

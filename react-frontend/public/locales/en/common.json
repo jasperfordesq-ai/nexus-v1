@@ -2016,7 +2016,13 @@
     "col_status": "Status",
     "col_due": "Due",
     "col_reminders": "Reminders",
+    "col_email_delivery": "Email delivery",
     "col_actions": "Actions",
+    "email_status": {
+      "failed": "Failed",
+      "pending": "No evidence",
+      "sent": "Sent"
+    },
     "errors": {
       "load_failed": "Failed to load membership dues.",
       "start_payment_failed": "Could not start payment. Please try again.",

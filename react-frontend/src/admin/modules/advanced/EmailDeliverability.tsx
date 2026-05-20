@@ -104,14 +104,25 @@ interface QueueDiagnosticRow {
   source:
     | 'notification_queue'
     | 'newsletter_queue'
+    | 'civic_digest_delivery_claims'
+    | 'transaction_notification_deliveries'
+    | 'marketplace_order_notification_deliveries'
+    | 'event_reminder_delivery_claims'
+    | 'vol_reminder_delivery_claims'
+    | 'listing_expiry_reminders_sent'
     | 'marketplace_report_notifications'
     | 'event_reminders'
+    | 'goal_reminders'
+    | 'job_interviews'
+    | 'vol_reminders_sent'
     | 'member_subscription_events'
     | 'vol_donations'
     | 'federation_messages'
     | 'federation_transactions'
     | 'federation_inbound_connections'
-    | 'reviews';
+    | 'reviews'
+    | 'user_safeguarding_preferences'
+    | 'notifications';
   id: number;
   email: string | null;
   category: string | null;

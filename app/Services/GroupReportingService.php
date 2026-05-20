@@ -358,7 +358,7 @@ class GroupReportingService
             ->theme('brand')
             ->title(__('emails.group_digest.title'))
             ->previewText(__('emails.group_digest.preview', ['group' => $safeGroupName, 'community' => $safeCommunityName]))
-            ->greeting($safeName ?: 'there')
+            ->greeting($safeName ?: __('emails.common.fallback_name'))
             ->paragraph(__('emails.group_digest.intro', ['group' => $safeGroupName, 'community' => $safeCommunityName]));
 
         // Build stat cards for non-zero activity metrics

@@ -1551,8 +1551,8 @@ HTML;
     private static function buildMatchDigestEmail($matches, $period, $hotCount, $mutualCount): string
     {
         $tenant = TenantContext::get();
-        $tenantName = $tenant['name'] ?? 'Community';
-        $userName = 'there';
+        $tenantName = $tenant['name'] ?? __('emails.common.fallback_tenant_name');
+        $userName = __('emails.common.fallback_name');
 
         $templatePath = base_path('views/emails/match_digest.php');
         if (file_exists($templatePath)) {

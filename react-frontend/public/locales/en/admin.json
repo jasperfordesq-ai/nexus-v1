@@ -11545,16 +11545,27 @@
         "status": "Status"
       },
       "sources": {
+        "civic_digest_delivery_claims": "Civic digest claim",
+        "event_reminder_delivery_claims": "Event reminder claim",
         "event_reminders": "Event reminder",
         "federation_inbound_connections": "Federation connection",
         "federation_messages": "Federation message",
         "federation_transactions": "Federation transaction",
+        "goal_reminders": "Goal reminder",
+        "job_interviews": "Job interview reminder",
+        "listing_expiry_reminders_sent": "Listing expiry reminder",
+        "marketplace_order_notification_deliveries": "Marketplace order notification",
         "marketplace_report_notifications": "Marketplace report",
         "member_subscription_events": "Member subscription billing",
         "newsletter_queue": "Newsletter",
         "notification_queue": "Notification",
+        "notifications": "Notification evidence",
         "reviews": "Federated review",
-        "vol_donations": "Donation receipt"
+        "transaction_notification_deliveries": "Transaction notification",
+        "user_safeguarding_preferences": "Safeguarding review",
+        "vol_donations": "Donation receipt",
+        "vol_reminder_delivery_claims": "Volunteer reminder claim",
+        "vol_reminders_sent": "Volunteer reminder"
       }
     },
     "logs": {

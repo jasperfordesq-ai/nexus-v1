@@ -54,12 +54,17 @@ echo "  Comment: " . substr($review['comment'] ?? '(none)', 0, 80) . "\n";
 echo "  Tenant: {$tenantId}\n";
 echo "\nSending email...\n";
 
-NotificationDispatcher::sendReviewEmail(
+$sent = NotificationDispatcher::sendReviewEmail(
     (int)$review['receiver_id'],
     $review['reviewer_name'],
     (int)$review['rating'],
     $review['comment'] ?? null,
     (bool)($review['is_anonymous'] ?? false)
 );
+
+if (!$sent) {
+    echo "Failed: dispatcher returned false for {$review['receiver_email']}\n";
+    exit(2);
+}
 
 echo "Done! Email sent to {$review['receiver_email']}\n";

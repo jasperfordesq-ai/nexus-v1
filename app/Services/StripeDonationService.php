@@ -282,7 +282,7 @@ class StripeDonationService
                         $accountUrl    = $baseUrl . $basePath . '/settings';
                         $amountDisplay = number_format((float) $donation->amount, 2) . ' ' . strtoupper($donation->currency ?? 'EUR');
                         $dateDisplay   = date('d M Y');
-                        $firstName     = explode(' ', trim($donorName ?: 'there'))[0];
+                        $firstName     = explode(' ', trim($donorName ?: __('emails.common.fallback_name')))[0];
 
                         $infoCard = [
                             __('emails_created.donation.label_amount') => $amountDisplay,

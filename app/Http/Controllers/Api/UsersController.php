@@ -583,7 +583,7 @@ class UsersController extends BaseApiController
         $userRow = DB::table('users')
             ->where('id', $userId)
             ->where('tenant_id', $tenantId)
-            ->select(['password_hash', 'email', 'first_name', 'name', 'preferred_language'])
+            ->select(['id', 'tenant_id', 'password_hash', 'email', 'first_name', 'name', 'preferred_language'])
             ->first();
 
         if (!$userRow || !password_verify($password, $userRow->password_hash)) {
@@ -606,8 +606,8 @@ class UsersController extends BaseApiController
         // anonymized by this point and has no locale we can query).
         try {
             if (!empty($userEmail) && filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
-                $tenantId = (int) ($user->tenant_id ?: TenantContext::getId());
-                LocaleContext::withLocale($userLocale, function () use ($userRow, $userEmail, $tenantId) {
+                $mailTenantId = (int) ($userRow->tenant_id ?: $tenantId);
+                LocaleContext::withLocale($userLocale, function () use ($userRow, $userEmail, $mailTenantId) {
                     $userName = $userRow->first_name ?? $userRow->name ?? __('emails.common.fallback_name');
                     $community = TenantContext::getName();
                     $html = EmailTemplateBuilder::make()
@@ -625,7 +625,7 @@ class UsersController extends BaseApiController
                         null,
                         null,
                         'account_deleted',
-                        ['tenant_id' => $tenantId]
+                        ['tenant_id' => $mailTenantId]
                     )) {
                         Log::warning('[UsersController] deleteAccount farewell email returned false', [
                             'user_id' => $userRow->id ?? null,

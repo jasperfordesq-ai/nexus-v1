@@ -466,7 +466,7 @@ class AdminSafeguardingController extends BaseApiController
                 $wardUser = \App\Models\User::where('id', $wardId)->where('tenant_id', $tenantId)->first();
                 $guardianUser = \App\Models\User::where('id', $guardianId)->where('tenant_id', $tenantId)->first();
 
-                $communityName = TenantContext::getName() ?: 'the community';
+                $communityName = TenantContext::getName() ?: __('emails.common.fallback_tenant_name');
                 $wardDisplayName = $wardUser->name ?? null;
                 $guardianDisplayName = $guardianUser->name ?? null;
 
@@ -608,7 +608,7 @@ class AdminSafeguardingController extends BaseApiController
             // already loaded with WHERE tenant_id = caller's tenant, so its
             // ward_user_id / guardian_user_id are guaranteed in-tenant).
             try {
-                $communityName  = TenantContext::getName() ?: 'the community';
+                $communityName  = TenantContext::getName() ?: __('emails.common.fallback_tenant_name');
                 $guardianUser   = \App\Models\User::where('id', $assignment->guardian_user_id)->where('tenant_id', $tenantId)->first();
                 $wardUser       = \App\Models\User::where('id', $assignment->ward_user_id)->where('tenant_id', $tenantId)->first();
                 $wardName       = $wardUser ? (trim(($wardUser->first_name ?? '') . ' ' . ($wardUser->last_name ?? '')) ?: ($wardUser->name ?? '')) : '';

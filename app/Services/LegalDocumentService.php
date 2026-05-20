@@ -636,7 +636,7 @@ class LegalDocumentService
             if ($sendEmail && ! empty($user->email)) {
                 LocaleContext::withLocale($user, function () use ($user, $docType, $community, $reviewUrl, $tenantId) {
                     try {
-                        $firstName = $user->first_name ?? (explode(' ', $user->name ?? '')[0] ?: 'there');
+                        $firstName = $user->first_name ?? (explode(' ', $user->name ?? '')[0] ?: __('emails.common.fallback_name'));
 
                         $html = EmailTemplateBuilder::make()
                             ->theme('warning')

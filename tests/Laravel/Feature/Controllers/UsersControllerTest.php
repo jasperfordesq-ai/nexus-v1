@@ -406,6 +406,40 @@ class UsersControllerTest extends TestCase
         $this->assertContains($response->getStatusCode(), [401, 403]);
     }
 
+    public function test_delete_account_sends_account_deleted_email_with_explicit_tenant(): void
+    {
+        $user = $this->authenticatedUser([
+            'email' => 'delete-account-' . uniqid('', true) . '@example.test',
+            'first_name' => 'Delete',
+            'name' => 'Delete Me',
+            'password_hash' => Hash::make('delete-password-123'),
+            'preferred_language' => 'en',
+        ]);
+
+        $mailer = new class extends EmailDispatchService {
+            public array $calls = [];
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->calls[] = compact('to', 'subject', 'body', 'options');
+
+                return true;
+            }
+        };
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $response = $this->apiDelete('/v2/users/me', [
+            'password' => 'delete-password-123',
+        ]);
+
+        $response->assertStatus(200);
+
+        $this->assertCount(1, $mailer->calls);
+        $this->assertSame($user->email, $mailer->calls[0]['to']);
+        $this->assertSame('account_deleted', $mailer->calls[0]['options']['category']);
+        $this->assertSame($this->testTenantId, $mailer->calls[0]['options']['tenant_id']);
+    }
+
     // ================================================================
     // MY LISTINGS
     // ================================================================

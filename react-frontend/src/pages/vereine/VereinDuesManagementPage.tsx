@@ -75,6 +75,12 @@ interface DuesRow {
   paid_at: string | null;
   reminder_count: number;
   last_reminder_at: string | null;
+  generated_email_sent_at: string | null;
+  generated_email_failed_at: string | null;
+  paid_email_sent_at: string | null;
+  paid_email_failed_at: string | null;
+  reminder_email_failed_at: string | null;
+  reminder_email_last_error: string | null;
   waived_reason: string | null;
   first_name: string | null;
   last_name: string | null;
@@ -93,6 +99,12 @@ function statusColor(status: string): 'success' | 'warning' | 'danger' | 'defaul
   if (status === 'paid' || status === 'waived') return 'success';
   if (status === 'pending') return 'warning';
   if (status === 'overdue') return 'danger';
+  return 'default';
+}
+
+function emailStatusColor(row: DuesRow): 'success' | 'warning' | 'danger' | 'default' {
+  if (row.reminder_email_failed_at || row.generated_email_failed_at || row.paid_email_failed_at) return 'danger';
+  if (row.generated_email_sent_at || row.paid_email_sent_at || row.last_reminder_at) return 'success';
   return 'default';
 }
 
@@ -414,6 +426,7 @@ export function VereinDuesManagementPage() {
                 <TableColumn>{t('verein_dues.col_status')}</TableColumn>
                 <TableColumn>{t('verein_dues.col_due')}</TableColumn>
                 <TableColumn>{t('verein_dues.col_reminders')}</TableColumn>
+                <TableColumn>{t('verein_dues.col_email_delivery')}</TableColumn>
                 <TableColumn>{t('verein_dues.col_actions')}</TableColumn>
               </TableHeader>
               <TableBody emptyContent={t('verein_dues.admin_no_rows')}>
@@ -439,6 +452,22 @@ export function VereinDuesManagementPage() {
                     </TableCell>
                     <TableCell>{row.due_date ?? '—'}</TableCell>
                     <TableCell>{row.reminder_count}</TableCell>
+                    <TableCell>
+                      <div className="flex max-w-56 flex-col gap-1">
+                        <Chip color={emailStatusColor(row)} variant="flat" size="sm">
+                          {row.reminder_email_failed_at || row.generated_email_failed_at || row.paid_email_failed_at
+                            ? t('verein_dues.email_status.failed')
+                            : row.generated_email_sent_at || row.paid_email_sent_at || row.last_reminder_at
+                              ? t('verein_dues.email_status.sent')
+                              : t('verein_dues.email_status.pending')}
+                        </Chip>
+                        {row.reminder_email_last_error && (
+                          <span className="line-clamp-2 text-xs text-danger">
+                            {row.reminder_email_last_error}
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-2">
                         {(row.status === 'pending' || row.status === 'overdue') && (
