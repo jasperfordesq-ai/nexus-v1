@@ -52,11 +52,19 @@ function statusChipColor(s: string): 'success' | 'warning' | 'danger' | 'default
   }
 }
 
+const KNOWN_SUBSCRIPTION_STATUSES = ['active', 'trialing', 'past_due', 'grace', 'canceled', 'incomplete'] as const;
+
+function getStatusKey(status: string) {
+  return KNOWN_SUBSCRIPTION_STATUSES.includes(status as (typeof KNOWN_SUBSCRIPTION_STATUSES)[number])
+    ? `premium.status.${status}`
+    : 'premium.status.unknown';
+}
+
 export function MySubscriptionPage() {
   const { t } = useTranslation('common');
   const { tenantPath } = useTenant();
   const { showToast } = useToast();
-  usePageTitle(t('premium.manage_title', 'My Subscription'));
+  usePageTitle(t('premium.manage_title'));
 
   const [data, setData] = useState<MeResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,26 +95,26 @@ export function MySubscriptionPage() {
       if (res.data?.portal_url) {
         window.location.href = res.data.portal_url;
       } else {
-        showToast(t('premium.portal_failed', 'Could not open billing portal'), 'error');
+        showToast(t('premium.portal_failed'), 'error');
         setActionBusy(null);
       }
     } catch (err: unknown) {
-      showToast(err instanceof Error ? err.message : t('premium.portal_failed', 'Could not open billing portal'), 'error');
+      showToast(err instanceof Error ? err.message : t('premium.portal_failed'), 'error');
       setActionBusy(null);
     }
   };
 
   const cancel = async () => {
-    if (!window.confirm(t('premium.cancel_confirm', 'Cancel subscription at the end of the current billing period?'))) {
+    if (!window.confirm(t('premium.cancel_confirm'))) {
       return;
     }
     setActionBusy('cancel');
     try {
       await api.post('/v2/member-premium/cancel', {});
-      showToast(t('premium.cancel_scheduled', 'Subscription will end at the period end'), 'success');
+      showToast(t('premium.cancel_scheduled'), 'success');
       await load();
     } catch (err: unknown) {
-      showToast(err instanceof Error ? err.message : t('premium.cancel_failed', 'Cancel failed'), 'error');
+      showToast(err instanceof Error ? err.message : t('premium.cancel_failed'), 'error');
     } finally {
       setActionBusy(null);
     }
@@ -115,7 +123,7 @@ export function MySubscriptionPage() {
   if (loading) {
     return (
       <div className="flex justify-center py-16">
-        <PageMeta title={t('premium.manage_title', 'My Subscription')} noIndex />
+        <PageMeta title={t('premium.manage_title')} noIndex />
         <Spinner size="lg" />
       </div>
     );
@@ -126,18 +134,18 @@ export function MySubscriptionPage() {
   if (!sub) {
     return (
       <div className="max-w-xl mx-auto px-4 py-12">
-        <PageMeta title={t('premium.manage_title', 'My Subscription')} noIndex />
-        <Card>
+        <PageMeta title={t('premium.manage_title')} noIndex />
+        <Card className="border border-default-200 shadow-sm">
           <CardBody className="text-center py-10 flex flex-col items-center gap-4">
             <Crown size={48} className="text-yellow-500" />
             <h1 className="text-xl font-semibold">
-              {t('premium.no_subscription_title', 'No active subscription')}
+              {t('premium.no_subscription_title')}
             </h1>
             <p className="text-[var(--color-text-secondary)]">
-              {t('premium.no_subscription_body', 'Browse premium tiers to find one that fits your needs.')}
+              {t('premium.no_subscription_body')}
             </p>
             <Button as={Link} to={tenantPath('/premium')} color="primary">
-              {t('premium.view_pricing_cta', 'View Pricing')}
+              {t('premium.view_pricing_cta')}
             </Button>
           </CardBody>
         </Card>
@@ -147,26 +155,26 @@ export function MySubscriptionPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
-      <PageMeta title={t('premium.manage_title', 'My Subscription')} noIndex />
-      <Card>
+      <PageMeta title={t('premium.manage_title')} noIndex />
+      <Card className="border border-default-200 shadow-sm">
         <CardHeader className="flex items-center gap-3">
           <Crown className="text-yellow-500" size={24} />
           <div>
             <h1 className="text-2xl font-semibold">{sub.tier_name}</h1>
             <p className="text-sm text-[var(--color-text-secondary)]">
               {sub.billing_interval === 'yearly'
-                ? t('premium.billed_yearly', 'Billed yearly')
-                : t('premium.billed_monthly', 'Billed monthly')}
+                ? t('premium.billed_yearly')
+                : t('premium.billed_monthly')}
             </p>
           </div>
         </CardHeader>
         <CardBody className="flex flex-col gap-5">
           <div className="flex items-center gap-2">
             <span className="text-sm text-[var(--color-text-secondary)]">
-              {t('premium.status_label', 'Status')}:
+              {t('premium.status_label')}:
             </span>
             <Chip color={statusChipColor(sub.status)} size="sm" variant="flat">
-              {t(`premium.status.${sub.status}`, sub.status)}
+              {t(getStatusKey(sub.status))}
             </Chip>
           </div>
 
@@ -174,8 +182,8 @@ export function MySubscriptionPage() {
             <div className="text-sm">
               <span className="text-[var(--color-text-secondary)]">
                 {sub.canceled_at
-                  ? t('premium.ends_on', 'Ends on')
-                  : t('premium.next_billing', 'Next billing')}
+                  ? t('premium.ends_on')
+                  : t('premium.next_billing')}
                 :{' '}
               </span>
               <span className="font-medium">
@@ -186,7 +194,7 @@ export function MySubscriptionPage() {
 
           {sub.grace_period_ends_at && (
             <div className="text-sm rounded-md p-3 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-900 dark:text-yellow-200">
-              {t('premium.grace_period_notice', 'Payment failed — please update your card before {{date}} to keep premium active.', {
+              {t('premium.grace_period_notice', {
                 date: new Date(sub.grace_period_ends_at).toLocaleDateString(),
               })}
             </div>
@@ -203,7 +211,7 @@ export function MySubscriptionPage() {
               isLoading={actionBusy === 'portal'}
               isDisabled={actionBusy !== null}
             >
-              {t('premium.manage_in_stripe', 'Manage in Stripe')}
+              {t('premium.manage_in_stripe')}
             </Button>
             {!sub.canceled_at && (
               <Button
@@ -213,11 +221,11 @@ export function MySubscriptionPage() {
                 isLoading={actionBusy === 'cancel'}
                 isDisabled={actionBusy !== null}
               >
-                {t('premium.cancel_subscription', 'Cancel Subscription')}
+                {t('premium.cancel_subscription')}
               </Button>
             )}
             <Button as={Link} to={tenantPath('/premium')} variant="light">
-              {t('premium.change_plan', 'Change plan')}
+              {t('premium.change_plan')}
             </Button>
           </div>
         </CardBody>

@@ -1540,7 +1540,8 @@
       "past_due": "Past Due",
       "grace": "Grace Period",
       "canceled": "Cancelled",
-      "incomplete": "Incomplete"
+      "incomplete": "Incomplete",
+      "unknown": "Unknown"
     },
     "feature": {
       "verified_badge": "Verified badge",
