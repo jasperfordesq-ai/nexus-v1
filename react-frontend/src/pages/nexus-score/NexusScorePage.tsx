@@ -21,6 +21,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { Link } from 'react-router-dom';
 import { GlassCard } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
@@ -64,19 +65,24 @@ interface NexusScoreData {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const TIERS = [
-  { name: 'Novice',        min: 0,   color: 'text-slate-400',   bar: 'bg-slate-400'   },
-  { name: 'Beginner',      min: 200, color: 'text-amber-400',   bar: 'bg-amber-400'   },
-  { name: 'Developing',    min: 300, color: 'text-emerald-400', bar: 'bg-emerald-400' },
-  { name: 'Intermediate',  min: 400, color: 'text-cyan-400',    bar: 'bg-cyan-400'    },
-  { name: 'Proficient',    min: 500, color: 'text-violet-400',  bar: 'bg-violet-400'  },
-  { name: 'Advanced',      min: 600, color: 'text-indigo-400',  bar: 'bg-indigo-400'  },
-  { name: 'Expert',        min: 700, color: 'text-orange-400',  bar: 'bg-orange-400'  },
-  { name: 'Elite',         min: 800, color: 'text-pink-400',    bar: 'bg-pink-400'    },
-  { name: 'Legendary',     min: 900, color: 'text-yellow-400',  bar: 'bg-yellow-400'  },
+  { name: 'Novice',        key: 'novice',       min: 0,   color: 'text-slate-400',   bar: 'bg-slate-400'   },
+  { name: 'Beginner',      key: 'beginner',     min: 200, color: 'text-amber-400',   bar: 'bg-amber-400'   },
+  { name: 'Developing',    key: 'developing',   min: 300, color: 'text-emerald-400', bar: 'bg-emerald-400' },
+  { name: 'Intermediate',  key: 'intermediate', min: 400, color: 'text-cyan-400',    bar: 'bg-cyan-400'    },
+  { name: 'Proficient',    key: 'proficient',   min: 500, color: 'text-violet-400',  bar: 'bg-violet-400'  },
+  { name: 'Advanced',      key: 'advanced',     min: 600, color: 'text-indigo-400',  bar: 'bg-indigo-400'  },
+  { name: 'Expert',        key: 'expert',       min: 700, color: 'text-orange-400',  bar: 'bg-orange-400'  },
+  { name: 'Elite',         key: 'elite',        min: 800, color: 'text-pink-400',    bar: 'bg-pink-400'    },
+  { name: 'Legendary',     key: 'legendary',    min: 900, color: 'text-yellow-400',  bar: 'bg-yellow-400'  },
 ] as const;
 
 function getTierConfig(name: string) {
   return TIERS.find(t => t.name === name) ?? TIERS[0];
+}
+
+function getTierLabel(t: TFunction<'gamification'>, name: string) {
+  const tier = getTierConfig(name);
+  return t(`nexus_score.tiers.${tier.key}`);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -118,7 +124,15 @@ const itemVariants = {
 // Tier ladder component
 // ─────────────────────────────────────────────────────────────────────────────
 
-function TierLadder({ currentTier, score }: { currentTier: string; score: number }) {
+function TierLadder({
+  currentTier,
+  score,
+  t,
+}: {
+  currentTier: string;
+  score: number;
+  t: TFunction<'gamification'>;
+}) {
   return (
     <div className="flex items-end justify-between gap-1 px-1">
       {TIERS.map((tier) => {
@@ -126,6 +140,7 @@ function TierLadder({ currentTier, score }: { currentTier: string; score: number
         const isPassed  = score >= tier.min;
         const nextTier  = TIERS[TIERS.indexOf(tier) + 1];
         const isCurrent = isPassed && (!nextTier || score < nextTier.min);
+        const tierLabel = t(`nexus_score.tiers.${tier.key}`);
         return (
           <div key={tier.name} className="flex flex-col items-center gap-1 flex-1">
             <div
@@ -135,11 +150,11 @@ function TierLadder({ currentTier, score }: { currentTier: string; score: number
                 isCurrent || isActive ? 'ring-2 ring-white/40 ring-offset-1 ring-offset-transparent' : '',
               ].join(' ')}
               style={{ height: `${Math.max(8, (tier.min / 900) * 48 + 8)}px` }}
-              title={`${tier.name} (${tier.min}+)`}
+              title={t('nexus_score.tier_threshold', { tier: tierLabel, min: tier.min })}
             />
             {isActive && (
               <span className={`text-[9px] font-bold leading-none ${tier.color}`}>
-                {tier.name}
+                {tierLabel}
               </span>
             )}
           </div>
@@ -159,7 +174,7 @@ export default function NexusScorePage() {
   const { tenantPath } = useTenant();
   const toast = useToast();
 
-  usePageTitle(t('nexus_score.title', 'NexusScore'));
+  usePageTitle(t('nexus_score.title'));
 
   const [data, setData]         = useState<NexusScoreData | null>(null);
   const [isLoading, setLoading] = useState(true);
@@ -191,13 +206,13 @@ export default function NexusScorePage() {
       if (res.success && res.data) {
         setData(res.data);
       } else {
-        setError(res.error ?? tRef.current('nexus_score.load_error', 'Could not load your NexusScore. Please try again.'));
+        setError(res.error ?? tRef.current('nexus_score.load_error'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('NexusScorePage.load', err);
-      setError(tRef.current('nexus_score.load_error', 'Could not load your NexusScore. Please try again.'));
-      if (force) toastRef.current.error(tRef.current('nexus_score.refresh_error', 'Refresh failed'));
+      setError(tRef.current('nexus_score.load_error'));
+      if (force) toastRef.current.error(tRef.current('nexus_score.refresh_error'));
     } finally {
       if (!controller.signal.aborted) {
         setLoading(false);
@@ -226,13 +241,14 @@ export default function NexusScorePage() {
         <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" aria-hidden="true" />
         <p className="text-theme-subtle mb-6">{error}</p>
         <Button color="primary" onPress={() => load()}>
-          {t('common.try_again', 'Try again')}
+          {t('nexus_score.try_again')}
         </Button>
       </div>
     );
   }
 
   const tierConfig = getTierConfig(data.tier.name);
+  const currentTierLabel = getTierLabel(t, data.tier.name);
 
   // Next tier threshold
   const currentTierIndex = TIERS.findIndex(tier => tier.name === data.tier.name);
@@ -246,16 +262,20 @@ export default function NexusScorePage() {
       initial="hidden"
       animate="show"
     >
-      <PageMeta title={t('page_meta.nexus_score.title')} noIndex />
+      <PageMeta
+        title={t('page_meta.nexus_score.title')}
+        description={t('page_meta.nexus_score.description')}
+        noIndex
+      />
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <motion.div variants={itemVariants} className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-2">
             <Trophy className="w-6 h-6 text-indigo-400" aria-hidden="true" />
-            {t('nexus_score.title', 'NexusScore')}
+            {t('nexus_score.title')}
           </h1>
           <p className="text-sm text-theme-subtle mt-0.5">
-            {t('nexus_score.subtitle', 'Your community reputation score')}
+            {t('nexus_score.subtitle')}
           </p>
         </div>
         <Button
@@ -266,7 +286,7 @@ export default function NexusScorePage() {
           onPress={() => load(true)}
           startContent={!refreshing && <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />}
         >
-          {t('common.refresh', 'Refresh')}
+          {t('nexus_score.refresh')}
         </Button>
       </motion.div>
 
@@ -295,7 +315,9 @@ export default function NexusScorePage() {
                 <span className="text-2xl font-bold text-theme-primary leading-none">
                   {data.total_score}
                 </span>
-                <span className="text-xs text-theme-subtle">/ 1000</span>
+                <span className="text-xs text-theme-subtle">
+                  {t('nexus_score.max_score_label', { max: data.max_score })}
+                </span>
               </div>
             </div>
 
@@ -306,24 +328,24 @@ export default function NexusScorePage() {
                   <span className="text-2xl leading-none">{data.tier.icon}</span>
                 )}
                 <span className={`text-xl font-bold ${tierConfig.color}`}>
-                  {data.tier.name}
+                  {currentTierLabel}
                 </span>
                 <Chip size="sm" variant="flat" color="secondary" className="ml-1">
-                  Top {Math.round(100 - data.percentile)}%
+                  {t('nexus_score.top_percent', { percent: Math.round(100 - data.percentile) })}
                 </Chip>
               </div>
 
               <p className="text-sm text-theme-subtle mb-4">
                 {nextTier
-                  ? t('nexus_score.points_to_next', `${pointsToNext} points to ${nextTier.name}`, {
+                  ? t('nexus_score.points_to_next', {
                       count: pointsToNext,
-                      tier: nextTier.name,
+                      tier: getTierLabel(t, nextTier.name),
                     })
-                  : t('nexus_score.max_tier', 'You have reached the highest tier!')}
+                  : t('nexus_score.max_tier')}
               </p>
 
               {/* Tier ladder */}
-              <TierLadder currentTier={data.tier.name} score={data.total_score} />
+              <TierLadder currentTier={data.tier.name} score={data.total_score} t={t} />
             </div>
           </div>
         </GlassCard>
@@ -333,7 +355,7 @@ export default function NexusScorePage() {
       <motion.div variants={itemVariants}>
         <h2 className="text-base font-semibold text-theme-primary mb-3 flex items-center gap-2">
           <Info className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
-          {t('nexus_score.breakdown_title', 'Score Breakdown')}
+          {t('nexus_score.breakdown_title')}
         </h2>
         <div className="space-y-3">
           {data.breakdown.map((cat) => (
@@ -358,13 +380,17 @@ export default function NexusScorePage() {
                   size="sm"
                   color="secondary"
                   className="w-full"
-                  aria-label={`${cat.label}: ${cat.score} of ${cat.max}`}
+                  aria-label={t('nexus_score.category_progress_aria', {
+                    category: cat.label,
+                    score: cat.score,
+                    max: cat.max,
+                  })}
                 />
                 <div className="flex justify-between mt-1">
                   <span className="text-xs text-theme-subtle">{cat.percentage}%</span>
                   {cat.percentage < 100 && (
                     <span className="text-xs text-theme-subtle">
-                      {cat.max - cat.score} {t('nexus_score.remaining', 'remaining')}
+                      {t('nexus_score.remaining_count', { count: cat.max - cat.score })}
                     </span>
                   )}
                 </div>
@@ -380,14 +406,14 @@ export default function NexusScorePage() {
           <GlassCard className="p-5">
             <h2 className="text-base font-semibold text-theme-primary mb-3 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-indigo-400" aria-hidden="true" />
-              {t('nexus_score.insights_title', 'How to improve')}
+              {t('nexus_score.insights_title')}
             </h2>
             <ul className="space-y-2">
               {data.insights.map((insight, i) => {
                 const text = typeof insight === 'string' ? insight : (insight as Record<string, string>).message ?? (insight as Record<string, string>).title ?? '';
                 return (
                   <li key={i} className="flex items-start gap-2 text-sm text-theme-subtle">
-                    <span className="text-indigo-400 font-bold mt-0.5">·</span>
+                    <span className="text-indigo-400 font-bold mt-0.5" aria-hidden="true">-</span>
                     {text}
                   </li>
                 );
@@ -407,7 +433,7 @@ export default function NexusScorePage() {
           size="sm"
           startContent={<Trophy className="w-4 h-4" aria-hidden="true" />}
         >
-          {t('nexus_score.view_leaderboard', 'View Leaderboard')}
+          {t('nexus_score.view_leaderboard')}
         </Button>
         <Button
           as={Link}
@@ -416,7 +442,7 @@ export default function NexusScorePage() {
           color="default"
           size="sm"
         >
-          {t('nexus_score.my_profile', 'My Profile')}
+          {t('nexus_score.my_profile')}
         </Button>
       </motion.div>
     </motion.div>

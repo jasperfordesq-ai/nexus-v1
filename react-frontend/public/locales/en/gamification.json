@@ -347,7 +347,25 @@
     "view_leaderboard": "View Leaderboard",
     "my_profile": "My Profile",
     "load_error": "Could not load your NexusScore. Please try again.",
-    "refresh_error": "Refresh failed"
+    "refresh_error": "Refresh failed",
+    "refresh": "Refresh",
+    "try_again": "Try again",
+    "top_percent": "Top {{percent}}%",
+    "remaining_count": "{{count}} remaining",
+    "category_progress_aria": "{{category}}: {{score}} of {{max}}",
+    "tier_threshold": "{{tier}} ({{min}}+)",
+    "tiers": {
+      "novice": "Novice",
+      "beginner": "Beginner",
+      "developing": "Developing",
+      "intermediate": "Intermediate",
+      "proficient": "Proficient",
+      "advanced": "Advanced",
+      "expert": "Expert",
+      "elite": "Elite",
+      "legendary": "Legendary"
+    },
+    "max_score_label": "/ {{max}}"
   },
   "common": {
     "refresh": "Refresh",
@@ -365,7 +383,8 @@
       "title": "Goals"
     },
     "nexus_score": {
-      "title": "NexusScore"
+      "title": "NexusScore",
+      "description": "Your private NexusScore breakdown, including community reputation tier, score categories, and tailored ways to improve your impact."
     }
   }
 }
