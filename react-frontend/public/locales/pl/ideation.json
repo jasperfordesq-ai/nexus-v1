@@ -89,7 +89,8 @@
     "page_title": "Szczegóły Pomysłu",
     "back_to_challenge": "Powrót do Wyzwania",
     "submitted_by": "Przesłane przez {{name}}",
-    "submitted_on": "Przesłane w {{date}}"
+    "submitted_on": "Przesłane w {{date}}",
+    "actions": "Akcje pomyslu"
   },
   "comments": {
     "title": "Comments",

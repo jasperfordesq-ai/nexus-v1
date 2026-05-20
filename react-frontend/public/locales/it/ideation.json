@@ -89,7 +89,8 @@
     "page_title": "Dettagli dell'Idea",
     "back_to_challenge": "Torna alla Sfida",
     "submitted_by": "Inviata da {{name}}",
-    "submitted_on": "Inviata il {{date}}"
+    "submitted_on": "Inviata il {{date}}",
+    "actions": "Azioni idea"
   },
   "comments": {
     "title": "Commenti",

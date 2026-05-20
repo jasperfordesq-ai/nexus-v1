@@ -88,7 +88,8 @@
     "page_title": "Sonrai an Smaoineamh",
     "back_to_challenge": "Ar Ais go dti an Dushshlan",
     "submitted_by": "Curtha isteach ag {{name}}",
-    "submitted_on": "Curtha isteach ar {{date}}"
+    "submitted_on": "Curtha isteach ar {{date}}",
+    "actions": "Idea actions"
   },
   "comments": {
     "title": "Trachtanna",

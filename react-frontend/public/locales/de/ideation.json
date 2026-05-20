@@ -89,7 +89,8 @@
     "page_title": "Ideendetails",
     "back_to_challenge": "Zurück zum Wettbewerb",
     "submitted_by": "Eingereicht von {{name}}",
-    "submitted_on": "Eingereicht am {{date}}"
+    "submitted_on": "Eingereicht am {{date}}",
+    "actions": "Ideenaktionen"
   },
   "comments": {
     "title": "Kommentare",

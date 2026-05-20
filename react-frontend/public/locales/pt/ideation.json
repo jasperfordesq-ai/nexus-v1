@@ -89,7 +89,8 @@
     "page_title": "Detalhes da Ideia",
     "back_to_challenge": "Voltar ao Desafio",
     "submitted_by": "Submetida por {{name}}",
-    "submitted_on": "Submetida em {{date}}"
+    "submitted_on": "Submetida em {{date}}",
+    "actions": "Acoes da ideia"
   },
   "comments": {
     "title": "Comentários",

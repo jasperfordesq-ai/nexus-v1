@@ -89,7 +89,8 @@
     "page_title": "تفاصيل الفكرة",
     "back_to_challenge": "العودة إلى التحدي",
     "submitted_by": "تم تقديمه بواسطة {{name}}",
-    "submitted_on": "تم تقديمه في {{date}}"
+    "submitted_on": "تم تقديمه في {{date}}",
+    "actions": "Idea actions"
   },
   "comments": {
     "title": "Comments",

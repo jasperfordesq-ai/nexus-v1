@@ -89,7 +89,8 @@
     "page_title": "Idee Details",
     "back_to_challenge": "Terug naar Uitdaging",
     "submitted_by": "Ingediend door {{name}}",
-    "submitted_on": "Ingediend op {{date}}"
+    "submitted_on": "Ingediend op {{date}}",
+    "actions": "Idee-acties"
   },
   "comments": {
     "title": "Comments",

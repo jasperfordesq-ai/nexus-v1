@@ -89,7 +89,8 @@
     "page_title": "アイデアの詳細",
     "back_to_challenge": "チャレンジに戻る",
     "submitted_by": "{{name}} によって提出されました",
-    "submitted_on": "{{date}} に提出されました"
+    "submitted_on": "{{date}} に提出されました",
+    "actions": "Idea actions"
   },
   "comments": {
     "title": "Comments",

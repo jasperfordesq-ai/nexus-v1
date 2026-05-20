@@ -368,16 +368,16 @@ export function IdeaDetailPage() {
     return (
       <div className="max-w-4xl mx-auto px-4 py-6">
         <EmptyState
-          icon={<AlertTriangle className="w-10 h-10 text-theme-subtle" />}
+          icon={<AlertTriangle aria-hidden="true" className="w-10 h-10 text-theme-subtle" />}
           title={t('ideas.load_error')}
           action={
             <Button
               color="primary"
               variant="flat"
-              startContent={<RefreshCw className="w-4 h-4" />}
+              startContent={<RefreshCw aria-hidden="true" className="w-4 h-4" />}
               onPress={() => fetchIdea()}
             >
-              {t('actions.retry', { defaultValue: 'Retry' })}
+              {t('actions.retry')}
             </Button>
           }
         />
@@ -391,7 +391,7 @@ export function IdeaDetailPage() {
       {
         key: 'shortlist',
         label: idea.status === 'shortlisted' ? t('admin.remove_status') : t('admin.set_shortlisted'),
-        startContent: <Star className="w-4 h-4" />,
+        startContent: <Star aria-hidden="true" className="w-4 h-4" />,
         onPress: () => handleIdeaStatusChange(
           idea.status === 'shortlisted' ? 'submitted' : 'shortlisted'
         ),
@@ -399,7 +399,7 @@ export function IdeaDetailPage() {
       {
         key: 'winner',
         label: idea.status === 'winner' ? t('admin.remove_status') : t('admin.set_winner'),
-        startContent: <Award className="w-4 h-4" />,
+        startContent: <Award aria-hidden="true" className="w-4 h-4" />,
         onPress: () => handleIdeaStatusChange(
           idea.status === 'winner' ? 'submitted' : 'winner'
         ),
@@ -410,7 +410,7 @@ export function IdeaDetailPage() {
       label: t('ideas.delete'),
       className: 'text-danger',
       color: 'danger' as const,
-      startContent: <Trash2 className="w-4 h-4" />,
+      startContent: <Trash2 aria-hidden="true" className="w-4 h-4" />,
       onPress: onDeleteOpen,
     },
   ];
@@ -431,7 +431,7 @@ export function IdeaDetailPage() {
       {/* Back link */}
       <Button
         variant="light"
-        startContent={<ArrowLeft className="w-4 h-4" />}
+        startContent={<ArrowLeft aria-hidden="true" className="w-4 h-4" />}
         className="mb-4 -ml-2"
         onPress={() => navigate(tenantPath(`/ideation/${challengeId ?? idea?.challenge_id}`))}
       >
@@ -451,7 +451,7 @@ export function IdeaDetailPage() {
                   size="sm"
                   color={IDEA_STATUS_COLOR_MAP[idea.status] ?? 'default'}
                   variant="flat"
-                  startContent={idea.status === 'winner' ? <Award className="w-3 h-3" /> : undefined}
+                  startContent={idea.status === 'winner' ? <Award aria-hidden="true" className="w-3 h-3" /> : undefined}
                 >
                   {t(`idea_status.${idea.status}`)}
                 </Chip>
@@ -480,7 +480,7 @@ export function IdeaDetailPage() {
                 variant="flat"
                 size="sm"
                 className="mt-4"
-                startContent={<Users className="w-4 h-4" />}
+                startContent={<Users aria-hidden="true" className="w-4 h-4" />}
                 onPress={() => setIsConvertOpen(true)}
               >
                 {t('convert_to_group.button')}
@@ -503,6 +503,7 @@ export function IdeaDetailPage() {
               aria-label={idea.has_voted ? t('ideas.unvote') : t('ideas.vote')}
             >
               <ArrowBigUp
+                aria-hidden="true"
                 className={`w-8 h-8 ${idea.has_voted ? 'fill-current' : ''}`}
               />
               <span className="text-lg font-bold">{idea.votes_count}</span>
@@ -512,11 +513,11 @@ export function IdeaDetailPage() {
             {(isAdmin || isOwner) && (
               <Dropdown>
                 <DropdownTrigger>
-                  <Button isIconOnly variant="flat" size="sm" aria-label={t('idea_detail.actions', { defaultValue: 'Idea actions' })}>
-                    <MoreVertical className="w-4 h-4" />
+                  <Button isIconOnly variant="flat" size="sm" aria-label={t('idea_detail.actions')}>
+                    <MoreVertical aria-hidden="true" className="w-4 h-4" />
                   </Button>
                 </DropdownTrigger>
-                <DropdownMenu aria-label={t('idea_detail.actions', { defaultValue: 'Idea actions' })} items={dropdownItems}>
+                <DropdownMenu aria-label={t('idea_detail.actions')} items={dropdownItems}>
                   {(item) => (
                     <DropdownItem
                       key={item.key}
@@ -538,7 +539,7 @@ export function IdeaDetailPage() {
       {/* Comments Section */}
       <div className="mb-4">
         <h2 className="text-xl font-semibold text-[var(--color-text)] flex items-center gap-2">
-          <MessageCircle className="w-5 h-5" />
+          <MessageCircle aria-hidden="true" className="w-5 h-5" />
           {t('comments.title')} ({idea.comments_count})
         </h2>
       </div>
@@ -568,7 +569,7 @@ export function IdeaDetailPage() {
                   size="sm"
                   isLoading={isPostingComment}
                   isDisabled={!newComment.trim()}
-                  startContent={<Send className="w-4 h-4" />}
+                  startContent={<Send aria-hidden="true" className="w-4 h-4" />}
                   onPress={handlePostComment}
                 >
                   {t('comments.add_button')}
@@ -589,7 +590,7 @@ export function IdeaDetailPage() {
       {/* Comments Empty */}
       {!isLoadingComments && comments.length === 0 && (
         <EmptyState
-          icon={<MessageCircle className="w-10 h-10 text-theme-subtle" />}
+          icon={<MessageCircle aria-hidden="true" className="w-10 h-10 text-theme-subtle" />}
           title={t('comments.empty_title')}
           description={t('comments.empty_description')}
         />
@@ -628,7 +629,7 @@ export function IdeaDetailPage() {
                         onPress={() => handleDeleteComment(comment.id)}
                         aria-label={t('comments.delete')}
                       >
-                        <Trash2 className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+                        <Trash2 aria-hidden="true" className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
                       </Button>
                     )}
                   </div>
@@ -723,7 +724,7 @@ export function IdeaDetailPage() {
               color="primary"
               isLoading={isConverting}
               isDisabled={!groupForm.name.trim()}
-              startContent={<Users className="w-4 h-4" />}
+              startContent={<Users aria-hidden="true" className="w-4 h-4" />}
               onPress={handleConvertToGroup}
             >
               {isConverting ? t('convert_to_group.creating') : t('convert_to_group.confirm')}

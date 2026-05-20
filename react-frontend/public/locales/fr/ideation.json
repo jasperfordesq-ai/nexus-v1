@@ -89,7 +89,8 @@
     "page_title": "Details de l'idee",
     "back_to_challenge": "Retour au defi",
     "submitted_by": "Soumise par {{name}}",
-    "submitted_on": "Soumise le {{date}}"
+    "submitted_on": "Soumise le {{date}}",
+    "actions": "Actions de l idee"
   },
   "comments": {
     "title": "Commentaires",

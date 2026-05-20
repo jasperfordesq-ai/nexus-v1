@@ -89,7 +89,8 @@
     "page_title": "Idea Details",
     "back_to_challenge": "Back to Challenge",
     "submitted_by": "Submitted by {{name}}",
-    "submitted_on": "Submitted on {{date}}"
+    "submitted_on": "Submitted on {{date}}",
+    "actions": "Idea actions"
   },
   "comments": {
     "title": "Comments",
