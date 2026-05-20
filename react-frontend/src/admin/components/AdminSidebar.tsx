@@ -727,7 +727,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
   const renderBadge = (item: NavItem) => {
     if (!item.badge) return null;
     const tone = item.attention === 'danger' ? 'bg-danger text-danger-foreground' : 'bg-primary text-primary-foreground';
-    return <span className={`ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-bold ${tone}`}>{item.badge}</span>;
+    return <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${tone}`}>{item.badge}</span>;
   };
 
   const renderNavLink = (item: NavItem, compact = false) => {
@@ -742,13 +742,13 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
           trackVisit(item.label, item.href);
         }}
         aria-current={active ? 'page' : undefined}
-        className={`group relative flex min-h-8 items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+        className={`group relative flex min-h-9 items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
           active
             ? 'bg-primary/10 text-primary font-semibold shadow-sm'
             : 'text-default-500 hover:bg-default-100 hover:text-foreground'
         } ${compact ? 'justify-center px-2' : ''}`}
       >
-        {active && !compact && <span className="absolute left-0 top-1.5 h-5 w-0.5 rounded-r bg-primary" />}
+        {active && !compact && <span className="absolute left-0 top-2 h-5 w-0.5 rounded-r bg-primary" />}
         <ItemIcon size={16} className="shrink-0" />
         {!compact && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
         {!compact && renderBadge(item)}
