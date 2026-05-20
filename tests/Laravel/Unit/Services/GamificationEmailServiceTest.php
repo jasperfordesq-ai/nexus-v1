@@ -40,4 +40,16 @@ class GamificationEmailServiceTest extends TestCase
         $result = $this->service->sendWeeklyDigests();
         $this->assertEquals(1, $result['errors']);
     }
+
+    public function test_gamification_email_fallback_copy_uses_translations(): void
+    {
+        $source = file_get_contents(app_path('Services/GamificationEmailService.php'));
+
+        $this->assertStringContainsString("__('emails.common.fallback_name')", $source);
+        $this->assertStringContainsString("__('emails.gamification_digest.badge_fallback')", $source);
+        $this->assertStringContainsString("__('emails.gamification_milestone.badge_fallback')", $source);
+        $this->assertStringNotContainsString("?: 'there'", $source);
+        $this->assertStringNotContainsString("?? 'Badge'", $source);
+        $this->assertStringNotContainsString("?? 'a new badge'", $source);
+    }
 }

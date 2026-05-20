@@ -164,6 +164,7 @@
     "rank": "Rank",
     "streak": "Streak",
     "streak_days": "{{days}} days",
+    "badge_fallback": "Badge",
     "encouragement": "Keep up the great work — your contributions make the community stronger!",
     "view_leaderboard": "View Leaderboard"
   },
@@ -179,6 +180,7 @@
     "badge_earned_preview": "You earned the {{badge}} badge!",
     "badge_earned_highlight": "You've earned the <strong>{{icon}} {{badge}}</strong> badge!",
     "badge_earned_body": "Great work contributing to your community!",
+    "badge_fallback": "a new badge",
     "view_badges": "View Your Badges",
     "streak_subject": "Amazing! {{days}}-day login streak",
     "streak_title": "Streak Milestone!",

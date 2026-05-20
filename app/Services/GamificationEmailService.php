@@ -301,7 +301,7 @@ class GamificationEmailService
             ->theme('achievement')
             ->title(__('emails.gamification_digest.title'))
             ->previewText(__('emails.gamification_digest.preview', ['xp' => $digest['xp_earned'], 'community' => $safeCommunity]))
-            ->greeting($safeName ?: 'there')
+            ->greeting($safeName ?: __('emails.common.fallback_name'))
             ->paragraph(__('emails.gamification_digest.intro', ['community' => $safeCommunity]));
 
         // Build stat cards — always show XP and Level
@@ -325,7 +325,7 @@ class GamificationEmailService
             $badgeItems = [];
             foreach ($digest['badges_earned'] as $badge) {
                 $icon = $badge['icon'] ?? '';
-                $badgeName = htmlspecialchars($badge['name'] ?? $badge['badge_key'] ?? 'Badge', ENT_QUOTES, 'UTF-8');
+                $badgeName = htmlspecialchars($badge['name'] ?? $badge['badge_key'] ?? __('emails.gamification_digest.badge_fallback'), ENT_QUOTES, 'UTF-8');
                 $badgeItems[] = ['text' => trim("{$icon} {$badgeName}"), 'color' => '#8b5cf6'];
             }
             $builder->badges($badgeItems);
@@ -363,7 +363,7 @@ class GamificationEmailService
                 break;
 
             case 'badge_earned':
-                $badgeName = htmlspecialchars((string) ($data['badge_name'] ?? $data['name'] ?? 'a new badge'), ENT_QUOTES, 'UTF-8');
+                $badgeName = htmlspecialchars((string) ($data['badge_name'] ?? $data['name'] ?? __('emails.gamification_milestone.badge_fallback')), ENT_QUOTES, 'UTF-8');
                 $badgeIcon = $data['icon'] ?? '';
                 $subject = __('emails.gamification_milestone.badge_earned_subject', ['badge' => $badgeName]);
                 $builder = EmailTemplateBuilder::make()
