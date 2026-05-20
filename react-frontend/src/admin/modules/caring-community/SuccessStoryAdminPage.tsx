@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -81,12 +82,6 @@ interface StoryResponse {
 
 const METRIC_SOURCES: MetricSource[] = ['pilot_scoreboard', 'municipal_roi', 'manual'];
 
-const METRIC_SOURCE_LABEL: Record<MetricSource, string> = {
-  pilot_scoreboard: 'AG83 pilot scoreboard',
-  municipal_roi: 'AG76 municipal ROI',
-  manual: 'Manual / illustrative',
-};
-
 const AUDIENCE_OPTIONS = [
   'all_residents',
   'municipality',
@@ -95,15 +90,6 @@ const AUDIENCE_OPTIONS = [
   'volunteers',
   'recipients',
 ];
-
-const AUDIENCE_LABEL: Record<string, string> = {
-  all_residents: 'All residents',
-  municipality: 'Municipality',
-  kanton: 'Kanton',
-  verein_members: 'Verein members',
-  volunteers: 'Volunteers',
-  recipients: 'Care recipients',
-};
 
 interface FormState {
   title: string;
@@ -180,7 +166,8 @@ function toPayload(form: FormState): Record<string, unknown> {
 // ---------------------------------------------------------------------------
 
 export default function SuccessStoryAdminPage(): JSX.Element {
-  usePageTitle('Success Stories');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('success_stories_admin.meta.title'));
   const { showToast } = useToast();
 
   const [items, setItems] = useState<SuccessStory[]>([]);
@@ -209,12 +196,12 @@ export default function SuccessStoryAdminPage(): JSX.Element {
         setItems([]);
       }
     } catch {
-      showToast('Failed to load success stories', 'error');
+      showToast(t('success_stories_admin.toasts.load_failed'), 'error');
       setItems([]);
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     void load();
@@ -246,12 +233,12 @@ export default function SuccessStoryAdminPage(): JSX.Element {
       );
       if (res.success && res.data) {
         setItems(res.data.items ?? []);
-        showToast('Seeded 3 demo cards', 'success');
+        showToast(t('success_stories_admin.toasts.seeded'), 'success');
       } else {
-        showToast(res.error ?? 'Seed failed', 'error');
+        showToast(res.error ?? t('success_stories_admin.toasts.seed_failed'), 'error');
       }
     } catch {
-      showToast('Seed failed', 'error');
+      showToast(t('success_stories_admin.toasts.seed_failed'), 'error');
     } finally {
       setSeeding(false);
     }
@@ -267,11 +254,11 @@ export default function SuccessStoryAdminPage(): JSX.Element {
           payload,
         );
         if (res.success && res.data?.story) {
-          showToast('Story updated', 'success');
+          showToast(t('success_stories_admin.toasts.updated'), 'success');
           editModal.onClose();
           await load();
         } else {
-          showToast(res.error ?? 'Update failed', 'error');
+          showToast(res.error ?? t('success_stories_admin.toasts.update_failed'), 'error');
         }
       } else {
         const res = await api.post<StoryResponse>(
@@ -279,15 +266,15 @@ export default function SuccessStoryAdminPage(): JSX.Element {
           payload,
         );
         if (res.success && res.data?.story) {
-          showToast('Story created', 'success');
+          showToast(t('success_stories_admin.toasts.created'), 'success');
           editModal.onClose();
           await load();
         } else {
-          showToast(res.error ?? 'Create failed', 'error');
+          showToast(res.error ?? t('success_stories_admin.toasts.create_failed'), 'error');
         }
       }
     } catch {
-      showToast(editing ? 'Update failed' : 'Create failed', 'error');
+      showToast(editing ? t('success_stories_admin.toasts.update_failed') : t('success_stories_admin.toasts.create_failed'), 'error');
     } finally {
       setSaving(false);
     }
@@ -301,15 +288,15 @@ export default function SuccessStoryAdminPage(): JSX.Element {
         `/v2/admin/caring-community/success-stories/${target.id}`,
       );
       if (res.success) {
-        showToast('Story removed', 'success');
+        showToast(t('success_stories_admin.toasts.removed'), 'success');
         deleteModal.onClose();
         setTarget(null);
         await load();
       } else {
-        showToast(res.error ?? 'Delete failed', 'error');
+        showToast(res.error ?? t('success_stories_admin.toasts.delete_failed'), 'error');
       }
     } catch {
-      showToast('Delete failed', 'error');
+      showToast(t('success_stories_admin.toasts.delete_failed'), 'error');
     } finally {
       setDeleting(false);
     }
@@ -323,13 +310,13 @@ export default function SuccessStoryAdminPage(): JSX.Element {
         {},
       );
       if (res.success && res.data?.story) {
-        showToast('Live metric refreshed', 'success');
+        showToast(t('success_stories_admin.toasts.metric_refreshed'), 'success');
         await load();
       } else {
-        showToast(res.error ?? 'Refresh failed', 'error');
+        showToast(res.error ?? t('success_stories_admin.toasts.refresh_failed'), 'error');
       }
     } catch {
-      showToast('Refresh failed', 'error');
+      showToast(t('success_stories_admin.toasts.refresh_failed'), 'error');
     } finally {
       setRefreshingId(null);
     }
@@ -351,8 +338,8 @@ export default function SuccessStoryAdminPage(): JSX.Element {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Success Stories"
-        subtitle="Create and manage proof cards that demonstrate the community's impact — designed for sharing with procurement officers, funders, and municipal partners."
+        title={t('success_stories_admin.meta.title')}
+        subtitle={t('success_stories_admin.meta.subtitle')}
         icon={<Award size={24} />}
         actions={
           <>
@@ -363,7 +350,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               onPress={() => void load()}
               isLoading={loading}
             >
-              Refresh
+              {t('success_stories_admin.actions.refresh')}
             </Button>
             <Button
               size="sm"
@@ -371,7 +358,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               startContent={<Plus size={14} />}
               onPress={openCreate}
             >
-              New story
+              {t('success_stories_admin.actions.new_story')}
             </Button>
           </>
         }
@@ -382,9 +369,9 @@ export default function SuccessStoryAdminPage(): JSX.Element {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('success_stories_admin.about.title')}</p>
               <p className="text-default-600">
-                Proof cards are structured impact stories tied to live metrics from the platform. Each card shows a before/after comparison with a cited evidence source and methodology note. Cards marked as "Demo" are illustrative only; mark a card as "Real evidence" once you have verified the data. Published cards appear in the Municipal Impact Report and the public-facing impact page.
+                {t('success_stories_admin.about.body')}
               </p>
             </div>
           </div>
@@ -407,11 +394,9 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                 <Award size={32} />
               </div>
               <div className="max-w-md space-y-1">
-                <h3 className="text-base font-semibold">No success stories yet</h3>
+                <h3 className="text-base font-semibold">{t('success_stories_admin.empty.title')}</h3>
                 <p className="text-sm text-default-500">
-                  Seed 3 illustrative demo cards to show what proof cards look like to
-                  procurement officers and funders. They are clearly labelled "Demo /
-                  illustrative" until you mark them as real evidence by hand.
+                  {t('success_stories_admin.empty.body')}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -421,14 +406,14 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                   onPress={() => void handleSeed()}
                   isLoading={seeding}
                 >
-                  Seed 3 demo cards
+                  {t('success_stories_admin.actions.seed_demo')}
                 </Button>
                 <Button
                   variant="flat"
                   startContent={<Plus size={14} />}
                   onPress={openCreate}
                 >
-                  New story
+                  {t('success_stories_admin.actions.new_story')}
                 </Button>
               </div>
             </div>
@@ -437,14 +422,16 @@ export default function SuccessStoryAdminPage(): JSX.Element {
       ) : (
         <Card shadow="sm">
           <CardBody>
-            <Table aria-label="Success stories" removeWrapper>
+            <Table aria-label={t('success_stories_admin.table.aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>Title</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Demo</TableColumn>
-                <TableColumn>Audience</TableColumn>
-                <TableColumn>Metric</TableColumn>
-                <TableColumn aria-label="Row actions">Actions</TableColumn>
+                <TableColumn>{t('success_stories_admin.table.title')}</TableColumn>
+                <TableColumn>{t('success_stories_admin.table.status')}</TableColumn>
+                <TableColumn>{t('success_stories_admin.table.demo')}</TableColumn>
+                <TableColumn>{t('success_stories_admin.table.audience')}</TableColumn>
+                <TableColumn>{t('success_stories_admin.table.metric')}</TableColumn>
+                <TableColumn aria-label={t('success_stories_admin.table.row_actions')}>
+                  {t('success_stories_admin.table.actions')}
+                </TableColumn>
               </TableHeader>
               <TableBody>
                 {items.map((s) => (
@@ -463,7 +450,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                         color={s.is_published ? 'success' : 'default'}
                         variant="flat"
                       >
-                        {s.is_published ? 'Published' : 'Unpublished'}
+                        {s.is_published ? t('success_stories_admin.status.published') : t('success_stories_admin.status.unpublished')}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -472,31 +459,31 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                         color={s.is_demo ? 'warning' : 'success'}
                         variant="flat"
                       >
-                        {s.is_demo ? 'Demo' : 'Real'}
+                        {s.is_demo ? t('success_stories_admin.status.demo') : t('success_stories_admin.status.real')}
                       </Chip>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm">
-                        {AUDIENCE_LABEL[s.audience] ?? s.audience}
+                        {AUDIENCE_OPTIONS.includes(s.audience) ? t(`success_stories_admin.audience.${s.audience}`) : s.audience}
                       </span>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="text-sm">{formatDelta(s)}</span>
                         <span className="text-xs text-default-500">
-                          {METRIC_SOURCE_LABEL[s.metric_source]}
+                          {t(`success_stories_admin.metric_sources.${s.metric_source}`)}
                         </span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         {s.metric_source !== 'manual' && (
-                          <Tooltip content="Refresh from live data">
+                          <Tooltip content={t('success_stories_admin.actions.refresh_live')}>
                             <Button
                               size="sm"
                               variant="light"
                               isIconOnly
-                              aria-label="Refresh from live data"
+                              aria-label={t('success_stories_admin.actions.refresh_live')}
                               onPress={() => void handleRefresh(s)}
                               isLoading={refreshingId === s.id}
                             >
@@ -508,7 +495,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                           size="sm"
                           variant="light"
                           isIconOnly
-                          aria-label="Edit"
+                          aria-label={t('success_stories_admin.actions.edit')}
                           onPress={() => openEdit(s)}
                         >
                           <Pencil size={14} />
@@ -518,7 +505,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                           variant="light"
                           color="danger"
                           isIconOnly
-                          aria-label="Delete"
+                          aria-label={t('success_stories_admin.actions.delete')}
                           onPress={() => openDelete(s)}
                         >
                           <Trash2 size={14} />
@@ -542,13 +529,13 @@ export default function SuccessStoryAdminPage(): JSX.Element {
       >
         <ModalContent>
           <ModalHeader>
-            {editing ? `Edit: ${editing.title}` : 'New success story'}
+            {editing ? t('success_stories_admin.editor.edit_title', { title: editing.title }) : t('success_stories_admin.editor.new_title')}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Input
-                label="Title"
-                placeholder="e.g. 30% lower information distribution effort"
+                label={t('success_stories_admin.editor.title')}
+                placeholder={t('success_stories_admin.editor.title_placeholder')}
                 variant="bordered"
                 isRequired
                 value={form.title}
@@ -556,8 +543,8 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               />
 
               <Textarea
-                label="Narrative"
-                placeholder="2–4 sentences explaining the story to a procurement officer or funder."
+                label={t('success_stories_admin.editor.narrative')}
+                placeholder={t('success_stories_admin.editor.narrative_placeholder')}
                 variant="bordered"
                 isRequired
                 minRows={3}
@@ -567,9 +554,9 @@ export default function SuccessStoryAdminPage(): JSX.Element {
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <Select
-                  label="Metric source"
+                  label={t('success_stories_admin.editor.metric_source')}
                   variant="bordered"
-                  description="pilot_scoreboard: auto-pulls from AG83; municipal_roi: auto-pulls from AG76; manual: you enter values by hand."
+                  description={t('success_stories_admin.editor.metric_source_description')}
                   selectedKeys={[form.metric_source]}
                   onChange={(e) =>
                     setForm({
@@ -579,14 +566,14 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                   }
                 >
                   {METRIC_SOURCES.map((s) => (
-                    <SelectItem key={s}>{METRIC_SOURCE_LABEL[s]}</SelectItem>
+                    <SelectItem key={s}>{t(`success_stories_admin.metric_sources.${s}`)}</SelectItem>
                   ))}
                 </Select>
 
                 <Input
-                  label="Metric key"
-                  placeholder="e.g. approved_hours, formal_care_offset_chf"
-                  description="Required for non-manual sources"
+                  label={t('success_stories_admin.editor.metric_key')}
+                  placeholder={t('success_stories_admin.editor.metric_key_placeholder')}
+                  description={t('success_stories_admin.editor.metric_key_description')}
                   variant="bordered"
                   value={form.metric_key}
                   onValueChange={(v) => setForm({ ...form, metric_key: v })}
@@ -595,22 +582,22 @@ export default function SuccessStoryAdminPage(): JSX.Element {
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                 <Input
-                  label="Before value"
+                  label={t('success_stories_admin.editor.before_value')}
                   type="number"
                   variant="bordered"
                   value={form.before_value}
                   onValueChange={(v) => setForm({ ...form, before_value: v })}
                 />
                 <Input
-                  label="After value"
+                  label={t('success_stories_admin.editor.after_value')}
                   type="number"
                   variant="bordered"
                   value={form.after_value}
                   onValueChange={(v) => setForm({ ...form, after_value: v })}
                 />
                 <Input
-                  label="Unit"
-                  placeholder="e.g. hours, CHF, %"
+                  label={t('success_stories_admin.editor.unit')}
+                  placeholder={t('success_stories_admin.editor.unit_placeholder')}
                   variant="bordered"
                   value={form.unit}
                   onValueChange={(v) => setForm({ ...form, unit: v })}
@@ -619,7 +606,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <Select
-                  label="Audience"
+                  label={t('success_stories_admin.editor.audience')}
                   variant="bordered"
                   selectedKeys={[form.audience]}
                   onChange={(e) =>
@@ -627,13 +614,13 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                   }
                 >
                   {AUDIENCE_OPTIONS.map((a) => (
-                    <SelectItem key={a}>{AUDIENCE_LABEL[a] ?? a}</SelectItem>
+                    <SelectItem key={a}>{t(`success_stories_admin.audience.${a}`)}</SelectItem>
                   ))}
                 </Select>
 
                 <Input
-                  label="Sub-region ID (optional)"
-                  placeholder="Leave blank for all"
+                  label={t('success_stories_admin.editor.sub_region_id')}
+                  placeholder={t('success_stories_admin.editor.sub_region_placeholder')}
                   variant="bordered"
                   value={form.sub_region_id}
                   onValueChange={(v) => setForm({ ...form, sub_region_id: v })}
@@ -641,9 +628,9 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               </div>
 
               <Textarea
-                label="Method caveat"
-                placeholder='e.g. "Pilot region only; n=42 members; 90-day window"'
-                description="Required — a one-sentence note on methodology limitations. Keeps claims honest with funders. Example: 'Based on self-reported hours; external audit pending.'"
+                label={t('success_stories_admin.editor.method_caveat')}
+                placeholder={t('success_stories_admin.editor.method_caveat_placeholder')}
+                description={t('success_stories_admin.editor.method_caveat_description')}
                 variant="bordered"
                 isRequired
                 minRows={2}
@@ -652,9 +639,9 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               />
 
               <Input
-                label="Evidence source"
-                placeholder='e.g. "AG83 pilot scoreboard 2026-04-30 baseline"'
-                description="Required — where the number comes from. Example: 'NEXUS platform data, 90-day rolling window ending 2026-04-01' or 'Swiss Federal Statistical Office 2023.'"
+                label={t('success_stories_admin.editor.evidence_source')}
+                placeholder={t('success_stories_admin.editor.evidence_source_placeholder')}
+                description={t('success_stories_admin.editor.evidence_source_description')}
                 variant="bordered"
                 isRequired
                 value={form.evidence_source}
@@ -666,9 +653,9 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <div className="flex items-center justify-between rounded-lg border border-default-200 px-4 py-3">
                   <div>
-                    <p className="text-sm font-medium">Demo / illustrative</p>
+                    <p className="text-sm font-medium">{t('success_stories_admin.editor.demo_label')}</p>
                     <p className="text-xs text-default-500">
-                      Card is labelled as demo on the gallery
+                      {t('success_stories_admin.editor.demo_description')}
                     </p>
                   </div>
                   <Switch
@@ -678,9 +665,9 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                 </div>
                 <div className="flex items-center justify-between rounded-lg border border-default-200 px-4 py-3">
                   <div>
-                    <p className="text-sm font-medium">Published</p>
+                    <p className="text-sm font-medium">{t('success_stories_admin.editor.published_label')}</p>
                     <p className="text-xs text-default-500">
-                      Visible on the member-facing gallery
+                      {t('success_stories_admin.editor.published_description')}
                     </p>
                   </div>
                   <Switch
@@ -693,7 +680,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={editModal.onClose}>
-              Cancel
+              {t('success_stories_admin.actions.cancel')}
             </Button>
             <Button
               color="primary"
@@ -701,7 +688,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               isDisabled={!isFormValid}
               isLoading={saving}
             >
-              {editing ? 'Save changes' : 'Create story'}
+              {editing ? t('success_stories_admin.actions.save_changes') : t('success_stories_admin.actions.create_story')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -710,30 +697,30 @@ export default function SuccessStoryAdminPage(): JSX.Element {
       {/* Delete confirmation modal */}
       <Modal isOpen={deleteModal.isOpen} onClose={deleteModal.onClose} size="md">
         <ModalContent>
-          <ModalHeader>Remove success story</ModalHeader>
+          <ModalHeader>{t('success_stories_admin.delete_modal.title')}</ModalHeader>
           <ModalBody>
             {target ? (
               <div className="space-y-3">
                 <p className="text-sm">
-                  This will permanently remove{' '}
-                  <span className="font-semibold">{target.title}</span> from the
-                  gallery.
+                  {t('success_stories_admin.delete_modal.body_prefix')}{' '}
+                  <span className="font-semibold">{target.title}</span>{' '}
+                  {t('success_stories_admin.delete_modal.body_suffix')}
                 </p>
                 <Divider />
-                <p className="text-xs text-default-500">This action cannot be undone.</p>
+                <p className="text-xs text-default-500">{t('success_stories_admin.delete_modal.warning')}</p>
               </div>
             ) : null}
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={deleteModal.onClose}>
-              Cancel
+              {t('success_stories_admin.actions.cancel')}
             </Button>
             <Button
               color="danger"
               onPress={() => void handleDelete()}
               isLoading={deleting}
             >
-              Remove
+              {t('success_stories_admin.actions.remove')}
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -2832,6 +2832,110 @@
     },
     "confirm_mark_inactive": "Mark \"{{name}}\" as inactive? Linked care providers will be detached from it."
   },
+  "success_stories_admin": {
+    "meta": {
+      "title": "Success Stories",
+      "subtitle": "Create and manage proof cards that demonstrate the community's impact - designed for sharing with procurement officers, funders, and municipal partners."
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Proof cards are structured impact stories tied to live metrics from the platform. Each card shows a before/after comparison with a cited evidence source and methodology note. Cards marked as \"Demo\" are illustrative only; mark a card as \"Real evidence\" once you have verified the data. Published cards appear in the Municipal Impact Report and the public-facing impact page."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "new_story": "New story",
+      "seed_demo": "Seed 3 demo cards",
+      "refresh_live": "Refresh from live data",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save_changes": "Save changes",
+      "create_story": "Create story",
+      "remove": "Remove"
+    },
+    "empty": {
+      "title": "No success stories yet",
+      "body": "Seed 3 illustrative demo cards to show what proof cards look like to procurement officers and funders. They are clearly labelled \"Demo / illustrative\" until you mark them as real evidence by hand."
+    },
+    "table": {
+      "aria": "Success stories",
+      "title": "Title",
+      "status": "Status",
+      "demo": "Demo",
+      "audience": "Audience",
+      "metric": "Metric",
+      "row_actions": "Row actions",
+      "actions": "Actions"
+    },
+    "status": {
+      "published": "Published",
+      "unpublished": "Unpublished",
+      "demo": "Demo",
+      "real": "Real"
+    },
+    "metric_sources": {
+      "pilot_scoreboard": "AG83 pilot scoreboard",
+      "municipal_roi": "AG76 municipal ROI",
+      "manual": "Manual / illustrative"
+    },
+    "audience": {
+      "all_residents": "All residents",
+      "municipality": "Municipality",
+      "kanton": "Kanton",
+      "verein_members": "Verein members",
+      "volunteers": "Volunteers",
+      "recipients": "Care recipients"
+    },
+    "editor": {
+      "new_title": "New success story",
+      "edit_title": "Edit: {{title}}",
+      "title": "Title",
+      "title_placeholder": "e.g. 30% lower information distribution effort",
+      "narrative": "Narrative",
+      "narrative_placeholder": "2-4 sentences explaining the story to a procurement officer or funder.",
+      "metric_source": "Metric source",
+      "metric_source_description": "pilot_scoreboard: auto-pulls from AG83; municipal_roi: auto-pulls from AG76; manual: you enter values by hand.",
+      "metric_key": "Metric key",
+      "metric_key_placeholder": "e.g. approved_hours, formal_care_offset_chf",
+      "metric_key_description": "Required for non-manual sources",
+      "before_value": "Before value",
+      "after_value": "After value",
+      "unit": "Unit",
+      "unit_placeholder": "e.g. hours, CHF, %",
+      "audience": "Audience",
+      "sub_region_id": "Sub-region ID (optional)",
+      "sub_region_placeholder": "Leave blank for all",
+      "method_caveat": "Method caveat",
+      "method_caveat_placeholder": "e.g. \"Pilot region only; n=42 members; 90-day window\"",
+      "method_caveat_description": "Required - a one-sentence note on methodology limitations. Keeps claims honest with funders. Example: 'Based on self-reported hours; external audit pending.'",
+      "evidence_source": "Evidence source",
+      "evidence_source_placeholder": "e.g. \"AG83 pilot scoreboard 2026-04-30 baseline\"",
+      "evidence_source_description": "Required - where the number comes from. Example: 'NEXUS platform data, 90-day rolling window ending 2026-04-01' or 'Swiss Federal Statistical Office 2023.'",
+      "demo_label": "Demo / illustrative",
+      "demo_description": "Card is labelled as demo on the gallery",
+      "published_label": "Published",
+      "published_description": "Visible on the member-facing gallery"
+    },
+    "delete_modal": {
+      "title": "Remove success story",
+      "body_prefix": "This will permanently remove",
+      "body_suffix": "from the gallery.",
+      "warning": "This action cannot be undone."
+    },
+    "toasts": {
+      "load_failed": "Failed to load success stories",
+      "seeded": "Seeded 3 demo cards",
+      "seed_failed": "Seed failed",
+      "updated": "Story updated",
+      "update_failed": "Update failed",
+      "created": "Story created",
+      "create_failed": "Create failed",
+      "removed": "Story removed",
+      "delete_failed": "Delete failed",
+      "metric_refreshed": "Live metric refreshed",
+      "refresh_failed": "Refresh failed"
+    }
+  },
   "billing": {
     "actions": "Actions",
     "billing_interval": "Billing Interval",
