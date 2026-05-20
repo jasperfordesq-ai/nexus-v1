@@ -91,7 +91,7 @@ export function VerifyEmailPage() {
       setIsResending(true);
       await api.post('/auth/resend-verification');
       setResendSuccess(true);
-      toast.success(t('resend_sent', 'Check your inbox — we sent a new verification link'));
+      toast.success(t('resend_sent'));
     } catch {
       setErrorMessage(t('verify_email.resend_error'));
     } finally {
@@ -111,7 +111,7 @@ export function VerifyEmailPage() {
         >
           <GlassCard className="p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-indigo-500/20 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
+              <Loader2 aria-hidden="true" className="w-8 h-8 text-indigo-400 animate-spin" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('verify_email.loading_title')}</h1>
             <p className="text-theme-muted">
@@ -139,7 +139,7 @@ export function VerifyEmailPage() {
         >
           <GlassCard className="p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-emerald-400" />
+              <CheckCircle aria-hidden="true" className="w-8 h-8 text-emerald-400" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('verify_email.success_title')}</h1>
             <p className="text-theme-muted mb-4">
@@ -150,11 +150,11 @@ export function VerifyEmailPage() {
             {requiresApproval && !isAuthenticated && (
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm text-left mb-6">
                 <div className="flex items-start gap-3">
-                  <ShieldCheck className="w-5 h-5 text-[var(--color-warning)] shrink-0 mt-0.5" />
+                  <ShieldCheck aria-hidden="true" className="w-5 h-5 text-[var(--color-warning)] shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-medium text-amber-600 dark:text-amber-400">{t('verify_email.awaiting_approval_title', { defaultValue: 'Awaiting admin approval' })}</p>
+                    <p className="font-medium text-amber-600 dark:text-amber-400">{t('verify_email.awaiting_approval_title')}</p>
                     <p className="text-amber-600/80 dark:text-amber-300/80 mt-1">
-                      {t("verify_email.awaiting_approval_body", { defaultValue: "Your email is verified, but your account still needs to be approved by a community administrator. You will receive an email once approved." })}
+                      {t('verify_email.awaiting_approval_body')}
                     </p>
                   </div>
                 </div>
@@ -170,7 +170,7 @@ export function VerifyEmailPage() {
             ) : (
               <Link to={tenantPath('/login')}>
                 <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                  {requiresApproval ? t('verify_email.back_to_login', { defaultValue: 'Back to Login' }) : t('verify_email.go_to_login')}
+                  {requiresApproval ? t('verify_email.back_to_login') : t('verify_email.go_to_login')}
                 </Button>
               </Link>
             )}
@@ -195,7 +195,7 @@ export function VerifyEmailPage() {
       >
         <GlassCard className="p-8 text-center">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
-            <XCircle className="w-8 h-8 text-red-400" />
+            <XCircle aria-hidden="true" className="w-8 h-8 text-red-400" />
           </div>
           <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('verify_email.error_title')}</h1>
           <p className="text-theme-muted mb-6">
@@ -214,7 +214,7 @@ export function VerifyEmailPage() {
                   onPress={handleResendVerification}
                   isLoading={isResending}
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                  startContent={!isResending ? <Mail className="w-4 h-4" /> : undefined}
+                  startContent={!isResending ? <Mail aria-hidden="true" className="w-4 h-4" /> : undefined}
                 >
                   {t('verify_email.resend')}
                 </Button>
@@ -229,7 +229,7 @@ export function VerifyEmailPage() {
               <Button
                 variant="flat"
                 className="w-full bg-theme-elevated text-theme-primary"
-                startContent={<ArrowLeft className="w-4 h-4" />}
+                startContent={<ArrowLeft aria-hidden="true" className="w-4 h-4" />}
               >
                 {isAuthenticated ? t('verify_email.back_to_dashboard') : t('verify_email.back_to_login')}
               </Button>
