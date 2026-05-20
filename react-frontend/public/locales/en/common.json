@@ -78,6 +78,10 @@
     "powered_by_google": "Powered by Google",
     "powered_by_osm": "© OpenStreetMap contributors"
   },
+  "keyboard": {
+    "command_symbol": "⌘",
+    "k_key": "K"
+  },
   "nav_desc": {
     "feed": "Community feed",
     "explore": "Discover trending content & people",

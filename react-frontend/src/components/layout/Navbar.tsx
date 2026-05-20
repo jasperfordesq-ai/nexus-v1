@@ -264,7 +264,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
   // Timebanking dropdown — replaces top-level Listings link
   const timebankingItems = useMemo(() => [
-    { label: t('nav.listings'), desc: t('nav_desc.timebanking_listings', 'Offers & requests'), href: tenantPath('/listings'), icon: ListTodo, module: 'listings' as const },
+    { label: t('nav.listings'), desc: t('nav_desc.timebanking_listings'), href: tenantPath('/listings'), icon: ListTodo, module: 'listings' as const },
     { label: t('nav.exchanges'), desc: t('nav_desc.exchanges'), href: tenantPath('/exchanges'), icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
     { label: t('nav.group_exchanges'), desc: t('nav_desc.group_exchanges'), href: tenantPath('/group-exchanges'), icon: Users, feature: 'group_exchanges' as const },
     { label: t('nav.wallet'), desc: t('nav_desc.wallet'), href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' as const },
@@ -283,8 +283,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.volunteering'), desc: t('nav_desc.volunteering'), path: '/volunteering', href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
     { label: t('nav.resources'), desc: t('nav_desc.resources'), path: '/resources', href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
     { label: t('nav.jobs'), desc: t('nav_desc.jobs'), path: '/jobs', href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
-    { label: t('nav.marketplace', 'Marketplace'), desc: t('nav_desc.marketplace', 'Buy & sell in your community'), path: '/marketplace', href: tenantPath('/marketplace'), icon: ShoppingBag, feature: 'marketplace' as const },
-    { label: t('nav.premium', 'Premium'), desc: t('nav_desc.premium', 'Premium membership tiers'), path: '/premium', href: tenantPath('/premium'), icon: Crown, feature: 'member_premium' as const },
+    { label: t('nav.marketplace'), desc: t('nav_desc.marketplace'), path: '/marketplace', href: tenantPath('/marketplace'), icon: ShoppingBag, feature: 'marketplace' as const },
+    { label: t('nav.premium'), desc: t('nav_desc.premium'), path: '/premium', href: tenantPath('/premium'), icon: Crown, feature: 'member_premium' as const },
   ], [t, tenantPath]);
   const visibleCommunityItems = useMemo(
     () => getVisibleCommunityItems(communityItems, hasFeature),
@@ -302,11 +302,11 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const overflowNavItems = useMemo(() => {
     const items: { label: string; desc: string; href: string; icon: typeof LayoutDashboard; module?: string }[] = [];
     if (hasModule('feed') && maxVisibleNav < 1)
-      items.push({ label: t('nav.feed'), desc: t('nav_desc.feed', 'Community feed'), href: tenantPath('/feed'), icon: Newspaper, module: 'feed' });
+      items.push({ label: t('nav.feed'), desc: t('nav_desc.feed'), href: tenantPath('/feed'), icon: Newspaper, module: 'feed' });
     if (maxVisibleNav < 2)
-      items.push({ label: t('nav.explore', 'Explore'), desc: t('nav_desc.explore', 'Discover content'), href: tenantPath('/explore'), icon: Compass });
+      items.push({ label: t('nav.explore'), desc: t('nav_desc.explore'), href: tenantPath('/explore'), icon: Compass });
     if (hasModule('messages') && maxVisibleNav < 4)
-      items.push({ label: t('nav.messages'), desc: t('nav_desc.messages', 'Your messages'), href: tenantPath('/messages'), icon: MessageSquare, module: 'messages' });
+      items.push({ label: t('nav.messages'), desc: t('nav_desc.messages'), href: tenantPath('/messages'), icon: MessageSquare, module: 'messages' });
     return items;
   }, [maxVisibleNav, hasModule, t, tenantPath]);
 
@@ -315,12 +315,12 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     // Overflow section — only visible when primary nav items are collapsed
     ...(overflowNavItems.length > 0 ? [{
       key: 'main',
-      title: t('sections.main', 'Main'),
+      title: t('sections.main'),
       items: overflowNavItems,
     }] : []),
     {
       key: 'engage',
-      title: t('sections.engage', 'Engage'),
+      title: t('sections.engage'),
       items: [
         { label: t('nav.goals'), desc: t('nav_desc.goals'), href: tenantPath('/goals'), icon: Target, feature: 'goals' },
         { label: t('nav.polls'), desc: t('nav_desc.polls'), href: tenantPath('/polls'), icon: BarChart3, feature: 'polls' },
@@ -329,26 +329,26 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     },
     {
       key: 'progress',
-      title: t('sections.progress', 'Progress'),
+      title: t('sections.progress'),
       collapsible: true,
       defaultExpanded: false,
       items: [
         { label: t('nav.achievements'), desc: t('nav_desc.achievements'), href: tenantPath('/achievements'), icon: Trophy, feature: 'gamification' },
         { label: t('nav.leaderboard'), desc: t('nav_desc.leaderboard'), href: tenantPath('/leaderboard'), icon: Medal, feature: 'gamification' },
-        { label: t('nav.nexus_score', 'NexusScore'), desc: t('nav_desc.nexus_score'), href: tenantPath('/nexus-score'), icon: BarChart3, feature: 'gamification' },
+        { label: t('nav.nexus_score'), desc: t('nav_desc.nexus_score'), href: tenantPath('/nexus-score'), icon: BarChart3, feature: 'gamification' },
       ].filter(gateFilter),
     },
     {
       key: 'tools',
-      title: t('sections.tools', 'Tools'),
+      title: t('sections.tools'),
       collapsible: true,
       defaultExpanded: false,
       items: [
-        { label: t('nav.matches', 'Matches'), desc: t('nav_desc.matches'), href: tenantPath('/matches'), icon: Handshake },
-        { label: t('nav.skills', 'Skills'), desc: t('nav_desc.skills'), href: tenantPath('/skills'), icon: GraduationCap },
-        { label: t('nav.saved', 'Saved'), desc: t('nav_desc.saved', 'Your bookmarked items'), href: tenantPath('/saved'), icon: Bookmark },
-        { label: t('nav.activity', 'My Activity'), desc: t('nav_desc.activity'), href: tenantPath('/activity'), icon: Activity },
-        { label: t('nav.ai_chat', 'AI Assistant'), desc: t('nav_desc.ai_chat'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' },
+        { label: t('nav.matches'), desc: t('nav_desc.matches'), href: tenantPath('/matches'), icon: Handshake },
+        { label: t('nav.skills'), desc: t('nav_desc.skills'), href: tenantPath('/skills'), icon: GraduationCap },
+        { label: t('nav.saved'), desc: t('nav_desc.saved'), href: tenantPath('/saved'), icon: Bookmark },
+        { label: t('nav.activity'), desc: t('nav_desc.activity'), href: tenantPath('/activity'), icon: Activity },
+        { label: t('nav.ai_chat'), desc: t('nav_desc.ai_chat'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' },
       ].filter(gateFilter),
     },
     ...(hasFeature('federation') ? [{
@@ -389,7 +389,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     },
     ...(isHourTimebank ? [{
       key: 'impact',
-      title: t('sections.impact', 'Impact'),
+      title: t('sections.impact'),
       collapsible: true,
       defaultExpanded: false,
       items: [
@@ -522,12 +522,12 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 size="sm"
                 className="text-theme-muted hover:text-theme-primary w-7 h-7 min-w-7 shrink-0"
                 onPress={toggleTheme}
-                aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                aria-label={resolvedTheme === 'dark' ? t('accessibility.switch_to_light') : t('accessibility.switch_to_dark')}
               >
                 {resolvedTheme === 'dark' ? (
                   <Sun className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
                 ) : (
-                  <Moon className="w-3.5 h-3.5 text-indigo-500" aria-hidden="true" />
+                  <Moon className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
                 )}
               </Button>
               <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>
@@ -542,7 +542,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 <Search className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                 <span className="hidden md:inline">{t('accessibility.search')}</span>
                 <kbd className="hidden lg:inline-flex items-center gap-0.5 ms-0.5 px-1 py-0 rounded bg-theme-hover/60 text-[10px] font-medium text-theme-subtle">
-                  <span className="text-xs">⌘</span>K
+                  <span className="text-xs">{t('keyboard.command_symbol')}</span>{t('keyboard.k_key')}
                 </kbd>
               </Button>
             </div>
@@ -608,7 +608,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   }
                 >
                   <Compass className="w-4 h-4" aria-hidden="true" />
-                  <span>{t('nav.explore', 'Explore')}</span>
+                  <span>{t('nav.explore')}</span>
                 </NavLink>
               )}
 
@@ -627,7 +627,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       endContent={<ChevronDown className="w-3 h-3" aria-hidden="true" />}
                     >
                       <ArrowRightLeft className="w-4 h-4" aria-hidden="true" />
-                      {t('nav.timebanking', 'Timebanking')}
+                      {t('nav.timebanking')}
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu
@@ -670,7 +670,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   {counts.messages > 0 && isAuthenticated && (
                     <span
                       className="ms-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-red-500 text-white rounded-full"
-                      aria-label={t('nav.unread_notifications', '{{count}} unread notifications', { count: counts.messages })}
+                      aria-label={t('nav.unread_notifications', { count: counts.messages })}
                     >
                       <span aria-hidden="true">{counts.messages > 99 ? '99+' : counts.messages}</span>
                     </span>
@@ -755,7 +755,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       <Button
                         isIconOnly
                         size="sm"
-                        className="hidden sm:flex bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                        color="primary"
+                        className="hidden sm:flex"
                         aria-label={t('accessibility.create_new')}
                       >
                         <Plus className="w-4 h-4" aria-hidden="true" />
@@ -809,7 +810,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                           name={`${user?.first_name} ${user?.last_name}`}
                           src={resolveAvatarUrl(user?.avatar_url || user?.avatar)}
                           size="sm"
-                          className="cursor-pointer ring-2 ring-transparent hover:ring-indigo-500/50 transition-all w-8 h-8 sm:w-9 sm:h-9"
+                          className="cursor-pointer ring-2 ring-transparent hover:ring-primary/50 transition-all w-8 h-8 sm:w-9 sm:h-9"
                           showFallback
                         />
                         {user?.id && <PresenceIndicator userId={user.id} size="lg" showOffline />}
@@ -833,7 +834,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                         <DropdownItem
                           key="profile-header"
                           className="h-14 gap-2 cursor-default"
-                          textValue="Profile"
+                          textValue={t('user_menu.my_profile')}
                           isReadOnly
                         >
                           <p className="font-semibold text-theme-primary truncate">
@@ -856,7 +857,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                             startContent={<Wallet className="w-4 h-4" aria-hidden="true" />}
                             endContent={
                               <span className="text-xs text-theme-subtle">
-                                {user?.balance ?? 0}h
+                                {t('hours_short', { count: user?.balance ?? 0 })}
                               </span>
                             }
                           >
@@ -878,7 +879,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                             resolvedTheme === 'dark' ? (
                               <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
                             ) : (
-                              <Moon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+                              <Moon className="w-4 h-4 text-primary" aria-hidden="true" />
                             )
                           }
                         >
@@ -888,11 +889,11 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                           <DropdownItem
                             key="install"
                             description={installState.isIosSafari
-                              ? t('install.cta_ios_sub', 'Add NEXUS to your home screen')
-                              : t('install.cta_sub', 'Faster access, works offline')}
-                            startContent={<Download className="w-4 h-4 text-indigo-500" aria-hidden="true" />}
+                              ? t('install.cta_ios_sub')
+                              : t('install.cta_sub')}
+                            startContent={<Download className="w-4 h-4 text-primary" aria-hidden="true" />}
                           >
-                            {t('install.cta', 'Install app')}
+                            {t('install.cta')}
                           </DropdownItem>
                         ) : null}
                       </DropdownSection>
@@ -920,12 +921,12 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       size="sm"
                       className="text-theme-muted hover:text-theme-primary"
                       onPress={toggleTheme}
-                      aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                      aria-label={resolvedTheme === 'dark' ? t('accessibility.switch_to_light') : t('accessibility.switch_to_dark')}
                     >
                       {resolvedTheme === 'dark' ? (
                         <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
                       ) : (
-                        <Moon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+                        <Moon className="w-4 h-4 text-primary" aria-hidden="true" />
                       )}
                     </Button>
                     <LanguageSwitcher />
@@ -937,7 +938,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     </Button>
                   </Link>
                   <Link to={tenantPath('/register')}>
-                    <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium min-w-0 px-2 sm:px-3">
+                    <Button size="sm" color="primary" className="font-medium min-w-0 px-2 sm:px-3">
                       {t('auth.sign_up')}
                     </Button>
                   </Link>
