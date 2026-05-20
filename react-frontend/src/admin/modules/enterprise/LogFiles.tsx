@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, Button, Spinner, Chip, Input } from '@heroui/react';
 import FileText from 'lucide-react/icons/file-text';
@@ -51,7 +52,8 @@ function matchesFilter(name: string, filter: FilterType): boolean {
 }
 
 export function LogFiles() {
-  usePageTitle("Enterprise");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -69,11 +71,11 @@ export function LogFiles() {
         setFiles(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error("Failed to load log files");
+      toast.error(t('enterprise.failed_to_load_log_files'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   useEffect(() => {
@@ -93,17 +95,17 @@ export function LogFiles() {
   };
 
   const filters: { key: FilterType; label: string }[] = [
-    { key: 'all', label: "All" },
-    { key: 'errors', label: "Errors" },
-    { key: 'application', label: "Application" },
-    { key: 'cron', label: "Cron" },
+    { key: 'all', label: t('log_files_labels.filter_all') },
+    { key: 'errors', label: t('log_files_labels.filter_errors') },
+    { key: 'application', label: t('log_files_labels.filter_application') },
+    { key: 'cron', label: t('log_files_labels.filter_cron') },
   ];
 
   return (
     <div>
       <PageHeader
-        title={"Log Files"}
-        description={"Log Files."}
+        title={t('enterprise.log_files_title')}
+        description={t('enterprise.log_files_desc')}
         actions={
           <Button
             variant="flat"
@@ -112,7 +114,7 @@ export function LogFiles() {
             isLoading={loading}
             size="sm"
           >
-            {"Refresh"}
+            {t('common.refresh')}
           </Button>
         }
       />
@@ -123,7 +125,7 @@ export function LogFiles() {
           <CardBody className="flex flex-row items-center gap-3 p-4">
             <Files size={20} className="text-primary" />
             <div>
-              <p className="text-xs text-default-500">{"Total Files"}</p>
+              <p className="text-xs text-default-500">{t('log_files_labels.total_files')}</p>
               <p className="text-lg font-bold text-foreground">{files.length}</p>
             </div>
           </CardBody>
@@ -132,7 +134,7 @@ export function LogFiles() {
           <CardBody className="flex flex-row items-center gap-3 p-4">
             <HardDrive size={20} className="text-warning" />
             <div>
-              <p className="text-xs text-default-500">{"Total Size"}</p>
+              <p className="text-xs text-default-500">{t('log_files_labels.total_size')}</p>
               <p className="text-lg font-bold text-foreground">{formatBytes(totalSize)}</p>
             </div>
           </CardBody>
@@ -142,7 +144,7 @@ export function LogFiles() {
       {/* Search & Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <Input type="search" name="admin-search" autoComplete="off"
-          placeholder={"Enter search..."}
+          placeholder={t('log_files_labels.search_placeholder')}
           startContent={<Search size={16} className="text-default-400" />}
           value={search}
           onValueChange={setSearch}
@@ -172,7 +174,7 @@ export function LogFiles() {
       ) : filtered.length === 0 ? (
         <Card shadow="sm">
           <CardBody className="py-16 text-center">
-            <p className="text-default-500">{"No log files found"}</p>
+            <p className="text-default-500">{t('enterprise.no_log_files')}</p>
           </CardBody>
         </Card>
       ) : (
@@ -197,7 +199,7 @@ export function LogFiles() {
                           {file.size}
                         </Chip>
                         <span className="text-xs text-default-400">
-                          {`Lines Count`}
+                          {t('log_files_labels.lines_count', { count: file.line_count })}
                         </span>
                       </div>
                       <p className="text-xs text-default-400 mt-1">
@@ -208,7 +210,7 @@ export function LogFiles() {
                       size="sm"
                       variant="flat"
                       isIconOnly
-                      aria-label={"Download"}
+                      aria-label={t('log_files_labels.download')}
                       onPress={() => window.open(`/v2/admin/enterprise/monitoring/log-files/${file.name}?download=1`, '_blank')}
                     >
                       <Download size={14} />

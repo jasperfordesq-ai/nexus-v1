@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardBody,
@@ -36,7 +37,8 @@ import { PageHeader } from '../../components';
 import type { SystemRequirements as SystemRequirementsType } from '../../api/types';
 
 export function SystemRequirements() {
-  usePageTitle("Enterprise");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
   const toast = useToast();
 
   const [data, setData] = useState<SystemRequirementsType | null>(null);
@@ -51,11 +53,11 @@ export function SystemRequirements() {
         setData(res.data as unknown as SystemRequirementsType);
       }
     } catch {
-      toast.error("Failed to load system requirements");
+      toast.error(t('enterprise.failed_to_load_system_requirements'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   useEffect(() => {
@@ -78,9 +80,9 @@ export function SystemRequirements() {
 
   const status = computeStatus();
   const statusConfig = {
-    pass: { color: 'success' as const, label: "All checks passed", icon: CheckCircle, bg: 'bg-success/10' },
-    warning: { color: 'warning' as const, label: "Some warnings detected", icon: AlertTriangle, bg: 'bg-warning/10' },
-    fail: { color: 'danger' as const, label: "Critical issues found", icon: XCircle, bg: 'bg-danger/10' },
+    pass: { color: 'success' as const, label: t('enterprise.all_checks_passed'), icon: CheckCircle, bg: 'bg-success/10' },
+    warning: { color: 'warning' as const, label: t('enterprise.some_warnings_detected'), icon: AlertTriangle, bg: 'bg-warning/10' },
+    fail: { color: 'danger' as const, label: t('enterprise.critical_issues_found'), icon: XCircle, bg: 'bg-danger/10' },
   };
 
   const filteredExtensions = data?.extensions.filter((ext) =>
@@ -93,19 +95,19 @@ export function SystemRequirements() {
   const iniEntries = data?.ini_settings ? Object.entries(data.ini_settings) : [];
 
   const iniLabels: Record<string, string> = {
-    memory_limit: "Memory Limit",
-    max_execution_time: "Max Execution Time",
-    max_input_time: "Max Input Time",
-    max_input_vars: "Max Input Variables",
-    upload_max_filesize: "Upload Max File Size",
-    post_max_size: "Post Max Size",
+    memory_limit: t('enterprise.ini_memory_limit'),
+    max_execution_time: t('enterprise.ini_max_execution_time'),
+    max_input_time: t('enterprise.ini_max_input_time'),
+    max_input_vars: t('enterprise.ini_max_input_vars'),
+    upload_max_filesize: t('enterprise.ini_upload_max_filesize'),
+    post_max_size: t('enterprise.ini_post_max_size'),
   };
 
   return (
     <div>
       <PageHeader
-        title={"System Requirements"}
-        description={"System Requirements."}
+        title={t('enterprise.system_requirements_title')}
+        description={t('enterprise.system_requirements_desc')}
         actions={
           <Button
             variant="flat"
@@ -114,7 +116,7 @@ export function SystemRequirements() {
             isLoading={loading}
             size="sm"
           >
-            {"Refresh"}
+            {t('common.refresh')}
           </Button>
         }
       />
@@ -135,7 +137,7 @@ export function SystemRequirements() {
                 })()}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground">{"Overall Status"}</h3>
+                <h3 className="text-lg font-bold text-foreground">{t('enterprise.overall_status')}</h3>
                 <Chip size="sm" variant="flat" color={statusConfig[status].color} className="mt-1">
                   {statusConfig[status].label}
                 </Chip>
@@ -147,7 +149,7 @@ export function SystemRequirements() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
               <Code size={18} className="text-primary" />
-              <h3 className="text-base font-semibold">{"Php Version"}</h3>
+              <h3 className="text-base font-semibold">{t('enterprise.php_version')}</h3>
             </CardHeader>
             <CardBody className="px-6 pb-5">
               <div className="flex items-center gap-4">
@@ -158,7 +160,7 @@ export function SystemRequirements() {
                   color={data.php.meets_minimum ? 'success' : 'danger'}
                   startContent={data.php.meets_minimum ? <CheckCircle size={12} /> : <XCircle size={12} />}
                 >
-                  {data.php.meets_minimum ? "Meets minimum (8.2+)" : "Below minimum (requires 8.2+)"}
+                  {data.php.meets_minimum ? t('enterprise.meets_minimum_version') : t('enterprise.below_minimum_version')}
                 </Chip>
               </div>
             </CardBody>
@@ -169,13 +171,13 @@ export function SystemRequirements() {
             <CardHeader className="flex items-center justify-between px-6 pt-5 pb-0">
               <div className="flex items-center gap-2">
                 <Puzzle size={18} className="text-secondary" />
-                <h3 className="text-base font-semibold">{"Php Extensions"}</h3>
+                <h3 className="text-base font-semibold">{t('enterprise.php_extensions')}</h3>
                 <Chip size="sm" variant="flat" color="default">
-                  {`${loadedCount} of ${data.extensions.length} loaded (${requiredCount} required)`}
+                  {t('enterprise.extensions_summary', { loaded: loadedCount, total: data.extensions.length, required: requiredCount })}
                 </Chip>
               </div>
               <Input type="search" name="admin-search" autoComplete="off"
-                placeholder={"Search extensions..."}
+                placeholder={t('enterprise.search_extensions_placeholder')}
                 startContent={<Search size={14} className="text-default-400" />}
                 value={extSearch}
                 onValueChange={setExtSearch}
@@ -212,7 +214,7 @@ export function SystemRequirements() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
               <FolderOpen size={18} className="text-warning" />
-              <h3 className="text-base font-semibold">{"Writable Directories"}</h3>
+              <h3 className="text-base font-semibold">{t('enterprise.writable_directories')}</h3>
             </CardHeader>
             <CardBody className="px-6 pb-5">
               <div className="space-y-2">
@@ -225,7 +227,7 @@ export function SystemRequirements() {
                     )}
                     <span className="font-mono text-sm text-foreground">{dir.path}</span>
                     <Chip size="sm" variant="flat" color={dir.writable ? 'success' : 'danger'}>
-                      {dir.writable ? "Writable" : "Not writable"}
+                      {dir.writable ? t('enterprise.writable_status') : t('enterprise.not_writable_status')}
                     </Chip>
                   </div>
                 ))}
@@ -237,7 +239,7 @@ export function SystemRequirements() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
               <Server size={18} className="text-success" />
-              <h3 className="text-base font-semibold">{"Services"}</h3>
+              <h3 className="text-base font-semibold">{t('enterprise.services')}</h3>
             </CardHeader>
             <CardBody className="px-6 pb-5">
               <div className="flex gap-4">
@@ -250,7 +252,7 @@ export function SystemRequirements() {
                     )}
                     <span className="text-sm font-medium text-foreground">{svc.name}</span>
                     <Chip size="sm" variant="flat" color={svc.status === 'ok' ? 'success' : 'danger'}>
-                      {svc.status === 'ok' ? "OK" : "FAIL"}
+                      {svc.status === 'ok' ? t('enterprise.status_ok') : t('enterprise.status_fail')}
                     </Chip>
                   </div>
                 ))}
@@ -263,7 +265,7 @@ export function SystemRequirements() {
             <Card shadow="sm">
               <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
                 <Settings size={18} className="text-default-500" />
-                <h3 className="text-base font-semibold">{"Ini Settings"}</h3>
+                <h3 className="text-base font-semibold">{t('enterprise.ini_settings')}</h3>
               </CardHeader>
               <CardBody className="px-6 pb-5">
                 <div className="divide-y divide-divider">
