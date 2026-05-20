@@ -42,7 +42,7 @@ export function Footer({ children, copyright }: FooterProps) {
   // Use tenant's footer_text from config if set, otherwise build a default
   const footerText = tenant?.config?.footer_text?.trim()
     || copyright
-    || `© ${year} ${branding.name}. All rights reserved.`;
+    || `${branding.name} — ${t('footer.agpl_notice', { year })}`;
 
   const contact = tenant?.contact;
 
@@ -127,8 +127,8 @@ export function Footer({ children, copyright }: FooterProps) {
                 <h3 className="text-sm font-semibold text-theme-primary mb-3">{t('footer.support')}</h3>
                 <ul className="space-y-2">
                   <li><FooterLink href={tenantPath('/help')}>{t('footer.help_center')}</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/kb')}>{t('nav.knowledge_base', 'Knowledge Base')}</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/trust-and-safety')}>{t('footer.trust_safety', 'Trust & Safety')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/kb')}>{t('nav.knowledge_base')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/trust-and-safety')}>{t('footer.trust_safety')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/contact')}>{t('footer.contact_us')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/about')}>{t('footer.about')}</FooterLink></li>
                   <li>
@@ -152,8 +152,8 @@ export function Footer({ children, copyright }: FooterProps) {
                   <li><FooterLink href={tenantPath('/legal')}>{t('legal.legal_hub')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/terms')}>{t('legal.terms_of_service')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/privacy')}>{t('legal.privacy_policy')}</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/community-guidelines')}>{t('legal.type_community_guidelines', 'Community Guidelines')}</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/acceptable-use')}>{t('legal.type_acceptable_use', 'Acceptable Use')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/community-guidelines')}>{t('legal.type_community_guidelines')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/acceptable-use')}>{t('legal.type_acceptable_use')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/cookies')}>{t('legal.cookie_policy')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/accessibility')}>{t('legal.accessibility')}</FooterLink></li>
                 </ul>
@@ -180,21 +180,21 @@ export function Footer({ children, copyright }: FooterProps) {
               <span>
                 <span className="font-semibold text-theme-primary">{RELEASE_STATUS.stageLabel}</span>
                 {' — '}
-                {t('release_status.summary', { defaultValue: RELEASE_STATUS.stageSummary })}
+                {t('release_status.summary')}
               </span>
               <span aria-hidden="true">&middot;</span>
               <Link
                 to={RELEASE_STATUS.readMorePath}
                 className="underline font-medium hover:text-theme-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded whitespace-nowrap"
               >
-                {t('release_status.features_link', { defaultValue: 'Features' })}
+                {t('release_status.features_link')}
               </Link>
               <span aria-hidden="true">&middot;</span>
               <Link
                 to={tenantPath('/changelog')}
                 className="underline font-medium hover:text-theme-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded whitespace-nowrap"
               >
-                {t('release_status.changelog_link', { defaultValue: 'Changelog' })}
+                {t('release_status.changelog_link')}
               </Link>
             </div>
 

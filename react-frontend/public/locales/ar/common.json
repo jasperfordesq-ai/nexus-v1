@@ -171,6 +171,8 @@
     "legal_hub": "المركز القانوني",
     "terms_of_service": "شروط الخدمة",
     "privacy_policy": "سياسة الخصوصية",
+    "type_community_guidelines": "Community Guidelines",
+    "type_acceptable_use": "Acceptable Use",
     "cookie_policy": "سياسة ملفات تعريف الارتباط",
     "accessibility": "إمكانية الوصول"
   },
@@ -1987,5 +1989,10 @@
     "ios_add_to_home": "Add to Home Screen",
     "ios_step_3": "Tap Add. NEXUS will appear on your home screen as a standalone app.",
     "got_it": "Got it"
+  },
+  "release_status": {
+    "summary": "Project NEXUS is actively evolving, with feature maturity shown transparently across the platform.",
+    "features_link": "Features",
+    "changelog_link": "Changelog"
   }
 }
