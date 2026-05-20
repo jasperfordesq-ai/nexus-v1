@@ -140,6 +140,23 @@
     "title_updated": "Highlight title updated",
     "title_update_error": "Failed to update title",
     "story_removed": "Story removed from highlight",
-    "story_remove_error": "Failed to remove story"
+    "story_remove_error": "Failed to remove story",
+    "aria_create": "Create new highlight",
+    "aria_view": "View highlight: {{title}}",
+    "aria_edit": "Edit highlight: {{title}}",
+    "aria_delete": "Delete highlight: {{title}}",
+    "aria_remove_story": "Remove story from highlight",
+    "new": "New",
+    "create_title": "Create Highlight",
+    "edit_title": "Edit Highlight",
+    "title_label": "Highlight Title",
+    "title_placeholder": "e.g., Travel, Food, Events...",
+    "create_hint": "You can add stories to this highlight later from the story viewer.",
+    "cancel": "Cancel",
+    "create": "Create",
+    "stories_in_highlight": "Stories in this highlight",
+    "story_type_image": "Image story",
+    "story_type_text": "Text story",
+    "story_type_poll": "Poll story"
   }
 }

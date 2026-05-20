@@ -277,6 +277,18 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
     setEditStories([]);
   };
 
+  const getStorySummary = (story: HighlightStory) => {
+    if (story.text_content) {
+      return story.text_content.substring(0, 40) + (story.text_content.length > 40 ? '...' : '');
+    }
+
+    if (story.poll_question) {
+      return story.poll_question.substring(0, 40);
+    }
+
+    return t(`highlights.story_type_${story.media_type}`);
+  };
+
   // Show skeleton while loading
   if (isLoading) {
     return (
@@ -304,12 +316,12 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
               variant="light"
               onPress={onCreateOpen}
               className="flex flex-col items-center gap-1.5 flex-shrink-0 w-18 group h-auto min-w-0 p-0"
-              aria-label={t('highlights.aria_create', 'Create new highlight')}
+              aria-label={t('highlights.aria_create')}
             >
               <div className="w-16 h-16 rounded-full border-2 border-dashed border-[var(--border-default)] flex items-center justify-center group-hover:border-[var(--color-primary)] transition-colors">
                 <Plus className="w-6 h-6 text-[var(--text-muted)] group-hover:text-[var(--color-primary)] transition-colors" />
               </div>
-              <span className="text-xs text-[var(--text-muted)] text-center">{t('highlights.new', 'New')}</span>
+              <span className="text-xs text-[var(--text-muted)] text-center">{t('highlights.new')}</span>
             </Button>
           )}
 
@@ -320,7 +332,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
               variant="light"
               onPress={() => handleHighlightClick(highlight)}
               className="flex flex-col items-center gap-1.5 flex-shrink-0 w-18 group relative h-auto min-w-0 p-0"
-              aria-label={`View highlight: ${highlight.title}`}
+              aria-label={t('highlights.aria_view', { title: highlight.title })}
             >
               <div className="w-16 h-16 rounded-full p-[2px] bg-[var(--border-default)] group-hover:bg-gradient-to-tr group-hover:from-yellow-400 group-hover:via-red-500 group-hover:to-purple-600 transition-all">
                 <div className="w-full h-full rounded-full bg-[var(--surface-elevated)] p-[2px]">
@@ -353,7 +365,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                     variant="flat"
                     className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[var(--color-primary)] text-white opacity-0 group-hover:opacity-100 transition-opacity min-w-0 p-0"
                     onClick={(e) => { e.stopPropagation(); handleEditClick(highlight, e); }}
-                    aria-label={`Edit highlight: ${highlight.title}`}
+                    aria-label={t('highlights.aria_edit', { title: highlight.title })}
                   >
                     <Pencil className="w-3 h-3" />
                   </Button>
@@ -363,7 +375,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                     variant="flat"
                     className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity min-w-0 p-0"
                     onClick={(e) => { e.stopPropagation(); handleDeleteHighlight(highlight.id, e); }}
-                    aria-label={`Delete highlight: ${highlight.title}`}
+                    aria-label={t('highlights.aria_delete', { title: highlight.title })}
                   >
                     <X className="w-3 h-3" />
                   </Button>
@@ -377,24 +389,24 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
       {/* Create Highlight Modal */}
       <Modal isOpen={isCreateOpen} onClose={onCreateClose} size="sm">
         <ModalContent>
-          <ModalHeader>{t('highlights.create_title', 'Create Highlight')}</ModalHeader>
+          <ModalHeader>{t('highlights.create_title')}</ModalHeader>
           <ModalBody>
             <Input
               value={newTitle}
               onValueChange={setNewTitle}
-              label={t('highlights.title_label', 'Highlight Title')}
-              placeholder={t('highlights.title_placeholder', 'e.g., Travel, Food, Events...')}
+              label={t('highlights.title_label')}
+              placeholder={t('highlights.title_placeholder')}
               variant="bordered"
               maxLength={100}
               autoFocus
             />
             <p className="text-xs text-[var(--text-muted)]">
-              {t('highlights.create_hint', 'You can add stories to this highlight later from the story viewer.')}
+              {t('highlights.create_hint')}
             </p>
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={onCreateClose}>
-              {t('highlights.cancel', 'Cancel')}
+              {t('highlights.cancel')}
             </Button>
             <Button
               color="primary"
@@ -402,7 +414,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
               isLoading={isCreating}
               isDisabled={!newTitle.trim()}
             >
-              {t('highlights.create', 'Create')}
+              {t('highlights.create')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -411,14 +423,14 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
       {/* Edit Highlight Modal */}
       <Modal isOpen={isEditOpen} onClose={handleEditClose} size="md">
         <ModalContent>
-          <ModalHeader>{t('highlights.edit_title', 'Edit Highlight')}</ModalHeader>
+          <ModalHeader>{t('highlights.edit_title')}</ModalHeader>
           <ModalBody className="gap-4">
             {/* Title editing */}
             <div className="flex gap-2 items-end">
               <Input
                 value={editTitle}
                 onValueChange={setEditTitle}
-                label={t('highlights.title_label', 'Highlight Title')}
+                label={t('highlights.title_label')}
                 variant="bordered"
                 maxLength={100}
                 className="flex-1"
@@ -437,7 +449,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
             {/* Stories list */}
             <div>
               <p className="text-sm font-medium text-[var(--text-primary)] mb-2">
-                Stories in this highlight
+                {t('highlights.stories_in_highlight')}
               </p>
               {isEditLoading ? (
                 <div className="flex flex-col gap-2">
@@ -479,11 +491,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                       {/* Story info */}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-[var(--text-primary)] truncate">
-                          {story.text_content
-                            ? story.text_content.substring(0, 40) + (story.text_content.length > 40 ? '...' : '')
-                            : story.poll_question
-                              ? story.poll_question.substring(0, 40)
-                              : `${story.media_type.charAt(0).toUpperCase()}${story.media_type.slice(1)} story`}
+                          {getStorySummary(story)}
                         </p>
                         <p className="text-xs text-[var(--text-muted)]">
                           {new Date(story.created_at).toLocaleDateString()}
@@ -498,7 +506,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                         isIconOnly
                         isLoading={removingStoryId === story.id}
                         onPress={() => handleRemoveStory(story.id)}
-                        aria-label={t('highlights.aria_remove_story', 'Remove story from highlight')}
+                        aria-label={t('highlights.aria_remove_story')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
