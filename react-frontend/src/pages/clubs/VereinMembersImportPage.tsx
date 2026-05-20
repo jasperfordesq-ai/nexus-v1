@@ -103,7 +103,7 @@ export default function VereinMembersImportPage() {
   const { t } = useTranslation('common');
   const { tenantPath } = useTenant();
   const toast = useToast();
-  usePageTitle(t('verein_import.title', 'Import club members'));
+  usePageTitle(t('verein_import.title'));
 
   const [csv, setCsv] = useState('');
   const [preview, setPreview] = useState<PreviewResponse | null>(null);
@@ -116,13 +116,13 @@ export default function VereinMembersImportPage() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => setCsv(String(reader.result ?? ''));
-    reader.onerror = () => toast.error(t('verein_import.errors.read_failed', 'Could not read file'));
+    reader.onerror = () => toast.error(t('verein_import.errors.read_failed'));
     reader.readAsText(file);
   }, [toast, t]);
 
   const runPreview = useCallback(async () => {
     if (!csv.trim()) {
-      toast.error(t('verein_import.errors.empty_csv', 'Paste or upload a CSV first'));
+      toast.error(t('verein_import.errors.empty_csv'));
       return;
     }
     setLoadingPreview(true);
@@ -135,12 +135,12 @@ export default function VereinMembersImportPage() {
       if (res.success && res.data) {
         setPreview(res.data);
       } else {
-        toast.error(res.error || t('verein_import.errors.preview_failed', 'Preview failed'));
+        toast.error(res.error || t('verein_import.errors.preview_failed'));
         setPreview(null);
       }
     } catch (err) {
       logError('VereinMembersImportPage: preview failed', err);
-      toast.error(t('verein_import.errors.preview_failed', 'Preview failed'));
+      toast.error(t('verein_import.errors.preview_failed'));
     } finally {
       setLoadingPreview(false);
     }
@@ -149,7 +149,7 @@ export default function VereinMembersImportPage() {
   const runImport = useCallback(async () => {
     if (!preview) return;
     if (preview.summary.invalid > 0) {
-      toast.error(t('verein_import.errors.has_invalid', 'Fix invalid rows before importing'));
+      toast.error(t('verein_import.errors.has_invalid'));
       return;
     }
     setImporting(true);
@@ -161,18 +161,18 @@ export default function VereinMembersImportPage() {
       if (res.success && res.data) {
         setImportResult(res.data);
         toast.success(
-          t('verein_import.success', 'Import complete: {{created}} created, {{linked}} linked', {
+          t('verein_import.success', {
             created: res.data.created,
             linked: res.data.linked,
           }),
         );
         setPreview(null);
       } else {
-        toast.error(res.error || t('verein_import.errors.import_failed', 'Import failed'));
+        toast.error(res.error || t('verein_import.errors.import_failed'));
       }
     } catch (err) {
       logError('VereinMembersImportPage: import failed', err);
-      toast.error(t('verein_import.errors.import_failed', 'Import failed'));
+      toast.error(t('verein_import.errors.import_failed'));
     } finally {
       setImporting(false);
     }
@@ -187,16 +187,13 @@ export default function VereinMembersImportPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 space-y-6">
-      <PageMeta title={t('verein_import.title', 'Import club members')} />
+      <PageMeta title={t('verein_import.title')} />
 
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div>
-          <h1 className="text-2xl font-bold">{t('verein_import.title', 'Import club members')}</h1>
-          <p className="text-sm text-default-500 mt-1">
-            {t(
-              'verein_import.subtitle',
-              'Bulk-add members from a CSV. Preview before confirming — no users are created until you click Import.',
-            )}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="max-w-3xl">
+          <h1 className="text-2xl font-bold text-default-900">{t('verein_import.title')}</h1>
+          <p className="mt-2 text-sm leading-6 text-default-600">
+            {t('verein_import.subtitle')}
           </p>
         </div>
         <Button
@@ -204,6 +201,7 @@ export default function VereinMembersImportPage() {
           to={tenantPath('/clubs')}
           size="sm"
           variant="flat"
+          className="self-start"
           startContent={<ArrowLeft className="w-4 h-4" />}
         >
           {t('back')}
@@ -211,34 +209,32 @@ export default function VereinMembersImportPage() {
       </div>
 
       {/* Step 1: upload */}
-      <Card>
+      <Card className="border border-default-200 shadow-sm">
         <CardHeader className="flex items-center gap-2">
           <Upload className="w-5 h-5 text-primary" />
           <h2 className="text-base font-semibold">
-            {t('verein_import.step1', '1. Upload CSV')}
+            {t('verein_import.step1')}
           </h2>
         </CardHeader>
         <Divider />
-        <CardBody className="space-y-3">
-          <p className="text-sm text-default-600">
-            {t(
-              'verein_import.csv_format',
-              'Required header row: email,first_name,last_name,phone,role',
-            )}
+        <CardBody className="space-y-4">
+          <p className="rounded-md border border-default-200 bg-default-50 px-3 py-2 text-sm text-default-600">
+            {t('verein_import.csv_format')}
           </p>
           <Input
             type="file"
             accept=".csv,text/csv"
             onChange={handleFile}
-            label={t('verein_import.file_label', 'CSV file')}
+            label={t('verein_import.file_label')}
           />
           <Textarea
-            label={t('verein_import.csv_label', 'Or paste CSV')}
+            label={t('verein_import.csv_label')}
             value={csv}
             onValueChange={setCsv}
             minRows={4}
             maxRows={10}
-            placeholder={'email,first_name,last_name,phone,role\nalice@example.org,Alice,Smith,+1 555 123 4567,member'}
+            classNames={{ input: 'font-mono text-sm' }}
+            placeholder={t('verein_import.csv_placeholder')}
           />
           <div className="flex justify-end">
             <Button
@@ -247,7 +243,7 @@ export default function VereinMembersImportPage() {
               onPress={() => void runPreview()}
               isLoading={loadingPreview}
             >
-              {t('verein_import.preview', 'Preview')}
+              {t('verein_import.preview')}
             </Button>
           </div>
         </CardBody>
@@ -261,11 +257,11 @@ export default function VereinMembersImportPage() {
       )}
 
       {preview && (
-        <Card>
+        <Card className="border border-default-200 shadow-sm">
           <CardHeader className="flex items-center gap-2 flex-wrap">
             <FileText className="w-5 h-5 text-primary" />
             <h2 className="text-base font-semibold">
-              {t('verein_import.step2', '2. Review and confirm')}
+              {t('verein_import.step2')}
             </h2>
             <span className="text-sm text-default-500 ml-2">{preview.organization.name}</span>
           </CardHeader>
@@ -273,24 +269,24 @@ export default function VereinMembersImportPage() {
           <CardBody className="space-y-4">
             {/* Summary */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              <div className="text-center p-3 rounded-lg bg-default-50">
-                <p className="text-xs text-default-500 uppercase">{t('verein_import.summary.total', 'Total')}</p>
+              <div className="rounded-lg border border-default-200 bg-default-50 p-3 text-center">
+                <p className="text-xs uppercase text-default-500">{t('verein_import.summary.total')}</p>
                 <p className="text-2xl font-bold">{preview.summary.total_rows}</p>
               </div>
-              <div className="text-center p-3 rounded-lg bg-success-50">
-                <p className="text-xs text-success-700 uppercase">{t('verein_import.summary.create', 'Create')}</p>
+              <div className="rounded-lg border border-success-200 bg-success-50 p-3 text-center">
+                <p className="text-xs uppercase text-success-700">{t('verein_import.summary.create')}</p>
                 <p className="text-2xl font-bold text-success">{preview.summary.ready_to_create}</p>
               </div>
-              <div className="text-center p-3 rounded-lg bg-primary-50">
-                <p className="text-xs text-primary-700 uppercase">{t('verein_import.summary.link', 'Link')}</p>
+              <div className="rounded-lg border border-primary-200 bg-primary-50 p-3 text-center">
+                <p className="text-xs uppercase text-primary-700">{t('verein_import.summary.link')}</p>
                 <p className="text-2xl font-bold text-primary">{preview.summary.ready_to_link}</p>
               </div>
-              <div className="text-center p-3 rounded-lg bg-warning-50">
-                <p className="text-xs text-warning-700 uppercase">{t('verein_import.summary.duplicates', 'Duplicates')}</p>
+              <div className="rounded-lg border border-warning-200 bg-warning-50 p-3 text-center">
+                <p className="text-xs uppercase text-warning-700">{t('verein_import.summary.duplicates')}</p>
                 <p className="text-2xl font-bold text-warning">{preview.summary.duplicates}</p>
               </div>
-              <div className="text-center p-3 rounded-lg bg-danger-50">
-                <p className="text-xs text-danger-700 uppercase">{t('verein_import.summary.invalid', 'Invalid')}</p>
+              <div className="rounded-lg border border-danger-200 bg-danger-50 p-3 text-center">
+                <p className="text-xs uppercase text-danger-700">{t('verein_import.summary.invalid')}</p>
                 <p className="text-2xl font-bold text-danger">{preview.summary.invalid}</p>
               </div>
             </div>
@@ -299,40 +295,44 @@ export default function VereinMembersImportPage() {
               <div className="flex items-center gap-2 p-3 bg-danger-50 border border-danger-200 rounded-lg text-sm text-danger-800">
                 <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                 <span>
-                  {t(
-                    'verein_import.errors.has_invalid_summary',
-                    'Some rows are invalid. Fix them in your CSV and re-run the preview before importing.',
-                  )}
+                  {t('verein_import.errors.has_invalid_summary')}
                 </span>
               </div>
             )}
 
-            <Table aria-label={t('verein_import.row.table_aria')} removeWrapper isStriped>
-              <TableHeader>
-                <TableColumn>{t('verein_import.row.row')}</TableColumn>
-                <TableColumn>{t('verein_import.row.action')}</TableColumn>
-                <TableColumn>{t('verein_import.row.email')}</TableColumn>
-                <TableColumn className="hidden md:table-cell">{t('verein_import.row.name')}</TableColumn>
-                <TableColumn className="hidden md:table-cell">{t('verein_import.row.role')}</TableColumn>
-                <TableColumn>{t('verein_import.row.errors')}</TableColumn>
-              </TableHeader>
-              <TableBody>
-                {preview.items.map((row) => (
-                  <TableRow key={row.row} className={row.errors.length ? 'bg-danger-50/40' : ''}>
-                    <TableCell className="text-default-500 tabular-nums">{row.row}</TableCell>
-                    <TableCell>{actionChip(row.action)}</TableCell>
-                    <TableCell>{row.email || t('empty_dash')}</TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {[row.first_name, row.last_name].filter(Boolean).join(' ') || t('empty_dash')}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">{row.role}</TableCell>
-                    <TableCell className="text-danger-700">
-                      {row.errors.length > 0 ? row.errors.join('; ') : ''}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="overflow-x-auto rounded-lg border border-default-200">
+              <Table
+                aria-label={t('verein_import.row.table_aria')}
+                removeWrapper
+                isStriped
+                className="min-w-[720px]"
+              >
+                <TableHeader>
+                  <TableColumn>{t('verein_import.row.row')}</TableColumn>
+                  <TableColumn>{t('verein_import.row.action')}</TableColumn>
+                  <TableColumn>{t('verein_import.row.email')}</TableColumn>
+                  <TableColumn className="hidden md:table-cell">{t('verein_import.row.name')}</TableColumn>
+                  <TableColumn className="hidden md:table-cell">{t('verein_import.row.role')}</TableColumn>
+                  <TableColumn>{t('verein_import.row.errors')}</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {preview.items.map((row) => (
+                    <TableRow key={row.row} className={row.errors.length ? 'bg-danger-50/40' : ''}>
+                      <TableCell className="text-default-500 tabular-nums">{row.row}</TableCell>
+                      <TableCell>{actionChip(row.action)}</TableCell>
+                      <TableCell>{row.email || t('empty_dash')}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {[row.first_name, row.last_name].filter(Boolean).join(' ') || t('empty_dash')}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">{row.role}</TableCell>
+                      <TableCell className="text-danger-700">
+                        {row.errors.length > 0 ? row.errors.join('; ') : ''}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
 
             <div className="flex justify-end gap-2">
               <Button variant="flat" onPress={() => setPreview(null)}>
@@ -345,7 +345,7 @@ export default function VereinMembersImportPage() {
                 isLoading={importing}
                 isDisabled={preview.summary.invalid > 0}
               >
-                {t('verein_import.confirm', 'Import members')}
+                {t('verein_import.confirm')}
               </Button>
             </div>
           </CardBody>
@@ -354,17 +354,17 @@ export default function VereinMembersImportPage() {
 
       {/* Step 3: result */}
       {importResult && (
-        <Card>
+        <Card className="border border-default-200 shadow-sm">
           <CardHeader className="flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-success" />
             <h2 className="text-base font-semibold">
-              {t('verein_import.result.title', 'Import complete')}
+              {t('verein_import.result.title')}
             </h2>
           </CardHeader>
           <Divider />
           <CardBody className="space-y-3">
             <p className="text-sm">
-              {t('verein_import.result.summary', 'Created {{created}} new members, linked {{linked}} existing, skipped {{skipped}}', {
+              {t('verein_import.result.summary', {
                 created: importResult.created,
                 linked: importResult.linked,
                 skipped: importResult.skipped,
@@ -373,7 +373,7 @@ export default function VereinMembersImportPage() {
             {importResult.members.some((m) => m.temporary_password) && (
               <div className="p-3 bg-warning-50 border border-warning-200 rounded-lg text-sm space-y-2">
                 <p className="font-medium">
-                  {t('verein_import.result.passwords_title', 'Temporary passwords (share securely):')}
+                  {t('verein_import.result.passwords_title')}
                 </p>
                 <ul className="list-disc list-inside space-y-1 font-mono text-xs">
                   {importResult.members
@@ -385,10 +385,7 @@ export default function VereinMembersImportPage() {
                     ))}
                 </ul>
                 <p className="text-xs text-warning-700">
-                  {t(
-                    'verein_import.result.passwords_warning',
-                    'These will not be shown again. Share securely; members will be prompted to change on first login.',
-                  )}
+                  {t('verein_import.result.passwords_warning')}
                 </p>
               </div>
             )}
