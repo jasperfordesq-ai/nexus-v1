@@ -74,7 +74,9 @@ export function BlogPostForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Dynamic page title
-  usePageTitle(isEdit && post ? `Admin - ${"Edit"}: ${post.title}` : `Admin - ${"Create"} ${"Blog"}`);
+  usePageTitle(isEdit && post
+    ? t('blog.page_title_edit_with_title', { title: post.title })
+    : t('blog.page_title_create'));
 
   // Load categories
   useEffect(() => {
@@ -120,14 +122,14 @@ export function BlogPostForm() {
         setMetaDescription(postData.meta_description || '');
         setNoindex(postData.noindex || false);
       } else {
-        setLoadError(res.error || "Failed to load blog posts");
+        setLoadError(res.error || t('blog.failed_to_load_blog_posts'));
       }
     } catch {
-      setLoadError("An unexpected error occurred");
+      setLoadError(t('blog.an_unexpected_error_occurred'));
     } finally {
       setLoading(false);
     }
-  }, [id])
+  }, [id, t])
 
 
   useEffect(() => {
@@ -151,7 +153,7 @@ export function BlogPostForm() {
     const newErrors: Record<string, string> = {};
 
     if (!title.trim()) {
-      newErrors.title = t('blog.title_required', 'Title is required');
+      newErrors.title = t('blog.title_required');
     }
 
     setErrors(newErrors);
@@ -184,13 +186,13 @@ export function BlogPostForm() {
         : await adminBlog.create(payload);
 
       if (res.success) {
-        toast.success(isEdit ? t('blog.post_updated', 'Post updated successfully') : t('blog.post_created', 'Post created successfully'));
+        toast.success(isEdit ? t('blog.post_updated') : t('blog.post_created'));
         navigate(tenantPath('/admin/blog'));
       } else {
-        toast.error(res.error || "An unexpected error occurred");
+        toast.error(res.error || t('blog.an_unexpected_error_occurred'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('blog.an_unexpected_error_occurred'));
     } finally {
       setSubmitting(false);
     }
@@ -200,7 +202,7 @@ export function BlogPostForm() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label={"Loading federation..."} />
+        <Spinner size="lg" label={t('blog.loading_post')} />
       </div>
     );
   }
@@ -210,25 +212,25 @@ export function BlogPostForm() {
     return (
       <div>
         <PageHeader
-          title={`${"Edit"} ${"Blog"}`}
+          title={t('blog.page_title_edit')}
           actions={
             <Button
               variant="flat"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/blog'))}
             >
-              {"Back"}
+              {t('blog.back')}
             </Button>
           }
         />
         <Card className="max-w-2xl">
           <CardBody className="p-6">
             <p className="text-center text-danger">
-              {loadError || "Failed to load blog posts"}
+              {loadError || t('blog.failed_to_load_blog_posts')}
             </p>
             <div className="mt-4 flex justify-center">
               <Button variant="flat" onPress={() => navigate(tenantPath('/admin/blog'))}>
-                {"Back"}
+                {t('blog.back')}
               </Button>
             </div>
           </CardBody>
@@ -240,14 +242,14 @@ export function BlogPostForm() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? `${"Edit"}: ${post?.title}` : `${"Create"} ${"Blog"}`}
+        title={isEdit && post?.title ? t('blog.page_title_edit_with_title', { title: post.title }) : t('blog.page_title_create')}
         actions={
           <Button
             variant="flat"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/blog'))}
           >
-            {"Back"}
+            {t('blog.back')}
           </Button>
         }
       />
@@ -257,8 +259,8 @@ export function BlogPostForm() {
           <CardBody className="gap-5 p-6">
             {/* Title */}
             <Input
-              label={"Name"}
-              placeholder={t('blog.placeholder_title', 'Enter post title')}
+              label={t('blog.label_title')}
+              placeholder={t('blog.placeholder_title')}
               value={title}
               onValueChange={setTitle}
               isRequired
@@ -269,19 +271,19 @@ export function BlogPostForm() {
 
             {/* Slug */}
             <Input
-              label={"Slug"}
-              placeholder={t('blog.placeholder_slug', 'Auto-generated from title')}
+              label={t('blog.label_slug')}
+              placeholder={t('blog.placeholder_slug')}
               value={slug}
               onValueChange={setSlug}
               isDisabled={submitting}
-              description={isEdit ? t('blog.slug_desc_edit', 'Edit to customize the URL. Leave as-is to keep current slug.') : t('blog.slug_desc_create', 'Auto-generated from title, or type a custom slug.')}
+              description={isEdit ? t('blog.slug_desc_edit') : t('blog.slug_desc_create')}
             />
 
             {/* Content */}
             <Suspense fallback={<Spinner size="sm" className="m-4" />}>
               <RichTextEditor
-                label={"Content"}
-                placeholder={t('blog.placeholder_content', 'Write the blog post content...')}
+                label={t('blog.label_content')}
+                placeholder={t('blog.placeholder_content')}
                 value={content}
                 onChange={setContent}
                 isDisabled={submitting}
@@ -290,8 +292,8 @@ export function BlogPostForm() {
 
             {/* Excerpt */}
             <Textarea
-              label={t('blog.excerpt', 'Excerpt')}
-              placeholder={t('blog.placeholder_excerpt', 'A short summary of the post')}
+              label={t('blog.excerpt')}
+              placeholder={t('blog.placeholder_excerpt')}
               value={excerpt}
               onValueChange={setExcerpt}
               minRows={2}
@@ -303,8 +305,8 @@ export function BlogPostForm() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {/* Status */}
               <Select
-                label={"Status"}
-                placeholder={t('blog.placeholder_status', 'Select status')}
+                label={t('blog.label_status')}
+                placeholder={t('blog.placeholder_status')}
                 selectedKeys={status ? [status] : []}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string;
@@ -312,14 +314,14 @@ export function BlogPostForm() {
                 }}
                 isDisabled={submitting}
               >
-                <SelectItem key="draft">{t('content.draft', 'Draft')}</SelectItem>
-                <SelectItem key="published">{t('content.published', 'Published')}</SelectItem>
+                <SelectItem key="draft">{t('content.draft')}</SelectItem>
+                <SelectItem key="published">{t('content.published')}</SelectItem>
               </Select>
 
               {/* Category */}
               <Select
-                label={"Categories"}
-                placeholder={t('blog.placeholder_category', 'Select a category')}
+                label={t('blog.label_categories')}
+                placeholder={t('blog.placeholder_category')}
                 selectedKeys={categoryId ? [categoryId] : []}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string;
@@ -337,42 +339,42 @@ export function BlogPostForm() {
 
             {/* Featured Image URL */}
             <Input
-              label={t('blog.featured_image', 'Featured Image URL')}
-              placeholder="https://example.com/image.jpg"
+              label={t('blog.featured_image')}
+              placeholder={t('blog.placeholder_featured_image')}
               value={featuredImage}
               onValueChange={setFeaturedImage}
               isDisabled={submitting}
-              description={t('blog.featured_image_desc', 'URL to the featured image for this post.')}
+              description={t('blog.featured_image_desc')}
             />
 
             {/* SEO Override (Optional) */}
             <Divider />
             <div className="flex items-center gap-2 text-default-600">
               <Search size={16} />
-              <span className="text-sm font-semibold">{t('blog.seo_override', 'SEO Override (Optional)')}</span>
+              <span className="text-sm font-semibold">{t('blog.seo_override')}</span>
             </div>
             <Input
-              label={t('blog.meta_title', 'Meta Title')}
-              placeholder={t('blog.placeholder_meta_title', 'Custom tab title for search engines')}
+              label={t('blog.meta_title')}
+              placeholder={t('blog.placeholder_meta_title')}
               value={metaTitle}
               onValueChange={setMetaTitle}
               isDisabled={submitting}
-              description={t('blog.meta_title_desc', 'Overrides the page title in search results. Leave blank to use post title.')}
+              description={t('blog.meta_title_desc')}
             />
             <Textarea
-              label={t('blog.meta_description', 'Meta Description')}
-              placeholder={t('blog.placeholder_meta_desc', 'Custom description for search engine results')}
+              label={t('blog.meta_description')}
+              placeholder={t('blog.placeholder_meta_desc')}
               value={metaDescription}
               onValueChange={setMetaDescription}
               minRows={2}
               maxRows={3}
               isDisabled={submitting}
-              description={t('blog.meta_desc_desc', 'Appears as the snippet in search results. Leave blank to use excerpt.')}
+              description={t('blog.meta_desc_desc')}
             />
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">{t('blog.noindex', 'NoIndex (Hide from Google)')}</p>
-                <p className="text-xs text-default-400">{t('blog.noindex_desc', 'Prevent search engines from indexing this post')}</p>
+                <p className="text-sm font-medium">{t('blog.noindex')}</p>
+                <p className="text-xs text-default-400">{t('blog.noindex_desc')}</p>
               </div>
               <Switch
                 isSelected={noindex}
@@ -389,7 +391,7 @@ export function BlogPostForm() {
                 onPress={() => navigate(tenantPath('/admin/blog'))}
                 isDisabled={submitting}
               >
-                {"Cancel"}
+                {t('blog.cancel')}
               </Button>
               <Button
                 type="submit"
@@ -398,7 +400,7 @@ export function BlogPostForm() {
                 isLoading={submitting}
                 isDisabled={submitting}
               >
-                {isEdit ? "Save Changes" : `${"Create"} ${"Blog"}`}
+                {isEdit ? t('blog.save_changes') : t('blog.page_title_create')}
               </Button>
             </div>
           </CardBody>

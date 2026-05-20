@@ -31,7 +31,7 @@ const statusColors: Record<string, 'success' | 'default'> = {
 
 export function BlogAdmin() {
   const { t } = useTranslation('admin');
-  usePageTitle("Blog");
+  usePageTitle(t('blog.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -49,14 +49,14 @@ export function BlogAdmin() {
 
   const handleBulkResult = (res: { success: boolean; error?: string; data?: BulkActionResult | unknown }) => {
     if (!res.success) {
-      toast.error(res.error || "Result failed");
+      toast.error(res.error || t('bulk.result_failed'));
       return;
     }
     const data = (res.data as BulkActionResult) || { success: 0, failed: 0 };
     if (data.failed && data.failed > 0) {
-      toast.error(`Result Partial`);
+      toast.error(t('bulk.result_partial'));
     } else {
-      toast.success(`Result succeeded`);
+      toast.success(t('bulk.result_success'));
     }
     setSelectedIds(new Set());
     loadItems();
@@ -83,11 +83,11 @@ export function BlogAdmin() {
         }
       }
     } catch {
-      toast.error("Failed to load blog posts");
+      toast.error(t('blog.failed_to_load_blog_posts'));
     } finally {
       setLoading(false);
     }
-  }, [page, status, search, toast])
+  }, [page, status, search, toast, t])
 
 
   useEffect(() => {
@@ -101,13 +101,13 @@ export function BlogAdmin() {
     try {
       const res = await adminBlog.delete(confirmDelete.id);
       if (res?.success) {
-        toast.success("Blog post deleted successfully");
+        toast.success(t('blog.blog_post_deleted_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || "An unexpected error occurred");
+        toast.error(res?.error || t('blog.an_unexpected_error_occurred'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('blog.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -118,20 +118,20 @@ export function BlogAdmin() {
     try {
       const res = await adminBlog.toggleStatus(post.id);
       if (res?.success) {
-        toast.success("Item Updated");
+        toast.success(t('blog.item_updated'));
         loadItems();
       } else {
-        toast.error(res?.error || "An unexpected error occurred");
+        toast.error(res?.error || t('blog.an_unexpected_error_occurred'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('blog.an_unexpected_error_occurred'));
     }
   };
 
   const columns: Column<AdminBlogPost>[] = [
     {
       key: 'title',
-      label: "Name",
+      label: t('blog.label_title'),
       sortable: true,
       render: (item) => (
         <Button
@@ -146,7 +146,7 @@ export function BlogAdmin() {
     },
     {
       key: 'status',
-      label: "Status",
+      label: t('blog.label_status'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -155,21 +155,21 @@ export function BlogAdmin() {
           color={statusColors[item.status] || 'default'}
           className="capitalize"
         >
-          {item.status}
+          {item.status === 'published' ? t('content.published') : t('content.draft')}
         </Chip>
       ),
     },
     {
       key: 'author_name',
-      label: "Author",
+      label: t('blog.label_author'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.author_name || t('blog.unknown', 'Unknown')}</span>
+        <span className="text-sm text-default-600">{item.author_name || t('blog.unknown')}</span>
       ),
     },
     {
       key: 'category_name',
-      label: "Categories",
+      label: t('blog.label_categories'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">{item.category_name || '--'}</span>
@@ -177,7 +177,7 @@ export function BlogAdmin() {
     },
     {
       key: 'created_at',
-      label: "Created",
+      label: t('blog.label_created'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -187,7 +187,7 @@ export function BlogAdmin() {
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('blog.label_actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -196,7 +196,7 @@ export function BlogAdmin() {
             variant="flat"
             color="primary"
             onPress={() => navigate(tenantPath(`/admin/blog/edit/${item.id}`))}
-            aria-label={"Edit Post"}
+            aria-label={t('blog.label_edit_post')}
           >
             <Pencil size={14} />
           </Button>
@@ -206,7 +206,7 @@ export function BlogAdmin() {
             variant="flat"
             color={item.status === 'published' ? 'warning' : 'success'}
             onPress={() => handleToggleStatus(item)}
-            aria-label={item.status === 'published' ? t('blog.unpublish', 'Unpublish') : t('blog.publish', 'Publish')}
+            aria-label={item.status === 'published' ? t('blog.unpublish') : t('blog.publish')}
           >
             <ToggleLeft size={14} />
           </Button>
@@ -216,7 +216,7 @@ export function BlogAdmin() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label={"Delete Post"}
+            aria-label={t('blog.label_delete_post')}
           >
             <Trash2 size={14} />
           </Button>
@@ -228,15 +228,15 @@ export function BlogAdmin() {
   return (
     <div>
       <PageHeader
-        title={"Blog Admin"}
-        description={"Create, edit, and manage blog posts for your community"}
+        title={t('blog.blog_admin_title')}
+        description={t('blog.blog_admin_desc')}
         actions={
           <Button
             color="primary"
             startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/blog/create'))}
           >
-            {"Create"} {"Blog"}
+            {t('blog.page_title_create')}
           </Button>
         }
       />
@@ -248,9 +248,9 @@ export function BlogAdmin() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={"All"} />
-          <Tab key="published" title={t('content.published', 'Published')} />
-          <Tab key="draft" title={t('content.draft', 'Draft')} />
+          <Tab key="all" title={t('blog.all')} />
+          <Tab key="published" title={t('content.published')} />
+          <Tab key="draft" title={t('content.draft')} />
         </Tabs>
       </div>
 
@@ -259,11 +259,11 @@ export function BlogAdmin() {
         const bulkActions: BulkAction[] = [
           {
             key: 'publish',
-            label: "Publish",
+            label: t('bulk.blog.publish'),
             icon: <Send size={14} />,
             color: 'success',
-            confirmTitle: "Publish Confirm",
-            confirmMessage: `Publish Confirm`,
+            confirmTitle: t('bulk.blog.publish_confirm_title'),
+            confirmMessage: t('bulk.blog.publish_confirm_message', { count: selectedIdList.length }),
             onConfirm: async () => {
               setBulkLoading(true);
               try {
@@ -276,14 +276,11 @@ export function BlogAdmin() {
           },
           {
             key: 'archive',
-            label: t('bulk.blog.archive', 'Archive (Unpublish)'),
+            label: t('bulk.blog.archive'),
             icon: <ToggleLeft size={14} />,
             color: 'warning',
-            confirmTitle: t('bulk.blog.archive_confirm_title', 'Archive selected posts?'),
-            confirmMessage: t('bulk.blog.archive_confirm_message', {
-              count: selectedIdList.length,
-              defaultValue: 'This will unpublish {{count}} post(s). They can be republished later.',
-            }),
+            confirmTitle: t('bulk.blog.archive_confirm_title'),
+            confirmMessage: t('bulk.blog.archive_confirm_message', { count: selectedIdList.length }),
             onConfirm: async () => {
               setBulkLoading(true);
               try {
@@ -310,12 +307,12 @@ export function BlogAdmin() {
           },
           {
             key: 'delete',
-            label: "Delete",
+            label: t('bulk.blog.delete'),
             icon: <Trash2 size={14} />,
             color: 'danger',
             destructive: true,
-            confirmTitle: "Delete Confirm",
-            confirmMessage: `Delete Confirm`,
+            confirmTitle: t('bulk.blog.delete_confirm_title'),
+            confirmMessage: t('bulk.blog.delete_confirm_message', { count: selectedIdList.length }),
             onConfirm: async () => {
               setBulkLoading(true);
               try {
@@ -341,7 +338,7 @@ export function BlogAdmin() {
         columns={columns}
         data={items}
         isLoading={loading}
-        searchPlaceholder={t('data_table.search', 'Search blog posts...')}
+        searchPlaceholder={t('blog.search_placeholder')}
         onSearch={(q) => { setSearch(q); setPage(1); }}
         onRefresh={loadItems}
         totalItems={total}
@@ -357,9 +354,9 @@ export function BlogAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={`${"Delete"} ${"Blog"}`}
-          message={`Delete Campaign`}
-          confirmLabel={"Delete"}
+          title={t('blog.delete_confirm_title')}
+          message={t('blog.delete_confirm_message', { title: confirmDelete.title })}
+          confirmLabel={t('bulk.blog.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />
