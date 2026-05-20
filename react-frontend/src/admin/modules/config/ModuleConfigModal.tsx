@@ -31,6 +31,45 @@ import type { BrokerConfig } from '../../api/types';
 import type { ModuleDefinition, ConfigOption } from './moduleRegistry';
 import { getOptionCategories } from './moduleRegistry';
 
+type AdminTranslator = ReturnType<typeof useTranslation<'admin'>>['t'];
+
+function slugConfigText(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '') || 'value';
+}
+
+function optionToken(optionKey: string): string {
+  return optionKey.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+}
+
+function translateRegistryText(t: AdminTranslator, key: string, fallback: string): string {
+  const translated = t(key);
+  return translated === key ? fallback : translated;
+}
+
+function getOptionLabel(t: AdminTranslator, option: ConfigOption): string {
+  return translateRegistryText(t, `config.option_${optionToken(option.key)}_label`, option.label);
+}
+
+function getOptionDescription(t: AdminTranslator, option: ConfigOption): string {
+  return translateRegistryText(t, `config.option_${optionToken(option.key)}_desc`, option.description);
+}
+
+function getCategoryLabel(t: AdminTranslator, category: string): string {
+  return translateRegistryText(t, `config.option_category_${slugConfigText(category)}`, category);
+}
+
+function getChoiceLabel(t: AdminTranslator, option: ConfigOption, choiceValue: string, fallback: string): string {
+  return translateRegistryText(
+    t,
+    `config.option_choice_${optionToken(option.key)}_${slugConfigText(choiceValue)}`,
+    fallback
+  );
+}
+
 interface ModuleConfigModalProps {
   module: ModuleDefinition | null;
   isOpen: boolean;
@@ -81,11 +120,11 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setBrokerConfig(res.data);
       }
     } catch {
-      toast.error("Modal Broker Load failed");
+      toast.error(t('config.modal_broker_load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   const loadGroupConfig = useCallback(async () => {
@@ -96,11 +135,11 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setGroupConfig(res.data.config);
       }
     } catch {
-      toast.error("Modal Group Load failed");
+      toast.error(t('config.modal_group_load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   const loadListingConfig = useCallback(async () => {
@@ -111,11 +150,11 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setListingConfig(res.data.config);
       }
     } catch {
-      toast.error("Modal Listing Load failed");
+      toast.error(t('config.modal_listing_load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   const loadVolunteeringConfig = useCallback(async () => {
@@ -126,11 +165,11 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setVolunteeringConfig(res.data.config);
       }
     } catch {
-      toast.error("Modal Volunteering Load failed");
+      toast.error(t('config.modal_volunteering_load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   const loadJobConfig = useCallback(async () => {
@@ -141,11 +180,11 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setJobConfig(res.data.config);
       }
     } catch {
-      toast.error("Modal Job Load failed");
+      toast.error(t('config.modal_job_load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   const loadIdentityConfig = useCallback(async () => {
@@ -156,11 +195,11 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setIdentityConfig(res.data.config);
       }
     } catch {
-      toast.error("Modal Identity Load failed");
+      toast.error(t('config.modal_identity_load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   useEffect(() => {
@@ -197,14 +236,14 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminBroker.saveConfiguration(brokerConfig);
       if (res.success) {
-        toast.success("Modal Broker saved");
+        toast.success(t('config.modal_broker_saved'));
         setHasChanges(false);
         onClose();
       } else {
-        toast.error("Modal Save failed");
+        toast.error(t('config.modal_save_failed'));
       }
     } catch {
-      toast.error("Modal Save failed");
+      toast.error(t('config.modal_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -216,15 +255,15 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateGroupConfigBulk(groupConfig);
       if (res.success) {
-        toast.success("Modal Group saved");
+        toast.success(t('config.modal_group_saved'));
         setHasChanges(false);
         refreshTenant();
         onClose();
       } else {
-        toast.error("Modal Save failed");
+        toast.error(t('config.modal_save_failed'));
       }
     } catch {
-      toast.error("Modal Save failed");
+      toast.error(t('config.modal_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -236,15 +275,15 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateListingConfigBulk(listingConfig);
       if (res.success) {
-        toast.success("Modal Listing saved");
+        toast.success(t('config.modal_listing_saved'));
         setHasChanges(false);
         refreshTenant();
         onClose();
       } else {
-        toast.error("Modal Save failed");
+        toast.error(t('config.modal_save_failed'));
       }
     } catch {
-      toast.error("Modal Save failed");
+      toast.error(t('config.modal_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -256,15 +295,15 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateVolunteeringConfigBulk(volunteeringConfig);
       if (res.success) {
-        toast.success("Modal Volunteering saved");
+        toast.success(t('config.modal_volunteering_saved'));
         setHasChanges(false);
         refreshTenant();
         onClose();
       } else {
-        toast.error("Modal Save failed");
+        toast.error(t('config.modal_save_failed'));
       }
     } catch {
-      toast.error("Modal Save failed");
+      toast.error(t('config.modal_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -276,15 +315,15 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateJobConfigBulk(jobConfig);
       if (res.success) {
-        toast.success("Modal Job saved");
+        toast.success(t('config.modal_job_saved'));
         setHasChanges(false);
         refreshTenant();
         onClose();
       } else {
-        toast.error("Modal Save failed");
+        toast.error(t('config.modal_save_failed'));
       }
     } catch {
-      toast.error("Modal Save failed");
+      toast.error(t('config.modal_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -296,14 +335,14 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateIdentityConfigBulk(identityConfig);
       if (res.success) {
-        toast.success("Modal Identity saved");
+        toast.success(t('config.modal_identity_saved'));
         setHasChanges(false);
         refreshTenant();
       } else {
-        toast.error("Modal Save failed");
+        toast.error(t('config.modal_save_failed'));
       }
     } catch {
-      toast.error("Modal Save failed");
+      toast.error(t('config.modal_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -403,7 +442,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                 <Info size={40} className="text-default-400" />
                 <div className="text-center">
                   <p className="text-sm text-default-600">
-                    {"Modal Onboarding."}
+                    {t('config.modal_onboarding_desc')}
                   </p>
                 </div>
                 {module.detailPageUrl && (
@@ -413,7 +452,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                     startContent={<ExternalLink size={16} />}
                     onPress={handleNavigateToDetail}
                   >
-                    {"Modal Go to Onboarding"}
+                    {t('config.modal_go_to_onboarding')}
                   </Button>
                 )}
               </CardBody>
@@ -438,7 +477,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
             return (
               <div key={category} className="mb-5 rounded-lg border border-default-200 bg-default-50/50">
                 <div className="px-5 pt-4 pb-1">
-                  <h4 className="text-sm font-semibold text-default-700">{category}</h4>
+                  <h4 className="text-sm font-semibold text-default-700">{getCategoryLabel(t, category)}</h4>
                 </div>
                 <div className="px-5 pb-4">
                   {categoryOptions.map((option, idx) => {
@@ -498,7 +537,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                 startContent={<ExternalLink size={14} />}
                 onPress={handleNavigateToDetail}
               >
-                {"Modal Open Broker Page"}
+                {t('config.modal_open_broker_page')}
               </Button>
             </div>
           )}
@@ -506,7 +545,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
 
         <ModalFooter>
           <Button variant="flat" onPress={onClose}>
-            {isEditable && hasChanges ? "Cancel" : "Close"}
+            {isEditable && hasChanges ? t('config.cancel') : t('config.close')}
           </Button>
           {isEditable && (
             <Button
@@ -516,7 +555,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
               isDisabled={!hasChanges || (isBroker && !brokerConfig) || (isGroupConfig && !groupConfig) || (isListingConfig && !listingConfig) || (isVolunteeringConfig && !volunteeringConfig) || (isJobConfig && !jobConfig) || (isIdentityConfig && !identityConfig)}
               onPress={isBroker ? handleSaveBrokerConfig : isListingConfig ? handleSaveListingConfig : isVolunteeringConfig ? handleSaveVolunteeringConfig : isJobConfig ? handleSaveJobConfig : isIdentityConfig ? handleSaveIdentityConfig : handleSaveGroupConfig}
             >
-              {"Save Changes"}
+              {t('config.save_changes')}
             </Button>
           )}
         </ModalFooter>
@@ -538,16 +577,19 @@ interface ConfigOptionRowProps {
 
 function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowProps) {
   const { t } = useTranslation('admin');
+  const label = getOptionLabel(t, option);
+  const description = getOptionDescription(t, option);
+
   return (
     <div className="flex items-start justify-between gap-6 py-2.5">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-medium">{option.label}</span>
+          <span className="text-sm font-medium">{label}</span>
           {option.comingSoon && (
             <Chip size="sm" variant="flat" color="warning">{t('config.coming_soon')}</Chip>
           )}
         </div>
-        <p className="text-xs text-default-500 mt-1 leading-relaxed">{option.description}</p>
+        <p className="text-xs text-default-500 mt-1 leading-relaxed">{description}</p>
       </div>
       <div className="flex-shrink-0 pt-0.5">
         {option.type === 'boolean' && (
@@ -556,7 +598,7 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
             isSelected={value as boolean}
             isDisabled={disabled}
             onValueChange={(val) => onChange(val)}
-            aria-label={option.label}
+            aria-label={label}
           />
         )}
         {option.type === 'number' && (
@@ -570,7 +612,7 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
             max={option.max}
             isDisabled={disabled}
             onValueChange={(val) => onChange(Number(val) || 0)}
-            aria-label={option.label}
+            aria-label={label}
           />
         )}
         {option.type === 'string' && (
@@ -581,7 +623,7 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
             value={value as string}
             isDisabled={disabled}
             onValueChange={(val) => onChange(val)}
-            aria-label={option.label}
+            aria-label={label}
           />
         )}
         {option.type === 'select' && option.choices && (
@@ -595,10 +637,10 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
               const selected = Array.from(keys)[0];
               if (selected) onChange(selected as string);
             }}
-            aria-label={option.label}
+            aria-label={label}
           >
             {option.choices.map(c => (
-              <SelectItem key={c.value}>{c.label}</SelectItem>
+              <SelectItem key={c.value}>{getChoiceLabel(t, option, c.value, c.label)}</SelectItem>
             ))}
           </Select>
         )}
