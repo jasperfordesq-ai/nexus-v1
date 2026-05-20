@@ -405,5 +405,15 @@
     "maintenance": {
       "title": "Maintenance"
     }
+  },
+  "changelog_page": {
+    "title": "Changelog",
+    "meta_title": "Changelog - Project NEXUS",
+    "meta_description": "Every notable change shipped in Project NEXUS, in Keep-a-Changelog format, following Semantic Versioning. Sourced from CHANGELOG.md in the public source repository.",
+    "heading": "Changelog",
+    "subheading": "Every notable change to Project NEXUS, in Keep-a-Changelog format. The platform follows Semantic Versioning.",
+    "view_on_github": "View on GitHub",
+    "loading": "Loading changelog...",
+    "error": "Could not load the changelog. You can read it directly on GitHub."
   }
 }

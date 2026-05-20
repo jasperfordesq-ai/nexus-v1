@@ -413,6 +413,16 @@
       }
     }
   },
+  "changelog_page": {
+    "title": "Changelog",
+    "meta_title": "Changelog - Project NEXUS",
+    "meta_description": "Every notable change shipped in Project NEXUS, in Keep-a-Changelog format, following Semantic Versioning. Sourced from CHANGELOG.md in the public source repository.",
+    "heading": "Changelog",
+    "subheading": "Every notable change to Project NEXUS, in Keep-a-Changelog format. The platform follows Semantic Versioning.",
+    "view_on_github": "View on GitHub",
+    "loading": "Loading changelog...",
+    "error": "Could not load the changelog. You can read it directly on GitHub."
+  },
   "home": {
     "meta_title": "Community Timebanking Platform",
     "meta_description": "Exchange skills using time credits — every hour is valued equally. Join a community where neighbours share help, build trust, and strengthen local connections.",

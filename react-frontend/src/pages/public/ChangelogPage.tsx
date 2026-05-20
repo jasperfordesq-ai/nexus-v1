@@ -30,7 +30,7 @@ type FetchState =
 
 export function ChangelogPage() {
   const { t } = useTranslation('public');
-  usePageTitle(t('changelog_page.title', { defaultValue: 'Changelog' }));
+  usePageTitle(t('changelog_page.title'));
   const [state, setState] = useState<FetchState>({ status: 'loading' });
 
   useEffect(() => {
@@ -55,11 +55,8 @@ export function ChangelogPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6 py-4 px-4 sm:px-0">
       <PageMeta
-        title={t('changelog_page.meta_title', { defaultValue: 'Changelog — Project NEXUS' })}
-        description={t('changelog_page.meta_description', {
-          defaultValue:
-            'Every notable change shipped in Project NEXUS, in Keep-a-Changelog format, following Semantic Versioning. Sourced from CHANGELOG.md in the public source repository.',
-        })}
+        title={t('changelog_page.meta_title')}
+        description={t('changelog_page.meta_description')}
       />
 
       {/* Header */}
@@ -67,17 +64,14 @@ export function ChangelogPage() {
         <div className="flex items-center gap-3 flex-wrap">
           <ScrollText className="w-7 h-7 text-primary shrink-0" aria-hidden="true" />
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-            {t('changelog_page.heading', { defaultValue: 'Changelog' })}
+            {t('changelog_page.heading')}
           </h1>
           <Chip color="success" variant="flat" size="sm">
             {RELEASE_STATUS.stageLabel}
           </Chip>
         </div>
         <p className="text-sm text-foreground-600">
-          {t('changelog_page.subheading', {
-            defaultValue:
-              'Every notable change to Project NEXUS, in Keep-a-Changelog format. The platform follows Semantic Versioning.',
-          })}
+          {t('changelog_page.subheading')}
         </p>
         <p className="text-xs text-foreground-500">
           <a
@@ -86,7 +80,7 @@ export function ChangelogPage() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 text-primary underline focus:outline-none focus:ring-2 focus:ring-primary rounded"
           >
-            {t('changelog_page.view_on_github', { defaultValue: 'View on GitHub' })}
+            {t('changelog_page.view_on_github')}
             <ExternalLink className="w-3 h-3" aria-hidden="true" />
           </a>
         </p>
@@ -99,15 +93,13 @@ export function ChangelogPage() {
             <div className="flex items-center justify-center py-12 gap-3 text-foreground-500">
               <Spinner size="sm" />
               <span className="text-sm">
-                {t('changelog_page.loading', { defaultValue: 'Loading changelog…' })}
+                {t('changelog_page.loading')}
               </span>
             </div>
           )}
           {state.status === 'error' && (
             <div className="py-8 text-center text-sm text-danger">
-              {t('changelog_page.error', {
-                defaultValue: "Could not load the changelog. You can read it directly on GitHub.",
-              })}
+              {t('changelog_page.error')}
               <p className="mt-2 text-xs text-foreground-500 font-mono">{state.message}</p>
             </div>
           )}
