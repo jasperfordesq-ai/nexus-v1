@@ -773,6 +773,7 @@
     "clear": "Clear",
     "scroll_left": "Scroll left",
     "scroll_right": "Scroll right",
+    "current_language": "Language: {{language}}",
     "select_language": "Select language",
     "clear_location": "Clear location",
     "select_category": "Select a category",

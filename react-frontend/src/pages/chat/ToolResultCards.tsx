@@ -70,6 +70,7 @@ interface ResultCardProps {
 }
 
 function ResultCard({ cardType, item }: ResultCardProps) {
+  const { t } = useTranslation('chat');
   const url = typeof item.url === 'string' ? item.url : undefined;
   const card = (
     <Card
@@ -83,7 +84,7 @@ function ResultCard({ cardType, item }: ResultCardProps) {
   );
 
   return url ? (
-    <a href={url} className="inline-block no-underline" aria-label={String(item.title ?? item.name ?? 'View')}>
+    <a href={url} className="inline-block no-underline" aria-label={String(item.title ?? item.name ?? t('tool_results.view'))}>
       {card}
     </a>
   ) : (

@@ -86,7 +86,7 @@ export function LanguageSwitcher({ compact = true }: LanguageSwitcherProps) {
           variant="light"
           size="sm"
           className="text-theme-muted hover:text-theme-primary gap-1 min-w-0"
-          aria-label={`Language: ${currentLang.label}`}
+          aria-label={t('aria.current_language', { language: currentLang.label })}
           startContent={<Globe className="w-4 h-4 shrink-0" aria-hidden="true" />}
         >
           {compact ? (

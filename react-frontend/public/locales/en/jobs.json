@@ -382,6 +382,7 @@
   "apply": {
     "button": "Apply Now",
     "button_label": "Apply for {{title}}",
+    "this_job": "this job",
     "view": "View",
     "applied": "Applied",
     "title": "Apply for this position",

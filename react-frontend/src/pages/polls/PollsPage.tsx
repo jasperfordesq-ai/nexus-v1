@@ -1204,7 +1204,7 @@ export function PollsPage() {
                             className="text-[var(--text-subtle)] min-w-0 w-7 h-7"
                             onPress={() => moveRankUp(index)}
                             isDisabled={index === 0}
-                            aria-label={`Move ${option.label} up`}
+                            aria-label={t('aria.move_rank_up', { option: option.label })}
                           >
                             <ChevronUp className="w-4 h-4" />
                           </Button>
@@ -1215,7 +1215,7 @@ export function PollsPage() {
                             className="text-[var(--text-subtle)] min-w-0 w-7 h-7 rotate-180"
                             onPress={() => moveRankDown(index)}
                             isDisabled={index === rankOrder.length - 1}
-                            aria-label={`Move ${option.label} down`}
+                            aria-label={t('aria.move_rank_down', { option: option.label })}
                           >
                             <ChevronUp className="w-4 h-4" />
                           </Button>

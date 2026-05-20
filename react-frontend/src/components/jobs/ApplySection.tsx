@@ -120,7 +120,7 @@ export function ApplySection({
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white w-full"
             size="lg"
             onPress={onApplyOpen}
-            aria-label={t('apply.button_label', { title: vacancy.title ?? 'this job' })}
+            aria-label={t('apply.button_label', { title: vacancy.title ?? t('apply.this_job') })}
           >
             {t('apply.button')}
           </Button>

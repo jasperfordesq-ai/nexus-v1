@@ -89,7 +89,9 @@
   "winner_label": "Winner: {{name}}",
   "submit_rankings": "Submit Rankings",
   "aria": {
-    "export_csv": "Export results as CSV"
+    "export_csv": "Export results as CSV",
+    "move_rank_down": "Move {{option}} down",
+    "move_rank_up": "Move {{option}} up"
   },
   "page_meta": {
     "title": "Polls"
