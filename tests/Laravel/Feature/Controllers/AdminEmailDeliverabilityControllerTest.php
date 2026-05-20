@@ -244,6 +244,69 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         $this->assertSame('listing-expiry-evidence@example.com', $rows->first()['email'] ?? null);
     }
 
+    public function test_queues_endpoint_surfaces_civic_digest_delivery_claim_gaps(): void
+    {
+        if (
+            !Schema::hasTable('civic_digest_delivery_claims')
+            || !Schema::hasTable('email_log')
+            || !Schema::hasColumn('civic_digest_delivery_claims', 'claimed_at')
+            || !Schema::hasColumn('civic_digest_delivery_claims', 'sent_at')
+        ) {
+            $this->markTestSkipped('Civic digest delivery claim tables are not available.');
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'civic-digest-claim-queue@example.test',
+        ]);
+        Sanctum::actingAs($admin);
+
+        DB::table('civic_digest_delivery_claims')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $member->id,
+                'cadence' => 'daily',
+                'window_key' => 'queue-stale-' . uniqid(),
+                'status' => 'claimed',
+                'claimed_at' => now()->subMinutes(20),
+                'sent_at' => null,
+                'delivery_evidence' => null,
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(20),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $member->id,
+                'cadence' => 'daily',
+                'window_key' => 'queue-sent-' . uniqid(),
+                'status' => 'sent',
+                'claimed_at' => now()->subMinutes(10),
+                'sent_at' => now()->subMinutes(5),
+                'delivery_evidence' => json_encode(['channel' => 'email', 'accepted' => true]),
+                'created_at' => now()->subMinutes(10),
+                'updated_at' => now()->subMinutes(5),
+            ],
+        ]);
+
+        $response = $this->apiGet('/v2/admin/email-deliverability/queues?source=civic_digest_delivery_claims&limit=10');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.diagnostics.civic_digest_delivery_claims.available', true);
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.civic_digest_delivery_claims.stale_pending'));
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.civic_digest_delivery_claims.failed_recent'));
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.civic_digest_delivery_claims.status_counts.pending'));
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.civic_digest_delivery_claims.status_counts.failed'));
+
+        $rows = collect($response->json('data.rows'));
+        $this->assertSame(['civic_digest_delivery_claims'], $rows->pluck('source')->unique()->values()->all());
+        $this->assertContains('pending', $rows->pluck('status')->all());
+        $this->assertContains('failed', $rows->pluck('status')->all());
+        $this->assertSame(
+            ['civic-digest-claim-queue@example.test'],
+            $rows->pluck('email')->unique()->values()->all()
+        );
+    }
+
     public function test_queues_endpoint_surfaces_goal_reminders(): void
     {
         if (!Schema::hasTable('goal_reminders') || !Schema::hasTable('goals')) {

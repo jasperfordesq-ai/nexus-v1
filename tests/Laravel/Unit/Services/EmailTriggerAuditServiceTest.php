@@ -32,6 +32,7 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('security:account_suspended_banned_deleted_reactivated:admin_user_status', $keys);
         $this->assertContains('insurance:insurance_certificate_verified_or_rejected:insurance_certificate', $keys);
         $this->assertContains('messages:direct_message_received:message', $keys);
+        $this->assertContains('digests:civic_digest_claim_source:civic_digest', $keys);
         $this->assertContains('federation:federated_message_received:federation_message', $keys);
         $this->assertContains('federation:federated_review_source:federation_review', $keys);
         $this->assertContains('goals:goal_reminder_source:goal_reminder', $keys);
@@ -64,6 +65,7 @@ class EmailTriggerAuditServiceTest extends TestCase
 
         foreach ([
             'billing_audit_log',
+            'civic_digest_delivery_claims',
             'email_log',
             'event_reminders',
             'federation_inbound_connections',
@@ -983,5 +985,60 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('job_interview_24h_reminder_overdue_pending', $codes);
         $this->assertContains('job_interview_1h_reminder_overdue_pending', $codes);
         $this->assertContains('job_interview_reminder_marked_sent_without_email_log', $codes);
+    }
+
+    public function test_run_detects_civic_digest_claim_source_gaps(): void
+    {
+        if (
+            !Schema::hasTable('civic_digest_delivery_claims')
+            || !Schema::hasTable('email_log')
+            || !Schema::hasColumn('civic_digest_delivery_claims', 'claimed_at')
+            || !Schema::hasColumn('civic_digest_delivery_claims', 'sent_at')
+        ) {
+            $this->markTestSkipped('Civic digest delivery claim audit tables are not available.');
+        }
+
+        $userId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Civic Digest Audit User',
+            'email' => 'civic-digest-audit@example.com',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('civic_digest_delivery_claims')->insert([
+            [
+                'tenant_id' => 2,
+                'user_id' => $userId,
+                'cadence' => 'daily',
+                'window_key' => 'audit-stale-' . uniqid(),
+                'status' => 'claimed',
+                'claimed_at' => now()->subMinutes(20),
+                'sent_at' => null,
+                'delivery_evidence' => null,
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(20),
+            ],
+            [
+                'tenant_id' => 2,
+                'user_id' => $userId,
+                'cadence' => 'daily',
+                'window_key' => 'audit-sent-' . uniqid(),
+                'status' => 'sent',
+                'claimed_at' => now()->subMinutes(10),
+                'sent_at' => now()->subMinutes(5),
+                'delivery_evidence' => json_encode(['channel' => 'email', 'accepted' => true]),
+                'created_at' => now()->subMinutes(10),
+                'updated_at' => now()->subMinutes(5),
+            ],
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('civic_digest_claim_stale_pending', $codes);
+        $this->assertContains('civic_digest_claim_marked_sent_without_email_log', $codes);
     }
 }

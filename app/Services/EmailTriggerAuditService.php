@@ -136,6 +136,7 @@ class EmailTriggerAuditService
             ['module' => 'broadcasts', 'event' => 'newsletter_broadcast', 'category' => 'newsletter', 'critical' => false, 'source_table' => 'newsletter_queue'],
             ['module' => 'broadcasts', 'event' => 'newsletter_unsubscribe_confirmation', 'category' => 'newsletter_unsubscribe', 'critical' => false, 'source_table' => 'email_log'],
             ['module' => 'digests', 'event' => 'civic_digest', 'category' => 'civic_digest', 'critical' => false, 'source_table' => 'email_log'],
+            ['module' => 'digests', 'event' => 'civic_digest_claim_source', 'category' => 'civic_digest', 'critical' => false, 'source_table' => 'civic_digest_delivery_claims'],
             ['module' => 'digests', 'event' => 'federation_activity_digest', 'category' => 'federation_digest', 'critical' => false, 'source_table' => 'email_log'],
             ['module' => 'digests', 'event' => 'group_activity_digest', 'category' => 'group_digest', 'critical' => false, 'source_table' => 'email_log'],
             ['module' => 'events', 'event' => 'event_created_update_cancellation_rsvp_reminder', 'category' => 'event_notification', 'critical' => true, 'source_table' => 'email_log'],
@@ -181,6 +182,7 @@ class EmailTriggerAuditService
                 $this->checkGoalReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkVolunteerReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkJobInterviewReminderSourceHealth($tenantId, $since, $windowHours),
+                $this->checkCivicDigestClaimSourceHealth($tenantId, $since, $windowHours),
                 $this->checkNotificationStoreHealth($tenantId),
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
                 $this->checkTenantProviderConfiguration($tenantId),
@@ -248,6 +250,7 @@ class EmailTriggerAuditService
     {
         $checks = [
             'billing_audit_log' => 'checkBillingAndStripeHealth',
+            'civic_digest_delivery_claims' => 'checkCivicDigestClaimSourceHealth',
             'email_log' => 'checkTenantContextAndWebhookHealth',
             'event_reminders' => 'checkEventReminderSourceHealth',
             'federation_inbound_connections' => 'checkFederationConnectionDeliveryHealth',
@@ -1242,6 +1245,65 @@ class EmailTriggerAuditService
             ->groupBy('ji.tenant_id')
             ->get();
         $issues = array_merge($issues, $this->rowsToIssues($sentWithoutEmail, 'job_interview_reminder_marked_sent_without_email_log', 'critical', 'jobs', 'job_interview_reminder_source', ['window_hours' => $windowHours]));
+
+        return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkCivicDigestClaimSourceHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (
+            !$this->hasTables(['civic_digest_delivery_claims'])
+            || !Schema::hasColumn('civic_digest_delivery_claims', 'sent_at')
+            || !Schema::hasColumn('civic_digest_delivery_claims', 'claimed_at')
+        ) {
+            return [];
+        }
+
+        $issues = [];
+
+        $staleClaimed = DB::table('civic_digest_delivery_claims as cddc')
+            ->select('cddc.tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('cddc.status', 'claimed')
+            ->whereNull('cddc.sent_at')
+            ->where('cddc.claimed_at', '<', now()->subMinutes(15))
+            ->when($tenantId !== null, fn ($q) => $q->where('cddc.tenant_id', $tenantId))
+            ->groupBy('cddc.tenant_id')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($staleClaimed, 'civic_digest_claim_stale_pending', 'warning', 'digests', 'civic_digest_claim_source', ['minutes' => 15]));
+
+        $sentStatusMissingTimestamp = DB::table('civic_digest_delivery_claims as cddc')
+            ->select('cddc.tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('cddc.status', 'sent')
+            ->whereNull('cddc.sent_at')
+            ->when($tenantId !== null, fn ($q) => $q->where('cddc.tenant_id', $tenantId))
+            ->groupBy('cddc.tenant_id')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($sentStatusMissingTimestamp, 'civic_digest_claim_sent_status_missing_sent_at', 'critical', 'digests', 'civic_digest_claim_source'));
+
+        if (!$this->hasTables(['email_log'])) {
+            return $issues;
+        }
+
+        $sentWithoutEmail = DB::table('civic_digest_delivery_claims as cddc')
+            ->select('cddc.tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('cddc.status', 'sent')
+            ->where('cddc.sent_at', '>=', $since)
+            ->whereNotExists(function ($sub): void {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereColumn('email_log.user_id', 'cddc.user_id')
+                    ->whereColumn('email_log.tenant_id', 'cddc.tenant_id')
+                    ->where('email_log.category', 'civic_digest')
+                    ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                    ->whereRaw('email_log.created_at BETWEEN DATE_SUB(cddc.sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(cddc.sent_at, INTERVAL 10 MINUTE)');
+            })
+            ->when($tenantId !== null, fn ($q) => $q->where('cddc.tenant_id', $tenantId))
+            ->groupBy('cddc.tenant_id')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($sentWithoutEmail, 'civic_digest_claim_marked_sent_without_email_log', 'warning', 'digests', 'civic_digest_claim_source', ['window_hours' => $windowHours]));
 
         return $issues;
     }
