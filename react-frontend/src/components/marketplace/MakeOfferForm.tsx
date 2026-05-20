@@ -59,17 +59,17 @@ export function MakeOfferForm({
         });
 
         if (response.success) {
-          toast.success(t('offer.sent_success', 'Your offer has been sent!'));
+          toast.success(t('offer.sent_success'));
           onSuccess();
         } else {
           toast.error(
             (response as { message?: string }).message ||
-              t('offer.sent_error', 'Failed to send offer. Please try again.'),
+              t('offer.sent_error'),
           );
         }
       } catch (err) {
         logError('Failed to submit marketplace offer', err);
-        toast.error(t('offer.sent_error', 'Failed to send offer. Please try again.'));
+        toast.error(t('offer.sent_error'));
       } finally {
         setIsSubmitting(false);
       }
@@ -86,7 +86,7 @@ export function MakeOfferForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Offer amount */}
       <Input
-        label={t('offer.your_offer', 'Your Offer')}
+        label={t('offer.your_offer')}
         type="number"
         min={0}
         step="0.01"
@@ -104,12 +104,12 @@ export function MakeOfferForm({
       {listingPrice != null && isValidAmount && comparisonPercent != null && (
         <div className="text-xs text-theme-muted px-1">
           {comparisonPercent === 0
-            ? t('offer.matches_price', 'Matches the listing price')
+            ? t('offer.matches_price')
             : comparisonPercent > 0
-              ? t('offer.above_price', '{{percent}}% above the listing price', {
+              ? t('offer.above_price', {
                   percent: comparisonPercent,
                 })
-              : t('offer.below_price', '{{percent}}% below the listing price', {
+              : t('offer.below_price', {
                   percent: Math.abs(comparisonPercent),
                 })}
         </div>
@@ -117,8 +117,8 @@ export function MakeOfferForm({
 
       {/* Optional message */}
       <Textarea
-        label={t('offer.message_label', 'Message (optional)')}
-        placeholder={t('offer.message_placeholder', 'Add a message to the seller...')}
+        label={t('offer.message_label')}
+        placeholder={t('offer.message_placeholder')}
         value={message}
         onValueChange={setMessage}
         maxLength={MAX_MESSAGE_LENGTH}
@@ -133,7 +133,7 @@ export function MakeOfferForm({
           onPress={onClose}
           isDisabled={isSubmitting}
         >
-          {t('common:cancel', 'Cancel')}
+          {t('offer.cancel')}
         </Button>
         <Button
           type="submit"
@@ -142,7 +142,7 @@ export function MakeOfferForm({
           isDisabled={!isValidAmount}
           startContent={!isSubmitting ? <Send className="w-4 h-4" aria-hidden="true" /> : undefined}
         >
-          {t('offer.send', 'Send Offer')}
+          {t('offer.send')}
         </Button>
       </div>
     </form>
