@@ -119,7 +119,9 @@
     "action_notify_me": "Notificarme",
     "generated_name": "{{stage}} to {{target}} after {{count}}d",
     "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
-    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}"
+    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}",
+    "rules_title": "Automation Rules",
+    "reviewed": "Reviewed"
   },
   "employer": {
     "page_title": "Perfil del Empleador",

@@ -18,6 +18,10 @@ interface JobPipelineRulesProps {
   jobId: string;
 }
 
+const PIPELINE_STAGES = ['applied', 'screening', 'reviewed', 'interview', 'rejected'] as const;
+const TRIGGER_STAGES = PIPELINE_STAGES.filter(stage => stage !== 'rejected');
+const TARGET_STAGES = PIPELINE_STAGES.filter(stage => stage !== 'applied');
+
 export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
   const { t } = useTranslation('jobs');
   const [pipelineOpen, setPipelineOpen] = useState(false);
@@ -30,6 +34,13 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
     action_target: 'screening',
   });
   const [isAddingRule, setIsAddingRule] = useState(false);
+
+  const stageLabel = useCallback((stage: string) => t(`pipeline.${stage}`), [t]);
+  const actionLabel = useCallback((action: string) => {
+    if (action === 'reject') return t('pipeline.action_auto_reject');
+    if (action === 'notify_reviewer') return t('pipeline.action_notify_me');
+    return t(`pipeline.action_${action}`);
+  }, [t]);
 
   const loadPipelineRules = useCallback(async () => {
     try {
@@ -58,14 +69,14 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
       >
         <span className="font-semibold flex items-center gap-2">
           <Zap size={16} aria-hidden="true" />
-          {t('pipeline.title', 'Automation Rules')}
+          {t('pipeline.rules_title')}
         </span>
         {pipelineOpen ? <ChevronUp size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}
       </Button>
       {pipelineOpen && (
         <div className="mt-3 space-y-3">
           {pipelineRules.length === 0 && (
-            <p className="text-sm text-theme-muted">{t('pipeline.no_rules', 'No automation rules yet.')}</p>
+            <p className="text-sm text-theme-muted">{t('pipeline.no_rules')}</p>
           )}
           {pipelineRules.map((rule) => (
             <div key={rule.id} className="flex items-center justify-between text-sm p-2 bg-white/5 rounded-lg">
@@ -75,8 +86,8 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
                   {t(rule.action_target ? 'pipeline.rule_summary_with_target' : 'pipeline.rule_summary', {
                     stage: rule.trigger_stage,
                     count: rule.condition_days,
-                    action: rule.action,
-                    target: rule.action_target ?? '',
+                    action: actionLabel(rule.action),
+                    target: rule.action_target ? stageLabel(rule.action_target) : '',
                   })}
                 </span>
               </div>
@@ -94,29 +105,29 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
                     .catch((err) => { if (import.meta.env.DEV) console.warn('Non-critical:', err); })
                 }
               >
-                {t('pipeline.delete', 'Delete')}
+                {t('pipeline.delete')}
               </Button>
             </div>
           ))}
           <div className="border-t border-divider pt-3">
-            <p className="text-xs font-medium text-theme-muted mb-2">{t('pipeline.add_rule', 'Add rule')}</p>
+            <p className="text-xs font-medium text-theme-muted mb-2">{t('pipeline.add_rule')}</p>
             <div className="grid grid-cols-2 gap-2">
               <Select
                 size="sm"
-                label={t('pipeline.trigger', 'If in stage')}
+                label={t('pipeline.trigger')}
                 selectedKeys={[newRule.trigger_stage]}
                 onSelectionChange={(keys) =>
                   setNewRule((r) => ({ ...r, trigger_stage: Array.from(keys)[0] as string }))
                 }
               >
-                {(['applied', 'screening', 'reviewed', 'interview'] as const).map((s) => (
-                  <SelectItem key={s}>{s}</SelectItem>
+                {TRIGGER_STAGES.map((stage) => (
+                  <SelectItem key={stage}>{stageLabel(stage)}</SelectItem>
                 ))}
               </Select>
               <Input
                 size="sm"
                 type="number"
-                label={t('pipeline.days', 'Days')}
+                label={t('pipeline.days')}
                 value={String(newRule.condition_days)}
                 onChange={(e) =>
                   setNewRule((r) => ({ ...r, condition_days: parseInt(e.target.value) || 7 }))
@@ -124,27 +135,27 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
               />
               <Select
                 size="sm"
-                label={t('pipeline.action', 'Action')}
+                label={t('pipeline.action')}
                 selectedKeys={[newRule.action]}
                 onSelectionChange={(keys) =>
                   setNewRule((r) => ({ ...r, action: Array.from(keys)[0] as string }))
                 }
               >
-                <SelectItem key="move_stage">{t('pipeline.action_move_stage', 'Move stage')}</SelectItem>
-                <SelectItem key="reject">{t('pipeline.action_auto_reject', 'Auto-reject')}</SelectItem>
-                <SelectItem key="notify_reviewer">{t('pipeline.action_notify_me', 'Notify me')}</SelectItem>
+                <SelectItem key="move_stage">{t('pipeline.action_move_stage')}</SelectItem>
+                <SelectItem key="reject">{t('pipeline.action_auto_reject')}</SelectItem>
+                <SelectItem key="notify_reviewer">{t('pipeline.action_notify_me')}</SelectItem>
               </Select>
               {newRule.action === 'move_stage' && (
                 <Select
                   size="sm"
-                  label={t('pipeline.target', 'Move to')}
+                  label={t('pipeline.target')}
                   selectedKeys={[newRule.action_target]}
                   onSelectionChange={(keys) =>
                     setNewRule((r) => ({ ...r, action_target: Array.from(keys)[0] as string }))
                   }
                 >
-                  {(['screening', 'reviewed', 'interview', 'rejected'] as const).map((s) => (
-                    <SelectItem key={s}>{s}</SelectItem>
+                  {TARGET_STAGES.map((stage) => (
+                    <SelectItem key={stage}>{stageLabel(stage)}</SelectItem>
                   ))}
                 </Select>
               )}
@@ -160,8 +171,8 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
                   await api.post(`/v2/jobs/${jobId}/pipeline-rules`, {
                     ...newRule,
                     name: t('pipeline.generated_name', {
-                      stage: newRule.trigger_stage,
-                      target: newRule.action_target || newRule.action,
+                      stage: stageLabel(newRule.trigger_stage),
+                      target: newRule.action_target ? stageLabel(newRule.action_target) : actionLabel(newRule.action),
                       count: newRule.condition_days,
                     }),
                   });
@@ -173,7 +184,7 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
                 }
               }}
             >
-              {t('pipeline.add', 'Add Rule')}
+              {t('pipeline.add')}
             </Button>
           </div>
         </div>
