@@ -185,10 +185,10 @@ export function TalentSearchPage() {
     const now = new Date();
     const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return t('talent_search.today', 'Today');
-    if (diffDays === 1) return t('talent_search.yesterday', 'Yesterday');
-    if (diffDays < 7) return t('talent_search.days_ago', '{{count}} days ago', { count: diffDays });
-    if (diffDays < 30) return t('talent_search.weeks_ago', '{{count}} weeks ago', { count: Math.floor(diffDays / 7) });
+    if (diffDays === 0) return t('talent_search.today');
+    if (diffDays === 1) return t('talent_search.yesterday');
+    if (diffDays < 7) return t('talent_search.days_ago', { count: diffDays });
+    if (diffDays < 30) return t('talent_search.weeks_ago', { count: Math.floor(diffDays / 7) });
     return date.toLocaleDateString();
   };
 
@@ -241,7 +241,7 @@ export function TalentSearchPage() {
               startContent={<Filter className="w-4 h-4" aria-hidden="true" />}
               onPress={() => setShowFilters(!showFilters)}
             >
-              {t('talent_search.skills_filter', 'Filters')}
+              {t('talent_search.skills_filter')}
             </Button>
           </div>
 
@@ -258,7 +258,7 @@ export function TalentSearchPage() {
                 placeholder={t('talent_search.skills_placeholder')}
                 value={skillsInput}
                 onChange={(e) => setSkillsInput(e.target.value)}
-                description={t('talent_search.skills_description', 'Comma-separated skills')}
+                description={t('talent_search.skills_description')}
                 classNames={{
                   input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
@@ -298,7 +298,7 @@ export function TalentSearchPage() {
                   color="secondary"
                   onClose={() => setSkillsInput('')}
                 >
-                  {t('talent_search.skills_chip', 'Skills: {{skills}}', { skills: skillsInput })}
+                  {t('talent_search.skills_chip', { skills: skillsInput })}
                 </Chip>
               )}
               {locationInput.trim() && (
@@ -459,7 +459,7 @@ export function TalentSearchPage() {
             onPress={handleLoadMore}
             isLoading={isLoadingMore}
           >
-            {t('talent_search.load_more', t('load_more'))}
+            {t('talent_search.load_more')}
           </Button>
         </div>
       )}
