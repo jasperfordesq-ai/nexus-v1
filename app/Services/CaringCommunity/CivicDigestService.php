@@ -425,6 +425,36 @@ class CivicDigestService
     }
 
     /**
+     * @param array<string, mixed> $evidence
+     */
+    public function markDeliverySuppressed(int $tenantId, int $userId, string $cadence, string $windowKey, array $evidence): bool
+    {
+        if (!Schema::hasTable(self::DELIVERY_CLAIMS_TABLE)) {
+            $this->markSentNow($tenantId, $userId);
+            return true;
+        }
+
+        $updated = DB::table(self::DELIVERY_CLAIMS_TABLE)
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->where('cadence', $cadence === 'monthly' || $cadence === 'weekly' ? 'monthly' : 'daily')
+            ->where('window_key', $windowKey)
+            ->whereNull('sent_at')
+            ->update([
+                'status' => 'suppressed',
+                'sent_at' => now(),
+                'delivery_evidence' => json_encode($evidence, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                'updated_at' => now(),
+            ]);
+
+        if ((int) $updated > 0) {
+            $this->markSentNow($tenantId, $userId);
+        }
+
+        return (int) $updated > 0;
+    }
+
+    /**
      * Read the last_sent_at timestamp for a user (epoch seconds), or null if
      * never sent.
      */

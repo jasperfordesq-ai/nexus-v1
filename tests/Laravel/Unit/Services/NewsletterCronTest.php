@@ -128,6 +128,22 @@ class NewsletterCronTest extends \Tests\Laravel\TestCase
         $this->assertCount(0, $params, 'processRecurring should take no parameters');
     }
 
+    public function testProcessRecurringOnlyMarksRecurringSentAfterSendNowSucceeds(): void
+    {
+        $source = file_get_contents(app_path('Services/NewsletterService.php'));
+        $processRecurring = substr($source, strpos($source, 'public static function processRecurring(): int'));
+
+        $claimPosition = strpos($processRecurring, "->update([\n                        'status' => 'sending',");
+        $sendNowPosition = strpos($processRecurring, '$service->sendNow(');
+        $recurringLastSentPosition = strpos($processRecurring, "'recurring_last_sent' => now(),");
+
+        $this->assertIsInt($claimPosition, 'processRecurring should atomically claim recurring newsletters.');
+        $this->assertIsInt($sendNowPosition, 'processRecurring should dispatch through sendNow().');
+        $this->assertIsInt($recurringLastSentPosition, 'processRecurring should record recurring sent markers after dispatch.');
+        $this->assertGreaterThan($claimPosition, $sendNowPosition, 'sendNow should run after the claim.');
+        $this->assertGreaterThan($sendNowPosition, $recurringLastSentPosition, 'recurring sent markers must be written after sendNow succeeds.');
+    }
+
     // =========================================================================
     // PROCESS QUEUE — BATCH EMAIL SENDING
     // =========================================================================

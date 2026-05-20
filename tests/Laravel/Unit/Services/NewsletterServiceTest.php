@@ -144,7 +144,7 @@ class NewsletterServiceTest extends TestCase
         $this->assertSame(1, TenantContext::runForTenant($tenantId, fn () => NewsletterService::getRecipientCount('subscribers_only')));
     }
 
-    public function test_process_queue_skips_suppressed_pending_rows(): void
+    public function test_process_queue_marks_suppressed_pending_rows_terminal_without_failed_retry(): void
     {
         $tenantId = $this->useIsolatedTenant();
 
@@ -180,12 +180,19 @@ class NewsletterServiceTest extends TestCase
 
         $result = TenantContext::runForTenant($tenantId, fn () => NewsletterService::processQueue($newsletterId, 10));
 
-        $this->assertSame(['sent' => 0, 'failed' => 1], $result);
+        $this->assertSame(['sent' => 0, 'failed' => 0], $result);
         $this->assertDatabaseHas('newsletter_queue', [
             'tenant_id' => $tenantId,
             'newsletter_id' => $newsletterId,
             'email' => 'suppressed-pending@example.test',
-            'status' => 'failed',
+            'status' => 'suppressed',
+            'attempts' => 5,
+        ]);
+        $this->assertDatabaseHas('email_log', [
+            'tenant_id' => $tenantId,
+            'recipient_email' => 'suppressed-pending@example.test',
+            'category' => 'newsletter',
+            'status' => 'suppressed',
         ]);
     }
 

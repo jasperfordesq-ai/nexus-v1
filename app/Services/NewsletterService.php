@@ -180,6 +180,7 @@ class NewsletterService
                 $segmentId = (int) $newsletter->segment_id;
             }
 
+            return TenantContext::runForTenant($tenantId, function () use ($newsletter, $newsletterId, $targetAudience, $segmentId, $tenantId): int {
             // Resolve recipients
             if ($segmentId) {
                 $recipients = self::getSegmentRecipients($segmentId);
@@ -214,6 +215,7 @@ class NewsletterService
             self::processQueue($newsletterId);
 
             return $queued;
+            });
         } finally {
             $lock->release();
         }
@@ -238,6 +240,7 @@ class NewsletterService
         }
 
         $tenantId = (int) ($newsletter->tenant_id ?: TenantContext::getId());
+        return TenantContext::runForTenant($tenantId, function () use ($newsletter, $newsletterId, $batchSize, $tenantId): array {
         $tenantName = DB::table('tenants')
             ->where('id', $tenantId)
             ->value('name') ?? 'Community';
@@ -305,7 +308,6 @@ class NewsletterService
                     $email = strtolower(trim((string) $item->email));
                     if (isset($suppressedEmails[$email])) {
                         self::markSuppressedRecipientSkipped((int) $item->id, $tenantId);
-                        $failed++;
                         continue;
                     }
 
@@ -384,7 +386,7 @@ class NewsletterService
             ->where('tenant_id', $tenantId)
             ->selectRaw("
                 SUM(CASE WHEN status = 'sent' THEN 1 ELSE 0 END) as sent,
-                SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed,
+                SUM(CASE WHEN status IN ('failed', 'suppressed') THEN 1 ELSE 0 END) as failed,
                 SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
                 SUM(CASE WHEN status = 'processing' THEN 1 ELSE 0 END) as processing,
                 SUM(CASE WHEN status = 'failed' AND attempts < ? THEN 1 ELSE 0 END) as retryable_failed
@@ -412,6 +414,7 @@ class NewsletterService
         }
 
         return ['sent' => $sent, 'failed' => $failed];
+        });
         } finally {
             Cache::forget($lockKey);
         }
@@ -448,17 +451,46 @@ class NewsletterService
 
     private static function markSuppressedRecipientSkipped(int $queueId, int $tenantId): void
     {
+        $row = DB::table('newsletter_queue')
+            ->where('id', $queueId)
+            ->where('tenant_id', $tenantId)
+            ->first(['id', 'newsletter_id', 'user_id', 'email', 'subject_override']);
+
         DB::table('newsletter_queue')
             ->where('id', $queueId)
             ->where('tenant_id', $tenantId)
             ->update([
-                'status' => 'failed',
+                'status' => 'suppressed',
                 'attempts' => self::MAX_SEND_ATTEMPTS,
                 'last_attempted_at' => now(),
                 'processing_batch_id' => null,
                 'processing_started_at' => null,
                 'error_message' => 'Recipient is suppressed',
             ]);
+
+        if ($row && Schema::hasTable('email_log')) {
+            $subject = $row->subject_override;
+            if ($subject === null && Schema::hasTable('newsletters')) {
+                $subject = DB::table('newsletters')
+                    ->where('id', $row->newsletter_id)
+                    ->where('tenant_id', $tenantId)
+                    ->value('subject');
+            }
+
+            DB::table('email_log')->insert([
+                'tenant_id' => $tenantId,
+                'user_id' => $row->user_id,
+                'recipient_email' => (string) $row->email,
+                'category' => 'newsletter',
+                'subject' => $subject,
+                'provider' => null,
+                'status' => 'suppressed',
+                'error' => 'Recipient is suppressed',
+                'sent_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 
     /**
@@ -1472,11 +1504,9 @@ HTML;
                 // Set correct tenant context for this newsletter's tenant
                 TenantContext::runForTenant((int) $newsletter->tenant_id, function () use ($newsletter, &$processed): void {
 
-                // Atomically claim by setting status to 'sending' AND updating
-                // last_sent_at in the SAME statement. This prevents a second runner
-                // from re-claiming after the first resets status to 'active', because
-                // last_sent_at will already be set to now() and the shouldSend check
-                // will fail on the next cycle.
+                // Atomically claim by flipping status to 'sending'. Recurring
+                // sent markers are written only after sendNow() succeeds, so
+                // retries are not hidden behind a false delivery claim.
                 $claimed = DB::table('newsletters')
                     ->where('id', $newsletter->id)
                     ->whereIn('status', ['scheduled', 'sent'])
@@ -1486,8 +1516,6 @@ HTML;
                     })
                     ->update([
                         'status' => 'sending',
-                        'recurring_last_sent' => now(),
-                        'last_recurring_sent' => now(),
                         'updated_at' => now(),
                     ]);
 
@@ -1501,13 +1529,15 @@ HTML;
                         $newsletter->target_audience ?? 'all_members',
                         $newsletter->segment_id ? (int) $newsletter->segment_id : null
                     );
-                    // Restore to 'active' for the next recurring cycle.
-                    // last_sent_at was already set during the atomic claim above.
+                    // Restore to 'scheduled' for the next recurring cycle and
+                    // record the recurring sent markers after successful send.
                     DB::table('newsletters')
                         ->where('id', $newsletter->id)
                         ->update([
                             'status' => 'scheduled',
                             'recurring_next_send' => self::nextRecurringSend($newsletter),
+                            'recurring_last_sent' => now(),
+                            'last_recurring_sent' => now(),
                             'updated_at' => now(),
                         ]);
                     $processed++;

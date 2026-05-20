@@ -244,6 +244,51 @@ class CivicDigestDispatchTest extends TestCase
         $this->assertNull($stub->getLastSentAt(self::TENANT_ID, $userId));
     }
 
+    public function test_suppressed_email_marks_delivery_claim_suppressed_without_retry_churn(): void
+    {
+        $userId = $this->makeUser('daily');
+        $email = (string) DB::table('users')->where('id', $userId)->value('email');
+
+        DB::table('email_suppression')->insert([
+            'email' => $email,
+            'reason' => 'bounce',
+            'detail' => 'test suppression',
+            'suppressed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $stub = Mockery::mock(CivicDigestService::class . '[digestForMember]', [])->makePartial();
+        $stub->shouldNotReceive('digestForMember');
+        $this->app->instance(CivicDigestService::class, $stub);
+
+        $emailMock = $this->fakeEmailDispatcher();
+        $this->app->instance(EmailDispatchService::class, $emailMock);
+
+        $exitCode = $this->artisan('caring:civic-digest-dispatch', [
+            '--cadence' => 'daily',
+            '--tenant' => self::TENANT_ID,
+        ])->run();
+
+        $this->assertSame(0, $exitCode);
+        $this->assertCount(0, $emailMock->calls);
+        $this->assertNotNull($stub->getLastSentAt(self::TENANT_ID, $userId));
+        $this->assertDatabaseHas(CivicDigestService::DELIVERY_CLAIMS_TABLE, [
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $userId,
+            'cadence' => 'daily',
+            'window_key' => $stub->deliveryWindowKey('daily'),
+            'status' => 'suppressed',
+        ]);
+        $this->assertDatabaseHas('email_log', [
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $userId,
+            'recipient_email' => $email,
+            'category' => 'civic_digest',
+            'status' => 'suppressed',
+        ]);
+    }
+
     public function test_email_failure_releases_delivery_claim_without_sent_marker(): void
     {
         $userId = $this->makeUser('daily');

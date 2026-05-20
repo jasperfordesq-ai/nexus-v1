@@ -264,6 +264,17 @@ class CivicDigestDispatch extends Command
                 continue;
             }
 
+            if ($this->isEmailSuppressed((string) ($user->email ?? ''))) {
+                $this->service->markDeliverySuppressed($tenantId, $userId, $cadence, $windowKey, [
+                    'channel' => 'email',
+                    'suppressed' => true,
+                    'reason' => 'email_suppression',
+                    'marked_at' => now()->toISOString(),
+                ]);
+                $this->recordSuppressedEmailLog($tenantId, $userId, (string) $user->email, $cadence);
+                continue;
+            }
+
             try {
                 $items = $this->service->digestForMember($tenantId, $userId, $limit);
             } catch (Throwable $e) {
@@ -343,5 +354,40 @@ class CivicDigestDispatch extends Command
         }
 
         return $stats;
+    }
+
+    private function isEmailSuppressed(string $email): bool
+    {
+        $email = strtolower(trim($email));
+        if ($email === '' || !Schema::hasTable('email_suppression')) {
+            return false;
+        }
+
+        return DB::table('email_suppression')
+            ->whereRaw('LOWER(email) = ?', [$email])
+            ->exists();
+    }
+
+    private function recordSuppressedEmailLog(int $tenantId, int $userId, string $email, string $cadence): void
+    {
+        if (!Schema::hasTable('email_log')) {
+            return;
+        }
+
+        DB::table('email_log')->insert([
+            'tenant_id' => $tenantId,
+            'user_id' => $userId,
+            'recipient_email' => $email,
+            'category' => 'civic_digest',
+            'subject' => (string) __($cadence === 'monthly' ? 'civic_digest.email.subject_monthly' : 'civic_digest.email.subject_daily', [
+                'community' => TenantContext::getName(),
+            ]),
+            'provider' => null,
+            'status' => 'suppressed',
+            'error' => 'Recipient is suppressed',
+            'sent_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }
