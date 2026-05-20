@@ -78,7 +78,7 @@ export function InstallBanner() {
     <>
       <div
         role="region"
-        aria-label={t('install.banner_aria', 'Install app banner')}
+        aria-label={t('install.banner_aria')}
         className="relative z-20 mx-3 mt-3 sm:mx-6 sm:mt-4 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 px-4 py-3 flex items-center gap-3"
         data-nosnippet
       >
@@ -87,12 +87,12 @@ export function InstallBanner() {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-theme-primary truncate">
-            {t('install.banner_title', 'Install NEXUS for faster access')}
+            {t('install.banner_title')}
           </p>
           <p className="text-xs text-theme-muted truncate">
             {state.isIosSafari
-              ? t('install.banner_sub_ios', 'Add to your home screen — works offline, no app store needed.')
-              : t('install.banner_sub', 'One tap install — works offline, no app store needed.')}
+              ? t('install.banner_sub_ios')
+              : t('install.banner_sub')}
           </p>
         </div>
         <Button
@@ -100,13 +100,13 @@ export function InstallBanner() {
           className="shrink-0 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
           onPress={onInstall}
         >
-          {t('install.cta', 'Install app')}
+          {t('install.cta')}
         </Button>
         <Button
           isIconOnly
           variant="light"
           size="sm"
-          aria-label={t('install.banner_dismiss', 'Dismiss install banner')}
+          aria-label={t('install.banner_dismiss')}
           className="shrink-0 text-theme-muted hover:text-theme-primary"
           onPress={dismiss}
         >
