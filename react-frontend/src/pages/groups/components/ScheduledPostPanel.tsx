@@ -23,6 +23,7 @@ import {
   ModalBody,
   ModalFooter,
   Spinner,
+  Tooltip,
 } from '@heroui/react';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Plus from 'lucide-react/icons/plus';
@@ -51,6 +52,20 @@ interface ScheduledPost {
 const POST_TYPES = ['discussion', 'announcement'] as const;
 const RECURRENCE_PATTERNS = ['daily', 'weekly', 'monthly'] as const;
 
+const getPostTypeKey = (type: string) => {
+  if (type === 'discussion' || type === 'announcement') {
+    return `scheduled.type_${type}`;
+  }
+  return 'scheduled.type_unknown';
+};
+
+const getRecurrencePatternKey = (pattern: string) => {
+  if (pattern === 'daily' || pattern === 'weekly' || pattern === 'monthly') {
+    return `scheduled.pattern_${pattern}`;
+  }
+  return 'scheduled.pattern_unknown';
+};
+
 export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps) {
   const { t } = useTranslation('groups');
   const toast = useToast();
@@ -77,7 +92,7 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
         setPosts(Array.isArray(payload) ? payload : []);
       }
     } catch {
-      toast.error(t('scheduled.load_failed', 'Failed to load scheduled posts'));
+      toast.error(t('scheduled.load_failed'));
     } finally {
       setLoading(false);
     }
@@ -98,7 +113,7 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
 
   const handleCreate = async () => {
     if (!formTitle.trim() || !formContent.trim() || !formScheduledAt) {
-      toast.error(t('scheduled.fields_required', 'Title, content, and date are required'));
+      toast.error(t('scheduled.fields_required'));
       return;
     }
 
@@ -117,15 +132,15 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
 
       const res = await api.post(`/v2/groups/${groupId}/scheduled-posts`, body);
       if (res.success) {
-        toast.success(t('scheduled.created', 'Post scheduled'));
+        toast.success(t('scheduled.created'));
         setModalOpen(false);
         resetForm();
         await loadPosts();
       } else {
-        toast.error(t('scheduled.create_failed', 'Failed to schedule post'));
+        toast.error(t('scheduled.create_failed'));
       }
     } catch {
-      toast.error(t('scheduled.create_failed', 'Failed to schedule post'));
+      toast.error(t('scheduled.create_failed'));
     } finally {
       setCreating(false);
     }
@@ -136,12 +151,12 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
       const res = await api.delete(`/v2/groups/${groupId}/scheduled-posts/${postId}`);
       if (res.success) {
         setPosts((prev) => prev.filter((p) => p.id !== postId));
-        toast.success(t('scheduled.cancelled', 'Scheduled post cancelled'));
+        toast.success(t('scheduled.cancelled'));
       } else {
-        toast.error(t('scheduled.cancel_failed', 'Failed to cancel scheduled post'));
+        toast.error(t('scheduled.cancel_failed'));
       }
     } catch {
-      toast.error(t('scheduled.cancel_failed', 'Failed to cancel scheduled post'));
+      toast.error(t('scheduled.cancel_failed'));
     }
   };
 
@@ -153,23 +168,24 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
   if (!isAdmin) return null;
 
   return (
-    <GlassCard className="p-5 space-y-5">
-      <div className="flex items-center justify-between">
+    <GlassCard className="space-y-5 p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <CalendarClock size={18} className="text-primary" />
           <h3 className="text-base font-semibold text-foreground">
-            {t('scheduled.title', 'Scheduled Posts')}
+            {t('scheduled.title')}
           </h3>
         </div>
 
         <Button
           size="sm"
           color="primary"
-          variant="flat"
+          variant="solid"
+          className="shrink-0"
           startContent={<Plus size={14} />}
           onPress={() => setModalOpen(true)}
         >
-          {t('scheduled.add', 'Schedule Post')}
+          {t('scheduled.add')}
         </Button>
       </div>
 
@@ -179,14 +195,14 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
         </div>
       ) : posts.length === 0 ? (
         <p className="text-sm text-default-400 text-center py-6">
-          {t('scheduled.empty', 'No scheduled posts')}
+          {t('scheduled.empty')}
         </p>
       ) : (
         <div className="space-y-3">
           {posts.map((post) => (
             <div
               key={post.id}
-              className="flex items-start gap-3 p-3 rounded-lg border border-default-200 bg-default-50"
+              className="flex items-start gap-3 rounded-lg border border-default-200 bg-content1 p-3 shadow-sm transition-colors hover:bg-default-50 dark:hover:bg-default-100/5"
             >
               <div className="flex-1 min-w-0 space-y-1">
                 <p className="text-sm font-medium text-foreground">{post.title}</p>
@@ -196,29 +212,32 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
                     variant="flat"
                     color={typeColorMap[post.post_type] ?? 'default'}
                   >
-                    {post.post_type}
+                    {t(getPostTypeKey(post.post_type))}
                   </Chip>
                   <span className="text-xs text-default-400">
                     {formatDateTime(post.scheduled_at)}
                   </span>
                   {post.is_recurring && post.recurrence_pattern && (
                     <Chip size="sm" variant="flat" color="secondary">
-                      {post.recurrence_pattern}
+                      {t(getRecurrencePatternKey(post.recurrence_pattern))}
                     </Chip>
                   )}
                 </div>
               </div>
 
-              <Button
-                size="sm"
-                variant="flat"
-                color="danger"
-                isIconOnly
-                onPress={() => handleCancel(post.id)}
-                aria-label={t('scheduled.cancel_label', 'Cancel scheduled post')}
-              >
-                <X size={14} />
-              </Button>
+              <Tooltip content={t('scheduled.cancel_label')}>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  color="danger"
+                  isIconOnly
+                  className="shrink-0"
+                  onPress={() => handleCancel(post.id)}
+                  aria-label={t('scheduled.cancel_label')}
+                >
+                  <X size={14} />
+                </Button>
+              </Tooltip>
             </div>
           ))}
         </div>
@@ -229,13 +248,13 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <CalendarClock size={20} className="text-primary" />
-            {t('scheduled.add_title', 'Schedule a Post')}
+            {t('scheduled.add_title')}
           </ModalHeader>
 
           <ModalBody>
             <div className="space-y-4">
               <Select
-                label={t('scheduled.type_label', 'Post Type')}
+                label={t('scheduled.type_label')}
                 selectedKeys={new Set([formType])}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0];
@@ -245,14 +264,14 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
               >
                 {POST_TYPES.map((type) => (
                   <SelectItem key={type}>
-                    {t(`scheduled.type_${type}`, type)}
+                    {t(`scheduled.type_${type}`)}
                   </SelectItem>
                 ))}
               </Select>
 
               <Input
-                label={t('scheduled.title_label', 'Title')}
-                placeholder={t('scheduled.title_placeholder', 'Post title')}
+                label={t('scheduled.title_label')}
+                placeholder={t('scheduled.title_placeholder')}
                 value={formTitle}
                 onValueChange={setFormTitle}
                 variant="bordered"
@@ -260,8 +279,8 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
               />
 
               <Textarea
-                label={t('scheduled.content_label', 'Content')}
-                placeholder={t('scheduled.content_placeholder', 'Post content...')}
+                label={t('scheduled.content_label')}
+                placeholder={t('scheduled.content_placeholder')}
                 value={formContent}
                 onValueChange={setFormContent}
                 minRows={3}
@@ -270,21 +289,14 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
                 isRequired
               />
 
-              <div className="space-y-1">
-                <label
-                  htmlFor="scheduled-post-datetime"
-                  className="block text-sm font-medium text-default-700"
-                >
-                  {t('scheduled.datetime_label', 'Schedule Date & Time')}
-                </label>
-                <input
-                  id="scheduled-post-datetime"
-                  type="datetime-local"
-                  value={formScheduledAt}
-                  onChange={(e) => setFormScheduledAt(e.target.value)}
-                  className="w-full rounded-lg border border-default-200 bg-default-100 px-3 py-2 text-sm text-foreground"
-                />
-              </div>
+              <Input
+                label={t('scheduled.datetime_label')}
+                type="datetime-local"
+                value={formScheduledAt}
+                onValueChange={setFormScheduledAt}
+                variant="bordered"
+                isRequired
+              />
 
               <div className="space-y-3">
                 <Switch
@@ -292,12 +304,12 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
                   onValueChange={setFormRecurring}
                   size="sm"
                 >
-                  {t('scheduled.recurring_label', 'Recurring post')}
+                  {t('scheduled.recurring_label')}
                 </Switch>
 
                 {formRecurring && (
                   <Select
-                    label={t('scheduled.pattern_label', 'Recurrence Pattern')}
+                    label={t('scheduled.pattern_label')}
                     selectedKeys={new Set([formPattern])}
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys)[0];
@@ -308,7 +320,7 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
                   >
                     {RECURRENCE_PATTERNS.map((pattern) => (
                       <SelectItem key={pattern}>
-                        {t(`scheduled.pattern_${pattern}`, pattern)}
+                        {t(`scheduled.pattern_${pattern}`)}
                       </SelectItem>
                     ))}
                   </Select>
@@ -319,14 +331,14 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
 
           <ModalFooter>
             <Button variant="flat" onPress={() => setModalOpen(false)}>
-              {t('common:cancel', 'Cancel')}
+              {t('common:cancel')}
             </Button>
             <Button
               color="primary"
               onPress={handleCreate}
               isLoading={creating}
             >
-              {t('scheduled.create_btn', 'Schedule')}
+              {t('scheduled.create_btn')}
             </Button>
           </ModalFooter>
         </ModalContent>
