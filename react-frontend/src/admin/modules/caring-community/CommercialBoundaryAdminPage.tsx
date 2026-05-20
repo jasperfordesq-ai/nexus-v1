@@ -26,6 +26,7 @@ import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import Scale from 'lucide-react/icons/scale';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Wrench from 'lucide-react/icons/wrench';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -82,13 +83,6 @@ const CLASSIFICATION_COLOR: Record<
   commercial: 'secondary',
 };
 
-const CLASSIFICATION_LABEL: Record<Classification, string> = {
-  agpl_public: 'AGPL public',
-  tenant_config: 'Tenant config',
-  private_deployment: 'Private deployment',
-  commercial: 'Commercial',
-};
-
 const CLASSIFICATION_OPTIONS: Classification[] = [
   'agpl_public',
   'tenant_config',
@@ -100,20 +94,20 @@ const CLASSIFICATION_OPTIONS: Classification[] = [
 // Helpers
 // ---------------------------------------------------------------------------
 
-function buildMarkdown(matrix: BoundaryMatrix): string {
+type AdminT = (key: string, options?: Record<string, unknown>) => string;
+
+function buildMarkdown(matrix: BoundaryMatrix, t: AdminT): string {
   const lines: string[] = [];
-  lines.push('# Commercial Boundary Map');
+  lines.push(`# ${t('commercial_boundary.meta.title')}`);
   lines.push('');
-  lines.push(
-    '_AG82 — what is AGPL public, tenant-configurable, deployment-layer, or commercial._',
-  );
+  lines.push(`_${t('commercial_boundary.meta.subtitle')}_`);
   lines.push('');
   if (matrix.last_updated_at) {
-    lines.push(`_Last updated: ${matrix.last_updated_at}_`);
+    lines.push(`_${t('commercial_boundary.export.last_updated', { date: matrix.last_updated_at })}_`);
     lines.push('');
   }
 
-  lines.push('## Classifications');
+  lines.push(`## ${t('commercial_boundary.sections.classifications')}`);
   lines.push('');
   for (const c of matrix.classifications) {
     lines.push(`- **${c.label}** (\`${c.key}\`) — ${c.description}`);
@@ -125,20 +119,20 @@ function buildMarkdown(matrix: BoundaryMatrix): string {
     if (inCat.length === 0) continue;
     lines.push(`## ${cat.label}`);
     lines.push('');
-    lines.push('| Capability | Classification | AGPL module | Default | Overridden | Notes |');
+    lines.push(`| ${t('commercial_boundary.export.capability')} | ${t('commercial_boundary.export.classification')} | ${t('commercial_boundary.export.agpl_module')} | ${t('commercial_boundary.export.default')} | ${t('commercial_boundary.export.overridden')} | ${t('commercial_boundary.export.notes')} |`);
     lines.push('|---|---|---|---|---|---|');
     for (const cap of inCat) {
-      const effective = CLASSIFICATION_LABEL[cap.effective_classification] ?? cap.effective_classification;
-      const def = CLASSIFICATION_LABEL[cap.default_classification] ?? cap.default_classification;
+      const effective = t(`commercial_boundary.classification.${cap.effective_classification}`);
+      const def = t(`commercial_boundary.classification.${cap.default_classification}`);
       const cleanNotes = (cap.notes || '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
       lines.push(
-        `| **${cap.label}** — ${cap.description.replace(/\|/g, '\\|')} | ${effective} | ${cap.agpl_module ? 'yes' : 'no'} | ${def} | ${cap.is_overridden ? 'yes' : '—'} | ${cleanNotes || '—'} |`,
+        `| **${cap.label}** — ${cap.description.replace(/\|/g, '\\|')} | ${effective} | ${cap.agpl_module ? t('commercial_boundary.export.yes') : t('commercial_boundary.export.no')} | ${def} | ${cap.is_overridden ? t('commercial_boundary.export.yes') : t('commercial_boundary.empty.value')} | ${cleanNotes || t('commercial_boundary.empty.value')} |`,
       );
     }
     lines.push('');
   }
 
-  lines.push(`_Generated ${new Date().toISOString()} from the NEXUS admin panel._`);
+  lines.push(`_${t('commercial_boundary.export.generated', { date: new Date().toISOString() })}_`);
   return lines.join('\n');
 }
 
@@ -147,7 +141,8 @@ function buildMarkdown(matrix: BoundaryMatrix): string {
 // ---------------------------------------------------------------------------
 
 export default function CommercialBoundaryAdminPage() {
-  usePageTitle('Commercial Boundary Map');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('commercial_boundary.meta.page_title'));
   const { showToast } = useToast();
 
   const [matrix, setMatrix] = useState<BoundaryMatrix | null>(null);
@@ -160,11 +155,11 @@ export default function CommercialBoundaryAdminPage() {
       const res = await api.get<BoundaryMatrix>('/v2/admin/caring-community/commercial-boundary');
       setMatrix(res.data ?? null);
     } catch {
-      showToast('Failed to load commercial boundary map', 'error');
+      showToast(t('commercial_boundary.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     load();
@@ -181,27 +176,27 @@ export default function CommercialBoundaryAdminPage() {
         setMatrix(res.data ?? null);
         showToast(
           classification === null
-            ? 'Reverted to canonical default'
-            : 'Classification updated',
+            ? t('commercial_boundary.toasts.reverted')
+            : t('commercial_boundary.toasts.updated'),
           'success',
         );
       } catch {
-        showToast('Failed to update classification', 'error');
+        showToast(t('commercial_boundary.toasts.update_failed'), 'error');
       } finally {
         setSavingKey(null);
       }
     },
-    [showToast],
+    [showToast, t],
   );
 
   const exportMarkdown = useCallback(async () => {
     try {
       const res = await api.get<BoundaryMatrix>('/v2/admin/caring-community/commercial-boundary');
       if (!res.data) {
-        showToast('Export returned empty', 'error');
+        showToast(t('commercial_boundary.toasts.export_empty'), 'error');
         return;
       }
-      const md = buildMarkdown(res.data);
+      const md = buildMarkdown(res.data, t);
       const blob = new Blob([md], { type: 'text/markdown' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -211,11 +206,11 @@ export default function CommercialBoundaryAdminPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast('Boundary map exported', 'success');
+      showToast(t('commercial_boundary.toasts.exported'), 'success');
     } catch {
-      showToast('Failed to export boundary map', 'error');
+      showToast(t('commercial_boundary.toasts.export_failed'), 'error');
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   const groupedCapabilities = useMemo(() => {
     if (!matrix) return [];
@@ -230,17 +225,17 @@ export default function CommercialBoundaryAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Commercial Boundary Map"
-        subtitle="AG82 — what is AGPL public, tenant-configurable, deployment-layer, or commercial"
+        title={t('commercial_boundary.meta.title')}
+        subtitle={t('commercial_boundary.meta.subtitle')}
         icon={<Scale size={20} />}
         actions={
           <div className="flex items-center gap-2">
             {matrix && matrix.overrides_count > 0 && (
               <Chip color="warning" variant="flat" size="sm">
-                {matrix.overrides_count} override{matrix.overrides_count === 1 ? '' : 's'}
+                {t('commercial_boundary.overrides_count', { count: matrix.overrides_count })}
               </Chip>
             )}
-            <Tooltip content="Export as Markdown">
+            <Tooltip content={t('commercial_boundary.actions.export_markdown')}>
               <Button
                 size="sm"
                 variant="flat"
@@ -248,17 +243,17 @@ export default function CommercialBoundaryAdminPage() {
                 onPress={exportMarkdown}
                 isDisabled={loading}
               >
-                Export
+                {t('commercial_boundary.actions.export')}
               </Button>
             </Tooltip>
-            <Tooltip content="Refresh data">
+            <Tooltip content={t('commercial_boundary.actions.refresh_data')}>
               <Button
                 isIconOnly
                 size="sm"
                 variant="flat"
                 onPress={load}
                 isLoading={loading}
-                aria-label="Refresh"
+                aria-label={t('commercial_boundary.actions.refresh_aria')}
               >
                 <RefreshCw size={15} />
               </Button>
@@ -272,21 +267,14 @@ export default function CommercialBoundaryAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('commercial_boundary.about.title')}</p>
               <p className="text-default-600">
-                The Commercial Boundary defines which types of paid work are permitted within the
-                community care programme and which must remain unpaid time credits. This boundary is
-                a requirement of the <Abbr term="KISS">KISS</Abbr>/<Abbr term="AGORIS">AGORIS</Abbr> methodology and must be agreed with your municipal
-                partner before the pilot launches. The matrix below lists activity categories and
-                their permitted exchange type.
+                {t('commercial_boundary.about.body_prefix')}{' '}
+                <Abbr term="KISS" />/<Abbr term="AGORIS" /> {t('commercial_boundary.about.body_suffix')}
               </p>
               <p className="text-default-600">
-                Use the per-row override to record a tenant-specific classification (for example, a
-                private deployment that has a commercial bundle). Overrides are stored in tenant
-                settings only — they never alter the canonical public classification shipped with the
-                <Abbr term="AGPL">AGPL</Abbr> repo. Once you confirm the boundary matrix, the agreement is recorded with a
-                timestamp and your user ID, forming part of the pilot governance documentation that
-                appears in the Pilot Launch Readiness check.
+                {t('commercial_boundary.about.override_prefix')}{' '}
+                <Abbr term="AGPL" /> {t('commercial_boundary.about.override_suffix')}
               </p>
             </div>
           </div>
@@ -306,7 +294,7 @@ export default function CommercialBoundaryAdminPage() {
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
               <ShieldCheck size={16} className="text-primary" />
-              <span className="font-semibold text-sm">Classifications</span>
+              <span className="font-semibold text-sm">{t('commercial_boundary.sections.classifications')}</span>
             </div>
           </CardHeader>
           <CardBody className="pt-0">
@@ -359,6 +347,7 @@ export default function CommercialBoundaryAdminPage() {
                     saving={savingKey === cap.key}
                     onChange={(cls) => setClassification(cap.key, cls)}
                     onReset={() => setClassification(cap.key, null)}
+                    t={t}
                   />
                 ))}
               </div>
@@ -379,9 +368,10 @@ interface CapabilityRowProps {
   saving: boolean;
   onChange: (classification: Classification) => void;
   onReset: () => void;
+  t: AdminT;
 }
 
-function CapabilityRow({ capability, saving, onChange, onReset }: CapabilityRowProps) {
+function CapabilityRow({ capability, saving, onChange, onReset, t }: CapabilityRowProps) {
   const effective = capability.effective_classification;
 
   return (
@@ -391,11 +381,11 @@ function CapabilityRow({ capability, saving, onChange, onReset }: CapabilityRowP
           <div className="flex flex-wrap items-center gap-2 mb-1">
             <span className="font-semibold text-sm text-foreground">{capability.label}</span>
             <Chip color={CLASSIFICATION_COLOR[effective]} variant="flat" size="sm">
-              {CLASSIFICATION_LABEL[effective]}
+              {t(`commercial_boundary.classification.${effective}`)}
             </Chip>
             {capability.is_overridden && (
               <Chip color="warning" variant="flat" size="sm">
-                Overridden
+                {t('commercial_boundary.labels.overridden')}
               </Chip>
             )}
             {capability.agpl_module ? (
@@ -405,11 +395,11 @@ function CapabilityRow({ capability, saving, onChange, onReset }: CapabilityRowP
                 size="sm"
                 startContent={<ShieldCheck size={10} />}
               >
-                <Abbr term="AGPL">AGPL</Abbr> module
+                <Abbr term="AGPL" /> {t('commercial_boundary.labels.module')}
               </Chip>
             ) : (
               <Chip color="secondary" variant="dot" size="sm" startContent={<Wrench size={10} />}>
-                Out-of-tree
+                {t('commercial_boundary.labels.out_of_tree')}
               </Chip>
             )}
           </div>
@@ -418,9 +408,9 @@ function CapabilityRow({ capability, saving, onChange, onReset }: CapabilityRowP
             <p className="mt-1 text-xs text-default-500 italic">{capability.notes}</p>
           )}
           <p className="mt-2 text-xs text-default-500">
-            Canonical default:{' '}
+            {t('commercial_boundary.labels.canonical_default')}{' '}
             <span className="font-medium">
-              {CLASSIFICATION_LABEL[capability.default_classification]}
+              {t(`commercial_boundary.classification.${capability.default_classification}`)}
             </span>
           </p>
         </div>
@@ -428,7 +418,7 @@ function CapabilityRow({ capability, saving, onChange, onReset }: CapabilityRowP
         <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
           <Select
             size="sm"
-            label="Set classification"
+            label={t('commercial_boundary.fields.set_classification')}
             selectedKeys={[effective]}
             onChange={(e) => {
               const next = e.target.value as Classification;
@@ -438,17 +428,17 @@ function CapabilityRow({ capability, saving, onChange, onReset }: CapabilityRowP
             }}
             isDisabled={saving}
             className="min-w-[200px]"
-            aria-label={`Classification for ${capability.label}`}
+            aria-label={t('commercial_boundary.fields.classification_aria', { label: capability.label })}
           >
             {CLASSIFICATION_OPTIONS.map((opt) => (
               <SelectItem key={opt}>
-                {CLASSIFICATION_LABEL[opt]}
+                {t(`commercial_boundary.classification.${opt}`)}
               </SelectItem>
             ))}
           </Select>
 
           {capability.is_overridden && (
-            <Tooltip content="Reset to canonical default">
+            <Tooltip content={t('commercial_boundary.actions.reset_default')}>
               <Button
                 size="sm"
                 variant="flat"
@@ -456,7 +446,7 @@ function CapabilityRow({ capability, saving, onChange, onReset }: CapabilityRowP
                 isIconOnly
                 onPress={onReset}
                 isLoading={saving}
-                aria-label="Reset to default"
+                aria-label={t('commercial_boundary.actions.reset_default_aria')}
               >
                 <RotateCcw size={14} />
               </Button>
@@ -467,7 +457,7 @@ function CapabilityRow({ capability, saving, onChange, onReset }: CapabilityRowP
 
       <Divider className="mt-3" />
       <p className="mt-2 text-[10px] uppercase tracking-wide text-default-400">
-        Key: <code>{capability.key}</code>
+        {t('commercial_boundary.labels.key')}: <code>{capability.key}</code>
       </p>
     </div>
   );

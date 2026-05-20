@@ -3692,6 +3692,74 @@
       "revoke_failed": "Failed to revoke verification"
     }
   },
+  "commercial_boundary": {
+    "meta": {
+      "page_title": "Commercial Boundary Map",
+      "title": "Commercial Boundary Map",
+      "subtitle": "AG82 - what is AGPL public, tenant-configurable, deployment-layer, or commercial"
+    },
+    "actions": {
+      "export_markdown": "Export as Markdown",
+      "export": "Export",
+      "refresh_data": "Refresh data",
+      "refresh_aria": "Refresh commercial boundary map",
+      "reset_default": "Reset to canonical default",
+      "reset_default_aria": "Reset to default"
+    },
+    "overrides_count": "{{count}} override",
+    "overrides_count_plural": "{{count}} overrides",
+    "about": {
+      "title": "About this page",
+      "body_prefix": "The Commercial Boundary defines which types of paid work are permitted within the community care programme and which must remain unpaid time credits. This boundary is a requirement of the",
+      "body_suffix": "methodology and must be agreed with your municipal partner before the pilot launches. The matrix below lists activity categories and their permitted exchange type.",
+      "override_prefix": "Use the per-row override to record a tenant-specific classification (for example, a private deployment that has a commercial bundle). Overrides are stored in tenant settings only - they never alter the canonical public classification shipped with the",
+      "override_suffix": "repo. Once you confirm the boundary matrix, the agreement is recorded with a timestamp and your user ID, forming part of the pilot governance documentation that appears in the Pilot Launch Readiness check."
+    },
+    "sections": {
+      "classifications": "Classifications"
+    },
+    "classification": {
+      "agpl_public": "AGPL public",
+      "tenant_config": "Tenant config",
+      "private_deployment": "Private deployment",
+      "commercial": "Commercial"
+    },
+    "labels": {
+      "overridden": "Overridden",
+      "module": "module",
+      "out_of_tree": "Out-of-tree",
+      "canonical_default": "Canonical default:",
+      "key": "Key"
+    },
+    "fields": {
+      "set_classification": "Set classification",
+      "classification_aria": "Classification for {{label}}"
+    },
+    "export": {
+      "last_updated": "Last updated: {{date}}",
+      "capability": "Capability",
+      "classification": "Classification",
+      "agpl_module": "AGPL module",
+      "default": "Default",
+      "overridden": "Overridden",
+      "notes": "Notes",
+      "yes": "yes",
+      "no": "no",
+      "generated": "Generated {{date}} from the NEXUS admin panel."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Failed to load commercial boundary map",
+      "reverted": "Reverted to canonical default",
+      "updated": "Classification updated",
+      "update_failed": "Failed to update classification",
+      "export_empty": "Export returned empty",
+      "exported": "Boundary map exported",
+      "export_failed": "Failed to export boundary map"
+    }
+  },
   "federation_peers_admin": {
     "meta": {
       "page_title": "Federation Peers - Admin",
