@@ -23,6 +23,7 @@ import {
 } from '@heroui/react';
 import Bell from 'lucide-react/icons/bell';
 import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
 import { useTranslation } from 'react-i18next';
 
@@ -65,8 +66,8 @@ export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotifi
             push_enabled: data.push_enabled ?? true,
           });
         }
-      } catch {
-        // Use defaults if prefs haven't been set yet
+      } catch (err) {
+        logError('GroupNotificationPrefs.loadPrefs', err);
       } finally {
         setLoading(false);
       }
@@ -80,13 +81,14 @@ export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotifi
     try {
       const res = await api.put(`/v2/groups/${groupId}/notification-prefs`, prefs);
       if (res.success) {
-        toast.success(t('notifications.prefs_saved', 'Notification preferences saved'));
+        toast.success(t('notifications.prefs_saved'));
         onClose();
       } else {
-        toast.error(t('notifications.prefs_save_failed', 'Failed to save preferences'));
+        toast.error(t('notifications.prefs_save_failed'));
       }
-    } catch {
-      toast.error(t('notifications.prefs_save_failed', 'Failed to save preferences'));
+    } catch (err) {
+      logError('GroupNotificationPrefs.handleSave', err);
+      toast.error(t('notifications.prefs_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -96,8 +98,8 @@ export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotifi
     <Modal isOpen={isOpen} onClose={onClose} size="md">
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
-          <Bell size={20} className="text-primary" />
-          {t('notifications.prefs_title', 'Notification Preferences')}
+          <Bell size={20} className="text-primary" aria-hidden="true" />
+          {t('notifications.prefs_title')}
         </ModalHeader>
 
         <ModalBody>
@@ -108,20 +110,20 @@ export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotifi
           ) : (
             <div className="space-y-6">
               <RadioGroup
-                label={t('notifications.frequency_label', 'Notification Frequency')}
+                label={t('notifications.frequency_label')}
                 value={prefs.frequency}
                 onValueChange={(value) =>
                   setPrefs((prev) => ({ ...prev, frequency: value as NotificationPrefs['frequency'] }))
                 }
               >
                 <Radio value="instant">
-                  {t('notifications.frequency_instant', 'Instant')}
+                  {t('notifications.frequency_instant')}
                 </Radio>
                 <Radio value="digest">
-                  {t('notifications.frequency_digest', 'Digest')}
+                  {t('notifications.frequency_digest')}
                 </Radio>
                 <Radio value="muted">
-                  {t('notifications.frequency_muted', 'Muted')}
+                  {t('notifications.frequency_muted')}
                 </Radio>
               </RadioGroup>
 
@@ -132,7 +134,7 @@ export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotifi
                     setPrefs((prev) => ({ ...prev, email_enabled: checked }))
                   }
                 >
-                  {t('notifications.email_enabled', 'Email notifications')}
+                  {t('notifications.email_enabled')}
                 </Switch>
 
                 <Switch
@@ -141,7 +143,7 @@ export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotifi
                     setPrefs((prev) => ({ ...prev, push_enabled: checked }))
                   }
                 >
-                  {t('notifications.push_enabled', 'Push notifications')}
+                  {t('notifications.push_enabled')}
                 </Switch>
               </div>
             </div>
@@ -150,7 +152,7 @@ export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotifi
 
         <ModalFooter>
           <Button variant="flat" onPress={onClose}>
-            {t('common:cancel', 'Cancel')}
+            {t('common:cancel')}
           </Button>
           <Button
             color="primary"
@@ -158,7 +160,7 @@ export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotifi
             isLoading={saving}
             isDisabled={loading}
           >
-            {t('common:save', 'Save')}
+            {t('common:save')}
           </Button>
         </ModalFooter>
       </ModalContent>
