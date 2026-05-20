@@ -81,6 +81,7 @@ function StarRating({ rating, size = 16, interactive, onChange }: {
   size?: number;
   interactive?: boolean;
   onChange?: (r: number) => void;
+  getStarLabel?: (rating: number) => string;
 }) {
   return (
     <span className="inline-flex gap-0.5">
@@ -90,15 +91,44 @@ function StarRating({ rating, size = 16, interactive, onChange }: {
           size={size}
           className={`${v <= rating ? 'text-warning fill-warning' : 'text-default-300'} ${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`}
           onClick={interactive && onChange ? () => onChange(v) : undefined}
-          aria-label={interactive ? `${v} star${v > 1 ? 's' : ''}` : undefined}
+          aria-label={interactive && getStarLabel ? getStarLabel(v) : undefined}
         />
       ))}
     </span>
   );
 }
 
+function formatSalaryRange(
+  min: number | null,
+  max: number | null,
+  currency: string | null,
+  locale: string,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string {
+  const currencyCode = currency && /^[A-Z]{3}$/.test(currency) ? currency : t('salary.currency_eur');
+  const formatter = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currencyCode,
+    maximumFractionDigits: 0,
+  });
+
+  if (min && max) {
+    return t('salary_display', { min: formatter.format(min), max: formatter.format(max) });
+  }
+
+  if (min) {
+    return t('salary.min_only', { min: formatter.format(min) });
+  }
+
+  if (max) {
+    return t('salary.max_only', { max: formatter.format(max) });
+  }
+
+  return '';
+}
+
 export function EmployerBrandPage() {
-  const { t } = useTranslation('jobs');
+  const { t, i18n } = useTranslation('jobs');
   const { userId } = useParams<{ userId: string }>();
   const { tenantPath } = useTenant();
   const { user, isAuthenticated } = useAuth();
@@ -123,7 +153,7 @@ export function EmployerBrandPage() {
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [hasReviewed, setHasReviewed] = useState(false);
 
-  usePageTitle(employer?.name ?? t('employer.page_title', 'Employer Profile'));
+  usePageTitle(employer?.name ?? t('employer.page_title'));
 
   const loadReviews = useCallback(async () => {
     if (!userId) return;
@@ -166,11 +196,11 @@ export function EmployerBrandPage() {
         setReviewComment('');
         loadReviews();
       } else {
-        setReviewError((res as { error?: string }).error ?? t('employer.review_submit_failed', { defaultValue: 'Failed to submit review' }));
+        setReviewError((res as { error?: string }).error ?? t('employer.review_submit_failed'));
       }
     } catch (err) {
       logError('EmployerBrandPage: review submit failed', err);
-      setReviewError(t('employer.review_submit_failed', { defaultValue: 'Failed to submit review' }));
+      setReviewError(t('employer.review_submit_failed'));
     } finally {
       setSubmittingReview(false);
     }
@@ -199,7 +229,7 @@ export function EmployerBrandPage() {
       if (jobList.length > 0) {
         setEmployer({
           id: parseInt(userId),
-          name: t('employer.employer_jobs', 'Employer Jobs'),
+          name: t('employer.employer_jobs'),
           avatar_url: null,
           tagline: null,
           company_size: null,
@@ -209,7 +239,7 @@ export function EmployerBrandPage() {
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('EmployerBrandPage: load failed', err);
-      setError(t('employer.error', 'Unable to load employer profile'));
+      setError(t('employer.error'));
     } finally {
       setIsLoading(false);
     }
@@ -237,10 +267,12 @@ export function EmployerBrandPage() {
       <PageMeta
         title={employer?.name ?? t('page_meta.employer_brand.title')}
         description={t('employer.meta_description', { count: jobs.length })}
+        image={employer?.avatar_url ?? undefined}
+        type="profile"
       />
       <Breadcrumbs items={[
-        { label: t('nav.jobs', 'Jobs'), href: '/jobs' },
-        { label: employer?.name ?? t('employer.page_title', 'Employer') },
+        { label: t('nav.jobs'), href: '/jobs' },
+        { label: employer?.name ?? t('employer.page_title') },
       ]} />
 
       {/* Employer header */}
@@ -260,11 +292,11 @@ export function EmployerBrandPage() {
             <div className="flex flex-wrap gap-2 mt-2">
               {employer?.company_size && (
                 <Chip size="sm" variant="flat" startContent={<Building2 size={12} />}>
-                  {t('employer.employees', '{{size}} employees', { size: employer.company_size })}
+                  {t('employer.employees', { size: employer.company_size })}
                 </Chip>
               )}
               <Chip size="sm" variant="flat" color="primary" startContent={<Briefcase size={12} />}>
-                {jobs.length} {t('employer.open_roles', 'open roles')}
+                {t('employer.open_roles_count', { count: jobs.length })}
               </Chip>
             </div>
           </div>
@@ -274,12 +306,12 @@ export function EmployerBrandPage() {
       {/* Job listings */}
       <div className="space-y-3">
         <h2 className="text-base font-semibold text-theme-primary px-1">
-          {t('employer.open_roles_heading', 'Open Roles')}
+          {t('employer.open_roles_heading')}
         </h2>
         {jobs.length === 0 ? (
           <GlassCard className="p-8 text-center">
             <Briefcase size={32} className="mx-auto text-theme-muted mb-2" />
-            <p className="text-theme-muted">{t('employer.no_roles', 'No open roles at this time')}</p>
+            <p className="text-theme-muted">{t('employer.no_roles')}</p>
           </GlassCard>
         ) : (
           <motion.div
@@ -294,11 +326,11 @@ export function EmployerBrandPage() {
                 variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
               >
                 <GlassCard className="p-4">
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex-1 min-w-0">
                       <Link
                         to={tenantPath(`/jobs/${job.id}`)}
-                        className="font-semibold text-theme-primary hover:text-primary transition-colors line-clamp-1"
+                        className="font-semibold text-theme-primary hover:text-primary transition-colors line-clamp-2"
                       >
                         {job.title}
                       </Link>
@@ -306,7 +338,7 @@ export function EmployerBrandPage() {
                         {job.is_remote ? (
                           <span className="flex items-center gap-1">
                             <Wifi size={11} aria-hidden="true" />
-                            {t('remote', 'Remote')}
+                            {t('remote')}
                           </span>
                         ) : job.location ? (
                           <span className="flex items-center gap-1">
@@ -315,24 +347,22 @@ export function EmployerBrandPage() {
                           </span>
                         ) : null}
                         <Chip size="sm" variant="flat">
-                          {t(`commitment.${job.commitment}`, job.commitment)}
+                          {t(`commitment.${job.commitment}`)}
                         </Chip>
                         <Chip
                           size="sm"
                           variant="flat"
                           color={job.type === 'paid' ? 'primary' : job.type === 'volunteer' ? 'success' : 'secondary'}
                         >
-                          {t(`type.${job.type}`, job.type)}
+                          {t(`type.${job.type}`)}
                         </Chip>
                         {(job.salary_min || job.salary_max) && (
                           <span>
-                            {job.salary_currency ?? '\u20ac'}
-                            {job.salary_min?.toLocaleString()}
-                            {job.salary_max ? ` \u2013 ${job.salary_max.toLocaleString()}` : '+'}
+                            {formatSalaryRange(job.salary_min, job.salary_max, job.salary_currency, i18n.language, t)}
                           </span>
                         )}
                         {job.salary_negotiable && !job.salary_min && (
-                          <span>{t('salary.negotiable', 'Negotiable')}</span>
+                          <span>{t('salary.negotiable')}</span>
                         )}
                       </div>
                       {job.benefits && job.benefits.length > 0 && (
@@ -349,9 +379,10 @@ export function EmployerBrandPage() {
                       size="sm"
                       variant="flat"
                       color="primary"
+                      className="w-full sm:w-auto"
                       endContent={<ChevronRight size={14} />}
                     >
-                      {t('apply.view', 'View')}
+                      {t('apply.view')}
                     </Button>
                   </div>
                 </GlassCard>
@@ -365,7 +396,7 @@ export function EmployerBrandPage() {
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <h2 className="text-base font-semibold text-theme-primary">
-            {t('employer.reviews_heading', 'Employer Reviews')}
+            {t('employer.reviews_heading')}
           </h2>
           {isAuthenticated && !hasReviewed && !showReviewForm && (
             <Button
@@ -375,7 +406,7 @@ export function EmployerBrandPage() {
               startContent={<MessageSquare size={14} />}
               onPress={() => setShowReviewForm(true)}
             >
-              {t('employer.leave_review', 'Leave a Review')}
+              {t('employer.leave_review')}
             </Button>
           )}
         </div>
@@ -391,7 +422,7 @@ export function EmployerBrandPage() {
                 </span>
                 <StarRating rating={Math.round(reviewStats.average_rating ?? 0)} size={18} />
                 <span className="text-xs text-theme-muted">
-                  {reviewStats.total_reviews} {t('employer.reviews_count', 'reviews')}
+                  {t('employer.reviews_count', { count: reviewStats.total_reviews })}
                 </span>
               </div>
               {/* Distribution */}
@@ -408,7 +439,7 @@ export function EmployerBrandPage() {
                         value={pct}
                         color="warning"
                         className="flex-1"
-                        aria-label={`${star} star${star > 1 ? 's' : ''}: ${count}`}
+                        aria-label={t('employer.star_distribution', { count, star })}
                       />
                       <span className="w-6 text-right text-theme-muted">{count}</span>
                     </div>
@@ -423,7 +454,7 @@ export function EmployerBrandPage() {
         {showReviewForm && (
           <GlassCard className="p-5 space-y-4">
             <h3 className="text-sm font-semibold text-theme-primary">
-              {t('employer.write_review', 'Write a Review')}
+              {t('employer.write_review')}
             </h3>
 
             {reviewError && (
@@ -433,15 +464,21 @@ export function EmployerBrandPage() {
             {/* Overall rating */}
             <div>
               <label className="text-xs font-medium text-theme-secondary mb-1 block">
-                {t('employer.overall_rating', 'Overall Rating')}
+                {t('employer.overall_rating')}
               </label>
-              <StarRating rating={reviewRating} size={24} interactive onChange={setReviewRating} />
+              <StarRating
+                rating={reviewRating}
+                size={24}
+                interactive
+                onChange={setReviewRating}
+                getStarLabel={(value) => t('employer.star_option', { count: value })}
+              />
             </div>
 
             {/* Dimension sliders */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Slider
-                label={t('employer.dim_respect', 'Respect')}
+                label={t('employer.dim_respect')}
                 step={1}
                 minValue={1}
                 maxValue={5}
@@ -453,7 +490,7 @@ export function EmployerBrandPage() {
                 marks={[{ value: 1, label: '1' }, { value: 3, label: '3' }, { value: 5, label: '5' }]}
               />
               <Slider
-                label={t('employer.dim_communication', 'Communication')}
+                label={t('employer.dim_communication')}
                 step={1}
                 minValue={1}
                 maxValue={5}
@@ -465,7 +502,7 @@ export function EmployerBrandPage() {
                 marks={[{ value: 1, label: '1' }, { value: 3, label: '3' }, { value: 5, label: '5' }]}
               />
               <Slider
-                label={t('employer.dim_flexibility', 'Flexibility')}
+                label={t('employer.dim_flexibility')}
                 step={1}
                 minValue={1}
                 maxValue={5}
@@ -477,7 +514,7 @@ export function EmployerBrandPage() {
                 marks={[{ value: 1, label: '1' }, { value: 3, label: '3' }, { value: 5, label: '5' }]}
               />
               <Slider
-                label={t('employer.dim_impact', 'Community Impact')}
+                label={t('employer.dim_impact')}
                 step={1}
                 minValue={1}
                 maxValue={5}
@@ -492,8 +529,8 @@ export function EmployerBrandPage() {
 
             {/* Comment */}
             <Textarea
-              label={t('employer.review_comment', 'Comment')}
-              placeholder={t('employer.review_comment_placeholder', 'Share your experience working with this employer...')}
+              label={t('employer.review_comment')}
+              placeholder={t('employer.review_comment_placeholder')}
               value={reviewComment}
               onValueChange={setReviewComment}
               variant="bordered"
@@ -508,7 +545,7 @@ export function EmployerBrandPage() {
                 variant="flat"
                 onPress={() => { setShowReviewForm(false); setReviewError(null); }}
               >
-                {t('common:cancel', 'Cancel')}
+                {t('cancel')}
               </Button>
               <Button
                 size="sm"
@@ -517,7 +554,7 @@ export function EmployerBrandPage() {
                 isLoading={submittingReview}
                 onPress={submitReview}
               >
-                {t('employer.submit_review', 'Submit Review')}
+                {t('employer.submit_review')}
               </Button>
             </div>
           </GlassCard>
@@ -527,7 +564,7 @@ export function EmployerBrandPage() {
         {reviews.length === 0 && !showReviewForm ? (
           <GlassCard className="p-8 text-center">
             <Star size={32} className="mx-auto text-theme-muted mb-2" />
-            <p className="text-theme-muted">{t('employer.no_reviews', 'No reviews yet')}</p>
+            <p className="text-theme-muted">{t('employer.no_reviews')}</p>
           </GlassCard>
         ) : (
           <motion.div
@@ -552,11 +589,11 @@ export function EmployerBrandPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-semibold text-theme-primary">
-                          {review.reviewer?.name ?? t('employer.anonymous', 'Anonymous')}
+                          {review.reviewer?.name ?? t('employer.anonymous')}
                         </span>
                         <StarRating rating={review.rating} size={13} />
                         <span className="text-xs text-theme-muted">
-                          {review.created_at ? new Date(review.created_at).toLocaleDateString() : ''}
+                          {review.created_at ? new Intl.DateTimeFormat(i18n.language).format(new Date(review.created_at)) : ''}
                         </span>
                       </div>
                       {review.comment && (
