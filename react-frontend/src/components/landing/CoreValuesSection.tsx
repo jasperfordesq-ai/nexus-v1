@@ -39,27 +39,18 @@ export function CoreValuesSection({ content }: CoreValuesSectionProps) {
         }))
       : [
           {
-            title: t('home.why_timebanking.values.0.title', 'Equal Value'),
-            description: t(
-              'home.why_timebanking.values.0.description',
-              "Every hour is worth the same. Whether you're teaching piano or mowing lawns, your time has equal value.",
-            ),
+            title: t('home.why_timebanking.values.0.title'),
+            description: t('home.why_timebanking.values.0.description'),
             gradient: 'from-indigo-500 to-blue-500',
           },
           {
-            title: t('home.why_timebanking.values.1.title', 'Build Trust'),
-            description: t(
-              'home.why_timebanking.values.1.description',
-              'Reviews and ratings help you find reliable community members and build your reputation in the community.',
-            ),
+            title: t('home.why_timebanking.values.1.title'),
+            description: t('home.why_timebanking.values.1.description'),
             gradient: 'from-purple-500 to-pink-500',
           },
           {
-            title: t('home.why_timebanking.values.2.title', 'Stay Local'),
-            description: t(
-              'home.why_timebanking.values.2.description',
-              'Connect with neighbours and strengthen your local community through meaningful skill exchanges.',
-            ),
+            title: t('home.why_timebanking.values.2.title'),
+            description: t('home.why_timebanking.values.2.description'),
             gradient: 'from-cyan-500 to-teal-500',
           },
         ];

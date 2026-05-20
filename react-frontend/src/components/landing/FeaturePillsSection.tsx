@@ -37,18 +37,18 @@ export function FeaturePillsSection({ content }: FeaturePillsSectionProps) {
       : [
           {
             Icon: Clock,
-            title: t('home.features.0.title', 'Time Credits'),
-            description: t('home.features.0.description', 'Exchange skills using time as currency'),
+            title: t('home.features.0.title'),
+            description: t('home.features.0.description'),
           },
           {
             Icon: Users,
-            title: t('home.features.1.title', 'Community'),
-            description: t('home.features.1.description', 'Connect with neighbours offering help'),
+            title: t('home.features.1.title'),
+            description: t('home.features.1.description'),
           },
           {
             Icon: Zap,
-            title: t('home.features.2.title', 'Instant'),
-            description: t('home.features.2.description', 'Quick and seamless transactions'),
+            title: t('home.features.2.title'),
+            description: t('home.features.2.description'),
           },
         ];
 
