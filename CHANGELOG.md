@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.5.1] - 2026-05-20
+
 ### Fixed
 
 - **Proximity regression guard tests added for listings, events, and members.** Three new integration tests assert that a listing/event/member at Cork coordinates (~258 km from Dublin) is excluded from a 10 km Dublin-centred radius search. These would have caught every recurrence of the proximity filter being silently ignored. Also fixed: `ListingService::countAll()` proximity subquery had a binding-order bug — `mergeBindings()` placed WHERE-clause values before SELECT bindings, causing MariaDB to evaluate `cos(radians('active'))` as the latitude. Replaced with a raw `DB::selectOne()` query using explicit ordered bindings.
@@ -634,6 +638,7 @@ For the people behind the project, see [CONTRIBUTORS.md](CONTRIBUTORS.md) — th
 
 ---
 
-[Unreleased]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.1...HEAD
+[1.5.1]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.0-rc.1...v1.5.0
 [1.5.0-rc.1]: https://github.com/jasperfordesq-ai/nexus-v1/releases/tag/v1.5.0-rc.1
