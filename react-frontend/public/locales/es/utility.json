@@ -58,7 +58,9 @@
     "faq_cat_5_a_2": "Sí, puedes eliminar tu cuenta desde Configuración. Esta acción es permanente y eliminará tu perfil, anuncios e historial de transacciones. Contacta con tu coordinador comunitario si necesitas ayuda.",
     "still_need_help": "¿Aún necesitas ayuda?",
     "still_need_help_description": "¿No encuentras lo que buscas? Nuestro equipo está aquí para ayudarte.",
-    "contact_support": "Contactar Soporte"
+    "contact_support": "Contactar Soporte",
+    "load_error_title": "No se pudieron cargar las FAQ",
+    "load_error_description": "Actualiza la pagina o contacta con soporte."
   },
   "resources": {
     "page_title": "Recursos",

@@ -58,7 +58,9 @@
     "faq_cat_5_a_2": "Oui, vous pouvez supprimer votre compte depuis les Paramètres. Cette action est définitive et supprimera votre profil, vos annonces et votre historique de transactions. Contactez le coordinateur de votre communauté si vous avez besoin d'aide.",
     "still_need_help": "Besoin d'aide supplémentaire ?",
     "still_need_help_description": "Vous ne trouvez pas ce que vous cherchez ? Notre équipe est là pour vous aider.",
-    "contact_support": "Contacter le support"
+    "contact_support": "Contacter le support",
+    "load_error_title": "Impossible de charger les FAQ",
+    "load_error_description": "Actualisez la page ou contactez le support."
   },
   "resources": {
     "page_title": "Ressources",

@@ -58,7 +58,9 @@
     "faq_cat_5_a_2": "Ja, Sie können Ihr Konto in den Einstellungen löschen. Diese Aktion ist dauerhaft und entfernt Ihr Profil, Ihre Inserate und Ihren Transaktionsverlauf. Wenden Sie sich an Ihren Gemeinschaftskoordinator, wenn Sie Hilfe benötigen.",
     "still_need_help": "Brauchen Sie noch Hilfe?",
     "still_need_help_description": "Sie finden nicht, was Sie suchen? Unser Team hilft Ihnen gerne.",
-    "contact_support": "Support kontaktieren"
+    "contact_support": "Support kontaktieren",
+    "load_error_title": "FAQs konnten nicht geladen werden",
+    "load_error_description": "Bitte aktualisieren Sie die Seite oder kontaktieren Sie den Support."
   },
   "resources": {
     "page_title": "Ressourcen",

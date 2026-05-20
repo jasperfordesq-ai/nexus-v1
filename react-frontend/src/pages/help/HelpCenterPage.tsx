@@ -106,7 +106,7 @@ export function HelpCenterPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-1 sm:px-0">
-      <PageMeta title={t('help.page_title', { defaultValue: 'Help Center' })} description={t('help.meta_description', { defaultValue: 'Find answers, guides, and support for using the platform.' })} />
+      <PageMeta title={t('help.page_title')} description={t('help.meta_description')} />
       <PublicPageHero
         eyebrow={t('help.hero_eyebrow')}
         title={t('help.heading')}
@@ -150,10 +150,10 @@ export function HelpCenterPage() {
         transition={{ delay: 0.1 }}
         className="grid grid-cols-2 sm:grid-cols-4 gap-3"
       >
-        {hasListings && <QuickLink to={tenantPath('/listings')} icon={<BookOpen />} label={t('help.quick_browse_listings')} />}
-        {hasWallet && <QuickLink to={tenantPath('/wallet')} icon={<Wallet />} label={t('help.quick_my_wallet')} />}
-        {hasEvents && <QuickLink to={tenantPath('/events')} icon={<Calendar />} label={t('help.quick_events')} />}
-        <QuickLink to={tenantPath('/contact')} icon={<MessageSquare />} label={t('help.quick_contact_us')} />
+        {hasListings && <QuickLink to={tenantPath('/listings')} icon={<BookOpen aria-hidden="true" />} label={t('help.quick_browse_listings')} />}
+        {hasWallet && <QuickLink to={tenantPath('/wallet')} icon={<Wallet aria-hidden="true" />} label={t('help.quick_my_wallet')} />}
+        {hasEvents && <QuickLink to={tenantPath('/events')} icon={<Calendar aria-hidden="true" />} label={t('help.quick_events')} />}
+        <QuickLink to={tenantPath('/contact')} icon={<MessageSquare aria-hidden="true" />} label={t('help.quick_contact_us')} />
       </motion.div>
 
       {/* FAQ Categories */}
@@ -176,10 +176,10 @@ export function HelpCenterPage() {
           <GlassCard className="p-8 text-center">
             <HelpCircle className="w-12 h-12 text-theme-subtle mx-auto mb-4 opacity-50" aria-hidden="true" />
             <h2 className="text-lg font-semibold text-theme-primary mb-2">
-              {t('help.load_error_title', 'Could not load FAQs')}
+              {t('help.load_error_title')}
             </h2>
             <p className="text-theme-muted">
-              {t('help.load_error_description', 'Please try refreshing the page or contact support.')}
+              {t('help.load_error_description')}
             </p>
           </GlassCard>
         )}

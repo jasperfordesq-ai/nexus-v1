@@ -58,7 +58,9 @@
     "faq_cat_5_a_2": "はい、設定からアカウントを削除できます。この操作は永久的で、あなたのプロフィール、リスティング、取引履歴が削除されます。助けが必要な場合は、コミュニティコーディネーターに連絡してください。",
     "still_need_help": "まだ助けが必要ですか？",
     "still_need_help_description": "探しているものが見つかりませんか？私たちのチームがサポートします。",
-    "contact_support": "サポートに連絡する"
+    "contact_support": "サポートに連絡する",
+    "load_error_title": "Could not load FAQs",
+    "load_error_description": "Please try refreshing the page or contact support."
   },
   "resources": {
     "page_title": "Resources",

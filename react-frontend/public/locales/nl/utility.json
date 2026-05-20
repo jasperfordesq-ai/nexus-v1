@@ -58,7 +58,9 @@
     "faq_cat_5_a_2": "Ja, je kunt je account verwijderen vanuit Instellingen. Deze actie is permanent en verwijdert je profiel, aanbiedingen en transactiegeschiedenis. Neem contact op met je gemeenschapscoördinator als je hulp nodig hebt.",
     "still_need_help": "Heb je nog hulp nodig?",
     "still_need_help_description": "Kun je niet vinden wat je zoekt? Ons team staat klaar om te helpen.",
-    "contact_support": "Neem contact op met Ondersteuning"
+    "contact_support": "Neem contact op met Ondersteuning",
+    "load_error_title": "FAQ kan niet worden geladen",
+    "load_error_description": "Vernieuw de pagina of neem contact op met support."
   },
   "resources": {
     "page_title": "Resources",

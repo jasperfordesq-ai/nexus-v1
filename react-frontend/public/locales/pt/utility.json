@@ -58,7 +58,9 @@
     "faq_cat_5_a_2": "Sim, pode eliminar a sua conta nas Definições. Esta ação é permanente e removerá o seu perfil, anúncios e histórico de transações. Contacte o coordenador da sua comunidade se precisar de ajuda.",
     "still_need_help": "Ainda precisa de ajuda?",
     "still_need_help_description": "Não encontra o que procura? A nossa equipa está aqui para ajudar.",
-    "contact_support": "Contactar Suporte"
+    "contact_support": "Contactar Suporte",
+    "load_error_title": "Nao foi possivel carregar as FAQ",
+    "load_error_description": "Atualize a pagina ou contacte o suporte."
   },
   "resources": {
     "page_title": "Recursos",

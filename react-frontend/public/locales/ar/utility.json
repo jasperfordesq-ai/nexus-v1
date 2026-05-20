@@ -58,7 +58,9 @@
     "faq_cat_5_a_2": "نعم، يمكنك حذف حسابك من الإعدادات. هذه العملية دائمة وستزيل ملفك الشخصي، والقوائم، وسجل المعاملات. اتصل بمنسق مجتمعك إذا كنت بحاجة إلى مساعدة.",
     "still_need_help": "هل لا تزال بحاجة إلى مساعدة؟",
     "still_need_help_description": "لا تستطيع العثور على ما تبحث عنه؟ فريقنا هنا لمساعدتك.",
-    "contact_support": "اتصل بالدعم"
+    "contact_support": "اتصل بالدعم",
+    "load_error_title": "Could not load FAQs",
+    "load_error_description": "Please try refreshing the page or contact support."
   },
   "resources": {
     "page_title": "Resources",

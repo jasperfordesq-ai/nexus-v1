@@ -58,7 +58,9 @@
     "faq_cat_5_a_2": "Tak, możesz usunąć swoje konto z Ustawień. Ta akcja jest trwała i usunie Twój profil, ogłoszenia i historię transakcji. Skontaktuj się z koordynatorem społeczności, jeśli potrzebujesz pomocy.",
     "still_need_help": "Wciąż potrzebujesz pomocy?",
     "still_need_help_description": "Nie możesz znaleźć tego, czego szukasz? Nasz zespół jest tutaj, aby pomóc.",
-    "contact_support": "Skontaktuj się z pomocą"
+    "contact_support": "Skontaktuj się z pomocą",
+    "load_error_title": "Nie mozna zaladowac FAQ",
+    "load_error_description": "Odswiez strone albo skontaktuj sie z pomoca techniczna."
   },
   "resources": {
     "page_title": "Resources",

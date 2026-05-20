@@ -60,7 +60,9 @@
     "faq_cat_5_a_2": "Yes, you can delete your account from Settings. This action is permanent and will remove your profile, listings, and transaction history. Contact your community coordinator if you need help.",
     "still_need_help": "Still need help?",
     "still_need_help_description": "Can't find what you're looking for? Our team is here to help.",
-    "contact_support": "Contact Support"
+    "contact_support": "Contact Support",
+    "load_error_title": "Could not load FAQs",
+    "load_error_description": "Please try refreshing the page or contact support."
   },
   "resources": {
     "page_title": "Resources",
