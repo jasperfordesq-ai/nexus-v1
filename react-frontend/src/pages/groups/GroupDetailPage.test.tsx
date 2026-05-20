@@ -31,6 +31,7 @@ vi.mock('@/contexts', () => ({
     tenantPath: (p: string) => `/test${p}`,
     hasFeature: vi.fn(() => true),
     hasModule: vi.fn(() => true),
+    hasGroupTab: vi.fn(() => true),
   })),
   useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() })),
   ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -56,6 +57,7 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
   resolveAssetUrl: vi.fn((url) => url || null),
+  formatDateValue: vi.fn(() => 'Jan 1, 2026'),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
 }));
 
