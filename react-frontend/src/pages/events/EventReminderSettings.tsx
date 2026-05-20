@@ -22,11 +22,11 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 
 export function EventReminderSettings() {
   const { t } = useTranslation('events');
-  usePageTitle(t('reminder_settings', 'Event Reminder Settings'));
+  usePageTitle(t('reminder_settings'));
 
   return (
     <>
-      <PageMeta title={t('reminder_settings', 'Event Reminder Settings')} noIndex />
+      <PageMeta title={t('reminder_settings')} noIndex />
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -45,19 +45,16 @@ export function EventReminderSettings() {
 
           <div>
             <h2 className="text-lg font-semibold text-theme-primary">
-              {t('reminder.title', { defaultValue: 'Event Reminders' })}
+              {t('reminder.title')}
             </h2>
             <p className="text-sm text-theme-subtle mt-1 max-w-md mx-auto">
-              {t('reminder.coming_soon_desc', {
-                defaultValue:
-                  'Global reminder preferences are coming soon. In the meantime, you can set reminders on individual events from their detail page.',
-              })}
+              {t('reminder.coming_soon_desc')}
             </p>
           </div>
 
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
             <Clock className="w-3.5 h-3.5" aria-hidden="true" />
-            {t('common:coming_soon', { defaultValue: 'Coming Soon' })}
+            {t('reminder.coming_soon_badge')}
           </div>
         </CardBody>
       </Card>

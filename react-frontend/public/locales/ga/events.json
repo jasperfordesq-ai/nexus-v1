@@ -237,6 +237,7 @@
   "reminder_settings": "Socruithe Meabhrúcháin Imeachtaí",
   "reminder": {
     "title": "Meabhrúcháin Imeachtaí",
+    "coming_soon_badge": "Ag teacht go luath",
     "coming_soon_desc": "Tá roghanna meabhrúcháin domhanda ag teacht go luath. Idir an dá linn, is féidir leat meabhrúcháin a shocrú ar imeachtaí aonair ón leathanach sonraí."
   },
   "polls": {

@@ -240,6 +240,7 @@
   "reminder_settings": "Configuración de Recordatorios de Eventos",
   "reminder": {
     "title": "Recordatorios de Eventos",
+    "coming_soon_badge": "Próximamente",
     "coming_soon_desc": "Las preferencias globales de recordatorios estarán disponibles pronto. Mientras tanto, puede configurar recordatorios en eventos individuales."
   },
   "polls": {

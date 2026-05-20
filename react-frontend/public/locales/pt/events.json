@@ -240,6 +240,7 @@
   "reminder_settings": "Definições de Lembrete de Evento",
   "reminder": {
     "title": "Lembretes de Evento",
+    "coming_soon_badge": "Em breve",
     "coming_soon_desc": "As preferências globais de lembrete estarão disponíveis em breve. Entretanto, pode definir lembretes em eventos individuais a partir da página de detalhes."
   },
   "polls": {

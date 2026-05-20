@@ -240,6 +240,7 @@
   "reminder_settings": "Impostazioni Promemoria Evento",
   "reminder": {
     "title": "Promemoria Evento",
+    "coming_soon_badge": "Prossimamente",
     "coming_soon_desc": "Le preferenze globali per i promemoria saranno disponibili a breve. Nel frattempo, puoi impostare promemoria sui singoli eventi dalla loro pagina di dettaglio."
   },
   "polls": {

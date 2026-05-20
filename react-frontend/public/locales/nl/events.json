@@ -237,6 +237,7 @@
   "reminder_settings": "Event Reminder Settings",
   "reminder": {
     "title": "Event Reminders",
+    "coming_soon_badge": "Binnenkort",
     "coming_soon_desc": "Global reminder preferences are coming soon. In the meantime, you can set reminders on individual events from their detail page."
   },
   "polls": {

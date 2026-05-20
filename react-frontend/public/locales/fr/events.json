@@ -240,6 +240,7 @@
   "reminder_settings": "Paramètres de rappel d'événement",
   "reminder": {
     "title": "Rappels d'événement",
+    "coming_soon_badge": "Bientôt disponible",
     "coming_soon_desc": "Les préférences de rappel globales seront bientôt disponibles. En attendant, vous pouvez configurer des rappels pour chaque événement depuis sa page de détails."
   },
   "polls": {

@@ -240,6 +240,7 @@
   "reminder_settings": "Veranstaltungserinnerungs-Einstellungen",
   "reminder": {
     "title": "Veranstaltungserinnerungen",
+    "coming_soon_badge": "Demnächst",
     "coming_soon_desc": "Globale Erinnerungseinstellungen kommen bald. In der Zwischenzeit können Sie Erinnerungen für einzelne Veranstaltungen auf deren Detailseite festlegen."
   },
   "polls": {
