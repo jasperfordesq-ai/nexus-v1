@@ -34,6 +34,7 @@ import Award from 'lucide-react/icons/award';
 import Flame from 'lucide-react/icons/flame';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
@@ -77,13 +78,7 @@ interface GroupChallengesTabProps {
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-const METRIC_OPTIONS: { key: ChallengeMetric; label: string }[] = [
-  { key: 'posts', label: 'Posts' },
-  { key: 'discussions', label: 'Discussions' },
-  { key: 'events', label: 'Events' },
-  { key: 'members', label: 'Members' },
-  { key: 'files', label: 'Files' },
-];
+const METRIC_OPTIONS: ChallengeMetric[] = ['posts', 'discussions', 'events', 'members', 'files'];
 
 /** Return progress percentage clamped 0–100 */
 function getProgressPercent(current: number, target: number): number {
@@ -99,16 +94,16 @@ function getProgressColor(percent: number): 'success' | 'warning' | 'danger' {
 }
 
 /** Human-readable countdown string */
-function getTimeRemaining(endDate: string): string {
+function getTimeRemaining(endDate: string, t: TFunction): string {
   const now = Date.now();
   const end = new Date(endDate).getTime();
   const diff = end - now;
-  if (diff <= 0) return 'Ended';
+  if (diff <= 0) return t('challenges.time_ended');
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  if (days > 0) return `${days}d ${hours}h remaining`;
+  if (days > 0) return t('challenges.time_remaining_days_hours', { days, hours });
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  return `${hours}h ${minutes}m remaining`;
+  return t('challenges.time_remaining_hours_minutes', { hours, minutes });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -167,7 +162,7 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
       }
     } catch (err) {
       logError('GroupChallengesTab.load', err);
-      toast.error(t('challenges.load_failed', 'Failed to load challenges'));
+      toast.error(t('challenges.load_failed'));
     }
     setLoading(false);
   }, [groupId, toast, t]);
@@ -203,14 +198,14 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
         end_date: formEndDate,
       });
       if (res.success) {
-        toast.success(t('challenges.created', 'Challenge created'));
+        toast.success(t('challenges.created'));
         resetForm();
         onClose();
         loadChallenges();
       }
     } catch (err) {
       logError('GroupChallengesTab.create', err);
-      toast.error(t('challenges.create_failed', 'Failed to create challenge'));
+      toast.error(t('challenges.create_failed'));
     }
     setCreating(false);
   }, [groupId, formTitle, formDescription, formMetric, formTarget, formRewardXp, formEndDate, toast, onClose, loadChallenges, resetForm, t]);
@@ -224,6 +219,7 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
     return (
       <div
         key={challenge.id}
+        role="listitem"
         className={`p-4 rounded-lg border transition-colors ${
           challenge.is_completed
             ? 'border-success/30 bg-success/5'
@@ -231,9 +227,9 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
         }`}
       >
         {/* Header row */}
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex flex-wrap items-center gap-2 mb-1">
               {challenge.is_completed ? (
                 <Trophy className="w-4 h-4 text-warning flex-shrink-0" aria-hidden="true" />
               ) : (
@@ -249,20 +245,20 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
                 color={challenge.is_completed ? 'success' : ended ? 'danger' : 'primary'}
               >
                 {challenge.is_completed
-                  ? t('challenges.completed_chip', 'Completed')
+                  ? t('challenges.completed_chip')
                   : ended
-                    ? t('challenges.ended_chip', 'Ended')
-                    : challenge.metric}
+                    ? t('challenges.ended_chip')
+                    : t(`challenges.metric_${challenge.metric}`)}
               </Chip>
             </div>
             <SafeHtml content={challenge.description} className="text-sm text-theme-secondary line-clamp-2" as="p" />
           </div>
 
           {/* XP reward badge */}
-          <div className="flex-shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10">
+          <div className="flex w-fit flex-shrink-0 items-center gap-1 rounded-lg bg-warning/10 px-2 py-1">
             <Flame className="w-3.5 h-3.5 text-[var(--color-warning)]" aria-hidden="true" />
             <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
-              {challenge.reward_xp} XP
+              {t('challenges.xp_reward', { xp: challenge.reward_xp })}
             </span>
           </div>
         </div>
@@ -271,14 +267,18 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
         <div className="mt-3">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs text-theme-subtle">
-              {challenge.current_value} / {challenge.target_value} {challenge.metric}
+              {t('challenges.progress_value', {
+                current: challenge.current_value,
+                target: challenge.target_value,
+                metric: t(`challenges.metric_${challenge.metric}`),
+              })}
             </span>
             <span className="text-xs font-medium text-theme-secondary">
               {percent}%
             </span>
           </div>
           <Progress
-            aria-label={t('challenges.progress_aria', 'Challenge progress: {{percent}}%', { percent })}
+            aria-label={t('challenges.progress_aria', { percent })}
             value={percent}
             color={color}
             size="sm"
@@ -287,25 +287,26 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
         </div>
 
         {/* Footer: time remaining + creator */}
-        <div className="flex items-center justify-between mt-3 text-xs text-theme-subtle">
+        <div className="mt-3 flex flex-col gap-2 text-xs text-theme-subtle sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-1">
             {challenge.is_completed ? (
               <>
                 <CheckCircle2 className="w-3 h-3 text-success" aria-hidden="true" />
                 <span>
-                  {t('challenges.completed_on', 'Completed')}
-                  {challenge.completed_at && ` ${formatRelativeTime(challenge.completed_at)}`}
+                  {challenge.completed_at
+                    ? t('challenges.completed_on', { date: formatRelativeTime(challenge.completed_at) })
+                    : t('challenges.completed_chip')}
                 </span>
               </>
             ) : (
               <>
                 <Clock className="w-3 h-3" aria-hidden="true" />
-                <span>{getTimeRemaining(challenge.end_date)}</span>
+                <span>{getTimeRemaining(challenge.end_date, t)}</span>
               </>
             )}
           </div>
-          <span>
-            {t('challenges.created_by', 'by {{name}}', { name: challenge.created_by.name })}
+          <span className="break-words sm:text-right">
+            {t('challenges.created_by', { name: challenge.created_by.name })}
             {' · '}
             {formatRelativeTime(challenge.created_at)}
           </span>
@@ -322,16 +323,16 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
             <Target className="w-5 h-5" aria-hidden="true" />
-            {t('challenges.heading', 'Challenges')}
+            {t('challenges.heading')}
           </h2>
           {isAdmin && (
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              color="primary"
               size="sm"
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               onPress={onOpen}
             >
-              {t('challenges.create', 'Create Challenge')}
+              {t('challenges.create')}
             </Button>
           )}
         </div>
@@ -343,16 +344,16 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
         ) : activeChallenges.length === 0 && completedChallenges.length === 0 ? (
           <EmptyState
             icon={<Trophy className="w-12 h-12" aria-hidden="true" />}
-            title={t('challenges.no_challenges_title', 'No challenges yet')}
+            title={t('challenges.no_challenges_title')}
             description={
               isAdmin
-                ? t('challenges.no_challenges_admin_desc', 'Create a challenge to motivate group members')
-                : t('challenges.no_challenges_desc', 'No challenges have been created yet')
+                ? t('challenges.no_challenges_admin_desc')
+                : t('challenges.no_challenges_desc')
             }
             action={
               isAdmin
                 ? {
-                    label: t('challenges.create', 'Create Challenge'),
+                    label: t('challenges.create'),
                     onClick: onOpen,
                   }
                 : undefined
@@ -362,12 +363,12 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
           <>
             {/* Active list */}
             {activeChallenges.length > 0 ? (
-              <div className="space-y-3" role="list" aria-label={t('challenges.active_list_aria', 'Active challenges')}>
+              <div className="space-y-3" role="list" aria-label={t('challenges.active_list_aria')}>
                 {activeChallenges.map(renderChallengeCard)}
               </div>
             ) : (
               <p className="text-sm text-theme-subtle text-center py-4">
-                {t('challenges.no_active', 'No active challenges right now')}
+                {t('challenges.no_active')}
               </p>
             )}
 
@@ -384,7 +385,7 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
                   aria-controls="completed-challenges-list"
                 >
                   <Award className="w-4 h-4 text-warning" aria-hidden="true" />
-                  {t('challenges.completed_section', 'Completed Challenges')}
+                  {t('challenges.completed_section')}
                   <Chip size="sm" variant="flat" color="success">
                     {completedChallenges.length}
                   </Chip>
@@ -395,7 +396,7 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
                     id="completed-challenges-list"
                     className="space-y-3 mt-3"
                     role="list"
-                    aria-label={t('challenges.completed_list_aria', 'Completed challenges')}
+                    aria-label={t('challenges.completed_list_aria')}
                   >
                     {completedChallenges.map(renderChallengeCard)}
                   </div>
@@ -425,13 +426,13 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
           {(onModalClose) => (
             <>
               <ModalHeader className="text-theme-primary flex items-center gap-2">
-                <Target className="w-5 h-5 text-purple-400" aria-hidden="true" />
-                {t('challenges.create_modal_title', 'Create Challenge')}
+                <Target className="w-5 h-5 text-primary" aria-hidden="true" />
+                {t('challenges.create_modal_title')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label={t('challenges.title_label', 'Title')}
-                  placeholder={t('challenges.title_placeholder', 'Challenge title')}
+                  label={t('challenges.title_label')}
+                  placeholder={t('challenges.title_placeholder')}
                   value={formTitle}
                   onChange={(e) => setFormTitle(e.target.value)}
                   isRequired
@@ -442,8 +443,8 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
                   }}
                 />
                 <Textarea
-                  label={t('challenges.description_label', 'Description')}
-                  placeholder={t('challenges.description_placeholder', 'Describe the challenge and what participants need to do...')}
+                  label={t('challenges.description_label')}
+                  placeholder={t('challenges.description_placeholder')}
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
                   minRows={3}
@@ -455,7 +456,7 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
                   }}
                 />
                 <Select
-                  label={t('challenges.metric_label', 'Metric')}
+                  label={t('challenges.metric_label')}
                   selectedKeys={[formMetric]}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0] as ChallengeMetric;
@@ -467,16 +468,16 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
                     value: 'text-theme-primary',
                   }}
                 >
-                  {METRIC_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.key}>
-                      {t(`challenges.metric_${opt.key}`, opt.label)}
+                  {METRIC_OPTIONS.map((metric) => (
+                    <SelectItem key={metric}>
+                      {t(`challenges.metric_${metric}`)}
                     </SelectItem>
                   ))}
                 </Select>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid gap-3 sm:grid-cols-2">
                   <Input
-                    label={t('challenges.target_label', 'Target Value')}
-                    placeholder="e.g. 50"
+                    label={t('challenges.target_label')}
+                    placeholder={t('challenges.target_placeholder')}
                     type="number"
                     min={1}
                     value={formTarget}
@@ -489,8 +490,8 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
                     }}
                   />
                   <Input
-                    label={t('challenges.reward_xp_label', 'Reward XP')}
-                    placeholder="e.g. 100"
+                    label={t('challenges.reward_xp_label')}
+                    placeholder={t('challenges.reward_xp_placeholder')}
                     type="number"
                     min={1}
                     value={formRewardXp}
@@ -504,7 +505,7 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
                   />
                 </div>
                 <Input
-                  label={t('challenges.end_date_label', 'End Date')}
+                  label={t('challenges.end_date_label')}
                   type="date"
                   value={formEndDate}
                   onChange={(e) => setFormEndDate(e.target.value)}
@@ -518,10 +519,10 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onModalClose}>
-                  {t('challenges.cancel', 'Cancel')}
+                  {t('challenges.cancel')}
                 </Button>
                 <Button
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  color="primary"
                   isLoading={creating}
                   isDisabled={
                     !formTitle.trim() ||
@@ -532,7 +533,7 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
                   }
                   onPress={handleCreate}
                 >
-                  {t('challenges.create_submit', 'Create Challenge')}
+                  {t('challenges.create_submit')}
                 </Button>
               </ModalFooter>
             </>
