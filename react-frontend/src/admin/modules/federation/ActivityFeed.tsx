@@ -157,9 +157,9 @@ function TimelineItem({ item }: { item: ActivityItem }) {
   if (item.actor_name && item.partner_tenant_name) {
     desc = `${item.actor_name} - ${item.description}`;
     if (item.direction === 'inbound') {
-      desc += ` (${`Incoming`})`;
+      desc += ` (${t('federation.direction_incoming')})`;
     } else {
-      desc += ` (${`Outgoing`})`;
+      desc += ` (${t('federation.direction_outgoing')})`;
     }
   } else if (item.actor_name) {
     desc = `${item.actor_name} - ${item.description}`;
@@ -188,16 +188,16 @@ function TimelineItem({ item }: { item: ActivityItem }) {
             variant="flat"
             color={item.direction === 'inbound' ? 'primary' : 'secondary'}
           >
-            {item.direction === 'inbound' ? "Inbound" : "Outbound"}
+            {item.direction === 'inbound' ? t('federation.direction_inbound') : t('federation.direction_outbound')}
           </Chip>
           {item.level === 'critical' && (
             <Chip size="sm" variant="flat" color="danger">
-              {"Critical"}
+              {t('federation.level_critical')}
             </Chip>
           )}
           {item.level === 'warning' && (
             <Chip size="sm" variant="flat" color="warning">
-              {"Warning"}
+              {t('federation.level_warning')}
             </Chip>
           )}
         </div>
@@ -408,15 +408,15 @@ export function ActivityFeed() {
   const exportCsv = () => {
     if (items.length === 0) return;
     const headers = [
-      "CSV ID",
-      "CSV Timestamp",
-      "CSV",
-      "CSV Category",
-      "CSV Level",
-      "CSV Direction",
-      "CSV.",
-      "CSV Actor",
-      "CSV Partner Community",
+      t('federation.csv_id'),
+      t('federation.csv_timestamp'),
+      t('federation.csv_type'),
+      t('federation.csv_category'),
+      t('federation.csv_level'),
+      t('federation.csv_direction'),
+      t('federation.csv_description'),
+      t('federation.csv_actor'),
+      t('federation.csv_partner_community'),
     ];
     const csvEscape = (val: string | number | null | undefined): string => {
       const s = String(val ?? '');
