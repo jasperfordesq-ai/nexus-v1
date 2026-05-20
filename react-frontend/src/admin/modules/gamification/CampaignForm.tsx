@@ -363,7 +363,7 @@ export function CampaignForm() {
 
           <div className="flex justify-end gap-2 pt-2">
             <Link to={tenantPath("/admin/gamification/campaigns")}>
-              <Button variant="flat" isDisabled={saving}>{t('cancel')}</Button>
+              <Button variant="flat" isDisabled={saving}>{t('gamification.cancel')}</Button>
             </Link>
             <Button
               color="primary"
@@ -371,7 +371,7 @@ export function CampaignForm() {
               onPress={handleSave}
               isLoading={saving}
             >
-              {isEdit ? t('federation.save_changes', 'Save Changes') : t('gamification.create_campaign')}
+              {isEdit ? t('gamification.save_changes') : t('gamification.create_campaign')}
             </Button>
           </div>
         </CardBody>

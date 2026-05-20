@@ -230,7 +230,7 @@ export function CreateBadge() {
             />
             <div className="flex items-center justify-between p-3 rounded-lg border border-default-200">
               <div>
-                <p className="text-sm font-medium">{t('active')}</p>
+                <p className="text-sm font-medium">{t('gamification.active')}</p>
                 <p className="text-xs text-default-400">{t('gamification.badge_active_description')}</p>
               </div>
               <Switch
@@ -257,7 +257,7 @@ export function CreateBadge() {
 
           <div className="flex justify-end gap-2 pt-2">
             <Link to={tenantPath("/admin/custom-badges")}>
-              <Button variant="flat" isDisabled={saving}>{t('cancel')}</Button>
+              <Button variant="flat" isDisabled={saving}>{t('gamification.cancel')}</Button>
             </Link>
             <Button
               color="primary"
