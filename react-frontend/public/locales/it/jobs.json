@@ -925,7 +925,9 @@
     "send": "Invia messaggio",
     "title": "Chiedi all'AI di questo lavoro",
     "hint": "Chiedimi qualsiasi cosa su questo lavoro — qualifiche, stipendio, come candidarsi, consigli per il colloquio...",
-    "placeholder": "Scrivi la tua domanda..."
+    "placeholder": "Scrivi la tua domanda...",
+    "error_response": "Sorry, I could not process your request.",
+    "error_generic": "Sorry, something went wrong."
   },
   "page_meta": {
     "bias_audit": {

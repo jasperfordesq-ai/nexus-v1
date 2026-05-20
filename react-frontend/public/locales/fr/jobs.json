@@ -925,7 +925,9 @@
     "send": "Envoyer un message",
     "title": "Demandez à l'IA à propos de ce travail",
     "hint": "Posez-moi toutes vos questions sur ce travail — qualifications, salaire, comment postuler, conseils d'entretien...",
-    "placeholder": "Tapez votre question..."
+    "placeholder": "Tapez votre question...",
+    "error_response": "Sorry, I could not process your request.",
+    "error_generic": "Sorry, something went wrong."
   },
   "page_meta": {
     "bias_audit": {

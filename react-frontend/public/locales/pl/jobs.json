@@ -925,7 +925,9 @@
     "send": "Wyślij wiadomość",
     "title": "Zapytaj AI o tę pracę",
     "hint": "Zapytaj mnie o wszystko dotyczące tej pracy — kwalifikacje, wynagrodzenie, jak aplikować, porady dotyczące rozmowy kwalifikacyjnej...",
-    "placeholder": "Wpisz swoje pytanie..."
+    "placeholder": "Wpisz swoje pytanie...",
+    "error_response": "Sorry, I could not process your request.",
+    "error_generic": "Sorry, something went wrong."
   },
   "page_meta": {
     "bias_audit": {

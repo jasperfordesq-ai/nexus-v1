@@ -925,7 +925,9 @@
     "send": "Enviar mensagem",
     "title": "Pergunte à IA sobre este trabalho",
     "hint": "Pergunte-me qualquer coisa sobre este trabalho — qualificações, salário, como se inscrever, dicas para entrevistas...",
-    "placeholder": "Digite sua pergunta..."
+    "placeholder": "Digite sua pergunta...",
+    "error_response": "Sorry, I could not process your request.",
+    "error_generic": "Sorry, something went wrong."
   },
   "page_meta": {
     "bias_audit": {

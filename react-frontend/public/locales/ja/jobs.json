@@ -925,7 +925,9 @@
     "send": "メッセージを送信",
     "title": "この仕事についてAIに聞いてみる",
     "hint": "この仕事について何でも聞いてください — 資格、給与、応募方法、面接のヒント...",
-    "placeholder": "質問を入力してください..."
+    "placeholder": "質問を入力してください...",
+    "error_response": "Sorry, I could not process your request.",
+    "error_generic": "Sorry, something went wrong."
   },
   "page_meta": {
     "bias_audit": {

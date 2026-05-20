@@ -384,7 +384,7 @@ export function JobDetailPage() {
     try {
       const response = await api.put(`/v2/jobs/interviews/${pendingInterview.id}/accept`, {});
       if (response.success) {
-        toastRef.current.success(tRef.current('inline_response.interview_accepted', 'Interview accepted'));
+        toastRef.current.success(tRef.current('inline_response.interview_accepted'));
         setPendingInterview({ ...pendingInterview, status: 'accepted' });
         loadVacancy();
       } else {
@@ -404,7 +404,7 @@ export function JobDetailPage() {
     try {
       const response = await api.put(`/v2/jobs/interviews/${pendingInterview.id}/decline`, { notes: declineNotes || undefined });
       if (response.success) {
-        toastRef.current.success(tRef.current('inline_response.interview_declined', 'Interview declined'));
+        toastRef.current.success(tRef.current('inline_response.interview_declined'));
         setPendingInterview({ ...pendingInterview, status: 'declined' });
         setShowDeclineInterviewModal(false);
         setDeclineNotes('');
@@ -427,7 +427,7 @@ export function JobDetailPage() {
     try {
       const response = await api.put(`/v2/jobs/offers/${pendingOffer.id}/accept`, {});
       if (response.success) {
-        toastRef.current.success(tRef.current('inline_response.offer_accepted', 'Offer accepted'));
+        toastRef.current.success(tRef.current('inline_response.offer_accepted'));
         setPendingOffer({ ...pendingOffer, status: 'accepted' });
         loadVacancy();
       } else {
@@ -447,7 +447,7 @@ export function JobDetailPage() {
     try {
       const response = await api.put(`/v2/jobs/offers/${pendingOffer.id}/reject`, { reason: declineNotes || undefined });
       if (response.success) {
-        toastRef.current.success(tRef.current('inline_response.offer_declined', 'Offer declined'));
+        toastRef.current.success(tRef.current('inline_response.offer_declined'));
         setPendingOffer({ ...pendingOffer, status: 'rejected' });
         setShowDeclineOfferModal(false);
         setDeclineNotes('');
@@ -510,7 +510,7 @@ export function JobDetailPage() {
               const count = parsed.skills?.length ?? 0;
               if (count > 0) {
                 toastRef.current.success(
-                  tRef.current('cv.parsed_toast', 'Application submitted! {{count}} skills detected from your CV.', { count })
+                  tRef.current('cv.parsed_toast', { count })
                 );
               } else {
                 toastRef.current.success(tRef.current('apply.success'));
@@ -519,7 +519,7 @@ export function JobDetailPage() {
               toastRef.current.success(tRef.current('apply.success'));
             }
           } catch (err) {
-            toastRef.current.error(tRef.current('apply.cv_parse_error', 'Failed to parse CV. You can still submit your application manually.'));
+            toastRef.current.error(tRef.current('apply.cv_parse_error'));
             if (import.meta.env.DEV) console.warn('CV parse failed:', err);
           }
         } else {
@@ -552,10 +552,10 @@ export function JobDetailPage() {
       if (file.size <= 5 * 1024 * 1024) {
         setCvFile(file);
       } else {
-        toastRef.current.error(tRef.current('apply.cv_too_large', 'CV file must be under 5MB'));
+        toastRef.current.error(tRef.current('apply.cv_too_large'));
       }
     } else {
-      toastRef.current.error(tRef.current('apply.cv_invalid_type', 'Only PDF, DOC, or DOCX files are supported'));
+      toastRef.current.error(tRef.current('apply.cv_invalid_type'));
     }
   };
 
@@ -670,10 +670,10 @@ export function JobDetailPage() {
         const data = res.data as { reply: string };
         setAiChatMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
       } else {
-        setAiChatMessages(prev => [...prev, { role: 'assistant', content: tRef.current('ai_chat.error_response', 'Sorry, I could not process your request.') }]);
+        setAiChatMessages(prev => [...prev, { role: 'assistant', content: tRef.current('ai_chat.error_response') }]);
       }
     } catch {
-      setAiChatMessages(prev => [...prev, { role: 'assistant', content: tRef.current('ai_chat.error_generic', 'Sorry, something went wrong.') }]);
+      setAiChatMessages(prev => [...prev, { role: 'assistant', content: tRef.current('ai_chat.error_generic') }]);
     } finally {
       setAiChatLoading(false);
     }
@@ -928,7 +928,7 @@ export function JobDetailPage() {
           setUsingSavedProfile={setUsingSavedProfile}
           onApply={handleApply}
           onCvDrop={handleCvDrop}
-          onCvTooBig={() => toastRef.current.error(tRef.current('apply.cv_too_large', 'CV file must be under 5MB'))}
+          onCvTooBig={() => toastRef.current.error(tRef.current('apply.cv_too_large'))}
         />
 
         <QualificationModal

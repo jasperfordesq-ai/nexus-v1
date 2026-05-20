@@ -925,7 +925,9 @@
     "send": "Send message",
     "title": "Ask AI about this job",
     "hint": "Ask me anything about this job — qualifications, salary, how to apply, interview tips...",
-    "placeholder": "Type your question..."
+    "placeholder": "Type your question...",
+    "error_response": "Sorry, I could not process your request.",
+    "error_generic": "Sorry, something went wrong."
   },
   "page_meta": {
     "bias_audit": {

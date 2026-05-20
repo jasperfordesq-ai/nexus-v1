@@ -925,7 +925,9 @@
     "send": "Stuur bericht",
     "title": "Vraag AI over deze baan",
     "hint": "Vraag me alles over deze baan — kwalificaties, salaris, hoe te solliciteren, sollicitatietips...",
-    "placeholder": "Typ je vraag..."
+    "placeholder": "Typ je vraag...",
+    "error_response": "Sorry, I could not process your request.",
+    "error_generic": "Sorry, something went wrong."
   },
   "page_meta": {
     "bias_audit": {

@@ -925,7 +925,9 @@
     "send": "Nachricht senden",
     "title": "Frag die KI zu diesem Job",
     "hint": "Frag mich alles zu diesem Job – Qualifikationen, Gehalt, wie man sich bewirbt, Interviewtipps...",
-    "placeholder": "Tippe deine Frage ein..."
+    "placeholder": "Tippe deine Frage ein...",
+    "error_response": "Sorry, I could not process your request.",
+    "error_generic": "Sorry, something went wrong."
   },
   "page_meta": {
     "bias_audit": {

@@ -925,7 +925,9 @@
     "send": "أرسل رسالة",
     "title": "اسأل الذكاء الاصطناعي عن هذه الوظيفة",
     "hint": "اسألني أي شيء عن هذه الوظيفة - المؤهلات، الراتب، كيفية التقديم، نصائح المقابلة...",
-    "placeholder": "اكتب سؤالك..."
+    "placeholder": "اكتب سؤالك...",
+    "error_response": "Sorry, I could not process your request.",
+    "error_generic": "Sorry, something went wrong."
   },
   "page_meta": {
     "bias_audit": {

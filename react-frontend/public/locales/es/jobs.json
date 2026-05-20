@@ -925,7 +925,9 @@
     "send": "Enviar mensaje",
     "title": "Pregunta a la IA sobre este trabajo",
     "hint": "Pregúntame cualquier cosa sobre este trabajo: requisitos, salario, cómo postular, consejos para la entrevista...",
-    "placeholder": "Escribe tu pregunta..."
+    "placeholder": "Escribe tu pregunta...",
+    "error_response": "Sorry, I could not process your request.",
+    "error_generic": "Sorry, something went wrong."
   },
   "page_meta": {
     "bias_audit": {
