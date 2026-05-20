@@ -48,13 +48,13 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
           setInfo(res.data as ResendInfo);
         }
       } catch {
-        toast.error("Failed to load resend info");
+        toast.error(t('newsletters.failed_to_load_resend_info'));
       }
       setLoading(false);
     };
 
     loadInfo();
-  }, [isOpen, newsletterId, toast])
+  }, [isOpen, newsletterId, toast, t])
 
 
   const handleResend = async () => {
@@ -73,10 +73,10 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
         onSuccess?.();
         onClose();
       } else {
-        toast.error("Failed to queue resend");
+        toast.error(t('newsletters.failed_to_queue_resend'));
       }
     } catch {
-      toast.error("Failed to queue resend");
+      toast.error(t('newsletters.failed_to_queue_resend'));
     }
     setSending(false);
   };
@@ -105,16 +105,16 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
             <ModalHeader className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <Mail size={20} />
-                <span>{"Resend Newsletter"}</span>
+                <span>{t('newsletter_resend.resend_newsletter')}</span>
               </div>
               <p className="text-sm font-normal text-default-500">
-                Send this newsletter to a targeted subset of recipients
+                {t('newsletter_resend.subtitle')}
               </p>
             </ModalHeader>
             <ModalBody>
               {loading ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="text-default-400">Loading resend info...</div>
+                  <div className="text-default-400">{t('newsletter_resend.loading')}</div>
                 </div>
               ) : info ? (
                 <div className="space-y-4">
@@ -122,15 +122,15 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                     <CardBody className="gap-2">
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div>
-                          <p className="text-sm text-default-500">{"Total sent"}</p>
+                          <p className="text-sm text-default-500">{t('newsletter_resend.total_sent')}</p>
                           <p className="text-2xl font-bold">{info.total_sent.toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-default-500">{"Opened"}</p>
+                          <p className="text-sm text-default-500">{t('newsletter_resend.opened')}</p>
                           <p className="text-2xl font-bold text-success">{info.total_opened.toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-default-500">{"Clicked"}</p>
+                          <p className="text-sm text-default-500">{t('newsletter_resend.clicked')}</p>
                           <p className="text-2xl font-bold text-primary">{info.total_clicked.toLocaleString()}</p>
                         </div>
                       </div>
@@ -138,43 +138,43 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                   </Card>
 
                   <RadioGroup
-                    label={"Resend to"}
+                    label={t('newsletter_resend.resend_to')}
                     value={target}
                     onValueChange={(v) => setTarget(v as typeof target)}
                   >
                     <Radio value="non_openers">
                       <div className="flex flex-col gap-1">
-                        <span>Non-openers</span>
+                        <span>{t('newsletter_resend.non_openers')}</span>
                         <span className="text-xs text-default-500">
-                          {info.non_openers_count.toLocaleString()} recipients who didn't open
+                          {t('newsletter_resend.non_openers_count', { count: info.non_openers_count })}
                         </span>
                       </div>
                     </Radio>
                     <Radio value="non_clickers">
                       <div className="flex flex-col gap-1">
-                        <span>Non-clickers</span>
+                        <span>{t('newsletter_resend.non_clickers')}</span>
                         <span className="text-xs text-default-500">
-                          {info.non_clickers_count.toLocaleString()} recipients who opened but didn't click
+                          {t('newsletter_resend.non_clickers_count', { count: info.non_clickers_count })}
                         </span>
                       </div>
                     </Radio>
                   </RadioGroup>
 
                   <Input
-                    label={"Subject Override"}
-                    placeholder={"Enter leave blank to use original subject..."}
+                    label={t('newsletter_resend.subject_override')}
+                    placeholder={t('newsletter_resend.subject_override_placeholder')}
                     value={subjectOverride}
                     onValueChange={setSubjectOverride}
-                    description={"Subject Override."}
+                    description={t('newsletter_resend.subject_override_desc')}
                   />
 
                   <Card className="bg-default-100">
                     <CardBody className="flex-row items-center gap-3">
                       <Users size={20} className="text-primary" />
                       <div className="flex-1">
-                        <p className="text-sm font-medium">{"Preview Recipient Count"}</p>
+                        <p className="text-sm font-medium">{t('newsletter_resend.preview_recipient_count')}</p>
                         <p className="text-xs text-default-500">
-                          This resend will be sent to {recipientCount.toLocaleString()} recipient{recipientCount !== 1 ? 's' : ''}
+                          {t('newsletter_resend.preview_recipient_count_desc', { count: recipientCount })}
                         </p>
                       </div>
                     </CardBody>
@@ -185,9 +185,9 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                       <CardBody className="flex-row items-center gap-3">
                         <AlertCircle size={20} className="text-warning" />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-warning">{"No recipients found"}</p>
+                          <p className="text-sm font-medium text-warning">{t('newsletter_resend.no_recipients')}</p>
                           <p className="text-xs text-warning-600 dark:text-warning-400">
-                            There are no recipients matching your selection criteria
+                            {t('newsletter_resend.no_recipients_desc')}
                           </p>
                         </div>
                       </CardBody>
@@ -196,13 +196,13 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                 </div>
               ) : (
                 <div className="flex items-center justify-center py-8">
-                  <div className="text-danger">{"Failed to load"}</div>
+                  <div className="text-danger">{t('newsletter_resend.failed_to_load')}</div>
                 </div>
               )}
             </ModalBody>
             <ModalFooter>
               <Button variant="light" onPress={onModalClose}>
-                Cancel
+                {t('newsletter_resend.cancel')}
               </Button>
               <Button
                 color="primary"
@@ -210,7 +210,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                 isLoading={sending}
                 isDisabled={!info || recipientCount === 0 || loading}
               >
-                Queue Resend
+                {t('newsletter_resend.queue_resend')}
               </Button>
             </ModalFooter>
           </>
