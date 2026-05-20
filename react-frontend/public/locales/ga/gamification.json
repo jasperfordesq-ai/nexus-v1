@@ -310,7 +310,18 @@
     "active_members": "Baill Ghníomhacha",
     "new_connections": "Ceangail Nua",
     "new_exchanges": "Malartuithe Nua",
-    "new_members": "Baill Nua"
+    "new_members": "Baill Nua",
+    "total_badges": "Badges Awarded",
+    "volunteer_hours": "Volunteer Hours",
+    "total_xp": "Total XP Earned",
+    "total_listings": "Listings",
+    "total_connections": "Connections",
+    "total_reviews": "Reviews",
+    "badges_awarded": "Badges Awarded",
+    "new_listings": "New Listings",
+    "new_posts": "New Posts",
+    "load_error": "Failed to load community data",
+    "no_change": "No change"
   },
   "journey": {
     "hours_earned": "Uaireanta Tuillte",

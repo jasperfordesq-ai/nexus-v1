@@ -310,7 +310,18 @@
     "active_members": "Active Members",
     "new_connections": "New Connections",
     "new_exchanges": "New Exchanges",
-    "new_members": "New Members"
+    "new_members": "New Members",
+    "total_badges": "Badges Awarded",
+    "volunteer_hours": "Volunteer Hours",
+    "total_xp": "Total XP Earned",
+    "total_listings": "Listings",
+    "total_connections": "Connections",
+    "total_reviews": "Reviews",
+    "badges_awarded": "Badges Awarded",
+    "new_listings": "New Listings",
+    "new_posts": "New Posts",
+    "load_error": "Failed to load community data",
+    "no_change": "No change"
   },
   "journey": {
     "hours_earned": "Hours Earned",

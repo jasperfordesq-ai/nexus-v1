@@ -58,18 +58,18 @@ export default function CommunityImpactTab() {
         if (res.success && res.data) {
           setData(res.data);
         } else {
-          setError(res.error || 'Failed to load community data');
+          setError(res.error || t('community.load_error'));
         }
       } catch (err: unknown) {
         logError('CommunityImpactTab', err);
-        setError('Failed to load community data');
+        setError(t('community.load_error'));
       } finally {
         setIsLoading(false);
       }
     };
 
     load();
-  }, []);
+  }, [t]);
 
   if (isLoading) {
     return (
@@ -97,25 +97,25 @@ export default function CommunityImpactTab() {
   if (!data) return null;
 
   const stats = [
-    { label: t('community.total_members', 'Community Members'), value: data.total_members, icon: <Users className="w-5 h-5" />, color: 'text-[var(--color-info)]', bg: 'bg-blue-500/10' },
-    { label: t('community.total_badges', 'Badges Awarded'), value: data.total_badges_awarded, icon: <Award className="w-5 h-5" />, color: 'text-[var(--color-warning)]', bg: 'bg-amber-500/10' },
-    { label: t('community.volunteer_hours', 'Volunteer Hours'), value: data.total_volunteer_hours, icon: <Clock className="w-5 h-5" />, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    { label: t('community.total_xp', 'Total XP Earned'), value: data.total_xp.toLocaleString(), icon: <Zap className="w-5 h-5" />, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+    { label: t('community.total_members'), value: data.total_members, icon: <Users className="w-5 h-5" />, color: 'text-[var(--color-info)]', bg: 'bg-blue-500/10' },
+    { label: t('community.total_badges'), value: data.total_badges_awarded, icon: <Award className="w-5 h-5" />, color: 'text-[var(--color-warning)]', bg: 'bg-amber-500/10' },
+    { label: t('community.volunteer_hours'), value: data.total_volunteer_hours, icon: <Clock className="w-5 h-5" />, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    { label: t('community.total_xp'), value: data.total_xp.toLocaleString(), icon: <Zap className="w-5 h-5" />, color: 'text-purple-500', bg: 'bg-purple-500/10' },
   ];
 
   const secondaryStats = [
-    { label: t('community.total_listings', 'Listings'), value: data.total_listings, icon: <FileText className="w-4 h-4" /> },
-    { label: t('community.total_connections', 'Connections'), value: data.total_connections, icon: <Handshake className="w-4 h-4" /> },
-    { label: t('community.total_reviews', 'Reviews'), value: data.total_reviews, icon: <Heart className="w-4 h-4" /> },
+    { label: t('community.total_listings'), value: data.total_listings, icon: <FileText className="w-4 h-4" /> },
+    { label: t('community.total_connections'), value: data.total_connections, icon: <Handshake className="w-4 h-4" /> },
+    { label: t('community.total_reviews'), value: data.total_reviews, icon: <Heart className="w-4 h-4" /> },
   ];
 
   const monthMetrics = [
-    { label: t('community.new_members', 'New Members'), value: data.this_month.new_members, trend: data.trends.new_members ?? 0, icon: <UserPlus className="w-4 h-4" /> },
-    { label: t('community.badges_awarded', 'Badges Awarded'), value: data.this_month.badges_awarded, trend: data.trends.badges_awarded ?? 0, icon: <Award className="w-4 h-4" /> },
-    { label: t('community.new_listings', 'New Listings'), value: data.this_month.new_listings, trend: data.trends.new_listings ?? 0, icon: <FileText className="w-4 h-4" /> },
-    { label: t('community.new_connections', 'New Connections'), value: data.this_month.new_connections, trend: data.trends.new_connections ?? 0, icon: <Handshake className="w-4 h-4" /> },
-    { label: t('community.volunteer_hours', 'Volunteer Hours'), value: data.this_month.volunteer_hours, trend: data.trends.volunteer_hours ?? 0, icon: <Clock className="w-4 h-4" /> },
-    { label: t('community.new_posts', 'New Posts'), value: data.this_month.new_posts, trend: data.trends.new_posts ?? 0, icon: <FileText className="w-4 h-4" /> },
+    { label: t('community.new_members'), value: data.this_month.new_members, trend: data.trends.new_members ?? 0, icon: <UserPlus className="w-4 h-4" /> },
+    { label: t('community.badges_awarded'), value: data.this_month.badges_awarded, trend: data.trends.badges_awarded ?? 0, icon: <Award className="w-4 h-4" /> },
+    { label: t('community.new_listings'), value: data.this_month.new_listings, trend: data.trends.new_listings ?? 0, icon: <FileText className="w-4 h-4" /> },
+    { label: t('community.new_connections'), value: data.this_month.new_connections, trend: data.trends.new_connections ?? 0, icon: <Handshake className="w-4 h-4" /> },
+    { label: t('community.volunteer_hours'), value: data.this_month.volunteer_hours, trend: data.trends.volunteer_hours ?? 0, icon: <Clock className="w-4 h-4" /> },
+    { label: t('community.new_posts'), value: data.this_month.new_posts, trend: data.trends.new_posts ?? 0, icon: <FileText className="w-4 h-4" /> },
   ];
 
   return (
@@ -150,7 +150,7 @@ export default function CommunityImpactTab() {
 
       {/* This month breakdown */}
       <GlassCard className="p-6">
-        <h3 className="text-lg font-semibold mb-4">{t('community.this_month', 'This Month')}</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('community.this_month')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {monthMetrics.map((metric) => (
             <div key={metric.label} className="flex items-center justify-between p-3 rounded-lg bg-default-100/50">
@@ -161,7 +161,7 @@ export default function CommunityImpactTab() {
                   <p className="text-lg font-semibold">{metric.value}</p>
                 </div>
               </div>
-              <TrendChip trend={metric.trend} />
+              <TrendChip trend={metric.trend} neutralLabel={t('community.no_change')} />
             </div>
           ))}
         </div>
@@ -170,8 +170,8 @@ export default function CommunityImpactTab() {
   );
 }
 
-function TrendChip({ trend }: { trend: number }) {
-  if (!trend || trend === 0) return <Chip size="sm" variant="flat">—</Chip>;
+function TrendChip({ trend, neutralLabel }: { trend: number; neutralLabel: string }) {
+  if (!trend || trend === 0) return <Chip size="sm" variant="flat">{neutralLabel}</Chip>;
   const isPositive = trend > 0;
   const Icon = isPositive ? TrendingUp : TrendingDown;
   return (
