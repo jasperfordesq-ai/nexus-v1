@@ -34,6 +34,7 @@ import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import XCircle from 'lucide-react/icons/x-circle';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import Info from 'lucide-react/icons/info';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -87,13 +88,6 @@ const STATUS_COLORS: Record<ProposalStatus, 'primary' | 'warning' | 'default' | 
   published: 'success',
 };
 
-const TONE_LABELS: Record<ToneAssessment, string> = {
-  too_formal: 'Too formal',
-  too_informal: 'Too informal',
-  condescending: 'Condescending',
-  ok: 'Tone OK',
-};
-
 const TONE_COLORS: Record<ToneAssessment, 'success' | 'warning' | 'danger'> = {
   ok: 'success',
   too_formal: 'warning',
@@ -101,8 +95,10 @@ const TONE_COLORS: Record<ToneAssessment, 'success' | 'warning' | 'danger'> = {
   condescending: 'danger',
 };
 
-function formatTime(iso: string | null): string {
-  if (!iso) return '—';
+type AdminT = (key: string, options?: Record<string, unknown>) => string;
+
+function formatTime(iso: string | null, t: AdminT): string {
+  if (!iso) return t('municipal_copilot.empty.value');
   try {
     return new Date(iso).toLocaleString();
   } catch {
@@ -120,7 +116,8 @@ function truncate(text: string, n: number): string {
 // ---------------------------------------------------------------------------
 
 export default function MunicipalCopilotAdminPage() {
-  usePageTitle('Municipal Communication Copilot');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('municipal_copilot.meta.page_title'));
   const { showToast } = useToast();
 
   const [proposals, setProposals] = useState<Proposal[]>([]);
@@ -149,11 +146,11 @@ export default function MunicipalCopilotAdminPage() {
       const res = await api.get<ListResponse>('/v2/admin/caring-community/copilot/proposals');
       setProposals(res.data?.items ?? []);
     } catch {
-      showToast('Failed to load copilot proposals', 'error');
+      showToast(t('municipal_copilot.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     load();
@@ -162,11 +159,11 @@ export default function MunicipalCopilotAdminPage() {
   const handleGenerate = useCallback(async () => {
     const trimmed = draft.trim();
     if (trimmed === '') {
-      showToast('Enter a draft first', 'error');
+      showToast(t('municipal_copilot.toasts.enter_draft'), 'error');
       return;
     }
     if (trimmed.length > 4000) {
-      showToast('Draft is too long (max 4000 characters)', 'error');
+      showToast(t('municipal_copilot.toasts.draft_too_long'), 'error');
       return;
     }
     setGenerating(true);
@@ -182,14 +179,14 @@ export default function MunicipalCopilotAdminPage() {
       if (newProposal) {
         setLatestId(newProposal.id);
         setProposals((prev) => [newProposal, ...prev.filter((p) => p.id !== newProposal.id)]);
-        showToast('Proposal generated', 'success');
+        showToast(t('municipal_copilot.toasts.generated'), 'success');
       }
     } catch {
-      showToast('Failed to generate proposal', 'error');
+      showToast(t('municipal_copilot.toasts.generate_failed'), 'error');
     } finally {
       setGenerating(false);
     }
-  }, [draft, audienceHint, showToast]);
+  }, [draft, audienceHint, showToast, t]);
 
   const handleAccept = useCallback(
     async (proposal: Proposal, polishedOverride?: string) => {
@@ -205,13 +202,13 @@ export default function MunicipalCopilotAdminPage() {
         const updated = res.data?.proposal ?? null;
         if (updated) {
           setProposals((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
-          showToast('Proposal accepted — now publish via Announcements admin', 'success');
+          showToast(t('municipal_copilot.toasts.accepted'), 'success');
         }
       } catch {
-        showToast('Failed to accept proposal', 'error');
+        showToast(t('municipal_copilot.toasts.accept_failed'), 'error');
       }
     },
-    [showToast],
+    [showToast, t],
   );
 
   const openReject = useCallback(
@@ -227,7 +224,7 @@ export default function MunicipalCopilotAdminPage() {
     if (!rejectTargetId) return;
     const reason = rejectReason.trim();
     if (reason === '') {
-      showToast('Reason is required', 'error');
+      showToast(t('municipal_copilot.toasts.reason_required'), 'error');
       return;
     }
     setRejecting(true);
@@ -239,23 +236,23 @@ export default function MunicipalCopilotAdminPage() {
       const updated = res.data?.proposal ?? null;
       if (updated) {
         setProposals((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
-        showToast('Proposal rejected', 'success');
+        showToast(t('municipal_copilot.toasts.rejected'), 'success');
       }
       rejectDisclosure.onClose();
       setRejectTargetId(null);
       setRejectReason('');
     } catch {
-      showToast('Failed to reject proposal', 'error');
+      showToast(t('municipal_copilot.toasts.reject_failed'), 'error');
     } finally {
       setRejecting(false);
     }
-  }, [rejectTargetId, rejectReason, rejectDisclosure, showToast]);
+  }, [rejectTargetId, rejectReason, rejectDisclosure, showToast, t]);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Municipal Communication Copilot"
-        subtitle="Draft official announcements, have them polished by AI, check tone and clarity, then publish. Designed for coordinators who need to communicate with residents and municipality contacts in a consistent, accessible voice."
+        title={t('municipal_copilot.meta.title')}
+        subtitle={t('municipal_copilot.meta.subtitle')}
         icon={<Wand2 size={20} />}
         actions={
           <Button
@@ -265,7 +262,7 @@ export default function MunicipalCopilotAdminPage() {
             onPress={load}
             isLoading={loading}
           >
-            Refresh
+            {t('municipal_copilot.actions.refresh')}
           </Button>
         }
       />
@@ -275,9 +272,9 @@ export default function MunicipalCopilotAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('municipal_copilot.about.title')}</p>
               <p className="text-default-600">
-                The Municipal Copilot helps you write announcements that are clear, appropriately formal, and free of jargon. Paste a rough draft — the AI will suggest improvements, flag tone issues (too formal, condescending, or unclear), and list any moderation concerns. You review and accept or reject the suggestion before anything is published.
+                {t('municipal_copilot.about.body')}
               </p>
             </div>
           </div>
@@ -289,24 +286,24 @@ export default function MunicipalCopilotAdminPage() {
         {/* Left: Draft input */}
         <Card>
           <CardHeader className="pb-2">
-            <span className="font-semibold text-sm">New draft</span>
+            <span className="font-semibold text-sm">{t('municipal_copilot.sections.new_draft')}</span>
           </CardHeader>
           <CardBody className="pt-0 space-y-3">
             <Textarea
-              label="Draft announcement"
-              placeholder="Paste a rough draft — the copilot will polish, check tone, and flag issues."
+              label={t('municipal_copilot.fields.draft_announcement')}
+              placeholder={t('municipal_copilot.fields.draft_placeholder')}
               minRows={8}
               maxRows={16}
               value={draft}
               onValueChange={setDraft}
-              description={`${draft.length} / 4000 characters`}
+              description={t('municipal_copilot.fields.character_count', { count: draft.length })}
             />
             <Input
-              label="Audience hint (optional)"
-              placeholder="e.g. caregivers in north sub-region"
+              label={t('municipal_copilot.fields.audience_hint')}
+              placeholder={t('municipal_copilot.fields.audience_placeholder')}
               value={audienceHint}
               onValueChange={setAudienceHint}
-              description="Specify who this announcement is for (e.g. 'all residents', 'volunteers', 'municipality contacts') so the AI can calibrate the tone and vocabulary appropriately."
+              description={t('municipal_copilot.fields.audience_description')}
             />
             <div className="flex justify-end">
               <Button
@@ -316,7 +313,7 @@ export default function MunicipalCopilotAdminPage() {
                 isLoading={generating}
                 isDisabled={draft.trim() === ''}
               >
-                Generate proposal
+                {t('municipal_copilot.actions.generate_proposal')}
               </Button>
             </div>
           </CardBody>
@@ -325,23 +322,23 @@ export default function MunicipalCopilotAdminPage() {
         {/* Right: Latest proposal preview */}
         <Card>
           <CardHeader className="pb-2 flex items-center justify-between">
-            <span className="font-semibold text-sm">Latest proposal</span>
+            <span className="font-semibold text-sm">{t('municipal_copilot.sections.latest_proposal')}</span>
             {latest && (
               <Chip size="sm" color={STATUS_COLORS[latest.status]} variant="flat">
-                {latest.status}
+                {t(`municipal_copilot.status.${latest.status}`)}
               </Chip>
             )}
           </CardHeader>
           <CardBody className="pt-0 space-y-3">
             {!latest && (
               <p className="text-sm text-default-500">
-                No proposal yet. Generate one from the draft on the left.
+                {t('municipal_copilot.empty.no_latest')}
               </p>
             )}
             {latest && (
               <>
                 <Textarea
-                  label="Polished text"
+                  label={t('municipal_copilot.fields.polished_text')}
                   value={latest.polished_text}
                   minRows={6}
                   maxRows={14}
@@ -354,22 +351,22 @@ export default function MunicipalCopilotAdminPage() {
                     color={TONE_COLORS[latest.tone_assessment] ?? 'default'}
                     variant="flat"
                   >
-                    {TONE_LABELS[latest.tone_assessment] ?? latest.tone_assessment}
+                    {t(`municipal_copilot.tone.${latest.tone_assessment}`)}
                   </Chip>
                   <Chip size="sm" variant="flat" color="primary">
-                    Audience: {latest.audience_suggestion}
+                    {t('municipal_copilot.labels.audience', { audience: latest.audience_suggestion })}
                   </Chip>
                   <Chip size="sm" variant="flat" color="default">
-                    Model: {latest.model_used}
+                    {t('municipal_copilot.labels.model', { model: latest.model_used })}
                   </Chip>
                 </div>
                 <p className="text-xs text-default-400">
-                  Tone legend — <span className="font-medium">too_formal</span>: overly bureaucratic; <span className="font-medium">too_informal</span>: may seem unprofessional; <span className="font-medium">condescending</span>: may patronise the reader; <span className="font-medium">ok</span>: no tone issues detected.
+                  {t('municipal_copilot.tone_legend.prefix')} <span className="font-medium">too_formal</span>: {t('municipal_copilot.tone_legend.too_formal')}; <span className="font-medium">too_informal</span>: {t('municipal_copilot.tone_legend.too_informal')}; <span className="font-medium">condescending</span>: {t('municipal_copilot.tone_legend.condescending')}; <span className="font-medium">ok</span>: {t('municipal_copilot.tone_legend.ok')}.
                 </p>
 
                 {latest.clarity_warnings.length > 0 && (
                   <div className="space-y-1">
-                    <p className="text-xs font-semibold text-default-600">Clarity warnings</p>
+                    <p className="text-xs font-semibold text-default-600">{t('municipal_copilot.sections.clarity_warnings')}</p>
                     <div className="flex flex-wrap gap-1.5">
                       {latest.clarity_warnings.map((w, i) => (
                         <Chip
@@ -388,7 +385,7 @@ export default function MunicipalCopilotAdminPage() {
 
                 {latest.moderation_flags.length > 0 && (
                   <div className="space-y-1">
-                    <p className="text-xs font-semibold text-default-600">Moderation flags</p>
+                    <p className="text-xs font-semibold text-default-600">{t('municipal_copilot.sections.moderation_flags')}</p>
                     <div className="flex flex-wrap gap-1.5">
                       {latest.moderation_flags.map((f, i) => (
                         <Chip
@@ -407,13 +404,13 @@ export default function MunicipalCopilotAdminPage() {
 
                 {latest.status === 'accepted' && (
                   <div className="rounded-md border border-warning-200 bg-warning-50 px-3 py-2 text-xs text-warning-700">
-                    Accepted. Now publish the polished text via the Announcements admin.
+                    {t('municipal_copilot.states.accepted')}
                   </div>
                 )}
 
                 {latest.status === 'rejected' && latest.rejection_reason && (
                   <div className="rounded-md border border-default-200 bg-default-50 px-3 py-2 text-xs text-default-600">
-                    Rejected — reason: {latest.rejection_reason}
+                    {t('municipal_copilot.states.rejected_reason', { reason: latest.rejection_reason })}
                   </div>
                 )}
 
@@ -428,7 +425,7 @@ export default function MunicipalCopilotAdminPage() {
                         startContent={<XCircle size={14} />}
                         onPress={() => openReject(latest.id)}
                       >
-                        Reject
+                        {t('municipal_copilot.actions.reject')}
                       </Button>
                       <Button
                         size="sm"
@@ -436,7 +433,7 @@ export default function MunicipalCopilotAdminPage() {
                         startContent={<CheckCircle2 size={14} />}
                         onPress={() => handleAccept(latest)}
                       >
-                        Accept
+                        {t('municipal_copilot.actions.accept')}
                       </Button>
                     </div>
                   </>
@@ -450,7 +447,7 @@ export default function MunicipalCopilotAdminPage() {
       {/* Recent proposals table */}
       <Card>
         <CardHeader className="pb-2">
-          <span className="font-semibold text-sm">Recent proposals</span>
+          <span className="font-semibold text-sm">{t('municipal_copilot.sections.recent_proposals')}</span>
         </CardHeader>
         <CardBody className="pt-0">
           {loading ? (
@@ -459,24 +456,24 @@ export default function MunicipalCopilotAdminPage() {
             </div>
           ) : proposals.length === 0 ? (
             <p className="text-sm text-default-500 py-6 text-center">
-              No proposals yet. Drafts you analyse will appear here as an audit trail.
+              {t('municipal_copilot.empty.no_proposals')}
             </p>
           ) : (
-            <Table aria-label="Recent copilot proposals" removeWrapper>
+            <Table aria-label={t('municipal_copilot.table.aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>STATUS</TableColumn>
-                <TableColumn>DRAFT</TableColumn>
-                <TableColumn>AUDIENCE</TableColumn>
-                <TableColumn>TONE</TableColumn>
-                <TableColumn>CREATED</TableColumn>
-                <TableColumn>ACTIONS</TableColumn>
+                <TableColumn>{t('municipal_copilot.table.status')}</TableColumn>
+                <TableColumn>{t('municipal_copilot.table.draft')}</TableColumn>
+                <TableColumn>{t('municipal_copilot.table.audience')}</TableColumn>
+                <TableColumn>{t('municipal_copilot.table.tone')}</TableColumn>
+                <TableColumn>{t('municipal_copilot.table.created')}</TableColumn>
+                <TableColumn>{t('municipal_copilot.table.actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {proposals.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell>
                       <Chip size="sm" color={STATUS_COLORS[p.status]} variant="flat">
-                        {p.status}
+                        {t(`municipal_copilot.status.${p.status}`)}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -493,11 +490,11 @@ export default function MunicipalCopilotAdminPage() {
                         variant="flat"
                         color={TONE_COLORS[p.tone_assessment] ?? 'default'}
                       >
-                        {TONE_LABELS[p.tone_assessment] ?? p.tone_assessment}
+                        {t(`municipal_copilot.tone.${p.tone_assessment}`)}
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs text-default-500">{formatTime(p.created_at)}</span>
+                      <span className="text-xs text-default-500">{formatTime(p.created_at, t)}</span>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -506,7 +503,7 @@ export default function MunicipalCopilotAdminPage() {
                           variant="light"
                           onPress={() => setLatestId(p.id)}
                         >
-                          View
+                          {t('municipal_copilot.actions.view')}
                         </Button>
                         {p.status === 'proposed' && (
                           <>
@@ -516,7 +513,7 @@ export default function MunicipalCopilotAdminPage() {
                               color="primary"
                               onPress={() => handleAccept(p)}
                             >
-                              Accept
+                              {t('municipal_copilot.actions.accept')}
                             </Button>
                             <Button
                               size="sm"
@@ -524,7 +521,7 @@ export default function MunicipalCopilotAdminPage() {
                               color="default"
                               onPress={() => openReject(p.id)}
                             >
-                              Reject
+                              {t('municipal_copilot.actions.reject')}
                             </Button>
                           </>
                         )}
@@ -543,11 +540,11 @@ export default function MunicipalCopilotAdminPage() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>Reject proposal</ModalHeader>
+              <ModalHeader>{t('municipal_copilot.modal.reject_title')}</ModalHeader>
               <ModalBody>
                 <Textarea
-                  label="Reason"
-                  placeholder="Why is this proposal being rejected?"
+                  label={t('municipal_copilot.fields.reason')}
+                  placeholder={t('municipal_copilot.fields.reason_placeholder')}
                   value={rejectReason}
                   onValueChange={setRejectReason}
                   minRows={3}
@@ -556,7 +553,7 @@ export default function MunicipalCopilotAdminPage() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose} isDisabled={rejecting}>
-                  Cancel
+                  {t('municipal_copilot.actions.cancel')}
                 </Button>
                 <Button
                   color="danger"
@@ -564,7 +561,7 @@ export default function MunicipalCopilotAdminPage() {
                   isLoading={rejecting}
                   isDisabled={rejectReason.trim() === ''}
                 >
-                  Reject proposal
+                  {t('municipal_copilot.actions.reject_proposal')}
                 </Button>
               </ModalFooter>
             </>

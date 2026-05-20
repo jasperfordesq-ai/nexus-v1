@@ -3760,6 +3760,100 @@
       "export_failed": "Failed to export boundary map"
     }
   },
+  "municipal_copilot": {
+    "meta": {
+      "page_title": "Municipal Communication Copilot",
+      "title": "Municipal Communication Copilot",
+      "subtitle": "Draft official announcements, have them polished by AI, check tone and clarity, then publish. Designed for coordinators who need to communicate with residents and municipality contacts in a consistent, accessible voice."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "generate_proposal": "Generate proposal",
+      "accept": "Accept",
+      "reject": "Reject",
+      "view": "View",
+      "cancel": "Cancel",
+      "reject_proposal": "Reject proposal"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "The Municipal Copilot helps you write announcements that are clear, appropriately formal, and free of jargon. Paste a rough draft - the AI will suggest improvements, flag tone issues (too formal, condescending, or unclear), and list any moderation concerns. You review and accept or reject the suggestion before anything is published."
+    },
+    "sections": {
+      "new_draft": "New draft",
+      "latest_proposal": "Latest proposal",
+      "clarity_warnings": "Clarity warnings",
+      "moderation_flags": "Moderation flags",
+      "recent_proposals": "Recent proposals"
+    },
+    "fields": {
+      "draft_announcement": "Draft announcement",
+      "draft_placeholder": "Paste a rough draft - the copilot will polish, check tone, and flag issues.",
+      "character_count": "{{count}} / 4000 characters",
+      "audience_hint": "Audience hint (optional)",
+      "audience_placeholder": "e.g. caregivers in north sub-region",
+      "audience_description": "Specify who this announcement is for (e.g. 'all residents', 'volunteers', 'municipality contacts') so the AI can calibrate the tone and vocabulary appropriately.",
+      "polished_text": "Polished text",
+      "reason": "Reason",
+      "reason_placeholder": "Why is this proposal being rejected?"
+    },
+    "status": {
+      "proposed": "Proposed",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "published": "Published"
+    },
+    "tone": {
+      "too_formal": "Too formal",
+      "too_informal": "Too informal",
+      "condescending": "Condescending",
+      "ok": "Tone OK"
+    },
+    "tone_legend": {
+      "prefix": "Tone legend -",
+      "too_formal": "overly bureaucratic",
+      "too_informal": "may seem unprofessional",
+      "condescending": "may patronise the reader",
+      "ok": "no tone issues detected"
+    },
+    "labels": {
+      "audience": "Audience: {{audience}}",
+      "model": "Model: {{model}}"
+    },
+    "states": {
+      "accepted": "Accepted. Now publish the polished text via the Announcements admin.",
+      "rejected_reason": "Rejected - reason: {{reason}}"
+    },
+    "empty": {
+      "value": "-",
+      "no_latest": "No proposal yet. Generate one from the draft on the left.",
+      "no_proposals": "No proposals yet. Drafts you analyse will appear here as an audit trail."
+    },
+    "table": {
+      "aria": "Recent copilot proposals",
+      "status": "STATUS",
+      "draft": "DRAFT",
+      "audience": "AUDIENCE",
+      "tone": "TONE",
+      "created": "CREATED",
+      "actions": "ACTIONS"
+    },
+    "modal": {
+      "reject_title": "Reject proposal"
+    },
+    "toasts": {
+      "load_failed": "Failed to load copilot proposals",
+      "enter_draft": "Enter a draft first",
+      "draft_too_long": "Draft is too long (max 4000 characters)",
+      "generated": "Proposal generated",
+      "generate_failed": "Failed to generate proposal",
+      "accepted": "Proposal accepted - now publish via Announcements admin",
+      "accept_failed": "Failed to accept proposal",
+      "reason_required": "Reason is required",
+      "rejected": "Proposal rejected",
+      "reject_failed": "Failed to reject proposal"
+    }
+  },
   "pilot_launch_readiness": {
     "meta": {
       "page_title": "Pilot Launch Readiness",
