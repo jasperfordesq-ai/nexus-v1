@@ -30,6 +30,15 @@
   "member_status": "Membro",
   "private_title": "Grupo privado",
   "public_title": "Grupo público",
+  "welcome": {
+    "title": "Mensagem de boas-vindas",
+    "toggle_label": "Ativar mensagem de boas-vindas",
+    "message_label": "Modelo da mensagem",
+    "message_placeholder": "Boas-vindas ao nosso grupo, {member_name}! Ficamos felizes por ter voce aqui.",
+    "variables_hint": "Variaveis disponiveis: {member_name}, {group_name}, {admin_name}",
+    "saved": "Mensagem de boas-vindas salva",
+    "save_failed": "Nao foi possivel salvar a mensagem de boas-vindas"
+  },
   "detail": {
     "loading": "A carregar grupo...",
     "unable_to_load": "Não Foi Possível Carregar o Grupo",

@@ -30,6 +30,15 @@
   "member_status": "Member",
   "private_title": "Privé groep",
   "public_title": "Openbare groep",
+  "welcome": {
+    "title": "Welkomstbericht",
+    "toggle_label": "Welkomstbericht inschakelen",
+    "message_label": "Berichtsjabloon",
+    "message_placeholder": "Welkom bij onze groep, {member_name}! We zijn blij dat je er bent.",
+    "variables_hint": "Beschikbare variabelen: {member_name}, {group_name}, {admin_name}",
+    "saved": "Welkomstbericht opgeslagen",
+    "save_failed": "Welkomstbericht kon niet worden opgeslagen"
+  },
   "detail": {
     "loading": "Groep Laden...",
     "unable_to_load": "Kon Groep Niet Laden",

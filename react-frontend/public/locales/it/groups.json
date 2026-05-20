@@ -30,6 +30,15 @@
   "member_status": "Membro",
   "private_title": "Gruppo privato",
   "public_title": "Gruppo pubblico",
+  "welcome": {
+    "title": "Messaggio di benvenuto",
+    "toggle_label": "Attiva il messaggio di benvenuto",
+    "message_label": "Modello del messaggio",
+    "message_placeholder": "Benvenuto/a nel nostro gruppo, {member_name}! Siamo felici di averti con noi.",
+    "variables_hint": "Variabili disponibili: {member_name}, {group_name}, {admin_name}",
+    "saved": "Messaggio di benvenuto salvato",
+    "save_failed": "Impossibile salvare il messaggio di benvenuto"
+  },
   "detail": {
     "loading": "Caricamento del gruppo...",
     "unable_to_load": "Impossibile caricare il gruppo",

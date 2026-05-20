@@ -30,6 +30,15 @@
   "member_status": "Member",
   "private_title": "مجموعة خاصة",
   "public_title": "مجموعة عامة",
+  "welcome": {
+    "title": "Welcome Message",
+    "toggle_label": "Enable welcome message",
+    "message_label": "Message Template",
+    "message_placeholder": "Welcome to our group, {member_name}! We are glad to have you.",
+    "variables_hint": "Available variables: {member_name}, {group_name}, {admin_name}",
+    "saved": "Welcome message saved",
+    "save_failed": "Failed to save welcome message"
+  },
   "detail": {
     "loading": "جارٍ تحميل المجموعة...",
     "unable_to_load": "تعذر تحميل المجموعة",

@@ -65,12 +65,12 @@ export function WelcomeConfigPanel({ groupId, isAdmin }: WelcomeConfigPanelProps
     try {
       const res = await api.put(`/v2/groups/${groupId}/welcome`, config);
       if (res.success) {
-        toast.success(t('welcome.saved', 'Welcome message saved'));
+        toast.success(t('welcome.saved'));
       } else {
-        toast.error(t('welcome.save_failed', 'Failed to save welcome message'));
+        toast.error(t('welcome.save_failed'));
       }
     } catch {
-      toast.error(t('welcome.save_failed', 'Failed to save welcome message'));
+      toast.error(t('welcome.save_failed'));
     } finally {
       setSaving(false);
     }
@@ -92,9 +92,9 @@ export function WelcomeConfigPanel({ groupId, isAdmin }: WelcomeConfigPanelProps
     <GlassCard className="p-5 space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <HandHeart size={18} className="text-primary" />
+          <HandHeart size={18} className="text-primary" aria-hidden="true" />
           <h3 className="text-base font-semibold text-foreground">
-            {t('welcome.title', 'Welcome Message')}
+            {t('welcome.title')}
           </h3>
         </div>
 
@@ -104,16 +104,13 @@ export function WelcomeConfigPanel({ groupId, isAdmin }: WelcomeConfigPanelProps
             setConfig((prev) => ({ ...prev, enabled: checked }))
           }
           size="sm"
-          aria-label={t('welcome.toggle_label', 'Enable welcome message')}
+          aria-label={t('welcome.toggle_label')}
         />
       </div>
 
       <Textarea
-        label={t('welcome.message_label', 'Message Template')}
-        placeholder={t(
-          'welcome.message_placeholder',
-          'Welcome to our group, {member_name}! We are glad to have you.'
-        )}
+        label={t('welcome.message_label')}
+        placeholder={t('welcome.message_placeholder')}
         value={config.message}
         onValueChange={(value) =>
           setConfig((prev) => ({ ...prev, message: value }))
@@ -122,20 +119,17 @@ export function WelcomeConfigPanel({ groupId, isAdmin }: WelcomeConfigPanelProps
         maxRows={8}
         variant="bordered"
         isDisabled={!config.enabled}
-        description={t(
-          'welcome.variables_hint',
-          'Available variables: {member_name}, {group_name}, {admin_name}'
-        )}
+        description={t('welcome.variables_hint')}
       />
 
       <div className="flex justify-end">
         <Button
           color="primary"
-          startContent={<Save size={16} />}
+          startContent={<Save size={16} aria-hidden="true" />}
           onPress={handleSave}
           isLoading={saving}
         >
-          {t('common:save', 'Save')}
+          {t('common:save')}
         </Button>
       </div>
     </GlassCard>

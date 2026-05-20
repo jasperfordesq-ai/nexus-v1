@@ -30,6 +30,15 @@
   "member_status": "Miembro",
   "private_title": "Grupo privado",
   "public_title": "Grupo público",
+  "welcome": {
+    "title": "Mensaje de bienvenida",
+    "toggle_label": "Activar mensaje de bienvenida",
+    "message_label": "Plantilla del mensaje",
+    "message_placeholder": "Bienvenido/a a nuestro grupo, {member_name}! Nos alegra tenerte aqui.",
+    "variables_hint": "Variables disponibles: {member_name}, {group_name}, {admin_name}",
+    "saved": "Mensaje de bienvenida guardado",
+    "save_failed": "No se pudo guardar el mensaje de bienvenida"
+  },
   "detail": {
     "loading": "Cargando grupo...",
     "unable_to_load": "No se Pudo Cargar el Grupo",

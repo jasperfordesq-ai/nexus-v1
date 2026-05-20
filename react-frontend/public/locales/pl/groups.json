@@ -30,6 +30,15 @@
   "member_status": "Member",
   "private_title": "Grupa prywatna",
   "public_title": "Grupa publiczna",
+  "welcome": {
+    "title": "Wiadomosc powitalna",
+    "toggle_label": "Wlacz wiadomosc powitalna",
+    "message_label": "Szablon wiadomosci",
+    "message_placeholder": "Witamy w naszej grupie, {member_name}! Cieszymy sie, ze jestes z nami.",
+    "variables_hint": "Dostepne zmienne: {member_name}, {group_name}, {admin_name}",
+    "saved": "Wiadomosc powitalna zapisana",
+    "save_failed": "Nie udalo sie zapisac wiadomosci powitalnej"
+  },
   "detail": {
     "loading": "Ładowanie grupy...",
     "unable_to_load": "Nie można załadować grupy",

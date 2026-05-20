@@ -30,6 +30,15 @@
   "member_status": "Mitglied",
   "private_title": "Private Gruppe",
   "public_title": "Öffentliche Gruppe",
+  "welcome": {
+    "title": "Willkommensnachricht",
+    "toggle_label": "Willkommensnachricht aktivieren",
+    "message_label": "Nachrichtenvorlage",
+    "message_placeholder": "Willkommen in unserer Gruppe, {member_name}! Wir freuen uns, dass Sie dabei sind.",
+    "variables_hint": "Verfuegbare Variablen: {member_name}, {group_name}, {admin_name}",
+    "saved": "Willkommensnachricht gespeichert",
+    "save_failed": "Willkommensnachricht konnte nicht gespeichert werden"
+  },
   "detail": {
     "loading": "Gruppe wird geladen...",
     "unable_to_load": "Gruppe kann nicht geladen werden",

@@ -30,6 +30,15 @@
   "member_status": "Comhalta",
   "private_title": "Grúpa príobháideach",
   "public_title": "Grúpa poiblí",
+  "welcome": {
+    "title": "Teachtaireacht failte",
+    "toggle_label": "Cumasaigh teachtaireacht failte",
+    "message_label": "Teimplead teachtaireachta",
+    "message_placeholder": "Failte chuig ar ngrupa, {member_name}! Ta athas orainn go bhfuil tu linn.",
+    "variables_hint": "Athroga ar fail: {member_name}, {group_name}, {admin_name}",
+    "saved": "Sabhailadh an teachtaireacht failte",
+    "save_failed": "Theip ar shabhail na teachtaireachta failte"
+  },
   "detail": {
     "loading": "Ag luchtú an ghrúpa...",
     "unable_to_load": "Ní féidir an Grúpa a Luchtú",
