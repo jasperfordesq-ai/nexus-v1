@@ -64,26 +64,27 @@ interface FeatureItem {
 }
 
 function FeatureList({ groupKey, items }: { groupKey: string; items: FeatureItem[] }) {
-  const { t } = useTranslation('public');
+  const { t, i18n } = useTranslation('public');
 
   return (
     <ul className="space-y-3 list-none">
       {items.map((item) => {
         const copyKey = `features_page.groups.${groupKey}.items.${item.key}`;
-        const note = t(`${copyKey}.note`, { defaultValue: '' });
+        const noteKey = `${copyKey}.note`;
+        const note = i18n.exists(noteKey, { ns: 'public' }) ? t(noteKey) : '';
 
         return (
-        <li key={item.key} className="flex items-start gap-2">
-          <CheckCircle className="w-4 h-4 text-success shrink-0 mt-1" aria-hidden="true" />
-          <div className="text-sm">
-            <span className="font-semibold text-foreground">{t(`${copyKey}.title`)}</span>
-            <MaturityChip level={item.maturity ?? 'ga'} />
-            <span className="text-foreground-600"> {t(`${copyKey}.description`)}</span>
-            {note && (
-              <p className="text-xs text-foreground-500 mt-1 italic">{note}</p>
-            )}
-          </div>
-        </li>
+          <li key={item.key} className="flex items-start gap-2">
+            <CheckCircle className="w-4 h-4 text-success shrink-0 mt-1" aria-hidden="true" />
+            <div className="text-sm">
+              <span className="font-semibold text-foreground">{t(`${copyKey}.title`)}</span>
+              <MaturityChip level={item.maturity ?? 'ga'} />
+              <span className="text-foreground-600"> {t(`${copyKey}.description`)}</span>
+              {note && (
+                <p className="text-xs text-foreground-500 mt-1 italic">{note}</p>
+              )}
+            </div>
+          </li>
         );
       })}
     </ul>
@@ -102,12 +103,13 @@ function FeatureSection({
   group: FeatureGroup;
   icon?: ReactNode;
 }) {
-  const { t } = useTranslation('public');
+  const { t, i18n } = useTranslation('public');
   const groupKey = `features_page.groups.${group.key}`;
-  const intro = t(`${groupKey}.intro`, { defaultValue: '' });
+  const introKey = `${groupKey}.intro`;
+  const intro = i18n.exists(introKey, { ns: 'public' }) ? t(introKey) : '';
 
   return (
-    <Card>
+    <Card className="border border-default-200 shadow-sm">
       <CardHeader className="flex gap-2 items-center">
         {icon}
         <h2 className="text-lg font-semibold">{t(`${groupKey}.title`)}</h2>
@@ -435,16 +437,13 @@ const GROUPS: FeatureGroup[] = [
 export function FeaturesPage() {
   const { t } = useTranslation('public');
   const { tenantPath } = useTenant();
-  usePageTitle(t('features_page.title', { defaultValue: 'Features' }));
+  usePageTitle(t('features_page.title'));
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 py-4 px-4 sm:px-0">
+    <div className="mx-auto max-w-6xl space-y-6 px-4 py-4 sm:px-6 lg:px-8">
       <PageMeta
-        title={t('features_page.meta_title', { defaultValue: 'Features — Project NEXUS v1.5' })}
-        description={t('features_page.meta_description', {
-          defaultValue:
-            'Every module shipped in Project NEXUS v1.5 (Generally Available). Honest maturity labels per module — including federation, which is live with external partners while protocols continue to harden.',
-        })}
+        title={t('features_page.meta_title')}
+        description={t('features_page.meta_description')}
       />
 
       {/* Hero */}
@@ -452,33 +451,28 @@ export function FeaturesPage() {
         <div className="flex items-center gap-3 flex-wrap">
           <Sparkles className="w-7 h-7 text-primary shrink-0" aria-hidden="true" />
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-            {t('features_page.heading', { defaultValue: 'What Project NEXUS does' })}
+            {t('features_page.heading')}
           </h1>
           <Chip color="success" variant="flat" size="sm">
             {RELEASE_STATUS.stageLabel}
           </Chip>
         </div>
         <p className="text-sm sm:text-base text-foreground-600">
-          {t('features_page.subheading', {
-            defaultValue:
-              'Project NEXUS is an enterprise-grade, multi-tenant community platform. Every module below ships in v1.5 today. We label modules honestly: unmarked items are Generally Available; newer or actively-hardening surfaces carry a Beta or Preview chip.',
-          })}
+          {t('features_page.subheading')}
         </p>
       </div>
 
       {/* Maturity key */}
-      <Card>
+      <Card className="border border-default-200 shadow-sm">
         <CardBody className="text-sm space-y-2">
           <p className="font-semibold text-foreground">
-            {t('features_page.maturity_key_title', { defaultValue: 'How we label maturity' })}
+            {t('features_page.maturity_key_title')}
           </p>
           <ul className="space-y-1.5 list-none">
             <li className="flex items-start gap-2">
               <Chip color="success" variant="flat" size="sm" className="shrink-0">GA</Chip>
               <span className="text-foreground-600">
-                {t('features_page.maturity_ga', {
-                  defaultValue: 'Generally Available — stable, supported, used in production across pilot tenants.',
-                })}
+                {t('features_page.maturity_ga')}
               </span>
             </li>
             <li className="flex items-start gap-2">
@@ -486,9 +480,7 @@ export function FeaturesPage() {
                 {t('features_page.chips.beta')}
               </Chip>
               <span className="text-foreground-600">
-                {t('features_page.maturity_beta', {
-                  defaultValue: 'Working in production today, but the public surface or wire protocol is still being hardened.',
-                })}
+                {t('features_page.maturity_beta')}
               </span>
             </li>
             <li className="flex items-start gap-2">
@@ -496,9 +488,7 @@ export function FeaturesPage() {
                 {t('features_page.chips.preview')}
               </Chip>
               <span className="text-foreground-600">
-                {t('features_page.maturity_preview', {
-                  defaultValue: 'Recently shipped and available to opt in. Expect rapid iteration — the API and UX may change.',
-                })}
+                {t('features_page.maturity_preview')}
               </span>
             </li>
           </ul>
@@ -521,10 +511,10 @@ export function FeaturesPage() {
       })}
 
       {/* Modern Tech Stack */}
-      <Card>
+      <Card className="border border-default-200 shadow-sm">
         <CardHeader>
           <h2 className="text-lg font-semibold">
-            {t('features_page.tech_stack_title', { defaultValue: 'Modern Tech Stack' })}
+            {t('features_page.tech_stack_title')}
           </h2>
         </CardHeader>
         <Divider />
@@ -547,16 +537,13 @@ export function FeaturesPage() {
         <CardHeader className="flex gap-2 items-center">
           <Github className="w-5 h-5 text-primary" aria-hidden="true" />
           <h2 className="text-lg font-semibold">
-            {t('features_page.open_source_title', { defaultValue: 'Open Source — AGPL-3.0' })}
+            {t('features_page.open_source_title')}
           </h2>
         </CardHeader>
         <Divider />
         <CardBody className="text-sm text-foreground-600 space-y-3">
           <p>
-            {t('features_page.open_source_body', {
-              defaultValue:
-                'Project NEXUS is fully open source under AGPL-3.0. Every line of code is auditable, forkable, and self-hostable. Federation protocols are documented as open standards so no single platform controls the global timebanking network.',
-            })}
+            {t('features_page.open_source_body')}
           </p>
           <div className="flex flex-wrap gap-3">
             <a
@@ -566,14 +553,14 @@ export function FeaturesPage() {
               className="inline-flex items-center gap-1.5 text-primary underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
             >
               <Github className="w-3.5 h-3.5" aria-hidden="true" />
-              {t('features_page.link_repo', { defaultValue: 'Source repository' })}
+              {t('features_page.link_repo')}
               <ExternalLink className="w-3 h-3" aria-hidden="true" />
             </a>
             <Link
               to={tenantPath('/changelog')}
               className="inline-flex items-center gap-1.5 text-primary underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
             >
-              {t('features_page.link_changelog', { defaultValue: 'Changelog' })}
+              {t('features_page.link_changelog')}
             </Link>
             <a
               href="https://project-nexus.canny.io/"
@@ -582,14 +569,14 @@ export function FeaturesPage() {
               className="inline-flex items-center gap-1.5 text-primary underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
             >
               <Bug className="w-3.5 h-3.5" aria-hidden="true" />
-              {t('features_page.link_report_bug', { defaultValue: 'Report a bug' })}
+              {t('features_page.link_report_bug')}
               <ExternalLink className="w-3 h-3" aria-hidden="true" />
             </a>
             <Link
               to={tenantPath('/about')}
               className="inline-flex items-center gap-1.5 text-primary underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
             >
-              {t('features_page.link_about', { defaultValue: 'About this tenant' })}
+              {t('features_page.link_about')}
             </Link>
           </div>
         </CardBody>
@@ -600,25 +587,20 @@ export function FeaturesPage() {
         <CardHeader className="flex gap-2 items-center">
           <Shield className="w-5 h-5 text-danger" aria-hidden="true" />
           <h2 className="text-lg font-semibold">
-            {t('features_page.security_title', { defaultValue: 'Security disclosure' })}
+            {t('features_page.security_title')}
           </h2>
         </CardHeader>
         <Divider />
         <CardBody className="text-sm text-foreground-600">
           <p>
-            {t('features_page.security_body_before', {
-              defaultValue: 'Found a security issue? Please report it privately to ',
-            })}
+            {t('features_page.security_body_before')}
             <a
               href="mailto:jasper@hour-timebank.ie"
               className="text-primary underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
             >
               {t('features_page.security_email')}
             </a>
-            {t('features_page.security_body_after', {
-              defaultValue:
-                ' rather than filing a public issue. Full vulnerability-disclosure policy in SECURITY.md on the source repository.',
-            })}
+            {t('features_page.security_body_after')}
           </p>
         </CardBody>
       </Card>
