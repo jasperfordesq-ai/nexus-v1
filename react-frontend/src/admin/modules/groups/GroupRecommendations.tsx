@@ -4,17 +4,19 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip } from '@heroui/react';
+import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Progress } from '@heroui/react';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
 import Target from 'lucide-react/icons/target';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { GroupRecommendation } from '@/admin/api/types';
 
 export default function GroupRecommendations() {
-  usePageTitle("Groups");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('groups.page_title'));
   const { error } = useToast();
   const [recommendations, setRecommendations] = useState<GroupRecommendation[]>([]);
   const [stats, setStats] = useState({ total: 0, avg_score: 0, join_rate: 0 });
@@ -28,11 +30,11 @@ export default function GroupRecommendations() {
       setRecommendations(data?.recommendations || []);
       setStats(data?.stats || { total: 0, avg_score: 0, join_rate: 0 });
     } catch {
-      error("Failed to load recommendations");
+      error(t('groups.failed_to_load_recommendations'));
     } finally {
       setLoading(false);
     }
-  }, [error])
+  }, [error, t])
 
 
   useEffect(() => {
@@ -42,62 +44,69 @@ export default function GroupRecommendations() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">{"Group Recommendations"}</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {"View recently generated group recommendations for members"}
+        <h1 className="text-2xl font-bold text-foreground">{t('groups.group_recommendations_title')}</h1>
+        <p className="text-sm text-default-500 mt-1">
+          {t('groups.group_recommendations_desc')}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-6">
+        <Card shadow="sm">
+          <CardBody className="p-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <div className="text-sm text-gray-500">{"Total Recommendations"}</div>
+              <div className="text-sm text-default-500">{t('groups.total_recommendations')}</div>
               <div className="text-2xl font-bold mt-1">{stats.total}</div>
             </div>
           </div>
+          </CardBody>
         </Card>
 
-        <Card className="p-6">
+        <Card shadow="sm">
+          <CardBody className="p-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center">
               <Target className="w-6 h-6 text-success" />
             </div>
             <div>
-              <div className="text-sm text-gray-500">{"Avg Match Score"}</div>
+              <div className="text-sm text-default-500">{t('groups.avg_match_score')}</div>
               <div className="text-2xl font-bold mt-1">{stats.avg_score.toFixed(2)}</div>
             </div>
           </div>
+          </CardBody>
         </Card>
 
-        <Card className="p-6">
+        <Card shadow="sm">
+          <CardBody className="p-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg bg-warning/10 flex items-center justify-center">
               <Users className="w-6 h-6 text-warning" />
             </div>
             <div>
-              <div className="text-sm text-gray-500">{"Join Rate"}</div>
+              <div className="text-sm text-default-500">{t('groups.join_rate')}</div>
               <div className="text-2xl font-bold mt-1">{stats.join_rate}%</div>
             </div>
           </div>
+          </CardBody>
         </Card>
       </div>
 
-      <Card className="p-4">
-        <h2 className="text-lg font-semibold mb-4">{"Recent Recommendations"}</h2>
-        <Table aria-label={"Recommendations Table"}>
+      <Card shadow="sm">
+        <CardBody className="p-4">
+        <h2 className="text-lg font-semibold mb-4 text-foreground">{t('groups.recent_recommendations')}</h2>
+        <Table aria-label={t('groups.label_recommendations_table')}>
           <TableHeader>
-            <TableColumn>{"User"}</TableColumn>
-            <TableColumn>{"Group"}</TableColumn>
-            <TableColumn>{"Score"}</TableColumn>
-            <TableColumn>{"Status"}</TableColumn>
-            <TableColumn>{"Date"}</TableColumn>
+            <TableColumn>{t('groups.col_user')}</TableColumn>
+            <TableColumn>{t('groups.col_group')}</TableColumn>
+            <TableColumn>{t('groups.col_score')}</TableColumn>
+            <TableColumn>{t('groups.col_status')}</TableColumn>
+            <TableColumn>{t('groups.col_date')}</TableColumn>
           </TableHeader>
           <TableBody
-            emptyContent={loading ? "Loading groups..." : "No recommendations found"}
+            emptyContent={loading ? t('groups.loading') : t('groups.no_recommendations_found')}
             items={recommendations}
           >
             {(rec) => (
@@ -106,18 +115,13 @@ export default function GroupRecommendations() {
                 <TableCell>{rec.group_name}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <div className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary"
-                        style={{ width: `${rec.score * 100}%` }}
-                      ></div>
-                    </div>
+                    <Progress aria-label={t('groups.col_score')} value={rec.score * 100} size="sm" className="w-24" color="primary" />
                     <span className="text-sm">{(rec.score * 100).toFixed(0)}%</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <Chip size="sm" color={rec.joined ? 'success' : 'default'}>
-                    {rec.joined ? "Joined" : "Pending"}
+                    {rec.joined ? t('groups.joined') : t('groups.pending')}
                   </Chip>
                 </TableCell>
                 <TableCell>{new Date(rec.created_at).toLocaleDateString()}</TableCell>
@@ -125,6 +129,7 @@ export default function GroupRecommendations() {
             )}
           </TableBody>
         </Table>
+        </CardBody>
       </Card>
     </div>
   );

@@ -96,7 +96,7 @@ export default function GroupPolicies({
       setPolicies(data);
       setSections(buildPolicySections(data, (key) => t(key)));
     } catch {
-      error("Failed to load policies");
+      error(t('groups.failed_to_load_policies'));
     } finally {
       setLoading(false);
     }
@@ -112,7 +112,7 @@ export default function GroupPolicies({
   const handlePolicyChange = async (policy: GroupPolicy, newValue: string | number | boolean) => {
     try {
       await adminGroups.setPolicy(typeId, policy.key, newValue);
-      success("Policy Updated");
+      success(t('groups.policy_updated'));
 
       // Update local state
       const updatedPolicies = policies.map((p) =>
@@ -121,7 +121,7 @@ export default function GroupPolicies({
       setPolicies(updatedPolicies);
       setSections(buildPolicySections(updatedPolicies, (key) => t(key)));
     } catch {
-      error("Failed to update policy");
+      error(t('groups.failed_to_update_policy'));
     }
   };
 
@@ -169,32 +169,32 @@ export default function GroupPolicies({
       <ModalContent>
         <ModalHeader>
           <div>
-            <div className="text-lg font-semibold">{"Group Policies"}</div>
-            <div className="text-sm font-normal text-gray-500 mt-1">{typeName}</div>
+            <div className="text-lg font-semibold text-foreground">{t('groups.group_policies')}</div>
+            <div className="text-sm font-normal text-default-500 mt-1">{typeName}</div>
           </div>
         </ModalHeader>
         <ModalBody>
           {loading ? (
-            <div className="text-center py-8 text-gray-500">{"Loading policies..."}</div>
+            <div className="text-center py-8 text-default-500">{t('groups.loading_policies')}</div>
           ) : sections.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">{"No policies configured"}</div>
+            <div className="text-center py-8 text-default-500">{t('groups.no_policies_configured')}</div>
           ) : (
             <div className="space-y-6">
               {sections.map((section) => (
                 <div key={section.category}>
-                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                  <h3 className="text-sm font-semibold text-foreground mb-3">
                     {section.title}
                   </h3>
                   <div className="space-y-4">
                     {section.policies.map((policy) => (
                       <div
                         key={policy.key}
-                        className="flex items-center justify-between py-2 px-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                        className="flex items-center justify-between gap-4 rounded-lg border border-default-200 bg-default-50/70 px-3 py-3 dark:bg-default-100/5"
                       >
                         <div className="flex-1">
                           <div className="font-medium text-sm">{policy.label}</div>
                           {policy.description && (
-                            <div className="text-xs text-gray-500 mt-1">{policy.description}</div>
+                            <div className="text-xs text-default-500 mt-1">{policy.description}</div>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
@@ -211,7 +211,7 @@ export default function GroupPolicies({
         </ModalBody>
         <ModalFooter>
           <Button variant="light" onPress={onClose}>
-            {"Close"}
+            {t('common.close', 'Close')}
           </Button>
         </ModalFooter>
       </ModalContent>
