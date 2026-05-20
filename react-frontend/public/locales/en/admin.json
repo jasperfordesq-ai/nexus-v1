@@ -3203,6 +3203,102 @@
       "copy_failed": "Failed to copy."
     }
   },
+  "pilot_scoreboard": {
+    "meta": {
+      "title": "Pilot Success Scoreboard",
+      "subtitle": "AG83 - pre-pilot baseline + 90-day rolling metrics with quarterly review cadence"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "pre_set": "Pre-pilot baseline set",
+      "capture_pre": "Capture pre-pilot baseline",
+      "capture_quarterly": "Capture quarterly review",
+      "capture_baseline": "Capture baseline",
+      "cancel": "Cancel"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "All metrics use a 90-day rolling window. Capture a pre-pilot baseline before onboarding real residents, then run a quarterly review snapshot every 3 months. The comparison table shows how each metric has moved relative to that baseline.",
+      "methodology_prefix": "Cost offset is calculated using the",
+      "age_stiftung": "Age-Stiftung",
+      "age_stiftung_title": "Stiftung für das Alter",
+      "methodology_middle": "methodology: hours of informal care x",
+      "methodology_suffix": "35/hr (Swiss formal-care assistant rate) x 2 (prevention multiplier reflecting avoided formal care costs). This methodology is recognised by Swiss cantonal social services for pilot reporting."
+    },
+    "quarterly": {
+      "next_review": "Next quarterly review:",
+      "overdue": "Overdue"
+    },
+    "sections": {
+      "metrics": "Pilot metrics",
+      "comparing_baseline": "Comparing against pre-pilot baseline captured {{date}}",
+      "no_baseline": "No pre-pilot baseline yet - current values shown alone",
+      "captured_baselines": "Captured baselines"
+    },
+    "table": {
+      "metric": "Metric",
+      "pre_pilot": "Pre-pilot",
+      "current": "Current",
+      "delta": "Delta",
+      "change": "Change"
+    },
+    "metrics": {
+      "active_members": "Active members (90d)",
+      "first_response_hours": "Median first-response",
+      "approved_hours": "Approved hours (90d)",
+      "recurring_relationships": "Recurring relationships",
+      "coordinator_workload_hrs": "Coordinator workload",
+      "satisfaction_score": "Satisfaction score (1-5)",
+      "social_isolation_pct": "Social isolation proxy",
+      "comms_reach_pct": "Comms reach",
+      "business_participation": "Active businesses (90d)",
+      "cost_offset_chf": "Estimated cost offset (CHF)"
+    },
+    "baselines": {
+      "label": "Label",
+      "captured": "Captured",
+      "period": "Period",
+      "type": "Type",
+      "notes": "Notes",
+      "pre_pilot": "Pre-pilot",
+      "quarterly": "Quarterly"
+    },
+    "fields": {
+      "notes_optional": "Notes (optional)",
+      "label_optional": "Label (optional)"
+    },
+    "pre_modal": {
+      "title": "Capture pre-pilot baseline",
+      "body": "Capture this ONCE before onboarding real residents. It freezes the current 90-day metrics as your comparison baseline. All future quarterly reviews will calculate delta against this snapshot. This action cannot be undone.",
+      "notes_placeholder": "Pilot region, participating municipality, decisions made before launch..."
+    },
+    "quarterly_modal": {
+      "title": "Capture quarterly review",
+      "body": "Run every 3 months after pilot launch. The snapshot label defaults to the current quarter (e.g. Q2_2026) but you can customise it. Add notes to record what changed since the last review - milestones reached, policy changes, resident feedback. Snapshot covers the most recent 90-day window from today.",
+      "label_placeholder": "quarterly_2026_07",
+      "label_description": "Use a recognisable label such as Q2_2026 or 2026_Q3. Defaults to quarterly_YYYY_MM.",
+      "notes_placeholder": "What changed this quarter, milestones reached..."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "currency": {
+      "chf": "CHF"
+    },
+    "methodology": {
+      "prefix": "Methodology: hours x",
+      "per_hour": "/hr x",
+      "multiplier": "prevention multiplier.",
+      "window": "Window: {{days}} days."
+    },
+    "toasts": {
+      "load_failed": "Failed to load pilot scoreboard",
+      "pre_captured": "Pre-pilot baseline captured",
+      "pre_failed": "Failed to capture pre-pilot baseline",
+      "quarterly_captured": "Quarterly review captured",
+      "quarterly_failed": "Failed to capture quarterly review"
+    }
+  },
   "billing": {
     "actions": "Actions",
     "billing_interval": "Billing Interval",

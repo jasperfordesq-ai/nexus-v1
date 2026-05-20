@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -104,20 +105,20 @@ const CHF = new Intl.NumberFormat('de-CH', {
 
 const METRIC_KEYS: Array<{
   key: keyof Omit<PilotMetrics, 'methodology'>;
-  label: string;
+  labelKey: string;
   format: 'int' | 'float' | 'pct' | 'hours' | 'chf' | 'score';
   betterDirection: 'up' | 'down';
 }> = [
-  { key: 'active_members',          label: 'Active members (90d)',     format: 'int',   betterDirection: 'up' },
-  { key: 'first_response_hours',    label: 'Median first-response',     format: 'hours', betterDirection: 'down' },
-  { key: 'approved_hours',          label: 'Approved hours (90d)',      format: 'float', betterDirection: 'up' },
-  { key: 'recurring_relationships', label: 'Recurring relationships',   format: 'int',   betterDirection: 'up' },
-  { key: 'coordinator_workload_hrs',label: 'Coordinator workload',       format: 'float', betterDirection: 'down' },
-  { key: 'satisfaction_score',      label: 'Satisfaction score (1–5)',   format: 'score', betterDirection: 'up' },
-  { key: 'social_isolation_pct',    label: 'Social isolation proxy',     format: 'pct',   betterDirection: 'down' },
-  { key: 'comms_reach_pct',         label: 'Comms reach',                format: 'pct',   betterDirection: 'up' },
-  { key: 'business_participation',  label: 'Active businesses (90d)',    format: 'int',   betterDirection: 'up' },
-  { key: 'cost_offset_chf',         label: 'Estimated cost offset (CHF)', format: 'chf',  betterDirection: 'up' },
+  { key: 'active_members',          labelKey: 'active_members',          format: 'int',   betterDirection: 'up' },
+  { key: 'first_response_hours',    labelKey: 'first_response_hours',    format: 'hours', betterDirection: 'down' },
+  { key: 'approved_hours',          labelKey: 'approved_hours',          format: 'float', betterDirection: 'up' },
+  { key: 'recurring_relationships', labelKey: 'recurring_relationships', format: 'int',   betterDirection: 'up' },
+  { key: 'coordinator_workload_hrs',labelKey: 'coordinator_workload_hrs',format: 'float', betterDirection: 'down' },
+  { key: 'satisfaction_score',      labelKey: 'satisfaction_score',      format: 'score', betterDirection: 'up' },
+  { key: 'social_isolation_pct',    labelKey: 'social_isolation_pct',    format: 'pct',   betterDirection: 'down' },
+  { key: 'comms_reach_pct',         labelKey: 'comms_reach_pct',         format: 'pct',   betterDirection: 'up' },
+  { key: 'business_participation',  labelKey: 'business_participation',  format: 'int',   betterDirection: 'up' },
+  { key: 'cost_offset_chf',         labelKey: 'cost_offset_chf',         format: 'chf',  betterDirection: 'up' },
 ];
 
 function formatValue(v: number | null, fmt: string): string {
@@ -147,7 +148,8 @@ const ICONS: Record<string, typeof Users> = {
 };
 
 export default function PilotScoreboardAdminPage() {
-  usePageTitle('Pilot Success Scoreboard');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('pilot_scoreboard.meta.title'));
   const { showToast } = useToast();
 
   const [data, setData] = useState<Scoreboard | null>(null);
@@ -170,11 +172,11 @@ export default function PilotScoreboardAdminPage() {
       setData(scoreboardRes.data ?? null);
       setBaselines(baselinesRes.data?.items ?? []);
     } catch {
-      showToast('Failed to load pilot scoreboard', 'error');
+      showToast(t('pilot_scoreboard.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     load();
@@ -184,12 +186,12 @@ export default function PilotScoreboardAdminPage() {
     setSubmitting(true);
     try {
       await api.post('/v2/admin/caring-community/pilot-scoreboard/pre-pilot', { notes: preNotes });
-      showToast('Pre-pilot baseline captured', 'success');
+      showToast(t('pilot_scoreboard.toasts.pre_captured'), 'success');
       setShowPreModal(false);
       setPreNotes('');
       await load();
     } catch {
-      showToast('Failed to capture pre-pilot baseline', 'error');
+      showToast(t('pilot_scoreboard.toasts.pre_failed'), 'error');
     } finally {
       setSubmitting(false);
     }
@@ -202,13 +204,13 @@ export default function PilotScoreboardAdminPage() {
         label: quarterlyLabel || undefined,
         notes: quarterlyNotes,
       });
-      showToast('Quarterly review captured', 'success');
+      showToast(t('pilot_scoreboard.toasts.quarterly_captured'), 'success');
       setShowQuarterlyModal(false);
       setQuarterlyLabel('');
       setQuarterlyNotes('');
       await load();
     } catch {
-      showToast('Failed to capture quarterly review', 'error');
+      showToast(t('pilot_scoreboard.toasts.quarterly_failed'), 'error');
     } finally {
       setSubmitting(false);
     }
@@ -222,13 +224,13 @@ export default function PilotScoreboardAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Pilot Success Scoreboard"
-        subtitle="AG83 — pre-pilot baseline + 90-day rolling metrics with quarterly review cadence"
+        title={t('pilot_scoreboard.meta.title')}
+        subtitle={t('pilot_scoreboard.meta.subtitle')}
         icon={<Flag size={20} />}
         actions={
           <div className="flex gap-2">
-            <Tooltip content="Refresh">
-              <Button isIconOnly size="sm" variant="flat" onPress={load} isLoading={loading} aria-label="Refresh">
+            <Tooltip content={t('pilot_scoreboard.actions.refresh')}>
+              <Button isIconOnly size="sm" variant="flat" onPress={load} isLoading={loading} aria-label={t('pilot_scoreboard.actions.refresh')}>
                 <RefreshCw size={15} />
               </Button>
             </Tooltip>
@@ -240,7 +242,7 @@ export default function PilotScoreboardAdminPage() {
               onPress={() => setShowPreModal(true)}
               isDisabled={prePilot !== null}
             >
-              {prePilot ? 'Pre-pilot baseline set' : 'Capture pre-pilot baseline'}
+              {prePilot ? t('pilot_scoreboard.actions.pre_set') : t('pilot_scoreboard.actions.capture_pre')}
             </Button>
             <Button
               size="sm"
@@ -250,7 +252,7 @@ export default function PilotScoreboardAdminPage() {
               onPress={() => setShowQuarterlyModal(true)}
               isDisabled={prePilot === null}
             >
-              Capture quarterly review
+              {t('pilot_scoreboard.actions.capture_quarterly')}
             </Button>
           </div>
         }
@@ -261,17 +263,14 @@ export default function PilotScoreboardAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('pilot_scoreboard.about.title')}</p>
               <p className="text-default-600">
-                All metrics use a 90-day rolling window. Capture a pre-pilot baseline before
-                onboarding real residents, then run a quarterly review snapshot every 3 months.
-                The comparison table shows how each metric has moved relative to that baseline.
+                {t('pilot_scoreboard.about.body')}
               </p>
               <p className="text-default-600">
-                Cost offset is calculated using the <Abbr term="KISS" />/<abbr title="Stiftung für das Alter">Age-Stiftung</abbr> methodology: hours of informal
-                care × <Abbr term="CHF">CHF</Abbr> 35/hr (Swiss formal-care assistant rate) × 2 (prevention multiplier
-                reflecting avoided formal care costs). This methodology is recognised by Swiss
-                cantonal social services for pilot reporting.
+                {t('pilot_scoreboard.about.methodology_prefix')} <Abbr term="KISS" />/<abbr title={t('pilot_scoreboard.about.age_stiftung_title')}>{t('pilot_scoreboard.about.age_stiftung')}</abbr>{' '}
+                {t('pilot_scoreboard.about.methodology_middle')} <Abbr term="CHF">{t('pilot_scoreboard.currency.chf')}</Abbr>{' '}
+                {t('pilot_scoreboard.about.methodology_suffix')}
               </p>
             </div>
           </div>
@@ -284,7 +283,7 @@ export default function PilotScoreboardAdminPage() {
             <div className="flex items-center gap-3">
               <CalendarClock size={18} className={quarterly.is_overdue ? 'text-danger' : 'text-default-500'} />
               <span className="text-sm">
-                Next quarterly review:{' '}
+                {t('pilot_scoreboard.quarterly.next_review')}{' '}
                 <span className="font-semibold">
                   {new Date(quarterly.next_due_at).toLocaleDateString()}
                 </span>
@@ -292,7 +291,7 @@ export default function PilotScoreboardAdminPage() {
             </div>
             {quarterly.is_overdue && (
               <Chip color="danger" variant="flat" size="sm" startContent={<ShieldAlert size={12} />}>
-                Overdue
+                {t('pilot_scoreboard.quarterly.overdue')}
               </Chip>
             )}
           </CardBody>
@@ -308,31 +307,31 @@ export default function PilotScoreboardAdminPage() {
       {current && !loading && (
         <Card>
           <CardHeader className="pb-2 flex justify-between">
-            <span className="font-semibold text-sm">Pilot metrics</span>
+            <span className="font-semibold text-sm">{t('pilot_scoreboard.sections.metrics')}</span>
             <span className="text-xs text-default-500">
               {prePilot
-                ? `Comparing against pre-pilot baseline captured ${new Date(prePilot.captured_at).toLocaleDateString()}`
-                : 'No pre-pilot baseline yet — current values shown alone'}
+                ? t('pilot_scoreboard.sections.comparing_baseline', { date: new Date(prePilot.captured_at).toLocaleDateString() })
+                : t('pilot_scoreboard.sections.no_baseline')}
             </span>
           </CardHeader>
           <CardBody className="pt-0">
-            <Table aria-label="Pilot metrics" removeWrapper>
+            <Table aria-label={t('pilot_scoreboard.sections.metrics')} removeWrapper>
               <TableHeader>
-                <TableColumn>Metric</TableColumn>
-                <TableColumn>Pre-pilot</TableColumn>
-                <TableColumn>Current</TableColumn>
-                <TableColumn>Δ</TableColumn>
-                <TableColumn>Change</TableColumn>
+                <TableColumn>{t('pilot_scoreboard.table.metric')}</TableColumn>
+                <TableColumn>{t('pilot_scoreboard.table.pre_pilot')}</TableColumn>
+                <TableColumn>{t('pilot_scoreboard.table.current')}</TableColumn>
+                <TableColumn>{t('pilot_scoreboard.table.delta')}</TableColumn>
+                <TableColumn>{t('pilot_scoreboard.table.change')}</TableColumn>
               </TableHeader>
               <TableBody>
-                {METRIC_KEYS.map(({ key, label, format, betterDirection }) => {
+                {METRIC_KEYS.map(({ key, labelKey, format, betterDirection }) => {
                   const Icon = ICONS[key];
                   const c = comp?.[key];
                   const baselineVal = c?.baseline ?? null;
                   const currentVal = current[key] as number | null;
                   const delta = c?.delta ?? null;
                   const pct = c?.pct_change ?? null;
-                  let chip: React.ReactNode = '—';
+                  let chip: React.ReactNode = t('pilot_scoreboard.empty.value');
                   if (pct !== null) {
                     const isImprovement =
                       (betterDirection === 'up' && pct >= 0) ||
@@ -355,15 +354,15 @@ export default function PilotScoreboardAdminPage() {
                     <TableRow key={key}>
                       <TableCell>
                         <span className="flex items-center gap-2">
-                          {Icon && <Icon size={14} className="text-default-500" />} {label}
+                          {Icon && <Icon size={14} className="text-default-500" />} {t(`pilot_scoreboard.metrics.${labelKey}`)}
                         </span>
                       </TableCell>
-                      <TableCell>{formatValue(baselineVal, format)}</TableCell>
-                      <TableCell className="font-semibold">{formatValue(currentVal, format)}</TableCell>
+                      <TableCell>{baselineVal === null ? t('pilot_scoreboard.empty.value') : formatValue(baselineVal, format)}</TableCell>
+                      <TableCell className="font-semibold">{currentVal === null ? t('pilot_scoreboard.empty.value') : formatValue(currentVal, format)}</TableCell>
                       <TableCell>
                         {delta !== null
                           ? formatValue(delta, format === 'pct' ? 'pct' : format === 'chf' ? 'chf' : 'float')
-                          : '—'}
+                          : t('pilot_scoreboard.empty.value')}
                       </TableCell>
                       <TableCell>{chip}</TableCell>
                     </TableRow>
@@ -378,16 +377,16 @@ export default function PilotScoreboardAdminPage() {
       {baselines.length > 0 && (
         <Card>
           <CardHeader className="pb-2">
-            <span className="font-semibold text-sm">Captured baselines</span>
+            <span className="font-semibold text-sm">{t('pilot_scoreboard.sections.captured_baselines')}</span>
           </CardHeader>
           <CardBody className="pt-0">
-            <Table aria-label="Captured baselines" removeWrapper>
+            <Table aria-label={t('pilot_scoreboard.sections.captured_baselines')} removeWrapper>
               <TableHeader>
-                <TableColumn>Label</TableColumn>
-                <TableColumn>Captured</TableColumn>
-                <TableColumn>Period</TableColumn>
-                <TableColumn>Type</TableColumn>
-                <TableColumn>Notes</TableColumn>
+                <TableColumn>{t('pilot_scoreboard.baselines.label')}</TableColumn>
+                <TableColumn>{t('pilot_scoreboard.baselines.captured')}</TableColumn>
+                <TableColumn>{t('pilot_scoreboard.baselines.period')}</TableColumn>
+                <TableColumn>{t('pilot_scoreboard.baselines.type')}</TableColumn>
+                <TableColumn>{t('pilot_scoreboard.baselines.notes')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {baselines.map((b) => (
@@ -399,13 +398,13 @@ export default function PilotScoreboardAdminPage() {
                     </TableCell>
                     <TableCell>
                       {b.is_pre_pilot ? (
-                        <Chip size="sm" color="primary" variant="flat">Pre-pilot</Chip>
+                        <Chip size="sm" color="primary" variant="flat">{t('pilot_scoreboard.baselines.pre_pilot')}</Chip>
                       ) : (
-                        <Chip size="sm" variant="flat">Quarterly</Chip>
+                        <Chip size="sm" variant="flat">{t('pilot_scoreboard.baselines.quarterly')}</Chip>
                       )}
                     </TableCell>
                     <TableCell className="text-xs text-default-600 max-w-md truncate">
-                      {b.notes ?? '—'}
+                      {b.notes ?? t('pilot_scoreboard.empty.value')}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -417,16 +416,14 @@ export default function PilotScoreboardAdminPage() {
 
       <Modal isOpen={showPreModal} onClose={() => setShowPreModal(false)} size="lg">
         <ModalContent>
-          <ModalHeader>Capture pre-pilot baseline</ModalHeader>
+          <ModalHeader>{t('pilot_scoreboard.pre_modal.title')}</ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-600">
-              Capture this ONCE before onboarding real residents. It freezes the current 90-day
-              metrics as your comparison baseline. All future quarterly reviews will calculate
-              delta against this snapshot. This action cannot be undone.
+                {t('pilot_scoreboard.pre_modal.body')}
             </p>
             <Textarea
-              label="Notes (optional)"
-              placeholder="Pilot region, participating municipality, decisions made before launch..."
+              label={t('pilot_scoreboard.fields.notes_optional')}
+              placeholder={t('pilot_scoreboard.pre_modal.notes_placeholder')}
               value={preNotes}
               onValueChange={setPreNotes}
               minRows={3}
@@ -434,10 +431,10 @@ export default function PilotScoreboardAdminPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setShowPreModal(false)} isDisabled={submitting}>
-              Cancel
+              {t('pilot_scoreboard.actions.cancel')}
             </Button>
             <Button color="primary" onPress={capturePre} isLoading={submitting}>
-              Capture baseline
+              {t('pilot_scoreboard.actions.capture_baseline')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -445,24 +442,21 @@ export default function PilotScoreboardAdminPage() {
 
       <Modal isOpen={showQuarterlyModal} onClose={() => setShowQuarterlyModal(false)} size="lg">
         <ModalContent>
-          <ModalHeader>Capture quarterly review</ModalHeader>
+          <ModalHeader>{t('pilot_scoreboard.quarterly_modal.title')}</ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-600">
-              Run every 3 months after pilot launch. The snapshot label defaults to the current
-              quarter (e.g. Q2_2026) but you can customise it. Add notes to record what changed
-              since the last review — milestones reached, policy changes, resident feedback.
-              Snapshot covers the most recent 90-day window from today.
+              {t('pilot_scoreboard.quarterly_modal.body')}
             </p>
             <Input
-              label="Label (optional)"
-              placeholder="quarterly_2026_07"
+              label={t('pilot_scoreboard.fields.label_optional')}
+              placeholder={t('pilot_scoreboard.quarterly_modal.label_placeholder')}
               value={quarterlyLabel}
               onValueChange={setQuarterlyLabel}
-              description="Use a recognisable label such as Q2_2026 or 2026_Q3. Defaults to quarterly_YYYY_MM."
+              description={t('pilot_scoreboard.quarterly_modal.label_description')}
             />
             <Textarea
-              label="Notes (optional)"
-              placeholder="What changed this quarter, milestones reached..."
+              label={t('pilot_scoreboard.fields.notes_optional')}
+              placeholder={t('pilot_scoreboard.quarterly_modal.notes_placeholder')}
               value={quarterlyNotes}
               onValueChange={setQuarterlyNotes}
               minRows={3}
@@ -470,10 +464,10 @@ export default function PilotScoreboardAdminPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setShowQuarterlyModal(false)} isDisabled={submitting}>
-              Cancel
+              {t('pilot_scoreboard.actions.cancel')}
             </Button>
             <Button color="primary" onPress={captureQuarterly} isLoading={submitting}>
-              Capture quarterly review
+              {t('pilot_scoreboard.actions.capture_quarterly')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -485,8 +479,9 @@ export default function PilotScoreboardAdminPage() {
 
       {!loading && current && (
         <p className="text-xs text-default-500">
-          Methodology: hours × <Abbr term="CHF">CHF</Abbr> {current.methodology.hourly_rate_chf}/hr × {current.methodology.prevention_multiplier}
-          {' '}prevention multiplier. Window: {current.methodology.window_days} days.
+          {t('pilot_scoreboard.methodology.prefix')} <Abbr term="CHF">{t('pilot_scoreboard.currency.chf')}</Abbr> {current.methodology.hourly_rate_chf}
+          {t('pilot_scoreboard.methodology.per_hour')} {current.methodology.prevention_multiplier}{' '}
+          {t('pilot_scoreboard.methodology.multiplier')} {t('pilot_scoreboard.methodology.window', { days: current.methodology.window_days })}
         </p>
       )}
     </div>
