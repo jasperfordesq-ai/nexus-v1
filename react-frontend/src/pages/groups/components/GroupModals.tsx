@@ -140,7 +140,7 @@ export function NewDiscussionModal({
                 {t('detail.cancel')}
               </Button>
               <Button
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                color="primary"
                 isLoading={creatingDiscussion}
                 isDisabled={!newDiscussionTitle.trim() || !newDiscussionContent.trim()}
                 onPress={onSubmit}
@@ -283,10 +283,17 @@ export function GroupSettingsModal({
                     {t('detail.settings_image_label')}
                   </p>
                   {group?.image_url && (
-                    <img src={group.image_url} alt={t('detail.image_alt_group', 'Group')} className="w-12 h-12 rounded-full object-cover mb-2" width={48} height={48} loading="lazy" />
+                    <img src={group.image_url} alt={t('detail.image_alt_group')} className="w-12 h-12 rounded-full object-cover mb-2" width={48} height={48} loading="lazy" />
                   )}
-                  <label className="flex items-center gap-1.5 text-xs text-primary cursor-pointer hover:underline">
-                    <Upload className="w-3 h-3" aria-hidden="true" />
+                  <Button
+                    as="label"
+                    size="sm"
+                    variant="flat"
+                    color="primary"
+                    isDisabled={uploadingImage}
+                    startContent={<Upload className="w-3 h-3" aria-hidden="true" />}
+                    className="cursor-pointer"
+                  >
                     {uploadingImage ? t('detail.uploading') : t('detail.upload_image')}
                     <input
                       type="file"
@@ -295,7 +302,7 @@ export function GroupSettingsModal({
                       disabled={uploadingImage}
                       onChange={(e) => onImageUpload(e, 'avatar')}
                     />
-                  </label>
+                  </Button>
                 </div>
                 <div className="p-3 rounded-lg bg-theme-elevated border border-theme-default">
                   <p className="text-sm font-medium text-theme-primary mb-2 flex items-center gap-1.5">
@@ -303,10 +310,17 @@ export function GroupSettingsModal({
                     {t('detail.settings_cover_label')}
                   </p>
                   {group?.cover_image_url && (
-                    <img src={group.cover_image_url} alt={t('detail.image_alt_cover', 'Cover')} className="w-full h-10 rounded object-cover mb-2" width={400} height={40} loading="lazy" />
+                    <img src={group.cover_image_url} alt={t('detail.image_alt_cover')} className="w-full h-10 rounded object-cover mb-2" width={400} height={40} loading="lazy" />
                   )}
-                  <label className="flex items-center gap-1.5 text-xs text-primary cursor-pointer hover:underline">
-                    <Upload className="w-3 h-3" aria-hidden="true" />
+                  <Button
+                    as="label"
+                    size="sm"
+                    variant="flat"
+                    color="primary"
+                    isDisabled={uploadingImage}
+                    startContent={<Upload className="w-3 h-3" aria-hidden="true" />}
+                    className="cursor-pointer"
+                  >
                     {uploadingImage ? t('detail.uploading') : t('detail.upload_cover')}
                     <input
                       type="file"
@@ -315,7 +329,7 @@ export function GroupSettingsModal({
                       disabled={uploadingImage}
                       onChange={(e) => onImageUpload(e, 'cover')}
                     />
-                  </label>
+                  </Button>
                 </div>
               </div>
               <div className="p-4 rounded-lg bg-theme-elevated border border-theme-default">
@@ -353,7 +367,7 @@ export function GroupSettingsModal({
                 {t('detail.cancel')}
               </Button>
               <Button
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                color="primary"
                 isLoading={savingSettings}
                 isDisabled={!settingsName.trim()}
                 onPress={onSave}
@@ -404,11 +418,11 @@ export function GroupLeaveModal({
           <>
             <ModalHeader className="text-theme-primary flex items-center gap-2">
               <UserMinus className="w-5 h-5" aria-hidden="true" />
-              {t('detail.leave_group_title', 'Leave Group')}
+              {t('detail.leave_group_title')}
             </ModalHeader>
             <ModalBody>
               <p className="text-theme-secondary">
-                {t('detail.leave_group_confirm', 'Are you sure you want to leave {{name}}? You will lose access to group discussions and files.', { name: groupName })}
+                {t('detail.leave_group_confirm', { name: groupName })}
               </p>
             </ModalBody>
             <ModalFooter>
@@ -550,40 +564,40 @@ export function GroupInviteModal({
           <>
             <ModalHeader className="text-theme-primary flex items-center gap-2">
               <UserPlus className="w-5 h-5 text-purple-400" aria-hidden="true" />
-              {t('detail.invite_members', 'Invite Members')}
+              {t('detail.invite_members')}
             </ModalHeader>
             <ModalBody>
               <div className="space-y-4">
                 {/* Invite link */}
                 <div>
-                  <p className="text-sm text-theme-subtle mb-2">{t('detail.invite_link_desc', 'Share a link anyone can use to join:')}</p>
+                  <p className="text-sm text-theme-subtle mb-2">{t('detail.invite_link_desc')}</p>
                   {inviteLink ? (
                     <div className="flex items-center gap-2">
                       <Input value={inviteLink} readOnly size="sm" className="flex-1" />
                       <Button size="sm" variant="flat" onPress={() => onCopyLink(inviteLink)}>
-                        {t('detail.copy', 'Copy')}
+                        {t('detail.copy')}
                       </Button>
                     </div>
                   ) : (
                     <Button size="sm" variant="bordered" onPress={onGenerateLink}>
-                      {t('detail.generate_link', 'Generate Invite Link')}
+                      {t('detail.generate_link')}
                     </Button>
                   )}
                 </div>
 
                 <div className="border-t border-theme-default pt-4">
-                  <p className="text-sm text-theme-subtle mb-2">{t('detail.invite_email_desc', 'Or invite by email (comma-separated):')}</p>
+                  <p className="text-sm text-theme-subtle mb-2">{t('detail.invite_email_desc')}</p>
                   <Textarea
-                    placeholder={t('detail.invite_email_placeholder', 'email1@example.com, email2@example.com')}
+                    placeholder={t('detail.invite_email_placeholder')}
                     value={inviteEmails}
                     onValueChange={onEmailsChange}
                     minRows={2}
                     size="sm"
-                    aria-label={t('detail.invite_emails_aria', 'Email addresses to invite')}
+                    aria-label={t('detail.invite_emails_aria')}
                   />
                   <Input
-                    label={t('detail.invite_message_label', 'Personal message (optional)')}
-                    placeholder={t('detail.invite_message_placeholder', 'Join our group!')}
+                    label={t('detail.invite_message_label')}
+                    placeholder={t('detail.invite_message_placeholder')}
                     value={inviteMessage}
                     onValueChange={onMessageChange}
                     size="sm"
@@ -594,7 +608,7 @@ export function GroupInviteModal({
             </ModalBody>
             <ModalFooter>
               <Button variant="flat" onPress={onClose}>
-                {t('detail.cancel', 'Cancel')}
+                {t('detail.cancel')}
               </Button>
               <Button
                 color="primary"
@@ -602,7 +616,7 @@ export function GroupInviteModal({
                 isLoading={sendingInvites}
                 isDisabled={!inviteEmails.trim()}
               >
-                {t('detail.send_invites', 'Send Invitations')}
+                {t('detail.send_invites')}
               </Button>
             </ModalFooter>
           </>
@@ -640,32 +654,35 @@ export function GroupReportModal({
       isOpen={isOpen}
       onClose={onClose}
       classNames={{
-        base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)]',
+        base: 'bg-content1 border border-theme-default',
+        header: 'border-b border-theme-default',
+        footer: 'border-t border-theme-default',
         backdrop: 'bg-black/60 backdrop-blur-sm',
       }}
     >
       <ModalContent>
-        <ModalHeader className="text-[var(--text-primary)]">
+        <ModalHeader className="text-theme-primary">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
               <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
             </div>
-            {t('detail.report_title', 'Report Post')}
+            {t('detail.report_title')}
           </div>
         </ModalHeader>
         <ModalBody>
-          <p className="text-sm text-[var(--text-muted)] mb-3">
-            {t('detail.report_description', 'Help us understand why you are reporting this post.')}
+          <p className="text-sm text-theme-muted mb-3">
+            {t('detail.report_description')}
           </p>
           <Textarea
-            label={t('detail.report_reason_label', 'Reason')}
-            placeholder={t('detail.report_reason_placeholder', 'Describe why this post is inappropriate...')}
+            label={t('detail.report_reason_label')}
+            placeholder={t('detail.report_reason_placeholder')}
             value={reportReason}
             onChange={(e) => onReasonChange(e.target.value)}
             minRows={3}
             classNames={{
-              input: 'bg-transparent text-[var(--text-primary)]',
-              inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)]',
+              input: 'bg-transparent text-theme-primary',
+              inputWrapper: 'bg-theme-elevated border-theme-default',
+              label: 'text-theme-muted',
             }}
             autoFocus
           />
@@ -674,7 +691,7 @@ export function GroupReportModal({
           <Button
             variant="flat"
             onPress={onClose}
-            className="text-[var(--text-muted)]"
+            className="text-theme-muted"
           >
             {t('detail.cancel')}
           </Button>
@@ -686,7 +703,7 @@ export function GroupReportModal({
             isDisabled={!reportReason.trim()}
             className="font-medium"
           >
-            {t('detail.report_submit', 'Report')}
+            {t('detail.report_submit')}
           </Button>
         </ModalFooter>
       </ModalContent>

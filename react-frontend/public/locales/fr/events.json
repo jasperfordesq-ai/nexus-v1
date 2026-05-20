@@ -204,7 +204,18 @@
     },
     "attach_polls_label": "Joindre des sondages (optionnel)",
     "attach_polls_placeholder": "Sélectionner des sondages à joindre...",
-    "attach_polls_hint": "Joignez des sondages communautaires existants à cet événement."
+    "attach_polls_hint": "Joignez des sondages communautaires existants à cet événement.",
+    "create_badge": "Event setup",
+    "edit_badge": "Editing event",
+    "create_intro": "Shape the essential details, timing, access, and cover image so people can decide quickly if this event is for them.",
+    "summary_category": "Category",
+    "summary_format": "Format",
+    "summary_remote": "Remote enabled",
+    "summary_in_person": "In person or local",
+    "summary_not_set": "Not set yet",
+    "essentials_section": "Event essentials",
+    "recurrence_count_placeholder": "10",
+    "recurrence_preview_empty": "RRULE:..."
   },
   "toast": {
     "rsvp_removed": "RSVP annulé",

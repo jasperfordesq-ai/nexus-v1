@@ -523,7 +523,7 @@ export function CreateEventPage() {
               </Button>
             </Link>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              color="primary"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => loadEvent()}
             >
@@ -732,7 +732,7 @@ export function CreateEventPage() {
 
           {/* Start Date & Time */}
           <fieldset className="grid sm:grid-cols-2 gap-4">
-            <legend className="sr-only">{t('form.legend_start_datetime', 'Start date and time')}</legend>
+            <legend className="sr-only">{t('form.legend_start_datetime')}</legend>
             <div>
               <DatePicker
                 label={t('form.start_date_label')}
@@ -771,7 +771,7 @@ export function CreateEventPage() {
 
           {/* End Date & Time (optional) */}
           <fieldset className="grid sm:grid-cols-2 gap-4">
-            <legend className="sr-only">{t('form.legend_end_datetime', 'End date and time (optional)')}</legend>
+            <legend className="sr-only">{t('form.legend_end_datetime')}</legend>
             <div>
               <DatePicker
                 label={t('form.end_date_label')}
@@ -812,15 +812,15 @@ export function CreateEventPage() {
                 </div>
                 <div>
                   <p className="font-medium text-theme-primary">
-                    {t('form.recurring_toggle', { defaultValue: 'Make this a recurring event' })}
+                    {t('form.recurring_toggle')}
                   </p>
                   <p className="text-sm text-theme-subtle">
-                    {t('form.recurring_desc', { defaultValue: 'Automatically create multiple occurrences' })}
+                    {t('form.recurring_desc')}
                   </p>
                 </div>
               </div>
               <Switch
-                aria-label={t('form.recurring_toggle_aria', 'Toggle recurring event')}
+                aria-label={t('form.recurring_toggle_aria')}
                 isSelected={formData.isRecurring}
                 onValueChange={(checked) => setFormData((prev) => ({ ...prev, isRecurring: checked }))}
                 classNames={{
@@ -839,8 +839,8 @@ export function CreateEventPage() {
               >
                 {/* Frequency */}
                 <Select
-                  label={t('form.recurrence_frequency', { defaultValue: 'Frequency' })}
-                  aria-label={t('form.recurrence_frequency_aria', 'Recurrence frequency')}
+                  label={t('form.recurrence_frequency')}
+                  aria-label={t('form.recurrence_frequency_aria')}
                   selectedKeys={[formData.recurrenceFrequency]}
                   onChange={(e) => setFormData((prev) => ({ ...prev, recurrenceFrequency: e.target.value as RecurrenceFrequency }))}
                   classNames={{
@@ -849,17 +849,17 @@ export function CreateEventPage() {
                     label: 'text-theme-muted',
                   }}
                 >
-                  <SelectItem key="daily">{t('form.freq_daily', { defaultValue: 'Daily' })}</SelectItem>
-                  <SelectItem key="weekly">{t('form.freq_weekly', { defaultValue: 'Weekly' })}</SelectItem>
-                  <SelectItem key="biweekly">{t('form.freq_biweekly', { defaultValue: 'Biweekly (every 2 weeks)' })}</SelectItem>
-                  <SelectItem key="monthly">{t('form.freq_monthly', { defaultValue: 'Monthly' })}</SelectItem>
+                  <SelectItem key="daily">{t('form.freq_daily')}</SelectItem>
+                  <SelectItem key="weekly">{t('form.freq_weekly')}</SelectItem>
+                  <SelectItem key="biweekly">{t('form.freq_biweekly')}</SelectItem>
+                  <SelectItem key="monthly">{t('form.freq_monthly')}</SelectItem>
                 </Select>
 
                 {/* Days of Week (for weekly/biweekly) */}
                 {(formData.recurrenceFrequency === 'weekly' || formData.recurrenceFrequency === 'biweekly') && (
                   <div>
                     <label className="block text-sm font-medium text-theme-muted mb-2">
-                      {t('form.recurrence_days', { defaultValue: 'Repeat on' })}
+                      {t('form.recurrence_days')}
                     </label>
                     <CheckboxGroup
                       orientation="horizontal"
@@ -894,8 +894,8 @@ export function CreateEventPage() {
                 {/* End Condition */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   <Select
-                    label={t('form.recurrence_end_type', { defaultValue: 'Ends' })}
-                    aria-label={t('form.recurrence_end_type_aria', 'How the series ends')}
+                    label={t('form.recurrence_end_type')}
+                    aria-label={t('form.recurrence_end_type_aria')}
                     selectedKeys={[formData.recurrenceEndType]}
                     onChange={(e) => setFormData((prev) => ({ ...prev, recurrenceEndType: e.target.value as RecurrenceEndType }))}
                     classNames={{
@@ -904,15 +904,15 @@ export function CreateEventPage() {
                       label: 'text-theme-muted',
                     }}
                   >
-                    <SelectItem key="after_count">{t('form.end_after_count', { defaultValue: 'After X occurrences' })}</SelectItem>
-                    <SelectItem key="on_date">{t('form.end_on_date', { defaultValue: 'On a specific date' })}</SelectItem>
+                    <SelectItem key="after_count">{t('form.end_after_count')}</SelectItem>
+                    <SelectItem key="on_date">{t('form.end_on_date')}</SelectItem>
                   </Select>
 
                   {formData.recurrenceEndType === 'after_count' ? (
                     <Input
                       type="number"
-                      label={t('form.recurrence_count', { defaultValue: 'Number of occurrences' })}
-                      placeholder="10"
+                      label={t('form.recurrence_count')}
+                      placeholder={t('form.recurrence_count_placeholder')}
                       value={formData.recurrenceCount}
                       onChange={(e) => {
                         setFormData((prev) => ({ ...prev, recurrenceCount: e.target.value }));
@@ -930,7 +930,7 @@ export function CreateEventPage() {
                     />
                   ) : (
                     <DatePicker
-                      label={t('form.recurrence_end_date', { defaultValue: 'Series end date' })}
+                      label={t('form.recurrence_end_date')}
                       value={formData.recurrenceEndDate}
                       onChange={(val) => {
                         setFormData((prev) => ({ ...prev, recurrenceEndDate: val }));
@@ -950,7 +950,7 @@ export function CreateEventPage() {
                 {/* Preview of generated RRULE (for transparency) */}
                 {formData.isRecurring && (
                   <div className="text-xs text-theme-subtle p-2 rounded-lg bg-theme-elevated font-mono break-all">
-                    {buildRecurrenceRule(formData) || 'RRULE:...'}
+                    {buildRecurrenceRule(formData) || t('form.recurrence_preview_empty')}
                   </div>
                 )}
               </motion.div>
@@ -1095,7 +1095,8 @@ export function CreateEventPage() {
           <div className="flex gap-3 pt-4">
             <Button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              color="primary"
+              className="flex-1"
               startContent={
                 isEditing
                   ? <CheckCircle className="w-4 h-4" aria-hidden="true" />
