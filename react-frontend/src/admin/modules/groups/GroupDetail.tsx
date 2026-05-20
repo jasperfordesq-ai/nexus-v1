@@ -27,6 +27,7 @@ import Users from 'lucide-react/icons/users';
 import FileText from 'lucide-react/icons/file-text';
 import Calendar from 'lucide-react/icons/calendar';
 import Save from 'lucide-react/icons/save';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
@@ -35,7 +36,8 @@ interface AdminGroupDetail extends AdminGroup {  stats?: { total_exchanges: numb
 import type { GroupMember } from '@/admin/api/types';
 
 export default function GroupDetail() {
-  usePageTitle("Groups");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('groups.page_title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { success, error } = useToast();
@@ -59,11 +61,11 @@ export default function GroupDetail() {
         });
       }
     } catch {
-      error("Failed to load groups");
+      error(t('groups.failed_to_load_groups'));
     } finally {
       setLoading(false);
     }
-  }, [id, error])
+  }, [id, error, t])
 
 
   const loadMembers = useCallback(async () => {
@@ -73,9 +75,9 @@ export default function GroupDetail() {
         setMembers(response.data as GroupMemberType[]);
       }
     } catch {
-      error("Failed to load members");
+      error(t('groups.failed_to_load_members'));
     }
-  }, [id, error])
+  }, [id, error, t])
 
 
   useEffect(() => {
@@ -88,76 +90,76 @@ export default function GroupDetail() {
   const handleSave = async () => {
     try {
       await adminGroups.updateGroup(Number(id), formData);
-      success("Group Updated");
+      success(t('groups.group_updated'));
       setEditMode(false);
       loadGroup();
     } catch {
-      error("Failed to update group");
+      error(t('groups.failed_to_update_group'));
     }
   };
 
   const handleGeocode = async () => {
     try {
       await adminGroups.geocodeGroup(Number(id));
-      success("Location Geocoded");
+      success(t('groups.location_geocoded'));
       loadGroup();
     } catch {
-      error("Failed to geocode location");
+      error(t('groups.failed_to_geocode_location'));
     }
   };
 
   const handlePromote = async (userId: number) => {
     try {
       await adminGroups.promoteMember(Number(id), userId);
-      success("Member Promoted");
+      success(t('groups.member_promoted'));
       loadMembers();
     } catch {
-      error("Failed to promote member");
+      error(t('groups.failed_to_promote_member'));
     }
   };
 
   const handleDemote = async (userId: number) => {
     try {
       await adminGroups.demoteMember(Number(id), userId);
-      success("Member Demoted");
+      success(t('groups.member_demoted'));
       loadMembers();
     } catch {
-      error("Failed to demote member");
+      error(t('groups.failed_to_demote_member'));
     }
   };
 
   const handleKick = async (userId: number) => {
-    if (!confirm("Remove Member")) return;
+    if (!confirm(t('groups.confirm_remove_member'))) return;
     try {
       await adminGroups.kickMember(Number(id), userId);
-      success("Member Removed");
+      success(t('groups.member_removed'));
       loadMembers();
     } catch {
-      error("Failed to remove member");
+      error(t('groups.failed_to_remove_member'));
     }
   };
 
   if (loading || !group) {
-    return <div className="p-6 text-center">{"Loading groups..."}</div>;
+    return <div className="p-6 text-center">{t('groups.loading')}</div>;
   }
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-4">
-        <Button isIconOnly variant="light" aria-label={"Go Back"} onPress={() => navigate(-1)}>
+        <Button isIconOnly variant="light" aria-label={t('groups.go_back')} onPress={() => navigate(-1)}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold">{group.name}</h1>
-          <p className="text-sm text-gray-500">{`Group ID`}</p>
+          <p className="text-sm text-gray-500">{t('groups.group_id')}</p>
         </div>
         {editMode ? (
           <Button color="primary" startContent={<Save className="w-4 h-4" />} onPress={handleSave}>
-            {"Save"}
+            {t('groups.save')}
           </Button>
         ) : (
           <Button variant="flat" onPress={() => setEditMode(true)}>
-            {"Edit"}
+            {t('groups.edit')}
           </Button>
         )}
       </div>
@@ -168,7 +170,7 @@ export default function GroupDetail() {
             <Users className="w-8 h-8 text-primary" />
             <div>
               <div className="text-2xl font-bold">{group.member_count || 0}</div>
-              <div className="text-xs text-gray-500">{"Members"}</div>
+              <div className="text-xs text-gray-500">{t('groups.members')}</div>
             </div>
           </div>
         </Card>
@@ -177,7 +179,7 @@ export default function GroupDetail() {
             <FileText className="w-8 h-8 text-success" />
             <div>
               <div className="text-2xl font-bold">{group.stats?.posts_count || 0}</div>
-              <div className="text-xs text-gray-500">{"Posts"}</div>
+              <div className="text-xs text-gray-500">{t('groups.posts')}</div>
             </div>
           </div>
         </Card>
@@ -186,7 +188,7 @@ export default function GroupDetail() {
             <Calendar className="w-8 h-8 text-warning" />
             <div>
               <div className="text-2xl font-bold">{group.stats?.events_count || 0}</div>
-              <div className="text-xs text-gray-500">{"Events"}</div>
+              <div className="text-xs text-gray-500">{t('groups.events')}</div>
             </div>
           </div>
         </Card>
@@ -195,33 +197,33 @@ export default function GroupDetail() {
             <TrendingUp className="w-8 h-8 text-secondary" />
             <div>
               <div className="text-2xl font-bold">{group.stats?.activity_score || 0}</div>
-              <div className="text-xs text-gray-500">{"Activity Score"}</div>
+              <div className="text-xs text-gray-500">{t('groups.activity_score')}</div>
             </div>
           </div>
         </Card>
       </div>
 
       <Tabs>
-        <Tab key="overview" title={"Overview"}>
+        <Tab key="overview" title={t('groups.overview')}>
           <Card className="p-6 mt-4 space-y-4">
             {editMode ? (
               <>
-                <Input label={"Name"} value={formData.name} onValueChange={(v) => setFormData({ ...formData, name: v })} />
-                <Textarea label={"Description"} value={formData.description} onValueChange={(v) => setFormData({ ...formData, description: v })} />
-                <Input label={"Location"} value={formData.location} onValueChange={(v) => setFormData({ ...formData, location: v })} />
+                <Input label={t('groups.name')} value={formData.name} onValueChange={(v) => setFormData({ ...formData, name: v })} />
+                <Textarea label={t('groups.description')} value={formData.description} onValueChange={(v) => setFormData({ ...formData, description: v })} />
+                <Input label={t('groups.location')} value={formData.location} onValueChange={(v) => setFormData({ ...formData, location: v })} />
               </>
             ) : (
               <>
                 <div>
-                  <div className="text-sm text-gray-500">{"Description"}</div>
-                  <div className="mt-1">{group.description || "No description"}</div>
+                  <div className="text-sm text-gray-500">{t('groups.description')}</div>
+                  <div className="mt-1">{group.description || t('groups.no_description')}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-gray-500">{"Visibility"}</div>
+                  <div className="text-sm text-gray-500">{t('groups.visibility')}</div>
                   <Chip className="mt-1" size="sm">{group.visibility}</Chip>
                 </div>
                 <div>
-                  <div className="text-sm text-gray-500">{"Created"}</div>
+                  <div className="text-sm text-gray-500">{t('groups.created')}</div>
                   <div className="mt-1">{new Date(group.created_at).toLocaleString()}</div>
                 </div>
               </>
@@ -229,21 +231,21 @@ export default function GroupDetail() {
           </Card>
         </Tab>
 
-        <Tab key="members" title={"Members"}>
+        <Tab key="members" title={t('groups.members')}>
           <Card className="p-4 mt-4">
-            <Table aria-label={"Members Table"}>
+            <Table aria-label={t('groups.members_table')}>
               <TableHeader>
-                <TableColumn>{"User"}</TableColumn>
-                <TableColumn>{"Role"}</TableColumn>
-                <TableColumn>{"Joined"}</TableColumn>
-                <TableColumn>{"Actions"}</TableColumn>
+                <TableColumn>{t('groups.user')}</TableColumn>
+                <TableColumn>{t('groups.role')}</TableColumn>
+                <TableColumn>{t('groups.joined')}</TableColumn>
+                <TableColumn>{t('groups.actions')}</TableColumn>
               </TableHeader>
-              <TableBody emptyContent={"No members found"}>
+              <TableBody emptyContent={t('groups.no_members_found')}>
                 {members.map((member) => (
                   <TableRow key={member.user_id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {member.user_avatar && <img src={member.user_avatar} className="w-8 h-8 rounded-full" alt={member.user_name || 'Member avatar'} loading="lazy" />}
+                        {member.user_avatar && <img src={member.user_avatar} className="w-8 h-8 rounded-full" alt={member.user_name || t('groups.member_avatar')} loading="lazy" />}
                         <div>{member.user_name}</div>
                       </div>
                     </TableCell>
@@ -251,14 +253,14 @@ export default function GroupDetail() {
                     <TableCell>{new Date(member.joined_at).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        {member.role === 'member' && <Button size="sm" variant="flat" onPress={() => handlePromote(member.user_id)}>{"Promote"}</Button>}
+                        {member.role === 'member' && <Button size="sm" variant="flat" onPress={() => handlePromote(member.user_id)}>{t('groups.promote')}</Button>}
                         {member.role === 'admin' && (
                           <>
-                            <Button size="sm" variant="flat" onPress={() => handlePromote(member.user_id)}>{"Make Owner"}</Button>
-                            <Button size="sm" variant="flat" onPress={() => handleDemote(member.user_id)}>{"Demote"}</Button>
+                            <Button size="sm" variant="flat" onPress={() => handlePromote(member.user_id)}>{t('groups.make_owner')}</Button>
+                            <Button size="sm" variant="flat" onPress={() => handleDemote(member.user_id)}>{t('groups.demote')}</Button>
                           </>
                         )}
-                        {member.role !== 'owner' && <Button size="sm" variant="flat" color="danger" onPress={() => handleKick(member.user_id)}>{"Kick"}</Button>}
+                        {member.role !== 'owner' && <Button size="sm" variant="flat" color="danger" onPress={() => handleKick(member.user_id)}>{t('groups.kick')}</Button>}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -268,15 +270,15 @@ export default function GroupDetail() {
           </Card>
         </Tab>
 
-        <Tab key="location" title={"Location"}>
+        <Tab key="location" title={t('groups.location')}>
           <Card className="p-6 mt-4 space-y-4">
             <div>
-              <div className="text-sm text-gray-500">{"Address"}</div>
-              <div className="mt-1">{group.location || "No location"}</div>
+              <div className="text-sm text-gray-500">{t('groups.address')}</div>
+              <div className="mt-1">{group.location || t('groups.no_location')}</div>
             </div>
             {group.latitude && group.longitude && (
               <div>
-                <div className="text-sm text-gray-500">{"Coordinates"}</div>
+                <div className="text-sm text-gray-500">{t('groups.coordinates')}</div>
                 <div className="mt-1">{group.latitude}, {group.longitude}</div>
               </div>
             )}
@@ -286,7 +288,7 @@ export default function GroupDetail() {
               onPress={handleGeocode}
               isDisabled={!group.location}
             >
-              {"Geocode Location"}
+              {t('groups.geocode_location')}
             </Button>
           </Card>
         </Tab>
