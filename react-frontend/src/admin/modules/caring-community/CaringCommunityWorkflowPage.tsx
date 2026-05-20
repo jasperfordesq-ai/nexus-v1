@@ -1550,7 +1550,7 @@ export default function CaringCommunityWorkflowPage() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <Spinner size="lg" label="Loading caring community workflow..." />
+        <Spinner size="lg" label={t('caring_workflow.loading.workflow')} />
       </div>
     );
   }
@@ -1558,8 +1558,8 @@ export default function CaringCommunityWorkflowPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 pb-8">
       <PageHeader
-        title="Caring Community Workflow"
-        description="This is your daily operations dashboard. Use it to review pending hour approvals, monitor overdue items, manage coordinator assignments, generate member statements, and configure workflow policy. Pending items that have exceeded their SLA appear highlighted in amber."
+        title={t('caring_workflow.meta.title')}
+        description={t('caring_workflow.meta.description')}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Button
@@ -1569,7 +1569,7 @@ export default function CaringCommunityWorkflowPage() {
               size="sm"
               startContent={<ClipboardCheck size={16} />}
             >
-              Open hour review
+              {t('caring_workflow.actions.open_hour_review')}
             </Button>
             <Button
               as={Link}
@@ -1578,7 +1578,7 @@ export default function CaringCommunityWorkflowPage() {
               size="sm"
               startContent={<FileText size={16} />}
             >
-              Open report pack
+              {t('caring_workflow.actions.open_report_pack')}
             </Button>
             <Button
               variant="flat"
@@ -1586,17 +1586,17 @@ export default function CaringCommunityWorkflowPage() {
               startContent={<RefreshCw size={16} />}
               onPress={loadWorkflow}
             >
-              Refresh
+              {t('caring_workflow.actions.refresh')}
             </Button>
           </div>
         }
       />
 
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
-        <StatCard label="Pending reviews" value={(stats?.pending_count ?? 0).toLocaleString()} icon={ClipboardCheck} color="warning" />
-        <StatCard label="Pending hours" value={formatHours(stats?.pending_hours ?? 0)} icon={Clock} color="primary" />
-        <StatCard label="Approved (30d)" value={formatHours(stats?.approved_30d_hours ?? 0)} icon={CheckCircle2} color="success" />
-        <StatCard label="Coordinators" value={(stats?.coordinator_count ?? 0).toLocaleString()} icon={Users} color="secondary" />
+        <StatCard label={t('caring_workflow.stats.pending_reviews')} value={(stats?.pending_count ?? 0).toLocaleString()} icon={ClipboardCheck} color="warning" />
+        <StatCard label={t('caring_workflow.stats.pending_hours')} value={formatHours(stats?.pending_hours ?? 0)} icon={Clock} color="primary" />
+        <StatCard label={t('caring_workflow.stats.approved_30d')} value={formatHours(stats?.approved_30d_hours ?? 0)} icon={CheckCircle2} color="success" />
+        <StatCard label={t('caring_workflow.stats.coordinators')} value={(stats?.coordinator_count ?? 0).toLocaleString()} icon={Users} color="secondary" />
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
@@ -1604,19 +1604,18 @@ export default function CaringCommunityWorkflowPage() {
           <Card shadow="sm">
             <CardHeader className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold">Pending Reviews</h2>
+                <h2 className="text-lg font-semibold">{t('caring_workflow.pending.title')}</h2>
                 <p className="mt-1 text-sm text-default-500">
-                  Hours awaiting coordinator review and approval. Items marked <span className="font-medium text-warning-600">Needs review</span> have
-                  exceeded the review SLA; items marked <span className="font-medium text-danger-600">Escalate now</span> have exceeded the escalation SLA.
-                  Approve or decline each submission, or assign it to a specific coordinator.
+                  {t('caring_workflow.pending.description_prefix')} <span className="font-medium text-warning-600">{t('caring_workflow.pending.needs_review')}</span> {t('caring_workflow.pending.description_middle')}{' '}
+                  <span className="font-medium text-danger-600">{t('caring_workflow.pending.escalate_now')}</span> {t('caring_workflow.pending.description_suffix')}
                 </p>
               </div>
               {(stats?.overdue_count ?? 0) > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {(stats?.escalated_count ?? 0) > 0 && (
-                    <Chip color="danger" variant="flat">{`${stats?.escalated_count ?? 0} escalated`}</Chip>
+                    <Chip color="danger" variant="flat">{t('caring_workflow.pending.escalated_count', { count: stats?.escalated_count ?? 0 })}</Chip>
                   )}
-                  <Chip color="warning" variant="flat">{`${stats?.overdue_count ?? 0} overdue`}</Chip>
+                  <Chip color="warning" variant="flat">{t('caring_workflow.pending.overdue_count', { count: stats?.overdue_count ?? 0 })}</Chip>
                 </div>
               )}
             </CardHeader>
@@ -1624,7 +1623,7 @@ export default function CaringCommunityWorkflowPage() {
             <CardBody className="gap-3">
               {summary?.pending_reviews.length === 0 ? (
                 <div className="rounded-lg bg-success/10 p-4 text-sm text-success-700">
-                  Nothing pending. The review queue is clear.
+                  {t('caring_workflow.pending.empty')}
                 </div>
               ) : summary?.pending_reviews.map((review) => (
                 <div key={review.id} className="rounded-lg border border-default-200 p-4">
@@ -1632,26 +1631,26 @@ export default function CaringCommunityWorkflowPage() {
                     <div>
                       <p className="text-sm font-semibold text-default-900">{review.member_name}</p>
                       <p className="mt-1 text-sm text-default-500">
-                        {review.organisation_name || review.opportunity_title || 'Unassigned'}
+                        {review.organisation_name || review.opportunity_title || t('caring_workflow.empty.unassigned')}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {review.is_escalated && <Chip size="sm" color="danger" variant="flat">Escalate now</Chip>}
-                      {!review.is_escalated && review.is_overdue && <Chip size="sm" color="warning" variant="flat">Needs review</Chip>}
+                      {review.is_escalated && <Chip size="sm" color="danger" variant="flat">{t('caring_workflow.pending.escalate_now')}</Chip>}
+                      {!review.is_escalated && review.is_overdue && <Chip size="sm" color="warning" variant="flat">{t('caring_workflow.pending.needs_review')}</Chip>}
                       <Chip size="sm" color="primary" variant="flat">{formatHours(review.hours)}</Chip>
                     </div>
                   </div>
                   <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-default-500">
-                    <span>{`Logged ${review.date_logged}`}</span>
-                    <span>{`Submitted ${review.created_at}`}</span>
-                    <span>{`${review.age_days} day${review.age_days === 1 ? '' : 's'} old`}</span>
-                    {review.assigned_name && <span>{`Assigned to ${review.assigned_name}`}</span>}
-                    {review.escalated_at && <span>{`Escalated ${review.escalated_at}`}</span>}
+                    <span>{t('caring_workflow.pending.logged', { date: review.date_logged })}</span>
+                    <span>{t('caring_workflow.pending.submitted', { date: review.created_at })}</span>
+                    <span>{t('caring_workflow.pending.age_days', { count: review.age_days })}</span>
+                    {review.assigned_name && <span>{t('caring_workflow.pending.assigned_to', { name: review.assigned_name })}</span>}
+                    {review.escalated_at && <span>{t('caring_workflow.pending.escalated_at', { date: review.escalated_at })}</span>}
                   </div>
                   <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_auto_auto_auto]">
                     <Select
                       size="sm"
-                      label="Assign coordinator"
+                      label={t('caring_workflow.pending.assign_coordinator')}
                       selectedKeys={[review.assigned_to ? String(review.assigned_to) : 'unassigned']}
                       isDisabled={assigningReviewId === review.id || decidingReviewId === review.id}
                       onSelectionChange={(keys) => {
@@ -1671,7 +1670,7 @@ export default function CaringCommunityWorkflowPage() {
                       isDisabled={decidingReviewId === review.id}
                       onPress={() => escalateReview(review)}
                     >
-                      {review.is_escalated ? 'Re-escalate' : 'Escalate'}
+                      {review.is_escalated ? t('caring_workflow.actions.re_escalate') : t('caring_workflow.actions.escalate')}
                     </Button>
                     <Button
                       size="sm"
@@ -1681,7 +1680,7 @@ export default function CaringCommunityWorkflowPage() {
                       isLoading={decidingReviewId === review.id}
                       onPress={() => decideReview(review, 'approve')}
                     >
-                      Approve
+                      {t('caring_workflow.actions.approve')}
                     </Button>
                     <Button
                       size="sm"
@@ -1691,7 +1690,7 @@ export default function CaringCommunityWorkflowPage() {
                       isDisabled={decidingReviewId === review.id}
                       onPress={() => decideReview(review, 'decline')}
                     >
-                      Decline
+                      {t('caring_workflow.actions.decline')}
                     </Button>
                   </div>
                 </div>

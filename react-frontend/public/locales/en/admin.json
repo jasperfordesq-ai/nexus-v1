@@ -3762,14 +3762,50 @@
   },
   "caring_workflow": {
     "meta": {
-      "page_title": "Caring Community Workflow"
+      "page_title": "Caring Community Workflow",
+      "title": "Caring Community Workflow",
+      "description": "This is your daily operations dashboard. Use it to review pending hour approvals, monitor overdue items, manage coordinator assignments, generate member statements, and configure workflow policy. Pending items that have exceeded their SLA appear highlighted in amber."
     },
     "actions": {
       "refresh": "Refresh",
-      "retry": "Retry"
+      "retry": "Retry",
+      "open_hour_review": "Open hour review",
+      "open_report_pack": "Open report pack",
+      "approve": "Approve",
+      "decline": "Decline",
+      "escalate": "Escalate",
+      "re_escalate": "Re-escalate"
+    },
+    "loading": {
+      "workflow": "Loading caring community workflow..."
     },
     "empty": {
-      "value": "-"
+      "value": "-",
+      "unassigned": "Unassigned"
+    },
+    "stats": {
+      "pending_reviews": "Pending reviews",
+      "pending_hours": "Pending hours",
+      "approved_30d": "Approved (30d)",
+      "coordinators": "Coordinators"
+    },
+    "pending": {
+      "title": "Pending Reviews",
+      "description_prefix": "Hours awaiting coordinator review and approval. Items marked",
+      "description_middle": "have exceeded the review SLA; items marked",
+      "description_suffix": "have exceeded the escalation SLA. Approve or decline each submission, or assign it to a specific coordinator.",
+      "needs_review": "Needs review",
+      "escalate_now": "Escalate now",
+      "escalated_count": "{{count}} escalated",
+      "overdue_count": "{{count}} overdue",
+      "empty": "Nothing pending. The review queue is clear.",
+      "logged": "Logged {{date}}",
+      "submitted": "Submitted {{date}}",
+      "age_days": "{{count}} day old",
+      "age_days_plural": "{{count}} days old",
+      "assigned_to": "Assigned to {{name}}",
+      "escalated_at": "Escalated {{date}}",
+      "assign_coordinator": "Assign coordinator"
     },
     "predictive": {
       "title": "Predictive Insights",
