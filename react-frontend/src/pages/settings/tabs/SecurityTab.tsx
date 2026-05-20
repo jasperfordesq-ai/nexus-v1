@@ -400,7 +400,7 @@ export function SecurityTab({
               {t('cancel')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              color="primary"
               onPress={onChangePassword}
               isLoading={isChangingPassword}
             >
@@ -424,7 +424,7 @@ export function SecurityTab({
               {t('cancel')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              color="primary"
               onPress={onLogout}
             >
               {t('logout_modal.submit')}
@@ -510,15 +510,42 @@ export function SecurityTab({
                     {t('twofa_download_prompt')}
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank" rel="noopener noreferrer" className="text-xs px-2.5 py-1 rounded-full bg-theme-elevated text-indigo-500 hover:bg-theme-hover transition-colors">
+                    <Button
+                      as="a"
+                      href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="sm"
+                      variant="flat"
+                      color="primary"
+                      className="min-h-9"
+                    >
                       {t('twofa_app_google')}
-                    </a>
-                    <a href="https://www.microsoft.com/en-us/security/mobile-authenticator-app" target="_blank" rel="noopener noreferrer" className="text-xs px-2.5 py-1 rounded-full bg-theme-elevated text-indigo-500 hover:bg-theme-hover transition-colors">
+                    </Button>
+                    <Button
+                      as="a"
+                      href="https://www.microsoft.com/en-us/security/mobile-authenticator-app"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="sm"
+                      variant="flat"
+                      color="primary"
+                      className="min-h-9"
+                    >
                       {t('twofa_app_microsoft')}
-                    </a>
-                    <a href="https://authy.com/download/" target="_blank" rel="noopener noreferrer" className="text-xs px-2.5 py-1 rounded-full bg-theme-elevated text-indigo-500 hover:bg-theme-hover transition-colors">
+                    </Button>
+                    <Button
+                      as="a"
+                      href="https://authy.com/download/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="sm"
+                      variant="flat"
+                      color="primary"
+                      className="min-h-9"
+                    >
                       {t('twofa_app_authy')}
-                    </a>
+                    </Button>
                   </div>
                 </div>
 
@@ -560,7 +587,7 @@ export function SecurityTab({
               {t('twofa_cancel')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
+              color="success"
               onPress={onVerify2FA}
               isLoading={isVerifying2FA}
               isDisabled={!twoFactorSetupData || twoFactorVerifyCode.length < 6}
@@ -647,7 +674,7 @@ export function SecurityTab({
           </ModalBody>
           <ModalFooter>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              color="primary"
               onPress={backupCodesModalOnClose}
             >
               {t('backup_codes_saved')}

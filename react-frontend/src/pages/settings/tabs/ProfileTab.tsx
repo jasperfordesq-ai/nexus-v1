@@ -119,8 +119,9 @@ export function ProfileTab({
             />
             <Button
               isIconOnly
-              size="sm"
-              className="absolute bottom-0 right-0 rounded-full bg-indigo-500 text-white hover:bg-indigo-600 min-w-0 w-8 h-8"
+              size="md"
+              color="primary"
+              className="absolute bottom-0 right-0 h-10 min-w-10 rounded-full shadow-lg"
               onPress={() => fileInputRef.current?.click()}
               isDisabled={isUploading}
               isLoading={isUploading}
