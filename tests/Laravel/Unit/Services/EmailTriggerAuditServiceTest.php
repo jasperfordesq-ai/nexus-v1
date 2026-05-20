@@ -46,6 +46,8 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('marketplace:marketplace_order_delivery_source:marketplace_order', $keys);
         $this->assertContains('verein:verein_dues_invoice_reminder_paid:verein_dues', $keys);
         $this->assertContains('events:event_created_update_cancellation_rsvp_reminder:event_notification', $keys);
+        $this->assertContains('events:event_reminder_delivery_claim_source:event_reminder', $keys);
+        $this->assertContains('volunteering:volunteer_reminder_delivery_claim_source:volunteer_reminder', $keys);
     }
 
     public function test_run_returns_score_and_issue_structure(): void
@@ -69,6 +71,7 @@ class EmailTriggerAuditServiceTest extends TestCase
             'billing_audit_log',
             'civic_digest_delivery_claims',
             'email_log',
+            'event_reminder_delivery_claims',
             'event_reminders',
             'federation_inbound_connections',
             'federation_messages',
@@ -88,6 +91,7 @@ class EmailTriggerAuditServiceTest extends TestCase
             'transaction_notification_deliveries',
             'verein_member_dues',
             'vol_donations',
+            'vol_reminder_delivery_claims',
             'vol_reminders_sent',
         ] as $table) {
             $this->assertTrue($byTable->has($table), "Expected {$table} in email trigger source coverage.");
@@ -1143,5 +1147,86 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('transaction_notification_delivery_delivered_without_email_log', $codes);
         $this->assertContains('marketplace_order_notification_delivery_stale_claimed', $codes);
         $this->assertContains('marketplace_order_notification_delivery_delivered_without_email_log', $codes);
+    }
+
+    public function test_run_detects_event_and_volunteer_reminder_delivery_claim_gaps(): void
+    {
+        if (
+            !Schema::hasTable('event_reminder_delivery_claims')
+            || !Schema::hasTable('vol_reminder_delivery_claims')
+            || !Schema::hasTable('email_log')
+        ) {
+            $this->markTestSkipped('Reminder delivery claim tables are not available.');
+        }
+
+        $userId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Reminder Claim Audit User',
+            'email' => 'reminder-claim-audit@example.com',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('event_reminder_delivery_claims')->insert([
+            [
+                'tenant_id' => 2,
+                'event_id' => 940001,
+                'user_id' => $userId,
+                'reminder_type' => '24h',
+                'status' => 'claimed',
+                'claimed_at' => now()->subMinutes(20),
+                'delivered_at' => null,
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(20),
+            ],
+            [
+                'tenant_id' => 2,
+                'event_id' => 940002,
+                'user_id' => $userId,
+                'reminder_type' => '1h',
+                'status' => 'delivered',
+                'claimed_at' => now()->subMinutes(10),
+                'delivered_at' => now()->subMinutes(5),
+                'created_at' => now()->subMinutes(10),
+                'updated_at' => now()->subMinutes(5),
+            ],
+        ]);
+
+        DB::table('vol_reminder_delivery_claims')->insert([
+            [
+                'tenant_id' => 2,
+                'user_id' => $userId,
+                'reminder_type' => 'pre_shift',
+                'reference_id' => 950001,
+                'channel' => 'email',
+                'status' => 'claimed',
+                'claimed_at' => now()->subMinutes(20),
+                'delivered_at' => null,
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(20),
+            ],
+            [
+                'tenant_id' => 2,
+                'user_id' => $userId,
+                'reminder_type' => 'pre_shift',
+                'reference_id' => 950002,
+                'channel' => 'email',
+                'status' => 'delivered',
+                'claimed_at' => now()->subMinutes(10),
+                'delivered_at' => now()->subMinutes(5),
+                'created_at' => now()->subMinutes(10),
+                'updated_at' => now()->subMinutes(5),
+            ],
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('event_reminder_delivery_claim_stale_claimed', $codes);
+        $this->assertContains('event_reminder_delivery_claim_delivered_without_email_log', $codes);
+        $this->assertContains('volunteer_reminder_delivery_claim_stale_claimed', $codes);
+        $this->assertContains('volunteer_reminder_delivery_claim_delivered_without_email_log', $codes);
     }
 }

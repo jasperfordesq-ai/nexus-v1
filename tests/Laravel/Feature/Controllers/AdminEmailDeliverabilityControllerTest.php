@@ -414,6 +414,95 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         );
     }
 
+    public function test_queues_endpoint_surfaces_reminder_delivery_claim_gaps(): void
+    {
+        if (
+            !Schema::hasTable('event_reminder_delivery_claims')
+            || !Schema::hasTable('vol_reminder_delivery_claims')
+            || !Schema::hasTable('email_log')
+        ) {
+            $this->markTestSkipped('Reminder delivery claim tables are not available.');
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'reminder-claim-queue@example.test',
+        ]);
+        Sanctum::actingAs($admin);
+
+        DB::table('event_reminder_delivery_claims')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'event_id' => 940101,
+                'user_id' => $member->id,
+                'reminder_type' => '24h',
+                'status' => 'claimed',
+                'claimed_at' => now()->subMinutes(20),
+                'delivered_at' => null,
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(20),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'event_id' => 940102,
+                'user_id' => $member->id,
+                'reminder_type' => '1h',
+                'status' => 'delivered',
+                'claimed_at' => now()->subMinutes(10),
+                'delivered_at' => now()->subMinutes(5),
+                'created_at' => now()->subMinutes(10),
+                'updated_at' => now()->subMinutes(5),
+            ],
+        ]);
+
+        DB::table('vol_reminder_delivery_claims')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $member->id,
+                'reminder_type' => 'pre_shift',
+                'reference_id' => 950101,
+                'channel' => 'email',
+                'status' => 'claimed',
+                'claimed_at' => now()->subMinutes(20),
+                'delivered_at' => null,
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(20),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $member->id,
+                'reminder_type' => 'pre_shift',
+                'reference_id' => 950102,
+                'channel' => 'email',
+                'status' => 'delivered',
+                'claimed_at' => now()->subMinutes(10),
+                'delivered_at' => now()->subMinutes(5),
+                'created_at' => now()->subMinutes(10),
+                'updated_at' => now()->subMinutes(5),
+            ],
+        ]);
+
+        $eventResponse = $this->apiGet('/v2/admin/email-deliverability/queues?source=event_reminder_delivery_claims&limit=10');
+        $eventResponse->assertOk();
+        $eventResponse->assertJsonPath('data.diagnostics.event_reminder_delivery_claims.available', true);
+        $this->assertGreaterThanOrEqual(1, $eventResponse->json('data.diagnostics.event_reminder_delivery_claims.stale_pending'));
+        $this->assertGreaterThanOrEqual(1, $eventResponse->json('data.diagnostics.event_reminder_delivery_claims.failed_recent'));
+        $this->assertSame(
+            ['event_reminder_delivery_claims'],
+            collect($eventResponse->json('data.rows'))->pluck('source')->unique()->values()->all()
+        );
+
+        $volunteerResponse = $this->apiGet('/v2/admin/email-deliverability/queues?source=vol_reminder_delivery_claims&limit=10');
+        $volunteerResponse->assertOk();
+        $volunteerResponse->assertJsonPath('data.diagnostics.vol_reminder_delivery_claims.available', true);
+        $this->assertGreaterThanOrEqual(1, $volunteerResponse->json('data.diagnostics.vol_reminder_delivery_claims.stale_pending'));
+        $this->assertGreaterThanOrEqual(1, $volunteerResponse->json('data.diagnostics.vol_reminder_delivery_claims.failed_recent'));
+        $this->assertSame(
+            ['vol_reminder_delivery_claims'],
+            collect($volunteerResponse->json('data.rows'))->pluck('source')->unique()->values()->all()
+        );
+    }
+
     public function test_queues_endpoint_surfaces_goal_reminders(): void
     {
         if (!Schema::hasTable('goal_reminders') || !Schema::hasTable('goals')) {

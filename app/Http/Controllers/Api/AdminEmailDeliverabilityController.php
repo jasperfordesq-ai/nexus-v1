@@ -173,6 +173,8 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'civic_digest_delivery_claims' => $this->queueSourceDiagnostics('civic_digest_delivery_claims', $tenantId),
             'transaction_notification_deliveries' => $this->queueSourceDiagnostics('transaction_notification_deliveries', $tenantId),
             'marketplace_order_notification_deliveries' => $this->queueSourceDiagnostics('marketplace_order_notification_deliveries', $tenantId),
+            'event_reminder_delivery_claims' => $this->queueSourceDiagnostics('event_reminder_delivery_claims', $tenantId),
+            'vol_reminder_delivery_claims' => $this->queueSourceDiagnostics('vol_reminder_delivery_claims', $tenantId),
             'listing_expiry_reminders_sent' => $this->queueSourceDiagnostics('listing_expiry_reminders_sent', $tenantId),
             'marketplace_report_notifications' => $this->queueSourceDiagnostics('marketplace_report_notifications', $tenantId),
             'event_reminders' => $this->queueSourceDiagnostics('event_reminders', $tenantId),
@@ -404,6 +406,34 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 'mond',
                 'marketplace_order',
                 'order_id',
+                $tenantId,
+                $statuses,
+                $limit
+            );
+        }
+
+        $eventReminderClaimRows = collect();
+        if (($source === '' || $source === 'event_reminder_delivery_claims') && $this->hasReminderDeliveryClaimColumns('event_reminder_delivery_claims')) {
+            $eventReminderClaimRows = $this->reminderDeliveryClaimRows(
+                'event_reminder_delivery_claims',
+                'erdc',
+                'event_reminder',
+                'CAST(erdc.event_id AS CHAR)',
+                'erdc.reminder_type',
+                $tenantId,
+                $statuses,
+                $limit
+            );
+        }
+
+        $volunteerReminderClaimRows = collect();
+        if (($source === '' || $source === 'vol_reminder_delivery_claims') && $this->hasReminderDeliveryClaimColumns('vol_reminder_delivery_claims')) {
+            $volunteerReminderClaimRows = $this->reminderDeliveryClaimRows(
+                'vol_reminder_delivery_claims',
+                'vrdc',
+                'volunteer_reminder',
+                'CAST(vrdc.reference_id AS CHAR)',
+                'vrdc.reminder_type',
                 $tenantId,
                 $statuses,
                 $limit
@@ -825,6 +855,8 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ->merge($civicDigestRows)
             ->merge($transactionDeliveryRows)
             ->merge($marketplaceOrderDeliveryRows)
+            ->merge($eventReminderClaimRows)
+            ->merge($volunteerReminderClaimRows)
             ->merge($listingExpiryReminderRows)
             ->merge($marketplaceReportRows)
             ->merge($eventReminderRows)
@@ -1003,6 +1035,24 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 $source,
                 'mond',
                 'marketplace_order',
+                $tenantId
+            );
+        }
+
+        if ($source === 'event_reminder_delivery_claims') {
+            return $this->reminderDeliveryClaimDiagnostics(
+                $source,
+                'erdc',
+                'event_reminder',
+                $tenantId
+            );
+        }
+
+        if ($source === 'vol_reminder_delivery_claims') {
+            return $this->reminderDeliveryClaimDiagnostics(
+                $source,
+                'vrdc',
+                'volunteer_reminder',
                 $tenantId
             );
         }
@@ -1412,6 +1462,106 @@ class AdminEmailDeliverabilityController extends BaseApiController
             && Schema::hasColumn($table, 'channel');
     }
 
+    private function hasReminderDeliveryClaimColumns(string $table): bool
+    {
+        return Schema::hasTable($table)
+            && Schema::hasTable('users')
+            && Schema::hasColumn($table, 'claimed_at')
+            && Schema::hasColumn($table, 'delivered_at');
+    }
+
+    /**
+     * @param list<string> $statuses
+     */
+    private function reminderDeliveryClaimRows(
+        string $table,
+        string $alias,
+        string $category,
+        string $subjectExpression,
+        string $frequencyExpression,
+        ?int $tenantId,
+        array $statuses,
+        int $limit
+    ) {
+        $channelFilter = Schema::hasColumn($table, 'channel')
+            ? fn ($q) => $q->where("{$alias}.channel", 'email')
+            : fn ($q) => $q;
+
+        $pendingRows = collect();
+        if (in_array('pending', $statuses, true)) {
+            $pendingRows = DB::table("{$table} as {$alias}")
+                ->leftJoin('users as u', function ($join) use ($alias): void {
+                    $join->on('u.id', '=', "{$alias}.user_id")
+                        ->whereColumn('u.tenant_id', '=', "{$alias}.tenant_id");
+                })
+                ->where("{$alias}.status", 'claimed')
+                ->whereNull("{$alias}.delivered_at")
+                ->where("{$alias}.claimed_at", '<', now()->subMinutes(15))
+                ->tap($channelFilter)
+                ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.tenant_id", $tenantId))
+                ->orderByDesc("{$alias}.id")
+                ->limit($limit)
+                ->get([
+                    "{$alias}.id",
+                    "{$alias}.tenant_id",
+                    "{$alias}.user_id",
+                    'u.email',
+                    DB::raw("'{$category}' as category"),
+                    DB::raw("{$subjectExpression} as subject"),
+                    DB::raw("'pending' as status"),
+                    DB::raw("{$frequencyExpression} as frequency"),
+                    DB::raw('0 as attempts'),
+                    "{$alias}.claimed_at as last_attempted_at",
+                    DB::raw('NULL as error'),
+                    DB::raw('NULL as processing_batch_id'),
+                    "{$alias}.claimed_at as processing_started_at",
+                    "{$alias}.delivered_at as sent_at",
+                    "{$alias}.created_at",
+                ]);
+        }
+
+        $failedRows = collect();
+        if (in_array('failed', $statuses, true) && Schema::hasTable('email_log')) {
+            $failedRows = $this->reminderDeliveryClaimMissingEvidenceQuery(
+                DB::table("{$table} as {$alias}")
+                    ->leftJoin('users as u', function ($join) use ($alias): void {
+                        $join->on('u.id', '=', "{$alias}.user_id")
+                            ->whereColumn('u.tenant_id', '=', "{$alias}.tenant_id");
+                    })
+                    ->where("{$alias}.status", 'delivered')
+                    ->where("{$alias}.delivered_at", '>=', now()->subDay())
+                    ->tap($channelFilter)
+                    ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.tenant_id", $tenantId)),
+                $alias,
+                $category
+            )
+                ->orderByDesc("{$alias}.id")
+                ->limit($limit)
+                ->get([
+                    "{$alias}.id",
+                    "{$alias}.tenant_id",
+                    "{$alias}.user_id",
+                    'u.email',
+                    DB::raw("'{$category}' as category"),
+                    DB::raw("{$subjectExpression} as subject"),
+                    DB::raw("'failed' as status"),
+                    DB::raw("{$frequencyExpression} as frequency"),
+                    DB::raw('0 as attempts'),
+                    "{$alias}.delivered_at as last_attempted_at",
+                    DB::raw("'delivered without email_log evidence' as error"),
+                    DB::raw('NULL as processing_batch_id'),
+                    "{$alias}.claimed_at as processing_started_at",
+                    "{$alias}.delivered_at as sent_at",
+                    "{$alias}.created_at",
+                ]);
+        }
+
+        return $pendingRows
+            ->merge($failedRows)
+            ->take($limit)
+            ->map(fn ($row) => $this->queueRow($table, $row));
+    }
+
     /**
      * @param list<string> $statuses
      */
@@ -1544,6 +1694,62 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'oldest_pending_at' => (clone $staleClaimed)->min("{$alias}.claimed_at"),
             'returned' => 0,
         ];
+    }
+
+    private function reminderDeliveryClaimDiagnostics(string $table, string $alias, string $category, ?int $tenantId): array
+    {
+        if (!$this->hasReminderDeliveryClaimColumns($table)) {
+            return $this->unavailableQueueDiagnostics($table);
+        }
+
+        $channelFilter = Schema::hasColumn($table, 'channel')
+            ? fn ($q) => $q->where("{$alias}.channel", 'email')
+            : fn ($q) => $q;
+
+        $base = DB::table("{$table} as {$alias}")
+            ->tap($channelFilter)
+            ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.tenant_id", $tenantId));
+        $staleClaimed = (clone $base)
+            ->where("{$alias}.status", 'claimed')
+            ->whereNull("{$alias}.delivered_at")
+            ->where("{$alias}.claimed_at", '<', now()->subMinutes(15));
+        $missingEvidence = Schema::hasTable('email_log')
+            ? $this->reminderDeliveryClaimMissingEvidenceQuery(
+                (clone $base)
+                    ->where("{$alias}.status", 'delivered')
+                    ->where("{$alias}.delivered_at", '>=', now()->subDay()),
+                $alias,
+                $category
+            )
+            : (clone $base)->whereRaw('1 = 0');
+
+        return [
+            'source' => $table,
+            'available' => true,
+            'status_counts' => [
+                'pending' => (clone $staleClaimed)->count(),
+                'failed' => (clone $missingEvidence)->count(),
+            ],
+            'stale_pending' => (clone $staleClaimed)->count(),
+            'stale_processing' => 0,
+            'failed_recent' => (clone $missingEvidence)->count(),
+            'suppressed_recent' => 0,
+            'oldest_pending_at' => (clone $staleClaimed)->min("{$alias}.claimed_at"),
+            'returned' => 0,
+        ];
+    }
+
+    private function reminderDeliveryClaimMissingEvidenceQuery($query, string $alias, string $category)
+    {
+        return $query->whereNotExists(function ($sub) use ($alias, $category): void {
+            $sub->select(DB::raw(1))
+                ->from('email_log')
+                ->whereColumn('email_log.user_id', "{$alias}.user_id")
+                ->whereColumn('email_log.tenant_id', "{$alias}.tenant_id")
+                ->where('email_log.category', $category)
+                ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                ->whereRaw("email_log.created_at BETWEEN DATE_SUB({$alias}.delivered_at, INTERVAL 10 MINUTE) AND DATE_ADD({$alias}.delivered_at, INTERVAL 10 MINUTE)");
+        });
     }
 
     private function emailDeliveryLedgerMissingEvidenceQuery($query, string $alias, string $category)

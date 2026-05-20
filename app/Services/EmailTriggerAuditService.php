@@ -48,8 +48,10 @@ class EmailTriggerAuditService
             ['module' => 'listings', 'event' => 'listing_expiry_reminder_source', 'category' => 'listing_expiry', 'critical' => true, 'source_table' => 'listing_expiry_reminders_sent'],
             ['module' => 'events', 'event' => 'rsvp_change_or_reminder', 'category' => 'event_reminder', 'critical' => true, 'source_table' => 'notification_queue'],
             ['module' => 'events', 'event' => 'scheduled_event_reminder', 'category' => 'event_reminder', 'critical' => true, 'source_table' => 'event_reminders'],
+            ['module' => 'events', 'event' => 'event_reminder_delivery_claim_source', 'category' => 'event_reminder', 'critical' => true, 'source_table' => 'event_reminder_delivery_claims'],
             ['module' => 'volunteering', 'event' => 'application_shift_reminder_hours_expense', 'category' => 'volunteering', 'critical' => true, 'source_table' => 'notification_queue'],
             ['module' => 'volunteering', 'event' => 'volunteer_reminder_source', 'category' => 'volunteer_reminder', 'critical' => true, 'source_table' => 'vol_reminders_sent'],
+            ['module' => 'volunteering', 'event' => 'volunteer_reminder_delivery_claim_source', 'category' => 'volunteer_reminder', 'critical' => true, 'source_table' => 'vol_reminder_delivery_claims'],
             ['module' => 'goals', 'event' => 'goal_reminder', 'category' => 'goal_reminder', 'critical' => true, 'source_table' => 'notification_queue'],
             ['module' => 'goals', 'event' => 'goal_reminder_source', 'category' => 'goal_reminder', 'critical' => true, 'source_table' => 'goal_reminders'],
             ['module' => 'marketplace', 'event' => 'order_offer_payment_rating_report', 'category' => 'marketplace', 'critical' => true, 'source_table' => 'notification_queue'],
@@ -181,8 +183,10 @@ class EmailTriggerAuditService
                 $this->checkNewsletterQueueHealth($tenantId, $since, $windowHours),
                 $this->checkListingExpiryReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkEventReminderSourceHealth($tenantId, $since, $windowHours),
+                $this->checkEventReminderDeliveryClaimHealth($tenantId, $since, $windowHours),
                 $this->checkGoalReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkVolunteerReminderSourceHealth($tenantId, $since, $windowHours),
+                $this->checkVolunteerReminderDeliveryClaimHealth($tenantId, $since, $windowHours),
                 $this->checkJobInterviewReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkCivicDigestClaimSourceHealth($tenantId, $since, $windowHours),
                 $this->checkNotificationStoreHealth($tenantId),
@@ -256,6 +260,7 @@ class EmailTriggerAuditService
             'billing_audit_log' => 'checkBillingAndStripeHealth',
             'civic_digest_delivery_claims' => 'checkCivicDigestClaimSourceHealth',
             'email_log' => 'checkTenantContextAndWebhookHealth',
+            'event_reminder_delivery_claims' => 'checkEventReminderDeliveryClaimHealth',
             'event_reminders' => 'checkEventReminderSourceHealth',
             'federation_inbound_connections' => 'checkFederationConnectionDeliveryHealth',
             'federation_messages' => 'checkFederationMessageDeliveryHealth',
@@ -279,6 +284,7 @@ class EmailTriggerAuditService
             'users' => 'checkNewUsersWithoutAccountEmail',
             'verein_member_dues' => 'checkVereinDuesEmailHealth',
             'vol_donations' => 'checkStripeDonationReceiptEmailHealth',
+            'vol_reminder_delivery_claims' => 'checkVolunteerReminderDeliveryClaimHealth',
             'vol_reminders_sent' => 'checkVolunteerReminderSourceHealth',
         ];
 
@@ -1521,6 +1527,109 @@ class EmailTriggerAuditService
             $since,
             $windowHours
         );
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkEventReminderDeliveryClaimHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        return $this->checkReminderDeliveryClaimHealth(
+            'event_reminder_delivery_claims',
+            'erdc',
+            'event_reminder',
+            'events',
+            'event_reminder_delivery_claim_source',
+            'event_reminder_delivery_claim',
+            $tenantId,
+            $since,
+            $windowHours
+        );
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkVolunteerReminderDeliveryClaimHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        return $this->checkReminderDeliveryClaimHealth(
+            'vol_reminder_delivery_claims',
+            'vrdc',
+            'volunteer_reminder',
+            'volunteering',
+            'volunteer_reminder_delivery_claim_source',
+            'volunteer_reminder_delivery_claim',
+            $tenantId,
+            $since,
+            $windowHours
+        );
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkReminderDeliveryClaimHealth(
+        string $table,
+        string $alias,
+        string $category,
+        string $module,
+        string $event,
+        string $codePrefix,
+        ?int $tenantId,
+        \DateTimeInterface $since,
+        int $windowHours
+    ): array {
+        if (
+            !$this->hasTables([$table])
+            || !Schema::hasColumn($table, 'claimed_at')
+            || !Schema::hasColumn($table, 'delivered_at')
+        ) {
+            return [];
+        }
+
+        $issues = [];
+
+        $staleClaimed = DB::table("{$table} as {$alias}")
+            ->select("{$alias}.tenant_id", DB::raw('COUNT(*) as count'))
+            ->where("{$alias}.status", 'claimed')
+            ->whereNull("{$alias}.delivered_at")
+            ->where("{$alias}.claimed_at", '<', now()->subMinutes(15))
+            ->when(
+                Schema::hasColumn($table, 'channel'),
+                fn ($q) => $q->where("{$alias}.channel", 'email')
+            )
+            ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.tenant_id", $tenantId))
+            ->groupBy("{$alias}.tenant_id")
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($staleClaimed, "{$codePrefix}_stale_claimed", 'critical', $module, $event, ['minutes' => 15]));
+
+        if (!$this->hasTables(['email_log'])) {
+            return $issues;
+        }
+
+        $deliveredWithoutEmail = DB::table("{$table} as {$alias}")
+            ->select("{$alias}.tenant_id", DB::raw('COUNT(*) as count'))
+            ->where("{$alias}.status", 'delivered')
+            ->where("{$alias}.delivered_at", '>=', $since)
+            ->when(
+                Schema::hasColumn($table, 'channel'),
+                fn ($q) => $q->where("{$alias}.channel", 'email')
+            )
+            ->whereNotExists(function ($sub) use ($alias, $category): void {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereColumn('email_log.user_id', "{$alias}.user_id")
+                    ->whereColumn('email_log.tenant_id', "{$alias}.tenant_id")
+                    ->where('email_log.category', $category)
+                    ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                    ->whereRaw("email_log.created_at BETWEEN DATE_SUB({$alias}.delivered_at, INTERVAL 10 MINUTE) AND DATE_ADD({$alias}.delivered_at, INTERVAL 10 MINUTE)");
+            })
+            ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.tenant_id", $tenantId))
+            ->groupBy("{$alias}.tenant_id")
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($deliveredWithoutEmail, "{$codePrefix}_delivered_without_email_log", 'critical', $module, $event, ['window_hours' => $windowHours]));
+
+        return $issues;
     }
 
     /**
