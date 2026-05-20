@@ -349,7 +349,7 @@ export function FaqPage() {
         name: item.question,
         acceptedAnswer: {
           '@type': 'Answer' as const,
-          text: t(`faq.categories.${catKey}.q${qi + 1}.${answerKeys[catKey]?.[qi] || 'answer_p1'}`, { defaultValue: item.question }),
+          text: t(`faq.categories.${catKey}.q${qi + 1}.${answerKeys[catKey]?.[qi] || 'answer_p1'}`),
         },
       }))
     );
@@ -375,7 +375,7 @@ export function FaqPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <PageMeta title={t('faq.page_title', { defaultValue: 'FAQ' })} description={t('faq.meta_description', { defaultValue: 'Frequently asked questions about the community platform.' })} />
+      <PageMeta title={t('faq.page_title')} description={t('faq.meta_description')} />
       <Helmet>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -390,7 +390,7 @@ export function FaqPage() {
           <GlassCard className="p-8 sm:p-10">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 rounded-xl bg-indigo-500/10">
-                <HelpCircle className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+                <HelpCircle aria-hidden="true" className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
               </div>
               <h1 className="text-3xl font-bold text-theme-primary">{t('faq.title')}</h1>
             </div>
@@ -432,7 +432,7 @@ export function FaqPage() {
                 <GlassCard className="p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-1.5 rounded-lg bg-indigo-500/10">
-                      <Icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
+                      <Icon aria-hidden="true" className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
                     </div>
                     <h2 className="text-lg font-semibold text-theme-primary">{cat.title}</h2>
                   </div>
