@@ -690,5 +690,20 @@
     "check_status": "Controlla lo stato",
     "start_error": "Impossibile avviare l'onboarding"
   },
-  "page_title": "Marketplace"
+  "page_title": "Marketplace",
+  "checkout": {
+    "title": "Secure Checkout",
+    "order_summary": "Order Summary",
+    "shipping": "Shipping",
+    "total": "Total",
+    "secure_notice": "Payments are processed securely by Stripe. Your card details are never stored on our servers.",
+    "cancel": "Cancel",
+    "close": "Close",
+    "pay_now": "Pay {{amount}}",
+    "payment_failed": "Payment failed. Please try again.",
+    "payment_processing": "Payment is being processed. You will be notified when complete.",
+    "payment_error": "An unexpected error occurred. Please try again.",
+    "not_available_title": "Payment Processing Being Set Up",
+    "not_available_description": "Payment processing is being set up. Please contact the seller to arrange payment."
+  }
 }

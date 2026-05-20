@@ -28,6 +28,7 @@ import CreditCard from 'lucide-react/icons/credit-card';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTranslation } from 'react-i18next';
+import { logError } from '@/lib/logger';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Stripe imports — packages are installed via @stripe/react-stripe-js
@@ -107,15 +108,16 @@ function CheckoutForm({
       });
 
       if (error) {
-        setErrorMessage(error.message || t('checkout.payment_failed', 'Payment failed. Please try again.'));
+        setErrorMessage(error.message || t('checkout.payment_failed'));
       } else if (paymentIntent?.status === 'succeeded') {
         onSuccess();
       } else {
         // Payment requires additional action or is processing
-        setErrorMessage(t('checkout.payment_processing', 'Payment is being processed. You will be notified when complete.'));
+        setErrorMessage(t('checkout.payment_processing'));
       }
-    } catch {
-      setErrorMessage(t('checkout.payment_error', 'An unexpected error occurred. Please try again.'));
+    } catch (err) {
+      logError('StripeCheckoutModal.confirmPayment', err);
+      setErrorMessage(t('checkout.payment_error'));
     } finally {
       setIsProcessing(false);
     }
@@ -127,7 +129,7 @@ function CheckoutForm({
         {/* Order summary */}
         <div className="bg-default-50 rounded-xl p-4 space-y-2">
           <h4 className="text-sm font-semibold text-default-500 uppercase tracking-wide">
-            {t('checkout.order_summary', 'Order Summary')}
+            {t('checkout.order_summary')}
           </h4>
           {listingTitle && (
             <div className="flex justify-between text-sm">
@@ -137,13 +139,13 @@ function CheckoutForm({
           )}
           {shippingCost != null && shippingCost > 0 && (
             <div className="flex justify-between text-sm">
-              <span className="text-default-500">{t('checkout.shipping', 'Shipping')}</span>
+              <span className="text-default-500">{t('checkout.shipping')}</span>
               <span className="text-foreground">{formatAmount(shippingCost, currency)}</span>
             </div>
           )}
           <Divider />
           <div className="flex justify-between">
-            <span className="font-semibold text-foreground">{t('checkout.total', 'Total')}</span>
+            <span className="font-semibold text-foreground">{t('checkout.total')}</span>
             <span className="font-bold text-lg text-primary">{formatAmount(totalAmount, currency)}</span>
           </div>
         </div>
@@ -168,30 +170,30 @@ function CheckoutForm({
         {/* Error message */}
         {errorMessage && (
           <div className="flex items-start gap-2 p-3 rounded-lg bg-danger-50 text-danger text-sm">
-            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
             <span>{errorMessage}</span>
           </div>
         )}
 
         {/* Security notice */}
         <div className="flex items-center gap-2 text-xs text-default-400">
-          <ShieldCheck className="w-4 h-4 shrink-0" />
-          <span>{t('checkout.secure_notice', 'Payments are processed securely by Stripe. Your card details are never stored on our servers.')}</span>
+          <ShieldCheck className="w-4 h-4 shrink-0" aria-hidden="true" />
+          <span>{t('checkout.secure_notice')}</span>
         </div>
       </ModalBody>
 
       <ModalFooter>
         <Button variant="flat" onPress={onClose} isDisabled={isProcessing}>
-          {t('checkout.cancel', 'Cancel')}
+          {t('checkout.cancel')}
         </Button>
         <Button
           color="success"
           onPress={handleSubmit}
           isLoading={isProcessing}
           isDisabled={!stripe || !elements || !isReady}
-          startContent={!isProcessing ? <CreditCard className="w-4 h-4" /> : undefined}
+          startContent={!isProcessing ? <CreditCard className="w-4 h-4" aria-hidden="true" /> : undefined}
         >
-          {t('checkout.pay_now', 'Pay {{amount}}', { amount: formatAmount(totalAmount, currency) })}
+          {t('checkout.pay_now', { amount: formatAmount(totalAmount, currency) })}
         </Button>
       </ModalFooter>
     </>
@@ -231,29 +233,26 @@ export function StripeCheckoutModal({
         {() => (
           <>
             <ModalHeader className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-primary" />
-              {t('checkout.title', 'Secure Checkout')}
+              <CreditCard className="w-5 h-5 text-primary" aria-hidden="true" />
+              {t('checkout.title')}
             </ModalHeader>
 
             {stripeUnavailable ? (
               <>
                 <ModalBody>
                   <div className="text-center py-6 space-y-3">
-                    <AlertCircle className="w-12 h-12 text-warning mx-auto" />
+                    <AlertCircle className="w-12 h-12 text-warning mx-auto" aria-hidden="true" />
                     <p className="text-foreground font-medium">
-                      {t('checkout.not_available_title', 'Payment Processing Being Set Up')}
+                      {t('checkout.not_available_title')}
                     </p>
                     <p className="text-sm text-default-500">
-                      {t(
-                        'checkout.not_available_description',
-                        'Payment processing is being set up. Please contact the seller to arrange payment.',
-                      )}
+                      {t('checkout.not_available_description')}
                     </p>
                   </div>
                 </ModalBody>
                 <ModalFooter>
                   <Button variant="flat" onPress={onClose}>
-                    {t('checkout.close', 'Close')}
+                    {t('checkout.close')}
                   </Button>
                 </ModalFooter>
               </>
