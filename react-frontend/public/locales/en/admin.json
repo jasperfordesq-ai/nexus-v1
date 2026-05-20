@@ -3839,6 +3839,113 @@
       "export_failed": "Failed to export CSV"
     }
   },
+  "national_kiss_dashboard": {
+    "meta": {
+      "page_title": "Fondation KISS - National Dashboard",
+      "title": "Fondation KISS - National Dashboard",
+      "description": "Cross-cooperative super-admin view across every KISS cooperative on the platform. Member counts are reported in privacy-preserving brackets."
+    },
+    "actions": {
+      "refresh": "Refresh"
+    },
+    "about": {
+      "title": "About this dashboard",
+      "body_prefix": "KISS (Koordination und Innovation fur Soziales) is a Swiss methodology for community-based care coordination developed with Age-Stiftung. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the Fondation",
+      "body_suffix": "a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "health_prefix": "Use the period selector to compare quarters. The comparative table ranks cooperatives by hours, members, or health status. Health status is derived from activity trends:",
+      "thriving_definition": "growing fast,",
+      "stable_definition": "flat activity,",
+      "struggling_definition": "declining activity or very low engagement."
+    },
+    "status": {
+      "thriving": "Thriving",
+      "stable": "Stable",
+      "struggling": "Struggling"
+    },
+    "health_legend": {
+      "title": "Health status key:",
+      "thriving": "hours growing strongly (>10% vs prior period)",
+      "stable": "flat activity (+/-10%)",
+      "struggling": "declining activity or fewer than 5 verified hours in period",
+      "privacy_note": "Member counts shown as privacy-preserving brackets (e.g. \"50-99\") - no individual data is ever surfaced here."
+    },
+    "filters": {
+      "period": "Period",
+      "period_aria": "Reporting period",
+      "from": "From",
+      "from_aria": "Period from",
+      "to": "To",
+      "to_aria": "Period to"
+    },
+    "periods": {
+      "this_month": "This month",
+      "last_quarter": "Last quarter (90 days)",
+      "last_year": "Last year",
+      "custom": "Custom range"
+    },
+    "stats": {
+      "total_cooperatives": "Total cooperatives",
+      "active_cooperatives": "Active cooperatives",
+      "active_description": "{{active}} of {{total}} active in period",
+      "total_hours": "Total hours (national)",
+      "active_tandems": "Active tandems"
+    },
+    "inline": {
+      "active_members": "Active members:",
+      "recipients_reached": "Recipients reached:",
+      "safeguarding_reports": "Safeguarding reports:"
+    },
+    "metrics": {
+      "yoy": "{{value}} YoY"
+    },
+    "trend": {
+      "title": "National 12-month trend",
+      "empty": "No trend data available.",
+      "hours_axis": "Hours",
+      "cooperatives_axis": "Cooperatives",
+      "active_cooperatives": "Active cooperatives",
+      "total_hours_all": "Total hours (all cooperatives)"
+    },
+    "comparative": {
+      "title": "Comparative metrics",
+      "sort_hint": "Click a column to sort",
+      "empty_prefix": "No",
+      "empty_middle": "cooperatives configured yet. Go to",
+      "super_admin_tenants": "Super Admin -> Tenants",
+      "empty_suffix": "and set the tenant category to",
+      "empty_tail": "on at least one tenant to populate this dashboard.",
+      "aria": "Comparative metrics by cooperative",
+      "cooperative": "Cooperative",
+      "hours_title": "Total verified care hours in the selected period",
+      "hours_sort": "Hours <->",
+      "members_title": "Active member count shown as a privacy-preserving bracket",
+      "members": "Members",
+      "recipients_title": "Care recipients reached (privacy-preserving bracket)",
+      "recipients": "Recipients",
+      "tandems_title": "Recurring helper/recipient pairs with 2+ completed exchanges",
+      "tandems_sort": "Tandems <->",
+      "retention_title": "% of members active in both this period and the prior equivalent period",
+      "retention_sort": "Retention <->",
+      "reciprocity_title": "% of supporters who also received hours in the period - indicates mutual exchange health",
+      "reciprocity_sort": "Reciprocity <->",
+      "status": "Status"
+    },
+    "leaderboards": {
+      "top_title": "Top 5 by hours",
+      "bottom_title": "Bottom 5 (active only)"
+    },
+    "empty": {
+      "no_data": "No data.",
+      "no_active_cooperatives": "No active cooperatives in this period."
+    },
+    "footer": {
+      "generated_at": "Generated at {{date}}.",
+      "privacy_note": "Member counts are reported in privacy-preserving brackets - no individual member identifiers are shown anywhere on this page."
+    },
+    "toasts": {
+      "load_failed": "Failed to load dashboard"
+    }
+  },
   "municipal_copilot": {
     "meta": {
       "page_title": "Municipal Communication Copilot",

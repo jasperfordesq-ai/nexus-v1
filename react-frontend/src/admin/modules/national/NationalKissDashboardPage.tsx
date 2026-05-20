@@ -55,6 +55,7 @@ import Info from 'lucide-react/icons/info';
 import Users from 'lucide-react/icons/users';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import TrendingDown from 'lucide-react/icons/trending-down';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -146,10 +147,10 @@ function rangeForPreset(preset: PeriodPreset, fallback: { from: string; to: stri
 // Status chip colour
 // ─────────────────────────────────────────────────────────────────────────────
 
-const statusChip: Record<CoopStatus, { color: 'success' | 'warning' | 'danger'; label: string }> = {
-  thriving: { color: 'success', label: 'Thriving' },
-  stable: { color: 'warning', label: 'Stable' },
-  struggling: { color: 'danger', label: 'Struggling' },
+const statusChip: Record<CoopStatus, { color: 'success' | 'warning' | 'danger' }> = {
+  thriving: { color: 'success' },
+  stable: { color: 'warning' },
+  struggling: { color: 'danger' },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -157,7 +158,8 @@ const statusChip: Record<CoopStatus, { color: 'success' | 'warning' | 'danger'; 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function NationalKissDashboardPage() {
-  usePageTitle('Fondation KISS — National Dashboard');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('national_kiss_dashboard.meta.page_title'));
   const { showToast } = useToast();
 
   const todayIso = useMemo(() => isoDate(new Date()), []);
@@ -201,12 +203,12 @@ export function NationalKissDashboardPage() {
       setComparative(comparativeRes.data?.rows ?? []);
       setTrend(trendRes.data?.trend ?? []);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load dashboard';
+      const message = err instanceof Error ? err.message : t('national_kiss_dashboard.toasts.load_failed');
       showToast(message, 'error');
     } finally {
       setLoading(false);
     }
-  }, [periodFrom, periodTo, showToast]);
+  }, [periodFrom, periodTo, showToast, t]);
 
   useEffect(() => {
     fetchAll();
@@ -248,16 +250,18 @@ export function NationalKissDashboardPage() {
         variant="flat"
         size="sm"
       >
-        {positive ? '+' : ''}{pct.toFixed(1)}% YoY
+        {t('national_kiss_dashboard.metrics.yoy', {
+          value: `${positive ? '+' : ''}${pct.toFixed(1)}%`,
+        })}
       </Chip>
     );
-  }, [summary]);
+  }, [summary, t]);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Fondation KISS — National Dashboard"
-        description="Cross-cooperative super-admin view across every KISS cooperative on the platform. Member counts are reported in privacy-preserving brackets."
+        title={t('national_kiss_dashboard.meta.title')}
+        description={t('national_kiss_dashboard.meta.description')}
         actions={
           <span className="inline-flex items-center gap-2 text-default-500">
             <Landmark size={20} />
@@ -270,19 +274,14 @@ export function NationalKissDashboardPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this dashboard</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('national_kiss_dashboard.about.title')}</p>
               <p className="text-default-600">
-                KISS (Koordination und Innovation für Soziales) is a Swiss methodology for community-based care
-                coordination developed with Age-Stiftung. This super-admin dashboard aggregates metrics across every
-                NEXUS cooperative running the Caring Community programme nationally — giving the Fondation <Abbr term="KISS">KISS</Abbr>
-                a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member
-                counts are shown as privacy-preserving brackets (e.g. "50–99") rather than exact numbers.
+                {t('national_kiss_dashboard.about.body_prefix')} <Abbr term="KISS" /> {t('national_kiss_dashboard.about.body_suffix')}
               </p>
               <p className="text-default-500">
-                Use the period selector to compare quarters. The comparative table ranks cooperatives by hours,
-                members, or health status. Health status is derived from activity trends: <strong>Thriving</strong> =
-                growing fast, <strong>Growing</strong> = steady increase, <strong>Stable</strong> = flat activity,{' '}
-                <strong>Struggling</strong> = declining activity or very low engagement.
+                {t('national_kiss_dashboard.about.health_prefix')} <strong>{t('national_kiss_dashboard.status.thriving')}</strong> =
+                {t('national_kiss_dashboard.about.thriving_definition')} <strong>{t('national_kiss_dashboard.status.stable')}</strong> = {t('national_kiss_dashboard.about.stable_definition')}{' '}
+                <strong>{t('national_kiss_dashboard.status.struggling')}</strong> = {t('national_kiss_dashboard.about.struggling_definition')}
               </p>
             </div>
           </div>
@@ -291,21 +290,21 @@ export function NationalKissDashboardPage() {
 
       {/* Health status legend */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-default-200 bg-default-50 px-3 py-2 text-xs text-default-500">
-        <span className="font-medium text-default-700">Health status key:</span>
+        <span className="font-medium text-default-700">{t('national_kiss_dashboard.health_legend.title')}</span>
         <span className="flex items-center gap-1.5">
-          <Chip size="sm" color="success" variant="flat">Thriving</Chip>
-          hours growing strongly (&gt;10% vs prior period)
+          <Chip size="sm" color="success" variant="flat">{t('national_kiss_dashboard.status.thriving')}</Chip>
+          {t('national_kiss_dashboard.health_legend.thriving')}
         </span>
         <span className="flex items-center gap-1.5">
-          <Chip size="sm" color="warning" variant="flat">Stable</Chip>
-          flat activity (±10%)
+          <Chip size="sm" color="warning" variant="flat">{t('national_kiss_dashboard.status.stable')}</Chip>
+          {t('national_kiss_dashboard.health_legend.stable')}
         </span>
         <span className="flex items-center gap-1.5">
-          <Chip size="sm" color="danger" variant="flat">Struggling</Chip>
-          declining activity or fewer than 5 verified hours in period
+          <Chip size="sm" color="danger" variant="flat">{t('national_kiss_dashboard.status.struggling')}</Chip>
+          {t('national_kiss_dashboard.health_legend.struggling')}
         </span>
         <span className="ml-3 text-default-400">
-          Member counts shown as privacy-preserving brackets (e.g. "50–99") — no individual data is ever surfaced here.
+          {t('national_kiss_dashboard.health_legend.privacy_note')}
         </span>
       </div>
 
@@ -313,38 +312,38 @@ export function NationalKissDashboardPage() {
       <Card>
         <CardBody className="flex flex-col gap-3 md:flex-row md:items-end">
           <Select
-            label="Period"
+            label={t('national_kiss_dashboard.filters.period')}
             selectedKeys={[preset]}
             onSelectionChange={(keys) => {
               const next = Array.from(keys)[0] as PeriodPreset;
               if (next) handlePresetChange(next);
             }}
             className="md:max-w-xs"
-            aria-label="Reporting period"
+            aria-label={t('national_kiss_dashboard.filters.period_aria')}
           >
-            <SelectItem key="this_month">This month</SelectItem>
-            <SelectItem key="last_quarter">Last quarter (90 days)</SelectItem>
-            <SelectItem key="last_year">Last year</SelectItem>
-            <SelectItem key="custom">Custom range</SelectItem>
+            <SelectItem key="this_month">{t('national_kiss_dashboard.periods.this_month')}</SelectItem>
+            <SelectItem key="last_quarter">{t('national_kiss_dashboard.periods.last_quarter')}</SelectItem>
+            <SelectItem key="last_year">{t('national_kiss_dashboard.periods.last_year')}</SelectItem>
+            <SelectItem key="custom">{t('national_kiss_dashboard.periods.custom')}</SelectItem>
           </Select>
           <Input
             type="date"
-            label="From"
+            label={t('national_kiss_dashboard.filters.from')}
             value={periodFrom}
             onChange={(e) => { setPeriodFrom(e.target.value); setPreset('custom'); }}
             className="md:max-w-xs"
-            aria-label="Period from"
+            aria-label={t('national_kiss_dashboard.filters.from_aria')}
           />
           <Input
             type="date"
-            label="To"
+            label={t('national_kiss_dashboard.filters.to')}
             value={periodTo}
             onChange={(e) => { setPeriodTo(e.target.value); setPreset('custom'); }}
             className="md:max-w-xs"
-            aria-label="Period to"
+            aria-label={t('national_kiss_dashboard.filters.to_aria')}
           />
           <Button color="primary" onPress={fetchAll} isLoading={loading}>
-            Refresh
+            {t('national_kiss_dashboard.actions.refresh')}
           </Button>
         </CardBody>
       </Card>
@@ -352,29 +351,32 @@ export function NationalKissDashboardPage() {
       {/* Summary stats */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          label="Total cooperatives"
+          label={t('national_kiss_dashboard.stats.total_cooperatives')}
           value={summary?.cooperatives_count ?? '—'}
           icon={Building2}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Active cooperatives"
+          label={t('national_kiss_dashboard.stats.active_cooperatives')}
           value={summary?.active_cooperatives_count ?? '—'}
           icon={Activity}
           color="success"
-          description={summary ? `${summary.active_cooperatives_count} of ${summary.cooperatives_count} active in period` : undefined}
+          description={summary ? t('national_kiss_dashboard.stats.active_description', {
+            active: summary.active_cooperatives_count,
+            total: summary.cooperatives_count,
+          }) : undefined}
           loading={loading}
         />
         <StatCard
-          label="Total hours (national)"
+          label={t('national_kiss_dashboard.stats.total_hours')}
           value={summary?.total_approved_hours_national.toFixed(1) ?? '—'}
           icon={Clock}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label="Active tandems"
+          label={t('national_kiss_dashboard.stats.active_tandems')}
           value={summary?.active_tandems_total ?? '—'}
           icon={Users}
           color="warning"
@@ -386,11 +388,11 @@ export function NationalKissDashboardPage() {
       {summary && !loading && (
         <Card>
           <CardBody className="flex flex-wrap items-center gap-3 text-sm">
-            <span className="text-default-500">Active members:</span>
+            <span className="text-default-500">{t('national_kiss_dashboard.inline.active_members')}</span>
             <Chip variant="flat">{summary.total_active_members_bucket}</Chip>
-            <span className="text-default-500">Recipients reached:</span>
+            <span className="text-default-500">{t('national_kiss_dashboard.inline.recipients_reached')}</span>
             <Chip variant="flat">{summary.total_recipients_reached_bucket}</Chip>
-            <span className="text-default-500">Safeguarding reports:</span>
+            <span className="text-default-500">{t('national_kiss_dashboard.inline.safeguarding_reports')}</span>
             <Chip variant="flat">{summary.safeguarding_reports_total}</Chip>
             {yoyChip}
           </CardBody>
@@ -401,7 +403,7 @@ export function NationalKissDashboardPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <Activity size={18} />
-          <h2 className="text-lg font-semibold">National 12-month trend</h2>
+          <h2 className="text-lg font-semibold">{t('national_kiss_dashboard.trend.title')}</h2>
         </CardHeader>
         <CardBody>
           {loading ? (
@@ -409,7 +411,7 @@ export function NationalKissDashboardPage() {
               <Spinner />
             </div>
           ) : trend.length === 0 ? (
-            <p className="text-sm text-default-500">No trend data available.</p>
+            <p className="text-sm text-default-500">{t('national_kiss_dashboard.trend.empty')}</p>
           ) : (
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -419,13 +421,13 @@ export function NationalKissDashboardPage() {
                   <YAxis
                     yAxisId="left"
                     stroke="var(--color-text-muted, #6b7280)"
-                    label={{ value: 'Hours', angle: -90, position: 'insideLeft', style: { fontSize: 11, fill: 'var(--color-text-muted, #6b7280)' } }}
+                    label={{ value: t('national_kiss_dashboard.trend.hours_axis'), angle: -90, position: 'insideLeft', style: { fontSize: 11, fill: 'var(--color-text-muted, #6b7280)' } }}
                   />
                   <YAxis
                     yAxisId="right"
                     orientation="right"
                     stroke="var(--color-text-muted, #6b7280)"
-                    label={{ value: 'Cooperatives', angle: 90, position: 'insideRight', style: { fontSize: 11, fill: 'var(--color-text-muted, #6b7280)' } }}
+                    label={{ value: t('national_kiss_dashboard.trend.cooperatives_axis'), angle: 90, position: 'insideRight', style: { fontSize: 11, fill: 'var(--color-text-muted, #6b7280)' } }}
                   />
                   <Tooltip />
                   <Legend />
@@ -433,7 +435,7 @@ export function NationalKissDashboardPage() {
                     yAxisId="right"
                     type="monotone"
                     dataKey="active_cooperatives"
-                    name="Active cooperatives"
+                    name={t('national_kiss_dashboard.trend.active_cooperatives')}
                     fill="rgba(99, 102, 241, 0.15)"
                     stroke="rgba(99, 102, 241, 0.6)"
                   />
@@ -441,7 +443,7 @@ export function NationalKissDashboardPage() {
                     yAxisId="left"
                     type="monotone"
                     dataKey="total_hours_all_cooperatives"
-                    name="Total hours (all cooperatives)"
+                    name={t('national_kiss_dashboard.trend.total_hours_all')}
                     stroke="#0ea5e9"
                     strokeWidth={2}
                     dot={false}
@@ -456,8 +458,8 @@ export function NationalKissDashboardPage() {
       {/* Comparative table */}
       <Card>
         <CardHeader className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Comparative metrics</h2>
-          <span className="text-xs text-default-500">Click a column to sort</span>
+          <h2 className="text-lg font-semibold">{t('national_kiss_dashboard.comparative.title')}</h2>
+          <span className="text-xs text-default-500">{t('national_kiss_dashboard.comparative.sort_hint')}</span>
         </CardHeader>
         <CardBody>
           {loading ? (
@@ -466,25 +468,25 @@ export function NationalKissDashboardPage() {
             </div>
           ) : sortedRows.length === 0 ? (
             <p className="text-sm text-default-500">
-              No <Abbr term="KISS">KISS</Abbr> cooperatives configured yet. Go to <strong>Super Admin → Tenants</strong> and set the
-              tenant category to <strong>kiss_cooperative</strong> on at least one tenant to populate this dashboard.
+              {t('national_kiss_dashboard.comparative.empty_prefix')} <Abbr term="KISS" /> {t('national_kiss_dashboard.comparative.empty_middle')} <strong>{t('national_kiss_dashboard.comparative.super_admin_tenants')}</strong> {t('national_kiss_dashboard.comparative.empty_suffix')}{' '}
+              <strong>{'kiss_cooperative'}</strong> {t('national_kiss_dashboard.comparative.empty_tail')}
             </p>
           ) : (
             <Table
-              aria-label="Comparative metrics by cooperative"
+              aria-label={t('national_kiss_dashboard.comparative.aria')}
               removeWrapper
               isHeaderSticky
               classNames={{ base: 'overflow-x-auto' }}
             >
               <TableHeader>
-                <TableColumn onClick={() => handleSort('name')} className="cursor-pointer">Cooperative</TableColumn>
-                <TableColumn onClick={() => handleSort('hours')} className="cursor-pointer text-right"><span title="Total verified care hours in the selected period">Hours ↕</span></TableColumn>
-                <TableColumn><span title="Active member count shown as a privacy-preserving bracket">Members</span></TableColumn>
-                <TableColumn><span title="Care recipients reached (privacy-preserving bracket)">Recipients</span></TableColumn>
-                <TableColumn onClick={() => handleSort('active_tandems')} className="cursor-pointer text-right"><span title="Recurring helper/recipient pairs with 2+ completed exchanges">Tandems ↕</span></TableColumn>
-                <TableColumn onClick={() => handleSort('retention_rate_pct')} className="cursor-pointer text-right"><span title="% of members active in both this period and the prior equivalent period">Retention ↕</span></TableColumn>
-                <TableColumn onClick={() => handleSort('reciprocity_pct')} className="cursor-pointer text-right"><span title="% of supporters who also received hours in the period — indicates mutual exchange health">Reciprocity ↕</span></TableColumn>
-                <TableColumn>Status</TableColumn>
+                <TableColumn onClick={() => handleSort('name')} className="cursor-pointer">{t('national_kiss_dashboard.comparative.cooperative')}</TableColumn>
+                <TableColumn onClick={() => handleSort('hours')} className="cursor-pointer text-right"><span title={t('national_kiss_dashboard.comparative.hours_title')}>{t('national_kiss_dashboard.comparative.hours_sort')}</span></TableColumn>
+                <TableColumn><span title={t('national_kiss_dashboard.comparative.members_title')}>{t('national_kiss_dashboard.comparative.members')}</span></TableColumn>
+                <TableColumn><span title={t('national_kiss_dashboard.comparative.recipients_title')}>{t('national_kiss_dashboard.comparative.recipients')}</span></TableColumn>
+                <TableColumn onClick={() => handleSort('active_tandems')} className="cursor-pointer text-right"><span title={t('national_kiss_dashboard.comparative.tandems_title')}>{t('national_kiss_dashboard.comparative.tandems_sort')}</span></TableColumn>
+                <TableColumn onClick={() => handleSort('retention_rate_pct')} className="cursor-pointer text-right"><span title={t('national_kiss_dashboard.comparative.retention_title')}>{t('national_kiss_dashboard.comparative.retention_sort')}</span></TableColumn>
+                <TableColumn onClick={() => handleSort('reciprocity_pct')} className="cursor-pointer text-right"><span title={t('national_kiss_dashboard.comparative.reciprocity_title')}>{t('national_kiss_dashboard.comparative.reciprocity_sort')}</span></TableColumn>
+                <TableColumn>{t('national_kiss_dashboard.comparative.status')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {sortedRows.map((row) => (
@@ -498,7 +500,7 @@ export function NationalKissDashboardPage() {
                     <TableCell className="text-right">{row.reciprocity_pct.toFixed(1)}%</TableCell>
                     <TableCell>
                       <Chip color={statusChip[row.status].color} variant="flat" size="sm">
-                        {statusChip[row.status].label}
+                        {t(`national_kiss_dashboard.status.${row.status}`)}
                       </Chip>
                     </TableCell>
                   </TableRow>
@@ -514,7 +516,7 @@ export function NationalKissDashboardPage() {
         <Card>
           <CardHeader className="flex items-center gap-2">
             <TrendingUp size={18} className="text-success" />
-            <h2 className="text-lg font-semibold">Top 5 by hours</h2>
+            <h2 className="text-lg font-semibold">{t('national_kiss_dashboard.leaderboards.top_title')}</h2>
           </CardHeader>
           <CardBody>
             {summary && summary.top_5_cooperatives_by_hours.length > 0 ? (
@@ -527,14 +529,14 @@ export function NationalKissDashboardPage() {
                 ))}
               </ol>
             ) : (
-              <p className="text-sm text-default-500">No data.</p>
+              <p className="text-sm text-default-500">{t('national_kiss_dashboard.empty.no_data')}</p>
             )}
           </CardBody>
         </Card>
         <Card>
           <CardHeader className="flex items-center gap-2">
             <TrendingDown size={18} className="text-danger" />
-            <h2 className="text-lg font-semibold">Bottom 5 (active only)</h2>
+            <h2 className="text-lg font-semibold">{t('national_kiss_dashboard.leaderboards.bottom_title')}</h2>
           </CardHeader>
           <CardBody>
             {summary && summary.bottom_5_active_cooperatives_by_hours.length > 0 ? (
@@ -547,7 +549,7 @@ export function NationalKissDashboardPage() {
                 ))}
               </ol>
             ) : (
-              <p className="text-sm text-default-500">No active cooperatives in this period.</p>
+              <p className="text-sm text-default-500">{t('national_kiss_dashboard.empty.no_active_cooperatives')}</p>
             )}
           </CardBody>
         </Card>
@@ -556,8 +558,10 @@ export function NationalKissDashboardPage() {
       {/* Footer */}
       {summary && (
         <p className="text-xs text-default-400">
-          Generated at {new Date(summary.generated_at).toLocaleString()}.
-          Member counts are reported in privacy-preserving brackets — no individual member identifiers are shown anywhere on this page.
+          {t('national_kiss_dashboard.footer.generated_at', {
+            date: new Date(summary.generated_at).toLocaleString(),
+          })}{' '}
+          {t('national_kiss_dashboard.footer.privacy_note')}
         </p>
       )}
     </div>
