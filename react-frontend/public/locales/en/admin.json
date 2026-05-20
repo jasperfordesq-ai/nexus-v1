@@ -4813,6 +4813,7 @@
     "page_title_edit_role": "Edit Role",
     "permission_browser_desc": "Browse all available permissions in the system",
     "permission_browser_title": "Permission Browser",
+    "permissions_count": "{{count}} permissions",
     "permissions_count_label": "Permissions",
     "placeholder_breach_description": "Describe the breach...",
     "placeholder_brief_description_of_the_breach": "Brief Description of the Breach...",

@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardBody, Input, Textarea, Button, Checkbox, Spinner } from '@heroui/react';
 import Save from 'lucide-react/icons/save';
@@ -18,10 +19,17 @@ import { useTenant, useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
+function permissionLabel(value: string): string {
+  return value
+    .replace(/[._-]+/g, ' ')
+    .replace(/\b\w/g, (match) => match.toUpperCase());
+}
+
 export function RoleForm() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const isEdit = !!id;
-  usePageTitle(isEdit ? "Edit Role" : "Create Role");
+  usePageTitle(isEdit ? t('enterprise.page_title_edit_role') : t('enterprise.page_title_create_role'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -53,11 +61,11 @@ export function RoleForm() {
         }
       }
     } catch {
-      toast.error("Failed to load data");
+      toast.error(t('enterprise.failed_to_load_data'));
     } finally {
       setLoading(false);
     }
-  }, [id, isEdit, toast])
+  }, [id, isEdit, toast, t])
 
 
   useEffect(() => {
@@ -92,7 +100,7 @@ export function RoleForm() {
 
   const handleSubmit = async () => {
     if (!name.trim()) {
-      toast.error("Name is Required");
+      toast.error(t('enterprise.name_is_required'));
       return;
     }
 
@@ -112,14 +120,14 @@ export function RoleForm() {
       }
 
       if (res.success) {
-        toast.success(isEdit ? "Role Updated" : "Role Created");
+        toast.success(isEdit ? t('enterprise.role_updated') : t('enterprise.role_created'));
         navigate(tenantPath('/admin/enterprise/roles'));
       } else {
-        const error = (res as { error?: string }).error || "Save Failed";
+        const error = (res as { error?: string }).error || t('enterprise.save_failed');
         toast.error(error);
       }
     } catch (err) {
-      toast.error(isEdit ? "Failed to update role" : "Failed to create role");
+      toast.error(isEdit ? t('enterprise.failed_to_update_role') : t('enterprise.failed_to_create_role'));
       console.error('Role save error:', err);
     } finally {
       setSaving(false);
@@ -137,8 +145,8 @@ export function RoleForm() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? "Edit Role" : "Create Role"}
-        description={isEdit ? "Update the name, description, and permissions for this role" : "Define a new custom role with specific permissions"}
+        title={isEdit ? t('enterprise.edit_role') : t('enterprise.create_role')}
+        description={isEdit ? t('enterprise.edit_role_desc') : t('enterprise.create_role_desc')}
         actions={
           <Button
             variant="flat"
@@ -146,7 +154,7 @@ export function RoleForm() {
             onPress={() => navigate(tenantPath('/admin/enterprise/roles'))}
             size="sm"
           >
-            {"Back to Roles"}
+            {t('enterprise.back_to_roles')}
           </Button>
         }
       />
@@ -155,21 +163,21 @@ export function RoleForm() {
         {/* Basic Info */}
         <Card shadow="sm">
           <CardBody className="p-4 space-y-4">
-            <h3 className="text-lg font-semibold">{"Basic Information"}</h3>
+            <h3 className="text-lg font-semibold">{t('enterprise.basic_information')}</h3>
             <Input
-              label={"Role Name"}
+              label={t('enterprise.label_role_name')}
               value={name}
               onValueChange={setName}
               variant="bordered"
               isRequired
-              placeholder={"Role Name..."}
+              placeholder={t('enterprise.placeholder_role_name')}
             />
             <Textarea
-              label={"Description"}
+              label={t('enterprise.label_description')}
               value={description}
               onValueChange={setDescription}
               variant="bordered"
-              placeholder={"Role description..."}
+              placeholder={t('enterprise.placeholder_role_description')}
               minRows={2}
             />
           </CardBody>
@@ -178,7 +186,7 @@ export function RoleForm() {
         {/* Permissions */}
         <Card shadow="sm">
           <CardBody className="p-4">
-            <h3 className="text-lg font-semibold mb-4">{"Permissions"}</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('enterprise.col_permissions')}</h3>
             <div className="space-y-6">
               {Object.entries(allPermissions).map(([category, perms]) => (
                 <div key={category}>
@@ -191,7 +199,7 @@ export function RoleForm() {
                       }
                       onValueChange={() => toggleCategory(category)}
                     >
-                      <span className="font-medium capitalize">{category}</span>
+                      <span className="font-medium">{permissionLabel(category)}</span>
                     </Checkbox>
                   </div>
                   <div className="ml-6 grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -202,7 +210,7 @@ export function RoleForm() {
                         onValueChange={() => togglePermission(perm)}
                         size="sm"
                       >
-                        <span className="text-sm text-default-600">{perm}</span>
+                        <span className="text-sm text-default-600">{permissionLabel(perm)}</span>
                       </Checkbox>
                     ))}
                   </div>
@@ -218,7 +226,7 @@ export function RoleForm() {
             variant="flat"
             onPress={() => navigate(tenantPath('/admin/enterprise/roles'))}
           >
-            {"Cancel"}
+            {t('enterprise.cancel')}
           </Button>
           <Button
             color="primary"
@@ -226,7 +234,7 @@ export function RoleForm() {
             onPress={handleSubmit}
             isLoading={saving}
           >
-            {isEdit ? "Update Role" : "Create Role"}
+            {isEdit ? t('enterprise.update_role') : t('enterprise.create_role')}
           </Button>
         </div>
       </div>
