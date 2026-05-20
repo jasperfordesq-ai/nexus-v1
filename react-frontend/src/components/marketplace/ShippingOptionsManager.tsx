@@ -92,11 +92,11 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
   const { t } = useTranslation('marketplace');
 
   return (
-    <GlassCard className="p-4 space-y-3 border-2 border-primary/20">
+    <GlassCard className="space-y-4 border border-primary/20 bg-primary/5 p-4 shadow-sm">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Input
-          label={t('shipping.courier_name', 'Courier Name')}
-          placeholder={t('shipping.courier_name_placeholder', 'e.g. An Post, Royal Mail, DHL')}
+          label={t('shipping.courier_name')}
+          placeholder={t('shipping.courier_name_placeholder')}
           value={form.courier_name}
           onValueChange={(v) => onChange('courier_name', v)}
           size="sm"
@@ -105,8 +105,8 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
         />
         <div className="flex gap-2">
           <Input
-            label={t('shipping.price', 'Price')}
-            placeholder="0.00"
+            label={t('shipping.price')}
+            placeholder={t('shipping.price_placeholder')}
             type="number"
             min={0}
             step={0.01}
@@ -118,7 +118,7 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
             className="flex-1"
           />
           <Select
-            label={t('shipping.currency', 'Currency')}
+            label={t('shipping.currency')}
             selectedKeys={form.currency ? [form.currency] : []}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0];
@@ -137,8 +137,8 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
         <Input
-          label={t('shipping.estimated_days', 'Estimated Days')}
-          placeholder={t('shipping.estimated_days_placeholder', 'e.g. 3')}
+          label={t('shipping.estimated_days')}
+          placeholder={t('shipping.estimated_days_placeholder')}
           type="number"
           min={1}
           value={form.estimated_days}
@@ -153,7 +153,7 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
             size="sm"
           />
           <span className="text-sm text-foreground">
-            {t('shipping.set_as_default', 'Set as default')}
+            {t('shipping.set_as_default')}
           </span>
         </div>
       </div>
@@ -165,7 +165,7 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
           onPress={onCancel}
           startContent={<X className="w-3.5 h-3.5" />}
         >
-          {t('common.cancel', 'Cancel')}
+          {t('shipping.cancel')}
         </Button>
         <Button
           color="primary"
@@ -214,7 +214,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
       }
     } catch (err) {
       logError('Failed to load shipping options', err);
-      toast.error(t('shipping.load_error', 'Failed to load shipping options'));
+      toast.error(t('shipping.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -249,11 +249,11 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
         });
         setAddForm(EMPTY_FORM);
         setShowAddForm(false);
-        toast.success(t('shipping.added_success', 'Shipping option added'));
+        toast.success(t('shipping.added_success'));
       }
     } catch (err) {
       logError('Failed to add shipping option', err);
-      toast.error(t('shipping.add_error', 'Failed to add shipping option'));
+      toast.error(t('shipping.add_error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -300,11 +300,11 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
         );
         setEditingId(null);
         setEditForm(EMPTY_FORM);
-        toast.success(t('shipping.updated_success', 'Shipping option updated'));
+        toast.success(t('shipping.updated_success'));
       }
     } catch (err) {
       logError('Failed to update shipping option', err);
-      toast.error(t('shipping.update_error', 'Failed to update shipping option'));
+      toast.error(t('shipping.update_error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -315,10 +315,10 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
     try {
       await api.delete(`/v2/marketplace/seller/shipping-options/${id}`);
       setOptions((prev) => prev.filter((o) => o.id !== id));
-      toast.success(t('shipping.deleted_success', 'Shipping option removed'));
+      toast.success(t('shipping.deleted_success'));
     } catch (err) {
       logError('Failed to delete shipping option', err);
-      toast.error(t('shipping.delete_error', 'Failed to remove shipping option'));
+      toast.error(t('shipping.delete_error'));
     }
   }, [toast, t]);
 
@@ -343,20 +343,21 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
           <Truck className="w-5 h-5 text-primary" />
-          {t('shipping.title', 'Shipping Options')}
+          {t('shipping.title')}
         </h3>
         {!showAddForm && editingId === null && (
           <Button
             color="primary"
-            variant="flat"
+            variant="solid"
             size="sm"
+            className="w-full sm:w-auto"
             startContent={<Plus className="w-4 h-4" />}
             onPress={() => { setShowAddForm(true); setAddForm(EMPTY_FORM); }}
           >
-            {t('shipping.add_option', 'Add Shipping Option')}
+            {t('shipping.add_option')}
           </Button>
         )}
       </div>
@@ -369,7 +370,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
           onSubmit={handleAdd}
           onCancel={() => { setShowAddForm(false); setAddForm(EMPTY_FORM); }}
           isSubmitting={isSubmitting}
-          submitLabel={t('shipping.add_option', 'Add Shipping Option')}
+          submitLabel={t('shipping.add_option')}
         />
       )}
 
@@ -377,10 +378,10 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
       {options.length === 0 && !showAddForm ? (
         <EmptyState
           icon={<Package className="w-6 h-6" />}
-          title={t('shipping.empty_title', 'No Shipping Options')}
-          description={t('shipping.empty_description', 'Add shipping options so buyers know how you deliver items.')}
+          title={t('shipping.empty_title')}
+          description={t('shipping.empty_description')}
           action={{
-            label: t('shipping.add_option', 'Add Shipping Option'),
+            label: t('shipping.add_option'),
             onClick: () => setShowAddForm(true),
           }}
         />
@@ -395,11 +396,11 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
                 onSubmit={handleUpdate}
                 onCancel={() => { setEditingId(null); setEditForm(EMPTY_FORM); }}
                 isSubmitting={isSubmitting}
-                submitLabel={t('shipping.save_changes', 'Save Changes')}
+                submitLabel={t('shipping.save_changes')}
               />
             ) : (
-              <GlassCard key={option.id} className="p-4">
-                <div className="flex items-center justify-between gap-3">
+              <GlassCard key={option.id} className="border border-default-200 p-4 shadow-sm">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <Truck className="w-5 h-5 text-default-400 shrink-0" />
                     <div className="min-w-0 flex-1">
@@ -409,7 +410,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
                         </span>
                         {option.is_default && (
                           <Chip size="sm" color="primary" variant="flat">
-                            {t('shipping.default_badge', 'Default')}
+                            {t('shipping.default_badge')}
                           </Chip>
                         )}
                       </div>
@@ -424,7 +425,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
                         </span>
                         {option.estimated_days != null && (
                           <span>
-                            {t('shipping.estimated_delivery', '~{{days}} days', {
+                            {t('shipping.estimated_delivery', {
                               days: option.estimated_days,
                             })}
                           </span>
@@ -433,13 +434,13 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
                     </div>
                   </div>
 
-                  <div className="flex gap-1 shrink-0">
+                  <div className="flex shrink-0 gap-1 self-end sm:self-auto">
                     <Button
                       isIconOnly
                       variant="light"
                       size="sm"
                       onPress={() => startEdit(option)}
-                      aria-label={t('shipping.edit_aria', 'Edit shipping option')}
+                      aria-label={t('shipping.edit_aria')}
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </Button>
@@ -449,7 +450,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
                       size="sm"
                       color="danger"
                       onPress={() => handleDelete(option.id)}
-                      aria-label={t('shipping.delete_aria', 'Delete shipping option')}
+                      aria-label={t('shipping.delete_aria')}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
