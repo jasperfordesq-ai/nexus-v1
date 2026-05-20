@@ -171,6 +171,8 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'notification_queue' => $this->queueSourceDiagnostics('notification_queue', $tenantId),
             'newsletter_queue' => $this->queueSourceDiagnostics('newsletter_queue', $tenantId),
             'civic_digest_delivery_claims' => $this->queueSourceDiagnostics('civic_digest_delivery_claims', $tenantId),
+            'transaction_notification_deliveries' => $this->queueSourceDiagnostics('transaction_notification_deliveries', $tenantId),
+            'marketplace_order_notification_deliveries' => $this->queueSourceDiagnostics('marketplace_order_notification_deliveries', $tenantId),
             'listing_expiry_reminders_sent' => $this->queueSourceDiagnostics('listing_expiry_reminders_sent', $tenantId),
             'marketplace_report_notifications' => $this->queueSourceDiagnostics('marketplace_report_notifications', $tenantId),
             'event_reminders' => $this->queueSourceDiagnostics('event_reminders', $tenantId),
@@ -380,6 +382,32 @@ class AdminEmailDeliverabilityController extends BaseApiController
                     'mrn.created_at',
                 ])
                 ->map(fn ($row) => $this->queueRow('marketplace_report_notifications', $row));
+        }
+
+        $transactionDeliveryRows = collect();
+        if (($source === '' || $source === 'transaction_notification_deliveries') && $this->hasEmailDeliveryLedgerColumns('transaction_notification_deliveries')) {
+            $transactionDeliveryRows = $this->emailDeliveryLedgerRows(
+                'transaction_notification_deliveries',
+                'tnd',
+                'transaction',
+                'transaction_id',
+                $tenantId,
+                $statuses,
+                $limit
+            );
+        }
+
+        $marketplaceOrderDeliveryRows = collect();
+        if (($source === '' || $source === 'marketplace_order_notification_deliveries') && $this->hasEmailDeliveryLedgerColumns('marketplace_order_notification_deliveries')) {
+            $marketplaceOrderDeliveryRows = $this->emailDeliveryLedgerRows(
+                'marketplace_order_notification_deliveries',
+                'mond',
+                'marketplace_order',
+                'order_id',
+                $tenantId,
+                $statuses,
+                $limit
+            );
         }
 
         $listingExpiryReminderRows = collect();
@@ -795,6 +823,8 @@ class AdminEmailDeliverabilityController extends BaseApiController
         $rows = $notificationRows
             ->merge($newsletterRows)
             ->merge($civicDigestRows)
+            ->merge($transactionDeliveryRows)
+            ->merge($marketplaceOrderDeliveryRows)
             ->merge($listingExpiryReminderRows)
             ->merge($marketplaceReportRows)
             ->merge($eventReminderRows)
@@ -957,6 +987,24 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 'oldest_pending_at' => (clone $staleClaimed)->min('cddc.claimed_at'),
                 'returned' => 0,
             ];
+        }
+
+        if ($source === 'transaction_notification_deliveries') {
+            return $this->emailDeliveryLedgerDiagnostics(
+                $source,
+                'tnd',
+                'transaction',
+                $tenantId
+            );
+        }
+
+        if ($source === 'marketplace_order_notification_deliveries') {
+            return $this->emailDeliveryLedgerDiagnostics(
+                $source,
+                'mond',
+                'marketplace_order',
+                $tenantId
+            );
         }
 
         if ($source === 'marketplace_report_notifications') {
@@ -1351,6 +1399,166 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->where('email_log.category', 'civic_digest')
                 ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
                 ->whereRaw('email_log.created_at BETWEEN DATE_SUB(cddc.sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(cddc.sent_at, INTERVAL 10 MINUTE)');
+        });
+    }
+
+    private function hasEmailDeliveryLedgerColumns(string $table): bool
+    {
+        return Schema::hasTable($table)
+            && Schema::hasTable('users')
+            && Schema::hasColumn($table, 'claimed_at')
+            && Schema::hasColumn($table, 'delivered_at')
+            && Schema::hasColumn($table, 'failed_at')
+            && Schema::hasColumn($table, 'channel');
+    }
+
+    /**
+     * @param list<string> $statuses
+     */
+    private function emailDeliveryLedgerRows(
+        string $table,
+        string $alias,
+        string $category,
+        string $subjectColumn,
+        ?int $tenantId,
+        array $statuses,
+        int $limit
+    ) {
+        $pendingRows = collect();
+        if (in_array('pending', $statuses, true)) {
+            $pendingRows = DB::table("{$table} as {$alias}")
+                ->leftJoin('users as u', function ($join) use ($alias): void {
+                    $join->on('u.id', '=', "{$alias}.user_id")
+                        ->whereColumn('u.tenant_id', '=', "{$alias}.tenant_id");
+                })
+                ->where("{$alias}.channel", 'email')
+                ->where("{$alias}.status", 'claimed')
+                ->where("{$alias}.claimed_at", '<', now()->subMinutes(15))
+                ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.tenant_id", $tenantId))
+                ->orderByDesc("{$alias}.id")
+                ->limit($limit)
+                ->get([
+                    "{$alias}.id",
+                    "{$alias}.tenant_id",
+                    "{$alias}.user_id",
+                    'u.email',
+                    DB::raw("'{$category}' as category"),
+                    DB::raw("CAST({$alias}.{$subjectColumn} AS CHAR) as subject"),
+                    DB::raw("'pending' as status"),
+                    "{$alias}.event as frequency",
+                    "{$alias}.attempts",
+                    "{$alias}.claimed_at as last_attempted_at",
+                    "{$alias}.last_error as error",
+                    DB::raw('NULL as processing_batch_id'),
+                    "{$alias}.claimed_at as processing_started_at",
+                    "{$alias}.delivered_at as sent_at",
+                    "{$alias}.created_at",
+                ]);
+        }
+
+        $failedRows = collect();
+        if (in_array('failed', $statuses, true)) {
+            $failedRows = $this->emailDeliveryLedgerMissingEvidenceQuery(
+                DB::table("{$table} as {$alias}")
+                    ->leftJoin('users as u', function ($join) use ($alias): void {
+                        $join->on('u.id', '=', "{$alias}.user_id")
+                            ->whereColumn('u.tenant_id', '=', "{$alias}.tenant_id");
+                    })
+                    ->where("{$alias}.channel", 'email')
+                    ->where(function ($query) use ($alias): void {
+                        $query->where(function ($failed) use ($alias): void {
+                            $failed->where("{$alias}.status", 'failed')
+                                ->where("{$alias}.failed_at", '>=', now()->subDay());
+                        })->orWhere(function ($sentWithoutEvidence) use ($alias): void {
+                            $sentWithoutEvidence->where("{$alias}.status", 'delivered')
+                                ->where("{$alias}.delivered_at", '>=', now()->subDay());
+                        });
+                    })
+                    ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.tenant_id", $tenantId)),
+                $alias,
+                $category
+            )
+                ->orderByDesc("{$alias}.id")
+                ->limit($limit)
+                ->get([
+                    "{$alias}.id",
+                    "{$alias}.tenant_id",
+                    "{$alias}.user_id",
+                    'u.email',
+                    DB::raw("'{$category}' as category"),
+                    DB::raw("CAST({$alias}.{$subjectColumn} AS CHAR) as subject"),
+                    DB::raw("'failed' as status"),
+                    "{$alias}.event as frequency",
+                    "{$alias}.attempts",
+                    DB::raw("COALESCE({$alias}.failed_at, {$alias}.delivered_at, {$alias}.claimed_at) as last_attempted_at"),
+                    DB::raw("COALESCE({$alias}.last_error, 'delivered without email_log evidence') as error"),
+                    DB::raw('NULL as processing_batch_id'),
+                    "{$alias}.claimed_at as processing_started_at",
+                    "{$alias}.delivered_at as sent_at",
+                    "{$alias}.created_at",
+                ]);
+        }
+
+        return $pendingRows
+            ->merge($failedRows)
+            ->take($limit)
+            ->map(fn ($row) => $this->queueRow($table, $row));
+    }
+
+    private function emailDeliveryLedgerDiagnostics(string $table, string $alias, string $category, ?int $tenantId): array
+    {
+        if (!$this->hasEmailDeliveryLedgerColumns($table)) {
+            return $this->unavailableQueueDiagnostics($table);
+        }
+
+        $base = DB::table("{$table} as {$alias}")
+            ->where("{$alias}.channel", 'email')
+            ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.tenant_id", $tenantId));
+        $staleClaimed = (clone $base)
+            ->where("{$alias}.status", 'claimed')
+            ->where("{$alias}.claimed_at", '<', now()->subMinutes(15));
+        $failedRecent = (clone $base)
+            ->where("{$alias}.status", 'failed')
+            ->where("{$alias}.failed_at", '>=', now()->subDay());
+        $missingEvidence = Schema::hasTable('email_log')
+            ? $this->emailDeliveryLedgerMissingEvidenceQuery(
+                (clone $base)
+                    ->where("{$alias}.status", 'delivered')
+                    ->where("{$alias}.delivered_at", '>=', now()->subDay()),
+                $alias,
+                $category
+            )
+            : (clone $base)->whereRaw('1 = 0');
+
+        return [
+            'source' => $table,
+            'available' => true,
+            'status_counts' => [
+                'pending' => (clone $staleClaimed)->count(),
+                'failed' => (clone $failedRecent)->count() + (clone $missingEvidence)->count(),
+            ],
+            'stale_pending' => (clone $staleClaimed)->count(),
+            'stale_processing' => 0,
+            'failed_recent' => (clone $failedRecent)->count() + (clone $missingEvidence)->count(),
+            'suppressed_recent' => 0,
+            'oldest_pending_at' => (clone $staleClaimed)->min("{$alias}.claimed_at"),
+            'returned' => 0,
+        ];
+    }
+
+    private function emailDeliveryLedgerMissingEvidenceQuery($query, string $alias, string $category)
+    {
+        return $query->where(function ($outer) use ($alias, $category): void {
+            $outer->where("{$alias}.status", 'failed')
+                ->orWhereNotExists(function ($sub) use ($alias, $category): void {
+                    $sub->select(DB::raw(1))
+                        ->from('email_log')
+                        ->whereColumn('email_log.user_id', "{$alias}.user_id")
+                        ->whereColumn('email_log.tenant_id', "{$alias}.tenant_id")
+                        ->where('email_log.category', $category)
+                        ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                        ->whereRaw("email_log.created_at BETWEEN DATE_SUB({$alias}.delivered_at, INTERVAL 10 MINUTE) AND DATE_ADD({$alias}.delivered_at, INTERVAL 10 MINUTE)");
+                });
         });
     }
 

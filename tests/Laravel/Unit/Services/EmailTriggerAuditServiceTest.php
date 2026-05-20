@@ -41,7 +41,9 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('volunteering:volunteer_reminder_source:volunteer_reminder', $keys);
         $this->assertContains('billing:member_premium_billing:billing', $keys);
         $this->assertContains('donations:stripe_donation_receipt_source:donation_receipt', $keys);
+        $this->assertContains('wallet:transaction_notification_delivery_source:transaction', $keys);
         $this->assertContains('marketplace:offer_order_refund_rating_report_dispute:marketplace_order', $keys);
+        $this->assertContains('marketplace:marketplace_order_delivery_source:marketplace_order', $keys);
         $this->assertContains('verein:verein_dues_invoice_reminder_paid:verein_dues', $keys);
         $this->assertContains('events:event_created_update_cancellation_rsvp_reminder:event_notification', $keys);
     }
@@ -78,10 +80,12 @@ class EmailTriggerAuditServiceTest extends TestCase
             'listing_expiry_reminders_sent',
             'marketplace_report_notifications',
             'marketplace_reports',
+            'marketplace_order_notification_deliveries',
             'member_subscription_events',
             'newsletter_queue',
             'notification_queue',
             'stripe_webhook_events',
+            'transaction_notification_deliveries',
             'verein_member_dues',
             'vol_donations',
             'vol_reminders_sent',
@@ -1040,5 +1044,104 @@ class EmailTriggerAuditServiceTest extends TestCase
 
         $this->assertContains('civic_digest_claim_stale_pending', $codes);
         $this->assertContains('civic_digest_claim_marked_sent_without_email_log', $codes);
+    }
+
+    public function test_run_detects_transaction_and_marketplace_order_delivery_ledger_gaps(): void
+    {
+        if (
+            !Schema::hasTable('transaction_notification_deliveries')
+            || !Schema::hasTable('marketplace_order_notification_deliveries')
+            || !Schema::hasTable('email_log')
+        ) {
+            $this->markTestSkipped('Notification delivery ledger tables are not available.');
+        }
+
+        $userId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Delivery Ledger Audit User',
+            'email' => 'delivery-ledger-audit@example.com',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('transaction_notification_deliveries')->insert([
+            [
+                'tenant_id' => 2,
+                'transaction_id' => 900001,
+                'user_id' => $userId,
+                'event' => 'credit_received',
+                'channel' => 'email',
+                'status' => 'claimed',
+                'attempts' => 1,
+                'claimed_at' => now()->subMinutes(20),
+                'delivered_at' => null,
+                'failed_at' => null,
+                'evidence_id' => null,
+                'last_error' => null,
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(20),
+            ],
+            [
+                'tenant_id' => 2,
+                'transaction_id' => 900002,
+                'user_id' => $userId,
+                'event' => 'credit_sent',
+                'channel' => 'email',
+                'status' => 'delivered',
+                'attempts' => 1,
+                'claimed_at' => now()->subMinutes(10),
+                'delivered_at' => now()->subMinutes(5),
+                'failed_at' => null,
+                'evidence_id' => null,
+                'last_error' => null,
+                'created_at' => now()->subMinutes(10),
+                'updated_at' => now()->subMinutes(5),
+            ],
+        ]);
+
+        DB::table('marketplace_order_notification_deliveries')->insert([
+            [
+                'tenant_id' => 2,
+                'order_id' => 910001,
+                'user_id' => $userId,
+                'event' => 'confirmed',
+                'channel' => 'email',
+                'status' => 'claimed',
+                'attempts' => 1,
+                'claimed_at' => now()->subMinutes(20),
+                'delivered_at' => null,
+                'failed_at' => null,
+                'evidence_id' => null,
+                'last_error' => null,
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(20),
+            ],
+            [
+                'tenant_id' => 2,
+                'order_id' => 910002,
+                'user_id' => $userId,
+                'event' => 'paid',
+                'channel' => 'email',
+                'status' => 'delivered',
+                'attempts' => 1,
+                'claimed_at' => now()->subMinutes(10),
+                'delivered_at' => now()->subMinutes(5),
+                'failed_at' => null,
+                'evidence_id' => null,
+                'last_error' => null,
+                'created_at' => now()->subMinutes(10),
+                'updated_at' => now()->subMinutes(5),
+            ],
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('transaction_notification_delivery_stale_claimed', $codes);
+        $this->assertContains('transaction_notification_delivery_delivered_without_email_log', $codes);
+        $this->assertContains('marketplace_order_notification_delivery_stale_claimed', $codes);
+        $this->assertContains('marketplace_order_notification_delivery_delivered_without_email_log', $codes);
     }
 }

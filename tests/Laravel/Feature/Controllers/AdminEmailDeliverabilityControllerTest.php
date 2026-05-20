@@ -307,6 +307,113 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         );
     }
 
+    public function test_queues_endpoint_surfaces_notification_delivery_ledger_gaps(): void
+    {
+        if (
+            !Schema::hasTable('transaction_notification_deliveries')
+            || !Schema::hasTable('marketplace_order_notification_deliveries')
+            || !Schema::hasTable('email_log')
+        ) {
+            $this->markTestSkipped('Notification delivery ledger tables are not available.');
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'delivery-ledger-queue@example.test',
+        ]);
+        Sanctum::actingAs($admin);
+
+        DB::table('transaction_notification_deliveries')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'transaction_id' => 920001,
+                'user_id' => $member->id,
+                'event' => 'credit_received',
+                'channel' => 'email',
+                'status' => 'claimed',
+                'attempts' => 1,
+                'claimed_at' => now()->subMinutes(20),
+                'delivered_at' => null,
+                'failed_at' => null,
+                'evidence_id' => null,
+                'last_error' => null,
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(20),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'transaction_id' => 920002,
+                'user_id' => $member->id,
+                'event' => 'credit_sent',
+                'channel' => 'email',
+                'status' => 'delivered',
+                'attempts' => 1,
+                'claimed_at' => now()->subMinutes(10),
+                'delivered_at' => now()->subMinutes(5),
+                'failed_at' => null,
+                'evidence_id' => null,
+                'last_error' => null,
+                'created_at' => now()->subMinutes(10),
+                'updated_at' => now()->subMinutes(5),
+            ],
+        ]);
+
+        DB::table('marketplace_order_notification_deliveries')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'order_id' => 930001,
+                'user_id' => $member->id,
+                'event' => 'confirmed',
+                'channel' => 'email',
+                'status' => 'claimed',
+                'attempts' => 1,
+                'claimed_at' => now()->subMinutes(20),
+                'delivered_at' => null,
+                'failed_at' => null,
+                'evidence_id' => null,
+                'last_error' => null,
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(20),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'order_id' => 930002,
+                'user_id' => $member->id,
+                'event' => 'paid',
+                'channel' => 'email',
+                'status' => 'delivered',
+                'attempts' => 1,
+                'claimed_at' => now()->subMinutes(10),
+                'delivered_at' => now()->subMinutes(5),
+                'failed_at' => null,
+                'evidence_id' => null,
+                'last_error' => null,
+                'created_at' => now()->subMinutes(10),
+                'updated_at' => now()->subMinutes(5),
+            ],
+        ]);
+
+        $transactionResponse = $this->apiGet('/v2/admin/email-deliverability/queues?source=transaction_notification_deliveries&limit=10');
+        $transactionResponse->assertOk();
+        $transactionResponse->assertJsonPath('data.diagnostics.transaction_notification_deliveries.available', true);
+        $this->assertGreaterThanOrEqual(1, $transactionResponse->json('data.diagnostics.transaction_notification_deliveries.stale_pending'));
+        $this->assertGreaterThanOrEqual(1, $transactionResponse->json('data.diagnostics.transaction_notification_deliveries.failed_recent'));
+        $this->assertSame(
+            ['transaction_notification_deliveries'],
+            collect($transactionResponse->json('data.rows'))->pluck('source')->unique()->values()->all()
+        );
+
+        $marketplaceResponse = $this->apiGet('/v2/admin/email-deliverability/queues?source=marketplace_order_notification_deliveries&limit=10');
+        $marketplaceResponse->assertOk();
+        $marketplaceResponse->assertJsonPath('data.diagnostics.marketplace_order_notification_deliveries.available', true);
+        $this->assertGreaterThanOrEqual(1, $marketplaceResponse->json('data.diagnostics.marketplace_order_notification_deliveries.stale_pending'));
+        $this->assertGreaterThanOrEqual(1, $marketplaceResponse->json('data.diagnostics.marketplace_order_notification_deliveries.failed_recent'));
+        $this->assertSame(
+            ['marketplace_order_notification_deliveries'],
+            collect($marketplaceResponse->json('data.rows'))->pluck('source')->unique()->values()->all()
+        );
+    }
+
     public function test_queues_endpoint_surfaces_goal_reminders(): void
     {
         if (!Schema::hasTable('goal_reminders') || !Schema::hasTable('goals')) {

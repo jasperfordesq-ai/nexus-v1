@@ -90,6 +90,7 @@ class EmailTriggerAuditService
             ['module' => 'volunteering', 'event' => 'organization_wallet_alert', 'category' => 'vol_org_wallet', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'connections', 'event' => 'connection_declined', 'category' => 'connection_declined', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'wallet', 'event' => 'credit_received_sent_review_request', 'category' => 'transaction', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'wallet', 'event' => 'transaction_notification_delivery_source', 'category' => 'transaction', 'critical' => true, 'source_table' => 'transaction_notification_deliveries'],
             ['module' => 'wallet', 'event' => 'wallet_low_empty_org_wallet_alerts', 'category' => 'wallet_alert', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'wallet', 'event' => 'balance_alert', 'category' => 'balance_alert', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'donations', 'event' => 'donation_sent_received', 'category' => 'donation', 'critical' => true, 'source_table' => 'email_log'],
@@ -112,6 +113,7 @@ class EmailTriggerAuditService
             ['module' => 'goals', 'event' => 'goal_created_updated', 'category' => 'goal', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'ideation', 'event' => 'new_idea_or_comment', 'category' => 'ideation', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'marketplace', 'event' => 'offer_order_refund_rating_report_dispute', 'category' => 'marketplace_order', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'marketplace', 'event' => 'marketplace_order_delivery_source', 'category' => 'marketplace_order', 'critical' => true, 'source_table' => 'marketplace_order_notification_deliveries'],
             ['module' => 'marketplace', 'event' => 'offer_created_updated', 'category' => 'marketplace_offer', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'marketplace', 'event' => 'refund_processed', 'category' => 'marketplace_refund', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'marketplace', 'event' => 'rating_received', 'category' => 'marketplace_rating', 'critical' => true, 'source_table' => 'email_log'],
@@ -191,6 +193,8 @@ class EmailTriggerAuditService
                 $this->checkStripeDonationReceiptEmailHealth($tenantId, $since, $windowHours),
                 $this->checkVereinDuesEmailHealth($tenantId, $since, $windowHours),
                 $this->checkMarketplaceReportNotificationHealth($tenantId, $since, $windowHours),
+                $this->checkTransactionNotificationDeliveryHealth($tenantId, $since, $windowHours),
+                $this->checkMarketplaceOrderNotificationDeliveryHealth($tenantId, $since, $windowHours),
                 $this->checkFederationMessageDeliveryHealth($tenantId, $since, $windowHours),
                 $this->checkFederationTransactionDeliveryHealth($tenantId, $since, $windowHours),
                 $this->checkFederationConnectionDeliveryHealth($tenantId, $since, $windowHours),
@@ -264,12 +268,14 @@ class EmailTriggerAuditService
             'listing_expiry_reminders_sent' => 'checkListingExpiryReminderSourceHealth',
             'marketplace_report_notifications' => 'checkMarketplaceReportNotificationHealth',
             'marketplace_reports' => 'checkMarketplaceReportSourceOutboxHealth',
+            'marketplace_order_notification_deliveries' => 'checkMarketplaceOrderNotificationDeliveryHealth',
             'member_subscription_events' => 'checkMemberPremiumBillingEmailHealth',
             'newsletter_queue' => 'checkNewsletterQueueHealth',
             'notification_queue' => 'checkNotificationQueueHealth',
             'notifications' => 'checkNotificationStoreHealth',
             'password_resets' => 'checkPasswordResetsWithoutEmail',
             'stripe_webhook_events' => 'checkBillingAndStripeHealth',
+            'transaction_notification_deliveries' => 'checkTransactionNotificationDeliveryHealth',
             'users' => 'checkNewUsersWithoutAccountEmail',
             'verein_member_dues' => 'checkVereinDuesEmailHealth',
             'vol_donations' => 'checkStripeDonationReceiptEmailHealth',
@@ -1479,6 +1485,114 @@ class EmailTriggerAuditService
             })
             ->when($tenantId !== null, fn ($q) => $q->where('mr.tenant_id', $tenantId))
             ->groupBy('mr.tenant_id');
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkTransactionNotificationDeliveryHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        return $this->checkEmailDeliveryLedgerHealth(
+            'transaction_notification_deliveries',
+            'tnd',
+            'transaction',
+            'wallet',
+            'transaction_notification_delivery_source',
+            'transaction_notification_delivery',
+            $tenantId,
+            $since,
+            $windowHours
+        );
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkMarketplaceOrderNotificationDeliveryHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        return $this->checkEmailDeliveryLedgerHealth(
+            'marketplace_order_notification_deliveries',
+            'mond',
+            'marketplace_order',
+            'marketplace',
+            'marketplace_order_delivery_source',
+            'marketplace_order_notification_delivery',
+            $tenantId,
+            $since,
+            $windowHours
+        );
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkEmailDeliveryLedgerHealth(
+        string $table,
+        string $alias,
+        string $category,
+        string $module,
+        string $event,
+        string $codePrefix,
+        ?int $tenantId,
+        \DateTimeInterface $since,
+        int $windowHours
+    ): array {
+        if (
+            !$this->hasTables([$table])
+            || !Schema::hasColumn($table, 'claimed_at')
+            || !Schema::hasColumn($table, 'delivered_at')
+            || !Schema::hasColumn($table, 'failed_at')
+            || !Schema::hasColumn($table, 'channel')
+        ) {
+            return [];
+        }
+
+        $issues = [];
+
+        $staleClaimed = DB::table("{$table} as {$alias}")
+            ->select("{$alias}.tenant_id", DB::raw('COUNT(*) as count'))
+            ->where("{$alias}.channel", 'email')
+            ->where("{$alias}.status", 'claimed')
+            ->where("{$alias}.claimed_at", '<', now()->subMinutes(15))
+            ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.tenant_id", $tenantId))
+            ->groupBy("{$alias}.tenant_id")
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($staleClaimed, "{$codePrefix}_stale_claimed", 'critical', $module, $event, ['minutes' => 15]));
+
+        $failedRecent = DB::table("{$table} as {$alias}")
+            ->select("{$alias}.tenant_id", DB::raw('COUNT(*) as count'))
+            ->where("{$alias}.channel", 'email')
+            ->where("{$alias}.status", 'failed')
+            ->where("{$alias}.failed_at", '>=', $since)
+            ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.tenant_id", $tenantId))
+            ->groupBy("{$alias}.tenant_id")
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($failedRecent, "{$codePrefix}_failed_recently", 'warning', $module, $event, ['window_hours' => $windowHours]));
+
+        if (!$this->hasTables(['email_log'])) {
+            return $issues;
+        }
+
+        $deliveredWithoutEmail = DB::table("{$table} as {$alias}")
+            ->select("{$alias}.tenant_id", DB::raw('COUNT(*) as count'))
+            ->where("{$alias}.channel", 'email')
+            ->where("{$alias}.status", 'delivered')
+            ->where("{$alias}.delivered_at", '>=', $since)
+            ->whereNotExists(function ($sub) use ($alias, $category): void {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereColumn('email_log.user_id', "{$alias}.user_id")
+                    ->whereColumn('email_log.tenant_id', "{$alias}.tenant_id")
+                    ->where('email_log.category', $category)
+                    ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                    ->whereRaw("email_log.created_at BETWEEN DATE_SUB({$alias}.delivered_at, INTERVAL 10 MINUTE) AND DATE_ADD({$alias}.delivered_at, INTERVAL 10 MINUTE)");
+            })
+            ->when($tenantId !== null, fn ($q) => $q->where("{$alias}.tenant_id", $tenantId))
+            ->groupBy("{$alias}.tenant_id")
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($deliveredWithoutEmail, "{$codePrefix}_delivered_without_email_log", 'critical', $module, $event, ['window_hours' => $windowHours]));
+
+        return $issues;
     }
 
     /**
