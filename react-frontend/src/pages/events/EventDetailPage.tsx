@@ -477,6 +477,7 @@ export function EventDetailPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-5xl space-y-6" role="status" aria-live="polite" aria-busy="true">
+        <PageMeta title={t('detail.loading')} noIndex />
         <Skeleton className="h-8 w-48 rounded-lg" />
         <Card className="overflow-hidden border border-theme-default bg-theme-surface/80 shadow-xl" radius="lg">
           <Skeleton className="h-64 w-full rounded-none" />
@@ -498,6 +499,7 @@ export function EventDetailPage() {
   if (error && !event) {
     return (
       <div className="max-w-4xl mx-auto">
+        <PageMeta title={t('detail.unable_to_load')} noIndex />
         <GlassCard className="p-8 text-center">
           <AlertCircle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('detail.unable_to_load')}</h2>
@@ -526,18 +528,21 @@ export function EventDetailPage() {
 
   if (!event) {
     return (
-      <EmptyState
-        icon={<AlertCircle className="w-12 h-12" aria-hidden="true" />}
-        title={t('detail.not_found')}
-        description={t('detail.not_found_desc')}
-        action={
-          <Link to={tenantPath("/events")}>
-            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              {t('detail.browse_events')}
-            </Button>
-          </Link>
-        }
-      />
+      <>
+        <PageMeta title={t('detail.not_found')} noIndex />
+        <EmptyState
+          icon={<AlertCircle className="w-12 h-12" aria-hidden="true" />}
+          title={t('detail.not_found')}
+          description={t('detail.not_found_desc')}
+          action={
+            <Link to={tenantPath("/events")}>
+              <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+                {t('detail.browse_events')}
+              </Button>
+            </Link>
+          }
+        />
+      </>
     );
   }
 

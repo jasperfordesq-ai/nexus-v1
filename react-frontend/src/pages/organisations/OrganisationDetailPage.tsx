@@ -212,11 +212,19 @@ export function OrganisationDetailPage() {
     }
   };
 
-  if (isLoading) return <LoadingScreen message={t('organisation_detail.loading')} />;
+  if (isLoading) {
+    return (
+      <>
+        <PageMeta title={t('organisation_detail.loading')} noIndex />
+        <LoadingScreen message={t('organisation_detail.loading')} />
+      </>
+    );
+  }
 
   if (error) {
     return (
       <div className="space-y-6">
+        <PageMeta title={t('organisation_detail.unable_to_load')} noIndex />
         <Breadcrumbs items={[
           { label: t('organisation_detail.breadcrumb_volunteering'), href: '/volunteering' },
           { label: t('organisation_detail.breadcrumb_organisations'), href: '/organisations' },
@@ -245,7 +253,7 @@ export function OrganisationDetailPage() {
     );
   }
 
-  if (!organisation) return null;
+  if (!organisation) return <PageMeta title={t('organisation_detail.breadcrumb_organisations')} noIndex />;
 
   const activeOpps = opportunities.filter((o) => o.is_active);
   const organisationMetaDescription = (

@@ -75,6 +75,7 @@ interface BlogPostDetail {
 interface ArticleStructuredDataOptions {
   origin: string;
   pathname: string;
+  canonicalUrl?: string;
   profileUrl: (path: string) => string;
   publisherName: string;
   publisherLogo?: string | null;
@@ -82,7 +83,7 @@ interface ArticleStructuredDataOptions {
 }
 
 function buildArticleStructuredData(post: BlogPostDetail, options: ArticleStructuredDataOptions) {
-  const canonicalUrl = `${options.origin}${options.pathname}`;
+  const canonicalUrl = options.canonicalUrl || `${options.origin}${options.pathname}`;
   const authorName = post.author?.name || options.fallbackAuthorName;
   const imageUrl = post.featured_image ? resolveAssetUrl(post.featured_image) : undefined;
   const publisherLogo = options.publisherLogo ? resolveAssetUrl(options.publisherLogo) : undefined;
@@ -179,6 +180,7 @@ export function BlogPostPage() {
   if (isLoading) {
     return (
       <div className="max-w-3xl mx-auto space-y-6">
+        <PageMeta title={t('page_title')} noIndex />
         <div className="animate-pulse">
           <div className="h-6 bg-theme-hover rounded w-1/4 mb-4" />
           <div className="h-64 bg-theme-hover rounded-xl mb-6" />
@@ -200,6 +202,7 @@ export function BlogPostPage() {
   if (error || !post) {
     return (
       <div className="max-w-3xl mx-auto">
+        <PageMeta title={error || t('post.not_found')} noIndex />
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
@@ -232,9 +235,13 @@ export function BlogPostPage() {
   }
 
   const imageUrl = post.featured_image ? resolveAssetUrl(post.featured_image) : null;
+  const canonicalUrl = post.canonical_url
+    ? new URL(post.canonical_url, window.location.origin).href
+    : `${window.location.origin}${window.location.pathname}`;
   const articleStructuredData = buildArticleStructuredData(post, {
     origin: window.location.origin,
     pathname: window.location.pathname,
+    canonicalUrl,
     profileUrl: tenantPath,
     publisherName: branding?.name || 'NEXUS',
     publisherLogo: branding?.logo,
