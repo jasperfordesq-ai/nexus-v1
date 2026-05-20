@@ -63,10 +63,10 @@ interface GroupMediaTabProps {
 // Filter chip config
 // ─────────────────────────────────────────────────────────────────────────────
 
-const FILTER_CHIPS: { key: MediaType; labelKey: string; fallback: string; icon?: typeof Camera }[] = [
-  { key: 'all', labelKey: 'media.filter_all', fallback: 'All' },
-  { key: 'image', labelKey: 'media.filter_photos', fallback: 'Photos', icon: Camera },
-  { key: 'video', labelKey: 'media.filter_videos', fallback: 'Videos', icon: Film },
+const FILTER_CHIPS: { key: MediaType; labelKey: string; icon?: typeof Camera }[] = [
+  { key: 'all', labelKey: 'media.filter_all' },
+  { key: 'image', labelKey: 'media.filter_photos', icon: Camera },
+  { key: 'video', labelKey: 'media.filter_videos', icon: Film },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -139,7 +139,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
     const isVideo = file.type.startsWith('video/');
 
     if (!isImage && !isVideo) {
-      toast.error(t('media.invalid_type', 'Please select an image or video file'));
+      toast.error(t('media.invalid_type'));
       return;
     }
 
@@ -147,7 +147,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
     const maxSize = isVideo ? 50 * 1024 * 1024 : 25 * 1024 * 1024;
     if (file.size > maxSize) {
       toast.error(
-        t('media.too_large', 'File exceeds the size limit ({{limit}}MB)', {
+        t('media.too_large', {
           limit: isVideo ? 50 : 25,
         }),
       );
@@ -161,11 +161,11 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
 
       await api.upload(`/v2/groups/${groupId}/media`, formData);
 
-      toast.success(t('media.upload_success', 'Media uploaded successfully'));
+      toast.success(t('media.upload_success'));
       loadMedia(true);
     } catch (err) {
       logError('GroupMediaTab.upload', err);
-      toast.error(t('media.upload_error', 'Failed to upload media'));
+      toast.error(t('media.upload_error'));
     } finally {
       setUploading(false);
     }
@@ -181,7 +181,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
     try {
       await api.delete(`/v2/groups/${groupId}/media/${mediaId}`);
       setItems((prev) => prev.filter((m) => m.id !== mediaId));
-      toast.success(t('media.delete_success', 'Media deleted'));
+      toast.success(t('media.delete_success'));
 
       // If lightbox is open and the deleted item was shown, close it
       if (lightbox.isOpen) {
@@ -194,7 +194,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
       }
     } catch (err) {
       logError('GroupMediaTab.delete', err);
-      toast.error(t('media.delete_error', 'Failed to delete media'));
+      toast.error(t('media.delete_error'));
     } finally {
       setDeleting(null);
     }
@@ -230,7 +230,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
     return (
       <div
         className="flex justify-center py-12"
-        aria-label={t('media.loading', 'Loading media')}
+        aria-label={t('media.loading')}
         aria-busy="true"
       >
         <Spinner size="lg" />
@@ -241,8 +241,8 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
   return (
     <div className="space-y-4">
       {/* Toolbar: filter chips + upload */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="flex flex-wrap gap-2 flex-1" role="group" aria-label={t('media.filter_group', 'Filter media')}>
+      <div className="flex flex-col gap-3 rounded-xl border border-default-200 bg-content1/80 p-3 shadow-sm sm:flex-row sm:items-center">
+        <div className="flex flex-wrap gap-2 flex-1" role="group" aria-label={t('media.filter_group')}>
           {FILTER_CHIPS.map((chip) => (
             <Chip
               key={chip.key}
@@ -255,7 +255,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
               {chip.icon && (
                 <chip.icon className="w-3 h-3 mr-1 inline" aria-hidden="true" />
               )}
-              {t(chip.labelKey, chip.fallback)}
+              {t(chip.labelKey)}
             </Chip>
           ))}
         </div>
@@ -273,11 +273,11 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
             }
             onPress={() => fileInputRef.current?.click()}
             isDisabled={uploading}
-            aria-label={t('media.upload_aria', 'Upload photo or video')}
+            aria-label={t('media.upload_aria')}
           >
             {uploading
-              ? t('media.uploading', 'Uploading...')
-              : t('media.upload', 'Upload')}
+              ? t('media.uploading')
+              : t('media.upload')}
           </Button>
         )}
 
@@ -295,13 +295,13 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
       {items.length === 0 ? (
         <EmptyState
           icon={<Camera className="w-10 h-10 text-default-400" />}
-          title={t('media.empty_title', 'No media yet')}
+          title={t('media.empty_title')}
           description={
             filter !== 'all'
-              ? t('media.no_results', 'No {{type}} found', {
-                  type: filter === 'image' ? t('media.photos', 'photos') : t('media.videos', 'videos'),
+              ? t('media.no_results', {
+                  type: filter === 'image' ? t('media.photos') : t('media.videos'),
                 })
-              : t('media.empty_description', 'Upload photos and videos to share with the group')
+              : t('media.empty_description')
           }
         />
       ) : (
@@ -309,7 +309,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
           {items.map((item, index) => (
             <GlassCard
               key={item.id}
-              className="relative group overflow-hidden cursor-pointer"
+              className="relative group overflow-hidden cursor-pointer border border-default-200 bg-content1 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
               onClick={() => openLightbox(index)}
             >
               {/* Thumbnail */}
@@ -319,7 +319,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                     {item.thumbnail_url ? (
                       <Image
                         src={item.thumbnail_url}
-                        alt={item.caption || t('media.video_thumbnail', 'Video thumbnail')}
+                        alt={item.caption || t('media.video_thumbnail')}
                         className="w-full h-full object-cover"
                         removeWrapper
                       />
@@ -329,13 +329,13 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                     {/* Video badge */}
                     <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
                       <Film className="w-3 h-3" aria-hidden="true" />
-                      {t('media.video_badge', 'Video')}
+                      {t('media.video_badge')}
                     </div>
                   </div>
                 ) : (
                   <Image
                     src={item.thumbnail_url || item.url}
-                    alt={item.caption || t('media.photo_alt', 'Group photo')}
+                    alt={item.caption || t('media.photo_alt')}
                     className="w-full h-full object-cover"
                     removeWrapper
                   />
@@ -365,7 +365,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                     className="absolute top-2 right-2 w-8 h-8 rounded-full bg-danger/80 hover:bg-danger text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 min-w-0"
                     onPress={() => handleDelete(item.id)}
                     isDisabled={deleting === item.id}
-                    aria-label={t('media.delete_aria', 'Delete media')}
+                    aria-label={t('media.delete_aria')}
                   >
                     {deleting === item.id ? (
                       <Spinner size="sm" color="current" />
@@ -384,7 +384,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
       {hasMore && (
         <div className="flex justify-center pt-4">
           <Button variant="flat" size="sm" onPress={() => loadMedia(false)} isLoading={loading}>
-            {t('media.load_more', 'Load More')}
+            {t('media.load_more')}
           </Button>
         </div>
       )}
@@ -412,7 +412,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                   variant="flat"
                   className="absolute top-2 right-2 z-50 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors min-w-0"
                   onPress={lightbox.onClose}
-                  aria-label={t('media.close_lightbox', 'Close')}
+                  aria-label={t('media.close_lightbox')}
                 >
                   <X className="w-5 h-5" />
                 </Button>
@@ -424,7 +424,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                     variant="flat"
                     className="absolute left-2 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors min-w-0"
                     onPress={() => navigateLightbox(-1)}
-                    aria-label={t('media.prev', 'Previous')}
+                    aria-label={t('media.prev')}
                   >
                     <ChevronLeft className="w-6 h-6" />
                   </Button>
@@ -437,7 +437,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                     variant="flat"
                     className="absolute right-2 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors min-w-0"
                     onPress={() => navigateLightbox(1)}
-                    aria-label={t('media.next', 'Next')}
+                    aria-label={t('media.next')}
                   >
                     <ChevronRight className="w-6 h-6" />
                   </Button>
@@ -450,12 +450,12 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                       src={currentItem.url}
                       controls
                       className="max-h-[80vh] max-w-full rounded-lg"
-                      aria-label={currentItem.caption || t('media.video_player', 'Video player')}
+                      aria-label={currentItem.caption || t('media.video_player')}
                     />
                   ) : (
                     <Image
                       src={currentItem.url}
-                      alt={currentItem.caption || t('media.fullsize_alt', 'Full size image')}
+                      alt={currentItem.caption || t('media.fullsize_alt')}
                       className="max-h-[80vh] max-w-full object-contain rounded-lg"
                       removeWrapper
                     />
@@ -485,9 +485,9 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                       startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                       onPress={() => handleDelete(currentItem.id)}
                       isLoading={deleting === currentItem.id}
-                      aria-label={t('media.delete_aria', 'Delete media')}
+                      aria-label={t('media.delete_aria')}
                     >
-                      {t('media.delete', 'Delete')}
+                      {t('media.delete')}
                     </Button>
                   )}
                 </div>
