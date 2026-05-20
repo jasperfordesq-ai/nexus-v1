@@ -86,7 +86,7 @@ export default function ExchangeDetail() {
           to={tenantPath('/broker/exchanges')}
           variant="flat"
           className="mt-4"
-          startContent={<ArrowLeft className="w-4 h-4" />}
+          startContent={<ArrowLeft aria-hidden="true" className="w-4 h-4" />}
         >
           {t('exchanges.detail_back_to_exchanges')}
         </Button>
@@ -107,7 +107,7 @@ export default function ExchangeDetail() {
             as={Link}
             to={tenantPath('/broker/exchanges')}
             variant="flat"
-            startContent={<ArrowLeft className="w-4 h-4" />}
+            startContent={<ArrowLeft aria-hidden="true" className="w-4 h-4" />}
             size="sm"
           >
             {t('exchanges.back')}
@@ -121,7 +121,7 @@ export default function ExchangeDetail() {
           <div className="space-y-1">
             <p className="text-sm text-default-500">{t('exchanges.detail_status_label')}</p>
             <Chip color={statusColor} variant="flat" size="sm">
-              {t(`status.${exchange.status}`, { defaultValue: exchange.status.replace(/_/g, ' ') })}
+              {t(`status.${exchange.status}`)}
             </Chip>
           </div>
           {exchange.final_hours !== undefined && exchange.final_hours !== null && (
@@ -141,7 +141,7 @@ export default function ExchangeDetail() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
-            <User className="w-4 h-4" />
+            <User aria-hidden="true" className="w-4 h-4" />
             <span className="font-semibold">{t('exchanges.detail_requester')}</span>
           </CardHeader>
           <Divider />
@@ -154,7 +154,7 @@ export default function ExchangeDetail() {
         </Card>
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
-            <User className="w-4 h-4" />
+            <User aria-hidden="true" className="w-4 h-4" />
             <span className="font-semibold">{t('exchanges.detail_provider')}</span>
           </CardHeader>
           <Divider />
@@ -171,7 +171,7 @@ export default function ExchangeDetail() {
       {risk_tag && (
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-warning" />
+            <Shield aria-hidden="true" className="w-4 h-4 text-warning" />
             <span className="font-semibold">{t('exchanges.detail_risk_tag')}</span>
           </CardHeader>
           <Divider />
@@ -182,9 +182,9 @@ export default function ExchangeDetail() {
                 variant="flat"
                 size="sm"
               >
-                {t(`risk_tags.level_${risk_tag.risk_level}`, { defaultValue: risk_tag.risk_level })}
+                {t(`risk_tags.level_${risk_tag.risk_level}`)}
               </Chip>
-              <span className="text-sm">{t(`risk_tags.category_${risk_tag.risk_category}`, { defaultValue: risk_tag.risk_category })}</span>
+              <span className="text-sm">{t(`risk_tags.category_${risk_tag.risk_category}`)}</span>
             </div>
             {risk_tag.risk_notes && (
               <p className="text-sm text-default-500 mt-2">{risk_tag.risk_notes}</p>
@@ -229,7 +229,7 @@ export default function ExchangeDetail() {
       {/* History Timeline */}
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
-          <Clock className="w-4 h-4" />
+          <Clock aria-hidden="true" className="w-4 h-4" />
           <span className="font-semibold">{t('exchanges.detail_history')}</span>
         </CardHeader>
         <Divider />
