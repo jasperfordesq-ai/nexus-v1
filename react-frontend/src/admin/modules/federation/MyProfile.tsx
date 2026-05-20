@@ -58,7 +58,7 @@ export function MyProfile() {
     community: t('federation.category_community', 'Community'),
     services: t('federation.category_services', 'Services'),
   };
-  usePageTitle("Federation");
+  usePageTitle(t('federation.my_profile_title'));
   const toast = useToast();
 
   const [profile, setProfile] = useState<FedProfile | null>(null);
@@ -104,11 +104,11 @@ export function MyProfile() {
         populateForm(profileData);
       }
     } catch {
-      toast.error("Failed to load federation profile");
+      toast.error(t('federation.failed_to_load_federation_profile'));
       setProfile(null);
     }
     setLoading(false);
-  }, [toast, populateForm]);
+  }, [t, toast, populateForm]);
 
 
   const loadTopics = useCallback(async () => {
@@ -196,18 +196,18 @@ export function MyProfile() {
         },
       });
       if (res.success) {
-        toast.success("Federation profile updated successfully");
+        toast.success(t('federation.federation_profile_updated_successfully'));
         setDirty(false);
         await loadData();
       } else {
-        toast.error("Failed to update federation profile");
+        toast.error(t('federation.failed_to_update_federation_profile'));
       }
     } catch {
-      toast.error("Failed to update federation profile");
+      toast.error(t('federation.failed_to_update_federation_profile'));
     } finally {
       setSaving(false);
     }
-  }, [profile, name, description, contactEmail, website, toast, loadData]);
+  }, [profile, name, description, contactEmail, website, t, toast, loadData]);
 
 
   const handleSaveTopics = useCallback(async () => {
@@ -243,8 +243,8 @@ export function MyProfile() {
     return (
       <div>
         <PageHeader
-          title={"My Profile"}
-          description={"Configure how your community appears to other communities in the federation"}
+          title={t('federation.my_profile_title')}
+          description={t('federation.my_profile_desc')}
         />
         <div className="space-y-6">
           <Card shadow="sm">
@@ -264,19 +264,19 @@ export function MyProfile() {
     return (
       <div>
         <PageHeader
-          title={"My Profile"}
-          description={"Configure how your community appears to other communities in the federation"}
+          title={t('federation.my_profile_title')}
+          description={t('federation.my_profile_desc')}
           actions={
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData}>
-              {"Refresh"}
+              {t('federation.refresh')}
             </Button>
           }
         />
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center py-8 text-default-400">
             <Building size={40} className="mb-2" />
-            <p>{"Profile not Available"}</p>
-            <p className="text-xs mt-1">{"Enable Federation to Create Profile"}</p>
+            <p>{t('federation.profile_not_available')}</p>
+            <p className="text-xs mt-1">{t('federation.enable_federation_to_create_profile')}</p>
           </CardBody>
         </Card>
       </div>
@@ -286,8 +286,8 @@ export function MyProfile() {
   return (
     <div>
       <PageHeader
-        title={"My Profile"}
-        description={"Configure how your community appears to other communities in the federation"}
+        title={t('federation.my_profile_title')}
+        description={t('federation.my_profile_desc')}
         actions={
           <Button
             variant="flat"
@@ -295,7 +295,7 @@ export function MyProfile() {
             onPress={() => { loadData(); loadTopics(); }}
             size="sm"
           >
-            {"Refresh"}
+            {t('federation.refresh')}
           </Button>
         }
       />
@@ -304,7 +304,7 @@ export function MyProfile() {
         {/* Profile Details Card */}
         <Card shadow="sm">
           <CardHeader className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">{"Community Profile"}</h3>
+            <h3 className="text-lg font-semibold">{t('federation.community_profile')}</h3>
             <Button
               color="primary"
               startContent={<Save size={16} />}
@@ -313,49 +313,49 @@ export function MyProfile() {
               isDisabled={!dirty}
               size="sm"
             >
-              {"Save Changes"}
+              {t('federation.save_changes')}
             </Button>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={"Community Name"}
+              label={t('federation.community_name')}
               value={name}
               onValueChange={(val) => { setName(val); markDirty(); }}
               variant="bordered"
-              description={"The public name of your community in the federation network"}
+              description={t('federation.desc_the_public_name_of_your_community_in_the')}
             />
             <Input
-              label={"Slug"}
+              label={t('federation.slug')}
               value={profile.slug}
               isReadOnly
               variant="bordered"
-              description={"Slug"}
+              description={t('federation.slug_desc')}
             />
             <Input
-              label={"Contact Email"}
+              label={t('federation.contact_email')}
               type="email"
               value={contactEmail}
               onValueChange={(val) => { setContactEmail(val); markDirty(); }}
               variant="bordered"
-              description={"Public contact email shown to partner communities"}
+              description={t('federation.public_contact_email_desc')}
             />
             <Input
-              label={"Website"}
+              label={t('federation.website')}
               type="url"
               value={website}
               onValueChange={(val) => { setWebsite(val); markDirty(); }}
               variant="bordered"
               placeholder="https://"
-              description={"Website"}
+              description={t('federation.website_desc')}
             />
             <Textarea
-              label={"Description"}
+              label={t('federation.description')}
               value={description}
               onValueChange={(val) => { setDescription(val); markDirty(); }}
               variant="bordered"
               minRows={3}
               maxRows={6}
-              description={"A brief description of your community for federation partners"}
+              description={t('federation.desc_a_brief_description_of_your_community_fo')}
             />
           </CardBody>
         </Card>
@@ -392,12 +392,12 @@ export function MyProfile() {
               <>
                 {/* Selection count */}
                 <div className="text-sm text-default-500">
-                  {`Topics Selected`}
-                  {primaryTopicIds.size > 0 && (
-                    <span className="ml-2 text-warning">
-                      ({`Primary Count`})
-                    </span>
-                  )}
+                {t('federation.topics_selected_count', { count: selectedTopicIds.size })}
+                {primaryTopicIds.size > 0 && (
+                  <span className="ml-2 text-warning">
+                      ({t('federation.primary_topics_count', { count: primaryTopicIds.size })})
+                  </span>
+                )}
                 </div>
 
                 {/* Helper text for primary topic toggle */}

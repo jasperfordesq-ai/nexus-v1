@@ -55,6 +55,11 @@ vi.mock('@/contexts', () => ({
   useModule: vi.fn(() => true),
 }));
 
+vi.mock('@/contexts/ToastContext', () => ({
+  useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), showToast: vi.fn() })),
+  ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 vi.mock('@/lib/helpers', () => ({
