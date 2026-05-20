@@ -959,11 +959,8 @@ export function JobDetailPage() {
         <DeclineModal
           isOpen={showDeclineInterviewModal}
           titleKey="inline_response.interview_decline"
-          titleDefault="Decline Interview"
           notesLabelKey="inline_response.decline_notes_label"
-          notesLabelDefault="Reason (optional)"
           notesPlaceholderKey="inline_response.decline_notes_placeholder"
-          notesPlaceholderDefault="Let the employer know why..."
           declineNotes={declineNotes}
           setDeclineNotes={setDeclineNotes}
           isLoading={isRespondingInterview}
@@ -974,11 +971,8 @@ export function JobDetailPage() {
         <DeclineModal
           isOpen={showDeclineOfferModal}
           titleKey="inline_response.offer_decline"
-          titleDefault="Decline Offer"
           notesLabelKey="inline_response.decline_reason_label"
-          notesLabelDefault="Reason (optional)"
           notesPlaceholderKey="inline_response.decline_reason_placeholder"
-          notesPlaceholderDefault="Share your reason..."
           declineNotes={declineNotes}
           setDeclineNotes={setDeclineNotes}
           isLoading={isRespondingOffer}

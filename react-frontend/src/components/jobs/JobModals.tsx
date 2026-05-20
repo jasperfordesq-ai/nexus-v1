@@ -85,7 +85,7 @@ export function ApplyModal({
                 {savedProfile && !usingSavedProfile && (
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20 text-sm">
                     <div className="flex-1 text-theme-primary">
-                      {t('saved_profile.found', 'Saved application profile found')}
+                      {t('saved_profile.found')}
                       {savedProfile.cv_filename && (
                         <span className="ml-1 text-xs text-theme-subtle">
                           {t('saved_profile.inline_cv', { filename: savedProfile.cv_filename })}
@@ -101,7 +101,7 @@ export function ApplyModal({
                         setUsingSavedProfile(true);
                       }}
                     >
-                      {t('saved_profile.use', 'Use Saved Profile')}
+                      {t('saved_profile.use')}
                     </Button>
                     <Button
                       size="sm"
@@ -109,13 +109,13 @@ export function ApplyModal({
                       className="text-theme-muted"
                       onPress={() => setSavedProfile(null)}
                     >
-                      {t('saved_profile.start_fresh', 'Start Fresh')}
+                      {t('saved_profile.start_fresh')}
                     </Button>
                   </div>
                 )}
                 {usingSavedProfile && savedProfile?.cv_filename && (
                   <Chip size="sm" variant="flat" color="primary">
-                    {t('saved_profile.cv_label', { defaultValue: 'Saved CV: {{filename}}', filename: savedProfile.cv_filename })}
+                    {t('saved_profile.cv_label', { filename: savedProfile.cv_filename })}
                   </Chip>
                 )}
 
@@ -133,9 +133,9 @@ export function ApplyModal({
 
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-foreground">
-                    {t('apply.cv_label', 'CV / Resume')}{' '}
+                    {t('apply.cv_label')}{' '}
                     <span className="text-default-400 text-xs">
-                      {t('apply.cv_hint', '(optional — PDF, DOC, DOCX, max 5MB)')}
+                      {t('apply.cv_hint')}
                     </span>
                   </label>
                   <div
@@ -145,7 +145,7 @@ export function ApplyModal({
                     onDragOver={(e) => e.preventDefault()}
                     role="button"
                     tabIndex={0}
-                    aria-label={t('apply.cv_dropzone_aria', 'Click or drop file to upload CV')}
+                    aria-label={t('apply.cv_dropzone_aria')}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cvInputRef.current?.click(); } }}
                   >
                     {cvFile ? (
@@ -161,7 +161,7 @@ export function ApplyModal({
                           color="danger"
                           isIconOnly
                           onClick={(e) => { e.stopPropagation(); setCvFile(null); }}
-                          aria-label={t('apply.cv_remove', 'Remove CV')}
+                          aria-label={t('apply.cv_remove')}
                         >
                           <X size={14} aria-hidden="true" />
                         </Button>
@@ -169,7 +169,7 @@ export function ApplyModal({
                     ) : (
                       <div className="text-default-400 text-sm">
                         <Upload size={20} className="mx-auto mb-1" aria-hidden="true" />
-                        {t('apply.cv_drop_prompt', 'Drop CV here or click to browse')}
+                        {t('apply.cv_drop_prompt')}
                       </div>
                     )}
                   </div>
@@ -195,14 +195,14 @@ export function ApplyModal({
                 {cvFile && !cvParsed && (
                   <p className="text-xs text-default-400 flex items-center gap-1 mt-1">
                     <Sparkles size={12} aria-hidden="true" />
-                    {t('cv.parse', 'Skills will be extracted after submission')}
+                    {t('cv.parse')}
                   </p>
                 )}
                 {cvParsed && cvParsed.skills && cvParsed.skills.length > 0 && (
                   <div className="p-2 rounded-lg bg-secondary-50 border border-secondary-200 text-xs mt-1">
                     <div className="font-medium text-secondary-700 mb-1 flex items-center gap-1">
                       <Sparkles size={12} aria-hidden="true" />
-                      {t('cv.detected', 'Skills detected from CV')}
+                      {t('cv.detected')}
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {cvParsed.skills.map((skill) => (
@@ -221,7 +221,7 @@ export function ApplyModal({
                 {t('apply.cancel')}
               </Button>
               <Button
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                color="primary"
                 onPress={onApply}
                 isLoading={isSubmitting}
               >
@@ -299,7 +299,7 @@ export function QualificationModal({
                       qualification.percentage >= 40 ? 'warning' : 'danger'
                     }
                     className="max-w-full"
-                    aria-label={t('aria.qualification_percentage', 'Qualification percentage')}
+                    aria-label={t('aria.qualification_percentage')}
                   />
 
                   <div className="space-y-2">
@@ -334,7 +334,7 @@ export function QualificationModal({
               </Button>
               {qualification && qualification.percentage > 0 && !hasApplied && vacancyStatus === 'open' && (
                 <Button
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  color="primary"
                   onPress={() => {
                     onClose();
                     onApplyOpen();
@@ -397,7 +397,7 @@ export function RenewModal({
                 {t('apply.cancel')}
               </Button>
               <Button
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                color="primary"
                 onPress={onRenew}
                 isLoading={isRenewing}
               >
@@ -447,11 +447,8 @@ export function DeleteModal({ isOpen, onOpenChange, onDelete }: DeleteModalProps
 interface DeclineModalProps {
   isOpen: boolean;
   titleKey: string;
-  titleDefault: string;
   notesLabelKey: string;
-  notesLabelDefault: string;
   notesPlaceholderKey: string;
-  notesPlaceholderDefault: string;
   declineNotes: string;
   setDeclineNotes: (v: string) => void;
   isLoading: boolean;
@@ -462,11 +459,8 @@ interface DeclineModalProps {
 export function DeclineModal({
   isOpen,
   titleKey,
-  titleDefault,
   notesLabelKey,
-  notesLabelDefault,
   notesPlaceholderKey,
-  notesPlaceholderDefault,
   declineNotes,
   setDeclineNotes,
   isLoading,
@@ -478,11 +472,11 @@ export function DeclineModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
       <ModalContent>
-        <ModalHeader>{t(titleKey, titleDefault)}</ModalHeader>
+        <ModalHeader>{t(titleKey)}</ModalHeader>
         <ModalBody>
           <Textarea
-            label={t(notesLabelKey, notesLabelDefault)}
-            placeholder={t(notesPlaceholderKey, notesPlaceholderDefault)}
+            label={t(notesLabelKey)}
+            placeholder={t(notesPlaceholderKey)}
             value={declineNotes}
             onValueChange={setDeclineNotes}
             minRows={3}
@@ -497,7 +491,7 @@ export function DeclineModal({
             {t('apply.cancel')}
           </Button>
           <Button color="danger" isLoading={isLoading} onPress={onConfirm}>
-            {t(titleKey, titleDefault)}
+            {t(titleKey)}
           </Button>
         </ModalFooter>
       </ModalContent>
