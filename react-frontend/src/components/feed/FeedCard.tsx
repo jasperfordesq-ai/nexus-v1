@@ -986,7 +986,7 @@ const FeedCard = React.memo(function FeedCard({
                 startContent={<TrendingUp className="w-3 h-3" aria-hidden="true" />}
                 className="h-6 text-[11px] font-medium"
               >
-                {t(`card.job.type_${item.job_type}`, item.job_type)}
+                {t(`card.job.type_${item.job_type}`)}
               </Chip>
             )}
             {item.commitment && (
@@ -997,7 +997,7 @@ const FeedCard = React.memo(function FeedCard({
                 startContent={<Clock className="w-3 h-3" aria-hidden="true" />}
                 className="h-6 text-[11px] font-medium"
               >
-                {t(`card.job.commitment_${item.commitment}`, item.commitment)}
+                {t(`card.job.commitment_${item.commitment}`)}
               </Chip>
             )}
             {item.location && (
@@ -1185,10 +1185,10 @@ const FeedCard = React.memo(function FeedCard({
                   const ms = new Date(pollData.expires_at).getTime() - now.getTime();
                   const hours = Math.floor(ms / 3600000);
                   const minutes = Math.floor(ms / 60000);
-                  if (minutes < 60) return t('poll.closes_minutes', `Closes in ${minutes}m`, { minutes });
-                  if (hours < 24) return t('poll.closes_hours', `Closes in ${hours}h`, { hours });
+                  if (minutes < 60) return t('poll.closes_minutes', { minutes });
+                  if (hours < 24) return t('poll.closes_hours', { hours });
                   const days = Math.floor(hours / 24);
-                  return t('poll.closes_days', `Closes in ${days}d`, { days });
+                  return t('poll.closes_days', { days });
                 })();
 
                 const pollDetailPath = tenantPath('/polls');
@@ -1424,7 +1424,6 @@ const FeedCard = React.memo(function FeedCard({
                 {t('card.badge_earned_message', {
                   name: author.name,
                   badge: item.badge_name || item.title || '',
-                  defaultValue: '{{name}} earned the "{{badge}}" badge!',
                 })}
               </p>
             </CardBody>
@@ -1446,7 +1445,6 @@ const FeedCard = React.memo(function FeedCard({
                 {t('card.level_up_message', {
                   name: author.name,
                   level: item.new_level || item.title?.replace('Level ', '') || '',
-                  defaultValue: '{{name}} reached Level {{level}}!',
                 })}
               </p>
             </CardBody>

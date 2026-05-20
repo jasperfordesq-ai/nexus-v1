@@ -39,20 +39,20 @@ export function InlineOfferCard({
         <div className="flex-1 space-y-3">
           <div>
             <h3 className="text-base font-semibold text-theme-primary">
-              {t('inline_response.offer_pending', 'You have received an offer!')}
+              {t('inline_response.offer_pending')}
             </h3>
             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-theme-secondary">
               {pendingOffer.salary_offered && (
                 <span className="flex items-center gap-1 font-medium">
                   <DollarSign className="w-3.5 h-3.5" aria-hidden="true" />
-                  {t('inline_response.offer_salary', 'Salary Offered')}: {pendingOffer.salary_currency}{pendingOffer.salary_offered}
+                  {t('inline_response.offer_salary')}: {pendingOffer.salary_currency}{pendingOffer.salary_offered}
                   {pendingOffer.salary_type && ` / ${t(`salary.${pendingOffer.salary_type}`)}`}
                 </span>
               )}
               {pendingOffer.start_date && (
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
-                  {t('inline_response.offer_start_date', 'Start Date')}: {formatDateValue(pendingOffer.start_date)}
+                  {t('inline_response.offer_start_date')}: {formatDateValue(pendingOffer.start_date)}
                 </span>
               )}
             </div>
@@ -70,7 +70,7 @@ export function InlineOfferCard({
               onPress={onAccept}
               startContent={<CheckCircle className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('inline_response.offer_accept', 'Accept Offer')}
+              {t('inline_response.offer_accept')}
             </Button>
             <Button
               color="danger"
@@ -80,7 +80,7 @@ export function InlineOfferCard({
               onPress={onDeclineOpen}
               startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('inline_response.offer_decline', 'Decline Offer')}
+              {t('inline_response.offer_decline')}
             </Button>
           </div>
         </div>
