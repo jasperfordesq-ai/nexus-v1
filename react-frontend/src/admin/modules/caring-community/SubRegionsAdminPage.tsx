@@ -6,13 +6,12 @@
 /**
  * SubRegionsAdminPage — AG77 Sub-Regional Geographic Units Admin
  *
- * Admin is English-only — NO t() calls. Plain English JSX.
- *
  * Manages tenant-scoped Quartier/Ortsteil/municipality/canton subdivisions
  * used by the care-provider directory and member-facing locality filters.
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -93,18 +92,9 @@ const EMPTY_FORM: FormData = {
   status: 'active',
 };
 
-const REGION_TYPES: { value: SubRegionType; label: string }[] = [
-  { value: 'quartier',     label: 'Quartier (neighbourhood)' },
-  { value: 'ortsteil',     label: 'Ortsteil (district)' },
-  { value: 'municipality', label: 'Municipality (Gemeinde)' },
-  { value: 'canton',       label: 'Canton' },
-  { value: 'other',        label: 'Other' },
-];
+const REGION_TYPES: SubRegionType[] = ['quartier', 'ortsteil', 'municipality', 'canton', 'other'];
 
-const TYPE_FILTER_OPTIONS: { value: SubRegionType | 'all'; label: string }[] = [
-  { value: 'all',          label: 'All types' },
-  ...REGION_TYPES.map((t) => ({ value: t.value, label: t.label })),
-];
+const TYPE_FILTER_OPTIONS: Array<SubRegionType | 'all'> = ['all', ...REGION_TYPES];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -140,7 +130,8 @@ function postalCodesPreview(codes: string[] | null): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function SubRegionsAdminPage() {
-  usePageTitle('Sub-Regions — Admin');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('sub_regions.meta.page_title'));
   const { showToast } = useToast();
 
   const [regions, setRegions] = useState<SubRegion[]>([]);
@@ -174,11 +165,11 @@ export default function SubRegionsAdminPage() {
       setRegions(res.data?.data ?? []);
     } catch (err) {
       logError('SubRegionsAdminPage.fetch', err);
-      setError('Failed to load sub-regions.');
+      setError(t('sub_regions.errors.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [search, typeFilter]);
+  }, [search, t, typeFilter]);
 
   useEffect(() => {
     void fetchRegions();
@@ -220,14 +211,14 @@ export default function SubRegionsAdminPage() {
 
   async function handleSave() {
     const errors: Partial<Record<keyof FormData, string>> = {};
-    if (!form.name.trim()) errors.name = 'Name is required.';
-    if (!form.type) errors.type = 'Type is required.';
+    if (!form.name.trim()) errors.name = t('sub_regions.validation.name_required');
+    if (!form.type) errors.type = t('sub_regions.validation.type_required');
 
     if (form.center_latitude !== '' && Number.isNaN(Number(form.center_latitude))) {
-      errors.center_latitude = 'Latitude must be a number.';
+      errors.center_latitude = t('sub_regions.validation.latitude_number');
     }
     if (form.center_longitude !== '' && Number.isNaN(Number(form.center_longitude))) {
-      errors.center_longitude = 'Longitude must be a number.';
+      errors.center_longitude = t('sub_regions.validation.longitude_number');
     }
 
     if (Object.keys(errors).length > 0) {
@@ -250,10 +241,10 @@ export default function SubRegionsAdminPage() {
 
       if (editTarget) {
         await api.put(`/v2/admin/caring-community/sub-regions/${editTarget.id}`, payload);
-        showToast('Sub-region updated successfully.', 'success');
+        showToast(t('sub_regions.toasts.updated'), 'success');
       } else {
         await api.post('/v2/admin/caring-community/sub-regions', payload);
-        showToast('Sub-region created successfully.', 'success');
+        showToast(t('sub_regions.toasts.created'), 'success');
       }
 
       closeModal();
@@ -271,7 +262,7 @@ export default function SubRegionsAdminPage() {
         }
         setFormErrors(fieldErrors);
       } else {
-        showToast(e?.response?.data?.error?.message ?? 'Failed to save sub-region.', 'error');
+        showToast(e?.response?.data?.error?.message ?? t('sub_regions.errors.save_failed'), 'error');
       }
     } finally {
       setSaving(false);
@@ -282,17 +273,17 @@ export default function SubRegionsAdminPage() {
 
   async function handleDelete(region: SubRegion) {
     if (!window.confirm(
-      `Mark "${region.name}" as inactive? Linked care providers will be detached from it.`
+      t('sub_regions.confirm_mark_inactive', { name: region.name })
     )) {
       return;
     }
     try {
       await api.delete(`/v2/admin/caring-community/sub-regions/${region.id}`);
-      showToast('Sub-region marked inactive.', 'success');
+      showToast(t('sub_regions.toasts.marked_inactive'), 'success');
       void fetchRegions();
     } catch (err) {
       logError('SubRegionsAdminPage.delete', err);
-      showToast('Failed to delete sub-region.', 'error');
+      showToast(t('sub_regions.errors.delete_failed'), 'error');
     }
   }
 
@@ -307,10 +298,10 @@ export default function SubRegionsAdminPage() {
         <div>
           <h1 className="text-xl font-semibold flex items-center gap-2">
             <MapPin className="h-5 w-5 text-primary" aria-hidden="true" />
-            Sub-Regions
+            {t('sub_regions.meta.title')}
           </h1>
           <p className="text-sm text-default-500 mt-0.5">
-            Quartier, Ortsteil, Gemeinde and Kanton subdivisions for the care provider directory and locality filters
+            {t('sub_regions.meta.subtitle')}
           </p>
         </div>
         <Button
@@ -318,7 +309,7 @@ export default function SubRegionsAdminPage() {
           startContent={<Plus className="h-4 w-4" aria-hidden="true" />}
           onPress={openCreate}
         >
-          Add Sub-Region
+          {t('sub_regions.actions.add')}
         </Button>
       </div>
 
@@ -328,18 +319,12 @@ export default function SubRegionsAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('sub_regions.about.title')}</p>
               <p className="text-default-600">
-                Sub-Regions divide your community into geographical areas (neighbourhoods, districts,
-                or wards). They are used to assign coordinators to specific areas, filter help
-                requests by location, and break down pilot metrics by neighbourhood. Adding
-                sub-regions is optional but strongly recommended for larger communities with multiple
-                coordinator teams.
+                {t('sub_regions.about.body')}
               </p>
               <p className="text-default-500">
-                For the Postal codes field: enter a postcode list, neighbourhood name, or freeform
-                description. Precise boundaries are not required — this is for coordinator assignment
-                and reporting filters, not mapping.
+                {t('sub_regions.about.postal_codes_note')}
               </p>
             </div>
           </div>
@@ -349,15 +334,15 @@ export default function SubRegionsAdminPage() {
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">
         <Input type="search" name="admin-search" autoComplete="off"
-          aria-label="Search sub-regions"
-          placeholder="Search by name, description or slug..."
+          aria-label={t('sub_regions.filters.search_aria')}
+          placeholder={t('sub_regions.filters.search_placeholder')}
           value={search}
           onValueChange={setSearch}
           className="max-w-xs"
           size="sm"
         />
         <Select
-          aria-label="Filter by type"
+          aria-label={t('sub_regions.filters.type_aria')}
           selectedKeys={new Set([typeFilter])}
           onSelectionChange={(keys) => {
             const v = Array.from(keys)[0] as SubRegionType | 'all' | undefined;
@@ -366,8 +351,8 @@ export default function SubRegionsAdminPage() {
           className="max-w-[220px]"
           size="sm"
         >
-          {TYPE_FILTER_OPTIONS.map(({ value, label }) => (
-            <SelectItem key={value}>{label}</SelectItem>
+          {TYPE_FILTER_OPTIONS.map((value) => (
+            <SelectItem key={value}>{t(`sub_regions.type_options.${value}`)}</SelectItem>
           ))}
         </Select>
       </div>
@@ -382,16 +367,16 @@ export default function SubRegionsAdminPage() {
           {error}
         </div>
       ) : (
-        <Table aria-label="Sub-regions table" removeWrapper>
+        <Table aria-label={t('sub_regions.table.aria')} removeWrapper>
           <TableHeader>
-            <TableColumn>Name</TableColumn>
-            <TableColumn>Type</TableColumn>
-            <TableColumn>Postal codes</TableColumn>
-            <TableColumn>Coordinates</TableColumn>
-            <TableColumn>Status</TableColumn>
-            <TableColumn>Actions</TableColumn>
+            <TableColumn>{t('sub_regions.table.name')}</TableColumn>
+            <TableColumn>{t('sub_regions.table.type')}</TableColumn>
+            <TableColumn>{t('sub_regions.table.postal_codes')}</TableColumn>
+            <TableColumn>{t('sub_regions.table.coordinates')}</TableColumn>
+            <TableColumn>{t('sub_regions.table.status')}</TableColumn>
+            <TableColumn>{t('sub_regions.table.actions')}</TableColumn>
           </TableHeader>
-          <TableBody emptyContent="No sub-regions yet — add one to start segmenting your tenant geographically.">
+          <TableBody emptyContent={t('sub_regions.table.empty')}>
             {visibleRegions.map((region) => (
               <TableRow key={region.id}>
                 <TableCell>
@@ -402,7 +387,7 @@ export default function SubRegionsAdminPage() {
                 </TableCell>
                 <TableCell>
                   <Chip size="sm" color={typeColor(region.type)} variant="flat">
-                    {region.type}
+                    {t(`sub_regions.type_options.${region.type}`)}
                   </Chip>
                 </TableCell>
                 <TableCell>
@@ -425,7 +410,7 @@ export default function SubRegionsAdminPage() {
                     color={region.status === 'active' ? 'success' : 'default'}
                     variant="flat"
                   >
-                    {region.status}
+                    {t(`sub_regions.status.${region.status}`)}
                   </Chip>
                 </TableCell>
                 <TableCell>
@@ -435,7 +420,7 @@ export default function SubRegionsAdminPage() {
                       variant="flat"
                       isIconOnly
                       onPress={() => openEdit(region)}
-                      aria-label="Edit sub-region"
+                      aria-label={t('sub_regions.actions.edit_aria')}
                     >
                       <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                     </Button>
@@ -446,7 +431,7 @@ export default function SubRegionsAdminPage() {
                         color="danger"
                         isIconOnly
                         onPress={() => handleDelete(region)}
-                        aria-label="Mark inactive"
+                        aria-label={t('sub_regions.actions.mark_inactive')}
                       >
                         <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                       </Button>
@@ -465,29 +450,29 @@ export default function SubRegionsAdminPage() {
           {() => (
             <>
               <ModalHeader>
-                {editTarget ? `Edit: ${editTarget.name}` : 'Add Sub-Region'}
+                {editTarget ? t('sub_regions.modal.edit_title', { name: editTarget.name }) : t('sub_regions.modal.add_title')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label="Name"
+                  label={t('sub_regions.form.name')}
                   isRequired
                   value={form.name}
                   onValueChange={(v) => setForm((f) => ({ ...f, name: v }))}
                   isInvalid={!!formErrors.name}
                   errorMessage={formErrors.name}
-                  placeholder="e.g. Lorzenhof"
+                  placeholder={t('sub_regions.form.name_placeholder')}
                 />
                 <Input
-                  label="Slug (auto-generated if blank)"
+                  label={t('sub_regions.form.slug')}
                   value={form.slug}
                   onValueChange={(v) => setForm((f) => ({ ...f, slug: v }))}
                   isInvalid={!!formErrors.slug}
                   errorMessage={formErrors.slug}
-                  placeholder="e.g. lorzenhof"
-                  description="Lowercase, hyphenated identifier used in URLs and filters."
+                  placeholder={t('sub_regions.form.slug_placeholder')}
+                  description={t('sub_regions.form.slug_description')}
                 />
                 <Select
-                  label="Type"
+                  label={t('sub_regions.form.type')}
                   isRequired
                   selectedKeys={form.type ? new Set([form.type]) : new Set()}
                   onSelectionChange={(keys) => {
@@ -497,60 +482,60 @@ export default function SubRegionsAdminPage() {
                   isInvalid={!!formErrors.type}
                   errorMessage={formErrors.type}
                 >
-                  {REGION_TYPES.map(({ value, label }) => (
-                    <SelectItem key={value}>{label}</SelectItem>
+                  {REGION_TYPES.map((value) => (
+                    <SelectItem key={value}>{t(`sub_regions.type_options.${value}`)}</SelectItem>
                   ))}
                 </Select>
                 <Textarea
-                  label="Description"
+                  label={t('sub_regions.form.description')}
                   value={form.description}
                   onValueChange={(v) => setForm((f) => ({ ...f, description: v }))}
-                  placeholder="Brief description of this area..."
+                  placeholder={t('sub_regions.form.description_placeholder')}
                   minRows={2}
                 />
                 <Input
-                  label="Postal codes"
+                  label={t('sub_regions.form.postal_codes')}
                   value={form.postal_codes}
                   onValueChange={(v) => setForm((f) => ({ ...f, postal_codes: v }))}
-                  placeholder="6330, 6331, 6332"
-                  description="Comma- or space-separated PLZ list."
+                  placeholder={t('sub_regions.form.postal_codes_placeholder')}
+                  description={t('sub_regions.form.postal_codes_description')}
                 />
                 <div className="grid grid-cols-2 gap-3">
                   <Input
-                    label="Centre latitude"
+                    label={t('sub_regions.form.centre_latitude')}
                     value={form.center_latitude}
                     onValueChange={(v) => setForm((f) => ({ ...f, center_latitude: v }))}
-                    placeholder="47.1758"
+                    placeholder={t('sub_regions.form.latitude_placeholder')}
                     isInvalid={!!formErrors.center_latitude}
                     errorMessage={formErrors.center_latitude}
                   />
                   <Input
-                    label="Centre longitude"
+                    label={t('sub_regions.form.centre_longitude')}
                     value={form.center_longitude}
                     onValueChange={(v) => setForm((f) => ({ ...f, center_longitude: v }))}
-                    placeholder="8.4622"
+                    placeholder={t('sub_regions.form.longitude_placeholder')}
                     isInvalid={!!formErrors.center_longitude}
                     errorMessage={formErrors.center_longitude}
                   />
                 </div>
                 <Select
-                  label="Status"
+                  label={t('sub_regions.form.status')}
                   selectedKeys={new Set([form.status])}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0] as 'active' | 'inactive' | undefined;
                     if (val) setForm((f) => ({ ...f, status: val }));
                   }}
                 >
-                  <SelectItem key="active">Active</SelectItem>
-                  <SelectItem key="inactive">Inactive</SelectItem>
+                  <SelectItem key="active">{t('sub_regions.status.active')}</SelectItem>
+                  <SelectItem key="inactive">{t('sub_regions.status.inactive')}</SelectItem>
                 </Select>
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={closeModal} isDisabled={saving}>
-                  Cancel
+                  {t('sub_regions.actions.cancel')}
                 </Button>
                 <Button color="primary" onPress={handleSave} isLoading={saving}>
-                  {editTarget ? 'Save Changes' : 'Create Sub-Region'}
+                  {editTarget ? t('sub_regions.actions.save_changes') : t('sub_regions.actions.create')}
                 </Button>
               </ModalFooter>
             </>

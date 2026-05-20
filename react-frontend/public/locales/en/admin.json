@@ -2746,6 +2746,92 @@
       "export_revoked": "Dataset export revoked"
     }
   },
+  "sub_regions": {
+    "meta": {
+      "page_title": "Sub-Regions - Admin",
+      "title": "Sub-Regions",
+      "subtitle": "Quartier, Ortsteil, Gemeinde and Kanton subdivisions for the care provider directory and locality filters"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Sub-Regions divide your community into geographical areas (neighbourhoods, districts, or wards). They are used to assign coordinators to specific areas, filter help requests by location, and break down pilot metrics by neighbourhood. Adding sub-regions is optional but strongly recommended for larger communities with multiple coordinator teams.",
+      "postal_codes_note": "For the Postal codes field: enter a postcode list, neighbourhood name, or freeform description. Precise boundaries are not required - this is for coordinator assignment and reporting filters, not mapping."
+    },
+    "actions": {
+      "add": "Add Sub-Region",
+      "edit_aria": "Edit sub-region",
+      "mark_inactive": "Mark inactive",
+      "cancel": "Cancel",
+      "save_changes": "Save changes",
+      "create": "Create Sub-Region"
+    },
+    "filters": {
+      "search_aria": "Search sub-regions",
+      "search_placeholder": "Search by name, description or slug...",
+      "type_aria": "Filter by type"
+    },
+    "table": {
+      "aria": "Sub-regions table",
+      "name": "Name",
+      "type": "Type",
+      "postal_codes": "Postal codes",
+      "coordinates": "Coordinates",
+      "status": "Status",
+      "actions": "Actions",
+      "empty": "No sub-regions yet - add one to start segmenting your tenant geographically."
+    },
+    "type_options": {
+      "all": "All types",
+      "quartier": "Quartier (neighbourhood)",
+      "ortsteil": "Ortsteil (district)",
+      "municipality": "Municipality (Gemeinde)",
+      "canton": "Canton",
+      "other": "Other"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "modal": {
+      "add_title": "Add Sub-Region",
+      "edit_title": "Edit: {{name}}"
+    },
+    "form": {
+      "name": "Name",
+      "name_placeholder": "e.g. Lorzenhof",
+      "slug": "Slug (auto-generated if blank)",
+      "slug_placeholder": "e.g. lorzenhof",
+      "slug_description": "Lowercase, hyphenated identifier used in URLs and filters.",
+      "type": "Type",
+      "description": "Description",
+      "description_placeholder": "Brief description of this area...",
+      "postal_codes": "Postal codes",
+      "postal_codes_placeholder": "6330, 6331, 6332",
+      "postal_codes_description": "Comma- or space-separated PLZ list.",
+      "centre_latitude": "Centre latitude",
+      "latitude_placeholder": "47.1758",
+      "centre_longitude": "Centre longitude",
+      "longitude_placeholder": "8.4622",
+      "status": "Status"
+    },
+    "validation": {
+      "name_required": "Name is required.",
+      "type_required": "Type is required.",
+      "latitude_number": "Latitude must be a number.",
+      "longitude_number": "Longitude must be a number."
+    },
+    "toasts": {
+      "created": "Sub-region created successfully.",
+      "updated": "Sub-region updated successfully.",
+      "marked_inactive": "Sub-region marked inactive."
+    },
+    "errors": {
+      "load_failed": "Failed to load sub-regions.",
+      "save_failed": "Failed to save sub-region.",
+      "delete_failed": "Failed to delete sub-region."
+    },
+    "confirm_mark_inactive": "Mark \"{{name}}\" as inactive? Linked care providers will be detached from it."
+  },
   "billing": {
     "actions": "Actions",
     "billing_interval": "Billing Interval",
