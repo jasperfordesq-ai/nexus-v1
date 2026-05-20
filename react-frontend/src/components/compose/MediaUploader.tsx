@@ -161,14 +161,14 @@ function SortableMediaItem({
           <Input
             size="sm"
             variant="bordered"
-            placeholder={t('compose.alt_text_placeholder', 'Describe this image...')}
+            placeholder={t('compose.alt_text_placeholder')}
             value={item.altText}
             onChange={(e) => onAltTextChange(index, e.target.value)}
             classNames={{
               input: 'text-white text-xs',
               inputWrapper: 'border-white/30 bg-transparent min-h-8 h-8',
             }}
-            aria-label={t('compose.alt_text_label', 'Alt text for image')}
+            aria-label={t('compose.alt_text_label')}
             maxLength={500}
             onKeyDown={(e) => {
               if (e.key === 'Enter') setShowAltInput(false);
@@ -218,10 +218,7 @@ export function MediaUploader({
       );
 
       if (rejected.length > 0) {
-        onError?.(t('compose.media_rejected', {
-          count: rejected.length,
-          defaultValue: '{{count}} file(s) skipped (wrong type or too large)',
-        }));
+        onError?.(t('compose.media_rejected', { count: rejected.length }));
       }
 
       if (validFiles.length === 0) return;
@@ -250,13 +247,10 @@ export function MediaUploader({
         }
 
         if (failedCount > 0) {
-          onError?.(t('compose.media_compression_failed', {
-            count: failedCount,
-            defaultValue: '{{count}} image(s) failed to process',
-          }));
+          onError?.(t('compose.media_compression_failed', { count: failedCount }));
         }
       } catch {
-        onError?.(t('compose.media_upload_error', 'Failed to process images'));
+        onError?.(t('compose.media_upload_error'));
       } finally {
         setCompressing(false);
       }
@@ -377,10 +371,10 @@ export function MediaUploader({
         >
           <ImagePlus className="w-8 h-8 mx-auto mb-2 text-[var(--text-subtle)]" aria-hidden="true" />
           <p className="text-sm text-[var(--text-muted)]">
-            {t('compose.media_drag_drop', 'Click or drag photos here')}
+            {t('compose.media_drag_drop')}
           </p>
           <p className="text-xs text-[var(--text-subtle)] mt-1">
-            {t('compose.media_formats', 'JPEG, PNG, GIF, WebP up to 10MB each')}
+            {t('compose.media_formats')}
           </p>
         </div>
       )}
@@ -421,7 +415,7 @@ export function MediaUploader({
                   >
                     <ImagePlus className="w-6 h-6 text-[var(--text-subtle)]" aria-hidden="true" />
                     <span className="text-[10px] text-[var(--text-subtle)]">
-                      {compressing ? t('compose.image_compressing', 'Processing...') : '+'}
+                      {compressing ? t('compose.image_compressing') : '+'}
                     </span>
                   </Button>
                 )}
@@ -436,23 +430,19 @@ export function MediaUploader({
         <div className="flex items-center gap-2 flex-wrap">
           {/* File count */}
           <span className="text-xs text-[var(--text-subtle)]">
-            {t('compose.images_max', {
-              count: mediaFiles.length,
-              max: maxFiles,
-              defaultValue: `${mediaFiles.length}/${maxFiles} photos`,
-            })}
+            {t('compose.images_count', { current: mediaFiles.length, max: maxFiles })}
           </span>
 
           {/* Reorder hint */}
           {mediaFiles.length > 1 && (
             <span className="text-xs text-[var(--text-subtle)] hidden sm:inline">
-              {t('compose.images_reorder', 'Drag to reorder')}
+              {t('compose.images_reorder')}
             </span>
           )}
 
           {compressing && (
             <span className="text-xs text-[var(--color-primary)] animate-pulse">
-              {t('compose.image_compressing', 'Processing...')}
+              {t('compose.image_compressing')}
             </span>
           )}
         </div>
