@@ -1987,6 +1987,7 @@
     "ios_step_1_after": "Share button at the bottom of Safari.",
     "ios_step_2": "Scroll down and tap",
     "ios_add_to_home": "Add to Home Screen",
+    "ios_step_2_after": ".",
     "ios_step_3": "Tap Add. NEXUS will appear on your home screen as a standalone app.",
     "got_it": "Got it"
   },
