@@ -3760,6 +3760,85 @@
       "export_failed": "Failed to export boundary map"
     }
   },
+  "municipal_roi_page": {
+    "meta": {
+      "page_title": "Municipal Impact Report",
+      "title": "Municipal Impact Report",
+      "subtitle": "Evidence for B2G procurement - care cost offsets and social capital metrics"
+    },
+    "actions": {
+      "export_csv": "Export CSV",
+      "refresh_data": "Refresh data",
+      "refresh_aria": "Refresh municipal impact report"
+    },
+    "about": {
+      "title": "About this page",
+      "body_prefix": "The Municipal",
+      "body_middle": "Report calculates the social and economic value of your community care programme using the",
+      "body_suffix": "Age-Stiftung methodology. It shows the estimated cost offset to formal care services (Spitex/Pflege), the social value generated, and trend data across reporting periods. This report is designed to be shared with municipal partners and funders as evidence of the programme's impact.",
+      "formula_prefix": "Cost offset = total approved care hours x",
+      "formula_suffix": "hourly rate x prevention multiplier. The prevention multiplier (default: 2.0) reflects that one hour of informal care prevents approximately two hours of formal care intervention, based on Age-Stiftung research."
+    },
+    "filters": {
+      "from": "From",
+      "to": "To",
+      "sub_region": "Sub-region",
+      "all_sub_regions": "All sub-regions",
+      "period": "Period: {{from}} -> {{to}}"
+    },
+    "methodology": {
+      "hours_valued_at": "Hours valued at",
+      "hours_are_valued_at": "Hours are valued at",
+      "chf_per_hour": "CHF {{amount}}/hr",
+      "default_rate": "CHF 35/hr",
+      "tenant_setting_source": "configured for this tenant",
+      "default_source": "Swiss formal care assistant rate, SECO 2024",
+      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per Age-Stiftung/",
+      "prevention_value_suffix": "evaluation methodology.",
+      "default_prevention_prefix": "Prevention value applies a 2x multiplier per Age-Stiftung/",
+      "default_prevention_suffix": "evaluation methodology.",
+      "substitution_applied": "Hours are weighted by per-category substitution coefficients.",
+      "substitution_not_applied": "All hours weighted at 1.0x."
+    },
+    "stats": {
+      "total_hours": "Total Hours",
+      "active_members": "Active Members",
+      "active_relationships": "Active Relationships",
+      "care_recipients": "Care Recipients",
+      "weighted_hours_tooltip": "Hours are weighted by category-specific substitution rates (e.g. companionship 0.4x, transport 0.7x, errands 1.0x) per Age-Stiftung methodology.",
+      "weighted_hours_note": "{{hours}} weighted hours after substitution coefficients"
+    },
+    "roi": {
+      "title": "Estimated Care Cost Offset",
+      "yoy": "{{value}} YoY",
+      "prevented_this_period": "in formal care costs prevented this period",
+      "prevention_value": "Prevention value",
+      "multiplier_note": " ({{multiplier}}x multiplier)",
+      "default_multiplier_note": " (2x multiplier)",
+      "social_isolation_supported": "People supported out of social isolation"
+    },
+    "municipalities": {
+      "title": "What this means for municipalities",
+      "point_hour_prefix": "Every hour of community caring time saves approximately",
+      "point_hour_suffix": "in formal care costs",
+      "point_prevention": "Preventative community support can reduce residential care needs - estimated 2x multiplier",
+      "point_nexus": "makes this impact measurable, auditable, and reportable for cantonal and municipal procurement",
+      "point_export": "CSV export available - use the button in the page header for Age-Stiftung, Pro Senectute, and cantonal social department reporting."
+    },
+    "breakdown": {
+      "title": "Breakdown by sub-region",
+      "description": "Sub-region breakdown shows which neighbourhoods are generating the most care activity. Use this to identify areas that may need more coordinator support or volunteer recruitment.",
+      "aria": "Sub-region breakdown",
+      "sub_region": "Sub-region",
+      "hours": "Hours",
+      "weighted_hours": "Weighted hours",
+      "formal_care_offset": "Formal care offset"
+    },
+    "toasts": {
+      "load_failed": "Failed to load municipal impact data",
+      "export_failed": "Failed to export CSV"
+    }
+  },
   "municipal_copilot": {
     "meta": {
       "page_title": "Municipal Communication Copilot",

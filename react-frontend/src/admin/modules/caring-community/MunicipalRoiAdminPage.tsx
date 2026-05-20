@@ -32,6 +32,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import TrendingDown from 'lucide-react/icons/trending-down';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api, tokenManager } from '@/lib/api';
@@ -116,7 +117,8 @@ function todayISO(): string {
 // ---------------------------------------------------------------------------
 
 export default function MunicipalRoiAdminPage() {
-  usePageTitle('Municipal Impact Report');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('municipal_roi_page.meta.page_title'));
   const { showToast } = useToast();
 
   const [data, setData] = useState<MunicipalRoi | null>(null);
@@ -148,11 +150,11 @@ export default function MunicipalRoiAdminPage() {
       const res = await api.get<MunicipalRoi>(url);
       setData(res.data ?? null);
     } catch {
-      showToast('Failed to load municipal impact data', 'error');
+      showToast(t('municipal_roi_page.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [queryParams, showToast]);
+  }, [queryParams, showToast, t]);
 
   // Fetch sub-regions once on mount; silently hide on failure / empty
   useEffect(() => {
@@ -210,11 +212,11 @@ export default function MunicipalRoiAdminPage() {
       a.click();
       URL.revokeObjectURL(objectUrl);
     } catch {
-      showToast('Failed to export CSV', 'error');
+      showToast(t('municipal_roi_page.toasts.export_failed'), 'error');
     } finally {
       setExporting(false);
     }
-  }, [queryParams, from, to, showToast]);
+  }, [queryParams, from, to, showToast, t]);
 
   // Sorted breakdown rows (by formal_care_offset_chf desc)
   const sortedBreakdown = useMemo(() => {
@@ -233,8 +235,8 @@ export default function MunicipalRoiAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Municipal Impact Report"
-        subtitle="Evidence for B2G procurement — care cost offsets and social capital metrics"
+        title={t('municipal_roi_page.meta.title')}
+        subtitle={t('municipal_roi_page.meta.subtitle')}
         icon={<TrendingUp size={20} />}
         actions={
           <div className="flex items-center gap-2 flex-wrap">
@@ -246,16 +248,16 @@ export default function MunicipalRoiAdminPage() {
               onPress={handleExport}
               isLoading={exporting}
             >
-              Export CSV
+              {t('municipal_roi_page.actions.export_csv')}
             </Button>
-            <Tooltip content="Refresh data">
+            <Tooltip content={t('municipal_roi_page.actions.refresh_data')}>
               <Button
                 isIconOnly
                 size="sm"
                 variant="flat"
                 onPress={load}
                 isLoading={loading}
-                aria-label="Refresh"
+                aria-label={t('municipal_roi_page.actions.refresh_aria')}
               >
                 <RefreshCw size={15} />
               </Button>
@@ -270,19 +272,13 @@ export default function MunicipalRoiAdminPage() {
           <div className="flex gap-3">
             <Info size={16} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('municipal_roi_page.about.title')}</p>
               <p className="text-default-600">
-                The Municipal <Abbr term="ROI" /> Report calculates the social and economic value of your community
-                care programme using the <Abbr term="KISS">KISS</Abbr>/Age-Stiftung methodology. It shows the estimated cost
-                offset to formal care services (Spitex/Pflege), the social value generated, and trend
-                data across reporting periods. This report is designed to be shared with municipal
-                partners and funders as evidence of the programme's impact.
+                {t('municipal_roi_page.about.body_prefix')} <Abbr term="ROI" /> {t('municipal_roi_page.about.body_middle')}{' '}
+                <Abbr term="KISS" />/{t('municipal_roi_page.about.body_suffix')}
               </p>
               <p className="text-default-500">
-                Cost offset = total approved care hours × <Abbr term="CHF" /> hourly rate × prevention multiplier.
-                The prevention multiplier (default: 2.0) reflects that one hour of informal care
-                prevents approximately two hours of formal care intervention, based on Age-Stiftung
-                research.
+                {t('municipal_roi_page.about.formula_prefix')} <Abbr term="CHF" /> {t('municipal_roi_page.about.formula_suffix')}
               </p>
             </div>
           </div>
@@ -295,7 +291,7 @@ export default function MunicipalRoiAdminPage() {
           <Input
             type="date"
             size="sm"
-            label="From"
+            label={t('municipal_roi_page.filters.from')}
             labelPlacement="outside"
             value={from}
             onValueChange={setFrom}
@@ -305,7 +301,7 @@ export default function MunicipalRoiAdminPage() {
           <Input
             type="date"
             size="sm"
-            label="To"
+            label={t('municipal_roi_page.filters.to')}
             labelPlacement="outside"
             value={to}
             onValueChange={setTo}
@@ -315,9 +311,9 @@ export default function MunicipalRoiAdminPage() {
           {subRegions.length > 0 && (
             <Select
               size="sm"
-              label="Sub-region"
+              label={t('municipal_roi_page.filters.sub_region')}
               labelPlacement="outside"
-              placeholder="All sub-regions"
+              placeholder={t('municipal_roi_page.filters.all_sub_regions')}
               selectedKeys={subRegionId ? [subRegionId] : []}
               onSelectionChange={(keys) => {
                 const arr = Array.from(keys as Set<string | number>);
@@ -327,7 +323,7 @@ export default function MunicipalRoiAdminPage() {
               variant="bordered"
             >
               <>
-                <SelectItem key="">All sub-regions</SelectItem>
+                <SelectItem key="">{t('municipal_roi_page.filters.all_sub_regions')}</SelectItem>
                 {subRegions.map((sr) => (
                   <SelectItem key={String(sr.id)}>{sr.name}</SelectItem>
                 ))}
@@ -336,8 +332,8 @@ export default function MunicipalRoiAdminPage() {
           )}
           <div className="ml-auto text-xs text-default-500">
             {data?.period
-              ? `Period: ${data.period.from} → ${data.period.to}`
-              : `Period: ${from} → ${to}`}
+              ? t('municipal_roi_page.filters.period', { from: data.period.from, to: data.period.to })
+              : t('municipal_roi_page.filters.period', { from, to })}
           </div>
         </CardBody>
       </Card>
@@ -349,21 +345,31 @@ export default function MunicipalRoiAdminPage() {
           <p className="text-sm text-default-600">
             {data?.methodology ? (
               <>
-                Hours valued at <Abbr term="CHF">CHF {NUM.format(data.methodology.hourly_rate_chf)}/hr</Abbr> (
+                {t('municipal_roi_page.methodology.hours_valued_at')}{' '}
+                <Abbr term="CHF">
+                  {t('municipal_roi_page.methodology.chf_per_hour', {
+                    amount: NUM.format(data.methodology.hourly_rate_chf),
+                  })}
+                </Abbr>{' '}
+                (
                 {data.methodology.hourly_rate_source === 'tenant_setting'
-                  ? 'configured for this tenant'
-                  : 'Swiss formal care assistant rate, SECO 2024'}
-                ). Prevention value applies a {data.methodology.prevention_multiplier}× multiplier
-                per Age-Stiftung/<Abbr term="KISS">KISS</Abbr> evaluation methodology.{' '}
+                  ? t('municipal_roi_page.methodology.tenant_setting_source')
+                  : t('municipal_roi_page.methodology.default_source')}
+                ). {t('municipal_roi_page.methodology.prevention_value_prefix', {
+                  multiplier: data.methodology.prevention_multiplier,
+                })}{' '}
+                <Abbr term="KISS" /> {t('municipal_roi_page.methodology.prevention_value_suffix')}{' '}
                 {data.methodology.substitution_applied
-                  ? 'Hours are weighted by per-category substitution coefficients.'
-                  : 'All hours weighted at 1.0×.'}
+                  ? t('municipal_roi_page.methodology.substitution_applied')
+                  : t('municipal_roi_page.methodology.substitution_not_applied')}
               </>
             ) : (
               <>
-                Hours are valued at <Abbr term="CHF">CHF 35/hr</Abbr> (Swiss formal care assistant rate, SECO 2024).
-                Prevention value applies a 2× multiplier per Age-Stiftung/<Abbr term="KISS">KISS</Abbr> evaluation
-                methodology.
+                {t('municipal_roi_page.methodology.hours_are_valued_at')}{' '}
+                <Abbr term="CHF">{t('municipal_roi_page.methodology.default_rate')}</Abbr>{' '}
+                ({t('municipal_roi_page.methodology.default_source')}).{' '}
+                {t('municipal_roi_page.methodology.default_prevention_prefix')}{' '}
+                <Abbr term="KISS" /> {t('municipal_roi_page.methodology.default_prevention_suffix')}
               </>
             )}
           </p>
@@ -383,35 +389,37 @@ export default function MunicipalRoiAdminPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <StatCard
-                label="Total Hours"
+                label={t('municipal_roi_page.stats.total_hours')}
                 value={data.total_hours.toLocaleString()}
                 icon={Clock}
                 color="primary"
               />
               {showWeightedAnnotation && typeof data.weighted_hours === 'number' && (
                 <Tooltip
-                  content="Hours are weighted by category-specific substitution rates (e.g. companionship 0.4×, transport 0.7×, errands 1.0×) per Age-Stiftung methodology."
+                  content={t('municipal_roi_page.stats.weighted_hours_tooltip')}
                 >
                   <p className="mt-1 text-xs text-default-500 cursor-help">
-                    {NUM.format(data.weighted_hours)} weighted hours after substitution coefficients
+                    {t('municipal_roi_page.stats.weighted_hours_note', {
+                      hours: NUM.format(data.weighted_hours),
+                    })}
                   </p>
                 </Tooltip>
               )}
             </div>
             <StatCard
-              label="Active Members"
+              label={t('municipal_roi_page.stats.active_members')}
               value={data.active_members.toLocaleString()}
               icon={Users}
               color="success"
             />
             <StatCard
-              label="Active Relationships"
+              label={t('municipal_roi_page.stats.active_relationships')}
               value={data.active_relationships.toLocaleString()}
               icon={Heart}
               color="secondary"
             />
             <StatCard
-              label="Care Recipients"
+              label={t('municipal_roi_page.stats.care_recipients')}
               value={data.recipient_count.toLocaleString()}
               icon={Building2}
               color="warning"
@@ -421,7 +429,7 @@ export default function MunicipalRoiAdminPage() {
           {/* ROI section */}
           <Card>
             <CardHeader className="pb-2">
-              <span className="font-semibold text-sm">Estimated Care Cost Offset</span>
+              <span className="font-semibold text-sm">{t('municipal_roi_page.roi.title')}</span>
             </CardHeader>
             <CardBody className="pt-0 space-y-4">
               {/* Primary figure */}
@@ -438,28 +446,31 @@ export default function MunicipalRoiAdminPage() {
                       yoyPct >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />
                     }
                   >
-                    {yoyPct > 0 ? '+' : ''}
-                    {yoyPct.toFixed(1)}% YoY
+                    {t('municipal_roi_page.roi.yoy', {
+                      value: `${yoyPct > 0 ? '+' : ''}${yoyPct.toFixed(1)}%`,
+                    })}
                   </Chip>
                 )}
               </div>
-              <p className="text-sm text-default-500">in formal care costs prevented this period</p>
+              <p className="text-sm text-default-500">{t('municipal_roi_page.roi.prevented_this_period')}</p>
 
               <Divider />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
                   <p className="text-xs text-default-500 mb-1">
-                    Prevention value
+                    {t('municipal_roi_page.roi.prevention_value')}
                     {data.methodology
-                      ? ` (${data.methodology.prevention_multiplier}× multiplier)`
-                      : ' (2× multiplier)'}
+                      ? t('municipal_roi_page.roi.multiplier_note', {
+                          multiplier: data.methodology.prevention_multiplier,
+                        })
+                      : t('municipal_roi_page.roi.default_multiplier_note')}
                   </p>
                   <p className="text-2xl font-bold">{CHF.format(data.roi.prevention_value_chf)}</p>
                 </div>
                 <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
                   <p className="text-xs text-default-500 mb-1">
-                    People supported out of social isolation
+                    {t('municipal_roi_page.roi.social_isolation_supported')}
                   </p>
                   <p className="text-2xl font-bold">
                     {data.roi.social_isolation_prevented.toLocaleString()}
@@ -472,15 +483,15 @@ export default function MunicipalRoiAdminPage() {
           {/* Municipalities context card */}
           <Card>
             <CardHeader className="pb-2">
-              <span className="font-semibold text-sm">What this means for municipalities</span>
+              <span className="font-semibold text-sm">{t('municipal_roi_page.municipalities.title')}</span>
             </CardHeader>
             <CardBody className="pt-0">
               <ul className="space-y-2">
                 {([
-                  <>Every hour of community caring time saves approximately <Abbr term="CHF">CHF 35</Abbr> in formal care costs</>,
-                  <>Preventative community support can reduce residential care needs — estimated 2× multiplier</>,
-                  <><Abbr term="NEXUS">NEXUS</Abbr> makes this impact measurable, auditable, and reportable for cantonal and municipal procurement</>,
-                  <>CSV export available — use the button in the page header for Age-Stiftung, Pro Senectute, and cantonal social department reporting.</>,
+                  <>{t('municipal_roi_page.municipalities.point_hour_prefix')} <Abbr term="CHF">{t('municipal_roi_page.methodology.default_rate')}</Abbr> {t('municipal_roi_page.municipalities.point_hour_suffix')}</>,
+                  <>{t('municipal_roi_page.municipalities.point_prevention')}</>,
+                  <><Abbr term="NEXUS" /> {t('municipal_roi_page.municipalities.point_nexus')}</>,
+                  <>{t('municipal_roi_page.municipalities.point_export')}</>,
                 ] as React.ReactNode[]).map((point, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-default-700">
                     <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
@@ -496,21 +507,19 @@ export default function MunicipalRoiAdminPage() {
             <Card>
               <CardHeader className="pb-2">
                 <div className="space-y-0.5">
-                  <span className="font-semibold text-sm">Breakdown by sub-region</span>
+                  <span className="font-semibold text-sm">{t('municipal_roi_page.breakdown.title')}</span>
                   <p className="text-xs text-default-500">
-                    Sub-region breakdown shows which neighbourhoods are generating the most care
-                    activity. Use this to identify areas that may need more coordinator support or
-                    volunteer recruitment.
+                    {t('municipal_roi_page.breakdown.description')}
                   </p>
                 </div>
               </CardHeader>
               <CardBody className="pt-0">
-                <Table aria-label="Sub-region breakdown" removeWrapper>
+                <Table aria-label={t('municipal_roi_page.breakdown.aria')} removeWrapper>
                   <TableHeader>
-                    <TableColumn>Sub-region</TableColumn>
-                    <TableColumn>Hours</TableColumn>
-                    <TableColumn>Weighted hours</TableColumn>
-                    <TableColumn>Formal care offset</TableColumn>
+                    <TableColumn>{t('municipal_roi_page.breakdown.sub_region')}</TableColumn>
+                    <TableColumn>{t('municipal_roi_page.breakdown.hours')}</TableColumn>
+                    <TableColumn>{t('municipal_roi_page.breakdown.weighted_hours')}</TableColumn>
+                    <TableColumn>{t('municipal_roi_page.breakdown.formal_care_offset')}</TableColumn>
                   </TableHeader>
                   <TableBody>
                     {sortedBreakdown.map((row) => (
