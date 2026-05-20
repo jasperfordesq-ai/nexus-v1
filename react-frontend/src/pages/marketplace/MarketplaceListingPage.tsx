@@ -388,13 +388,6 @@ export function MarketplaceListingPage() {
     return () => { cancelled = true; };
   }, [id, t])
 
-  // Update page title when listing loads
-  useEffect(() => {
-    if (listing?.title) {
-      document.title = `${listing.title} - ${t('page_title')}`;
-    }
-  }, [listing?.title, t])
-
   // Load seller listings
   useEffect(() => {
     if (!sellerId || !listing?.id) return;
@@ -494,13 +487,19 @@ export function MarketplaceListingPage() {
 
   // Loading state — skeleton instead of spinner
   if (isLoading) {
-    return <MarketplaceListingDetailSkeleton />;
+    return (
+      <>
+        <PageMeta title={t('page_title')} noIndex />
+        <MarketplaceListingDetailSkeleton />
+      </>
+    );
   }
 
   // Error state
   if (error || !listing) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
+        <PageMeta title={t('listing.not_found_title')} noIndex />
         <EmptyState
           icon={<ShoppingBag className="w-8 h-8" />}
           title={t('listing.not_found_title')}

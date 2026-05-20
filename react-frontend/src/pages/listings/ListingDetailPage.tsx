@@ -370,23 +370,31 @@ export function ListingDetailPage() {
   const isOwner = user && listing && user.id === listing.user_id;
 
   if (isLoading) {
-    return <LoadingScreen message={t('loading')} />;
+    return (
+      <>
+        <PageMeta title={t('loading')} noIndex />
+        <LoadingScreen message={t('loading')} />
+      </>
+    );
   }
 
   if (error || !listing) {
     return (
-      <EmptyState
-        icon={<AlertCircle className="w-12 h-12" />}
-        title={t('not_found_title')}
-        description={error || t('not_found_fallback')}
-        action={
-          <Link to={tenantPath('/listings')}>
-            <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
-              {t('browse')}
-            </Button>
-          </Link>
-        }
-      />
+      <>
+        <PageMeta title={t('not_found_title')} noIndex />
+        <EmptyState
+          icon={<AlertCircle className="w-12 h-12" />}
+          title={t('not_found_title')}
+          description={error || t('not_found_fallback')}
+          action={
+            <Link to={tenantPath('/listings')}>
+              <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
+                {t('browse')}
+              </Button>
+            </Link>
+          }
+        />
+      </>
     );
   }
 
@@ -410,7 +418,7 @@ export function ListingDetailPage() {
     >
       <PageMeta
         title={listing?.title}
-        description={listing?.description?.substring(0, 160)}
+        description={listing?.description?.replace(/\s+/g, ' ').trim().slice(0, 160)}
         image={listing?.image_url ? resolveAssetUrl(listing.image_url) : undefined}
         type="article"
         publishedTime={listing.created_at}

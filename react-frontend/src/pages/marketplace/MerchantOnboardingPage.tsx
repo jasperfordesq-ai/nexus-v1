@@ -474,6 +474,7 @@ export function MerchantOnboardingPage() {
         title={t('meta.title')}
         description={t('meta.description')}
         url={tenantPath('/marketplace/become-partner')}
+        noIndex
       />
 
       {/* Hero */}

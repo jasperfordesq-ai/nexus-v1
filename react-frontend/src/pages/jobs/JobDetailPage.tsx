@@ -689,6 +689,7 @@ export function JobDetailPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
+        <PageMeta title={t('detail.loading')} noIndex />
         <GlassCard className="p-6 animate-pulse">
           <div className="h-8 bg-theme-hover rounded w-1/2 mb-4" />
           <div className="h-4 bg-theme-hover rounded w-3/4 mb-2" />
@@ -702,27 +703,30 @@ export function JobDetailPage() {
   // Error state
   if (error || !vacancy) {
     return (
-      <EmptyState
-        icon={<Briefcase className="w-12 h-12" aria-hidden="true" />}
-        title={error || t('detail.not_found')}
-        description={t('detail.not_found_desc')}
-        action={
-          <div className="flex gap-2">
-            <Link to={tenantPath('/jobs')}>
-              <Button variant="flat" className="bg-theme-elevated text-theme-muted">
-                {t('detail.browse_vacancies')}
+      <>
+        <PageMeta title={error || t('detail.not_found')} noIndex />
+        <EmptyState
+          icon={<Briefcase className="w-12 h-12" aria-hidden="true" />}
+          title={error || t('detail.not_found')}
+          description={t('detail.not_found_desc')}
+          action={
+            <div className="flex gap-2">
+              <Link to={tenantPath('/jobs')}>
+                <Button variant="flat" className="bg-theme-elevated text-theme-muted">
+                  {t('detail.browse_vacancies')}
+                </Button>
+              </Link>
+              <Button
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+                onPress={loadVacancy}
+              >
+                {t('detail.try_again')}
               </Button>
-            </Link>
-            <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
-              onPress={loadVacancy}
-            >
-              {t('detail.try_again')}
-            </Button>
-          </div>
-        }
-      />
+            </div>
+          }
+        />
+      </>
     );
   }
 
@@ -739,7 +743,7 @@ export function JobDetailPage() {
       <main className="space-y-6">
         <PageMeta
           title={vacancy.title}
-          description={vacancy.description?.substring(0, 160)}
+          description={vacancy.description?.replace(/\s+/g, ' ').trim().slice(0, 160)}
           image={vacancy.organization?.logo_url || undefined}
           type="article"
           publishedTime={vacancy.created_at}
