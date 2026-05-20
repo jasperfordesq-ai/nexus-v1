@@ -3294,6 +3294,90 @@
       "export_failed": "Failed to export CSV"
     }
   },
+  "smart_nudges": {
+    "meta": {
+      "page_title": "Smart member nudges",
+      "title": "Smart member nudges",
+      "description": "Automated suggestions that nudge members toward high-fit tandem partners. Conservative defaults - runs on a daily cap."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "dry_run": "Dry-run",
+      "dispatch_now": "Dispatch now",
+      "save_configuration": "Save configuration",
+      "cancel": "Cancel",
+      "dispatch": "Dispatch"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Smart Nudges are automated prompts sent to members when a high-fit tandem-match partner is detected. Members who would benefit from a peer connection are identified by the matching engine and sent an in-app notification (and optionally email) suggesting they connect. Nudges respect a cooldown window so no member is contacted too frequently. Use the dry-run to preview who would be nudged before dispatching for real.",
+      "inactivity_label": "Inactivity",
+      "inactivity_body": "triggered when a member hasn't logged in for the configured number of days",
+      "unmatched_request_label": "Unmatched request",
+      "unmatched_request_body": "triggered when a help request has no offers after the cooldown window passes",
+      "follow_up_label": "Follow-up",
+      "follow_up_body": "sent to the coordinator after an approved exchange hasn't been marked complete"
+    },
+    "stats": {
+      "sent_30d": "Sent (30d)",
+      "conversion_30d": "Conversion (30d)",
+      "eligible_candidates": "Eligible candidates",
+      "opted_out": "Opted out"
+    },
+    "chart": {
+      "title": "Daily nudges (last 30 days)",
+      "sent": "Sent",
+      "converted": "Converted"
+    },
+    "config": {
+      "title": "Configuration",
+      "engine_enabled": "Engine enabled",
+      "engine_description": "When off, no nudges are dispatched.",
+      "min_score": "Minimum score (0.40 - 0.95)",
+      "min_score_description": "Tandem-match score threshold for sending a nudge",
+      "cooldown_days": "Cooldown (days)",
+      "cooldown_description": "Wait this long before nudging the same pair again",
+      "daily_limit": "Daily limit",
+      "daily_limit_description": "Maximum nudges per day across the whole tenant",
+      "save_note": "Changes take effect immediately - the next scheduled nudge run will apply the new settings."
+    },
+    "dry_run": {
+      "title": "Dry-run preview",
+      "candidates": "{{count}} candidates",
+      "empty": "No eligible candidates right now.",
+      "table_aria": "Dry-run nudge candidates"
+    },
+    "recent": {
+      "title": "Recent nudges",
+      "empty": "No nudges sent yet.",
+      "table_aria": "Recent smart nudges"
+    },
+    "table": {
+      "target_user": "Target user",
+      "target": "Target",
+      "suggested_partner": "Suggested partner",
+      "score": "Score",
+      "sent": "Sent",
+      "status": "Status"
+    },
+    "status": {
+      "sent": "Sent",
+      "converted": "Converted"
+    },
+    "dispatch_modal": {
+      "title": "Dispatch nudges now?",
+      "body_prefix": "This will send up to",
+      "body_suffix": "nudge notifications to eligible members right now. Make sure you've reviewed a dry-run first."
+    },
+    "toasts": {
+      "load_failed": "Failed to load nudge analytics",
+      "config_saved": "Nudge config saved. The updated rules will apply on the next scheduled run.",
+      "save_failed": "Failed to save configuration",
+      "dry_run": "Dry run: {{count}} eligible candidates",
+      "dispatched": "Dispatched {{count}} nudges",
+      "dispatch_failed": "Dispatch failed"
+    }
+  },
   "federation_peers_admin": {
     "meta": {
       "page_title": "Federation Peers - Admin",

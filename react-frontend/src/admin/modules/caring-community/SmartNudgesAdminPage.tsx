@@ -14,7 +14,7 @@
  * - Dry-run dispatch preview (no emails sent)
  * - Real dispatch with confirm modal
  *
- * Admin English only — no t() calls.
+ * Admin UI text is translated through the admin namespace.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -58,6 +58,7 @@ import Save from 'lucide-react/icons/save';
 import Send from 'lucide-react/icons/send';
 import FlaskConical from 'lucide-react/icons/flask-conical';
 import TrendingUp from 'lucide-react/icons/trending-up';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -146,8 +147,9 @@ function formatAdminDate(value: string): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function SmartNudgesAdminPage() {
+  const { t } = useTranslation('admin');
   const toast = useToast();
-  usePageTitle('Smart member nudges');
+  usePageTitle(t('smart_nudges.meta.page_title'));
 
   const [data, setData] = useState<NudgeAnalytics | null>(null);
   const [config, setConfig] = useState<NudgeConfig | null>(null);
@@ -166,16 +168,16 @@ export default function SmartNudgesAdminPage() {
         setData(res.data);
         setConfig(res.data.config);
       } else {
-        toast.error(res.error || 'Failed to load nudge analytics');
+        toast.error(res.error || t('smart_nudges.toasts.load_failed'));
       }
     } catch (err) {
       logError('SmartNudgesAdminPage: load failed', err);
-      toast.error('Failed to load nudge analytics');
+      toast.error(t('smart_nudges.toasts.load_failed'));
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => {
     void load();
@@ -190,18 +192,18 @@ export default function SmartNudgesAdminPage() {
         config,
       );
       if (res.success) {
-        toast.success('Nudge config saved. The updated rules will apply on the next scheduled run.');
+        toast.success(t('smart_nudges.toasts.config_saved'));
         void load();
       } else {
-        toast.error(res.error || 'Failed to save configuration');
+        toast.error(res.error || t('smart_nudges.toasts.save_failed'));
       }
     } catch (err) {
       logError('SmartNudgesAdminPage: save config failed', err);
-      toast.error('Failed to save configuration');
+      toast.error(t('smart_nudges.toasts.save_failed'));
     } finally {
       setSavingConfig(false);
     }
-  }, [config, toast, load]);
+  }, [config, toast, load, t]);
 
   const handleDispatch = useCallback(
     async (dryRun: boolean) => {
@@ -213,25 +215,35 @@ export default function SmartNudgesAdminPage() {
         if (res.success && res.data) {
           if (dryRun) {
             setDryResult(res.data);
-            toast.success(`Dry run: ${res.data.candidates?.length ?? 0} eligible candidates`);
+            toast.success(t('smart_nudges.toasts.dry_run', { count: res.data.candidates?.length ?? 0 }));
           } else {
-            toast.success(`Dispatched ${res.data.dispatched ?? 0} nudges`);
+            toast.success(t('smart_nudges.toasts.dispatched', { count: res.data.dispatched ?? 0 }));
             setDryResult(null);
             onClose();
             void load();
           }
         } else {
-          toast.error(res.error || 'Dispatch failed');
+          toast.error(res.error || t('smart_nudges.toasts.dispatch_failed'));
         }
       } catch (err) {
         logError('SmartNudgesAdminPage: dispatch failed', err);
-        toast.error('Dispatch failed');
+        toast.error(t('smart_nudges.toasts.dispatch_failed'));
       } finally {
         setRunning(false);
       }
     },
-    [toast, onClose, load],
+    [toast, onClose, load, t],
   );
+
+  const chartSeries = {
+    sent: t('smart_nudges.chart.sent'),
+    converted: t('smart_nudges.chart.converted'),
+  };
+  const statusLabel = (status: string) => {
+    if (status === 'converted') return t('smart_nudges.status.converted');
+    if (status === 'sent') return t('smart_nudges.status.sent');
+    return status;
+  };
 
   if (loading || !data || !config) {
     return (
@@ -247,8 +259,8 @@ export default function SmartNudgesAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Smart member nudges"
-        description="Automated suggestions that nudge members toward high-fit tandem partners. Conservative defaults — runs on a daily cap."
+        title={t('smart_nudges.meta.title')}
+        description={t('smart_nudges.meta.description')}
         actions={
           <div className="flex flex-wrap gap-2">
             <Button
@@ -258,7 +270,7 @@ export default function SmartNudgesAdminPage() {
               onPress={() => void load()}
               isDisabled={refreshing}
             >
-              Refresh
+              {t('smart_nudges.actions.refresh')}
             </Button>
             <Button
               size="sm"
@@ -268,7 +280,7 @@ export default function SmartNudgesAdminPage() {
               onPress={() => void handleDispatch(true)}
               isLoading={running}
             >
-              Dry-run
+              {t('smart_nudges.actions.dry_run')}
             </Button>
             <Button
               size="sm"
@@ -277,7 +289,7 @@ export default function SmartNudgesAdminPage() {
               onPress={onOpen}
               isDisabled={!config.enabled}
             >
-              Dispatch now
+              {t('smart_nudges.actions.dispatch_now')}
             </Button>
           </div>
         }
@@ -289,18 +301,14 @@ export default function SmartNudgesAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('smart_nudges.about.title')}</p>
               <p className="text-default-600">
-                Smart Nudges are automated prompts sent to members when a high-fit tandem-match partner is detected.
-                Members who would benefit from a peer connection are identified by the matching engine and sent an
-                in-app notification (and optionally email) suggesting they connect. Nudges respect a cooldown window
-                so no member is contacted too frequently. Use the dry-run to preview who would be nudged before
-                dispatching for real.
+                {t('smart_nudges.about.body')}
               </p>
               <ul className="mt-1 space-y-0.5 text-default-500 list-disc list-inside">
-                <li><span className="font-medium text-default-600">Inactivity:</span> triggered when a member hasn't logged in for the configured number of days</li>
-                <li><span className="font-medium text-default-600">Unmatched request:</span> triggered when a help request has no offers after the cooldown window passes</li>
-                <li><span className="font-medium text-default-600">Follow-up:</span> sent to the coordinator after an approved exchange hasn't been marked complete</li>
+                <li><span className="font-medium text-default-600">{t('smart_nudges.about.inactivity_label')}:</span> {t('smart_nudges.about.inactivity_body')}</li>
+                <li><span className="font-medium text-default-600">{t('smart_nudges.about.unmatched_request_label')}:</span> {t('smart_nudges.about.unmatched_request_body')}</li>
+                <li><span className="font-medium text-default-600">{t('smart_nudges.about.follow_up_label')}:</span> {t('smart_nudges.about.follow_up_body')}</li>
               </ul>
             </div>
           </div>
@@ -309,22 +317,22 @@ export default function SmartNudgesAdminPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard icon={Bell} label="Sent (30d)" value={String(stats.sent_30d)} color="primary" />
+        <StatCard icon={Bell} label={t('smart_nudges.stats.sent_30d')} value={String(stats.sent_30d)} color="primary" />
         <StatCard
           icon={TrendingUp}
-          label="Conversion (30d)"
+          label={t('smart_nudges.stats.conversion_30d')}
           value={`${(stats.conversion_rate_30d * 100).toFixed(1)}%`}
           color="success"
         />
-        <StatCard icon={Bell} label="Eligible candidates" value={String(data.eligible_candidates)} color="warning" />
-        <StatCard icon={Bell} label="Opted out" value={String(stats.opted_out_members)} color="default" />
+        <StatCard icon={Bell} label={t('smart_nudges.stats.eligible_candidates')} value={String(data.eligible_candidates)} color="warning" />
+        <StatCard icon={Bell} label={t('smart_nudges.stats.opted_out')} value={String(stats.opted_out_members)} color="default" />
       </div>
 
       {/* Chart */}
       <Card>
         <CardHeader className="flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-primary" />
-          <h2 className="text-base font-semibold">Daily nudges (last 30 days)</h2>
+          <h2 className="text-base font-semibold">{t('smart_nudges.chart.title')}</h2>
         </CardHeader>
         <Divider />
         <CardBody>
@@ -336,8 +344,8 @@ export default function SmartNudgesAdminPage() {
                 <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="sent" fill="#3b82f6" name="Sent" />
-                <Bar dataKey="converted" fill="#22c55e" name="Converted" />
+                <Bar dataKey="sent" fill="#3b82f6" name={chartSeries.sent} />
+                <Bar dataKey="converted" fill="#22c55e" name={chartSeries.converted} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -348,14 +356,14 @@ export default function SmartNudgesAdminPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <Bell className="w-5 h-5 text-warning" />
-          <h2 className="text-base font-semibold">Configuration</h2>
+          <h2 className="text-base font-semibold">{t('smart_nudges.config.title')}</h2>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Engine enabled</p>
-              <p className="text-xs text-default-500">When off, no nudges are dispatched.</p>
+              <p className="text-sm font-medium">{t('smart_nudges.config.engine_enabled')}</p>
+              <p className="text-xs text-default-500">{t('smart_nudges.config.engine_description')}</p>
             </div>
             <Switch
               isSelected={config.enabled}
@@ -366,7 +374,7 @@ export default function SmartNudgesAdminPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
-              label="Minimum score (0.40 - 0.95)"
+              label={t('smart_nudges.config.min_score')}
               type="number"
               min="0.40"
               max="0.95"
@@ -375,10 +383,10 @@ export default function SmartNudgesAdminPage() {
               onValueChange={(v) =>
                 setConfig({ ...config, min_score: Math.max(0.4, Math.min(0.95, parseFloat(v) || 0.55)) })
               }
-              description="Tandem-match score threshold for sending a nudge"
+              description={t('smart_nudges.config.min_score_description')}
             />
             <Input
-              label="Cooldown (days)"
+              label={t('smart_nudges.config.cooldown_days')}
               type="number"
               min="1"
               max="90"
@@ -387,10 +395,10 @@ export default function SmartNudgesAdminPage() {
               onValueChange={(v) =>
                 setConfig({ ...config, cooldown_days: Math.max(1, Math.min(90, parseInt(v, 10) || 14)) })
               }
-              description="Wait this long before nudging the same pair again"
+              description={t('smart_nudges.config.cooldown_description')}
             />
             <Input
-              label="Daily limit"
+              label={t('smart_nudges.config.daily_limit')}
               type="number"
               min="1"
               max="250"
@@ -399,7 +407,7 @@ export default function SmartNudgesAdminPage() {
               onValueChange={(v) =>
                 setConfig({ ...config, daily_limit: Math.max(1, Math.min(250, parseInt(v, 10) || 25)) })
               }
-              description="Maximum nudges per day across the whole tenant"
+              description={t('smart_nudges.config.daily_limit_description')}
             />
           </div>
 
@@ -410,10 +418,10 @@ export default function SmartNudgesAdminPage() {
               onPress={() => void handleSaveConfig()}
               isLoading={savingConfig}
             >
-              Save configuration
+              {t('smart_nudges.actions.save_configuration')}
             </Button>
             <p className="text-xs text-default-400">
-              Changes take effect immediately — the next scheduled nudge run will apply the new settings.
+              {t('smart_nudges.config.save_note')}
             </p>
           </div>
         </CardBody>
@@ -424,21 +432,21 @@ export default function SmartNudgesAdminPage() {
         <Card>
           <CardHeader className="flex items-center gap-2">
             <FlaskConical className="w-5 h-5 text-secondary" />
-            <h2 className="text-base font-semibold">Dry-run preview</h2>
+            <h2 className="text-base font-semibold">{t('smart_nudges.dry_run.title')}</h2>
             <Chip size="sm" variant="flat" className="ml-auto">
-              {dryResult.candidates?.length ?? 0} candidates
+              {t('smart_nudges.dry_run.candidates', { count: dryResult.candidates?.length ?? 0 })}
             </Chip>
           </CardHeader>
           <Divider />
           <CardBody>
             {!dryResult.candidates || dryResult.candidates.length === 0 ? (
-              <p className="text-sm text-default-500">No eligible candidates right now.</p>
+              <p className="text-sm text-default-500">{t('smart_nudges.dry_run.empty')}</p>
             ) : (
-              <Table aria-label="Dry-run nudge candidates" removeWrapper>
+              <Table aria-label={t('smart_nudges.dry_run.table_aria')} removeWrapper>
                 <TableHeader>
-                  <TableColumn>Target user</TableColumn>
-                  <TableColumn>Suggested partner</TableColumn>
-                  <TableColumn align="end">Score</TableColumn>
+                  <TableColumn>{t('smart_nudges.table.target_user')}</TableColumn>
+                  <TableColumn>{t('smart_nudges.table.suggested_partner')}</TableColumn>
+                  <TableColumn align="end">{t('smart_nudges.table.score')}</TableColumn>
                 </TableHeader>
                 <TableBody>
                   {dryResult.candidates.map((c, i) => (
@@ -459,7 +467,7 @@ export default function SmartNudgesAdminPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <Bell className="w-5 h-5 text-default-500" />
-          <h2 className="text-base font-semibold">Recent nudges</h2>
+          <h2 className="text-base font-semibold">{t('smart_nudges.recent.title')}</h2>
           <Chip size="sm" variant="flat" className="ml-auto">
             {data.recent.length}
           </Chip>
@@ -467,15 +475,15 @@ export default function SmartNudgesAdminPage() {
         <Divider />
         <CardBody className="p-0">
           {data.recent.length === 0 ? (
-            <div className="text-center py-12 text-sm text-default-500">No nudges sent yet.</div>
+            <div className="text-center py-12 text-sm text-default-500">{t('smart_nudges.recent.empty')}</div>
           ) : (
-            <Table aria-label="Recent smart nudges" removeWrapper>
+            <Table aria-label={t('smart_nudges.recent.table_aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>Sent</TableColumn>
-                <TableColumn>Target</TableColumn>
-                <TableColumn>Suggested partner</TableColumn>
-                <TableColumn align="end">Score</TableColumn>
-                <TableColumn>Status</TableColumn>
+                <TableColumn>{t('smart_nudges.table.sent')}</TableColumn>
+                <TableColumn>{t('smart_nudges.table.target')}</TableColumn>
+                <TableColumn>{t('smart_nudges.table.suggested_partner')}</TableColumn>
+                <TableColumn align="end">{t('smart_nudges.table.score')}</TableColumn>
+                <TableColumn>{t('smart_nudges.table.status')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {data.recent.map((r) => (
@@ -490,7 +498,7 @@ export default function SmartNudgesAdminPage() {
                         variant="flat"
                         color={r.status === 'converted' ? 'success' : 'default'}
                       >
-                        {r.status}
+                        {statusLabel(r.status)}
                       </Chip>
                     </TableCell>
                   </TableRow>
@@ -504,19 +512,19 @@ export default function SmartNudgesAdminPage() {
       {/* Confirm dispatch modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalContent>
-          <ModalHeader>Dispatch nudges now?</ModalHeader>
+          <ModalHeader>{t('smart_nudges.dispatch_modal.title')}</ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-600">
-              This will send up to <strong>{config.daily_limit}</strong> nudge notifications to eligible
-              members right now. Make sure you've reviewed a dry-run first.
+              {t('smart_nudges.dispatch_modal.body_prefix')} <strong>{config.daily_limit}</strong>{' '}
+              {t('smart_nudges.dispatch_modal.body_suffix')}
             </p>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onClose}>
-              Cancel
+              {t('smart_nudges.actions.cancel')}
             </Button>
             <Button color="primary" onPress={() => void handleDispatch(false)} isLoading={running}>
-              Dispatch
+              {t('smart_nudges.actions.dispatch')}
             </Button>
           </ModalFooter>
         </ModalContent>
