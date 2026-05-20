@@ -13,7 +13,7 @@
  * - Apply a manual admin attestation
  * - Revoke an existing verification
  *
- * Admin English only — no t() calls.
+ * Admin UI text is translated through the admin namespace.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -44,6 +44,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Globe from 'lucide-react/icons/globe';
 import Stamp from 'lucide-react/icons/stamp';
 import Trash2 from 'lucide-react/icons/trash-2';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -71,8 +72,9 @@ interface VerificationResponse {
 }
 
 export default function MunicipalVerificationAdminPage() {
+  const { t } = useTranslation('admin');
   const toast = useToast();
-  usePageTitle('Municipal verification');
+  usePageTitle(t('municipal_verification.meta.page_title'));
 
   const [data, setData] = useState<VerificationResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -99,16 +101,16 @@ export default function MunicipalVerificationAdminPage() {
       if (res.success && res.data) {
         setData(res.data);
       } else {
-        toast.error(res.error || 'Failed to load verification status');
+        toast.error(res.error || t('municipal_verification.toasts.load_failed'));
       }
     } catch (err) {
       logError('MunicipalVerificationAdminPage: load failed', err);
-      toast.error('Failed to load verification status');
+      toast.error(t('municipal_verification.toasts.load_failed'));
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => {
     void load();
@@ -116,7 +118,7 @@ export default function MunicipalVerificationAdminPage() {
 
   const handleStartDns = useCallback(async () => {
     if (!dnsDomain.trim()) {
-      toast.error('Enter a domain');
+      toast.error(t('municipal_verification.validation.domain_required'));
       return;
     }
     setSubmittingDns(true);
@@ -126,23 +128,23 @@ export default function MunicipalVerificationAdminPage() {
         { domain: dnsDomain.trim() },
       );
       if (res.success) {
-        toast.success('DNS verification token generated');
+        toast.success(t('municipal_verification.toasts.dns_generated'));
         setDnsDomain('');
         void load();
       } else {
-        toast.error(res.error || 'Failed to start DNS verification');
+        toast.error(res.error || t('municipal_verification.toasts.dns_failed'));
       }
     } catch (err) {
       logError('MunicipalVerificationAdminPage: start DNS failed', err);
-      toast.error('Failed to start DNS verification');
+      toast.error(t('municipal_verification.toasts.dns_failed'));
     } finally {
       setSubmittingDns(false);
     }
-  }, [dnsDomain, toast, load]);
+  }, [dnsDomain, toast, load, t]);
 
   const handleAttest = useCallback(async () => {
     if (!attestDomain.trim()) {
-      toast.error('Enter a domain');
+      toast.error(t('municipal_verification.validation.domain_required'));
       return;
     }
     setSubmittingAttest(true);
@@ -152,20 +154,20 @@ export default function MunicipalVerificationAdminPage() {
         attestation_note: attestNote.trim(),
       });
       if (res.success) {
-        toast.success('Verification attested');
+        toast.success(t('municipal_verification.toasts.attested'));
         setAttestDomain('');
         setAttestNote('');
         void load();
       } else {
-        toast.error(res.error || 'Failed to attest verification');
+        toast.error(res.error || t('municipal_verification.toasts.attest_failed'));
       }
     } catch (err) {
       logError('MunicipalVerificationAdminPage: attest failed', err);
-      toast.error('Failed to attest verification');
+      toast.error(t('municipal_verification.toasts.attest_failed'));
     } finally {
       setSubmittingAttest(false);
     }
-  }, [attestDomain, attestNote, toast, load]);
+  }, [attestDomain, attestNote, toast, load, t]);
 
   const handleRevoke = useCallback(async () => {
     if (!revokeTarget) return;
@@ -176,20 +178,20 @@ export default function MunicipalVerificationAdminPage() {
         {},
       );
       if (res.success) {
-        toast.success('Verification revoked');
+        toast.success(t('municipal_verification.toasts.revoked'));
         closeRevoke();
         setRevokeTarget(null);
         void load();
       } else {
-        toast.error(res.error || 'Failed to revoke verification');
+        toast.error(res.error || t('municipal_verification.toasts.revoke_failed'));
       }
     } catch (err) {
       logError('MunicipalVerificationAdminPage: revoke failed', err);
-      toast.error('Failed to revoke verification');
+      toast.error(t('municipal_verification.toasts.revoke_failed'));
     } finally {
       setSubmittingRevoke(false);
     }
-  }, [revokeTarget, toast, load, closeRevoke]);
+  }, [revokeTarget, toast, load, closeRevoke, t]);
 
   if (loading || !data) {
     return (
@@ -206,14 +208,14 @@ export default function MunicipalVerificationAdminPage() {
     if (status === 'verified') {
       return (
         <Chip color="success" variant="flat" size="sm" startContent={<ShieldCheck className="w-3.5 h-3.5" />}>
-          Verified
+          {t('municipal_verification.status.verified')}
         </Chip>
       );
     }
     if (status === 'pending') {
       return (
         <Chip color="warning" variant="flat" size="sm">
-          Pending DNS
+          {t('municipal_verification.status.pending_dns')}
         </Chip>
       );
     }
@@ -227,8 +229,8 @@ export default function MunicipalVerificationAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Municipal verification"
-        description="Mark this community as a verified municipal partner. Adds a 'Verified municipality' badge to public reports."
+        title={t('municipal_verification.meta.title')}
+        description={t('municipal_verification.meta.description')}
         actions={
           <Button
             size="sm"
@@ -237,7 +239,7 @@ export default function MunicipalVerificationAdminPage() {
             onPress={() => void load()}
             isDisabled={refreshing}
           >
-            Refresh
+            {t('municipal_verification.actions.refresh')}
           </Button>
         }
       />
@@ -248,18 +250,14 @@ export default function MunicipalVerificationAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('municipal_verification.about.title')}</p>
               <p className="text-default-600">
-                Municipal Verification records the formal sign-off from a municipality or canton
-                partner that this community care programme meets their requirements. Verification is
-                required for the Pilot Launch Readiness check and unlocks the Municipal Impact
-                Report. Use DNS TXT verification for official municipal domains, or apply an admin
-                attestation if DNS control is not available.
+                {t('municipal_verification.about.body')}
               </p>
               <div className="space-y-0.5 pt-1 text-default-500">
-                <p><strong>Pending DNS:</strong> Verification token generated — awaiting DNS propagation and confirmation.</p>
-                <p><strong>Verified:</strong> Formally verified — the municipal reporting pack is unlocked.</p>
-                <p><strong>Revoked:</strong> Verification was removed — re-verify to restore access.</p>
+                <p><strong>{t('municipal_verification.status.pending_dns')}:</strong> {t('municipal_verification.about.pending_dns')}</p>
+                <p><strong>{t('municipal_verification.status.verified')}:</strong> {t('municipal_verification.about.verified')}</p>
+                <p><strong>{t('municipal_verification.status.revoked')}:</strong> {t('municipal_verification.about.revoked')}</p>
               </div>
             </div>
           </div>
@@ -274,7 +272,7 @@ export default function MunicipalVerificationAdminPage() {
           ) : (
             <ShieldAlert className="w-5 h-5 text-default-400" />
           )}
-          <h2 className="text-base font-semibold">Current status</h2>
+          <h2 className="text-base font-semibold">{t('municipal_verification.current.title')}</h2>
         </CardHeader>
         <Divider />
         <CardBody>
@@ -286,7 +284,7 @@ export default function MunicipalVerificationAdminPage() {
               </div>
               {active.verified_at && (
                 <p className="text-xs text-default-500">
-                  Verified on {new Date(active.verified_at).toLocaleString()}
+                  {t('municipal_verification.current.verified_on', { date: new Date(active.verified_at).toLocaleString() })}
                 </p>
               )}
               {active.attestation_note && (
@@ -295,8 +293,7 @@ export default function MunicipalVerificationAdminPage() {
             </div>
           ) : (
             <p className="text-sm text-default-500">
-              This tenant is not currently verified. Use the options below to start a DNS verification or
-              apply a manual admin attestation.
+              {t('municipal_verification.current.not_verified')}
             </p>
           )}
         </CardBody>
@@ -306,20 +303,19 @@ export default function MunicipalVerificationAdminPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <Globe className="w-5 h-5 text-primary" />
-          <h2 className="text-base font-semibold">Request verification</h2>
+          <h2 className="text-base font-semibold">{t('municipal_verification.request.title')}</h2>
         </CardHeader>
         <Divider />
         <CardBody>
-          <Tabs aria-label="Verification method">
-            <Tab key="dns" title="DNS TXT (preferred)">
+          <Tabs aria-label={t('municipal_verification.request.method_aria')}>
+            <Tab key="dns" title={t('municipal_verification.request.dns_tab')}>
               <div className="space-y-3 pt-3">
                 <p className="text-sm text-default-600">
-                  Provide the official municipality domain you control. We'll generate a DNS TXT record
-                  for you to publish; once it propagates, the system marks this tenant as verified.
+                  {t('municipal_verification.request.dns_body')}
                 </p>
                 <Input
-                  label="Municipality domain"
-                  placeholder="e.g. zurich.ch"
+                  label={t('municipal_verification.fields.municipality_domain')}
+                  placeholder={t('municipal_verification.fields.domain_placeholder')}
                   value={dnsDomain}
                   onValueChange={setDnsDomain}
                   startContent={<Globe className="w-4 h-4 text-default-400" />}
@@ -330,26 +326,25 @@ export default function MunicipalVerificationAdminPage() {
                     onPress={() => void handleStartDns()}
                     isLoading={submittingDns}
                   >
-                    Generate DNS token
+                    {t('municipal_verification.actions.generate_dns_token')}
                   </Button>
                 </div>
               </div>
             </Tab>
-            <Tab key="attest" title="Admin attestation">
+            <Tab key="attest" title={t('municipal_verification.request.attestation_tab')}>
               <div className="space-y-3 pt-3">
                 <p className="text-sm text-default-600">
-                  Use this only when DNS control is not available. The verification is recorded as
-                  manually attested by an admin.
+                  {t('municipal_verification.request.attestation_body')}
                 </p>
                 <Input
-                  label="Domain or organisation"
-                  placeholder="e.g. zurich.ch"
+                  label={t('municipal_verification.fields.domain_or_organisation')}
+                  placeholder={t('municipal_verification.fields.domain_placeholder')}
                   value={attestDomain}
                   onValueChange={setAttestDomain}
                 />
                 <Textarea
-                  label="Attestation note (optional)"
-                  description="Why are you attesting this without DNS verification? (Audit trail.)"
+                  label={t('municipal_verification.fields.attestation_note')}
+                  description={t('municipal_verification.fields.attestation_description')}
                   minRows={2}
                   value={attestNote}
                   onValueChange={setAttestNote}
@@ -361,7 +356,7 @@ export default function MunicipalVerificationAdminPage() {
                     onPress={() => void handleAttest()}
                     isLoading={submittingAttest}
                   >
-                    Apply attestation
+                    {t('municipal_verification.actions.apply_attestation')}
                   </Button>
                 </div>
               </div>
@@ -374,7 +369,7 @@ export default function MunicipalVerificationAdminPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <ShieldCheck className="w-5 h-5 text-default-500" />
-          <h2 className="text-base font-semibold">Verifications</h2>
+          <h2 className="text-base font-semibold">{t('municipal_verification.history.title')}</h2>
           <Chip size="sm" variant="flat" className="ml-auto">
             {items.length}
           </Chip>
@@ -383,7 +378,7 @@ export default function MunicipalVerificationAdminPage() {
         <CardBody className="p-0">
           {items.length === 0 ? (
             <div className="text-center py-12 text-sm text-default-500">
-              No verification records yet.
+              {t('municipal_verification.history.empty')}
             </div>
           ) : (
             <div className="divide-y divide-default-200">
@@ -394,10 +389,10 @@ export default function MunicipalVerificationAdminPage() {
                       <div className="flex items-center gap-2">
                         <StatusChip status={item.status} />
                         <span className="font-medium">{item.domain}</span>
-                        <span className="text-xs text-default-500">via {item.method}</span>
+                        <span className="text-xs text-default-500">{t('municipal_verification.history.via_method', { method: item.method })}</span>
                       </div>
                       <p className="text-xs text-default-500 mt-1">
-                        Updated {new Date(item.updated_at).toLocaleString()}
+                        {t('municipal_verification.history.updated', { date: new Date(item.updated_at).toLocaleString() })}
                       </p>
                     </div>
                     {item.status !== 'revoked' && (
@@ -411,26 +406,26 @@ export default function MunicipalVerificationAdminPage() {
                           openRevoke();
                         }}
                       >
-                        Revoke
+                        {t('municipal_verification.actions.revoke')}
                       </Button>
                     )}
                   </div>
 
                   {item.status === 'pending' && item.dns_record_name && item.dns_record_value && (
                     <div className="bg-default-50 border border-default-200 rounded-md p-3 text-sm space-y-2">
-                      <p className="font-medium">Publish this TXT record on your DNS, then wait for propagation:</p>
+                      <p className="font-medium">{t('municipal_verification.dns.publish_record')}</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         <div>
-                          <p className="text-xs text-default-500 uppercase tracking-wide">Record name</p>
+                          <p className="text-xs text-default-500 uppercase tracking-wide">{t('municipal_verification.dns.record_name')}</p>
                           <Code className="text-xs">{item.dns_record_name}</Code>
                         </div>
                         <div>
-                          <p className="text-xs text-default-500 uppercase tracking-wide">Value</p>
+                          <p className="text-xs text-default-500 uppercase tracking-wide">{t('municipal_verification.dns.value')}</p>
                           <Code className="text-xs break-all">{item.dns_record_value}</Code>
                         </div>
                       </div>
                       <p className="text-xs text-default-500">
-                        Type: <Code className="text-xs">TXT</Code> · TTL: <Code className="text-xs">300</Code>
+                        {t('municipal_verification.dns.type_label')}: <Code className="text-xs">{t('municipal_verification.dns.txt_type')}</Code> · {t('municipal_verification.dns.ttl_label')}: <Code className="text-xs">{t('municipal_verification.dns.ttl_value')}</Code>
                       </p>
                     </div>
                   )}
@@ -448,21 +443,21 @@ export default function MunicipalVerificationAdminPage() {
       {/* Revoke modal */}
       <Modal isOpen={revokeOpen} onClose={closeRevoke}>
         <ModalContent>
-          <ModalHeader>Revoke verification?</ModalHeader>
+          <ModalHeader>{t('municipal_verification.revoke_modal.title')}</ModalHeader>
           <ModalBody>
             {revokeTarget && (
               <p className="text-sm text-default-600">
-                Revoke verification for <strong>{revokeTarget.domain}</strong>? This removes the verified
-                badge and the verification record will be marked as revoked.
+                {t('municipal_verification.revoke_modal.body_prefix')}{' '}
+                <strong>{revokeTarget.domain}</strong>? {t('municipal_verification.revoke_modal.body_suffix')}
               </p>
             )}
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={closeRevoke}>
-              Cancel
+              {t('municipal_verification.actions.cancel')}
             </Button>
             <Button color="danger" onPress={() => void handleRevoke()} isLoading={submittingRevoke}>
-              Revoke
+              {t('municipal_verification.actions.revoke')}
             </Button>
           </ModalFooter>
         </ModalContent>

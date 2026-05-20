@@ -3614,6 +3614,84 @@
       "load_failed": "Failed to load integration showcase"
     }
   },
+  "municipal_verification": {
+    "meta": {
+      "page_title": "Municipal verification",
+      "title": "Municipal verification",
+      "description": "Mark this community as a verified municipal partner. Adds a 'Verified municipality' badge to public reports."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "generate_dns_token": "Generate DNS token",
+      "apply_attestation": "Apply attestation",
+      "revoke": "Revoke",
+      "cancel": "Cancel"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Municipal Verification records the formal sign-off from a municipality or canton partner that this community care programme meets their requirements. Verification is required for the Pilot Launch Readiness check and unlocks the Municipal Impact Report. Use DNS TXT verification for official municipal domains, or apply an admin attestation if DNS control is not available.",
+      "pending_dns": "Verification token generated - awaiting DNS propagation and confirmation.",
+      "verified": "Formally verified - the municipal reporting pack is unlocked.",
+      "revoked": "Verification was removed - re-verify to restore access."
+    },
+    "status": {
+      "verified": "Verified",
+      "pending_dns": "Pending DNS",
+      "revoked": "Revoked"
+    },
+    "current": {
+      "title": "Current status",
+      "verified_on": "Verified on {{date}}",
+      "not_verified": "This tenant is not currently verified. Use the options below to start a DNS verification or apply a manual admin attestation."
+    },
+    "request": {
+      "title": "Request verification",
+      "method_aria": "Verification method",
+      "dns_tab": "DNS TXT (preferred)",
+      "dns_body": "Provide the official municipality domain you control. We'll generate a DNS TXT record for you to publish; once it propagates, the system marks this tenant as verified.",
+      "attestation_tab": "Admin attestation",
+      "attestation_body": "Use this only when DNS control is not available. The verification is recorded as manually attested by an admin."
+    },
+    "fields": {
+      "municipality_domain": "Municipality domain",
+      "domain_or_organisation": "Domain or organisation",
+      "domain_placeholder": "e.g. zurich.ch",
+      "attestation_note": "Attestation note (optional)",
+      "attestation_description": "Why are you attesting this without DNS verification? (Audit trail.)"
+    },
+    "history": {
+      "title": "Verifications",
+      "empty": "No verification records yet.",
+      "via_method": "via {{method}}",
+      "updated": "Updated {{date}}"
+    },
+    "dns": {
+      "publish_record": "Publish this TXT record on your DNS, then wait for propagation:",
+      "record_name": "Record name",
+      "value": "Value",
+      "type_label": "Type",
+      "ttl_label": "TTL",
+      "txt_type": "TXT",
+      "ttl_value": "300"
+    },
+    "revoke_modal": {
+      "title": "Revoke verification?",
+      "body_prefix": "Revoke verification for",
+      "body_suffix": "This removes the verified badge and the verification record will be marked as revoked."
+    },
+    "validation": {
+      "domain_required": "Enter a domain"
+    },
+    "toasts": {
+      "load_failed": "Failed to load verification status",
+      "dns_generated": "DNS verification token generated",
+      "dns_failed": "Failed to start DNS verification",
+      "attested": "Verification attested",
+      "attest_failed": "Failed to attest verification",
+      "revoked": "Verification revoked",
+      "revoke_failed": "Failed to revoke verification"
+    }
+  },
   "federation_peers_admin": {
     "meta": {
       "page_title": "Federation Peers - Admin",
