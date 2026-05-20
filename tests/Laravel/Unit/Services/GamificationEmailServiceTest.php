@@ -52,4 +52,14 @@ class GamificationEmailServiceTest extends TestCase
         $this->assertStringNotContainsString("?? 'Badge'", $source);
         $this->assertStringNotContainsString("?? 'a new badge'", $source);
     }
+
+    public function test_gamification_milestone_email_service_is_wired_to_badge_and_level_events(): void
+    {
+        $source = file_get_contents(app_path('Services/GamificationService.php'));
+
+        $this->assertStringContainsString("sendMilestoneEmail(\$userId, 'badge_earned'", $source);
+        $this->assertStringContainsString("sendMilestoneEmail(\$userId, 'level_up'", $source);
+        $this->assertStringContainsString('GamificationService: badge milestone email failed', $source);
+        $this->assertStringContainsString('GamificationService: level milestone email failed', $source);
+    }
 }

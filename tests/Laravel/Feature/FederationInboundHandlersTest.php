@@ -462,6 +462,17 @@ class FederationInboundHandlersTest extends TestCase
         ]);
     }
 
+    public function test_external_webhook_delivery_paths_keep_explicit_tenant_predicates(): void
+    {
+        $source = file_get_contents(app_path('Http/Controllers/Api/FederationExternalWebhookController.php'));
+
+        $this->assertStringContainsString("->where('tenant_id', \$tenantId)\n            ->where('external_partner_id', \$partner->id)", $source);
+        $this->assertStringContainsString("->where('id', \$existing->id)\n                ->where('tenant_id', \$tenantId)", $source);
+        $this->assertStringContainsString("->where('external_idempotency_key', \$idempotencyKey)\n                ->where('receiver_tenant_id', (int) \$partner->tenant_id)", $source);
+        $this->assertStringContainsString("->where('external_partner_id', \$partner->id)\n            ->where('receiver_tenant_id', (int) \$partner->tenant_id)", $source);
+        $this->assertStringContainsString("->where('id', \$transactionId)\n                    ->where('receiver_tenant_id', \$receiverTenantId)", $source);
+    }
+
     public function test_connection_requested_sends_one_email_and_bell_on_partner_retry(): void
     {
         $localUser = User::factory()->forTenant($this->testTenantId)->create([

@@ -486,9 +486,11 @@ class FederationExternalWebhookController extends BaseApiController
             $tx = DB::table('federation_transactions')
                 ->where('external_transaction_id', $externalTxId)
                 ->where('external_partner_id', $partner->id)
+                ->where('receiver_tenant_id', $tenantId)
                 ->first(['id']);
             if ($tx) {
                 $existing = DB::table('reviews')
+                    ->where('tenant_id', $tenantId)
                     ->where('federation_transaction_id', $tx->id)
                     ->where('reviewer_id', $reviewerExternalId)
                     ->where('receiver_id', $receiverId)
@@ -741,6 +743,7 @@ class FederationExternalWebhookController extends BaseApiController
         $message = $this->optionalString($data, 'message', 1000);
 
         $existing = DB::table('federation_inbound_connections')
+            ->where('tenant_id', $tenantId)
             ->where('external_partner_id', $partner->id)
             ->where('local_user_id', $localUserId)
             ->where('external_user_id', $externalUserId)
@@ -771,7 +774,10 @@ class FederationExternalWebhookController extends BaseApiController
                 $row['email_failed_at'] = null;
                 $row['email_last_error'] = null;
             }
-            DB::table('federation_inbound_connections')->where('id', $existing->id)->update($row);
+            DB::table('federation_inbound_connections')
+                ->where('id', $existing->id)
+                ->where('tenant_id', $tenantId)
+                ->update($row);
             $localId = (int) $existing->id;
         } else {
             $row['created_at'] = now();
@@ -1430,6 +1436,7 @@ class FederationExternalWebhookController extends BaseApiController
         if ($idempotencyKey !== null && $this->federationTransactionsSupportsIdempotencyKey()) {
             return DB::table('federation_transactions')
                 ->where('external_idempotency_key', $idempotencyKey)
+                ->where('receiver_tenant_id', (int) $partner->tenant_id)
                 ->first();
         }
 
@@ -1440,6 +1447,7 @@ class FederationExternalWebhookController extends BaseApiController
         return DB::table('federation_transactions')
             ->where('external_transaction_id', trim($externalTxId))
             ->where('external_partner_id', $partner->id)
+            ->where('receiver_tenant_id', (int) $partner->tenant_id)
             ->first();
     }
 
@@ -1473,6 +1481,7 @@ class FederationExternalWebhookController extends BaseApiController
 
                 DB::table('federation_transactions')
                     ->where('id', $transactionId)
+                    ->where('receiver_tenant_id', $receiverTenantId)
                     ->whereNull('notification_sent_at')
                     ->update(['notification_sent_at' => now()]);
             }
@@ -1492,6 +1501,7 @@ class FederationExternalWebhookController extends BaseApiController
 
             DB::table('federation_transactions')
                 ->where('id', $transactionId)
+                ->where('receiver_tenant_id', $receiverTenantId)
                 ->update([
                     'email_sent_at' => $emailSent ? now() : null,
                     'email_failed_at' => $emailSent ? null : now(),

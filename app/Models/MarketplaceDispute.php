@@ -29,6 +29,9 @@ class MarketplaceDispute extends Model
         'resolved_by',
         'resolved_at',
         'refund_amount',
+        'notification_email_sent_at',
+        'notification_email_failed_at',
+        'notification_email_last_error',
     ];
 
     /**
@@ -43,6 +46,8 @@ class MarketplaceDispute extends Model
         'order_id' => 'integer',
         'opened_by' => 'integer',
         'resolved_by' => 'integer',
+        'notification_email_sent_at' => 'datetime',
+        'notification_email_failed_at' => 'datetime',
     ];
 
     // ---------------------------------------------------------------

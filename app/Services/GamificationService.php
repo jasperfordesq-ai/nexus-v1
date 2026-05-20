@@ -515,6 +515,21 @@ class GamificationService
             Log::debug('Gamification broadcast failed', ['error' => $e->getMessage()]);
         }
 
+        try {
+            app(GamificationEmailService::class)->sendMilestoneEmail($userId, 'badge_earned', [
+                'badge_key' => $badge['key'],
+                'badge_name' => $badge['name'],
+                'name' => $badge['name'],
+                'icon' => $badge['icon'],
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('GamificationService: badge milestone email failed', [
+                'user_id' => $userId,
+                'badge_key' => $badge['key'] ?? null,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         // Create feed activity post for badge earned
         try {
             $tenantId = TenantContext::getId();
@@ -653,6 +668,18 @@ class GamificationService
                     app(GamificationRealtimeService::class)->broadcastLevelUp($userId, $newLevel);
                 } catch (\Throwable $e) {
                     Log::debug('Gamification broadcast failed', ['error' => $e->getMessage()]);
+                }
+
+                try {
+                    app(GamificationEmailService::class)->sendMilestoneEmail($userId, 'level_up', [
+                        'level' => $newLevel,
+                    ]);
+                } catch (\Throwable $e) {
+                    Log::warning('GamificationService: level milestone email failed', [
+                        'user_id' => $userId,
+                        'level' => $newLevel,
+                        'error' => $e->getMessage(),
+                    ]);
                 }
 
                 // Create feed activity post for level up

@@ -93,7 +93,7 @@ class MarketplaceRatingService
             if (!$sellerRating->is_anonymous) {
                 try {
                     $link = '/marketplace/orders/' . $orderId;
-                    self::sendRatingEmail(
+                    $emailSent = self::sendRatingEmail(
                         $rateeId,
                         'emails_misc.marketplace_rating.received_subject',
                         [],
@@ -103,9 +103,12 @@ class MarketplaceRatingService
                             'rating'       => $rating,
                             'order_number' => $order->order_number,
                         ],
-                        $link
+                        $link,
+                        'marketplace_rating'
                     );
+                    self::markRatingNotificationEmail($sellerRating, $emailSent, $emailSent ? null : 'Marketplace rating notification email returned false');
                 } catch (\Throwable $e) {
+                    self::markRatingNotificationEmail($sellerRating, false, $e->getMessage());
                     Log::warning('[MarketplaceRatingService] rateOrder email failed: ' . $e->getMessage());
                 }
             }
@@ -199,15 +202,6 @@ class MarketplaceRatingService
                 throw new \InvalidArgumentException('Cannot dispute a cancelled or refunded order.');
             }
 
-            // Check for existing open dispute
-            $existingDispute = MarketplaceDispute::where('order_id', $orderId)
-                ->whereNotIn('status', ['closed'])
-                ->first();
-
-            if ($existingDispute) {
-                throw new \InvalidArgumentException('A dispute already exists for this order.');
-            }
-
             $validReasons = ['not_received', 'not_as_described', 'damaged', 'wrong_item', 'other'];
             $reason = $data['reason'] ?? '';
             if (!in_array($reason, $validReasons, true)) {
@@ -215,6 +209,22 @@ class MarketplaceRatingService
             }
 
             $dispute = DB::transaction(function () use ($order, $orderId, $userId, $data, $reason, $tenantId) {
+                MarketplaceOrder::withoutGlobalScopes()
+                    ->whereKey($orderId)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $existingDispute = MarketplaceDispute::where('order_id', $orderId)
+                    ->where('tenant_id', $tenantId)
+                    ->whereNotIn('status', ['closed'])
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($existingDispute) {
+                    throw new \InvalidArgumentException('A dispute already exists for this order.');
+                }
+
                 $dispute = new MarketplaceDispute();
                 $dispute->tenant_id = $tenantId;
                 $dispute->order_id = $orderId;
@@ -236,16 +246,19 @@ class MarketplaceRatingService
             try {
                 $otherPartyId = ($userId === (int) $order->buyer_id) ? (int) $order->seller_id : (int) $order->buyer_id;
                 $link = '/marketplace/orders/' . $orderId;
-                self::sendRatingEmail(
+                $emailSent = self::sendRatingEmail(
                     $otherPartyId,
                     'emails_misc.marketplace_dispute.opened_subject',
                     ['order_number' => $order->order_number],
                     'emails_misc.marketplace_dispute.opened_title',
                     'emails_misc.marketplace_dispute.opened_body',
                     ['order_number' => $order->order_number],
-                    $link
+                    $link,
+                    'marketplace_order'
                 );
+                self::markDisputeNotificationEmail($dispute, $emailSent, $emailSent ? null : 'Marketplace dispute notification email returned false');
             } catch (\Throwable $e) {
+                self::markDisputeNotificationEmail($dispute, false, $e->getMessage());
                 Log::warning('[MarketplaceRatingService] openDispute email failed: ' . $e->getMessage());
             }
 
@@ -283,18 +296,18 @@ class MarketplaceRatingService
     //  Helpers
     // -----------------------------------------------------------------
 
-    private static function sendRatingEmail(int $userId, string $subjectKey, array $subjectParams, string $titleKey, string $bodyKey, array $bodyParams, string $link): void
+    private static function sendRatingEmail(int $userId, string $subjectKey, array $subjectParams, string $titleKey, string $bodyKey, array $bodyParams, string $link, string $category): bool
     {
         $tenantId = TenantContext::getId();
         $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language', 'tenant_id'])->first();
 
         if (!$user || empty($user->email)) {
-            return;
+            return false;
         }
 
         $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $fullUrl, $userId, $tenantId): void {
+        return (bool) LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $fullUrl, $userId, $tenantId, $category): bool {
             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
             $html = EmailTemplateBuilder::make()
@@ -304,10 +317,31 @@ class MarketplaceRatingService
                 ->button(__('emails_misc.marketplace_rating.received_cta'), $fullUrl)
                 ->render();
 
-            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_rating', ['tenant_id' => $tenantId])) {
+            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, $category, ['tenant_id' => $tenantId])) {
                 Log::warning('[MarketplaceRatingService] email failed', ['user_id' => $userId]);
+                return false;
             }
+
+            return true;
         });
+    }
+
+    private static function markRatingNotificationEmail(MarketplaceSellerRating $rating, bool $sent, ?string $error): void
+    {
+        $rating->forceFill([
+            'notification_email_sent_at' => $sent ? now() : null,
+            'notification_email_failed_at' => $sent ? null : now(),
+            'notification_email_last_error' => $sent ? null : ($error !== null ? mb_substr($error, 0, 2000) : null),
+        ])->save();
+    }
+
+    private static function markDisputeNotificationEmail(MarketplaceDispute $dispute, bool $sent, ?string $error): void
+    {
+        $dispute->forceFill([
+            'notification_email_sent_at' => $sent ? now() : null,
+            'notification_email_failed_at' => $sent ? null : now(),
+            'notification_email_last_error' => $sent ? null : ($error !== null ? mb_substr($error, 0, 2000) : null),
+        ])->save();
     }
 
     private static function formatRating(MarketplaceSellerRating $rating): array

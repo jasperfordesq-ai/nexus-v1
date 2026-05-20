@@ -336,6 +336,7 @@ class VereinDuesService
         $emailSent = $this->sendReminderEmail((int) $dues->user_id, (int) $dues->organization_id, (int) $dues->membership_year, (int) $dues->amount_cents, (string) $dues->currency, (string) $dues->due_date);
 
         if (!$emailSent) {
+            $this->markReminderEmailFailed($duesId, $tenantId, 'Verein dues reminder email returned false');
             return ['dues_id' => $duesId, 'sent' => false];
         }
 
@@ -345,6 +346,8 @@ class VereinDuesService
             ->update([
             'reminder_count' => DB::raw('reminder_count + 1'),
             'last_reminder_at' => now(),
+            'reminder_email_failed_at' => null,
+            'reminder_email_last_error' => null,
             'updated_at' => now(),
         ]);
 
@@ -387,6 +390,7 @@ class VereinDuesService
             ->select([
                 'd.id', 'd.user_id', 'd.membership_year', 'd.amount_cents', 'd.currency',
                 'd.status', 'd.due_date', 'd.paid_at', 'd.reminder_count', 'd.last_reminder_at',
+                'd.reminder_email_failed_at', 'd.reminder_email_last_error',
                 'd.waived_reason', 'u.first_name', 'u.last_name', 'u.email',
             ])
             ->orderBy('d.due_date')
@@ -639,6 +643,7 @@ class VereinDuesService
                         'dues_id' => $row->id,
                         'tenant_id' => $row->tenant_id,
                     ]);
+                    $this->markReminderEmailFailed((int) $row->id, (int) $row->tenant_id, 'Verein dues reminder email returned false');
                     continue;
                 }
 
@@ -648,10 +653,13 @@ class VereinDuesService
                     ->update([
                     'reminder_count' => DB::raw('reminder_count + 1'),
                     'last_reminder_at' => now(),
+                    'reminder_email_failed_at' => null,
+                    'reminder_email_last_error' => null,
                     'updated_at' => now(),
                 ]);
                 $sent++;
             } catch (\Throwable $e) {
+                $this->markReminderEmailFailed((int) $row->id, (int) $row->tenant_id, $e->getMessage());
                 Log::warning('VereinDues: reminder send failed', [
                     'dues_id' => $row->id,
                     'error' => $e->getMessage(),
@@ -723,6 +731,18 @@ class VereinDuesService
             '/me/verein-dues',
             'emails.verein_dues.cta_pay'
         );
+    }
+
+    private function markReminderEmailFailed(int $duesId, int $tenantId, string $error): void
+    {
+        DB::table('verein_member_dues')
+            ->where('id', $duesId)
+            ->where('tenant_id', $tenantId)
+            ->update([
+                'reminder_email_failed_at' => now(),
+                'reminder_email_last_error' => mb_substr($error, 0, 2000),
+                'updated_at' => now(),
+            ]);
     }
 
     private function sendReminderEmail(int $userId, int $organizationId, int $year, int $amountCents, string $currency, string $dueDate): bool

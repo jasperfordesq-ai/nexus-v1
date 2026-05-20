@@ -26,6 +26,9 @@ class MarketplaceSellerRating extends Model
         'rating',
         'comment',
         'is_anonymous',
+        'notification_email_sent_at',
+        'notification_email_failed_at',
+        'notification_email_last_error',
     ];
 
     /**
@@ -39,6 +42,8 @@ class MarketplaceSellerRating extends Model
         'order_id' => 'integer',
         'rater_id' => 'integer',
         'ratee_id' => 'integer',
+        'notification_email_sent_at' => 'datetime',
+        'notification_email_failed_at' => 'datetime',
     ];
 
     // ---------------------------------------------------------------

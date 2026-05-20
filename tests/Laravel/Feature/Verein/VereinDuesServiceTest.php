@@ -289,6 +289,47 @@ class VereinDuesServiceTest extends TestCase
         $this->assertSame(1, DB::table('verein_dues_payments')->where('stripe_payment_intent_id', $piId)->count());
     }
 
+    public function test_reminder_failure_is_persisted_for_admin_visibility(): void
+    {
+        app()->instance(EmailDispatchService::class, new class(true) extends EmailDispatchService {
+            public function __construct(private bool $result)
+            {
+            }
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                return $this->result;
+            }
+        });
+
+        $user = $this->makeUser();
+        $this->joinOrg($user);
+        $this->configureFee(6000);
+        $year = (int) date('Y');
+        $this->service->generateAnnualDues($this->organizationId, $year);
+        $duesId = (int) DB::table('verein_member_dues')->where('organization_id', $this->organizationId)->value('id');
+
+        app()->instance(EmailDispatchService::class, new class(false) extends EmailDispatchService {
+            public function __construct(private bool $result)
+            {
+            }
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                return $this->result;
+            }
+        });
+
+        $result = $this->service->sendReminder($duesId);
+
+        $this->assertFalse($result['sent']);
+        $failed = DB::table('verein_member_dues')->where('id', $duesId)->first();
+        $this->assertSame(0, (int) $failed->reminder_count);
+        $this->assertNull($failed->last_reminder_at);
+        $this->assertNotNull($failed->reminder_email_failed_at);
+        $this->assertSame('Verein dues reminder email returned false', $failed->reminder_email_last_error);
+    }
+
     public function test_webhook_paid_email_failure_is_not_treated_as_processed(): void
     {
         app()->instance(EmailDispatchService::class, new class extends EmailDispatchService {
