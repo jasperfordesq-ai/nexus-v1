@@ -15,7 +15,6 @@ import Bookmark from 'lucide-react/icons/bookmark';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Play from 'lucide-react/icons/play';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { useToast, useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -201,7 +200,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
             {t('saved_searches', { count: savedSearches.length })}
           </h4>
           {savedSearches.map((search) => (
-            <GlassCard key={search.id} className="p-3 flex items-center gap-3">
+            <div key={search.id} className="flex items-center gap-3 rounded-lg border border-divider bg-content2/50 p-3">
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-sm text-theme-primary truncate">
                   {search.name}
@@ -219,8 +218,9 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
                 <Tooltip content={t('run_search')}>
                   <Button
                     isIconOnly
-                    size="sm"
+                    size="md"
                     variant="light"
+                    className="h-9 min-w-9"
                     onPress={() => handleRun(search)}
                     aria-label={t('run_search')}
                   >
@@ -230,8 +230,9 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
                 <Tooltip content={t('delete')}>
                   <Button
                     isIconOnly
-                    size="sm"
+                    size="md"
                     variant="light"
+                    className="h-9 min-w-9"
                     onPress={() => handleDelete(search.id)}
                     aria-label={t('delete_saved_search')}
                   >
@@ -239,7 +240,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
                   </Button>
                 </Tooltip>
               </div>
-            </GlassCard>
+            </div>
           ))}
         </div>
       ) : null}
