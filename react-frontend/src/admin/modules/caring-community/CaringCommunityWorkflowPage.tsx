@@ -469,7 +469,10 @@ type PredictiveInsightsCardProps = {
   loading: boolean;
   error: string | null;
   onRefresh: () => void;
+  t: AdminT;
 };
+
+type AdminT = (key: string, options?: Record<string, unknown>) => string;
 
 type ForecastChartPoint = {
   month: string;
@@ -505,19 +508,19 @@ function buildChartData(series: ForecastSeries): ForecastChartPoint[] {
   return points;
 }
 
-function trendChip(series: ForecastSeries): { label: string; color: 'success' | 'warning' | 'default'; icon: typeof TrendingUp } {
+function trendChip(series: ForecastSeries, t: AdminT): { label: string; color: 'success' | 'warning' | 'default'; icon: typeof TrendingUp } {
   if (series.trend === 'growing') {
-    return { label: `Growing ${series.growth_rate_pct.toFixed(0)}%`, color: 'success', icon: TrendingUp };
+    return { label: t('caring_workflow.predictive.trend_growing', { value: series.growth_rate_pct.toFixed(0) }), color: 'success', icon: TrendingUp };
   }
   if (series.trend === 'declining') {
-    return { label: `Declining ${Math.abs(series.growth_rate_pct).toFixed(0)}%`, color: 'warning', icon: TrendingDown };
+    return { label: t('caring_workflow.predictive.trend_declining', { value: Math.abs(series.growth_rate_pct).toFixed(0) }), color: 'warning', icon: TrendingDown };
   }
-  return { label: 'Stable', color: 'default', icon: Minus };
+  return { label: t('caring_workflow.predictive.trend_stable'), color: 'default', icon: Minus };
 }
 
-function ForecastMiniChart({ title, series, valueSuffix }: { title: string; series: ForecastSeries; valueSuffix: string }): JSX.Element {
+function ForecastMiniChart({ title, series, valueSuffix, t }: { title: string; series: ForecastSeries; valueSuffix: string; t: AdminT }): JSX.Element {
   const data = buildChartData(series);
-  const chip = trendChip(series);
+  const chip = trendChip(series, t);
   const ChipIcon = chip.icon;
 
   if (series.history.every((p) => p.hours === 0) && series.forecast.length === 0) {
@@ -525,7 +528,7 @@ function ForecastMiniChart({ title, series, valueSuffix }: { title: string; seri
       <div className="rounded-lg border border-default-200 p-4">
         <div className="text-sm font-semibold text-default-900">{title}</div>
         <div className="mt-3 rounded-md bg-default-100 p-3 text-xs text-default-500">
-          Not enough activity yet to forecast. Come back in a few weeks.
+          {t('caring_workflow.predictive.not_enough_activity')}
         </div>
       </div>
     );
@@ -547,9 +550,9 @@ function ForecastMiniChart({ title, series, valueSuffix }: { title: string; seri
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip
               formatter={(value) => {
-                if (value === null || value === undefined) return '—';
+                if (value === null || value === undefined) return t('caring_workflow.empty.value');
                 const num = typeof value === 'number' ? value : Number(value);
-                return Number.isFinite(num) ? `${num.toFixed(1)} ${valueSuffix}`.trim() : '—';
+                return Number.isFinite(num) ? `${num.toFixed(1)} ${valueSuffix}`.trim() : t('caring_workflow.empty.value');
               }}
               labelStyle={{ fontSize: 12 }}
               contentStyle={{ fontSize: 12 }}
@@ -570,7 +573,7 @@ function ForecastMiniChart({ title, series, valueSuffix }: { title: string; seri
               dot={{ r: 2 }}
               connectNulls={false}
               isAnimationActive={false}
-              name="History"
+              name={t('caring_workflow.predictive.history')}
             />
             <Line
               type="monotone"
@@ -581,13 +584,13 @@ function ForecastMiniChart({ title, series, valueSuffix }: { title: string; seri
               dot={{ r: 2 }}
               connectNulls
               isAnimationActive={false}
-              name="Forecast"
+              name={t('caring_workflow.predictive.forecast')}
             />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
       <div className="mt-1 text-[11px] text-default-400">
-        Confidence: <span className="capitalize">{series.confidence}</span>
+        {t('caring_workflow.predictive.confidence')}: <span className="capitalize">{series.confidence}</span>
       </div>
     </div>
   );
@@ -599,13 +602,13 @@ function alertSeverityChipColor(severity: ForecastAlert['severity']): 'danger' |
   return 'primary';
 }
 
-function alertSeverityLabel(severity: ForecastAlert['severity']): string {
-  if (severity === 'critical') return 'Critical';
-  if (severity === 'warning') return 'Warning';
-  return 'Info';
+function alertSeverityLabel(severity: ForecastAlert['severity'], t: AdminT): string {
+  if (severity === 'critical') return t('caring_workflow.predictive.severity.critical');
+  if (severity === 'warning') return t('caring_workflow.predictive.severity.warning');
+  return t('caring_workflow.predictive.severity.info');
 }
 
-function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: PredictiveInsightsCardProps): JSX.Element {
+function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: PredictiveInsightsCardProps): JSX.Element {
   const isInitialLoading = loading && !forecast;
   const hasAnyHistory = forecast
     ? [forecast.hours, forecast.members, forecast.recipients].some(
@@ -619,10 +622,10 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: Predict
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <BrainCircuit size={18} className="text-primary" />
-            Predictive Insights
+            {t('caring_workflow.predictive.title')}
           </h2>
           <p className="mt-1 text-sm text-default-500">
-            Forward-looking forecasts and proactive alerts. Spot regional care deficits before they become emergencies.
+            {t('caring_workflow.predictive.subtitle')}
           </p>
         </div>
         <Button
@@ -632,7 +635,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: Predict
           isLoading={loading}
           onPress={onRefresh}
         >
-          Refresh
+          {t('caring_workflow.actions.refresh')}
         </Button>
       </CardHeader>
       <Divider />
@@ -645,42 +648,46 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: Predict
           <div className="rounded-lg bg-danger-50 p-4 text-sm text-danger-700 flex items-center justify-between gap-3">
             <span>{error}</span>
             <Button size="sm" variant="flat" color="danger" startContent={<RefreshCw size={14} />} onPress={onRefresh}>
-              Retry
+              {t('caring_workflow.actions.retry')}
             </Button>
           </div>
         ) : !forecast ? (
           <div className="rounded-lg bg-default-100 p-4 text-sm text-default-500">
-            No forecast data available yet.
+            {t('caring_workflow.predictive.no_forecast')}
           </div>
         ) : !hasAnyHistory ? (
           <div className="rounded-lg bg-default-100 p-4 text-sm text-default-500">
-            Not enough activity yet to forecast. Come back in a few weeks.
+            {t('caring_workflow.predictive.not_enough_activity')}
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              <ForecastMiniChart title="Hours forecast" series={forecast.hours} valueSuffix="h" />
-              <ForecastMiniChart title="Active members" series={forecast.members} valueSuffix="" />
-              <ForecastMiniChart title="Recipients reached" series={forecast.recipients} valueSuffix="" />
+              <ForecastMiniChart title={t('caring_workflow.predictive.hours_forecast')} series={forecast.hours} valueSuffix="h" t={t} />
+              <ForecastMiniChart title={t('caring_workflow.predictive.active_members')} series={forecast.members} valueSuffix="" t={t} />
+              <ForecastMiniChart title={t('caring_workflow.predictive.recipients_reached')} series={forecast.recipients} valueSuffix="" t={t} />
             </div>
             {forecast.sub_region_demand && forecast.sub_region_demand.sub_regions.length > 0 && (
               <div className="space-y-2">
                 <div className="text-sm font-semibold text-default-900 flex items-center gap-2">
                   <Info size={14} />
-                  Sub-region coverage (last {forecast.sub_region_demand.window_days.long} days)
+                  {t('caring_workflow.predictive.sub_region_coverage', {
+                    days: forecast.sub_region_demand.window_days.long,
+                  })}
                   {forecast.sub_region_demand.under_supplied_count > 0 && (
                     <Chip size="sm" variant="flat" color="warning">
-                      {forecast.sub_region_demand.under_supplied_count} under-supplied
+                      {t('caring_workflow.predictive.under_supplied_count', {
+                        count: forecast.sub_region_demand.under_supplied_count,
+                      })}
                     </Chip>
                   )}
                 </div>
-                <Table aria-label="Sub-region coverage" removeWrapper>
+                <Table aria-label={t('caring_workflow.predictive.sub_region_coverage_aria')} removeWrapper>
                   <TableHeader>
-                    <TableColumn>Sub-region</TableColumn>
-                    <TableColumn align="end">Requested (90d)</TableColumn>
-                    <TableColumn align="end">Fulfilled (90d)</TableColumn>
-                    <TableColumn align="end">Coverage</TableColumn>
-                    <TableColumn>Status</TableColumn>
+                    <TableColumn>{t('caring_workflow.predictive.columns.sub_region')}</TableColumn>
+                    <TableColumn align="end">{t('caring_workflow.predictive.columns.requested_90d')}</TableColumn>
+                    <TableColumn align="end">{t('caring_workflow.predictive.columns.fulfilled_90d')}</TableColumn>
+                    <TableColumn align="end">{t('caring_workflow.predictive.columns.coverage')}</TableColumn>
+                    <TableColumn>{t('caring_workflow.predictive.columns.status')}</TableColumn>
                   </TableHeader>
                   <TableBody>
                     {forecast.sub_region_demand.sub_regions.map((r) => (
@@ -691,7 +698,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: Predict
                         <TableCell className="text-right tabular-nums">{(r.coverage_ratio_90d * 100).toFixed(0)}%</TableCell>
                         <TableCell>
                           <Chip size="sm" variant="flat" color={r.flagged ? 'warning' : 'default'}>
-                            {r.flagged ? 'Under-supplied' : 'OK'}
+                            {r.flagged ? t('caring_workflow.predictive.status.under_supplied') : t('caring_workflow.predictive.status.ok')}
                           </Chip>
                         </TableCell>
                       </TableRow>
@@ -705,26 +712,32 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: Predict
               <div className="space-y-2">
                 <div className="text-sm font-semibold text-default-900 flex items-center gap-2">
                   <Info size={14} />
-                  Helper churn (lapsed ≥ {forecast.helper_churn.lapsed_threshold_days} days)
+                  {t('caring_workflow.predictive.helper_churn', {
+                    days: forecast.helper_churn.lapsed_threshold_days,
+                  })}
                   <Chip
                     size="sm"
                     variant="flat"
                     color={forecast.helper_churn.overall.churn_rate > 0.3 ? 'warning' : 'default'}
                   >
-                    {(forecast.helper_churn.overall.churn_rate * 100).toFixed(0)}% overall
+                    {t('caring_workflow.predictive.overall_percent', {
+                      value: (forecast.helper_churn.overall.churn_rate * 100).toFixed(0),
+                    })}
                   </Chip>
                 </div>
                 <p className="text-xs text-default-500">
-                  {forecast.helper_churn.overall.lapsed} of {forecast.helper_churn.overall.prior_active} previously
-                  active helpers haven't logged hours recently.
+                  {t('caring_workflow.predictive.helper_churn_note', {
+                    lapsed: forecast.helper_churn.overall.lapsed,
+                    prior: forecast.helper_churn.overall.prior_active,
+                  })}
                 </p>
                 {forecast.helper_churn.by_category.length > 0 && (
-                  <Table aria-label="Helper churn by category" removeWrapper>
+                  <Table aria-label={t('caring_workflow.predictive.helper_churn_aria')} removeWrapper>
                     <TableHeader>
-                      <TableColumn>Category</TableColumn>
-                      <TableColumn align="end">Prior active</TableColumn>
-                      <TableColumn align="end">Lapsed</TableColumn>
-                      <TableColumn align="end">Churn rate</TableColumn>
+                      <TableColumn>{t('caring_workflow.predictive.columns.category')}</TableColumn>
+                      <TableColumn align="end">{t('caring_workflow.predictive.columns.prior_active')}</TableColumn>
+                      <TableColumn align="end">{t('caring_workflow.predictive.columns.lapsed')}</TableColumn>
+                      <TableColumn align="end">{t('caring_workflow.predictive.columns.churn_rate')}</TableColumn>
                     </TableHeader>
                     <TableBody>
                       {forecast.helper_churn.by_category.map((c) => (
@@ -745,25 +758,28 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: Predict
               <div className="space-y-2">
                 <div className="text-sm font-semibold text-default-900 flex items-center gap-2">
                   <Info size={14} />
-                  Category coefficient drift
+                  {t('caring_workflow.predictive.coefficient_drift')}
                   {forecast.coefficient_drift.drift_count > 0 && (
                     <Chip size="sm" variant="flat" color="warning">
-                      {forecast.coefficient_drift.drift_count} drifting
+                      {t('caring_workflow.predictive.drifting_count', {
+                        count: forecast.coefficient_drift.drift_count,
+                      })}
                     </Chip>
                   )}
                 </div>
                 <p className="text-xs text-default-500">
-                  Categories with absolute drift &gt; {(forecast.coefficient_drift.threshold * 100).toFixed(0)}% are
-                  flagged. Review baseline coefficients in the category coefficient editor.
+                  {t('caring_workflow.predictive.coefficient_drift_note', {
+                    threshold: (forecast.coefficient_drift.threshold * 100).toFixed(0),
+                  })}
                 </p>
-                <Table aria-label="Category coefficient drift" removeWrapper>
+                <Table aria-label={t('caring_workflow.predictive.coefficient_drift_aria')} removeWrapper>
                   <TableHeader>
-                    <TableColumn>Category</TableColumn>
-                    <TableColumn align="end">Baseline</TableColumn>
-                    <TableColumn align="end">Expected hrs</TableColumn>
-                    <TableColumn align="end">Observed hrs</TableColumn>
-                    <TableColumn align="end">Drift</TableColumn>
-                    <TableColumn align="end">Sample</TableColumn>
+                    <TableColumn>{t('caring_workflow.predictive.columns.category')}</TableColumn>
+                    <TableColumn align="end">{t('caring_workflow.predictive.columns.baseline')}</TableColumn>
+                    <TableColumn align="end">{t('caring_workflow.predictive.columns.expected_hrs')}</TableColumn>
+                    <TableColumn align="end">{t('caring_workflow.predictive.columns.observed_hrs')}</TableColumn>
+                    <TableColumn align="end">{t('caring_workflow.predictive.columns.drift')}</TableColumn>
+                    <TableColumn align="end">{t('caring_workflow.predictive.columns.sample')}</TableColumn>
                   </TableHeader>
                   <TableBody>
                     {forecast.coefficient_drift.categories.map((c) => (
@@ -789,14 +805,14 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: Predict
               <div className="space-y-2">
                 <div className="text-sm font-semibold text-default-900 flex items-center gap-2">
                   <Info size={14} />
-                  Proactive alerts
+                  {t('caring_workflow.predictive.proactive_alerts')}
                 </div>
                 {forecast.alerts.map((alert) => (
                   <div key={alert.id} className="rounded-lg border border-default-200 p-3 flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <Chip size="sm" variant="flat" color={alertSeverityChipColor(alert.severity)}>
-                          {alertSeverityLabel(alert.severity)}
+                          {alertSeverityLabel(alert.severity, t)}
                         </Chip>
                         <span className="text-sm font-semibold text-default-900">{alert.title}</span>
                         <Chip size="sm" variant="flat" color="default">
@@ -828,9 +844,10 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: Predict
 }
 
 export default function CaringCommunityWorkflowPage() {
+  const { t } = useTranslation('admin');
   const { tenantPath } = useTenant();
   const toast = useToast();
-  usePageTitle('Caring Community Workflow');
+  usePageTitle(t('caring_workflow.meta.page_title'));
 
   const [summary, setSummary] = useState<WorkflowSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1982,6 +1999,7 @@ export default function CaringCommunityWorkflowPage() {
             loading={loadingForecast}
             error={forecastError}
             onRefresh={loadForecast}
+            t={t}
           />
 
           <Card shadow="sm">

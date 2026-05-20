@@ -3760,6 +3760,70 @@
       "export_failed": "Failed to export boundary map"
     }
   },
+  "caring_workflow": {
+    "meta": {
+      "page_title": "Caring Community Workflow"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "retry": "Retry"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "predictive": {
+      "title": "Predictive Insights",
+      "subtitle": "Forward-looking forecasts and proactive alerts. Spot regional care deficits before they become emergencies.",
+      "not_enough_activity": "Not enough activity yet to forecast. Come back in a few weeks.",
+      "no_forecast": "No forecast data available yet.",
+      "hours_forecast": "Hours forecast",
+      "active_members": "Active members",
+      "recipients_reached": "Recipients reached",
+      "history": "History",
+      "forecast": "Forecast",
+      "confidence": "Confidence",
+      "trend_growing": "Growing {{value}}%",
+      "trend_declining": "Declining {{value}}%",
+      "trend_stable": "Stable",
+      "sub_region_coverage": "Sub-region coverage (last {{days}} days)",
+      "under_supplied_count": "{{count}} under-supplied",
+      "sub_region_coverage_aria": "Sub-region coverage",
+      "helper_churn": "Helper churn (lapsed >= {{days}} days)",
+      "overall_percent": "{{value}}% overall",
+      "helper_churn_note": "{{lapsed}} of {{prior}} previously active helpers haven't logged hours recently.",
+      "helper_churn_aria": "Helper churn by category",
+      "coefficient_drift": "Category coefficient drift",
+      "drifting_count": "{{count}} drifting",
+      "coefficient_drift_note": "Categories with absolute drift > {{threshold}}% are flagged. Review baseline coefficients in the category coefficient editor.",
+      "coefficient_drift_aria": "Category coefficient drift",
+      "proactive_alerts": "Proactive alerts",
+      "columns": {
+        "sub_region": "Sub-region",
+        "requested_90d": "Requested (90d)",
+        "fulfilled_90d": "Fulfilled (90d)",
+        "coverage": "Coverage",
+        "status": "Status",
+        "category": "Category",
+        "prior_active": "Prior active",
+        "lapsed": "Lapsed",
+        "churn_rate": "Churn rate",
+        "baseline": "Baseline",
+        "expected_hrs": "Expected hrs",
+        "observed_hrs": "Observed hrs",
+        "drift": "Drift",
+        "sample": "Sample"
+      },
+      "status": {
+        "under_supplied": "Under-supplied",
+        "ok": "OK"
+      },
+      "severity": {
+        "critical": "Critical",
+        "warning": "Warning",
+        "info": "Info"
+      }
+    }
+  },
   "municipal_roi_page": {
     "meta": {
       "page_title": "Municipal Impact Report",
