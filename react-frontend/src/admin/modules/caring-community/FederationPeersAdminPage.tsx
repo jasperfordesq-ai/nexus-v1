@@ -11,7 +11,6 @@
  * with. The shared secret is shown ONCE on creation or rotation — copy it
  * to the remote side immediately.
  *
- * Admin English only — no t() calls.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -77,8 +76,8 @@ const STATUS_COLOR: Record<PeerStatus, 'default' | 'success' | 'warning' | 'dang
 };
 
 export default function FederationPeersAdminPage() {
-  const { t } = useTranslation('caring_community', { keyPrefix: 'admin_a11y' });
-  usePageTitle('Federation Peers — Admin');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('federation_peers_admin.meta.page_title'));
   const { showToast } = useToast();
 
   const [peers, setPeers] = useState<Peer[]>([]);
@@ -104,11 +103,11 @@ export default function FederationPeersAdminPage() {
       setPeers(res.data?.peers ?? []);
     } catch (err) {
       logError('FederationPeersAdminPage.fetch', err);
-      showToast('Failed to load federation peers.', 'error');
+      showToast(t('federation_peers_admin.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     void fetchPeers();
@@ -125,7 +124,7 @@ export default function FederationPeersAdminPage() {
 
   async function handleCreate() {
     if (!peerSlug.trim() || !displayName.trim() || !baseUrl.trim()) {
-      showToast('All required fields must be filled.', 'error');
+      showToast(t('federation_peers_admin.validation.required_fields'), 'error');
       return;
     }
     setCreating(true);
@@ -144,13 +143,13 @@ export default function FederationPeersAdminPage() {
           secret: peer.shared_secret,
         });
       }
-      showToast('Federation peer created.', 'success');
+      showToast(t('federation_peers_admin.toasts.created'), 'success');
       setCreateOpen(false);
       resetForm();
       void fetchPeers();
     } catch (err) {
       logError('FederationPeersAdminPage.create', err);
-      showToast('Failed to create peer.', 'error');
+      showToast(t('federation_peers_admin.toasts.create_failed'), 'error');
     } finally {
       setCreating(false);
     }
@@ -161,17 +160,17 @@ export default function FederationPeersAdminPage() {
   async function handleStatus(peer: Peer, status: PeerStatus) {
     try {
       await api.put(`/v2/admin/caring-community/federation-peers/${peer.id}/status`, { status });
-      showToast(`Peer status set to ${status}.`, 'success');
+      showToast(t('federation_peers_admin.toasts.status_updated', { status: t(`federation_peers_admin.status.${status}`) }), 'success');
       void fetchPeers();
     } catch (err) {
       logError('FederationPeersAdminPage.status', err);
-      showToast('Failed to update peer status.', 'error');
+      showToast(t('federation_peers_admin.toasts.status_failed'), 'error');
     }
   }
 
   async function handleRotate(peer: Peer) {
     if (!window.confirm(
-      `Rotate the shared secret for "${peer.display_name}"? The old secret stops working immediately and you must update the remote side.`,
+      t('federation_peers_admin.confirm_rotate', { name: peer.display_name }),
     )) {
       return;
     }
@@ -185,32 +184,32 @@ export default function FederationPeersAdminPage() {
           secret: updated.shared_secret,
         });
       }
-      showToast('Shared secret rotated.', 'success');
+      showToast(t('federation_peers_admin.toasts.secret_rotated'), 'success');
       void fetchPeers();
     } catch (err) {
       logError('FederationPeersAdminPage.rotate', err);
-      showToast('Failed to rotate secret.', 'error');
+      showToast(t('federation_peers_admin.toasts.rotate_failed'), 'error');
     }
   }
 
   async function handleDelete(peer: Peer) {
-    if (!window.confirm(`Delete federation peer "${peer.display_name}"? This is permanent.`)) {
+    if (!window.confirm(t('federation_peers_admin.confirm_delete', { name: peer.display_name }))) {
       return;
     }
     try {
       await api.delete(`/v2/admin/caring-community/federation-peers/${peer.id}`);
-      showToast('Peer deleted.', 'success');
+      showToast(t('federation_peers_admin.toasts.deleted'), 'success');
       void fetchPeers();
     } catch (err) {
       logError('FederationPeersAdminPage.delete', err);
-      showToast('Failed to delete peer.', 'error');
+      showToast(t('federation_peers_admin.toasts.delete_failed'), 'error');
     }
   }
 
   function copyToClipboard(value: string) {
     void navigator.clipboard.writeText(value).then(
-      () => showToast('Copied to clipboard.', 'success'),
-      () => showToast('Failed to copy.', 'error'),
+      () => showToast(t('federation_peers_admin.toasts.copied'), 'success'),
+      () => showToast(t('federation_peers_admin.toasts.copy_failed'), 'error'),
     );
   }
 
@@ -219,19 +218,19 @@ export default function FederationPeersAdminPage() {
   return (
     <div className="space-y-5">
       <PageHeader
-        title="Federation Peers"
-        subtitle="Cross-platform partnerships for cooperative-to-cooperative hour transfers"
+        title={t('federation_peers_admin.meta.title')}
+        subtitle={t('federation_peers_admin.meta.subtitle')}
         icon={<Server size={20} />}
         actions={
           <div className="flex items-center gap-2">
-            <Tooltip content="Refresh">
+            <Tooltip content={t('federation_peers_admin.actions.refresh')}>
               <Button
                 isIconOnly
                 size="sm"
                 variant="flat"
                 onPress={() => void fetchPeers()}
                 isLoading={loading}
-                aria-label={t('refresh_federation_peers')}
+                aria-label={t('federation_peers_admin.actions.refresh_aria')}
               >
                 <RefreshCw size={15} />
               </Button>
@@ -242,7 +241,7 @@ export default function FederationPeersAdminPage() {
               startContent={<Plus size={15} />}
               onPress={() => { resetForm(); setCreateOpen(true); }}
             >
-              Add Peer
+              {t('federation_peers_admin.actions.add_peer')}
             </Button>
           </div>
         }
@@ -254,19 +253,15 @@ export default function FederationPeersAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('federation_peers_admin.about.title')}</p>
               <p className="text-default-600">
-                Federation Peers are other NEXUS cooperatives that your community has agreed to share
-                members and hours with. Once a peer connection is established, members can transfer
-                hours between communities and view federated listings. Each peer connection requires
-                a shared secret that both sides must configure — contact the peer cooperative's
-                administrator to exchange credentials.
+                {t('federation_peers_admin.about.body')}
               </p>
               <div className="space-y-0.5 pt-1 text-default-500">
-                <p><strong>Shared secret:</strong> A cryptographic token used to authenticate peer-to-peer API calls. It must match exactly on both sides. Rotate it periodically (every 6–12 months) and always rotate immediately if you suspect it has been compromised.</p>
-                <p><strong>Pending:</strong> Credentials set, awaiting first successful API call.</p>
-                <p><strong>Active:</strong> Connected and syncing.</p>
-                <p><strong>Suspended:</strong> Last sync failed or manually suspended — check that the peer's base URL is correct and reachable.</p>
+                <p><strong>{t('federation_peers_admin.about.shared_secret_label')}</strong> {t('federation_peers_admin.about.shared_secret_body')}</p>
+                <p><strong>{t('federation_peers_admin.status.pending')}:</strong> {t('federation_peers_admin.about.pending_body')}</p>
+                <p><strong>{t('federation_peers_admin.status.active')}:</strong> {t('federation_peers_admin.about.active_body')}</p>
+                <p><strong>{t('federation_peers_admin.status.suspended')}:</strong> {t('federation_peers_admin.about.suspended_body')}</p>
               </div>
             </div>
           </div>
@@ -276,22 +271,22 @@ export default function FederationPeersAdminPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <Server size={18} className="text-primary" />
-          <span className="font-semibold">Registered Peers</span>
+          <span className="font-semibold">{t('federation_peers_admin.peers.title')}</span>
         </CardHeader>
         <CardBody className="p-0">
           {loading ? (
             <div className="flex justify-center py-10"><Spinner /></div>
           ) : (
-            <Table aria-label="Federation peers" removeWrapper>
+            <Table aria-label={t('federation_peers_admin.peers.table_aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>Name</TableColumn>
-                <TableColumn>Slug</TableColumn>
-                <TableColumn>Base URL</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Last Handshake</TableColumn>
-                <TableColumn>Actions</TableColumn>
+                <TableColumn>{t('federation_peers_admin.table.name')}</TableColumn>
+                <TableColumn>{t('federation_peers_admin.table.slug')}</TableColumn>
+                <TableColumn>{t('federation_peers_admin.table.base_url')}</TableColumn>
+                <TableColumn>{t('federation_peers_admin.table.status')}</TableColumn>
+                <TableColumn>{t('federation_peers_admin.table.last_handshake')}</TableColumn>
+                <TableColumn>{t('federation_peers_admin.table.actions')}</TableColumn>
               </TableHeader>
-              <TableBody emptyContent="No federation peers yet — add one to start.">
+              <TableBody emptyContent={t('federation_peers_admin.peers.empty')}>
                 {peers.map((peer) => (
                   <TableRow key={peer.id}>
                     <TableCell>
@@ -317,20 +312,20 @@ export default function FederationPeersAdminPage() {
                     </TableCell>
                     <TableCell>
                       <Chip size="sm" color={STATUS_COLOR[peer.status]} variant="flat">
-                        {peer.status}
+                        {t(`federation_peers_admin.status.${peer.status}`)}
                       </Chip>
                     </TableCell>
                     <TableCell>
                       <span className="text-xs text-default-500">
                         {peer.last_handshake_at
                           ? new Date(peer.last_handshake_at).toLocaleString()
-                          : 'Never'}
+                          : t('federation_peers_admin.empty.never')}
                       </span>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1.5">
                         <Select
-                          aria-label="Status"
+                          aria-label={t('federation_peers_admin.table.status')}
                           size="sm"
                           className="min-w-[110px]"
                           selectedKeys={[peer.status]}
@@ -340,28 +335,28 @@ export default function FederationPeersAdminPage() {
                           }}
                         >
                           {(['pending', 'active', 'suspended'] as PeerStatus[]).map((s) => (
-                            <SelectItem key={s}>{s}</SelectItem>
+                            <SelectItem key={s}>{t(`federation_peers_admin.status.${s}`)}</SelectItem>
                           ))}
                         </Select>
-                        <Tooltip content="Rotate shared secret">
+                        <Tooltip content={t('federation_peers_admin.actions.rotate_secret')}>
                           <Button
                             size="sm"
                             variant="flat"
                             isIconOnly
                             onPress={() => void handleRotate(peer)}
-                            aria-label="Rotate secret"
+                            aria-label={t('federation_peers_admin.actions.rotate_secret')}
                           >
                             <KeyRound size={14} />
                           </Button>
                         </Tooltip>
-                        <Tooltip content="Delete peer">
+                        <Tooltip content={t('federation_peers_admin.actions.delete_peer')}>
                           <Button
                             size="sm"
                             variant="flat"
                             color="danger"
                             isIconOnly
                             onPress={() => void handleDelete(peer)}
-                            aria-label="Delete peer"
+                            aria-label={t('federation_peers_admin.actions.delete_peer')}
                           >
                             <Trash2 size={14} />
                           </Button>
@@ -381,48 +376,50 @@ export default function FederationPeersAdminPage() {
         <ModalContent>
           {(close) => (
             <>
-              <ModalHeader>Add Federation Peer</ModalHeader>
+              <ModalHeader>{t('federation_peers_admin.create_modal.title')}</ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label="Peer Slug"
+                  label={t('federation_peers_admin.create_modal.peer_slug')}
                   isRequired
-                  description="Lowercase alphanumeric + hyphens. Used as destination cooperative slug for outbound transfers."
-                  placeholder="kiss-bern"
+                  description={t('federation_peers_admin.create_modal.peer_slug_description')}
+                  placeholder={t('federation_peers_admin.create_modal.peer_slug_placeholder')}
                   value={peerSlug}
                   onValueChange={setPeerSlug}
                 />
                 <Input
-                  label="Display Name"
+                  label={t('federation_peers_admin.create_modal.display_name')}
                   isRequired
-                  placeholder="KISS Bern Cooperative"
+                  placeholder={t('federation_peers_admin.create_modal.display_name_placeholder')}
                   value={displayName}
                   onValueChange={setDisplayName}
                 />
                 <Input
-                  label="Base URL"
+                  label={t('federation_peers_admin.create_modal.base_url')}
                   isRequired
-                  description="HTTPS URL of the remote NEXUS API. The /v2/federation/hour-transfer/inbound path is appended automatically."
-                  placeholder="https://api.kiss-bern.ch"
+                  description={t('federation_peers_admin.create_modal.base_url_description')}
+                  placeholder={t('federation_peers_admin.create_modal.base_url_placeholder')}
                   value={baseUrl}
                   onValueChange={setBaseUrl}
                 />
                 <Textarea
-                  label="Notes"
-                  placeholder="Internal notes — partner contact, agreement reference..."
+                  label={t('federation_peers_admin.create_modal.notes')}
+                  placeholder={t('federation_peers_admin.create_modal.notes_placeholder')}
                   value={notes}
                   onValueChange={setNotes}
                   minRows={2}
                 />
                 <div className="text-xs text-default-500">
                   <Power size={12} className="inline mr-1" />
-                  Status starts as <strong>pending</strong>. After the remote side has
-                  registered the same shared secret, set both sides to <strong>active</strong>.
+                  {t('federation_peers_admin.create_modal.status_hint_prefix')}{' '}
+                  <strong>{t('federation_peers_admin.status.pending')}</strong>.
+                  {' '}{t('federation_peers_admin.create_modal.status_hint_middle')}{' '}
+                  <strong>{t('federation_peers_admin.status.active')}</strong>.
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={close} isDisabled={creating}>Cancel</Button>
+                <Button variant="flat" onPress={close} isDisabled={creating}>{t('federation_peers_admin.actions.cancel')}</Button>
                 <Button color="primary" onPress={() => void handleCreate()} isLoading={creating}>
-                  Create &amp; Reveal Secret
+                  {t('federation_peers_admin.actions.create_reveal_secret')}
                 </Button>
               </ModalFooter>
             </>
@@ -439,13 +436,12 @@ export default function FederationPeersAdminPage() {
         <ModalContent>
           {(close) => (
             <>
-              <ModalHeader>One-Time Shared Secret</ModalHeader>
+              <ModalHeader>{t('federation_peers_admin.secret_modal.title')}</ModalHeader>
               <ModalBody className="gap-3">
                 <p className="text-sm">
-                  This secret is shown <strong>only once</strong>. Copy it now and
-                  paste it into the remote NEXUS install&apos;s federation peer entry
-                  for this cooperative. If you lose it, you must rotate the secret
-                  here and update the remote side again.
+                  {t('federation_peers_admin.secret_modal.body_prefix')}{' '}
+                  <strong>{t('federation_peers_admin.secret_modal.only_once')}</strong>.
+                  {' '}{t('federation_peers_admin.secret_modal.body_suffix')}
                 </p>
                 {secretReveal && (
                   <>
@@ -458,25 +454,25 @@ export default function FederationPeersAdminPage() {
                         startContent={<Copy size={14} />}
                         onPress={() => copyToClipboard(secretReveal.secret)}
                       >
-                        Copy Secret
+                        {t('federation_peers_admin.actions.copy_secret')}
                       </Button>
                       <Button
                         variant="flat"
                         startContent={<Copy size={14} />}
                         onPress={() => copyToClipboard(secretReveal.peerSlug)}
                       >
-                        Copy Peer Slug
+                        {t('federation_peers_admin.actions.copy_peer_slug')}
                       </Button>
                     </div>
                     <div className="text-xs text-default-500">
-                      <strong>Peer slug:</strong> <code>{secretReveal.peerSlug}</code><br />
-                      <strong>Base URL:</strong> <code>{secretReveal.baseUrl}</code>
+                      <strong>{t('federation_peers_admin.secret_modal.peer_slug_label')}</strong> <code>{secretReveal.peerSlug}</code><br />
+                      <strong>{t('federation_peers_admin.secret_modal.base_url_label')}</strong> <code>{secretReveal.baseUrl}</code>
                     </div>
                   </>
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button color="primary" onPress={close}>I have copied the secret</Button>
+                <Button color="primary" onPress={close}>{t('federation_peers_admin.actions.copied_secret')}</Button>
               </ModalFooter>
             </>
           )}

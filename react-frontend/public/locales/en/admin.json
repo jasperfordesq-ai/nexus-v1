@@ -3113,6 +3113,96 @@
       "delete_failed": "Delete failed"
     }
   },
+  "federation_peers_admin": {
+    "meta": {
+      "page_title": "Federation Peers - Admin",
+      "title": "Federation Peers",
+      "subtitle": "Cross-platform partnerships for cooperative-to-cooperative hour transfers"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh federation peers",
+      "add_peer": "Add Peer",
+      "rotate_secret": "Rotate shared secret",
+      "delete_peer": "Delete peer",
+      "cancel": "Cancel",
+      "create_reveal_secret": "Create & Reveal Secret",
+      "copy_secret": "Copy Secret",
+      "copy_peer_slug": "Copy Peer Slug",
+      "copied_secret": "I have copied the secret"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Federation Peers are other NEXUS cooperatives that your community has agreed to share members and hours with. Once a peer connection is established, members can transfer hours between communities and view federated listings. Each peer connection requires a shared secret that both sides must configure - contact the peer cooperative's administrator to exchange credentials.",
+      "shared_secret_label": "Shared secret:",
+      "shared_secret_body": "A cryptographic token used to authenticate peer-to-peer API calls. It must match exactly on both sides. Rotate it periodically (every 6-12 months) and always rotate immediately if you suspect it has been compromised.",
+      "pending_body": "Credentials set, awaiting first successful API call.",
+      "active_body": "Connected and syncing.",
+      "suspended_body": "Last sync failed or manually suspended - check that the peer's base URL is correct and reachable."
+    },
+    "peers": {
+      "title": "Registered Peers",
+      "table_aria": "Federation peers",
+      "empty": "No federation peers yet - add one to start."
+    },
+    "table": {
+      "name": "Name",
+      "slug": "Slug",
+      "base_url": "Base URL",
+      "status": "Status",
+      "last_handshake": "Last Handshake",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "empty": {
+      "never": "Never"
+    },
+    "create_modal": {
+      "title": "Add Federation Peer",
+      "peer_slug": "Peer Slug",
+      "peer_slug_description": "Lowercase alphanumeric + hyphens. Used as destination cooperative slug for outbound transfers.",
+      "peer_slug_placeholder": "kiss-bern",
+      "display_name": "Display Name",
+      "display_name_placeholder": "KISS Bern Cooperative",
+      "base_url": "Base URL",
+      "base_url_description": "HTTPS URL of the remote NEXUS API. The /v2/federation/hour-transfer/inbound path is appended automatically.",
+      "base_url_placeholder": "https://api.kiss-bern.ch",
+      "notes": "Notes",
+      "notes_placeholder": "Internal notes - partner contact, agreement reference...",
+      "status_hint_prefix": "Status starts as",
+      "status_hint_middle": "After the remote side has registered the same shared secret, set both sides to"
+    },
+    "secret_modal": {
+      "title": "One-Time Shared Secret",
+      "body_prefix": "This secret is shown",
+      "only_once": "only once",
+      "body_suffix": "Copy it now and paste it into the remote NEXUS install's federation peer entry for this cooperative. If you lose it, you must rotate the secret here and update the remote side again.",
+      "peer_slug_label": "Peer slug:",
+      "base_url_label": "Base URL:"
+    },
+    "validation": {
+      "required_fields": "All required fields must be filled."
+    },
+    "confirm_rotate": "Rotate the shared secret for \"{{name}}\"? The old secret stops working immediately and you must update the remote side.",
+    "confirm_delete": "Delete federation peer \"{{name}}\"? This is permanent.",
+    "toasts": {
+      "load_failed": "Failed to load federation peers.",
+      "created": "Federation peer created.",
+      "create_failed": "Failed to create peer.",
+      "status_updated": "Peer status set to {{status}}.",
+      "status_failed": "Failed to update peer status.",
+      "secret_rotated": "Shared secret rotated.",
+      "rotate_failed": "Failed to rotate secret.",
+      "deleted": "Peer deleted.",
+      "delete_failed": "Failed to delete peer.",
+      "copied": "Copied to clipboard.",
+      "copy_failed": "Failed to copy."
+    }
+  },
   "billing": {
     "actions": "Actions",
     "billing_interval": "Billing Interval",
