@@ -158,6 +158,9 @@
     "edit_challenge": "Wettbewerb bearbeiten",
     "delete_challenge": "Wettbewerb löschen",
     "delete_confirm": "Möchten Sie diesen Wettbewerb wirklich löschen? Alle Ideen, Stimmen und Kommentare werden dauerhaft entfernt.",
+    "edit_campaign": "Kampagne bearbeiten",
+    "delete_campaign": "Kampagne löschen",
+    "delete_campaign_confirm": "Sind Sie sicher, dass Sie diese Kampagne löschen möchten? Verknüpfte Wettbewerbe bleiben verfügbar.",
     "status_updated": "Wettbewerbsstatus aktualisiert",
     "idea_status_updated": "Ideenstatus aktualisiert"
   },
@@ -305,6 +308,9 @@
     "challenges_count_one": "{{count}} Wettbewerb",
     "link_challenge": "Wettbewerb verknüpfen",
     "unlink_challenge": "Wettbewerb trennen",
+    "confirm_unlink": "Bestätigen",
+    "confirm_unlink_label": "Trennung bestätigen",
+    "fallback_title": "Kampagne",
     "feature_not_available": "Ideation Not Available",
     "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },

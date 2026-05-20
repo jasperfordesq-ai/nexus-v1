@@ -157,6 +157,9 @@
     "edit_challenge": "Cuir Dúshlán in Eagar",
     "delete_challenge": "Scrios Dúshlán",
     "delete_confirm": "An bhfuil tú cinnte gur mhaith leat an dúshlán seo a scriosadh? Scriosfar gach smaoineamh, vóta agus trácht go buan.",
+    "edit_campaign": "Cuir Feachtas in Eagar",
+    "delete_campaign": "Scrios Feachtas",
+    "delete_campaign_confirm": "An bhfuil tú cinnte gur mhaith leat an feachtas seo a scriosadh? Fanfaidh na dúshláin nasctha ar fáil.",
     "status_updated": "Stádas an dúshláin nuashonraithe",
     "idea_status_updated": "Stádas an smaoineamh nuashonraithe"
   },
@@ -304,6 +307,9 @@
     "challenges_count_one": "{{count}} dúshlán",
     "link_challenge": "Nasc Dúshlán",
     "unlink_challenge": "Dínasc Dúshlán",
+    "confirm_unlink": "Deimhnigh",
+    "confirm_unlink_label": "Deimhnigh dínascadh",
+    "fallback_title": "Feachtas",
     "feature_not_available": "Ideation Not Available",
     "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },

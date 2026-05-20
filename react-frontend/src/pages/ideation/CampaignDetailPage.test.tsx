@@ -153,8 +153,8 @@ describe('CampaignDetailPage', () => {
       expect(screen.getByText('Sustainable Futures Campaign')).toBeInTheDocument();
     });
     // Admin controls are icon-only buttons with aria-labels using i18n keys
-    expect(screen.getByRole('button', { name: 'admin.edit_challenge' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'admin.delete_challenge' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'admin.edit_campaign' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'admin.delete_campaign' })).toBeInTheDocument();
   });
 
   it('does not show edit/delete buttons for regular members', async () => {

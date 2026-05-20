@@ -158,6 +158,9 @@
     "edit_challenge": "Modifier le defi",
     "delete_challenge": "Supprimer le defi",
     "delete_confirm": "Etes-vous sur de vouloir supprimer ce defi ? Toutes les idees, votes et commentaires seront definitivement supprimes.",
+    "edit_campaign": "Modifier la campagne",
+    "delete_campaign": "Supprimer la campagne",
+    "delete_campaign_confirm": "Voulez-vous vraiment supprimer cette campagne ? Les defis lies resteront disponibles.",
     "status_updated": "Statut du defi mis a jour",
     "idea_status_updated": "Statut de l'idee mis a jour"
   },
@@ -305,6 +308,9 @@
     "challenges_count_one": "{{count}} defi",
     "link_challenge": "Lier un defi",
     "unlink_challenge": "Delier un defi",
+    "confirm_unlink": "Confirmer",
+    "confirm_unlink_label": "Confirmer le retrait du lien",
+    "fallback_title": "Campagne",
     "feature_not_available": "Ideation Not Available",
     "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },

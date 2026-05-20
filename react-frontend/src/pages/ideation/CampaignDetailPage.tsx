@@ -235,7 +235,7 @@ export function CampaignDetailPage() {
               startContent={<RefreshCw className="w-4 h-4" />}
               onPress={() => fetchCampaign()}
             >
-              {t('actions.retry', { defaultValue: 'Retry' })}
+              {t('actions.retry')}
             </Button>
           }
         />
@@ -245,7 +245,7 @@ export function CampaignDetailPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
-      <PageMeta title={campaign?.title || 'Campaign'} description={campaign?.description?.substring(0, 160)} noIndex />
+      <PageMeta title={campaign?.title || t('campaigns.fallback_title')} description={campaign?.description?.substring(0, 160)} noIndex />
       {/* Back link */}
       <Button
         variant="light"
@@ -287,7 +287,7 @@ export function CampaignDetailPage() {
                 variant="flat"
                 size="sm"
                 onPress={onEditOpen}
-                aria-label={t('admin.edit_challenge')}
+                aria-label={t('admin.edit_campaign')}
               >
                 <Edit3 className="w-4 h-4" />
               </Button>
@@ -297,7 +297,7 @@ export function CampaignDetailPage() {
                 size="sm"
                 color="danger"
                 onPress={onDeleteOpen}
-                aria-label={t('admin.delete_challenge')}
+                aria-label={t('admin.delete_campaign')}
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
@@ -308,7 +308,7 @@ export function CampaignDetailPage() {
 
       {/* Linked Challenges */}
       <h2 className="text-xl font-semibold text-[var(--color-text)] mb-4">
-        {t('challenges.title', { defaultValue: 'Challenges' })} ({campaign.challenges.length})
+        {t('challenges.title')} ({campaign.challenges.length})
       </h2>
 
       {campaign.challenges.length === 0 ? (
@@ -394,17 +394,17 @@ export function CampaignDetailPage() {
                     color="danger"
                     variant="flat"
                     onPress={() => handleUnlinkChallenge(ch.id)}
-                    aria-label={t('campaigns.confirm_unlink', { defaultValue: 'Confirm unlink' })}
+                    aria-label={t('campaigns.confirm_unlink_label')}
                   >
-                    {t('campaigns.confirm_unlink', { defaultValue: 'Confirm' })}
+                    {t('campaigns.confirm_unlink')}
                   </Button>
                   <Button
                     size="sm"
                     variant="flat"
                     onPress={() => setUnlinkTargetId(null)}
-                    aria-label={t('actions.cancel', { defaultValue: 'Cancel' })}
+                    aria-label={t('form.cancel')}
                   >
-                    {t('actions.cancel', { defaultValue: 'Cancel' })}
+                    {t('form.cancel')}
                   </Button>
                 </div>
               ) : isAdmin ? (
@@ -427,7 +427,7 @@ export function CampaignDetailPage() {
       {/* Edit Campaign Modal */}
       <Modal isOpen={isEditOpen} onClose={onEditClose} size="lg">
         <ModalContent>
-          <ModalHeader>{t('admin.edit_challenge')}</ModalHeader>
+          <ModalHeader>{t('admin.edit_campaign')}</ModalHeader>
           <ModalBody>
             <Input
               label={t('form.title_label')}
@@ -463,10 +463,10 @@ export function CampaignDetailPage() {
       {/* Delete Campaign Modal */}
       <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
         <ModalContent>
-          <ModalHeader>{t('admin.delete_challenge')}</ModalHeader>
+          <ModalHeader>{t('admin.delete_campaign')}</ModalHeader>
           <ModalBody>
             <p className="text-[var(--color-text-secondary)]">
-              {t('admin.delete_confirm')}
+              {t('admin.delete_campaign_confirm')}
             </p>
           </ModalBody>
           <ModalFooter>
@@ -478,7 +478,7 @@ export function CampaignDetailPage() {
               isLoading={isDeleting}
               onPress={handleDelete}
             >
-              {t('admin.delete_challenge')}
+              {t('admin.delete_campaign')}
             </Button>
           </ModalFooter>
         </ModalContent>

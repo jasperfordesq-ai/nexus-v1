@@ -158,6 +158,9 @@
     "edit_challenge": "チャレンジを編集",
     "delete_challenge": "チャレンジを削除",
     "delete_confirm": "このチャレンジを削除してもよろしいですか？すべてのアイデア、投票、コメントは永久に削除されます。",
+    "edit_campaign": "キャンペーンを編集",
+    "delete_campaign": "キャンペーンを削除",
+    "delete_campaign_confirm": "このキャンペーンを削除してもよろしいですか？リンクされたチャレンジは引き続き利用できます。",
     "status_updated": "チャレンジのステータスが更新されました",
     "idea_status_updated": "アイデアのステータスが更新されました"
   },
@@ -305,6 +308,9 @@
     "challenges_count_one": "{{count}} 課題",
     "link_challenge": "課題をリンク",
     "unlink_challenge": "課題のリンクを解除",
+    "confirm_unlink": "確認",
+    "confirm_unlink_label": "リンク解除を確認",
+    "fallback_title": "キャンペーン",
     "feature_not_available": "Ideation Not Available",
     "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },

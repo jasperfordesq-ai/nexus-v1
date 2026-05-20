@@ -158,6 +158,9 @@
     "edit_challenge": "Modifica Sfida",
     "delete_challenge": "Elimina Sfida",
     "delete_confirm": "Sei sicuro di voler eliminare questa sfida? Tutte le idee, i voti e i commenti verranno rimossi definitivamente.",
+    "edit_campaign": "Modifica Campagna",
+    "delete_campaign": "Elimina Campagna",
+    "delete_campaign_confirm": "Sei sicuro di voler eliminare questa campagna? Le sfide collegate resteranno disponibili.",
     "status_updated": "Stato della sfida aggiornato",
     "idea_status_updated": "Stato dell'idea aggiornato"
   },
@@ -305,6 +308,9 @@
     "challenges_count_one": "{{count}} sfida",
     "link_challenge": "Collega Sfida",
     "unlink_challenge": "Scollega Sfida",
+    "confirm_unlink": "Conferma",
+    "confirm_unlink_label": "Conferma scollegamento",
+    "fallback_title": "Campagna",
     "feature_not_available": "Ideation Not Available",
     "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },

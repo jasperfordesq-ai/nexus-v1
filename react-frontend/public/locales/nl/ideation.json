@@ -158,6 +158,9 @@
     "edit_challenge": "Uitdaging bewerken",
     "delete_challenge": "Uitdaging verwijderen",
     "delete_confirm": "Weet je zeker dat je deze uitdaging wilt verwijderen? Alle ideeën, stemmen en opmerkingen worden permanent verwijderd.",
+    "edit_campaign": "Campagne bewerken",
+    "delete_campaign": "Campagne verwijderen",
+    "delete_campaign_confirm": "Weet je zeker dat je deze campagne wilt verwijderen? Gekoppelde uitdagingen blijven beschikbaar.",
     "status_updated": "Status van de uitdaging bijgewerkt",
     "idea_status_updated": "Status van het idee bijgewerkt"
   },
@@ -305,6 +308,9 @@
     "challenges_count_one": "{{count}} uitdaging",
     "link_challenge": "Koppel Uitdaging",
     "unlink_challenge": "Ontkoppel Uitdaging",
+    "confirm_unlink": "Bevestigen",
+    "confirm_unlink_label": "Ontkoppelen bevestigen",
+    "fallback_title": "Campagne",
     "feature_not_available": "Ideation Not Available",
     "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },

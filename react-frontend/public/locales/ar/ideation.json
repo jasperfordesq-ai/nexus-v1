@@ -158,6 +158,9 @@
     "edit_challenge": "تعديل التحدي",
     "delete_challenge": "حذف التحدي",
     "delete_confirm": "هل أنت متأكد أنك تريد حذف هذا التحدي؟ سيتم إزالة جميع الأفكار، الأصوات، والتعليقات بشكل دائم.",
+    "edit_campaign": "تعديل الحملة",
+    "delete_campaign": "حذف الحملة",
+    "delete_campaign_confirm": "هل أنت متأكد أنك تريد حذف هذه الحملة؟ ستبقى التحديات المرتبطة متاحة.",
     "status_updated": "تم تحديث حالة التحدي",
     "idea_status_updated": "تم تحديث حالة الفكرة"
   },
@@ -305,6 +308,9 @@
     "challenges_count_one": "{{count}} تحدي",
     "link_challenge": "ربط التحدي",
     "unlink_challenge": "فك ارتباط التحدي",
+    "confirm_unlink": "تأكيد",
+    "confirm_unlink_label": "تأكيد فك الارتباط",
+    "fallback_title": "حملة",
     "feature_not_available": "Ideation Not Available",
     "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },
