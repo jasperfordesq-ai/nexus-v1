@@ -42,7 +42,7 @@ export function InlineInterviewCard({
         <div className="flex-1 space-y-3">
           <div>
             <h3 className="text-base font-semibold text-theme-primary">
-              {t('inline_response.interview_pending', 'You have an interview scheduled')}
+              {t('inline_response.interview_pending')}
             </h3>
             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-theme-secondary">
               <span className="flex items-center gap-1">
@@ -50,12 +50,12 @@ export function InlineInterviewCard({
                 {new Date(pendingInterview.scheduled_at).toLocaleString()}
               </span>
               <Chip size="sm" variant="flat" color="secondary">
-                {t(`interview.type_${pendingInterview.interview_type}`, pendingInterview.interview_type)}
+                {t(`interview.type_${pendingInterview.interview_type}`)}
               </Chip>
               {pendingInterview.duration_mins && (
                 <span className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" aria-hidden="true" />
-                  {pendingInterview.duration_mins} {t('interview.minutes', 'min')}
+                  {pendingInterview.duration_mins} {t('interview.minutes')}
                 </span>
               )}
             </div>
@@ -71,7 +71,7 @@ export function InlineInterviewCard({
                   variant="flat"
                   startContent={<Video className="w-3.5 h-3.5" aria-hidden="true" />}
                 >
-                  {t('interview.join_call', 'Join Video Call')}
+                  {t('interview.join_call')}
                 </Button>
               </div>
             )}
@@ -83,9 +83,9 @@ export function InlineInterviewCard({
                   as="a"
                   href={`${API_BASE}/v2/jobs/interviews/${pendingInterview.id}/calendar`}
                   download="interview.ics"
-                  startContent={<CalendarPlus className="w-3.5 h-3.5" />}
+                  startContent={<CalendarPlus className="w-3.5 h-3.5" aria-hidden="true" />}
                 >
-                  {t('interview.download_ics', { defaultValue: 'Download .ics' })}
+                  {t('interview.download_ics')}
                 </Button>
               </div>
             )}
@@ -117,7 +117,7 @@ export function InlineInterviewCard({
               onPress={onAccept}
               startContent={<CheckCircle className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('inline_response.interview_accept', 'Accept Interview')}
+              {t('inline_response.interview_accept')}
             </Button>
             <Button
               color="danger"
@@ -127,7 +127,7 @@ export function InlineInterviewCard({
               onPress={onDeclineOpen}
               startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('inline_response.interview_decline', 'Decline Interview')}
+              {t('inline_response.interview_decline')}
             </Button>
           </div>
         </div>

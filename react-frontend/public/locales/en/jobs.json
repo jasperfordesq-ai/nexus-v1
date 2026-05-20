@@ -476,7 +476,8 @@
     "declined": "Interview Declined",
     "accept": "Accept",
     "decline": "Decline",
-    "minutes": "min"
+    "minutes": "min",
+    "download_ics": "Download .ics"
   },
   "offer": {
     "title": "You received an offer!",

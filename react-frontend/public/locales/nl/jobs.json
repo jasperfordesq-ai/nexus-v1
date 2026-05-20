@@ -416,7 +416,8 @@
     "add_to_calendar": "Add to Calendar",
     "calendar_google": "Google",
     "calendar_outlook": "Outlook",
-    "calendar_ics": ".ics"
+    "calendar_ics": ".ics",
+    "download_ics": ".ics downloaden"
   },
   "offer": {
     "title": "Je hebt een aanbod ontvangen!",
