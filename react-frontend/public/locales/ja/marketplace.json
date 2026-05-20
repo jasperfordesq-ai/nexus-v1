@@ -457,7 +457,12 @@
     "bump": "トップに移動",
     "featured": "注目リスティング",
     "top_of_category": "カテゴリのトップ",
-    "homepage_carousel": "ホームページカルーセル"
+    "homepage_carousel": "ホームページカルーセル",
+    "cancel": "キャンセル",
+    "duration_days_one": "{{count}}日",
+    "duration_days_other": "{{count}}日",
+    "duration_hours_one": "{{count}}時間",
+    "duration_hours_other": "{{count}}時間"
   },
   "free": {
     "page_title": "無料アイテム",

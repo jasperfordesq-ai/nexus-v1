@@ -456,6 +456,11 @@
     "featured": "قائمة مميزة",
     "top_of_category": "أعلى الفئة",
     "homepage_carousel": "دوار الصفحة الرئيسية",
+    "cancel": "إلغاء",
+    "duration_days_one": "{{count}} يوم",
+    "duration_days_other": "{{count}} أيام",
+    "duration_hours_one": "{{count}} ساعة",
+    "duration_hours_other": "{{count}} ساعات",
     "free_label": "Free"
   },
   "free": {

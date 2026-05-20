@@ -456,6 +456,11 @@
     "featured": "Annuncio in evidenza",
     "top_of_category": "In cima alla categoria",
     "homepage_carousel": "Carousel della homepage",
+    "cancel": "Annulla",
+    "duration_days_one": "{{count}} giorno",
+    "duration_days_other": "{{count}} giorni",
+    "duration_hours_one": "{{count}} ora",
+    "duration_hours_other": "{{count}} ore",
     "free_label": "Free"
   },
   "free": {

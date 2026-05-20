@@ -457,7 +457,12 @@
     "bump": "Podbij na górę",
     "featured": "Ogłoszenie wyróżnione",
     "top_of_category": "Góra kategorii",
-    "homepage_carousel": "Karuzela na stronie głównej"
+    "homepage_carousel": "Karuzela na stronie głównej",
+    "cancel": "Anuluj",
+    "duration_days_one": "{{count}} dzień",
+    "duration_days_other": "{{count}} dni",
+    "duration_hours_one": "{{count}} godzina",
+    "duration_hours_other": "{{count}} godzin"
   },
   "free": {
     "page_title": "Darmowe przedmioty",

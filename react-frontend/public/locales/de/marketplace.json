@@ -457,7 +457,12 @@
     "bump": "Nach oben verschieben",
     "featured": "Empfohlenes Inserat",
     "top_of_category": "Oben in der Kategorie",
-    "homepage_carousel": "Startseiten-Karussell"
+    "homepage_carousel": "Startseiten-Karussell",
+    "cancel": "Abbrechen",
+    "duration_days_one": "{{count}} Tag",
+    "duration_days_other": "{{count}} Tage",
+    "duration_hours_one": "{{count}} Stunde",
+    "duration_hours_other": "{{count}} Stunden"
   },
   "free": {
     "page_title": "Kostenlose Artikel",

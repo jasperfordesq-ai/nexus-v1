@@ -457,7 +457,12 @@
     "bump": "Ardaigh go dtí an Barr",
     "featured": "Liosta Cleiteach",
     "top_of_category": "Barr na Catagóire",
-    "homepage_carousel": "Carbhsheó an Leathanaigh Bhaile"
+    "homepage_carousel": "Carbhsheó an Leathanaigh Bhaile",
+    "cancel": "Cealaigh",
+    "duration_days_one": "{{count}} lá",
+    "duration_days_other": "{{count}} lá",
+    "duration_hours_one": "{{count}} uair",
+    "duration_hours_other": "{{count}} uair"
   },
   "free": {
     "page_title": "Earraí Saor in Aisce",

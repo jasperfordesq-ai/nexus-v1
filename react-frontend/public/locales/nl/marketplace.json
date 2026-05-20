@@ -456,6 +456,11 @@
     "featured": "Uitgelichte Vermelding",
     "top_of_category": "Bovenaan Categorie",
     "homepage_carousel": "Homepage Carrousel",
+    "cancel": "Annuleren",
+    "duration_days_one": "{{count}} dag",
+    "duration_days_other": "{{count}} dagen",
+    "duration_hours_one": "{{count}} uur",
+    "duration_hours_other": "{{count}} uur",
     "free_label": "Free"
   },
   "free": {

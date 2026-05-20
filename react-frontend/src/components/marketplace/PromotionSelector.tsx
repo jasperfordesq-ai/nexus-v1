@@ -53,14 +53,6 @@ const TYPE_COLORS: Record<string, 'primary' | 'warning' | 'secondary' | 'success
   homepage_carousel: 'success',
 };
 
-function formatDuration(hours: number): string {
-  if (hours >= 24) {
-    const days = Math.round(hours / 24);
-    return `${days} day${days !== 1 ? 's' : ''}`;
-  }
-  return `${hours} hour${hours !== 1 ? 's' : ''}`;
-}
-
 export function PromotionSelector({
   isOpen,
   onClose,
@@ -91,7 +83,7 @@ export function PromotionSelector({
       } catch (err) {
         logError('Failed to load promotion products', err);
         if (!cancelled) {
-          setError(t('promotions.load_error', 'Failed to load promotion options.'));
+          setError(t('promotions.load_error'));
         }
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -115,23 +107,36 @@ export function PromotionSelector({
         onPromoted?.();
         onClose();
       } else {
-        setError(t('promotions.create_error', 'Failed to create promotion.'));
+        setError(t('promotions.create_error'));
       }
     } catch (err) {
       logError('Failed to create promotion', err);
-      setError(t('promotions.create_error', 'Failed to create promotion.'));
+      setError(t('promotions.create_error'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const selectedProduct = products.find((p) => p.type === selectedType);
+  const selectedPrice = selectedProduct
+    ? selectedProduct.price > 0
+      ? `${selectedProduct.currency} ${Number(selectedProduct.price).toFixed(2)}`
+      : t('promotions.free_label')
+    : '';
+
+  const formatPromotionDuration = (hours: number): string => {
+    if (hours >= 24) {
+      return t('promotions.duration_days', { count: Math.round(hours / 24) });
+    }
+
+    return t('promotions.duration_hours', { count: hours });
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg">
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
-          <span>{t('promotions.title', 'Promote Listing')}</span>
+          <span>{t('promotions.title')}</span>
           <span className="text-sm font-normal text-default-500 truncate">{listingTitle}</span>
         </ModalHeader>
 
@@ -163,7 +168,7 @@ export function PromotionSelector({
                     <CardBody className="p-4">
                       <div className="flex items-start gap-3">
                         <div className={`p-2 rounded-lg bg-${color}/10`}>
-                          <Icon className={`w-5 h-5 text-${color}`} />
+                          <Icon aria-hidden="true" className={`w-5 h-5 text-${color}`} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
@@ -172,16 +177,16 @@ export function PromotionSelector({
                               <span className="font-bold text-foreground">
                                 {product.price > 0
                                   ? `${product.currency} ${Number(product.price).toFixed(2)}`
-                                  : t('promotions.free_label', 'Free')}
+                                  : t('promotions.free_label')}
                               </span>
-                              {isSelected && <Check className="w-5 h-5 text-primary" />}
+                              {isSelected && <Check aria-hidden="true" className="w-5 h-5 text-primary" />}
                             </div>
                           </div>
                           <p className="text-sm text-default-500 mt-1">{product.description}</p>
                           <div className="flex items-center gap-1 mt-2">
-                            <Clock className="w-3.5 h-3.5 text-default-400" />
+                            <Clock aria-hidden="true" className="w-3.5 h-3.5 text-default-400" />
                             <span className="text-xs text-default-400">
-                              {formatDuration(product.duration_hours)}
+                              {formatPromotionDuration(product.duration_hours)}
                             </span>
                           </div>
                         </div>
@@ -200,7 +205,7 @@ export function PromotionSelector({
 
         <ModalFooter>
           <Button variant="flat" onPress={onClose}>
-            {t('common.cancel', 'Cancel')}
+            {t('promotions.cancel')}
           </Button>
           <Button
             color="primary"
@@ -209,10 +214,8 @@ export function PromotionSelector({
             onPress={handleConfirm}
           >
             {selectedProduct
-              ? t('promotions.confirm_promote', 'Promote for {{price}}', {
-                  price: `${selectedProduct.currency} ${Number(selectedProduct.price).toFixed(2)}`,
-                })
-              : t('promotions.select_type', 'Select a promotion')}
+              ? t('promotions.confirm_promote', { price: selectedPrice })
+              : t('promotions.select_type')}
           </Button>
         </ModalFooter>
       </ModalContent>

@@ -456,6 +456,11 @@
     "featured": "Annonce en vedette",
     "top_of_category": "Haut de la catégorie",
     "homepage_carousel": "Carrousel de la page d'accueil",
+    "cancel": "Annuler",
+    "duration_days_one": "{{count}} jour",
+    "duration_days_other": "{{count}} jours",
+    "duration_hours_one": "{{count}} heure",
+    "duration_hours_other": "{{count}} heures",
     "free_label": "Free"
   },
   "free": {

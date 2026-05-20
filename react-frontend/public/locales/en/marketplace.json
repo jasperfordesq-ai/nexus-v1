@@ -491,7 +491,12 @@
     "bump": "Bump to Top",
     "featured": "Featured Listing",
     "top_of_category": "Top of Category",
-    "homepage_carousel": "Homepage Carousel"
+    "homepage_carousel": "Homepage Carousel",
+    "cancel": "Cancel",
+    "duration_days_one": "{{count}} day",
+    "duration_days_other": "{{count}} days",
+    "duration_hours_one": "{{count}} hour",
+    "duration_hours_other": "{{count}} hours"
   },
   "free": {
     "page_title": "Free Items",

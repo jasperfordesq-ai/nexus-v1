@@ -456,6 +456,11 @@
     "featured": "Listado destacado",
     "top_of_category": "Parte superior de la categoría",
     "homepage_carousel": "Carrusel de la página de inicio",
+    "cancel": "Cancelar",
+    "duration_days_one": "{{count}} día",
+    "duration_days_other": "{{count}} días",
+    "duration_hours_one": "{{count}} hora",
+    "duration_hours_other": "{{count}} horas",
     "free_label": "Free"
   },
   "free": {
