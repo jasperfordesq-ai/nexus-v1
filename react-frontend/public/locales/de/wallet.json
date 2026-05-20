@@ -89,6 +89,7 @@
   "donate_member_desc": "Kredite direkt an ein anderes Mitglied verschenken",
   "donate_recipient_id": "Empfänger-ID",
   "donate_recipient_placeholder": "Mitglieds-ID eingeben",
+  "donate_search_member": "Search by member",
   "donate_amount_placeholder": "1",
   "donate_message_placeholder": "Fügen Sie Ihrer Spende eine Notiz hinzu...",
   "donate_balance_info": "Ihr Guthaben: {{balance}} Stunden",

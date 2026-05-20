@@ -89,6 +89,7 @@
   "donate_member_desc": "Geef credits rechtstreeks aan een ander lid",
   "donate_recipient_id": "Ontvanger ID",
   "donate_recipient_placeholder": "Voer lid ID in",
+  "donate_search_member": "Search by member",
   "donate_amount_placeholder": "1",
   "donate_message_placeholder": "Voeg een opmerking toe bij je donatie...",
   "donate_balance_info": "Je saldo: {{balance}} uren",

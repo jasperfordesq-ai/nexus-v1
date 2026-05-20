@@ -89,6 +89,7 @@
   "donate_member_desc": "Regala créditos directamente a otro miembro",
   "donate_recipient_id": "ID del Destinatario",
   "donate_recipient_placeholder": "Introduzca ID del miembro",
+  "donate_search_member": "Search by member",
   "donate_amount_placeholder": "1",
   "donate_message_placeholder": "Añade una nota con tu donación...",
   "donate_balance_info": "Tu saldo: {{balance}} horas",

@@ -89,6 +89,7 @@
   "donate_member_desc": "Podaruj kredyty bezpośrednio innemu członkowi",
   "donate_recipient_id": "ID odbiorcy",
   "donate_recipient_placeholder": "Wprowadź ID członka",
+  "donate_search_member": "Search by member",
   "donate_amount_placeholder": "1",
   "donate_message_placeholder": "Dodaj notatkę do swojej darowizny...",
   "donate_balance_info": "Twoje saldo: {{balance}} godziny",

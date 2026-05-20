@@ -95,6 +95,7 @@
   "donate_member_desc": "Gift credits directly to another member",
   "donate_recipient_id": "Recipient ID",
   "donate_recipient_placeholder": "Enter member ID",
+  "donate_search_member": "Search by member",
   "donate_amount_placeholder": "1",
   "donate_message_placeholder": "Add a note with your donation...",
   "donate_balance_info": "Your balance: {{balance}} hours",

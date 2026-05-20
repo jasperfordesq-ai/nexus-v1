@@ -89,6 +89,7 @@
   "donate_member_desc": "Tabhair creidmheasanna go díreach do bhall eile",
   "donate_recipient_id": "Aitheantas Faighteora",
   "donate_recipient_placeholder": "Cuir aitheantas baill isteach",
+  "donate_search_member": "Search by member",
   "donate_amount_placeholder": "1",
   "donate_message_placeholder": "Cuir nóta le do thabhartas...",
   "donate_balance_info": "D'iarmhéid: {{balance}} uair",

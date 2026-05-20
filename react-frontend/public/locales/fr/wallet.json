@@ -89,6 +89,7 @@
   "donate_member_desc": "Offrir des crédits directement à un autre membre",
   "donate_recipient_id": "ID du destinataire",
   "donate_recipient_placeholder": "Saisir l'ID du membre",
+  "donate_search_member": "Search by member",
   "donate_amount_placeholder": "1",
   "donate_message_placeholder": "Ajouter une note à votre don...",
   "donate_balance_info": "Votre solde : {{balance}} heures",

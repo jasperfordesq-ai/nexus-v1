@@ -89,6 +89,7 @@
   "donate_member_desc": "別のメンバーに直接クレジットを贈る",
   "donate_recipient_id": "受取人ID",
   "donate_recipient_placeholder": "メンバーIDを入力してください",
+  "donate_search_member": "Search by member",
   "donate_amount_placeholder": "1",
   "donate_message_placeholder": "寄付にメモを追加...",
   "donate_balance_info": "あなたの残高：{{balance}} 時間",

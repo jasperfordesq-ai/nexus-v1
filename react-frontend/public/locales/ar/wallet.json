@@ -89,6 +89,7 @@
   "donate_member_desc": "أهدِ الرصيد مباشرةً لعضو آخر",
   "donate_recipient_id": "معرف المستلم",
   "donate_recipient_placeholder": "أدخل معرف العضو",
+  "donate_search_member": "Search by member",
   "donate_amount_placeholder": "1",
   "donate_message_placeholder": "أضف ملاحظة مع تبرعك...",
   "donate_balance_info": "رصيدك: {{balance}} ساعات",
