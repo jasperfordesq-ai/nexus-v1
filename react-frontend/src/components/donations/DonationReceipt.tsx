@@ -58,11 +58,11 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
         if (response.success && response.data) {
           setReceipt(response.data);
         } else {
-          setError(response.error || t('donations.receipt_error', 'Failed to load receipt.'));
+          setError(response.error || t('donations.receipt_error'));
         }
       } catch (err) {
         logError('Failed to fetch donation receipt', err);
-        setError(t('donations.receipt_error', 'Failed to load receipt.'));
+        setError(t('donations.receipt_error'));
       } finally {
         setIsLoading(false);
       }
@@ -87,7 +87,7 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
     return (
       <div className="text-center py-12">
         <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
-        <p className="text-theme-muted">{error || t('donations.receipt_not_found', 'Receipt not found.')}</p>
+        <p className="text-theme-muted">{error || t('donations.receipt_not_found')}</p>
       </div>
     );
   }
@@ -110,7 +110,7 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
         <CardHeader className="flex items-center gap-2 pb-2">
           <Receipt className="w-5 h-5 text-theme-muted" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary">
-            {t('donations.receipt_title', 'Donation Receipt')}
+            {t('donations.receipt_title')}
           </h2>
         </CardHeader>
 
@@ -118,7 +118,7 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
           {/* Reference */}
           {receipt.reference && (
             <div className="text-xs text-theme-subtle text-right">
-              {t('donations.receipt_ref', 'Ref: {{ref}}', { ref: receipt.reference })}
+              {t('donations.receipt_ref', { ref: receipt.reference })}
             </div>
           )}
 
@@ -131,35 +131,35 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
               variant="flat"
               className="mt-2"
             >
-              {t(`donations.status.${receipt.status}`, receipt.status)}
+              {t(`donations.status.${receipt.status}`)}
             </Chip>
           </div>
 
           {/* Details */}
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-theme-muted">{t('donations.receipt_donor', 'Donor')}</span>
+              <span className="text-theme-muted">{t('donations.receipt_donor')}</span>
               <span className="text-theme-primary font-medium">{receipt.donor_name}</span>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-theme-muted">{t('donations.receipt_date', 'Date')}</span>
+              <span className="text-theme-muted">{t('donations.receipt_date')}</span>
               <span className="text-theme-primary">{formatDateValue(receipt.date)}</span>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-theme-muted">{t('donations.receipt_community', 'Community')}</span>
+              <span className="text-theme-muted">{t('donations.receipt_community')}</span>
               <span className="text-theme-primary">{receipt.community_name}</span>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-theme-muted">{t('donations.receipt_method', 'Payment Method')}</span>
+              <span className="text-theme-muted">{t('donations.receipt_method')}</span>
               <span className="text-theme-primary capitalize">{receipt.payment_method}</span>
             </div>
 
             {receipt.message && (
               <div className="pt-2 border-t border-theme-default">
-                <p className="text-theme-muted text-xs mb-1">{t('donations.receipt_message', 'Message')}</p>
+                <p className="text-theme-muted text-xs mb-1">{t('donations.receipt_message')}</p>
                 <p className="text-theme-secondary italic">{receipt.message}</p>
               </div>
             )}
@@ -173,7 +173,7 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
               startContent={<Printer className="w-4 h-4" aria-hidden="true" />}
               onPress={handlePrint}
             >
-              {t('donations.print_receipt', 'Print Receipt')}
+              {t('donations.print_receipt')}
             </Button>
           </div>
         </CardBody>
