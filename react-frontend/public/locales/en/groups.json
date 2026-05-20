@@ -340,6 +340,7 @@
     "search_aria": "Search files",
     "upload_file": "Upload File",
     "all_files": "All Files",
+    "folder_chip": "{{name}} ({{count}})",
     "empty_title": "No files yet",
     "empty_description": "Upload files to share with group members",
     "no_results": "No files match your search",
@@ -358,7 +359,12 @@
     "folder_placeholder": "e.g. Documents, Photos",
     "description_label": "Description (optional)",
     "description_placeholder": "Brief description of the file",
-    "remove_file": "Remove file"
+    "remove_file": "Remove file",
+    "size_value": "{{value}} {{unit}}",
+    "size_b": "B",
+    "size_kb": "KB",
+    "size_mb": "MB",
+    "size_gb": "GB"
   },
   "media": {
     "filter_all": "All",

@@ -84,11 +84,14 @@ interface GroupFilesTabProps {
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  const units = ['B', 'KB', 'MB', 'GB'];
+function getFileSizeParts(bytes: number): { value: string; unitKey: string } {
+  if (bytes === 0) return { value: '0', unitKey: 'files.size_b' };
+  const unitKeys = ['files.size_b', 'files.size_kb', 'files.size_mb', 'files.size_gb'];
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+  return {
+    value: (bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1),
+    unitKey: unitKeys[i] ?? 'files.size_gb',
+  };
 }
 
 function getFileIcon(mimeType: string) {
@@ -124,6 +127,11 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
   const [uploadFolder, setUploadFolder] = useState('');
   const [uploadDescription, setUploadDescription] = useState('');
   const [deleting, setDeleting] = useState<number | null>(null);
+
+  const formatFileSize = useCallback((bytes: number) => {
+    const { value, unitKey } = getFileSizeParts(bytes);
+    return t('files.size_value', { value, unit: t(unitKey) });
+  }, [t]);
 
   const loadFiles = useCallback(
     async (reset = false) => {
@@ -186,7 +194,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
 
       await api.upload(`/v2/groups/${groupId}/files`, formData);
 
-      toast.success(t('files.upload_success', 'File uploaded successfully'));
+      toast.success(t('files.upload_success'));
       setSelectedFile(null);
       setUploadFolder('');
       setUploadDescription('');
@@ -195,7 +203,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
       loadFolders();
     } catch (err) {
       logError('GroupFilesTab.upload', err);
-      toast.error(t('files.upload_error', 'Failed to upload file'));
+      toast.error(t('files.upload_error'));
     } finally {
       setUploading(false);
     }
@@ -208,7 +216,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
       });
     } catch (err) {
       logError('GroupFilesTab.download', err);
-      toast.error(t('files.download_error', 'Failed to download file'));
+      toast.error(t('files.download_error'));
     }
   };
 
@@ -217,11 +225,11 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
     try {
       await api.delete(`/v2/groups/${groupId}/files/${fileId}`);
       setFiles((prev) => prev.filter((f) => f.id !== fileId));
-      toast.success(t('files.delete_success', 'File deleted'));
+      toast.success(t('files.delete_success'));
       loadFolders();
     } catch (err) {
       logError('GroupFilesTab.delete', err);
-      toast.error(t('files.delete_error', 'Failed to delete file'));
+      toast.error(t('files.delete_error'));
     } finally {
       setDeleting(null);
     }
@@ -231,7 +239,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 25 * 1024 * 1024) {
-        toast.error(t('files.too_large', 'File exceeds 25MB limit'));
+        toast.error(t('files.too_large'));
         return;
       }
       setSelectedFile(file);
@@ -245,7 +253,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
 
   if (loading && files.length === 0) {
     return (
-      <div className="flex justify-center py-12" aria-label={t('files.loading', 'Loading files')} aria-busy="true">
+      <div className="flex justify-center py-12" aria-label={t('files.loading')} aria-busy="true">
         <Spinner size="lg" />
       </div>
     );
@@ -256,22 +264,23 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <Input
-          placeholder={t('files.search_placeholder', 'Search files...')}
+          placeholder={t('files.search_placeholder')}
           value={search}
           onValueChange={setSearch}
           startContent={<Search className="w-4 h-4 text-default-400" aria-hidden="true" />}
           className="flex-1"
           size="sm"
-          aria-label={t('files.search_aria', 'Search files')}
+          aria-label={t('files.search_aria')}
         />
         {isMember && (
           <Button
             color="primary"
             size="sm"
+            className="w-full sm:w-auto"
             startContent={<Upload className="w-4 h-4" aria-hidden="true" />}
             onPress={() => fileInputRef.current?.click()}
           >
-            {t('files.upload', 'Upload File')}
+            {t('files.upload_file')}
           </Button>
         )}
         <input
@@ -290,9 +299,11 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
             variant={activeFolder === null ? 'solid' : 'bordered'}
             color="primary"
             className="cursor-pointer"
+            role="button"
+            aria-pressed={activeFolder === null}
             onClick={() => setActiveFolder(null)}
           >
-            {t('files.all_files', 'All Files')}
+            {t('files.all_files')}
           </Chip>
           {folders.map((folder) => (
             <Chip
@@ -300,10 +311,12 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
               variant={activeFolder === folder.folder ? 'solid' : 'bordered'}
               color="primary"
               className="cursor-pointer"
+              role="button"
+              aria-pressed={activeFolder === folder.folder}
               onClick={() => setActiveFolder(folder.folder)}
             >
               <FolderOpen className="w-3 h-3 mr-1 inline" aria-hidden="true" />
-              {folder.folder} ({folder.file_count})
+              {t('files.folder_chip', { name: folder.folder, count: folder.file_count })}
             </Chip>
           ))}
         </div>
@@ -313,11 +326,11 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
       {files.length === 0 ? (
         <EmptyState
           icon={<FolderOpen className="w-12 h-12" aria-hidden="true" />}
-          title={t('files.empty_title', 'No files yet')}
+          title={t('files.empty_title')}
           description={
             search
-              ? t('files.no_results', 'No files match your search')
-              : t('files.empty_description', 'Upload files to share with group members')
+              ? t('files.no_results')
+              : t('files.empty_description')
           }
         />
       ) : (
@@ -325,7 +338,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
           {files.map((file) => {
             const FileIcon = getFileIcon(file.file_type);
             return (
-              <GlassCard key={file.id} className="p-3">
+              <GlassCard key={file.id} className="p-3 transition-colors hover:bg-default-50 dark:hover:bg-default-100/5">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <FileIcon className="w-5 h-5 text-primary" aria-hidden="true" />
@@ -335,7 +348,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
                     <p className="text-sm font-medium text-theme-primary truncate">
                       {file.file_name}
                     </p>
-                    <div className="flex items-center gap-2 text-xs text-theme-subtle">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-theme-subtle">
                       <span>{formatFileSize(file.file_size)}</span>
                       <span aria-hidden="true">&#183;</span>
                       <span>{file.uploader_name}</span>
@@ -370,7 +383,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
                             isIconOnly
                             variant="light"
                             size="sm"
-                            aria-label={t('files.actions_aria', 'File actions')}
+                            aria-label={t('files.actions_aria')}
                           >
                             <MoreVertical className="w-4 h-4" />
                           </Button>
@@ -385,8 +398,8 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
                             isDisabled={deleting === file.id}
                           >
                             {deleting === file.id
-                              ? t('files.deleting', 'Deleting...')
-                              : t('files.delete', 'Delete')}
+                              ? t('files.deleting')
+                              : t('files.delete')}
                           </DropdownItem>
                         </DropdownMenu>
                       </Dropdown>
@@ -403,7 +416,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
       {hasMore && (
         <div className="flex justify-center pt-4">
           <Button variant="flat" size="sm" onPress={() => loadFiles(false)} isLoading={loading}>
-            {t('files.load_more', 'Load More')}
+            {t('files.load_more')}
           </Button>
         </div>
       )}
@@ -411,11 +424,11 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
       {/* Upload modal */}
       <Modal isOpen={uploadModal.isOpen} onClose={uploadModal.onClose} size="md">
         <ModalContent>
-          <ModalHeader>{t('files.upload_title', 'Upload File')}</ModalHeader>
+          <ModalHeader>{t('files.upload_title')}</ModalHeader>
           <ModalBody>
             {selectedFile && (
               <div className="space-y-4">
-                <div className="flex items-center gap-3 p-3 bg-default-100 rounded-lg">
+                <div className="flex items-center gap-3 rounded-lg border border-default-200 bg-default-100 p-3">
                   <File className="w-8 h-8 text-primary" aria-hidden="true" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{selectedFile.name}</p>
@@ -426,15 +439,15 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
                     variant="light"
                     size="sm"
                     onPress={() => setSelectedFile(null)}
-                    aria-label={t('files.remove_file', 'Remove file')}
+                    aria-label={t('files.remove_file')}
                   >
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
 
                 <Input
-                  label={t('files.folder_label', 'Folder (optional)')}
-                  placeholder={t('files.folder_placeholder', 'e.g. Documents, Photos')}
+                  label={t('files.folder_label')}
+                  placeholder={t('files.folder_placeholder')}
                   value={uploadFolder}
                   onValueChange={setUploadFolder}
                   startContent={<FolderPlus className="w-4 h-4 text-default-400" aria-hidden="true" />}
@@ -442,8 +455,8 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
                 />
 
                 <Textarea
-                  label={t('files.description_label', 'Description (optional)')}
-                  placeholder={t('files.description_placeholder', 'Brief description of the file')}
+                  label={t('files.description_label')}
+                  placeholder={t('files.description_placeholder')}
                   value={uploadDescription}
                   onValueChange={setUploadDescription}
                   minRows={2}
@@ -454,7 +467,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={uploadModal.onClose}>
-              {t('files.cancel', 'Cancel')}
+              {t('files.cancel')}
             </Button>
             <Button
               color="primary"
@@ -462,7 +475,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
               isLoading={uploading}
               isDisabled={!selectedFile}
             >
-              {t('files.upload_btn', 'Upload')}
+              {t('files.upload_btn')}
             </Button>
           </ModalFooter>
         </ModalContent>
