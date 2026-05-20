@@ -3389,6 +3389,100 @@
       "dispatch_failed": "Dispatch failed"
     }
   },
+  "help_request_sla": {
+    "meta": {
+      "page_title": "Help Request SLA Dashboard",
+      "title": "Help Request SLA Dashboard",
+      "subtitle_prefix": "AG96 - first-response and resolution",
+      "subtitle_suffix": "tracking against AG81 operating policy"
+    },
+    "actions": {
+      "edit_policy": "Edit policy",
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh SLA dashboard"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Service Level Agreements (SLAs) set the maximum expected response and resolution times for help requests. When a request approaches or exceeds its SLA, it is flagged as overdue in this dashboard. SLAs help you maintain consistent service quality and generate accurate pilot metrics.",
+      "first_response_label": "First response",
+      "first_response_prefix": "time from request submission to first coordinator contact (status moves out of",
+      "first_response_suffix": ")",
+      "resolution_label": "Resolution",
+      "resolution_prefix": "time from first response to the request being matched and confirmed (status reaches",
+      "resolution_suffix": ")",
+      "note": "SLA windows are set in the AG81 Operating Policy. Edit them using the \"Edit policy\" button above. Set tighter SLAs for urgent care categories (e.g. medical transport) and looser ones for social activities."
+    },
+    "policy": {
+      "first_response_description": "- time from submission to first coordinator contact",
+      "resolution_description": "- time from first response to request being matched and confirmed",
+      "platform_defaults": "Platform defaults - no AG81 workshop run",
+      "tenant_policy": "Tenant policy applied"
+    },
+    "metrics": {
+      "first_response_breached": "First-response breached",
+      "first_response_at_risk": "First-response at risk",
+      "resolution_breached": "Resolution breached",
+      "resolution_at_risk": "Resolution at risk",
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "resolved_24h": "Resolved <24h (recent)"
+    },
+    "open": {
+      "title": "Open help requests",
+      "subtitle": "{{count}} open - sorted breached first",
+      "bucket_filter_aria": "Bucket filter",
+      "all_count": "All ({{count}})",
+      "breached_count": "Breached ({{count}})",
+      "at_risk_count": "At risk ({{count}})",
+      "on_track_count": "On track ({{count}})",
+      "empty_bucket": "No open help requests in this bucket.",
+      "table_aria": "Open help requests",
+      "request_meta": "When: {{when}} - user #{{userId}} - age {{age}}",
+      "target_hours": "Target {{hours}}h",
+      "over_by": "Over by {{duration}}",
+      "left": "{{duration}} left"
+    },
+    "resolved": {
+      "title": "Recently resolved (last 72h)",
+      "table_aria": "Recently resolved help requests",
+      "user_id": "user #{{userId}}"
+    },
+    "table": {
+      "request": "Request",
+      "bucket": "Bucket",
+      "status": "Status",
+      "created": "Created",
+      "turnaround": "Turnaround",
+      "within": "Within",
+      "resolved": "Resolved"
+    },
+    "buckets": {
+      "breached": "Breached",
+      "at_risk": "At risk",
+      "on_track": "On track"
+    },
+    "dimensions": {
+      "first_response": "First response",
+      "resolution": "Resolution"
+    },
+    "answers": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "footer": {
+      "generated": "Report generated {{date}}.",
+      "proxy_prefix": "proxy: first-response = status moves out of",
+      "proxy_middle": "resolution = status reaches",
+      "proxy_suffix": "Adjust",
+      "proxy_end": "windows in AG81 operating policy."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Failed to load SLA dashboard"
+    }
+  },
   "federation_peers_admin": {
     "meta": {
       "page_title": "Federation Peers - Admin",
