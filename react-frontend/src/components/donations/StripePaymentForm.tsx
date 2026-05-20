@@ -65,21 +65,21 @@ function PaymentForm({ onSuccess, onError }: Omit<StripePaymentFormProps, 'clien
       });
 
       if (error) {
-        const msg = error.message || t('donations.payment_failed', 'Payment failed. Please try again.');
+        const msg = error.message || t('donations.payment_failed');
         setErrorMessage(msg);
         onError(msg);
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
         onSuccess();
       } else if (paymentIntent && paymentIntent.status === 'requires_action') {
         // 3D Secure or other action — Stripe handles this automatically
-        setErrorMessage(t('donations.payment_action_required', 'Additional authentication required.'));
+        setErrorMessage(t('donations.payment_action_required'));
       } else {
-        const msg = t('donations.payment_unexpected', 'Unexpected payment status. Please contact support.');
+        const msg = t('donations.payment_unexpected');
         setErrorMessage(msg);
         onError(msg);
       }
-    } catch (err) {
-      const msg = t('donations.payment_error', 'An error occurred during payment.');
+    } catch {
+      const msg = t('donations.payment_error');
       setErrorMessage(msg);
       onError(msg);
     } finally {
@@ -99,7 +99,7 @@ function PaymentForm({ onSuccess, onError }: Omit<StripePaymentFormProps, 'clien
         <Chip
           color="danger"
           variant="flat"
-          startContent={<AlertTriangle className="w-3 h-3" />}
+          startContent={<AlertTriangle aria-hidden="true" className="w-3 h-3" />}
           className="w-full max-w-full"
         >
           {errorMessage}
@@ -114,8 +114,8 @@ function PaymentForm({ onSuccess, onError }: Omit<StripePaymentFormProps, 'clien
         startContent={!isProcessing ? <CreditCard className="w-4 h-4" aria-hidden="true" /> : undefined}
       >
         {isProcessing
-          ? t('donations.processing', 'Processing...')
-          : t('donations.pay_now', 'Pay Now')}
+          ? t('donations.processing')
+          : t('donations.pay_now')}
       </Button>
     </form>
   );
