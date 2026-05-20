@@ -53,26 +53,26 @@ export function HowItWorksSection({ content }: HowItWorksSectionProps) {
       : [
           {
             Icon: UserPlus,
-            title: t('home.how_it_works.steps.0.title', 'Sign Up Free'),
-            description: t('home.how_it_works.steps.0.description', 'Create your profile in minutes and list the skills you can offer.'),
+            title: t('home.how_it_works.steps.0.title'),
+            description: t('home.how_it_works.steps.0.description'),
             color: 'from-indigo-500 to-blue-500',
           },
           {
             Icon: Search,
-            title: t('home.how_it_works.steps.1.title', 'Browse & Connect'),
-            description: t('home.how_it_works.steps.1.description', 'Find services you need and connect with local community members.'),
+            title: t('home.how_it_works.steps.1.title'),
+            description: t('home.how_it_works.steps.1.description'),
             color: 'from-purple-500 to-pink-500',
           },
           {
             Icon: Handshake,
-            title: t('home.how_it_works.steps.2.title', 'Exchange Services'),
-            description: t('home.how_it_works.steps.2.description', 'Arrange skill exchanges and help each other out.'),
+            title: t('home.how_it_works.steps.2.title'),
+            description: t('home.how_it_works.steps.2.description'),
             color: 'from-cyan-500 to-teal-500',
           },
           {
             Icon: Coins,
-            title: t('home.how_it_works.steps.3.title', 'Earn Credits'),
-            description: t('home.how_it_works.steps.3.description', 'Get one time credit for every hour you give. Spend them freely.'),
+            title: t('home.how_it_works.steps.3.title'),
+            description: t('home.how_it_works.steps.3.description'),
             color: 'from-amber-500 to-orange-500',
           },
         ];
