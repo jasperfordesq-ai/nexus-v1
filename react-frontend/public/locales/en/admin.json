@@ -2643,6 +2643,109 @@
       "create_failed": "Create failed"
     }
   },
+  "research_partnerships": {
+    "meta": {
+      "title": "Research Partnerships",
+      "subtitle": "Manage privacy-safe research partners, aggregate dataset exports, and revocation history"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh research partnerships",
+      "generate_export": "Generate export",
+      "add_partner": "Add partner",
+      "view": "View",
+      "open": "Open",
+      "revoke": "Revoke",
+      "cancel": "Cancel",
+      "create": "Create",
+      "close": "Close",
+      "download_markdown": "Download Markdown",
+      "render": "Render",
+      "rerender": "Re-render",
+      "generate": "Generate"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Research partnerships give approved academic or policy researchers controlled access to anonymised platform data for evaluation purposes. Each partnership defines a specific data scope, a duration, and a data sharing agreement. All access is logged. Partners never see individual member data - only aggregated or anonymised datasets.",
+      "data_scope_label": "Data scope:",
+      "data_scope_body": "Define exactly what data the researcher can access, for example aggregate monthly care hours by sub-region, excluding all personal identifiers. The scope is contractually binding and audited quarterly.",
+      "download_history_label": "Download history:",
+      "download_history_body": "Every data export is logged with a timestamp and the researcher's details. This log is available to your Data Protection Officer on request. Use Revoke to withdraw a previously issued dataset."
+    },
+    "partners": {
+      "title": "Research Partners",
+      "table_aria": "Research partners",
+      "empty": "No research partners yet."
+    },
+    "templates": {
+      "title": "Agreement Templates",
+      "subtitle": "FADP/nDSG-aligned drafts for legal review",
+      "empty": "No agreement templates available.",
+      "placeholder_count_one": "{{count}} placeholder",
+      "placeholder_count_other": "{{count}} placeholders",
+      "fallback_title": "Agreement Template",
+      "placeholder_label": "{{placeholder}}",
+      "rendered_markdown": "Rendered Markdown ({{count}} chars)",
+      "missing_placeholder_count_one": "{{count}} placeholder missing",
+      "missing_placeholder_count_other": "{{count}} placeholders missing"
+    },
+    "exports": {
+      "title": "Dataset Export History",
+      "table_aria": "Research dataset exports",
+      "empty": "No dataset exports yet.",
+      "partner_fallback": "Partner #{{id}}"
+    },
+    "columns": {
+      "partner": "Partner",
+      "status": "Status",
+      "agreement": "Agreement",
+      "methodology": "Methodology",
+      "created": "Created",
+      "period": "Period",
+      "rows": "Rows",
+      "hash": "Hash",
+      "actions": "Actions"
+    },
+    "fields": {
+      "name": "Name",
+      "institution": "Institution",
+      "contact_email": "Contact email",
+      "agreement_reference": "Agreement reference",
+      "methodology_url": "Methodology URL",
+      "status": "Status",
+      "dataset_scope": "Dataset scope",
+      "dataset_scope_description": "Comma-separated dataset keys.",
+      "period_start": "Period start",
+      "period_end": "Period end"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "active": "Active",
+      "paused": "Paused",
+      "ended": "Ended",
+      "generated": "Generated",
+      "superseded": "Superseded",
+      "revoked": "Revoked"
+    },
+    "partner_modal": {
+      "title": "Add Research Partner"
+    },
+    "export_modal": {
+      "title": "Generate Aggregate Dataset",
+      "active_partner": "Active research partner",
+      "privacy_note": "Exports are aggregate only and use suppression thresholds. Direct member identifiers are not included."
+    },
+    "toasts": {
+      "load_failed": "Failed to load research partnerships",
+      "render_template_failed": "Failed to render template",
+      "create_partner_failed": "Failed to create research partner",
+      "partner_created": "Research partner created",
+      "generate_export_failed": "Failed to generate dataset export",
+      "export_generated": "Aggregate dataset export generated",
+      "revoke_export_failed": "Failed to revoke dataset export",
+      "export_revoked": "Dataset export revoked"
+    }
+  },
   "billing": {
     "actions": "Actions",
     "billing_interval": "Billing Interval",

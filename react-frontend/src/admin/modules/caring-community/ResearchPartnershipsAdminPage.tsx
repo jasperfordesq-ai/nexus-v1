@@ -104,8 +104,8 @@ function formatDate(value: string | null): string {
 }
 
 export default function ResearchPartnershipsAdminPage() {
-  const { t } = useTranslation('caring_community', { keyPrefix: 'admin_a11y' });
-  usePageTitle('Research Partnerships');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('research_partnerships.meta.title'));
   const { showToast } = useToast();
 
   const [partners, setPartners] = useState<ResearchPartner[]>([]);
@@ -158,11 +158,11 @@ export default function ResearchPartnershipsAdminPage() {
         setTemplates(templatesResponse.data?.templates ?? []);
       }
     } catch {
-      showToast('Failed to load research partnerships', 'error');
+      showToast(t('research_partnerships.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   const openTemplate = useCallback((template: AgreementTemplateSummary) => {
     setActiveTemplate(template);
@@ -186,14 +186,14 @@ export default function ResearchPartnershipsAdminPage() {
       if (response.success && response.data) {
         setRenderedTemplate(response.data);
       } else {
-        showToast(response.error || 'Failed to render template', 'error');
+        showToast(response.error || t('research_partnerships.toasts.render_template_failed'), 'error');
       }
     } catch {
-      showToast('Failed to render template', 'error');
+      showToast(t('research_partnerships.toasts.render_template_failed'), 'error');
     } finally {
       setRenderingTemplate(false);
     }
-  }, [activeTemplate, templateValues, showToast]);
+  }, [activeTemplate, templateValues, showToast, t]);
 
   const downloadRendered = useCallback(() => {
     if (!renderedTemplate) return;
@@ -234,15 +234,15 @@ export default function ResearchPartnershipsAdminPage() {
     });
 
     if (!response.success) {
-      showToast(response.error || 'Failed to create research partner', 'error');
+      showToast(response.error || t('research_partnerships.toasts.create_partner_failed'), 'error');
       return;
     }
 
-    showToast('Research partner created', 'success');
+    showToast(t('research_partnerships.toasts.partner_created'), 'success');
     setPartnerModalOpen(false);
     resetPartnerForm();
     await load();
-  }, [agreementReference, contactEmail, institution, load, methodologyUrl, name, scope, showToast, status]);
+  }, [agreementReference, contactEmail, institution, load, methodologyUrl, name, scope, showToast, status, t]);
 
   const generateExport = useCallback(async () => {
     if (!selectedPartnerId) return;
@@ -258,14 +258,14 @@ export default function ResearchPartnershipsAdminPage() {
     setWorkingId(null);
 
     if (!response.success) {
-      showToast(response.error || 'Failed to generate dataset export', 'error');
+      showToast(response.error || t('research_partnerships.toasts.generate_export_failed'), 'error');
       return;
     }
 
-    showToast('Aggregate dataset export generated', 'success');
+    showToast(t('research_partnerships.toasts.export_generated'), 'success');
     setExportModalOpen(false);
     await load();
-  }, [load, periodEnd, periodStart, selectedPartnerId, showToast]);
+  }, [load, periodEnd, periodStart, selectedPartnerId, showToast, t]);
 
   const revokeExport = useCallback(async (exportId: number) => {
     setWorkingId(exportId);
@@ -273,39 +273,39 @@ export default function ResearchPartnershipsAdminPage() {
     setWorkingId(null);
 
     if (!response.success) {
-      showToast(response.error || 'Failed to revoke dataset export', 'error');
+      showToast(response.error || t('research_partnerships.toasts.revoke_export_failed'), 'error');
       return;
     }
 
-    showToast('Dataset export revoked', 'success');
+    showToast(t('research_partnerships.toasts.export_revoked'), 'success');
     await load();
-  }, [load, showToast]);
+  }, [load, showToast, t]);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Research Partnerships"
-        subtitle="Manage privacy-safe research partners, aggregate dataset exports, and revocation history"
+        title={t('research_partnerships.meta.title')}
+        subtitle={t('research_partnerships.meta.subtitle')}
         icon={<FlaskConical size={20} />}
         actions={
           <div className="flex items-center gap-2">
-            <Tooltip content="Refresh">
+            <Tooltip content={t('research_partnerships.actions.refresh')}>
               <Button
                 isIconOnly
                 size="sm"
                 variant="flat"
                 onPress={() => void load()}
                 isLoading={loading}
-                aria-label={t('refresh_research_partnerships')}
+                aria-label={t('research_partnerships.actions.refresh_aria')}
               >
                 <RefreshCw size={15} />
               </Button>
             </Tooltip>
             <Button size="sm" variant="flat" startContent={<Database size={15} />} onPress={() => setExportModalOpen(true)}>
-              Generate Export
+              {t('research_partnerships.actions.generate_export')}
             </Button>
             <Button size="sm" color="primary" startContent={<Plus size={15} />} onPress={() => setPartnerModalOpen(true)}>
-              Add Partner
+              {t('research_partnerships.actions.add_partner')}
             </Button>
           </div>
         }
@@ -317,17 +317,19 @@ export default function ResearchPartnershipsAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('research_partnerships.about.title')}</p>
               <p className="text-default-600">
-                Research Partnerships give approved academic or policy researchers controlled access
-                to anonymised platform data for evaluation purposes. Each partnership defines a
-                specific data scope (which metrics can be accessed), a duration, and a data sharing
-                agreement. All access is logged. Partners never see individual member data — only
-                aggregated or anonymised datasets.
+                {t('research_partnerships.about.body')}
               </p>
               <div className="space-y-0.5 pt-1 text-default-500">
-                <p><strong>Data scope:</strong> Define exactly what data the researcher can access — e.g. aggregate monthly care hours by sub-region, excluding all personal identifiers. The scope is contractually binding and audited quarterly.</p>
-                <p><strong>Download history:</strong> Every data export is logged with a timestamp and the researcher's details. This log is available to your Data Protection Officer on request. Use Revoke to withdraw a previously issued dataset.</p>
+                <p>
+                  <strong>{t('research_partnerships.about.data_scope_label')}</strong>{' '}
+                  {t('research_partnerships.about.data_scope_body')}
+                </p>
+                <p>
+                  <strong>{t('research_partnerships.about.download_history_label')}</strong>{' '}
+                  {t('research_partnerships.about.download_history_body')}
+                </p>
               </div>
             </div>
           </div>
@@ -337,21 +339,21 @@ export default function ResearchPartnershipsAdminPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <FlaskConical size={18} className="text-primary" />
-          <span className="font-semibold">Research Partners</span>
+          <span className="font-semibold">{t('research_partnerships.partners.title')}</span>
         </CardHeader>
         <CardBody className="p-0">
           {loading ? (
             <div className="flex justify-center py-10"><Spinner /></div>
           ) : (
-            <Table aria-label="Research partners" removeWrapper>
+            <Table aria-label={t('research_partnerships.partners.table_aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>Partner</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Agreement</TableColumn>
-                <TableColumn>Methodology</TableColumn>
-                <TableColumn>Created</TableColumn>
+                <TableColumn>{t('research_partnerships.columns.partner')}</TableColumn>
+                <TableColumn>{t('research_partnerships.columns.status')}</TableColumn>
+                <TableColumn>{t('research_partnerships.columns.agreement')}</TableColumn>
+                <TableColumn>{t('research_partnerships.columns.methodology')}</TableColumn>
+                <TableColumn>{t('research_partnerships.columns.created')}</TableColumn>
               </TableHeader>
-              <TableBody emptyContent="No research partners yet.">
+              <TableBody emptyContent={t('research_partnerships.partners.empty')}>
                 {partners.map((partner) => (
                   <TableRow key={partner.id}>
                     <TableCell>
@@ -361,14 +363,14 @@ export default function ResearchPartnershipsAdminPage() {
                     </TableCell>
                     <TableCell>
                       <Chip size="sm" color={statusColors[partner.status] ?? 'default'} variant="flat">
-                        {partner.status}
+                        {t(`research_partnerships.statuses.${partner.status}`)}
                       </Chip>
                     </TableCell>
                     <TableCell>{partner.agreement_reference || '-'}</TableCell>
                     <TableCell>
                       {partner.methodology_url ? (
                         <a className="text-primary text-sm" href={partner.methodology_url} target="_blank" rel="noreferrer">
-                          View
+                          {t('research_partnerships.actions.view')}
                         </a>
                       ) : '-'}
                     </TableCell>
@@ -384,14 +386,14 @@ export default function ResearchPartnershipsAdminPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <FileText size={18} className="text-primary" />
-          <span className="font-semibold">Agreement Templates</span>
+          <span className="font-semibold">{t('research_partnerships.templates.title')}</span>
           <span className="text-xs text-default-500 font-normal ml-2">
-            FADP/nDSG-aligned drafts for legal review
+            {t('research_partnerships.templates.subtitle')}
           </span>
         </CardHeader>
         <CardBody>
           {templates.length === 0 ? (
-            <p className="text-sm text-default-500">No agreement templates available.</p>
+            <p className="text-sm text-default-500">{t('research_partnerships.templates.empty')}</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {templates.map((template) => (
@@ -416,8 +418,7 @@ export default function ResearchPartnershipsAdminPage() {
                   )}
                   <div className="flex items-center justify-between mt-2.5">
                     <span className="text-xs text-default-400">
-                      {template.placeholders.length} placeholder
-                      {template.placeholders.length === 1 ? '' : 's'}
+                      {t('research_partnerships.templates.placeholder_count', { count: template.placeholders.length })}
                     </span>
                     <Button
                       size="sm"
@@ -425,7 +426,7 @@ export default function ResearchPartnershipsAdminPage() {
                       color="primary"
                       onPress={() => openTemplate(template)}
                     >
-                      Open
+                      {t('research_partnerships.actions.open')}
                     </Button>
                   </div>
                 </div>
@@ -438,29 +439,31 @@ export default function ResearchPartnershipsAdminPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <FileCheck2 size={18} className="text-primary" />
-          <span className="font-semibold">Dataset Export History</span>
+          <span className="font-semibold">{t('research_partnerships.exports.title')}</span>
         </CardHeader>
         <CardBody className="p-0">
-          <Table aria-label="Research dataset exports" removeWrapper>
+          <Table aria-label={t('research_partnerships.exports.table_aria')} removeWrapper>
             <TableHeader>
-              <TableColumn>Partner</TableColumn>
-              <TableColumn>Period</TableColumn>
-              <TableColumn>Status</TableColumn>
-              <TableColumn>Rows</TableColumn>
-              <TableColumn>Hash</TableColumn>
-              <TableColumn>Actions</TableColumn>
+              <TableColumn>{t('research_partnerships.columns.partner')}</TableColumn>
+              <TableColumn>{t('research_partnerships.columns.period')}</TableColumn>
+              <TableColumn>{t('research_partnerships.columns.status')}</TableColumn>
+              <TableColumn>{t('research_partnerships.columns.rows')}</TableColumn>
+              <TableColumn>{t('research_partnerships.columns.hash')}</TableColumn>
+              <TableColumn>{t('research_partnerships.columns.actions')}</TableColumn>
             </TableHeader>
-            <TableBody emptyContent="No dataset exports yet.">
+            <TableBody emptyContent={t('research_partnerships.exports.empty')}>
               {exports.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
-                    <div className="font-medium">{item.partner_name || `Partner #${item.partner_id}`}</div>
+                    <div className="font-medium">
+                      {item.partner_name || t('research_partnerships.exports.partner_fallback', { id: item.partner_id })}
+                    </div>
                     <div className="text-xs text-default-500">{item.partner_institution || item.dataset_key}</div>
                   </TableCell>
                   <TableCell>{formatDate(item.period_start)} - {formatDate(item.period_end)}</TableCell>
                   <TableCell>
                     <Chip size="sm" color={statusColors[item.status] ?? 'default'} variant="flat">
-                      {item.status}
+                      {t(`research_partnerships.statuses.${item.status}`)}
                     </Chip>
                   </TableCell>
                   <TableCell>{item.row_count}</TableCell>
@@ -477,7 +480,7 @@ export default function ResearchPartnershipsAdminPage() {
                       isLoading={workingId === item.id}
                       onPress={() => void revokeExport(item.id)}
                     >
-                      Revoke
+                      {t('research_partnerships.actions.revoke')}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -491,36 +494,55 @@ export default function ResearchPartnershipsAdminPage() {
         <ModalContent>
           {(close) => (
             <>
-              <ModalHeader>Add Research Partner</ModalHeader>
+              <ModalHeader>{t('research_partnerships.partner_modal.title')}</ModalHeader>
               <ModalBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <Input label="Name" value={name} onValueChange={setName} isRequired />
-                  <Input label="Institution" value={institution} onValueChange={setInstitution} isRequired />
-                  <Input label="Contact email" value={contactEmail} onValueChange={setContactEmail} type="email" />
-                  <Input label="Agreement reference" value={agreementReference} onValueChange={setAgreementReference} />
-                  <Input label="Methodology URL" value={methodologyUrl} onValueChange={setMethodologyUrl} className="md:col-span-2" />
+                  <Input label={t('research_partnerships.fields.name')} value={name} onValueChange={setName} isRequired />
+                  <Input
+                    label={t('research_partnerships.fields.institution')}
+                    value={institution}
+                    onValueChange={setInstitution}
+                    isRequired
+                  />
+                  <Input
+                    label={t('research_partnerships.fields.contact_email')}
+                    value={contactEmail}
+                    onValueChange={setContactEmail}
+                    type="email"
+                  />
+                  <Input
+                    label={t('research_partnerships.fields.agreement_reference')}
+                    value={agreementReference}
+                    onValueChange={setAgreementReference}
+                  />
+                  <Input
+                    label={t('research_partnerships.fields.methodology_url')}
+                    value={methodologyUrl}
+                    onValueChange={setMethodologyUrl}
+                    className="md:col-span-2"
+                  />
                   <Select
-                    label="Status"
+                    label={t('research_partnerships.fields.status')}
                     selectedKeys={[status]}
                     onChange={(event) => setStatus(event.target.value as PartnerStatus)}
                   >
                     {['draft', 'active', 'paused', 'ended'].map((item) => (
-                      <SelectItem key={item}>{item}</SelectItem>
+                      <SelectItem key={item}>{t(`research_partnerships.statuses.${item}`)}</SelectItem>
                     ))}
                   </Select>
                   <Textarea
-                    label="Dataset scope"
+                    label={t('research_partnerships.fields.dataset_scope')}
                     value={scope}
                     onValueChange={setScope}
                     className="md:col-span-2"
-                    description="Comma-separated dataset keys."
+                    description={t('research_partnerships.fields.dataset_scope_description')}
                   />
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={close}>Cancel</Button>
+                <Button variant="flat" onPress={close}>{t('research_partnerships.actions.cancel')}</Button>
                 <Button color="primary" onPress={() => void createPartner()} isDisabled={!name.trim() || !institution.trim()}>
-                  Create
+                  {t('research_partnerships.actions.create')}
                 </Button>
               </ModalFooter>
             </>
@@ -533,7 +555,7 @@ export default function ResearchPartnershipsAdminPage() {
           {(close) => (
             <>
               <ModalHeader>
-                {activeTemplate?.title ?? 'Agreement Template'}
+                {activeTemplate?.title ?? t('research_partnerships.templates.fallback_title')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 {activeTemplate && (
@@ -543,7 +565,7 @@ export default function ResearchPartnershipsAdminPage() {
                       {activeTemplate.placeholders.map((p) => (
                         <Input
                           key={p}
-                          label={p.replace(/_/g, ' ')}
+                          label={t('research_partnerships.templates.placeholder_label', { placeholder: p.replace(/_/g, ' ') })}
                           size="sm"
                           value={templateValues[p] ?? ''}
                           onValueChange={(v) =>
@@ -556,12 +578,13 @@ export default function ResearchPartnershipsAdminPage() {
                       <div className="rounded-lg border border-default-200 bg-default-50 dark:bg-default-100/30 p-3">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold">
-                            Rendered Markdown ({renderedTemplate.markdown.length} chars)
+                            {t('research_partnerships.templates.rendered_markdown', { count: renderedTemplate.markdown.length })}
                           </span>
                           {renderedTemplate.placeholders_missing.length > 0 && (
                             <Chip size="sm" color="warning" variant="flat">
-                              {renderedTemplate.placeholders_missing.length} placeholder
-                              {renderedTemplate.placeholders_missing.length === 1 ? '' : 's'} missing
+                              {t('research_partnerships.templates.missing_placeholder_count', {
+                                count: renderedTemplate.placeholders_missing.length,
+                              })}
                             </Chip>
                           )}
                         </div>
@@ -574,14 +597,14 @@ export default function ResearchPartnershipsAdminPage() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={close}>Close</Button>
+                <Button variant="flat" onPress={close}>{t('research_partnerships.actions.close')}</Button>
                 {renderedTemplate && (
                   <Button variant="flat" color="primary" onPress={downloadRendered}>
-                    Download Markdown
+                    {t('research_partnerships.actions.download_markdown')}
                   </Button>
                 )}
                 <Button color="primary" onPress={() => void renderTemplate()} isLoading={renderingTemplate}>
-                  {renderedTemplate ? 'Re-render' : 'Render'}
+                  {renderedTemplate ? t('research_partnerships.actions.rerender') : t('research_partnerships.actions.render')}
                 </Button>
               </ModalFooter>
             </>
@@ -593,10 +616,10 @@ export default function ResearchPartnershipsAdminPage() {
         <ModalContent>
           {(close) => (
             <>
-              <ModalHeader>Generate Aggregate Dataset</ModalHeader>
+              <ModalHeader>{t('research_partnerships.export_modal.title')}</ModalHeader>
               <ModalBody>
                 <Select
-                  label="Active research partner"
+                  label={t('research_partnerships.export_modal.active_partner')}
                   selectedKeys={selectedPartnerId ? [String(selectedPartnerId)] : []}
                   onChange={(event) => setSelectedPartnerId(Number(event.target.value) || null)}
                 >
@@ -605,17 +628,27 @@ export default function ResearchPartnershipsAdminPage() {
                   ))}
                 </Select>
                 <div className="grid grid-cols-2 gap-3">
-                  <Input label="Period start" type="date" value={periodStart} onValueChange={setPeriodStart} />
-                  <Input label="Period end" type="date" value={periodEnd} onValueChange={setPeriodEnd} />
+                  <Input
+                    label={t('research_partnerships.fields.period_start')}
+                    type="date"
+                    value={periodStart}
+                    onValueChange={setPeriodStart}
+                  />
+                  <Input
+                    label={t('research_partnerships.fields.period_end')}
+                    type="date"
+                    value={periodEnd}
+                    onValueChange={setPeriodEnd}
+                  />
                 </div>
                 <p className="text-xs text-default-500">
-                  Exports are aggregate only and use suppression thresholds. Direct member identifiers are not included.
+                  {t('research_partnerships.export_modal.privacy_note')}
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={close}>Cancel</Button>
+                <Button variant="flat" onPress={close}>{t('research_partnerships.actions.cancel')}</Button>
                 <Button color="primary" onPress={() => void generateExport()} isDisabled={!selectedPartnerId} isLoading={workingId === selectedPartnerId}>
-                  Generate
+                  {t('research_partnerships.actions.generate')}
                 </Button>
               </ModalFooter>
             </>
