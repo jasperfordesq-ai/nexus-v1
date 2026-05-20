@@ -51,7 +51,7 @@ export function PlanForm() {
   const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
-  usePageTitle(`Admin — ${isEdit ? t('breadcrumbs.edit', 'Edit') : t('breadcrumbs.create', 'Create')} Plan`);
+  usePageTitle(t(isEdit ? 'content.plan_edit_page_title' : 'content.plan_create_page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -142,7 +142,7 @@ export function PlanForm() {
       if (!check.value) continue;
       const n = Number(check.value);
       if (Number.isNaN(n) || n < 0) {
-        toast.error(`${check.label} must be a valid non-negative number`);
+        toast.error(t('content.valid_non_negative_number', { field: check.label }));
         return;
       }
     }
@@ -155,7 +155,7 @@ export function PlanForm() {
           toast.success(t('content.plan_updated', 'Plan updated'));
           navigate(tenantPath('/admin/plans'));
         } else {
-          toast.error("Failed to update plan");
+          toast.error(t('content.failed_to_update_plan'));
         }
       } else {
         const res = await adminPlans.create(buildPayload());
@@ -163,7 +163,7 @@ export function PlanForm() {
           toast.success(t('content.plan_created', 'Plan created'));
           navigate(tenantPath('/admin/plans'));
         } else {
-          toast.error("Failed to create plan");
+          toast.error(t('content.failed_to_create_plan'));
         }
       }
     } catch {
@@ -185,12 +185,12 @@ export function PlanForm() {
           stripe_price_id_monthly: d.stripe_price_id_monthly,
           stripe_price_id_yearly: d.stripe_price_id_yearly,
         });
-        toast.success("Synced to Stripe");
+        toast.success(t('content.stripe_sync_success'));
       } else {
-        toast.error("Stripe sync failed");
+        toast.error(t('content.stripe_sync_failed'));
       }
     } catch {
-      toast.error("Stripe sync failed — ensure STRIPE_SECRET_KEY is configured");
+      toast.error(t('content.stripe_sync_failed_config'));
     } finally {
       setSyncing(false);
     }
@@ -199,7 +199,7 @@ export function PlanForm() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={`${isEdit ? 'Edit' : 'Create'} Plan`} description="" />
+        <PageHeader title={t(isEdit ? 'content.plan_edit_title' : 'content.plan_create_title')} description="" />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -210,7 +210,7 @@ export function PlanForm() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title={isEdit ? `${t('breadcrumbs.edit', 'Edit')} Plan` : `${t('breadcrumbs.create', 'Create')} Plan`}
+        title={t(isEdit ? 'content.plan_edit_title' : 'content.plan_create_title')}
         description={isEdit
           ? t('content.plans_admin_desc', 'Update plan details, pricing, and features')
           : t('content.desc_create_subscription_plans_to_offer_diffe', 'Create a new subscription plan')}
@@ -227,13 +227,13 @@ export function PlanForm() {
           <Card shadow="sm">
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <CreditCard size={20} /> Plan Details
+                <CreditCard size={20} /> {t('content.plan_details')}
               </h3>
             </CardHeader>
             <CardBody className="gap-4">
               <Input
                 label={t('content.label_name', 'Name')}
-                placeholder="e.g., Community"
+                placeholder={t('content.plan_name_placeholder')}
                 isRequired
                 variant="bordered"
                 value={formData.name}
@@ -241,7 +241,7 @@ export function PlanForm() {
               />
               <Textarea
                 label={t('content.label_description', 'Description')}
-                placeholder="Describe who this plan is for and what makes it suitable for them."
+                placeholder={t('content.plan_description_placeholder')}
                 variant="bordered"
                 minRows={3}
                 value={formData.description}
@@ -261,7 +261,7 @@ export function PlanForm() {
                   type="number" min="0" step="0.01"
                   variant="bordered"
                   startContent={<span className="text-default-400 text-sm">EUR</span>}
-                  description="Typically ~17% off the monthly rate"
+                  description={t('content.annual_price_description')}
                   value={formData.price_yearly}
                   onValueChange={(v) => handleChange('price_yearly', v)}
                 />
@@ -271,7 +271,7 @@ export function PlanForm() {
                   label={t('content.tier_level', 'Tier Level')}
                   type="number" min="0" step="1"
                   variant="bordered"
-                  description="0 = free, 1 = basic, 2 = partner, 3 = network"
+                  description={t('content.tier_level_description')}
                   value={formData.tier_level}
                   onValueChange={(v) => handleChange('tier_level', v)}
                 />
@@ -279,8 +279,8 @@ export function PlanForm() {
                   label={t('content.max_users', 'Max Members')}
                   type="number" min="1" step="1"
                   variant="bordered"
-                  placeholder="Leave blank for unlimited"
-                  description="Active members allowed on this plan"
+                  placeholder={t('content.leave_blank_unlimited')}
+                  description={t('content.max_users_description')}
                   value={formData.max_users}
                   onValueChange={(v) => handleChange('max_users', v)}
                 />
@@ -290,15 +290,15 @@ export function PlanForm() {
 
           <Card shadow="sm">
             <CardHeader>
-              <h3 className="text-lg font-semibold">Selling Points</h3>
+              <h3 className="text-lg font-semibold">{t('content.selling_points')}</h3>
             </CardHeader>
             <CardBody className="gap-4">
               <Textarea
                 label={t('content.features', 'Feature List')}
-                placeholder={'Up to 500 community members\nFull listings, wallet & exchanges\nEvents & group coordination'}
+                placeholder={t('content.features_placeholder')}
                 variant="bordered"
                 minRows={6}
-                description="One feature per line. These are displayed as bullet points on the pricing page."
+                description={t('content.features_description')}
                 value={formData.features}
                 onValueChange={(v) => handleChange('features', v)}
               />
@@ -310,13 +310,13 @@ export function PlanForm() {
         <div className="flex flex-col gap-6">
           <Card shadow="sm">
             <CardHeader>
-              <h3 className="text-base font-semibold">Status & Limits</h3>
+              <h3 className="text-base font-semibold">{t('content.status_limits')}</h3>
             </CardHeader>
             <CardBody className="gap-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-sm">{t('content.label_active', 'Active')}</p>
-                  <p className="text-xs text-default-500">Visible to tenants on the pricing page</p>
+                  <p className="text-xs text-default-500">{t('content.plan_active_description')}</p>
                 </div>
                 <Switch
                   isSelected={formData.is_active}
@@ -327,20 +327,20 @@ export function PlanForm() {
               <Divider />
               <div className="grid grid-cols-2 gap-3">
                 <Input
-                  label="Max Menus"
+                  label={t('content.max_menus')}
                   type="number" min="1" step="1"
                   variant="bordered"
                   size="sm"
-                  placeholder="e.g., 10"
+                  placeholder={t('content.max_menus_placeholder')}
                   value={formData.max_menus}
                   onValueChange={(v) => handleChange('max_menus', v)}
                 />
                 <Input
-                  label="Max Menu Items"
+                  label={t('content.max_menu_items')}
                   type="number" min="1" step="1"
                   variant="bordered"
                   size="sm"
-                  placeholder="e.g., 50"
+                  placeholder={t('content.max_menu_items_placeholder')}
                   value={formData.max_menu_items}
                   onValueChange={(v) => handleChange('max_menu_items', v)}
                 />
@@ -352,7 +352,7 @@ export function PlanForm() {
             <Card shadow="sm">
               <CardHeader>
                 <h3 className="text-base font-semibold flex items-center gap-2">
-                  Stripe Sync
+                  {t('content.stripe_sync')}
                 </h3>
               </CardHeader>
               <CardBody className="gap-3">
@@ -363,20 +363,20 @@ export function PlanForm() {
                     <AlertCircle size={16} className="text-warning shrink-0" />
                   )}
                   <Chip size="sm" variant="flat" color={stripeSynced ? 'success' : 'warning'}>
-                    {stripeSynced ? 'Synced' : 'Not synced'}
+                    {stripeSynced ? t('content.synced') : t('content.not_synced')}
                   </Chip>
                 </div>
 
                 {stripeSynced && (
                   <div className="flex flex-col gap-1 text-xs text-default-500 break-all">
                     {stripeStatus.stripe_product_id && (
-                      <span><span className="font-medium">Product:</span> {stripeStatus.stripe_product_id}</span>
+                      <span><span className="font-medium">{t('content.product')}:</span> {stripeStatus.stripe_product_id}</span>
                     )}
                     {stripeStatus.stripe_price_id_monthly && (
-                      <span><span className="font-medium">Monthly:</span> {stripeStatus.stripe_price_id_monthly}</span>
+                      <span><span className="font-medium">{t('content.monthly')}:</span> {stripeStatus.stripe_price_id_monthly}</span>
                     )}
                     {stripeStatus.stripe_price_id_yearly && (
-                      <span><span className="font-medium">Yearly:</span> {stripeStatus.stripe_price_id_yearly}</span>
+                      <span><span className="font-medium">{t('content.yearly')}:</span> {stripeStatus.stripe_price_id_yearly}</span>
                     )}
                   </div>
                 )}
@@ -390,10 +390,10 @@ export function PlanForm() {
                   size="sm"
                   fullWidth
                 >
-                  {stripeSynced ? 'Re-sync to Stripe' : 'Sync to Stripe'}
+                  {stripeSynced ? t('content.resync_stripe') : t('content.sync_stripe')}
                 </Button>
                 <p className="text-xs text-default-400">
-                  Creates or updates the Stripe product and prices for this plan. Requires STRIPE_SECRET_KEY.
+                  {t('content.stripe_sync_description')}
                 </p>
               </CardBody>
             </Card>
@@ -407,7 +407,7 @@ export function PlanForm() {
               isLoading={saving}
               fullWidth
             >
-              {isEdit ? t('federation.save_changes', 'Save Changes') : `${t('breadcrumbs.create', 'Create')} Plan`}
+              {isEdit ? t('federation.save_changes', 'Save Changes') : t('content.plan_create_title')}
             </Button>
             <Button variant="flat" onPress={() => navigate(tenantPath('/admin/plans'))} fullWidth>
               {t('cancel', 'Cancel')}
