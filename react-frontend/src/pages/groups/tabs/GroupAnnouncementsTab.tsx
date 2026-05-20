@@ -105,7 +105,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
       }
     } catch (err) {
       logError('GroupAnnouncementsTab.load', err);
-      toast.error(t('announcements.load_failed', 'Failed to load announcements'));
+      toast.error(t('announcements.load_failed'));
     }
     setLoading(false);
   }, [groupId, toast, t]);
@@ -123,7 +123,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
         is_pinned: isPinned,
       });
       if (res.success) {
-        toast.success(t('announcements.created', 'Announcement created'));
+        toast.success(t('announcements.created'));
         setTitle('');
         setContent('');
         setIsPinned(false);
@@ -132,7 +132,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
       }
     } catch (err) {
       logError('GroupAnnouncementsTab.create', err);
-      toast.error(t('announcements.create_failed', 'Failed to create announcement'));
+      toast.error(t('announcements.create_failed'));
     }
     setCreating(false);
   }, [groupId, title, content, isPinned, toast, onClose, loadAnnouncements, t]);
@@ -152,10 +152,10 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         })
       );
-      toast.success(announcement.is_pinned ? t('announcements.unpinned', 'Unpinned') : t('announcements.pinned_success', 'Pinned'));
+      toast.success(announcement.is_pinned ? t('announcements.unpinned') : t('announcements.pinned_success'));
     } catch (err) {
       logError('GroupAnnouncementsTab.togglePin', err);
-      toast.error(t('announcements.update_failed', 'Failed to update announcement'));
+      toast.error(t('announcements.update_failed'));
     }
   }, [groupId, toast, t]);
 
@@ -165,12 +165,12 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
     setDeleting(true);
     try {
       await api.delete(`/v2/groups/${groupId}/announcements/${deleteTarget.id}`);
-      toast.success(t('announcements.deleted', 'Announcement deleted'));
+      toast.success(t('announcements.deleted'));
       setAnnouncements((prev) => prev.filter((a) => a.id !== deleteTarget.id));
       setDeleteTarget(null);
     } catch (err) {
       logError('GroupAnnouncementsTab.delete', err);
-      toast.error(t('announcements.delete_failed', 'Failed to delete announcement'));
+      toast.error(t('announcements.delete_failed'));
     }
     setDeleting(false);
   }, [groupId, deleteTarget, toast, t]);
@@ -180,19 +180,20 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
     <div className="space-y-4">
       {/* Header */}
       <GlassCard className="p-6">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
           <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
             <Megaphone className="w-5 h-5" aria-hidden="true" />
-            {t('announcements.heading', 'Announcements')}
+            {t('announcements.heading')}
           </h2>
           {isAdmin && (
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              color="primary"
+              className="w-full sm:w-auto"
               size="sm"
               startContent={<Plus className="w-4 h-4" />}
               onPress={onOpen}
             >
-              {t('announcements.new', 'New Announcement')}
+              {t('announcements.new')}
             </Button>
           )}
         </div>
@@ -204,8 +205,8 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
         ) : announcements.length === 0 ? (
           <EmptyState
             icon={<Megaphone className="w-12 h-12" />}
-            title={t('announcements.no_announcements_title', 'No announcements')}
-            description={isAdmin ? t('announcements.no_announcements_admin_desc', 'Create an announcement to share with the group') : t('announcements.no_announcements_desc', 'No announcements have been posted yet')}
+            title={t('announcements.no_announcements_title')}
+            description={isAdmin ? t('announcements.no_announcements_admin_desc') : t('announcements.no_announcements_desc')}
           />
         ) : (
           <div className="space-y-3">
@@ -229,14 +230,14 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                       </h3>
                       {announcement.is_pinned && (
                         <Chip size="sm" variant="flat" color="primary" className="flex-shrink-0">
-                          {t('announcements.pinned', 'Pinned')}
+                          {t('announcements.pinned')}
                         </Chip>
                       )}
                     </div>
                     <SafeHtml content={announcement.content} className="text-sm text-theme-secondary whitespace-pre-wrap" as="div" />
                     <div className="flex items-center gap-2 mt-2 text-xs text-theme-subtle">
                       <span>{announcement.author.name}</span>
-                      <span className="text-theme-muted">·</span>
+                      <span className="text-theme-muted" aria-hidden="true">&middot;</span>
                       <span>{formatRelativeTime(announcement.created_at)}</span>
                     </div>
                   </div>
@@ -244,17 +245,17 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                   {isAdmin && (
                     <Dropdown>
                       <DropdownTrigger>
-                        <Button isIconOnly variant="light" size="sm" aria-label={t('announcements.actions_aria', 'Actions')}>
+                        <Button isIconOnly variant="light" size="sm" aria-label={t('announcements.actions_aria')}>
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </DropdownTrigger>
-                      <DropdownMenu aria-label={t('announcements.dropdown_aria', 'Announcement actions')}>
+                      <DropdownMenu aria-label={t('announcements.dropdown_aria')}>
                         <DropdownItem
                           key="pin"
                           startContent={announcement.is_pinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
                           onPress={() => handleTogglePin(announcement)}
                         >
-                          {announcement.is_pinned ? t('announcements.unpin', 'Unpin') : t('announcements.pin', 'Pin')}
+                          {announcement.is_pinned ? t('announcements.unpin') : t('announcements.pin')}
                         </DropdownItem>
                         <DropdownItem
                           key="delete"
@@ -263,7 +264,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                           color="danger"
                           onPress={() => setDeleteTarget(announcement)}
                         >
-                          {t('announcements.delete', 'Delete')}
+                          {t('announcements.delete')}
                         </DropdownItem>
                       </DropdownMenu>
                     </Dropdown>
@@ -289,13 +290,13 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
           {(onModalClose) => (
             <>
               <ModalHeader className="text-theme-primary flex items-center gap-2">
-                <Megaphone className="w-5 h-5 text-purple-400" />
-                {t('announcements.new', 'New Announcement')}
+                <Megaphone className="w-5 h-5 text-primary" />
+                {t('announcements.new')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label={t('announcements.title_label', 'Title')}
-                  placeholder={t('announcements.title_placeholder', 'Announcement title')}
+                  label={t('announcements.title_label')}
+                  placeholder={t('announcements.title_placeholder')}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   classNames={{
@@ -305,8 +306,8 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                   }}
                 />
                 <Textarea
-                  label={t('announcements.content_label', 'Content')}
-                  placeholder={t('announcements.content_placeholder', 'Write your announcement...')}
+                  label={t('announcements.content_label')}
+                  placeholder={t('announcements.content_placeholder')}
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   minRows={4}
@@ -324,19 +325,19 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                     startContent={<Pin className="w-4 h-4" />}
                     onPress={() => setIsPinned(!isPinned)}
                   >
-                    {isPinned ? t('announcements.pinned', 'Pinned') : t('announcements.pin_this', 'Pin this announcement')}
+                    {isPinned ? t('announcements.pinned') : t('announcements.pin_this')}
                   </Button>
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onModalClose}>{t('announcements.cancel', 'Cancel')}</Button>
+                <Button variant="flat" onPress={onModalClose}>{t('announcements.cancel')}</Button>
                 <Button
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  color="primary"
                   isLoading={creating}
                   isDisabled={!title.trim() || !content.trim()}
                   onPress={handleCreate}
                 >
-                  {t('announcements.post', 'Post Announcement')}
+                  {t('announcements.post')}
                 </Button>
               </ModalFooter>
             </>
@@ -357,18 +358,18 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
         <ModalContent>
           {(onModalClose) => (
             <>
-              <ModalHeader className="text-theme-primary">{t('announcements.delete_title', 'Delete Announcement')}</ModalHeader>
+              <ModalHeader className="text-theme-primary">{t('announcements.delete_title')}</ModalHeader>
               <ModalBody>
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
                   <p className="text-theme-secondary">
-                    {t('announcements.delete_confirm', 'Are you sure you want to delete "{{name}}"? This action cannot be undone.', { name: deleteTarget?.title })}
+                    {t('announcements.delete_confirm', { name: deleteTarget?.title })}
                   </p>
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onModalClose}>{t('announcements.cancel', 'Cancel')}</Button>
-                <Button color="danger" isLoading={deleting} onPress={handleDelete}>{t('announcements.delete', 'Delete')}</Button>
+                <Button variant="flat" onPress={onModalClose}>{t('announcements.cancel')}</Button>
+                <Button color="danger" isLoading={deleting} onPress={handleDelete}>{t('announcements.delete')}</Button>
               </ModalFooter>
             </>
           )}
