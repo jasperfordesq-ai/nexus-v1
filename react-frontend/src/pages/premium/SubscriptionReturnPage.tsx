@@ -13,6 +13,7 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import api from '@/lib/api';
+import { logError } from '@/lib/logger';
 
 interface SubscriptionResponse {
   subscription: {
@@ -38,7 +39,7 @@ export function SubscriptionReturnPage() {
   const { tenantPath } = useTenant();
   const [search] = useSearchParams();
   const cancelled = search.get('cancelled') === '1';
-  usePageTitle(t('premium.return_title', 'Activating Subscription'));
+  usePageTitle(t('premium.return_title'));
 
   const [status, setStatus] = useState<'pending' | 'success' | 'cancelled' | 'timeout'>(
     cancelled ? 'cancelled' : 'pending'
@@ -61,8 +62,8 @@ export function SubscriptionReturnPage() {
           setStatus('success');
           return;
         }
-      } catch {
-        // ignore — keep polling
+      } catch (err) {
+        logError('SubscriptionReturnPage.poll', err);
       }
       if (attempts >= MAX_POLLS) {
         if (mounted) setStatus('timeout');
@@ -80,17 +81,21 @@ export function SubscriptionReturnPage() {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-16">
-      <PageMeta title={t('premium.return_title', 'Activating Subscription')} noIndex />
-      <Card>
+      <PageMeta
+        title={t('premium.return_title')}
+        description={t('premium.return_meta_description')}
+        noIndex
+      />
+      <Card className="border border-divider/70 bg-content1/95 shadow-lg shadow-primary/5">
         <CardBody className="text-center py-10 flex flex-col items-center gap-4">
           {status === 'pending' && (
             <>
               <Spinner size="lg" />
               <h1 className="text-xl font-semibold">
-                {t('premium.return_pending', 'Activating your subscription…')}
+                {t('premium.return_pending')}
               </h1>
               <p className="text-[var(--color-text-secondary)]">
-                {t('premium.return_pending_body', 'This usually takes a few seconds.')}
+                {t('premium.return_pending_body')}
               </p>
             </>
           )}
@@ -99,19 +104,19 @@ export function SubscriptionReturnPage() {
             <>
               <CheckCircle2 size={56} className="text-green-500" />
               <h1 className="text-2xl font-semibold">
-                {t('premium.return_success_title', 'You are all set!')}
+                {t('premium.return_success_title')}
               </h1>
               <p className="text-[var(--color-text-secondary)]">
                 {tierName
-                  ? t('premium.return_success_with_tier', { tier: tierName, defaultValue: 'You are now subscribed to {{tier}}.' })
-                  : t('premium.return_success_body', 'Your subscription is now active.')}
+                  ? t('premium.return_success_with_tier', { tier: tierName })
+                  : t('premium.return_success_body')}
               </p>
               <div className="flex gap-2 mt-2">
                 <Button as={Link} to={tenantPath('/premium/manage')} color="primary">
-                  {t('premium.manage_cta', 'Manage subscription')}
+                  {t('premium.manage_cta')}
                 </Button>
                 <Button as={Link} to={tenantPath('/dashboard')} variant="flat">
-                  {t('premium.go_to_dashboard', 'Go to dashboard')}
+                  {t('premium.go_to_dashboard')}
                 </Button>
               </div>
             </>
@@ -121,13 +126,13 @@ export function SubscriptionReturnPage() {
             <>
               <XCircle size={48} className="text-[var(--color-text-secondary)]" />
               <h1 className="text-xl font-semibold">
-                {t('premium.return_cancelled_title', 'Checkout cancelled')}
+                {t('premium.return_cancelled_title')}
               </h1>
               <p className="text-[var(--color-text-secondary)]">
-                {t('premium.return_cancelled_body', 'You can try again whenever you are ready.')}
+                {t('premium.return_cancelled_body')}
               </p>
               <Button as={Link} to={tenantPath('/premium')} color="primary">
-                {t('premium.back_to_pricing', 'Back to pricing')}
+                {t('premium.back_to_pricing')}
               </Button>
             </>
           )}
@@ -135,16 +140,13 @@ export function SubscriptionReturnPage() {
           {status === 'timeout' && (
             <>
               <h1 className="text-xl font-semibold">
-                {t('premium.return_timeout_title', 'Still processing…')}
+                {t('premium.return_timeout_title')}
               </h1>
               <p className="text-[var(--color-text-secondary)]">
-                {t(
-                  'premium.return_timeout_body',
-                  'Your payment is going through. It may take a moment for your subscription to appear.'
-                )}
+                {t('premium.return_timeout_body')}
               </p>
               <Button as={Link} to={tenantPath('/premium/manage')} color="primary">
-                {t('premium.check_status', 'Check status')}
+                {t('premium.check_status')}
               </Button>
             </>
           )}

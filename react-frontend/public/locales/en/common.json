@@ -1548,7 +1548,8 @@
       "priority_matching": "Priority matching",
       "advanced_search": "Advanced search",
       "ad_free": "Ad-free experience"
-    }
+    },
+    "return_meta_description": "Secure checkout return page for activating, confirming, or managing your premium subscription."
   },
   "developers": {
     "page_title": "Developers",
