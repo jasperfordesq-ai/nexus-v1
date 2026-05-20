@@ -57,9 +57,9 @@ interface PaymentIntentResponse {
 }
 
 const CURRENCIES = [
-  { key: 'EUR', label: 'EUR' },
-  { key: 'GBP', label: 'GBP' },
-  { key: 'USD', label: 'USD' },
+  { key: 'EUR', labelKey: 'donations.currencies.EUR' },
+  { key: 'GBP', labelKey: 'donations.currencies.GBP' },
+  { key: 'USD', labelKey: 'donations.currencies.USD' },
 ];
 
 /* ───────────────────────── Component ───────────────────────── */
@@ -105,7 +105,7 @@ export function DonationCheckout({
   const handleContinueToPayment = async () => {
     const numAmount = parseFloat(amount);
     if (!amount || isNaN(numAmount) || numAmount < 0.5) {
-      toast.error(t('donations.min_amount', 'Minimum donation amount is 0.50.'));
+      toast.error(t('donations.min_amount'));
       return;
     }
 
@@ -126,11 +126,12 @@ export function DonationCheckout({
         setDonationId(response.data.donation_id);
         setStep('payment');
       } else {
-        toast.error(response.error || t('donations.intent_error', 'Failed to initialize payment. Please try again.'));
+        logError('Donation payment intent API error', response.error);
+        toast.error(t('donations.intent_error'));
       }
     } catch (err) {
       logError('Failed to create payment intent', err);
-      toast.error(t('donations.intent_error', 'Failed to initialize payment. Please try again.'));
+      toast.error(t('donations.intent_error'));
     } finally {
       setIsCreatingIntent(false);
     }
@@ -142,7 +143,8 @@ export function DonationCheckout({
   };
 
   const handlePaymentError = (error: string) => {
-    toast.error(error);
+    logError('Donation payment failed', error);
+    toast.error(t('donations.payment_error'));
   };
 
   const formattedAmount = amount
@@ -171,10 +173,14 @@ export function DonationCheckout({
         {() => (
           <>
             <ModalHeader className="text-theme-primary flex items-center gap-2">
-              <CreditCard className="w-5 h-5" aria-hidden="true" />
+              {step === 'success' ? (
+                <CheckCircle className="w-5 h-5 text-[var(--color-success)]" aria-hidden="true" />
+              ) : (
+                <CreditCard className="w-5 h-5" aria-hidden="true" />
+              )}
               {step === 'success'
-                ? t('donations.success_title', 'Thank You!')
-                : t('donations.checkout_title', 'Donate with Card')}
+                ? t('donations.success_title')
+                : t('donations.checkout_title')}
             </ModalHeader>
 
             <ModalBody className="gap-4 py-4">
@@ -182,7 +188,7 @@ export function DonationCheckout({
               {step === 'form' && (
                 <>
                   <Input
-                    label={t('donations.amount_label', 'Amount')}
+                    label={t('donations.amount_label')}
                     type="number"
                     min="0.50"
                     step="0.01"
@@ -191,11 +197,11 @@ export function DonationCheckout({
                     onValueChange={setAmount}
                     startContent={<Banknote className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                     isRequired
-                    placeholder={t('donations.placeholder_amount', '0.00')}
+                    placeholder={t('donations.placeholder_amount')}
                   />
 
                   <Select
-                    label={t('donations.currency_label', 'Currency')}
+                    label={t('donations.currency_label')}
                     variant="bordered"
                     selectedKeys={[currency]}
                     onSelectionChange={(keys) => {
@@ -204,30 +210,30 @@ export function DonationCheckout({
                     }}
                   >
                     {CURRENCIES.map((c) => (
-                      <SelectItem key={c.key}>{c.label}</SelectItem>
+                      <SelectItem key={c.key}>{t(c.labelKey)}</SelectItem>
                     ))}
                   </Select>
 
                   <Textarea
-                    label={t('donations.message_label', 'Message (optional)')}
+                    label={t('donations.message_label')}
                     variant="bordered"
                     value={message}
                     onValueChange={setMessage}
                     maxRows={3}
-                    placeholder={t('donations.message_placeholder', 'Add a message to your donation...')}
+                    placeholder={t('donations.message_placeholder')}
                   />
 
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-theme-secondary">
-                      {t('donations.anonymous_toggle', 'Donate anonymously')}
-                    </span>
-                    <Switch
-                      isSelected={isAnonymous}
-                      onValueChange={setIsAnonymous}
-                      size="sm"
-                      aria-label={t('donations.anonymous_toggle', 'Donate anonymously')}
-                    />
-                  </div>
+                  <Switch
+                    isSelected={isAnonymous}
+                    onValueChange={setIsAnonymous}
+                    size="sm"
+                    classNames={{
+                      base: 'flex w-full max-w-none flex-row-reverse justify-between rounded-xl border border-theme-default bg-content2/60 p-3',
+                      label: 'text-sm text-theme-secondary',
+                    }}
+                  >
+                    {t('donations.anonymous_toggle')}
+                  </Switch>
                 </>
               )}
 
@@ -235,7 +241,7 @@ export function DonationCheckout({
               {step === 'payment' && clientSecret && (
                 <div className="space-y-4">
                   <div className="text-center text-sm text-theme-muted mb-2">
-                    {t('donations.paying_amount', 'Paying {{amount}}', { amount: formattedAmount })}
+                    {t('donations.paying_amount', { amount: formattedAmount })}
                   </div>
                   <StripePaymentForm
                     clientSecret={clientSecret}
@@ -251,10 +257,10 @@ export function DonationCheckout({
                   <CheckCircle className="w-16 h-16 text-[var(--color-success)] mx-auto" aria-hidden="true" />
                   <div>
                     <p className="text-lg font-semibold text-theme-primary">
-                      {t('donations.success_title', 'Thank You!')}
+                      {t('donations.success_title')}
                     </p>
                     <p className="text-sm text-theme-muted mt-1">
-                      {t('donations.success_message', 'Your donation of {{amount}} has been processed successfully.', {
+                      {t('donations.success_message', {
                         amount: formattedAmount,
                       })}
                     </p>
@@ -272,7 +278,7 @@ export function DonationCheckout({
                         window.open(receiptPath, '_blank');
                       }}
                     >
-                      {t('donations.view_receipt', 'View Receipt')}
+                      {t('donations.view_receipt')}
                     </Button>
                   )}
                 </div>
@@ -283,15 +289,15 @@ export function DonationCheckout({
               {step === 'form' && (
                 <>
                   <Button variant="flat" onPress={handleClose}>
-                    {t('donations.cancel', 'Cancel')}
+                    {t('donations.cancel')}
                   </Button>
                   <Button
-                    className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+                    color="primary"
                     onPress={handleContinueToPayment}
                     isLoading={isCreatingIntent}
                     isDisabled={!amount || parseFloat(amount) < 0.5}
                   >
-                    {t('donations.continue_to_payment', 'Continue to Payment')}
+                    {t('donations.continue_to_payment')}
                   </Button>
                 </>
               )}
@@ -302,16 +308,16 @@ export function DonationCheckout({
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                   onPress={() => setStep('form')}
                 >
-                  {t('donations.back', 'Back')}
+                  {t('donations.back')}
                 </Button>
               )}
 
               {step === 'success' && (
                 <Button
-                  className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+                  color="primary"
                   onPress={handleClose}
                 >
-                  {t('donations.close', 'Close')}
+                  {t('donations.close')}
                 </Button>
               )}
             </ModalFooter>

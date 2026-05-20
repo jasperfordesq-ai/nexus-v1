@@ -361,6 +361,11 @@
     "payment_action_required": "Additional authentication required.",
     "payment_unexpected": "Unexpected payment status. Please contact support.",
     "payment_error": "An error occurred during payment.",
+    "currencies": {
+      "EUR": "EUR",
+      "GBP": "GBP",
+      "USD": "USD"
+    },
     "receipt_title": "Donation Receipt",
     "receipt_ref": "Ref: {{ref}}",
     "receipt_donor": "Donor",
