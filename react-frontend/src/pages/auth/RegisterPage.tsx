@@ -128,7 +128,7 @@ export function RegisterPage() {
   const phoneError = !phone.trim()
     ? t('register.phone_required')
     : !isPhoneValid(phone)
-      ? t('register.phone_error', { defaultValue: 'Enter a valid international number (e.g. +1 555 123 4567)' })
+      ? t('register.phone_error')
       : '';
   const locationError = !location.trim() ? t('register.location_required') : '';
 
@@ -573,8 +573,8 @@ export function RegisterPage() {
             {requiresInviteCode && (
               <Input
                 type="text"
-                label={t('register.invite_code_label', { defaultValue: 'Invite Code' })}
-                placeholder={t('register.invite_code_placeholder', { defaultValue: 'Enter your invite code' })}
+                label={t('register.invite_code_label')}
+                placeholder={t('register.invite_code_placeholder')}
                 value={inviteCode}
                 onChange={(e) => {
                   setInviteCode(e.target.value.toUpperCase());
@@ -593,8 +593,8 @@ export function RegisterPage() {
                 }
                 isRequired
                 isInvalid={inviteCodeValid === false}
-                errorMessage={inviteCodeValid === false ? t('register.invite_code_invalid', { defaultValue: 'This invite code is invalid or has been used' }) : ''}
-                description={inviteCodeValid !== false ? t('register.invite_code_description', { defaultValue: 'You need an invite code from a community administrator to register' }) : undefined}
+                errorMessage={inviteCodeValid === false ? t('register.invite_code_invalid') : ''}
+                description={inviteCodeValid !== false ? t('register.invite_code_description') : undefined}
                 classNames={{
                   inputWrapper:
                     'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
@@ -742,7 +742,7 @@ export function RegisterPage() {
                     variant="light"
                     className="min-w-0 w-auto h-auto p-0 text-theme-subtle"
                     onPress={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? t('register.hide_password', { defaultValue: 'Hide password' }) : t('register.show_password', { defaultValue: 'Show password' })}
+                    aria-label={showPassword ? t('register.hide_password') : t('register.show_password')}
                   >
                     {showPassword ? (
                       <EyeOff className="w-4 h-4" aria-hidden="true" />
@@ -793,7 +793,7 @@ export function RegisterPage() {
               }
               description={
                 confirmTouched && passwordConfirm.length > 0 && passwordsMatch
-                  ? t('register.passwords_match', { defaultValue: 'Passwords match' })
+                  ? t('register.passwords_match')
                   : undefined
               }
               classNames={{
@@ -884,7 +884,7 @@ export function RegisterPage() {
             aria-hidden="true"
             style={{ position: 'absolute', left: '-10000px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}
           >
-            <label htmlFor="website">{t('register.honeypot_label', 'Website')}</label>
+            <label htmlFor="website">{t('register.honeypot_label')}</label>
             <input ref={honeypotRef} type="text" name="website" id="website" tabIndex={-1} autoComplete="off" />
           </div>
 
@@ -898,7 +898,8 @@ export function RegisterPage() {
             type="submit"
             isLoading={isLoading}
             isDisabled={!isFormValid}
-            className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
+            color="primary"
+            className="w-full font-medium"
             size="lg"
             spinner={<Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
           >
@@ -1003,7 +1004,8 @@ export function RegisterPage() {
               type="button"
               onPress={handleNext}
               isDisabled={!canProceed()}
-              className={`${currentStep === 1 ? 'w-full' : 'flex-1'} bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium`}
+              color="primary"
+              className={`${currentStep === 1 ? 'w-full' : 'flex-1'} font-medium`}
               endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
             >
               {t('register.continue')}
@@ -1013,7 +1015,8 @@ export function RegisterPage() {
               type="submit"
               isLoading={isLoading}
               isDisabled={!isFormValid}
-              className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
+              color="primary"
+              className="flex-1 font-medium"
               spinner={<Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
             >
               {t('register.submit')}
@@ -1039,7 +1042,7 @@ export function RegisterPage() {
               <motion.div
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
-                className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 mb-4"
+                className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-success/15"
               >
                 {pendingResult.requiresWaitlist ? (
                   <Users className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
@@ -1051,7 +1054,7 @@ export function RegisterPage() {
               </motion.div>
 
               <h1 className="text-xl sm:text-2xl font-bold text-theme-primary mb-2">
-                {pendingResult.requiresWaitlist ? t('register.waitlist_title', { defaultValue: "You're on the waitlist!" }) : t('register.success_title', { defaultValue: 'Registration Successful!' })}
+                {pendingResult.requiresWaitlist ? t('register.waitlist_title') : t('register.success_title')}
               </h1>
 
               <div className="space-y-3 mt-4 text-left">
@@ -1062,11 +1065,11 @@ export function RegisterPage() {
                       <div>
                         <p className="font-medium text-indigo-600 dark:text-indigo-400">
                           {pendingResult.waitlistPosition
-                            ? t('register.waitlist_position', { defaultValue: 'Position #{{position}} on the waitlist', position: pendingResult.waitlistPosition })
-                            : t('register.waitlist_joined', { defaultValue: 'Added to the waitlist' })}
+                            ? t('register.waitlist_position', { position: pendingResult.waitlistPosition })
+                            : t('register.waitlist_joined')}
                         </p>
                         <p className="text-indigo-600/80 dark:text-indigo-300/80 mt-1">
-                          {t('register.waitlist_body', { defaultValue: "We'll send you an email when a spot opens up. Thank you for your patience!" })}
+                          {t('register.waitlist_body')}
                         </p>
                       </div>
                     </div>
@@ -1078,11 +1081,11 @@ export function RegisterPage() {
                     <div className="flex items-start gap-3">
                       <MailCheck className="w-5 h-5 text-[var(--color-info)] flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-medium text-blue-600 dark:text-blue-400">{t('register.verify_email_title', { defaultValue: 'Verify your email' })}</p>
+                        <p className="font-medium text-blue-600 dark:text-blue-400">{t('register.verify_email_title')}</p>
                         <p className="text-blue-600/80 dark:text-blue-300/80 mt-1">
                           <Trans
+                            ns="auth"
                             i18nKey="register.verify_email_body"
-                            defaults="We've sent a verification link to <strong>{{email}}</strong>. Please check your inbox and click the link to verify your email address."
                             values={{ email }}
                             components={{ strong: <strong /> }}
                           />
@@ -1097,9 +1100,9 @@ export function RegisterPage() {
                     <div className="flex items-start gap-3">
                       <ShieldCheck className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-medium text-amber-600 dark:text-amber-400">{t('register.approval_title', { defaultValue: 'Awaiting admin approval' })}</p>
+                        <p className="font-medium text-amber-600 dark:text-amber-400">{t('register.approval_title')}</p>
                         <p className="text-amber-600/80 dark:text-amber-300/80 mt-1">
-                          {t('register.approval_body', { defaultValue: "Your account will be reviewed by a community administrator. You'll receive an email once your account has been approved." })}
+                          {t('register.approval_body')}
                         </p>
                       </div>
                     </div>
@@ -1109,20 +1112,21 @@ export function RegisterPage() {
 
               <p className="text-theme-muted text-sm mt-6">
                 {pendingResult.requiresWaitlist
-                  ? t('register.waitlist_next', { defaultValue: "You'll receive an email when your account is activated." })
+                  ? t('register.waitlist_next')
                   : pendingResult.requiresVerification && pendingResult.requiresApproval
-                    ? t('register.next_verify_approve', { defaultValue: 'Once your email is verified and your account is approved, you can log in.' })
+                    ? t('register.next_verify_approve')
                     : pendingResult.requiresVerification
-                      ? t('register.next_verify', { defaultValue: 'Once your email is verified, you can log in.' })
-                      : t('register.next_approve', { defaultValue: 'Once your account is approved, you can log in.' })}
+                      ? t('register.next_verify')
+                      : t('register.next_approve')}
               </p>
 
               <Button
-                className="w-full mt-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
+                color="primary"
+                className="mt-6 w-full font-medium"
                 size="lg"
                 onPress={() => navigate(tenantPath('/login'))}
               >
-                {t('register.go_to_login', { defaultValue: 'Go to Login' })}
+                {t('register.go_to_login')}
               </Button>
             </div>
           </GlassCard>
@@ -1146,7 +1150,7 @@ export function RegisterPage() {
             <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
-              className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
+              className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 sm:h-16 sm:w-16"
             >
               <User className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
             </motion.div>
