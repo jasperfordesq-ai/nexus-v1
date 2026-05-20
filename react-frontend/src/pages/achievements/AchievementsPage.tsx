@@ -221,7 +221,7 @@ function DailyRewardWidget() {
 
   if (isLoading) {
     return (
-      <GlassCard className="p-4" aria-label={t('achievements.daily_reward.loading', 'Loading daily reward')} aria-busy="true">
+      <GlassCard className="p-4" aria-label={t('achievements.daily_reward.loading')} aria-busy="true">
         <div className="flex items-center gap-4">
           <Skeleton className="rounded-full flex-shrink-0"><div className="w-12 h-12 rounded-full bg-default-300" /></Skeleton>
           <div className="flex-1 space-y-2">
@@ -490,7 +490,7 @@ function ChallengesTab() {
                           <h4 className="font-semibold text-theme-primary">{challenge.title}</h4>
                           <Chip size="sm" color="warning" variant="flat">
                             <Gem className="w-3 h-3 inline mr-1" aria-hidden="true" />
-                            {challenge.reward_xp} XP
+                            {t('achievements.xp_value', { xp: challenge.reward_xp })}
                           </Chip>
                         </div>
                         <p className="text-sm text-theme-muted mb-3">{challenge.description}</p>
@@ -502,7 +502,7 @@ function ChallengesTab() {
                             track: 'bg-theme-hover',
                           }}
                           size="sm"
-                          aria-label={`Challenge progress: ${progressPct}%`}
+                          aria-label={t('achievements.challenges.progress_aria', { percent: progressPct })}
                         />
                         <div className="flex items-center justify-between text-xs text-theme-subtle">
                           <span>{challenge.user_progress} / {challenge.target_count}</span>
@@ -698,7 +698,7 @@ function JourneysTab() {
                 {collection.reward_xp > 0 && (
                   <Chip size="sm" color="warning" variant="flat" className="flex-shrink-0">
                     <Gem className="w-3 h-3 inline mr-1" aria-hidden="true" />
-                    {collection.reward_xp} XP
+                    {t('achievements.xp_value', { xp: collection.reward_xp })}
                   </Chip>
                 )}
               </div>
@@ -713,7 +713,7 @@ function JourneysTab() {
                   track: 'bg-theme-hover',
                 }}
                 size="sm"
-                aria-label={`Collection progress: ${progressPct}%`}
+                aria-label={t('achievements.collections.progress_aria', { percent: progressPct })}
               />
               <p className="text-xs text-theme-subtle mb-3">
                 {t('achievements.collections.badges_collected', { earned: collection.earned_count, total: collection.total_count })}
@@ -820,11 +820,11 @@ function EngagementTab() {
       <GlassCard className="p-5">
         <div className="flex items-center justify-between mb-4">
           <h4 className="font-semibold text-theme-primary flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-indigo-400" />
-            {t('achievements.engagement.title', 'Monthly Engagement')}
+            <Calendar className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+            {t('achievements.engagement.title')}
           </h4>
           <Chip size="sm" color={activeCount >= 6 ? 'success' : 'default'} variant="flat">
-            {t('achievements.engagement.months_active', { count: activeCount, defaultValue: `${activeCount} of 12 months` })}
+            {t('achievements.engagement.months_active', { count: activeCount })}
           </Chip>
         </div>
 
@@ -837,11 +837,15 @@ function EngagementTab() {
                   ? 'bg-emerald-500/20 border border-emerald-500/30'
                   : 'bg-default-100/50 border border-transparent'
               }`}
-              title={month.active ? `Active: ${month.count} activities` : 'Inactive'}
+              title={
+                month.active
+                  ? t('achievements.engagement.month_active_tooltip', { count: month.count })
+                  : t('achievements.engagement.month_inactive_tooltip')
+              }
             >
               <span className="text-[10px] text-default-400">{month.label}</span>
               {month.active ? (
-                <CheckCircle className="w-5 h-5 text-emerald-500 mt-1" />
+                <CheckCircle className="w-5 h-5 text-emerald-500 mt-1" aria-hidden="true" />
               ) : (
                 <div className="w-5 h-5 rounded-full bg-default-200 mt-1" />
               )}
@@ -850,7 +854,7 @@ function EngagementTab() {
         </div>
 
         <p className="text-xs text-theme-muted mt-3">
-          {t('achievements.engagement.description', 'Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours).')}
+          {t('achievements.engagement.description')}
         </p>
       </GlassCard>
     </div>
@@ -978,7 +982,10 @@ function XpShopTab({ userXp }: { userXp: number }) {
         <div className="flex items-center gap-3">
           <Gem className="w-5 h-5 text-indigo-400" aria-hidden="true" />
           <span className="text-theme-primary font-medium">
-            {t('achievements.shop.your_balance')}: <strong className="text-indigo-400">{currentXp.toLocaleString()} XP</strong>
+            {t('achievements.shop.your_balance')}:{' '}
+            <strong className="text-indigo-400">
+              {t('achievements.xp_value', { xp: currentXp.toLocaleString() })}
+            </strong>
           </span>
         </div>
       </GlassCard>
@@ -1034,7 +1041,7 @@ function XpShopTab({ userXp }: { userXp: number }) {
                       variant="flat"
                     >
                       <Gem className="w-3 h-3 inline mr-1" aria-hidden="true" />
-                      {cost.toLocaleString()} XP
+                      {t('achievements.xp_value', { xp: cost.toLocaleString() })}
                     </Chip>
                     {item.stock_limit !== null && item.stock_limit !== undefined && !isOwned && (
                       <p className="text-xs text-theme-subtle mt-1">{t('achievements.shop.stock_left', { count: item.stock_limit })}</p>
@@ -1110,37 +1117,6 @@ interface BadgeDetailModalProps {
   badgeKey: string | null;
 }
 
-const BADGE_TYPE_LABELS: Record<string, string> = {
-  vol: 'Volunteering',
-  offer: 'Offers',
-  request: 'Requests',
-  earn: 'Earning',
-  spend: 'Spending',
-  transaction: 'Transactions',
-  diversity: 'Community Diversity',
-  connection: 'Connections',
-  message: 'Messaging',
-  review_given: 'Reviews',
-  '5star': '5-Star Reviews',
-  event_attend: 'Event Attendance',
-  event_host: 'Event Hosting',
-  group_join: 'Groups',
-  group_create: 'Group Creation',
-  post: 'Posts',
-  likes_received: 'Likes',
-  profile: 'Profile',
-  membership: 'Membership',
-  streak: 'Streaks',
-  level: 'Levels',
-  special: 'Special',
-  vol_org: 'Organisations',
-  quality: 'Quality',
-  reliability: 'Reliability',
-  mentoring: 'Mentoring',
-  reciprocity: 'Reciprocity',
-  verification: 'Verification',
-};
-
 function BadgeDetailModal({ isOpen, onClose, badgeKey }: BadgeDetailModalProps) {
   const { t } = useTranslation('gamification');
   const [badge, setBadge] = useState<BadgeDetail | null>(null);
@@ -1176,7 +1152,7 @@ function BadgeDetailModal({ isOpen, onClose, badgeKey }: BadgeDetailModalProps) 
     return () => { cancelled = true; };
   }, [isOpen, badgeKey]);
 
-  const typeLabel = badge ? (BADGE_TYPE_LABELS[badge.type] ?? badge.type) : '';
+  const typeLabel = badge ? t(`achievements.badge_type.${badge.type}`) : '';
   const rarityKey = badge?.rarity ? `achievements.badge_detail.rarity_${badge.rarity}` : '';
   const tierKey = badge?.badge_tier ? `achievements.badge_detail.tier_${badge.badge_tier}` : '';
 
@@ -1265,7 +1241,7 @@ function BadgeDetailModal({ isOpen, onClose, badgeKey }: BadgeDetailModalProps) 
                   {badge.rarity && (
                     <div className="p-3 rounded-lg bg-white/5 border border-white/10">
                       <p className="text-xs text-theme-subtle mb-1">{t('achievements.badge_detail.rarity')}</p>
-                      <p className="text-sm font-medium text-theme-primary">{t(rarityKey, badge.rarity)}</p>
+                      <p className="text-sm font-medium text-theme-primary">{t(rarityKey)}</p>
                     </div>
                   )}
 
@@ -1275,7 +1251,9 @@ function BadgeDetailModal({ isOpen, onClose, badgeKey }: BadgeDetailModalProps) 
                       <p className="text-xs text-theme-subtle mb-1">{t('achievements.badge_detail.xp_reward')}</p>
                       <div className="flex items-center gap-1">
                         <Zap className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
-                        <p className="text-sm font-medium text-amber-400">{badge.xp_value} XP</p>
+                        <p className="text-sm font-medium text-amber-400">
+                          {t('achievements.badge_detail.xp_value', { xp: badge.xp_value })}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -1284,7 +1262,7 @@ function BadgeDetailModal({ isOpen, onClose, badgeKey }: BadgeDetailModalProps) 
                   {badge.badge_tier && (
                     <div className="p-3 rounded-lg bg-white/5 border border-white/10">
                       <p className="text-xs text-theme-subtle mb-1">{t('achievements.badge_detail.tier')}</p>
-                      <p className="text-sm font-medium text-theme-primary">{t(tierKey, badge.badge_tier)}</p>
+                      <p className="text-sm font-medium text-theme-primary">{t(tierKey)}</p>
                     </div>
                   )}
                 </div>
@@ -1503,7 +1481,7 @@ export function AchievementsPage() {
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load achievements', err);
-      setError(tRef.current('achievements.unable_to_load', 'Failed to load achievements. Please try again.'));
+      setError(tRef.current('achievements.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -1583,7 +1561,7 @@ export function AchievementsPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div aria-label={t('achievements.loading', 'Loading achievements')} aria-busy="true" className="space-y-6">
+            <div aria-label={t('achievements.loading')} aria-busy="true" className="space-y-6">
               {/* Daily reward skeleton */}
               <GlassCard className="p-4">
                 <div className="flex items-center gap-4">
@@ -1702,7 +1680,7 @@ export function AchievementsPage() {
                   title={
                     <div className="flex items-center gap-2">
                       <Route className="w-4 h-4" aria-hidden="true" />
-                      <span>{t('achievements.tab_journeys', 'Journeys')}</span>
+                      <span>{t('achievements.tab_journeys')}</span>
                     </div>
                   }
                 />
@@ -1711,7 +1689,7 @@ export function AchievementsPage() {
                   title={
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" aria-hidden="true" />
-                      <span>{t('achievements.tab_engagement', 'Engagement')}</span>
+                      <span>{t('achievements.tab_engagement')}</span>
                     </div>
                   }
                 />
@@ -1749,7 +1727,7 @@ export function AchievementsPage() {
                               { key: 'all', label: t('achievements.all_types') },
                               ...availableTypes.map((badgeType) => ({
                                 key: badgeType,
-                                label: badgeType.charAt(0).toUpperCase() + badgeType.slice(1),
+                                label: t(`achievements.badge_type.${badgeType}`),
                               })),
                             ]}
                           >
