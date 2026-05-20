@@ -870,7 +870,7 @@ export function JobKanbanPage() {
 
       {/* Kanban board */}
       <div className="overflow-x-auto pb-4">
-        <div className="flex gap-4" style={{ minWidth: `${COLUMNS.length * 17}rem` }}>
+        <div className="flex min-w-[102rem] gap-4">
           {COLUMNS.map((column) => (
             <KanbanColumn
               key={column.id}
