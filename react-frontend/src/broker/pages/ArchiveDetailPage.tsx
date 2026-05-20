@@ -90,7 +90,7 @@ export function ArchiveDetail() {
           to={tenantPath('/broker/archives')}
           variant="flat"
           className="mt-4"
-          startContent={<ArrowLeft size={16} />}
+          startContent={<ArrowLeft aria-hidden="true" size={16} />}
         >
           {t('archives.back_to_archives')}
         </Button>
@@ -109,7 +109,7 @@ export function ArchiveDetail() {
             as={Link}
             to={tenantPath('/broker/archives')}
             variant="flat"
-            startContent={<ArrowLeft size={16} />}
+            startContent={<ArrowLeft aria-hidden="true" size={16} />}
             size="sm"
           >
             {t('archives.back')}
@@ -122,7 +122,7 @@ export function ArchiveDetail() {
         color="secondary"
         variant="flat"
         size="lg"
-        startContent={<Lock size={14} />}
+        startContent={<Lock aria-hidden="true" size={14} />}
       >
         {t('archives.read_only_badge')}
       </Chip>
@@ -131,9 +131,9 @@ export function ArchiveDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           {isApproved ? (
-            <CheckCircle size={18} className="text-success" />
+            <CheckCircle aria-hidden="true" size={18} className="text-success" />
           ) : (
-            <Flag size={18} className="text-danger" />
+            <Flag aria-hidden="true" size={18} className="text-danger" />
           )}
           <span className="font-semibold">{t('archives.section_decision')}</span>
         </CardHeader>
@@ -148,7 +148,7 @@ export function ArchiveDetail() {
                 color={isApproved ? 'success' : 'danger'}
                 className="mt-1"
               >
-                {t(`archives.decision_${data.decision}`, { defaultValue: data.decision })}
+                {t(`archives.decision_${data.decision}`)}
               </Chip>
             </div>
             <div>
@@ -182,7 +182,7 @@ export function ArchiveDetail() {
                     variant="flat"
                     color="danger"
                   >
-                    {t(`archives.severity_${data.flag_severity}`, { defaultValue: data.flag_severity })}
+                    {t(`archives.severity_${data.flag_severity}`)}
                   </Chip>
                 </div>
               )}
@@ -194,21 +194,21 @@ export function ArchiveDetail() {
       {/* Target Message Card */}
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
-          <Mail size={18} />
+          <Mail aria-hidden="true" size={18} />
           <span className="font-semibold">{t('archives.section_target')}</span>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex items-center gap-2">
-              <User size={14} className="text-default-400" />
+              <User aria-hidden="true" size={14} className="text-default-400" />
               <div>
                 <p className="text-xs text-default-400">{t('archives.label_sender')}</p>
                 <p className="text-sm font-medium">{data.sender_name}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <User size={14} className="text-default-400" />
+              <User aria-hidden="true" size={14} className="text-default-400" />
               <div>
                 <p className="text-xs text-default-400">{t('archives.label_receiver')}</p>
                 <p className="text-sm font-medium">{data.receiver_name}</p>
@@ -227,7 +227,7 @@ export function ArchiveDetail() {
             <div>
               <p className="text-xs text-default-400">{t('archives.label_copy_reason')}</p>
               <Chip size="sm" variant="flat" color="default" className="mt-1">
-                {t(`archives.copy_reason_${data.copy_reason}`, { defaultValue: data.copy_reason.replace(/_/g, ' ') })}
+                {t(`archives.copy_reason_${data.copy_reason}`)}
               </Chip>
             </div>
             <div>
@@ -249,7 +249,7 @@ export function ArchiveDetail() {
       {/* Conversation Snapshot Card */}
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
-          <MessageSquare size={18} />
+          <MessageSquare aria-hidden="true" size={18} />
           <span className="font-semibold">{t('archives.section_conversation_snapshot')}</span>
           <Chip size="sm" variant="flat" color="default" className="ml-auto">
             {t('archives.messages_count', { count: data.conversation_snapshot.length })}
