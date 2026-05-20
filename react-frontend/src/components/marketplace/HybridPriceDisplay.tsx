@@ -79,13 +79,10 @@ export function HybridPriceDisplay({
 
         {/* Time credit portion */}
         <Tooltip
-          content={t(
-            'hybrid_pricing.tooltip',
-            'Time credits earned through community timebanking'
-          )}
+          content={t('hybrid_pricing.tooltip')}
         >
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-            <Clock className={`${classes.icon} text-primary`} />
+            <Clock className={`${classes.icon} text-primary`} aria-hidden="true" />
             <span className={`${classes.tc} font-bold text-primary`}>
               {timeCreditPrice} TC
             </span>
@@ -95,7 +92,7 @@ export function HybridPriceDisplay({
         {/* Negotiable badge */}
         {priceType === 'negotiable' && (
           <Chip color="warning" variant="flat" size="sm">
-            {t('price.negotiable', 'Negotiable')}
+            {t('price.negotiable')}
           </Chip>
         )}
       </div>
@@ -103,22 +100,19 @@ export function HybridPriceDisplay({
       {/* Explainer row */}
       <div className="flex items-center gap-1.5">
         <Tooltip
-          content={t(
-            'hybrid_pricing.explanation',
-            'Hybrid pricing lets you pay with a combination of regular currency and time credits you have earned through community service.'
-          )}
+          content={t('hybrid_pricing.explanation')}
         >
           <span className="inline-flex items-center gap-1 text-xs text-theme-muted cursor-help">
-            <HelpCircle className="w-3 h-3" />
-            {t('hybrid_pricing.label', 'Pay with cash + time credits')}
+            <HelpCircle className="w-3 h-3" aria-hidden="true" />
+            {t('hybrid_pricing.label')}
           </span>
         </Tooltip>
-        <span className="text-xs text-theme-muted">|</span>
+        <span className="text-xs text-theme-muted" aria-hidden="true">|</span>
         <Link
           to={tenantPath('/help')}
           className="text-xs text-primary hover:underline"
         >
-          {t('hybrid_pricing.learn_more', 'What are time credits?')}
+          {t('hybrid_pricing.learn_more')}
         </Link>
       </div>
     </div>

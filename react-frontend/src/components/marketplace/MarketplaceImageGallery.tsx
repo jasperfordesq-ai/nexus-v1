@@ -58,7 +58,7 @@ export function MarketplaceImageGallery({ images }: MarketplaceImageGalleryProps
             strokeWidth={1.5}
           />
           <p className="text-sm text-theme-muted">
-            {t('gallery.no_images', 'No images available')}
+            {t('gallery.no_images')}
           </p>
         </div>
       </div>
@@ -77,7 +77,7 @@ export function MarketplaceImageGallery({ images }: MarketplaceImageGalleryProps
       <div className="hidden sm:block relative">
         <img
           src={activeImage.url}
-          alt={activeImage.alt_text || t('gallery.image_alt', 'Listing image')}
+          alt={activeImage.alt_text || t('gallery.image_alt')}
           className="w-full aspect-video object-cover rounded-lg"
         />
         {/* Image count badge */}
@@ -102,7 +102,7 @@ export function MarketplaceImageGallery({ images }: MarketplaceImageGalleryProps
             <div className="relative">
               <img
                 src={image.url}
-                alt={image.alt_text || t('gallery.image_alt', 'Listing image')}
+                alt={image.alt_text || t('gallery.image_alt')}
                 className="w-full aspect-video object-cover rounded-lg"
               />
               {images.length > 1 && (
@@ -130,12 +130,12 @@ export function MarketplaceImageGallery({ images }: MarketplaceImageGalleryProps
                   ? 'border-primary'
                   : 'border-transparent hover:border-default-300'
               }`}
-              aria-label={t('gallery.select_image', 'View image {{number}}', { number: index + 1 })}
+              aria-label={t('gallery.select_image', { number: index + 1 })}
               aria-current={index === activeIndex ? 'true' : undefined}
             >
               <img
                 src={image.thumbnail_url || image.url}
-                alt={t('gallery.thumbnail_alt', 'Image {{number}}', { number: index + 1 })}
+                alt={t('gallery.thumbnail_alt', { number: index + 1 })}
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
