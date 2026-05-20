@@ -89,7 +89,8 @@
       "declined": "辞退",
       "countered": "カウンター提案済み",
       "withdrawn": "取り下げ",
-      "expired": "期限切れ"
+      "expired": "期限切れ",
+      "unknown": "不明"
     },
     "counter_amount": "カウンター: {{amount}}",
     "accept": "承諾",

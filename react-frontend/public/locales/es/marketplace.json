@@ -90,7 +90,8 @@
       "declined": "Declined",
       "countered": "Countered",
       "withdrawn": "Withdrawn",
-      "expired": "Expired"
+      "expired": "Expired",
+      "unknown": "Desconocido"
     },
     "accept": "Accept",
     "decline": "Decline",
@@ -522,9 +523,9 @@
     "suggested_reply": "Respuesta Sugerida por IA",
     "use_reply": "Usar Esta Respuesta",
     "error": "Error al generar una respuesta. Por favor, intenta de nuevo.",
-    "regenerate": "Regenerate",
-    "copy": "Copy",
-    "copied": "Copied"
+    "regenerate": "Regenerar",
+    "copy": "Copiar",
+    "copied": "Copiado"
   },
   "map": {
     "page_title": "Búsqueda en el Mapa - Mercado",

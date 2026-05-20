@@ -90,7 +90,8 @@
       "declined": "Abgelehnt",
       "countered": "Gegenangebot",
       "withdrawn": "Zurückgezogen",
-      "expired": "Abgelaufen"
+      "expired": "Abgelaufen",
+      "unknown": "Unbekannt"
     },
     "counter_amount": "Gegenangebot: {{amount}}",
     "accept": "Annehmen",

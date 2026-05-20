@@ -31,13 +31,13 @@ interface OfferCardProps {
   onAcceptCounter?: (offerId: number) => void;
 }
 
-const STATUS_CONFIG: Record<string, { color: 'warning' | 'success' | 'danger' | 'secondary' | 'default'; label: string }> = {
-  pending: { color: 'warning', label: 'Pending' },
-  accepted: { color: 'success', label: 'Accepted' },
-  declined: { color: 'danger', label: 'Declined' },
-  countered: { color: 'secondary', label: 'Countered' },
-  expired: { color: 'default', label: 'Expired' },
-  withdrawn: { color: 'default', label: 'Withdrawn' },
+const STATUS_CONFIG: Record<string, { color: 'warning' | 'success' | 'danger' | 'secondary' | 'default'; labelKey: string }> = {
+  pending: { color: 'warning', labelKey: 'offer.status.pending' },
+  accepted: { color: 'success', labelKey: 'offer.status.accepted' },
+  declined: { color: 'danger', labelKey: 'offer.status.declined' },
+  countered: { color: 'secondary', labelKey: 'offer.status.countered' },
+  expired: { color: 'default', labelKey: 'offer.status.expired' },
+  withdrawn: { color: 'default', labelKey: 'offer.status.withdrawn' },
 };
 
 function formatCurrency(amount: number, currency: string): string {
@@ -74,7 +74,7 @@ export function OfferCard({
   onAcceptCounter,
 }: OfferCardProps) {
   const { t } = useTranslation('marketplace');
-  const statusConfig = STATUS_CONFIG[offer.status] ?? { color: 'default' as const, label: 'Unknown' };
+  const statusConfig = STATUS_CONFIG[offer.status] ?? { color: 'default' as const, labelKey: 'offer.status.unknown' };
   const counterparty = perspective === 'buyer' ? offer.seller : offer.buyer;
 
   return (
@@ -108,7 +108,7 @@ export function OfferCard({
               size="sm"
               className="shrink-0"
             >
-              {t(`offer.status.${offer.status}`, statusConfig.label)}
+              {t(statusConfig.labelKey)}
             </Chip>
           </div>
 
@@ -120,7 +120,7 @@ export function OfferCard({
           {/* Counter offer amount */}
           {offer.status === 'countered' && offer.counter_amount != null && (
             <p className="text-sm text-theme-muted mt-0.5">
-              {t('offer.counter_amount', 'Counter: {{amount}}', {
+              {t('offer.counter_amount', {
                 amount: formatCurrency(offer.counter_amount, offer.currency),
               })}
             </p>
@@ -170,7 +170,7 @@ export function OfferCard({
                     startContent={<Check className="w-3.5 h-3.5" aria-hidden="true" />}
                     onPress={() => onAccept?.(offer.id)}
                   >
-                    {t('offer.accept', 'Accept')}
+                    {t('offer.accept')}
                   </Button>
                   <Button
                     size="sm"
@@ -179,7 +179,7 @@ export function OfferCard({
                     startContent={<X className="w-3.5 h-3.5" aria-hidden="true" />}
                     onPress={() => onDecline?.(offer.id)}
                   >
-                    {t('offer.decline', 'Decline')}
+                    {t('offer.decline')}
                   </Button>
                   <Button
                     size="sm"
@@ -188,7 +188,7 @@ export function OfferCard({
                     startContent={<RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />}
                     onPress={() => onCounter?.(offer.id)}
                   >
-                    {t('offer.counter', 'Counter')}
+                    {t('offer.counter')}
                   </Button>
                 </>
               )}
@@ -200,7 +200,7 @@ export function OfferCard({
                   startContent={<Undo2 className="w-3.5 h-3.5" aria-hidden="true" />}
                   onPress={() => onWithdraw?.(offer.id)}
                 >
-                  {t('offer.withdraw', 'Withdraw')}
+                  {t('offer.withdraw')}
                 </Button>
               )}
             </div>
@@ -216,7 +216,7 @@ export function OfferCard({
                 startContent={<Check className="w-3.5 h-3.5" aria-hidden="true" />}
                 onPress={() => onAcceptCounter?.(offer.id)}
               >
-                {t('offer.accept_counter', 'Accept Counter')}
+                {t('offer.accept_counter')}
               </Button>
               <Button
                 size="sm"
@@ -225,7 +225,7 @@ export function OfferCard({
                 startContent={<X className="w-3.5 h-3.5" aria-hidden="true" />}
                 onPress={() => onDecline?.(offer.id)}
               >
-                {t('offer.decline', 'Decline')}
+                {t('offer.decline')}
               </Button>
             </div>
           )}

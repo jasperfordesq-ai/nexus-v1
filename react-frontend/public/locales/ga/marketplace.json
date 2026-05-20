@@ -89,7 +89,8 @@
       "declined": "Diúltaithe",
       "countered": "Frithsheasta",
       "withdrawn": "Tarraingthe Siar",
-      "expired": "Imithe in Éag"
+      "expired": "Imithe in Éag",
+      "unknown": "Anaithnid"
     },
     "counter_amount": "Frith: {{amount}}",
     "accept": "Glac Leis",

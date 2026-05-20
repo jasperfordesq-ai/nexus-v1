@@ -105,7 +105,8 @@
       "declined": "Declined",
       "countered": "Countered",
       "withdrawn": "Withdrawn",
-      "expired": "Expired"
+      "expired": "Expired",
+      "unknown": "Unknown"
     },
     "counter_amount": "Counter: {{amount}}",
     "accept": "Accept",

@@ -89,7 +89,8 @@
       "declined": "Odrzucona",
       "countered": "Kontroferta",
       "withdrawn": "Wycofana",
-      "expired": "Wygasła"
+      "expired": "Wygasła",
+      "unknown": "Nieznany"
     },
     "counter_amount": "Kontroferta: {{amount}}",
     "accept": "Zaakceptuj",
