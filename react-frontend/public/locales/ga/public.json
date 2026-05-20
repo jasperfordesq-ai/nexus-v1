@@ -187,7 +187,8 @@
       "login_link": "Logáil isteach",
       "login_prompt_after": "le haghaidh tacaíocht níos tapúla."
     },
-    "meta_description": "Get in touch with the team — questions about joining, partnering, social prescribing, accessibility, or how timebanking works. We're happy to help."
+    "meta_description": "Get in touch with the team — questions about joining, partnering, social prescribing, accessibility, or how timebanking works. We're happy to help.",
+    "turnstile_error": "Couldn't load security check. Refresh the page to try again."
   },
   "faq": {
     "title": "Ceisteanna Coitianta",

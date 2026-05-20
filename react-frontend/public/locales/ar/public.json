@@ -187,7 +187,8 @@
       "login_prompt_before": "هل لديك حساب بالفعل؟",
       "login_link": "تسجيل الدخول",
       "login_prompt_after": "للحصول على دعم أسرع."
-    }
+    },
+    "turnstile_error": "Couldn't load security check. Refresh the page to try again."
   },
   "faq": {
     "page_title": "Frequently Asked Questions",

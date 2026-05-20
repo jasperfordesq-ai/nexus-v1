@@ -106,7 +106,7 @@ export function ContactPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <PageMeta title={t('contact.title', { defaultValue: 'Contact Us' })} description={t('contact.meta_description', { defaultValue: 'Get in touch with our community support team.' })} />
+      <PageMeta title={t('contact.title')} description={t('contact.meta_description')} />
       {contactPointSchema && (
         <Helmet>
           <script type="application/ld+json">
@@ -121,7 +121,7 @@ export function ContactPage() {
         <GlassCard className="p-5 sm:p-8">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
-              <MessageSquare className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+              <MessageSquare aria-hidden="true" className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary">{t('contact.title')}</h1>
             <p className="text-theme-muted mt-2">
@@ -223,7 +223,7 @@ export function ContactPage() {
                   <div ref={turnstileRef} className="my-2 min-h-[1px]" />
                   {turnstileStatus === 'error' && (
                     <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                      {t('contact.turnstile_error', { defaultValue: "Couldn't load security check. Refresh the page to try again." })}
+                      {t('contact.turnstile_error')}
                     </p>
                   )}
                 </div>
@@ -235,7 +235,7 @@ export function ContactPage() {
                 isDisabled={!formData.name.trim() || !formData.email.trim() || !formData.message.trim() || (!!turnstileSiteKey && !turnstileToken)}
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
                 size="lg"
-                spinner={<Loader2 className="w-4 h-4 animate-spin" />}
+                spinner={<Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />}
               >
                 {t('contact.form.submit')}
               </Button>

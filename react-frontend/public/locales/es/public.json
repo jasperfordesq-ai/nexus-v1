@@ -187,7 +187,8 @@
       "login_prompt_before": "¿Ya tienes una cuenta?",
       "login_link": "Inicia sesión",
       "login_prompt_after": "para soporte más rápido."
-    }
+    },
+    "turnstile_error": "No se pudo cargar la comprobacion de seguridad. Actualiza la pagina e intentalo de nuevo."
   },
   "faq": {
     "page_title": "Frequently Asked Questions",

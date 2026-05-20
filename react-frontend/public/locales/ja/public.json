@@ -187,7 +187,8 @@
       "login_prompt_before": "すでにアカウントをお持ちですか？",
       "login_link": "ログイン",
       "login_prompt_after": "より迅速なサポートのために。"
-    }
+    },
+    "turnstile_error": "Couldn't load security check. Refresh the page to try again."
   },
   "faq": {
     "page_title": "Frequently Asked Questions",

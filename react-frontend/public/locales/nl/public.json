@@ -187,7 +187,8 @@
       "login_prompt_before": "Heb je al een account?",
       "login_link": "Log in",
       "login_prompt_after": "voor snellere ondersteuning."
-    }
+    },
+    "turnstile_error": "Beveiligingscontrole kan niet worden geladen. Vernieuw de pagina en probeer opnieuw."
   },
   "faq": {
     "page_title": "Frequently Asked Questions",

@@ -187,7 +187,8 @@
       "login_prompt_before": "Ha già un account?",
       "login_link": "Acceda",
       "login_prompt_after": "per un supporto più rapido."
-    }
+    },
+    "turnstile_error": "Impossibile caricare il controllo di sicurezza. Aggiorna la pagina e riprova."
   },
   "faq": {
     "page_title": "Frequently Asked Questions",

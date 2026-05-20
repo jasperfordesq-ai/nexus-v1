@@ -611,7 +611,8 @@
       "login_prompt_before": "Already have an account?",
       "login_link": "Log in",
       "login_prompt_after": "for faster support."
-    }
+    },
+    "turnstile_error": "Couldn't load security check. Refresh the page to try again."
   },
   "faq": {
     "page_title": "Frequently Asked Questions",

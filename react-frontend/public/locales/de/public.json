@@ -187,7 +187,8 @@
       "login_prompt_before": "Haben Sie bereits ein Konto?",
       "login_link": "Anmelden",
       "login_prompt_after": "für schnelleren Support."
-    }
+    },
+    "turnstile_error": "Sicherheitspr?fung konnte nicht geladen werden. Aktualisieren Sie die Seite und versuchen Sie es erneut."
   },
   "faq": {
     "page_title": "Frequently Asked Questions",

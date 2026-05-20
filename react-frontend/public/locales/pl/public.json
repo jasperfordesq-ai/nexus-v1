@@ -187,7 +187,8 @@
       "login_prompt_before": "Masz już konto?",
       "login_link": "Zaloguj się",
       "login_prompt_after": "aby uzyskać szybszą pomoc."
-    }
+    },
+    "turnstile_error": "Nie mozna zaladowac kontroli bezpieczenstwa. Odswiez strone i sprobuj ponownie."
   },
   "faq": {
     "page_title": "Frequently Asked Questions",
