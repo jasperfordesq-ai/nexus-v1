@@ -200,7 +200,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
     if (isLink) {
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
     } else {
-      const url = prompt(t('rte.enter_url', 'Enter URL'));
+      const url = prompt(t('rte.enter_url'));
       if (url) {
         editor.dispatchCommand(TOGGLE_LINK_COMMAND, url);
       }
@@ -210,27 +210,27 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
   return (
     <div className="flex flex-wrap items-center gap-0.5 border-b border-default-200 dark:border-default-100 px-2 py-1.5 bg-default-50 dark:bg-default-100 rounded-t-lg">
       {/* Undo / Redo */}
-      <Tooltip content={t('rte.undo', 'Undo')} size="sm" delay={500}>
+      <Tooltip content={t('rte.undo')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
           variant="light"
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
-          aria-label={t('rte.undo', 'Undo')}
+          aria-label={t('rte.undo')}
           className="min-w-8 w-8 h-8"
         >
           <Undo2 size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content={t('rte.redo', 'Redo')} size="sm" delay={500}>
+      <Tooltip content={t('rte.redo')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
           variant="light"
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
-          aria-label={t('rte.redo', 'Redo')}
+          aria-label={t('rte.redo')}
           className="min-w-8 w-8 h-8"
         >
           <Redo2 size={15} />
@@ -240,7 +240,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
       <Divider orientation="vertical" className="h-5 mx-1" />
 
       {/* Headings */}
-      <Tooltip content={t('rte.heading_2', 'Heading 2')} size="sm" delay={500}>
+      <Tooltip content={t('rte.heading_2')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -248,13 +248,13 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
           color={blockType === 'h2' ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => formatHeading('h2')}
-          aria-label={t('rte.heading_2', 'Heading 2')}
+          aria-label={t('rte.heading_2')}
           className="min-w-8 w-8 h-8"
         >
           <Heading2 size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content={t('rte.heading_3', 'Heading 3')} size="sm" delay={500}>
+      <Tooltip content={t('rte.heading_3')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -262,7 +262,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
           color={blockType === 'h3' ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => formatHeading('h3')}
-          aria-label={t('rte.heading_3', 'Heading 3')}
+          aria-label={t('rte.heading_3')}
           className="min-w-8 w-8 h-8"
         >
           <Heading3 size={15} />
@@ -272,7 +272,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
       <Divider orientation="vertical" className="h-5 mx-1" />
 
       {/* Inline formatting */}
-      <Tooltip content={t('rte.bold', 'Bold')} size="sm" delay={500}>
+      <Tooltip content={t('rte.bold')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -280,13 +280,13 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
           color={isBold ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
-          aria-label={t('rte.bold', 'Bold')}
+          aria-label={t('rte.bold')}
           className="min-w-8 w-8 h-8"
         >
           <Bold size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content={t('rte.italic', 'Italic')} size="sm" delay={500}>
+      <Tooltip content={t('rte.italic')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -294,13 +294,13 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
           color={isItalic ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
-          aria-label={t('rte.italic', 'Italic')}
+          aria-label={t('rte.italic')}
           className="min-w-8 w-8 h-8"
         >
           <Italic size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content={t('rte.underline', 'Underline')} size="sm" delay={500}>
+      <Tooltip content={t('rte.underline')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -308,13 +308,13 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
           color={isUnderline ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}
-          aria-label={t('rte.underline', 'Underline')}
+          aria-label={t('rte.underline')}
           className="min-w-8 w-8 h-8"
         >
           <Underline size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content={t('rte.strikethrough', 'Strikethrough')} size="sm" delay={500}>
+      <Tooltip content={t('rte.strikethrough')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -322,13 +322,13 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
           color={isStrikethrough ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')}
-          aria-label={t('rte.strikethrough', 'Strikethrough')}
+          aria-label={t('rte.strikethrough')}
           className="min-w-8 w-8 h-8"
         >
           <Strikethrough size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content={t('rte.inline_code', 'Inline Code')} size="sm" delay={500}>
+      <Tooltip content={t('rte.inline_code')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -336,7 +336,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
           color={isCode ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')}
-          aria-label={t('rte.inline_code', 'Inline Code')}
+          aria-label={t('rte.inline_code')}
           className="min-w-8 w-8 h-8"
         >
           <Code size={15} />
@@ -346,7 +346,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
       <Divider orientation="vertical" className="h-5 mx-1" />
 
       {/* Block formatting */}
-      <Tooltip content={t('rte.bullet_list', 'Bullet List')} size="sm" delay={500}>
+      <Tooltip content={t('rte.bullet_list')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -354,13 +354,13 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
           color={blockType === 'bullet' ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => formatList('bullet')}
-          aria-label={t('rte.bullet_list', 'Bullet List')}
+          aria-label={t('rte.bullet_list')}
           className="min-w-8 w-8 h-8"
         >
           <List size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content={t('rte.numbered_list', 'Numbered List')} size="sm" delay={500}>
+      <Tooltip content={t('rte.numbered_list')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -368,13 +368,13 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
           color={blockType === 'number' ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => formatList('number')}
-          aria-label={t('rte.numbered_list', 'Numbered List')}
+          aria-label={t('rte.numbered_list')}
           className="min-w-8 w-8 h-8"
         >
           <ListOrdered size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content={t('rte.block_quote', 'Block Quote')} size="sm" delay={500}>
+      <Tooltip content={t('rte.block_quote')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -382,7 +382,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
           color={blockType === 'quote' ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={formatQuote}
-          aria-label={t('rte.block_quote', 'Block Quote')}
+          aria-label={t('rte.block_quote')}
           className="min-w-8 w-8 h-8"
         >
           <Quote size={15} />
@@ -392,7 +392,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
       <Divider orientation="vertical" className="h-5 mx-1" />
 
       {/* Link */}
-      <Tooltip content={isLink ? t('rte.remove_link', 'Remove Link') : t('rte.insert_link', 'Insert Link')} size="sm" delay={500}>
+      <Tooltip content={isLink ? t('rte.remove_link') : t('rte.insert_link')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -400,7 +400,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
           color={isLink ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={insertLink}
-          aria-label={isLink ? t('rte.remove_link', 'Remove Link') : t('rte.insert_link', 'Insert Link')}
+          aria-label={isLink ? t('rte.remove_link') : t('rte.insert_link')}
           className="min-w-8 w-8 h-8"
         >
           <Link2 size={15} />
@@ -411,7 +411,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
       {showMarkdownImport && (
         <>
           <Divider orientation="vertical" className="h-5 mx-1" />
-          <Tooltip content={t('rte.import_markdown', 'Import Markdown')} size="sm" delay={500}>
+          <Tooltip content={t('rte.import_markdown')} size="sm" delay={500}>
             <Button
               size="sm"
               variant="light"
@@ -436,11 +436,11 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
                 };
                 input.click();
               }}
-              aria-label={t('rte.import_markdown', 'Import Markdown')}
+              aria-label={t('rte.import_markdown')}
               className="h-8 gap-1 text-xs px-2"
               startContent={<FileDown size={14} />}
             >
-              {t('rte.import_md', 'Import .md')}
+              {t('rte.import_md')}
             </Button>
           </Tooltip>
         </>
@@ -495,11 +495,14 @@ function DisabledPlugin({ isDisabled }: { isDisabled?: boolean }) {
 export function RichTextEditor({
   value,
   onChange,
-  placeholder = 'Start writing...',
+  placeholder,
   isDisabled = false,
   label,
   showMarkdownImport = false,
 }: RichTextEditorProps) {
+  const { t } = useTranslation('admin');
+  const editorPlaceholder = placeholder ?? t('rte.start_writing');
+
   const initialConfig = {
     namespace: 'NexusBlogEditor',
     theme: editorTheme,
@@ -552,7 +555,7 @@ export function RichTextEditor({
               }
               placeholder={
                 <div className="pointer-events-none absolute top-3 left-4 text-default-400">
-                  {placeholder}
+                  {editorPlaceholder}
                 </div>
               }
               ErrorBoundary={LexicalErrorBoundary}
