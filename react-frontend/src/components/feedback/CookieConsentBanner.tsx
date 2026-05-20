@@ -16,7 +16,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Switch } from '@heroui/react';
+import { Button, Card, CardBody, Chip, Switch } from '@heroui/react';
 import Cookie from 'lucide-react/icons/cookie';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronUp from 'lucide-react/icons/chevron-up';
@@ -62,38 +62,35 @@ export function CookieConsentBanner() {
         className="fixed bottom-0 inset-x-0 z-[700] p-3 sm:p-4"
         style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}
         role="dialog"
-        aria-label={t('cookie_consent.banner_label', 'Cookie consent')}
+        aria-label={t('cookie_consent.banner_label')}
         aria-modal="false"
         data-nosnippet
       >
-        <div
-          className="max-w-3xl mx-auto rounded-2xl border border-[var(--glass-border)] shadow-lg"
+        <Card
+          className="mx-auto max-w-3xl border border-[var(--border-strong)] bg-[var(--surface-overlay)] shadow-2xl shadow-black/20 supports-[backdrop-filter]:bg-[var(--glass-bg)]"
+          radius="lg"
           style={{
-            background: 'var(--glass-bg)',
-            backdropFilter: `blur(var(--glass-blur)) saturate(var(--glass-saturate))`,
-            WebkitBackdropFilter: `blur(var(--glass-blur)) saturate(var(--glass-saturate))`,
+            backdropFilter: 'blur(var(--glass-blur)) saturate(var(--glass-saturate))',
+            WebkitBackdropFilter: 'blur(var(--glass-blur)) saturate(var(--glass-saturate))',
           }}
         >
-          <div className="p-4 sm:p-5">
+          <CardBody className="p-4 sm:p-5">
             {/* Header row */}
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-amber-500/15 flex-shrink-0">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-500/15 shadow-sm">
                 <Cookie className="w-5 h-5 text-amber-500" aria-hidden="true" />
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-sm sm:text-base font-semibold text-[var(--text-primary)]">
-                  {t('cookie_consent.title', 'We use cookies')}
+                  {t('cookie_consent.title')}
                 </h2>
                 <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1 leading-relaxed">
-                  {t(
-                    'cookie_consent.description',
-                    'We use essential cookies for platform security and functionality. Optional cookies help us improve your experience and track errors.'
-                  )}{' '}
+                  {t('cookie_consent.description')}{' '}
                   <Link
                     to={tenantPath('/cookies')}
                     className="inline-flex items-center gap-1 text-[var(--color-primary)] hover:underline font-medium"
                   >
-                    {t('cookie_consent.learn_more', 'Learn more')}
+                    {t('cookie_consent.learn_more')}
                     <ExternalLink className="w-3 h-3" aria-hidden="true" />
                   </Link>
                 </p>
@@ -112,33 +109,33 @@ export function CookieConsentBanner() {
                 >
                   <div className="mt-4 space-y-3 border-t border-[var(--border-default)] pt-4">
                     {/* Essential — always on */}
-                    <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[var(--surface-elevated)]">
+                    <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-elevated)] p-3">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <Shield className="w-4 h-4 text-emerald-500 flex-shrink-0" aria-hidden="true" />
                         <div>
                           <p className="text-sm font-medium text-[var(--text-primary)]">
-                            {t('cookie_consent.essential', 'Essential')}
+                            {t('cookie_consent.essential')}
                           </p>
                           <p className="text-xs text-[var(--text-subtle)]">
-                            {t('cookie_consent.essential_desc', 'Authentication, security, session management')}
+                            {t('cookie_consent.essential_desc')}
                           </p>
                         </div>
                       </div>
-                      <span className="text-xs font-medium text-emerald-500 whitespace-nowrap">
-                        {t('cookie_consent.always_on', 'Always on')}
-                      </span>
+                      <Chip color="success" size="sm" variant="flat" className="shrink-0">
+                        {t('cookie_consent.always_on')}
+                      </Chip>
                     </div>
 
                     {/* Analytics */}
-                    <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[var(--surface-elevated)]">
+                    <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-elevated)] p-3">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <Cookie className="w-4 h-4 text-blue-500 flex-shrink-0" aria-hidden="true" />
                         <div>
                           <p className="text-sm font-medium text-[var(--text-primary)]">
-                            {t('cookie_consent.analytics', 'Analytics')}
+                            {t('cookie_consent.analytics')}
                           </p>
                           <p className="text-xs text-[var(--text-subtle)]">
-                            {t('cookie_consent.analytics_desc', 'Error tracking, usage statistics')}
+                            {t('cookie_consent.analytics_desc')}
                           </p>
                         </div>
                       </div>
@@ -146,20 +143,20 @@ export function CookieConsentBanner() {
                         size="sm"
                         isSelected={analyticsEnabled}
                         onValueChange={setAnalyticsEnabled}
-                        aria-label={t('cookie_consent.toggle_analytics', 'Toggle analytics cookies')}
+                        aria-label={t('cookie_consent.toggle_analytics')}
                       />
                     </div>
 
                     {/* Preferences */}
-                    <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[var(--surface-elevated)]">
+                    <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-elevated)] p-3">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <Cookie className="w-4 h-4 text-purple-500 flex-shrink-0" aria-hidden="true" />
                         <div>
                           <p className="text-sm font-medium text-[var(--text-primary)]">
-                            {t('cookie_consent.preferences', 'Preferences')}
+                            {t('cookie_consent.preferences')}
                           </p>
                           <p className="text-xs text-[var(--text-subtle)]">
-                            {t('cookie_consent.preferences_desc', 'Theme, language, display settings')}
+                            {t('cookie_consent.preferences_desc')}
                           </p>
                         </div>
                       </div>
@@ -167,7 +164,7 @@ export function CookieConsentBanner() {
                         size="sm"
                         isSelected={preferencesEnabled}
                         onValueChange={setPreferencesEnabled}
-                        aria-label={t('cookie_consent.toggle_preferences', 'Toggle preference cookies')}
+                        aria-label={t('cookie_consent.toggle_preferences')}
                       />
                     </div>
                   </div>
@@ -189,8 +186,8 @@ export function CookieConsentBanner() {
                 }
               >
                 {showDetails
-                  ? t('cookie_consent.hide_details', 'Hide details')
-                  : t('cookie_consent.manage', 'Manage preferences')
+                  ? t('cookie_consent.hide_details')
+                  : t('cookie_consent.manage')
                 }
               </Button>
 
@@ -203,7 +200,7 @@ export function CookieConsentBanner() {
                   className="order-1 sm:order-3"
                   onPress={handleSavePreferences}
                 >
-                  {t('cookie_consent.save', 'Save preferences')}
+                  {t('cookie_consent.save')}
                 </Button>
               ) : (
                 <>
@@ -213,7 +210,7 @@ export function CookieConsentBanner() {
                     className="bg-[var(--surface-elevated)] text-[var(--text-primary)] order-2 sm:order-3"
                     onPress={acceptEssentialOnly}
                   >
-                    {t('cookie_consent.essential_only', 'Essential only')}
+                    {t('cookie_consent.essential_only')}
                   </Button>
                   <Button
                     size="sm"
@@ -221,13 +218,13 @@ export function CookieConsentBanner() {
                     className="order-1 sm:order-4"
                     onPress={acceptAll}
                   >
-                    {t('cookie_consent.accept_all', 'Accept all')}
+                    {t('cookie_consent.accept_all')}
                   </Button>
                 </>
               )}
             </div>
-          </div>
-        </div>
+          </CardBody>
+        </Card>
       </motion.div>
     </AnimatePresence>
   );
