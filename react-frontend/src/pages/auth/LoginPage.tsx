@@ -369,8 +369,8 @@ export function LoginPage() {
                       {loginErrorCode === 'RATE_LIMITED' && (
                         <p className="text-red-600 dark:text-red-400 text-xs mt-1">
                           {loginRetryAfter && loginRetryAfter > 0
-                            ? t('login.rate_limited_seconds', { seconds: loginRetryAfter, defaultValue: 'Too many attempts. Please wait {{seconds}} seconds.' })
-                            : t('login.rate_limited', { defaultValue: 'Too many attempts. Please try again later.' })}
+                            ? t('login.rate_limited_seconds', { seconds: loginRetryAfter })
+                            : t('login.rate_limited')}
                         </p>
                       )}
                       {/* Resend verification email button */}
@@ -378,7 +378,7 @@ export function LoginPage() {
                         <div className="mt-3">
                           {resendVerificationSent ? (
                             <p className="text-emerald-600 dark:text-emerald-400 text-xs">
-                              {t('login.verification_email_sent', { defaultValue: 'Verification email sent! Check your inbox.' })}
+                              {t('login.verification_email_sent')}
                             </p>
                           ) : (
                             <Button
@@ -389,7 +389,7 @@ export function LoginPage() {
                               className="bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20"
                               startContent={!isResendingVerification ? <Mail className="w-3 h-3" /> : undefined}
                             >
-                              {t('login.resend_verification', { defaultValue: 'Resend verification email' })}
+                              {t('login.resend_verification')}
                             </Button>
                           )}
                         </div>
@@ -399,9 +399,7 @@ export function LoginPage() {
                           <ShieldAlert className="w-4 h-4 text-[var(--color-warning)] mt-0.5 flex-shrink-0" />
                           <div>
                             <p className="text-amber-600 dark:text-amber-400 text-xs">
-                              {t('login.pending_verification', {
-                                defaultValue: 'Your identity verification is still in progress. Please complete the verification process or wait for it to finish.',
-                              })}
+                              {t('login.pending_verification')}
                             </p>
                             <Button
                               size="sm"
@@ -411,7 +409,7 @@ export function LoginPage() {
                               className="mt-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
                               startContent={<ShieldAlert className="w-3 h-3" />}
                             >
-                              {t('login.continue_verification', { defaultValue: 'Continue verification' })}
+                              {t('login.continue_verification')}
                             </Button>
                           </div>
                         </div>
@@ -421,9 +419,7 @@ export function LoginPage() {
                           <ShieldX className="w-4 h-4 text-[var(--color-error)] mt-0.5 flex-shrink-0" />
                           <div>
                             <p className="text-red-600 dark:text-red-400 text-xs">
-                              {t('login.verification_failed', {
-                                defaultValue: 'Your identity verification was unsuccessful. You may retry the process or contact support for assistance.',
-                              })}
+                              {t('login.verification_failed')}
                             </p>
                             <Button
                               size="sm"
@@ -433,7 +429,7 @@ export function LoginPage() {
                               className="mt-2 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20"
                               startContent={<ShieldX className="w-3 h-3" />}
                             >
-                              {t('login.retry_verification', { defaultValue: 'Retry verification' })}
+                              {t('login.retry_verification')}
                             </Button>
                           </div>
                         </div>
@@ -452,13 +448,13 @@ export function LoginPage() {
                   <form onSubmit={handleLogin} className="space-y-5">
                     {/* Tenant resolved from URL/domain — show as read-only info */}
                     {showResolvedTenant && (
-                      <div className="p-3 rounded-xl bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10">
+                      <div className="p-3 rounded-xl bg-theme-elevated border border-theme-default">
                         <div className="flex items-center gap-3">
-                          <Building2 className="w-5 h-5 text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
+                          <Building2 className="w-5 h-5 text-primary flex-shrink-0" />
                           <div>
-                            <p className="text-gray-900 dark:text-white font-medium">{tenant.name}</p>
+                            <p className="text-theme-primary font-medium">{tenant.name}</p>
                             {tenant.tagline && (
-                              <p className="text-gray-500 dark:text-gray-400 text-xs">{tenant.tagline}</p>
+                              <p className="text-theme-muted text-xs">{tenant.tagline}</p>
                             )}
                           </div>
                         </div>
@@ -502,13 +498,13 @@ export function LoginPage() {
 
                     {/* Single tenant card */}
                     {showTenantCard && (
-                      <div className="p-3 rounded-xl bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10">
+                      <div className="p-3 rounded-xl bg-theme-elevated border border-theme-default">
                         <div className="flex items-center gap-3">
-                          <Building2 className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
+                          <Building2 className="w-5 h-5 text-primary" />
                           <div>
-                            <p className="text-gray-900 dark:text-white font-medium">{tenants[0]?.name}</p>
+                            <p className="text-theme-primary font-medium">{tenants[0]?.name}</p>
                             {tenants[0]?.tagline && (
-                              <p className="text-gray-500 dark:text-gray-400 text-xs">{tenants[0]?.tagline}</p>
+                              <p className="text-theme-muted text-xs">{tenants[0]?.tagline}</p>
                             )}
                           </div>
                         </div>
@@ -534,7 +530,7 @@ export function LoginPage() {
                     <Input
                       type={showPassword ? 'text' : 'password'}
                       label={t('login.password_label')}
-                      placeholder="••••••••"
+                      placeholder={t('login.password_placeholder')}
                       value={password}
                       onChange={(e) => { setPassword(e.target.value); setLoginErrorCode(undefined); setLoginRetryAfter(null); }}
                       startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
@@ -545,7 +541,7 @@ export function LoginPage() {
                           variant="light"
                           className="min-w-0 w-auto h-auto p-0 text-theme-subtle"
                           onPress={() => setShowPassword(!showPassword)}
-                          aria-label={showPassword ? t('login.hide_password', { defaultValue: 'Hide password' }) : t('login.show_password', { defaultValue: 'Show password' })}
+                          aria-label={showPassword ? t('login.hide_password') : t('login.show_password')}
                         >
                           {showPassword ? (
                             <EyeOff className="w-4 h-4" aria-hidden="true" />
@@ -576,7 +572,8 @@ export function LoginPage() {
                       type="submit"
                       isLoading={isLoading}
                       isDisabled={!canSubmit}
-                      className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
+                      color="primary"
+                      className="w-full font-medium"
                       size="lg"
                       spinner={<Loader2 className="w-4 h-4 animate-spin" />}
                     >
@@ -590,7 +587,7 @@ export function LoginPage() {
                       <div className="relative flex items-center my-5">
                         <div className="flex-grow border-t border-[var(--border-default)]" />
                         <span className="flex-shrink mx-3 text-xs text-theme-subtle">
-                          {t('login.or', { defaultValue: 'or' })}
+                          {t('login.or')}
                         </span>
                         <div className="flex-grow border-t border-[var(--border-default)]" />
                       </div>
@@ -610,12 +607,10 @@ export function LoginPage() {
                         }
                         spinner={<Loader2 className="w-4 h-4 animate-spin" />}
                       >
-                        {t('login.passkey_login', { defaultValue: 'Sign in with a passkey' })}
+                        {t('login.passkey_login')}
                       </Button>
                       <p className="text-xs text-theme-muted text-center mt-1.5">
-                        {t('login.passkey_hint', {
-                          defaultValue: 'Use a passkey from this device or another device. No passkey yet? Log in with your password, then set one up in Settings.',
-                        })}
+                        {t('login.passkey_hint')}
                       </p>
                     </>
                   )}
@@ -682,7 +677,7 @@ export function LoginPage() {
                       startContent={<Shield className="w-4 h-4 text-theme-subtle" />}
                       isRequired
                       autoComplete="one-time-code"
-                      aria-label={useBackupCode ? t('login.twofa_backup_code_label') : t('login.two_factor_code_label', { defaultValue: 'Two-factor authentication code' })}
+                      aria-label={useBackupCode ? t('login.twofa_backup_code_label') : t('login.two_factor_code_label')}
                       classNames={{
                         inputWrapper: 'glass-card backdrop-blur-lg',
                         label: 'text-theme-muted',
@@ -734,7 +729,8 @@ export function LoginPage() {
                         type="submit"
                         isLoading={isLoading}
                         isDisabled={!twoFactorCode.trim()}
-                        className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
+                        color="primary"
+                        className="flex-1 font-medium"
                         spinner={<Loader2 className="w-4 h-4 animate-spin" />}
                       >
                         {t('login.twofa_verify')}
