@@ -60,7 +60,7 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
               onPress={() => onRun?.(search)}
               className="flex items-center gap-2 text-left hover:text-primary transition-colors h-auto p-0 min-w-0 justify-start"
             >
-              <Search className="w-4 h-4 text-primary shrink-0" />
+              <Search aria-hidden="true" className="w-4 h-4 text-primary shrink-0" />
               <span className="font-semibold text-foreground truncate">{search.name}</span>
             </Button>
 
@@ -68,19 +68,19 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
             {filterSummary.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {search.search_query && (
-                  <Chip size="sm" variant="flat" startContent={<Search className="w-3 h-3" />}>
+                  <Chip size="sm" variant="flat" startContent={<Search aria-hidden="true" className="w-3 h-3" />}>
                     {search.search_query}
                   </Chip>
                 )}
                 {search.filters?.location && (
-                  <Chip size="sm" variant="flat" startContent={<MapPin className="w-3 h-3" />}>
+                  <Chip size="sm" variant="flat" startContent={<MapPin aria-hidden="true" className="w-3 h-3" />}>
                     {search.filters.location}
                     {search.filters.radius ? ` (${search.filters.radius}km)` : ''}
                   </Chip>
                 )}
                 {search.filters?.category_id && (
-                  <Chip size="sm" variant="flat" startContent={<Tag className="w-3 h-3" />}>
-                    {t('collections.category', 'Category')}: {search.filters.category_id}
+                  <Chip size="sm" variant="flat" startContent={<Tag aria-hidden="true" className="w-3 h-3" />}>
+                    {t('collections.category')}: {search.filters.category_id}
                   </Chip>
                 )}
               </div>
@@ -88,20 +88,20 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
 
             {/* Alert frequency */}
             <div className="flex items-center gap-2 mt-2">
-              <Bell className="w-3.5 h-3.5 text-default-400" />
+              <Bell aria-hidden="true" className="w-3.5 h-3.5 text-default-400" />
               <Chip
                 size="sm"
                 variant="flat"
                 color={FREQUENCY_COLORS[search.alert_frequency] ?? 'default'}
               >
-                {t(`saved_searches.frequency_${search.alert_frequency}`, search.alert_frequency)}
+                {t(`saved_searches.frequency_${search.alert_frequency}`)}
               </Chip>
               <span className="text-xs text-default-400">
                 {search.alert_channel === 'both'
-                  ? t('saved_searches.channel_both', 'Email & Push')
+                  ? t('saved_searches.channel_both')
                   : search.alert_channel === 'push'
-                    ? t('saved_searches.channel_push', 'Push')
-                    : t('saved_searches.channel_email', 'Email')}
+                    ? t('saved_searches.channel_push')
+                    : t('saved_searches.channel_email')}
               </span>
             </div>
           </div>
@@ -112,7 +112,7 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
               size="sm"
               isSelected={search.is_active}
               onValueChange={(val) => onToggle?.(search.id, val)}
-              aria-label={t('saved_searches.toggle_active', 'Toggle active')}
+              aria-label={t('saved_searches.toggle_active')}
             />
             <Button
               isIconOnly
@@ -120,9 +120,9 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
               variant="light"
               color="danger"
               onPress={() => onDelete?.(search.id)}
-              aria-label={t('saved_searches.delete', 'Delete saved search')}
+              aria-label={t('saved_searches.delete')}
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 aria-hidden="true" className="w-4 h-4" />
             </Button>
           </div>
         </div>
