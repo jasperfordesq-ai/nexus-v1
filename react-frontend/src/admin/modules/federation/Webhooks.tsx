@@ -141,7 +141,7 @@ export function Webhooks() {
 
   const ALL_EVENTS = ALL_EVENT_KEYS.map((key) => ({
     key,
-    label: t(`federation.webhook_${key.replace('.', '_')}`, key),
+    label: t(`federation.webhook_${key.replace('.', '_')}`),
   }));
 
   const formModal = useDisclosure();
@@ -265,7 +265,7 @@ export function Webhooks() {
         }
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error || 'Failed to save webhook';
+        const errorMsg = (res as { error?: string }).error || t('federation.webhooks_save_failed');
         toast.error(errorMsg);
       }
     } catch (err) {
@@ -303,7 +303,7 @@ export function Webhooks() {
     timestamp: new Date().toISOString(),
     data: {
       webhook_id: testPreview?.id ?? 0,
-      message: 'This is a test delivery from Project NEXUS Federation',
+      message: t('federation.webhooks_sample_message'),
     },
   };
 
@@ -324,7 +324,7 @@ export function Webhooks() {
         );
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error || 'Test delivery failed';
+        const errorMsg = (res as { error?: string }).error || t('federation.webhooks_test_failed');
         toast.error(errorMsg);
       }
     } catch (err) {
@@ -455,7 +455,9 @@ export function Webhooks() {
               <TableCell>
                 <div className="flex flex-wrap gap-1 max-w-[200px]">
                   {(webhook.events || []).slice(0, 3).map((evt) => (
-                    <Chip key={evt} size="sm" variant="flat" className="text-xs">{evt.split('.')[1]}</Chip>
+                    <Chip key={evt} size="sm" variant="flat" className="text-xs">
+                      {t(`federation.webhook_${evt.replace('.', '_')}`)}
+                    </Chip>
                   ))}
                   {(webhook.events || []).length > 3 && (
                     <Chip size="sm" variant="flat" className="text-xs">+{webhook.events.length - 3}</Chip>
@@ -469,7 +471,7 @@ export function Webhooks() {
                   color={STATUS_COLORS[webhook.status] ?? 'default'}
                   className="capitalize"
                 >
-                  {webhook.status}
+                  {t(`federation.status_${webhook.status}`)}
                 </Chip>
               </TableCell>
               <TableCell>

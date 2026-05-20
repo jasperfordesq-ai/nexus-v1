@@ -137,10 +137,10 @@ const AUTH_METHODS = [
 ];
 
 const PROTOCOL_TYPES = [
-  { key: 'nexus', label: 'Project NEXUS' },
-  { key: 'timeoverflow', label: 'TimeOverflow' },
-  { key: 'komunitin', label: 'Komunitin (JSON:API)' },
-  { key: 'credit_commons', label: 'Credit Commons' },
+  { key: 'nexus', i18nKey: 'federation.protocol_nexus' },
+  { key: 'timeoverflow', i18nKey: 'federation.protocol_timeoverflow' },
+  { key: 'komunitin', i18nKey: 'federation.protocol_komunitin' },
+  { key: 'credit_commons', i18nKey: 'federation.protocol_credit_commons' },
 ];
 
 const PARTNER_STATUSES = [
@@ -176,7 +176,7 @@ const EMPTY_FORM: PartnerFormData = {
 
 export function ExternalPartners() {
   const { t } = useTranslation('admin');
-  usePageTitle("Federation");
+  usePageTitle(t('federation.page_title'));
   const toast = useToast();
 
   const formModal = useDisclosure();
@@ -305,7 +305,7 @@ export function ExternalPartners() {
         formModal.onClose();
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error || "Failed to save partner";
+        const errorMsg = (res as { error?: string }).error || t('federation.failed_to_save_partner');
         toast.error(errorMsg);
       }
     } catch (err) {
@@ -322,7 +322,7 @@ export function ExternalPartners() {
     try {
       const res = await api.delete(`/v2/admin/federation/external-partners/${deleteTarget.id}`);
       if (res.success) {
-        toast.success(`Partner Deleted`);
+        toast.success(t('federation.partner_deleted'));
         setDeleteTarget(null);
         loadData();
       } else {
@@ -353,8 +353,8 @@ export function ExternalPartners() {
           toast.error(
             t('federation.health_check_partner_error', {
               name: partner.name,
-              error: data?.error ?? 'Partner unreachable',
-            }) || `${partner.name}: ${data?.error ?? 'Partner unreachable'}`
+              error: data?.error ?? t('federation.partner_unreachable'),
+            })
           );
         }
         loadData();
@@ -417,7 +417,7 @@ export function ExternalPartners() {
         actions={
           <div className="flex items-center gap-2">
             <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
-              {"Refresh"}
+              {t('federation.refresh')}
             </Button>
             <Button color="primary" size="sm" startContent={<Plus size={16} />} onPress={openCreate}>
               {t('federation.add_partner', 'Add Partner')}
@@ -459,7 +459,7 @@ export function ExternalPartners() {
               </TableCell>
               <TableCell>
                 <Chip size="sm" variant="flat" color="secondary">
-                  {PROTOCOL_TYPES.find((p) => p.key === partner.protocol_type)?.label ?? partner.protocol_type ?? 'NEXUS'}
+                  {t(PROTOCOL_TYPES.find((p) => p.key === partner.protocol_type)?.i18nKey ?? 'federation.protocol_nexus')}
                 </Chip>
               </TableCell>
               <TableCell>
@@ -574,7 +574,7 @@ export function ExternalPartners() {
                   }}
                 >
                   {PROTOCOL_TYPES.map((p) => (
-                    <SelectItem key={p.key}>{p.label}</SelectItem>
+                    <SelectItem key={p.key}>{t(p.i18nKey)}</SelectItem>
                   ))}
                 </Select>
 
