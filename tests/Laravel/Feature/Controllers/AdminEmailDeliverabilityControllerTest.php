@@ -453,6 +453,128 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         );
     }
 
+    public function test_queues_endpoint_distinguishes_newsletter_queue_statuses(): void
+    {
+        if (!Schema::hasTable('newsletter_queue') || !Schema::hasTable('newsletters')) {
+            $this->markTestSkipped('Newsletter queue tables are not available.');
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'newsletter-statuses@example.test',
+        ]);
+        Sanctum::actingAs($admin);
+
+        $newsletterId = DB::table('newsletters')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'created_by' => $admin->id,
+            'subject' => 'Newsletter Queue Status Visibility',
+            'content' => '<p>Status visibility</p>',
+            'status' => 'sending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        foreach (['pending', 'failed', 'suppressed', 'sent'] as $status) {
+            DB::table('newsletter_queue')->insert([
+                'tenant_id' => $this->testTenantId,
+                'newsletter_id' => $newsletterId,
+                'user_id' => $member->id,
+                'email' => "newsletter-{$status}@example.test",
+                'status' => $status,
+                'attempts' => $status === 'failed' ? 5 : 0,
+                'error_message' => in_array($status, ['failed', 'suppressed'], true) ? "simulated {$status}" : null,
+                'last_attempted_at' => in_array($status, ['failed', 'suppressed', 'sent'], true) ? now()->subMinutes(2) : null,
+                'sent_at' => $status === 'sent' ? now()->subMinutes(2) : null,
+                'created_at' => $status === 'pending' ? now()->subMinutes(20) : now()->subMinutes(5),
+            ]);
+        }
+
+        foreach (['pending', 'failed', 'suppressed', 'sent'] as $status) {
+            $response = $this->apiGet("/v2/admin/email-deliverability/queues?source=newsletter_queue&status={$status}&limit=10");
+
+            $response->assertOk();
+            $rows = collect($response->json('data.rows'));
+            $this->assertContains($status, $rows->pluck('status')->all());
+            $this->assertContains("newsletter-{$status}@example.test", $rows->pluck('email')->all());
+            $this->assertGreaterThanOrEqual(1, $response->json("data.diagnostics.newsletter_queue.status_counts.{$status}"));
+        }
+    }
+
+    public function test_queues_endpoint_distinguishes_civic_digest_claim_statuses(): void
+    {
+        if (
+            !Schema::hasTable('civic_digest_delivery_claims')
+            || !Schema::hasTable('email_log')
+            || !Schema::hasColumn('civic_digest_delivery_claims', 'claimed_at')
+            || !Schema::hasColumn('civic_digest_delivery_claims', 'sent_at')
+        ) {
+            $this->markTestSkipped('Civic digest delivery claim tables are not available.');
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'civic-digest-statuses@example.test',
+        ]);
+        $failedMember = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'civic-digest-failed-status@example.test',
+        ]);
+        Sanctum::actingAs($admin);
+
+        foreach (['claimed', 'suppressed', 'sent'] as $status) {
+            DB::table('civic_digest_delivery_claims')->insert([
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $member->id,
+                'cadence' => 'daily',
+                'window_key' => 'queue-' . $status . '-' . uniqid(),
+                'status' => $status,
+                'claimed_at' => $status === 'claimed' ? now()->subMinutes(20) : now()->subMinutes(10),
+                'sent_at' => in_array($status, ['suppressed', 'sent'], true) ? now()->subMinutes(5) : null,
+                'delivery_evidence' => json_encode(['channel' => 'email', 'status' => $status]),
+                'created_at' => now()->subMinutes(20),
+                'updated_at' => now()->subMinutes(5),
+            ]);
+        }
+
+        DB::table('email_log')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'recipient_email' => 'civic-digest-statuses@example.test',
+            'category' => 'civic_digest',
+            'subject' => 'Civic digest sent evidence',
+            'provider' => 'smtp',
+            'status' => 'sent',
+            'sent_at' => now()->subMinutes(5),
+            'created_at' => now()->subMinutes(5),
+            'updated_at' => now()->subMinutes(5),
+        ]);
+
+        $sentClaimId = DB::table('civic_digest_delivery_claims')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $failedMember->id,
+            'cadence' => 'daily',
+            'window_key' => 'queue-failed-' . uniqid(),
+            'status' => 'sent',
+            'claimed_at' => now()->subMinutes(10),
+            'sent_at' => now()->subMinutes(5),
+            'delivery_evidence' => json_encode(['channel' => 'email', 'accepted' => true]),
+            'created_at' => now()->subMinutes(10),
+            'updated_at' => now()->subMinutes(5),
+        ]);
+
+        foreach (['pending', 'failed', 'suppressed', 'sent'] as $status) {
+            $response = $this->apiGet("/v2/admin/email-deliverability/queues?source=civic_digest_delivery_claims&status={$status}&limit=10");
+
+            $response->assertOk();
+            $rows = collect($response->json('data.rows'));
+            $this->assertContains($status, $rows->pluck('status')->all(), "Expected civic digest {$status} row.");
+            $this->assertGreaterThanOrEqual(1, $response->json("data.diagnostics.civic_digest_delivery_claims.status_counts.{$status}"));
+        }
+
+        $failedResponse = $this->apiGet('/v2/admin/email-deliverability/queues?source=civic_digest_delivery_claims&status=failed&limit=10');
+        $this->assertContains($sentClaimId, collect($failedResponse->json('data.rows'))->pluck('id')->all());
+    }
+
     public function test_queues_endpoint_surfaces_notification_delivery_ledger_gaps(): void
     {
         if (

@@ -11,7 +11,9 @@ use App\Services\EmailDispatchService;
 use App\Services\EmailTriggerAuditService;
 use App\Core\TenantContext;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Tests\Laravel\TestCase;
 
 /**
@@ -59,6 +61,18 @@ class EmailMailerRoutingTest extends TestCase
             'EmailDispatchService must use the tenant-aware Mailer'
         );
 
+        $this->assertStringContainsString(
+            "'dispatch_id'",
+            $source,
+            'EmailDispatchService must attach a durable dispatch id to every Mailer send.'
+        );
+
+        $this->assertStringContainsString(
+            "'idempotency_key'",
+            $source,
+            'EmailDispatchService must preserve caller idempotency metadata for email_log and provider evidence.'
+        );
+
         $this->assertStringNotContainsString(
             'Mail::raw(',
             $source,
@@ -70,6 +84,57 @@ class EmailMailerRoutingTest extends TestCase
             $source,
             'EmailDispatchService must NOT use Mail::send() - that bypasses SendGrid'
         );
+    }
+
+    public function test_mailer_records_dispatch_metadata_in_email_log(): void
+    {
+        if (
+            !Schema::hasTable('email_log')
+            || !Schema::hasColumn('email_log', 'source')
+            || !Schema::hasColumn('email_log', 'idempotency_key')
+            || !Schema::hasColumn('email_log', 'dispatch_id')
+        ) {
+            $this->markTestSkipped('email_log dispatch metadata columns are not available.');
+        }
+
+        $method = new \ReflectionMethod(\App\Core\Mailer::class, 'logEmail');
+        $method->setAccessible(true);
+        $method->invoke(
+            null,
+            'metadata-evidence@example.test',
+            'Metadata Evidence',
+            'sent',
+            'provider-msg-123',
+            null,
+            $this->testTenantId,
+            'audit_test',
+            'sendgrid',
+            [
+                'source' => 'Tests\\Laravel\\Integration\\EmailMailerRoutingTest',
+                'idempotency_key' => 'audit-test-key-123',
+                'dispatch_id' => 'dispatch-test-123',
+            ]
+        );
+
+        $row = DB::table('email_log')
+            ->where('recipient_email', 'metadata-evidence@example.test')
+            ->where('provider_message_id', 'provider-msg-123')
+            ->first();
+
+        $this->assertNotNull($row);
+        $this->assertSame('Tests\\Laravel\\Integration\\EmailMailerRoutingTest', $row->source);
+        $this->assertSame('audit-test-key-123', $row->idempotency_key);
+        $this->assertSame('dispatch-test-123', $row->dispatch_id);
+    }
+
+    public function test_sendgrid_payload_includes_dispatch_custom_args(): void
+    {
+        $source = file_get_contents(app_path('Core/Mailer.php'));
+
+        $this->assertStringContainsString("\$email->addCustomArg('tenant_id'", $source);
+        $this->assertStringContainsString("\$email->addCustomArg('category'", $source);
+        $this->assertStringContainsString('normalizeEmailMetadata($metadata)', $source);
+        $this->assertStringContainsString("\$email->addCustomArg(\$key, \$value)", $source);
     }
 
     public function test_email_dispatch_service_refuses_missing_tenant_without_explicit_allowance(): void

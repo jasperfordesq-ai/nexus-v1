@@ -36,6 +36,10 @@ class PushReviewToFederatedPartner implements ShouldQueue
     /** Route to the standard federation queue (bulk, non-time-critical). */
     public string $queue = 'federation';
 
+    public int $tries = 3;
+
+    public array $backoff = [60, 300, 900];
+
     public function __construct(
         private readonly FederationFeatureService $federationFeatureService,
     ) {}
@@ -89,8 +93,16 @@ class PushReviewToFederatedPartner implements ShouldQueue
                 return; // Pure-local review, nothing to push.
             }
 
+            $retryableFailures = [];
             foreach ($identities as $identity) {
-                $this->pushToPartner($review, $identity);
+                $failure = $this->pushToPartner($review, $identity);
+                if ($failure !== null) {
+                    $retryableFailures[] = $failure;
+                }
+            }
+
+            if (!empty($retryableFailures)) {
+                throw new \RuntimeException('Retryable federation review push failure: ' . implode('; ', $retryableFailures));
             }
         } catch (\Throwable $e) {
             Log::error('PushReviewToFederatedPartner failed', [
@@ -98,6 +110,8 @@ class PushReviewToFederatedPartner implements ShouldQueue
                 'tenant_id' => $event->tenantId ?? null,
                 'error'     => $e->getMessage(),
             ]);
+
+            throw $e;
         } finally {
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
@@ -109,7 +123,7 @@ class PushReviewToFederatedPartner implements ShouldQueue
      * protocol adapter, runs transformOutboundReview(), and POSTs to the
      * protocol-specific endpoint from mapEndpoint('reviews').
      */
-    private function pushToPartner(Review $review, FederatedIdentity $identity): void
+    private function pushToPartner(Review $review, FederatedIdentity $identity): ?string
     {
         $partnerId = (int) $identity->partner_id;
 
@@ -126,13 +140,39 @@ class PushReviewToFederatedPartner implements ShouldQueue
         ];
 
         try {
-            FederationExternalApiClient::sendReview($partnerId, $payload);
+            $result = FederationExternalApiClient::sendReview($partnerId, $payload);
+            if (empty($result['success'])) {
+                Log::warning('Federated review push to partner rejected', [
+                    'partner_id' => $partnerId,
+                    'review_id'  => $review->id,
+                    'error'      => $result['error'] ?? null,
+                    'status_code' => $result['status_code'] ?? null,
+                ]);
+
+                if ($this->isRetryablePartnerFailure($result)) {
+                    return $partnerId . ':' . ($result['error'] ?? 'unknown error');
+                }
+            }
         } catch (\Throwable $e) {
             Log::warning('Federated review push to partner failed', [
                 'partner_id' => $partnerId,
                 'review_id'  => $review->id,
                 'error'      => $e->getMessage(),
             ]);
+
+            return $partnerId . ':' . $e->getMessage();
         }
+
+        return null;
+    }
+
+    /**
+     * @param array<string,mixed> $result
+     */
+    private function isRetryablePartnerFailure(array $result): bool
+    {
+        $statusCode = (int) ($result['status_code'] ?? $result['code'] ?? 0);
+
+        return $statusCode === 0 || $statusCode >= 500;
     }
 }

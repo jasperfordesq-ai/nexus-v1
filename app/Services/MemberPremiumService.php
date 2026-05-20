@@ -646,7 +646,7 @@ class MemberPremiumService
         );
 
         $eventRecordId = self::recordEvent((int) $row->id, (int) $row->tenant_id, 'subscription.deleted', $eventId, $sub);
-        if ($eventRecordId > 0 && !self::notifyMemberBillingEvent((int) $row->id, 'cancelled', $eventRecordId)) {
+        if ($eventRecordId > 0 && !self::notifyMemberBillingEvent((int) $row->id, (int) $row->tenant_id, 'cancelled', $eventRecordId)) {
             throw new \RuntimeException('Member premium cancellation email failed');
         }
     }
@@ -674,7 +674,7 @@ class MemberPremiumService
         );
 
         $eventRecordId = self::recordEvent((int) $row->id, (int) $row->tenant_id, 'invoice.paid', $eventId, $invoice);
-        if ($eventRecordId > 0 && !self::notifyMemberBillingEvent((int) $row->id, 'paid', $eventRecordId)) {
+        if ($eventRecordId > 0 && !self::notifyMemberBillingEvent((int) $row->id, (int) $row->tenant_id, 'paid', $eventRecordId)) {
             throw new \RuntimeException('Member premium paid email failed');
         }
     }
@@ -704,7 +704,7 @@ class MemberPremiumService
         );
 
         $eventRecordId = self::recordEvent((int) $row->id, (int) $row->tenant_id, 'invoice.payment_failed', $eventId, $invoice);
-        if ($eventRecordId > 0 && !self::notifyMemberBillingEvent((int) $row->id, 'payment_failed', $eventRecordId)) {
+        if ($eventRecordId > 0 && !self::notifyMemberBillingEvent((int) $row->id, (int) $row->tenant_id, 'payment_failed', $eventRecordId)) {
             throw new \RuntimeException('Member premium payment failed email failed');
         }
     }
@@ -841,7 +841,7 @@ class MemberPremiumService
         }
     }
 
-    private static function notifyMemberBillingEvent(int $subscriptionId, string $event, int $eventRecordId): bool
+    private static function notifyMemberBillingEvent(int $subscriptionId, int $tenantId, string $event, int $eventRecordId): bool
     {
         $row = DB::selectOne(
             "SELECT ms.id, ms.user_id, ms.tenant_id, ms.grace_period_ends_at,
@@ -850,17 +850,18 @@ class MemberPremiumService
              FROM member_subscriptions ms
              JOIN member_premium_tiers mpt ON mpt.id = ms.tier_id
              JOIN users u ON u.id = ms.user_id AND u.tenant_id = ms.tenant_id
-             WHERE ms.id = ?
+             WHERE ms.id = ? AND ms.tenant_id = ?
              LIMIT 1",
-            [$subscriptionId]
+            [$subscriptionId, $tenantId]
         );
 
         if (!$row || empty($row->email)) {
             Log::warning('MemberPremiumService::notifyMemberBillingEvent skipped missing recipient', [
                 'subscription_id' => $subscriptionId,
+                'tenant_id' => $tenantId,
                 'event' => $event,
             ]);
-            self::markSubscriptionEventNotification($eventRecordId, false, 'Missing recipient email');
+            self::markSubscriptionEventNotification($eventRecordId, $tenantId, false, 'Missing recipient email');
             return false;
         }
 
@@ -892,11 +893,10 @@ class MemberPremiumService
         ];
 
         if (!isset($keys[$event])) {
-            self::markSubscriptionEventNotification($eventRecordId, true, null);
+            self::markSubscriptionEventNotification($eventRecordId, $tenantId, true, null);
             return true;
         }
 
-        $tenantId = (int) $row->tenant_id;
         try {
             return (bool) TenantContext::runForTenant($tenantId, function () use ($row, $keys, $event, $tenantId, $eventRecordId): bool {
                 $tierName = (string) ($row->tier_name ?? __('emails.common.fallback_tenant_name'));
@@ -944,7 +944,7 @@ class MemberPremiumService
                     return $sent;
                 });
 
-                self::markSubscriptionEventNotification($eventRecordId, $sent, $sent ? null : 'Email dispatch returned false');
+                self::markSubscriptionEventNotification($eventRecordId, $tenantId, $sent, $sent ? null : 'Email dispatch returned false');
 
                 if ($sent) {
                     try {
@@ -970,7 +970,7 @@ class MemberPremiumService
                 return $sent;
             });
         } catch (\Throwable $e) {
-            self::markSubscriptionEventNotification($eventRecordId, false, $e->getMessage());
+            self::markSubscriptionEventNotification($eventRecordId, $tenantId, false, $e->getMessage());
             Log::warning('MemberPremiumService billing notification failed', [
                 'subscription_id' => $subscriptionId,
                 'tenant_id' => $tenantId,
@@ -982,10 +982,11 @@ class MemberPremiumService
         }
     }
 
-    private static function markSubscriptionEventNotification(int $eventRecordId, bool $sent, ?string $error): void
+    private static function markSubscriptionEventNotification(int $eventRecordId, int $tenantId, bool $sent, ?string $error): void
     {
         DB::table('member_subscription_events')
             ->where('id', $eventRecordId)
+            ->where('tenant_id', $tenantId)
             ->update([
                 'notification_sent_at' => $sent ? now() : null,
                 'notification_failed_at' => $sent ? null : now(),

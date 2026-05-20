@@ -172,6 +172,55 @@ class MemberPremiumBillingEmailTest extends TestCase
             ->count());
     }
 
+    public function test_failed_member_premium_event_replay_marks_sent_only_after_email_acceptance(): void
+    {
+        $tenantId = 999;
+        [$user, , $stripeSubId] = $this->createMemberSubscription($tenantId);
+        $mailer = $this->fakeMailer(false);
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $event = (object) [
+            'id' => 'evt_member_retry_after_failure_' . uniqid(),
+            'type' => 'invoice.payment_failed',
+            'data' => (object) [
+                'object' => (object) [
+                    'subscription' => $stripeSubId,
+                ],
+            ],
+        ];
+
+        try {
+            MemberPremiumService::applyWebhookEvent($event);
+            $this->fail('Expected first member premium email attempt to fail webhook processing.');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Member premium payment failed email failed', $e->getMessage());
+        }
+
+        $failedEventRow = DB::table('member_subscription_events')->where('stripe_event_id', $event->id)->first();
+        $this->assertNotNull($failedEventRow);
+        $this->assertNull($failedEventRow->notification_sent_at);
+        $this->assertNotNull($failedEventRow->notification_failed_at);
+        $this->assertSame(0, DB::table('notifications')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $user->id)
+            ->where('type', 'member_premium_billing')
+            ->count());
+
+        $mailer->sendResult = true;
+        MemberPremiumService::applyWebhookEvent($event);
+
+        $retriedEventRow = DB::table('member_subscription_events')->where('stripe_event_id', $event->id)->first();
+        $this->assertNotNull($retriedEventRow->notification_sent_at);
+        $this->assertNull($retriedEventRow->notification_failed_at);
+        $this->assertNull($retriedEventRow->notification_last_error);
+        $this->assertCount(2, $mailer->calls);
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $user->id)
+            ->where('type', 'member_premium_billing')
+            ->count());
+    }
+
     public function test_missing_member_premium_recipient_is_failed_not_sent(): void
     {
         $tenantId = 999;
@@ -249,9 +298,11 @@ class MemberPremiumBillingEmailTest extends TestCase
     {
         return new class($sendResult) extends EmailDispatchService {
             public array $calls = [];
+            public bool $sendResult;
 
-            public function __construct(private bool $sendResult)
+            public function __construct(bool $sendResult)
             {
+                $this->sendResult = $sendResult;
             }
 
             public function send(string $to, string $subject, string $body, array $options = []): bool

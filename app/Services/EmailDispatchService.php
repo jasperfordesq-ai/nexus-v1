@@ -10,6 +10,7 @@ namespace App\Services;
 
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -64,7 +65,11 @@ class EmailDispatchService
      *   tenant_id?:int|null,
      *   tenantId?:int|null,
      *   allow_missing_tenant?:bool,
-     *   source?:string|null
+     *   source?:string|null,
+     *   idempotency_key?:string|null,
+     *   idempotencyKey?:string|null,
+     *   dispatch_id?:string|null,
+     *   dispatchId?:string|null
      * } $options
      */
     public function send(string $to, string $subject, string $body, array $options = []): bool
@@ -73,6 +78,16 @@ class EmailDispatchService
         $tenantId = $this->resolveTenantId($options, $to);
         $source = (string) ($options['source'] ?? 'EmailDispatchService');
         $allowMissingTenant = (bool) ($options['allow_missing_tenant'] ?? false);
+        $dispatchId = trim((string) ($options['dispatch_id'] ?? $options['dispatchId'] ?? ''));
+        if ($dispatchId === '') {
+            $dispatchId = (string) Str::uuid();
+        }
+        $idempotencyKey = trim((string) ($options['idempotency_key'] ?? $options['idempotencyKey'] ?? ''));
+        $metadata = [
+            'source' => $source,
+            'idempotency_key' => $idempotencyKey !== '' ? $idempotencyKey : null,
+            'dispatch_id' => $dispatchId,
+        ];
 
         if ($category === '') {
             Log::warning('EmailDispatchService::send called without category', [
@@ -100,7 +115,7 @@ class EmailDispatchService
         }
 
         try {
-            return (bool) $this->runWithResolvedTenant($tenantId, function () use ($to, $subject, $body, $options, $category, $tenantId, $source): bool {
+            return (bool) $this->runWithResolvedTenant($tenantId, function () use ($to, $subject, $body, $options, $category, $tenantId, $source, $metadata): bool {
                 $sent = Mailer::forCurrentTenant()->send(
                     $to,
                     $subject,
@@ -109,6 +124,7 @@ class EmailDispatchService
                     $options['replyTo'] ?? null,
                     $options['unsubscribeUrl'] ?? null,
                     $category !== '' ? $category : null,
+                    $metadata,
                 );
 
                 if (!$sent) {

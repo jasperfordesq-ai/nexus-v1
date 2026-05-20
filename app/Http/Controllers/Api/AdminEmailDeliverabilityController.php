@@ -243,6 +243,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->whereIn('nq.status', $statuses)
                 ->where(function ($q) {
                     $q->whereIn('nq.status', ['failed', 'suppressed'])
+                        ->orWhere('nq.status', 'sent')
                         ->orWhere(function ($stale) {
                             $stale->where('nq.status', 'processing')
                                 ->whereRaw('COALESCE(nq.processing_started_at, nq.last_attempted_at, nq.created_at) < ?', [now()->subMinutes(15)]);
@@ -341,8 +342,72 @@ class AdminEmailDeliverabilityController extends BaseApiController
                     ]);
             }
 
+            $suppressedRows = collect();
+            if (in_array('suppressed', $statuses, true)) {
+                $suppressedRows = DB::table('civic_digest_delivery_claims as cddc')
+                    ->leftJoin('users as u', function ($join): void {
+                        $join->on('u.id', '=', 'cddc.user_id')
+                            ->whereColumn('u.tenant_id', '=', 'cddc.tenant_id');
+                    })
+                    ->when($tenantId !== null, fn ($q) => $q->where('cddc.tenant_id', $tenantId))
+                    ->where('cddc.status', 'suppressed')
+                    ->orderByDesc('cddc.id')
+                    ->limit($limit)
+                    ->get([
+                        'cddc.id',
+                        'cddc.tenant_id',
+                        'cddc.user_id',
+                        'u.email',
+                        DB::raw("'civic_digest' as category"),
+                        'cddc.window_key as subject',
+                        DB::raw("'suppressed' as status"),
+                        'cddc.cadence as frequency',
+                        DB::raw('0 as attempts'),
+                        'cddc.sent_at as last_attempted_at',
+                        DB::raw("'Recipient is suppressed' as error"),
+                        DB::raw('NULL as processing_batch_id'),
+                        'cddc.claimed_at as processing_started_at',
+                        'cddc.sent_at',
+                        'cddc.created_at',
+                    ]);
+            }
+
+            $sentRows = collect();
+            if (in_array('sent', $statuses, true) && Schema::hasTable('email_log')) {
+                $sentRows = $this->civicDigestClaimWithEmailEvidenceQuery(
+                    DB::table('civic_digest_delivery_claims as cddc')
+                        ->leftJoin('users as u', function ($join): void {
+                            $join->on('u.id', '=', 'cddc.user_id')
+                                ->whereColumn('u.tenant_id', '=', 'cddc.tenant_id');
+                        })
+                        ->when($tenantId !== null, fn ($q) => $q->where('cddc.tenant_id', $tenantId))
+                        ->where('cddc.status', 'sent')
+                )
+                    ->orderByDesc('cddc.id')
+                    ->limit($limit)
+                    ->get([
+                        'cddc.id',
+                        'cddc.tenant_id',
+                        'cddc.user_id',
+                        'u.email',
+                        DB::raw("'civic_digest' as category"),
+                        'cddc.window_key as subject',
+                        DB::raw("'sent' as status"),
+                        'cddc.cadence as frequency',
+                        DB::raw('0 as attempts'),
+                        'cddc.sent_at as last_attempted_at',
+                        DB::raw('NULL as error'),
+                        DB::raw('NULL as processing_batch_id'),
+                        'cddc.claimed_at as processing_started_at',
+                        'cddc.sent_at',
+                        'cddc.created_at',
+                    ]);
+            }
+
             $civicDigestRows = $pendingRows
                 ->merge($missingEvidenceRows)
+                ->merge($suppressedRows)
+                ->merge($sentRows)
                 ->take($limit)
                 ->map(fn ($row) => $this->queueRow('civic_digest_delivery_claims', $row));
         }
@@ -1088,6 +1153,16 @@ class AdminEmailDeliverabilityController extends BaseApiController
                         ->where('cddc.sent_at', '>=', now()->subDay())
                 )
                 : (clone $base)->whereRaw('1 = 0');
+            $sentWithEvidence = Schema::hasTable('email_log')
+                ? $this->civicDigestClaimWithEmailEvidenceQuery(
+                    (clone $base)
+                        ->where('cddc.status', 'sent')
+                        ->where('cddc.sent_at', '>=', now()->subDay())
+                )
+                : (clone $base)->whereRaw('1 = 0');
+            $suppressed = (clone $base)
+                ->where('cddc.status', 'suppressed')
+                ->where('cddc.updated_at', '>=', now()->subDay());
 
             return [
                 'source' => $source,
@@ -1095,11 +1170,13 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 'status_counts' => [
                     'pending' => (clone $staleClaimed)->count(),
                     'failed' => (clone $missingEvidence)->count(),
+                    'suppressed' => (clone $suppressed)->count(),
+                    'sent' => (clone $sentWithEvidence)->count(),
                 ],
                 'stale_pending' => (clone $staleClaimed)->count(),
                 'stale_processing' => 0,
                 'failed_recent' => (clone $missingEvidence)->count(),
-                'suppressed_recent' => 0,
+                'suppressed_recent' => (clone $suppressed)->count(),
                 'oldest_pending_at' => (clone $staleClaimed)->min('cddc.claimed_at'),
                 'returned' => 0,
             ];
@@ -1671,6 +1748,19 @@ class AdminEmailDeliverabilityController extends BaseApiController
     private function civicDigestClaimMissingEmailEvidenceQuery($query)
     {
         return $query->whereNotExists(function ($sub): void {
+            $sub->select(DB::raw(1))
+                ->from('email_log')
+                ->whereColumn('email_log.user_id', 'cddc.user_id')
+                ->whereColumn('email_log.tenant_id', 'cddc.tenant_id')
+                ->where('email_log.category', 'civic_digest')
+                ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                ->whereRaw('email_log.created_at BETWEEN DATE_SUB(cddc.sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(cddc.sent_at, INTERVAL 10 MINUTE)');
+        });
+    }
+
+    private function civicDigestClaimWithEmailEvidenceQuery($query)
+    {
+        return $query->whereExists(function ($sub): void {
             $sub->select(DB::raw(1))
                 ->from('email_log')
                 ->whereColumn('email_log.user_id', 'cddc.user_id')

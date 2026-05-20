@@ -92,47 +92,77 @@ class TenantProvisioningMailer
     /**
      * Send the rejection email.
      */
-    public static function sendRejection(array $request, string $reason): void
+    public static function sendRejection(array $request, string $reason): bool
     {
         $applicantEmail = $request['applicant_email'] ?? null;
         if (empty($applicantEmail)) {
-            return;
+            return false;
         }
 
         $locale = $request['default_language'] ?? 'en';
-        LocaleContext::withLocale($locale, function () use ($request, $reason, $applicantEmail) {
-            try {
-                $name = $request['applicant_name'] ?? '';
-                $org  = $request['org_name'] ?? '';
+        return self::withoutTenantContext(function () use ($request, $reason, $applicantEmail, $locale): bool {
+            return (bool) LocaleContext::withLocale($locale, function () use ($request, $reason, $applicantEmail): bool {
+                try {
+                    $name = $request['applicant_name'] ?? '';
+                    $org  = $request['org_name'] ?? '';
 
-                $builder = EmailTemplateBuilder::make()
-                    ->theme('warning')
-                    ->title(__('emails_provisioning.rejection.title'))
-                    ->previewText(__('emails_provisioning.rejection.preview'))
-                    ->greeting($name ?: __('emails.common.fallback_name'))
-                    ->paragraph(__('emails_provisioning.rejection.body', ['org' => $org]));
+                    $builder = EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('emails_provisioning.rejection.title'))
+                        ->previewText(__('emails_provisioning.rejection.preview'))
+                        ->greeting($name ?: __('emails.common.fallback_name'))
+                        ->paragraph(__('emails_provisioning.rejection.body', ['org' => $org]));
 
-                if (! empty($reason)) {
-                    $builder->infoCard([
-                        __('emails_provisioning.rejection.reason_label') => $reason,
-                    ]);
+                    if (! empty($reason)) {
+                        $builder->infoCard([
+                            __('emails_provisioning.rejection.reason_label') => $reason,
+                        ]);
+                    }
+
+                    $builder->paragraph(__('emails_provisioning.rejection.followup'));
+
+                    $subject = __('emails_provisioning.rejection.subject');
+                    $html    = $builder->render();
+
+                    // Rejected provisioning requests do not have a tenant yet. Tell
+                    // the dispatcher this is an intentional platform/pre-tenant
+                    // send so a stale request or worker tenant is not inherited.
+                    if (!EmailDispatchService::sendRaw($applicantEmail, $subject, $html, null, null, null, 'tenant_provisioning', ['tenant_id' => null, 'allow_missing_tenant' => true])) {
+                        Log::warning('TenantProvisioningMailer rejection send returned false');
+                        return false;
+                    }
+
+                    return true;
+                } catch (Throwable $e) {
+                    Log::warning('TenantProvisioningMailer rejection failed', ['error' => $e->getMessage()]);
+                    return false;
                 }
-
-                $builder->paragraph(__('emails_provisioning.rejection.followup'));
-
-                $subject = __('emails_provisioning.rejection.subject');
-                $html    = $builder->render();
-
-                // Rejected provisioning requests do not have a tenant yet. Tell
-                // the dispatcher this is an intentional platform/pre-tenant
-                // send so a stale request or worker tenant is not inherited.
-                if (!EmailDispatchService::sendRaw($applicantEmail, $subject, $html, null, null, null, 'tenant_provisioning', ['tenant_id' => null, 'allow_missing_tenant' => true])) {
-                    Log::warning('TenantProvisioningMailer rejection send returned false');
-                }
-            } catch (Throwable $e) {
-                Log::warning('TenantProvisioningMailer rejection failed', ['error' => $e->getMessage()]);
-            }
+            });
         });
+    }
+
+    /**
+     * Render pre-tenant provisioning emails without inheriting request/worker
+     * tenant state, then restore the caller's original context.
+     *
+     * @template T
+     * @param callable():T $callback
+     * @return T
+     */
+    private static function withoutTenantContext(callable $callback)
+    {
+        $previousTenantId = TenantContext::currentId();
+        TenantContext::reset();
+
+        try {
+            return $callback();
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
+        }
     }
 
     private static function tenantUrl(object $tenant): string

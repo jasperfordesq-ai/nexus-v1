@@ -196,6 +196,63 @@ class NewsletterServiceTest extends TestCase
         ]);
     }
 
+    public function test_process_queue_uses_global_email_suppression_cache_for_terminal_suppression(): void
+    {
+        if (!Schema::hasTable('email_suppression')) {
+            $this->markTestSkipped('Email suppression cache table is not available.');
+        }
+
+        $tenantId = $this->useIsolatedTenant();
+
+        $admin = User::factory()->forTenant($tenantId)->admin()->create();
+        $newsletterId = DB::table('newsletters')->insertGetId([
+            'tenant_id' => $tenantId,
+            'name' => 'Global suppression send guard',
+            'subject' => 'Global suppression send guard',
+            'content' => '<p>Hello</p>',
+            'status' => 'sending',
+            'target_audience' => 'subscribers_only',
+            'created_by' => $admin->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('newsletter_queue')->insert([
+            'tenant_id' => $tenantId,
+            'newsletter_id' => $newsletterId,
+            'email' => 'global-suppressed-pending@example.test',
+            'status' => 'pending',
+            'unsubscribe_token' => Str::random(64),
+            'tracking_token' => Str::random(64),
+            'created_at' => now(),
+        ]);
+        DB::table('email_suppression')->insert([
+            'email' => 'global-suppressed-pending@example.test',
+            'reason' => 'bounce',
+            'detail' => 'global suppression test',
+            'suppressed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $result = TenantContext::runForTenant($tenantId, fn () => NewsletterService::processQueue($newsletterId, 10));
+
+        $this->assertSame(['sent' => 0, 'failed' => 0], $result);
+        $this->assertDatabaseHas('newsletter_queue', [
+            'tenant_id' => $tenantId,
+            'newsletter_id' => $newsletterId,
+            'email' => 'global-suppressed-pending@example.test',
+            'status' => 'suppressed',
+            'attempts' => 5,
+        ]);
+        $this->assertDatabaseHas('email_log', [
+            'tenant_id' => $tenantId,
+            'recipient_email' => 'global-suppressed-pending@example.test',
+            'category' => 'newsletter',
+            'status' => 'suppressed',
+        ]);
+    }
+
     public function test_all_members_recipient_count_includes_active_approved_members(): void
     {
         $tenantId = $this->useIsolatedTenant();

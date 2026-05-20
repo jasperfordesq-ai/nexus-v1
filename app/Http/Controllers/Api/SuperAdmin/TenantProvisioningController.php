@@ -13,6 +13,7 @@ use App\Jobs\ProvisionTenantJob;
 use App\Services\TenantProvisioning\TenantProvisioningService;
 use Illuminate\Http\JsonResponse;
 use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * AG44 — Super-admin queue for tenant provisioning.
@@ -110,6 +111,8 @@ class TenantProvisioningController extends BaseApiController
             return $this->respondWithData($row);
         } catch (InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (RuntimeException $e) {
+            return $this->respondWithError('EMAIL_SEND_FAILED', __('api.create_failed', ['resource' => 'tenant provisioning rejection email']), null, 500);
         }
     }
 

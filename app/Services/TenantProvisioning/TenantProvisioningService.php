@@ -300,27 +300,27 @@ class TenantProvisioningService
      */
     public static function reject(int $requestId, string $reason, int $reviewerId): array
     {
+        $reason = trim($reason);
+        if ($reason === '') {
+            throw new InvalidArgumentException(__('api.provisioning_reject_reason_required'));
+        }
+
         $request = DB::table(self::TABLE)->where('id', $requestId)->first();
         if (! $request) {
             throw new InvalidArgumentException(__('api.provisioning_request_not_found'));
         }
 
+        if (! TenantProvisioningMailer::sendRejection((array) $request, $reason)) {
+            throw new RuntimeException('Tenant provisioning rejection email was not accepted for delivery.');
+        }
+
         DB::table(self::TABLE)->where('id', $requestId)->update([
             'status'           => 'rejected',
-            'rejection_reason' => trim($reason),
+            'rejection_reason' => $reason,
             'reviewed_by'      => $reviewerId,
             'reviewed_at'      => now(),
             'updated_at'       => now(),
         ]);
-
-        try {
-            TenantProvisioningMailer::sendRejection((array) $request, $reason);
-        } catch (Throwable $e) {
-            Log::warning('TenantProvisioningService: rejection email failed', [
-                'request_id' => $requestId,
-                'error'      => $e->getMessage(),
-            ]);
-        }
 
         return (array) DB::table(self::TABLE)->where('id', $requestId)->first();
     }

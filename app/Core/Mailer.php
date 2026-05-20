@@ -391,7 +391,7 @@ class Mailer
      * Append a row to email_log capturing the outcome of a send attempt.
      * Best-effort — never throws, never blocks the email itself.
      */
-    private static function logEmail(string $to, string $subject, string $status, ?string $messageId = null, ?string $error = null, ?int $tenantIdOverride = null, ?string $category = null, ?string $provider = null): void
+    private static function logEmail(string $to, string $subject, string $status, ?string $messageId = null, ?string $error = null, ?int $tenantIdOverride = null, ?string $category = null, ?string $provider = null, ?array $metadata = null): void
     {
         try {
             if (!\Illuminate\Support\Facades\Schema::hasTable('email_log')) {
@@ -410,7 +410,7 @@ class Mailer
             } catch (\Throwable $e) {
                 // ignore — user lookup is best-effort
             }
-            \Illuminate\Support\Facades\DB::table('email_log')->insert([
+            $row = [
                 'tenant_id'           => $tenantId,
                 'user_id'             => $userId,
                 'recipient_email'     => $to,
@@ -423,10 +423,40 @@ class Mailer
                 'sent_at'             => in_array($status, ['sent', 'delivered'], true) ? now() : null,
                 'created_at'          => now(),
                 'updated_at'          => now(),
-            ]);
+            ];
+
+            $metadata = self::normalizeEmailMetadata($metadata);
+            if (\Illuminate\Support\Facades\Schema::hasColumn('email_log', 'source')) {
+                $row['source'] = $metadata['source'];
+            }
+            if (\Illuminate\Support\Facades\Schema::hasColumn('email_log', 'idempotency_key')) {
+                $row['idempotency_key'] = $metadata['idempotency_key'];
+            }
+            if (\Illuminate\Support\Facades\Schema::hasColumn('email_log', 'dispatch_id')) {
+                $row['dispatch_id'] = $metadata['dispatch_id'];
+            }
+
+            \Illuminate\Support\Facades\DB::table('email_log')->insert($row);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::debug('Mailer::logEmail failed: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * @param array<string,mixed>|null $metadata
+     * @return array{source:?string,idempotency_key:?string,dispatch_id:?string}
+     */
+    private static function normalizeEmailMetadata(?array $metadata): array
+    {
+        $source = isset($metadata['source']) ? trim((string) $metadata['source']) : '';
+        $idempotencyKey = isset($metadata['idempotency_key']) ? trim((string) $metadata['idempotency_key']) : '';
+        $dispatchId = isset($metadata['dispatch_id']) ? trim((string) $metadata['dispatch_id']) : '';
+
+        return [
+            'source' => $source !== '' ? mb_substr($source, 0, 160) : null,
+            'idempotency_key' => $idempotencyKey !== '' ? mb_substr($idempotencyKey, 0, 191) : null,
+            'dispatch_id' => $dispatchId !== '' ? mb_substr($dispatchId, 0, 64) : null,
+        ];
     }
 
     /**
@@ -486,7 +516,7 @@ class Mailer
      * @param string|null $replyTo Reply-To address (optional)
      * @return bool
      */
-    public function send($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $category = null): bool
+    public function send($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $category = null, ?array $metadata = null): bool
     {
         // When using the platform's SendGrid account, set a category-specific
         // From address (e.g. newsletters@project-nexus.net) and a default
@@ -525,7 +555,7 @@ class Mailer
         // hydrated by the SendGrid event webhook and by periodic sync from
         // /v3/suppression/* in the Mailer's housekeeping cron.
         if (self::isSuppressed($to)) {
-            self::logEmail($to, $subject, 'suppressed', null, 'recipient on local suppression list', $this->tenantId, $category, $this->driver);
+            self::logEmail($to, $subject, 'suppressed', null, 'recipient on local suppression list', $this->tenantId, $category, $this->driver, $metadata);
             \Illuminate\Support\Facades\Log::info('Mailer: refusing to send to suppressed address', [
                 'to_masked' => self::maskEmail($to),
             ]);
@@ -540,7 +570,7 @@ class Mailer
             if (class_exists(\App\Services\EmailMonitorService::class)) {
                 \App\Services\EmailMonitorService::recordRateLimitHitStatic($this->tenantId);
             }
-            self::logEmail($to, $subject, 'failed', null, 'per-recipient rate limit exceeded', $this->tenantId, $category, $this->driver);
+            self::logEmail($to, $subject, 'failed', null, 'per-recipient rate limit exceeded', $this->tenantId, $category, $this->driver, $metadata);
             \Illuminate\Support\Facades\Log::warning('Mailer: rate-limited recipient', [
                 'to_masked' => self::maskEmail($to),
             ]);
@@ -549,9 +579,9 @@ class Mailer
 
         // Route based on configured driver
         if ($this->driver === 'sendgrid') {
-            $result = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+            $result = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $category, $metadata);
             if ($result) {
-                self::logEmail($to, $subject, 'sent', $this->lastMessageId, null, $this->tenantId, $category, 'sendgrid');
+                self::logEmail($to, $subject, 'sent', $this->lastMessageId, null, $this->tenantId, $category, 'sendgrid', $metadata);
                 return true;
             }
 
@@ -562,19 +592,19 @@ class Mailer
                     \App\Services\EmailMonitorService::recordFallbackToSmtpStatic('sendgrid_failed', $this->tenantId);
                     \App\Services\EmailMonitorService::recordEmailSendStatic('smtp', $smtpOk, $this->tenantId);
                 }
-                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'SendGrid + SMTP both failed', $this->tenantId, $category, 'smtp');
+                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'SendGrid + SMTP both failed', $this->tenantId, $category, 'smtp', $metadata);
                 return $smtpOk;
             }
 
             \Illuminate\Support\Facades\Log::warning("Mailer: SendGrid failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
-            self::logEmail($to, $subject, 'failed', null, 'SendGrid failed, no SMTP fallback', $this->tenantId, $category, 'sendgrid');
+            self::logEmail($to, $subject, 'failed', null, 'SendGrid failed, no SMTP fallback', $this->tenantId, $category, 'sendgrid', $metadata);
             return false;
         }
 
         if ($this->driver === 'gmail_api') {
             $result = $this->sendViaGmailApi($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             if ($result) {
-                self::logEmail($to, $subject, 'sent', null, null, $this->tenantId, $category, 'gmail_api');
+                self::logEmail($to, $subject, 'sent', null, null, $this->tenantId, $category, 'gmail_api', $metadata);
                 return true;
             }
 
@@ -585,12 +615,12 @@ class Mailer
                     \App\Services\EmailMonitorService::recordFallbackToSmtpStatic('gmail_api_failed', $this->tenantId);
                     \App\Services\EmailMonitorService::recordEmailSendStatic('smtp', $smtpOk, $this->tenantId);
                 }
-                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'Gmail + SMTP both failed', $this->tenantId, $category, 'smtp');
+                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'Gmail + SMTP both failed', $this->tenantId, $category, 'smtp', $metadata);
                 return $smtpOk;
             }
 
             \Illuminate\Support\Facades\Log::warning("Mailer: Gmail API failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
-            self::logEmail($to, $subject, 'failed', null, 'Gmail API failed, no SMTP fallback', $this->tenantId, $category, 'gmail_api');
+            self::logEmail($to, $subject, 'failed', null, 'Gmail API failed, no SMTP fallback', $this->tenantId, $category, 'gmail_api', $metadata);
             return false;
         }
 
@@ -599,7 +629,7 @@ class Mailer
             if (class_exists(\App\Services\EmailMonitorService::class)) {
                 \App\Services\EmailMonitorService::recordEmailSendStatic('smtp', true, $this->tenantId);
             }
-            self::logEmail($to, $subject, 'sent', null, null, $this->tenantId, $category, 'smtp');
+            self::logEmail($to, $subject, 'sent', null, null, $this->tenantId, $category, 'smtp', $metadata);
             return true;
         }
 
@@ -609,15 +639,15 @@ class Mailer
 
         if ($this->usePlatformSendGridFallback()) {
             \Illuminate\Support\Facades\Log::warning("Mailer: SMTP failed, falling back to platform SendGrid for: " . self::maskEmail($to));
-            $sendGridOk = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+            $sendGridOk = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $category, $metadata);
             if (class_exists(\App\Services\EmailMonitorService::class)) {
                 \App\Services\EmailMonitorService::recordFallbackToSmtpStatic('smtp_failed_platform_sendgrid', $this->tenantId);
             }
-            self::logEmail($to, $subject, $sendGridOk ? 'sent' : 'failed', $this->lastMessageId, $sendGridOk ? null : 'SMTP + platform SendGrid both failed', $this->tenantId, $category, 'sendgrid');
+            self::logEmail($to, $subject, $sendGridOk ? 'sent' : 'failed', $this->lastMessageId, $sendGridOk ? null : 'SMTP + platform SendGrid both failed', $this->tenantId, $category, 'sendgrid', $metadata);
             return $sendGridOk;
         }
 
-        self::logEmail($to, $subject, 'failed', null, 'SMTP failed, no platform SendGrid fallback', $this->tenantId, $category, 'smtp');
+        self::logEmail($to, $subject, 'failed', null, 'SMTP failed, no platform SendGrid fallback', $this->tenantId, $category, 'smtp', $metadata);
         return false;
     }
 
@@ -651,7 +681,7 @@ class Mailer
     /**
      * Send email via SendGrid Web API v3.
      */
-    private function sendViaSendGrid($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null): bool
+    private function sendViaSendGrid($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $category = null, ?array $metadata = null): bool
     {
         try {
             $email = new \SendGrid\Mail\Mail();
@@ -684,6 +714,14 @@ class Mailer
             if ($this->tenantId) {
                 $email->addCustomArg('tenant_id', (string) $this->tenantId);
                 $email->addHeader('X-Nexus-Tenant', (string) $this->tenantId);
+            }
+            if ($category !== null && $category !== '') {
+                $email->addCustomArg('category', mb_substr($category, 0, 64));
+            }
+            foreach (self::normalizeEmailMetadata($metadata) as $key => $value) {
+                if ($value !== null) {
+                    $email->addCustomArg($key, $value);
+                }
             }
 
             if ($unsubscribeUrl) {

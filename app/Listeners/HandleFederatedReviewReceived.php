@@ -133,6 +133,7 @@ class HandleFederatedReviewReceived implements ShouldQueue
                         ]);
                     } else {
                         $this->markReviewEmailFailed('Email dispatch returned false');
+                        throw new \RuntimeException('Federated review email dispatch returned false');
                     }
                 }
             });
@@ -151,6 +152,7 @@ class HandleFederatedReviewReceived implements ShouldQueue
                 'review_id'  => $event->localId ?? null,
                 'error'      => $e->getMessage(),
             ]);
+            throw $e;
         } finally {
             $this->currentReviewId = 0;
             TenantContext::restoreAfterScopedListener($previousTenantId);

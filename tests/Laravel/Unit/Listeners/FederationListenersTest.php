@@ -156,6 +156,19 @@ class FederationListenersTest extends TestCase
         $this->assertStringContainsString(':accepted:', $source);
     }
 
+    public function test_review_partner_push_retries_transient_failures(): void
+    {
+        $reflection = new \ReflectionClass(PushReviewToFederatedPartner::class);
+        $listener = $reflection->newInstanceWithoutConstructor();
+        $source = file_get_contents($reflection->getFileName());
+
+        $this->assertSame(3, $reflection->getProperty('tries')->getValue($listener));
+        $this->assertSame([60, 300, 900], $reflection->getProperty('backoff')->getValue($listener));
+        $this->assertIsString($source);
+        $this->assertStringContainsString('isRetryablePartnerFailure', $source);
+        $this->assertStringContainsString('Retryable federation review push failure', $source);
+    }
+
     // -------- CommunityEvent listener --------
 
     public function test_community_event_listener_skips_when_tenant_feature_disabled(): void

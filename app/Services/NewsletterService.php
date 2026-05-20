@@ -1042,20 +1042,32 @@ HTML;
 
     private static function getSuppressedEmails(int $tenantId): array
     {
-        if (!Schema::hasTable('newsletter_suppression_list')) {
-            return [];
+        $suppressed = [];
+
+        if (Schema::hasTable('newsletter_suppression_list')) {
+            $suppressed = DB::table('newsletter_suppression_list')
+                ->where('tenant_id', $tenantId)
+                ->where(function ($query) {
+                    $query->whereNull('expires_at')
+                        ->orWhere('expires_at', '>', now());
+                })
+                ->pluck('email')
+                ->map(fn ($email) => strtolower((string) $email))
+                ->flip()
+                ->all();
         }
 
-        return DB::table('newsletter_suppression_list')
-            ->where('tenant_id', $tenantId)
-            ->where(function ($query) {
-                $query->whereNull('expires_at')
-                    ->orWhere('expires_at', '>', now());
-            })
-            ->pluck('email')
-            ->map(fn ($email) => strtolower((string) $email))
-            ->flip()
-            ->all();
+        if (Schema::hasTable('email_suppression')) {
+            $globalSuppressed = DB::table('email_suppression')
+                ->pluck('email')
+                ->map(fn ($email) => strtolower((string) $email))
+                ->flip()
+                ->all();
+
+            $suppressed = $suppressed + $globalSuppressed;
+        }
+
+        return $suppressed;
     }
 
     // =========================================================================
