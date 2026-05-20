@@ -78,7 +78,7 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
         setWebhooks(Array.isArray(payload) ? payload : []);
       }
     } catch {
-      toast.error(t('webhooks.load_failed', 'Failed to load webhooks'));
+      toast.error(t('webhooks.load_failed'));
     } finally {
       setLoading(false);
     }
@@ -90,11 +90,11 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
 
   const handleCreate = async () => {
     if (!newUrl.trim()) {
-      toast.error(t('webhooks.url_required', 'Webhook URL is required'));
+      toast.error(t('webhooks.url_required'));
       return;
     }
     if (newEvents.length === 0) {
-      toast.error(t('webhooks.events_required', 'Select at least one event'));
+      toast.error(t('webhooks.events_required'));
       return;
     }
 
@@ -107,15 +107,15 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
 
       const res = await api.post(`/v2/groups/${groupId}/webhooks`, body);
       if (res.success) {
-        toast.success(t('webhooks.created', 'Webhook created'));
+        toast.success(t('webhooks.created'));
         setModalOpen(false);
         resetForm();
         await loadWebhooks();
       } else {
-        toast.error(t('webhooks.create_failed', 'Failed to create webhook'));
+        toast.error(t('webhooks.create_failed'));
       }
     } catch {
-      toast.error(t('webhooks.create_failed', 'Failed to create webhook'));
+      toast.error(t('webhooks.create_failed'));
     } finally {
       setCreating(false);
     }
@@ -132,10 +132,10 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
           prev.map((wh) => (wh.id === webhookId ? { ...wh, is_active: isActive } : wh))
         );
       } else {
-        toast.error(t('webhooks.toggle_failed', 'Failed to toggle webhook'));
+        toast.error(t('webhooks.toggle_failed'));
       }
     } catch {
-      toast.error(t('webhooks.toggle_failed', 'Failed to toggle webhook'));
+      toast.error(t('webhooks.toggle_failed'));
     }
   };
 
@@ -144,12 +144,12 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
       const res = await api.delete(`/v2/groups/${groupId}/webhooks/${webhookId}`);
       if (res.success) {
         setWebhooks((prev) => prev.filter((wh) => wh.id !== webhookId));
-        toast.success(t('webhooks.deleted', 'Webhook deleted'));
+        toast.success(t('webhooks.deleted'));
       } else {
-        toast.error(t('webhooks.delete_failed', 'Failed to delete webhook'));
+        toast.error(t('webhooks.delete_failed'));
       }
     } catch {
-      toast.error(t('webhooks.delete_failed', 'Failed to delete webhook'));
+      toast.error(t('webhooks.delete_failed'));
     }
   };
 
@@ -169,22 +169,23 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
 
   return (
     <GlassCard className="p-5 space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Webhook size={18} className="text-primary" />
           <h3 className="text-base font-semibold text-foreground">
-            {t('webhooks.title', 'Webhooks')}
+            {t('webhooks.title')}
           </h3>
         </div>
 
         <Button
           size="sm"
           color="primary"
-          variant="flat"
+          variant="solid"
+          className="w-full sm:w-auto"
           startContent={<Plus size={14} />}
           onPress={() => setModalOpen(true)}
         >
-          {t('webhooks.add', 'Add Webhook')}
+          {t('webhooks.add')}
         </Button>
       </div>
 
@@ -194,14 +195,14 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
         </div>
       ) : webhooks.length === 0 ? (
         <p className="text-sm text-default-400 text-center py-6">
-          {t('webhooks.empty', 'No webhooks configured')}
+          {t('webhooks.empty')}
         </p>
       ) : (
         <div className="space-y-3">
           {webhooks.map((wh) => (
             <div
               key={wh.id}
-              className="flex items-start gap-3 p-3 rounded-lg border border-default-200 bg-default-50"
+              className="flex flex-col gap-3 rounded-lg border border-default-200 bg-content1 p-3 shadow-sm sm:flex-row sm:items-start"
             >
               <div className="flex-1 min-w-0 space-y-1">
                 <p className="text-sm font-medium text-foreground truncate" title={wh.url}>
@@ -214,8 +215,8 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
                     color={wh.is_active ? 'success' : 'default'}
                   >
                     {wh.is_active
-                      ? t('webhooks.active', 'Active')
-                      : t('webhooks.inactive', 'Inactive')}
+                      ? t('webhooks.active')
+                      : t('webhooks.inactive')}
                   </Chip>
                   {wh.failure_count > 0 && (
                     <Chip
@@ -224,26 +225,26 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
                       color="warning"
                       startContent={<AlertTriangle size={10} />}
                     >
-                      {t('webhooks.failures', '{{count}} failures', {
+                      {t('webhooks.failures', {
                         count: wh.failure_count,
                       })}
                     </Chip>
                   )}
                   {wh.last_fired_at && (
                     <span className="text-xs text-default-400">
-                      {t('webhooks.last_fired', 'Last fired')}{' '}
+                      {t('webhooks.last_fired')}{' '}
                       {formatDateValue(wh.last_fired_at)}
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2 flex-shrink-0 sm:self-start">
                 <Switch
                   size="sm"
                   isSelected={wh.is_active}
                   onValueChange={(checked) => handleToggle(wh.id, checked)}
-                  aria-label={t('webhooks.toggle_label', 'Toggle webhook')}
+                  aria-label={t('webhooks.toggle_label')}
                 />
                 <Button
                   size="sm"
@@ -251,7 +252,7 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
                   color="danger"
                   isIconOnly
                   onPress={() => handleDelete(wh.id)}
-                  aria-label={t('webhooks.delete_label', 'Delete webhook')}
+                  aria-label={t('webhooks.delete_label')}
                 >
                   <Trash2 size={14} />
                 </Button>
@@ -266,14 +267,14 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Webhook size={20} className="text-primary" />
-            {t('webhooks.add_title', 'Add Webhook')}
+            {t('webhooks.add_title')}
           </ModalHeader>
 
           <ModalBody>
             <div className="space-y-4">
               <Input
-                label={t('webhooks.url_label', 'Webhook URL')}
-                placeholder="https://example.com/webhook"
+                label={t('webhooks.url_label')}
+                placeholder={t('webhooks.url_placeholder')}
                 value={newUrl}
                 onValueChange={setNewUrl}
                 variant="bordered"
@@ -283,7 +284,7 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
 
               <div className="space-y-2">
                 <p className="text-sm font-medium text-default-700">
-                  {t('webhooks.events_label', 'Events')}
+                  {t('webhooks.events_label')}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {AVAILABLE_EVENTS.map((event) => (
@@ -300,8 +301,8 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
               </div>
 
               <Input
-                label={t('webhooks.secret_label', 'Secret (optional)')}
-                placeholder={t('webhooks.secret_placeholder', 'Signing secret for payload verification')}
+                label={t('webhooks.secret_label')}
+                placeholder={t('webhooks.secret_placeholder')}
                 value={newSecret}
                 onValueChange={setNewSecret}
                 variant="bordered"
@@ -312,14 +313,14 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
 
           <ModalFooter>
             <Button variant="flat" onPress={() => setModalOpen(false)}>
-              {t('common:cancel', 'Cancel')}
+              {t('webhooks.cancel')}
             </Button>
             <Button
               color="primary"
               onPress={handleCreate}
               isLoading={creating}
             >
-              {t('webhooks.create_btn', 'Create Webhook')}
+              {t('webhooks.create_btn')}
             </Button>
           </ModalFooter>
         </ModalContent>
