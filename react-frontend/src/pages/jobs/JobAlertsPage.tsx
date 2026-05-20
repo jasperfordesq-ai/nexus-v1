@@ -113,7 +113,7 @@ export function JobAlertsPage() {
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load job alerts', err);
-      setError(tRef.current('alerts.load_error', 'Failed to load alerts. Please try again.'));
+      setError(tRef.current('alerts.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -232,14 +232,14 @@ export function JobAlertsPage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('alerts.load_error', 'Failed to load alerts')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('alerts.load_error')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadAlerts}
           >
-            {t('alerts.retry', 'Retry')}
+            {t('alerts.retry')}
           </Button>
         </GlassCard>
       )}
@@ -327,9 +327,9 @@ export function JobAlertsPage() {
                     </div>
 
                     <p className="text-xs text-theme-subtle mt-2">
-                      {t('alerts.created_date', 'Created {{date}}', { date: new Date(alert.created_at).toLocaleDateString() })}
+                      {t('alerts.created_date', { date: new Date(alert.created_at).toLocaleDateString() })}
                       {' '}&middot;{' '}
-                      {t('alerts.last_notified', 'Last notification {{date}}', { date: alert.last_notified_at ? new Date(alert.last_notified_at).toLocaleDateString() : t('alerts.never', 'Never') })}
+                      {t('alerts.last_notified', { date: alert.last_notified_at ? new Date(alert.last_notified_at).toLocaleDateString() : t('alerts.never') })}
                     </p>
                   </div>
 
@@ -486,15 +486,15 @@ export function JobAlertsPage() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="text-theme-primary">{t('alerts.delete', 'Delete alert')}</ModalHeader>
+              <ModalHeader className="text-theme-primary">{t('alerts.delete')}</ModalHeader>
               <ModalBody>
                 <p className="text-theme-secondary">
-                  {t('alerts.delete_confirm', 'Are you sure you want to delete this alert? This cannot be undone.')}
+                  {t('alerts.delete_confirm')}
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('apply.cancel', 'Cancel')}</Button>
-                <Button color="danger" onPress={handleDelete}>{t('alerts.delete', 'Delete alert')}</Button>
+                <Button variant="flat" onPress={onClose}>{t('apply.cancel')}</Button>
+                <Button color="danger" onPress={handleDelete}>{t('alerts.delete')}</Button>
               </ModalFooter>
             </>
           )}
