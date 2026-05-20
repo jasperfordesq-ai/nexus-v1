@@ -232,13 +232,10 @@ export function LegalHubPage() {
             </div>
             <div>
               <h2 className="text-lg font-semibold text-theme-primary">
-                {t('hub.platform_section_title', 'Platform Provider Legal')}
+                {t('hub.platform_section_title')}
               </h2>
               <p className="text-sm text-theme-muted mt-1">
-                {t(
-                  'hub.platform_section_desc',
-                  'These documents govern the Project NEXUS platform infrastructure and are separate from your community\'s policies.',
-                )}
+                {t('hub.platform_section_desc')}
               </p>
             </div>
           </div>
@@ -250,7 +247,7 @@ export function LegalHubPage() {
                 startContent={<FileText className="w-4 h-4 text-slate-500" aria-hidden="true" />}
                 endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
               >
-                {t('hub.platform_terms', 'Platform Terms')}
+                {t('hub.platform_terms')}
               </Button>
             </Link>
             <Link to={tenantPath('/platform/privacy')}>
@@ -260,7 +257,7 @@ export function LegalHubPage() {
                 startContent={<Shield className="w-4 h-4 text-slate-500" aria-hidden="true" />}
                 endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
               >
-                {t('hub.platform_privacy', 'Platform Privacy')}
+                {t('hub.platform_privacy')}
               </Button>
             </Link>
             <Link to={tenantPath('/platform/disclaimer')}>
@@ -270,7 +267,7 @@ export function LegalHubPage() {
                 startContent={<AlertTriangle className="w-4 h-4 text-slate-500" aria-hidden="true" />}
                 endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
               >
-                {t('hub.platform_disclaimer', 'Disclaimer')}
+                {t('hub.platform_disclaimer')}
               </Button>
             </Link>
           </div>

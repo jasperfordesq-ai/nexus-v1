@@ -364,7 +364,12 @@
     "contact_team": "Contactar a Nossa Equipa",
     "privacy_policy_link": "Política de Privacidade",
     "doc_trust_safety_title": "Trust & Safety",
-    "doc_trust_safety_desc": "Plain-English guide to how exchanges work, what we do to keep the community safe, what we don’t, and how to report a safeguarding concern."
+    "doc_trust_safety_desc": "Plain-English guide to how exchanges work, what we do to keep the community safe, what we don’t, and how to report a safeguarding concern.",
+    "platform_section_title": "Platform Provider Legal",
+    "platform_section_desc": "These documents govern the Project NEXUS platform infrastructure and are separate from your community's policies.",
+    "platform_terms": "Platform Terms",
+    "platform_privacy": "Platform Privacy",
+    "platform_disclaimer": "Disclaimer"
   },
   "version_history": {
     "page_title": "Histórico de Versões",

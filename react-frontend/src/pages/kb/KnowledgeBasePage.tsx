@@ -203,7 +203,7 @@ export function KnowledgeBasePage() {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <PageMeta title={t('page_title', { defaultValue: 'Knowledge Base' })} description={t('page_description', { defaultValue: 'Articles, guides, and tutorials for the community.' })} />
+      <PageMeta title={t('page_title')} description={t('page_description')} />
       {/* Header */}
       <div className="text-center py-4">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 mb-4">
@@ -265,7 +265,7 @@ export function KnowledgeBasePage() {
               key={ALL_CATEGORIES}
               title={
                 <span className="flex items-center gap-1.5">
-                  {t('all_categories', 'All')}
+                  {t('all_categories')}
                   <Chip size="sm" variant="flat" className="text-[10px] min-w-5 h-4 bg-theme-elevated text-theme-subtle">
                     {articles.length}
                   </Chip>
@@ -383,12 +383,12 @@ export function KnowledgeBasePage() {
                               {article.views_count > 0 && (
                                 <span className="flex items-center gap-1">
                                   <Eye className="w-3 h-3" aria-hidden="true" />
-                                  {article.views_count.toLocaleString()} views
+                                  {t('views', { count: article.views_count })}
                                 </span>
                               )}
                               {article.author && (
                                 <span className="text-theme-subtle">
-                                  by {article.author.name}
+                                  {t('author_by', { name: article.author.name })}
                                 </span>
                               )}
                             </div>

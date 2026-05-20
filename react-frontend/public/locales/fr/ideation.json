@@ -214,7 +214,8 @@
     "label": "Rechercher des defis",
     "placeholder": "Rechercher des defis par titre ou description...",
     "clear_tags": "Effacer les tags",
-    "no_results": "Aucun defi ne correspond a votre recherche"
+    "no_results": "Aucun defi ne correspond a votre recherche",
+    "clear": "Clear search"
   },
   "tags": {
     "label": "Tags",

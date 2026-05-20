@@ -214,7 +214,8 @@
     "label": "Buscar retos",
     "placeholder": "Buscar retos por título o descripción...",
     "clear_tags": "Limpiar etiquetas",
-    "no_results": "Ningún reto coincide con tu búsqueda"
+    "no_results": "Ningún reto coincide con tu búsqueda",
+    "clear": "Clear search"
   },
   "tags": {
     "label": "Etiquetas",

@@ -340,7 +340,8 @@
     "report_failed": "Falha ao denunciar publicação",
     "vote_failed": "Falha ao votar",
     "post_deleted": "Post deleted",
-    "post_delete_failed": "Failed to delete post"
+    "post_delete_failed": "Failed to delete post",
+    "join_requested": "Join request submitted"
   },
   "loading_aria": "A carregar grupos",
   "load_error": "Falha ao carregar grupos.",

@@ -214,7 +214,8 @@
     "label": "Cerca sfide",
     "placeholder": "Cerca sfide per titolo o descrizione...",
     "clear_tags": "Cancella tag",
-    "no_results": "Nessuna sfida corrisponde alla tua ricerca"
+    "no_results": "Nessuna sfida corrisponde alla tua ricerca",
+    "clear": "Clear search"
   },
   "tags": {
     "label": "Tag",

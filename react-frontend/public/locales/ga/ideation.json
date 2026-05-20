@@ -213,7 +213,8 @@
     "label": "Cuardaigh dúshláin",
     "placeholder": "Cuardaigh dúshláin de réir teidil nó cur síos...",
     "clear_tags": "Glan clibeanna",
-    "no_results": "Níl aon dúshlán ag freagairt do do chuardach"
+    "no_results": "Níl aon dúshlán ag freagairt do do chuardach",
+    "clear": "Clear search"
   },
   "tags": {
     "label": "Clibeanna",

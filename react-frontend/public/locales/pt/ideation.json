@@ -214,7 +214,8 @@
     "label": "Pesquisar desafios",
     "placeholder": "Pesquisar desafios por título ou descrição...",
     "clear_tags": "Limpar etiquetas",
-    "no_results": "Nenhum desafio corresponde à sua pesquisa"
+    "no_results": "Nenhum desafio corresponde à sua pesquisa",
+    "clear": "Clear search"
   },
   "tags": {
     "label": "Etiquetas",

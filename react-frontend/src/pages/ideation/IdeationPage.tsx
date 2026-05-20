@@ -326,7 +326,7 @@ export function IdeationPage() {
     <div className="max-w-6xl mx-auto px-4 py-6">
       <PageMeta
         title={t('page_title')}
-        description={t('page_description', { defaultValue: 'Browse community challenges, submit ideas, and vote on solutions.' })}
+        description={t('page_description')}
       />
 
       {/* Header */}
@@ -431,7 +431,7 @@ export function IdeationPage() {
               variant="light"
               onPress={() => setSearchQuery('')}
               className="p-0.5 rounded hover:bg-[var(--color-surface-hover)] min-w-0 w-auto h-auto"
-              aria-label={t('search.clear', 'Clear search')}
+              aria-label={t('search.clear')}
             >
               <X className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
             </Button>
@@ -497,7 +497,7 @@ export function IdeationPage() {
               startContent={<RefreshCw className="w-4 h-4" />}
               onPress={() => fetchChallenges(activeTab, false, selectedCategory, debouncedSearch, selectedTags)}
             >
-              {t('actions.retry', { defaultValue: 'Retry' })}
+              {t('actions.retry')}
             </Button>
           }
         />

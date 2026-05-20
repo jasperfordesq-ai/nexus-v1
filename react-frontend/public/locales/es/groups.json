@@ -340,7 +340,8 @@
     "report_failed": "No se pudo reportar la publicación",
     "vote_failed": "No se pudo votar",
     "post_deleted": "Post deleted",
-    "post_delete_failed": "Failed to delete post"
+    "post_delete_failed": "Failed to delete post",
+    "join_requested": "Join request submitted"
   },
   "loading_aria": "Cargando grupos",
   "load_error": "Error al cargar los grupos.",

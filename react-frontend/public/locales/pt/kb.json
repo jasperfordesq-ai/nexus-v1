@@ -45,5 +45,9 @@
     "question": "Este artigo foi útil?",
     "yes": "Sim ({{count}})",
     "no": "Não ({{count}})"
-  }
+  },
+  "page_title": "Knowledge Base",
+  "page_description": "Articles, guides, and tutorials for the community.",
+  "all_categories": "All",
+  "author_by": "by {{name}}"
 }

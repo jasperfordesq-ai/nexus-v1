@@ -340,7 +340,8 @@
     "report_failed": "فشل في الإبلاغ عن المنشور",
     "vote_failed": "فشل في التصويت",
     "post_deleted": "Post deleted",
-    "post_delete_failed": "Failed to delete post"
+    "post_delete_failed": "Failed to delete post",
+    "join_requested": "Join request submitted"
   },
   "loading_aria": "جارٍ تحميل المجموعات",
   "load_error": "فشل في تحميل المجموعات. يرجى المحاولة مرة أخرى.",

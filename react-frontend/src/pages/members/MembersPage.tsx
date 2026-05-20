@@ -568,7 +568,7 @@ export function MembersPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div role="status" className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'space-y-3'} aria-label={t('aria.loading_members', 'Loading members')} aria-busy="true">
+            <div role="status" className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'space-y-3'} aria-label={t('aria.loading_members')} aria-busy="true">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <MemberCardSkeleton key={i} />
               ))}
@@ -804,7 +804,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                   </span>
                 )}
                 {sortBy === 'communityrank' && member.community_rank_score != null && (
-                  <Tooltip content={t('members.community_rank_score_tooltip', 'CommunityRank score')}>
+                  <Tooltip content={t('members.community_rank_score_tooltip')}>
                     <span className="flex items-center gap-1 shrink-0 whitespace-nowrap text-violet-600 dark:text-violet-400 cursor-default">
                       <TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />
                       <span>{Math.round(member.community_rank_score * 100)}%</span>
@@ -834,8 +834,8 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
           <div className="flex items-center justify-center gap-1.5 flex-wrap">
             <h3 className="font-semibold text-theme-primary">{displayName}</h3>
             {member.is_verified && (
-              <Tooltip content={t('members.verified_member', 'Verified member')}>
-                <BadgeCheck className="w-4 h-4 text-teal-500 shrink-0" aria-label={t('members.verified_member', 'Verified member')} />
+              <Tooltip content={t('members.verified_member')}>
+                <BadgeCheck className="w-4 h-4 text-teal-500 shrink-0" aria-label={t('members.verified_member')} />
               </Tooltip>
             )}
             {hasGamification && level > 0 && (
@@ -876,7 +876,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
               {t('members.hours_short', { count: (member.total_hours_given ?? 0) + (member.total_hours_received ?? 0) })}
             </span>
             {sortBy === 'communityrank' && member.community_rank_score != null && (
-              <Tooltip content={t('members.community_rank_score_tooltip', 'CommunityRank score')}>
+              <Tooltip content={t('members.community_rank_score_tooltip')}>
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-violet-500/10 text-violet-600 dark:text-violet-400 text-xs font-medium cursor-default">
                   <TrendingUp className="w-3 h-3" aria-hidden="true" />
                   {Math.round(member.community_rank_score * 100)}%

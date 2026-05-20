@@ -1025,5 +1025,8 @@
     "employer_brand": {
       "title": "Employer Brand"
     }
+  },
+  "jobs": {
+    "view_details": "View job details"
   }
 }

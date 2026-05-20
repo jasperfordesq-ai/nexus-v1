@@ -214,7 +214,8 @@
     "label": "チャレンジを検索",
     "placeholder": "タイトルまたは説明でチャレンジを検索...",
     "clear_tags": "タグをクリア",
-    "no_results": "検索に一致するチャレンジはありません"
+    "no_results": "検索に一致するチャレンジはありません",
+    "clear": "Clear search"
   },
   "tags": {
     "label": "Tags",

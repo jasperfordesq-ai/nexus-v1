@@ -679,8 +679,8 @@ export function JobsPage() {
           ) : myPostings.length === 0 ? (
             <EmptyState
               icon={<Briefcase className="w-12 h-12" aria-hidden="true" />}
-              title={t('my_postings.empty_title', 'No postings yet')}
-              description={t('my_postings.empty_description', 'Post a vacancy to start receiving applications from your community.')}
+              title={t('my_postings.empty_title')}
+              description={t('my_postings.empty_description')}
               action={
                 <Link to={tenantPath('/jobs/create')}>
                   <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
@@ -962,7 +962,7 @@ const MyPostingCard = memo(function MyPostingCard({ vacancy }: MyPostingCardProp
                 className={vacancy.applications_count > 0 ? '' : 'bg-theme-elevated text-theme-muted'}
                 startContent={<FileText className="w-3.5 h-3.5" aria-hidden="true" />}
               >
-                {t('my_postings.view_applicants', 'View Applicants')} ({vacancy.applications_count})
+                {t('my_postings.view_applicants')} ({vacancy.applications_count})
               </Button>
             </Link>
             <Link to={tenantPath(`/jobs/${vacancy.id}/edit`)}>
@@ -972,7 +972,7 @@ const MyPostingCard = memo(function MyPostingCard({ vacancy }: MyPostingCardProp
                 className="bg-theme-elevated text-theme-muted"
                 startContent={<Edit className="w-3.5 h-3.5" aria-hidden="true" />}
               >
-                {t('my_postings.edit', 'Edit')}
+                {t('my_postings.edit')}
               </Button>
             </Link>
           </div>
@@ -980,7 +980,7 @@ const MyPostingCard = memo(function MyPostingCard({ vacancy }: MyPostingCardProp
 
         {/* Arrow */}
         <div className="flex-shrink-0 self-center">
-          <Link to={tenantPath(`/jobs/${vacancy.id}`)} aria-label={t('jobs.view_details', 'View job details')}>
+          <Link to={tenantPath(`/jobs/${vacancy.id}`)} aria-label={t('jobs.view_details')}>
             <ChevronRight className="w-5 h-5 text-theme-subtle" aria-hidden="true" />
           </Link>
         </div>

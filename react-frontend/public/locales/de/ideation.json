@@ -214,7 +214,8 @@
     "label": "Wettbewerbe durchsuchen",
     "placeholder": "Wettbewerbe nach Titel oder Beschreibung durchsuchen...",
     "clear_tags": "Schlagwörter löschen",
-    "no_results": "Keine Wettbewerbe entsprechen Ihrer Suche"
+    "no_results": "Keine Wettbewerbe entsprechen Ihrer Suche",
+    "clear": "Clear search"
   },
   "tags": {
     "label": "Schlagwörter",

@@ -250,7 +250,7 @@ export function GroupDetailPage() {
       setInviteLink(resp.data?.invite_url || null);
     } catch (err) {
       logError('GroupDetailPage.generateInviteLink', err);
-      toastRef.current.error(t('detail.invite_link_error', 'Failed to generate invite link'));
+      toastRef.current.error(t('detail.invite_link_error'));
     }
   };
 
@@ -260,13 +260,13 @@ export function GroupDetailPage() {
     try {
       const emails = inviteEmails.split(',').map((e: string) => e.trim()).filter(Boolean);
       await api.post(`/v2/groups/${id}/invites/email`, { emails, message: inviteMessage });
-      toast.success(t('detail.invites_sent', 'Invitations sent!'));
+      toast.success(t('detail.invites_sent'));
       setInviteEmails('');
       setInviteMessage('');
       setShowInviteModal(false);
     } catch (err) {
       logError('GroupDetailPage.sendInvites', err);
-      toast.error(t('detail.invites_failed', 'Failed to send invitations'));
+      toast.error(t('detail.invites_failed'));
     } finally {
       setSendingInvites(false);
     }
@@ -635,7 +635,7 @@ export function GroupDetailPage() {
         toastRef.current.success(
           joinStatus === 'active'
             ? tRef.current('toast.joined')
-            : tRef.current('toast.join_requested', 'Join request submitted')
+            : tRef.current('toast.join_requested')
         );
       } else if (response.code === 'JOIN_FAILED' && response.error?.toLowerCase().includes('already')) {
         // 409 — already a member but UI was stale; refresh to sync state
@@ -1260,7 +1260,7 @@ export function GroupDetailPage() {
         onEmailsChange={setInviteEmails}
         onMessageChange={setInviteMessage}
         onSendInvites={handleSendInvites}
-        onCopyLink={(link) => { navigator.clipboard.writeText(link); toast.success(t('detail.link_copied', 'Link copied!')); }}
+        onCopyLink={(link) => { navigator.clipboard.writeText(link); toast.success(t('detail.link_copied')); }}
       />
     </motion.div>
   );

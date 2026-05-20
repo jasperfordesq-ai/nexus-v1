@@ -214,7 +214,8 @@
     "label": "Szukaj wyzwań",
     "placeholder": "Szukaj wyzwań według tytułu lub opisu...",
     "clear_tags": "Wyczyść tagi",
-    "no_results": "Brak wyzwań pasujących do twojego wyszukiwania"
+    "no_results": "Brak wyzwań pasujących do twojego wyszukiwania",
+    "clear": "Clear search"
   },
   "tags": {
     "label": "Tags",

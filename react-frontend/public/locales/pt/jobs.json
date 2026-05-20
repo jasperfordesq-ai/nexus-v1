@@ -960,5 +960,8 @@
     }
   },
   "page_title": "Job Vacancies",
-  "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you."
+  "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
+  "jobs": {
+    "view_details": "View job details"
+  }
 }

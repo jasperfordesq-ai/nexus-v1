@@ -340,7 +340,8 @@
     "report_failed": "Failed to report post",
     "vote_failed": "Failed to vote",
     "post_deleted": "Post deleted",
-    "post_delete_failed": "Failed to delete post"
+    "post_delete_failed": "Failed to delete post",
+    "join_requested": "Join request submitted"
   },
   "loading_aria": "Loading groups",
   "load_error": "Failed to load groups. Please try again.",

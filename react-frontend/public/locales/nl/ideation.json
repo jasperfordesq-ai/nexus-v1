@@ -214,7 +214,8 @@
     "label": "Zoek uitdagingen",
     "placeholder": "Zoek uitdagingen op titel of beschrijving...",
     "clear_tags": "Tags wissen",
-    "no_results": "Geen uitdagingen die overeenkomen met je zoekopdracht"
+    "no_results": "Geen uitdagingen die overeenkomen met je zoekopdracht",
+    "clear": "Clear search"
   },
   "tags": {
     "label": "Tags",

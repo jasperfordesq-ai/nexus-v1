@@ -340,7 +340,8 @@
     "report_failed": "Kon bericht niet rapporteren",
     "vote_failed": "Kon niet stemmen",
     "post_deleted": "Post deleted",
-    "post_delete_failed": "Failed to delete post"
+    "post_delete_failed": "Failed to delete post",
+    "join_requested": "Join request submitted"
   },
   "loading_aria": "Groepen laden",
   "load_error": "Kon groepen niet laden. Probeer het opnieuw.",

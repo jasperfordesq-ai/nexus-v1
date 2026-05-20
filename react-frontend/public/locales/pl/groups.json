@@ -340,7 +340,8 @@
     "report_failed": "Nie udało się zgłosić posta",
     "vote_failed": "Nie udało się zagłosować",
     "post_deleted": "Post deleted",
-    "post_delete_failed": "Failed to delete post"
+    "post_delete_failed": "Failed to delete post",
+    "join_requested": "Join request submitted"
   },
   "loading_aria": "Ładowanie grup",
   "load_error": "Nie udało się załadować grup. Proszę spróbować ponownie.",

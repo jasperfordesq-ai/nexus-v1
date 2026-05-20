@@ -340,7 +340,8 @@
     "report_failed": "Theip ar phostáil a thuairisciú",
     "vote_failed": "Theip ar vótáil",
     "post_deleted": "Post deleted",
-    "post_delete_failed": "Failed to delete post"
+    "post_delete_failed": "Failed to delete post",
+    "join_requested": "Join request submitted"
   },
   "loading_aria": "Grúpaí á lódáil",
   "load_error": "Theip ar lodail na ngrupai.",

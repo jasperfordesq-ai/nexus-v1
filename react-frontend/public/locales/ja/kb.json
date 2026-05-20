@@ -45,5 +45,9 @@
     "question": "この記事は役に立ちましたか？",
     "yes": "Yes",
     "no": "No"
-  }
+  },
+  "page_title": "Knowledge Base",
+  "page_description": "Articles, guides, and tutorials for the community.",
+  "all_categories": "All",
+  "author_by": "by {{name}}"
 }
