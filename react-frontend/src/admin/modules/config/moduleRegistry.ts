@@ -39,11 +39,6 @@ import Search from 'lucide-react/icons/search';
 import Brain from 'lucide-react/icons/brain';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import ShieldCheck from 'lucide-react/icons/shield-check';
-import Ticket from 'lucide-react/icons/ticket';
-import Crown from 'lucide-react/icons/crown';
-import Bot from 'lucide-react/icons/bot';
-import Plug from 'lucide-react/icons/plug';
-import ChartLine from 'lucide-react/icons/chart-line';
 import Mail from 'lucide-react/icons/mail';
 import Languages from 'lucide-react/icons/languages';
 
@@ -654,55 +649,6 @@ const FEATURE_MODULES: ModuleDefinition[] = [
     configOptions: [
       { key: 'identity_verification_fee_cents', label: 'Verification Fee (cents)', description: 'One-time fee charged for identity verification. Set to 0 for free verification. Value in cents (e.g. 500 = €5.00)', type: 'number', defaultValue: 500, category: 'Pricing', min: 0, max: 10000 },
     ],
-  },
-  {
-    id: 'merchant_coupons',
-    name: 'Merchant Coupons',
-    description: 'Discount coupons issued by marketplace merchants. Separate from closed-loop time-credit redemption. Requires Marketplace to be enabled.',
-    icon: Ticket,
-    type: 'feature',
-    configSource: 'tenant_features',
-    configOptions: [],
-  },
-  {
-    id: 'member_premium',
-    name: 'Member Premium',
-    description: 'Paid premium subscription tier for members with upgraded features and perks.',
-    icon: Crown,
-    type: 'feature',
-    configSource: 'tenant_features',
-    detailPageUrl: '/admin/member-premium',
-    configOptions: [],
-  },
-  {
-    id: 'ai_agents',
-    name: 'AI Agents',
-    description: 'Autonomous AI agents that can run jobs, propose actions, and assist with platform operations.',
-    icon: Bot,
-    type: 'feature',
-    configSource: 'tenant_features',
-    detailPageUrl: '/admin/agents',
-    configOptions: [],
-  },
-  {
-    id: 'partner_api',
-    name: 'Partner API',
-    description: 'Allow external partners to integrate with this tenant via the Partner API. Exposes the Integrations admin section.',
-    icon: Plug,
-    type: 'feature',
-    configSource: 'tenant_features',
-    detailPageUrl: '/admin/api-partners',
-    configOptions: [],
-  },
-  {
-    id: 'regional_analytics',
-    name: 'Regional Analytics',
-    description: 'Paid regional analytics product — monthly reports sold to municipalities and regional bodies. Super-admin managed.',
-    icon: ChartLine,
-    type: 'feature',
-    configSource: 'tenant_features',
-    detailPageUrl: '/admin/regional-analytics/subscriptions',
-    configOptions: [],
   },
   {
     id: 'newsletter',
