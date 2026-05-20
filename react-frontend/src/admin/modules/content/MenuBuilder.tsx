@@ -203,11 +203,16 @@ const getTypeOptions = (t: TFunction): { key: MenuItemType; label: string; descr
   { key: 'divider', label: t('menu_builder.type_divider_label'), description: t('menu_builder.type_divider_desc') },
 ];
 
+const getTypeLabel = (type: MenuItemType, t: TFunction): string => {
+  const option = getTypeOptions(t).find((item) => item.key === type);
+  return option?.label ?? type;
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Live Preview Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-function LivePreview({ items }: { items: MenuItemData[] }) {
+function LivePreview({ items, t }: { items: MenuItemData[]; t: TFunction }) {
   const topLevel = items.filter((i) => !i.parent_id && i.is_active);
 
   return (
@@ -215,16 +220,16 @@ function LivePreview({ items }: { items: MenuItemData[] }) {
       <CardHeader className="pb-2">
         <h3 className="text-sm font-semibold flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
           <Eye size={15} />
-          {"Live Preview"}
+          {t('menu_builder.live_preview')}
           <Chip size="sm" variant="flat" color="secondary" className="text-[10px]">
-            {"Preview"}
+            {t('menu_builder.preview')}
           </Chip>
         </h3>
       </CardHeader>
       <CardBody className="pt-0">
         <div className="flex items-center gap-1 min-h-[40px] px-3 py-2 rounded-lg bg-[var(--color-surface,#f9fafb)] dark:bg-default-800/50 flex-wrap border border-dashed border-default-200">
           {topLevel.length === 0 ? (
-            <p className="text-xs text-default-400">{"No data available"}</p>
+            <p className="text-xs text-default-400">{t('menu_builder.no_data')}</p>
           ) : (
             topLevel.map((item) => {
               const children = items.filter((i) => i.parent_id === item.id && i.is_active);
@@ -268,7 +273,7 @@ function LivePreview({ items }: { items: MenuItemData[] }) {
             })
           )}
         </div>
-        <p className="text-[10px] text-default-400 mt-1.5">{"Drag items to reorder"}</p>
+        <p className="text-[10px] text-default-400 mt-1.5">{t('menu_builder.drag_hint')}</p>
       </CardBody>
     </Card>
   );
@@ -283,10 +288,11 @@ interface SortableItemProps {
   isSelected: boolean;
   onSelect: () => void;
   onDelete: () => void;
+  t: TFunction;
   depth?: number;
 }
 
-function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: SortableItemProps) {
+function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: SortableItemProps) {
   const {
     attributes,
     listeners,
@@ -321,7 +327,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
         className="cursor-grab active:cursor-grabbing text-default-300 hover:text-default-500 p-0.5 min-w-0 h-auto shrink-0"
         {...attributes}
         {...listeners}
-        aria-label={"Drag to Reorder"}
+        aria-label={t('menu_builder.drag_to_reorder')}
         onClick={(e) => e.stopPropagation()}
       >
         <GripVertical size={16} />
@@ -333,7 +339,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
         <div className="flex items-center gap-1.5">
           <p className="text-sm font-medium truncate">{item.label}</p>
           <Chip size="sm" variant="flat" className="text-[10px] h-4 shrink-0">
-            {item.type}
+            {getTypeLabel(item.type, t)}
           </Chip>
           {!item.is_active && <EyeOff size={12} className="text-default-300 shrink-0" />}
         </div>
@@ -344,7 +350,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
 
       {item.children && item.children.length > 0 && (
         <Chip size="sm" variant="flat" color="secondary" className="text-[10px] shrink-0">
-          {`${item.children.length} sub-item(s)`}
+          {t('menu_builder.sub_items', { count: item.children.length })}
         </Chip>
       )}
 
@@ -353,7 +359,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
         size="sm"
         variant="light"
         onPress={onSelect}
-        aria-label={"Edit Item"}
+        aria-label={t('menu_builder.edit_item')}
         onClick={(e) => e.stopPropagation()}
       >
         <Pencil size={13} />
@@ -365,7 +371,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
         variant="light"
         color="danger"
         onPress={() => onDelete()}
-        aria-label={"Delete Item"}
+        aria-label={t('menu_builder.delete_item')}
         onClick={(e) => e.stopPropagation()}
       >
         <Trash2 size={13} />
@@ -375,14 +381,14 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
 }
 
 /** Static card used in DragOverlay — no DnD hooks */
-function DragItemCard({ item }: { item: MenuItemData }) {
+function DragItemCard({ item, t }: { item: MenuItemData; t: TFunction }) {
   return (
     <div className="flex items-center gap-2 rounded-lg border border-indigo-400 bg-indigo-50 dark:bg-indigo-950 p-2.5 shadow-lg opacity-90">
       <GripVertical size={16} className="text-indigo-400 shrink-0" />
       <DynamicIcon name={item.icon} className="w-4 h-4 text-indigo-500 shrink-0" />
       <p className="text-sm font-medium truncate text-indigo-700 dark:text-indigo-300">{item.label}</p>
       <Chip size="sm" variant="flat" color="secondary" className="text-[10px] h-4 shrink-0">
-        {item.type}
+        {getTypeLabel(item.type, t)}
       </Chip>
     </div>
   );
@@ -396,7 +402,7 @@ export function MenuBuilder() {
   const { id } = useParams<{ id: string }>();
   const isEdit = id !== undefined && id !== 'new';
   const { t } = useTranslation('admin');
-  usePageTitle("Content");
+  usePageTitle(t('menu_builder.menu_builder_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -473,11 +479,11 @@ export function MenuBuilder() {
         setMenuItems(flattenItems(items as MenuItemData[]));
       }
     } catch {
-      toast.error("Failed to load menu");
+      toast.error(t('menu_builder.failed_to_load_menu'));
     } finally {
       setLoading(false);
     }
-  }, [id, isEdit, flattenItems, toast]);
+  }, [id, isEdit, flattenItems, t, toast]);
 
 
   useEffect(() => { loadMenu(); }, [loadMenu]);
@@ -509,11 +515,11 @@ export function MenuBuilder() {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast.warning("Menu name is required");
+      toast.warning(t('menu_builder.menu_name_required'));
       return;
     }
     if (!formData.location) {
-      toast.warning("Menu location is required");
+      toast.warning(t('menu_builder.menu_location_required'));
       return;
     }
     setSaving(true);
@@ -526,9 +532,9 @@ export function MenuBuilder() {
           is_active: formData.is_active ? 1 : 0,
         });
         if (res?.success) {
-          toast.success("Menu Updated");
+          toast.success(t('menu_builder.menu_updated'));
         } else {
-          toast.error("Failed to update menu");
+          toast.error(t('menu_builder.failed_to_update_menu'));
         }
       } else {
         const res = await adminMenus.create({
@@ -553,15 +559,15 @@ export function MenuBuilder() {
               });
             }
           }
-          toast.success("Menu Created");
+          toast.success(t('menu_builder.menu_created'));
           navigate(tenantPath('/admin/menus'));
           return;
         } else {
-          toast.error("Failed to create menu");
+          toast.error(t('menu_builder.failed_to_create_menu'));
         }
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('menu_builder.unexpected_error'));
     } finally {
       setSaving(false);
     }
@@ -597,7 +603,7 @@ export function MenuBuilder() {
 
   const handleAddItem = async () => {
     const newItem: Partial<MenuItemData> = {
-      label: "New Item",
+      label: t('menu_builder.new_item_default'),
       url: '/',
       type: 'link',
       icon: null,
@@ -613,15 +619,15 @@ export function MenuBuilder() {
       try {
         const res = await adminMenus.createItem(Number(id), newItem);
         if (res?.success) {
-          toast.success("Item Added");
+          toast.success(t('menu_builder.item_added'));
           await loadMenu();
           const created = res.data as MenuItemData | undefined;
           if (created?.id) selectItem(created);
         } else {
-          toast.error("Failed to add item");
+          toast.error(t('menu_builder.failed_to_add_item'));
         }
       } catch {
-        toast.error("An unexpected error occurred");
+        toast.error(t('menu_builder.unexpected_error'));
       }
     } else {
       const localItem: MenuItemData = { ...newItem as MenuItemData, id: Date.now() };
@@ -641,13 +647,13 @@ export function MenuBuilder() {
         }
         const res = await adminMenus.updateItem(selectedItemId, payload);
         if (res?.success) {
-          toast.success("Item Updated");
+          toast.success(t('menu_builder.item_updated'));
           await loadMenu();
         } else {
-          toast.error("Failed to update item");
+          toast.error(t('menu_builder.failed_to_update_item'));
         }
       } catch {
-        toast.error("An unexpected error occurred");
+        toast.error(t('menu_builder.unexpected_error'));
       }
     } else {
       setMenuItems((prev) =>
@@ -655,7 +661,7 @@ export function MenuBuilder() {
           item.id === selectedItemId ? { ...item, ...editForm } as MenuItemData : item
         )
       );
-      toast.success("Item Updated");
+      toast.success(t('menu_builder.item_updated'));
     }
   };
 
@@ -664,14 +670,14 @@ export function MenuBuilder() {
       try {
         const res = await adminMenus.deleteItem(itemId);
         if (res?.success) {
-          toast.success("Item Deleted");
+          toast.success(t('menu_builder.item_deleted'));
           if (selectedItemId === itemId) clearSelection();
           await loadMenu();
         } else {
-          toast.error("Failed to delete item");
+          toast.error(t('menu_builder.failed_to_delete_item'));
         }
       } catch {
-        toast.error("An unexpected error occurred");
+        toast.error(t('menu_builder.unexpected_error'));
       }
     } else {
       setMenuItems((prev) => prev.filter((i) => i.id !== itemId));
@@ -739,7 +745,7 @@ export function MenuBuilder() {
           })),
         );
       } catch {
-        toast.error("Failed to save reorder");
+        toast.error(t('menu_builder.failed_to_save_reorder'));
         await loadMenu();
       }
     }
@@ -768,7 +774,7 @@ export function MenuBuilder() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={"Menu Builder"} description={"Build and manage custom navigation menus for your platform"} />
+        <PageHeader title={t('menu_builder.menu_builder_title')} description={t('menu_builder.menu_builder_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -777,8 +783,8 @@ export function MenuBuilder() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? "Edit Menu" : "Create Menu"}
-        description={"Build and manage custom navigation menus for your platform"}
+        title={isEdit ? t('menu_builder.edit_menu') : t('menu_builder.create_menu')}
+        description={t('menu_builder.menu_builder_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -787,14 +793,14 @@ export function MenuBuilder() {
               startContent={showPreview ? <EyeOff size={15} /> : <Eye size={15} />}
               onPress={() => setShowPreview((v) => !v)}
             >
-              {showPreview ? "Hide Preview" : "Live Preview"}
+              {showPreview ? t('menu_builder.hide_preview') : t('menu_builder.live_preview')}
             </Button>
             <Button
               variant="flat"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/menus'))}
             >
-              {"Back"}
+              {t('menu_builder.back')}
             </Button>
             <Button
               color="primary"
@@ -802,7 +808,7 @@ export function MenuBuilder() {
               onPress={handleSave}
               isLoading={saving}
             >
-              {isEdit ? "Save Changes" : "Create Menu"}
+              {isEdit ? t('menu_builder.save_changes') : t('menu_builder.create_menu')}
             </Button>
           </div>
         }
@@ -813,15 +819,15 @@ export function MenuBuilder() {
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
-              label={"Menu Name"}
-              placeholder={"Menu Item Text..."}
+              label={t('menu_builder.menu_name')}
+              placeholder={t('menu_builder.menu_item_text_placeholder')}
               isRequired
               variant="bordered"
               value={formData.name}
               onValueChange={(v) => handleChange('name', v)}
             />
             <Select
-              label={"Location"}
+              label={t('menu_builder.location')}
               isRequired
               variant="bordered"
               selectedKeys={formData.location ? [formData.location] : []}
@@ -836,8 +842,8 @@ export function MenuBuilder() {
             </Select>
             <div className="flex items-end gap-4">
               <Input
-                label={"Description"}
-                placeholder={"Optional..."}
+                label={t('menu_builder.description')}
+                placeholder={t('menu_builder.optional_placeholder')}
                 variant="bordered"
                 value={formData.description}
                 onValueChange={(v) => handleChange('description', v)}
@@ -848,7 +854,7 @@ export function MenuBuilder() {
                 onValueChange={(v) => handleChange('is_active', v)}
                 size="sm"
               >
-                <span className="text-sm">{"Active"}</span>
+                <span className="text-sm">{t('active')}</span>
               </Switch>
             </div>
           </div>
@@ -856,7 +862,7 @@ export function MenuBuilder() {
       </Card>
 
       {/* Live Preview */}
-      {showPreview && <LivePreview items={menuItems} />}
+      {showPreview && <LivePreview items={menuItems} t={t as TFunction} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         {/* Left: Item Tree */}
@@ -864,7 +870,7 @@ export function MenuBuilder() {
           <Card shadow="sm">
             <CardHeader className="flex items-center justify-between">
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Menu size={20} /> {"Menu Builder"}
+                <Menu size={20} /> {t('menu_builder.menu_builder_title')}
                 <Chip size="sm" variant="flat">{menuItems.length}</Chip>
               </h3>
               <Button
@@ -874,14 +880,14 @@ export function MenuBuilder() {
                 startContent={<Plus size={14} />}
                 onPress={handleAddItem}
               >
-                {"Add"}
+                {t('menu_builder.add')}
               </Button>
             </CardHeader>
             <CardBody>
               {menuItems.length === 0 ? (
                 <div className="flex flex-col items-center py-12 text-default-400 gap-3">
                   <Menu size={40} />
-                  <p className="text-sm">{"No data available"}</p>
+                  <p className="text-sm">{t('menu_builder.no_data')}</p>
                   <div className="flex gap-2 flex-wrap justify-center">
                     <Button
                       size="sm"
@@ -889,7 +895,7 @@ export function MenuBuilder() {
                       startContent={<Plus size={14} />}
                       onPress={handleAddItem}
                     >
-                      {"Add"}
+                      {t('menu_builder.add')}
                     </Button>
                     <Button
                       size="sm"
@@ -897,10 +903,10 @@ export function MenuBuilder() {
                       startContent={<Eye size={14} />}
                       onPress={() => setMenuItems(getDefaultItems(t as TFunction))}
                     >
-                      {"Load Defaults"}
+                      {t('menu_builder.load_defaults')}
                     </Button>
                   </div>
-                  <p className="text-[11px] text-default-400">{"Load the default menu structure as a starting point"}</p>
+                  <p className="text-[11px] text-default-400">{t('menu_builder.load_defaults_hint')}</p>
                 </div>
               ) : (
                 <>
@@ -922,17 +928,18 @@ export function MenuBuilder() {
                             isSelected={selectedItemId === item.id}
                             onSelect={() => selectItem(item)}
                             onDelete={() => setDeleteTarget(item.id)}
+                            t={t as TFunction}
                             depth={getItemDepth(item)}
                           />
                         ))}
                       </div>
                     </SortableContext>
                     <DragOverlay>
-                      {activeItem ? <DragItemCard item={activeItem} /> : null}
+                      {activeItem ? <DragItemCard item={activeItem} t={t as TFunction} /> : null}
                     </DragOverlay>
                   </DndContext>
                   <p className="text-[11px] text-default-400 mt-3 text-center">
-                    {"Drag items to reorder"}
+                    {t('menu_builder.drag_hint')}
                   </p>
                 </>
               )}
@@ -945,21 +952,21 @@ export function MenuBuilder() {
           <Card shadow="sm" className="sticky top-20">
             <CardHeader>
               <h3 className="text-lg font-semibold">
-                {selectedItemId ? "Edit Item" : "Menu Builder"}
+                {selectedItemId ? t('menu_builder.edit_item') : t('menu_builder.menu_builder_title')}
               </h3>
             </CardHeader>
             <CardBody className="gap-3">
               {!selectedItemId ? (
                 <div className="flex flex-col items-center py-8 text-default-400">
                   <Pencil size={32} className="mb-3" />
-                  <p className="text-sm">{"Build and manage custom navigation menus for your platform"}</p>
+                  <p className="text-sm">{t('menu_builder.menu_builder_desc')}</p>
                 </div>
               ) : (
                 <>
                   {/* Label */}
                   <Input
-                    label={"Label"}
-                    placeholder={"Menu Item Text..."}
+                    label={t('menu_builder.label')}
+                    placeholder={t('menu_builder.menu_item_text_placeholder')}
                     isRequired
                     variant="bordered"
                     size="sm"
@@ -969,7 +976,7 @@ export function MenuBuilder() {
 
                   {/* Type */}
                   <Select
-                    label={"Type"}
+                    label={t('menu_builder.type')}
                     variant="bordered"
                     size="sm"
                     selectedKeys={editForm.type ? [editForm.type] : ['link']}
@@ -998,7 +1005,7 @@ export function MenuBuilder() {
                   {/* URL field for link / external */}
                   {(editForm.type === 'link' || editForm.type === 'external' || !editForm.type) && (
                     <Input
-                      label={"URL"}
+                      label={t('menu_builder.url')}
                       placeholder={editForm.type === 'external' ? 'https://example.com' : '/dashboard'}
                       variant="bordered"
                       size="sm"
@@ -1010,7 +1017,7 @@ export function MenuBuilder() {
                   {/* Page picker */}
                   {editForm.type === 'page' && (
                     <Select
-                      label={"Select Page"}
+                      label={t('menu_builder.select_page')}
                       variant="bordered"
                       size="sm"
                       isLoading={!pagesLoaded}
@@ -1041,7 +1048,7 @@ export function MenuBuilder() {
                   {/* Route picker */}
                   {editForm.type === 'route' && (
                     <Select
-                      label={"Select Route"}
+                      label={t('menu_builder.select_route')}
                       variant="bordered"
                       size="sm"
                       selectedKeys={editForm.url ? [editForm.url] : []}
@@ -1079,7 +1086,7 @@ export function MenuBuilder() {
                   {/* Target */}
                   {editForm.type !== 'divider' && editForm.type !== 'dropdown' && (
                     <Select
-                      label={"Open in"}
+                      label={t('menu_builder.open_in')}
                       variant="bordered"
                       size="sm"
                       selectedKeys={[editForm.target || '_self']}
@@ -1088,15 +1095,15 @@ export function MenuBuilder() {
                         if (sel) setEditForm((f) => ({ ...f, target: sel }));
                       }}
                     >
-                      <SelectItem key="_self">{"Same Window"}</SelectItem>
-                      <SelectItem key="_blank">{"New Tab"}</SelectItem>
+                      <SelectItem key="_self">{t('menu_builder.same_window')}</SelectItem>
+                      <SelectItem key="_blank">{t('menu_builder.new_tab')}</SelectItem>
                     </Select>
                   )}
 
                   {/* Parent (nest under dropdown) */}
                   {editForm.type !== 'dropdown' && parentOptions.length > 0 && (
                     <Select
-                      label={"Parent Item"}
+                      label={t('menu_builder.parent_item')}
                       variant="bordered"
                       size="sm"
                       selectedKeys={editForm.parent_id ? [String(editForm.parent_id)] : ['']}
@@ -1106,7 +1113,7 @@ export function MenuBuilder() {
                       }}
                     >
                       {[
-                        { key: '', label: "None (top-level item)" },
+                        { key: '', label: t('menu_builder.no_parent') },
                         ...parentOptions,
                       ].map((opt) => (
                         <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -1122,7 +1129,7 @@ export function MenuBuilder() {
                   >
                     <span className="text-sm flex items-center gap-1.5">
                       {editForm.is_active ? <Eye size={14} /> : <EyeOff size={14} />}
-                      {editForm.is_active ? "Visible" : "Hidden"}
+                      {editForm.is_active ? t('menu_builder.visible') : t('menu_builder.hidden')}
                     </span>
                   </Switch>
 
@@ -1135,14 +1142,14 @@ export function MenuBuilder() {
                     onPress={() => setShowAdvanced(!showAdvanced)}
                   >
                     {showAdvanced ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                    {"Advanced Options"}
+                    {t('menu_builder.advanced_options')}
                   </Button>
 
                   {showAdvanced && (
                     <div className="space-y-3 pl-2 border-l-2 border-default-100">
                       <Input
-                        label={"CSS Class"}
-                        placeholder={"Enter css..."}
+                        label={t('menu_builder.css_class')}
+                        placeholder={t('menu_builder.placeholder_css')}
                         variant="bordered"
                         size="sm"
                         value={editForm.css_class || ''}
@@ -1164,14 +1171,14 @@ export function MenuBuilder() {
                       className="flex-1"
                       onPress={handleUpdateItem}
                     >
-                      {"Save Changes"}
+                      {t('menu_builder.save_changes')}
                     </Button>
                     <Button
                       variant="flat"
                       size="sm"
                       onPress={clearSelection}
                     >
-                      {"Cancel"}
+                      {t('menu_builder.cancel')}
                     </Button>
                   </div>
                 </>
@@ -1190,9 +1197,9 @@ export function MenuBuilder() {
             setDeleteTarget(null);
           }
         }}
-        title={"Delete Item"}
-        message={"Delete Item"}
-        confirmLabel={"Delete"}
+        title={t('menu_builder.delete_item')}
+        message={t('menu_builder.delete_item_message')}
+        confirmLabel={t('menu_builder.delete')}
         confirmColor="danger"
       />
     </div>
