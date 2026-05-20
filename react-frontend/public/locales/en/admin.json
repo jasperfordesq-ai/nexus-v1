@@ -2560,6 +2560,89 @@
       }
     }
   },
+  "regional_analytics_admin": {
+    "meta": {
+      "title": "Regional Analytics",
+      "description": "Manage paid analytics subscriptions for municipality and SME partners - bucketed, privacy-safe aggregates only."
+    },
+    "actions": {
+      "new_subscription": "New subscription",
+      "generate_report_now": "Generate report now",
+      "view_access_log": "View access log",
+      "suspend": "Suspend",
+      "resume": "Resume",
+      "close": "Close",
+      "cancel": "Cancel",
+      "create": "Create"
+    },
+    "tables": {
+      "subscriptions_aria": "Regional analytics subscriptions",
+      "partner": "Partner",
+      "type": "Type",
+      "plan": "Plan",
+      "status": "Status",
+      "period_end": "Period end",
+      "price_per_month": "Price / mo",
+      "modules": "Modules",
+      "actions": "Actions"
+    },
+    "partner_types": {
+      "municipality": "Municipality",
+      "sme_partner": "SME partner"
+    },
+    "plan_tiers": {
+      "basic": "Basic",
+      "pro": "Pro",
+      "enterprise": "Enterprise"
+    },
+    "statuses": {
+      "trialing": "Trialing",
+      "active": "Active",
+      "past_due": "Past due",
+      "cancelled": "Cancelled"
+    },
+    "modules": {
+      "trends": "Trends",
+      "demand_supply": "Demand and supply",
+      "demographics": "Demographics",
+      "footfall": "Footfall"
+    },
+    "empty": {
+      "subscriptions": "No subscriptions yet. Provision one to start selling regional analytics.",
+      "access_log": "No access events recorded yet.",
+      "value": "-"
+    },
+    "access_log": {
+      "title": "Access log - {{name}}",
+      "table_aria": "Access log",
+      "when": "When",
+      "endpoint": "Endpoint",
+      "ip_hashed": "IP (hashed)",
+      "user_agent": "User agent"
+    },
+    "create_modal": {
+      "title": "New regional analytics subscription",
+      "tenant_id": "Tenant ID",
+      "partner_name": "Partner name",
+      "partner_type": "Partner type",
+      "contact_email": "Contact email",
+      "billing_email": "Billing email",
+      "plan_tier": "Plan tier",
+      "monthly_price_cents": "Monthly price (cents)",
+      "currency": "Currency",
+      "enabled_modules": "Enabled modules"
+    },
+    "toasts": {
+      "load_failed": "Failed to load subscriptions",
+      "status_updated": "Subscription {{status}}",
+      "update_failed": "Update failed",
+      "report_queued": "Report generation queued",
+      "report_failed": "Failed to queue report",
+      "required_fields": "Tenant, partner name and contact email are required",
+      "created": "Subscription created",
+      "create_failed": "Create failed"
+    }
+  },
   "billing": {
     "actions": "Actions",
     "billing_interval": "Billing Interval",

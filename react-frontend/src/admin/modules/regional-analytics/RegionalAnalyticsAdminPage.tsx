@@ -10,10 +10,10 @@
  * subscriptions, suspend / resume them, trigger ad-hoc PDF reports, and
  * inspect the per-subscription access log.
  *
- * English-only by design — see project CLAUDE.md "ADMIN PANEL IS ENGLISH-ONLY".
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -99,7 +99,8 @@ const tierColor = (t: PlanTier): 'primary' | 'secondary' | 'warning' => {
 // ─── Component ────────────────────────────────────────────────────────────
 
 export default function RegionalAnalyticsAdminPage() {
-  usePageTitle('Regional Analytics');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('regional_analytics_admin.meta.title'));
   const toast = useToast();
 
   const [subs, setSubs] = useState<Subscription[]>([]);
@@ -115,11 +116,11 @@ export default function RegionalAnalyticsAdminPage() {
       const res = await api.get<{ subscriptions: Subscription[] }>('/super-admin/regional-analytics/subscriptions');
       setSubs(res.data?.subscriptions ?? []);
     } catch {
-      toast.error('Failed to load subscriptions');
+      toast.error(t('regional_analytics_admin.toasts.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     void load();
@@ -128,19 +129,19 @@ export default function RegionalAnalyticsAdminPage() {
   const updateStatus = async (id: number, status: SubStatus) => {
     try {
       await api.put(`/super-admin/regional-analytics/subscriptions/${id}`, { status });
-      toast.success(`Subscription ${status}`);
+      toast.success(t('regional_analytics_admin.toasts.status_updated', { status: t(`regional_analytics_admin.statuses.${status}`) }));
       void load();
     } catch {
-      toast.error('Update failed');
+      toast.error(t('regional_analytics_admin.toasts.update_failed'));
     }
   };
 
   const generateReport = async (id: number) => {
     try {
       await api.post(`/super-admin/regional-analytics/subscriptions/${id}/generate-report`);
-      toast.success('Report generation queued');
+      toast.success(t('regional_analytics_admin.toasts.report_queued'));
     } catch {
-      toast.error('Failed to queue report');
+      toast.error(t('regional_analytics_admin.toasts.report_failed'));
     }
   };
 
@@ -163,11 +164,11 @@ export default function RegionalAnalyticsAdminPage() {
   return (
     <div className="p-6">
       <PageHeader
-        title="Regional Analytics"
-        description="Manage paid analytics subscriptions for municipality and SME partners — bucketed, privacy-safe aggregates only."
+        title={t('regional_analytics_admin.meta.title')}
+        description={t('regional_analytics_admin.meta.description')}
         actions={
           <Button color="primary" startContent={<Plus size={16} />} onPress={() => setCreateOpen(true)}>
-            New subscription
+            {t('regional_analytics_admin.actions.new_subscription')}
           </Button>
         }
       />
@@ -180,19 +181,19 @@ export default function RegionalAnalyticsAdminPage() {
             </div>
           ) : subs.length === 0 ? (
             <div className="p-10 text-center text-[var(--color-text-muted)]">
-              No subscriptions yet. Provision one to start selling regional analytics.
+              {t('regional_analytics_admin.empty.subscriptions')}
             </div>
           ) : (
-            <Table aria-label="Regional analytics subscriptions" removeWrapper>
+            <Table aria-label={t('regional_analytics_admin.tables.subscriptions_aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>Partner</TableColumn>
-                <TableColumn>Type</TableColumn>
-                <TableColumn>Plan</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Period end</TableColumn>
-                <TableColumn>Price / mo</TableColumn>
-                <TableColumn>Modules</TableColumn>
-                <TableColumn>Actions</TableColumn>
+                <TableColumn>{t('regional_analytics_admin.tables.partner')}</TableColumn>
+                <TableColumn>{t('regional_analytics_admin.tables.type')}</TableColumn>
+                <TableColumn>{t('regional_analytics_admin.tables.plan')}</TableColumn>
+                <TableColumn>{t('regional_analytics_admin.tables.status')}</TableColumn>
+                <TableColumn>{t('regional_analytics_admin.tables.period_end')}</TableColumn>
+                <TableColumn>{t('regional_analytics_admin.tables.price_per_month')}</TableColumn>
+                <TableColumn>{t('regional_analytics_admin.tables.modules')}</TableColumn>
+                <TableColumn>{t('regional_analytics_admin.tables.actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {subs.map((s) => (
@@ -203,27 +204,28 @@ export default function RegionalAnalyticsAdminPage() {
                     </TableCell>
                     <TableCell>
                       <Chip size="sm" variant="flat">
-                        {s.partner_type === 'municipality' ? 'Municipality' : 'SME'}
+                        {t(`regional_analytics_admin.partner_types.${s.partner_type}`)}
                       </Chip>
                     </TableCell>
                     <TableCell>
                       <Chip size="sm" color={tierColor(s.plan_tier)} variant="flat">
-                        {s.plan_tier}
+                        {t(`regional_analytics_admin.plan_tiers.${s.plan_tier}`)}
                       </Chip>
                     </TableCell>
                     <TableCell>
                       <Chip size="sm" color={statusColor(s.status)} variant="flat">
-                        {s.status}
+                        {t(`regional_analytics_admin.statuses.${s.status}`)}
                       </Chip>
                     </TableCell>
                     <TableCell className="text-xs">
-                      {s.current_period_end ? s.current_period_end.slice(0, 10) : '—'}
+                      {s.current_period_end ? s.current_period_end.slice(0, 10) : t('regional_analytics_admin.empty.value')}
                     </TableCell>
                     <TableCell>
                       {(s.monthly_price_cents / 100).toFixed(2)} {s.currency}
                     </TableCell>
                     <TableCell className="text-xs">
-                      {(s.enabled_modules ?? []).join(', ') || '—'}
+                      {(s.enabled_modules ?? []).map((module) => t(`regional_analytics_admin.modules.${module}`)).join(', ') ||
+                        t('regional_analytics_admin.empty.value')}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">
@@ -231,7 +233,7 @@ export default function RegionalAnalyticsAdminPage() {
                           size="sm"
                           variant="light"
                           isIconOnly
-                          aria-label="Generate report now"
+                          aria-label={t('regional_analytics_admin.actions.generate_report_now')}
                           onPress={() => generateReport(s.id)}
                         >
                           <Download size={16} />
@@ -240,7 +242,7 @@ export default function RegionalAnalyticsAdminPage() {
                           size="sm"
                           variant="light"
                           isIconOnly
-                          aria-label="View access log"
+                          aria-label={t('regional_analytics_admin.actions.view_access_log')}
                           onPress={() => openLog(s)}
                         >
                           <Eye size={16} />
@@ -250,7 +252,7 @@ export default function RegionalAnalyticsAdminPage() {
                             size="sm"
                             variant="light"
                             isIconOnly
-                            aria-label="Suspend"
+                            aria-label={t('regional_analytics_admin.actions.suspend')}
                             onPress={() => updateStatus(s.id, 'past_due')}
                           >
                             <Pause size={16} />
@@ -260,7 +262,7 @@ export default function RegionalAnalyticsAdminPage() {
                             size="sm"
                             variant="light"
                             isIconOnly
-                            aria-label="Resume"
+                            aria-label={t('regional_analytics_admin.actions.resume')}
                             onPress={() => updateStatus(s.id, 'active')}
                           >
                             <Play size={16} />
@@ -288,7 +290,7 @@ export default function RegionalAnalyticsAdminPage() {
       <Modal isOpen={logSub !== null} onClose={() => setLogSub(null)} size="3xl">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <BarChart3 size={18} /> Access log — {logSub?.partner_name}
+            <BarChart3 size={18} /> {t('regional_analytics_admin.access_log.title', { name: logSub?.partner_name })}
           </ModalHeader>
           <ModalBody>
             {logLoading ? (
@@ -297,15 +299,15 @@ export default function RegionalAnalyticsAdminPage() {
               </div>
             ) : log.length === 0 ? (
               <div className="p-6 text-center text-[var(--color-text-muted)]">
-                No access events recorded yet.
+                {t('regional_analytics_admin.empty.access_log')}
               </div>
             ) : (
-              <Table aria-label="Access log" removeWrapper>
+              <Table aria-label={t('regional_analytics_admin.access_log.table_aria')} removeWrapper>
                 <TableHeader>
-                  <TableColumn>When</TableColumn>
-                  <TableColumn>Endpoint</TableColumn>
-                  <TableColumn>IP (hashed)</TableColumn>
-                  <TableColumn>User agent</TableColumn>
+                  <TableColumn>{t('regional_analytics_admin.access_log.when')}</TableColumn>
+                  <TableColumn>{t('regional_analytics_admin.access_log.endpoint')}</TableColumn>
+                  <TableColumn>{t('regional_analytics_admin.access_log.ip_hashed')}</TableColumn>
+                  <TableColumn>{t('regional_analytics_admin.access_log.user_agent')}</TableColumn>
                 </TableHeader>
                 <TableBody>
                   {log.map((e) => (
@@ -313,9 +315,9 @@ export default function RegionalAnalyticsAdminPage() {
                       <TableCell className="text-xs">{e.accessed_at}</TableCell>
                       <TableCell className="font-mono text-xs">{e.accessed_endpoint}</TableCell>
                       <TableCell className="font-mono text-xs">
-                        {e.ip_hash ? e.ip_hash.slice(0, 12) + '…' : '—'}
+                        {e.ip_hash ? `${e.ip_hash.slice(0, 12)}...` : t('regional_analytics_admin.empty.value')}
                       </TableCell>
-                      <TableCell className="text-xs">{e.user_agent ?? '—'}</TableCell>
+                      <TableCell className="text-xs">{e.user_agent ?? t('regional_analytics_admin.empty.value')}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -324,7 +326,7 @@ export default function RegionalAnalyticsAdminPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={() => setLogSub(null)}>
-              Close
+              {t('regional_analytics_admin.actions.close')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -344,6 +346,7 @@ function CreateSubscriptionModal({
   onClose: () => void;
   onCreated: () => void;
 }) {
+  const { t } = useTranslation('admin');
   const toast = useToast();
   const [tenantId, setTenantId] = useState('');
   const [partnerName, setPartnerName] = useState('');
@@ -370,7 +373,7 @@ function CreateSubscriptionModal({
 
   const submit = async () => {
     if (!tenantId.trim() || !partnerName.trim() || !contactEmail.trim()) {
-      toast.error('Tenant, partner name and contact email are required');
+      toast.error(t('regional_analytics_admin.toasts.required_fields'));
       return;
     }
     setSubmitting(true);
@@ -386,11 +389,11 @@ function CreateSubscriptionModal({
         currency: currency.toUpperCase().slice(0, 3),
         enabled_modules: modules,
       });
-      toast.success('Subscription created');
+      toast.success(t('regional_analytics_admin.toasts.created'));
       reset();
       onCreated();
     } catch {
-      toast.error('Create failed');
+      toast.error(t('regional_analytics_admin.toasts.create_failed'));
     } finally {
       setSubmitting(false);
     }
@@ -402,59 +405,87 @@ function CreateSubscriptionModal({
 
   const moduleLabel = useMemo<Record<Module, string>>(
     () => ({
-      trends: 'Trends',
-      demand_supply: 'Demand & Supply',
-      demographics: 'Demographics',
-      footfall: 'Footfall',
+      trends: t('regional_analytics_admin.modules.trends'),
+      demand_supply: t('regional_analytics_admin.modules.demand_supply'),
+      demographics: t('regional_analytics_admin.modules.demographics'),
+      footfall: t('regional_analytics_admin.modules.footfall'),
     }),
-    [],
+    [t],
   );
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl">
       <ModalContent>
-        <ModalHeader>New regional analytics subscription</ModalHeader>
+        <ModalHeader>{t('regional_analytics_admin.create_modal.title')}</ModalHeader>
         <ModalBody>
           <div className="space-y-4">
-            <Input label="Tenant ID" value={tenantId} onValueChange={setTenantId} type="number" isRequired />
-            <Input label="Partner name" value={partnerName} onValueChange={setPartnerName} isRequired />
+            <Input
+              label={t('regional_analytics_admin.create_modal.tenant_id')}
+              value={tenantId}
+              onValueChange={setTenantId}
+              type="number"
+              isRequired
+            />
+            <Input
+              label={t('regional_analytics_admin.create_modal.partner_name')}
+              value={partnerName}
+              onValueChange={setPartnerName}
+              isRequired
+            />
             <Select
-              label="Partner type"
+              label={t('regional_analytics_admin.create_modal.partner_type')}
               selectedKeys={new Set([partnerType])}
               onSelectionChange={(keys) => {
                 const v = Array.from(keys as Set<string>)[0] as PartnerType | undefined;
                 if (v) setPartnerType(v);
               }}
             >
-              <SelectItem key="municipality">Municipality</SelectItem>
-              <SelectItem key="sme_partner">SME partner</SelectItem>
+              <SelectItem key="municipality">{t('regional_analytics_admin.partner_types.municipality')}</SelectItem>
+              <SelectItem key="sme_partner">{t('regional_analytics_admin.partner_types.sme_partner')}</SelectItem>
             </Select>
-            <Input label="Contact email" type="email" value={contactEmail} onValueChange={setContactEmail} isRequired />
-            <Input label="Billing email" type="email" value={billingEmail} onValueChange={setBillingEmail} />
+            <Input
+              label={t('regional_analytics_admin.create_modal.contact_email')}
+              type="email"
+              value={contactEmail}
+              onValueChange={setContactEmail}
+              isRequired
+            />
+            <Input
+              label={t('regional_analytics_admin.create_modal.billing_email')}
+              type="email"
+              value={billingEmail}
+              onValueChange={setBillingEmail}
+            />
             <Select
-              label="Plan tier"
+              label={t('regional_analytics_admin.create_modal.plan_tier')}
               selectedKeys={new Set([planTier])}
               onSelectionChange={(keys) => {
                 const v = Array.from(keys as Set<string>)[0] as PlanTier | undefined;
                 if (v) setPlanTier(v);
               }}
             >
-              <SelectItem key="basic">Basic</SelectItem>
-              <SelectItem key="pro">Pro</SelectItem>
-              <SelectItem key="enterprise">Enterprise</SelectItem>
+              <SelectItem key="basic">{t('regional_analytics_admin.plan_tiers.basic')}</SelectItem>
+              <SelectItem key="pro">{t('regional_analytics_admin.plan_tiers.pro')}</SelectItem>
+              <SelectItem key="enterprise">{t('regional_analytics_admin.plan_tiers.enterprise')}</SelectItem>
             </Select>
             <div className="flex gap-3">
               <Input
-                label="Monthly price (cents)"
+                label={t('regional_analytics_admin.create_modal.monthly_price_cents')}
                 value={priceCents}
                 onValueChange={setPriceCents}
                 type="number"
                 className="flex-1"
               />
-              <Input label="Currency" value={currency} onValueChange={setCurrency} className="w-32" maxLength={3} />
+              <Input
+                label={t('regional_analytics_admin.create_modal.currency')}
+                value={currency}
+                onValueChange={setCurrency}
+                className="w-32"
+                maxLength={3}
+              />
             </div>
             <div>
-              <label className="text-sm font-medium block mb-2">Enabled modules</label>
+              <label className="text-sm font-medium block mb-2">{t('regional_analytics_admin.create_modal.enabled_modules')}</label>
               <div className="flex flex-wrap gap-2">
                 {ALL_MODULES.map((m) => (
                   <Chip
@@ -473,10 +504,10 @@ function CreateSubscriptionModal({
         </ModalBody>
         <ModalFooter>
           <Button variant="light" onPress={onClose} isDisabled={submitting}>
-            Cancel
+            {t('regional_analytics_admin.actions.cancel')}
           </Button>
           <Button color="primary" onPress={submit} isLoading={submitting}>
-            Create
+            {t('regional_analytics_admin.actions.create')}
           </Button>
         </ModalFooter>
       </ModalContent>
