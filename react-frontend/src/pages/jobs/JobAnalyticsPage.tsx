@@ -15,7 +15,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Button, Chip, Spinner } from '@heroui/react';
+import { Button, Chip, Progress, Spinner, Tooltip } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Eye from 'lucide-react/icons/eye';
 import Users from 'lucide-react/icons/users';
@@ -94,6 +94,59 @@ const STAGE_COLORS: Record<string, string> = {
   pending: 'bg-warning/20 text-warning',
 };
 
+const APPLICATION_STATUSES = [
+  'applied',
+  'pending',
+  'screening',
+  'reviewed',
+  'interview',
+  'offer',
+  'accepted',
+  'rejected',
+  'withdrawn',
+] as const;
+
+const STAGE_PROGRESS_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'default'> = {
+  applied: 'warning',
+  pending: 'warning',
+  screening: 'primary',
+  reviewed: 'primary',
+  interview: 'secondary',
+  offer: 'success',
+  accepted: 'success',
+  rejected: 'danger',
+  withdrawn: 'default',
+};
+
+const BAR_HEIGHT_CLASSES = [
+  'h-1',
+  'h-2',
+  'h-4',
+  'h-6',
+  'h-8',
+  'h-10',
+  'h-12',
+  'h-16',
+  'h-20',
+  'h-24',
+  'h-28',
+  'h-32',
+  'h-36',
+  'h-40',
+];
+
+function getApplicationStatusKey(stage: string) {
+  return APPLICATION_STATUSES.includes(stage as (typeof APPLICATION_STATUSES)[number])
+    ? `application_status.${stage}`
+    : 'application_status.unknown';
+}
+
+function getBarHeightClass(value: number, max: number) {
+  const ratio = max > 0 ? value / max : 0;
+  const index = Math.max(0, Math.min(BAR_HEIGHT_CLASSES.length - 1, Math.ceil(ratio * (BAR_HEIGHT_CLASSES.length - 1))));
+  return BAR_HEIGHT_CLASSES[index];
+}
+
 export function JobAnalyticsPage() {
   const { t } = useTranslation('jobs');
   const { id } = useParams<{ id: string }>();
@@ -126,12 +179,12 @@ export function JobAnalyticsPage() {
       if (response.success && response.data) {
         setAnalytics(response.data);
       } else {
-        setError(response.error || tRef.current('analytics.load_error', 'Failed to load analytics'));
+        setError(response.error || tRef.current('analytics.load_error'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load job analytics', err);
-      setError(tRef.current('analytics.load_error', 'Failed to load analytics'));
+      setError(tRef.current('analytics.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -182,7 +235,7 @@ export function JobAnalyticsPage() {
               </Button>
             </Link>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              color="primary"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={loadAnalytics}
             >
@@ -224,7 +277,7 @@ export function JobAnalyticsPage() {
           startContent={<Download className="w-4 h-4" aria-hidden="true" />}
           onPress={handleExportCsv}
         >
-          {t('analytics.export_csv', 'Export CSV')}
+          {t('analytics.export_csv')}
         </Button>
       </div>
 
@@ -257,24 +310,24 @@ export function JobAnalyticsPage() {
         <div className="flex flex-wrap gap-3">
           {analytics.referral_stats && (
             <>
-              <GlassCard className="p-4 flex items-center gap-3">
+              <GlassCard className="flex min-w-[12rem] flex-1 items-center gap-3 p-4 sm:flex-none">
                 <Share2 className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
-                <div>
-                  <p className="text-xs text-theme-subtle">{t('analytics.referral_shares', 'Total Shares')}</p>
+                <div className="min-w-0">
+                  <p className="text-xs text-theme-subtle">{t('analytics.referral_shares')}</p>
                   <p className="text-lg font-bold text-theme-primary">{analytics.referral_stats.total_shares.toLocaleString()}</p>
                 </div>
               </GlassCard>
-              <GlassCard className="p-4 flex items-center gap-3">
+              <GlassCard className="flex min-w-[12rem] flex-1 items-center gap-3 p-4 sm:flex-none">
                 <Users className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
-                <div>
-                  <p className="text-xs text-theme-subtle">{t('analytics.referral_apps', 'Referral Applications')}</p>
+                <div className="min-w-0">
+                  <p className="text-xs text-theme-subtle">{t('analytics.referral_apps')}</p>
                   <p className="text-lg font-bold text-theme-primary">{analytics.referral_stats.referral_applications.toLocaleString()}</p>
                 </div>
               </GlassCard>
-              <GlassCard className="p-4 flex items-center gap-3">
+              <GlassCard className="flex min-w-[12rem] flex-1 items-center gap-3 p-4 sm:flex-none">
                 <TrendingUp className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
-                <div>
-                  <p className="text-xs text-theme-subtle">{t('analytics.referral_conversion', 'Referral Conversion')}</p>
+                <div className="min-w-0">
+                  <p className="text-xs text-theme-subtle">{t('analytics.referral_conversion')}</p>
                   <p className="text-lg font-bold text-theme-primary">{analytics.referral_stats.referral_conversion_pct}%</p>
                 </div>
               </GlassCard>
@@ -284,7 +337,7 @@ export function JobAnalyticsPage() {
             <GlassCard className="p-4 flex items-center gap-3">
               <Star className={`w-4 h-4 ${analytics.scorecard_avg >= 60 ? 'text-success' : 'text-warning'}`} aria-hidden="true" />
               <div>
-                <p className="text-xs text-theme-subtle">{t('analytics.scorecard_avg', 'Avg Scorecard')}</p>
+                <p className="text-xs text-theme-subtle">{t('analytics.scorecard_avg')}</p>
                 <p className={`text-lg font-bold ${analytics.scorecard_avg >= 60 ? 'text-success' : 'text-warning'}`}>
                   {analytics.scorecard_avg}%
                 </p>
@@ -330,20 +383,18 @@ export function JobAnalyticsPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-4">
             {t('analytics.views_over_time')}
           </h2>
-          <div className="flex items-end gap-1 h-40">
+          <div className="flex h-48 items-end gap-1 overflow-x-auto pb-8">
             {analytics.views_by_day.map((day) => {
-              const height = (Number(day.count) / maxViews) * 100;
+              const count = Number(day.count);
               return (
                 <div
                   key={day.date}
-                  className="flex-1 flex flex-col items-center gap-1"
+                  className="flex min-w-6 flex-1 flex-col items-center gap-1"
                 >
-                  <span className="text-[10px] text-theme-subtle">{Number(day.count)}</span>
-                  <div
-                    className="w-full bg-gradient-to-t from-indigo-500 to-purple-400 rounded-t min-h-[2px]"
-                    style={{ height: `${Math.max(height, 2)}%` }}
-                    title={`${day.date}: ${day.count} views`}
-                  />
+                  <span className="text-[10px] text-theme-subtle">{count}</span>
+                  <Tooltip content={t('analytics.views_tooltip', { date: day.date, count })}>
+                    <div className={`w-full rounded-t bg-primary ${getBarHeightClass(count, maxViews)}`} />
+                  </Tooltip>
                   <span className="text-[9px] text-theme-subtle rotate-[-45deg] origin-top-left whitespace-nowrap">
                     {new Date(day.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                   </span>
@@ -358,25 +409,23 @@ export function JobAnalyticsPage() {
       {analytics.weekly_trend && analytics.weekly_trend.length > 0 && (
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-4">
-            {t('analytics.weekly_trend', 'Weekly Applications (last 8 weeks)')}
+            {t('analytics.weekly_trend')}
           </h2>
           {(() => {
             const maxWeeklyCount = Math.max(...analytics.weekly_trend.map((w) => Number(w.count)), 1);
             return (
-              <div className="flex items-end gap-1 h-40">
+              <div className="flex h-48 items-end gap-1 overflow-x-auto pb-8">
                 {analytics.weekly_trend.map((week) => {
-                  const height = (Number(week.count) / maxWeeklyCount) * 100;
+                  const count = Number(week.count);
                   return (
                     <div
                       key={week.week}
-                      className="flex-1 flex flex-col items-center gap-1"
+                      className="flex min-w-10 flex-1 flex-col items-center gap-1"
                     >
-                      <span className="text-[10px] text-theme-subtle">{Number(week.count)}</span>
-                      <div
-                        className="w-full bg-gradient-to-t from-purple-500 to-indigo-400 rounded-t min-h-[2px]"
-                        style={{ height: `${Math.max(height, 2)}%` }}
-                        title={`${week.week}: ${week.count} applications`}
-                      />
+                      <span className="text-[10px] text-theme-subtle">{count}</span>
+                      <Tooltip content={t('analytics.applications_tooltip', { week: week.week, count })}>
+                        <div className={`w-full rounded-t bg-secondary ${getBarHeightClass(count, maxWeeklyCount)}`} />
+                      </Tooltip>
                       <span className="text-[9px] text-theme-subtle rotate-[-45deg] origin-top-left whitespace-nowrap">
                         {week.week}
                       </span>
@@ -402,16 +451,20 @@ export function JobAnalyticsPage() {
               return (
                 <div key={item.stage} className="flex items-center gap-3">
                   <div className="w-28 text-sm text-theme-muted">
-                    {t(`application_status.${item.stage}`, { defaultValue: item.stage })}
+                    {t(getApplicationStatusKey(item.stage))}
                   </div>
-                  <div className="flex-1 h-6 bg-theme-hover rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${STAGE_COLORS[item.stage] ?? 'bg-primary/20'} flex items-center px-2`}
-                      style={{ width: `${Math.max(pct, 5)}%` }}
-                    >
-                      <span className="text-xs font-medium">{item.count}</span>
-                    </div>
+                  <div className="flex-1">
+                    <Progress
+                      aria-label={t('analytics.stage_progress_aria', { stage: t(getApplicationStatusKey(item.stage)) })}
+                      color={STAGE_PROGRESS_COLORS[item.stage] ?? 'primary'}
+                      value={pct}
+                      size="sm"
+                      className="min-w-24"
+                    />
                   </div>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STAGE_COLORS[item.stage] ?? 'bg-primary/20 text-primary'}`}>
+                    {item.count}
+                  </span>
                   <span className="text-xs text-theme-subtle w-12 text-right">{pct}%</span>
                 </div>
               );
@@ -425,11 +478,11 @@ export function JobAnalyticsPage() {
         <div className="flex items-center gap-2 mb-4">
           <Sparkles size={20} className="text-secondary" />
           <h2 className="text-lg font-semibold text-theme-primary">
-            {t('analytics.predictions', { defaultValue: 'AI Predictions' })}
+            {t('analytics.predictions')}
           </h2>
           {predictions && (
             <Chip size="sm" variant="flat" color="default">
-              {t('analytics.based_on', { defaultValue: 'Based on {{count}} similar jobs', count: predictions.similar_jobs_analyzed })}
+              {t('analytics.based_on', { count: predictions.similar_jobs_analyzed })}
             </Chip>
           )}
         </div>
@@ -437,16 +490,16 @@ export function JobAnalyticsPage() {
         {predictionsLoading ? (
           <div className="flex justify-center py-8"><Spinner size="lg" /></div>
         ) : !predictions ? (
-          <p className="text-center text-default-400 py-6">{t('analytics.no_predictions', { defaultValue: 'Insufficient data for predictions.' })}</p>
+          <p className="text-center text-default-400 py-6">{t('analytics.no_predictions')}</p>
         ) : (
           <div className="space-y-4">
             {/* Prediction cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="p-4 rounded-lg bg-default-50 border border-default-200">
-                <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.expected_apps', { defaultValue: 'Expected Applications' })}</p>
+                <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.expected_apps')}</p>
                 <p className="text-2xl font-bold text-foreground mt-1">{predictions.expected_applications.value}</p>
                 <p className="text-xs mt-1">
-                  <span className="text-default-400">{t('analytics.current', { defaultValue: 'Current' })}: {predictions.expected_applications.current}</span>
+                  <span className="text-default-400">{t('analytics.current')}: {predictions.expected_applications.current}</span>
                   {' · '}
                   <Chip size="sm" variant="flat" color={predictions.expected_applications.current >= predictions.expected_applications.value ? 'success' : 'warning'}>
                     {predictions.expected_applications.label}
@@ -455,16 +508,20 @@ export function JobAnalyticsPage() {
               </div>
 
               <div className="p-4 rounded-lg bg-default-50 border border-default-200">
-                <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.time_to_fill', { defaultValue: 'Est. Time to Fill' })}</p>
-                <p className="text-2xl font-bold text-foreground mt-1">{predictions.estimated_time_to_fill.value ? `${predictions.estimated_time_to_fill.value}d` : 'N/A'}</p>
-                <p className="text-xs text-default-400 mt-1">{t('analytics.posted_days_ago', { defaultValue: 'Posted {{days}} days ago', days: predictions.estimated_time_to_fill.days_posted })}</p>
+                <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.time_to_fill')}</p>
+                <p className="text-2xl font-bold text-foreground mt-1">
+                  {predictions.estimated_time_to_fill.value
+                    ? t('analytics.days_short_value', { count: predictions.estimated_time_to_fill.value })
+                    : t('analytics.not_available')}
+                </p>
+                <p className="text-xs text-default-400 mt-1">{t('analytics.posted_days_ago', { days: predictions.estimated_time_to_fill.days_posted })}</p>
               </div>
 
               <div className="p-4 rounded-lg bg-default-50 border border-default-200">
-                <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.conversion_comparison', { defaultValue: 'Conversion Rate' })}</p>
+                <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.conversion_comparison')}</p>
                 <p className="text-2xl font-bold text-foreground mt-1">{predictions.conversion_rate.yours}%</p>
                 <p className="text-xs mt-1">
-                  <span className="text-default-400">{t('analytics.avg', { defaultValue: 'Avg' })}: {predictions.conversion_rate.average}%</span>
+                  <span className="text-default-400">{t('analytics.avg')}: {predictions.conversion_rate.average}%</span>
                   {' · '}
                   <Chip size="sm" variant="flat" color={predictions.conversion_rate.yours >= predictions.conversion_rate.average ? 'success' : 'warning'}>
                     {predictions.conversion_rate.label}
@@ -476,15 +533,15 @@ export function JobAnalyticsPage() {
             {/* Salary comparison */}
             {predictions.salary_comparison && (
               <div className="p-4 rounded-lg bg-default-50 border border-default-200">
-                <p className="text-xs text-default-500 uppercase tracking-wide mb-2">{t('analytics.salary_comparison', { defaultValue: 'Salary vs Market' })}</p>
+                <p className="text-xs text-default-500 uppercase tracking-wide mb-2">{t('analytics.salary_comparison')}</p>
                 <div className="flex items-center gap-4">
                   <div>
-                    <p className="text-sm text-default-500">{t('analytics.yours', { defaultValue: 'Yours' })}</p>
+                    <p className="text-sm text-default-500">{t('analytics.yours')}</p>
                     <p className="text-lg font-bold">{predictions.salary_comparison.your_salary.toLocaleString()}</p>
                   </div>
-                  <div className="text-default-300">{t('analytics.versus', { defaultValue: 'vs' })}</div>
+                  <div className="text-default-300">{t('analytics.versus')}</div>
                   <div>
-                    <p className="text-sm text-default-500">{t('analytics.market_avg', { defaultValue: 'Market Avg' })}</p>
+                    <p className="text-sm text-default-500">{t('analytics.market_avg')}</p>
                     <p className="text-lg font-bold">{predictions.salary_comparison.market_avg.toLocaleString()}</p>
                   </div>
                   <Chip size="sm" variant="flat" color={predictions.salary_comparison.diff_percent >= 0 ? 'success' : 'danger'}>
@@ -499,7 +556,7 @@ export function JobAnalyticsPage() {
               <div className="p-4 rounded-lg bg-secondary/5 border border-secondary/20">
                 <div className="flex items-center gap-2 mb-3">
                   <Sparkles size={16} className="text-secondary" />
-                  <p className="text-sm font-semibold text-secondary">{t('analytics.ai_insights', { defaultValue: 'AI Insights' })}</p>
+                  <p className="text-sm font-semibold text-secondary">{t('analytics.ai_insights')}</p>
                 </div>
                 <ul className="space-y-2">
                   {predictions.ai_insights.map((insight, i) => (
