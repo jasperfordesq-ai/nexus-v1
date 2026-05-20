@@ -62,6 +62,12 @@ interface StartVerificationResult {
 
 type PageState = 'loading' | 'start' | 'in_progress' | 'passed' | 'failed' | 'active' | 'error';
 
+const MAX_POLL_MS = 10 * 60 * 1000;
+
+// Exponential backoff: 5s, 7.5s, 11s, 17s, 25s, capped at 30s.
+const nextPollDelayMs = (attempt: number) =>
+  Math.min(30_000, Math.round(5_000 * Math.pow(1.5, attempt)));
+
 export function VerifyIdentityPage() {
   const { t } = useTranslation('auth');
   usePageTitle(t('page_meta.verify_identity.title'));
@@ -78,14 +84,17 @@ export function VerifyIdentityPage() {
   const pollStartRef = useRef<number>(Date.now());
   const pollAttemptRef = useRef<number>(0);
 
-  const MAX_POLL_MS = 10 * 60 * 1000;
-  // Exponential backoff: 5s, 7.5s, 11s, 17s, 25s, capped at 30s.
-  const nextPollDelayMs = (attempt: number) =>
-    Math.min(30_000, Math.round(5_000 * Math.pow(1.5, attempt)));
-
   // Stable refs for t — avoids re-creating callbacks when i18n namespace loads
   const tRef = useRef(t);
   tRef.current = t;
+
+  const pageMeta = (
+    <PageMeta
+      title={t('page_meta.verify_identity.title')}
+      description={t('page_meta.verify_identity.description')}
+      noIndex
+    />
+  );
 
   const stopPolling = useCallback(() => {
     if (pollRef.current) {
@@ -98,7 +107,7 @@ export function VerifyIdentityPage() {
     if (Date.now() - pollStartRef.current > MAX_POLL_MS) {
       stopPolling();
       setPageState('error');
-      setErrorMessage(tRef.current('verify_identity.timeout_error', { defaultValue: 'Verification is taking longer than expected. Please try again.' }));
+      setErrorMessage(tRef.current('verify_identity.timeout_error'));
       return;
     }
     try {
@@ -142,7 +151,7 @@ export function VerifyIdentityPage() {
       }
     } catch {
       setPageState('error');
-      setErrorMessage(tRef.current('verify_identity.fetch_error', { defaultValue: 'Unable to check verification status. Please try again.' }));
+      setErrorMessage(tRef.current('verify_identity.fetch_error'));
     }
   }, [navigate, tenantPath, stopPolling]);
 
@@ -187,7 +196,7 @@ export function VerifyIdentityPage() {
         }
       }
     } catch {
-      setErrorMessage(tRef.current('verify_identity.start_error', { defaultValue: 'Unable to start verification. Please try again later.' }));
+      setErrorMessage(tRef.current('verify_identity.start_error'));
     } finally {
       setIsStarting(false);
     }
@@ -198,11 +207,11 @@ export function VerifyIdentityPage() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <GlassCard className="p-8 text-center max-w-md">
           <p className="text-theme-muted mb-4">
-            {t('verify_identity.login_required', { defaultValue: 'Please log in to verify your identity.' })}
+            {t('verify_identity.login_required')}
           </p>
           <Link to={tenantPath('/login')}>
-            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              {t('verify_identity.go_to_login', { defaultValue: 'Go to Login' })}
+            <Button color="primary">
+              {t('verify_identity.go_to_login')}
             </Button>
           </Link>
         </GlassCard>
@@ -214,14 +223,14 @@ export function VerifyIdentityPage() {
   if (pageState === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <PageMeta title={t('page_meta.verify_identity.title')} noIndex />
+        {pageMeta}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-8 text-center">
-            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-indigo-500/20 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">
-              {t('verify_identity.loading_title', { defaultValue: 'Checking verification status...' })}
+              {t('verify_identity.loading_title')}
             </h1>
           </GlassCard>
         </motion.div>
@@ -239,14 +248,14 @@ export function VerifyIdentityPage() {
               <CheckCircle className="w-8 h-8 text-emerald-400" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">
-              {t('verify_identity.active_title', { defaultValue: 'Account verified' })}
+              {t('verify_identity.active_title')}
             </h1>
             <p className="text-theme-muted mb-6">
-              {t('verify_identity.active_subtitle', { defaultValue: 'Your account is fully verified and active.' })}
+              {t('verify_identity.active_subtitle')}
             </p>
             <Link to={tenantPath('/dashboard')}>
-              <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                {t('verify_identity.go_to_dashboard', { defaultValue: 'Go to Dashboard' })}
+              <Button color="primary" className="w-full">
+                {t('verify_identity.go_to_dashboard')}
               </Button>
             </Link>
           </GlassCard>
@@ -266,10 +275,10 @@ export function VerifyIdentityPage() {
               <ShieldCheck className="w-8 h-8 text-emerald-400" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">
-              {t('verify_identity.passed_title', { defaultValue: 'Identity verified' })}
+              {t('verify_identity.passed_title')}
             </h1>
             <p className="text-theme-muted mb-4">
-              {t('verify_identity.passed_subtitle', { defaultValue: 'Your identity has been successfully verified.' })}
+              {t('verify_identity.passed_subtitle')}
             </p>
             {verificationData && !verificationData.is_approved && (
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm text-left mb-6">
@@ -277,12 +286,10 @@ export function VerifyIdentityPage() {
                   <Clock className="w-5 h-5 text-[var(--color-warning)] shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-amber-600 dark:text-amber-400">
-                      {t('verify_identity.pending_approval_title', { defaultValue: 'Awaiting admin approval' })}
+                      {t('verify_identity.pending_approval_title')}
                     </p>
                     <p className="text-amber-600/80 dark:text-amber-300/80 mt-1">
-                      {t('verify_identity.pending_approval_body', {
-                        defaultValue: 'Your identity is verified, but your account still needs to be approved by a community administrator. You\'ll receive an email once approved.',
-                      })}
+                      {t('verify_identity.pending_approval_body')}
                     </p>
                   </div>
                 </div>
@@ -290,7 +297,7 @@ export function VerifyIdentityPage() {
             )}
             <Link to={tenantPath('/login')}>
               <Button variant="flat" className="w-full bg-theme-elevated text-theme-primary" startContent={<ArrowLeft className="w-4 h-4" />}>
-                {t('verify_identity.back_to_login', { defaultValue: 'Back to Login' })}
+                {t('verify_identity.back_to_login')}
               </Button>
             </Link>
           </GlassCard>
@@ -310,10 +317,10 @@ export function VerifyIdentityPage() {
               <ShieldX className="w-8 h-8 text-red-400" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">
-              {t('verify_identity.failed_title', { defaultValue: 'Verification unsuccessful' })}
+              {t('verify_identity.failed_title')}
             </h1>
             <p className="text-theme-muted mb-2">
-              {t('verify_identity.failed_subtitle', { defaultValue: 'We were unable to verify your identity.' })}
+              {t('verify_identity.failed_subtitle')}
             </p>
             {verificationData?.latest_session?.failure_reason && (
               <p className="text-red-600 dark:text-red-400 text-sm mb-6">
@@ -324,14 +331,15 @@ export function VerifyIdentityPage() {
               <Button
                 onPress={handleStartVerification}
                 isLoading={isStarting}
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                color="primary"
+                className="w-full"
                 startContent={!isStarting ? <RefreshCw className="w-4 h-4" /> : undefined}
               >
-                {t('verify_identity.retry', { defaultValue: 'Try again' })}
+                {t('verify_identity.retry')}
               </Button>
               <Link to={tenantPath('/login')}>
                 <Button variant="flat" className="w-full bg-theme-elevated text-theme-primary" startContent={<ArrowLeft className="w-4 h-4" />}>
-                  {t('verify_identity.back_to_login', { defaultValue: 'Back to Login' })}
+                  {t('verify_identity.back_to_login')}
                 </Button>
               </Link>
             </div>
@@ -352,15 +360,16 @@ export function VerifyIdentityPage() {
               <ShieldX className="w-8 h-8 text-red-400" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">
-              {t('verify_identity.error_title', { defaultValue: 'Something went wrong' })}
+              {t('verify_identity.error_title')}
             </h1>
             <p className="text-theme-muted mb-6">{errorMessage}</p>
             <Button
               onPress={() => { setPageState('loading'); fetchStatus(); }}
-              className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              color="primary"
+              className="w-full"
               startContent={<RefreshCw className="w-4 h-4" />}
             >
-              {t('verify_identity.retry', { defaultValue: 'Try again' })}
+              {t('verify_identity.retry')}
             </Button>
           </GlassCard>
           <p className="text-center text-theme-subtle text-sm mt-6">{branding.name}</p>
@@ -378,27 +387,23 @@ export function VerifyIdentityPage() {
             <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
-              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4"
             >
               {pageState === 'in_progress' ? (
                 <Spinner size="lg" color="secondary" />
               ) : (
-                <ShieldAlert className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+                <ShieldAlert className="w-8 h-8 text-primary" />
               )}
             </motion.div>
             <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">
               {pageState === 'in_progress'
-                ? t('verify_identity.in_progress_title', { defaultValue: 'Verification in progress' })
-                : t('verify_identity.start_title', { defaultValue: 'Verify your identity' })}
+                ? t('verify_identity.in_progress_title')
+                : t('verify_identity.start_title')}
             </h1>
             <p className="text-theme-muted mt-2">
               {pageState === 'in_progress'
-                ? t('verify_identity.in_progress_subtitle', {
-                    defaultValue: 'Please complete the verification in the opened window. This page will update automatically.',
-                  })
-                : t('verify_identity.start_subtitle', {
-                    defaultValue: 'This community requires identity verification before you can access your account.',
-                  })}
+                ? t('verify_identity.in_progress_subtitle')
+                : t('verify_identity.start_subtitle')}
             </p>
           </div>
 
@@ -414,26 +419,27 @@ export function VerifyIdentityPage() {
 
           {pageState === 'start' && (
             <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10">
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
                 <h3 className="font-medium text-theme-primary text-sm mb-2">
-                  {t('verify_identity.what_needed_title', { defaultValue: 'What you\'ll need' })}
+                  {t('verify_identity.what_needed_title')}
                 </h3>
-                <ul className="text-sm text-theme-muted space-y-1">
-                  <li>• {t('verify_identity.need_document', { defaultValue: 'A valid government-issued photo ID' })}</li>
-                  <li>• {t('verify_identity.need_camera', { defaultValue: 'A device with a camera' })}</li>
-                  <li>• {t('verify_identity.need_minutes', { defaultValue: 'About 2–5 minutes' })}</li>
+                <ul className="list-disc pl-5 text-sm text-theme-muted space-y-1">
+                  <li>{t('verify_identity.need_document')}</li>
+                  <li>{t('verify_identity.need_camera')}</li>
+                  <li>{t('verify_identity.need_minutes')}</li>
                 </ul>
               </div>
 
               <Button
                 onPress={handleStartVerification}
                 isLoading={isStarting}
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
+                color="primary"
+                className="w-full font-medium"
                 size="lg"
                 startContent={!isStarting ? <ShieldCheck className="w-5 h-5" /> : undefined}
                 spinner={<Loader2 className="w-4 h-4 animate-spin" />}
               >
-                {t('verify_identity.start_button', { defaultValue: 'Start verification' })}
+                {t('verify_identity.start_button')}
               </Button>
             </div>
           )}
@@ -447,17 +453,18 @@ export function VerifyIdentityPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   variant="bordered"
-                  className="w-full border-indigo-500/30 text-theme-primary hover:bg-indigo-500/10"
+                  color="primary"
+                  className="w-full"
                   size="lg"
                   startContent={<ExternalLink className="w-4 h-4" />}
                 >
-                  {t('verify_identity.open_verification', { defaultValue: 'Open verification window' })}
+                  {t('verify_identity.open_verification')}
                 </Button>
               )}
 
               <div className="flex items-center justify-center gap-2 text-sm text-theme-muted">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                {t('verify_identity.waiting', { defaultValue: 'Waiting for verification result...' })}
+                {t('verify_identity.waiting')}
               </div>
             </div>
           )}
@@ -468,7 +475,7 @@ export function VerifyIdentityPage() {
               className="inline-flex items-center gap-2 text-theme-subtle hover:text-theme-secondary text-sm transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              {t('verify_identity.back_to_login', { defaultValue: 'Back to Login' })}
+              {t('verify_identity.back_to_login')}
             </Link>
           </div>
         </GlassCard>
