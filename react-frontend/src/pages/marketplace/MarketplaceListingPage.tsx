@@ -17,6 +17,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Button,
@@ -394,17 +395,6 @@ export function MarketplaceListingPage() {
     }
   }, [listing?.title, t])
 
-  // JSON-LD structured data — inject via textContent (XSS-safe, avoids dangerouslySetInnerHTML)
-  // Must be before any early returns to satisfy Rules of Hooks
-  useEffect(() => {
-    if (!listing) return;
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.textContent = buildProductSchema(listing, tenantPath, branding.name);
-    document.head.appendChild(script);
-    return () => { script.remove(); };
-  }, [listing, tenantPath, branding.name]);
-
   // Load seller listings
   useEffect(() => {
     if (!sellerId || !listing?.id) return;
@@ -537,6 +527,11 @@ export function MarketplaceListingPage() {
         publishedTime={listing.created_at}
         modifiedTime={listing.updated_at}
       />
+      <Helmet>
+        <script type="application/ld+json">
+          {buildProductSchema(listing, tenantPath, branding.name)}
+        </script>
+      </Helmet>
 
       <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
         {/* Breadcrumb / Back */}

@@ -144,7 +144,11 @@ export function StripeOnboardingPage() {
 
   return (
     <>
-      <PageMeta title={t('onboarding.page_title')} />
+      <PageMeta
+        title={t('onboarding.page_title')}
+        description={t('onboarding.subtitle')}
+        noIndex
+      />
 
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         {/* Header */}

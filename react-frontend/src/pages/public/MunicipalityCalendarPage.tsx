@@ -147,7 +147,12 @@ export default function MunicipalityCalendarPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 space-y-4">
-      <PageMeta title={t('verein_federation.calendar.title')} />
+      <PageMeta
+        title={t('verein_federation.calendar.title')}
+        description={code
+          ? t('verein_federation.calendar.subtitle', { municipality: code })
+          : t('verein_federation.calendar.no_municipality')}
+      />
 
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">

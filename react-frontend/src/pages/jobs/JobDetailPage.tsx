@@ -22,6 +22,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@heroui/react';
 import Briefcase from 'lucide-react/icons/briefcase';
@@ -366,16 +367,6 @@ export function JobDetailPage() {
     load();
     return () => { controller.abort(); };
   }, [vacancy, isOwner, isAuthenticated]);
-
-  // JSON-LD structured data
-  useEffect(() => {
-    if (!vacancy) return;
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.textContent = buildJobPostingSchema(vacancy, tenantPath);
-    document.head.appendChild(script);
-    return () => { script.remove(); };
-  }, [vacancy, tenantPath]);
 
   // Interview accept/decline handlers
   const handleAcceptInterview = async () => {
@@ -754,6 +745,11 @@ export function JobDetailPage() {
           publishedTime={vacancy.created_at}
           modifiedTime={vacancy.renewed_at || vacancy.created_at}
         />
+        <Helmet>
+          <script type="application/ld+json">
+            {buildJobPostingSchema(vacancy, tenantPath)}
+          </script>
+        </Helmet>
 
         {/* Back nav */}
         <Link to={tenantPath('/jobs')} className="inline-flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors">

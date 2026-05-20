@@ -202,7 +202,14 @@ export function GoalDetailPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title={goal.title} noIndex={!goal.is_public} />
+      <PageMeta
+        title={goal.title}
+        description={goal.description?.replace(/\s+/g, ' ').trim().slice(0, 160)}
+        type="article"
+        noIndex={!goal.is_public}
+        publishedTime={goal.created_at}
+        modifiedTime={goal.updated_at}
+      />
 
       {backButton}
 

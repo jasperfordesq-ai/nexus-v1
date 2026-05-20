@@ -187,7 +187,11 @@ export default function VereinMembersImportPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 space-y-6">
-      <PageMeta title={t('verein_import.title')} />
+      <PageMeta
+        title={t('verein_import.title')}
+        description={t('verein_import.subtitle')}
+        noIndex
+      />
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-3xl">

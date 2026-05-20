@@ -412,6 +412,7 @@ export function ListingDetailPage() {
         title={listing?.title}
         description={listing?.description?.substring(0, 160)}
         image={listing?.image_url ? resolveAssetUrl(listing.image_url) : undefined}
+        type="article"
         publishedTime={listing.created_at}
         modifiedTime={listing.updated_at}
       />
