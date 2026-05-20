@@ -83,7 +83,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
       } catch (err) {
         if (!cancelled) {
           logError('Failed to load seller shipping options', err);
-          setError(t('shipping.load_error', 'Failed to load shipping options'));
+          setError(t('shipping.load_error'));
         }
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -118,7 +118,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
       <div className="flex items-center gap-2 py-4">
         <Spinner size="sm" color="primary" />
         <span className="text-sm text-default-500">
-          {t('shipping.loading', 'Loading shipping options...')}
+          {t('shipping.loading')}
         </span>
       </div>
     );
@@ -136,7 +136,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
     return (
       <div className="py-3">
         <p className="text-sm text-default-500">
-          {t('shipping.no_options', 'No shipping options available for this seller.')}
+          {t('shipping.no_options')}
         </p>
       </div>
     );
@@ -146,8 +146,8 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
   return (
     <div className="space-y-3">
       <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
-        <Truck className="w-4 h-4 text-primary" />
-        {t('shipping.select_title', 'Delivery Method')}
+        <Truck className="w-4 h-4 text-primary" aria-hidden="true" />
+        {t('shipping.select_title')}
       </h4>
 
       <RadioGroup
@@ -164,17 +164,17 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
             }}
           >
             <div className="flex items-center gap-3">
-              <MapPin className="w-4 h-4 text-success shrink-0" />
+              <MapPin className="w-4 h-4 text-success shrink-0" aria-hidden="true" />
               <div className="flex-1">
                 <span className="text-sm font-medium text-foreground">
-                  {t('shipping.local_pickup', 'Local Pickup')}
+                  {t('shipping.local_pickup')}
                 </span>
                 <span className="text-xs text-default-500 ml-2">
-                  {t('shipping.local_pickup_subtitle', 'Collect in person')}
+                  {t('shipping.local_pickup_subtitle')}
                 </span>
               </div>
               <Chip size="sm" color="success" variant="flat">
-                {t('price.free', 'Free')}
+                {t('price.free')}
               </Chip>
             </div>
           </Radio>
@@ -190,7 +190,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
             }}
           >
             <div className="flex items-center gap-3">
-              <Package className="w-4 h-4 text-primary shrink-0" />
+              <Package className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-foreground">
@@ -198,14 +198,14 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
                   </span>
                   {option.is_default && (
                     <Chip size="sm" variant="flat" color="secondary" className="text-[10px]">
-                      {t('shipping.recommended', 'Recommended')}
+                      {t('shipping.recommended')}
                     </Chip>
                   )}
                 </div>
                 {option.estimated_days != null && (
                   <span className="text-xs text-default-500 flex items-center gap-1 mt-0.5">
-                    <Clock className="w-3 h-3" />
-                    {t('shipping.estimated_delivery', '~{{days}} days', { days: option.estimated_days })}
+                    <Clock className="w-3 h-3" aria-hidden="true" />
+                    {t('shipping.estimated_delivery', { days: option.estimated_days })}
                   </span>
                 )}
               </div>
