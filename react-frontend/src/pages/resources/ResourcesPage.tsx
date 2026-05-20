@@ -147,6 +147,7 @@ function CategoryTreeItem({
   onSelect: (id: number | null) => void;
   depth?: number;
 }) {
+  const { t } = useTranslation('utility');
   const [expanded, setExpanded] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
   const isSelected = selectedId === node.id;
@@ -167,7 +168,7 @@ function CategoryTreeItem({
             size="sm"
             variant="light"
             onPress={() => setExpanded(!expanded)}
-            aria-label={expanded ? 'Collapse' : 'Expand'}
+            aria-label={expanded ? t('resources.collapse_category') : t('resources.expand_category')}
             className="p-0 min-w-0 w-auto h-auto flex-shrink-0"
           >
             {expanded ? (
@@ -432,7 +433,8 @@ export function ResourcesPage() {
         setCursor(undefined);
         loadResources();
       } else {
-        toast.error(t('resources.upload_failed'), response.error || t('resources.upload_failed_description'));
+        logError('Resource upload API error', response.error);
+        toast.error(t('resources.upload_failed'), t('resources.upload_failed_description'));
       }
     } catch (err) {
       logError('Failed to upload resource', err);
@@ -450,16 +452,17 @@ export function ResourcesPage() {
       setIsDeleting(true);
       const response = await api.delete(`/v2/resources/${deletingResource.id}`);
       if (response.success) {
-        toast.success(t('resources.delete_success', 'Resource deleted'), t('resources.delete_success_description', 'The resource has been removed.'));
+        toast.success(t('resources.delete_success'), t('resources.delete_success_description'));
         setResources((prev) => prev.filter((r) => r.id !== deletingResource.id));
         deleteModal.onClose();
         setDeletingResource(null);
       } else {
-        toast.error(t('resources.delete_failed', 'Delete failed'), response.error || t('resources.delete_failed_description', 'Could not delete the resource.'));
+        logError('Resource delete API error', response.error);
+        toast.error(t('resources.delete_failed'), t('resources.delete_failed_description'));
       }
     } catch (err) {
       logError('Failed to delete resource', err);
-      toast.error(t('resources.delete_failed', 'Delete failed'), t('resources.delete_failed_description', 'Could not delete the resource.'));
+      toast.error(t('resources.delete_failed'), t('resources.delete_failed_description'));
     } finally {
       setIsDeleting(false);
     }
@@ -517,7 +520,7 @@ export function ResourcesPage() {
       );
     } catch (err) {
       logError('Failed to download resource', err);
-      toast.error(t('resources.download_failed', 'Download failed'));
+      toast.error(t('resources.download_failed'));
     }
   }
 
@@ -583,11 +586,12 @@ export function ResourcesPage() {
             <Button
               size="sm"
               variant={isReordering ? 'solid' : 'flat'}
-              className={isReordering ? 'bg-linear-to-r from-amber-500 to-orange-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              color={isReordering ? 'warning' : 'default'}
+              className={isReordering ? 'text-white' : 'bg-theme-elevated text-theme-muted'}
               startContent={<GripVertical className="w-3.5 h-3.5" aria-hidden="true" />}
               onPress={() => setIsReordering(!isReordering)}
             >
-              {isReordering ? t('resources.done_reordering', 'Done Reordering') : t('resources.reorder', 'Reorder')}
+              {isReordering ? t('resources.done_reordering') : t('resources.reorder')}
             </Button>
           )}
 
@@ -597,7 +601,8 @@ export function ResourcesPage() {
               <Button
                 size="sm"
                 variant={!selectedCategory ? 'solid' : 'flat'}
-                className={!selectedCategory ? 'bg-linear-to-r from-amber-500 to-orange-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+                color={!selectedCategory ? 'warning' : 'default'}
+                className={!selectedCategory ? 'text-white' : 'bg-theme-elevated text-theme-muted'}
                 onPress={() => setSelectedCategory(null)}
               >
                 {t('resources.filter_all')}
@@ -607,9 +612,10 @@ export function ResourcesPage() {
                   key={cat.id}
                   size="sm"
                   variant={selectedCategory === cat.id ? 'solid' : 'flat'}
+                  color={selectedCategory === cat.id ? 'warning' : 'default'}
                   className={
                     selectedCategory === cat.id
-                      ? 'bg-linear-to-r from-amber-500 to-orange-600 text-white'
+                      ? 'text-white'
                       : 'bg-theme-elevated text-theme-muted'
                   }
                   onPress={() => setSelectedCategory(cat.id)}
@@ -639,7 +645,7 @@ export function ResourcesPage() {
                   isIconOnly
                   className="text-theme-subtle min-w-0 w-6 h-6 lg:hidden"
                   onPress={() => setShowCategoryTree(!showCategoryTree)}
-                  aria-label={showCategoryTree ? 'Hide categories' : 'Show categories'}
+                  aria-label={showCategoryTree ? t('resources.hide_categories') : t('resources.show_categories')}
                 >
                   {showCategoryTree ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                 </Button>
@@ -654,7 +660,7 @@ export function ResourcesPage() {
                     }`}
                     startContent={<FolderOpen className="w-3.5 h-3.5" aria-hidden="true" />}
                   >
-                    {t('resources.all_resources', 'All Resources')}
+                    {t('resources.all_resources')}
                   </Button>
                   {categoryTree.map((node) => (
                     <CategoryTreeItem
@@ -680,7 +686,8 @@ export function ResourcesPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('resources.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-linear-to-r from-amber-500 to-orange-600 text-white"
+            color="warning"
+            className="text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadResources()}
           >
@@ -739,7 +746,7 @@ export function ResourcesPage() {
                             variant="light"
                             className="text-theme-subtle min-w-0 w-6 h-6"
                             onPress={() => handleMoveResource(resource.id, 'up')}
-                            aria-label={t('resources.aria_move_up', 'Move up')}
+                            aria-label={t('resources.aria_move_up')}
                           >
                             <ArrowUp className="w-3.5 h-3.5" />
                           </Button>
@@ -749,7 +756,7 @@ export function ResourcesPage() {
                             variant="light"
                             className="text-theme-subtle min-w-0 w-6 h-6"
                             onPress={() => handleMoveResource(resource.id, 'down')}
-                            aria-label={t('resources.aria_move_down', 'Move down')}
+                            aria-label={t('resources.aria_move_down')}
                           >
                             <ArrowDown className="w-3.5 h-3.5" />
                           </Button>
@@ -817,7 +824,7 @@ export function ResourcesPage() {
                             startContent={<Download className="w-3.5 h-3.5" aria-hidden="true" />}
                             onPress={() => handleDownload(resource.id, resource.title)}
                           >
-                            {t('resources.download', 'Download')}
+                            {t('resources.download')}
                           </Button>
                         {(user?.id === resource.uploader.id || isAdmin) && (
                           <Button
@@ -829,7 +836,7 @@ export function ResourcesPage() {
                               setDeletingResource(resource);
                               deleteModal.onOpen();
                             }}
-                            aria-label={t('resources.delete', 'Delete resource')}
+                            aria-label={t('resources.delete')}
                           >
                             <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                           </Button>
@@ -890,11 +897,11 @@ export function ResourcesPage() {
         <ModalContent>
           <ModalHeader className="text-theme-primary flex items-center gap-2">
             <Trash2 className="w-5 h-5 text-[var(--color-error)]" aria-hidden="true" />
-            {t('resources.delete_confirm_title', 'Delete Resource')}
+            {t('resources.delete_confirm_title')}
           </ModalHeader>
           <ModalBody>
             <p className="text-theme-muted text-sm">
-              {t('resources.delete_confirm_message', 'Are you sure you want to delete "{{title}}"? This action cannot be undone.', { title: deletingResource?.title })}
+              {t('resources.delete_confirm_message', { title: deletingResource?.title })}
             </p>
           </ModalBody>
           <ModalFooter>
@@ -914,7 +921,7 @@ export function ResourcesPage() {
               onPress={handleDeleteResource}
               isLoading={isDeleting}
             >
-              {t('resources.delete_confirm', 'Delete')}
+              {t('resources.delete_confirm')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -1071,7 +1078,7 @@ export function ResourcesPage() {
                       indicator: 'bg-linear-to-r from-amber-500 to-orange-600',
                       track: 'bg-theme-elevated',
                     }}
-                    aria-label={t('resources.aria_upload_progress', 'Upload progress')}
+                    aria-label={t('resources.aria_upload_progress')}
                   />
                   <p className="text-xs text-theme-subtle text-center">
                     {t('resources.uploading_progress', { progress: uploadProgress })}
@@ -1093,7 +1100,8 @@ export function ResourcesPage() {
               {t('resources.cancel')}
             </Button>
             <Button
-              className="bg-linear-to-r from-amber-500 to-orange-600 text-white"
+              color="warning"
+              className="text-white"
               startContent={!isUploading ? <Upload className="w-4 h-4" aria-hidden="true" /> : undefined}
               onPress={handleUploadSubmit}
               isLoading={isUploading}

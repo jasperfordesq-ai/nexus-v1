@@ -112,7 +112,18 @@
     "aria_move_down": "Sposta giù",
     "aria_upload_progress": "Avanzamento caricamento",
     "download": "Download",
-    "download_failed": "Download failed"
+    "download_failed": "Download failed",
+    "delete_success": "Resource deleted",
+    "delete_success_description": "The resource has been removed.",
+    "delete_failed": "Delete failed",
+    "delete_failed_description": "Could not delete the resource.",
+    "done_reordering": "Done Reordering",
+    "all_resources": "All Resources",
+    "delete": "Delete resource",
+    "collapse_category": "Collapse category",
+    "expand_category": "Expand category",
+    "hide_categories": "Hide categories",
+    "show_categories": "Show categories"
   },
   "not_found": {
     "page_title": "Pagina non trovata",
