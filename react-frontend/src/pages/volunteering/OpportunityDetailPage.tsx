@@ -726,8 +726,14 @@ export function OpportunityDetailPage() {
 
   const opp = opportunity;
   const upcomingShifts = (opp.shifts || []).filter((s) => new Date(s.start_time) >= new Date());
-  const seoDescription = opp.description?.replace(/\s+/g, ' ').trim().slice(0, 160);
-  const structuredDescription = opp.description?.replace(/\s+/g, ' ').trim().slice(0, 300);
+  const cleanDescription = opp.description?.replace(/\s+/g, ' ').trim();
+  const seoDescription = cleanDescription?.slice(0, 160)
+    || t('opportunity.meta_description_fallback', {
+      title: opp.title,
+      organization: opp.organization.name,
+      location: opp.location || t('opportunity.remote'),
+    });
+  const structuredDescription = cleanDescription?.slice(0, 300) || seoDescription;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
@@ -735,6 +741,8 @@ export function OpportunityDetailPage() {
         title={opp.title}
         description={seoDescription}
         image={opp.organization?.logo_url || undefined}
+        type="article"
+        publishedTime={opp.created_at}
       />
       <Helmet>
         <script type="application/ld+json">

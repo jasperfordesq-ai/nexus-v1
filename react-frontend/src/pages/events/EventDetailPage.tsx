@@ -553,8 +553,14 @@ export function EventDetailPage() {
     ? formatDateTime(endDate, { hour: '2-digit', minute: '2-digit' })
     : null;
   const eventImage = event.cover_image ? resolveAssetUrl(event.cover_image) : undefined;
-  const seoDescription = event.description?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 160);
   const organizerName = event.organizer?.name || `${event.organizer?.first_name ?? ''} ${event.organizer?.last_name ?? ''}`.trim() || t('detail.community_member');
+  const seoDescription = event.description?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 160)
+    || t('detail.meta_description_fallback', {
+      title: event.title,
+      date: fullDateLabel,
+      location: event.location || t('detail.remote_attendance_available'),
+      organizer: organizerName,
+    });
   const attendanceTotal = goingCount + interestedCount;
   const eventSocial = event as Event & {
     is_liked?: boolean;
@@ -572,6 +578,9 @@ export function EventDetailPage() {
         title={event.title}
         description={seoDescription}
         image={eventImage}
+        type="article"
+        publishedTime={event.created_at}
+        modifiedTime={event.updated_at || event.created_at}
       />
       <Helmet>
         <script type="application/ld+json">

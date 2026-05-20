@@ -36,6 +36,22 @@ interface PageData {
   updated_at: string;
 }
 
+function plainTextExcerpt(html: string, maxLength = 160): string | undefined {
+  const text = html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!text) return undefined;
+  return text.length > maxLength ? `${text.slice(0, maxLength - 1).trim()}...` : text;
+}
+
 export function CustomPage() {
   const { t } = useTranslation('utility');
   const { slug } = useParams<{ slug: string }>();
@@ -105,11 +121,13 @@ export function CustomPage() {
     );
   }
 
+  const metaDescription = page.meta_description?.trim() || plainTextExcerpt(page.content);
+
   return (
     <>
       <PageMeta
         title={page.title}
-        description={page.meta_description || undefined}
+        description={metaDescription}
         type="article"
         publishedTime={page.created_at}
         modifiedTime={page.updated_at || page.created_at}

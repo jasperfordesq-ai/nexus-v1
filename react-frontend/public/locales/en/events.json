@@ -100,6 +100,7 @@
     "share_aria": "Copy link to {{title}}",
     "event_link": "Event Link",
     "event_link_aria": "Open event link for {{title}}",
+    "meta_description_fallback": "{{title}} is a community event on {{date}} with {{organizer}} at {{location}}.",
     "edit_event_aria": "Edit {{title}}",
     "cancel_event_aria": "Cancel {{title}}",
     "delete_event_aria": "Delete {{title}}",

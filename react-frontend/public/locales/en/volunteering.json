@@ -570,6 +570,7 @@
     "page_title": "Opportunity Details",
     "not_found": "Opportunity not found.",
     "load_error": "Unable to load this opportunity. Please try again.",
+    "meta_description_fallback": "{{title}} is a volunteering opportunity with {{organization}} in {{location}}.",
     "application_submitted": "Application submitted.",
     "apply_failed": "Failed to apply.",
     "try_again": "Try Again",
