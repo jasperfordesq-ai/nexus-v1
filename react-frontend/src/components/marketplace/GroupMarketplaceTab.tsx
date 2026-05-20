@@ -150,21 +150,21 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
       {stats && (
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
-            <Package className="w-4 h-4 text-theme-primary" />
+            <Package className="w-4 h-4 text-theme-primary" aria-hidden="true" />
             <span className="text-sm font-medium">
-              {stats.active_listings} {t('group_marketplace.active_listings', 'active listings')}
+              {stats.active_listings} {t('group_marketplace.active_listings')}
             </span>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
-            <Tag className="w-4 h-4 text-theme-secondary" />
+            <Tag className="w-4 h-4 text-theme-secondary" aria-hidden="true" />
             <span className="text-sm font-medium">
-              {stats.total_listed} {t('group_marketplace.total_listed', 'total listed')}
+              {stats.total_listed} {t('group_marketplace.total_listed')}
             </span>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
-            <Users className="w-4 h-4 text-theme-muted" />
+            <Users className="w-4 h-4 text-theme-muted" aria-hidden="true" />
             <span className="text-sm font-medium">
-              {stats.total_sellers} {t('group_marketplace.sellers', 'sellers')}
+              {stats.total_sellers} {t('group_marketplace.sellers')}
             </span>
           </div>
         </div>
@@ -179,7 +179,7 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
             className="cursor-pointer"
             onClick={() => handleCategoryFilter(null)}
           >
-            {t('categories.all', 'All')}
+            {t('categories.all')}
           </Chip>
           {stats?.categories.map(cat => (
             <Chip
@@ -196,10 +196,10 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
 
         <Button
           color="primary"
-          startContent={<Plus className="w-4 h-4" />}
+          startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={() => navigate(tenantPath('/marketplace/sell'))}
         >
-          {t('group_marketplace.sell_to_group', 'Sell to Group')}
+          {t('group_marketplace.sell_to_group')}
         </Button>
       </div>
 
@@ -210,20 +210,20 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
         </div>
       ) : listings.length === 0 ? (
         <div className="text-center py-12">
-          <ShoppingBag className="w-12 h-12 mx-auto mb-4 text-theme-muted opacity-40" />
+          <ShoppingBag className="w-12 h-12 mx-auto mb-4 text-theme-muted opacity-40" aria-hidden="true" />
           <h3 className="text-lg font-semibold text-theme-primary mb-2">
-            {t('group_marketplace.empty_title', 'No Group Listings Yet')}
+            {t('group_marketplace.empty_title')}
           </h3>
           <p className="text-sm text-theme-muted mb-4">
-            {t('group_marketplace.empty_description', 'Be the first group member to list something for sale!')}
+            {t('group_marketplace.empty_description')}
           </p>
           <Button
             color="primary"
             variant="flat"
-            startContent={<Plus className="w-4 h-4" />}
+            startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             onPress={() => navigate(tenantPath('/marketplace/sell'))}
           >
-            {t('group_marketplace.sell_to_group', 'Sell to Group')}
+            {t('group_marketplace.sell_to_group')}
           </Button>
         </div>
       ) : (
@@ -241,7 +241,7 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
                 isLoading={loadingMore}
                 onPress={() => loadListings(true, selectedCategory)}
               >
-                {t('common.load_more', 'Load More')}
+                {t('common.load_more')}
               </Button>
             </div>
           )}
