@@ -634,7 +634,7 @@ For the people behind the project, see [CONTRIBUTORS.md](CONTRIBUTORS.md) — th
 
 - **Issues**: https://github.com/jasperfordesq-ai/nexus-v1/issues
 - **Documentation**: `/docs` directory
-- **Email**: support@project-nexus.ie
+- **Email**: jasper@hour-timebank.ie
 
 ---
 
