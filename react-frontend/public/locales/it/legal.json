@@ -381,7 +381,14 @@
     "original": "Originale",
     "effective": "In vigore dal {{date}}",
     "summary_of_changes": "Riepilogo delle modifiche",
-    "back_to_current": "Torna all'attuale {{title}}"
+    "back_to_current": "Torna all'attuale {{title}}",
+    "unknown_date": "Sconosciuta",
+    "hide_changes": "Nascondi modifiche",
+    "view_changes": "Cosa e cambiato da v{{prev}}",
+    "changes_between": "Modifiche: v{{old}} a v{{new}}",
+    "changes_count": "{{count}} modifiche",
+    "legend_removed": "Rimosso",
+    "legend_added": "Aggiunto"
   },
   "platform": {
     "effective_date": "In vigore dal {{date}}",

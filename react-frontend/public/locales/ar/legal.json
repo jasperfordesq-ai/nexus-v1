@@ -381,7 +381,14 @@
     "original": "Original",
     "effective": "ساري المفعول {{date}}",
     "summary_of_changes": "ملخص التغييرات",
-    "back_to_current": "العودة إلى {{title}} الحالية"
+    "back_to_current": "العودة إلى {{title}} الحالية",
+    "unknown_date": "Unknown",
+    "hide_changes": "Hide changes",
+    "view_changes": "What changed from v{{prev}}",
+    "changes_between": "Changes: v{{old}} to v{{new}}",
+    "changes_count": "{{count}} changes",
+    "legend_removed": "Removed",
+    "legend_added": "Added"
   },
   "platform": {
     "effective_date": "ساري المفعول {{date}}",

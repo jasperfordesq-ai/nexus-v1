@@ -9,7 +9,7 @@
  * Shows all published versions of a legal document (terms, privacy, etc.)
  * with a timeline UI. Clicking a version expands it to show the full content
  * with a "Summary of Changes" callout. Each non-original version has a
- * "What changed" button that loads a unified diff from the previous version.
+ * change-comparison button that loads a unified diff from the previous version.
  *
  * Routes:
  *   /terms/versions
@@ -87,8 +87,8 @@ interface VersionComparison {
   changes_count: number;
 }
 
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return 'Unknown';
+function formatDate(dateStr: string | null, unknownLabel: string): string {
+  if (!dateStr) return unknownLabel;
   return formatDateValue(dateStr, {
     year: 'numeric',
     month: 'long',
@@ -239,7 +239,7 @@ export function LegalVersionHistoryPage() {
           to={tenantPath(backRoute)}
           className="inline-flex items-center gap-1.5 text-sm text-theme-muted hover:text-theme-primary transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           {t('version_history.back_to', { title: title || t('version_history.document') })}
         </Link>
       </motion.div>
@@ -314,7 +314,7 @@ export function LegalVersionHistoryPage() {
                           <Chip
                             size="sm"
                             variant="flat"
-                            startContent={<CheckCircle className="w-3 h-3" />}
+                            startContent={<CheckCircle className="w-3 h-3" aria-hidden="true" />}
                             classNames={{ base: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' }}
                           >
                             {t('version_history.current')}
@@ -324,7 +324,7 @@ export function LegalVersionHistoryPage() {
                           <Chip
                             size="sm"
                             variant="flat"
-                            startContent={<Clock className="w-3 h-3" />}
+                            startContent={<Clock className="w-3 h-3" aria-hidden="true" />}
                             classNames={{ base: 'bg-[var(--surface-elevated)] text-theme-subtle' }}
                           >
                             {t('version_history.original')}
@@ -339,7 +339,9 @@ export function LegalVersionHistoryPage() {
                       <div className="flex items-center gap-3 text-sm text-theme-muted">
                         <span className="inline-flex items-center gap-1">
                           <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" />
-                          {t('version_history.effective', { date: formatDate(version.effective_date) })}
+                          {t('version_history.effective', {
+                            date: formatDate(version.effective_date, t('version_history.unknown_date')),
+                          })}
                         </span>
                       </div>
                       {version.summary_of_changes && (
@@ -349,9 +351,9 @@ export function LegalVersionHistoryPage() {
                       )}
                     </div>
                     {expandedId === version.id ? (
-                      <ChevronUp className="w-5 h-5 text-theme-subtle shrink-0" />
+                      <ChevronUp className="w-5 h-5 text-theme-subtle shrink-0" aria-hidden="true" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-theme-subtle shrink-0" />
+                      <ChevronDown className="w-5 h-5 text-theme-subtle shrink-0" aria-hidden="true" />
                     )}
                   </Button>
 
@@ -380,7 +382,7 @@ export function LegalVersionHistoryPage() {
                             </div>
                           )}
 
-                          {/* "What changed" diff button — only for non-original versions */}
+                          {/* Diff comparison button — only for non-original versions */}
                           {previousVersion && (
                             <div>
                               <Button
@@ -391,13 +393,16 @@ export function LegalVersionHistoryPage() {
                                     ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
                                     : 'text-theme-muted border-[var(--border-default)]'
                                 }
-                                startContent={isDiffOpen ? <X className="w-3.5 h-3.5" /> : <GitCompareArrows className="w-3.5 h-3.5" />}
+                                startContent={
+                                  isDiffOpen
+                                    ? <X className="w-3.5 h-3.5" aria-hidden="true" />
+                                    : <GitCompareArrows className="w-3.5 h-3.5" aria-hidden="true" />
+                                }
                                 onPress={() => handleViewDiff(version, previousVersion)}
                               >
                                 {isDiffOpen
-                                  ? t('version_history.hide_changes', 'Hide changes')
+                                  ? t('version_history.hide_changes')
                                   : t('version_history.view_changes', {
-                                      defaultValue: 'What changed from v{{prev}}',
                                       prev: previousVersion.version_number,
                                     })}
                               </Button>
@@ -427,14 +432,12 @@ export function LegalVersionHistoryPage() {
                                         <GitCompareArrows className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />
                                         <span className="font-medium text-theme-primary">
                                           {t('version_history.changes_between', {
-                                            defaultValue: 'Changes: v{{old}} → v{{new}}',
                                             old: diffData.version1.version_number,
                                             new: diffData.version2.version_number,
                                           })}
                                         </span>
                                         <Chip size="sm" variant="flat" classNames={{ base: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' }}>
                                           {t('version_history.changes_count', {
-                                            defaultValue: '{{count}} changes',
                                             count: diffData.changes_count,
                                           })}
                                         </Chip>
@@ -444,12 +447,12 @@ export function LegalVersionHistoryPage() {
                                     {/* Legend */}
                                     <div className="flex items-center gap-4 px-4 py-2 bg-[var(--surface-elevated)] border-b border-[var(--border-default)] text-xs text-theme-muted">
                                       <span className="inline-flex items-center gap-1">
-                                        <span className="inline-block w-3 h-3 rounded-sm bg-red-500/20 border border-red-500/30" />
-                                        {t('version_history.legend_removed', 'Removed')}
+                                        <span className="inline-block w-3 h-3 rounded-sm bg-red-500/20 border border-red-500/30" aria-hidden="true" />
+                                        {t('version_history.legend_removed')}
                                       </span>
                                       <span className="inline-flex items-center gap-1">
-                                        <span className="inline-block w-3 h-3 rounded-sm bg-emerald-500/20 border border-emerald-500/30" />
-                                        {t('version_history.legend_added', 'Added')}
+                                        <span className="inline-block w-3 h-3 rounded-sm bg-emerald-500/20 border border-emerald-500/30" aria-hidden="true" />
+                                        {t('version_history.legend_added')}
                                       </span>
                                     </div>
 
@@ -486,7 +489,7 @@ export function LegalVersionHistoryPage() {
           <Button
             variant="flat"
             className="bg-theme-elevated text-theme-primary"
-            startContent={<ArrowLeft className="w-4 h-4" />}
+            startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
           >
             {t('version_history.back_to_current', { title })}
           </Button>

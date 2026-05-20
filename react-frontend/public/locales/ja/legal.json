@@ -381,7 +381,14 @@
     "original": "Original",
     "effective": "有効 {{date}}",
     "summary_of_changes": "変更の概要",
-    "back_to_current": "現在の {{title}} に戻る"
+    "back_to_current": "現在の {{title}} に戻る",
+    "unknown_date": "Unknown",
+    "hide_changes": "Hide changes",
+    "view_changes": "What changed from v{{prev}}",
+    "changes_between": "Changes: v{{old}} to v{{new}}",
+    "changes_count": "{{count}} changes",
+    "legend_removed": "Removed",
+    "legend_added": "Added"
   },
   "platform": {
     "effective_date": "有効 {{date}}",

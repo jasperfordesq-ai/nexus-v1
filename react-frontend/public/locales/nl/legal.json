@@ -381,7 +381,14 @@
     "original": "Original",
     "effective": "Ingangsdatum {{date}}",
     "summary_of_changes": "Samenvatting van Wijzigingen",
-    "back_to_current": "Terug naar Huidige {{title}}"
+    "back_to_current": "Terug naar Huidige {{title}}",
+    "unknown_date": "Onbekend",
+    "hide_changes": "Wijzigingen verbergen",
+    "view_changes": "Wat is gewijzigd sinds v{{prev}}",
+    "changes_between": "Wijzigingen: v{{old}} tot v{{new}}",
+    "changes_count": "{{count}} wijzigingen",
+    "legend_removed": "Verwijderd",
+    "legend_added": "Toegevoegd"
   },
   "platform": {
     "effective_date": "Ingangsdatum {{date}}",

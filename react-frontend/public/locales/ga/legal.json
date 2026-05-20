@@ -381,7 +381,14 @@
     "original": "Bunaidh",
     "effective": "I bhfeidhm {{date}}",
     "summary_of_changes": "Achoimre ar Athrutie",
-    "back_to_current": "Ar ais go {{title}} Reatha"
+    "back_to_current": "Ar ais go {{title}} Reatha",
+    "unknown_date": "Anaithnid",
+    "hide_changes": "Folaigh athruithe",
+    "view_changes": "Cad a d-athraigh o v{{prev}}",
+    "changes_between": "Athruithe: v{{old}} go v{{new}}",
+    "changes_count": "{{count}} athru",
+    "legend_removed": "Bainte",
+    "legend_added": "Curtha leis"
   },
   "platform": {
     "effective_date": "I bhfeidhm {{date}}",
