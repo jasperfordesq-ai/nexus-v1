@@ -17,29 +17,53 @@
    GLASS CARD
    ───────────────────────────────────────────── */
 .glass-card {
-  background: var(--glass-bg);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0) 42%),
+    var(--glass-bg);
   /* backdrop-blur-lg (16px = var(--glass-blur)) applied via Tailwind utility on each element */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 16px 40px rgba(0, 0, 0, 0.18);
   transition: all var(--transition-slow);
   overflow: hidden;
   max-width: 100%;
 }
 
 .glass-card-hover {
-  background: var(--glass-bg);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 42%),
+    var(--glass-bg);
   /* backdrop-blur-lg (16px = var(--glass-blur)) applied via Tailwind utility on each element */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 16px 40px rgba(0, 0, 0, 0.18);
   transition: all var(--transition-slow);
   overflow: hidden;
   max-width: 100%;
 }
 
 .glass-card-hover:hover {
-  background: var(--glass-highlight);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015) 46%),
+    var(--glass-bg-hover);
   border-color: var(--glass-border-hover);
-  box-shadow: 0 8px 32px var(--glow-primary-subtle);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 18px 44px rgba(0, 0, 0, 0.22),
+    0 0 28px var(--glow-primary-subtle);
+}
+
+.glass-card:focus-visible,
+.glass-card-hover:focus-visible {
+  border-color: var(--glass-border-focus);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 0 0 3px var(--glow-primary-subtle),
+    0 16px 40px rgba(0, 0, 0, 0.2);
 }
 
 /* ─────────────────────────────────────────────
