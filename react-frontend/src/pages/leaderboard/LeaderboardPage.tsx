@@ -191,7 +191,7 @@ function SeasonCard() {
 
   if (isLoading) {
     return (
-      <GlassCard className="p-5" aria-label={t('leaderboard.season.loading', 'Loading season')} aria-busy="true">
+      <GlassCard className="p-5" aria-label={t('leaderboard.season.loading')} aria-busy="true">
         <div className="space-y-3">
           <Skeleton className="rounded-lg">
             <div className="h-5 rounded-lg bg-default-300 w-1/3" />
@@ -216,8 +216,8 @@ function SeasonCard() {
         <div className="flex items-center gap-3 text-[var(--color-warning)]">
           <AlertTriangle className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-theme-primary">{t('leaderboard.season.unavailable', 'Season data unavailable')}</p>
-            <p className="text-xs text-theme-muted mt-0.5">{t('leaderboard.season.unavailable_desc', 'Could not load season information. Rankings below are still available.')}</p>
+            <p className="text-sm font-medium text-theme-primary">{t('leaderboard.season.unavailable')}</p>
+            <p className="text-xs text-theme-muted mt-0.5">{t('leaderboard.season.unavailable_desc')}</p>
           </div>
           <Button size="sm" variant="light" onPress={loadCurrentSeason}>
             <RefreshCw className="w-4 h-4" aria-hidden="true" />
@@ -290,8 +290,8 @@ function SeasonCard() {
             <div className="flex flex-wrap gap-2">
               {rewardEntries.map(([key, value]) => {
                 const reward = value as Record<string, unknown>;
-                const label = (reward.title as string) ?? `Rank ${key}`;
-                const xp = reward.xp ? `${reward.xp} XP` : '';
+                const label = (reward.title as string) ?? t('leaderboard.season.rank_label', { rank: key });
+                const xp = reward.xp ? t('leaderboard.season.xp_reward', { xp: reward.xp }) : '';
                 return (
                   <Chip key={key} size="sm" variant="flat">
                     {label}{xp ? ` — ${xp}` : ''}
@@ -419,13 +419,13 @@ export function LeaderboardPage() {
         setHasMore(responseMeta?.has_more ?? false);
       } else {
         setError(response.code === 'SESSION_EXPIRED'
-          ? tRef.current('leaderboard.session_expired', 'Your session has expired. Please log in again.')
-          : tRef.current('leaderboard.load_error', 'Failed to load leaderboard.'));
+          ? tRef.current('leaderboard.session_expired')
+          : tRef.current('leaderboard.load_error'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load leaderboard', err);
-      setError(tRef.current('leaderboard.load_error', 'Failed to load leaderboard. Please try again.'));
+      setError(tRef.current('leaderboard.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -484,21 +484,21 @@ export function LeaderboardPage() {
         return (
           <>
             <span className="font-bold text-theme-primary">{value.toLocaleString()}</span>
-            <span className="text-xs text-theme-subtle ml-1">h</span>
+            <span className="text-xs text-theme-subtle ml-1">{t('leaderboard.score_unit.hours')}</span>
           </>
         );
       case 'credits_earned':
         return (
           <>
             <span className="font-bold text-theme-primary">{value.toLocaleString()}</span>
-            <span className="text-xs text-theme-subtle ml-1">cr</span>
+            <span className="text-xs text-theme-subtle ml-1">{t('leaderboard.score_unit.credits')}</span>
           </>
         );
       case 'nexus_score':
         return (
           <>
             <span className="font-bold text-indigo-400">{value.toLocaleString()}</span>
-            <span className="text-xs text-theme-subtle ml-1">/1000</span>
+            <span className="text-xs text-theme-subtle ml-1">{t('leaderboard.score_unit.nexus_score')}</span>
           </>
         );
       case 'xp':
@@ -506,7 +506,7 @@ export function LeaderboardPage() {
         return (
           <>
             <span className="font-bold text-theme-primary">{value.toLocaleString()}</span>
-            <span className="text-xs text-theme-subtle ml-1">XP</span>
+            <span className="text-xs text-theme-subtle ml-1">{t('leaderboard.score_unit.xp')}</span>
           </>
         );
     }
@@ -516,7 +516,7 @@ export function LeaderboardPage() {
     xp: t('leaderboard.type.xp'),
     volunteer_hours: t('leaderboard.type.volunteer_hours'),
     credits_earned: t('leaderboard.type.credits_earned'),
-    nexus_score: t('leaderboard.type.nexus_score', 'NexusScore'),
+    nexus_score: t('leaderboard.type.nexus_score'),
   };
 
   const typeIcons: Record<LeaderboardType, React.ReactNode> = {
@@ -550,16 +550,16 @@ export function LeaderboardPage() {
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <Users className="w-7 h-7 text-amber-400" aria-hidden="true" />
-          {t('leaderboard.title', 'Community')}
+          {t('leaderboard.title')}
         </h1>
         <p className="text-theme-muted mt-1">
-          {t('leaderboard.subtitle_redesign', 'See how our community is growing together')}
+          {t('leaderboard.subtitle_redesign')}
         </p>
       </div>
 
       {/* Tab navigation */}
       <Tabs
-        aria-label={t('leaderboard.tabs_aria', 'Community views')}
+        aria-label={t('leaderboard.tabs_aria')}
         color="primary"
         variant="underlined"
         classNames={{ tabList: 'gap-4' }}
@@ -570,7 +570,7 @@ export function LeaderboardPage() {
           title={
             <div className="flex items-center gap-2">
               <Trophy className="w-4 h-4" />
-              <span>{t('leaderboard.tab.competitive', 'Most Active')}</span>
+              <span>{t('leaderboard.tab.competitive')}</span>
             </div>
           }
         >
@@ -606,7 +606,7 @@ export function LeaderboardPage() {
           title={
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
-              <span>{t('leaderboard.tab.community', 'Community Impact')}</span>
+              <span>{t('leaderboard.tab.community')}</span>
             </div>
           }
         >
@@ -620,7 +620,7 @@ export function LeaderboardPage() {
           title={
             <div className="flex items-center gap-2">
               <Route className="w-4 h-4" />
-              <span>{t('leaderboard.tab.journey', 'My Journey')}</span>
+              <span>{t('leaderboard.tab.journey')}</span>
             </div>
           }
         >
@@ -634,7 +634,7 @@ export function LeaderboardPage() {
           title={
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
-              <span>{t('leaderboard.tab.spotlight', 'Spotlight')}</span>
+              <span>{t('leaderboard.tab.spotlight')}</span>
             </div>
           }
         >
@@ -718,7 +718,7 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
             <SelectItem key="xp">{t('leaderboard.type.xp')}</SelectItem>
             <SelectItem key="volunteer_hours">{t('leaderboard.type.volunteer_hours')}</SelectItem>
             <SelectItem key="credits_earned">{t('leaderboard.type.credits_earned')}</SelectItem>
-            <SelectItem key="nexus_score">{t('leaderboard.type.nexus_score', 'NexusScore')}</SelectItem>
+            <SelectItem key="nexus_score">{t('leaderboard.type.nexus_score')}</SelectItem>
           </Select>
 
           {/* Period Selector */}
@@ -776,7 +776,7 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('leaderboard.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            color="primary"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadLeaderboard}
           >
@@ -789,7 +789,7 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
       {!error && (
         <>
           {isLoading ? (
-            <GlassCard className="divide-y divide-white/5" aria-label={t('leaderboard.loading', 'Loading leaderboard')} aria-busy="true">
+            <GlassCard className="divide-y divide-white/5" aria-label={t('leaderboard.loading')} aria-busy="true">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-4 p-4">
                   <Skeleton className="rounded-full flex-shrink-0">

@@ -281,14 +281,24 @@
       "active": "Gníomhach",
       "loading": "Séasúr á lódáil",
       "load_failed": "Theip ar Lódáil",
-      "load_failed_desc": "Ní fhéadfaí stair séasúir a lódáil."
+      "load_failed_desc": "Ní fhéadfaí stair séasúir a lódáil.",
+      "unavailable": "Season data unavailable",
+      "unavailable_desc": "Could not load season information. Rankings below are still available.",
+      "rank_label": "Rank {{rank}}",
+      "xp_reward": "{{xp}} XP"
     },
     "season_unavailable": "Sonraí séasúir gan fáil",
     "season_unavailable_desc": "Níorbh fhéidir faisnéis séasúir a lódáil. Tá na ranguithe thíos fós ar fáil.",
     "session_expired": "Tá do sheisiún éagtha. Logáil isteach arís le do thoil.",
     "load_error": "Theip ar lódáil an chláir ceannais. Bain triail eile as le do thoil.",
     "type_nexus_score": "NexusScore",
-    "load_more": "Load More"
+    "load_more": "Load More",
+    "score_unit": {
+      "hours": "h",
+      "credits": "cr",
+      "nexus_score": "/1000",
+      "xp": "XP"
+    }
   },
   "community": {
     "total_hours": "Uaireanta Iomlána Malartaithe",

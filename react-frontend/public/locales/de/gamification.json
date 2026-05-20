@@ -281,14 +281,24 @@
       "active": "Aktiv",
       "loading": "Saison wird geladen",
       "load_failed": "Laden fehlgeschlagen",
-      "load_failed_desc": "Saisonverlauf konnte nicht geladen werden."
+      "load_failed_desc": "Saisonverlauf konnte nicht geladen werden.",
+      "unavailable": "Season data unavailable",
+      "unavailable_desc": "Could not load season information. Rankings below are still available.",
+      "rank_label": "Rank {{rank}}",
+      "xp_reward": "{{xp}} XP"
     },
     "season_unavailable": "Saisondaten nicht verfügbar",
     "season_unavailable_desc": "Saisoninformationen konnten nicht geladen werden. Die Rangliste unten ist weiterhin verfügbar.",
     "session_expired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
     "load_error": "Rangliste konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
     "type_nexus_score": "NexusScore",
-    "load_more": "Load More"
+    "load_more": "Load More",
+    "score_unit": {
+      "hours": "h",
+      "credits": "cr",
+      "nexus_score": "/1000",
+      "xp": "XP"
+    }
   },
   "community": {
     "total_hours": "Insgesamt getauschte Stunden",

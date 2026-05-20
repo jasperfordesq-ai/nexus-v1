@@ -287,8 +287,18 @@
       "history": "Season History",
       "active": "Active",
       "loading": "Loading season",
+      "unavailable": "Season data unavailable",
+      "unavailable_desc": "Could not load season information. Rankings below are still available.",
+      "rank_label": "Rank {{rank}}",
+      "xp_reward": "{{xp}} XP",
       "load_failed": "Load Failed",
       "load_failed_desc": "Could not load season history."
+    },
+    "score_unit": {
+      "hours": "h",
+      "credits": "cr",
+      "nexus_score": "/1000",
+      "xp": "XP"
     },
     "season_unavailable": "Season data unavailable",
     "season_unavailable_desc": "Could not load season information. Rankings below are still available.",
