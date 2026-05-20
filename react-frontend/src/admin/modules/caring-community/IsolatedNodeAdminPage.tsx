@@ -30,6 +30,7 @@ import Pencil from 'lucide-react/icons/pencil';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Server from 'lucide-react/icons/server';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -70,25 +71,13 @@ interface UpdateResponse {
   gate: GateStatus;
 }
 
-const STATUS_OPTIONS: { key: ItemStatus; label: string }[] = [
-  { key: 'pending', label: 'Pending' },
-  { key: 'in_progress', label: 'In progress' },
-  { key: 'decided', label: 'Decided' },
-  { key: 'blocked', label: 'Blocked' },
-];
+const STATUS_OPTIONS: ItemStatus[] = ['pending', 'in_progress', 'decided', 'blocked'];
 
 const STATUS_COLORS: Record<ItemStatus, 'default' | 'warning' | 'success' | 'danger'> = {
   pending: 'default',
   in_progress: 'warning',
   decided: 'success',
   blocked: 'danger',
-};
-
-const STATUS_LABELS: Record<ItemStatus, string> = {
-  pending: 'Pending',
-  in_progress: 'In progress',
-  decided: 'Decided',
-  blocked: 'Blocked',
 };
 
 interface DraftState {
@@ -108,7 +97,8 @@ function buildDraft(item: DecisionItem): DraftState {
 }
 
 export default function IsolatedNodeAdminPage() {
-  usePageTitle('Isolated-Node Decision Gate');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('isolated_node.meta.page_title'));
   const { showToast } = useToast();
 
   const [data, setData] = useState<GateResponse | null>(null);
@@ -123,11 +113,11 @@ export default function IsolatedNodeAdminPage() {
       const res = await api.get<GateResponse>('/v2/admin/caring-community/isolated-node');
       setData(res.data ?? null);
     } catch {
-      showToast('Failed to load decision-gate data', 'error');
+      showToast(t('isolated_node.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     load();
@@ -172,10 +162,10 @@ export default function IsolatedNodeAdminPage() {
           last_updated_at: updatedItem.updated_at ?? data.last_updated_at,
         });
       }
-      showToast('Decision item updated', 'success');
+      showToast(t('isolated_node.toasts.item_updated'), 'success');
       closeModal();
     } catch (err) {
-      const msg = (err as { message?: string })?.message ?? 'Failed to save decision item';
+      const msg = (err as { message?: string })?.message ?? t('isolated_node.toasts.save_failed');
       showToast(msg, 'error');
     } finally {
       setSaving(false);
@@ -213,7 +203,7 @@ export default function IsolatedNodeAdminPage() {
     if (editingItem.type === 'enum' || editingItem.type === 'choice') {
       return (
         <Select
-          label="Value"
+          label={t('isolated_node.fields.value')}
           description={editingItem.help}
           selectedKeys={draft.value ? [draft.value] : []}
           onSelectionChange={(keys) => {
@@ -233,10 +223,10 @@ export default function IsolatedNodeAdminPage() {
     if (editingItem.type === 'url') {
       return (
         <Input
-          label="Value"
+          label={t('isolated_node.fields.value')}
           description={editingItem.help}
           type="url"
-          placeholder="https://..."
+          placeholder={t('isolated_node.fields.url_placeholder')}
           value={draft.value}
           onValueChange={(v) => setDraft({ ...draft, value: v })}
         />
@@ -245,7 +235,7 @@ export default function IsolatedNodeAdminPage() {
 
     return (
       <Input
-        label="Value"
+        label={t('isolated_node.fields.value')}
         description={editingItem.help}
         value={draft.value}
         onValueChange={(v) => setDraft({ ...draft, value: v })}
@@ -259,18 +249,18 @@ export default function IsolatedNodeAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Isolated-Node Decision Gate"
-        subtitle="AG85 — readiness checklist for canton-controlled deployment"
+        title={t('isolated_node.meta.title')}
+        subtitle={t('isolated_node.meta.subtitle')}
         icon={<Server size={20} />}
         actions={
-          <Tooltip content="Refresh">
+          <Tooltip content={t('isolated_node.actions.refresh')}>
             <Button
               isIconOnly
               size="sm"
               variant="flat"
               onPress={load}
               isLoading={loading}
-              aria-label="Refresh"
+              aria-label={t('isolated_node.actions.refresh_aria')}
             >
               <RefreshCw size={15} />
             </Button>
@@ -283,18 +273,13 @@ export default function IsolatedNodeAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('isolated_node.about.title')}</p>
               <p className="text-default-600">
-                An Isolated Node deployment runs <Abbr term="NEXUS">NEXUS</Abbr> on infrastructure controlled entirely by the
-                canton or municipality — no data leaves the canton boundary. This configuration is
-                required for <Abbr term="AGORIS">AGORIS</Abbr> deployments under strict Swiss cantonal data protection rules.
-                Most communities run as standard hosted deployments and do not need to configure this
-                section.
+                {t('isolated_node.about.body_prefix')} <Abbr term="NEXUS" /> {t('isolated_node.about.body_middle')}{' '}
+                <Abbr term="AGORIS" /> {t('isolated_node.about.body_suffix')}
               </p>
               <p className="text-default-600">
-                Work through each decision item below: set the value, assign an owner, and mark it
-                as 'Decided' when agreed. The gate closes (and the Pilot Launch Readiness check
-                passes) once every item is in 'Decided' status.
+                {t('isolated_node.about.workflow')}
               </p>
             </div>
           </div>
@@ -306,12 +291,9 @@ export default function IsolatedNodeAdminPage() {
           <div className="flex gap-3">
             <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-warning-600" aria-hidden="true" />
             <div className="text-sm">
-              <p className="font-semibold text-warning-800 dark:text-warning-200">Important — only configure if required</p>
+              <p className="font-semibold text-warning-800 dark:text-warning-200">{t('isolated_node.warning.title')}</p>
               <p className="text-default-600 mt-0.5">
-                Only change these settings if your municipality has explicitly specified an
-                isolated-node requirement. Changing the deployment mode after pilot launch requires
-                coordination with the <Abbr term="NEXUS">NEXUS</Abbr> technical team. Do not change this setting without
-                agreement from your cantonal data protection officer.
+                {t('isolated_node.warning.body_prefix')} <Abbr term="NEXUS" /> {t('isolated_node.warning.body_suffix')}
               </p>
             </div>
           </div>
@@ -344,34 +326,37 @@ export default function IsolatedNodeAdminPage() {
                   <div>
                     <p className="text-base font-semibold">
                       {gate.closed
-                        ? 'Gate closed — ready to launch'
-                        : 'Gate open — decisions still required'}
+                        ? t('isolated_node.gate.closed')
+                        : t('isolated_node.gate.open')}
                     </p>
                     <p className="text-sm text-default-500">
-                      {gate.decided_count} of {gate.total_count} items decided
+                      {t('isolated_node.gate.decided_count', {
+                        decided: gate.decided_count,
+                        total: gate.total_count,
+                      })}
                       {gate.blockers.length > 0
-                        ? ` · ${gate.blockers.length} blocked`
+                        ? t('isolated_node.gate.blocked_count', { count: gate.blockers.length })
                         : ''}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Chip size="sm" variant="flat" color={STATUS_COLORS.pending}>
-                    Pending: {gate.status_counts.pending}
+                    {t('isolated_node.status_counts.pending', { count: gate.status_counts.pending })}
                   </Chip>
                   <Chip size="sm" variant="flat" color={STATUS_COLORS.in_progress}>
-                    In progress: {gate.status_counts.in_progress}
+                    {t('isolated_node.status_counts.in_progress', { count: gate.status_counts.in_progress })}
                   </Chip>
                   <Chip size="sm" variant="flat" color={STATUS_COLORS.decided}>
-                    Decided: {gate.status_counts.decided}
+                    {t('isolated_node.status_counts.decided', { count: gate.status_counts.decided })}
                   </Chip>
                   <Chip size="sm" variant="flat" color={STATUS_COLORS.blocked}>
-                    Blocked: {gate.status_counts.blocked}
+                    {t('isolated_node.status_counts.blocked', { count: gate.status_counts.blocked })}
                   </Chip>
                 </div>
               </div>
               <Progress
-                aria-label="Decision-gate progress"
+                aria-label={t('isolated_node.gate.progress_aria')}
                 value={progressValue}
                 color={gate.closed ? 'success' : 'warning'}
                 className="max-w-full"
@@ -389,7 +374,7 @@ export default function IsolatedNodeAdminPage() {
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <Chip size="sm" variant="flat" color={STATUS_COLORS[item.status]}>
-                      {STATUS_LABELS[item.status]}
+                      {t(`isolated_node.status.${item.status}`)}
                     </Chip>
                     <Button
                       size="sm"
@@ -397,33 +382,33 @@ export default function IsolatedNodeAdminPage() {
                       startContent={<Pencil size={13} />}
                       onPress={() => openEditor(item)}
                     >
-                      Edit
+                      {t('isolated_node.actions.edit')}
                     </Button>
                   </div>
                 </CardHeader>
                 <CardBody className="pt-0">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-default-400">Value</p>
+                      <p className="text-xs uppercase tracking-wide text-default-400">{t('isolated_node.fields.value')}</p>
                       <div className="mt-1">{renderValueChip(item)}</div>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-default-400">Owner</p>
+                      <p className="text-xs uppercase tracking-wide text-default-400">{t('isolated_node.fields.owner')}</p>
                       <p className="mt-1">
                         {item.owner ? (
                           item.owner
                         ) : (
-                          <span className="text-default-400 italic">unassigned</span>
+                          <span className="text-default-400 italic">{t('isolated_node.empty.unassigned')}</span>
                         )}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-default-400">Notes</p>
+                      <p className="text-xs uppercase tracking-wide text-default-400">{t('isolated_node.fields.notes')}</p>
                       <p className="mt-1 whitespace-pre-wrap break-words">
                         {item.notes ? (
                           item.notes
                         ) : (
-                          <span className="text-default-400 italic">none</span>
+                          <span className="text-default-400 italic">{t('isolated_node.empty.none')}</span>
                         )}
                       </p>
                     </div>
@@ -437,7 +422,9 @@ export default function IsolatedNodeAdminPage() {
             <>
               <Divider />
               <p className="text-xs text-default-500">
-                Last updated {new Date(data.last_updated_at).toLocaleString()}
+                {t('isolated_node.timestamps.last_updated', {
+                  date: new Date(data.last_updated_at).toLocaleString(),
+                })}
               </p>
             </>
           )}
@@ -447,9 +434,9 @@ export default function IsolatedNodeAdminPage() {
       <Modal isOpen={!!editingItem} onClose={closeModal} size="lg" scrollBehavior="inside">
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
-            <span>{editingItem?.label ?? 'Edit decision item'}</span>
+            <span>{editingItem?.label ?? t('isolated_node.modal.edit_decision_item')}</span>
             <span className="text-xs font-normal text-default-500">
-              Update value, owner, status, and notes for this gate item
+              {t('isolated_node.modal.subtitle')}
             </span>
           </ModalHeader>
           <ModalBody>
@@ -457,13 +444,13 @@ export default function IsolatedNodeAdminPage() {
               <div className="space-y-4">
                 {renderValueInput()}
                 <Input
-                  label="Owner"
-                  description="Person or organisation responsible for this decision"
+                  label={t('isolated_node.fields.owner')}
+                  description={t('isolated_node.fields.owner_description')}
                   value={draft.owner}
                   onValueChange={(v) => setDraft({ ...draft, owner: v })}
                 />
                 <Select
-                  label="Status"
+                  label={t('isolated_node.fields.status')}
                   selectedKeys={[draft.status]}
                   onSelectionChange={(keys) => {
                     const next = Array.from(keys)[0];
@@ -473,12 +460,12 @@ export default function IsolatedNodeAdminPage() {
                   }}
                 >
                   {STATUS_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.key}>{opt.label}</SelectItem>
+                    <SelectItem key={opt}>{t(`isolated_node.status.${opt}`)}</SelectItem>
                   ))}
                 </Select>
                 <Textarea
-                  label="Notes"
-                  description="Context, links, contract references, or blockers"
+                  label={t('isolated_node.fields.notes')}
+                  description={t('isolated_node.fields.notes_description')}
                   minRows={3}
                   value={draft.notes}
                   onValueChange={(v) => setDraft({ ...draft, notes: v })}
@@ -488,10 +475,10 @@ export default function IsolatedNodeAdminPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={closeModal} isDisabled={saving}>
-              Cancel
+              {t('isolated_node.actions.cancel')}
             </Button>
             <Button color="primary" onPress={save} isLoading={saving}>
-              Save changes
+              {t('isolated_node.actions.save_changes')}
             </Button>
           </ModalFooter>
         </ModalContent>

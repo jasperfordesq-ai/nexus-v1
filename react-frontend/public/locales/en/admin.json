@@ -3760,6 +3760,176 @@
       "export_failed": "Failed to export boundary map"
     }
   },
+  "pilot_launch_readiness": {
+    "meta": {
+      "page_title": "Pilot Launch Readiness",
+      "title": "Pilot Launch Readiness",
+      "subtitle": "AG95 - go/no-go report combining AG80-AG87 evaluation surfaces"
+    },
+    "actions": {
+      "launch_pilot": "Launch pilot",
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh launch-readiness report",
+      "retry": "Retry",
+      "open": "Open",
+      "acknowledge_default_matrix": "Acknowledge default matrix",
+      "cancel": "Cancel",
+      "confirm_launch": "Yes, launch the pilot"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "This is the go/no-go gate before your Caring Community pilot goes live. Each section below corresponds to a configuration or evaluation module (AG80-AG87). All sections must reach Ready status before the Launch button is enabled. Once launched, this is a one-way action - the launch timestamp and operator are recorded permanently.",
+      "review_help": "Sections showing Needs review have missing or incomplete configuration. Click through to the relevant module to resolve the listed items."
+    },
+    "status": {
+      "ready": "Ready",
+      "needs_review": "Needs review",
+      "not_started": "Not started",
+      "blocked": "Blocked"
+    },
+    "missing": {
+      "controller_name": "Controller name",
+      "controller_contact_email": "Controller contact email",
+      "controller_data_protection_officer": "Data protection officer",
+      "incident_response_contact_email": "Incident response contact email",
+      "workshop_not_run": "Operating policy workshop not run",
+      "policy_appendix_url": "Policy appendix URL",
+      "safeguarding_escalation_user_id": "Safeguarding escalation contact",
+      "acknowledgement": "Coordinator acknowledgement",
+      "pre_pilot_baseline": "Pre-pilot scoreboard baseline",
+      "danger_checks": "Data quality issues",
+      "backlog_empty": "Integration backlog empty"
+    },
+    "states": {
+      "launched_title": "Pilot launched",
+      "launched_body": "Launched on {{date}}{{user}}. This is a one-way milestone - readiness checks remain visible for audit.",
+      "launched_by_user": " by user #{{id}}",
+      "ready_title": "Ready to launch",
+      "ready_body_prefix": "Every readiness section is ready. Click",
+      "ready_body_suffix": "when your coordinator team is ready to make this a one-way decision.",
+      "blocked_title": "Cannot launch yet - {{count}} blocker remains",
+      "blocked_title_plural": "Cannot launch yet - {{count}} blockers remain",
+      "blocked_body": "Resolve every section below before the launch button is enabled."
+    },
+    "overall": {
+      "ready": "Pilot is ready to launch",
+      "blocked": "Launch blocked - fix issues first",
+      "not_started": "Pilot evaluation not yet run",
+      "needs_review": "Pilot needs coordinator review"
+    },
+    "progress": {
+      "ready_count": "{{ready}} / {{total}} ready",
+      "aria": "Launch readiness progress"
+    },
+    "isolated_node": {
+      "required": "Isolated-node gate is active - this deployment is configured as a canton-isolated node (AG85). All items must reach Decided status before launch.",
+      "informational": "Isolated-node gate is informational for standard hosted deployments. It only blocks launch when AG85 deployment_mode is set to canton_isolated_node. If your municipality has not specified an isolated-node requirement, you can disregard items in this section."
+    },
+    "timestamps": {
+      "last_updated": "Last updated {{date}}",
+      "report_generated": "Report generated {{date}}. Click any section to open the corresponding admin surface."
+    },
+    "modal": {
+      "title": "Launch the pilot?",
+      "body_prefix": "Launching the pilot is a",
+      "one_way_action": "one-way action",
+      "body_suffix": "It records the launch timestamp and operator on the tenant, and platform reports begin treating the community as live.",
+      "confirm_intro": "Before continuing, confirm with your coordinator team that:",
+      "check_disclosure": "The disclosure pack, operating policy, and commercial boundary are signed off",
+      "check_baseline": "The pre-pilot scoreboard baseline has been captured",
+      "check_data_quality": "Data quality checks are green",
+      "check_residents": "Real residents are ready to be invited",
+      "section_summary": "Section summary"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "more_count": "+{{count}} more",
+    "toasts": {
+      "load_failed": "Failed to load launch-readiness report",
+      "boundary_acknowledged": "Commercial boundary acknowledged",
+      "boundary_acknowledge_failed": "Failed to acknowledge boundary",
+      "launch_success": "Pilot launched successfully.",
+      "cannot_launch": "Cannot launch - readiness gate is not closed.",
+      "already_launched": "This pilot has already been launched.",
+      "launch_failed": "Failed to launch pilot."
+    },
+    "errors": {
+      "load_failed": "The launch-readiness report could not be loaded.",
+      "unexpected_response": "The launch-readiness report returned an unexpected response.",
+      "unavailable_title": "Readiness report unavailable"
+    }
+  },
+  "isolated_node": {
+    "meta": {
+      "page_title": "Isolated-Node Decision Gate",
+      "title": "Isolated-Node Decision Gate",
+      "subtitle": "AG85 - readiness checklist for canton-controlled deployment"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh isolated-node decision gate",
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "save_changes": "Save changes"
+    },
+    "about": {
+      "title": "About this page",
+      "body_prefix": "An Isolated Node deployment runs",
+      "body_middle": "on infrastructure controlled entirely by the canton or municipality - no data leaves the canton boundary. This configuration is required for",
+      "body_suffix": "deployments under strict Swiss cantonal data protection rules. Most communities run as standard hosted deployments and do not need to configure this section.",
+      "workflow": "Work through each decision item below: set the value, assign an owner, and mark it as Decided when agreed. The gate closes (and the Pilot Launch Readiness check passes) once every item is in Decided status."
+    },
+    "warning": {
+      "title": "Important - only configure if required",
+      "body_prefix": "Only change these settings if your municipality has explicitly specified an isolated-node requirement. Changing the deployment mode after pilot launch requires coordination with the",
+      "body_suffix": "technical team. Do not change this setting without agreement from your cantonal data protection officer."
+    },
+    "status": {
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "decided": "Decided",
+      "blocked": "Blocked"
+    },
+    "status_counts": {
+      "pending": "Pending: {{count}}",
+      "in_progress": "In progress: {{count}}",
+      "decided": "Decided: {{count}}",
+      "blocked": "Blocked: {{count}}"
+    },
+    "gate": {
+      "closed": "Gate closed - ready to launch",
+      "open": "Gate open - decisions still required",
+      "decided_count": "{{decided}} of {{total}} items decided",
+      "blocked_count": " - {{count}} blocked",
+      "progress_aria": "Decision-gate progress"
+    },
+    "fields": {
+      "value": "Value",
+      "owner": "Owner",
+      "notes": "Notes",
+      "status": "Status",
+      "url_placeholder": "https://...",
+      "owner_description": "Person or organisation responsible for this decision",
+      "notes_description": "Context, links, contract references, or blockers"
+    },
+    "empty": {
+      "unassigned": "unassigned",
+      "none": "none"
+    },
+    "timestamps": {
+      "last_updated": "Last updated {{date}}"
+    },
+    "modal": {
+      "edit_decision_item": "Edit decision item",
+      "subtitle": "Update value, owner, status, and notes for this gate item"
+    },
+    "toasts": {
+      "load_failed": "Failed to load decision-gate data",
+      "item_updated": "Decision item updated",
+      "save_failed": "Failed to save decision item"
+    }
+  },
   "federation_peers_admin": {
     "meta": {
       "page_title": "Federation Peers - Admin",

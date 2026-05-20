@@ -29,6 +29,7 @@ import ChevronRight from 'lucide-react/icons/chevron-right';
 import Rocket from 'lucide-react/icons/rocket';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import Info from 'lucide-react/icons/info';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -80,32 +81,25 @@ const STATUS_COLORS: Record<SectionStatus, 'success' | 'warning' | 'default' | '
   blocked: 'danger',
 };
 
-const STATUS_LABELS: Record<SectionStatus, string> = {
-  ready: 'Ready',
-  needs_review: 'Needs review',
-  not_started: 'Not started',
-  blocked: 'Blocked',
+const MISSING_LABEL_KEYS: Record<string, string> = {
+  'controller.name': 'controller_name',
+  'controller.contact_email': 'controller_contact_email',
+  'controller.data_protection_officer': 'controller_data_protection_officer',
+  'incident_response.contact_email': 'incident_response_contact_email',
+  workshop_not_run: 'workshop_not_run',
+  policy_appendix_url: 'policy_appendix_url',
+  safeguarding_escalation_user_id: 'safeguarding_escalation_user_id',
+  acknowledgement: 'acknowledgement',
+  pre_pilot_baseline: 'pre_pilot_baseline',
+  danger_checks: 'danger_checks',
+  backlog_empty: 'backlog_empty',
 };
 
-const MISSING_LABELS: Record<string, string> = {
-  'controller.name': 'Controller name',
-  'controller.contact_email': 'Controller contact email',
-  'controller.data_protection_officer': 'Data protection officer',
-  'incident_response.contact_email': 'Incident response contact email',
-  workshop_not_run: 'Operating policy workshop not run',
-  policy_appendix_url: 'Policy appendix URL',
-  safeguarding_escalation_user_id: 'Safeguarding escalation contact',
-  acknowledgement: 'Coordinator acknowledgement',
-  pre_pilot_baseline: 'Pre-pilot scoreboard baseline',
-  danger_checks: 'Data quality issues',
-  backlog_empty: 'Integration backlog empty',
-};
+type AdminT = (key: string, options?: Record<string, unknown>) => string;
 
-function humanizeMissing(slug: string): string {
-  if (MISSING_LABELS[slug]) return MISSING_LABELS[slug];
-  return slug
-    .replace(/[._]/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+function missingLabel(t: AdminT, slug: string): string {
+  const key = MISSING_LABEL_KEYS[slug];
+  return key ? t(`pilot_launch_readiness.missing.${key}`) : slug.replace(/[._]/g, ' ');
 }
 
 function statusIcon(status: SectionStatus) {
@@ -130,7 +124,8 @@ function isReadinessReport(value: unknown): value is ReadinessReport {
 }
 
 export default function PilotLaunchReadinessAdminPage() {
-  usePageTitle('Pilot Launch Readiness');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('pilot_launch_readiness.meta.page_title'));
   const { showToast } = useToast();
 
   const [report, setReport] = useState<ReadinessReport | null>(null);
@@ -147,25 +142,25 @@ export default function PilotLaunchReadinessAdminPage() {
       const res = await api.get<ReadinessReport>('/v2/admin/caring-community/launch-readiness');
       if (!res.success) {
         setReport(null);
-        setLoadError(res.error ?? 'The launch-readiness report could not be loaded.');
+        setLoadError(res.error ?? t('pilot_launch_readiness.errors.load_failed'));
         return;
       }
 
       if (!isReadinessReport(res.data)) {
         setReport(null);
-        setLoadError('The launch-readiness report returned an unexpected response.');
+        setLoadError(t('pilot_launch_readiness.errors.unexpected_response'));
         return;
       }
 
       setReport(res.data);
     } catch {
       setReport(null);
-      setLoadError('The launch-readiness report could not be loaded.');
-      showToast('Failed to load launch-readiness report', 'error');
+      setLoadError(t('pilot_launch_readiness.errors.load_failed'));
+      showToast(t('pilot_launch_readiness.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     load();
@@ -179,9 +174,9 @@ export default function PilotLaunchReadinessAdminPage() {
         {},
       );
       if (isReadinessReport(res.data?.report)) setReport(res.data.report);
-      showToast('Commercial boundary acknowledged', 'success');
+      showToast(t('pilot_launch_readiness.toasts.boundary_acknowledged'), 'success');
     } catch {
-      showToast('Failed to acknowledge boundary', 'error');
+      showToast(t('pilot_launch_readiness.toasts.boundary_acknowledge_failed'), 'error');
     } finally {
       setAcknowledging(false);
     }
@@ -201,21 +196,21 @@ export default function PilotLaunchReadinessAdminPage() {
         } else {
           await load();
         }
-        showToast('Pilot launched successfully.', 'success');
+        showToast(t('pilot_launch_readiness.toasts.launch_success'), 'success');
         setLaunchModalOpen(false);
       } else {
         const code = res.code ?? '';
         const msg =
           code === 'CANNOT_LAUNCH'
-            ? 'Cannot launch — readiness gate is not closed.'
+            ? t('pilot_launch_readiness.toasts.cannot_launch')
             : code === 'ALREADY_LAUNCHED'
-            ? 'This pilot has already been launched.'
-            : 'Failed to launch pilot.';
+            ? t('pilot_launch_readiness.toasts.already_launched')
+            : t('pilot_launch_readiness.toasts.launch_failed');
         showToast(msg, 'error');
         await load();
       }
     } catch {
-      showToast('Failed to launch pilot.', 'error');
+      showToast(t('pilot_launch_readiness.toasts.launch_failed'), 'error');
     } finally {
       setLaunching(false);
     }
@@ -233,8 +228,8 @@ export default function PilotLaunchReadinessAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Pilot Launch Readiness"
-        subtitle="AG95 — go/no-go report combining AG80–AG87 evaluation surfaces"
+        title={t('pilot_launch_readiness.meta.title')}
+        subtitle={t('pilot_launch_readiness.meta.subtitle')}
         icon={<Rocket size={20} />}
         actions={
           <div className="flex items-center gap-2">
@@ -246,17 +241,17 @@ export default function PilotLaunchReadinessAdminPage() {
                 onPress={() => setLaunchModalOpen(true)}
                 isDisabled={!canLaunch || loading}
               >
-                Launch pilot
+                {t('pilot_launch_readiness.actions.launch_pilot')}
               </Button>
             )}
-            <Tooltip content="Refresh">
+            <Tooltip content={t('pilot_launch_readiness.actions.refresh')}>
               <Button
                 isIconOnly
                 size="sm"
                 variant="flat"
                 onPress={load}
                 isLoading={loading}
-                aria-label="Refresh"
+                aria-label={t('pilot_launch_readiness.actions.refresh_aria')}
               >
                 <RefreshCw size={15} />
               </Button>
@@ -270,16 +265,12 @@ export default function PilotLaunchReadinessAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('pilot_launch_readiness.about.title')}</p>
               <p className="text-default-600">
-                This is the go/no-go gate before your Caring Community pilot goes live. Each section
-                below corresponds to a configuration or evaluation module (AG80–AG87). All sections
-                must reach 'Ready' status before the Launch button is enabled. Once launched, this is
-                a one-way action — the launch timestamp and operator are recorded permanently.
+                {t('pilot_launch_readiness.about.body')}
               </p>
               <p className="text-default-600 mt-1">
-                Sections showing 'Needs review' have missing or incomplete configuration. Click
-                through to the relevant module to resolve the listed items.
+                {t('pilot_launch_readiness.about.review_help')}
               </p>
             </div>
           </div>
@@ -293,16 +284,18 @@ export default function PilotLaunchReadinessAdminPage() {
               <div className="flex items-center gap-3">
                 <CheckCircle2 size={22} className="text-success" />
                 <div>
-                  <p className="text-base font-semibold">Pilot launched</p>
+                  <p className="text-base font-semibold">{t('pilot_launch_readiness.states.launched_title')}</p>
                   <p className="text-sm text-default-600">
-                    Launched on{' '}
-                    {report.launched
-                      ? new Date(report.launched.launched_at).toLocaleString()
-                      : '—'}
-                    {report.launched?.launched_by_id
-                      ? ` by user #${report.launched.launched_by_id}`
-                      : ''}
-                    . This is a one-way milestone — readiness checks remain visible for audit.
+                    {t('pilot_launch_readiness.states.launched_body', {
+                      date: report.launched
+                        ? new Date(report.launched.launched_at).toLocaleString()
+                        : t('pilot_launch_readiness.empty.value'),
+                      user: report.launched?.launched_by_id
+                        ? t('pilot_launch_readiness.states.launched_by_user', {
+                            id: report.launched.launched_by_id,
+                          })
+                        : '',
+                    })}
                   </p>
                 </div>
               </div>
@@ -314,10 +307,9 @@ export default function PilotLaunchReadinessAdminPage() {
               <div className="flex items-center gap-3">
                 <CheckCircle2 size={22} className="text-success" />
                 <div>
-                  <p className="text-base font-semibold">Ready to launch</p>
+                  <p className="text-base font-semibold">{t('pilot_launch_readiness.states.ready_title')}</p>
                   <p className="text-sm text-default-600">
-                    Every readiness section is ready. Click <em>Launch pilot</em> when your
-                    coordinator team is ready to make this a one-way decision.
+                    {t('pilot_launch_readiness.states.ready_body_prefix')} <em>{t('pilot_launch_readiness.actions.launch_pilot')}</em> {t('pilot_launch_readiness.states.ready_body_suffix')}
                   </p>
                 </div>
               </div>
@@ -330,11 +322,10 @@ export default function PilotLaunchReadinessAdminPage() {
                 <ShieldAlert size={22} className="text-danger" />
                 <div>
                   <p className="text-base font-semibold">
-                    Cannot launch yet — {blockerCount} blocker{blockerCount === 1 ? '' : 's'}{' '}
-                    remain{blockerCount === 1 ? 's' : ''}
+                    {t('pilot_launch_readiness.states.blocked_title', { count: blockerCount })}
                   </p>
                   <p className="text-sm text-default-600">
-                    Resolve every section below before the launch button is enabled.
+                    {t('pilot_launch_readiness.states.blocked_body')}
                   </p>
                 </div>
               </div>
@@ -355,7 +346,7 @@ export default function PilotLaunchReadinessAdminPage() {
             <div className="flex items-start gap-3">
               <AlertTriangle size={22} className="mt-0.5 shrink-0 text-danger" />
               <div className="min-w-0 flex-1">
-                <p className="text-base font-semibold">Readiness report unavailable</p>
+                <p className="text-base font-semibold">{t('pilot_launch_readiness.errors.unavailable_title')}</p>
                 <p className="mt-1 text-sm text-default-600">{loadError}</p>
               </div>
               <Button
@@ -364,7 +355,7 @@ export default function PilotLaunchReadinessAdminPage() {
                 startContent={<RefreshCw size={14} />}
                 onPress={load}
               >
-                Retry
+                {t('pilot_launch_readiness.actions.retry')}
               </Button>
             </div>
           </CardBody>
@@ -389,30 +380,33 @@ export default function PilotLaunchReadinessAdminPage() {
                   <div>
                     <p className="text-lg font-semibold">
                       {overall.status === 'ready'
-                        ? 'Pilot is ready to launch'
+                        ? t('pilot_launch_readiness.overall.ready')
                         : overall.status === 'blocked'
-                        ? 'Launch blocked — fix issues first'
+                        ? t('pilot_launch_readiness.overall.blocked')
                         : overall.status === 'not_started'
-                        ? 'Pilot evaluation not yet run'
-                        : 'Pilot needs coordinator review'}
+                        ? t('pilot_launch_readiness.overall.not_started')
+                        : t('pilot_launch_readiness.overall.needs_review')}
                     </p>
                     <p className="text-sm text-default-500">{overall.summary}</p>
                   </div>
                 </div>
                 <Chip color={STATUS_COLORS[overall.status]} variant="flat" size="lg">
-                  {overall.ready_section_count} / {overall.total_section_count} ready
+                  {t('pilot_launch_readiness.progress.ready_count', {
+                    ready: overall.ready_section_count,
+                    total: overall.total_section_count,
+                  })}
                 </Chip>
               </div>
               <Progress
-                aria-label="Launch readiness progress"
+                aria-label={t('pilot_launch_readiness.progress.aria')}
                 value={progressValue}
                 color={STATUS_COLORS[overall.status]}
                 className="max-w-full"
               />
               <p className="text-xs text-default-500 italic">
                 {report.isolated_node_required
-                  ? 'Isolated-node gate is active — this deployment is configured as a canton-isolated node (AG85). All items must reach Decided status before launch.'
-                  : 'Isolated-node gate is informational for standard hosted deployments. It only blocks launch when AG85 deployment_mode is set to canton_isolated_node. If your municipality has not specified an isolated-node requirement, you can disregard items in this section.'}
+                  ? t('pilot_launch_readiness.isolated_node.required')
+                  : t('pilot_launch_readiness.isolated_node.informational')}
               </p>
             </CardBody>
           </Card>
@@ -427,7 +421,7 @@ export default function PilotLaunchReadinessAdminPage() {
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <Chip size="sm" variant="flat" color={STATUS_COLORS[section.status]}>
-                      {STATUS_LABELS[section.status]}
+                      {t(`pilot_launch_readiness.status.${section.status}`)}
                     </Chip>
                     <Button
                       as={Link}
@@ -436,7 +430,7 @@ export default function PilotLaunchReadinessAdminPage() {
                       variant="flat"
                       endContent={<ChevronRight size={14} />}
                     >
-                      Open
+                      {t('pilot_launch_readiness.actions.open')}
                     </Button>
                   </div>
                 </CardHeader>
@@ -450,12 +444,12 @@ export default function PilotLaunchReadinessAdminPage() {
                           variant="dot"
                           color={section.status === 'blocked' ? 'danger' : 'warning'}
                         >
-                          {humanizeMissing(item)}
+                          {missingLabel(t, item)}
                         </Chip>
                       ))}
                       {section.missing.length > 8 && (
                         <Chip size="sm" variant="flat" color="default">
-                          +{section.missing.length - 8} more
+                          {t('pilot_launch_readiness.more_count', { count: section.missing.length - 8 })}
                         </Chip>
                       )}
                     </div>
@@ -471,14 +465,16 @@ export default function PilotLaunchReadinessAdminPage() {
                         onPress={acknowledgeBoundary}
                         isLoading={acknowledging}
                       >
-                        Acknowledge default matrix
+                        {t('pilot_launch_readiness.actions.acknowledge_default_matrix')}
                       </Button>
                     </div>
                   )}
 
                   {section.last_updated_at && (
                     <p className="text-[11px] text-default-400">
-                      Last updated {new Date(section.last_updated_at).toLocaleString()}
+                      {t('pilot_launch_readiness.timestamps.last_updated', {
+                        date: new Date(section.last_updated_at).toLocaleString(),
+                      })}
                     </p>
                   )}
                 </CardBody>
@@ -488,8 +484,9 @@ export default function PilotLaunchReadinessAdminPage() {
 
           <Divider />
           <p className="text-xs text-default-500">
-            Report generated {new Date(report.generated_at).toLocaleString()}. Click any section to
-            open the corresponding admin surface.
+            {t('pilot_launch_readiness.timestamps.report_generated', {
+              date: new Date(report.generated_at).toLocaleString(),
+            })}
           </p>
         </>
       )}
@@ -505,32 +502,30 @@ export default function PilotLaunchReadinessAdminPage() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Rocket size={20} className="text-success" />
-            Launch the pilot?
+            {t('pilot_launch_readiness.modal.title')}
           </ModalHeader>
           <ModalBody className="space-y-3">
             <p>
-              Launching the pilot is a <strong>one-way action</strong>. It records the launch
-              timestamp and operator on the tenant, and platform reports begin treating the
-              community as live.
+              {t('pilot_launch_readiness.modal.body_prefix')} <strong>{t('pilot_launch_readiness.modal.one_way_action')}</strong>. {t('pilot_launch_readiness.modal.body_suffix')}
             </p>
             <p>
-              Before continuing, confirm with your coordinator team that:
+              {t('pilot_launch_readiness.modal.confirm_intro')}
             </p>
             <ul className="list-disc pl-6 text-sm text-default-700 space-y-1">
-              <li>The disclosure pack, operating policy, and commercial boundary are signed off</li>
-              <li>The pre-pilot scoreboard baseline has been captured</li>
-              <li>Data quality checks are green</li>
-              <li>Real residents are ready to be invited</li>
+              <li>{t('pilot_launch_readiness.modal.check_disclosure')}</li>
+              <li>{t('pilot_launch_readiness.modal.check_baseline')}</li>
+              <li>{t('pilot_launch_readiness.modal.check_data_quality')}</li>
+              <li>{t('pilot_launch_readiness.modal.check_residents')}</li>
             </ul>
             {report && (
               <div className="rounded-lg border border-default-200 bg-default-50 p-3 text-xs text-default-700 dark:bg-default-100/30">
-                <p className="font-semibold mb-1">Section summary</p>
+                <p className="font-semibold mb-1">{t('pilot_launch_readiness.modal.section_summary')}</p>
                 <ul className="space-y-0.5">
                   {report.sections.map((s) => (
                     <li key={s.key} className="flex items-center justify-between gap-2">
                       <span>{s.label}</span>
                       <Chip size="sm" variant="flat" color={STATUS_COLORS[s.status]}>
-                        {STATUS_LABELS[s.status]}
+                        {t(`pilot_launch_readiness.status.${s.status}`)}
                       </Chip>
                     </li>
                   ))}
@@ -544,7 +539,7 @@ export default function PilotLaunchReadinessAdminPage() {
               onPress={() => setLaunchModalOpen(false)}
               isDisabled={launching}
             >
-              Cancel
+              {t('pilot_launch_readiness.actions.cancel')}
             </Button>
             <Button
               color="success"
@@ -553,7 +548,7 @@ export default function PilotLaunchReadinessAdminPage() {
               isLoading={launching}
               isDisabled={!canLaunch}
             >
-              Yes, launch the pilot
+              {t('pilot_launch_readiness.actions.confirm_launch')}
             </Button>
           </ModalFooter>
         </ModalContent>
