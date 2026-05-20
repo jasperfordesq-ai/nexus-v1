@@ -268,7 +268,7 @@ export function PlanForm() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label={t('content.tier_level', 'Tier Level')}
+                  label={t('content.tier_level')}
                   type="number" min="0" step="1"
                   variant="bordered"
                   description={t('content.tier_level_description')}
@@ -276,7 +276,7 @@ export function PlanForm() {
                   onValueChange={(v) => handleChange('tier_level', v)}
                 />
                 <Input
-                  label={t('content.max_users', 'Max Members')}
+                  label={t('content.max_users')}
                   type="number" min="1" step="1"
                   variant="bordered"
                   placeholder={t('content.leave_blank_unlimited')}
@@ -294,7 +294,7 @@ export function PlanForm() {
             </CardHeader>
             <CardBody className="gap-4">
               <Textarea
-                label={t('content.features', 'Feature List')}
+                label={t('content.feature_list')}
                 placeholder={t('content.features_placeholder')}
                 variant="bordered"
                 minRows={6}
@@ -315,13 +315,13 @@ export function PlanForm() {
             <CardBody className="gap-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-sm">{t('content.label_active', 'Active')}</p>
+                  <p className="font-medium text-sm">{t('content.label_active')}</p>
                   <p className="text-xs text-default-500">{t('content.plan_active_description')}</p>
                 </div>
                 <Switch
                   isSelected={formData.is_active}
                   onValueChange={(v) => handleChange('is_active', v)}
-                  aria-label={t('content.label_active', 'Active')}
+                  aria-label={t('content.label_active')}
                 />
               </div>
               <Divider />
