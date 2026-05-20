@@ -27,6 +27,7 @@ import Network from 'lucide-react/icons/network';
 import Plug from 'lucide-react/icons/plug';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Webhook from 'lucide-react/icons/webhook';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -81,7 +82,8 @@ const METHOD_COLOUR: Record<string, 'success' | 'primary' | 'warning' | 'danger'
 };
 
 export default function IntegrationShowcaseAdminPage() {
-  usePageTitle('Integration Showcase');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('integration_showcase.meta.page_title'));
   const { showToast } = useToast();
 
   const [data, setData] = useState<Showcase | null>(null);
@@ -93,36 +95,36 @@ export default function IntegrationShowcaseAdminPage() {
       const res = await api.get<Showcase>('/v2/admin/caring-community/integration-showcase');
       setData(res.data ?? null);
     } catch {
-      showToast('Failed to load integration showcase', 'error');
+      showToast(t('integration_showcase.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     load();
   }, [load]);
 
   const updatedLabel = useMemo(
-    () => (data?.updated_at ? new Date(data.updated_at).toLocaleString() : '—'),
-    [data?.updated_at],
+    () => (data?.updated_at ? new Date(data.updated_at).toLocaleString() : t('integration_showcase.empty.value')),
+    [data?.updated_at, t],
   );
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Integration Showcase"
-        subtitle="A single-page reference of every public API, webhook, federation endpoint, and OAuth surface available in this deployment — ready to hand to a technical integration partner."
+        title={t('integration_showcase.meta.title')}
+        subtitle={t('integration_showcase.meta.subtitle')}
         icon={<Plug size={20} />}
         actions={
-          <Tooltip content="Refresh">
+          <Tooltip content={t('integration_showcase.actions.refresh')}>
             <Button
               isIconOnly
               size="sm"
               variant="flat"
               onPress={load}
               isLoading={loading}
-              aria-label="Refresh"
+              aria-label={t('integration_showcase.actions.refresh_aria')}
             >
               <RefreshCw size={15} />
             </Button>
@@ -135,11 +137,11 @@ export default function IntegrationShowcaseAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('integration_showcase.about.title')}</p>
               <p className="text-default-600">
-                Use this page when setting up an integration with a third-party service, a municipality's data system, or a federated NEXUS network. Every endpoint listed here is live and scoped to this deployment. Sample payloads are illustrative — real values depend on your tenant slug and partner credentials. Share this URL with integration partners rather than pointing them to the raw API docs.
+                {t('integration_showcase.about.body')}
               </p>
-              <p className="text-default-500 text-xs">Last refreshed {updatedLabel}.</p>
+              <p className="text-default-500 text-xs">{t('integration_showcase.about.last_refreshed', { date: updatedLabel })}</p>
             </div>
           </div>
         </CardBody>
@@ -194,7 +196,7 @@ export default function IntegrationShowcaseAdminPage() {
                   {section.sample_request && (
                     <Card className="border border-[var(--color-border)]">
                       <CardHeader className="pb-1">
-                        <span className="text-xs font-semibold">Sample request</span>
+                        <span className="text-xs font-semibold">{t('integration_showcase.sections.sample_request')}</span>
                       </CardHeader>
                       <CardBody className="pt-0">
                         <Snippet
@@ -260,7 +262,7 @@ export default function IntegrationShowcaseAdminPage() {
                         rel="noreferrer"
                         className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
                       >
-                        Read the full spec on GitHub <ExternalLink size={12} />
+                        {t('integration_showcase.sections.read_full_spec')} <ExternalLink size={12} />
                       </a>
                     </>
                   )}

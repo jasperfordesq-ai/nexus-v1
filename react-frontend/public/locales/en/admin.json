@@ -3588,6 +3588,32 @@
       "rows_failed": "Failed to load affected rows"
     }
   },
+  "integration_showcase": {
+    "meta": {
+      "page_title": "Integration Showcase",
+      "title": "Integration Showcase",
+      "subtitle": "A single-page reference of every public API, webhook, federation endpoint, and OAuth surface available in this deployment - ready to hand to a technical integration partner."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh integration showcase"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Use this page when setting up an integration with a third-party service, a municipality's data system, or a federated NEXUS network. Every endpoint listed here is live and scoped to this deployment. Sample payloads are illustrative - real values depend on your tenant slug and partner credentials. Share this URL with integration partners rather than pointing them to the raw API docs.",
+      "last_refreshed": "Last refreshed {{date}}."
+    },
+    "sections": {
+      "sample_request": "Sample request",
+      "read_full_spec": "Read the full spec on GitHub"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Failed to load integration showcase"
+    }
+  },
   "federation_peers_admin": {
     "meta": {
       "page_title": "Federation Peers - Admin",
