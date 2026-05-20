@@ -35,6 +35,7 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('federation:federated_message_received:federation_message', $keys);
         $this->assertContains('federation:federated_review_source:federation_review', $keys);
         $this->assertContains('goals:goal_reminder_source:goal_reminder', $keys);
+        $this->assertContains('jobs:job_interview_reminder_source:job_interview', $keys);
         $this->assertContains('listings:listing_expiry_reminder_source:listing_expiry', $keys);
         $this->assertContains('volunteering:volunteer_reminder_source:volunteer_reminder', $keys);
         $this->assertContains('billing:member_premium_billing:billing', $keys);
@@ -71,6 +72,7 @@ class EmailTriggerAuditServiceTest extends TestCase
             'reviews',
             'goal_reminders',
             'group_members',
+            'job_interviews',
             'listing_expiry_reminders_sent',
             'marketplace_report_notifications',
             'marketplace_reports',
@@ -878,5 +880,108 @@ class EmailTriggerAuditServiceTest extends TestCase
 
         $this->assertContains('listing_expiry_reminder_marked_sent_without_email_log', $codes);
         $this->assertContains('volunteer_reminder_marked_sent_without_email_log', $codes);
+    }
+
+    public function test_run_detects_job_interview_reminder_source_gaps(): void
+    {
+        if (
+            !Schema::hasTable('job_interviews')
+            || !Schema::hasTable('job_vacancies')
+            || !Schema::hasTable('job_applications')
+            || !Schema::hasColumn('job_interviews', 'reminder_24h_sent_at')
+            || !Schema::hasColumn('job_interviews', 'reminder_1h_sent_at')
+        ) {
+            $this->markTestSkipped('Job interview reminder audit tables are not available.');
+        }
+
+        $posterId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Interview Poster Audit User',
+            'email' => 'job-poster-audit@example.com',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $candidateId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Interview Candidate Audit User',
+            'email' => 'job-candidate-audit@example.com',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $vacancyId = DB::table('job_vacancies')->insertGetId([
+            'tenant_id' => 2,
+            'user_id' => $posterId,
+            'title' => 'Audit Interview Role',
+            'description' => 'Audit interview source rows',
+            'type' => 'paid',
+            'commitment' => 'flexible',
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $applicationId = DB::table('job_applications')->insertGetId([
+            'tenant_id' => 2,
+            'vacancy_id' => $vacancyId,
+            'user_id' => $candidateId,
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('job_interviews')->insert([
+            [
+                'tenant_id' => 2,
+                'vacancy_id' => $vacancyId,
+                'application_id' => $applicationId,
+                'proposed_by' => $posterId,
+                'interview_type' => 'video',
+                'scheduled_at' => now()->addHours(23),
+                'duration_mins' => 30,
+                'status' => 'accepted',
+                'reminder_24h_sent_at' => null,
+                'reminder_1h_sent_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tenant_id' => 2,
+                'vacancy_id' => $vacancyId,
+                'application_id' => $applicationId,
+                'proposed_by' => $posterId,
+                'interview_type' => 'video',
+                'scheduled_at' => now()->addMinutes(30),
+                'duration_mins' => 30,
+                'status' => 'accepted',
+                'reminder_24h_sent_at' => now()->subHour(),
+                'reminder_1h_sent_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tenant_id' => 2,
+                'vacancy_id' => $vacancyId,
+                'application_id' => $applicationId,
+                'proposed_by' => $posterId,
+                'interview_type' => 'video',
+                'scheduled_at' => now()->addHours(2),
+                'duration_mins' => 30,
+                'status' => 'accepted',
+                'reminder_24h_sent_at' => now()->subMinutes(5),
+                'reminder_1h_sent_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('job_interview_24h_reminder_overdue_pending', $codes);
+        $this->assertContains('job_interview_1h_reminder_overdue_pending', $codes);
+        $this->assertContains('job_interview_reminder_marked_sent_without_email_log', $codes);
     }
 }

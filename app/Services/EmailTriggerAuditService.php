@@ -103,6 +103,7 @@ class EmailTriggerAuditService
             ['module' => 'jobs', 'event' => 'job_vacancy_expiry_or_application', 'category' => 'job_application', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'jobs', 'event' => 'job_vacancy_expiry', 'category' => 'job_expiry', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'jobs', 'event' => 'job_interview_all_stages', 'category' => 'job_interview', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'jobs', 'event' => 'job_interview_reminder_source', 'category' => 'job_interview', 'critical' => true, 'source_table' => 'job_interviews'],
             ['module' => 'exchanges', 'event' => 'exchange_dispute_opened_or_resolved', 'category' => 'exchange', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'exchanges', 'event' => 'exchange_dispute_opened_or_resolved', 'category' => 'exchange_dispute', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'exchanges', 'event' => 'exchange_rating_received', 'category' => 'exchange_rating', 'critical' => true, 'source_table' => 'email_log'],
@@ -179,6 +180,7 @@ class EmailTriggerAuditService
                 $this->checkEventReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkGoalReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkVolunteerReminderSourceHealth($tenantId, $since, $windowHours),
+                $this->checkJobInterviewReminderSourceHealth($tenantId, $since, $windowHours),
                 $this->checkNotificationStoreHealth($tenantId),
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
                 $this->checkTenantProviderConfiguration($tenantId),
@@ -255,6 +257,7 @@ class EmailTriggerAuditService
             'goal_reminders' => 'checkGoalReminderSourceHealth',
             'group_invites' => 'checkGroupInvitesWithoutEmail',
             'group_members' => 'checkGroupMembershipNotificationHealth',
+            'job_interviews' => 'checkJobInterviewReminderSourceHealth',
             'listing_expiry_reminders_sent' => 'checkListingExpiryReminderSourceHealth',
             'marketplace_report_notifications' => 'checkMarketplaceReportNotificationHealth',
             'marketplace_reports' => 'checkMarketplaceReportSourceOutboxHealth',
@@ -1175,6 +1178,72 @@ class EmailTriggerAuditService
             ->get();
 
         return $this->rowsToIssues($sentWithoutEmail, 'volunteer_reminder_marked_sent_without_email_log', 'critical', 'volunteering', 'volunteer_reminder_source', ['window_hours' => $windowHours]);
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkJobInterviewReminderSourceHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (
+            !$this->hasTables(['job_interviews'])
+            || !Schema::hasColumn('job_interviews', 'reminder_24h_sent_at')
+            || !Schema::hasColumn('job_interviews', 'reminder_1h_sent_at')
+        ) {
+            return [];
+        }
+
+        $issues = [];
+
+        $stale24h = DB::table('job_interviews as ji')
+            ->select('ji.tenant_id', DB::raw('COUNT(*) as count'))
+            ->whereIn('ji.status', ['proposed', 'accepted'])
+            ->whereNull('ji.reminder_24h_sent_at')
+            ->where('ji.scheduled_at', '>', now()->addHour())
+            ->where('ji.scheduled_at', '<=', now()->addHours(24)->subMinutes(15))
+            ->when($tenantId !== null, fn ($q) => $q->where('ji.tenant_id', $tenantId))
+            ->groupBy('ji.tenant_id')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($stale24h, 'job_interview_24h_reminder_overdue_pending', 'critical', 'jobs', 'job_interview_reminder_source', ['window_hours' => $windowHours]));
+
+        $stale1h = DB::table('job_interviews as ji')
+            ->select('ji.tenant_id', DB::raw('COUNT(*) as count'))
+            ->whereIn('ji.status', ['proposed', 'accepted'])
+            ->whereNull('ji.reminder_1h_sent_at')
+            ->where('ji.scheduled_at', '>', now())
+            ->where('ji.scheduled_at', '<=', now()->addHour()->subMinutes(15))
+            ->when($tenantId !== null, fn ($q) => $q->where('ji.tenant_id', $tenantId))
+            ->groupBy('ji.tenant_id')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($stale1h, 'job_interview_1h_reminder_overdue_pending', 'critical', 'jobs', 'job_interview_reminder_source', ['window_hours' => $windowHours]));
+
+        if (!$this->hasTables(['email_log'])) {
+            return $issues;
+        }
+
+        $sentWithoutEmail = DB::table('job_interviews as ji')
+            ->select('ji.tenant_id', DB::raw('COUNT(*) as count'))
+            ->where(function ($query) use ($since): void {
+                $query->where('ji.reminder_24h_sent_at', '>=', $since)
+                    ->orWhere('ji.reminder_1h_sent_at', '>=', $since);
+            })
+            ->whereNotExists(function ($sub): void {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereColumn('email_log.tenant_id', 'ji.tenant_id')
+                    ->where('email_log.category', 'job_interview')
+                    ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                    ->whereRaw(
+                        '(email_log.created_at BETWEEN DATE_SUB(ji.reminder_24h_sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(ji.reminder_24h_sent_at, INTERVAL 10 MINUTE)
+                          OR email_log.created_at BETWEEN DATE_SUB(ji.reminder_1h_sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(ji.reminder_1h_sent_at, INTERVAL 10 MINUTE))'
+                    );
+            })
+            ->when($tenantId !== null, fn ($q) => $q->where('ji.tenant_id', $tenantId))
+            ->groupBy('ji.tenant_id')
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($sentWithoutEmail, 'job_interview_reminder_marked_sent_without_email_log', 'critical', 'jobs', 'job_interview_reminder_source', ['window_hours' => $windowHours]));
+
+        return $issues;
     }
 
     /**

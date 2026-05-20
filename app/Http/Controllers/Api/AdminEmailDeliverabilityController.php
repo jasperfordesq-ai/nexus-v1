@@ -174,6 +174,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'marketplace_report_notifications' => $this->queueSourceDiagnostics('marketplace_report_notifications', $tenantId),
             'event_reminders' => $this->queueSourceDiagnostics('event_reminders', $tenantId),
             'goal_reminders' => $this->queueSourceDiagnostics('goal_reminders', $tenantId),
+            'job_interviews' => $this->queueSourceDiagnostics('job_interviews', $tenantId),
             'vol_reminders_sent' => $this->queueSourceDiagnostics('vol_reminders_sent', $tenantId),
             'member_subscription_events' => $this->queueSourceDiagnostics('member_subscription_events', $tenantId),
             'vol_donations' => $this->queueSourceDiagnostics('vol_donations', $tenantId),
@@ -428,6 +429,96 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->map(fn ($row) => $this->queueRow('goal_reminders', $row));
         }
 
+        $jobInterviewRows = collect();
+        if (($source === '' || $source === 'job_interviews') && $this->hasJobInterviewReminderDeliveryColumns()) {
+            $pendingRows = collect();
+            if (in_array('pending', $statuses, true)) {
+                $pendingRows = $this->jobInterviewReminderPendingQuery(
+                    DB::table('job_interviews as ji')
+                        ->leftJoin('job_vacancies as jv', function ($join): void {
+                            $join->on('jv.id', '=', 'ji.vacancy_id')
+                                ->whereColumn('jv.tenant_id', '=', 'ji.tenant_id');
+                        })
+                        ->leftJoin('job_applications as ja', function ($join): void {
+                            $join->on('ja.id', '=', 'ji.application_id')
+                                ->whereColumn('ja.tenant_id', '=', 'ji.tenant_id');
+                        })
+                        ->leftJoin('users as u', function ($join): void {
+                            $join->on('u.id', '=', 'ja.user_id')
+                                ->whereColumn('u.tenant_id', '=', 'ji.tenant_id');
+                        })
+                        ->when($tenantId !== null, fn ($q) => $q->where('ji.tenant_id', $tenantId))
+                )
+                    ->orderByDesc('ji.id')
+                    ->limit($limit)
+                    ->get([
+                        'ji.id',
+                        'ji.tenant_id',
+                        DB::raw('COALESCE(ja.user_id, ji.proposed_by) as user_id'),
+                        'u.email',
+                        DB::raw("'job_interview' as category"),
+                        'jv.title as subject',
+                        DB::raw("'pending' as status"),
+                        DB::raw("CASE WHEN ji.scheduled_at <= DATE_ADD(NOW(), INTERVAL 1 HOUR) THEN '1h' ELSE '24h' END as frequency"),
+                        DB::raw('0 as attempts'),
+                        DB::raw('NULL as last_attempted_at'),
+                        DB::raw('NULL as error'),
+                        DB::raw('NULL as processing_batch_id'),
+                        DB::raw('NULL as processing_started_at'),
+                        DB::raw('NULL as sent_at'),
+                        'ji.created_at',
+                    ]);
+            }
+
+            $missingEvidenceRows = collect();
+            if (in_array('failed', $statuses, true)) {
+                $missingEvidenceRows = $this->jobInterviewReminderMissingEmailEvidenceQuery(
+                    DB::table('job_interviews as ji')
+                        ->leftJoin('job_vacancies as jv', function ($join): void {
+                            $join->on('jv.id', '=', 'ji.vacancy_id')
+                                ->whereColumn('jv.tenant_id', '=', 'ji.tenant_id');
+                        })
+                        ->leftJoin('job_applications as ja', function ($join): void {
+                            $join->on('ja.id', '=', 'ji.application_id')
+                                ->whereColumn('ja.tenant_id', '=', 'ji.tenant_id');
+                        })
+                        ->leftJoin('users as u', function ($join): void {
+                            $join->on('u.id', '=', 'ja.user_id')
+                                ->whereColumn('u.tenant_id', '=', 'ji.tenant_id');
+                        })
+                        ->when($tenantId !== null, fn ($q) => $q->where('ji.tenant_id', $tenantId))
+                        ->where(function ($query): void {
+                            $query->where('ji.reminder_24h_sent_at', '>=', now()->subDay())
+                                ->orWhere('ji.reminder_1h_sent_at', '>=', now()->subDay());
+                        })
+                )
+                    ->orderByDesc('ji.id')
+                    ->limit($limit)
+                    ->get([
+                        'ji.id',
+                        'ji.tenant_id',
+                        DB::raw('COALESCE(ja.user_id, ji.proposed_by) as user_id'),
+                        'u.email',
+                        DB::raw("'job_interview' as category"),
+                        'jv.title as subject',
+                        DB::raw("'failed' as status"),
+                        DB::raw("CASE WHEN ji.reminder_1h_sent_at IS NOT NULL THEN '1h' ELSE '24h' END as frequency"),
+                        DB::raw('0 as attempts'),
+                        DB::raw('COALESCE(ji.reminder_1h_sent_at, ji.reminder_24h_sent_at) as last_attempted_at'),
+                        DB::raw("'marked sent without email_log evidence' as error"),
+                        DB::raw('NULL as processing_batch_id'),
+                        DB::raw('NULL as processing_started_at'),
+                        DB::raw('COALESCE(ji.reminder_1h_sent_at, ji.reminder_24h_sent_at) as sent_at'),
+                        'ji.created_at',
+                    ]);
+            }
+
+            $jobInterviewRows = $pendingRows
+                ->merge($missingEvidenceRows)
+                ->take($limit)
+                ->map(fn ($row) => $this->queueRow('job_interviews', $row));
+        }
+
         $volunteerReminderRows = collect();
         if (($source === '' || $source === 'vol_reminders_sent') && $this->hasVolunteerReminderEvidenceColumns()) {
             $volunteerReminderRows = DB::table('vol_reminders_sent as vrs')
@@ -633,6 +724,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ->merge($marketplaceReportRows)
             ->merge($eventReminderRows)
             ->merge($goalReminderRows)
+            ->merge($jobInterviewRows)
             ->merge($volunteerReminderRows)
             ->merge($memberSubscriptionRows)
             ->merge($volDonationRows)
@@ -875,6 +967,37 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ];
         }
 
+        if ($source === 'job_interviews') {
+            if (!$this->hasJobInterviewReminderDeliveryColumns()) {
+                return $this->unavailableQueueDiagnostics($source);
+            }
+
+            $base = DB::table('job_interviews as ji')
+                ->when($tenantId !== null, fn ($q) => $q->where('ji.tenant_id', $tenantId));
+            $pending = $this->jobInterviewReminderPendingQuery(clone $base);
+            $missingEvidence = $this->jobInterviewReminderMissingEmailEvidenceQuery(
+                (clone $base)->where(function ($query): void {
+                    $query->where('ji.reminder_24h_sent_at', '>=', now()->subDay())
+                        ->orWhere('ji.reminder_1h_sent_at', '>=', now()->subDay());
+                })
+            );
+
+            return [
+                'source' => $source,
+                'available' => true,
+                'status_counts' => [
+                    'pending' => (clone $pending)->count(),
+                    'failed' => (clone $missingEvidence)->count(),
+                ],
+                'stale_pending' => (clone $pending)->count(),
+                'stale_processing' => 0,
+                'failed_recent' => (clone $missingEvidence)->count(),
+                'suppressed_recent' => 0,
+                'oldest_pending_at' => (clone $pending)->min('ji.scheduled_at'),
+                'returned' => 0,
+            ];
+        }
+
         if ($source === 'vol_reminders_sent') {
             if (!$this->hasVolunteerReminderEvidenceColumns()) {
                 return $this->unavailableQueueDiagnostics($source);
@@ -1097,6 +1220,50 @@ class AdminEmailDeliverabilityController extends BaseApiController
                 ->where('email_log.category', 'listing_expiry')
                 ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
                 ->whereRaw('email_log.created_at BETWEEN DATE_SUB(lers.sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(lers.sent_at, INTERVAL 10 MINUTE)');
+        });
+    }
+
+    private function hasJobInterviewReminderDeliveryColumns(): bool
+    {
+        return Schema::hasTable('job_interviews')
+            && Schema::hasTable('job_applications')
+            && Schema::hasTable('job_vacancies')
+            && Schema::hasTable('email_log')
+            && Schema::hasTable('users')
+            && Schema::hasColumn('job_interviews', 'scheduled_at')
+            && Schema::hasColumn('job_interviews', 'reminder_24h_sent_at')
+            && Schema::hasColumn('job_interviews', 'reminder_1h_sent_at');
+    }
+
+    private function jobInterviewReminderPendingQuery($query)
+    {
+        return $query
+            ->whereIn('ji.status', ['proposed', 'accepted'])
+            ->where(function ($query): void {
+                $query->where(function ($window): void {
+                    $window->whereNull('ji.reminder_24h_sent_at')
+                        ->where('ji.scheduled_at', '>', now()->addHour())
+                        ->where('ji.scheduled_at', '<=', now()->addHours(24)->subMinutes(15));
+                })->orWhere(function ($window): void {
+                    $window->whereNull('ji.reminder_1h_sent_at')
+                        ->where('ji.scheduled_at', '>', now())
+                        ->where('ji.scheduled_at', '<=', now()->addHour()->subMinutes(15));
+                });
+            });
+    }
+
+    private function jobInterviewReminderMissingEmailEvidenceQuery($query)
+    {
+        return $query->whereNotExists(function ($sub): void {
+            $sub->select(DB::raw(1))
+                ->from('email_log')
+                ->whereColumn('email_log.tenant_id', 'ji.tenant_id')
+                ->where('email_log.category', 'job_interview')
+                ->whereIn('email_log.status', ['sent', 'delivered', 'bounced'])
+                ->whereRaw(
+                    '(email_log.created_at BETWEEN DATE_SUB(ji.reminder_24h_sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(ji.reminder_24h_sent_at, INTERVAL 10 MINUTE)
+                        OR email_log.created_at BETWEEN DATE_SUB(ji.reminder_1h_sent_at, INTERVAL 10 MINUTE) AND DATE_ADD(ji.reminder_1h_sent_at, INTERVAL 10 MINUTE))'
+                );
         });
     }
 

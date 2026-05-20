@@ -290,6 +290,95 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         $this->assertSame('goal-reminder-queue@example.test', $rows->first()['email'] ?? null);
     }
 
+    public function test_queues_endpoint_surfaces_job_interview_reminder_source_gaps(): void
+    {
+        if (
+            !Schema::hasTable('job_interviews')
+            || !Schema::hasTable('job_vacancies')
+            || !Schema::hasTable('job_applications')
+            || !Schema::hasTable('email_log')
+            || !Schema::hasColumn('job_interviews', 'reminder_24h_sent_at')
+            || !Schema::hasColumn('job_interviews', 'reminder_1h_sent_at')
+        ) {
+            $this->markTestSkipped('Job interview reminder audit tables are not available.');
+        }
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $poster = User::factory()->forTenant($this->testTenantId)->create();
+        $candidate = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'job-interview-reminder-queue@example.test',
+        ]);
+        Sanctum::actingAs($admin);
+
+        $vacancyId = DB::table('job_vacancies')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $poster->id,
+            'title' => 'Email Queue Diagnostic Vacancy',
+            'description' => 'Job interview reminder diagnostics',
+            'type' => 'paid',
+            'commitment' => 'flexible',
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $applicationId = DB::table('job_applications')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'vacancy_id' => $vacancyId,
+            'user_id' => $candidate->id,
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('job_interviews')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'vacancy_id' => $vacancyId,
+                'application_id' => $applicationId,
+                'proposed_by' => $poster->id,
+                'interview_type' => 'video',
+                'scheduled_at' => now()->addHours(23),
+                'status' => 'accepted',
+                'reminder_24h_sent_at' => null,
+                'reminder_1h_sent_at' => null,
+                'created_at' => now()->subHours(2),
+                'updated_at' => now()->subHours(2),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'vacancy_id' => $vacancyId,
+                'application_id' => $applicationId,
+                'proposed_by' => $poster->id,
+                'interview_type' => 'video',
+                'scheduled_at' => now()->addHours(2),
+                'status' => 'accepted',
+                'reminder_24h_sent_at' => now()->subMinutes(5),
+                'reminder_1h_sent_at' => null,
+                'created_at' => now()->subHours(3),
+                'updated_at' => now()->subMinutes(5),
+            ],
+        ]);
+
+        $response = $this->apiGet('/v2/admin/email-deliverability/queues?source=job_interviews&limit=10');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.diagnostics.job_interviews.available', true);
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.job_interviews.stale_pending'));
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.job_interviews.failed_recent'));
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.job_interviews.status_counts.pending'));
+        $this->assertGreaterThanOrEqual(1, $response->json('data.diagnostics.job_interviews.status_counts.failed'));
+
+        $rows = collect($response->json('data.rows'));
+        $this->assertSame(['job_interviews'], $rows->pluck('source')->unique()->values()->all());
+        $this->assertContains('pending', $rows->pluck('status')->all());
+        $this->assertContains('failed', $rows->pluck('status')->all());
+        $this->assertSame(
+            ['job-interview-reminder-queue@example.test'],
+            $rows->pluck('email')->unique()->values()->all()
+        );
+    }
+
     public function test_queues_endpoint_surfaces_volunteer_reminder_sent_rows_without_email_evidence(): void
     {
         if (!Schema::hasTable('vol_reminders_sent') || !Schema::hasTable('email_log')) {
