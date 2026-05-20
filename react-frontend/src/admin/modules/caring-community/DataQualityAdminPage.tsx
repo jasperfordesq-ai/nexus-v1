@@ -32,6 +32,7 @@ import Eye from 'lucide-react/icons/eye';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -85,15 +86,8 @@ const SEVERITY_CHIP_COLOR: Record<Severity, 'success' | 'default' | 'warning' | 
   danger: 'danger',
 };
 
-const SEVERITY_LABEL: Record<Severity, string> = {
-  ok: 'OK',
-  info: 'Info',
-  warning: 'Warning',
-  danger: 'Danger',
-};
-
 function formatTimestamp(ts: string | null | undefined): string {
-  if (!ts) return '—';
+  if (!ts) return '-';
   const d = new Date(ts);
   if (Number.isNaN(d.getTime())) return ts;
   return d.toLocaleString();
@@ -104,7 +98,8 @@ function formatTimestamp(ts: string | null | undefined): string {
 // ---------------------------------------------------------------------------
 
 export default function DataQualityAdminPage() {
-  usePageTitle('Pilot Data Quality');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('data_quality.meta.page_title'));
   const { showToast } = useToast();
 
   const [report, setReport] = useState<DataQualityReport | null>(null);
@@ -124,11 +119,11 @@ export default function DataQualityAdminPage() {
       );
       setReport(res.data ?? null);
     } catch {
-      showToast('Failed to load data-quality report', 'error');
+      showToast(t('data_quality.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     load();
@@ -153,13 +148,13 @@ export default function DataQualityAdminPage() {
           setDrilldownRows([]);
         }
       } catch {
-        showToast('Failed to load affected rows', 'error');
+        showToast(t('data_quality.toasts.rows_failed'), 'error');
         setDrilldownRows([]);
       } finally {
         setDrilldownLoading(false);
       }
     },
-    [showToast],
+    [showToast, t],
   );
 
   const closeDrilldown = useCallback(() => {
@@ -170,6 +165,8 @@ export default function DataQualityAdminPage() {
   }, []);
 
   const totals = report?.totals;
+  const emptyValue = t('data_quality.empty.value');
+  const severityLabel = useCallback((severity: Severity) => t(`data_quality.severity.${severity}`), [t]);
 
   const sortedChecks = useMemo<DataQualityCheck[]>(() => {
     if (!report) return [];
@@ -180,18 +177,18 @@ export default function DataQualityAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Pilot Data Quality"
-        subtitle="AG84 — readiness checks before onboarding real residents"
+        title={t('data_quality.meta.title')}
+        subtitle={t('data_quality.meta.subtitle')}
         icon={<ClipboardCheck size={20} />}
         actions={
-          <Tooltip content="Refresh checks">
+          <Tooltip content={t('data_quality.actions.refresh_checks')}>
             <Button
               isIconOnly
               size="sm"
               variant="flat"
               onPress={load}
               isLoading={loading}
-              aria-label="Refresh"
+              aria-label={t('data_quality.actions.refresh_aria')}
             >
               <RefreshCw size={15} />
             </Button>
@@ -204,13 +201,9 @@ export default function DataQualityAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('data_quality.about.title')}</p>
               <p className="text-default-600">
-                Data Quality checks scan your platform data for issues that could distort pilot
-                metrics or cause reporting errors — for example, members with duplicate profiles,
-                hours logged against deleted listings, or exchange records missing required fields.
-                Run this monthly before generating reports. Resolve all Critical and Warning items
-                before submitting reports to funders or municipal partners.
+                {t('data_quality.about.body')}
               </p>
             </div>
           </div>
@@ -220,28 +213,28 @@ export default function DataQualityAdminPage() {
       {/* Severity legend */}
       <Card className="border border-[var(--color-border)] bg-[var(--color-surface-alt)]">
         <CardBody className="py-3 px-4">
-          <p className="text-xs font-semibold text-default-500 uppercase tracking-wide mb-2">Severity guide</p>
+          <p className="text-xs font-semibold text-default-500 uppercase tracking-wide mb-2">{t('data_quality.severity_guide.title')}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm">
             <div className="flex items-start gap-2">
-              <Chip color="danger" variant="flat" size="sm" startContent={<ShieldAlert size={11} />}>Danger</Chip>
-              <span className="text-default-600 text-xs">Errors that will cause incorrect numbers in reports — must fix before exporting.</span>
+              <Chip color="danger" variant="flat" size="sm" startContent={<ShieldAlert size={11} />}>{severityLabel('danger')}</Chip>
+              <span className="text-default-600 text-xs">{t('data_quality.severity_guide.danger')}</span>
             </div>
             <div className="flex items-start gap-2">
-              <Chip color="warning" variant="flat" size="sm" startContent={<AlertTriangle size={11} />}>Warning</Chip>
-              <span className="text-default-600 text-xs">Potential issues that may affect metric accuracy — review and confirm or fix.</span>
+              <Chip color="warning" variant="flat" size="sm" startContent={<AlertTriangle size={11} />}>{severityLabel('warning')}</Chip>
+              <span className="text-default-600 text-xs">{t('data_quality.severity_guide.warning')}</span>
             </div>
             <div className="flex items-start gap-2">
-              <Chip color="default" variant="flat" size="sm" startContent={<Info size={11} />}>Info</Chip>
-              <span className="text-default-600 text-xs">Informational notices — no action required.</span>
+              <Chip color="default" variant="flat" size="sm" startContent={<Info size={11} />}>{severityLabel('info')}</Chip>
+              <span className="text-default-600 text-xs">{t('data_quality.severity_guide.info')}</span>
             </div>
             <div className="flex items-start gap-2">
-              <Chip color="success" variant="flat" size="sm" startContent={<CheckCircle2 size={11} />}>OK</Chip>
-              <span className="text-default-600 text-xs">No issues detected in this category.</span>
+              <Chip color="success" variant="flat" size="sm" startContent={<CheckCircle2 size={11} />}>{severityLabel('ok')}</Chip>
+              <span className="text-default-600 text-xs">{t('data_quality.severity_guide.ok')}</span>
             </div>
           </div>
           <p className="text-xs text-default-500 mt-2">
-            Click <strong>View affected rows</strong> on any card to see the specific records. Some
-            issues can be corrected in the platform; others require manual review of the underlying data.
+            {t('data_quality.severity_guide.note_prefix')} <strong>{t('data_quality.actions.view_affected_rows')}</strong>{' '}
+            {t('data_quality.severity_guide.note_suffix')}
           </p>
         </CardBody>
       </Card>
@@ -257,9 +250,9 @@ export default function DataQualityAdminPage() {
         <>
           {/* Summary chip row */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm text-default-500">Summary:</span>
+            <span className="text-sm text-default-500">{t('data_quality.summary.label')}</span>
             <Chip color="danger" variant="flat" startContent={<ShieldAlert size={12} />} size="sm">
-              {totals?.danger ?? 0} danger
+              {t('data_quality.summary.count', { count: totals?.danger ?? 0, label: severityLabel('danger') })}
             </Chip>
             <Chip
               color="warning"
@@ -267,10 +260,10 @@ export default function DataQualityAdminPage() {
               startContent={<AlertTriangle size={12} />}
               size="sm"
             >
-              {totals?.warning ?? 0} warning
+              {t('data_quality.summary.count', { count: totals?.warning ?? 0, label: severityLabel('warning') })}
             </Chip>
             <Chip color="default" variant="flat" startContent={<Info size={12} />} size="sm">
-              {totals?.info ?? 0} info
+              {t('data_quality.summary.count', { count: totals?.info ?? 0, label: severityLabel('info') })}
             </Chip>
             <Chip
               color="success"
@@ -278,10 +271,10 @@ export default function DataQualityAdminPage() {
               startContent={<CheckCircle2 size={12} />}
               size="sm"
             >
-              {totals?.ok ?? 0} OK
+              {t('data_quality.summary.count', { count: totals?.ok ?? 0, label: severityLabel('ok') })}
             </Chip>
             <span className="ml-auto text-xs text-default-400">
-              Generated {formatTimestamp(report.generated_at)}
+              {t('data_quality.summary.generated', { date: formatTimestamp(report.generated_at) })}
             </span>
           </div>
 
@@ -302,7 +295,7 @@ export default function DataQualityAdminPage() {
                     variant="flat"
                     size="sm"
                   >
-                    {SEVERITY_LABEL[check.severity]}
+                    {severityLabel(check.severity)}
                   </Chip>
                 </CardHeader>
                 <Divider />
@@ -311,7 +304,7 @@ export default function DataQualityAdminPage() {
                     <span className="text-3xl font-extrabold text-foreground">
                       {check.count.toLocaleString()}
                     </span>
-                    <span className="pb-1 text-xs text-default-500">affected</span>
+                    <span className="pb-1 text-xs text-default-500">{t('data_quality.summary.affected')}</span>
                   </div>
                   <p className="text-sm text-default-600">{check.message}</p>
                   {check.has_drilldown && (
@@ -322,7 +315,7 @@ export default function DataQualityAdminPage() {
                       startContent={<Eye size={14} />}
                       onPress={() => openDrilldown(check)}
                     >
-                      View affected rows
+                      {t('data_quality.actions.view_affected_rows')}
                     </Button>
                   )}
                 </CardBody>
@@ -343,7 +336,7 @@ export default function DataQualityAdminPage() {
           <ModalHeader className="flex flex-col gap-1">
             <span className="text-base font-semibold">{drilldownLabel}</span>
             <span className="text-xs text-default-400">
-              Up to 50 affected rows — resolve or document before launch.
+              {t('data_quality.drilldown.subtitle')}
             </span>
           </ModalHeader>
           <ModalBody>
@@ -360,25 +353,25 @@ export default function DataQualityAdminPage() {
             )}
 
             {!drilldownLoading && drilldownRows && drilldownRows.length === 0 && !drilldownNote && (
-              <p className="py-6 text-center text-sm text-default-500">No affected rows to show.</p>
+              <p className="py-6 text-center text-sm text-default-500">{t('data_quality.drilldown.empty')}</p>
             )}
 
             {!drilldownLoading && drilldownRows && drilldownRows.length > 0 && (
-              <Table aria-label="Affected rows" removeWrapper>
+              <Table aria-label={t('data_quality.drilldown.table_aria')} removeWrapper>
                 <TableHeader>
-                  <TableColumn>ID</TableColumn>
-                  <TableColumn>Identifier</TableColumn>
-                  <TableColumn>Name</TableColumn>
-                  <TableColumn>Status</TableColumn>
-                  <TableColumn>Created</TableColumn>
+                  <TableColumn>{t('data_quality.table.id')}</TableColumn>
+                  <TableColumn>{t('data_quality.table.identifier')}</TableColumn>
+                  <TableColumn>{t('data_quality.table.name')}</TableColumn>
+                  <TableColumn>{t('data_quality.table.status')}</TableColumn>
+                  <TableColumn>{t('data_quality.table.created')}</TableColumn>
                 </TableHeader>
-                <TableBody emptyContent="No rows">
+                <TableBody emptyContent={t('data_quality.empty.rows')}>
                   {drilldownRows.map((row) => (
                     <TableRow key={row.id}>
                       <TableCell>{row.id}</TableCell>
-                      <TableCell>{row.identifier ?? '—'}</TableCell>
-                      <TableCell>{row.name ?? '—'}</TableCell>
-                      <TableCell>{row.status ?? '—'}</TableCell>
+                      <TableCell>{row.identifier ?? emptyValue}</TableCell>
+                      <TableCell>{row.name ?? emptyValue}</TableCell>
+                      <TableCell>{row.status ?? emptyValue}</TableCell>
                       <TableCell>{formatTimestamp(row.created_at)}</TableCell>
                     </TableRow>
                   ))}
@@ -388,7 +381,7 @@ export default function DataQualityAdminPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={closeDrilldown}>
-              Close
+              {t('data_quality.actions.close')}
             </Button>
           </ModalFooter>
         </ModalContent>

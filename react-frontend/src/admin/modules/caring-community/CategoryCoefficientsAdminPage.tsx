@@ -33,6 +33,7 @@ import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import Sliders from 'lucide-react/icons/sliders';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -79,7 +80,8 @@ function clampCoefficient(value: number): number {
 // ---------------------------------------------------------------------------
 
 export default function CategoryCoefficientsAdminPage() {
-  usePageTitle('Category Substitution Coefficients');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('category_coefficients.meta.page_title'));
   const { showToast } = useToast();
 
   const [rows, setRows] = useState<CategoryCoefficient[]>([]);
@@ -106,11 +108,11 @@ export default function CategoryCoefficientsAdminPage() {
       }
       setDrafts(next);
     } catch {
-      showToast('Failed to load category coefficients', 'error');
+      showToast(t('category_coefficients.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     load();
@@ -124,7 +126,7 @@ export default function CategoryCoefficientsAdminPage() {
     const draft = drafts[row.id] ?? '';
     const parsed = Number.parseFloat(draft);
     if (Number.isNaN(parsed)) {
-      showToast('Coefficient must be a number', 'error');
+      showToast(t('category_coefficients.toasts.invalid_number'), 'error');
       return;
     }
     const value = clampCoefficient(parsed);
@@ -147,9 +149,9 @@ export default function CategoryCoefficientsAdminPage() {
         ),
       );
       setDrafts((prev) => ({ ...prev, [row.id]: newCoeff.toFixed(2) }));
-      showToast(`Saved coefficient for ${row.name}`, 'success');
+      showToast(t('category_coefficients.toasts.saved', { name: row.name }), 'success');
     } catch {
-      showToast(`Failed to save coefficient for ${row.name}`, 'error');
+      showToast(t('category_coefficients.toasts.save_failed', { name: row.name }), 'error');
     } finally {
       setSavingId(null);
     }
@@ -158,8 +160,8 @@ export default function CategoryCoefficientsAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Category Substitution Coefficients"
-        subtitle="How much each hour of community care substitutes for formal Spitex/Pflege hours. Used in Municipal Impact Report calculations."
+        title={t('category_coefficients.meta.title')}
+        subtitle={t('category_coefficients.meta.subtitle')}
         icon={<Sliders size={20} />}
         actions={
           <Button
@@ -168,7 +170,7 @@ export default function CategoryCoefficientsAdminPage() {
             variant="flat"
             onPress={load}
             isLoading={loading}
-            aria-label="Refresh"
+            aria-label={t('category_coefficients.actions.refresh_aria')}
           >
             <RefreshCw size={15} />
           </Button>
@@ -181,19 +183,15 @@ export default function CategoryCoefficientsAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('category_coefficients.about.title')}</p>
               <p className="text-default-600">
-                Substitution Coefficients control how much social value each care category is worth
-                in the cost-offset calculation. A coefficient of 1.0 means one hour equals one hour
-                of formal Spitex/Pflege care (<Abbr term="CHF">CHF&nbsp;35</Abbr>). A coefficient of 0.5 means it substitutes
-                for half an hour. A coefficient of 2.0 means it substitutes for two hours of formal
-                care — for example, intensive personal care or specialist support. The
-                Age-Stiftung/<Abbr term="KISS">KISS</Abbr> methodology recommends starting all categories at 1.0 and adjusting
-                based on observed care intensity.
+                {t('category_coefficients.about.body_prefix')}{' '}
+                <Abbr term="CHF">{t('category_coefficients.about.chf_amount')}</Abbr>
+                {t('category_coefficients.about.body_middle')}{' '}
+                <Abbr term="KISS" /> {t('category_coefficients.about.body_suffix')}
               </p>
               <p className="text-default-500">
-                Values range from 0.00 (no care substitution value) to 9.99. Changes take effect on
-                the next <Abbr term="ROI" /> report refresh.
+                {t('category_coefficients.about.range_prefix')} <Abbr term="ROI" /> {t('category_coefficients.about.range_suffix')}
               </p>
             </div>
           </div>
@@ -206,18 +204,18 @@ export default function CategoryCoefficientsAdminPage() {
           <CardBody className="flex flex-row items-start gap-3 py-3">
             <AlertTriangle size={18} className="mt-0.5 shrink-0 text-warning-600" />
             <div className="text-sm text-warning-800">
-              <p className="font-semibold">Migration pending</p>
+              <p className="font-semibold">{t('category_coefficients.migration.title')}</p>
               <p className="mt-1">
-                The <code className="rounded bg-warning-100 px-1">substitution_coefficient</code>{' '}
-                column has not been migrated yet. Run{' '}
+                {t('category_coefficients.migration.body_prefix')}{' '}
+                <code className="rounded bg-warning-100 px-1">substitution_coefficient</code>{' '}
+                {t('category_coefficients.migration.body_middle')}{' '}
                 <code className="rounded bg-warning-100 px-1">
                   docker exec nexus-php-app php artisan migrate
                 </code>{' '}
-                to enable per-category coefficients.
+                {t('category_coefficients.migration.body_suffix')}
               </p>
               <p className="mt-1">
-                A database migration is pending — save your changes after the migration completes to
-                avoid them being overwritten.
+                {t('category_coefficients.migration.warning')}
               </p>
             </div>
           </CardBody>
@@ -235,14 +233,14 @@ export default function CategoryCoefficientsAdminPage() {
       {!loading && !migrationPending && (
         <Card>
           <CardBody className="p-0">
-            <Table aria-label="Category substitution coefficients" removeWrapper>
+            <Table aria-label={t('category_coefficients.table.aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>Category</TableColumn>
-                <TableColumn>Source</TableColumn>
-                <TableColumn>Coefficient</TableColumn>
-                <TableColumn align="end">Action</TableColumn>
+                <TableColumn>{t('category_coefficients.table.category')}</TableColumn>
+                <TableColumn>{t('category_coefficients.table.source')}</TableColumn>
+                <TableColumn>{t('category_coefficients.table.coefficient')}</TableColumn>
+                <TableColumn align="end">{t('category_coefficients.table.action')}</TableColumn>
               </TableHeader>
-              <TableBody emptyContent="No categories found.">
+              <TableBody emptyContent={t('category_coefficients.empty.categories')}>
                 {rows.map((row) => {
                   const draft = drafts[row.id] ?? row.substitution_coefficient.toFixed(2);
                   const isSaving = savingId === row.id;
@@ -266,10 +264,10 @@ export default function CategoryCoefficientsAdminPage() {
                           max={COEFFICIENT_MAX}
                           value={draft}
                           onValueChange={(v) => handleDraftChange(row.id, v)}
-                          aria-label={`Coefficient for ${row.name}`}
+                          aria-label={t('category_coefficients.fields.coefficient_aria', { name: row.name })}
                           className="max-w-[140px]"
                           isInvalid={Number.parseFloat(draft) < COEFFICIENT_MIN || Number.parseFloat(draft) > COEFFICIENT_MAX}
-                          errorMessage="Must be between 0.00 and 9.99"
+                          errorMessage={t('category_coefficients.fields.coefficient_error')}
                         />
                       </TableCell>
                       <TableCell className="text-right">
@@ -282,7 +280,7 @@ export default function CategoryCoefficientsAdminPage() {
                           isLoading={isSaving}
                           isDisabled={!dirty || isSaving}
                         >
-                          Save
+                          {t('category_coefficients.actions.save')}
                         </Button>
                       </TableCell>
                     </TableRow>

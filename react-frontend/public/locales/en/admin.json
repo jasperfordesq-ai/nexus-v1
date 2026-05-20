@@ -3483,6 +3483,111 @@
       "load_failed": "Failed to load SLA dashboard"
     }
   },
+  "category_coefficients": {
+    "meta": {
+      "page_title": "Category Substitution Coefficients",
+      "title": "Category Substitution Coefficients",
+      "subtitle": "How much each hour of community care substitutes for formal Spitex/Pflege hours. Used in Municipal Impact Report calculations."
+    },
+    "actions": {
+      "refresh_aria": "Refresh category coefficients",
+      "save": "Save"
+    },
+    "about": {
+      "title": "About this page",
+      "chf_amount": "CHF 35",
+      "body_prefix": "Substitution Coefficients control how much social value each care category is worth in the cost-offset calculation. A coefficient of 1.0 means one hour equals one hour of formal Spitex/Pflege care (",
+      "body_middle": "). A coefficient of 0.5 means it substitutes for half an hour. A coefficient of 2.0 means it substitutes for two hours of formal care - for example, intensive personal care or specialist support. The Age-Stiftung/",
+      "body_suffix": "methodology recommends starting all categories at 1.0 and adjusting based on observed care intensity.",
+      "range_prefix": "Values range from 0.00 (no care substitution value) to 9.99. Changes take effect on the next",
+      "range_suffix": "report refresh."
+    },
+    "migration": {
+      "title": "Migration pending",
+      "body_prefix": "The",
+      "body_middle": "column has not been migrated yet. Run",
+      "body_suffix": "to enable per-category coefficients.",
+      "warning": "A database migration is pending - save your changes after the migration completes to avoid them being overwritten."
+    },
+    "table": {
+      "aria": "Category substitution coefficients",
+      "category": "Category",
+      "source": "Source",
+      "coefficient": "Coefficient",
+      "action": "Action"
+    },
+    "fields": {
+      "coefficient_aria": "Coefficient for {{name}}",
+      "coefficient_error": "Must be between 0.00 and 9.99"
+    },
+    "empty": {
+      "categories": "No categories found."
+    },
+    "toasts": {
+      "load_failed": "Failed to load category coefficients",
+      "invalid_number": "Coefficient must be a number",
+      "saved": "Saved coefficient for {{name}}",
+      "save_failed": "Failed to save coefficient for {{name}}"
+    }
+  },
+  "data_quality": {
+    "meta": {
+      "page_title": "Pilot Data Quality",
+      "title": "Pilot Data Quality",
+      "subtitle": "AG84 - readiness checks before onboarding real residents"
+    },
+    "actions": {
+      "refresh_checks": "Refresh checks",
+      "refresh_aria": "Refresh data-quality checks",
+      "view_affected_rows": "View affected rows",
+      "close": "Close"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Data Quality checks scan your platform data for issues that could distort pilot metrics or cause reporting errors - for example, members with duplicate profiles, hours logged against deleted listings, or exchange records missing required fields. Run this monthly before generating reports. Resolve all Critical and Warning items before submitting reports to funders or municipal partners."
+    },
+    "severity": {
+      "ok": "OK",
+      "info": "Info",
+      "warning": "Warning",
+      "danger": "Danger"
+    },
+    "severity_guide": {
+      "title": "Severity guide",
+      "danger": "Errors that will cause incorrect numbers in reports - must fix before exporting.",
+      "warning": "Potential issues that may affect metric accuracy - review and confirm or fix.",
+      "info": "Informational notices - no action required.",
+      "ok": "No issues detected in this category.",
+      "note_prefix": "Click",
+      "note_suffix": "on any card to see the specific records. Some issues can be corrected in the platform; others require manual review of the underlying data."
+    },
+    "summary": {
+      "label": "Summary:",
+      "count": "{{count}} {{label}}",
+      "generated": "Generated {{date}}",
+      "affected": "affected"
+    },
+    "drilldown": {
+      "subtitle": "Up to 50 affected rows - resolve or document before launch.",
+      "empty": "No affected rows to show.",
+      "table_aria": "Affected rows"
+    },
+    "table": {
+      "id": "ID",
+      "identifier": "Identifier",
+      "name": "Name",
+      "status": "Status",
+      "created": "Created"
+    },
+    "empty": {
+      "value": "-",
+      "rows": "No rows"
+    },
+    "toasts": {
+      "load_failed": "Failed to load data-quality report",
+      "rows_failed": "Failed to load affected rows"
+    }
+  },
   "federation_peers_admin": {
     "meta": {
       "page_title": "Federation Peers - Admin",
