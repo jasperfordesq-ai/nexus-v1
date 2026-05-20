@@ -1880,6 +1880,7 @@ class FederationV2Controller extends BaseApiController
                 $subject, $body,
                 $referenceMessageId ? (int)$referenceMessageId : null,
             ]);
+            $inboundId = (int)DB::getPdo()->lastInsertId();
 
             // Audit log
             $this->federationAuditService->log(
@@ -1898,15 +1899,38 @@ class FederationV2Controller extends BaseApiController
 
             // 1. Email notification to recipient
             try {
-                $this->federationEmailService->sendNewMessageNotification(
+                $emailSent = $this->federationEmailService->sendNewMessageNotification(
                     (int)$receiverId,
                     $userId,
                     $tenantId,
                     substr($body, 0, 200),
                     (int)$receiverTenantId
                 );
+
+                DB::update(
+                    "UPDATE federation_messages
+                        SET email_sent_at = ?,
+                            email_failed_at = ?,
+                            email_last_error = ?
+                      WHERE id = ? AND receiver_tenant_id = ?",
+                    [
+                        $emailSent ? now() : null,
+                        $emailSent ? null : now(),
+                        $emailSent ? null : 'Federation message email returned false',
+                        $inboundId,
+                        (int)$receiverTenantId,
+                    ]
+                );
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::warning("FederationV2: Failed to send federation message email: " . $e->getMessage());
+                DB::update(
+                    "UPDATE federation_messages
+                        SET email_sent_at = NULL,
+                            email_failed_at = NOW(),
+                            email_last_error = ?
+                      WHERE id = ? AND receiver_tenant_id = ?",
+                    [$e->getMessage(), $inboundId, (int)$receiverTenantId]
+                );
             }
 
             // 2. Real-time notification via Pusher
@@ -1947,6 +1971,13 @@ class FederationV2Controller extends BaseApiController
                     'federation_message',
                     true,
                     (int)$receiverTenantId  // Receiver's tenant, not sender's
+                );
+
+                DB::update(
+                    "UPDATE federation_messages
+                        SET notification_sent_at = NOW()
+                      WHERE id = ? AND receiver_tenant_id = ? AND notification_sent_at IS NULL",
+                    [$inboundId, (int)$receiverTenantId]
                 );
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::warning("FederationV2: Failed to send federation message in-app notification: " . $e->getMessage());

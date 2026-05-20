@@ -2854,8 +2854,9 @@ class CronJobRunner
     {
         try {
             $totalFlagged = 0;
-            $this->forEachTenant(function ($tenantId, $slug) use (&$totalFlagged) {
-                $result = InactiveMemberService::detectInactive($tenantId);
+            $service = app(InactiveMemberService::class);
+            $this->forEachTenant(function ($tenantId, $slug) use (&$totalFlagged, $service) {
+                $result = $service->detectInactive($tenantId);
                 $totalFlagged += $result['total_flagged'];
                 if ($result['total_flagged'] > 0) {
                     echo "   [$slug] Flagged {$result['flagged_inactive']} inactive, {$result['flagged_dormant']} dormant.\n";

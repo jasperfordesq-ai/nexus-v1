@@ -157,4 +157,16 @@ class FederationV2ControllerTest extends TestCase
 
         $response->assertStatus(401);
     }
+
+    public function test_send_message_records_delivery_evidence_on_receiver_copy(): void
+    {
+        $source = file_get_contents(app_path('Http/Controllers/Api/FederationV2Controller.php'));
+
+        $this->assertStringContainsString('$inboundId = (int)DB::getPdo()->lastInsertId();', $source);
+        $this->assertStringContainsString('$emailSent = $this->federationEmailService->sendNewMessageNotification(', $source);
+        $this->assertStringContainsString('SET email_sent_at = ?', $source);
+        $this->assertStringContainsString('email_failed_at = ?', $source);
+        $this->assertStringContainsString('WHERE id = ? AND receiver_tenant_id = ?', $source);
+        $this->assertStringContainsString('SET notification_sent_at = NOW()', $source);
+    }
 }

@@ -363,7 +363,7 @@ class PasswordResetController extends BaseApiController
                     ->theme('warning')
                     ->title(__('emails.password_reset.title'))
                     ->previewText(__('emails.password_reset.preview'))
-                    ->greeting($greeting ?? __('emails.password_reset.greeting', ['name' => 'there']))
+                    ->greeting($greeting ?? __('emails.password_reset.greeting', ['name' => __('emails.common.fallback_name')]))
                     ->paragraph(__('emails.password_reset.body'))
                     ->paragraph(__('emails.password_reset.expiry'))
                     ->button(__('emails.password_reset.cta'), $resetUrl)

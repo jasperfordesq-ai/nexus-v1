@@ -1167,40 +1167,70 @@ class NotificationDispatcher
         $user = DB::table('users')
             ->where('id', $userId)
             ->where('tenant_id', $tenantId)
-            ->select(['preferred_language'])
+            ->select(['email', 'first_name', 'name', 'preferred_language'])
             ->first();
 
-        return (bool) LocaleContext::withLocale($user, function () use ($userId): bool {
-        $content = __('notifications.verification_reminder');
-        $link = "/verify-identity";
+        if (!$user || empty($user->email)) {
+            Log::warning('NotificationDispatcher::dispatchVerificationReminder missing recipient email', [
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+            ]);
 
-        Notification::createNotification($userId, $content, $link, 'verification_reminder');
+            return false;
+        }
 
-        $tenant = TenantContext::get();
-        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
-        $basePath = TenantContext::getSlugPrefix();
-        $frontendUrl = TenantContext::getFrontendUrl();
+        return (bool) LocaleContext::withLocale($user, function () use ($user, $userId, $tenantId): bool {
+            $content = __('notifications.verification_reminder');
+            $link = '/verify-identity';
 
-        $reminderHeading = __('notifications.verification_reminder_heading');
-        $reminderBody = __('notifications.verification_reminder_body');
-        $reminderCta = __('notifications.verification_reminder_cta');
+            $tenant = TenantContext::get();
+            $tenantName = htmlspecialchars($tenant['name'] ?? __('emails.common.fallback_tenant_name'), ENT_QUOTES, 'UTF-8');
+            $verificationUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+            $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
-        $htmlContent = <<<HTML
-<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
-    <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">{$reminderHeading}</h1>
-        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
-    </div>
-    <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$reminderBody}</p>
-        <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/verify-identity" style="display: inline-block; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$reminderCta}</a>
-        </div>
-    </div>
-</div>
-HTML;
+            $htmlContent = EmailTemplateBuilder::make()
+                ->theme('brand')
+                ->title(__('notifications.verification_reminder_heading'))
+                ->previewText($content)
+                ->greeting($firstName)
+                ->paragraph(__('notifications.verification_reminder_body'))
+                ->infoCard([
+                    __('emails.common.community_label') => $tenantName,
+                ])
+                ->button(__('notifications.verification_reminder_cta'), $verificationUrl)
+                ->render();
 
-        return self::queueNotification($userId, 'verification_reminder', $content, $link, 'instant', $htmlContent);
+            $sent = EmailDispatchService::sendRaw(
+                (string) $user->email,
+                __('notifications.verification_reminder_heading'),
+                $htmlContent,
+                null,
+                null,
+                null,
+                'identity_verification',
+                ['tenant_id' => $tenantId]
+            );
+
+            if (!$sent) {
+                Log::warning('NotificationDispatcher::dispatchVerificationReminder email failed', [
+                    'tenant_id' => $tenantId,
+                    'user_id' => $userId,
+                ]);
+
+                return false;
+            }
+
+            try {
+                Notification::createNotification($userId, $content, $link, 'verification_reminder');
+            } catch (\Throwable $e) {
+                Log::warning('NotificationDispatcher::dispatchVerificationReminder bell failed after email send', [
+                    'tenant_id' => $tenantId,
+                    'user_id' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            return true;
         });
     }
 

@@ -53,7 +53,7 @@ class SendOnboardingCompletionEmail implements ShouldQueue
             // Render entire completion email in the user's language.
             [$subject, $html] = LocaleContext::withLocale($user, function () use ($user) {
                 $firstName = $user->first_name ?? $user->name ?? '';
-                $communityName = TenantContext::getName() ?: 'the community';
+                $communityName = TenantContext::getName() ?: __('emails.common.fallback_tenant_name');
 
                 $exploreUrl = TenantContext::getFrontendUrl()
                     . TenantContext::getSlugPrefix()

@@ -129,6 +129,7 @@
     "fallback_goal": "your goal",
     "fallback_manager": "Manager",
     "fallback_organization": "Organization",
+    "community_label": "Community",
     "or_separator": "or",
     "signoff": "Thanks,\n{{app}}"
   },

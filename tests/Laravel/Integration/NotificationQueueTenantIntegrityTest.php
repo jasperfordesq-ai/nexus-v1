@@ -514,6 +514,9 @@ class NotificationQueueTenantIntegrityTest extends TestCase
     {
         $otherTenantId = 999;
         $otherTenantSlug = 'test-999';
+        $mailer = $this->fakeMailer(true);
+        app()->instance(EmailDispatchService::class, $mailer);
+
         $user = User::factory()->forTenant($otherTenantId)->create([
             'status' => 'active',
             'email' => 'identity-reminder-' . uniqid('', true) . '@example.test',
@@ -535,16 +538,55 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         try {
             $sent = RegistrationOrchestrationService::sendVerificationReminders();
 
-            $row = DB::table('notification_queue')
-                ->where('user_id', $user->id)
-                ->where('activity_type', 'verification_reminder')
-                ->orderByDesc('id')
-                ->first();
-
             $this->assertSame(1, $sent);
-            $this->assertNotNull($row);
-            $this->assertSame($otherTenantId, (int) $row->tenant_id);
-            $this->assertStringContainsString("/{$otherTenantSlug}/verify-identity", (string) $row->email_body);
+            $this->assertCount(1, $mailer->calls);
+            $this->assertSame($otherTenantId, (int) $mailer->calls[0]['options']['tenant_id']);
+            $this->assertSame('identity_verification', $mailer->calls[0]['options']['category']);
+            $this->assertStringContainsString("/{$otherTenantSlug}/verify-identity", (string) $mailer->calls[0]['body']);
+            $this->assertNotNull(DB::table('identity_verification_sessions')->where('user_id', $user->id)->value('reminder_sent_at'));
+            $this->assertDatabaseHas('notifications', [
+                'tenant_id' => $otherTenantId,
+                'user_id' => $user->id,
+                'type' => 'verification_reminder',
+            ]);
+        } finally {
+            TenantContext::setById($this->testTenantId);
+        }
+    }
+
+    public function test_identity_verification_reminder_failure_does_not_stamp_sent_or_create_bell(): void
+    {
+        $tenantId = 999;
+        app()->instance(EmailDispatchService::class, $this->fakeMailer(false));
+
+        $user = User::factory()->forTenant($tenantId)->create([
+            'status' => 'active',
+            'email' => 'identity-reminder-fail-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+
+        DB::table('identity_verification_sessions')->insert([
+            'tenant_id' => $tenantId,
+            'user_id' => $user->id,
+            'provider_slug' => 'mock',
+            'verification_level' => 'document_only',
+            'status' => 'created',
+            'created_at' => now()->subHours(25),
+            'updated_at' => now()->subHours(25),
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+
+        try {
+            $sent = RegistrationOrchestrationService::sendVerificationReminders();
+
+            $this->assertSame(0, $sent);
+            $this->assertNull(DB::table('identity_verification_sessions')->where('user_id', $user->id)->value('reminder_sent_at'));
+            $this->assertDatabaseMissing('notifications', [
+                'tenant_id' => $tenantId,
+                'user_id' => $user->id,
+                'type' => 'verification_reminder',
+            ]);
         } finally {
             TenantContext::setById($this->testTenantId);
         }
@@ -586,5 +628,23 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         $this->assertNotNull($row);
         $this->assertSame($otherTenantId, (int) $row->tenant_id);
         $this->assertSame($this->testTenantId, TenantContext::currentId());
+    }
+
+    private function fakeMailer(bool $result): EmailDispatchService
+    {
+        return new class($result) extends EmailDispatchService {
+            public array $calls = [];
+
+            public function __construct(private bool $result)
+            {
+            }
+
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                $this->calls[] = compact('to', 'subject', 'body', 'options');
+
+                return $this->result;
+            }
+        };
     }
 }

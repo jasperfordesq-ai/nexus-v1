@@ -108,6 +108,15 @@ class InactiveMemberServiceTest extends TestCase
         $this->assertSame(0, $result);
     }
 
+    public function test_cron_runner_uses_inactive_member_service_instance(): void
+    {
+        $source = file_get_contents(app_path('Services/CronJobRunner.php'));
+
+        $this->assertStringContainsString('app(InactiveMemberService::class)', $source);
+        $this->assertStringContainsString('$service->detectInactive($tenantId)', $source);
+        $this->assertStringNotContainsString('InactiveMemberService::detectInactive($tenantId)', $source);
+    }
+
     public function test_markNotified_updates_records_after_email_success(): void
     {
         app()->instance(EmailDispatchService::class, new class extends EmailDispatchService {
