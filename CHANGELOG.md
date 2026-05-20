@@ -278,6 +278,91 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`UnexpectedValueException: chmod(): Operation not permitted` on every request that triggers a Laravel log write** (Sentry [NEXUS-PHP-7](https://hour-timebank-clg.sentry.io/issues/NEXUS-PHP-7)). The `daily` log channel in `config/logging.php` set `'permission' => 0664`, which made Monolog call `chmod()` on the file on every write. When the existing day's log file is owned by a different user — e.g. left behind on a mounted volume from a prior container run — the `chmod()` fails and bubbles up as a 500. Removed the explicit permission so Monolog skips the chmod step entirely; new files are created with the default `0644` and existing files are left untouched.
 - **CHANGELOG.md cleaned up.** Removed a block of fabricated legacy entries (a fake `[2.0.0] - 2024-02-13`, a duplicate `[1.5.0] - 2024-02-12`, and `[1.4.0]` through `[1.0.0]` with 2023–2024 dates) that were left over from a template — Project NEXUS development only began in mid-December 2025, so none of those releases ever existed. Also removed an incorrect "Hour Timebank (Crewkerne)" attribution (Crewkerne is an unrelated UK timebank) and the changelog's own contributors list, which conflicted with the canonical [CONTRIBUTORS.md](CONTRIBUTORS.md). Footer compare links pruned to the versions that actually exist (`v1.5.0`, `v1.5.0-rc.1`).
 
+### Added
+
+- **Goals module: accountability and check-ins enhanced.** New `GoalInsightsPanel` component surfaces trend analysis, streak tracking, milestone progress, and next-step recommendations on the goal detail page. `GoalCheckinModal` extended with cadence-aware prompts and partner-accountability nudges. Backend: `GoalCheckinService` and `GoalProgressService` rewritten to compute velocity, predict completion, and surface at-risk goals; new `goal_insights` and `goal_accountability_partners` columns added via migration. New `GET /api/v2/goals/{id}/insights` endpoint. Unit tests cover the insights panel.
+
+- **Security: `users:purge-undeliverable` artisan command.** Retroactive cleanup for accounts registered with undeliverable email addresses (e.g. `testing@example.com` accounts created during the May 2026 cyber-attack). Re-runs the same `DisposableEmailService` + `MxRecordValidator` validators the registration form uses, restricted to `email_verified_at IS NULL` non-admin users. Defaults to `--dry-run`; `--soft` sets `deleted_at`, `--hard` issues a real DELETE. Scoped with `--since=90days`, `--tenant=N`, `--limit=200`.
+
+- **Registration: reserved-domain MX gap closed.** `MxRecordValidator` previously only rejected `.invalid` TLD (RFC 6761) but passed `example.com`, `example.net`, `example.org`, `*.test`, `*.example`, `*.localhost` — all have real DNS records but are guaranteed undeliverable (RFC 2606/6761). Now rejects the full reserved-domain and reserved-TLD lists before any DNS round-trip.
+
+- **`SocialInteractionPanel` shared component.** Likes, comments, shares, reactions, and poll voting are now handled by a single `SocialInteractionPanel` component used across the Feed, Blog, Events, Goal detail, and Group Discussion tab — replacing five separate per-page implementations. Backed by a new `POST /api/v2/social/interactions` endpoint. Tests cover the panel in all five contexts.
+
+- **Per-category From addresses on platform SendGrid.** When the platform `SENDGRID_API_KEY` driver is active, outgoing emails now use purpose-specific From addresses on `project-nexus.net` instead of the single generic address: `notifications@` (member alerts), `newsletters@` (digests), `messages@` (DMs, cross-community invites), `noreply@` (password reset, verification, security), `admin@` (moderation, ban, vetting), `events@` (event reminders), `safeguarding@` (staff alerts), `billing@` (payments, marketplace, subscriptions). Mapping is derived from the existing `EmailDispatchService` audit category strings — no call-site changes needed. A default Reply-To of the platform owner address is attached to all platform SendGrid emails when the caller supplies none. Tenant-specific SMTP/Gmail/SendGrid accounts are unaffected.
+
+- **Password change email notifications.** Users now receive a security notification at their current email address whenever their password is changed — whether self-initiated or by an admin. Wired through `Mailer::forCurrentTenant()` so it honours tenant email settings, suppression lists, and the `email_log` audit trail.
+
+- **Admin email deliverability dashboard polished.** The `/admin/email-deliverability` dashboard (introduced in the email observability rollout) received a focused UX pass: clearer metric card labels, a time-range selector that persists in URL state, improved empty-state messaging, and a per-recipient search that highlights suppressed addresses. No new API endpoints — data comes from the existing `email_log` and `email_suppression` endpoints.
+
+### Fixed
+
+- **Email delivery reliability — exhaustive multi-pass audit.** Following the email observability rollout, a systematic audit of every email-sending path across the codebase identified and fixed ~80 reliability gaps spanning four themes:
+  1. **Tenant context leaks**: ~20 service classes and listeners were not resetting or explicitly binding `TenantContext` before dispatch, so cron / queue jobs sent emails in the wrong tenant's locale or from the wrong sender. Affected paths: newsletter cron batches, federation notification listeners, Verein webhook handler, volunteering reminders, marketplace dispute handler, async notification queue.
+  2. **Missing send evidence guards**: ~15 paths updated a state machine (registration token, activation token, billing reminder sent-at, digest status) before confirming the email was actually delivered, so a transient failure left the record in an "already sent" state with no email sent. Tokens are now only updated / marked as sent after `Mailer::send()` returns a provider message id.
+  3. **Deduplication gaps**: duplicate event reminder bell rows, duplicate federated connection notifications, duplicate review notifications, duplicate event cancellation recipient lookups, and re-delivered newsletter queue rows. Each fixed with `Cache::add()` idempotency guards, unique index constraints, or atomic claiming.
+  4. **Broken delivery paths**: federated message / connection / transaction delivery was silently no-op'd (missing tenant resolution on inbound payloads). Event reminders were blocked by a stale `status=failed` guard that prevented retries. Marketplace dispute notifications used the wrong tenant scope. Stripe webhook handler did not restore tenant context after processing. All repaired.
+
+- **All member-facing email links are now tenant- and domain-aware.** Nine files were using `config('app.frontend_url')` or `getFrontendUrl(path)` with a silent path-discard bug, producing links that always pointed to the shared platform host or to the tenant homepage rather than the specific resource:
+  - `AdminUsersController` — admin-initiated password reset was also broken at the token layer: the controller was storing tokens hashed with `bcrypt` but `PasswordResetController` validates with `hash('sha256')`. Fixed both the hash algorithm and added `tenant_id` to the INSERT/DELETE so the token passes the ownership check.
+  - `JobAlertEmailService` and `JobExpiryNotificationService` — `getFrontendUrl(path)` silently discarded the path argument (method signature takes no params). Every job link pointed to the tenant homepage.
+  - `GuardianConsentService` — produced double-slug URLs like `app.project-nexus.ie/hour-timebank/hour-timebank/...` for path-based tenants.
+  - `NewsletterService` — unsubscribe and manage-preferences links always used the platform host.
+  - `AppreciationReceived`, `VereinCrossInvitationReceived`, `CivicDigestMail` — same `config()` pattern.
+  - `SafeguardingService` — admin alert linked to `app.project-nexus.ie/admin/...` even for custom-domain tenants.
+  All nine now use `TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix()`.
+
+- **Browser geolocation obliterated — all proximity uses profile location.** `useProximity` and `useGeolocation` hooks (both called `navigator.geolocation`) removed. No browser geolocation popup appears anywhere on the platform. The `ProximityFilter` shared component (Listings, Events, Volunteering, Marketplace map) now reads lat/lng from the authenticated user's profile via `useAuth()`, matching the pattern already used by the Members page.
+
+- **Listings location locked to user profile with automatic sync.** Both listing creation forms (feed compose + full create/edit page) now show a disabled, pre-populated location field sourced from the user's profile. Users can no longer enter a custom listing location — the coordinates always reflect their profile. `UserService::updateProfile()` now propagates lat/lng changes to all non-deleted listings owned by the user. A backfill migration fills missing coordinates on existing listings from the owning user's profile.
+
+- **Proximity filter dropdown replaces pill buttons.** The shared `ProximityFilter` component now offers a dropdown of 5 / 10 / 25 / 50 / 100 km radii (up from the 1 / 2 / 5 / 10 km pills), consistent with the Members page.
+
+- **Explore: trending posts sorted by velocity-weighted score (not raw engagement count).** The `trendingScore` (velocity × 60% + volume × 40%) was already computed but then discarded — two sequential `usort()` calls left the final order sorted by raw engagement, so the same high-engagement posts always appeared regardless of recency. Replaced with a single sort on `trendingScore` so recently-active posts surface correctly.
+
+- **Explore: trending posts and popular listings windows widened from 90 → 365 days.** The tight 90-day window returned near-empty results for early-stage communities. 365 days is appropriate because engagement-weighted ordering already surfaces the best content without an artificial hard cutoff.
+
+- **Explore: popular listings — collation crash fixed.** A `utf8mb4_unicode_ci` vs `utf8mb4_general_ci` mismatch between `listings.title` and `categories.name` caused `MariaDB ERROR 1267` on the title/category filter; the `try/catch` swallowed it silently, returning an empty list. Fixed by normalising the category name to `unicode_ci` via `CONVERT`.
+
+- **Docker: storage/logs permission denied on cross-user appends fixed** (Sentry NEXUS-PHP-5, -6, -16). When `artisan` commands ran as `root` (image CMD, `docker exec`) before `apache` (www-data) did its first write, `root` created the day's log file with `0644` owner root — subsequent www-data writes threw `UnexpectedValueException: Permission denied`. Fixed in `Dockerfile.bluegreen` and `Dockerfile.prod`: container boot now sets `umask 0002`, applies `setgid` on all storage directories so new files inherit group `www-data` with group-write, and re-chowns after `artisan optimize` as defence-in-depth.
+
+- **Boot: `URL::forceScheme('https')` deferred to avoid null Request in console** (NEXUS-PHP-17). Calling `URL::forceScheme` eagerly in `AppServiceProvider::boot()` resolved the `url` container binding immediately, which injected a null `$request` in non-HTTP contexts (queue workers, scheduler, artisan), throwing `TypeError` on every cron tick. Fixed with a `resolving('url', ...)` callback so `forceScheme` only runs when the url service is actually constructed inside an HTTP request.
+
+- **UI: transparent modals and popovers replaced with opaque surface token.** 20 components including dropdowns, hover cards, command palettes, and sheet panels were using `--glass-bg` (`rgba(255,255,255,0.05)`) as their background — nearly invisible in dark mode, allowing background content to bleed through. All switched to `--surface-dropdown` (`#16162a` dark / `#ffffff` light), the correct opaque surface token for floating UI. `UserHoverCard` also has an `!important` override to win against HeroUI defaults.
+
+- **Listings: comments open inline on detail page.** Previously, the comments section on a listing detail page required a separate tap/click to expand. Comments now render immediately below the listing content, consistent with blog posts and events.
+
+- **Feed: disable sharing for content you own.** The share button on feed posts, listings, events, and blog posts is now hidden when the current user is the author — sharing your own content to your own feed was a no-op that cluttered the share count.
+
+- **Social: comment parity gaps closed.** Several content types (Goals, Marketplace listings, Volunteer opportunities) were missing comment threading, nested replies, or the delete-own-comment permission. Brought to parity with Feed posts.
+
+- **Tenant: five correctness + one polish fix.** (1) `PrerenderPlanRoutes` now excludes master tenant (id=1) from the parent-domain map so a misconfigured platform root can never pollute child routing. (2) `prerender-tenants.sh` re-validates `FILTER_TENANT` inside `get_tenants()` at the SQL use site. (3) `moveTenant()` fails safely on NULL path fields instead of using a fallback that could allow circular hierarchy moves. (4) `TenantContext::getReservedPaths()` adds `'platform'` to sync with the TypeScript `RESERVED_PATHS` set. (5) `SitemapController::tenant()` replaces two sequential DB queries with a single JOIN. (6) `tenant-routing.ts` documents that slugs are lowercased at the DB layer.
+
+- **Deploy: post-deploy smoke tests hardened.** WebAuthn / passkey smoke check now passes a real tenant slug (rather than hitting the platform root), matching how passkeys are actually challenged in production. Passkey smoke checks are also allowed during maintenance-mode windows so blue-green health checks don't fail because the platform is in maintenance. Local development health checks allowed through the post-deploy gate.
+
+- **Goals: modal polish and history label fixes.** Check-in modal updated with clearer cadence copy. History panel label keys corrected (were displaying raw translation keys). Floating modal positioning fixed on small screens.
+
+- **Frontend: remaining TypeScript type errors and stale query patterns closed.** Type-only pass over React pages — no behaviour changes.
+
+### Changed
+
+- **Activity digest default changed from weekly to monthly.** Feedback from early members found weekly digests too frequent for communities with moderate activity. Monthly is now the opt-in default for new users; existing preferences are unchanged. Critical instant-category events (DMs, connection requests, application status) are unaffected.
+
+- **Admin sidebar: navigation refined.** Email Deliverability moved into the Settings group. Registration Security moved adjacent to Registration Policy. Prerender Engine entry restricted to platform super-admins only (was visible to tenant super-admins, who couldn't operate it). Ordering of secondary items tidied.
+
+- **SEO: detail page metadata enriched.** Listing, event, job, blog post, and marketplace listing detail pages now emit `og:updated_time`, `article:modified_time`, and `dateModified` in JSON-LD. Listing and event pages also emit `geo.placename` when coordinates are present.
+
+- **SEO: account and settings pages marked noindex.** `/settings/*`, `/wallet/*`, `/notifications`, `/profile/edit`, and similar authenticated-only pages now emit `<meta name="robots" content="noindex">`. Prevents personal account pages from appearing in search results.
+
+- **SEO: public SEO route coverage improved.** Organisation profiles, ideation challenges, and caring-community hubs added to the prerender route plan and sitemap.
+
+- **SEO: crawl metadata coverage improved.** `<link rel="canonical">` and `og:url` now use the tenant's canonical domain (custom domain or slug-prefixed) rather than always `app.project-nexus.ie`. Duplicate-content risk reduced for tenants on custom domains.
+
+- **i18n: complete frontend translation fallback audit.** All 52 React locale namespaces verified across all 11 languages (`en`, `ga`, `de`, `fr`, `it`, `pt`, `es`, `nl`, `pl`, `ja`, `ar`). ~400 keys that existed only in `en/` were filled with English fallbacks in all other language files. `node scripts/check-i18n-drift.mjs` now reports zero drift. This was the source of several recurring CI failures.
+
+- **Admin: icon-only buttons given accessible labels.** Toolbar icon buttons in the admin panel that had no visible text now carry `aria-label` attributes. Screen-reader and keyboard users can identify all admin actions.
+
+- **Newsletter heatmap contrast improved.** Day/time engagement heatmap in the newsletter admin now uses a higher-contrast colour ramp for the top quartile, making peak send-time cells distinguishable in both light and dark mode.
+
 ---
 
 ## [1.5.0] - 2026-05-13
