@@ -233,11 +233,18 @@ export function SellerProfilePage() {
     );
   }
 
+  const sellerMetaDescription = (
+    seller.bio ||
+    t('seller.view_listings', { name: seller.display_name })
+  ).replace(/\s+/g, ' ').trim().slice(0, 160);
+
   return (
     <>
       <PageMeta
         title={`${seller.display_name} - ${t('seller.page_title')}`}
-        description={(seller.bio || t('seller.view_listings', { name: seller.display_name })).replace(/\s+/g, ' ').trim().slice(0, 160)}
+        description={sellerMetaDescription}
+        image={seller.avatar_url || undefined}
+        type="profile"
       />
 
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">

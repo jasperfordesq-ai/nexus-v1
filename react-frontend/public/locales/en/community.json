@@ -195,6 +195,7 @@
     "not_found": "Organisation not found.",
     "error_load_retry": "Failed to load organisation details. Please try again.",
     "unable_to_load": "Unable to Load Organisation",
+    "meta_description_fallback": "Explore {{name}} and {{count}} active volunteer opportunities on this community timebank.",
     "try_again": "Try Again",
     "browse_organisations": "Browse Organisations",
     "website": "Website",

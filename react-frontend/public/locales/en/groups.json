@@ -60,6 +60,7 @@
     "members_count": "{{count}} members",
     "created": "Created",
     "private_meta_description": "Private group. Join the group to see member-only posts, files, and discussions.",
+    "meta_description_fallback": "Join {{name}} and connect with {{count}} community members through shared posts, events, and discussions.",
     "settings": "Settings",
     "delete": "Delete",
     "leave_group": "Leave Group",

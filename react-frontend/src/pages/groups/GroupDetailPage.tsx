@@ -1008,7 +1008,10 @@ export function GroupDetailPage() {
   const isPrivateGroup = group?.visibility === 'private' || group?.visibility === 'secret';
   const metaDescription = isPrivateGroup
     ? t('detail.private_meta_description')
-    : group?.description?.substring(0, 160);
+    : (
+      group?.description ||
+      (group ? t('detail.meta_description_fallback', { name: group.name, count: getMemberCount(group) }) : '')
+    ).replace(/\s+/g, ' ').trim().slice(0, 160);
   const metaImage = isPrivateGroup
     ? undefined
     : group?.image_url || group?.cover_image_url || undefined;
@@ -1065,6 +1068,7 @@ export function GroupDetailPage() {
         title={group?.name}
         description={metaDescription}
         image={metaImage}
+        type="profile"
         noIndex={isPrivateGroup}
       />
       {!isPrivateGroup && (

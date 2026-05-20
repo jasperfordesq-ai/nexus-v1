@@ -121,12 +121,17 @@ export default function CouponDetailPage() {
   const qrImageUrl = qr
     ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr.token)}`
     : null;
+  const couponMetaDescription = (
+    coupon.description ||
+    t('coupon.detail_meta_description_named', { title: coupon.title, code: coupon.code })
+  ).replace(/\s+/g, ' ').trim().slice(0, 160);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <PageMeta
         title={coupon.title}
-        description={coupon.description || t('coupon.detail_meta_description')}
+        description={couponMetaDescription}
+        type="article"
       />
       <Button
         as={Link}

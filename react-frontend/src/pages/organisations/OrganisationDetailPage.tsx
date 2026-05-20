@@ -248,10 +248,22 @@ export function OrganisationDetailPage() {
   if (!organisation) return null;
 
   const activeOpps = opportunities.filter((o) => o.is_active);
+  const organisationMetaDescription = (
+    organisation.description ||
+    t('organisation_detail.meta_description_fallback', {
+      name: organisation.name,
+      count: activeOpps.length,
+    })
+  ).replace(/\s+/g, ' ').trim().slice(0, 160);
 
   return (
     <div className="space-y-6">
-      <PageMeta title={organisation?.name} description={organisation?.description?.substring(0, 160)} image={organisation?.logo_url || undefined} />
+      <PageMeta
+        title={organisation.name}
+        description={organisationMetaDescription}
+        image={organisation.logo_url || undefined}
+        type="profile"
+      />
       <Helmet>
         <script type="application/ld+json">
           {JSON.stringify({
