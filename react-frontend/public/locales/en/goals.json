@@ -6,6 +6,7 @@
     "not_found_description": "This goal may have been deleted or never existed.",
     "private_title": "This goal is private",
     "private_description": "Only the goal owner can view this goal.",
+    "meta_description": "{{owner}} is tracking \"{{title}}\" with {{progress}}% progress in this community goal.",
     "overdue_chip": "Overdue",
     "checkin_frequency": "Check-in frequency"
   },

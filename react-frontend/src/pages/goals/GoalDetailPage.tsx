@@ -199,12 +199,18 @@ export function GoalDetailPage() {
   const isCompleted = goal.status === 'completed' || goal.progress_percentage >= 100;
   const deadlineDate = goal.deadline ? new Date(goal.deadline) : null;
   const isOverdue = deadlineDate && deadlineDate < new Date() && !isCompleted;
+  const normalizedDescription = goal.description?.replace(/\s+/g, ' ').trim();
+  const metaDescription = normalizedDescription || tGoals('detail.meta_description', {
+    title: goal.title,
+    owner: goal.user_name,
+    progress: Math.round(goal.progress_percentage),
+  });
 
   return (
     <div className="space-y-6">
       <PageMeta
         title={goal.title}
-        description={goal.description?.replace(/\s+/g, ' ').trim().slice(0, 160)}
+        description={metaDescription.slice(0, 160)}
         type="article"
         noIndex={!goal.is_public}
         publishedTime={goal.created_at}

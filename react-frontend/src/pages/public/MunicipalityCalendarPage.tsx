@@ -59,6 +59,7 @@ export default function MunicipalityCalendarPage() {
   usePageTitle(t('verein_federation.calendar.title'));
 
   const code = params.get('code') ?? '';
+  const normalizedCode = code.trim();
   const [inputCode, setInputCode] = useState(code);
   const [data, setData] = useState<CalendarResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -149,9 +150,13 @@ export default function MunicipalityCalendarPage() {
     <div className="mx-auto max-w-6xl px-4 py-6 space-y-4">
       <PageMeta
         title={t('verein_federation.calendar.title')}
-        description={code
-          ? t('verein_federation.calendar.subtitle', { municipality: code })
+        description={normalizedCode
+          ? t('verein_federation.calendar.subtitle', { municipality: normalizedCode })
           : t('verein_federation.calendar.no_municipality')}
+        url={normalizedCode
+          ? tenantPath(`/municipality-calendar?code=${encodeURIComponent(normalizedCode)}`)
+          : tenantPath('/municipality-calendar')}
+        noIndex={!normalizedCode}
       />
 
       <div>
