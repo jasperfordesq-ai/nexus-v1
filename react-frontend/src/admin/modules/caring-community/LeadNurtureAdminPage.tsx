@@ -35,6 +35,7 @@ import Info from 'lucide-react/icons/info';
 import Mailbox from 'lucide-react/icons/mailbox';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import UserMinus from 'lucide-react/icons/user-minus';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -89,7 +90,8 @@ const STAGE_COLOR: Record<Stage, 'default' | 'primary' | 'warning' | 'success' |
 };
 
 export default function LeadNurtureAdminPage() {
-  usePageTitle('Lead Nurture');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('lead_nurture.meta.page_title'));
   const { showToast } = useToast();
 
   const [data, setData] = useState<ListResponse | null>(null);
@@ -118,11 +120,11 @@ export default function LeadNurtureAdminPage() {
       setData(listRes.data ?? null);
       setSummary(sumRes.data ?? null);
     } catch {
-      showToast('Failed to load lead nurture contacts', 'error');
+      showToast(t('lead_nurture.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [segmentFilter, stageFilter, showToast]);
+  }, [segmentFilter, stageFilter, showToast, t]);
 
   useEffect(() => {
     load();
@@ -150,24 +152,24 @@ export default function LeadNurtureAdminPage() {
         follow_up_at: draftFollowUp || null,
         notes: draftNotes || null,
       });
-      showToast('Contact updated', 'success');
+      showToast(t('lead_nurture.toasts.updated'), 'success');
       closeEdit();
       await load();
     } catch {
-      showToast('Failed to update contact', 'error');
+      showToast(t('lead_nurture.toasts.update_failed'), 'error');
     } finally {
       setSaving(false);
     }
   };
 
   const unsubscribe = async (contact: Contact) => {
-    if (!window.confirm(`Mark ${contact.email} as unsubscribed?`)) return;
+    if (!window.confirm(t('lead_nurture.confirm_unsubscribe', { email: contact.email }))) return;
     try {
       await api.post(`/v2/admin/caring-community/leads/${contact.id}/unsubscribe`);
-      showToast('Marked unsubscribed', 'success');
+      showToast(t('lead_nurture.toasts.unsubscribed'), 'success');
       await load();
     } catch {
-      showToast('Failed to unsubscribe', 'error');
+      showToast(t('lead_nurture.toasts.unsubscribe_failed'), 'error');
     }
   };
 
@@ -179,31 +181,42 @@ export default function LeadNurtureAdminPage() {
       await api.download(`/v2/admin/caring-community/leads/export.csv${qs}`, {
         filename: 'lead-nurture-export.csv',
       });
-      showToast('Lead list exported', 'success');
+      showToast(t('lead_nurture.toasts.exported'), 'success');
     } catch {
-      showToast('Failed to export CSV', 'error');
+      showToast(t('lead_nurture.toasts.export_failed'), 'error');
     }
   };
+
+  const emptyValue = t('lead_nurture.empty.value');
+  const segmentLabel = useCallback((segment: Segment) => t(`lead_nurture.segments.${segment}`), [t]);
+  const stageLabel = useCallback((stage: Stage) => t(`lead_nurture.stages.${stage}`), [t]);
 
   const segmentChips = useMemo(() => {
     if (!summary) return null;
     return SEGMENTS.map((s) => (
-      <Chip key={s} size="sm" variant="flat" className="capitalize">
-        {s}: {summary.by_segment[s] ?? 0}
+      <Chip key={s} size="sm" variant="flat">
+        {segmentLabel(s)}: {summary.by_segment[s] ?? 0}
       </Chip>
     ));
-  }, [summary]);
+  }, [segmentLabel, summary]);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Lead Nurture"
-        subtitle="Track and nurture prospective partners — municipalities, investors, businesses, residents, and community organisations — from first contact through to onboarding."
+        title={t('lead_nurture.meta.title')}
+        subtitle={t('lead_nurture.meta.subtitle')}
         icon={<Mailbox size={20} />}
         actions={
           <div className="flex gap-2">
-            <Tooltip content="Refresh">
-              <Button isIconOnly size="sm" variant="flat" onPress={load} isLoading={loading} aria-label="Refresh">
+            <Tooltip content={t('lead_nurture.actions.refresh')}>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="flat"
+                onPress={load}
+                isLoading={loading}
+                aria-label={t('lead_nurture.actions.refresh_aria')}
+              >
                 <RefreshCw size={15} />
               </Button>
             </Tooltip>
@@ -213,7 +226,7 @@ export default function LeadNurtureAdminPage() {
               startContent={<Download size={14} />}
               onPress={exportCsv}
             >
-              Export CSV
+              {t('lead_nurture.actions.export_csv')}
             </Button>
           </div>
         }
@@ -224,9 +237,9 @@ export default function LeadNurtureAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('lead_nurture.about.title')}</p>
               <p className="text-default-600">
-                The Lead Nurture tracker is a lightweight CRM for NEXUS deployment opportunities. When a municipality, potential funder, or business partner expresses interest, add them here and track their progress through the funnel. Use the stage field to record where each contact is in the conversation, and the follow-up date to ensure no one goes cold. Export to CSV for reporting or import into an external CRM.
+                {t('lead_nurture.about.body')}
               </p>
             </div>
           </div>
@@ -236,23 +249,23 @@ export default function LeadNurtureAdminPage() {
       {summary && (
         <Card>
           <CardHeader className="pb-2">
-            <span className="text-sm font-semibold">Summary</span>
+            <span className="text-sm font-semibold">{t('lead_nurture.summary.title')}</span>
           </CardHeader>
           <CardBody className="pt-0 space-y-3">
             <div className="flex items-center gap-3">
               <span className="text-2xl font-bold">{summary.total}</span>
-              <span className="text-sm text-default-500">total contacts</span>
+              <span className="text-sm text-default-500">{t('lead_nurture.summary.total_contacts')}</span>
             </div>
             <Divider />
             <div className="flex flex-wrap gap-2">
-              <span className="text-xs text-default-500 self-center">By segment:</span>
+              <span className="text-xs text-default-500 self-center">{t('lead_nurture.summary.by_segment')}</span>
               {segmentChips}
             </div>
             <div className="flex flex-wrap gap-2">
-              <span className="text-xs text-default-500 self-center">By stage:</span>
+              <span className="text-xs text-default-500 self-center">{t('lead_nurture.summary.by_stage')}</span>
               {STAGES.map((s) => (
-                <Chip key={s} size="sm" variant="flat" color={STAGE_COLOR[s]} className="capitalize">
-                  {s}: {summary.by_stage[s] ?? 0}
+                <Chip key={s} size="sm" variant="flat" color={STAGE_COLOR[s]}>
+                  {stageLabel(s)}: {summary.by_stage[s] ?? 0}
                 </Chip>
               ))}
             </div>
@@ -263,27 +276,27 @@ export default function LeadNurtureAdminPage() {
       <Card>
         <CardHeader className="pb-2 flex items-center gap-2">
           <Filter size={14} className="text-default-500" />
-          <span className="text-sm font-semibold">Filters</span>
+          <span className="text-sm font-semibold">{t('lead_nurture.filters.title')}</span>
         </CardHeader>
         <CardBody className="pt-0">
           <div className="flex flex-wrap gap-3">
             <Select
               size="sm"
-              label="Segment"
+              label={t('lead_nurture.filters.segment')}
               className="max-w-[200px]"
-              description="municipality: local gov; investor: funder; business: sponsorship; resident: individual; partner: NGO/charity."
+              description={t('lead_nurture.filters.segment_description')}
               selectedKeys={segmentFilter ? [segmentFilter] : []}
               onSelectionChange={(keys) => {
                 const v = Array.from(keys)[0];
                 setSegmentFilter(typeof v === 'string' ? v : '');
               }}
             >
-              <SelectItem key="">All segments</SelectItem>
-              <>{SEGMENTS.map((s) => <SelectItem key={s} className="capitalize">{s}</SelectItem>)}</>
+              <SelectItem key="">{t('lead_nurture.filters.all_segments')}</SelectItem>
+              <>{SEGMENTS.map((s) => <SelectItem key={s}>{segmentLabel(s)}</SelectItem>)}</>
             </Select>
             <Select
               size="sm"
-              label="Stage"
+              label={t('lead_nurture.filters.stage')}
               className="max-w-[200px]"
               selectedKeys={stageFilter ? [stageFilter] : []}
               onSelectionChange={(keys) => {
@@ -291,8 +304,8 @@ export default function LeadNurtureAdminPage() {
                 setStageFilter(typeof v === 'string' ? v : '');
               }}
             >
-              <SelectItem key="">All stages</SelectItem>
-              <>{STAGES.map((s) => <SelectItem key={s} className="capitalize">{s}</SelectItem>)}</>
+              <SelectItem key="">{t('lead_nurture.filters.all_stages')}</SelectItem>
+              <>{STAGES.map((s) => <SelectItem key={s}>{stageLabel(s)}</SelectItem>)}</>
             </Select>
           </div>
         </CardBody>
@@ -307,62 +320,62 @@ export default function LeadNurtureAdminPage() {
       {!loading && data && (
         <Card>
           <CardHeader className="pb-2">
-            <span className="text-sm font-semibold">Contacts ({data.items.length})</span>
+            <span className="text-sm font-semibold">{t('lead_nurture.contacts.title', { count: data.items.length })}</span>
           </CardHeader>
           <CardBody className="pt-0">
             {data.items.length === 0 ? (
-              <p className="text-sm text-default-500 py-8 text-center">No contacts match the current filters.</p>
+              <p className="text-sm text-default-500 py-8 text-center">{t('lead_nurture.contacts.empty')}</p>
             ) : (
-              <Table aria-label="Lead nurture contacts" removeWrapper>
+              <Table aria-label={t('lead_nurture.contacts.table_aria')} removeWrapper>
                 <TableHeader>
-                  <TableColumn>Name / Email</TableColumn>
-                  <TableColumn>Organisation</TableColumn>
-                  <TableColumn>Segment</TableColumn>
-                  <TableColumn>Stage</TableColumn>
-                  <TableColumn>Source</TableColumn>
-                  <TableColumn>Captured</TableColumn>
-                  <TableColumn>Follow-up</TableColumn>
-                  <TableColumn>Actions</TableColumn>
+                  <TableColumn>{t('lead_nurture.table.name_email')}</TableColumn>
+                  <TableColumn>{t('lead_nurture.table.organisation')}</TableColumn>
+                  <TableColumn>{t('lead_nurture.table.segment')}</TableColumn>
+                  <TableColumn>{t('lead_nurture.table.stage')}</TableColumn>
+                  <TableColumn>{t('lead_nurture.table.source')}</TableColumn>
+                  <TableColumn>{t('lead_nurture.table.captured')}</TableColumn>
+                  <TableColumn>{t('lead_nurture.table.follow_up')}</TableColumn>
+                  <TableColumn>{t('lead_nurture.table.actions')}</TableColumn>
                 </TableHeader>
                 <TableBody>
                   {data.items.map((c) => (
                     <TableRow key={c.id}>
                       <TableCell>
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium">{c.name ?? '—'}</span>
+                          <span className="text-sm font-medium">{c.name ?? emptyValue}</span>
                           <span className="text-xs text-default-500">{c.email}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm">{c.organisation ?? '—'}</TableCell>
+                      <TableCell className="text-sm">{c.organisation ?? emptyValue}</TableCell>
                       <TableCell>
-                        <Chip size="sm" variant="flat" className="capitalize">{c.segment}</Chip>
+                        <Chip size="sm" variant="flat">{segmentLabel(c.segment)}</Chip>
                       </TableCell>
                       <TableCell>
-                        <Chip size="sm" variant="flat" color={STAGE_COLOR[c.stage]} className="capitalize">
-                          {c.stage}
+                        <Chip size="sm" variant="flat" color={STAGE_COLOR[c.stage]}>
+                          {stageLabel(c.stage)}
                         </Chip>
                       </TableCell>
-                      <TableCell className="text-xs text-default-500">{c.source ?? '—'}</TableCell>
+                      <TableCell className="text-xs text-default-500">{c.source ?? emptyValue}</TableCell>
                       <TableCell className="text-xs text-default-500">
-                        {c.consent_at ? new Date(c.consent_at).toLocaleDateString() : '—'}
+                        {c.consent_at ? new Date(c.consent_at).toLocaleDateString() : emptyValue}
                       </TableCell>
                       <TableCell className="text-xs text-default-500">
-                        {c.follow_up_at ? new Date(c.follow_up_at).toLocaleDateString() : '—'}
+                        {c.follow_up_at ? new Date(c.follow_up_at).toLocaleDateString() : emptyValue}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
                           <Button size="sm" variant="flat" onPress={() => openEdit(c)}>
-                            Edit
+                            {t('lead_nurture.actions.edit')}
                           </Button>
                           {c.stage !== 'unsubscribed' && (
-                            <Tooltip content="Mark unsubscribed">
+                            <Tooltip content={t('lead_nurture.actions.mark_unsubscribed')}>
                               <Button
                                 size="sm"
                                 isIconOnly
                                 variant="flat"
                                 color="danger"
                                 onPress={() => unsubscribe(c)}
-                                aria-label="Unsubscribe"
+                                aria-label={t('lead_nurture.actions.unsubscribe_aria')}
                               >
                                 <UserMinus size={14} />
                               </Button>
@@ -381,14 +394,14 @@ export default function LeadNurtureAdminPage() {
 
       <Modal isOpen={editing !== null} onClose={closeEdit} size="lg">
         <ModalContent>
-          <ModalHeader>Edit contact</ModalHeader>
+          <ModalHeader>{t('lead_nurture.modal.title')}</ModalHeader>
           <ModalBody>
             {editing && (
               <div className="space-y-3">
-                <p className="text-sm text-default-500">{editing.name ?? '—'} · {editing.email}</p>
+                <p className="text-sm text-default-500">{editing.name ?? emptyValue} · {editing.email}</p>
                 <Select
-                  label="Stage"
-                  description="captured: first contact; contacted: reached out; engaged: active conversation; qualified: interest and budget confirmed; converted: signed up; dormant: gone quiet; unsubscribed: opted out."
+                  label={t('lead_nurture.filters.stage')}
+                  description={t('lead_nurture.modal.stage_description')}
                   selectedKeys={[draftStage]}
                   onSelectionChange={(keys) => {
                     const v = Array.from(keys)[0];
@@ -396,17 +409,17 @@ export default function LeadNurtureAdminPage() {
                   }}
                 >
                   {STAGES.map((s) => (
-                    <SelectItem key={s} className="capitalize">{s}</SelectItem>
+                    <SelectItem key={s}>{stageLabel(s)}</SelectItem>
                   ))}
                 </Select>
                 <Input
-                  label="Follow-up date (ISO 8601)"
-                  placeholder="2026-05-15"
+                  label={t('lead_nurture.fields.follow_up_date')}
+                  placeholder={t('lead_nurture.fields.follow_up_placeholder')}
                   value={draftFollowUp}
                   onValueChange={setDraftFollowUp}
                 />
                 <Textarea
-                  label="Notes"
+                  label={t('lead_nurture.fields.notes')}
                   value={draftNotes}
                   onValueChange={setDraftNotes}
                   minRows={3}
@@ -415,8 +428,8 @@ export default function LeadNurtureAdminPage() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={closeEdit} isDisabled={saving}>Cancel</Button>
-            <Button color="primary" onPress={saveEdit} isLoading={saving}>Save</Button>
+            <Button variant="flat" onPress={closeEdit} isDisabled={saving}>{t('lead_nurture.actions.cancel')}</Button>
+            <Button color="primary" onPress={saveEdit} isLoading={saving}>{t('lead_nurture.actions.save')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

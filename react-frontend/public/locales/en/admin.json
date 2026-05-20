@@ -3206,6 +3206,94 @@
       "export_failed": "Failed to export disclosure pack"
     }
   },
+  "lead_nurture": {
+    "meta": {
+      "page_title": "Lead Nurture",
+      "title": "Lead Nurture",
+      "subtitle": "Track and nurture prospective partners - municipalities, investors, businesses, residents, and community organisations - from first contact through to onboarding."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh lead nurture contacts",
+      "export_csv": "Export CSV",
+      "edit": "Edit",
+      "mark_unsubscribed": "Mark unsubscribed",
+      "unsubscribe_aria": "Unsubscribe contact",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "The Lead Nurture tracker is a lightweight CRM for NEXUS deployment opportunities. When a municipality, potential funder, or business partner expresses interest, add them here and track their progress through the funnel. Use the stage field to record where each contact is in the conversation, and the follow-up date to ensure no one goes cold. Export to CSV for reporting or import into an external CRM."
+    },
+    "summary": {
+      "title": "Summary",
+      "total_contacts": "total contacts",
+      "by_segment": "By segment:",
+      "by_stage": "By stage:"
+    },
+    "filters": {
+      "title": "Filters",
+      "segment": "Segment",
+      "segment_description": "municipality: local gov; investor: funder; business: sponsorship; resident: individual; partner: NGO/charity.",
+      "stage": "Stage",
+      "all_segments": "All segments",
+      "all_stages": "All stages"
+    },
+    "contacts": {
+      "title": "Contacts ({{count}})",
+      "empty": "No contacts match the current filters.",
+      "table_aria": "Lead nurture contacts"
+    },
+    "table": {
+      "name_email": "Name / Email",
+      "organisation": "Organisation",
+      "segment": "Segment",
+      "stage": "Stage",
+      "source": "Source",
+      "captured": "Captured",
+      "follow_up": "Follow-up",
+      "actions": "Actions"
+    },
+    "segments": {
+      "municipality": "Municipality",
+      "investor": "Investor",
+      "business": "Business",
+      "resident": "Resident",
+      "partner": "Partner"
+    },
+    "stages": {
+      "captured": "Captured",
+      "contacted": "Contacted",
+      "engaged": "Engaged",
+      "qualified": "Qualified",
+      "converted": "Converted",
+      "dormant": "Dormant",
+      "unsubscribed": "Unsubscribed"
+    },
+    "fields": {
+      "follow_up_date": "Follow-up date (ISO 8601)",
+      "follow_up_placeholder": "2026-05-15",
+      "notes": "Notes"
+    },
+    "modal": {
+      "title": "Edit contact",
+      "stage_description": "captured: first contact; contacted: reached out; engaged: active conversation; qualified: interest and budget confirmed; converted: signed up; dormant: gone quiet; unsubscribed: opted out."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "confirm_unsubscribe": "Mark {{email}} as unsubscribed?",
+    "toasts": {
+      "load_failed": "Failed to load lead nurture contacts",
+      "updated": "Contact updated",
+      "update_failed": "Failed to update contact",
+      "unsubscribed": "Marked unsubscribed",
+      "unsubscribe_failed": "Failed to unsubscribe",
+      "exported": "Lead list exported",
+      "export_failed": "Failed to export CSV"
+    }
+  },
   "federation_peers_admin": {
     "meta": {
       "page_title": "Federation Peers - Admin",
