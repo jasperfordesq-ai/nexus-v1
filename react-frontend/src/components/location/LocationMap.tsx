@@ -510,17 +510,17 @@ function ClusterChooser({
 }) {
   const { t } = useTranslation('common');
   return (
-    <div className="max-w-[260px] max-h-[280px] overflow-y-auto">
-      <div className="font-semibold text-[13px] mb-1.5 text-gray-900">
+    <div className="max-w-[260px] max-h-[280px] overflow-y-auto text-foreground">
+      <div className="mb-1.5 text-[13px] font-semibold text-foreground">
         {t('map.listings_here', { count: markers.length })}
       </div>
       <ul className="list-none p-0 m-0">
         {markers.map((m) => (
-          <li key={m.id} className="border-t border-gray-200 first:border-t-0">
+          <li key={m.id} className="border-t border-divider first:border-t-0">
             <button
               type="button"
               onClick={() => onPick(m)}
-              className="block w-full text-left px-1 py-2 bg-transparent border-0 cursor-pointer text-[13px] text-gray-800 hover:bg-gray-50"
+              className="block w-full cursor-pointer rounded-md border-0 bg-transparent px-2 py-2 text-left text-[13px] text-default-700 transition-colors hover:bg-default-100 hover:text-foreground"
             >
               {m.title}
             </button>
