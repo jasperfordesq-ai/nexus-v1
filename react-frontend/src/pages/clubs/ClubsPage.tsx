@@ -178,7 +178,7 @@ export function ClubsPage() {
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadClubs(1)}
           >
-            {t('accessibility.close', 'Retry')}
+            {t('accessibility.close')}
           </Button>
         </GlassCard>
       )}
@@ -231,7 +231,7 @@ export function ClubsPage() {
                     onPress={handleLoadMore}
                     isLoading={isLoadingMore}
                   >
-                    {t('clubs.view', 'Load more')}
+                    {t('clubs.view')}
                   </Button>
                 </div>
               )}

@@ -364,7 +364,7 @@ export function CreateChallengePage() {
           tags: td.tags ?? [],
         });
         onTemplateClose();
-        toast.success(t('toast.template_applied', { defaultValue: 'Template applied successfully' }));
+        toast.success(t('toast.template_applied'));
       }
     } catch (err) {
       logError('Failed to apply template', err);

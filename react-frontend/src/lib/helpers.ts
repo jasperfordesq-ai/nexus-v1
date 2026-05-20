@@ -207,7 +207,7 @@ export function truncate(text: string, maxLength: number): string {
  * Format hours for display
  */
 export function formatHours(hours: number): string {
-  return i18n.t('common:hours_display', { count: hours, defaultValue: `${hours} hours` });
+  return i18n.t('common:hours_display', { count: hours });
 }
 
 /**
@@ -236,12 +236,12 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
  * Storage helpers with error handling
  */
 export const storage = {
-  get<T>(key: string, defaultValue: T): T {
+  get<T>(key: string, fallbackValue: T): T {
     try {
       const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : defaultValue;
+      return item ? JSON.parse(item) : fallbackValue;
     } catch {
-      return defaultValue;
+      return fallbackValue;
     }
   },
 

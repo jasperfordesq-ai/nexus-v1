@@ -1,6 +1,5 @@
 {
   "checking_permissions": "Checking permissions...",
-
   "sidebar": {
     "title": "Broker Panel",
     "expand": "Expand sidebar",
@@ -12,7 +11,6 @@
     "section_records": "Records",
     "section_settings": "Settings"
   },
-
   "header": {
     "toggle_sidebar": "Toggle sidebar",
     "back_to_site": "Back to Site",
@@ -22,7 +20,6 @@
     "sign_out": "Sign Out",
     "user_fallback": "Broker"
   },
-
   "nav": {
     "dashboard": "Dashboard",
     "members": "Members",
@@ -38,7 +35,6 @@
     "configuration": "Configuration",
     "help": "Help"
   },
-
   "breadcrumbs": {
     "aria_label": "Breadcrumb navigation",
     "dashboard": "Broker Panel",
@@ -55,7 +51,6 @@
     "configuration": "Configuration",
     "help": "Help"
   },
-
   "dashboard": {
     "title": "Broker Dashboard",
     "description": "Overview of pending exchanges, insurance, vetting, and monitored users",
@@ -155,7 +150,6 @@
     "time_hours_ago": "{{count}}h ago",
     "time_days_ago": "{{count}}d ago"
   },
-
   "members": {
     "title": "Members",
     "page_title": "Members - Broker",
@@ -197,9 +191,9 @@
     "time_minutes_ago": "{{count}}m ago",
     "time_hours_ago": "{{count}}h ago",
     "time_days_ago": "{{count}}d ago",
-    "note_system_author": "System"
+    "note_system_author": "System",
+    "hours_short": "hrs"
   },
-
   "onboarding": {
     "title": "Onboarding",
     "page_title": "Onboarding - Broker",
@@ -212,7 +206,6 @@
     "pending_approvals": "Pending Approvals",
     "no_pending": "No pending members to approve."
   },
-
   "safeguarding": {
     "title": "Safeguarding",
     "description": "Monitor safeguarding alerts, guardian assignments, and member preferences.",
@@ -252,7 +245,6 @@
     "load_error_body": "One or more sections above failed to load. Retry — if the failure persists, check the broker logs.",
     "retry": "Retry"
   },
-
   "vetting": {
     "title": "Vetting & DBS",
     "description": "Manage vetting records, DBS checks, and expiry tracking.",
@@ -392,7 +384,6 @@
     "toast_upload_failed": "Failed to upload document.",
     "toast_file_too_large": "File is too large. Maximum size is 5MB."
   },
-
   "exchanges": {
     "title": "Exchange Management",
     "description": "Review and approve or reject exchanges flagged for broker attention",
@@ -468,7 +459,6 @@
     "detail_history_by": "by {{name}}",
     "detail_no_history": "No history available."
   },
-
   "messages": {
     "title": "Message Review",
     "description": "Review flagged conversations requiring broker oversight.",
@@ -577,7 +567,6 @@
     "copy_reason_manual_monitoring": "Manual Monitoring",
     "copy_reason_random_sample": "Random Sample"
   },
-
   "monitoring": {
     "title": "User Monitoring",
     "page_title": "User Monitoring",
@@ -623,7 +612,6 @@
     "status_monitored": "Monitored",
     "status_messaging_off": "Messaging disabled"
   },
-
   "risk_tags": {
     "title": "Risk Tags",
     "description": "Manage risk classifications on listings.",
@@ -692,7 +680,6 @@
     "category_fraud": "Potential Fraud",
     "category_other": "Other"
   },
-
   "insurance": {
     "title": "Insurance Certificates",
     "page_title": "Insurance Certificates",
@@ -788,7 +775,6 @@
     "label_verified_at": "Verified at",
     "label_verified_by": "Verified by"
   },
-
   "archives": {
     "title": "Review Archive",
     "page_title": "Review Archive",
@@ -847,7 +833,6 @@
     "severity_high": "High",
     "severity_critical": "Critical"
   },
-
   "configuration": {
     "title": "Broker Configuration",
     "page_title": "Broker Configuration",
@@ -939,7 +924,6 @@
     "field_notify_on_high_risk_match_label": "Notify on high-risk match",
     "field_notify_on_high_risk_match_help": "Send an alert when a member engages with a listing tagged as high risk."
   },
-
   "status": {
     "active": "Active",
     "pending": "Pending",
@@ -967,7 +951,6 @@
     "in_progress": "In Progress",
     "pending_confirmation": "Pending Confirmation"
   },
-
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong. Please try again.",
@@ -977,12 +960,10 @@
     "refresh": "Refresh",
     "no_data": "No data available."
   },
-
   "help": {
     "page_title": "Help - Broker",
     "title": "Guidance & reference",
     "subtitle": "How the brokering and safeguarding system works — for admins and coordinators. Each section is independent — open whichever you need.",
-
     "overview": {
       "aria": "What Broker Controls manages",
       "title": "What this module manages",
@@ -995,7 +976,6 @@
       "bullet_configuration": "<b>Configuration</b> — tune thresholds for how the system decides what to copy.",
       "access_note": "Access is restricted to users with the <code>admin</code>, <code>tenant_admin</code>, <code>broker</code>, or <code>super_admin</code> role. Every view and action is written to the audit log."
     },
-
     "workflow": {
       "aria": "Your daily broker workflow",
       "title": "Your daily workflow",
@@ -1007,7 +987,6 @@
       "step_activity": "<b>Recent activity feed</b> — skim the activity list to catch patterns: repeat senders, unusual volumes, new monitored users.",
       "tip": "The stat tiles all deep-link into the correct filter — one click from overview to actionable list."
     },
-
     "messages": {
       "aria": "How message review works",
       "title": "How message review works",
@@ -1023,7 +1002,6 @@
       "action_escalate": "If the message is a safeguarding concern, also create or update a guardian assignment in the Safeguarding dashboard.",
       "retention": "Reviewed copies stay in the archive for 180 days then auto-purge (configurable in the Configuration sub-module)."
     },
-
     "monitoring": {
       "aria": "User monitoring and risk tags",
       "title": "User monitoring & risk tags",
@@ -1033,7 +1011,6 @@
       "expiry": "Monitoring can be <i>time-limited</i> — set <code>monitoring_expires_at</code> and the daily <code>safeguarding:clear-expired-monitoring</code> command will silently lift the flag once the date passes.",
       "risk_tags": "<b>Risk tags</b> are a listing-level flag, not a member-level one. Tag a listing if you want to watch how it performs without restricting the member."
     },
-
     "vetting": {
       "aria": "Vetting records",
       "title": "Vetting records (DBS, Garda, PVG, AccessNI)",
@@ -1052,7 +1029,6 @@
       "lifecycle_rejected": "If evidence is bad, <i>reject</i> with a reason. Rejected records preserve the audit trail (soft delete) for legal retention.",
       "match_note": "The vetting status also powers the discovery filter in the Smart Matching Engine — a member who has declared <i>\"I only want vetted contacts\"</i> will never see un-vetted members in their match suggestions."
     },
-
     "alerts": {
       "aria": "Safeguarding alerts",
       "title": "Safeguarding alerts & escalation",
@@ -1064,7 +1040,6 @@
       "escalate_child": "<b>Child protection concern:</b> in Ireland, notify Tusla; in UK, notify the local authority children's services. The law requires this regardless of the platform's internal process.",
       "escalate_vetting": "<b>Vetting mismatch:</b> if the name or DoB on submitted vetting evidence does not match the profile, reject with reason and ask for a fresh submission."
     },
-
     "legal": {
       "aria": "Legal framework",
       "title": "Legal framework & compliance",
@@ -1076,7 +1051,6 @@
       "law_svgni": "<b>Safeguarding Vulnerable Groups (Northern Ireland) Order 2007</b> — AccessNI disclosures.",
       "law_gdpr": "<b>GDPR / UK GDPR</b> — vetting data and safeguarding preferences are <i>special category</i> personal data. Access is restricted, audit-logged, and retained only as long as operationally required."
     },
-
     "data": {
       "aria": "Where data lives",
       "title": "Where the data lives & retention",
@@ -1087,7 +1061,6 @@
       "guardian_assignments": "<b>Guardian assignments</b>: <code>safeguarding_assignments</code>. Revocation is soft — the audit trail is preserved.",
       "audit_trail": "<b>All admin access</b> to any of the above is written to <code>activity_log</code> with <code>action_type = 'safeguarding'</code>. Use the per-member activity drill-down on the Safeguarding dashboard to export a full trail as CSV."
     },
-
     "contacts": {
       "aria": "Who to contact",
       "title": "Who to contact & when",
@@ -1096,7 +1069,6 @@
       "criminality": "<b>Suspected criminality</b> — law enforcement (999 / 112 for immediate danger). The platform's audit trail will support any subsequent investigation.",
       "policy": "<b>Policy question</b> — your tenant admin or compliance officer. Safeguarding options and country presets are configurable per-tenant."
     },
-
     "troubleshooting": {
       "aria": "Troubleshooting",
       "title": "Troubleshooting common situations",

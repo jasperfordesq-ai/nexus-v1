@@ -225,7 +225,8 @@
       "updated": "Grupo atualizado",
       "save_failed": "Falha ao guardar grupo",
       "something_wrong": "Algo correu mal"
-    }
+    },
+    "template_label": "Start from a template (optional)"
   },
   "announcements": {
     "heading": "Comunicados",

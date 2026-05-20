@@ -525,7 +525,7 @@ export function InsuranceCertificates() {
           color={STATUS_COLOR_MAP[item.status] || 'default'}
           className="capitalize"
         >
-          {t(`status.${item.status}`, { defaultValue: item.status })}
+          {t(`status.${item.status}`)}
         </Chip>
       ),
     },
@@ -1104,7 +1104,7 @@ export function InsuranceCertificates() {
                 <div>
                   <p className="text-default-400">{t('insurance.label_status')}</p>
                   <Chip size="sm" variant="flat" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
-                    {t(`status.${viewItem.status}`, { defaultValue: viewItem.status })}
+                    {t(`status.${viewItem.status}`)}
                   </Chip>
                 </div>
                 <div>

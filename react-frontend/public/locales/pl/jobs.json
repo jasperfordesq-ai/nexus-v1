@@ -343,7 +343,8 @@
     "cv_invalid_type": "Obsługiwane są tylko pliki PDF, DOC lub DOCX",
     "message_employer": "Wyślij wiadomość do pracodawcy",
     "cv_parse_error": "Nie udało się przetworzyć CV. Możesz nadal złożyć swoją aplikację ręcznie.",
-    "cv_size_kb": "({{count}} KB)"
+    "cv_size_kb": "({{count}} KB)",
+    "quick_apply": "Quick Apply with Saved Profile"
   },
   "detail": {
     "loading": "Ładowanie oferty pracy...",
@@ -871,7 +872,8 @@
     "title": "Share",
     "copy_link": "Skopiuj link",
     "email": "Podziel się przez e-mail",
-    "copied": "Link skopiowany!"
+    "copied": "Link skopiowany!",
+    "native": "Share..."
   },
   "already_applied": "Już aplikowałeś",
   "application_status_label": "Status aplikacji",

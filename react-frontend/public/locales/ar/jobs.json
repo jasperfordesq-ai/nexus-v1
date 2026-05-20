@@ -343,7 +343,8 @@
     "cv_invalid_type": "يدعم فقط ملفات PDF و DOC و DOCX",
     "message_employer": "رسالة إلى صاحب العمل",
     "cv_parse_error": "فشل في تحليل السيرة الذاتية. يمكنك تقديم طلبك يدويًا.",
-    "cv_size_kb": "({{count}} KB)"
+    "cv_size_kb": "({{count}} KB)",
+    "quick_apply": "Quick Apply with Saved Profile"
   },
   "detail": {
     "loading": "جارٍ تحميل الوظيفة...",
@@ -871,7 +872,8 @@
     "title": "Share",
     "copy_link": "نسخ الرابط",
     "email": "شارك عبر البريد الإلكتروني",
-    "copied": "تم نسخ الرابط!"
+    "copied": "تم نسخ الرابط!",
+    "native": "Share..."
   },
   "already_applied": "لقد تقدمت بالفعل",
   "application_status_label": "حالة الطلب",

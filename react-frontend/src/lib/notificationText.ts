@@ -44,10 +44,11 @@ function resolveTranslationKey(key: string): string | null {
     return null;
   }
 
-  const translated = i18n.t(translationKey, {
-    ns: namespace,
-    defaultValue: trimmedKey,
-  });
+  if (!i18n.exists(translationKey, { ns: namespace })) {
+    return null;
+  }
+
+  const translated = i18n.t(translationKey, { ns: namespace });
 
   if (!translated || translated === trimmedKey || translated.includes('{{')) {
     return null;

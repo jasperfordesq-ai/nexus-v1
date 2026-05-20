@@ -16,7 +16,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? k,
+    t: (k: string, o?: { fallbackValue?: string }) => o?.fallbackValue ?? k,
   }),
 }));
 

@@ -98,7 +98,7 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
                 color="secondary"
                 startContent={<Megaphone className="w-3 h-3" aria-hidden="true" />}
               >
-                {t('listing.promoted', 'Promoted')}
+                {t('listing.promoted')}
               </Chip>
             </div>
           )}
@@ -134,8 +134,8 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
         className="absolute top-2 right-2 z-20 bg-background/90 text-foreground shadow-lg ring-1 ring-black/10 backdrop-blur-md transition-colors hover:bg-background"
         aria-label={
           isSaved
-            ? t('listing.unsave', 'Remove from saved')
-            : t('listing.save', 'Save listing')
+            ? t('listing.unsave')
+            : t('listing.save')
         }
       >
         <Heart

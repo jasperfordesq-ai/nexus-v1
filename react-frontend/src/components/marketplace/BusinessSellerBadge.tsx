@@ -35,14 +35,14 @@ export function BusinessSellerBadge({ sellerType, businessVerified }: BusinessSe
         size="sm"
         startContent={<CheckCircle className="w-3.5 h-3.5" aria-hidden="true" />}
       >
-        {t('seller.verified_business', 'Verified Business')}
+        {t('seller.verified_business')}
       </Chip>
     );
   }
 
   return (
     <Chip color="secondary" variant="flat" size="sm">
-      {t('seller.business', 'Business')}
+      {t('seller.business')}
     </Chip>
   );
 }

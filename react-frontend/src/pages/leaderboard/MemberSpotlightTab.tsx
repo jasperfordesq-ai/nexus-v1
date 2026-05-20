@@ -87,11 +87,8 @@ export default function MemberSpotlightTab() {
     return (
       <EmptyState
         icon={<Sparkles className="w-12 h-12" />}
-        title={t('spotlight.empty_title', 'No Spotlight Yet')}
-        description={t(
-          'spotlight.empty_description',
-          'Active members will be featured here once the community starts exchanging.'
-        )}
+        title={t('spotlight.empty_title')}
+        description={t('spotlight.empty_description')}
       />
     );
   }
@@ -101,7 +98,7 @@ export default function MemberSpotlightTab() {
       <div className="flex items-center gap-2 mb-2">
         <Sparkles className="w-5 h-5 text-[var(--color-warning)]" />
         <p className="text-sm text-default-500">
-          {t('spotlight.description', "Today's featured active community members")}
+          {t('spotlight.description')}
         </p>
       </div>
 
@@ -128,7 +125,7 @@ export default function MemberSpotlightTab() {
                     </p>
                     {member.member_since && (
                       <p className="text-xs text-default-400">
-                        {t('spotlight.member_since', 'Member since')} {member.member_since}
+                        {t('spotlight.member_since')} {member.member_since}
                       </p>
                     )}
                   </div>

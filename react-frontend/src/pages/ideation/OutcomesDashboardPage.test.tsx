@@ -23,7 +23,7 @@ vi.mock('react-i18next', () => ({
     t: (key: string, opts?: string | Record<string, unknown>) =>
       typeof opts === 'string'
         ? opts
-        : (opts?.defaultValue as string | undefined) ?? key,
+        : (opts?.fallbackValue as string | undefined) ?? key,
   }),
 }));
 

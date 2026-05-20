@@ -161,11 +161,11 @@ export function TemplatePicker({ tab, onSelect }: TemplatePickerProps) {
             <FileText className="w-3.5 h-3.5" aria-hidden="true" />
           }
         >
-          {t('compose.template_button', 'Template')}
+          {t('compose.template_button')}
         </Button>
       </DropdownTrigger>
       <DropdownMenu
-        aria-label={t('compose.template_button', 'Template')}
+        aria-label={t('compose.template_button')}
         onAction={handleAction}
       >
         {templates.map((tpl) => (

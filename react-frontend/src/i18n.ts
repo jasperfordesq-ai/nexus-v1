@@ -80,11 +80,11 @@ const reportMissingKey = (identifier: string) => {
   }
 };
 
-const formatMissingKey = (key: string, defaultValue?: string) => {
-  // Honor caller-supplied defaultValue when present — i18next's own fallback
+const formatMissingKey = (key: string, fallbackText?: string) => {
+  // Honor caller-supplied fallback text when present — i18next's own fallback
   // is suppressed once parseMissingKeyHandler is set, so forward it explicitly.
-  if (typeof defaultValue === 'string' && defaultValue.length > 0 && defaultValue !== key) {
-    return defaultValue;
+  if (typeof fallbackText === 'string' && fallbackText.length > 0 && fallbackText !== key) {
+    return fallbackText;
   }
   return import.meta.env.DEV ? `${DEV_MISSING_KEY_PREFIX} ${key}` : key;
 };

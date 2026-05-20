@@ -391,7 +391,7 @@ export function EventsPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="space-y-6" aria-label={t('loading_aria', 'Loading events')} aria-busy="true">
+            <div className="space-y-6" aria-label={t('loading_aria')} aria-busy="true">
               {[1, 2, 3].map((i) => (
                 <GlassCard key={i} className="p-5">
                   <div className="flex gap-4">
@@ -445,7 +445,7 @@ export function EventsPage() {
               animate="visible"
             >
               {Object.entries(groupedEvents).map(([month, monthEvents]) => (
-                <section key={month} aria-label={t('events_in_month', 'Events in {{month}}', { month })}>
+                <section key={month} aria-label={t('events_in_month', { month })}>
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-theme-muted mb-3 flex items-center gap-2">
                     <CalendarDays className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />
                     {month}

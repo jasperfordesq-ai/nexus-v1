@@ -45,7 +45,7 @@ vi.mock('@/contexts', () => ({
 // Mock i18next
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, opts?: { defaultValue?: string }) => opts?.defaultValue || key,
+    t: (key: string, opts?: { fallbackValue?: string }) => opts?.fallbackValue || key,
   }),
 }));
 

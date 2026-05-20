@@ -57,7 +57,7 @@ export function JobMetadataSidebar({
         <div className="flex items-center gap-3">
           <MapPin className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
           <div>
-            <p className="text-xs text-theme-subtle">{t('detail.location_label', 'Location')}</p>
+            <p className="text-xs text-theme-subtle">{t('detail.location_label')}</p>
             <p className="text-sm text-theme-primary">{vacancy.location}</p>
           </div>
         </div>
@@ -111,7 +111,7 @@ export function JobMetadataSidebar({
               max: (benchmark.salary_max ?? 0).toLocaleString(),
               type: benchmark.salary_type,
               median: (benchmark.salary_median ?? 0).toLocaleString(),
-              defaultValue: `Market rate for "${benchmark.role_keyword}": ${benchmark.currency}${(benchmark.salary_min ?? 0).toLocaleString()} – ${benchmark.currency}${(benchmark.salary_max ?? 0).toLocaleString()} / ${benchmark.salary_type} (median: ${benchmark.currency}${(benchmark.salary_median ?? 0).toLocaleString()})`,
+
             })}
           </p>
         </div>

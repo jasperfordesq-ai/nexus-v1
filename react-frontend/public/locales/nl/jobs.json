@@ -343,7 +343,8 @@
     "cv_invalid_type": "Alleen PDF-, DOC- of DOCX-bestanden worden ondersteund",
     "message_employer": "Bericht Werkgever",
     "cv_parse_error": "Kon CV niet parseren. Je kunt je aanvraag nog steeds handmatig indienen.",
-    "cv_size_kb": "({{count}} KB)"
+    "cv_size_kb": "({{count}} KB)",
+    "quick_apply": "Quick Apply with Saved Profile"
   },
   "detail": {
     "loading": "Vacature laden...",
@@ -871,7 +872,8 @@
     "title": "Share",
     "copy_link": "Kopieer Link",
     "email": "Deel via E-mail",
-    "copied": "Link gekopieerd!"
+    "copied": "Link gekopieerd!",
+    "native": "Share..."
   },
   "already_applied": "Je hebt al gesolliciteerd",
   "application_status_label": "Sollicitatiestatus",

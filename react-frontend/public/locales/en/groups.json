@@ -250,7 +250,8 @@
     },
     "create_intro": "Set the purpose, privacy, location, and image for a group people can understand at a glance.",
     "summary_visibility": "Visibility",
-    "essentials_section": "Group essentials"
+    "essentials_section": "Group essentials",
+    "template_label": "Start from a template (optional)"
   },
   "announcements": {
     "heading": "Announcements",

@@ -33,7 +33,7 @@ export function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps) {
   if (items.length === 0) return null;
 
   return (
-    <nav aria-label={t('accessibility.breadcrumb', { defaultValue: 'Breadcrumb' })} className="mb-4">
+    <nav aria-label={t('accessibility.breadcrumb')} className="mb-4">
       <ol className="flex items-center gap-1 text-sm overflow-x-auto">
         {showHome && (
           <li className="flex items-center">

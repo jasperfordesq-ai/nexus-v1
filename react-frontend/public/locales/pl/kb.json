@@ -49,5 +49,6 @@
   "page_title": "Knowledge Base",
   "page_description": "Articles, guides, and tutorials for the community.",
   "all_categories": "All",
-  "author_by": "by {{name}}"
+  "author_by": "by {{name}}",
+  "attachments": "Attachments"
 }

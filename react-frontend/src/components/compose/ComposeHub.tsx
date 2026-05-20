@@ -154,7 +154,7 @@ export function ComposeHub({
           activeTab={activeTab}
           onTabChange={editItem ? () => {} : setActiveTab}
           tabs={editItem ? [] : tabs}
-          headerTitle={editItem ? t('card.edit_post', 'Edit Post') : t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
+          headerTitle={editItem ? t('card.edit_post') : t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
           templatePicker={editItem ? undefined : <TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />}
         >
           {bodyContent}
@@ -188,7 +188,7 @@ export function ComposeHub({
                   <ActiveIcon className="w-4 h-4 text-white" aria-hidden="true" />
                 </div>
                 <span className="font-semibold flex-1">
-                  {editItem ? t('card.edit_post', 'Edit Post') : t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
+                  {editItem ? t('card.edit_post') : t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
                 </span>
                 {!editItem && <TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />}
               </div>

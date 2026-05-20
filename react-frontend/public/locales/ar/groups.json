@@ -225,7 +225,8 @@
       "updated": "تم تحديث المجموعة",
       "save_failed": "فشل في حفظ المجموعة",
       "something_wrong": "حدث خطأ ما"
-    }
+    },
+    "template_label": "Start from a template (optional)"
   },
   "announcements": {
     "heading": "Announcements",

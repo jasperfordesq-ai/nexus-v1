@@ -1112,7 +1112,7 @@ export function CreateJobPage() {
                   max: benchmark.salary_max.toLocaleString(),
                   type: benchmark.salary_type,
                   median: benchmark.salary_median.toLocaleString(),
-                  defaultValue: `Market rate for "${benchmark.role_keyword}": ${benchmark.currency}${benchmark.salary_min.toLocaleString()} – ${benchmark.currency}${benchmark.salary_max.toLocaleString()} / ${benchmark.salary_type} (median: ${benchmark.currency}${benchmark.salary_median.toLocaleString()})`,
+
                 })}
               </p>
               <Button

@@ -225,7 +225,8 @@
       "updated": "Group updated",
       "save_failed": "Failed to save group",
       "something_wrong": "Something went wrong"
-    }
+    },
+    "template_label": "Start from a template (optional)"
   },
   "announcements": {
     "heading": "Announcements",

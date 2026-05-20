@@ -149,7 +149,7 @@ export function Layout({
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:shadow-lg"
       >
-        {t('accessibility.skip_to_content', 'Skip to main content')}
+        {t('accessibility.skip_to_content')}
       </a>
 
       {/* Offline indicator */}
@@ -234,7 +234,7 @@ export function AuthLayout() {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:shadow-lg"
       >
-        {t('accessibility.skip_to_content', 'Skip to main content')}
+        {t('accessibility.skip_to_content')}
       </a>
 
       {/* Language switcher — top-right on auth pages */}

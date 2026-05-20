@@ -286,7 +286,7 @@ export function ConversationPage() {
   // Update page title when conversation loads
   useEffect(() => {
     if (conversation?.meta?.other_user?.name) {
-      setPageTitle(t('conversation_with', '{{name}} \u2014 Messages', { name: conversation.meta.other_user.name }));
+      setPageTitle(t('conversation_with', { name: conversation.meta.other_user.name }));
     }
   }, [conversation?.meta?.other_user?.name, t]);
 

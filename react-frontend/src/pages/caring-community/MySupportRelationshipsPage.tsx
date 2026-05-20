@@ -224,7 +224,7 @@ function RelationshipCard({ relationship, t, onPause, onEnd, onResume, busyId }:
                   }
                   variant="flat"
                 >
-                  {t(`my_support_relationships.log_status.${log.status}`, { defaultValue: log.status })}
+                  {t(`my_support_relationships.log_status.${log.status}`)}
                 </Chip>
               </li>
             ))}

@@ -562,7 +562,7 @@ export function ListingDetailPage() {
             <div className="min-w-0">
               <div className="text-xs text-theme-subtle">{t('detail_status')}</div>
               <div className="truncate text-sm font-medium text-theme-primary sm:text-base">
-                {t(`status_${listing.status}`, { defaultValue: listing.status })}
+                {t(`status_${listing.status}`)}
               </div>
             </div>
           </div>

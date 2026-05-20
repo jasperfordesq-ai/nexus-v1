@@ -290,15 +290,15 @@ export function RequestExchangePage() {
           <div>
             <Input
               type="number"
-              label={t('request.prep_time_label', 'Preparation Time')}
-              placeholder={t('request.prep_time_placeholder', '0')}
+              label={t('request.prep_time_label')}
+              placeholder={t('request.prep_time_placeholder')}
               value={prepTime}
               onChange={(e) => setPrepTime(e.target.value)}
               min="0"
               max="10"
               step="0.25"
               endContent={<span className="text-theme-muted">{t('request.hours_unit')}</span>}
-              description={t('request.prep_time_description', 'Additional time needed for preparation (optional)')}
+              description={t('request.prep_time_description')}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',

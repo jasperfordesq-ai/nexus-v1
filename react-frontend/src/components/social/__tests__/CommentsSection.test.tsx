@@ -17,11 +17,11 @@ import { HeroUIProvider } from '@heroui/react';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, options?: string | { name?: string; defaultValue?: string }) => {
+    t: (key: string, options?: string | { name?: string; fallbackValue?: string }) => {
       if (key === 'write_reply_to' && typeof options === 'object') {
         return `Reply to ${options.name}...`;
       }
-      return typeof options === 'string' ? options : options?.defaultValue ?? key;
+      return typeof options === 'string' ? options : options?.fallbackValue ?? key;
     },
     i18n: { language: 'en', changeLanguage: vi.fn() },
   }),

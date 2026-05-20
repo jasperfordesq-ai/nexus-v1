@@ -209,7 +209,8 @@
     "cover_message_label": "Message de motivation (facultatif)",
     "cover_message_placeholder": "Expliquez à l'organisation pourquoi vous souhaitez faire du bénévolat...",
     "cancel": "Annuler",
-    "submit_application": "Envoyer la candidature"
+    "submit_application": "Envoyer la candidature",
+    "job_openings": "Job Openings"
   },
   "emergency_alerts": {
     "heading": "Alertes d'urgence",

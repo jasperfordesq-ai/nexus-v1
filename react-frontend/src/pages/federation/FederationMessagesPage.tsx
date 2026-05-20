@@ -1330,7 +1330,7 @@ export function FederationMessagesPage() {
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-theme-primary truncate">
-                        {selectedRecipient.name || (selectedRecipient.is_external ? t('members.external_member', 'External Member') : `User #${selectedRecipient.id}`)}
+                        {selectedRecipient.name || (selectedRecipient.is_external ? t('members.external_member') : `User #${selectedRecipient.id}`)}
                       </p>
                       {selectedRecipient.tenant_name && (
                         <Chip
@@ -1361,7 +1361,7 @@ export function FederationMessagesPage() {
                   {selectedRecipient.is_external && (
                     <div className="flex items-center gap-2 p-2.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm">
                       <Globe className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                      <span>{t('messages.external_recipient_info', 'This message will be sent to an external partner server.')}</span>
+                      <span>{t('messages.external_recipient_info')}</span>
                     </div>
                   )}
                 </>

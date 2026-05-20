@@ -67,7 +67,7 @@ export function AccessibilityPage() {
       animate="visible"
       className="max-w-4xl mx-auto space-y-8"
     >
-      <PageMeta title={t('accessibility.page_title', { defaultValue: 'Accessibility Statement' })} description={t('accessibility.meta_description', { defaultValue: 'Our commitment to making the platform accessible to everyone.' })} />
+      <PageMeta title={t('accessibility.page_title')} description={t('accessibility.meta_description')} />
       {/* Hero */}
       <motion.div variants={itemVariants} className="text-center">
         <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">

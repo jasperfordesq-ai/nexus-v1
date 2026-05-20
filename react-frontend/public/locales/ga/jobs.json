@@ -343,7 +343,8 @@
     "cv_invalid_type": "Ní thacaítear ach le comhaid PDF, DOC, nó DOCX",
     "message_employer": "Cuir Teachtaireacht chuig Fostóir",
     "cv_parse_error": "Theip ar CV a pharsáil. Is féidir leat d'iarratas a chur isteach de láimh fós.",
-    "cv_size_kb": "({{count}} KB)"
+    "cv_size_kb": "({{count}} KB)",
+    "quick_apply": "Quick Apply with Saved Profile"
   },
   "detail": {
     "loading": "Folúntas á luchtú...",
@@ -871,7 +872,8 @@
     "title": "Roinn",
     "copy_link": "Cóipeáil Nasc",
     "email": "Roinn trí Ríomhphost",
-    "copied": "Nasc cóipeáilte!"
+    "copied": "Nasc cóipeáilte!",
+    "native": "Share..."
   },
   "already_applied": "Tá iarratas curtha isteach agat cheana féin",
   "application_status_label": "Stádas Iarratais",

@@ -191,7 +191,8 @@
     "time_hours_ago": "{{count}}h ago",
     "time_days_ago": "{{count}}d ago",
     "page_title": "Members - Broker",
-    "note_system_author": "System"
+    "note_system_author": "System",
+    "hours_short": "hrs"
   },
   "onboarding": {
     "title": "オンボーディング",

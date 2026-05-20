@@ -53,7 +53,7 @@ export function PriceBadge({ price, currency, priceType, timeCreditPrice, isOver
         size="sm"
         className={isOverlay ? 'font-semibold shadow-lg ring-1 ring-black/10' : 'font-semibold'}
       >
-        {t('price.free', 'Free')}
+        {t('price.free')}
       </Chip>
     );
   }
@@ -66,7 +66,7 @@ export function PriceBadge({ price, currency, priceType, timeCreditPrice, isOver
         size="sm"
         className={isOverlay ? 'bg-background/95 text-foreground shadow-lg ring-1 ring-black/10 backdrop-blur-md' : undefined}
       >
-        {t('price.contact', 'Contact for price')}
+        {t('price.contact')}
       </Chip>
     );
   }
@@ -88,7 +88,7 @@ export function PriceBadge({ price, currency, priceType, timeCreditPrice, isOver
           {formattedPrice}{timeCreditSuffix}
         </span>
         <Chip color="warning" variant="flat" size="sm">
-          {t('price.negotiable', 'Negotiable')}
+          {t('price.negotiable')}
         </Chip>
       </span>
     );

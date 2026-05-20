@@ -153,7 +153,10 @@
     "broker_approval_title": "موافقة الوسيط مطلوبة",
     "broker_approval_description": "سيحتاج هذا التبادل إلى موافقة منسق المجتمع قبل أن يتمكن من المتابعة.",
     "cancel": "Cancel",
-    "send_request": "أرسل الطلب"
+    "send_request": "أرسل الطلب",
+    "prep_time_label": "Preparation Time",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Additional time needed for preparation (optional)"
   },
   "page_meta": {
     "request": {

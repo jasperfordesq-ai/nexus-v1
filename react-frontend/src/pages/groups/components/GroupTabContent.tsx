@@ -143,8 +143,8 @@ export function GroupTabContent({
     <GlassCard className="p-6">
       <EmptyState
         icon={<Lock className="w-12 h-12" aria-hidden="true" />}
-        title={t('detail.join_to_access_title', 'Members Only')}
-        description={t('detail.join_to_access_desc', 'Join this group to access this feature.')}
+        title={t('detail.join_to_access_title')}
+        description={t('detail.join_to_access_desc')}
         action={
           isAuthenticated ? (
             <Button

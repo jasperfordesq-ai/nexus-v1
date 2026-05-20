@@ -104,13 +104,13 @@ export function PremiumGate({ featureKey, children, fallback, silent = false }: 
       <CardBody className="text-center py-8 flex flex-col items-center gap-3">
         <Crown size={36} className="text-yellow-500" />
         <h3 className="text-lg font-semibold">
-          {t('premium.gate_title', 'Premium feature')}
+          {t('premium.gate_title')}
         </h3>
         <p className="text-sm text-[var(--color-text-secondary)] max-w-md">
-          {t('premium.gate_body', 'Subscribe to a premium tier to unlock this feature.')}
+          {t('premium.gate_body')}
         </p>
         <Button as={Link} to={tenantPath('/premium')} color="primary">
-          {t('premium.gate_cta', 'View Premium Tiers')}
+          {t('premium.gate_cta')}
         </Button>
       </CardBody>
     </Card>

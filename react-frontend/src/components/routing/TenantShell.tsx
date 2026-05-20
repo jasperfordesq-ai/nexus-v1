@@ -235,16 +235,16 @@ function BootstrapError({ onRetry }: { onRetry: () => void }) {
           </svg>
         </div>
         <h1 className="text-xl font-bold text-theme-primary mb-2">
-          {t('errors.connection_failed', 'Unable to connect')}
+          {t('errors.connection_failed')}
         </h1>
         <p className="text-theme-muted mb-6 text-sm">
-          {t('errors.connection_failed_detail', 'Check your internet connection and try again.')}
+          {t('errors.connection_failed_detail')}
         </p>
         <button
           onClick={onRetry}
           className="px-6 py-2 rounded-lg bg-primary text-white font-medium text-sm hover:opacity-90 transition-opacity"
         >
-          {t('actions.retry', 'Try again')}
+          {t('actions.retry')}
         </button>
       </div>
     </div>

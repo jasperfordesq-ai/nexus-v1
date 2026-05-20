@@ -209,7 +209,8 @@
     "cover_message_label": "Anschreiben (optional)",
     "cover_message_placeholder": "Erzählen Sie der Organisation, warum Sie sich freiwillig engagieren möchten...",
     "cancel": "Abbrechen",
-    "submit_application": "Bewerbung absenden"
+    "submit_application": "Bewerbung absenden",
+    "job_openings": "Job Openings"
   },
   "emergency_alerts": {
     "heading": "Notfallwarnungen",

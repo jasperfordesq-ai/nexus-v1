@@ -154,7 +154,7 @@ export function NotificationFlyout() {
             size="sm"
             className="text-theme-muted hover:text-theme-primary h-7 w-7 min-w-0"
             onPress={() => setIsOpen(false)}
-            aria-label={t('flyout.close', 'Close notifications')}
+            aria-label={t('flyout.close')}
           >
             <X className="w-4 h-4" aria-hidden="true" />
           </Button>

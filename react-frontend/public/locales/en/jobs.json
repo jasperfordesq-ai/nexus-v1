@@ -403,7 +403,8 @@
     "cv_invalid_type": "Only PDF, DOC, or DOCX files are supported",
     "cv_size_kb": "({{count}} KB)",
     "message_employer": "Message Employer",
-    "cv_parse_error": "Failed to parse CV. You can still submit your application manually."
+    "cv_parse_error": "Failed to parse CV. You can still submit your application manually.",
+    "quick_apply": "Quick Apply with Saved Profile"
   },
   "detail": {
     "loading": "Loading vacancy...",
@@ -932,7 +933,8 @@
     "title": "Share",
     "copy_link": "Copy Link",
     "email": "Share via Email",
-    "copied": "Link copied!"
+    "copied": "Link copied!",
+    "native": "Share..."
   },
   "already_applied": "You've already applied",
   "application_status_label": "Application Status",

@@ -435,7 +435,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
             />
             <div className="grid grid-cols-2 gap-3">
               <Select
-                label={t('tasks.status_label', { defaultValue: 'Status' })}
+                label={t('tasks.status_label')}
                 selectedKeys={[taskForm.status]}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0];
@@ -448,7 +448,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
                 <SelectItem key="done">{t('tasks.status_done')}</SelectItem>
               </Select>
               <Select
-                label={t('tasks.priority_label', { defaultValue: 'Priority' })}
+                label={t('tasks.priority_label')}
                 selectedKeys={[taskForm.priority]}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0];

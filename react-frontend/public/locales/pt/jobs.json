@@ -343,7 +343,8 @@
     "cv_invalid_type": "Apenas ficheiros PDF, DOC ou DOCX são suportados",
     "message_employer": "Mensagem ao Empregador",
     "cv_parse_error": "Falha ao analisar CV. Pode submeter a sua candidatura manualmente.",
-    "cv_size_kb": "({{count}} KB)"
+    "cv_size_kb": "({{count}} KB)",
+    "quick_apply": "Quick Apply with Saved Profile"
   },
   "detail": {
     "loading": "A carregar vaga...",
@@ -871,7 +872,8 @@
     "title": "Partilhar",
     "copy_link": "Copiar Ligação",
     "email": "Partilhar por Email",
-    "copied": "Ligação copiada!"
+    "copied": "Ligação copiada!",
+    "native": "Share..."
   },
   "already_applied": "Já se candidatou",
   "application_status_label": "Estado da Candidatura",

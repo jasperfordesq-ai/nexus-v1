@@ -322,7 +322,7 @@ export function RiskTagsPage() {
           }
           className="capitalize"
         >
-          {t(`risk_tags.level_${item.risk_level}`, { defaultValue: item.risk_level })}
+          {t(`risk_tags.level_${item.risk_level}`)}
         </Chip>
       ),
     },
@@ -332,7 +332,7 @@ export function RiskTagsPage() {
       sortable: true,
       render: (item) => {
         const cat = item.risk_category;
-        const label = cat ? t(`risk_tags.category_${cat}`, { defaultValue: cat }) : '—';
+        const label = cat ? t(`risk_tags.category_${cat}`) : '—';
         return <span className="text-sm">{label}</span>;
       },
     },

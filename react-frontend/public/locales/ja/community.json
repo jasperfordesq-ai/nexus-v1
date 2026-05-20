@@ -209,7 +209,8 @@
     "cover_message_label": "Cover Message (optional)",
     "cover_message_placeholder": "Tell the organisation why you'd like to volunteer...",
     "cancel": "Cancel",
-    "submit_application": "Submit Application"
+    "submit_application": "Submit Application",
+    "job_openings": "Job Openings"
   },
   "emergency_alerts": {
     "heading": "Emergency Alerts",

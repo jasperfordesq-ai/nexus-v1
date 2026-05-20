@@ -153,7 +153,10 @@
     "broker_approval_title": "Vermittler-Genehmigung erforderlich",
     "broker_approval_description": "Dieses Tauschgeschäft muss von einem Gemeinschaftskoordinator genehmigt werden, bevor es fortfahren kann.",
     "cancel": "Abbrechen",
-    "send_request": "Anfrage senden"
+    "send_request": "Anfrage senden",
+    "prep_time_label": "Preparation Time",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Additional time needed for preparation (optional)"
   },
   "page_meta": {
     "request": {

@@ -209,7 +209,8 @@
     "cover_message_label": "Messaggio di presentazione (facoltativo)",
     "cover_message_placeholder": "Spieghi all'organizzazione perché desidera fare volontariato...",
     "cancel": "Annulla",
-    "submit_application": "Invia candidatura"
+    "submit_application": "Invia candidatura",
+    "job_openings": "Job Openings"
   },
   "emergency_alerts": {
     "heading": "Avvisi di Emergenza",

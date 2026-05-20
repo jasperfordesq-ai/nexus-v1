@@ -111,7 +111,7 @@ export function ApplySection({
             className="w-full bg-theme-elevated text-theme-muted"
             onPress={() => navigate(tenantPath(`/messages?user=${vacancy.creator?.id}&context=job&context_id=${vacancy.id}`))}
           >
-            {t('apply.message_employer', 'Message Employer')}
+            {t('apply.message_employer')}
           </Button>
         </div>
       ) : (
@@ -120,7 +120,7 @@ export function ApplySection({
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white w-full"
             size="lg"
             onPress={onApplyOpen}
-            aria-label={t('apply.button_label', 'Apply for {{title}}', { title: vacancy.title ?? 'this job' })}
+            aria-label={t('apply.button_label', { title: vacancy.title ?? 'this job' })}
           >
             {t('apply.button')}
           </Button>
@@ -133,7 +133,7 @@ export function ApplySection({
               isLoading={isSubmitting}
               onPress={handleQuickApply}
             >
-              {t('apply.quick_apply', 'Quick Apply with Saved Profile')}
+              {t('apply.quick_apply')}
             </Button>
           )}
         </div>

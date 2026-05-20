@@ -343,7 +343,8 @@
     "cv_invalid_type": "PDF、DOC、またはDOCXファイルのみがサポートされています",
     "message_employer": "雇用主にメッセージを送る",
     "cv_parse_error": "CVの解析に失敗しました。手動で申請を提出することはできます。",
-    "cv_size_kb": "({{count}} KB)"
+    "cv_size_kb": "({{count}} KB)",
+    "quick_apply": "Quick Apply with Saved Profile"
   },
   "detail": {
     "loading": "求人情報を読み込んでいます...",
@@ -871,7 +872,8 @@
     "title": "Share",
     "copy_link": "リンクをコピー",
     "email": "メールで共有",
-    "copied": "リンクがコピーされました！"
+    "copied": "リンクがコピーされました！",
+    "native": "Share..."
   },
   "already_applied": "すでに応募しています",
   "application_status_label": "応募状況",

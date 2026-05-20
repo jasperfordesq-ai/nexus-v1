@@ -225,7 +225,8 @@
       "updated": "Grúpa nuashonraithe",
       "save_failed": "Theip ar shábháil an ghrúpa",
       "something_wrong": "Chuaigh rud éigin mícheart"
-    }
+    },
+    "template_label": "Start from a template (optional)"
   },
   "announcements": {
     "heading": "Fógraí",

@@ -103,7 +103,7 @@ export function MyPickupsPage() {
                   </p>
                 </div>
                 <Chip color={statusColor(r.status)} variant="flat" size="sm">
-                  {t(`pickup.status_${r.status}`, { defaultValue: t('pickup.status_unknown') })}
+                  {t(`pickup.status_${r.status}`)}
                 </Chip>
               </div>
 

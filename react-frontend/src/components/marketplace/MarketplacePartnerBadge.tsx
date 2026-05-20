@@ -31,7 +31,7 @@ export function MarketplacePartnerBadge({ grantedAt, size = 'sm' }: MarketplaceP
       size={size}
       startContent={<ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />}
     >
-      {t('marketplace.onboarding.partner_badge', 'Marketplace Partner')}
+      {t('marketplace.onboarding.partner_badge')}
     </Chip>
   );
 }

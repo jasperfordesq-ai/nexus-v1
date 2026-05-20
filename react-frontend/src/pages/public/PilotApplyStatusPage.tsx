@@ -109,7 +109,7 @@ export function PilotApplyStatusPage() {
               <div>
                 <p className="text-xs uppercase tracking-wide text-theme-subtle mb-1">{t('provisioning.status_title')}</p>
                 <Chip color={STATUS_COLORS[info.status] ?? 'default'} variant="flat" size="sm">
-                  {t(`provisioning.status_labels.${info.status}`, { defaultValue: info.status })}
+                  {t(`provisioning.status_labels.${info.status}`)}
                 </Chip>
               </div>
               <p className="text-theme-muted text-sm pt-2">{t('provisioning.status_check_email')}</p>

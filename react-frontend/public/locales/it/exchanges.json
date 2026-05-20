@@ -153,7 +153,10 @@
     "broker_approval_title": "Approvazione del coordinatore necessaria",
     "broker_approval_description": "Questo scambio dovrà essere approvato da un coordinatore della comunità prima di poter procedere.",
     "cancel": "Annulla",
-    "send_request": "Invia richiesta"
+    "send_request": "Invia richiesta",
+    "prep_time_label": "Preparation Time",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Additional time needed for preparation (optional)"
   },
   "page_meta": {
     "request": {

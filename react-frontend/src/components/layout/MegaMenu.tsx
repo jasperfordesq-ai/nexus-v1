@@ -213,7 +213,7 @@ export function MegaMenu({
     <>
     {/* Screen reader announcement for menu state changes */}
     <div className="sr-only" aria-live="polite" aria-atomic="true">
-      {isOpen ? t('accessibility.menu_opened', 'Navigation menu opened') : ''}
+      {isOpen ? t('accessibility.menu_opened') : ''}
     </div>
     <Popover
       placement="bottom-start"

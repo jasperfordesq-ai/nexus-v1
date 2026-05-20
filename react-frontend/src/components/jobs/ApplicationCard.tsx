@@ -151,7 +151,7 @@ export function ApplicationCard({ application, onUpdateStatus, tenantPathFn, nav
           startContent={<MessageCircle size={13} aria-hidden="true" />}
           onPress={() => navigateFn(tenantPathFn(`/messages?user=${application.applicant.id}&context=job&context_id=${application.vacancy_id}`))}
         >
-          {t('detail.message_applicant', 'Message')}
+          {t('detail.message_applicant')}
         </Button>
       </div>
 

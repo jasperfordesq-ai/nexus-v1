@@ -451,7 +451,7 @@ export function OrganisationDetailPage() {
         <div>
           <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-            {t('organisation_detail.job_openings', 'Job Openings')}
+            {t('organisation_detail.job_openings')}
             <Chip size="sm" variant="flat" className="text-theme-subtle">{orgJobs.length}</Chip>
           </h2>
           <div className="space-y-3">

@@ -343,7 +343,8 @@
     "cv_invalid_type": "Nur PDF-, DOC- oder DOCX-Dateien werden unterstützt",
     "message_employer": "Arbeitgeber kontaktieren",
     "cv_parse_error": "Lebenslauf konnte nicht analysiert werden. Sie können Ihre Bewerbung trotzdem manuell einreichen.",
-    "cv_size_kb": "({{count}} KB)"
+    "cv_size_kb": "({{count}} KB)",
+    "quick_apply": "Quick Apply with Saved Profile"
   },
   "detail": {
     "loading": "Stelle wird geladen...",
@@ -871,7 +872,8 @@
     "title": "Teilen",
     "copy_link": "Link kopieren",
     "email": "Per E-Mail teilen",
-    "copied": "Link kopiert!"
+    "copied": "Link kopiert!",
+    "native": "Share..."
   },
   "already_applied": "Sie haben sich bereits beworben",
   "application_status_label": "Bewerbungsstatus",

@@ -68,8 +68,8 @@ export function JobApplicationsList({
                 <div className="w-14 h-14 rounded-full bg-theme-elevated flex items-center justify-center mx-auto">
                   <Users className="w-7 h-7 text-theme-subtle" aria-hidden="true" />
                 </div>
-                <p className="font-medium text-theme-primary">{t('detail.no_applications', 'No applications yet')}</p>
-                <p className="text-sm text-theme-muted">{t('detail.no_applications_desc', "Share your vacancy to attract candidates. When someone applies, they'll appear here.")}</p>
+                <p className="font-medium text-theme-primary">{t('detail.no_applications')}</p>
+                <p className="text-sm text-theme-muted">{t('detail.no_applications_desc')}</p>
                 <div className="flex gap-2 justify-center">
                   <Button
                     size="sm"
@@ -78,7 +78,7 @@ export function JobApplicationsList({
                     startContent={<RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />}
                     onPress={onRefresh}
                   >
-                    {t('detail.refresh', 'Refresh')}
+                    {t('detail.refresh')}
                   </Button>
                 </div>
               </div>

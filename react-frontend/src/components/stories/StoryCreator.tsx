@@ -803,7 +803,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 />
                 {videoDuration > 0 && (
                   <div className="absolute top-3 right-3 bg-black/60 backdrop-blur rounded-full px-2.5 py-1 text-white text-xs font-medium">
-                    {Math.round(videoDuration)}s
+                    {t('creator.video_duration_seconds', { count: Math.round(videoDuration) })}
                   </div>
                 )}
                 {videoDuration > 60 && (
@@ -963,7 +963,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
               <Textarea
                 value={textContent}
                 onValueChange={setTextContent}
-                placeholder={t('creator.compose_placeholder', "What's on your mind?")}
+                placeholder={t('creator.compose_placeholder')}
                 variant="bordered"
                 maxLength={500}
                 minRows={2}

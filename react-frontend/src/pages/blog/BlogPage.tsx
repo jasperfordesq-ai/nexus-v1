@@ -187,7 +187,7 @@ export function BlogPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title={t('page_title')} description={t('page_description', { defaultValue: 'Latest blog posts and community stories' })} />
+      <PageMeta title={t('page_title')} description={t('page_description')} />
       <PublicPageHero
         eyebrow={t('hero_eyebrow')}
         title={t('title')}

@@ -73,7 +73,7 @@ export function TermsPage() {
   // Default fallback — generic terms content
   return (
     <>
-      <PageMeta title={t('terms.page_title', { defaultValue: 'Terms of Service' })} description={t('terms.meta_description', { defaultValue: 'Terms and conditions for using our community platform.' })} />
+      <PageMeta title={t('terms.page_title')} description={t('terms.meta_description')} />
       <DefaultTermsContent branding={branding} tenantPath={tenantPath} />
     </>
   );

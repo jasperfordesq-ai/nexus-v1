@@ -58,7 +58,7 @@ vi.mock('react-i18next', () => ({
 vi.mock('i18next', () => ({
   default: {
     t: (key: string, opts?: Record<string, unknown>) =>
-      (opts as { defaultValue?: string } | undefined)?.defaultValue ?? key,
+      (opts as { fallbackValue?: string } | undefined)?.fallbackValue ?? key,
     language: 'en',
     changeLanguage: () => Promise.resolve(),
   },

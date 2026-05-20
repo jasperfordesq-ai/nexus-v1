@@ -265,7 +265,7 @@ export function MessageDetail() {
                 variant="flat"
                 color={COPY_REASON_COLORS[copy.copy_reason] ?? 'default'}
               >
-                {t(`messages.copy_reason_${copy.copy_reason}`, { defaultValue: copy.copy_reason.replace(/_/g, ' ') })}
+                {t(`messages.copy_reason_${copy.copy_reason}`)}
               </Chip>
             </div>
 

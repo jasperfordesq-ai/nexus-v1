@@ -29,10 +29,10 @@ export function InstallAppButton({ children }: InstallAppButtonProps) {
 
   if (!shouldOfferInstall(state)) return null;
 
-  const label = t('install.cta', 'Install app');
+  const label = t('install.cta');
   const sublabel = state.isIosSafari
-    ? t('install.cta_ios_sub', 'Add NEXUS to your home screen')
-    : t('install.cta_sub', 'Faster access, works offline');
+    ? t('install.cta_ios_sub')
+    : t('install.cta_sub');
 
   return <>{children({ onClick, label, sublabel })}</>;
 }

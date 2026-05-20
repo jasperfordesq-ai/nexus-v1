@@ -31,7 +31,7 @@ export function AudienceCardsSection({ content }: AudienceCardsSectionProps) {
 
   if (cards.length === 0) return null;
 
-  const title = content?.title ?? t('home.audience_cards.title', 'Where would you like to start?');
+  const title = content?.title ?? t('home.audience_cards.title');
   const subtitle = content?.subtitle;
 
   const colCount = Math.min(cards.length, 4);

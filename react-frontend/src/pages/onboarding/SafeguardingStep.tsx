@@ -524,7 +524,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
                     } catch { /* ignore parse errors */ }
                     return selectOpts.length > 0 ? (
                       <Select
-                        label={t('safeguarding.select_option', 'Choose an option')}
+                        label={t('safeguarding.select_option')}
                         size="sm"
                         variant="bordered"
                         className="mt-2 max-w-xs"

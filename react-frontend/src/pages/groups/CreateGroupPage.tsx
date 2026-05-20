@@ -412,7 +412,7 @@ export function CreateGroupPage() {
           {!isEditing && templates.length > 0 && (
             <div>
               <p className="text-sm font-medium text-theme-primary mb-2">
-                {t('form.template_label', 'Start from a template (optional)')}
+                {t('form.template_label')}
               </p>
               <div className="flex flex-wrap gap-2">
                 {templates.map((tmpl) => (

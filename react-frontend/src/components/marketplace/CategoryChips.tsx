@@ -21,7 +21,7 @@ export function CategoryChips({ categories, activeId, onSelect }: CategoryChipsP
     <div
       className="flex flex-wrap gap-2"
       role="listbox"
-      aria-label={t('categories.label', 'Filter by category')}
+      aria-label={t('categories.label')}
     >
       <Chip
         as="button"
@@ -33,7 +33,7 @@ export function CategoryChips({ categories, activeId, onSelect }: CategoryChipsP
         role="option"
         aria-selected={activeId == null}
       >
-        {t('categories.all', 'All')}
+        {t('categories.all')}
       </Chip>
 
       {categories.map((category) => (

@@ -141,11 +141,11 @@ export function GifPicker({ onSelect }: GifPickerProps) {
                   variant="flat"
                   onPress={() => handleGifClick(gif)}
                   className="relative overflow-hidden rounded-lg cursor-pointer hover:opacity-80 transition-opacity p-0 min-w-0 h-auto"
-                  aria-label={t('gif.select', 'Select GIF')}
+                  aria-label={t('gif.select')}
                 >
                   <img
                     src={gif.preview_url}
-                    alt={t('gif.preview_alt', 'GIF preview')}
+                    alt={t('gif.preview_alt')}
                     loading="lazy"
                     className="w-full aspect-square object-cover"
                   />

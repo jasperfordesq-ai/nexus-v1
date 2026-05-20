@@ -20,7 +20,7 @@ interface LoadingScreenProps {
 export function LoadingScreen({ message }: LoadingScreenProps) {
   const displayMessage = message ?? (
     i18n.isInitialized && i18n.hasLoadedNamespace('common')
-      ? i18n.t('loading', { ns: 'common', defaultValue: 'Loading...' })
+      ? i18n.t('loading', { ns: 'common' })
       : 'Loading...'
   );
   return (

@@ -327,7 +327,7 @@ export function PilotApplyPage() {
             )}
             {slugStatus.state === 'unavailable' && (
               <p className="text-xs text-rose-500 mt-1">
-                {t(`provisioning.slug_status.${slugStatus.reason}`, { defaultValue: t('provisioning.slug_status.taken') })}
+                {t(`provisioning.slug_status.${slugStatus.reason}`)}
               </p>
             )}
           </div>

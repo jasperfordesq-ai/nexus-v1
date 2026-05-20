@@ -108,7 +108,7 @@ function SeverityChip({ severity, t }: { severity: string; t: TFunction }) {
   // avoids a parallel severity.* keyset that would drift.
   return (
     <Chip size="sm" color={color} variant={variant}>
-      {t(`status.${severity}`, { defaultValue: severity })}
+      {t(`status.${severity}`)}
     </Chip>
   );
 }

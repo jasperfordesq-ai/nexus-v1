@@ -153,7 +153,10 @@
     "broker_approval_title": "Wymagana zgoda brokera",
     "broker_approval_description": "Ta wymiana musi zostać zatwierdzona przez koordynatora społeczności, zanim będzie mogła zostać zrealizowana.",
     "cancel": "Cancel",
-    "send_request": "Wyślij prośbę"
+    "send_request": "Wyślij prośbę",
+    "prep_time_label": "Preparation Time",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Additional time needed for preparation (optional)"
   },
   "page_meta": {
     "request": {

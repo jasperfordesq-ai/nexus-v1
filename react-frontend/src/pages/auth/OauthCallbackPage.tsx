@@ -69,7 +69,7 @@ export function OauthCallbackPage() {
               variant="bordered"
               startContent={<ArrowLeft className="w-4 h-4" />}
             >
-              {t('back_to_login', { defaultValue: 'Back to login' })}
+              {t('back_to_login')}
             </Button>
           </GlassCard>
         </div>

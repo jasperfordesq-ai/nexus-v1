@@ -71,7 +71,7 @@ export function PinnedAnnouncementsBanner({ groupId, isMember = true }: PinnedAn
             <p className="text-sm font-medium text-theme-primary">{announcement.title}</p>
             <SafeHtml content={announcement.content} className="text-xs text-theme-subtle mt-0.5 line-clamp-2" as="p" />
           </div>
-          <Chip size="sm" variant="flat" color="primary" className="flex-shrink-0">{t('announcements.pinned', 'Pinned')}</Chip>
+          <Chip size="sm" variant="flat" color="primary" className="flex-shrink-0">{t('announcements.pinned')}</Chip>
         </div>
       ))}
     </div>

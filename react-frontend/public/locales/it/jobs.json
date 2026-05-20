@@ -343,7 +343,8 @@
     "cv_invalid_type": "Sono supportati solo file PDF, DOC o DOCX",
     "message_employer": "Messaggio al Datore",
     "cv_parse_error": "Impossibile analizzare il CV. Puoi comunque inviare la candidatura manualmente.",
-    "cv_size_kb": "({{count}} KB)"
+    "cv_size_kb": "({{count}} KB)",
+    "quick_apply": "Quick Apply with Saved Profile"
   },
   "detail": {
     "loading": "Caricamento offerta...",
@@ -871,7 +872,8 @@
     "title": "Condividi",
     "copy_link": "Copia Link",
     "email": "Condividi via Email",
-    "copied": "Link copiato!"
+    "copied": "Link copiato!",
+    "native": "Share..."
   },
   "already_applied": "Hai già fatto domanda",
   "application_status_label": "Stato Candidatura",

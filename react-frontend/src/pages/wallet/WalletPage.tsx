@@ -82,7 +82,7 @@ export function WalletPage() {
         setBalance(balanceRes.data);
       } else {
         setError(balanceRes.code === 'SESSION_EXPIRED'
-          ? tRef.current('error.session_expired', 'Your session has expired. Please log in again.')
+          ? tRef.current('error.session_expired')
           : tRef.current('error.load_balance'));
         return;
       }

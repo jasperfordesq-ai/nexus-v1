@@ -225,7 +225,8 @@
       "updated": "Gruppe aktualisiert",
       "save_failed": "Gruppe konnte nicht gespeichert werden",
       "something_wrong": "Etwas ist schiefgelaufen"
-    }
+    },
+    "template_label": "Start from a template (optional)"
   },
   "announcements": {
     "heading": "Ankündigungen",

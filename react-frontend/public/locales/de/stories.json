@@ -94,7 +94,8 @@
     "videos_trimmed_notice": "Videos longer than 60s will be trimmed to 60s display duration",
     "share_story": "Share Story",
     "error_camera_permission": "Camera access was denied. Please enable it in your browser settings.",
-    "error_camera_not_found": "No camera found on this device."
+    "error_camera_not_found": "No camera found on this device.",
+    "video_duration_seconds": "{{count}}s"
   },
   "viewer": {
     "story_from": "Story von {{name}}",

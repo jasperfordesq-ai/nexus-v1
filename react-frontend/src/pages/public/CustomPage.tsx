@@ -93,11 +93,11 @@ export function CustomPage() {
           <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" aria-hidden="true" />
           <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('not_found.heading')}</h1>
           <p className="text-theme-secondary mb-6">
-            {t('custom_page.not_found_description', "The page you're looking for doesn't exist or is no longer available.")}
+            {t('custom_page.not_found_description')}
           </p>
           <Link to={tenantPath('/')}>
             <Button color="primary" startContent={<ArrowLeft size={16} />}>
-              {t('custom_page.back_to_home', 'Back to Home')}
+              {t('custom_page.back_to_home')}
             </Button>
           </Link>
         </GlassCard>
@@ -117,7 +117,7 @@ export function CustomPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         <Breadcrumbs items={[
-          { label: t('not_found.go_home', 'Home'), href: '/' },
+          { label: t('not_found.go_home'), href: '/' },
           { label: page.title },
         ]} />
 

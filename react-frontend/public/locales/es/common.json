@@ -1995,5 +1995,21 @@
     "summary": "Project NEXUS is actively evolving, with feature maturity shown transparently across the platform.",
     "features_link": "Features",
     "changelog_link": "Changelog"
-  }
+  },
+  "no_activity_title": "No activity yet",
+  "errors": {
+    "connection_failed": "Unable to connect",
+    "connection_failed_detail": "Check your internet connection and try again.",
+    "unexpected": "Something went wrong"
+  },
+  "actions": {
+    "retry": "Try again"
+  },
+  "back_to_login": "Back to login",
+  "detail": {
+    "feed_whats_on_your_mind": "What's on your mind?",
+    "join_to_see_feed_title": "Join to see the feed",
+    "feed_load_more": "Load More"
+  },
+  "apply": "Apply"
 }

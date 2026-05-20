@@ -140,13 +140,13 @@ describe('GroupFeedTab', () => {
   it('shows compose prompt for members', () => {
     render(<GroupFeedTab {...defaultProps} feedItems={[]} />);
     // The compose prompt (write something area) should be shown for members
-    // Component uses t('detail.feed_whats_on_your_mind', "What's on your mind?") — fallback rendered
+    // Component uses t('detail.feed_whats_on_your_mind') — fallback rendered
     expect(screen.getByText("What's on your mind?")).toBeInTheDocument();
   });
 
   it('shows join prompt for non-members', () => {
     render(<GroupFeedTab {...defaultProps} isMember={false} feedItems={[]} />);
-    // Component uses t('detail.join_to_see_feed_title', 'Join to see the feed')
+    // Component uses t('detail.join_to_see_feed_title')
     expect(screen.getByText('Join to see the feed')).toBeInTheDocument();
   });
 
@@ -159,7 +159,7 @@ describe('GroupFeedTab', () => {
 
   it('shows load more button when feedHasMore is true', () => {
     render(<GroupFeedTab {...defaultProps} feedHasMore={true} />);
-    // Component uses t('detail.feed_load_more', 'Load More') — fallback rendered
+    // Component uses t('detail.feed_load_more') — fallback rendered
     expect(screen.getByText('Load More')).toBeInTheDocument();
   });
 

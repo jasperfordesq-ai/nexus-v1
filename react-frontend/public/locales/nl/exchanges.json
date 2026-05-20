@@ -153,7 +153,10 @@
     "broker_approval_title": "Goedkeuring van de Broker Vereist",
     "broker_approval_description": "Deze uitwisseling moet goedgekeurd worden door een coördinator van de gemeenschap voordat deze kan doorgaan.",
     "cancel": "Cancel",
-    "send_request": "Verzoek Verzenden"
+    "send_request": "Verzoek Verzenden",
+    "prep_time_label": "Preparation Time",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Additional time needed for preparation (optional)"
   },
   "page_meta": {
     "request": {

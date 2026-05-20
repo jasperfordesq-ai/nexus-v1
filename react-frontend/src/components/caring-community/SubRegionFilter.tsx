@@ -116,7 +116,6 @@ export function SubRegionFilter({
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantKey]);
 
   const grouped = useMemo(() => {
@@ -169,7 +168,7 @@ export function SubRegionFilter({
               <span className="flex items-center gap-2">
                 <span className="font-medium">{r.name}</span>
                 <span className="text-xs text-default-400">
-                  {t(`sub_region.type_${r.type}` as const, { defaultValue: r.type })}
+                  {t(`sub_region.type_${r.type}` as const)}
                 </span>
               </span>
             </SelectItem>

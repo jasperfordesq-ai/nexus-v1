@@ -225,7 +225,8 @@
       "updated": "Groupe mis à jour",
       "save_failed": "Échec de l'enregistrement du groupe",
       "something_wrong": "Une erreur est survenue"
-    }
+    },
+    "template_label": "Start from a template (optional)"
   },
   "announcements": {
     "heading": "Annonces",

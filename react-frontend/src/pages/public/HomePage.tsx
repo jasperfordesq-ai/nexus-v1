@@ -25,7 +25,7 @@ export function HomePage() {
           PageMeta (Helmet) handles <title> as part of the React tree, which
           the prerenderer captures correctly. */}
       <PageMeta
-        title={t('home.meta_title', 'Community Timebanking Platform')}
+        title={t('home.meta_title')}
         description={t('home.meta_description')}
         keywords={t('home.meta_keywords')}
       />

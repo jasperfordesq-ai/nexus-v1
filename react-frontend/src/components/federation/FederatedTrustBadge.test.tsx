@@ -10,7 +10,7 @@ import { FederatedTrustBadge } from './FederatedTrustBadge';
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
-      const fallback = (opts?.defaultValue as string | undefined) ?? key;
+      const fallback = (opts?.fallbackValue as string | undefined) ?? key;
       if (!opts) return fallback;
       // Simple interpolation for tests
       return fallback.replace(/\{\{(\w+)\}\}/g, (_, k: string) =>

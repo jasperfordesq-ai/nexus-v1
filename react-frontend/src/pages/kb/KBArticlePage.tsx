@@ -363,7 +363,7 @@ export function KBArticlePage() {
               <div className="space-y-2">
                 <h3 className="text-sm font-semibold text-theme-primary flex items-center gap-2">
                   <File className="w-4 h-4 text-blue-400" aria-hidden="true" />
-                  {t('attachments', 'Attachments')}
+                  {t('attachments')}
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {article.attachments.map((att) => (
@@ -462,7 +462,7 @@ export function KBArticlePage() {
                   onPress={() => handleFeedback(true)}
                   isLoading={isSubmittingFeedback}
                 >
-                  {t('feedback.yes', 'Yes')} ({article.helpful_yes ?? 0})
+                  {t('feedback.yes')} ({article.helpful_yes ?? 0})
                 </Button>
                 <Button
                   variant="flat"
@@ -471,7 +471,7 @@ export function KBArticlePage() {
                   onPress={() => handleFeedback(false)}
                   isLoading={isSubmittingFeedback}
                 >
-                  {t('feedback.no', 'No')} ({article.helpful_no ?? 0})
+                  {t('feedback.no')} ({article.helpful_no ?? 0})
                 </Button>
               </div>
             </>

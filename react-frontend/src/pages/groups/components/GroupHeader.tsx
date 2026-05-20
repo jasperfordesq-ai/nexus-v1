@@ -216,7 +216,7 @@ export function GroupHeader({
                   variant="flat"
                   className="h-10 w-10 flex-shrink-0"
                   onPress={onOpenNotifPrefs}
-                  aria-label={t('detail.notification_prefs', 'Notification preferences')}
+                  aria-label={t('detail.notification_prefs')}
                 >
                   <Megaphone className="w-4 h-4" />
                 </Button>
@@ -227,9 +227,9 @@ export function GroupHeader({
                   className="min-w-0 flex-1 sm:flex-none"
                   startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
                   onPress={onOpenInvite}
-                  aria-label={t('detail.invite_members', 'Invite Members')}
+                  aria-label={t('detail.invite_members')}
                 >
-                  {t('detail.invite', 'Invite')}
+                  {t('detail.invite')}
                 </Button>
               )}
             </div>

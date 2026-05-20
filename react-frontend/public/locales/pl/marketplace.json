@@ -71,7 +71,10 @@
     "report_submit": "Submit Report",
     "location_title": "Location",
     "approximate_location": "Approximate location",
-    "get_directions": "Directions"
+    "get_directions": "Directions",
+    "promoted": "Promoted",
+    "unsave": "Remove from saved",
+    "save": "Save listing"
   },
   "offer": {
     "modal_title": "Złóż ofertę",
@@ -220,7 +223,8 @@
     "view_listings": "Zobacz ogłoszenia {{name}} na marketplace.",
     "business": "Business",
     "private": "Private",
-    "view_profile": "View Profile"
+    "view_profile": "View Profile",
+    "verified_business": "Verified Business"
   },
   "category": {
     "not_found_title": "Nie znaleziono kategorii",

@@ -85,7 +85,7 @@ export default function CouponDetailPage() {
       }
     } catch (err) {
       logError('CouponDetailPage.qr', err);
-      toast.error(t('errors.unexpected', 'Something went wrong'));
+      toast.error(t('errors.unexpected'));
     } finally {
       setQrLoading(false);
     }

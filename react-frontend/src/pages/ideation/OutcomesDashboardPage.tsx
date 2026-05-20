@@ -159,7 +159,7 @@ export function OutcomesDashboardPage() {
               startContent={<RefreshCw className="w-4 h-4" />}
               onPress={fetchDashboard}
             >
-              {t('actions.retry', { defaultValue: 'Retry' })}
+              {t('actions.retry')}
             </Button>
           }
         />
@@ -196,7 +196,7 @@ export function OutcomesDashboardPage() {
           {dashboard.outcomes.length === 0 ? (
             <EmptyState
               icon={<Target className="w-10 h-10 text-theme-subtle" />}
-              title={t('outcomes.empty_title', { defaultValue: 'No outcomes yet' })}
+              title={t('outcomes.empty_title')}
             />
           ) : (
             <div className="space-y-3">

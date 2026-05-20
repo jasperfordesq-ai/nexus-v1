@@ -171,7 +171,7 @@ export default function MunicipalityCalendarPage() {
             placeholder="8001"
           />
           <Button color="primary" onPress={handleSubmitCode}>
-            {t('apply', 'Apply')}
+            {t('apply')}
           </Button>
 
           <div className="ml-auto flex items-center gap-2">

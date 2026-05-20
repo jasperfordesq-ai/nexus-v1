@@ -339,7 +339,7 @@ export default function MembersPage() {
               color={STATUS_COLOR[user.status] ?? 'default'}
               className="capitalize"
             >
-              {t(`status.${user.status}`, { defaultValue: user.status })}
+              {t(`status.${user.status}`)}
             </Chip>
             {user.onboarding_completed === false && user.status !== 'pending' && (
               <Chip size="sm" variant="dot" color="warning" className="text-xs">
@@ -358,7 +358,7 @@ export default function MembersPage() {
             <span className="text-sm font-medium">
               {typeof user.balance === 'number' ? user.balance.toLocaleString() : '0'}
             </span>
-            <span className="text-xs text-default-400">hrs</span>
+            <span className="text-xs text-default-400">{t('members.hours_short')}</span>
           </div>
         ),
       },
@@ -468,7 +468,7 @@ export default function MembersPage() {
         ),
       },
     ],
-    [t, tenantPath, handleReactivate, openNotes],
+    [t, tenantPath, timeAgo, handleReactivate, openNotes],
   );
 
   // ─── Render ───────────────────────────────────────────────────────────────

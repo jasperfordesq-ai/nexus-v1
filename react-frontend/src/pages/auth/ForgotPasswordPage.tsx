@@ -49,15 +49,11 @@ export function ForgotPasswordPage() {
     // Surface concrete failures so the user knows they should retry rather
     // than waiting forever for an email that will never arrive.
     if (response.code === 'RATE_LIMIT_EXCEEDED') {
-      setSubmitError(t('forgot_password.rate_limited', {
-        defaultValue: 'Too many reset attempts. Please wait an hour before trying again, or contact support.',
-      }));
+      setSubmitError(t('forgot_password.rate_limited'));
       return;
     }
     // Generic fallthrough — show the message so the user has a chance to act.
-    setSubmitError(response.error || t('forgot_password.generic_error', {
-      defaultValue: "We couldn't process that request. Please try again, or email support if it persists.",
-    }));
+    setSubmitError(response.error || t('forgot_password.generic_error'));
   }
 
   if (isSubmitted) {

@@ -209,7 +209,8 @@
     "cover_message_label": "Mensagem de Apresentação (opcional)",
     "cover_message_placeholder": "Diga à organização porque gostaria de ser voluntário...",
     "cancel": "Cancelar",
-    "submit_application": "Submeter Candidatura"
+    "submit_application": "Submeter Candidatura",
+    "job_openings": "Job Openings"
   },
   "emergency_alerts": {
     "heading": "Alertas de Emergência",

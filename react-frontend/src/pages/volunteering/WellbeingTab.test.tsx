@@ -52,7 +52,7 @@ const stableT = (
     };
 
     return interpolate(
-      translations[key] ?? String(fallbackOrOptions.defaultValue ?? key),
+      translations[key] ?? String(fallbackOrOptions.fallbackValue ?? key),
       fallbackOrOptions,
     );
   }

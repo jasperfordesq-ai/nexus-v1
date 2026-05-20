@@ -153,7 +153,10 @@
     "broker_approval_title": "Faomhadh Bróicéara de Dhíth",
     "broker_approval_description": "Beidh gá le faomhadh ó chomhordaitheoir pobail sula bhféadfaidh an malartú seo dul ar aghaidh.",
     "cancel": "Cealaigh",
-    "send_request": "Seol Iarratas"
+    "send_request": "Seol Iarratas",
+    "prep_time_label": "Preparation Time",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Additional time needed for preparation (optional)"
   },
   "page_meta": {
     "list": {

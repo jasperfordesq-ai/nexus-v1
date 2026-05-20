@@ -343,7 +343,8 @@
     "cv_invalid_type": "Seuls les fichiers PDF, DOC ou DOCX sont pris en charge",
     "message_employer": "Contacter l'employeur",
     "cv_parse_error": "Échec de l'analyse du CV. Vous pouvez toujours soumettre votre candidature manuellement.",
-    "cv_size_kb": "({{count}} KB)"
+    "cv_size_kb": "({{count}} KB)",
+    "quick_apply": "Quick Apply with Saved Profile"
   },
   "detail": {
     "loading": "Chargement de l'offre...",
@@ -871,7 +872,8 @@
     "title": "Partager",
     "copy_link": "Copier le lien",
     "email": "Partager par e-mail",
-    "copied": "Lien copié !"
+    "copied": "Lien copié !",
+    "native": "Share..."
   },
   "already_applied": "Vous avez déjà postulé",
   "application_status_label": "Statut de la candidature",

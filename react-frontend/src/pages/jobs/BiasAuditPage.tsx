@@ -212,7 +212,7 @@ export function BiasAuditPage() {
         </Link>
         <EmptyState
           icon={<ShieldCheck className="w-12 h-12" aria-hidden="true" />}
-          title={t('bias_audit.access_denied', 'Access denied')}
+          title={t('bias_audit.access_denied')}
         />
       </div>
     );
@@ -404,7 +404,7 @@ export function BiasAuditPage() {
             <p className="text-sm text-theme-muted mb-4">{t('bias_audit.rejection_rates_description')}</p>
             <Table aria-label={t('bias_audit.rejection_rates_table_aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>{t('bias_audit.stage.applied', 'Stage')}</TableColumn>
+                <TableColumn>{t('bias_audit.stage.applied')}</TableColumn>
                 <TableColumn align="end">{t('bias_audit.total_at_stage')}</TableColumn>
                 <TableColumn align="end">{t('bias_audit.rejections')}</TableColumn>
                 <TableColumn align="end">{t('bias_audit.rate')}</TableColumn>

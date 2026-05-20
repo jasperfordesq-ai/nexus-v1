@@ -262,7 +262,7 @@ export function SearchPage() {
             isLoading={isLoading}
             className="sm:w-auto w-full"
           >
-            {t('search_button', 'Search')}
+            {t('search_button')}
           </Button>
         </form>
       </GlassCard>
@@ -326,7 +326,7 @@ export function SearchPage() {
               </Button>
             </GlassCard>
           ) : isLoading ? (
-            <div aria-label={t('aria.loading_search_results', 'Loading search results')} aria-busy="true" className="space-y-4">
+            <div aria-label={t('aria.loading_search_results')} aria-busy="true" className="space-y-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <GlassCard key={i} className="p-4">
                   <div className="flex items-center gap-3">

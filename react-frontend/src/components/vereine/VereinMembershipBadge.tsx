@@ -68,7 +68,7 @@ export function VereinMembershipBadge({ userId, organizationId, hideWhenAbsent =
         variant="flat"
         startContent={<CheckCircle2 className="w-3 h-3" />}
       >
-        {t('verein_dues.badge_member_year', 'Member {{year}}', { year })}
+        {t('verein_dues.badge_member_year', { year })}
       </Chip>
     );
   }

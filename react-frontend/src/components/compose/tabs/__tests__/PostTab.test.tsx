@@ -45,8 +45,8 @@ vi.mock('@/lib/compress-image', () => ({
 }));
 
 vi.mock('@/hooks', () => ({
-  useDraftPersistence: vi.fn((_key: string, defaultValue: unknown) => {
-    const state = { ...(defaultValue as Record<string, unknown>) };
+  useDraftPersistence: vi.fn((_key: string, fallbackValue: unknown) => {
+    const state = { ...(fallbackValue as Record<string, unknown>) };
     const setState = vi.fn((updater: ((s: typeof state) => typeof state) | typeof state) => {
       if (typeof updater === 'function') {
         Object.assign(state, updater(state));

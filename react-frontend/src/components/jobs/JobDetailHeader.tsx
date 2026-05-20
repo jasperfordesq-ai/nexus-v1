@@ -201,7 +201,7 @@ export function JobDetailHeader({
                   }).catch(() => {});
                 }}
               >
-                {t('share.native', 'Share...')}
+                {t('share.native')}
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>

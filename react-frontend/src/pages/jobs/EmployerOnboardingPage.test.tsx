@@ -12,7 +12,7 @@ const mockNavigate = vi.fn();
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) =>
-      (opts?.defaultValue as string | undefined) ?? key,
+      (opts?.fallbackValue as string | undefined) ?? key,
   }),
 }));
 

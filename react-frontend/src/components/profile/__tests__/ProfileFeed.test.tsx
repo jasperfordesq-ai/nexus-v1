@@ -141,7 +141,7 @@ describe('ProfileFeed', () => {
     render(<ProfileFeed userId={5} />);
 
     await waitFor(() => {
-      // t('no_activity_title', 'No activity yet') uses default
+      // t('no_activity_title') uses default
       expect(screen.getByText('No activity yet')).toBeInTheDocument();
     });
   });

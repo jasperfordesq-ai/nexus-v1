@@ -185,7 +185,7 @@ export function VerificationBadgeRow({
     iconSm: <ShieldOff className="w-3 h-3" />,
     color: 'text-theme-muted',
     bgColor: 'bg-theme-elevated',
-    label: t('verification.not_id_verified', 'Not ID Verified'),
+    label: t('verification.not_id_verified'),
   };
 
   const allBadges = hasIdVerified ? badges : [
@@ -194,7 +194,7 @@ export function VerificationBadgeRow({
   ];
 
   return (
-    <div className="flex items-center gap-1.5 flex-wrap" aria-label={t('aria.verification_badges', 'Verification badges')}>
+    <div className="flex items-center gap-1.5 flex-wrap" aria-label={t('aria.verification_badges')}>
       {allBadges.map((badge) => {
         const isUnverified = badge.type === '__unverified__';
         const config = isUnverified ? unverifiedConfig : (badgeConfig[badge.type] || {

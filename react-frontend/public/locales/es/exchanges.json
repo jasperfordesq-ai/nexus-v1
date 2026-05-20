@@ -153,7 +153,10 @@
     "broker_approval_title": "Aprobación del Coordinador Requerida",
     "broker_approval_description": "Este intercambio necesitará ser aprobado por un coordinador de la comunidad antes de poder proceder.",
     "cancel": "Cancelar",
-    "send_request": "Enviar Solicitud"
+    "send_request": "Enviar Solicitud",
+    "prep_time_label": "Preparation Time",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Additional time needed for preparation (optional)"
   },
   "page_meta": {
     "request": {

@@ -33,10 +33,10 @@ export function MarketplaceEmptyState({ message, showCta = false }: MarketplaceE
         strokeWidth={1.5}
       />
       <p className="text-lg text-theme-muted mb-2">
-        {message || t('empty.no_listings', 'No listings yet')}
+        {message || t('empty.no_listings')}
       </p>
       <p className="text-sm text-theme-subtle mb-6">
-        {t('empty.subtitle', 'Check back later or be the first to list something.')}
+        {t('empty.subtitle')}
       </p>
       {showCta && (
         <Button
@@ -45,7 +45,7 @@ export function MarketplaceEmptyState({ message, showCta = false }: MarketplaceE
           color="primary"
           variant="solid"
         >
-          {t('empty.start_selling', 'Start Selling')}
+          {t('empty.start_selling')}
         </Button>
       )}
     </div>

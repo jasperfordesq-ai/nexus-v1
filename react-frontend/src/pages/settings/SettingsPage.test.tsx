@@ -230,8 +230,8 @@ vi.mock('react-i18next', () => {
     'save_changes': 'Save Changes',
   };
   const stableTFn = (key: string, opts?: Record<string, unknown> | string): string => {
-    if (typeof opts === 'object' && opts !== null && 'defaultValue' in opts) {
-      return opts.defaultValue as string;
+    if (typeof opts === 'object' && opts !== null && 'fallbackValue' in opts) {
+      return opts.fallbackValue as string;
     }
     return settingsTranslations[key] ?? key;
   };

@@ -314,7 +314,8 @@
     "confirm_unlink_label": "Confirmar desvinculación",
     "fallback_title": "Campaña",
     "feature_not_available": "Ideation Not Available",
-    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
+    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more.",
+    "retry": "Retry"
   },
   "templates": {
     "title": "Plantillas de Reto",

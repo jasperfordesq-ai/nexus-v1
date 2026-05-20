@@ -124,7 +124,7 @@ export function GroupMembersTab({
                         <MoreVertical className="w-4 h-4" aria-hidden="true" />
                       </Button>
                     </DropdownTrigger>
-                    <DropdownMenu aria-label={t('detail.member_actions_aria', 'Member actions')}>
+                    <DropdownMenu aria-label={t('detail.member_actions_aria')}>
                       {memberIsAdmin ? (
                         <DropdownItem
                           key="demote"

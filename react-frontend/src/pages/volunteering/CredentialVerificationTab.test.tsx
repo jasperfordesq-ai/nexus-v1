@@ -14,12 +14,12 @@ import { framerMotionMock } from '@/test/mocks';
 vi.mock('framer-motion', () => framerMotionMock);
 
 // Stable t function reference to avoid useCallback/useEffect re-trigger loops
-const stableT = (key: string, fallbackOrOptions?: string | { defaultValue?: string }, _opts?: object) => {
+const stableT = (key: string, fallbackOrOptions?: string | { fallbackValue?: string }, _opts?: object) => {
   if (typeof fallbackOrOptions === 'string') {
     return fallbackOrOptions;
   }
 
-  return fallbackOrOptions?.defaultValue ?? key;
+  return fallbackOrOptions?.fallbackValue ?? key;
 };
 vi.mock('react-i18next', () => ({
   initReactI18next: {
