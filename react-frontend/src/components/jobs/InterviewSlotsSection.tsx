@@ -26,12 +26,12 @@ export function InterviewSlotsSection({ isOwner, hasApplied }: InterviewSlotsSec
               <CalendarClock className="w-5 h-5 text-cyan-400" aria-hidden="true" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-theme-primary">{t('self_scheduling.title', 'Interview Slots')}</h3>
-              <p className="text-sm text-theme-muted">{t('self_scheduling.employer_no_slots', 'Add interview slots so candidates can self-schedule')}</p>
+              <h3 className="text-lg font-semibold text-theme-primary">{t('self_scheduling.title')}</h3>
+              <p className="text-sm text-theme-muted">{t('self_scheduling.employer_no_slots')}</p>
             </div>
           </div>
           <p className="text-sm text-theme-muted">
-            {t('self_scheduling.manage_slots', 'Manage Interview Slots')} &mdash; {t('self_scheduling.candidate_pick', 'Choose a time slot for your interview')}
+            {t('self_scheduling.manage_slots')} &mdash; {t('self_scheduling.candidate_pick')}
           </p>
         </GlassCard>
       </div>
@@ -45,9 +45,9 @@ export function InterviewSlotsSection({ isOwner, hasApplied }: InterviewSlotsSec
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center">
             <CalendarClock className="w-5 h-5 text-cyan-400" aria-hidden="true" />
           </div>
-          <h3 className="text-lg font-semibold text-theme-primary">{t('self_scheduling.title', 'Interview Slots')}</h3>
+          <h3 className="text-lg font-semibold text-theme-primary">{t('self_scheduling.title')}</h3>
         </div>
-        <p className="text-sm text-theme-muted">{t('self_scheduling.candidate_pick', 'Choose a time slot for your interview')}</p>
+        <p className="text-sm text-theme-muted">{t('self_scheduling.candidate_pick')}</p>
       </GlassCard>
     </div>
   );
