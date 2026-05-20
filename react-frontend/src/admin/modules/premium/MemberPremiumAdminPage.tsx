@@ -5,10 +5,10 @@
 
 /**
  * AG58 — Admin: Member Premium Tier management.
- * English-only per project convention for /admin/.
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   Card,
@@ -82,7 +82,8 @@ function inputToCents(v: string): number {
 }
 
 export function MemberPremiumAdminPage() {
-  usePageTitle('Member Premium Tiers');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('member_premium_admin.meta.title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -100,11 +101,11 @@ export function MemberPremiumAdminPage() {
       const res = await memberPremiumAdminApi.listTiers();
       setTiers(res.data?.tiers ?? []);
     } catch {
-      toast.error('Failed to load tiers');
+      toast.error(t('member_premium_admin.toasts.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     load();
@@ -132,11 +133,11 @@ export function MemberPremiumAdminPage() {
 
   const save = async () => {
     if (!form.slug.trim() || !form.name.trim()) {
-      toast.error('Slug and Name are required');
+      toast.error(t('member_premium_admin.validation.slug_name_required'));
       return;
     }
     if (!/^[a-z0-9][a-z0-9_-]{0,79}$/.test(form.slug.trim())) {
-      toast.error('Slug must be lowercase a-z, 0-9, dashes/underscores');
+      toast.error(t('member_premium_admin.validation.slug_format'));
       return;
     }
     setSaving(true);
@@ -157,15 +158,15 @@ export function MemberPremiumAdminPage() {
     try {
       if (form.id) {
         await memberPremiumAdminApi.updateTier(form.id, payload);
-        toast.success('Tier updated');
+        toast.success(t('member_premium_admin.toasts.updated'));
       } else {
         await memberPremiumAdminApi.createTier(payload);
-        toast.success('Tier created');
+        toast.success(t('member_premium_admin.toasts.created'));
       }
       onClose();
       await load();
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Save failed');
+      toast.error(err instanceof Error ? err.message : t('member_premium_admin.toasts.save_failed'));
     } finally {
       setSaving(false);
     }
@@ -175,24 +176,24 @@ export function MemberPremiumAdminPage() {
     setSyncing(tier.id);
     try {
       await memberPremiumAdminApi.syncStripe(tier.id);
-      toast.success(`Synced "${tier.name}" to Stripe`);
+      toast.success(t('member_premium_admin.toasts.synced', { name: tier.name }));
       await load();
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Stripe sync failed');
+      toast.error(err instanceof Error ? err.message : t('member_premium_admin.toasts.stripe_sync_failed'));
     } finally {
       setSyncing(null);
     }
   };
 
   const deleteTier = async (tier: MemberPremiumTier) => {
-    if (!window.confirm(`Delete tier "${tier.name}"? This cannot be undone.`)) return;
+    if (!window.confirm(t('member_premium_admin.confirm_delete', { name: tier.name }))) return;
     setDeleting(tier.id);
     try {
       await memberPremiumAdminApi.deleteTier(tier.id);
-      toast.success('Tier deleted');
+      toast.success(t('member_premium_admin.toasts.deleted'));
       await load();
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Delete failed');
+      toast.error(err instanceof Error ? err.message : t('member_premium_admin.toasts.delete_failed'));
     } finally {
       setDeleting(null);
     }
@@ -201,16 +202,16 @@ export function MemberPremiumAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Member Premium Tiers"
-        description="Define paid premium tiers that members can subscribe to. Each tier unlocks specific feature keys."
+        title={t('member_premium_admin.meta.title')}
+        description={t('member_premium_admin.meta.description')}
         icon={<Crown size={24} />}
         actions={
           <div className="flex gap-2">
             <Button as={Link} to={tenantPath('/admin/member-premium/subscribers')} variant="flat" startContent={<Users size={16} />}>
-              Subscribers
+              {t('member_premium_admin.actions.subscribers')}
             </Button>
             <Button color="primary" startContent={<Plus size={16} />} onPress={openCreate}>
-              New Tier
+              {t('member_premium_admin.actions.new_tier')}
             </Button>
           </div>
         }
@@ -223,23 +224,23 @@ export function MemberPremiumAdminPage() {
       ) : tiers.length === 0 ? (
         <Card>
           <CardBody className="text-center py-10 text-default-500">
-            No tiers yet. Create your first premium tier above.
+            {t('member_premium_admin.empty.tiers')}
           </CardBody>
         </Card>
       ) : (
         <Card>
           <CardBody className="p-0">
-            <Table removeWrapper aria-label="Premium tiers">
+            <Table removeWrapper aria-label={t('member_premium_admin.table.aria')}>
               <TableHeader>
-                <TableColumn>NAME</TableColumn>
-                <TableColumn>SLUG</TableColumn>
-                <TableColumn>PRICE / MONTH</TableColumn>
-                <TableColumn>PRICE / YEAR</TableColumn>
-                <TableColumn>FEATURES</TableColumn>
-                <TableColumn>STATUS</TableColumn>
-                <TableColumn>SUBSCRIBERS</TableColumn>
-                <TableColumn>STRIPE</TableColumn>
-                <TableColumn>ACTIONS</TableColumn>
+                <TableColumn>{t('member_premium_admin.table.name')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.table.slug')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.table.price_month')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.table.price_year')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.table.features')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.table.status')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.table.subscribers')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.table.stripe')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.table.actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {tiers.map((tier) => {
@@ -254,19 +255,19 @@ export function MemberPremiumAdminPage() {
                       <TableCell>{centsToInput(tier.yearly_price_cents)}</TableCell>
                       <TableCell>
                         <span className="text-xs">
-                          {(tier.features ?? []).slice(0, 3).join(', ') || '—'}
+                          {(tier.features ?? []).slice(0, 3).join(', ') || t('member_premium_admin.empty.value')}
                           {(tier.features ?? []).length > 3 ? `, +${tier.features.length - 3}` : ''}
                         </span>
                       </TableCell>
                       <TableCell>
                         <Chip size="sm" color={tier.is_active ? 'success' : 'default'} variant="flat">
-                          {tier.is_active ? 'Active' : 'Inactive'}
+                          {tier.is_active ? t('member_premium_admin.status.active') : t('member_premium_admin.status.inactive')}
                         </Chip>
                       </TableCell>
                       <TableCell>{tier.active_subscriber_count ?? 0}</TableCell>
                       <TableCell>
                         <Chip size="sm" color={fullySynced ? 'success' : 'warning'} variant="flat">
-                          {fullySynced ? 'Synced' : 'Needs sync'}
+                          {fullySynced ? t('member_premium_admin.stripe.synced') : t('member_premium_admin.stripe.needs_sync')}
                         </Chip>
                       </TableCell>
                       <TableCell>
@@ -276,7 +277,7 @@ export function MemberPremiumAdminPage() {
                             variant="flat"
                             isIconOnly
                             onPress={() => openEdit(tier)}
-                            aria-label="Edit"
+                            aria-label={t('member_premium_admin.actions.edit')}
                           >
                             <Pencil size={14} />
                           </Button>
@@ -287,7 +288,7 @@ export function MemberPremiumAdminPage() {
                             isIconOnly
                             isLoading={syncing === tier.id}
                             onPress={() => syncTier(tier)}
-                            aria-label="Sync to Stripe"
+                            aria-label={t('member_premium_admin.actions.sync_stripe')}
                           >
                             <RefreshCw size={14} />
                           </Button>
@@ -298,7 +299,7 @@ export function MemberPremiumAdminPage() {
                             isIconOnly
                             isLoading={deleting === tier.id}
                             onPress={() => deleteTier(tier)}
-                            aria-label="Delete"
+                            aria-label={t('member_premium_admin.actions.delete')}
                           >
                             <Trash size={14} />
                           </Button>
@@ -315,25 +316,25 @@ export function MemberPremiumAdminPage() {
 
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalContent>
-          <ModalHeader>{form.id ? 'Edit Tier' : 'New Tier'}</ModalHeader>
+          <ModalHeader>{form.id ? t('member_premium_admin.modal.edit_title') : t('member_premium_admin.modal.new_title')}</ModalHeader>
           <ModalBody>
             <div className="grid gap-4 sm:grid-cols-2">
               <Input
-                label="Name"
+                label={t('member_premium_admin.form.name')}
                 value={form.name}
                 onValueChange={(v) => setForm({ ...form, name: v })}
                 isRequired
               />
               <Input
-                label="Slug"
+                label={t('member_premium_admin.form.slug')}
                 value={form.slug}
                 onValueChange={(v) => setForm({ ...form, slug: v })}
-                description="Lowercase letters, numbers, dashes/underscores"
+                description={t('member_premium_admin.form.slug_description')}
                 isRequired
               />
             </div>
             <Textarea
-              label="Description"
+              label={t('member_premium_admin.form.description')}
               value={form.description}
               onValueChange={(v) => setForm({ ...form, description: v })}
             />
@@ -342,7 +343,7 @@ export function MemberPremiumAdminPage() {
                 type="number"
                 step="0.01"
                 min="0"
-                label="Price / month"
+                label={t('member_premium_admin.form.price_month')}
                 value={form.monthly_price}
                 onValueChange={(v) => setForm({ ...form, monthly_price: v })}
               />
@@ -350,21 +351,21 @@ export function MemberPremiumAdminPage() {
                 type="number"
                 step="0.01"
                 min="0"
-                label="Price / year"
+                label={t('member_premium_admin.form.price_year')}
                 value={form.yearly_price}
                 onValueChange={(v) => setForm({ ...form, yearly_price: v })}
               />
             </div>
             <Textarea
-              label="Feature keys (comma-separated)"
+              label={t('member_premium_admin.form.features')}
               value={form.features}
               onValueChange={(v) => setForm({ ...form, features: v })}
-              description="e.g. verified_badge, priority_matching, advanced_search, ad_free"
+              description={t('member_premium_admin.form.features_description')}
             />
             <div className="grid gap-4 sm:grid-cols-2 items-center">
               <Input
                 type="number"
-                label="Sort order"
+                label={t('member_premium_admin.form.sort_order')}
                 value={String(form.sort_order)}
                 onValueChange={(v) => setForm({ ...form, sort_order: Number(v) || 0 })}
               />
@@ -372,19 +373,19 @@ export function MemberPremiumAdminPage() {
                 isSelected={form.is_active}
                 onValueChange={(v) => setForm({ ...form, is_active: v })}
               >
-                Active
+                {t('member_premium_admin.status.active')}
               </Switch>
             </div>
             {form.id && (
               <p className="text-xs text-warning-600 mt-2">
-                Note: changing prices clears the Stripe Price IDs. Run "Sync to Stripe" after saving so checkout works again.
+                {t('member_premium_admin.modal.stripe_price_note')}
               </p>
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} isDisabled={saving}>Cancel</Button>
+            <Button variant="flat" onPress={onClose} isDisabled={saving}>{t('member_premium_admin.actions.cancel')}</Button>
             <Button color="primary" onPress={save} isLoading={saving}>
-              {form.id ? 'Save changes' : 'Create tier'}
+              {form.id ? t('member_premium_admin.actions.save_changes') : t('member_premium_admin.actions.create_tier')}
             </Button>
           </ModalFooter>
         </ModalContent>

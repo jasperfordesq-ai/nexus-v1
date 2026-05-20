@@ -3042,6 +3042,77 @@
       "delete_failed": "Delete failed"
     }
   },
+  "member_premium_admin": {
+    "meta": {
+      "title": "Member Premium Tiers",
+      "description": "Define paid premium tiers that members can subscribe to. Each tier unlocks specific feature keys."
+    },
+    "actions": {
+      "subscribers": "Subscribers",
+      "new_tier": "New Tier",
+      "edit": "Edit",
+      "sync_stripe": "Sync to Stripe",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save_changes": "Save changes",
+      "create_tier": "Create tier"
+    },
+    "empty": {
+      "tiers": "No tiers yet. Create your first premium tier above.",
+      "value": "-"
+    },
+    "table": {
+      "aria": "Premium tiers",
+      "name": "NAME",
+      "slug": "SLUG",
+      "price_month": "PRICE / MONTH",
+      "price_year": "PRICE / YEAR",
+      "features": "FEATURES",
+      "status": "STATUS",
+      "subscribers": "SUBSCRIBERS",
+      "stripe": "STRIPE",
+      "actions": "ACTIONS"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "stripe": {
+      "synced": "Synced",
+      "needs_sync": "Needs sync"
+    },
+    "modal": {
+      "edit_title": "Edit Tier",
+      "new_title": "New Tier",
+      "stripe_price_note": "Note: changing prices clears the Stripe Price IDs. Run \"Sync to Stripe\" after saving so checkout works again."
+    },
+    "form": {
+      "name": "Name",
+      "slug": "Slug",
+      "slug_description": "Lowercase letters, numbers, dashes/underscores",
+      "description": "Description",
+      "price_month": "Price / month",
+      "price_year": "Price / year",
+      "features": "Feature keys (comma-separated)",
+      "features_description": "e.g. verified_badge, priority_matching, advanced_search, ad_free",
+      "sort_order": "Sort order"
+    },
+    "validation": {
+      "slug_name_required": "Slug and Name are required",
+      "slug_format": "Slug must be lowercase a-z, 0-9, dashes/underscores"
+    },
+    "confirm_delete": "Delete tier \"{{name}}\"? This cannot be undone.",
+    "toasts": {
+      "load_failed": "Failed to load tiers",
+      "updated": "Tier updated",
+      "created": "Tier created",
+      "save_failed": "Save failed",
+      "synced": "Synced \"{{name}}\" to Stripe",
+      "stripe_sync_failed": "Stripe sync failed",
+      "deleted": "Tier deleted",
+      "delete_failed": "Delete failed"
+    }
+  },
   "billing": {
     "actions": "Actions",
     "billing_interval": "Billing Interval",
