@@ -56,7 +56,7 @@ export function JobDescriptionCard({
           >
             <span className="font-semibold flex items-center gap-2">
               <Sparkles size={16} className={qualificationData.percentage >= 70 ? 'text-success' : 'text-warning'} aria-hidden="true" />
-              {t('match.why_you_match', 'Why you match')} — {qualificationData.percentage}%
+              {t('match.why_you_match')} — {qualificationData.percentage}%
             </span>
             {qualOpen ? <ChevronUp size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}
           </Button>
@@ -75,7 +75,7 @@ export function JobDescriptionCard({
               )}
               {qualificationData.matched_skills.length > 0 && (
                 <div>
-                  <p className="text-xs font-medium text-success mb-1">{t('match.you_have', 'You have:')}</p>
+                  <p className="text-xs font-medium text-success mb-1">{t('match.you_have')}</p>
                   <div className="flex flex-wrap gap-1">
                     {qualificationData.matched_skills.map((s, i) => (
                       <Chip key={i} size="sm" color="success" variant="flat">{s}</Chip>
@@ -85,7 +85,7 @@ export function JobDescriptionCard({
               )}
               {qualificationData.missing_skills.length > 0 && (
                 <div>
-                  <p className="text-xs font-medium text-warning mb-1">{t('match.to_develop', 'Skills to develop:')}</p>
+                  <p className="text-xs font-medium text-warning mb-1">{t('match.to_develop')}</p>
                   <div className="flex flex-wrap gap-1">
                     {qualificationData.missing_skills.map((s, i) => (
                       <Chip key={i} size="sm" color="warning" variant="flat">{s}</Chip>
@@ -103,7 +103,7 @@ export function JobDescriptionCard({
         <GlassCard className="p-5 mt-4">
           <h2 className="text-base font-semibold mb-3 flex items-center gap-2">
             <Building2 size={16} aria-hidden="true" />
-            {t('branding.about_company', 'About the Company')}
+            {t('branding.about_company')}
           </h2>
           {vacancy.tagline && (
             <p className="text-sm text-theme-secondary italic mb-3">&ldquo;{vacancy.tagline}&rdquo;</p>

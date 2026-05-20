@@ -67,7 +67,10 @@
     "report_modal_title": "Report Listing",
     "report_reason_label": "Reason",
     "report_reason_placeholder": "Please describe why you are reporting this listing...",
-    "report_submit": "Submit Report"
+    "report_submit": "Submit Report",
+    "location_title": "Location",
+    "approximate_location": "Approximate location",
+    "get_directions": "Directions"
   },
   "offer": {
     "modal_title": "Hacer una oferta",

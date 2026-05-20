@@ -85,9 +85,9 @@ export function ListingLocationMap({
     <GlassCard className={`p-0 overflow-hidden ${className}`}>
       {/* Header */}
       <div className="flex items-center gap-2 px-4 pt-4 pb-2">
-        <MapPin className="w-4 h-4 text-primary" />
+        <MapPin className="w-4 h-4 text-primary" aria-hidden="true" />
         <h3 className="text-sm font-semibold text-foreground">
-          {t('listing.location_title', 'Location')}
+          {t('listing.location_title')}
         </h3>
       </div>
 
@@ -105,9 +105,9 @@ export function ListingLocationMap({
         </div>
       ) : (
         <div className="px-4 py-6 flex flex-col items-center gap-2">
-          <MapPinOff className="w-10 h-10 text-default-300" />
+          <MapPinOff className="w-10 h-10 text-default-300" aria-hidden="true" />
           <p className="text-xs text-default-400">
-            {t('map.not_available_short', 'Map not available')}
+            {t('map.not_available_short')}
           </p>
         </div>
       )}
@@ -117,7 +117,7 @@ export function ListingLocationMap({
         <div className="min-w-0">
           <p className="text-sm text-foreground truncate">{location}</p>
           <p className="text-xs text-default-400">
-            {t('listing.approximate_location', 'Approximate location')}
+            {t('listing.approximate_location')}
           </p>
         </div>
         <Button
@@ -128,9 +128,9 @@ export function ListingLocationMap({
           variant="flat"
           size="sm"
           color="primary"
-          startContent={<Navigation className="w-3.5 h-3.5" />}
+          startContent={<Navigation className="w-3.5 h-3.5" aria-hidden="true" />}
         >
-          {t('listing.get_directions', 'Directions')}
+          {t('listing.get_directions')}
         </Button>
       </div>
     </GlassCard>

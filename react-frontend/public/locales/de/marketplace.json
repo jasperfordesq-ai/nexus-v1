@@ -68,7 +68,10 @@
     "report_modal_title": "Inserat melden",
     "report_reason_label": "Grund",
     "report_reason_placeholder": "Bitte beschreiben Sie, warum Sie dieses Inserat melden...",
-    "report_submit": "Meldung senden"
+    "report_submit": "Meldung senden",
+    "location_title": "Location",
+    "approximate_location": "Approximate location",
+    "get_directions": "Directions"
   },
   "offer": {
     "modal_title": "Angebot machen",
