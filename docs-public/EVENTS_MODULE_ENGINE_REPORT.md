@@ -1,7 +1,7 @@
 # Project NEXUS — Events Module Engine: Complete Technical Report
 
 **Generated:** 2026-03-29
-**Version:** 1.5.0
+**Version:** 1.5.1
 **License:** AGPL-3.0-or-later
 
 ---
@@ -973,4 +973,4 @@ Full-featured event creation form:
 
 ---
 
-*This report documents the complete events module engine as implemented in Project NEXUS v1.5.0. For the most current implementation, refer to the source files listed in Section 2.*
+*This report documents the complete events module engine as implemented in Project NEXUS v1.5.1. For the most current implementation, refer to the source files listed in Section 2.*

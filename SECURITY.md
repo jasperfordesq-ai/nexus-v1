@@ -6,8 +6,8 @@ Project NEXUS is an AGPL-3.0-or-later, multi-tenant community platform. Security
 
 | Version | Supported |
 | ------- | --------- |
-| `main` / current V1.5 release-candidate line | Yes |
-| Older untagged snapshots | No |
+| `main` / v1.5.1 (Generally Available) | Yes |
+| Older releases | No |
 
 Security fixes are developed against `main` unless a published release explicitly says otherwise.
 
