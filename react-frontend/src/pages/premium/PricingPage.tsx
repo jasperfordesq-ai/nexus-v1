@@ -21,6 +21,7 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
+import { logError } from '@/lib/logger';
 
 interface PremiumTier {
   id: number;
@@ -43,12 +44,12 @@ function formatPrice(cents: number, currency = 'EUR'): string {
 }
 
 export function PricingPage() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const { isAuthenticated } = useAuth();
   const { tenantPath, hasFeature } = useTenant();
   const navigate = useNavigate();
   const { showToast } = useToast();
-  usePageTitle(t('premium.pricing_title', 'Premium'));
+  usePageTitle(t('premium.pricing_title'));
 
   const [tiers, setTiers] = useState<PremiumTier[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,9 +80,9 @@ export function PricingPage() {
   if (!hasFeature('member_premium')) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12 text-center">
-        <PageMeta title={t('premium.pricing_title', 'Premium')} noIndex />
+        <PageMeta title={t('premium.pricing_title')} noIndex />
         <h1 className="text-2xl font-semibold mb-2">
-          {t('premium.unavailable_title', 'Premium tiers are not available in this community yet')}
+          {t('premium.unavailable_title')}
         </h1>
       </div>
     );
@@ -106,42 +107,39 @@ export function PricingPage() {
       if (res.data?.checkout_url) {
         window.location.href = res.data.checkout_url;
       } else {
-        showToast(t('premium.checkout_no_url', 'Checkout could not be started'), 'error');
+        showToast(t('premium.checkout_no_url'), 'error');
         setSubmittingTierId(null);
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t('premium.checkout_failed', 'Checkout failed');
-      showToast(msg, 'error');
+      logError('Premium checkout failed', err);
+      showToast(t('premium.checkout_failed'), 'error');
       setSubmittingTierId(null);
     }
   };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
-      <PageMeta title={t('premium.pricing_title', 'Premium')} noIndex />
+      <PageMeta title={t('premium.pricing_title')} noIndex />
       <div className="text-center mb-10">
         <Crown className="mx-auto mb-3 text-yellow-500" size={48} />
         <h1 className="text-3xl font-bold mb-2">
-          {t('premium.pricing_title', 'Premium')}
+          {t('premium.pricing_title')}
         </h1>
         <p className="text-[var(--color-text-secondary)] max-w-2xl mx-auto">
-          {t(
-            'premium.pricing_subtitle',
-            'Unlock premium features to get more out of your community.'
-          )}
+          {t('premium.pricing_subtitle')}
         </p>
 
         <div className="flex items-center justify-center gap-3 mt-6">
           <span className={interval === 'monthly' ? 'font-semibold' : 'text-[var(--color-text-secondary)]'}>
-            {t('premium.monthly', 'Monthly')}
+            {t('premium.monthly')}
           </span>
           <Switch
             isSelected={interval === 'yearly'}
             onValueChange={(v) => setInterval(v ? 'yearly' : 'monthly')}
-            aria-label={t('premium.toggle_billing', 'Toggle billing interval')}
+            aria-label={t('premium.toggle_billing')}
           />
           <span className={interval === 'yearly' ? 'font-semibold' : 'text-[var(--color-text-secondary)]'}>
-            {t('premium.yearly', 'Yearly')}
+            {t('premium.yearly')}
           </span>
         </div>
       </div>
@@ -153,7 +151,7 @@ export function PricingPage() {
       ) : tiers.length === 0 ? (
         <Card>
           <CardBody className="text-center py-10 text-[var(--color-text-secondary)]">
-            {t('premium.no_tiers', 'No premium tiers are available yet.')}
+            {t('premium.no_tiers')}
           </CardBody>
         </Card>
       ) : (
@@ -162,7 +160,7 @@ export function PricingPage() {
             const cents = interval === 'yearly' ? tier.yearly_price_cents : tier.monthly_price_cents;
             const isFree = cents === 0;
             return (
-              <Card key={tier.id} className="flex flex-col" shadow="sm">
+              <Card key={tier.id} className="flex flex-col border border-theme-default bg-content1" shadow="sm">
                 <CardHeader className="flex flex-col items-start gap-2">
                   <div className="flex items-center gap-2">
                     <Crown size={20} className="text-yellow-500" />
@@ -177,13 +175,13 @@ export function PricingPage() {
                 <CardBody className="flex flex-col gap-4">
                   <div>
                     <div className="text-3xl font-bold">
-                      {isFree ? t('premium.free', 'Free') : formatPrice(cents)}
+                      {isFree ? t('premium.free') : formatPrice(cents)}
                     </div>
                     {!isFree && (
                       <div className="text-sm text-[var(--color-text-secondary)]">
                         {interval === 'yearly'
-                          ? t('premium.per_year', 'per year')
-                          : t('premium.per_month', 'per month')}
+                          ? t('premium.per_year')
+                          : t('premium.per_month')}
                       </div>
                     )}
                   </div>
@@ -191,13 +189,13 @@ export function PricingPage() {
                   <ul className="space-y-2 flex-1">
                     {tier.features.length === 0 ? (
                       <li className="text-sm text-[var(--color-text-secondary)]">
-                        {t('premium.no_features_listed', 'No features listed yet')}
+                        {t('premium.no_features_listed')}
                       </li>
                     ) : (
                       tier.features.map((f) => (
                         <li key={f} className="flex items-start gap-2 text-sm">
                           <CheckCircle2 size={16} className="text-green-500 mt-0.5 shrink-0" />
-                          <span>{t(`premium.feature.${f}`, f)}</span>
+                          <span>{i18n.exists(`premium.feature.${f}`, { ns: 'common' }) ? t(`premium.feature.${f}`) : f}</span>
                         </li>
                       ))
                     )}
@@ -209,7 +207,7 @@ export function PricingPage() {
                     isDisabled={submittingTierId !== null}
                     isLoading={submittingTierId === tier.id}
                   >
-                    {t('premium.subscribe_cta', 'Subscribe')}
+                    {t('premium.subscribe_cta')}
                   </Button>
                 </CardBody>
               </Card>
@@ -220,7 +218,7 @@ export function PricingPage() {
 
       <div className="mt-10 text-center text-sm text-[var(--color-text-secondary)]">
         <Chip size="sm" variant="flat">
-          {t('premium.cancel_anytime', 'Cancel anytime')}
+          {t('premium.cancel_anytime')}
         </Chip>
       </div>
     </div>
