@@ -683,26 +683,19 @@ interface StatCardProps {
   color: 'indigo' | 'emerald' | 'amber' | 'rose'; href: string; isLoading?: boolean;
 }
 
-const statGlowColors = {
-  indigo: 'hover:shadow-[0_0_25px_rgba(99,102,241,0.25)]',
-  emerald: 'hover:shadow-[0_0_25px_rgba(16,185,129,0.25)]',
-  amber: 'hover:shadow-[0_0_25px_rgba(245,158,11,0.25)]',
-  rose: 'hover:shadow-[0_0_25px_rgba(244,63,94,0.25)]',
-} as const;
-
 function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps) {
   const { tenantPath } = useTenant();
   const { t } = useTranslation('dashboard');
   const colorClasses = {
-    indigo: 'from-indigo-500/20 to-purple-500/20 text-indigo-600 dark:text-indigo-400',
-    emerald: 'from-emerald-500/20 to-teal-500/20 text-emerald-600 dark:text-emerald-400',
-    amber: 'from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400',
-    rose: 'from-rose-500/20 to-pink-500/20 text-rose-600 dark:text-rose-400',
+    indigo: 'bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300',
+    emerald: 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300',
+    amber: 'bg-amber-500/10 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300',
+    rose: 'bg-rose-500/10 text-rose-600 dark:bg-rose-500/15 dark:text-rose-300',
   };
   return (
-    <Link to={tenantPath(href)} aria-label={`${label}: ${isLoading ? t('common.loading') : value}`}>
-      <GlassCard className={`min-h-[124px] p-4 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${statGlowColors[color]}`}>
-        <div className={`mb-3 inline-flex rounded-xl bg-gradient-to-br p-2.5 ${colorClasses[color]}`}>{icon}</div>
+    <Link to={tenantPath(href)} aria-label={`${label}: ${isLoading ? t('common.loading') : value}`} className="block focus-visible:outline-none">
+      <GlassCard hoverable className="min-h-[124px] p-4 focus-within:ring-2 focus-within:ring-primary/40">
+        <div className={`mb-3 inline-flex rounded-xl p-2.5 ${colorClasses[color]}`}>{icon}</div>
         <div className="text-xs font-medium uppercase tracking-wide text-theme-muted sm:text-sm sm:normal-case sm:tracking-normal">{label}</div>
         {isLoading ? (<Skeleton className="mt-2 rounded-lg"><div className="h-8 w-16 rounded-lg bg-default-300" /></Skeleton>) : (<div className="mt-1 truncate text-2xl font-bold text-theme-primary">{value}</div>)}
       </GlassCard>
@@ -714,10 +707,15 @@ interface QuickActionLinkProps { to: string; icon: React.ReactNode; label: strin
 
 function QuickActionLink({ to, icon, label }: QuickActionLinkProps) {
   return (
-    <Link to={to} className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-xl border border-transparent bg-theme-elevated p-3 text-center text-theme-secondary transition-all duration-200 hover:border-[var(--glass-border-hover)] hover:bg-theme-hover hover:text-theme-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]">
+    <Button
+      as={Link}
+      to={to}
+      variant="flat"
+      className="h-auto min-h-24 flex-col gap-2 rounded-lg border border-theme-default bg-theme-elevated px-3 py-3 text-center text-theme-secondary data-[hover=true]:border-theme-default data-[hover=true]:bg-theme-hover data-[hover=true]:text-theme-primary"
+    >
       <span className="text-[var(--color-primary)] [&>svg]:h-5 [&>svg]:w-5">{icon}</span>
       <span className="max-w-full text-xs font-medium leading-tight">{label}</span>
-    </Link>
+    </Button>
   );
 }
 
