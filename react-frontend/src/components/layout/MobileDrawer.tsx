@@ -132,7 +132,7 @@ function IdentityVerificationCTA({ userId, tenantPath, onClose }: { userId: numb
       className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-3.5 min-h-[48px] rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-base font-semibold hover:bg-emerald-500/20 h-auto min-w-0"
     >
       <Fingerprint className="w-5 h-5 shrink-0" />
-      <span className="min-w-0 truncate">{t('nav.verify_identity', 'Verify Your Identity')}</span>
+      <span className="min-w-0 truncate">{t('nav.verify_identity')}</span>
     </Button>
   );
 }
@@ -176,10 +176,10 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.home'), href: '/', icon: Home },
     { label: t('nav.feed'), href: '/feed', icon: Newspaper, auth: true, module: 'feed' as keyof TenantModules },
     { label: t('nav.dashboard'), href: '/dashboard', icon: LayoutDashboard, auth: true, module: 'dashboard' as keyof TenantModules },
-    { label: t('nav.explore', 'Explore'), href: '/explore', icon: Compass },
+    { label: t('nav.explore'), href: '/explore', icon: Compass },
     { label: t('nav.messages'), href: '/messages', icon: MessageSquare, auth: true, module: 'messages' as keyof TenantModules },
-    { label: t('nav.saved', 'Saved'), href: '/saved', icon: Bookmark, auth: true },
-    { label: t('nav.activity', 'My Activity'), href: '/activity', icon: Activity, auth: true },
+    { label: t('nav.saved'), href: '/saved', icon: Bookmark, auth: true },
+    { label: t('nav.activity'), href: '/activity', icon: Activity, auth: true },
   ];
 
   const timebankingNavItems = [
@@ -197,7 +197,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.volunteering'), href: '/volunteering', icon: Heart, feature: 'volunteering' as const },
     { label: t('nav.resources'), href: '/resources', icon: FolderOpen, feature: 'resources' as const },
     { label: t('nav.jobs'), href: '/jobs', icon: Briefcase, feature: 'job_vacancies' as const },
-    { label: t('nav.marketplace', 'Marketplace'), href: '/marketplace', icon: ShoppingBag, feature: 'marketplace' as const },
+    { label: t('nav.marketplace'), href: '/marketplace', icon: ShoppingBag, feature: 'marketplace' as const },
   ];
 
   const engageNavItems = [
@@ -207,24 +207,24 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   ];
 
   const exploreNavItems = [
-    { label: t('nav.matches', 'Matches'), href: '/matches', icon: Handshake },
+    { label: t('nav.matches'), href: '/matches', icon: Handshake },
     { label: t('nav.achievements'), href: '/achievements', icon: Trophy, feature: 'gamification' as const },
     { label: t('nav.leaderboard'), href: '/leaderboard', icon: Medal, feature: 'gamification' as const },
-    { label: t('nav.nexus_score', 'NexusScore'), href: '/nexus-score', icon: BarChart3, feature: 'gamification' as const },
-    { label: t('nav.skills', 'Skills'), href: '/skills', icon: GraduationCap },
-    { label: t('nav.ai_chat', 'AI Assistant'), href: '/chat', icon: Bot, feature: 'ai_chat' as keyof TenantFeatures },
+    { label: t('nav.nexus_score'), href: '/nexus-score', icon: BarChart3, feature: 'gamification' as const },
+    { label: t('nav.skills'), href: '/skills', icon: GraduationCap },
+    { label: t('nav.ai_chat'), href: '/chat', icon: Bot, feature: 'ai_chat' as keyof TenantFeatures },
   ];
 
   // Section header is "Partner Communities" — drop the redundant "Federated" / "Federation" prefix on each item.
   // Fallback strings on t() let i18next show the short label until translators add proper keys.
   const federationNavItems = [
-    { label: t('nav.federation_hub_short', 'Hub'), href: '/federation', icon: Globe, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federation_partners_short', 'Communities'), href: '/federation/partners', icon: Building2, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federation_members_short', 'Members'), href: '/federation/members', icon: Users, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federation_messages_short', 'Messages'), href: '/federation/messages', icon: MessageSquare, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federation_listings_short', 'Listings'), href: '/federation/listings', icon: ListTodo, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federation_events_short', 'Events'), href: '/federation/events', icon: Calendar, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federation_settings_short', 'Settings'), href: '/federation/settings', icon: Settings, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_hub_short'), href: '/federation', icon: Globe, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_partners_short'), href: '/federation/partners', icon: Building2, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_members_short'), href: '/federation/members', icon: Users, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_messages_short'), href: '/federation/messages', icon: MessageSquare, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_listings_short'), href: '/federation/listings', icon: ListTodo, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_events_short'), href: '/federation/events', icon: Calendar, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_settings_short'), href: '/federation/settings', icon: Settings, feature: 'federation' as keyof TenantFeatures },
   ];
 
   const aboutNavItems = [
@@ -247,7 +247,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('legal.legal_hub'), href: '/legal', icon: FileText },
     { label: t('legal.terms_of_service'), href: '/terms', icon: FileText },
     { label: t('legal.privacy_policy'), href: '/privacy', icon: FileText },
-    { label: t('legal.cookie_policy', 'Cookie Policy'), href: '/cookies', icon: Cookie },
+    { label: t('legal.cookie_policy'), href: '/cookies', icon: Cookie },
     { label: t('legal.accessibility'), href: '/accessibility', icon: FileText },
   ];
 
@@ -351,7 +351,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 <Button
                   variant="flat"
                   fullWidth
-                  className="flex items-center justify-start gap-3 px-4 py-3.5 min-h-[48px] rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-700 dark:text-indigo-300 h-auto min-w-0"
+                  className="flex h-auto min-h-[48px] min-w-0 items-center justify-start gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3.5 text-primary hover:bg-primary/20"
                   onPress={() => { onClose(); setTimeout(onClick, DRAWER_CLOSE_MS); }}
                 >
                   <Download className="w-5 h-5 shrink-0" aria-hidden="true" />
@@ -470,7 +470,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               }}
             >
               {/* Main Navigation */}
-              <AccordionItem key="main" title={t('sections.main', 'Main')} aria-label={t('aria.main_navigation')}>
+              <AccordionItem key="main" title={t('sections.main')} aria-label={t('aria.main_navigation')}>
                 <div className="space-y-1">
                   {mainNavItems.map(renderNavLink)}
                 </div>
@@ -478,7 +478,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Timebanking */}
               {visibleTimebanking.length > 0 ? (
-                <AccordionItem key="timebanking" title={t('nav.timebanking', 'Timebanking')} aria-label={t('aria.timebanking_navigation')}>
+                <AccordionItem key="timebanking" title={t('nav.timebanking')} aria-label={t('aria.timebanking_navigation')}>
                   <div className="space-y-1">
                     {timebankingNavItems.map(renderNavLink)}
                   </div>
@@ -496,7 +496,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Engage */}
               {visibleEngage.length > 0 ? (
-                <AccordionItem key="engage" title={t('sections.engage', 'Engage')} aria-label={t('aria.engage_navigation')}>
+                <AccordionItem key="engage" title={t('sections.engage')} aria-label={t('aria.engage_navigation')}>
                   <div className="space-y-1">
                     {engageNavItems.map(renderNavLink)}
                   </div>
@@ -517,7 +517,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 <AccordionItem
                   key="federation"
                   title={t('sections.partner_communities')}
-                  aria-label={t('aria.partner_communities_navigation', 'Partner communities navigation')}
+                  aria-label={t('aria.partner_communities_navigation')}
                 >
                   <div className="space-y-1">
                     {federationNavItems.map(renderNavLink)}
@@ -548,7 +548,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                     className="flex items-center gap-3 px-4 py-3.5 min-h-[48px] rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all w-full justify-start h-auto"
                   >
                     <Settings className="w-5 h-5" aria-hidden="true" />
-                    <span>{t('cookie_consent.manage', 'Cookie Settings')}</span>
+                    <span>{t('cookie_consent.manage')}</span>
                   </Button>
                 </div>
               </AccordionItem>
@@ -620,7 +620,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                     size="sm"
                     className="text-theme-muted hover:text-theme-primary min-w-[44px] min-h-[44px]"
                     onPress={toggleTheme}
-                    aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                    aria-label={t(resolvedTheme === 'dark' ? 'accessibility.switch_to_light' : 'accessibility.switch_to_dark')}
                   >
                     {resolvedTheme === 'dark' ? (
                       <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
@@ -667,7 +667,8 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   {t('auth.log_in')}
                 </Button>
                 <Button
-                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium min-h-[48px] text-base"
+                  color="primary"
+                  className="w-full min-h-[48px] text-base font-medium"
                   onPress={() => { onClose(); navigate(tenantPath('/register')); }}
                 >
                   {t('auth.sign_up')}
