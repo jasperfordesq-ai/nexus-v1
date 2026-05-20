@@ -45,12 +45,12 @@ import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ATTRIBUTE_TYPES = [
-  { key: 'checkbox', label: 'Checkbox' },
-  { key: 'text', label: 'Text' },
-  { key: 'number', label: 'Number' },
-  { key: 'select', label: 'Select' },
-  { key: 'radio', label: 'Radio' },
-  { key: 'date', label: 'Date' },
+  { key: 'checkbox' },
+  { key: 'text' },
+  { key: 'number' },
+  { key: 'select' },
+  { key: 'radio' },
+  { key: 'date' },
 ] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -59,7 +59,7 @@ const ATTRIBUTE_TYPES = [
 
 export function AttributesAdmin() {
   const { t } = useTranslation('admin');
-  usePageTitle("Content");
+  usePageTitle(t('content.page_title'));
   const toast = useToast();
 
   // Data state
@@ -142,7 +142,7 @@ export function AttributesAdmin() {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast.error("Attribute name is required");
+      toast.error(t('content.attribute_name_is_required'));
       return;
     }
 
@@ -157,13 +157,13 @@ export function AttributesAdmin() {
       });
 
       if (res.success) {
-        toast.success("Item Updated");
+        toast.success(t('content.item_updated'));
         closeModal();
         loadData();
       } else {
         const errorMsg = (res as { error?: string }).error
           || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || "An unexpected error occurred";
+          || t('content.an_unexpected_error_occurred');
         toast.error(errorMsg);
       }
     } else {
@@ -174,13 +174,13 @@ export function AttributesAdmin() {
       });
 
       if (res.success) {
-        toast.success("Item Added");
+        toast.success(t('content.item_added'));
         closeModal();
         loadData();
       } else {
         const errorMsg = (res as { error?: string }).error
           || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || "An unexpected error occurred";
+          || t('content.an_unexpected_error_occurred');
         toast.error(errorMsg);
       }
     }
@@ -196,11 +196,11 @@ export function AttributesAdmin() {
 
     const res = await adminAttributes.delete(deleteTarget.id);
     if (res.success) {
-      toast.success("Item Deleted");
+      toast.success(t('content.item_deleted'));
       setDeleteTarget(null);
       loadData();
     } else {
-      toast.error("Failed to delete attribute");
+      toast.error(t('content.failed_to_delete_attribute'));
     }
 
     setDeleting(false);
@@ -223,16 +223,16 @@ export function AttributesAdmin() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={"Attribute Actions"}>
+          <Button isIconOnly size="sm" variant="light" aria-label={t('content.label_attribute_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
-        <DropdownMenu aria-label={"Attribute Actions"} onAction={handleMenuAction}>
+        <DropdownMenu aria-label={t('content.label_attribute_actions')} onAction={handleMenuAction}>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
-            {"Edit"}
+            {t('content.label_edit_item')}
           </DropdownItem>
           <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
-            {"Delete"}
+            {t('content.label_delete_item')}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -244,24 +244,24 @@ export function AttributesAdmin() {
   const columns: Column<AdminAttribute>[] = [
     {
       key: 'name',
-      label: "Name",
+      label: t('content.label_name'),
       sortable: true,
       render: (item) => <span className="font-medium text-foreground">{item.name}</span>,
     },
-    { key: 'slug', label: "Slug", render: (item) => <span className="text-sm text-default-500 font-mono">{item.slug}</span> },
+    { key: 'slug', label: t('content.label_slug'), render: (item) => <span className="text-sm text-default-500 font-mono">{item.slug}</span> },
     {
       key: 'type',
-      label: "Type",
+      label: t('content.label_type'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color="primary">
-          {item.type}
+          {t(`content.attr_type_${item.type}`)}
         </Chip>
       ),
     },
     {
       key: 'category_name',
-      label: "Categories",
+      label: t('content.label_categories'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">{item.category_name || '--'}</span>
@@ -269,16 +269,16 @@ export function AttributesAdmin() {
     },
     {
       key: 'is_active',
-      label: "Status",
+      label: t('content.label_status'),
       render: (item) => (
         <Chip size="sm" variant="flat" color={item.is_active ? 'success' : 'default'}>
-          {item.is_active ? "Active" : t('reports.label_inactive', 'Inactive')}
+          {item.is_active ? t('content.label_active') : t('content.label_inactive')}
         </Chip>
       ),
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('content.label_actions'),
       render: (item) => <AttributeActionsMenu item={item} />,
     },
   ];
@@ -288,12 +288,12 @@ export function AttributesAdmin() {
   return (
     <div>
       <PageHeader
-        title={"Attributes Admin"}
-        description={"Create custom profile attributes to collect extra information from members"}
+        title={t('content.attributes_admin_title')}
+        description={t('content.attributes_admin_desc')}
         actions={
           <div className="flex gap-2">
-            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{"Refresh"}</Button>
-            <Button color="primary" startContent={<Plus size={16} />} onPress={openCreateModal}>{"Create"} {"Attributes"}</Button>
+            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('content.refresh')}</Button>
+            <Button color="primary" startContent={<Plus size={16} />} onPress={openCreateModal}>{t('content.create_attributes')}</Button>
           </div>
         }
       />
@@ -301,9 +301,9 @@ export function AttributesAdmin() {
       {items.length === 0 && !loading ? (
         <EmptyState
           icon={Tags}
-          title={"No data available"}
-          description={"Create custom attributes to add extra fields to your content"}
-          actionLabel={`${"Create"} ${"Attributes"}`}
+          title={t('content.no_data_available')}
+          description={t('content.desc_create_custom_attributes_to_add_extra_fi')}
+          actionLabel={t('content.create_attributes')}
           onAction={openCreateModal}
         />
       ) : (
@@ -311,9 +311,9 @@ export function AttributesAdmin() {
           columns={columns}
           data={items}
           isLoading={loading}
-          searchPlaceholder={t('data_table.search', 'Search attributes...')}
+          searchPlaceholder={t('content.search_attributes')}
           onRefresh={loadData}
-          emptyContent={"No data available"}
+          emptyContent={t('content.no_data_available')}
         />
       )}
 
@@ -322,12 +322,12 @@ export function AttributesAdmin() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Tags size={20} />
-            {editingItem ? `${"Edit"} ${"Attributes"}` : `${"Create"} ${"Attributes"}`}
+            {editingItem ? t('content.edit_attributes') : t('content.create_attributes')}
           </ModalHeader>
           <ModalBody className="gap-4">
             <Input
-              label={"Name"}
-              placeholder={"e.g. Skill Level..."}
+              label={t('content.label_name')}
+              placeholder={t('content.placeholder_eg_skill_level')}
               value={formData.name}
               onValueChange={(v) => setFormData((prev) => ({ ...prev, name: v }))}
               isRequired
@@ -336,7 +336,7 @@ export function AttributesAdmin() {
             />
 
             <Select
-              label={"Input Type"}
+              label={t('content.label_input_type')}
               selectedKeys={new Set([formData.type])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -350,7 +350,7 @@ export function AttributesAdmin() {
             </Select>
 
             <Select
-              label={`${"Categories"} (${"Optional..."})`}
+              label={t('content.label_categories_optional')}
               selectedKeys={formData.category_id ? new Set([formData.category_id]) : new Set()}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string | undefined;
@@ -366,23 +366,23 @@ export function AttributesAdmin() {
             {editingItem && (
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">{"Active"}</p>
-                  <p className="text-sm text-default-500">{t('content.label_active_desc', 'Whether this attribute is available for use')}</p>
+                  <p className="font-medium">{t('content.label_active')}</p>
+                  <p className="text-sm text-default-500">{t('content.attribute_active_desc')}</p>
                 </div>
                 <Switch
                   isSelected={formData.is_active}
                   onValueChange={(v) => setFormData((prev) => ({ ...prev, is_active: v }))}
-                  aria-label={"Active"}
+                  aria-label={t('content.label_active')}
                 />
               </div>
             )}
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={closeModal} isDisabled={saving}>
-              {"Cancel"}
+              {t('common.cancel')}
             </Button>
             <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
-              {editingItem ? "Save Changes" : `${"Create"} ${"Attributes"}`}
+              {editingItem ? t('content.save_changes') : t('content.create_attributes')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -394,9 +394,9 @@ export function AttributesAdmin() {
           isOpen={!!deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
-          title={`${"Delete"} ${"Attributes"}`}
-          message={`Delete Campaign`}
-          confirmLabel={"Delete"}
+          title={t('content.delete_attributes')}
+          message={t('content.delete_attribute_confirm', { name: deleteTarget.name })}
+          confirmLabel={t('content.label_delete_item')}
           confirmColor="danger"
           isLoading={deleting}
         />
