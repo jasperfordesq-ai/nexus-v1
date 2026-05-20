@@ -580,6 +580,12 @@
     "approximate_location": "Lokalizacja przybliżona",
     "get_directions": "Wskazówki dojazdu"
   },
+  "pickup": {
+    "choose_slot": "Choose pickup slot",
+    "no_slot_selected": "No pickup slot",
+    "left": "left",
+    "slot_fallback": "Slot #{{id}}"
+  },
   "orders": {
     "load_error": "Nie udało się załadować zamówień",
     "action_error": "Operacja nie powiodła się",

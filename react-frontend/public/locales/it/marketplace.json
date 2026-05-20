@@ -579,6 +579,12 @@
     "location_title": "Location",
     "get_directions": "Directions"
   },
+  "pickup": {
+    "choose_slot": "Choose pickup slot",
+    "no_slot_selected": "No pickup slot",
+    "left": "left",
+    "slot_fallback": "Slot #{{id}}"
+  },
   "orders": {
     "load_error": "Impossibile caricare gli ordini",
     "action_error": "Azione non riuscita",

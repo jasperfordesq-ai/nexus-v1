@@ -570,6 +570,10 @@
     "status_picked_up": "Picked up",
     "status_cancelled": "Cancelled",
     "status_no_show": "No show",
+    "choose_slot": "Choose pickup slot",
+    "no_slot_selected": "No pickup slot",
+    "left": "left",
+    "slot_fallback": "Slot #{{id}}",
     "status_unknown": "Unknown"
   },
   "inventory": {

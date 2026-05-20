@@ -580,6 +580,12 @@
     "approximate_location": "Suíomh neastachta",
     "get_directions": "Treoracha"
   },
+  "pickup": {
+    "choose_slot": "Choose pickup slot",
+    "no_slot_selected": "No pickup slot",
+    "left": "left",
+    "slot_fallback": "Slot #{{id}}"
+  },
   "orders": {
     "load_error": "Theip ar luchtú na n-orduithe",
     "action_error": "Theip ar an ngníomh",

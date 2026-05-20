@@ -580,6 +580,12 @@
     "approximate_location": "おおよその場所",
     "get_directions": "経路案内"
   },
+  "pickup": {
+    "choose_slot": "Choose pickup slot",
+    "no_slot_selected": "No pickup slot",
+    "left": "left",
+    "slot_fallback": "Slot #{{id}}"
+  },
   "orders": {
     "load_error": "注文の読み込みに失敗しました",
     "action_error": "操作に失敗しました",

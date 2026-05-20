@@ -122,7 +122,7 @@ export function BuyNowButton({
       const orderRes = await api.post<CreateOrderResponse>('/v2/marketplace/orders', orderPayload);
 
       if (!orderRes.success || !orderRes.data?.id) {
-        toast.error(orderRes.error || t('orders.buy.create_order_failed', 'Failed to create order'));
+        toast.error(orderRes.error || t('orders.buy.create_order_failed'));
         return;
       }
 
@@ -146,7 +146,7 @@ export function BuyNowButton({
       });
 
       if (!intentRes.success || !intentRes.data) {
-        toast.error(intentRes.error || t('orders.buy.payment_failed', 'Failed to create payment session'));
+        toast.error(intentRes.error || t('orders.buy.payment_failed'));
         return;
       }
 
@@ -165,12 +165,12 @@ export function BuyNowButton({
 
       // Fallback: No Stripe checkout URL available
       toast.info(
-        t('orders.buy.contact_seller', 'Order created. Please contact the seller to arrange payment.'),
+        t('orders.buy.contact_seller'),
       );
       onSuccess();
     } catch (err) {
       logError('BuyNowButton: payment flow failed', err);
-      toast.error(t('orders.buy.error', 'Something went wrong. Please try again.'));
+      toast.error(t('orders.buy.error'));
     } finally {
       setIsProcessing(false);
     }
@@ -205,9 +205,9 @@ export function BuyNowButton({
 
   const formatSlotLabel = (s: PickupSlotOption) => {
     try {
-      return s.slot_start ? new Date(s.slot_start).toLocaleString() : `Slot #${s.id}`;
+      return s.slot_start ? new Date(s.slot_start).toLocaleString() : t('pickup.slot_fallback', { id: s.id });
     } catch {
-      return `Slot #${s.id}`;
+      return t('pickup.slot_fallback', { id: s.id });
     }
   };
 
@@ -217,8 +217,8 @@ export function BuyNowButton({
         <div className="mb-2">
           <Select
             size="sm"
-            label={t('marketplace.pickup.choose_slot', 'Choose pickup slot')}
-            placeholder={t('marketplace.pickup.no_slot_selected', 'No pickup slot')}
+            label={t('pickup.choose_slot')}
+            placeholder={t('pickup.no_slot_selected')}
             selectedKeys={selectedSlotId ? [selectedSlotId] : []}
             onSelectionChange={(keys) => {
               const v = Array.from(keys)[0];
@@ -227,7 +227,7 @@ export function BuyNowButton({
           >
             {pickupSlots.map((s) => (
               <SelectItem key={String(s.id)} textValue={formatSlotLabel(s)}>
-                {formatSlotLabel(s)} ({s.remaining} {t('marketplace.pickup.left', 'left')})
+                {formatSlotLabel(s)} ({s.remaining} {t('pickup.left')})
               </SelectItem>
             ))}
           </Select>
@@ -264,9 +264,9 @@ export function BuyNowButton({
         isLoading={isProcessing}
         isDisabled={isOwnListing || !user}
         className={className}
-        aria-label={t('orders.buy.buy_now_aria', 'Buy now for {{price}}', { price: priceLabel })}
+        aria-label={t('orders.buy.buy_now_aria', { price: priceLabel })}
       >
-        {t('orders.buy.buy_now', 'Buy Now')} {priceLabel}
+        {t('orders.buy.buy_now')} {priceLabel}
       </Button>
 
       {/* Embedded Stripe Checkout Modal */}
