@@ -692,5 +692,11 @@
     "excellent": "Excellent",
     "good": "Good",
     "below_average": "Below Average"
+  },
+  "branding": {
+    "title": "Group Branding",
+    "primary_color": "Primary Color",
+    "accent_color": "Accent Color",
+    "preview": "Preview"
   }
 }

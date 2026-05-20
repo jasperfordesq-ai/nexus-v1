@@ -416,5 +416,11 @@
   "filters_aria": "Group filters",
   "active_filters": "Showing",
   "members_count_label": "{{count}} members",
-  "posts_count_label": "{{count}} posts"
+  "posts_count_label": "{{count}} posts",
+  "branding": {
+    "title": "Image du groupe",
+    "primary_color": "Couleur principale",
+    "accent_color": "Couleur d accent",
+    "preview": "Apercu"
+  }
 }

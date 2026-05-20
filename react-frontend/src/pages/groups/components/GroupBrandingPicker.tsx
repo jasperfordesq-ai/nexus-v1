@@ -47,9 +47,9 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
   return (
     <GlassCard className="p-5 space-y-5">
       <div className="flex items-center gap-2 mb-1">
-        <Paintbrush size={18} className="text-primary" />
+        <Paintbrush aria-hidden="true" size={18} className="text-primary" />
         <h3 className="text-base font-semibold text-foreground">
-          {t('branding.title', 'Group Branding')}
+          {t('branding.title')}
         </h3>
       </div>
 
@@ -60,7 +60,7 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
             htmlFor="group-primary-color"
             className="block text-sm font-medium text-default-700"
           >
-            {t('branding.primary_color', 'Primary Color')}
+            {t('branding.primary_color')}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -69,7 +69,7 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
               value={primary}
               onChange={(e) => handlePrimaryChange(e.target.value)}
               className="w-10 h-10 rounded-lg border border-default-200 cursor-pointer"
-              aria-label={t('branding.primary_color', 'Primary Color')}
+              aria-label={t('branding.primary_color')}
             />
             <span className="text-sm text-default-500 font-mono uppercase">
               {primary}
@@ -83,7 +83,7 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
             htmlFor="group-accent-color"
             className="block text-sm font-medium text-default-700"
           >
-            {t('branding.accent_color', 'Accent Color')}
+            {t('branding.accent_color')}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -92,7 +92,7 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
               value={accent}
               onChange={(e) => handleAccentChange(e.target.value)}
               className="w-10 h-10 rounded-lg border border-default-200 cursor-pointer"
-              aria-label={t('branding.accent_color', 'Accent Color')}
+              aria-label={t('branding.accent_color')}
             />
             <span className="text-sm text-default-500 font-mono uppercase">
               {accent}
@@ -104,7 +104,7 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
       {/* Preview swatch strip */}
       <div className="space-y-2">
         <p className="text-xs text-default-400">
-          {t('branding.preview', 'Preview')}
+          {t('branding.preview')}
         </p>
         <div className="flex rounded-lg overflow-hidden h-8">
           <div className="flex-1" style={{ backgroundColor: primary }} />
