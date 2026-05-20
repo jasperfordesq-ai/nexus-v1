@@ -80,11 +80,10 @@ export function SafeguardingHelp() {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground">
-              How safeguarding works here
+              {t('safeguarding.help.title')}
             </h2>
             <p className="text-xs text-default-500">
-              A guide to the flows you see on this dashboard — flagging, activations,
-              member autonomy, audit. Expand any section for detail.
+              {t('safeguarding.help.subtitle')}
             </p>
           </div>
         </CardHeader>
@@ -94,28 +93,25 @@ export function SafeguardingHelp() {
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
               key="about"
-              aria-label="About this dashboard"
+              aria-label={t('safeguarding.help.about.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <Shield className="w-4 h-4 text-primary" />
-                  <span className="font-medium">About this dashboard</span>
+                  <span className="font-medium">{t('safeguarding.help.about.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
                 <p>
-                  The safeguarding dashboard is your view of every member the system is actively
-                  protecting. It surfaces:
+                  {t('safeguarding.help.about.intro')}
                 </p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li><strong>Flagged messages</strong> — copies of messages sent or received by monitored members.</li>
-                  <li><strong>Guardian assignments</strong> — relationships where a coordinator mediates contact for a ward.</li>
-                  <li><strong>Member preferences</strong> — which safeguarding options each flagged member has selected.</li>
+                  <li><strong>{t('safeguarding.help.about.flagged_messages_label')}</strong> {t('safeguarding.help.about.flagged_messages_body')}</li>
+                  <li><strong>{t('safeguarding.help.about.guardian_assignments_label')}</strong> {t('safeguarding.help.about.guardian_assignments_body')}</li>
+                  <li><strong>{t('safeguarding.help.about.member_preferences_label')}</strong> {t('safeguarding.help.about.member_preferences_body')}</li>
                 </ul>
                 <p>
-                  The numbers at the top are live — the red Safeguarding item in the sidebar shows
-                  the count of unreviewed critical flags so you can spot when attention is needed
-                  without opening the page.
+                  {t('safeguarding.help.about.live_counts')}
                 </p>
               </div>
             </AccordionItem>
@@ -123,48 +119,42 @@ export function SafeguardingHelp() {
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
               key="flagging"
-              aria-label="How members get flagged"
+              aria-label={t('safeguarding.help.flagging.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <Flag className="w-4 h-4 text-danger" />
-                  <span className="font-medium">How members get flagged</span>
+                  <span className="font-medium">{t('safeguarding.help.flagging.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
                 <p>
-                  Flags are never applied silently behind the member's back. There are two routes:
+                  {t('safeguarding.help.flagging.intro')}
                 </p>
                 <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
                   <p className="font-medium text-foreground mb-1">
                     <Chip size="sm" color="primary" variant="flat" className="mr-2">
-                      Most common
+                      {t('safeguarding.help.flagging.most_common')}
                     </Chip>
-                    Self-identification during onboarding
+                    {t('safeguarding.help.flagging.self_identification_title')}
                   </p>
                   <p>
-                    The member ticked one or more options on the safeguarding step during sign-up
-                    (e.g. <em>"I consider myself a vulnerable adult"</em>, or
-                    <em> "I prefer only to interact with vetted members"</em>). The system reads the
-                    triggers attached to each selected option and OR-merges them into a single
-                    set of protections written to <code>user_messaging_restrictions</code>.
+                    {t('safeguarding.help.flagging.self_identification_prefix')} <em>{t('safeguarding.help.flagging.example_vulnerable')}</em>, {t('safeguarding.help.flagging.or')}{' '}
+                    <em>{t('safeguarding.help.flagging.example_vetted')}</em>. {t('safeguarding.help.flagging.self_identification_suffix')} <code>user_messaging_restrictions</code>.
                   </p>
                   <p className="italic mt-2">
-                    Because these are self-chosen, the member can revoke any of them from
-                    <em> Settings → Safeguarding</em> at any time — without needing to ask you.
+                    {t('safeguarding.help.flagging.self_revoke_prefix')} <em>{t('safeguarding.help.flagging.settings_safeguarding')}</em> {t('safeguarding.help.flagging.self_revoke_suffix')}
                   </p>
                 </div>
                 <div className="p-3 rounded-lg bg-warning/5 border border-warning/20">
                   <p className="font-medium text-foreground mb-1">
                     <Chip size="sm" color="warning" variant="flat" className="mr-2">
-                      Admin-initiated
+                      {t('safeguarding.help.flagging.admin_initiated')}
                     </Chip>
-                    Manual monitoring
+                    {t('safeguarding.help.flagging.manual_monitoring_title')}
                   </p>
                   <p>
-                    You open <em>User Monitoring</em> in Broker Controls and place a member under
-                    oversight with a reason and optional expiry date. Used for compliance reviews,
-                    complaint investigations, or probationary periods after an incident.
+                    {t('safeguarding.help.flagging.manual_monitoring_prefix')} <em>{t('safeguarding.help.flagging.user_monitoring')}</em> {t('safeguarding.help.flagging.manual_monitoring_suffix')}
                   </p>
                 </div>
               </div>
@@ -173,19 +163,17 @@ export function SafeguardingHelp() {
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
               key="triggers"
-              aria-label="What each trigger activates"
+              aria-label={t('safeguarding.help.triggers.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <Zap className="w-4 h-4 text-warning" />
-                  <span className="font-medium">What each trigger activates</span>
+                  <span className="font-medium">{t('safeguarding.help.triggers.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
                 <p>
-                  A safeguarding option (defined per-tenant in <em>Safeguarding Options</em>) carries
-                  a JSON block of triggers. When a member selects the option, the relevant triggers
-                  activate:
+                  {t('safeguarding.help.triggers.intro_prefix')} <em>{t('safeguarding.help.triggers.safeguarding_options')}</em> {t('safeguarding.help.triggers.intro_suffix')}
                 </p>
                 <Table aria-label={t('safeguarding.help.triggers.table_aria')} removeWrapper>
                   <TableHeader>
@@ -204,9 +192,7 @@ export function SafeguardingHelp() {
                   </TableBody>
                 </Table>
                 <p className="italic text-default-500">
-                  When a member selects multiple options, triggers OR-merge: the most protective
-                  combination wins. Revoking one option may release some protections but keep
-                  others active — the system re-evaluates from scratch each time.
+                  {t('safeguarding.help.triggers.merge_note')}
                 </p>
               </div>
             </AccordionItem>
@@ -214,46 +200,35 @@ export function SafeguardingHelp() {
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
               key="vetting-gate"
-              aria-label="Vetting gates"
+              aria-label={t('safeguarding.help.vetting.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <UserCheck className="w-4 h-4 text-success" />
-                  <span className="font-medium">How vetting gates interactions</span>
+                  <span className="font-medium">{t('safeguarding.help.vetting.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
                 <p>
-                  When a flagged member requires a specific vetting type, the system enforces it
-                  at three separate points — not just as a UI warning, but as a hard block with
-                  a specific error code <code>VETTING_REQUIRED</code> returned to the caller.
+                  {t('safeguarding.help.vetting.intro_prefix')} <code>{'VETTING_REQUIRED'}</code> {t('safeguarding.help.vetting.intro_suffix')}
                 </p>
                 <ol className="list-decimal pl-5 space-y-2">
                   <li>
-                    <strong>Discovery filter</strong> — Smart Matching Engine never surfaces
-                    flagged members to someone who doesn't hold the required vetting. They are
-                    invisible, not greyed out.
+                    <strong>{t('safeguarding.help.vetting.discovery_label')}</strong> {t('safeguarding.help.vetting.discovery_body')}
                   </li>
                   <li>
-                    <strong>Messaging</strong> — if a sender lacks vetting the recipient requires,
-                    <code> MessageService::send</code> returns <code>VETTING_REQUIRED</code> with
-                    the specific types listed.
+                    <strong>{t('safeguarding.help.vetting.messaging_label')}</strong> {t('safeguarding.help.vetting.messaging_prefix')}
+                    <code>{' MessageService::send'}</code> {t('safeguarding.help.vetting.messaging_middle')} <code>{'VETTING_REQUIRED'}</code> {t('safeguarding.help.vetting.messaging_suffix')}
                   </li>
                   <li>
-                    <strong>Match approval</strong> — even if a match is manually submitted for
-                    approval, it's blocked bidirectionally if either party is flagged and the
-                    other lacks the required vetting.
+                    <strong>{t('safeguarding.help.vetting.match_label')}</strong> {t('safeguarding.help.vetting.match_body')}
                   </li>
                   <li>
-                    <strong>Group exchanges</strong> — adding a participant fails if the organiser
-                    or the participant requires vetting the other doesn't hold.
+                    <strong>{t('safeguarding.help.vetting.group_label')}</strong> {t('safeguarding.help.vetting.group_body')}
                   </li>
                 </ol>
                 <p>
-                  <strong>Staff bypass:</strong> admins, tenant admins, brokers, and super admins
-                  see the full pool in discovery (for assignment purposes). Messaging, match
-                  submission, and group exchange gates still apply to everyone — there is no
-                  admin-level bypass for those.
+                  <strong>{t('safeguarding.help.vetting.staff_bypass_label')}</strong> {t('safeguarding.help.vetting.staff_bypass_body')}
                 </p>
               </div>
             </AccordionItem>
@@ -261,40 +236,34 @@ export function SafeguardingHelp() {
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
               key="assignments"
-              aria-label="Guardian assignments"
+              aria-label={t('safeguarding.help.assignments.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <Users className="w-4 h-4 text-secondary" />
-                  <span className="font-medium">Guardian / ward assignments</span>
+                  <span className="font-medium">{t('safeguarding.help.assignments.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
                 <p>
-                  A guardian assignment pairs a ward (the protected member) with a guardian (a
-                  trusted coordinator or family member). Use this when a member needs a specific
-                  person mediating their interactions, rather than the general broker pool.
+                  {t('safeguarding.help.assignments.intro')}
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
                   <li>
-                    <strong>Create</strong> from the Assignments tab or by navigating to
-                    <em> broker/monitoring → Assign Guardian</em>. Both parties receive an
-                    email and an in-app bell notification.
+                    <strong>{t('safeguarding.help.assignments.create_label')}</strong> {t('safeguarding.help.assignments.create_prefix')}
+                    <em>{t('safeguarding.help.assignments.assign_guardian_path')}</em>. {t('safeguarding.help.assignments.create_suffix')}
                   </li>
                   <li>
-                    <strong>Consent</strong> — the ward must accept; their acceptance is recorded
-                    in <code>consent_given_at</code>. The assignment only becomes <em>active</em>
-                    once accepted.
+                    <strong>{t('safeguarding.help.assignments.consent_label')}</strong> {t('safeguarding.help.assignments.consent_prefix')}
+                    <code>consent_given_at</code>. {t('safeguarding.help.assignments.consent_middle')} <em>{t('safeguarding.help.assignments.active')}</em>
+                    {t('safeguarding.help.assignments.consent_suffix')}
                   </li>
                   <li>
-                    <strong>Revoke</strong> — either the admin or the ward can revoke. Revocation
-                    is soft (sets <code>revoked_at</code>) so the audit trail is preserved.
+                    <strong>{t('safeguarding.help.assignments.revoke_label')}</strong> {t('safeguarding.help.assignments.revoke_prefix')} <code>revoked_at</code>{t('safeguarding.help.assignments.revoke_suffix')}
                   </li>
                 </ul>
                 <p>
-                  Guardian assignments do not replace the broker review queue — monitored messages
-                  still flow there. A guardian is an extra trusted layer, not a substitute for
-                  platform oversight.
+                  {t('safeguarding.help.assignments.queue_note')}
                 </p>
               </div>
             </AccordionItem>
@@ -302,30 +271,27 @@ export function SafeguardingHelp() {
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
               key="member-preferences"
-              aria-label="Member preferences tab"
+              aria-label={t('safeguarding.help.preferences.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-primary" />
-                  <span className="font-medium">Reading member preferences</span>
+                  <span className="font-medium">{t('safeguarding.help.preferences.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
                 <p>
-                  The Member Preferences tab lists every flagged member alongside the specific
-                  options they've selected. This data is <strong>special category personal data</strong>
-                  under GDPR — treat it with care.
+                  {t('safeguarding.help.preferences.intro_prefix')} <strong>{t('safeguarding.help.preferences.special_category')}</strong>
+                  {t('safeguarding.help.preferences.intro_suffix')}
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                  <li>Every view is audit-logged with your user ID and timestamp.</li>
-                  <li>It is never exposed in a member's public profile.</li>
-                  <li>Other members cannot see this tab — access requires an admin-class role.</li>
-                  <li>Do not discuss another member's flags with anyone outside the safeguarding team.</li>
+                  <li>{t('safeguarding.help.preferences.audit_logged')}</li>
+                  <li>{t('safeguarding.help.preferences.not_public')}</li>
+                  <li>{t('safeguarding.help.preferences.admin_only')}</li>
+                  <li>{t('safeguarding.help.preferences.confidential')}</li>
                 </ul>
                 <p>
-                  Click a member's row to open their full activity trail — every message copied,
-                  every assignment change, every trigger activation, chronologically. The trail
-                  is downloadable as CSV for regulator requests or incident reports.
+                  {t('safeguarding.help.preferences.activity_trail')}
                 </p>
               </div>
             </AccordionItem>
@@ -333,37 +299,33 @@ export function SafeguardingHelp() {
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
               key="autonomy"
-              aria-label="Adult autonomy principle"
+              aria-label={t('safeguarding.help.autonomy.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <Scale className="w-4 h-4 text-success" />
-                  <span className="font-medium">Adult autonomy principle</span>
+                  <span className="font-medium">{t('safeguarding.help.autonomy.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
                 <div className="p-3 rounded-lg bg-success/5 border border-success/20">
-                  <p className="font-medium text-foreground mb-2">The rule:</p>
+                  <p className="font-medium text-foreground mb-2">{t('safeguarding.help.autonomy.rule_label')}</p>
                   <p>
-                    An adult who has self-identified as requiring safeguarding protections has the
-                    absolute right to view <em>and</em> revoke those protections without asking
-                    an administrator. Admins <strong>cannot</strong> block member self-revocation.
+                    {t('safeguarding.help.autonomy.rule_prefix')} <em>{t('safeguarding.help.autonomy.and')}</em> {t('safeguarding.help.autonomy.rule_middle')}
+                    <strong>{t('safeguarding.help.autonomy.cannot')}</strong> {t('safeguarding.help.autonomy.rule_suffix')}
                   </p>
                 </div>
                 <p>
-                  This is grounded in <strong>Safeguarding Ireland's adult-autonomy guidance</strong>
-                  (and equivalent UK statutory guidance — "Making Safeguarding Personal"). Revoking
-                  a flag triggers:
+                  {t('safeguarding.help.autonomy.grounded_prefix')} <strong>{t('safeguarding.help.autonomy.guidance')}</strong>
+                  {t('safeguarding.help.autonomy.grounded_suffix')}
                 </p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Re-evaluation of triggers → monitoring/approval requirements may lift.</li>
-                  <li>An in-app bell notification to admins/brokers — you are told, but you cannot veto.</li>
-                  <li>An audit-log entry with <code>action = 'safeguarding_consent_revoked'</code>.</li>
+                  <li>{t('safeguarding.help.autonomy.trigger_reevaluation')}</li>
+                  <li>{t('safeguarding.help.autonomy.admin_notification')}</li>
+                  <li>{t('safeguarding.help.autonomy.audit_log_prefix')} <code>action = 'safeguarding_consent_revoked'</code>.</li>
                 </ul>
                 <p>
-                  If you believe revocation was coerced by a third party, the right response is
-                  a safeguarding conversation with the member (and if needed, a referral to
-                  statutory services) — not re-applying the flag via admin controls.
+                  {t('safeguarding.help.autonomy.coercion_note')}
                 </p>
               </div>
             </AccordionItem>
@@ -371,32 +333,29 @@ export function SafeguardingHelp() {
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
               key="annual-review"
-              aria-label="Annual review process"
+              aria-label={t('safeguarding.help.annual_review.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-warning" />
-                  <span className="font-medium">Annual review process</span>
+                  <span className="font-medium">{t('safeguarding.help.annual_review.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
                 <p>
-                  On the first of each month, the <code>safeguarding:review-flags</code> command runs
-                  automatically. For any preference older than 365 days without a recent review, it:
+                  {t('safeguarding.help.annual_review.intro_prefix')} <code>safeguarding:review-flags</code> {t('safeguarding.help.annual_review.intro_suffix')}
                 </p>
                 <ol className="list-decimal pl-5 space-y-1">
-                  <li>Sends the member an email and bell asking them to review — stamps <code>review_reminder_sent_at</code>.</li>
-                  <li>Waits 30 days.</li>
-                  <li>If no response, notifies admins/brokers via bell + email — stamps <code>review_escalated_at</code>.</li>
+                  <li>{t('safeguarding.help.annual_review.step_reminder')} <code>review_reminder_sent_at</code>.</li>
+                  <li>{t('safeguarding.help.annual_review.step_wait')}</li>
+                  <li>{t('safeguarding.help.annual_review.step_escalate')} <code>review_escalated_at</code>.</li>
                 </ol>
                 <p>
-                  <strong>The flag stays active regardless.</strong> The escalation is a prompt for
-                  a coordinator to reach out personally — it is not a cue to strip the protection.
-                  Silence is not consent to remove safeguards.
+                  <strong>{t('safeguarding.help.annual_review.flag_stays_active')}</strong> {t('safeguarding.help.annual_review.escalation_note')}
                 </p>
                 <p>
-                  Viewing <em>Settings → Safeguarding</em> counts as a review — the backend stamps
-                  <code> review_confirmed_at</code> automatically when the member opens the page.
+                  {t('safeguarding.help.annual_review.settings_prefix')} <em>{t('safeguarding.help.flagging.settings_safeguarding')}</em> {t('safeguarding.help.annual_review.settings_suffix')}
+                  <code> review_confirmed_at</code> {t('safeguarding.help.annual_review.settings_tail')}
                 </p>
               </div>
             </AccordionItem>
@@ -404,29 +363,26 @@ export function SafeguardingHelp() {
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
               key="audit"
-              aria-label="Audit trail & CSV export"
+              aria-label={t('safeguarding.help.audit.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <Eye className="w-4 h-4 text-default-500" />
-                  <span className="font-medium">Audit trail &amp; CSV export</span>
+                  <span className="font-medium">{t('safeguarding.help.audit.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
                 <p>
-                  Every safeguarding-related action is written to <code>activity_log</code> with
-                  <code> action_type = 'safeguarding'</code>. The per-member activity endpoint combines
-                  three sources into one newest-first timeline:
+                  {t('safeguarding.help.audit.intro_prefix')} <code>activity_log</code> {t('safeguarding.help.audit.intro_middle')}
+                  <code> action_type = 'safeguarding'</code>. {t('safeguarding.help.audit.intro_suffix')}
                 </p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li><strong>Activity log</strong> — option selections, consent revocations, admin views, trigger activations.</li>
-                  <li><strong>Message copies</strong> — every message sent or received by the member while monitored.</li>
-                  <li><strong>Assignment history</strong> — guardian assignments created or revoked involving the member.</li>
+                  <li><strong>{t('safeguarding.help.audit.activity_log_label')}</strong> {t('safeguarding.help.audit.activity_log_body')}</li>
+                  <li><strong>{t('safeguarding.help.audit.message_copies_label')}</strong> {t('safeguarding.help.audit.message_copies_body')}</li>
+                  <li><strong>{t('safeguarding.help.audit.assignment_history_label')}</strong> {t('safeguarding.help.audit.assignment_history_body')}</li>
                 </ul>
                 <p>
-                  Use the <em>Export CSV</em> action on the member detail view when you need a
-                  file you can attach to an incident report or share with a regulator. The CSV
-                  is UTF-8 with a BOM so Excel opens it correctly without prompting for encoding.
+                  {t('safeguarding.help.audit.export_prefix')} <em>{t('safeguarding.help.audit.export_csv')}</em> {t('safeguarding.help.audit.export_suffix')}
                 </p>
               </div>
             </AccordionItem>
