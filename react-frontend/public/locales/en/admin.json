@@ -3113,6 +3113,99 @@
       "delete_failed": "Delete failed"
     }
   },
+  "disclosure_pack": {
+    "meta": {
+      "page_title": "FADP / nDSG Disclosure Pack",
+      "title": "FADP / nDSG Disclosure Pack",
+      "subtitle": "AG80 - pilot disclosure document for Swiss data-protection law"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh disclosure pack",
+      "export_markdown": "Export Markdown",
+      "save_changes": "Save changes"
+    },
+    "about": {
+      "title": "About this page",
+      "body_prefix": "The Disclosure Pack (AG80) is the",
+      "body_suffix": "data-protection disclosure document that residents must be made aware of before participating in the community care programme. It covers the data controller and processor identities, data categories processed, lawful basis, data-subject rights, incident response contacts, and cross-border transfer safeguards.",
+      "review_prefix": "This pack is a working draft - review it with",
+      "review_middle": "counsel before publishing. Edit the controller details, incident-response owner, and isolated-node configuration for your deployment, then use",
+      "review_suffix": "to produce the legal handover document. Defaults reflect platform-side commitments. Save any changes before exporting."
+    },
+    "tabs": {
+      "aria": "Disclosure sections",
+      "controller": "Controller & Processor",
+      "data_retention": "Data & retention",
+      "data_subject_rights": "Data subject rights",
+      "federation_isolated_node": "Federation & isolated node",
+      "incident_response": "Incident response",
+      "cross_border_transfers": "Cross-border transfers"
+    },
+    "sections": {
+      "tenant_controller": "Tenant controller",
+      "platform_processor": "Platform processor",
+      "data_categories": "Data categories",
+      "lawful_basis": "Lawful basis",
+      "retention_defaults": "Retention defaults",
+      "federation_policy": "Federation policy",
+      "isolated_node_configuration": "Isolated-node configuration",
+      "destinations": "Destinations",
+      "safeguards": "Safeguards"
+    },
+    "fields": {
+      "controller_name": "Controller name",
+      "address": "Address",
+      "contact_email": "Contact email",
+      "data_protection_officer": "Data protection officer",
+      "processor_name": "Processor name",
+      "sub_processors": "Sub-processors (one per line)",
+      "hosting_owner": "Hosting owner",
+      "smtp_owner": "SMTP owner",
+      "storage_owner": "Storage owner",
+      "backup_owner": "Backup owner",
+      "update_cadence": "Update cadence",
+      "owner_name": "Owner name",
+      "notification_window_hours": "Notification window (hours)",
+      "fadp_authority": "FADP authority"
+    },
+    "labels": {
+      "aggregate_policy": "Aggregate policy"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "enabled_lower": "enabled",
+      "disabled_lower": "disabled",
+      "members_can_opt_out": "Members can opt out",
+      "no_member_opt_out": "No member opt-out",
+      "cross_border_occurs": "Cross-border transfers occur",
+      "no_cross_border_transfers": "No cross-border transfers"
+    },
+    "isolated_node": {
+      "description_prefix": "These fields are only relevant if this deployment runs on canton-controlled infrastructure. For standard hosted deployments, leave as defaults. Each owner field identifies the legal entity responsible for that infrastructure component under",
+      "description_suffix": "Article 9."
+    },
+    "descriptions": {
+      "hosting_owner": "Legal entity that controls the server infrastructure (e.g. the canton IT department).",
+      "smtp_owner": "Legal entity responsible for outbound email delivery.",
+      "storage_owner": "Legal entity controlling file/blob storage (uploads, exports).",
+      "backup_owner": "Legal entity responsible for database backup storage and retention.",
+      "update_cadence": "How frequently the canton node receives platform updates (e.g. 'monthly', 'quarterly')."
+    },
+    "footer": {
+      "last_saved": "Last saved {{date}}",
+      "customised": "Customised"
+    },
+    "toasts": {
+      "load_failed": "Failed to load disclosure pack",
+      "saved": "Disclosure pack saved",
+      "save_failed": "Failed to save disclosure pack",
+      "export_empty": "Export returned empty",
+      "exported": "Disclosure pack exported",
+      "export_failed": "Failed to export disclosure pack"
+    }
+  },
   "federation_peers_admin": {
     "meta": {
       "page_title": "Federation Peers - Admin",

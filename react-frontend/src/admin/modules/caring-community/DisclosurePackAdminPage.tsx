@@ -24,6 +24,7 @@ import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import ShieldCheck from 'lucide-react/icons/shield-check';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -62,7 +63,8 @@ interface PackResponse {
 }
 
 export default function DisclosurePackAdminPage() {
-  usePageTitle('FADP / nDSG Disclosure Pack');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('disclosure_pack.meta.page_title'));
   const { showToast } = useToast();
 
   const [data, setData] = useState<PackResponse | null>(null);
@@ -78,11 +80,11 @@ export default function DisclosurePackAdminPage() {
       setData(res.data ?? null);
       setDraft(res.data?.pack ?? null);
     } catch {
-      showToast('Failed to load disclosure pack', 'error');
+      showToast(t('disclosure_pack.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     load();
@@ -101,9 +103,9 @@ export default function DisclosurePackAdminPage() {
       const updated = res.data ?? draft;
       setDraft(updated);
       setData((prev) => (prev ? { ...prev, pack: updated, is_customised: true } : prev));
-      showToast('Disclosure pack saved', 'success');
+      showToast(t('disclosure_pack.toasts.saved'), 'success');
     } catch (err) {
-      const msg = (err as { message?: string })?.message ?? 'Failed to save disclosure pack';
+      const msg = (err as { message?: string })?.message ?? t('disclosure_pack.toasts.save_failed');
       showToast(msg, 'error');
     } finally {
       setSaving(false);
@@ -118,7 +120,7 @@ export default function DisclosurePackAdminPage() {
       );
       const payload = res.data;
       if (!payload?.content) {
-        showToast('Export returned empty', 'error');
+        showToast(t('disclosure_pack.toasts.export_empty'), 'error');
         return;
       }
       const blob = new Blob([payload.content], { type: 'text/markdown' });
@@ -130,9 +132,9 @@ export default function DisclosurePackAdminPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast('Disclosure pack exported', 'success');
+      showToast(t('disclosure_pack.toasts.exported'), 'success');
     } catch {
-      showToast('Failed to export disclosure pack', 'error');
+      showToast(t('disclosure_pack.toasts.export_failed'), 'error');
     } finally {
       setExporting(false);
     }
@@ -162,13 +164,20 @@ export default function DisclosurePackAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="FADP / nDSG Disclosure Pack"
-        subtitle="AG80 — pilot disclosure document for Swiss data-protection law"
+        title={t('disclosure_pack.meta.title')}
+        subtitle={t('disclosure_pack.meta.subtitle')}
         icon={<ShieldCheck size={20} />}
         actions={
           <div className="flex gap-2">
-            <Tooltip content="Refresh">
-              <Button isIconOnly size="sm" variant="flat" onPress={load} isLoading={loading} aria-label="Refresh">
+            <Tooltip content={t('disclosure_pack.actions.refresh')}>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="flat"
+                onPress={load}
+                isLoading={loading}
+                aria-label={t('disclosure_pack.actions.refresh_aria')}
+              >
                 <RefreshCw size={15} />
               </Button>
             </Tooltip>
@@ -179,7 +188,7 @@ export default function DisclosurePackAdminPage() {
               onPress={exportMarkdown}
               isLoading={exporting}
             >
-              Export Markdown
+              {t('disclosure_pack.actions.export_markdown')}
             </Button>
             <Button
               size="sm"
@@ -189,7 +198,7 @@ export default function DisclosurePackAdminPage() {
               isLoading={saving}
               isDisabled={!dirty || saving}
             >
-              Save changes
+              {t('disclosure_pack.actions.save_changes')}
             </Button>
           </div>
         }
@@ -200,20 +209,20 @@ export default function DisclosurePackAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
-              <p className="text-default-600">
-                The Disclosure Pack (AG80) is the <Abbr term="FADP">FADP</Abbr>/<Abbr term="nDSG">nDSG</Abbr> data-protection disclosure document
-                that residents must be made aware of before participating in the community care
-                programme. It covers the data controller and processor identities, data categories
-                processed, lawful basis, data-subject rights, incident response contacts, and
-                cross-border transfer safeguards.
+              <p className="font-semibold text-primary-800 dark:text-primary-200">
+                {t('disclosure_pack.about.title')}
               </p>
               <p className="text-default-600">
-                This pack is a working draft — review it with <Abbr term="FADP">FADP</Abbr>/<Abbr term="nDSG">nDSG</Abbr> counsel before publishing.
-                Edit the controller details, incident-response owner, and isolated-node
-                configuration for your deployment, then use <strong>Export Markdown</strong> to
-                produce the legal handover document. Defaults reflect platform-side commitments.
-                Save any changes before exporting.
+                {t('disclosure_pack.about.body_prefix')}{' '}
+                <Abbr term="FADP" />/<Abbr term="nDSG" />{' '}
+                {t('disclosure_pack.about.body_suffix')}
+              </p>
+              <p className="text-default-600">
+                {t('disclosure_pack.about.review_prefix')}{' '}
+                <Abbr term="FADP" />/<Abbr term="nDSG" />{' '}
+                {t('disclosure_pack.about.review_middle')}{' '}
+                <strong>{t('disclosure_pack.actions.export_markdown')}</strong>{' '}
+                {t('disclosure_pack.about.review_suffix')}
               </p>
             </div>
           </div>
@@ -227,37 +236,37 @@ export default function DisclosurePackAdminPage() {
       )}
 
       {!loading && draft && (
-        <Tabs aria-label="Disclosure sections">
-          <Tab key="controller" title="Controller & Processor">
+        <Tabs aria-label={t('disclosure_pack.tabs.aria')}>
+          <Tab key="controller" title={t('disclosure_pack.tabs.controller')}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
               <Card>
                 <CardHeader className="pb-2">
-                  <span className="font-semibold text-sm">Tenant controller</span>
+                  <span className="font-semibold text-sm">{t('disclosure_pack.sections.tenant_controller')}</span>
                 </CardHeader>
                 <CardBody className="pt-0 space-y-3">
-                  <Input label="Controller name" value={draft.controller.name}
+                  <Input label={t('disclosure_pack.fields.controller_name')} value={draft.controller.name}
                     onValueChange={(v) => setControllerField('name', v)} />
-                  <Input label="Address" value={draft.controller.address}
+                  <Input label={t('disclosure_pack.fields.address')} value={draft.controller.address}
                     onValueChange={(v) => setControllerField('address', v)} />
-                  <Input label="Contact email" type="email" value={draft.controller.contact_email}
+                  <Input label={t('disclosure_pack.fields.contact_email')} type="email" value={draft.controller.contact_email}
                     onValueChange={(v) => setControllerField('contact_email', v)} />
-                  <Input label="Data protection officer" value={draft.controller.data_protection_officer}
+                  <Input label={t('disclosure_pack.fields.data_protection_officer')} value={draft.controller.data_protection_officer}
                     onValueChange={(v) => setControllerField('data_protection_officer', v)} />
                 </CardBody>
               </Card>
 
               <Card>
                 <CardHeader className="pb-2">
-                  <span className="font-semibold text-sm">Platform processor</span>
+                  <span className="font-semibold text-sm">{t('disclosure_pack.sections.platform_processor')}</span>
                 </CardHeader>
                 <CardBody className="pt-0 space-y-3">
-                  <Input label="Processor name" value={draft.processor.name}
+                  <Input label={t('disclosure_pack.fields.processor_name')} value={draft.processor.name}
                     onValueChange={(v) => setProcessorField('name', v)} />
-                  <Input label="Address" value={draft.processor.address}
+                  <Input label={t('disclosure_pack.fields.address')} value={draft.processor.address}
                     onValueChange={(v) => setProcessorField('address', v)} />
-                  <Input label="Contact email" type="email" value={draft.processor.contact_email}
+                  <Input label={t('disclosure_pack.fields.contact_email')} type="email" value={draft.processor.contact_email}
                     onValueChange={(v) => setProcessorField('contact_email', v)} />
-                  <Textarea label="Sub-processors (one per line)"
+                  <Textarea label={t('disclosure_pack.fields.sub_processors')}
                     value={draft.processor.sub_processors.join('\n')}
                     onValueChange={(v) => setProcessorField('sub_processors', v.split('\n').map((l) => l.trim()).filter(Boolean))}
                     minRows={5}
@@ -267,10 +276,10 @@ export default function DisclosurePackAdminPage() {
             </div>
           </Tab>
 
-          <Tab key="data" title="Data & retention">
+          <Tab key="data" title={t('disclosure_pack.tabs.data_retention')}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
               <Card>
-                <CardHeader className="pb-2"><span className="font-semibold text-sm">Data categories</span></CardHeader>
+                <CardHeader className="pb-2"><span className="font-semibold text-sm">{t('disclosure_pack.sections.data_categories')}</span></CardHeader>
                 <CardBody className="pt-0 space-y-1">
                   {Object.entries(draft.data_categories).map(([cat, fields]) => (
                     <p key={cat} className="text-sm">
@@ -282,7 +291,7 @@ export default function DisclosurePackAdminPage() {
               </Card>
 
               <Card>
-                <CardHeader className="pb-2"><span className="font-semibold text-sm">Lawful basis</span></CardHeader>
+                <CardHeader className="pb-2"><span className="font-semibold text-sm">{t('disclosure_pack.sections.lawful_basis')}</span></CardHeader>
                 <CardBody className="pt-0 space-y-1">
                   {Object.entries(draft.lawful_basis).map(([cat, basis]) => (
                     <p key={cat} className="text-sm">
@@ -294,7 +303,7 @@ export default function DisclosurePackAdminPage() {
               </Card>
 
               <Card className="lg:col-span-2">
-                <CardHeader className="pb-2"><span className="font-semibold text-sm">Retention defaults</span></CardHeader>
+                <CardHeader className="pb-2"><span className="font-semibold text-sm">{t('disclosure_pack.sections.retention_defaults')}</span></CardHeader>
                 <CardBody className="pt-0">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {Object.entries(draft.retention_defaults).map(([k, v]) => (
@@ -309,7 +318,7 @@ export default function DisclosurePackAdminPage() {
             </div>
           </Tab>
 
-          <Tab key="rights" title="Data subject rights">
+          <Tab key="rights" title={t('disclosure_pack.tabs.data_subject_rights')}>
             <Card className="mt-4">
               <CardBody className="grid grid-cols-1 sm:grid-cols-2 gap-2 py-4">
                 {Object.entries(draft.data_subject_rights).map(([k, v]) => (
@@ -317,7 +326,7 @@ export default function DisclosurePackAdminPage() {
                     <span className="font-mono text-xs text-primary">{k}</span>:{' '}
                     {typeof v === 'boolean' ? (
                       <Chip size="sm" color={v ? 'success' : 'default'} variant="flat">
-                        {v ? 'enabled' : 'disabled'}
+                        {v ? t('disclosure_pack.status.enabled_lower') : t('disclosure_pack.status.disabled_lower')}
                       </Chip>
                     ) : (
                       <span className="text-default-600">{v as string}</span>
@@ -328,61 +337,60 @@ export default function DisclosurePackAdminPage() {
             </Card>
           </Tab>
 
-          <Tab key="federation" title="Federation & isolated node">
+          <Tab key="federation" title={t('disclosure_pack.tabs.federation_isolated_node')}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
               <Card>
-                <CardHeader className="pb-2"><span className="font-semibold text-sm">Federation policy</span></CardHeader>
+                <CardHeader className="pb-2"><span className="font-semibold text-sm">{t('disclosure_pack.sections.federation_policy')}</span></CardHeader>
                 <CardBody className="pt-0 space-y-2">
                   <p className="text-sm">
-                    Aggregate policy: <span className="font-mono text-xs">{draft.federation.aggregate_policy}</span>
+                    {t('disclosure_pack.labels.aggregate_policy')}: <span className="font-mono text-xs">{draft.federation.aggregate_policy}</span>
                   </p>
                   <Chip size="sm" color={draft.federation.enabled ? 'success' : 'default'} variant="flat">
-                    {draft.federation.enabled ? 'Enabled' : 'Disabled'}
+                    {draft.federation.enabled ? t('disclosure_pack.status.enabled') : t('disclosure_pack.status.disabled')}
                   </Chip>
                   <Chip size="sm" variant="flat">
-                    {draft.federation.opt_out ? 'Members can opt out' : 'No member opt-out'}
+                    {draft.federation.opt_out ? t('disclosure_pack.status.members_can_opt_out') : t('disclosure_pack.status.no_member_opt_out')}
                   </Chip>
                 </CardBody>
               </Card>
 
               <Card>
-                <CardHeader className="pb-2"><span className="font-semibold text-sm">Isolated-node configuration</span></CardHeader>
+                <CardHeader className="pb-2"><span className="font-semibold text-sm">{t('disclosure_pack.sections.isolated_node_configuration')}</span></CardHeader>
                 <CardBody className="pt-0 space-y-3">
                   <p className="text-xs text-default-500">
-                    These fields are only relevant if this deployment runs on canton-controlled
-                    infrastructure. For standard hosted deployments, leave as defaults. Each owner
-                    field identifies the legal entity responsible for that infrastructure component
-                    under <Abbr term="FADP">FADP</Abbr>/<Abbr term="nDSG">nDSG</Abbr> Article 9.
+                    {t('disclosure_pack.isolated_node.description_prefix')}{' '}
+                    <Abbr term="FADP" />/<Abbr term="nDSG" />{' '}
+                    {t('disclosure_pack.isolated_node.description_suffix')}
                   </p>
-                  <Input label="Hosting owner" value={draft.isolated_node.hosting_owner}
+                  <Input label={t('disclosure_pack.fields.hosting_owner')} value={draft.isolated_node.hosting_owner}
                     onValueChange={(v) => setIsolatedField('hosting_owner', v)}
-                    description="Legal entity that controls the server infrastructure (e.g. the canton IT department)." />
-                  <Input label="SMTP owner" value={draft.isolated_node.smtp_owner}
+                    description={t('disclosure_pack.descriptions.hosting_owner')} />
+                  <Input label={t('disclosure_pack.fields.smtp_owner')} value={draft.isolated_node.smtp_owner}
                     onValueChange={(v) => setIsolatedField('smtp_owner', v)}
-                    description="Legal entity responsible for outbound email delivery." />
-                  <Input label="Storage owner" value={draft.isolated_node.storage_owner}
+                    description={t('disclosure_pack.descriptions.smtp_owner')} />
+                  <Input label={t('disclosure_pack.fields.storage_owner')} value={draft.isolated_node.storage_owner}
                     onValueChange={(v) => setIsolatedField('storage_owner', v)}
-                    description="Legal entity controlling file/blob storage (uploads, exports)." />
-                  <Input label="Backup owner" value={draft.isolated_node.backup_owner}
+                    description={t('disclosure_pack.descriptions.storage_owner')} />
+                  <Input label={t('disclosure_pack.fields.backup_owner')} value={draft.isolated_node.backup_owner}
                     onValueChange={(v) => setIsolatedField('backup_owner', v)}
-                    description="Legal entity responsible for database backup storage and retention." />
-                  <Input label="Update cadence" value={draft.isolated_node.update_cadence}
+                    description={t('disclosure_pack.descriptions.backup_owner')} />
+                  <Input label={t('disclosure_pack.fields.update_cadence')} value={draft.isolated_node.update_cadence}
                     onValueChange={(v) => setIsolatedField('update_cadence', v)}
-                    description="How frequently the canton node receives platform updates (e.g. 'monthly', 'quarterly')." />
+                    description={t('disclosure_pack.descriptions.update_cadence')} />
                 </CardBody>
               </Card>
             </div>
           </Tab>
 
-          <Tab key="incident" title="Incident response">
+          <Tab key="incident" title={t('disclosure_pack.tabs.incident_response')}>
             <Card className="mt-4">
               <CardBody className="space-y-3 py-4">
-                <Input label="Owner name" value={draft.incident_response.owner_name}
+                <Input label={t('disclosure_pack.fields.owner_name')} value={draft.incident_response.owner_name}
                   onValueChange={(v) => setIncidentField('owner_name', v)} />
-                <Input label="Contact email" type="email" value={draft.incident_response.contact_email}
+                <Input label={t('disclosure_pack.fields.contact_email')} type="email" value={draft.incident_response.contact_email}
                   onValueChange={(v) => setIncidentField('contact_email', v)} />
                 <Input
-                  label="Notification window (hours)" type="number"
+                  label={t('disclosure_pack.fields.notification_window_hours')} type="number"
                   min={1} max={720}
                   value={String(draft.incident_response.notification_window_hours)}
                   onValueChange={(v) => {
@@ -390,28 +398,28 @@ export default function DisclosurePackAdminPage() {
                     if (!isNaN(n)) setIncidentField('notification_window_hours', n);
                   }}
                 />
-                <Input label="FADP authority" value={draft.incident_response.fadp_authority}
+                <Input label={t('disclosure_pack.fields.fadp_authority')} value={draft.incident_response.fadp_authority}
                   onValueChange={(v) => setIncidentField('fadp_authority', v)} />
               </CardBody>
             </Card>
           </Tab>
 
-          <Tab key="transfers" title="Cross-border transfers">
+          <Tab key="transfers" title={t('disclosure_pack.tabs.cross_border_transfers')}>
             <Card className="mt-4">
               <CardBody className="py-4 space-y-3">
                 <p className="text-sm">
                   <Chip size="sm" color={draft.cross_border_transfers.occurs ? 'warning' : 'success'} variant="flat">
-                    {draft.cross_border_transfers.occurs ? 'Cross-border transfers occur' : 'No cross-border transfers'}
+                    {draft.cross_border_transfers.occurs ? t('disclosure_pack.status.cross_border_occurs') : t('disclosure_pack.status.no_cross_border_transfers')}
                   </Chip>
                 </p>
                 <div>
-                  <p className="text-sm font-semibold mb-1">Destinations</p>
+                  <p className="text-sm font-semibold mb-1">{t('disclosure_pack.sections.destinations')}</p>
                   <ul className="list-disc pl-6 text-sm text-default-600">
                     {draft.cross_border_transfers.destinations.map((d) => <li key={d}>{d}</li>)}
                   </ul>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold mb-1">Safeguards</p>
+                  <p className="text-sm font-semibold mb-1">{t('disclosure_pack.sections.safeguards')}</p>
                   <ul className="list-disc pl-6 text-sm text-default-600">
                     {draft.cross_border_transfers.safeguards.map((s) => <li key={s}>{s}</li>)}
                   </ul>
@@ -427,9 +435,9 @@ export default function DisclosurePackAdminPage() {
           <Divider />
           <p className="text-xs text-default-500 flex items-center gap-2">
             <FileText size={12} />
-            Last saved {new Date(data.last_updated_at).toLocaleString()}
+            {t('disclosure_pack.footer.last_saved', { date: new Date(data.last_updated_at).toLocaleString() })}
             {data.is_customised && (
-              <Chip size="sm" variant="flat" color="primary">Customised</Chip>
+              <Chip size="sm" variant="flat" color="primary">{t('disclosure_pack.footer.customised')}</Chip>
             )}
           </p>
         </>
