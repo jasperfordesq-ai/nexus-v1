@@ -322,6 +322,7 @@ class AdminUsersController extends BaseApiController
             $params[] = $input['profile_type'];
         }
 
+        $approvingViaStatusChange = false;
         if (array_key_exists('status', $input)) {
             $newStatus = is_string($input['status']) ? trim($input['status']) : $input['status'];
             if (!in_array($newStatus, ['active', 'pending', 'suspended', 'banned'], true)) {
@@ -332,6 +333,11 @@ class AdminUsersController extends BaseApiController
             $statusForNotification = $newStatus;
             if ($newStatus === 'active') {
                 $updates[] = 'is_approved = 1';
+                // Detect first-time approval via the generic update path (pending → active)
+                // so we can grant welcome credits and send the approval email below.
+                if (empty($user['is_approved'])) {
+                    $approvingViaStatusChange = true;
+                }
             } elseif ($newStatus === 'pending') {
                 $updates[] = 'is_approved = 0';
             }
@@ -351,6 +357,16 @@ class AdminUsersController extends BaseApiController
 
         ActivityLog::log($adminId, 'admin_update_user', "Updated user #{$id}");
         $this->auditLogService->logUserUpdated($adminId, $id, array_keys($input));
+
+        // If this update is effectively an approval (pending → active), grant welcome credits
+        // and send the approval welcome email — same as the dedicated /approve endpoint.
+        if ($approvingViaStatusChange) {
+            ActivityLog::log($adminId, 'admin_approve_user', "Approved user #{$id} ({$user['email']}) via status change");
+            $this->auditLogService->logUserApproved($adminId, $id, $user['email']);
+            $creditsAwarded = $this->grantWelcomeCredits($user, $adminId);
+            $this->sendApprovalWelcomeEmail($user, $creditsAwarded);
+            $this->sendApprovalInAppNotification($user, $creditsAwarded);
+        }
 
         if (isset($input['role']) && ($user['role'] ?? 'member') !== $input['role']) {
             $this->auditLogService->logAdminRoleChanged($adminId, $id, $user['role'] ?? 'member', $input['role']);
@@ -1782,8 +1798,13 @@ class AdminUsersController extends BaseApiController
             $userTenantId = (int) $user['tenant_id'];
             $userId = (int) $user['id'];
 
-            // Read the welcome credits amount for the user's tenant (default: 5)
-            $creditAmount = (int) $this->tenantSettingsService->get($userTenantId, 'welcome_credits', 5);
+            // Read the welcome credits amount from the wallet settings key that the
+            // admin Settings page writes to. Falls back to 'general.welcome_credits'
+            // (legacy key) then to a hardcoded default of 5 so existing tenants that
+            // haven't saved the setting yet still get the expected behaviour.
+            $creditAmount = (int) $this->tenantSettingsService->get($userTenantId, 'wallet.starting_balance',
+                $this->tenantSettingsService->get($userTenantId, 'general.welcome_credits', 5)
+            );
             if ($creditAmount <= 0) {
                 return 0;
             }

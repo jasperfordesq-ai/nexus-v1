@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Welcome credits now granted when admin approves via status change.** Admins were approving members by editing their status to "active" (the user detail edit page) rather than using the dedicated Approve button. The generic `update()` endpoint set `is_approved=1` but never called `grantWelcomeCredits`, so no starting balance was applied. Fix: detect the `pending → active` transition in `update()` and run the same credit-grant + welcome-email + in-app-notification flow as the dedicated `/approve` endpoint. Also fixed: `grantWelcomeCredits` was reading the `welcome_credits` tenant-settings key (which doesn't exist) instead of `wallet.starting_balance` (the key the admin Settings page actually writes). The code now reads `wallet.starting_balance` with a fallback chain so every tenant resolves the correct value. Backfilled 5 credits to the one user who had been approved but received nothing.
+
 - **Member activity reports now show real data.** `AuthController::login()` never stamped `last_login_at` on successful login after the Laravel migration, so `/admin/reports/members` showed "No active members found" for all tenants. Fixed by adding `DB::table('users')->update(['last_login_at' => now()])` immediately after token creation. A backfill migration approximates past login dates from `personal_access_tokens.created_at` for all active users so reports are immediately useful.
 
 ---
