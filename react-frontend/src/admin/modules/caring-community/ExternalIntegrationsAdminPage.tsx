@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -127,25 +128,6 @@ const DSA_COLOR: Record<DsaStatus, 'default' | 'primary' | 'warning' | 'success'
   signed: 'success',
 };
 
-const CATEGORY_LABEL: Record<IntegrationCategory, string> = {
-  banking: 'Banking',
-  payment: 'Payment',
-  identity_verification: 'Identity verification',
-  professional_care: 'Professional care',
-  municipal_data: 'Municipal data',
-  postal: 'Postal',
-  ahv: 'AHV',
-  healthcare: 'Healthcare',
-  other: 'Other',
-};
-
-const DSA_LABEL: Record<DsaStatus, string> = {
-  not_required: 'Not required',
-  drafting: 'Drafting',
-  in_review: 'In review',
-  signed: 'Signed',
-};
-
 interface FormState {
   name: string;
   category: IntegrationCategory;
@@ -187,7 +169,8 @@ function fromIntegration(item: Integration): FormState {
 }
 
 export default function ExternalIntegrationsAdminPage(): JSX.Element {
-  usePageTitle('External Integration Backlog');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('external_integrations.meta.title'));
   const { showToast } = useToast();
 
   const [items, setItems] = useState<Integration[]>([]);
@@ -218,13 +201,13 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
         setLastUpdatedAt(null);
       }
     } catch {
-      showToast('Failed to load integration backlog', 'error');
+      showToast(t('external_integrations.toasts.load_failed'), 'error');
       setItems([]);
       setLastUpdatedAt(null);
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   useEffect(() => {
     void load();
@@ -257,12 +240,12 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
       if (res.success && res.data) {
         setItems(res.data.items ?? []);
         setLastUpdatedAt(res.data.last_updated_at ?? null);
-        showToast('Seeded default backlog', 'success');
+        showToast(t('external_integrations.toasts.seeded'), 'success');
       } else {
-        showToast(res.error ?? 'Seed failed', 'error');
+        showToast(res.error ?? t('external_integrations.toasts.seed_failed'), 'error');
       }
     } catch {
-      showToast('Seed failed', 'error');
+      showToast(t('external_integrations.toasts.seed_failed'), 'error');
     } finally {
       setSeeding(false);
     }
@@ -277,11 +260,11 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
           form,
         );
         if (res.success && res.data?.item) {
-          showToast('Integration updated', 'success');
+          showToast(t('external_integrations.toasts.updated'), 'success');
           editModal.onClose();
           await load();
         } else {
-          showToast(res.error ?? 'Update failed', 'error');
+          showToast(res.error ?? t('external_integrations.toasts.update_failed'), 'error');
         }
       } else {
         const res = await api.post<ItemResponse>(
@@ -289,15 +272,15 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
           form,
         );
         if (res.success && res.data?.item) {
-          showToast('Integration created', 'success');
+          showToast(t('external_integrations.toasts.created'), 'success');
           editModal.onClose();
           await load();
         } else {
-          showToast(res.error ?? 'Create failed', 'error');
+          showToast(res.error ?? t('external_integrations.toasts.create_failed'), 'error');
         }
       }
     } catch {
-      showToast(editing ? 'Update failed' : 'Create failed', 'error');
+      showToast(editing ? t('external_integrations.toasts.update_failed') : t('external_integrations.toasts.create_failed'), 'error');
     } finally {
       setSaving(false);
     }
@@ -311,15 +294,15 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
         `/v2/admin/caring-community/external-integrations/${target.id}`,
       );
       if (res.success) {
-        showToast('Integration removed', 'success');
+        showToast(t('external_integrations.toasts.removed'), 'success');
         deleteModal.onClose();
         setTarget(null);
         await load();
       } else {
-        showToast(res.error ?? 'Delete failed', 'error');
+        showToast(res.error ?? t('external_integrations.toasts.delete_failed'), 'error');
       }
     } catch {
-      showToast('Delete failed', 'error');
+      showToast(t('external_integrations.toasts.delete_failed'), 'error');
     } finally {
       setDeleting(false);
     }
@@ -330,8 +313,8 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="External Integration Backlog"
-        subtitle="AG87 — partner-dependent integrations awaiting external owner / DSA / sandbox"
+        title={t('external_integrations.meta.title')}
+        subtitle={t('external_integrations.meta.subtitle')}
         icon={<PlugZap size={24} />}
         actions={
           <>
@@ -342,7 +325,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
               onPress={() => void load()}
               isLoading={loading}
             >
-              Refresh
+              {t('external_integrations.actions.refresh')}
             </Button>
             <Button
               size="sm"
@@ -350,7 +333,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
               startContent={<Plus size={14} />}
               onPress={openCreate}
             >
-              Add integration
+              {t('external_integrations.actions.add')}
             </Button>
           </>
         }
@@ -362,18 +345,14 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('external_integrations.about.title')}</p>
               <p className="text-default-600">
-                External Integrations is a backlog tracker for partner-dependent connections —
-                banking, AHV submission, postal address verification, and cantonal data feeds. Each
-                entry tracks the integration owner, data sharing agreement (DSA) status, and sandbox
-                readiness. Use this to coordinate with external partners and report progress to
-                stakeholders.
+                {t('external_integrations.about.body')}
               </p>
               <div className="space-y-0.5 pt-1 text-default-500">
-                <p><strong>DSA (Data Sharing Agreement):</strong> Must be signed before any live data exchange. Draft agreements using the Research Partnerships templates.</p>
-                <p><strong>Sandbox URL:</strong> Link to the partner's test environment. Validate the integration in sandbox before promoting to live.</p>
-                <p><strong>Statuses:</strong> Proposed → Scoping → Sandbox → Live. Blocked means an external dependency is unresolved.</p>
+                <p><strong>{t('external_integrations.about.dsa_label')}</strong> {t('external_integrations.about.dsa_body')}</p>
+                <p><strong>{t('external_integrations.about.sandbox_label')}</strong> {t('external_integrations.about.sandbox_body')}</p>
+                <p><strong>{t('external_integrations.about.statuses_label')}</strong> {t('external_integrations.about.statuses_body')}</p>
               </div>
             </div>
           </div>
@@ -396,13 +375,9 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                 <PlugZap size={32} />
               </div>
               <div className="max-w-md space-y-1">
-                <h3 className="text-base font-semibold">No integrations tracked yet</h3>
+                <h3 className="text-base font-semibold">{t('external_integrations.empty.title')}</h3>
                 <p className="text-sm text-default-500">
-                  Seed a curated set of well-known partner-dependent integrations
-                  (AHV submission, Spitex handoff, cantonal master-data feed,
-                  PostFinance, Twint, postal-address verification) so the
-                  platform operator can track owner, DSA status, and sandbox
-                  readiness.
+                  {t('external_integrations.empty.body')}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -412,14 +387,14 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                   onPress={() => void handleSeed()}
                   isLoading={seeding}
                 >
-                  Seed default backlog
+                  {t('external_integrations.actions.seed')}
                 </Button>
                 <Button
                   variant="flat"
                   startContent={<Plus size={14} />}
                   onPress={openCreate}
                 >
-                  Add integration
+                  {t('external_integrations.actions.add')}
                 </Button>
               </div>
             </div>
@@ -430,19 +405,21 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
           <CardBody>
             {lastUpdatedAt && (
               <p className="mb-3 text-xs text-default-500">
-                Last updated {new Date(lastUpdatedAt).toLocaleString()}
+                {t('external_integrations.last_updated', { date: new Date(lastUpdatedAt).toLocaleString() })}
               </p>
             )}
-            <Table aria-label="External integrations" removeWrapper>
+            <Table aria-label={t('external_integrations.table.aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>Name</TableColumn>
-                <TableColumn>Category</TableColumn>
-                <TableColumn>Owner</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>DSA</TableColumn>
-                <TableColumn>Sandbox</TableColumn>
-                <TableColumn>Updated</TableColumn>
-                <TableColumn aria-label="Row actions">Actions</TableColumn>
+                <TableColumn>{t('external_integrations.table.name')}</TableColumn>
+                <TableColumn>{t('external_integrations.table.category')}</TableColumn>
+                <TableColumn>{t('external_integrations.table.owner')}</TableColumn>
+                <TableColumn>{t('external_integrations.table.status')}</TableColumn>
+                <TableColumn>{t('external_integrations.table.dsa')}</TableColumn>
+                <TableColumn>{t('external_integrations.table.sandbox')}</TableColumn>
+                <TableColumn>{t('external_integrations.table.updated')}</TableColumn>
+                <TableColumn aria-label={t('external_integrations.table.row_actions')}>
+                  {t('external_integrations.table.actions')}
+                </TableColumn>
               </TableHeader>
               <TableBody>
                 {items.map((item) => (
@@ -458,7 +435,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{CATEGORY_LABEL[item.category]}</span>
+                      <span className="text-sm">{t(`external_integrations.categories.${item.category}`)}</span>
                     </TableCell>
                     <TableCell>
                       {item.owner_name ? (
@@ -480,7 +457,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                         color={STATUS_COLOR[item.status]}
                         variant="flat"
                       >
-                        {item.status}
+                        {t(`external_integrations.statuses.${item.status}`)}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -489,7 +466,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                         color={DSA_COLOR[item.dsa_status]}
                         variant="flat"
                       >
-                        {DSA_LABEL[item.dsa_status]}
+                        {t(`external_integrations.dsa_statuses.${item.dsa_status}`)}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -500,7 +477,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                           rel="noreferrer"
                           className="text-sm text-primary underline"
                         >
-                          Open
+                          {t('external_integrations.actions.open')}
                         </a>
                       ) : (
                         <span className="text-default-400">—</span>
@@ -517,7 +494,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                           size="sm"
                           variant="light"
                           isIconOnly
-                          aria-label="Edit"
+                          aria-label={t('external_integrations.actions.edit')}
                           onPress={() => openEdit(item)}
                         >
                           <Pencil size={14} />
@@ -527,7 +504,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                           variant="light"
                           color="danger"
                           isIconOnly
-                          aria-label="Delete"
+                          aria-label={t('external_integrations.actions.delete')}
                           onPress={() => openDelete(item)}
                         >
                           <Trash2 size={14} />
@@ -550,13 +527,13 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
       >
         <ModalContent>
           <ModalHeader>
-            {editing ? `Edit: ${editing.name}` : 'Add integration'}
+            {editing ? t('external_integrations.editor.edit_title', { name: editing.name }) : t('external_integrations.editor.add_title')}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Input
-                label="Name"
-                placeholder="e.g. AHV submission gateway"
+                label={t('external_integrations.editor.name')}
+                placeholder={t('external_integrations.editor.name_placeholder')}
                 variant="bordered"
                 isRequired
                 value={form.name}
@@ -565,7 +542,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <Select
-                  label="Category"
+                  label={t('external_integrations.editor.category')}
                   variant="bordered"
                   selectedKeys={[form.category]}
                   onChange={(e) =>
@@ -576,12 +553,12 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                   }
                 >
                   {CATEGORIES.map((c) => (
-                    <SelectItem key={c}>{CATEGORY_LABEL[c]}</SelectItem>
+                    <SelectItem key={c}>{t(`external_integrations.categories.${c}`)}</SelectItem>
                   ))}
                 </Select>
 
                 <Select
-                  label="Status"
+                  label={t('external_integrations.editor.status')}
                   variant="bordered"
                   selectedKeys={[form.status]}
                   onChange={(e) =>
@@ -592,23 +569,23 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                   }
                 >
                   {STATUSES.map((s) => (
-                    <SelectItem key={s}>{s}</SelectItem>
+                    <SelectItem key={s}>{t(`external_integrations.statuses.${s}`)}</SelectItem>
                   ))}
                 </Select>
               </div>
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <Input
-                  label="Owner name"
-                  placeholder="External contact full name"
+                  label={t('external_integrations.editor.owner_name')}
+                  placeholder={t('external_integrations.editor.owner_name_placeholder')}
                   variant="bordered"
                   value={form.owner_name}
                   onValueChange={(v) => setForm({ ...form, owner_name: v })}
                 />
                 <Input
-                  label="Owner email"
+                  label={t('external_integrations.editor.owner_email')}
                   type="email"
-                  placeholder="contact@partner.example"
+                  placeholder={t('external_integrations.editor.owner_email_placeholder')}
                   variant="bordered"
                   value={form.owner_email}
                   onValueChange={(v) => setForm({ ...form, owner_email: v })}
@@ -616,8 +593,8 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
               </div>
 
               <Input
-                label="Interface specification URL"
-                placeholder="https://docs.partner.example/spec"
+                label={t('external_integrations.editor.interface_spec_url')}
+                placeholder={t('external_integrations.editor.interface_spec_placeholder')}
                 variant="bordered"
                 value={form.interface_spec_url}
                 onValueChange={(v) => setForm({ ...form, interface_spec_url: v })}
@@ -625,7 +602,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <Select
-                  label="Data sharing agreement"
+                  label={t('external_integrations.editor.dsa_status')}
                   variant="bordered"
                   selectedKeys={[form.dsa_status]}
                   onChange={(e) =>
@@ -636,13 +613,13 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                   }
                 >
                   {DSA_STATUSES.map((d) => (
-                    <SelectItem key={d}>{DSA_LABEL[d]}</SelectItem>
+                    <SelectItem key={d}>{t(`external_integrations.dsa_statuses.${d}`)}</SelectItem>
                   ))}
                 </Select>
 
                 <Input
-                  label="Sandbox URL"
-                  placeholder="https://sandbox.partner.example"
+                  label={t('external_integrations.editor.sandbox_url')}
+                  placeholder={t('external_integrations.editor.sandbox_placeholder')}
                   variant="bordered"
                   value={form.sandbox_url}
                   onValueChange={(v) => setForm({ ...form, sandbox_url: v })}
@@ -650,8 +627,8 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
               </div>
 
               <Textarea
-                label="Notes"
-                placeholder="Open questions, blockers, dependencies, contractual notes…"
+                label={t('external_integrations.editor.notes')}
+                placeholder={t('external_integrations.editor.notes_placeholder')}
                 variant="bordered"
                 minRows={3}
                 value={form.notes}
@@ -661,7 +638,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={editModal.onClose}>
-              Cancel
+              {t('external_integrations.actions.cancel')}
             </Button>
             <Button
               color="primary"
@@ -669,7 +646,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
               isDisabled={!isFormValid}
               isLoading={saving}
             >
-              {editing ? 'Save changes' : 'Create integration'}
+              {editing ? t('external_integrations.actions.save_changes') : t('external_integrations.actions.create')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -677,33 +654,32 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
 
       <Modal isOpen={deleteModal.isOpen} onClose={deleteModal.onClose} size="md">
         <ModalContent>
-          <ModalHeader>Remove integration</ModalHeader>
+          <ModalHeader>{t('external_integrations.delete_modal.title')}</ModalHeader>
           <ModalBody>
             {target ? (
               <div className="space-y-3">
                 <p className="text-sm">
-                  This will permanently remove the backlog entry for{' '}
-                  <span className="font-semibold">{target.name}</span>. The
-                  external partner record is not affected — only the tracking
-                  entry is removed.
+                  {t('external_integrations.delete_modal.body_prefix')}{' '}
+                  <span className="font-semibold">{target.name}</span>.{' '}
+                  {t('external_integrations.delete_modal.body_suffix')}
                 </p>
                 <Divider />
                 <p className="text-xs text-default-500">
-                  This action cannot be undone.
+                  {t('external_integrations.delete_modal.warning')}
                 </p>
               </div>
             ) : null}
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={deleteModal.onClose}>
-              Cancel
+              {t('external_integrations.actions.cancel')}
             </Button>
             <Button
               color="danger"
               onPress={() => void handleDelete()}
               isLoading={deleting}
             >
-              Remove
+              {t('external_integrations.actions.remove')}
             </Button>
           </ModalFooter>
         </ModalContent>

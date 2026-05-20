@@ -2936,6 +2936,112 @@
       "refresh_failed": "Refresh failed"
     }
   },
+  "external_integrations": {
+    "meta": {
+      "title": "External Integration Backlog",
+      "subtitle": "AG87 - partner-dependent integrations awaiting external owner / DSA / sandbox"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "add": "Add integration",
+      "seed": "Seed default backlog",
+      "open": "Open",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save_changes": "Save changes",
+      "create": "Create integration",
+      "remove": "Remove"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "External Integrations is a backlog tracker for partner-dependent connections - banking, AHV submission, postal address verification, and cantonal data feeds. Each entry tracks the integration owner, data sharing agreement (DSA) status, and sandbox readiness. Use this to coordinate with external partners and report progress to stakeholders.",
+      "dsa_label": "DSA (Data Sharing Agreement):",
+      "dsa_body": "Must be signed before any live data exchange. Draft agreements using the Research Partnerships templates.",
+      "sandbox_label": "Sandbox URL:",
+      "sandbox_body": "Link to the partner's test environment. Validate the integration in sandbox before promoting to live.",
+      "statuses_label": "Statuses:",
+      "statuses_body": "Proposed -> Scoping -> Sandbox -> Live. Blocked means an external dependency is unresolved."
+    },
+    "empty": {
+      "title": "No integrations tracked yet",
+      "body": "Seed a curated set of well-known partner-dependent integrations (AHV submission, Spitex handoff, cantonal master-data feed, PostFinance, Twint, postal-address verification) so the platform operator can track owner, DSA status, and sandbox readiness."
+    },
+    "last_updated": "Last updated {{date}}",
+    "table": {
+      "aria": "External integrations",
+      "name": "Name",
+      "category": "Category",
+      "owner": "Owner",
+      "status": "Status",
+      "dsa": "DSA",
+      "sandbox": "Sandbox",
+      "updated": "Updated",
+      "row_actions": "Row actions",
+      "actions": "Actions"
+    },
+    "categories": {
+      "banking": "Banking",
+      "payment": "Payment",
+      "identity_verification": "Identity verification",
+      "professional_care": "Professional care",
+      "municipal_data": "Municipal data",
+      "postal": "Postal",
+      "ahv": "AHV",
+      "healthcare": "Healthcare",
+      "other": "Other"
+    },
+    "statuses": {
+      "proposed": "Proposed",
+      "scoping": "Scoping",
+      "blocked": "Blocked",
+      "sandbox": "Sandbox",
+      "live": "Live",
+      "deprecated": "Deprecated"
+    },
+    "dsa_statuses": {
+      "not_required": "Not required",
+      "drafting": "Drafting",
+      "in_review": "In review",
+      "signed": "Signed"
+    },
+    "editor": {
+      "add_title": "Add integration",
+      "edit_title": "Edit: {{name}}",
+      "name": "Name",
+      "name_placeholder": "e.g. AHV submission gateway",
+      "category": "Category",
+      "status": "Status",
+      "owner_name": "Owner name",
+      "owner_name_placeholder": "External contact full name",
+      "owner_email": "Owner email",
+      "owner_email_placeholder": "contact@partner.example",
+      "interface_spec_url": "Interface specification URL",
+      "interface_spec_placeholder": "https://docs.partner.example/spec",
+      "dsa_status": "Data sharing agreement",
+      "sandbox_url": "Sandbox URL",
+      "sandbox_placeholder": "https://sandbox.partner.example",
+      "notes": "Notes",
+      "notes_placeholder": "Open questions, blockers, dependencies, contractual notes..."
+    },
+    "delete_modal": {
+      "title": "Remove integration",
+      "body_prefix": "This will permanently remove the backlog entry for",
+      "body_suffix": "The external partner record is not affected - only the tracking entry is removed.",
+      "warning": "This action cannot be undone."
+    },
+    "toasts": {
+      "load_failed": "Failed to load integration backlog",
+      "seeded": "Seeded default backlog",
+      "seed_failed": "Seed failed",
+      "updated": "Integration updated",
+      "update_failed": "Update failed",
+      "created": "Integration created",
+      "create_failed": "Create failed",
+      "removed": "Integration removed",
+      "delete_failed": "Delete failed"
+    }
+  },
   "billing": {
     "actions": "Actions",
     "billing_interval": "Billing Interval",
