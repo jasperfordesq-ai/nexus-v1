@@ -346,23 +346,31 @@ export function ExchangeDetailPage() {
   }
 
   if (isLoading) {
-    return <LoadingScreen message={t('detail.loading')} />;
+    return (
+      <>
+        <PageMeta title={t('detail.loading')} noIndex />
+        <LoadingScreen message={t('detail.loading')} />
+      </>
+    );
   }
 
   if (error || !exchange) {
     return (
-      <EmptyState
-        icon={<AlertTriangle className="w-12 h-12" />}
-        title={t('detail.not_found_title')}
-        description={error || t('detail.not_found_description')}
-        action={
-          <Link to={tenantPath("/exchanges")}>
-            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              {t('detail.view_exchanges')}
-            </Button>
-          </Link>
-        }
-      />
+      <>
+        <PageMeta title={t('detail.not_found_title')} noIndex />
+        <EmptyState
+          icon={<AlertTriangle className="w-12 h-12" />}
+          title={t('detail.not_found_title')}
+          description={error || t('detail.not_found_description')}
+          action={
+            <Link to={tenantPath("/exchanges")}>
+              <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+                {t('detail.view_exchanges')}
+              </Button>
+            </Link>
+          }
+        />
+      </>
     );
   }
 

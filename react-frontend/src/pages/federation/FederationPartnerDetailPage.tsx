@@ -137,6 +137,7 @@ export function FederationPartnerDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
+        <PageMeta title={t('partner_detail.loading')} noIndex />
         <Spinner size="lg" label={t('partner_detail.loading')} />
       </div>
     );
@@ -146,6 +147,7 @@ export function FederationPartnerDetailPage() {
   if (error || !partner) {
     return (
       <div className="space-y-6">
+        <PageMeta title={t('partner_detail.not_found_heading')} noIndex />
         <Breadcrumbs
           items={[
             { label: t('partner_detail.breadcrumb_federation'), href: tenantPath('/federation') },

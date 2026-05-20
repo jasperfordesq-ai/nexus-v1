@@ -211,6 +211,7 @@ export function KBArticlePage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
+        <PageMeta title={t('title')} noIndex />
         <Spinner size="lg" color="primary" />
       </div>
     );
@@ -219,6 +220,7 @@ export function KBArticlePage() {
   if (error) {
     return (
       <div className="space-y-6">
+        <PageMeta title={t('error.article_title')} noIndex />
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error.article_title')}</h2>
@@ -246,7 +248,7 @@ export function KBArticlePage() {
     );
   }
 
-  if (!article) return null;
+  if (!article) return <PageMeta title={t('error.article_title')} noIndex />;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">

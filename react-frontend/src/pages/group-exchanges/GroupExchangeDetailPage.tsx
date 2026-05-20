@@ -412,23 +412,31 @@ export function GroupExchangeDetailPage() {
   // ─────────────────────────────────────────────────────────────────────────
 
   if (isLoading) {
-    return <LoadingScreen message={t('detail.loading')} />;
+    return (
+      <>
+        <PageMeta title={t('detail.loading')} noIndex />
+        <LoadingScreen message={t('detail.loading')} />
+      </>
+    );
   }
 
   if (error || !exchange) {
     return (
-      <EmptyState
-        icon={<AlertTriangle className="w-12 h-12" />}
-        title={t('detail.not_found')}
-        description={error || t('detail.not_found_desc')}
-        action={
-          <Link to={tenantPath('/group-exchanges')}>
-            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              {t('detail.view_exchanges')}
-            </Button>
-          </Link>
-        }
-      />
+      <>
+        <PageMeta title={t('detail.not_found')} noIndex />
+        <EmptyState
+          icon={<AlertTriangle className="w-12 h-12" />}
+          title={t('detail.not_found')}
+          description={error || t('detail.not_found_desc')}
+          action={
+            <Link to={tenantPath('/group-exchanges')}>
+              <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+                {t('detail.view_exchanges')}
+              </Button>
+            </Link>
+          }
+        />
+      </>
     );
   }
 

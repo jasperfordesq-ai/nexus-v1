@@ -1021,12 +1021,18 @@ export function GroupDetailPage() {
   // ─────────────────────────────────────────────────────────────────────────
 
   if (isLoading) {
-    return <LoadingScreen message={t('detail.loading')} />;
+    return (
+      <>
+        <PageMeta title={t('detail.loading')} noIndex />
+        <LoadingScreen message={t('detail.loading')} />
+      </>
+    );
   }
 
   if (error || !group) {
     return (
       <div className="max-w-4xl mx-auto">
+        <PageMeta title={t('detail.unable_to_load')} noIndex />
         <GlassCard className="p-8 text-center">
           <AlertCircle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('detail.unable_to_load')}</h2>
