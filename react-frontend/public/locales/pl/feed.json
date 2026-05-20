@@ -216,7 +216,11 @@
     "image_remove_number_aria": "Remove image {{number}}",
     "alt_text_add": "Add alt text",
     "alt_text_edit": "Edit alt text",
-    "location_from_profile": "From your profile — update in Settings"
+    "location_from_profile": "From your profile — update in Settings",
+    "video_invalid_type": "Invalid video format. Use MP4, WebM, OGG, or MOV.",
+    "video_too_large": "Video must be under {{size}}MB.",
+    "video": "Video",
+    "video_remove": "Remove video"
   },
   "moderation": {
     "unauthorized": "You do not have permission to perform this action."

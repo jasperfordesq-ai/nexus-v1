@@ -239,7 +239,10 @@
     "no_listings_description": "{{name}} doesn't have any active listings right now.",
     "reviews_coming_soon_title": "Reviews Coming Soon",
     "reviews_coming_soon_description": "Buyer reviews will be available in Phase 2. Check back later to see what the community thinks about this seller.",
-    "view_listings": "View {{name}}'s marketplace listings."
+    "view_listings": "View {{name}}'s marketplace listings.",
+    "business": "Business",
+    "private": "Private",
+    "view_profile": "View Profile"
   },
   "category": {
     "not_found_title": "Category Not Found",

@@ -221,7 +221,11 @@
     "sdg_selected_other": "{{count}} goals selected",
     "content_required": "Post content cannot be empty.",
     "content_too_long": "Post is too long (max {{max}} characters).",
-    "groups_load_error": "Failed to load groups."
+    "groups_load_error": "Failed to load groups.",
+    "video_invalid_type": "Invalid video format. Use MP4, WebM, OGG, or MOV.",
+    "video_too_large": "Video must be under {{size}}MB.",
+    "video": "Video",
+    "video_remove": "Remove video"
   },
   "moderation": {
     "unauthorized": "You do not have permission to perform this action."
@@ -419,9 +423,17 @@
     "dm_done": "Done"
   },
   "video": {
-    "default_title": "Video",
-    "play_label": "Play video: {{title}}",
-    "thumbnail_alt": "Thumbnail for {{title}}"
+    "select": "Add Video",
+    "too_large": "Video must be smaller than {{size}}MB",
+    "invalid_type": "Invalid video format. Supported: MP4, WebM, MOV",
+    "remove": "Remove video",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "pause": "Pause",
+    "play": "Play",
+    "aria_label": "Video",
+    "unavailable": "Video unavailable",
+    "unavailable_desc": "This video could not be loaded."
   },
   "trending": {
     "title": "Trending",
@@ -542,19 +554,6 @@
     "time_credit": "Time Credit",
     "click_to_remove": "{{label}} (click to remove)",
     "react_to_post": "React to this post"
-  },
-  "video": {
-    "select": "Add Video",
-    "too_large": "Video must be smaller than {{size}}MB",
-    "invalid_type": "Invalid video format. Supported: MP4, WebM, MOV",
-    "remove": "Remove video",
-    "mute": "Mute",
-    "unmute": "Unmute",
-    "pause": "Pause",
-    "play": "Play",
-    "aria_label": "Video",
-    "unavailable": "Video unavailable",
-    "unavailable_desc": "This video could not be loaded."
   },
   "why_shown": {
     "label": "Why am I seeing this?",

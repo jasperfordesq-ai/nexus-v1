@@ -42,7 +42,7 @@ export function CollectionCard({ collection, thumbnails = [], onClick }: Collect
                   {thumbnails[i] ? (
                     <img
                       src={thumbnails[i]}
-                      alt={t('marketplace.collection_image', 'Collection image {{number}}', { number: i + 1 })}
+                      alt={t('collection_image', { number: i + 1 })}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
@@ -74,8 +74,8 @@ export function CollectionCard({ collection, thumbnails = [], onClick }: Collect
                 : <Lock className="w-3 h-3" />}
             >
               {collection.is_public
-                ? t('collections.public', 'Public')
-                : t('collections.private', 'Private')}
+                ? t('collections.public')
+                : t('collections.private')}
             </Chip>
           </div>
 
@@ -84,7 +84,7 @@ export function CollectionCard({ collection, thumbnails = [], onClick }: Collect
           )}
 
           <p className="text-xs text-default-400">
-            {t('collections.item_count', '{{count}} items', { count: collection.item_count })}
+            {t('collections.item_count', { count: collection.item_count })}
           </p>
         </div>
       </CardBody>

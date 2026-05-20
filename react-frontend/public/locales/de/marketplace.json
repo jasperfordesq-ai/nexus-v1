@@ -214,7 +214,10 @@
     "no_listings_description": "{{name}} hat derzeit keine aktiven Inserate.",
     "reviews_coming_soon_title": "Bewertungen kommen bald",
     "reviews_coming_soon_description": "Käuferbewertungen werden in Phase 2 verfügbar sein. Schauen Sie später wieder vorbei, um zu sehen, was die Gemeinschaft über diesen Verkäufer denkt.",
-    "view_listings": "Marktplatzinserate von {{name}} anzeigen."
+    "view_listings": "Marktplatzinserate von {{name}} anzeigen.",
+    "business": "Business",
+    "private": "Private",
+    "view_profile": "View Profile"
   },
   "category": {
     "not_found_title": "Kategorie nicht gefunden",

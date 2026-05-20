@@ -43,14 +43,14 @@ export function VideoUploader({ onVideoSelect, onVideoRemove, selectedVideo }: V
     setError(null);
 
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      setError(t('compose.video_invalid_type', 'Invalid video format. Use MP4, WebM, OGG, or MOV.'));
+      setError(t('compose.video_invalid_type'));
       if (inputRef.current) inputRef.current.value = '';
       return;
     }
 
     if (file.size > MAX_SIZE_BYTES) {
       setError(
-        t('compose.video_too_large', 'Video must be under {{size}}MB.', { size: MAX_SIZE_MB })
+        t('compose.video_too_large', { size: MAX_SIZE_MB })
       );
       if (inputRef.current) inputRef.current.value = '';
       return;
@@ -83,18 +83,18 @@ export function VideoUploader({ onVideoSelect, onVideoRemove, selectedVideo }: V
         <Button
           size="sm"
           variant="light"
-          startContent={<Video className="w-4 h-4" />}
+          startContent={<Video className="w-4 h-4" aria-hidden="true" />}
           onPress={handleTrigger}
           className="text-[var(--text-muted)]"
         >
-          {t('compose.video', 'Video')}
+          {t('compose.video')}
         </Button>
       )}
 
       {selectedVideo && (
         <div className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-elevated)]">
           <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-500/10">
-            <Video className="w-5 h-5 text-indigo-500" />
+            <Video className="w-5 h-5 text-indigo-500" aria-hidden="true" />
           </div>
           <div className="flex-1 min-w-0">
             <p
@@ -112,16 +112,16 @@ export function VideoUploader({ onVideoSelect, onVideoRemove, selectedVideo }: V
             size="sm"
             variant="light"
             onPress={handleRemove}
-            aria-label={t('compose.video_remove', 'Remove video')}
+            aria-label={t('compose.video_remove')}
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4" aria-hidden="true" />
           </Button>
         </div>
       )}
 
       {error && (
         <div className="flex items-center gap-2 mt-2 text-xs text-[var(--color-error)]">
-          <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+          <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
           <span>{error}</span>
         </div>
       )}

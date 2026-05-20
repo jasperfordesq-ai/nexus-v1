@@ -214,7 +214,10 @@
     "no_listings_description": "{{name}} は現在有効なリスティングがありません。",
     "reviews_coming_soon_title": "レビューは近日公開",
     "reviews_coming_soon_description": "バイヤーのレビューはフェーズ2で利用可能になります。後ほどご確認ください。",
-    "view_listings": "{{name}} のマーケットプレイスリスティングを表示。"
+    "view_listings": "{{name}} のマーケットプレイスリスティングを表示。",
+    "business": "Business",
+    "private": "Private",
+    "view_profile": "View Profile"
   },
   "category": {
     "not_found_title": "カテゴリが見つかりません",

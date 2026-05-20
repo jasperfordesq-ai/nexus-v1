@@ -214,7 +214,10 @@
     "no_listings_description": "{{name}} nie ma obecnie żadnych aktywnych ogłoszeń.",
     "reviews_coming_soon_title": "Opinie już wkrótce",
     "reviews_coming_soon_description": "Opinie kupujących będą dostępne w fazie 2. Zajrzyj później, aby zobaczyć, co społeczność sądzi o tym sprzedawcy.",
-    "view_listings": "Zobacz ogłoszenia {{name}} na marketplace."
+    "view_listings": "Zobacz ogłoszenia {{name}} na marketplace.",
+    "business": "Business",
+    "private": "Private",
+    "view_profile": "View Profile"
   },
   "category": {
     "not_found_title": "Nie znaleziono kategorii",

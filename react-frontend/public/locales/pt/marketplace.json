@@ -213,7 +213,10 @@
     "seller_type_business": "Business",
     "message": "Message",
     "tab_listings": "Listings",
-    "tab_reviews": "Reviews"
+    "tab_reviews": "Reviews",
+    "business": "Business",
+    "private": "Private",
+    "view_profile": "View Profile"
   },
   "category": {
     "not_found_title": "Categoria Não Encontrada",

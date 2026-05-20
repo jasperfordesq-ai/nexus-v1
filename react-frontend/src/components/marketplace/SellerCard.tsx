@@ -47,7 +47,7 @@ export function SellerCard({ seller }: SellerCardProps) {
           {seller.is_verified && (
             <CheckCircle
               className="w-4 h-4 text-[var(--color-info)] shrink-0"
-              aria-label={t('seller.verified', 'Verified')}
+              aria-label={t('seller.verified')}
             />
           )}
         </div>
@@ -59,8 +59,8 @@ export function SellerCard({ seller }: SellerCardProps) {
             className="mt-1"
           >
             {seller.seller_type === 'business'
-              ? t('seller.business', 'Business')
-              : t('seller.private', 'Private')}
+              ? t('seller.business')
+              : t('seller.private')}
           </Chip>
         )}
       </div>
@@ -68,7 +68,7 @@ export function SellerCard({ seller }: SellerCardProps) {
         to={tenantPath(`/marketplace/seller/${seller.id}`)}
         className="text-xs text-primary hover:underline shrink-0"
       >
-        {t('seller.view_profile', 'View Profile')}
+        {t('seller.view_profile')}
       </Link>
     </div>
   );
