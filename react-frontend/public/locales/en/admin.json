@@ -10133,7 +10133,7 @@
     "desc_newsletter": "Email newsletter campaigns, subscribers, segments, and analytics",
     "desc_partner_api": "Allow external partners to integrate with this tenant via the Partner API",
     "desc_regional_analytics": "Paid regional analytics product — monthly reports for municipalities and regional bodies",
-    "cost_warning": "This setting affects costs — review carefully before changing.",
+    "cost_warning": "This tenant is configured to use paid Google services. Google Places autocomplete is typically the largest cost driver ? sessions are billed per keystroke burst. Switch to Nominatim to remove that bill component entirely.",
     "currently_serving": "Currently serving",
     "status_autocomplete": "Autocomplete",
     "status_google_paid": "Google (paid)",
@@ -10141,7 +10141,15 @@
     "status_maps": "Maps",
     "status_nominatim_free": "Nominatim (free)",
     "status_off": "Off",
-    "status_osm_free": "OpenStreetMap (free)"
+    "status_osm_free": "OpenStreetMap (free)",
+    "language_settings_saved": "Language settings saved",
+    "language_settings_save_failed": "Failed to save language settings",
+    "maps_policy_locked": "Platform policy",
+    "maps_policy_desc": "Map view is globally disabled. Google Places autocomplete remains active via the geocoding provider below.",
+    "maps_kill_switch_aria": "Map display kill switch (locked off)",
+    "map_provider_aria": "Map provider",
+    "geocoding_provider_aria": "Autocomplete provider",
+    "clear_failed": "Failed to clear"
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",

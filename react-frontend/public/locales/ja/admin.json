@@ -7672,7 +7672,7 @@
     "status_autocomplete": "オートコンプリート",
     "status_google_places_paid": "Google Places（有料）",
     "status_nominatim_free": "Nominatim（無料）",
-    "cost_warning": "このテナントは有料の Google サービスを使用する設定です。Google Places オートコンプリートが通常もっとも大きな費用要因で、セッションはキー入力のバーストごとに課金されます。Nominatim に切り替えるとこの請求項目は完全になくなります。",
+    "cost_warning": "This tenant is configured to use paid Google services. Google Places autocomplete is typically the largest cost driver ? sessions are billed per keystroke burst. Switch to Nominatim to remove that bill component entirely.",
     "api_keys_card_title": "テナント別 API キーと課金",
     "api_keys_card_subtitle": "プラットフォーム既定値を上書き",
     "api_keys_intro": "このテナント独自の API キーをここで設定すると、請求はあなたの口座ではなくテナントの口座へ送られます。空欄のままにするとプラットフォームの既定値が使用されます。ブラウザ API キーは使用時に必然的に公開されますので、Console 側の制限（HTTP リファラー、IP、許可された API）で保護してください。",
@@ -7707,7 +7707,15 @@
     "desc_message_translation": "Auto-translate direct messages between members who speak different languages",
     "desc_newsletter": "Email newsletter campaigns, subscribers, segments, and analytics",
     "desc_partner_api": "Allow external partners to integrate with this tenant via the Partner API",
-    "desc_regional_analytics": "Paid regional analytics product — monthly reports for municipalities and regional bodies"
+    "desc_regional_analytics": "Paid regional analytics product — monthly reports for municipalities and regional bodies",
+    "language_settings_saved": "Language settings saved",
+    "language_settings_save_failed": "Failed to save language settings",
+    "maps_policy_locked": "Platform policy",
+    "maps_policy_desc": "Map view is globally disabled. Google Places autocomplete remains active via the geocoding provider below.",
+    "maps_kill_switch_aria": "Map display kill switch (locked off)",
+    "map_provider_aria": "Map provider",
+    "geocoding_provider_aria": "Autocomplete provider",
+    "clear_failed": "Failed to clear"
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",

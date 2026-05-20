@@ -127,10 +127,10 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       supported_languages: langSupported,
     });
     if (res.success) {
-      toast.success('Language settings saved');
+      toast.success(t('tenant_features.language_settings_saved'));
       refreshTenant();
     } else {
-      toast.error(res.error || 'Failed to save language settings');
+      toast.error(res.error || t('tenant_features.language_settings_save_failed'));
     }
     setSavingLang(false);
   };
@@ -142,10 +142,10 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       geocoding_provider: geocodingProvider,
     });
     if (res.success) {
-      toast.success(t('tenant_features.maps_providers_saved', { defaultValue: 'Map & location providers saved' }));
+      toast.success(t('tenant_features.maps_providers_saved'));
       refreshTenant();
     } else {
-      toast.error(res.error || t('tenant_features.maps_providers_save_failed', { defaultValue: 'Failed to save providers' }));
+      toast.error(res.error || t('tenant_features.maps_providers_save_failed'));
     }
     setSavingProviders(false);
   };
@@ -158,12 +158,12 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
     if (maptilerKeyInput !== '') payload.maptiler_api_key = maptilerKeyInput.trim();
     const res = await adminSettings.update(payload);
     if (res.success) {
-      toast.success(t('tenant_features.api_keys_saved', { defaultValue: 'API keys saved' }));
+      toast.success(t('tenant_features.api_keys_saved'));
       setGoogleMapsKeyInput('');
       setMaptilerKeyInput('');
       await loadSettings();
     } else {
-      toast.error(res.error || t('tenant_features.api_keys_save_failed', { defaultValue: 'Failed to save API keys' }));
+      toast.error(res.error || t('tenant_features.api_keys_save_failed'));
     }
     setSavingKeys(false);
   };
@@ -172,10 +172,10 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
     setSavingKeys(true);
     const res = await adminSettings.update({ google_maps_api_key: '' });
     if (res.success) {
-      toast.success(t('tenant_features.google_key_cleared', { defaultValue: 'Google key cleared — using platform default' }));
+      toast.success(t('tenant_features.google_key_cleared'));
       await loadSettings();
     } else {
-      toast.error(res.error || 'Failed to clear');
+      toast.error(res.error || t('tenant_features.clear_failed'));
     }
     setSavingKeys(false);
   };
@@ -184,10 +184,10 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
     setSavingKeys(true);
     const res = await adminSettings.update({ maptiler_api_key: '' });
     if (res.success) {
-      toast.success(t('tenant_features.maptiler_key_cleared', { defaultValue: 'MapTiler key cleared — using free OSM tiles' }));
+      toast.success(t('tenant_features.maptiler_key_cleared'));
       await loadSettings();
     } else {
-      toast.error(res.error || 'Failed to clear');
+      toast.error(res.error || t('tenant_features.clear_failed'));
     }
     setSavingKeys(false);
   };
@@ -208,16 +208,16 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Globe size={18} className="text-primary" />
-            <h3 className="font-semibold">{'Languages & Localisation'}</h3>
+            <h3 className="font-semibold">{t('tenant_features.language_localisation_heading')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4 space-y-4">
             <div>
-              <p className="text-sm font-medium mb-1">{'Default language'}</p>
+              <p className="text-sm font-medium mb-1">{t('tenant_features.default_language')}</p>
               <p className="text-xs text-default-400 mb-2">
-                {'The language users see by default on this platform'}
+                {t('tenant_features.default_language_hint')}
               </p>
               <Select
-                aria-label="Default Language"
+                aria-label={t('tenant_features.default_language')}
                 selectedKeys={[langDefault]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
@@ -233,9 +233,9 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
             </div>
             <Divider />
             <div>
-              <p className="text-sm font-medium mb-1">{'Available languages'}</p>
+              <p className="text-sm font-medium mb-1">{t('tenant_features.available_languages')}</p>
               <p className="text-xs text-default-400 mb-3">
-                {'Choose which languages members can switch to'}
+                {t('tenant_features.available_languages_hint')}
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {PLATFORM_LANGUAGES.map((lang) => (
@@ -248,7 +248,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                     <span className="text-sm">
                       {lang.label} ({lang.short})
                       {lang.code === 'en' && (
-                        <span className="ml-2 text-xs text-default-400">{'(always on)'}</span>
+                        <span className="ml-2 text-xs text-default-400">{t('tenant_features.always_enabled')}</span>
                       )}
                     </span>
                   </Checkbox>
@@ -263,7 +263,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 isDisabled={savingLang}
                 onPress={handleSaveLanguages}
               >
-                {'Save changes'}
+                {t('tenant_features.save_changes')}
               </Button>
             </div>
           </CardBody>
@@ -273,29 +273,29 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <MapPin size={18} className="text-warning" />
-            <h3 className="font-semibold">{t('tenant_features.maps_card_title', { defaultValue: 'Maps & location' })}</h3>
+            <h3 className="font-semibold">{t('tenant_features.maps_card_title')}</h3>
             <span className="text-sm text-default-400">
-              {t('tenant_features.maps_card_subtitle', { defaultValue: 'Cost & provider controls' })}
+              {t('tenant_features.maps_card_subtitle')}
             </span>
           </CardHeader>
           <CardBody className="px-4 pb-4 space-y-4">
             <div className="flex flex-wrap gap-2 items-center text-xs">
-              <span className="text-default-500">{t('tenant_features.currently_serving', { defaultValue: 'Currently serving:' })}</span>
+              <span className="text-default-500">{t('tenant_features.currently_serving')}:</span>
               <span className="px-2 py-0.5 rounded-full font-medium bg-default-200 text-default-600">
-                {t('tenant_features.status_maps', { defaultValue: 'Maps' })}{': '}
-                {t('tenant_features.status_off', { defaultValue: 'off' })}
+                {t('tenant_features.status_maps')}{': '}
+                {t('tenant_features.status_off')}
               </span>
               <span className={`px-2 py-0.5 rounded-full font-medium ${geocodingProvider === 'google' ? 'bg-warning-100 text-warning-700 dark:bg-warning-900/30 dark:text-warning-300' : 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300'}`}>
-                {t('tenant_features.status_autocomplete', { defaultValue: 'Autocomplete' })}{': '}
+                {t('tenant_features.status_autocomplete')}{': '}
                 {geocodingProvider === 'google'
-                  ? t('tenant_features.status_google_places_paid', { defaultValue: 'Google Places (paid)' })
-                  : t('tenant_features.status_nominatim_free', { defaultValue: 'Nominatim (free)' })}
+                  ? t('tenant_features.status_google_places_paid')
+                  : t('tenant_features.status_nominatim_free')}
               </span>
             </div>
 
             {geocodingProvider === 'google' && (
               <div className="rounded-lg bg-warning-50 dark:bg-warning-900/10 px-3 py-2 text-xs text-warning-700 dark:text-warning-300 border border-warning-200 dark:border-warning-800">
-                {t('tenant_features.cost_warning', { defaultValue: 'This tenant is configured to use paid Google services. Google Places autocomplete is typically the largest cost driver — sessions billed per keystroke burst. Switch to Nominatim to remove that bill component entirely.' })}
+                {t('tenant_features.cost_warning')}
               </div>
             )}
 
@@ -305,22 +305,22 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
               <div className="pr-4">
                 <div className="flex items-center gap-1.5 mb-0.5">
                   <p className="font-medium text-sm">
-                    {t('tenant_features.maps_kill_switch_label', { defaultValue: 'Map display (kill switch)' })}
+                    {t('tenant_features.maps_kill_switch_label')}
                   </p>
                   <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full bg-default-200 text-default-600">
                     <Lock size={10} />
-                    {'Platform policy'}
+                    {t('tenant_features.maps_policy_locked')}
                   </span>
                 </div>
                 <p className="text-xs text-default-500 mt-0.5">
-                  {'Map view is globally disabled. Google Places autocomplete remains active via the geocoding provider below.'}
+                  {t('tenant_features.maps_policy_desc')}
                 </p>
               </div>
               <Switch
                 isSelected={false}
                 isDisabled={true}
                 size="sm"
-                aria-label="Map display kill switch (locked off)"
+                aria-label={t('tenant_features.maps_kill_switch_aria')}
               />
             </div>
 
@@ -328,13 +328,13 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
 
             <div>
               <p className="text-sm font-medium mb-1">
-                {t('tenant_features.map_provider_label', { defaultValue: 'Map display provider' })}
+                {t('tenant_features.map_provider_label')}
               </p>
               <p className="text-xs text-default-400 mb-2">
-                {t('tenant_features.map_provider_desc', { defaultValue: 'Which service renders interactive maps. Google = paid, Places-quality. OpenStreetMap = free, community-maintained.' })}
+                {t('tenant_features.map_provider_desc')}
               </p>
               <Select
-                aria-label="Map provider"
+                aria-label={t('tenant_features.map_provider_aria')}
                 selectedKeys={[mapProvider]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
@@ -344,20 +344,20 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 size="sm"
                 isDisabled={true}
               >
-                <SelectItem key="google">{t('tenant_features.provider_google', { defaultValue: 'Google Maps (paid)' })}</SelectItem>
-                <SelectItem key="openstreetmap">{t('tenant_features.provider_osm', { defaultValue: 'OpenStreetMap (free)' })}</SelectItem>
+                <SelectItem key="google">{t('tenant_features.provider_google')}</SelectItem>
+                <SelectItem key="openstreetmap">{t('tenant_features.provider_osm')}</SelectItem>
               </Select>
             </div>
 
             <div>
               <p className="text-sm font-medium mb-1">
-                {t('tenant_features.geocoding_provider_label', { defaultValue: 'Address autocomplete provider' })}
+                {t('tenant_features.geocoding_provider_label')}
               </p>
               <p className="text-xs text-default-400 mb-2">
-                {t('tenant_features.geocoding_provider_desc', { defaultValue: 'Powers location search across registration, listings, events, groups, and volunteering. Always on — only the provider is configurable. Google Places is paid; Nominatim is free, slightly slower, and rate-limited.' })}
+                {t('tenant_features.geocoding_provider_desc')}
               </p>
               <Select
-                aria-label="Autocomplete provider"
+                aria-label={t('tenant_features.geocoding_provider_aria')}
                 selectedKeys={[geocodingProvider]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
@@ -366,8 +366,8 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 className="max-w-xs"
                 size="sm"
               >
-                <SelectItem key="google">{t('tenant_features.provider_google_places', { defaultValue: 'Google Places (paid)' })}</SelectItem>
-                <SelectItem key="nominatim">{t('tenant_features.provider_nominatim', { defaultValue: 'Nominatim / OpenStreetMap (free)' })}</SelectItem>
+                <SelectItem key="google">{t('tenant_features.provider_google_places')}</SelectItem>
+                <SelectItem key="nominatim">{t('tenant_features.provider_nominatim')}</SelectItem>
               </Select>
             </div>
 
@@ -379,7 +379,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 isDisabled={savingProviders}
                 onPress={handleSaveProviders}
               >
-                {t('tenant_features.save_changes', { defaultValue: 'Save changes' })}
+                {t('tenant_features.save_changes')}
               </Button>
             </div>
           </CardBody>
@@ -390,30 +390,30 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <KeyRound size={18} className="text-primary" />
             <h3 className="font-semibold">
-              {t('tenant_features.api_keys_card_title', { defaultValue: 'Per-tenant API keys & billing' })}
+              {t('tenant_features.api_keys_card_title')}
             </h3>
             <span className="text-sm text-default-400">
-              {t('tenant_features.api_keys_card_subtitle', { defaultValue: 'Override platform defaults' })}
+              {t('tenant_features.api_keys_card_subtitle')}
             </span>
           </CardHeader>
           <CardBody className="px-4 pb-4 space-y-5">
             <p className="text-xs text-default-500">
-              {t('tenant_features.api_keys_intro', { defaultValue: 'Set this tenant’s own API keys here so the bill goes to the tenant’s account, not yours. Leave a field blank to fall back to the platform default. Browser API keys are necessarily public when used; protect them via Console-side restrictions (HTTP referrer, IP, allowed APIs).' })}
+              {t('tenant_features.api_keys_intro')}
             </p>
 
             <div>
               <div className="flex items-center justify-between mb-1">
                 <p className="text-sm font-medium">
-                  {t('tenant_features.google_maps_api_key_label', { defaultValue: 'Google Maps / Places API key' })}
+                  {t('tenant_features.google_maps_api_key_label')}
                 </p>
                 <span className={`text-xs px-2 py-0.5 rounded-full ${googleMapsKeySet ? 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300' : 'bg-default-200 text-default-600'}`}>
                   {googleMapsKeySet
-                    ? t('tenant_features.key_status_set', { defaultValue: 'Tenant key set' })
-                    : t('tenant_features.key_status_default', { defaultValue: 'Using platform default' })}
+                    ? t('tenant_features.key_status_set')
+                    : t('tenant_features.key_status_default')}
                 </span>
               </div>
               <p className="text-xs text-default-400 mb-2">
-                {t('tenant_features.google_maps_api_key_hint', { defaultValue: 'Used for both map display (Google branch) and Places autocomplete. One key with both APIs enabled is the typical setup. Get one at console.cloud.google.com → APIs & Services → Credentials.' })}
+                {t('tenant_features.google_maps_api_key_hint')}
               </p>
               <div className="flex gap-2">
                 <Input
@@ -446,7 +446,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                     isDisabled={savingKeys}
                     onPress={handleClearGoogleKey}
                   >
-                    {t('tenant_features.clear', { defaultValue: 'Clear' })}
+                    {t('tenant_features.clear')}
                   </Button>
                 )}
               </div>
@@ -454,10 +454,10 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
 
             <div>
               <p className="text-sm font-medium mb-1">
-                {t('tenant_features.google_map_id_label', { defaultValue: 'Google Map ID (optional)' })}
+                {t('tenant_features.google_map_id_label')}
               </p>
               <p className="text-xs text-default-400 mb-2">
-                {t('tenant_features.google_map_id_hint', { defaultValue: 'A Map ID enables custom Cloud-based map styling. Leave blank for default styling.' })}
+                {t('tenant_features.google_map_id_hint')}
               </p>
               <Input
                 aria-label="Google Map ID"
@@ -476,16 +476,16 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
             <div>
               <div className="flex items-center justify-between mb-1">
                 <p className="text-sm font-medium">
-                  {t('tenant_features.maptiler_api_key_label', { defaultValue: 'MapTiler API key (paid OSM tile host)' })}
+                  {t('tenant_features.maptiler_api_key_label')}
                 </p>
                 <span className={`text-xs px-2 py-0.5 rounded-full ${maptilerKeySet ? 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300' : 'bg-default-200 text-default-600'}`}>
                   {maptilerKeySet
-                    ? t('tenant_features.tiles_status_maptiler', { defaultValue: 'MapTiler tiles' })
-                    : t('tenant_features.tiles_status_free_osm', { defaultValue: 'Free OSM tiles' })}
+                    ? t('tenant_features.tiles_status_maptiler')
+                    : t('tenant_features.tiles_status_free_osm')}
                 </span>
               </div>
               <p className="text-xs text-default-400 mb-2">
-                {t('tenant_features.maptiler_api_key_hint', { defaultValue: 'Only used when this tenant’s map_provider is OpenStreetMap. Switches from the free tile.openstreetmap.org service (subject to OSMF policy at scale) to MapTiler’s paid host with proper dark mode and high-throughput tile delivery. Free tier covers ~100k tiles/month. Get a key at maptiler.com → Cloud → API keys.' })}
+                {t('tenant_features.maptiler_api_key_hint')}
               </p>
               <div className="flex gap-2">
                 <Input
@@ -518,7 +518,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                     isDisabled={savingKeys}
                     onPress={handleClearMaptilerKey}
                   >
-                    {t('tenant_features.clear', { defaultValue: 'Clear' })}
+                    {t('tenant_features.clear')}
                   </Button>
                 )}
               </div>
@@ -532,7 +532,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 isDisabled={savingKeys || (!googleMapsKeyInput && !maptilerKeyInput && googleMapId === '')}
                 onPress={handleSaveApiKeys}
               >
-                {t('tenant_features.save_api_keys', { defaultValue: 'Save API keys' })}
+                {t('tenant_features.save_api_keys')}
               </Button>
             </div>
           </CardBody>

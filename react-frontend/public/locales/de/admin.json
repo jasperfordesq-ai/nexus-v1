@@ -7672,7 +7672,7 @@
     "status_autocomplete": "Autovervollständigung",
     "status_google_places_paid": "Google Places (kostenpflichtig)",
     "status_nominatim_free": "Nominatim (kostenlos)",
-    "cost_warning": "Dieser Mandant ist für kostenpflichtige Google-Dienste konfiguriert. Google Places-Autovervollständigung ist meist der größte Kostentreiber — Sitzungen werden pro Tastendruck-Burst abgerechnet. Wechsel auf Nominatim entfernt diesen Posten vollständig.",
+    "cost_warning": "This tenant is configured to use paid Google services. Google Places autocomplete is typically the largest cost driver ? sessions are billed per keystroke burst. Switch to Nominatim to remove that bill component entirely.",
     "api_keys_card_title": "API-Schlüssel pro Mandant & Abrechnung",
     "api_keys_card_subtitle": "Plattform-Standards überschreiben",
     "api_keys_intro": "Hinterlegen Sie hier die eigenen API-Schlüssel dieses Mandanten, damit die Rechnung an dessen Konto geht, nicht an Ihres. Lassen Sie ein Feld leer, um auf den Plattform-Standard zurückzufallen. Browser-API-Schlüssel sind im Einsatz zwangsläufig öffentlich; schützen Sie sie über Console-seitige Einschränkungen (HTTP-Referrer, IP, erlaubte APIs).",
@@ -7707,7 +7707,15 @@
     "desc_message_translation": "Auto-translate direct messages between members who speak different languages",
     "desc_newsletter": "Email newsletter campaigns, subscribers, segments, and analytics",
     "desc_partner_api": "Allow external partners to integrate with this tenant via the Partner API",
-    "desc_regional_analytics": "Paid regional analytics product — monthly reports for municipalities and regional bodies"
+    "desc_regional_analytics": "Paid regional analytics product — monthly reports for municipalities and regional bodies",
+    "language_settings_saved": "Language settings saved",
+    "language_settings_save_failed": "Failed to save language settings",
+    "maps_policy_locked": "Platform policy",
+    "maps_policy_desc": "Map view is globally disabled. Google Places autocomplete remains active via the geocoding provider below.",
+    "maps_kill_switch_aria": "Map display kill switch (locked off)",
+    "map_provider_aria": "Map provider",
+    "geocoding_provider_aria": "Autocomplete provider",
+    "clear_failed": "Failed to clear"
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",
