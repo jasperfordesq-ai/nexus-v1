@@ -119,7 +119,7 @@ export function CommunityDeliveryCard({
         estimated_minutes: estimatedMinutes ? parseInt(estimatedMinutes, 10) : undefined,
         notes: notes || undefined,
       });
-      toast.success(t('community_delivery.offer_sent', 'Delivery offer sent!'));
+      toast.success(t('community_delivery.offer_sent'));
       onClose();
       setTimeCredits('1');
       setEstimatedMinutes('');
@@ -127,7 +127,7 @@ export function CommunityDeliveryCard({
       loadOffers();
     } catch (err) {
       logError('Failed to submit delivery offer', err);
-      toast.error(t('community_delivery.offer_failed', 'Failed to send delivery offer'));
+      toast.error(t('community_delivery.offer_failed'));
     } finally {
       setSubmitting(false);
     }
@@ -137,11 +137,11 @@ export function CommunityDeliveryCard({
     if (!orderId) return;
     try {
       await api.put(`/v2/marketplace/orders/${orderId}/delivery-offers/${delivererId}/accept`);
-      toast.success(t('community_delivery.offer_accepted', 'Delivery offer accepted!'));
+      toast.success(t('community_delivery.offer_accepted'));
       loadOffers();
     } catch (err) {
       logError('Failed to accept delivery offer', err);
-      toast.error(t('community_delivery.accept_failed', 'Failed to accept offer'));
+      toast.error(t('community_delivery.accept_failed'));
     }
   };
 
@@ -149,11 +149,11 @@ export function CommunityDeliveryCard({
     if (!orderId) return;
     try {
       await api.put(`/v2/marketplace/orders/${orderId}/delivery-offers/${delivererId}/confirm`);
-      toast.success(t('community_delivery.delivery_confirmed', 'Delivery confirmed! Time credits awarded.'));
+      toast.success(t('community_delivery.delivery_confirmed'));
       loadOffers();
     } catch (err) {
       logError('Failed to confirm delivery', err);
-      toast.error(t('community_delivery.confirm_failed', 'Failed to confirm delivery'));
+      toast.error(t('community_delivery.confirm_failed'));
     }
   };
 
@@ -169,7 +169,7 @@ export function CommunityDeliveryCard({
 
   return (
     <>
-      <Card className="border border-primary/20 bg-primary/5">
+      <Card className="border border-primary/20 bg-primary/5 shadow-sm">
         <CardBody className="gap-4">
           {/* Header */}
           <div className="flex items-start gap-3">
@@ -178,20 +178,14 @@ export function CommunityDeliveryCard({
             </div>
             <div className="flex-1">
               <h4 className="text-sm font-semibold text-theme-primary">
-                {t('community_delivery.title', 'Community Delivery')}
+                {t('community_delivery.title')}
               </h4>
               <p className="text-xs text-theme-muted mt-0.5">
-                {t(
-                  'community_delivery.description',
-                  'A community member can deliver this item and earn time credits.'
-                )}
+                {t('community_delivery.description')}
               </p>
             </div>
             <Tooltip
-              content={t(
-                'community_delivery.tooltip',
-                'Community delivery is a NEXUS feature where community members offer to deliver items for time credits instead of cash. This supports the local community and the timebanking ecosystem.'
-              )}
+              content={t('community_delivery.tooltip')}
             >
               <HelpCircle className="w-4 h-4 text-theme-muted cursor-help flex-shrink-0" />
             </Tooltip>
@@ -202,15 +196,15 @@ export function CommunityDeliveryCard({
             <div className="space-y-2 text-xs text-theme-muted">
               <div className="flex items-center gap-2">
                 <Users className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                <span>{t('community_delivery.step1', 'Community members offer to deliver')}</span>
+                <span>{t('community_delivery.step1')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                <span>{t('community_delivery.step2', 'Deliverer earns time credits on completion')}</span>
+                <span>{t('community_delivery.step2')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                <span>{t('community_delivery.step3', 'Buyer confirms delivery, credits are transferred')}</span>
+                <span>{t('community_delivery.step3')}</span>
               </div>
             </div>
           )}
@@ -219,12 +213,12 @@ export function CommunityDeliveryCard({
           {!informational && offers.length > 0 && (
             <div className="space-y-2">
               <h5 className="text-xs font-medium text-theme-muted uppercase tracking-wider">
-                {t('community_delivery.offers_title', 'Delivery Offers')} ({offers.length})
+                {t('community_delivery.offers_title_count', { count: offers.length })}
               </h5>
               {offers.map(offer => (
                 <div
                   key={offer.id}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)]"
+                  className="flex flex-col gap-3 rounded-lg border border-default-200 bg-content1 p-3 shadow-sm sm:flex-row sm:items-center"
                 >
                   {offer.deliverer && (
                     <Avatar
@@ -236,17 +230,17 @@ export function CommunityDeliveryCard({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-theme-primary truncate">
-                        {offer.deliverer?.name ?? t('community_delivery.unknown', 'Unknown')}
+                        {offer.deliverer?.name ?? t('community_delivery.unknown')}
                       </span>
                       <Chip size="sm" color={statusColor(offer.status)} variant="flat">
-                        {offer.status}
+                        {t(`community_delivery.status.${offer.status}`)}
                       </Chip>
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       <Clock className="w-3 h-3 text-primary" />
                       <span className="text-xs text-theme-muted">
-                        {offer.time_credits} TC
-                        {offer.estimated_minutes && ` - ~${offer.estimated_minutes} min`}
+                        {t('community_delivery.time_credits_value', { count: offer.time_credits })}
+                        {offer.estimated_minutes && ` - ${t('community_delivery.estimated_minutes', { count: offer.estimated_minutes })}`}
                       </span>
                     </div>
                     {offer.notes && (
@@ -262,7 +256,7 @@ export function CommunityDeliveryCard({
                       variant="flat"
                       onPress={() => handleAcceptOffer(offer.deliverer_id)}
                     >
-                      {t('community_delivery.accept', 'Accept')}
+                      {t('community_delivery.accept')}
                     </Button>
                   )}
                   {isOwner && offer.status === 'accepted' && (
@@ -272,7 +266,7 @@ export function CommunityDeliveryCard({
                       variant="flat"
                       onPress={() => handleConfirmDelivery(offer.deliverer_id)}
                     >
-                      {t('community_delivery.confirm', 'Confirm Delivery')}
+                      {t('community_delivery.confirm')}
                     </Button>
                   )}
                 </div>
@@ -295,7 +289,7 @@ export function CommunityDeliveryCard({
               onPress={onOpen}
               className="w-full"
             >
-              {t('community_delivery.offer_to_deliver', 'Offer to Deliver')}
+              {t('community_delivery.offer_to_deliver')}
             </Button>
           )}
         </CardBody>
@@ -305,45 +299,36 @@ export function CommunityDeliveryCard({
       <Modal isOpen={isOpen} onClose={onClose} size="md">
         <ModalContent>
           <ModalHeader>
-            {t('community_delivery.offer_modal_title', 'Offer to Deliver')}
+            {t('community_delivery.offer_modal_title')}
           </ModalHeader>
           <ModalBody className="gap-4">
             <p className="text-sm text-theme-muted">
-              {t(
-                'community_delivery.offer_modal_description',
-                'Offer to deliver this item and earn time credits. The buyer/seller will review your offer.'
-              )}
+              {t('community_delivery.offer_modal_description')}
             </p>
             <Input
               type="number"
-              label={t('community_delivery.time_credits_label', 'Time Credits (hours)')}
-              placeholder="1.0"
+              label={t('community_delivery.time_credits_label')}
+              placeholder={t('community_delivery.time_credits_placeholder')}
               value={timeCredits}
               onValueChange={setTimeCredits}
               min={0.25}
               max={100}
               step={0.25}
               startContent={<Clock className="w-4 h-4 text-theme-muted" />}
-              description={t(
-                'community_delivery.time_credits_hint',
-                'How many time credits you want to earn for this delivery'
-              )}
+              description={t('community_delivery.time_credits_hint')}
             />
             <Input
               type="number"
-              label={t('community_delivery.estimated_time_label', 'Estimated Delivery Time (minutes)')}
-              placeholder="30"
+              label={t('community_delivery.estimated_time_label')}
+              placeholder={t('community_delivery.estimated_time_placeholder')}
               value={estimatedMinutes}
               onValueChange={setEstimatedMinutes}
               min={5}
               max={1440}
             />
             <Textarea
-              label={t('community_delivery.notes_label', 'Notes (optional)')}
-              placeholder={t(
-                'community_delivery.notes_placeholder',
-                'Any details about your delivery availability...'
-              )}
+              label={t('community_delivery.notes_label')}
+              placeholder={t('community_delivery.notes_placeholder')}
               value={notes}
               onValueChange={setNotes}
               maxLength={500}
@@ -351,7 +336,7 @@ export function CommunityDeliveryCard({
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onClose}>
-              {t('common.cancel', 'Cancel')}
+              {t('community_delivery.cancel')}
             </Button>
             <Button
               color="primary"
@@ -359,7 +344,7 @@ export function CommunityDeliveryCard({
               onPress={handleSubmitOffer}
               isDisabled={!timeCredits || parseFloat(timeCredits) <= 0}
             >
-              {t('community_delivery.send_offer', 'Send Offer')}
+              {t('community_delivery.send_offer')}
             </Button>
           </ModalFooter>
         </ModalContent>
