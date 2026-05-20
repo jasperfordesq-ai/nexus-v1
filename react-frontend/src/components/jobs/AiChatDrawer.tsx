@@ -52,32 +52,32 @@ export function AiChatDrawer({
         size="lg"
         className="fixed bottom-6 right-6 z-40 rounded-full shadow-lg"
         onPress={onOpen}
-        aria-label={t('ai_chat.open', { defaultValue: 'Ask AI about this job' })}
+        aria-label={t('ai_chat.open')}
       >
-        <Sparkles size={22} />
+        <Sparkles size={22} aria-hidden="true" />
       </Button>
       {isOpen && (
         <div className="fixed bottom-0 right-0 z-50 w-full max-w-md h-[500px] bg-background border-l border-t border-divider rounded-tl-2xl shadow-2xl flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-divider">
             <div className="flex items-center gap-2">
-              <Sparkles size={18} className="text-secondary" />
-              <span className="font-semibold text-sm">{t('ai_chat.title', { defaultValue: 'Ask AI about this job' })}</span>
+              <Sparkles size={18} className="text-secondary" aria-hidden="true" />
+              <span className="font-semibold text-sm">{t('ai_chat.title')}</span>
             </div>
             <Button
               isIconOnly
               size="sm"
               variant="light"
               onPress={onClose}
-              aria-label={t('ai_chat.close', { defaultValue: 'Close AI chat' })}
+              aria-label={t('ai_chat.close')}
             >
-              <X size={16} />
+              <X size={16} aria-hidden="true" />
             </Button>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.length === 0 && (
               <div className="text-center text-default-400 text-sm py-8">
-                <Sparkles size={24} className="mx-auto mb-2 text-secondary" />
-                <p>{t('ai_chat.hint', { defaultValue: 'Ask me anything about this job — qualifications, salary, how to apply, interview tips...' })}</p>
+                <Sparkles size={24} className="mx-auto mb-2 text-secondary" aria-hidden="true" />
+                <p>{t('ai_chat.hint')}</p>
               </div>
             )}
             {messages.map((msg, i) => (
@@ -99,7 +99,7 @@ export function AiChatDrawer({
           <div className="p-3 border-t border-divider flex gap-2">
             <Input
               size="sm"
-              placeholder={t('ai_chat.placeholder', { defaultValue: 'Type your question...' })}
+              placeholder={t('ai_chat.placeholder')}
               value={inputValue}
               onValueChange={onInputChange}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSend(); } }}
@@ -111,9 +111,9 @@ export function AiChatDrawer({
               color="primary"
               onPress={onSend}
               isDisabled={!inputValue.trim() || isLoading}
-              aria-label={t('ai_chat.send', { defaultValue: 'Send message' })}
+              aria-label={t('ai_chat.send')}
             >
-              <Send size={14} />
+              <Send size={14} aria-hidden="true" />
             </Button>
           </div>
         </div>
