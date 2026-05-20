@@ -21,12 +21,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Note: no tokenable_type filter — all rows in personal_access_tokens
+        // are App\Models\User and the backslash escaping is fragile across DBs.
         DB::statement("
             UPDATE users u
             INNER JOIN (
                 SELECT tokenable_id AS user_id, MAX(created_at) AS latest_token
                 FROM personal_access_tokens
-                WHERE tokenable_type = 'App\\\\Models\\\\User'
                 GROUP BY tokenable_id
             ) t ON t.user_id = u.id
             SET u.last_login_at = t.latest_token
