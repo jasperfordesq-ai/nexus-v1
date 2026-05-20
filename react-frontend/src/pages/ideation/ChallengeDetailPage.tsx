@@ -707,10 +707,10 @@ export function ChallengeDetailPage() {
             <Button
               color="primary"
               variant="flat"
-              startContent={<RefreshCw className="w-4 h-4" />}
+              startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => fetchChallenge()}
             >
-              {t('actions.retry', { defaultValue: 'Retry' })}
+              {t('actions.retry')}
             </Button>
           }
         />
@@ -806,9 +806,9 @@ export function ChallengeDetailPage() {
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 flex items-center justify-center mb-4">
           <Lightbulb className="w-8 h-8 text-[var(--color-warning)]" aria-hidden="true" />
         </div>
-        <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('campaigns.feature_not_available', 'Ideation Not Available')}</h2>
+        <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('campaigns.feature_not_available')}</h2>
         <p className="text-[var(--color-text-muted)] max-w-sm">
-          {t('campaigns.feature_not_available_desc', 'The ideation feature is not enabled for this community. Contact your timebank administrator to learn more.')}
+          {t('campaigns.feature_not_available_desc')}
         </p>
       </div>
     );
@@ -831,7 +831,7 @@ export function ChallengeDetailPage() {
       {/* Back link */}
       <Button
         variant="light"
-        startContent={<ArrowLeft className="w-4 h-4" />}
+        startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
         className="mb-4 -ml-2"
         onPress={() => navigate(tenantPath('/ideation'))}
       >
@@ -870,7 +870,7 @@ export function ChallengeDetailPage() {
                   size="sm"
                   color="warning"
                   variant="flat"
-                  startContent={<Star className="w-3 h-3 fill-current" />}
+                  startContent={<Star className="w-3 h-3 fill-current" aria-hidden="true" />}
                 >
                   {t('featured')}
                 </Chip>
@@ -889,7 +889,7 @@ export function ChallengeDetailPage() {
                   size="sm"
                   variant="flat"
                   color="secondary"
-                  startContent={<Layers className="w-3 h-3" />}
+                  startContent={<Layers className="w-3 h-3" aria-hidden="true" />}
                 >
                   {challenge.campaign_name}
                 </Chip>
@@ -920,8 +920,8 @@ export function ChallengeDetailPage() {
             {isAdmin && (
               <Dropdown>
                 <DropdownTrigger>
-                  <Button isIconOnly variant="flat" size="sm" aria-label={t('challenge_detail.actions', { defaultValue: 'Challenge actions' })}>
-                    <MoreVertical className="w-4 h-4" />
+                  <Button isIconOnly variant="flat" size="sm" aria-label={t('challenge_detail.actions')}>
+                    <MoreVertical className="w-4 h-4" aria-hidden="true" />
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu aria-label={t('admin.change_status')} items={adminMenuItems}>
@@ -1021,12 +1021,12 @@ export function ChallengeDetailPage() {
         <GlassCard className="p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-[var(--color-text)] flex items-center gap-2">
-              <Target className="w-5 h-5" />
+              <Target className="w-5 h-5" aria-hidden="true" />
               {t('outcomes.title')}
             </h2>
             {isAdmin && (
-              <Button variant="flat" size="sm" onPress={onOutcomeOpen} aria-label={t('outcomes.edit', 'Edit outcomes')}>
-                <Edit3 className="w-4 h-4" />
+              <Button variant="flat" size="sm" onPress={onOutcomeOpen} aria-label={t('outcomes.edit')}>
+                <Edit3 className="w-4 h-4" aria-hidden="true" />
               </Button>
             )}
           </div>
@@ -1038,7 +1038,7 @@ export function ChallengeDetailPage() {
                   {t('outcomes.winning_idea')}
                 </span>
                 <p className="text-[var(--color-text)] flex items-center gap-2 mt-0.5">
-                  <Award className="w-4 h-4 text-[var(--color-warning)]" />
+                  <Award className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />
                   {outcome.winning_idea_title}
                 </p>
               </div>
@@ -1046,7 +1046,7 @@ export function ChallengeDetailPage() {
 
             <div>
               <span className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                {t('outcomes.status_label', { defaultValue: 'Status' })}
+                {t('outcomes.status_label')}
               </span>
               <div className="mt-0.5">
                 <Chip
@@ -1081,7 +1081,7 @@ export function ChallengeDetailPage() {
 
         <div className="flex items-center gap-2">
           {/* Sort Toggle */}
-          <div className="flex rounded-lg overflow-hidden border border-[var(--color-border)]" role="group" aria-label={t('ideas.sort_label', { defaultValue: 'Sort ideas' })}>
+          <div className="flex rounded-lg overflow-hidden border border-[var(--color-border)]" role="group" aria-label={t('ideas.sort_label')}>
             <Button
               variant={sortMode === 'votes' ? 'solid' : 'flat'}
               color={sortMode === 'votes' ? 'primary' : 'default'}
@@ -1532,7 +1532,7 @@ export function ChallengeDetailPage() {
             )}
 
             <Select
-              label={t('outcomes.implementation_status_label', { defaultValue: 'Implementation Status' })}
+              label={t('outcomes.implementation_status_label')}
               selectedKeys={[outcomeForm.implementation_status]}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0];

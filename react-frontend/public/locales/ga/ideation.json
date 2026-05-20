@@ -81,7 +81,8 @@
     "untitled_draft": "Dreacht Gan Teideal",
     "draft_updated": "Nuashonraithe {{date}}",
     "draft_created": "Cruthaithe {{date}}",
-    "new_idea": "Smaoineamh Nua"
+    "new_idea": "Smaoineamh Nua",
+    "sort_label": "Sort ideas"
   },
   "idea_detail": {
     "page_title": "Sonrai an Smaoineamh",
@@ -302,7 +303,9 @@
     "challenges_count": "{{count}} dúshlán",
     "challenges_count_one": "{{count}} dúshlán",
     "link_challenge": "Nasc Dúshlán",
-    "unlink_challenge": "Dínasc Dúshlán"
+    "unlink_challenge": "Dínasc Dúshlán",
+    "feature_not_available": "Ideation Not Available",
+    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },
   "templates": {
     "title": "Teimpléid Dúshláin",
@@ -331,7 +334,8 @@
     "dashboard": "Painéal Tionchair",
     "total_challenges": "Iomlán Rianta",
     "implemented_count": "Curtha i bhFeidhm",
-    "in_progress_count": "Ar Siúl"
+    "in_progress_count": "Ar Siúl",
+    "edit": "Edit outcomes"
   },
   "tasks": {
     "title": "Tascanna",
@@ -403,5 +407,8 @@
     "campaigns": {
       "title": "Campaigns"
     }
+  },
+  "challenge_detail": {
+    "actions": "Challenge actions"
   }
 }

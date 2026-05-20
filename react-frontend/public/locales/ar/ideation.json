@@ -82,7 +82,8 @@
     "untitled_draft": "مسودة بلا عنوان",
     "draft_updated": "تم تحديث {{date}}",
     "draft_created": "تم إنشاء {{date}}",
-    "new_idea": "فكرة جديدة"
+    "new_idea": "فكرة جديدة",
+    "sort_label": "Sort ideas"
   },
   "idea_detail": {
     "page_title": "تفاصيل الفكرة",
@@ -303,7 +304,9 @@
     "challenges_count": "{{count}} تحديات",
     "challenges_count_one": "{{count}} تحدي",
     "link_challenge": "ربط التحدي",
-    "unlink_challenge": "فك ارتباط التحدي"
+    "unlink_challenge": "فك ارتباط التحدي",
+    "feature_not_available": "Ideation Not Available",
+    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },
   "templates": {
     "title": "قوالب التحديات",
@@ -332,7 +335,8 @@
     "dashboard": "لوحة تأثير",
     "total_challenges": "الإجمالي المتعقب",
     "implemented_count": "Implemented",
-    "in_progress_count": "قيد التنفيذ"
+    "in_progress_count": "قيد التنفيذ",
+    "edit": "Edit outcomes"
   },
   "tasks": {
     "title": "Tasks",
@@ -403,5 +407,8 @@
     "campaigns": {
       "title": "Campaigns"
     }
+  },
+  "challenge_detail": {
+    "actions": "Challenge actions"
   }
 }

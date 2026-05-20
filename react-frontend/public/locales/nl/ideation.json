@@ -82,7 +82,8 @@
     "untitled_draft": "Ongetiteld Concept",
     "draft_updated": "Bijgewerkt {{date}}",
     "draft_created": "Aangemaakt {{date}}",
-    "new_idea": "Nieuw Idee"
+    "new_idea": "Nieuw Idee",
+    "sort_label": "Sort ideas"
   },
   "idea_detail": {
     "page_title": "Idee Details",
@@ -303,7 +304,9 @@
     "challenges_count": "{{count}} uitdagingen",
     "challenges_count_one": "{{count}} uitdaging",
     "link_challenge": "Koppel Uitdaging",
-    "unlink_challenge": "Ontkoppel Uitdaging"
+    "unlink_challenge": "Ontkoppel Uitdaging",
+    "feature_not_available": "Ideation Not Available",
+    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },
   "templates": {
     "title": "Uitdaging Sjablonen",
@@ -332,7 +335,8 @@
     "dashboard": "Impact Dashboard",
     "total_challenges": "Totaal Gevolgd",
     "implemented_count": "Implemented",
-    "in_progress_count": "In Behandeling"
+    "in_progress_count": "In Behandeling",
+    "edit": "Edit outcomes"
   },
   "tasks": {
     "title": "Tasks",
@@ -403,5 +407,8 @@
     "campaigns": {
       "title": "Campaigns"
     }
+  },
+  "challenge_detail": {
+    "actions": "Challenge actions"
   }
 }

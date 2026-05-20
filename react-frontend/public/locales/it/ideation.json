@@ -82,7 +82,8 @@
     "untitled_draft": "Bozza Senza Titolo",
     "draft_updated": "Aggiornata {{date}}",
     "draft_created": "Creata {{date}}",
-    "new_idea": "Nuova Idea"
+    "new_idea": "Nuova Idea",
+    "sort_label": "Sort ideas"
   },
   "idea_detail": {
     "page_title": "Dettagli dell'Idea",
@@ -303,7 +304,9 @@
     "challenges_count": "{{count}} sfide",
     "challenges_count_one": "{{count}} sfida",
     "link_challenge": "Collega Sfida",
-    "unlink_challenge": "Scollega Sfida"
+    "unlink_challenge": "Scollega Sfida",
+    "feature_not_available": "Ideation Not Available",
+    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },
   "templates": {
     "title": "Modelli di Sfida",
@@ -332,7 +335,8 @@
     "dashboard": "Dashboard dell'Impatto",
     "total_challenges": "Totale Monitorato",
     "implemented_count": "Implementati",
-    "in_progress_count": "In Corso"
+    "in_progress_count": "In Corso",
+    "edit": "Edit outcomes"
   },
   "tasks": {
     "title": "Attivita",
@@ -403,5 +407,8 @@
     "campaigns": {
       "title": "Campaigns"
     }
+  },
+  "challenge_detail": {
+    "actions": "Challenge actions"
   }
 }

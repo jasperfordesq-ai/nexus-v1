@@ -82,7 +82,8 @@
     "untitled_draft": "Rascunho Sem Título",
     "draft_updated": "Atualizado {{date}}",
     "draft_created": "Criado {{date}}",
-    "new_idea": "Nova Ideia"
+    "new_idea": "Nova Ideia",
+    "sort_label": "Sort ideas"
   },
   "idea_detail": {
     "page_title": "Detalhes da Ideia",
@@ -303,7 +304,9 @@
     "challenges_count": "{{count}} desafios",
     "challenges_count_one": "{{count}} desafio",
     "link_challenge": "Associar Desafio",
-    "unlink_challenge": "Desassociar Desafio"
+    "unlink_challenge": "Desassociar Desafio",
+    "feature_not_available": "Ideation Not Available",
+    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },
   "templates": {
     "title": "Modelos de Desafio",
@@ -332,7 +335,8 @@
     "dashboard": "Painel de Impacto",
     "total_challenges": "Total Rastreado",
     "implemented_count": "Implementados",
-    "in_progress_count": "Em Progresso"
+    "in_progress_count": "Em Progresso",
+    "edit": "Edit outcomes"
   },
   "tasks": {
     "title": "Tarefas",
@@ -403,5 +407,8 @@
     "campaigns": {
       "title": "Campaigns"
     }
+  },
+  "challenge_detail": {
+    "actions": "Challenge actions"
   }
 }

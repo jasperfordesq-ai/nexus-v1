@@ -82,7 +82,8 @@
     "untitled_draft": "Unbenannter Entwurf",
     "draft_updated": "Aktualisiert {{date}}",
     "draft_created": "Erstellt {{date}}",
-    "new_idea": "Neue Idee"
+    "new_idea": "Neue Idee",
+    "sort_label": "Sort ideas"
   },
   "idea_detail": {
     "page_title": "Ideendetails",
@@ -303,7 +304,9 @@
     "challenges_count": "{{count}} Wettbewerbe",
     "challenges_count_one": "{{count}} Wettbewerb",
     "link_challenge": "Wettbewerb verknüpfen",
-    "unlink_challenge": "Wettbewerb trennen"
+    "unlink_challenge": "Wettbewerb trennen",
+    "feature_not_available": "Ideation Not Available",
+    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },
   "templates": {
     "title": "Wettbewerbsvorlagen",
@@ -332,7 +335,8 @@
     "dashboard": "Wirkungs-Dashboard",
     "total_challenges": "Gesamt verfolgt",
     "implemented_count": "Umgesetzt",
-    "in_progress_count": "In Bearbeitung"
+    "in_progress_count": "In Bearbeitung",
+    "edit": "Edit outcomes"
   },
   "tasks": {
     "title": "Aufgaben",
@@ -403,5 +407,8 @@
     "campaigns": {
       "title": "Campaigns"
     }
+  },
+  "challenge_detail": {
+    "actions": "Challenge actions"
   }
 }

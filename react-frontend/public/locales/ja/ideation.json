@@ -82,7 +82,8 @@
     "untitled_draft": "無題のドラフト",
     "draft_updated": "更新された {{date}}",
     "draft_created": "作成された {{date}}",
-    "new_idea": "新しいアイデア"
+    "new_idea": "新しいアイデア",
+    "sort_label": "Sort ideas"
   },
   "idea_detail": {
     "page_title": "アイデアの詳細",
@@ -303,7 +304,9 @@
     "challenges_count": "{{count}} 課題",
     "challenges_count_one": "{{count}} 課題",
     "link_challenge": "課題をリンク",
-    "unlink_challenge": "課題のリンクを解除"
+    "unlink_challenge": "課題のリンクを解除",
+    "feature_not_available": "Ideation Not Available",
+    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },
   "templates": {
     "title": "課題テンプレート",
@@ -332,7 +335,8 @@
     "dashboard": "インパクトダッシュボード",
     "total_challenges": "合計トラッキング数",
     "implemented_count": "Implemented",
-    "in_progress_count": "進行中"
+    "in_progress_count": "進行中",
+    "edit": "Edit outcomes"
   },
   "tasks": {
     "title": "Tasks",
@@ -403,5 +407,8 @@
     "campaigns": {
       "title": "Campaigns"
     }
+  },
+  "challenge_detail": {
+    "actions": "Challenge actions"
   }
 }

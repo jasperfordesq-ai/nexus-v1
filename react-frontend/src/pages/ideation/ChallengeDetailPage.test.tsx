@@ -206,7 +206,7 @@ describe('ChallengeDetailPage', () => {
       expect(screen.getByText('Zero-Waste Living Challenge')).toBeInTheDocument();
     });
     // Admin dropdown menu trigger should be present
-    expect(screen.getByRole('button', { name: /Challenge actions/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'challenge_detail.actions' })).toBeInTheDocument();
   });
 
   it('shows prize description when set', async () => {

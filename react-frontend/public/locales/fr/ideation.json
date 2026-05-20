@@ -82,7 +82,8 @@
     "untitled_draft": "Brouillon sans titre",
     "draft_updated": "Mis a jour le {{date}}",
     "draft_created": "Cree le {{date}}",
-    "new_idea": "Nouvelle idee"
+    "new_idea": "Nouvelle idee",
+    "sort_label": "Sort ideas"
   },
   "idea_detail": {
     "page_title": "Details de l'idee",
@@ -303,7 +304,9 @@
     "challenges_count": "{{count}} defis",
     "challenges_count_one": "{{count}} defi",
     "link_challenge": "Lier un defi",
-    "unlink_challenge": "Delier un defi"
+    "unlink_challenge": "Delier un defi",
+    "feature_not_available": "Ideation Not Available",
+    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more."
   },
   "templates": {
     "title": "Modeles de defis",
@@ -332,7 +335,8 @@
     "dashboard": "Tableau de bord de l'impact",
     "total_challenges": "Total suivi",
     "implemented_count": "Mis en oeuvre",
-    "in_progress_count": "En cours"
+    "in_progress_count": "En cours",
+    "edit": "Edit outcomes"
   },
   "tasks": {
     "title": "Taches",
@@ -403,5 +407,8 @@
     "campaigns": {
       "title": "Campaigns"
     }
+  },
+  "challenge_detail": {
+    "actions": "Challenge actions"
   }
 }
