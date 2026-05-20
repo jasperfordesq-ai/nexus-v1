@@ -55,11 +55,11 @@ export function JobOwnerBanner({ vacancy, tenantPath, onVacancyUpdated }: JobOwn
             <Briefcase className="w-5 h-5 text-indigo-400" aria-hidden="true" />
           </div>
           <div>
-            <p className="font-semibold text-theme-primary">{t('detail.owner_banner_title', 'You posted this vacancy')}</p>
+            <p className="font-semibold text-theme-primary">{t('detail.owner_banner_title')}</p>
             <p className="text-sm text-theme-muted">
               {vacancy.applications_count > 0
-                ? t('detail.owner_has_applicants', '{{count}} applicant(s) — scroll down to review', { count: vacancy.applications_count })
-                : t('detail.owner_no_applicants', 'No applicants yet — share this listing to get more visibility')}
+                ? t('detail.owner_has_applicants', { count: vacancy.applications_count })
+                : t('detail.owner_no_applicants')}
             </p>
           </div>
         </div>
@@ -76,7 +76,7 @@ export function JobOwnerBanner({ vacancy, tenantPath, onVacancyUpdated }: JobOwn
           </Link>
           <Link to={tenantPath(`/jobs/${vacancy.id}/kanban`)}>
             <Button size="sm" variant="flat" color="primary" startContent={<Users className="w-4 h-4" aria-hidden="true" />}>
-              {t('detail.kanban_board', 'Kanban Board')}
+              {t('detail.kanban_board')}
             </Button>
           </Link>
           <Button
@@ -89,16 +89,16 @@ export function JobOwnerBanner({ vacancy, tenantPath, onVacancyUpdated }: JobOwn
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
           >
-            {t('self_scheduling.manage_slots', 'Interview Slots')}
+            {t('self_scheduling.manage_slots')}
           </Button>
           {vacancy.status === 'open' && (
             <Button size="sm" color="warning" variant="flat" onPress={handleCloseVacancy}>
-              {t('detail.close_vacancy', 'Close Vacancy')}
+              {t('detail.close_vacancy')}
             </Button>
           )}
           {vacancy.status !== 'open' && (
             <Button size="sm" color="success" variant="flat" onPress={handleReopenVacancy}>
-              {t('detail.reopen_vacancy', 'Reopen')}
+              {t('detail.reopen_vacancy')}
             </Button>
           )}
         </div>
