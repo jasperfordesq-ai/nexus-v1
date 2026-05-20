@@ -45,27 +45,27 @@ export function GroupTabNav({
   const { hasGroupTab } = useTenant();
 
   const primaryTabs = [
-    { key: 'feed', icon: Newspaper, label: t('detail.tab_feed', 'Feed') },
+    { key: 'feed', icon: Newspaper, label: t('detail.tab_feed') },
     // Subgroups shown as a primary tab (not buried in More) so users can drill through hierarchy
-    ...(hasSubGroups ? [{ key: 'subgroups', icon: FolderTree, label: `${t('detail.tab_subgroups', 'Subgroups')} (${subGroupCount})` }] : []),
-    { key: 'discussion', icon: MessageSquare, label: t('detail.tab_discussion', 'Discussion') },
-    { key: 'members', icon: Users, label: t('detail.tab_members', 'Members') },
-    { key: 'events', icon: Calendar, label: t('detail.tab_events', 'Events') },
-    { key: 'files', icon: FolderOpen, label: t('detail.tab_files', 'Files') },
+    ...(hasSubGroups ? [{ key: 'subgroups', icon: FolderTree, label: t('detail.tab_subgroups_count', { count: subGroupCount }) }] : []),
+    { key: 'discussion', icon: MessageSquare, label: t('detail.tab_discussion') },
+    { key: 'members', icon: Users, label: t('detail.tab_members') },
+    { key: 'events', icon: Calendar, label: t('detail.tab_events') },
+    { key: 'files', icon: FolderOpen, label: t('detail.tab_files') },
   ].filter(tab => tab.key === 'subgroups' || hasGroupTab(`tab_${tab.key}` as keyof import('@/types').GroupTabConfig));
 
   const secondaryTabs = [
     // Content
-    { key: 'announcements', icon: Megaphone, label: t('detail.tab_announcements', 'Announcements'), section: t('detail.tab_section_content', 'Content') },
-    { key: 'qa', icon: AlertCircle, label: t('detail.tab_qa', 'Q&A'), section: null },
-    { key: 'wiki', icon: FileText, label: t('detail.tab_wiki', 'Wiki'), section: null },
-    { key: 'media', icon: Image, label: t('detail.tab_media', 'Gallery'), section: null },
+    { key: 'announcements', icon: Megaphone, label: t('detail.tab_announcements'), section: t('detail.tab_section_content') },
+    { key: 'qa', icon: AlertCircle, label: t('detail.tab_qa'), section: null },
+    { key: 'wiki', icon: FileText, label: t('detail.tab_wiki'), section: null },
+    { key: 'media', icon: Image, label: t('detail.tab_media'), section: null },
     // Collaboration
-    { key: 'chatrooms', icon: MessageSquare, label: t('detail.tab_channels', 'Channels'), section: t('detail.tab_section_collab', 'Collaboration') },
-    { key: 'tasks', icon: CheckCircle, label: t('detail.tab_tasks', 'Tasks'), section: null },
-    { key: 'challenges', icon: Flag, label: t('detail.tab_challenges', 'Challenges'), section: null },
+    { key: 'chatrooms', icon: MessageSquare, label: t('detail.tab_channels'), section: t('detail.tab_section_collab') },
+    { key: 'tasks', icon: CheckCircle, label: t('detail.tab_tasks'), section: null },
+    { key: 'challenges', icon: Flag, label: t('detail.tab_challenges'), section: null },
     // Admin (conditional)
-    ...(userIsAdmin ? [{ key: 'analytics', icon: Newspaper, label: t('detail.tab_analytics', 'Analytics'), section: t('detail.tab_section_admin', 'Admin') }] : []),
+    ...(userIsAdmin ? [{ key: 'analytics', icon: Newspaper, label: t('detail.tab_analytics'), section: t('detail.tab_section_admin') }] : []),
   ].filter(tab => hasGroupTab(`tab_${tab.key}` as keyof import('@/types').GroupTabConfig));
 
   const isSecondaryActive = secondaryTabs.some((tab) => tab.key === activeTab);
@@ -75,7 +75,7 @@ export function GroupTabNav({
     <div
       className="sticky top-2 z-20 -mx-1 flex items-center gap-1 overflow-x-auto rounded-xl border border-theme-default bg-content1/95 p-1 shadow-sm backdrop-blur scrollbar-hide sm:mx-0"
       role="tablist"
-      aria-label={t('detail.tab_nav_aria', 'Group navigation')}
+      aria-label={t('detail.tab_nav_aria')}
     >
       {/* Primary tabs */}
       {primaryTabs.map((tab) => {
@@ -117,7 +117,7 @@ export function GroupTabNav({
                 ? 'bg-theme-hover text-theme-primary shadow-sm'
                 : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
             }`}
-            aria-label={t('detail.tab_more', 'More sections')}
+            aria-label={t('detail.tab_more')}
           >
             {isSecondaryActive && activeSecondaryTab ? (
               <>
@@ -125,13 +125,13 @@ export function GroupTabNav({
                 <span className="hidden max-w-36 truncate sm:inline">{activeSecondaryTab.label}</span>
               </>
             ) : (
-              <span className="hidden sm:inline">{t('detail.tab_more_label', 'More')}</span>
+              <span className="hidden sm:inline">{t('detail.tab_more_label')}</span>
             )}
             <ChevronDown className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
           </Button>
         </DropdownTrigger>
         <DropdownMenu
-          aria-label={t('detail.tab_more_menu', 'More group sections')}
+          aria-label={t('detail.tab_more_menu')}
           onAction={(key) => onTabChange(key as string)}
           selectedKeys={new Set([activeTab])}
           selectionMode="single"
@@ -145,7 +145,7 @@ export function GroupTabNav({
                 startContent={<Icon className="w-4 h-4" />}
                 className={activeTab === tab.key ? 'bg-primary/10 text-primary' : ''}
               >
-                {showSection ? `${tab.section} - ${tab.label}` : tab.label}
+                {showSection ? t('detail.tab_section_label', { section: tab.section, label: tab.label }) : tab.label}
               </DropdownItem>
             );
           })}
