@@ -453,45 +453,48 @@ export function useNotifications(): NotificationsContextValue {
 // Helper Functions
 // ─────────────────────────────────────────────────────────────────────────────
 
+function getNotificationToastTitle(key: string): string {
+  return i18n.t(`realtime.toast_${key}`, { ns: 'notifications' });
+}
+
 function getToastConfig(type: string): { title: string } {
-  const t = (key: string, fallback: string) => i18n.t(`realtime.toast_${key}`, { ns: 'notifications', defaultValue: fallback });
   const configs: Record<string, { title: string }> = {
-    message: { title: t('message', 'New Message') },
-    listing: { title: t('listing', 'Listing Update') },
-    transaction: { title: t('transaction', 'Transaction') },
-    connection: { title: t('connection', 'Connection Request') },
-    event: { title: t('event', 'Event Update') },
-    group: { title: t('group', 'Group Notification') },
-    achievement: { title: t('achievement', 'Achievement Unlocked!') },
-    broker_review: { title: t('broker_review', 'Message for Review') },
-    safeguarding_flag: { title: t('safeguarding_flag', 'Safeguarding Alert') },
-    safeguarding_assignment: { title: t('safeguarding_assignment', 'Safeguarding Assignment') },
-    system: { title: t('system', 'System Notification') },
-    vol_application_received: { title: t('vol_application_received', 'New Application') },
-    vol_application_approved: { title: t('vol_application_approved', 'Application Approved') },
-    vol_application_declined: { title: t('vol_application_declined', 'Application Declined') },
-    vol_application_withdrawn: { title: t('vol_application_withdrawn', 'Application Withdrawn') },
-    vol_shift_signup: { title: t('vol_shift_signup', 'Shift Sign-up') },
-    vol_shift_cancelled: { title: t('vol_shift_cancelled', 'Shift Cancelled') },
-    vol_hours_approved: { title: t('vol_hours_approved', 'Hours Approved') },
-    vol_hours_declined: { title: t('vol_hours_declined', 'Hours Declined') },
-    vol_opportunity_closed: { title: t('vol_opportunity_closed', 'Opportunity Closed') },
-    job_application_status: { title: t('job_application_status', 'Application Update') },
-    job_application: { title: t('job_application', 'Job Application') },
-    job_interview_proposed: { title: t('job_interview_proposed', 'Interview Requested') },
-    job_interview_accepted: { title: t('job_interview_accepted', 'Interview Accepted') },
-    job_interview_declined: { title: t('job_interview_declined', 'Interview Declined') },
-    job_interview_cancelled: { title: t('job_interview_cancelled', 'Interview Cancelled') },
-    job_offer_received: { title: t('job_offer_received', 'Job Offer Received!') },
-    job_offer_accepted: { title: t('job_offer_accepted', 'Offer Accepted') },
-    job_offer_rejected: { title: t('job_offer_rejected', 'Offer Rejected') },
-    job_offer_withdrawn: { title: t('job_offer_withdrawn', 'Offer Withdrawn') },
-    job_alert_match: { title: t('job_alert_match', 'New Job Match') },
-    job_interview_reminder: { title: t('job_interview_reminder', 'Interview Reminder') },
-    job_completion_credits: { title: t('job_completion_credits', 'Time Credits Earned!') },
+    message: { title: getNotificationToastTitle('message') },
+    listing: { title: getNotificationToastTitle('listing') },
+    transaction: { title: getNotificationToastTitle('transaction') },
+    connection: { title: getNotificationToastTitle('connection') },
+    event: { title: getNotificationToastTitle('event') },
+    group: { title: getNotificationToastTitle('group') },
+    achievement: { title: getNotificationToastTitle('achievement') },
+    broker_review: { title: getNotificationToastTitle('broker_review') },
+    safeguarding_flag: { title: getNotificationToastTitle('safeguarding_flag') },
+    safeguarding_assignment: { title: getNotificationToastTitle('safeguarding_assignment') },
+    system: { title: getNotificationToastTitle('system') },
+    vol_application_received: { title: getNotificationToastTitle('vol_application_received') },
+    vol_application_approved: { title: getNotificationToastTitle('vol_application_approved') },
+    vol_application_declined: { title: getNotificationToastTitle('vol_application_declined') },
+    vol_application_withdrawn: { title: getNotificationToastTitle('vol_application_withdrawn') },
+    vol_shift_signup: { title: getNotificationToastTitle('vol_shift_signup') },
+    vol_shift_cancelled: { title: getNotificationToastTitle('vol_shift_cancelled') },
+    vol_hours_approved: { title: getNotificationToastTitle('vol_hours_approved') },
+    vol_hours_declined: { title: getNotificationToastTitle('vol_hours_declined') },
+    vol_opportunity_closed: { title: getNotificationToastTitle('vol_opportunity_closed') },
+    job_application_status: { title: getNotificationToastTitle('job_application_status') },
+    job_application: { title: getNotificationToastTitle('job_application') },
+    job_interview_proposed: { title: getNotificationToastTitle('job_interview_proposed') },
+    job_interview_accepted: { title: getNotificationToastTitle('job_interview_accepted') },
+    job_interview_declined: { title: getNotificationToastTitle('job_interview_declined') },
+    job_interview_cancelled: { title: getNotificationToastTitle('job_interview_cancelled') },
+    job_offer_received: { title: getNotificationToastTitle('job_offer_received') },
+    job_offer_accepted: { title: getNotificationToastTitle('job_offer_accepted') },
+    job_offer_rejected: { title: getNotificationToastTitle('job_offer_rejected') },
+    job_offer_withdrawn: { title: getNotificationToastTitle('job_offer_withdrawn') },
+    job_alert_match: { title: getNotificationToastTitle('job_alert_match') },
+    job_interview_reminder: { title: getNotificationToastTitle('job_interview_reminder') },
+    job_completion_credits: { title: getNotificationToastTitle('job_completion_credits') },
   };
 
-  return configs[type] || { title: t('default', 'Notification') };
+  return configs[type] || { title: getNotificationToastTitle('default') };
 }
 
 export default NotificationsContext;
