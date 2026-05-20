@@ -99,7 +99,7 @@ function formatActivityDate(value: string): string {
 export default function RegionalPointsPage() {
   const { t } = useTranslation('common');
   const toast = useToast();
-  usePageTitle(t('regional_points.title', 'Regional Points'));
+  usePageTitle(t('regional_points.title'));
 
   const [summary, setSummary] = useState<SummaryResponse | null>(null);
   const [history, setHistory] = useState<PointTransaction[] | null>(null);
@@ -132,7 +132,7 @@ export default function RegionalPointsPage() {
       }
     } catch (err) {
       logError('RegionalPointsPage: load failed', err);
-      toast.error(t('regional_points.errors.load_failed', 'Failed to load regional points'));
+      toast.error(t('regional_points.errors.load_failed'));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -147,11 +147,11 @@ export default function RegionalPointsPage() {
     const recipient = parseInt(recipientId, 10);
     const amount = parseFloat(points);
     if (!recipient || recipient <= 0) {
-      toast.error(t('regional_points.transfer.errors.invalid_recipient', 'Enter a valid recipient member ID'));
+      toast.error(t('regional_points.transfer.errors.invalid_recipient'));
       return;
     }
     if (!amount || amount <= 0) {
-      toast.error(t('regional_points.transfer.errors.invalid_amount', 'Enter a positive amount'));
+      toast.error(t('regional_points.transfer.errors.invalid_amount'));
       return;
     }
     setSubmitting(true);
@@ -162,17 +162,17 @@ export default function RegionalPointsPage() {
         message: message.trim() || null,
       });
       if (res.success) {
-        toast.success(t('regional_points.transfer.success', 'Transfer sent'));
+        toast.success(t('regional_points.transfer.success'));
         setRecipientId('');
         setPoints('');
         setMessage('');
         await load();
       } else {
-        toast.error(res.error || t('regional_points.errors.transfer_failed', 'Transfer failed'));
+        toast.error(res.error || t('regional_points.errors.transfer_failed'));
       }
     } catch (err) {
       logError('RegionalPointsPage: transfer failed', err);
-      toast.error(t('regional_points.errors.transfer_failed', 'Transfer failed'));
+      toast.error(t('regional_points.errors.transfer_failed'));
     } finally {
       setSubmitting(false);
     }
@@ -189,13 +189,13 @@ export default function RegionalPointsPage() {
   if (unavailable || !summary) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-8">
-        <PageMeta title={t('regional_points.title', 'Regional Points')} />
+        <PageMeta
+          title={t('regional_points.title')}
+          description={t('regional_points.subtitle')}
+        />
         <EmptyState
-          title={t('regional_points.unavailable.title', 'Regional points are not enabled here')}
-          description={t(
-            'regional_points.unavailable.description',
-            'This community has not turned on the regional points programme yet.',
-          )}
+          title={t('regional_points.unavailable.title')}
+          description={t('regional_points.unavailable.description')}
         />
       </div>
     );
@@ -203,62 +203,65 @@ export default function RegionalPointsPage() {
 
   const cfg = summary.config;
   const account = summary.account;
-  const symbol = cfg.symbol || 'pts';
+  const symbol = cfg.symbol || t('regional_points.default_symbol');
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 space-y-6">
-      <PageMeta title={t('regional_points.title', 'Regional Points')} />
+      <PageMeta
+        title={t('regional_points.title')}
+        description={t('regional_points.subtitle')}
+      />
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Coins className="w-6 h-6 text-warning" />
-            {cfg.label || t('regional_points.title', 'Regional Points')}
+      <div className="flex flex-col gap-4 rounded-2xl border border-default-200 bg-content1/80 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold flex items-center gap-2 text-foreground">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-warning/15 text-warning">
+              <Coins className="w-6 h-6" aria-hidden="true" />
+            </span>
+            {cfg.label || t('regional_points.title')}
           </h1>
-          <p className="text-sm text-default-500 mt-1">
-            {t(
-              'regional_points.subtitle',
-              'A regional currency you can earn and spend with neighbours and local merchants.',
-            )}
+          <p className="text-sm text-default-500 mt-2 max-w-2xl">
+            {t('regional_points.subtitle')}
           </p>
         </div>
         <Button
           size="sm"
           variant="bordered"
+          className="w-full sm:w-auto"
           startContent={<RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
           onPress={() => void load()}
           isDisabled={refreshing}
         >
-          {t('common.refresh', 'Refresh')}
+          {t('refresh')}
         </Button>
       </div>
 
       {/* Balance */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+        <Card className="border border-default-200 bg-content1/80 shadow-sm">
           <CardBody>
             <p className="text-xs uppercase text-default-500 tracking-wide">
-              {t('regional_points.balance', 'Balance')}
+              {t('regional_points.balance')}
             </p>
             <p className="text-3xl font-bold tabular-nums mt-1">
               {account.balance.toFixed(2)} <span className="text-base text-default-500">{symbol}</span>
             </p>
           </CardBody>
         </Card>
-        <Card>
+        <Card className="border border-default-200 bg-content1/80 shadow-sm">
           <CardBody>
             <p className="text-xs uppercase text-default-500 tracking-wide">
-              {t('regional_points.lifetime_earned', 'Lifetime earned')}
+              {t('regional_points.lifetime_earned')}
             </p>
             <p className="text-3xl font-bold tabular-nums mt-1">
               {account.lifetime_earned.toFixed(2)} <span className="text-base text-default-500">{symbol}</span>
             </p>
           </CardBody>
         </Card>
-        <Card>
+        <Card className="border border-default-200 bg-content1/80 shadow-sm">
           <CardBody>
             <p className="text-xs uppercase text-default-500 tracking-wide">
-              {t('regional_points.lifetime_spent', 'Lifetime spent')}
+              {t('regional_points.lifetime_spent')}
             </p>
             <p className="text-3xl font-bold tabular-nums mt-1">
               {account.lifetime_spent.toFixed(2)} <span className="text-base text-default-500">{symbol}</span>
@@ -269,26 +272,26 @@ export default function RegionalPointsPage() {
 
       {/* Transfer */}
       {cfg.member_transfers_enabled && (
-        <Card>
+        <Card className="border border-default-200 bg-content1/80 shadow-sm">
           <CardHeader className="flex items-center gap-2">
             <Send className="w-5 h-5 text-primary" />
             <h2 className="text-base font-semibold">
-              {t('regional_points.transfer.title', 'Send points to another member')}
+              {t('regional_points.transfer.title')}
             </h2>
           </CardHeader>
           <Divider />
           <CardBody className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                label={t('regional_points.transfer.recipient_id', 'Recipient member ID')}
-                placeholder="e.g. 123"
+                label={t('regional_points.transfer.recipient_id')}
+                placeholder={t('regional_points.transfer.recipient_placeholder')}
                 type="number"
                 value={recipientId}
                 onValueChange={setRecipientId}
               />
               <Input
-                label={t('regional_points.transfer.amount', 'Amount')}
-                placeholder="0.00"
+                label={t('regional_points.transfer.amount')}
+                placeholder={t('regional_points.transfer.amount_placeholder')}
                 type="number"
                 step="0.01"
                 min="0"
@@ -298,7 +301,8 @@ export default function RegionalPointsPage() {
               />
             </div>
             <Textarea
-              label={t('regional_points.transfer.message', 'Message (optional)')}
+              label={t('regional_points.transfer.message')}
+              placeholder={t('regional_points.transfer.message_placeholder')}
               value={message}
               onValueChange={setMessage}
               minRows={2}
@@ -311,7 +315,7 @@ export default function RegionalPointsPage() {
                 onPress={() => void handleTransfer()}
                 isLoading={submitting}
               >
-                {t('regional_points.transfer.submit', 'Send transfer')}
+                {t('regional_points.transfer.submit')}
               </Button>
             </div>
           </CardBody>
@@ -319,11 +323,11 @@ export default function RegionalPointsPage() {
       )}
 
       {/* History */}
-      <Card>
+      <Card className="border border-default-200 bg-content1/80 shadow-sm">
         <CardHeader className="flex items-center gap-2">
           <Coins className="w-5 h-5 text-warning" />
           <h2 className="text-base font-semibold">
-            {t('regional_points.history.title', 'Recent activity')}
+            {t('regional_points.history.title')}
           </h2>
           <Chip size="sm" variant="flat" className="ml-auto">
             {history?.length ?? 0}
@@ -333,16 +337,16 @@ export default function RegionalPointsPage() {
         <CardBody className="p-0">
           {!history || history.length === 0 ? (
             <div className="text-center py-12 text-sm text-default-500">
-              {t('regional_points.history.empty', 'No transactions yet.')}
+              {t('regional_points.history.empty')}
             </div>
           ) : (
             <Table aria-label={t('regional_points.history.table_aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>{t('regional_points.history.date', 'Date')}</TableColumn>
-                <TableColumn>{t('regional_points.history.type', 'Type')}</TableColumn>
-                <TableColumn>{t('regional_points.history.description', 'Description')}</TableColumn>
-                <TableColumn align="end">{t('regional_points.history.amount', 'Amount')}</TableColumn>
-                <TableColumn align="end">{t('regional_points.history.balance_after', 'Balance')}</TableColumn>
+                <TableColumn>{t('regional_points.history.date')}</TableColumn>
+                <TableColumn>{t('regional_points.history.type')}</TableColumn>
+                <TableColumn>{t('regional_points.history.description')}</TableColumn>
+                <TableColumn align="end">{t('regional_points.history.amount')}</TableColumn>
+                <TableColumn align="end">{t('regional_points.history.balance_after')}</TableColumn>
               </TableHeader>
               <TableBody>
                   {history.map((row) => {

@@ -1,6 +1,7 @@
 {
   "back": "Back",
   "empty_dash": "-",
+  "refresh": "Refresh",
   "hours_short": "{{count}}h",
   "not_available": "Not available",
   "error_title": "Something went wrong",
@@ -1391,6 +1392,7 @@
   },
   "regional_points": {
     "title": "Regional Points",
+    "default_symbol": "pts",
     "subtitle": "A regional currency you can earn and spend with neighbours and local merchants.",
     "balance": "Balance",
     "lifetime_earned": "Lifetime earned",
@@ -1402,8 +1404,11 @@
     "transfer": {
       "title": "Send points to another member",
       "recipient_id": "Recipient member ID",
+      "recipient_placeholder": "e.g. 123",
       "amount": "Amount",
+      "amount_placeholder": "0.00",
       "message": "Message (optional)",
+      "message_placeholder": "Add a note for the recipient",
       "submit": "Send transfer",
       "success": "Transfer sent",
       "errors": {
