@@ -73,7 +73,9 @@
     "load_balance": "Failed to load wallet balance",
     "load_wallet": "Failed to load wallet data. Please try again.",
     "session_expired": "Your session has expired. Please log in again.",
-    "load_community_fund": "Could not load community fund"
+    "load_community_fund": "Could not load community fund",
+    "transfer_failed": "Transfer failed. Please try again.",
+    "unexpected": "An unexpected error occurred. Please try again."
   },
   "no_members_found": "No members found",
   "donate": "Donate",
@@ -151,5 +153,6 @@
   "exceeds_balance": "Exceeds available balance",
   "optional": "optional",
   "description_placeholder": "What is this transfer for?",
-  "new_balance_after": "Your new balance will be {{balance}} hours"
+  "new_balance_after": "Your new balance will be {{balance}} hours",
+  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}"
 }

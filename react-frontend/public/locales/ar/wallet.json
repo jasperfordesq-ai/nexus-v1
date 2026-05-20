@@ -67,7 +67,9 @@
     "load_balance": "فشل في تحميل رصيد المحفظة",
     "load_wallet": "فشل في تحميل بيانات المحفظة. يرجى المحاولة مرة أخرى.",
     "session_expired": "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.",
-    "load_community_fund": "تعذر تحميل صندوق المجتمع"
+    "load_community_fund": "تعذر تحميل صندوق المجتمع",
+    "transfer_failed": "Transfer failed. Please try again.",
+    "unexpected": "An unexpected error occurred. Please try again."
   },
   "no_members_found": "لم يتم العثور على أعضاء",
   "donate": "Donate",
@@ -134,6 +136,7 @@
   "optional": "optional",
   "description_placeholder": "ما هو الغرض من هذا التحويل؟",
   "new_balance_after": "رصيدك الجديد سيكون {{balance}} ساعات",
+  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
   "validation": {
     "select_recipient": "Please select a recipient",
     "valid_amount": "Please enter a valid amount",

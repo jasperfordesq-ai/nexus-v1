@@ -67,7 +67,9 @@
     "load_balance": "ウォレット残高の読み込みに失敗しました",
     "load_wallet": "ウォレットデータの読み込みに失敗しました。もう一度お試しください。",
     "session_expired": "セッションが期限切れです。もう一度ログインしてください。",
-    "load_community_fund": "コミュニティファンドの読み込みに失敗しました"
+    "load_community_fund": "コミュニティファンドの読み込みに失敗しました",
+    "transfer_failed": "Transfer failed. Please try again.",
+    "unexpected": "An unexpected error occurred. Please try again."
   },
   "no_members_found": "メンバーが見つかりませんでした",
   "donate": "Donate",
@@ -134,6 +136,7 @@
   "optional": "optional",
   "description_placeholder": "この送金は何のためですか？",
   "new_balance_after": "あなたの新しい残高は{{balance}}時間になります",
+  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
   "validation": {
     "select_recipient": "Please select a recipient",
     "valid_amount": "Please enter a valid amount",

@@ -67,7 +67,9 @@
     "load_balance": "Kontostand konnte nicht geladen werden",
     "load_wallet": "Zeitkonto-Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
     "session_expired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
-    "load_community_fund": "Community-Fonds konnte nicht geladen werden"
+    "load_community_fund": "Community-Fonds konnte nicht geladen werden",
+    "transfer_failed": "Transfer failed. Please try again.",
+    "unexpected": "An unexpected error occurred. Please try again."
   },
   "no_members_found": "Keine Mitglieder gefunden",
   "donate": "Spenden",
@@ -134,6 +136,7 @@
   "optional": "optional",
   "description_placeholder": "Wofür ist diese Überweisung?",
   "new_balance_after": "Ihr neues Guthaben beträgt {{balance}} Stunden",
+  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
   "validation": {
     "select_recipient": "Bitte wählen Sie einen Empfänger aus",
     "valid_amount": "Bitte geben Sie einen gültigen Betrag ein",

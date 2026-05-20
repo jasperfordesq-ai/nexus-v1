@@ -67,7 +67,9 @@
     "load_balance": "Kon het saldo van de portemonnee niet laden",
     "load_wallet": "Kon de gegevens van de portemonnee niet laden. Probeer het opnieuw.",
     "session_expired": "Je sessie is verlopen. Log alsjeblieft opnieuw in.",
-    "load_community_fund": "Kon het gemeenschapsfonds niet laden"
+    "load_community_fund": "Kon het gemeenschapsfonds niet laden",
+    "transfer_failed": "Transfer failed. Please try again.",
+    "unexpected": "An unexpected error occurred. Please try again."
   },
   "no_members_found": "Geen leden gevonden",
   "donate": "Donate",
@@ -134,6 +136,7 @@
   "optional": "optional",
   "description_placeholder": "Waar is deze overdracht voor?",
   "new_balance_after": "Uw nieuwe saldo is {{balance}} uren",
+  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
   "validation": {
     "select_recipient": "Please select a recipient",
     "valid_amount": "Please enter a valid amount",

@@ -148,7 +148,7 @@ export function TransferModal({
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [isOpen, initialRecipientId]);
+  }, [isOpen, initialRecipientId, t, toast]);
 
   // Debounced user search
   const searchUsers = useCallback(async (query: string) => {
@@ -208,16 +208,16 @@ export function TransferModal({
   // Validate form
   const validateForm = (): string | null => {
     if (!formData.recipient) {
-      return t('validation.select_recipient', 'Please select a recipient');
+      return t('validation.select_recipient');
     }
 
     const amount = parseFloat(formData.amount);
     if (isNaN(amount) || amount <= 0) {
-      return t('validation.valid_amount', 'Please enter a valid amount');
+      return t('validation.valid_amount');
     }
 
     if (amount > currentBalance) {
-      return t('validation.insufficient_balance', 'Insufficient balance');
+      return t('validation.insufficient_balance');
     }
 
     // Check for reasonable max (prevent typos)
@@ -253,11 +253,11 @@ export function TransferModal({
         onTransferComplete(response.data);
         onClose();
       } else {
-        setError(response.error || t('error.transfer_failed', 'Transfer failed. Please try again.'));
+        setError(response.error || t('error.transfer_failed'));
       }
     } catch (err) {
       logError('Transfer failed', err);
-      setError(t('error.unexpected', 'An unexpected error occurred. Please try again.'));
+      setError(t('error.unexpected'));
     } finally {
       setIsSubmitting(false);
     }
@@ -285,7 +285,7 @@ export function TransferModal({
         {(onModalClose) => (
           <>
             <ModalHeader className="text-xl font-semibold text-theme-primary flex items-center gap-2">
-              <Send className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <Send className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
               {t('send_credits')}
             </ModalHeader>
 
@@ -329,7 +329,7 @@ export function TransferModal({
                       className="text-theme-subtle hover:text-theme-primary transition-colors p-1 min-w-0 h-auto"
                       aria-label={t('remove_recipient')}
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-4 h-4" aria-hidden="true" />
                     </Button>
                   </div>
                 ) : (
@@ -354,7 +354,7 @@ export function TransferModal({
                         isSearching ? (
                           <Spinner size="sm" color="current" />
                         ) : (
-                          <Search className="w-4 h-4 text-theme-subtle" />
+                          <Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
                         )
                       }
                       classNames={{
@@ -409,7 +409,7 @@ export function TransferModal({
                     {showResults && searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-content1 border border-theme-default rounded-lg p-4 text-center z-50">
                         <User className="w-8 h-8 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
-                        <p className="text-theme-muted text-sm">{t('no_members_found', 'No members found')}</p>
+                        <p className="text-theme-muted text-sm">{t('no_members_found')}</p>
                       </div>
                     )}
                   </div>
@@ -440,7 +440,7 @@ export function TransferModal({
                 />
                 {isOverBalance && (
                   <p className="text-[var(--color-error)] text-sm flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
+                    <AlertCircle className="w-3 h-3" aria-hidden="true" />
                     {t('exceeds_balance')}
                   </p>
                 )}
@@ -479,7 +479,7 @@ export function TransferModal({
               {/* Error Message */}
               {error && (
                 <div className="bg-red-500/20 border border-red-500/40 rounded-lg p-3 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-[var(--color-error)] flex-shrink-0" />
+                  <AlertCircle className="w-4 h-4 text-[var(--color-error)] flex-shrink-0" aria-hidden="true" />
                   <p className="text-[var(--color-error)] text-sm">{error}</p>
                 </div>
               )}
@@ -492,7 +492,6 @@ export function TransferModal({
                       amount: parsedAmount,
                       unit: t('hours').toLowerCase(),
                       name: `${formData.recipient.first_name} ${formData.recipient.last_name}`,
-                      defaultValue: 'You are about to send {{amount}} {{unit}} to {{name}}',
                     })}
                   </p>
                   <p className="text-theme-subtle text-xs mt-1">
@@ -518,7 +517,7 @@ export function TransferModal({
               </Button>
               <Button
                 className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                startContent={!isSubmitting && <Send className="w-4 h-4" />}
+                startContent={!isSubmitting && <Send className="w-4 h-4" aria-hidden="true" />}
                 isLoading={isSubmitting}
                 isDisabled={!formData.recipient || !parsedAmount || isOverBalance}
                 onPress={handleSubmit}

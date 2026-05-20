@@ -67,7 +67,9 @@
     "load_balance": "Falha ao carregar saldo da carteira",
     "load_wallet": "Falha ao carregar dados da carteira. Tente novamente.",
     "session_expired": "A sua sessão expirou. Inicie sessão novamente.",
-    "load_community_fund": "Não foi possível carregar o fundo comunitário"
+    "load_community_fund": "Não foi possível carregar o fundo comunitário",
+    "transfer_failed": "Transfer failed. Please try again.",
+    "unexpected": "An unexpected error occurred. Please try again."
   },
   "no_members_found": "Nenhum membro encontrado",
   "donate": "Doar",
@@ -134,6 +136,7 @@
   "optional": "opcional",
   "description_placeholder": "Para que é esta transferência?",
   "new_balance_after": "O seu novo saldo será de {{balance}} horas",
+  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
   "validation": {
     "select_recipient": "Please select a recipient",
     "valid_amount": "Please enter a valid amount",

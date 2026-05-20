@@ -67,7 +67,9 @@
     "load_balance": "Theip ar luchtú iarmhéid an sparáin",
     "load_wallet": "Theip ar luchtú sonraí an sparáin. Bain triail eile as le do thoil.",
     "session_expired": "Tá do sheisiún imithe in éag. Logáil isteach arís le do thoil.",
-    "load_community_fund": "Níorbh fhéidir an ciste pobail a luchtú"
+    "load_community_fund": "Níorbh fhéidir an ciste pobail a luchtú",
+    "transfer_failed": "Transfer failed. Please try again.",
+    "unexpected": "An unexpected error occurred. Please try again."
   },
   "no_members_found": "Níor aimsíodh comhaltaí",
   "donate": "Tabhair",
@@ -134,6 +136,7 @@
   "optional": "roghnach",
   "description_placeholder": "Cad is aidhm leis an aistriú seo?",
   "new_balance_after": "Beidh d'iarmhéid nua {{balance}} uair",
+  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
   "validation": {
     "select_recipient": "Please select a recipient",
     "valid_amount": "Please enter a valid amount",

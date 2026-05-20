@@ -67,7 +67,9 @@
     "load_balance": "Error al cargar el saldo de la billetera",
     "load_wallet": "Error al cargar los datos de la billetera. Por favor intenta de nuevo.",
     "session_expired": "Su sesión ha expirado. Por favor, inicie sesión nuevamente.",
-    "load_community_fund": "No se pudo cargar el fondo comunitario"
+    "load_community_fund": "No se pudo cargar el fondo comunitario",
+    "transfer_failed": "Transfer failed. Please try again.",
+    "unexpected": "An unexpected error occurred. Please try again."
   },
   "no_members_found": "No se encontraron miembros",
   "donate": "Donar",
@@ -134,6 +136,7 @@
   "optional": "opcional",
   "description_placeholder": "¿Para qué es esta transferencia?",
   "new_balance_after": "Tu nuevo saldo será de {{balance}} horas",
+  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
   "validation": {
     "select_recipient": "Please select a recipient",
     "valid_amount": "Please enter a valid amount",

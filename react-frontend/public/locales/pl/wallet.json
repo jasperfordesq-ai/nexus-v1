@@ -67,7 +67,9 @@
     "load_balance": "Nie udało się załadować salda portfela",
     "load_wallet": "Nie udało się załadować danych portfela. Proszę spróbować ponownie.",
     "session_expired": "Twoja sesja wygasła. Proszę zalogować się ponownie.",
-    "load_community_fund": "Nie udało się załadować funduszu społecznościowego"
+    "load_community_fund": "Nie udało się załadować funduszu społecznościowego",
+    "transfer_failed": "Transfer failed. Please try again.",
+    "unexpected": "An unexpected error occurred. Please try again."
   },
   "no_members_found": "Nie znaleziono członków",
   "donate": "Donate",
@@ -134,6 +136,7 @@
   "optional": "optional",
   "description_placeholder": "Na co jest ten przelew?",
   "new_balance_after": "Twój nowy bilans wyniesie {{balance}} godzin",
+  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
   "validation": {
     "select_recipient": "Please select a recipient",
     "valid_amount": "Please enter a valid amount",

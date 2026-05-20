@@ -67,7 +67,9 @@
     "load_balance": "Impossibile caricare il saldo del portafoglio",
     "load_wallet": "Impossibile caricare i dati del portafoglio. La preghiamo di riprovare.",
     "session_expired": "La Sua sessione è scaduta. Effettui nuovamente l'accesso.",
-    "load_community_fund": "Impossibile caricare il fondo comunitario"
+    "load_community_fund": "Impossibile caricare il fondo comunitario",
+    "transfer_failed": "Transfer failed. Please try again.",
+    "unexpected": "An unexpected error occurred. Please try again."
   },
   "no_members_found": "Nessun membro trovato",
   "donate": "Dona",
@@ -134,6 +136,7 @@
   "optional": "opzionale",
   "description_placeholder": "A cosa serve questo trasferimento?",
   "new_balance_after": "Il tuo nuovo saldo sarà {{balance}} ore",
+  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
   "validation": {
     "select_recipient": "Please select a recipient",
     "valid_amount": "Please enter a valid amount",
