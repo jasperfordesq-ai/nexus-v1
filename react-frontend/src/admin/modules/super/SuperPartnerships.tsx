@@ -14,6 +14,7 @@ import Calendar from 'lucide-react/icons/calendar';
 import UsersRound from 'lucide-react/icons/users-round';
 import Pause from 'lucide-react/icons/pause';
 import XCircle from 'lucide-react/icons/circle-x';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '../../components/PageHeader';
 import ConfirmModal from '../../components/ConfirmModal';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -73,8 +74,32 @@ function computeStats(partnerships: Partnership[]): Stats {
   );
 }
 
+function statusLabelKey(status: PartnershipStatus | Partnership['status']): string {
+  switch (status) {
+    case 'all': return 'super.tab_all';
+    case 'active': return 'super.status_active';
+    case 'pending': return 'super.status_pending';
+    case 'suspended': return 'super.status_suspended';
+    case 'terminated': return 'super.status_terminated';
+    default: return 'super.unknown_error';
+  }
+}
+
+function featureLabelKey(feature: string): string {
+  switch (feature) {
+    case 'profiles': return 'super.feature_profiles';
+    case 'messaging': return 'super.feature_messaging';
+    case 'transactions': return 'super.feature_transactions';
+    case 'listings': return 'super.feature_listings';
+    case 'events': return 'super.feature_events';
+    case 'groups': return 'super.feature_groups';
+    default: return 'super.unknown_error';
+  }
+}
+
 export default function Partnerships() {
-  usePageTitle("Super Admin");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super.page_title'));
   const toast = useToast();
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
   const [stats, setStats] = useState<Stats>({ active: 0, pending: 0, suspended: 0, terminated: 0 });
@@ -96,7 +121,7 @@ export default function Partnerships() {
   useEffect(() => { loadData(); }, [loadData]);
 
   const handleSuspend = async (id: number) => {
-    const res = await adminSuper.suspendPartnership(id, 'Suspended by admin');
+    const res = await adminSuper.suspendPartnership(id, t('super.suspended_by_super_admin'));
     if (res.success) {
       setPartnerships(prev => {
         const updated = prev.map(p => p.id === id ? { ...p, status: 'suspended' as const } : p);
@@ -104,14 +129,14 @@ export default function Partnerships() {
         return updated;
       });
       setActionPartnership(null);
-      toast.success("Partnership Suspended");
+      toast.success(t('super.partnership_suspended'));
     } else {
-      toast.error(res.error || "Failed to suspend partnership");
+      toast.error(res.error || t('super.failed_to_suspend_partnership'));
     }
   };
 
   const handleTerminate = async (id: number) => {
-    const res = await adminSuper.terminatePartnership(id, 'Terminated by admin');
+    const res = await adminSuper.terminatePartnership(id, t('super.terminated_by_super_admin'));
     if (res.success) {
       setPartnerships(prev => {
         const updated = prev.map(p => p.id === id ? { ...p, status: 'terminated' as const } : p);
@@ -119,9 +144,9 @@ export default function Partnerships() {
         return updated;
       });
       setActionPartnership(null);
-      toast.success("Partnership Terminated");
+      toast.success(t('super.partnership_terminated'));
     } else {
-      toast.error(res.error || "Failed to terminate partnership");
+      toast.error(res.error || t('super.failed_to_terminate_partnership'));
     }
   };
 
@@ -172,8 +197,8 @@ export default function Partnerships() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={"Super Partnerships"}
-        description={"View and manage all federation partnerships across the platform"}
+        title={t('super.super_partnerships_title')}
+        description={t('super.super_partnerships_desc')}
       />
 
       {/* Stats Cards */}
@@ -185,7 +210,7 @@ export default function Partnerships() {
                 <TrendingUp className="w-5 h-5 text-success" />
               </div>
               <div>
-                <p className="text-xs text-default-500">{"Active"}</p>
+                <p className="text-xs text-default-500">{t('super.status_active')}</p>
                 <p className="text-2xl font-bold text-success">{stats.active}</p>
               </div>
             </div>
@@ -199,7 +224,7 @@ export default function Partnerships() {
                 <TrendingUp className="w-5 h-5 text-warning" />
               </div>
               <div>
-                <p className="text-xs text-default-500">{"Pending"}</p>
+                <p className="text-xs text-default-500">{t('super.status_pending')}</p>
                 <p className="text-2xl font-bold text-warning">{stats.pending}</p>
               </div>
             </div>
@@ -213,7 +238,7 @@ export default function Partnerships() {
                 <Pause className="w-5 h-5 text-danger" />
               </div>
               <div>
-                <p className="text-xs text-default-500">{"Suspended"}</p>
+                <p className="text-xs text-default-500">{t('super.status_suspended')}</p>
                 <p className="text-2xl font-bold text-danger">{stats.suspended}</p>
               </div>
             </div>
@@ -227,7 +252,7 @@ export default function Partnerships() {
                 <XCircle className="w-5 h-5 text-default-500" />
               </div>
               <div>
-                <p className="text-xs text-default-500">{"Terminated"}</p>
+                <p className="text-xs text-default-500">{t('super.status_terminated')}</p>
                 <p className="text-2xl font-bold">{stats.terminated}</p>
               </div>
             </div>
@@ -242,24 +267,24 @@ export default function Partnerships() {
             selectedKey={filter}
             onSelectionChange={(key) => setFilter(key as PartnershipStatus)}
           >
-            <Tab key="all" title={`${"All"} (${partnerships.length})`} />
-            <Tab key="active" title={`${"Active"} (${stats.active})`} />
-            <Tab key="pending" title={`${"Pending"} (${stats.pending})`} />
-            <Tab key="suspended" title={`${"Suspended"} (${stats.suspended})`} />
-            <Tab key="terminated" title={`${"Terminated"} (${stats.terminated})`} />
+            <Tab key="all" title={t('super.tab_with_count', { label: t(statusLabelKey('all')), count: partnerships.length })} />
+            <Tab key="active" title={t('super.tab_with_count', { label: t(statusLabelKey('active')), count: stats.active })} />
+            <Tab key="pending" title={t('super.tab_with_count', { label: t(statusLabelKey('pending')), count: stats.pending })} />
+            <Tab key="suspended" title={t('super.tab_with_count', { label: t(statusLabelKey('suspended')), count: stats.suspended })} />
+            <Tab key="terminated" title={t('super.tab_with_count', { label: t(statusLabelKey('terminated')), count: stats.terminated })} />
           </Tabs>
         </CardHeader>
         <CardBody>
-          <Table aria-label={"Federation Partnerships"} shadow="sm" isStriped>
+          <Table aria-label={t('super.label_federation_partnerships')} shadow="sm" isStriped>
             <TableHeader>
-              <TableColumn>{"Partnership"}</TableColumn>
-              <TableColumn>{"Level"}</TableColumn>
-              <TableColumn>{"Features"}</TableColumn>
-              <TableColumn>{"Status"}</TableColumn>
-              <TableColumn>{"Created"}</TableColumn>
-              <TableColumn>{"Actions"}</TableColumn>
+              <TableColumn>{t('super.col_partnership')}</TableColumn>
+              <TableColumn>{t('super.col_level')}</TableColumn>
+              <TableColumn>{t('super.col_features')}</TableColumn>
+              <TableColumn>{t('super.col_status')}</TableColumn>
+              <TableColumn>{t('super.col_created')}</TableColumn>
+              <TableColumn>{t('super.col_actions')}</TableColumn>
             </TableHeader>
-            <TableBody emptyContent={`No partnerships found found`}>
+            <TableBody emptyContent={t('super.no_partnerships_found')}>
               {filteredPartnerships.map(partnership => (
                 <TableRow key={partnership.id}>
                   <TableCell>
@@ -271,14 +296,14 @@ export default function Partnerships() {
                   </TableCell>
                   <TableCell>
                     <Chip size="sm" color={getLevelColor(partnership.level)} variant="flat">
-                      L{partnership.level}
+                      {t('super.level_value', { level: partnership.level })}
                     </Chip>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       {Object.entries(partnership.features).map(([key, enabled]) =>
                         enabled ? (
-                          <span key={key} title={key}>
+                          <span key={key} title={t(featureLabelKey(key))}>
                             {getFeatureIcon(key)}
                           </span>
                         ) : null
@@ -287,7 +312,7 @@ export default function Partnerships() {
                   </TableCell>
                   <TableCell>
                     <Chip size="sm" color={getStatusColor(partnership.status)} variant="flat">
-                      {partnership.status}
+                      {t(statusLabelKey(partnership.status))}
                     </Chip>
                   </TableCell>
                   <TableCell className="text-sm text-default-600">
@@ -303,7 +328,7 @@ export default function Partnerships() {
                           onPress={() => setActionPartnership({ id: partnership.id, action: 'suspend' })}
                           startContent={<Pause className="w-4 h-4" />}
                         >
-                          {"Suspend"}
+                          {t('super.suspend')}
                         </Button>
                       )}
                       {(partnership.status === 'active' || partnership.status === 'suspended') && (
@@ -314,7 +339,7 @@ export default function Partnerships() {
                           onPress={() => setActionPartnership({ id: partnership.id, action: 'terminate' })}
                           startContent={<XCircle className="w-4 h-4" />}
                         >
-                          {"Terminate"}
+                          {t('super.terminate')}
                         </Button>
                       )}
                     </div>
@@ -338,13 +363,13 @@ export default function Partnerships() {
               handleTerminate(actionPartnership.id);
             }
           }}
-          title={actionPartnership.action === 'suspend' ? "Suspend Partnership" : "Terminate Partnership"}
+          title={actionPartnership.action === 'suspend' ? t('super.suspend_partnership') : t('super.terminate_partnership')}
           message={
             actionPartnership.action === 'suspend'
-              ? "Suspend Partnership"
-              : "Terminate Partnership"
+              ? t('super.suspend_partnership_confirm')
+              : t('super.terminate_partnership_confirm')
           }
-          confirmLabel={actionPartnership.action === 'suspend' ? "Suspend" : "Terminate"}
+          confirmLabel={actionPartnership.action === 'suspend' ? t('super.suspend_btn') : t('super.terminate_btn')}
           confirmColor="danger"
         />
       )}
