@@ -21,6 +21,7 @@ import Calendar from 'lucide-react/icons/calendar';
 import Tag from 'lucide-react/icons/tag';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Activity from 'lucide-react/icons/activity';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminSystem, adminCron } from '../../api/adminApi';
@@ -62,7 +63,8 @@ const categoryColorMap: Record<string, 'primary' | 'secondary' | 'success' | 'wa
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CronJobs() {
-  usePageTitle("System");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
   const [jobs, setJobs] = useState<CronJobExtended[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,7 +73,7 @@ export function CronJobs() {
   const [loadingHealth, setLoadingHealth] = useState(true);
 
   const formatDate = useCallback((dateStr: string | null): string => {
-    if (!dateStr) return "Never";
+    if (!dateStr) return t('system.never');
     const d = new Date(dateStr);
     return d.toLocaleDateString(undefined, {
       year: 'numeric',
@@ -80,21 +82,21 @@ export function CronJobs() {
       hour: '2-digit',
       minute: '2-digit',
     });
-  }, []);
+  }, [t]);
 
   const timeAgo = useCallback((dateStr: string | null): string => {
-    if (!dateStr) return "Never";
+    if (!dateStr) return t('system.never');
     const d = new Date(dateStr);
     const now = new Date();
     const diffMs = now.getTime() - d.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffMins < 1) return t('system.just_now');
+    if (diffMins < 60) return t('system.minutes_ago', { count: diffMins });
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffHours < 24) return t('system.hours_ago', { count: diffHours });
     const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
-  }, []);
+    return t('system.days_ago', { count: diffDays });
+  }, [t]);
 
   const loadJobs = useCallback(async () => {
     setLoading(true);
@@ -127,13 +129,13 @@ export function CronJobs() {
     try {
       const res = await adminSystem.runCronJob(id);
       if (res.success) {
-        toast.success(`Job Triggered`);
+        toast.success(t('system.job_triggered'));
         loadJobs(); // Refresh to get updated status
       } else {
-        toast.error(res.error || `Failed to run job`);
+        toast.error(res.error || t('system.failed_to_run_job'));
       }
     } catch {
-      toast.error(`Failed to run job`);
+      toast.error(t('system.failed_to_run_job'));
     }
     setRunningJob(null);
   };
@@ -160,8 +162,8 @@ export function CronJobs() {
   return (
     <div>
       <PageHeader
-        title={"Cron Jobs"}
-        description={"Manage scheduled background jobs for your platform"}
+        title={t('system.cron_jobs_title')}
+        description={t('system.cron_jobs_desc')}
         actions={
           <Button
             variant="flat"
@@ -170,7 +172,7 @@ export function CronJobs() {
             isLoading={loading}
             size="sm"
           >
-            {"Refresh"}
+            {t('system.btn_refresh')}
           </Button>
         }
       />
@@ -178,7 +180,7 @@ export function CronJobs() {
       {/* Loading state */}
       {loading && jobs.length === 0 && (
         <div className="flex items-center justify-center py-20">
-          <Spinner size="lg" label={"Loading cron jobs..."} />
+          <Spinner size="lg" label={t('system.loading_cron_jobs')} />
         </div>
       )}
 
@@ -191,9 +193,9 @@ export function CronJobs() {
               <CardBody className="flex flex-row items-center gap-3 p-4 bg-danger/10">
                 <AlertTriangle size={24} className="text-danger shrink-0" />
                 <div>
-                  <p className="font-semibold text-danger">{"Critical cron job failing"}</p>
+                  <p className="font-semibold text-danger">{t('system.critical_cron_failing')}</p>
                   <p className="text-sm text-danger-700 dark:text-danger-300">
-                    {`Jobs failed in the last 24 hours`}
+                    {t('system.jobs_failed_24h_message')}
                   </p>
                 </div>
               </CardBody>
@@ -205,7 +207,7 @@ export function CronJobs() {
             <Card shadow="sm">
               <CardHeader className="flex items-center gap-2 pb-2">
                 <Activity size={16} className="text-default-500" />
-                <span className="text-sm font-medium">{"Health Score"}</span>
+                <span className="text-sm font-medium">{t('system.health_score')}</span>
               </CardHeader>
               <CardBody className="pt-0">
                 <div className="flex items-end gap-2">
@@ -237,7 +239,7 @@ export function CronJobs() {
             <Card shadow="sm">
               <CardHeader className="flex items-center gap-2 pb-2">
                 <CheckCircle size={16} className="text-success" />
-                <span className="text-sm font-medium">{"7-Day Success Rate"}</span>
+                <span className="text-sm font-medium">{t('system.seven_day_success_rate')}</span>
               </CardHeader>
               <CardBody className="pt-0">
                 <div className="flex items-end gap-2">
@@ -247,7 +249,7 @@ export function CronJobs() {
                   <span className="text-sm text-default-500 mb-1">%</span>
                 </div>
                 <p className="text-xs text-default-400 mt-2">
-                  {"Average across all jobs"}
+                  {t('system.average_across_all_jobs')}
                 </p>
               </CardBody>
             </Card>
@@ -256,7 +258,7 @@ export function CronJobs() {
             <Card shadow="sm">
               <CardHeader className="flex items-center gap-2 pb-2">
                 <XCircle size={16} className="text-danger" />
-                <span className="text-sm font-medium">{"24h Failures"}</span>
+                <span className="text-sm font-medium">{t('system.twenty_four_h_failures')}</span>
               </CardHeader>
               <CardBody className="pt-0">
                 <div className="flex items-end gap-2">
@@ -269,7 +271,7 @@ export function CronJobs() {
                   </span>
                 </div>
                 <p className="text-xs text-default-400 mt-2">
-                  {"Jobs Failed in Last 24h"}
+                  {t('system.jobs_failed_in_last_24h')}
                 </p>
               </CardBody>
             </Card>
@@ -279,7 +281,7 @@ export function CronJobs() {
           {healthMetrics.recent_failures.length > 0 && (
             <Card shadow="sm" className="mt-4">
               <CardHeader>
-                <span className="text-sm font-semibold">{"Recent Failures"}</span>
+                <span className="text-sm font-semibold">{t('system.recent_failures')}</span>
               </CardHeader>
               <CardBody className="p-0">
                 <div className="divide-y divide-divider">
@@ -308,7 +310,7 @@ export function CronJobs() {
             <Card shadow="sm" className="mt-4 border border-warning">
               <CardHeader className="flex items-center gap-2 bg-warning/10">
                 <AlertTriangle size={16} className="text-warning" />
-                <span className="text-sm font-semibold">{"Overdue Jobs"}</span>
+                <span className="text-sm font-semibold">{t('system.overdue_jobs')}</span>
               </CardHeader>
               <CardBody className="p-0">
                 <div className="divide-y divide-divider">
@@ -318,7 +320,7 @@ export function CronJobs() {
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium truncate">{job.job_name}</p>
                           <p className="text-xs text-default-500">
-                            {"Expected"}: {job.expected_interval} • {"Last Run"}: {job.last_run || "Never"}
+                            {t('system.expected')}: {job.expected_interval} • {t('system.last_run')}: {job.last_run || t('system.never')}
                           </p>
                         </div>
                       </div>
@@ -340,7 +342,7 @@ export function CronJobs() {
                 <Clock size={20} className="text-primary" />
               </div>
               <div>
-                <p className="text-xs text-default-500">{"Total Jobs"}</p>
+                <p className="text-xs text-default-500">{t('system.total_jobs')}</p>
                 <p className="text-xl font-bold">{totalJobs}</p>
               </div>
             </CardBody>
@@ -351,7 +353,7 @@ export function CronJobs() {
                 <CheckCircle size={20} className="text-success" />
               </div>
               <div>
-                <p className="text-xs text-default-500">{"Active"}</p>
+                <p className="text-xs text-default-500">{t('system.active')}</p>
                 <p className="text-xl font-bold">{activeJobs}</p>
               </div>
             </CardBody>
@@ -362,7 +364,7 @@ export function CronJobs() {
                 <CheckCircle size={20} className="text-success" />
               </div>
               <div>
-                <p className="text-xs text-default-500">{"Last Succeeded"}</p>
+                <p className="text-xs text-default-500">{t('system.last_succeeded')}</p>
                 <p className="text-xl font-bold">{recentSuccesses}</p>
               </div>
             </CardBody>
@@ -373,7 +375,7 @@ export function CronJobs() {
                 <XCircle size={20} className="text-danger" />
               </div>
               <div>
-                <p className="text-xs text-default-500">{"Last Failed"}</p>
+                <p className="text-xs text-default-500">{t('system.last_failed')}</p>
                 <p className="text-xl font-bold">{recentFailures}</p>
               </div>
             </CardBody>
@@ -386,8 +388,8 @@ export function CronJobs() {
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center gap-3 py-16 text-default-400">
             <Clock size={48} />
-            <p className="text-lg font-medium">{"No cron jobs"}</p>
-            <p className="text-sm">{"No cron jobs have been configured yet"}</p>
+            <p className="text-lg font-medium">{t('system.no_cron_jobs')}</p>
+            <p className="text-sm">{t('system.no_cron_jobs_hint')}</p>
           </CardBody>
         </Card>
       )}
@@ -406,7 +408,7 @@ export function CronJobs() {
                 {category}
               </Chip>
               <span className="text-sm text-default-400">
-                {`Job`}
+                {t('system.job_count')}
               </span>
             </div>
 
@@ -440,7 +442,7 @@ export function CronJobs() {
                     <div className="flex items-center gap-2">
                       <Clock size={14} className="text-default-400 shrink-0" />
                       <span className="text-xs text-default-600">
-                        {"Schedule"}: <code className="bg-default-100 px-1.5 py-0.5 rounded">{job.schedule}</code>
+                        {t('system.schedule')}: <code className="bg-default-100 px-1.5 py-0.5 rounded">{job.schedule}</code>
                       </span>
                     </div>
 
@@ -450,7 +452,7 @@ export function CronJobs() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Calendar size={14} className="text-default-400 shrink-0" />
-                        <span className="text-xs text-default-500">{"Last Run"}:</span>
+                        <span className="text-xs text-default-500">{t('system.last_run')}:</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         {job.last_status === 'success' && (
@@ -470,7 +472,7 @@ export function CronJobs() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Tag size={14} className="text-default-400 shrink-0" />
-                          <span className="text-xs text-default-500">{"Last Status"}:</span>
+                          <span className="text-xs text-default-500">{t('system.last_status')}:</span>
                         </div>
                         <StatusBadge status={job.last_status} />
                       </div>
@@ -480,10 +482,10 @@ export function CronJobs() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Clock size={14} className="text-default-400 shrink-0" />
-                        <span className="text-xs text-default-500">{"Next Run"}:</span>
+                        <span className="text-xs text-default-500">{t('system.next_run')}:</span>
                       </div>
                       <span className="text-xs text-default-600">
-                        {job.next_run_at ? formatDate(job.next_run_at) : "Not Scheduled"}
+                        {job.next_run_at ? formatDate(job.next_run_at) : t('system.not_scheduled')}
                       </span>
                     </div>
                   </CardBody>
@@ -502,7 +504,7 @@ export function CronJobs() {
                       isDisabled={job.status === 'disabled' || runningJob !== null}
                       onPress={() => handleRunJob(job.id, job.name)}
                     >
-                      {runningJob === job.id ? "Running" : "Run Now"}
+                      {runningJob === job.id ? t('system.running') : t('system.run_now')}
                     </Button>
                   </CardFooter>
                 </Card>
