@@ -299,7 +299,570 @@
     "sitemap_urls_by_type": "URLs by Type",
     "social_sharing_image_heading": "Social Sharing Image",
     "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
-    "usage_limits_heading": "Usage Limits"
+    "usage_limits_heading": "Usage Limits",
+    "prerender": {
+      "description": "Instantâneos renderizados pelo servidor somente para bot. Monitore a cobertura, detecte inatividade e force atualizações.",
+      "analytics": {
+        "actions": {
+          "reload": "Recarregar"
+        },
+        "columns": {
+          "crawler": "CRAWLER",
+          "hits": "HITS",
+          "host": "HOST",
+          "ip": "IP",
+          "status": "STATUS",
+          "time": "TIME",
+          "uri": "URI",
+          "url": "URL"
+        },
+        "empty": "Nenhuma análise disponível. O log de acesso do bot pode estar vazio.",
+        "empty_bot_traffic": "Ainda não há tráfego de bot",
+        "empty_no_data": "Sem dados",
+        "empty_recent_hits": "Nenhum hit recente",
+        "errors": {
+          "load": "Falha ao carregar análises"
+        },
+        "filters": {
+          "window": "Janela"
+        },
+        "hints": {
+          "spoofed": "bot principal reivindicado, intervalo IP com falha",
+          "top_50_cap": "da tampa top-50",
+          "verified_of_total": "{{verified}} de {{total}}"
+        },
+        "kpi": {
+          "ip_verified": "IP verificado",
+          "spoofed": "Falsificado (suspeito)",
+          "total_bot_hits": "Total de acessos de bot",
+          "unique_uris": "URI exclusivos"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} falsificado"
+        },
+        "log_summary": "Registro: {{size}} - desde {{time}}",
+        "sections": {
+          "hits_by_crawler": "Acessos por rastreador",
+          "hits_by_status": "Acessos por status HTTP",
+          "recent_activity": "Atividade recente (mais recente primeiro, último {{count}})",
+          "top_uris": "Principais URIs (50 principais por contagem de acessos)"
+        },
+        "tables": {
+          "recent_hits_aria": "Acessos recentes de bot",
+          "top_uris_aria": "Principais URIs"
+        },
+        "windows": {
+          "1": "Últimas 24h",
+          "7": "Últimos 7 dias",
+          "30": "Últimos 30 dias"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "Aberto no inventário",
+          "refresh": "Atualizar",
+          "refresh_all_stale": "Atualizar tudo obsoleto ({{count}})"
+        },
+        "columns": {
+          "actions": "ACTIONS",
+          "asset": "ASSET",
+          "coverage": "COVERAGE",
+          "host": "HOST",
+          "missing": "MISSING",
+          "stale": "STALE",
+          "tenant": "TENANT"
+        },
+        "confirm": {
+          "queue_recache": "Recache de fila para locatários {{count}}?"
+        },
+        "empty": "Sem inquilinos",
+        "errors": {
+          "bulk_enqueue": "Falha no enfileiramento em massa (alguns locatários podem ter entrado na fila)",
+          "enqueue": "Falha ao enfileirar",
+          "load": "Falha ao carregar a cobertura"
+        },
+        "messages": {
+          "bulk_queued": "Recache em fila para locatários {{count}}",
+          "no_stale": "Sem inquilinos obsoletos – a cobertura é saudável",
+          "tenant_queued": "#{{id}} na fila para {{slug}}"
+        },
+        "summary": {
+          "healthy": "Todos os locatários {{count}} estão íntegros.",
+          "needs_work": "{{needing}} dos locatários {{total}} têm rotas ausentes, obsoletas ou com ativos quebrados."
+        },
+        "table_aria": "Cobertura"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "Aplicar",
+          "dry_run": "Teste a seco"
+        },
+        "auto_recache": {
+          "description": "Verifica cada instantâneo. Enfileira novos caches de baixa prioridade para rotas cujo conteúdo de origem foi alterado ou cujo TTL expirou. Executa no cron a cada 15-30 minutos; use isso para acionar um imediatamente.",
+          "title": "Recache automático (TTL + desvio de conteúdo)"
+        },
+        "drift": {
+          "description": "Percorre cada mapa do site do locatário, compara lastmod com snapshots várias vezes e captura páginas obsoletas de gravações brutas, migrações ou trabalhos em fila. É executado a cada 2 minutos e enfileira recaches de alta prioridade.",
+          "title": "Detectar desvio (mapa do site vs instantâneos)"
+        },
+        "errors": {
+          "auto_recache": "Falha ao acionar o recache automático",
+          "drift_detection": "Falha ao acionar a detecção de desvio",
+          "purge_unexpected": "Falha inesperada na limpeza"
+        },
+        "messages": {
+          "auto_recache_applied": "Recache automático aplicado",
+          "auto_recache_dry_run": "Teste de recache automático concluído",
+          "drift_applied": "Detecção de desvio aplicada",
+          "drift_dry_run": "Teste de deriva concluído",
+          "purge_dry_run": "Teste: os instantâneos {{count}} seriam eliminados",
+          "purged_ungated": "Instantâneos não bloqueados de {{count}} eliminados em locatários {{tenants}}"
+        },
+        "no_output": "(sem saída)",
+        "purge_ungated": {
+          "description": "Varrer instantâneos cuja rota não está em um conjunto esperado do locatário. Comum após desativar um recurso ou para limpeza de rotas estáticas pré-renderizadas sem sinalizadores de recurso. As rotas de conteúdo dinâmico são deixadas de lado.",
+          "title": "Limpar snapshots não bloqueados (limpeza 404 por locatário)"
+        },
+        "result": {
+          "deleted": "Instantâneos {{count}} excluídos em locatários {{tenants}}",
+          "would_delete": "Excluiria snapshots {{count}} em locatários {{tenants}}"
+        },
+        "title": "Automação de frescor"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "Cancelar",
+          "close_breaker_now": "Feche o disjuntor agora",
+          "details": "Detalhes",
+          "emergency_reset": "Reinicialização de emergência",
+          "hide": "Esconder",
+          "hide_details": "Ocultar detalhes",
+          "reset_queue": "Redefinir fila"
+        },
+        "engine_healthy": "Motor saudável",
+        "issue_count_one": "Problema {{count}}",
+        "issue_count_other": "Problemas com {{count}}",
+        "modal": {
+          "body_middle": "ou",
+          "body_prefix": "Isso irá recolocar na fila todos",
+          "body_suffix": "linha cujo trabalhador ficou em silêncio por >30 min e limpe o disjuntor.",
+          "title": "Emergência: redefinir fila presa",
+          "warning": "Use isso apenas se você tiver confirmado que a fila está travada. Se um trabalhador íntegro ainda estiver em execução, isso criará trabalho duplicado."
+        },
+        "toasts": {
+          "breaker_reset": "Reinicialização do disjuntor",
+          "queue_reset_one": "Redefinir linha presa {{count}}; disjuntor liberado",
+          "queue_reset_other": "Redefinir linhas presas em {{count}}; disjuntor liberado",
+          "queue_reset_failed": "Falha na redefinição da fila",
+          "reset_failed": "Falha na redefinição"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "Fechar",
+          "inspect": "Inspecionar",
+          "inspect_snapshot": "Inspecione {{path}}",
+          "open_rendered_url": "Abrir URL renderizado",
+          "recache_selected": "Recache selecionado ({{count}})",
+          "reload": "Recarregar",
+          "select_all_visible": "Selecione tudo visível",
+          "select_snapshot": "Selecione {{path}}"
+        },
+        "columns": {
+          "actions": "Ações",
+          "age": "Idade",
+          "host": "Hospedar",
+          "http": "HTTP",
+          "route": "Rota",
+          "size": "Tamanho",
+          "status": "Status"
+        },
+        "empty": "Nenhum instantâneo corresponde aos filtros",
+        "errors": {
+          "bulk_recache": "Falha no recache em massa",
+          "inspect": "Falha ao inspecionar o instantâneo",
+          "load": "Falha ao carregar inventário"
+        },
+        "filters": {
+          "aging": "Envelhecimento",
+          "all": "Todos",
+          "asset_broken": "Ativo quebrado",
+          "content_drifted": "Conteúdo desviado",
+          "filter": "Filtro",
+          "filter_placeholder": "rota ou substring de host",
+          "fresh": "Fresco",
+          "issue": "Emitir",
+          "stale": "Obsoleto",
+          "staleness": "obsoleto",
+          "status": "Status",
+          "status_200": "200 apenas",
+          "status_non_200": "Não-200",
+          "tenant_placeholder": "opcional",
+          "tenant_slug": "Lesma inquilina"
+        },
+        "messages": {
+          "bulk_recache": "Instantâneos {{count}} invalidados e recache em fila"
+        },
+        "inspect": {
+          "age": "Idade",
+          "all_valid": "tudo válido",
+          "asset_references": "Referências de ativos ({{count}})",
+          "canonical": "Canônico",
+          "dead_assets": "{{count}} morto",
+          "flags": "Bandeiras",
+          "h1_count": "H1 (contagem)",
+          "html_parse_warnings": "HTML analisa avisos",
+          "html_preview": "Visualização do HTML (primeiros 12 KB, scripts removidos)",
+          "integrity_mismatch": "bytes alterados desde a renderização - esperado sha256 {{expected}}..., obtido {{actual}}...",
+          "integrity_missing": "sem sidecar sha256 - o instantâneo é anterior à verificação de integridade ou foi editado manualmente",
+          "integrity_ok": "bytes correspondem ao sha256 escrito no tempo de renderização",
+          "integrity_status": "integridade: {{status}}",
+          "integrity_unreadable": "O sidecar sha256 existe, mas está malformado",
+          "invalid_present": "INVALID PRESENTE",
+          "json_ld": "JSON-LD (blocos {{blocks}}, {{status}})",
+          "meta_description": "Meta descrição",
+          "missing": "- ausente -",
+          "modal_title": "Inspeção de instantâneo",
+          "modified": "Modificado",
+          "must_fix": "Deve corrigir ({{count}})",
+          "no_structured_data": "Sem dados estruturados",
+          "no_type": "(sem @tipo)",
+          "none": "(nenhum)",
+          "old": "{{age}} antigo",
+          "open_graph": "Abrir gráfico",
+          "path": "Caminho",
+          "seo_score": "Pontuação SEO",
+          "size": "Tamanho",
+          "tips": "Dicas ({{count}})",
+          "title": "Título"
+        },
+        "selected": "{{count}} selecionado",
+        "status": {
+          "asset": "ativo",
+          "content": "contente",
+          "content_drifted": "conteúdo desviado"
+        },
+        "summary": "{{filtered}} de instantâneos {{total}}",
+        "table_aria": "Inventário instantâneo"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "Cancelar trabalho #{{id}}",
+          "close": "Fechar",
+          "reload": "Recarregar",
+          "retry_job": "Tentar novamente trabalho #{{id}}",
+          "retry_same_parameters": "Tente novamente com os mesmos parâmetros",
+          "view_details": "Ver detalhes do trabalho #{{id}}"
+        },
+        "columns": {
+          "actions": "Ações",
+          "by": "Por",
+          "flags": "Bandeiras",
+          "id": "#",
+          "priority": "Prioridade",
+          "queued": "Na fila",
+          "result": "Resultado",
+          "scope": "Escopo",
+          "status": "Status"
+        },
+        "detail": {
+          "all": "todos",
+          "claimed_by": "Reivindicado por",
+          "duration": "Duração",
+          "error": "Erro",
+          "exit_code": "Código de saída",
+          "finished_at": "Terminou em",
+          "log_tail": "Registro (cauda)",
+          "queued_at": "Na fila em",
+          "requested_by": "Solicitado por",
+          "routes": "Rotas",
+          "started_at": "Começou em",
+          "status": "Status",
+          "tenant": "Inquilino",
+          "title": "Trabalho #{{id}}"
+        },
+        "empty": "Sem empregos",
+        "errors": {
+          "cancel": "Não foi possível cancelar - o trabalho pode ter começado",
+          "load": "Falha ao carregar trabalhos",
+          "retry": "Falha na nova tentativa - o trabalho original ainda pode estar em andamento"
+        },
+        "filters": {
+          "all": "Todos",
+          "cancelled": "Cancelado",
+          "failed": "Fracassado",
+          "partial": "Parcial",
+          "queued": "Na fila",
+          "running": "Correndo",
+          "status": "Status",
+          "succeeded": "Sucesso"
+        },
+        "flags": {
+          "dry_run": "ensaio",
+          "force": "vigor"
+        },
+        "messages": {
+          "cancelled": "Trabalho #{{id}} cancelado",
+          "retry_queued": "Nova tentativa #{{retryId}} na fila (de #{{id}})"
+        },
+        "priority": {
+          "high": "Alto",
+          "low": "Baixo",
+          "normal": "Normal",
+          "tooltip": "prioridade = {{priority}} (vitórias menores)"
+        },
+        "result": {
+          "invalid": "{{count}} inválido"
+        },
+        "scope": {
+          "all_tenants": "todos os inquilinos"
+        },
+        "table_aria": "Empregos"
+      },
+      "events": {
+        "actions": {
+          "reload": "Recarregar"
+        },
+        "columns": {
+          "commit": "Comprometer-se",
+          "details": "Detalhes",
+          "event": "Evento",
+          "time": "Tempo"
+        },
+        "empty": "Nenhum evento",
+        "errors": {
+          "load": "Falha ao carregar eventos"
+        },
+        "filters": {
+          "limit": "Limite"
+        },
+        "summary": "Eventos {{count}}",
+        "table_aria": "Eventos",
+        "types": {
+          "fail": "Falhar",
+          "partial": "Parcial",
+          "success": "Sucesso",
+          "supersede": "Substituir",
+          "unknown": "Evento desconhecido: {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "Idade",
+          "cache_path": "Caminho do cache",
+          "failed_at": "Falha em"
+        },
+        "description_action": "Forçar atualização",
+        "description_middle": "As rotas nesta lista são ignoradas automaticamente durante a janela de espera por falha (padrão 6h). Usar",
+        "description_prefix": "Caminhos de cache que falharam durante uma execução recente de pré-renderização.",
+        "description_suffix": "na guia Visão geral para tentar novamente imediatamente.",
+        "empty": "Nenhuma falha recente",
+        "errors": {
+          "load": "Falha ao carregar falhas"
+        },
+        "table_aria": "Falhas"
+      },
+      "live_connected": "Atualizações ao vivo conectadas",
+      "audit": {
+        "actions": {
+          "auto_recache": "auto_recache",
+          "cancel": "cancelar",
+          "detect_drift": "detect_drift",
+          "enqueue": "enfileirar",
+          "invalidate": "invalidar",
+          "purge": "purga",
+          "purge_unexpected": "purge_unexpected",
+          "reset_breaker": "reset_breaker",
+          "reset_queue": "reset_queue"
+        },
+        "buttons": {
+          "export_csv": "Exportar CSV",
+          "refresh": "Atualizar"
+        },
+        "columns": {
+          "action": "Ação",
+          "actor": "Ator",
+          "details": "Detalhes",
+          "job": "Trabalho",
+          "outcome": "Resultado",
+          "tenant": "Inquilino",
+          "when": "Quando"
+        },
+        "empty": "Nenhuma entrada de auditoria.",
+        "fallbacks": {
+          "all": "todos",
+          "system": "sistema"
+        },
+        "filters": {
+          "action": "Filtro de ação",
+          "all": "Todos"
+        },
+        "table_aria": "Histórico de auditoria"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "Trabalho na fila",
+          "refresh": "Atualizar"
+        },
+        "empty_summary": "Nenhum resumo disponível.",
+        "errors": {
+          "enqueue_job": "Falha ao enfileirar o trabalho",
+          "load_summary": "Falha ao carregar o resumo"
+        },
+        "fields": {
+          "routes": "Rotas",
+          "tenant_slug": "Lesma inquilina"
+        },
+        "force_refresh": {
+          "description": "Enfileirar uma nova renderização. Deixe ambos os campos vazios para atualizar cada locatário e rota. O processador host seleciona o trabalho em cerca de 60 segundos.",
+          "dry_run": "Teste (somente plano)",
+          "force": "Forçar (ignorar cache)",
+          "title": "Forçar atualização"
+        },
+        "health": {
+          "cache_unreachable": "Cache inacessível",
+          "healthy": "Saudável",
+          "missing": "{{count}} ausente",
+          "stale": "{{count}} obsoleto"
+        },
+        "hints": {
+          "active_jobs": "{{count}} ativo",
+          "aging": "Envelhecimento {{count}} (>7d)",
+          "asset_broken": "Referências mortas /assets/*",
+          "backoff_window": "Na janela de espera de 6h",
+          "cache_age": "{{oldest}} mais antigo/{{newest}} mais novo",
+          "content_stale": "Conteúdo de origem mais recente que o snapshot",
+          "event_at": "Evento {{time}}",
+          "no_events": "Nenhum evento",
+          "prometheus": "Formato de texto Prometheus",
+          "tenants_routes": "Inquilinos {{tenants}} x rotas {{routes}}"
+        },
+        "kpi": {
+          "age_stale": "Idade obsoleta (>14d)",
+          "asset_broken": "Ativo quebrado",
+          "build_commit": "Compromisso de construção",
+          "cache_size": "Tamanho do cache",
+          "content_stale": "Conteúdo obsoleto",
+          "coverage": "Cobertura",
+          "metrics": "Métricas",
+          "missing": "Ausente",
+          "queued_jobs": "Trabalhos em fila",
+          "recent_failures": "Falhas recentes",
+          "status": "Status"
+        },
+        "last_run": "Última execução concluída",
+        "messages": {
+          "job_queued": "Trabalho #{{id}} na fila"
+        },
+        "placeholders": {
+          "routes": "/sobre,/blog (em branco = todos)",
+          "tenant_slug": "por exemplo banco de horas (em branco = todos)"
+        },
+        "super_admin_only": "Somente superadministrador"
+      },
+      "polling_fallback": "Reserva de votação",
+      "purge": {
+        "actions": {
+          "auto_recache": "Recache automático após a limpeza",
+          "dry_run": "Teste a seco",
+          "preview_purge": "Pré-visualização da limpeza",
+          "purge_now": "Purgar agora"
+        },
+        "description_middle": "para um segmento de caminho,",
+        "description_prefix": "Exclua instantâneos que correspondam a um padrão glob. Usar",
+        "description_suffix": "para qualquer descendente. Exemplos:",
+        "errors": {
+          "pattern_required": "O padrão é obrigatório (por exemplo, /blog/*)",
+          "purge_failed": "Falha na limpeza"
+        },
+        "fields": {
+          "pattern": "Padrão",
+          "tenant_slug": "Lesma inquilina"
+        },
+        "messages": {
+          "dry_run": "Teste: os instantâneos {{count}} seriam eliminados",
+          "purged": "Instantâneos {{count}} eliminados{{job}}"
+        },
+        "placeholders": {
+          "pattern": "/blog/* ou /listagens/**",
+          "tenant_slug": "opcional - deixe em branco para todos"
+        },
+        "result": {
+          "deleted": "Instantâneos {{count}} excluídos",
+          "would_delete": "Excluiria os instantâneos {{count}}"
+        },
+        "title": "Limpeza de cache curinga"
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "Inspecionar"
+        },
+        "description_prefix": "Veja qual",
+        "description_suffix": "pattern possui uma rota e o que TTL ela obtém, sem usar a configuração. Usado para ajustar a política de atualização.",
+        "error": "Falha na pesquisa - verifique o formato da rota (deve começar com \"/\")",
+        "fields": {
+          "route": "Rota"
+        },
+        "path_only": "Apenas caminho - sem esquema ou host",
+        "placeholders": {
+          "route": "/blog/minha-postagem"
+        },
+        "result": {
+          "match": "correspondência: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (especificidade {{specificity}})",
+          "other_patterns": "Outros padrões que correspondem a esta rota:",
+          "ttl": "TTL: {{ttl}} ({{seconds}}s)"
+        },
+        "title": "Inspetor TTL",
+        "units": {
+          "days": "{{count}} d",
+          "hours": "{{count}}h",
+          "minutes": "{{count}} min"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "Explorar"
+        },
+        "counts": {
+          "dynamic": "{{count}} dinâmico",
+          "static": "{{count}} estático",
+          "total": "{{count}} total"
+        },
+        "description_prefix": "Veja exatamente quais rotas o mecanismo planeja renderizar para um locatário - piso estático (recurso/módulo fechado) mais os URLs dinâmicos de",
+        "description_suffix": "O trabalhador do dramaturgo visita esta lista.",
+        "error": "Falha na pesquisa – verifique o slug do locatário",
+        "fields": {
+          "tenant_slug": "Lesma inquilina"
+        },
+        "none": "(nenhum)",
+        "placeholders": {
+          "tenant_slug": "banco de horas"
+        },
+        "sections": {
+          "dynamic_routes": "Rotas dinâmicas (limitadas a 1.000)",
+          "static_routes": "Rotas estáticas"
+        },
+        "title": "Explorador de mapa do site"
+      },
+      "readonly": {
+        "prefix": "Visualização somente leitura – os botões de ação estão desabilitados porque o mecanismo de pré-renderização opera em todos os locatários. Faça login com um",
+        "role": "superadministrador da plataforma",
+        "suffix": "conta para enfileirar trabalhos, limpar instantâneos ou acionar a detecção de desvios."
+      },
+      "tabs": {
+        "analytics": "Análise",
+        "coverage": "Cobertura",
+        "events": "Eventos",
+        "failures": "Falhas",
+        "history": "História",
+        "inventory": "Inventário",
+        "jobs": "Empregos",
+        "overview": "Visão geral"
+      },
+      "tabs_aria": "Pré-renderizar guias",
+      "title": "Mecanismo de pré-renderização"
+    }
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",

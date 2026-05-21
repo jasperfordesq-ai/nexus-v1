@@ -299,7 +299,570 @@
     "sitemap_urls_by_type": "URLs by Type",
     "social_sharing_image_heading": "Social Sharing Image",
     "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
-    "usage_limits_heading": "Usage Limits"
+    "usage_limits_heading": "Usage Limits",
+    "prerender": {
+      "description": "Instantanés rendus par le serveur uniquement par des robots. Surveillez la couverture, détectez l’obsolescence et forcez les actualisations.",
+      "analytics": {
+        "actions": {
+          "reload": "Recharger"
+        },
+        "columns": {
+          "crawler": "CRAWLER",
+          "hits": "HITS",
+          "host": "HOST",
+          "ip": "IP",
+          "status": "STATUS",
+          "time": "TIME",
+          "uri": "URI",
+          "url": "URL"
+        },
+        "empty": "Aucune analyse disponible. Le journal d'accès au robot peut être vide.",
+        "empty_bot_traffic": "Pas encore de trafic de robots",
+        "empty_no_data": "Aucune donnée",
+        "empty_recent_hits": "Aucun hit récent",
+        "errors": {
+          "load": "Échec du chargement des analyses"
+        },
+        "filters": {
+          "window": "Fenêtre"
+        },
+        "hints": {
+          "spoofed": "revendiqué un bot majeur, échec de la gamme IP",
+          "top_50_cap": "de la casquette top-50",
+          "verified_of_total": "{{verified}} de {{total}}"
+        },
+        "kpi": {
+          "ip_verified": "IP-vérifié",
+          "spoofed": "Usurpé (suspect)",
+          "total_bot_hits": "Nombre total de visites de robots",
+          "unique_uris": "URI uniques"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} usurpé"
+        },
+        "log_summary": "Journal : {{size}} - depuis {{time}}",
+        "sections": {
+          "hits_by_crawler": "Clics par robot",
+          "hits_by_status": "Clics par statut HTTP",
+          "recent_activity": "Activité récente (la plus récente en premier, la dernière {{count}})",
+          "top_uris": "Top URI (top 50 par nombre de hits)"
+        },
+        "tables": {
+          "recent_hits_aria": "Hits récents de robots",
+          "top_uris_aria": "Meilleurs URI"
+        },
+        "windows": {
+          "1": "Dernières 24 heures",
+          "7": "7 derniers jours",
+          "30": "30 derniers jours"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "Ouvert en inventaire",
+          "refresh": "Rafraîchir",
+          "refresh_all_stale": "Actualiser tous les éléments obsolètes ({{count}})"
+        },
+        "columns": {
+          "actions": "ACTIONS",
+          "asset": "ASSET",
+          "coverage": "COVERAGE",
+          "host": "HOST",
+          "missing": "MISSING",
+          "stale": "STALE",
+          "tenant": "TENANT"
+        },
+        "confirm": {
+          "queue_recache": "Remise en file d'attente pour les locataires {{count}} ?"
+        },
+        "empty": "Aucun locataire",
+        "errors": {
+          "bulk_enqueue": "Échec de la mise en file d'attente groupée (certains locataires peuvent avoir été mis en file d'attente)",
+          "enqueue": "Échec de la mise en file d'attente",
+          "load": "Échec du chargement de la couverture"
+        },
+        "messages": {
+          "bulk_queued": "Remise en file d'attente pour les locataires {{count}}",
+          "no_stale": "Pas de locataires périmés - la couverture est saine",
+          "tenant_queued": "#{{id}} mis en file d?attente pour {{slug}}"
+        },
+        "summary": {
+          "healthy": "Tous les locataires de {{count}} en bonne santé.",
+          "needs_work": "Les locataires {{needing}} des {{total}} ont des routes manquantes, obsolètes ou dont les actifs sont endommagés."
+        },
+        "table_aria": "Couverture"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "Appliquer",
+          "dry_run": "Essai à sec"
+        },
+        "auto_recache": {
+          "description": "Analyse chaque instantané. Met en file d'attente les remises en file d'attente de faible priorité pour les routes dont le contenu source a changé ou dont le TTL a expiré. S'exécute sur cron toutes les 15 à 30 minutes ; utilisez-le pour en déclencher un immédiatement.",
+          "title": "Mise en cache automatique (TTL + dérive du contenu)"
+        },
+        "drift": {
+          "description": "Parcourt le plan du site de chaque locataire, compare lastmod aux instantanés mtimes et récupère les pages obsolètes à partir d'écritures brutes, de migrations ou de tâches en file d'attente. S'exécute toutes les 2 minutes et met en file d'attente les mises à jour hautement prioritaires.",
+          "title": "Détecter la dérive (plan du site vs instantanés)"
+        },
+        "errors": {
+          "auto_recache": "Échec du déclenchement de la remise en cache automatique",
+          "drift_detection": "Échec du déclenchement de la détection de dérive",
+          "purge_unexpected": "Échec inattendu de la purge"
+        },
+        "messages": {
+          "auto_recache_applied": "Mise en cache automatique appliquée",
+          "auto_recache_dry_run": "Essai à sec de récupération automatique terminé",
+          "drift_applied": "Détection de dérive appliquée",
+          "drift_dry_run": "Essai à sec de dérive terminé",
+          "purge_dry_run": "Essai à sec : les instantanés {{count}} seraient purgés",
+          "purged_ungated": "Suppression des instantanés non protégés de {{count}} sur les locataires {{tenants}}"
+        },
+        "no_output": "(pas de sortie)",
+        "purge_ungated": {
+          "description": "Balayez les instantanés dont l’itinéraire ne se trouve pas dans un ensemble attendu par le locataire. Courant après la désactivation d'une fonctionnalité ou pour le nettoyage des routes statiques pré-rendues sans indicateurs de fonctionnalité. Les itinéraires de contenu dynamique sont laissés seuls.",
+          "title": "Purger les instantanés non sécurisés (nettoyage 404 par locataire)"
+        },
+        "result": {
+          "deleted": "Instantanés {{count}} supprimés dans les locataires {{tenants}}",
+          "would_delete": "Supprimerait les instantanés {{count}} sur les locataires {{tenants}}"
+        },
+        "title": "Automatisation de la fraîcheur"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "Annuler",
+          "close_breaker_now": "Fermez le disjoncteur maintenant",
+          "details": "Détails",
+          "emergency_reset": "Réinitialisation d'urgence",
+          "hide": "Cacher",
+          "hide_details": "Masquer les détails",
+          "reset_queue": "Réinitialiser la file d'attente"
+        },
+        "engine_healthy": "Moteur sain",
+        "issue_count_one": "Problème {{count}}",
+        "issue_count_other": "Problèmes {{count}}",
+        "modal": {
+          "body_middle": "ou",
+          "body_prefix": "Cela remettra en file d'attente tous les",
+          "body_suffix": "rangée dont le travailleur est resté silencieux pendant >30 min et dégagez le disjoncteur.",
+          "title": "Urgence : réinitialiser la file d'attente bloquée",
+          "warning": "Utilisez-le uniquement si vous avez confirmé que la file d'attente est bloquée. Si un travailleur en bonne santé est toujours en cours d'exécution, cela créera un travail en double."
+        },
+        "toasts": {
+          "breaker_reset": "Réinitialisation du disjoncteur",
+          "queue_reset_one": "Réinitialiser la ligne bloquée {{count}} ; disjoncteur dégagé",
+          "queue_reset_other": "Réinitialiser les lignes bloquées {{count}} ; disjoncteur dégagé",
+          "queue_reset_failed": "Échec de la réinitialisation de la file d'attente",
+          "reset_failed": "Échec de la réinitialisation"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "Fermer",
+          "inspect": "Inspecter",
+          "inspect_snapshot": "Inspecter {{path}}",
+          "open_rendered_url": "Ouvrir le rendu URL",
+          "recache_selected": "Remise en cache sélectionnée ({{count}})",
+          "reload": "Recharger",
+          "select_all_visible": "Sélectionner tout ce qui est visible",
+          "select_snapshot": "Sélectionnez {{path}}"
+        },
+        "columns": {
+          "actions": "Actes",
+          "age": "Âge",
+          "host": "Hôte",
+          "http": "HTTP",
+          "route": "Itinéraire",
+          "size": "Taille",
+          "status": "Statut"
+        },
+        "empty": "Aucun instantané ne correspond aux filtres",
+        "errors": {
+          "bulk_recache": "Échec de la remise en cache groupée",
+          "inspect": "Échec de l'inspection de l'instantané",
+          "load": "Échec du chargement de l'inventaire"
+        },
+        "filters": {
+          "aging": "Vieillissement",
+          "all": "Tous",
+          "asset_broken": "Actif cassé",
+          "content_drifted": "Le contenu a dérivé",
+          "filter": "Filtre",
+          "filter_placeholder": "sous-chaîne d'itinéraire ou d'hôte",
+          "fresh": "Frais",
+          "issue": "Problème",
+          "stale": "Vicié",
+          "staleness": "Manque de fraîcheur",
+          "status": "Statut",
+          "status_200": "200 seulement",
+          "status_non_200": "Non-200",
+          "tenant_placeholder": "facultatif",
+          "tenant_slug": "Limace de locataire"
+        },
+        "messages": {
+          "bulk_recache": "Instantanés {{count}} invalidés et remise en cache en file d'attente"
+        },
+        "inspect": {
+          "age": "Âge",
+          "all_valid": "tous valides",
+          "asset_references": "Références d'actifs ({{count}})",
+          "canonical": "Canonique",
+          "dead_assets": "{{count}} mort",
+          "flags": "Drapeaux",
+          "h1_count": "H1 (compte)",
+          "html_parse_warnings": "HTML analyse les avertissements",
+          "html_preview": "Aperçu HTML (12 premiers Ko, scripts supprimés)",
+          "integrity_mismatch": "octets modifiés depuis le rendu - attendu sha256 {{expected}}..., obtenu {{actual}}...",
+          "integrity_missing": "pas de side-car sha256 - l'instantané est antérieur à la vérification de l'intégrité ou a été modifié à la main",
+          "integrity_ok": "les octets correspondent au sha256 écrit au moment du rendu",
+          "integrity_status": "intégrité : {{status}}",
+          "integrity_unreadable": "Le side-car sha256 existe mais est mal formé",
+          "invalid_present": "INVALID PRÉSENT",
+          "json_ld": "JSON-LD (blocs {{blocks}}, {{status}})",
+          "meta_description": "Méta description",
+          "missing": "- manquant -",
+          "modal_title": "Inspection instantanée",
+          "modified": "Modifié",
+          "must_fix": "Doit être corrigé ({{count}})",
+          "no_structured_data": "Aucune donnée structurée",
+          "no_type": "(pas de @type)",
+          "none": "(aucun)",
+          "old": "{{age}} ancien",
+          "open_graph": "Ouvrir le graphique",
+          "path": "Chemin",
+          "seo_score": "Score SEO",
+          "size": "Taille",
+          "tips": "Conseils ({{count}})",
+          "title": "Titre"
+        },
+        "selected": "{{count}} sélectionné",
+        "status": {
+          "asset": "actif",
+          "content": "contenu",
+          "content_drifted": "contenu dérivé"
+        },
+        "summary": "{{filtered}} sur les instantanés {{total}}",
+        "table_aria": "Inventaire instantané"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "Annuler la t?che #{{id}}",
+          "close": "Fermer",
+          "reload": "Recharger",
+          "retry_job": "R?essayer la t?che #{{id}}",
+          "retry_same_parameters": "Réessayez avec les mêmes paramètres",
+          "view_details": "Voir les d?tails de la t?che #{{id}}"
+        },
+        "columns": {
+          "actions": "Actes",
+          "by": "Par",
+          "flags": "Drapeaux",
+          "id": "#",
+          "priority": "Priorité",
+          "queued": "En file d'attente",
+          "result": "Résultat",
+          "scope": "Portée",
+          "status": "Statut"
+        },
+        "detail": {
+          "all": "tous",
+          "claimed_by": "Réclamé par",
+          "duration": "Durée",
+          "error": "Erreur",
+          "exit_code": "Code de sortie",
+          "finished_at": "Terminé à",
+          "log_tail": "Bûche (queue)",
+          "queued_at": "En file d'attente à",
+          "requested_by": "Demandé par",
+          "routes": "Itinéraires",
+          "started_at": "Commencé à",
+          "status": "Statut",
+          "tenant": "Locataire",
+          "title": "T?che #{{id}}"
+        },
+        "empty": "Aucun emploi",
+        "errors": {
+          "cancel": "Impossible d'annuler : la tâche a peut-être commencé",
+          "load": "Échec du chargement des tâches",
+          "retry": "Échec de la nouvelle tentative : la tâche d'origine est peut-être toujours en cours"
+        },
+        "filters": {
+          "all": "Tous",
+          "cancelled": "Annulé",
+          "failed": "Échoué",
+          "partial": "Partiel",
+          "queued": "En file d'attente",
+          "running": "En cours d'exécution",
+          "status": "Statut",
+          "succeeded": "Réussi"
+        },
+        "flags": {
+          "dry_run": "essai à sec",
+          "force": "forcer"
+        },
+        "messages": {
+          "cancelled": "T?che #{{id}} annul?e",
+          "retry_queued": "Nouvelle tentative #{{retryId}} en file d?attente (depuis #{{id}})"
+        },
+        "priority": {
+          "high": "Haut",
+          "low": "Faible",
+          "normal": "Normale",
+          "tooltip": "priorité = {{priority}} (gains inférieurs)"
+        },
+        "result": {
+          "invalid": "{{count}} invalide"
+        },
+        "scope": {
+          "all_tenants": "tous les locataires"
+        },
+        "table_aria": "Emplois"
+      },
+      "events": {
+        "actions": {
+          "reload": "Recharger"
+        },
+        "columns": {
+          "commit": "Commettre",
+          "details": "Détails",
+          "event": "Événement",
+          "time": "Temps"
+        },
+        "empty": "Aucun événement",
+        "errors": {
+          "load": "Échec du chargement des événements"
+        },
+        "filters": {
+          "limit": "Limite"
+        },
+        "summary": "Événements {{count}}",
+        "table_aria": "Événements",
+        "types": {
+          "fail": "Échouer",
+          "partial": "Partiel",
+          "success": "Succès",
+          "supersede": "Remplacer",
+          "unknown": "Événement inconnu : {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "Âge",
+          "cache_path": "Chemin du cache",
+          "failed_at": "Échec à"
+        },
+        "description_action": "Forcer l'actualisation",
+        "description_middle": "Les routes de cette liste sont automatiquement ignorées pendant la fenêtre d'attente en cas d'échec (6 heures par défaut). Utiliser",
+        "description_prefix": "Chemins de cache ayant échoué lors d’une récente exécution de pré-rendu.",
+        "description_suffix": "dans l'onglet Présentation pour réessayer immédiatement.",
+        "empty": "Aucun échec récent",
+        "errors": {
+          "load": "Échec du chargement des échecs"
+        },
+        "table_aria": "Échecs"
+      },
+      "live_connected": "Mises à jour en direct connectées",
+      "audit": {
+        "actions": {
+          "auto_recache": "auto_recache",
+          "cancel": "Annuler",
+          "detect_drift": "detect_drift",
+          "enqueue": "mettre en file d'attente",
+          "invalidate": "invalider",
+          "purge": "purge",
+          "purge_unexpected": "purge_unexpected",
+          "reset_breaker": "reset_breaker",
+          "reset_queue": "reset_queue"
+        },
+        "buttons": {
+          "export_csv": "Exporter CSV",
+          "refresh": "Rafraîchir"
+        },
+        "columns": {
+          "action": "Action",
+          "actor": "Acteur",
+          "details": "Détails",
+          "job": "Emploi",
+          "outcome": "Résultat",
+          "tenant": "Locataire",
+          "when": "Quand"
+        },
+        "empty": "Aucune entrée d'audit.",
+        "fallbacks": {
+          "all": "tous",
+          "system": "système"
+        },
+        "filters": {
+          "action": "Filtre d'actions",
+          "all": "Tous"
+        },
+        "table_aria": "Historique des audits"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "Travail en file d'attente",
+          "refresh": "Rafraîchir"
+        },
+        "empty_summary": "Aucun résumé disponible.",
+        "errors": {
+          "enqueue_job": "Échec de la mise en file d'attente du travail",
+          "load_summary": "Échec du chargement du résumé"
+        },
+        "fields": {
+          "routes": "Itinéraires",
+          "tenant_slug": "Limace de locataire"
+        },
+        "force_refresh": {
+          "description": "Mettez en file d'attente un nouveau rendu. Laissez les deux champs vides pour actualiser chaque locataire et itinéraire. Le processeur hôte récupère la tâche dans un délai d'environ 60 secondes.",
+          "dry_run": "Essai à sec (plan uniquement)",
+          "force": "Forcer (ignorer le cache)",
+          "title": "Forcer l'actualisation"
+        },
+        "health": {
+          "cache_unreachable": "Cache inaccessible",
+          "healthy": "En bonne santé",
+          "missing": "{{count}} manquant",
+          "stale": "{{count}} périmé"
+        },
+        "hints": {
+          "active_jobs": "{{count}} actif",
+          "aging": "Vieillissement {{count}} (>7j)",
+          "asset_broken": "Références décédées /actifs/*",
+          "backoff_window": "Dans une fenêtre d'attente de 6 heures",
+          "cache_age": "{{oldest}} le plus ancien / {{newest}} le plus récent",
+          "content_stale": "Contenu source plus récent que l'instantané",
+          "event_at": "Événement {{time}}",
+          "no_events": "Aucun événement",
+          "prometheus": "Format de texte Prométhée",
+          "tenants_routes": "Locataires {{tenants}} x itinéraires {{routes}}"
+        },
+        "kpi": {
+          "age_stale": "Âge périmé (> 14 jours)",
+          "asset_broken": "Actif brisé",
+          "build_commit": "Construire un commit",
+          "cache_size": "Taille du cache",
+          "content_stale": "Contenu obsolète",
+          "coverage": "Couverture",
+          "metrics": "Métrique",
+          "missing": "Manquant",
+          "queued_jobs": "Travaux en file d'attente",
+          "recent_failures": "Échecs récents",
+          "status": "Statut"
+        },
+        "last_run": "Dernière exécution terminée",
+        "messages": {
+          "job_queued": "T?che #{{id}} mise en file d?attente"
+        },
+        "placeholders": {
+          "routes": "/about,/blog (vide = tout)",
+          "tenant_slug": "par ex. banque d'heures (vide = tout)"
+        },
+        "super_admin_only": "Super administrateur uniquement"
+      },
+      "polling_fallback": "Repli du sondage",
+      "purge": {
+        "actions": {
+          "auto_recache": "Mise en cache automatique après purge",
+          "dry_run": "Essai à sec",
+          "preview_purge": "Aperçu de la purge",
+          "purge_now": "Purger maintenant"
+        },
+        "description_middle": "pour un segment de chemin,",
+        "description_prefix": "Supprimez les instantanés correspondant à un modèle global. Utiliser",
+        "description_suffix": "pour tout descendant. Exemples :",
+        "errors": {
+          "pattern_required": "Le modèle est requis (par exemple /blog/*)",
+          "purge_failed": "Échec de la purge"
+        },
+        "fields": {
+          "pattern": "Modèle",
+          "tenant_slug": "Limace de locataire"
+        },
+        "messages": {
+          "dry_run": "Essai à sec : les instantanés {{count}} seraient purgés",
+          "purged": "Instantanés {{count}} purgés{{job}}"
+        },
+        "placeholders": {
+          "pattern": "/blog/* ou /listings/**",
+          "tenant_slug": "facultatif - laisser vide pour tous"
+        },
+        "result": {
+          "deleted": "Instantanés {{count}} supprimés",
+          "would_delete": "Supprimerait les instantanés {{count}}"
+        },
+        "title": "Purge du cache générique"
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "Inspecter"
+        },
+        "description_prefix": "Voir lequel",
+        "description_suffix": "pattern possède une route et ce que TTL il obtient, sans saisir la configuration. Utilisé pour régler la politique de fraîcheur.",
+        "error": "Échec de la recherche - vérifiez le format de l'itinéraire (doit commencer par \"/\")",
+        "fields": {
+          "route": "Itinéraire"
+        },
+        "path_only": "Chemin uniquement - pas de schéma ni d'hôte",
+        "placeholders": {
+          "route": "/blog/mon-post"
+        },
+        "result": {
+          "match": "correspondance: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (spécificité {{specificity}})",
+          "other_patterns": "Autres modèles qui correspondent à cet itinéraire :",
+          "ttl": "TTL : {{ttl}} ({{seconds}})"
+        },
+        "title": "Inspecteur TTL",
+        "units": {
+          "days": "{{count}} d",
+          "hours": "{{count}} h",
+          "minutes": "{{count}} min"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "Explorer"
+        },
+        "counts": {
+          "dynamic": "{{count}} dynamique",
+          "static": "{{count}} statique",
+          "total": "{{count}} total"
+        },
+        "description_prefix": "Découvrez exactement les itinéraires que le moteur prévoit de restituer pour un locataire - étage statique (fonctionnalité/module fermé) plus les URL dynamiques de",
+        "description_suffix": "L'ouvrier dramaturge visite cette liste.",
+        "error": "Échec de la recherche : vérifiez le slug du locataire",
+        "fields": {
+          "tenant_slug": "Limace de locataire"
+        },
+        "none": "(aucun)",
+        "placeholders": {
+          "tenant_slug": "banque d'heures"
+        },
+        "sections": {
+          "dynamic_routes": "Itinéraires dynamiques (plafonnés à 1 000)",
+          "static_routes": "Itinéraires statiques"
+        },
+        "title": "Explorateur de plan du site"
+      },
+      "readonly": {
+        "prefix": "Vue en lecture seule : les boutons d'action sont désactivés car le moteur de pré-rendu fonctionne sur chaque locataire. Connectez-vous avec un",
+        "role": "super-administrateur de la plateforme",
+        "suffix": "compte pour mettre les tâches en file d'attente, purger les instantanés ou déclencher la détection de dérive."
+      },
+      "tabs": {
+        "analytics": "Analytique",
+        "coverage": "Couverture",
+        "events": "Événements",
+        "failures": "Échecs",
+        "history": "Histoire",
+        "inventory": "Inventaire",
+        "jobs": "Emplois",
+        "overview": "Aperçu"
+      },
+      "tabs_aria": "Onglets de pré-rendu",
+      "title": "Moteur de pré-rendu"
+    }
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",

@@ -299,7 +299,570 @@
     "sitemap_urls_by_type": "URLs by Type",
     "social_sharing_image_heading": "Social Sharing Image",
     "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
-    "usage_limits_heading": "Usage Limits"
+    "usage_limits_heading": "Usage Limits",
+    "prerender": {
+      "description": "Bot-only server-gerenderde snapshots. Bewaak de dekking, detecteer veroudering en forceer vernieuwingen.",
+      "analytics": {
+        "actions": {
+          "reload": "Herladen"
+        },
+        "columns": {
+          "crawler": "CRAWLER",
+          "hits": "HITS",
+          "host": "HOST",
+          "ip": "IP",
+          "status": "STATUS",
+          "time": "TIME",
+          "uri": "URI",
+          "url": "URL"
+        },
+        "empty": "Geen analyses beschikbaar. Bottoegangslogboek is mogelijk leeg.",
+        "empty_bot_traffic": "Nog geen botverkeer",
+        "empty_no_data": "Geen gegevens",
+        "empty_recent_hits": "Geen recente hits",
+        "errors": {
+          "load": "Kan analyses niet laden"
+        },
+        "filters": {
+          "window": "Raam"
+        },
+        "hints": {
+          "spoofed": "claimde grote bot, mislukte IP-reeks",
+          "top_50_cap": "van top-50 cap",
+          "verified_of_total": "{{verified}} of {{total}}"
+        },
+        "kpi": {
+          "ip_verified": "IP-geverifieerd",
+          "spoofed": "Vervalst (verdacht)",
+          "total_bot_hits": "Totaal aantal bothits",
+          "unique_uris": "Unieke URI's"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} vervalst"
+        },
+        "log_summary": "Logboek: {{size}} - sinds {{time}}",
+        "sections": {
+          "hits_by_crawler": "Hits door crawler",
+          "hits_by_status": "Hits op HTTP-status",
+          "recent_activity": "Recente activiteit (nieuwste eerst, laatste {{count}})",
+          "top_uris": "Top URIs (top 50 op basis van aantal hits)"
+        },
+        "tables": {
+          "recent_hits_aria": "Recente bothits",
+          "top_uris_aria": "Top URI's"
+        },
+        "windows": {
+          "1": "Afgelopen 24 uur",
+          "7": "Laatste 7 dagen",
+          "30": "Laatste 30 dagen"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "Openen in inventaris",
+          "refresh": "Vernieuwen",
+          "refresh_all_stale": "Alles vernieuwen ({{count}})"
+        },
+        "columns": {
+          "actions": "ACTIONS",
+          "asset": "ASSET",
+          "coverage": "COVERAGE",
+          "host": "HOST",
+          "missing": "MISSING",
+          "stale": "STALE",
+          "tenant": "TENANT"
+        },
+        "confirm": {
+          "queue_recache": "Wachtrij opnieuw cachen voor {{count}}-tenants?"
+        },
+        "empty": "Geen huurders",
+        "errors": {
+          "bulk_enqueue": "Bulkinschrijving mislukt (sommige tenants zijn mogelijk in de wachtrij geplaatst)",
+          "enqueue": "Kan niet in de wachtrij worden geplaatst",
+          "load": "Kan de dekking niet laden"
+        },
+        "messages": {
+          "bulk_queued": "In de wachtrij geplaatste cache voor {{count}}-tenants",
+          "no_stale": "Geen oude huurders - de dekking is gezond",
+          "tenant_queued": "#{{id}} in wachtrij geplaatst voor {{slug}}"
+        },
+        "summary": {
+          "healthy": "Alle {{count}}-huurders gezond.",
+          "needs_work": "{{needing}} van {{total}}-tenants hebben ontbrekende, verouderde of defecte routes."
+        },
+        "table_aria": "Dekking"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "Toepassen",
+          "dry_run": "Drooglopen"
+        },
+        "auto_recache": {
+          "description": "Scant elke momentopname. Zet hercaches met lage prioriteit in de wachtrij voor routes waarvan de broninhoud is gewijzigd of waarvan de TTL is verlopen. Draait elke 15-30 minuten op cron; gebruik dit om er onmiddellijk een te activeren.",
+          "title": "Automatisch opnieuw cachen (TTL + inhoudsdrift)"
+        },
+        "drift": {
+          "description": "Doorloopt elke tenant-sitemap, vergelijkt lastmod mtimes met momentopnamen en vangt verouderde pagina's op van onbewerkte schrijfbewerkingen, migraties of taken in de wachtrij. Wordt elke 2 minuten uitgevoerd en zet hercaches met hoge prioriteit in de wachtrij.",
+          "title": "Detecteer drift (sitemap versus snapshots)"
+        },
+        "errors": {
+          "auto_recache": "Kan automatisch opnieuw cachen niet activeren",
+          "drift_detection": "Kan driftdetectie niet activeren",
+          "purge_unexpected": "Opschonen-onverwacht mislukt"
+        },
+        "messages": {
+          "auto_recache_applied": "Automatisch opnieuw cachen toegepast",
+          "auto_recache_dry_run": "Droogloop automatisch opnieuw uitvoeren voltooid",
+          "drift_applied": "Driftdetectie toegepast",
+          "drift_dry_run": "Driftdroogloop voltooid",
+          "purge_dry_run": "Testrun: {{count}}-snapshots zouden worden verwijderd",
+          "purged_ungated": "{{count}} niet-geregistreerde momentopnamen opgeschoond voor {{tenants}}-tenants"
+        },
+        "no_output": "(geen uitvoer)",
+        "purge_ungated": {
+          "description": "Opruimmomentopnamen waarvan de route zich niet in de verwachte set van een tenant bevindt. Vaak na het uitschakelen van een functie, of voor het opschonen van statische routes die vooraf zijn weergegeven zonder functievlaggen. Dynamische contentroutes worden met rust gelaten.",
+          "title": "Niet-geregistreerde momentopnamen opschonen (opschonen per tenant 404)"
+        },
+        "result": {
+          "deleted": "{{count}}-momentopnamen voor {{tenants}}-tenants verwijderd",
+          "would_delete": "Zou {{count}}-momentopnamen voor {{tenants}}-tenants verwijderen"
+        },
+        "title": "Automatisering van versheid"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "Annuleren",
+          "close_breaker_now": "Sluit de breker nu",
+          "details": "Details",
+          "emergency_reset": "Noodreset",
+          "hide": "Verbergen",
+          "hide_details": "Details verbergen",
+          "reset_queue": "Wachtrij opnieuw instellen"
+        },
+        "engine_healthy": "Motor gezond",
+        "issue_count_one": "{{count}}-probleem",
+        "issue_count_other": "{{count}}-problemen",
+        "modal": {
+          "body_middle": "of",
+          "body_prefix": "Dit zal elke opnieuw in de wachtrij plaatsen",
+          "body_suffix": "rij waarvan de arbeider stil is geweest vanwege >30 min, en schakel de stroomonderbreker uit.",
+          "title": "Noodgeval: vastgelopen wachtrij opnieuw instellen",
+          "warning": "Gebruik dit alleen als u zeker weet dat de wachtrij vastzit. Als een gezonde werknemer nog aan het werk is, ontstaat er dubbel werk."
+        },
+        "toasts": {
+          "breaker_reset": "Reset van de stroomonderbreker",
+          "queue_reset_one": "Reset {{count}} vastzittende rij; breker gewist",
+          "queue_reset_other": "Reset {{count}} vastzittende rijen; breker gewist",
+          "queue_reset_failed": "Het opnieuw instellen van de wachtrij is mislukt",
+          "reset_failed": "Resetten mislukt"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "Dichtbij",
+          "inspect": "Inspecteren",
+          "inspect_snapshot": "Inspecteer {{path}}",
+          "open_rendered_url": "Open weergegeven URL",
+          "recache_selected": "Opnieuw cachen geselecteerd ({{count}})",
+          "reload": "Herladen",
+          "select_all_visible": "Selecteer alles wat zichtbaar is",
+          "select_snapshot": "Selecteer {{path}}"
+        },
+        "columns": {
+          "actions": "Acties",
+          "age": "Leeftijd",
+          "host": "Gastheer",
+          "http": "HTTP",
+          "route": "Route",
+          "size": "Maat",
+          "status": "Status"
+        },
+        "empty": "Er zijn geen momentopnamen die overeenkomen met filters",
+        "errors": {
+          "bulk_recache": "Bulk opnieuw cachen is mislukt",
+          "inspect": "Kan momentopname niet inspecteren",
+          "load": "Kan voorraad niet laden"
+        },
+        "filters": {
+          "aging": "Veroudering",
+          "all": "Alle",
+          "asset_broken": "Aanwinst kapot",
+          "content_drifted": "De inhoud dreef",
+          "filter": "Filter",
+          "filter_placeholder": "route- of host-subtekenreeks",
+          "fresh": "Vers",
+          "issue": "Probleem",
+          "stale": "Muf",
+          "staleness": "Oudheid",
+          "status": "Status",
+          "status_200": "Slechts 200",
+          "status_non_200": "Niet-200",
+          "tenant_placeholder": "optioneel",
+          "tenant_slug": "Huurderslak"
+        },
+        "messages": {
+          "bulk_recache": "Ongeldige {{count}}-snapshots en opnieuw cachen in de wachtrij"
+        },
+        "inspect": {
+          "age": "Leeftijd",
+          "all_valid": "allemaal geldig",
+          "asset_references": "Assetreferenties ({{count}})",
+          "canonical": "Canoniek",
+          "dead_assets": "{{count}} dood",
+          "flags": "Vlaggen",
+          "h1_count": "H1 (telling)",
+          "html_parse_warnings": "HTML parseerwaarschuwingen",
+          "html_preview": "HTML preview (eerste 12 KB, scripts verwijderd)",
+          "integrity_mismatch": "bytes veranderd sinds render - verwacht sha256 {{expected}}..., kreeg {{actual}}...",
+          "integrity_missing": "geen sha256 zijspan - momentopname dateert van vóór de integriteitsverificatie of is met de hand bewerkt",
+          "integrity_ok": "bytes komen overeen met de sha256 die tijdens het renderen is geschreven",
+          "integrity_status": "integriteit: {{status}}",
+          "integrity_unreadable": "sha256 zijspan bestaat maar is misvormd",
+          "invalid_present": "INVALID AANWEZIG",
+          "json_ld": "JSON-LD ({{blocks}}-blokken, {{status}})",
+          "meta_description": "Metabeschrijving",
+          "missing": "- ontbreekt -",
+          "modal_title": "Momentopname inspectie",
+          "modified": "Gewijzigd",
+          "must_fix": "Moet worden opgelost ({{count}})",
+          "no_structured_data": "Geen gestructureerde gegevens",
+          "no_type": "(geen @type)",
+          "none": "(geen)",
+          "old": "{{age}} oud",
+          "open_graph": "Grafiek openen",
+          "path": "Pad",
+          "seo_score": "SEO-score",
+          "size": "Maat",
+          "tips": "Fooien ({{count}})",
+          "title": "Titel"
+        },
+        "selected": "{{count}} geselecteerd",
+        "status": {
+          "asset": "bezit",
+          "content": "inhoud",
+          "content_drifted": "inhoud dwaalde af"
+        },
+        "summary": "{{filtered}} van {{total}}-snapshots",
+        "table_aria": "Momentopname inventaris"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "Taak #{{id}} annuleren",
+          "close": "Dichtbij",
+          "reload": "Herladen",
+          "retry_job": "Taak #{{id}} opnieuw proberen",
+          "retry_same_parameters": "Probeer het opnieuw met dezelfde parameters",
+          "view_details": "Details van taak #{{id}} bekijken"
+        },
+        "columns": {
+          "actions": "Acties",
+          "by": "Door",
+          "flags": "Vlaggen",
+          "id": "#",
+          "priority": "Prioriteit",
+          "queued": "In de wachtrij",
+          "result": "Resultaat",
+          "scope": "Domein",
+          "status": "Status"
+        },
+        "detail": {
+          "all": "alle",
+          "claimed_by": "Geclaimd door",
+          "duration": "Duur",
+          "error": "Fout",
+          "exit_code": "Afsluitcode",
+          "finished_at": "Klaar om",
+          "log_tail": "Stam (staart)",
+          "queued_at": "In de rij gestaan ​​bij",
+          "requested_by": "Aangevraagd door",
+          "routes": "Routes",
+          "started_at": "Begonnen om",
+          "status": "Status",
+          "tenant": "Huurder",
+          "title": "Taak #{{id}}"
+        },
+        "empty": "Geen banen",
+        "errors": {
+          "cancel": "Kon niet annuleren - de taak is mogelijk gestart",
+          "load": "Kan taken niet laden",
+          "retry": "Opnieuw proberen mislukt - de oorspronkelijke taak is mogelijk nog in uitvoering"
+        },
+        "filters": {
+          "all": "Alle",
+          "cancelled": "Geannuleerd",
+          "failed": "Mislukt",
+          "partial": "Gedeeltelijk",
+          "queued": "In de wachtrij",
+          "running": "Rennen",
+          "status": "Status",
+          "succeeded": "Geslaagd"
+        },
+        "flags": {
+          "dry_run": "drooglopen",
+          "force": "kracht"
+        },
+        "messages": {
+          "cancelled": "Taak #{{id}} geannuleerd",
+          "retry_queued": "Nieuwe poging #{{retryId}} in wachtrij (van #{{id}})"
+        },
+        "priority": {
+          "high": "Hoog",
+          "low": "Laag",
+          "normal": "Normaal",
+          "tooltip": "prioriteit={{priority}} (lagere winsten)"
+        },
+        "result": {
+          "invalid": "{{count}} ongeldig"
+        },
+        "scope": {
+          "all_tenants": "alle huurders"
+        },
+        "table_aria": "Banen"
+      },
+      "events": {
+        "actions": {
+          "reload": "Herladen"
+        },
+        "columns": {
+          "commit": "Verbinden",
+          "details": "Details",
+          "event": "Evenement",
+          "time": "Tijd"
+        },
+        "empty": "Geen evenementen",
+        "errors": {
+          "load": "Kan gebeurtenissen niet laden"
+        },
+        "filters": {
+          "limit": "Beperken"
+        },
+        "summary": "{{count}}-evenementen",
+        "table_aria": "Evenementen",
+        "types": {
+          "fail": "Mislukking",
+          "partial": "Gedeeltelijk",
+          "success": "Succes",
+          "supersede": "Vervangen",
+          "unknown": "Onbekende gebeurtenis: {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "Leeftijd",
+          "cache_path": "Cache-pad",
+          "failed_at": "Mislukt bij"
+        },
+        "description_action": "Forceer vernieuwing",
+        "description_middle": "Routes in deze lijst worden automatisch overgeslagen tijdens de uitstelperiode voor fouten (standaard 6 uur). Gebruik",
+        "description_prefix": "Paden in de cache opslaan die zijn mislukt tijdens een recente pre-rendering.",
+        "description_suffix": "op het tabblad Overzicht om het onmiddellijk opnieuw te proberen.",
+        "empty": "Geen recente mislukkingen",
+        "errors": {
+          "load": "Kan fouten niet laden"
+        },
+        "table_aria": "Mislukkingen"
+      },
+      "live_connected": "Live-updates verbonden",
+      "audit": {
+        "actions": {
+          "auto_recache": "auto_recache",
+          "cancel": "annuleren",
+          "detect_drift": "detect_drift",
+          "enqueue": "in de rij staan",
+          "invalidate": "ongeldig maken",
+          "purge": "zuiveren",
+          "purge_unexpected": "purge_unexpected",
+          "reset_breaker": "reset_breaker",
+          "reset_queue": "reset_queue"
+        },
+        "buttons": {
+          "export_csv": "CSV exporteren",
+          "refresh": "Vernieuwen"
+        },
+        "columns": {
+          "action": "Actie",
+          "actor": "Acteur",
+          "details": "Details",
+          "job": "Functie",
+          "outcome": "Resultaat",
+          "tenant": "Huurder",
+          "when": "Wanneer"
+        },
+        "empty": "Geen auditgegevens.",
+        "fallbacks": {
+          "all": "alle",
+          "system": "systeem"
+        },
+        "filters": {
+          "action": "Actiefilter",
+          "all": "Alle"
+        },
+        "table_aria": "Auditgeschiedenis"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "Wachtrij taak",
+          "refresh": "Vernieuwen"
+        },
+        "empty_summary": "Geen samenvatting beschikbaar.",
+        "errors": {
+          "enqueue_job": "Kan de taak niet in de wachtrij plaatsen",
+          "load_summary": "Kan samenvatting niet laden"
+        },
+        "fields": {
+          "routes": "Routes",
+          "tenant_slug": "Huurderslak"
+        },
+        "force_refresh": {
+          "description": "Zet een nieuwe weergave in de wachtrij. Laat beide velden leeg om elke tenant en route te vernieuwen. De hostprocessor pikt de taak binnen ongeveer 60 seconden op.",
+          "dry_run": "Droogdraaien (alleen plan)",
+          "force": "Forceren (cache negeren)",
+          "title": "Forceer vernieuwing"
+        },
+        "health": {
+          "cache_unreachable": "Cache onbereikbaar",
+          "healthy": "Gezond",
+          "missing": "{{count}} ontbreekt",
+          "stale": "{{count}} oud"
+        },
+        "hints": {
+          "active_jobs": "{{count}} actief",
+          "aging": "{{count}} veroudering (>7d)",
+          "asset_broken": "Referenties dood /assets/*",
+          "backoff_window": "Binnen een uitstelperiode van 6 uur",
+          "cache_age": "Oudste {{oldest}} / nieuwste {{newest}}",
+          "content_stale": "Broninhoud nieuwer dan momentopname",
+          "event_at": "Evenement {{time}}",
+          "no_events": "Geen evenementen",
+          "prometheus": "Prometheus-tekstformaat",
+          "tenants_routes": "{{tenants}}-huurders x {{routes}}-routes"
+        },
+        "kpi": {
+          "age_stale": "Leeftijd oud (>14d)",
+          "asset_broken": "Vermogen kapot",
+          "build_commit": "Bouw commitment op",
+          "cache_size": "Cachegrootte",
+          "content_stale": "Inhoud verouderd",
+          "coverage": "Dekking",
+          "metrics": "Statistieken",
+          "missing": "Ontbreekt",
+          "queued_jobs": "Taken in de wachtrij",
+          "recent_failures": "Recente mislukkingen",
+          "status": "Status"
+        },
+        "last_run": "Laatst voltooide run",
+        "messages": {
+          "job_queued": "Taak #{{id}} in wachtrij geplaatst"
+        },
+        "placeholders": {
+          "routes": "/over,/blog (leeg = alles)",
+          "tenant_slug": "bijv. urenbank (leeg = alles)"
+        },
+        "super_admin_only": "Alleen superbeheerder"
+      },
+      "polling_fallback": "Terugval in de peilingen",
+      "purge": {
+        "actions": {
+          "auto_recache": "Automatisch opnieuw cachen na opschonen",
+          "dry_run": "Drooglopen",
+          "preview_purge": "Voorbeeld van opschonen",
+          "purge_now": "Nu opruimen"
+        },
+        "description_middle": "voor één padsegment,",
+        "description_prefix": "Verwijder momentopnamen die overeenkomen met een glob-patroon. Gebruik",
+        "description_suffix": "voor elke afstammeling. Voorbeelden:",
+        "errors": {
+          "pattern_required": "Patroon is vereist (bijv. /blog/*)",
+          "purge_failed": "Opschonen is mislukt"
+        },
+        "fields": {
+          "pattern": "Patroon",
+          "tenant_slug": "Huurderslak"
+        },
+        "messages": {
+          "dry_run": "Testrun: {{count}}-snapshots zouden worden verwijderd",
+          "purged": "{{count}}-snapshots{{job}} verwijderd"
+        },
+        "placeholders": {
+          "pattern": "/blog/* of /listings/**",
+          "tenant_slug": "optioneel - laat voor iedereen leeg"
+        },
+        "result": {
+          "deleted": "{{count}}-snapshots verwijderd",
+          "would_delete": "Zou {{count}}-snapshots verwijderen"
+        },
+        "title": "Cache met jokertekens leegmaken"
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "Inspecteren"
+        },
+        "description_prefix": "Kijk welke",
+        "description_suffix": "patroon eigenaar is van een route en wat TTL het krijgt, zonder config. Wordt gebruikt om het versheidsbeleid af te stemmen.",
+        "error": "Opzoeken mislukt - controleer het routeformaat (moet beginnen met \"/\")",
+        "fields": {
+          "route": "Route"
+        },
+        "path_only": "Alleen pad - geen schema of host",
+        "placeholders": {
+          "route": "/blog/mijn-post"
+        },
+        "result": {
+          "match": "overeenkomst: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (specificiteit {{specificity}})",
+          "other_patterns": "Andere patronen die bij deze route passen:",
+          "ttl": "TTL: {{ttl}} ({{seconds}}'s)"
+        },
+        "title": "TTL-inspecteur",
+        "units": {
+          "days": "{{count}} d",
+          "hours": "{{count}} h",
+          "minutes": "{{count}} min"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "Ontdekken"
+        },
+        "counts": {
+          "dynamic": "{{count}} dynamisch",
+          "static": "{{count}} statisch",
+          "total": "{{count}} totaal"
+        },
+        "description_prefix": "Bekijk precies welke routes de engine voor een huurder wil weergeven: statische verdieping (functie/module gated) plus de dynamische URLs van",
+        "description_suffix": "De toneelschrijvermedewerker bezoekt deze lijst.",
+        "error": "Opzoeken mislukt. Controleer de tenant-slug",
+        "fields": {
+          "tenant_slug": "Huurderslak"
+        },
+        "none": "(geen)",
+        "placeholders": {
+          "tenant_slug": "uren-tijdbank"
+        },
+        "sections": {
+          "dynamic_routes": "Dynamische routes (maximaal 1.000)",
+          "static_routes": "Statische routes"
+        },
+        "title": "Sitemapverkenner"
+      },
+      "readonly": {
+        "prefix": "Alleen-lezen weergave: actieknoppen zijn uitgeschakeld omdat de prerender-engine voor elke tenant werkt. Meld u aan met een",
+        "role": "platform super-admin",
+        "suffix": "account om taken in de wachtrij te plaatsen, momentopnamen op te schonen of driftdetectie te activeren."
+      },
+      "tabs": {
+        "analytics": "Analyses",
+        "coverage": "Dekking",
+        "events": "Evenementen",
+        "failures": "Mislukkingen",
+        "history": "Geschiedenis",
+        "inventory": "Inventaris",
+        "jobs": "Banen",
+        "overview": "Overzicht"
+      },
+      "tabs_aria": "Tabbladen vooraf renderen",
+      "title": "Prerender-engine"
+    }
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",

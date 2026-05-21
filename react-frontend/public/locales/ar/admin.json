@@ -299,7 +299,570 @@
     "sitemap_urls_by_type": "URLs by Type",
     "social_sharing_image_heading": "Social Sharing Image",
     "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
-    "usage_limits_heading": "Usage Limits"
+    "usage_limits_heading": "Usage Limits",
+    "prerender": {
+      "description": "اللقطات المقدمة من الخادم بواسطة الروبوت فقط. مراقبة التغطية، واكتشاف الثبات، وفرض التحديث.",
+      "analytics": {
+        "actions": {
+          "reload": "إعادة تحميل"
+        },
+        "columns": {
+          "crawler": "CRAWLER",
+          "hits": "HITS",
+          "host": "HOST",
+          "ip": "IP",
+          "status": "STATUS",
+          "time": "TIME",
+          "uri": "URI",
+          "url": "URL"
+        },
+        "empty": "لا توجد تحليلات متاحة. قد يكون سجل وصول الروبوت فارغًا.",
+        "empty_bot_traffic": "لا توجد حركة مرور بوت حتى الآن",
+        "empty_no_data": "لا توجد بيانات",
+        "empty_recent_hits": "لا يوجد الزيارات الأخيرة",
+        "errors": {
+          "load": "فشل تحميل التحليلات"
+        },
+        "filters": {
+          "window": "نافذة"
+        },
+        "hints": {
+          "spoofed": "ادعى الروبوت الرئيسي، وفشل نطاق IP",
+          "top_50_cap": "من غطاء top-50",
+          "verified_of_total": "{{verified}} من {{total}}"
+        },
+        "kpi": {
+          "ip_verified": "تم التحقق من IP",
+          "spoofed": "مخادع (مشبوه)",
+          "total_bot_hits": "إجمالي عدد مرات دخول الروبوت",
+          "unique_uris": "رموز URI الفريدة"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} مخادع"
+        },
+        "log_summary": "السجل: {{size}} - منذ {{time}}",
+        "sections": {
+          "hits_by_crawler": "الزيارات بواسطة الزاحف",
+          "hits_by_status": "الزيارات حسب حالة HTTP",
+          "recent_activity": "النشاط الأخير (الأحدث أولاً، الأخير {{count}})",
+          "top_uris": "أهم URIs (أعلى 50 حسب عدد النتائج)"
+        },
+        "tables": {
+          "recent_hits_aria": "زيارات الروبوت الأخيرة",
+          "top_uris_aria": "أعلى URIs"
+        },
+        "windows": {
+          "1": "آخر 24 ساعة",
+          "7": "آخر 7 أيام",
+          "30": "آخر 30 يومًا"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "فتح في المخزون",
+          "refresh": "ينعش",
+          "refresh_all_stale": "تحديث الكل القديم ({{count}})"
+        },
+        "columns": {
+          "actions": "ACTIONS",
+          "asset": "ASSET",
+          "coverage": "COVERAGE",
+          "host": "HOST",
+          "missing": "MISSING",
+          "stale": "STALE",
+          "tenant": "TENANT"
+        },
+        "confirm": {
+          "queue_recache": "هل تريد استعادة قائمة الانتظار لمستأجري {{count}}؟"
+        },
+        "empty": "لا يوجد مستأجرين",
+        "errors": {
+          "bulk_enqueue": "فشل الانتظار المجمع (ربما يكون بعض المستأجرين قد اصطفوا في قائمة الانتظار)",
+          "enqueue": "فشل في قائمة الانتظار",
+          "load": "فشل تحميل التغطية"
+        },
+        "messages": {
+          "bulk_queued": "إعادة التخزين المؤقت في قائمة الانتظار لمستأجري {{count}}",
+          "no_stale": "لا يوجد مستأجرين قديمين - التغطية صحية",
+          "tenant_queued": "?? ??? #{{id}} ?? ????? ???????? ?? {{slug}}"
+        },
+        "summary": {
+          "healthy": "جميع مستأجري {{count}} يتمتعون بصحة جيدة.",
+          "needs_work": "{{needing}} من مستأجري {{total}} لديهم مسارات مفقودة أو قديمة أو معطلة."
+        },
+        "table_aria": "التغطية"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "يتقدم",
+          "dry_run": "التشغيل الجاف"
+        },
+        "auto_recache": {
+          "description": "يقوم بمسح كل لقطة. يقوم بإدراج عمليات إعادة التخزين المؤقت ذات الأولوية المنخفضة للمسارات التي تغير محتوى مصدرها أو انتهت صلاحية TTL الخاصة بها. يعمل على كرون كل 15-30 دقيقة؛ استخدم هذا لتحريك واحد على الفور.",
+          "title": "التخزين المؤقت التلقائي (TTL + انحراف المحتوى)"
+        },
+        "drift": {
+          "description": "يتنقل في كل خريطة موقع مستأجر، ويقارن lastmod مع أوقات اللقطة، ويلتقط الصفحات القديمة من عمليات الكتابة الأولية، أو عمليات الترحيل، أو المهام الموضوعة في قائمة الانتظار. يتم تشغيله كل دقيقتين ويسجل عمليات إعادة التخزين المؤقت ذات الأولوية العالية.",
+          "title": "كشف الانجراف (خريطة الموقع مقابل اللقطات)"
+        },
+        "errors": {
+          "auto_recache": "فشل في تشغيل التخزين المؤقت التلقائي",
+          "drift_detection": "فشل في تشغيل الكشف عن الانجراف",
+          "purge_unexpected": "فشل التطهير غير المتوقع"
+        },
+        "messages": {
+          "auto_recache_applied": "تم تطبيق التخزين التلقائي",
+          "auto_recache_dry_run": "اكتمل التشغيل الجاف للتخزين التلقائي",
+          "drift_applied": "تم تطبيق كشف الانجراف",
+          "drift_dry_run": "اكتمل التشغيل الجاف للانجراف",
+          "purge_dry_run": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "purged_ungated": "تمت إزالة لقطات {{count}} غير المحظورة عبر مستأجري {{tenants}}"
+        },
+        "no_output": "(لا يوجد إخراج)",
+        "purge_ungated": {
+          "description": "مسح اللقطات التي لا يوجد مسارها في مجموعة المستأجر المتوقعة. شائع بعد إيقاف تشغيل إحدى الميزات، أو لتنظيف المسارات الثابتة المعروضة مسبقًا بدون علامات الميزات. يتم ترك مسارات المحتوى الديناميكي بمفردها.",
+          "title": "إزالة اللقطات غير المحظورة (تنظيف 404 لكل مستأجر)"
+        },
+        "result": {
+          "deleted": "تم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "would_delete": "سيتم حذف لقطات {{count}} عبر مستأجري {{tenants}}"
+        },
+        "title": "أتمتة النضارة"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "يلغي",
+          "close_breaker_now": "إغلاق الكسارة الآن",
+          "details": "تفاصيل",
+          "emergency_reset": "إعادة تعيين الطوارئ",
+          "hide": "يخفي",
+          "hide_details": "إخفاء التفاصيل",
+          "reset_queue": "إعادة تعيين قائمة الانتظار"
+        },
+        "engine_healthy": "المحرك سليم",
+        "issue_count_one": "مشكلة {{count}}",
+        "issue_count_other": "مشكلات {{count}}",
+        "modal": {
+          "body_middle": "أو",
+          "body_prefix": "هذا سوف يستعيد كل",
+          "body_suffix": "الصف الذي ظل عامله صامتًا لمدة >30 min، وقم بمسح قاطع الدائرة.",
+          "title": "الطوارئ: إعادة تعيين قائمة الانتظار العالقة",
+          "warning": "استخدم هذا فقط إذا تأكدت من أن قائمة الانتظار عالقة. إذا كان العامل السليم لا يزال قيد التشغيل، فسيؤدي ذلك إلى إنشاء عمل مكرر."
+        },
+        "toasts": {
+          "breaker_reset": "إعادة ضبط قاطع الدائرة",
+          "queue_reset_one": "إعادة تعيين الصف العالق {{count}}؛ تم مسح الكسارة",
+          "queue_reset_other": "إعادة تعيين الصفوف العالقة {{count}}؛ تم مسح الكسارة",
+          "queue_reset_failed": "فشلت إعادة تعيين قائمة الانتظار",
+          "reset_failed": "فشلت إعادة التعيين"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "يغلق",
+          "inspect": "فحص",
+          "inspect_snapshot": "افحص {{path}}",
+          "open_rendered_url": "فتح URL المقدمة",
+          "recache_selected": "تم تحديد ذاكرة التخزين المؤقت ({{count}})",
+          "reload": "إعادة تحميل",
+          "select_all_visible": "حدد كل ما هو مرئي",
+          "select_snapshot": "حدد {{path}}"
+        },
+        "columns": {
+          "actions": "الإجراءات",
+          "age": "عمر",
+          "host": "يستضيف",
+          "http": "HTTP",
+          "route": "طريق",
+          "size": "مقاس",
+          "status": "حالة"
+        },
+        "empty": "لا توجد لقطات تتطابق مع المرشحات",
+        "errors": {
+          "bulk_recache": "فشلت عملية الاستعادة المجمعة",
+          "inspect": "فشل فحص اللقطة",
+          "load": "فشل في تحميل المخزون"
+        },
+        "filters": {
+          "aging": "شيخوخة",
+          "all": "الجميع",
+          "asset_broken": "الأصول مكسورة",
+          "content_drifted": "انجرف المحتوى",
+          "filter": "فلتر",
+          "filter_placeholder": "الطريق أو السلسلة الفرعية المضيفة",
+          "fresh": "طازج",
+          "issue": "مشكلة",
+          "stale": "قديمة",
+          "staleness": "جفاء",
+          "status": "حالة",
+          "status_200": "200 فقط",
+          "status_non_200": "غير 200",
+          "tenant_placeholder": "خياري",
+          "tenant_slug": "سبيكة المستأجر"
+        },
+        "messages": {
+          "bulk_recache": "لقطات {{count}} غير صالحة وتم وضع ذاكرة التخزين المؤقت في قائمة الانتظار"
+        },
+        "inspect": {
+          "age": "عمر",
+          "all_valid": "كلها صالحة",
+          "asset_references": "مراجع الأصول ({{count}})",
+          "canonical": "الكنسي",
+          "dead_assets": "{{count}} ميت",
+          "flags": "أعلام",
+          "h1_count": "H1 (العدد)",
+          "html_parse_warnings": "HTML تحليل التحذيرات",
+          "html_preview": "معاينة HTML (أول 12 كيلو بايت، تمت إزالة البرامج النصية)",
+          "integrity_mismatch": "تم تغيير البايتات منذ العرض - المتوقع sha256 {{expected}}...، حصل على {{actual}}...",
+          "integrity_missing": "لا توجد صورة جانبية sha256 - اللقطة تسبق التحقق من السلامة أو تم تحريرها يدويًا",
+          "integrity_ok": "تتطابق البايتات مع sha256 المكتوبة في وقت العرض",
+          "integrity_status": "السلامة: {{status}}",
+          "integrity_unreadable": "sha256 Sidecar موجود ولكنه مشوه",
+          "invalid_present": "INVALID موجود",
+          "json_ld": "JSON-LD (كتل {{blocks}}، {{status}})",
+          "meta_description": "الوصف التعريفي",
+          "missing": "- مفتقد -",
+          "modal_title": "فحص لقطة",
+          "modified": "معدل",
+          "must_fix": "يجب إصلاح ({{count}})",
+          "no_structured_data": "لا توجد بيانات منظمة",
+          "no_type": "(لا يوجد @نوع)",
+          "none": "(لا أحد)",
+          "old": "{{age}} قديم",
+          "open_graph": "افتح الرسم البياني",
+          "path": "طريق",
+          "seo_score": "النتيجة SEO",
+          "size": "مقاس",
+          "tips": "نصائح ({{count}})",
+          "title": "عنوان"
+        },
+        "selected": "تم تحديد {{count}}",
+        "status": {
+          "asset": "أصل",
+          "content": "محتوى",
+          "content_drifted": "انجرف المحتوى"
+        },
+        "summary": "{{filtered}} من لقطات {{total}}",
+        "table_aria": "جرد لقطة"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "????? ?????? #{{id}}",
+          "close": "يغلق",
+          "reload": "إعادة تحميل",
+          "retry_job": "????? ?????? ?????? #{{id}}",
+          "retry_same_parameters": "أعد المحاولة بنفس المعلمات",
+          "view_details": "??? ?????? ?????? #{{id}}"
+        },
+        "columns": {
+          "actions": "الإجراءات",
+          "by": "بواسطة",
+          "flags": "أعلام",
+          "id": "#",
+          "priority": "أولوية",
+          "queued": "في قائمة الانتظار",
+          "result": "نتيجة",
+          "scope": "نِطَاق",
+          "status": "حالة"
+        },
+        "detail": {
+          "all": "الجميع",
+          "claimed_by": "تمت المطالبة به بواسطة",
+          "duration": "مدة",
+          "error": "خطأ",
+          "exit_code": "رمز الخروج",
+          "finished_at": "انتهى عند",
+          "log_tail": "سجل (الذيل)",
+          "queued_at": "في قائمة الانتظار",
+          "requested_by": "طلب بواسطة",
+          "routes": "الطرق",
+          "started_at": "بدأت في",
+          "status": "حالة",
+          "tenant": "مستأجر",
+          "title": "?????? #{{id}}"
+        },
+        "empty": "لا وظائف",
+        "errors": {
+          "cancel": "تعذر الإلغاء - ربما تكون المهمة قد بدأت",
+          "load": "فشل في تحميل المهام",
+          "retry": "فشلت إعادة المحاولة - ربما لا تزال المهمة الأصلية قيد التشغيل"
+        },
+        "filters": {
+          "all": "الجميع",
+          "cancelled": "تم الإلغاء",
+          "failed": "فشل",
+          "partial": "جزئي",
+          "queued": "في قائمة الانتظار",
+          "running": "جري",
+          "status": "حالة",
+          "succeeded": "نجحت"
+        },
+        "flags": {
+          "dry_run": "التشغيل الجاف",
+          "force": "قوة"
+        },
+        "messages": {
+          "cancelled": "?? ????? ?????? #{{id}}",
+          "retry_queued": "?? ??? ????? ???????? #{{retryId}} ?? ????? ???????? (?? #{{id}})"
+        },
+        "priority": {
+          "high": "عالي",
+          "low": "قليل",
+          "normal": "طبيعي",
+          "tooltip": "الأولوية = {{priority}} (انتصارات أقل)"
+        },
+        "result": {
+          "invalid": "{{count}} غير صالح"
+        },
+        "scope": {
+          "all_tenants": "جميع المستأجرين"
+        },
+        "table_aria": "وظائف"
+      },
+      "events": {
+        "actions": {
+          "reload": "إعادة تحميل"
+        },
+        "columns": {
+          "commit": "يقترف",
+          "details": "تفاصيل",
+          "event": "حدث",
+          "time": "وقت"
+        },
+        "empty": "لا توجد أحداث",
+        "errors": {
+          "load": "فشل تحميل الأحداث"
+        },
+        "filters": {
+          "limit": "حد"
+        },
+        "summary": "أحداث {{count}}",
+        "table_aria": "الأحداث",
+        "types": {
+          "fail": "يفشل",
+          "partial": "جزئي",
+          "success": "نجاح",
+          "supersede": "يحل محل",
+          "unknown": "حدث غير معروف: {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "عمر",
+          "cache_path": "مسار ذاكرة التخزين المؤقت",
+          "failed_at": "فشل في"
+        },
+        "description_action": "تحديث القوة",
+        "description_middle": "يتم تخطي المسارات الموجودة في هذه القائمة تلقائيًا أثناء نافذة التراجع عن الفشل (الافتراضي 6 ساعات). يستخدم",
+        "description_prefix": "مسارات ذاكرة التخزين المؤقت التي فشلت أثناء تشغيل العرض المسبق الأخير.",
+        "description_suffix": "في علامة التبويب نظرة عامة لإعادة المحاولة على الفور.",
+        "empty": "لا توجد إخفاقات الأخيرة",
+        "errors": {
+          "load": "فشل تحميل الفشل"
+        },
+        "table_aria": "الفشل"
+      },
+      "live_connected": "التحديثات الحية متصلة",
+      "audit": {
+        "actions": {
+          "auto_recache": "auto_recache",
+          "cancel": "يلغي",
+          "detect_drift": "detect_drift",
+          "enqueue": "أدخل في قائمة الانتظار",
+          "invalidate": "يبطل",
+          "purge": "تطهير",
+          "purge_unexpected": "purge_unexpected",
+          "reset_breaker": "reset_breaker",
+          "reset_queue": "reset_queue"
+        },
+        "buttons": {
+          "export_csv": "تصدير CSV",
+          "refresh": "ينعش"
+        },
+        "columns": {
+          "action": "فعل",
+          "actor": "ممثل",
+          "details": "تفاصيل",
+          "job": "وظيفة",
+          "outcome": "حصيلة",
+          "tenant": "مستأجر",
+          "when": "متى"
+        },
+        "empty": "لا توجد إدخالات التدقيق.",
+        "fallbacks": {
+          "all": "الجميع",
+          "system": "نظام"
+        },
+        "filters": {
+          "action": "مرشح العمل",
+          "all": "الجميع"
+        },
+        "table_aria": "تاريخ التدقيق"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "وظيفة قائمة الانتظار",
+          "refresh": "ينعش"
+        },
+        "empty_summary": "لا يوجد ملخص متاح.",
+        "errors": {
+          "enqueue_job": "فشل في إدراج المهمة",
+          "load_summary": "فشل تحميل الملخص"
+        },
+        "fields": {
+          "routes": "الطرق",
+          "tenant_slug": "سبيكة المستأجر"
+        },
+        "force_refresh": {
+          "description": "طابور إعادة العرض. اترك كلا الحقلين فارغين لتحديث كل مستأجر ومسار. يلتقط المعالج المضيف المهمة خلال 60 ثانية تقريبًا.",
+          "dry_run": "التشغيل الجاف (الخطة فقط)",
+          "force": "القوة (تجاهل ذاكرة التخزين المؤقت)",
+          "title": "تحديث القوة"
+        },
+        "health": {
+          "cache_unreachable": "ذاكرة التخزين المؤقت غير قابلة للوصول",
+          "healthy": "صحيح",
+          "missing": "{{count}} مفقود",
+          "stale": "{{count}} قديمة"
+        },
+        "hints": {
+          "active_jobs": "{{count}} نشط",
+          "aging": "تقادم {{count}} (> 7 أيام)",
+          "asset_broken": "المراجع الميتة /الأصول/*",
+          "backoff_window": "في نافذة التراجع لمدة 6 ساعات",
+          "cache_age": "أقدم {{oldest}} / أحدث {{newest}}",
+          "content_stale": "محتوى المصدر أحدث من اللقطة",
+          "event_at": "الحدث {{time}}",
+          "no_events": "لا توجد أحداث",
+          "prometheus": "تنسيق نص بروميثيوس",
+          "tenants_routes": "مستأجرو {{tenants}} × مسارات {{routes}}"
+        },
+        "kpi": {
+          "age_stale": "العمر قديم (> 14 يومًا)",
+          "asset_broken": "الأصول مكسورة",
+          "build_commit": "بناء الالتزام",
+          "cache_size": "حجم ذاكرة التخزين المؤقت",
+          "content_stale": "المحتوى قديم",
+          "coverage": "التغطية",
+          "metrics": "المقاييس",
+          "missing": "مفتقد",
+          "queued_jobs": "وظائف في قائمة الانتظار",
+          "recent_failures": "الإخفاقات الأخيرة",
+          "status": "حالة"
+        },
+        "last_run": "آخر تشغيل مكتمل",
+        "messages": {
+          "job_queued": "?? ??? ?????? #{{id}} ?? ????? ????????"
+        },
+        "placeholders": {
+          "routes": "/حول،/مدونة (فارغ = الكل)",
+          "tenant_slug": "على سبيل المثال بنك الوقت للساعة (فارغ = الكل)"
+        },
+        "super_admin_only": "المشرف المتميز فقط"
+      },
+      "polling_fallback": "تراجع الاقتراع",
+      "purge": {
+        "actions": {
+          "auto_recache": "الاسترداد التلقائي بعد التطهير",
+          "dry_run": "التشغيل الجاف",
+          "preview_purge": "معاينة التطهير",
+          "purge_now": "تطهير الآن"
+        },
+        "description_middle": "لجزء مسار واحد،",
+        "description_prefix": "حذف اللقطات المطابقة لنمط الكرة الأرضية. يستخدم",
+        "description_suffix": "لأي نسل. أمثلة:",
+        "errors": {
+          "pattern_required": "النمط مطلوب (على سبيل المثال /blog/*)",
+          "purge_failed": "فشل التطهير"
+        },
+        "fields": {
+          "pattern": "نمط",
+          "tenant_slug": "سبيكة المستأجر"
+        },
+        "messages": {
+          "dry_run": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "purged": "تم مسح لقطات {{count}}{{job}}"
+        },
+        "placeholders": {
+          "pattern": "/blog/* أو /listings/**",
+          "tenant_slug": "اختياري - اتركه فارغًا للجميع"
+        },
+        "result": {
+          "deleted": "لقطات {{count}} المحذوفة",
+          "would_delete": "سيتم حذف لقطات {{count}}"
+        },
+        "title": "تطهير ذاكرة التخزين المؤقت لأحرف البدل"
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "فحص"
+        },
+        "description_prefix": "انظر أي",
+        "description_suffix": "يمتلك النمط مسارًا وما يحصل عليه TTL، دون الإمساك بالتكوين. يستخدم لضبط سياسة النضارة.",
+        "error": "فشل البحث - تحقق من تنسيق المسار (يجب أن يبدأ بـ \"/\")",
+        "fields": {
+          "route": "طريق"
+        },
+        "path_only": "المسار فقط - لا يوجد مخطط أو مضيف",
+        "placeholders": {
+          "route": "/مدونة/مشاركتي"
+        },
+        "result": {
+          "match": "المباراة: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (خصوصية {{specificity}})",
+          "other_patterns": "الأنماط الأخرى التي تتوافق مع هذا المسار:",
+          "ttl": "TTL: {{ttl}} ({{seconds}}s)"
+        },
+        "title": "مفتش TTL",
+        "units": {
+          "days": "{{count}} د",
+          "hours": "{{count}} ح",
+          "minutes": "{{count}} دقيقة"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "يستكشف"
+        },
+        "counts": {
+          "dynamic": "{{count}} ديناميكي",
+          "static": "{{count}} ثابت",
+          "total": "إجمالي {{count}}"
+        },
+        "description_prefix": "تعرف بالضبط على المسارات التي يخطط المحرك لتقديمها للمستأجر - الأرضية الثابتة (الميزة/الوحدة النمطية) بالإضافة إلى URLs الديناميكية من",
+        "description_suffix": "العامل المسرحي يزور هذه القائمة.",
+        "error": "فشل البحث - تحقق من سبيكة المستأجر",
+        "fields": {
+          "tenant_slug": "سبيكة المستأجر"
+        },
+        "none": "(لا أحد)",
+        "placeholders": {
+          "tenant_slug": "ساعة الوقت"
+        },
+        "sections": {
+          "dynamic_routes": "المسارات الديناميكية (بحد أقصى 1000)",
+          "static_routes": "الطرق الثابتة"
+        },
+        "title": "مستكشف خرائط الموقع"
+      },
+      "readonly": {
+        "prefix": "عرض للقراءة فقط - يتم تعطيل أزرار الإجراءات لأن محرك العرض المسبق يعمل عبر كل مستأجر. تسجيل الدخول مع أ",
+        "role": "المشرف الفائق للمنصة",
+        "suffix": "حساب لإدراج المهام أو مسح اللقطات أو تشغيل اكتشاف الانجراف."
+      },
+      "tabs": {
+        "analytics": "التحليلات",
+        "coverage": "التغطية",
+        "events": "الأحداث",
+        "failures": "الفشل",
+        "history": "تاريخ",
+        "inventory": "جرد",
+        "jobs": "وظائف",
+        "overview": "ملخص"
+      },
+      "tabs_aria": "علامات تبويب العرض المسبق",
+      "title": "محرك العرض المسبق"
+    }
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",

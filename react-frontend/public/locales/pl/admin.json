@@ -299,7 +299,570 @@
     "sitemap_urls_by_type": "URLs by Type",
     "social_sharing_image_heading": "Social Sharing Image",
     "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
-    "usage_limits_heading": "Usage Limits"
+    "usage_limits_heading": "Usage Limits",
+    "prerender": {
+      "description": "Migawki renderowane przez serwer tylko przez boty. Monitoruj zasięg, wykrywaj nieaktualności i wymuszaj odświeżenia.",
+      "analytics": {
+        "actions": {
+          "reload": "Przeładować"
+        },
+        "columns": {
+          "crawler": "ŻETON NEXUSARM20",
+          "hits": "ŻETON NEXUSARM21",
+          "host": "ŻETON NEXUSARM22",
+          "ip": "ŻETON NEXUSARM14",
+          "status": "ŻETON NEXUSARM23",
+          "time": "TOKEN NEXUSARM24",
+          "uri": "ŻETON NEXUSARM12",
+          "url": "TOKEN NEXUSARM11"
+        },
+        "empty": "Brak dostępnych analiz. Dziennik dostępu bota może być pusty.",
+        "empty_bot_traffic": "Nie ma jeszcze ruchu botów",
+        "empty_no_data": "Brak danych",
+        "empty_recent_hits": "Brak najnowszych hitów",
+        "errors": {
+          "load": "Nie udało się załadować statystyk"
+        },
+        "filters": {
+          "window": "Okno"
+        },
+        "hints": {
+          "spoofed": "zgłosił główny bot, nie udało się uzyskać zasięgu IP",
+          "top_50_cap": "od top-50 czapka",
+          "verified_of_total": "{{verified}} z {{total}}"
+        },
+        "kpi": {
+          "ip_verified": "IP zweryfikowane",
+          "spoofed": "Sfałszowany (podejrzany)",
+          "total_bot_hits": "Całkowita liczba trafień botów",
+          "unique_uris": "Unikalne żetony URI"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} sfałszowany"
+        },
+        "log_summary": "Log: {{size}} - od {{time}}",
+        "sections": {
+          "hits_by_crawler": "Trafienia przez robota",
+          "hits_by_status": "Trafienia według statusu HTTP",
+          "recent_activity": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})",
+          "top_uris": "Najpopularniejsze tokeny NEXUSTERM12 (50 najlepszych według liczby trafień)"
+        },
+        "tables": {
+          "recent_hits_aria": "Ostatnie trafienia botów",
+          "top_uris_aria": "Najlepsze tokeny NEXUSRM12"
+        },
+        "windows": {
+          "1": "Ostatnie 24 godziny",
+          "7": "Ostatnie 7 dni",
+          "30": "Ostatnie 30 dni"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "Otwórz w ekwipunku",
+          "refresh": "Odświeżać",
+          "refresh_all_stale": "Odśwież wszystkie nieaktualne ({{count}})"
+        },
+        "columns": {
+          "actions": "ŻETON NEXUSARM25",
+          "asset": "ASSET",
+          "coverage": "ŻETON NEXUSARM27",
+          "host": "ŻETON NEXUSARM22",
+          "missing": "ŻETON NEXUSARM28",
+          "stale": "ŻETON NEXUSARM29",
+          "tenant": "ŻETON NEXUSARM30"
+        },
+        "confirm": {
+          "queue_recache": "Odzyskiwanie kolejki dla dzierżawców {{count}}?"
+        },
+        "empty": "Żadnych najemców",
+        "errors": {
+          "bulk_enqueue": "Zbiorcze kolejkowanie nie powiodło się (niektórzy dzierżawcy mogli ustawić się w kolejce)",
+          "enqueue": "Nie udało się umieścić w kolejce",
+          "load": "Nie udało się załadować zasięgu"
+        },
+        "messages": {
+          "bulk_queued": "Pamięć podręczna w kolejce dla dzierżawców {{count}}",
+          "no_stale": "Brak nieaktualnych najemców – zasięg jest dobry",
+          "tenant_queued": "Dodano #{{id}} do kolejki dla {{slug}}"
+        },
+        "summary": {
+          "healthy": "Wszyscy najemcy {{count}} zdrowi.",
+          "needs_work": "{{needing}} z dzierżawców {{total}} ma brakujące, nieaktualne lub uszkodzone trasy."
+        },
+        "table_aria": "Zasięg"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "Stosować",
+          "dry_run": "Praca na sucho"
+        },
+        "auto_recache": {
+          "description": "Skanuje każdą migawkę. Kolejkuje operacje ponownego ładowania o niskim priorytecie dla tras, których zawartość źródłowa uległa zmianie lub których TTL wygasł. Działa na cronie co 15-30 minut; użyj tego, aby natychmiast go uruchomić.",
+          "title": "Automatyczne ponowne buforowanie (TTL + dryf zawartości)"
+        },
+        "drift": {
+          "description": "Przechodzi mapę witryny każdej dzierżawy, porównuje lastmod z mtimesami migawek i wychwytuje nieaktualne strony z nieprzetworzonych zapisów, migracji lub zadań w kolejce. Uruchamia się co 2 minuty i kolejkuje pamięci podręczne o wysokim priorytecie.",
+          "title": "Wykryj dryf (mapa witryny a migawki)"
+        },
+        "errors": {
+          "auto_recache": "Nie udało się uruchomić automatycznego ponownego buforowania",
+          "drift_detection": "Nie udało się uruchomić wykrywania dryfu",
+          "purge_unexpected": "Nieoczekiwane czyszczenie nie powiodło się"
+        },
+        "messages": {
+          "auto_recache_applied": "Zastosowano automatyczne ponowne buforowanie",
+          "auto_recache_dry_run": "Próba automatycznego ponownego buforowania została ukończona",
+          "drift_applied": "Zastosowano wykrywanie dryfu",
+          "drift_dry_run": "Zakończono jazdę na sucho",
+          "purge_dry_run": "Praca próbna: migawki {{count}} zostaną usunięte",
+          "purged_ungated": "Usunięto niezamknięte migawki {{count}} wśród dzierżawców {{tenants}}"
+        },
+        "no_output": "(brak wyjścia)",
+        "purge_ungated": {
+          "description": "Przeglądaj migawki, których trasa nie znajduje się w oczekiwanym zestawie dzierżawcy. Często po wyłączeniu funkcji lub w celu oczyszczenia tras statycznych wstępnie renderowanych bez flag funkcji. Trasy zawartości dynamicznej pozostają w spokoju.",
+          "title": "Usuń niezablokowane migawki (czyszczenie 404 dla poszczególnych dzierżawców)"
+        },
+        "result": {
+          "deleted": "Usunięto migawki {{count}} wśród dzierżawców {{tenants}}",
+          "would_delete": "Spowoduje usunięcie migawek {{count}} wśród dzierżawców {{tenants}}"
+        },
+        "title": "Automatyzacja świeżości"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "Anulować",
+          "close_breaker_now": "Zamknij teraz wyłącznik",
+          "details": "Bliższe dane",
+          "emergency_reset": "Reset awaryjny",
+          "hide": "Ukrywać",
+          "hide_details": "Ukryj szczegóły",
+          "reset_queue": "Zresetuj kolejkę"
+        },
+        "engine_healthy": "Silnik zdrowy",
+        "issue_count_one": "Problem z {{count}}",
+        "issue_count_other": "Problemy z {{count}}",
+        "modal": {
+          "body_middle": "Lub",
+          "body_prefix": "Spowoduje to konieczność kolejkowania każdego",
+          "body_suffix": "wiersz, którego pracownik milczał przez >30 min, i wyczyść wyłącznik automatyczny.",
+          "title": "Awaryjne: zresetuj zablokowaną kolejkę",
+          "warning": "Używaj tej opcji tylko wtedy, gdy potwierdziłeś, że kolejka utknęła. Jeśli zdrowy pracownik nadal działa, spowoduje to utworzenie duplikatu pracy."
+        },
+        "toasts": {
+          "breaker_reset": "Reset wyłącznika automatycznego",
+          "queue_reset_one": "Zresetuj zablokowany wiersz {{count}}; wyłącznik wyczyszczony",
+          "queue_reset_other": "Zresetuj zablokowane wiersze {{count}}; wyłącznik wyczyszczony",
+          "queue_reset_failed": "Resetowanie kolejki nie powiodło się",
+          "reset_failed": "Resetowanie nie powiodło się"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "Zamknąć",
+          "inspect": "Sprawdzać",
+          "inspect_snapshot": "Sprawdź {{path}}",
+          "open_rendered_url": "Otwórz wyrenderowany URL",
+          "recache_selected": "Wybrano pamięć podręczną ({{count}})",
+          "reload": "Przeładować",
+          "select_all_visible": "Wybierz wszystkie widoczne",
+          "select_snapshot": "Wybierz {{path}}"
+        },
+        "columns": {
+          "actions": "Działania",
+          "age": "Wiek",
+          "host": "Gospodarz",
+          "http": "ŻETON NEXUSARM15",
+          "route": "Trasa",
+          "size": "Rozmiar",
+          "status": "Status"
+        },
+        "empty": "Żadne migawki nie pasują do filtrów",
+        "errors": {
+          "bulk_recache": "Zbiorcze ponowne załadowanie nie powiodło się",
+          "inspect": "Nie udało się sprawdzić migawki",
+          "load": "Nie udało się załadować zapasów"
+        },
+        "filters": {
+          "aging": "Starzenie się",
+          "all": "Wszystko",
+          "asset_broken": "Zasób uszkodzony",
+          "content_drifted": "Treść dryfowała",
+          "filter": "Filtr",
+          "filter_placeholder": "podciąg trasy lub hosta",
+          "fresh": "Świeży",
+          "issue": "Wydanie",
+          "stale": "Nieświeży",
+          "staleness": "Nieaktualność",
+          "status": "Status",
+          "status_200": "Tylko 200",
+          "status_non_200": "Nie-200",
+          "tenant_placeholder": "fakultatywny",
+          "tenant_slug": "Ślimak najemcy"
+        },
+        "messages": {
+          "bulk_recache": "Nieprawidłowe migawki {{count}} i pamięć podręczna w kolejce"
+        },
+        "inspect": {
+          "age": "Wiek",
+          "all_valid": "wszystko aktualne",
+          "asset_references": "Referencje zasobów ({{count}})",
+          "canonical": "Kanoniczny",
+          "dead_assets": "{{count}} nie żyje",
+          "flags": "Flagi",
+          "h1_count": "H1 (liczba)",
+          "html_parse_warnings": "HTML analizuje ostrzeżenia",
+          "html_preview": "Podgląd HTML (pierwsze 12 KB, usunięte skrypty)",
+          "integrity_mismatch": "bajty zmienione od czasu renderowania - oczekiwano sha256 {{expected}}..., otrzymano {{actual}}...",
+          "integrity_missing": "brak wózka bocznego sha256 — migawka powstała przed weryfikacją integralności lub została ręcznie edytowana",
+          "integrity_ok": "bajty odpowiadają sha256 zapisanemu w czasie renderowania",
+          "integrity_status": "integralność: {{status}}",
+          "integrity_unreadable": "Wózek boczny sha256 istnieje, ale jest zniekształcony",
+          "invalid_present": "INVALID OBECNY",
+          "json_ld": "JSON-LD (bloki {{blocks}}, {{status}})",
+          "meta_description": "Metaopis",
+          "missing": "- zaginiony -",
+          "modal_title": "Kontrola migawki",
+          "modified": "Zmodyfikowany",
+          "must_fix": "Należy naprawić ({{count}})",
+          "no_structured_data": "Brak danych strukturalnych",
+          "no_type": "(brak @typu)",
+          "none": "(nic)",
+          "old": "{{age}} stary",
+          "open_graph": "Otwórz wykres",
+          "path": "Ścieżka",
+          "seo_score": "Wynik SEO",
+          "size": "Rozmiar",
+          "tips": "Wskazówki ({{count}})",
+          "title": "Tytuł"
+        },
+        "selected": "Wybrano {{count}}",
+        "status": {
+          "asset": "zaleta",
+          "content": "treść",
+          "content_drifted": "treść poszła"
+        },
+        "summary": "{{filtered}} z migawek {{total}}",
+        "table_aria": "Inwentarz migawkowy"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "Anuluj zadanie #{{id}}",
+          "close": "Zamknąć",
+          "reload": "Przeładować",
+          "retry_job": "Pon?w zadanie #{{id}}",
+          "retry_same_parameters": "Spróbuj ponownie z tymi samymi parametrami",
+          "view_details": "Wy?wietl szczeg??y zadania #{{id}}"
+        },
+        "columns": {
+          "actions": "Działania",
+          "by": "Przez",
+          "flags": "Flagi",
+          "id": "#",
+          "priority": "Priorytet",
+          "queued": "W kolejce",
+          "result": "Wynik",
+          "scope": "Zakres",
+          "status": "Status"
+        },
+        "detail": {
+          "all": "Wszystko",
+          "claimed_by": "Zgłoszone przez",
+          "duration": "Czas trwania",
+          "error": "Błąd",
+          "exit_code": "Kod wyjścia",
+          "finished_at": "Skończono o godz",
+          "log_tail": "Kłoda (ogon)",
+          "queued_at": "W kolejce o godz",
+          "requested_by": "Na prośbę",
+          "routes": "Trasy",
+          "started_at": "Rozpoczęło się o godz",
+          "status": "Status",
+          "tenant": "Najemca",
+          "title": "Zadanie #{{id}}"
+        },
+        "empty": "Brak pracy",
+        "errors": {
+          "cancel": "Nie można anulować — zadanie mogło się rozpocząć",
+          "load": "Nie udało się załadować zadań",
+          "retry": "Ponowna próba nie powiodła się — oryginalne zadanie może nadal być w trakcie wykonywania"
+        },
+        "filters": {
+          "all": "Wszystko",
+          "cancelled": "Odwołany",
+          "failed": "Przegrany",
+          "partial": "Częściowy",
+          "queued": "W kolejce",
+          "running": "Działanie",
+          "status": "Status",
+          "succeeded": "Udało się"
+        },
+        "flags": {
+          "dry_run": "praca na sucho",
+          "force": "siła"
+        },
+        "messages": {
+          "cancelled": "Anulowano zadanie #{{id}}",
+          "retry_queued": "Dodano ponown? pr?b? #{{retryId}} do kolejki (z #{{id}})"
+        },
+        "priority": {
+          "high": "Wysoki",
+          "low": "Niski",
+          "normal": "Normalna",
+          "tooltip": "priorytet={{priority}} (niższe wygrane)"
+        },
+        "result": {
+          "invalid": "{{count}} nieprawidłowy"
+        },
+        "scope": {
+          "all_tenants": "wszyscy najemcy"
+        },
+        "table_aria": "Praca"
+      },
+      "events": {
+        "actions": {
+          "reload": "Przeładować"
+        },
+        "columns": {
+          "commit": "Popełniać",
+          "details": "Bliższe dane",
+          "event": "Wydarzenie",
+          "time": "Czas"
+        },
+        "empty": "Brak wydarzeń",
+        "errors": {
+          "load": "Nie udało się załadować wydarzeń"
+        },
+        "filters": {
+          "limit": "Limit"
+        },
+        "summary": "Wydarzenia {{count}}",
+        "table_aria": "Wydarzenia",
+        "types": {
+          "fail": "Ponieść porażkę",
+          "partial": "Częściowy",
+          "success": "Sukces",
+          "supersede": "Zastąpić",
+          "unknown": "Nieznane zdarzenie: {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "Wiek",
+          "cache_path": "Ścieżka pamięci podręcznej",
+          "failed_at": "Nie udało się w"
+        },
+        "description_action": "Wymuś odświeżenie",
+        "description_middle": "Trasy na tej liście są automatycznie pomijane w okresie wygaśnięcia awarii (domyślnie 6 godzin). Używać",
+        "description_prefix": "Zapisz w pamięci podręcznej ścieżki, które nie powiodły się podczas ostatniego renderowania wstępnego.",
+        "description_suffix": "na karcie Przegląd, aby natychmiast ponowić próbę.",
+        "empty": "Żadnych ostatnich awarii",
+        "errors": {
+          "load": "Nie udało się załadować błędów"
+        },
+        "table_aria": "Awarie"
+      },
+      "live_connected": "Połączono aktualizacje na żywo",
+      "audit": {
+        "actions": {
+          "auto_recache": "TOKEN NEXUSARM0",
+          "cancel": "anulować",
+          "detect_drift": "TOKEN NEXUSARM0",
+          "enqueue": "kolejkować",
+          "invalidate": "unieważnić",
+          "purge": "oczyszczać",
+          "purge_unexpected": "TOKEN NEXUSARM0",
+          "reset_breaker": "TOKEN NEXUSARM0",
+          "reset_queue": "TOKEN NEXUSARM0"
+        },
+        "buttons": {
+          "export_csv": "Eksportuj CSV",
+          "refresh": "Odświeżać"
+        },
+        "columns": {
+          "action": "Działanie",
+          "actor": "Aktor",
+          "details": "Bliższe dane",
+          "job": "Stanowisko",
+          "outcome": "Wynik",
+          "tenant": "Najemca",
+          "when": "Gdy"
+        },
+        "empty": "Brak wpisów audytu.",
+        "fallbacks": {
+          "all": "Wszystko",
+          "system": "system"
+        },
+        "filters": {
+          "action": "Filtr akcji",
+          "all": "Wszystko"
+        },
+        "table_aria": "Historia audytu"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "Praca w kolejce",
+          "refresh": "Odświeżać"
+        },
+        "empty_summary": "Brak podsumowania.",
+        "errors": {
+          "enqueue_job": "Nie udało się umieścić zadania w kolejce",
+          "load_summary": "Nie udało się załadować podsumowania"
+        },
+        "fields": {
+          "routes": "Trasy",
+          "tenant_slug": "Ślimak najemcy"
+        },
+        "force_refresh": {
+          "description": "Kolejkuj ponowne renderowanie. Pozostaw oba pola puste, aby odświeżyć każdego najemcę i trasę. Procesor hosta podejmuje zadanie w ciągu około 60 sekund.",
+          "dry_run": "Próba próbna (tylko plan)",
+          "force": "Wymuś (ignoruj ​​pamięć podręczną)",
+          "title": "Wymuś odświeżenie"
+        },
+        "health": {
+          "cache_unreachable": "Pamięć podręczna nieosiągalna",
+          "healthy": "Zdrowy",
+          "missing": "Brak {{count}}",
+          "stale": "{{count}} jest nieaktualny"
+        },
+        "hints": {
+          "active_jobs": "{{count}} aktywny",
+          "aging": "{{count}} starzenie się (>7 dni)",
+          "asset_broken": "Referencje martwe /aktywa/*",
+          "backoff_window": "W 6-godzinnym oknie wycofania",
+          "cache_age": "Najstarszy {{oldest}} / najnowszy {{newest}}",
+          "content_stale": "Treść źródłowa nowsza niż migawka",
+          "event_at": "Zdarzenie {{time}}",
+          "no_events": "Brak wydarzeń",
+          "prometheus": "Format tekstowy Prometeusza",
+          "tenants_routes": "Najemcy {{tenants}} x trasy {{routes}}"
+        },
+        "kpi": {
+          "age_stale": "Wiek nieaktualny (>14d)",
+          "asset_broken": "Zniszczony majątek",
+          "build_commit": "Zbuduj zatwierdzenie",
+          "cache_size": "Rozmiar pamięci podręcznej",
+          "content_stale": "Treść nieaktualna",
+          "coverage": "Zasięg",
+          "metrics": "Metryka",
+          "missing": "Zaginiony",
+          "queued_jobs": "Zadania w kolejce",
+          "recent_failures": "Ostatnie awarie",
+          "status": "Status"
+        },
+        "last_run": "Ostatni ukończony bieg",
+        "messages": {
+          "job_queued": "Dodano zadanie #{{id}} do kolejki"
+        },
+        "placeholders": {
+          "routes": "/about,/blog (puste = wszystkie)",
+          "tenant_slug": "np. bank godzin (puste = wszystkie)"
+        },
+        "super_admin_only": "Tylko superadministrator"
+      },
+      "polling_fallback": "Ankieta zastępcza",
+      "purge": {
+        "actions": {
+          "auto_recache": "Automatyczne ponowne buforowanie po czyszczeniu",
+          "dry_run": "Praca na sucho",
+          "preview_purge": "Podgląd czyszczenia",
+          "purge_now": "Oczyść teraz"
+        },
+        "description_middle": "dla jednego segmentu ścieżki,",
+        "description_prefix": "Usuń migawki pasujące do wzorca globu. Używać",
+        "description_suffix": "dla każdego potomka. Przykłady:",
+        "errors": {
+          "pattern_required": "Wymagany jest wzór (np. /blog/*)",
+          "purge_failed": "Czyszczenie nie powiodło się"
+        },
+        "fields": {
+          "pattern": "Wzór",
+          "tenant_slug": "Ślimak najemcy"
+        },
+        "messages": {
+          "dry_run": "Praca próbna: migawki {{count}} zostaną usunięte",
+          "purged": "Usunięto migawki {{count}}{{job}}"
+        },
+        "placeholders": {
+          "pattern": "/blog/* lub /listy/**",
+          "tenant_slug": "opcjonalne - pozostaw puste dla wszystkich"
+        },
+        "result": {
+          "deleted": "Usunięto migawki {{count}}",
+          "would_delete": "Spowoduje usunięcie migawek {{count}}"
+        },
+        "title": "Czyszczenie pamięci podręcznej symboli wieloznacznych"
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "Sprawdzać"
+        },
+        "description_prefix": "Zobacz które",
+        "description_suffix": "wzorzec jest właścicielem trasy i tego, co otrzymuje TTL, bez konfiguracji grepowania. Służy do dostrojenia polityki świeżości.",
+        "error": "Wyszukiwanie nie powiodło się — sprawdź format trasy (musi zaczynać się od „/”)",
+        "fields": {
+          "route": "Trasa"
+        },
+        "path_only": "Tylko ścieżka — bez schematu i hosta",
+        "placeholders": {
+          "route": "/blog/mój-post"
+        },
+        "result": {
+          "match": "dopasowanie: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (specyficzność {{specificity}})",
+          "other_patterns": "Inne wzorce pasujące do tej trasy:",
+          "ttl": "TTL: {{ttl}} ({{seconds}}s)"
+        },
+        "title": "Inspektor TTL",
+        "units": {
+          "days": "{{count}} d",
+          "hours": "{{count}} godz",
+          "minutes": "{{count}} min"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "Badać"
+        },
+        "counts": {
+          "dynamic": "{{count}} dynamiczny",
+          "static": "{{count}} statyczny",
+          "total": "Łącznie {{count}}"
+        },
+        "description_prefix": "Zobacz dokładnie, które trasy silnik planuje renderować dla najemcy — podłoga statyczna (ograniczona funkcja/moduł) plus dynamiczne znaczniki URL z",
+        "description_suffix": "Pracownik dramaturga odwiedza tę listę.",
+        "error": "Wyszukiwanie nie powiodło się — sprawdź informację o dzierżawie",
+        "fields": {
+          "tenant_slug": "Ślimak najemcy"
+        },
+        "none": "(nic)",
+        "placeholders": {
+          "tenant_slug": "bank czasu"
+        },
+        "sections": {
+          "dynamic_routes": "Trasy dynamiczne (ograniczone do 1000)",
+          "static_routes": "Trasy statyczne"
+        },
+        "title": "Eksplorator mapy witryny"
+      },
+      "readonly": {
+        "prefix": "Widok tylko do odczytu — przyciski akcji są wyłączone, ponieważ silnik renderowania wstępnego działa w każdej dzierżawie. Zaloguj się za pomocą a",
+        "role": "superadministrator platformy",
+        "suffix": "konto, aby kolejkować zadania, usuwać migawki lub wyzwalać wykrywanie dryfu."
+      },
+      "tabs": {
+        "analytics": "Analityka",
+        "coverage": "Zasięg",
+        "events": "Wydarzenia",
+        "failures": "Awarie",
+        "history": "Historia",
+        "inventory": "Spis",
+        "jobs": "Praca",
+        "overview": "Przegląd"
+      },
+      "tabs_aria": "Karty wstępnego renderowania",
+      "title": "Silnik wstępnego renderowania"
+    }
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",

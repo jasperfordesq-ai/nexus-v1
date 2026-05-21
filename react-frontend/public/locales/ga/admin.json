@@ -299,7 +299,570 @@
     "sitemap_urls_by_type": "URLs by Type",
     "social_sharing_image_heading": "Social Sharing Image",
     "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
-    "usage_limits_heading": "Usage Limits"
+    "usage_limits_heading": "Usage Limits",
+    "prerender": {
+      "description": "Grianghraif a rinne an freastalaí le bot amháin. Monatóireacht a dhéanamh ar chlúdach, staleness a bhrath, agus athnuachan bhfeidhm.",
+      "analytics": {
+        "actions": {
+          "reload": "Athlódáil"
+        },
+        "columns": {
+          "crawler": "CRAWLER",
+          "hits": "HITS",
+          "host": "HOST",
+          "ip": "IP",
+          "status": "STATUS",
+          "time": "TIME",
+          "uri": "URI",
+          "url": "URL"
+        },
+        "empty": "Níl aon anailísíocht ar fáil. Seans go bhfuil loga rochtana bot folamh.",
+        "empty_bot_traffic": "Níl aon trácht bot fós",
+        "empty_no_data": "Gan sonraí",
+        "empty_recent_hits": "Uimh amas le déanaí",
+        "errors": {
+          "load": "Theip ar an anailísíocht a lódáil"
+        },
+        "filters": {
+          "window": "Fuinneog"
+        },
+        "hints": {
+          "spoofed": "mórbot éileamh, theip ar raon IP",
+          "top_50_cap": "ó caipín top-50",
+          "verified_of_total": "{{verified}} de {{total}}"
+        },
+        "kpi": {
+          "ip_verified": "IP-fíoraithe",
+          "spoofed": "spoofed (amhrasach)",
+          "total_bot_hits": "Amas iomlán bot",
+          "unique_uris": "URIs uathúla"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} spoofed"
+        },
+        "log_summary": "Logáil: {{size}} - ó {{time}}",
+        "sections": {
+          "hits_by_crawler": "Hits ag crawler",
+          "hits_by_status": "Amas de réir stádas HTTP",
+          "recent_activity": "Gníomhaíocht le déanaí (an chéad cheann is déanaí, an ceann deireanach {{count}})",
+          "top_uris": "URIs is fearr (50 barr de réir an chomhairimh)"
+        },
+        "tables": {
+          "recent_hits_aria": "Amas bot le déanaí",
+          "top_uris_aria": "URIs is fearr"
+        },
+        "windows": {
+          "1": "An 24 uair dheireanach",
+          "7": "7 lá seo caite",
+          "30": "30 lá anuas"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "Oscail san fhardal",
+          "refresh": "Athnuaigh",
+          "refresh_all_stale": "Athnuaigh an seanscéal ({{count}})"
+        },
+        "columns": {
+          "actions": "ACTIONS",
+          "asset": "ASSET",
+          "coverage": "COVERAGE",
+          "host": "HOST",
+          "missing": "MISSING",
+          "stale": "STALE",
+          "tenant": "TENANT"
+        },
+        "confirm": {
+          "queue_recache": "Reache scuaine do thionóntaí {{count}}?"
+        },
+        "empty": "Uimh tionóntaí",
+        "errors": {
+          "bulk_enqueue": "Theip ar an mórscuaine (b’fhéidir gur scuaine roinnt tionóntaí)",
+          "enqueue": "Theip ar an scuaine",
+          "load": "Theip ar chlúdach a lódáil"
+        },
+        "messages": {
+          "bulk_queued": "Reache scuaine do thionóntaí {{count}}",
+          "no_stale": "Uimh tionóntaí stale - clúdach sláintiúil",
+          "tenant_queued": "Cuireadh #{{id}} sa scuaine do {{slug}}"
+        },
+        "summary": {
+          "healthy": "Gach tionónta {{count}} sláintiúil.",
+          "needs_work": "{{needing}} ó thionóntaí {{total}} tá bealaí in easnamh, sean, nó sócmhainní briste."
+        },
+        "table_aria": "Clúdach"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "Cuir iarratas isteach",
+          "dry_run": "Rith tirim"
+        },
+        "auto_recache": {
+          "description": "Scanann gach pictiúr. Déanann sé scuainí ar thosaíocht íseal do bhealaí a bhfuil a n-ábhar foinse athraithe nó a bhfuil TTL imithe in éag. Ritheann sé ar cron gach 15-30 nóiméad; bain úsáid as seo chun ceann a spreagadh láithreach.",
+          "title": "Athchúrsáil uathoibríoch (sruth ábhair TTL +)"
+        },
+        "drift": {
+          "description": "Siúlfaidh sé léarscáil an láithreáin do gach tionónta, déanann sé comparáid idir lastmod agus uaireanta snapshot, agus glacann sé seanleathanaigh ó scríbhinní amh, aistrithe, nó jabanna ciúáilte. Ritheann sé gach 2 nóiméad agus inqueues sleachta ardtosaíochta.",
+          "title": "Braith sruth (mapa suímh vs pictiúir)"
+        },
+        "errors": {
+          "auto_recache": "Theip ar uath-thaisceadh a spreagadh",
+          "drift_detection": "Theip ar bhrath srutha a spreagadh",
+          "purge_unexpected": "Theip ar an glantachán gan choinne"
+        },
+        "messages": {
+          "auto_recache_applied": "Auto-recache i bhfeidhm",
+          "auto_recache_dry_run": "Auto-recache tirim-rith críochnaithe",
+          "drift_applied": "Cuireadh braite srutha i bhfeidhm",
+          "drift_dry_run": "Drift tirim-rith críochnaithe",
+          "purge_dry_run": "Rith tirim: ghlanfaí pictiúir {{count}}",
+          "purged_ungated": "Glanghlacadóirí {{count}} gan ghá thar thionóntaí {{tenants}}"
+        },
+        "no_output": "(gan aschur)",
+        "purge_ungated": {
+          "description": "Grianghraif scuabtha nach bhfuil a mbealach laistigh de shraith ionchais tionónta. Go coitianta tar éis gné a scoránú, nó chun bealaí statacha a ghlanadh a dhéantar gan bratacha gné. Fágtar bealaí ábhar dinimiciúil leo féin.",
+          "title": "Glan na pictiúir neamháitithe (glanta 404 in aghaidh an tionónta)"
+        },
+        "result": {
+          "deleted": "Scriosadh pictiúir {{count}} thar thionóntaí {{tenants}}",
+          "would_delete": "An scriosfaí pictiúir {{count}} thar thionóntaí {{tenants}}"
+        },
+        "title": "Uathoibriú úire"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "Cealaigh",
+          "close_breaker_now": "Dún briseadh anois",
+          "details": "Sonraí",
+          "emergency_reset": "Athshocrú éigeandála",
+          "hide": "Folaigh",
+          "hide_details": "Folaigh sonraí",
+          "reset_queue": "Athshocraigh scuaine"
+        },
+        "engine_healthy": "Inneall sláintiúil",
+        "issue_count_one": "{{count}} eisiúint",
+        "issue_count_other": "{{count}} saincheisteanna",
+        "modal": {
+          "body_middle": "nó",
+          "body_prefix": "Beidh sé seo requeue gach",
+          "body_suffix": "as a chéile a bhfuil a oibrí ina thost le haghaidh >30 min, agus glan an scoradán ciorcaid.",
+          "title": "Éigeandáil: athshocrú scuaine bhfostú",
+          "warning": "Ná húsáid é seo ach amháin má dheimhnigh tú go bhfuil an scuaine i bhfostú. Má tá oibrí sláintiúil fós ag rith, cruthóidh sé seo obair dhúblach."
+        },
+        "toasts": {
+          "breaker_reset": "Athshocrú an scoradáin chiorcaid",
+          "queue_reset_one": "Athshocraigh sraith greamaithe {{count}}; breaker glanta",
+          "queue_reset_other": "Athshocraigh sraitheanna greamaithe {{count}}; breaker glanta",
+          "queue_reset_failed": "Theip ar athshocrú na scuaine",
+          "reset_failed": "Theip ar an athshocrú"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "Dún",
+          "inspect": "Iniúchadh",
+          "inspect_snapshot": "Déan iniúchadh ar {{path}}",
+          "open_rendered_url": "Oscail rindreáilte URL",
+          "recache_selected": "Recache roghnaithe ({{count}})",
+          "reload": "Athlódáil",
+          "select_all_visible": "Roghnaigh gach infheicthe",
+          "select_snapshot": "Roghnaigh {{path}}"
+        },
+        "columns": {
+          "actions": "Gníomhartha",
+          "age": "Aois",
+          "host": "Óstach",
+          "http": "HTTP",
+          "route": "Bealach",
+          "size": "Méid",
+          "status": "Stádas"
+        },
+        "empty": "Ní mheaitseálann aon ghrianghraif na scagairí",
+        "errors": {
+          "bulk_recache": "Theip ar aisghabháil mórchóir",
+          "inspect": "Theip ar iniúchadh pictiúr",
+          "load": "Theip ar lódáil an fhardail"
+        },
+        "filters": {
+          "aging": "Ag dul in aois",
+          "all": "Gach",
+          "asset_broken": "Sócmhainn briste",
+          "content_drifted": "Ábhar drifted",
+          "filter": "Scagaire",
+          "filter_placeholder": "bealach nó fotheaghrán ósta",
+          "fresh": "Úr",
+          "issue": "Eisiúint",
+          "stale": "stale",
+          "staleness": "Staileness",
+          "status": "Stádas",
+          "status_200": "200 amháin",
+          "status_non_200": "Neamh-200",
+          "tenant_placeholder": "roghnach",
+          "tenant_slug": "Drúchtín tionónta"
+        },
+        "messages": {
+          "bulk_recache": "Neamhbhailíochtú pictiúir {{count}} agus reache scuaine"
+        },
+        "inspect": {
+          "age": "Aois",
+          "all_valid": "ar fad bailí",
+          "asset_references": "Tagairtí sócmhainní ({{count}})",
+          "canonical": "Canonical",
+          "dead_assets": "{{count}} marbh",
+          "flags": "Bratacha",
+          "h1_count": "H1 (comhaireamh)",
+          "html_parse_warnings": "Rabhadh parsála HTML",
+          "html_preview": "Réamhamharc HTML (an chéad 12KB, scripteanna bainte)",
+          "integrity_mismatch": "bearta athraithe ó rindreáil - táthar ag súil sha256 {{expected}}..., fuair {{actual}}...",
+          "integrity_missing": "níl aon taobhcharr sha256 - tá pictiúr roimh fhíorú sláine nó rinneadh eagarthóireacht láimhe air",
+          "integrity_ok": "meaitseálann bearta an sha256 scríofa ag am rindreála",
+          "integrity_status": "sláine: {{status}}",
+          "integrity_unreadable": "tá taobhcharr sha256 ann ach tá sé míchumtha",
+          "invalid_present": "INVALID I LÁTHAIR",
+          "json_ld": "JSON-LD (bloic {{blocks}}, {{status}})",
+          "meta_description": "Cur síos meta",
+          "missing": "- ar iarraidh -",
+          "modal_title": "Iniúchadh seat",
+          "modified": "Athraithe",
+          "must_fix": "Ní mór a shocrú ({{count}})",
+          "no_structured_data": "Gan sonraí struchtúrtha",
+          "no_type": "(gan @cineál)",
+          "none": "(aon cheann)",
+          "old": "{{age}} d'aois",
+          "open_graph": "Oscail Graf",
+          "path": "Conair",
+          "seo_score": "SEO scór",
+          "size": "Méid",
+          "tips": "Leideanna ({{count}})",
+          "title": "Teideal"
+        },
+        "selected": "{{count}} roghnaithe",
+        "status": {
+          "asset": "sócmhainn",
+          "content": "ábhar",
+          "content_drifted": "ábhar drifted"
+        },
+        "summary": "{{filtered}} de na pictiúir {{total}}",
+        "table_aria": "fardal seat"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "Cealaigh jab #{{id}}",
+          "close": "Dún",
+          "reload": "Athlódáil",
+          "retry_job": "Bain triail eile as jab #{{id}}",
+          "retry_same_parameters": "Bain triail eile as leis na paraiméadair chéanna",
+          "view_details": "F?ach ar shonra? jab #{{id}}"
+        },
+        "columns": {
+          "actions": "Gníomhartha",
+          "by": "Le",
+          "flags": "Bratacha",
+          "id": "#",
+          "priority": "Tosaíocht",
+          "queued": "Ciúáilte",
+          "result": "Toradh",
+          "scope": "Raon feidhme",
+          "status": "Stádas"
+        },
+        "detail": {
+          "all": "go léir",
+          "claimed_by": "Éilithe ag",
+          "duration": "Fad",
+          "error": "Earráid",
+          "exit_code": "Cód scoir",
+          "finished_at": "Críochnaithe ag",
+          "log_tail": "Log (eireaball)",
+          "queued_at": "Ciúáilte ag",
+          "requested_by": "Arna iarraidh ag",
+          "routes": "Bealaí",
+          "started_at": "Thosaigh ag",
+          "status": "Stádas",
+          "tenant": "Tionónta",
+          "title": "Jab #{{id}}"
+        },
+        "empty": "Gan postanna",
+        "errors": {
+          "cancel": "Níorbh fhéidir a chur ar ceal - seans gur thosaigh an post",
+          "load": "Theip ar lódáil jabanna",
+          "retry": "Theip ar atriail - seans go bhfuil an bunphost fós ag eitilt"
+        },
+        "filters": {
+          "all": "Gach",
+          "cancelled": "Ar ceal",
+          "failed": "Theip",
+          "partial": "Páirteach",
+          "queued": "Ciúáilte",
+          "running": "Ag rith",
+          "status": "Stádas",
+          "succeeded": "D'éirigh"
+        },
+        "flags": {
+          "dry_run": "tirim-rith",
+          "force": "bhfeidhm"
+        },
+        "messages": {
+          "cancelled": "Cuireadh jab #{{id}} ar ceal",
+          "retry_queued": "Cuireadh atriail #{{retryId}} sa scuaine (? #{{id}})"
+        },
+        "priority": {
+          "high": "Ard",
+          "low": "Íseal",
+          "normal": "Gnáth",
+          "tooltip": "tosaíocht={{priority}} (bua níos ísle)"
+        },
+        "result": {
+          "invalid": "{{count}} neamhbhailí"
+        },
+        "scope": {
+          "all_tenants": "gach tionónta"
+        },
+        "table_aria": "Poist"
+      },
+      "events": {
+        "actions": {
+          "reload": "Athlódáil"
+        },
+        "columns": {
+          "commit": "Geall",
+          "details": "Sonraí",
+          "event": "Imeacht",
+          "time": "Am"
+        },
+        "empty": "Gan imeachtaí",
+        "errors": {
+          "load": "Theip ar lódáil imeachtaí"
+        },
+        "filters": {
+          "limit": "Teorainn"
+        },
+        "summary": "Imeachtaí {{count}}",
+        "table_aria": "Imeachtaí",
+        "types": {
+          "fail": "Teip",
+          "partial": "Páirteach",
+          "success": "Rath",
+          "supersede": "ionad",
+          "unknown": "Imeacht anaithnid: {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "Aois",
+          "cache_path": "Cosán taisce",
+          "failed_at": "Theip ar"
+        },
+        "description_action": "Déan athnuachan",
+        "description_middle": "Déantar bealaí sa liosta seo a scipeáil go huathoibríoch le linn na fuinneoige teip-aischurtha (réamhshocraithe 6h). Úsáid",
+        "description_prefix": "Cosáin taisce ar theip orthu le linn rith réamhréiteora le déanaí.",
+        "description_suffix": "ar an táb Forbhreathnú chun triail eile a bhaint as láithreach.",
+        "empty": "Uimh teipeanna le déanaí",
+        "errors": {
+          "load": "Theip ar theipeanna a luchtú"
+        },
+        "table_aria": "Teipeanna"
+      },
+      "live_connected": "Nuashonruithe beo ceangailte",
+      "audit": {
+        "actions": {
+          "auto_recache": "auto_recache",
+          "cancel": "ceal",
+          "detect_drift": "detect_drift",
+          "enqueue": "enqueue",
+          "invalidate": "neamhbhailí",
+          "purge": "purge",
+          "purge_unexpected": "purge_unexpected",
+          "reset_breaker": "reset_breaker",
+          "reset_queue": "reset_queue"
+        },
+        "buttons": {
+          "export_csv": "Easpórtáil CSV",
+          "refresh": "Athnuaigh"
+        },
+        "columns": {
+          "action": "Gníomh",
+          "actor": "Aisteoir",
+          "details": "Sonraí",
+          "job": "Jab",
+          "outcome": "Toradh",
+          "tenant": "Tionónta",
+          "when": "Cathain"
+        },
+        "empty": "Uimh iontrálacha iniúchta.",
+        "fallbacks": {
+          "all": "go léir",
+          "system": "córas"
+        },
+        "filters": {
+          "action": "Scagaire gníomhaíochta",
+          "all": "Gach"
+        },
+        "table_aria": "Stair iniúchta"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "Post scuaine",
+          "refresh": "Athnuaigh"
+        },
+        "empty_summary": "Níl achoimre ar fáil.",
+        "errors": {
+          "enqueue_job": "Theip ar an bpost a chur i scuaine",
+          "load_summary": "Theip ar an achoimre a lódáil"
+        },
+        "fields": {
+          "routes": "Bealaí",
+          "tenant_slug": "Drúchtín tionónta"
+        },
+        "force_refresh": {
+          "description": "Cuir scuaine ar rindreáil. Fág an dá pháirc folamh chun gach tionónta agus bealach a athnuachan. Roghnaíonn an próiseálaí óstaigh an post laistigh de thart ar 60 soicind.",
+          "dry_run": "Rith tirim (plean amháin)",
+          "force": "Fórsáil (neamhaird ar an taisce)",
+          "title": "Déan athnuachan"
+        },
+        "health": {
+          "cache_unreachable": "Ní féidir teacht ar thaisce",
+          "healthy": "sláintiúil",
+          "missing": "{{count}} in easnamh",
+          "stale": "{{count}} sean"
+        },
+        "hints": {
+          "active_jobs": "{{count}} gníomhach",
+          "aging": "{{count}} ag dul in aois (>7d)",
+          "asset_broken": "Tagairtí marbh /sócmhainní/*",
+          "backoff_window": "I bhfuinneog chúltaca 6h",
+          "cache_age": "{{oldest}} is sine / {{newest}} is nuaí",
+          "content_stale": "Bunábhar níos nuaí ná an pictiúr",
+          "event_at": "Imeacht {{time}}",
+          "no_events": "Gan imeachtaí",
+          "prometheus": "Prometheus i bhformáid téacs",
+          "tenants_routes": "Tionóntaí {{tenants}} x bealaí {{routes}}"
+        },
+        "kpi": {
+          "age_stale": "Aois sean (>14d)",
+          "asset_broken": "Sócmhainn-bhriste",
+          "build_commit": "Tóg gealltanas",
+          "cache_size": "Méid taisce",
+          "content_stale": "Ábhar seanchaite",
+          "coverage": "Clúdach",
+          "metrics": "Méadracht",
+          "missing": "Ar iarraidh",
+          "queued_jobs": "Poist ciúáilte",
+          "recent_failures": "Teipeanna le déanaí",
+          "status": "Stádas"
+        },
+        "last_run": "An rith dheireanach críochnaithe",
+        "messages": {
+          "job_queued": "Cuireadh jab #{{id}} sa scuaine"
+        },
+        "placeholders": {
+          "routes": "/faoi,/blog (bán = uile)",
+          "tenant_slug": "e.g. banc uair-ama (bán = uile)"
+        },
+        "super_admin_only": "Sár-riarachán amháin"
+      },
+      "polling_fallback": "Cúltaca vótaíochta",
+      "purge": {
+        "actions": {
+          "auto_recache": "Auto-recache tar éis glantacháin",
+          "dry_run": "Rith tirim",
+          "preview_purge": "purge Réamhamhairc",
+          "purge_now": "Glan anois"
+        },
+        "description_middle": "do mhír cosáin amháin,",
+        "description_prefix": "Scrios pictiúir a thagann le patrún glob. Úsáid",
+        "description_suffix": "do shliocht ar bith. Samplaí:",
+        "errors": {
+          "pattern_required": "Tá patrún ag teastáil (m.sh. /blog/*)",
+          "purge_failed": "Theip ar an bpurgáiste"
+        },
+        "fields": {
+          "pattern": "Patrún",
+          "tenant_slug": "Drúchtín tionónta"
+        },
+        "messages": {
+          "dry_run": "Rith tirim: ghlanfaí pictiúir {{count}}",
+          "purged": "Glanghlacadóirí {{count}}{{job}}"
+        },
+        "placeholders": {
+          "pattern": "/blog/* nó /listings/**",
+          "tenant_slug": "roghnach - fág bán do chách"
+        },
+        "result": {
+          "deleted": "Scriosadh pictiúir {{count}}",
+          "would_delete": "Scriosfaí pictiúir {{count}}"
+        },
+        "title": "Glantóir taisce saoróg"
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "Iniúchadh"
+        },
+        "description_prefix": "Féach cé acu",
+        "description_suffix": "úinéireacht patrún bealach agus cad TTL a fhaigheann sé, gan grepping config. Úsáidte chun an polasaí úire a choigeartú.",
+        "error": "Theip ar an gcuardach - seiceáil formáid an bhealaigh (ní mór tosú le \"/\")",
+        "fields": {
+          "route": "Bealach"
+        },
+        "path_only": "Conair amháin - gan aon scéim nó óstach",
+        "placeholders": {
+          "route": "/blog/mo-phost"
+        },
+        "result": {
+          "match": "mheaitseáil: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (sonraíocht {{specificity}})",
+          "other_patterns": "Patrúin eile a mheaitseálann an bealach seo:",
+          "ttl": "TTL: {{ttl}} ({{seconds}}s)"
+        },
+        "title": "TTL cigire",
+        "units": {
+          "days": "{{count}} d",
+          "hours": "{{count}} h",
+          "minutes": "{{count}} nóim"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "Déan iniúchadh"
+        },
+        "counts": {
+          "dynamic": "{{count}} dinimiciúil",
+          "static": "{{count}} statach",
+          "total": "{{count}} iomlán"
+        },
+        "description_prefix": "Féach go díreach cé na bealaí atá beartaithe ag an inneall a sholáthar do thionónta - urlár statach (gné / modúl le geata) móide na URLanna dinimiciúla ó",
+        "description_suffix": "Tugann oibrí na nDrámadóir cuairt ar an liosta seo.",
+        "error": "Cuardaigh theip - seiceáil an seilide tionónta",
+        "fields": {
+          "tenant_slug": "Drúchtín tionónta"
+        },
+        "none": "(aon cheann)",
+        "placeholders": {
+          "tenant_slug": "banc uair-ama"
+        },
+        "sections": {
+          "dynamic_routes": "Bealaí dinimiciúla (uasmhéid de 1,000)",
+          "static_routes": "Bealaí statacha"
+        },
+        "title": "Insamhlóir léarscáil an tsuímh"
+      },
+      "readonly": {
+        "prefix": "Amharc inléite amháin - díchumasaítear cnaipí gnímh toisc go n-oibríonn an t-inneall réamhreora thar gach tionónta. Sínigh isteach le a",
+        "role": "ardán super-admin",
+        "suffix": "cuntas chun jabanna a chuartú, grianghraif a ghlanadh, nó braite srutha a spreagadh."
+      },
+      "tabs": {
+        "analytics": "Anailísíocht",
+        "coverage": "Clúdach",
+        "events": "Imeachtaí",
+        "failures": "Teipeanna",
+        "history": "Stair",
+        "inventory": "Fardal",
+        "jobs": "Poist",
+        "overview": "Forbhreathnú"
+      },
+      "tabs_aria": "Cluaisíní réamhshocraithe",
+      "title": "Inneall Réamhshocraithe"
+    }
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",

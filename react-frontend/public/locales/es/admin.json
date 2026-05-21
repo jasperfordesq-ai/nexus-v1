@@ -299,7 +299,570 @@
     "sitemap_urls_by_type": "URLs by Type",
     "social_sharing_image_heading": "Social Sharing Image",
     "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
-    "usage_limits_heading": "Usage Limits"
+    "usage_limits_heading": "Usage Limits",
+    "prerender": {
+      "description": "Instantáneas renderizadas por el servidor solo para bots. Supervise la cobertura, detecte estancamiento y fuerce actualizaciones.",
+      "analytics": {
+        "actions": {
+          "reload": "Recargar"
+        },
+        "columns": {
+          "crawler": "CRAWLER",
+          "hits": "HITS",
+          "host": "HOST",
+          "ip": "IP",
+          "status": "STATUS",
+          "time": "TIME",
+          "uri": "URI",
+          "url": "URL"
+        },
+        "empty": "No hay análisis disponibles. El registro de acceso del bot puede estar vacío.",
+        "empty_bot_traffic": "Aún no hay tráfico de bots",
+        "empty_no_data": "Sin datos",
+        "empty_recent_hits": "No hay visitas recientes",
+        "errors": {
+          "load": "No se pudieron cargar los análisis"
+        },
+        "filters": {
+          "window": "Ventana"
+        },
+        "hints": {
+          "spoofed": "robot importante reclamado, rango IP fallido",
+          "top_50_cap": "de la gorra top-50",
+          "verified_of_total": "{{verified}} de {{total}}"
+        },
+        "kpi": {
+          "ip_verified": "IP verificado",
+          "spoofed": "Falsificado (sospechoso)",
+          "total_bot_hits": "Total de visitas de bots",
+          "unique_uris": "URI únicos"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} falsificado"
+        },
+        "log_summary": "Registro: {{size}} - desde {{time}}",
+        "sections": {
+          "hits_by_crawler": "Golpes del rastreador",
+          "hits_by_status": "Visitas por estado HTTP",
+          "recent_activity": "Actividad reciente (lo más nuevo primero, el último {{count}})",
+          "top_uris": "Principales URI (50 principales por recuento de visitas)"
+        },
+        "tables": {
+          "recent_hits_aria": "Golpes recientes de bots",
+          "top_uris_aria": "Principales URI"
+        },
+        "windows": {
+          "1": "Últimas 24h",
+          "7": "últimos 7 días",
+          "30": "últimos 30 días"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "Abrir en inventario",
+          "refresh": "Refrescar",
+          "refresh_all_stale": "Actualizar todo obsoleto ({{count}})"
+        },
+        "columns": {
+          "actions": "ACTIONS",
+          "asset": "ASSET",
+          "coverage": "COVERAGE",
+          "host": "HOST",
+          "missing": "MISSING",
+          "stale": "STALE",
+          "tenant": "TENANT"
+        },
+        "confirm": {
+          "queue_recache": "¿Recaché de cola para inquilinos de {{count}}?"
+        },
+        "empty": "Sin inquilinos",
+        "errors": {
+          "bulk_enqueue": "Error en la puesta en cola masiva (es posible que algunos inquilinos hayan hecho cola)",
+          "enqueue": "No se pudo poner en cola",
+          "load": "No se pudo cargar la cobertura"
+        },
+        "messages": {
+          "bulk_queued": "Recuperación de caché en cola para inquilinos de {{count}}",
+          "no_stale": "Sin inquilinos obsoletos: la cobertura es saludable",
+          "tenant_queued": "#{{id}} en cola para {{slug}}"
+        },
+        "summary": {
+          "healthy": "Todos los inquilinos de {{count}} sanos.",
+          "needs_work": "{{needing}} de los inquilinos de {{total}} tienen rutas faltantes, obsoletas o con activos rotos."
+        },
+        "table_aria": "Cobertura"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "Aplicar",
+          "dry_run": "Ejecución en seco"
+        },
+        "auto_recache": {
+          "description": "Escanea cada instantánea. Pone en cola las recuperaciones de baja prioridad para rutas cuyo contenido fuente ha cambiado o cuyo TTL ha caducado. Se ejecuta en cron cada 15 a 30 minutos; use esto para activar uno inmediatamente.",
+          "title": "Recaché automático (TTL + deriva de contenido)"
+        },
+        "drift": {
+          "description": "Recorre el mapa del sitio de cada inquilino, compara lastmod con instantáneas mtimes y detecta páginas obsoletas de escrituras sin procesar, migraciones o trabajos en cola. Se ejecuta cada 2 minutos y pone en cola las recuperaciones de alta prioridad.",
+          "title": "Detectar deriva (mapa del sitio versus instantáneas)"
+        },
+        "errors": {
+          "auto_recache": "No se pudo activar la recuperación de caché automática",
+          "drift_detection": "No se pudo activar la detección de deriva",
+          "purge_unexpected": "Purga inesperada fallida"
+        },
+        "messages": {
+          "auto_recache_applied": "Se aplicó recuperación automática de caché",
+          "auto_recache_dry_run": "Ejecución en seco de recuperación automática completa",
+          "drift_applied": "Detección de deriva aplicada",
+          "drift_dry_run": "Se completó el ensayo de deriva",
+          "purge_dry_run": "Ejecución en seco: las instantáneas de {{count}} se eliminarían",
+          "purged_ungated": "Instantáneas no controladas de {{count}} eliminadas en los inquilinos de {{tenants}}"
+        },
+        "no_output": "(sin salida)",
+        "purge_ungated": {
+          "description": "Barrido de instantáneas cuya ruta no se encuentra en un conjunto esperado de inquilinos. Común después de desactivar una función o para limpiar rutas estáticas renderizadas previamente sin indicadores de función. Las rutas de contenido dinámico se dejan en paz.",
+          "title": "Purgar instantáneas no cerradas (limpieza 404 por inquilino)"
+        },
+        "result": {
+          "deleted": "Instantáneas de {{count}} eliminadas en los inquilinos de {{tenants}}",
+          "would_delete": "Eliminaría instantáneas de {{count}} en los inquilinos de {{tenants}}"
+        },
+        "title": "Automatización de frescura"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "Cancelar",
+          "close_breaker_now": "Cerrar el disyuntor ahora",
+          "details": "Detalles",
+          "emergency_reset": "Reinicio de emergencia",
+          "hide": "Esconder",
+          "hide_details": "Ocultar detalles",
+          "reset_queue": "Restablecer cola"
+        },
+        "engine_healthy": "Motor sano",
+        "issue_count_one": "Problema con {{count}}",
+        "issue_count_other": "Problemas con {{count}}",
+        "modal": {
+          "body_middle": "o",
+          "body_prefix": "Esto hará cola cada",
+          "body_suffix": "fila cuyo trabajador ha estado en silencio durante >30 min y borre el disyuntor.",
+          "title": "Emergencia: restablecer la cola atascada",
+          "warning": "Úselo solo si ha confirmado que la cola está atascada. Si todavía se está ejecutando un trabajador sano, esto creará trabajo duplicado."
+        },
+        "toasts": {
+          "breaker_reset": "Reinicio del disyuntor",
+          "queue_reset_one": "Restablecer la fila atascada de {{count}}; interruptor despejado",
+          "queue_reset_other": "Restablecer las filas atascadas de {{count}}; interruptor despejado",
+          "queue_reset_failed": "Error al restablecer la cola",
+          "reset_failed": "Error al restablecer"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "Cerca",
+          "inspect": "Inspeccionar",
+          "inspect_snapshot": "Inspeccionar {{path}}",
+          "open_rendered_url": "Abrir renderizado URL",
+          "recache_selected": "Recuperación de caché seleccionada ({{count}})",
+          "reload": "Recargar",
+          "select_all_visible": "Seleccionar todo visible",
+          "select_snapshot": "Seleccione {{path}}"
+        },
+        "columns": {
+          "actions": "Comportamiento",
+          "age": "Edad",
+          "host": "Anfitrión",
+          "http": "HTTP",
+          "route": "Ruta",
+          "size": "Tamaño",
+          "status": "Estado"
+        },
+        "empty": "Ninguna instantánea coincide con los filtros",
+        "errors": {
+          "bulk_recache": "Error en la recuperación masiva",
+          "inspect": "No se pudo inspeccionar la instantánea",
+          "load": "No se pudo cargar el inventario"
+        },
+        "filters": {
+          "aging": "Envejecimiento",
+          "all": "Todo",
+          "asset_broken": "Activo roto",
+          "content_drifted": "El contenido se desvió",
+          "filter": "Filtrar",
+          "filter_placeholder": "subcadena de ruta o host",
+          "fresh": "Fresco",
+          "issue": "Asunto",
+          "stale": "Duro",
+          "staleness": "estancamiento",
+          "status": "Estado",
+          "status_200": "200 solo",
+          "status_non_200": "No 200",
+          "tenant_placeholder": "opcional",
+          "tenant_slug": "babosa inquilino"
+        },
+        "messages": {
+          "bulk_recache": "Instantáneas de {{count}} no validadas y recuperación de caché en cola"
+        },
+        "inspect": {
+          "age": "Edad",
+          "all_valid": "todo válido",
+          "asset_references": "Referencias de activos ({{count}})",
+          "canonical": "Canónico",
+          "dead_assets": "{{count}} muerto",
+          "flags": "Banderas",
+          "h1_count": "H1 (recuento)",
+          "html_parse_warnings": "Advertencias de análisis de HTML",
+          "html_preview": "Vista previa de HTML (primeros 12 KB, scripts eliminados)",
+          "integrity_mismatch": "los bytes cambiaron desde el procesamiento: se esperaba sha256 {{expected}}..., obtuve {{actual}}...",
+          "integrity_missing": "sin sidecar sha256: la instantánea es anterior a la verificación de integridad o fue editada a mano",
+          "integrity_ok": "los bytes coinciden con el sha256 escrito en el momento del renderizado",
+          "integrity_status": "integridad: {{status}}",
+          "integrity_unreadable": "El sidecar sha256 existe pero tiene un formato incorrecto",
+          "invalid_present": "INVALID PRESENTE",
+          "json_ld": "JSON-LD (bloques {{blocks}}, {{status}})",
+          "meta_description": "Meta descripción",
+          "missing": "- desaparecido -",
+          "modal_title": "Inspección instantánea",
+          "modified": "Modificado",
+          "must_fix": "Debe arreglar ({{count}})",
+          "no_structured_data": "Sin datos estructurados",
+          "no_type": "(sin @tipo)",
+          "none": "(ninguno)",
+          "old": "{{age}} antiguo",
+          "open_graph": "Abrir gráfico",
+          "path": "Camino",
+          "seo_score": "Puntuación SEO",
+          "size": "Tamaño",
+          "tips": "Consejos ({{count}})",
+          "title": "Título"
+        },
+        "selected": "{{count}} seleccionado",
+        "status": {
+          "asset": "activo",
+          "content": "contenido",
+          "content_drifted": "el contenido se desvió"
+        },
+        "summary": "{{filtered}} de instantáneas de {{total}}",
+        "table_aria": "Inventario instantáneo"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "Cancelar tarea #{{id}}",
+          "close": "Cerca",
+          "reload": "Recargar",
+          "retry_job": "Reintentar tarea #{{id}}",
+          "retry_same_parameters": "Reintentar con los mismos parámetros",
+          "view_details": "Ver detalles de la tarea #{{id}}"
+        },
+        "columns": {
+          "actions": "Comportamiento",
+          "by": "Por",
+          "flags": "Banderas",
+          "id": "#",
+          "priority": "Prioridad",
+          "queued": "En cola",
+          "result": "Resultado",
+          "scope": "Alcance",
+          "status": "Estado"
+        },
+        "detail": {
+          "all": "todo",
+          "claimed_by": "Reclamado por",
+          "duration": "Duración",
+          "error": "Error",
+          "exit_code": "código de salida",
+          "finished_at": "Terminado en",
+          "log_tail": "Registro (cola)",
+          "queued_at": "En cola en",
+          "requested_by": "Solicitado por",
+          "routes": "Rutas",
+          "started_at": "Comenzó en",
+          "status": "Estado",
+          "tenant": "Arrendatario",
+          "title": "Tarea #{{id}}"
+        },
+        "empty": "Sin trabajos",
+        "errors": {
+          "cancel": "No se pudo cancelar: es posible que el trabajo haya comenzado",
+          "load": "No se pudieron cargar los trabajos",
+          "retry": "El reintento falló: es posible que el trabajo original aún esté en proceso"
+        },
+        "filters": {
+          "all": "Todo",
+          "cancelled": "Cancelado",
+          "failed": "Fallido",
+          "partial": "Parcial",
+          "queued": "En cola",
+          "running": "Correr",
+          "status": "Estado",
+          "succeeded": "Tuvo éxito"
+        },
+        "flags": {
+          "dry_run": "ejecución en seco",
+          "force": "fuerza"
+        },
+        "messages": {
+          "cancelled": "Tarea #{{id}} cancelada",
+          "retry_queued": "Reintento #{{retryId}} en cola (desde #{{id}})"
+        },
+        "priority": {
+          "high": "Alto",
+          "low": "Bajo",
+          "normal": "Normal",
+          "tooltip": "prioridad={{priority}} (ganancias más bajas)"
+        },
+        "result": {
+          "invalid": "{{count}} no válido"
+        },
+        "scope": {
+          "all_tenants": "todos los inquilinos"
+        },
+        "table_aria": "Empleos"
+      },
+      "events": {
+        "actions": {
+          "reload": "Recargar"
+        },
+        "columns": {
+          "commit": "Comprometerse",
+          "details": "Detalles",
+          "event": "Evento",
+          "time": "Tiempo"
+        },
+        "empty": "Sin eventos",
+        "errors": {
+          "load": "No se pudieron cargar eventos"
+        },
+        "filters": {
+          "limit": "Límite"
+        },
+        "summary": "Eventos {{count}}",
+        "table_aria": "Eventos",
+        "types": {
+          "fail": "Fallar",
+          "partial": "Parcial",
+          "success": "Éxito",
+          "supersede": "Reemplazar",
+          "unknown": "Evento desconocido: {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "Edad",
+          "cache_path": "Ruta de caché",
+          "failed_at": "Falló en"
+        },
+        "description_action": "Forzar actualización",
+        "description_middle": "Las rutas de esta lista se omiten automáticamente durante el período de recuperación de fallas (predeterminado 6 h). Usar",
+        "description_prefix": "Rutas de caché que fallaron durante una ejecución previa al renderizado reciente.",
+        "description_suffix": "en la pestaña Descripción general para volver a intentarlo inmediatamente.",
+        "empty": "Sin fallos recientes",
+        "errors": {
+          "load": "No se pudieron cargar fallas"
+        },
+        "table_aria": "Fallos"
+      },
+      "live_connected": "Actualizaciones en vivo conectadas",
+      "audit": {
+        "actions": {
+          "auto_recache": "auto_recache",
+          "cancel": "Cancelar",
+          "detect_drift": "detect_drift",
+          "enqueue": "poner en cola",
+          "invalidate": "invalidar",
+          "purge": "purga",
+          "purge_unexpected": "purge_unexpected",
+          "reset_breaker": "reset_breaker",
+          "reset_queue": "reset_queue"
+        },
+        "buttons": {
+          "export_csv": "Exportar CSV",
+          "refresh": "Refrescar"
+        },
+        "columns": {
+          "action": "Acción",
+          "actor": "Actor",
+          "details": "Detalles",
+          "job": "Trabajo",
+          "outcome": "Resultado",
+          "tenant": "Arrendatario",
+          "when": "Cuando"
+        },
+        "empty": "No hay entradas de auditoría.",
+        "fallbacks": {
+          "all": "todo",
+          "system": "sistema"
+        },
+        "filters": {
+          "action": "Filtro de acción",
+          "all": "Todo"
+        },
+        "table_aria": "Historial de auditoría"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "Trabajo en cola",
+          "refresh": "Refrescar"
+        },
+        "empty_summary": "No hay resumen disponible.",
+        "errors": {
+          "enqueue_job": "No se pudo poner en cola el trabajo",
+          "load_summary": "No se pudo cargar el resumen"
+        },
+        "fields": {
+          "routes": "Rutas",
+          "tenant_slug": "babosa inquilino"
+        },
+        "force_refresh": {
+          "description": "Poner en cola una nueva renderización. Deje ambos campos vacíos para actualizar cada inquilino y ruta. El procesador host retoma el trabajo en unos 60 segundos.",
+          "dry_run": "Ejecución en seco (solo plan)",
+          "force": "Forzar (ignorar caché)",
+          "title": "Forzar actualización"
+        },
+        "health": {
+          "cache_unreachable": "Caché inalcanzable",
+          "healthy": "Saludable",
+          "missing": "Falta {{count}}",
+          "stale": "{{count}} obsoleto"
+        },
+        "hints": {
+          "active_jobs": "{{count}} activo",
+          "aging": "Antigüedad del {{count}} (>7d)",
+          "asset_broken": "Referencias muertas /activos/*",
+          "backoff_window": "En ventana de retroceso de 6h",
+          "cache_age": "{{oldest}} más antiguo/{{newest}} más nuevo",
+          "content_stale": "Contenido fuente más reciente que la instantánea",
+          "event_at": "Evento {{time}}",
+          "no_events": "Sin eventos",
+          "prometheus": "Formato de texto Prometeo",
+          "tenants_routes": "Inquilinos {{tenants}} x rutas {{routes}}"
+        },
+        "kpi": {
+          "age_stale": "Edad obsoleta (>14d)",
+          "asset_broken": "activo roto",
+          "build_commit": "Compromiso de construcción",
+          "cache_size": "Tamaño de caché",
+          "content_stale": "Contenido obsoleto",
+          "coverage": "Cobertura",
+          "metrics": "Métrica",
+          "missing": "Desaparecido",
+          "queued_jobs": "Trabajos en cola",
+          "recent_failures": "Fallos recientes",
+          "status": "Estado"
+        },
+        "last_run": "Última ejecución completa",
+        "messages": {
+          "job_queued": "Tarea #{{id}} en cola"
+        },
+        "placeholders": {
+          "routes": "/acerca de,/blog (en blanco = todo)",
+          "tenant_slug": "p.ej. banco de horas (en blanco = todo)"
+        },
+        "super_admin_only": "Solo superadministrador"
+      },
+      "polling_fallback": "Respaldo de las encuestas",
+      "purge": {
+        "actions": {
+          "auto_recache": "Recaché automático después de la purga",
+          "dry_run": "Ejecución en seco",
+          "preview_purge": "Vista previa de purga",
+          "purge_now": "Purgar ahora"
+        },
+        "description_middle": "para un segmento de ruta,",
+        "description_prefix": "Elimine instantáneas que coincidan con un patrón global. Usar",
+        "description_suffix": "para cualquier descendiente. Ejemplos:",
+        "errors": {
+          "pattern_required": "Se requiere patrón (por ejemplo, /blog/*)",
+          "purge_failed": "Error de purga"
+        },
+        "fields": {
+          "pattern": "Patrón",
+          "tenant_slug": "babosa inquilino"
+        },
+        "messages": {
+          "dry_run": "Ejecución en seco: las instantáneas de {{count}} se eliminarían",
+          "purged": "Instantáneas {{count}} purgadas{{job}}"
+        },
+        "placeholders": {
+          "pattern": "/blog/* o /listings/**",
+          "tenant_slug": "Opcional: dejar en blanco para todos."
+        },
+        "result": {
+          "deleted": "Instantáneas {{count}} eliminadas",
+          "would_delete": "Eliminaría instantáneas de {{count}}"
+        },
+        "title": "Purga de caché con comodines"
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "Inspeccionar"
+        },
+        "description_prefix": "ver cual",
+        "description_suffix": "El patrón posee una ruta y lo que TTL obtiene, sin grepping config. Se utiliza para ajustar la política de frescura.",
+        "error": "La búsqueda falló: verifique el formato de la ruta (debe comenzar con \"/\")",
+        "fields": {
+          "route": "Ruta"
+        },
+        "path_only": "Sólo ruta: sin esquema ni host",
+        "placeholders": {
+          "route": "/blog/mi-publicación"
+        },
+        "result": {
+          "match": "partido: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (especificidad {{specificity}})",
+          "other_patterns": "Otros patrones que coinciden con esta ruta:",
+          "ttl": "TTL: {{ttl}} ({{seconds}})"
+        },
+        "title": "Inspector TTL",
+        "units": {
+          "days": "{{count}} d",
+          "hours": "{{count}} h",
+          "minutes": "{{count}} min"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "Explorar"
+        },
+        "counts": {
+          "dynamic": "{{count}} dinámico",
+          "static": "{{count}} estático",
+          "total": "{{count}} total"
+        },
+        "description_prefix": "Vea exactamente qué rutas planea representar el motor para un inquilino: piso estático (función/módulo cerrado) más los URL dinámicos de",
+        "description_suffix": "El trabajador del Dramaturgo visita esta lista.",
+        "error": "La búsqueda falló: verifique el slug del inquilino",
+        "fields": {
+          "tenant_slug": "babosa inquilino"
+        },
+        "none": "(ninguno)",
+        "placeholders": {
+          "tenant_slug": "banco de horas"
+        },
+        "sections": {
+          "dynamic_routes": "Rutas dinámicas (con un límite de 1000)",
+          "static_routes": "Rutas estáticas"
+        },
+        "title": "Explorador de mapas del sitio"
+      },
+      "readonly": {
+        "prefix": "Vista de solo lectura: los botones de acción están deshabilitados porque el motor de procesamiento previo funciona en todos los inquilinos. Iniciar sesión con un",
+        "role": "superadministrador de plataforma",
+        "suffix": "cuenta para poner en cola trabajos, purgar instantáneas o activar la detección de desviaciones."
+      },
+      "tabs": {
+        "analytics": "Analítica",
+        "coverage": "Cobertura",
+        "events": "Eventos",
+        "failures": "Fallos",
+        "history": "Historia",
+        "inventory": "Inventario",
+        "jobs": "Empleos",
+        "overview": "Descripción general"
+      },
+      "tabs_aria": "Pestañas de prerenderizado",
+      "title": "Motor de prerenderizado"
+    }
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",

@@ -299,7 +299,570 @@
     "sitemap_urls_by_type": "URLs by Type",
     "social_sharing_image_heading": "Social Sharing Image",
     "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
-    "usage_limits_heading": "Usage Limits"
+    "usage_limits_heading": "Usage Limits",
+    "prerender": {
+      "description": "ボットのみのサーバーでレンダリングされたスナップショット。カバレッジを監視し、古くなったものを検出し、強制的に更新します。",
+      "analytics": {
+        "actions": {
+          "reload": "リロード"
+        },
+        "columns": {
+          "crawler": "NEXUSTERM20トークン",
+          "hits": "NEXUSTERM21トークン",
+          "host": "NEXUSTERM22トークン",
+          "ip": "NEXUSTERM14トークン",
+          "status": "NEXUSTERM23トークン",
+          "time": "NEXUSTERM24トークン",
+          "uri": "NEXUSTERM12トークン",
+          "url": "NEXUSTERM11トークン"
+        },
+        "empty": "利用可能な分析はありません。ボットのアクセス ログが空である可能性があります。",
+        "empty_bot_traffic": "ボットトラフィックはまだありません",
+        "empty_no_data": "データなし",
+        "empty_recent_hits": "最近のヒット曲はありません",
+        "errors": {
+          "load": "分析のロードに失敗しました"
+        },
+        "filters": {
+          "window": "ウィンドウ"
+        },
+        "hints": {
+          "spoofed": "主要なボットを主張し、IP 範囲に失敗しました",
+          "top_50_cap": "top-50 ????",
+          "verified_of_total": "{{total}} の {{verified}}"
+        },
+        "kpi": {
+          "ip_verified": "IP-検証済み",
+          "spoofed": "なりすまし（疑わしい）",
+          "total_bot_hits": "ボットの総ヒット数",
+          "unique_uris": "ユニークな URI"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} がなりすましされました"
+        },
+        "log_summary": "ログ: {{size}} - {{time}} 以降",
+        "sections": {
+          "hits_by_crawler": "クローラーによるヒット",
+          "hits_by_status": "HTTP ステータスによるヒット数",
+          "recent_activity": "最近のアクティビティ (新しい順、最後の {{count}})",
+          "top_uris": "?? URI (?????? 50 ?)"
+        },
+        "tables": {
+          "recent_hits_aria": "最近のボットのヒット数",
+          "top_uris_aria": "トップの URI"
+        },
+        "windows": {
+          "1": "過去 24 時間",
+          "7": "過去 7 日間",
+          "30": "過去 30 日間"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "インベントリで開く",
+          "refresh": "リフレッシュ",
+          "refresh_all_stale": "古いものをすべて更新 ({{count}})"
+        },
+        "columns": {
+          "actions": "NEXUSTERM25トークン",
+          "asset": "ANEXUSTERM19トークン",
+          "coverage": "NEXUSTERM27トークン",
+          "host": "NEXUSTERM22トークン",
+          "missing": "NEXUSTERM28トークン",
+          "stale": "NEXUSTERM29トークン",
+          "tenant": "NEXUSTERM30トークン"
+        },
+        "confirm": {
+          "queue_recache": "{{count}} ?????????????????????????"
+        },
+        "empty": "テナントなし",
+        "errors": {
+          "bulk_enqueue": "一括エンキューに失敗しました (一部のテナントがキューに入っている可能性があります)",
+          "enqueue": "エンキューに失敗しました",
+          "load": "カバレッジのロードに失敗しました"
+        },
+        "messages": {
+          "bulk_queued": "{{count}} テナントのキューに入れられた再キャッシュ",
+          "no_stale": "古いテナントはありません - カバレッジは健全です",
+          "tenant_queued": "{{slug}} ? #{{id}} ???????????"
+        },
+        "summary": {
+          "healthy": "???? {{count}} ????????????",
+          "needs_work": "{{total}} テナントの {{needing}} には、ルートが見つからないか、古くなっているか、資産が壊れています。"
+        },
+        "table_aria": "カバレッジ"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "適用する",
+          "dry_run": "ドライラン"
+        },
+        "auto_recache": {
+          "description": "すべてのスナップショットをスキャンします。ソース コンテンツが変更されたルート、または TTL の有効期限が切れたルートの、優先度の低い再キャッシュをキューに入れます。 cron で 15 ～ 30 分ごとに実行されます。これを使用してすぐにトリガーします。",
+          "title": "自動再キャッシュ (TTL + コンテンツ ドリフト)"
+        },
+        "drift": {
+          "description": "各テナント サイトマップを調べ、lastmod をスナップショット mtimes と比較し、生の書き込み、移行、またはキューに入れられたジョブから古いページを捕捉します。 2 分ごとに実行され、優先度の高い再キャッシュがキューに入れられます。",
+          "title": "ドリフトの検出 (サイトマップとスナップショット)"
+        },
+        "errors": {
+          "auto_recache": "自動再キャッシュのトリガーに失敗しました",
+          "drift_detection": "ドリフト検出のトリガーに失敗しました",
+          "purge_unexpected": "パージが予期せず失敗しました"
+        },
+        "messages": {
+          "auto_recache_applied": "自動再キャッシュが適用されました",
+          "auto_recache_dry_run": "自動再キャッシュのドライランが完了しました",
+          "drift_applied": "ドリフト検出が適用されました",
+          "drift_dry_run": "ドリフト予行演習完了",
+          "purge_dry_run": "?????: {{count}} ?????????????????",
+          "purged_ungated": "{{tenants}} テナント全体で {{count}} のゲートされていないスナップショットをパージしました"
+        },
+        "no_output": "(出力なし)",
+        "purge_ungated": {
+          "description": "ルートがテナントの予期されるセットに含まれていないスナップショットをスイープします。機能をオフに切り替えた後、または機能フラグなしで事前レンダリングされた静的ルートのクリーンアップによく使用されます。動的コンテンツのルートはそのまま残されます。",
+          "title": "ゲートされていないスナップショットのパージ (テナントごとの 404 クリーンアップ)"
+        },
+        "result": {
+          "deleted": "{{tenants}} テナント全体で削除された {{count}} スナップショット",
+          "would_delete": "{{tenants}} テナント全体で {{count}} スナップショットを削除します"
+        },
+        "title": "鮮度自動化"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "キャンセル",
+          "close_breaker_now": "今すぐブレーカーを閉じてください",
+          "details": "詳細",
+          "emergency_reset": "緊急リセット",
+          "hide": "隠れる",
+          "hide_details": "詳細を隠す",
+          "reset_queue": "キューをリセット"
+        },
+        "engine_healthy": "エンジンは健全です",
+        "issue_count_one": "{{count}} ????",
+        "issue_count_other": "{{count}}の問題",
+        "modal": {
+          "body_middle": "または",
+          "body_prefix": "これにより、毎回キューに再配置されます",
+          "body_suffix": "従業員が >30 min に対して沈黙している行を削除し、サーキット ブレーカーをクリアします。",
+          "title": "緊急: スタックしたキューをリセット",
+          "warning": "これは、キューがスタックしていることを確認した場合にのみ使用してください。正常なワーカーがまだ実行中の場合、重複した作業が作成されます。"
+        },
+        "toasts": {
+          "breaker_reset": "サーキットブレーカーのリセット",
+          "queue_reset_one": "{{count}} ???????????????????????????",
+          "queue_reset_other": "{{count}} ???????????????????????????",
+          "queue_reset_failed": "キューのリセットに失敗しました",
+          "reset_failed": "リセットに失敗しました"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "近い",
+          "inspect": "検査する",
+          "inspect_snapshot": "{{path}} を検査する",
+          "open_rendered_url": "レンダリングされた URL を開く",
+          "recache_selected": "再キャッシュが選択されました ({{count}})",
+          "reload": "リロード",
+          "select_all_visible": "表示されているものをすべて選択します",
+          "select_snapshot": "{{path}}を選択します"
+        },
+        "columns": {
+          "actions": "アクション",
+          "age": "年",
+          "host": "ホスト",
+          "http": "NEXUSTERM15トークン",
+          "route": "ルート",
+          "size": "サイズ",
+          "status": "状態"
+        },
+        "empty": "フィルターに一致するスナップショットはありません",
+        "errors": {
+          "bulk_recache": "一括再キャッシュに失敗しました",
+          "inspect": "スナップショットの検査に失敗しました",
+          "load": "在庫のロードに失敗しました"
+        },
+        "filters": {
+          "aging": "エージング",
+          "all": "全て",
+          "asset_broken": "壊れた資産",
+          "content_drifted": "コンテンツのドリフト",
+          "filter": "フィルター",
+          "filter_placeholder": "ルートまたはホストの部分文字列",
+          "fresh": "新鮮な",
+          "issue": "問題",
+          "stale": "古い",
+          "staleness": "古さ",
+          "status": "状態",
+          "status_200": "200のみ",
+          "status_non_200": "200以外",
+          "tenant_placeholder": "オプション",
+          "tenant_slug": "テナントナメクジ"
+        },
+        "messages": {
+          "bulk_recache": "無効化された {{count}} スナップショットとキューに入れられた再キャッシュ"
+        },
+        "inspect": {
+          "age": "年",
+          "all_valid": "すべて有効です",
+          "asset_references": "アセット参照 ({{count}})",
+          "canonical": "正規",
+          "dead_assets": "{{count}} が死亡しました",
+          "flags": "フラグ",
+          "h1_count": "H1 (カウント)",
+          "html_parse_warnings": "HTML 解析の警告",
+          "html_preview": "HTML ????? (??? 12KB???????????)",
+          "integrity_mismatch": "レンダリング後にバイトが変更されました - sha256 {{expected}}... が期待されていましたが、{{actual}} を取得しました...",
+          "integrity_missing": "sha256 サイドカーがありません - スナップショットは整合性検証より前のものであるか、手動で編集されました",
+          "integrity_ok": "バイトはレンダリング時に書き込まれた sha256 と一致します",
+          "integrity_status": "整合性: {{status}}",
+          "integrity_unreadable": "sha256 サイドカーは存在しますが、形式が正しくありません",
+          "invalid_present": "INVALNEXUSTERM13トークンプレゼント",
+          "json_ld": "JSON-LD ({{blocks}} ブロック、{{status}})",
+          "meta_description": "メタディスクリプション",
+          "missing": "- ない -",
+          "modal_title": "スナップショット検査",
+          "modified": "修正済み",
+          "must_fix": "修正する必要があります ({{count}})",
+          "no_structured_data": "構造化データなし",
+          "no_type": "(@type なし)",
+          "none": "（なし）",
+          "old": "{{age}} 古い",
+          "open_graph": "グラフを開く",
+          "path": "パス",
+          "seo_score": "SEO スコア",
+          "size": "サイズ",
+          "tips": "??? ({{count}})",
+          "title": "タイトル"
+        },
+        "selected": "{{count}} が選択されました",
+        "status": {
+          "asset": "資産",
+          "content": "コンテンツ",
+          "content_drifted": "内容がずれた"
+        },
+        "summary": "{{total}} スナップショットのうちの {{filtered}}",
+        "table_aria": "スナップショットインベントリ"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "??? #{{id}} ??????",
+          "close": "近い",
+          "reload": "リロード",
+          "retry_job": "??? #{{id}} ????",
+          "retry_same_parameters": "同じパラメータで再試行します",
+          "view_details": "??? #{{id}} ??????"
+        },
+        "columns": {
+          "actions": "アクション",
+          "by": "による",
+          "flags": "フラグ",
+          "id": "#",
+          "priority": "優先度",
+          "queued": "キューに入れられました",
+          "result": "結果",
+          "scope": "範囲",
+          "status": "状態"
+        },
+        "detail": {
+          "all": "全て",
+          "claimed_by": "請求者",
+          "duration": "間隔",
+          "error": "エラー",
+          "exit_code": "終了コード",
+          "finished_at": "終了時刻",
+          "log_tail": "ログ（尾部）",
+          "queued_at": "でキューに入れられました",
+          "requested_by": "リクエスト者",
+          "routes": "ルート",
+          "started_at": "に開始",
+          "status": "状態",
+          "tenant": "テナント",
+          "title": "??? #{{id}}"
+        },
+        "empty": "仕事がありません",
+        "errors": {
+          "cancel": "キャンセルできませんでした - ジョブが開始された可能性があります",
+          "load": "ジョブのロードに失敗しました",
+          "retry": "再試行が失敗しました - 元のジョブがまだ実行中の可能性があります"
+        },
+        "filters": {
+          "all": "全て",
+          "cancelled": "キャンセル",
+          "failed": "失敗した",
+          "partial": "部分的",
+          "queued": "キューに入れられました",
+          "running": "ランニング",
+          "status": "状態",
+          "succeeded": "成功しました"
+        },
+        "flags": {
+          "dry_run": "予行演習",
+          "force": "力"
+        },
+        "messages": {
+          "cancelled": "??? #{{id}} ??????????",
+          "retry_queued": "??? #{{retryId}} ??????????? (#{{id}} ??)"
+        },
+        "priority": {
+          "high": "高い",
+          "low": "低い",
+          "normal": "普通",
+          "tooltip": "priority={{priority}} (??????)"
+        },
+        "result": {
+          "invalid": "{{count}} ????"
+        },
+        "scope": {
+          "all_tenants": "すべてのテナント"
+        },
+        "table_aria": "求人"
+      },
+      "events": {
+        "actions": {
+          "reload": "リロード"
+        },
+        "columns": {
+          "commit": "専念",
+          "details": "詳細",
+          "event": "イベント",
+          "time": "時間"
+        },
+        "empty": "イベントはありません",
+        "errors": {
+          "load": "イベントの読み込みに失敗しました"
+        },
+        "filters": {
+          "limit": "限界"
+        },
+        "summary": "{{count}} イベント",
+        "table_aria": "イベント",
+        "types": {
+          "fail": "失敗",
+          "partial": "部分的",
+          "success": "成功",
+          "supersede": "置き換える",
+          "unknown": "不明なイベント: {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "年",
+          "cache_path": "キャッシュパス",
+          "failed_at": "失敗しました"
+        },
+        "description_action": "強制リフレッシュ",
+        "description_middle": "このリスト内のルートは、障害バックオフ ウィンドウ中（デフォルトは 6 時間）、自動的にスキップされます。使用",
+        "description_prefix": "最近のプリレンダリング実行中に失敗したキャッシュ パス。",
+        "description_suffix": "すぐに再試行するには、「概要」タブをクリックしてください。",
+        "empty": "最近失敗はありません",
+        "errors": {
+          "load": "失敗のロードに失敗しました"
+        },
+        "table_aria": "失敗"
+      },
+      "live_connected": "ライブアップデートが接続されています",
+      "audit": {
+        "actions": {
+          "auto_recache": "NEXUSTERM0トークン",
+          "cancel": "キャンセル",
+          "detect_drift": "NEXUSTERM0トークン",
+          "enqueue": "エンキューする",
+          "invalidate": "無効にする",
+          "purge": "パージ",
+          "purge_unexpected": "NEXUSTERM0トークン",
+          "reset_breaker": "NEXUSTERM0トークン",
+          "reset_queue": "NEXUSTERM0トークン"
+        },
+        "buttons": {
+          "export_csv": "CSVをエクスポートする",
+          "refresh": "リフレッシュ"
+        },
+        "columns": {
+          "action": "アクション",
+          "actor": "俳優",
+          "details": "詳細",
+          "job": "仕事",
+          "outcome": "結果",
+          "tenant": "テナント",
+          "when": "いつ"
+        },
+        "empty": "監査エントリはありません。",
+        "fallbacks": {
+          "all": "全て",
+          "system": "システム"
+        },
+        "filters": {
+          "action": "アクションフィルター",
+          "all": "全て"
+        },
+        "table_aria": "監査履歴"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "ジョブをキューに入れる",
+          "refresh": "リフレッシュ"
+        },
+        "empty_summary": "要約はありません。",
+        "errors": {
+          "enqueue_job": "ジョブをキューに入れることができませんでした",
+          "load_summary": "概要の読み込みに失敗しました"
+        },
+        "fields": {
+          "routes": "ルート",
+          "tenant_slug": "テナントナメクジ"
+        },
+        "force_refresh": {
+          "description": "再レンダリングをキューに入れます。すべてのテナントとルートを更新するには、両方のフィールドを空のままにします。ホスト プロセッサは約 60 秒以内にジョブを取得します。",
+          "dry_run": "ドライラン (計画のみ)",
+          "force": "強制（キャッシュを無視）",
+          "title": "強制リフレッシュ"
+        },
+        "health": {
+          "cache_unreachable": "キャッシュに到達できません",
+          "healthy": "健康",
+          "missing": "{{count}} がありません",
+          "stale": "{{count}} が古い"
+        },
+        "hints": {
+          "active_jobs": "{{count}} アクティブ",
+          "aging": "{{count}} のエージング (7 日以上)",
+          "asset_broken": "参照が無効になっています /assets/*",
+          "backoff_window": "6 時間のバックオフ ウィンドウ内",
+          "cache_age": "最古の {{oldest}} / 最新の {{newest}}",
+          "content_stale": "スナップショットより新しいソース コンテンツ",
+          "event_at": "???? {{time}}",
+          "no_events": "イベントはありません",
+          "prometheus": "プロメテウスのテキスト形式",
+          "tenants_routes": "{{tenants}} テナント x {{routes}} ルート"
+        },
+        "kpi": {
+          "age_stale": "古い (>14 日)",
+          "asset_broken": "資産が壊れた",
+          "build_commit": "ビルドコミット",
+          "cache_size": "キャッシュサイズ",
+          "content_stale": "コンテンツが古い",
+          "coverage": "カバレッジ",
+          "metrics": "メトリクス",
+          "missing": "ない",
+          "queued_jobs": "キューに入れられたジョブ",
+          "recent_failures": "最近の失敗",
+          "status": "状態"
+        },
+        "last_run": "最後に完了した実行",
+        "messages": {
+          "job_queued": "??? #{{id}} ???????????"
+        },
+        "placeholders": {
+          "routes": "/about、/blog (空白 = すべて)",
+          "tenant_slug": "例えば時間-タイムバンク (空白 = すべて)"
+        },
+        "super_admin_only": "スーパー管理者のみ"
+      },
+      "polling_fallback": "ポーリングフォールバック",
+      "purge": {
+        "actions": {
+          "auto_recache": "パージ後の自動再キャッシュ",
+          "dry_run": "ドライラン",
+          "preview_purge": "プレビューパージ",
+          "purge_now": "今すぐパージ"
+        },
+        "description_middle": "1 つのパス セグメントに対して、",
+        "description_prefix": "グロブパターンに一致するスナップショットを削除します。使用",
+        "description_suffix": "あらゆる子孫のために。例:",
+        "errors": {
+          "pattern_required": "パターンは必須です (例: /blog/*)",
+          "purge_failed": "パージに失敗しました"
+        },
+        "fields": {
+          "pattern": "パターン",
+          "tenant_slug": "テナントナメクジ"
+        },
+        "messages": {
+          "dry_run": "?????: {{count}} ?????????????????",
+          "purged": "パージされた {{count}} スナップショット{{job}}"
+        },
+        "placeholders": {
+          "pattern": "/blog/* または /listings/**",
+          "tenant_slug": "オプション - すべて空白のままにします"
+        },
+        "result": {
+          "deleted": "{{count}} ?????????????????",
+          "would_delete": "{{count}} ????????????????"
+        },
+        "title": "ワイルドカードキャッシュのパージ"
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "検査する"
+        },
+        "description_prefix": "どちらを参照してください",
+        "description_suffix": "pattern は、設定を grep せずに、ルートとそれが取得する TTL を所有します。鮮度ポリシーを調整するために使用されます。",
+        "error": "ルックアップに失敗しました - ルート形式を確認してください (「/」で始まる必要があります)",
+        "fields": {
+          "route": "ルート"
+        },
+        "path_only": "パスのみ - スキームやホストなし",
+        "placeholders": {
+          "route": "/ブログ/私の投稿"
+        },
+        "result": {
+          "match": "一致: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (特異性 {{specificity}})",
+          "other_patterns": "このルートに一致する他のパターン:",
+          "ttl": "TTL: {{ttl}} ({{seconds}})"
+        },
+        "title": "TTL検査官",
+        "units": {
+          "days": "{{count}}?",
+          "hours": "{{count}} h",
+          "minutes": "{{count}} 分"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "探検する"
+        },
+        "counts": {
+          "dynamic": "{{count}} ダイナミック",
+          "static": "{{count}} 静的",
+          "total": "{{count}} 合計"
+        },
+        "description_prefix": "エンジンがテナントに対してどのルートをレンダリングする予定であるかを正確に確認します - 静的フロア (機能/モジュール ゲート) と、からの動的 URL",
+        "description_suffix": "Playwright ワーカーはこのリストにアクセスします。",
+        "error": "ルックアップに失敗しました - テナントのスラッグを確認してください",
+        "fields": {
+          "tenant_slug": "テナントナメクジ"
+        },
+        "none": "（なし）",
+        "placeholders": {
+          "tenant_slug": "時間銀行"
+        },
+        "sections": {
+          "dynamic_routes": "動的ルート (上限は 1,000)",
+          "static_routes": "静的ルート"
+        },
+        "title": "サイトマップエクスプローラー"
+      },
+      "readonly": {
+        "prefix": "読み取り専用ビュー - プリレンダリング エンジンはすべてのテナントにわたって動作するため、アクション ボタンは無効になります。でサインインします",
+        "role": "プラットフォームのスーパー管理者",
+        "suffix": "アカウントを使用して、ジョブをキューに入れたり、スナップショットをパージしたり、ドリフト検出をトリガーしたりできます。"
+      },
+      "tabs": {
+        "analytics": "分析",
+        "coverage": "カバレッジ",
+        "events": "イベント",
+        "failures": "失敗",
+        "history": "歴史",
+        "inventory": "在庫",
+        "jobs": "求人",
+        "overview": "概要"
+      },
+      "tabs_aria": "タブの事前レンダリング",
+      "title": "プリレンダー エンジン"
+    }
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",

@@ -299,7 +299,570 @@
     "sitemap_urls_by_type": "URLs by Type",
     "social_sharing_image_heading": "Social Sharing Image",
     "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
-    "usage_limits_heading": "Usage Limits"
+    "usage_limits_heading": "Usage Limits",
+    "prerender": {
+      "description": "Nur vom Bot gerenderte Snapshots. Überwachen Sie die Abdeckung, erkennen Sie veraltete Daten und erzwingen Sie Aktualisierungen.",
+      "analytics": {
+        "actions": {
+          "reload": "Neu laden"
+        },
+        "columns": {
+          "crawler": "CRAWLER",
+          "hits": "HITS",
+          "host": "HOST",
+          "ip": "IP",
+          "status": "STATUS",
+          "time": "TIME",
+          "uri": "URI",
+          "url": "URL"
+        },
+        "empty": "Keine Analyse verfügbar. Das Bot-Zugriffsprotokoll ist möglicherweise leer.",
+        "empty_bot_traffic": "Noch kein Bot-Traffic",
+        "empty_no_data": "Keine Daten",
+        "empty_recent_hits": "Keine aktuellen Treffer",
+        "errors": {
+          "load": "Analyse konnte nicht geladen werden"
+        },
+        "filters": {
+          "window": "Fenster"
+        },
+        "hints": {
+          "spoofed": "Behaupteter Major-Bot, fehlgeschlagener IP-Bereich",
+          "top_50_cap": "von top-50 cap",
+          "verified_of_total": "{{verified}} von {{total}}"
+        },
+        "kpi": {
+          "ip_verified": "IP-verifiziert",
+          "spoofed": "Gefälscht (verdächtig)",
+          "total_bot_hits": "Gesamtzahl der Bot-Treffer",
+          "unique_uris": "Einzigartige URIs"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} gefälscht"
+        },
+        "log_summary": "Protokoll: {{size}} – seit {{time}}",
+        "sections": {
+          "hits_by_crawler": "Treffer durch Crawler",
+          "hits_by_status": "Treffer nach HTTP-Status",
+          "recent_activity": "Letzte Aktivität (neueste zuerst, letzte {{count}})",
+          "top_uris": "Top URIs (Top 50 nach Trefferzahl)"
+        },
+        "tables": {
+          "recent_hits_aria": "Aktuelle Bot-Hits",
+          "top_uris_aria": "Top URIs"
+        },
+        "windows": {
+          "1": "Letzte 24 Stunden",
+          "7": "Letzte 7 Tage",
+          "30": "Letzte 30 Tage"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "Im Inventar öffnen",
+          "refresh": "Aktualisieren",
+          "refresh_all_stale": "Alle veralteten Dateien aktualisieren ({{count}})"
+        },
+        "columns": {
+          "actions": "ACTIONS",
+          "asset": "ASSET",
+          "coverage": "COVERAGE",
+          "host": "HOST",
+          "missing": "MISSING",
+          "stale": "STALE",
+          "tenant": "TENANT"
+        },
+        "confirm": {
+          "queue_recache": "Warteschlangen-Recache für {{count}}-Mandanten?"
+        },
+        "empty": "Keine Mieter",
+        "errors": {
+          "bulk_enqueue": "Masseneinreihen in die Warteschlange fehlgeschlagen (einige Mandanten stehen möglicherweise in der Warteschlange)",
+          "enqueue": "Einreihen in die Warteschlange fehlgeschlagen",
+          "load": "Die Abdeckung konnte nicht geladen werden"
+        },
+        "messages": {
+          "bulk_queued": "Recache in der Warteschlange für {{count}}-Mandanten",
+          "no_stale": "Keine veralteten Mieter – der Versicherungsschutz ist gut",
+          "tenant_queued": "#{{id}} f?r {{slug}} in die Warteschlange gestellt"
+        },
+        "summary": {
+          "healthy": "Alle {{count}}-Mandanten fehlerfrei.",
+          "needs_work": "{{needing}} von {{total}}-Mandanten haben fehlende, veraltete oder Asset-defekte Routen."
+        },
+        "table_aria": "Abdeckung"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "Anwenden",
+          "dry_run": "Trockenlauf"
+        },
+        "auto_recache": {
+          "description": "Scannt jeden Schnappschuss. Stellt Recaches mit niedriger Priorität für Routen in die Warteschlange, deren Quellinhalt sich geändert hat oder deren TTL abgelaufen ist. Läuft alle 15–30 Minuten auf Cron; Verwenden Sie dies, um sofort einen auszulösen.",
+          "title": "Automatischer Recache (TTL + Inhaltsdrift)"
+        },
+        "drift": {
+          "description": "Durchsucht jede Mandanten-Sitemap, vergleicht LastMod mit Snapshot-Mtimes und fängt veraltete Seiten von Rohschreibvorgängen, Migrationen oder in der Warteschlange befindlichen Jobs ab. Wird alle 2 Minuten ausgeführt und stellt Recaches mit hoher Priorität in die Warteschlange.",
+          "title": "Drift erkennen (Sitemap vs. Snapshots)"
+        },
+        "errors": {
+          "auto_recache": "Der automatische Recache konnte nicht ausgelöst werden",
+          "drift_detection": "Die Drifterkennung konnte nicht ausgelöst werden",
+          "purge_unexpected": "Bereinigung – unerwartet fehlgeschlagen"
+        },
+        "messages": {
+          "auto_recache_applied": "Automatischer Recache angewendet",
+          "auto_recache_dry_run": "Probelauf des automatischen Recaches abgeschlossen",
+          "drift_applied": "Drifterkennung angewendet",
+          "drift_dry_run": "Drift-Trockenlauf abgeschlossen",
+          "purge_dry_run": "Probelauf: {{count}}-Snapshots würden gelöscht",
+          "purged_ungated": "Nicht verknüpfte {{count}}-Snapshots in allen {{tenants}}-Mandanten gelöscht"
+        },
+        "no_output": "(keine Ausgabe)",
+        "purge_ungated": {
+          "description": "Sweep-Snapshots, deren Route nicht in einem vom Mandanten erwarteten Satz enthalten ist. Wird häufig nach dem Ausschalten einer Funktion oder zum Bereinigen statischer Routen verwendet, die ohne Funktionsflags vorgerendert wurden. Dynamische Content-Routen bleiben unberücksichtigt.",
+          "title": "Nicht gesicherte Snapshots löschen (404-Bereinigung pro Mandant)"
+        },
+        "result": {
+          "deleted": "{{count}}-Snapshots in allen {{tenants}}-Mandanten gelöscht",
+          "would_delete": "Würde {{count}}-Snapshots in allen {{tenants}}-Mandanten löschen"
+        },
+        "title": "Frischeautomatisierung"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "Stornieren",
+          "close_breaker_now": "Jetzt Leistungsschalter schließen",
+          "details": "Details",
+          "emergency_reset": "Notfall-Reset",
+          "hide": "Verstecken",
+          "hide_details": "Details ausblenden",
+          "reset_queue": "Warteschlange zurücksetzen"
+        },
+        "engine_healthy": "Motor gesund",
+        "issue_count_one": "{{count}}-Problem",
+        "issue_count_other": "{{count}}-Probleme",
+        "modal": {
+          "body_middle": "oder",
+          "body_prefix": "Dadurch wird jeder erneut in die Warteschlange gestellt",
+          "body_suffix": "Zeile, deren Arbeiter >30 min lang geschwiegen hat, und deaktivieren Sie den Leistungsschalter.",
+          "title": "Notfall: Hängende Warteschlange zurücksetzen",
+          "warning": "Verwenden Sie dies nur, wenn Sie bestätigt haben, dass die Warteschlange feststeckt. Wenn noch ein fehlerfreier Worker ausgeführt wird, führt dies zu doppelter Arbeit."
+        },
+        "toasts": {
+          "breaker_reset": "Zurücksetzen des Leistungsschalters",
+          "queue_reset_one": "Setzen Sie {{count}} in der hängengebliebenen Zeile zurück. Leistungsschalter gelöscht",
+          "queue_reset_other": "{{count}} blockierte Zeilen zurücksetzen; Leistungsschalter gelöscht",
+          "queue_reset_failed": "Das Zurücksetzen der Warteschlange ist fehlgeschlagen",
+          "reset_failed": "Zurücksetzen fehlgeschlagen"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "Schließen",
+          "inspect": "Überprüfen",
+          "inspect_snapshot": "Überprüfen Sie {{path}}",
+          "open_rendered_url": "Öffnen Sie das gerenderte URL",
+          "recache_selected": "Recache ausgewählt ({{count}})",
+          "reload": "Neu laden",
+          "select_all_visible": "Wählen Sie alle sichtbaren aus",
+          "select_snapshot": "Wählen Sie {{path}}"
+        },
+        "columns": {
+          "actions": "Aktionen",
+          "age": "Alter",
+          "host": "Gastgeber",
+          "http": "HTTP",
+          "route": "Route",
+          "size": "Größe",
+          "status": "Status"
+        },
+        "empty": "Keine Snapshots entsprechen den Filtern",
+        "errors": {
+          "bulk_recache": "Massen-Recache ist fehlgeschlagen",
+          "inspect": "Snapshot konnte nicht überprüft werden",
+          "load": "Das Laden des Inventars ist fehlgeschlagen"
+        },
+        "filters": {
+          "aging": "Altern",
+          "all": "Alle",
+          "asset_broken": "Vermögenswert kaputt",
+          "content_drifted": "Der Inhalt ist abgedriftet",
+          "filter": "Filter",
+          "filter_placeholder": "Route oder Host-Teilzeichenfolge",
+          "fresh": "Frisch",
+          "issue": "Ausgabe",
+          "stale": "Abgestanden",
+          "staleness": "Abgestandenheit",
+          "status": "Status",
+          "status_200": "Nur 200",
+          "status_non_200": "Nicht-200",
+          "tenant_placeholder": "optional",
+          "tenant_slug": "Mieterschnecke"
+        },
+        "messages": {
+          "bulk_recache": "Ungültige {{count}}-Snapshots und Recache in der Warteschlange"
+        },
+        "inspect": {
+          "age": "Alter",
+          "all_valid": "alles gültig",
+          "asset_references": "Asset-Referenzen ({{count}})",
+          "canonical": "Kanonisch",
+          "dead_assets": "{{count}} tot",
+          "flags": "Flaggen",
+          "h1_count": "H1 (Anzahl)",
+          "html_parse_warnings": "HTML-Analysewarnungen",
+          "html_preview": "HTML-Vorschau (erste 12 KB, Skripte entfernt)",
+          "integrity_mismatch": "Bytes seit dem Rendern geändert – erwartet sha256 {{expected}}..., habe {{actual}}...",
+          "integrity_missing": "kein sha256-Sidecar – Snapshot stammt aus der Zeit vor der Integritätsüberprüfung oder wurde von Hand bearbeitet",
+          "integrity_ok": "Bytes stimmen mit dem zum Renderzeitpunkt geschriebenen sha256 überein",
+          "integrity_status": "Integrität: {{status}}",
+          "integrity_unreadable": "sha256 Sidecar existiert, ist aber fehlerhaft",
+          "invalid_present": "INVALID VORHANDEN",
+          "json_ld": "JSON-LD ({{blocks}}-Blöcke, {{status}})",
+          "meta_description": "Meta-Beschreibung",
+          "missing": "- fehlen -",
+          "modal_title": "Snapshot-Inspektion",
+          "modified": "Geändert",
+          "must_fix": "Muss behoben werden ({{count}})",
+          "no_structured_data": "Keine strukturierten Daten",
+          "no_type": "(kein @type)",
+          "none": "(keiner)",
+          "old": "{{age}} alt",
+          "open_graph": "Diagramm öffnen",
+          "path": "Weg",
+          "seo_score": "SEO-Punktzahl",
+          "size": "Größe",
+          "tips": "Tipps ({{count}})",
+          "title": "Titel"
+        },
+        "selected": "{{count}} ausgewählt",
+        "status": {
+          "asset": "Vermögenswert",
+          "content": "Inhalt",
+          "content_drifted": "Der Inhalt ist abgedriftet"
+        },
+        "summary": "{{filtered}} von {{total}}-Snapshots",
+        "table_aria": "Snapshot-Inventar"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "Job #{{id}} abbrechen",
+          "close": "Schließen",
+          "reload": "Neu laden",
+          "retry_job": "Job #{{id}} erneut versuchen",
+          "retry_same_parameters": "Versuchen Sie es erneut mit denselben Parametern",
+          "view_details": "Details zu Job #{{id}} anzeigen"
+        },
+        "columns": {
+          "actions": "Aktionen",
+          "by": "Von",
+          "flags": "Flaggen",
+          "id": "#",
+          "priority": "Priorität",
+          "queued": "In der Warteschlange",
+          "result": "Ergebnis",
+          "scope": "Umfang",
+          "status": "Status"
+        },
+        "detail": {
+          "all": "alle",
+          "claimed_by": "Beansprucht von",
+          "duration": "Dauer",
+          "error": "Fehler",
+          "exit_code": "Exit-Code",
+          "finished_at": "Fertig um",
+          "log_tail": "Baumstamm (Schwanz)",
+          "queued_at": "In der Warteschlange",
+          "requested_by": "Angefordert von",
+          "routes": "Routen",
+          "started_at": "Begonnen um",
+          "status": "Status",
+          "tenant": "Mieter",
+          "title": "Job #{{id}}"
+        },
+        "empty": "Keine Jobs",
+        "errors": {
+          "cancel": "Der Abbruch konnte nicht erfolgen – der Auftrag wurde möglicherweise gestartet",
+          "load": "Jobs konnten nicht geladen werden",
+          "retry": "Der erneute Versuch ist fehlgeschlagen. Der ursprüngliche Auftrag befindet sich möglicherweise noch in der Ausführung"
+        },
+        "filters": {
+          "all": "Alle",
+          "cancelled": "Abgesagt",
+          "failed": "Fehlgeschlagen",
+          "partial": "Teilweise",
+          "queued": "In der Warteschlange",
+          "running": "Läuft",
+          "status": "Status",
+          "succeeded": "Erfolgreich"
+        },
+        "flags": {
+          "dry_run": "Trockenlauf",
+          "force": "Gewalt"
+        },
+        "messages": {
+          "cancelled": "Job #{{id}} abgebrochen",
+          "retry_queued": "Wiederholung #{{retryId}} in die Warteschlange gestellt (von #{{id}})"
+        },
+        "priority": {
+          "high": "Hoch",
+          "low": "Niedrig",
+          "normal": "Normal",
+          "tooltip": "priorität={{priority}} (geringere Gewinne)"
+        },
+        "result": {
+          "invalid": "{{count}} ungültig"
+        },
+        "scope": {
+          "all_tenants": "alle Mieter"
+        },
+        "table_aria": "Jobs"
+      },
+      "events": {
+        "actions": {
+          "reload": "Neu laden"
+        },
+        "columns": {
+          "commit": "Begehen",
+          "details": "Details",
+          "event": "Ereignis",
+          "time": "Zeit"
+        },
+        "empty": "Keine Veranstaltungen",
+        "errors": {
+          "load": "Ereignisse konnten nicht geladen werden"
+        },
+        "filters": {
+          "limit": "Limit"
+        },
+        "summary": "{{count}}-Ereignisse",
+        "table_aria": "Veranstaltungen",
+        "types": {
+          "fail": "Scheitern",
+          "partial": "Teilweise",
+          "success": "Erfolg",
+          "supersede": "Ersetzen",
+          "unknown": "Unbekanntes Ereignis: {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "Alter",
+          "cache_path": "Cache-Pfad",
+          "failed_at": "Fehlgeschlagen bei"
+        },
+        "description_action": "Aktualisierung erzwingen",
+        "description_middle": "Routen in dieser Liste werden während des Fehler-Backoff-Fensters (Standard 6 Stunden) automatisch übersprungen. Verwenden",
+        "description_prefix": "Cache-Pfade, die während eines kürzlichen Prerender-Laufs fehlgeschlagen sind.",
+        "description_suffix": "auf der Registerkarte „Übersicht“, um es sofort erneut zu versuchen.",
+        "empty": "Keine aktuellen Ausfälle",
+        "errors": {
+          "load": "Fehler konnten nicht geladen werden"
+        },
+        "table_aria": "Misserfolge"
+      },
+      "live_connected": "Live-Updates verbunden",
+      "audit": {
+        "actions": {
+          "auto_recache": "auto_recache",
+          "cancel": "stornieren",
+          "detect_drift": "detect_drift",
+          "enqueue": "in die Warteschlange stellen",
+          "invalidate": "ungültig machen",
+          "purge": "säubern",
+          "purge_unexpected": "purge_unexpected",
+          "reset_breaker": "reset_breaker",
+          "reset_queue": "reset_queue"
+        },
+        "buttons": {
+          "export_csv": "CSV exportieren",
+          "refresh": "Aktualisieren"
+        },
+        "columns": {
+          "action": "Aktion",
+          "actor": "Schauspieler",
+          "details": "Details",
+          "job": "Arbeit",
+          "outcome": "Ergebnis",
+          "tenant": "Mieter",
+          "when": "Wann"
+        },
+        "empty": "Keine Audit-Einträge.",
+        "fallbacks": {
+          "all": "alle",
+          "system": "System"
+        },
+        "filters": {
+          "action": "Aktionsfilter",
+          "all": "Alle"
+        },
+        "table_aria": "Audit-Historie"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "Warteschlangenjob",
+          "refresh": "Aktualisieren"
+        },
+        "empty_summary": "Keine Zusammenfassung verfügbar.",
+        "errors": {
+          "enqueue_job": "Job konnte nicht in die Warteschlange gestellt werden",
+          "load_summary": "Zusammenfassung konnte nicht geladen werden"
+        },
+        "fields": {
+          "routes": "Routen",
+          "tenant_slug": "Mieterschnecke"
+        },
+        "force_refresh": {
+          "description": "Stellen Sie ein erneutes Rendern in die Warteschlange. Lassen Sie beide Felder leer, um jeden Mandanten und jede Route zu aktualisieren. Der Host-Prozessor übernimmt den Auftrag innerhalb von etwa 60 Sekunden.",
+          "dry_run": "Probelauf (nur Plan)",
+          "force": "Erzwingen (Cache ignorieren)",
+          "title": "Aktualisierung erzwingen"
+        },
+        "health": {
+          "cache_unreachable": "Cache nicht erreichbar",
+          "healthy": "Gesund",
+          "missing": "{{count}} fehlt",
+          "stale": "{{count}} veraltet"
+        },
+        "hints": {
+          "active_jobs": "{{count}} aktiv",
+          "aging": "{{count}} Alterung (>7 Tage)",
+          "asset_broken": "Referenzen tot /assets/*",
+          "backoff_window": "Im 6-Stunden-Backoff-Fenster",
+          "cache_age": "Ältester {{oldest}} / neuester {{newest}}",
+          "content_stale": "Quellinhalt neuer als Snapshot",
+          "event_at": "Ereignis {{time}}",
+          "no_events": "Keine Veranstaltungen",
+          "prometheus": "Prometheus-Textformat",
+          "tenants_routes": "{{tenants}}-Mandanten x {{routes}}-Routen"
+        },
+        "kpi": {
+          "age_stale": "Alter (>14 Tage)",
+          "asset_broken": "Vermögenswert kaputt",
+          "build_commit": "Build-Commit",
+          "cache_size": "Cachegröße",
+          "content_stale": "Inhalt veraltet",
+          "coverage": "Abdeckung",
+          "metrics": "Metriken",
+          "missing": "Fehlen",
+          "queued_jobs": "Aufträge in der Warteschlange",
+          "recent_failures": "Aktuelle Misserfolge",
+          "status": "Status"
+        },
+        "last_run": "Letzter abgeschlossener Lauf",
+        "messages": {
+          "job_queued": "Job #{{id}} in die Warteschlange gestellt"
+        },
+        "placeholders": {
+          "routes": "/about,/blog (leer = alle)",
+          "tenant_slug": "z.B. Stunden-Zeitbank (leer = alle)"
+        },
+        "super_admin_only": "Nur Superadministratoren"
+      },
+      "polling_fallback": "Polling-Fallback",
+      "purge": {
+        "actions": {
+          "auto_recache": "Automatischer Recache nach der Bereinigung",
+          "dry_run": "Trockenlauf",
+          "preview_purge": "Vorschau der Bereinigung",
+          "purge_now": "Jetzt reinigen"
+        },
+        "description_middle": "für ein Wegsegment,",
+        "description_prefix": "Snapshots löschen, die einem Glob-Muster entsprechen. Verwenden",
+        "description_suffix": "für jeden Nachkommen. Beispiele:",
+        "errors": {
+          "pattern_required": "Muster ist erforderlich (z. B. /blog/*)",
+          "purge_failed": "Die Bereinigung ist fehlgeschlagen"
+        },
+        "fields": {
+          "pattern": "Muster",
+          "tenant_slug": "Mieterschnecke"
+        },
+        "messages": {
+          "dry_run": "Probelauf: {{count}}-Snapshots würden gelöscht",
+          "purged": "{{count}}-Snapshots{{job}} gelöscht"
+        },
+        "placeholders": {
+          "pattern": "/blog/* oder /listings/**",
+          "tenant_slug": "optional – für alle leer lassen"
+        },
+        "result": {
+          "deleted": "{{count}}-Snapshots gelöscht",
+          "would_delete": "Würde {{count}}-Snapshots löschen"
+        },
+        "title": "Platzhalter-Cache löschen"
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "Überprüfen"
+        },
+        "description_prefix": "Sehen Sie welche",
+        "description_suffix": "Das Muster besitzt eine Route und welches TTL es erhält, ohne die Konfiguration zu überprüfen. Wird zum Optimieren der Frischerichtlinie verwendet.",
+        "error": "Die Suche ist fehlgeschlagen. Überprüfen Sie das Routenformat (muss mit „/“ beginnen).",
+        "fields": {
+          "route": "Route"
+        },
+        "path_only": "Nur Pfad – kein Schema oder Host",
+        "placeholders": {
+          "route": "/blog/mein-beitrag"
+        },
+        "result": {
+          "match": "Übereinstimmung: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (Spezifität {{specificity}})",
+          "other_patterns": "Andere Muster, die zu dieser Route passen:",
+          "ttl": "TTL: {{ttl}} ({{seconds}}s)"
+        },
+        "title": "TTL-Inspektor",
+        "units": {
+          "days": "{{count}} d",
+          "hours": "{{count}} h",
+          "minutes": "{{count}} min"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "Erkunden"
+        },
+        "counts": {
+          "dynamic": "{{count}} dynamisch",
+          "static": "{{count}} statisch",
+          "total": "{{count}} insgesamt"
+        },
+        "description_prefix": "Sehen Sie genau, welche Routen die Engine für einen Mandanten rendern möchte – statische Etage (Feature/Modul-Gated) plus die dynamischen URLs von",
+        "description_suffix": "Der Dramatiker-Mitarbeiter besucht diese Liste.",
+        "error": "Die Suche ist fehlgeschlagen. Überprüfen Sie den Mandanten-Slug",
+        "fields": {
+          "tenant_slug": "Mieterschnecke"
+        },
+        "none": "(keiner)",
+        "placeholders": {
+          "tenant_slug": "Stunden-Zeitbank"
+        },
+        "sections": {
+          "dynamic_routes": "Dynamische Routen (maximal 1.000)",
+          "static_routes": "Statische Routen"
+        },
+        "title": "Sitemap-Explorer"
+      },
+      "readonly": {
+        "prefix": "Schreibgeschützte Ansicht – Aktionsschaltflächen sind deaktiviert, da die Prerender-Engine für alle Mandanten ausgeführt wird. Melden Sie sich mit einem an",
+        "role": "Plattform-Superadministrator",
+        "suffix": "Konto, um Jobs in die Warteschlange zu stellen, Snapshots zu löschen oder eine Abweichungserkennung auszulösen."
+      },
+      "tabs": {
+        "analytics": "Analytik",
+        "coverage": "Abdeckung",
+        "events": "Veranstaltungen",
+        "failures": "Misserfolge",
+        "history": "Geschichte",
+        "inventory": "Inventar",
+        "jobs": "Jobs",
+        "overview": "Überblick"
+      },
+      "tabs_aria": "Registerkarten für das Vorrendern",
+      "title": "Prerender-Engine"
+    }
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",
