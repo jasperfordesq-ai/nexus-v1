@@ -41,10 +41,10 @@ type ConfirmActionType =
   | 'revoke-global';
 
 function getPrivilegeLevel(user: SuperAdminUserDetail) {
-  if (user.is_super_admin) return { label: "Privilege Global Super Admin", color: 'danger' as const, level: 4 };
-  if (user.is_tenant_super_admin) return { label: "Privilege Tenant Super Admin", color: 'secondary' as const, level: 3 };
-  if (user.role === 'admin' || user.role === 'tenant_admin') return { label: "Privilege Admin", color: 'primary' as const, level: 2 };
-  return { label: "Privilege Regular Member", color: 'default' as const, level: 1 };
+  if (user.is_super_admin) return { labelKey: 'super.privilege_global_super_admin', color: 'danger' as const, level: 4 };
+  if (user.is_tenant_super_admin) return { labelKey: 'super.privilege_tenant_super_admin', color: 'secondary' as const, level: 3 };
+  if (user.role === 'admin' || user.role === 'tenant_admin') return { labelKey: 'super.privilege_admin', color: 'primary' as const, level: 2 };
+  return { labelKey: 'super.privilege_regular_member', color: 'default' as const, level: 1 };
 }
 
 function formatDate(dateStr: string | null | undefined, neverLabel = 'Never'): string {
@@ -56,7 +56,7 @@ function formatDate(dateStr: string | null | undefined, neverLabel = 'Never'): s
 
 export function UserShow() {
   const { t } = useTranslation('admin');
-  usePageTitle("Super Admin");
+  usePageTitle(t('super.users'));
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -120,10 +120,10 @@ export function UserShow() {
       case 'revoke-global': res = await adminSuper.revokeGlobalSuperAdmin(user.id); break;
     }
     if (res?.success) {
-      toast.success("User updated successfully");
+      toast.success(t('super.user_updated_successfully'));
       loadUser();
     } else {
-      toast.error(res?.error || "Failed");
+      toast.error(res?.error || t('super.operation_failed'));
     }
     setActionLoading(false);
     setConfirmAction(null);
@@ -134,12 +134,12 @@ export function UserShow() {
     setMoveLoading(true);
     const res = await adminSuper.moveUserTenant(user.id, Number(moveTargetTenant));
     if (res?.success) {
-      toast.success("User Moved to New Tenant");
+      toast.success(t('super.user_moved_to_new_tenant'));
       setMoveModalOpen(false);
       setMoveTargetTenant('');
       loadUser();
     } else {
-      toast.error(res?.error || "Failed to move user");
+      toast.error(res?.error || t('super.failed_to_move_user'));
     }
     setMoveLoading(false);
   };
@@ -149,12 +149,12 @@ export function UserShow() {
     setPromoteLoading(true);
     const res = await adminSuper.moveAndPromote(user.id, Number(promoteTargetTenant));
     if (res?.success) {
-      toast.success("User moved and promoted to tenant super admin");
+      toast.success(t('super.user_moved_and_promoted_to_tenant_super_admin'));
       setPromoteModalOpen(false);
       setPromoteTargetTenant('');
       loadUser();
     } else {
-      toast.error(res?.error || "Failed to move and promote");
+      toast.error(res?.error || t('super.failed_to_move_and_promote'));
     }
     setPromoteLoading(false);
   };
@@ -185,27 +185,27 @@ export function UserShow() {
 
   const confirmMessages: Record<ConfirmActionType, { title: string; message: string; label: string; color: 'danger' | 'warning' | 'primary' }> = {
     'grant-sa': {
-      title: "Are you sure you want to grant sa title?",
-      message: `Are you sure you want to grant sa message detail?`,
-      label: "Grant Tenant Sa",
+      title: t('super.confirm_grant_sa_title'),
+      message: t('super.confirm_grant_sa_message_detail'),
+      label: t('super.grant_tenant_sa'),
       color: 'primary',
     },
     'revoke-sa': {
-      title: "Are you sure you want to revoke sa title?",
-      message: `Are you sure you want to revoke sa message detail?`,
-      label: "Revoke Tenant Sa",
+      title: t('super.confirm_revoke_sa_title'),
+      message: t('super.confirm_revoke_sa_message_detail'),
+      label: t('super.revoke_tenant_sa'),
       color: 'danger',
     },
     'grant-global': {
-      title: "Are you sure you want to grant global title?",
-      message: `Are you sure you want to grant global message detail?`,
-      label: "Grant Global Sa",
+      title: t('super.confirm_grant_global_title'),
+      message: t('super.confirm_grant_global_message_detail'),
+      label: t('super.grant_global_sa'),
       color: 'danger',
     },
     'revoke-global': {
-      title: "Are you sure you want to revoke global title?",
-      message: `Are you sure you want to revoke global message detail?`,
-      label: "Revoke Global Sa",
+      title: t('super.confirm_revoke_global_title'),
+      message: t('super.confirm_revoke_global_message_detail'),
+      label: t('super.revoke_global_sa'),
       color: 'danger',
     },
   };
@@ -216,7 +216,7 @@ export function UserShow() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Spinner size="lg" label={"Loading user details..."} />
+        <Spinner size="lg" label={t('super.loading_user_details')} />
       </div>
     );
   }
@@ -224,9 +224,9 @@ export function UserShow() {
   if (!user) {
     return (
       <div className="p-8 text-center">
-        <p className="text-default-500">{"User Not Found"}</p>
+        <p className="text-default-500">{t('super.user_not_found')}</p>
         <Button className="mt-4" variant="flat" onPress={() => navigate(tenantPath('/admin/super/users'))}>
-          {"Back to Users"}
+          {t('super.back_to_users')}
         </Button>
       </div>
     );
@@ -238,7 +238,7 @@ export function UserShow() {
     <div>
       <PageHeader
         title={user.name}
-        description={`Cross Tenant User Details`}
+        description={t('super.cross_tenant_user_details')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -246,14 +246,14 @@ export function UserShow() {
               startContent={<Edit size={16} />}
               onPress={() => navigate(tenantPath(`/admin/super/users/${user.id}/edit`))}
             >
-              {"Edit"}
+              {t('super.edit')}
             </Button>
             <Button
               variant="light"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/super/users'))}
             >
-              {"Back to Users"}
+              {t('super.back_to_users')}
             </Button>
           </div>
         }
@@ -266,7 +266,7 @@ export function UserShow() {
           <Card>
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
               <User size={18} />
-              {"User Information"}
+              {t('super.user_information')}
             </CardHeader>
             <Divider />
             <CardBody>
@@ -295,12 +295,12 @@ export function UserShow() {
                     </Chip>
                     {user.is_super_admin && (
                       <Chip size="sm" variant="flat" color="danger" startContent={<ShieldAlert size={12} />}>
-                        {"Privilege Global Super Admin"}
+                        {t('super.privilege_global_super_admin')}
                       </Chip>
                     )}
                     {user.is_tenant_super_admin && (
                       <Chip size="sm" variant="flat" color="secondary" startContent={<Shield size={12} />}>
-                        {"Privilege Tenant Super Admin"}
+                        {t('super.privilege_tenant_super_admin')}
                       </Chip>
                     )}
                   </div>
@@ -311,44 +311,44 @@ export function UserShow() {
 
           {/* Profile Info */}
           <Card>
-            <CardHeader className="font-semibold text-lg">{"Profile Info"}</CardHeader>
+            <CardHeader className="font-semibold text-lg">{t('super.profile_info')}</CardHeader>
             <Divider />
             <CardBody>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
                   <MapPin size={16} className="text-default-400 shrink-0" />
                   <div>
-                    <p className="text-xs text-default-400">{"Location"}</p>
-                    <p className="text-sm text-foreground">{user.location || "Not Set"}</p>
+                    <p className="text-xs text-default-400">{t('super.label_location')}</p>
+                    <p className="text-sm text-foreground">{user.location || t('super.not_set')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Phone size={16} className="text-default-400 shrink-0" />
                   <div>
-                    <p className="text-xs text-default-400">{"Phone"}</p>
-                    <p className="text-sm text-foreground">{user.phone || "Not Set"}</p>
+                    <p className="text-xs text-default-400">{t('super.label_phone')}</p>
+                    <p className="text-sm text-foreground">{user.phone || t('super.not_set')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <CalendarDays size={16} className="text-default-400 shrink-0" />
                   <div>
-                    <p className="text-xs text-default-400">{"Member Since"}</p>
-                    <p className="text-sm text-foreground">{formatDate(user.created_at, "Never")}</p>
+                    <p className="text-xs text-default-400">{t('super.label_member_since')}</p>
+                    <p className="text-sm text-foreground">{formatDate(user.created_at, t('super.never'))}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Clock size={16} className="text-default-400 shrink-0" />
                   <div>
-                    <p className="text-xs text-default-400">{"Last Login"}</p>
-                    <p className="text-sm text-foreground">{formatDate(user.last_login_at, "Never")}</p>
+                    <p className="text-xs text-default-400">{t('super.label_last_login')}</p>
+                    <p className="text-sm text-foreground">{formatDate(user.last_login_at, t('super.never'))}</p>
                   </div>
                 </div>
                 {user.balance !== undefined && (
                   <div className="flex items-center gap-3">
                     <Wallet size={16} className="text-default-400 shrink-0" />
                     <div>
-                      <p className="text-xs text-default-400">{"Time Balance"}</p>
-                      <p className="text-sm font-medium text-foreground">{user.balance} {"Hours"}</p>
+                      <p className="text-xs text-default-400">{t('super.label_time_balance')}</p>
+                      <p className="text-sm font-medium text-foreground">{user.balance} {t('super.hours')}</p>
                     </div>
                   </div>
                 )}
@@ -360,22 +360,22 @@ export function UserShow() {
           <Card>
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
               <Building2 size={18} />
-              {"Tenant Association"}
+              {t('super.tenant_association')}
             </CardHeader>
             <Divider />
             <CardBody className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <div>
-                  <p className="text-xs text-default-400">{"Current Tenant"}</p>
+                  <p className="text-xs text-default-400">{t('super.label_current_tenant')}</p>
                   <Link
                     to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)}
                     className="text-sm font-medium text-primary hover:underline"
                   >
-                    {user.tenant_name || `Tenant ${user.tenant_id}`}
+                    {user.tenant_name || t('super.tenant_with_id', { id: user.tenant_id })}
                   </Link>
                 </div>
                 <div>
-                  <p className="text-xs text-default-400">{"Tenant I D"}</p>
+                  <p className="text-xs text-default-400">{t('super.label_tenant_id')}</p>
                   <p className="text-sm text-foreground">{user.tenant_id}</p>
                 </div>
               </div>
@@ -387,7 +387,7 @@ export function UserShow() {
                   startContent={<ArrowRightLeft size={16} />}
                   onPress={() => setMoveModalOpen(true)}
                 >
-                  {"Move to Different Tenant"}
+                  {t('super.move_to_different_tenant')}
                 </Button>
                 <Button
                   variant="flat"
@@ -395,7 +395,7 @@ export function UserShow() {
                   startContent={<Crown size={16} />}
                   onPress={() => setPromoteModalOpen(true)}
                 >
-                  {"Move and Promote to Hub"}
+                  {t('super.move_and_promote_to_hub')}
                 </Button>
               </div>
             </CardBody>
@@ -409,13 +409,13 @@ export function UserShow() {
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
               <ShieldAlert size={18} className="text-purple-600 dark:text-purple-400" />
               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                {"God Level Access"}
+                {t('super.god_level_access')}
               </span>
             </CardHeader>
             <Divider className="bg-purple-500/20" />
             <CardBody className="flex flex-col gap-3">
               <p className="text-xs text-default-600">
-                {"God Level."}
+                {t('super.god_level_desc')}
               </p>
               {user.is_super_admin ? (
                 <Button
@@ -425,7 +425,7 @@ export function UserShow() {
                   onPress={() => setConfirmAction('revoke-global')}
                 >
                   <span className="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent font-medium">
-                    {"Revoke Global Sa"}
+                    {t('super.revoke_global_sa')}
                   </span>
                 </Button>
               ) : (
@@ -437,11 +437,11 @@ export function UserShow() {
                     onPress={() => setConfirmAction('grant-global')}
                   >
                     <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-semibold">
-                      {"Grant Global Sa"}
+                      {t('super.grant_global_sa')}
                     </span>
                   </Button>
                   <p className="text-[10px] text-purple-700 dark:text-purple-400 mt-2 text-center font-medium">
-                    {"God Level Caution"}
+                    {t('super.god_level_caution')}
                   </p>
                 </div>
               )}
@@ -452,12 +452,12 @@ export function UserShow() {
           <Card>
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
               <Shield size={18} />
-              {"Tenant Super Admin"}
+              {t('super.tenant_super_admin')}
             </CardHeader>
             <Divider />
             <CardBody className="flex flex-col gap-3">
               <p className="text-xs text-default-600">
-                {"Tenant Sa."}
+                {t('super.tenant_sa_desc')}
               </p>
               {user.is_tenant_super_admin ? (
                 <Button
@@ -466,7 +466,7 @@ export function UserShow() {
                   startContent={<ShieldOff size={16} />}
                   onPress={() => setConfirmAction('revoke-sa')}
                 >
-                  {"Revoke Tenant Sa"}
+                  {t('super.revoke_tenant_sa')}
                 </Button>
               ) : (
                 <Button
@@ -475,7 +475,7 @@ export function UserShow() {
                   startContent={<Shield size={16} />}
                   onPress={() => setConfirmAction('grant-sa')}
                 >
-                  {"Grant Tenant Sa"}
+                  {t('super.grant_tenant_sa')}
                 </Button>
               )}
             </CardBody>
@@ -483,7 +483,7 @@ export function UserShow() {
 
           {/* Privilege Level */}
           <Card>
-            <CardHeader className="font-semibold text-lg">{"Privilege Level"}</CardHeader>
+            <CardHeader className="font-semibold text-lg">{t('super.privilege_level')}</CardHeader>
             <Divider />
             <CardBody>
               <div className="flex flex-col items-center gap-3 py-2">
@@ -504,7 +504,7 @@ export function UserShow() {
                   )}
                 </div>
                 <Chip size="lg" variant="flat" color={privilege.color}>
-                  {privilege.label}
+                  {t(privilege.labelKey)}
                 </Chip>
                 {/* Privilege bar */}
                 <div className="w-full flex gap-1 mt-1">
@@ -523,10 +523,10 @@ export function UserShow() {
                   ))}
                 </div>
                 <div className="flex justify-between w-full text-[10px] text-default-400">
-                  <span>{"Privilege Member Short"}</span>
-                  <span>{"Privilege Admin Short"}</span>
-                  <span>{"Privilege Tsa Short"}</span>
-                  <span>{"Privilege Gsa Short"}</span>
+                  <span>{t('super.privilege_member_short')}</span>
+                  <span>{t('super.privilege_admin_short')}</span>
+                  <span>{t('super.privilege_tsa_short')}</span>
+                  <span>{t('super.privilege_gsa_short')}</span>
                 </div>
               </div>
             </CardBody>
@@ -534,7 +534,7 @@ export function UserShow() {
 
           {/* Quick Actions */}
           <Card>
-            <CardHeader className="font-semibold text-lg">{"Quick Actions"}</CardHeader>
+            <CardHeader className="font-semibold text-lg">{t('super.quick_actions')}</CardHeader>
             <Divider />
             <CardBody>
               <div className="flex flex-col gap-2">
@@ -545,7 +545,7 @@ export function UserShow() {
                   fullWidth
                   onPress={() => navigate(tenantPath(`/admin/super/users/${user.id}/edit`))}
                 >
-                  {"Edit User"}
+                  {t('super.edit_user')}
                 </Button>
                 {isCurrentSuperAdmin && (
                   <Button
@@ -564,7 +564,7 @@ export function UserShow() {
                   fullWidth
                   onPress={() => navigate(tenantPath('/admin/super/users'))}
                 >
-                  {"Back to Users"}
+                  {t('super.back_to_users')}
                 </Button>
               </div>
             </CardBody>
@@ -637,16 +637,11 @@ export function UserShow() {
             <p className="text-sm text-default-600">
               {t('super.impersonate_user_desc', {
                 name: user.name,
-                defaultValue:
-                  'You are about to impersonate {{name}}. You will see the platform exactly as they do. This action is logged in the super-admin audit trail.',
               })}
             </p>
             <div className="bg-warning-50 dark:bg-warning-50/10 border border-warning-200 dark:border-warning-200/20 rounded-lg p-3 mt-3">
               <p className="text-xs text-warning-700 dark:text-warning-400">
-                {t(
-                  'super.impersonate_user_warning',
-                  'Only use this feature for support and debugging. Your actions will appear as if performed by the target user.',
-                )}
+                {t('super.impersonate_user_warning')}
               </p>
             </div>
           </ModalBody>

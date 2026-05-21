@@ -12190,6 +12190,7 @@
     "user_detail_page": "User detail page",
     "user_information": "User Information",
     "user_moved_and_promoted": "User moved and promoted",
+    "user_moved_and_promoted_to_tenant_super_admin": "User moved and promoted to tenant super admin",
     "user_not_found": "User Not Found",
     "users": "Users",
     "users_count": "Users Count",
