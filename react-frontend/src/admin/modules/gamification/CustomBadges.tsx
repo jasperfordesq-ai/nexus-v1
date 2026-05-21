@@ -15,6 +15,7 @@ import { Card, CardBody, Button } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import Award from 'lucide-react/icons/award';
 import Trash2 from 'lucide-react/icons/trash-2';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
@@ -26,7 +27,8 @@ import type { BadgeDefinition } from '../../api/types';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CustomBadges() {
-  usePageTitle("Gamification");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('gamification.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -47,10 +49,10 @@ export function CustomBadges() {
       // Show only custom badges on this page
       setBadges(all.filter((b) => b.type === 'custom'));
     } else {
-      toast.error("Failed to load badges");
+      toast.error(t('gamification.failed_to_load_badges'));
     }
     setLoading(false);
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -63,11 +65,11 @@ export function CustomBadges() {
 
     const res = await adminGamification.deleteBadge(deleteTarget.id);
     if (res.success) {
-      toast.success(`Badge deleted`);
+      toast.success(t('gamification.badge_deleted_msg'));
       setDeleteTarget(null);
       loadBadges();
     } else {
-      toast.error("Failed to delete badge");
+      toast.error(t('gamification.failed_to_delete_badge'));
     }
 
     setDeleting(false);
@@ -76,12 +78,12 @@ export function CustomBadges() {
   return (
     <div>
       <PageHeader
-        title={"Custom Badges"}
-        description={"Create and manage custom badges to recognise member achievements"}
+        title={t('gamification.custom_badges_title')}
+        description={t('gamification.custom_badges_desc')}
         actions={
           <Link to={tenantPath("/admin/custom-badges/create")}>
             <Button color="primary" startContent={<Plus size={16} />}>
-              {"Create Badge"}
+              {t('gamification.create_badge')}
             </Button>
           </Link>
         }
@@ -109,9 +111,9 @@ export function CustomBadges() {
       ) : badges.length === 0 ? (
         <EmptyState
           icon={Award}
-          title={"No custom badges"}
-          description={"Create your first custom badge to reward outstanding community members"}
-          actionLabel={"Create Badge"}
+          title={t('gamification.no_custom_badges')}
+          description={t('gamification.desc_create_your_first_custom_badge_to_reward')}
+          actionLabel={t('gamification.create_badge')}
           onAction={() => navigate(tenantPath('/admin/custom-badges/create'))}
         />
       ) : (
@@ -126,7 +128,7 @@ export function CustomBadges() {
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-foreground truncate">{badge.name}</h4>
                     <p className="text-xs text-default-500 mt-0.5">
-                      {`Users Awarded`}
+                      {t('gamification.users_awarded')}
                     </p>
                   </div>
                   <Button
@@ -136,7 +138,7 @@ export function CustomBadges() {
                     color="danger"
                     className="opacity-0 group-hover:opacity-100 transition-opacity"
                     onPress={() => setDeleteTarget(badge)}
-                    aria-label={`Delete ${badge.name}`}
+                    aria-label={t('gamification.delete_badge_aria', { name: badge.name })}
                   >
                     <Trash2 size={16} />
                   </Button>
@@ -156,13 +158,13 @@ export function CustomBadges() {
           isOpen={!!deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
-          title={"Delete Badge"}
+          title={t('gamification.confirm_delete_badge')}
           message={
             deleteTarget.awarded_count > 0
-              ? `Delete Badge Awarded`
-              : `Delete Badge`
+              ? t('gamification.confirm_delete_badge_awarded')
+              : t('gamification.delete_badge')
           }
-          confirmLabel={"Delete"}
+          confirmLabel={t('gamification.delete')}
           confirmColor="danger"
           isLoading={deleting}
         />

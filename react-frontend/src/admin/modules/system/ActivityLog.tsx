@@ -70,7 +70,7 @@ function formatDate(dateStr: string): string {
 
 export function ActivityLog() {
   const { t } = useTranslation('admin');
-  usePageTitle("System");
+  usePageTitle(t('system.page_title'));
 
   const [entries, setEntries] = useState<ActivityLogEntry[]>([]);
   const [total, setTotal] = useState(0);
@@ -119,7 +119,7 @@ export function ActivityLog() {
   const columns: Column<ActivityLogEntry>[] = [
     {
       key: 'user_name',
-      label: "User",
+      label: t('system.col_user'),
       sortable: true,
       render: (entry) => (
         <div className="flex items-center gap-3">
@@ -139,7 +139,7 @@ export function ActivityLog() {
     },
     {
       key: 'action',
-      label: "Action",
+      label: t('system.col_action'),
       sortable: true,
       render: (entry) => {
         const key = `system.action.${entry.action}`;
@@ -156,7 +156,7 @@ export function ActivityLog() {
     },
     {
       key: 'description',
-      label: "Description",
+      label: t('system.col_description'),
       render: (entry) => (
         <span className="text-sm text-default-600 line-clamp-2">
           {entry.description || '—'}
@@ -165,7 +165,7 @@ export function ActivityLog() {
     },
     {
       key: 'ip_address',
-      label: "IP Address",
+      label: t('system.col_ip_address'),
       render: (entry) => (
         <code className="text-xs text-default-500 bg-default-100 px-1.5 py-0.5 rounded">
           {entry.ip_address || '—'}
@@ -174,7 +174,7 @@ export function ActivityLog() {
     },
     {
       key: 'created_at',
-      label: "Date",
+      label: t('system.col_date'),
       sortable: true,
       render: (entry) => (
         <span className="text-sm text-default-500">
@@ -187,8 +187,8 @@ export function ActivityLog() {
   return (
     <div>
       <PageHeader
-        title={"Activity Log"}
-        description={"View a log of all admin actions taken on this platform"}
+        title={t('system.activity_log_title')}
+        description={t('system.activity_log_desc')}
         actions={
           <Button
             variant="flat"
@@ -196,7 +196,7 @@ export function ActivityLog() {
             onPress={loadData}
             isLoading={loading}
           >
-            {"Refresh"}
+            {t('system.btn_refresh')}
           </Button>
         }
       />
@@ -206,7 +206,7 @@ export function ActivityLog() {
         columns={columns}
         data={filteredEntries}
         isLoading={loading}
-        searchPlaceholder={"Filter activity..."}
+        searchPlaceholder={t('system.filter_activity_placeholder')}
         onSearch={(q) => setSearch(q)}
         onRefresh={loadData}
         totalItems={total}
@@ -216,7 +216,7 @@ export function ActivityLog() {
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8 text-default-400">
             <Activity size={40} />
-            <p>{"No activity log entries"}</p>
+            <p>{t('system.no_activity_log_entries')}</p>
           </div>
         }
       />

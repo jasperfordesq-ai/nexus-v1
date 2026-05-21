@@ -12,6 +12,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardBody, CardHeader, Button, Spinner } from '@heroui/react';
 import Image from 'lucide-react/icons/image';
 import Play from 'lucide-react/icons/play';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
@@ -24,7 +25,8 @@ interface WebpStats {
 }
 
 export function WebpConverter() {
-  usePageTitle("System");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
 
   const [stats, setStats] = useState<WebpStats | null>(null);
@@ -37,11 +39,11 @@ export function WebpConverter() {
       const res = await adminTools.getWebpStats();
       setStats(res.data ?? null);
     } catch {
-      toast.error("Failed to load WebP stats");
+      toast.error(t('system.failed_to_load_web_p_stats'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -52,10 +54,10 @@ export function WebpConverter() {
     setConverting(true);
     try {
       await adminTools.runWebpConversion();
-      toast.success("WebP Conversion Complete", "WebP All Converted");
+      toast.success(t('system.webp_conversion_complete'), t('system.webp_all_converted'));
       await fetchStats();
     } catch {
-      toast.error("Conversion failed", "WebP Conversion error");
+      toast.error(t('system.conversion_failed'), t('system.webp_conversion_error'));
     } finally {
       setConverting(false);
     }
@@ -64,8 +66,8 @@ export function WebpConverter() {
   return (
     <div>
       <PageHeader
-        title={"WebP Converter"}
-        description={"Convert uploaded images to WebP format for better performance"}
+        title={t('system.webp_converter_title')}
+        description={t('system.webp_converter_desc')}
         actions={
           <Button
             color="primary"
@@ -74,14 +76,14 @@ export function WebpConverter() {
             isLoading={converting}
             isDisabled={loading || (stats !== null && stats.pending_conversion === 0)}
           >
-            Start Conversion
+            {t('system.start_conversion')}
           </Button>
         }
       />
       <Card shadow="sm">
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Image size={20} /> Image Conversion
+            <Image size={20} /> {t('system.image_conversion')}
           </h3>
         </CardHeader>
         <CardBody>
@@ -96,24 +98,23 @@ export function WebpConverter() {
                   <p className="text-2xl font-bold text-foreground">
                     {stats?.total_images?.toLocaleString() ?? '--'}
                   </p>
-                  <p className="text-sm text-default-500">{"Total Images"}</p>
+                  <p className="text-sm text-default-500">{t('system.total_images')}</p>
                 </div>
                 <div className="rounded-lg border border-default-200 p-4 text-center">
                   <p className="text-2xl font-bold text-success">
                     {stats?.webp_images?.toLocaleString() ?? '--'}
                   </p>
-                  <p className="text-sm text-default-500">{"Already WebP"}</p>
+                  <p className="text-sm text-default-500">{t('system.already_webp')}</p>
                 </div>
                 <div className="rounded-lg border border-default-200 p-4 text-center">
                   <p className="text-2xl font-bold text-warning">
                     {stats?.pending_conversion?.toLocaleString() ?? '--'}
                   </p>
-                  <p className="text-sm text-default-500">{"Pending Conversion"}</p>
+                  <p className="text-sm text-default-500">{t('system.pending_conversion')}</p>
                 </div>
               </div>
               <p className="text-sm text-default-400">
-                WebP images are typically 25-35% smaller than comparable JPEG or PNG files while maintaining similar quality.
-                Running conversion will process all non-WebP images in the uploads directory.
+                {t('system.webp_converter_body')}
               </p>
             </div>
           )}

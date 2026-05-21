@@ -15,6 +15,7 @@ import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import FileArchive from 'lucide-react/icons/file-archive';
 import Download from 'lucide-react/icons/download';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader, EmptyState, ConfirmModal } from '../../components';
@@ -28,7 +29,8 @@ interface BlogBackup {
 }
 
 export function BlogRestore() {
-  usePageTitle("System");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
 
   const [backups, setBackups] = useState<BlogBackup[]>([]);
@@ -54,11 +56,11 @@ export function BlogRestore() {
         setBackups([]);
       }
     } catch {
-      toast.error("Failed to load blog backups");
+      toast.error(t('system.failed_to_load_blog_backups'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -74,26 +76,26 @@ export function BlogRestore() {
       if (res.success) {
         const restored = (res.data as { restored_count?: number })?.restored_count;
         const message = restored !== undefined
-          ? `${restored} blog post${restored !== 1 ? 's' : ''} restored from ${confirmBackup.filename}`
-          : `Blog data restored from ${confirmBackup.filename}`;
-        toast.success("Restore Complete", message);
+          ? t('system.blog_posts_restored', { count: restored, filename: confirmBackup.filename })
+          : t('system.blog_data_restored', { filename: confirmBackup.filename });
+        toast.success(t('system.restore_complete'), message);
         // Refresh the backup list in case status changed
         await fetchBackups();
       } else {
-        toast.error("Restore failed", "Restore Server error");
+        toast.error(t('system.restore_failed'), t('system.restore_server_error'));
       }
     } catch {
-      toast.error("Restore failed", "Restore Error Occurred");
+      toast.error(t('system.restore_failed'), t('system.restore_error_occurred'));
     } finally {
       setRestoringId(null);
     }
-  }, [confirmBackup, toast, fetchBackups])
+  }, [confirmBackup, t, toast, fetchBackups])
 
 
   if (loading) {
     return (
       <div>
-        <PageHeader title={"Blog Restore"} description={"Restore blog posts from automatic backups"} />
+        <PageHeader title={t('system.blog_restore_title')} description={t('system.blog_restore_desc')} />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -103,27 +105,27 @@ export function BlogRestore() {
 
   return (
     <div>
-      <PageHeader title={"Blog Restore"} description={"Restore blog posts from automatic backups"} />
+      <PageHeader title={t('system.blog_restore_title')} description={t('system.blog_restore_desc')} />
 
       <div className="rounded-lg border border-warning-200 bg-warning-50 p-4 mb-4 flex items-start gap-3">
         <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
         <div>
-          <p className="font-medium text-warning-700">{"Use With Caution"}</p>
-          <p className="text-sm text-warning-600">{"Blog Restore Warning"}</p>
+          <p className="font-medium text-warning-700">{t('system.use_with_caution')}</p>
+          <p className="text-sm text-warning-600">{t('system.blog_restore_warning')}</p>
         </div>
       </div>
 
       {backups.length === 0 ? (
         <EmptyState
           icon={RotateCcw}
-          title={"No backups available found"}
-          description={"Blog post backups will appear here when auto-backup is enabled"}
+          title={t('system.no_backups_available')}
+          description={t('system.desc_blog_post_backups_will_appear_here_when_')}
         />
       ) : (
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <FileArchive size={20} /> Available Backups ({backups.length})
+              <FileArchive size={20} /> {t('system.available_backups', { count: backups.length })}
             </h3>
           </CardHeader>
           <CardBody>
@@ -153,7 +155,7 @@ export function BlogRestore() {
                     isLoading={restoringId === backup.id}
                     isDisabled={restoringId !== null}
                   >
-                    Restore
+                    {t('system.restore')}
                   </Button>
                 </div>
               ))}
@@ -166,13 +168,13 @@ export function BlogRestore() {
         isOpen={confirmBackup !== null}
         onClose={() => setConfirmBackup(null)}
         onConfirm={handleRestoreConfirm}
-        title={"Restore Blog Backup"}
+        title={t('system.restore_blog_backup')}
         message={
           confirmBackup
-            ? `Restore Blog Confirm`
+            ? t('system.restore_blog_confirm', { filename: confirmBackup.filename })
             : ''
         }
-        confirmLabel={"Restore Backup"}
+        confirmLabel={t('system.restore_backup')}
         confirmColor="warning"
         isLoading={restoringId !== null}
       />

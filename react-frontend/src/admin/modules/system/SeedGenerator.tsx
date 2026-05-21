@@ -32,7 +32,7 @@ const SEED_OPTIONS = [
 
 export function SeedGenerator() {
   const { t } = useTranslation('admin');
-  usePageTitle("System");
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
   const [selected, setSelected] = useState<string[]>([]);
   const [running, setRunning] = useState(false);
@@ -64,11 +64,11 @@ export function SeedGenerator() {
 
       await adminTools.runSeedGenerator({ types: selected, counts });
       toast.success(
-        "Seed Data Generated",
-        `Generated Data for`
+        t('system.seed_data_generated'),
+        t('system.generated_data_for', { count: selected.length })
       );
     } catch {
-      toast.error("Seed Generation failed", "Seed Generation error");
+      toast.error(t('system.seed_generation_failed'), t('system.seed_generation_error'));
     } finally {
       setRunning(false);
     }
@@ -76,20 +76,20 @@ export function SeedGenerator() {
 
   return (
     <div>
-      <PageHeader title={"Seed Generator"} description={"Generate seed data for testing and development purposes"} />
+      <PageHeader title={t('system.seed_generator_title')} description={t('system.seed_generator_desc')} />
 
       <div className="rounded-lg border border-warning-200 bg-warning-50 p-4 mb-4 flex items-start gap-3">
         <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
         <div>
-          <p className="font-medium text-warning-700">{"Development Only"}</p>
-          <p className="text-sm text-warning-600">{"Warning Body"}</p>
+          <p className="font-medium text-warning-700">{t('seed_generator.development_only')}</p>
+          <p className="text-sm text-warning-600">{t('seed_generator.warning_body')}</p>
         </div>
       </div>
 
       <Card shadow="sm">
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Database size={20} /> {"Data Types"}
+            <Database size={20} /> {t('seed_generator.data_types_heading')}
           </h3>
         </CardHeader>
         <CardBody>
@@ -108,7 +108,7 @@ export function SeedGenerator() {
                   defaultValue={String(opt.count)}
                   className="w-20"
                   variant="bordered"
-                  aria-label={`Count Aria`}
+                  aria-label={t('seed_generator.count_aria_label', { label: t(opt.labelKey) })}
                   onValueChange={(val) => handleCountChange(opt.key, val)}
                 />
               </div>
@@ -122,7 +122,7 @@ export function SeedGenerator() {
               isLoading={running}
               isDisabled={selected.length === 0}
             >
-              {`Generate`}
+              {t('seed_generator.generate_button')}
             </Button>
           </div>
         </CardBody>

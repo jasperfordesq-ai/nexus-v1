@@ -49,7 +49,7 @@ type FilterTab = 'all' | 'core' | 'template' | 'custom' | 'quality';
 
 export function BadgeConfiguration() {
   const { t } = useTranslation('admin');
-  usePageTitle("Page");
+  usePageTitle(t('gamification.badge_configuration_title'));
   const toast = useToast();
 
   const [badges, setBadges] = useState<BadgeConfigEntry[]>([]);
@@ -63,10 +63,10 @@ export function BadgeConfiguration() {
     if (res.success && res.data) {
       setBadges(res.data as BadgeConfigEntry[]);
     } else {
-      toast.error("Failed to load badge configuration");
+      toast.error(t('gamification.failed_to_load_badge_configuration'));
     }
     setLoading(false);
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -81,9 +81,9 @@ export function BadgeConfiguration() {
       setBadges((prev) =>
         prev.map((b) => (b.key === badge.key ? { ...b, is_enabled: enabled } : b)),
       );
-      toast.success(`Toggled`);
+      toast.success(t('gamification.badge_toggled'));
     } else {
-      toast.error("Failed to update badge");
+      toast.error(t('gamification.failed_to_update_badge'));
     }
     setUpdating(null);
   };
@@ -92,10 +92,10 @@ export function BadgeConfiguration() {
     setUpdating(badge.key);
     const res = await adminGamification.resetBadgeConfig(badge.key);
     if (res.success) {
-      toast.success(`Reset to Defaults`);
+      toast.success(t('gamification.badge_reset_to_defaults'));
       loadBadges();
     } else {
-      toast.error("Failed to reset badge");
+      toast.error(t('gamification.failed_to_reset_badge'));
     }
     setUpdating(null);
   };
@@ -118,7 +118,7 @@ export function BadgeConfiguration() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={"Page"} description={"Description"} />
+        <PageHeader title={t('gamification.badge_configuration_title')} description={t('gamification.badge_configuration_desc')} />
         <div className="flex items-center justify-center py-24">
           <Spinner size="lg" />
         </div>
@@ -129,28 +129,28 @@ export function BadgeConfiguration() {
   return (
     <div>
       <PageHeader
-        title={"Page"}
-        description={"Description"}
+        title={t('gamification.badge_configuration_title')}
+        description={t('gamification.badge_configuration_desc')}
       />
 
       <Tabs
-        aria-label={"Badge Filter"}
+        aria-label={t('gamification.badge_filter')}
         selectedKey={filter}
         onSelectionChange={(key) => setFilter(key as FilterTab)}
         className="mb-6"
       >
-        <Tab key="all" title={`All`} />
-        <Tab key="core" title={`Core`} />
-        <Tab key="template" title={`Template`} />
-        <Tab key="custom" title={`Custom`} />
-        <Tab key="quality" title={`Quality`} />
+        <Tab key="all" title={t('gamification.filter_all')} />
+        <Tab key="core" title={t('gamification.badge_tiers.core')} />
+        <Tab key="template" title={t('gamification.badge_tiers.template')} />
+        <Tab key="custom" title={t('gamification.badge_tiers.custom')} />
+        <Tab key="quality" title={t('gamification.badge_classes.quality')} />
       </Tabs>
 
       {filtered.length === 0 ? (
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center justify-center py-12">
             <Award size={40} className="text-default-300 mb-2" />
-            <p className="text-default-500">{"No badges for filter found"}</p>
+            <p className="text-default-500">{t('gamification.no_badges_for_filter')}</p>
           </CardBody>
         </Card>
       ) : (
@@ -160,12 +160,10 @@ export function BadgeConfiguration() {
             <div key={tier} className="mb-8">
               <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
                 <Chip color={TIER_COLORS[tier] ?? 'primary'} size="sm" variant="flat">
-                  {t(`gamification.badge_tiers.${tier}`, { defaultValue: tier })}
+                  {t(`gamification.badge_tiers.${tier}`)}
                 </Chip>
                 <span className="text-default-400 text-sm font-normal">
-                  {(grouped[tier] ?? []).length !== 1
-                    ? `Count Plural`
-                    : `Count`}
+                  {t('gamification.badge_count', { count: (grouped[tier] ?? []).length })}
                 </span>
               </h2>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -194,26 +192,26 @@ export function BadgeConfiguration() {
                             isSelected={badge.is_enabled}
                             isDisabled={badge.badge_tier === 'core' || isUpdating}
                             onValueChange={(val) => handleToggle(badge, val)}
-                            aria-label={`Toggle ${badge.name}`}
+                            aria-label={t('gamification.toggle_badge_aria', { name: badge.name })}
                           />
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
                           <Chip size="sm" variant="flat" color={RARITY_COLORS[badge.rarity] ?? 'default'}>
-                            {t(`gamification.badge_rarities.${badge.rarity}`, { defaultValue: badge.rarity })}
+                            {t(`gamification.badge_rarities.${badge.rarity}`)}
                           </Chip>
                           {badge.threshold > 0 && (
                             <Chip size="sm" variant="flat" color="default">
-                              {`Threshold`}
+                              {t('gamification.threshold_count', { count: badge.threshold })}
                             </Chip>
                           )}
                           {badge.xp_value > 0 && (
                             <Chip size="sm" variant="flat" color="warning">
-                              {`XP`}
+                              {t('gamification.xp_count', { count: badge.xp_value })}
                             </Chip>
                           )}
                           {badge.has_override && (
                             <Chip size="sm" variant="dot" color="secondary">
-                              {"Customized"}
+                              {t('gamification.customized')}
                             </Chip>
                           )}
                         </div>
@@ -227,7 +225,7 @@ export function BadgeConfiguration() {
                             onPress={() => handleReset(badge)}
                             className="self-end"
                           >
-                            {"Reset to Default"}
+                            {t('gamification.reset_to_default')}
                           </Button>
                         )}
                       </CardBody>
