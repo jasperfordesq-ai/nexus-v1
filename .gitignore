@@ -46,6 +46,7 @@ CLAUDE.md
 !/scripts/check-spdx.mjs
 !/scripts/safe_migrate.php
 !/scripts/backfill_embeddings.php
+!/scripts/watchdog-queue.sh
 !/scripts/sync_search_index.php
 !/scripts/train_recommendations.php
 !/scripts/batch_geocode_users.php
