@@ -336,7 +336,8 @@
     "navigation": {
       "label": "Caring community navigation",
       "close": "Close caring community navigation"
-    }
+    },
+    "meta_title": "Troskliwy administrator społeczności"
   },
   "admin": {
     "providers": {
@@ -424,7 +425,8 @@
         "name_match": "Dopasowanie nazwy",
         "name_similar": "Imię podobne",
         "phone_match": "Mecz telefoniczny",
-        "website_match": "Dopasowanie witryny"
+        "website_match": "Dopasowanie witryny",
+        "unknown": "Nieznany sygnał: {{signal}}"
       },
       "status": {
         "active": "Aktywny",
@@ -499,7 +501,9 @@
     "common": {
       "refresh": "Refresh",
       "cancel": "Cancel",
-      "empty_dash": "-"
+      "empty_dash": "-",
+      "all": "Wszystko",
+      "close": "Zamknąć"
     },
     "loyalty": {
       "title": "Loyalty Programme",
@@ -547,7 +551,8 @@
         "status": "Status",
         "actions": "Actions",
         "reverse": "Reverse",
-        "empty_value": "-"
+        "empty_value": "-",
+        "aria": "Ostatnie odkupy lojalnościowe"
       },
       "reverse_modal": {
         "title": "Reverse redemption",
@@ -572,6 +577,11 @@
         "discount_range": "Max discount percent must be between 0 and 100",
         "save_settings": "Failed to save settings",
         "reverse": "Failed to reverse redemption"
+      },
+      "status": {
+        "pending": "Aż do",
+        "applied": "Stosowany",
+        "reversed": "Wywrócony"
       }
     },
     "hour_transfers": {
@@ -584,11 +594,15 @@
       },
       "pending": {
         "title": "Awaiting your approval",
-        "empty": "No pending transfers."
+        "empty": "No pending transfers.",
+        "description": "Każdy przelew musi zostać ręcznie zatwierdzony przez administratora. Przed zatwierdzeniem sprawdź, czy adres e-mail członka docelowego jest zgodny z nowym kontem członka.",
+        "table_aria": "Oczekujące wychodzące przelewy godzinowe"
       },
       "inbound": {
         "title": "Received from other cooperatives (last 90 days)",
-        "empty": "No transfers received in the last 90 days."
+        "empty": "No transfers received in the last 90 days.",
+        "description": "Jest to wyłącznie dziennik audytu – przelewy przychodzące są przetwarzane automatycznie po zatwierdzeniu przez spółdzielnię źródłową. Tutaj nie jest wymagane żadne działanie.",
+        "table_aria": "Przychodzące transfery godzinowe"
       },
       "actions": {
         "approve": "Approve",
@@ -608,6 +622,25 @@
         "load_inbound": "Failed to load inbound transfers",
         "approve": "Approval failed",
         "reject": "Rejection failed"
+      },
+      "table": {
+        "actions": "Działania",
+        "date": "Data",
+        "destination": "Miejsce docelowe",
+        "hours": "Godziny",
+        "member": "Członek",
+        "member_credited": "Członek zaliczony",
+        "reason": "Powód",
+        "source": "Źródło",
+        "status": "Status"
+      },
+      "status": {
+        "approved_by_source": "Zatwierdzone przez źródło",
+        "completed": "Zakończony",
+        "pending": "Aż do",
+        "received": "Otrzymane",
+        "rejected": "Odrzucony",
+        "sent": "Wysłano"
       }
     },
     "surveys": {
@@ -834,6 +867,310 @@
         "months_ago_one": "{{count}}mo ago",
         "months_ago_other": "{{count}}mo ago"
       }
+    },
+    "civic_digest": {
+      "meta_title": "Kadencja Przeglądu Obywatelskiego",
+      "title": "Kadencja Przeglądu Obywatelskiego",
+      "subtitle": "Skonfiguruj domyślną częstotliwość dostarczania spersonalizowanego podsumowania obywatelskiego otrzymywanego przez członków. Podsumowanie gromadzi odpowiednią zawartość społeczności – alerty dotyczące bezpieczeństwa, aktualizacje projektu, powiadomienia o wydarzeniach i ogłoszenia – w jednym podsumowaniu.",
+      "preview_member_view": "Podgląd widoku członka",
+      "reset": "Nastawić",
+      "save": "Zapisz rytm",
+      "member_override": "Członkowie mogą zastąpić rytm i zrezygnować z poszczególnych źródeł na własnej stronie preferencji podsumowania.",
+      "about": {
+        "title": "O tej stronie",
+        "body": "Civic Digest zastępuje konieczność sprawdzania przez członków wielu stron, dostarczając spersonalizowane podsumowanie tego, co jest dla nich istotne. Tutaj ustawiasz domyślną dzierżawę. Członkowie mogą zmienić rytm lub całkowicie z niego zrezygnować w swoich własnych ustawieniach. Zmiana domyślnej dzierżawy ma wpływ tylko na członków, którzy nigdy nie dostosowywali swoich preferencji."
+      },
+      "cadence": {
+        "title": "Domyślna częstotliwość najemcy",
+        "description": "Kontroluje domyślną częstotliwość dostarczania nowych członków. Obecni członkowie zachowują to, co już wybrali.",
+        "current": "Obecne: {{cadence}}"
+      },
+      "options": {
+        "off": {
+          "label": "Wyłączony",
+          "description": "Nie jest wysyłane żadne podsumowanie. Członkowie widzą aktualizacje tylko wtedy, gdy odwiedzają platformę."
+        },
+        "daily": {
+          "label": "Codziennie",
+          "description": "Podsumowanie jest wysyłane każdego ranka wraz z aktywnością z poprzedniego dnia."
+        },
+        "monthly": {
+          "label": "Miesięczny",
+          "description": "Podsumowanie jest wysyłane pierwszego dnia każdego miesiąca i obejmuje ostatnią aktywność."
+        }
+      },
+      "includes": {
+        "title": "Co zawiera podsumowanie",
+        "description": "Pozycje są uszeregowane według członków według dopasowania podregionu, dopasowania zainteresowań, świeżości i wagi źródła. Mieszanka źródłowa:",
+        "sources": {
+          "safety_alerts": "Alerty bezpieczeństwa",
+          "project_updates": "Aktualizacje projektu",
+          "municipality_announcements": "Ogłoszenia gminne",
+          "events": "Wydarzenia",
+          "vereine": "Vereine",
+          "care_providers": "Dostawcy opieki",
+          "marketplace": "Rynek",
+          "help_requests": "Prośby o pomoc",
+          "feed_posts": "Posty z kanałami"
+        }
+      },
+      "messages": {
+        "saved": "Zapisano rytm podsumowania"
+      },
+      "errors": {
+        "load": "Nie udało się załadować rytmu podsumowania",
+        "save": "Nie udało się zapisać rytmu"
+      }
+    },
+    "recipient_circle": {
+      "meta_title": "Krąg odbiorców opieki",
+      "title": "Krąg odbiorców opieki",
+      "subtitle": "Zobacz pełną sieć wsparcia wokół dowolnego członka",
+      "recipient": "Odbiorca",
+      "loading": "Ładowanie kręgu odbiorców...",
+      "member_since": "Członek od {{date}}",
+      "member_id_value": "Identyfikator {{id}}",
+      "safeguarding_flags_one": "Flaga zabezpieczająca {{count}}",
+      "safeguarding_flags_other": "{{count}} flagi zabezpieczające",
+      "about": {
+        "title": "O tej stronie",
+        "body": "Koło Opieki to prywatna grupa wsparcia skupiona wokół osoby objętej opieką. Ten widok pokazuje pełną sieć wsparcia: wszystkich pomocników, całkowitą liczbę przepracowanych godzin, otwarte prośby o pomoc i wszelkie flagi zabezpieczające. Wprowadź identyfikator użytkownika członka, aby wyszukać jego krąg.",
+        "trust_tiers_label": "Poziomy zaufania:",
+        "trust_tiers_body": "Nowicjusz, Członek, Zaufany, Zweryfikowany, Koordynator - pokazany dla odbiorcy i każdego wspierającego.",
+        "safeguarding_label": "Flagi zabezpieczające:",
+        "safeguarding_body": "Liczba flag różna od zera wskazuje aktywne problemy dotyczące zabezpieczeń zarejestrowane w stosunku do tego elementu członkowskiego. Przejrzyj je w sekcji Ochrona.",
+        "privacy_label": "Prywatność:",
+        "privacy_body": "Dane kręgu są widoczne tylko dla członków kręgu i administratorów dzierżawy. Nie jest uwzględniany w raportach ogólnospołecznych ani w katalogu członków."
+      },
+      "lookup": {
+        "member_id": "Identyfikator członka",
+        "placeholder": "Wprowadź identyfikator użytkownika członkowskiego...",
+        "button": "Zobacz okrąg"
+      },
+      "stats": {
+        "total_hours": "Całkowita liczba otrzymanych godzin",
+        "active_supporters": "Aktywni zwolennicy",
+        "open_help_requests": "Otwórz Prośby o pomoc"
+      },
+      "tiers": {
+        "newcomer": "Przybysz",
+        "member": "Członek",
+        "trusted": "Zaufany",
+        "verified": "Zweryfikowano",
+        "coordinator": "Koordynator",
+        "fallback": "Poziom {{tier}}"
+      },
+      "relationship_types": {
+        "care": "Pielęgnacja",
+        "support": "Wsparcie",
+        "family": "Rodzina",
+        "friend": "Przyjaciel",
+        "neighbour": "Sąsiad",
+        "professional": "Profesjonalny",
+        "unknown": "Nieznany związek: {{type}}"
+      },
+      "status": {
+        "active": "Aktywny",
+        "paused": "Wstrzymano",
+        "ended": "Zakończone",
+        "unknown": "Nieznany status: {{status}}"
+      },
+      "relationships": {
+        "title": "Wsparcie Relacji",
+        "empty": "Brak aktywnych relacji wsparcia",
+        "aria": "Wspieraj relacje",
+        "supporter": "Kibic",
+        "trust_tier": "Poziom zaufania",
+        "type": "Typ",
+        "hours_logged": "Zarejestrowane godziny",
+        "last_activity": "Ostatnia aktywność",
+        "status": "Status"
+      },
+      "errors": {
+        "load": "Nie udało się załadować kręgu odbiorców. Sprawdź identyfikator członka i spróbuj ponownie."
+      }
+    },
+    "safeguarding_reports": {
+      "meta_title": "Raporty zabezpieczające — administrator",
+      "title": "Raporty zabezpieczające",
+      "subtitle": "Przeglądaj, przypisuj i rozwiązuj wątpliwości dotyczące bezpieczeństwa zgłaszane przez członków.",
+      "empty_dash": "-",
+      "actor_id": "#{{id}}",
+      "subject_org": "Organizacja #{{id}}",
+      "overdue": "Zaległy",
+      "escalated": "Eskalacja",
+      "open": "Otwarte",
+      "report_title": "Zgłoś #{{id}}",
+      "empty": "Żadne raporty zabezpieczające nie pasują do tych filtrów.",
+      "loading": "Ładowanie raportów zabezpieczających",
+      "loading_detail": "Ładowanie szczegółów raportu zabezpieczającego",
+      "about": {
+        "title": "O tej stronie",
+        "body": "Na tej stronie opisano formalne zdarzenia związane z ochroną: sytuacje, w których dobro, bezpieczeństwo lub godność członka może być zagrożone. Raporty składają członkowie, koordynatorzy lub administratorzy. Wszystkie raporty muszą zostać poddane segregacji w ramach umowy SLA skonfigurowanej w Zasadach operacyjnych. Raporty krytyczne i o dużej wadze wymagają natychmiastowej uwagi. Raporty dotyczą wyłącznie najemców i nie mogą być widoczne dla innych społeczności."
+      },
+      "severity": {
+        "critical": "Krytyczny",
+        "high": "Wysoki",
+        "medium": "Średni",
+        "low": "Niski"
+      },
+      "status": {
+        "submitted": "Złożony",
+        "triaged": "Tried",
+        "investigating": "Badanie",
+        "resolved": "Rozwiązany",
+        "dismissed": "Zwolniony"
+      },
+      "severity_legend": {
+        "title": "Poziomy ważności",
+        "critical": "Bezpośrednie ryzyko fizyczne: nasilać się w ciągu 1 godziny.",
+        "high": "Poważne obawy: segregacja w ciągu 24 godzin.",
+        "medium": "Znaczące, ale niepilne: segregacja w ciągu 72 godzin.",
+        "low": "Drobne zastrzeżenia: przegląd na następnym posiedzeniu koordynatorów."
+      },
+      "workflow": {
+        "title": "Przepływ pracy dotyczący statusu",
+        "submitted": "Otrzymano raport, który nie został jeszcze sprawdzony przez koordynatora.",
+        "triaged": "Koordynator ocenił wagę problemu i przypisał mu odpowiedzialność.",
+        "investigating": "Trwa aktywne dochodzenie lub interwencja wsparcia.",
+        "resolved": "Zamknięto z udokumentowanymi notatkami dotyczącymi rozstrzygnięcia po podjęciu działań.",
+        "dismissed": "Zamknięte bez dalszych działań. Należy zapisać powód."
+      },
+      "filters": {
+        "status": "Status",
+        "severity": "Powaga"
+      },
+      "table": {
+        "aria": "Raporty zabezpieczające",
+        "severity": "Powaga",
+        "category": "Kategoria",
+        "reporter": "Reporter",
+        "subject": "Temat",
+        "status": "Status",
+        "assigned": "Przydzielony",
+        "sla": "Umowa dotycząca poziomu usług",
+        "sla_abbr": "SLA",
+        "created": "Stworzony",
+        "actions": "Działania"
+      },
+      "fields": {
+        "category": "Kategoria",
+        "reporter": "Reporter",
+        "subject": "Temat",
+        "description": "Opis",
+        "evidence": "Dowód",
+        "resolution_notes": "Uwagi do uchwały"
+      },
+      "actions": {
+        "title": "Działania",
+        "assignee_user_id": "Identyfikator użytkownika przypisanego",
+        "assign": "Przydzielać",
+        "escalation_note": "Notatka dotycząca eskalacji (opcjonalnie)",
+        "escalate": "Wzmagać",
+        "set_status": "Ustaw stan",
+        "notes": "Notatki (opcjonalnie)",
+        "update": "Aktualizacja",
+        "resolved_hint": "„Rozwiązane” zamyka ten raport udokumentowanymi notatkami dotyczącymi rozwiązania. Użyj, gdy podjęto działanie.",
+        "dismissed_hint": "Opcja „Odrzucona” zamyka ten raport bez dalszych działań. W powyższych uwagach należy podać powód.",
+        "add_note": "Dodaj notatkę"
+      },
+      "history": {
+        "title": "Historia",
+        "empty": "Nie ma jeszcze żadnych działań.",
+        "by_actor": "przez {{name}}"
+      },
+      "messages": {
+        "assigned": "Przydzielony",
+        "escalated": "Eskalacja",
+        "status_updated": "Stan zaktualizowany",
+        "note_added": "Uwaga dodana"
+      },
+      "errors": {
+        "load": "Nie udało się załadować raportów",
+        "load_detail": "Nie udało się załadować szczegółów raportu",
+        "assign": "Przypisanie nie powiodło się",
+        "escalate": "Eskalacja nie powiodła się",
+        "status": "Zmiana statusu nie powiodła się",
+        "note": "Uwaga nie powiodła się"
+      }
+    },
+    "regional_points": {
+      "title": "Punkty regionalne",
+      "description": "Program trzeciej waluty – działa obok kredytów czasowych i waluty rynkowej. Domyślnie wyłączone.",
+      "about": {
+        "title": "O tej stronie",
+        "body": "Punkty regionalne to dodatkowe punkty służące do uznania wkładu, który nie pasuje do standardowego modelu wymiany godzin – na przykład za udział w wydarzeniach społecznościowych, udział w ankietach lub ukończenie szkoleń. Różnią się one od kredytów czasowych (godzin opieki) i nie można na nie zamienić. Wykorzystaj je, aby zachęcić do szerszego udziału społeczności poza bezpośrednią opieką.",
+        "secondary": "Przydziel punkty ręcznie poszczególnym członkom, korzystając z poniższych narzędzi lub dostosuj narzędzia. Punkty pojawiają się w portfelu członka wraz z jego saldem czasowym. Członkowie mogą wymieniać punkty regionalne na lokalne nagrody określone w programie lojalnościowym. Punkty wygasają po 12 miesiącach, chyba że ustawienie wygaśnięcia jest ustawione na 0 (nigdy nie wygasają)."
+      },
+      "stats": {
+        "total_balance": "Wydane saldo ogółem",
+        "lifetime_issued": "Wydane na całe życie",
+        "lifetime_spent": "Spędzone całe życie",
+        "member_accounts": "Konta członkowskie"
+      },
+      "config": {
+        "title": "Konfiguracja programu",
+        "enabled": "Program włączony",
+        "enabled_hint": "Gdy jest wyłączona, trzecia waluta jest ukryta przed członkami, a punkty końcowe administratora zwracają 403.",
+        "display_label": "Wyświetl etykietę",
+        "display_label_description": "Wyświetlane w portfelu (np. „Punkty regionalne”, „Stadtmuenze”)",
+        "symbol": "Symbol",
+        "symbol_description": "Krótki przyrostek pokazywany obok kwot (np. „pkt”, „SM”)",
+        "auto_issue": "Automatyczne wydawanie w zatwierdzonych godzinach",
+        "auto_issue_hint": "Po zarejestrowaniu zweryfikowanej godziny automatycznie przyznaj tyle punktów regionalnych.",
+        "points_per_hour": "Punkty za zatwierdzoną godzinę",
+        "member_transfers": "Transfery między członkami",
+        "member_transfers_hint": "Zezwalaj członkom na przesyłanie sobie punktów.",
+        "marketplace_redemption": "Odkupienie targowiska",
+        "marketplace_redemption_hint": "Pozwól członkom wymieniać punkty na zniżkę w CHF u uczestniczących sprzedawców.",
+        "save": "Zapisz konfigurację"
+      },
+      "member_balance": {
+        "title": "Wydaj / dostosuj saldo członkowskie",
+        "member": "Członek",
+        "member_placeholder": "Szukaj według nazwy lub adresu e-mail",
+        "no_matching_members": "Brak pasujących członków",
+        "clear": "Jasne",
+        "tabs_aria": "Działania równoważące punkty regionalne",
+        "issue_tab": "Punkty wydania",
+        "points_to_issue": "Punkty do wydania",
+        "description": "Opis",
+        "issue": "Punkty wydania",
+        "adjust_tab": "Dostosuj (+/-)",
+        "points_delta": "Punkty delta (dodatnie lub ujemne)",
+        "apply_adjustment": "Zastosuj regulację"
+      },
+      "ledger": {
+        "title": "Ostatnie wpisy w księdze",
+        "aria": "Najnowsze wpisy do księgi punktów regionalnych",
+        "empty": "Nie ma jeszcze żadnych wpisów do księgi.",
+        "date": "Data",
+        "member": "Członek",
+        "type": "Typ",
+        "description": "Opis",
+        "points": "Zwrotnica",
+        "balance": "Balansować",
+        "user_fallback": "#{{id}}"
+      },
+      "messages": {
+        "config_saved": "Konfiguracja została zapisana",
+        "issued": "Wydano punkty {{amount}} na {{member}}",
+        "adjusted": "Skorygowano {{member}} o punkty {{delta}}"
+      },
+      "errors": {
+        "load": "Nie udało się załadować punktów regionalnych",
+        "save_config": "Nie udało się zapisać konfiguracji",
+        "pick_member": "Najpierw wybierz członka",
+        "positive_amount": "Wpisz kwotę dodatnią",
+        "issue": "Nie udało się przyznać punktów",
+        "non_zero_delta": "Wprowadź niezerową deltę (dodatnią lub ujemną)",
+        "adjust": "Nie udało się dostosować punktów"
+      }
     }
+  },
+  "admin_a11y": {
+    "refresh_federation_peers": "Odśwież kolegów z federacji",
+    "refresh_kpi_baselines": "Odśwież wartości bazowe KPI",
+    "refresh_research_partnerships": "Odśwież partnerstwa badawcze"
   }
 }

@@ -336,7 +336,8 @@
     "navigation": {
       "label": "Caring community navigation",
       "close": "Close caring community navigation"
-    }
+    },
+    "meta_title": "思いやりのあるコミュニティ管理者"
   },
   "admin": {
     "providers": {
@@ -424,7 +425,8 @@
         "name_match": "名前一致",
         "name_similar": "名前が似ている",
         "phone_match": "電話照合",
-        "website_match": "ウェブサイトの一致"
+        "website_match": "ウェブサイトの一致",
+        "unknown": "不明な信号: {{signal}}"
       },
       "status": {
         "active": "アクティブ",
@@ -499,7 +501,9 @@
     "common": {
       "refresh": "Refresh",
       "cancel": "Cancel",
-      "empty_dash": "-"
+      "empty_dash": "-",
+      "all": "全て",
+      "close": "近い"
     },
     "loyalty": {
       "title": "Loyalty Programme",
@@ -547,7 +551,8 @@
         "status": "Status",
         "actions": "Actions",
         "reverse": "Reverse",
-        "empty_value": "-"
+        "empty_value": "-",
+        "aria": "最近のロイヤルティの引き換え"
       },
       "reverse_modal": {
         "title": "Reverse redemption",
@@ -572,6 +577,11 @@
         "discount_range": "Max discount percent must be between 0 and 100",
         "save_settings": "Failed to save settings",
         "reverse": "Failed to reverse redemption"
+      },
+      "status": {
+        "pending": "保留中",
+        "applied": "適用済み",
+        "reversed": "逆向き"
       }
     },
     "hour_transfers": {
@@ -584,11 +594,15 @@
       },
       "pending": {
         "title": "Awaiting your approval",
-        "empty": "No pending transfers."
+        "empty": "No pending transfers.",
+        "description": "各転送は管理者が手動で承認する必要があります。承認する前に、宛先のメンバーのメールアドレスがメンバーの新しいアカウントと一致することを確認してください。",
+        "table_aria": "保留中のアウトバウンド時間転送"
       },
       "inbound": {
         "title": "Received from other cooperatives (last 90 days)",
-        "empty": "No transfers received in the last 90 days."
+        "empty": "No transfers received in the last 90 days.",
+        "description": "これは監査ログのみです。受信転送は、ソース協同組合が承認すると自動的に処理されます。ここでは何もする必要はありません。",
+        "table_aria": "到着時間内の転送"
       },
       "actions": {
         "approve": "Approve",
@@ -608,6 +622,25 @@
         "load_inbound": "Failed to load inbound transfers",
         "approve": "Approval failed",
         "reject": "Rejection failed"
+      },
+      "table": {
+        "actions": "アクション",
+        "date": "日付",
+        "destination": "行き先",
+        "hours": "営業時間",
+        "member": "メンバー",
+        "member_credited": "メンバーがクレジットされました",
+        "reason": "理由",
+        "source": "ソース",
+        "status": "状態"
+      },
+      "status": {
+        "approved_by_source": "ソースによって承認されました",
+        "completed": "完了",
+        "pending": "保留中",
+        "received": "受け取った",
+        "rejected": "拒否されました",
+        "sent": "送信済み"
       }
     },
     "surveys": {
@@ -834,6 +867,310 @@
         "months_ago_one": "{{count}}mo ago",
         "months_ago_other": "{{count}}mo ago"
       }
+    },
+    "civic_digest": {
+      "meta_title": "シビックダイジェストのケイデンス",
+      "title": "シビックダイジェストのケイデンス",
+      "subtitle": "メンバーが受け取るパーソナライズされた市民ダイジェストのデフォルトの配信頻度を構成します。ダイジェストは、安全に関する警告、プロジェクトの更新、イベント通知、お知らせなど、関連するコミュニティ コンテンツを 1 つの概要に集約します。",
+      "preview_member_view": "メンバービューのプレビュー",
+      "reset": "リセット",
+      "save": "ケイデンスを保存する",
+      "member_override": "メンバーは、独自のダイジェスト設定ページからケイデンスをオーバーライドし、個々のソースをオプトアウトできます。",
+      "about": {
+        "title": "このページについて",
+        "body": "Civic Digest は、メンバーに関連する内容のパーソナライズされた概要を提供することで、メンバーが複数のページをチェックする必要をなくします。ここでテナントのデフォルトを設定します。メンバーは、独自の設定からリズムをオーバーライドしたり、完全にオプトアウトしたりできます。テナントのデフォルトの変更は、設定をカスタマイズしたことがないメンバーにのみ影響します。"
+      },
+      "cadence": {
+        "title": "テナントのデフォルトの頻度",
+        "description": "新しいメンバーのデフォルトの配信頻度を制御します。既存のメンバーは、すでに選択したものをそのまま保持します。",
+        "current": "現在: {{cadence}}"
+      },
+      "options": {
+        "off": {
+          "label": "オフ",
+          "description": "ダイジェストは送信されません。メンバーはプラットフォームにアクセスした場合にのみ更新情報を確認できます。"
+        },
+        "daily": {
+          "label": "毎日",
+          "description": "前日のアクティビティのダイジェストが毎朝送信されます。"
+        },
+        "monthly": {
+          "label": "毎月",
+          "description": "最近のアクティビティをカバーするダイジェストが毎月 1 日に送信されます。"
+        }
+      },
+      "includes": {
+        "title": "ダイジェストに含まれるもの",
+        "description": "項目は、サブ領域の一致、関心の一致、鮮度、およびソースの重みによってメンバーごとにランク付けされます。ソースミックス:",
+        "sources": {
+          "safety_alerts": "安全に関する警告",
+          "project_updates": "プロジェクトの更新情報",
+          "municipality_announcements": "自治体の発表",
+          "events": "イベント",
+          "vereine": "ヴェレーヌ",
+          "care_providers": "介護提供者",
+          "marketplace": "市場",
+          "help_requests": "ヘルプリクエスト",
+          "feed_posts": "フィード投稿"
+        }
+      },
+      "messages": {
+        "saved": "ダイジェスト ケイデンスが保存されました"
+      },
+      "errors": {
+        "load": "ダイジェスト ケイデンスのロードに失敗しました",
+        "save": "ケイデンスの保存に失敗しました"
+      }
+    },
+    "recipient_circle": {
+      "meta_title": "要介護者サークル",
+      "title": "要介護者サークル",
+      "subtitle": "メンバーを中心とした完全なサポート ネットワークを表示する",
+      "recipient": "受信者",
+      "loading": "受信者サークルを読み込んでいます...",
+      "member_since": "{{date}} 以来のメンバー",
+      "member_id_value": "ID {{id}}",
+      "safeguarding_flags_one": "{{count}} 保護フラグ",
+      "safeguarding_flags_other": "{{count}} 保護フラグ",
+      "about": {
+        "title": "このページについて",
+        "body": "介護受給者サークルは、介護を受ける個人を中心とする民間のサポート グループです。このビューには、すべてのヘルパー、合計受信時間、オープンなヘルプ リクエスト、および安全対策フラグなど、完全なサポート ネットワークが表示されます。メンバーのユーザー ID を入力してサークルを検索します。",
+        "trust_tiers_label": "信頼層:",
+        "trust_tiers_body": "新人、メンバー、信頼できる、検証済み、コーディネーター - 受信者と各サポーターに表示されます。",
+        "safeguarding_label": "フラグの保護:",
+        "safeguarding_body": "ゼロ以外のフラグ数は、このメンバーに対して記録されたアクティブな保護懸念を示します。 「安全保護」セクションでそれらを確認してください。",
+        "privacy_label": "プライバシー：",
+        "privacy_body": "サークル データは、サークル メンバーとテナント管理者のみに表示されます。これはコミュニティ全体のレポートやメンバー ディレクトリには含まれません。"
+      },
+      "lookup": {
+        "member_id": "会員ID",
+        "placeholder": "会員ユーザーIDを入力してください...",
+        "button": "ビューサークル"
+      },
+      "stats": {
+        "total_hours": "合計受信時間",
+        "active_supporters": "アクティブサポーター",
+        "open_help_requests": "ヘルプリクエストを開く"
+      },
+      "tiers": {
+        "newcomer": "新人",
+        "member": "メンバー",
+        "trusted": "信頼できる",
+        "verified": "確認済み",
+        "coordinator": "コーディネーター",
+        "fallback": "層 {{tier}}"
+      },
+      "relationship_types": {
+        "care": "ケア",
+        "support": "サポート",
+        "family": "家族",
+        "friend": "友達",
+        "neighbour": "近所の人",
+        "professional": "プロ",
+        "unknown": "不明な関係: {{type}}"
+      },
+      "status": {
+        "active": "アクティブ",
+        "paused": "一時停止中",
+        "ended": "終了しました",
+        "unknown": "不明なステータス: {{status}}"
+      },
+      "relationships": {
+        "title": "サポート関係",
+        "empty": "アクティブなサポート関係がない",
+        "aria": "サポート関係",
+        "supporter": "サポーター",
+        "trust_tier": "トラスト層",
+        "type": "タイプ",
+        "hours_logged": "記録された時間数",
+        "last_activity": "最後のアクティビティ",
+        "status": "状態"
+      },
+      "errors": {
+        "load": "受信者サークルの読み込みに失敗しました。会員IDをご確認の上、再度お試しください。"
+      }
+    },
+    "safeguarding_reports": {
+      "meta_title": "レポートの保護 - 管理者",
+      "title": "レポートの保護",
+      "subtitle": "メンバーから提起された安全対策に関する懸念を検討、割り当て、解決します。",
+      "empty_dash": "-",
+      "actor_id": "#{{id}}",
+      "subject_org": "組織 #{{id}}",
+      "overdue": "期限を過ぎました",
+      "escalated": "エスカレート",
+      "open": "開ける",
+      "report_title": "レポート #{{id}}",
+      "empty": "これらのフィルターに一致する保護レポートはありません。",
+      "loading": "安全保護レポートをロードしています",
+      "loading_detail": "安全保護レポートの詳細をロードしています",
+      "about": {
+        "title": "このページについて",
+        "body": "このページは、正式な安全保護に関するインシデント、つまりメンバーの福祉、安全、または尊厳が危険にさらされる可能性のある状況を管理します。レポートはメンバー、コーディネーター、または管理者によって提出されます。すべてのレポートは、運用ポリシーで構成された SLA 内で優先順位付けする必要があります。重大かつ重大度の高いレポートには、直ちに対処する必要があります。レポートはテナント限定であり、他のコミュニティからは参照できません。"
+      },
+      "severity": {
+        "critical": "致命的",
+        "high": "高い",
+        "medium": "中くらい",
+        "low": "低い"
+      },
+      "status": {
+        "submitted": "提出済み",
+        "triaged": "トリアージ",
+        "investigating": "調査中",
+        "resolved": "解決済み",
+        "dismissed": "解雇された"
+      },
+      "severity_legend": {
+        "title": "重大度レベル",
+        "critical": "差し迫った身体的リスク: 1 時間以内にエスカレートします。",
+        "high": "深刻な懸念事項: 24 時間以内にトリアージします。",
+        "medium": "重要だが緊急ではない: 72 時間以内にトリアージします。",
+        "low": "小さな懸念事項: 次回のコーディネーター会議で検討してください。"
+      },
+      "workflow": {
+        "title": "ステータスのワークフロー",
+        "submitted": "レポートは受領されましたが、コーディネーターによってまだレビューされていません。",
+        "triaged": "コーディネーターが重大度を評価し、所有権を割り当てました。",
+        "investigating": "積極的な調査または支援介入が進行中です。",
+        "resolved": "措置が講じられた後、文書化された解決メモを提出して終了しました。",
+        "dismissed": "それ以上のアクションは行われずに閉じられました。理由を記録する必要があります。"
+      },
+      "filters": {
+        "status": "状態",
+        "severity": "重大度"
+      },
+      "table": {
+        "aria": "レポートの保護",
+        "severity": "重大度",
+        "category": "カテゴリ",
+        "reporter": "記者",
+        "subject": "主題",
+        "status": "状態",
+        "assigned": "割り当て済み",
+        "sla": "サービスレベル契約",
+        "sla_abbr": "SLA",
+        "created": "作成されました",
+        "actions": "アクション"
+      },
+      "fields": {
+        "category": "カテゴリ",
+        "reporter": "記者",
+        "subject": "主題",
+        "description": "説明",
+        "evidence": "証拠",
+        "resolution_notes": "解決策のメモ"
+      },
+      "actions": {
+        "title": "アクション",
+        "assignee_user_id": "担当者のユーザーID",
+        "assign": "割り当てる",
+        "escalation_note": "エスカレーションメモ (オプション)",
+        "escalate": "エスカレート",
+        "set_status": "ステータスを設定する",
+        "notes": "注記 (オプション)",
+        "update": "アップデート",
+        "resolved_hint": "「解決済み」では、解決メモが文書化されてこのレポートが閉じられます。アクションが実行された場合に使用します。",
+        "dismissed_hint": "「却下」を選択すると、それ以上のアクションは行われずにこのレポートが閉じられます。理由を上記のメモに記録する必要があります。",
+        "add_note": "メモを追加"
+      },
+      "history": {
+        "title": "歴史",
+        "empty": "まだアクションはありません。",
+        "by_actor": "by {{name}}"
+      },
+      "messages": {
+        "assigned": "割り当て済み",
+        "escalated": "エスカレート",
+        "status_updated": "ステータスが更新されました",
+        "note_added": "注記を追加しました"
+      },
+      "errors": {
+        "load": "レポートのロードに失敗しました",
+        "load_detail": "レポートの詳細をロードできませんでした",
+        "assign": "割り当てに失敗しました",
+        "escalate": "エスカレーションに失敗しました",
+        "status": "ステータス変更に失敗しました",
+        "note": "メモは失敗しました"
+      }
+    },
+    "regional_points": {
+      "title": "地域ポイント",
+      "description": "第三通貨プログラム - 時間クレジットと市場通貨と並行して実行されます。デフォルトでは無効になっています。",
+      "about": {
+        "title": "このページについて",
+        "body": "地域ポイントは、標準的な時間交換モデルに適合しない貢献 (コミュニティ イベントへの参加、アンケートへの参加、トレーニングの完了など) を認識するために使用される補足クレジットです。これらは時間クレジット (ケア時間) とは異なるものであり、換算することはできません。直接的なケアを超えて、より広範な地域社会への参加を促進するためにこれらを活用してください。",
+        "secondary": "以下の課題または調整ツールを使用して、個々のメンバーにポイントを手動で割り当てます。ポイントはタイム クレジット残高とともにメンバーのウォレットに表示されます。メンバーは、ロイヤルティ プログラムで定義された地域特典と地域ポイントを引き換えることができます。有効期限設定が 0 (無期限) に設定されていない限り、ポイントは 12 か月後に期限切れになります。"
+      },
+      "stats": {
+        "total_balance": "発行残高合計",
+        "lifetime_issued": "永久発行",
+        "lifetime_spent": "費やした生涯",
+        "member_accounts": "メンバーアカウント"
+      },
+      "config": {
+        "title": "プログラム構成",
+        "enabled": "プログラムが有効になっている",
+        "enabled_hint": "オフの場合、3 番目の通貨はメンバーに対して非表示になり、管理エンドポイントは 403 を返します。",
+        "display_label": "表示ラベル",
+        "display_label_description": "ウォレットに表示されます (例: 「地域ポイント」、「シュタットミュンツェ」)",
+        "symbol": "シンボル",
+        "symbol_description": "金額の横に表示される短い接尾辞 (例: 「pts」、「SM」)",
+        "auto_issue": "承認された時間に自動発行",
+        "auto_issue_hint": "検証された時間が記録されると、この数の地域ポイントが自動的に付与されます。",
+        "points_per_hour": "承認された時間ごとのポイント",
+        "member_transfers": "会員間の送金",
+        "member_transfers_hint": "メンバー同士がポイントを送信できるようにします。",
+        "marketplace_redemption": "マーケットプレイスでの引き換え",
+        "marketplace_redemption_hint": "メンバーがポイントを参加販売者の CHF 割引として引き換えられるようにします。",
+        "save": "設定の保存"
+      },
+      "member_balance": {
+        "title": "メンバーバランスの発行・調整",
+        "member": "メンバー",
+        "member_placeholder": "名前またはメールアドレスで検索",
+        "no_matching_members": "一致するメンバーがいません",
+        "clear": "クリア",
+        "tabs_aria": "地域ポイントバランスアクション",
+        "issue_tab": "論点",
+        "points_to_issue": "発行するポイント",
+        "description": "説明",
+        "issue": "論点",
+        "adjust_tab": "調整(+/-)",
+        "points_delta": "ポイントデルタ (正または負)",
+        "apply_adjustment": "調整を適用する"
+      },
+      "ledger": {
+        "title": "最近の台帳エントリ",
+        "aria": "最近の地域ポイント台帳エントリ",
+        "empty": "まだ帳簿エントリがありません。",
+        "date": "日付",
+        "member": "メンバー",
+        "type": "タイプ",
+        "description": "説明",
+        "points": "ポイント",
+        "balance": "バランス",
+        "user_fallback": "#{{id}}"
+      },
+      "messages": {
+        "config_saved": "設定が保存されました",
+        "issued": "{{member}}に{{amount}}ポイントを発行",
+        "adjusted": "{{member}} を {{delta}} ポイントで調整"
+      },
+      "errors": {
+        "load": "地域ポイントの読み込みに失敗しました",
+        "save_config": "設定の保存に失敗しました",
+        "pick_member": "まずはメンバーを選ぶ",
+        "positive_amount": "正の金額を入力してください",
+        "issue": "ポイントの発行に失敗しました",
+        "non_zero_delta": "ゼロ以外のデルタ (正または負) を入力してください",
+        "adjust": "ポイント調整に失敗しました"
+      }
     }
+  },
+  "admin_a11y": {
+    "refresh_federation_peers": "フェデレーションピアを更新する",
+    "refresh_kpi_baselines": "KPI ベースラインを更新する",
+    "refresh_research_partnerships": "研究パートナーシップを更新する"
   }
 }

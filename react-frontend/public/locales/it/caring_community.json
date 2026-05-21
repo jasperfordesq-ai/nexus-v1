@@ -336,7 +336,8 @@
     "navigation": {
       "label": "Caring community navigation",
       "close": "Close caring community navigation"
-    }
+    },
+    "meta_title": "Amministratore della comunità premurosa"
   },
   "admin": {
     "providers": {
@@ -347,14 +348,14 @@
       "yes": "SÌ",
       "no": "NO",
       "empty": "Ancora nessun fornitore di servizi sanitari: aggiungine uno per iniziare.",
-      "confirm_delete": "Eliminare \"NEXUSPLACEholder0TOKEN\"? Questo lo nasconderà dalla directory.",
-      "confirm_deactivate": "Contrassegnare \"NEXUSPLACEholder0TOKEN\" come inattivo? Puoi riattivarlo in seguito.",
+      "confirm_delete": "Eliminare \"{{name}}\"? Verr? nascosto dalla directory.",
+      "confirm_deactivate": "Contrassegnare \"{{name}}\" come inattivo? Potrai riattivarlo in seguito.",
       "actions": {
         "add_provider": "Aggiungi fornitore",
         "cancel": "Cancellare",
         "close": "Vicino",
         "create_provider": "Crea fornitore",
-        "deactivate_named": "Disattiva \"NEXUSPLACEholder0TOKEN\"",
+        "deactivate_named": "Disattiva \"{{name}}\"",
         "delete_provider": "Elimina fornitore",
         "edit_provider": "Modifica fornitore",
         "find_duplicates": "Trova duplicati",
@@ -371,11 +372,11 @@
       },
       "duplicates": {
         "title": "Potenziali duplicati",
-        "summary": "Fornitori attivi {{scanned}} scansionati: coppie NEXUSPLACEholder1TOKEN con una somiglianza superiore al 65%",
+        "summary": "Analizzati {{scanned}} fornitori attivi - {{total}} coppie sopra il 65% di somiglianza",
         "scanning": "Scansione...",
         "empty": "Nessun probabile duplicato trovato. La directory sembra pulita.",
         "vs": "contro",
-        "match_percent": "NEXUSPLACEholder0TOKEN% corrispondenza"
+        "match_percent": "{{percent}}% di corrispondenza"
       },
       "errors": {
         "delete": "Impossibile eliminare il fornitore.",
@@ -399,19 +400,19 @@
       },
       "messages": {
         "created": "Fornitore creato con successo.",
-        "deactivated": "\"NEXUSPLACEholder0TOKEN\" disattivato.",
+        "deactivated": "\"{{name}}\" disattivato.",
         "removed": "Fornitore rimosso.",
         "updated": "Fornitore aggiornato correttamente.",
-        "verified": "\"NEXUSPLACEholder0TOKEN\" contrassegnato come verificato."
+        "verified": "\"{{name}}\" contrassegnato come verificato."
       },
       "modal": {
         "create_title": "Aggiungi fornitore di servizi sanitari",
-        "edit_title": "Modifica: NEXUSPLACEholder0TOKEN"
+        "edit_title": "Modifica: {{name}}"
       },
       "pagination": {
         "next": "Prossimo",
         "previous": "Precedente",
-        "summary": "Visualizzazione {{from}}-NEXUSPLACEholder1TOKEN dei fornitori NEXUSPLACEholder2TOKEN"
+        "summary": "Visualizzazione di {{from}}-{{to}} su {{total}} fornitori"
       },
       "placeholders": {
         "address": "Via, città, codice postale",
@@ -424,7 +425,8 @@
         "name_match": "Corrispondenza del nome",
         "name_similar": "Nome simile",
         "phone_match": "Corrispondenza telefonica",
-        "website_match": "Corrispondenza del sito web"
+        "website_match": "Corrispondenza del sito web",
+        "unknown": "Segnale sconosciuto: {{signal}}"
       },
       "status": {
         "active": "Attivo",
@@ -456,7 +458,7 @@
       "loading": "Caricamento pass membro...",
       "empty_date": "Non impostato",
       "no_categories": "Nessuna categoria registrata.",
-      "tier_chip": "NEXUSPLACEholder0TOKEN (Livello NEXUSPLACEholder1TOKEN)",
+      "tier_chip": "{{label}} (Livello {{tier}})",
       "about": {
         "title": "A proposito di questa pagina",
         "body": "Un Warmth Pass è una credenziale di fiducia portatile che dimostra che un membro ha raggiunto il livello di fiducia, ha ricevuto revisioni tra pari ed è idoneo a fornire assistenza informale di quartiere. I destinatari possono richiedere di vedere il Warmth Pass di un aiutante prima di accettare l'assistenza. Utilizza questa ricerca per verificare le credenziali di un membro su richiesta o per assistere un membro che non è sicuro della propria idoneità."
@@ -499,7 +501,9 @@
     "common": {
       "refresh": "Refresh",
       "cancel": "Cancel",
-      "empty_dash": "-"
+      "empty_dash": "-",
+      "all": "Tutto",
+      "close": "Vicino"
     },
     "loyalty": {
       "title": "Loyalty Programme",
@@ -547,7 +551,8 @@
         "status": "Status",
         "actions": "Actions",
         "reverse": "Reverse",
-        "empty_value": "-"
+        "empty_value": "-",
+        "aria": "Riscatti fedeltà recenti"
       },
       "reverse_modal": {
         "title": "Reverse redemption",
@@ -572,6 +577,11 @@
         "discount_range": "Max discount percent must be between 0 and 100",
         "save_settings": "Failed to save settings",
         "reverse": "Failed to reverse redemption"
+      },
+      "status": {
+        "pending": "In attesa di",
+        "applied": "Applicato",
+        "reversed": "Invertito"
       }
     },
     "hour_transfers": {
@@ -584,11 +594,15 @@
       },
       "pending": {
         "title": "Awaiting your approval",
-        "empty": "No pending transfers."
+        "empty": "No pending transfers.",
+        "description": "Ogni trasferimento deve essere approvato manualmente da un amministratore. Verifica che l'e-mail del membro di destinazione corrisponda al nuovo account del membro prima di approvare.",
+        "table_aria": "Trasferimenti orari in uscita in sospeso"
       },
       "inbound": {
         "title": "Received from other cooperatives (last 90 days)",
-        "empty": "No transfers received in the last 90 days."
+        "empty": "No transfers received in the last 90 days.",
+        "description": "Questo è solo un registro di controllo: i trasferimenti in entrata vengono elaborati automaticamente quando la cooperativa di origine li approva. Non è richiesta alcuna azione qui.",
+        "table_aria": "Trasferimenti orari in entrata"
       },
       "actions": {
         "approve": "Approve",
@@ -608,6 +622,25 @@
         "load_inbound": "Failed to load inbound transfers",
         "approve": "Approval failed",
         "reject": "Rejection failed"
+      },
+      "table": {
+        "actions": "Azioni",
+        "date": "Data",
+        "destination": "Destinazione",
+        "hours": "Ore",
+        "member": "Membro",
+        "member_credited": "Membro accreditato",
+        "reason": "Motivo",
+        "source": "Fonte",
+        "status": "Stato"
+      },
+      "status": {
+        "approved_by_source": "Approvato dalla fonte",
+        "completed": "Completato",
+        "pending": "In attesa di",
+        "received": "Ricevuto",
+        "rejected": "Respinto",
+        "sent": "Inviato"
       }
     },
     "surveys": {
@@ -834,6 +867,310 @@
         "months_ago_one": "{{count}}mo ago",
         "months_ago_other": "{{count}}mo ago"
       }
+    },
+    "civic_digest": {
+      "meta_title": "Cadenza del digest civico",
+      "title": "Cadenza del digest civico",
+      "subtitle": "Configura la cadenza di consegna predefinita per il compendio civico personalizzato che i membri ricevono. Il riepilogo aggrega i contenuti rilevanti della comunità (avvisi di sicurezza, aggiornamenti di progetti, avvisi di eventi e annunci) in un unico riepilogo.",
+      "preview_member_view": "Anteprima della visualizzazione dei membri",
+      "reset": "Reset",
+      "save": "Risparmia cadenza",
+      "member_override": "I membri possono ignorare la cadenza e disattivare singole fonti dalla propria pagina delle preferenze del digest.",
+      "about": {
+        "title": "A proposito di questa pagina",
+        "body": "Il Civic Digest sostituisce la necessità per i membri di controllare più pagine fornendo un riepilogo personalizzato di ciò che è rilevante per loro. Puoi impostare il valore predefinito del tenant qui. I membri possono ignorare la cadenza o disattivarla completamente dalle proprie impostazioni. La modifica dell'impostazione predefinita del tenant interessa solo i membri che non hanno mai personalizzato la propria preferenza."
+      },
+      "cadence": {
+        "title": "Cadenza predefinita del tenant",
+        "description": "Controlla la cadenza di consegna predefinita per i nuovi membri. I membri esistenti mantengono ciò che hanno già scelto.",
+        "current": "Attuale: {{cadence}}"
+      },
+      "options": {
+        "off": {
+          "label": "Spento",
+          "description": "Non viene inviato alcun riepilogo. I membri vedono gli aggiornamenti solo quando visitano la piattaforma."
+        },
+        "daily": {
+          "label": "Quotidiano",
+          "description": "Ogni mattina viene inviato un riassunto con l'attività del giorno precedente."
+        },
+        "monthly": {
+          "label": "Mensile",
+          "description": "Il primo giorno di ogni mese viene inviato un riepilogo relativo all'attività recente."
+        }
+      },
+      "includes": {
+        "title": "Cosa include il digest",
+        "description": "Gli articoli vengono classificati per membro in base alla corrispondenza della sottoregione, alla corrispondenza degli interessi, alla freschezza e al peso dell'origine. Miscela di fonti:",
+        "sources": {
+          "safety_alerts": "Avvisi di sicurezza",
+          "project_updates": "Aggiornamenti del progetto",
+          "municipality_announcements": "Avvisi del Comune",
+          "events": "Eventi",
+          "vereine": "Vereine",
+          "care_providers": "Fornitori di cure",
+          "marketplace": "Mercato",
+          "help_requests": "Richieste di aiuto",
+          "feed_posts": "Alimenta i post"
+        }
+      },
+      "messages": {
+        "saved": "Cadenza del digest salvata"
+      },
+      "errors": {
+        "load": "Impossibile caricare la cadenza del digest",
+        "save": "Impossibile salvare la cadenza"
+      }
+    },
+    "recipient_circle": {
+      "meta_title": "Circolo dei destinatari delle cure",
+      "title": "Circolo dei destinatari delle cure",
+      "subtitle": "Visualizza l'intera rete di supporto attorno a qualsiasi membro",
+      "recipient": "Destinatario",
+      "loading": "Caricamento cerchia destinatari...",
+      "member_since": "Membro dal {{date}}",
+      "member_id_value": "ID {{id}}",
+      "safeguarding_flags_one": "{{count}} bandiera di salvaguardia",
+      "safeguarding_flags_other": "{{count}} bandiere di salvaguardia",
+      "about": {
+        "title": "A proposito di questa pagina",
+        "body": "Un Care Recipient Circle è un gruppo di supporto privato attorno a un individuo che riceve assistenza. Questa visualizzazione mostra l'intera rete di supporto: tutti gli aiutanti, le ore totali ricevute, le richieste di aiuto aperte ed eventuali flag di salvaguardia. Inserisci l'ID utente del membro per cercare la sua cerchia.",
+        "trust_tiers_label": "Livelli di fiducia:",
+        "trust_tiers_body": "Nuovo arrivato, Membro, Affidabile, Verificato, Coordinatore: mostrato per il destinatario e ciascun sostenitore.",
+        "safeguarding_label": "Salvaguardia delle bandiere:",
+        "safeguarding_body": "Un conteggio di flag diverso da zero indica problemi di protezione attivi registrati nei confronti di questo membro. Esaminateli nella sezione Salvaguardia.",
+        "privacy_label": "Privacy:",
+        "privacy_body": "I dati della cerchia sono visibili solo ai membri della cerchia e agli amministratori dei tenant. Non è incluso nei report a livello di comunità o nella directory dei membri."
+      },
+      "lookup": {
+        "member_id": "ID membro",
+        "placeholder": "Inserisci l'ID utente membro...",
+        "button": "Visualizza cerchio"
+      },
+      "stats": {
+        "total_hours": "Ore totali ricevute",
+        "active_supporters": "Sostenitori attivi",
+        "open_help_requests": "Apri Richieste di aiuto"
+      },
+      "tiers": {
+        "newcomer": "Nuovo arrivato",
+        "member": "Membro",
+        "trusted": "Fidato",
+        "verified": "Verificato",
+        "coordinator": "Coordinatore",
+        "fallback": "Livello {{tier}}"
+      },
+      "relationship_types": {
+        "care": "Cura",
+        "support": "Supporto",
+        "family": "Famiglia",
+        "friend": "Amico",
+        "neighbour": "Vicino",
+        "professional": "Professionale",
+        "unknown": "Relazione sconosciuta: {{type}}"
+      },
+      "status": {
+        "active": "Attivo",
+        "paused": "In pausa",
+        "ended": "Finito",
+        "unknown": "Stato sconosciuto: {{status}}"
+      },
+      "relationships": {
+        "title": "Relazioni di supporto",
+        "empty": "Nessuna relazione di supporto attiva",
+        "aria": "Supportare le relazioni",
+        "supporter": "Sostenitore",
+        "trust_tier": "Livello di fiducia",
+        "type": "Tipo",
+        "hours_logged": "Ore registrate",
+        "last_activity": "Ultima attività",
+        "status": "Stato"
+      },
+      "errors": {
+        "load": "Impossibile caricare la cerchia dei destinatari. Controlla l'ID membro e riprova."
+      }
+    },
+    "safeguarding_reports": {
+      "meta_title": "Rapporti di salvaguardia - Ammin",
+      "title": "Rapporti di salvaguardia",
+      "subtitle": "Esaminare, assegnare e risolvere i problemi di salvaguardia sollevati dai membri.",
+      "empty_dash": "-",
+      "actor_id": "#{{id}}",
+      "subject_org": "Organizzazione #{{id}}",
+      "overdue": "In ritardo",
+      "escalated": "Incrementato",
+      "open": "Aprire",
+      "report_title": "Segnala #{{id}}",
+      "empty": "Nessun rapporto di salvaguardia corrisponde a questi filtri.",
+      "loading": "Caricamento dei rapporti di salvaguardia",
+      "loading_detail": "Caricamento dei dettagli del rapporto di protezione",
+      "about": {
+        "title": "A proposito di questa pagina",
+        "body": "Questa pagina gestisce gli incidenti di salvaguardia formale: situazioni in cui il benessere, la sicurezza o la dignità di un membro possono essere a rischio. Le relazioni vengono presentate dai membri, dai coordinatori o dagli amministratori. Tutti i report devono essere sottoposti a valutazione nell'ambito dello SLA configurato nella Politica operativa. Le segnalazioni critiche e di gravità elevata richiedono attenzione immediata. I report hanno come ambito il tenant e non possono essere visualizzati da altre comunità."
+      },
+      "severity": {
+        "critical": "Critico",
+        "high": "Alto",
+        "medium": "Medio",
+        "low": "Basso"
+      },
+      "status": {
+        "submitted": "Inviato",
+        "triaged": "Triage",
+        "investigating": "Indagando",
+        "resolved": "Risolto",
+        "dismissed": "Licenziato"
+      },
+      "severity_legend": {
+        "title": "Livelli di gravità",
+        "critical": "Rischio fisico immediato: intensificare entro 1 ora.",
+        "high": "Preoccupazione seria: triage entro 24 ore.",
+        "medium": "Significativo ma non urgente: triage entro 72 ore.",
+        "low": "Piccola preoccupazione: revisione alla prossima riunione del coordinatore."
+      },
+      "workflow": {
+        "title": "Flusso di lavoro dello stato",
+        "submitted": "Rapporto ricevuto, non ancora esaminato da un coordinatore.",
+        "triaged": "Il coordinatore ha valutato la gravità e assegnato la proprietà.",
+        "investigating": "Indagine attiva o intervento di supporto in corso.",
+        "resolved": "Chiuso con note di risoluzione documentate dopo l'esecuzione dell'azione.",
+        "dismissed": "Chiuso senza ulteriori azioni. È necessario registrare un motivo."
+      },
+      "filters": {
+        "status": "Stato",
+        "severity": "Gravità"
+      },
+      "table": {
+        "aria": "Salvaguardia dei rapporti",
+        "severity": "Gravità",
+        "category": "Categoria",
+        "reporter": "Reporter",
+        "subject": "Soggetto",
+        "status": "Stato",
+        "assigned": "Assegnato",
+        "sla": "Accordo sul livello di servizio",
+        "sla_abbr": "SLA",
+        "created": "Creato",
+        "actions": "Azioni"
+      },
+      "fields": {
+        "category": "Categoria",
+        "reporter": "Reporter",
+        "subject": "Soggetto",
+        "description": "Descrizione",
+        "evidence": "Prova",
+        "resolution_notes": "Note sulla risoluzione"
+      },
+      "actions": {
+        "title": "Azioni",
+        "assignee_user_id": "ID utente assegnatario",
+        "assign": "Assegnare",
+        "escalation_note": "Nota di escalation (facoltativa)",
+        "escalate": "Aumentare",
+        "set_status": "Imposta lo stato",
+        "notes": "Note (facoltativo)",
+        "update": "Aggiornamento",
+        "resolved_hint": "\"Risolto\" chiude questo report con note di risoluzione documentate. Utilizzare quando è stata intrapresa un'azione.",
+        "dismissed_hint": "\"Ignorato\" chiude questo report senza ulteriori azioni. Il motivo deve essere registrato nelle note sopra.",
+        "add_note": "Aggiungi nota"
+      },
+      "history": {
+        "title": "Storia",
+        "empty": "Nessuna azione ancora.",
+        "by_actor": "di {{name}}"
+      },
+      "messages": {
+        "assigned": "Assegnato",
+        "escalated": "Incrementato",
+        "status_updated": "Stato aggiornato",
+        "note_added": "Nota aggiunta"
+      },
+      "errors": {
+        "load": "Impossibile caricare i rapporti",
+        "load_detail": "Impossibile caricare i dettagli del rapporto",
+        "assign": "Assegnazione non riuscita",
+        "escalate": "L'escalation non è riuscita",
+        "status": "La modifica dello stato non è riuscita",
+        "note": "Nota non riuscita"
+      }
+    },
+    "regional_points": {
+      "title": "Punti regionali",
+      "description": "Programma di terza valuta: funziona insieme ai crediti temporali e alla valuta del mercato. Disabilitato per impostazione predefinita.",
+      "about": {
+        "title": "A proposito di questa pagina",
+        "body": "I punti regionali sono crediti supplementari utilizzati per riconoscere contributi che non rientrano nel modello standard di scambio orario, ad esempio la partecipazione a eventi della comunità, la partecipazione a sondaggi o il completamento della formazione. Sono distinti dai crediti di tempo (ore di assistenza) e non possono essere convertiti in essi. Usateli per incoraggiare una più ampia partecipazione della comunità oltre l’assistenza diretta.",
+        "secondary": "Assegna manualmente i punti ai singoli membri utilizzando il problema o modifica gli strumenti di seguito. I punti vengono visualizzati nel portafoglio del membro insieme al saldo del credito temporale. I membri possono riscattare i punti regionali per i premi locali definiti nel programma fedeltà. I punti scadono dopo 12 mesi, a meno che l'impostazione di scadenza non sia impostata su 0 (non scadono mai)."
+      },
+      "stats": {
+        "total_balance": "Saldo totale emesso",
+        "lifetime_issued": "Rilasciato a vita",
+        "lifetime_spent": "Trascorsa tutta la vita",
+        "member_accounts": "Conti dei membri"
+      },
+      "config": {
+        "title": "Configurazione del programma",
+        "enabled": "Programma abilitato",
+        "enabled_hint": "Quando è disattivata, la terza valuta è nascosta ai membri e gli endpoint di amministrazione restituiscono 403.",
+        "display_label": "Visualizza etichetta",
+        "display_label_description": "Visualizzato nel portafoglio (ad es. \"Punti regionali\", \"Stadtmuenze\")",
+        "symbol": "Simbolo",
+        "symbol_description": "Suffisso breve mostrato accanto agli importi (ad esempio \"pts\", \"SM\")",
+        "auto_issue": "Emissione automatica negli orari approvati",
+        "auto_issue_hint": "Quando viene registrata un'ora verificata, assegna automaticamente questo numero di punti regionali.",
+        "points_per_hour": "Punti per ora approvata",
+        "member_transfers": "Trasferimenti da membro a membro",
+        "member_transfers_hint": "Consenti ai membri di scambiarsi punti.",
+        "marketplace_redemption": "Redenzione sul mercato",
+        "marketplace_redemption_hint": "Consenti ai membri di riscattare i punti come sconto in CHF sui venditori partecipanti.",
+        "save": "Salva configurazione"
+      },
+      "member_balance": {
+        "title": "Emettere/modificare il saldo dei membri",
+        "member": "Membro",
+        "member_placeholder": "Cerca per nome o email",
+        "no_matching_members": "Nessun membro corrispondente",
+        "clear": "Chiaro",
+        "tabs_aria": "Azioni di saldo punti regionali",
+        "issue_tab": "Punti problematici",
+        "points_to_issue": "Punti al problema",
+        "description": "Descrizione",
+        "issue": "Punti problematici",
+        "adjust_tab": "Regola (+/-)",
+        "points_delta": "Delta punti (positivo o negativo)",
+        "apply_adjustment": "Applicare la regolazione"
+      },
+      "ledger": {
+        "title": "Voci contabili recenti",
+        "aria": "Voci recenti del registro dei punti regionali",
+        "empty": "Nessuna voce contabile ancora.",
+        "date": "Data",
+        "member": "Membro",
+        "type": "Tipo",
+        "description": "Descrizione",
+        "points": "Punti",
+        "balance": "Bilancia",
+        "user_fallback": "#{{id}}"
+      },
+      "messages": {
+        "config_saved": "Configurazione salvata",
+        "issued": "{{amount}} emesso punta a {{member}}",
+        "adjusted": "{{member}} modificato in base ai punti {{delta}}"
+      },
+      "errors": {
+        "load": "Impossibile caricare i punti regionali",
+        "save_config": "Impossibile salvare la configurazione",
+        "pick_member": "Scegli prima un membro",
+        "positive_amount": "Inserisci un importo positivo",
+        "issue": "Impossibile assegnare punti",
+        "non_zero_delta": "Inserisci un delta diverso da zero (positivo o negativo)",
+        "adjust": "Impossibile regolare i punti"
+      }
     }
+  },
+  "admin_a11y": {
+    "refresh_federation_peers": "Aggiorna i peer della federazione",
+    "refresh_kpi_baselines": "Aggiorna le linee di base KPI",
+    "refresh_research_partnerships": "Aggiornare i partenariati di ricerca"
   }
 }

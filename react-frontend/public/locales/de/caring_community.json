@@ -336,7 +336,8 @@
     "navigation": {
       "label": "Caring community navigation",
       "close": "Close caring community navigation"
-    }
+    },
+    "meta_title": "Fürsorglicher Community-Administrator"
   },
   "admin": {
     "providers": {
@@ -424,7 +425,8 @@
         "name_match": "Namensübereinstimmung",
         "name_similar": "Name ähnlich",
         "phone_match": "Telefonübereinstimmung",
-        "website_match": "Website-Übereinstimmung"
+        "website_match": "Website-Übereinstimmung",
+        "unknown": "Unbekanntes Signal: {{signal}}"
       },
       "status": {
         "active": "Aktiv",
@@ -499,7 +501,9 @@
     "common": {
       "refresh": "Refresh",
       "cancel": "Cancel",
-      "empty_dash": "-"
+      "empty_dash": "-",
+      "all": "Alle",
+      "close": "Schließen"
     },
     "loyalty": {
       "title": "Loyalty Programme",
@@ -547,7 +551,8 @@
         "status": "Status",
         "actions": "Actions",
         "reverse": "Reverse",
-        "empty_value": "-"
+        "empty_value": "-",
+        "aria": "Aktuelle Treueeinlösungen"
       },
       "reverse_modal": {
         "title": "Reverse redemption",
@@ -572,6 +577,11 @@
         "discount_range": "Max discount percent must be between 0 and 100",
         "save_settings": "Failed to save settings",
         "reverse": "Failed to reverse redemption"
+      },
+      "status": {
+        "pending": "Ausstehend",
+        "applied": "Angewandt",
+        "reversed": "Umgedreht"
       }
     },
     "hour_transfers": {
@@ -584,11 +594,15 @@
       },
       "pending": {
         "title": "Awaiting your approval",
-        "empty": "No pending transfers."
+        "empty": "No pending transfers.",
+        "description": "Jede Übertragung muss manuell von einem Administrator genehmigt werden. Überprüfen Sie vor der Genehmigung, ob die E-Mail-Adresse des Zielmitglieds mit dem neuen Konto des Mitglieds übereinstimmt.",
+        "table_aria": "Ausstehende ausgehende Stundentransfers"
       },
       "inbound": {
         "title": "Received from other cooperatives (last 90 days)",
-        "empty": "No transfers received in the last 90 days."
+        "empty": "No transfers received in the last 90 days.",
+        "description": "Dies ist nur ein Prüfprotokoll – eingehende Übertragungen werden automatisch verarbeitet, wenn die Quellgenossenschaft sie genehmigt. Hier besteht kein Handlungsbedarf.",
+        "table_aria": "Eingehende Stundentransfers"
       },
       "actions": {
         "approve": "Approve",
@@ -608,6 +622,25 @@
         "load_inbound": "Failed to load inbound transfers",
         "approve": "Approval failed",
         "reject": "Rejection failed"
+      },
+      "table": {
+        "actions": "Aktionen",
+        "date": "Datum",
+        "destination": "Ziel",
+        "hours": "Std",
+        "member": "Mitglied",
+        "member_credited": "Mitglied gutgeschrieben",
+        "reason": "Grund",
+        "source": "Quelle",
+        "status": "Status"
+      },
+      "status": {
+        "approved_by_source": "Von der Quelle genehmigt",
+        "completed": "Vollendet",
+        "pending": "Ausstehend",
+        "received": "Erhalten",
+        "rejected": "Abgelehnt",
+        "sent": "Gesendet"
       }
     },
     "surveys": {
@@ -834,6 +867,310 @@
         "months_ago_one": "{{count}}mo ago",
         "months_ago_other": "{{count}}mo ago"
       }
+    },
+    "civic_digest": {
+      "meta_title": "Civic Digest Trittfrequenz",
+      "title": "Civic Digest Trittfrequenz",
+      "subtitle": "Konfigurieren Sie den Standard-Übermittlungsrhythmus für den personalisierten Civic Digest, den Mitglieder erhalten. Der Digest fasst relevante Community-Inhalte – Sicherheitswarnungen, Projektaktualisierungen, Veranstaltungshinweise und Ankündigungen – in einer einzigen Zusammenfassung zusammen.",
+      "preview_member_view": "Vorschau der Mitgliederansicht",
+      "reset": "Zurücksetzen",
+      "save": "Trittfrequenz speichern",
+      "member_override": "Mitglieder können die Trittfrequenz überschreiben und einzelne Quellen auf ihrer eigenen Digest-Einstellungsseite deaktivieren.",
+      "about": {
+        "title": "Über diese Seite",
+        "body": "Der Civic Digest macht es für Mitglieder überflüssig, mehrere Seiten durchzusehen, indem er eine personalisierte Zusammenfassung dessen liefert, was für sie relevant ist. Hier legen Sie den Mandantenstandard fest. Mitglieder können die Kadenz über ihre eigenen Einstellungen überschreiben oder ganz ablehnen. Das Ändern des Mandantenstandards betrifft nur Mitglieder, die ihre Präferenz nie angepasst haben."
+      },
+      "cadence": {
+        "title": "Standardrhythmus des Mandanten",
+        "description": "Steuert den Standard-Übermittlungsrhythmus für neue Mitglieder. Bestehende Mitglieder behalten alles, was sie bereits ausgewählt haben.",
+        "current": "Aktuell: {{cadence}}"
+      },
+      "options": {
+        "off": {
+          "label": "Aus",
+          "description": "Es wird kein Digest gesendet. Mitglieder sehen Aktualisierungen nur, wenn sie die Plattform besuchen."
+        },
+        "daily": {
+          "label": "Täglich",
+          "description": "Jeden Morgen wird eine Zusammenfassung mit den Aktivitäten des Vortages gesendet."
+        },
+        "monthly": {
+          "label": "Monatlich",
+          "description": "Am ersten Tag jedes Monats wird eine Übersicht über die letzten Aktivitäten gesendet."
+        }
+      },
+      "includes": {
+        "title": "Was der Digest beinhaltet",
+        "description": "Die Artikel werden pro Mitglied nach Unterregionsübereinstimmung, Interessenübereinstimmung, Frische und Quellengewicht eingestuft. Quellmix:",
+        "sources": {
+          "safety_alerts": "Sicherheitswarnungen",
+          "project_updates": "Projektaktualisierungen",
+          "municipality_announcements": "Mitteilungen der Gemeinde",
+          "events": "Veranstaltungen",
+          "vereine": "Vereine",
+          "care_providers": "Pflegedienstleister",
+          "marketplace": "Marktplatz",
+          "help_requests": "Hilfeanfragen",
+          "feed_posts": "Feed-Beiträge"
+        }
+      },
+      "messages": {
+        "saved": "Digest-Trittfrequenz gespeichert"
+      },
+      "errors": {
+        "load": "Die Digest-Kadenz konnte nicht geladen werden",
+        "save": "Trittfrequenz konnte nicht gespeichert werden"
+      }
+    },
+    "recipient_circle": {
+      "meta_title": "Kreis der Pflegebedürftigen",
+      "title": "Kreis der Pflegebedürftigen",
+      "subtitle": "Sehen Sie sich das vollständige Support-Netzwerk rund um jedes Mitglied an",
+      "recipient": "Empfänger",
+      "loading": "Empfängerkreis wird geladen...",
+      "member_since": "Mitglied seit {{date}}",
+      "member_id_value": "ID {{id}}",
+      "safeguarding_flags_one": "{{count}}-Schutzflag",
+      "safeguarding_flags_other": "{{count}}-Schutzflags",
+      "about": {
+        "title": "Über diese Seite",
+        "body": "Ein Care Recipient Circle ist eine private Selbsthilfegruppe rund um eine Person, die Pflege erhält. Diese Ansicht zeigt ihr gesamtes Support-Netzwerk: alle Helfer, insgesamt erhaltene Stunden, offene Hilfeanfragen und alle Sicherheitsmarkierungen. Geben Sie die Benutzer-ID des Mitglieds ein, um seinen Kreis zu suchen.",
+        "trust_tiers_label": "Vertrauensstufen:",
+        "trust_tiers_body": "Neuling, Mitglied, Vertrauenswürdig, Verifiziert, Koordinator – wird für den Empfänger und jeden Unterstützer angezeigt.",
+        "safeguarding_label": "Fahnensicherung:",
+        "safeguarding_body": "Eine Flag-Zählung ungleich Null weist auf aktive Schutzbedenken hin, die gegen dieses Mitglied registriert wurden. Sehen Sie sich diese im Abschnitt „Schutz“ an.",
+        "privacy_label": "Datenschutz:",
+        "privacy_body": "Kreisdaten sind nur für Kreismitglieder und Mandantenadministratoren sichtbar. Es ist nicht in gemeinschaftsweiten Berichten oder im Mitgliederverzeichnis enthalten."
+      },
+      "lookup": {
+        "member_id": "Mitglieds-ID",
+        "placeholder": "Geben Sie die Benutzer-ID des Mitglieds ein...",
+        "button": "Kreis anzeigen"
+      },
+      "stats": {
+        "total_hours": "Insgesamt erhaltene Stunden",
+        "active_supporters": "Aktive Unterstützer",
+        "open_help_requests": "Öffnen Sie Hilfeanfragen"
+      },
+      "tiers": {
+        "newcomer": "Neuling",
+        "member": "Mitglied",
+        "trusted": "Vertrauenswürdig",
+        "verified": "Verifiziert",
+        "coordinator": "Koordinator",
+        "fallback": "Stufe {{tier}}"
+      },
+      "relationship_types": {
+        "care": "Pflege",
+        "support": "Unterstützung",
+        "family": "Familie",
+        "friend": "Freund",
+        "neighbour": "Nachbar",
+        "professional": "Professional",
+        "unknown": "Unbekannte Beziehung: {{type}}"
+      },
+      "status": {
+        "active": "Aktiv",
+        "paused": "Angehalten",
+        "ended": "Beendet",
+        "unknown": "Unbekannter Status: {{status}}"
+      },
+      "relationships": {
+        "title": "Unterstützen Sie Beziehungen",
+        "empty": "Keine aktiven Unterstützungsbeziehungen",
+        "aria": "Unterstützen Sie Beziehungen",
+        "supporter": "Fan",
+        "trust_tier": "Vertrauensstufe",
+        "type": "Typ",
+        "hours_logged": "Protokollierte Stunden",
+        "last_activity": "Letzte Aktivität",
+        "status": "Status"
+      },
+      "errors": {
+        "load": "Empfängerkreis konnte nicht geladen werden. Überprüfen Sie die Mitglieds-ID und versuchen Sie es erneut."
+      }
+    },
+    "safeguarding_reports": {
+      "meta_title": "Schutzberichte – Admin",
+      "title": "Schutzberichte",
+      "subtitle": "Von Mitgliedern geäußerte Sicherheitsbedenken prüfen, zuweisen und lösen.",
+      "empty_dash": "-",
+      "actor_id": "#{{id}}",
+      "subject_org": "Organisation #{{id}}",
+      "overdue": "Überfällig",
+      "escalated": "Eskaliert",
+      "open": "Offen",
+      "report_title": "#{{id}} melden",
+      "empty": "Keine Schutzberichte entsprechen diesen Filtern.",
+      "loading": "Schutzberichte werden geladen",
+      "loading_detail": "Details zum Schutzbericht werden geladen",
+      "about": {
+        "title": "Über diese Seite",
+        "body": "Auf dieser Seite werden formelle Schutzvorfälle verwaltet: Situationen, in denen das Wohlergehen, die Sicherheit oder die Würde eines Mitglieds gefährdet sein könnten. Berichte werden von Mitgliedern, Koordinatoren oder Administratoren eingereicht. Alle Berichte müssen innerhalb des in der Betriebsrichtlinie konfigurierten SLA einer Triage unterzogen werden. Kritische Meldungen und Meldungen mit hohem Schweregrad erfordern sofortige Aufmerksamkeit. Berichte gelten für Mandanten und können von anderen Communities nicht eingesehen werden."
+      },
+      "severity": {
+        "critical": "Kritisch",
+        "high": "Hoch",
+        "medium": "Medium",
+        "low": "Niedrig"
+      },
+      "status": {
+        "submitted": "Eingereicht",
+        "triaged": "Triagiert",
+        "investigating": "Untersuchen",
+        "resolved": "Gelöst",
+        "dismissed": "Entlassen"
+      },
+      "severity_legend": {
+        "title": "Schweregrade",
+        "critical": "Unmittelbares körperliches Risiko: Eskalation innerhalb einer Stunde.",
+        "high": "Ernsthaftes Anliegen: Triage innerhalb von 24 Stunden.",
+        "medium": "Wichtig, aber nicht dringend: Triage innerhalb von 72 Stunden.",
+        "low": "Kleinere Sorge: Überprüfung beim nächsten Koordinatorentreffen."
+      },
+      "workflow": {
+        "title": "Status-Workflow",
+        "submitted": "Bericht erhalten, noch nicht von einem Koordinator überprüft.",
+        "triaged": "Der Koordinator hat den Schweregrad bewertet und die Verantwortung zugewiesen.",
+        "investigating": "Aktive Untersuchung oder unterstützende Intervention im Gange.",
+        "resolved": "Wird mit dokumentierten Lösungsnotizen abgeschlossen, nachdem Maßnahmen ergriffen wurden.",
+        "dismissed": "Ohne weitere Maßnahmen geschlossen. Ein Grund muss protokolliert werden."
+      },
+      "filters": {
+        "status": "Status",
+        "severity": "Schwere"
+      },
+      "table": {
+        "aria": "Sicherstellung von Berichten",
+        "severity": "Schwere",
+        "category": "Kategorie",
+        "reporter": "Reporter",
+        "subject": "Thema",
+        "status": "Status",
+        "assigned": "Zugewiesen",
+        "sla": "Service-Level-Agreement",
+        "sla_abbr": "SLA",
+        "created": "Erstellt",
+        "actions": "Aktionen"
+      },
+      "fields": {
+        "category": "Kategorie",
+        "reporter": "Reporter",
+        "subject": "Thema",
+        "description": "Beschreibung",
+        "evidence": "Beweis",
+        "resolution_notes": "Hinweise zur Lösung"
+      },
+      "actions": {
+        "title": "Aktionen",
+        "assignee_user_id": "Benutzer-ID des Beauftragten",
+        "assign": "Zuordnen",
+        "escalation_note": "Eskalationshinweis (optional)",
+        "escalate": "Eskalieren",
+        "set_status": "Status festlegen",
+        "notes": "Notizen (optional)",
+        "update": "Aktualisieren",
+        "resolved_hint": "„Gelöst“ schließt diesen Bericht mit dokumentierten Lösungsnotizen ab. Verwenden Sie diese Option, wenn Maßnahmen ergriffen wurden.",
+        "dismissed_hint": "„Abgelehnt“ schließt diesen Bericht ab, ohne dass weitere Maßnahmen ergriffen werden müssen. In den obigen Anmerkungen ist ein Grund anzugeben.",
+        "add_note": "Notiz hinzufügen"
+      },
+      "history": {
+        "title": "Geschichte",
+        "empty": "Noch keine Aktionen.",
+        "by_actor": "von {{name}}"
+      },
+      "messages": {
+        "assigned": "Zugewiesen",
+        "escalated": "Eskaliert",
+        "status_updated": "Status aktualisiert",
+        "note_added": "Hinweis hinzugefügt"
+      },
+      "errors": {
+        "load": "Berichte konnten nicht geladen werden",
+        "load_detail": "Berichtsdetails konnten nicht geladen werden",
+        "assign": "Zuweisung fehlgeschlagen",
+        "escalate": "Die Eskalation ist fehlgeschlagen",
+        "status": "Statusänderung fehlgeschlagen",
+        "note": "Hinweis fehlgeschlagen"
+      }
+    },
+    "regional_points": {
+      "title": "Regionale Punkte",
+      "description": "Drittwährungsprogramm – läuft neben Zeitguthaben und der Marktplatzwährung. Standardmäßig deaktiviert.",
+      "about": {
+        "title": "Über diese Seite",
+        "body": "Regionale Punkte sind zusätzliche Credits, die zur Anerkennung von Beiträgen verwendet werden, die nicht dem Standardmodell des Stundenaustauschs entsprechen – beispielsweise die Teilnahme an Community-Veranstaltungen, die Teilnahme an Umfragen oder die Teilnahme an Schulungen. Sie unterscheiden sich von Zeitguthaben (Pflegestunden) und können nicht in diese umgewandelt werden. Nutzen Sie sie, um eine breitere Beteiligung der Gemeinschaft über die direkte Pflege hinaus zu fördern.",
+        "secondary": "Weisen Sie einzelnen Mitgliedern manuell Punkte zu, indem Sie die unten aufgeführten Problem- oder Anpassungstools verwenden. Die Punkte erscheinen im Guthaben des Mitglieds zusammen mit seinem Zeitguthaben. Mitglieder können regionale Punkte gegen lokale Prämien einlösen, die im Treueprogramm definiert sind. Punkte verfallen nach 12 Monaten, es sei denn, die Ablaufeinstellung ist auf 0 (nie verfallen) gesetzt."
+      },
+      "stats": {
+        "total_balance": "Gesamtbetrag ausgegeben",
+        "lifetime_issued": "Auf Lebenszeit ausgestellt",
+        "lifetime_spent": "Lebenszeit verbracht",
+        "member_accounts": "Mitgliedskonten"
+      },
+      "config": {
+        "title": "Programmkonfiguration",
+        "enabled": "Programm aktiviert",
+        "enabled_hint": "Wenn diese Option deaktiviert ist, wird die dritte Währung für Mitglieder ausgeblendet und Administratorendpunkte geben 403 zurück.",
+        "display_label": "Etikett anzeigen",
+        "display_label_description": "Wird im Wallet angezeigt (z. B. „Regionalpunkte“, „Stadtmünze“)",
+        "symbol": "Symbol",
+        "symbol_description": "Kurzes Suffix, das neben den Beträgen angezeigt wird (z. B. „pts“, „SM“)",
+        "auto_issue": "Automatische Ausstellung zu genehmigten Zeiten",
+        "auto_issue_hint": "Wenn eine verifizierte Stunde protokolliert wird, werden automatisch so viele regionale Punkte vergeben.",
+        "points_per_hour": "Punkte pro genehmigter Stunde",
+        "member_transfers": "Übertragungen von Mitglied zu Mitglied",
+        "member_transfers_hint": "Erlauben Sie Mitgliedern, sich gegenseitig Punkte zu senden.",
+        "marketplace_redemption": "Marktplatzeinlösung",
+        "marketplace_redemption_hint": "Ermöglichen Sie Mitgliedern, Punkte als CHF-Rabatt bei teilnehmenden Verkäufern einzulösen.",
+        "save": "Konfiguration speichern"
+      },
+      "member_balance": {
+        "title": "Mitgliederguthaben ausstellen/anpassen",
+        "member": "Mitglied",
+        "member_placeholder": "Suchen Sie nach Name oder E-Mail",
+        "no_matching_members": "Keine passenden Mitglieder",
+        "clear": "Klar",
+        "tabs_aria": "Aktionen zum regionalen Punkteausgleich",
+        "issue_tab": "Problempunkte",
+        "points_to_issue": "Punkte zur Ausgabe",
+        "description": "Beschreibung",
+        "issue": "Problempunkte",
+        "adjust_tab": "Anpassen (+/-)",
+        "points_delta": "Punktedelta (positiv oder negativ)",
+        "apply_adjustment": "Anpassung anwenden"
+      },
+      "ledger": {
+        "title": "Aktuelle Hauptbucheinträge",
+        "aria": "Aktuelle regionale Punktebucheinträge",
+        "empty": "Noch keine Bucheinträge.",
+        "date": "Datum",
+        "member": "Mitglied",
+        "type": "Typ",
+        "description": "Beschreibung",
+        "points": "Punkte",
+        "balance": "Gleichgewicht",
+        "user_fallback": "#{{id}}"
+      },
+      "messages": {
+        "config_saved": "Konfiguration gespeichert",
+        "issued": "Ausgegebenes {{amount}} verweist auf {{member}}",
+        "adjusted": "{{member}} um {{delta}}-Punkte angepasst"
+      },
+      "errors": {
+        "load": "Regionale Punkte konnten nicht geladen werden",
+        "save_config": "Die Konfiguration konnte nicht gespeichert werden",
+        "pick_member": "Wählen Sie zuerst ein Mitglied aus",
+        "positive_amount": "Geben Sie einen positiven Betrag ein",
+        "issue": "Es konnten keine Punkte vergeben werden",
+        "non_zero_delta": "Geben Sie ein Delta ungleich Null ein (positiv oder negativ).",
+        "adjust": "Punkte konnten nicht angepasst werden"
+      }
     }
+  },
+  "admin_a11y": {
+    "refresh_federation_peers": "Verbund-Peers aktualisieren",
+    "refresh_kpi_baselines": "Aktualisieren Sie die KPI-Baselines",
+    "refresh_research_partnerships": "Forschungskooperationen auffrischen"
   }
 }

@@ -336,7 +336,8 @@
     "navigation": {
       "label": "Caring community navigation",
       "close": "Close caring community navigation"
-    }
+    },
+    "meta_title": "Zorgzame gemeenschapsbeheerder"
   },
   "admin": {
     "providers": {
@@ -424,7 +425,8 @@
         "name_match": "Naamovereenkomst",
         "name_similar": "Naam vergelijkbaar",
         "phone_match": "Telefoon wedstrijd",
-        "website_match": "Website-match"
+        "website_match": "Website-match",
+        "unknown": "Onbekend signaal: {{signal}}"
       },
       "status": {
         "active": "Actief",
@@ -499,7 +501,9 @@
     "common": {
       "refresh": "Refresh",
       "cancel": "Cancel",
-      "empty_dash": "-"
+      "empty_dash": "-",
+      "all": "Alle",
+      "close": "Dichtbij"
     },
     "loyalty": {
       "title": "Loyalty Programme",
@@ -547,7 +551,8 @@
         "status": "Status",
         "actions": "Actions",
         "reverse": "Reverse",
-        "empty_value": "-"
+        "empty_value": "-",
+        "aria": "Recente loyaliteitsaflossingen"
       },
       "reverse_modal": {
         "title": "Reverse redemption",
@@ -572,6 +577,11 @@
         "discount_range": "Max discount percent must be between 0 and 100",
         "save_settings": "Failed to save settings",
         "reverse": "Failed to reverse redemption"
+      },
+      "status": {
+        "pending": "In behandeling",
+        "applied": "Toegepast",
+        "reversed": "Teruggedraaid"
       }
     },
     "hour_transfers": {
@@ -584,11 +594,15 @@
       },
       "pending": {
         "title": "Awaiting your approval",
-        "empty": "No pending transfers."
+        "empty": "No pending transfers.",
+        "description": "Elke overdracht moet handmatig worden goedgekeurd door een beheerder. Controleer of het e-mailadres van het bestemmingslid overeenkomt met het nieuwe account van het lid voordat u het goedkeurt.",
+        "table_aria": "In afwachting van uitgaande urenoverdrachten"
       },
       "inbound": {
         "title": "Received from other cooperatives (last 90 days)",
-        "empty": "No transfers received in the last 90 days."
+        "empty": "No transfers received in the last 90 days.",
+        "description": "Dit is alleen een auditlogboek: inkomende overdrachten worden automatisch verwerkt wanneer de broncoöperatie ze goedkeurt. Hier is geen actie vereist.",
+        "table_aria": "Inkomende uuroverdrachten"
       },
       "actions": {
         "approve": "Approve",
@@ -608,6 +622,25 @@
         "load_inbound": "Failed to load inbound transfers",
         "approve": "Approval failed",
         "reject": "Rejection failed"
+      },
+      "table": {
+        "actions": "Acties",
+        "date": "Datum",
+        "destination": "Bestemming",
+        "hours": "Uur",
+        "member": "Lid",
+        "member_credited": "Lid gecrediteerd",
+        "reason": "Reden",
+        "source": "Bron",
+        "status": "Status"
+      },
+      "status": {
+        "approved_by_source": "Goedgekeurd door bron",
+        "completed": "Voltooid",
+        "pending": "In behandeling",
+        "received": "Ontvangen",
+        "rejected": "Afgewezen",
+        "sent": "Verstuurd"
       }
     },
     "surveys": {
@@ -834,6 +867,310 @@
         "months_ago_one": "{{count}}mo ago",
         "months_ago_other": "{{count}}mo ago"
       }
+    },
+    "civic_digest": {
+      "meta_title": "Civic Digest-cadans",
+      "title": "Civic Digest-cadans",
+      "subtitle": "Configureer de standaard bezorgfrequentie voor de gepersonaliseerde civic digest die leden ontvangen. De samenvatting verzamelt relevante community-inhoud (veiligheidswaarschuwingen, projectupdates, aankondigingen van evenementen en aankondigingen) in één samenvatting.",
+      "preview_member_view": "Bekijk een voorbeeld van de ledenweergave",
+      "reset": "Opnieuw instellen",
+      "save": "Cadans opslaan",
+      "member_override": "Leden kunnen de cadans overschrijven en zich afmelden voor individuele bronnen via hun eigen overzichtsvoorkeurenpagina.",
+      "about": {
+        "title": "Over deze pagina",
+        "body": "De Civic Digest vervangt de noodzaak voor leden om meerdere pagina's te controleren door een gepersonaliseerde samenvatting te geven van wat voor hen relevant is. Hier stelt u de standaardwaarde van de tenant in. Leden kunnen de cadans overschrijven of zich volledig afmelden via hun eigen instellingen. Het wijzigen van de standaardwaarde van de tenant heeft alleen invloed op leden die hun voorkeur nooit hebben aangepast."
+      },
+      "cadence": {
+        "title": "Standaardcadans van de huurder",
+        "description": "Beheert de standaard bezorgfrequentie voor nieuwe leden. Bestaande leden behouden wat ze al gekozen hebben.",
+        "current": "Huidig: {{cadence}}"
+      },
+      "options": {
+        "off": {
+          "label": "Uit",
+          "description": "Er wordt geen samenvatting verzonden. Leden zien updates alleen wanneer ze het platform bezoeken."
+        },
+        "daily": {
+          "label": "Dagelijks",
+          "description": "Elke ochtend wordt er een samenvatting verzonden met de activiteit van de vorige dag."
+        },
+        "monthly": {
+          "label": "Maandelijks",
+          "description": "Op de eerste dag van elke maand wordt een samenvatting verzonden over recente activiteiten."
+        }
+      },
+      "includes": {
+        "title": "Wat de samenvatting inhoudt",
+        "description": "Artikelen worden per lid gerangschikt op basis van overeenkomst in de subregio, overeenkomst van interesse, versheid en brongewicht. Bronmix:",
+        "sources": {
+          "safety_alerts": "Veiligheidswaarschuwingen",
+          "project_updates": "Projectupdates",
+          "municipality_announcements": "Mededelingen gemeente",
+          "events": "Evenementen",
+          "vereine": "Vereine",
+          "care_providers": "Zorgverleners",
+          "marketplace": "Marktplaats",
+          "help_requests": "Hulpverzoeken",
+          "feed_posts": "Feedposts"
+        }
+      },
+      "messages": {
+        "saved": "Digest-cadans opgeslagen"
+      },
+      "errors": {
+        "load": "Kan de cadans van de samenvatting niet laden",
+        "save": "Kan cadans niet opslaan"
+      }
+    },
+    "recipient_circle": {
+      "meta_title": "Zorgontvangerscirkel",
+      "title": "Zorgontvangerscirkel",
+      "subtitle": "Bekijk het volledige ondersteuningsnetwerk rond elk lid",
+      "recipient": "Ontvanger",
+      "loading": "Ontvangerskring laden...",
+      "member_since": "Lid sinds {{date}}",
+      "member_id_value": "ID {{id}}",
+      "safeguarding_flags_one": "{{count}} veiligheidsvlag",
+      "safeguarding_flags_other": "{{count}} vlaggen beschermen",
+      "about": {
+        "title": "Over deze pagina",
+        "body": "Een Care Recipient Circle is een particuliere steungroep rond een persoon die zorg ontvangt. Deze weergave toont hun volledige ondersteuningsnetwerk: alle helpers, het totaal aantal ontvangen uren, openstaande hulpverzoeken en eventuele veiligheidsvlaggen. Voer de gebruikers-ID van het lid in om zijn/haar kring op te zoeken.",
+        "trust_tiers_label": "Vertrouwensniveaus:",
+        "trust_tiers_body": "Nieuwkomer, Lid, Vertrouwd, Geverifieerd, Coördinator - weergegeven voor de ontvanger en elke supporter.",
+        "safeguarding_label": "Vlaggen beveiligen:",
+        "safeguarding_body": "Een vlagtelling die niet nul is, duidt op actieve beveiligingsproblemen die tegen dit lid zijn geregistreerd. Bekijk ze in het gedeelte Beveiliging.",
+        "privacy_label": "Privacy:",
+        "privacy_body": "Kringgegevens zijn alleen zichtbaar voor kringleden en tenantbeheerders. Het is niet opgenomen in rapporten voor de hele gemeenschap of in de ledenlijst."
+      },
+      "lookup": {
+        "member_id": "Lid-ID",
+        "placeholder": "Voer de gebruikers-ID van het lid in...",
+        "button": "Cirkel bekijken"
+      },
+      "stats": {
+        "total_hours": "Totaal ontvangen uren",
+        "active_supporters": "Actieve supporters",
+        "open_help_requests": "Hulpverzoeken openen"
+      },
+      "tiers": {
+        "newcomer": "Nieuwkomer",
+        "member": "Lid",
+        "trusted": "Vertrouwd",
+        "verified": "Geverifieerd",
+        "coordinator": "Coördinator",
+        "fallback": "Niveau {{tier}}"
+      },
+      "relationship_types": {
+        "care": "Zorg",
+        "support": "Steun",
+        "family": "Familie",
+        "friend": "Vriend",
+        "neighbour": "Buurman",
+        "professional": "Professioneel",
+        "unknown": "Onbekende relatie: {{type}}"
+      },
+      "status": {
+        "active": "Actief",
+        "paused": "Gepauzeerd",
+        "ended": "Beëindigd",
+        "unknown": "Onbekende status: {{status}}"
+      },
+      "relationships": {
+        "title": "Ondersteun relaties",
+        "empty": "Geen actieve ondersteuningsrelaties",
+        "aria": "Ondersteun relaties",
+        "supporter": "Supporter",
+        "trust_tier": "Vertrouwensniveau",
+        "type": "Type",
+        "hours_logged": "Uren geregistreerd",
+        "last_activity": "Laatste activiteit",
+        "status": "Status"
+      },
+      "errors": {
+        "load": "Kan de ontvangerskring niet laden. Controleer de lid-ID en probeer het opnieuw."
+      }
+    },
+    "safeguarding_reports": {
+      "meta_title": "Rapporten beveiligen - Beheerder",
+      "title": "Beveiligingsrapporten",
+      "subtitle": "Beoordelen, toewijzen en oplossen van door leden geuite beveiligingsproblemen.",
+      "empty_dash": "-",
+      "actor_id": "#{{id}}",
+      "subject_org": "Organisatie #{{id}}",
+      "overdue": "Verlopen",
+      "escalated": "Geëscaleerd",
+      "open": "Open",
+      "report_title": "Rapporteer #{{id}}",
+      "empty": "Er zijn geen beveiligingsrapporten die overeenkomen met deze filters.",
+      "loading": "Beveiligingsrapporten laden",
+      "loading_detail": "Beveiligingsrapportdetails laden",
+      "about": {
+        "title": "Over deze pagina",
+        "body": "Op deze pagina worden formele beveiligingsincidenten beheerd: situaties waarin het welzijn, de veiligheid of de waardigheid van een lid in gevaar kan komen. Rapporten worden ingediend door leden, coördinatoren of beheerders. Alle rapporten moeten worden beoordeeld binnen de SLA die is geconfigureerd in Operating Policy. Kritieke en zeer ernstige rapporten vereisen onmiddellijke aandacht. Rapporten zijn huurdergericht en kunnen niet door andere community's worden gezien."
+      },
+      "severity": {
+        "critical": "Kritisch",
+        "high": "Hoog",
+        "medium": "Medium",
+        "low": "Laag"
+      },
+      "status": {
+        "submitted": "Ingediend",
+        "triaged": "Triaged",
+        "investigating": "Onderzoeken",
+        "resolved": "Opgelost",
+        "dismissed": "Afgewezen"
+      },
+      "severity_legend": {
+        "title": "Ernstniveaus",
+        "critical": "Direct fysiek risico: escaleren binnen 1 uur.",
+        "high": "Ernstige zorg: triage binnen 24 uur.",
+        "medium": "Belangrijk maar niet urgent: triage binnen 72 uur.",
+        "low": "Klein probleem: evaluatie tijdens de volgende coördinatorvergadering."
+      },
+      "workflow": {
+        "title": "Statuswerkstroom",
+        "submitted": "Rapport ontvangen, nog niet beoordeeld door een coördinator.",
+        "triaged": "De coördinator heeft de ernst beoordeeld en het eigenaarschap toegewezen.",
+        "investigating": "Actief onderzoek of ondersteuningsinterventie gaande.",
+        "resolved": "Afgesloten met gedocumenteerde resolutienotities nadat actie was ondernomen.",
+        "dismissed": "Gesloten zonder verdere actie. Er moet een reden worden vastgelegd."
+      },
+      "filters": {
+        "status": "Status",
+        "severity": "Ernst"
+      },
+      "table": {
+        "aria": "Beveiliging van rapporten",
+        "severity": "Ernst",
+        "category": "Categorie",
+        "reporter": "Verslaggever",
+        "subject": "Onderwerp",
+        "status": "Status",
+        "assigned": "Toegewezen",
+        "sla": "Service level overeenkomst",
+        "sla_abbr": "SLA",
+        "created": "Gemaakt",
+        "actions": "Acties"
+      },
+      "fields": {
+        "category": "Categorie",
+        "reporter": "Verslaggever",
+        "subject": "Onderwerp",
+        "description": "Beschrijving",
+        "evidence": "Bewijs",
+        "resolution_notes": "Resolutie opmerkingen"
+      },
+      "actions": {
+        "title": "Acties",
+        "assignee_user_id": "Gebruikers-ID van de toegewezen persoon",
+        "assign": "Toewijzen",
+        "escalation_note": "Escalatienotitie (optioneel)",
+        "escalate": "Escaleren",
+        "set_status": "Status instellen",
+        "notes": "Opmerkingen (optioneel)",
+        "update": "Update",
+        "resolved_hint": "'Opgelost' sluit dit rapport af met gedocumenteerde resolutienotities. Gebruik wanneer actie is ondernomen.",
+        "dismissed_hint": "Met 'Afgewezen' wordt dit rapport afgesloten zonder verdere actie. In de opmerkingen hierboven moet een reden worden vermeld.",
+        "add_note": "Notitie toevoegen"
+      },
+      "history": {
+        "title": "Geschiedenis",
+        "empty": "Nog geen acties.",
+        "by_actor": "door {{name}}"
+      },
+      "messages": {
+        "assigned": "Toegewezen",
+        "escalated": "Geëscaleerd",
+        "status_updated": "Status bijgewerkt",
+        "note_added": "Opmerking toegevoegd"
+      },
+      "errors": {
+        "load": "Kan rapporten niet laden",
+        "load_detail": "Kan rapportdetails niet laden",
+        "assign": "Toewijzing mislukt",
+        "escalate": "Escalatie is mislukt",
+        "status": "Statuswijziging mislukt",
+        "note": "Notitie mislukt"
+      }
+    },
+    "regional_points": {
+      "title": "Regionale punten",
+      "description": "Programma voor derde valuta - loopt naast tijdskredieten en de marktvaluta. Standaard uitgeschakeld.",
+      "about": {
+        "title": "Over deze pagina",
+        "body": "Regionale punten zijn aanvullende credits die worden gebruikt om bijdragen te erkennen die niet passen in het standaard urenuitwisselingsmodel, bijvoorbeeld het bijwonen van community-evenementen, deelname aan enquêtes of het voltooien van trainingen. Ze onderscheiden zich van tijdskredieten (zorguren) en kunnen er niet naar omgezet worden. Gebruik ze om bredere gemeenschapsparticipatie aan te moedigen die verder gaat dan directe zorg.",
+        "secondary": "Wijs punten handmatig toe aan individuele leden met behulp van het probleem of pas onderstaande tools aan. Punten verschijnen naast het tijdsaldo van het lid in de portemonnee van het lid. Leden kunnen regionale punten inwisselen voor lokale beloningen die zijn gedefinieerd in het loyaliteitsprogramma. Punten vervallen na 12 maanden, tenzij de vervaldatum is ingesteld op 0 (verlopen nooit)."
+      },
+      "stats": {
+        "total_balance": "Totaal uitgegeven saldo",
+        "lifetime_issued": "Levenslang uitgegeven",
+        "lifetime_spent": "Een leven lang besteed",
+        "member_accounts": "Ledenaccounts"
+      },
+      "config": {
+        "title": "Programma configuratie",
+        "enabled": "Programma ingeschakeld",
+        "enabled_hint": "Als deze optie is uitgeschakeld, wordt de derde valuta verborgen voor leden en retourneren beheerderseindpunten 403.",
+        "display_label": "Etiket weergeven",
+        "display_label_description": "Weergegeven in de portemonnee (bijvoorbeeld 'Regionale punten', 'Stadtmuenze')",
+        "symbol": "Symbool",
+        "symbol_description": "Kort achtervoegsel weergegeven naast bedragen (bijvoorbeeld 'pts', 'SM')",
+        "auto_issue": "Automatische uitgifte op goedgekeurde uren",
+        "auto_issue_hint": "Wanneer een geverifieerd uur wordt geregistreerd, kent u automatisch zoveel regionale punten toe.",
+        "points_per_hour": "Punten per goedgekeurd uur",
+        "member_transfers": "Overdrachten van lid naar lid",
+        "member_transfers_hint": "Laat leden punten naar elkaar sturen.",
+        "marketplace_redemption": "Inwisseling op de marktplaats",
+        "marketplace_redemption_hint": "Sta leden toe punten in te wisselen als CHF-korting op deelnemende verkopers.",
+        "save": "Configuratie opslaan"
+      },
+      "member_balance": {
+        "title": "Ledensaldo uitgeven/aanpassen",
+        "member": "Lid",
+        "member_placeholder": "Zoek op naam of e-mailadres",
+        "no_matching_members": "Geen overeenkomende leden",
+        "clear": "Duidelijk",
+        "tabs_aria": "Regionale puntensaldo-acties",
+        "issue_tab": "Punten uitgeven",
+        "points_to_issue": "Punten om uit te geven",
+        "description": "Beschrijving",
+        "issue": "Punten uitgeven",
+        "adjust_tab": "Aanpassen (+/-)",
+        "points_delta": "Puntendelta (positief of negatief)",
+        "apply_adjustment": "Aanpassing toepassen"
+      },
+      "ledger": {
+        "title": "Recente grootboekposten",
+        "aria": "Recente regionale puntenposten",
+        "empty": "Er zijn nog geen grootboekposten.",
+        "date": "Datum",
+        "member": "Lid",
+        "type": "Type",
+        "description": "Beschrijving",
+        "points": "Punten",
+        "balance": "Evenwicht",
+        "user_fallback": "#{{id}}"
+      },
+      "messages": {
+        "config_saved": "Configuratie opgeslagen",
+        "issued": "Uitgegeven {{amount}} punten naar {{member}}",
+        "adjusted": "{{member}} aangepast met {{delta}}-punten"
+      },
+      "errors": {
+        "load": "Kan regionale punten niet laden",
+        "save_config": "Kan configuratie niet opslaan",
+        "pick_member": "Kies eerst een lid",
+        "positive_amount": "Vul een positief bedrag in",
+        "issue": "Het is niet gelukt om punten uit te geven",
+        "non_zero_delta": "Voer een delta in die niet nul is (positief of negatief)",
+        "adjust": "Kan de punten niet aanpassen"
+      }
     }
+  },
+  "admin_a11y": {
+    "refresh_federation_peers": "Federatie-peers vernieuwen",
+    "refresh_kpi_baselines": "KPI-basislijnen vernieuwen",
+    "refresh_research_partnerships": "Onderzoekspartnerschappen vernieuwen"
   }
 }

@@ -336,7 +336,8 @@
     "navigation": {
       "label": "Caring community navigation",
       "close": "Close caring community navigation"
-    }
+    },
+    "meta_title": "Riarachán Pobail Cúramach"
   },
   "admin": {
     "providers": {
@@ -424,7 +425,8 @@
         "name_match": "Meaitseáil ainm",
         "name_similar": "Ainm cosúil",
         "phone_match": "Cluiche fón",
-        "website_match": "Cluiche láithreán gréasáin"
+        "website_match": "Cluiche láithreán gréasáin",
+        "unknown": "Comhartha anaithnid: {{signal}}"
       },
       "status": {
         "active": "Gníomhach",
@@ -499,7 +501,9 @@
     "common": {
       "refresh": "Refresh",
       "cancel": "Cancel",
-      "empty_dash": "-"
+      "empty_dash": "-",
+      "all": "Gach",
+      "close": "Dún"
     },
     "loyalty": {
       "title": "Loyalty Programme",
@@ -547,7 +551,8 @@
         "status": "Status",
         "actions": "Actions",
         "reverse": "Reverse",
-        "empty_value": "-"
+        "empty_value": "-",
+        "aria": "Fuascailtí dílseachta le déanaí"
       },
       "reverse_modal": {
         "title": "Reverse redemption",
@@ -572,6 +577,11 @@
         "discount_range": "Max discount percent must be between 0 and 100",
         "save_settings": "Failed to save settings",
         "reverse": "Failed to reverse redemption"
+      },
+      "status": {
+        "pending": "Ar feitheamh",
+        "applied": "Fheidhmeach",
+        "reversed": "droim ar ais"
       }
     },
     "hour_transfers": {
@@ -584,11 +594,15 @@
       },
       "pending": {
         "title": "Awaiting your approval",
-        "empty": "No pending transfers."
+        "empty": "No pending transfers.",
+        "description": "Caithfidh gach aistriú a bheith ceadaithe de láimh ag riarthóir. Cinntigh go meaitseálann ríomhphost an bhaill sprice le cuntas nua an bhaill sula gceadaítear é.",
+        "table_aria": "Ar feitheamh aistrithe uair an chloig amach"
       },
       "inbound": {
         "title": "Received from other cooperatives (last 90 days)",
-        "empty": "No transfers received in the last 90 days."
+        "empty": "No transfers received in the last 90 days.",
+        "description": "Is logáil iniúchta amháin é seo - déantar aistrithe isteach a phróiseáil go huathoibríoch nuair a cheadaíonn an comharchumann foinse iad. Níl aon ghníomh ag teastáil anseo.",
+        "table_aria": "Aistrithe uair an chloig isteach"
       },
       "actions": {
         "approve": "Approve",
@@ -608,6 +622,25 @@
         "load_inbound": "Failed to load inbound transfers",
         "approve": "Approval failed",
         "reject": "Rejection failed"
+      },
+      "table": {
+        "actions": "Gníomhartha",
+        "date": "Dáta",
+        "destination": "Ceann Scríbe",
+        "hours": "Uaireanta",
+        "member": "Ball",
+        "member_credited": "Comhalta curtha chun sochair",
+        "reason": "Cúis",
+        "source": "Foinse",
+        "status": "Stádas"
+      },
+      "status": {
+        "approved_by_source": "Faofa de réir foinse",
+        "completed": "Críochnaithe",
+        "pending": "Ar feitheamh",
+        "received": "Faighte",
+        "rejected": "Diúltaithe",
+        "sent": "Seolta"
       }
     },
     "surveys": {
@@ -834,6 +867,310 @@
         "months_ago_one": "{{count}}mo ago",
         "months_ago_other": "{{count}}mo ago"
       }
+    },
+    "civic_digest": {
+      "meta_title": "Cadence Achoimre Cathartha",
+      "title": "Cadence Achoimre Cathartha",
+      "subtitle": "Cumraigh an deireadh seachadta réamhshocraithe don achoimriú sibhialta pearsantaithe a fhaigheann comhaltaí. Déanann an achoimre ábhar pobail ábhartha - foláirimh sábháilteachta, nuashonruithe tionscadail, fógraí imeachta agus fógraí - a chomhiomlánú in aon achoimre amháin.",
+      "preview_member_view": "Amharc ball réamhamhairc",
+      "reset": "Athshocraigh",
+      "save": "Sábháil cadence",
+      "member_override": "Is féidir le baill deireadh a chur le deireadh agus rogha an diúltaithe d’fhoinsí aonair óna leathanach sainroghanna achoimre féin.",
+      "about": {
+        "title": "Maidir leis an leathanach seo",
+        "body": "Tagann an Achoimre Cathartha in áit an ghá atá le baill iolracha a sheiceáil trí achoimre phearsantaithe a sheachadadh ar a bhfuil ábharthach dóibh. Socraíonn tú réamhshocrú an tionónta anseo. Is féidir le baill an deireadh a shárú, nó tarraingt siar go hiomlán, óna socruithe féin. Ní dhéanann athrú ar mhainneachtain an tionónta ach difear do chomhaltaí nár shaincheapadh a rogha tosaíochta riamh."
+      },
+      "cadence": {
+        "title": "Dúnta réamhshocraithe do thionóntaí",
+        "description": "Rialaíonn sé an deireadh seachadta réamhshocraithe do bhaill nua. Coinníonn baill reatha cibé rud atá roghnaithe acu cheana féin.",
+        "current": "Reatha: {{cadence}}"
+      },
+      "options": {
+        "off": {
+          "label": "as",
+          "description": "Ní sheoltar aon díolaim. Ní fheiceann baill nuashonruithe ach amháin nuair a thugann siad cuairt ar an ardán."
+        },
+        "daily": {
+          "label": "laethúil",
+          "description": "Seoltar achoimre gach maidin le gníomhaíocht an lae roimhe sin."
+        },
+        "monthly": {
+          "label": "go míosúil",
+          "description": "Seoltar achoimre ar an gcéad lá de gach mí a chlúdaíonn gníomhaíocht le déanaí."
+        }
+      },
+      "includes": {
+        "title": "Cad a chuimsíonn an díolaim",
+        "description": "Rangaítear na míreanna in aghaidh an chomhalta de réir cluiche fo-réigiúin, meaitseála úis, úire agus meáchan foinse. Meascán foinse:",
+        "sources": {
+          "safety_alerts": "Foláirimh sábháilteachta",
+          "project_updates": "Nuashonruithe tionscadail",
+          "municipality_announcements": "Fógraí bardais",
+          "events": "Imeachtaí",
+          "vereine": "Vereine",
+          "care_providers": "Soláthraithe cúraim",
+          "marketplace": "Margadh",
+          "help_requests": "Iarratais cabhrach",
+          "feed_posts": "Poist bheatha"
+        }
+      },
+      "messages": {
+        "saved": "Achoimre dúnadh a shábháil"
+      },
+      "errors": {
+        "load": "Theip ar dúnadh an díolama a lódáil",
+        "save": "Theip ar an deireadh a shábháil"
+      }
+    },
+    "recipient_circle": {
+      "meta_title": "Ciorcal Faighteoirí Cúraim",
+      "title": "Ciorcal Faighteoirí Cúraim",
+      "subtitle": "Féach ar an líonra tacaíochta iomlán thart ar aon bhall",
+      "recipient": "Faighteoir",
+      "loading": "Ciorcal faighteora á lódáil...",
+      "member_since": "Ball ó {{date}}",
+      "member_id_value": "ID {{id}}",
+      "safeguarding_flags_one": "Bratach cosanta {{count}}",
+      "safeguarding_flags_other": "Bratacha cosanta {{count}}",
+      "about": {
+        "title": "Maidir leis an leathanach seo",
+        "body": "Is grúpa tacaíochta príobháideach é Ciorcal Faighteoirí Cúraim timpeall ar dhuine aonair a fhaigheann cúram. Taispeánann an radharc seo a líonra tacaíochta iomlán: gach cúntóir, iomlán na n-uaireanta a fuarthas, iarratais ar chabhair oscailte, agus aon bhratacha cosanta. Cuir isteach ID úsáideora an bhaill chun breathnú ar a gciorcal.",
+        "trust_tiers_label": "Sraitheanna iontaobhais:",
+        "trust_tiers_body": "Núíosach, Ball, Iontaofa, Fíoraithe, Comhordaitheoir - léirithe don fhaighteoir agus do gach tacadóir.",
+        "safeguarding_label": "Bratacha a chosaint:",
+        "safeguarding_body": "Léiríonn comhaireamh bratach neamh-nialas imní cosanta gníomhach a taifeadadh i gcoinne an bhaill seo. Déan athbhreithniú orthu sa rannán um Chosaint.",
+        "privacy_label": "Príobháideacht:",
+        "privacy_body": "Níl sonraí ciorcail le feiceáil ach ag baill chiorcail agus riarthóirí tionóntaí. Níl sé san áireamh i dtuarascálacha ar fud an phobail nó san eolaire ball."
+      },
+      "lookup": {
+        "member_id": "Aitheantas Ball",
+        "placeholder": "Cuir isteach ID úsáideora ball...",
+        "button": "Féach ciorcal"
+      },
+      "stats": {
+        "total_hours": "Uaireanta Iomlána Faighte",
+        "active_supporters": "Tacadóirí Gníomhacha",
+        "open_help_requests": "Oscail Iarratais Chabhrach"
+      },
+      "tiers": {
+        "newcomer": "núíosach",
+        "member": "Ball",
+        "trusted": "Iontaofa",
+        "verified": "Fíoraithe",
+        "coordinator": "Comhordaitheoir",
+        "fallback": "Sraith {{tier}}"
+      },
+      "relationship_types": {
+        "care": "Cúram",
+        "support": "Tacaíocht",
+        "family": "Teaghlaigh",
+        "friend": "Cara",
+        "neighbour": "Comharsa",
+        "professional": "Gairmiúil",
+        "unknown": "Caidreamh anaithnid: {{type}}"
+      },
+      "status": {
+        "active": "Gníomhach",
+        "paused": "Sos",
+        "ended": "dar críoch",
+        "unknown": "Stádas anaithnid: {{status}}"
+      },
+      "relationships": {
+        "title": "Caidrimh Tacaíochta",
+        "empty": "Uimh caidreamh tacaíochta gníomhach",
+        "aria": "Caidrimh tacaíochta",
+        "supporter": "Tacadóir",
+        "trust_tier": "Sraith Iontaobhais",
+        "type": "Cineál",
+        "hours_logged": "Uaireanta Logáilte",
+        "last_activity": "Gníomhaíocht Deiridh",
+        "status": "Stádas"
+      },
+      "errors": {
+        "load": "Theip ar luchtú an chiorcail faighteora. Seiceáil ID an bhaill agus bain triail eile as."
+      }
+    },
+    "safeguarding_reports": {
+      "meta_title": "Tuarascálacha Cosanta - Riarachán",
+      "title": "Tuarascálacha Coimirce",
+      "subtitle": "Athbhreithnigh, sann, agus réitigh imní faoi chosaint a d'ardaigh comhaltaí.",
+      "empty_dash": "-",
+      "actor_id": "#{{id}}",
+      "subject_org": "Eagraíocht #{{id}}",
+      "overdue": "thar téarma",
+      "escalated": "Ardaithe",
+      "open": "Oscail",
+      "report_title": "Tuairiscigh #{{id}}",
+      "empty": "Níl aon tuairiscí cosanta ag teacht leis na scagairí seo.",
+      "loading": "Tuarascálacha cosanta á lódáil",
+      "loading_detail": "Sonraí tuairisce cosanta á lódáil",
+      "about": {
+        "title": "Maidir leis an leathanach seo",
+        "body": "Bainistíonn an leathanach seo teagmhais chosanta fhoirmiúla: cásanna ina bhféadfadh leas, sábháilteacht nó dínit ball a bheith i mbaol. Cuireann baill, comhordaitheoirí nó riarthóirí tuarascálacha isteach. Ní mór gach tuairisc a thriáiseáil laistigh den CLS atá cumraithe sa Bheartas Oibriúcháin. Teastaíonn aird láithreach ar thuarascálacha criticiúla agus ar dhéine ard. Déantar scóip ó thionóntaí ar thuarascálacha agus ní féidir le pobail eile iad a fheiceáil."
+      },
+      "severity": {
+        "critical": "Criticiúil",
+        "high": "Ard",
+        "medium": "Meánach",
+        "low": "Íseal"
+      },
+      "status": {
+        "submitted": "Arna chur isteach",
+        "triaged": "Triáiseadh",
+        "investigating": "Ag fiosrú",
+        "resolved": "Réitíodh",
+        "dismissed": "Briseadh as a post"
+      },
+      "severity_legend": {
+        "title": "Leibhéil déine",
+        "critical": "Riosca fisiceach láithreach: ardú laistigh de 1 uair an chloig.",
+        "high": "Imní thromchúiseach: triage laistigh de 24 uair an chloig.",
+        "medium": "Suntasach ach neamhphráinneach: triage laistigh de 72 uair an chloig.",
+        "low": "Mionábhar imní: athbhreithniú ag an gcéad chruinniú eile de chuid an chomhordaitheora."
+      },
+      "workflow": {
+        "title": "Sreabhadh oibre stádais",
+        "submitted": "Tuairisc faighte, gan athbhreithniú fós ag comhordaitheoir.",
+        "triaged": "Tá measúnú déanta ag an gcomhordaitheoir ar dhéine agus ar úinéireacht sannta.",
+        "investigating": "Imscrúdú gníomhach nó idirghabháil tacaíochta ar siúl.",
+        "resolved": "Dúnta le nótaí réitigh doiciméadaithe tar éis beart a dhéanamh.",
+        "dismissed": "Dúnta gan aon ghníomhaíocht eile. Ní mór cúis a thaifeadadh."
+      },
+      "filters": {
+        "status": "Stádas",
+        "severity": "Déine"
+      },
+      "table": {
+        "aria": "Tuarascálacha cosanta",
+        "severity": "Déine",
+        "category": "Catagóir",
+        "reporter": "Tuairisceoir",
+        "subject": "Ábhar",
+        "status": "Stádas",
+        "assigned": "Sannta",
+        "sla": "Comhaontú leibhéal seirbhíse",
+        "sla_abbr": "SLA",
+        "created": "Cruthaithe",
+        "actions": "Gníomhartha"
+      },
+      "fields": {
+        "category": "Catagóir",
+        "reporter": "Tuairisceoir",
+        "subject": "Ábhar",
+        "description": "Cur síos",
+        "evidence": "Fianaise",
+        "resolution_notes": "Nótaí réitigh"
+      },
+      "actions": {
+        "title": "Gníomhartha",
+        "assignee_user_id": "Aitheantas úsáideora sannaí",
+        "assign": "Sann",
+        "escalation_note": "Nóta formhéadaithe (roghnach)",
+        "escalate": "Ardaigh",
+        "set_status": "Socraigh stádas",
+        "notes": "Nótaí (roghnach)",
+        "update": "Nuashonrú",
+        "resolved_hint": "Dúnann \"Réiteach\" an tuarascáil seo le nótaí réitigh doiciméadaithe. Bain úsáid as nuair a bhíonn gníomh déanta.",
+        "dismissed_hint": "Dúnann “Díbhe” an tuarascáil seo gan aon ghníomhaíocht eile. Ní mór cúis a thaifeadadh sna nótaí thuas.",
+        "add_note": "Cuir nóta leis"
+      },
+      "history": {
+        "title": "Stair",
+        "empty": "Gan gníomhartha fós.",
+        "by_actor": "ag {{name}}"
+      },
+      "messages": {
+        "assigned": "Sannta",
+        "escalated": "Ardaithe",
+        "status_updated": "Nuashonraíodh an stádas",
+        "note_added": "Nóta curtha leis"
+      },
+      "errors": {
+        "load": "Theip ar lódáil tuarascálacha",
+        "load_detail": "Theip ar lódáil sonraí tuairisce",
+        "assign": "Theip ar an sannadh",
+        "escalate": "Theip ar an ardú céime",
+        "status": "Theip ar athrú stádais",
+        "note": "Theip ar an nóta"
+      }
+    },
+    "regional_points": {
+      "title": "Pointí Réigiúnacha",
+      "description": "Tríú-airgeadra clár - ritheann taobh le creidmheasanna ama agus an t-airgeadra margadh. Díchumasaithe de réir réamhshocraithe.",
+      "about": {
+        "title": "Maidir leis an leathanach seo",
+        "body": "Is creidmheasanna forlíontacha iad Pointí Réigiúnacha a úsáidtear chun ranníocaíochtaí a aithint nach n-oireann don mhúnla caighdeánach malartaithe uaireanta - mar shampla, freastal ar imeachtaí pobail, páirt a ghlacadh i suirbhéanna, nó oiliúint a chríochnú. Tá siad éagsúil ó chreidmheasanna ama (uaireanta cúraim) agus ní féidir iad a thiontú. Bain úsáid astu chun rannpháirtíocht pobail níos leithne a spreagadh lasmuigh de chúram díreach.",
+        "secondary": "Tabhair pointí de láimh ar bhaill aonair ag baint úsáide as an tsaincheist nó coigeartaigh na huirlisí thíos. Tá pointí le feiceáil i sparán an bhaill taobh lena n-iarmhéid creidmheasa ama. Is féidir le baill Pointí Réigiúnacha a fhuascailt le haghaidh luaíochtaí áitiúla a shainítear sa Chlár Dílseachta. Téann pointí in éag tar éis 12 mhí mura bhfuil an socrú éaga socraithe ag 0 (ní rachaidh sé in éag)."
+      },
+      "stats": {
+        "total_balance": "Iarmhéid iomlán eisithe",
+        "lifetime_issued": "Saoil eisithe",
+        "lifetime_spent": "Saol caite",
+        "member_accounts": "Cuntais bhall"
+      },
+      "config": {
+        "title": "Cumraíocht cláir",
+        "enabled": "Clár cumasaithe",
+        "enabled_hint": "Nuair atá sé múchta, tá an tríú airgeadra i bhfolach ó bhaill agus cuireann críochphointí riaracháin 403 ar ais.",
+        "display_label": "Lipéad taispeána",
+        "display_label_description": "Ar taispeáint sa sparán (m.sh. ‘Pointí Réigiúnacha’, ‘Stadtmuenze’)",
+        "symbol": "Siombail",
+        "symbol_description": "Iarmhír ghearr léirithe in aice le méideanna (m.sh. 'pts', 'SM')",
+        "auto_issue": "Eisiúint uathoibríoch ar uaireanta ceadaithe",
+        "auto_issue_hint": "Nuair a bhíonn uair an chloig fíoraithe logáilte, bronn an iliomad pointí réigiúnacha seo go huathoibríoch.",
+        "points_per_hour": "Pointí in aghaidh na huaire ceadaithe",
+        "member_transfers": "Aistrithe comhalta go ball",
+        "member_transfers_hint": "Lig do chomhaltaí pointí a sheoladh chuig a chéile.",
+        "marketplace_redemption": "Fuascailt ionad an mhargaidh",
+        "marketplace_redemption_hint": "Lig do chomhaltaí pointí a fhuascailt mar lascaine CHF ar dhíoltóirí rannpháirteacha.",
+        "save": "Sábháil cumraíocht"
+      },
+      "member_balance": {
+        "title": "Eisigh / coigeartaigh cothromaíocht na mball",
+        "member": "Ball",
+        "member_placeholder": "Cuardaigh de réir ainm nó ríomhphost",
+        "no_matching_members": "Gan aon bhall meaitseála",
+        "clear": "Glan",
+        "tabs_aria": "Gníomhaíochtaí cothromaíochta pointí réigiúnacha",
+        "issue_tab": "Pointí eisiúna",
+        "points_to_issue": "Pointí le heisiúint",
+        "description": "Cur síos",
+        "issue": "Pointí eisiúna",
+        "adjust_tab": "Coigeartaigh (+/-)",
+        "points_delta": "Pointí deilt (dearfach nó diúltach)",
+        "apply_adjustment": "Cuir coigeartú i bhfeidhm"
+      },
+      "ledger": {
+        "title": "Iontrálacha mórleabhair le déanaí",
+        "aria": "Iontrálacha mórleabhair pointí réigiúnacha le déanaí",
+        "empty": "Níl aon iontrálacha mórleabhair fós.",
+        "date": "Dáta",
+        "member": "Ball",
+        "type": "Cineál",
+        "description": "Cur síos",
+        "points": "Pointí",
+        "balance": "Iarmhéid",
+        "user_fallback": "#{{id}}"
+      },
+      "messages": {
+        "config_saved": "Sábháladh an chumraíocht",
+        "issued": "Eisithe pointí {{amount}} go {{member}}",
+        "adjusted": "{{member}} coigeartaithe ag pointí {{delta}}"
+      },
+      "errors": {
+        "load": "Theip ar lódáil pointí réigiúnacha",
+        "save_config": "Theip ar an chumraíocht a shábháil",
+        "pick_member": "Roghnaigh ball ar dtús",
+        "positive_amount": "Cuir isteach méid dearfach",
+        "issue": "Theip ar na pointí a eisiúint",
+        "non_zero_delta": "Cuir isteach deilt neamh-nialas (dearfach nó diúltach)",
+        "adjust": "Theip ar na pointí a choigeartú"
+      }
     }
+  },
+  "admin_a11y": {
+    "refresh_federation_peers": "Athnuaigh piaraí cónaidhm",
+    "refresh_kpi_baselines": "Bunlínte KPI a athnuachan",
+    "refresh_research_partnerships": "Comhpháirtíochtaí taighde a athnuachan"
   }
 }
