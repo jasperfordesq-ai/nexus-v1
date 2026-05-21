@@ -36,6 +36,7 @@ interface DeliverableItem {
 
 export function DeliverablesList() {
   const { t: tNav } = useTranslation('admin_nav');
+  const { t } = useTranslation('admin');
   useAdminPageMeta({ title: tNav('deliverability') });
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -61,15 +62,15 @@ export function DeliverablesList() {
           setData(pd.data || []);
         }
       } else {
-        setLoadError("Failed to load deliverables");
+        setLoadError(t('deliverability.failed_to_load_deliverables'));
       }
     } catch {
-      setLoadError("Failed to load deliverables");
-      toast.error("Failed to load deliverables");
+      setLoadError(t('deliverability.failed_to_load_deliverables'));
+      toast.error(t('deliverability.failed_to_load_deliverables'));
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
 
   useEffect(() => {
@@ -82,13 +83,13 @@ export function DeliverablesList() {
     try {
       const res = await adminDeliverability.delete(confirmDelete.id);
       if (res?.success) {
-        toast.success("Deliverable deleted successfully");
+        toast.success(t('deliverability.deliverable_deleted_successfully'));
         fetchData();
       } else {
-        toast.error("Failed to delete deliverable");
+        toast.error(t('deliverability.failed_to_delete_deliverable'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('deliverability.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -98,13 +99,13 @@ export function DeliverablesList() {
   const columns: Column<DeliverableItem>[] = [
     {
       key: 'title',
-      label: "Title",
+      label: t('deliverability.col_title'),
       sortable: true,
       render: (item) => <span className="font-medium">{item.title}</span>,
     },
     {
       key: 'priority',
-      label: "Priority",
+      label: t('deliverability.col_priority'),
       sortable: true,
       render: (item) => (
         <StatusBadge status={item.priority || 'medium'} />
@@ -112,18 +113,18 @@ export function DeliverablesList() {
     },
     {
       key: 'status',
-      label: "Status",
+      label: t('deliverability.col_status'),
       sortable: true,
       render: (item) => <StatusBadge status={item.status || 'planned'} />,
     },
     {
       key: 'assigned_to',
-      label: "Assigned to",
+      label: t('deliverability.col_assigned_to'),
       render: (item) => <span className="text-sm text-default-500">{item.assigned_to || '--'}</span>,
     },
     {
       key: 'due_date',
-      label: "Due Date",
+      label: t('deliverability.col_due_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -133,7 +134,7 @@ export function DeliverablesList() {
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('deliverability.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -141,7 +142,7 @@ export function DeliverablesList() {
             size="sm"
             variant="flat"
             onPress={() => navigate(tenantPath(`/admin/deliverability/edit/${item.id}`))}
-            aria-label={"Edit Deliverable"}
+            aria-label={t('deliverability.label_edit_deliverable')}
           >
             <Pencil size={14} />
           </Button>
@@ -151,7 +152,7 @@ export function DeliverablesList() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label={"Delete Deliverable"}
+            aria-label={t('deliverability.label_delete_deliverable')}
           >
             <Trash2 size={14} />
           </Button>
@@ -163,7 +164,7 @@ export function DeliverablesList() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={"Deliverables List"} description={"Create and track deliverables for your project milestones"} />
+        <PageHeader title={t('deliverability.deliverables_list_title')} description={t('deliverability.deliverables_list_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -172,15 +173,15 @@ export function DeliverablesList() {
   return (
     <div>
       <PageHeader
-        title={"Deliverables List"}
-        description={"Create and track deliverables for your project milestones"}
+        title={t('deliverability.deliverables_list_title')}
+        description={t('deliverability.deliverables_list_desc')}
         actions={
           <Button
             color="primary"
             startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/deliverability/create'))}
           >
-            {"Create Deliverable"}
+            {t('deliverability.create_deliverable')}
           </Button>
         }
       />
@@ -189,24 +190,24 @@ export function DeliverablesList() {
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center gap-3 py-10 text-center">
             <AlertTriangle size={32} className="text-danger" />
-            <div className="text-base font-semibold">{"Loading Data error"}</div>
+            <div className="text-base font-semibold">{t('common.error_loading_data')}</div>
             <div className="text-sm text-default-500">{loadError}</div>
-            <Button color="primary" variant="flat" onPress={fetchData}>{"Retry"}</Button>
+            <Button color="primary" variant="flat" onPress={fetchData}>{t('common.retry')}</Button>
           </CardBody>
         </Card>
       ) : data.length === 0 ? (
         <EmptyState
           icon={Target}
-          title={"No deliverables"}
-          description={"Create deliverables to track project milestones and progress"}
-          actionLabel={"Create Deliverable"}
+          title={t('deliverability.no_deliverables')}
+          description={t('deliverability.desc_create_deliverables_to_track_project_mil')}
+          actionLabel={t('deliverability.create_deliverable')}
           onAction={() => navigate(tenantPath('/admin/deliverability/create'))}
         />
       ) : (
         <DataTable
           columns={columns}
           data={data}
-          searchPlaceholder={"Search Deliverables"}
+          searchPlaceholder={t('deliverability.search_deliverables')}
           onRefresh={fetchData}
         />
       )}
@@ -216,9 +217,9 @@ export function DeliverablesList() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={"Delete Deliverable"}
-          message={`Are you sure you want to delete this deliverable? This cannot be undone.`}
-          confirmLabel={"Delete"}
+          title={t('deliverability.delete_deliverable_title')}
+          message={t('deliverability.delete_deliverable_message')}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />

@@ -7505,6 +7505,7 @@
     "search": "Search"
   },
   "deliverability": {
+    "activity_by_user_date": "{{action}} by {{user}} - {{date}}",
     "an_unexpected_error_occurred": "An unexpected error occurred",
     "assigned_to_label": "Assigned to",
     "assigned_to_placeholder": "Assigned to...",
@@ -7561,6 +7562,10 @@
     "priority_low": "Low",
     "priority_medium": "Medium",
     "recent_activity": "Recent Activity",
+    "risk_critical": "Critical",
+    "risk_high": "High",
+    "risk_low": "Low",
+    "risk_medium": "Medium",
     "save_deliverable": "Save Deliverable",
     "search_deliverables": "Search Deliverables",
     "status_completed": "Completed",
