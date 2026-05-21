@@ -4,6 +4,7 @@
   "clear_primary_color": "Clear primary color",
   "enabled": "Enabled",
   "disabled": "Disabled",
+  "something_wrong": "Something went wrong. Please try again.",
   "api_partners": {
     "meta": {
       "title": "API Partners"
@@ -9721,7 +9722,7 @@
     "templates_load_error": "Failed to load templates",
     "templates_delete": "Delete",
     "templates_delete_title": "Delete Template",
-    "templates_delete_confirm": "Are you sure you want to delete this template?",
+    "templates_delete_confirm": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
     "templates_delete_error": "Failed to delete template",
     "templates_deleted": "Template deleted",
     "stage_applied": "Applied",
@@ -10148,11 +10149,11 @@
     "no_pending_description": "All caught up - no items are waiting for review.",
     "notes_label": "Notes",
     "notes_placeholder": "Add moderation notes...",
-    "posted_by": "Posted by",
+    "posted_by": "Posted by {{name}}",
     "reason_label": "Reason",
     "reason_placeholder": "Enter reason...",
     "reason_required": "A reason is required",
-    "spam_score": "Spam score",
+    "spam_score": "Spam Score: {{score}}",
     "stats": {
       "pending_count": "Pending",
       "flagged_count": "Flagged",

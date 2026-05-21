@@ -98,7 +98,7 @@ const PAGE_SIZE = 20;
 
 export function JobPipelineOverview() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('jobs.pipeline_title', 'Job Pipeline'));
+  usePageTitle(t('jobs.pipeline_title'));
   const toast = useToast();
 
   // Tab
@@ -138,10 +138,10 @@ export function JobPipelineOverview() {
       } else {
         setInterviews([]);
         setInterviewsTotal(0);
-        toast.error(t('jobs.pipeline_load_error', 'Failed to load interviews'));
+        toast.error(t('jobs.pipeline_load_error'));
       }
     } catch {
-      toast.error(t('jobs.pipeline_load_error', 'Failed to load interviews'));
+      toast.error(t('jobs.pipeline_load_error'));
     } finally {
       setInterviewsLoading(false);
     }
@@ -168,10 +168,10 @@ export function JobPipelineOverview() {
       } else {
         setOffers([]);
         setOffersTotal(0);
-        toast.error(t('jobs.pipeline_load_error_offers', 'Failed to load offers'));
+        toast.error(t('jobs.pipeline_load_error_offers'));
       }
     } catch {
-      toast.error(t('jobs.pipeline_load_error_offers', 'Failed to load offers'));
+      toast.error(t('jobs.pipeline_load_error_offers'));
     } finally {
       setOffersLoading(false);
     }
@@ -201,13 +201,13 @@ export function JobPipelineOverview() {
     () => [
       {
         key: 'job_title',
-        label: t('jobs.pipeline_job_title', 'Job Title'),
+        label: t('jobs.pipeline_job_title'),
         sortable: true,
         render: (item) => item.job_title ?? '—',
       },
       {
         key: 'candidate_name',
-        label: t('jobs.pipeline_candidate', 'Candidate'),
+        label: t('jobs.pipeline_candidate'),
         sortable: true,
         render: (item) => (
           <div className="min-w-0">
@@ -224,7 +224,7 @@ export function JobPipelineOverview() {
       },
       {
         key: 'interview_type',
-        label: t('jobs.pipeline_type', 'Type'),
+        label: t('jobs.pipeline_type'),
         render: (item) => (
           <Chip size="sm" variant="flat" color="primary" className="capitalize">
             {item.interview_type}
@@ -233,7 +233,7 @@ export function JobPipelineOverview() {
       },
       {
         key: 'scheduled_at',
-        label: t('jobs.pipeline_scheduled_at', 'Scheduled At'),
+        label: t('jobs.pipeline_scheduled_at'),
         sortable: true,
         render: (item) =>
           new Date(item.scheduled_at).toLocaleDateString(undefined, {
@@ -246,13 +246,13 @@ export function JobPipelineOverview() {
       },
       {
         key: 'duration_mins',
-        label: t('jobs.pipeline_duration', 'Duration'),
+        label: t('jobs.pipeline_duration'),
         render: (item) =>
-          t('jobs.pipeline_minutes', '{{count}} min', { count: item.duration_mins }),
+          t('jobs.pipeline_minutes', { count: item.duration_mins }),
       },
       {
         key: 'status',
-        label: t('jobs.pipeline_status', 'Status'),
+        label: t('jobs.pipeline_status'),
         render: (item) => (
           <Chip size="sm" variant="flat" color={getStatusColor(item.status)} className="capitalize">
             {item.status}
@@ -268,13 +268,13 @@ export function JobPipelineOverview() {
     () => [
       {
         key: 'job_title',
-        label: t('jobs.pipeline_job_title', 'Job Title'),
+        label: t('jobs.pipeline_job_title'),
         sortable: true,
         render: (item) => item.job_title ?? '—',
       },
       {
         key: 'candidate_name',
-        label: t('jobs.pipeline_candidate', 'Candidate'),
+        label: t('jobs.pipeline_candidate'),
         sortable: true,
         render: (item) => (
           <div className="min-w-0">
@@ -291,7 +291,7 @@ export function JobPipelineOverview() {
       },
       {
         key: 'salary_offered',
-        label: t('jobs.pipeline_salary', 'Salary'),
+        label: t('jobs.pipeline_salary'),
         sortable: true,
         render: (item) =>
           item.salary_offered != null
@@ -304,7 +304,7 @@ export function JobPipelineOverview() {
       },
       {
         key: 'start_date',
-        label: t('jobs.pipeline_start_date', 'Start Date'),
+        label: t('jobs.pipeline_start_date'),
         sortable: true,
         render: (item) =>
           item.start_date
@@ -317,7 +317,7 @@ export function JobPipelineOverview() {
       },
       {
         key: 'status',
-        label: t('jobs.pipeline_status', 'Status'),
+        label: t('jobs.pipeline_status'),
         render: (item) => (
           <Chip size="sm" variant="flat" color={getStatusColor(item.status)} className="capitalize">
             {item.status}
@@ -326,7 +326,7 @@ export function JobPipelineOverview() {
       },
       {
         key: 'expires_at',
-        label: t('jobs.pipeline_expires_at', 'Expires At'),
+        label: t('jobs.pipeline_expires_at'),
         sortable: true,
         render: (item) =>
           item.expires_at
@@ -345,7 +345,7 @@ export function JobPipelineOverview() {
   return (
     <div>
       <PageHeader
-        title={t('jobs.pipeline_title', 'Job Pipeline')}
+        title={t('jobs.pipeline_title')}
         description={t(
           'jobs.pipeline_description',
           'Overview of interviews and offers across all job vacancies'
@@ -353,7 +353,7 @@ export function JobPipelineOverview() {
       />
 
       <Tabs
-        aria-label={t('jobs.pipeline_tabs', 'Pipeline Tabs')}
+        aria-label={t('jobs.pipeline_tabs')}
         selectedKey={activeTab}
         onSelectionChange={(key) => setActiveTab(String(key))}
         color="primary"
@@ -366,7 +366,7 @@ export function JobPipelineOverview() {
           title={
             <div className="flex items-center gap-2">
               <CalendarClock size={16} />
-              {t('jobs.pipeline_interviews', 'Interviews')}
+              {t('jobs.pipeline_interviews')}
               {interviewsTotal > 0 && (
                 <Chip size="sm" variant="flat" color="primary">
                   {interviewsTotal}
@@ -379,7 +379,7 @@ export function JobPipelineOverview() {
             <CardBody>
               <div className="mb-4">
                 <Select
-                  label={t('jobs.pipeline_filter_status', 'Filter by Status')}
+                  label={t('jobs.pipeline_filter_status')}
                   selectedKeys={new Set([interviewsStatus])}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0];
@@ -392,7 +392,7 @@ export function JobPipelineOverview() {
                   {INTERVIEW_STATUSES.map((s) => (
                     <SelectItem key={s}>
                       {s === 'all'
-                        ? t('jobs.pipeline_all', 'All')
+                        ? t('jobs.pipeline_all')
                         : t(`jobs.pipeline_status_${s}`, s.charAt(0).toUpperCase() + s.slice(1))}
                     </SelectItem>
                   ))}
@@ -401,12 +401,12 @@ export function JobPipelineOverview() {
 
               {interviewsLoading && interviews.length === 0 ? (
                 <div className="flex justify-center py-16">
-                  <Spinner label={t('jobs.pipeline_loading', 'Loading...')} />
+                  <Spinner label={t('jobs.pipeline_loading')} />
                 </div>
               ) : interviews.length === 0 ? (
                 <EmptyState
                   icon={CalendarClock}
-                  title={t('jobs.pipeline_no_interviews', 'No interviews found')}
+                  title={t('jobs.pipeline_no_interviews')}
                   description={t(
                     'jobs.pipeline_no_interviews_desc',
                     'There are no interviews matching the current filter.'
@@ -435,7 +435,7 @@ export function JobPipelineOverview() {
           title={
             <div className="flex items-center gap-2">
               <Handshake size={16} />
-              {t('jobs.pipeline_offers', 'Offers')}
+              {t('jobs.pipeline_offers')}
               {offersTotal > 0 && (
                 <Chip size="sm" variant="flat" color="primary">
                   {offersTotal}
@@ -448,7 +448,7 @@ export function JobPipelineOverview() {
             <CardBody>
               <div className="mb-4">
                 <Select
-                  label={t('jobs.pipeline_filter_status', 'Filter by Status')}
+                  label={t('jobs.pipeline_filter_status')}
                   selectedKeys={new Set([offersStatus])}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0];
@@ -461,7 +461,7 @@ export function JobPipelineOverview() {
                   {OFFER_STATUSES.map((s) => (
                     <SelectItem key={s}>
                       {s === 'all'
-                        ? t('jobs.pipeline_all', 'All')
+                        ? t('jobs.pipeline_all')
                         : t(`jobs.pipeline_status_${s}`, s.charAt(0).toUpperCase() + s.slice(1))}
                     </SelectItem>
                   ))}
@@ -470,12 +470,12 @@ export function JobPipelineOverview() {
 
               {offersLoading && offers.length === 0 ? (
                 <div className="flex justify-center py-16">
-                  <Spinner label={t('jobs.pipeline_loading', 'Loading...')} />
+                  <Spinner label={t('jobs.pipeline_loading')} />
                 </div>
               ) : offers.length === 0 ? (
                 <EmptyState
                   icon={Handshake}
-                  title={t('jobs.pipeline_no_offers', 'No offers found')}
+                  title={t('jobs.pipeline_no_offers')}
                   description={t(
                     'jobs.pipeline_no_offers_desc',
                     'There are no offers matching the current filter.'

@@ -65,7 +65,7 @@ const typeColors: Record<string, 'primary' | 'success' | 'secondary' | 'default'
 
 export function JobTemplatesAdmin() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('jobs.templates_page_title', 'Job Templates'));
+  usePageTitle(t('jobs.templates_page_title'));
   const toast = useToast();
 
   const [items, setItems] = useState<JobTemplate[]>([]);
@@ -94,10 +94,10 @@ export function JobTemplatesAdmin() {
       } else {
         setItems([]);
         setTotal(0);
-        toast.error(t('jobs.templates_load_error', 'Failed to load job templates'));
+        toast.error(t('jobs.templates_load_error'));
       }
     } catch {
-      toast.error(t('jobs.templates_load_error', 'Failed to load job templates'));
+      toast.error(t('jobs.templates_load_error'));
     } finally {
       setLoading(false);
     }
@@ -116,14 +116,14 @@ export function JobTemplatesAdmin() {
     try {
       const res = await api.delete(`/v2/admin/jobs/templates/${confirmDelete.id}`);
       if (res.success) {
-        toast.success(t('jobs.templates_deleted', 'Template deleted'));
+        toast.success(t('jobs.templates_deleted'));
         setItems((prev) => prev.filter((tpl) => tpl.id !== confirmDelete.id));
         setTotal((prev) => prev - 1);
       } else {
-        toast.error(t('jobs.templates_delete_error', 'Failed to delete template'));
+        toast.error(t('jobs.templates_delete_error'));
       }
     } catch {
-      toast.error(t('jobs.templates_delete_error', 'Failed to delete template'));
+      toast.error(t('jobs.templates_delete_error'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -135,19 +135,19 @@ export function JobTemplatesAdmin() {
   const columns: Column<JobTemplate>[] = [
     {
       key: 'name',
-      label: t('jobs.templates_col_name', 'Name'),
+      label: t('jobs.templates_col_name'),
       sortable: true,
       render: (tpl) => <span className="font-semibold">{tpl.name}</span>,
     },
     {
       key: 'creator_name',
-      label: t('jobs.templates_col_creator', 'Creator'),
+      label: t('jobs.templates_col_creator'),
       sortable: true,
       render: (tpl) => tpl.creator_name ?? '—',
     },
     {
       key: 'type',
-      label: t('jobs.templates_col_type', 'Type'),
+      label: t('jobs.templates_col_type'),
       sortable: true,
       render: (tpl) => (
         <Chip
@@ -162,27 +162,27 @@ export function JobTemplatesAdmin() {
     },
     {
       key: 'is_public',
-      label: t('jobs.templates_col_visibility', 'Visibility'),
+      label: t('jobs.templates_col_visibility'),
       render: (tpl) =>
         tpl.is_public ? (
-          <Tooltip content={t('jobs.templates_public', 'Public')}>
+          <Tooltip content={t('jobs.templates_public')}>
             <Globe size={16} className="text-success" />
           </Tooltip>
         ) : (
-          <Tooltip content={t('jobs.templates_private', 'Private')}>
+          <Tooltip content={t('jobs.templates_private')}>
             <Lock size={16} className="text-default-400" />
           </Tooltip>
         ),
     },
     {
       key: 'use_count',
-      label: t('jobs.templates_col_uses', 'Uses'),
+      label: t('jobs.templates_col_uses'),
       sortable: true,
       render: (tpl) => tpl.use_count,
     },
     {
       key: 'created_at',
-      label: t('jobs.templates_col_created', 'Created'),
+      label: t('jobs.templates_col_created'),
       sortable: true,
       render: (tpl) =>
         new Date(tpl.created_at).toLocaleDateString(undefined, {
@@ -193,16 +193,16 @@ export function JobTemplatesAdmin() {
     },
     {
       key: 'actions',
-      label: t('jobs.templates_col_actions', 'Actions'),
+      label: t('jobs.templates_col_actions'),
       render: (tpl) => (
-        <Tooltip content={t('jobs.templates_delete', 'Delete template')} color="danger">
+        <Tooltip content={t('jobs.templates_delete')} color="danger">
           <Button
             isIconOnly
             size="sm"
             variant="light"
             color="danger"
             onPress={() => setConfirmDelete(tpl)}
-            aria-label={t('jobs.templates_delete', 'Delete template')}
+            aria-label={t('jobs.templates_delete')}
           >
             <Trash2 size={16} />
           </Button>
@@ -216,7 +216,7 @@ export function JobTemplatesAdmin() {
   return (
     <div>
       <PageHeader
-        title={t('jobs.templates_page_title', 'Job Templates')}
+        title={t('jobs.templates_page_title')}
         description={t(
           'jobs.templates_page_description',
           'Manage reusable job posting templates'
@@ -227,7 +227,7 @@ export function JobTemplatesAdmin() {
             startContent={<RefreshCw size={16} />}
             onPress={loadItems}
           >
-            {t('jobs.templates_refresh', 'Refresh')}
+            {t('jobs.templates_refresh')}
           </Button>
         }
       />
@@ -235,7 +235,7 @@ export function JobTemplatesAdmin() {
       {!loading && items.length === 0 && !search ? (
         <EmptyState
           icon={Copy}
-          title={t('jobs.templates_empty', 'No job templates')}
+          title={t('jobs.templates_empty')}
           description={t(
             'jobs.templates_empty_description',
             'Job templates will appear here once users create them.'
@@ -248,7 +248,7 @@ export function JobTemplatesAdmin() {
           keyField="id"
           isLoading={loading}
           searchable
-          searchPlaceholder={t('jobs.templates_search', 'Search templates...')}
+          searchPlaceholder={t('jobs.templates_search')}
           totalItems={total}
           page={page}
           pageSize={PAGE_SIZE}
@@ -265,11 +265,11 @@ export function JobTemplatesAdmin() {
         isOpen={!!confirmDelete}
         onClose={() => setConfirmDelete(null)}
         onConfirm={handleDelete}
-        title={t('jobs.templates_delete_title', 'Delete Template')}
-        message={t('jobs.templates_delete_confirm', 'Are you sure you want to delete "{{name}}"? This action cannot be undone.', {
+        title={t('jobs.templates_delete_title')}
+        message={t('jobs.templates_delete_confirm', {
           name: confirmDelete?.name ?? '',
         })}
-        confirmLabel={t('jobs.templates_delete', 'Delete')}
+        confirmLabel={t('jobs.templates_delete')}
         confirmColor="danger"
         isLoading={actionLoading}
       />

@@ -93,7 +93,7 @@ function getSpamScoreColor(score: number): 'success' | 'warning' | 'danger' | 'd
 
 export function JobModerationQueue() {
   const { t } = useTranslation('jobs');
-  usePageTitle(t('moderation.title', 'Moderation Queue'));
+  usePageTitle(t('moderation.title'));
   const toast = useToast();
 
   // State
@@ -177,7 +177,7 @@ export function JobModerationQueue() {
 
     // Reject and flag require a reason
     if ((action === 'reject' || action === 'flag') && !actionReason.trim()) {
-      toast.error(t('moderation.reason_required', 'A reason is required'));
+      toast.error(t('moderation.reason_required'));
       return;
     }
 
@@ -205,7 +205,7 @@ export function JobModerationQueue() {
         toast.error(t(errorKey));
       }
     } catch {
-      toast.error(t('something_wrong', 'Something went wrong. Please try again.'));
+      toast.error(t('something_wrong'));
     } finally {
       setActionLoading(false);
       setActionModal({ isOpen: false, action: 'approve', job: null });
@@ -213,23 +213,23 @@ export function JobModerationQueue() {
   };
 
   const actionConfig: Record<ModerationAction, { color: 'success' | 'danger' | 'warning'; icon: typeof CheckCircle2; label: string }> = {
-    approve: { color: 'success', icon: CheckCircle2, label: t('moderation.approve', 'Approve') },
-    reject: { color: 'danger', icon: XCircle, label: t('moderation.reject', 'Reject') },
-    flag: { color: 'warning', icon: Flag, label: t('moderation.flag', 'Flag for Review') },
+    approve: { color: 'success', icon: CheckCircle2, label: t('moderation.approve') },
+    reject: { color: 'danger', icon: XCircle, label: t('moderation.reject') },
+    flag: { color: 'warning', icon: Flag, label: t('moderation.flag') },
   };
 
   return (
     <div>
       <PageHeader
-        title={t('moderation.title', 'Moderation Queue')}
-        description={t('moderation.description', 'Review and approve job postings before they go live')}
+        title={t('moderation.title')}
+        description={t('moderation.description')}
         actions={
           <Button
             variant="flat"
             startContent={<RefreshCw size={16} />}
             onPress={() => { loadPendingJobs(); loadStats(); }}
           >
-            {t('moderation.refresh', 'Refresh')}
+            {t('moderation.refresh')}
           </Button>
         }
       />
@@ -237,35 +237,35 @@ export function JobModerationQueue() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
         <StatCard
-          label={t('moderation.stats.pending_count', 'Pending')}
+          label={t('moderation.stats.pending_count')}
           value={stats?.pending ?? 0}
           icon={Clock}
           color="warning"
           loading={statsLoading}
         />
         <StatCard
-          label={t('moderation.stats.approved_today', 'Approved Today')}
+          label={t('moderation.stats.approved_today')}
           value={stats?.approved_today ?? 0}
           icon={ShieldCheck}
           color="success"
           loading={statsLoading}
         />
         <StatCard
-          label={t('moderation.stats.rejected_today', 'Rejected Today')}
+          label={t('moderation.stats.rejected_today')}
           value={stats?.rejected_today ?? 0}
           icon={XCircle}
           color="danger"
           loading={statsLoading}
         />
         <StatCard
-          label={t('moderation.stats.flagged_count', 'Flagged')}
+          label={t('moderation.stats.flagged_count')}
           value={stats?.flagged ?? 0}
           icon={Flag}
           color="warning"
           loading={statsLoading}
         />
         <StatCard
-          label={t('moderation.stats.total_reviewed', 'Total Reviewed')}
+          label={t('moderation.stats.total_reviewed')}
           value={stats?.total_reviewed ?? 0}
           icon={BarChart3}
           color="primary"
@@ -279,25 +279,25 @@ export function JobModerationQueue() {
           <CardHeader className="flex items-center gap-2 pb-2">
             <ShieldAlert size={18} className="text-warning" />
             <h3 className="text-sm font-semibold text-foreground">
-              {t('spam.title', 'Spam Detection')}
+              {t('spam.title')}
             </h3>
           </CardHeader>
           <CardBody className="pt-0">
             <div className="flex flex-wrap gap-6 text-sm">
               <div>
-                <span className="text-default-500">{t('spam.total_analyzed', 'Total Analyzed')}:</span>{' '}
+                <span className="text-default-500">{t('spam.total_analyzed')}:</span>{' '}
                 <span className="font-medium">{spamStats.total_analyzed}</span>
               </div>
               <div>
-                <span className="text-default-500">{t('spam.blocked_count', 'Blocked')}:</span>{' '}
+                <span className="text-default-500">{t('spam.blocked_count')}:</span>{' '}
                 <span className="font-medium text-danger">{spamStats.blocked}</span>
               </div>
               <div>
-                <span className="text-default-500">{t('spam.flagged_count', 'Flagged')}:</span>{' '}
+                <span className="text-default-500">{t('spam.flagged_count')}:</span>{' '}
                 <span className="font-medium text-warning">{spamStats.flagged}</span>
               </div>
               <div>
-                <span className="text-default-500">{t('spam.avg_score', 'Avg. Score')}:</span>{' '}
+                <span className="text-default-500">{t('spam.avg_score')}:</span>{' '}
                 <span className="font-medium">{spamStats.avg_score}</span>
               </div>
             </div>
@@ -317,13 +317,13 @@ export function JobModerationQueue() {
       {/* Pending Jobs List */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <Spinner label={t('moderation.loading', 'Loading moderation queue...')} />
+          <Spinner label={t('moderation.loading')} />
         </div>
       ) : pendingJobs.length === 0 ? (
         <EmptyState
           icon={Inbox}
-          title={t('moderation.no_pending', 'No pending jobs')}
-          description={t('moderation.no_pending_description', 'All job postings have been reviewed. New submissions will appear here.')}
+          title={t('moderation.no_pending')}
+          description={t('moderation.no_pending_description')}
         />
       ) : (
         <div className="flex flex-col gap-4">
@@ -346,7 +346,7 @@ export function JobModerationQueue() {
                         </h3>
                         <p className="text-xs text-default-500">
                           {job.poster_name
-                            ? t('moderation.posted_by', 'Posted by {{name}}', { name: job.poster_name })
+                            ? t('moderation.posted_by', { name: job.poster_name })
                             : t('moderation.user_fallback', { id: job.user_id })}
                           {' '}&middot;{' '}
                           {new Date(job.created_at).toLocaleDateString(undefined, {
@@ -362,7 +362,7 @@ export function JobModerationQueue() {
 
                     {/* Description preview */}
                     <p className="text-sm text-default-600 line-clamp-3 mb-2">
-                      {job.description || t('moderation.no_description', 'No description provided')}
+                      {job.description || t('moderation.no_description')}
                     </p>
 
                     {/* Meta chips */}
@@ -388,7 +388,7 @@ export function JobModerationQueue() {
                             ? t('moderation.flags_tooltip', {
                                 flags: job.spam_flags.map(getFlagLabel).join(', '),
                               })
-                            : t('moderation.no_flags', 'No specific flags')
+                            : t('moderation.no_flags')
                         }>
                           <Chip
                             size="sm"
@@ -396,7 +396,7 @@ export function JobModerationQueue() {
                             color={getSpamScoreColor(job.spam_score)}
                             startContent={<AlertTriangle size={12} />}
                           >
-                            {t('moderation.spam_score', 'Spam Score: {{score}}', { score: job.spam_score })}
+                            {t('moderation.spam_score', { score: job.spam_score })}
                           </Chip>
                         </Tooltip>
                       )}
@@ -414,7 +414,7 @@ export function JobModerationQueue() {
                       startContent={<CheckCircle2 size={14} />}
                       onPress={() => openActionModal('approve', job)}
                     >
-                      {t('moderation.approve', 'Approve')}
+                      {t('moderation.approve')}
                     </Button>
                     <Button
                       size="sm"
@@ -423,7 +423,7 @@ export function JobModerationQueue() {
                       startContent={<XCircle size={14} />}
                       onPress={() => openActionModal('reject', job)}
                     >
-                      {t('moderation.reject', 'Reject')}
+                      {t('moderation.reject')}
                     </Button>
                     <Button
                       size="sm"
@@ -432,7 +432,7 @@ export function JobModerationQueue() {
                       startContent={<Flag size={14} />}
                       onPress={() => openActionModal('flag', job)}
                     >
-                      {t('moderation.flag', 'Flag')}
+                      {t('moderation.flag')}
                     </Button>
                   </div>
                 </div>
@@ -473,18 +473,18 @@ export function JobModerationQueue() {
                 </ModalHeader>
                 <ModalBody>
                   <p className="text-sm text-default-600 mb-3">
-                    {actionModal.action === 'approve' && t('moderation.confirm_approve', 'Approve this job posting? It will be published immediately.')}
-                    {actionModal.action === 'reject' && t('moderation.confirm_reject', 'Are you sure you want to reject this job posting?')}
-                    {actionModal.action === 'flag' && t('moderation.confirm_flag', 'Flag this job posting for further review?')}
+                    {actionModal.action === 'approve' && t('moderation.confirm_approve')}
+                    {actionModal.action === 'reject' && t('moderation.confirm_reject')}
+                    {actionModal.action === 'flag' && t('moderation.confirm_flag')}
                   </p>
                   <Textarea
                     label={requiresReason
-                      ? t('moderation.reason_label', 'Reason')
-                      : t('moderation.notes_label', 'Notes (optional)')
+                      ? t('moderation.reason_label')
+                      : t('moderation.notes_label')
                     }
                     placeholder={requiresReason
-                      ? t('moderation.reason_placeholder', 'Provide a reason for this action...')
-                      : t('moderation.notes_placeholder', 'Add optional notes...')
+                      ? t('moderation.reason_placeholder')
+                      : t('moderation.notes_placeholder')
                     }
                     value={actionReason}
                     onValueChange={setActionReason}
@@ -498,7 +498,7 @@ export function JobModerationQueue() {
                     variant="flat"
                     onPress={() => setActionModal({ isOpen: false, action: 'approve', job: null })}
                   >
-                    {t('moderation.cancel', 'Cancel')}
+                    {t('moderation.cancel')}
                   </Button>
                   <Button
                     color={config.color}
