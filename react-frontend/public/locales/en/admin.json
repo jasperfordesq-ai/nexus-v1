@@ -7584,6 +7584,20 @@
   },
   "details": "Details",
   "diagnostics": {
+    "avg_match_score": "Avg Match Score",
+    "cache_entries": "Cache Entries",
+    "diagnose": "Diagnose",
+    "diagnose_listing_matches": "Diagnose Listing Matches",
+    "diagnose_listing_matches_desc": "Enter a listing ID to see which users were matched and why.",
+    "diagnose_user_matches": "Diagnose User Matches",
+    "diagnose_user_matches_desc": "Enter a user ID to see their match results, scores, and the factors contributing to each match.",
+    "engine_status": "Engine Status",
+    "factor_community_participation": "Community Participation",
+    "factor_login_frequency": "Login Frequency",
+    "factor_profile_completeness": "Profile Completeness",
+    "factor_review_quality": "Review Quality",
+    "factor_social_engagement": "Social Engagement",
+    "factor_transaction_activity": "Transaction Activity",
     "failed_to_diagnose_listing": "Failed to diagnose listing",
     "failed_to_diagnose_user": "Failed to diagnose user",
     "failed_to_load_engine_status": "Failed to load engine status",
@@ -7594,6 +7608,7 @@
     "label_user_i_d": "User ID",
     "matching_diagnostic_desc": "Run a diagnostic on specific users or listings to understand match scores",
     "matching_diagnostic_title": "Matching Diagnostic",
+    "matches_today": "Matches Today",
     "nexus_score_analytics_desc": "View analytics for NEXUS scores across your member base",
     "nexus_score_analytics_title": "NEXUS Score Analytics",
     "no_diagnostic_data_found_for_this_listin": "No diagnostic data found for this listing",
@@ -7604,7 +7619,8 @@
     "score_distribution": "Score Distribution",
     "score_distribution_empty": "No score distribution found",
     "score_factors": "Score Factors",
-    "score_factors_desc": "Score Factors."
+    "score_factors_desc": "Score factors are weighted signals used to calculate member engagement.",
+    "user_prompt": "Enter a user ID and click Diagnose to see their matching analysis."
   },
   "enterprise": {
     "back_to_roles": "Back to Roles",

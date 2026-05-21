@@ -13,6 +13,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Input, Button, Spinner } from '@heroui/react';
 import Stethoscope from 'lucide-react/icons/stethoscope';
 import Search from 'lucide-react/icons/search';
+import { useTranslation } from 'react-i18next';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useToast } from '@/contexts';
 import { adminDiagnostics } from '../../api/adminApi';
@@ -32,7 +33,8 @@ interface EngineStatus {
 }
 
 export function MatchingDiagnostic() {
-  useAdminPageMeta({ title: "Diagnostics" });
+  const { t } = useTranslation('admin');
+  useAdminPageMeta({ title: t('diagnostics.page_title') });
   const toast = useToast();
 
   const [userId, setUserId] = useState('');
@@ -51,9 +53,9 @@ export function MatchingDiagnostic() {
           setEngineStatus(res.data as EngineStatus);
         }
       })
-      .catch(() => toast.error("Failed to load engine status"))
+      .catch(() => toast.error(t('diagnostics.failed_to_load_engine_status')))
       .finally(() => setLoadingEngine(false));
-  }, [toast])
+  }, [t, toast])
 
 
   const handleDiagnoseUser = async () => {
@@ -65,10 +67,10 @@ export function MatchingDiagnostic() {
       if (res.success && res.data) {
         setUserResult(res.data as DiagResult);
       } else {
-        toast.error("No diagnostic data found for this user");
+        toast.error(t('diagnostics.no_diagnostic_data_found_for_this_user'));
       }
     } catch {
-      toast.error("Failed to diagnose user");
+      toast.error(t('diagnostics.failed_to_diagnose_user'));
     } finally {
       setLoadingUser(false);
     }
@@ -83,10 +85,10 @@ export function MatchingDiagnostic() {
       if (res.success && res.data) {
         setListingResult(res.data as DiagResult);
       } else {
-        toast.error("No diagnostic data found for this listing");
+        toast.error(t('diagnostics.no_diagnostic_data_found_for_this_listin'));
       }
     } catch {
-      toast.error("Failed to diagnose listing");
+      toast.error(t('diagnostics.failed_to_diagnose_listing'));
     } finally {
       setLoadingListing(false);
     }
@@ -96,15 +98,15 @@ export function MatchingDiagnostic() {
 
   return (
     <div>
-      <PageHeader title={"Matching Diagnostic"} description={"Run a diagnostic on specific users or listings to understand match scores"} />
+      <PageHeader title={t('diagnostics.matching_diagnostic_title')} description={t('diagnostics.matching_diagnostic_desc')} />
 
       <div className="space-y-4">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Stethoscope size={20} /> {"Diagnose User Matches"}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Stethoscope size={20} /> {t('diagnostics.diagnose_user_matches')}</h3></CardHeader>
           <CardBody className="gap-4">
-            <p className="text-sm text-default-500">Enter a user ID to see their match results, scores, and the factors contributing to each match.</p>
+            <p className="text-sm text-default-500">{t('diagnostics.diagnose_user_matches_desc')}</p>
             <div className="flex gap-3">
-              <Input label={"User ID"} placeholder="e.g., 42" type="number" value={userId} onValueChange={setUserId} variant="bordered" className="max-w-xs" />
+              <Input label={t('diagnostics.label_user_i_d')} placeholder="e.g., 42" type="number" value={userId} onValueChange={setUserId} variant="bordered" className="max-w-xs" />
               <Button
                 color="primary"
                 startContent={loadingUser ? undefined : <Search size={16} />}
@@ -113,7 +115,7 @@ export function MatchingDiagnostic() {
                 isLoading={loadingUser}
                 onPress={handleDiagnoseUser}
               >
-                Diagnose
+                {t('diagnostics.diagnose')}
               </Button>
             </div>
             {userResult && (
@@ -126,17 +128,17 @@ export function MatchingDiagnostic() {
               </Card>
             )}
             {!userId && !userResult && (
-              <p className="text-xs text-default-400">Enter a user ID and click Diagnose to see their matching analysis.</p>
+              <p className="text-xs text-default-400">{t('diagnostics.user_prompt')}</p>
             )}
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{"Diagnose Listing Matches"}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics.diagnose_listing_matches')}</h3></CardHeader>
           <CardBody className="gap-4">
-            <p className="text-sm text-default-500">Enter a listing ID to see which users were matched and why.</p>
+            <p className="text-sm text-default-500">{t('diagnostics.diagnose_listing_matches_desc')}</p>
             <div className="flex gap-3">
-              <Input label={"Listing ID"} placeholder="e.g., 105" type="number" value={listingId} onValueChange={setListingId} variant="bordered" className="max-w-xs" />
+              <Input label={t('diagnostics.label_listing_i_d')} placeholder="e.g., 105" type="number" value={listingId} onValueChange={setListingId} variant="bordered" className="max-w-xs" />
               <Button
                 color="primary"
                 startContent={loadingListing ? undefined : <Search size={16} />}
@@ -145,7 +147,7 @@ export function MatchingDiagnostic() {
                 isLoading={loadingListing}
                 onPress={handleDiagnoseListing}
               >
-                Diagnose
+                {t('diagnostics.diagnose')}
               </Button>
             </div>
             {listingResult && (
@@ -161,22 +163,22 @@ export function MatchingDiagnostic() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{"Engine Status"}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics.engine_status')}</h3></CardHeader>
           <CardBody>
             {loadingEngine ? (
               <div className="flex justify-center py-4"><Spinner size="sm" /></div>
             ) : (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="rounded-lg border border-default-200 p-3 text-center">
-                  <p className="text-sm text-default-500">{"Matches Today"}</p>
+                  <p className="text-sm text-default-500">{t('diagnostics.matches_today')}</p>
                   <p className="font-medium">{overview?.total_matches_today ?? '--'}</p>
                 </div>
                 <div className="rounded-lg border border-default-200 p-3 text-center">
-                  <p className="text-sm text-default-500">{"Cache Entries"}</p>
+                  <p className="text-sm text-default-500">{t('diagnostics.cache_entries')}</p>
                   <p className="font-medium">{overview?.cache_entries ?? '--'}</p>
                 </div>
                 <div className="rounded-lg border border-default-200 p-3 text-center">
-                  <p className="text-sm text-default-500">{"Avg Match Score"}</p>
+                  <p className="text-sm text-default-500">{t('diagnostics.avg_match_score')}</p>
                   <p className="font-medium">
                     {overview?.avg_match_score !== undefined
                       ? `${Number(overview.avg_match_score).toFixed(1)}%`

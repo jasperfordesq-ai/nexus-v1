@@ -13,6 +13,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Spinner } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import TrendingUp from 'lucide-react/icons/trending-up';
+import { useTranslation } from 'react-i18next';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useToast } from '@/contexts';
 import { adminDiagnostics } from '../../api/adminApi';
@@ -31,7 +32,8 @@ interface NexusScoreData {
 }
 
 export function NexusScoreAnalytics() {
-  useAdminPageMeta({ title: "Diagnostics" });
+  const { t } = useTranslation('admin');
+  useAdminPageMeta({ title: t('diagnostics.page_title') });
   const toast = useToast();
 
   const [data, setData] = useState<NexusScoreData | null>(null);
@@ -44,15 +46,15 @@ export function NexusScoreAnalytics() {
           setData(res.data as NexusScoreData);
         }
       })
-      .catch(() => toast.error("Failed to load NEXUS score analytics"))
+      .catch(() => toast.error(t('diagnostics.failed_to_load_nexus_score_analytics')))
       .finally(() => setLoading(false));
-  }, [toast])
+  }, [t, toast])
 
 
   if (loading) {
     return (
       <div>
-        <PageHeader title={"NEXUS Score Analytics"} description={"View analytics for NEXUS scores across your member base"} />
+        <PageHeader title={t('diagnostics.nexus_score_analytics_title')} description={t('diagnostics.nexus_score_analytics_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -62,29 +64,29 @@ export function NexusScoreAnalytics() {
 
   return (
     <div>
-      <PageHeader title={"NEXUS Score Analytics"} description={"View analytics for NEXUS scores across your member base"} />
+      <PageHeader title={t('diagnostics.nexus_score_analytics_title')} description={t('diagnostics.nexus_score_analytics_desc')} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={"Avg NEXUS Score"}
+          label={t('diagnostics.label_avg_nexus_score')}
           value={stats.avg_nexus_score !== undefined ? `${Number(stats.avg_nexus_score).toFixed(1)}` : String(stats.total_xp_awarded)}
           icon={BarChart3}
           color="primary"
         />
         <StatCard
-          label={"Top 10 Percent Threshold"}
+          label={t('diagnostics.label_top_10_percent_threshold')}
           value={stats.top_10_threshold !== undefined ? String(stats.top_10_threshold) : String(stats.total_badges_awarded)}
           icon={TrendingUp}
           color="success"
         />
         <StatCard
-          label={"Active Users Scored"}
+          label={t('diagnostics.label_active_users_scored')}
           value={stats.active_users_scored ?? stats.active_users}
           icon={BarChart3}
           color="warning"
         />
         <StatCard
-          label={"Score Trend 30d"}
+          label={t('diagnostics.label_score_trend_30d')}
           value={stats.score_trend_30d !== undefined ? `${stats.score_trend_30d > 0 ? '+' : ''}${stats.score_trend_30d}%` : String(stats.active_campaigns)}
           icon={TrendingUp}
           color="secondary"
@@ -93,7 +95,7 @@ export function NexusScoreAnalytics() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{"Score Distribution"}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics.score_distribution')}</h3></CardHeader>
           <CardBody>
             {stats.badge_distribution && stats.badge_distribution.length > 0 ? (
               <div className="space-y-3">
@@ -107,24 +109,24 @@ export function NexusScoreAnalytics() {
             ) : (
               <div className="flex flex-col items-center py-8 text-default-400">
                 <BarChart3 size={40} className="mb-3" />
-                <p>{"No score distribution found"}</p>
+                <p>{t('diagnostics.score_distribution_empty')}</p>
               </div>
             )}
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{"Score Factors"}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics.score_factors')}</h3></CardHeader>
           <CardBody>
-            <p className="text-xs text-default-400 mb-3">{"Score Factors."}</p>
+            <p className="text-xs text-default-400 mb-3">{t('diagnostics.score_factors_desc')}</p>
             <div className="space-y-3">
               {[
-                { factor: 'Transaction Activity', weight: '25%' },
-                { factor: 'Social Engagement', weight: '20%' },
-                { factor: 'Profile Completeness', weight: '15%' },
-                { factor: 'Login Frequency', weight: '15%' },
-                { factor: 'Community Participation', weight: '15%' },
-                { factor: 'Review Quality', weight: '10%' },
+                { factor: t('diagnostics.factor_transaction_activity'), weight: '25%' },
+                { factor: t('diagnostics.factor_social_engagement'), weight: '20%' },
+                { factor: t('diagnostics.factor_profile_completeness'), weight: '15%' },
+                { factor: t('diagnostics.factor_login_frequency'), weight: '15%' },
+                { factor: t('diagnostics.factor_community_participation'), weight: '15%' },
+                { factor: t('diagnostics.factor_review_quality'), weight: '10%' },
               ].map(({ factor, weight }) => (
                 <div key={factor} className="flex items-center justify-between py-1 border-b border-default-100 last:border-0">
                   <span className="text-sm">{factor}</span>
