@@ -299,7 +299,570 @@
     "sitemap_urls_by_type": "URLs by Type",
     "social_sharing_image_heading": "Social Sharing Image",
     "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
-    "usage_limits_heading": "Usage Limits"
+    "usage_limits_heading": "Usage Limits",
+    "prerender": {
+      "description": "ボットのみのサーバーでレンダリングされたスナップショット。カバレッジを監視し、古くなったものを検出し、強制的に更新します。",
+      "analytics": {
+        "actions": {
+          "reload": "リロード"
+        },
+        "columns": {
+          "crawler": "NEXUSTERM20トークン",
+          "hits": "NEXUSTERM21トークン",
+          "host": "NEXUSTERM22トークン",
+          "ip": "NEXUSTERM14トークン",
+          "status": "NEXUSTERM23トークン",
+          "time": "NEXUSTERM24トークン",
+          "uri": "NEXUSTERM12トークン",
+          "url": "NEXUSTERM11トークン"
+        },
+        "empty": "利用可能な分析はありません。ボットのアクセス ログが空である可能性があります。",
+        "empty_bot_traffic": "ボットトラフィックはまだありません",
+        "empty_no_data": "データなし",
+        "empty_recent_hits": "最近のヒット曲はありません",
+        "errors": {
+          "load": "分析のロードに失敗しました"
+        },
+        "filters": {
+          "window": "ウィンドウ"
+        },
+        "hints": {
+          "spoofed": "主要なボットを主張し、IP 範囲に失敗しました",
+          "top_50_cap": "top-50 ????",
+          "verified_of_total": "{{total}} の {{verified}}"
+        },
+        "kpi": {
+          "ip_verified": "IP-検証済み",
+          "spoofed": "なりすまし（疑わしい）",
+          "total_bot_hits": "ボットの総ヒット数",
+          "unique_uris": "ユニークな URI"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} がなりすましされました"
+        },
+        "log_summary": "ログ: {{size}} - {{time}} 以降",
+        "sections": {
+          "hits_by_crawler": "クローラーによるヒット",
+          "hits_by_status": "HTTP ステータスによるヒット数",
+          "recent_activity": "最近のアクティビティ (新しい順、最後の {{count}})",
+          "top_uris": "?? URI (?????? 50 ?)"
+        },
+        "tables": {
+          "recent_hits_aria": "最近のボットのヒット数",
+          "top_uris_aria": "トップの URI"
+        },
+        "windows": {
+          "1": "過去 24 時間",
+          "7": "過去 7 日間",
+          "30": "過去 30 日間"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "インベントリで開く",
+          "refresh": "リフレッシュ",
+          "refresh_all_stale": "古いものをすべて更新 ({{count}})"
+        },
+        "columns": {
+          "actions": "NEXUSTERM25トークン",
+          "asset": "ANEXUSTERM19トークン",
+          "coverage": "NEXUSTERM27トークン",
+          "host": "NEXUSTERM22トークン",
+          "missing": "NEXUSTERM28トークン",
+          "stale": "NEXUSTERM29トークン",
+          "tenant": "NEXUSTERM30トークン"
+        },
+        "confirm": {
+          "queue_recache": "{{count}} ?????????????????????????"
+        },
+        "empty": "テナントなし",
+        "errors": {
+          "bulk_enqueue": "一括エンキューに失敗しました (一部のテナントがキューに入っている可能性があります)",
+          "enqueue": "エンキューに失敗しました",
+          "load": "カバレッジのロードに失敗しました"
+        },
+        "messages": {
+          "bulk_queued": "{{count}} テナントのキューに入れられた再キャッシュ",
+          "no_stale": "古いテナントはありません - カバレッジは健全です",
+          "tenant_queued": "{{slug}} ? #{{id}} ???????????"
+        },
+        "summary": {
+          "healthy": "???? {{count}} ????????????",
+          "needs_work": "{{total}} テナントの {{needing}} には、ルートが見つからないか、古くなっているか、資産が壊れています。"
+        },
+        "table_aria": "カバレッジ"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "適用する",
+          "dry_run": "ドライラン"
+        },
+        "auto_recache": {
+          "description": "すべてのスナップショットをスキャンします。ソース コンテンツが変更されたルート、または TTL の有効期限が切れたルートの、優先度の低い再キャッシュをキューに入れます。 cron で 15 ～ 30 分ごとに実行されます。これを使用してすぐにトリガーします。",
+          "title": "自動再キャッシュ (TTL + コンテンツ ドリフト)"
+        },
+        "drift": {
+          "description": "各テナント サイトマップを調べ、lastmod をスナップショット mtimes と比較し、生の書き込み、移行、またはキューに入れられたジョブから古いページを捕捉します。 2 分ごとに実行され、優先度の高い再キャッシュがキューに入れられます。",
+          "title": "ドリフトの検出 (サイトマップとスナップショット)"
+        },
+        "errors": {
+          "auto_recache": "自動再キャッシュのトリガーに失敗しました",
+          "drift_detection": "ドリフト検出のトリガーに失敗しました",
+          "purge_unexpected": "パージが予期せず失敗しました"
+        },
+        "messages": {
+          "auto_recache_applied": "自動再キャッシュが適用されました",
+          "auto_recache_dry_run": "自動再キャッシュのドライランが完了しました",
+          "drift_applied": "ドリフト検出が適用されました",
+          "drift_dry_run": "ドリフト予行演習完了",
+          "purge_dry_run": "?????: {{count}} ?????????????????",
+          "purged_ungated": "{{tenants}} テナント全体で {{count}} のゲートされていないスナップショットをパージしました"
+        },
+        "no_output": "(出力なし)",
+        "purge_ungated": {
+          "description": "ルートがテナントの予期されるセットに含まれていないスナップショットをスイープします。機能をオフに切り替えた後、または機能フラグなしで事前レンダリングされた静的ルートのクリーンアップによく使用されます。動的コンテンツのルートはそのまま残されます。",
+          "title": "ゲートされていないスナップショットのパージ (テナントごとの 404 クリーンアップ)"
+        },
+        "result": {
+          "deleted": "{{tenants}} テナント全体で削除された {{count}} スナップショット",
+          "would_delete": "{{tenants}} テナント全体で {{count}} スナップショットを削除します"
+        },
+        "title": "鮮度自動化"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "キャンセル",
+          "close_breaker_now": "今すぐブレーカーを閉じてください",
+          "details": "詳細",
+          "emergency_reset": "緊急リセット",
+          "hide": "隠れる",
+          "hide_details": "詳細を隠す",
+          "reset_queue": "キューをリセット"
+        },
+        "engine_healthy": "エンジンは健全です",
+        "issue_count_one": "{{count}} ????",
+        "issue_count_other": "{{count}}の問題",
+        "modal": {
+          "body_middle": "または",
+          "body_prefix": "これにより、毎回キューに再配置されます",
+          "body_suffix": "従業員が >30 min に対して沈黙している行を削除し、サーキット ブレーカーをクリアします。",
+          "title": "緊急: スタックしたキューをリセット",
+          "warning": "これは、キューがスタックしていることを確認した場合にのみ使用してください。正常なワーカーがまだ実行中の場合、重複した作業が作成されます。"
+        },
+        "toasts": {
+          "breaker_reset": "サーキットブレーカーのリセット",
+          "queue_reset_one": "{{count}} ???????????????????????????",
+          "queue_reset_other": "{{count}} ???????????????????????????",
+          "queue_reset_failed": "キューのリセットに失敗しました",
+          "reset_failed": "リセットに失敗しました"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "近い",
+          "inspect": "検査する",
+          "inspect_snapshot": "{{path}} を検査する",
+          "open_rendered_url": "レンダリングされた URL を開く",
+          "recache_selected": "再キャッシュが選択されました ({{count}})",
+          "reload": "リロード",
+          "select_all_visible": "表示されているものをすべて選択します",
+          "select_snapshot": "{{path}}を選択します"
+        },
+        "columns": {
+          "actions": "アクション",
+          "age": "年",
+          "host": "ホスト",
+          "http": "NEXUSTERM15トークン",
+          "route": "ルート",
+          "size": "サイズ",
+          "status": "状態"
+        },
+        "empty": "フィルターに一致するスナップショットはありません",
+        "errors": {
+          "bulk_recache": "一括再キャッシュに失敗しました",
+          "inspect": "スナップショットの検査に失敗しました",
+          "load": "在庫のロードに失敗しました"
+        },
+        "filters": {
+          "aging": "エージング",
+          "all": "全て",
+          "asset_broken": "壊れた資産",
+          "content_drifted": "コンテンツのドリフト",
+          "filter": "フィルター",
+          "filter_placeholder": "ルートまたはホストの部分文字列",
+          "fresh": "新鮮な",
+          "issue": "問題",
+          "stale": "古い",
+          "staleness": "古さ",
+          "status": "状態",
+          "status_200": "200のみ",
+          "status_non_200": "200以外",
+          "tenant_placeholder": "オプション",
+          "tenant_slug": "テナントナメクジ"
+        },
+        "messages": {
+          "bulk_recache": "無効化された {{count}} スナップショットとキューに入れられた再キャッシュ"
+        },
+        "inspect": {
+          "age": "年",
+          "all_valid": "すべて有効です",
+          "asset_references": "アセット参照 ({{count}})",
+          "canonical": "正規",
+          "dead_assets": "{{count}} が死亡しました",
+          "flags": "フラグ",
+          "h1_count": "H1 (カウント)",
+          "html_parse_warnings": "HTML 解析の警告",
+          "html_preview": "HTML ????? (??? 12KB???????????)",
+          "integrity_mismatch": "レンダリング後にバイトが変更されました - sha256 {{expected}}... が期待されていましたが、{{actual}} を取得しました...",
+          "integrity_missing": "sha256 サイドカーがありません - スナップショットは整合性検証より前のものであるか、手動で編集されました",
+          "integrity_ok": "バイトはレンダリング時に書き込まれた sha256 と一致します",
+          "integrity_status": "整合性: {{status}}",
+          "integrity_unreadable": "sha256 サイドカーは存在しますが、形式が正しくありません",
+          "invalid_present": "INVALNEXUSTERM13トークンプレゼント",
+          "json_ld": "JSON-LD ({{blocks}} ブロック、{{status}})",
+          "meta_description": "メタディスクリプション",
+          "missing": "- ない -",
+          "modal_title": "スナップショット検査",
+          "modified": "修正済み",
+          "must_fix": "修正する必要があります ({{count}})",
+          "no_structured_data": "構造化データなし",
+          "no_type": "(@type なし)",
+          "none": "（なし）",
+          "old": "{{age}} 古い",
+          "open_graph": "グラフを開く",
+          "path": "パス",
+          "seo_score": "SEO スコア",
+          "size": "サイズ",
+          "tips": "??? ({{count}})",
+          "title": "タイトル"
+        },
+        "selected": "{{count}} が選択されました",
+        "status": {
+          "asset": "資産",
+          "content": "コンテンツ",
+          "content_drifted": "内容がずれた"
+        },
+        "summary": "{{total}} スナップショットのうちの {{filtered}}",
+        "table_aria": "スナップショットインベントリ"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "??? #{{id}} ??????",
+          "close": "近い",
+          "reload": "リロード",
+          "retry_job": "??? #{{id}} ????",
+          "retry_same_parameters": "同じパラメータで再試行します",
+          "view_details": "??? #{{id}} ??????"
+        },
+        "columns": {
+          "actions": "アクション",
+          "by": "による",
+          "flags": "フラグ",
+          "id": "#",
+          "priority": "優先度",
+          "queued": "キューに入れられました",
+          "result": "結果",
+          "scope": "範囲",
+          "status": "状態"
+        },
+        "detail": {
+          "all": "全て",
+          "claimed_by": "請求者",
+          "duration": "間隔",
+          "error": "エラー",
+          "exit_code": "終了コード",
+          "finished_at": "終了時刻",
+          "log_tail": "ログ（尾部）",
+          "queued_at": "でキューに入れられました",
+          "requested_by": "リクエスト者",
+          "routes": "ルート",
+          "started_at": "に開始",
+          "status": "状態",
+          "tenant": "テナント",
+          "title": "??? #{{id}}"
+        },
+        "empty": "仕事がありません",
+        "errors": {
+          "cancel": "キャンセルできませんでした - ジョブが開始された可能性があります",
+          "load": "ジョブのロードに失敗しました",
+          "retry": "再試行が失敗しました - 元のジョブがまだ実行中の可能性があります"
+        },
+        "filters": {
+          "all": "全て",
+          "cancelled": "キャンセル",
+          "failed": "失敗した",
+          "partial": "部分的",
+          "queued": "キューに入れられました",
+          "running": "ランニング",
+          "status": "状態",
+          "succeeded": "成功しました"
+        },
+        "flags": {
+          "dry_run": "予行演習",
+          "force": "力"
+        },
+        "messages": {
+          "cancelled": "??? #{{id}} ??????????",
+          "retry_queued": "??? #{{retryId}} ??????????? (#{{id}} ??)"
+        },
+        "priority": {
+          "high": "高い",
+          "low": "低い",
+          "normal": "普通",
+          "tooltip": "priority={{priority}} (??????)"
+        },
+        "result": {
+          "invalid": "{{count}} ????"
+        },
+        "scope": {
+          "all_tenants": "すべてのテナント"
+        },
+        "table_aria": "求人"
+      },
+      "events": {
+        "actions": {
+          "reload": "リロード"
+        },
+        "columns": {
+          "commit": "専念",
+          "details": "詳細",
+          "event": "イベント",
+          "time": "時間"
+        },
+        "empty": "イベントはありません",
+        "errors": {
+          "load": "イベントの読み込みに失敗しました"
+        },
+        "filters": {
+          "limit": "限界"
+        },
+        "summary": "{{count}} イベント",
+        "table_aria": "イベント",
+        "types": {
+          "fail": "失敗",
+          "partial": "部分的",
+          "success": "成功",
+          "supersede": "置き換える",
+          "unknown": "不明なイベント: {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "年",
+          "cache_path": "キャッシュパス",
+          "failed_at": "失敗しました"
+        },
+        "description_action": "強制リフレッシュ",
+        "description_middle": "このリスト内のルートは、障害バックオフ ウィンドウ中（デフォルトは 6 時間）、自動的にスキップされます。使用",
+        "description_prefix": "最近のプリレンダリング実行中に失敗したキャッシュ パス。",
+        "description_suffix": "すぐに再試行するには、「概要」タブをクリックしてください。",
+        "empty": "最近失敗はありません",
+        "errors": {
+          "load": "失敗のロードに失敗しました"
+        },
+        "table_aria": "失敗"
+      },
+      "live_connected": "ライブアップデートが接続されています",
+      "audit": {
+        "actions": {
+          "auto_recache": "NEXUSTERM0トークン",
+          "cancel": "キャンセル",
+          "detect_drift": "NEXUSTERM0トークン",
+          "enqueue": "エンキューする",
+          "invalidate": "無効にする",
+          "purge": "パージ",
+          "purge_unexpected": "NEXUSTERM0トークン",
+          "reset_breaker": "NEXUSTERM0トークン",
+          "reset_queue": "NEXUSTERM0トークン"
+        },
+        "buttons": {
+          "export_csv": "CSVをエクスポートする",
+          "refresh": "リフレッシュ"
+        },
+        "columns": {
+          "action": "アクション",
+          "actor": "俳優",
+          "details": "詳細",
+          "job": "仕事",
+          "outcome": "結果",
+          "tenant": "テナント",
+          "when": "いつ"
+        },
+        "empty": "監査エントリはありません。",
+        "fallbacks": {
+          "all": "全て",
+          "system": "システム"
+        },
+        "filters": {
+          "action": "アクションフィルター",
+          "all": "全て"
+        },
+        "table_aria": "監査履歴"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "ジョブをキューに入れる",
+          "refresh": "リフレッシュ"
+        },
+        "empty_summary": "要約はありません。",
+        "errors": {
+          "enqueue_job": "ジョブをキューに入れることができませんでした",
+          "load_summary": "概要の読み込みに失敗しました"
+        },
+        "fields": {
+          "routes": "ルート",
+          "tenant_slug": "テナントナメクジ"
+        },
+        "force_refresh": {
+          "description": "再レンダリングをキューに入れます。すべてのテナントとルートを更新するには、両方のフィールドを空のままにします。ホスト プロセッサは約 60 秒以内にジョブを取得します。",
+          "dry_run": "ドライラン (計画のみ)",
+          "force": "強制（キャッシュを無視）",
+          "title": "強制リフレッシュ"
+        },
+        "health": {
+          "cache_unreachable": "キャッシュに到達できません",
+          "healthy": "健康",
+          "missing": "{{count}} がありません",
+          "stale": "{{count}} が古い"
+        },
+        "hints": {
+          "active_jobs": "{{count}} アクティブ",
+          "aging": "{{count}} のエージング (7 日以上)",
+          "asset_broken": "参照が無効になっています /assets/*",
+          "backoff_window": "6 時間のバックオフ ウィンドウ内",
+          "cache_age": "最古の {{oldest}} / 最新の {{newest}}",
+          "content_stale": "スナップショットより新しいソース コンテンツ",
+          "event_at": "???? {{time}}",
+          "no_events": "イベントはありません",
+          "prometheus": "プロメテウスのテキスト形式",
+          "tenants_routes": "{{tenants}} テナント x {{routes}} ルート"
+        },
+        "kpi": {
+          "age_stale": "古い (>14 日)",
+          "asset_broken": "資産が壊れた",
+          "build_commit": "ビルドコミット",
+          "cache_size": "キャッシュサイズ",
+          "content_stale": "コンテンツが古い",
+          "coverage": "カバレッジ",
+          "metrics": "メトリクス",
+          "missing": "ない",
+          "queued_jobs": "キューに入れられたジョブ",
+          "recent_failures": "最近の失敗",
+          "status": "状態"
+        },
+        "last_run": "最後に完了した実行",
+        "messages": {
+          "job_queued": "??? #{{id}} ???????????"
+        },
+        "placeholders": {
+          "routes": "/about、/blog (空白 = すべて)",
+          "tenant_slug": "例えば時間-タイムバンク (空白 = すべて)"
+        },
+        "super_admin_only": "スーパー管理者のみ"
+      },
+      "polling_fallback": "ポーリングフォールバック",
+      "purge": {
+        "actions": {
+          "auto_recache": "パージ後の自動再キャッシュ",
+          "dry_run": "ドライラン",
+          "preview_purge": "プレビューパージ",
+          "purge_now": "今すぐパージ"
+        },
+        "description_middle": "1 つのパス セグメントに対して、",
+        "description_prefix": "グロブパターンに一致するスナップショットを削除します。使用",
+        "description_suffix": "あらゆる子孫のために。例:",
+        "errors": {
+          "pattern_required": "パターンは必須です (例: /blog/*)",
+          "purge_failed": "パージに失敗しました"
+        },
+        "fields": {
+          "pattern": "パターン",
+          "tenant_slug": "テナントナメクジ"
+        },
+        "messages": {
+          "dry_run": "?????: {{count}} ?????????????????",
+          "purged": "パージされた {{count}} スナップショット{{job}}"
+        },
+        "placeholders": {
+          "pattern": "/blog/* または /listings/**",
+          "tenant_slug": "オプション - すべて空白のままにします"
+        },
+        "result": {
+          "deleted": "{{count}} ?????????????????",
+          "would_delete": "{{count}} ????????????????"
+        },
+        "title": "ワイルドカードキャッシュのパージ"
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "検査する"
+        },
+        "description_prefix": "どちらを参照してください",
+        "description_suffix": "pattern は、設定を grep せずに、ルートとそれが取得する TTL を所有します。鮮度ポリシーを調整するために使用されます。",
+        "error": "ルックアップに失敗しました - ルート形式を確認してください (「/」で始まる必要があります)",
+        "fields": {
+          "route": "ルート"
+        },
+        "path_only": "パスのみ - スキームやホストなし",
+        "placeholders": {
+          "route": "/ブログ/私の投稿"
+        },
+        "result": {
+          "match": "一致: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (特異性 {{specificity}})",
+          "other_patterns": "このルートに一致する他のパターン:",
+          "ttl": "TTL: {{ttl}} ({{seconds}})"
+        },
+        "title": "TTL検査官",
+        "units": {
+          "days": "{{count}}?",
+          "hours": "{{count}} h",
+          "minutes": "{{count}} 分"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "探検する"
+        },
+        "counts": {
+          "dynamic": "{{count}} ダイナミック",
+          "static": "{{count}} 静的",
+          "total": "{{count}} 合計"
+        },
+        "description_prefix": "エンジンがテナントに対してどのルートをレンダリングする予定であるかを正確に確認します - 静的フロア (機能/モジュール ゲート) と、からの動的 URL",
+        "description_suffix": "Playwright ワーカーはこのリストにアクセスします。",
+        "error": "ルックアップに失敗しました - テナントのスラッグを確認してください",
+        "fields": {
+          "tenant_slug": "テナントナメクジ"
+        },
+        "none": "（なし）",
+        "placeholders": {
+          "tenant_slug": "時間銀行"
+        },
+        "sections": {
+          "dynamic_routes": "動的ルート (上限は 1,000)",
+          "static_routes": "静的ルート"
+        },
+        "title": "サイトマップエクスプローラー"
+      },
+      "readonly": {
+        "prefix": "読み取り専用ビュー - プリレンダリング エンジンはすべてのテナントにわたって動作するため、アクション ボタンは無効になります。でサインインします",
+        "role": "プラットフォームのスーパー管理者",
+        "suffix": "アカウントを使用して、ジョブをキューに入れたり、スナップショットをパージしたり、ドリフト検出をトリガーしたりできます。"
+      },
+      "tabs": {
+        "analytics": "分析",
+        "coverage": "カバレッジ",
+        "events": "イベント",
+        "failures": "失敗",
+        "history": "歴史",
+        "inventory": "在庫",
+        "jobs": "求人",
+        "overview": "概要"
+      },
+      "tabs_aria": "タブの事前レンダリング",
+      "title": "プリレンダー エンジン"
+    }
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",
@@ -342,7 +905,132 @@
     "refresh": "Refresh",
     "top_areas_title": "Top Areas",
     "top_earners_title": "Top Earners",
-    "top_spenders_title": "Top Spenders"
+    "top_spenders_title": "Top Spenders",
+    "regional": {
+      "meta": {
+        "title": "地域分析",
+        "description": "地域パートナーに関する地理的、人口統計的、エンゲージメント、ボランティア、支援要請に関する洞察。"
+      },
+      "controls": {
+        "period": "期間"
+      },
+      "periods": {
+        "last_30d": "過去 30 日間",
+        "last_90d": "過去90日間",
+        "last_12m": "過去 12 か月",
+        "all_time": "ずっと"
+      },
+      "actions": {
+        "refresh_cache": "キャッシュを更新する",
+        "export_report": "レポートのエクスポート"
+      },
+      "stats": {
+        "active_members": "アクティブなメンバー",
+        "active_members_description": "選択したレポート期間にアクティブなメンバー",
+        "vol_hours_this_month": "ボランティアの時間",
+        "vol_hours_description": "今月記録されたボランティア時間",
+        "help_requests_this_month": "ヘルプリクエスト",
+        "help_requests_description": "今月開始されたヘルプリクエスト",
+        "most_needed_category": "最も必要なカテゴリ",
+        "most_needed_description": "最近需要が最も高いカテゴリー"
+      },
+      "tabs": {
+        "aria": "地域分析セクション",
+        "heatmap": "メンバーのヒートマップ",
+        "demographics": "人口統計",
+        "demand_supply": "需要と供給",
+        "engagement": "婚約",
+        "help_requests": "ヘルプリクエスト",
+        "volunteer": "ボランティア"
+      },
+      "sections": {
+        "geographic_activity_density": "地理的な活動密度",
+        "member_demographics": "会員層",
+        "demand_supply_by_category": "カテゴリ別の需要と供給",
+        "demand_supply_note": "1.0 ??????????????????????????????????????????",
+        "monthly_engagement_metrics": "毎月のエンゲージメント指標",
+        "volunteer_activity": "ボランティア活動",
+        "help_request_analysis": "ヘルプリクエストの分析"
+      },
+      "columns": {
+        "rank": "ランク",
+        "latitude": "緯度",
+        "longitude": "経度",
+        "members": "メンバー",
+        "density": "密度",
+        "month": "月",
+        "new_members": "新しいメンバー",
+        "cumulative_total": "累計",
+        "category": "カテゴリ",
+        "requests": "リクエスト",
+        "offers": "オファー",
+        "ratio": "比率",
+        "trend": "傾向",
+        "active_members": "アクティブなメンバー",
+        "vol_hours": "ボランティアの時間",
+        "new_listings": "新規出品",
+        "new_events": "新しいイベント",
+        "help_requests": "ヘルプリクエスト",
+        "organisation": "組織",
+        "volunteers": "ボランティア",
+        "total": "合計",
+        "resolved": "解決済み",
+        "resolution_rate": "解像度率",
+        "avg_days_to_resolve": "平均解決までの日数"
+      },
+      "heatmap": {
+        "description": "メンバーのアクティビティと密度による上位の場所。"
+      },
+      "demographics": {
+        "age_distribution": "年齢分布",
+        "language_distribution": "言語の分布",
+        "member_growth_12m": "過去 12 か月間のメンバーの増加",
+        "total_with_data": "?????????????? {{total}} ?",
+        "total_active_members": "????????? {{total}} ?"
+      },
+      "volunteer": {
+        "total_hours": "合計時間",
+        "avg_hours_per_volunteer": "平均ボランティア1人当たりの時間",
+        "reciprocity_ratio": "相反比",
+        "reciprocity_description": "地域全体で与えられた時間と受け取られた時間のバランスをとる。",
+        "top_orgs_title": "トップのボランティア団体"
+      },
+      "help": {
+        "by_category": "カテゴリ別のヘルプ リクエスト",
+        "resolution_trend_6m": "過去 6 か月間の解決傾向"
+      },
+      "empty": {
+        "infinity": "∞",
+        "no_geographic_data": "この期間の地理データはありません。",
+        "no_listing_data": "この期間の上場需要データはありません。",
+        "no_engagement_data": "この期間のエンゲージメント データはありません。",
+        "no_organisation_data": "この期間中は組織活動はありません。",
+        "no_help_request_data": "この期間に利用可能な支援要請データはありません。",
+        "select_tab_to_load": "データをロードするには、このタブを選択します。"
+      },
+      "empty_value": "-",
+      "loading": {
+        "section": "分析を読み込み中"
+      },
+      "errors": {
+        "data_unavailable": "この期間はデータが利用できません。",
+        "load_data": "この分析セクションを読み込めませんでした: {{error}}",
+        "load_overview": "地域分析の概要を読み込めませんでした。",
+        "failed_to_load_data": "分析データを読み込めませんでした。"
+      },
+      "units": {
+        "days_count": "{{count}} 日"
+      },
+      "age_groups": {
+        "under_25": "25歳未満",
+        "25_34": "NEXUSTERM0トークン",
+        "35_44": "NEXUSTERM0トークン",
+        "45_54": "NEXUSTERM0トークン",
+        "55_64": "NEXUSTERM0トークン",
+        "65_plus": "65歳以上",
+        "unknown": "未知"
+      }
+    }
   },
   "billing": {
     "actions": "Actions",
@@ -5845,7 +6533,157 @@
     "placeholder_guardian_email": "guardian@example.com",
     "placeholder_help_url": "https://...",
     "placeholder_option_key": "e.g. needs_additional_support",
-    "placeholder_ward_email": "ward@example.com"
+    "placeholder_ward_email": "ward@example.com",
+    "help": {
+      "title": "ここでの保護の仕組み",
+      "subtitle": "このダッシュボードに表示されるフローのガイド - フラグ設定、アクティベーション、メンバーの自律性、監査。詳細についてはセクションを展開してください。",
+      "about": {
+        "aria": "このダッシュボードについて",
+        "title": "このダッシュボードについて",
+        "intro": "保護ダッシュボードには、システムがアクティブに保護しているすべてのメンバーが表示されます。それは表面化します：",
+        "flagged_messages_label": "フラグ付きメッセージ",
+        "flagged_messages_body": "- 監視対象のメンバーによって送受信されたメッセージのコピー。",
+        "guardian_assignments_label": "保護者の割り当て",
+        "guardian_assignments_body": "- コーディネーターが病棟との連絡を仲介する関係。",
+        "member_preferences_label": "メンバーの好み",
+        "member_preferences_body": "- フラグが立てられた各メンバーが選択した保護オプション。",
+        "live_counts": "上部の数値はリアルタイムです。サイドバーの赤いセーフガード項目には、未レビューの重要なフラグの数が表示されるため、ページを開かずに注意が必要なタイミングを見つけることができます。"
+      },
+      "flagging": {
+        "aria": "メンバーにフラグが立てられる仕組み",
+        "title": "メンバーにフラグが立てられる仕組み",
+        "intro": "メンバーの背後で黙ってフラグが適用されることはありません。ルートは 2 つあります。",
+        "most_common": "最も一般的な",
+        "self_identification_title": "オンボーディング中の自己識別",
+        "self_identification_prefix": "メンバーは、サインアップ中に安全策のステップで 1 つ以上のオプションにチェックを入れました (例:",
+        "or": "または",
+        "example_vulnerable": "私は自分自身を傷つきやすい大人だと思っています",
+        "example_vetted": "精査されたメンバーとのみやり取りすることを好みます",
+        "self_identification_suffix": "システムは、選択された各オプションに関連付けられたトリガーを読み取り、それらを OR マージして、書き込まれた単一の保護セットに追加します。",
+        "self_revoke_prefix": "これらは自分で選択したものであるため、メンバーはいずれかを取り消すことができます。",
+        "settings_safeguarding": "設定 -> 保護",
+        "self_revoke_suffix": "いつでも - あなたに尋ねる必要はありません。",
+        "admin_initiated": "管理者が開始",
+        "manual_monitoring_title": "手動監視",
+        "manual_monitoring_prefix": "あなたは開きます",
+        "user_monitoring": "ユーザーの監視",
+        "manual_monitoring_suffix": "Broker Controls でメンバーを監視下に置き、その理由とオプションの有効期限を指定します。コンプライアンスレビュー、苦情調査、またはインシデント後の試用期間に使用されます。"
+      },
+      "triggers": {
+        "aria": "各トリガーが発動するもの",
+        "title": "各トリガーが発動するもの",
+        "intro_prefix": "保護オプション (テナントごとに定義)",
+        "safeguarding_options": "保護オプション",
+        "intro_suffix": ") は、トリガーの JSON ブロックを保持します。メンバーがオプションを選択すると、関連するトリガーがアクティブになります。",
+        "col_effect": "効果",
+        "col_trigger_key": "トリガーキー",
+        "effects": {
+          "notify_admin_on_selection": "オプションにチェックを入れた瞬間にリアルタイムの通知が届きます。",
+          "requires_broker_approval": "すべての送信メッセージはブローカーのレビューのためにコピーされます。試合には承認が必要です。",
+          "requires_vetted_interaction": "精査されていないメンバーは、メンバーの発見フィードから非表示になります。",
+          "restricts_matching": "一致承認ワークフローが関与します - 自動導入はありません。",
+          "restricts_messaging": "監視対象のメンバーをマークします。メッセージのコピーが始まります。",
+          "vetting_type_required": "連絡するメンバーがどの審査を保持する必要があるかを指定します (例: garda_vetting)。"
+        },
+        "table_aria": "トリガー効果の保護",
+        "merge_note": "メンバーが複数のオプションを選択すると、OR マージがトリガーされます。最も保護的な組み合わせが優先されます。 1 つのオプションを取り消すと、一部の保護は解除されますが、他の保護はアクティブのままになる可能性があります。システムは毎回最初から再評価します。"
+      },
+      "vetting": {
+        "aria": "ゲートの審査",
+        "title": "インタラクションを精査する方法",
+        "intro_prefix": "フラグが設定されたメンバーが特定の審査タイプを必要とする場合、システムはそれを 3 つの別々のポイントで強制します。UI 警告としてだけでなく、特定のエラー コードを含むハード ブロックとしても適用されます。",
+        "intro_suffix": "発信者に返されました。",
+        "discovery_label": "ディスカバリーフィルター",
+        "discovery_body": "- スマート マッチング エンジンは、フラグが立てられたメンバーを、必要な審査を持たない人に表示することはありません。これらはグレー表示されず、非表示になります。",
+        "messaging_label": "メッセージング",
+        "messaging_prefix": "- 送信者が受信者が要求する精査を欠いている場合、",
+        "messaging_middle": "返品",
+        "messaging_suffix": "特定のタイプがリストされています。",
+        "match_label": "試合の承認",
+        "match_body": "- 承認のためにマッチングが手動で送信された場合でも、どちらかの当事者にフラグが立てられ、もう一方の当事者が必要な審査を欠いている場合は、双方向でブロックされます。",
+        "group_label": "グループ交流",
+        "group_body": "- 主催者または参加者が、もう一方が保持していないことを精査する必要がある場合、参加者の追加は失敗します。",
+        "staff_bypass_label": "スタッフバイパス:",
+        "staff_bypass_body": "管理者、テナント管理者、ブローカー、およびスーパー管理者には、検出で完全なプールが表示されます (割り当て目的)。メッセージング、マッチ送信、グループ交換ゲートは引き続き全員に適用されます。これらに対する管理者レベルのバイパスはありません。"
+      },
+      "assignments": {
+        "aria": "保護者の割り当て",
+        "title": "後見人/被後見人の割り当て",
+        "intro": "後見人の割り当ては、被後見人 (保護されるメンバー) と後見人 (信頼できるコーディネーターまたは家族のメンバー) をペアにします。メンバーが一般的なブローカー プールではなく、やり取りを仲介する特定の人物を必要とする場合にこれを使用します。",
+        "create_label": "作成する",
+        "create_prefix": "[割り当て] タブから、またはに移動して、",
+        "assign_guardian_path": "ブローカー/モニタリング -> ガーディアンの割り当て",
+        "create_suffix": "双方が電子メールとアプリ内ベル通知を受け取ります。",
+        "consent_label": "同意",
+        "consent_prefix": "- 区は受け入れなければなりません。彼らの受け入れは以下に記録されています",
+        "consent_middle": "課題は",
+        "active": "アクティブ",
+        "consent_suffix": "一度受け入れられました。",
+        "revoke_label": "取り消す",
+        "revoke_prefix": "- 管理者または病棟のいずれかが取り消すことができます。取り消しはソフトです (セット",
+        "revoke_suffix": "）そのため、監査証跡が保存されます。",
+        "queue_note": "ガーディアンの割り当てはブローカーのレビュー キューを置き換えるものではありません。監視対象のメッセージは引き続きそこに流れます。ガーディアンは追加の信頼できる層であり、プラットフォームの監視の代わりとなるものではありません。"
+      },
+      "preferences": {
+        "aria": "メンバー設定タブ",
+        "title": "メンバー設定の読み取り",
+        "intro_prefix": "[メンバー設定] タブには、フラグが設定されたすべてのメンバーが、選択した特定のオプションとともにリストされます。このデータは",
+        "special_category": "特別なカテゴリの個人データ",
+        "intro_suffix": "GDPR ????????????????",
+        "audit_logged": "すべてのビューは、ユーザーの ID とタイムスタンプとともに監査ログに記録されます。",
+        "not_public": "メンバーの公開プロフィールに公開されることはありません。",
+        "admin_only": "他のメンバーはこのタブを表示できません。アクセスするには管理者クラスの役割が必要です。",
+        "confidential": "他のメンバーの旗について、保護チーム以外の人と議論しないでください。",
+        "activity_trail": "???????????????????????????????????????????????????????????????????????????????????????????????????????????? CSV ??????????????"
+      },
+      "autonomy": {
+        "aria": "大人の自主性の原則",
+        "title": "大人の自主性の原則",
+        "rule_label": "ルール:",
+        "rule_prefix": "安全な保護が必要であると自己認識している成人には、閲覧する絶対的な権利があります。",
+        "and": "そして",
+        "rule_middle": "管理者に問い合わせることなくこれらの保護を取り消してください。管理者",
+        "cannot": "できない",
+        "rule_suffix": "メンバーの自己取り消しをブロックします。",
+        "grounded_prefix": "これは根拠があります",
+        "guidance": "Safeguarding Ireland ??????????",
+        "grounded_suffix": "(および同等の UK 法的ガイダンス - 「Making Safeguarding Personal」)。フラグを取り消すと、次のことがトリガーされます。",
+        "trigger_reevaluation": "トリガーの再評価 -> 監視/承認要件が解除される可能性があります。",
+        "admin_notification": "管理者/ブローカーへのアプリ内ベル通知 - 通知されますが、拒否することはできません。",
+        "audit_log_prefix": "次の監査ログ エントリ",
+        "coercion_note": "取り消しが第三者によって強制されたと思われる場合、適切な対応は、管理者コントロールを介してフラグを再適用するのではなく、メンバーとの安全を守るための会話 (および必要に応じて法定サービスへの紹介) です。"
+      },
+      "annual_review": {
+        "aria": "年次レビュープロセス",
+        "title": "年次レビュープロセス",
+        "intro_prefix": "毎月 1 日には、",
+        "intro_suffix": "コマンドが自動的に実行されます。最近のレビューのない 365 日より前の設定の場合、次のようになります。",
+        "step_reminder": "メンバーにレビューを求めるメールとベルを送信します - スタンプ",
+        "step_wait": "30日待ちます。",
+        "step_escalate": "応答がない場合は、ベル + 電子メール - スタンプで管理者/ブローカーに通知します。",
+        "flag_stays_active": "フラグは関係なくアクティブのままです。",
+        "escalation_note": "エスカレーションは、コーディネーターが個人的に連絡を取るよう促すものであり、保護を剥奪するための合図ではありません。沈黙はセーフガードの解除に同意するものではありません。",
+        "settings_prefix": "見る",
+        "settings_suffix": "レビューとしてカウント - バックエンドスタンプ",
+        "settings_tail": "メンバーがページを開いたときに自動的に表示されます。"
+      },
+      "audit": {
+        "aria": "監査証跡とCSVのエクスポート",
+        "title": "監査証跡とCSVのエクスポート",
+        "intro_prefix": "すべての安全保護関連のアクションは、",
+        "intro_middle": "と",
+        "intro_suffix": "メンバーごとのアクティビティ エンドポイントは、3 つのソースを 1 つの新しい順のタイムラインに結合します。",
+        "activity_log_label": "アクティビティログ",
+        "activity_log_body": "- オプションの選択、同意の取り消し、管理者ビュー、トリガーのアクティブ化。",
+        "message_copies_label": "メッセージのコピー",
+        "message_copies_body": "- 監視中にメンバーが送受信したすべてのメッセージ。",
+        "assignment_history_label": "課題履歴",
+        "assignment_history_body": "- メンバーに関係して作成または取り消された後見人の割り当て。",
+        "export_prefix": "を使用します。",
+        "export_csv": "CSV をエクスポートする",
+        "export_suffix": "インシデントレポートに添付したり規制当局と共有したりできるファイルが必要な場合は、メンバーの詳細ビューでアクションを実行します。 CSV は BOM を備えた UTF-8 であるため、Excel はエンコードを要求することなく正しく開きます。"
+      }
+    }
   },
   "stats": {
     "active_listings": "Active Listings",
@@ -9204,13 +10042,21 @@
   "caring_workflow": {
     "meta": {
       "title": "KISS Workflow Console",
-      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements.",
+      "page_title": "思いやりのあるコミュニティのワークフロー"
     },
-    "loading": "Loading KISS workflow data",
+    "loading": {
+      "workflow": "思いやりのあるコミュニティのワークフローを読み込んでいます..."
+    },
     "actions": {
       "open_hour_review": "Open hour review",
       "open_report_pack": "Open report pack",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "retry": "リトライ",
+      "approve": "承認する",
+      "decline": "衰退",
+      "escalate": "エスカレート",
+      "re_escalate": "再エスカレーション"
     },
     "stats": {
       "pending_reviews": "Pending reviews",
@@ -9344,7 +10190,11 @@
         "last_90_days": "Last 90 days",
         "year_to_date": "Year to date",
         "previous_quarter": "Previous quarter"
-      }
+      },
+      "review_sla_days_description": "この日数以内にレビューされなかった時間には、キュー内で期限超過としてフラグが立てられます。",
+      "escalation_sla_days_description": "この追加日数以内に対応されなかった期限を過ぎた項目は、自動的にエスカレーションされます。",
+      "monthly_statement_day_description": "メンバーステートメントが生成される月の日 (例: 1 = 毎月 1 日)。",
+      "default_hour_value_chf_description": "ステートメントや自治体の報告書の社会的価値の推定値を計算するために使用されます。"
     },
     "member_statement": {
       "title": "Member statements",
@@ -9363,7 +10213,11 @@
       "invalid_member": "Enter a valid member ID.",
       "load_failed": "Failed to load the member statement.",
       "export_success": "Member statement CSV prepared.",
-      "export_failed": "Failed to export the member statement."
+      "export_failed": "Failed to export the member statement.",
+      "approved_support_hours": "承認されたサポート時間",
+      "pending_support_hours": "保留中のサポート時間",
+      "wallet_hours_earned": "ウォレットで獲得した時間数",
+      "wallet_hours_spent": "ウォレットに費やした時間数"
     },
     "support_relationships": {
       "title": "Recurring support relationships",
@@ -9460,146 +10314,519 @@
       "upload_failed": "Could not upload the paper form.",
       "confirmed": "Paper onboarding confirmed and member account created.",
       "confirm_failed": "Could not confirm this paper onboarding intake.",
-      "load_failed": "Could not load paper onboarding intakes."
+      "load_failed": "Could not load paper onboarding intakes.",
+      "upload_success": "紙の摂取量をアップロードしました。",
+      "confirm_success": "メンバーが確認され、アカウントが作成されました。"
     },
     "invite_card": {
       "brand": "Caring Community",
       "subtitle": "Your Invitation Code",
       "instructions": "Visit the link below or ask your coordinator to help you get started.",
       "valid_until": "Valid until {{date}}"
+    },
+    "empty": {
+      "value": "-",
+      "unassigned": "未割り当て"
+    },
+    "pending": {
+      "title": "保留中のレビュー",
+      "description_prefix": "コーディネーターのレビューと承認を待つ時間。マークのある項目",
+      "description_middle": "???? SLA ?????????????????????",
+      "description_suffix": "エスカレーション SLA を超えています。各提出物を承認または拒否するか、特定のコーディネーターに割り当てます。",
+      "needs_review": "見直しが必要",
+      "escalate_now": "今すぐエスカレーションしてください",
+      "escalated_count": "{{count}} がエスカレーションされました",
+      "overdue_count": "{{count}} 期限切れ",
+      "empty": "保留中のものはありません。レビューのキューは空になっています。",
+      "logged": "記録された {{date}}",
+      "submitted": "{{date}}を提出しました",
+      "age_days": "{{count}} 1 日目",
+      "age_days_plural": "{{count}} 日前",
+      "assigned_to": "{{name}} に割り当てられました",
+      "escalated_at": "エスカレートされた {{date}}",
+      "assign_coordinator": "コーディネーターの割り当て",
+      "assign_success": "コーディネーターが割り当てられました。",
+      "assign_failed": "コーディネーターを割り当てることができませんでした。",
+      "manual_escalation_note": "{{count}} の保留日数が経過した後、手動でエスカレーションされました。",
+      "escalate_success": "レビューがエスカレートしました。",
+      "escalate_failed": "レビューをエスカレーションできませんでした。",
+      "approve_success": "レビューが承認されました。",
+      "decline_success": "レビューは拒否されました。",
+      "decision_failed": "決定を記録できませんでした。"
+    },
+    "tandem": {
+      "title": "Tandem の提案",
+      "description": "??????????????????? AI ????????????????????",
+      "empty": "現在提案はありません。さらにメンバーを追加するか、空き状況を調整します。",
+      "load_failed": "タンデムの提案を読み込めませんでした。",
+      "dismiss_success": "提案は却下されました。",
+      "dismiss_failed": "提案を却下できませんでした。",
+      "relationship_title": "Tandem: {{supporter}} ? {{recipient}}",
+      "distance_km": "{{value}} km",
+      "same_language": "同じ言語",
+      "complementary_skills": "補完的なスキル",
+      "availability_overlap": "可用性の重複",
+      "shared_interests": "共通の興味",
+      "score": "スコア {{value}}%",
+      "dismiss": "却下する",
+      "create": "Tandem ???"
+    },
+    "safeguarding": {
+      "title": "レポートの保護",
+      "description": "メンバーが他のメンバー、コーディネーター、または組織に関して提起した懸念。",
+      "view_all": "すべて見る",
+      "no_data": "利用可能な保護データはまだありません。",
+      "overdue": "期限を過ぎました",
+      "no_reports": "まだ報告はありません。",
+      "table_aria": "最近の安全対策レポート",
+      "open": "開ける",
+      "org_subject": "?? #{{id}}",
+      "age_hours": "{{count}}h",
+      "age_days": "{{count}}?",
+      "columns": {
+        "severity": "重大度",
+        "category": "カテゴリ",
+        "subject": "主題",
+        "status": "状態",
+        "age": "年",
+        "action": "アクション"
+      },
+      "severity": {
+        "critical": "致命的",
+        "high": "高い",
+        "medium": "中くらい",
+        "low": "低い"
+      },
+      "status": {
+        "submitted": "提出済み",
+        "triaged": "トリアージ",
+        "investigating": "調査中",
+        "resolved": "解決済み",
+        "dismissed": "解雇されました"
+      }
+    },
+    "role_pack": {
+      "title": "役割のプリセット",
+      "description": "??????????????????????????????????????????????????????????????????????????????{{countLabel}}?",
+      "installed_count": "{{total}} ロール プリセットの {{installed}} がインストールされました",
+      "available_count": "{{count}} ???????????????",
+      "installing": "インストール中...",
+      "install": "役割パックをインストールする",
+      "install_success": "ロールパックがインストールされました。",
+      "install_failed": "役割パックをインストールできませんでした。",
+      "installed": "インストール済み",
+      "not_installed": "インストールされていません",
+      "permissions_granted": "{{total}} 権限のうち {{installed}} 権限が付与されました",
+      "presets": {
+        "national_admin": {
+          "title": "国家管理者",
+          "description": "すべての州および組織にわたるプラットフォーム全体の監視。"
+        },
+        "canton_admin": {
+          "title": "カントン管理者",
+          "description": "カントン内のすべての思いやりのあるコミュニティ活動を管理します。"
+        },
+        "municipality_admin": {
+          "title": "自治体の管理者",
+          "description": "自治体内で思いやりのあるコミュニティ活動を管理します。"
+        },
+        "cooperative_coordinator": {
+          "title": "協力コーディネーター",
+          "description": "地元の協同組合とそのメンバーを調整します。"
+        },
+        "organisation_coordinator": {
+          "title": "組織コーディネーター",
+          "description": "1 つの組織のボランティアとパートナーを調整します。"
+        },
+        "trusted_reviewer": {
+          "title": "信頼できるレビュアー",
+          "description": "軽いタッチで監視しながら時間をすばやく承認します。"
+        }
+      }
+    },
+    "favours": {
+      "title": "非公式の好意",
+      "loading": "読み込み中...",
+      "total_recorded": "?? {{count}} ?????",
+      "loading_favours": "好意を読み込んでいます...",
+      "empty": "まだ好意は記録されていません。",
+      "anonymous": "匿名",
+      "unknown": "未知"
+    },
+    "invite_codes": {
+      "title": "招待コード",
+      "description": "新しいメンバーが電子メールの招待状を必要とせずに参加するために使用できる、印刷可能なコードを生成します。",
+      "label": "ラベル (オプション)",
+      "label_placeholder": "例えばメアリーの隣人のために",
+      "generate": "コードの生成",
+      "new_code": "新しい招待コード",
+      "expires": "有効期限: {{date}}",
+      "copied": "コピーしました！",
+      "copy_url": "URLをコピーする",
+      "print_card": "プリントカード",
+      "open": "開ける",
+      "table_aria": "招待コード",
+      "empty": "招待コードはまだありません。上記のものを生成して、将来のメンバーと共有します。",
+      "load_failed": "招待コードを読み込めませんでした。",
+      "generate_success": "招待コードが生成されました。",
+      "generate_failed": "招待コードを生成できませんでした。",
+      "columns": {
+        "code": "コード",
+        "label": "ラベル",
+        "expires": "有効期限が切れます",
+        "status": "状態",
+        "actions": "アクション"
+      },
+      "status": {
+        "active": "アクティブ",
+        "used": "使用済み",
+        "used_by": "{{name}} によって使用されます",
+        "expired": "期限切れ"
+      }
+    },
+    "predictive": {
+      "title": "予測的洞察",
+      "subtitle": "将来を見据えた予測とプロアクティブなアラート。地域のケア不足を緊急事態になる前に発見します。",
+      "not_enough_activity": "予測するにはまだ十分な活動がありません。数週間後にまた来てください。",
+      "no_forecast": "まだ予測データはありません。",
+      "hours_forecast": "時間予測",
+      "active_members": "アクティブなメンバー",
+      "recipients_reached": "受信者に到達しました",
+      "history": "歴史",
+      "forecast": "予報",
+      "confidence": "自信",
+      "trend_growing": "{{value}}% の成長",
+      "trend_declining": "{{value}}% の下落",
+      "trend_stable": "安定した",
+      "sub_region_coverage": "サブリージョンの適用範囲 (過去 {{days}} 日間)",
+      "under_supplied_count": "{{count}}の供給が不足しています",
+      "sub_region_coverage_aria": "サブリージョンのカバー範囲",
+      "helper_churn": "?????? ({{days}} ??????)",
+      "overall_percent": "全体で {{value}}%",
+      "helper_churn_note": "以前アクティブだった {{prior}} の {{lapsed}} は、最近時間を記録していません。",
+      "helper_churn_aria": "カテゴリ別のヘルパー チャーン",
+      "coefficient_drift": "カテゴリ係数ドリフト",
+      "drifting_count": "{{count}} ???????",
+      "coefficient_drift_note": "絶対ドリフト > {{threshold}}% を持つカテゴリにはフラグが立てられます。カテゴリ係数エディタでベースライン係数を確認します。",
+      "coefficient_drift_aria": "カテゴリ係数ドリフト",
+      "proactive_alerts": "プロアクティブなアラート",
+      "columns": {
+        "sub_region": "サブリージョン",
+        "requested_90d": "リクエスト済み (90日)",
+        "fulfilled_90d": "満たされました (90日)",
+        "coverage": "カバレッジ",
+        "status": "状態",
+        "category": "カテゴリ",
+        "prior_active": "以前のアクティブな",
+        "lapsed": "失効しました",
+        "churn_rate": "チャーンレート",
+        "baseline": "ベースライン",
+        "expected_hrs": "予想時間",
+        "observed_hrs": "観測時間",
+        "drift": "ドリフト",
+        "sample": "サンプル"
+      },
+      "status": {
+        "under_supplied": "供給不足",
+        "ok": "わかりました"
+      },
+      "severity": {
+        "critical": "致命的",
+        "warning": "警告",
+        "info": "情報"
+      }
+    },
+    "relationships": {
+      "title": "サポート関係",
+      "description": "継続的な支援者と受信者のペアと定期的なチェックイン。",
+      "active": "アクティブ",
+      "paused": "一時停止中",
+      "check_ins_due": "チェックイン期限",
+      "expected_hours": "予定時間",
+      "supporter": "サポーター",
+      "supporter_placeholder": "サポーターを探す",
+      "recipient": "受信者",
+      "recipient_placeholder": "受信者を検索する",
+      "no_members": "メンバーが見つかりませんでした",
+      "clear": "クリア",
+      "relationship_title": "関係タイトル",
+      "frequency_label": "頻度",
+      "expected_hours_per_visit": "1回の訪問あたりの予想時間",
+      "start_date": "開始日",
+      "create": "関係を築く",
+      "empty": "まだサポート関係はありません。上に作成します。",
+      "pair": "{{recipient}} をサポートする {{supporter}}",
+      "started": "{{date}} ???",
+      "next_check_in": "???????? {{date}}",
+      "pause": "一時停止",
+      "resume": "再開する",
+      "log_date": "日付",
+      "log_hours": "営業時間",
+      "log_note": "注記 (オプション)",
+      "log_hours_action": "時間を記録する",
+      "load_failed": "サポート関係を読み込めませんでした。",
+      "pick_different_members": "2 人の異なるメンバーを選択します。",
+      "create_success": "サポート関係が構築されました。",
+      "create_failed": "サポート関係を作成できませんでした。",
+      "update_success": "サポート関係を更新しました。",
+      "update_failed": "サポート関係を更新できませんでした。",
+      "log_validation_failed": "有効な日付と 0.25-24 時間を入力してください。",
+      "log_success": "サポート時間が記録されました。",
+      "log_failed": "サポート時間を記録できませんでした。",
+      "frequency": {
+        "weekly": "毎週",
+        "fortnightly": "隔週",
+        "monthly": "毎月",
+        "ad_hoc": "このために"
+      },
+      "status": {
+        "active": "アクティブ",
+        "paused": "一時停止中",
+        "completed": "完了しました",
+        "cancelled": "キャンセル"
+      }
     }
   },
   "municipal_reports": {
     "meta": {
-      "title": "Municipal Impact Reports",
-      "description": "Prepare KISS-style reporting for verified hours, active members, trusted organisations, and municipal value conversations."
+      "title": "自治体の影響レポート",
+      "description": "検証された時間、アクティブなメンバー、信頼できる組織、自治体の価値観に関する会話について、KISS スタイルのレポートを準備します。"
     },
     "actions": {
-      "analytics": "Community analytics",
-      "impact_report": "Impact report",
-      "open_source_report": "Open source report",
-      "export_csv": "Export CSV",
-      "export_pdf": "Export PDF"
+      "analytics": "コミュニティ分析",
+      "impact_report": "影響レポート",
+      "open_source_report": "オープンソースレポート",
+      "export_csv": "エクスポート CSV",
+      "export_pdf": "エクスポート PDF"
     },
     "stats": {
-      "report_pack": "Report pack",
-      "ready": "Ready",
-      "hours_source": "Hours source",
-      "verified": "Verified",
-      "audience": "Audience",
-      "municipal": "Municipal",
-      "exports": "Exports",
+      "report_pack": "レポートパック",
+      "ready": "準備ができて",
+      "hours_source": "時間ソース",
+      "verified": "確認済み",
+      "audience": "観客",
+      "municipal": "市営",
+      "exports": "輸出",
       "csv_pdf": "CSV/PDF",
-      "verified_hours": "Verified hours",
-      "participants": "Participants",
-      "organisations": "Organisations",
-      "total_value": "Total value"
+      "verified_hours": "確認済みの営業時間",
+      "participants": "参加者",
+      "organisations": "組織",
+      "total_value": "合計値"
     },
-    "loading": "Loading municipal impact data",
-    "period": "Reporting period",
-    "hour_value": "Hour value",
-    "multiplier": "Social multiplier",
+    "loading": "自治体の影響データをロードしています",
+    "period": "報告期間",
+    "hour_value": "時間値",
+    "multiplier": "ソーシャル乗数",
     "sections": {
-      "categories": "Support categories",
-      "trends": "Verified activity trend",
-      "readiness": "Procurement readiness signals"
+      "categories": "サポートカテゴリー",
+      "trends": "検証されたアクティビティの傾向",
+      "readiness": "調達準備シグナル"
     },
     "empty": {
-      "categories": "No completed support categories in this period.",
-      "trends": "No verified activity trend is available for this period."
+      "categories": "この期間中に完了したサポート カテゴリはありません。",
+      "trends": "この期間の検証済みのアクティビティ傾向はありません。"
     },
     "values": {
       "hours": "{{count}}h",
-      "activities": "{{count}} activities",
-      "trend_detail": "{{participants}} participants, {{activities}} activities",
-      "disabled": "Disabled"
+      "activities": "{{count}} アクティビティ",
+      "trend_detail": "{{participants}} 人の参加者、{{activities}} 人のアクティビティ",
+      "disabled": "無効"
     },
     "toast": {
-      "load_failed": "Failed to load municipal impact data.",
-      "export_started": "Report export started.",
-      "export_failed": "Failed to export the municipal report.",
-      "templates_load_failed": "Failed to load report templates.",
-      "template_saved": "Report template saved.",
-      "template_save_failed": "Failed to save the report template.",
-      "template_deleted": "Report template deleted.",
-      "template_delete_failed": "Failed to delete the report template."
+      "load_failed": "地方自治体の影響データをロードできませんでした。",
+      "export_started": "レポートのエクスポートが開始されました。",
+      "export_failed": "自治体レポートのエクスポートに失敗しました。",
+      "templates_load_failed": "レポートテンプレートの読み込みに失敗しました。",
+      "template_saved": "レポートテンプレートが保存されました。",
+      "template_save_failed": "レポートテンプレートの保存に失敗しました。",
+      "template_deleted": "レポートテンプレートが削除されました。",
+      "template_delete_failed": "レポートテンプレートの削除に失敗しました。"
     },
     "cards": {
       "verified_hours": {
-        "title": "Verified hours and economic value",
-        "description": "Summarise approved support hours, transaction volume, active contributors, and estimated value.",
-        "metric_1": "Approved hours",
-        "metric_2": "Active contributors",
-        "metric_3": "Value estimate"
+        "title": "検証済みの時間と経済的価値",
+        "description": "承認されたサポート時間、トランザクション量、アクティブな貢献者、および推定金額を要約します。",
+        "metric_1": "承認された時間",
+        "metric_2": "積極的な貢献者",
+        "metric_3": "価値の見積もり"
       },
       "active_members": {
-        "title": "Member reach and inclusion",
-        "description": "Track active members, new joiners, inactive members, and groups that need coordinator attention.",
-        "metric_1": "Active members",
-        "metric_2": "New joiners",
-        "metric_3": "Inactive members"
+        "title": "メンバーのリーチと参加",
+        "description": "アクティブなメンバー、新しい参加者、非アクティブなメンバー、およびコーディネーターの注意が必要なグループを追跡します。",
+        "metric_1": "アクティブなメンバー",
+        "metric_2": "新しい参加者",
+        "metric_3": "非アクティブなメンバー"
       },
       "organisations": {
-        "title": "Organisation and partner activity",
-        "description": "Show participating organisations, opportunities, verified logs, and coordinator workflows.",
-        "metric_1": "Organisations",
-        "metric_2": "Opportunities",
-        "metric_3": "Verified logs"
+        "title": "組織とパートナーの活動",
+        "description": "参加組織、機会、検証済みのログ、コーディネーターのワークフローを表示します。",
+        "metric_1": "組織",
+        "metric_2": "機会",
+        "metric_3": "検証されたログ"
       },
       "trust_pack": {
-        "title": "Trust, safeguarding, and compliance",
-        "description": "Surface verification, review, safeguarding, consent, and audit signals for sensitive care coordination.",
-        "metric_1": "Verification",
-        "metric_2": "Reviews",
-        "metric_3": "Audit trail"
+        "title": "信頼、保護、コンプライアンス",
+        "description": "デリケートなケアの調整のための検証、レビュー、保護、同意、および監査シグナルを表面化します。",
+        "metric_1": "検証",
+        "metric_2": "レビュー",
+        "metric_3": "監査証跡"
       }
     },
-    "policy_default": "Policy default",
-    "audience": "Audience",
+    "policy_default": "ポリシーのデフォルト",
+    "audience": "観客",
     "filters": {
-      "title": "Reporting window",
-      "description": "Use explicit dates when preparing canton, municipality, foundation, or cooperative packs.",
-      "date_from": "From",
-      "date_to": "To",
-      "apply": "Apply dates",
-      "clear": "Clear"
+      "title": "レポートウィンドウ",
+      "description": "州、地方自治体、財団、または協同組合のパックを準備するときは、明確な日付を使用してください。",
+      "date_from": "から",
+      "date_to": "に",
+      "apply": "申請日",
+      "clear": "クリア"
     },
     "readiness": {
-      "municipal_value": "Municipal value",
-      "participation": "Participation",
-      "partner_network": "Partner network",
-      "local_exchange": "Local exchange",
+      "municipal_value": "自治体の価値",
+      "participation": "参加",
+      "partner_network": "パートナーネットワーク",
+      "local_exchange": "現地交換所",
       "status": {
-        "ready": "Ready",
-        "needs_data": "Needs data"
+        "ready": "準備ができて",
+        "needs_data": "データが必要です"
       }
     },
     "templates": {
-      "title": "Saved report templates",
-      "description": "Prepare repeatable municipal, canton, cooperative, or foundation report packs with the right audience, period, and value assumptions.",
-      "create": "New template",
-      "select_label": "Report template",
-      "default_policy": "Use workflow policy defaults",
-      "apply": "Apply",
-      "delete": "Delete",
-      "cancel": "Cancel",
-      "save": "Save template",
-      "modal_title": "Create report template",
+      "title": "保存されたレポートテンプレート",
+      "description": "対象者、期間、価値を適切に想定して、再現可能な地方自治体、州、協同組合、または財団のレポート パックを作成します。",
+      "create": "新しいテンプレート",
+      "select_label": "レポートテンプレート",
+      "default_policy": "ワークフローポリシーのデフォルトを使用する",
+      "apply": "適用する",
+      "delete": "消去",
+      "cancel": "キャンセル",
+      "save": "テンプレートの保存",
+      "modal_title": "レポートテンプレートの作成",
       "hour_value_chip": "CHF {{value}}/h",
       "fields": {
-        "name": "Template name",
-        "description": "Description",
-        "audience": "Audience",
-        "period": "Reporting period",
-        "hour_value": "Hour value override (CHF)",
-        "include_social_value": "Include social value estimate"
+        "name": "テンプレート名",
+        "description": "説明",
+        "audience": "観客",
+        "period": "報告期間",
+        "hour_value": "時間値の上書き (CHF)",
+        "include_social_value": "社会的価値の推定を含める"
       },
       "audiences": {
-        "municipality": "Municipality",
-        "canton": "Canton",
-        "cooperative": "Cooperative",
-        "foundation": "Foundation"
+        "municipality": "自治体",
+        "canton": "カントン",
+        "cooperative": "協同組合",
+        "foundation": "財団"
+      },
+      "descriptions": {
+        "audience": "物語の枠組みと、PDF/CSV エクスポートに表示されるセクションを決定します。",
+        "hour_value": "費用相殺計算用の地域のフォーマルケアの時間料金 (例: スイスの場合は CHF 35)。テナントのデフォルトを使用する場合は空白のままにします。",
+        "period": "手動日付フィルタが設定されていない場合に適用されるデフォルトのレポートウィンドウ。"
+      },
+      "placeholders": {
+        "description": "将来の参照のためのオプションのメモ - 例: 「年次総会プレゼンテーションに使用」",
+        "name": "例えば2025 年第 3 四半期資金提供者向けカントンレポート"
       }
+    },
+    "about": {
+      "body_1_after_chf": "時間の値 x 予防乗数)。",
+      "body_1_after_kiss": "/Age-Stiftung 方法論、正式な介護サービスに対する推定コスト相殺 (",
+      "body_1_before_kiss": "自治体影響レポートは、プログラムの価値を実証するために自治体パートナー、州、資金提供者と共有する証拠パックです。検証されたケア時間、アクティブなメンバー、パートナー組織が表示されます。",
+      "body_2_after_audience": "切り替えて物語の枠組みを切り替えます。",
+      "body_2_after_canton": "複数の自治体を集約し、州規模でのコスト回避を示します。",
+      "body_2_after_cooperative": "メンバーの維持率、互恵率、コーディネーターの作業負荷を示します。 PDF としてエクスポートしてパートナーに送信するか、CSV としてエクスポートしてさらに分析します。レポート テンプレートを保存すると、将来同じ構成をすぐに再生成できます。",
+      "body_2_after_municipality": "地域住民とパートナー組織に焦点を当てます。",
+      "body_2_prefix": "を使用します。",
+      "chf_abbr": "CHF",
+      "kiss_abbr": "KISS",
+      "title": "このレポートについて"
+    },
+    "audience_selector": {
+      "description": "物語の枠組みを切り替えます。選択した対象ユーザー セクションのみが PDF/CSV エクスポートに含まれます。",
+      "title": "観客"
+    },
+    "export_note": {
+      "csv_label": "CSV エクスポート",
+      "csv_text": "スプレッドシート分析または補助金レポート用の生データを提供します。",
+      "pdf_label": "PDF エクスポート",
+      "pdf_text": "自治体のパートナーや資金提供者と共有できるようにフォーマットされています。"
+    },
+    "narrative": {
+      "canton": {
+        "description": "地方自治体全体の影響の合計、専門的ケアの費用回避、前年比の傾向。",
+        "empty_body": "カントンモードに切り替えて、カントンレベルの物語をロードします。",
+        "empty_description": "自治体全体の影響、コスト回避、前年比変化を集計します。",
+        "empty_title": "カントン (Kantonsrat / 地方政府)",
+        "estimated_cost_avoidance": "推定コストの回避",
+        "estimated_cost_avoidance_desc": "時間 x 保険金額 x {{multiplier}} (プロフェッショナルケア相当)。",
+        "multi_node_total_hours": "マルチノードの合計時間",
+        "multi_node_total_hours_desc": "オプトインされたすべてのノードで検証されます。",
+        "municipalities_reporting": "自治体の報告",
+        "municipalities_reporting_desc": "このビューに寄与するノードの総数。",
+        "prior_period_detail": "以前の期間: {{from}} から {{to}} - {{hours}} 時間の検証。",
+        "title": "確認済みのサポート時間{{tenant}} - {{from}} ～ {{to}}",
+        "yoy_change": "前年比変化"
+      },
+      "cooperative": {
+        "active_tandems": "アクティブタンデム",
+        "active_tandems_desc": "定期的なヘルパー/受信者のペア (2 回以上の交換)。",
+        "coordinator_load": "コーディネーターの負荷",
+        "coordinator_load_desc": "{{pending}} は {{coordinators}} コーディネーター間で保留中です。",
+        "description": "内部協力の健全性: 維持、互恵性、タンデム、コーディネーターの負荷、クレジット プール。",
+        "empty_body": "協力モードに切り替えて、協力内部の物語をロードします。",
+        "empty_description": "メンバーの維持、時間の相互関係、タンデム関係、コーディネーターの仕事量、将来のケアのクレジットプール。",
+        "empty_title": "協力的 (KISS-Genossenschaft 内部)",
+        "future_care_credit_pool": "フューチャーケア信用残高プール",
+        "future_care_credit_pool_desc": "正の組合員残高の合計 - 協同組合の暗黙の将来介護準備金。アクティブなメンバー ベース: {{count}}。",
+        "member_retention": "会員維持",
+        "member_retention_desc": "{{count}} メンバーは、この期間と以前の同等の期間の両方でアクティブでした。",
+        "reciprocity_rate": "相反率",
+        "reciprocity_rate_desc": "{{count}} サポーターも期間中に何時間も受け取りました。",
+        "title": "協力内部レポート - {{from}} から {{to}}"
+      },
+      "in_export": "輸出中",
+      "logs_count": "{{count}} ログ",
+      "municipality": {
+        "description": "地域の参加、指定されたパートナー組織、地理的/カテゴリの分割、受信者のリーチ。",
+        "empty_body": "自治体モードに切り替えて、自治体レベルのナラティブをロードします。",
+        "empty_description": "地域的な参加、指定されたパートナー組織、地理的/カテゴリの分割。",
+        "empty_title": "自治体 (ゲマインデ)",
+        "no_category_data": "この期間にはカテゴリ データがありません。",
+        "no_partner_activity": "この期間はパートナーによるアクティビティはありません。",
+        "partner_organisations": "パートナー組織",
+        "partner_organisations_by_hours": "パートナー組織（時間別）",
+        "recipients_reached": "受信者に到達しました",
+        "recipients_reached_desc": "完了した交換の個別の受信者。",
+        "title": "コミュニティへの影響 - {{from}} から {{to}}",
+        "top_5_categories": "上位 5 カテゴリ (地理的/アクティビティ分割)",
+        "top_categories": "トップカテゴリー",
+        "top_categories_desc": "以下に時間ごとに記載します。",
+        "trusted_total": "{{count}} 件の信頼できる合計。"
+      },
+      "no_prior_data": "以前のデータはありません"
+    },
+    "readiness_help": {
+      "local_exchange": {
+        "fix": "まだ完了した交換はありません。コーディネーターは保留中の時間ログを承認する必要があります。",
+        "what": "この期間に記録された検証済みの交換 (完了および承認)。"
+      },
+      "municipal_value": {
+        "fix": "コスト オフセットはまだ計算できません。保留中のボランティア時間ログを承認して、この指標を設定します。",
+        "what": "正式な治療に対する推定コスト相殺（時間 x 保険時間値 x 予防乗数）。"
+      },
+      "participation": {
+        "fix": "最低参加基準を下回っています。メンバーのオンボーディングと交換の完了を続けます。",
+        "what": "この時代に支援者や受給者として活躍する個性豊かなメンバー。"
+      },
+      "partner_network": {
+        "fix": "アクティブな信頼できる組織はありません。 「ボランティア」>「組織」から組織を参加させます。",
+        "what": "この期間に何時間も貢献した信頼できるパートナー組織。"
+      }
+    },
+    "readiness_intro": {
+      "needs_data_suffix": "= メトリクスがしきい値を下回っています - 各カードにカーソルを置くとガイダンスが表示されます。",
+      "prefix": "これら 4 つのシグナルは、レポートに外部の読者を納得させるのに十分なデータがあるかどうかを示します。",
+      "ready_suffix": "= 十分なデータ。"
     }
   },
   "caring_emergency": {
@@ -9889,13 +11116,99 @@
     "trust_tier": {
       "errors": {
         "recompute_failed": "Failed to recompute trust tiers.",
-        "save_failed": "Failed to save trust tier settings."
+        "save_failed": "Failed to save trust tier settings.",
+        "load_failed": "信頼層構成のロードに失敗しました。"
       },
       "messages": {
-        "recomputed": "Trust tiers recomputed.",
+        "recomputed": "{{count}} ?????????????????????",
         "saved": "Trust tier settings saved."
       },
-      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes."
+      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes.",
+      "title": "トラスト層の構成",
+      "subtitle": "信頼レベルごとに基準のしきい値を設定します。変更は次回の再計算実行時に適用されます。",
+      "loading": "信頼層構成をロードしています",
+      "recompute_hint": "しきい値が変更され、既存のメンバーを直ちに再評価する必要がある場合は、再計算を使用します。バックグラウンドで実行され、30-60 秒かかる場合があります。",
+      "meta": {
+        "title": "トラスト層の構成",
+        "description": "信頼層のしきい値を構成し、メンバー層を再計算し、各層のロックが解除される内容を確認します。"
+      },
+      "actions": {
+        "recompute": "すべての層を再計算する",
+        "save": "設定の保存"
+      },
+      "about": {
+        "title": "このページについて",
+        "body": "信頼層は、メンバーがよりアクティブになり、認証されるにつれて特権を解放する評判のはしごです。メンバーは、以下の基準のしきい値を満たした場合に自動的に昇格します。 recompute を使用して、すべてのメンバーに対して即時再計算を強制します。ティアの進行は、Warmth Pass、コーディネーターの資格、およびメンバー ディレクトリでの可視性に影響します。"
+      },
+      "criteria": {
+        "title": "階層基準のしきい値"
+      },
+      "fields": {
+        "hours_logged": "記録された時間数 (最小)",
+        "reviews_received": "受け取ったレビュー (最低)",
+        "identity_verified": "本人確認が必要"
+      },
+      "tiers": {
+        "member": {
+          "label": "メンバー",
+          "description": "少なくとも 1 時間ログインしている基本コミュニティ メンバー。"
+        },
+        "trusted": {
+          "label": "信頼できる",
+          "description": "数時間のレビューとレビューを持つアクティブなメンバー。"
+        },
+        "verified": {
+          "label": "確認済み",
+          "description": "身元が確認された信頼できるメンバー。"
+        },
+        "coordinator": {
+          "label": "コーディネーター",
+          "description": "コーディネートする資格のある非常にアクティブな認証済みメンバー。"
+        }
+      },
+      "reference": {
+        "title": "階層リファレンス",
+        "aria": "信頼層のリファレンス",
+        "columns": {
+          "tier": "階層",
+          "level": "レベル",
+          "color": "色",
+          "description": "説明",
+          "unlocks": "ロックを解除するもの"
+        },
+        "rows": {
+          "0": {
+            "name": "新人",
+            "color": "グレー",
+            "description": "参加しただけなので、アクティビティは必要ありません。",
+            "unlocks": "基本的なメンバーアクセス。"
+          },
+          "1": {
+            "name": "メンバー",
+            "color": "青",
+            "description": "時間が記録されています。",
+            "unlocks": "ヘルプリストを投稿したり、ケア時間を受け取ることができます。"
+          },
+          "2": {
+            "name": "信頼できる",
+            "color": "緑",
+            "description": "口コミで活躍中。",
+            "unlocks": "Warmth Pass ?????????????????"
+          },
+          "3": {
+            "name": "確認済み",
+            "color": "紫",
+            "description": "身元が確認されました。",
+            "unlocks": "フルケア コーディネーターの可視性と ID バッジ。"
+          },
+          "4": {
+            "name": "コーディネーター",
+            "color": "アンバー",
+            "description": "身元確認済みで非常にアクティブです。",
+            "unlocks": "時間を承認し、試合を調整する資格があります。"
+          }
+        }
+      }
     },
     "warmth_pass": {
       "title": "Warmth Pass",
@@ -9934,6 +11247,109 @@
       "not_eligible_notice": {
         "title": "Not eligible yet",
         "body": "This member does not yet meet the requirements for a Warmth Pass."
+      }
+    },
+    "operating_policy": {
+      "title": "運営方針",
+      "subtitle": "KISS ?????????????: ??????????????????",
+      "loading": "操作ポリシーをロードしています",
+      "last_updated": "最終更新日: {{date}}",
+      "meta": {
+        "title": "運営方針",
+        "description": "ケア プログラムの承認、保護、SLA、および社会的価値のポリシー ルールを構成します。"
+      },
+      "actions": {
+        "refresh": "リフレッシュ",
+        "save": "変更を保存する"
+      },
+      "about": {
+        "title": "このページについて",
+        "body": "運営ポリシーでは、誰が時間を承認できるか、コーディネーターがどれだけ早く対応しなければならないか、社会的価値の計算方法、報告サイクルがどのようなものであるかなど、地域ケア プログラムのルールを定義します。パイロットを開始する前にこれを構成します。変更はすぐに有効になり、監査のために記録されます。",
+        "methodology_prefix": "の",
+        "methodology_middle": "時間単価と予防乗数フィールドでは、",
+        "methodology_suffix": "Age-Stiftung とともに開発された方法論 (Koordination und Innovation fur Soziales、Schwyz)。 Swiss KISS/ を実行していない場合",
+        "methodology_tail": "????????????????????????????????? 1.0 ???????"
+      },
+      "sections": {
+        "approvals": "承認と信頼",
+        "sla": "SLA のウィンドウ",
+        "hours": "時間管理",
+        "safeguarding": "保護",
+        "social_value": "社会的価値の方法論",
+        "appendix": "パイロットポリシーの付録"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "承認権限",
+          "help": "承認された時間を最終的に決定できるのは、テナント管理者、コーディネーター、または相互承認による両当事者です。"
+        },
+        "trusted_reviewer_threshold": {
+          "label": "信頼できるレビュー担当者のしきい値 (記録時間)",
+          "help": "メンバーが信頼できるレビュー担当者になるか、信頼できるレベルに到達するまでの最小承認時間。"
+        },
+        "sla_first_response_hours": {
+          "label": "SLA: ???? (??)",
+          "help": "新しいヘルプ リクエストに対する最初の応答までの目標時間を設定します。"
+        },
+        "sla_help_request_hours": {
+          "label": "SLA: ?????????? (??)",
+          "help": "ヘルプ リクエストを終了または一致させるまでの目標時間を設定します。"
+        },
+        "legacy_hour_settlement": {
+          "label": "従来の時間決済ポリシー",
+          "help": "死亡したメンバーの残りの時間はどのように精算されるか。"
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "相互バランス介入閾値 (時間)",
+          "help": "メンバーの授受の不均衡により、コーディネーターのチェックインがトリガーされた場合。"
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "????????????????????? (???? ID)",
+          "help": "??????????????????????????? ID??????????????????????????"
+        },
+        "chf_hourly_rate": {
+          "label": "CHF 1 時間あたりの社会的価値",
+          "help": "スイスの正規介護アシスタント率を使用した ROI レポートの介護時間あたりの CHF 価値。"
+        },
+        "chf_prevention_multiplier": {
+          "label": "CHF 防止乗数",
+          "help": "Age-Stiftung および KISS 方法論のフォーマルケア オフセットに適用される乗数。"
+        },
+        "statement_cadence": {
+          "label": "メンバーの発言の頻度",
+          "help": "メンバーがメンバーごとの時間明細を受け取る頻度。"
+        },
+        "policy_appendix_url": {
+          "label": "署名済みポリシーの付録 URL",
+          "help": "協同組合と自治体の間で署名された政策協定の公開 URL を貼り付けます。これは監査報告書と地方自治体の報告パックに記載されます。"
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "管理者",
+          "coordinator": "コーディネーター",
+          "mutual": "共通の"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "プールに寄付する",
+          "expire": "期限切れ",
+          "transfer_to_nominee": "候補者に転送"
+        },
+        "statement_cadence": {
+          "monthly": "毎月",
+          "quarterly": "四半期ごと",
+          "annual": "年間"
+        }
+      },
+      "placeholders": {
+        "url": "NEXUSTERM0トークン"
+      },
+      "errors": {
+        "load_failed": "運用ポリシーの読み込みに失敗しました。",
+        "save_failed": "運用ポリシーの保存に失敗しました。"
+      },
+      "messages": {
+        "saved": "運用ポリシーが保存されました。変更はすべての新しい取引所に直ちに適用されます。"
       }
     }
   },
@@ -9985,7 +11401,349 @@
       "email_warning_check_failed": {
         "title": "Warning check failed",
         "body": "Email warning checks could not complete."
+      },
+      "notification_queue_suppressed": {
+        "title": "通知メールが抑制される",
+        "body": "{{count}} キューに登録された通知メールは、過去 {{window_hours}} 時間内に抑制されました。"
+      },
+      "newsletter_queue_failures": {
+        "title": "ニュースレターキューの失敗",
+        "body": "{{count}} ニュースレターの受信者は、過去 {{window_hours}} 時間内に失敗しました。"
+      },
+      "newsletter_queue_stale_processing": {
+        "title": "古いニュースレターのキュー",
+        "body": "{{count}} ニュースレターの受信者は、{{minutes}} 分を超えて処理を続けています。"
+      },
+      "new_users_without_account_email_attempt": {
+        "title": "アカウントのメールアドレスがトリガーされませんでした",
+        "body": "{{count}} の新規ユーザーは、過去 {{window_hours}} 時間内にアカウントのアクティベーション、検証、承認、またはウェルカム メールの試行を行っていません。"
+      },
+      "password_resets_without_email_attempt": {
+        "title": "パスワードリセットメールがトリガーされませんでした",
+        "body": "{{count}} パスワード リセット トークンには、過去 {{window_hours}} 時間内に試行されたパスワード リセット電子メールに一致するものはありません。"
+      },
+      "group_invites_without_email_attempt": {
+        "title": "グループ招待メールがトリガーされませんでした",
+        "body": "{{count}} のメール グループ招待には、過去 {{window_hours}} 時間内に一致するグループ招待メールの試行がありませんでした。"
+      },
+      "group_members_tenant_mismatch": {
+        "title": "グループメンバーシップテナントの不一致",
+        "body": "{{count}} ???????????????????????????????????????????????????????????????????????????"
+      },
+      "group_member_joined_without_owner_notification_queue": {
+        "title": "グループ参加通知がキューに登録されませんでした",
+        "body": "過去 {{window_hours}} 時間内に、一致する所有者通知キュー行がない状態で、{{count}} グループ メンバーシップがアクティブになりました。"
+      },
+      "instant_notifications_stuck_pending": {
+        "title": "インスタントメールが止まってしまう",
+        "body": "{{count}} ?????????? {{minutes}} ???????????"
+      },
+      "notification_queue_failed_recently": {
+        "title": "通知メールが失敗しました",
+        "body": "{{count}} キューに登録された通知メールは、過去 {{window_hours}} 時間内に失敗しました。"
+      },
+      "notification_queue_suppressed_recently": {
+        "title": "通知メールが抑制される",
+        "body": "{{count}} キューに登録された通知メールは、過去 {{window_hours}} 時間内に抑制されました。"
+      },
+      "notification_queue_missing_tenant_id": {
+        "title": "通知キューにテナントがありません",
+        "body": "{{count}} ???????????????????????????????????????????????????????"
+      },
+      "notification_queue_tenant_mismatch": {
+        "title": "通知キューのテナントの不一致",
+        "body": "{{count}} ????????????????????????????????????????????????????????????????"
+      },
+      "notifications_missing_tenant_id": {
+        "title": "テナントが見つからない通知",
+        "body": "{{count}} ??????????????????????????????????????????????"
+      },
+      "notifications_tenant_mismatch": {
+        "title": "通知テナントの不一致",
+        "body": "{{count}} ?????????????????????????????????????????????????????????????"
+      },
+      "notification_queue_marked_sent_without_email_log": {
+        "title": "電子メールによる証拠なしで送信済みとマークされた通知",
+        "body": "{{count}} のキューに登録された通知は、過去 {{window_hours}} 時間内に一致する電子メール ログ エントリなしで送信されたとマークされました。"
+      },
+      "newsletter_queue_missing_tenant_id": {
+        "title": "ニュースレターのキューにテナントがありません",
+        "body": "{{count}} ??????????????????????????????????????????????????"
+      },
+      "newsletter_queue_tenant_mismatch": {
+        "title": "ニュースレターキューのテナントの不一致",
+        "body": "{{count}} ニュースレター キュー行は、ニュースレターとは異なるテナントに属します。これらの行は、間違ったテナント ルーティングの危険性があります。"
+      },
+      "newsletter_queue_stuck_pending": {
+        "title": "ニュースレターのメールが止まってしまう",
+        "body": "{{count}} ニュースレターの受信者は、{{minutes}} 分以上保留されています。"
+      },
+      "newsletter_queue_failed_recently": {
+        "title": "ニュースレターメールが失敗しました",
+        "body": "{{count}} ニュースレターの受信者は、過去 {{window_hours}} 時間内に失敗しました。"
+      },
+      "newsletter_queue_marked_sent_without_email_log": {
+        "title": "電子メールによる証拠なしで送信済みとマークされたニュースレター",
+        "body": "{{count}} ニュースレターの受信者は、過去 {{window_hours}} 時間に、一致する成功した電子メール ログ エントリなしで送信済みとしてマークされました。"
+      },
+      "event_reminders_overdue_pending": {
+        "title": "イベントリマインダーの期限が切れています",
+        "body": "{{count}} イベント リマインダーは、予定された送信時刻から {{minutes}} 分以上経過しても保留中です。"
+      },
+      "event_reminders_failed_recently": {
+        "title": "イベントリマインダーが失敗しました",
+        "body": "過去 {{window_hours}} 時間で、{{count}} イベント リマインダーが失敗しました。"
+      },
+      "event_reminders_marked_sent_without_email_log": {
+        "title": "電子メールによる証拠なしで送信済みとマークされたイベントリマインダー",
+        "body": "{{count}} 電子メール イベント リマインダーは、過去 {{window_hours}} 時間内に一致する成功した電子メール ログ エントリなしで送信済みとしてマークされました。"
+      },
+      "marketplace_report_received_without_notification_outbox": {
+        "title": "マーケットプレイスのレポート受信メールがキューに登録されませんでした",
+        "body": "?? {{window_hours}} ??????{{count}} ????????????????????????????????????????"
+      },
+      "marketplace_report_acknowledged_without_notification_outbox": {
+        "title": "マーケットプレイスのレポート確認メールがキューに登録されませんでした",
+        "body": "{{count}} マーケットプレイス レポートは、過去 {{window_hours}} 時間内に、一致する確認メール通知行なしで確認されました。"
+      },
+      "marketplace_report_resolved_without_notification_outbox": {
+        "title": "マーケットプレイスのレポート解決メールがキューに登録されませんでした",
+        "body": "{{count}} マーケットプレイス レポートは、過去 {{window_hours}} 時間内に、一致する解決策の電子メール通知行なしで解決されました。"
+      },
+      "marketplace_report_appealed_without_notification_outbox": {
+        "title": "マーケットプレイス レポートの異議メールがキューに登録されませんでした",
+        "body": "?? {{window_hours}} ??????{{count}} ???????????????????????????????????????????????????"
+      },
+      "marketplace_report_appeal_resolved_without_notification_outbox": {
+        "title": "マーケットプレイス レポートの異議申し立て解決メールがキューに登録されませんでした",
+        "body": "{{count}} マーケットプレイス レポートの異議申し立ては、過去 {{window_hours}} 時間内に一致する最終決定メール通知行なしで解決されました。"
+      },
+      "federation_connection_without_email_evidence": {
+        "title": "フェデレーション接続電子メールの証拠がありません",
+        "body": "{{count}} フェデレーション接続イベントには、過去 {{window_hours}} 時間内に電子メール配信が成功したという証拠はありません。"
+      },
+      "federation_connection_without_bell_evidence": {
+        "title": "フェデレーション接続通知の証拠がありません",
+        "body": "{{count}} フェデレーション接続イベントには、過去 {{window_hours}} 時間におけるアプリ内通知の証拠はありません。"
+      },
+      "federation_review_without_email_evidence": {
+        "title": "フェデレーションレビュー電子メールの証拠が欠落している",
+        "body": "{{count}} フェデレーション レビューでは、過去 {{window_hours}} 時間内に成功した、または意図的にスキップされた電子メールの証拠はありません。"
+      },
+      "federation_review_without_bell_evidence": {
+        "title": "連盟審査通知の証拠が欠落している",
+        "body": "{{count}} フェデレーション レビューには、過去 {{window_hours}} 時間におけるアプリ内通知の証拠はありません。"
+      },
+      "member_subscription_event_without_email_evidence": {
+        "title": "メンバーのサブスクリプション電子メールの証拠がありません",
+        "body": "{{count}} メンバーのサブスクリプション請求イベントでは、過去 {{window_hours}} 時間内に電子メール配信が成功した証拠はありません。"
+      },
+      "stripe_donation_without_receipt_email_evidence": {
+        "title": "寄付金受領書メールの証拠が見つからない",
+        "body": "{{count}} が完了した Stripe 寄付は、過去 {{window_hours}} 時間以内に電子メールで正常に受信されたという証拠がありません。"
+      },
+      "critical_email_attempts_missing_tenant_context": {
+        "title": "重要な電子メールにテナント コンテキストがありません",
+        "body": "{{count}} の重要な電子メール試行は、過去 {{window_hours}} 時間にテナント コンテキストなしでログに記録されました。"
+      },
+      "sendgrid_events_not_confirming_delivery": {
+        "title": "SendGrid 配信イベントがありません",
+        "body": "{{count}} SendGrid の電子メールは引き続き受け付けられますが、{{hours}} 時間以上経過しても確認されません。"
+      },
+      "tenant_gmail_override_incomplete": {
+        "title": "テナント Gmail 構成が不完全",
+        "body": "このテナントには、Gmail 電子メール プロバイダーのオーバーライドが不完全です。"
+      },
+      "tenant_smtp_override_incomplete": {
+        "title": "テナント SMTP 構成が不完全",
+        "body": "このテナントには、SMTP 電子メール プロバイダーのオーバーライドが不完全です。"
+      },
+      "tenant_sendgrid_override_missing_api_key": {
+        "title": "テナントの SendGrid が欠落している API キーをオーバーライドします",
+        "body": "このテナントは SendGrid オーバーライドを使用するように設定されていますが、テナント API キーがないため、プラットフォーム フォールバックが使用されます。"
+      },
+      "tenant_provider_config_check_failed": {
+        "title": "テナントプロバイダーのチェックに失敗しました",
+        "body": "このテナントの電子メール プロバイダー構成監査を完了できませんでした。"
+      },
+      "direct_email_send_paths_remaining": {
+        "title": "従来のダイレクトメールパスはそのまま残ります",
+        "body": "{{count}} ?????????????????????????????????????????????????????????????????????????????????????"
+      },
+      "email_dispatch_missing_explicit_tenant": {
+        "title": "ディスパッチャーのメールに明示的なテナントがありません",
+        "body": "{{count}} ???????????????????????????????????????????????????cron?Webhook????????????????????????tenant_id ??? tenantId ?????????????"
+      },
+      "email_trigger_audit_failed": {
+        "title": "電子メールトリガー監査に失敗しました",
+        "body": "電子メール トリガーの監査を完了できませんでした。"
       }
+    },
+    "title": "電子メールの到達性",
+    "subtitle": "このテナントのトリガーの証拠、送信試行、プロバイダーのステータス、および抑制された受信者を追跡します。",
+    "trigger_score": "トリガースコア",
+    "trigger_coverage": "{{count}} が監視するフロー全体にわたる {{issues}} の問題",
+    "actions": {
+      "refresh": "リフレッシュ",
+      "reset": "リセット",
+      "search": "検索"
+    },
+    "windows": {
+      "1": "過去 24 時間",
+      "7": "過去 7 日間",
+      "30": "過去 30 日間",
+      "90": "過去90日間"
+    },
+    "filters": {
+      "all": "全て",
+      "category": "カテゴリ",
+      "email": "電子メール",
+      "recipient": "受信者の電子メール",
+      "reason": "理由",
+      "since": "以来",
+      "status": "状態",
+      "until": "それまで",
+      "window": "タイムウィンドウ"
+    },
+    "metrics": {
+      "accepted": "承認されました",
+      "bad_outcomes": "{{count}} が失敗、バウンス、または抑制されました",
+      "bounced": "跳ね返った",
+      "delivered": "納品済み",
+      "not_available": "トリガー監査データなし",
+      "total": "合計",
+      "trigger_score": "トリガースコア",
+      "unconfirmed": "{{count}} ??????????????",
+      "webhook_confirmed": "プロバイダー Webhook で確認済み",
+      "window_days": "{{days}} の日枠"
+    },
+    "status": {
+      "bounced": "跳ね返った",
+      "delivered": "納品済み",
+      "failed": "失敗した",
+      "pending": "保留中",
+      "processing": "処理",
+      "queued": "キューに入れられました",
+      "sent": "送信済み",
+      "suppressed": "抑制された",
+      "unknown": "不明なステータス: {{status}}"
+    },
+    "severity": {
+      "critical": "致命的",
+      "info": "情報",
+      "warning": "警告"
+    },
+    "status_breakdown": {
+      "title": "ステータスの内訳",
+      "subtitle": "選択したウィンドウに対する現在のテナントの送信結果のコンパクトなビュー。"
+    },
+    "trigger_health": {
+      "critical": "トリガーに関する重大な問題",
+      "monitored": "監視対象のフロー",
+      "warning": "警告トリガーの問題"
+    },
+    "trigger_issues": {
+      "title": "監査の問題のトリガー",
+      "subtitle": "電子メールまたは通知が発行されるべきソース行ですが、監査には信頼できる配信証拠がありません。",
+      "table_label": "電子メールトリガー監査の問題",
+      "empty": "選択したウィンドウにはトリガー監査の問題はありません。",
+      "all_tenants": "すべてのテナント",
+      "columns": {
+        "event": "イベント",
+        "issue": "問題",
+        "module": "モジュール",
+        "params": "証拠",
+        "severity": "重大度",
+        "tenant": "テナント"
+      }
+    },
+    "queues": {
+      "title": "キュー診断",
+      "subtitle": "このテナントの失敗した、抑制された、または古い保留中の電子メール キュー行。",
+      "table_label": "電子メールキュー診断",
+      "empty": "失敗した電子メール キュー行、抑制された電子メール キュー行、または古い電子メール キュー行はありません。",
+      "columns": {
+        "attempts": "試み",
+        "category": "カテゴリ",
+        "error": "エラー",
+        "last_attempt": "最後の試み",
+        "recipient": "受信者",
+        "source": "ソース",
+        "status": "状態"
+      },
+      "sources": {
+        "civic_digest_delivery_claims": "シビックダイジェスト請求",
+        "event_reminder_delivery_claims": "イベントリマインダーの請求",
+        "event_reminders": "イベントリマインダー",
+        "federation_inbound_connections": "フェデレーション接続",
+        "federation_messages": "フェデレーションメッセージ",
+        "federation_transactions": "フェデレーショントランザクション",
+        "goal_reminders": "目標リマインダー",
+        "job_interviews": "就職面接のリマインダー",
+        "listing_expiry_reminders_sent": "出品期限リマインダー",
+        "marketplace_disputes": "市場紛争",
+        "marketplace_order_notification_deliveries": "マーケットプレイスの注文通知",
+        "marketplace_report_notifications": "マーケットプレイスレポート",
+        "marketplace_seller_ratings": "マーケットプレイスの販売者の評価",
+        "member_subscription_events": "メンバーのサブスクリプションの請求",
+        "newsletter_queue": "ニュースレター",
+        "notification_queue": "通知",
+        "notifications": "通知証拠",
+        "reviews": "連合審査",
+        "transaction_notification_deliveries": "取引通知",
+        "user_safeguarding_preferences": "安全保護の見直し",
+        "vol_donations": "寄付金受領書",
+        "vol_reminder_delivery_claims": "ボランティアのリマインダー請求",
+        "vol_reminders_sent": "ボランティアのリマインダー"
+      }
+    },
+    "logs": {
+      "title": "電子メール試行ログ",
+      "subtitle": "すべての送信試行を受信者、カテゴリ、ステータス、日付で検索します。",
+      "table_label": "電子メール試行ログ",
+      "empty": "現在のフィルターに一致する電子メールはありません。",
+      "columns": {
+        "category": "カテゴリ",
+        "delivered": "納品済み",
+        "error": "エラー",
+        "provider": "プロバイダー",
+        "recipient": "受信者",
+        "sent": "送信済み",
+        "status": "状態",
+        "subject": "主題"
+      }
+    },
+    "pagination": {
+      "page_size": "ページあたりの行数",
+      "summary": "{{from}}-{{total}} の {{to}}"
+    },
+    "suppressions": {
+      "title": "抑制リスト",
+      "subtitle": "プロバイダーがバウンス、ブロック、無効化、または購読解除したプラットフォーム全体の受信者。",
+      "table_label": "電子メール抑制リスト",
+      "empty": "現在のフィルタに一致する抑制された受信者はありません。",
+      "confirm_remove": "{{email}} を抑制リストから削除しますか?再度メールを受信できるようになります。",
+      "remove": "抑制を解除する",
+      "remove_failed": "抑制を解除できませんでした。",
+      "removed": "{{email}} ????????",
+      "columns": {
+        "actions": "アクション",
+        "detail": "詳細",
+        "email": "電子メール",
+        "reason": "理由",
+        "suppressed_at": "で抑制されました"
+      },
+      "reasons": {
+        "block": "ブロック",
+        "bounce": "バウンス",
+        "invalid": "無効",
+        "spam_report": "スパムレポート",
+        "unsubscribe": "購読を解除する",
+        "unknown": "不明な理由: {{reason}}"
+      }
+    },
+    "empty": {
+      "no_statuses": "まだステータスがありません"
     }
   },
   "help_drawer": {
@@ -10212,7 +11970,7 @@
       "subject_user": "対象ユーザー: {{id}}",
       "target_user": "対象ユーザー：{{id}}",
       "meta": {
-        "title": "NEXUSSTERM0TOKEN エージェントの提案",
+        "title": "AI ?????????",
         "description": "テナント データに影響を与える前に、自律エージェントの提案を確認、編集、承認、または拒否します。"
       },
       "actions": {
@@ -10253,6 +12011,880 @@
         "reject_failed": "拒否できませんでした",
         "rejected": "提案は拒否されました"
       }
+    }
+  },
+  "fadp": {
+    "meta": {
+      "page_title": "FADP のコンプライアンス"
+    },
+    "header": {
+      "title": "Swiss FADP コンプライアンス (nDSG)",
+      "description": "データ保護に関する連邦法: 登録処理、保持設定、同意監査、および居住管理。"
+    },
+    "actions": {
+      "add_activity": "アクティビティの追加",
+      "cancel": "キャンセル",
+      "delete": "消去",
+      "edit": "編集",
+      "export_csv": "CSV をエクスポートする",
+      "export_ledger_csv": "完全な台帳をエクスポートする CSV",
+      "refresh": "リフレッシュ",
+      "save_changes": "変更を保存する",
+      "save_configuration": "設定の保存"
+    },
+    "common": {
+      "empty_dash": "—",
+      "no": "いいえ"
+    },
+    "tabs": {
+      "aria": "FADP セクション",
+      "ledger": "同意台帳",
+      "register": "処理レジスタ",
+      "residency": "データの常駐性",
+      "retention": "保持設定"
+    },
+    "register": {
+      "description": "Article 12 nDSG には、処理アクティビティの記録が必要です。個人データが収集、使用、共有、または保持される各アクティビティを追加します。",
+      "empty": "まだ処理アクティビティはありません。レジスタを作成するアクティビティを追加します。",
+      "profiling_yes": "はい: 同意が必要です",
+      "table_aria": "処理アクティビティ",
+      "columns": {
+        "actions": "アクション",
+        "activity": "活動",
+        "automated_profiling": "自動プロファイリング",
+        "legal_basis": "法的根拠",
+        "retention": "保持"
+      }
+    },
+    "retention": {
+      "data_residency_label": "データ常駐宣言",
+      "dpa_contact_description": "データ保護責任者または責任者の電子メール。",
+      "dpa_contact_label": "DPA ?????????? (??)",
+      "periods_title": "保存期間",
+      "residency_title": "データの保存場所と DPA への連絡先",
+      "fields": {
+        "activity_logs_years": "活動ログ（年）",
+        "ai_embeddings_years": "AI の埋め込み (年)",
+        "member_data_years": "会員データ（年）",
+        "messages_years": "メッセージ (年)",
+        "transaction_data_years": "取引データ（年）"
+      },
+      "hints": {
+        "activity_logs_years": "プラットフォームのアクティビティと監査ログ。",
+        "ai_embeddings_years": "一致する埋め込み。同意が必要です。",
+        "member_data_years": "登録、プロファイル、認証データ。",
+        "messages_years": "ダイレクトメッセージとグループメッセージ。",
+        "transaction_data_years": "タイムクレジット交換記録。"
+      }
+    },
+    "ledger": {
+      "description": "メンバーの同意決定に関する不変の監査ログ。合法性を証明するために Art. 6 nDSG によって要求されます。",
+      "empty": "同意記録はまだありません。",
+      "table_aria": "同意記録",
+      "truncated": "最新の 200 件のレコードを表示します。完全な台帳 CSV をエクスポートして、すべての {{count}} レコードをダウンロードします。",
+      "columns": {
+        "action": "アクション",
+        "consent_type": "同意の種類",
+        "date": "日付",
+        "ip_address": "IP アドレス",
+        "member_id": "???? ID"
+      }
+    },
+    "residency": {
+      "article_16": "国境を越えた個人データの開示は、宛先国が連邦理事会によって認められた適切なデータ保護を確保している場合に許可されます。 Switzerland、EU/EEA 加盟国、およびその他の少数の国が対象となります。",
+      "article_16_label": "FADP Art. 16",
+      "article_17": "?????????????FDPIC ???????????????????????????????????????????????????????",
+      "article_17_label": "FADP Art. 17",
+      "description": "テナント メンバー データが保存および処理される場所。",
+      "dpa_contact": "DPA ???",
+      "title": "宣言されたデータ常駐性",
+      "update_hint_prefix": "宣言された居住権を更新するには、",
+      "update_hint_suffix": "タブ。",
+      "copy": {
+        "EU": "データは EU/EEA 内に保存されます。 Switzerland は、EU のデータ保護が適切であると認識するため、これらの転送には追加の FADP 保護手段は必要ありません。",
+        "International": "データは Switzerland および EU の外部に保存されます。 Art. 16-17 nDSG の安全対策（標準の契約条項や転送ごとの明示的なメンバーの同意など）が必要です。",
+        "Switzerland": "データはすべて Switzerland 内に保存されます。この宣言には国境を越えた転送規定は必要ありません。"
+      }
+    },
+    "summary": {
+      "automated_profiling": "自動プロファイリング",
+      "generated": "生成された",
+      "tenant": "テナント",
+      "title": "レジスタ概要",
+      "total_activities": "活動合計"
+    },
+    "activity_modal": {
+      "add_title": "処理アクティビティの追加",
+      "edit_title": "処理アクティビティの編集",
+      "fields": {
+        "activity_name": "アクティビティ名",
+        "automated_profiling": "自動プロファイリング",
+        "data_categories": "データ カテゴリ (カンマ区切り)",
+        "legal_basis": "法的根拠",
+        "purpose": "目的",
+        "recipients": "受信者 (カンマ区切り、オプション)",
+        "retention_period": "保存期間",
+        "sort_order": "並べ替え順序"
+      },
+      "hints": {
+        "automated_profiling": "Art. 21 nDSG: 自動化された個人の意思決定には、明示的な同意と透明性が必要です。",
+        "data_categories": "例: 名前、電子メール、電話番号、住所。",
+        "purpose": "このデータはなぜ処理されるのですか?正当な目的については具体的に説明してください。",
+        "recipients": "このデータを受信またはアクセスする人 (内部チームや処理者など)。",
+        "retention_period": "例: メンバーシップ終了後 7 年間、または同意が撤回されるまで。"
+      }
+    },
+    "delete_modal": {
+      "message": "この処理アクティビティを削除しますか?これを元に戻すことはできません。",
+      "title": "処理アクティビティの削除"
+    },
+    "legal_basis": {
+      "consent": "同意",
+      "contract": "契約",
+      "legal_obligation": "法的義務",
+      "legitimate_interest": "正当な利益",
+      "unknown": "不明な法的根拠: {{basis}}"
+    },
+    "data_residency": {
+      "EU": "EU (EEA)",
+      "International": "インターナショナル (EU/Switzerland 以外)",
+      "Switzerland": "Switzerland"
+    },
+    "consent_actions": {
+      "granted": "付与された",
+      "withdrawn": "撤回されました",
+      "unknown": "不明なアクション: {{action}}"
+    },
+    "toasts": {
+      "activities_load_failed": "処理アクティビティのロードに失敗しました。",
+      "activity_delete_failed": "アクティビティの削除に失敗しました。",
+      "activity_deleted": "アクティビティが削除されました。",
+      "activity_required": "アクティビティ名と目的は必須です。",
+      "activity_save_failed": "アクティビティを保存できませんでした。",
+      "activity_saved": "処理アクティビティが保存されました。",
+      "consent_export_failed": "同意台帳のエクスポートに失敗しました。",
+      "consent_load_failed": "同意台帳の読み込みに失敗しました。",
+      "register_export_failed": "レジスタのエクスポートに失敗しました。",
+      "retention_load_failed": "保持設定のロードに失敗しました。",
+      "retention_save_failed": "保持設定の保存に失敗しました。",
+      "retention_saved": "保持設定が保存されました。"
+    }
+  },
+  "ai": {
+    "common": {
+      "cancel": "キャンセル",
+      "close": "近い",
+      "empty_dash": "-",
+      "loading": "読み込み中...",
+      "save_changes": "変更を保存する"
+    },
+    "ki_agents": {
+      "meta": {
+        "title": "KI-Agenten",
+        "description": "AG61 - 自律エージェント フレームワーク。エージェントはアクションを提案します。人間は何かが適用される前に承認します。"
+      },
+      "about": {
+        "title": "KI-Agentenについて",
+        "body": "KI-Agenten (AI エージェント) は、適切なケア ペアの検索、非アクティブなメンバーの誘導、コーディネーターのワークロードの要約、未解決のヘルプ リクエストのルーティングなどの日常的な調整タスクを自動化します。すべてのエージェントは、提案してから承認するモデルで動作します。エージェントは提案を生成しますが、提案の信頼スコアが設定した自動適用しきい値を超えない限り、人間が承認するまでは何も適用されません。",
+        "tandem_prefix": "示唆する",
+        "tandem_suffix": "- スキル、場所、空き状況に基づいた 1 対 1 のケアの組み合わせ。",
+        "nudge": "非アクティブなメンバー、または一致しないリクエストを持つメンバーに対象を絞ったプロンプトを送信します。",
+        "demand": "過去のパターンから今後の介護需要を予測します。",
+        "help": "オープンなヘルプ リクエストに最適なコーディネーターを提案します。",
+        "activity": "毎週のボランティア活動のダイジェストをコーディネーターに電子メールで送信します。"
+      },
+      "tabs": {
+        "aria": "KI-Agenten タブ",
+        "config": "構成",
+        "proposals": "提案",
+        "runs": "走る"
+      },
+      "stats": {
+        "total_runs": "総実行数",
+        "total_proposals": "トータル提案",
+        "pending_review": "{{count}} の審査待ち"
+      },
+      "agent_types": {
+        "activity_summary": "活動の概要",
+        "demand_forecast": "需要予測",
+        "help_routing": "ヘルプルーティング",
+        "member_welcome": "メンバー歓迎",
+        "nudge_dispatch": "ナッジディスパッチ",
+        "tandem_matching": "タンデムマッチング"
+      },
+      "status": {
+        "all": "全て",
+        "approved": "承認された",
+        "auto_applied": "自動適用",
+        "cancelled": "キャンセル",
+        "completed": "完了",
+        "expired": "期限切れ",
+        "failed": "失敗した",
+        "pending": "保留中",
+        "pending_review": "審査待ち",
+        "rejected": "拒否されました",
+        "running": "ランニング"
+      },
+      "triggered_by": {
+        "manual": "マニュアル",
+        "scheduled": "予定されている"
+      },
+      "config": {
+        "enable_title": "KI-Agenten を有効にする",
+        "enable_description": "マスターのオン/オフ。オフの場合、エージェントはスケジュールどおりに実行されません。",
+        "agent_types_title": "エージェントの種類",
+        "tandem_description": "-スタイルのサポートペアリング",
+        "nudge_description": "メンバーに対するスマートなエンゲージメントの促進",
+        "activity_description": "コーディネーター向けの毎週のボランティアログの概要",
+        "demand_description": "ボランティアログの傾向からケア需要を予測する",
+        "help_description": "オープンヘルプリクエストの自動ルーティング",
+        "thresholds_title": "しきい値とスケジュール",
+        "auto_apply_threshold": "自動適用しきい値:",
+        "auto_apply_threshold_aria": "自動適用しきい値",
+        "auto_apply_threshold_help": "この信頼度を超える提案はレビューなしで自動的に適用されます。",
+        "max_proposals": "実行ごとの最大提案",
+        "schedule_hour": "スケジュール時間 (0 ～ 23、サーバー現地時間)",
+        "notification_email": "通知メール",
+        "notification_email_placeholder": "admin@example.org"
+      },
+      "actions": {
+        "approve": "承認する",
+        "approve_all_eligible": "対象者全員を承認する",
+        "details": "詳細",
+        "reject": "拒否する",
+        "save_config": "設定を保存する",
+        "trigger": "トリガー"
+      },
+      "empty": {
+        "loading_config": "構成を読み込んでいます...",
+        "loading_proposals": "提案を読み込んでいます...",
+        "loading_runs": "実行をロード中...",
+        "no_filtered_proposals": "このフィルターに一致する提案はありません。",
+        "no_pending_proposals": "審査待ちの提案はありません。 「実行」タブからエージェントを実行して提案を生成します。",
+        "no_runs": "まだ実行はありません。上のトリガー パネルを使用して、最初のエージェントの実行を開始します。"
+      },
+      "proposals": {
+        "approve_all_help": "信頼度が自動適用のしきい値を満たしている保留中のレビュー提案をすべて承認します。",
+        "table_aria": "エージェントの提案",
+        "columns": {
+          "actions": "アクション",
+          "confidence": "自信",
+          "created": "作成されました",
+          "proposal_data": "提案データ",
+          "status": "状態",
+          "subject_user": "対象ユーザー",
+          "target_user": "対象ユーザー",
+          "type": "タイプ"
+        }
+      },
+      "legend": {
+        "status": "状態：",
+        "awaiting_decision": "あなたの決断を待っています",
+        "human_approved": "人間によって承認され適用される",
+        "auto_applied": "しきい値を超えると自動的に適用されます",
+        "rejected": "破棄され、適用されません",
+        "confidence": "自信：",
+        "confidence_high": "80% 以上安全に自動適用",
+        "confidence_medium": "50～79% のレビューを推奨",
+        "confidence_low": "50% 未満では信頼度が低い"
+      },
+      "runs": {
+        "agent_type_aria": "トリガーするエージェントの種類",
+        "agent_type_title": "エージェントの種類",
+        "table_aria": "エージェントの実行",
+        "trigger_title": "今すぐ実行をトリガーする",
+        "triggered_by_help": "手動とは、管理者によってこのページからトリガーされることを意味します。スケジュール済みとは、設定されたスケジュール時間に自動的に実行されることを意味します。",
+        "columns": {
+          "actions": "アクション",
+          "agent_type": "エージェントの種類",
+          "applied": "適用済み",
+          "duration": "間隔",
+          "proposals": "提案",
+          "started": "開始しました",
+          "status": "状態",
+          "triggered_by": "きっかけは"
+        }
+      },
+      "run_detail": {
+        "title": "#{{id}} - {{type}} を実行します",
+        "status": "状態：",
+        "triggered_by": "きっかけ:",
+        "started": "開始:",
+        "duration": "間隔：",
+        "proposals_generated": "生成された提案:",
+        "proposals_applied": "適用された提案:",
+        "proposals_count": "提案 ({{count}})",
+        "proposals_table_aria": "提案を実行する",
+        "columns": {
+          "subject": "主題"
+        }
+      },
+      "toasts": {
+        "approve_eligible_failed": "適格な提案を承認できませんでした。",
+        "approved_eligible": "{{approved}} プロポーザルが承認されました ({{failed}} は失敗しました、しきい値 {{threshold}}%)。",
+        "config_load_failed": "エージェント構成のロードに失敗しました。",
+        "config_save_failed": "設定の保存に失敗しました。",
+        "config_saved": "エージェント構成が保存されました。",
+        "proposal_approve_failed": "提案の承認に失敗しました。",
+        "proposal_approved": "提案は承認され、適用されました。",
+        "proposal_reject_failed": "提案を拒否できませんでした。",
+        "proposal_rejected": "提案は拒否されました。",
+        "proposals_load_failed": "プロポーザルの読み込みに失敗しました。",
+        "run_details_load_failed": "実行の詳細をロードできませんでした。",
+        "run_trigger_failed": "実行のトリガーに失敗しました。",
+        "run_triggered": "??????????: {{count}} ?????????????",
+        "runs_load_failed": "実行のロードに失敗しました。"
+      }
+    },
+    "module_docs": {
+      "meta": {
+        "title": "AI モジュールのドキュメント",
+        "description": "各モジュールのわかりやすい説明。 AI チャット アシスタントは、メンバーの質問に答えるときにこれらを正規の根拠として使用します。"
+      },
+      "actions": {
+        "create_doc": "ドキュメントの作成",
+        "delete": "消去",
+        "edit": "編集",
+        "new_doc": "新しいドキュメント",
+        "seed_defaults": "シードのデフォルト"
+      },
+      "about": {
+        "body": "メンバーのチャット メッセージにドキュメントのキーワードのいずれかが含まれている場合、そのドキュメントの本文が AI のシステム プロンプトに追加されます。 1 ターンごとに最大 3 つのドキュメントが挿入されます。機能が何をするのか、その使用方法、何ができないのかをわかりやすい言葉で書きます。",
+        "tip_label": "ヒント：",
+        "tip_body": "[デフォルトのシード] をクリックして、コア モジュールをカバーする 10 個の事前に作成されたドキュメントから開始します。カスタマイズしたものは上書きされません。"
+      },
+      "columns": {
+        "actions": "アクション",
+        "keywords": "キーワード",
+        "slug": "ナメクジ",
+        "status": "状態",
+        "title": "タイトル",
+        "updated": "更新されました"
+      },
+      "confirm_delete": "「{{title}}」を削除しますか?これを元に戻すことはできません。",
+      "empty": {
+        "no_docs": "モジュールのドキュメントはまだありません。シードのデフォルトまたは新しいドキュメントを使用して開始します。"
+      },
+      "editor": {
+        "create_title": "新しいモジュールのドキュメント",
+        "edit_title": "「{{title}}」を編集",
+        "fields": {
+          "active": "アクティブ",
+          "body": "体",
+          "keywords": "トリガーキーワード (カンマ区切り)",
+          "module_slug": "モジュールのスラグ",
+          "title": "タイトル"
+        },
+        "hints": {
+          "active": "?????????? AI ??????????????",
+          "keywords": "これらの単語のいずれかがチャット メッセージに表示されると、このドキュメントが AI プロンプトに挿入されます。",
+          "module_slug": "小文字、数字、アンダースコア、ダッシュ。作成後に変更することはできません。"
+        },
+        "placeholders": {
+          "body": "このモジュールの平易な説明。何ができるのか、どうやって使うのか、何ができないのか。",
+          "keywords": "?: timebank?hours?credits?exchange",
+          "module_slug": "?: listings?wallet?events",
+          "title": "例えばcreditsの仕組み"
+        }
+      },
+      "status": {
+        "active": "アクティブ",
+        "disabled": "無効"
+      },
+      "table_aria": "AI モジュールのドキュメント",
+      "toasts": {
+        "created": "ドキュメントが作成されました。",
+        "deleted": "ドキュメントが削除されました。",
+        "delete_failed": "削除に失敗しました。",
+        "load_failed": "モジュールドキュメントのロードに失敗しました。",
+        "save_failed": "保存に失敗しました。",
+        "seed_failed": "シードに失敗しました。",
+        "seeded": "シードされた{{count}}のデフォルト・ドキュメント。",
+        "updated": "ドキュメントが更新されました。"
+      }
+    },
+    "trace_metrics": {
+      "meta": {
+        "title": "AI トレース メトリクス",
+        "description": "AI チャット アシスタントのコスト、レイテンシ、ツールの使用法、未回答の質問。"
+      },
+      "empty": {
+        "loading_tools": "ツールの使用法を読み込んでいます...",
+        "no_downvotes": "反対票はありません。今のところ改善すべき点は何もありません。",
+        "no_tools": "このウィンドウではツール呼び出しはありません。"
+      },
+      "filters": {
+        "window": "ウィンドウ"
+      },
+      "stats": {
+        "avg_latency": "平均レイテンシー",
+        "cost": "??? (USD)",
+        "latency_value": "{{value}} ミリ秒",
+        "thumbs_down": "親指を下げる",
+        "thumbs_up": "いいぞ",
+        "turns": "ターン"
+      },
+      "tools": {
+        "title": "と呼ばれるトップツール"
+      },
+      "toasts": {
+        "load_failed": "メトリクスのロードに失敗しました。"
+      },
+      "unanswered": {
+        "title": "未回答の質問 (サムダウン)",
+        "description": "これらはメンバーがサムダウンを与えたターンです。繰り返し発生するパターンをカバーするために、新しい AI モジュール ドキュメントを作成します。",
+        "table_aria": "答えのない質問",
+        "columns": {
+          "assistant_reply": "アシスタントの返答（抜粋）",
+          "note": "注記",
+          "user_question": "ユーザーの質問",
+          "when": "いつ"
+        }
+      },
+      "windows": {
+        "7": "過去 7 日間",
+        "30": "過去 30 日間",
+        "90": "過去90日間"
+      }
+    }
+  },
+  "advertising": {
+    "status": {
+      "all": "全て",
+      "active": "アクティブ",
+      "cancelled": "キャンセル",
+      "completed": "完了",
+      "draft": "下書き",
+      "drafts": "下書き",
+      "paused": "一時停止中",
+      "pending_review": "審査待ち",
+      "rejected": "拒否されました",
+      "scheduled": "予定されている",
+      "sending": "送信中",
+      "sent": "送信済み"
+    },
+    "advertiser": {
+      "gemeinde": "自治体",
+      "private": "プライベート",
+      "sme": "SME",
+      "sme_local": "SME (ローカルビジネス)",
+      "verein": "協会"
+    },
+    "shared": {
+      "campaign_details": "キャンペーン詳細",
+      "filter_by_status": "ステータスでフィルタリングする",
+      "rejection_reason": "拒否理由",
+      "search_campaigns": "検索キャンペーン...",
+      "unexpected_error": "予期しないエラーが発生しました",
+      "actions": {
+        "approve": "承認する",
+        "cancel": "キャンセル",
+        "close": "近い",
+        "create_campaign": "キャンペーンの作成",
+        "details": "詳細",
+        "new_campaign": "新しいキャンペーン",
+        "pause": "一時停止",
+        "reject": "拒否する",
+        "reject_campaign": "拒否キャンペーン",
+        "submit_for_review": "レビューのために送信する",
+        "view_details": "詳細を見る"
+      },
+      "columns": {
+        "actions": "アクション",
+        "advertiser": "広告主",
+        "campaign": "キャンペーン",
+        "clicks": "クリック数",
+        "ctr": "CTR",
+        "id": "ID",
+        "impressions": "感想",
+        "status": "状態"
+      },
+      "empty": {
+        "no_campaigns": "キャンペーンが見つかりませんでした。"
+      },
+      "fields": {
+        "advertiser_type": "広告主の種類",
+        "campaign_name": "キャンペーン名",
+        "type": "タイプ"
+      }
+    },
+    "ad": {
+      "page_title": "広告キャンペーン",
+      "budget_description": "予算を無制限にするには 0 を入力します",
+      "audience_description": "すべてのコミュニティメンバーを対象とする場合は空白のままにします",
+      "creative_alt": "クリエイティブ",
+      "create_title": "広告キャンペーンの作成",
+      "creatives_count": "クリエイティブ ({{count}})",
+      "no_creatives": "このキャンペーンにはまだクリエイティブが添付されていません。",
+      "performance_30_days": "公演（30日間）",
+      "reject_intro_prefix": "あなたは拒否しています",
+      "reject_intro_suffix": "広告主が送信内容を改善する方法を理解できるように、理由を入力してください。",
+      "rejection_placeholder": "例えばコンテンツはコミュニティ ガイドラインに違反しています。見出しを修正してください。",
+      "columns": {
+        "budget_spent": "予算/支出額"
+      },
+      "fields": {
+        "audience_filters": "オーディエンスフィルター (JSON、オプション)",
+        "end_date": "終了日",
+        "placement": "配置",
+        "start_date": "開始日",
+        "total_budget_cents": "総予算 (セント単位)"
+      },
+      "header": {
+        "title": "ローカル広告",
+        "description": "SME??????????????????????????"
+      },
+      "placement": {
+        "all": "すべてのプレースメント",
+        "discovery": "発見",
+        "feed": "餌",
+        "market": "市場"
+      },
+      "placeholders": {
+        "budget": "?: 5000 = EUR 50.00",
+        "campaign_name": "サマーセール - Cafe Helvetia"
+      },
+      "stats": {
+        "active_campaigns": "アクティブなキャンペーン",
+        "clicks_today": "今日のクリック数",
+        "impressions_today": "今日の感想",
+        "total_revenue": "総収益"
+      },
+      "toasts": {
+        "approved": "???????{{name}}?????????",
+        "approve_failed": "キャンペーンの承認に失敗しました",
+        "audience_json_invalid": "オーディエンスフィルターは有効なJSONである必要があります",
+        "created": "キャンペーンを作成し、レビューのために送信しました",
+        "create_failed": "キャンペーンの作成に失敗しました",
+        "details_failed": "キャンペーンの詳細を読み込めませんでした",
+        "load_failed": "広告キャンペーンを読み込めませんでした",
+        "name_required": "キャンペーン名は必須です",
+        "paused": "???????{{name}}??????????",
+        "pause_failed": "キャンペーンを一時停止できませんでした",
+        "rejected": "キャンペーン「{{name}}」が拒否されました",
+        "reject_failed": "キャンペーンを拒否できませんでした"
+      }
+    },
+    "push": {
+      "chart_opens_title": "{{count}} ????",
+      "chart_sends_title": "{{count}} ????",
+      "create_title": "新しいプッシュキャンペーン",
+      "daily_breakdown": "一日の内訳",
+      "immediate": "すぐに",
+      "no_daily_data": "日次データはまだありません。",
+      "reject_intro_prefix": "拒否する",
+      "reject_intro_suffix": "広告主にわかる理由を入力してください。",
+      "rejection_placeholder": "例えばコンテンツがコミュニティ ガイドラインに準拠していません...",
+      "table_aria": "プッシュキャンペーン",
+      "actions": {
+        "dispatch_now": "今すぐ発送"
+      },
+      "columns": {
+        "cost": "料金",
+        "open_rate": "開封率",
+        "scheduled": "予定されている",
+        "targets": "ターゲット",
+        "title_preview": "タイトルプレビュー"
+      },
+      "dates": {
+        "approved": "承認された",
+        "created": "作成されました",
+        "scheduled": "予定されている",
+        "sent": "送信済み"
+      },
+      "fields": {
+        "cta_url": "CTA URL",
+        "cta_url_optional": "CTA URL (オプション)",
+        "notification_body": "プッシュ通知本文",
+        "notification_title": "プッシュ通知のタイトル",
+        "push_body": "プッシュボディ",
+        "push_title": "タイトルをプッシュ",
+        "scheduled_at": "スケジュール済み (オプション - 承認時に送信するには空白のままにします)"
+      },
+      "header": {
+        "title": "???????????? (AG57)"
+      },
+      "metrics": {
+        "opens": "開く",
+        "revenue": "収益",
+        "sends": "送信します",
+        "sent": "送信済み"
+      },
+      "placeholders": {
+        "body": "最大400文字",
+        "campaign_name": "例えば春のプロモーション - Cafe Seeblick",
+        "title": "最大100文字"
+      },
+      "stats": {
+        "needs_attention": "注意が必要です",
+        "pending_review": "審査待ち",
+        "revenue_this_month": "今月の収益",
+        "sends_this_month": "今月発送します",
+        "total_campaigns": "キャンペーンの合計"
+      },
+      "toasts": {
+        "approved": "???????{{name}}??????????",
+        "approve_failed": "キャンペーンの承認に失敗しました。",
+        "created": "キャンペーンが作成されました。",
+        "create_failed": "キャンペーンの作成に失敗しました。",
+        "dispatched": "???????{{name}}?????????",
+        "dispatch_failed": "キャンペーンのディスパッチに失敗しました。",
+        "load_failed": "キャンペーンの読み込みに失敗しました",
+        "rejected": "???????{{name}}??????????",
+        "reject_failed": "キャンペーンを拒否できませんでした。",
+        "required_fields": "名前、タイトル、本文は必須です。"
+      }
+    }
+  },
+  "municipal_copilot": {
+    "about": {
+      "body": "市副操縦士は、明確で、適切に形式的で、専門用語のないアナウンスを作成するのに役立ちます。下書きを貼り付けます。AI は改善を提案し、口調の問題 (形式的すぎる、見下すような、または不明瞭な) にフラグを立て、モデレーションに関する懸念事項をリストします。何かが公開される前に、提案を確認して承認または拒否します。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "accept": "受け入れる",
+      "cancel": "キャンセル",
+      "generate_proposal": "提案書の生成",
+      "refresh": "リフレッシュ",
+      "reject": "拒否する",
+      "reject_proposal": "提案を拒否する",
+      "view": "ビュー"
+    },
+    "empty": {
+      "no_latest": "まだ提案はありません。左側のドラフトから 1 つを生成します。",
+      "no_proposals": "まだ提案はありません。分析した下書きは監査証跡としてここに表示されます。",
+      "value": "-"
+    },
+    "fields": {
+      "audience_description": "AI がトーンと語彙を適切に調整できるように、このアナウンスの対象者 (例: 「すべての住民」、「ボランティア」、「自治体の連絡先」) を指定します。",
+      "audience_hint": "視聴者へのヒント (オプション)",
+      "audience_placeholder": "例えば北部地域の介護者",
+      "character_count": "{{count}} / 4000 文字",
+      "draft_announcement": "ドラフト発表",
+      "draft_placeholder": "大まかなドラフトを貼り付けます。副操縦士が磨きをかけ、トーンをチェックし、問題にフラグを立てます。",
+      "polished_text": "洗練されたテキスト",
+      "reason": "理由",
+      "reason_placeholder": "なぜこの提案は拒否されるのでしょうか?"
+    },
+    "labels": {
+      "audience": "視聴者: {{audience}}",
+      "model": "モデル: {{model}}"
+    },
+    "meta": {
+      "page_title": "市営通信副操縦士",
+      "subtitle": "公式発表の下書きを作成し、AI によって洗練され、トーンと明瞭さをチェックしてから公開します。一貫したアクセス可能な音声で住民や自治体の担当者とコミュニケーションをとる必要があるコーディネーター向けに設計されています。",
+      "title": "市営通信副操縦士"
+    },
+    "modal": {
+      "reject_title": "提案を拒否する"
+    },
+    "sections": {
+      "clarity_warnings": "明確さに関する警告",
+      "latest_proposal": "最新の提案",
+      "moderation_flags": "モデレーションフラグ",
+      "new_draft": "新しいドラフト",
+      "recent_proposals": "最近の提案"
+    },
+    "states": {
+      "accepted": "受け入れられました。次に、お知らせ管理者を通じて洗練されたテキストを公開します。",
+      "rejected_reason": "拒否されました - 理由: {{reason}}"
+    },
+    "status": {
+      "accepted": "承認されました",
+      "proposed": "提案された",
+      "published": "発行済み",
+      "rejected": "拒否されました"
+    },
+    "table": {
+      "actions": "アクション",
+      "aria": "最近の副操縦士の提案",
+      "audience": "観客",
+      "created": "作成されました",
+      "draft": "下書き",
+      "status": "状態",
+      "tone": "トーン"
+    },
+    "toasts": {
+      "accept_failed": "提案を受け入れられませんでした",
+      "accepted": "提案が承認されました - お知らせ管理者経由で公開されるようになりました",
+      "draft_too_long": "下書きが長すぎます (最大 4000 文字)",
+      "enter_draft": "最初に下書きを入力してください",
+      "generate_failed": "プロポーザルの生成に失敗しました",
+      "generated": "生成された提案",
+      "load_failed": "副操縦士の提案をロードできませんでした",
+      "reason_required": "理由は必須です",
+      "reject_failed": "提案を拒否できませんでした",
+      "rejected": "提案は拒否されました"
+    },
+    "tone": {
+      "condescending": "見下すような",
+      "ok": "トーンOK",
+      "too_formal": "形式的すぎる",
+      "too_informal": "カジュアルすぎる"
+    },
+    "tone_legend": {
+      "condescending": "読者をひいきにするかもしれない",
+      "ok": "トーンの問題は検出されませんでした",
+      "prefix": "トーンレジェンド -",
+      "too_formal": "過度に官僚的",
+      "too_informal": "プロフェッショナルではないと思われるかもしれない"
+    }
+  },
+  "municipal_roi_page": {
+    "about": {
+      "body_middle": "レポートは、次の方法を使用して、地域ケア プログラムの社会的および経済的価値を計算します。",
+      "body_prefix": "市営",
+      "body_suffix": "Age-Stiftung 方法論。これには、正式なケア サービス (Spitex/Pflege) に対する推定コスト オフセット、生成された社会的価値、およびレポート期間にわたる傾向データが表示されます。このレポートは、プログラムの効果の証拠として自治体のパートナーや資金提供者と共有されるように設計されています。",
+      "formula_prefix": "コスト相殺 = 承認されたケア時間の合計 x",
+      "formula_suffix": "時給×予防乗数。 Age-Stiftung の調査に基づくと、予防乗数 (デフォルト: 2.0) は、1 時間の非公式ケアにより約 2 時間の正式なケア介入が防止されることを反映しています。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "export_csv": "エクスポート CSV",
+      "refresh_aria": "自治体の影響レポートを更新する",
+      "refresh_data": "データを更新する"
+    },
+    "breakdown": {
+      "aria": "サブリージョンの内訳",
+      "description": "サブ地域の内訳は、どの地域が最も多くのケア活動を行っているかを示します。これを使用して、コーディネーターのサポートやボランティアの募集がさらに必要な分野を特定します。",
+      "formal_care_offset": "フォーマルケアオフセット",
+      "hours": "営業時間",
+      "sub_region": "サブリージョン",
+      "title": "サブ地域別内訳",
+      "weighted_hours": "加重時間数"
+    },
+    "filters": {
+      "all_sub_regions": "すべてのサブリージョン",
+      "from": "から",
+      "period": "期間: {{from}} -> {{to}}",
+      "sub_region": "サブリージョン",
+      "to": "に"
+    },
+    "meta": {
+      "page_title": "自治体の影響レポート",
+      "subtitle": "B2G 調達の証拠 - 介護コストの相殺と社会資本の指標",
+      "title": "自治体の影響レポート"
+    },
+    "methodology": {
+      "chf_per_hour": "CHF {{amount}}/時",
+      "default_prevention_prefix": "防止値は Age-Stiftung/ ごとに 2 倍の乗数を適用します。",
+      "default_prevention_suffix": "評価方法論。",
+      "default_rate": "CHF 35/時間",
+      "default_source": "スイスの介護助手率、SECO 2024",
+      "hours_are_valued_at": "時間の価値は",
+      "hours_valued_at": "価値のある時間数",
+      "prevention_value_prefix": "防止値は、Age-Stiftung ごとに {{multiplier}}x 乗数を適用します/",
+      "prevention_value_suffix": "評価方法論。",
+      "substitution_applied": "時間はカテゴリごとの置換係数によって重み付けされます。",
+      "substitution_not_applied": "すべての時間は 1.0 倍で重み付けされます。",
+      "tenant_setting_source": "このテナント用に構成された"
+    },
+    "municipalities": {
+      "point_export": "CSV エクスポートが可能 - Age-Stiftung、Pro Senectute、および州の社会部門のレポートにはページ ヘッダーのボタンを使用します。",
+      "point_hour_prefix": "地域社会でのケアの時間を 1 時間ごとに約節約できます",
+      "point_hour_suffix": "正式な介護費用の中で",
+      "point_nexus": "この影響を州および地方自治体の調達に関して測定、監査、および報告できるようにします。",
+      "point_prevention": "地域社会の予防的支援により、居住介護の必要性を軽減できる - 推定乗数は 2 倍",
+      "title": "これが自治体にとって何を意味するか"
+    },
+    "roi": {
+      "default_multiplier_note": "(2倍の乗数)",
+      "multiplier_note": "({{multiplier}}x 乗数)",
+      "prevented_this_period": "この期間は正式な医療費が発生しませんでした",
+      "prevention_value": "予防価値",
+      "social_isolation_supported": "社会的孤立から支援された人々",
+      "title": "推定介護費用の相殺",
+      "yoy": "{{value}} YoY"
+    },
+    "stats": {
+      "active_members": "アクティブなメンバー",
+      "active_relationships": "活発な人間関係",
+      "care_recipients": "要介護者",
+      "total_hours": "合計時間",
+      "weighted_hours_note": "{{hours}} 置換係数後の加重時間数",
+      "weighted_hours_tooltip": "時間は、Age-Stiftung 方法論ごとにカテゴリ固有の代替率 (例: 交際 0.4 倍、移動 0.7 倍、用事 1.0 倍) によって重み付けされます。"
+    },
+    "toasts": {
+      "export_failed": "CSV をエクスポートできませんでした",
+      "load_failed": "地方自治体の影響データをロードできませんでした"
+    }
+  },
+  "municipal_verification": {
+    "about": {
+      "body": "Municipal Verification は、このコミュニティ ケア プログラムが要件を満たしているという自治体または州のパートナーからの正式な承認を記録します。パイロット打ち上げ準備状況チェックには検証が必要で、これにより自治体影響レポートのロックが解除されます。公式自治体ドメインには DNS TXT 検証を使用するか、DNS 制御が利用できない場合は管理者証明書を適用します。",
+      "pending_dns": "検証トークンが生成されました - DNS の伝播と確認を待っています。",
+      "revoked": "検証が削除されました - アクセスを復元するには再検証してください。",
+      "title": "このページについて",
+      "verified": "正式に確認されました - 自治体レポート パックのロックが解除されました。"
+    },
+    "actions": {
+      "apply_attestation": "証明書の適用",
+      "cancel": "キャンセル",
+      "generate_dns_token": "DNS トークンを生成する",
+      "refresh": "リフレッシュ",
+      "revoke": "取り消す"
+    },
+    "current": {
+      "not_verified": "このテナントは現在検証されていません。 DNS 検証を開始するか、手動の管理者証明書を適用するには、以下のオプションを使用します。",
+      "title": "現在の状況",
+      "verified_on": "{{date}} で確認済み"
+    },
+    "dns": {
+      "publish_record": "この TXT レコードを DNS で公開し、伝播を待ちます。",
+      "record_name": "レコード名",
+      "ttl_label": "TTL",
+      "ttl_value": "300",
+      "txt_type": "TXT",
+      "type_label": "タイプ",
+      "value": "価値"
+    },
+    "fields": {
+      "attestation_description": "DNS 検証を行わずにこれを証明するのはなぜですか? (監査証跡。)",
+      "attestation_note": "証明書メモ（オプション）",
+      "domain_or_organisation": "ドメインまたは組織",
+      "domain_placeholder": "例えばチューリッヒ",
+      "municipality_domain": "自治体ドメイン"
+    },
+    "history": {
+      "empty": "まだ検証記録がありません。",
+      "title": "検証",
+      "updated": "{{date}} を更新しました",
+      "via_method": "{{method}}経由"
+    },
+    "meta": {
+      "description": "このコミュニティを認証済み自治体パートナーとしてマークします。公開レポートに「認証済み自治体」バッジを追加します。",
+      "page_title": "市区町村の検証",
+      "title": "市区町村の検証"
+    },
+    "request": {
+      "attestation_body": "これは、DNS コントロールが使用できない場合にのみ使用してください。検証は、管理者が手動で証明したものとして記録されます。",
+      "attestation_tab": "管理者の証明書",
+      "dns_body": "あなたが管理する自治体の公式ドメインを指定してください。公開できる DNS TXT レコードを生成します。伝播すると、システムはこのテナントを検証済みとしてマークします。",
+      "dns_tab": "DNS TXT (推奨)",
+      "method_aria": "検証方法",
+      "title": "検証のリクエスト"
+    },
+    "revoke_modal": {
+      "body_prefix": "の検証を取り消します",
+      "body_suffix": "これにより、検証済みバッジが削除され、検証レコードは取り消されたものとしてマークされます。",
+      "title": "認証を取り消しますか?"
+    },
+    "status": {
+      "pending_dns": "保留中 DNS",
+      "revoked": "取り消されました",
+      "verified": "確認済み"
+    },
+    "toasts": {
+      "attest_failed": "検証を証明できませんでした",
+      "attested": "検証済み",
+      "dns_failed": "DNS 検証を開始できませんでした",
+      "dns_generated": "DNS 検証トークンが生成されました",
+      "load_failed": "検証ステータスのロードに失敗しました",
+      "revoke_failed": "検証の取り消しに失敗しました",
+      "revoked": "検証が取り消されました"
+    },
+    "validation": {
+      "domain_required": "ドメインを入力してください"
     }
   }
 }

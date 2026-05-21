@@ -299,7 +299,570 @@
     "sitemap_urls_by_type": "URLs by Type",
     "social_sharing_image_heading": "Social Sharing Image",
     "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
-    "usage_limits_heading": "Usage Limits"
+    "usage_limits_heading": "Usage Limits",
+    "prerender": {
+      "description": "Instantanés rendus par le serveur uniquement par des robots. Surveillez la couverture, détectez l’obsolescence et forcez les actualisations.",
+      "analytics": {
+        "actions": {
+          "reload": "Recharger"
+        },
+        "columns": {
+          "crawler": "CRAWLER",
+          "hits": "HITS",
+          "host": "HOST",
+          "ip": "IP",
+          "status": "STATUS",
+          "time": "TIME",
+          "uri": "URI",
+          "url": "URL"
+        },
+        "empty": "Aucune analyse disponible. Le journal d'accès au robot peut être vide.",
+        "empty_bot_traffic": "Pas encore de trafic de robots",
+        "empty_no_data": "Aucune donnée",
+        "empty_recent_hits": "Aucun hit récent",
+        "errors": {
+          "load": "Échec du chargement des analyses"
+        },
+        "filters": {
+          "window": "Fenêtre"
+        },
+        "hints": {
+          "spoofed": "revendiqué un bot majeur, échec de la gamme IP",
+          "top_50_cap": "de la casquette top-50",
+          "verified_of_total": "{{verified}} de {{total}}"
+        },
+        "kpi": {
+          "ip_verified": "IP-vérifié",
+          "spoofed": "Usurpé (suspect)",
+          "total_bot_hits": "Nombre total de visites de robots",
+          "unique_uris": "URI uniques"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} usurpé"
+        },
+        "log_summary": "Journal : {{size}} - depuis {{time}}",
+        "sections": {
+          "hits_by_crawler": "Clics par robot",
+          "hits_by_status": "Clics par statut HTTP",
+          "recent_activity": "Activité récente (la plus récente en premier, la dernière {{count}})",
+          "top_uris": "Top URI (top 50 par nombre de hits)"
+        },
+        "tables": {
+          "recent_hits_aria": "Hits récents de robots",
+          "top_uris_aria": "Meilleurs URI"
+        },
+        "windows": {
+          "1": "Dernières 24 heures",
+          "7": "7 derniers jours",
+          "30": "30 derniers jours"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "Ouvert en inventaire",
+          "refresh": "Rafraîchir",
+          "refresh_all_stale": "Actualiser tous les éléments obsolètes ({{count}})"
+        },
+        "columns": {
+          "actions": "ACTIONS",
+          "asset": "ASSET",
+          "coverage": "COVERAGE",
+          "host": "HOST",
+          "missing": "MISSING",
+          "stale": "STALE",
+          "tenant": "TENANT"
+        },
+        "confirm": {
+          "queue_recache": "Remise en file d'attente pour les locataires {{count}} ?"
+        },
+        "empty": "Aucun locataire",
+        "errors": {
+          "bulk_enqueue": "Échec de la mise en file d'attente groupée (certains locataires peuvent avoir été mis en file d'attente)",
+          "enqueue": "Échec de la mise en file d'attente",
+          "load": "Échec du chargement de la couverture"
+        },
+        "messages": {
+          "bulk_queued": "Remise en file d'attente pour les locataires {{count}}",
+          "no_stale": "Pas de locataires périmés - la couverture est saine",
+          "tenant_queued": "#{{id}} mis en file d?attente pour {{slug}}"
+        },
+        "summary": {
+          "healthy": "Tous les locataires de {{count}} en bonne santé.",
+          "needs_work": "Les locataires {{needing}} des {{total}} ont des routes manquantes, obsolètes ou dont les actifs sont endommagés."
+        },
+        "table_aria": "Couverture"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "Appliquer",
+          "dry_run": "Essai à sec"
+        },
+        "auto_recache": {
+          "description": "Analyse chaque instantané. Met en file d'attente les remises en file d'attente de faible priorité pour les routes dont le contenu source a changé ou dont le TTL a expiré. S'exécute sur cron toutes les 15 à 30 minutes ; utilisez-le pour en déclencher un immédiatement.",
+          "title": "Mise en cache automatique (TTL + dérive du contenu)"
+        },
+        "drift": {
+          "description": "Parcourt le plan du site de chaque locataire, compare lastmod aux instantanés mtimes et récupère les pages obsolètes à partir d'écritures brutes, de migrations ou de tâches en file d'attente. S'exécute toutes les 2 minutes et met en file d'attente les mises à jour hautement prioritaires.",
+          "title": "Détecter la dérive (plan du site vs instantanés)"
+        },
+        "errors": {
+          "auto_recache": "Échec du déclenchement de la remise en cache automatique",
+          "drift_detection": "Échec du déclenchement de la détection de dérive",
+          "purge_unexpected": "Échec inattendu de la purge"
+        },
+        "messages": {
+          "auto_recache_applied": "Mise en cache automatique appliquée",
+          "auto_recache_dry_run": "Essai à sec de récupération automatique terminé",
+          "drift_applied": "Détection de dérive appliquée",
+          "drift_dry_run": "Essai à sec de dérive terminé",
+          "purge_dry_run": "Essai à sec : les instantanés {{count}} seraient purgés",
+          "purged_ungated": "Suppression des instantanés non protégés de {{count}} sur les locataires {{tenants}}"
+        },
+        "no_output": "(pas de sortie)",
+        "purge_ungated": {
+          "description": "Balayez les instantanés dont l’itinéraire ne se trouve pas dans un ensemble attendu par le locataire. Courant après la désactivation d'une fonctionnalité ou pour le nettoyage des routes statiques pré-rendues sans indicateurs de fonctionnalité. Les itinéraires de contenu dynamique sont laissés seuls.",
+          "title": "Purger les instantanés non sécurisés (nettoyage 404 par locataire)"
+        },
+        "result": {
+          "deleted": "Instantanés {{count}} supprimés dans les locataires {{tenants}}",
+          "would_delete": "Supprimerait les instantanés {{count}} sur les locataires {{tenants}}"
+        },
+        "title": "Automatisation de la fraîcheur"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "Annuler",
+          "close_breaker_now": "Fermez le disjoncteur maintenant",
+          "details": "Détails",
+          "emergency_reset": "Réinitialisation d'urgence",
+          "hide": "Cacher",
+          "hide_details": "Masquer les détails",
+          "reset_queue": "Réinitialiser la file d'attente"
+        },
+        "engine_healthy": "Moteur sain",
+        "issue_count_one": "Problème {{count}}",
+        "issue_count_other": "Problèmes {{count}}",
+        "modal": {
+          "body_middle": "ou",
+          "body_prefix": "Cela remettra en file d'attente tous les",
+          "body_suffix": "rangée dont le travailleur est resté silencieux pendant >30 min et dégagez le disjoncteur.",
+          "title": "Urgence : réinitialiser la file d'attente bloquée",
+          "warning": "Utilisez-le uniquement si vous avez confirmé que la file d'attente est bloquée. Si un travailleur en bonne santé est toujours en cours d'exécution, cela créera un travail en double."
+        },
+        "toasts": {
+          "breaker_reset": "Réinitialisation du disjoncteur",
+          "queue_reset_one": "Réinitialiser la ligne bloquée {{count}} ; disjoncteur dégagé",
+          "queue_reset_other": "Réinitialiser les lignes bloquées {{count}} ; disjoncteur dégagé",
+          "queue_reset_failed": "Échec de la réinitialisation de la file d'attente",
+          "reset_failed": "Échec de la réinitialisation"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "Fermer",
+          "inspect": "Inspecter",
+          "inspect_snapshot": "Inspecter {{path}}",
+          "open_rendered_url": "Ouvrir le rendu URL",
+          "recache_selected": "Remise en cache sélectionnée ({{count}})",
+          "reload": "Recharger",
+          "select_all_visible": "Sélectionner tout ce qui est visible",
+          "select_snapshot": "Sélectionnez {{path}}"
+        },
+        "columns": {
+          "actions": "Actes",
+          "age": "Âge",
+          "host": "Hôte",
+          "http": "HTTP",
+          "route": "Itinéraire",
+          "size": "Taille",
+          "status": "Statut"
+        },
+        "empty": "Aucun instantané ne correspond aux filtres",
+        "errors": {
+          "bulk_recache": "Échec de la remise en cache groupée",
+          "inspect": "Échec de l'inspection de l'instantané",
+          "load": "Échec du chargement de l'inventaire"
+        },
+        "filters": {
+          "aging": "Vieillissement",
+          "all": "Tous",
+          "asset_broken": "Actif cassé",
+          "content_drifted": "Le contenu a dérivé",
+          "filter": "Filtre",
+          "filter_placeholder": "sous-chaîne d'itinéraire ou d'hôte",
+          "fresh": "Frais",
+          "issue": "Problème",
+          "stale": "Vicié",
+          "staleness": "Manque de fraîcheur",
+          "status": "Statut",
+          "status_200": "200 seulement",
+          "status_non_200": "Non-200",
+          "tenant_placeholder": "facultatif",
+          "tenant_slug": "Limace de locataire"
+        },
+        "messages": {
+          "bulk_recache": "Instantanés {{count}} invalidés et remise en cache en file d'attente"
+        },
+        "inspect": {
+          "age": "Âge",
+          "all_valid": "tous valides",
+          "asset_references": "Références d'actifs ({{count}})",
+          "canonical": "Canonique",
+          "dead_assets": "{{count}} mort",
+          "flags": "Drapeaux",
+          "h1_count": "H1 (compte)",
+          "html_parse_warnings": "HTML analyse les avertissements",
+          "html_preview": "Aperçu HTML (12 premiers Ko, scripts supprimés)",
+          "integrity_mismatch": "octets modifiés depuis le rendu - attendu sha256 {{expected}}..., obtenu {{actual}}...",
+          "integrity_missing": "pas de side-car sha256 - l'instantané est antérieur à la vérification de l'intégrité ou a été modifié à la main",
+          "integrity_ok": "les octets correspondent au sha256 écrit au moment du rendu",
+          "integrity_status": "intégrité : {{status}}",
+          "integrity_unreadable": "Le side-car sha256 existe mais est mal formé",
+          "invalid_present": "INVALID PRÉSENT",
+          "json_ld": "JSON-LD (blocs {{blocks}}, {{status}})",
+          "meta_description": "Méta description",
+          "missing": "- manquant -",
+          "modal_title": "Inspection instantanée",
+          "modified": "Modifié",
+          "must_fix": "Doit être corrigé ({{count}})",
+          "no_structured_data": "Aucune donnée structurée",
+          "no_type": "(pas de @type)",
+          "none": "(aucun)",
+          "old": "{{age}} ancien",
+          "open_graph": "Ouvrir le graphique",
+          "path": "Chemin",
+          "seo_score": "Score SEO",
+          "size": "Taille",
+          "tips": "Conseils ({{count}})",
+          "title": "Titre"
+        },
+        "selected": "{{count}} sélectionné",
+        "status": {
+          "asset": "actif",
+          "content": "contenu",
+          "content_drifted": "contenu dérivé"
+        },
+        "summary": "{{filtered}} sur les instantanés {{total}}",
+        "table_aria": "Inventaire instantané"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "Annuler la t?che #{{id}}",
+          "close": "Fermer",
+          "reload": "Recharger",
+          "retry_job": "R?essayer la t?che #{{id}}",
+          "retry_same_parameters": "Réessayez avec les mêmes paramètres",
+          "view_details": "Voir les d?tails de la t?che #{{id}}"
+        },
+        "columns": {
+          "actions": "Actes",
+          "by": "Par",
+          "flags": "Drapeaux",
+          "id": "#",
+          "priority": "Priorité",
+          "queued": "En file d'attente",
+          "result": "Résultat",
+          "scope": "Portée",
+          "status": "Statut"
+        },
+        "detail": {
+          "all": "tous",
+          "claimed_by": "Réclamé par",
+          "duration": "Durée",
+          "error": "Erreur",
+          "exit_code": "Code de sortie",
+          "finished_at": "Terminé à",
+          "log_tail": "Bûche (queue)",
+          "queued_at": "En file d'attente à",
+          "requested_by": "Demandé par",
+          "routes": "Itinéraires",
+          "started_at": "Commencé à",
+          "status": "Statut",
+          "tenant": "Locataire",
+          "title": "T?che #{{id}}"
+        },
+        "empty": "Aucun emploi",
+        "errors": {
+          "cancel": "Impossible d'annuler : la tâche a peut-être commencé",
+          "load": "Échec du chargement des tâches",
+          "retry": "Échec de la nouvelle tentative : la tâche d'origine est peut-être toujours en cours"
+        },
+        "filters": {
+          "all": "Tous",
+          "cancelled": "Annulé",
+          "failed": "Échoué",
+          "partial": "Partiel",
+          "queued": "En file d'attente",
+          "running": "En cours d'exécution",
+          "status": "Statut",
+          "succeeded": "Réussi"
+        },
+        "flags": {
+          "dry_run": "essai à sec",
+          "force": "forcer"
+        },
+        "messages": {
+          "cancelled": "T?che #{{id}} annul?e",
+          "retry_queued": "Nouvelle tentative #{{retryId}} en file d?attente (depuis #{{id}})"
+        },
+        "priority": {
+          "high": "Haut",
+          "low": "Faible",
+          "normal": "Normale",
+          "tooltip": "priorité = {{priority}} (gains inférieurs)"
+        },
+        "result": {
+          "invalid": "{{count}} invalide"
+        },
+        "scope": {
+          "all_tenants": "tous les locataires"
+        },
+        "table_aria": "Emplois"
+      },
+      "events": {
+        "actions": {
+          "reload": "Recharger"
+        },
+        "columns": {
+          "commit": "Commettre",
+          "details": "Détails",
+          "event": "Événement",
+          "time": "Temps"
+        },
+        "empty": "Aucun événement",
+        "errors": {
+          "load": "Échec du chargement des événements"
+        },
+        "filters": {
+          "limit": "Limite"
+        },
+        "summary": "Événements {{count}}",
+        "table_aria": "Événements",
+        "types": {
+          "fail": "Échouer",
+          "partial": "Partiel",
+          "success": "Succès",
+          "supersede": "Remplacer",
+          "unknown": "Événement inconnu : {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "Âge",
+          "cache_path": "Chemin du cache",
+          "failed_at": "Échec à"
+        },
+        "description_action": "Forcer l'actualisation",
+        "description_middle": "Les routes de cette liste sont automatiquement ignorées pendant la fenêtre d'attente en cas d'échec (6 heures par défaut). Utiliser",
+        "description_prefix": "Chemins de cache ayant échoué lors d’une récente exécution de pré-rendu.",
+        "description_suffix": "dans l'onglet Présentation pour réessayer immédiatement.",
+        "empty": "Aucun échec récent",
+        "errors": {
+          "load": "Échec du chargement des échecs"
+        },
+        "table_aria": "Échecs"
+      },
+      "live_connected": "Mises à jour en direct connectées",
+      "audit": {
+        "actions": {
+          "auto_recache": "auto_recache",
+          "cancel": "Annuler",
+          "detect_drift": "detect_drift",
+          "enqueue": "mettre en file d'attente",
+          "invalidate": "invalider",
+          "purge": "purge",
+          "purge_unexpected": "purge_unexpected",
+          "reset_breaker": "reset_breaker",
+          "reset_queue": "reset_queue"
+        },
+        "buttons": {
+          "export_csv": "Exporter CSV",
+          "refresh": "Rafraîchir"
+        },
+        "columns": {
+          "action": "Action",
+          "actor": "Acteur",
+          "details": "Détails",
+          "job": "Emploi",
+          "outcome": "Résultat",
+          "tenant": "Locataire",
+          "when": "Quand"
+        },
+        "empty": "Aucune entrée d'audit.",
+        "fallbacks": {
+          "all": "tous",
+          "system": "système"
+        },
+        "filters": {
+          "action": "Filtre d'actions",
+          "all": "Tous"
+        },
+        "table_aria": "Historique des audits"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "Travail en file d'attente",
+          "refresh": "Rafraîchir"
+        },
+        "empty_summary": "Aucun résumé disponible.",
+        "errors": {
+          "enqueue_job": "Échec de la mise en file d'attente du travail",
+          "load_summary": "Échec du chargement du résumé"
+        },
+        "fields": {
+          "routes": "Itinéraires",
+          "tenant_slug": "Limace de locataire"
+        },
+        "force_refresh": {
+          "description": "Mettez en file d'attente un nouveau rendu. Laissez les deux champs vides pour actualiser chaque locataire et itinéraire. Le processeur hôte récupère la tâche dans un délai d'environ 60 secondes.",
+          "dry_run": "Essai à sec (plan uniquement)",
+          "force": "Forcer (ignorer le cache)",
+          "title": "Forcer l'actualisation"
+        },
+        "health": {
+          "cache_unreachable": "Cache inaccessible",
+          "healthy": "En bonne santé",
+          "missing": "{{count}} manquant",
+          "stale": "{{count}} périmé"
+        },
+        "hints": {
+          "active_jobs": "{{count}} actif",
+          "aging": "Vieillissement {{count}} (>7j)",
+          "asset_broken": "Références décédées /actifs/*",
+          "backoff_window": "Dans une fenêtre d'attente de 6 heures",
+          "cache_age": "{{oldest}} le plus ancien / {{newest}} le plus récent",
+          "content_stale": "Contenu source plus récent que l'instantané",
+          "event_at": "Événement {{time}}",
+          "no_events": "Aucun événement",
+          "prometheus": "Format de texte Prométhée",
+          "tenants_routes": "Locataires {{tenants}} x itinéraires {{routes}}"
+        },
+        "kpi": {
+          "age_stale": "Âge périmé (> 14 jours)",
+          "asset_broken": "Actif brisé",
+          "build_commit": "Construire un commit",
+          "cache_size": "Taille du cache",
+          "content_stale": "Contenu obsolète",
+          "coverage": "Couverture",
+          "metrics": "Métrique",
+          "missing": "Manquant",
+          "queued_jobs": "Travaux en file d'attente",
+          "recent_failures": "Échecs récents",
+          "status": "Statut"
+        },
+        "last_run": "Dernière exécution terminée",
+        "messages": {
+          "job_queued": "T?che #{{id}} mise en file d?attente"
+        },
+        "placeholders": {
+          "routes": "/about,/blog (vide = tout)",
+          "tenant_slug": "par ex. banque d'heures (vide = tout)"
+        },
+        "super_admin_only": "Super administrateur uniquement"
+      },
+      "polling_fallback": "Repli du sondage",
+      "purge": {
+        "actions": {
+          "auto_recache": "Mise en cache automatique après purge",
+          "dry_run": "Essai à sec",
+          "preview_purge": "Aperçu de la purge",
+          "purge_now": "Purger maintenant"
+        },
+        "description_middle": "pour un segment de chemin,",
+        "description_prefix": "Supprimez les instantanés correspondant à un modèle global. Utiliser",
+        "description_suffix": "pour tout descendant. Exemples :",
+        "errors": {
+          "pattern_required": "Le modèle est requis (par exemple /blog/*)",
+          "purge_failed": "Échec de la purge"
+        },
+        "fields": {
+          "pattern": "Modèle",
+          "tenant_slug": "Limace de locataire"
+        },
+        "messages": {
+          "dry_run": "Essai à sec : les instantanés {{count}} seraient purgés",
+          "purged": "Instantanés {{count}} purgés{{job}}"
+        },
+        "placeholders": {
+          "pattern": "/blog/* ou /listings/**",
+          "tenant_slug": "facultatif - laisser vide pour tous"
+        },
+        "result": {
+          "deleted": "Instantanés {{count}} supprimés",
+          "would_delete": "Supprimerait les instantanés {{count}}"
+        },
+        "title": "Purge du cache générique"
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "Inspecter"
+        },
+        "description_prefix": "Voir lequel",
+        "description_suffix": "pattern possède une route et ce que TTL il obtient, sans saisir la configuration. Utilisé pour régler la politique de fraîcheur.",
+        "error": "Échec de la recherche - vérifiez le format de l'itinéraire (doit commencer par \"/\")",
+        "fields": {
+          "route": "Itinéraire"
+        },
+        "path_only": "Chemin uniquement - pas de schéma ni d'hôte",
+        "placeholders": {
+          "route": "/blog/mon-post"
+        },
+        "result": {
+          "match": "correspondance: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (spécificité {{specificity}})",
+          "other_patterns": "Autres modèles qui correspondent à cet itinéraire :",
+          "ttl": "TTL : {{ttl}} ({{seconds}})"
+        },
+        "title": "Inspecteur TTL",
+        "units": {
+          "days": "{{count}} d",
+          "hours": "{{count}} h",
+          "minutes": "{{count}} min"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "Explorer"
+        },
+        "counts": {
+          "dynamic": "{{count}} dynamique",
+          "static": "{{count}} statique",
+          "total": "{{count}} total"
+        },
+        "description_prefix": "Découvrez exactement les itinéraires que le moteur prévoit de restituer pour un locataire - étage statique (fonctionnalité/module fermé) plus les URL dynamiques de",
+        "description_suffix": "L'ouvrier dramaturge visite cette liste.",
+        "error": "Échec de la recherche : vérifiez le slug du locataire",
+        "fields": {
+          "tenant_slug": "Limace de locataire"
+        },
+        "none": "(aucun)",
+        "placeholders": {
+          "tenant_slug": "banque d'heures"
+        },
+        "sections": {
+          "dynamic_routes": "Itinéraires dynamiques (plafonnés à 1 000)",
+          "static_routes": "Itinéraires statiques"
+        },
+        "title": "Explorateur de plan du site"
+      },
+      "readonly": {
+        "prefix": "Vue en lecture seule : les boutons d'action sont désactivés car le moteur de pré-rendu fonctionne sur chaque locataire. Connectez-vous avec un",
+        "role": "super-administrateur de la plateforme",
+        "suffix": "compte pour mettre les tâches en file d'attente, purger les instantanés ou déclencher la détection de dérive."
+      },
+      "tabs": {
+        "analytics": "Analytique",
+        "coverage": "Couverture",
+        "events": "Événements",
+        "failures": "Échecs",
+        "history": "Histoire",
+        "inventory": "Inventaire",
+        "jobs": "Emplois",
+        "overview": "Aperçu"
+      },
+      "tabs_aria": "Onglets de pré-rendu",
+      "title": "Moteur de pré-rendu"
+    }
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",
@@ -342,7 +905,132 @@
     "refresh": "Refresh",
     "top_areas_title": "Top Areas",
     "top_earners_title": "Top Earners",
-    "top_spenders_title": "Top Spenders"
+    "top_spenders_title": "Top Spenders",
+    "regional": {
+      "meta": {
+        "title": "Analyse régionale",
+        "description": "Informations géographiques, démographiques, d’engagement, de bénévolat et de demande d’aide pour les partenaires régionaux."
+      },
+      "controls": {
+        "period": "Période"
+      },
+      "periods": {
+        "last_30d": "30 derniers jours",
+        "last_90d": "90 derniers jours",
+        "last_12m": "12 derniers mois",
+        "all_time": "Tout le temps"
+      },
+      "actions": {
+        "refresh_cache": "Actualiser le cache",
+        "export_report": "Exporter le rapport"
+      },
+      "stats": {
+        "active_members": "Membres actifs",
+        "active_members_description": "Membres actifs dans la période de reporting sélectionnée",
+        "vol_hours_this_month": "Heures de bénévolat",
+        "vol_hours_description": "Heures de bénévolat enregistrées ce mois-ci",
+        "help_requests_this_month": "Demandes d'aide",
+        "help_requests_description": "Demandes d'aide ouvertes ce mois-ci",
+        "most_needed_category": "Catégorie la plus recherchée",
+        "most_needed_description": "Catégorie avec la demande récente la plus élevée"
+      },
+      "tabs": {
+        "aria": "Sections d'analyse régionale",
+        "heatmap": "Carte thermique des membres",
+        "demographics": "Données démographiques",
+        "demand_supply": "Demande et offre",
+        "engagement": "Fiançailles",
+        "help_requests": "Demandes d'aide",
+        "volunteer": "Bénévole"
+      },
+      "sections": {
+        "geographic_activity_density": "Densité géographique d'activité",
+        "member_demographics": "Données démographiques des membres",
+        "demand_supply_by_category": "Demande vs offre par catégorie",
+        "demand_supply_note": "Un ratio supérieur à 1.0 signifie que la demande est supérieure aux offres disponibles dans cette catégorie.",
+        "monthly_engagement_metrics": "Mesures d'engagement mensuelles",
+        "volunteer_activity": "Activité bénévole",
+        "help_request_analysis": "Analyse des demandes d'aide"
+      },
+      "columns": {
+        "rank": "Rang",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "members": "Membres",
+        "density": "Densité",
+        "month": "Mois",
+        "new_members": "Nouveaux membres",
+        "cumulative_total": "Total cumulé",
+        "category": "Catégorie",
+        "requests": "Demandes",
+        "offers": "Offres",
+        "ratio": "Rapport",
+        "trend": "S'orienter",
+        "active_members": "Membres actifs",
+        "vol_hours": "Heures de bénévolat",
+        "new_listings": "Nouvelles annonces",
+        "new_events": "Nouveaux événements",
+        "help_requests": "Demandes d'aide",
+        "organisation": "Organisation",
+        "volunteers": "Bénévoles",
+        "total": "Total",
+        "resolved": "Résolu",
+        "resolution_rate": "Taux de résolution",
+        "avg_days_to_resolve": "Moy. jours pour résoudre"
+      },
+      "heatmap": {
+        "description": "Principaux emplacements par activité et densité des membres."
+      },
+      "demographics": {
+        "age_distribution": "Répartition par âge",
+        "language_distribution": "Répartition linguistique",
+        "member_growth_12m": "Croissance des membres, 12 derniers mois",
+        "total_with_data": "Membres de {{total}} avec données démographiques",
+        "total_active_members": "Membres actifs {{total}}"
+      },
+      "volunteer": {
+        "total_hours": "Heures totales",
+        "avg_hours_per_volunteer": "Moy. heures par bénévole",
+        "reciprocity_ratio": "Rapport de réciprocité",
+        "reciprocity_description": "Equilibre entre les heures données et les heures reçues sur l'ensemble de la région.",
+        "top_orgs_title": "Meilleures organisations bénévoles"
+      },
+      "help": {
+        "by_category": "Demandes d'aide par catégorie",
+        "resolution_trend_6m": "Tendance de résolution, 6 derniers mois"
+      },
+      "empty": {
+        "infinity": "∞",
+        "no_geographic_data": "Aucune donnée géographique n'est disponible pour cette période.",
+        "no_listing_data": "Aucune donnée sur la demande d’inscription n’est disponible pour cette période.",
+        "no_engagement_data": "Aucune donnée d'engagement n'est disponible pour cette période.",
+        "no_organisation_data": "Aucune activité d'organisation n'est disponible pour cette période.",
+        "no_help_request_data": "Aucune donnée de demande d'aide n'est disponible pour cette période.",
+        "select_tab_to_load": "Sélectionnez cet onglet pour charger les données."
+      },
+      "empty_value": "-",
+      "loading": {
+        "section": "Chargement des analyses"
+      },
+      "errors": {
+        "data_unavailable": "Les données ne sont pas disponibles pour cette période.",
+        "load_data": "Impossible de charger cette section d'analyse : {{error}}",
+        "load_overview": "Impossible de charger l'aperçu des analyses régionales.",
+        "failed_to_load_data": "Impossible de charger les données d'analyse."
+      },
+      "units": {
+        "days_count": "{{count}} jours"
+      },
+      "age_groups": {
+        "under_25": "Moins de 25 ans",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
+        "65_plus": "65+",
+        "unknown": "Inconnu"
+      }
+    }
   },
   "billing": {
     "actions": "Actions",
@@ -5845,7 +6533,157 @@
     "placeholder_guardian_email": "guardian@example.com",
     "placeholder_help_url": "https://...",
     "placeholder_option_key": "e.g. needs_additional_support",
-    "placeholder_ward_email": "ward@example.com"
+    "placeholder_ward_email": "ward@example.com",
+    "help": {
+      "title": "Comment fonctionne la sauvegarde ici",
+      "subtitle": "Un guide des flux que vous voyez sur ce tableau de bord - signalement, activations, autonomie des membres, audit. Développez n’importe quelle section pour plus de détails.",
+      "about": {
+        "aria": "À propos de ce tableau de bord",
+        "title": "À propos de ce tableau de bord",
+        "intro": "Le tableau de bord de protection vous donne une vue de chaque membre que le système protège activement. Il fait surface :",
+        "flagged_messages_label": "Messages signalés",
+        "flagged_messages_body": "- des copies des messages envoyés ou reçus par les membres surveillés.",
+        "guardian_assignments_label": "Missions de tuteur",
+        "guardian_assignments_body": "- les relations dans lesquelles un coordinateur assure la médiation des contacts pour une paroisse.",
+        "member_preferences_label": "Préférences des membres",
+        "member_preferences_body": "- quelles options de sauvegarde chaque membre signalé a sélectionnées.",
+        "live_counts": "Les chiffres en haut sont en direct : l'élément de sauvegarde rouge dans la barre latérale indique le nombre d'indicateurs critiques non examinés afin que vous puissiez repérer quand une attention est requise sans ouvrir la page."
+      },
+      "flagging": {
+        "aria": "Comment les membres sont signalés",
+        "title": "Comment les membres sont signalés",
+        "intro": "Les drapeaux ne sont jamais déployés silencieusement dans le dos du député. Il existe deux itinéraires :",
+        "most_common": "Le plus courant",
+        "self_identification_title": "Auto-identification lors de l'intégration",
+        "self_identification_prefix": "Le membre a coché une ou plusieurs options lors de l'étape de sauvegarde lors de l'inscription (par ex.",
+        "or": "ou",
+        "example_vulnerable": "Je me considère comme un adulte vulnérable",
+        "example_vetted": "Je préfère interagir uniquement avec des membres sélectionnés",
+        "self_identification_suffix": "Le système lit les déclencheurs attachés à chaque option sélectionnée et les fusionne par OU en un seul ensemble de protections écrites dans",
+        "self_revoke_prefix": "Parce qu'ils sont choisis par lui-même, le membre peut révoquer n'importe lequel d'entre eux.",
+        "settings_safeguarding": "Paramètres -> Sauvegarde",
+        "self_revoke_suffix": "à tout moment - sans avoir à vous le demander.",
+        "admin_initiated": "Lancé par l'administrateur",
+        "manual_monitoring_title": "Surveillance manuelle",
+        "manual_monitoring_prefix": "Vous ouvrez",
+        "user_monitoring": "Surveillance des utilisateurs",
+        "manual_monitoring_suffix": "dans les contrôles des courtiers et placer un membre sous surveillance avec un motif et une date d'expiration facultative. Utilisé pour les contrôles de conformité, les enquêtes sur les plaintes ou les périodes probatoires après un incident."
+      },
+      "triggers": {
+        "aria": "Ce que chaque déclencheur active",
+        "title": "Ce que chaque déclencheur active",
+        "intro_prefix": "Une option de sauvegarde (définie par locataire dans",
+        "safeguarding_options": "Options de sauvegarde",
+        "intro_suffix": ") contient un bloc de déclencheurs JSON. Lorsqu'un membre sélectionne l'option, les déclencheurs pertinents s'activent :",
+        "col_effect": "Effet",
+        "col_trigger_key": "Clé de déclenchement",
+        "effects": {
+          "notify_admin_on_selection": "Vous recevez une notification en temps réel dès que l'option est cochée.",
+          "requires_broker_approval": "Tous les messages sortants copiés pour examen par le courtier ; les matchs doivent être approuvés.",
+          "requires_vetted_interaction": "Les membres non sélectionnés sont masqués du flux de découverte des membres.",
+          "restricts_matching": "Le workflow d'approbation des correspondances s'engage - pas d'introductions automatiques.",
+          "restricts_messaging": "Marque le membre sous surveillance ; les copies des messages commencent.",
+          "vetting_type_required": "Spécifie quelle vérification un membre contactant doit détenir, par exemple garda_vetting."
+        },
+        "table_aria": "Sauvegarder les effets déclencheurs",
+        "merge_note": "Lorsqu'un membre sélectionne plusieurs options, déclenche la fusion OU : la combinaison la plus protectrice l'emporte. La révocation d'une option peut libérer certaines protections mais en garder d'autres actives - le système réévalue à partir de zéro à chaque fois."
+      },
+      "vetting": {
+        "aria": "Portes de contrôle",
+        "title": "Comment contrôler les interactions des portes",
+        "intro_prefix": "Lorsqu'un membre signalé nécessite un type de vérification spécifique, le système l'applique à trois moments distincts : pas seulement sous la forme d'un avertissement dans l'interface utilisateur, mais sous la forme d'un blocage définitif avec un code d'erreur spécifique.",
+        "intro_suffix": "retourné à l'appelant.",
+        "discovery_label": "Filtre de découverte",
+        "discovery_body": "- Smart Matching Engine ne présente jamais les membres signalés à une personne qui ne détient pas les qualifications requises. Ils sont invisibles et non grisés.",
+        "messaging_label": "Messagerie",
+        "messaging_prefix": "- si l'expéditeur ne dispose pas des vérifications requises par le destinataire,",
+        "messaging_middle": "retours",
+        "messaging_suffix": "avec les types spécifiques répertoriés.",
+        "match_label": "Approbation du match",
+        "match_body": "- même si une correspondance est soumise manuellement pour approbation, elle est bloquée de manière bidirectionnelle si l'une des parties est signalée et que l'autre ne dispose pas de la vérification requise.",
+        "group_label": "Échanges de groupe",
+        "group_body": "- L'ajout d'un participant échoue si l'organisateur ou le participant demande une vérification, l'autre ne tient pas.",
+        "staff_bypass_label": "Contournement du personnel :",
+        "staff_bypass_body": "les administrateurs, les administrateurs de locataires, les courtiers et les super-administrateurs voient le pool complet en mode découverte (à des fins d'affectation). Les portes de messagerie, de soumission de matchs et d’échange de groupe s’appliquent toujours à tout le monde – il n’y a pas de contournement au niveau administrateur pour ceux-ci."
+      },
+      "assignments": {
+        "aria": "Missions de tuteur",
+        "title": "Missions de tuteur / pupille",
+        "intro": "Une mission de tuteur associe une pupille (le membre protégé) à un tuteur (un coordinateur de confiance ou un membre de la famille). Utilisez-le lorsqu'un membre a besoin d'une personne spécifique pour médier ses interactions, plutôt que du pool général de courtiers.",
+        "create_label": "Créer",
+        "create_prefix": "à partir de l'onglet Devoirs ou en accédant à",
+        "assign_guardian_path": "courtier/suivi -> Attribuer un tuteur",
+        "create_suffix": "Les deux parties reçoivent un e-mail et une notification de cloche dans l'application.",
+        "consent_label": "Consentement",
+        "consent_prefix": "- le service doit accepter ; leur acceptation est consignée dans",
+        "consent_middle": "La mission devient seulement",
+        "active": "actif",
+        "consent_suffix": "une fois accepté.",
+        "revoke_label": "Révoquer",
+        "revoke_prefix": "- soit l'administrateur, soit la paroisse peut révoquer. La révocation est douce (définit",
+        "revoke_suffix": ") afin que la piste d'audit soit préservée.",
+        "queue_note": "Les affectations de tuteur ne remplacent pas la file d'attente de révision des courtiers : les messages surveillés y circulent toujours. Un tuteur est une couche de confiance supplémentaire et ne remplace pas la surveillance de la plateforme."
+      },
+      "preferences": {
+        "aria": "Onglet Préférences des membres",
+        "title": "Lecture des préférences des membres",
+        "intro_prefix": "L'onglet Préférences des membres répertorie tous les membres marqués ainsi que les options spécifiques qu'ils ont sélectionnées. Ces données sont",
+        "special_category": "données personnelles de catégorie spéciale",
+        "intro_suffix": "sous GDPR - traitez-le avec soin.",
+        "audit_logged": "Chaque vue est enregistrée avec votre utilisateur ID et votre horodatage.",
+        "not_public": "Il n’est jamais exposé dans le profil public d’un membre.",
+        "admin_only": "Les autres membres ne peuvent pas voir cet onglet. L'accès nécessite un rôle de classe administrateur.",
+        "confidential": "Ne discutez pas des drapeaux d’un autre membre avec quiconque extérieur à l’équipe de sauvegarde.",
+        "activity_trail": "Cliquez sur la ligne d'un membre pour ouvrir son parcours d'activité complet : chaque message copié, chaque changement d'affectation, chaque activation de déclencheur, par ordre chronologique. La piste est téléchargeable sous le nom CSV pour les demandes des régulateurs ou les rapports d'incidents."
+      },
+      "autonomy": {
+        "aria": "Principe d'autonomie des adultes",
+        "title": "Principe d'autonomie des adultes",
+        "rule_label": "La règle :",
+        "rule_prefix": "Un adulte qui s'est identifié comme ayant besoin de mesures de protection a le droit absolu de voir",
+        "and": "et",
+        "rule_middle": "révoquer ces protections sans demander à un administrateur. Administrateurs",
+        "cannot": "ne peut pas",
+        "rule_suffix": "bloquer l’auto-révocation d’un membre.",
+        "grounded_prefix": "Ceci est fondé sur",
+        "guidance": "Conseils pour l'autonomie des adultes de Safeguarding Ireland",
+        "grounded_suffix": "(et les directives statutaires équivalentes de UK - \"Making Safeguarding Personal\"). La révocation d'un indicateur déclenche :",
+        "trigger_reevaluation": "Réévaluation des déclencheurs -> les exigences de surveillance/approbation peuvent être levées.",
+        "admin_notification": "Une notification par cloche dans l'application aux administrateurs/courtiers - on vous le dit, mais vous ne pouvez pas y opposer votre veto.",
+        "audit_log_prefix": "Une entrée du journal d'audit avec",
+        "coercion_note": "Si vous pensez que la révocation a été forcée par un tiers, la bonne réponse est une conversation de sauvegarde avec le membre (et si nécessaire, une référence aux services statutaires) - sans réappliquer l'indicateur via les contrôles administratifs."
+      },
+      "annual_review": {
+        "aria": "Processus de révision annuelle",
+        "title": "Processus de révision annuelle",
+        "intro_prefix": "Le premier de chaque mois, le",
+        "intro_suffix": "la commande s'exécute automatiquement. Pour toute préférence datant de plus de 365 jours sans avis récent, il :",
+        "step_reminder": "Envoie au membre un e-mail et une cloche lui demandant de réviser - timbres",
+        "step_wait": "Attend 30 jours.",
+        "step_escalate": "Si aucune réponse, informe les administrateurs/courtiers via cloche + email - tampons",
+        "flag_stays_active": "Le drapeau reste actif malgré tout.",
+        "escalation_note": "L'escalade est une incitation pour qu'un coordinateur vous contacte personnellement ; il ne s'agit pas d'un signal pour supprimer la protection. Le silence n’est pas un consentement à la suppression des garanties.",
+        "settings_prefix": "Affichage",
+        "settings_suffix": "compte comme une évaluation - les tampons du backend",
+        "settings_tail": "automatiquement lorsque le membre ouvre la page."
+      },
+      "audit": {
+        "aria": "Piste d'audit et export CSV",
+        "title": "Piste d'audit et export CSV",
+        "intro_prefix": "Chaque action liée à la sauvegarde est écrite à",
+        "intro_middle": "avec",
+        "intro_suffix": "Le point de terminaison de l’activité par membre combine trois sources dans une seule chronologie la plus récente :",
+        "activity_log_label": "Journal d'activité",
+        "activity_log_body": "- sélections d'options, révocations de consentement, vues d'administrateur, activations de déclencheurs.",
+        "message_copies_label": "Copies des messages",
+        "message_copies_body": "- chaque message envoyé ou reçu par le membre sous surveillance.",
+        "assignment_history_label": "Historique des affectations",
+        "assignment_history_body": "- les missions de tuteur créées ou révoquées impliquant le membre.",
+        "export_prefix": "Utilisez le",
+        "export_csv": "Exporter CSV",
+        "export_suffix": "action sur la vue détaillée du membre lorsque vous avez besoin d'un fichier que vous pouvez joindre à un rapport d'incident ou partager avec un régulateur. Le CSV est un UTF-8 avec un BOM donc Excel l'ouvre correctement sans demander d'encodage."
+      }
+    }
   },
   "stats": {
     "active_listings": "Active Listings",
@@ -9204,13 +10042,21 @@
   "caring_workflow": {
     "meta": {
       "title": "KISS Workflow Console",
-      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements.",
+      "page_title": "Flux de travail d’une communauté bienveillante"
     },
-    "loading": "Loading KISS workflow data",
+    "loading": {
+      "workflow": "Chargement du workflow de la communauté bienveillante..."
+    },
     "actions": {
       "open_hour_review": "Open hour review",
       "open_report_pack": "Open report pack",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "retry": "Réessayer",
+      "approve": "Approuver",
+      "decline": "Déclin",
+      "escalate": "Intensifier",
+      "re_escalate": "Réescalader"
     },
     "stats": {
       "pending_reviews": "Pending reviews",
@@ -9344,7 +10190,11 @@
         "last_90_days": "Last 90 days",
         "year_to_date": "Year to date",
         "previous_quarter": "Previous quarter"
-      }
+      },
+      "review_sla_days_description": "Les heures non examinées dans ce délai seront signalées comme étant en retard dans la file d'attente.",
+      "escalation_sla_days_description": "Les éléments en retard non traités dans ce délai supplémentaire seront automatiquement signalés.",
+      "monthly_statement_day_description": "Jour du mois au cours duquel les relevés des membres sont générés (par exemple 1 = 1er de chaque mois).",
+      "default_hour_value_chf_description": "Utilisé pour calculer la valeur sociale estimée sur les relevés et les rapports municipaux."
     },
     "member_statement": {
       "title": "Member statements",
@@ -9363,7 +10213,11 @@
       "invalid_member": "Enter a valid member ID.",
       "load_failed": "Failed to load the member statement.",
       "export_success": "Member statement CSV prepared.",
-      "export_failed": "Failed to export the member statement."
+      "export_failed": "Failed to export the member statement.",
+      "approved_support_hours": "Heures d'assistance approuvées",
+      "pending_support_hours": "Heures d'assistance en attente",
+      "wallet_hours_earned": "Heures Wallet gagnées",
+      "wallet_hours_spent": "Heures de portefeuille passées"
     },
     "support_relationships": {
       "title": "Recurring support relationships",
@@ -9460,146 +10314,519 @@
       "upload_failed": "Could not upload the paper form.",
       "confirmed": "Paper onboarding confirmed and member account created.",
       "confirm_failed": "Could not confirm this paper onboarding intake.",
-      "load_failed": "Could not load paper onboarding intakes."
+      "load_failed": "Could not load paper onboarding intakes.",
+      "upload_success": "Prise de papier téléchargée.",
+      "confirm_success": "Membre confirmé et compte créé."
     },
     "invite_card": {
       "brand": "Caring Community",
       "subtitle": "Your Invitation Code",
       "instructions": "Visit the link below or ask your coordinator to help you get started.",
       "valid_until": "Valid until {{date}}"
+    },
+    "empty": {
+      "value": "-",
+      "unassigned": "Non attribué"
+    },
+    "pending": {
+      "title": "Examens en attente",
+      "description_prefix": "Heures en attente d'examen et d'approbation par le coordonnateur. Articles marqués",
+      "description_middle": "ont dépassé la revue SLA ; éléments marqués",
+      "description_suffix": "ont dépassé l'escalade SLA. Approuvez ou refusez chaque soumission, ou attribuez-la à un coordinateur spécifique.",
+      "needs_review": "Besoin d'un examen",
+      "escalate_now": "Escalader maintenant",
+      "escalated_count": "{{count}} a été signalé",
+      "overdue_count": "{{count}} en retard",
+      "empty": "Rien en attente. La file d’attente de révision est claire.",
+      "logged": "{{date}} connecté",
+      "submitted": "Soumis {{date}}",
+      "age_days": "{{count}} jour",
+      "age_days_plural": "{{count}} jours",
+      "assigned_to": "Attribué à {{name}}",
+      "escalated_at": "{{date}} remonté",
+      "assign_coordinator": "Désigner un coordinateur",
+      "assign_success": "Coordonnateur désigné.",
+      "assign_failed": "Impossible d'attribuer un coordinateur.",
+      "manual_escalation_note": "Signalé manuellement après les jours d'attente de {{count}}.",
+      "escalate_success": "L'avis a été intensifié.",
+      "escalate_failed": "Impossible de faire remonter l'examen.",
+      "approve_success": "Examen approuvé.",
+      "decline_success": "Avis refusé.",
+      "decision_failed": "Impossible d'enregistrer la décision."
+    },
+    "tandem": {
+      "title": "Suggestions Tandem",
+      "description": "Paires de supporteur-bénéficiaire suggérées par AI en fonction de l'emplacement, de la langue, des compétences et de la disponibilité.",
+      "empty": "Aucune suggestion pour le moment. Ajoutez plus de membres ou ajustez la disponibilité.",
+      "load_failed": "Impossible de charger les suggestions tandem.",
+      "dismiss_success": "Suggestion rejetée.",
+      "dismiss_failed": "Impossible d'ignorer la suggestion.",
+      "relationship_title": "Tandem : {{supporter}} & {{recipient}}",
+      "distance_km": "{{value}} km",
+      "same_language": "Même langue",
+      "complementary_skills": "Compétences complémentaires",
+      "availability_overlap": "Chevauchement des disponibilités",
+      "shared_interests": "Intérêts partagés",
+      "score": "Score {{value}}%",
+      "dismiss": "Rejeter",
+      "create": "Créer Tandem"
+    },
+    "safeguarding": {
+      "title": "Rapports de sauvegarde",
+      "description": "Préoccupations soulevées par les membres concernant d’autres membres, coordinateurs ou organisations.",
+      "view_all": "Voir tout",
+      "no_data": "Aucune donnée de sauvegarde disponible pour l'instant.",
+      "overdue": "En retard",
+      "no_reports": "Aucun rapport pour l'instant.",
+      "table_aria": "Rapports récents sur la sauvegarde",
+      "open": "Ouvrir",
+      "org_subject": "Organisation #{{id}}",
+      "age_hours": "{{count}}h",
+      "age_days": "{{count}}d",
+      "columns": {
+        "severity": "Gravité",
+        "category": "Catégorie",
+        "subject": "Sujet",
+        "status": "Statut",
+        "age": "Âge",
+        "action": "Action"
+      },
+      "severity": {
+        "critical": "Critique",
+        "high": "Haut",
+        "medium": "Moyen",
+        "low": "Faible"
+      },
+      "status": {
+        "submitted": "Soumis",
+        "triaged": "Trié",
+        "investigating": "Enquêter",
+        "resolved": "Résolu",
+        "dismissed": "Rejeté"
+      }
+    },
+    "role_pack": {
+      "title": "Préréglages de rôle",
+      "description": "Ensembles d'autorisations préconfigurés pour chaque rôle de communauté bienveillante. Installez le pack de rôles complet pour configurer rapidement vos coordinateurs avec l'accès correct. {{countLabel}}.",
+      "installed_count": "{{installed}} des préréglages de rôle {{total}} installés",
+      "available_count": "Préréglages de rôle {{count}} disponibles",
+      "installing": "Installation...",
+      "install": "Installer le pack de rôles",
+      "install_success": "Pack de rôles installé.",
+      "install_failed": "Impossible d'installer le pack de rôles.",
+      "installed": "Installé",
+      "not_installed": "Non installé",
+      "permissions_granted": "{{installed}} sur {{total}} autorisations accordées",
+      "presets": {
+        "national_admin": {
+          "title": "Administrateur national",
+          "description": "Surveillance à l’échelle de la plateforme dans tous les cantons et organisations."
+        },
+        "canton_admin": {
+          "title": "Administrateur cantonal",
+          "description": "Gérer toutes les activités communautaires bienveillantes au sein d’un canton."
+        },
+        "municipality_admin": {
+          "title": "Administrateur de la municipalité",
+          "description": "Gérer l’activité communautaire bienveillante au sein d’une municipalité."
+        },
+        "cooperative_coordinator": {
+          "title": "Coordonnateur coopératif",
+          "description": "Coordonner une coopérative locale et ses membres."
+        },
+        "organisation_coordinator": {
+          "title": "Coordonnateur de l'organisation",
+          "description": "Coordonner les bénévoles et les partenaires d’une organisation."
+        },
+        "trusted_reviewer": {
+          "title": "Évaluateur de confiance",
+          "description": "Approuvez rapidement les heures avec une surveillance légère."
+        }
+      }
+    },
+    "favours": {
+      "title": "Faveurs informelles",
+      "loading": "Chargement...",
+      "total_recorded": "Total {{count}} enregistré",
+      "loading_favours": "Chargement des faveurs...",
+      "empty": "Aucune faveur enregistrée pour le moment.",
+      "anonymous": "Anonyme",
+      "unknown": "Inconnu"
+    },
+    "invite_codes": {
+      "title": "Codes d'invitation",
+      "description": "Générez un code imprimable qu'un nouveau membre peut utiliser pour adhérer sans avoir besoin d'une invitation par e-mail.",
+      "label": "Étiquette (facultatif)",
+      "label_placeholder": "par ex. Pour le voisin de Mary",
+      "generate": "Générer du code",
+      "new_code": "Nouveau code d'invitation",
+      "expires": "Expire : {{date}}",
+      "copied": "Copié!",
+      "copy_url": "Copier URL",
+      "print_card": "Imprimer la carte",
+      "open": "Ouvrir",
+      "table_aria": "Codes d'invitation",
+      "empty": "Aucun code d'invitation pour l'instant. Générez-en un ci-dessus pour le partager avec un membre potentiel.",
+      "load_failed": "Impossible de charger les codes d'invitation.",
+      "generate_success": "Code d'invitation généré.",
+      "generate_failed": "Impossible de générer le code d'invitation.",
+      "columns": {
+        "code": "Code",
+        "label": "Étiquette",
+        "expires": "Expire",
+        "status": "Statut",
+        "actions": "Actes"
+      },
+      "status": {
+        "active": "Actif",
+        "used": "Utilisé",
+        "used_by": "Utilisé par {{name}}",
+        "expired": "Expiré"
+      }
+    },
+    "predictive": {
+      "title": "Informations prédictives",
+      "subtitle": "Prévisions prospectives et alertes proactives. Repérez les déficits de soins régionaux avant qu’ils ne deviennent des urgences.",
+      "not_enough_activity": "Pas encore assez d’activité à prévoir. Revenez dans quelques semaines.",
+      "no_forecast": "Aucune donnée prévisionnelle n’est encore disponible.",
+      "hours_forecast": "Prévisions d'heures",
+      "active_members": "Membres actifs",
+      "recipients_reached": "Destinataires atteints",
+      "history": "Histoire",
+      "forecast": "Prévision",
+      "confidence": "Confiance",
+      "trend_growing": "{{value}}% en croissance",
+      "trend_declining": "{{value}}% en baisse",
+      "trend_stable": "Écurie",
+      "sub_region_coverage": "Couverture sous-régionale (derniers jours {{days}})",
+      "under_supplied_count": "{{count}} sous-approvisionné",
+      "sub_region_coverage_aria": "Couverture sous-régionale",
+      "helper_churn": "Désabonnement des assistants (périmé > = {{days}} jours)",
+      "overall_percent": "{{value}}% au total",
+      "helper_churn_note": "{{lapsed}} des assistants {{prior}} précédemment actifs n'ont pas enregistré d'heures récemment.",
+      "helper_churn_aria": "Taux de désabonnement des assistants par catégorie",
+      "coefficient_drift": "Dérive du coefficient de catégorie",
+      "drifting_count": "{{count}} à la dérive",
+      "coefficient_drift_note": "Les catégories avec une dérive absolue > {{threshold}}% sont signalées. Examinez les coefficients de base dans l’éditeur de coefficients de catégorie.",
+      "coefficient_drift_aria": "Dérive du coefficient de catégorie",
+      "proactive_alerts": "Alertes proactives",
+      "columns": {
+        "sub_region": "Sous-région",
+        "requested_90d": "Demandé (90j)",
+        "fulfilled_90d": "Accompli (90j)",
+        "coverage": "Couverture",
+        "status": "Statut",
+        "category": "Catégorie",
+        "prior_active": "Actif antérieur",
+        "lapsed": "Péchu",
+        "churn_rate": "Taux de désabonnement",
+        "baseline": "Référence",
+        "expected_hrs": "Heures prévues",
+        "observed_hrs": "Heures observées",
+        "drift": "Dérive",
+        "sample": "Échantillon"
+      },
+      "status": {
+        "under_supplied": "Sous-approvisionné",
+        "ok": "D'ACCORD"
+      },
+      "severity": {
+        "critical": "Critique",
+        "warning": "Avertissement",
+        "info": "Informations"
+      }
+    },
+    "relationships": {
+      "title": "Relations de soutien",
+      "description": "Paires supporters-bénéficiaires en cours et enregistrements récurrents.",
+      "active": "Actif",
+      "paused": "En pause",
+      "check_ins_due": "Enregistrements à effectuer",
+      "expected_hours": "Heures prévues",
+      "supporter": "Supporter",
+      "supporter_placeholder": "Rechercher le supporter",
+      "recipient": "Destinataire",
+      "recipient_placeholder": "Rechercher le destinataire",
+      "no_members": "Aucun membre trouvé",
+      "clear": "Clair",
+      "relationship_title": "Titre de la relation",
+      "frequency_label": "Fréquence",
+      "expected_hours_per_visit": "Heures prévues par visite",
+      "start_date": "Date de début",
+      "create": "Créer une relation",
+      "empty": "Aucune relation de soutien pour l'instant. Créez-en un ci-dessus.",
+      "pair": "{{supporter}} prenant en charge {{recipient}}",
+      "started": "{{date}} démarré",
+      "next_check_in": "Prochain enregistrement {{date}}",
+      "pause": "Pause",
+      "resume": "CV",
+      "log_date": "Date",
+      "log_hours": "Heures",
+      "log_note": "Remarque (facultatif)",
+      "log_hours_action": "Heures de journalisation",
+      "load_failed": "Impossible de charger les relations de support.",
+      "pick_different_members": "Choisissez deux membres différents.",
+      "create_success": "Relation d'accompagnement créée.",
+      "create_failed": "Impossible de créer une relation de support.",
+      "update_success": "Relation de support mise à jour.",
+      "update_failed": "Impossible de mettre à jour la relation d'assistance.",
+      "log_validation_failed": "Saisissez une date valide et entre 0,25 et 24 heures.",
+      "log_success": "Heures d'assistance enregistrées.",
+      "log_failed": "Impossible d'enregistrer les heures d'assistance.",
+      "frequency": {
+        "weekly": "Hebdomadaire",
+        "fortnightly": "Bimensuel",
+        "monthly": "Mensuel",
+        "ad_hoc": "Ad hoc"
+      },
+      "status": {
+        "active": "Actif",
+        "paused": "En pause",
+        "completed": "Complété",
+        "cancelled": "Annulé"
+      }
     }
   },
   "municipal_reports": {
     "meta": {
-      "title": "Municipal Impact Reports",
-      "description": "Prepare KISS-style reporting for verified hours, active members, trusted organisations, and municipal value conversations."
+      "title": "Rapports d'impact municipaux",
+      "description": "Préparez des rapports de style KISS pour les heures vérifiées, les membres actifs, les organisations de confiance et les conversations sur les valeurs municipales."
     },
     "actions": {
-      "analytics": "Community analytics",
-      "impact_report": "Impact report",
-      "open_source_report": "Open source report",
-      "export_csv": "Export CSV",
-      "export_pdf": "Export PDF"
+      "analytics": "Analyse de la communauté",
+      "impact_report": "Rapport d'impact",
+      "open_source_report": "Rapport open source",
+      "export_csv": "Exporter CSV",
+      "export_pdf": "Exporter PDF"
     },
     "stats": {
-      "report_pack": "Report pack",
-      "ready": "Ready",
-      "hours_source": "Hours source",
-      "verified": "Verified",
-      "audience": "Audience",
-      "municipal": "Municipal",
-      "exports": "Exports",
+      "report_pack": "Pack de rapports",
+      "ready": "Prêt",
+      "hours_source": "Source des heures",
+      "verified": "Vérifié",
+      "audience": "Public",
+      "municipal": "Communal",
+      "exports": "Exportations",
       "csv_pdf": "CSV/PDF",
-      "verified_hours": "Verified hours",
+      "verified_hours": "Horaires vérifiés",
       "participants": "Participants",
       "organisations": "Organisations",
-      "total_value": "Total value"
+      "total_value": "Valeur totale"
     },
-    "loading": "Loading municipal impact data",
-    "period": "Reporting period",
-    "hour_value": "Hour value",
-    "multiplier": "Social multiplier",
+    "loading": "Chargement des données d'impact municipal",
+    "period": "Période de déclaration",
+    "hour_value": "Valeur horaire",
+    "multiplier": "Multiplicateur social",
     "sections": {
-      "categories": "Support categories",
-      "trends": "Verified activity trend",
-      "readiness": "Procurement readiness signals"
+      "categories": "Catégories d'assistance",
+      "trends": "Tendance d'activité vérifiée",
+      "readiness": "Signaux de préparation aux achats"
     },
     "empty": {
-      "categories": "No completed support categories in this period.",
-      "trends": "No verified activity trend is available for this period."
+      "categories": "Aucune catégorie de support complétée au cours de cette période.",
+      "trends": "Aucune tendance d’activité vérifiée n’est disponible pour cette période."
     },
     "values": {
       "hours": "{{count}}h",
-      "activities": "{{count}} activities",
-      "trend_detail": "{{participants}} participants, {{activities}} activities",
-      "disabled": "Disabled"
+      "activities": "{{count}} activités",
+      "trend_detail": "{{participants}} participants, {{activities}} activités",
+      "disabled": "Désactivé"
     },
     "toast": {
-      "load_failed": "Failed to load municipal impact data.",
-      "export_started": "Report export started.",
-      "export_failed": "Failed to export the municipal report.",
-      "templates_load_failed": "Failed to load report templates.",
-      "template_saved": "Report template saved.",
-      "template_save_failed": "Failed to save the report template.",
-      "template_deleted": "Report template deleted.",
-      "template_delete_failed": "Failed to delete the report template."
+      "load_failed": "Échec du chargement des données d'impact municipal.",
+      "export_started": "L'exportation du rapport a démarré.",
+      "export_failed": "Échec de l'exportation du rapport municipal.",
+      "templates_load_failed": "Échec du chargement des modèles de rapport.",
+      "template_saved": "Modèle de rapport enregistré.",
+      "template_save_failed": "Échec de l'enregistrement du modèle de rapport.",
+      "template_deleted": "Modèle de rapport supprimé.",
+      "template_delete_failed": "Échec de la suppression du modèle de rapport."
     },
     "cards": {
       "verified_hours": {
-        "title": "Verified hours and economic value",
-        "description": "Summarise approved support hours, transaction volume, active contributors, and estimated value.",
-        "metric_1": "Approved hours",
-        "metric_2": "Active contributors",
-        "metric_3": "Value estimate"
+        "title": "Heures vérifiées et valeur économique",
+        "description": "Résumez les heures d’assistance approuvées, le volume de transactions, les contributeurs actifs et la valeur estimée.",
+        "metric_1": "Heures approuvées",
+        "metric_2": "Contributeurs actifs",
+        "metric_3": "Estimation de la valeur"
       },
       "active_members": {
-        "title": "Member reach and inclusion",
-        "description": "Track active members, new joiners, inactive members, and groups that need coordinator attention.",
-        "metric_1": "Active members",
-        "metric_2": "New joiners",
-        "metric_3": "Inactive members"
+        "title": "Portée et inclusion des membres",
+        "description": "Suivez les membres actifs, les nouveaux membres, les membres inactifs et les groupes qui nécessitent l’attention d’un coordinateur.",
+        "metric_1": "Membres actifs",
+        "metric_2": "Nouveaux arrivants",
+        "metric_3": "Membres inactifs"
       },
       "organisations": {
-        "title": "Organisation and partner activity",
-        "description": "Show participating organisations, opportunities, verified logs, and coordinator workflows.",
+        "title": "Organisation et activité des partenaires",
+        "description": "Affichez les organisations participantes, les opportunités, les journaux vérifiés et les flux de travail des coordinateurs.",
         "metric_1": "Organisations",
-        "metric_2": "Opportunities",
-        "metric_3": "Verified logs"
+        "metric_2": "Opportunités",
+        "metric_3": "Journaux vérifiés"
       },
       "trust_pack": {
-        "title": "Trust, safeguarding, and compliance",
-        "description": "Surface verification, review, safeguarding, consent, and audit signals for sensitive care coordination.",
-        "metric_1": "Verification",
-        "metric_2": "Reviews",
-        "metric_3": "Audit trail"
+        "title": "Confiance, protection et conformité",
+        "description": "Signaux de vérification, d’examen, de sauvegarde, de consentement et d’audit de surface pour la coordination des soins sensibles.",
+        "metric_1": "Vérification",
+        "metric_2": "Avis",
+        "metric_3": "Piste d'audit"
       }
     },
-    "policy_default": "Policy default",
-    "audience": "Audience",
+    "policy_default": "Valeur par défaut de la stratégie",
+    "audience": "Public",
     "filters": {
-      "title": "Reporting window",
-      "description": "Use explicit dates when preparing canton, municipality, foundation, or cooperative packs.",
-      "date_from": "From",
-      "date_to": "To",
-      "apply": "Apply dates",
-      "clear": "Clear"
+      "title": "Fenêtre de rapport",
+      "description": "Utilisez des dates explicites lors de la préparation des dossiers de canton, de commune, de fondation ou de coopérative.",
+      "date_from": "Depuis",
+      "date_to": "À",
+      "apply": "Appliquer les dates",
+      "clear": "Clair"
     },
     "readiness": {
-      "municipal_value": "Municipal value",
+      "municipal_value": "Valeur municipale",
       "participation": "Participation",
-      "partner_network": "Partner network",
-      "local_exchange": "Local exchange",
+      "partner_network": "Réseau de partenaires",
+      "local_exchange": "Échange local",
       "status": {
-        "ready": "Ready",
-        "needs_data": "Needs data"
+        "ready": "Prêt",
+        "needs_data": "Besoin de données"
       }
     },
     "templates": {
-      "title": "Saved report templates",
-      "description": "Prepare repeatable municipal, canton, cooperative, or foundation report packs with the right audience, period, and value assumptions.",
-      "create": "New template",
-      "select_label": "Report template",
-      "default_policy": "Use workflow policy defaults",
-      "apply": "Apply",
-      "delete": "Delete",
-      "cancel": "Cancel",
-      "save": "Save template",
-      "modal_title": "Create report template",
+      "title": "Modèles de rapport enregistrés",
+      "description": "Préparez des packs de rapports reproductibles au niveau municipal, cantonal, coopératif ou de fondation avec les bonnes hypothèses d'audience, de période et de valeur.",
+      "create": "Nouveau modèle",
+      "select_label": "Modèle de rapport",
+      "default_policy": "Utiliser les valeurs par défaut de la stratégie de flux de travail",
+      "apply": "Appliquer",
+      "delete": "Supprimer",
+      "cancel": "Annuler",
+      "save": "Enregistrer le modèle",
+      "modal_title": "Créer un modèle de rapport",
       "hour_value_chip": "CHF {{value}}/h",
       "fields": {
-        "name": "Template name",
+        "name": "Nom du modèle",
         "description": "Description",
-        "audience": "Audience",
-        "period": "Reporting period",
-        "hour_value": "Hour value override (CHF)",
-        "include_social_value": "Include social value estimate"
+        "audience": "Public",
+        "period": "Période de déclaration",
+        "hour_value": "Remplacement de la valeur horaire (CHF)",
+        "include_social_value": "Inclure une estimation de la valeur sociale"
       },
       "audiences": {
-        "municipality": "Municipality",
+        "municipality": "Municipalité",
         "canton": "Canton",
-        "cooperative": "Cooperative",
-        "foundation": "Foundation"
+        "cooperative": "Coopérative",
+        "foundation": "Fondation"
+      },
+      "descriptions": {
+        "audience": "Détermine le cadrage narratif et les sections qui apparaissent dans l'export PDF/CSV.",
+        "hour_value": "Taux horaire local de soins formels pour le calcul de la compensation des coûts (par exemple CHF 35 pour la Suisse). Laissez vide pour utiliser la valeur par défaut du locataire.",
+        "period": "Fenêtre de rapport par défaut appliquée lorsqu'aucun filtre de date manuel n'est défini."
+      },
+      "placeholders": {
+        "description": "Note facultative pour référence future - par ex. « Utilisé pour la présentation annuelle à l'AGA »",
+        "name": "par ex. Rapport cantonal du troisième trimestre 2025 destiné aux bailleurs de fonds"
       }
+    },
+    "about": {
+      "body_1_after_chf": "valeur des heures x multiplicateur de prévention).",
+      "body_1_after_kiss": "/Age-Stiftung méthodologie, une estimation des coûts compensés par les services de soins formels (",
+      "body_1_before_kiss": "Le rapport d'impact municipal est un ensemble de preuves que vous partagez avec les partenaires municipaux, les cantons et les bailleurs de fonds pour démontrer la valeur du programme. Il affiche les heures de soins vérifiées, les membres actifs, les organisations partenaires et, à l'aide du",
+      "body_2_after_audience": "basculez pour changer le cadrage narratif:",
+      "body_2_after_canton": "regroupe plusieurs communes et montre une économie de coûts à l’échelle cantonale;",
+      "body_2_after_cooperative": "montre la fidélisation des membres, le taux de réciprocité et la charge de travail du coordinateur. Exportez sous PDF pour envoyer aux partenaires ou sous CSV pour une analyse plus approfondie. Enregistrez des modèles de rapport pour régénérer rapidement la même configuration dans les périodes futures.",
+      "body_2_after_municipality": "se concentre sur les résidents locaux touchés et les organisations partenaires;",
+      "body_2_prefix": "Utilisez le",
+      "chf_abbr": "CHF",
+      "kiss_abbr": "KISS",
+      "title": "À propos de ce rapport"
+    },
+    "audience_selector": {
+      "description": "Changez le cadre narratif. Seule la section d'audience sélectionnée est incluse dans l'export PDF/CSV.",
+      "title": "Public"
+    },
+    "export_note": {
+      "csv_label": "CSV exportation",
+      "csv_text": "fournit des données brutes pour l'analyse de feuilles de calcul ou les rapports sur les subventions.",
+      "pdf_label": "PDF exportation",
+      "pdf_text": "est formaté pour être partagé avec les partenaires municipaux et les bailleurs de fonds."
+    },
+    "narrative": {
+      "canton": {
+        "description": "Impact global dans toutes les municipalités, évitement des coûts de soins professionnels, tendance d’une année sur l’autre.",
+        "empty_body": "Passez en mode Canton pour charger le récit au niveau du canton.",
+        "empty_description": "Impact global dans toutes les municipalités, évitement de coûts et changement d’une année à l’autre.",
+        "empty_title": "Canton (Kantonsrat / gouvernement régional)",
+        "estimated_cost_avoidance": "Coûts évités estimés",
+        "estimated_cost_avoidance_desc": "Heures x valeur de la politique x {{multiplier}} (équivalence de soins professionnels).",
+        "multi_node_total_hours": "Heures totales multi-nœuds",
+        "multi_node_total_hours_desc": "Vérifié sur tous les nœuds activés.",
+        "municipalities_reporting": "Déclaration des municipalités",
+        "municipalities_reporting_desc": "Nombre total de nœuds contribuant à cette vue.",
+        "prior_period_detail": "Période précédente: {{from}} à {{to}} - {{hours}} heures vérifiées.",
+        "title": "Heures d'assistance vérifiées{{tenant}} - {{from}} à {{to}}",
+        "yoy_change": "Changement d'une année à l'autre"
+      },
+      "cooperative": {
+        "active_tandems": "Tandems actifs",
+        "active_tandems_desc": "Paires aide/bénéficiaire récurrentes (2+ échanges).",
+        "coordinator_load": "Charge du coordinateur",
+        "coordinator_load_desc": "{{pending}} en attente auprès de {{coordinators}} coordinateurs.",
+        "description": "Santé coopérative interne: rétention, réciprocité, tandems, charge de coordinateur, pool de crédits.",
+        "empty_body": "Passez en mode coopératif pour charger le récit interne à la coopérative.",
+        "empty_description": "Fidélisation des membres, réciprocité horaire, relations tandem, charge de travail du coordinateur, pool de crédits pour soins futurs.",
+        "empty_title": "Coopérative (KISS-Genossenschaft interne)",
+        "future_care_credit_pool": "Pool de soldes de crédits pour soins futurs",
+        "future_care_credit_pool_desc": "Somme des soldes positifs des membres - la réserve implicite de soins futurs de la coopérative. Base de membres actifs: {{count}}.",
+        "member_retention": "Fidélisation des membres",
+        "member_retention_desc": "{{count}} membres actifs à la fois pendant cette période et la période équivalente précédente.",
+        "reciprocity_rate": "Taux de réciprocité",
+        "reciprocity_rate_desc": "Les supporters {{count}} ont également reçu des heures au cours de cette période.",
+        "title": "Rapport interne coopératif - {{from}} à {{to}}"
+      },
+      "in_export": "À l'export",
+      "logs_count": "{{count}} journaux",
+      "municipality": {
+        "description": "Participation locale, organisations partenaires nommées, répartition géographique/catégorie, portée des bénéficiaires.",
+        "empty_body": "Passez en mode Municipalité pour charger le récit au niveau de la municipalité.",
+        "empty_description": "Participation locale, organisations partenaires nommées, répartition géographique/catégorie.",
+        "empty_title": "Commune (Gemeinde)",
+        "no_category_data": "Aucune donnée de catégorie sur cette période.",
+        "no_partner_activity": "Aucune activité partenaire sur cette période.",
+        "partner_organisations": "Organisations partenaires",
+        "partner_organisations_by_hours": "Organisations partenaires (par heures)",
+        "recipients_reached": "Destinataires atteints",
+        "recipients_reached_desc": "Destinataires distincts des échanges terminés.",
+        "title": "Impact sur la communauté - {{from}} à {{to}}",
+        "top_5_categories": "Top 5 des catégories (répartition géographique/activité)",
+        "top_categories": "Principales catégories",
+        "top_categories_desc": "Classés ci-dessous par heures.",
+        "trusted_total": "sur {{count}} total de confiance."
+      },
+      "no_prior_data": "Aucune donnée préalable"
+    },
+    "readiness_help": {
+      "local_exchange": {
+        "fix": "Aucun échange terminé pour l'instant. Les coordonnateurs doivent approuver les registres d’heures en attente.",
+        "what": "Échanges vérifiés (réalisés et approuvés) enregistrés sur cette période."
+      },
+      "municipal_value": {
+        "fix": "Aucune compensation de coût calculable pour l’instant. Approuvez les journaux d’heures de bénévolat en attente pour renseigner cette mesure.",
+        "what": "Coût estimé compensé par les soins formels (heures x valeur horaire de la politique x multiplicateur de prévention)."
+      },
+      "participation": {
+        "fix": "En dessous du seuil minimum de participation. Continuez à intégrer les membres et à réaliser des échanges.",
+        "what": "Membres distincts actifs en tant que supporters ou bénéficiaires au cours de cette période."
+      },
+      "partner_network": {
+        "fix": "Aucune organisation de confiance active. Intégrez des organisations via Volontariat > Organisations.",
+        "what": "Organisations partenaires de confiance qui ont contribué des heures au cours de cette période."
+      }
+    },
+    "readiness_intro": {
+      "needs_data_suffix": "= la métrique est inférieure au seuil - survolez chaque carte pour obtenir des conseils.",
+      "prefix": "Ces quatre signaux indiquent si le rapport contient suffisamment de données pour convaincre un public externe.",
+      "ready_suffix": "= données suffisantes;"
     }
   },
   "caring_emergency": {
@@ -9889,13 +11116,99 @@
     "trust_tier": {
       "errors": {
         "recompute_failed": "Failed to recompute trust tiers.",
-        "save_failed": "Failed to save trust tier settings."
+        "save_failed": "Failed to save trust tier settings.",
+        "load_failed": "Échec du chargement de la configuration du niveau de confiance."
       },
       "messages": {
-        "recomputed": "Trust tiers recomputed.",
+        "recomputed": "Niveaux de confiance recalcul?s pour {{count}} membres.",
         "saved": "Trust tier settings saved."
       },
-      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes."
+      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes.",
+      "title": "Configuration du niveau de confiance",
+      "subtitle": "Définissez les seuils de critères pour chaque niveau de confiance. Les modifications s’appliquent lors de la prochaine exécution de recalcul.",
+      "loading": "Chargement de la configuration du niveau de confiance",
+      "recompute_hint": "Utilisez le recalcul lorsque les seuils changent et que les membres existants doivent être réévalués immédiatement. S'exécute en arrière-plan et peut prendre 30-60 secondes.",
+      "meta": {
+        "title": "Configuration du niveau de confiance",
+        "description": "Configurez les seuils de niveau de confiance, recalculez les niveaux de membres et examinez ce que chaque niveau débloque."
+      },
+      "actions": {
+        "recompute": "Recalculer tous les niveaux",
+        "save": "Enregistrer la configuration"
+      },
+      "about": {
+        "title": "À propos de cette page",
+        "body": "Les niveaux de confiance sont une échelle de réputation qui débloque des privilèges à mesure que les membres deviennent plus actifs et vérifiés. Les membres avancent automatiquement lorsqu’ils atteignent les seuils de critères ci-dessous. Utilisez recalcul pour forcer un recalcul immédiat pour tous les membres. La progression de niveau affecte le Warmth Pass, l’éligibilité du coordinateur et la visibilité dans l’annuaire des membres."
+      },
+      "criteria": {
+        "title": "Seuils de critères de niveau"
+      },
+      "fields": {
+        "hours_logged": "Heures enregistrées (minimum)",
+        "reviews_received": "Avis reçus (minimum)",
+        "identity_verified": "Exiger une vérification de l'identité"
+      },
+      "tiers": {
+        "member": {
+          "label": "Membre",
+          "description": "Membre de la communauté de base avec au moins 1 heure de connexion."
+        },
+        "trusted": {
+          "label": "Confiance",
+          "description": "Membre actif avec plusieurs heures et avis."
+        },
+        "verified": {
+          "label": "Vérifié",
+          "description": "Membre de confiance avec identité confirmée."
+        },
+        "coordinator": {
+          "label": "Coordinateur",
+          "description": "Membre vérifié très actif éligible à la coordination."
+        }
+      },
+      "reference": {
+        "title": "Référence de niveau",
+        "aria": "Référence du niveau de confiance",
+        "columns": {
+          "tier": "Étage",
+          "level": "Niveau",
+          "color": "Couleur",
+          "description": "Description",
+          "unlocks": "Ce qu'il débloque"
+        },
+        "rows": {
+          "0": {
+            "name": "Nouveau venu",
+            "color": "Gris",
+            "description": "Je viens de m'inscrire, aucune activité requise.",
+            "unlocks": "Accès membre de base."
+          },
+          "1": {
+            "name": "Membre",
+            "color": "Bleu",
+            "description": "A enregistré des heures.",
+            "unlocks": "Peut publier des listes d'aide et recevoir des heures de soins."
+          },
+          "2": {
+            "name": "Confiance",
+            "color": "Vert",
+            "description": "Actif avec des critiques.",
+            "unlocks": "Éligible au Warmth Pass et peut être recommandé pour les soins."
+          },
+          "3": {
+            "name": "Vérifié",
+            "color": "Violet",
+            "description": "Identité vérifiée.",
+            "unlocks": "Visibilité et badge d'identité du coordinateur de soins complet."
+          },
+          "4": {
+            "name": "Coordinateur",
+            "color": "Ambre",
+            "description": "Très actif avec une identité vérifiée.",
+            "unlocks": "Éligible pour approuver les heures et coordonner les matchs."
+          }
+        }
+      }
     },
     "warmth_pass": {
       "title": "Warmth Pass",
@@ -9934,6 +11247,109 @@
       "not_eligible_notice": {
         "title": "Not eligible yet",
         "body": "This member does not yet meet the requirements for a Warmth Pass."
+      }
+    },
+    "operating_policy": {
+      "title": "Politique de fonctionnement",
+      "subtitle": "Atelier de politique d'exploitation KISS : les logiciels de règles ne peuvent pas deviner.",
+      "loading": "Politique d'exploitation de chargement",
+      "last_updated": "Dernière mise à jour {{date}}",
+      "meta": {
+        "title": "Politique de fonctionnement",
+        "description": "Configurez les règles d'approbation, de sauvegarde, de SLA et de politique de valeur sociale pour le programme de soins."
+      },
+      "actions": {
+        "refresh": "Rafraîchir",
+        "save": "Enregistrer les modifications"
+      },
+      "about": {
+        "title": "À propos de cette page",
+        "body": "La politique opérationnelle définit les règles de votre programme de soins communautaires : qui peut approuver les heures, à quelle vitesse les coordinateurs doivent répondre, comment la valeur sociale est calculée et à quoi ressemble le cycle de reporting. Configurez-le avant de lancer le pilote. Les modifications prennent effet immédiatement et sont enregistrées à des fins d'audit.",
+        "methodology_prefix": "Le",
+        "methodology_middle": "Les champs taux horaire et multiplicateur de prévention utilisent le",
+        "methodology_suffix": "méthodologie (Koordination und Innovation fur Soziales, Schwyz) développée avec Age-Stiftung. Si vous n'utilisez pas de compte Swiss KISS/",
+        "methodology_tail": "pilote, définissez le tarif sur votre équivalent horaire local de soins formels et le multiplicateur sur 1.0."
+      },
+      "sections": {
+        "approvals": "Approbations et confiance",
+        "sla": "Fenêtres SLA",
+        "hours": "Gestion des heures",
+        "safeguarding": "Sauvegarde",
+        "social_value": "méthodologie de la valeur sociale",
+        "appendix": "Annexe sur la politique pilote"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "Autorité d'approbation",
+          "help": "Qui peut finaliser les heures approuvées : l'administrateur du locataire, les coordinateurs ou les deux parties par approbation mutuelle."
+        },
+        "trusted_reviewer_threshold": {
+          "label": "Seuil d'évaluateur de confiance (heures enregistrées)",
+          "help": "Nombre minimum d'heures approuvées avant qu'un membre devienne un évaluateur de confiance ou atteigne le niveau de confiance."
+        },
+        "sla_first_response_hours": {
+          "label": "SLA : première réponse (heures)",
+          "help": "Ciblez le délai de première réponse à une nouvelle demande d'aide."
+        },
+        "sla_help_request_hours": {
+          "label": "SLA : résolution des demandes d'aide (heures)",
+          "help": "Ciblez le temps nécessaire pour clôturer ou faire correspondre une demande d'aide."
+        },
+        "legacy_hour_settlement": {
+          "label": "Politique de règlement en heures héritées",
+          "help": "Comment sont réglées les heures restantes d'un membre décédé."
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "Seuil d'intervention en équilibre réciproque (heures)",
+          "help": "Lorsque le déséquilibre donner/recevoir d’un membre déclenche un enregistrement du coordinateur."
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "Propriétaire de l’escalade de protection (utilisateur ID)",
+          "help": "L'utilisateur ID reçoit des escalades de sauvegarde. Laissez vide pour utiliser les administrateurs en tant que groupe."
+        },
+        "chf_hourly_rate": {
+          "label": "CHF valeur sociale par heure",
+          "help": "Valeur CHF par heure de soins pour le reporting ROI utilisant le tarif suisse des aides-soignantes."
+        },
+        "chf_prevention_multiplier": {
+          "label": "Multiplicateur de prévention CHF",
+          "help": "Multiplicateur appliqué à la compensation des soins formels pour les méthodologies Age-Stiftung et KISS."
+        },
+        "statement_cadence": {
+          "label": "Cadence des déclarations des membres",
+          "help": "À quelle fréquence les membres reçoivent un relevé horaire par membre."
+        },
+        "policy_appendix_url": {
+          "label": "Annexe à la politique signée URL",
+          "help": "Collez le URL public de l'entente de politique signée entre votre coopérative et la municipalité. Cela apparaît dans les rapports d’audit et dans le dossier de reporting municipal."
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "Administrateur",
+          "coordinator": "Coordinateur",
+          "mutual": "Mutuel"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "Faire un don à la piscine",
+          "expire": "Expirer",
+          "transfer_to_nominee": "Transfert au candidat"
+        },
+        "statement_cadence": {
+          "monthly": "Mensuel",
+          "quarterly": "Trimestriel",
+          "annual": "Annuel"
+        }
+      },
+      "placeholders": {
+        "url": "https://..."
+      },
+      "errors": {
+        "load_failed": "Échec du chargement de la stratégie d'exploitation.",
+        "save_failed": "Échec de l'enregistrement de la stratégie d'exploitation."
+      },
+      "messages": {
+        "saved": "Politique de fonctionnement enregistrée. Les modifications s’appliquent immédiatement à tous les nouveaux échanges."
       }
     }
   },
@@ -9985,7 +11401,349 @@
       "email_warning_check_failed": {
         "title": "Warning check failed",
         "body": "Email warning checks could not complete."
+      },
+      "notification_queue_suppressed": {
+        "title": "E-mails de notification supprimés",
+        "body": "Les e-mails de notification en file d'attente {{count}} ont été supprimés au cours des dernières heures {{window_hours}}."
+      },
+      "newsletter_queue_failures": {
+        "title": "Échecs de la file d’attente de la newsletter",
+        "body": "Les destinataires de la newsletter {{count}} ont échoué au cours des dernières heures {{window_hours}}."
+      },
+      "newsletter_queue_stale_processing": {
+        "title": "File d'attente de newsletter obsolète",
+        "body": "Les destinataires de la newsletter {{count}} traitent le message depuis plus de minutes {{minutes}}."
+      },
+      "new_users_without_account_email_attempt": {
+        "title": "L'e-mail du compte ne s'est pas déclenché",
+        "body": "Les nouveaux utilisateurs de {{count}} n'ont eu aucune tentative d'activation, de vérification, d'approbation ou d'e-mail de bienvenue au cours des dernières heures de {{window_hours}}."
+      },
+      "password_resets_without_email_attempt": {
+        "title": "L'e-mail de réinitialisation du mot de passe n'a pas été déclenché",
+        "body": "Les jetons de réinitialisation de mot de passe {{count}} n'ont reçu aucune tentative d'e-mail de réinitialisation de mot de passe correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "group_invites_without_email_attempt": {
+        "title": "L'e-mail d'invitation au groupe ne s'est pas déclenché",
+        "body": "Les invitations de groupe par courrier électronique {{count}} n'ont reçu aucune tentative de courrier électronique d'invitation à un groupe correspondant au cours des dernières heures {{window_hours}}."
+      },
+      "group_members_tenant_mismatch": {
+        "title": "Inadéquation des locataires d’appartenance à un groupe",
+        "body": "Les adhésions aux groupes {{count}} appartiennent à un locataire différent de leur groupe. Ces lignes risquent de comporter un rôle de locataire incorrect et un routage des notifications."
+      },
+      "group_member_joined_without_owner_notification_queue": {
+        "title": "La notification d'adhésion au groupe n'a pas été mise en file d'attente",
+        "body": "Les adhésions aux groupes {{count}} sont devenues actives sans ligne de file d'attente de notification de propriétaire correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "instant_notifications_stuck_pending": {
+        "title": "Les e-mails instantanés sont bloqués",
+        "body": "Les e-mails de notification instantanée {{count}} sont en attente depuis plus de minutes {{minutes}}."
+      },
+      "notification_queue_failed_recently": {
+        "title": "Les e-mails de notification ont échoué",
+        "body": "Les e-mails de notification mis en file d'attente {{count}} ont échoué au cours des dernières heures {{window_hours}}."
+      },
+      "notification_queue_suppressed_recently": {
+        "title": "E-mails de notification supprimés",
+        "body": "Les e-mails de notification en file d'attente {{count}} ont été supprimés au cours des dernières heures {{window_hours}}."
+      },
+      "notification_queue_missing_tenant_id": {
+        "title": "Locataire manquant dans la file d'attente de notification",
+        "body": "Les notifications en file d'attente {{count}} sont en attente ou en traitement sans propriété du locataire. Ils ne peuvent pas être acheminés de manière fiable tant qu'ils n'ont pas été réparés."
+      },
+      "notification_queue_tenant_mismatch": {
+        "title": "Incompatibilité des locataires de la file d'attente de notification",
+        "body": "Les notifications en file d'attente {{count}} appartiennent à un locataire différent de celui de leur utilisateur destinataire. Ces lignes risquent d’être acheminées par un mauvais locataire."
+      },
+      "notifications_missing_tenant_id": {
+        "title": "Notifications locataire manquant",
+        "body": "Les notifications intégrées à l'application {{count}} n'ont aucun propriétaire, les utilisateurs peuvent donc ne pas les voir de manière cohérente."
+      },
+      "notifications_tenant_mismatch": {
+        "title": "Incompatibilité des locataires des notifications",
+        "body": "Les notifications in-app {{count}} appartiennent à un locataire différent de leur utilisateur destinataire. Ces lignes risquent des échecs de visibilité entre locataires."
+      },
+      "notification_queue_marked_sent_without_email_log": {
+        "title": "Notification marquée envoyée sans preuve par courrier électronique",
+        "body": "Les notifications en file d'attente {{count}} ont été marquées comme envoyées sans entrée de journal de courrier électronique correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "newsletter_queue_missing_tenant_id": {
+        "title": "Locataire manquant dans la file d'attente de la newsletter",
+        "body": "Les lignes de file d’attente de newsletter {{count}} n’ont aucun propriétaire locataire. Ils ne peuvent pas être acheminés de manière fiable tant qu'ils n'ont pas été réparés."
+      },
+      "newsletter_queue_tenant_mismatch": {
+        "title": "Incompatibilité des locataires de la file d'attente de newsletter",
+        "body": "Les lignes de la file d’attente de la newsletter {{count}} appartiennent à un locataire différent de leur newsletter. Ces lignes risquent d’être acheminées par un mauvais locataire."
+      },
+      "newsletter_queue_stuck_pending": {
+        "title": "Les e-mails de newsletter sont bloqués",
+        "body": "Les destinataires de la newsletter {{count}} sont en attente depuis plus de minutes {{minutes}}."
+      },
+      "newsletter_queue_failed_recently": {
+        "title": "Échec des e-mails de newsletter",
+        "body": "Les destinataires de la newsletter {{count}} ont échoué au cours des dernières heures {{window_hours}}."
+      },
+      "newsletter_queue_marked_sent_without_email_log": {
+        "title": "Newsletter marquée envoyée sans preuve par email",
+        "body": "Les destinataires de la newsletter {{count}} ont été marqués comme envoyés sans entrée de journal de courrier électronique réussie au cours des dernières heures {{window_hours}}."
+      },
+      "event_reminders_overdue_pending": {
+        "title": "Rappels d'événements en retard",
+        "body": "Les rappels d'événements {{count}} sont toujours en attente plus de {{minutes}} minutes après leur heure d'envoi prévue."
+      },
+      "event_reminders_failed_recently": {
+        "title": "Les rappels d'événements ont échoué",
+        "body": "Les rappels d'événements {{count}} ont échoué au cours des dernières heures {{window_hours}}."
+      },
+      "event_reminders_marked_sent_without_email_log": {
+        "title": "Rappels d'événements marqués envoyés sans preuve par courrier électronique",
+        "body": "Les rappels d'événements par courrier électronique {{count}} ont été marqués comme envoyés sans entrée de journal de courrier électronique réussie correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "marketplace_report_received_without_notification_outbox": {
+        "title": "L'e-mail de réception du rapport Marketplace n'a pas été mis en file d'attente",
+        "body": "Des rapports de marché {{count}} ont été reçus sans ligne de notification par courrier électronique de réception correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "marketplace_report_acknowledged_without_notification_outbox": {
+        "title": "L'e-mail d'accusé de réception du rapport Marketplace n'a pas été mis en file d'attente",
+        "body": "Les rapports du marché {{count}} ont été accusés de réception sans ligne de notification par courrier électronique d'accusé de réception correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "marketplace_report_resolved_without_notification_outbox": {
+        "title": "L'e-mail de résolution du rapport Marketplace n'a pas été mis en file d'attente",
+        "body": "Les rapports du marché {{count}} ont été résolus sans ligne de notification par e-mail de résolution correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "marketplace_report_appealed_without_notification_outbox": {
+        "title": "L'e-mail d'appel du rapport Marketplace n'a pas été mis en file d'attente",
+        "body": "Des appels liés au rapport de marché {{count}} ont été déposés sans ligne de notification par courrier électronique de réception d'appel correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "marketplace_report_appeal_resolved_without_notification_outbox": {
+        "title": "L'e-mail de résolution d'appel du rapport Marketplace n'a pas été mis en file d'attente",
+        "body": "Les appels du rapport du marché {{count}} ont été résolus sans ligne de notification par courrier électronique de décision finale correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "federation_connection_without_email_evidence": {
+        "title": "Preuve d'e-mail de connexion à la fédération manquante",
+        "body": "Les événements de connexion fédérés {{count}} n'ont aucune preuve de livraison réussie d'e-mails au cours des dernières heures {{window_hours}}."
+      },
+      "federation_connection_without_bell_evidence": {
+        "title": "Preuve de notification de connexion à la fédération manquante",
+        "body": "Les événements de connexion fédérés {{count}} n'ont aucune preuve de notification dans l'application au cours des dernières heures {{window_hours}}."
+      },
+      "federation_review_without_email_evidence": {
+        "title": "La Fédération examine les preuves par courrier électronique manquantes",
+        "body": "Les avis fédérés {{count}} n'ont aucune preuve d'e-mail réussie ou intentionnellement ignorée au cours des dernières heures {{window_hours}}."
+      },
+      "federation_review_without_bell_evidence": {
+        "title": "Preuve de notification de révision de la Fédération manquante",
+        "body": "Les avis fédérés {{count}} n'ont aucune preuve de notification dans l'application au cours des dernières heures {{window_hours}}."
+      },
+      "member_subscription_event_without_email_evidence": {
+        "title": "Il manque la preuve de l'e-mail d'abonnement du membre",
+        "body": "Les événements de facturation des abonnements des membres {{count}} n'ont aucune preuve de livraison réussie d'e-mails au cours des dernières heures {{window_hours}}."
+      },
+      "stripe_donation_without_receipt_email_evidence": {
+        "title": "Il manque une preuve par courrier électronique du reçu de don",
+        "body": "Les dons Stripe complétés par {{count}} n'ont aucune preuve de réception par courrier électronique réussie au cours des dernières heures {{window_hours}}."
+      },
+      "critical_email_attempts_missing_tenant_context": {
+        "title": "Contexte du locataire manquant dans l'e-mail critique",
+        "body": "Des tentatives de courrier électronique critiques {{count}} ont été enregistrées sans contexte de locataire au cours des dernières heures {{window_hours}}."
+      },
+      "sendgrid_events_not_confirming_delivery": {
+        "title": "Événements de livraison SendGrid manquants",
+        "body": "Les e-mails {{count}} SendGrid restent acceptés mais non confirmés après plus d'heures {{hours}}."
+      },
+      "tenant_gmail_override_incomplete": {
+        "title": "Configuration du locataire Gmail incomplète",
+        "body": "Ce locataire a un remplacement incomplet du fournisseur de messagerie Gmail."
+      },
+      "tenant_smtp_override_incomplete": {
+        "title": "Configuration du locataire SMTP incomplète",
+        "body": "Ce locataire a un remplacement incomplet du fournisseur de messagerie SMTP."
+      },
+      "tenant_sendgrid_override_missing_api_key": {
+        "title": "Le locataire SendGrid remplace la clé API manquante",
+        "body": "Ce locataire est configuré pour utiliser un remplacement SendGrid mais n'a pas de clé de locataire API, donc la solution de secours de la plateforme sera utilisée."
+      },
+      "tenant_provider_config_check_failed": {
+        "title": "La vérification du fournisseur de locataire a échoué",
+        "body": "L’audit de configuration du fournisseur de messagerie n’a pas pu être terminé pour ce locataire."
+      },
+      "direct_email_send_paths_remaining": {
+        "title": "Les anciens chemins de messagerie directe restent",
+        "body": "Les chemins d’envoi d’e-mails bruts {{count}} contournent toujours le répartiteur de notifications unifié. Continuez à renforcer ces chemins jusqu'à ce que chaque module soit acheminé via le répartiteur auditable."
+      },
+      "email_dispatch_missing_explicit_tenant": {
+        "title": "E-mail du répartiteur manquant de locataire explicite",
+        "body": "Les sites d’appel des répartiteurs de courrier électronique {{count}} s’appuient toujours sur le contexte de locataire déduit. Transmettez explicitement tenant_id ou tenantId afin que chaque envoi en file d'attente, cron, webhook et entre locataires soit auditable."
+      },
+      "email_trigger_audit_failed": {
+        "title": "Échec de l'audit du déclencheur d'e-mail",
+        "body": "L’audit du déclencheur d’e-mail n’a pas pu se terminer."
       }
+    },
+    "title": "Délivrabilité des e-mails",
+    "subtitle": "Suivez les preuves de déclenchement, les tentatives d'envoi, le statut du fournisseur et les destinataires supprimés pour ce locataire.",
+    "trigger_score": "Score de déclenchement",
+    "trigger_coverage": "Problèmes {{issues}} dans les flux surveillés {{count}}",
+    "actions": {
+      "refresh": "Rafraîchir",
+      "reset": "Réinitialiser",
+      "search": "Recherche"
+    },
+    "windows": {
+      "1": "Dernières 24 heures",
+      "7": "7 derniers jours",
+      "30": "30 derniers jours",
+      "90": "90 derniers jours"
+    },
+    "filters": {
+      "all": "Tous",
+      "category": "Catégorie",
+      "email": "E-mail",
+      "recipient": "E-mail du destinataire",
+      "reason": "Raison",
+      "since": "Depuis",
+      "status": "Statut",
+      "until": "Jusqu'à",
+      "window": "Fenêtre de temps"
+    },
+    "metrics": {
+      "accepted": "Accepté",
+      "bad_outcomes": "{{count}} a échoué, a été renvoyé ou supprimé",
+      "bounced": "Rebondi",
+      "delivered": "Livré",
+      "not_available": "Aucune donnée d’audit déclencheur",
+      "total": "Total",
+      "trigger_score": "Score de déclenchement",
+      "unconfirmed": "{{count}} accepté mais non confirmé",
+      "webhook_confirmed": "Confirmé par le webhook du fournisseur",
+      "window_days": "Fenêtre de jour {{days}}"
+    },
+    "status": {
+      "bounced": "Rebondi",
+      "delivered": "Livré",
+      "failed": "Échoué",
+      "pending": "En attente",
+      "processing": "Traitement",
+      "queued": "En file d'attente",
+      "sent": "Envoyé",
+      "suppressed": "Supprimé",
+      "unknown": "Statut inconnu : {{status}}"
+    },
+    "severity": {
+      "critical": "Critique",
+      "info": "Informations",
+      "warning": "Avertissement"
+    },
+    "status_breakdown": {
+      "title": "Répartition du statut",
+      "subtitle": "Une vue compacte des résultats d'envoi du locataire actuel pour la fenêtre sélectionnée."
+    },
+    "trigger_health": {
+      "critical": "Problèmes de déclenchement critiques",
+      "monitored": "Flux surveillés",
+      "warning": "Problèmes de déclenchement d'avertissement"
+    },
+    "trigger_issues": {
+      "title": "Déclencher des problèmes d'audit",
+      "subtitle": "Lignes sources où un e-mail ou une notification aurait dû être déclenché, mais l'audit ne dispose pas de preuves de livraison fiables.",
+      "table_label": "Problèmes d’audit des déclencheurs d’e-mails",
+      "empty": "Aucun problème d’audit de déclenchement pour la fenêtre sélectionnée.",
+      "all_tenants": "Tous les locataires",
+      "columns": {
+        "event": "Événement",
+        "issue": "Problème",
+        "module": "Module",
+        "params": "Preuve",
+        "severity": "Gravité",
+        "tenant": "Locataire"
+      }
+    },
+    "queues": {
+      "title": "Diagnostics de file d'attente",
+      "subtitle": "Lignes de file d'attente de courrier électronique en attente ayant échoué, supprimées ou obsolètes pour ce locataire.",
+      "table_label": "Diagnostic de la file d'attente des e-mails",
+      "empty": "Aucune ligne de file d'attente de courrier électronique ayant échoué, supprimée ou obsolète.",
+      "columns": {
+        "attempts": "Tentatives",
+        "category": "Catégorie",
+        "error": "Erreur",
+        "last_attempt": "Dernière tentative",
+        "recipient": "Destinataire",
+        "source": "Source",
+        "status": "Statut"
+      },
+      "sources": {
+        "civic_digest_delivery_claims": "Réclamation du résumé civique",
+        "event_reminder_delivery_claims": "Réclamation de rappel d'événement",
+        "event_reminders": "Rappel d'événement",
+        "federation_inbound_connections": "Connexion à la fédération",
+        "federation_messages": "Message de la Fédération",
+        "federation_transactions": "Opération de fédération",
+        "goal_reminders": "Rappel d'objectif",
+        "job_interviews": "Rappel d'entretien d'embauche",
+        "listing_expiry_reminders_sent": "Rappel d'expiration de l'annonce",
+        "marketplace_disputes": "Litige sur le marché",
+        "marketplace_order_notification_deliveries": "Notification de commande Marketplace",
+        "marketplace_report_notifications": "Rapport du marché",
+        "marketplace_seller_ratings": "Évaluation du vendeur sur le marché",
+        "member_subscription_events": "Facturation de l'abonnement des membres",
+        "newsletter_queue": "Bulletin",
+        "notification_queue": "Notification",
+        "notifications": "Preuve de notification",
+        "reviews": "Examen fédéré",
+        "transaction_notification_deliveries": "Avis de transaction",
+        "user_safeguarding_preferences": "Examen de la sauvegarde",
+        "vol_donations": "Reçu de don",
+        "vol_reminder_delivery_claims": "Réclamation de rappel aux bénévoles",
+        "vol_reminders_sent": "Rappel aux bénévoles"
+      }
+    },
+    "logs": {
+      "title": "Journal des tentatives d'envoi d'e-mails",
+      "subtitle": "Recherchez chaque tentative d'envoi par destinataire, catégorie, statut et date.",
+      "table_label": "Journal des tentatives d'envoi d'e-mails",
+      "empty": "Aucun e-mail ne correspond aux filtres actuels.",
+      "columns": {
+        "category": "Catégorie",
+        "delivered": "Livré",
+        "error": "Erreur",
+        "provider": "Fournisseur",
+        "recipient": "Destinataire",
+        "sent": "Envoyé",
+        "status": "Statut",
+        "subject": "Sujet"
+      }
+    },
+    "pagination": {
+      "page_size": "Lignes par page",
+      "summary": "{{from}}-{{to}} de {{total}}"
+    },
+    "suppressions": {
+      "title": "Liste de suppression",
+      "subtitle": "Destinataires à l'échelle de la plateforme que les fournisseurs ont renvoyés, bloqués, invalidés ou désabonnés.",
+      "table_label": "Liste de suppression d'e-mails",
+      "empty": "Aucun destinataire supprimé ne correspond aux filtres actuels.",
+      "confirm_remove": "Supprimer {{email}} de la liste de suppression ? Ils pourront à nouveau recevoir des e-mails.",
+      "remove": "Supprimer la suppression",
+      "remove_failed": "Échec de la suppression de la suppression.",
+      "removed": "{{email}} supprimé.",
+      "columns": {
+        "actions": "Actes",
+        "detail": "Détail",
+        "email": "E-mail",
+        "reason": "Raison",
+        "suppressed_at": "Supprimé à"
+      },
+      "reasons": {
+        "block": "Bloc",
+        "bounce": "Rebond",
+        "invalid": "Invalide",
+        "spam_report": "Rapport de spam",
+        "unsubscribe": "Se désabonner",
+        "unknown": "Raison inconnue : {{reason}}"
+      }
+    },
+    "empty": {
+      "no_statuses": "Aucun statut pour l'instant"
     }
   },
   "help_drawer": {
@@ -10253,6 +12011,880 @@
         "reject_failed": "Échec du rejet",
         "rejected": "Proposition rejetée"
       }
+    }
+  },
+  "fadp": {
+    "meta": {
+      "page_title": "Conformité FADP"
+    },
+    "header": {
+      "title": "Conformité Swiss FADP (nDSG)",
+      "description": "Loi fédérale sur la protection des données : registre de traitement, configuration de la conservation, contrôle du consentement et contrôle du séjour."
+    },
+    "actions": {
+      "add_activity": "Ajouter une activité",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "export_csv": "Exporter CSV",
+      "export_ledger_csv": "Exporter le grand livre complet CSV",
+      "refresh": "Rafraîchir",
+      "save_changes": "Enregistrer les modifications",
+      "save_configuration": "Enregistrer la configuration"
+    },
+    "common": {
+      "empty_dash": "—",
+      "no": "Non"
+    },
+    "tabs": {
+      "aria": "Sections FADP",
+      "ledger": "Registre des consentements",
+      "register": "Registre de traitement",
+      "residency": "Résidence des données",
+      "retention": "Configuration de rétention"
+    },
+    "register": {
+      "description": "Article 12 nDSG nécessite un enregistrement des activités de traitement. Ajoutez chaque activité dans laquelle des données personnelles sont collectées, utilisées, partagées ou conservées.",
+      "empty": "Aucune activité de traitement pour l'instant. Ajoutez une activité pour créer le registre.",
+      "profiling_yes": "Oui : consentement requis",
+      "table_aria": "Activités de traitement",
+      "columns": {
+        "actions": "Actes",
+        "activity": "Activité",
+        "automated_profiling": "Profilage automatisé",
+        "legal_basis": "Base juridique",
+        "retention": "Rétention"
+      }
+    },
+    "retention": {
+      "data_residency_label": "Déclaration de résidence des données",
+      "dpa_contact_description": "E-mail du délégué à la protection des données ou de la personne responsable.",
+      "dpa_contact_label": "E-mail de contact DPA (facultatif)",
+      "periods_title": "Périodes de conservation",
+      "residency_title": "Résidence des données et contact DPA",
+      "fields": {
+        "activity_logs_years": "Journaux d'activité (années)",
+        "ai_embeddings_years": "Intégrations d'IA (années)",
+        "member_data_years": "Données des membres (années)",
+        "messages_years": "Messages (années)",
+        "transaction_data_years": "Données de transaction (années)"
+      },
+      "hints": {
+        "activity_logs_years": "Activités de la plateforme et journaux d’audit.",
+        "ai_embeddings_years": "Intégrations correspondantes. Le consentement est requis.",
+        "member_data_years": "Données d’enregistrement, de profils et d’authentification.",
+        "messages_years": "Messages directs et de groupe.",
+        "transaction_data_years": "Registres d'échange de crédits-temps."
+      }
+    },
+    "ledger": {
+      "description": "Journal d'audit immuable des décisions de consentement des membres. Requis par Art. 6 nDSG pour démontrer la légalité.",
+      "empty": "Aucun enregistrement de consentement pour l'instant.",
+      "table_aria": "Dossiers de consentement",
+      "truncated": "Affichage des 200 enregistrements les plus récents. Exportez le registre complet CSV pour télécharger tous les enregistrements {{count}}.",
+      "columns": {
+        "action": "Action",
+        "consent_type": "Type de consentement",
+        "date": "Date",
+        "ip_address": "Adresse IP",
+        "member_id": "Membre ID"
+      }
+    },
+    "residency": {
+      "article_16": "La divulgation transfrontalière de données personnelles est autorisée si le pays de destination garantit une protection des données adéquate, reconnue par le Conseil fédéral. Les États membres de Switzerland, EU/EEA et une petite liste d'autres pays sont éligibles.",
+      "article_16_label": "FADP Art. 16",
+      "article_17": "Si la destination n'est pas éligible, des garanties appropriées doivent être en place, telles que des clauses standard de protection des données approuvées par FDPIC, des règles d'entreprise contraignantes ou le consentement des membres.",
+      "article_17_label": "FADP Art. 17",
+      "description": "Où les données des membres locataires sont stockées et traitées.",
+      "dpa_contact": "DPA contact",
+      "title": "Résidence déclarée des données",
+      "update_hint_prefix": "Pour mettre à jour la résidence déclarée, utilisez le",
+      "update_hint_suffix": "languette.",
+      "copy": {
+        "EU": "Les données sont stockées dans le EU/EEA. Switzerland reconnaît la protection des données EU comme adéquate, donc aucune protection FADP supplémentaire n'est nécessaire pour ces transferts.",
+        "International": "Les données sont stockées en dehors de Switzerland et de EU. Art. 16-17 nDSG des garanties sont requises, telles que des clauses contractuelles standard ou le consentement explicite des membres pour chaque transfert.",
+        "Switzerland": "Les données sont entièrement stockées dans Switzerland. Aucune disposition relative aux transferts transfrontaliers n’est requise pour cette déclaration."
+      }
+    },
+    "summary": {
+      "automated_profiling": "Profilage automatisé",
+      "generated": "Généré",
+      "tenant": "Locataire",
+      "title": "Résumé de l'inscription",
+      "total_activities": "Activités totales"
+    },
+    "activity_modal": {
+      "add_title": "Ajouter une activité de traitement",
+      "edit_title": "Modifier l'activité de traitement",
+      "fields": {
+        "activity_name": "Nom de l'activité",
+        "automated_profiling": "Profilage automatisé",
+        "data_categories": "Catégories de données (séparées par des virgules)",
+        "legal_basis": "Base juridique",
+        "purpose": "But",
+        "recipients": "Destinataires (séparés par des virgules, facultatif)",
+        "retention_period": "Période de conservation",
+        "sort_order": "Ordre de tri"
+      },
+      "hints": {
+        "automated_profiling": "Art. 21 nDSG : la prise de décision individuelle automatisée nécessite un consentement explicite et de la transparence.",
+        "data_categories": "Par exemple : nom, email, téléphone, adresse.",
+        "purpose": "Pourquoi ces données sont-elles traitées ? Soyez précis sur le but légitime.",
+        "recipients": "Qui reçoit ou accède à ces données, comme les équipes internes ou les sous-traitants.",
+        "retention_period": "Par exemple : 7 ans après la fin de l’adhésion ou jusqu’au retrait du consentement."
+      }
+    },
+    "delete_modal": {
+      "message": "Supprimer cette activité de traitement ? Cela ne peut pas être annulé.",
+      "title": "Supprimer l'activité de traitement"
+    },
+    "legal_basis": {
+      "consent": "Consentement",
+      "contract": "Contracter",
+      "legal_obligation": "Obligation légale",
+      "legitimate_interest": "Intérêt légitime",
+      "unknown": "Base légale inconnue : {{basis}}"
+    },
+    "data_residency": {
+      "EU": "EU (EEA)",
+      "International": "International (en dehors de EU/Switzerland)",
+      "Switzerland": "Switzerland"
+    },
+    "consent_actions": {
+      "granted": "Accordé",
+      "withdrawn": "Retiré",
+      "unknown": "Action inconnue : {{action}}"
+    },
+    "toasts": {
+      "activities_load_failed": "Échec du chargement des activités de traitement.",
+      "activity_delete_failed": "Échec de la suppression de l'activité.",
+      "activity_deleted": "Activité supprimée.",
+      "activity_required": "Le nom et le but de l’activité sont requis.",
+      "activity_save_failed": "Échec de l'enregistrement de l'activité.",
+      "activity_saved": "Activité de traitement enregistrée.",
+      "consent_export_failed": "Échec de l'exportation du registre des consentements.",
+      "consent_load_failed": "Échec du chargement du registre des consentements.",
+      "register_export_failed": "Échec de l'exportation du registre.",
+      "retention_load_failed": "Échec du chargement de la configuration de rétention.",
+      "retention_save_failed": "Échec de l'enregistrement de la configuration de rétention.",
+      "retention_saved": "Configuration de rétention enregistrée."
+    }
+  },
+  "ai": {
+    "common": {
+      "cancel": "Annuler",
+      "close": "Fermer",
+      "empty_dash": "-",
+      "loading": "Chargement...",
+      "save_changes": "Enregistrer les modifications"
+    },
+    "ki_agents": {
+      "meta": {
+        "title": "KI-Agenten",
+        "description": "AG61 - Cadre d'agent autonome. Les agents proposent des actions ; les humains approuvent avant que quoi que ce soit ne soit appliqué."
+      },
+      "about": {
+        "title": "À propos de KI-Agenten",
+        "body": "KI-Agenten (agents AI) automatise les tâches de coordination de routine : trouver de bons couples de soins, donner un coup de pouce aux membres inactifs, résumer les charges de travail des coordonnateurs et acheminer les demandes d'aide ouvertes. Chaque agent travaille sur un modèle de proposition puis d'approbation : les agents génèrent des propositions, mais rien n'est appliqué jusqu'à ce qu'un humain l'approuve, à moins que le score de confiance de la proposition dépasse le seuil d'application automatique que vous configurez.",
+        "tandem_prefix": "suggère",
+        "tandem_suffix": "-stylez des jumelages de soins individuels en fonction des compétences, de l'emplacement et de la disponibilité.",
+        "nudge": "envoie des invites ciblées aux membres qui ont été inactifs ou dont les demandes n'ont pas été satisfaites.",
+        "demand": "prédit la demande de soins à venir à partir de modèles historiques.",
+        "help": "suggère le meilleur coordinateur pour les demandes d'aide ouvertes.",
+        "activity": "envoie par courrier électronique aux coordinateurs un résumé hebdomadaire des activités bénévoles."
+      },
+      "tabs": {
+        "aria": "Onglets KI-Agenten",
+        "config": "Configuration",
+        "proposals": "Propositions",
+        "runs": "Fonctionne"
+      },
+      "stats": {
+        "total_runs": "courses totales",
+        "total_proposals": "propositions totales",
+        "pending_review": "{{count}} en attente d'examen"
+      },
+      "agent_types": {
+        "activity_summary": "Résumé de l'activité",
+        "demand_forecast": "Prévision de la demande",
+        "help_routing": "Aide Routage",
+        "member_welcome": "Bienvenue aux membres",
+        "nudge_dispatch": "Envoi de coups de pouce",
+        "tandem_matching": "Correspondance en tandem"
+      },
+      "status": {
+        "all": "Tous",
+        "approved": "Approuvé",
+        "auto_applied": "Appliqué automatiquement",
+        "cancelled": "Annulé",
+        "completed": "Complété",
+        "expired": "Expiré",
+        "failed": "Échoué",
+        "pending": "En attente",
+        "pending_review": "En attente d'examen",
+        "rejected": "Rejeté",
+        "running": "En cours d'exécution"
+      },
+      "triggered_by": {
+        "manual": "Manuel",
+        "scheduled": "Programmé"
+      },
+      "config": {
+        "enable_title": "Activer KI-Agenten",
+        "enable_description": "Maître marche/arrêt. Lorsqu'elle est désactivée, aucun agent ne s'exécutera dans les délais.",
+        "agent_types_title": "Types d'agents",
+        "tandem_description": "-appariements de support de style",
+        "nudge_description": "Un engagement intelligent donne un coup de pouce aux membres",
+        "activity_description": "Résumé hebdomadaire du journal des bénévoles aux coordinateurs",
+        "demand_description": "Prédire la demande de soins à partir des tendances des journaux de bénévoles",
+        "help_description": "Acheminer automatiquement les demandes d'aide ouvertes",
+        "thresholds_title": "Seuils et calendrier",
+        "auto_apply_threshold": "Seuil d'application automatique :",
+        "auto_apply_threshold_aria": "Seuil d'application automatique",
+        "auto_apply_threshold_help": "Les propositions dépassant ce niveau de confiance sont appliquées automatiquement sans examen.",
+        "max_proposals": "Nombre maximum de propositions par exécution",
+        "schedule_hour": "Heure de planification (0-23, heure locale du serveur)",
+        "notification_email": "E-mail de notification",
+        "notification_email_placeholder": "admin@example.org"
+      },
+      "actions": {
+        "approve": "Approuver",
+        "approve_all_eligible": "Approuver tous les éligibles",
+        "details": "Détails",
+        "reject": "Rejeter",
+        "save_config": "Enregistrer la configuration",
+        "trigger": "Déclenchement"
+      },
+      "empty": {
+        "loading_config": "Chargement de la configuration...",
+        "loading_proposals": "Chargement des propositions...",
+        "loading_runs": "Chargement des courses...",
+        "no_filtered_proposals": "Aucune proposition ne correspond à ce filtre.",
+        "no_pending_proposals": "Aucune proposition en attente d'examen. Exécutez un agent à partir de l'onglet Exécutions pour générer des propositions.",
+        "no_runs": "Aucune course pour l'instant. Use the trigger panel above to kick off your first agent run."
+      },
+      "proposals": {
+        "approve_all_help": "Approuve toutes les propositions en attente d’examen dont la confiance atteint le seuil d’application automatique.",
+        "table_aria": "Propositions d'agents",
+        "columns": {
+          "actions": "Actes",
+          "confidence": "Confiance",
+          "created": "Créé",
+          "proposal_data": "Données de la proposition",
+          "status": "Statut",
+          "subject_user": "Utilisateur concerné",
+          "target_user": "Utilisateur cible",
+          "type": "Taper"
+        }
+      },
+      "legend": {
+        "status": "Statut:",
+        "awaiting_decision": "en attendant votre décision",
+        "human_approved": "approuvé et appliqué par l'homme",
+        "auto_applied": "appliqué automatiquement après dépassement du seuil",
+        "rejected": "rejeté, non appliqué",
+        "confidence": "Confiance:",
+        "confidence_high": "80 %+ d'application automatique en toute sécurité",
+        "confidence_medium": "50 à 79 % d'évaluation recommandée",
+        "confidence_low": "Niveau de confiance faible inférieur à 50 %"
+      },
+      "runs": {
+        "agent_type_aria": "Type d'agent à déclencher",
+        "agent_type_title": "Type d'agent",
+        "table_aria": "L'agent s'exécute",
+        "trigger_title": "Déclenchez une course maintenant",
+        "triggered_by_help": "Manuel signifie déclenché par un administrateur à partir de cette page ; planifié signifie qu'il s'exécute automatiquement à l'heure programmée configurée.",
+        "columns": {
+          "actions": "Actes",
+          "agent_type": "Type d'agent",
+          "applied": "Appliqué",
+          "duration": "Durée",
+          "proposals": "Propositions",
+          "started": "Commencé",
+          "status": "Statut",
+          "triggered_by": "Déclenché par"
+        }
+      },
+      "run_detail": {
+        "title": "Exécutez #{{id}} - {{type}}",
+        "status": "Statut:",
+        "triggered_by": "Déclenché par :",
+        "started": "Commencé:",
+        "duration": "Durée:",
+        "proposals_generated": "Propositions générées :",
+        "proposals_applied": "Propositions appliquées :",
+        "proposals_count": "Propositions ({{count}})",
+        "proposals_table_aria": "Exécuter des propositions",
+        "columns": {
+          "subject": "Sujet"
+        }
+      },
+      "toasts": {
+        "approve_eligible_failed": "Échec de l'approbation des propositions éligibles.",
+        "approved_eligible": "Propositions {{approved}} approuvées (échec de {{failed}}, seuil {{threshold}}%).",
+        "config_load_failed": "Échec du chargement de la configuration de l'agent.",
+        "config_save_failed": "Échec de l'enregistrement de la configuration.",
+        "config_saved": "Configuration de l'agent enregistrée.",
+        "proposal_approve_failed": "Échec de l'approbation de la proposition.",
+        "proposal_approved": "Proposition approuvée et appliquée.",
+        "proposal_reject_failed": "Échec du rejet de la proposition.",
+        "proposal_rejected": "Proposition rejetée.",
+        "proposals_load_failed": "Échec du chargement des propositions.",
+        "run_details_load_failed": "Échec du chargement des détails de l'exécution.",
+        "run_trigger_failed": "Échec du déclenchement de l'exécution.",
+        "run_triggered": "Exécution déclenchée : propositions {{count}} générées.",
+        "runs_load_failed": "Échec du chargement des exécutions."
+      }
+    },
+    "module_docs": {
+      "meta": {
+        "title": "Documentation du module AI",
+        "description": "Descriptions en langage simple de chaque module. L'assistant de chat AI les utilise comme base canonique pour répondre aux questions des membres."
+      },
+      "actions": {
+        "create_doc": "Créer un document",
+        "delete": "Supprimer",
+        "edit": "Modifier",
+        "new_doc": "Nouveau document",
+        "seed_defaults": "Valeurs par défaut des semences"
+      },
+      "about": {
+        "body": "Lorsque le message de discussion d'un membre contient l'un des mots-clés d'un document, le corps de ce document est ajouté à l'invite système de AI. Jusqu'à 3 documents sont injectés par tour. Écrivez en langage simple : ce que fait la fonctionnalité, comment l'utiliser et ce qui n'est pas possible.",
+        "tip_label": "Conseil:",
+        "tip_body": "Cliquez sur Seed defaults pour commencer avec 10 documents pré-écrits couvrant les modules de base. Ils n’écraseront rien de ce que vous avez personnalisé."
+      },
+      "columns": {
+        "actions": "Actes",
+        "keywords": "Mots-clés",
+        "slug": "Limace",
+        "status": "Statut",
+        "title": "Titre",
+        "updated": "Mis à jour"
+      },
+      "confirm_delete": "Supprimer \"{{title}}\" ? Cela ne peut pas être annulé.",
+      "empty": {
+        "no_docs": "Aucun document de module pour l'instant. Utilisez les valeurs par défaut de Seed ou New doc pour commencer."
+      },
+      "editor": {
+        "create_title": "Documentation du nouveau module",
+        "edit_title": "Modifier \"{{title}}\"",
+        "fields": {
+          "active": "Actif",
+          "body": "Corps",
+          "keywords": "Mots-clés déclencheurs (séparés par des virgules)",
+          "module_slug": "Limace de module",
+          "title": "Titre"
+        },
+        "hints": {
+          "active": "Les documents inactifs ne sont jamais injectés dans l'invite AI.",
+          "keywords": "Lorsque l'un de ces mots apparaît dans un message de discussion, ce document sera injecté dans l'invite AI.",
+          "module_slug": "Lettres minuscules, chiffres, traits de soulignement et tirets. Ne peut pas être modifié après la création."
+        },
+        "placeholders": {
+          "body": "Description en langage simple de ce module. Ce qu'il fait, comment l'utiliser et ce qui n'est pas possible.",
+          "keywords": "par ex. timebank, hours, credits, exchange",
+          "module_slug": "par ex. listings, wallet, events",
+          "title": "par ex. À quelle heure fonctionne credits"
+        }
+      },
+      "status": {
+        "active": "Actif",
+        "disabled": "Désactivé"
+      },
+      "table_aria": "Documentation du module AI",
+      "toasts": {
+        "created": "Doc créé.",
+        "deleted": "Document supprimé.",
+        "delete_failed": "Échec de la suppression.",
+        "load_failed": "Échec du chargement des documents du module.",
+        "save_failed": "L'enregistrement a échoué.",
+        "seed_failed": "La graine a échoué.",
+        "seeded": "Documents par défaut {{count}} prédéfinis.",
+        "updated": "Doc mis à jour."
+      }
+    },
+    "trace_metrics": {
+      "meta": {
+        "title": "Métriques de trace AI",
+        "description": "Coût, latence, utilisation des outils et questions sans réponse pour l'assistant de chat AI."
+      },
+      "empty": {
+        "loading_tools": "Chargement de l'utilisation de l'outil...",
+        "no_downvotes": "Aucun vote négatif. Rien à améliorer pour le moment.",
+        "no_tools": "Aucun outil n'appelle dans cette fenêtre."
+      },
+      "filters": {
+        "window": "Fenêtre"
+      },
+      "stats": {
+        "avg_latency": "Latence moyenne",
+        "cost": "Coût (USD)",
+        "latency_value": "{{value}} ms",
+        "thumbs_down": "Pouce vers le bas",
+        "thumbs_up": "Bravo",
+        "turns": "Virages"
+      },
+      "tools": {
+        "title": "Les meilleurs outils appelés"
+      },
+      "toasts": {
+        "load_failed": "Échec du chargement des métriques."
+      },
+      "unanswered": {
+        "title": "Questions sans réponse (pouce vers le bas)",
+        "description": "Ce sont des tours que les membres ont rejetés. Écrivez un nouveau document de module AI pour couvrir tous les modèles récurrents.",
+        "table_aria": "Questions sans réponse",
+        "columns": {
+          "assistant_reply": "Réponse de l'assistant (extrait)",
+          "note": "Note",
+          "user_question": "Question de l'utilisateur",
+          "when": "Quand"
+        }
+      },
+      "windows": {
+        "7": "7 derniers jours",
+        "30": "30 derniers jours",
+        "90": "90 derniers jours"
+      }
+    }
+  },
+  "advertising": {
+    "status": {
+      "all": "Tous",
+      "active": "Actif",
+      "cancelled": "Annulé",
+      "completed": "Complété",
+      "draft": "Brouillon",
+      "drafts": "Brouillons",
+      "paused": "En pause",
+      "pending_review": "En attente d'examen",
+      "rejected": "Rejeté",
+      "scheduled": "Programmé",
+      "sending": "Envoi",
+      "sent": "Envoyé"
+    },
+    "advertiser": {
+      "gemeinde": "Municipalité",
+      "private": "Privé",
+      "sme": "SME",
+      "sme_local": "SME (entreprise locale)",
+      "verein": "Association"
+    },
+    "shared": {
+      "campaign_details": "Détails de la campagne",
+      "filter_by_status": "Filtrer par statut",
+      "rejection_reason": "Motif du refus",
+      "search_campaigns": "Campagnes de recherche...",
+      "unexpected_error": "Une erreur inattendue s'est produite",
+      "actions": {
+        "approve": "Approuver",
+        "cancel": "Annuler",
+        "close": "Fermer",
+        "create_campaign": "Créer une campagne",
+        "details": "Détails",
+        "new_campaign": "Nouvelle campagne",
+        "pause": "Pause",
+        "reject": "Rejeter",
+        "reject_campaign": "Rejeter la campagne",
+        "submit_for_review": "Soumettre pour examen",
+        "view_details": "Afficher les détails"
+      },
+      "columns": {
+        "actions": "Actes",
+        "advertiser": "Annonceur",
+        "campaign": "Campagne",
+        "clicks": "Clics",
+        "ctr": "CTR",
+        "id": "ID",
+        "impressions": "Impressions",
+        "status": "Statut"
+      },
+      "empty": {
+        "no_campaigns": "Aucune campagne trouvée."
+      },
+      "fields": {
+        "advertiser_type": "Type d'annonceur",
+        "campaign_name": "Nom de la campagne",
+        "type": "Taper"
+      }
+    },
+    "ad": {
+      "page_title": "Campagnes publicitaires",
+      "budget_description": "Entrez 0 pour un budget illimité",
+      "audience_description": "Laisser vide pour cibler tous les membres de la communauté",
+      "creative_alt": "Créatif",
+      "create_title": "Créer une campagne publicitaire",
+      "creatives_count": "Créations ({{count}})",
+      "no_creatives": "Aucune création associée à cette campagne pour le moment.",
+      "performance_30_days": "Performance (30 jours)",
+      "reject_intro_prefix": "Vous rejetez",
+      "reject_intro_suffix": "Veuillez fournir une raison afin que l'annonceur sache comment améliorer sa soumission.",
+      "rejection_placeholder": "par ex. Le contenu enfreint les directives de la communauté : veuillez réviser le titre.",
+      "columns": {
+        "budget_spent": "Budget / Dépensé"
+      },
+      "fields": {
+        "audience_filters": "Filtres d'audience (JSON, en option)",
+        "end_date": "Date de fin",
+        "placement": "Placement",
+        "start_date": "Date de début",
+        "total_budget_cents": "Budget total (en centimes)"
+      },
+      "header": {
+        "title": "Publicité locale",
+        "description": "Gérer les campagnes publicitaires locales des SME, des associations et des municipalités"
+      },
+      "placement": {
+        "all": "Tous les emplacements",
+        "discovery": "Découverte",
+        "feed": "Alimentation",
+        "market": "Marché"
+      },
+      "placeholders": {
+        "budget": "par ex. 5000 = EUR 50,00",
+        "campaign_name": "Soldes d'été - Cafe Helvetia"
+      },
+      "stats": {
+        "active_campaigns": "Campagnes actives",
+        "clicks_today": "Clics aujourd'hui",
+        "impressions_today": "Impressions aujourd'hui",
+        "total_revenue": "Revenu total"
+      },
+      "toasts": {
+        "approved": "Campagne \"{{name}}\" approuvée",
+        "approve_failed": "Échec de l'approbation de la campagne",
+        "audience_json_invalid": "Les filtres d'audience doivent être valides JSON",
+        "created": "Campagne créée et soumise pour examen",
+        "create_failed": "Échec de la création de la campagne",
+        "details_failed": "Échec du chargement des détails de la campagne",
+        "load_failed": "Échec du chargement des campagnes publicitaires",
+        "name_required": "Le nom de la campagne est obligatoire",
+        "paused": "Campagne \"{{name}}\" suspendue",
+        "pause_failed": "Échec de la mise en veille de la campagne",
+        "rejected": "Campagne \"{{name}}\" rejetée",
+        "reject_failed": "Échec du rejet de la campagne"
+      }
+    },
+    "push": {
+      "chart_opens_title": "{{count}} s'ouvre",
+      "chart_sends_title": "{{count}} envoie",
+      "create_title": "Nouvelle campagne push",
+      "daily_breakdown": "Répartition quotidienne",
+      "immediate": "Immédiat",
+      "no_daily_data": "Pas encore de données quotidiennes.",
+      "reject_intro_prefix": "Rejetant",
+      "reject_intro_suffix": "Veuillez fournir une raison qui sera visible pour l'annonceur.",
+      "rejection_placeholder": "par ex. Le contenu n'est pas conforme aux directives de la communauté...",
+      "table_aria": "Campagnes push",
+      "actions": {
+        "dispatch_now": "Expédier maintenant"
+      },
+      "columns": {
+        "cost": "Coût",
+        "open_rate": "Taux d'ouverture",
+        "scheduled": "Programmé",
+        "targets": "Cibles",
+        "title_preview": "Aperçu du titre"
+      },
+      "dates": {
+        "approved": "Approuvé",
+        "created": "Créé",
+        "scheduled": "Programmé",
+        "sent": "Envoyé"
+      },
+      "fields": {
+        "cta_url": "URL CTA",
+        "cta_url_optional": "CTA URL (facultatif)",
+        "notification_body": "Corps de notification push",
+        "notification_title": "Titre de la notification push",
+        "push_body": "Pousser le corps",
+        "push_title": "Pousser le titre",
+        "scheduled_at": "Prévu à (facultatif - laisser vide pour envoyer après approbation)"
+      },
+      "header": {
+        "title": "Campagnes push payantes (AG57)"
+      },
+      "metrics": {
+        "opens": "Ouvre",
+        "revenue": "Revenu",
+        "sends": "Envoie",
+        "sent": "Envoyé"
+      },
+      "placeholders": {
+        "body": "400 caractères maximum",
+        "campaign_name": "par ex. Promotion de printemps - Cafe Seeblick",
+        "title": "100 caractères maximum"
+      },
+      "stats": {
+        "needs_attention": "A besoin d'attention",
+        "pending_review": "En attente d'examen",
+        "revenue_this_month": "Revenus ce mois-ci",
+        "sends_this_month": "Envoie ce mois-ci",
+        "total_campaigns": "Total des campagnes"
+      },
+      "toasts": {
+        "approved": "Campagne \"{{name}}\" approuvée.",
+        "approve_failed": "Échec de l'approbation de la campagne.",
+        "created": "Campagne créée.",
+        "create_failed": "Échec de la création de la campagne.",
+        "dispatched": "Campagne \"{{name}}\" lancée.",
+        "dispatch_failed": "Échec de l'envoi de la campagne.",
+        "load_failed": "Échec du chargement des campagnes",
+        "rejected": "Campagne \"{{name}}\" rejetée.",
+        "reject_failed": "Échec du rejet de la campagne.",
+        "required_fields": "Le nom, le titre et le corps sont requis."
+      }
+    }
+  },
+  "municipal_copilot": {
+    "about": {
+      "body": "Le copilote municipal vous aide à rédiger des annonces claires, correctement formelles et exemptes de jargon. Collez un brouillon: le AI suggérera des améliorations, signalera les problèmes de ton (trop formel, condescendant ou peu clair) et listera tout problème de modération. Vous examinez et acceptez ou rejetez la suggestion avant que quoi que ce soit ne soit publié.",
+      "title": "À propos de cette page"
+    },
+    "actions": {
+      "accept": "Accepter",
+      "cancel": "Annuler",
+      "generate_proposal": "Générer une proposition",
+      "refresh": "Rafraîchir",
+      "reject": "Rejeter",
+      "reject_proposal": "Rejeter la proposition",
+      "view": "Voir"
+    },
+    "empty": {
+      "no_latest": "Aucune proposition pour l'instant. Générez-en un à partir du brouillon de gauche.",
+      "no_proposals": "Aucune proposition pour l'instant. Les brouillons que vous analysez apparaîtront ici sous forme de piste d’audit.",
+      "value": "-"
+    },
+    "fields": {
+      "audience_description": "Précisez à qui s'adresse cette annonce (par exemple, « tous les résidents », « bénévoles », « contacts de la municipalité ») afin que AI puisse calibrer le ton et le vocabulaire de manière appropriée.",
+      "audience_hint": "Indice d'audience (facultatif)",
+      "audience_placeholder": "par ex. soignants dans la sous-région nord",
+      "character_count": "{{count}} / 4000 caractères",
+      "draft_announcement": "Projet d'annonce",
+      "draft_placeholder": "Collez un brouillon: le copilote peaufinera, vérifiera le ton et signalera les problèmes.",
+      "polished_text": "Texte soigné",
+      "reason": "Raison",
+      "reason_placeholder": "Pourquoi cette proposition est-elle rejetée?"
+    },
+    "labels": {
+      "audience": "Public: {{audience}}",
+      "model": "Modèle: {{model}}"
+    },
+    "meta": {
+      "page_title": "Copilote de communication municipale",
+      "subtitle": "Rédigez les annonces officielles, faites-les peaufiner par AI, vérifiez le ton et la clarté, puis publiez-les. Conçu pour les coordinateurs qui ont besoin de communiquer avec les résidents et les contacts de la municipalité d'une voix cohérente et accessible.",
+      "title": "Copilote de communication municipale"
+    },
+    "modal": {
+      "reject_title": "Rejeter la proposition"
+    },
+    "sections": {
+      "clarity_warnings": "Avertissements de clarté",
+      "latest_proposal": "Dernière proposition",
+      "moderation_flags": "Indicateurs de modération",
+      "new_draft": "Nouveau brouillon",
+      "recent_proposals": "Propositions récentes"
+    },
+    "states": {
+      "accepted": "Accepté. Publiez maintenant le texte soigné via l’administrateur des annonces.",
+      "rejected_reason": "Rejeté - motif: {{reason}}"
+    },
+    "status": {
+      "accepted": "Accepté",
+      "proposed": "Proposé",
+      "published": "Publié",
+      "rejected": "Rejeté"
+    },
+    "table": {
+      "actions": "ACTES",
+      "aria": "Propositions récentes de copilote",
+      "audience": "PUBLIC",
+      "created": "CRÉÉ",
+      "draft": "BROUILLON",
+      "status": "STATUT",
+      "tone": "TONIFIER"
+    },
+    "toasts": {
+      "accept_failed": "Échec de l'acceptation de la proposition",
+      "accepted": "Proposition acceptée - maintenant publiée via l'administrateur des annonces",
+      "draft_too_long": "Le brouillon est trop long (maximum 4 000 caractères)",
+      "enter_draft": "Saisissez d'abord un brouillon",
+      "generate_failed": "Échec de la génération de la proposition",
+      "generated": "Proposition générée",
+      "load_failed": "Échec du chargement des propositions de copilote",
+      "reason_required": "La raison est requise",
+      "reject_failed": "Échec du rejet de la proposition",
+      "rejected": "Proposition rejetée"
+    },
+    "tone": {
+      "condescending": "Condescendant",
+      "ok": "Tonalité OK",
+      "too_formal": "Trop formel",
+      "too_informal": "Trop informel"
+    },
+    "tone_legend": {
+      "condescending": "peut prendre avec condescendance le lecteur",
+      "ok": "aucun problème de tonalité détecté",
+      "prefix": "Légende du ton -",
+      "too_formal": "trop bureaucratique",
+      "too_informal": "peut sembler peu professionnel"
+    }
+  },
+  "municipal_roi_page": {
+    "about": {
+      "body_middle": "Le rapport calcule la valeur sociale et économique de votre programme de soins communautaires en utilisant le",
+      "body_prefix": "La Municipale",
+      "body_suffix": "Méthodologie Age-Stiftung. Il montre le coût estimé de la compensation pour les services de soins formels (Spitex/Pflege), la valeur sociale générée et les données de tendance sur les périodes de référence. Ce rapport est conçu pour être partagé avec les partenaires municipaux et les bailleurs de fonds comme preuve de l'impact du programme.",
+      "formula_prefix": "Compensation des coûts = nombre total d'heures de soins approuvées x",
+      "formula_suffix": "taux horaire x multiplicateur de prévention. Le multiplicateur de prévention (par défaut: 2,0) reflète qu'une heure de soins informels évite environ deux heures d'intervention de soins formels, sur la base de Age-Stiftung recherches.",
+      "title": "À propos de cette page"
+    },
+    "actions": {
+      "export_csv": "Exporter CSV",
+      "refresh_aria": "Actualiser le rapport d’impact municipal",
+      "refresh_data": "Actualiser les données"
+    },
+    "breakdown": {
+      "aria": "Répartition par sous-région",
+      "description": "La répartition par sous-région montre quels quartiers génèrent le plus d’activités de soins. Utilisez-le pour identifier les domaines qui pourraient nécessiter davantage de soutien du coordinateur ou de recrutement de bénévoles.",
+      "formal_care_offset": "Compensation des soins formels",
+      "hours": "Heures",
+      "sub_region": "Sous-région",
+      "title": "Répartition par sous-région",
+      "weighted_hours": "Heures pondérées"
+    },
+    "filters": {
+      "all_sub_regions": "Toutes les sous-régions",
+      "from": "Depuis",
+      "period": "Période: {{from}} -> {{to}}",
+      "sub_region": "Sous-région",
+      "to": "À"
+    },
+    "meta": {
+      "page_title": "Rapport d'impact municipal",
+      "subtitle": "Preuves pour l'approvisionnement B2G - compensations des coûts de soins et mesures du capital social",
+      "title": "Rapport d'impact municipal"
+    },
+    "methodology": {
+      "chf_per_hour": "CHF {{amount}}/heure",
+      "default_prevention_prefix": "La valeur de prévention applique un multiplicateur 2x par Age-Stiftung/",
+      "default_prevention_suffix": "méthodologie d’évaluation.",
+      "default_rate": "CHF 35/h",
+      "default_source": "Tarif suisse des aides-soignants, SECO 2024",
+      "hours_are_valued_at": "Les heures sont valorisées à",
+      "hours_valued_at": "Des heures valorisées à",
+      "prevention_value_prefix": "La valeur de prévention applique un multiplicateur {{multiplier}}x par Age-Stiftung/",
+      "prevention_value_suffix": "méthodologie d’évaluation.",
+      "substitution_applied": "Les heures sont pondérées par des coefficients de substitution par catégorie.",
+      "substitution_not_applied": "Toutes les heures pondérées à 1,0x.",
+      "tenant_setting_source": "configuré pour ce locataire"
+    },
+    "municipalities": {
+      "point_export": "Exportation CSV disponible - utilisez le bouton dans l'en-tête de la page pour les rapports Age-Stiftung, Pro Senectute et des services sociaux cantonaux.",
+      "point_hour_prefix": "Chaque heure consacrée aux soins communautaires permet d'économiser environ",
+      "point_hour_suffix": "dans les coûts de soins formels",
+      "point_nexus": "rend cet impact mesurable, vérifiable et déclarable pour les marchés publics cantonaux et municipaux",
+      "point_prevention": "Le soutien communautaire préventif peut réduire les besoins en matière de soins en établissement - multiplicateur estimé à 2x",
+      "title": "Ce que cela signifie pour les municipalités"
+    },
+    "roi": {
+      "default_multiplier_note": "(multiplicateur 2x)",
+      "multiplier_note": "({{multiplier}}x multiplicateur)",
+      "prevented_this_period": "en coûts de soins formels empêchés cette période",
+      "prevention_value": "Valeur de prévention",
+      "social_isolation_supported": "Personnes accompagnées hors de l’isolement social",
+      "title": "Compensation estimée du coût des soins",
+      "yoy": "{{value}} YoY"
+    },
+    "stats": {
+      "active_members": "Membres actifs",
+      "active_relationships": "Relations actives",
+      "care_recipients": "Bénéficiaires de soins",
+      "total_hours": "Heures totales",
+      "weighted_hours_note": "{{hours}} heures pondérées après coefficients de substitution",
+      "weighted_hours_tooltip": "Les heures sont pondérées par les taux de substitution spécifiques à la catégorie (par exemple, compagnie 0,4x, transport 0,7x, courses 1,0x) selon la méthodologie Age-Stiftung."
+    },
+    "toasts": {
+      "export_failed": "Échec de l'exportation CSV",
+      "load_failed": "Échec du chargement des données d'impact municipal"
+    }
+  },
+  "municipal_verification": {
+    "about": {
+      "body": "Municipal Verification records the formal sign-off from a municipality or canton partner that this community care programme meets their requirements. La vérification est requise pour la vérification de l'état de préparation au lancement pilote et déverrouille le rapport d'impact municipal. Utilisez la vérification DNS TXT pour les domaines municipaux officiels ou appliquez une attestation d'administrateur si le contrôle DNS n'est pas disponible.",
+      "pending_dns": "Jeton de vérification généré – en attente de propagation et de confirmation DNS.",
+      "revoked": "La vérification a été supprimée: revérifiez pour restaurer l'accès.",
+      "title": "À propos de cette page",
+      "verified": "Vérifié formellement - le pack de reporting municipal est déverrouillé."
+    },
+    "actions": {
+      "apply_attestation": "Appliquer l'attestation",
+      "cancel": "Annuler",
+      "generate_dns_token": "Générer un jeton DNS",
+      "refresh": "Rafraîchir",
+      "revoke": "Révoquer"
+    },
+    "current": {
+      "not_verified": "Ce locataire n'est pas actuellement vérifié. Use the options below to start a DNS verification or apply a manual admin attestation.",
+      "title": "Statut actuel",
+      "verified_on": "Vérifié le {{date}}"
+    },
+    "dns": {
+      "publish_record": "Publiez cet enregistrement TXT sur votre DNS, puis attendez la propagation:",
+      "record_name": "Nom de l'enregistrement",
+      "ttl_label": "TTL",
+      "ttl_value": "300",
+      "txt_type": "TXT",
+      "type_label": "Taper",
+      "value": "Valeur"
+    },
+    "fields": {
+      "attestation_description": "Pourquoi attestez-vous cela sans vérification DNS? (Piste d'audit.)",
+      "attestation_note": "Note d'attestation (facultatif)",
+      "domain_or_organisation": "Domaine ou organisation",
+      "domain_placeholder": "par ex. zurich.ch",
+      "municipality_domain": "Domaine de la municipalité"
+    },
+    "history": {
+      "empty": "Aucun enregistrement de vérification pour l'instant.",
+      "title": "Vérifications",
+      "updated": "Mise à jour {{date}}",
+      "via_method": "par {{method}}"
+    },
+    "meta": {
+      "description": "Marquez cette communauté comme partenaire municipal vérifié. Ajoute un badge « Municipalité vérifiée » aux rapports publics.",
+      "page_title": "Vérification municipale",
+      "title": "Vérification municipale"
+    },
+    "request": {
+      "attestation_body": "Utilisez-le uniquement lorsque le contrôle DNS n’est pas disponible. La vérification est enregistrée comme attestée manuellement par un administrateur.",
+      "attestation_tab": "Attestation d'administrateur",
+      "dns_body": "Fournissez le domaine officiel de la municipalité que vous contrôlez. Nous générerons un enregistrement DNS TXT que vous pourrez publier; une fois propagé, le système marque ce locataire comme vérifié.",
+      "dns_tab": "DNS TXT (de préférence)",
+      "method_aria": "Méthode de vérification",
+      "title": "Demander une vérification"
+    },
+    "revoke_modal": {
+      "body_prefix": "Révoquer la vérification pour",
+      "body_suffix": "Cela supprime le badge vérifié et l'enregistrement de vérification sera marqué comme révoqué.",
+      "title": "Révoquer la vérification?"
+    },
+    "status": {
+      "pending_dns": "En attente DNS",
+      "revoked": "Révoqué",
+      "verified": "Vérifié"
+    },
+    "toasts": {
+      "attest_failed": "Échec de la vérification de l'attestation",
+      "attested": "Vérification attestée",
+      "dns_failed": "Échec du démarrage de la vérification DNS",
+      "dns_generated": "DNS jeton de vérification généré",
+      "load_failed": "Échec du chargement du statut de vérification",
+      "revoke_failed": "Échec de la révocation de la vérification",
+      "revoked": "Vérification révoquée"
+    },
+    "validation": {
+      "domain_required": "Entrez un domaine"
     }
   }
 }

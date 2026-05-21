@@ -118,6 +118,11 @@ export default function OperatingPolicyAdminPage() {
     const label = t(`admin.operating_policy.fields.${key}.label`);
     const help = t(`admin.operating_policy.fields.${key}.help`);
     const value = draft[key];
+    const choiceLabel = (option: string) => {
+      const choiceKey = `admin.operating_policy.choices.${key}.${option}`;
+      const translated = t(choiceKey);
+      return translated === choiceKey ? option : translated;
+    };
 
     if (schema.type === 'enum') {
       return (
@@ -134,7 +139,7 @@ export default function OperatingPolicyAdminPage() {
         >
           {(schema.choices ?? []).map((opt) => (
             <SelectItem key={opt}>
-              {t(`admin.operating_policy.choices.${key}.${opt}`, opt)}
+              {choiceLabel(opt)}
             </SelectItem>
           ))}
         </Select>

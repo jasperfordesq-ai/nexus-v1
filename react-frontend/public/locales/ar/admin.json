@@ -299,7 +299,570 @@
     "sitemap_urls_by_type": "URLs by Type",
     "social_sharing_image_heading": "Social Sharing Image",
     "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
-    "usage_limits_heading": "Usage Limits"
+    "usage_limits_heading": "Usage Limits",
+    "prerender": {
+      "description": "اللقطات المقدمة من الخادم بواسطة الروبوت فقط. مراقبة التغطية، واكتشاف الثبات، وفرض التحديث.",
+      "analytics": {
+        "actions": {
+          "reload": "إعادة تحميل"
+        },
+        "columns": {
+          "crawler": "CRAWLER",
+          "hits": "HITS",
+          "host": "HOST",
+          "ip": "IP",
+          "status": "STATUS",
+          "time": "TIME",
+          "uri": "URI",
+          "url": "URL"
+        },
+        "empty": "لا توجد تحليلات متاحة. قد يكون سجل وصول الروبوت فارغًا.",
+        "empty_bot_traffic": "لا توجد حركة مرور بوت حتى الآن",
+        "empty_no_data": "لا توجد بيانات",
+        "empty_recent_hits": "لا يوجد الزيارات الأخيرة",
+        "errors": {
+          "load": "فشل تحميل التحليلات"
+        },
+        "filters": {
+          "window": "نافذة"
+        },
+        "hints": {
+          "spoofed": "ادعى الروبوت الرئيسي، وفشل نطاق IP",
+          "top_50_cap": "من غطاء top-50",
+          "verified_of_total": "{{verified}} من {{total}}"
+        },
+        "kpi": {
+          "ip_verified": "تم التحقق من IP",
+          "spoofed": "مخادع (مشبوه)",
+          "total_bot_hits": "إجمالي عدد مرات دخول الروبوت",
+          "unique_uris": "رموز URI الفريدة"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} مخادع"
+        },
+        "log_summary": "السجل: {{size}} - منذ {{time}}",
+        "sections": {
+          "hits_by_crawler": "الزيارات بواسطة الزاحف",
+          "hits_by_status": "الزيارات حسب حالة HTTP",
+          "recent_activity": "النشاط الأخير (الأحدث أولاً، الأخير {{count}})",
+          "top_uris": "أهم URIs (أعلى 50 حسب عدد النتائج)"
+        },
+        "tables": {
+          "recent_hits_aria": "زيارات الروبوت الأخيرة",
+          "top_uris_aria": "أعلى URIs"
+        },
+        "windows": {
+          "1": "آخر 24 ساعة",
+          "7": "آخر 7 أيام",
+          "30": "آخر 30 يومًا"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "فتح في المخزون",
+          "refresh": "ينعش",
+          "refresh_all_stale": "تحديث الكل القديم ({{count}})"
+        },
+        "columns": {
+          "actions": "ACTIONS",
+          "asset": "ASSET",
+          "coverage": "COVERAGE",
+          "host": "HOST",
+          "missing": "MISSING",
+          "stale": "STALE",
+          "tenant": "TENANT"
+        },
+        "confirm": {
+          "queue_recache": "هل تريد استعادة قائمة الانتظار لمستأجري {{count}}؟"
+        },
+        "empty": "لا يوجد مستأجرين",
+        "errors": {
+          "bulk_enqueue": "فشل الانتظار المجمع (ربما يكون بعض المستأجرين قد اصطفوا في قائمة الانتظار)",
+          "enqueue": "فشل في قائمة الانتظار",
+          "load": "فشل تحميل التغطية"
+        },
+        "messages": {
+          "bulk_queued": "إعادة التخزين المؤقت في قائمة الانتظار لمستأجري {{count}}",
+          "no_stale": "لا يوجد مستأجرين قديمين - التغطية صحية",
+          "tenant_queued": "?? ??? #{{id}} ?? ????? ???????? ?? {{slug}}"
+        },
+        "summary": {
+          "healthy": "جميع مستأجري {{count}} يتمتعون بصحة جيدة.",
+          "needs_work": "{{needing}} من مستأجري {{total}} لديهم مسارات مفقودة أو قديمة أو معطلة."
+        },
+        "table_aria": "التغطية"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "يتقدم",
+          "dry_run": "التشغيل الجاف"
+        },
+        "auto_recache": {
+          "description": "يقوم بمسح كل لقطة. يقوم بإدراج عمليات إعادة التخزين المؤقت ذات الأولوية المنخفضة للمسارات التي تغير محتوى مصدرها أو انتهت صلاحية TTL الخاصة بها. يعمل على كرون كل 15-30 دقيقة؛ استخدم هذا لتحريك واحد على الفور.",
+          "title": "التخزين المؤقت التلقائي (TTL + انحراف المحتوى)"
+        },
+        "drift": {
+          "description": "يتنقل في كل خريطة موقع مستأجر، ويقارن lastmod مع أوقات اللقطة، ويلتقط الصفحات القديمة من عمليات الكتابة الأولية، أو عمليات الترحيل، أو المهام الموضوعة في قائمة الانتظار. يتم تشغيله كل دقيقتين ويسجل عمليات إعادة التخزين المؤقت ذات الأولوية العالية.",
+          "title": "كشف الانجراف (خريطة الموقع مقابل اللقطات)"
+        },
+        "errors": {
+          "auto_recache": "فشل في تشغيل التخزين المؤقت التلقائي",
+          "drift_detection": "فشل في تشغيل الكشف عن الانجراف",
+          "purge_unexpected": "فشل التطهير غير المتوقع"
+        },
+        "messages": {
+          "auto_recache_applied": "تم تطبيق التخزين التلقائي",
+          "auto_recache_dry_run": "اكتمل التشغيل الجاف للتخزين التلقائي",
+          "drift_applied": "تم تطبيق كشف الانجراف",
+          "drift_dry_run": "اكتمل التشغيل الجاف للانجراف",
+          "purge_dry_run": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "purged_ungated": "تمت إزالة لقطات {{count}} غير المحظورة عبر مستأجري {{tenants}}"
+        },
+        "no_output": "(لا يوجد إخراج)",
+        "purge_ungated": {
+          "description": "مسح اللقطات التي لا يوجد مسارها في مجموعة المستأجر المتوقعة. شائع بعد إيقاف تشغيل إحدى الميزات، أو لتنظيف المسارات الثابتة المعروضة مسبقًا بدون علامات الميزات. يتم ترك مسارات المحتوى الديناميكي بمفردها.",
+          "title": "إزالة اللقطات غير المحظورة (تنظيف 404 لكل مستأجر)"
+        },
+        "result": {
+          "deleted": "تم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "would_delete": "سيتم حذف لقطات {{count}} عبر مستأجري {{tenants}}"
+        },
+        "title": "أتمتة النضارة"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "يلغي",
+          "close_breaker_now": "إغلاق الكسارة الآن",
+          "details": "تفاصيل",
+          "emergency_reset": "إعادة تعيين الطوارئ",
+          "hide": "يخفي",
+          "hide_details": "إخفاء التفاصيل",
+          "reset_queue": "إعادة تعيين قائمة الانتظار"
+        },
+        "engine_healthy": "المحرك سليم",
+        "issue_count_one": "مشكلة {{count}}",
+        "issue_count_other": "مشكلات {{count}}",
+        "modal": {
+          "body_middle": "أو",
+          "body_prefix": "هذا سوف يستعيد كل",
+          "body_suffix": "الصف الذي ظل عامله صامتًا لمدة >30 min، وقم بمسح قاطع الدائرة.",
+          "title": "الطوارئ: إعادة تعيين قائمة الانتظار العالقة",
+          "warning": "استخدم هذا فقط إذا تأكدت من أن قائمة الانتظار عالقة. إذا كان العامل السليم لا يزال قيد التشغيل، فسيؤدي ذلك إلى إنشاء عمل مكرر."
+        },
+        "toasts": {
+          "breaker_reset": "إعادة ضبط قاطع الدائرة",
+          "queue_reset_one": "إعادة تعيين الصف العالق {{count}}؛ تم مسح الكسارة",
+          "queue_reset_other": "إعادة تعيين الصفوف العالقة {{count}}؛ تم مسح الكسارة",
+          "queue_reset_failed": "فشلت إعادة تعيين قائمة الانتظار",
+          "reset_failed": "فشلت إعادة التعيين"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "يغلق",
+          "inspect": "فحص",
+          "inspect_snapshot": "افحص {{path}}",
+          "open_rendered_url": "فتح URL المقدمة",
+          "recache_selected": "تم تحديد ذاكرة التخزين المؤقت ({{count}})",
+          "reload": "إعادة تحميل",
+          "select_all_visible": "حدد كل ما هو مرئي",
+          "select_snapshot": "حدد {{path}}"
+        },
+        "columns": {
+          "actions": "الإجراءات",
+          "age": "عمر",
+          "host": "يستضيف",
+          "http": "HTTP",
+          "route": "طريق",
+          "size": "مقاس",
+          "status": "حالة"
+        },
+        "empty": "لا توجد لقطات تتطابق مع المرشحات",
+        "errors": {
+          "bulk_recache": "فشلت عملية الاستعادة المجمعة",
+          "inspect": "فشل فحص اللقطة",
+          "load": "فشل في تحميل المخزون"
+        },
+        "filters": {
+          "aging": "شيخوخة",
+          "all": "الجميع",
+          "asset_broken": "الأصول مكسورة",
+          "content_drifted": "انجرف المحتوى",
+          "filter": "فلتر",
+          "filter_placeholder": "الطريق أو السلسلة الفرعية المضيفة",
+          "fresh": "طازج",
+          "issue": "مشكلة",
+          "stale": "قديمة",
+          "staleness": "جفاء",
+          "status": "حالة",
+          "status_200": "200 فقط",
+          "status_non_200": "غير 200",
+          "tenant_placeholder": "خياري",
+          "tenant_slug": "سبيكة المستأجر"
+        },
+        "messages": {
+          "bulk_recache": "لقطات {{count}} غير صالحة وتم وضع ذاكرة التخزين المؤقت في قائمة الانتظار"
+        },
+        "inspect": {
+          "age": "عمر",
+          "all_valid": "كلها صالحة",
+          "asset_references": "مراجع الأصول ({{count}})",
+          "canonical": "الكنسي",
+          "dead_assets": "{{count}} ميت",
+          "flags": "أعلام",
+          "h1_count": "H1 (العدد)",
+          "html_parse_warnings": "HTML تحليل التحذيرات",
+          "html_preview": "معاينة HTML (أول 12 كيلو بايت، تمت إزالة البرامج النصية)",
+          "integrity_mismatch": "تم تغيير البايتات منذ العرض - المتوقع sha256 {{expected}}...، حصل على {{actual}}...",
+          "integrity_missing": "لا توجد صورة جانبية sha256 - اللقطة تسبق التحقق من السلامة أو تم تحريرها يدويًا",
+          "integrity_ok": "تتطابق البايتات مع sha256 المكتوبة في وقت العرض",
+          "integrity_status": "السلامة: {{status}}",
+          "integrity_unreadable": "sha256 Sidecar موجود ولكنه مشوه",
+          "invalid_present": "INVALID موجود",
+          "json_ld": "JSON-LD (كتل {{blocks}}، {{status}})",
+          "meta_description": "الوصف التعريفي",
+          "missing": "- مفتقد -",
+          "modal_title": "فحص لقطة",
+          "modified": "معدل",
+          "must_fix": "يجب إصلاح ({{count}})",
+          "no_structured_data": "لا توجد بيانات منظمة",
+          "no_type": "(لا يوجد @نوع)",
+          "none": "(لا أحد)",
+          "old": "{{age}} قديم",
+          "open_graph": "افتح الرسم البياني",
+          "path": "طريق",
+          "seo_score": "النتيجة SEO",
+          "size": "مقاس",
+          "tips": "نصائح ({{count}})",
+          "title": "عنوان"
+        },
+        "selected": "تم تحديد {{count}}",
+        "status": {
+          "asset": "أصل",
+          "content": "محتوى",
+          "content_drifted": "انجرف المحتوى"
+        },
+        "summary": "{{filtered}} من لقطات {{total}}",
+        "table_aria": "جرد لقطة"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "????? ?????? #{{id}}",
+          "close": "يغلق",
+          "reload": "إعادة تحميل",
+          "retry_job": "????? ?????? ?????? #{{id}}",
+          "retry_same_parameters": "أعد المحاولة بنفس المعلمات",
+          "view_details": "??? ?????? ?????? #{{id}}"
+        },
+        "columns": {
+          "actions": "الإجراءات",
+          "by": "بواسطة",
+          "flags": "أعلام",
+          "id": "#",
+          "priority": "أولوية",
+          "queued": "في قائمة الانتظار",
+          "result": "نتيجة",
+          "scope": "نِطَاق",
+          "status": "حالة"
+        },
+        "detail": {
+          "all": "الجميع",
+          "claimed_by": "تمت المطالبة به بواسطة",
+          "duration": "مدة",
+          "error": "خطأ",
+          "exit_code": "رمز الخروج",
+          "finished_at": "انتهى عند",
+          "log_tail": "سجل (الذيل)",
+          "queued_at": "في قائمة الانتظار",
+          "requested_by": "طلب بواسطة",
+          "routes": "الطرق",
+          "started_at": "بدأت في",
+          "status": "حالة",
+          "tenant": "مستأجر",
+          "title": "?????? #{{id}}"
+        },
+        "empty": "لا وظائف",
+        "errors": {
+          "cancel": "تعذر الإلغاء - ربما تكون المهمة قد بدأت",
+          "load": "فشل في تحميل المهام",
+          "retry": "فشلت إعادة المحاولة - ربما لا تزال المهمة الأصلية قيد التشغيل"
+        },
+        "filters": {
+          "all": "الجميع",
+          "cancelled": "تم الإلغاء",
+          "failed": "فشل",
+          "partial": "جزئي",
+          "queued": "في قائمة الانتظار",
+          "running": "جري",
+          "status": "حالة",
+          "succeeded": "نجحت"
+        },
+        "flags": {
+          "dry_run": "التشغيل الجاف",
+          "force": "قوة"
+        },
+        "messages": {
+          "cancelled": "?? ????? ?????? #{{id}}",
+          "retry_queued": "?? ??? ????? ???????? #{{retryId}} ?? ????? ???????? (?? #{{id}})"
+        },
+        "priority": {
+          "high": "عالي",
+          "low": "قليل",
+          "normal": "طبيعي",
+          "tooltip": "الأولوية = {{priority}} (انتصارات أقل)"
+        },
+        "result": {
+          "invalid": "{{count}} غير صالح"
+        },
+        "scope": {
+          "all_tenants": "جميع المستأجرين"
+        },
+        "table_aria": "وظائف"
+      },
+      "events": {
+        "actions": {
+          "reload": "إعادة تحميل"
+        },
+        "columns": {
+          "commit": "يقترف",
+          "details": "تفاصيل",
+          "event": "حدث",
+          "time": "وقت"
+        },
+        "empty": "لا توجد أحداث",
+        "errors": {
+          "load": "فشل تحميل الأحداث"
+        },
+        "filters": {
+          "limit": "حد"
+        },
+        "summary": "أحداث {{count}}",
+        "table_aria": "الأحداث",
+        "types": {
+          "fail": "يفشل",
+          "partial": "جزئي",
+          "success": "نجاح",
+          "supersede": "يحل محل",
+          "unknown": "حدث غير معروف: {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "عمر",
+          "cache_path": "مسار ذاكرة التخزين المؤقت",
+          "failed_at": "فشل في"
+        },
+        "description_action": "تحديث القوة",
+        "description_middle": "يتم تخطي المسارات الموجودة في هذه القائمة تلقائيًا أثناء نافذة التراجع عن الفشل (الافتراضي 6 ساعات). يستخدم",
+        "description_prefix": "مسارات ذاكرة التخزين المؤقت التي فشلت أثناء تشغيل العرض المسبق الأخير.",
+        "description_suffix": "في علامة التبويب نظرة عامة لإعادة المحاولة على الفور.",
+        "empty": "لا توجد إخفاقات الأخيرة",
+        "errors": {
+          "load": "فشل تحميل الفشل"
+        },
+        "table_aria": "الفشل"
+      },
+      "live_connected": "التحديثات الحية متصلة",
+      "audit": {
+        "actions": {
+          "auto_recache": "auto_recache",
+          "cancel": "يلغي",
+          "detect_drift": "detect_drift",
+          "enqueue": "أدخل في قائمة الانتظار",
+          "invalidate": "يبطل",
+          "purge": "تطهير",
+          "purge_unexpected": "purge_unexpected",
+          "reset_breaker": "reset_breaker",
+          "reset_queue": "reset_queue"
+        },
+        "buttons": {
+          "export_csv": "تصدير CSV",
+          "refresh": "ينعش"
+        },
+        "columns": {
+          "action": "فعل",
+          "actor": "ممثل",
+          "details": "تفاصيل",
+          "job": "وظيفة",
+          "outcome": "حصيلة",
+          "tenant": "مستأجر",
+          "when": "متى"
+        },
+        "empty": "لا توجد إدخالات التدقيق.",
+        "fallbacks": {
+          "all": "الجميع",
+          "system": "نظام"
+        },
+        "filters": {
+          "action": "مرشح العمل",
+          "all": "الجميع"
+        },
+        "table_aria": "تاريخ التدقيق"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "وظيفة قائمة الانتظار",
+          "refresh": "ينعش"
+        },
+        "empty_summary": "لا يوجد ملخص متاح.",
+        "errors": {
+          "enqueue_job": "فشل في إدراج المهمة",
+          "load_summary": "فشل تحميل الملخص"
+        },
+        "fields": {
+          "routes": "الطرق",
+          "tenant_slug": "سبيكة المستأجر"
+        },
+        "force_refresh": {
+          "description": "طابور إعادة العرض. اترك كلا الحقلين فارغين لتحديث كل مستأجر ومسار. يلتقط المعالج المضيف المهمة خلال 60 ثانية تقريبًا.",
+          "dry_run": "التشغيل الجاف (الخطة فقط)",
+          "force": "القوة (تجاهل ذاكرة التخزين المؤقت)",
+          "title": "تحديث القوة"
+        },
+        "health": {
+          "cache_unreachable": "ذاكرة التخزين المؤقت غير قابلة للوصول",
+          "healthy": "صحيح",
+          "missing": "{{count}} مفقود",
+          "stale": "{{count}} قديمة"
+        },
+        "hints": {
+          "active_jobs": "{{count}} نشط",
+          "aging": "تقادم {{count}} (> 7 أيام)",
+          "asset_broken": "المراجع الميتة /الأصول/*",
+          "backoff_window": "في نافذة التراجع لمدة 6 ساعات",
+          "cache_age": "أقدم {{oldest}} / أحدث {{newest}}",
+          "content_stale": "محتوى المصدر أحدث من اللقطة",
+          "event_at": "الحدث {{time}}",
+          "no_events": "لا توجد أحداث",
+          "prometheus": "تنسيق نص بروميثيوس",
+          "tenants_routes": "مستأجرو {{tenants}} × مسارات {{routes}}"
+        },
+        "kpi": {
+          "age_stale": "العمر قديم (> 14 يومًا)",
+          "asset_broken": "الأصول مكسورة",
+          "build_commit": "بناء الالتزام",
+          "cache_size": "حجم ذاكرة التخزين المؤقت",
+          "content_stale": "المحتوى قديم",
+          "coverage": "التغطية",
+          "metrics": "المقاييس",
+          "missing": "مفتقد",
+          "queued_jobs": "وظائف في قائمة الانتظار",
+          "recent_failures": "الإخفاقات الأخيرة",
+          "status": "حالة"
+        },
+        "last_run": "آخر تشغيل مكتمل",
+        "messages": {
+          "job_queued": "?? ??? ?????? #{{id}} ?? ????? ????????"
+        },
+        "placeholders": {
+          "routes": "/حول،/مدونة (فارغ = الكل)",
+          "tenant_slug": "على سبيل المثال بنك الوقت للساعة (فارغ = الكل)"
+        },
+        "super_admin_only": "المشرف المتميز فقط"
+      },
+      "polling_fallback": "تراجع الاقتراع",
+      "purge": {
+        "actions": {
+          "auto_recache": "الاسترداد التلقائي بعد التطهير",
+          "dry_run": "التشغيل الجاف",
+          "preview_purge": "معاينة التطهير",
+          "purge_now": "تطهير الآن"
+        },
+        "description_middle": "لجزء مسار واحد،",
+        "description_prefix": "حذف اللقطات المطابقة لنمط الكرة الأرضية. يستخدم",
+        "description_suffix": "لأي نسل. أمثلة:",
+        "errors": {
+          "pattern_required": "النمط مطلوب (على سبيل المثال /blog/*)",
+          "purge_failed": "فشل التطهير"
+        },
+        "fields": {
+          "pattern": "نمط",
+          "tenant_slug": "سبيكة المستأجر"
+        },
+        "messages": {
+          "dry_run": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "purged": "تم مسح لقطات {{count}}{{job}}"
+        },
+        "placeholders": {
+          "pattern": "/blog/* أو /listings/**",
+          "tenant_slug": "اختياري - اتركه فارغًا للجميع"
+        },
+        "result": {
+          "deleted": "لقطات {{count}} المحذوفة",
+          "would_delete": "سيتم حذف لقطات {{count}}"
+        },
+        "title": "تطهير ذاكرة التخزين المؤقت لأحرف البدل"
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "فحص"
+        },
+        "description_prefix": "انظر أي",
+        "description_suffix": "يمتلك النمط مسارًا وما يحصل عليه TTL، دون الإمساك بالتكوين. يستخدم لضبط سياسة النضارة.",
+        "error": "فشل البحث - تحقق من تنسيق المسار (يجب أن يبدأ بـ \"/\")",
+        "fields": {
+          "route": "طريق"
+        },
+        "path_only": "المسار فقط - لا يوجد مخطط أو مضيف",
+        "placeholders": {
+          "route": "/مدونة/مشاركتي"
+        },
+        "result": {
+          "match": "المباراة: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (خصوصية {{specificity}})",
+          "other_patterns": "الأنماط الأخرى التي تتوافق مع هذا المسار:",
+          "ttl": "TTL: {{ttl}} ({{seconds}}s)"
+        },
+        "title": "مفتش TTL",
+        "units": {
+          "days": "{{count}} د",
+          "hours": "{{count}} ح",
+          "minutes": "{{count}} دقيقة"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "يستكشف"
+        },
+        "counts": {
+          "dynamic": "{{count}} ديناميكي",
+          "static": "{{count}} ثابت",
+          "total": "إجمالي {{count}}"
+        },
+        "description_prefix": "تعرف بالضبط على المسارات التي يخطط المحرك لتقديمها للمستأجر - الأرضية الثابتة (الميزة/الوحدة النمطية) بالإضافة إلى URLs الديناميكية من",
+        "description_suffix": "العامل المسرحي يزور هذه القائمة.",
+        "error": "فشل البحث - تحقق من سبيكة المستأجر",
+        "fields": {
+          "tenant_slug": "سبيكة المستأجر"
+        },
+        "none": "(لا أحد)",
+        "placeholders": {
+          "tenant_slug": "ساعة الوقت"
+        },
+        "sections": {
+          "dynamic_routes": "المسارات الديناميكية (بحد أقصى 1000)",
+          "static_routes": "الطرق الثابتة"
+        },
+        "title": "مستكشف خرائط الموقع"
+      },
+      "readonly": {
+        "prefix": "عرض للقراءة فقط - يتم تعطيل أزرار الإجراءات لأن محرك العرض المسبق يعمل عبر كل مستأجر. تسجيل الدخول مع أ",
+        "role": "المشرف الفائق للمنصة",
+        "suffix": "حساب لإدراج المهام أو مسح اللقطات أو تشغيل اكتشاف الانجراف."
+      },
+      "tabs": {
+        "analytics": "التحليلات",
+        "coverage": "التغطية",
+        "events": "الأحداث",
+        "failures": "الفشل",
+        "history": "تاريخ",
+        "inventory": "جرد",
+        "jobs": "وظائف",
+        "overview": "ملخص"
+      },
+      "tabs_aria": "علامات تبويب العرض المسبق",
+      "title": "محرك العرض المسبق"
+    }
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",
@@ -342,7 +905,132 @@
     "refresh": "Refresh",
     "top_areas_title": "Top Areas",
     "top_earners_title": "Top Earners",
-    "top_spenders_title": "Top Spenders"
+    "top_spenders_title": "Top Spenders",
+    "regional": {
+      "meta": {
+        "title": "التحليلات الإقليمية",
+        "description": "رؤى جغرافية وديموغرافية ومشاركة وتطوعية وطلب مساعدة للشركاء الإقليميين."
+      },
+      "controls": {
+        "period": "فترة"
+      },
+      "periods": {
+        "last_30d": "آخر 30 يومًا",
+        "last_90d": "آخر 90 يومًا",
+        "last_12m": "آخر 12 شهرًا",
+        "all_time": "كل الوقت"
+      },
+      "actions": {
+        "refresh_cache": "تحديث ذاكرة التخزين المؤقت",
+        "export_report": "تقرير التصدير"
+      },
+      "stats": {
+        "active_members": "الأعضاء النشطين",
+        "active_members_description": "الأعضاء النشطون في الفترة المشمولة بالتقارير المحددة",
+        "vol_hours_this_month": "ساعات تطوعية",
+        "vol_hours_description": "الساعات التطوعية المسجلة هذا الشهر",
+        "help_requests_this_month": "طلبات المساعدة",
+        "help_requests_description": "تم فتح طلبات المساعدة هذا الشهر",
+        "most_needed_category": "الفئة الأكثر حاجة",
+        "most_needed_description": "الفئة ذات الطلب الأعلى مؤخرًا"
+      },
+      "tabs": {
+        "aria": "أقسام التحليلات الإقليمية",
+        "heatmap": "خريطة حرارة الأعضاء",
+        "demographics": "التركيبة السكانية",
+        "demand_supply": "الطلب والعرض",
+        "engagement": "ارتباط",
+        "help_requests": "طلبات المساعدة",
+        "volunteer": "متطوع"
+      },
+      "sections": {
+        "geographic_activity_density": "كثافة النشاط الجغرافي",
+        "member_demographics": "التركيبة السكانية للأعضاء",
+        "demand_supply_by_category": "الطلب مقابل العرض حسب الفئة",
+        "demand_supply_note": "النسبة الأعلى من 1.0 تعني أن الطلب أعلى من العروض المتاحة في تلك الفئة.",
+        "monthly_engagement_metrics": "مقاييس المشاركة الشهرية",
+        "volunteer_activity": "النشاط التطوعي",
+        "help_request_analysis": "تحليل طلب المساعدة"
+      },
+      "columns": {
+        "rank": "رتبة",
+        "latitude": "خط العرض",
+        "longitude": "خط الطول",
+        "members": "أعضاء",
+        "density": "كثافة",
+        "month": "شهر",
+        "new_members": "أعضاء جدد",
+        "cumulative_total": "المجموع التراكمي",
+        "category": "فئة",
+        "requests": "الطلبات",
+        "offers": "العروض",
+        "ratio": "نسبة",
+        "trend": "اتجاه",
+        "active_members": "الأعضاء النشطين",
+        "vol_hours": "ساعات تطوعية",
+        "new_listings": "قوائم جديدة",
+        "new_events": "أحداث جديدة",
+        "help_requests": "طلبات المساعدة",
+        "organisation": "منظمة",
+        "volunteers": "المتطوعين",
+        "total": "المجموع",
+        "resolved": "تم الحل",
+        "resolution_rate": "معدل القرار",
+        "avg_days_to_resolve": "متوسط أيام لحلها"
+      },
+      "heatmap": {
+        "description": "أفضل المواقع حسب نشاط الأعضاء وكثافتهم."
+      },
+      "demographics": {
+        "age_distribution": "التوزيع العمري",
+        "language_distribution": "توزيع اللغة",
+        "member_growth_12m": "نمو الأعضاء، آخر 12 شهرًا",
+        "total_with_data": "أعضاء {{total}} مع البيانات الديموغرافية",
+        "total_active_members": "{{total}} الأعضاء النشطين"
+      },
+      "volunteer": {
+        "total_hours": "إجمالي الساعات",
+        "avg_hours_per_volunteer": "متوسط ساعة لكل متطوع",
+        "reciprocity_ratio": "نسبة المعاملة بالمثل",
+        "reciprocity_description": "التوازن بين الساعات المقدمة والساعات المستلمة في جميع أنحاء المنطقة.",
+        "top_orgs_title": "أهم المنظمات التطوعية"
+      },
+      "help": {
+        "by_category": "طلبات المساعدة حسب الفئة",
+        "resolution_trend_6m": "اتجاه القرار، آخر 6 أشهر"
+      },
+      "empty": {
+        "infinity": "∞",
+        "no_geographic_data": "لا توجد بيانات جغرافية متاحة لهذه الفترة.",
+        "no_listing_data": "لا تتوفر بيانات طلب الإدراج لهذه الفترة.",
+        "no_engagement_data": "لا تتوفر بيانات المشاركة لهذه الفترة.",
+        "no_organisation_data": "لا يوجد نشاط تنظيمي متاح لهذه الفترة.",
+        "no_help_request_data": "لا توجد بيانات لطلب المساعدة متاحة لهذه الفترة.",
+        "select_tab_to_load": "حدد علامة التبويب هذه لتحميل البيانات."
+      },
+      "empty_value": "-",
+      "loading": {
+        "section": "جارٍ تحميل التحليلات"
+      },
+      "errors": {
+        "data_unavailable": "البيانات غير متوفرة لهذه الفترة.",
+        "load_data": "تعذر تحميل قسم التحليلات هذا: {{error}}",
+        "load_overview": "تعذر تحميل النظرة العامة على التحليلات الإقليمية.",
+        "failed_to_load_data": "تعذر تحميل بيانات التحليلات."
+      },
+      "units": {
+        "days_count": "{{count}} من الأيام"
+      },
+      "age_groups": {
+        "under_25": "تحت 25",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
+        "65_plus": "65+",
+        "unknown": "مجهول"
+      }
+    }
   },
   "billing": {
     "actions": "Actions",
@@ -5845,7 +6533,157 @@
     "placeholder_guardian_email": "guardian@example.com",
     "placeholder_help_url": "https://...",
     "placeholder_option_key": "e.g. needs_additional_support",
-    "placeholder_ward_email": "ward@example.com"
+    "placeholder_ward_email": "ward@example.com",
+    "help": {
+      "title": "كيف تعمل الحماية هنا",
+      "subtitle": "دليل للتدفقات التي تراها على لوحة المعلومات هذه - وضع العلامات، والتنشيط، واستقلالية الأعضاء، والتدقيق. قم بتوسيع أي قسم لمزيد من التفاصيل.",
+      "about": {
+        "aria": "حول لوحة القيادة هذه",
+        "title": "حول لوحة القيادة هذه",
+        "intro": "لوحة معلومات الحماية هي وجهة نظرك لكل عضو يقوم النظام بحمايته بشكل فعال. انه السطوح:",
+        "flagged_messages_label": "الرسائل التي تم وضع علامة عليها",
+        "flagged_messages_body": "- نسخ من الرسائل المرسلة أو المستلمة من قبل الأعضاء المراقبين.",
+        "guardian_assignments_label": "مهام الوصي",
+        "guardian_assignments_body": "- العلاقات التي يتوسط فيها المنسق في الاتصال بالجناح.",
+        "member_preferences_label": "تفضيلات الأعضاء",
+        "member_preferences_body": "- ما هي خيارات الحماية التي اختارها كل عضو تم وضع علامة عليه.",
+        "live_counts": "الأرقام الموجودة في الأعلى مباشرة - يُظهر عنصر الحماية الأحمر في الشريط الجانبي عدد العلامات المهمة التي لم تتم مراجعتها حتى تتمكن من تحديد متى تكون هناك حاجة إلى الاهتمام دون فتح الصفحة."
+      },
+      "flagging": {
+        "aria": "كيف يتم وضع علامة على الأعضاء",
+        "title": "كيف يتم وضع علامة على الأعضاء",
+        "intro": "لا يتم تطبيق الأعلام أبدًا بصمت خلف ظهر العضو. هناك طريقان:",
+        "most_common": "الأكثر شيوعًا",
+        "self_identification_title": "تحديد الهوية أثناء الصعود",
+        "self_identification_prefix": "قام العضو بوضع علامة على خيار واحد أو أكثر في خطوة الحماية أثناء التسجيل (على سبيل المثال.",
+        "or": "أو",
+        "example_vulnerable": "أنا أعتبر نفسي شخصًا بالغًا ضعيفًا",
+        "example_vetted": "أفضّل فقط التفاعل مع الأعضاء الذين تم فحصهم",
+        "self_identification_suffix": "يقرأ النظام المشغلات المرفقة بكل خيار محدد ويقوم بدمجها أو دمجها في مجموعة واحدة من وسائل الحماية المكتوبة عليها",
+        "self_revoke_prefix": "ونظرًا لأن هذه العناصر تم اختيارها ذاتيًا، فيمكن للعضو إلغاء أي منها",
+        "settings_safeguarding": "الإعدادات -> الحماية",
+        "self_revoke_suffix": "في أي وقت - دون الحاجة إلى سؤالك.",
+        "admin_initiated": "بمبادرة من المشرف",
+        "manual_monitoring_title": "المراقبة اليدوية",
+        "manual_monitoring_prefix": "أنت تفتح",
+        "user_monitoring": "مراقبة المستخدم",
+        "manual_monitoring_suffix": "في ضوابط الوسيط ووضع العضو تحت الإشراف مع ذكر السبب وتاريخ انتهاء الصلاحية الاختياري. يُستخدم لمراجعات الامتثال أو التحقيقات في الشكاوى أو فترات الاختبار بعد وقوع الحادث."
+      },
+      "triggers": {
+        "aria": "ما ينشط كل الزناد",
+        "title": "ما ينشط كل الزناد",
+        "intro_prefix": "خيار الحماية (محدد لكل مستأجر في",
+        "safeguarding_options": "خيارات الحماية",
+        "intro_suffix": ") يحمل كتلة JSON من المشغلات. عندما يحدد العضو الخيار، يتم تنشيط المشغلات ذات الصلة:",
+        "col_effect": "تأثير",
+        "col_trigger_key": "مفتاح الزناد",
+        "effects": {
+          "notify_admin_on_selection": "تحصل على إشعار في الوقت الفعلي بمجرد تحديد الخيار.",
+          "requires_broker_approval": "تم نسخ جميع الرسائل الصادرة لمراجعة الوسيط؛ المباريات تحتاج إلى تسجيل الخروج.",
+          "requires_vetted_interaction": "يتم إخفاء الأعضاء الذين لم يتم فحصهم من موجز اكتشاف العضو.",
+          "restricts_matching": "يتم تفعيل سير عمل الموافقة على المطابقة - بدون مقدمات تلقائية.",
+          "restricts_messaging": "وضع علامة على العضو الخاضع للمراقبة؛ تبدأ نسخ الرسالة.",
+          "vetting_type_required": "يحدد عملية التدقيق التي يجب أن يقوم بها العضو المتصل، على سبيل المثال garda_vetting."
+        },
+        "table_aria": "حماية آثار الزناد",
+        "merge_note": "عندما يحدد أحد الأعضاء خيارات متعددة، يتم تشغيل الدمج أو: المجموعة الأكثر حماية هي التي تفوز. قد يؤدي إلغاء أحد الخيارات إلى تحرير بعض وسائل الحماية مع إبقاء الخيارات الأخرى نشطة - حيث يقوم النظام بإعادة التقييم من البداية في كل مرة."
+      },
+      "vetting": {
+        "aria": "بوابات الفحص",
+        "title": "كيفية فحص تفاعلات البوابات",
+        "intro_prefix": "عندما يتطلب العضو الذي تم الإبلاغ عنه نوعًا معينًا من التدقيق، يفرض النظام ذلك في ثلاث نقاط منفصلة - ليس فقط كتحذير لواجهة المستخدم، ولكن ككتلة صلبة تحتوي على رمز خطأ محدد",
+        "intro_suffix": "عاد إلى المتصل.",
+        "discovery_label": "مرشح الاكتشاف",
+        "discovery_body": "- محرك المطابقة الذكي لا يظهر أبدًا الأعضاء الذين تم وضع علامة عليهم لشخص لا يخضع للتدقيق المطلوب. فهي غير مرئية، وليست باللون الرمادي.",
+        "messaging_label": "المراسلة",
+        "messaging_prefix": "- إذا كان المرسل يفتقر إلى التدقيق الذي يتطلبه المتلقي،",
+        "messaging_middle": "يعود",
+        "messaging_suffix": "مع الأنواع المحددة المذكورة.",
+        "match_label": "الموافقة على المباراة",
+        "match_body": "- حتى إذا تم إرسال المطابقة يدويًا للموافقة عليها، فسيتم حظرها في الاتجاهين إذا تم وضع علامة على أحد الطرفين وكان الطرف الآخر يفتقر إلى الفحص المطلوب.",
+        "group_label": "التبادلات الجماعية",
+        "group_body": "- تفشل إضافة مشارك إذا كان المنظم أو المشارك يتطلب فحص الآخر فلا يصمد.",
+        "staff_bypass_label": "تجاوز الموظفين:",
+        "staff_bypass_body": "يرى المسؤولون ومسؤولو المستأجرون والوسطاء والمسؤولون المتميزون المجموعة الكاملة أثناء الاكتشاف (لأغراض التعيين). لا تزال المراسلة وتقديم المطابقة وبوابات التبادل الجماعي تنطبق على الجميع - ولا يوجد تجاوز على مستوى المسؤول لهؤلاء."
+      },
+      "assignments": {
+        "aria": "مهام الوصي",
+        "title": "مهام الوصي / الجناح",
+        "intro": "يقوم تعيين الوصي بإقران الجناح (العضو المحمي) مع الوصي (منسق موثوق به أو أحد أفراد الأسرة). استخدم هذا عندما يحتاج العضو إلى شخص معين يتوسط في تفاعلاته، بدلاً من مجموعة الوسطاء العامة.",
+        "create_label": "يخلق",
+        "create_prefix": "من علامة التبويب \"المهام\" أو من خلال الانتقال إلى",
+        "assign_guardian_path": "الوسيط/المراقبة -> تعيين الوصي",
+        "create_suffix": "يتلقى كلا الطرفين بريدًا إلكترونيًا وإشعارًا بالجرس داخل التطبيق.",
+        "consent_label": "موافقة",
+        "consent_prefix": "- يجب أن يقبل الجناح؛ يتم تسجيل قبولهم في",
+        "consent_middle": "يصبح التكليف فقط",
+        "active": "نشيط",
+        "consent_suffix": "بمجرد قبولها.",
+        "revoke_label": "إبطال",
+        "revoke_prefix": "- يمكن للمسؤول أو الجناح إلغاء. الإلغاء ناعم (sets",
+        "revoke_suffix": ") لذلك يتم الحفاظ على مسار التدقيق.",
+        "queue_note": "لا تحل تعيينات الأوصياء محل قائمة انتظار مراجعة الوسيط - فلا تزال الرسائل المراقبة تتدفق هناك. يعتبر الوصي طبقة إضافية موثوقة، وليس بديلاً عن مراقبة النظام الأساسي."
+      },
+      "preferences": {
+        "aria": "علامة تبويب تفضيلات الأعضاء",
+        "title": "قراءة تفضيلات الأعضاء",
+        "intro_prefix": "تسرد علامة التبويب \"تفضيلات الأعضاء\" كل عضو تم وضع علامة عليه إلى جانب الخيارات المحددة التي حددها. هذه البيانات",
+        "special_category": "البيانات الشخصية فئة خاصة",
+        "intro_suffix": "تحت GDPR - تعامل معه بعناية.",
+        "audit_logged": "يتم تسجيل كل عرض بواسطة المستخدم ID والطابع الزمني.",
+        "not_public": "ولا يتم عرضه أبدًا في الملف الشخصي العام للعضو.",
+        "admin_only": "لا يمكن للأعضاء الآخرين رؤية علامة التبويب هذه - يتطلب الوصول دور فئة المسؤول.",
+        "confidential": "لا تناقش أعلام عضو آخر مع أي شخص خارج فريق الحماية.",
+        "activity_trail": "انقر فوق صف العضو لفتح سجل نشاطه الكامل - كل رسالة يتم نسخها، وكل تغيير في المهمة، وكل تنشيط للمشغل، بترتيب زمني. يمكن تنزيل المسار باسم CSV لطلبات الجهات التنظيمية أو تقارير الحوادث."
+      },
+      "autonomy": {
+        "aria": "مبدأ الحكم الذاتي للبالغين",
+        "title": "مبدأ الحكم الذاتي للبالغين",
+        "rule_label": "القاعدة:",
+        "rule_prefix": "يتمتع الشخص البالغ الذي عرّف نفسه بأنه يحتاج إلى وسائل حماية وقائية بالحق المطلق في المشاهدة",
+        "and": "و",
+        "rule_middle": "قم بإلغاء هذه الحماية دون مطالبة المسؤول. المشرفين",
+        "cannot": "لا أستطيع",
+        "rule_suffix": "حظر الإلغاء الذاتي للعضو.",
+        "grounded_prefix": "وهذا متأصل في",
+        "guidance": "إرشادات Safeguarding Ireland المتعلقة بالاستقلالية للبالغين",
+        "grounded_suffix": "(والإرشادات القانونية المكافئة لـ UK - \"Making Safeguarding Personal\"). يؤدي إلغاء العلم إلى:",
+        "trigger_reevaluation": "إعادة تقييم المحفزات -> قد يتم رفع متطلبات المراقبة/الموافقة.",
+        "admin_notification": "إشعار جرس داخل التطبيق للمسؤولين/الوسطاء - يتم إخبارك، ولكن لا يمكنك الاعتراض عليه.",
+        "audit_log_prefix": "إدخال سجل التدقيق مع",
+        "coercion_note": "إذا كنت تعتقد أن الإلغاء قد تم بالإكراه من قبل طرف ثالث، فإن الرد الصحيح هو إجراء محادثة وقائية مع العضو (وإذا لزم الأمر، الإحالة إلى الخدمات القانونية) - وليس إعادة تطبيق العلامة عبر عناصر التحكم الإدارية."
+      },
+      "annual_review": {
+        "aria": "عملية المراجعة السنوية",
+        "title": "عملية المراجعة السنوية",
+        "intro_prefix": "في الأول من كل شهر،",
+        "intro_suffix": "يعمل الأمر تلقائيًا. بالنسبة لأي تفضيل مضى عليه أكثر من 365 يومًا دون مراجعة حديثة، فإنه:",
+        "step_reminder": "يرسل للأعضاء بريدًا إلكترونيًا وجرسًا يطلب منهم المراجعة - الطوابع",
+        "step_wait": "ينتظر 30 يوما.",
+        "step_escalate": "في حالة عدم الاستجابة، قم بإخطار المسؤولين/الوسطاء عبر الجرس + البريد الإلكتروني - الطوابع",
+        "flag_stays_active": "يظل العلم نشطًا بغض النظر.",
+        "escalation_note": "يعد التصعيد بمثابة حث للمنسق على التواصل شخصيًا - وهو ليس إشارة لتجريد الحماية. والسكوت ليس موافقة على إزالة الضمانات.",
+        "settings_prefix": "المشاهدة",
+        "settings_suffix": "يعتبر بمثابة مراجعة - الطوابع الخلفية",
+        "settings_tail": "تلقائيا عندما يفتح العضو الصفحة."
+      },
+      "audit": {
+        "aria": "مسار التدقيق وتصدير CSV",
+        "title": "مسار التدقيق وتصدير CSV",
+        "intro_prefix": "تتم كتابة كل إجراء متعلق بالحماية",
+        "intro_middle": "مع",
+        "intro_suffix": "تجمع نقطة نهاية نشاط كل عضو بين ثلاثة مصادر في مخطط زمني واحد من الأحدث إلى الأول:",
+        "activity_log_label": "سجل النشاط",
+        "activity_log_body": "- تحديدات الخيارات، وإلغاء الموافقة، وطرق عرض المسؤول، وتنشيط التنشيط.",
+        "message_copies_label": "نسخ الرسالة",
+        "message_copies_body": "- كل رسالة يرسلها أو يستقبلها العضو أثناء مراقبتها.",
+        "assignment_history_label": "تاريخ المهمة",
+        "assignment_history_body": "- تعيينات الوصي التي تم إنشاؤها أو إلغاؤها تتعلق بالعضو.",
+        "export_prefix": "استخدم",
+        "export_csv": "تصدير CSV",
+        "export_suffix": "الإجراء الخاص بعرض تفاصيل العضو عندما تحتاج إلى ملف يمكنك إرفاقه بتقرير الحادث أو مشاركته مع جهة تنظيمية. CSV هو UTF-8 مع BOM لذا يفتحه Excel بشكل صحيح دون المطالبة بالتشفير."
+      }
+    }
   },
   "stats": {
     "active_listings": "Active Listings",
@@ -9204,13 +10042,21 @@
   "caring_workflow": {
     "meta": {
       "title": "KISS Workflow Console",
-      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements.",
+      "page_title": "سير عمل مجتمع الرعاية"
     },
-    "loading": "Loading KISS workflow data",
+    "loading": {
+      "workflow": "جارٍ تحميل سير عمل مجتمع الرعاية..."
+    },
     "actions": {
       "open_hour_review": "Open hour review",
       "open_report_pack": "Open report pack",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "retry": "أعد المحاولة",
+      "approve": "يعتمد",
+      "decline": "انخفاض",
+      "escalate": "تصعيد",
+      "re_escalate": "إعادة التصعيد"
     },
     "stats": {
       "pending_reviews": "Pending reviews",
@@ -9344,7 +10190,11 @@
         "last_90_days": "Last 90 days",
         "year_to_date": "Year to date",
         "previous_quarter": "Previous quarter"
-      }
+      },
+      "review_sla_days_description": "سيتم وضع علامة على الساعات التي لم تتم مراجعتها خلال هذه الأيام العديدة على أنها متأخرة في قائمة الانتظار.",
+      "escalation_sla_days_description": "سيتم تصعيد العناصر المتأخرة التي لم يتم اتخاذ إجراء بشأنها خلال هذه الأيام الإضافية العديدة تلقائيًا.",
+      "monthly_statement_day_description": "يوم الشهر الذي يتم فيه إنشاء كشوفات الأعضاء (على سبيل المثال، 1 = اليوم الأول من كل شهر).",
+      "default_hour_value_chf_description": "يستخدم لحساب القيمة الاجتماعية المقدرة على البيانات والتقارير البلدية."
     },
     "member_statement": {
       "title": "Member statements",
@@ -9363,7 +10213,11 @@
       "invalid_member": "Enter a valid member ID.",
       "load_failed": "Failed to load the member statement.",
       "export_success": "Member statement CSV prepared.",
-      "export_failed": "Failed to export the member statement."
+      "export_failed": "Failed to export the member statement.",
+      "approved_support_hours": "ساعات الدعم المعتمدة",
+      "pending_support_hours": "ساعات الدعم المعلقة",
+      "wallet_hours_earned": "ساعات المحفظة المكتسبة",
+      "wallet_hours_spent": "ساعات المحفظة التي قضاها"
     },
     "support_relationships": {
       "title": "Recurring support relationships",
@@ -9460,146 +10314,519 @@
       "upload_failed": "Could not upload the paper form.",
       "confirmed": "Paper onboarding confirmed and member account created.",
       "confirm_failed": "Could not confirm this paper onboarding intake.",
-      "load_failed": "Could not load paper onboarding intakes."
+      "load_failed": "Could not load paper onboarding intakes.",
+      "upload_success": "تم تحميل كمية الورق.",
+      "confirm_success": "تم تأكيد العضو وإنشاء الحساب."
     },
     "invite_card": {
       "brand": "Caring Community",
       "subtitle": "Your Invitation Code",
       "instructions": "Visit the link below or ask your coordinator to help you get started.",
       "valid_until": "Valid until {{date}}"
+    },
+    "empty": {
+      "value": "-",
+      "unassigned": "غير معين"
+    },
+    "pending": {
+      "title": "المراجعات المعلقة",
+      "description_prefix": "ساعات في انتظار مراجعة المنسق والموافقة عليه. العناصر التي تم وضع علامة عليها",
+      "description_middle": "لقد تجاوزت المراجعة SLA؛ تم وضع علامة على العناصر",
+      "description_suffix": "لقد تجاوزت التصعيد SLA. الموافقة على كل طلب أو رفضه أو إسناده إلى منسق محدد.",
+      "needs_review": "يحتاج إلى مراجعة",
+      "escalate_now": "تصعيد الآن",
+      "escalated_count": "تم تصعيد {{count}}",
+      "overdue_count": "{{count}} متأخر",
+      "empty": "لا شيء معلق. قائمة انتظار المراجعة واضحة.",
+      "logged": "تم تسجيل {{date}}",
+      "submitted": "تم إرسال {{date}}",
+      "age_days": "{{count}} عمره يوم",
+      "age_days_plural": "{{count}} عمرها أيام",
+      "assigned_to": "تم تعيينه إلى {{name}}",
+      "escalated_at": "تم تصعيد {{date}}",
+      "assign_coordinator": "تعيين منسق",
+      "assign_success": "تم تعيين المنسق.",
+      "assign_failed": "لا يمكن تعيين المنسق.",
+      "manual_escalation_note": "تم التصعيد يدويًا بعد أيام {{count}} المعلقة.",
+      "escalate_success": "تم تصعيد المراجعة.",
+      "escalate_failed": "تعذر تصعيد المراجعة.",
+      "approve_success": "تمت الموافقة على المراجعة.",
+      "decline_success": "تم رفض المراجعة.",
+      "decision_failed": "لا يمكن تسجيل القرار."
+    },
+    "tandem": {
+      "title": "اقتراحات Tandem",
+      "description": "AI أزواج الداعم والمتلقي المقترحة بناءً على الموقع واللغة والمهارات والتوافر.",
+      "empty": "لا توجد اقتراحات في الوقت الراهن. أضف المزيد من الأعضاء أو اضبط مدى التوفر.",
+      "load_failed": "تعذر تحميل الاقتراحات الترادفية.",
+      "dismiss_success": "تم رفض الاقتراح.",
+      "dismiss_failed": "تعذر رفض الاقتراح.",
+      "relationship_title": "Tandem: {{supporter}} و{{recipient}}",
+      "distance_km": "{{value}} كم",
+      "same_language": "نفس اللغة",
+      "complementary_skills": "مهارات تكميلية",
+      "availability_overlap": "تداخل التوفر",
+      "shared_interests": "المصالح المشتركة",
+      "score": "النتيجة {{value}}%",
+      "dismiss": "رفض",
+      "create": "قم بإنشاء Tandem"
+    },
+    "safeguarding": {
+      "title": "تقارير الحماية",
+      "description": "المخاوف التي أثارها الأعضاء بشأن الأعضاء أو المنسقين أو المنظمات الأخرى.",
+      "view_all": "عرض الكل",
+      "no_data": "لا توجد بيانات حماية متاحة حتى الآن.",
+      "overdue": "تأخرت",
+      "no_reports": "لا توجد تقارير حتى الآن.",
+      "table_aria": "تقارير الحماية الأخيرة",
+      "open": "يفتح",
+      "org_subject": "????? #{{id}}",
+      "age_hours": "{{count}}h",
+      "age_days": "{{count}}d",
+      "columns": {
+        "severity": "خطورة",
+        "category": "فئة",
+        "subject": "موضوع",
+        "status": "حالة",
+        "age": "عمر",
+        "action": "فعل"
+      },
+      "severity": {
+        "critical": "شديد الأهمية",
+        "high": "عالي",
+        "medium": "واسطة",
+        "low": "قليل"
+      },
+      "status": {
+        "submitted": "مُقَدَّم",
+        "triaged": "فرز",
+        "investigating": "التحقيق",
+        "resolved": "تم الحل",
+        "dismissed": "مرفوض"
+      }
+    },
+    "role_pack": {
+      "title": "الإعدادات المسبقة للدور",
+      "description": "مجموعات الأذونات التي تم تكوينها مسبقًا لكل دور مجتمع رعاية. قم بتثبيت حزمة الأدوار الكاملة لإعداد منسقيك بسرعة مع الوصول الصحيح. {{countLabel}}.",
+      "installed_count": "تم تثبيت الإعدادات المسبقة لدور {{installed}} لـ {{total}}",
+      "available_count": "تتوفر الإعدادات المسبقة لدور {{count}}",
+      "installing": "جارٍ التثبيت...",
+      "install": "تثبيت حزمة الدور",
+      "install_success": "تم تثبيت حزمة الدور.",
+      "install_failed": "تعذر تثبيت حزمة الأدوار.",
+      "installed": "تم التثبيت",
+      "not_installed": "غير مثبت",
+      "permissions_granted": "تم منح أذونات {{installed}} لـ {{total}}",
+      "presets": {
+        "national_admin": {
+          "title": "المشرف الوطني",
+          "description": "الإشراف على مستوى المنصة في جميع الكانتونات والمنظمات."
+        },
+        "canton_admin": {
+          "title": "مدير الكانتون",
+          "description": "إدارة جميع أنشطة مجتمع الرعاية داخل الكانتون."
+        },
+        "municipality_admin": {
+          "title": "مدير البلدية",
+          "description": "إدارة نشاط مجتمع الرعاية داخل البلدية."
+        },
+        "cooperative_coordinator": {
+          "title": "منسق التعاونية",
+          "description": "التنسيق بين التعاونية المحلية وأعضائها."
+        },
+        "organisation_coordinator": {
+          "title": "منسق المنظمة",
+          "description": "تنسيق المتطوعين والشركاء لمنظمة واحدة."
+        },
+        "trusted_reviewer": {
+          "title": "مراجع موثوق",
+          "description": "قم بالموافقة على ساعات العمل بسرعة من خلال الإشراف الخفيف."
+        }
+      }
+    },
+    "favours": {
+      "title": "تفضل غير رسمية",
+      "loading": "تحميل...",
+      "total_recorded": "تم تسجيل إجمالي {{count}}",
+      "loading_favours": "جارٍ تحميل المزايا...",
+      "empty": "لم يتم تسجيل أي تفضل حتى الآن.",
+      "anonymous": "مجهول",
+      "unknown": "مجهول"
+    },
+    "invite_codes": {
+      "title": "رموز الدعوة",
+      "description": "قم بإنشاء رمز قابل للطباعة يمكن للعضو الجديد استخدامه للانضمام دون الحاجة إلى دعوة عبر البريد الإلكتروني.",
+      "label": "التسمية (اختياري)",
+      "label_placeholder": "على سبيل المثال لجارة مريم",
+      "generate": "إنشاء رمز",
+      "new_code": "كود الدعوة الجديد",
+      "expires": "تنتهي الصلاحية: {{date}}",
+      "copied": "منسوخ!",
+      "copy_url": "انسخ URL",
+      "print_card": "طباعة البطاقة",
+      "open": "يفتح",
+      "table_aria": "رموز الدعوة",
+      "empty": "لا توجد رموز دعوة حتى الآن. قم بإنشاء واحد أعلاه لمشاركته مع عضو محتمل.",
+      "load_failed": "تعذر تحميل رموز الدعوة.",
+      "generate_success": "تم إنشاء رمز الدعوة.",
+      "generate_failed": "تعذر إنشاء رمز الدعوة.",
+      "columns": {
+        "code": "شفرة",
+        "label": "ملصق",
+        "expires": "تنتهي",
+        "status": "حالة",
+        "actions": "الإجراءات"
+      },
+      "status": {
+        "active": "نشيط",
+        "used": "مستخدم",
+        "used_by": "يستخدم بواسطة {{name}}",
+        "expired": "منتهي الصلاحية"
+      }
+    },
+    "predictive": {
+      "title": "رؤى تنبؤية",
+      "subtitle": "توقعات تطلعية وتنبيهات استباقية. اكتشف أوجه القصور في الرعاية الإقليمية قبل أن تصبح حالات طوارئ.",
+      "not_enough_activity": "لا يوجد نشاط كافٍ حتى الآن للتنبؤ به. أعود في غضون بضعة أسابيع.",
+      "no_forecast": "لا توجد بيانات توقعات متاحة حتى الآن.",
+      "hours_forecast": "توقعات ساعات",
+      "active_members": "الأعضاء النشطين",
+      "recipients_reached": "وصلت المستلمين",
+      "history": "تاريخ",
+      "forecast": "تنبؤ بالمناخ",
+      "confidence": "ثقة",
+      "trend_growing": "نمو {{value}}%",
+      "trend_declining": "انخفاض {{value}}%",
+      "trend_stable": "مستقر",
+      "sub_region_coverage": "تغطية المنطقة الفرعية (آخر {{days}} أيام)",
+      "under_supplied_count": "{{count}} غير متوفر",
+      "sub_region_coverage_aria": "تغطية المنطقة الفرعية",
+      "helper_churn": "التغيير المساعد (منقضي >= {{days}} من الأيام)",
+      "overall_percent": "{{value}}% بشكل عام",
+      "helper_churn_note": "{{lapsed}} من {{prior}} المساعدون النشطون سابقًا لم يسجلوا ساعات العمل مؤخرًا.",
+      "helper_churn_aria": "مساعد بعنف حسب الفئة",
+      "coefficient_drift": "معامل الفئة الانجراف",
+      "drifting_count": "{{count}} الانجراف",
+      "coefficient_drift_note": "يتم وضع علامة على الفئات ذات الانجراف المطلق > {{threshold}}%. قم بمراجعة المعاملات الأساسية في محرر معاملات الفئة.",
+      "coefficient_drift_aria": "معامل الفئة الانجراف",
+      "proactive_alerts": "تنبيهات استباقية",
+      "columns": {
+        "sub_region": "المنطقة الفرعية",
+        "requested_90d": "مطلوب (90د)",
+        "fulfilled_90d": "مستوفاة (90 د)",
+        "coverage": "التغطية",
+        "status": "حالة",
+        "category": "فئة",
+        "prior_active": "نشط مسبقًا",
+        "lapsed": "انقضت",
+        "churn_rate": "معدل الزبد",
+        "baseline": "خط الأساس",
+        "expected_hrs": "الساعات المتوقعة",
+        "observed_hrs": "ساعات ملاحظه",
+        "drift": "الانجراف",
+        "sample": "عينة"
+      },
+      "status": {
+        "under_supplied": "نقص المعروض",
+        "ok": "نعم"
+      },
+      "severity": {
+        "critical": "شديد الأهمية",
+        "warning": "تحذير",
+        "info": "معلومات"
+      }
+    },
+    "relationships": {
+      "title": "دعم العلاقات",
+      "description": "أزواج الداعمين والمتلقين المستمرة وعمليات تسجيل الوصول المتكررة.",
+      "active": "نشيط",
+      "paused": "متوقف مؤقتًا",
+      "check_ins_due": "تسجيلات الوصول مستحقة",
+      "expected_hours": "الساعات المتوقعة",
+      "supporter": "مؤيد",
+      "supporter_placeholder": "ابحث عن الداعم",
+      "recipient": "متلقي",
+      "recipient_placeholder": "ابحث عن المستلم",
+      "no_members": "لم يتم العثور على أعضاء",
+      "clear": "واضح",
+      "relationship_title": "عنوان العلاقة",
+      "frequency_label": "تكرار",
+      "expected_hours_per_visit": "الساعات المتوقعة لكل زيارة",
+      "start_date": "تاريخ البدء",
+      "create": "إنشاء علاقة",
+      "empty": "لا توجد علاقات دعم حتى الآن. إنشاء واحد أعلاه.",
+      "pair": "{{supporter}} يدعم {{recipient}}",
+      "started": "تم بدء تشغيل {{date}}",
+      "next_check_in": "تسجيل الوصول التالي {{date}}",
+      "pause": "يوقف",
+      "resume": "سيرة ذاتية",
+      "log_date": "تاريخ",
+      "log_hours": "ساعات",
+      "log_note": "ملاحظة (اختياري)",
+      "log_hours_action": "ساعات السجل",
+      "load_failed": "تعذر تحميل علاقات الدعم.",
+      "pick_different_members": "اختر عضوين مختلفين.",
+      "create_success": "تم إنشاء علاقة دعم.",
+      "create_failed": "لا يمكن إنشاء علاقة دعم.",
+      "update_success": "تم تحديث علاقة الدعم.",
+      "update_failed": "لا يمكن تحديث علاقة الدعم.",
+      "log_validation_failed": "أدخل تاريخًا صالحًا و0.25-24 ساعة.",
+      "log_success": "تم تسجيل ساعات الدعم.",
+      "log_failed": "لا يمكن تسجيل ساعات الدعم.",
+      "frequency": {
+        "weekly": "أسبوعي",
+        "fortnightly": "كل أسبوعين",
+        "monthly": "شهريا",
+        "ad_hoc": "مخصصة"
+      },
+      "status": {
+        "active": "نشيط",
+        "paused": "متوقف مؤقتًا",
+        "completed": "مكتمل",
+        "cancelled": "تم الإلغاء"
+      }
     }
   },
   "municipal_reports": {
     "meta": {
-      "title": "Municipal Impact Reports",
-      "description": "Prepare KISS-style reporting for verified hours, active members, trusted organisations, and municipal value conversations."
+      "title": "تقارير الأثر البلدي",
+      "description": "قم بإعداد تقارير بأسلوب KISS لساعات العمل التي تم التحقق منها، والأعضاء النشطين، والمنظمات الموثوقة، ومحادثات القيمة البلدية."
     },
     "actions": {
-      "analytics": "Community analytics",
-      "impact_report": "Impact report",
-      "open_source_report": "Open source report",
-      "export_csv": "Export CSV",
-      "export_pdf": "Export PDF"
+      "analytics": "تحليلات المجتمع",
+      "impact_report": "تقرير التأثير",
+      "open_source_report": "تقرير مفتوح المصدر",
+      "export_csv": "تصدير CSV",
+      "export_pdf": "تصدير PDF"
     },
     "stats": {
-      "report_pack": "Report pack",
-      "ready": "Ready",
-      "hours_source": "Hours source",
-      "verified": "Verified",
-      "audience": "Audience",
-      "municipal": "Municipal",
-      "exports": "Exports",
+      "report_pack": "حزمة التقارير",
+      "ready": "مستعد",
+      "hours_source": "مصدر ساعات",
+      "verified": "تم التحقق منه",
+      "audience": "جمهور",
+      "municipal": "البلدية",
+      "exports": "صادرات",
       "csv_pdf": "CSV/PDF",
-      "verified_hours": "Verified hours",
-      "participants": "Participants",
-      "organisations": "Organisations",
-      "total_value": "Total value"
+      "verified_hours": "ساعات التحقق",
+      "participants": "مشاركون",
+      "organisations": "المنظمات",
+      "total_value": "القيمة الإجمالية"
     },
-    "loading": "Loading municipal impact data",
-    "period": "Reporting period",
-    "hour_value": "Hour value",
-    "multiplier": "Social multiplier",
+    "loading": "تحميل بيانات الأثر البلدي",
+    "period": "فترة التقرير",
+    "hour_value": "قيمة الساعة",
+    "multiplier": "المضاعف الاجتماعي",
     "sections": {
-      "categories": "Support categories",
-      "trends": "Verified activity trend",
-      "readiness": "Procurement readiness signals"
+      "categories": "فئات الدعم",
+      "trends": "اتجاه النشاط الذي تم التحقق منه",
+      "readiness": "إشارات الاستعداد للشراء"
     },
     "empty": {
-      "categories": "No completed support categories in this period.",
-      "trends": "No verified activity trend is available for this period."
+      "categories": "لا توجد فئات دعم مكتملة في هذه الفترة.",
+      "trends": "لا يوجد اتجاه نشاط تم التحقق منه متاح لهذه الفترة."
     },
     "values": {
-      "hours": "{{count}}h",
-      "activities": "{{count}} activities",
-      "trend_detail": "{{participants}} participants, {{activities}} activities",
-      "disabled": "Disabled"
+      "hours": "{{count}}ح",
+      "activities": "أنشطة {{count}}",
+      "trend_detail": "{{participants}} مشارك، {{activities}} أنشطة",
+      "disabled": "عاجز"
     },
     "toast": {
-      "load_failed": "Failed to load municipal impact data.",
-      "export_started": "Report export started.",
-      "export_failed": "Failed to export the municipal report.",
-      "templates_load_failed": "Failed to load report templates.",
-      "template_saved": "Report template saved.",
-      "template_save_failed": "Failed to save the report template.",
-      "template_deleted": "Report template deleted.",
-      "template_delete_failed": "Failed to delete the report template."
+      "load_failed": "فشل تحميل بيانات التأثير البلدي.",
+      "export_started": "بدأ تصدير التقرير.",
+      "export_failed": "فشل تصدير تقرير البلدية.",
+      "templates_load_failed": "فشل تحميل قوالب التقارير.",
+      "template_saved": "تم حفظ نموذج التقرير.",
+      "template_save_failed": "فشل في حفظ قالب التقرير.",
+      "template_deleted": "تم حذف نموذج التقرير.",
+      "template_delete_failed": "فشل في حذف قالب التقرير."
     },
     "cards": {
       "verified_hours": {
-        "title": "Verified hours and economic value",
-        "description": "Summarise approved support hours, transaction volume, active contributors, and estimated value.",
-        "metric_1": "Approved hours",
-        "metric_2": "Active contributors",
-        "metric_3": "Value estimate"
+        "title": "ساعات التحقق والقيمة الاقتصادية",
+        "description": "قم بتلخيص ساعات الدعم المعتمدة وحجم المعاملات والمساهمين النشطين والقيمة المقدرة.",
+        "metric_1": "الساعات المعتمدة",
+        "metric_2": "المساهمين النشطين",
+        "metric_3": "تقدير القيمة"
       },
       "active_members": {
-        "title": "Member reach and inclusion",
-        "description": "Track active members, new joiners, inactive members, and groups that need coordinator attention.",
-        "metric_1": "Active members",
-        "metric_2": "New joiners",
-        "metric_3": "Inactive members"
+        "title": "وصول الأعضاء وإدراجهم",
+        "description": "تتبع الأعضاء النشطين والمنضمين الجدد والأعضاء غير النشطين والمجموعات التي تحتاج إلى اهتمام المنسق.",
+        "metric_1": "الأعضاء النشطين",
+        "metric_2": "النجارون الجدد",
+        "metric_3": "الأعضاء غير النشطين"
       },
       "organisations": {
-        "title": "Organisation and partner activity",
-        "description": "Show participating organisations, opportunities, verified logs, and coordinator workflows.",
-        "metric_1": "Organisations",
-        "metric_2": "Opportunities",
-        "metric_3": "Verified logs"
+        "title": "النشاط التنظيمي والشريك",
+        "description": "اعرض المنظمات المشاركة والفرص والسجلات التي تم التحقق منها وسير عمل المنسق.",
+        "metric_1": "المنظمات",
+        "metric_2": "فرص",
+        "metric_3": "السجلات التي تم التحقق منها"
       },
       "trust_pack": {
-        "title": "Trust, safeguarding, and compliance",
-        "description": "Surface verification, review, safeguarding, consent, and audit signals for sensitive care coordination.",
-        "metric_1": "Verification",
-        "metric_2": "Reviews",
-        "metric_3": "Audit trail"
+        "title": "الثقة والحماية والامتثال",
+        "description": "إشارات التحقق السطحي والمراجعة والحماية والموافقة والتدقيق لتنسيق الرعاية الحساسة.",
+        "metric_1": "تَحَقّق",
+        "metric_2": "التعليقات",
+        "metric_3": "مسار التدقيق"
       }
     },
-    "policy_default": "Policy default",
-    "audience": "Audience",
+    "policy_default": "السياسة الافتراضية",
+    "audience": "جمهور",
     "filters": {
-      "title": "Reporting window",
-      "description": "Use explicit dates when preparing canton, municipality, foundation, or cooperative packs.",
-      "date_from": "From",
-      "date_to": "To",
-      "apply": "Apply dates",
-      "clear": "Clear"
+      "title": "نافذة التقارير",
+      "description": "استخدم تواريخ واضحة عند إعداد حزم الكانتون أو البلدية أو المؤسسة أو التعاونية.",
+      "date_from": "من",
+      "date_to": "ل",
+      "apply": "تطبيق التواريخ",
+      "clear": "واضح"
     },
     "readiness": {
-      "municipal_value": "Municipal value",
-      "participation": "Participation",
-      "partner_network": "Partner network",
-      "local_exchange": "Local exchange",
+      "municipal_value": "القيمة البلدية",
+      "participation": "مشاركة",
+      "partner_network": "شبكة الشركاء",
+      "local_exchange": "الصرف المحلي",
       "status": {
-        "ready": "Ready",
-        "needs_data": "Needs data"
+        "ready": "مستعد",
+        "needs_data": "يحتاج إلى بيانات"
       }
     },
     "templates": {
-      "title": "Saved report templates",
-      "description": "Prepare repeatable municipal, canton, cooperative, or foundation report packs with the right audience, period, and value assumptions.",
-      "create": "New template",
-      "select_label": "Report template",
-      "default_policy": "Use workflow policy defaults",
-      "apply": "Apply",
-      "delete": "Delete",
-      "cancel": "Cancel",
-      "save": "Save template",
-      "modal_title": "Create report template",
-      "hour_value_chip": "CHF {{value}}/h",
+      "title": "قوالب التقارير المحفوظة",
+      "description": "قم بإعداد حزم تقارير قابلة للتكرار للبلديات أو الكانتونات أو التعاونيات أو المؤسسات مع الجمهور المناسب والفترة وافتراضات القيمة.",
+      "create": "قالب جديد",
+      "select_label": "قالب التقرير",
+      "default_policy": "استخدم الإعدادات الافتراضية لسياسة سير العمل",
+      "apply": "يتقدم",
+      "delete": "يمسح",
+      "cancel": "يلغي",
+      "save": "حفظ القالب",
+      "modal_title": "إنشاء قالب التقرير",
+      "hour_value_chip": "CHF {{value}}/ح",
       "fields": {
-        "name": "Template name",
-        "description": "Description",
-        "audience": "Audience",
-        "period": "Reporting period",
-        "hour_value": "Hour value override (CHF)",
-        "include_social_value": "Include social value estimate"
+        "name": "اسم القالب",
+        "description": "وصف",
+        "audience": "جمهور",
+        "period": "فترة التقرير",
+        "hour_value": "تجاوز قيمة الساعة (CHF)",
+        "include_social_value": "تشمل تقدير القيمة الاجتماعية"
       },
       "audiences": {
-        "municipality": "Municipality",
-        "canton": "Canton",
-        "cooperative": "Cooperative",
-        "foundation": "Foundation"
+        "municipality": "بلدية",
+        "canton": "كانتون",
+        "cooperative": "تعاونية",
+        "foundation": "مؤسسة"
+      },
+      "descriptions": {
+        "audience": "يحدد إطار السرد والأقسام التي تظهر في تصدير PDF/CSV.",
+        "hour_value": "معدل الرعاية الرسمية المحلية بالساعة لحساب تعويض التكلفة (على سبيل المثال CHF 35 لسويسرا). اتركه فارغًا لاستخدام الإعداد الافتراضي للمستأجر.",
+        "period": "يتم تطبيق نافذة التقارير الافتراضية عند عدم تعيين مرشح يدوي للتاريخ."
+      },
+      "placeholders": {
+        "description": "ملاحظة اختيارية للرجوع إليها مستقبلاً - على سبيل المثال. \"تُستخدم في العرض التقديمي السنوي للجمعية العمومية السنوية\"",
+        "name": "على سبيل المثال تقرير كانتون للربع الثالث من عام 2025 للممولين"
       }
+    },
+    "about": {
+      "body_1_after_chf": "قيمة الساعات × مضاعف المنع).",
+      "body_1_after_kiss": "/Age-Stiftung المنهجية، التكلفة المقدرة لتعويض خدمات الرعاية الرسمية (",
+      "body_1_before_kiss": "تقرير الأثر البلدي هو حزمة الأدلة التي تشاركها مع شركاء البلديات والكانتونات والممولين لإثبات قيمة البرنامج. يُظهر ساعات الرعاية التي تم التحقق منها، والأعضاء النشطين، والمنظمات الشريكة، وباستخدام",
+      "body_2_after_audience": "تبديل لتبديل تأطير السرد:",
+      "body_2_after_canton": "يجمع بلديات متعددة ويظهر تجنب التكاليف على مستوى الكانتونات؛",
+      "body_2_after_cooperative": "يُظهر الاحتفاظ بالأعضاء، ومعدل المعاملة بالمثل، وعبء عمل المنسق. قم بالتصدير كـ PDF لإرساله إلى الشركاء أو كـ CSV لمزيد من التحليل. احفظ قوالب التقارير لإعادة إنشاء نفس التكوين بسرعة في الفترات المستقبلية.",
+      "body_2_after_municipality": "يركز على السكان المحليين الذين تم الوصول إليهم والمنظمات الشريكة؛",
+      "body_2_prefix": "استخدم",
+      "chf_abbr": "CHF",
+      "kiss_abbr": "KISS",
+      "title": "حول هذا التقرير"
+    },
+    "audience_selector": {
+      "description": "تبديل تأطير السرد. يتم تضمين قسم الجمهور المحدد فقط في عملية التصدير PDF/CSV.",
+      "title": "جمهور"
+    },
+    "export_note": {
+      "csv_label": "تصدير CSV",
+      "csv_text": "يعطي بيانات أولية لتحليل جداول البيانات أو تقارير المنح.",
+      "pdf_label": "تصدير PDF",
+      "pdf_text": "تم تنسيقه للمشاركة مع شركاء وممولي البلديات."
+    },
+    "narrative": {
+      "canton": {
+        "description": "التأثير الإجمالي عبر البلديات، وتجنب تكاليف الرعاية المهنية، والاتجاه السنوي.",
+        "empty_body": "قم بالتبديل إلى وضع كانتون لتحميل السرد على مستوى كانتون.",
+        "empty_description": "التأثير الإجمالي عبر البلديات، وتجنب التكاليف، والتغيير من عام لآخر.",
+        "empty_title": "كانتون (كانتونسرات / الحكومة الإقليمية)",
+        "estimated_cost_avoidance": "تجنب التكاليف المقدرة",
+        "estimated_cost_avoidance_desc": "الساعات × قيمة السياسة × {{multiplier}} (معادلة الرعاية المهنية).",
+        "multi_node_total_hours": "إجمالي ساعات العقدة المتعددة",
+        "multi_node_total_hours_desc": "تم التحقق منه عبر جميع العقد التي تم اختيارها.",
+        "municipalities_reporting": "تقارير البلديات",
+        "municipalities_reporting_desc": "إجمالي عدد العقد المساهمة في طريقة العرض هذه.",
+        "prior_period_detail": "الفترة السابقة: {{from}} إلى {{to}} - {{hours}} الساعات التي تم التحقق منها.",
+        "title": "ساعات الدعم التي تم التحقق منها{{tenant}} - {{from}} إلى {{to}}",
+        "yoy_change": "التغيير على أساس سنوي"
+      },
+      "cooperative": {
+        "active_tandems": "ترادفات نشطة",
+        "active_tandems_desc": "أزواج المساعد/المتلقي المتكررة (+2 تبادلات).",
+        "coordinator_load": "تحميل المنسق",
+        "coordinator_load_desc": "{{pending}} معلق عبر منسقي {{coordinators}}.",
+        "description": "الصحة التعاونية الداخلية: الاحتفاظ، المعاملة بالمثل، الترادف، تحميل المنسق، تجمع الائتمان.",
+        "empty_body": "قم بالتبديل إلى الوضع التعاوني لتحميل السرد التعاوني الداخلي.",
+        "empty_description": "الاحتفاظ بالأعضاء، والمعاملة بالمثل على مدار الساعة، والعلاقات الترادفية، وعبء عمل المنسق، وتجمع ائتمان الرعاية المستقبلية.",
+        "empty_title": "تعاونية (KISS-Genossenschaft داخلية)",
+        "future_care_credit_pool": "تجمع الرصيد الائتماني للرعاية المستقبلية",
+        "future_care_credit_pool_desc": "مجموع أرصدة الأعضاء الإيجابية - الاحتياطي الضمني للرعاية المستقبلية للتعاونية. قاعدة الأعضاء النشطة: {{count}}.",
+        "member_retention": "الاحتفاظ بالأعضاء",
+        "member_retention_desc": "{{count}} عضو نشط في كل من هذه الفترة والفترة المماثلة السابقة.",
+        "reciprocity_rate": "معدل المعاملة بالمثل",
+        "reciprocity_rate_desc": "تلقى مؤيدو {{count}} أيضًا ساعات في هذه الفترة.",
+        "title": "التقرير الداخلي التعاوني - {{from}} إلى {{to}}"
+      },
+      "in_export": "في التصدير",
+      "logs_count": "سجلات {{count}}",
+      "municipality": {
+        "description": "المشاركة المحلية، والمنظمات الشريكة المحددة، والتقسيم الجغرافي/الفئة، ومدى وصول المتلقي.",
+        "empty_body": "قم بالتبديل إلى وضع البلدية لتحميل السرد على مستوى البلدية.",
+        "empty_description": "المشاركة المحلية، والمنظمات الشريكة المسماة، والتقسيم الجغرافي/الفئةي.",
+        "empty_title": "بلدية (جيميندي)",
+        "no_category_data": "لا توجد بيانات فئة في هذه الفترة.",
+        "no_partner_activity": "لا يوجد نشاط شريك في هذه الفترة.",
+        "partner_organisations": "المنظمات الشريكة",
+        "partner_organisations_by_hours": "المنظمات الشريكة (بالساعات)",
+        "recipients_reached": "وصلت المستلمين",
+        "recipients_reached_desc": "مستلمون متميزون للتبادلات المكتملة.",
+        "title": "تأثير المجتمع - {{from}} إلى {{to}}",
+        "top_5_categories": "أهم 5 فئات (التقسيم الجغرافي/النشاط)",
+        "top_categories": "أعلى الفئات",
+        "top_categories_desc": "المدرجة أدناه حسب الساعات.",
+        "trusted_total": "من {{count}} الإجمالي الموثوق به."
+      },
+      "no_prior_data": "لا توجد بيانات سابقة"
+    },
+    "readiness_help": {
+      "local_exchange": {
+        "fix": "لا توجد عمليات تبادل مكتملة حتى الآن. يجب على المنسقين الموافقة على سجلات الساعات المعلقة.",
+        "what": "التبادلات التي تم التحقق منها (المكتملة والمعتمدة) المسجلة في هذه الفترة."
+      },
+      "municipal_value": {
+        "fix": "لا توجد تكلفة قابلة للحساب حتى الآن. قم بالموافقة على سجلات ساعات العمل التطوعي المعلقة لملء هذا المقياس.",
+        "what": "تعويض التكلفة المقدرة للرعاية الرسمية (ساعات × قيمة ساعة السياسة × مضاعف الوقاية)."
+      },
+      "participation": {
+        "fix": "أقل من الحد الأدنى للمشاركة. استمر في تأهيل الأعضاء واستكمال عمليات التبادل.",
+        "what": "الأعضاء المتميزون الناشطون كداعمين أو متلقين في هذه الفترة."
+      },
+      "partner_network": {
+        "fix": "لا توجد منظمات موثوقة نشطة. المنظمات على متن الطائرة عبر التطوع> المنظمات.",
+        "what": "المنظمات الشريكة الموثوقة التي ساهمت بساعات في هذه الفترة."
+      }
+    },
+    "readiness_intro": {
+      "needs_data_suffix": "= المقياس أقل من الحد الأدنى - مرر مؤشر الماوس فوق كل بطاقة للحصول على إرشادات.",
+      "prefix": "تشير هذه الإشارات الأربع إلى ما إذا كان التقرير يحتوي على بيانات كافية ليكون مقنعًا للجمهور الخارجي.",
+      "ready_suffix": "= بيانات كافية؛"
     }
   },
   "caring_emergency": {
@@ -9889,13 +11116,99 @@
     "trust_tier": {
       "errors": {
         "recompute_failed": "Failed to recompute trust tiers.",
-        "save_failed": "Failed to save trust tier settings."
+        "save_failed": "Failed to save trust tier settings.",
+        "load_failed": "فشل تحميل تكوين طبقة الثقة."
       },
       "messages": {
-        "recomputed": "Trust tiers recomputed.",
+        "recomputed": "??? ????? ???? ??????? ????? ?? {{count}} ?????.",
         "saved": "Trust tier settings saved."
       },
-      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes."
+      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes.",
+      "title": "تكوين طبقة الثقة",
+      "subtitle": "قم بتعيين عتبات المعايير لكل مستوى ثقة. تنطبق التغييرات على عملية إعادة الحساب التالية.",
+      "loading": "جارٍ تحميل تكوين طبقة الثقة",
+      "recompute_hint": "استخدم إعادة الحساب عندما تتغير الحدود ويلزم إعادة تقييم الأعضاء الحاليين على الفور. يعمل في الخلفية وقد يستغرق 30-60 ثانية.",
+      "meta": {
+        "title": "تكوين طبقة الثقة",
+        "description": "قم بتكوين حدود طبقة الثقة، وأعد حساب طبقات الأعضاء، وراجع ما تفتحه كل طبقة."
+      },
+      "actions": {
+        "recompute": "إعادة حساب كافة المستويات",
+        "save": "حفظ التكوين"
+      },
+      "about": {
+        "title": "حول هذه الصفحة",
+        "body": "طبقات الثقة هي سلم السمعة الذي يفتح الامتيازات عندما يصبح الأعضاء أكثر نشاطًا ويتم التحقق منهم. يتقدم الأعضاء تلقائيًا عندما يستوفون حدود المعايير أدناه. استخدم إعادة الحساب لفرض إعادة الحساب الفوري لجميع الأعضاء. يؤثر تقدم المستوى على Warmth Pass وأهلية المنسق والرؤية في دليل الأعضاء."
+      },
+      "criteria": {
+        "title": "عتبات معايير الطبقة"
+      },
+      "fields": {
+        "hours_logged": "الساعات المسجلة (الحد الأدنى)",
+        "reviews_received": "المراجعات المستلمة (الحد الأدنى)",
+        "identity_verified": "تتطلب التحقق من الهوية"
+      },
+      "tiers": {
+        "member": {
+          "label": "عضو",
+          "description": "عضو أساسي في المجتمع تم تسجيله لمدة ساعة واحدة على الأقل."
+        },
+        "trusted": {
+          "label": "موثوق به",
+          "description": "عضو نشط مع عدة ساعات ومراجعات."
+        },
+        "verified": {
+          "label": "تم التحقق منه",
+          "description": "عضو موثوق به مع هوية مؤكدة."
+        },
+        "coordinator": {
+          "label": "منسق",
+          "description": "عضو نشط للغاية تم التحقق منه ومؤهل للتنسيق."
+        }
+      },
+      "reference": {
+        "title": "مرجع الطبقة",
+        "aria": "مرجع مستوى الثقة",
+        "columns": {
+          "tier": "الطبقة",
+          "level": "مستوى",
+          "color": "لون",
+          "description": "وصف",
+          "unlocks": "ما يفتح"
+        },
+        "rows": {
+          "0": {
+            "name": "الوافد الجديد",
+            "color": "رمادي",
+            "description": "انضم للتو، لا يوجد نشاط مطلوب.",
+            "unlocks": "وصول الأعضاء الأساسية."
+          },
+          "1": {
+            "name": "عضو",
+            "color": "أزرق",
+            "description": "لقد تم تسجيل الساعات.",
+            "unlocks": "يمكن نشر قوائم المساعدة وتلقي ساعات الرعاية."
+          },
+          "2": {
+            "name": "موثوق به",
+            "color": "أخضر",
+            "description": "نشط مع الاستعراضات.",
+            "unlocks": "مؤهل للحصول على Warmth Pass ويمكن التوصية به للرعاية."
+          },
+          "3": {
+            "name": "تم التحقق منه",
+            "color": "أرجواني",
+            "description": "تم التحقق من الهوية.",
+            "unlocks": "رؤية منسق الرعاية الكاملة وشارة الهوية."
+          },
+          "4": {
+            "name": "منسق",
+            "color": "العنبر",
+            "description": "نشط للغاية مع هوية تم التحقق منها.",
+            "unlocks": "مؤهلة للموافقة على ساعات وتنسيق المباريات."
+          }
+        }
+      }
     },
     "warmth_pass": {
       "title": "Warmth Pass",
@@ -9934,6 +11247,109 @@
       "not_eligible_notice": {
         "title": "Not eligible yet",
         "body": "This member does not yet meet the requirements for a Warmth Pass."
+      }
+    },
+    "operating_policy": {
+      "title": "سياسة التشغيل",
+      "subtitle": "ورشة عمل سياسة التشغيل KISS: لا يمكن لبرنامج القواعد تخمينها.",
+      "loading": "جارٍ تحميل سياسة التشغيل",
+      "last_updated": "آخر تحديث لـ {{date}}",
+      "meta": {
+        "title": "سياسة التشغيل",
+        "description": "قم بتكوين الموافقة والحماية وSLA وقواعد سياسة القيمة الاجتماعية لبرنامج الرعاية."
+      },
+      "actions": {
+        "refresh": "ينعش",
+        "save": "حفظ التغييرات"
+      },
+      "about": {
+        "title": "حول هذه الصفحة",
+        "body": "تحدد سياسة التشغيل قواعد برنامج رعاية المجتمع الخاص بك: من يمكنه الموافقة على ساعات العمل، ومدى سرعة استجابة المنسقين، وكيفية حساب القيمة الاجتماعية، وكيف تبدو دورة إعداد التقارير. قم بتكوين هذا قبل إطلاق البرنامج التجريبي. تسري التغييرات على الفور ويتم تسجيلها لأغراض التدقيق.",
+        "methodology_prefix": "ال",
+        "methodology_middle": "تستخدم حقول معدل الأجر بالساعة ومضاعف المنع",
+        "methodology_suffix": "المنهجية (Koordination und Innovation fur Soziales، Schwyz) تم تطويرها باستخدام Age-Stiftung. إذا كنت لا تقوم بتشغيل Swiss KISS/",
+        "methodology_tail": "تجريبي، قم بتعيين السعر على ما يعادل الرعاية الرسمية المحلية الخاصة بك بالساعة والمضاعف على 1.0."
+      },
+      "sections": {
+        "approvals": "الموافقات والثقة",
+        "sla": "نوافذ SLA",
+        "hours": "إدارة الساعة",
+        "safeguarding": "الحماية",
+        "social_value": "منهجية القيمة الاجتماعية",
+        "appendix": "ملحق السياسة التجريبية"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "سلطة الموافقة",
+          "help": "من يمكنه إنهاء الساعات المعتمدة: مسؤول المستأجر أو المنسقون أو كلا الطرفين بالموافقة المتبادلة."
+        },
+        "trusted_reviewer_threshold": {
+          "label": "حد المراجع الموثوق به (ساعات التسجيل)",
+          "help": "الحد الأدنى من الساعات المعتمدة قبل أن يصبح العضو مراجعًا موثوقًا به أو يصل إلى الطبقة الموثوقة."
+        },
+        "sla_first_response_hours": {
+          "label": "SLA: الاستجابة الأولى (ساعات)",
+          "help": "الوقت المستهدف للرد الأول على طلب مساعدة جديد."
+        },
+        "sla_help_request_hours": {
+          "label": "SLA: حل طلب المساعدة (ساعات)",
+          "help": "الوقت المستهدف لإغلاق طلب المساعدة أو مطابقته."
+        },
+        "legacy_hour_settlement": {
+          "label": "سياسة تسوية الساعات القديمة",
+          "help": "كيفية تسوية الساعات المتبقية للعضو المتوفى."
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "عتبة تدخل التوازن المتبادل (ساعات)",
+          "help": "عندما يؤدي عدم توازن العطاء/الاستلام لدى أحد الأعضاء إلى قيام المنسق بتسجيل الوصول."
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "حماية مالك التصعيد (المستخدم ID)",
+          "help": "يتلقى المستخدم ID تصعيدات الحماية. اتركه فارغًا لاستخدام المسؤولين كمجموعة."
+        },
+        "chf_hourly_rate": {
+          "label": "CHF القيمة الاجتماعية لكل ساعة",
+          "help": "قيمة CHF لكل ساعة رعاية لتقارير ROI باستخدام معدل مساعد الرعاية الرسمية السويسري."
+        },
+        "chf_prevention_multiplier": {
+          "label": "CHF مضاعف الوقاية",
+          "help": "يتم تطبيق المضاعف على تعويض الرعاية الرسمية لمنهجية Age-Stiftung وKISS."
+        },
+        "statement_cadence": {
+          "label": "إيقاع بيان العضو",
+          "help": "عدد المرات التي يتلقى فيها الأعضاء بيانًا بالساعة لكل عضو."
+        },
+        "policy_appendix_url": {
+          "label": "ملحق السياسة الموقعة URL",
+          "help": "قم بلصق URL العام لاتفاقية السياسة الموقعة بين تعاونيتك والبلدية. يظهر هذا في تقارير التدقيق وحزمة التقارير البلدية."
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "مسؤل",
+          "coordinator": "منسق",
+          "mutual": "مشترك"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "تبرع للمسبح",
+          "expire": "تنتهي",
+          "transfer_to_nominee": "نقل إلى المرشح"
+        },
+        "statement_cadence": {
+          "monthly": "شهريا",
+          "quarterly": "ربع سنوية",
+          "annual": "سنوي"
+        }
+      },
+      "placeholders": {
+        "url": "https://..."
+      },
+      "errors": {
+        "load_failed": "فشل تحميل سياسة التشغيل.",
+        "save_failed": "فشل في حفظ سياسة التشغيل."
+      },
+      "messages": {
+        "saved": "تم حفظ سياسة التشغيل. تنطبق التغييرات على جميع البورصات الجديدة على الفور."
       }
     }
   },
@@ -9985,7 +11401,349 @@
       "email_warning_check_failed": {
         "title": "Warning check failed",
         "body": "Email warning checks could not complete."
+      },
+      "notification_queue_suppressed": {
+        "title": "تم قمع رسائل البريد الإلكتروني الإخطار",
+        "body": "تم منع رسائل البريد الإلكتروني للإشعارات الموجودة في قائمة انتظار {{count}} خلال ساعات {{window_hours}} الأخيرة."
+      },
+      "newsletter_queue_failures": {
+        "title": "فشل قائمة انتظار الرسائل الإخبارية",
+        "body": "فشل مستلمو النشرة الإخبارية {{count}} خلال ساعات {{window_hours}} الأخيرة."
+      },
+      "newsletter_queue_stale_processing": {
+        "title": "قائمة انتظار الرسائل الإخبارية التي لا معنى لها",
+        "body": "تمت معالجة مستلمي النشرة الإخبارية {{count}} لأكثر من {{minutes}} دقيقة."
+      },
+      "new_users_without_account_email_attempt": {
+        "title": "لم يتم تشغيل البريد الإلكتروني للحساب",
+        "body": "ليس لدى مستخدمي {{count}} الجدد أي تنشيط للحساب أو التحقق أو الموافقة أو محاولة إرسال بريد إلكتروني ترحيبي خلال ساعات {{window_hours}} الأخيرة."
+      },
+      "password_resets_without_email_attempt": {
+        "title": "لم يتم تشغيل البريد الإلكتروني لإعادة تعيين كلمة المرور",
+        "body": "لا تشتمل رموز {{count}} المميزة لإعادة تعيين كلمة المرور على أي محاولة مطابقة لإعادة تعيين كلمة المرور عبر البريد الإلكتروني في الساعات {{window_hours}} الأخيرة."
+      },
+      "group_invites_without_email_attempt": {
+        "title": "لم يتم تشغيل البريد الإلكتروني لدعوة المجموعة",
+        "body": "لا تحتوي دعوات مجموعة البريد الإلكتروني {{count}} على أي محاولة مطابقة عبر البريد الإلكتروني لدعوة المجموعة في الساعات {{window_hours}} الأخيرة."
+      },
+      "group_members_tenant_mismatch": {
+        "title": "عدم تطابق مستأجر عضوية المجموعة",
+        "body": "تنتمي عضويات مجموعة {{count}} إلى مستأجر مختلف عن مجموعته. تخاطر هذه الصفوف بدور المستأجر الخاطئ وتوجيه الإشعارات."
+      },
+      "group_member_joined_without_owner_notification_queue": {
+        "title": "لم يتم وضع إشعار الانضمام إلى المجموعة في قائمة الانتظار",
+        "body": "أصبحت عضويات مجموعة {{count}} نشطة بدون صف قائمة انتظار إشعارات المالك المطابق في آخر ساعات {{window_hours}}."
+      },
+      "instant_notifications_stuck_pending": {
+        "title": "رسائل البريد الإلكتروني الفورية عالقة",
+        "body": "ظلت رسائل البريد الإلكتروني للإشعارات الفورية {{count}} معلقة لأكثر من {{minutes}} دقيقة."
+      },
+      "notification_queue_failed_recently": {
+        "title": "فشلت رسائل البريد الإلكتروني للإخطار",
+        "body": "فشلت رسائل البريد الإلكتروني للإشعارات الموضوعة في قائمة انتظار {{count}} خلال ساعات {{window_hours}} الأخيرة."
+      },
+      "notification_queue_suppressed_recently": {
+        "title": "تم قمع رسائل البريد الإلكتروني الإخطار",
+        "body": "تم منع رسائل البريد الإلكتروني للإشعارات الموجودة في قائمة انتظار {{count}} خلال ساعات {{window_hours}} الأخيرة."
+      },
+      "notification_queue_missing_tenant_id": {
+        "title": "قائمة انتظار الإعلام مفقودة المستأجر",
+        "body": "{{count}} الإشعارات الموضوعة في قائمة الانتظار معلقة أو تتم معالجتها بدون ملكية المستأجر. ولا يمكن توجيهها بشكل موثوق حتى يتم إصلاحها."
+      },
+      "notification_queue_tenant_mismatch": {
+        "title": "عدم تطابق مستأجر قائمة انتظار الإعلام",
+        "body": "تنتمي إعلامات {{count}} المدرجة في قائمة الانتظار إلى مستأجر مختلف عن المستخدم المستلم. تخاطر هذه الصفوف بتوجيه المستأجر بشكل خاطئ."
+      },
+      "notifications_missing_tenant_id": {
+        "title": "الإخطارات في عداد المفقودين المستأجر",
+        "body": "لا تحتوي إشعارات {{count}} داخل التطبيق على ملكية المستأجر، لذلك قد لا يراها المستخدمون باستمرار."
+      },
+      "notifications_tenant_mismatch": {
+        "title": "عدم تطابق إخطارات المستأجر",
+        "body": "تنتمي إشعارات {{count}} داخل التطبيق إلى مستأجر مختلف عن المستخدم المستلم. تخاطر هذه الصفوف بفشل الرؤية بين المستأجرين."
+      },
+      "notification_queue_marked_sent_without_email_log": {
+        "title": "تم وضع علامة على الإشعار مُرسل بدون دليل البريد الإلكتروني",
+        "body": "تم وضع علامة على إشعارات {{count}} الموضوعة في قائمة الانتظار كإرسال بدون إدخال سجل بريد إلكتروني مطابق في آخر ساعات {{window_hours}}."
+      },
+      "newsletter_queue_missing_tenant_id": {
+        "title": "قائمة انتظار الرسائل الإخبارية في عداد المفقودين المستأجر",
+        "body": "لا تحتوي صفوف قائمة انتظار الرسائل الإخبارية {{count}} على ملكية مستأجر. ولا يمكن توجيهها بشكل موثوق حتى يتم إصلاحها."
+      },
+      "newsletter_queue_tenant_mismatch": {
+        "title": "عدم تطابق مستأجر قائمة انتظار الرسائل الإخبارية",
+        "body": "تنتمي صفوف قائمة انتظار الرسائل الإخبارية {{count}} إلى مستأجر مختلف عن الرسالة الإخبارية الخاصة به. تخاطر هذه الصفوف بتوجيه المستأجر بشكل خاطئ."
+      },
+      "newsletter_queue_stuck_pending": {
+        "title": "رسائل البريد الإلكتروني الإخبارية عالقة",
+        "body": "لقد ظل مستلمو النشرة الإخبارية {{count}} معلقين لأكثر من {{minutes}} دقيقة."
+      },
+      "newsletter_queue_failed_recently": {
+        "title": "فشلت رسائل البريد الإلكتروني الإخبارية",
+        "body": "فشل مستلمو النشرة الإخبارية {{count}} خلال ساعات {{window_hours}} الأخيرة."
+      },
+      "newsletter_queue_marked_sent_without_email_log": {
+        "title": "تم وضع علامة على الرسالة الإخبارية بأنها مرسلة بدون دليل البريد الإلكتروني",
+        "body": "تم وضع علامة على مستلمي النشرة الإخبارية {{count}} كمرسلين بدون إدخال سجل بريد إلكتروني ناجح مطابق في آخر ساعات {{window_hours}}."
+      },
+      "event_reminders_overdue_pending": {
+        "title": "تأخرت تذكيرات الأحداث",
+        "body": "لا تزال تذكيرات الأحداث {{count}} معلقة لأكثر من {{minutes}} من الدقائق بعد وقت إرسالها المقرر."
+      },
+      "event_reminders_failed_recently": {
+        "title": "فشلت تذكيرات الأحداث",
+        "body": "فشلت تذكيرات الأحداث {{count}} خلال ساعات {{window_hours}} الأخيرة."
+      },
+      "event_reminders_marked_sent_without_email_log": {
+        "title": "تم وضع علامة على تذكيرات الأحداث بأنها مرسلة بدون دليل عبر البريد الإلكتروني",
+        "body": "تم وضع علامة على تذكيرات حدث البريد الإلكتروني {{count}} كمرسلة دون إدخال سجل بريد إلكتروني ناجح مطابق في آخر ساعات {{window_hours}}."
+      },
+      "marketplace_report_received_without_notification_outbox": {
+        "title": "لم يتم وضع البريد الإلكتروني لاستلام تقرير السوق في قائمة الانتظار",
+        "body": "تم استلام تقارير سوق {{count}} بدون صف إشعار البريد الإلكتروني المطابق للاستلام في آخر ساعات {{window_hours}}."
+      },
+      "marketplace_report_acknowledged_without_notification_outbox": {
+        "title": "لم يتم وضع البريد الإلكتروني لإقرار تقرير السوق في قائمة الانتظار",
+        "body": "تم الإقرار بتقارير سوق {{count}} دون وجود صف إشعار بالبريد الإلكتروني لإقرار الإقرار في آخر ساعات {{window_hours}}."
+      },
+      "marketplace_report_resolved_without_notification_outbox": {
+        "title": "لم يتم وضع البريد الإلكتروني لقرار السوق في قائمة الانتظار",
+        "body": "تم حل تقارير سوق {{count}} دون وجود صف إشعارات بالبريد الإلكتروني لدقة المطابقة في آخر ساعات {{window_hours}}."
+      },
+      "marketplace_report_appealed_without_notification_outbox": {
+        "title": "لم يتم وضع البريد الإلكتروني لاستئناف تقرير السوق في قائمة الانتظار",
+        "body": "تم تقديم الطعون في تقرير سوق {{count}} بدون صف إشعار البريد الإلكتروني لإيصال الاستئناف المطابق في آخر ساعات {{window_hours}}."
+      },
+      "marketplace_report_appeal_resolved_without_notification_outbox": {
+        "title": "لم يتم وضع البريد الإلكتروني لحل الاستئناف الخاص بتقرير السوق في قائمة الانتظار",
+        "body": "تم حل الطعون في تقرير سوق {{count}} دون وجود صف إشعار بالبريد الإلكتروني للقرار النهائي المطابق في آخر ساعات {{window_hours}}."
+      },
+      "federation_connection_without_email_evidence": {
+        "title": "دليل البريد الإلكتروني لاتصال الاتحاد مفقود",
+        "body": "لا تحتوي أحداث الاتصال الموحد لـ {{count}} على دليل ناجح لتسليم البريد الإلكتروني في ساعات {{window_hours}} الأخيرة."
+      },
+      "federation_connection_without_bell_evidence": {
+        "title": "دليل إشعار اتصال الاتحاد مفقود",
+        "body": "لا تحتوي أحداث الاتصال الموحد لـ {{count}} على دليل إعلام داخل التطبيق في ساعات {{window_hours}} الأخيرة."
+      },
+      "federation_review_without_email_evidence": {
+        "title": "أدلة البريد الإلكتروني الخاصة بمراجعة الاتحاد مفقودة",
+        "body": "لم تتضمن المراجعات الموحدة لـ {{count}} أي دليل بريد إلكتروني ناجح أو تم تخطيه عمدًا في ساعات {{window_hours}} الأخيرة."
+      },
+      "federation_review_without_bell_evidence": {
+        "title": "أدلة إشعار مراجعة الاتحاد مفقودة",
+        "body": "لا تحتوي مراجعات {{count}} الموحدة على دليل إشعار داخل التطبيق في ساعات {{window_hours}} الأخيرة."
+      },
+      "member_subscription_event_without_email_evidence": {
+        "title": "دليل البريد الإلكتروني لاشتراك الأعضاء مفقود",
+        "body": "لا تحتوي أحداث فواتير اشتراك أعضاء {{count}} على دليل ناجح لتسليم البريد الإلكتروني في ساعات {{window_hours}} الأخيرة."
+      },
+      "stripe_donation_without_receipt_email_evidence": {
+        "title": "دليل البريد الإلكتروني لإيصال التبرع مفقود",
+        "body": "{{count}} تبرعات Stripe المكتملة ليس لها دليل استلام ناجح عبر البريد الإلكتروني في ساعات {{window_hours}} الأخيرة."
+      },
+      "critical_email_attempts_missing_tenant_context": {
+        "title": "البريد الإلكتروني المهم يفتقد سياق المستأجر",
+        "body": "تم تسجيل محاولات البريد الإلكتروني المهمة لـ {{count}} بدون سياق المستأجر في ساعات {{window_hours}} الأخيرة."
+      },
+      "sendgrid_events_not_confirming_delivery": {
+        "title": "أحداث التسليم SendGrid مفقودة",
+        "body": "تظل رسائل البريد الإلكتروني {{count}} SendGrid مقبولة ولكن غير مؤكدة بعد أكثر من {{hours}} ساعة."
+      },
+      "tenant_gmail_override_incomplete": {
+        "title": "تكوين المستأجر Gmail غير مكتمل",
+        "body": "لدى هذا المستأجر تجاوز موفر البريد الإلكتروني Gmail غير مكتمل."
+      },
+      "tenant_smtp_override_incomplete": {
+        "title": "تكوين المستأجر SMTP غير مكتمل",
+        "body": "لدى هذا المستأجر تجاوز موفر البريد الإلكتروني SMTP غير مكتمل."
+      },
+      "tenant_sendgrid_override_missing_api_key": {
+        "title": "يتجاوز المستأجر SendGrid مفتاح API المفقود",
+        "body": "تم تعيين هذا المستأجر لاستخدام تجاوز SendGrid ولكن ليس لديه مفتاح API للمستأجر، لذلك سيتم استخدام النظام الأساسي الاحتياطي."
+      },
+      "tenant_provider_config_check_failed": {
+        "title": "فشل التحقق من موفر المستأجر",
+        "body": "تعذر إكمال تدقيق تكوين موفر البريد الإلكتروني لهذا المستأجر."
+      },
+      "direct_email_send_paths_remaining": {
+        "title": "تبقى مسارات البريد الإلكتروني المباشرة القديمة",
+        "body": "لا تزال مسارات إرسال البريد الإلكتروني الأولية {{count}} تتجاوز مرسل الإشعارات الموحد. استمر في تقوية هذه المسارات حتى يتم توجيه كل وحدة عبر المرسل القابل للتدقيق."
+      },
+      "email_dispatch_missing_explicit_tenant": {
+        "title": "البريد الإلكتروني للمرسل يفتقد مستأجرًا صريحًا",
+        "body": "لا تزال مواقع استدعاء مرسل البريد الإلكتروني {{count}} تعتمد على سياق المستأجر المستنتج. قم بتمرير Tenant_id أو TenantId بشكل صريح بحيث يكون كل إرسال في قائمة الانتظار، أو cron، أو webhook، أو عبر المستأجرين قابلاً للتدقيق."
+      },
+      "email_trigger_audit_failed": {
+        "title": "فشل تدقيق مشغل البريد الإلكتروني",
+        "body": "تعذر إكمال تدقيق مشغل البريد الإلكتروني."
       }
+    },
+    "title": "إمكانية تسليم البريد الإلكتروني",
+    "subtitle": "تتبع دليل التشغيل ومحاولات الإرسال وحالة الموفر والمستلمين المحظورين لهذا المستأجر.",
+    "trigger_score": "درجة الزناد",
+    "trigger_coverage": "مشكلات {{issues}} عبر التدفقات التي تتم مراقبتها بواسطة {{count}}",
+    "actions": {
+      "refresh": "ينعش",
+      "reset": "إعادة ضبط",
+      "search": "يبحث"
+    },
+    "windows": {
+      "1": "آخر 24 ساعة",
+      "7": "آخر 7 أيام",
+      "30": "آخر 30 يومًا",
+      "90": "آخر 90 يومًا"
+    },
+    "filters": {
+      "all": "الجميع",
+      "category": "فئة",
+      "email": "بريد إلكتروني",
+      "recipient": "البريد الإلكتروني للمستلم",
+      "reason": "سبب",
+      "since": "منذ",
+      "status": "حالة",
+      "until": "حتى",
+      "window": "نافذة الوقت"
+    },
+    "metrics": {
+      "accepted": "مقبول",
+      "bad_outcomes": "فشل {{count}}، أو ارتد، أو تم منعه",
+      "bounced": "ارتد",
+      "delivered": "تم التوصيل",
+      "not_available": "لا توجد بيانات تدقيق الزناد",
+      "total": "المجموع",
+      "trigger_score": "درجة الزناد",
+      "unconfirmed": "تم قبول {{count}} ولكن لم يتم تأكيده",
+      "webhook_confirmed": "تم التأكيد بواسطة خطاف الويب للموفر",
+      "window_days": "نافذة اليوم {{days}}"
+    },
+    "status": {
+      "bounced": "ارتد",
+      "delivered": "تم التوصيل",
+      "failed": "فشل",
+      "pending": "قيد الانتظار",
+      "processing": "يعالج",
+      "queued": "في قائمة الانتظار",
+      "sent": "مرسل",
+      "suppressed": "قمعت",
+      "unknown": "حالة غير معروفة: {{status}}"
+    },
+    "severity": {
+      "critical": "شديد الأهمية",
+      "info": "معلومات",
+      "warning": "تحذير"
+    },
+    "status_breakdown": {
+      "title": "انهيار الحالة",
+      "subtitle": "عرض مضغوط لنتائج إرسال المستأجر الحالي للنافذة المحددة."
+    },
+    "trigger_health": {
+      "critical": "قضايا الزناد الحرجة",
+      "monitored": "التدفقات المراقبة",
+      "warning": "تحذير مشاكل الزناد"
+    },
+    "trigger_issues": {
+      "title": "إثارة مشكلات التدقيق",
+      "subtitle": "صفوف المصدر التي كان من المفترض أن يتم فيها تشغيل بريد إلكتروني أو إشعار، ولكن لا تحتوي عملية التدقيق على دليل تسليم موثوق به.",
+      "table_label": "مشكلات تدقيق مشغل البريد الإلكتروني",
+      "empty": "لا توجد مشكلات تدقيق تؤدي إلى النافذة المحددة.",
+      "all_tenants": "جميع المستأجرين",
+      "columns": {
+        "event": "حدث",
+        "issue": "مشكلة",
+        "module": "الوحدة النمطية",
+        "params": "شهادة",
+        "severity": "خطورة",
+        "tenant": "مستأجر"
+      }
+    },
+    "queues": {
+      "title": "تشخيص قائمة الانتظار",
+      "subtitle": "صفوف قائمة انتظار البريد الإلكتروني الفاشلة أو المحظورة أو القديمة المعلقة لهذا المستأجر.",
+      "table_label": "تشخيص قائمة انتظار البريد الإلكتروني",
+      "empty": "لا توجد صفوف قائمة انتظار البريد الإلكتروني الفاشلة أو المحظورة أو التي لا معنى لها.",
+      "columns": {
+        "attempts": "محاولات",
+        "category": "فئة",
+        "error": "خطأ",
+        "last_attempt": "المحاولة الأخيرة",
+        "recipient": "متلقي",
+        "source": "مصدر",
+        "status": "حالة"
+      },
+      "sources": {
+        "civic_digest_delivery_claims": "المطالبة ملخص المدنية",
+        "event_reminder_delivery_claims": "المطالبة بتذكير الحدث",
+        "event_reminders": "تذكير بالحدث",
+        "federation_inbound_connections": "اتصال الاتحاد",
+        "federation_messages": "رسالة الإتحاد",
+        "federation_transactions": "معاملة الاتحاد",
+        "goal_reminders": "تذكير بالهدف",
+        "job_interviews": "تذكير بمقابلة العمل",
+        "listing_expiry_reminders_sent": "تذكير بانتهاء القائمة",
+        "marketplace_disputes": "نزاع السوق",
+        "marketplace_order_notification_deliveries": "إشعار أمر السوق",
+        "marketplace_report_notifications": "تقرير السوق",
+        "marketplace_seller_ratings": "تقييم البائع في السوق",
+        "member_subscription_events": "فواتير اشتراك الأعضاء",
+        "newsletter_queue": "النشرة الإخبارية",
+        "notification_queue": "إشعار",
+        "notifications": "أدلة الإخطار",
+        "reviews": "مراجعة اتحادية",
+        "transaction_notification_deliveries": "إشعار المعاملة",
+        "user_safeguarding_preferences": "مراجعة الحماية",
+        "vol_donations": "إيصال التبرع",
+        "vol_reminder_delivery_claims": "مطالبة تذكير التطوع",
+        "vol_reminders_sent": "تذكير بالتطوع"
+      }
+    },
+    "logs": {
+      "title": "سجل محاولات البريد الإلكتروني",
+      "subtitle": "ابحث في كل محاولة إرسال حسب المستلم والفئة والحالة والتاريخ.",
+      "table_label": "سجل محاولات البريد الإلكتروني",
+      "empty": "لا توجد رسائل بريد إلكتروني تتطابق مع المرشحات الحالية.",
+      "columns": {
+        "category": "فئة",
+        "delivered": "تم التوصيل",
+        "error": "خطأ",
+        "provider": "مزود",
+        "recipient": "متلقي",
+        "sent": "مرسل",
+        "status": "حالة",
+        "subject": "موضوع"
+      }
+    },
+    "pagination": {
+      "page_size": "صفوف لكل صفحة",
+      "summary": "{{from}}-{{to}} من {{total}}"
+    },
+    "suppressions": {
+      "title": "قائمة القمع",
+      "subtitle": "المستلمون على مستوى النظام الأساسي الذين قام مقدمو الخدمة بارتداد اشتراكهم أو حظره أو إبطاله أو إلغاء اشتراكهم.",
+      "table_label": "قائمة قمع البريد الإلكتروني",
+      "empty": "لا يتطابق أي مستلمين تم إيقافهم مع عوامل التصفية الحالية.",
+      "confirm_remove": "هل ترغب في إزالة {{email}} من قائمة المنع؟ سيكونون مؤهلين لتلقي البريد الإلكتروني مرة أخرى.",
+      "remove": "إزالة القمع",
+      "remove_failed": "فشل في إزالة القمع.",
+      "removed": "تمت إزالة {{email}}.",
+      "columns": {
+        "actions": "الإجراءات",
+        "detail": "التفاصيل",
+        "email": "بريد إلكتروني",
+        "reason": "سبب",
+        "suppressed_at": "قمع عند"
+      },
+      "reasons": {
+        "block": "حاجز",
+        "bounce": "ترتد",
+        "invalid": "غير صالح",
+        "spam_report": "تقرير البريد العشوائي",
+        "unsubscribe": "إلغاء الاشتراك",
+        "unknown": "سبب غير معروف: {{reason}}"
+      }
+    },
+    "empty": {
+      "no_statuses": "لا توجد حالات حتى الآن"
     }
   },
   "help_drawer": {
@@ -10410,6 +12168,723 @@
       "retention_load_failed": "فشل تحميل تكوين الاحتفاظ.",
       "retention_save_failed": "فشل حفظ تكوين الاحتفاظ.",
       "retention_saved": "تم حفظ تكوين الاحتفاظ."
+    }
+  },
+  "ai": {
+    "common": {
+      "cancel": "يلغي",
+      "close": "يغلق",
+      "empty_dash": "-",
+      "loading": "تحميل...",
+      "save_changes": "حفظ التغييرات"
+    },
+    "ki_agents": {
+      "meta": {
+        "title": "KI-Agenten",
+        "description": "AG61 - إطار عمل الوكيل المستقل. وكلاء يقترحون الإجراءات. يوافق البشر قبل تطبيق أي شيء."
+      },
+      "about": {
+        "title": "حول KI-Agenten",
+        "body": "يقوم KI-Agenten (AI Agents) بأتمتة مهام التنسيق الروتينية: العثور على أزواج رعاية جيدة، ودفع الأعضاء غير النشطين، وتلخيص أعباء عمل المنسق، وتوجيه طلبات المساعدة المفتوحة. يعمل كل وكيل على نموذج الاقتراح ثم الموافقة: يقوم الوكلاء بإنشاء المقترحات، ولكن لا يتم تطبيق أي شيء حتى يوافق عليه الإنسان، ما لم تتجاوز درجة ثقة الاقتراح حد التطبيق التلقائي الذي قمت بتكوينه.",
+        "tandem_prefix": "يقترح",
+        "tandem_suffix": "- أسلوب أزواج الرعاية الفردية بناءً على المهارات والموقع والتوافر.",
+        "nudge": "يرسل مطالبات مستهدفة إلى الأعضاء الذين كانوا غير نشطين أو لديهم طلبات غير متطابقة.",
+        "demand": "يتنبأ الطلب على الرعاية القادمة من الأنماط التاريخية.",
+        "help": "يقترح أفضل منسق لطلبات المساعدة المفتوحة.",
+        "activity": "منسقو رسائل البريد الإلكتروني: ملخص أسبوعي للنشاط التطوعي."
+      },
+      "tabs": {
+        "aria": "علامات التبويب KI-Agenten",
+        "config": "التكوين",
+        "proposals": "المقترحات",
+        "runs": "أشواط"
+      },
+      "stats": {
+        "total_runs": "إجمالي أشواط",
+        "total_proposals": "مجموع المقترحات",
+        "pending_review": "{{count}} في انتظار المراجعة"
+      },
+      "agent_types": {
+        "activity_summary": "ملخص النشاط",
+        "demand_forecast": "توقعات الطلب",
+        "help_routing": "توجيه المساعدة",
+        "member_welcome": "مرحبا بالعضو",
+        "nudge_dispatch": "دفعة إيفاد",
+        "tandem_matching": "مطابقة جنبا إلى جنب"
+      },
+      "status": {
+        "all": "الجميع",
+        "approved": "موافقة",
+        "auto_applied": "تم التطبيق تلقائيًا",
+        "cancelled": "تم الإلغاء",
+        "completed": "مكتمل",
+        "expired": "منتهي الصلاحية",
+        "failed": "فشل",
+        "pending": "قيد الانتظار",
+        "pending_review": "في انتظار المراجعة",
+        "rejected": "مرفوض",
+        "running": "جري"
+      },
+      "triggered_by": {
+        "manual": "يدوي",
+        "scheduled": "المقرر"
+      },
+      "config": {
+        "enable_title": "تمكين KI-Agenten",
+        "enable_description": "سيد تشغيل/إيقاف. عند إيقاف التشغيل، لن يعمل أي وكلاء في الموعد المحدد.",
+        "agent_types_title": "أنواع الوكيل",
+        "tandem_description": "-أسلوب دعم الاقتران",
+        "nudge_description": "المشاركة الذكية تحفز الأعضاء",
+        "activity_description": "ملخص سجل المتطوعين الأسبوعي للمنسقين",
+        "demand_description": "توقع الطلب على الرعاية من اتجاهات سجل المتطوعين",
+        "help_description": "التوجيه التلقائي لطلبات المساعدة المفتوحة",
+        "thresholds_title": "العتبات والجدول الزمني",
+        "auto_apply_threshold": "حد التطبيق التلقائي:",
+        "auto_apply_threshold_aria": "عتبة التطبيق التلقائي",
+        "auto_apply_threshold_help": "يتم تطبيق المقترحات التي تزيد عن هذه الثقة تلقائيًا دون مراجعة.",
+        "max_proposals": "الحد الأقصى للمقترحات لكل تشغيل",
+        "schedule_hour": "ساعة الجدولة (0-23، التوقيت المحلي للخادم)",
+        "notification_email": "البريد الإلكتروني الإخطار",
+        "notification_email_placeholder": "admin@example.org"
+      },
+      "actions": {
+        "approve": "يعتمد",
+        "approve_all_eligible": "الموافقة على جميع المؤهلين",
+        "details": "تفاصيل",
+        "reject": "يرفض",
+        "save_config": "حفظ التكوين",
+        "trigger": "مشغل"
+      },
+      "empty": {
+        "loading_config": "جارٍ تحميل التكوين...",
+        "loading_proposals": "جارٍ تحميل المقترحات...",
+        "loading_runs": "جاري التحميل...",
+        "no_filtered_proposals": "لا توجد مقترحات تتطابق مع هذا الفلتر.",
+        "no_pending_proposals": "لا توجد مقترحات في انتظار المراجعة. قم بتشغيل وكيل من علامة التبويب \"عمليات التشغيل\" لإنشاء المقترحات.",
+        "no_runs": "لا يوجد أشواط حتى الآن. استخدم لوحة التشغيل أعلاه لبدء تشغيل العميل الأول."
+      },
+      "proposals": {
+        "approve_all_help": "يوافق على جميع المقترحات التي في انتظار المراجعة والتي تفي ثقتها بحد التطبيق التلقائي.",
+        "table_aria": "مقترحات الوكيل",
+        "columns": {
+          "actions": "الإجراءات",
+          "confidence": "ثقة",
+          "created": "مخلوق",
+          "proposal_data": "بيانات الاقتراح",
+          "status": "حالة",
+          "subject_user": "مستخدم الموضوع",
+          "target_user": "المستخدم المستهدف",
+          "type": "يكتب"
+        }
+      },
+      "legend": {
+        "status": "حالة:",
+        "awaiting_decision": "في انتظار قرارك",
+        "human_approved": "وافق عليها الإنسان وتطبيقها",
+        "auto_applied": "يتم تطبيقه تلقائيًا بعد تجاوز الحد الأدنى",
+        "rejected": "تم التخلص منها، ولم يتم تطبيقها",
+        "confidence": "ثقة:",
+        "confidence_high": "80%+ آمن للتطبيق التلقائي",
+        "confidence_medium": "يوصى بمراجعة 50-79%",
+        "confidence_low": "أقل من 50% ثقة منخفضة"
+      },
+      "runs": {
+        "agent_type_aria": "نوع الوكيل الذي سيتم تشغيله",
+        "agent_type_title": "نوع الوكيل",
+        "table_aria": "يدير الوكيل",
+        "trigger_title": "قم بتشغيل التشغيل الآن",
+        "triggered_by_help": "الوسائل اليدوية التي يتم تشغيلها بواسطة المسؤول من هذه الصفحة؛ يتم تشغيل الوسائل المجدولة تلقائيًا في ساعة الجدول التي تم تكوينها.",
+        "columns": {
+          "actions": "الإجراءات",
+          "agent_type": "نوع الوكيل",
+          "applied": "مُطبَّق",
+          "duration": "مدة",
+          "proposals": "المقترحات",
+          "started": "بدأت",
+          "status": "حالة",
+          "triggered_by": "أثار بواسطة"
+        }
+      },
+      "run_detail": {
+        "title": "قم بتشغيل #{{id}} - {{type}}",
+        "status": "حالة:",
+        "triggered_by": "تم التشغيل بواسطة:",
+        "started": "بدأت:",
+        "duration": "مدة:",
+        "proposals_generated": "المقترحات الناتجة:",
+        "proposals_applied": "المقترحات المطبقة:",
+        "proposals_count": "المقترحات ({{count}})",
+        "proposals_table_aria": "تشغيل المقترحات",
+        "columns": {
+          "subject": "موضوع"
+        }
+      },
+      "toasts": {
+        "approve_eligible_failed": "فشل في الموافقة على المقترحات المؤهلة.",
+        "approved_eligible": "تمت الموافقة على مقترحات {{approved}} (فشل {{failed}}، عتبة {{threshold}}%).",
+        "config_load_failed": "فشل تحميل تكوين الوكيل.",
+        "config_save_failed": "فشل حفظ التكوين.",
+        "config_saved": "تم حفظ تكوين الوكيل.",
+        "proposal_approve_failed": "فشل في الموافقة على الاقتراح.",
+        "proposal_approved": "تمت الموافقة على الاقتراح وتطبيقه.",
+        "proposal_reject_failed": "فشل في رفض الاقتراح.",
+        "proposal_rejected": "تم رفض الاقتراح.",
+        "proposals_load_failed": "فشل تحميل المقترحات.",
+        "run_details_load_failed": "فشل تحميل تفاصيل التشغيل.",
+        "run_trigger_failed": "فشل في تشغيل التشغيل.",
+        "run_triggered": "تم تشغيل التشغيل: تم إنشاء مقترحات {{count}}.",
+        "runs_load_failed": "فشل في تحميل عمليات التشغيل."
+      }
+    },
+    "module_docs": {
+      "meta": {
+        "title": "AI مستندات الوحدة النمطية",
+        "description": "أوصاف باللغة البسيطة لكل وحدة. يستخدم مساعد الدردشة AI هذه كأساس أساسي عند الإجابة على أسئلة الأعضاء."
+      },
+      "actions": {
+        "create_doc": "إنشاء مستند",
+        "delete": "يمسح",
+        "edit": "يحرر",
+        "new_doc": "وثيقة جديدة",
+        "seed_defaults": "افتراضيات البذور"
+      },
+      "about": {
+        "body": "عندما تحتوي رسالة الدردشة الخاصة بأحد الأعضاء على أي من الكلمات الرئيسية للمستند، يتم إلحاق نص هذا المستند بموجه نظام AI. يتم حقن ما يصل إلى 3 مستندات في كل دور. اكتب بلغة واضحة: ما الذي تفعله الميزة، وكيفية استخدامها، وما هو غير ممكن.",
+        "tip_label": "نصيحة:",
+        "tip_body": "انقر على الإعدادات الافتراضية للبذور للبدء بعشرة مستندات مكتوبة مسبقًا تغطي الوحدات الأساسية. لن يقوموا بالكتابة فوق أي شيء قمت بتخصيصه."
+      },
+      "columns": {
+        "actions": "الإجراءات",
+        "keywords": "الكلمات الرئيسية",
+        "slug": "سبيكة",
+        "status": "حالة",
+        "title": "عنوان",
+        "updated": "تم التحديث"
+      },
+      "confirm_delete": "هل تريد حذف \"{{title}}\"؟ لا يمكن التراجع عن هذا.",
+      "empty": {
+        "no_docs": "لا توجد مستندات وحدة حتى الآن. استخدم الإعدادات الافتراضية للبذور أو مستند جديد للبدء."
+      },
+      "editor": {
+        "create_title": "وثيقة وحدة جديدة",
+        "edit_title": "تحرير \"{{title}}\"",
+        "fields": {
+          "active": "نشيط",
+          "body": "جسم",
+          "keywords": "الكلمات الرئيسية المحفزة (مفصولة بفواصل)",
+          "module_slug": "سبيكة الوحدة",
+          "title": "عنوان"
+        },
+        "hints": {
+          "active": "لا يتم أبدًا إدراج المستندات غير النشطة في موجه AI.",
+          "keywords": "عندما تظهر أي من هذه الكلمات في رسالة محادثة، سيتم إدراج هذا المستند في موجه AI.",
+          "module_slug": "الأحرف الصغيرة والأرقام والشرطات السفلية والشرطات. لا يمكن تغييره بعد الإنشاء."
+        },
+        "placeholders": {
+          "body": "وصف بلغة مبسطة لهذه الوحدة. ماذا يفعل، وكيفية استخدامه، وما هو غير ممكن.",
+          "keywords": "على سبيل المثال timebank، hours، credits، exchange",
+          "module_slug": "على سبيل المثال listings، wallet، events",
+          "title": "على سبيل المثال كيف يعمل credits"
+        }
+      },
+      "status": {
+        "active": "نشيط",
+        "disabled": "عاجز"
+      },
+      "table_aria": "مستندات الوحدة النمطية AI",
+      "toasts": {
+        "created": "تم إنشاء المستند.",
+        "deleted": "تم حذف المستند.",
+        "delete_failed": "فشل الحذف.",
+        "load_failed": "فشل تحميل مستندات الوحدة النمطية.",
+        "save_failed": "فشل الحفظ.",
+        "seed_failed": "فشلت البذور.",
+        "seeded": "المستند (المستندات) الافتراضي {{count}} المصنف.",
+        "updated": "تم تحديث المستند."
+      }
+    },
+    "trace_metrics": {
+      "meta": {
+        "title": "AI مقاييس التتبع",
+        "description": "التكلفة وزمن الوصول واستخدام الأداة والأسئلة التي لم تتم الإجابة عليها لمساعد الدردشة AI."
+      },
+      "empty": {
+        "loading_tools": "جارٍ تحميل استخدام الأداة...",
+        "no_downvotes": "لا يوجد تصويتات سلبية. لا يوجد شيء لتحسينه الآن.",
+        "no_tools": "لا توجد أداة تستدعي في هذه النافذة."
+      },
+      "filters": {
+        "window": "نافذة"
+      },
+      "stats": {
+        "avg_latency": "متوسط ​​زمن الوصول",
+        "cost": "التكلفة (USD)",
+        "latency_value": "{{value}} مللي",
+        "thumbs_down": "اعترض",
+        "thumbs_up": "ممتاز",
+        "turns": "المنعطفات"
+      },
+      "tools": {
+        "title": "أعلى الأدوات تسمى"
+      },
+      "toasts": {
+        "load_failed": "فشل تحميل المقاييس."
+      },
+      "unanswered": {
+        "title": "الأسئلة التي لم تتم الإجابة عليها (ممتاز)",
+        "description": "هذه هي المنعطفات التي أعطاها الأعضاء إبهامًا للأسفل. اكتب AI Module Doc جديد لتغطية أي أنماط متكررة.",
+        "table_aria": "أسئلة بلا إجابة",
+        "columns": {
+          "assistant_reply": "رد المساعد (مقتطف)",
+          "note": "ملحوظة",
+          "user_question": "سؤال المستخدم",
+          "when": "متى"
+        }
+      },
+      "windows": {
+        "7": "آخر 7 أيام",
+        "30": "آخر 30 يومًا",
+        "90": "آخر 90 يومًا"
+      }
+    }
+  },
+  "advertising": {
+    "status": {
+      "all": "الجميع",
+      "active": "نشيط",
+      "cancelled": "تم الإلغاء",
+      "completed": "مكتمل",
+      "draft": "مسودة",
+      "drafts": "المسودات",
+      "paused": "متوقف مؤقتًا",
+      "pending_review": "في انتظار المراجعة",
+      "rejected": "مرفوض",
+      "scheduled": "المقرر",
+      "sending": "إرسال",
+      "sent": "مرسل"
+    },
+    "advertiser": {
+      "gemeinde": "بلدية",
+      "private": "خاص",
+      "sme": "SME",
+      "sme_local": "SME (الأعمال التجارية المحلية)",
+      "verein": "منظمة"
+    },
+    "shared": {
+      "campaign_details": "تفاصيل الحملة",
+      "filter_by_status": "التصفية حسب الحالة",
+      "rejection_reason": "سبب الرفض",
+      "search_campaigns": "حملات البحث...",
+      "unexpected_error": "حدث خطأ غير متوقع",
+      "actions": {
+        "approve": "يعتمد",
+        "cancel": "يلغي",
+        "close": "يغلق",
+        "create_campaign": "إنشاء حملة",
+        "details": "تفاصيل",
+        "new_campaign": "حملة جديدة",
+        "pause": "يوقف",
+        "reject": "يرفض",
+        "reject_campaign": "رفض الحملة",
+        "submit_for_review": "إرسال للمراجعة",
+        "view_details": "عرض التفاصيل"
+      },
+      "columns": {
+        "actions": "الإجراءات",
+        "advertiser": "معلن",
+        "campaign": "حملة",
+        "clicks": "النقرات",
+        "ctr": "CTR",
+        "id": "ID",
+        "impressions": "انطباعات",
+        "status": "حالة"
+      },
+      "empty": {
+        "no_campaigns": "لم يتم العثور على حملات."
+      },
+      "fields": {
+        "advertiser_type": "نوع المعلن",
+        "campaign_name": "اسم الحملة",
+        "type": "يكتب"
+      }
+    },
+    "ad": {
+      "page_title": "الحملات الإعلانية",
+      "budget_description": "أدخل 0 للميزانية غير المحدودة",
+      "audience_description": "اتركه فارغًا لاستهداف جميع أفراد المجتمع",
+      "creative_alt": "مبدع",
+      "create_title": "إنشاء حملة إعلانية",
+      "creatives_count": "التصميمات ({{count}})",
+      "no_creatives": "لا توجد تصميمات إعلانية مرفقة بهذه الحملة حتى الآن.",
+      "performance_30_days": "الأداء (30 يومًا)",
+      "reject_intro_prefix": "أنت ترفض",
+      "reject_intro_suffix": "يرجى تقديم السبب حتى يعرف المعلن كيفية تحسين عملية الإرسال.",
+      "rejection_placeholder": "على سبيل المثال المحتوى ينتهك إرشادات المجتمع - يرجى مراجعة العنوان.",
+      "columns": {
+        "budget_spent": "الميزانية / الإنفاق"
+      },
+      "fields": {
+        "audience_filters": "مرشحات الجمهور (JSON، اختياري)",
+        "end_date": "تاريخ الانتهاء",
+        "placement": "التنسيب",
+        "start_date": "تاريخ البدء",
+        "total_budget_cents": "الميزانية الإجمالية (بالسنتات)"
+      },
+      "header": {
+        "title": "الإعلان المحلي",
+        "description": "إدارة الحملات الإعلانية المحلية من SMEs والجمعيات والبلديات"
+      },
+      "placement": {
+        "all": "جميع المواضع",
+        "discovery": "اكتشاف",
+        "feed": "يٌطعم",
+        "market": "سوق"
+      },
+      "placeholders": {
+        "budget": "على سبيل المثال 5000 = EUR 50.00",
+        "campaign_name": "تخفيضات الصيف - Cafe Helvetia"
+      },
+      "stats": {
+        "active_campaigns": "الحملات النشطة",
+        "clicks_today": "نقرات اليوم",
+        "impressions_today": "الانطباعات اليوم",
+        "total_revenue": "إجمالي الإيرادات"
+      },
+      "toasts": {
+        "approved": "تمت الموافقة على الحملة \"{{name}}\".",
+        "approve_failed": "فشلت الموافقة على الحملة",
+        "audience_json_invalid": "يجب أن تكون عوامل تصفية الجمهور صالحة JSON",
+        "created": "تم إنشاء الحملة وتقديمها للمراجعة",
+        "create_failed": "فشل إنشاء الحملة",
+        "details_failed": "فشل تحميل تفاصيل الحملة",
+        "load_failed": "فشل تحميل الحملات الإعلانية",
+        "name_required": "اسم الحملة مطلوب",
+        "paused": "الحملة \"{{name}}\" متوقفة مؤقتًا",
+        "pause_failed": "فشل إيقاف الحملة مؤقتًا",
+        "rejected": "تم رفض الحملة \"{{name}}\".",
+        "reject_failed": "فشل رفض الحملة"
+      }
+    },
+    "push": {
+      "chart_opens_title": "يتم فتح {{count}}",
+      "chart_sends_title": "يرسل {{count}}",
+      "create_title": "حملة دفع جديدة",
+      "daily_breakdown": "انهيار يومي",
+      "immediate": "مباشر",
+      "no_daily_data": "لا توجد بيانات يومية حتى الآن.",
+      "reject_intro_prefix": "رفض",
+      "reject_intro_suffix": "يرجى تقديم السبب الذي سيكون مرئيًا للمعلن.",
+      "rejection_placeholder": "على سبيل المثال المحتوى لا يتوافق مع إرشادات المجتمع...",
+      "table_aria": "حملات الدفع",
+      "actions": {
+        "dispatch_now": "أرسل الآن"
+      },
+      "columns": {
+        "cost": "يكلف",
+        "open_rate": "معدل مفتوح",
+        "scheduled": "المقرر",
+        "targets": "الأهداف",
+        "title_preview": "معاينة العنوان"
+      },
+      "dates": {
+        "approved": "موافقة",
+        "created": "مخلوق",
+        "scheduled": "المقرر",
+        "sent": "مرسل"
+      },
+      "fields": {
+        "cta_url": "CTA URL",
+        "cta_url_optional": "CTA URL (اختياري)",
+        "notification_body": "دفع هيئة الإخطار",
+        "notification_title": "دفع عنوان الإخطار",
+        "push_body": "دفع الجسم",
+        "push_title": "دفع العنوان",
+        "scheduled_at": "تمت جدولته في (اختياري - اتركه فارغًا للإرسال عند الموافقة)"
+      },
+      "header": {
+        "title": "حملات الدفع المدفوعة (AG57)"
+      },
+      "metrics": {
+        "opens": "يفتح",
+        "revenue": "ربح",
+        "sends": "يرسل",
+        "sent": "مرسل"
+      },
+      "placeholders": {
+        "body": "الحد الأقصى 400 حرف",
+        "campaign_name": "على سبيل المثال ترويج الربيع - Cafe Seeblick",
+        "title": "الحد الأقصى 100 حرف"
+      },
+      "stats": {
+        "needs_attention": "يحتاج إلى اهتمام",
+        "pending_review": "في انتظار المراجعة",
+        "revenue_this_month": "الإيرادات هذا الشهر",
+        "sends_this_month": "يرسل هذا الشهر",
+        "total_campaigns": "إجمالي الحملات"
+      },
+      "toasts": {
+        "approved": "تمت الموافقة على الحملة \"{{name}}\".",
+        "approve_failed": "فشلت الموافقة على الحملة.",
+        "created": "تم إنشاء الحملة.",
+        "create_failed": "فشل إنشاء الحملة.",
+        "dispatched": "تم إرسال الحملة \"{{name}}\".",
+        "dispatch_failed": "فشل في إرسال الحملة.",
+        "load_failed": "فشل تحميل الحملات",
+        "rejected": "تم رفض الحملة \"{{name}}\".",
+        "reject_failed": "فشل رفض الحملة.",
+        "required_fields": "الاسم والعنوان والجسم مطلوبة."
+      }
+    }
+  },
+  "municipal_copilot": {
+    "about": {
+      "body": "يساعدك مساعد الطيار المحلي على كتابة إعلانات واضحة ورسمية بشكل مناسب وخالية من المصطلحات. الصق مسودة تقريبية - سيقترح AI تحسينات، ومشكلات نغمة الإشارة (رسمية جدًا، أو متعالية، أو غير واضحة)، وسيدرج أي مخاوف متعلقة بالاعتدال. يمكنك مراجعة الاقتراح وقبوله أو رفضه قبل نشر أي شيء.",
+      "title": "حول هذه الصفحة"
+    },
+    "actions": {
+      "accept": "يقبل",
+      "cancel": "يلغي",
+      "generate_proposal": "توليد الاقتراح",
+      "refresh": "ينعش",
+      "reject": "يرفض",
+      "reject_proposal": "رفض الاقتراح",
+      "view": "منظر"
+    },
+    "empty": {
+      "no_latest": "لا يوجد اقتراح حتى الآن. قم بإنشاء واحد من المسودة الموجودة على اليسار.",
+      "no_proposals": "لا توجد مقترحات حتى الآن. ستظهر المسودات التي تقوم بتحليلها هنا كمسار تدقيق.",
+      "value": "-"
+    },
+    "fields": {
+      "audience_description": "حدد من هو هذا الإعلان (على سبيل المثال، \"جميع المقيمين\"، \"المتطوعين\"، \"جهات الاتصال بالبلدية\") حتى يتمكن AI من معايرة النغمة والمفردات بشكل مناسب.",
+      "audience_hint": "تلميح الجمهور (اختياري)",
+      "audience_placeholder": "على سبيل المثال مقدمي الرعاية في المنطقة الشمالية الفرعية",
+      "character_count": "{{count}} / 4000 حرف",
+      "draft_announcement": "مشروع إعلان",
+      "draft_placeholder": "الصق مسودة تقريبية - سيقوم مساعد الطيار بتلميع المشكلات والتحقق من النغمة ووضع علامة عليها.",
+      "polished_text": "نص مصقول",
+      "reason": "سبب",
+      "reason_placeholder": "لماذا يتم رفض هذا الاقتراح؟"
+    },
+    "labels": {
+      "audience": "الجمهور: {{audience}}",
+      "model": "الموديل: {{model}}"
+    },
+    "meta": {
+      "page_title": "مساعد الاتصالات البلدية",
+      "subtitle": "قم بصياغة الإعلانات الرسمية، وصقلها بواسطة AI، وتحقق من النغمة والوضوح، ثم انشرها. مصمم للمنسقين الذين يحتاجون إلى التواصل مع السكان وجهات الاتصال بالبلدية بصوت ثابت وسهل الوصول إليه.",
+      "title": "مساعد الاتصالات البلدية"
+    },
+    "modal": {
+      "reject_title": "رفض الاقتراح"
+    },
+    "sections": {
+      "clarity_warnings": "تحذيرات الوضوح",
+      "latest_proposal": "أحدث اقتراح",
+      "moderation_flags": "أعلام الاعتدال",
+      "new_draft": "مسودة جديدة",
+      "recent_proposals": "المقترحات الأخيرة"
+    },
+    "states": {
+      "accepted": "مقبول. الآن قم بنشر النص المصقول عبر مسؤول الإعلانات.",
+      "rejected_reason": "مرفوض - السبب: {{reason}}"
+    },
+    "status": {
+      "accepted": "مقبول",
+      "proposed": "مقترح",
+      "published": "تم النشر",
+      "rejected": "مرفوض"
+    },
+    "table": {
+      "actions": "الإجراءات",
+      "aria": "مقترحات مساعد الطيار الأخيرة",
+      "audience": "جمهور",
+      "created": "مخلوق",
+      "draft": "مسودة",
+      "status": "حالة",
+      "tone": "نغمة"
+    },
+    "toasts": {
+      "accept_failed": "فشل في قبول الاقتراح",
+      "accepted": "تم قبول الاقتراح - قم بالنشر الآن عبر مسؤول الإعلانات",
+      "draft_too_long": "المسودة طويلة جدًا (الحد الأقصى 4000 حرف)",
+      "enter_draft": "أدخل مسودة أولاً",
+      "generate_failed": "فشل في إنشاء الاقتراح",
+      "generated": "تم إنشاء الاقتراح",
+      "load_failed": "فشل تحميل مقترحات مساعد الطيار",
+      "reason_required": "السبب مطلوب",
+      "reject_failed": "فشل في رفض الاقتراح",
+      "rejected": "تم رفض الاقتراح"
+    },
+    "tone": {
+      "condescending": "تنازل",
+      "ok": "نغمة موافق",
+      "too_formal": "رسمي للغاية",
+      "too_informal": "غير رسمية للغاية"
+    },
+    "tone_legend": {
+      "condescending": "قد يرعى القارئ",
+      "ok": "لم يتم اكتشاف مشاكل في النغمة",
+      "prefix": "أسطورة النغمة -",
+      "too_formal": "بيروقراطية بشكل مفرط",
+      "too_informal": "قد يبدو غير مهني"
+    }
+  },
+  "municipal_roi_page": {
+    "about": {
+      "body_middle": "يحسب التقرير القيمة الاجتماعية والاقتصادية لبرنامج الرعاية المجتمعية الخاص بك باستخدام",
+      "body_prefix": "البلدية",
+      "body_suffix": "منهجية Age-Stiftung. فهو يعرض التكلفة المقدرة لتعويض خدمات الرعاية الرسمية (Spitex/Pflege)، والقيمة الاجتماعية الناتجة، وبيانات الاتجاه عبر فترات الإبلاغ. تم تصميم هذا التقرير لمشاركته مع شركاء البلديات والممولين كدليل على تأثير البرنامج.",
+      "formula_prefix": "تعويض التكلفة = إجمالي ساعات الرعاية المعتمدة x",
+      "formula_suffix": "معدل الساعة × مضاعف الوقاية. يعكس مضاعف الوقاية (الافتراضي: 2.0) أن ساعة واحدة من الرعاية غير الرسمية تمنع حوالي ساعتين من تدخل الرعاية الرسمية، بناءً على بحث Age-Stiftung.",
+      "title": "حول هذه الصفحة"
+    },
+    "actions": {
+      "export_csv": "تصدير CSV",
+      "refresh_aria": "تحديث تقرير الأثر البلدي",
+      "refresh_data": "تحديث البيانات"
+    },
+    "breakdown": {
+      "aria": "انهيار المنطقة الفرعية",
+      "description": "يُظهر تقسيم المنطقة الفرعية الأحياء التي تولد معظم أنشطة الرعاية. استخدم هذا لتحديد المجالات التي قد تحتاج إلى مزيد من دعم المنسق أو توظيف المتطوعين.",
+      "formal_care_offset": "تعويض الرعاية الرسمية",
+      "hours": "ساعات",
+      "sub_region": "المنطقة الفرعية",
+      "title": "التوزيع حسب المنطقة الفرعية",
+      "weighted_hours": "الساعات المرجحة"
+    },
+    "filters": {
+      "all_sub_regions": "جميع المناطق الفرعية",
+      "from": "من",
+      "period": "الفترة: {{from}} -> {{to}}",
+      "sub_region": "المنطقة الفرعية",
+      "to": "ل"
+    },
+    "meta": {
+      "page_title": "تقرير الأثر البلدي",
+      "subtitle": "الأدلة على المشتريات بين الشركات - تعويضات تكاليف الرعاية ومقاييس رأس المال الاجتماعي",
+      "title": "تقرير الأثر البلدي"
+    },
+    "methodology": {
+      "chf_per_hour": "CHF {{amount}}/ساعة",
+      "default_prevention_prefix": "تنطبق قيمة المنع على مضاعف 2x لكل Age-Stiftung/",
+      "default_prevention_suffix": "منهجية التقييم.",
+      "default_rate": "CHF 35/ساعة",
+      "default_source": "معدل مساعد الرعاية الرسمية السويسري، SECO 2024",
+      "hours_are_valued_at": "الساعات تقدر ب",
+      "hours_valued_at": "ساعات تقدر بـ",
+      "prevention_value_prefix": "تنطبق قيمة المنع على مضاعف {{multiplier}}x لكل Age-Stiftung/",
+      "prevention_value_suffix": "منهجية التقييم.",
+      "substitution_applied": "يتم ترجيح الساعات حسب معاملات الاستبدال لكل فئة.",
+      "substitution_not_applied": "جميع الساعات مرجحة بـ 1.0x.",
+      "tenant_setting_source": "تم تكوينه لهذا المستأجر"
+    },
+    "municipalities": {
+      "point_export": "يتوفر تصدير CSV - استخدم الزر الموجود في رأس الصفحة لإعداد تقارير Age-Stiftung وPro Senectute وتقارير الإدارة الاجتماعية في الكانتون.",
+      "point_hour_prefix": "كل ساعة من وقت رعاية المجتمع توفر تقريبًا",
+      "point_hour_suffix": "في تكاليف الرعاية الرسمية",
+      "point_nexus": "يجعل هذا التأثير قابلاً للقياس والتدقيق والإبلاغ عنه بالنسبة لمشتريات الكانتونات والبلديات",
+      "point_prevention": "يمكن للدعم المجتمعي الوقائي أن يقلل من احتياجات الرعاية السكنية - مضاعف يقدر بمرتين",
+      "title": "ماذا يعني هذا بالنسبة للبلديات"
+    },
+    "roi": {
+      "default_multiplier_note": "(مضاعف 2x)",
+      "multiplier_note": "({{multiplier}}مضاعف x)",
+      "prevented_this_period": "في تكاليف الرعاية الرسمية منعت هذه الفترة",
+      "prevention_value": "قيمة الوقاية",
+      "social_isolation_supported": "دعم الناس للخروج من العزلة الاجتماعية",
+      "title": "تعويض تكلفة الرعاية المقدرة",
+      "yoy": "{{value}} YoY"
+    },
+    "stats": {
+      "active_members": "الأعضاء النشطين",
+      "active_relationships": "العلاقات النشطة",
+      "care_recipients": "متلقي الرعاية",
+      "total_hours": "إجمالي الساعات",
+      "weighted_hours_note": "{{hours}} الساعات المرجحة بعد معاملات الاستبدال",
+      "weighted_hours_tooltip": "يتم ترجيح الساعات بمعدلات الاستبدال الخاصة بفئة معينة (على سبيل المثال، الرفقة 0.4x، النقل 0.7x، المهمات 1.0x) لكل منهجية Age-Stiftung."
+    },
+    "toasts": {
+      "export_failed": "فشل التصدير CSV",
+      "load_failed": "فشل تحميل بيانات التأثير البلدي"
+    }
+  },
+  "municipal_verification": {
+    "about": {
+      "body": "يسجل التحقق البلدي التوقيع الرسمي من شريك البلدية أو الكانتون بأن برنامج الرعاية المجتمعية هذا يلبي متطلباتهم. مطلوب التحقق من أجل التحقق من جاهزية الإطلاق التجريبي وفتح تقرير التأثير البلدي. استخدم التحقق DNS TXT للنطاقات البلدية الرسمية، أو قم بتطبيق شهادة المسؤول إذا لم يكن التحكم DNS متاحًا.",
+      "pending_dns": "تم إنشاء رمز التحقق - في انتظار نشر وتأكيد DNS.",
+      "revoked": "تمت إزالة التحقق - أعد التحقق لاستعادة الوصول.",
+      "title": "حول هذه الصفحة",
+      "verified": "تم التحقق رسميًا - تم فتح حزمة التقارير البلدية."
+    },
+    "actions": {
+      "apply_attestation": "تطبيق التصديق",
+      "cancel": "يلغي",
+      "generate_dns_token": "قم بإنشاء الرمز المميز DNS",
+      "refresh": "ينعش",
+      "revoke": "إبطال"
+    },
+    "current": {
+      "not_verified": "لم يتم التحقق من هذا المستأجر حاليا. استخدم الخيارات أدناه لبدء عملية التحقق DNS أو تطبيق شهادة المشرف اليدوية.",
+      "title": "الوضع الحالي",
+      "verified_on": "تم التحقق منه على {{date}}"
+    },
+    "dns": {
+      "publish_record": "انشر هذا السجل TXT على DNS، ثم انتظر النشر:",
+      "record_name": "اسم السجل",
+      "ttl_label": "TTL",
+      "ttl_value": "300",
+      "txt_type": "TXT",
+      "type_label": "يكتب",
+      "value": "قيمة"
+    },
+    "fields": {
+      "attestation_description": "لماذا تصدق هذا دون التحقق من DNS؟ (مسار التدقيق.)",
+      "attestation_note": "مذكرة التصديق (اختياري)",
+      "domain_or_organisation": "المجال أو المنظمة",
+      "domain_placeholder": "على سبيل المثال zurich.ch",
+      "municipality_domain": "نطاق البلدية"
+    },
+    "history": {
+      "empty": "لا توجد سجلات التحقق حتى الآن.",
+      "title": "التحقق",
+      "updated": "تم التحديث {{date}}",
+      "via_method": "عبر {{method}}"
+    },
+    "meta": {
+      "description": "ضع علامة على هذا المجتمع كشريك بلدي معتمد. إضافة شارة \"البلدية التي تم التحقق منها\" إلى التقارير العامة.",
+      "page_title": "التحقق البلدي",
+      "title": "التحقق البلدي"
+    },
+    "request": {
+      "attestation_body": "استخدم هذا فقط عندما لا يكون التحكم DNS متاحًا. يتم تسجيل التحقق كما تم التصديق عليه يدويًا بواسطة المسؤول.",
+      "attestation_tab": "شهادة المشرف",
+      "dns_body": "قم بتوفير نطاق البلدية الرسمي الذي تتحكم فيه. سنقوم بإنشاء سجل DNS TXT لتتمكن من نشره؛ بمجرد نشره، يقوم النظام بوضع علامة على هذا المستأجر على أنه تم التحقق منه.",
+      "dns_tab": "DNS TXT (مفضل)",
+      "method_aria": "طريقة التحقق",
+      "title": "طلب التحقق"
+    },
+    "revoke_modal": {
+      "body_prefix": "إلغاء التحقق ل",
+      "body_suffix": "يؤدي هذا إلى إزالة شارة التحقق وسيتم وضع علامة على سجل التحقق على أنه ملغى.",
+      "title": "هل تريد إلغاء التحقق؟"
+    },
+    "status": {
+      "pending_dns": "في انتظار DNS",
+      "revoked": "تم إبطاله",
+      "verified": "تم التحقق منه"
+    },
+    "toasts": {
+      "attest_failed": "فشل في إثبات التحقق",
+      "attested": "التحقق موثق",
+      "dns_failed": "فشل بدء التحقق من DNS",
+      "dns_generated": "تم إنشاء رمز التحقق DNS",
+      "load_failed": "فشل تحميل حالة التحقق",
+      "revoke_failed": "فشل في إلغاء التحقق",
+      "revoked": "تم إلغاء التحقق"
+    },
+    "validation": {
+      "domain_required": "أدخل المجال"
     }
   }
 }
