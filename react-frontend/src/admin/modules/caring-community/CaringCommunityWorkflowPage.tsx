@@ -278,13 +278,6 @@ const rolePresets = [
 const reportPeriods = ['last_30_days', 'last_90_days', 'year_to_date', 'previous_quarter'] as const;
 const relationshipFrequencies = ['weekly', 'fortnightly', 'monthly', 'ad_hoc'] as const;
 
-const reportPeriodLabels: Record<'last_30_days' | 'last_90_days' | 'year_to_date' | 'previous_quarter', string> = {
-  last_30_days: 'Last 30 days',
-  last_90_days: 'Last 90 days',
-  year_to_date: 'Year to date',
-  previous_quarter: 'Previous quarter',
-};
-
 const stageContent: Record<'intake' | 'match' | 'log' | 'verify' | 'statement', { title: string; description: string }> = {
   intake: { title: 'Intake', description: 'Welcome new members and capture their support needs.' },
   match: { title: 'Match', description: 'Pair supporters and recipients based on skills and availability.' },
@@ -2135,10 +2128,9 @@ export default function CaringCommunityWorkflowPage() {
             <Card shadow="sm">
               <CardHeader className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-lg font-semibold">Workflow policy</h2>
+                  <h2 className="text-lg font-semibold">{t('caring_workflow.policy.title')}</h2>
                   <p className="mt-1 text-sm text-default-500">
-                    Configure SLAs, approval rules, and reporting defaults. Changes take effect immediately on save
-                    and apply to all new hour submissions from that point forward.
+                    {t('caring_workflow.policy.description')}
                   </p>
                 </div>
                 <Button
@@ -2148,7 +2140,7 @@ export default function CaringCommunityWorkflowPage() {
                   isLoading={savingPolicy}
                   onPress={savePolicy}
                 >
-                  Save policy
+                  {t('caring_workflow.policy.save')}
                 </Button>
               </CardHeader>
               <Divider />
@@ -2158,8 +2150,8 @@ export default function CaringCommunityWorkflowPage() {
                     type="number"
                     min={1}
                     max={30}
-                    label="Review SLA (days)"
-                    description="Hours not reviewed within this many days will be flagged as overdue in the queue."
+                    label={t('caring_workflow.policy.review_sla_days')}
+                    description={t('caring_workflow.policy.review_sla_days_description')}
                     value={String(summary.policy.review_sla_days)}
                     onValueChange={(value) => updatePolicyField('review_sla_days', Number(value || 1))}
                   />
@@ -2167,8 +2159,8 @@ export default function CaringCommunityWorkflowPage() {
                     type="number"
                     min={1}
                     max={60}
-                    label="Escalation SLA (days)"
-                    description="Overdue items not actioned within this many additional days will be escalated automatically."
+                    label={t('caring_workflow.policy.escalation_sla_days')}
+                    description={t('caring_workflow.policy.escalation_sla_days_description')}
                     value={String(summary.policy.escalation_sla_days)}
                     onValueChange={(value) => updatePolicyField('escalation_sla_days', Number(value || 1))}
                   />
@@ -2176,8 +2168,8 @@ export default function CaringCommunityWorkflowPage() {
                     type="number"
                     min={1}
                     max={28}
-                    label="Monthly statement day"
-                    description="Day of the month on which member statements are generated (e.g. 1 = 1st of each month)."
+                    label={t('caring_workflow.policy.monthly_statement_day')}
+                    description={t('caring_workflow.policy.monthly_statement_day_description')}
                     value={String(summary.policy.monthly_statement_day)}
                     onValueChange={(value) => updatePolicyField('monthly_statement_day', Number(value || 1))}
                   />
@@ -2185,49 +2177,49 @@ export default function CaringCommunityWorkflowPage() {
                     type="number"
                     min={0}
                     max={500}
-                    label="Default hour value (CHF)"
-                    description="Used to calculate estimated social value on statements and municipal reports."
+                    label={t('caring_workflow.policy.default_hour_value_chf')}
+                    description={t('caring_workflow.policy.default_hour_value_chf_description')}
                     value={String(summary.policy.default_hour_value_chf)}
                     onValueChange={(value) => updatePolicyField('default_hour_value_chf', Number(value || 0))}
                   />
                 </div>
                 <Select
-                  label="Default report period"
+                  label={t('caring_workflow.policy.municipal_report_default_period')}
                   selectedKeys={[summary.policy.municipal_report_default_period]}
                   onSelectionChange={(keys) => updatePolicyField('municipal_report_default_period', Array.from(keys)[0]?.toString() ?? 'last_90_days')}
                 >
                   {reportPeriods.map((period) => (
-                    <SelectItem key={period}>{reportPeriodLabels[period]}</SelectItem>
+                    <SelectItem key={period}>{t(`caring_workflow.policy.periods.${period}`)}</SelectItem>
                   ))}
                 </Select>
                 <div className="grid grid-cols-1 gap-3">
                   <PolicySwitch
-                    label="Approval required"
-                    description="Require coordinator approval before hours are added to wallets."
+                    label={t('caring_workflow.policy.approval_required')}
+                    description={t('caring_workflow.policy.approval_required_description')}
                     value={summary.policy.approval_required}
                     onChange={(value) => updatePolicyField('approval_required', value)}
                   />
                   <PolicySwitch
-                    label="Auto-approve trusted reviewers"
-                    description="Skip the queue for hours logged by trusted reviewers."
+                    label={t('caring_workflow.policy.auto_approve_trusted_reviewers')}
+                    description={t('caring_workflow.policy.auto_approve_trusted_reviewers_description')}
                     value={summary.policy.auto_approve_trusted_reviewers}
                     onChange={(value) => updatePolicyField('auto_approve_trusted_reviewers', value)}
                   />
                   <PolicySwitch
-                    label="Allow member self-log"
-                    description="Let members log their own support hours without coordinator entry."
+                    label={t('caring_workflow.policy.allow_member_self_log')}
+                    description={t('caring_workflow.policy.allow_member_self_log_description')}
                     value={summary.policy.allow_member_self_log}
                     onChange={(value) => updatePolicyField('allow_member_self_log', value)}
                   />
                   <PolicySwitch
-                    label="Require organisation for partner hours"
-                    description="Hours given on behalf of partners must be linked to an organisation."
+                    label={t('caring_workflow.policy.require_organisation_for_partner_hours')}
+                    description={t('caring_workflow.policy.require_organisation_for_partner_hours_description')}
                     value={summary.policy.require_organisation_for_partner_hours}
                     onChange={(value) => updatePolicyField('require_organisation_for_partner_hours', value)}
                   />
                   <PolicySwitch
-                    label="Include social value estimate"
-                    description="Show estimated social value (CHF) on statements and reports."
+                    label={t('caring_workflow.policy.include_social_value_estimate')}
+                    description={t('caring_workflow.policy.include_social_value_estimate_description')}
                     value={summary.policy.include_social_value_estimate}
                     onChange={(value) => updatePolicyField('include_social_value_estimate', value)}
                   />
@@ -2239,11 +2231,9 @@ export default function CaringCommunityWorkflowPage() {
           <Card shadow="sm">
             <CardHeader>
               <div>
-                <h2 className="text-lg font-semibold">Member Statements</h2>
+                <h2 className="text-lg font-semibold">{t('caring_workflow.member_statement.title')}</h2>
                 <p className="mt-1 text-sm text-default-500">
-                  Generate a hours-and-impact statement for a single member. Use this to share a formal record of
-                  their support hours, wallet balance, and estimated social value — useful for grant applications,
-                  reviews, or member queries. Enter a member ID and an optional date range, then Preview or Export CSV.
+                  {t('caring_workflow.member_statement.description')}
                 </p>
               </div>
             </CardHeader>
@@ -2252,20 +2242,20 @@ export default function CaringCommunityWorkflowPage() {
               <Input
                 type="number"
                 min={1}
-                label="Member ID"
+                label={t('caring_workflow.member_statement.member_id')}
                 value={statementMemberId}
                 onValueChange={setStatementMemberId}
               />
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <Input
                   type="date"
-                  label="Start date"
+                  label={t('caring_workflow.member_statement.start_date')}
                   value={statementStartDate}
                   onValueChange={setStatementStartDate}
                 />
                 <Input
                   type="date"
-                  label="End date"
+                  label={t('caring_workflow.member_statement.end_date')}
                   value={statementEndDate}
                   onValueChange={setStatementEndDate}
                 />
@@ -2278,7 +2268,7 @@ export default function CaringCommunityWorkflowPage() {
                   isLoading={loadingStatement}
                   onPress={loadMemberStatement}
                 >
-                  Preview
+                  {t('caring_workflow.member_statement.preview')}
                 </Button>
                 <Button
                   variant="flat"
@@ -2286,7 +2276,7 @@ export default function CaringCommunityWorkflowPage() {
                   isLoading={loadingStatement}
                   onPress={exportMemberStatement}
                 >
-                  Export CSV
+                  {t('caring_workflow.member_statement.export_csv')}
                 </Button>
               </div>
               {memberStatement ? (
@@ -2301,10 +2291,10 @@ export default function CaringCommunityWorkflowPage() {
                     </Chip>
                   </div>
                   <div className="mt-3 grid grid-cols-2 gap-2">
-                    <SignalRow label="Approved support hours" value={memberStatement.summary.approved_support_hours} />
-                    <SignalRow label="Pending support hours" value={memberStatement.summary.pending_support_hours} />
-                    <SignalRow label="Wallet hours earned" value={memberStatement.summary.wallet_hours_earned} />
-                    <SignalRow label="Wallet hours spent" value={memberStatement.summary.wallet_hours_spent} />
+                    <SignalRow label={t('caring_workflow.member_statement.approved_support_hours')} value={memberStatement.summary.approved_support_hours} />
+                    <SignalRow label={t('caring_workflow.member_statement.pending_support_hours')} value={memberStatement.summary.pending_support_hours} />
+                    <SignalRow label={t('caring_workflow.member_statement.wallet_hours_earned')} value={memberStatement.summary.wallet_hours_earned} />
+                    <SignalRow label={t('caring_workflow.member_statement.wallet_hours_spent')} value={memberStatement.summary.wallet_hours_spent} />
                   </div>
                   <div className="mt-3 rounded-lg bg-default-100 px-3 py-2 text-sm text-default-700">
                     {formatChf(memberStatement.summary.estimated_social_value_chf)}
@@ -2322,7 +2312,7 @@ export default function CaringCommunityWorkflowPage() {
                 </div>
               ) : (
                 <div className="rounded-lg bg-default-100 p-3 text-sm text-default-500">
-                  Enter a member ID and press Preview to view their statement.
+                  {t('caring_workflow.member_statement.empty')}
                 </div>
               )}
             </CardBody>
