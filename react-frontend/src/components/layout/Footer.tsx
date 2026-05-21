@@ -190,6 +190,21 @@ export function Footer({ children, copyright }: FooterProps) {
               </div>
             ) : null}
 
+            {/* Tenant Copyright */}
+            <div className="border-t border-theme-default pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <p className="text-sm text-theme-subtle">{footerText}</p>
+              <Button
+                variant="light"
+                size="sm"
+                onPress={resetConsent}
+                className="inline-flex items-center gap-1 text-xs text-theme-subtle hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
+                aria-label={t('aria.cookie_settings')}
+                startContent={<Cookie className="w-3 h-3" aria-hidden="true" />}
+              >
+                {t('footer.cookie_settings')}
+              </Button>
+            </div>
+
             {/* Release status — GA strip with Features + Changelog links */}
             <div className="border-t border-theme-default pt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs text-theme-subtle">
               <Sparkles className="w-3.5 h-3.5 shrink-0 text-success" aria-hidden="true" />
@@ -212,21 +227,6 @@ export function Footer({ children, copyright }: FooterProps) {
               >
                 {t('release_status.changelog_link')}
               </Link>
-            </div>
-
-            {/* Tenant Copyright */}
-            <div className="border-t border-theme-default pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <p className="text-sm text-theme-subtle">{footerText}</p>
-              <Button
-                variant="light"
-                size="sm"
-                onPress={resetConsent}
-                className="inline-flex items-center gap-1 text-xs text-theme-subtle hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
-                aria-label={t('aria.cookie_settings')}
-                startContent={<Cookie className="w-3 h-3" aria-hidden="true" />}
-              >
-                {t('footer.cookie_settings')}
-              </Button>
             </div>
 
             {/* Platform Attribution — 3-zone panel */}
