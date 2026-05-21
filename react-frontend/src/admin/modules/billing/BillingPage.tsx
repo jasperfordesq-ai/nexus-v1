@@ -215,10 +215,7 @@ export function BillingPage() {
                 />
                 {usagePct >= 100 && (
                   <p className="text-danger text-sm">
-                    {t(
-                      'billing.over_limit_warning',
-                      'You have exceeded your plan limit. Please contact us to upgrade.'
-                    )}
+                    {t('billing.over_limit_warning')}
                   </p>
                 )}
                 {usagePct >= 80 && usagePct < 100 && (
@@ -248,10 +245,7 @@ export function BillingPage() {
           <ModalHeader>{t('billing.request_upgrade')}</ModalHeader>
           <ModalBody>
             <p className="text-default-500 text-sm mb-3">
-              {t(
-                'billing.upgrade_modal_desc',
-                "We'll be in touch about upgrading your plan."
-              )}
+              {t('billing.upgrade_modal_desc')}
             </p>
             <Textarea
               label={t('billing.upgrade_message')}

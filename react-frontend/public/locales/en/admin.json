@@ -5106,7 +5106,7 @@
     "change_plan": "Change Plan",
     "checkout_error": "Checkout error",
     "checkout_failed": "Checkout Failed",
-    "checkout_failed_desc": "There was a problem processing your checkout. Please try again.",
+    "checkout_failed_desc": "We could not confirm your subscription. If you were charged, your subscription should activate shortly.",
     "checkout_success": "Checkout successfully",
     "checkout_success_desc": "You are now on the {{plan}} plan",
     "checkout_success_generic": "Checkout completed successfully",
@@ -9847,7 +9847,7 @@
     "visibility_private": "Private",
     "visibility_public": "Public",
     "geocode_description": "Geocode group locations to enable map display and distance-based discovery.",
-    "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet."
+    "geocode_not_migrated_desc": "The batch geocoding admin screen has not yet been rebuilt in React. For now, run the Artisan command on the server:"
   },
   "header": {
     "admin_menu": "Admin menu",
@@ -10105,6 +10105,13 @@
     "pipeline_candidate": "Candidate",
     "pipeline_job_title": "Job",
     "pipeline_status": "Status",
+    "pipeline_status_accepted": "Accepted",
+    "pipeline_status_cancelled": "Cancelled",
+    "pipeline_status_declined": "Declined",
+    "pipeline_status_pending": "Pending",
+    "pipeline_status_proposed": "Proposed",
+    "pipeline_status_rejected": "Rejected",
+    "pipeline_status_withdrawn": "Withdrawn",
     "pipeline_scheduled_at": "Scheduled",
     "pipeline_duration": "Duration",
     "pipeline_minutes": "{{count}} min",

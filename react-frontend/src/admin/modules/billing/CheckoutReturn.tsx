@@ -120,12 +120,7 @@ export function CheckoutReturn() {
               <h2 className="text-xl font-semibold mt-4">
                 {t('billing.checkout_failed')}
               </h2>
-              <p className="text-default-500">
-                {t(
-                  'billing.checkout_failed_desc',
-                  'We could not confirm your subscription. If you were charged, your subscription should activate shortly.'
-                )}
-              </p>
+              <p className="text-default-500">{t('billing.checkout_failed_desc')}</p>
               <div className="flex gap-3 justify-center mt-4">
                 <Button
                   as={Link}

@@ -217,10 +217,7 @@ export function JobTemplatesAdmin() {
     <div>
       <PageHeader
         title={t('jobs.templates_page_title')}
-        description={t(
-          'jobs.templates_page_description',
-          'Manage reusable job posting templates'
-        )}
+        description={t('jobs.templates_page_description')}
         actions={
           <Button
             variant="flat"
@@ -236,10 +233,7 @@ export function JobTemplatesAdmin() {
         <EmptyState
           icon={Copy}
           title={t('jobs.templates_empty')}
-          description={t(
-            'jobs.templates_empty_description',
-            'Job templates will appear here once users create them.'
-          )}
+          description={t('jobs.templates_empty_description')}
         />
       ) : (
         <DataTable

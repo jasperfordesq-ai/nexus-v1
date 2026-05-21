@@ -462,10 +462,7 @@ export function ActivityFeed() {
     <div>
       <PageHeader
         title={t('federation.activity_feed_title')}
-        description={t(
-          'federation.activity_feed_desc',
-          'Cross-tenant federation activity for your community',
-        )}
+        description={t('federation.activity_feed_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -631,10 +628,7 @@ export function ActivityFeed() {
               {t('federation.no_activity_title')}
             </p>
             <p className="text-default-400 text-sm">
-              {t(
-                'federation.no_activity_desc',
-                'Activity will appear here once your community interacts with federation partners.',
-              )}
+              {t('federation.no_activity_desc')}
             </p>
           </CardBody>
         </Card>

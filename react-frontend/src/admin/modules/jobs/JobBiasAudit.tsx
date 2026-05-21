@@ -132,10 +132,7 @@ function JobBiasAudit() {
     <div className="space-y-6">
       <PageHeader
         title={t('jobs.bias_page_title')}
-        description={t(
-          'jobs.bias_page_description',
-          'Analyze hiring funnel metrics for potential bias indicators'
-        )}
+        description={t('jobs.bias_page_description')}
       />
 
       {/* Filters */}

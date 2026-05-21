@@ -83,6 +83,10 @@ function getStatusColor(status: string): 'warning' | 'success' | 'danger' | 'def
   return STATUS_COLOR_MAP[status.toLowerCase()] ?? 'default';
 }
 
+function getStatusKey(status: string) {
+  return `jobs.pipeline_status_${status.toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Filter options
 // ─────────────────────────────────────────────────────────────────────────────
@@ -255,7 +259,7 @@ export function JobPipelineOverview() {
         label: t('jobs.pipeline_status'),
         render: (item) => (
           <Chip size="sm" variant="flat" color={getStatusColor(item.status)} className="capitalize">
-            {item.status}
+            {t(getStatusKey(item.status))}
           </Chip>
         ),
       },
@@ -320,7 +324,7 @@ export function JobPipelineOverview() {
         label: t('jobs.pipeline_status'),
         render: (item) => (
           <Chip size="sm" variant="flat" color={getStatusColor(item.status)} className="capitalize">
-            {item.status}
+            {t(getStatusKey(item.status))}
           </Chip>
         ),
       },
@@ -346,10 +350,7 @@ export function JobPipelineOverview() {
     <div>
       <PageHeader
         title={t('jobs.pipeline_title')}
-        description={t(
-          'jobs.pipeline_description',
-          'Overview of interviews and offers across all job vacancies'
-        )}
+        description={t('jobs.pipeline_description')}
       />
 
       <Tabs
@@ -391,9 +392,7 @@ export function JobPipelineOverview() {
                 >
                   {INTERVIEW_STATUSES.map((s) => (
                     <SelectItem key={s}>
-                      {s === 'all'
-                        ? t('jobs.pipeline_all')
-                        : t(`jobs.pipeline_status_${s}`, s.charAt(0).toUpperCase() + s.slice(1))}
+                      {s === 'all' ? t('jobs.pipeline_all') : t(getStatusKey(s))}
                     </SelectItem>
                   ))}
                 </Select>
@@ -407,10 +406,7 @@ export function JobPipelineOverview() {
                 <EmptyState
                   icon={CalendarClock}
                   title={t('jobs.pipeline_no_interviews')}
-                  description={t(
-                    'jobs.pipeline_no_interviews_desc',
-                    'There are no interviews matching the current filter.'
-                  )}
+                  description={t('jobs.pipeline_no_interviews_desc')}
                 />
               ) : (
                 <DataTable<Interview>
@@ -460,9 +456,7 @@ export function JobPipelineOverview() {
                 >
                   {OFFER_STATUSES.map((s) => (
                     <SelectItem key={s}>
-                      {s === 'all'
-                        ? t('jobs.pipeline_all')
-                        : t(`jobs.pipeline_status_${s}`, s.charAt(0).toUpperCase() + s.slice(1))}
+                      {s === 'all' ? t('jobs.pipeline_all') : t(getStatusKey(s))}
                     </SelectItem>
                   ))}
                 </Select>
@@ -476,10 +470,7 @@ export function JobPipelineOverview() {
                 <EmptyState
                   icon={Handshake}
                   title={t('jobs.pipeline_no_offers')}
-                  description={t(
-                    'jobs.pipeline_no_offers_desc',
-                    'There are no offers matching the current filter.'
-                  )}
+                  description={t('jobs.pipeline_no_offers_desc')}
                 />
               ) : (
                 <DataTable<Offer>

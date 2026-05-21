@@ -25,10 +25,7 @@ export function GroupGeocode() {
     <div>
       <PageHeader
         title={t('groups.geocode_title')}
-        description={t(
-          'groups.geocode_description',
-          'Batch-geocode group locations so they appear on the map.',
-        )}
+        description={t('groups.geocode_description')}
       />
 
       <Card shadow="sm" className="border border-warning/30 bg-warning/5 max-w-2xl">
@@ -43,10 +40,7 @@ export function GroupGeocode() {
           <div className="flex items-start gap-3">
             <Info size={18} className="text-default-400 shrink-0 mt-0.5" />
             <p className="text-sm text-default-600">
-              {t(
-                'groups.geocode_not_migrated_desc',
-                'The batch geocoding admin screen has not yet been rebuilt in React. For now, run the Artisan command on the server:',
-              )}
+              {t('groups.geocode_not_migrated_desc')}
             </p>
           </div>
           <Code className="text-xs">php artisan groups:geocode</Code>
