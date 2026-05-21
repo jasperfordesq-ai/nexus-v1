@@ -3819,10 +3819,55 @@
       "load_failed": "Could not load paper onboarding intakes."
     },
     "tandem": {
+      "title": "Tandem Suggestions",
+      "description": "AI-suggested supporter-recipient pairs based on location, language, skills and availability.",
+      "empty": "No suggestions right now. Add more members or adjust availability.",
       "load_failed": "Could not load tandem suggestions.",
       "dismiss_success": "Suggestion dismissed.",
       "dismiss_failed": "Could not dismiss suggestion.",
-      "relationship_title": "Tandem: {{supporter}} & {{recipient}}"
+      "relationship_title": "Tandem: {{supporter}} & {{recipient}}",
+      "distance_km": "{{value}} km",
+      "same_language": "Same language",
+      "complementary_skills": "Complementary skills",
+      "availability_overlap": "Availability overlap",
+      "shared_interests": "Shared interests",
+      "score": "Score {{value}}%",
+      "dismiss": "Dismiss",
+      "create": "Create Tandem"
+    },
+    "safeguarding": {
+      "title": "Safeguarding Reports",
+      "description": "Member-raised concerns about other members, coordinators, or organisations.",
+      "view_all": "View all",
+      "no_data": "No safeguarding data available yet.",
+      "overdue": "Overdue",
+      "no_reports": "No reports yet.",
+      "table_aria": "Recent safeguarding reports",
+      "open": "Open",
+      "org_subject": "Org #{{id}}",
+      "age_hours": "{{count}}h",
+      "age_days": "{{count}}d",
+      "columns": {
+        "severity": "Severity",
+        "category": "Category",
+        "subject": "Subject",
+        "status": "Status",
+        "age": "Age",
+        "action": "Action"
+      },
+      "severity": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "status": {
+        "submitted": "Submitted",
+        "triaged": "Triaged",
+        "investigating": "Investigating",
+        "resolved": "Resolved",
+        "dismissed": "Dismissed"
+      }
     },
     "role_pack": {
       "installed_count": "{{installed}} of {{total}} role presets installed",

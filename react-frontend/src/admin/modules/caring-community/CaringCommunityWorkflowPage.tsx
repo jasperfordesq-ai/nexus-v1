@@ -1841,16 +1841,16 @@ export default function CaringCommunityWorkflowPage() {
             </CardBody>
           </Card>
 
-          {/* Safeguarding Reports — K9 — admin English-only */}
+          {/* Safeguarding reports - K9 */}
           <Card shadow="sm">
             <CardHeader className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold flex items-center gap-2">
                   <TriangleAlert size={18} className="text-danger" />
-                  Safeguarding Reports
+                  {t('caring_workflow.safeguarding.title')}
                 </h2>
                 <p className="mt-1 text-sm text-default-500">
-                  Member-raised concerns about other members, coordinators, or organisations.
+                  {t('caring_workflow.safeguarding.description')}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -1861,7 +1861,7 @@ export default function CaringCommunityWorkflowPage() {
                   isLoading={loadingSafeguarding}
                   onPress={loadSafeguardingSummary}
                 >
-                  Refresh
+                  {t('caring_workflow.actions.refresh')}
                 </Button>
                 <Button
                   as={Link}
@@ -1870,7 +1870,7 @@ export default function CaringCommunityWorkflowPage() {
                   color="primary"
                   variant="flat"
                 >
-                  View all
+                  {t('caring_workflow.safeguarding.view_all')}
                 </Button>
               </div>
             </CardHeader>
@@ -1881,45 +1881,45 @@ export default function CaringCommunityWorkflowPage() {
                   <Spinner size="sm" />
                 </div>
               ) : !safeguardingSummary ? (
-                <p className="text-sm text-default-500 py-4 text-center">No safeguarding data available yet.</p>
+                <p className="text-sm text-default-500 py-4 text-center">{t('caring_workflow.safeguarding.no_data')}</p>
               ) : (
                 <>
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                     <div className="rounded-lg border border-rose-500/30 bg-rose-500/5 p-3 text-center">
-                      <p className="text-xs uppercase tracking-wide text-rose-700 dark:text-rose-300">Critical</p>
+                      <p className="text-xs uppercase tracking-wide text-rose-700 dark:text-rose-300">{t('caring_workflow.safeguarding.severity.critical')}</p>
                       <p className="text-2xl font-semibold">{safeguardingSummary.open_by_severity.critical}</p>
                     </div>
                     <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-center">
-                      <p className="text-xs uppercase tracking-wide text-amber-700 dark:text-amber-300">High</p>
+                      <p className="text-xs uppercase tracking-wide text-amber-700 dark:text-amber-300">{t('caring_workflow.safeguarding.severity.high')}</p>
                       <p className="text-2xl font-semibold">{safeguardingSummary.open_by_severity.high}</p>
                     </div>
                     <div className="rounded-lg border border-default-200 p-3 text-center">
-                      <p className="text-xs uppercase tracking-wide text-default-600">Medium</p>
+                      <p className="text-xs uppercase tracking-wide text-default-600">{t('caring_workflow.safeguarding.severity.medium')}</p>
                       <p className="text-2xl font-semibold">{safeguardingSummary.open_by_severity.medium}</p>
                     </div>
                     <div className="rounded-lg border border-default-200 p-3 text-center">
-                      <p className="text-xs uppercase tracking-wide text-default-600">Low</p>
+                      <p className="text-xs uppercase tracking-wide text-default-600">{t('caring_workflow.safeguarding.severity.low')}</p>
                       <p className="text-2xl font-semibold">{safeguardingSummary.open_by_severity.low}</p>
                     </div>
                     <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-center">
                       <p className="text-xs uppercase tracking-wide text-rose-700 dark:text-rose-300 flex items-center justify-center gap-1">
-                        <TriangleAlert size={12} /> Overdue
+                        <TriangleAlert size={12} /> {t('caring_workflow.safeguarding.overdue')}
                       </p>
                       <p className="text-2xl font-semibold">{safeguardingSummary.overdue}</p>
                     </div>
                   </div>
 
                   {safeguardingSummary.recent.length === 0 ? (
-                    <p className="text-sm text-default-500 py-4 text-center">No reports yet.</p>
+                    <p className="text-sm text-default-500 py-4 text-center">{t('caring_workflow.safeguarding.no_reports')}</p>
                   ) : (
-                    <Table aria-label="Recent safeguarding reports" removeWrapper>
+                    <Table aria-label={t('caring_workflow.safeguarding.table_aria')} removeWrapper>
                       <TableHeader>
-                        <TableColumn>Severity</TableColumn>
-                        <TableColumn>Category</TableColumn>
-                        <TableColumn>Subject</TableColumn>
-                        <TableColumn>Status</TableColumn>
-                        <TableColumn>Age</TableColumn>
-                        <TableColumn align="end">Action</TableColumn>
+                        <TableColumn>{t('caring_workflow.safeguarding.columns.severity')}</TableColumn>
+                        <TableColumn>{t('caring_workflow.safeguarding.columns.category')}</TableColumn>
+                        <TableColumn>{t('caring_workflow.safeguarding.columns.subject')}</TableColumn>
+                        <TableColumn>{t('caring_workflow.safeguarding.columns.status')}</TableColumn>
+                        <TableColumn>{t('caring_workflow.safeguarding.columns.age')}</TableColumn>
+                        <TableColumn align="end">{t('caring_workflow.safeguarding.columns.action')}</TableColumn>
                       </TableHeader>
                       <TableBody>
                           {safeguardingSummary.recent.slice(0, 10).map((r) => {
@@ -1940,25 +1940,27 @@ export default function CaringCommunityWorkflowPage() {
                               0,
                               Math.floor((Date.now() - new Date(r.created_at).getTime()) / (1000 * 60 * 60)),
                             );
-                            const ageLabel = ageHours < 24 ? `${ageHours}h` : `${Math.floor(ageHours / 24)}d`;
+                            const ageLabel = ageHours < 24
+                              ? t('caring_workflow.safeguarding.age_hours', { count: ageHours })
+                              : t('caring_workflow.safeguarding.age_days', { count: Math.floor(ageHours / 24) });
                             return (
                               <TableRow key={r.id}>
                                 <TableCell>
                                   <Chip size="sm" color={severityColor[r.severity]} variant="flat">
-                                    {r.severity}
+                                    {t(`caring_workflow.safeguarding.severity.${r.severity}`)}
                                   </Chip>
                                 </TableCell>
                                 <TableCell>{r.category}</TableCell>
                                 <TableCell>
-                                  {r.subject_user_name ?? (r.subject_organisation_id ? `Org #${r.subject_organisation_id}` : '—')}
+                                  {r.subject_user_name ?? (r.subject_organisation_id ? t('caring_workflow.safeguarding.org_subject', { id: r.subject_organisation_id }) : t('caring_workflow.empty.value'))}
                                 </TableCell>
                                 <TableCell>
                                   <Chip size="sm" color={statusColor[r.status]} variant="flat">
-                                    {r.status}
+                                    {t(`caring_workflow.safeguarding.status.${r.status}`)}
                                   </Chip>
                                   {r.is_overdue && (
                                     <Chip size="sm" color="danger" variant="bordered" className="ml-1">
-                                      Overdue
+                                      {t('caring_workflow.safeguarding.overdue')}
                                     </Chip>
                                   )}
                                 </TableCell>
@@ -1971,7 +1973,7 @@ export default function CaringCommunityWorkflowPage() {
                                       size="sm"
                                       variant="flat"
                                     >
-                                      Open
+                                      {t('caring_workflow.safeguarding.open')}
                                     </Button>
                                   </div>
                                 </TableCell>
@@ -1999,10 +2001,10 @@ export default function CaringCommunityWorkflowPage() {
               <div>
                 <h2 className="text-lg font-semibold flex items-center gap-2">
                   <Sparkles size={18} className="text-primary" />
-                  Tandem Suggestions
+                  {t('caring_workflow.tandem.title')}
                 </h2>
                 <p className="mt-1 text-sm text-default-500">
-                  AI-suggested supporter–recipient pairs based on location, language, skills and availability.
+                  {t('caring_workflow.tandem.description')}
                 </p>
               </div>
               <Button
@@ -2012,7 +2014,7 @@ export default function CaringCommunityWorkflowPage() {
                 isLoading={loadingTandems}
                 onPress={loadTandemSuggestions}
               >
-                Refresh
+                {t('caring_workflow.actions.refresh')}
               </Button>
             </CardHeader>
             <Divider />
@@ -2027,7 +2029,7 @@ export default function CaringCommunityWorkflowPage() {
                 </div>
               ) : tandemSuggestions.length === 0 ? (
                 <div className="rounded-lg bg-default-100 p-4 text-sm text-default-500">
-                  No suggestions right now. Add more members or adjust availability.
+                  {t('caring_workflow.tandem.empty')}
                 </div>
               ) : (
                 tandemSuggestions.map((suggestion) => {
@@ -2037,19 +2039,19 @@ export default function CaringCommunityWorkflowPage() {
                   const signals = suggestion.signals;
                   const chips: { key: string; label: string }[] = [];
                   if (typeof signals.distance_km === 'number') {
-                    chips.push({ key: 'distance', label: `${signals.distance_km.toFixed(1)} km` });
+                    chips.push({ key: 'distance', label: t('caring_workflow.tandem.distance_km', { value: signals.distance_km.toFixed(1) }) });
                   }
                   if (typeof signals.language_overlap === 'number' && signals.language_overlap > 0.4) {
-                    chips.push({ key: 'language', label: 'Same language' });
+                    chips.push({ key: 'language', label: t('caring_workflow.tandem.same_language') });
                   }
                   if (typeof signals.skill_complement === 'number' && signals.skill_complement > 0.4) {
-                    chips.push({ key: 'skills', label: 'Complementary skills' });
+                    chips.push({ key: 'skills', label: t('caring_workflow.tandem.complementary_skills') });
                   }
                   if (typeof signals.availability_overlap === 'number' && signals.availability_overlap > 0.4) {
-                    chips.push({ key: 'availability', label: 'Availability overlap' });
+                    chips.push({ key: 'availability', label: t('caring_workflow.tandem.availability_overlap') });
                   }
                   if (typeof signals.interest_overlap === 'number' && signals.interest_overlap > 0.4) {
-                    chips.push({ key: 'interests', label: 'Shared interests' });
+                    chips.push({ key: 'interests', label: t('caring_workflow.tandem.shared_interests') });
                   }
                   return (
                     <div key={key} className="rounded-lg border border-default-200 p-4">
@@ -2065,7 +2067,7 @@ export default function CaringCommunityWorkflowPage() {
                             </div>
                             <div className="text-sm">
                               <div className="font-semibold text-default-900">{suggestion.supporter.name}</div>
-                              <div className="text-xs text-default-500">Supporter</div>
+                              <div className="text-xs text-default-500">{t('caring_workflow.relationships.supporter')}</div>
                             </div>
                           </div>
                           <HeartHandshake size={20} className="text-primary" />
@@ -2079,12 +2081,12 @@ export default function CaringCommunityWorkflowPage() {
                             </div>
                             <div className="text-sm">
                               <div className="font-semibold text-default-900">{suggestion.recipient.name}</div>
-                              <div className="text-xs text-default-500">Recipient</div>
+                              <div className="text-xs text-default-500">{t('caring_workflow.relationships.recipient')}</div>
                             </div>
                           </div>
                         </div>
                         <Chip size="sm" color={scoreColor} variant="flat">
-                          Score {Math.round(suggestion.score * 100)}%
+                          {t('caring_workflow.tandem.score', { value: Math.round(suggestion.score * 100) })}
                         </Chip>
                       </div>
                       {chips.length > 0 && (
@@ -2108,7 +2110,7 @@ export default function CaringCommunityWorkflowPage() {
                           isLoading={dismissingTandemKey === key}
                           onPress={() => dismissTandemSuggestion(suggestion)}
                         >
-                          Dismiss
+                          {t('caring_workflow.tandem.dismiss')}
                         </Button>
                         <Button
                           size="sm"
@@ -2117,7 +2119,7 @@ export default function CaringCommunityWorkflowPage() {
                           startContent={<Heart size={16} />}
                           onPress={() => createTandemFromSuggestion(suggestion)}
                         >
-                          Create Tandem
+                          {t('caring_workflow.tandem.create')}
                         </Button>
                       </div>
                     </div>
