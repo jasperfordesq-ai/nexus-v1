@@ -16,6 +16,7 @@ import { sanitizeRichText } from '@/lib/sanitize';
 import GitCompare from 'lucide-react/icons/git-compare';
 import FileText from 'lucide-react/icons/file-text';
 import AlertCircle from 'lucide-react/icons/circle-alert';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts/ToastContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';
 import type { VersionComparison } from '@/admin/api/types';
@@ -33,6 +34,7 @@ export default function LegalDocVersionComparison({
   version2Id,
   onClose,
 }: LegalDocVersionComparisonProps) {
+  const { t } = useTranslation('admin');
   const { error } = useToast();
 
   const [comparison, setComparison] = useState<VersionComparison | null>(null);
@@ -46,14 +48,14 @@ export default function LegalDocVersionComparison({
       if (response.success && response.data) {
         setComparison(response.data);
       } else {
-        error(response.error || "Failed to load");
+        error(response.error || t('enterprise.comparison.failed_to_load'));
       }
     } catch {
-      error("Failed to load");
+      error(t('enterprise.comparison.failed_to_load'));
     } finally {
       setLoading(false);
     }
-  }, [documentId, version1Id, version2Id, error]);
+  }, [documentId, version1Id, version2Id, error, t]);
 
 
   useEffect(() => {
@@ -64,7 +66,7 @@ export default function LegalDocVersionComparison({
     <>
       <ModalHeader className="flex items-center gap-2">
         <GitCompare size={20} />
-        <span>{"Enterprise"}</span>
+        <span>{t('enterprise.comparison.title')}</span>
       </ModalHeader>
 
       <ModalBody>
@@ -80,18 +82,18 @@ export default function LegalDocVersionComparison({
                 <div className="flex items-center gap-2 mb-2">
                   <FileText size={16} />
                   <span className="font-semibold">
-                    {`Version`}
+                    {t('enterprise.comparison.version')}
                   </span>
                   {comparison.version1.is_current && (
-                    <Chip size="sm" color="success">{"Current"}</Chip>
+                    <Chip size="sm" color="success">{t('enterprise.version_list.current')}</Chip>
                   )}
                 </div>
                 <p className="text-sm text-[var(--color-text-secondary)]">
-                  {"Created"}: {new Date(comparison.version1.created_at).toLocaleDateString()}
+                  {t('enterprise.comparison.created')}: {new Date(comparison.version1.created_at).toLocaleDateString()}
                 </p>
                 {comparison.version1.effective_date && (
                   <p className="text-sm text-[var(--color-text-secondary)]">
-                    {"Effective"}: {new Date(comparison.version1.effective_date).toLocaleDateString()}
+                    {t('enterprise.version_list.effective')}: {new Date(comparison.version1.effective_date).toLocaleDateString()}
                   </p>
                 )}
               </div>
@@ -100,18 +102,18 @@ export default function LegalDocVersionComparison({
                 <div className="flex items-center gap-2 mb-2">
                   <FileText size={16} />
                   <span className="font-semibold">
-                    {`Version`}
+                    {t('enterprise.comparison.version')}
                   </span>
                   {comparison.version2.is_current && (
-                    <Chip size="sm" color="success">{"Current"}</Chip>
+                    <Chip size="sm" color="success">{t('enterprise.version_list.current')}</Chip>
                   )}
                 </div>
                 <p className="text-sm text-[var(--color-text-secondary)]">
-                  {"Created"}: {new Date(comparison.version2.created_at).toLocaleDateString()}
+                  {t('enterprise.comparison.created')}: {new Date(comparison.version2.created_at).toLocaleDateString()}
                 </p>
                 {comparison.version2.effective_date && (
                   <p className="text-sm text-[var(--color-text-secondary)]">
-                    {"Effective"}: {new Date(comparison.version2.effective_date).toLocaleDateString()}
+                    {t('enterprise.version_list.effective')}: {new Date(comparison.version2.effective_date).toLocaleDateString()}
                   </p>
                 )}
               </div>
@@ -122,14 +124,14 @@ export default function LegalDocVersionComparison({
               <AlertCircle size={18} className="text-primary" />
               <span className="text-sm">
                 {comparison.changes_count > 0
-                  ? `Changes Detected`
-                  : "No changes"}
+                  ? t('enterprise.comparison.changes_detected')
+                  : t('enterprise.comparison.no_changes')}
               </span>
             </div>
 
             {/* Diff Display */}
             <div>
-              <h3 className="font-semibold mb-3">{"Content Comparison"}</h3>
+              <h3 className="font-semibold mb-3">{t('enterprise.comparison.content_comparison')}</h3>
               <div
                 className="version-diff-content prose dark:prose-invert max-w-none p-4 border rounded-lg bg-[var(--color-surface)]"
                 dangerouslySetInnerHTML={{ __html: sanitizeRichText(comparison.diff_html) }}
@@ -140,7 +142,7 @@ export default function LegalDocVersionComparison({
             {comparison.version1.summary_of_changes && (
               <div>
                 <h3 className="font-semibold mb-2">
-                  {`Summary Version`}
+                  {t('enterprise.comparison.summary_version')}
                 </h3>
                 <p className="text-sm text-[var(--color-text-secondary)] p-3 bg-[var(--color-surface)] rounded-lg">
                   {comparison.version1.summary_of_changes}
@@ -151,7 +153,7 @@ export default function LegalDocVersionComparison({
             {comparison.version2.summary_of_changes && (
               <div>
                 <h3 className="font-semibold mb-2">
-                  {`Summary Version`}
+                  {t('enterprise.comparison.summary_version')}
                 </h3>
                 <p className="text-sm text-[var(--color-text-secondary)] p-3 bg-[var(--color-surface)] rounded-lg">
                   {comparison.version2.summary_of_changes}
@@ -162,14 +164,14 @@ export default function LegalDocVersionComparison({
         ) : (
           <div className="text-center py-12">
             <AlertCircle size={48} className="mx-auto text-[var(--color-text-tertiary)] mb-4" />
-            <p className="text-[var(--color-text-secondary)]">{"Failed to load"}</p>
+            <p className="text-[var(--color-text-secondary)]">{t('enterprise.comparison.failed_to_load')}</p>
           </div>
         )}
       </ModalBody>
 
       <ModalFooter>
         <Button color="primary" onPress={onClose}>
-          {"Close"}
+          {t('enterprise.btn_close')}
         </Button>
       </ModalFooter>
     </>

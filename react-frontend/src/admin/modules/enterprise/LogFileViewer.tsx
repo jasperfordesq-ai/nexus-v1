@@ -67,7 +67,7 @@ function levelColorClass(level: string | null): string {
 
 export function LogFileViewer() {
   const { t } = useTranslation('admin');
-  usePageTitle("Enterprise");
+  usePageTitle(t('enterprise.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -92,11 +92,11 @@ export function LogFileViewer() {
         setContent(res.data as unknown as LogFileContent);
       }
     } catch {
-      toast.error("Failed to load log file");
+      toast.error(t('enterprise.failed_to_load_log_file'));
     } finally {
       setLoading(false);
     }
-  }, [filename, lines, level, toast])
+  }, [filename, lines, level, t, toast])
 
 
   useEffect(() => {
@@ -139,22 +139,31 @@ export function LogFileViewer() {
     try {
       const res = await adminEnterprise.clearLogFile(filename);
       if (res.success) {
-        toast.success("Log File Cleared");
+        toast.success(t('enterprise.log_file_cleared'));
         setClearModalOpen(false);
         loadData();
       }
     } catch {
-      toast.error("Failed to clear log file");
+      toast.error(t('enterprise.failed_to_clear_log_file'));
     } finally {
       setClearing(false);
     }
   };
 
+  const headerDescription = content
+    ? content.filtered_count !== content.total_lines
+      ? t('enterprise.log_viewer_desc_filtered', {
+          total: content.total_lines,
+          filtered: content.filtered_count,
+        })
+      : t('enterprise.log_viewer_desc', { total: content.total_lines })
+    : t('enterprise.log_viewer_loading_desc');
+
   return (
     <div>
       <PageHeader
-        title={filename || "Log Viewer Title Fallback"}
-        description={content ? `${content.total_lines} total lines${content.filtered_count !== content.total_lines ? `, ${content.filtered_count} filtered` : ''}` : "Log Viewer Loading."}
+        title={filename || t('enterprise.log_viewer_title_fallback')}
+        description={headerDescription}
         actions={
           <Button
             variant="flat"
@@ -162,7 +171,7 @@ export function LogFileViewer() {
             onPress={() => navigate(tenantPath('/admin/enterprise/monitoring/log-files'))}
             size="sm"
           >
-            {"Log Viewer Back"}
+            {t('enterprise.log_viewer_back')}
           </Button>
         }
       />
@@ -171,7 +180,7 @@ export function LogFileViewer() {
       <Card shadow="sm" className="mb-4">
         <CardBody className="flex flex-wrap items-center gap-4 p-4">
           <Select
-            label={"Lines"}
+            label={t('enterprise.label_lines')}
             selectedKeys={[String(lines)]}
             onSelectionChange={(keys) => {
               const val = Array.from(keys)[0];
@@ -187,7 +196,7 @@ export function LogFileViewer() {
           </Select>
 
           <Select
-            label={"Level"}
+            label={t('enterprise.label_level')}
             selectedKeys={[level]}
             onSelectionChange={(keys) => {
               const val = Array.from(keys)[0];
@@ -208,7 +217,7 @@ export function LogFileViewer() {
               isSelected={autoRefresh}
               onValueChange={setAutoRefresh}
             />
-            <span className="text-sm text-default-600">{"Auto Refresh"}</span>
+            <span className="text-sm text-default-600">{t('enterprise.auto_refresh_label')}</span>
           </div>
 
           <div className="flex-1" />
@@ -219,7 +228,7 @@ export function LogFileViewer() {
             onPress={loadData}
             size="sm"
           >
-            {"Refresh"}
+            {t('enterprise.refresh')}
           </Button>
           <Button
             variant="flat"
@@ -228,7 +237,7 @@ export function LogFileViewer() {
             isDisabled={!content}
             onPress={handleDownload}
           >
-            {"Download"}
+            {t('log_files_labels.download')}
           </Button>
           <Button
             color="danger"
@@ -237,7 +246,7 @@ export function LogFileViewer() {
             onPress={() => setClearModalOpen(true)}
             size="sm"
           >
-            {"Clear"}
+            {t('enterprise.btn_clear')}
           </Button>
         </CardBody>
       </Card>
@@ -269,7 +278,7 @@ export function LogFileViewer() {
       ) : (
         <Card shadow="sm">
           <CardBody className="py-16 text-center">
-            <p className="text-default-500">{"No log file found"}</p>
+            <p className="text-default-500">{t('enterprise.no_log_file_found')}</p>
           </CardBody>
         </Card>
       )}
@@ -277,18 +286,18 @@ export function LogFileViewer() {
       {/* Clear Confirmation Modal */}
       <Modal isOpen={clearModalOpen} onClose={() => setClearModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>{"Clear Log File"}</ModalHeader>
+          <ModalHeader>{t('enterprise.clear_log_file')}</ModalHeader>
           <ModalBody>
             <p className="text-default-600">
-              {`Clear Log Confirm`}
+              {t('enterprise.clear_log_confirm')}
             </p>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setClearModalOpen(false)}>
-              {"Cancel Modal"}
+              {t('enterprise.btn_cancel_modal')}
             </Button>
             <Button color="danger" onPress={handleClear} isLoading={clearing}>
-              {"Clear File"}
+              {t('enterprise.btn_clear_file')}
             </Button>
           </ModalFooter>
         </ModalContent>
