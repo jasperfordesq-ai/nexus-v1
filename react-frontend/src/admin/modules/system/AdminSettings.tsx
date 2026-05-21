@@ -52,13 +52,13 @@ interface SettingsForm {
   default_currency: string;   // general.default_currency (ISO 4217 lowercase, e.g. 'eur', 'usd')
 }
 
-const CURRENCY_OPTIONS: Array<{ code: string; label: string }> = [
-  { code: 'eur', label: 'EUR — Euro' },
-  { code: 'usd', label: 'USD — US Dollar' },
-  { code: 'gbp', label: 'GBP — British Pound' },
-  { code: 'cad', label: 'CAD — Canadian Dollar' },
-  { code: 'aud', label: 'AUD — Australian Dollar' },
-  { code: 'jpy', label: 'JPY — Japanese Yen' },
+const CURRENCY_OPTIONS: Array<{ code: string; labelKey: string }> = [
+  { code: 'eur', labelKey: 'system.currency_eur' },
+  { code: 'usd', labelKey: 'system.currency_usd' },
+  { code: 'gbp', labelKey: 'system.currency_gbp' },
+  { code: 'cad', labelKey: 'system.currency_cad' },
+  { code: 'aud', labelKey: 'system.currency_aud' },
+  { code: 'jpy', labelKey: 'system.currency_jpy' },
 ];
 
 const DEFAULT_SETTINGS: SettingsForm = {
@@ -75,8 +75,9 @@ const DEFAULT_SETTINGS: SettingsForm = {
 };
 
 export function AdminSettings() {
-  const { t } = useTranslation('admin_nav');
-  useAdminPageMeta({ title: t('system') });
+  const { t: tNav } = useTranslation('admin_nav');
+  const { t } = useTranslation('admin');
+  useAdminPageMeta({ title: tNav('system') });
   const toast = useToast();
   const { tenant, tenantPath } = useTenant();
   const { user } = useAuth();
@@ -117,11 +118,11 @@ export function AdminSettings() {
         setOriginalForm(loaded);
       }
     } catch {
-      toast.error("Failed to load settings");
+      toast.error(t('system.failed_to_load_settings'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -145,22 +146,22 @@ export function AdminSettings() {
       if (form.default_currency !== originalForm.default_currency) changes.default_currency = form.default_currency;
 
       if (Object.keys(changes).length === 0) {
-        toast.error("No changes to save");
+        toast.error(t('system.no_changes_to_save'));
         setSaving(false);
         return;
       }
       const res = await adminSettings.update(changes);
 
       if (res.success) {
-        toast.success("Settings Saved");
+        toast.success(t('system.settings_saved'));
         // Reload settings to confirm persistence
         fetchSettings();
       } else {
-        const error = (res as { error?: string }).error || 'Save failed';
+        const error = (res as { error?: string }).error || t('system.save_failed');
         toast.error(error);
       }
     } catch (err) {
-      toast.error("Failed to save settings");
+      toast.error(t('system.failed_to_save_settings'));
       console.error('Settings save error:', err);
     } finally {
       setSaving(false);
@@ -170,7 +171,10 @@ export function AdminSettings() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={"Admin Settings"} description={`Manage platform-wide settings for ${tenant?.name || "your community"}`} />
+        <PageHeader
+          title={t('system.admin_settings_title')}
+          description={t('system.admin_settings_desc', { name: tenant?.name || t('system.your_community') })}
+        />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -180,48 +184,51 @@ export function AdminSettings() {
 
   return (
     <div>
-      <PageHeader title={"Admin Settings"} description={`Manage platform-wide settings for ${tenant?.name || "your community"}`} />
+      <PageHeader
+        title={t('system.admin_settings_title')}
+        description={t('system.admin_settings_desc', { name: tenant?.name || t('system.your_community') })}
+      />
 
       <div className="space-y-4">
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Settings size={20} /> {"General"}
+              <Settings size={20} /> {t('system.section_general')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={"Site Name"}
-              placeholder={"Project NEXUS..."}
+              label={t('system.label_site_name')}
+              placeholder={t('system.placeholder_project_nexus')}
               variant="bordered"
               value={form.name}
               onValueChange={(val) => setForm(prev => ({ ...prev, name: val }))}
             />
             <Textarea
-              label={"Site Description"}
-              placeholder={"Community Timebanking Platform..."}
+              label={t('system.label_site_description')}
+              placeholder={t('system.placeholder_community_timebanking_platform')}
               variant="bordered"
               minRows={2}
               value={form.description}
               onValueChange={(val) => setForm(prev => ({ ...prev, description: val }))}
             />
             <Input
-              label={"Support Email"}
+              label={t('system.label_support_email')}
               placeholder="support@project-nexus.ie"
               variant="bordered"
               value={form.contact_email}
               onValueChange={(val) => setForm(prev => ({ ...prev, contact_email: val }))}
             />
             <Input
-              label={"Contact Phone"}
+              label={t('system.label_contact_phone')}
               placeholder="+1 555 123 4567"
               variant="bordered"
               value={form.contact_phone}
               onValueChange={(val) => setForm(prev => ({ ...prev, contact_phone: val }))}
             />
             <Select
-              label={"Default currency"}
-              description={"Used for subscription and marketplace pricing"}
+              label={t('system.label_default_currency')}
+              description={t('system.desc_default_currency')}
               variant="bordered"
               selectedKeys={[form.default_currency]}
               onSelectionChange={(keys) => {
@@ -230,7 +237,7 @@ export function AdminSettings() {
               }}
             >
               {CURRENCY_OPTIONS.map(opt => (
-                <SelectItem key={opt.code}>{opt.label}</SelectItem>
+                <SelectItem key={opt.code}>{t(opt.labelKey)}</SelectItem>
               ))}
             </Select>
           </CardBody>
@@ -239,14 +246,14 @@ export function AdminSettings() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Scale size={20} /> {"Branding & Legal"}
+              <Scale size={20} /> {t('system.section_branding_legal')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Textarea
-              label={"Footer Legal Text"}
-              description={"Displayed in the site footer and on legal/about pages"}
-              placeholder="e.g. hOUR Timebank CLG. Registered Charity No. 20204862. Company No. 705275."
+              label={t('system.label_footer_legal_text')}
+              description={t('system.desc_displayed_in_the_site_footer_and_legal_h')}
+              placeholder={t('system.placeholder_footer_legal_text')}
               variant="bordered"
               minRows={2}
               value={form.footer_text}
@@ -257,72 +264,72 @@ export function AdminSettings() {
 
         <Card shadow="sm">
           <CardHeader className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">{"Registration & Access"}</h3>
+            <h3 className="text-lg font-semibold">{t('system.section_registration_access')}</h3>
             <Link to={tenantPath("/admin/settings/registration-policy")}>
               <Button size="sm" variant="flat" color="primary" startContent={<ShieldCheck size={14} />}>
-                {"Advanced policy"}
+                {t('system.advanced_policy')}
               </Button>
             </Link>
           </CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{"Open registration"}</p>
-                <p className="text-sm text-default-500">{"Allow anyone to register an account"}</p>
+                <p className="font-medium">{t('system.label_open_registration')}</p>
+                <p className="text-sm text-default-500">{t('system.desc_open_registration')}</p>
               </div>
               <Switch
                 isSelected={form.registration_mode === 'open'}
                 onValueChange={(val) => setForm(prev => ({ ...prev, registration_mode: val ? 'open' : 'closed' }))}
-                aria-label={"Open Registration"}
+                aria-label={t('system.label_open_registration')}
               />
             </div>
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="font-medium">{"Require email verification"}</p>
+                  <p className="font-medium">{t('system.require_email_verification')}</p>
                   {!isGod && (
-                    <Tooltip content="Only platform super-admins may change this setting">
-                      <Chip size="sm" color="warning" variant="flat" startContent={<Lock size={10} />}>God only</Chip>
+                    <Tooltip content={t('system.super_admin_only_tooltip')}>
+                      <Chip size="sm" color="warning" variant="flat" startContent={<Lock size={10} />}>{t('system.super_admin_only')}</Chip>
                     </Tooltip>
                   )}
                 </div>
-                <p className="text-sm text-default-500">{"Members must verify their email before accessing the platform"}</p>
+                <p className="text-sm text-default-500">{t('system.desc_email_verification')}</p>
               </div>
               <Switch
                 isSelected={form.email_verification}
                 onValueChange={(val) => setForm(prev => ({ ...prev, email_verification: val }))}
                 isDisabled={!isGod}
-                aria-label={"Email Verification"}
+                aria-label={t('system.label_email_verification')}
               />
             </div>
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="font-medium">{"Admin approval required"}</p>
+                  <p className="font-medium">{t('system.admin_approval_required')}</p>
                   {!isGod && (
-                    <Tooltip content="Only platform super-admins may change this setting">
-                      <Chip size="sm" color="warning" variant="flat" startContent={<Lock size={10} />}>God only</Chip>
+                    <Tooltip content={t('system.super_admin_only_tooltip')}>
+                      <Chip size="sm" color="warning" variant="flat" startContent={<Lock size={10} />}>{t('system.super_admin_only')}</Chip>
                     </Tooltip>
                   )}
                 </div>
-                <p className="text-sm text-default-500">{"New accounts must be approved by an admin before activation"}</p>
+                <p className="text-sm text-default-500">{t('system.admin_approval_required_desc')}</p>
               </div>
               <Switch
                 isSelected={form.admin_approval}
                 onValueChange={(val) => setForm(prev => ({ ...prev, admin_approval: val }))}
                 isDisabled={!isGod}
-                aria-label={"Admin Approval"}
+                aria-label={t('system.label_admin_approval')}
               />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-default-400">{"Maintenance mode (read only)"}</p>
-                <p className="text-sm text-default-500">Use CLI: <code className="text-xs bg-default-100 px-1 rounded">sudo bash scripts/maintenance.sh on|off</code></p>
+                <p className="font-medium text-default-400">{t('system.maintenance_mode_read_only')}</p>
+                <p className="text-sm text-default-500">{t('system.maintenance_mode_cli_prefix')} <code className="text-xs bg-default-100 px-1 rounded">sudo bash scripts/maintenance.sh on|off</code></p>
               </div>
               <Switch
                 isSelected={form.maintenance_mode}
                 isDisabled
-                aria-label={"Maintenance Mode"}
+                aria-label={t('system.label_maintenance_mode')}
               />
             </div>
           </CardBody>
@@ -335,7 +342,7 @@ export function AdminSettings() {
             onPress={handleSave}
             isLoading={saving}
           >
-            {"Save settings"}
+            {t('system.btn_save_settings')}
           </Button>
         </div>
 
@@ -345,9 +352,9 @@ export function AdminSettings() {
             double card nesting — SystemConfig provides its own per-group Cards. */}
         <div className="pt-6 mt-2 border-t border-default-200">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-foreground">{"Additional configuration"}</h2>
+            <h2 className="text-lg font-semibold text-foreground">{t('system.additional_configuration')}</h2>
             <p className="text-sm text-default-500 mt-1">
-              {"Localization, wallet, content moderation, notifications, and limits. These settings save independently from the form above."}
+              {t('system.additional_configuration_desc')}
             </p>
           </div>
           <SystemConfig
