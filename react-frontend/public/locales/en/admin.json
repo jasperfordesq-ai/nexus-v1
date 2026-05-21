@@ -9542,8 +9542,13 @@
     "no_goals_found": "No goals found",
     "page_title": "Goals",
     "placeholder_search_goals_by_title_or_member": "Search Goals by Title or Member...",
+    "progress_complete": "{{percent}}% complete",
     "search": "Search",
     "showing_of_total": "Showing {{count}} of {{total}}",
+    "status_abandoned": "Abandoned",
+    "status_active": "Active",
+    "status_completed": "Completed",
+    "status_unknown": "Unknown",
     "try_adjusting_search": "Try adjusting your search",
     "yes": "Yes"
   },

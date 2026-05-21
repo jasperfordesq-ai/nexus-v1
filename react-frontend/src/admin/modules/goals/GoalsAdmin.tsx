@@ -32,6 +32,7 @@ import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Eye from 'lucide-react/icons/eye';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -87,6 +88,19 @@ const statusColors: Record<string, 'primary' | 'success' | 'danger'> = {
   abandoned: 'danger',
 };
 
+function statusLabelKey(status: Goal['status']): string {
+  switch (status) {
+    case 'active':
+      return 'goals.status_active';
+    case 'completed':
+      return 'goals.status_completed';
+    case 'abandoned':
+      return 'goals.status_abandoned';
+    default:
+      return 'goals.status_unknown';
+  }
+}
+
 function normalizeGoal(item: RawGoal): Goal {
   const memberName = item.user?.name
     ?? [item.user?.first_name, item.user?.last_name].filter(Boolean).join(' ').trim()
@@ -110,7 +124,8 @@ function normalizeGoal(item: RawGoal): Goal {
 // ---------------------------------------------------------------------------
 
 export function GoalsAdmin() {
-  usePageTitle("Goals");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('goals.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -148,11 +163,11 @@ export function GoalsAdmin() {
         });
       }
     } catch {
-      toast.error("Failed to load goals");
+      toast.error(t('goals.failed_to_load_goals'));
     } finally {
       setLoading(false);
     }
-  }, [page, search, toast])
+  }, [page, search, t, toast])
 
 
   useEffect(() => {
@@ -182,13 +197,13 @@ export function GoalsAdmin() {
     try {
       const res = await api.delete(`/v2/admin/goals/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success(`Goal Deleted`);
+        toast.success(t('goals.goal_deleted'));
         loadGoals();
       } else {
-        toast.error(res?.error || "Failed to delete goal");
+        toast.error(res?.error || t('goals.failed_to_delete_goal'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('goals.an_unexpected_error_occurred'));
     } finally {
       setDeleteLoading(false);
       setConfirmDelete(null);
@@ -214,8 +229,8 @@ export function GoalsAdmin() {
   return (
     <div>
       <PageHeader
-        title={"Goals Admin"}
-        description={"View and manage member goals"}
+        title={t('goals.goals_admin_title')}
+        description={t('goals.goals_admin_desc')}
         actions={
           <Button
             variant="flat"
@@ -223,7 +238,7 @@ export function GoalsAdmin() {
             onPress={loadGoals}
             isDisabled={loading}
           >
-            {"Refresh"}
+            {t('common.refresh')}
           </Button>
         }
       />
@@ -231,8 +246,8 @@ export function GoalsAdmin() {
       {/* Search bar */}
       <div className="mb-4 flex items-center gap-2">
         <Input type="search" name="admin-search" autoComplete="off"
-          placeholder={"Search Goals by Title or Member..."}
-          aria-label={"Search Goals"}
+          placeholder={t('goals.placeholder_search_goals_by_title_or_member')}
+          aria-label={t('goals.label_search_goals')}
           value={searchInput}
           onValueChange={setSearchInput}
           onKeyDown={handleSearchKeyDown}
@@ -242,7 +257,7 @@ export function GoalsAdmin() {
           className="max-w-md"
         />
         <Button color="primary" variant="flat" onPress={handleSearch}>
-          {"Search"}
+          {t('goals.search')}
         </Button>
       </div>
 
@@ -251,31 +266,31 @@ export function GoalsAdmin() {
         <CardBody className="p-0">
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <Spinner size="lg" label={"Loading Goals"} />
+              <Spinner size="lg" label={t('goals.loading_goals')} />
             </div>
           ) : goals.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-default-400">
               <Target size={48} />
-              <p className="text-lg font-medium">{"No goals found"}</p>
+              <p className="text-lg font-medium">{t('goals.no_goals_found')}</p>
               <p className="text-sm">
-                {search ? "Try adjusting your search" : "No goals created yet"}
+                {search ? t('goals.try_adjusting_search') : t('goals.no_goals_created_yet')}
               </p>
             </div>
           ) : (
             <Table
-              aria-label={"Goals Administration Table"}
+              aria-label={t('goals.label_goals_administration_table')}
               removeWrapper
               isStriped
             >
               <TableHeader>
-                <TableColumn>{"Title"}</TableColumn>
-                <TableColumn>{"Member"}</TableColumn>
-                <TableColumn>{"Target"}</TableColumn>
-                <TableColumn>{"Progress"}</TableColumn>
-                <TableColumn>{"Status"}</TableColumn>
-                <TableColumn>{"Buddy"}</TableColumn>
-                <TableColumn>{"Created"}</TableColumn>
-                <TableColumn>{"Actions"}</TableColumn>
+                <TableColumn>{t('goals.col_title')}</TableColumn>
+                <TableColumn>{t('goals.col_member')}</TableColumn>
+                <TableColumn>{t('goals.col_target')}</TableColumn>
+                <TableColumn>{t('goals.col_progress')}</TableColumn>
+                <TableColumn>{t('goals.col_status')}</TableColumn>
+                <TableColumn>{t('goals.col_buddy')}</TableColumn>
+                <TableColumn>{t('goals.col_created')}</TableColumn>
+                <TableColumn>{t('goals.col_actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {goals.map((goal) => (
@@ -296,7 +311,7 @@ export function GoalsAdmin() {
                           value={progressPercent(goal)}
                           color={goal.status === 'completed' ? 'success' : 'primary'}
                           className="flex-1"
-                          aria-label={`${progressPercent(goal)}% complete`}
+                          aria-label={t('goals.progress_complete', { percent: progressPercent(goal) })}
                         />
                         <span className="text-xs text-default-500 w-10 text-right">
                           {progressPercent(goal)}%
@@ -308,9 +323,8 @@ export function GoalsAdmin() {
                         size="sm"
                         variant="flat"
                         color={statusColors[goal.status] || 'default'}
-                        className="capitalize"
                       >
-                        {goal.status}
+                        {t(statusLabelKey(goal.status))}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -319,7 +333,7 @@ export function GoalsAdmin() {
                         variant="flat"
                         color={goal.has_buddy ? 'success' : 'default'}
                       >
-                        {goal.has_buddy ? "Yes" : "No"}
+                        {goal.has_buddy ? t('goals.yes') : t('goals.no')}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -332,7 +346,7 @@ export function GoalsAdmin() {
                           size="sm"
                           variant="flat"
                           color="primary"
-                          aria-label={"View Goal"}
+                          aria-label={t('goals.label_view_goal')}
                           onPress={() => window.open(tenantPath(`/goals/${goal.id}`), '_blank')}
                         >
                           <Eye size={14} />
@@ -342,7 +356,7 @@ export function GoalsAdmin() {
                           size="sm"
                           variant="flat"
                           color="danger"
-                          aria-label={"Delete Goal"}
+                          aria-label={t('goals.label_delete_goal')}
                           onPress={() => setConfirmDelete(goal)}
                         >
                           <Trash2 size={14} />
@@ -361,7 +375,7 @@ export function GoalsAdmin() {
       {meta.total_pages > 1 && (
         <div className="mt-4 flex items-center justify-between">
           <span className="text-sm text-default-500">
-            {`Showing ${goals.length} of ${meta.total}`}
+            {t('goals.showing_of_total', { count: goals.length, total: meta.total })}
           </span>
           <Pagination
             total={meta.total_pages}
@@ -378,9 +392,9 @@ export function GoalsAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={"Delete Goal"}
-          message={`Delete Goal`}
-          confirmLabel={"Delete"}
+          title={t('goals.delete_goal')}
+          message={t('goals.confirm_delete_goal')}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={deleteLoading}
         />
