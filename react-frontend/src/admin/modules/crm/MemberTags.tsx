@@ -145,12 +145,12 @@ export function MemberTags() {
 
   const handleAddTag = async () => {
     if (!formUserId || isNaN(Number(formUserId))) {
-      toast.error("A valid user ID is required");
+      toast.error(t('crm.valid_user_id_required'));
       return;
     }
     const tagValue = formTag.trim() || formTagSearch.trim();
     if (!tagValue) {
-      toast.error("Tag name is required");
+      toast.error(t('crm.tag_name_is_required'));
       return;
     }
     setSaving(true);
@@ -160,7 +160,7 @@ export function MemberTags() {
         tag: tagValue,
       });
       if (res.success) {
-        toast.success("Tag Added");
+        toast.success(t('crm.tag_added'));
         addModal.onClose();
         if (viewMode === 'members' && tagValue === activeTag) {
           loadMembersByTag(activeTag);
@@ -168,10 +168,10 @@ export function MemberTags() {
           loadTagSummaries();
         }
       } else {
-        toast.error("Failed to add tag");
+        toast.error(t('crm.failed_to_add_tag'));
       }
     } catch {
-      toast.error("Failed to add tag");
+      toast.error(t('crm.failed_to_add_tag'));
     }
     setSaving(false);
   };
@@ -184,17 +184,17 @@ export function MemberTags() {
     try {
       const res = await adminCrm.removeTag(deleteTarget.id);
       if (res.success) {
-        toast.success("Tag removed from member");
+        toast.success(t('crm.tag_removed_from_member'));
         setDeleteTarget(null);
         if (viewMode === 'members') {
           loadMembersByTag(activeTag);
         }
         loadTagSummaries();
       } else {
-        toast.error("Failed to remove tag");
+        toast.error(t('crm.failed_to_remove_tag'));
       }
     } catch {
-      toast.error("Failed to remove tag");
+      toast.error(t('crm.failed_to_remove_tag'));
     }
     setDeleting(false);
   };
@@ -207,14 +207,14 @@ export function MemberTags() {
     try {
       const res = await adminCrm.bulkRemoveTag(deleteSummaryTarget.tag);
       if (res.success) {
-        toast.success(`Tag removed from all members`);
+        toast.success(t('crm.tag_removed_all'));
         setDeleteSummaryTarget(null);
         loadTagSummaries();
       } else {
-        toast.error("Failed to remove tag");
+        toast.error(t('crm.failed_to_remove_tag'));
       }
     } catch {
-      toast.error("Failed to remove tag");
+      toast.error(t('crm.failed_to_remove_tag'));
     }
     setDeleting(false);
   };
@@ -256,8 +256,8 @@ export function MemberTags() {
       {/* Search */}
       <div className="flex flex-wrap items-end gap-3 mb-6">
         <Input
-          label={"Search Tags"}
-          placeholder={"Filter by Tag Name..."}
+          label={t('crm.label_search_tags')}
+          placeholder={t('crm.placeholder_filter_by_tag_name')}
           className="w-64"
           size="sm"
           startContent={<Search size={14} />}
@@ -270,7 +270,7 @@ export function MemberTags() {
             variant="flat"
             onPress={() => setSummarySearch('')}
           >
-            {"Clear"}
+            {t('crm.clear')}
           </Button>
         )}
       </div>
@@ -278,17 +278,17 @@ export function MemberTags() {
       {/* Tag Grid */}
       {summaryLoading ? (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" label={"Loading Tags"} />
+          <Spinner size="lg" label={t('crm.loading_tags')} />
         </div>
       ) : filteredSummaries.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
             <Tag size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">{"No tags found"}</p>
+            <p className="text-default-500 text-lg font-medium">{t('crm.no_tags_found')}</p>
             <p className="text-default-400 text-sm mt-1">
               {summarySearch
-                ? "No tags match your search"
-                : "No tags have been created yet"}
+                ? t('crm.no_tags_hint_search')
+                : t('crm.no_tags_hint_default')}
             </p>
           </CardBody>
         </Card>
@@ -314,7 +314,7 @@ export function MemberTags() {
                   onPress={() => {
                     setDeleteSummaryTarget(ts);
                   }}
-                  aria-label={`Delete tag ${ts.tag}`}
+                  aria-label={t('crm.delete_tag_aria', { tag: ts.tag })}
                 >
                   <Trash2 size={14} />
                 </Button>
@@ -323,7 +323,7 @@ export function MemberTags() {
                 <div className="flex items-center gap-2">
                   <Users size={14} className="text-default-400" />
                   <Chip size="sm" variant="flat" color="primary">
-                    {ts.member_count === 1 ? `Member` : `Members`}
+                    {ts.member_count === 1 ? t('crm.member_count') : t('crm.members_count')}
                   </Chip>
                 </div>
               </CardBody>
@@ -345,28 +345,28 @@ export function MemberTags() {
           startContent={<ArrowLeft size={16} />}
           onPress={backToSummary}
         >
-          {"Back to All Tags"}
+          {t('crm.back_to_all_tags')}
         </Button>
       </div>
 
       <div className="flex items-center gap-3 mb-6">
         <Tag size={20} className="text-primary" />
         <h2 className="text-xl font-semibold">
-          {"Members Tagged"} &ldquo;{activeTag}&rdquo;
+          {t('crm.members_tagged')} &ldquo;{activeTag}&rdquo;
         </h2>
       </div>
 
       {membersLoading ? (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" label={"Loading Members"} />
+          <Spinner size="lg" label={t('crm.loading_members')} />
         </div>
       ) : memberTags.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
             <Users size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">{"No members with this tag"}</p>
+            <p className="text-default-500 text-lg font-medium">{t('crm.no_members_with_tag')}</p>
             <p className="text-default-400 text-sm mt-1">
-              {"No members match your search"}
+              {t('crm.no_members_hint')}
             </p>
           </CardBody>
         </Card>
@@ -378,7 +378,7 @@ export function MemberTags() {
                 <div className="flex items-center gap-3 min-w-0">
                   <Avatar
                     src={mt.user_avatar || undefined}
-                    name={mt.user_name || `User #${mt.user_id}`}
+                    name={mt.user_name || t('crm.user_with_id', { id: mt.user_id })}
                     size="sm"
                     className="shrink-0"
                   />
@@ -387,10 +387,10 @@ export function MemberTags() {
                       to={tenantPath(`/admin/users/${mt.user_id}/edit`)}
                       className="font-semibold text-foreground hover:text-primary transition-colors truncate block"
                     >
-                      {mt.user_name || `User #${mt.user_id}`}
+                      {mt.user_name || t('crm.user_with_id', { id: mt.user_id })}
                     </Link>
                     <p className="text-xs text-default-400">
-                      User #{mt.user_id}
+                      {t('crm.user_with_id', { id: mt.user_id })}
                     </p>
                   </div>
                   <Chip size="sm" variant="flat" color="primary">
@@ -407,7 +407,9 @@ export function MemberTags() {
                   variant="light"
                   color="danger"
                   onPress={() => setDeleteTarget(mt)}
-                  aria-label={`Remove tag from ${mt.user_name || `User #${mt.user_id}`}`}
+                  aria-label={t('crm.remove_tag_from_member_aria', {
+                    name: mt.user_name || t('crm.user_with_id', { id: mt.user_id }),
+                  })}
                 >
                   <Trash2 size={16} />
                 </Button>
@@ -424,11 +426,11 @@ export function MemberTags() {
   return (
     <div className="max-w-6xl mx-auto">
       <PageHeader
-        title={"Member Tags"}
-        description={"Tag members to categorise them for filtering and outreach"}
+        title={t('crm.member_tags_title')}
+        description={t('crm.member_tags_desc')}
         actions={
           <Button color="primary" startContent={<Plus size={16} />} onPress={openAddModal}>
-            {"Add Tag"}
+            {t('crm.add_tag')}
           </Button>
         }
       />
@@ -440,14 +442,14 @@ export function MemberTags() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Tag size={20} />
-            {"Add Tag"}
+            {t('crm.add_tag')}
           </ModalHeader>
           <ModalBody className="flex flex-col gap-4">
             <MemberSearchPicker
-              label={"Search Member"}
-              placeholder={"Type a Name or Email to Search..."}
-              noResultsText={"No members found found"}
-              clearText={t('common.clear')}
+              label={t('crm.label_search_member')}
+              placeholder={t('crm.placeholder_type_name_or_email')}
+              noResultsText={t('crm.no_members_found')}
+              clearText={t('crm.clear')}
               isRequired
               value={formUserId}
               selectedMember={formMember}
@@ -456,8 +458,8 @@ export function MemberTags() {
             />
             <div className="flex flex-col gap-2">
               <Input
-                label={"Tag"}
-                placeholder={"Type a Tag Name or Select from Suggestions..."}
+                label={t('crm.label_tag')}
+                placeholder={t('crm.placeholder_type_a_tag_name_or_select_from_suggestions')}
                 isRequired
                 value={formTag || formTagSearch}
                 onValueChange={(val) => {
@@ -487,10 +489,10 @@ export function MemberTags() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={addModal.onClose} isDisabled={saving}>
-              {"Cancel"}
+              {t('crm.cancel_button')}
             </Button>
             <Button color="primary" onPress={handleAddTag} isLoading={saving} isDisabled={saving}>
-              {"Add Tag"}
+              {t('crm.add_tag')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -501,9 +503,9 @@ export function MemberTags() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDeleteMemberTag}
-        title={"Remove Tag"}
-        message={`Are you sure you want to remove this tag from this member?`}
-        confirmLabel={"Remove"}
+        title={t('crm.remove_tag_title')}
+        message={t('crm.remove_tag_confirm')}
+        confirmLabel={t('crm.remove_button')}
         confirmColor="danger"
         isLoading={deleting}
       />
@@ -513,9 +515,9 @@ export function MemberTags() {
         isOpen={!!deleteSummaryTarget}
         onClose={() => setDeleteSummaryTarget(null)}
         onConfirm={handleDeleteSummaryTag}
-        title={"Remove Tag from All Members"}
-        message={`Are you sure you want to remove this tag from all members?`}
-        confirmLabel={"Remove All"}
+        title={t('crm.remove_tag_all_title')}
+        message={t('crm.remove_tag_all_confirm')}
+        confirmLabel={t('crm.remove_all_button')}
         confirmColor="danger"
         isLoading={deleting}
       />
