@@ -80,7 +80,7 @@ interface AvailableTenant {
 
 export function Neighborhoods() {
   const { t } = useTranslation('admin');
-  usePageTitle("Federation");
+  usePageTitle(t('federation.page_title'));
   const toast = useToast();
   const createModal = useDisclosure();
   const addTenantModal = useDisclosure();
@@ -126,10 +126,10 @@ export function Neighborhoods() {
       }
     } catch (err) {
       logError('Neighborhoods.load', err);
-      toast.error("Failed to load neighborhoods");
+      toast.error(t('federation.failed_to_load_neighborhoods'));
     }
     setLoading(false);
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -143,7 +143,7 @@ export function Neighborhoods() {
         description: newDescription.trim() || undefined,
       });
       if (res.success) {
-        toast.success("Neighborhood Created");
+        toast.success(t('federation.neighborhood_created'));
         setNewName('');
         setNewDescription('');
         createModal.onClose();
@@ -151,10 +151,10 @@ export function Neighborhoods() {
       }
     } catch (err) {
       logError('Neighborhoods.create', err);
-      toast.error("Failed to create neighborhood");
+      toast.error(t('federation.failed_to_create_neighborhood'));
     }
     setCreating(false);
-  }, [newName, newDescription, toast, createModal, loadData]);
+  }, [newName, newDescription, t, toast, createModal, loadData]);
 
   // ─── Add tenant to neighborhood ───
   const handleAddTenant = useCallback(async () => {
@@ -165,7 +165,7 @@ export function Neighborhoods() {
         tenant_id: parseInt(selectedTenantId),
       });
       if (res.success) {
-        toast.success("Tenant Added to Neighborhood");
+        toast.success(t('federation.tenant_added_to_neighborhood'));
         setSelectedTenantId('');
         setAddToNeighborhood(null);
         addTenantModal.onClose();
@@ -173,10 +173,10 @@ export function Neighborhoods() {
       }
     } catch (err) {
       logError('Neighborhoods.addTenant', err);
-      toast.error("Failed to add tenant");
+      toast.error(t('federation.failed_to_add_tenant'));
     }
     setAddingTenant(false);
-  }, [addToNeighborhood, selectedTenantId, toast, addTenantModal, loadData]);
+  }, [addToNeighborhood, selectedTenantId, t, toast, addTenantModal, loadData]);
 
   // ─── Remove tenant from neighborhood ───
   const confirmRemoveTenant = useCallback(async () => {
@@ -185,17 +185,17 @@ export function Neighborhoods() {
     try {
       const res = await api.delete(`/v2/admin/federation/neighborhoods/${neighborhoodId}/tenants/${tenantId}`);
       if (res.success) {
-        toast.success("Tenant Removed from Neighborhood");
+        toast.success(t('federation.tenant_removed_from_neighborhood'));
         loadData();
       } else {
-        toast.error(res.error || "Failed to remove tenant");
+        toast.error(res.error || t('federation.failed_to_remove_tenant'));
       }
     } catch (err) {
       logError('Neighborhoods.removeTenant', err);
-      toast.error("Failed to remove tenant");
+      toast.error(t('federation.failed_to_remove_tenant'));
     }
     setRemoveTenantTarget(null);
-  }, [toast, loadData, removeTenantTarget]);
+  }, [t, toast, loadData, removeTenantTarget]);
 
   // ─── Delete neighborhood ───
   const confirmDelete = useCallback(async () => {
@@ -203,17 +203,17 @@ export function Neighborhoods() {
     try {
       const res = await api.delete(`/v2/admin/federation/neighborhoods/${deleteTarget}`);
       if (res.success) {
-        toast.success("Neighborhood Deleted");
+        toast.success(t('federation.neighborhood_deleted'));
         loadData();
       } else {
-        toast.error(res.error || "Failed to delete neighborhood");
+        toast.error(res.error || t('federation.failed_to_delete_neighborhood'));
       }
     } catch (err) {
       logError('Neighborhoods.delete', err);
-      toast.error("Failed to delete neighborhood");
+      toast.error(t('federation.failed_to_delete_neighborhood'));
     }
     setDeleteTarget(null);
-  }, [toast, loadData, deleteTarget]);
+  }, [t, toast, loadData, deleteTarget]);
 
   // ─── Stats ───
   const totalNeighborhoods = neighborhoods.length;
@@ -225,7 +225,7 @@ export function Neighborhoods() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={"Neighborhoods"} description={"Manage neighborhood clusters that group related communities together"} />
+        <PageHeader title={t('federation.neighborhoods_title')} description={t('federation.neighborhoods_desc')} />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
         </div>
@@ -236,15 +236,15 @@ export function Neighborhoods() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={"Neighborhoods"}
-        description={"Manage neighborhood clusters that group related communities together"}
+        title={t('federation.neighborhoods_title')}
+        description={t('federation.neighborhoods_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()}>
-              {"Refresh"}
+              {t('common.refresh')}
             </Button>
             <Button color="primary" size="sm" startContent={<Plus size={16} />} onPress={createModal.onOpen}>
-              {"New Neighborhood"}
+              {t('federation.new_neighborhood')}
             </Button>
           </div>
         }
@@ -252,10 +252,10 @@ export function Neighborhoods() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label={"Neighborhoods"} value={totalNeighborhoods} icon={MapPin} color="primary" />
-        <StatCard label={"Communities"} value={totalTenants} icon={Building2} color="secondary" />
-        <StatCard label={"Total Members"} value={totalMembers} icon={Users} color="success" />
-        <StatCard label={"Shared Events"} value={totalSharedEvents} icon={Calendar} color="warning" />
+        <StatCard label={t('federation.label_neighborhoods')} value={totalNeighborhoods} icon={MapPin} color="primary" />
+        <StatCard label={t('federation.label_communities')} value={totalTenants} icon={Building2} color="secondary" />
+        <StatCard label={t('federation.label_total_members')} value={totalMembers} icon={Users} color="success" />
+        <StatCard label={t('federation.label_shared_events')} value={totalSharedEvents} icon={Calendar} color="warning" />
       </div>
 
       {/* Neighborhoods grid */}
@@ -263,15 +263,15 @@ export function Neighborhoods() {
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center py-12 text-default-400">
             <MapPin size={48} className="mb-4" />
-            <p className="text-lg font-medium">{"No neighborhoods yet"}</p>
-            <p className="text-sm">{"No neighborhoods have been created yet"}</p>
+            <p className="text-lg font-medium">{t('federation.no_neighborhoods_yet')}</p>
+            <p className="text-sm">{t('federation.no_neighborhoods_desc')}</p>
             <Button
               color="primary"
               className="mt-4"
               startContent={<Plus size={16} />}
               onPress={createModal.onOpen}
             >
-              {"Create Neighborhood"}
+              {t('federation.create_neighborhood')}
             </Button>
           </CardBody>
         </Card>
@@ -294,7 +294,7 @@ export function Neighborhoods() {
                   variant="flat"
                   color="danger"
                   isIconOnly
-                  aria-label={"Delete Neighborhood"}
+                  aria-label={t('federation.label_delete_neighborhood')}
                   onPress={() => setDeleteTarget(neighborhood.id)}
                 >
                   <Trash2 size={14} />
@@ -305,15 +305,15 @@ export function Neighborhoods() {
                 <div className="flex items-center gap-4 text-sm text-default-500">
                   <span className="flex items-center gap-1">
                     <Building2 size={14} />
-                    {`Communities`}
+                    {t('federation.label_communities')}
                   </span>
                   <span className="flex items-center gap-1">
                     <Users size={14} />
-                    {`Members`}
+                    {t('federation.members_count')}
                   </span>
                   <span className="flex items-center gap-1">
                     <Calendar size={14} />
-                    {`Shared Events`}
+                    {t('federation.label_shared_events')}
                   </span>
                 </div>
 
@@ -322,7 +322,7 @@ export function Neighborhoods() {
                 {/* Tenants list */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-default-600">{"Communities"}</span>
+                    <span className="text-sm font-medium text-default-600">{t('federation.label_communities')}</span>
                     <Button
                       size="sm"
                       variant="flat"
@@ -332,12 +332,12 @@ export function Neighborhoods() {
                         addTenantModal.onOpen();
                       }}
                     >
-                      {"Add"}
+                      {t('federation.add')}
                     </Button>
                   </div>
 
                   {neighborhood.tenants.length === 0 ? (
-                    <p className="text-sm text-default-400 py-2">{"No communities in neighborhood"}</p>
+                    <p className="text-sm text-default-400 py-2">{t('federation.no_communities_in_neighborhood')}</p>
                   ) : (
                     <div className="space-y-1.5">
                       {neighborhood.tenants.map((tenant) => (
@@ -354,7 +354,7 @@ export function Neighborhoods() {
                             <div>
                               <p className="text-sm font-medium">{tenant.name}</p>
                               <p className="text-xs text-default-400">
-                                {`Members`} · {tenant.slug}
+                                {t('federation.members_count')} · {tenant.slug}
                               </p>
                             </div>
                           </div>
@@ -363,7 +363,7 @@ export function Neighborhoods() {
                             variant="light"
                             isIconOnly
                             color="danger"
-                            aria-label={`Remove Name`}
+                            aria-label={t('federation.remove_tenant_aria', { name: tenant.name })}
                             onPress={() => setRemoveTenantTarget({ neighborhoodId: neighborhood.id, tenantId: tenant.id })}
                           >
                             <X size={14} />
@@ -375,7 +375,7 @@ export function Neighborhoods() {
                 </div>
 
                 <div className="text-xs text-default-400 pt-1">
-                  {`Created Time`}
+                  {t('federation.created_time')}
                 </div>
               </CardBody>
             </Card>
@@ -390,32 +390,32 @@ export function Neighborhoods() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <MapPin size={20} />
-                {"New Neighborhood"}
+                {t('federation.new_neighborhood')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label={"Name"}
-                  placeholder={"Neighborhood Name..."}
+                  label={t('federation.label_name')}
+                  placeholder={t('federation.placeholder_neighborhood_name')}
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                 />
                 <Textarea
-                  label={"Description"}
-                  placeholder={"Optional Description of This Neighborhood Cluster..."}
+                  label={t('federation.label_description')}
+                  placeholder={t('federation.placeholder_optional_description_of_this_neighborhood_cluster')}
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
                   minRows={2}
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{"Cancel"}</Button>
+                <Button variant="flat" onPress={onClose}>{t('federation.cancel')}</Button>
                 <Button
                   color="primary"
                   isLoading={creating}
                   isDisabled={!newName.trim()}
                   onPress={handleCreate}
                 >
-                  {"Create"}
+                  {t('federation.create')}
                 </Button>
               </ModalFooter>
             </>
@@ -430,12 +430,12 @@ export function Neighborhoods() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <UserPlus size={20} />
-                {`Add Community`}
+                {t('federation.add_community')}
               </ModalHeader>
               <ModalBody>
                 <Select
-                  label={"Select Community"}
-                  placeholder={"Choose a Community to Add..."}
+                  label={t('federation.label_select_community')}
+                  placeholder={t('federation.placeholder_choose_community')}
                   selectedKeys={selectedTenantId ? [selectedTenantId] : []}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0];
@@ -450,14 +450,14 @@ export function Neighborhoods() {
                 </Select>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{"Cancel"}</Button>
+                <Button variant="flat" onPress={onClose}>{t('federation.cancel')}</Button>
                 <Button
                   color="primary"
                   isLoading={addingTenant}
                   isDisabled={!selectedTenantId}
                   onPress={handleAddTenant}
                 >
-                  {"Add Community"}
+                  {t('federation.add_community')}
                 </Button>
               </ModalFooter>
             </>
