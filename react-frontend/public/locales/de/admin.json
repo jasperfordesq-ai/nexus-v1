@@ -9995,5 +9995,119 @@
     "label": "Help",
     "related_pages": "Related pages",
     "tips": "Tips & gotchas"
+  },
+  "clear_accent_color": "Klare Akzentfarbe",
+  "clear_primary_color": "Klare Primärfarbe",
+  "something_wrong": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
+  "admin_not_found": {
+    "title": "Nicht gefunden",
+    "heading": "Seite nicht gefunden",
+    "description": "Die gesuchte Seite existiert nicht",
+    "back_to_dashboard": "Zurück zum Dashboard"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "API-Partner"
+    },
+    "header": {
+      "title": "API-Partner",
+      "description": "Bereitstellung und Verwaltung externer Integrationen (Banken, Zahlungsabwickler, Verwaltungssysteme), die den Partner API aufrufen."
+    },
+    "actions": {
+      "activate": "Aktivieren",
+      "cancel": "Stornieren",
+      "close": "Schließen",
+      "new_partner": "Neuer Partner",
+      "regenerate_credentials": "Anmeldeinformationen neu generieren",
+      "suspend": "Aussetzen",
+      "view_call_log": "Anrufprotokoll anzeigen"
+    },
+    "call_log": {
+      "table_aria": "Letzte Anrufe",
+      "columns": {
+        "duration": "Dauer",
+        "method": "Verfahren",
+        "path": "Weg",
+        "status": "Status",
+        "when": "Wann"
+      }
+    },
+    "columns": {
+      "actions": "Aktionen",
+      "name": "Name",
+      "rate_limit": "Ratenbegrenzung",
+      "sandbox": "Sandkasten",
+      "scopes": "Bereiche",
+      "slug": "Schnecke",
+      "status": "Status"
+    },
+    "common": {
+      "any": "beliebig",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ms",
+      "no": "NEIN",
+      "per_minute": "{{value}}/Min",
+      "yes": "Ja"
+    },
+    "confirm": {
+      "regenerate_credentials": "Anmeldeinformationen neu generieren? Das alte client_id/client_secret wird sofort widerrufen."
+    },
+    "create_modal": {
+      "allowed_scopes": "Zulässige Bereiche",
+      "contact_email": "Kontakt-E-Mail",
+      "contact_email_placeholder": "integrations@partner.example",
+      "description": "Beschreibung",
+      "name": "Name",
+      "name_placeholder": "z.B. PostFinance Switzerland",
+      "rate_limit": "Ratenlimit (Anfragen/Minute)",
+      "sandbox_mode": "Sandbox-Modus (schreibgeschützt – Schreibvorgänge werden abgelehnt)",
+      "submit": "Anmeldeinformationen erstellen und ausstellen",
+      "title": "Neuer API-Partner"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "Kopieren Sie client_id",
+      "copy_client_secret": "Kopieren Sie client_secret",
+      "saved_button": "Ich habe diese gespeichert",
+      "title": "Kundenanmeldeinformationen wurden ausgestellt",
+      "warning_body": "Das Client-Geheimnis wird nicht erneut angezeigt. Übergeben Sie sie Ihrem Partner über einen sicheren Kanal.",
+      "warning_title": "Speichern Sie diese jetzt."
+    },
+    "detail": {
+      "call_log_tab": "Anrufprotokoll",
+      "contact": "Kontakt:",
+      "info_tab": "Info",
+      "ip_allowlist": "IP-Zulassungsliste:",
+      "rate_limit": "Ratenlimit:",
+      "sandbox": "Sandkasten:",
+      "scopes": "Geltungsbereiche:",
+      "status": "Status:",
+      "tabs_aria": "Registerkarten für Partnerdetails"
+    },
+    "empty": {
+      "no_calls": "Noch keine Anrufe.",
+      "no_partners": "Noch keine Partner. Erstellen Sie eine, um Client-Anmeldeinformationen auszugeben."
+    },
+    "status": {
+      "active": "Aktiv",
+      "pending": "Ausstehend",
+      "suspended": "Ausgesetzt"
+    },
+    "toasts": {
+      "activate_failed": "Aktivierung fehlgeschlagen",
+      "activated": "Partner aktiviert",
+      "copied": "{{label}} kopiert",
+      "copy_failed": "Kopieren fehlgeschlagen – manuell kopieren",
+      "create_failed": "Erstellen ist fehlgeschlagen",
+      "load_failed": "Partner konnten nicht geladen werden",
+      "name_required": "Name ist erforderlich",
+      "regenerate_failed": "Die Neugenerierung ist fehlgeschlagen",
+      "suspend_failed": "Die Unterbrechung ist fehlgeschlagen",
+      "suspended": "Partner suspendiert"
+    },
+    "table": {
+      "aria": "API-Partner"
+    }
   }
 }

@@ -9995,5 +9995,119 @@
     "label": "Help",
     "related_pages": "Related pages",
     "tips": "Tips & gotchas"
+  },
+  "clear_accent_color": "Dath accent soiléir",
+  "clear_primary_color": "Dath bunscoile soiléir",
+  "something_wrong": "Chuaigh rud éigin mícheart. Bain triail eile as.",
+  "admin_not_found": {
+    "title": "Gan Aimsiú",
+    "heading": "Leathanach Gan Aimsiú",
+    "description": "Níl an leathanach atá á lorg agat ann",
+    "back_to_dashboard": "Ar ais go dtí an Deais"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "Comhpháirtithe API"
+    },
+    "header": {
+      "title": "Comhpháirtithe API",
+      "description": "Comhtháthaithe seachtracha a sholáthar agus a bhainistiú (bainc, próiseálaithe íocaíochta, córais riaracháin) a ghlaonn an Comhpháirtí API."
+    },
+    "actions": {
+      "activate": "Gníomhachtaigh",
+      "cancel": "Cealaigh",
+      "close": "Dún",
+      "new_partner": "Comhpháirtí nua",
+      "regenerate_credentials": "Athghin dintiúir",
+      "suspend": "Fionraí",
+      "view_call_log": "Féach ar loga glaonna"
+    },
+    "call_log": {
+      "table_aria": "Glaonna le déanaí",
+      "columns": {
+        "duration": "Fad",
+        "method": "Modh",
+        "path": "Conair",
+        "status": "Stádas",
+        "when": "Cathain"
+      }
+    },
+    "columns": {
+      "actions": "Gníomhartha",
+      "name": "Ainm",
+      "rate_limit": "Teorainn ráta",
+      "sandbox": "Bosca gainimh",
+      "scopes": "Scóip",
+      "slug": "Drúchtín",
+      "status": "Stádas"
+    },
+    "common": {
+      "any": "ar bith",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ms",
+      "no": "Níl",
+      "per_minute": "{{value}}/nóim",
+      "yes": "Tá"
+    },
+    "confirm": {
+      "regenerate_credentials": "Athghin dintiúir? Déanfar an sean-client_id/client_secret a chúlghairm láithreach."
+    },
+    "create_modal": {
+      "allowed_scopes": "Scóipeanna ceadaithe",
+      "contact_email": "Ríomhphost teagmhála",
+      "contact_email_placeholder": "integrations@partner.example",
+      "description": "Cur síos",
+      "name": "Ainm",
+      "name_placeholder": "e.g. PostFinance Switzerland",
+      "rate_limit": "Teorainn an ráta (iarratais / nóiméad)",
+      "sandbox_mode": "Mód bosca gainimh (inléite amháin - diúltófar do scríobhann)",
+      "submit": "Cruthaigh & eisigh dintiúir",
+      "title": "Comhpháirtí nua API"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "Cóipeáil client_id",
+      "copy_client_secret": "Cóipeáil client_secret",
+      "saved_button": "Shábháil mé iad seo",
+      "title": "Dintiúir cliant eisithe",
+      "warning_body": "Ní thaispeánfar rún an chliaint arís. Tabhair do do pháirtí iad trí chainéal slán.",
+      "warning_title": "Sábháil iad seo anois."
+    },
+    "detail": {
+      "call_log_tab": "Logchomhaid glaonna",
+      "contact": "Déan teagmháil le:",
+      "info_tab": "Eolas",
+      "ip_allowlist": "Liosta ceadaithe IP:",
+      "rate_limit": "Teorainn ráta:",
+      "sandbox": "Bosca gainimh:",
+      "scopes": "Scóip:",
+      "status": "Stádas:",
+      "tabs_aria": "Cluaisíní sonraí comhpháirtíochta"
+    },
+    "empty": {
+      "no_calls": "Níl aon ghlaonna fós.",
+      "no_partners": "Níl comhpháirtithe fós. Create one to issue client credentials."
+    },
+    "status": {
+      "active": "Gníomhach",
+      "pending": "Ar feitheamh",
+      "suspended": "Ar fionraí"
+    },
+    "toasts": {
+      "activate_failed": "Theip ar ghníomhachtú",
+      "activated": "Comhpháirtí gníomhachtaithe",
+      "copied": "{{label}} cóipeáilte",
+      "copy_failed": "Theip ar an gcóipeáil - cóip de láimh",
+      "create_failed": "Theip ar chruthú",
+      "load_failed": "Theip ar lódáil na gcomhpháirtithe",
+      "name_required": "Tá ainm ag teastáil",
+      "regenerate_failed": "Theip ar athghiniúint",
+      "suspend_failed": "Theip ar an bhfionraí",
+      "suspended": "Comhpháirtí ar fionraí"
+    },
+    "table": {
+      "aria": "Comhpháirtithe API"
+    }
   }
 }

@@ -9995,5 +9995,119 @@
     "label": "Help",
     "related_pages": "Related pages",
     "tips": "Tips & gotchas"
+  },
+  "clear_accent_color": "Color de acento claro",
+  "clear_primary_color": "Color primario claro",
+  "something_wrong": "Algo salió mal. Por favor inténtalo de nuevo.",
+  "admin_not_found": {
+    "title": "Extraviado",
+    "heading": "Página no encontrada",
+    "description": "La página que buscas no existe",
+    "back_to_dashboard": "Volver al panel"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "Socios de API"
+    },
+    "header": {
+      "title": "Socios de API",
+      "description": "Provisione y gestione integraciones externas (bancos, procesadores de pagos, sistemas de administración) que llamen al socio API."
+    },
+    "actions": {
+      "activate": "Activar",
+      "cancel": "Cancelar",
+      "close": "Cerca",
+      "new_partner": "Nuevo socio",
+      "regenerate_credentials": "Regenerar credenciales",
+      "suspend": "Suspender",
+      "view_call_log": "Ver registro de llamadas"
+    },
+    "call_log": {
+      "table_aria": "Llamadas recientes",
+      "columns": {
+        "duration": "Duración",
+        "method": "Método",
+        "path": "Camino",
+        "status": "Estado",
+        "when": "Cuando"
+      }
+    },
+    "columns": {
+      "actions": "Comportamiento",
+      "name": "Nombre",
+      "rate_limit": "Límite de tarifa",
+      "sandbox": "Salvadera",
+      "scopes": "Alcances",
+      "slug": "Babosa",
+      "status": "Estado"
+    },
+    "common": {
+      "any": "cualquier",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ms",
+      "no": "No",
+      "per_minute": "{{value}}/min",
+      "yes": "Sí"
+    },
+    "confirm": {
+      "regenerate_credentials": "¿Regenerar credenciales? El antiguo client_id/client_secret será revocado inmediatamente."
+    },
+    "create_modal": {
+      "allowed_scopes": "Alcances permitidos",
+      "contact_email": "Correo electrónico de contacto",
+      "contact_email_placeholder": "integrations@partner.example",
+      "description": "Descripción",
+      "name": "Nombre",
+      "name_placeholder": "p.ej. PostFinance Switzerland",
+      "rate_limit": "Límite de tarifa (solicitudes/minuto)",
+      "sandbox_mode": "Modo Sandbox (solo lectura; se rechazarán las escrituras)",
+      "submit": "Crear y emitir credenciales",
+      "title": "Nuevo socio API"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "Copiar client_id",
+      "copy_client_secret": "Copiar client_secret",
+      "saved_button": "He guardado estos",
+      "title": "Credenciales de cliente emitidas",
+      "warning_body": "El secreto del cliente no se volverá a mostrar. Entrégaselos a tu socio a través de un canal seguro.",
+      "warning_title": "Guárdalos ahora."
+    },
+    "detail": {
+      "call_log_tab": "Registro de llamadas",
+      "contact": "Contacto:",
+      "info_tab": "Información",
+      "ip_allowlist": "Lista de permitidos de IP:",
+      "rate_limit": "Límite de tarifa:",
+      "sandbox": "Salvadera:",
+      "scopes": "Alcances:",
+      "status": "Estado:",
+      "tabs_aria": "Pestañas de detalles de socios"
+    },
+    "empty": {
+      "no_calls": "Aún no hay llamadas.",
+      "no_partners": "Aún no hay socios. Cree uno para emitir credenciales de cliente."
+    },
+    "status": {
+      "active": "Activo",
+      "pending": "Pendiente",
+      "suspended": "Suspendido"
+    },
+    "toasts": {
+      "activate_failed": "Activación fallida",
+      "activated": "Socio activado",
+      "copied": "{{label}} copiado",
+      "copy_failed": "Error al copiar: copiar manualmente",
+      "create_failed": "Error al crear",
+      "load_failed": "No se pudieron cargar los socios",
+      "name_required": "El nombre es obligatorio",
+      "regenerate_failed": "Falló la regeneración",
+      "suspend_failed": "Suspender falló",
+      "suspended": "Socio suspendido"
+    },
+    "table": {
+      "aria": "Socios de API"
+    }
   }
 }

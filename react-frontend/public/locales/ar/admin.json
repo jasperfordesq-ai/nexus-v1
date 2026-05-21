@@ -9995,5 +9995,119 @@
     "label": "Help",
     "related_pages": "Related pages",
     "tips": "Tips & gotchas"
+  },
+  "clear_accent_color": "لون مميز واضح",
+  "clear_primary_color": "مسح اللون الأساسي",
+  "something_wrong": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+  "admin_not_found": {
+    "title": "لم يتم العثور عليه",
+    "heading": "لم يتم العثور على الصفحة",
+    "description": "الصفحة التي تبحث عنها غير موجودة",
+    "back_to_dashboard": "العودة إلى لوحة القيادة"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "شركاء API"
+    },
+    "header": {
+      "title": "شركاء API",
+      "description": "توفير وإدارة عمليات التكامل الخارجية (البنوك ومعالجات الدفع وأنظمة الإدارة) التي تستدعي الشريك API."
+    },
+    "actions": {
+      "activate": "فعل",
+      "cancel": "يلغي",
+      "close": "يغلق",
+      "new_partner": "شريك جديد",
+      "regenerate_credentials": "إعادة إنشاء بيانات الاعتماد",
+      "suspend": "تعليق",
+      "view_call_log": "عرض سجل المكالمات"
+    },
+    "call_log": {
+      "table_aria": "المكالمات الأخيرة",
+      "columns": {
+        "duration": "مدة",
+        "method": "طريقة",
+        "path": "طريق",
+        "status": "حالة",
+        "when": "متى"
+      }
+    },
+    "columns": {
+      "actions": "الإجراءات",
+      "name": "اسم",
+      "rate_limit": "حد المعدل",
+      "sandbox": "رمل",
+      "scopes": "النطاقات",
+      "slug": "سبيكة",
+      "status": "حالة"
+    },
+    "common": {
+      "any": "أي",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} مللي",
+      "no": "لا",
+      "per_minute": "{{value}}/دقيقة",
+      "yes": "نعم"
+    },
+    "confirm": {
+      "regenerate_credentials": "هل ترغب في إعادة إنشاء بيانات الاعتماد؟ سيتم إلغاء client_id/client_secret القديم على الفور."
+    },
+    "create_modal": {
+      "allowed_scopes": "النطاقات المسموح بها",
+      "contact_email": "البريد الإلكتروني للاتصال",
+      "contact_email_placeholder": "integrations@partner.example",
+      "description": "وصف",
+      "name": "اسم",
+      "name_placeholder": "على سبيل المثال PostFinance Switzerland",
+      "rate_limit": "حد السعر (الطلبات / الدقيقة)",
+      "sandbox_mode": "وضع الحماية (للقراءة فقط - سيتم رفض الكتابة)",
+      "submit": "إنشاء وإصدار بيانات الاعتماد",
+      "title": "شريك API الجديد"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "انسخ client_id",
+      "copy_client_secret": "انسخ client_secret",
+      "saved_button": "لقد أنقذت هذه",
+      "title": "تم إصدار بيانات اعتماد العميل",
+      "warning_body": "لن يتم عرض سر العميل مرة أخرى. قم بتسليمها إلى شريكك عبر قناة آمنة.",
+      "warning_title": "احفظ هذه الآن."
+    },
+    "detail": {
+      "call_log_tab": "سجل المكالمات",
+      "contact": "اتصال:",
+      "info_tab": "معلومات",
+      "ip_allowlist": "القائمة المسموح بها لـ IP:",
+      "rate_limit": "حد السعر:",
+      "sandbox": "وضع الحماية:",
+      "scopes": "النطاقات:",
+      "status": "حالة:",
+      "tabs_aria": "علامات تبويب تفاصيل الشريك"
+    },
+    "empty": {
+      "no_calls": "لا توجد مكالمات حتى الآن.",
+      "no_partners": "لا يوجد شركاء حتى الآن. قم بإنشاء واحدة لإصدار بيانات اعتماد العميل."
+    },
+    "status": {
+      "active": "نشيط",
+      "pending": "قيد الانتظار",
+      "suspended": "معلق"
+    },
+    "toasts": {
+      "activate_failed": "فشل التنشيط",
+      "activated": "تم تفعيل الشريك",
+      "copied": "تم نسخ {{label}}",
+      "copy_failed": "فشل النسخ — انسخ يدويًا",
+      "create_failed": "فشل الإنشاء",
+      "load_failed": "فشل تحميل الشركاء",
+      "name_required": "الاسم مطلوب",
+      "regenerate_failed": "فشلت عملية إعادة الإنشاء",
+      "suspend_failed": "فشل التعليق",
+      "suspended": "الشريك موقوف"
+    },
+    "table": {
+      "aria": "شركاء API"
+    }
   }
 }

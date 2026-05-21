@@ -9995,5 +9995,119 @@
     "label": "Help",
     "related_pages": "Related pages",
     "tips": "Tips & gotchas"
+  },
+  "clear_accent_color": "クリアなアクセントカラー",
+  "clear_primary_color": "はっきりとした原色",
+  "something_wrong": "何か問題が発生しました。もう一度試してください。",
+  "admin_not_found": {
+    "title": "見つかりません",
+    "heading": "ページが見つかりません",
+    "description": "お探しのページは存在しません",
+    "back_to_dashboard": "ダッシュボードに戻る"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "API ?????"
+    },
+    "header": {
+      "title": "API ?????",
+      "description": "パートナー API を呼び出す外部統合 (銀行、決済プロセッサ、管理システム) をプロビジョニングおよび管理します。"
+    },
+    "actions": {
+      "activate": "活性化",
+      "cancel": "キャンセル",
+      "close": "近い",
+      "new_partner": "新しいパートナー",
+      "regenerate_credentials": "資格情報を再生成する",
+      "suspend": "つるす",
+      "view_call_log": "通話記録を表示する"
+    },
+    "call_log": {
+      "table_aria": "最近の通話",
+      "columns": {
+        "duration": "間隔",
+        "method": "方法",
+        "path": "パス",
+        "status": "状態",
+        "when": "いつ"
+      }
+    },
+    "columns": {
+      "actions": "アクション",
+      "name": "名前",
+      "rate_limit": "レート制限",
+      "sandbox": "サンドボックス",
+      "scopes": "スコープ",
+      "slug": "ナメクジ",
+      "status": "状態"
+    },
+    "common": {
+      "any": "どれでも",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ミリ秒",
+      "no": "いいえ",
+      "per_minute": "{{value}}/分",
+      "yes": "はい"
+    },
+    "confirm": {
+      "regenerate_credentials": "資格情報を再生成しますか?古い client_id/client_secret は直ちに取り消されます。"
+    },
+    "create_modal": {
+      "allowed_scopes": "許可されるスコープ",
+      "contact_email": "連絡先メールアドレス",
+      "contact_email_placeholder": "integrations@partner.example",
+      "description": "説明",
+      "name": "名前",
+      "name_placeholder": "?: PostFinance Switzerland",
+      "rate_limit": "レート制限 (リクエスト/分)",
+      "sandbox_mode": "サンドボックス モード (読み取り専用 - 書き込みは拒否されます)",
+      "submit": "認証情報の作成と発行",
+      "title": "??? API ?????"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "client_idをコピーする",
+      "copy_client_secret": "client_secretをコピーする",
+      "saved_button": "これらを保存しました",
+      "title": "発行されたクライアント認証情報",
+      "warning_body": "クライアント シークレットは再度表示されません。安全なチャネルを通じてパートナーにそれらを渡します。",
+      "warning_title": "今すぐこれらを保存してください。"
+    },
+    "detail": {
+      "call_log_tab": "通話履歴",
+      "contact": "接触：",
+      "info_tab": "情報",
+      "ip_allowlist": "IP 許可リスト:",
+      "rate_limit": "レート制限:",
+      "sandbox": "サンドボックス:",
+      "scopes": "範囲:",
+      "status": "状態：",
+      "tabs_aria": "パートナーの詳細タブ"
+    },
+    "empty": {
+      "no_calls": "まだ電話はありません。",
+      "no_partners": "まだパートナーがいません。クライアント認証情報を発行するために作成します。"
+    },
+    "status": {
+      "active": "アクティブ",
+      "pending": "保留中",
+      "suspended": "一時停止中"
+    },
+    "toasts": {
+      "activate_failed": "アクティブ化に失敗しました",
+      "activated": "パートナーがアクティブ化されました",
+      "copied": "{{label}} がコピーされました",
+      "copy_failed": "コピーに失敗しました - 手動でコピーします",
+      "create_failed": "作成に失敗しました",
+      "load_failed": "パートナーをロードできませんでした",
+      "name_required": "名前は必須です",
+      "regenerate_failed": "再生成に失敗しました",
+      "suspend_failed": "サスペンドに失敗しました",
+      "suspended": "パートナーの停止"
+    },
+    "table": {
+      "aria": "API ?????"
+    }
   }
 }

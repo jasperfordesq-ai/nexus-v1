@@ -9995,5 +9995,119 @@
     "label": "Help",
     "related_pages": "Related pages",
     "tips": "Tips & gotchas"
+  },
+  "clear_accent_color": "Cor de destaque clara",
+  "clear_primary_color": "Limpar cor primária",
+  "something_wrong": "Algo deu errado. Por favor, tente novamente.",
+  "admin_not_found": {
+    "title": "Não encontrado",
+    "heading": "Página não encontrada",
+    "description": "A página que você procura não existe",
+    "back_to_dashboard": "Voltar ao painel"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "Parceiros API"
+    },
+    "header": {
+      "title": "Parceiros API",
+      "description": "Provisione e gerencie integrações externas (bancos, processadores de pagamento, sistemas administrativos) que chamam o Parceiro API."
+    },
+    "actions": {
+      "activate": "Ativar",
+      "cancel": "Cancelar",
+      "close": "Fechar",
+      "new_partner": "Novo parceiro",
+      "regenerate_credentials": "Gerar credenciais novamente",
+      "suspend": "Suspender",
+      "view_call_log": "Ver registro de chamadas"
+    },
+    "call_log": {
+      "table_aria": "Chamadas recentes",
+      "columns": {
+        "duration": "Duração",
+        "method": "Método",
+        "path": "Caminho",
+        "status": "Status",
+        "when": "Quando"
+      }
+    },
+    "columns": {
+      "actions": "Ações",
+      "name": "Nome",
+      "rate_limit": "Limite de taxa",
+      "sandbox": "Caixa de areia",
+      "scopes": "Escopos",
+      "slug": "Lesma",
+      "status": "Status"
+    },
+    "common": {
+      "any": "qualquer",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ms",
+      "no": "Não",
+      "per_minute": "{{value}}/min",
+      "yes": "Sim"
+    },
+    "confirm": {
+      "regenerate_credentials": "Regenerar credenciais? O antigo client_id/client_secret será revogado imediatamente."
+    },
+    "create_modal": {
+      "allowed_scopes": "Escopos permitidos",
+      "contact_email": "E-mail de contato",
+      "contact_email_placeholder": "integrations@partner.example",
+      "description": "Descrição",
+      "name": "Nome",
+      "name_placeholder": "por exemplo PostFinance Switzerland",
+      "rate_limit": "Limite de taxa (solicitações/minuto)",
+      "sandbox_mode": "Modo sandbox (somente leitura – as gravações serão rejeitadas)",
+      "submit": "Criar e emitir credenciais",
+      "title": "Novo parceiro API"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "Copiar client_id",
+      "copy_client_secret": "Copiar client_secret",
+      "saved_button": "Eu salvei estes",
+      "title": "Credenciais do cliente emitidas",
+      "warning_body": "O segredo do cliente não será mostrado novamente. Entregue-os ao seu parceiro através de um canal seguro.",
+      "warning_title": "Salve-os agora."
+    },
+    "detail": {
+      "call_log_tab": "Registro de chamadas",
+      "contact": "Contato:",
+      "info_tab": "Informações",
+      "ip_allowlist": "Lista de permissões IP:",
+      "rate_limit": "Limite de taxa:",
+      "sandbox": "Caixa de areia:",
+      "scopes": "Escopos:",
+      "status": "Status:",
+      "tabs_aria": "Guias de detalhes do parceiro"
+    },
+    "empty": {
+      "no_calls": "Nenhuma ligação ainda.",
+      "no_partners": "Ainda não há parceiros. Crie um para emitir credenciais de cliente."
+    },
+    "status": {
+      "active": "Ativo",
+      "pending": "Pendente",
+      "suspended": "Suspenso"
+    },
+    "toasts": {
+      "activate_failed": "Falha na ativação",
+      "activated": "Parceiro ativado",
+      "copied": "{{label}} copiado",
+      "copy_failed": "Falha na cópia — copie manualmente",
+      "create_failed": "Falha na criação",
+      "load_failed": "Falha ao carregar parceiros",
+      "name_required": "O nome é obrigatório",
+      "regenerate_failed": "Falha na regeneração",
+      "suspend_failed": "Falha na suspensão",
+      "suspended": "Parceiro suspenso"
+    },
+    "table": {
+      "aria": "Parceiros API"
+    }
   }
 }

@@ -9995,5 +9995,119 @@
     "label": "Help",
     "related_pages": "Related pages",
     "tips": "Tips & gotchas"
+  },
+  "clear_accent_color": "Wyraźny akcent kolorystyczny",
+  "clear_primary_color": "Wyraźny kolor podstawowy",
+  "something_wrong": "Coś poszło nie tak. Spróbuj ponownie.",
+  "admin_not_found": {
+    "title": "Nie znaleziono",
+    "heading": "Nie znaleziono strony",
+    "description": "Strona, której szukasz nie istnieje",
+    "back_to_dashboard": "Powrót do Panelu"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "Partnerzy API"
+    },
+    "header": {
+      "title": "Partnerzy API",
+      "description": "Dostarczanie i zarządzanie integracjami zewnętrznymi (banki, procesory płatności, systemy administracyjne), które wywołują Partnera API."
+    },
+    "actions": {
+      "activate": "Aktywować",
+      "cancel": "Anulować",
+      "close": "Zamknąć",
+      "new_partner": "Nowy partner",
+      "regenerate_credentials": "Wygeneruj ponownie dane uwierzytelniające",
+      "suspend": "Wstrzymać",
+      "view_call_log": "Wyświetl rejestr połączeń"
+    },
+    "call_log": {
+      "table_aria": "Ostatnie połączenia",
+      "columns": {
+        "duration": "Czas trwania",
+        "method": "Metoda",
+        "path": "Ścieżka",
+        "status": "Status",
+        "when": "Gdy"
+      }
+    },
+    "columns": {
+      "actions": "Działania",
+      "name": "Nazwa",
+      "rate_limit": "Limit stawki",
+      "sandbox": "Piaskownica",
+      "scopes": "Zakresy",
+      "slug": "Ślimak",
+      "status": "Status"
+    },
+    "common": {
+      "any": "każdy",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ms",
+      "no": "NIE",
+      "per_minute": "{{value}}/min",
+      "yes": "Tak"
+    },
+    "confirm": {
+      "regenerate_credentials": "Wygenerować ponownie dane uwierzytelniające? Stary client_id/client_secret zostanie natychmiast unieważniony."
+    },
+    "create_modal": {
+      "allowed_scopes": "Dozwolone zakresy",
+      "contact_email": "Adres e-mail do kontaktu",
+      "contact_email_placeholder": "integrations@partner.example",
+      "description": "Opis",
+      "name": "Nazwa",
+      "name_placeholder": "np. PostFinance Switzerland",
+      "rate_limit": "Limit szybkości (żądania / minutę)",
+      "sandbox_mode": "Tryb piaskownicy (tylko do odczytu — zapisy zostaną odrzucone)",
+      "submit": "Twórz i wydawaj poświadczenia",
+      "title": "Nowy partner API"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "Skopiuj client_id",
+      "copy_client_secret": "Skopiuj client_secret",
+      "saved_button": "Zachowałem je",
+      "title": "Wydano dane uwierzytelniające klienta",
+      "warning_body": "Klucz tajny klienta nie zostanie ponownie wyświetlony. Przekaż je swojemu partnerowi za pośrednictwem bezpiecznego kanału.",
+      "warning_title": "Zapisz je teraz."
+    },
+    "detail": {
+      "call_log_tab": "Dziennik połączeń",
+      "contact": "Kontakt:",
+      "info_tab": "Informacje",
+      "ip_allowlist": "Lista dozwolonych IP:",
+      "rate_limit": "Limit stawki:",
+      "sandbox": "Piaskownica:",
+      "scopes": "Zakresy:",
+      "status": "Status:",
+      "tabs_aria": "Zakładki szczegółów partnera"
+    },
+    "empty": {
+      "no_calls": "Jeszcze żadnych połączeń.",
+      "no_partners": "Nie ma jeszcze partnerów. Utwórz taki, aby wystawiać poświadczenia klienta."
+    },
+    "status": {
+      "active": "Aktywny",
+      "pending": "Aż do",
+      "suspended": "Zawieszony"
+    },
+    "toasts": {
+      "activate_failed": "Aktywacja nie powiodła się",
+      "activated": "Partner aktywowany",
+      "copied": "Skopiowano {{label}}",
+      "copy_failed": "Kopiowanie nie powiodło się — skopiuj ręcznie",
+      "create_failed": "Tworzenie nie powiodło się",
+      "load_failed": "Nie udało się załadować partnerów",
+      "name_required": "Imię i nazwisko jest wymagane",
+      "regenerate_failed": "Regeneracja nie powiodła się",
+      "suspend_failed": "Zawieszenie nie powiodło się",
+      "suspended": "Partner zawieszony"
+    },
+    "table": {
+      "aria": "Partnerzy API"
+    }
   }
 }

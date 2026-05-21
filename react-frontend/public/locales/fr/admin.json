@@ -9995,5 +9995,119 @@
     "label": "Help",
     "related_pages": "Related pages",
     "tips": "Tips & gotchas"
+  },
+  "clear_accent_color": "Couleur d'accent claire",
+  "clear_primary_color": "Couleur primaire claire",
+  "something_wrong": "Quelque chose s'est mal passé. Veuillez réessayer.",
+  "admin_not_found": {
+    "title": "Introuvable",
+    "heading": "Page introuvable",
+    "description": "La page que vous recherchez n'existe pas",
+    "back_to_dashboard": "Retour au tableau de bord"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "Partenaires API"
+    },
+    "header": {
+      "title": "Partenaires API",
+      "description": "Provisionnez et gérez les intégrations externes (banques, processeurs de paiement, systèmes d'administration) qui appellent le partenaire API."
+    },
+    "actions": {
+      "activate": "Activer",
+      "cancel": "Annuler",
+      "close": "Fermer",
+      "new_partner": "Nouveau partenaire",
+      "regenerate_credentials": "Régénérer les identifiants",
+      "suspend": "Suspendre",
+      "view_call_log": "Afficher le journal des appels"
+    },
+    "call_log": {
+      "table_aria": "Appels récents",
+      "columns": {
+        "duration": "Durée",
+        "method": "Méthode",
+        "path": "Chemin",
+        "status": "Statut",
+        "when": "Quand"
+      }
+    },
+    "columns": {
+      "actions": "Actes",
+      "name": "Nom",
+      "rate_limit": "Limite de taux",
+      "sandbox": "Bac à sable",
+      "scopes": "Portées",
+      "slug": "Limace",
+      "status": "Statut"
+    },
+    "common": {
+      "any": "n'importe lequel",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ms",
+      "no": "Non",
+      "per_minute": "{{value}}/min",
+      "yes": "Oui"
+    },
+    "confirm": {
+      "regenerate_credentials": "Régénérer les identifiants ? L'ancien client_id/client_secret sera immédiatement révoqué."
+    },
+    "create_modal": {
+      "allowed_scopes": "Portées autorisées",
+      "contact_email": "E-mail de contact",
+      "contact_email_placeholder": "integrations@partner.example",
+      "description": "Description",
+      "name": "Nom",
+      "name_placeholder": "par ex. PostFinance Switzerland",
+      "rate_limit": "Limite de débit (requêtes / minute)",
+      "sandbox_mode": "Mode Sandbox (lecture seule : les écritures seront rejetées)",
+      "submit": "Créer et émettre des informations d'identification",
+      "title": "Nouveau partenaire API"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "Copier client_id",
+      "copy_client_secret": "Copier client_secret",
+      "saved_button": "Je les ai sauvegardés",
+      "title": "Identifiants client émis",
+      "warning_body": "Le secret client ne sera plus affiché. Remettez-les à votre partenaire via un canal sécurisé.",
+      "warning_title": "Enregistrez-les maintenant."
+    },
+    "detail": {
+      "call_log_tab": "Journal des appels",
+      "contact": "Contact:",
+      "info_tab": "Informations",
+      "ip_allowlist": "Liste verte IP :",
+      "rate_limit": "Limite de taux :",
+      "sandbox": "Bac à sable :",
+      "scopes": "Portées :",
+      "status": "Statut:",
+      "tabs_aria": "Onglets de détails du partenaire"
+    },
+    "empty": {
+      "no_calls": "Aucun appel pour l'instant.",
+      "no_partners": "Pas encore de partenaires. Créez-en un pour émettre les informations d’identification du client."
+    },
+    "status": {
+      "active": "Actif",
+      "pending": "En attente",
+      "suspended": "Suspendu"
+    },
+    "toasts": {
+      "activate_failed": "Échec de l'activation",
+      "activated": "Partenaire activé",
+      "copied": "{{label}} copié",
+      "copy_failed": "Échec de la copie – copier manuellement",
+      "create_failed": "Échec de la création",
+      "load_failed": "Échec du chargement des partenaires",
+      "name_required": "Le nom est requis",
+      "regenerate_failed": "Échec de la régénération",
+      "suspend_failed": "Échec de la suspension",
+      "suspended": "Partenaire suspendu"
+    },
+    "table": {
+      "aria": "Partenaires API"
+    }
   }
 }

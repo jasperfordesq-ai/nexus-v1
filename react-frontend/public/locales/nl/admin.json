@@ -9995,5 +9995,119 @@
     "label": "Help",
     "related_pages": "Related pages",
     "tips": "Tips & gotchas"
+  },
+  "clear_accent_color": "Heldere accentkleur",
+  "clear_primary_color": "Heldere primaire kleur",
+  "something_wrong": "Er is iets misgegaan. Probeer het opnieuw.",
+  "admin_not_found": {
+    "title": "Niet gevonden",
+    "heading": "Pagina niet gevonden",
+    "description": "De pagina die u zoekt bestaat niet",
+    "back_to_dashboard": "Terug naar Dashboard"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "API-partners"
+    },
+    "header": {
+      "title": "API-partners",
+      "description": "Lever en beheer externe integraties (banken, betalingsverwerkers, beheerderssystemen) die de Partner API aanroepen."
+    },
+    "actions": {
+      "activate": "Activeren",
+      "cancel": "Annuleren",
+      "close": "Dichtbij",
+      "new_partner": "Nieuwe partner",
+      "regenerate_credentials": "Referenties opnieuw genereren",
+      "suspend": "Opschorten",
+      "view_call_log": "Bekijk oproeplog"
+    },
+    "call_log": {
+      "table_aria": "Recente oproepen",
+      "columns": {
+        "duration": "Duur",
+        "method": "Methode",
+        "path": "Pad",
+        "status": "Status",
+        "when": "Wanneer"
+      }
+    },
+    "columns": {
+      "actions": "Acties",
+      "name": "Naam",
+      "rate_limit": "Tarieflimiet",
+      "sandbox": "Zandbak",
+      "scopes": "Bereik",
+      "slug": "Naaktslak",
+      "status": "Status"
+    },
+    "common": {
+      "any": "elk",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ms",
+      "no": "Nee",
+      "per_minute": "{{value}}/min",
+      "yes": "Ja"
+    },
+    "confirm": {
+      "regenerate_credentials": "Referenties opnieuw genereren? De oude client_id/client_secret wordt onmiddellijk ingetrokken."
+    },
+    "create_modal": {
+      "allowed_scopes": "Toegestane bereiken",
+      "contact_email": "E-mailadres voor contact",
+      "contact_email_placeholder": "integrations@partner.example",
+      "description": "Beschrijving",
+      "name": "Naam",
+      "name_placeholder": "bijv. PostFinance Switzerland",
+      "rate_limit": "Tarieflimiet (aanvragen / minuut)",
+      "sandbox_mode": "Sandbox-modus (alleen-lezen - schrijfbewerkingen worden afgewezen)",
+      "submit": "Creëren en uitgeven van inloggegevens",
+      "title": "Nieuwe API-partner"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "Kopieer client_id",
+      "copy_client_secret": "Kopieer client_secret",
+      "saved_button": "Deze heb ik bewaard",
+      "title": "Klantreferenties uitgegeven",
+      "warning_body": "Het klantgeheim wordt niet meer getoond. Geef ze via een beveiligd kanaal aan uw partner.",
+      "warning_title": "Bewaar deze nu."
+    },
+    "detail": {
+      "call_log_tab": "Oproeplog",
+      "contact": "Contact:",
+      "info_tab": "Info",
+      "ip_allowlist": "IP toelatingslijst:",
+      "rate_limit": "Tarieflimiet:",
+      "sandbox": "Zandbak:",
+      "scopes": "Bereik:",
+      "status": "Status:",
+      "tabs_aria": "Tabbladen met partnerdetails"
+    },
+    "empty": {
+      "no_calls": "Nog geen oproepen.",
+      "no_partners": "Nog geen partners. Maak er een om clientreferenties uit te geven."
+    },
+    "status": {
+      "active": "Actief",
+      "pending": "In behandeling",
+      "suspended": "Opgeschort"
+    },
+    "toasts": {
+      "activate_failed": "Activeren mislukt",
+      "activated": "Partner geactiveerd",
+      "copied": "{{label}} gekopieerd",
+      "copy_failed": "Kopiëren mislukt — handmatig kopiëren",
+      "create_failed": "Maken mislukt",
+      "load_failed": "Kan partners niet laden",
+      "name_required": "Naam is vereist",
+      "regenerate_failed": "Opnieuw genereren is mislukt",
+      "suspend_failed": "Opschorten is mislukt",
+      "suspended": "Partner geschorst"
+    },
+    "table": {
+      "aria": "API-partners"
+    }
   }
 }

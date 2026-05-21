@@ -9995,5 +9995,119 @@
     "label": "Help",
     "related_pages": "Related pages",
     "tips": "Tips & gotchas"
+  },
+  "clear_accent_color": "Colore chiaro",
+  "clear_primary_color": "Colore primario chiaro",
+  "something_wrong": "Qualcosa è andato storto. Per favore riprova.",
+  "admin_not_found": {
+    "title": "Non trovato",
+    "heading": "Pagina non trovata",
+    "description": "La pagina che stai cercando non esiste",
+    "back_to_dashboard": "Torna alla dashboard"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "API Partner"
+    },
+    "header": {
+      "title": "API Partner",
+      "description": "Fornire e gestire integrazioni esterne (banche, processori di pagamento, sistemi di amministrazione) che chiamano il partner API."
+    },
+    "actions": {
+      "activate": "Attivare",
+      "cancel": "Cancellare",
+      "close": "Vicino",
+      "new_partner": "Nuovo socio",
+      "regenerate_credentials": "Rigenerare credenziali",
+      "suspend": "Sospendere",
+      "view_call_log": "Visualizza il registro delle chiamate"
+    },
+    "call_log": {
+      "table_aria": "Chiamate recenti",
+      "columns": {
+        "duration": "Durata",
+        "method": "Metodo",
+        "path": "Sentiero",
+        "status": "Stato",
+        "when": "Quando"
+      }
+    },
+    "columns": {
+      "actions": "Azioni",
+      "name": "Nome",
+      "rate_limit": "Limite di tariffa",
+      "sandbox": "Sabbiera",
+      "scopes": "Ambiti",
+      "slug": "Lumaca",
+      "status": "Stato"
+    },
+    "common": {
+      "any": "Qualunque",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ms",
+      "no": "NO",
+      "per_minute": "{{value}}/min",
+      "yes": "SÌ"
+    },
+    "confirm": {
+      "regenerate_credentials": "Rigenerare le credenziali? Il vecchio client_id/client_secret verrà revocato immediatamente."
+    },
+    "create_modal": {
+      "allowed_scopes": "Ambiti consentiti",
+      "contact_email": "Contatto e-mail",
+      "contact_email_placeholder": "integrations@partner.example",
+      "description": "Descrizione",
+      "name": "Nome",
+      "name_placeholder": "per esempio. PostFinance Switzerland",
+      "rate_limit": "Limite di velocità (richieste/minuto)",
+      "sandbox_mode": "Modalità Sandbox (sola lettura: le scritture verranno rifiutate)",
+      "submit": "Creare ed emettere credenziali",
+      "title": "Nuovo partner API"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "Copia client_id",
+      "copy_client_secret": "Copia client_secret",
+      "saved_button": "Questi li ho salvati",
+      "title": "Credenziali del cliente rilasciate",
+      "warning_body": "Il segreto client non verrà visualizzato nuovamente. Consegnali al tuo partner tramite un canale sicuro.",
+      "warning_title": "Salvateli adesso."
+    },
+    "detail": {
+      "call_log_tab": "Registro delle chiamate",
+      "contact": "Contatto:",
+      "info_tab": "Informazioni",
+      "ip_allowlist": "Lista consentita IP:",
+      "rate_limit": "Limite di tariffa:",
+      "sandbox": "Sabbiera:",
+      "scopes": "Ambiti:",
+      "status": "Stato:",
+      "tabs_aria": "Schede dei dettagli del partner"
+    },
+    "empty": {
+      "no_calls": "Nessuna chiamata ancora.",
+      "no_partners": "Nessun partner ancora. Creane uno per emettere le credenziali del cliente."
+    },
+    "status": {
+      "active": "Attivo",
+      "pending": "In attesa di",
+      "suspended": "Sospeso"
+    },
+    "toasts": {
+      "activate_failed": "Attivazione non riuscita",
+      "activated": "Partner attivato",
+      "copied": "{{label}} copiato",
+      "copy_failed": "Copia non riuscita: copia manualmente",
+      "create_failed": "Creazione fallita",
+      "load_failed": "Impossibile caricare i partner",
+      "name_required": "Il nome è obbligatorio",
+      "regenerate_failed": "Rigenerazione fallita",
+      "suspend_failed": "Sospensione non riuscita",
+      "suspended": "Partner sospeso"
+    },
+    "table": {
+      "aria": "Partner API"
+    }
   }
 }
