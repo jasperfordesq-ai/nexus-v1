@@ -52,9 +52,9 @@ export function Footer({ children, copyright }: FooterProps) {
         <div className="flex flex-col items-center gap-4">
           {/* NEXUS logo — readable on mobile */}
           <img
-            src="/images/project-nexus-logo.png"
+            src="/images/project-nexus-banner.png"
             alt={t('footer.project_nexus')}
-            className="h-20 w-auto"
+            className="h-20 w-auto max-w-[16rem] object-contain"
           />
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
           {/* Tenant partner logo — real or placeholder */}
@@ -258,9 +258,9 @@ export function Footer({ children, copyright }: FooterProps) {
                   <SourceRepositoryLink />
                   <div className="w-px self-stretch bg-theme-default" aria-hidden="true" />
                   <img
-                    src="/images/project-nexus-logo.png"
+                    src="/images/project-nexus-banner.png"
                     alt={t('footer.project_nexus')}
-                    className="h-24 w-auto"
+                    className="h-24 w-auto max-w-[18rem] object-contain"
                   />
                 </div>
 
