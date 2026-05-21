@@ -148,8 +148,8 @@ export function KBArticleForm() {
 
   usePageTitle(
     isEdit && article
-      ? `Admin - ${"Edit"}: ${article.title}`
-      : `Admin - ${"Create"} ${"Resources"}`,
+      ? t('resources.page_title_edit_article', { title: article.title })
+      : t('resources.page_title_create_article'),
   );
 
   // Load categories (from main categories table, type=resource)
@@ -187,7 +187,7 @@ export function KBArticleForm() {
       }
     }
     loadParentArticles();
-  }, [id]);
+  }, [id, t]);
 
   // Load article for edit mode
   const loadArticle = useCallback(async () => {
@@ -213,14 +213,14 @@ export function KBArticleForm() {
         // Set mode based on content_type
         setMode(data.content_type === 'markdown' ? 'upload' : 'write');
       } else {
-        setLoadError("Failed to load resources");
+        setLoadError(t('resources.failed_to_load_resources'));
       }
     } catch {
-      setLoadError("An unexpected error occurred");
+      setLoadError(t('resources.an_unexpected_error_occurred'));
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
 
   useEffect(() => {
@@ -306,12 +306,12 @@ export function KBArticleForm() {
       const res = await api.upload(`/v2/kb/${id}/attachments`, file);
       if (res.success && res.data) {
         setAttachments((prev) => [...prev, res.data as KBAttachment]);
-        toast.success(t('resources.attachment_uploaded', 'File attached successfully'));
+        toast.success(t('resources.attachment_uploaded'));
       } else {
-        toast.error(res.error || "Failed to upload attachment");
+        toast.error(res.error || t('resources.attachment_upload_failed'));
       }
     } catch {
-      toast.error("Failed to upload attachment");
+      toast.error(t('resources.attachment_upload_failed'));
     } finally {
       setUploadingAttachment(false);
     }
@@ -323,10 +323,10 @@ export function KBArticleForm() {
       const res = await api.delete(`/v2/kb/${id}/attachments/${attachmentId}`);
       if (res.success !== false) {
         setAttachments((prev) => prev.filter((a) => a.id !== attachmentId));
-        toast.success(t('resources.attachment_deleted', 'Attachment removed'));
+        toast.success(t('resources.attachment_deleted'));
       }
     } catch {
-      toast.error("Failed to delete attachment");
+      toast.error(t('resources.attachment_delete_failed'));
     }
   }
 
@@ -335,7 +335,7 @@ export function KBArticleForm() {
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
     if (!title.trim()) {
-      newErrors.title = t('blog.title_required', 'Title is required');
+      newErrors.title = t('blog.title_required');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -372,15 +372,15 @@ export function KBArticleForm() {
 
         toast.success(
           isEdit
-            ? t('resources.article_updated', 'Article updated successfully')
-            : t('resources.article_created', 'Article created successfully'),
+            ? t('resources.article_updated')
+            : t('resources.article_created'),
         );
         navigate(tenantPath('/admin/resources'));
       } else {
-        toast.error(res.error || "An unexpected error occurred");
+        toast.error(res.error || t('resources.an_unexpected_error_occurred'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('resources.an_unexpected_error_occurred'));
     } finally {
       setSubmitting(false);
     }
@@ -391,7 +391,7 @@ export function KBArticleForm() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label={"Loading federation..."} />
+        <Spinner size="lg" label={t('resources.loading_article')} />
       </div>
     );
   }
@@ -400,22 +400,22 @@ export function KBArticleForm() {
     return (
       <div>
         <PageHeader
-          title={`${"Edit"} ${"Resources"}`}
+          title={t('resources.edit_resources')}
           actions={
             <Button variant="flat" startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/resources'))}>
-              {"Back"}
+              {t('resources.back')}
             </Button>
           }
         />
         <Card className="max-w-2xl">
           <CardBody className="p-6">
             <p className="text-center text-danger">
-              {loadError || "Failed to load resources"}
+              {loadError || t('resources.failed_to_load_resources')}
             </p>
             <div className="mt-4 flex justify-center">
               <Button variant="flat" onPress={() => navigate(tenantPath('/admin/resources'))}>
-                {"Back"}
+                {t('resources.back')}
               </Button>
             </div>
           </CardBody>
@@ -429,13 +429,13 @@ export function KBArticleForm() {
       <PageHeader
         title={
           isEdit
-            ? `${"Edit"}: ${article?.title}`
-            : `${"Create"} ${"Resources"}`
+            ? t('resources.edit_article_title', { title: article?.title })
+            : t('resources.create_resources')
         }
         actions={
           <Button variant="flat" startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/resources'))}>
-            {"Back"}
+            {t('resources.back')}
           </Button>
         }
       />
@@ -460,12 +460,12 @@ export function KBArticleForm() {
               >
                 <Tab key="write" title={
                   <span className="flex items-center gap-1.5">
-                    <FileText size={14} /> {t('resources.mode_write', 'Write')}
+                    <FileText size={14} /> {t('resources.mode_write')}
                   </span>
                 } />
                 <Tab key="upload" title={
                   <span className="flex items-center gap-1.5">
-                    <Upload size={14} /> {t('resources.mode_upload', 'Upload File')}
+                    <Upload size={14} /> {t('resources.mode_upload')}
                   </span>
                 } />
               </Tabs>
@@ -473,8 +473,8 @@ export function KBArticleForm() {
 
             {/* Title */}
             <Input
-              label={"Name"}
-              placeholder={t('resources.placeholder_title', 'Enter article title')}
+              label={t('resources.name')}
+              placeholder={t('resources.placeholder_title')}
               value={title}
               onValueChange={setTitle}
               isRequired
@@ -485,15 +485,15 @@ export function KBArticleForm() {
 
             {/* Slug */}
             <Input
-              label={"Slug"}
-              placeholder={t('resources.placeholder_slug', 'Auto-generated from title')}
+              label={t('resources.slug')}
+              placeholder={t('resources.placeholder_slug')}
               value={slug}
               onValueChange={setSlug}
               isDisabled={submitting}
               description={
                 isEdit
-                  ? t('blog.slug_desc_edit', 'Edit to customize the URL. Leave as-is to keep current slug.')
-                  : t('blog.slug_desc_create', 'Auto-generated from title, or type a custom slug.')
+                  ? t('blog.slug_desc_edit')
+                  : t('blog.slug_desc_create')
               }
             />
 
@@ -501,8 +501,8 @@ export function KBArticleForm() {
             {mode === 'write' && contentType !== 'markdown' && (
               <Suspense fallback={<Spinner size="sm" className="m-4" />}>
                 <RichTextEditor
-                  label={"Content"}
-                  placeholder={t('resources.placeholder_content', 'Write the article content...')}
+                  label={t('resources.content')}
+                  placeholder={t('resources.placeholder_content')}
                   value={content}
                   onChange={setContent}
                   isDisabled={submitting}
@@ -514,14 +514,14 @@ export function KBArticleForm() {
             {/* Content — Markdown edit (when editing a markdown article) */}
             {(mode === 'write' || mode === 'upload') && contentType === 'markdown' && content && (
               <Textarea
-                label={t('resources.markdown_content', 'Markdown Content')}
+                label={t('resources.markdown_content')}
                 value={content}
                 onValueChange={setContent}
                 minRows={12}
                 maxRows={30}
                 isDisabled={submitting}
                 classNames={{ input: 'font-mono text-sm' }}
-                description={t('resources.markdown_desc', 'Raw markdown — will be rendered on the public page.')}
+                description={t('resources.markdown_desc')}
               />
             )}
 
@@ -543,10 +543,10 @@ export function KBArticleForm() {
                 <Upload size={32} className="text-default-400" />
                 <div className="text-center">
                   <p className="text-sm font-medium text-foreground">
-                    {t('resources.drop_file', 'Drop a file here or click to browse')}
+                    {t('resources.drop_file')}
                   </p>
                   <p className="text-xs text-default-400 mt-1">
-                    {t('resources.supported_formats', 'Supported: Markdown (.md), PDF, Word (.doc, .docx), Text (.txt)')}
+                    {t('resources.supported_formats')}
                   </p>
                 </div>
                 <input
@@ -579,7 +579,7 @@ export function KBArticleForm() {
                       setContentType('html');
                     }
                   }}
-                  aria-label="Remove file"
+                  aria-label={t('resources.remove_file')}
                 >
                   <X size={14} />
                 </Button>
@@ -588,8 +588,8 @@ export function KBArticleForm() {
 
             {/* Excerpt */}
             <Textarea
-              label={t('blog.excerpt', 'Excerpt')}
-              placeholder={t('resources.placeholder_excerpt', 'A short summary of the article (optional)')}
+              label={t('blog.excerpt')}
+              placeholder={t('resources.placeholder_excerpt')}
               value={excerpt}
               onValueChange={setExcerpt}
               minRows={2}
@@ -597,29 +597,27 @@ export function KBArticleForm() {
               isDisabled={submitting}
               description={t(
                 'resources.excerpt_desc',
-                'Brief description shown in article listings. If blank, the first lines of content are used.',
               )}
             />
 
             {/* YouTube Video */}
             <Input
-              label={t('resources.video_url', 'YouTube Video URL')}
-              placeholder="https://www.youtube.com/watch?v=..."
+              label={t('resources.video_url')}
+              placeholder={t('resources.video_url_placeholder')}
               value={videoUrl}
               onValueChange={setVideoUrl}
               isDisabled={submitting}
               startContent={<Youtube size={16} className="text-red-500 flex-shrink-0" />}
               description={t(
                 'resources.video_url_desc',
-                'Paste a YouTube link to embed a video at the top of the article.',
               )}
             />
 
             {/* Category + Parent */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Select
-                label={"Categories"}
-                placeholder={t('resources.placeholder_category', 'Select a category (optional)')}
+                label={t('resources.categories')}
+                placeholder={t('resources.placeholder_category')}
                 selectedKeys={categoryId ? [categoryId] : []}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string;
@@ -633,8 +631,8 @@ export function KBArticleForm() {
               </Select>
 
               <Select
-                label={t('resources.parent_article', 'Parent Article')}
-                placeholder={t('resources.placeholder_parent', 'None (top-level)')}
+                label={t('resources.parent_article')}
+                placeholder={t('resources.placeholder_parent')}
                 selectedKeys={parentArticleId ? [parentArticleId] : []}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string;
@@ -651,20 +649,20 @@ export function KBArticleForm() {
             {/* Sort Order + Published */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
-                label={t('resources.sort_order', 'Sort Order')}
-                placeholder="0"
+                label={t('resources.sort_order')}
+                placeholder={t('resources.sort_order_placeholder')}
                 type="number"
                 value={sortOrder}
                 onValueChange={setSortOrder}
                 isDisabled={submitting}
-                description={t('resources.sort_order_desc', 'Lower numbers appear first. Default is 0.')}
+                description={t('resources.sort_order_desc')}
               />
 
               <div className="flex items-center justify-between rounded-lg border border-default-200 px-4 py-3">
                 <div>
-                  <p className="text-sm font-medium">{t('content.published', 'Published')}</p>
+                  <p className="text-sm font-medium">{t('resources.published')}</p>
                   <p className="text-xs text-default-400">
-                    {t('resources.publish_desc', 'Published articles are visible to all users')}
+                    {t('resources.publish_desc')}
                   </p>
                 </div>
                 <Switch
@@ -683,7 +681,7 @@ export function KBArticleForm() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-foreground">
-                      {t('resources.attachments', 'Attachments')}
+                      {t('resources.attachments')}
                       {attachments.length > 0 && (
                         <Chip size="sm" variant="flat" className="ml-2">{attachments.length}</Chip>
                       )}
@@ -705,13 +703,13 @@ export function KBArticleForm() {
                         input.click();
                       }}
                     >
-                      {t('resources.add_attachment', 'Add File')}
+                      {t('resources.add_attachment')}
                     </Button>
                   </div>
 
                   {attachments.length === 0 && (
                     <p className="text-xs text-default-400">
-                      {t('resources.no_attachments', 'No files attached yet.')}
+                      {t('resources.no_attachments')}
                     </p>
                   )}
 
@@ -729,14 +727,14 @@ export function KBArticleForm() {
                           isIconOnly size="sm" variant="flat" color="default"
                           as="a" href={resolveAttachmentUrl(att.file_url)} download={att.file_name}
                           target="_blank" rel="noopener noreferrer"
-                          aria-label="Download"
+                          aria-label={t('resources.download_attachment')}
                         >
                           <Download size={14} />
                         </Button>
                         <Button
                           isIconOnly size="sm" variant="flat" color="danger"
                           onPress={() => deleteAttachment(att.id)}
-                          aria-label="Delete attachment"
+                          aria-label={t('resources.delete_attachment')}
                         >
                           <Trash2 size={14} />
                         </Button>
@@ -754,7 +752,7 @@ export function KBArticleForm() {
                 onPress={() => navigate(tenantPath('/admin/resources'))}
                 isDisabled={submitting}
               >
-                {"Cancel"}
+                {t('resources.cancel')}
               </Button>
               <Button
                 type="submit"
@@ -764,8 +762,8 @@ export function KBArticleForm() {
                 isDisabled={submitting}
               >
                 {isEdit
-                  ? "Save Changes"
-                  : `${"Create"} ${"Resources"}`}
+                  ? t('resources.save_changes')
+                  : t('resources.create_resources')}
               </Button>
             </div>
           </CardBody>
