@@ -83,7 +83,7 @@ const categoryColorMap: Record<string, 'primary' | 'secondary' | 'success' | 'wa
 
 export function FederationAuditLog() {
   const { t } = useTranslation('admin');
-  usePageTitle("Super Admin");
+  usePageTitle(t('super.page_title'));
 
   const [logs, setLogs] = useState<SuperAuditEntry[]>([]);
   const [totalItems, setTotalItems] = useState(0);
@@ -194,14 +194,21 @@ export function FederationAuditLog() {
 
   const exportCsv = () => {
     if (logs.length === 0) return;
-    const headers = ["ID", "Timestamp", "Category", "Level", "Description", "Actor"];
+    const headers = [
+      t('super.csv_id'),
+      t('super.label_timestamp'),
+      t('super.label_category'),
+      t('super.label_level'),
+      t('super.label_description'),
+      t('super.label_actor'),
+    ];
     const rows = logs.map((entry) => [
       entry.id,
       entry.created_at,
-      categorizeAction(entry.action_type),
-      inferLevel(entry.action_type),
+      t(`super.cat_${categorizeAction(entry.action_type)}`),
+      t(`super.level_${inferLevel(entry.action_type)}`),
       `"${(entry.description || '').replace(/"/g, '""')}"`,
-      entry.actor_name || `User #${entry.actor_id}`,
+      entry.actor_name || t('super.user_with_id', { id: entry.actor_id }),
     ]);
     const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -216,7 +223,7 @@ export function FederationAuditLog() {
   const columns: Column<SuperAuditEntry>[] = [
     {
       key: 'created_at',
-      label: "Timestamp",
+      label: t('super.label_timestamp'),
       sortable: true,
       render: (entry) => (
         <span className="text-sm text-default-500">
@@ -226,41 +233,41 @@ export function FederationAuditLog() {
     },
     {
       key: 'category',
-      label: "Category",
+      label: t('super.label_category'),
       render: (entry) => {
         const cat = categorizeAction(entry.action_type);
         return (
           <Chip size="sm" variant="flat" color={categoryColorMap[cat] || 'primary'}>
-            {cat.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+            {t(`super.cat_${cat}`)}
           </Chip>
         );
       },
     },
     {
       key: 'level',
-      label: "Level",
+      label: t('super.label_level'),
       render: (entry) => {
         const lvl = inferLevel(entry.action_type);
         return (
           <Chip size="sm" variant="flat" color={levelColorMap[lvl] || 'primary'}>
-            {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
+            {t(`super.level_${lvl}`)}
           </Chip>
         );
       },
     },
     {
       key: 'description',
-      label: "Description",
+      label: t('super.label_description'),
       render: (entry) => (
-        <span className="text-sm">{entry.description || entry.action_type.replace(/_/g, ' ')}</span>
+        <span className="text-sm">{entry.description || entry.action_type}</span>
       ),
     },
     {
       key: 'actor',
-      label: "Actor",
+      label: t('super.label_actor'),
       render: (entry) => (
         <span className="text-sm text-default-500">
-          {entry.actor_name || `User #${entry.actor_id}`}
+          {entry.actor_name || t('super.user_with_id', { id: entry.actor_id })}
         </span>
       ),
     },
@@ -269,46 +276,46 @@ export function FederationAuditLog() {
   return (
     <div>
       <PageHeader
-        title={"Federation Audit Log"}
-        description={"View the audit log for all federation actions taken by super admins"}
+        title={t('super.federation_audit_log_title')}
+        description={t('super.federation_audit_log_desc')}
         actions={
           <Button
             variant="flat"
             size="sm"
             startContent={<Download size={16} />}
             onPress={exportCsv}
-            isDisabled={logs.length === 0}
-          >
-            {"Export CSV"}
-          </Button>
+          isDisabled={logs.length === 0}
+        >
+          {t('super.export_csv')}
+        </Button>
         }
       />
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
-          label={"Total Actions 30d"}
+          label={t('super.label_total_actions_30d')}
           value={stats.total}
           icon={Activity}
           color="primary"
           loading={loading && stats.total === 0}
         />
         <StatCard
-          label={"Federation Changes"}
+          label={t('super.label_federation_changes')}
           value={stats.federation}
           icon={Network}
           color="success"
           loading={loading && stats.total === 0}
         />
         <StatCard
-          label={"Partnership Actions"}
+          label={t('super.label_partnership_actions')}
           value={stats.partnerships}
           icon={Handshake}
           color="secondary"
           loading={loading && stats.total === 0}
         />
         <StatCard
-          label={"Emergency Actions"}
+          label={t('super.label_emergency_actions')}
           value={stats.emergency}
           icon={AlertTriangle}
           color="danger"
@@ -319,7 +326,7 @@ export function FederationAuditLog() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4 items-end">
         <Select
-          label={"Category"}
+          label={t('super.label_category')}
           size="sm"
           className="max-w-[200px]"
           selectedKeys={category ? [category] : []}
@@ -334,7 +341,7 @@ export function FederationAuditLog() {
         </Select>
 
         <Select
-          label={"Level"}
+          label={t('super.label_level')}
           size="sm"
           className="max-w-[160px]"
           selectedKeys={level ? [level] : []}
@@ -349,7 +356,7 @@ export function FederationAuditLog() {
         </Select>
 
         <Input
-          label={"From Date"}
+          label={t('super.label_from_date')}
           type="date"
           size="sm"
           className="max-w-[170px]"
@@ -358,7 +365,7 @@ export function FederationAuditLog() {
         />
 
         <Input
-          label={"To Date"}
+          label={t('super.label_to_date')}
           type="date"
           size="sm"
           className="max-w-[170px]"
@@ -367,7 +374,7 @@ export function FederationAuditLog() {
         />
 
         <Input
-          label={"Search"}
+          label={t('super.label_search')}
           size="sm"
           className="max-w-[200px]"
           value={search}
@@ -382,10 +389,10 @@ export function FederationAuditLog() {
             variant="light"
             color="danger"
             startContent={<X size={14} />}
-            onPress={clearFilters}
-          >
-            {"Clear"}
-          </Button>
+          onPress={clearFilters}
+        >
+          {t('super.clear')}
+        </Button>
         )}
       </div>
 
