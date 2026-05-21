@@ -60,17 +60,17 @@ type StatusLabelTranslator = (key: string, defaultValue: string) => string;
 function statusLabel(status: string, t: StatusLabelTranslator): string {
   switch (status) {
     case 'active':
-      return t('billing.status_active', 'Active');
+      return t('billing.status_active');
     case 'trialing':
-      return t('billing.status_trialing', 'Trial');
+      return t('billing.status_trialing');
     case 'past_due':
-      return t('billing.status_past_due', 'Past Due');
+      return t('billing.status_past_due');
     case 'cancelled':
-      return t('billing.status_cancelled', 'Cancelled');
+      return t('billing.status_cancelled');
     case 'expired':
-      return t('billing.status_expired', 'Expired');
+      return t('billing.status_expired');
     case 'incomplete':
-      return t('billing.status_incomplete', 'Incomplete');
+      return t('billing.status_incomplete');
     default:
       return status;
   }
@@ -86,7 +86,7 @@ interface SubscriptionWithUsage extends SubscriptionDetails {
 
 export function BillingPage() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('billing.title', 'Billing'));
+  usePageTitle(t('billing.title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const [searchParams] = useSearchParams();
@@ -94,7 +94,7 @@ export function BillingPage() {
 
   useEffect(() => {
     if (searchParams.get('cancelled') === '1') {
-      toast.warning(t('billing.checkout_cancelled', 'Checkout was cancelled. No charge was made.'));
+      toast.warning(t('billing.checkout_cancelled'));
       navigate(tenantPath('/admin/billing'), { replace: true });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -133,7 +133,7 @@ export function BillingPage() {
         window.open(data.portal_url, '_blank', 'noopener,noreferrer');
       }
     } catch {
-      toast.error(t('billing.portal_error', 'Failed to open payment portal'));
+      toast.error(t('billing.portal_error'));
     } finally {
       setPortalLoading(false);
     }
@@ -148,7 +148,7 @@ export function BillingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: upgradeMessage }),
       });
-      toast.success(t('billing.upgrade_sent', 'Upgrade request sent'));
+      toast.success(t('billing.upgrade_sent'));
       onUpgradeClose();
       setUpgradeMessage('');
     } catch {
@@ -177,8 +177,8 @@ export function BillingPage() {
   return (
     <div>
       <PageHeader
-        title={t('billing.title', 'Billing')}
-        description={t('billing.description', 'Manage your subscription, payment methods, and invoices')}
+        title={t('billing.title')}
+        description={t('billing.description')}
       />
 
       {/* ─── Plan Usage Card ─── */}
@@ -187,20 +187,20 @@ export function BillingPage() {
           <CardHeader className="flex gap-3">
             <Users className="w-5 h-5 text-primary" />
             <h3 className="text-lg font-semibold">
-              {t('billing.your_plan_usage', 'Your Plan Usage')}
+              {t('billing.your_plan_usage')}
             </h3>
           </CardHeader>
           <Divider />
           <CardBody className="gap-4">
             {maxUsers === null ? (
               <p className="text-success font-medium">
-                {t('billing.unlimited_users', 'Unlimited users on your plan ✓')}
+                {t('billing.unlimited_users')}
               </p>
             ) : userCount !== null && usagePct !== null ? (
               <>
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span className="text-default-500">
-                    {t('billing.user_count_label', '{{count}} / {{max}} users', {
+                    {t('billing.user_count_label', {
                       count: userCount,
                       max: maxUsers,
                     })}
@@ -211,7 +211,7 @@ export function BillingPage() {
                   value={usagePct}
                   color={usagePct >= 100 ? 'danger' : usagePct >= 80 ? 'warning' : 'primary'}
                   className="w-full"
-                  aria-label={t('billing.your_plan_usage', 'Your Plan Usage')}
+                  aria-label={t('billing.your_plan_usage')}
                 />
                 {usagePct >= 100 && (
                   <p className="text-danger text-sm">
@@ -223,7 +223,7 @@ export function BillingPage() {
                 )}
                 {usagePct >= 80 && usagePct < 100 && (
                   <p className="text-warning text-sm">
-                    {t('billing.approaching_limit', 'Approaching your plan limit')}
+                    {t('billing.approaching_limit')}
                   </p>
                 )}
               </>
@@ -236,7 +236,7 @@ export function BillingPage() {
               className="self-start"
               onPress={onUpgradeOpen}
             >
-              {t('billing.request_upgrade', 'Request Upgrade')}
+              {t('billing.request_upgrade')}
             </Button>
           </CardBody>
         </Card>
@@ -245,7 +245,7 @@ export function BillingPage() {
       {/* ─── Upgrade Request Modal ─── */}
       <Modal isOpen={isUpgradeOpen} onClose={onUpgradeClose} size="md">
         <ModalContent>
-          <ModalHeader>{t('billing.request_upgrade', 'Request Upgrade')}</ModalHeader>
+          <ModalHeader>{t('billing.request_upgrade')}</ModalHeader>
           <ModalBody>
             <p className="text-default-500 text-sm mb-3">
               {t(
@@ -254,8 +254,8 @@ export function BillingPage() {
               )}
             </p>
             <Textarea
-              label={t('billing.upgrade_message', 'Message (optional)')}
-              placeholder={t('billing.upgrade_message_placeholder', 'Describe your needs...')}
+              label={t('billing.upgrade_message')}
+              placeholder={t('billing.upgrade_message_placeholder')}
               value={upgradeMessage}
               onValueChange={setUpgradeMessage}
               minRows={3}
@@ -263,10 +263,10 @@ export function BillingPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onUpgradeClose}>
-              {t('billing.cancel', 'Cancel')}
+              {t('billing.cancel')}
             </Button>
             <Button color="primary" isLoading={upgradeSending} onPress={handleUpgradeRequest}>
-              {t('billing.send_request', 'Send Request')}
+              {t('billing.send_request')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -282,7 +282,7 @@ export function BillingPage() {
           <Card className="lg:col-span-2">
             <CardHeader className="flex gap-3">
               <CreditCard className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold">{t('billing.current_plan', 'Current Plan')}</h3>
+              <h3 className="text-lg font-semibold">{t('billing.current_plan')}</h3>
             </CardHeader>
             <Divider />
             <CardBody className="gap-4">
@@ -291,7 +291,7 @@ export function BillingPage() {
                   <div className="flex items-center gap-3 flex-wrap">
                     <h4 className="text-xl font-bold">{subscription.plan_name}</h4>
                     <Chip size="sm" variant="flat" color="primary">
-                      {t('billing.tier', 'Tier')} {subscription.plan_tier_level}
+                      {t('billing.tier')} {subscription.plan_tier_level}
                     </Chip>
                     <Chip size="sm" variant="flat" color={statusColor(subscription.status)}>
                       {statusLabel(subscription.status, (key, defaultValue) => t(key, defaultValue))}
@@ -301,13 +301,13 @@ export function BillingPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                     <div>
                       <p className="text-sm text-default-500">
-                        {t('billing.billing_interval', 'Billing Interval')}
+                        {t('billing.billing_interval')}
                       </p>
                       <p className="font-medium capitalize">{subscription.billing_interval}</p>
                     </div>
                     <div>
                       <p className="text-sm text-default-500">
-                        {t('billing.next_billing_date', 'Next Billing Date')}
+                        {t('billing.next_billing_date')}
                       </p>
                       <p className="font-medium">
                         {subscription.current_period_end
@@ -318,7 +318,7 @@ export function BillingPage() {
                     {subscription.trial_ends_at && (
                       <div>
                         <p className="text-sm text-default-500">
-                          {t('billing.trial_ends', 'Trial Ends')}
+                          {t('billing.trial_ends')}
                         </p>
                         <p className="font-medium">
                           {new Date(subscription.trial_ends_at).toLocaleDateString()}
@@ -328,7 +328,7 @@ export function BillingPage() {
                     {subscription.cancel_at_period_end && (
                       <div>
                         <Chip size="sm" color="warning" variant="flat">
-                          {t('billing.cancels_at_period_end', 'Cancels at period end')}
+                          {t('billing.cancels_at_period_end')}
                         </Chip>
                       </div>
                     )}
@@ -338,7 +338,7 @@ export function BillingPage() {
                 <div className="text-center py-6">
                   <CreditCard className="w-12 h-12 text-default-300 mx-auto mb-3" />
                   <p className="text-default-500 mb-4">
-                    {t('billing.no_subscription', 'No active subscription')}
+                    {t('billing.no_subscription')}
                   </p>
                   <Button
                     as={Link}
@@ -346,7 +346,7 @@ export function BillingPage() {
                     color="primary"
                     endContent={<ArrowRight className="w-4 h-4" />}
                   >
-                    {t('billing.choose_plan', 'Choose a Plan')}
+                    {t('billing.choose_plan')}
                   </Button>
                 </div>
               )}
@@ -356,7 +356,7 @@ export function BillingPage() {
           {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <h3 className="text-lg font-semibold">{t('billing.actions', 'Actions')}</h3>
+              <h3 className="text-lg font-semibold">{t('billing.actions')}</h3>
             </CardHeader>
             <Divider />
             <CardBody className="gap-3">
@@ -370,7 +370,7 @@ export function BillingPage() {
                 endContent={<ArrowRight className="w-4 h-4 ml-auto" />}
                 fullWidth
               >
-                {t('billing.change_plan', 'Change Plan')}
+                {t('billing.change_plan')}
               </Button>
 
               {hasActiveSubscription && (
@@ -383,7 +383,7 @@ export function BillingPage() {
                   onPress={handleManagePayment}
                   fullWidth
                 >
-                  {t('billing.manage_payment', 'Manage Payment Methods')}
+                  {t('billing.manage_payment')}
                 </Button>
               )}
 
@@ -396,7 +396,7 @@ export function BillingPage() {
                 endContent={<ArrowRight className="w-4 h-4 ml-auto" />}
                 fullWidth
               >
-                {t('billing.view_invoices', 'View Invoices')}
+                {t('billing.view_invoices')}
               </Button>
             </CardBody>
           </Card>

@@ -35,7 +35,7 @@ function invoiceStatusColor(status: string): 'success' | 'warning' | 'danger' | 
 
 export function InvoiceHistory() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('billing.view_invoices', 'Invoices'));
+  usePageTitle(t('billing.view_invoices'));
   const toast = useToast();
 
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -55,7 +55,7 @@ export function InvoiceHistory() {
         }
       }
     } catch {
-      toast.error(t('billing.invoices_error', 'Failed to load invoices'));
+      toast.error(t('billing.invoices_error'));
     } finally {
       setLoading(false);
     }
@@ -76,7 +76,7 @@ export function InvoiceHistory() {
   const columns: Column<Invoice>[] = [
     {
       key: 'number',
-      label: t('billing.invoice_number', 'Invoice'),
+      label: t('billing.invoice_number'),
       sortable: true,
       render: (item) => (
         <span className="font-medium">{item.number || item.id}</span>
@@ -84,7 +84,7 @@ export function InvoiceHistory() {
     },
     {
       key: 'date',
-      label: t('billing.invoice_date', 'Date'),
+      label: t('billing.invoice_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">
@@ -94,7 +94,7 @@ export function InvoiceHistory() {
     },
     {
       key: 'amount',
-      label: t('billing.invoice_amount', 'Amount'),
+      label: t('billing.invoice_amount'),
       sortable: true,
       render: (item) => (
         <span className="font-medium">{formatAmount(item.amount, item.currency)}</span>
@@ -102,7 +102,7 @@ export function InvoiceHistory() {
     },
     {
       key: 'status',
-      label: t('billing.invoice_status', 'Status'),
+      label: t('billing.invoice_status'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color={invoiceStatusColor(item.status)}>
@@ -112,7 +112,7 @@ export function InvoiceHistory() {
     },
     {
       key: 'id',
-      label: t('billing.actions', 'Actions'),
+      label: t('billing.actions'),
       render: (item) => (
         <div className="flex gap-2">
           {item.hosted_invoice_url && (
@@ -122,7 +122,7 @@ export function InvoiceHistory() {
               startContent={<ExternalLink className="w-3 h-3" />}
               onPress={() => window.open(item.hosted_invoice_url!, '_blank', 'noopener,noreferrer')}
             >
-              {t('billing.invoice_view', 'View')}
+              {t('billing.invoice_view')}
             </Button>
           )}
           {item.invoice_pdf && (
@@ -132,7 +132,7 @@ export function InvoiceHistory() {
               startContent={<Download className="w-3 h-3" />}
               onPress={() => window.open(item.invoice_pdf!, '_blank', 'noopener,noreferrer')}
             >
-              {t('billing.invoice_download', 'PDF')}
+              {t('billing.invoice_download')}
             </Button>
           )}
         </div>
@@ -144,8 +144,8 @@ export function InvoiceHistory() {
     return (
       <div>
         <PageHeader
-          title={t('billing.view_invoices', 'Invoices')}
-          description={t('billing.invoices_description', 'View and download your billing invoices')}
+          title={t('billing.view_invoices')}
+          description={t('billing.invoices_description')}
         />
         <div className="flex justify-center py-12">
           <Spinner size="lg" />
@@ -157,21 +157,21 @@ export function InvoiceHistory() {
   return (
     <div>
       <PageHeader
-        title={t('billing.view_invoices', 'Invoices')}
-        description={t('billing.invoices_description', 'View and download your billing invoices')}
+        title={t('billing.view_invoices')}
+        description={t('billing.invoices_description')}
       />
 
       {invoices.length === 0 ? (
         <EmptyState
           icon={Receipt}
-          title={t('billing.no_invoices', 'No invoices yet')}
-          description={t('billing.no_invoices_desc', 'Invoices will appear here once you have an active subscription')}
+          title={t('billing.no_invoices')}
+          description={t('billing.no_invoices_desc')}
         />
       ) : (
         <DataTable
           columns={columns}
           data={invoices}
-          searchPlaceholder={t('billing.search_invoices', 'Search invoices...')}
+          searchPlaceholder={t('billing.search_invoices')}
           onRefresh={loadInvoices}
         />
       )}

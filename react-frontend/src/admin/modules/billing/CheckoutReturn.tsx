@@ -24,7 +24,7 @@ const POLL_INTERVAL_MS = 2000;
 
 export function CheckoutReturn() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('billing.checkout_title', 'Checkout'));
+  usePageTitle(t('billing.checkout_title'));
   const { tenantPath } = useTenant();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
@@ -81,10 +81,10 @@ export function CheckoutReturn() {
             <>
               <Spinner size="lg" className="mx-auto" />
               <h2 className="text-xl font-semibold mt-4">
-                {t('billing.processing', 'Processing your subscription...')}
+                {t('billing.processing')}
               </h2>
               <p className="text-default-500">
-                {t('billing.processing_desc', 'Please wait while we confirm your payment')}
+                {t('billing.processing_desc')}
               </p>
             </>
           )}
@@ -93,14 +93,14 @@ export function CheckoutReturn() {
             <>
               <CheckCircle className="w-16 h-16 text-success mx-auto" />
               <h2 className="text-xl font-semibold mt-4">
-                {t('billing.checkout_success', 'Subscription activated!')}
+                {t('billing.checkout_success')}
               </h2>
               <p className="text-default-500">
                 {subscription
-                  ? t('billing.checkout_success_desc', 'You are now on the {{plan}} plan', {
+                  ? t('billing.checkout_success_desc', {
                       plan: subscription.plan_name,
                     })
-                  : t('billing.checkout_success_generic', 'Your subscription is now active')}
+                  : t('billing.checkout_success_generic')}
               </p>
               <Button
                 as={Link}
@@ -109,7 +109,7 @@ export function CheckoutReturn() {
                 endContent={<ArrowRight className="w-4 h-4" />}
                 className="mt-4"
               >
-                {t('billing.go_to_billing', 'Go to Billing')}
+                {t('billing.go_to_billing')}
               </Button>
             </>
           )}
@@ -118,7 +118,7 @@ export function CheckoutReturn() {
             <>
               <AlertCircle className="w-16 h-16 text-danger mx-auto" />
               <h2 className="text-xl font-semibold mt-4">
-                {t('billing.checkout_failed', 'Something went wrong')}
+                {t('billing.checkout_failed')}
               </h2>
               <p className="text-default-500">
                 {t(
@@ -133,14 +133,14 @@ export function CheckoutReturn() {
                   color="primary"
                   variant="flat"
                 >
-                  {t('billing.try_again', 'Try Again')}
+                  {t('billing.try_again')}
                 </Button>
                 <Button
                   as={Link}
                   to={tenantPath('/admin/billing')}
                   variant="bordered"
                 >
-                  {t('billing.go_to_billing', 'Go to Billing')}
+                  {t('billing.go_to_billing')}
                 </Button>
               </div>
             </>

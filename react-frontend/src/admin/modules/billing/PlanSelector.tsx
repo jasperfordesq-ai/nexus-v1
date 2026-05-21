@@ -30,7 +30,7 @@ import { PageHeader } from '../../components';
 
 export function PlanSelector() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('billing.choose_plan', 'Choose a Plan'));
+  usePageTitle(t('billing.choose_plan'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -58,7 +58,7 @@ export function PlanSelector() {
         setSubscription(subRes.data as unknown as SubscriptionDetails);
       }
     } catch {
-      toast.error(t('billing.load_error', 'Failed to load plans'));
+      toast.error(t('billing.load_error'));
     } finally {
       setLoading(false);
     }
@@ -79,18 +79,18 @@ export function PlanSelector() {
       if (res.success && res.data) {
         const data = res.data as unknown as { checkout_url: string | null; activated?: boolean };
         if (data.activated) {
-          toast.success(t('billing.free_plan_activated', 'Plan activated successfully'));
+          toast.success(t('billing.free_plan_activated'));
           navigate(tenantPath('/admin/billing'));
         } else if (data.checkout_url) {
           window.location.href = data.checkout_url;
         } else {
-          toast.error(t('billing.checkout_error', 'Failed to start checkout'));
+          toast.error(t('billing.checkout_error'));
         }
       } else {
-        toast.error(t('billing.checkout_error', 'Failed to start checkout'));
+        toast.error(t('billing.checkout_error'));
       }
     } catch {
-      toast.error(t('billing.checkout_error', 'Failed to start checkout'));
+      toast.error(t('billing.checkout_error'));
     } finally {
       setCheckoutLoading(null);
     }
@@ -125,8 +125,8 @@ export function PlanSelector() {
   return (
     <div>
       <PageHeader
-        title={t('billing.choose_plan', 'Choose a Plan')}
-        description={t('billing.plans_description', 'Select the plan that best fits your community')}
+        title={t('billing.choose_plan')}
+        description={t('billing.plans_description')}
       />
 
       {loading ? (
@@ -143,16 +143,16 @@ export function PlanSelector() {
                 variant={billingInterval === 'monthly' ? 'solid' : 'bordered'}
                 onPress={() => setBillingInterval('monthly')}
               >
-                {t('billing.monthly', 'Monthly')}
+                {t('billing.monthly')}
               </Button>
               <Button
                 color={billingInterval === 'yearly' ? 'primary' : 'default'}
                 variant={billingInterval === 'yearly' ? 'solid' : 'bordered'}
                 onPress={() => setBillingInterval('yearly')}
               >
-                {t('billing.yearly', 'Yearly')}
+                {t('billing.yearly')}
                 <Chip size="sm" color="success" variant="flat" className="ml-2">
-                  {t('billing.save_percent', 'Save ~17%')}
+                  {t('billing.save_percent')}
                 </Chip>
               </Button>
             </ButtonGroup>
@@ -178,7 +178,7 @@ export function PlanSelector() {
                       variant="solid"
                       className="absolute top-3 right-3 z-10"
                     >
-                      {t('billing.current', 'Current')}
+                      {t('billing.current')}
                     </Chip>
                   )}
                   {isDowngradeBlocked && (
@@ -188,7 +188,7 @@ export function PlanSelector() {
                       variant="flat"
                       className="absolute top-3 right-3 z-10"
                     >
-                      {t('billing.not_available', 'Not available')}
+                      {t('billing.not_available')}
                     </Chip>
                   )}
                   <CardHeader className="flex-col items-start gap-1 pb-0">
@@ -200,8 +200,8 @@ export function PlanSelector() {
                       <span className="text-3xl font-bold">{formatPrice(price)}</span>
                       <span className="text-default-500 text-sm ml-1">
                         /{billingInterval === 'monthly'
-                          ? t('billing.per_month', 'mo')
-                          : t('billing.per_year', 'yr')}
+                          ? t('billing.per_month')
+                          : t('billing.per_year')}
                       </span>
                     </div>
 
@@ -226,10 +226,10 @@ export function PlanSelector() {
                       fullWidth
                     >
                       {isCurrent
-                        ? t('billing.current', 'Current')
+                        ? t('billing.current')
                         : isDowngradeBlocked
-                          ? t('billing.contact_support', 'Contact support')
-                          : t('billing.subscribe', 'Subscribe')}
+                          ? t('billing.contact_support')
+                          : t('billing.subscribe')}
                     </Button>
                   </CardFooter>
                 </Card>
@@ -239,7 +239,7 @@ export function PlanSelector() {
 
           {plans.length === 0 && (
             <div className="text-center py-12 text-default-500">
-              {t('billing.no_plans', 'No plans available at this time')}
+              {t('billing.no_plans')}
             </div>
           )}
         </>
