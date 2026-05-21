@@ -83,7 +83,7 @@ export function AdminSettings() {
   const { t } = useTranslation('admin');
   useAdminPageMeta({ title: tNav('system') });
   const toast = useToast();
-  const { tenant, tenantPath } = useTenant();
+  const { tenant, tenantPath, refreshTenant } = useTenant();
   const { user } = useAuth();
   const userRecord = user as Record<string, unknown> | null;
   const isGod =
@@ -186,6 +186,7 @@ export function AdminSettings() {
         setForm(prev => ({ ...prev, partner_logo_url: res.data!.url }));
         setOriginalForm(prev => ({ ...prev, partner_logo_url: res.data!.url }));
         toast.success('Partner logo uploaded');
+        refreshTenant();
       } else {
         toast.error('Upload failed');
       }
