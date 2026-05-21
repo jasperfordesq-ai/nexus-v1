@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Input, Chip } from '@heroui/react';
 import { useTenant } from '@/contexts';
@@ -44,12 +45,25 @@ const CATEGORY_CHIP_COLOR: Record<Category, 'default' | 'secondary' | 'warning'>
   'KISS & AGORIS': 'warning',
 };
 
+function categoryKey(category: Category): string {
+  switch (category) {
+    case 'Caring Community':
+      return 'admin_help.categories.caring_community';
+    case 'KISS & AGORIS':
+      return 'admin_help.categories.kiss_agoris';
+    case 'General Admin':
+    default:
+      return 'admin_help.categories.general_admin';
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function AdminHelpCenterPage() {
-  usePageTitle('Help Centre');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('admin_help.page_title'));
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
@@ -88,20 +102,20 @@ export default function AdminHelpCenterPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Admin Help Centre"
-        description="Find guidance for every page in the admin panel. Click any article to go to that page — a ? button will open contextual help."
+        title={t('admin_help.title')}
+        description={t('admin_help.description')}
       />
 
       {/* Search bar */}
       <div className="max-w-lg">
         <Input type="search" name="admin-search" autoComplete="off"
-          placeholder={`Search ${totalArticles} help articles…`}
+          placeholder={t('admin_help.search_placeholder', { count: totalArticles })}
           value={query}
           onValueChange={setQuery}
           startContent={<SearchIcon size={16} className="text-default-400 shrink-0" />}
           variant="bordered"
           size="md"
-          aria-label="Search help articles"
+          aria-label={t('admin_help.search_aria')}
           isClearable
           onClear={() => setQuery('')}
         />
@@ -111,7 +125,7 @@ export default function AdminHelpCenterPage() {
       {isEmpty && (
         <div className="flex flex-col items-center gap-3 py-16 text-center text-default-400">
           <SearchIcon size={40} className="opacity-40" />
-          <p className="text-sm">No articles match your search.</p>
+          <p className="text-sm">{t('admin_help.no_matches')}</p>
         </div>
       )}
 
@@ -120,7 +134,7 @@ export default function AdminHelpCenterPage() {
         categorised.map(({ category, articles }) => (
           <section key={category}>
             <div className="mb-3 flex items-center gap-2">
-              <h2 className="text-base font-semibold text-foreground">{category}</h2>
+              <h2 className="text-base font-semibold text-foreground">{t(categoryKey(category))}</h2>
               <Chip
                 size="sm"
                 variant="flat"
@@ -156,7 +170,7 @@ export default function AdminHelpCenterPage() {
                       onPress={() => navigate(tenantPath(path))}
                       startContent={<HelpCircle size={14} />}
                     >
-                      View help
+                      {t('admin_help.view_help')}
                     </Button>
                   </CardBody>
                 </Card>
