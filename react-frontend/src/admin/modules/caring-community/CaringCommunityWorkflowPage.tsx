@@ -278,26 +278,6 @@ const rolePresets = [
 const reportPeriods = ['last_30_days', 'last_90_days', 'year_to_date', 'previous_quarter'] as const;
 const relationshipFrequencies = ['weekly', 'fortnightly', 'monthly', 'ad_hoc'] as const;
 
-const stageContent: Record<'intake' | 'match' | 'log' | 'verify' | 'statement', { title: string; description: string }> = {
-  intake: { title: 'Intake', description: 'Welcome new members and capture their support needs.' },
-  match: { title: 'Match', description: 'Pair supporters and recipients based on skills and availability.' },
-  log: { title: 'Log Hours', description: 'Capture support hours as they happen.' },
-  verify: { title: 'Verify', description: 'Coordinators review and approve logged hours.' },
-  statement: { title: 'Statement', description: 'Issue monthly statements and impact reports.' },
-};
-
-const rolePresetContent: Record<
-  'national_admin' | 'canton_admin' | 'municipality_admin' | 'cooperative_coordinator' | 'organisation_coordinator' | 'trusted_reviewer',
-  { title: string; description: string }
-> = {
-  national_admin: { title: 'National Admin', description: 'Platform-wide oversight across all cantons and organisations.' },
-  canton_admin: { title: 'Canton Admin', description: 'Manage all caring community activity within a canton.' },
-  municipality_admin: { title: 'Municipality Admin', description: 'Manage caring community activity within a municipality.' },
-  cooperative_coordinator: { title: 'Cooperative Coordinator', description: 'Coordinate a local cooperative and its members.' },
-  organisation_coordinator: { title: 'Organisation Coordinator', description: 'Coordinate volunteers and partners for one organisation.' },
-  trusted_reviewer: { title: 'Trusted Reviewer', description: 'Approve hours quickly with light-touch oversight.' },
-};
-
 type FavourItem = {
   id: number;
   category: string | null;
@@ -929,11 +909,11 @@ export default function CaringCommunityWorkflowPage() {
       const res = await api.get<WorkflowSummary>('/v2/admin/caring-community/workflow');
       if (isWorkflowSummary(res.data)) setSummary(res.data);
     } catch {
-      toast.error('Could not load caring community workflow.');
+      toast.error(t('caring_workflow.toast.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     loadWorkflow();
@@ -1364,11 +1344,11 @@ export default function CaringCommunityWorkflowPage() {
       const res = await api.get<InviteCode[]>('/v2/admin/caring-community/invite-codes');
       if (Array.isArray(res.data)) setInviteCodes(res.data);
     } catch {
-      toast.error('Could not load invite codes.');
+      toast.error(t('caring_workflow.invite_codes.load_failed'));
     } finally {
       setLoadingInviteCodes(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     loadInviteCodes();
@@ -1385,15 +1365,15 @@ export default function CaringCommunityWorkflowPage() {
       if (res.data) {
         setGeneratedCode(res.data);
         setInviteLabel('');
-        toast.success('Invite code generated.');
+        toast.success(t('caring_workflow.invite_codes.generate_success'));
         loadInviteCodes();
       }
     } catch {
-      toast.error('Could not generate invite code.');
+      toast.error(t('caring_workflow.invite_codes.generate_failed'));
     } finally {
       setGeneratingCode(false);
     }
-  }, [inviteLabel, loadInviteCodes, toast]);
+  }, [inviteLabel, loadInviteCodes, t, toast]);
 
   const copyInviteCode = useCallback((text: string) => {
     void navigator.clipboard.writeText(text);
@@ -1415,7 +1395,7 @@ export default function CaringCommunityWorkflowPage() {
 
   const uploadPaperOnboarding = useCallback(async () => {
     if (!paperFile) {
-      toast.error('Choose a file to upload first.');
+      toast.error(t('caring_workflow.paper_onboarding.file_required'));
       return;
     }
 
@@ -1434,14 +1414,14 @@ export default function CaringCommunityWorkflowPage() {
         setPaperIntakes((current) => [res.data as PaperOnboardingIntake, ...current]);
         setPaperReviewingId(res.data.id);
         setPaperFile(null);
-        toast.success('Paper intake uploaded.');
+        toast.success(t('caring_workflow.paper_onboarding.upload_success'));
       }
     } catch {
-      toast.error('Could not upload paper intake.');
+      toast.error(t('caring_workflow.paper_onboarding.upload_failed'));
     } finally {
       setPaperUploading(false);
     }
-  }, [paperAddress, paperDateOfBirth, paperEmail, paperFile, paperName, paperPhone, toast]);
+  }, [paperAddress, paperDateOfBirth, paperEmail, paperFile, paperName, paperPhone, t, toast]);
 
   const startPaperReview = useCallback((intake: PaperOnboardingIntake) => {
     const fields = intake.corrected_fields ?? intake.extracted_fields ?? {};
@@ -1457,7 +1437,7 @@ export default function CaringCommunityWorkflowPage() {
   const confirmPaperOnboarding = useCallback(async () => {
     if (!paperReviewingId) return;
     if (!paperName.trim() || !paperEmail.trim()) {
-      toast.error('Name and email are required.');
+      toast.error(t('caring_workflow.assisted_onboarding.required'));
       return;
     }
 
@@ -1485,18 +1465,18 @@ export default function CaringCommunityWorkflowPage() {
         setPaperPhone('');
         setPaperEmail('');
         setPaperNote('');
-        toast.success('Member confirmed and account created.');
+        toast.success(t('caring_workflow.paper_onboarding.confirm_success'));
       }
     } catch {
-      toast.error('Could not confirm paper intake.');
+      toast.error(t('caring_workflow.paper_onboarding.confirm_failed'));
     } finally {
       setOnboardingLoading(false);
     }
-  }, [paperAddress, paperDateOfBirth, paperEmail, paperName, paperNote, paperPhone, paperReviewingId, toast]);
+  }, [paperAddress, paperDateOfBirth, paperEmail, paperName, paperNote, paperPhone, paperReviewingId, t, toast]);
 
   const submitAssistedOnboarding = useCallback(async () => {
     if (!onboardingName.trim() || !onboardingEmail.trim()) {
-      toast.error('Name and email are required.');
+      toast.error(t('caring_workflow.assisted_onboarding.required'));
       return;
     }
     setOnboardingLoading(true);
@@ -1517,14 +1497,14 @@ export default function CaringCommunityWorkflowPage() {
         setOnboardingEmail('');
         setOnboardingPhone('');
         setOnboardingNote('');
-        toast.success('Member account created.');
+        toast.success(t('caring_workflow.assisted_onboarding.created'));
       }
     } catch {
-      toast.error('Could not create member account.');
+      toast.error(t('caring_workflow.assisted_onboarding.create_failed'));
     } finally {
       setOnboardingLoading(false);
     }
-  }, [onboardingEmail, onboardingName, onboardingNote, onboardingPhone, toast]);
+  }, [onboardingEmail, onboardingName, onboardingNote, onboardingPhone, t, toast]);
 
   const copyTempPassword = useCallback(() => {
     if (!onboardingResult) return;
@@ -2321,19 +2301,18 @@ export default function CaringCommunityWorkflowPage() {
           <Card shadow="sm">
             <CardHeader>
               <div>
-                <h2 className="text-lg font-semibold">Coordinator signals</h2>
+                <h2 className="text-lg font-semibold">{t('caring_workflow.signals.title')}</h2>
                 <p className="mt-1 text-sm text-default-500">
-                  A real-time snapshot of activity that may need coordinator attention — open requests, available
-                  offers, trusted organisations, and recent declines.
+                  {t('caring_workflow.signals.description')}
                 </p>
               </div>
             </CardHeader>
             <Divider />
             <CardBody className="gap-3">
-              <SignalRow label="Active support requests" value={signals?.active_requests ?? 0} />
-              <SignalRow label="Active support offers" value={signals?.active_offers ?? 0} />
-              <SignalRow label="Trusted organisations" value={signals?.trusted_organisations ?? 0} />
-              <SignalRow label="Declined (30d)" value={stats?.declined_30d_count ?? 0} />
+              <SignalRow label={t('caring_workflow.signals.active_requests')} value={signals?.active_requests ?? 0} />
+              <SignalRow label={t('caring_workflow.signals.active_offers')} value={signals?.active_offers ?? 0} />
+              <SignalRow label={t('caring_workflow.signals.trusted_organisations')} value={signals?.trusted_organisations ?? 0} />
+              <SignalRow label={t('caring_workflow.signals.declined_30d')} value={stats?.declined_30d_count ?? 0} />
             </CardBody>
           </Card>
 
@@ -2343,9 +2322,9 @@ export default function CaringCommunityWorkflowPage() {
               <div className="flex items-center gap-2">
                 <Heart size={18} className="text-rose-500" />
                 <div>
-                  <h2 className="text-lg font-semibold">Informal Favours</h2>
+                  <h2 className="text-lg font-semibold">{t('caring_workflow.favours.title')}</h2>
                   <p className="mt-0.5 text-sm text-default-500">
-                    {loadingFavours ? 'Loading...' : `${favoursData?.count ?? 0} total recorded`}
+                    {loadingFavours ? t('caring_workflow.favours.loading') : t('caring_workflow.favours.total_recorded', { count: favoursData?.count ?? 0 })}
                   </p>
                 </div>
               </div>
@@ -2353,15 +2332,15 @@ export default function CaringCommunityWorkflowPage() {
             <Divider />
             <CardBody className="gap-2">
               {loadingFavours && (
-                <p className="text-sm text-default-500">Loading favours...</p>
+                <p className="text-sm text-default-500">{t('caring_workflow.favours.loading_favours')}</p>
               )}
               {!loadingFavours && !favoursData?.items?.length && (
-                <p className="text-sm text-default-500">No favours recorded yet.</p>
+                <p className="text-sm text-default-500">{t('caring_workflow.favours.empty')}</p>
               )}
               {!loadingFavours && (favoursData?.items ?? []).slice(0, 5).map((f) => (
                 <div key={f.id} className="rounded-lg border border-default-200 p-3">
                   <div className="flex items-center justify-between gap-2 text-xs text-default-500">
-                    <span>{f.is_anonymous ? 'Anonymous' : (f.offerer_name ?? 'Unknown')}</span>
+                    <span>{f.is_anonymous ? t('caring_workflow.favours.anonymous') : (f.offerer_name ?? t('caring_workflow.favours.unknown'))}</span>
                     <span>{f.favour_date}</span>
                   </div>
                   <p className="mt-1 text-sm text-default-800 line-clamp-2">{f.description}</p>
@@ -2378,10 +2357,9 @@ export default function CaringCommunityWorkflowPage() {
           <Card shadow="sm">
             <CardHeader className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold">Role presets</h2>
+                <h2 className="text-lg font-semibold">{t('caring_workflow.role_pack.title')}</h2>
                 <p className="mt-1 text-sm text-default-500">
-                  Pre-configured permission sets for each caring community role. Install the full role pack to
-                  quickly set up your coordinators with the correct access. {roleCountLabel}.
+                  {t('caring_workflow.role_pack.description', { countLabel: roleCountLabel })}
                 </p>
               </div>
               <Button
@@ -2391,7 +2369,7 @@ export default function CaringCommunityWorkflowPage() {
                 isLoading={installingRoles}
                 onPress={installRolePack}
               >
-                {installingRoles ? 'Installing...' : 'Install role pack'}
+                {installingRoles ? t('caring_workflow.role_pack.installing') : t('caring_workflow.role_pack.install')}
               </Button>
             </CardHeader>
             <Divider />
@@ -2406,15 +2384,15 @@ export default function CaringCommunityWorkflowPage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-semibold text-default-900">{rolePresetContent[role.key].title}</p>
+                        <p className="text-sm font-semibold text-default-900">{t(`caring_workflow.role_pack.presets.${role.key}.title`)}</p>
                         <Chip size="sm" color={status?.installed ? 'success' : 'default'} variant="flat">
-                          {status?.installed ? 'Installed' : 'Not installed'}
+                          {status?.installed ? t('caring_workflow.role_pack.installed') : t('caring_workflow.role_pack.not_installed')}
                         </Chip>
                       </div>
-                      <p className="mt-1 text-xs text-default-500">{rolePresetContent[role.key].description}</p>
+                      <p className="mt-1 text-xs text-default-500">{t(`caring_workflow.role_pack.presets.${role.key}.description`)}</p>
                       {status && (
                         <p className="mt-2 text-xs text-default-400">
-                          {`${status.installed_permissions} of ${status.permission_count} permissions granted`}
+                          {t('caring_workflow.role_pack.permissions_granted', { installed: status.installed_permissions, total: status.permission_count })}
                         </p>
                       )}
                     </div>
@@ -2430,9 +2408,9 @@ export default function CaringCommunityWorkflowPage() {
       <Card className="mt-6" shadow="sm">
         <CardHeader>
           <div>
-            <h2 className="text-lg font-semibold">Assisted onboarding</h2>
+            <h2 className="text-lg font-semibold">{t('caring_workflow.assisted_onboarding.title')}</h2>
             <p className="mt-1 text-sm text-default-500">
-              Create an account on behalf of a member who can&rsquo;t self-register, then share their temporary password.
+              {t('caring_workflow.assisted_onboarding.description')}
             </p>
           </div>
         </CardHeader>
@@ -2442,10 +2420,10 @@ export default function CaringCommunityWorkflowPage() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h3 className="text-sm font-semibold text-default-900">
-                  Paper onboarding (OCR)
+                  {t('caring_workflow.paper_onboarding.title')}
                 </h3>
                 <p className="mt-1 text-xs text-default-500">
-                  Upload a scanned form or photo. We&rsquo;ll extract the fields and let you review before creating the account.
+                  {t('caring_workflow.paper_onboarding.description')}
                 </p>
               </div>
               <Button
@@ -2455,45 +2433,45 @@ export default function CaringCommunityWorkflowPage() {
                 isLoading={paperLoading}
                 onPress={loadPaperIntakes}
               >
-                Refresh
+                {t('caring_workflow.actions.refresh')}
               </Button>
             </div>
 
             <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
               <Input
                 type="file"
-                label="Scanned form or photo"
+                label={t('caring_workflow.paper_onboarding.file_label')}
                 accept="application/pdf,image/jpeg,image/png,image/webp"
                 onChange={handlePaperFileChange}
               />
               <Input
-                label="Full name"
-                placeholder="As written on the form"
+                label={t('caring_workflow.paper_onboarding.name_label')}
+                placeholder={t('caring_workflow.paper_onboarding.name_placeholder')}
                 value={paperName}
                 onValueChange={setPaperName}
               />
               <Input
                 type="date"
-                label="Date of birth"
+                label={t('caring_workflow.paper_onboarding.dob_label')}
                 value={paperDateOfBirth}
                 onValueChange={setPaperDateOfBirth}
               />
               <Input
                 type="email"
-                label="Email"
-                placeholder="member@example.com"
+                label={t('caring_workflow.paper_onboarding.email_label')}
+                placeholder={t('caring_workflow.paper_onboarding.email_placeholder')}
                 value={paperEmail}
                 onValueChange={setPaperEmail}
               />
               <Input
-                label="Phone"
-                placeholder="+1 555 123 4567"
+                label={t('caring_workflow.paper_onboarding.phone_label')}
+                placeholder={t('caring_workflow.paper_onboarding.phone_placeholder')}
                 value={paperPhone}
                 onValueChange={setPaperPhone}
               />
               <Input
-                label="Address"
-                placeholder="Street, city, postcode"
+                label={t('caring_workflow.paper_onboarding.address_label')}
+                placeholder={t('caring_workflow.paper_onboarding.address_placeholder')}
                 value={paperAddress}
                 onValueChange={setPaperAddress}
               />
@@ -2507,7 +2485,7 @@ export default function CaringCommunityWorkflowPage() {
                 isLoading={paperUploading}
                 onPress={uploadPaperOnboarding}
               >
-                Upload &amp; extract
+                {t('caring_workflow.paper_onboarding.upload_cta')}
               </Button>
               {paperReviewingId && (
                 <Button
@@ -2517,7 +2495,7 @@ export default function CaringCommunityWorkflowPage() {
                   isLoading={onboardingLoading}
                   onPress={confirmPaperOnboarding}
                 >
-                  Confirm &amp; create account
+                  {t('caring_workflow.paper_onboarding.confirm_cta')}
                 </Button>
               )}
             </div>
@@ -2525,8 +2503,8 @@ export default function CaringCommunityWorkflowPage() {
             {paperReviewingId && (
               <Textarea
                 className="mt-3"
-                label="Coordinator note"
-                placeholder="Optional context for this intake"
+                label={t('caring_workflow.paper_onboarding.note_label')}
+                placeholder={t('caring_workflow.paper_onboarding.note_placeholder')}
                 value={paperNote}
                 onValueChange={setPaperNote}
               />
@@ -2543,11 +2521,11 @@ export default function CaringCommunityWorkflowPage() {
                           {fields.name || intake.original_filename}
                         </p>
                         <p className="text-xs text-default-500">
-                          {fields.email || 'No email'} · {intake.original_filename}
+                          {fields.email || t('caring_workflow.paper_onboarding.no_email')} · {intake.original_filename}
                         </p>
                       </div>
                       <Button size="sm" variant="flat" onPress={() => startPaperReview(intake)}>
-                        Review
+                        {t('caring_workflow.paper_onboarding.review_cta')}
                       </Button>
                     </div>
                   );
@@ -2558,29 +2536,29 @@ export default function CaringCommunityWorkflowPage() {
 
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <Input
-              label="Full name"
-              placeholder="Member's full name"
+              label={t('caring_workflow.assisted_onboarding.name_label')}
+              placeholder={t('caring_workflow.assisted_onboarding.name_placeholder')}
               value={onboardingName}
               onValueChange={setOnboardingName}
               isRequired
             />
             <Input
               type="email"
-              label="Email"
-              placeholder="member@example.com"
+              label={t('caring_workflow.assisted_onboarding.email_label')}
+              placeholder={t('caring_workflow.assisted_onboarding.email_placeholder')}
               value={onboardingEmail}
               onValueChange={setOnboardingEmail}
               isRequired
             />
             <Input
-              label="Phone (optional)"
-              placeholder="+1 555 123 4567"
+              label={t('caring_workflow.assisted_onboarding.phone_label')}
+              placeholder={t('caring_workflow.assisted_onboarding.phone_placeholder')}
               value={onboardingPhone}
               onValueChange={setOnboardingPhone}
             />
             <Input
-              label="Coordinator note (optional)"
-              placeholder="Anything the coordinator should remember"
+              label={t('caring_workflow.assisted_onboarding.note_label')}
+              placeholder={t('caring_workflow.assisted_onboarding.note_placeholder')}
               value={onboardingNote}
               onValueChange={setOnboardingNote}
             />
@@ -2592,16 +2570,16 @@ export default function CaringCommunityWorkflowPage() {
             isLoading={onboardingLoading}
             onPress={submitAssistedOnboarding}
           >
-            Create member account
+            {t('caring_workflow.assisted_onboarding.create_cta')}
           </Button>
 
           {onboardingResult && (
             <div className="rounded-lg border border-success-200 bg-success-50 p-4">
               <p className="text-sm font-semibold text-success-700">
-                {`Account created for ${onboardingResult.user.name} (${onboardingResult.user.email}).`}
+                {t('caring_workflow.assisted_onboarding.created_for', { name: onboardingResult.user.name, email: onboardingResult.user.email })}
               </p>
               <p className="mt-2 text-xs text-default-500">
-                Share this temporary password with the member. They will be asked to change it on first login.
+                {t('caring_workflow.assisted_onboarding.password_note')}
               </p>
               <div className="mt-3 flex items-center gap-2">
                 <code className="flex-1 rounded bg-default-100 px-3 py-2 text-sm font-mono text-default-900">
@@ -2613,7 +2591,7 @@ export default function CaringCommunityWorkflowPage() {
                   startContent={<Copy size={14} />}
                   onPress={copyTempPassword}
                 >
-                  {onboardingCopied ? 'Copied!' : 'Copy'}
+                  {onboardingCopied ? t('caring_workflow.assisted_onboarding.copied') : t('caring_workflow.assisted_onboarding.copy')}
                 </Button>
               </div>
             </div>
@@ -2625,9 +2603,9 @@ export default function CaringCommunityWorkflowPage() {
       <Card className="mt-6" shadow="sm">
         <CardHeader className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold">Invite Codes</h2>
+            <h2 className="text-lg font-semibold">{t('caring_workflow.invite_codes.title')}</h2>
             <p className="mt-1 text-sm text-default-500">
-              Generate a printable code that a new member can use to join without needing an email invitation.
+              {t('caring_workflow.invite_codes.description')}
             </p>
           </div>
           <Button
@@ -2637,7 +2615,7 @@ export default function CaringCommunityWorkflowPage() {
             isLoading={loadingInviteCodes}
             onPress={loadInviteCodes}
           >
-            Refresh
+            {t('caring_workflow.actions.refresh')}
           </Button>
         </CardHeader>
         <Divider />
@@ -2646,8 +2624,8 @@ export default function CaringCommunityWorkflowPage() {
           <div className="flex flex-wrap items-end gap-3">
             <Input
               className="flex-1"
-              label="Label (optional)"
-              placeholder="e.g. For Mary's neighbour"
+              label={t('caring_workflow.invite_codes.label')}
+              placeholder={t('caring_workflow.invite_codes.label_placeholder')}
               value={inviteLabel}
               onValueChange={setInviteLabel}
             />
@@ -2658,7 +2636,7 @@ export default function CaringCommunityWorkflowPage() {
               isLoading={generatingCode}
               onPress={generateInviteCode}
             >
-              Generate Code
+              {t('caring_workflow.invite_codes.generate')}
             </Button>
           </div>
 
@@ -2667,7 +2645,7 @@ export default function CaringCommunityWorkflowPage() {
             <div className="rounded-lg border border-success-200 bg-success-50 p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs text-default-500">New invite code</p>
+                  <p className="text-xs text-default-500">{t('caring_workflow.invite_codes.new_code')}</p>
                   <p className="mt-1 font-mono text-3xl font-bold tracking-widest text-success-700">
                     {generatedCode.code}
                   </p>
@@ -2675,7 +2653,7 @@ export default function CaringCommunityWorkflowPage() {
                     <p className="mt-1 text-xs text-default-600">{generatedCode.label}</p>
                   )}
                   <p className="mt-1 text-xs text-default-400">
-                    Expires: {new Date(generatedCode.expires_at).toLocaleDateString()}
+                    {t('caring_workflow.invite_codes.expires', { date: new Date(generatedCode.expires_at).toLocaleDateString() })}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -2685,7 +2663,7 @@ export default function CaringCommunityWorkflowPage() {
                     startContent={<Copy size={14} />}
                     onPress={() => copyInviteCode(generatedCode.invite_url)}
                   >
-                    {codeCopied ? 'Copied!' : 'Copy URL'}
+                    {codeCopied ? t('caring_workflow.invite_codes.copied') : t('caring_workflow.invite_codes.copy_url')}
                   </Button>
                   <Button
                     size="sm"
@@ -2693,7 +2671,7 @@ export default function CaringCommunityWorkflowPage() {
                     startContent={<Printer size={14} />}
                     onPress={() => printInviteCard(generatedCode)}
                   >
-                    Print Card
+                    {t('caring_workflow.invite_codes.print_card')}
                   </Button>
                   <Button
                     as="a"
@@ -2704,7 +2682,7 @@ export default function CaringCommunityWorkflowPage() {
                     variant="flat"
                     startContent={<ExternalLink size={14} />}
                   >
-                    Open
+                    {t('caring_workflow.invite_codes.open')}
                   </Button>
                 </div>
               </div>
@@ -2725,19 +2703,19 @@ export default function CaringCommunityWorkflowPage() {
 
           {/* Recent codes table */}
           {inviteCodes.length > 0 && (
-            <Table aria-label="Invite codes" removeWrapper>
+            <Table aria-label={t('caring_workflow.invite_codes.table_aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>Code</TableColumn>
-                <TableColumn>Label</TableColumn>
-                <TableColumn>Expires</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Actions</TableColumn>
+                <TableColumn>{t('caring_workflow.invite_codes.columns.code')}</TableColumn>
+                <TableColumn>{t('caring_workflow.invite_codes.columns.label')}</TableColumn>
+                <TableColumn>{t('caring_workflow.invite_codes.columns.expires')}</TableColumn>
+                <TableColumn>{t('caring_workflow.invite_codes.columns.status')}</TableColumn>
+                <TableColumn>{t('caring_workflow.invite_codes.columns.actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                   {inviteCodes.map((ic) => (
                     <TableRow key={ic.id}>
                       <TableCell className="font-mono font-semibold tracking-wider text-default-900">{ic.code}</TableCell>
-                      <TableCell className="text-default-600">{ic.label ?? '-'}</TableCell>
+                      <TableCell className="text-default-600">{ic.label ?? t('caring_workflow.empty.value')}</TableCell>
                       <TableCell className="text-default-500">{new Date(ic.expires_at).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <Chip
@@ -2745,7 +2723,11 @@ export default function CaringCommunityWorkflowPage() {
                           variant="flat"
                           color={ic.status === 'active' ? 'success' : ic.status === 'used' ? 'default' : 'warning'}
                         >
-                          {ic.status === 'active' ? 'Active' : ic.status === 'used' ? `Used${ic.used_by ? ` by ${ic.used_by}` : ''}` : 'Expired'}
+                          {ic.status === 'active'
+                            ? t('caring_workflow.invite_codes.status.active')
+                            : ic.status === 'used'
+                              ? (ic.used_by ? t('caring_workflow.invite_codes.status.used_by', { name: ic.used_by }) : t('caring_workflow.invite_codes.status.used'))
+                              : t('caring_workflow.invite_codes.status.expired')}
                         </Chip>
                       </TableCell>
                       <TableCell>
@@ -2754,7 +2736,7 @@ export default function CaringCommunityWorkflowPage() {
                             size="sm"
                             isIconOnly
                             variant="light"
-                            title="Copy URL"
+                            title={t('caring_workflow.invite_codes.copy_url')}
                             onPress={() => copyInviteCode(ic.invite_url)}
                           >
                             <Copy size={14} />
@@ -2764,7 +2746,7 @@ export default function CaringCommunityWorkflowPage() {
                               size="sm"
                               isIconOnly
                               variant="light"
-                              title="Print card"
+                              title={t('caring_workflow.invite_codes.print_card')}
                               onPress={() => printInviteCard(ic)}
                             >
                               <Printer size={14} />
@@ -2791,7 +2773,7 @@ export default function CaringCommunityWorkflowPage() {
 
           {inviteCodes.length === 0 && !loadingInviteCodes && (
             <div className="rounded-lg bg-default-100 p-3 text-sm text-default-500">
-              No invite codes yet. Generate one above to share with a prospective member.
+              {t('caring_workflow.invite_codes.empty')}
             </div>
           )}
         </CardBody>
@@ -2800,8 +2782,8 @@ export default function CaringCommunityWorkflowPage() {
       <Card className="mt-6" shadow="sm">
         <CardHeader>
           <div>
-            <h2 className="text-lg font-semibold">Workflow stages</h2>
-            <p className="mt-1 text-sm text-default-500">The five-step caring community pipeline at a glance.</p>
+            <h2 className="text-lg font-semibold">{t('caring_workflow.stages.title')}</h2>
+            <p className="mt-1 text-sm text-default-500">{t('caring_workflow.stages.description')}</p>
           </div>
         </CardHeader>
         <Divider />
@@ -2816,8 +2798,8 @@ export default function CaringCommunityWorkflowPage() {
                   </div>
                   <Chip size="sm" variant="flat">{index + 1}</Chip>
                 </div>
-                <p className="text-sm font-semibold text-default-900">{stageContent[stage.key].title}</p>
-                <p className="mt-1 text-xs text-default-500">{stageContent[stage.key].description}</p>
+                <p className="text-sm font-semibold text-default-900">{t(`caring_workflow.stages.${stage.key}.title`)}</p>
+                <p className="mt-1 text-xs text-default-500">{t(`caring_workflow.stages.${stage.key}.description`)}</p>
               </div>
             );
           })}
