@@ -37,6 +37,7 @@ import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 
 function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
+  const { t } = useTranslation('admin');
   const toast = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -80,16 +81,16 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
 
   const handleGrant = async () => {
     if (!selectedUser) {
-      toast.error("Please Select a Member");
+      toast.error(t('timebanking.please_select_a_member'));
       return;
     }
     const parsedAmount = parseFloat(amount);
     if (!parsedAmount || parsedAmount <= 0) {
-      toast.error("Please enter a valid credit amount greater than zero");
+      toast.error(t('timebanking.please_enter_a_valid_credit_amount_great'));
       return;
     }
     if (!reason.trim()) {
-      toast.error("Please Provide a Reason for This Grant");
+      toast.error(t('timebanking.please_provide_a_reason_for_this_grant'));
       return;
     }
 
@@ -102,16 +103,16 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
       });
 
       if (res?.success) {
-        toast.success(`Granted Credits`);
+        toast.success(t('timebanking.granted_credits'));
         setSelectedUser(null);
         setAmount('');
         setReason('');
         onGranted();
       } else {
-        toast.error(res?.error || "Failed to grant credits");
+        toast.error(res?.error || t('timebanking.failed_to_grant_credits'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('timebanking.an_unexpected_error_occurred'));
     } finally {
       setGranting(false);
     }
@@ -121,15 +122,15 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
     <Card shadow="sm">
       <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
         <Plus size={18} className="text-primary" />
-        <h3 className="font-semibold">{"Grant Starting Credits"}</h3>
+        <h3 className="font-semibold">{t('timebanking.grant_starting_credits')}</h3>
       </CardHeader>
       <CardBody className="px-4 pb-4 space-y-4">
         {/* Member search */}
         {!selectedUser ? (
           <div>
             <Input type="search" name="admin-search" autoComplete="off"
-              label={"Search Member"}
-              placeholder={"Search by Name or Email..."}
+              label={t('timebanking.label_search_member')}
+              placeholder={t('timebanking.placeholder_search_by_name_or_email')}
               startContent={<Search size={16} className="text-default-400" />}
               value={searchQuery}
               onValueChange={handleSearch}
@@ -159,7 +160,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
                       </p>
                     </div>
                     <div className="text-right shrink-0 ml-3">
-                      <p className="text-xs text-default-500">{"Balance"}</p>
+                      <p className="text-xs text-default-500">{t('timebanking.col_balance')}</p>
                       <p className="text-sm font-semibold text-foreground">
                         {user.balance}h
                       </p>
@@ -170,7 +171,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
             )}
             {searchQuery.length >= 2 && !searching && searchResults.length === 0 && (
               <p className="text-sm text-default-400 text-center py-2 mt-2">
-                {`No members found`}
+                {t('timebanking.no_members_found')}
               </p>
             )}
           </div>
@@ -185,7 +186,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
                   {selectedUser.name}
                 </p>
                 <p className="text-xs text-default-500">
-                  {selectedUser.email} &middot; {"Current Balance"}: {selectedUser.balance}h
+                  {selectedUser.email} &middot; {t('timebanking.current_balance')}: {selectedUser.balance}h
                 </p>
               </div>
             </div>
@@ -194,15 +195,15 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
               variant="flat"
               onPress={() => setSelectedUser(null)}
             >
-              {"Change"}
+              {t('timebanking.change')}
             </Button>
           </div>
         )}
 
         {/* Amount input */}
         <Input
-          label={"Credit Amount"}
-          placeholder={"e.g. 10"}
+          label={t('timebanking.label_credit_amount')}
+          placeholder={t('timebanking.placeholder_credit_amount')}
           type="number"
           min="0.25"
           step="0.25"
@@ -213,20 +214,20 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
           startContent={
             <Wallet size={16} className="text-default-400" />
           }
-          description={"Amount of time credits to grant, in hours"}
+          description={t('timebanking.desc_amount_of_time_credits_to_grant_in_hours')}
         />
 
         {/* Reason */}
         <Textarea
-          label={"Reason"}
-          placeholder={"Grant Reason..."}
+          label={t('timebanking.label_reason')}
+          placeholder={t('timebanking.placeholder_grant_reason')}
           value={reason}
           onValueChange={setReason}
           size="sm"
           variant="bordered"
           minRows={2}
           maxRows={4}
-          description={"Required. This will be recorded in the general ledger"}
+          description={t('timebanking.desc_required_this_will_be_recorded_in_the_g')}
         />
 
         {/* Submit */}
@@ -238,7 +239,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
           isDisabled={!selectedUser || !amount || !reason.trim()}
           className="w-full sm:w-auto"
         >
-          {"Grant Credits"}
+          {t('timebanking.grant_credits')}
         </Button>
       </CardBody>
     </Card>
@@ -250,6 +251,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function GrantHistory({ refreshKey }: { refreshKey: number }) {
+  const { t } = useTranslation('admin');
   const toast = useToast();
 
   const [grants, setGrants] = useState<WalletGrant[]>([]);
@@ -278,7 +280,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
         }
       }
     } catch {
-      toast.error("Failed to load grant history");
+      toast.error(t('timebanking.failed_to_load_grant_history'));
     } finally {
       setLoading(false);
     }
@@ -292,7 +294,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
   const columns: Column<WalletGrant>[] = [
     {
       key: 'user_name',
-      label: "Member",
+      label: t('timebanking.col_member'),
       sortable: true,
       render: (item) => (
         <div>
@@ -303,7 +305,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     },
     {
       key: 'amount',
-      label: "Amount",
+      label: t('timebanking.col_amount'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color="success">
@@ -313,7 +315,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     },
     {
       key: 'reason',
-      label: "Reason",
+      label: t('timebanking.label_reason'),
       render: (item) => (
         <span className="text-sm text-default-600 line-clamp-2">
           {item.reason}
@@ -322,7 +324,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     },
     {
       key: 'granted_by',
-      label: "Granted by",
+      label: t('timebanking.col_granted_by'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -332,7 +334,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     },
     {
       key: 'created_at',
-      label: "Date",
+      label: t('timebanking.col_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -346,20 +348,20 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     <div>
       <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
         <History size={16} className="text-secondary" />
-        {"Grant History"}
+        {t('timebanking.grant_history')}
       </h3>
       <DataTable
         columns={columns}
         data={grants}
         isLoading={loading}
-        searchPlaceholder={"Search grants..."}
+        searchPlaceholder={t('timebanking.search_grants_placeholder')}
         onSearch={(q) => { setSearch(q); setPage(1); }}
         onRefresh={loadGrants}
         totalItems={total}
         page={page}
         pageSize={20}
         onPageChange={setPage}
-        emptyContent={"No credit grants"}
+        emptyContent={t('timebanking.no_credit_grants')}
       />
     </div>
   );
@@ -371,6 +373,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
 
 export function StartingBalances() {
   const { t: tNav } = useTranslation('admin_nav');
+  const { t } = useTranslation('admin');
   useAdminPageMeta({ title: tNav('timebanking') });
 
   // Key to trigger grant history refresh after new grant
@@ -383,8 +386,8 @@ export function StartingBalances() {
   return (
     <div>
       <PageHeader
-        title={"Starting Balances"}
-        description={"Grant starting time credit balances to new or existing members"}
+        title={t('timebanking.starting_balances_title')}
+        description={t('timebanking.starting_balances_desc')}
       />
 
       <div className="space-y-6">

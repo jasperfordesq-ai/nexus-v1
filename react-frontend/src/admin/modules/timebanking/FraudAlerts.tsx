@@ -80,11 +80,11 @@ export function FraudAlerts() {
         }
       }
     } catch {
-      toast.error("Failed to load alerts");
+      toast.error(t('timebanking.failed_to_load_alerts'));
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, toast])
+  }, [page, statusFilter, t, toast])
 
 
   useEffect(() => {
@@ -96,16 +96,16 @@ export function FraudAlerts() {
       try {
         const res = await adminTimebanking.updateAlertStatus(alertId, newStatus);
         if (res.success) {
-          toast.success(`Alert status updated`);
+          toast.success(t('timebanking.alert_status_updated'));
           loadAlerts();
         } else {
-          toast.error("Failed to update alert status");
+          toast.error(t('timebanking.failed_to_update_alert_status'));
         }
       } catch {
-        toast.error("Failed to update alert status");
+        toast.error(t('timebanking.failed_to_update_alert_status'));
       }
     },
-    [loadAlerts, toast]
+    [loadAlerts, t, toast]
   );
 
   const handleTabChange = useCallback((key: React.Key) => {
@@ -117,7 +117,7 @@ export function FraudAlerts() {
     () => [
       {
         key: 'user_name',
-        label: "User",
+        label: t('timebanking.col_user'),
         render: (alert) => (
           <Link
             to={tenantPath(`/admin/users/${alert.user_id}/edit`)}
@@ -129,7 +129,7 @@ export function FraudAlerts() {
       },
       {
         key: 'alert_type',
-        label: "Alert Type",
+        label: t('timebanking.col_alert_type'),
         sortable: true,
         render: (alert) => (
           <span className="text-sm capitalize">
@@ -139,7 +139,7 @@ export function FraudAlerts() {
       },
       {
         key: 'severity',
-        label: "Severity",
+        label: t('timebanking.col_severity'),
         sortable: true,
         render: (alert) => (
           <Chip
@@ -148,13 +148,13 @@ export function FraudAlerts() {
             color={SEVERITY_COLOR_MAP[alert.severity] || 'default'}
             className="capitalize"
           >
-            {alert.severity}
+            {t(`timebanking.severity_${alert.severity}`)}
           </Chip>
         ),
       },
       {
         key: 'status',
-        label: "Status",
+        label: t('timebanking.col_status'),
         sortable: true,
         render: (alert) => (
           <Chip
@@ -163,13 +163,13 @@ export function FraudAlerts() {
             color={STATUS_COLOR_MAP[alert.status] || 'default'}
             className="capitalize"
           >
-            {alert.status}
+            {t(`timebanking.status_${alert.status}`)}
           </Chip>
         ),
       },
       {
         key: 'created_at',
-        label: "Date",
+        label: t('timebanking.col_date'),
         sortable: true,
         render: (alert) => (
           <span className="text-sm text-default-500">
@@ -179,41 +179,41 @@ export function FraudAlerts() {
       },
       {
         key: 'actions',
-        label: "Actions",
+        label: t('timebanking.label_actions'),
         render: (alert) => (
           <Dropdown>
             <DropdownTrigger>
-              <Button isIconOnly size="sm" variant="light" aria-label={"Actions"}>
+              <Button isIconOnly size="sm" variant="light" aria-label={t('timebanking.label_actions')}>
                 <MoreVertical size={16} />
               </Button>
             </DropdownTrigger>
             <DropdownMenu
-              aria-label={"Alert Actions"}
+              aria-label={t('timebanking.label_alert_actions')}
               onAction={(key) => handleStatusChange(alert.id, String(key))}
               disabledKeys={[alert.status]}
             >
-              <DropdownItem key="reviewing" description={"Mark as Under Investigation"}>
-                {"Investigate"}
+              <DropdownItem key="reviewing" description={t('timebanking.desc_mark_as_under_investigation')}>
+                {t('timebanking.action_investigate')}
               </DropdownItem>
-              <DropdownItem key="resolved" description={"Mark as Resolved"} className="text-success">
-                {"Resolve"}
+              <DropdownItem key="resolved" description={t('timebanking.desc_mark_as_resolved')} className="text-success">
+                {t('timebanking.action_resolve')}
               </DropdownItem>
-              <DropdownItem key="dismissed" description={"Dismiss This Alert"} className="text-default-400">
-                {"Dismiss"}
+              <DropdownItem key="dismissed" description={t('timebanking.desc_dismiss_this_alert')} className="text-default-400">
+                {t('timebanking.action_dismiss')}
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
         ),
       },
     ],
-    [tenantPath, handleStatusChange]
+    [tenantPath, handleStatusChange, t]
   );
 
   return (
     <div>
       <PageHeader
-        title={"Fraud Alerts"}
-        description={"View and manage fraud alerts generated by suspicious transaction patterns"}
+        title={t('timebanking.fraud_alerts_title')}
+        description={t('timebanking.fraud_alerts_desc')}
         actions={
           <Button
             as={Link}
@@ -222,7 +222,7 @@ export function FraudAlerts() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            {"Back to Timebanking"}
+            {t('timebanking.back_to_timebanking')}
           </Button>
         }
       />
@@ -234,7 +234,7 @@ export function FraudAlerts() {
           onSelectionChange={handleTabChange}
           size="sm"
           variant="underlined"
-          aria-label={"Filter by Status"}
+          aria-label={t('timebanking.label_filter_by_status')}
         >
           {STATUS_TAB_KEYS.map((key) => (
             <Tab key={key} title={t(`timebanking.tab_${key}`)} />
@@ -256,7 +256,7 @@ export function FraudAlerts() {
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8">
             <AlertTriangle size={32} className="text-default-300" />
-            <p className="text-sm text-default-400">{"No fraud alerts"}</p>
+            <p className="text-sm text-default-400">{t('timebanking.no_fraud_alerts')}</p>
           </div>
         }
       />
