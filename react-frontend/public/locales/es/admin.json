@@ -10173,7 +10173,29 @@
     "title_create": "Create",
     "title_edit": "Edit",
     "twitter_label": "Twitter",
-    "youtube_label": "Youtube"
+    "youtube_label": "Youtube",
+    "countries": {
+      "AT": "Austria",
+      "AU": "Australia",
+      "BE": "Bélgica",
+      "CA": "Canadá",
+      "CH": "Suiza",
+      "DE": "Alemania",
+      "DK": "Dinamarca",
+      "ES": "España",
+      "FI": "Finlandia",
+      "FR": "Francia",
+      "GB": "Reino Unido",
+      "IE": "Irlanda",
+      "IT": "Italia",
+      "NL": "Países Bajos",
+      "NO": "Noruega",
+      "NZ": "Nueva Zelanda",
+      "PL": "Polonia",
+      "PT": "Portugal",
+      "SE": "Suecia",
+      "US": "Estados Unidos"
+    }
   },
   "tenant_list": {
     "action_delete": "Delete",
@@ -13443,6 +13465,291 @@
       "seeded": "Sembradas 3 cartas de demostración",
       "update_failed": "La actualización falló",
       "updated": "Historia actualizada"
+    }
+  },
+  "disclosure_pack": {
+    "about": {
+      "body_prefix": "El paquete de divulgación (AG80) es el",
+      "body_suffix": "Documento de divulgación de protección de datos que los residentes deben conocer antes de participar en el programa de atención comunitaria. Cubre las identidades del controlador y del procesador de datos, las categorías de datos procesados, la base legal, los derechos de los interesados, los contactos de respuesta a incidentes y las salvaguardias para las transferencias transfronterizas.",
+      "review_middle": "consejo antes de publicar. Edite los detalles del controlador, el propietario de la respuesta a incidentes y la configuración del nodo aislado para su implementación, luego use",
+      "review_prefix": "Este paquete es un borrador de trabajo; revíselo con",
+      "review_suffix": "para producir el documento legal de entrega. Los valores predeterminados reflejan compromisos del lado de la plataforma. Guarde los cambios antes de exportar.",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "export_markdown": "Rebaja de exportación",
+      "refresh": "Refrescar",
+      "refresh_aria": "Actualizar paquete de divulgación",
+      "save_changes": "Guardar cambios"
+    },
+    "descriptions": {
+      "backup_owner": "Entidad jurídica responsable del almacenamiento y retención de copias de seguridad de la base de datos.",
+      "hosting_owner": "Entidad jurídica que controla la infraestructura del servidor (por ejemplo, el departamento de TI del cantón).",
+      "smtp_owner": "Entidad jurídica responsable de la entrega de correo electrónico saliente.",
+      "storage_owner": "Entidad jurídica que controla el almacenamiento de archivos/blobs (cargas, exportaciones).",
+      "update_cadence": "Con qué frecuencia el nodo del cantón recibe actualizaciones de la plataforma (por ejemplo, \"mensualmente\", \"trimestralmente\")."
+    },
+    "fields": {
+      "address": "DIRECCIÓN",
+      "backup_owner": "Propietario de la copia de seguridad",
+      "contact_email": "Correo electrónico de contacto",
+      "controller_name": "Nombre del controlador",
+      "data_protection_officer": "Delegado de protección de datos",
+      "fadp_authority": "autoridad FADP",
+      "hosting_owner": "Propietario del alojamiento",
+      "notification_window_hours": "Ventana de notificación (horas)",
+      "owner_name": "Nombre del propietario",
+      "processor_name": "Nombre del procesador",
+      "smtp_owner": "SMTP propietario",
+      "storage_owner": "Propietario del almacenamiento",
+      "sub_processors": "Subprocesadores (uno por línea)",
+      "update_cadence": "Actualizar cadencia"
+    },
+    "footer": {
+      "customised": "Personalizado",
+      "last_saved": "Último guardado {{date}}"
+    },
+    "isolated_node": {
+      "description_prefix": "Estos campos sólo son relevantes si este despliegue se realiza en una infraestructura controlada por el cantón. Para implementaciones alojadas estándar, déjelo como predeterminado. Cada campo de propietario identifica la entidad legal responsable de ese componente de infraestructura bajo",
+      "description_suffix": "Artículo 9."
+    },
+    "labels": {
+      "aggregate_policy": "Política agregada"
+    },
+    "meta": {
+      "page_title": "FADP / nDSG Paquete de divulgación",
+      "subtitle": "AG80 - documento piloto de divulgación para la ley suiza de protección de datos",
+      "title": "FADP / nDSG Paquete de divulgación"
+    },
+    "sections": {
+      "data_categories": "Categorías de datos",
+      "destinations": "Destinos",
+      "federation_policy": "Política de federación",
+      "isolated_node_configuration": "Configuración de nodo aislado",
+      "lawful_basis": "Base legal",
+      "platform_processor": "Procesador de plataforma",
+      "retention_defaults": "Valores predeterminados de retención",
+      "safeguards": "Salvaguardias",
+      "tenant_controller": "Controlador de inquilinos"
+    },
+    "status": {
+      "cross_border_occurs": "Se producen transferencias transfronterizas",
+      "disabled": "Desactivado",
+      "disabled_lower": "desactivado",
+      "enabled": "Activado",
+      "enabled_lower": "activado",
+      "members_can_opt_out": "Los miembros pueden optar por no participar",
+      "no_cross_border_transfers": "Sin transferencias transfronterizas",
+      "no_member_opt_out": "Ningún miembro puede darse de baja"
+    },
+    "tabs": {
+      "aria": "Secciones de divulgación",
+      "controller": "Controlador y procesador",
+      "cross_border_transfers": "Transferencias transfronterizas",
+      "data_retention": "Datos y retención",
+      "data_subject_rights": "Derechos del interesado",
+      "federation_isolated_node": "Federación y nodo aislado",
+      "incident_response": "Respuesta a incidentes"
+    },
+    "toasts": {
+      "export_empty": "Exportación devuelta vacía",
+      "export_failed": "No se pudo exportar el paquete de divulgación",
+      "exported": "Paquete de divulgación exportado",
+      "load_failed": "No se pudo cargar el paquete de divulgación",
+      "save_failed": "No se pudo guardar el paquete de divulgación",
+      "saved": "Paquete de divulgación guardado"
+    }
+  },
+  "external_integrations": {
+    "about": {
+      "body": "Integraciones externas es un rastreador de trabajos pendientes para conexiones dependientes de socios: banca, envío AHV, verificación de direcciones postales y fuentes de datos cantonales. Cada entrada realiza un seguimiento del propietario de la integración, el estado del acuerdo de intercambio de datos (DSA) y la preparación del espacio aislado. Utilícelo para coordinar con socios externos e informar el progreso a las partes interesadas.",
+      "dsa_body": "Debe firmarse antes de cualquier intercambio de datos en vivo. Redactar acuerdos utilizando las plantillas de Asociaciones de Investigación.",
+      "dsa_label": "DSA (Acuerdo de intercambio de datos):",
+      "sandbox_body": "Enlace al entorno de prueba del socio. Valide la integración en sandbox antes de promocionar a live.",
+      "sandbox_label": "Zona de pruebas URL:",
+      "statuses_body": "Propuesto -> Alcance -> Sandbox -> Live. Bloqueado significa que una dependencia externa no está resuelta.",
+      "statuses_label": "Estados:",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "add": "Agregar integración",
+      "cancel": "Cancelar",
+      "create": "Crear integración",
+      "delete": "Borrar",
+      "edit": "Editar",
+      "open": "Abierto",
+      "refresh": "Refrescar",
+      "remove": "Eliminar",
+      "save_changes": "Guardar cambios",
+      "seed": "Atraso predeterminado de semillas"
+    },
+    "categories": {
+      "ahv": "AHV",
+      "banking": "Bancario",
+      "healthcare": "Cuidado de la salud",
+      "identity_verification": "Verificación de identidad",
+      "municipal_data": "Datos municipales",
+      "other": "Otro",
+      "payment": "Pago",
+      "postal": "Postal",
+      "professional_care": "Atención profesional"
+    },
+    "delete_modal": {
+      "body_prefix": "Esto eliminará permanentemente la entrada del trabajo pendiente para",
+      "body_suffix": "El registro de socio externo no se ve afectado; solo se elimina la entrada de seguimiento.",
+      "title": "Eliminar integración",
+      "warning": "Esta acción no se puede deshacer."
+    },
+    "dsa_statuses": {
+      "drafting": "Redacción",
+      "in_review": "En revisión",
+      "not_required": "No requerido",
+      "signed": "Firmado"
+    },
+    "editor": {
+      "add_title": "Agregar integración",
+      "category": "Categoría",
+      "dsa_status": "Acuerdo de intercambio de datos",
+      "edit_title": "Editar: {{name}}",
+      "interface_spec_placeholder": "https://docs.partner.example/spec",
+      "interface_spec_url": "Especificación de interfaz URL",
+      "name": "Nombre",
+      "name_placeholder": "p.ej. AHV puerta de enlace de envío",
+      "notes": "Notas",
+      "notes_placeholder": "Preguntas abiertas, bloqueadores, dependencias, notas contractuales...",
+      "owner_email": "Correo electrónico del propietario",
+      "owner_email_placeholder": "contacto@socio.ejemplo",
+      "owner_name": "Nombre del propietario",
+      "owner_name_placeholder": "Nombre completo del contacto externo",
+      "sandbox_placeholder": "https://sandbox.partner.ejemplo",
+      "sandbox_url": "Zona de pruebas URL",
+      "status": "Estado"
+    },
+    "empty": {
+      "body": "Genere un conjunto seleccionado de integraciones conocidas dependientes de socios (envío AHV, transferencia Spitex, fuente de datos maestros cantonales, PostFinance, Twint, verificación de dirección postal) para que el operador de la plataforma pueda rastrear el propietario, el estado de DSA y la preparación del sandbox.",
+      "title": "Aún no se han realizado seguimientos de integraciones"
+    },
+    "last_updated": "Última actualización {{date}}",
+    "meta": {
+      "subtitle": "AG87: integraciones dependientes del socio en espera de propietario externo/DSA/sandbox",
+      "title": "Trabajo pendiente de integración externa"
+    },
+    "statuses": {
+      "blocked": "Obstruido",
+      "deprecated": "En desuso",
+      "live": "Vivir",
+      "proposed": "Propuesto",
+      "sandbox": "Salvadera",
+      "scoping": "Alcance"
+    },
+    "table": {
+      "actions": "Comportamiento",
+      "aria": "Integraciones externas",
+      "category": "Categoría",
+      "dsa": "DSA",
+      "name": "Nombre",
+      "owner": "Dueño",
+      "row_actions": "Acciones de fila",
+      "sandbox": "Salvadera",
+      "status": "Estado",
+      "updated": "Actualizado"
+    },
+    "toasts": {
+      "create_failed": "Error al crear",
+      "created": "Integración creada",
+      "delete_failed": "Error al eliminar",
+      "load_failed": "No se pudo cargar el trabajo pendiente de integración",
+      "removed": "Integración eliminada",
+      "seed_failed": "La semilla falló",
+      "seeded": "Trabajo pendiente predeterminado inicializado",
+      "update_failed": "La actualización falló",
+      "updated": "Integración actualizada"
+    }
+  },
+  "sub_regions": {
+    "about": {
+      "body": "Las subregiones dividen su comunidad en áreas geográficas (barrios, distritos o distritos). Se utilizan para asignar coordinadores a áreas específicas, filtrar solicitudes de ayuda por ubicación y desglosar las métricas piloto por vecindario. Agregar subregiones es opcional, pero se recomienda encarecidamente para comunidades más grandes con varios equipos de coordinadores.",
+      "postal_codes_note": "Para el campo Códigos postales: ingrese una lista de códigos postales, un nombre de vecindario o una descripción libre. No se requieren límites precisos; esto es para la asignación de coordinadores y los filtros de informes, no para el mapeo.",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "add": "Agregar subregión",
+      "cancel": "Cancelar",
+      "create": "Crear subregión",
+      "edit_aria": "Editar subregión",
+      "mark_inactive": "Marcar inactivo",
+      "save_changes": "Guardar cambios"
+    },
+    "confirm_mark_inactive": "¿Marcar \"{{name}}\" como inactivo? Los proveedores de atención vinculados quedarán desvinculados del mismo.",
+    "errors": {
+      "delete_failed": "No se pudo eliminar la subregión.",
+      "load_failed": "No se pudieron cargar las subregiones.",
+      "save_failed": "No se pudo guardar la subregión."
+    },
+    "filters": {
+      "search_aria": "Buscar subregiones",
+      "search_placeholder": "Buscar por nombre, descripción o slug...",
+      "type_aria": "Filtrar por tipo"
+    },
+    "form": {
+      "centre_latitude": "Latitud central",
+      "centre_longitude": "Longitud central",
+      "description": "Descripción",
+      "description_placeholder": "Breve descripción de esta zona...",
+      "latitude_placeholder": "47.1758",
+      "longitude_placeholder": "8.4622",
+      "name": "Nombre",
+      "name_placeholder": "p.ej. Lorzenhof",
+      "postal_codes": "Códigos postales",
+      "postal_codes_description": "Lista PLZ separada por comas o espacios.",
+      "postal_codes_placeholder": "6330, 6331, 6332",
+      "slug": "Slug (generado automáticamente si está en blanco)",
+      "slug_description": "Identificador en minúsculas y con guiones utilizado en URLs y filtros.",
+      "slug_placeholder": "p.ej. lorzenhof",
+      "status": "Estado",
+      "type": "Tipo"
+    },
+    "meta": {
+      "page_title": "Subregiones - Administrador",
+      "subtitle": "Subdivisiones Quartier, Ortsteil, Gemeinde y Kanton para el directorio de proveedores de atención y filtros de localidad",
+      "title": "Subregiones"
+    },
+    "modal": {
+      "add_title": "Agregar subregión",
+      "edit_title": "Editar: {{name}}"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "table": {
+      "actions": "Comportamiento",
+      "aria": "Tabla de subregiones",
+      "coordinates": "Coordenadas",
+      "empty": "Aún no hay subregiones: agregue una para comenzar a segmentar geográficamente a su inquilino.",
+      "name": "Nombre",
+      "postal_codes": "Códigos postales",
+      "status": "Estado",
+      "type": "Tipo"
+    },
+    "toasts": {
+      "created": "Subregión creada correctamente.",
+      "marked_inactive": "Subregión marcada como inactiva.",
+      "updated": "Subregión actualizada correctamente."
+    },
+    "type_options": {
+      "all": "Todos los tipos",
+      "canton": "Cantón",
+      "municipality": "Municipio (Gemeinde)",
+      "ortsteil": "Ortsteil (distrito)",
+      "other": "Otro",
+      "quartier": "Barrio (barrio)"
+    },
+    "validation": {
+      "latitude_number": "La latitud debe ser un número.",
+      "longitude_number": "La longitud debe ser un número.",
+      "name_required": "El nombre es obligatorio.",
+      "type_required": "Se requiere tipo."
     }
   }
 }

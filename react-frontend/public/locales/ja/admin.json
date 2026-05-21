@@ -10173,7 +10173,29 @@
     "title_create": "Create",
     "title_edit": "Edit",
     "twitter_label": "Twitter",
-    "youtube_label": "Youtube"
+    "youtube_label": "Youtube",
+    "countries": {
+      "AT": "オーストリア",
+      "AU": "オーストラリア",
+      "BE": "ベルギー",
+      "CA": "カナダ",
+      "CH": "スイス",
+      "DE": "ドイツ",
+      "DK": "デンマーク",
+      "ES": "スペイン",
+      "FI": "フィンランド",
+      "FR": "フランス",
+      "GB": "イギリス",
+      "IE": "アイルランド",
+      "IT": "イタリア",
+      "NL": "オランダ",
+      "NO": "ノルウェー",
+      "NZ": "ニュージーランド",
+      "PL": "ポーランド",
+      "PT": "ポルトガル",
+      "SE": "スウェーデン",
+      "US": "米国"
+    }
   },
   "tenant_list": {
     "action_delete": "Delete",
@@ -13443,6 +13465,291 @@
       "seeded": "シード済みのデモ カード 3 枚",
       "update_failed": "アップデートに失敗しました",
       "updated": "ストーリーが更新されました"
+    }
+  },
+  "disclosure_pack": {
+    "about": {
+      "body_prefix": "開示パック (AG80) は、",
+      "body_suffix": "地域ケアプログラムに参加する前に住民に周知しなければならないデータ保護開示文書。データ管理者と処理者の身元、処理されるデータのカテゴリ、法的根拠、データ主体の権利、インシデント対応の連絡先、国境を越えた転送の保護措置が含まれます。",
+      "review_middle": "出版前のカウンセリング。コントローラーの詳細、インシデント対応の所有者、展開の分離ノード構成を編集してから、次を使用します。",
+      "review_prefix": "このパックは作業中のドラフトです - でレビューしてください",
+      "review_suffix": "法的な引き継ぎ文書を作成します。デフォルトはプラットフォーム側のコミットメントを反映しています。エクスポートする前に変更を保存します。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "export_markdown": "マークダウンのエクスポート",
+      "refresh": "リフレッシュ",
+      "refresh_aria": "開示パックを更新する",
+      "save_changes": "変更を保存する"
+    },
+    "descriptions": {
+      "backup_owner": "データベースのバックアップ ストレージと保持を担当する法人。",
+      "hosting_owner": "サーバー インフラストラクチャを管理する法人 (例: 州の IT 部門)。",
+      "smtp_owner": "アウトバウンド電子メール配信を担当する法人。",
+      "storage_owner": "ファイル/BLOB ストレージ (アップロード、エクスポート) を管理する法人。",
+      "update_cadence": "カントンノードがプラットフォームの更新を受け取る頻度 (例: 「毎月」、「四半期」)。"
+    },
+    "fields": {
+      "address": "住所",
+      "backup_owner": "バックアップ所有者",
+      "contact_email": "連絡先メールアドレス",
+      "controller_name": "コントローラ名",
+      "data_protection_officer": "データ保護責任者",
+      "fadp_authority": "FADP 権限",
+      "hosting_owner": "ホスティングオーナー",
+      "notification_window_hours": "通知ウィンドウ (時間)",
+      "owner_name": "所有者名",
+      "processor_name": "プロセッサ名",
+      "smtp_owner": "SMTP オーナー",
+      "storage_owner": "ストレージ所有者",
+      "sub_processors": "サブプロセッサ (1 行に 1 つ)",
+      "update_cadence": "更新頻度"
+    },
+    "footer": {
+      "customised": "カスタマイズされた",
+      "last_saved": "最後に保存した {{date}}"
+    },
+    "isolated_node": {
+      "description_prefix": "これらのフィールドは、この展開が州が管理するインフラストラクチャで実行される場合にのみ関連します。標準のホスト型展開の場合は、デフォルトのままにしておきます。各所有者フィールドは、そのインフラストラクチャ コンポーネントに責任を負う法人を識別します。",
+      "description_suffix": "第9条。"
+    },
+    "labels": {
+      "aggregate_policy": "集約ポリシー"
+    },
+    "meta": {
+      "page_title": "FADP / nDSG 開示パック",
+      "subtitle": "AG80 - スイスのデータ保護法のパイロット開示文書",
+      "title": "FADP / nDSG 開示パック"
+    },
+    "sections": {
+      "data_categories": "データカテゴリー",
+      "destinations": "目的地",
+      "federation_policy": "フェデレーションポリシー",
+      "isolated_node_configuration": "分離ノード構成",
+      "lawful_basis": "法的根拠",
+      "platform_processor": "プラットフォームプロセッサ",
+      "retention_defaults": "保持のデフォルト",
+      "safeguards": "安全対策",
+      "tenant_controller": "テナントコントローラー"
+    },
+    "status": {
+      "cross_border_occurs": "国境を越えた転送が発生する",
+      "disabled": "無効",
+      "disabled_lower": "無効",
+      "enabled": "有効",
+      "enabled_lower": "有効",
+      "members_can_opt_out": "メンバーはオプトアウトできます",
+      "no_cross_border_transfers": "国境を越えた転送は禁止",
+      "no_member_opt_out": "メンバーのオプトアウトはありません"
+    },
+    "tabs": {
+      "aria": "開示セクション",
+      "controller": "コントローラーとプロセッサー",
+      "cross_border_transfers": "国境を越えた送金",
+      "data_retention": "データと保持",
+      "data_subject_rights": "データ主体の権利",
+      "federation_isolated_node": "フェデレーションと孤立したノード",
+      "incident_response": "インシデント対応"
+    },
+    "toasts": {
+      "export_empty": "エクスポートが空で返されました",
+      "export_failed": "開示パックのエクスポートに失敗しました",
+      "exported": "開示パックがエクスポートされました",
+      "load_failed": "開示パックのロードに失敗しました",
+      "save_failed": "開示パックの保存に失敗しました",
+      "saved": "開示パックが保存されました"
+    }
+  },
+  "external_integrations": {
+    "about": {
+      "body": "外部統合は、銀行取引、AHV 送信、郵便住所検証、州のデータ フィードなど、パートナーに依存する接続のバックログ トラッカーです。各エントリは、統合所有者、データ共有契約 (DSA) のステータス、およびサンドボックスの準備状況を追跡します。これを使用して外部パートナーと調整し、関係者に進捗状況を報告します。",
+      "dsa_body": "ライブデータ交換の前に署名する必要があります。 Research Partnerships テンプレートを使用して契約書の草案を作成します。",
+      "dsa_label": "DSA (データ共有契約):",
+      "sandbox_body": "パートナーのテスト環境へのリンク。ライブに昇格する前に、サンドボックスで統合を検証します。",
+      "sandbox_label": "サンドボックス URL:",
+      "statuses_body": "提案 -> スコーピング -> サンドボックス -> ライブ。ブロックされているということは、外部依存関係が未解決であることを意味します。",
+      "statuses_label": "ステータス:",
+      "title": "このページについて"
+    },
+    "actions": {
+      "add": "統合の追加",
+      "cancel": "キャンセル",
+      "create": "統合の作成",
+      "delete": "消去",
+      "edit": "編集",
+      "open": "開ける",
+      "refresh": "リフレッシュ",
+      "remove": "取り除く",
+      "save_changes": "変更を保存する",
+      "seed": "シードのデフォルトのバックログ"
+    },
+    "categories": {
+      "ahv": "AHV",
+      "banking": "銀行業",
+      "healthcare": "健康管理",
+      "identity_verification": "本人確認",
+      "municipal_data": "自治体データ",
+      "other": "他の",
+      "payment": "支払い",
+      "postal": "郵便",
+      "professional_care": "プロフェッショナルケア"
+    },
+    "delete_modal": {
+      "body_prefix": "これにより、バックログ エントリが完全に削除されます。",
+      "body_suffix": "外部パートナー レコードは影響を受けません。追跡エントリのみが削除されます。",
+      "title": "統合の削除",
+      "warning": "この操作は元に戻すことができません。"
+    },
+    "dsa_statuses": {
+      "drafting": "製図",
+      "in_review": "レビュー中",
+      "not_required": "不要",
+      "signed": "署名済み"
+    },
+    "editor": {
+      "add_title": "統合の追加",
+      "category": "カテゴリ",
+      "dsa_status": "データ共有契約",
+      "edit_title": "編集: {{name}}",
+      "interface_spec_placeholder": "https://docs.partner.example/spec",
+      "interface_spec_url": "インターフェース仕様 URL",
+      "name": "名前",
+      "name_placeholder": "例えばAHV 送信ゲートウェイ",
+      "notes": "注意事項",
+      "notes_placeholder": "未解決の質問、阻害要因、依存関係、契約上の注意事項...",
+      "owner_email": "所有者のメールアドレス",
+      "owner_email_placeholder": "contact@partner.example",
+      "owner_name": "所有者名",
+      "owner_name_placeholder": "外部連絡先のフルネーム",
+      "sandbox_placeholder": "https://sandbox.partner.example",
+      "sandbox_url": "サンドボックス URL",
+      "status": "状態"
+    },
+    "empty": {
+      "body": "厳選されたよく知られたパートナー依存の統合セット (AHV 送信、Spitex ハンドオフ、州のマスターデータ フィード、PostFinance、Twint、住所検証) をシードして、プラットフォーム オペレーターが所有者、DSA ステータス、サンドボックスの準備状況を追跡できるようにします。",
+      "title": "統合はまだ追跡されていません"
+    },
+    "last_updated": "最終更新日 {{date}}",
+    "meta": {
+      "subtitle": "AG87 - 外部所有者を待っているパートナー依存の統合 / DSA / サンドボックス",
+      "title": "外部統合バックログ"
+    },
+    "statuses": {
+      "blocked": "ブロックされました",
+      "deprecated": "廃止されました",
+      "live": "ライブ",
+      "proposed": "提案された",
+      "sandbox": "サンドボックス",
+      "scoping": "スコーピング"
+    },
+    "table": {
+      "actions": "アクション",
+      "aria": "外部統合",
+      "category": "カテゴリ",
+      "dsa": "DSA",
+      "name": "名前",
+      "owner": "所有者",
+      "row_actions": "行アクション",
+      "sandbox": "サンドボックス",
+      "status": "状態",
+      "updated": "更新されました"
+    },
+    "toasts": {
+      "create_failed": "作成に失敗しました",
+      "created": "統合が作成されました",
+      "delete_failed": "削除に失敗しました",
+      "load_failed": "統合バックログのロードに失敗しました",
+      "removed": "統合が削除されました",
+      "seed_failed": "シードに失敗しました",
+      "seeded": "シードされたデフォルトのバックログ",
+      "update_failed": "アップデートに失敗しました",
+      "updated": "統合が更新されました"
+    }
+  },
+  "sub_regions": {
+    "about": {
+      "body": "サブリージョンは、コミュニティを地理的エリア (近隣、地区、または区) に分割します。これらは、コーディネーターを特定のエリアに割り当て、場所ごとにヘルプ リクエストをフィルタリングし、近隣ごとにパイロット メトリクスを分析するために使用されます。サブリージョンの追加はオプションですが、複数のコーディネーター チームがいる大規模なコミュニティでは強く推奨されます。",
+      "postal_codes_note": "[郵便番号] フィールド: 郵便番号リスト、近隣の名前、または自由形式の説明を入力します。正確な境界は必要ありません。これは、マッピングではなく、コーディネーターの割り当てとレポート フィルター用です。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "add": "サブ領域の追加",
+      "cancel": "キャンセル",
+      "create": "サブ領域の作成",
+      "edit_aria": "サブ領域の編集",
+      "mark_inactive": "非アクティブとしてマークする",
+      "save_changes": "変更を保存する"
+    },
+    "confirm_mark_inactive": "「{{name}}」を非アクティブとしてマークしますか?リンクされている医療提供者はそこから切り離されることになる。",
+    "errors": {
+      "delete_failed": "サブ領域の削除に失敗しました。",
+      "load_failed": "サブ領域のロードに失敗しました。",
+      "save_failed": "サブ領域の保存に失敗しました。"
+    },
+    "filters": {
+      "search_aria": "サブリージョンを検索する",
+      "search_placeholder": "名前、説明、またはスラッグで検索します...",
+      "type_aria": "タイプでフィルタリングする"
+    },
+    "form": {
+      "centre_latitude": "中心緯度",
+      "centre_longitude": "中心経度",
+      "description": "説明",
+      "description_placeholder": "このエリアについて簡単に説明すると...",
+      "latitude_placeholder": "47.1758",
+      "longitude_placeholder": "8.4622",
+      "name": "名前",
+      "name_placeholder": "例えばロルツェンホフ",
+      "postal_codes": "郵便番号",
+      "postal_codes_description": "カンマまたはスペースで区切られた PLZ リスト。",
+      "postal_codes_placeholder": "6330, 6331, 6332",
+      "slug": "スラグ (空白の場合は自動生成)",
+      "slug_description": "URL およびフィルタで使用される小文字のハイフンでつながれた識別子。",
+      "slug_placeholder": "例えばロルツェンホフ",
+      "status": "状態",
+      "type": "タイプ"
+    },
+    "meta": {
+      "page_title": "サブリージョン - 管理者",
+      "subtitle": "医療提供者ディレクトリと地域フィルター用のカルチェ、オルトシュタイン、ゲマインデ、およびカントンの区画",
+      "title": "サブリージョン"
+    },
+    "modal": {
+      "add_title": "サブ領域の追加",
+      "edit_title": "編集: {{name}}"
+    },
+    "status": {
+      "active": "アクティブ",
+      "inactive": "非アクティブ"
+    },
+    "table": {
+      "actions": "アクション",
+      "aria": "サブ領域テーブル",
+      "coordinates": "座標",
+      "empty": "サブリージョンはまだありません。サブリージョンを追加して、テナントの地理的なセグメント化を開始します。",
+      "name": "名前",
+      "postal_codes": "郵便番号",
+      "status": "状態",
+      "type": "タイプ"
+    },
+    "toasts": {
+      "created": "サブ領域が正常に作成されました。",
+      "marked_inactive": "サブ領域は非アクティブとしてマークされています。",
+      "updated": "サブリージョンが正常に更新されました。"
+    },
+    "type_options": {
+      "all": "全種類",
+      "canton": "カントン",
+      "municipality": "自治体 (ゲマインデ)",
+      "ortsteil": "オルトシュタイル (地区)",
+      "other": "他の",
+      "quartier": "カルチェ (地区)"
+    },
+    "validation": {
+      "latitude_number": "緯度は数値でなければなりません。",
+      "longitude_number": "経度は数値でなければなりません。",
+      "name_required": "名前は必須です。",
+      "type_required": "タイプは必須です。"
     }
   }
 }

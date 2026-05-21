@@ -10173,7 +10173,29 @@
     "title_create": "Create",
     "title_edit": "Edit",
     "twitter_label": "Twitter",
-    "youtube_label": "Youtube"
+    "youtube_label": "Youtube",
+    "countries": {
+      "AT": "Ostair",
+      "AU": "Astráil",
+      "BE": "an Bheilg",
+      "CA": "Ceanada",
+      "CH": "Eilvéis",
+      "DE": "an Ghearmáin",
+      "DK": "an Danmhairg",
+      "ES": "Spáinn",
+      "FI": "an Fhionlainn",
+      "FR": "Fhrainc",
+      "GB": "An Ríocht Aontaithe",
+      "IE": "Éire",
+      "IT": "an Iodáil",
+      "NL": "Ísiltír",
+      "NO": "Iorua",
+      "NZ": "an Nua-Shéalainn",
+      "PL": "an Pholainn",
+      "PT": "an Phortaingéil",
+      "SE": "an tSualainn",
+      "US": "Stáit Aontaithe Mheiriceá"
+    }
   },
   "tenant_list": {
     "action_delete": "Delete",
@@ -13443,6 +13465,291 @@
       "seeded": "Seeded 3 cártaí taispeána",
       "update_failed": "Theip ar an nuashonrú",
       "updated": "Nuashonraíodh an scéal"
+    }
+  },
+  "disclosure_pack": {
+    "about": {
+      "body_prefix": "Is é an Pacáiste Nochtadh (AG80) an",
+      "body_suffix": "doiciméad nochta um chosaint sonraí nach mór cónaitheoirí a chur ar an eolas faoi sula nglacfaidh siad páirt sa chlár cúraim phobail. Clúdaíonn sé céannachtaí an rialaitheora sonraí agus an phróiseálaí, catagóirí sonraí arna bpróiseáil, bunús dleathach, cearta ábhar sonraí, teagmhálacha freagartha ar theagmhais, agus cosaintí aistrithe trasteorann.",
+      "review_middle": "abhcóide roimh fhoilsiú. Cuir sonraí an rialtóra, úinéir freagartha teagmhais, agus cumraíocht nód leithlisithe in eagar le haghaidh d'imscartha agus ansin bain úsáid as",
+      "review_prefix": "Is dréacht oibre é an pacáiste seo - déan athbhreithniú air",
+      "review_suffix": "an doiciméad aistrithe dlíthiúil a thabhairt ar aird. Léiríonn mainneachtain gealltanais ar thaobh an ardáin. Sábháil aon athruithe roimh easpórtáil.",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "export_markdown": "Easpórtáil Markdown",
+      "refresh": "Athnuaigh",
+      "refresh_aria": "Athnuaigh pacáiste nochtaithe",
+      "save_changes": "Sábháil athruithe"
+    },
+    "descriptions": {
+      "backup_owner": "Aonán dlíthiúil atá freagrach as stóráil agus coinneáil chúltaca bunachar sonraí.",
+      "hosting_owner": "Aonán dlíthiúil a rialaíonn bonneagar an fhreastalaí (m.sh. an roinn TF canton).",
+      "smtp_owner": "Aonán dlíthiúil atá freagrach as seachadadh ríomhphoist amach.",
+      "storage_owner": "Aonán dlíthiúil a rialaíonn stóráil comhad/blob (uaslódálacha, onnmhairí).",
+      "update_cadence": "Cé chomh minic is a fhaigheann an nód canton nuashonruithe ardáin (m.sh. ‘míosúil’, ‘ráithiúil’)."
+    },
+    "fields": {
+      "address": "Seoladh",
+      "backup_owner": "Úinéir cúltaca",
+      "contact_email": "Ríomhphost teagmhála",
+      "controller_name": "Ainm rialtóir",
+      "data_protection_officer": "Oifigeach cosanta sonraí",
+      "fadp_authority": "FADP údarás",
+      "hosting_owner": "Úinéir óstála",
+      "notification_window_hours": "Fuinneog fógra (uaireanta)",
+      "owner_name": "Ainm úinéara",
+      "processor_name": "Ainm próiseálaí",
+      "smtp_owner": "SMTP úinéir",
+      "storage_owner": "Úinéir stórála",
+      "sub_processors": "Fophróiseálaithe (ceann amháin in aghaidh an líne)",
+      "update_cadence": "Dúnta a nuashonrú"
+    },
+    "footer": {
+      "customised": "Saincheaptha",
+      "last_saved": "An uair dheireanach a sábháladh {{date}}"
+    },
+    "isolated_node": {
+      "description_prefix": "Ní bheidh na réimsí seo ábhartha ach amháin má ritheann an t-imscaradh seo ar bhonneagar canton-rialaithe. Le haghaidh imlonnaithe óstaithe caighdeánacha, fág mar réamhshocruithe. Sainaithníonn gach réimse úinéara an t-eintiteas dlíthiúil atá freagrach as an gcomhpháirt bonneagair sin faoi",
+      "description_suffix": "Airteagal 9."
+    },
+    "labels": {
+      "aggregate_policy": "Beartas comhiomlán"
+    },
+    "meta": {
+      "page_title": "FADP / nDSG Pacáiste Nochtadh",
+      "subtitle": "AG80 - doiciméad píolótach nochta do dhlí na hEilvéise um chosaint sonraí",
+      "title": "FADP / nDSG Pacáiste Nochtadh"
+    },
+    "sections": {
+      "data_categories": "Catagóirí sonraí",
+      "destinations": "Cinn scríbe",
+      "federation_policy": "Beartas Cónaidhme",
+      "isolated_node_configuration": "Cumraíocht nód scoite",
+      "lawful_basis": "Bunús dleathach",
+      "platform_processor": "Próiseálaí ardán",
+      "retention_defaults": "Mainneachtainí coinneála",
+      "safeguards": "Coimircí",
+      "tenant_controller": "Rialaitheoir tionónta"
+    },
+    "status": {
+      "cross_border_occurs": "Tarlaíonn aistrithe trasteorann",
+      "disabled": "faoi ​​mhíchumas",
+      "disabled_lower": "faoi ​​mhíchumas",
+      "enabled": "Cumasaithe",
+      "enabled_lower": "cumasaithe",
+      "members_can_opt_out": "Is féidir le baill rogha an diúltaithe",
+      "no_cross_border_transfers": "Gan aon aistrithe trasteorann",
+      "no_member_opt_out": "Níl aon bhall tarraingthe amach"
+    },
+    "tabs": {
+      "aria": "Ailt Nochta",
+      "controller": "Rialaitheoir & Próiseálaí",
+      "cross_border_transfers": "Aistrithe trasteorann",
+      "data_retention": "Sonraí & coinneáil",
+      "data_subject_rights": "Cearta ábhar sonraí",
+      "federation_isolated_node": "Cónaidhm & nód scoite",
+      "incident_response": "Freagra ar theagmhais"
+    },
+    "toasts": {
+      "export_empty": "Easpórtáil ar ais folamh",
+      "export_failed": "Theip ar easpórtáil an phacáiste nochta",
+      "exported": "Easpórtáil an pacáiste nochta",
+      "load_failed": "Theip ar lódáil an phacáiste nochta",
+      "save_failed": "Theip ar shábháil an phacáiste nochta",
+      "saved": "Pacáiste nochta sábháilte"
+    }
+  },
+  "external_integrations": {
+    "about": {
+      "body": "Is rianaire riaráiste é Comhtháthú Seachtracha le haghaidh naisc atá ag brath ar chomhpháirtí - baincéireacht, aighneacht AHV, fíorú seoltaí poist, agus fothaí sonraí cantonal. Rianaíonn gach iontráil úinéir an chomhtháthaithe, stádas an chomhaontaithe comhroinnte sonraí (DSA), agus ullmhacht an bhosca gainimh. Bain úsáid as seo chun comhordú le comhpháirtithe seachtracha agus chun dul chun cinn a thuairisciú do pháirtithe leasmhara.",
+      "dsa_body": "Ní mór é a shíniú roimh aon mhalartú sonraí beo. Comhaontuithe a dhréachtú ag baint úsáide as teimpléid na gComhpháirtíochtaí Taighde.",
+      "dsa_label": "DSA (Comhaontú Comhroinnte Sonraí):",
+      "sandbox_body": "Nasc le timpeallacht tástála an pháirtí. Bailíochtaigh an comhtháthú i mbosca gainimh roimh chur chun cinn chun cónaí.",
+      "sandbox_label": "Bosca gainimh URL:",
+      "statuses_body": "Molta -> Scóip -> Bosca Gainimh -> Beo. Ciallaíonn blocáilte go bhfuil spleáchas seachtrach gan réiteach.",
+      "statuses_label": "Stádais:",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "add": "Cuir comhtháthú leis",
+      "cancel": "Cealaigh",
+      "create": "Cruthaigh comhtháthú",
+      "delete": "Scrios",
+      "edit": "Cuir in eagar",
+      "open": "Oscail",
+      "refresh": "Athnuaigh",
+      "remove": "Bain",
+      "save_changes": "Sábháil athruithe",
+      "seed": "Riaráiste réamhshocraithe síolta"
+    },
+    "categories": {
+      "ahv": "AHV",
+      "banking": "Baincéireacht",
+      "healthcare": "Cúram sláinte",
+      "identity_verification": "Fíorú aitheantais",
+      "municipal_data": "Sonraí cathrach",
+      "other": "Eile",
+      "payment": "Íocaíocht",
+      "postal": "Poist",
+      "professional_care": "Cúram gairmiúil"
+    },
+    "delete_modal": {
+      "body_prefix": "Bainfidh sé seo go buan an iontráil riaráiste le haghaidh",
+      "body_suffix": "Ní dhéantar difear do thaifead na gcomhpháirtithe seachtracha - ní dhéantar ach an iontráil rianaithe a bhaint.",
+      "title": "Bain comhtháthú",
+      "warning": "Ní féidir an gníomh seo a chealú."
+    },
+    "dsa_statuses": {
+      "drafting": "Dréachtadh",
+      "in_review": "In athbhreithniú",
+      "not_required": "Ní gá",
+      "signed": "Sínithe"
+    },
+    "editor": {
+      "add_title": "Cuir comhtháthú leis",
+      "category": "Catagóir",
+      "dsa_status": "Comhaontú comhroinnte sonraí",
+      "edit_title": "Cuir: {{name}}",
+      "interface_spec_placeholder": "https://docs.partner.example/spec",
+      "interface_spec_url": "Sonraíocht an chomhéadain URL",
+      "name": "Ainm",
+      "name_placeholder": "e.g. AHV geata aighneachta",
+      "notes": "Nótaí",
+      "notes_placeholder": "Ceisteanna oscailte, bacóirí, spleáchais, nótaí conartha...",
+      "owner_email": "Ríomhphost úinéara",
+      "owner_email_placeholder": "contact@partner.sampla",
+      "owner_name": "Ainm úinéara",
+      "owner_name_placeholder": "Ainm iomlán teagmhálaí seachtracha",
+      "sandbox_placeholder": "https://sandbox.partner.example",
+      "sandbox_url": "Bosca gainimh URL",
+      "status": "Stádas"
+    },
+    "empty": {
+      "body": "Síl sraith coimeádaithe de chomhtháthaithe dea-aitheanta atá ag brath ar chomhpháirtí (aighneacht AHV, Spitex handoff, fotha máistir-shonraí cantonal, PostFinance, Twint, fíorú seoltaí poist) ionas gur féidir le hoibreoir an ardáin rianú úinéara, stádas DSA, agus ullmhacht an bhosca gainimh.",
+      "title": "Níl aon chomhtháthú rianaithe fós"
+    },
+    "last_updated": "Nuashonraithe {{date}} is déanaí",
+    "meta": {
+      "subtitle": "AG87 - comhtháthuithe atá ag brath ar chomhpháirtí ag fanacht ar úinéir seachtrach / DSA/ bosca gainimh",
+      "title": "Riaráiste Comhtháthaithe Seachtrach"
+    },
+    "statuses": {
+      "blocked": "bactha",
+      "deprecated": "Dímheasta",
+      "live": "Beo",
+      "proposed": "Beartaithe",
+      "sandbox": "Bosca gainimh",
+      "scoping": "Scóip"
+    },
+    "table": {
+      "actions": "Gníomhartha",
+      "aria": "Comhtháthaithe seachtracha",
+      "category": "Catagóir",
+      "dsa": "DSA",
+      "name": "Ainm",
+      "owner": "Úinéir",
+      "row_actions": "Gníomhartha as a chéile",
+      "sandbox": "Bosca gainimh",
+      "status": "Stádas",
+      "updated": "Nuashonraithe"
+    },
+    "toasts": {
+      "create_failed": "Theip ar chruthú",
+      "created": "Comhtháthú cruthaithe",
+      "delete_failed": "Theip ar an scriosadh",
+      "load_failed": "Theip ar riaráiste an chomhtháthaithe a lódáil",
+      "removed": "Baineadh an comhtháthú",
+      "seed_failed": "Theip ar shíol",
+      "seeded": "Riaráiste réamhshocraithe sílithe",
+      "update_failed": "Theip ar an nuashonrú",
+      "updated": "Comhtháthú nuashonraithe"
+    }
+  },
+  "sub_regions": {
+    "about": {
+      "body": "Roinneann Fo-Réigiúin do phobal ina limistéir gheografacha (comharsanachtaí, ceantair nó bardaí). Úsáidtear iad chun comhordaitheoirí a shannadh do réimsí sonracha, iarratais ar chabhair a scagadh de réir suímh, agus mion-mhéadracht phíolótacha de réir comharsanachta. Tá sé roghnach fo-réigiúin a chur leis ach moltar go láidir é do phobail níos mó le foirne comhordaithe iolracha.",
+      "postal_codes_note": "Le haghaidh réimse na gCód Poist: cuir isteach liosta postchóid, ainm comharsanachta, nó cur síos saorfhoirme. Níl teorainneacha beachta ag teastáil - baineann sé seo le sannadh comhordaitheora agus scagairí tuairiscithe, ní le haghaidh mapála.",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "add": "Cuir Fo-Réigiún leis",
+      "cancel": "Cealaigh",
+      "create": "Cruthaigh Fo-Réigiún",
+      "edit_aria": "Cuir fo-réigiún in eagar",
+      "mark_inactive": "Marcáil neamhghníomhach",
+      "save_changes": "Sábháil athruithe"
+    },
+    "confirm_mark_inactive": "Marcáil \"{{name}}\" mar neamhghníomhach? Beidh soláthraithe cúraim nasctha scoite uaidh.",
+    "errors": {
+      "delete_failed": "Theip ar an bhfo-réigiún a scriosadh.",
+      "load_failed": "Theip ar lódáil na bhfo-réigiúin.",
+      "save_failed": "Theip ar shábháil an fho-réigiúin."
+    },
+    "filters": {
+      "search_aria": "Cuardaigh fo-réigiúin",
+      "search_placeholder": "Cuardaigh de réir ainm, tuairisce nó seilide...",
+      "type_aria": "Scag de réir cineáil"
+    },
+    "form": {
+      "centre_latitude": "domhanleithead lár",
+      "centre_longitude": "Domhanfhad lár",
+      "description": "Cur síos",
+      "description_placeholder": "Cur síos gairid ar an réimse seo...",
+      "latitude_placeholder": "47.1758",
+      "longitude_placeholder": "8.4622",
+      "name": "Ainm",
+      "name_placeholder": "e.g. Lorzenhof",
+      "postal_codes": "Cóid poist",
+      "postal_codes_description": "Liosta PLZ camóg nó spásscartha.",
+      "postal_codes_placeholder": "6330, 6331, 6332",
+      "slug": "Drúchtín (uathghinte má tá sé bán)",
+      "slug_description": "Cás íochtair, aitheantóir hyphenated a úsáidtear i URLs agus scagairí.",
+      "slug_placeholder": "e.g. lorzenhof",
+      "status": "Stádas",
+      "type": "Cineál"
+    },
+    "meta": {
+      "page_title": "Fo-Réigiúin - Riarachán",
+      "subtitle": "Fo-ranna Quartier, Ortsteil, Gemeinde agus Kanton don eolaire soláthraí cúraim agus scagairí ceantair",
+      "title": "Fo-Réigiúin"
+    },
+    "modal": {
+      "add_title": "Cuir Fo-Réigiún leis",
+      "edit_title": "Cuir: {{name}}"
+    },
+    "status": {
+      "active": "Gníomhach",
+      "inactive": "Neamhghníomhach"
+    },
+    "table": {
+      "actions": "Gníomhartha",
+      "aria": "Tábla fo-réigiúin",
+      "coordinates": "Comhordanáidí",
+      "empty": "Níl fo-réigiúin ar bith fós - cuir ceann leis chun do thionónta a dheighilt go tíreolaíoch.",
+      "name": "Ainm",
+      "postal_codes": "Cóid poist",
+      "status": "Stádas",
+      "type": "Cineál"
+    },
+    "toasts": {
+      "created": "Fo-réigiún cruthaithe go rathúil.",
+      "marked_inactive": "Fo-réigiún marcáilte neamhghníomhach.",
+      "updated": "D'éirigh le nuashonrú an fho-réigiúin."
+    },
+    "type_options": {
+      "all": "Gach cineál",
+      "canton": "Canton",
+      "municipality": "Bardas (Gemeinde)",
+      "ortsteil": "Ortsteil (ceantar)",
+      "other": "Eile",
+      "quartier": "Ceathrú (comharsanacht)"
+    },
+    "validation": {
+      "latitude_number": "Caithfidh domhanleithead a bheith ina uimhir.",
+      "longitude_number": "Caithfidh gur uimhir é an Domhanfhad.",
+      "name_required": "Tá ainm ag teastáil.",
+      "type_required": "Cineál ag teastáil."
     }
   }
 }

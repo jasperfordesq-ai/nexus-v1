@@ -10173,7 +10173,29 @@
     "title_create": "Create",
     "title_edit": "Edit",
     "twitter_label": "Twitter",
-    "youtube_label": "Youtube"
+    "youtube_label": "Youtube",
+    "countries": {
+      "AT": "Oostenrijk",
+      "AU": "Australië",
+      "BE": "België",
+      "CA": "Canada",
+      "CH": "Zwitserland",
+      "DE": "Duitsland",
+      "DK": "Denemarken",
+      "ES": "Spanje",
+      "FI": "Finland",
+      "FR": "Frankrijk",
+      "GB": "Verenigd Koninkrijk",
+      "IE": "Ierland",
+      "IT": "Italië",
+      "NL": "Nederland",
+      "NO": "Noorwegen",
+      "NZ": "Nieuw-Zeeland",
+      "PL": "Polen",
+      "PT": "Portugal",
+      "SE": "Zweden",
+      "US": "Verenigde Staten"
+    }
   },
   "tenant_list": {
     "action_delete": "Delete",
@@ -13443,6 +13465,291 @@
       "seeded": "3 demokaarten geplaatst",
       "update_failed": "Update mislukt",
       "updated": "Verhaal bijgewerkt"
+    }
+  },
+  "disclosure_pack": {
+    "about": {
+      "body_prefix": "Het Disclosure Pack (AG80) is het",
+      "body_suffix": "openbaarmakingsdocument inzake gegevensbescherming waarvan bewoners op de hoogte moeten worden gesteld voordat zij deelnemen aan het gemeenschapszorgprogramma. Het heeft betrekking op de identiteit van de verwerkingsverantwoordelijke en de verwerker, de verwerkte gegevenscategorieën, de rechtsgrondslag, de rechten van de betrokkene, contacten met respons op incidenten en waarborgen voor grensoverschrijdende overdracht.",
+      "review_middle": "advies alvorens te publiceren. Bewerk de controllergegevens, de eigenaar van de incidentrespons en de geïsoleerde knooppuntconfiguratie voor uw implementatie en gebruik deze vervolgens",
+      "review_prefix": "Dit pakket is een werkconcept - bespreek het met",
+      "review_suffix": "om het document voor de juridische overdracht te produceren. Wanbetalingen weerspiegelen verplichtingen aan de kant van het platform. Sla eventuele wijzigingen op voordat u exporteert.",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "export_markdown": "Markdown exporteren",
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Vernieuw het openbaarmakingspakket",
+      "save_changes": "Wijzigingen opslaan"
+    },
+    "descriptions": {
+      "backup_owner": "Juridische entiteit die verantwoordelijk is voor de opslag en retentie van databaseback-ups.",
+      "hosting_owner": "Juridische entiteit die de serverinfrastructuur beheert (bijvoorbeeld de IT-afdeling van het kanton).",
+      "smtp_owner": "Juridische entiteit die verantwoordelijk is voor de bezorging van uitgaande e-mail.",
+      "storage_owner": "Rechtspersoon die de opslag van bestanden/blobs beheert (uploads, exports).",
+      "update_cadence": "Hoe vaak het kantonknooppunt platformupdates ontvangt (bijvoorbeeld 'maandelijks', 'driemaandelijks')."
+    },
+    "fields": {
+      "address": "Adres",
+      "backup_owner": "Back-up eigenaar",
+      "contact_email": "E-mailadres voor contact",
+      "controller_name": "Naam van controller",
+      "data_protection_officer": "Functionaris voor gegevensbescherming",
+      "fadp_authority": "FADP autoriteit",
+      "hosting_owner": "Hosting-eigenaar",
+      "notification_window_hours": "Meldingsvenster (uren)",
+      "owner_name": "Naam eigenaar",
+      "processor_name": "Processornaam",
+      "smtp_owner": "SMTP eigenaar",
+      "storage_owner": "Eigenaar van opslag",
+      "sub_processors": "Subverwerkers (één per lijn)",
+      "update_cadence": "Cadans bijwerken"
+    },
+    "footer": {
+      "customised": "Aangepast",
+      "last_saved": "Laatst opgeslagen {{date}}"
+    },
+    "isolated_node": {
+      "description_prefix": "Deze velden zijn alleen relevant als deze inzet draait op door het kanton gecontroleerde infrastructuur. Voor standaard gehoste implementaties laat u de standaardwaarden staan. In elk eigenaarveld wordt de rechtspersoon geïdentificeerd die verantwoordelijk is voor de desbetreffende infrastructuurcomponent",
+      "description_suffix": "Artikel 9."
+    },
+    "labels": {
+      "aggregate_policy": "Geaggregeerd beleid"
+    },
+    "meta": {
+      "page_title": "FADP / nDSG Disclosure-pakket",
+      "subtitle": "AG80 - pilot-openbaarmakingsdocument voor de Zwitserse wetgeving inzake gegevensbescherming",
+      "title": "FADP / nDSG Disclosure-pakket"
+    },
+    "sections": {
+      "data_categories": "Gegevenscategorieën",
+      "destinations": "Bestemmingen",
+      "federation_policy": "Federatie beleid",
+      "isolated_node_configuration": "Configuratie met geïsoleerde knooppunten",
+      "lawful_basis": "Wettelijke basis",
+      "platform_processor": "Platformprocessor",
+      "retention_defaults": "Standaardwaarden voor bewaring",
+      "safeguards": "Waarborgen",
+      "tenant_controller": "Huurder controleur"
+    },
+    "status": {
+      "cross_border_occurs": "Er vinden grensoverschrijdende overdrachten plaats",
+      "disabled": "Gehandicapt",
+      "disabled_lower": "gehandicapt",
+      "enabled": "Ingeschakeld",
+      "enabled_lower": "ingeschakeld",
+      "members_can_opt_out": "Leden kunnen zich afmelden",
+      "no_cross_border_transfers": "Geen grensoverschrijdende overdrachten",
+      "no_member_opt_out": "Er is geen opt-out voor leden"
+    },
+    "tabs": {
+      "aria": "Openbaarmakingssecties",
+      "controller": "Verwerkingsverantwoordelijke & Verwerker",
+      "cross_border_transfers": "Grensoverschrijdende overdrachten",
+      "data_retention": "Gegevens en retentie",
+      "data_subject_rights": "Rechten van betrokkenen",
+      "federation_isolated_node": "Federatie en geïsoleerd knooppunt",
+      "incident_response": "Reactie op incidenten"
+    },
+    "toasts": {
+      "export_empty": "Export is leeg geretourneerd",
+      "export_failed": "Kan het openbaarmakingspakket niet exporteren",
+      "exported": "Disclosure-pakket geëxporteerd",
+      "load_failed": "Kan het openbaarmakingspakket niet laden",
+      "save_failed": "Kan het openbaarmakingspakket niet opslaan",
+      "saved": "Disclosure-pakket opgeslagen"
+    }
+  },
+  "external_integrations": {
+    "about": {
+      "body": "External Integrations is een backlog-tracker voor partnerafhankelijke verbindingen: bankieren, AHV indiening, postadresverificatie en kantonale datafeeds. Bij elk item worden de eigenaar van de integratie, de status van de overeenkomst voor het delen van gegevens (DSA) en de gereedheid voor de sandbox bijgehouden. Gebruik dit om te coördineren met externe partners en om de voortgang aan belanghebbenden te rapporteren.",
+      "dsa_body": "Moet worden ondertekend vóór elke live gegevensuitwisseling. Maak overeenkomsten op met behulp van de Research Partnerships-sjablonen.",
+      "dsa_label": "DSA (overeenkomst voor het delen van gegevens):",
+      "sandbox_body": "Link naar de testomgeving van de partner. Valideer de integratie in de sandbox voordat u deze promoveert naar live.",
+      "sandbox_label": "Sandbox URL:",
+      "statuses_body": "Voorgesteld -> Scoping -> Sandbox -> Live. Geblokkeerd betekent dat een externe afhankelijkheid onopgelost is.",
+      "statuses_label": "Statussen:",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "add": "Voeg integratie toe",
+      "cancel": "Annuleren",
+      "create": "Creëer integratie",
+      "delete": "Verwijderen",
+      "edit": "Bewerking",
+      "open": "Open",
+      "refresh": "Vernieuwen",
+      "remove": "Verwijderen",
+      "save_changes": "Wijzigingen opslaan",
+      "seed": "Standaard achterstand inzaaien"
+    },
+    "categories": {
+      "ahv": "AHV",
+      "banking": "Bankieren",
+      "healthcare": "Gezondheidszorg",
+      "identity_verification": "Identiteitsverificatie",
+      "municipal_data": "Gemeentelijke gegevens",
+      "other": "Ander",
+      "payment": "Betaling",
+      "postal": "Post",
+      "professional_care": "Professionele zorg"
+    },
+    "delete_modal": {
+      "body_prefix": "Hiermee wordt de achterstandsinvoer voor permanent verwijderd",
+      "body_suffix": "Het externe partnerrecord wordt niet beïnvloed; alleen de trackinginvoer wordt verwijderd.",
+      "title": "Integratie verwijderen",
+      "warning": "Deze actie kan niet ongedaan worden gemaakt."
+    },
+    "dsa_statuses": {
+      "drafting": "Opstellen",
+      "in_review": "Wordt beoordeeld",
+      "not_required": "Niet vereist",
+      "signed": "Ondertekend"
+    },
+    "editor": {
+      "add_title": "Voeg integratie toe",
+      "category": "Categorie",
+      "dsa_status": "Overeenkomst voor het delen van gegevens",
+      "edit_title": "Bewerken: {{name}}",
+      "interface_spec_placeholder": "https://docs.partner.example/spec",
+      "interface_spec_url": "Interfacespecificatie URL",
+      "name": "Naam",
+      "name_placeholder": "bijv. AHV indieningsgateway",
+      "notes": "Opmerkingen",
+      "notes_placeholder": "Open vragen, blokkers, afhankelijkheden, contractuele opmerkingen...",
+      "owner_email": "E-mailadres van de eigenaar",
+      "owner_email_placeholder": "contact@partner.voorbeeld",
+      "owner_name": "Naam eigenaar",
+      "owner_name_placeholder": "Volledige naam van externe contactpersoon",
+      "sandbox_placeholder": "https://sandbox.partner.voorbeeld",
+      "sandbox_url": "Sandbox URL",
+      "status": "Status"
+    },
+    "empty": {
+      "body": "Zorg voor een samengestelde set bekende partnerafhankelijke integraties (AHV indiening, Spitex overdracht, kantonale masterdatafeed, PostFinance, Twint, postadresverificatie), zodat de platformbeheerder de eigenaar, DSA status en de gereedheid voor de sandbox kan volgen.",
+      "title": "Er zijn nog geen integraties bijgehouden"
+    },
+    "last_updated": "Laatst bijgewerkt {{date}}",
+    "meta": {
+      "subtitle": "AG87 - partnerafhankelijke integraties in afwachting van externe eigenaar / DSA / sandbox",
+      "title": "Externe integratieachterstand"
+    },
+    "statuses": {
+      "blocked": "Geblokkeerd",
+      "deprecated": "Afgekeurd",
+      "live": "Live",
+      "proposed": "Voorgesteld",
+      "sandbox": "Zandbak",
+      "scoping": "Scoring"
+    },
+    "table": {
+      "actions": "Acties",
+      "aria": "Externe integraties",
+      "category": "Categorie",
+      "dsa": "DSA",
+      "name": "Naam",
+      "owner": "Eigenaar",
+      "row_actions": "Rij-acties",
+      "sandbox": "Zandbak",
+      "status": "Status",
+      "updated": "Bijgewerkt"
+    },
+    "toasts": {
+      "create_failed": "Maken mislukt",
+      "created": "Integratie gecreëerd",
+      "delete_failed": "Verwijderen is mislukt",
+      "load_failed": "Kan de integratieachterstand niet laden",
+      "removed": "Integratie verwijderd",
+      "seed_failed": "Zaad is mislukt",
+      "seeded": "Gezaaide standaardachterstand",
+      "update_failed": "Update mislukt",
+      "updated": "Integratie bijgewerkt"
+    }
+  },
+  "sub_regions": {
+    "about": {
+      "body": "Subregio's verdelen uw gemeenschap in geografische gebieden (buurten, districten of wijken). Ze worden gebruikt om coördinatoren aan specifieke gebieden toe te wijzen, hulpverzoeken op locatie te filteren en pilotstatistieken op te splitsen per buurt. Het toevoegen van subregio's is optioneel, maar wordt sterk aanbevolen voor grotere gemeenschappen met meerdere coördinatorteams.",
+      "postal_codes_note": "Voor het veld Postcodes: voer een postcodelijst, buurtnaam of vrije beschrijving in. Nauwkeurige grenzen zijn niet vereist. Dit is bedoeld voor toewijzing van coördinatoren en rapportagefilters, niet voor mapping.",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "add": "Subregio toevoegen",
+      "cancel": "Annuleren",
+      "create": "Maak een subregio",
+      "edit_aria": "Subregio bewerken",
+      "mark_inactive": "Markeer inactief",
+      "save_changes": "Wijzigingen opslaan"
+    },
+    "confirm_mark_inactive": "Markeer '{{name}}' als inactief? Gekoppelde zorgaanbieders worden daarvan losgemaakt.",
+    "errors": {
+      "delete_failed": "Kan subregio niet verwijderen.",
+      "load_failed": "Kan subregio's niet laden.",
+      "save_failed": "Kan subregio niet opslaan."
+    },
+    "filters": {
+      "search_aria": "Zoek subregio's",
+      "search_placeholder": "Zoek op naam, beschrijving of naaktslak...",
+      "type_aria": "Filter op type"
+    },
+    "form": {
+      "centre_latitude": "Centrum breedtegraad",
+      "centre_longitude": "Centrum lengtegraad",
+      "description": "Beschrijving",
+      "description_placeholder": "Korte beschrijving van dit gebied...",
+      "latitude_placeholder": "47.1758",
+      "longitude_placeholder": "8.4622",
+      "name": "Naam",
+      "name_placeholder": "bijv. Lorzenhof",
+      "postal_codes": "Postcodes",
+      "postal_codes_description": "Door komma's of spaties gescheiden PLZ lijst.",
+      "postal_codes_placeholder": "6330, 6331, 6332",
+      "slug": "Slug (automatisch gegenereerd indien leeg)",
+      "slug_description": "Identificatie met koppelteken in kleine letters, gebruikt in URLs en filters.",
+      "slug_placeholder": "bijv. lorzenhof",
+      "status": "Status",
+      "type": "Type"
+    },
+    "meta": {
+      "page_title": "Subregio's - Beheerder",
+      "subtitle": "Onderverdelingen Quartier, Ortsteil, Gemeinde en Kanton voor de zorgverlenergids en locatiefilters",
+      "title": "Subregio's"
+    },
+    "modal": {
+      "add_title": "Subregio toevoegen",
+      "edit_title": "Bewerken: {{name}}"
+    },
+    "status": {
+      "active": "Actief",
+      "inactive": "Inactief"
+    },
+    "table": {
+      "actions": "Acties",
+      "aria": "Tabel met subregio's",
+      "coordinates": "Coördinaten",
+      "empty": "Nog geen subregio's. Voeg er een toe om uw tenant geografisch te segmenteren.",
+      "name": "Naam",
+      "postal_codes": "Postcodes",
+      "status": "Status",
+      "type": "Type"
+    },
+    "toasts": {
+      "created": "Subregio is succesvol aangemaakt.",
+      "marked_inactive": "Subregio gemarkeerd als inactief.",
+      "updated": "Subregio is succesvol bijgewerkt."
+    },
+    "type_options": {
+      "all": "Alle soorten",
+      "canton": "Kanton",
+      "municipality": "Gemeente (Gemeinde)",
+      "ortsteil": "Ortsteil (district)",
+      "other": "Ander",
+      "quartier": "Kwartier (buurt)"
+    },
+    "validation": {
+      "latitude_number": "De breedtegraad moet een getal zijn.",
+      "longitude_number": "Lengtegraad moet een getal zijn.",
+      "name_required": "Naam is vereist.",
+      "type_required": "Type is vereist."
     }
   }
 }

@@ -10173,7 +10173,29 @@
     "title_create": "Create",
     "title_edit": "Edit",
     "twitter_label": "Twitter",
-    "youtube_label": "Youtube"
+    "youtube_label": "Youtube",
+    "countries": {
+      "AT": "Austria",
+      "AU": "Australia",
+      "BE": "Belgia",
+      "CA": "Kanada",
+      "CH": "Szwajcaria",
+      "DE": "Niemcy",
+      "DK": "Dania",
+      "ES": "Hiszpania",
+      "FI": "Finlandia",
+      "FR": "Francja",
+      "GB": "Zjednoczone Królestwo",
+      "IE": "Irlandia",
+      "IT": "Włochy",
+      "NL": "Niderlandy",
+      "NO": "Norwegia",
+      "NZ": "Nowa Zelandia",
+      "PL": "Polska",
+      "PT": "Portugalia",
+      "SE": "Szwecja",
+      "US": "Stany Zjednoczone"
+    }
   },
   "tenant_list": {
     "action_delete": "Delete",
@@ -13443,6 +13465,291 @@
       "seeded": "Rozstawione 3 karty demo",
       "update_failed": "Aktualizacja nie powiodła się",
       "updated": "Historia zaktualizowana"
+    }
+  },
+  "disclosure_pack": {
+    "about": {
+      "body_prefix": "Pakiet ujawnień (AG80) to",
+      "body_suffix": "dokument ujawniający zasady ochrony danych, z którym mieszkańcy muszą się zapoznać przed wzięciem udziału w programie opieki środowiskowej. Obejmuje tożsamość administratora i podmiotu przetwarzającego dane, kategorie przetwarzanych danych, podstawę prawną, prawa osób, których dane dotyczą, kontakty w odpowiedzi na incydenty oraz gwarancje transferu transgranicznego.",
+      "review_middle": "porady przed publikacją. Edytuj szczegóły kontrolera, właściciela reakcji na incydent i konfigurację izolowanego węzła dla swojego wdrożenia, a następnie użyj",
+      "review_prefix": "Ten pakiet jest wersją roboczą — przejrzyj go za pomocą",
+      "review_suffix": "w celu przedstawienia prawnego dokumentu przekazania. Wartości domyślne odzwierciedlają zobowiązania po stronie platformy. Zapisz wszelkie zmiany przed eksportem.",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "export_markdown": "Eksportuj przecenę",
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież pakiet informacyjny",
+      "save_changes": "Zapisz zmiany"
+    },
+    "descriptions": {
+      "backup_owner": "Podmiot prawny odpowiedzialny za przechowywanie i przechowywanie kopii zapasowych baz danych.",
+      "hosting_owner": "Podmiot prawny kontrolujący infrastrukturę serwerową (np. dział IT kantonu).",
+      "smtp_owner": "Podmiot prawny odpowiedzialny za dostarczanie wychodzącej poczty elektronicznej.",
+      "storage_owner": "Podmiot prawny kontrolujący przechowywanie plików/blobów (przesyłanie, eksportowanie).",
+      "update_cadence": "Jak często węzeł kantonu otrzymuje aktualizacje platformy (np. „co miesiąc”, „kwartalnie”)."
+    },
+    "fields": {
+      "address": "Adres",
+      "backup_owner": "Właściciel kopii zapasowej",
+      "contact_email": "Adres e-mail do kontaktu",
+      "controller_name": "Nazwa kontrolera",
+      "data_protection_officer": "Inspektor ochrony danych",
+      "fadp_authority": "FADP autorytet",
+      "hosting_owner": "Właściciel hostingu",
+      "notification_window_hours": "Okno powiadomień (godziny)",
+      "owner_name": "Imię właściciela",
+      "processor_name": "Nazwa procesora",
+      "smtp_owner": "SMTP właściciel",
+      "storage_owner": "Właściciel magazynu",
+      "sub_processors": "Podwykonawcy przetwarzania (jeden na linię)",
+      "update_cadence": "Aktualizuj rytm"
+    },
+    "footer": {
+      "customised": "Dostosowane",
+      "last_saved": "Ostatnio zapisany {{date}}"
+    },
+    "isolated_node": {
+      "description_prefix": "Pola te są istotne tylko wtedy, gdy to wdrożenie działa w infrastrukturze kontrolowanej przez kanton. W przypadku standardowych wdrożeń hostowanych pozostaw ustawienia domyślne. Każde pole właściciela określa podmiot prawny odpowiedzialny za dany element infrastruktury",
+      "description_suffix": "Artykuł 9."
+    },
+    "labels": {
+      "aggregate_policy": "Polityka zbiorcza"
+    },
+    "meta": {
+      "page_title": "FADP / nDSG Pakiet informacyjny",
+      "subtitle": "AG80 – pilotażowy dokument ujawniający szwajcarskie prawo o ochronie danych",
+      "title": "FADP / nDSG Pakiet informacyjny"
+    },
+    "sections": {
+      "data_categories": "Kategorie danych",
+      "destinations": "Miejsca docelowe",
+      "federation_policy": "Polityka Federacji",
+      "isolated_node_configuration": "Konfiguracja izolowanego węzła",
+      "lawful_basis": "Podstawa prawna",
+      "platform_processor": "Procesor platformowy",
+      "retention_defaults": "Wartości domyślne przechowywania",
+      "safeguards": "Zabezpieczenia",
+      "tenant_controller": "Kontroler najemcy"
+    },
+    "status": {
+      "cross_border_occurs": "Zdarzają się przelewy transgraniczne",
+      "disabled": "Wyłączony",
+      "disabled_lower": "wyłączony",
+      "enabled": "Włączony",
+      "enabled_lower": "włączony",
+      "members_can_opt_out": "Członkowie mogą zrezygnować",
+      "no_cross_border_transfers": "Brak przelewów transgranicznych",
+      "no_member_opt_out": "Brak możliwości rezygnacji przez członka"
+    },
+    "tabs": {
+      "aria": "Sekcje ujawnień",
+      "controller": "Kontroler i procesor",
+      "cross_border_transfers": "Przelewy transgraniczne",
+      "data_retention": "Dane i przechowywanie",
+      "data_subject_rights": "Prawa osób, których dane dotyczą",
+      "federation_isolated_node": "Federacja i izolowany węzeł",
+      "incident_response": "Reakcja na incydent"
+    },
+    "toasts": {
+      "export_empty": "Eksport zwrócił pusty",
+      "export_failed": "Nie udało się wyeksportować pakietu ujawnień",
+      "exported": "Wyeksportowano pakiet ujawnień",
+      "load_failed": "Nie udało się załadować pakietu ujawnień",
+      "save_failed": "Nie udało się zapisać pakietu ujawnień",
+      "saved": "Pakiet ujawnień został zapisany"
+    }
+  },
+  "external_integrations": {
+    "about": {
+      "body": "Integracje zewnętrzne to narzędzie do śledzenia zaległości dla połączeń zależnych od partnerów — bankowość, składanie AHV, weryfikacja adresu pocztowego i źródła danych kantonalnych. Każdy wpis śledzi właściciela integracji, status umowy udostępniania danych (DSA) i gotowość piaskownicy. Użyj tego, aby koordynować działania z partnerami zewnętrznymi i raportować postępy zainteresowanym stronom.",
+      "dsa_body": "Należy podpisać przed jakąkolwiek wymianą danych w czasie rzeczywistym. Projektuj umowy, korzystając z szablonów Partnerstw Badawczych.",
+      "dsa_label": "DSA (Umowa o udostępnianiu danych):",
+      "sandbox_body": "Link do środowiska testowego partnera. Przed promowaniem na żywo zweryfikuj integrację w piaskownicy.",
+      "sandbox_label": "Piaskownica URL:",
+      "statuses_body": "Proponowane -> Zakres -> Piaskownica -> Na żywo. Zablokowany oznacza, że ​​zależność zewnętrzna jest nierozwiązana.",
+      "statuses_label": "Statusy:",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "add": "Dodaj integrację",
+      "cancel": "Anulować",
+      "create": "Stwórz integrację",
+      "delete": "Usuwać",
+      "edit": "Redagować",
+      "open": "Otwarte",
+      "refresh": "Odświeżać",
+      "remove": "Usunąć",
+      "save_changes": "Zapisz zmiany",
+      "seed": "Domyślny zaległości w początkowej fazie"
+    },
+    "categories": {
+      "ahv": "AHV",
+      "banking": "Bankowy",
+      "healthcare": "Opieka zdrowotna",
+      "identity_verification": "Weryfikacja tożsamości",
+      "municipal_data": "Dane miejskie",
+      "other": "Inny",
+      "payment": "Zapłata",
+      "postal": "Pocztowy",
+      "professional_care": "Profesjonalna opieka"
+    },
+    "delete_modal": {
+      "body_prefix": "Spowoduje to trwałe usunięcie wpisu zaległości dla",
+      "body_suffix": "Nie ma to wpływu na rekord partnera zewnętrznego – usuwany jest jedynie wpis śledzenia.",
+      "title": "Usuń integrację",
+      "warning": "Tej akcji nie można cofnąć."
+    },
+    "dsa_statuses": {
+      "drafting": "Redakcja",
+      "in_review": "W recenzji",
+      "not_required": "Nie jest wymagane",
+      "signed": "Podpisano"
+    },
+    "editor": {
+      "add_title": "Dodaj integrację",
+      "category": "Kategoria",
+      "dsa_status": "Umowa udostępniania danych",
+      "edit_title": "Edycja: {{name}}",
+      "interface_spec_placeholder": "https://docs.partner.example/spec",
+      "interface_spec_url": "Specyfikacja interfejsu URL",
+      "name": "Nazwa",
+      "name_placeholder": "np. AHV bramka do przesyłania",
+      "notes": "Notatki",
+      "notes_placeholder": "Pytania otwarte, blokady, zależności, uwagi umowne...",
+      "owner_email": "Adres e-mail właściciela",
+      "owner_email_placeholder": "kontakt@partner.przykład",
+      "owner_name": "Imię właściciela",
+      "owner_name_placeholder": "Imię i nazwisko kontaktu zewnętrznego",
+      "sandbox_placeholder": "https://sandbox.partner.example",
+      "sandbox_url": "Piaskownica URL",
+      "status": "Status"
+    },
+    "empty": {
+      "body": "Stwórz wyselekcjonowany zestaw dobrze znanych, zależnych od partnerów integracji (złożenie AHV, przekazanie Spitex, kantonalne źródło danych podstawowych, PostFinance, Twint, weryfikacja adresu pocztowego), aby operator platformy mógł śledzić właściciela, status DSA i gotowość piaskownicy.",
+      "title": "Nie śledzono jeszcze żadnych integracji"
+    },
+    "last_updated": "Ostatnia aktualizacja {{date}}",
+    "meta": {
+      "subtitle": "AG87 - integracje zależne od partnera oczekujące na zewnętrznego właściciela / DSA / sandbox",
+      "title": "Zaległości w zakresie integracji zewnętrznej"
+    },
+    "statuses": {
+      "blocked": "Zablokowany",
+      "deprecated": "Przestarzałe",
+      "live": "Na żywo",
+      "proposed": "Zaproponowano",
+      "sandbox": "Piaskownica",
+      "scoping": "Zakres"
+    },
+    "table": {
+      "actions": "Działania",
+      "aria": "Integracje zewnętrzne",
+      "category": "Kategoria",
+      "dsa": "DSA",
+      "name": "Nazwa",
+      "owner": "Właściciel",
+      "row_actions": "Działania wierszowe",
+      "sandbox": "Piaskownica",
+      "status": "Status",
+      "updated": "Zaktualizowano"
+    },
+    "toasts": {
+      "create_failed": "Tworzenie nie powiodło się",
+      "created": "Integracja utworzona",
+      "delete_failed": "Usunięcie nie powiodło się",
+      "load_failed": "Nie udało się załadować zaległości integracji",
+      "removed": "Integracja usunięta",
+      "seed_failed": "Nasienie nie powiodło się",
+      "seeded": "Rozstawiony domyślny zaległości",
+      "update_failed": "Aktualizacja nie powiodła się",
+      "updated": "Integracja zaktualizowana"
+    }
+  },
+  "sub_regions": {
+    "about": {
+      "body": "Podregiony dzielą Twoją społeczność na obszary geograficzne (dzielnice, dystrykty lub okręgi). Służą do przypisywania koordynatorów do konkretnych obszarów, filtrowania próśb o pomoc według lokalizacji i dzielenia wskaźników pilotażowych według sąsiedztwa. Dodawanie podregionów jest opcjonalne, ale zdecydowanie zalecane w przypadku większych społeczności z wieloma zespołami koordynatorów.",
+      "postal_codes_note": "W polu Kody pocztowe: wprowadź listę kodów pocztowych, nazwę okolicy lub dowolny opis. Dokładne granice nie są wymagane – dotyczy to przydzielania koordynatorów i filtrów raportowania, a nie mapowania.",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "add": "Dodaj podregion",
+      "cancel": "Anulować",
+      "create": "Utwórz podregion",
+      "edit_aria": "Edytuj podregion",
+      "mark_inactive": "Oznacz jako nieaktywne",
+      "save_changes": "Zapisz zmiany"
+    },
+    "confirm_mark_inactive": "Oznaczyć „{{name}}” jako nieaktywne? Powiązani świadczeniodawcy zostaną z niego odłączeni.",
+    "errors": {
+      "delete_failed": "Nie udało się usunąć podregionu.",
+      "load_failed": "Nie udało się wczytać podregionów.",
+      "save_failed": "Nie udało się zapisać podregionu."
+    },
+    "filters": {
+      "search_aria": "Wyszukaj podregiony",
+      "search_placeholder": "Szukaj według nazwy, opisu lub ślimaka...",
+      "type_aria": "Filtruj według typu"
+    },
+    "form": {
+      "centre_latitude": "Środkowa szerokość geograficzna",
+      "centre_longitude": "Długość geograficzna środkowa",
+      "description": "Opis",
+      "description_placeholder": "Krótki opis tego obszaru...",
+      "latitude_placeholder": "47.1758",
+      "longitude_placeholder": "8.4622",
+      "name": "Nazwa",
+      "name_placeholder": "np. Lorzenhof",
+      "postal_codes": "Kody pocztowe",
+      "postal_codes_description": "Lista PLZ rozdzielana przecinkami lub spacjami.",
+      "postal_codes_placeholder": "6330, 6331, 6332",
+      "slug": "Informacja o błędzie (generowana automatycznie, jeśli jest pusta)",
+      "slug_description": "Identyfikator z małymi literami i łącznikami używany w URLs i filtrach.",
+      "slug_placeholder": "np. Lozenhof",
+      "status": "Status",
+      "type": "Typ"
+    },
+    "meta": {
+      "page_title": "Podregiony - Admin",
+      "subtitle": "Podziały Quartier, Ortsteil, Gemeinde i Kanton dla katalogu dostawców opieki i filtrów lokalizacji",
+      "title": "Podregiony"
+    },
+    "modal": {
+      "add_title": "Dodaj podregion",
+      "edit_title": "Edycja: {{name}}"
+    },
+    "status": {
+      "active": "Aktywny",
+      "inactive": "Nieaktywny"
+    },
+    "table": {
+      "actions": "Działania",
+      "aria": "Tabela podregionów",
+      "coordinates": "Współrzędne",
+      "empty": "Nie ma jeszcze podregionów — dodaj jeden, aby rozpocząć geograficzną segmentację najemcy.",
+      "name": "Nazwa",
+      "postal_codes": "Kody pocztowe",
+      "status": "Status",
+      "type": "Typ"
+    },
+    "toasts": {
+      "created": "Podregion został utworzony pomyślnie.",
+      "marked_inactive": "Podregion oznaczony jako nieaktywny.",
+      "updated": "Podregion został pomyślnie zaktualizowany."
+    },
+    "type_options": {
+      "all": "Wszystkie typy",
+      "canton": "Kanton",
+      "municipality": "Gmina (Gemeinde)",
+      "ortsteil": "Ortsteil (dzielnica)",
+      "other": "Inny",
+      "quartier": "Dzielnica (dzielnica)"
+    },
+    "validation": {
+      "latitude_number": "Szerokość geograficzna musi być liczbą.",
+      "longitude_number": "Długość geograficzna musi być liczbą.",
+      "name_required": "Imię i nazwisko jest wymagane.",
+      "type_required": "Typ jest wymagany."
     }
   }
 }

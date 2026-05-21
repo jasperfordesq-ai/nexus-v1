@@ -10173,7 +10173,29 @@
     "title_create": "Create",
     "title_edit": "Edit",
     "twitter_label": "Twitter",
-    "youtube_label": "Youtube"
+    "youtube_label": "Youtube",
+    "countries": {
+      "AT": "Österreich",
+      "AU": "Australien",
+      "BE": "Belgien",
+      "CA": "Kanada",
+      "CH": "Schweiz",
+      "DE": "Deutschland",
+      "DK": "Dänemark",
+      "ES": "Spanien",
+      "FI": "Finnland",
+      "FR": "Frankreich",
+      "GB": "Vereinigtes Königreich",
+      "IE": "Irland",
+      "IT": "Italien",
+      "NL": "Niederlande",
+      "NO": "Norwegen",
+      "NZ": "Neuseeland",
+      "PL": "Polen",
+      "PT": "Portugal",
+      "SE": "Schweden",
+      "US": "Vereinigte Staaten"
+    }
   },
   "tenant_list": {
     "action_delete": "Delete",
@@ -13443,6 +13465,291 @@
       "seeded": "3 Demokarten gesetzt",
       "update_failed": "Update fehlgeschlagen",
       "updated": "Geschichte aktualisiert"
+    }
+  },
+  "disclosure_pack": {
+    "about": {
+      "body_prefix": "Das Disclosure Pack (AG80) ist das",
+      "body_suffix": "Offenlegungsdokument zum Datenschutz, über das die Bewohner informiert werden müssen, bevor sie am Community-Care-Programm teilnehmen. Es umfasst die Identität der Datenverantwortlichen und -verarbeiter, die verarbeiteten Datenkategorien, die Rechtsgrundlage, die Rechte der betroffenen Personen, Kontakte zur Reaktion auf Vorfälle und Schutzmaßnahmen für grenzüberschreitende Übermittlungen.",
+      "review_middle": "Lassen Sie sich vor der Veröffentlichung beraten. Bearbeiten Sie die Controller-Details, den Incident-Response-Besitzer und die Konfiguration des isolierten Knotens für Ihre Bereitstellung und verwenden Sie sie dann",
+      "review_prefix": "Bei diesem Paket handelt es sich um einen funktionierenden Entwurf – überprüfen Sie ihn mit",
+      "review_suffix": "zur Erstellung des rechtsgültigen Übergabedokuments. Standardwerte spiegeln plattformseitige Verpflichtungen wider. Speichern Sie alle Änderungen vor dem Exportieren.",
+      "title": "Über diese Seite"
+    },
+    "actions": {
+      "export_markdown": "Markdown exportieren",
+      "refresh": "Aktualisieren",
+      "refresh_aria": "Offenlegungspaket aktualisieren",
+      "save_changes": "Änderungen speichern"
+    },
+    "descriptions": {
+      "backup_owner": "Juristische Person, die für die Speicherung und Aufbewahrung von Datenbanksicherungen verantwortlich ist.",
+      "hosting_owner": "Juristische Person, die die Serverinfrastruktur kontrolliert (z. B. die Informatikabteilung des Kantons).",
+      "smtp_owner": "Juristische Person, die für die Zustellung ausgehender E-Mails verantwortlich ist.",
+      "storage_owner": "Juristische Person, die die Datei-/BLOB-Speicherung (Uploads, Exporte) kontrolliert.",
+      "update_cadence": "Wie oft der Kantonsknoten Plattformaktualisierungen erhält (z. B. „monatlich“, „vierteljährlich“)."
+    },
+    "fields": {
+      "address": "Adresse",
+      "backup_owner": "Backup-Besitzer",
+      "contact_email": "Kontakt-E-Mail",
+      "controller_name": "Controllername",
+      "data_protection_officer": "Datenschutzbeauftragter",
+      "fadp_authority": "FADP-Berechtigung",
+      "hosting_owner": "Hosting-Inhaber",
+      "notification_window_hours": "Benachrichtigungsfenster (Stunden)",
+      "owner_name": "Name des Besitzers",
+      "processor_name": "Prozessorname",
+      "smtp_owner": "SMTP Besitzer",
+      "storage_owner": "Speichereigentümer",
+      "sub_processors": "Unterauftragsverarbeiter (einer pro Zeile)",
+      "update_cadence": "Trittfrequenz aktualisieren"
+    },
+    "footer": {
+      "customised": "Maßgeschneidert",
+      "last_saved": "Zuletzt gespeichert {{date}}"
+    },
+    "isolated_node": {
+      "description_prefix": "Diese Felder sind nur relevant, wenn dieser Einsatz auf einer vom Kanton kontrollierten Infrastruktur läuft. Behalten Sie für gehostete Standardbereitstellungen die Standardeinstellungen bei. Jedes Eigentümerfeld identifiziert die juristische Person, die für diese Infrastrukturkomponente verantwortlich ist",
+      "description_suffix": "Artikel 9."
+    },
+    "labels": {
+      "aggregate_policy": "Aggregierte Richtlinie"
+    },
+    "meta": {
+      "page_title": "FADP / nDSG Offenlegungspaket",
+      "subtitle": "AG80 – Pilot-Offenlegungsdokument zum Schweizer Datenschutzrecht",
+      "title": "FADP / nDSG Offenlegungspaket"
+    },
+    "sections": {
+      "data_categories": "Datenkategorien",
+      "destinations": "Reiseziele",
+      "federation_policy": "Föderationspolitik",
+      "isolated_node_configuration": "Konfiguration mit isoliertem Knoten",
+      "lawful_basis": "Rechtsgrundlage",
+      "platform_processor": "Plattformprozessor",
+      "retention_defaults": "Aufbewahrungsvorgaben",
+      "safeguards": "Schutzmaßnahmen",
+      "tenant_controller": "Mietercontroller"
+    },
+    "status": {
+      "cross_border_occurs": "Es kommt zu grenzüberschreitenden Überweisungen",
+      "disabled": "Deaktiviert",
+      "disabled_lower": "deaktiviert",
+      "enabled": "Ermöglicht",
+      "enabled_lower": "ermöglicht",
+      "members_can_opt_out": "Mitglieder können sich abmelden",
+      "no_cross_border_transfers": "Keine grenzüberschreitenden Überweisungen",
+      "no_member_opt_out": "Kein Abmelden für Mitglieder"
+    },
+    "tabs": {
+      "aria": "Offenlegungsabschnitte",
+      "controller": "Verantwortlicher und Auftragsverarbeiter",
+      "cross_border_transfers": "Grenzüberschreitende Überweisungen",
+      "data_retention": "Daten und Aufbewahrung",
+      "data_subject_rights": "Rechte der betroffenen Person",
+      "federation_isolated_node": "Föderation und isolierter Knoten",
+      "incident_response": "Reaktion auf Vorfälle"
+    },
+    "toasts": {
+      "export_empty": "Der Export wurde leer zurückgegeben",
+      "export_failed": "Offenlegungspaket konnte nicht exportiert werden",
+      "exported": "Offenlegungspaket exportiert",
+      "load_failed": "Offenlegungspaket konnte nicht geladen werden",
+      "save_failed": "Offenlegungspaket konnte nicht gespeichert werden",
+      "saved": "Offenlegungspaket gespeichert"
+    }
+  },
+  "external_integrations": {
+    "about": {
+      "body": "External Integrations ist ein Backlog-Tracker für partnerabhängige Verbindungen – Banking, AHV-Übermittlung, Überprüfung der Postadresse und kantonale Datenfeeds. Jeder Eintrag verfolgt den Integrationseigentümer, den Status der Datenfreigabevereinbarung (DSA) und die Sandbox-Bereitschaft. Nutzen Sie dies, um sich mit externen Partnern abzustimmen und den Stakeholdern über Fortschritte zu berichten.",
+      "dsa_body": "Muss vor jedem Live-Datenaustausch unterzeichnet werden. Entwerfen Sie Vereinbarungen mithilfe der Vorlagen für Forschungspartnerschaften.",
+      "dsa_label": "DSA (Datenfreigabevereinbarung):",
+      "sandbox_body": "Link zur Testumgebung des Partners. Überprüfen Sie die Integration in der Sandbox, bevor Sie sie zum Leben erwecken.",
+      "sandbox_label": "Sandbox URL:",
+      "statuses_body": "Vorgeschlagen -> Scoping -> Sandbox -> Live. Blockiert bedeutet, dass eine externe Abhängigkeit nicht aufgelöst ist.",
+      "statuses_label": "Status:",
+      "title": "Über diese Seite"
+    },
+    "actions": {
+      "add": "Integration hinzufügen",
+      "cancel": "Stornieren",
+      "create": "Schaffen Sie Integration",
+      "delete": "Löschen",
+      "edit": "Bearbeiten",
+      "open": "Offen",
+      "refresh": "Aktualisieren",
+      "remove": "Entfernen",
+      "save_changes": "Änderungen speichern",
+      "seed": "Seed-Standardrückstand"
+    },
+    "categories": {
+      "ahv": "AHV",
+      "banking": "Bankwesen",
+      "healthcare": "Gesundheitspflege",
+      "identity_verification": "Identitätsprüfung",
+      "municipal_data": "Kommunale Daten",
+      "other": "Andere",
+      "payment": "Zahlung",
+      "postal": "Post",
+      "professional_care": "Professionelle Betreuung"
+    },
+    "delete_modal": {
+      "body_prefix": "Dadurch wird der Rückstandseintrag für dauerhaft entfernt",
+      "body_suffix": "Der externe Partnerdatensatz ist nicht betroffen – lediglich der Tracking-Eintrag wird entfernt.",
+      "title": "Integration entfernen",
+      "warning": "Diese Aktion kann nicht rückgängig gemacht werden."
+    },
+    "dsa_statuses": {
+      "drafting": "Abfassung",
+      "in_review": "Im Rückblick",
+      "not_required": "Nicht erforderlich",
+      "signed": "Unterzeichnet"
+    },
+    "editor": {
+      "add_title": "Integration hinzufügen",
+      "category": "Kategorie",
+      "dsa_status": "Vereinbarung zur Datenweitergabe",
+      "edit_title": "Bearbeiten: {{name}}",
+      "interface_spec_placeholder": "https://docs.partner.example/spec",
+      "interface_spec_url": "Schnittstellenspezifikation URL",
+      "name": "Name",
+      "name_placeholder": "z.B. AHV-Übermittlungsgateway",
+      "notes": "Notizen",
+      "notes_placeholder": "Offene Fragen, Blockaden, Abhängigkeiten, Vertragshinweise...",
+      "owner_email": "E-Mail des Eigentümers",
+      "owner_email_placeholder": "contact@partner.example",
+      "owner_name": "Name des Besitzers",
+      "owner_name_placeholder": "Vollständiger Name des externen Kontakts",
+      "sandbox_placeholder": "https://sandbox.partner.example",
+      "sandbox_url": "Sandbox URL",
+      "status": "Status"
+    },
+    "empty": {
+      "body": "Erstellen Sie einen kuratierten Satz bekannter partnerabhängiger Integrationen (AHV-Einreichung, Spitex-Übergabe, kantonaler Stammdaten-Feed, PostFinance, Twint, Überprüfung der Postanschrift), damit der Plattformbetreiber Eigentümer, DSA-Status und Sandbox-Bereitschaft verfolgen kann.",
+      "title": "Es wurden noch keine Integrationen erfasst"
+    },
+    "last_updated": "Letzte Aktualisierung {{date}}",
+    "meta": {
+      "subtitle": "AG87 – Partnerabhängige Integrationen warten auf externen Eigentümer / DSA / Sandbox",
+      "title": "Externer Integrationsrückstand"
+    },
+    "statuses": {
+      "blocked": "Blockiert",
+      "deprecated": "Veraltet",
+      "live": "Live",
+      "proposed": "Vorgeschlagen",
+      "sandbox": "Sandkasten",
+      "scoping": "Scoping"
+    },
+    "table": {
+      "actions": "Aktionen",
+      "aria": "Externe Integrationen",
+      "category": "Kategorie",
+      "dsa": "DSA",
+      "name": "Name",
+      "owner": "Eigentümer",
+      "row_actions": "Zeilenaktionen",
+      "sandbox": "Sandkasten",
+      "status": "Status",
+      "updated": "Aktualisiert"
+    },
+    "toasts": {
+      "create_failed": "Erstellen ist fehlgeschlagen",
+      "created": "Integration geschaffen",
+      "delete_failed": "Das Löschen ist fehlgeschlagen",
+      "load_failed": "Das Laden des Integrationsrückstands ist fehlgeschlagen",
+      "removed": "Integration entfernt",
+      "seed_failed": "Saatgut ist fehlgeschlagen",
+      "seeded": "Gesäter Standardrückstand",
+      "update_failed": "Update fehlgeschlagen",
+      "updated": "Integration aktualisiert"
+    }
+  },
+  "sub_regions": {
+    "about": {
+      "body": "Unterregionen unterteilen Ihre Gemeinde in geografische Gebiete (Nachbarschaften, Bezirke oder Bezirke). Sie werden verwendet, um Koordinatoren bestimmten Bereichen zuzuweisen, Hilfeanfragen nach Standort zu filtern und Pilotkennzahlen nach Stadtteilen aufzuschlüsseln. Das Hinzufügen von Unterregionen ist optional, wird jedoch für größere Communities mit mehreren Koordinatorteams dringend empfohlen.",
+      "postal_codes_note": "Geben Sie für das Feld „Postleitzahlen“ eine Postleitzahlenliste, einen Nachbarschaftsnamen oder eine Freiformbeschreibung ein. Es sind keine genauen Grenzen erforderlich – dies gilt für die Koordinatorzuweisung und Berichtsfilter, nicht für die Zuordnung.",
+      "title": "Über diese Seite"
+    },
+    "actions": {
+      "add": "Unterregion hinzufügen",
+      "cancel": "Stornieren",
+      "create": "Unterregion erstellen",
+      "edit_aria": "Unterregion bearbeiten",
+      "mark_inactive": "Als inaktiv markieren",
+      "save_changes": "Änderungen speichern"
+    },
+    "confirm_mark_inactive": "„{{name}}“ als inaktiv markieren? Verbundene Pflegedienstleister werden davon entkoppelt.",
+    "errors": {
+      "delete_failed": "Unterregion konnte nicht gelöscht werden.",
+      "load_failed": "Unterregionen konnten nicht geladen werden.",
+      "save_failed": "Unterregion konnte nicht gespeichert werden."
+    },
+    "filters": {
+      "search_aria": "Unterregionen durchsuchen",
+      "search_placeholder": "Suche nach Name, Beschreibung oder Slug...",
+      "type_aria": "Nach Typ filtern"
+    },
+    "form": {
+      "centre_latitude": "Zentraler Breitengrad",
+      "centre_longitude": "Mittlerer Längengrad",
+      "description": "Beschreibung",
+      "description_placeholder": "Kurze Beschreibung dieses Bereichs...",
+      "latitude_placeholder": "47.1758",
+      "longitude_placeholder": "8.4622",
+      "name": "Name",
+      "name_placeholder": "z.B. Lorzenhof",
+      "postal_codes": "Postleitzahlen",
+      "postal_codes_description": "Durch Kommas oder Leerzeichen getrennte PLZ-Liste.",
+      "postal_codes_placeholder": "6330, 6331, 6332",
+      "slug": "Slug (automatisch generiert, wenn leer)",
+      "slug_description": "Kleingeschriebener Bezeichner mit Bindestrich, der in URLs und Filtern verwendet wird.",
+      "slug_placeholder": "z.B. Lorzenhof",
+      "status": "Status",
+      "type": "Typ"
+    },
+    "meta": {
+      "page_title": "Unterregionen – Admin",
+      "subtitle": "Quartier-, Ortsteil-, Gemeinde- und Kanton-Unterteilungen für das Leistungserbringerverzeichnis und Ortsfilter",
+      "title": "Unterregionen"
+    },
+    "modal": {
+      "add_title": "Unterregion hinzufügen",
+      "edit_title": "Bearbeiten: {{name}}"
+    },
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "table": {
+      "actions": "Aktionen",
+      "aria": "Tabelle der Unterregionen",
+      "coordinates": "Koordinaten",
+      "empty": "Noch keine Unterregionen – fügen Sie eine hinzu, um mit der geografischen Segmentierung Ihres Mandanten zu beginnen.",
+      "name": "Name",
+      "postal_codes": "Postleitzahlen",
+      "status": "Status",
+      "type": "Typ"
+    },
+    "toasts": {
+      "created": "Unterregion erfolgreich erstellt.",
+      "marked_inactive": "Unterregion als inaktiv markiert.",
+      "updated": "Unterregion erfolgreich aktualisiert."
+    },
+    "type_options": {
+      "all": "Alle Arten",
+      "canton": "Kanton",
+      "municipality": "Gemeinde (Gemeinde)",
+      "ortsteil": "Ortsteil",
+      "other": "Andere",
+      "quartier": "Quartier (Nachbarschaft)"
+    },
+    "validation": {
+      "latitude_number": "Der Breitengrad muss eine Zahl sein.",
+      "longitude_number": "Der Längengrad muss eine Zahl sein.",
+      "name_required": "Name ist erforderlich.",
+      "type_required": "Typ ist erforderlich."
     }
   }
 }
