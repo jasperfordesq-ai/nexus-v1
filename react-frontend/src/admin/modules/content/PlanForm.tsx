@@ -99,7 +99,7 @@ export function PlanForm() {
           });
         }
       })
-      .catch(() => toast.error(t('content.failed_to_load_plans', 'Failed to load plan')))
+      .catch(() => toast.error(t('content.failed_to_load_plans')))
       .finally(() => setLoading(false));
   }, [id, isEdit, t, toast]);
 
@@ -129,14 +129,14 @@ export function PlanForm() {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast.warning(t('content.plan_name_required', 'Plan name is required'));
+      toast.warning(t('content.plan_name_required'));
       return;
     }
 
     const numericChecks: Array<{ label: string; value: string }> = [
-      { label: t('content.monthly_price', 'Monthly Price'), value: formData.price_monthly },
-      { label: t('content.annual_price', 'Annual Price'), value: formData.price_yearly },
-      { label: t('content.tier_level', 'Tier Level'), value: formData.tier_level },
+      { label: t('content.monthly_price'), value: formData.price_monthly },
+      { label: t('content.annual_price'), value: formData.price_yearly },
+      { label: t('content.tier_level'), value: formData.tier_level },
     ];
     for (const check of numericChecks) {
       if (!check.value) continue;
@@ -152,7 +152,7 @@ export function PlanForm() {
       if (isEdit) {
         const res = await adminPlans.update(Number(id), buildPayload());
         if (res?.success) {
-          toast.success(t('content.plan_updated', 'Plan updated'));
+          toast.success(t('content.plan_updated'));
           navigate(tenantPath('/admin/plans'));
         } else {
           toast.error(t('content.failed_to_update_plan'));
@@ -160,14 +160,14 @@ export function PlanForm() {
       } else {
         const res = await adminPlans.create(buildPayload());
         if (res?.success) {
-          toast.success(t('content.plan_created', 'Plan created'));
+          toast.success(t('content.plan_created'));
           navigate(tenantPath('/admin/plans'));
         } else {
           toast.error(t('content.failed_to_create_plan'));
         }
       }
     } catch {
-      toast.error(t('content.an_unexpected_error_occurred', 'An unexpected error occurred'));
+      toast.error(t('content.an_unexpected_error_occurred'));
     } finally {
       setSaving(false);
     }
@@ -212,11 +212,11 @@ export function PlanForm() {
       <PageHeader
         title={t(isEdit ? 'content.plan_edit_title' : 'content.plan_create_title')}
         description={isEdit
-          ? t('content.plans_admin_desc', 'Update plan details, pricing, and features')
-          : t('content.desc_create_subscription_plans_to_offer_diffe', 'Create a new subscription plan')}
+          ? t('content.plans_admin_desc')
+          : t('content.desc_create_subscription_plans_to_offer_diffe')}
         actions={
           <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/plans'))}>
-            {t('common.back', 'Back')}
+            {t('common.back')}
           </Button>
         }
       />
@@ -232,7 +232,7 @@ export function PlanForm() {
             </CardHeader>
             <CardBody className="gap-4">
               <Input
-                label={t('content.label_name', 'Name')}
+                label={t('content.label_name')}
                 placeholder={t('content.plan_name_placeholder')}
                 isRequired
                 variant="bordered"
@@ -240,7 +240,7 @@ export function PlanForm() {
                 onValueChange={(v) => handleChange('name', v)}
               />
               <Textarea
-                label={t('content.label_description', 'Description')}
+                label={t('content.label_description')}
                 placeholder={t('content.plan_description_placeholder')}
                 variant="bordered"
                 minRows={3}
@@ -249,7 +249,7 @@ export function PlanForm() {
               />
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label={t('content.monthly_price', 'Monthly Price')}
+                  label={t('content.monthly_price')}
                   type="number" min="0" step="0.01"
                   variant="bordered"
                   startContent={<span className="text-default-400 text-sm">EUR</span>}
@@ -257,7 +257,7 @@ export function PlanForm() {
                   onValueChange={(v) => handleChange('price_monthly', v)}
                 />
                 <Input
-                  label={t('content.annual_price', 'Annual Price')}
+                  label={t('content.annual_price')}
                   type="number" min="0" step="0.01"
                   variant="bordered"
                   startContent={<span className="text-default-400 text-sm">EUR</span>}
@@ -407,10 +407,10 @@ export function PlanForm() {
               isLoading={saving}
               fullWidth
             >
-              {isEdit ? t('federation.save_changes', 'Save Changes') : t('content.plan_create_title')}
+              {isEdit ? t('federation.save_changes') : t('content.plan_create_title')}
             </Button>
             <Button variant="flat" onPress={() => navigate(tenantPath('/admin/plans'))} fullWidth>
-              {t('cancel', 'Cancel')}
+              {t('cancel')}
             </Button>
           </div>
         </div>
