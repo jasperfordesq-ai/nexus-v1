@@ -264,7 +264,9 @@
     "agpl_notice": "AGPL-3.0 — Auteursrecht © 2024–{{year}} Jasper Ford",
     "terms": "Voorwaarden",
     "privacy": "Privacy",
-    "trust_safety": "Trust & Safety"
+    "trust_safety": "Trust & Safety",
+    "community_partner": "Community Partner",
+    "tenant_logo_placeholder": "Your logo here"
   },
   "mobile_tab": {
     "create": "Aanmaken",

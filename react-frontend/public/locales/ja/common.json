@@ -264,7 +264,9 @@
     "agpl_notice": "AGPL-3.0 — 著作権 © 2024–{{year}} ジャスパー・フォード",
     "terms": "利用規約",
     "privacy": "プライバシー",
-    "trust_safety": "Trust & Safety"
+    "trust_safety": "Trust & Safety",
+    "community_partner": "Community Partner",
+    "tenant_logo_placeholder": "Your logo here"
   },
   "mobile_tab": {
     "create": "作成",

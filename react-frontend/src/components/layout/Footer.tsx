@@ -48,14 +48,19 @@ export function Footer({ children, copyright }: FooterProps) {
 
   return (
     <footer className="relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm" data-nosnippet>
-      <div className="md:hidden px-4 py-5 pb-[calc(var(--safe-area-bottom)+5rem)] text-center">
-        <div className="flex flex-col items-center gap-3">
+      <div className="md:hidden px-4 py-6 pb-[calc(var(--safe-area-bottom)+5rem)]">
+        <div className="flex flex-col items-center gap-4">
+          {/* NEXUS logo — readable on mobile */}
           <img
             src="/images/project-nexus-logo.png"
             alt={t('footer.project_nexus')}
-            className="h-12 w-auto"
+            className="h-20 w-auto"
           />
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
+          {/* Tenant placeholder */}
+          <div className="w-full max-w-[18rem] border-2 border-dashed border-theme-default/40 rounded-xl h-14 flex items-center justify-center">
+            <span className="text-xs text-theme-subtle/40">{t('footer.tenant_logo_placeholder')}</span>
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-theme-subtle/70">
             <span>{t('footer.agpl_notice', { year })}</span>
             <span aria-hidden="true">&middot;</span>
@@ -216,18 +221,35 @@ export function Footer({ children, copyright }: FooterProps) {
               </Button>
             </div>
 
-            {/* Platform Attribution */}
-            <div className="border-t border-theme-default pt-6 flex flex-col items-center gap-4">
-              {/* Logo + GitHub button side by side */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <img
-                  src="/images/project-nexus-logo.png"
-                  alt={t('footer.project_nexus')}
-                  className="h-14 w-auto"
-                />
-                <div className="hidden sm:block w-px h-10 bg-theme-default" aria-hidden="true" />
-                <SourceRepositoryLink />
+            {/* Platform Attribution — 3-zone panel */}
+            <div className="border-t border-theme-default pt-6 flex flex-col gap-5">
+              <div className="flex flex-col sm:flex-row items-center sm:items-stretch justify-between gap-6">
+
+                {/* LEFT: tenant / community partner logo placeholder */}
+                <div className="flex flex-col items-start gap-2">
+                  <span className="text-[10px] font-semibold uppercase tracking-widest text-theme-subtle/50">
+                    {t('footer.community_partner')}
+                  </span>
+                  <div className="h-20 w-48 border-2 border-dashed border-theme-default/40 rounded-xl flex items-center justify-center">
+                    <span className="text-xs text-theme-subtle/40 text-center leading-snug px-3">
+                      {t('footer.tenant_logo_placeholder')}
+                    </span>
+                  </div>
+                </div>
+
+                {/* RIGHT: GitHub button + NEXUS logo */}
+                <div className="flex items-center gap-4 sm:gap-6">
+                  <SourceRepositoryLink />
+                  <div className="w-px self-stretch bg-theme-default" aria-hidden="true" />
+                  <img
+                    src="/images/project-nexus-logo.png"
+                    alt={t('footer.project_nexus')}
+                    className="h-24 w-auto"
+                  />
+                </div>
+
               </div>
+
               {/* Legal strip */}
               <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-theme-subtle/70">
                 <span>{t('footer.agpl_notice', { year })}</span>
