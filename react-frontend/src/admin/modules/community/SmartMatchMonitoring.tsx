@@ -13,6 +13,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Spinner } from '@heroui/react';
 import Activity from 'lucide-react/icons/activity';
 import BarChart3 from 'lucide-react/icons/chart-column';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
@@ -20,7 +21,8 @@ import { PageHeader, StatCard } from '../../components';
 import type { MatchingStatsResponse } from '../../api/types';
 
 export function SmartMatchMonitoring() {
-  usePageTitle("Community");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('community.page_title'));
   const toast = useToast();
 
   const [data, setData] = useState<MatchingStatsResponse | null>(null);
@@ -33,15 +35,15 @@ export function SmartMatchMonitoring() {
           setData(res.data as MatchingStatsResponse);
         }
       })
-      .catch(() => toast.error("Failed to load matching stats"))
+      .catch(() => toast.error(t('community.failed_to_load_matching_stats')))
       .finally(() => setLoading(false));
-  }, [toast])
+  }, [t, toast])
 
 
   if (loading) {
     return (
       <div>
-        <PageHeader title={"Smart Match Monitoring"} description={"Monitor real-time smart matching activity and match score distribution"} />
+        <PageHeader title={t('community.smart_match_monitoring_title')} description={t('community.smart_match_monitoring_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -51,29 +53,29 @@ export function SmartMatchMonitoring() {
 
   return (
     <div>
-      <PageHeader title={"Smart Match Monitoring"} description={"Monitor real-time smart matching activity and match score distribution"} />
+      <PageHeader title={t('community.smart_match_monitoring_title')} description={t('community.smart_match_monitoring_desc')} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={"Matches Generated"}
+          label={t('community.label_matches_generated')}
           value={overview?.total_matches_month ?? 0}
           icon={Activity}
           color="primary"
         />
         <StatCard
-          label={"Avg Match Score"}
+          label={t('community.label_avg_match_score')}
           value={overview?.avg_match_score !== undefined ? `${Number(overview.avg_match_score).toFixed(1)}%` : '--'}
           icon={BarChart3}
           color="success"
         />
         <StatCard
-          label={"Approval Rate"}
+          label={t('community.label_approval_rate')}
           value={data?.approval_rate !== undefined ? `${Number(data.approval_rate).toFixed(0)}%` : '--'}
           icon={Activity}
           color="warning"
         />
         <StatCard
-          label={"Cache Hit Rate"}
+          label={t('community.label_cache_hit_rate')}
           value={overview?.cache_hit_rate !== undefined ? `${Number(overview.cache_hit_rate).toFixed(0)}%` : '--'}
           icon={Activity}
           color="secondary"
@@ -82,55 +84,55 @@ export function SmartMatchMonitoring() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{"Engine Status"}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('community.engine_status')}</h3></CardHeader>
           <CardBody>
             {data ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{"Broker Approval"}</span>
-                  <span className="text-sm font-medium">{data.broker_approval_enabled ? "Enabled" : "Disabled"}</span>
+                  <span className="text-sm text-default-500">{t('community.broker_approval')}</span>
+                  <span className="text-sm font-medium">{data.broker_approval_enabled ? t('community.enabled') : t('community.disabled')}</span>
                 </div>
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{"Pending Approvals"}</span>
+                  <span className="text-sm text-default-500">{t('community.pending_approvals')}</span>
                   <span className="text-sm font-medium">{data.pending_approvals ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{"Approved Total"}</span>
+                  <span className="text-sm text-default-500">{t('community.approved_total')}</span>
                   <span className="text-sm font-medium">{data.approved_count ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{"Rejected Total"}</span>
+                  <span className="text-sm text-default-500">{t('community.rejected_total')}</span>
                   <span className="text-sm font-medium">{data.rejected_count ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{"Matches Today"}</span>
+                  <span className="text-sm text-default-500">{t('community.matches_today')}</span>
                   <span className="text-sm font-medium">{overview?.total_matches_today ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{"Matches this week"}</span>
+                  <span className="text-sm text-default-500">{t('community.matches_this_week')}</span>
                   <span className="text-sm font-medium">{overview?.total_matches_week ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{"Hot Matches"}</span>
+                  <span className="text-sm text-default-500">{t('community.hot_matches')}</span>
                   <span className="text-sm font-medium">{overview?.hot_matches_count ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between py-1">
-                  <span className="text-sm text-default-500">{"Active Matching Users"}</span>
+                  <span className="text-sm text-default-500">{t('community.active_matching_users')}</span>
                   <span className="text-sm font-medium">{overview?.active_users_matching ?? 0}</span>
                 </div>
               </div>
             ) : (
               <div className="flex flex-col items-center py-8 text-default-400">
                 <Activity size={40} className="mb-3" />
-                <p>{"No monitoring data"}</p>
-                <p className="text-xs mt-1">{"Configure matching settings"}</p>
+                <p>{t('community.no_monitoring_data')}</p>
+                <p className="text-xs mt-1">{t('community.configure_matching_hint')}</p>
               </div>
             )}
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{"Score Distribution"}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('community.score_distribution')}</h3></CardHeader>
           <CardBody>
             {data?.score_distribution && Object.keys(data.score_distribution).length > 0 ? (
               <div className="space-y-3">
@@ -144,7 +146,7 @@ export function SmartMatchMonitoring() {
             ) : (
               <div className="flex flex-col items-center py-8 text-default-400">
                 <BarChart3 size={40} className="mb-3" />
-                <p className="text-sm">{"No score distribution"}</p>
+                <p className="text-sm">{t('community.no_score_distribution')}</p>
               </div>
             )}
           </CardBody>
