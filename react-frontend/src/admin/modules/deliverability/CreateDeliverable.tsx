@@ -32,6 +32,7 @@ interface DeliverableFormData {
 
 export function CreateDeliverable() {
   const { t: tNav } = useTranslation('admin_nav');
+  const { t } = useTranslation('admin');
   useAdminPageMeta({ title: tNav('deliverability') });
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
@@ -53,7 +54,7 @@ export function CreateDeliverable() {
 
   const handleSave = async () => {
     if (!formData.title.trim()) {
-      toast.warning("Title is required");
+      toast.warning(t('deliverability.title_required'));
       return;
     }
     setSaving(true);
@@ -66,13 +67,13 @@ export function CreateDeliverable() {
         due_date: formData.due_date || undefined,
       });
       if (res?.success) {
-        toast.success("Created successfully");
+        toast.success(t('deliverability.created_success'));
         navigate(tenantPath('/admin/deliverability/list'));
       } else {
-        toast.error("Create Failed");
+        toast.error(t('deliverability.create_failed'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('deliverability.an_unexpected_error_occurred'));
     } finally {
       setSaving(false);
     }
@@ -81,32 +82,32 @@ export function CreateDeliverable() {
   return (
     <div>
       <PageHeader
-        title={"Create"}
-        description={"Create"}
-        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{"Back"}</Button>}
+        title={t('deliverability.create_title')}
+        description={t('deliverability.create_description')}
+        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{t('common.back')}</Button>}
       />
 
       <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Target size={20} /> {"Details"}</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Target size={20} /> {t('deliverability.details_heading')}</h3></CardHeader>
         <CardBody className="gap-4">
           <Input
-            label={"Title"}
-            placeholder={"Deliverable title..."}
+            label={t('deliverability.title_label')}
+            placeholder={t('deliverability.title_placeholder')}
             isRequired
             variant="bordered"
             value={formData.title}
             onValueChange={(v) => handleChange('title', v)}
           />
           <Textarea
-            label={"Description"}
-            placeholder={"Describe the Deliverable..."}
+            label={t('deliverability.label_description')}
+            placeholder={t('deliverability.placeholder_describe_the_deliverable')}
             variant="bordered"
             minRows={3}
             value={formData.description}
             onValueChange={(v) => handleChange('description', v)}
           />
           <Select
-            label={"Priority"}
+            label={t('deliverability.priority_label')}
             variant="bordered"
             selectedKeys={[formData.priority]}
             onSelectionChange={(keys) => {
@@ -114,13 +115,13 @@ export function CreateDeliverable() {
               if (selected) handleChange('priority', selected);
             }}
           >
-            <SelectItem key="low">{"Low"}</SelectItem>
-            <SelectItem key="medium">{"Medium"}</SelectItem>
-            <SelectItem key="high">{"High"}</SelectItem>
-            <SelectItem key="critical">{"Critical"}</SelectItem>
+            <SelectItem key="low">{t('deliverability.priority_low')}</SelectItem>
+            <SelectItem key="medium">{t('deliverability.priority_medium')}</SelectItem>
+            <SelectItem key="high">{t('deliverability.priority_high')}</SelectItem>
+            <SelectItem key="critical">{t('deliverability.priority_critical')}</SelectItem>
           </Select>
           <Select
-            label={"Status"}
+            label={t('deliverability.status_label')}
             variant="bordered"
             selectedKeys={[formData.status]}
             onSelectionChange={(keys) => {
@@ -128,27 +129,27 @@ export function CreateDeliverable() {
               if (selected) handleChange('status', selected);
             }}
           >
-            <SelectItem key="planned">{"Planned"}</SelectItem>
-            <SelectItem key="in_progress">{"In Progress"}</SelectItem>
-            <SelectItem key="review">{"In Review"}</SelectItem>
-            <SelectItem key="completed">{"Completed"}</SelectItem>
+            <SelectItem key="planned">{t('deliverability.status_planned')}</SelectItem>
+            <SelectItem key="in_progress">{t('deliverability.status_in_progress')}</SelectItem>
+            <SelectItem key="review">{t('deliverability.status_review')}</SelectItem>
+            <SelectItem key="completed">{t('deliverability.status_completed')}</SelectItem>
           </Select>
           <Input
-            label={"Due Date"}
+            label={t('deliverability.due_date_label')}
             type="date"
             variant="bordered"
             value={formData.due_date}
             onValueChange={(v) => handleChange('due_date', v)}
           />
           <Input
-            label={"Assigned to"}
-            placeholder={"Assigned to..."}
+            label={t('deliverability.assigned_to_label')}
+            placeholder={t('deliverability.assigned_to_placeholder')}
             variant="bordered"
             value={formData.assigned_to}
             onValueChange={(v) => handleChange('assigned_to', v)}
           />
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{"Cancel"}</Button>
+            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{t('common.cancel')}</Button>
             <Button
               color="primary"
               startContent={<Save size={16} />}
@@ -156,7 +157,7 @@ export function CreateDeliverable() {
               isLoading={saving}
               isDisabled={saving}
             >
-              {"Save Deliverable"}
+              {t('deliverability.save_deliverable')}
             </Button>
           </div>
         </CardBody>
