@@ -783,14 +783,14 @@ export default function MunicipalImpactReportsPage() {
           <ModalBody className="gap-4">
             <Input
               label={t('municipal_reports.templates.fields.name')}
-              placeholder="e.g. Q3 2025 Canton Report for Funders"
+              placeholder={t('municipal_reports.templates.placeholders.name')}
               value={templateForm.name}
               onValueChange={(name) => setTemplateForm((form) => ({ ...form, name }))}
               isRequired
             />
             <Textarea
               label={t('municipal_reports.templates.fields.description')}
-              placeholder="Optional note for future reference — e.g. 'Used for annual AGM presentation'"
+              placeholder={t('municipal_reports.templates.placeholders.description')}
               value={templateForm.description}
               onValueChange={(description) => setTemplateForm((form) => ({ ...form, description }))}
               minRows={2}
@@ -798,7 +798,7 @@ export default function MunicipalImpactReportsPage() {
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <Select
                 label={t('municipal_reports.templates.fields.audience')}
-                description="Determines the narrative framing and which sections appear in the PDF/CSV export."
+                description={t('municipal_reports.templates.descriptions.audience')}
                 selectedKeys={[templateForm.audience]}
                 onSelectionChange={(keys) => {
                   const value = Array.from(keys)[0] as ReportTemplate['audience'] | undefined;
@@ -811,7 +811,7 @@ export default function MunicipalImpactReportsPage() {
               </Select>
               <Select
                 label={t('municipal_reports.templates.fields.period')}
-                description="Default reporting window applied when no manual date filter is set."
+                description={t('municipal_reports.templates.descriptions.period')}
                 selectedKeys={[templateForm.date_preset]}
                 onSelectionChange={(keys) => {
                   const value = Array.from(keys)[0] as ReportTemplate['date_preset'] | undefined;
@@ -826,7 +826,7 @@ export default function MunicipalImpactReportsPage() {
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <Input
                 label={t('municipal_reports.templates.fields.hour_value')}
-                description="Local formal-care hourly rate for cost-offset calculation (e.g. CHF 35 for Switzerland). Leave blank to use the tenant default."
+                description={t('municipal_reports.templates.descriptions.hour_value')}
                 type="number"
                 min={0}
                 max={500}

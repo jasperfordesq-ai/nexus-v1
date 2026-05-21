@@ -1375,6 +1375,15 @@
         "hour_value": "Hour value override (CHF)",
         "include_social_value": "Include social value estimate"
       },
+      "placeholders": {
+        "name": "e.g. Q3 2025 Canton Report for Funders",
+        "description": "Optional note for future reference - e.g. 'Used for annual AGM presentation'"
+      },
+      "descriptions": {
+        "audience": "Determines the narrative framing and which sections appear in the PDF/CSV export.",
+        "period": "Default reporting window applied when no manual date filter is set.",
+        "hour_value": "Local formal-care hourly rate for cost-offset calculation (e.g. CHF 35 for Switzerland). Leave blank to use the tenant default."
+      },
       "audiences": {
         "municipality": "Municipality",
         "canton": "Canton",
