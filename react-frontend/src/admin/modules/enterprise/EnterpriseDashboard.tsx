@@ -19,6 +19,7 @@ import ArrowRight from 'lucide-react/icons/arrow-right';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Database from 'lucide-react/icons/database';
 import Cpu from 'lucide-react/icons/cpu';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
@@ -26,7 +27,8 @@ import { StatCard, PageHeader } from '../../components';
 import type { EnterpriseDashboardStats } from '../../api/types';
 
 export function EnterpriseDashboard() {
-  usePageTitle("Enterprise");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.enterprise_dashboard_title'));
   const { tenantPath } = useTenant();
 
   const [stats, setStats] = useState<EnterpriseDashboardStats | null>(null);
@@ -53,17 +55,17 @@ export function EnterpriseDashboard() {
   const healthColor = stats?.health_status === 'healthy' ? 'success' : stats?.health_status === 'degraded' ? 'warning' : 'danger';
 
   const quickLinks = [
-    { label: "Roles & Permissions", href: tenantPath('/admin/enterprise/roles'), icon: Shield },
-    { label: "GDPR Dashboard", href: tenantPath('/admin/enterprise/gdpr'), icon: FileWarning },
-    { label: "System Monitoring", href: tenantPath('/admin/enterprise/monitoring'), icon: HeartPulse },
-    { label: "Legal Documents", href: tenantPath('/admin/legal-documents'), icon: FileWarning },
+    { label: t('enterprise.link_roles_permissions'), href: tenantPath('/admin/enterprise/roles'), icon: Shield },
+    { label: t('enterprise.link_gdpr_dashboard'), href: tenantPath('/admin/enterprise/gdpr'), icon: FileWarning },
+    { label: t('enterprise.link_system_monitoring'), href: tenantPath('/admin/enterprise/monitoring'), icon: HeartPulse },
+    { label: t('enterprise.link_legal_documents'), href: tenantPath('/admin/legal-documents'), icon: FileWarning },
   ];
 
   return (
     <div>
       <PageHeader
-        title={"Enterprise Dashboard"}
-        description={"Overview of GDPR compliance, system health, roles, and configuration"}
+        title={t('enterprise.enterprise_dashboard_title')}
+        description={t('enterprise.enterprise_dashboard_desc')}
         actions={
           <Button
             variant="flat"
@@ -72,7 +74,7 @@ export function EnterpriseDashboard() {
             isLoading={loading}
             size="sm"
           >
-            {"Refresh"}
+            {t('enterprise.refresh')}
           </Button>
         }
       />
@@ -80,28 +82,28 @@ export function EnterpriseDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={"Total Users"}
+          label={t('enterprise.label_total_users')}
           value={stats?.user_count ?? '---'}
           icon={Users}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={"Roles"}
+          label={t('enterprise.label_roles')}
           value={stats?.role_count ?? '---'}
           icon={Shield}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label={"Pending GDPR"}
+          label={t('enterprise.label_pending_g_d_p_r')}
           value={stats?.pending_gdpr_requests ?? 0}
           icon={FileWarning}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label={"System Health"}
+          label={t('enterprise.label_system_health')}
           value={stats?.health_status ?? '---'}
           icon={HeartPulse}
           color={healthColor}
@@ -113,19 +115,19 @@ export function EnterpriseDashboard() {
       {stats && (
         <Card shadow="sm" className="mb-6">
           <CardBody className="p-4">
-            <p className="text-sm font-semibold text-default-700 mb-3">{"System Health"}</p>
+            <p className="text-sm font-semibold text-default-700 mb-3">{t('enterprise.label_system_health')}</p>
             <div className="flex flex-wrap gap-3">
               <Chip color={stats.db_connected ? 'success' : 'danger'} variant="flat" size="sm" startContent={<Database size={12} />}>
-                Database {stats.db_connected ? 'Connected' : 'Disconnected'}
+                {t('enterprise.database')} {stats.db_connected ? t('enterprise.connected') : t('enterprise.disconnected')}
               </Chip>
               <Chip color={stats.redis_connected ? 'success' : 'danger'} variant="flat" size="sm" startContent={<Cpu size={12} />}>
-                Redis {stats.redis_connected ? 'Connected' : 'Disconnected'}
+                {t('enterprise.redis')} {stats.redis_connected ? t('enterprise.connected') : t('enterprise.disconnected')}
               </Chip>
               <Chip color={stats.memory_percent > 90 ? 'danger' : stats.memory_percent > 70 ? 'warning' : 'success'} variant="flat" size="sm">
-                Memory {stats.memory_percent}%
+                {t('enterprise.memory')} {stats.memory_percent}%
               </Chip>
               <Chip color={stats.disk_percent > 90 ? 'danger' : stats.disk_percent > 70 ? 'warning' : 'success'} variant="flat" size="sm">
-                Disk {stats.disk_percent}%
+                {t('enterprise.disk')} {stats.disk_percent}%
               </Chip>
             </div>
           </CardBody>
@@ -135,7 +137,7 @@ export function EnterpriseDashboard() {
       {/* Quick Links */}
       <Card shadow="sm">
         <CardBody className="p-4">
-          <h3 className="text-lg font-semibold text-foreground mb-4">{"Quick Links"}</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-4">{t('enterprise.quick_links')}</h3>
           {loading ? (
             <div className="flex justify-center py-8">
               <Spinner />
@@ -164,7 +166,7 @@ export function EnterpriseDashboard() {
       {stats?.recent_gdpr_activity && stats.recent_gdpr_activity.length > 0 && (
         <Card shadow="sm" className="mt-6">
           <CardBody className="p-4">
-            <p className="text-sm font-semibold text-default-700 mb-3">{"Recent GDPR Activity"}</p>
+            <p className="text-sm font-semibold text-default-700 mb-3">{t('enterprise.recent_gdpr_activity')}</p>
             <div className="space-y-2">
               {stats.recent_gdpr_activity.map((entry) => (
                 <div key={entry.id} className="flex items-center justify-between text-sm border-b border-divider pb-2 last:border-0">
