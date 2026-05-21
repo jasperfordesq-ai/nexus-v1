@@ -66,7 +66,7 @@ export function Subscriptions() {
   const columns: Column<SubscriptionItem>[] = [
     {
       key: 'tenant_name',
-      label: t('content.tenant', 'Tenant'),
+      label: t('content.tenant'),
       sortable: true,
       render: (item) => <span className="font-medium">{item.tenant_name || '--'}</span>,
     },
@@ -84,13 +84,13 @@ export function Subscriptions() {
     },
     {
       key: 'plan_tier_level',
-      label: t('content.tier', 'Tier'),
+      label: t('content.tier'),
       sortable: true,
       render: (item) => <span className="text-sm text-default-500">{item.plan_tier_level ?? '--'}</span>,
     },
     {
       key: 'starts_at',
-      label: t('content.started', 'Started'),
+      label: t('content.started'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -100,7 +100,7 @@ export function Subscriptions() {
     },
     {
       key: 'expires_at',
-      label: t('users.expires', 'Expires'),
+      label: t('users.expires'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -110,7 +110,7 @@ export function Subscriptions() {
     },
     {
       key: 'trial_ends_at',
-      label: t('content.trial_ends', 'Trial Ends'),
+      label: t('content.trial_ends'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -120,7 +120,7 @@ export function Subscriptions() {
     },
     {
       key: 'stripe_subscription_id',
-      label: t('content.stripe_subscription_id', 'Stripe ID'),
+      label: t('content.stripe_subscription_id'),
       sortable: true,
       render: (item) => (
         <span className="text-xs text-default-400 font-mono">
@@ -153,7 +153,7 @@ export function Subscriptions() {
         <DataTable
           columns={columns}
           data={data}
-          searchPlaceholder={t('data_table.search', 'Search subscriptions...')}
+          searchPlaceholder={t('data_table.search')}
           onRefresh={fetchData}
         />
       )}

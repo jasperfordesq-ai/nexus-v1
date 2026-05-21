@@ -165,7 +165,7 @@ export function UserShow() {
     try {
       const res = await adminUsers.impersonate(user.id);
       if (res?.success && res.data?.token) {
-        toast.success(t('super.impersonation_started', 'Impersonation started'));
+        toast.success(t('super.impersonation_started'));
         // Store token & navigate to member dashboard. The backend returns a
         // short-lived token scoped to the target user.
         localStorage.setItem('impersonation_token', res.data.token);
@@ -174,11 +174,11 @@ export function UserShow() {
       } else {
         toast.error(
           (res as { error?: string })?.error ||
-          t('super.impersonation_failed', 'Failed to start impersonation'),
+          t('super.impersonation_failed'),
         );
       }
     } catch {
-      toast.error(t('super.impersonation_failed', 'Failed to start impersonation'));
+      toast.error(t('super.impersonation_failed'));
     }
     setImpersonateLoading(false);
   };
@@ -555,7 +555,7 @@ export function UserShow() {
                     fullWidth
                     onPress={() => setImpersonateModalOpen(true)}
                   >
-                    {t('super.impersonate_user', 'Impersonate user')}
+                    {t('super.impersonate_user')}
                   </Button>
                 )}
                 <Button
@@ -631,7 +631,7 @@ export function UserShow() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <UserCog size={20} className="text-warning" />
-            {t('super.impersonate_user_title', 'Impersonate user')}
+            {t('super.impersonate_user_title')}
           </ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-600">
@@ -664,7 +664,7 @@ export function UserShow() {
               isLoading={impersonateLoading}
               startContent={<UserCog size={16} />}
             >
-              {t('super.impersonate_confirm', 'Start impersonation')}
+              {t('super.impersonate_confirm')}
             </Button>
           </ModalFooter>
         </ModalContent>

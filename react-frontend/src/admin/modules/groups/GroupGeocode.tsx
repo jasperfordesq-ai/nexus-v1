@@ -19,12 +19,12 @@ import { PageHeader } from '../../components';
 
 export function GroupGeocode() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('groups.geocode_title', 'Geocode Groups'));
+  usePageTitle(t('groups.geocode_title'));
 
   return (
     <div>
       <PageHeader
-        title={t('groups.geocode_title', 'Geocode Groups')}
+        title={t('groups.geocode_title')}
         description={t(
           'groups.geocode_description',
           'Batch-geocode group locations so they appear on the map.',
@@ -35,7 +35,7 @@ export function GroupGeocode() {
         <CardHeader className="flex items-center gap-2">
           <MapPin size={20} className="text-warning" />
           <h3 className="text-lg font-semibold">
-            {t('groups.geocode_not_migrated_title', 'Admin UI not yet migrated')}
+            {t('groups.geocode_not_migrated_title')}
           </h3>
         </CardHeader>
         <Divider />

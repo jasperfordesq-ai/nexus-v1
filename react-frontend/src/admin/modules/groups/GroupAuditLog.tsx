@@ -133,7 +133,7 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
         }
       }
     } catch {
-      toast.error(t('groups.audit_load_failed', 'Failed to load audit log'));
+      toast.error(t('groups.audit_load_failed'));
     } finally {
       setLoading(false);
     }
@@ -153,12 +153,12 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
         <div className="flex items-center gap-2">
           <ScrollText size={18} className="text-primary" />
           <h3 className="text-base font-semibold text-foreground">
-            {t('groups.audit_log_title', 'Audit Log')}
+            {t('groups.audit_log_title')}
           </h3>
         </div>
 
         <Select
-          label={t('groups.audit_filter_label', 'Filter by action')}
+          label={t('groups.audit_filter_label')}
           selectedKeys={new Set([actionFilter])}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];
@@ -168,7 +168,7 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
           size="sm"
           className="max-w-[200px]"
           items={[
-            { key: 'all', label: t('groups.audit_all_actions', 'All actions') },
+            { key: 'all', label: t('groups.audit_all_actions') },
             ...uniqueActions.map((action) => ({ key: action, label: action })),
           ]}
         >
@@ -182,16 +182,16 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
         </div>
       ) : entries.length === 0 ? (
         <p className="text-sm text-default-400 text-center py-8">
-          {t('groups.audit_empty', 'No audit entries found')}
+          {t('groups.audit_empty')}
         </p>
       ) : (
-        <Table aria-label={t('groups.audit_log_title', 'Audit Log')}>
+        <Table aria-label={t('groups.audit_log_title')}>
           <TableHeader>
-            <TableColumn>{t('groups.audit_col_date', 'Date')}</TableColumn>
-            <TableColumn>{t('groups.audit_col_action', 'Action')}</TableColumn>
-            <TableColumn>{t('groups.audit_col_user', 'User')}</TableColumn>
-            <TableColumn>{t('groups.audit_col_details', 'Details')}</TableColumn>
-            <TableColumn>{t('groups.audit_col_ip', 'IP Address')}</TableColumn>
+            <TableColumn>{t('groups.audit_col_date')}</TableColumn>
+            <TableColumn>{t('groups.audit_col_action')}</TableColumn>
+            <TableColumn>{t('groups.audit_col_user')}</TableColumn>
+            <TableColumn>{t('groups.audit_col_details')}</TableColumn>
+            <TableColumn>{t('groups.audit_col_ip')}</TableColumn>
           </TableHeader>
           <TableBody>
             {entries.map((entry) => (

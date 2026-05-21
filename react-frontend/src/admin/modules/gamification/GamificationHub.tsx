@@ -266,8 +266,8 @@ export function GamificationHub() {
                     <Settings2 size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground">{t('gamification.badge_configuration', 'Badge Configuration')}</p>
-                    <p className="text-xs text-default-500">{t('gamification.configure_badge_availability', 'Enable, disable & customize badges')}</p>
+                    <p className="font-medium text-foreground">{t('gamification.badge_configuration')}</p>
+                    <p className="text-xs text-default-500">{t('gamification.configure_badge_availability')}</p>
                   </div>
                   <ArrowRight size={16} className="text-default-400" />
                 </CardBody>

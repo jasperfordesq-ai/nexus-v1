@@ -120,7 +120,7 @@ export function PagesAdmin() {
     },
     {
       key: 'show_in_menu',
-      label: t('content.in_menu', 'In Menu'),
+      label: t('content.in_menu'),
       sortable: true,
       render: (item) => item.show_in_menu ? (
         <Chip size="sm" variant="flat" color="primary">
@@ -207,7 +207,7 @@ export function PagesAdmin() {
         <DataTable
           columns={columns}
           data={data}
-          searchPlaceholder={t('data_table.search', 'Search pages...')}
+          searchPlaceholder={t('data_table.search')}
           onRefresh={fetchData}
         />
       )}

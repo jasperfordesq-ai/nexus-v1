@@ -211,7 +211,7 @@ export default function GroupPolicies({
         </ModalBody>
         <ModalFooter>
           <Button variant="light" onPress={onClose}>
-            {t('common.close', 'Close')}
+            {t('common.close')}
           </Button>
         </ModalFooter>
       </ModalContent>
