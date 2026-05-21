@@ -50,12 +50,22 @@ export function Footer({ children, copyright }: FooterProps) {
     <footer className="relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm" data-nosnippet>
       <div className="md:hidden px-4 py-6 pb-[calc(var(--safe-area-bottom)+5rem)]">
         <div className="flex flex-col items-center gap-4">
-          {/* NEXUS logo — readable on mobile */}
-          <img
-            src="/images/project-nexus-banner.png"
-            alt={t('footer.project_nexus')}
-            className="h-20 w-auto max-w-[16rem] object-contain"
-          />
+          {/* NEXUS banner — clickable, links to project-nexus.ie */}
+          <a
+            href="https://project-nexus.ie"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Project NEXUS — Open-source timebanking and community platform"
+            className="transition-opacity hover:opacity-80"
+          >
+            <img
+              src="/images/project-nexus-open-source-community-platform.png"
+              alt="Project NEXUS — Open-source timebanking and community platform"
+              className="h-24 w-auto max-w-[18rem] object-contain"
+              width="288"
+              height="96"
+            />
+          </a>
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
           {/* Tenant partner logo — real or placeholder */}
           {tenant?.config?.partner_logo_url ? (
@@ -229,11 +239,11 @@ export function Footer({ children, copyright }: FooterProps) {
               </Link>
             </div>
 
-            {/* Platform Attribution — 3-zone panel */}
-            <div className="border-t border-theme-default pt-6 flex flex-col gap-5">
-              <div className="flex flex-col sm:flex-row items-center sm:items-stretch justify-between gap-6">
+            {/* Platform Attribution — 3-column grid */}
+            <div className="border-t border-theme-default pt-6 flex flex-col gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 items-start">
 
-                {/* LEFT: tenant / community partner logo — real or placeholder */}
+                {/* COL 1: Community partner logo */}
                 <div className="flex flex-col items-start gap-2">
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-theme-subtle/50">
                     {t('footer.community_partner')}
@@ -253,15 +263,46 @@ export function Footer({ children, copyright }: FooterProps) {
                   )}
                 </div>
 
-                {/* RIGHT: GitHub button + NEXUS logo */}
-                <div className="flex items-center gap-4 sm:gap-6">
+                {/* COL 2: Open source */}
+                <div className="flex flex-col items-start sm:items-center gap-3">
+                  <span className="text-[10px] font-semibold uppercase tracking-widest text-theme-subtle/50">
+                    {t('footer.open_source')}
+                  </span>
                   <SourceRepositoryLink />
-                  <div className="w-px self-stretch bg-theme-default" aria-hidden="true" />
-                  <img
-                    src="/images/project-nexus-banner.png"
-                    alt={t('footer.project_nexus')}
-                    className="h-24 w-auto max-w-[18rem] object-contain"
-                  />
+                  <p className="text-xs text-theme-subtle/60 text-left sm:text-center max-w-[16rem] leading-relaxed">
+                    {t('footer.agpl_short')}
+                  </p>
+                </div>
+
+                {/* COL 3: Powered by Project NEXUS */}
+                <div className="flex flex-col items-start sm:items-end gap-2">
+                  <span className="text-[10px] font-semibold uppercase tracking-widest text-theme-subtle/50">
+                    {t('footer.powered_by')}
+                  </span>
+                  <a
+                    href="https://project-nexus.ie"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Project NEXUS — Open-source timebanking and community platform"
+                    aria-label={t('footer.nexus_link_label')}
+                    className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
+                  >
+                    <img
+                      src="/images/project-nexus-open-source-community-platform.png"
+                      alt="Project NEXUS — Open-source timebanking and community platform"
+                      className="h-28 w-auto max-w-[20rem] object-contain"
+                      width="320"
+                      height="112"
+                    />
+                  </a>
+                  <a
+                    href="https://project-nexus.ie"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-theme-muted hover:text-theme-primary transition-colors"
+                  >
+                    project-nexus.ie ↗
+                  </a>
                 </div>
 
               </div>
