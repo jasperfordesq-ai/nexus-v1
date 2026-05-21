@@ -15109,12 +15109,20 @@
     "failed_to_add": "Failed to add",
     "failed_to_remove": "Failed to remove",
     "label_notes_optional": "Notes Optional",
-    "no_tenants_whitelisted": "No tenants whitelisted found",
+    "no_tenants_whitelisted": "No tenants are currently whitelisted.",
+    "notes_placeholder": "Add notes about why this tenant is being whitelisted...",
+    "page_description": "Manage the list of tenants allowed to participate in federation.",
+    "page_title": "Federation Whitelist",
     "remove": "Remove",
-    "remove_confirm_message": "Remove Confirm",
+    "remove_confirm_message": "Remove this tenant from the federation whitelist?",
     "remove_from_whitelist": "Remove From Whitelist",
+    "select_tenant_placeholder": "Select a tenant...",
+    "select_tenant_required": "Please select a tenant.",
+    "tenant_added_to_whitelist": "Tenant added to whitelist",
+    "tenant_removed_from_whitelist": "Tenant removed from whitelist",
     "view": "View",
-    "whitelisted_tenants_count": "Whitelisted Tenants Count"
+    "whitelisted_tenants_aria": "Whitelisted tenants",
+    "whitelisted_tenants_count": "Whitelisted tenants ({{count}})"
   },
   "impact_report_labels": {
     "transactions": "Transactions",
