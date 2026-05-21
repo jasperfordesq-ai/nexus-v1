@@ -48,12 +48,15 @@ export function Footer({ children, copyright }: FooterProps) {
 
   return (
     <footer className="relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm" data-nosnippet>
-      <div className="md:hidden px-4 py-4 pb-[calc(var(--safe-area-bottom)+5rem)] text-center">
-        <div className="flex flex-col items-center gap-2">
+      <div className="md:hidden px-4 py-5 pb-[calc(var(--safe-area-bottom)+5rem)] text-center">
+        <div className="flex flex-col items-center gap-3">
+          <img
+            src="/images/project-nexus-logo.png"
+            alt={t('footer.project_nexus')}
+            className="h-12 w-auto"
+          />
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
-          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-theme-subtle/75">
-            <img src="/images/project-nexus-logo.png" alt={t('footer.project_nexus')} className="h-5 w-auto opacity-70 hover:opacity-100 transition-opacity" />
-            <span aria-hidden="true">&middot;</span>
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-theme-subtle/70">
             <span>{t('footer.agpl_notice', { year })}</span>
             <span aria-hidden="true">&middot;</span>
             <Link to={tenantPath('/platform/terms')} className="hover:text-theme-primary transition-colors">
@@ -214,11 +217,19 @@ export function Footer({ children, copyright }: FooterProps) {
             </div>
 
             {/* Platform Attribution */}
-            <div className="pt-4 flex flex-col items-center justify-center gap-3 text-center">
-              <SourceRepositoryLink />
+            <div className="border-t border-theme-default pt-6 flex flex-col items-center gap-4">
+              {/* Logo + GitHub button side by side */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <img
+                  src="/images/project-nexus-logo.png"
+                  alt={t('footer.project_nexus')}
+                  className="h-14 w-auto"
+                />
+                <div className="hidden sm:block w-px h-10 bg-theme-default" aria-hidden="true" />
+                <SourceRepositoryLink />
+              </div>
+              {/* Legal strip */}
               <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-theme-subtle/70">
-                <img src="/images/project-nexus-logo.png" alt={t('footer.project_nexus')} className="h-5 w-auto opacity-70 hover:opacity-100 transition-opacity" />
-                <span aria-hidden="true">&middot;</span>
                 <span>{t('footer.agpl_notice', { year })}</span>
                 <span aria-hidden="true">&middot;</span>
                 <Link to={tenantPath('/platform/terms')} className="hover:text-theme-primary transition-colors">
