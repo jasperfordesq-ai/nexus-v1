@@ -24,6 +24,7 @@ import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import EyeOff from 'lucide-react/icons/eye-off';
 import Trash2 from 'lucide-react/icons/trash-2';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,21 +36,22 @@ import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminFeedPost } from '@/admin/api/types';
 
 export default function FeedModeration() {
-  usePageTitle("Moderation");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('moderation.page_title'));
 
   const POST_TYPES = [
-    { label: "All Types", value: '' },
-    { label: "Text Post", value: 'post' },
-    { label: "Poll", value: 'poll' },
-    { label: "Event", value: 'event' },
-    { label: "Listing", value: 'listing' },
-    { label: "Goal", value: 'goal' },
-    { label: "Review", value: 'review' },
-    { label: "Job", value: 'job' },
-    { label: "Challenge", value: 'challenge' },
-    { label: "Volunteer", value: 'volunteer' },
-    { label: "Blog Post", value: 'blog' },
-    { label: "Discussion", value: 'discussion' },
+    { label: t('moderation.filter_all_types'), value: '' },
+    { label: t('moderation.post_type_text'), value: 'post' },
+    { label: t('moderation.post_type_poll'), value: 'poll' },
+    { label: t('moderation.content_type_event'), value: 'event' },
+    { label: t('moderation.content_type_listing'), value: 'listing' },
+    { label: t('moderation.post_type_goal'), value: 'goal' },
+    { label: t('moderation.content_type_review'), value: 'review' },
+    { label: t('moderation.post_type_job'), value: 'job' },
+    { label: t('moderation.post_type_challenge'), value: 'challenge' },
+    { label: t('moderation.post_type_volunteer'), value: 'volunteer' },
+    { label: t('moderation.post_type_blog'), value: 'blog' },
+    { label: t('moderation.post_type_discussion'), value: 'discussion' },
   ];
 
   const toast = useToast();
@@ -80,13 +82,13 @@ export default function FeedModeration() {
       if (res.success && Array.isArray(res.data)) {
         setTenants(res.data.map((t) => ({
           id: Number(t.id),
-          name: String(t.name || 'Unknown'),
+          name: String(t.name || t('moderation.unknown_tenant')),
         })));
       }
     }).catch(() => {
       // Tenant list is optional; silently fail
     });
-  }, [isSuperAdmin]);
+  }, [isSuperAdmin, t]);
 
   // Build query params for the endpoint
   const buildQueryString = () => {
@@ -128,7 +130,7 @@ export default function FeedModeration() {
     const isAdmin = user?.role === 'admin' || user?.role === 'super_admin' || user?.is_super_admin === true || user?.is_tenant_super_admin === true;
     const isModerator = user?.role === 'moderator';
     if (!isAdmin && !isModerator) {
-      toast.error("Unauthorized");
+      toast.error(t('moderation.unauthorized'));
       setConfirmAction(null);
       return;
     }
@@ -143,16 +145,16 @@ export default function FeedModeration() {
       if (response.success) {
         toast.success(
           confirmAction.type === 'hide'
-            ? "Post hidden successfully"
-            : "Post deleted successfully"
+            ? t('moderation.post_hidden_successfully')
+            : t('moderation.post_deleted_successfully')
         );
         setConfirmAction(null);
         execute();
       } else {
-        toast.error(response.error || "Failed");
+        toast.error(response.error || t('something_wrong'));
       }
     } catch {
-      toast.error("An error occurred");
+      toast.error(t('something_wrong'));
     } finally {
       setActionLoading(false);
     }
@@ -174,7 +176,7 @@ export default function FeedModeration() {
           />
           <div className="flex flex-col">
             <span className="text-sm font-medium">{post.user_name}</span>
-            <span className="text-xs text-default-400">ID: {post.user_id}</span>
+            <span className="text-xs text-default-400">{t('moderation.member_id', { id: post.user_id })}</span>
           </div>
         </div>
       </TableCell>,
@@ -196,21 +198,21 @@ export default function FeedModeration() {
           <p className="text-sm line-clamp-2">{post.content}</p>
           {post.is_flagged && (
             <Chip size="sm" color="warning" variant="flat" className="mt-1">
-              {"Flagged"}
+              {t('moderation.flagged')}
             </Chip>
           )}
         </div>
       </TableCell>,
       <TableCell key="type">
         <Chip size="sm" variant="flat">
-          {post.type}
+          {t(`moderation.post_type_${post.type || 'text'}`)}
         </Chip>
       </TableCell>,
       <TableCell key="status">
         {post.is_hidden ? (
-          <Chip size="sm" color="warning" variant="flat">{"Hidden"}</Chip>
+          <Chip size="sm" color="warning" variant="flat">{t('moderation.hidden')}</Chip>
         ) : (
-          <Chip size="sm" color="success" variant="flat">{"Visible"}</Chip>
+          <Chip size="sm" color="success" variant="flat">{t('moderation.visible')}</Chip>
         )}
       </TableCell>,
       <TableCell key="created">
@@ -228,7 +230,7 @@ export default function FeedModeration() {
               startContent={<EyeOff className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'hide', post })}
             >
-              {"Hide"}
+              {t('moderation.hide')}
             </Button>
           )}
           <Button
@@ -238,7 +240,7 @@ export default function FeedModeration() {
             startContent={<Trash2 className="w-4 h-4" />}
             onPress={() => setConfirmAction({ type: 'delete', post })}
           >
-            {"Delete"}
+            {t('moderation.delete')}
           </Button>
         </div>
       </TableCell>
@@ -249,14 +251,29 @@ export default function FeedModeration() {
 
   // Determine columns based on super admin status
   const columns = isSuperAdmin
-    ? ["User", "Tenant", "Content", "Type", "Status", "Created", "Actions"]
-    : ["User", "Content", "Type", "Status", "Created", "Actions"];
+    ? [
+        { key: 'user', label: t('moderation.col_user') },
+        { key: 'tenant', label: t('moderation.label_tenant') },
+        { key: 'content', label: t('moderation.label_content') },
+        { key: 'type', label: t('moderation.label_post_type') },
+        { key: 'status', label: t('moderation.label_status') },
+        { key: 'created', label: t('moderation.col_created') },
+        { key: 'actions', label: t('moderation.col_actions') },
+      ]
+    : [
+        { key: 'user', label: t('moderation.col_user') },
+        { key: 'content', label: t('moderation.label_content') },
+        { key: 'type', label: t('moderation.label_post_type') },
+        { key: 'status', label: t('moderation.label_status') },
+        { key: 'created', label: t('moderation.col_created') },
+        { key: 'actions', label: t('moderation.col_actions') },
+      ];
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={"Feed Moderation"}
-        description={isSuperAdmin ? "Moderate feed posts across all tenants" : "Moderate feed posts and flagged content"}
+        title={t('moderation.feed_moderation_title')}
+        description={isSuperAdmin ? t('moderation.feed_desc_super') : t('moderation.feed_desc')}
         actions={
           <Button
             color="primary"
@@ -265,7 +282,7 @@ export default function FeedModeration() {
             onPress={() => execute()}
             isLoading={isLoading}
           >
-            {"Refresh"}
+            {t('moderation.refresh')}
           </Button>
         }
       />
@@ -273,8 +290,8 @@ export default function FeedModeration() {
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
         <Input type="search" name="admin-search" autoComplete="off"
-          placeholder={"Search Posts or Users..."}
-          aria-label={"Search Posts"}
+          placeholder={t('moderation.placeholder_search_posts_or_users')}
+          aria-label={t('moderation.label_search_posts')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -282,7 +299,7 @@ export default function FeedModeration() {
           className="flex-1"
         />
         <Select
-          label={"Post Type"}
+          label={t('moderation.label_post_type')}
           selectedKeys={typeFilter ? [typeFilter] : []}
           onChange={(e) => setTypeFilter(e.target.value)}
           className="w-full sm:w-48"
@@ -295,13 +312,13 @@ export default function FeedModeration() {
         </Select>
         {isSuperAdmin && (
           <Select
-            label={"Tenant"}
+            label={t('moderation.label_tenant')}
             selectedKeys={tenantFilter ? [tenantFilter] : []}
             onChange={(e) => setTenantFilter(e.target.value)}
             className="w-full sm:w-56"
           >
             {[
-              <SelectItem key="all">{"All Tenants"}</SelectItem>,
+              <SelectItem key="all">{t('moderation.filter_all_tenants')}</SelectItem>,
               ...tenants.map((t) => (
                 <SelectItem key={t.id.toString()}>
                   {t.name}
@@ -312,10 +329,10 @@ export default function FeedModeration() {
         )}
         <div className="flex gap-2">
           <Button color="primary" onPress={handleSearch}>
-            {"Apply"}
+            {t('moderation.apply')}
           </Button>
           <Button variant="flat" onPress={handleClear}>
-            {"Clear"}
+            {t('moderation.clear')}
           </Button>
         </div>
       </div>
@@ -323,23 +340,23 @@ export default function FeedModeration() {
       {/* Stats */}
       {meta && (
         <div className="text-sm text-default-500">
-          {`Showing`}
-          {isSuperAdmin && !activeTenant && ` (${"All Tenants"})`}
+          {t('moderation.showing_count')}
+          {isSuperAdmin && !activeTenant && ` (${t('moderation.filter_all_tenants')})`}
         </div>
       )}
 
       {/* Error State */}
       {error && (
         <div className="bg-danger-50 dark:bg-danger-950 text-danger border border-danger rounded-lg p-4">
-          {"Failed to load posts"}
+          {t('moderation.failed_to_load_posts')}
         </div>
       )}
 
       {/* Table */}
-      <Table aria-label={"Feed Posts Table"}>
+      <Table aria-label={t('moderation.label_feed_posts_table')}>
         <TableHeader>
           {columns.map((col) => (
-            <TableColumn key={col}>{col}</TableColumn>
+            <TableColumn key={col.key}>{col.label}</TableColumn>
           ))}
         </TableHeader>
         <TableBody
@@ -348,7 +365,7 @@ export default function FeedModeration() {
           loadingContent={<Spinner />}
           emptyContent={
             <div className="text-center py-8 text-default-400">
-              {activeSearch || activeType ? "No posts match filters" : "No posts to moderate"}
+              {activeSearch || activeType ? t('moderation.no_posts_match_filters') : t('moderation.no_posts_to_moderate')}
             </div>
           }
         >
@@ -378,13 +395,13 @@ export default function FeedModeration() {
         isOpen={!!confirmAction}
         onClose={() => setConfirmAction(null)}
         onConfirm={handleAction}
-        title={confirmAction?.type === 'hide' ? "Hide Post" : "Delete Post"}
+        title={confirmAction?.type === 'hide' ? t('moderation.hide_post') : t('moderation.delete_post')}
         message={
           confirmAction?.type === 'hide'
-            ? `Are you sure you want to hide this post from members?`
-            : `Are you sure you want to delete this post? This cannot be undone.`
+            ? t('moderation.confirm_hide_post')
+            : t('moderation.confirm_delete_post')
         }
-        confirmLabel={confirmAction?.type === 'hide' ? "Hide Post" : "Delete Post"}
+        confirmLabel={confirmAction?.type === 'hide' ? t('moderation.hide_post') : t('moderation.delete_post')}
         confirmColor={confirmAction?.type === 'hide' ? 'warning' : 'danger'}
         isLoading={actionLoading}
       />

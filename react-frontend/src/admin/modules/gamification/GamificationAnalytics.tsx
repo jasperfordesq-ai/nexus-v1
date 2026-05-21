@@ -17,6 +17,7 @@ import Award from 'lucide-react/icons/award';
 import Users from 'lucide-react/icons/users';
 import Zap from 'lucide-react/icons/zap';
 import Target from 'lucide-react/icons/target';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
@@ -28,7 +29,8 @@ import type { GamificationStats, BadgeDefinition } from '../../api/types';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function GamificationAnalytics() {
-  usePageTitle("Gamification");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('gamification.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -49,7 +51,7 @@ export function GamificationAnalytics() {
       // res.data is already unwrapped by the API client — never double-unwrap
       setStats(statsRes.data as GamificationStats);
     } else {
-      toast.error("Failed to load gamification stats");
+      toast.error(t('gamification.failed_to_load_gamification_stats'));
     }
 
     if (badgesRes.success && badgesRes.data) {
@@ -58,7 +60,7 @@ export function GamificationAnalytics() {
     }
 
     setLoading(false);
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -69,12 +71,12 @@ export function GamificationAnalytics() {
   return (
     <div>
       <PageHeader
-        title={"Gamification Analytics"}
-        description={"View badge distribution, XP stats, and engagement analytics"}
+        title={t('gamification.gamification_analytics_title')}
+        description={t('gamification.gamification_analytics_desc')}
         actions={
           <Link to={tenantPath("/admin/gamification")}>
             <Button variant="flat" startContent={<ArrowLeft size={16} />}>
-              {"Back to Hub"}
+              {t('gamification.back_to_hub')}
             </Button>
           </Link>
         }
@@ -83,28 +85,28 @@ export function GamificationAnalytics() {
       {/* Stats Row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={"Total Badges Awarded"}
+          label={t('gamification.label_total_badges_awarded')}
           value={stats?.total_badges_awarded ?? 0}
           icon={Award}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={"Users with Badges"}
+          label={t('gamification.label_users_with_badges')}
           value={stats?.active_users ?? 0}
           icon={Users}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={"Total XP in System"}
+          label={t('gamification.label_total_x_p_in_system')}
           value={stats?.total_xp_awarded ?? 0}
           icon={Zap}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label={"Active Campaigns"}
+          label={t('gamification.label_active_campaigns')}
           value={stats?.active_campaigns ?? 0}
           icon={Target}
           color="secondary"
@@ -117,8 +119,8 @@ export function GamificationAnalytics() {
         <Card shadow="sm">
           <CardHeader className="pb-0">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">{"Badge Distribution"}</h3>
-              <p className="text-sm text-default-500">{"Top 10 Badges"}</p>
+              <h3 className="text-lg font-semibold text-foreground">{t('gamification.badge_distribution')}</h3>
+              <p className="text-sm text-default-500">{t('gamification.top_10_badges')}</p>
             </div>
           </CardHeader>
           <CardBody>
@@ -148,7 +150,7 @@ export function GamificationAnalytics() {
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Award size={40} className="text-default-300 mb-2" />
-                <p className="text-default-500">{"No badges awarded"}</p>
+                <p className="text-default-500">{t('gamification.no_badges_awarded')}</p>
               </div>
             )}
           </CardBody>
@@ -158,9 +160,9 @@ export function GamificationAnalytics() {
         <Card shadow="sm">
           <CardHeader className="pb-0">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">{"Badge Catalogue"}</h3>
+              <h3 className="text-lg font-semibold text-foreground">{t('gamification.badge_catalogue')}</h3>
               <p className="text-sm text-default-500">
-                {`Total Badges`}
+                {t('gamification.total_badges')}
               </p>
             </div>
           </CardHeader>
@@ -181,25 +183,25 @@ export function GamificationAnalytics() {
                       <span className="text-sm font-medium text-foreground truncate">{badge.name}</span>
                       {badge.type === 'custom' && (
                         <span className="text-[10px] uppercase tracking-wider text-success bg-success/10 px-1.5 py-0.5 rounded font-semibold">
-                          {`Custom`}
+                          {t('gamification.badge_type_custom')}
                         </span>
                       )}
                     </div>
                     <span className="text-xs text-default-500 whitespace-nowrap">
-                      {`Awarded`}
+                      {t('gamification.users_awarded')}
                     </span>
                   </div>
                 ))}
                 {badges.length > 20 && (
                   <p className="text-center text-xs text-default-400 pt-2">
-                    {`And More`}
+                    {t('gamification.and_more')}
                   </p>
                 )}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Award size={40} className="text-default-300 mb-2" />
-                <p className="text-default-500">{"No badges defined"}</p>
+                <p className="text-default-500">{t('gamification.no_badges_defined')}</p>
               </div>
             )}
           </CardBody>
