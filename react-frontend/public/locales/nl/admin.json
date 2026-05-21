@@ -10589,135 +10589,244 @@
   },
   "municipal_reports": {
     "meta": {
-      "title": "Municipal Impact Reports",
-      "description": "Prepare KISS-style reporting for verified hours, active members, trusted organisations, and municipal value conversations."
+      "title": "Gemeentelijke Impactrapporten",
+      "description": "Bereid rapportages in KISS-stijl voor over geverifieerde uren, actieve leden, vertrouwde organisaties en gemeentelijke waardegesprekken."
     },
     "actions": {
-      "analytics": "Community analytics",
-      "impact_report": "Impact report",
-      "open_source_report": "Open source report",
-      "export_csv": "Export CSV",
-      "export_pdf": "Export PDF"
+      "analytics": "Community-analyses",
+      "impact_report": "Impactrapport",
+      "open_source_report": "Open source-rapport",
+      "export_csv": "Exporteer CSV",
+      "export_pdf": "Exporteer PDF"
     },
     "stats": {
-      "report_pack": "Report pack",
-      "ready": "Ready",
-      "hours_source": "Hours source",
-      "verified": "Verified",
-      "audience": "Audience",
-      "municipal": "Municipal",
-      "exports": "Exports",
+      "report_pack": "Rapportpakket",
+      "ready": "Klaar",
+      "hours_source": "Uren bron",
+      "verified": "Geverifieerd",
+      "audience": "Publiek",
+      "municipal": "Gemeentelijk",
+      "exports": "Exporteert",
       "csv_pdf": "CSV/PDF",
-      "verified_hours": "Verified hours",
-      "participants": "Participants",
-      "organisations": "Organisations",
-      "total_value": "Total value"
+      "verified_hours": "Geverifieerde uren",
+      "participants": "Deelnemers",
+      "organisations": "Organisaties",
+      "total_value": "Totale waarde"
     },
-    "loading": "Loading municipal impact data",
-    "period": "Reporting period",
-    "hour_value": "Hour value",
-    "multiplier": "Social multiplier",
+    "loading": "Gemeentelijke impactgegevens laden",
+    "period": "Rapportageperiode",
+    "hour_value": "Uurwaarde",
+    "multiplier": "Sociale multiplier",
     "sections": {
-      "categories": "Support categories",
-      "trends": "Verified activity trend",
-      "readiness": "Procurement readiness signals"
+      "categories": "Ondersteuningscategorieën",
+      "trends": "Geverifieerde activiteitstrend",
+      "readiness": "Signalen van gereedheid voor inkoop"
     },
     "empty": {
-      "categories": "No completed support categories in this period.",
-      "trends": "No verified activity trend is available for this period."
+      "categories": "Geen voltooide ondersteuningscategorieën in deze periode.",
+      "trends": "Er is geen geverifieerde activiteitstrend beschikbaar voor deze periode."
     },
     "values": {
-      "hours": "{{count}}h",
-      "activities": "{{count}} activities",
-      "trend_detail": "{{participants}} participants, {{activities}} activities",
-      "disabled": "Disabled"
+      "hours": "{{count}}u",
+      "activities": "{{count}} activiteiten",
+      "trend_detail": "{{participants}} deelnemers, {{activities}} activiteiten",
+      "disabled": "Gehandicapt"
     },
     "toast": {
-      "load_failed": "Failed to load municipal impact data.",
-      "export_started": "Report export started.",
-      "export_failed": "Failed to export the municipal report.",
-      "templates_load_failed": "Failed to load report templates.",
-      "template_saved": "Report template saved.",
-      "template_save_failed": "Failed to save the report template.",
-      "template_deleted": "Report template deleted.",
-      "template_delete_failed": "Failed to delete the report template."
+      "load_failed": "Kan gemeentelijke impactgegevens niet laden.",
+      "export_started": "Rapportexport gestart.",
+      "export_failed": "Kan het gemeentelijk rapport niet exporteren.",
+      "templates_load_failed": "Kan rapportsjablonen niet laden.",
+      "template_saved": "Rapportsjabloon opgeslagen.",
+      "template_save_failed": "Kan de rapportsjabloon niet opslaan.",
+      "template_deleted": "Rapportsjabloon verwijderd.",
+      "template_delete_failed": "Kan de rapportsjabloon niet verwijderen."
     },
     "cards": {
       "verified_hours": {
-        "title": "Verified hours and economic value",
-        "description": "Summarise approved support hours, transaction volume, active contributors, and estimated value.",
-        "metric_1": "Approved hours",
-        "metric_2": "Active contributors",
-        "metric_3": "Value estimate"
+        "title": "Geverifieerde uren en economische waarde",
+        "description": "Geef een samenvatting van goedgekeurde ondersteuningsuren, transactievolume, actieve bijdragers en geschatte waarde.",
+        "metric_1": "Goedgekeurde uren",
+        "metric_2": "Actieve bijdragers",
+        "metric_3": "Waarde schatting"
       },
       "active_members": {
-        "title": "Member reach and inclusion",
-        "description": "Track active members, new joiners, inactive members, and groups that need coordinator attention.",
-        "metric_1": "Active members",
-        "metric_2": "New joiners",
-        "metric_3": "Inactive members"
+        "title": "Bereik en inclusie van leden",
+        "description": "Houd actieve leden, nieuwe leden, inactieve leden en groepen bij die de aandacht van de coördinator nodig hebben.",
+        "metric_1": "Actieve leden",
+        "metric_2": "Nieuwe deelnemers",
+        "metric_3": "Inactieve leden"
       },
       "organisations": {
-        "title": "Organisation and partner activity",
-        "description": "Show participating organisations, opportunities, verified logs, and coordinator workflows.",
-        "metric_1": "Organisations",
-        "metric_2": "Opportunities",
-        "metric_3": "Verified logs"
+        "title": "Organisatie- en partneractiviteiten",
+        "description": "Toon deelnemende organisaties, kansen, geverifieerde logboeken en coördinatorworkflows.",
+        "metric_1": "Organisaties",
+        "metric_2": "Mogelijkheden",
+        "metric_3": "Geverifieerde logboeken"
       },
       "trust_pack": {
-        "title": "Trust, safeguarding, and compliance",
-        "description": "Surface verification, review, safeguarding, consent, and audit signals for sensitive care coordination.",
-        "metric_1": "Verification",
-        "metric_2": "Reviews",
-        "metric_3": "Audit trail"
+        "title": "Vertrouwen, bescherming en naleving",
+        "description": "Verificatie-, beoordelings-, beschermings-, toestemmings- en auditsignalen voor de coördinatie van gevoelige zorg.",
+        "metric_1": "Verificatie",
+        "metric_2": "Recensies",
+        "metric_3": "Audittrail"
       }
     },
-    "policy_default": "Policy default",
-    "audience": "Audience",
+    "policy_default": "Standaardbeleid",
+    "audience": "Publiek",
     "filters": {
-      "title": "Reporting window",
-      "description": "Use explicit dates when preparing canton, municipality, foundation, or cooperative packs.",
-      "date_from": "From",
-      "date_to": "To",
-      "apply": "Apply dates",
-      "clear": "Clear"
+      "title": "Rapportagevenster",
+      "description": "Gebruik expliciete data bij het voorbereiden van kanton-, gemeente-, stichtings- of coöperatieve pakketten.",
+      "date_from": "Van",
+      "date_to": "Naar",
+      "apply": "Datums toepassen",
+      "clear": "Duidelijk"
     },
     "readiness": {
-      "municipal_value": "Municipal value",
-      "participation": "Participation",
-      "partner_network": "Partner network",
-      "local_exchange": "Local exchange",
+      "municipal_value": "Gemeentelijke waarde",
+      "participation": "Deelname",
+      "partner_network": "Partnernetwerk",
+      "local_exchange": "Lokale uitwisseling",
       "status": {
-        "ready": "Ready",
-        "needs_data": "Needs data"
+        "ready": "Klaar",
+        "needs_data": "Heeft gegevens nodig"
       }
     },
     "templates": {
-      "title": "Saved report templates",
-      "description": "Prepare repeatable municipal, canton, cooperative, or foundation report packs with the right audience, period, and value assumptions.",
-      "create": "New template",
-      "select_label": "Report template",
-      "default_policy": "Use workflow policy defaults",
-      "apply": "Apply",
-      "delete": "Delete",
-      "cancel": "Cancel",
-      "save": "Save template",
-      "modal_title": "Create report template",
-      "hour_value_chip": "CHF {{value}}/h",
+      "title": "Opgeslagen rapportsjablonen",
+      "description": "Bereid herhaalbare gemeentelijke, kanton-, coöperatieve of stichtingsrapportpakketten voor met de juiste doelgroep, periode en aannames over de juiste waarde.",
+      "create": "Nieuw sjabloon",
+      "select_label": "Rapportsjabloon",
+      "default_policy": "Gebruik standaardinstellingen voor workflowbeleid",
+      "apply": "Toepassen",
+      "delete": "Verwijderen",
+      "cancel": "Annuleren",
+      "save": "Sjabloon opslaan",
+      "modal_title": "Rapportsjabloon maken",
+      "hour_value_chip": "CHF {{value}}/u",
       "fields": {
-        "name": "Template name",
-        "description": "Description",
-        "audience": "Audience",
-        "period": "Reporting period",
-        "hour_value": "Hour value override (CHF)",
-        "include_social_value": "Include social value estimate"
+        "name": "Sjabloonnaam",
+        "description": "Beschrijving",
+        "audience": "Publiek",
+        "period": "Rapportageperiode",
+        "hour_value": "Uurwaarde overschrijven (CHF)",
+        "include_social_value": "Inclusief schatting van de sociale waarde"
       },
       "audiences": {
-        "municipality": "Municipality",
-        "canton": "Canton",
-        "cooperative": "Cooperative",
-        "foundation": "Foundation"
+        "municipality": "Gemeente",
+        "canton": "Kanton",
+        "cooperative": "Coöperatief",
+        "foundation": "Fundering"
+      },
+      "descriptions": {
+        "audience": "Bepaalt de verhalende omkadering en welke secties verschijnen in de PDF/CSV-export.",
+        "hour_value": "Lokaal uurtarief voor formele zorg voor berekening van de kostencompensatie (bijv. CHF 35 voor Zwitserland). Laat dit leeg om de standaardtenant te gebruiken.",
+        "period": "Standaard rapportagevenster toegepast als er geen handmatig datumfilter is ingesteld."
+      },
+      "placeholders": {
+        "description": "Optionele opmerking voor toekomstig gebruik - b.v. 'Gebruikt voor jaarlijkse AVA-presentatie'",
+        "name": "bijv. Kantonrapport over het derde kwartaal van 2025 voor financiers"
       }
+    },
+    "about": {
+      "body_1_after_chf": "waarde van uren x preventiemultiplier).",
+      "body_1_after_kiss": "/Age-Stiftung methodologie, een geschatte kostencompensatie voor formele zorgdiensten (",
+      "body_1_before_kiss": "Het Gemeentelijk Impactrapport is het bewijspakket dat u deelt met gemeentelijke partners, kantons en financiers om de waarde van het programma aan te tonen. Het toont geverifieerde opvanguren, actieve leden, partnerorganisaties en, met behulp van de",
+      "body_2_after_audience": "schakel om de verhaalkader te wijzigen:",
+      "body_2_after_canton": "verzamelt meerdere gemeenten en toont kostenvermijding op kantonnale schaal;",
+      "body_2_after_cooperative": "toont het ledenbehoud, het wederkerigheidspercentage en de werklast van de coördinator. Exporteer als PDF om naar partners te sturen of als CSV voor verdere analyse. Sla rapportsjablonen op om dezelfde configuratie in toekomstige perioden snel opnieuw te genereren.",
+      "body_2_after_municipality": "richt zich op bereikte buurtbewoners en partnerorganisaties;",
+      "body_2_prefix": "Gebruik de",
+      "chf_abbr": "CHF",
+      "kiss_abbr": "KISS",
+      "title": "Over dit rapport"
+    },
+    "audience_selector": {
+      "description": "Verander de verhaalkader. Alleen de geselecteerde doelgroepsectie wordt opgenomen in de PDF/CSV-export.",
+      "title": "Publiek"
+    },
+    "export_note": {
+      "csv_label": "CSV exporteren",
+      "csv_text": "geeft ruwe gegevens voor spreadsheetanalyse of subsidierapportage.",
+      "pdf_label": "PDF exporteren",
+      "pdf_text": "is geformatteerd om te delen met gemeentelijke partners en financiers."
+    },
+    "narrative": {
+      "canton": {
+        "description": "Totale impact binnen gemeenten, kostenvermijding van professionele zorg, trend op jaarbasis.",
+        "empty_body": "Schakel over naar de Canton-modus om het verhaal op kantonniveau te laden.",
+        "empty_description": "Geaggregeerde impact over gemeenten, kostenvermijding en jaar-op-jaar verandering.",
+        "empty_title": "Kanton (Kantonsrat / regionale overheid)",
+        "estimated_cost_avoidance": "Geschatte kostenbesparing",
+        "estimated_cost_avoidance_desc": "Uren x poliswaarde x {{multiplier}} (equivalentie van professionele zorg).",
+        "multi_node_total_hours": "Totaal aantal uren met meerdere knooppunten",
+        "multi_node_total_hours_desc": "Geverifieerd op alle aangemelde knooppunten.",
+        "municipalities_reporting": "Gemeenten rapporteren",
+        "municipalities_reporting_desc": "Het totale aantal knooppunten dat bijdraagt ​​aan deze weergave.",
+        "prior_period_detail": "Vorige periode: {{from}} tot {{to}} - {{hours}} geverifieerde uren.",
+        "title": "Geverifieerde ondersteuningsuren{{tenant}} - {{from}} tot {{to}}",
+        "yoy_change": "Verandering van jaar tot jaar"
+      },
+      "cooperative": {
+        "active_tandems": "Actieve tandems",
+        "active_tandems_desc": "Terugkerende helper/ontvanger-paren (2+ uitwisselingen).",
+        "coordinator_load": "Coördinator belasting",
+        "coordinator_load_desc": "{{pending}} in behandeling bij {{coordinators}} coördinatoren.",
+        "description": "Interne coöperatieve gezondheid: retentie, wederkerigheid, tandems, coördinatorbelasting, kredietpool.",
+        "empty_body": "Schakel over naar de coöperatieve modus om het coöperatieve interne verhaal te laden.",
+        "empty_description": "Ledenbehoud, wederkerigheid van uren, tandemrelaties, werklast van de coördinator, kredietpool voor toekomstige zorg.",
+        "empty_title": "Coöperatief (KISS-Genossenschaft intern)",
+        "future_care_credit_pool": "Kredietbalanspool voor toekomstige zorg",
+        "future_care_credit_pool_desc": "Som van de positieve ledensaldi: de impliciete reserve voor toekomstige zorg van de coöperatie. Actief ledenbestand: {{count}}.",
+        "member_retention": "Retentie van leden",
+        "member_retention_desc": "{{count}} leden actief in zowel deze periode als de voorgaande equivalente periode.",
+        "reciprocity_rate": "Wederkerigheid tarief",
+        "reciprocity_rate_desc": "{{count}}-supporters kregen in de periode ook uren.",
+        "title": "Coöperatief intern rapport - {{from}} tot {{to}}"
+      },
+      "in_export": "Bij het exporteren",
+      "logs_count": "{{count}} logt",
+      "municipality": {
+        "description": "Lokale deelname, genoemde partnerorganisaties, geografische / categorie-indeling, bereik van de ontvangers.",
+        "empty_body": "Schakel over naar de gemeentemodus om het verhaal op gemeenteniveau te laden.",
+        "empty_description": "Lokale participatie, genoemde partnerorganisaties, geografische / categorie-indeling.",
+        "empty_title": "Gemeente (Gemeinde)",
+        "no_category_data": "Geen categoriegegevens in deze periode.",
+        "no_partner_activity": "Geen partneractiviteit in deze periode.",
+        "partner_organisations": "Partnerorganisaties",
+        "partner_organisations_by_hours": "Partnerorganisaties (per uren)",
+        "recipients_reached": "Ontvangers bereikt",
+        "recipients_reached_desc": "Verschillende ontvangers van voltooide uitwisselingen.",
+        "title": "Impact op de gemeenschap - {{from}} tot {{to}}",
+        "top_5_categories": "Top 5 categorieën (geografisch/activiteitenverdeling)",
+        "top_categories": "Topcategorieën",
+        "top_categories_desc": "Hieronder per uur vermeld.",
+        "trusted_total": "van {{count}} vertrouwd totaal."
+      },
+      "no_prior_data": "Geen voorafgaande gegevens"
+    },
+    "readiness_help": {
+      "local_exchange": {
+        "fix": "Nog geen voltooide uitwisselingen. Coördinatoren moeten openstaande urenregistraties goedkeuren.",
+        "what": "Geverifieerde uitwisselingen (voltooid en goedgekeurd) geregistreerd in deze periode."
+      },
+      "municipal_value": {
+        "fix": "Er is nog geen kostencompensatie berekenbaar. Keur openstaande vrijwilligersurenlogboeken goed om deze statistiek in te vullen.",
+        "what": "Geschatte kostencompensatie voor formele zorg (uren x beleidsuurwaarde x preventiemultiplier)."
+      },
+      "participation": {
+        "fix": "Onder de minimale deelnamedrempel. Ga door met het onboarden van leden en het voltooien van uitwisselingen.",
+        "what": "Verschillende leden die in deze periode actief zijn als ondersteuner of ontvanger."
+      },
+      "partner_network": {
+        "fix": "Geen vertrouwde organisaties actief. Onboard organisaties via Vrijwilligerswerk > Organisaties.",
+        "what": "Vertrouwde partnerorganisaties die in deze periode uren hebben bijgedragen."
+      }
+    },
+    "readiness_intro": {
+      "needs_data_suffix": "= statistiek ligt onder de drempelwaarde - plaats de muisaanwijzer op elke kaart ter begeleiding.",
+      "prefix": "Deze vier signalen geven aan of het rapport voldoende gegevens bevat om overtuigend te zijn voor een extern publiek.",
+      "ready_suffix": "= voldoende gegevens;"
     }
   },
   "caring_emergency": {
@@ -12525,6 +12634,257 @@
         "reject_failed": "Kan de campagne niet afwijzen.",
         "required_fields": "Naam, titel en hoofdtekst zijn vereist."
       }
+    }
+  },
+  "municipal_copilot": {
+    "about": {
+      "body": "De Gemeentelijke Copiloot helpt u mededelingen te schrijven die duidelijk, passend formeel en vrij van jargon zijn. Plak een ruwe schets. De AI zal verbeteringen voorstellen, toonproblemen markeren (te formeel, neerbuigend of onduidelijk) en eventuele moderatieproblemen opnoemen. U beoordeelt en accepteert of wijst de suggestie af voordat er iets wordt gepubliceerd.",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "accept": "Accepteren",
+      "cancel": "Annuleren",
+      "generate_proposal": "Voorstel genereren",
+      "refresh": "Vernieuwen",
+      "reject": "Afwijzen",
+      "reject_proposal": "Voorstel afwijzen",
+      "view": "Weergave"
+    },
+    "empty": {
+      "no_latest": "Nog geen voorstel. Genereer er een uit het concept aan de linkerkant.",
+      "no_proposals": "Nog geen voorstellen. Concepten die u analyseert, verschijnen hier als een audittrail.",
+      "value": "-"
+    },
+    "fields": {
+      "audience_description": "Geef aan voor wie deze mededeling bedoeld is (bijvoorbeeld 'alle bewoners', 'vrijwilligers', 'gemeentecontacten'), zodat de AI de toon en de woordenschat op de juiste manier kan kalibreren.",
+      "audience_hint": "Doelgroephint (optioneel)",
+      "audience_placeholder": "bijv. zorgverleners in de noordelijke subregio",
+      "character_count": "{{count}} / 4000 tekens",
+      "draft_announcement": "Concept-aankondiging",
+      "draft_placeholder": "Plak een ruwe schets. De copiloot zal de toon oppoetsen, de toon controleren en problemen signaleren.",
+      "polished_text": "Gepolijste tekst",
+      "reason": "Reden",
+      "reason_placeholder": "Waarom wordt dit voorstel afgewezen?"
+    },
+    "labels": {
+      "audience": "Publiek: {{audience}}",
+      "model": "Gebruikt model: {{model}}"
+    },
+    "meta": {
+      "page_title": "Copiloot gemeentelijke communicatie",
+      "subtitle": "Stel officiële aankondigingen op, laat ze op AI bijwerken, controleer de toon en duidelijkheid en publiceer ze vervolgens. Ontworpen voor coördinatoren die op een consistente, toegankelijke toon moeten communiceren met bewoners en gemeentecontacten.",
+      "title": "Copiloot gemeentelijke communicatie"
+    },
+    "modal": {
+      "reject_title": "Voorstel afwijzen"
+    },
+    "sections": {
+      "clarity_warnings": "Duidelijkheidswaarschuwingen",
+      "latest_proposal": "Laatste voorstel",
+      "moderation_flags": "Moderatievlaggen",
+      "new_draft": "Nieuw ontwerp",
+      "recent_proposals": "Recente voorstellen"
+    },
+    "states": {
+      "accepted": "Geaccepteerd. Publiceer nu de gepolijste tekst via de aankondigingenbeheerder.",
+      "rejected_reason": "Afgewezen - reden: {{reason}}"
+    },
+    "status": {
+      "accepted": "Geaccepteerd",
+      "proposed": "Voorgesteld",
+      "published": "Gepubliceerd",
+      "rejected": "Afgewezen"
+    },
+    "table": {
+      "actions": "ACTIES",
+      "aria": "Recente copilootvoorstellen",
+      "audience": "PUBLIEK",
+      "created": "GEMAAKT",
+      "draft": "VOORLOPIGE VERSIE",
+      "status": "Status",
+      "tone": "TOON"
+    },
+    "toasts": {
+      "accept_failed": "Kan het voorstel niet accepteren",
+      "accepted": "Voorstel geaccepteerd - publiceer nu via de aankondigingenbeheerder",
+      "draft_too_long": "Het concept is te lang (max. 4000 tekens)",
+      "enter_draft": "Voer eerst een concept in",
+      "generate_failed": "Kan voorstel niet genereren",
+      "generated": "Voorstel gegenereerd",
+      "load_failed": "Kan copilootvoorstellen niet laden",
+      "reason_required": "Reden is vereist",
+      "reject_failed": "Het voorstel kan niet worden afgewezen",
+      "rejected": "Voorstel afgewezen"
+    },
+    "tone": {
+      "condescending": "Zelfingenomen",
+      "ok": "Toon oké",
+      "too_formal": "Te formeel",
+      "too_informal": "Te informeel"
+    },
+    "tone_legend": {
+      "condescending": "kan de lezer betuttelen",
+      "ok": "geen toonproblemen gedetecteerd",
+      "prefix": "Toon legende -",
+      "too_formal": "overdreven bureaucratisch",
+      "too_informal": "lijkt misschien onprofessioneel"
+    }
+  },
+  "municipal_roi_page": {
+    "about": {
+      "body_middle": "Report berekent de sociale en economische waarde van uw gemeenschapszorgprogramma met behulp van de",
+      "body_prefix": "De gemeentelijke",
+      "body_suffix": "Age-Stiftung methodologie. Het toont de geschatte kosten die worden gecompenseerd voor formele zorgdiensten (Spitex/Pflege), de gegenereerde sociale waarde en trendgegevens over de rapportageperioden. Dit rapport is bedoeld om te worden gedeeld met gemeentelijke partners en financiers als bewijs van de impact van het programma.",
+      "formula_prefix": "Kostencompensatie = totaal goedgekeurde zorguren x",
+      "formula_suffix": "uurtarief x preventiemultiplier. De preventiemultiplier (standaard: 2,0) weerspiegelt dat één uur informele zorg ongeveer twee uur formele zorginterventie voorkomt, gebaseerd op Age-Stiftung onderzoek.",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "export_csv": "Exporteer CSV",
+      "refresh_aria": "Vernieuwen gemeentelijke impactrapportage",
+      "refresh_data": "Gegevens vernieuwen"
+    },
+    "breakdown": {
+      "aria": "Uitsplitsing naar subregio",
+      "description": "Uitsplitsing naar subregio laat zien welke buurten de meeste zorgactiviteit genereren. Gebruik dit om gebieden te identificeren die mogelijk meer coördinatorondersteuning of vrijwilligerswerving nodig hebben.",
+      "formal_care_offset": "Formele zorgcompensatie",
+      "hours": "Uur",
+      "sub_region": "Subregio",
+      "title": "Uitsplitsing per subregio",
+      "weighted_hours": "Gewogen uren"
+    },
+    "filters": {
+      "all_sub_regions": "Alle subregio's",
+      "from": "Van",
+      "period": "Periode: {{from}} -> {{to}}",
+      "sub_region": "Subregio",
+      "to": "Naar"
+    },
+    "meta": {
+      "page_title": "Gemeentelijk Impactrapport",
+      "subtitle": "Bewijs voor B2G-inkoop: compensaties voor zorgkosten en maatstaven voor sociaal kapitaal",
+      "title": "Gemeentelijk Impactrapport"
+    },
+    "methodology": {
+      "chf_per_hour": "CHF {{amount}}/uur",
+      "default_prevention_prefix": "Preventiewaarde past een vermenigvuldiger van 2x toe per Age-Stiftung/",
+      "default_prevention_suffix": "evaluatiemethodologie.",
+      "default_rate": "CHF 35/uur",
+      "default_source": "Tarief Zwitserse formele zorgassistenten, SECO 2024",
+      "hours_are_valued_at": "Uren worden gewaardeerd op",
+      "hours_valued_at": "Uren gewaardeerd op",
+      "prevention_value_prefix": "Preventiewaarde past een {{multiplier}}x vermenigvuldiger toe per Age-Stiftung/",
+      "prevention_value_suffix": "evaluatiemethodologie.",
+      "substitution_applied": "Uren worden gewogen op basis van substitutiecoëfficiënten per categorie.",
+      "substitution_not_applied": "Alle uren gewogen op 1,0x.",
+      "tenant_setting_source": "geconfigureerd voor deze tenant"
+    },
+    "municipalities": {
+      "point_export": "CSV export beschikbaar - gebruik de knop in de paginakop voor Age-Stiftung, Pro Senectute en rapportage van de kantonnale sociale afdelingen.",
+      "point_hour_prefix": "Elk uur zorgtijd voor de gemeenschap bespaart ongeveer",
+      "point_hour_suffix": "in de formele zorgkosten",
+      "point_nexus": "maakt deze impact meetbaar, controleerbaar en rapporteerbaar voor kantonnale en gemeentelijke aanbestedingen",
+      "point_prevention": "Preventieve gemeenschapssteun kan de behoeften aan residentiële zorg verminderen - een geschatte vermenigvuldiger van 2x",
+      "title": "Wat dit betekent voor gemeenten"
+    },
+    "roi": {
+      "default_multiplier_note": "(2x vermenigvuldiger)",
+      "multiplier_note": "({{multiplier}}x vermenigvuldiger)",
+      "prevented_this_period": "aan formele zorgkosten voorkomen deze periode",
+      "prevention_value": "Preventiewaarde",
+      "social_isolation_supported": "Mensen ondersteund uit sociaal isolement",
+      "title": "Geschatte zorgkostencompensatie",
+      "yoy": "{{value}} YoY"
+    },
+    "stats": {
+      "active_members": "Actieve leden",
+      "active_relationships": "Actieve relaties",
+      "care_recipients": "Zorgontvangers",
+      "total_hours": "Totaal aantal uren",
+      "weighted_hours_note": "{{hours}} gewogen uren na vervangingscoëfficiënten",
+      "weighted_hours_tooltip": "Uren worden gewogen op basis van categoriespecifieke vervangingspercentages (bijvoorbeeld gezelschap 0,4x, vervoer 0,7x, boodschappen 1,0x) per Age-Stiftung methodologie."
+    },
+    "toasts": {
+      "export_failed": "Kan CSV niet exporteren",
+      "load_failed": "Kan gemeentelijke impactgegevens niet laden"
+    }
+  },
+  "municipal_verification": {
+    "about": {
+      "body": "Gemeentelijke Verificatie registreert de formele ondertekening door een gemeente of kantonpartner dat dit gemeenschapszorgprogramma aan hun eisen voldoet. Verificatie is vereist voor de controle van de pilotlanceringsgereedheid en ontgrendelt het gemeentelijke impactrapport. Gebruik DNS TXT verificatie voor officiële gemeentelijke domeinen, of pas een beheerdersattest toe als DNS controle niet beschikbaar is.",
+      "pending_dns": "Verificatietoken gegenereerd - in afwachting van DNS-propagatie en bevestiging.",
+      "revoked": "Verificatie is verwijderd. Verifieer opnieuw om de toegang te herstellen.",
+      "title": "Over deze pagina",
+      "verified": "Formeel geverifieerd - het gemeentelijke rapportagepakket is ontgrendeld."
+    },
+    "actions": {
+      "apply_attestation": "Pas attest toe",
+      "cancel": "Annuleren",
+      "generate_dns_token": "Genereer een DNS-token",
+      "refresh": "Vernieuwen",
+      "revoke": "Herroepen"
+    },
+    "current": {
+      "not_verified": "Deze tenant is momenteel niet geverifieerd. Gebruik de onderstaande opties om een ​​DNS-verificatie te starten of een handmatige beheerdersattest toe te passen.",
+      "title": "Huidige status",
+      "verified_on": "Geverifieerd op {{date}}"
+    },
+    "dns": {
+      "publish_record": "Publiceer deze TXT record op uw DNS en wacht vervolgens op verspreiding:",
+      "record_name": "Naam opnemen",
+      "ttl_label": "TTL",
+      "ttl_value": "300",
+      "txt_type": "TXT",
+      "type_label": "Soort",
+      "value": "Waarde"
+    },
+    "fields": {
+      "attestation_description": "Waarom bevestigt u dit zonder DNS verificatie? (Audittraject.)",
+      "attestation_note": "Attestnota (optioneel)",
+      "domain_or_organisation": "Domein of organisatie",
+      "domain_placeholder": "bijv. zürich.ch",
+      "municipality_domain": "Gemeente domein"
+    },
+    "history": {
+      "empty": "Nog geen verificatiegegevens.",
+      "title": "Verificaties",
+      "updated": "{{date}} bijgewerkt",
+      "via_method": "via {{method}}"
+    },
+    "meta": {
+      "description": "Markeer deze gemeenschap als een geverifieerde gemeentelijke partner. Voegt een badge 'Geverifieerde gemeente' toe aan openbare rapporten.",
+      "page_title": "Gemeentelijke verificatie",
+      "title": "Gemeentelijke verificatie"
+    },
+    "request": {
+      "attestation_body": "Gebruik dit alleen als DNS-besturing niet beschikbaar is. De verificatie wordt geregistreerd als handmatig bevestigd door een beheerder.",
+      "attestation_tab": "Beheerdersattest",
+      "dns_body": "Geef het officiële gemeentedomein op dat u beheert. We genereren een DNS TXT record die u kunt publiceren; Zodra het zich verspreidt, markeert het systeem deze tenant als geverifieerd.",
+      "dns_tab": "DNS TXT (bij voorkeur)",
+      "method_aria": "Verificatiemethode",
+      "title": "Verificatie aanvragen"
+    },
+    "revoke_modal": {
+      "body_prefix": "Verificatie intrekken voor",
+      "body_suffix": "Hierdoor wordt de geverifieerde badge verwijderd en wordt het verificatierecord gemarkeerd als ingetrokken.",
+      "title": "Verificatie intrekken?"
+    },
+    "status": {
+      "pending_dns": "In behandeling DNS",
+      "revoked": "Ingetrokken",
+      "verified": "Geverifieerd"
+    },
+    "toasts": {
+      "attest_failed": "Kan de verificatie niet bevestigen",
+      "attested": "Verificatie bevestigd",
+      "dns_failed": "Kan de DNS-verificatie niet starten",
+      "dns_generated": "DNS verificatietoken gegenereerd",
+      "load_failed": "Kan de verificatiestatus niet laden",
+      "revoke_failed": "Kan de verificatie niet intrekken",
+      "revoked": "Verificatie ingetrokken"
+    },
+    "validation": {
+      "domain_required": "Voer een domein in"
     }
   }
 }

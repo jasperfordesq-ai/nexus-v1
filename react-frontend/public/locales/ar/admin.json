@@ -10589,135 +10589,244 @@
   },
   "municipal_reports": {
     "meta": {
-      "title": "Municipal Impact Reports",
-      "description": "Prepare KISS-style reporting for verified hours, active members, trusted organisations, and municipal value conversations."
+      "title": "تقارير الأثر البلدي",
+      "description": "قم بإعداد تقارير بأسلوب KISS لساعات العمل التي تم التحقق منها، والأعضاء النشطين، والمنظمات الموثوقة، ومحادثات القيمة البلدية."
     },
     "actions": {
-      "analytics": "Community analytics",
-      "impact_report": "Impact report",
-      "open_source_report": "Open source report",
-      "export_csv": "Export CSV",
-      "export_pdf": "Export PDF"
+      "analytics": "تحليلات المجتمع",
+      "impact_report": "تقرير التأثير",
+      "open_source_report": "تقرير مفتوح المصدر",
+      "export_csv": "تصدير CSV",
+      "export_pdf": "تصدير PDF"
     },
     "stats": {
-      "report_pack": "Report pack",
-      "ready": "Ready",
-      "hours_source": "Hours source",
-      "verified": "Verified",
-      "audience": "Audience",
-      "municipal": "Municipal",
-      "exports": "Exports",
+      "report_pack": "حزمة التقارير",
+      "ready": "مستعد",
+      "hours_source": "مصدر ساعات",
+      "verified": "تم التحقق منه",
+      "audience": "جمهور",
+      "municipal": "البلدية",
+      "exports": "صادرات",
       "csv_pdf": "CSV/PDF",
-      "verified_hours": "Verified hours",
-      "participants": "Participants",
-      "organisations": "Organisations",
-      "total_value": "Total value"
+      "verified_hours": "ساعات التحقق",
+      "participants": "مشاركون",
+      "organisations": "المنظمات",
+      "total_value": "القيمة الإجمالية"
     },
-    "loading": "Loading municipal impact data",
-    "period": "Reporting period",
-    "hour_value": "Hour value",
-    "multiplier": "Social multiplier",
+    "loading": "تحميل بيانات الأثر البلدي",
+    "period": "فترة التقرير",
+    "hour_value": "قيمة الساعة",
+    "multiplier": "المضاعف الاجتماعي",
     "sections": {
-      "categories": "Support categories",
-      "trends": "Verified activity trend",
-      "readiness": "Procurement readiness signals"
+      "categories": "فئات الدعم",
+      "trends": "اتجاه النشاط الذي تم التحقق منه",
+      "readiness": "إشارات الاستعداد للشراء"
     },
     "empty": {
-      "categories": "No completed support categories in this period.",
-      "trends": "No verified activity trend is available for this period."
+      "categories": "لا توجد فئات دعم مكتملة في هذه الفترة.",
+      "trends": "لا يوجد اتجاه نشاط تم التحقق منه متاح لهذه الفترة."
     },
     "values": {
-      "hours": "{{count}}h",
-      "activities": "{{count}} activities",
-      "trend_detail": "{{participants}} participants, {{activities}} activities",
-      "disabled": "Disabled"
+      "hours": "{{count}}ح",
+      "activities": "أنشطة {{count}}",
+      "trend_detail": "{{participants}} مشارك، {{activities}} أنشطة",
+      "disabled": "عاجز"
     },
     "toast": {
-      "load_failed": "Failed to load municipal impact data.",
-      "export_started": "Report export started.",
-      "export_failed": "Failed to export the municipal report.",
-      "templates_load_failed": "Failed to load report templates.",
-      "template_saved": "Report template saved.",
-      "template_save_failed": "Failed to save the report template.",
-      "template_deleted": "Report template deleted.",
-      "template_delete_failed": "Failed to delete the report template."
+      "load_failed": "فشل تحميل بيانات التأثير البلدي.",
+      "export_started": "بدأ تصدير التقرير.",
+      "export_failed": "فشل تصدير تقرير البلدية.",
+      "templates_load_failed": "فشل تحميل قوالب التقارير.",
+      "template_saved": "تم حفظ نموذج التقرير.",
+      "template_save_failed": "فشل في حفظ قالب التقرير.",
+      "template_deleted": "تم حذف نموذج التقرير.",
+      "template_delete_failed": "فشل في حذف قالب التقرير."
     },
     "cards": {
       "verified_hours": {
-        "title": "Verified hours and economic value",
-        "description": "Summarise approved support hours, transaction volume, active contributors, and estimated value.",
-        "metric_1": "Approved hours",
-        "metric_2": "Active contributors",
-        "metric_3": "Value estimate"
+        "title": "ساعات التحقق والقيمة الاقتصادية",
+        "description": "قم بتلخيص ساعات الدعم المعتمدة وحجم المعاملات والمساهمين النشطين والقيمة المقدرة.",
+        "metric_1": "الساعات المعتمدة",
+        "metric_2": "المساهمين النشطين",
+        "metric_3": "تقدير القيمة"
       },
       "active_members": {
-        "title": "Member reach and inclusion",
-        "description": "Track active members, new joiners, inactive members, and groups that need coordinator attention.",
-        "metric_1": "Active members",
-        "metric_2": "New joiners",
-        "metric_3": "Inactive members"
+        "title": "وصول الأعضاء وإدراجهم",
+        "description": "تتبع الأعضاء النشطين والمنضمين الجدد والأعضاء غير النشطين والمجموعات التي تحتاج إلى اهتمام المنسق.",
+        "metric_1": "الأعضاء النشطين",
+        "metric_2": "النجارون الجدد",
+        "metric_3": "الأعضاء غير النشطين"
       },
       "organisations": {
-        "title": "Organisation and partner activity",
-        "description": "Show participating organisations, opportunities, verified logs, and coordinator workflows.",
-        "metric_1": "Organisations",
-        "metric_2": "Opportunities",
-        "metric_3": "Verified logs"
+        "title": "النشاط التنظيمي والشريك",
+        "description": "اعرض المنظمات المشاركة والفرص والسجلات التي تم التحقق منها وسير عمل المنسق.",
+        "metric_1": "المنظمات",
+        "metric_2": "فرص",
+        "metric_3": "السجلات التي تم التحقق منها"
       },
       "trust_pack": {
-        "title": "Trust, safeguarding, and compliance",
-        "description": "Surface verification, review, safeguarding, consent, and audit signals for sensitive care coordination.",
-        "metric_1": "Verification",
-        "metric_2": "Reviews",
-        "metric_3": "Audit trail"
+        "title": "الثقة والحماية والامتثال",
+        "description": "إشارات التحقق السطحي والمراجعة والحماية والموافقة والتدقيق لتنسيق الرعاية الحساسة.",
+        "metric_1": "تَحَقّق",
+        "metric_2": "التعليقات",
+        "metric_3": "مسار التدقيق"
       }
     },
-    "policy_default": "Policy default",
-    "audience": "Audience",
+    "policy_default": "السياسة الافتراضية",
+    "audience": "جمهور",
     "filters": {
-      "title": "Reporting window",
-      "description": "Use explicit dates when preparing canton, municipality, foundation, or cooperative packs.",
-      "date_from": "From",
-      "date_to": "To",
-      "apply": "Apply dates",
-      "clear": "Clear"
+      "title": "نافذة التقارير",
+      "description": "استخدم تواريخ واضحة عند إعداد حزم الكانتون أو البلدية أو المؤسسة أو التعاونية.",
+      "date_from": "من",
+      "date_to": "ل",
+      "apply": "تطبيق التواريخ",
+      "clear": "واضح"
     },
     "readiness": {
-      "municipal_value": "Municipal value",
-      "participation": "Participation",
-      "partner_network": "Partner network",
-      "local_exchange": "Local exchange",
+      "municipal_value": "القيمة البلدية",
+      "participation": "مشاركة",
+      "partner_network": "شبكة الشركاء",
+      "local_exchange": "الصرف المحلي",
       "status": {
-        "ready": "Ready",
-        "needs_data": "Needs data"
+        "ready": "مستعد",
+        "needs_data": "يحتاج إلى بيانات"
       }
     },
     "templates": {
-      "title": "Saved report templates",
-      "description": "Prepare repeatable municipal, canton, cooperative, or foundation report packs with the right audience, period, and value assumptions.",
-      "create": "New template",
-      "select_label": "Report template",
-      "default_policy": "Use workflow policy defaults",
-      "apply": "Apply",
-      "delete": "Delete",
-      "cancel": "Cancel",
-      "save": "Save template",
-      "modal_title": "Create report template",
-      "hour_value_chip": "CHF {{value}}/h",
+      "title": "قوالب التقارير المحفوظة",
+      "description": "قم بإعداد حزم تقارير قابلة للتكرار للبلديات أو الكانتونات أو التعاونيات أو المؤسسات مع الجمهور المناسب والفترة وافتراضات القيمة.",
+      "create": "قالب جديد",
+      "select_label": "قالب التقرير",
+      "default_policy": "استخدم الإعدادات الافتراضية لسياسة سير العمل",
+      "apply": "يتقدم",
+      "delete": "يمسح",
+      "cancel": "يلغي",
+      "save": "حفظ القالب",
+      "modal_title": "إنشاء قالب التقرير",
+      "hour_value_chip": "CHF {{value}}/ح",
       "fields": {
-        "name": "Template name",
-        "description": "Description",
-        "audience": "Audience",
-        "period": "Reporting period",
-        "hour_value": "Hour value override (CHF)",
-        "include_social_value": "Include social value estimate"
+        "name": "اسم القالب",
+        "description": "وصف",
+        "audience": "جمهور",
+        "period": "فترة التقرير",
+        "hour_value": "تجاوز قيمة الساعة (CHF)",
+        "include_social_value": "تشمل تقدير القيمة الاجتماعية"
       },
       "audiences": {
-        "municipality": "Municipality",
-        "canton": "Canton",
-        "cooperative": "Cooperative",
-        "foundation": "Foundation"
+        "municipality": "بلدية",
+        "canton": "كانتون",
+        "cooperative": "تعاونية",
+        "foundation": "مؤسسة"
+      },
+      "descriptions": {
+        "audience": "يحدد إطار السرد والأقسام التي تظهر في تصدير PDF/CSV.",
+        "hour_value": "معدل الرعاية الرسمية المحلية بالساعة لحساب تعويض التكلفة (على سبيل المثال CHF 35 لسويسرا). اتركه فارغًا لاستخدام الإعداد الافتراضي للمستأجر.",
+        "period": "يتم تطبيق نافذة التقارير الافتراضية عند عدم تعيين مرشح يدوي للتاريخ."
+      },
+      "placeholders": {
+        "description": "ملاحظة اختيارية للرجوع إليها مستقبلاً - على سبيل المثال. \"تُستخدم في العرض التقديمي السنوي للجمعية العمومية السنوية\"",
+        "name": "على سبيل المثال تقرير كانتون للربع الثالث من عام 2025 للممولين"
       }
+    },
+    "about": {
+      "body_1_after_chf": "قيمة الساعات × مضاعف المنع).",
+      "body_1_after_kiss": "/Age-Stiftung المنهجية، التكلفة المقدرة لتعويض خدمات الرعاية الرسمية (",
+      "body_1_before_kiss": "تقرير الأثر البلدي هو حزمة الأدلة التي تشاركها مع شركاء البلديات والكانتونات والممولين لإثبات قيمة البرنامج. يُظهر ساعات الرعاية التي تم التحقق منها، والأعضاء النشطين، والمنظمات الشريكة، وباستخدام",
+      "body_2_after_audience": "تبديل لتبديل تأطير السرد:",
+      "body_2_after_canton": "يجمع بلديات متعددة ويظهر تجنب التكاليف على مستوى الكانتونات؛",
+      "body_2_after_cooperative": "يُظهر الاحتفاظ بالأعضاء، ومعدل المعاملة بالمثل، وعبء عمل المنسق. قم بالتصدير كـ PDF لإرساله إلى الشركاء أو كـ CSV لمزيد من التحليل. احفظ قوالب التقارير لإعادة إنشاء نفس التكوين بسرعة في الفترات المستقبلية.",
+      "body_2_after_municipality": "يركز على السكان المحليين الذين تم الوصول إليهم والمنظمات الشريكة؛",
+      "body_2_prefix": "استخدم",
+      "chf_abbr": "CHF",
+      "kiss_abbr": "KISS",
+      "title": "حول هذا التقرير"
+    },
+    "audience_selector": {
+      "description": "تبديل تأطير السرد. يتم تضمين قسم الجمهور المحدد فقط في عملية التصدير PDF/CSV.",
+      "title": "جمهور"
+    },
+    "export_note": {
+      "csv_label": "تصدير CSV",
+      "csv_text": "يعطي بيانات أولية لتحليل جداول البيانات أو تقارير المنح.",
+      "pdf_label": "تصدير PDF",
+      "pdf_text": "تم تنسيقه للمشاركة مع شركاء وممولي البلديات."
+    },
+    "narrative": {
+      "canton": {
+        "description": "التأثير الإجمالي عبر البلديات، وتجنب تكاليف الرعاية المهنية، والاتجاه السنوي.",
+        "empty_body": "قم بالتبديل إلى وضع كانتون لتحميل السرد على مستوى كانتون.",
+        "empty_description": "التأثير الإجمالي عبر البلديات، وتجنب التكاليف، والتغيير من عام لآخر.",
+        "empty_title": "كانتون (كانتونسرات / الحكومة الإقليمية)",
+        "estimated_cost_avoidance": "تجنب التكاليف المقدرة",
+        "estimated_cost_avoidance_desc": "الساعات × قيمة السياسة × {{multiplier}} (معادلة الرعاية المهنية).",
+        "multi_node_total_hours": "إجمالي ساعات العقدة المتعددة",
+        "multi_node_total_hours_desc": "تم التحقق منه عبر جميع العقد التي تم اختيارها.",
+        "municipalities_reporting": "تقارير البلديات",
+        "municipalities_reporting_desc": "إجمالي عدد العقد المساهمة في طريقة العرض هذه.",
+        "prior_period_detail": "الفترة السابقة: {{from}} إلى {{to}} - {{hours}} الساعات التي تم التحقق منها.",
+        "title": "ساعات الدعم التي تم التحقق منها{{tenant}} - {{from}} إلى {{to}}",
+        "yoy_change": "التغيير على أساس سنوي"
+      },
+      "cooperative": {
+        "active_tandems": "ترادفات نشطة",
+        "active_tandems_desc": "أزواج المساعد/المتلقي المتكررة (+2 تبادلات).",
+        "coordinator_load": "تحميل المنسق",
+        "coordinator_load_desc": "{{pending}} معلق عبر منسقي {{coordinators}}.",
+        "description": "الصحة التعاونية الداخلية: الاحتفاظ، المعاملة بالمثل، الترادف، تحميل المنسق، تجمع الائتمان.",
+        "empty_body": "قم بالتبديل إلى الوضع التعاوني لتحميل السرد التعاوني الداخلي.",
+        "empty_description": "الاحتفاظ بالأعضاء، والمعاملة بالمثل على مدار الساعة، والعلاقات الترادفية، وعبء عمل المنسق، وتجمع ائتمان الرعاية المستقبلية.",
+        "empty_title": "تعاونية (KISS-Genossenschaft داخلية)",
+        "future_care_credit_pool": "تجمع الرصيد الائتماني للرعاية المستقبلية",
+        "future_care_credit_pool_desc": "مجموع أرصدة الأعضاء الإيجابية - الاحتياطي الضمني للرعاية المستقبلية للتعاونية. قاعدة الأعضاء النشطة: {{count}}.",
+        "member_retention": "الاحتفاظ بالأعضاء",
+        "member_retention_desc": "{{count}} عضو نشط في كل من هذه الفترة والفترة المماثلة السابقة.",
+        "reciprocity_rate": "معدل المعاملة بالمثل",
+        "reciprocity_rate_desc": "تلقى مؤيدو {{count}} أيضًا ساعات في هذه الفترة.",
+        "title": "التقرير الداخلي التعاوني - {{from}} إلى {{to}}"
+      },
+      "in_export": "في التصدير",
+      "logs_count": "سجلات {{count}}",
+      "municipality": {
+        "description": "المشاركة المحلية، والمنظمات الشريكة المحددة، والتقسيم الجغرافي/الفئة، ومدى وصول المتلقي.",
+        "empty_body": "قم بالتبديل إلى وضع البلدية لتحميل السرد على مستوى البلدية.",
+        "empty_description": "المشاركة المحلية، والمنظمات الشريكة المسماة، والتقسيم الجغرافي/الفئةي.",
+        "empty_title": "بلدية (جيميندي)",
+        "no_category_data": "لا توجد بيانات فئة في هذه الفترة.",
+        "no_partner_activity": "لا يوجد نشاط شريك في هذه الفترة.",
+        "partner_organisations": "المنظمات الشريكة",
+        "partner_organisations_by_hours": "المنظمات الشريكة (بالساعات)",
+        "recipients_reached": "وصلت المستلمين",
+        "recipients_reached_desc": "مستلمون متميزون للتبادلات المكتملة.",
+        "title": "تأثير المجتمع - {{from}} إلى {{to}}",
+        "top_5_categories": "أهم 5 فئات (التقسيم الجغرافي/النشاط)",
+        "top_categories": "أعلى الفئات",
+        "top_categories_desc": "المدرجة أدناه حسب الساعات.",
+        "trusted_total": "من {{count}} الإجمالي الموثوق به."
+      },
+      "no_prior_data": "لا توجد بيانات سابقة"
+    },
+    "readiness_help": {
+      "local_exchange": {
+        "fix": "لا توجد عمليات تبادل مكتملة حتى الآن. يجب على المنسقين الموافقة على سجلات الساعات المعلقة.",
+        "what": "التبادلات التي تم التحقق منها (المكتملة والمعتمدة) المسجلة في هذه الفترة."
+      },
+      "municipal_value": {
+        "fix": "لا توجد تكلفة قابلة للحساب حتى الآن. قم بالموافقة على سجلات ساعات العمل التطوعي المعلقة لملء هذا المقياس.",
+        "what": "تعويض التكلفة المقدرة للرعاية الرسمية (ساعات × قيمة ساعة السياسة × مضاعف الوقاية)."
+      },
+      "participation": {
+        "fix": "أقل من الحد الأدنى للمشاركة. استمر في تأهيل الأعضاء واستكمال عمليات التبادل.",
+        "what": "الأعضاء المتميزون الناشطون كداعمين أو متلقين في هذه الفترة."
+      },
+      "partner_network": {
+        "fix": "لا توجد منظمات موثوقة نشطة. المنظمات على متن الطائرة عبر التطوع> المنظمات.",
+        "what": "المنظمات الشريكة الموثوقة التي ساهمت بساعات في هذه الفترة."
+      }
+    },
+    "readiness_intro": {
+      "needs_data_suffix": "= المقياس أقل من الحد الأدنى - مرر مؤشر الماوس فوق كل بطاقة للحصول على إرشادات.",
+      "prefix": "تشير هذه الإشارات الأربع إلى ما إذا كان التقرير يحتوي على بيانات كافية ليكون مقنعًا للجمهور الخارجي.",
+      "ready_suffix": "= بيانات كافية؛"
     }
   },
   "caring_emergency": {
@@ -12525,6 +12634,257 @@
         "reject_failed": "فشل رفض الحملة.",
         "required_fields": "الاسم والعنوان والجسم مطلوبة."
       }
+    }
+  },
+  "municipal_copilot": {
+    "about": {
+      "body": "يساعدك مساعد الطيار المحلي على كتابة إعلانات واضحة ورسمية بشكل مناسب وخالية من المصطلحات. الصق مسودة تقريبية - سيقترح AI تحسينات، ومشكلات نغمة الإشارة (رسمية جدًا، أو متعالية، أو غير واضحة)، وسيدرج أي مخاوف متعلقة بالاعتدال. يمكنك مراجعة الاقتراح وقبوله أو رفضه قبل نشر أي شيء.",
+      "title": "حول هذه الصفحة"
+    },
+    "actions": {
+      "accept": "يقبل",
+      "cancel": "يلغي",
+      "generate_proposal": "توليد الاقتراح",
+      "refresh": "ينعش",
+      "reject": "يرفض",
+      "reject_proposal": "رفض الاقتراح",
+      "view": "منظر"
+    },
+    "empty": {
+      "no_latest": "لا يوجد اقتراح حتى الآن. قم بإنشاء واحد من المسودة الموجودة على اليسار.",
+      "no_proposals": "لا توجد مقترحات حتى الآن. ستظهر المسودات التي تقوم بتحليلها هنا كمسار تدقيق.",
+      "value": "-"
+    },
+    "fields": {
+      "audience_description": "حدد من هو هذا الإعلان (على سبيل المثال، \"جميع المقيمين\"، \"المتطوعين\"، \"جهات الاتصال بالبلدية\") حتى يتمكن AI من معايرة النغمة والمفردات بشكل مناسب.",
+      "audience_hint": "تلميح الجمهور (اختياري)",
+      "audience_placeholder": "على سبيل المثال مقدمي الرعاية في المنطقة الشمالية الفرعية",
+      "character_count": "{{count}} / 4000 حرف",
+      "draft_announcement": "مشروع إعلان",
+      "draft_placeholder": "الصق مسودة تقريبية - سيقوم مساعد الطيار بتلميع المشكلات والتحقق من النغمة ووضع علامة عليها.",
+      "polished_text": "نص مصقول",
+      "reason": "سبب",
+      "reason_placeholder": "لماذا يتم رفض هذا الاقتراح؟"
+    },
+    "labels": {
+      "audience": "الجمهور: {{audience}}",
+      "model": "الموديل: {{model}}"
+    },
+    "meta": {
+      "page_title": "مساعد الاتصالات البلدية",
+      "subtitle": "قم بصياغة الإعلانات الرسمية، وصقلها بواسطة AI، وتحقق من النغمة والوضوح، ثم انشرها. مصمم للمنسقين الذين يحتاجون إلى التواصل مع السكان وجهات الاتصال بالبلدية بصوت ثابت وسهل الوصول إليه.",
+      "title": "مساعد الاتصالات البلدية"
+    },
+    "modal": {
+      "reject_title": "رفض الاقتراح"
+    },
+    "sections": {
+      "clarity_warnings": "تحذيرات الوضوح",
+      "latest_proposal": "أحدث اقتراح",
+      "moderation_flags": "أعلام الاعتدال",
+      "new_draft": "مسودة جديدة",
+      "recent_proposals": "المقترحات الأخيرة"
+    },
+    "states": {
+      "accepted": "مقبول. الآن قم بنشر النص المصقول عبر مسؤول الإعلانات.",
+      "rejected_reason": "مرفوض - السبب: {{reason}}"
+    },
+    "status": {
+      "accepted": "مقبول",
+      "proposed": "مقترح",
+      "published": "تم النشر",
+      "rejected": "مرفوض"
+    },
+    "table": {
+      "actions": "الإجراءات",
+      "aria": "مقترحات مساعد الطيار الأخيرة",
+      "audience": "جمهور",
+      "created": "مخلوق",
+      "draft": "مسودة",
+      "status": "حالة",
+      "tone": "نغمة"
+    },
+    "toasts": {
+      "accept_failed": "فشل في قبول الاقتراح",
+      "accepted": "تم قبول الاقتراح - قم بالنشر الآن عبر مسؤول الإعلانات",
+      "draft_too_long": "المسودة طويلة جدًا (الحد الأقصى 4000 حرف)",
+      "enter_draft": "أدخل مسودة أولاً",
+      "generate_failed": "فشل في إنشاء الاقتراح",
+      "generated": "تم إنشاء الاقتراح",
+      "load_failed": "فشل تحميل مقترحات مساعد الطيار",
+      "reason_required": "السبب مطلوب",
+      "reject_failed": "فشل في رفض الاقتراح",
+      "rejected": "تم رفض الاقتراح"
+    },
+    "tone": {
+      "condescending": "تنازل",
+      "ok": "نغمة موافق",
+      "too_formal": "رسمي للغاية",
+      "too_informal": "غير رسمية للغاية"
+    },
+    "tone_legend": {
+      "condescending": "قد يرعى القارئ",
+      "ok": "لم يتم اكتشاف مشاكل في النغمة",
+      "prefix": "أسطورة النغمة -",
+      "too_formal": "بيروقراطية بشكل مفرط",
+      "too_informal": "قد يبدو غير مهني"
+    }
+  },
+  "municipal_roi_page": {
+    "about": {
+      "body_middle": "يحسب التقرير القيمة الاجتماعية والاقتصادية لبرنامج الرعاية المجتمعية الخاص بك باستخدام",
+      "body_prefix": "البلدية",
+      "body_suffix": "منهجية Age-Stiftung. فهو يعرض التكلفة المقدرة لتعويض خدمات الرعاية الرسمية (Spitex/Pflege)، والقيمة الاجتماعية الناتجة، وبيانات الاتجاه عبر فترات الإبلاغ. تم تصميم هذا التقرير لمشاركته مع شركاء البلديات والممولين كدليل على تأثير البرنامج.",
+      "formula_prefix": "تعويض التكلفة = إجمالي ساعات الرعاية المعتمدة x",
+      "formula_suffix": "معدل الساعة × مضاعف الوقاية. يعكس مضاعف الوقاية (الافتراضي: 2.0) أن ساعة واحدة من الرعاية غير الرسمية تمنع حوالي ساعتين من تدخل الرعاية الرسمية، بناءً على بحث Age-Stiftung.",
+      "title": "حول هذه الصفحة"
+    },
+    "actions": {
+      "export_csv": "تصدير CSV",
+      "refresh_aria": "تحديث تقرير الأثر البلدي",
+      "refresh_data": "تحديث البيانات"
+    },
+    "breakdown": {
+      "aria": "انهيار المنطقة الفرعية",
+      "description": "يُظهر تقسيم المنطقة الفرعية الأحياء التي تولد معظم أنشطة الرعاية. استخدم هذا لتحديد المجالات التي قد تحتاج إلى مزيد من دعم المنسق أو توظيف المتطوعين.",
+      "formal_care_offset": "تعويض الرعاية الرسمية",
+      "hours": "ساعات",
+      "sub_region": "المنطقة الفرعية",
+      "title": "التوزيع حسب المنطقة الفرعية",
+      "weighted_hours": "الساعات المرجحة"
+    },
+    "filters": {
+      "all_sub_regions": "جميع المناطق الفرعية",
+      "from": "من",
+      "period": "الفترة: {{from}} -> {{to}}",
+      "sub_region": "المنطقة الفرعية",
+      "to": "ل"
+    },
+    "meta": {
+      "page_title": "تقرير الأثر البلدي",
+      "subtitle": "الأدلة على المشتريات بين الشركات - تعويضات تكاليف الرعاية ومقاييس رأس المال الاجتماعي",
+      "title": "تقرير الأثر البلدي"
+    },
+    "methodology": {
+      "chf_per_hour": "CHF {{amount}}/ساعة",
+      "default_prevention_prefix": "تنطبق قيمة المنع على مضاعف 2x لكل Age-Stiftung/",
+      "default_prevention_suffix": "منهجية التقييم.",
+      "default_rate": "CHF 35/ساعة",
+      "default_source": "معدل مساعد الرعاية الرسمية السويسري، SECO 2024",
+      "hours_are_valued_at": "الساعات تقدر ب",
+      "hours_valued_at": "ساعات تقدر بـ",
+      "prevention_value_prefix": "تنطبق قيمة المنع على مضاعف {{multiplier}}x لكل Age-Stiftung/",
+      "prevention_value_suffix": "منهجية التقييم.",
+      "substitution_applied": "يتم ترجيح الساعات حسب معاملات الاستبدال لكل فئة.",
+      "substitution_not_applied": "جميع الساعات مرجحة بـ 1.0x.",
+      "tenant_setting_source": "تم تكوينه لهذا المستأجر"
+    },
+    "municipalities": {
+      "point_export": "يتوفر تصدير CSV - استخدم الزر الموجود في رأس الصفحة لإعداد تقارير Age-Stiftung وPro Senectute وتقارير الإدارة الاجتماعية في الكانتون.",
+      "point_hour_prefix": "كل ساعة من وقت رعاية المجتمع توفر تقريبًا",
+      "point_hour_suffix": "في تكاليف الرعاية الرسمية",
+      "point_nexus": "يجعل هذا التأثير قابلاً للقياس والتدقيق والإبلاغ عنه بالنسبة لمشتريات الكانتونات والبلديات",
+      "point_prevention": "يمكن للدعم المجتمعي الوقائي أن يقلل من احتياجات الرعاية السكنية - مضاعف يقدر بمرتين",
+      "title": "ماذا يعني هذا بالنسبة للبلديات"
+    },
+    "roi": {
+      "default_multiplier_note": "(مضاعف 2x)",
+      "multiplier_note": "({{multiplier}}مضاعف x)",
+      "prevented_this_period": "في تكاليف الرعاية الرسمية منعت هذه الفترة",
+      "prevention_value": "قيمة الوقاية",
+      "social_isolation_supported": "دعم الناس للخروج من العزلة الاجتماعية",
+      "title": "تعويض تكلفة الرعاية المقدرة",
+      "yoy": "{{value}} YoY"
+    },
+    "stats": {
+      "active_members": "الأعضاء النشطين",
+      "active_relationships": "العلاقات النشطة",
+      "care_recipients": "متلقي الرعاية",
+      "total_hours": "إجمالي الساعات",
+      "weighted_hours_note": "{{hours}} الساعات المرجحة بعد معاملات الاستبدال",
+      "weighted_hours_tooltip": "يتم ترجيح الساعات بمعدلات الاستبدال الخاصة بفئة معينة (على سبيل المثال، الرفقة 0.4x، النقل 0.7x، المهمات 1.0x) لكل منهجية Age-Stiftung."
+    },
+    "toasts": {
+      "export_failed": "فشل التصدير CSV",
+      "load_failed": "فشل تحميل بيانات التأثير البلدي"
+    }
+  },
+  "municipal_verification": {
+    "about": {
+      "body": "يسجل التحقق البلدي التوقيع الرسمي من شريك البلدية أو الكانتون بأن برنامج الرعاية المجتمعية هذا يلبي متطلباتهم. مطلوب التحقق من أجل التحقق من جاهزية الإطلاق التجريبي وفتح تقرير التأثير البلدي. استخدم التحقق DNS TXT للنطاقات البلدية الرسمية، أو قم بتطبيق شهادة المسؤول إذا لم يكن التحكم DNS متاحًا.",
+      "pending_dns": "تم إنشاء رمز التحقق - في انتظار نشر وتأكيد DNS.",
+      "revoked": "تمت إزالة التحقق - أعد التحقق لاستعادة الوصول.",
+      "title": "حول هذه الصفحة",
+      "verified": "تم التحقق رسميًا - تم فتح حزمة التقارير البلدية."
+    },
+    "actions": {
+      "apply_attestation": "تطبيق التصديق",
+      "cancel": "يلغي",
+      "generate_dns_token": "قم بإنشاء الرمز المميز DNS",
+      "refresh": "ينعش",
+      "revoke": "إبطال"
+    },
+    "current": {
+      "not_verified": "لم يتم التحقق من هذا المستأجر حاليا. استخدم الخيارات أدناه لبدء عملية التحقق DNS أو تطبيق شهادة المشرف اليدوية.",
+      "title": "الوضع الحالي",
+      "verified_on": "تم التحقق منه على {{date}}"
+    },
+    "dns": {
+      "publish_record": "انشر هذا السجل TXT على DNS، ثم انتظر النشر:",
+      "record_name": "اسم السجل",
+      "ttl_label": "TTL",
+      "ttl_value": "300",
+      "txt_type": "TXT",
+      "type_label": "يكتب",
+      "value": "قيمة"
+    },
+    "fields": {
+      "attestation_description": "لماذا تصدق هذا دون التحقق من DNS؟ (مسار التدقيق.)",
+      "attestation_note": "مذكرة التصديق (اختياري)",
+      "domain_or_organisation": "المجال أو المنظمة",
+      "domain_placeholder": "على سبيل المثال zurich.ch",
+      "municipality_domain": "نطاق البلدية"
+    },
+    "history": {
+      "empty": "لا توجد سجلات التحقق حتى الآن.",
+      "title": "التحقق",
+      "updated": "تم التحديث {{date}}",
+      "via_method": "عبر {{method}}"
+    },
+    "meta": {
+      "description": "ضع علامة على هذا المجتمع كشريك بلدي معتمد. إضافة شارة \"البلدية التي تم التحقق منها\" إلى التقارير العامة.",
+      "page_title": "التحقق البلدي",
+      "title": "التحقق البلدي"
+    },
+    "request": {
+      "attestation_body": "استخدم هذا فقط عندما لا يكون التحكم DNS متاحًا. يتم تسجيل التحقق كما تم التصديق عليه يدويًا بواسطة المسؤول.",
+      "attestation_tab": "شهادة المشرف",
+      "dns_body": "قم بتوفير نطاق البلدية الرسمي الذي تتحكم فيه. سنقوم بإنشاء سجل DNS TXT لتتمكن من نشره؛ بمجرد نشره، يقوم النظام بوضع علامة على هذا المستأجر على أنه تم التحقق منه.",
+      "dns_tab": "DNS TXT (مفضل)",
+      "method_aria": "طريقة التحقق",
+      "title": "طلب التحقق"
+    },
+    "revoke_modal": {
+      "body_prefix": "إلغاء التحقق ل",
+      "body_suffix": "يؤدي هذا إلى إزالة شارة التحقق وسيتم وضع علامة على سجل التحقق على أنه ملغى.",
+      "title": "هل تريد إلغاء التحقق؟"
+    },
+    "status": {
+      "pending_dns": "في انتظار DNS",
+      "revoked": "تم إبطاله",
+      "verified": "تم التحقق منه"
+    },
+    "toasts": {
+      "attest_failed": "فشل في إثبات التحقق",
+      "attested": "التحقق موثق",
+      "dns_failed": "فشل بدء التحقق من DNS",
+      "dns_generated": "تم إنشاء رمز التحقق DNS",
+      "load_failed": "فشل تحميل حالة التحقق",
+      "revoke_failed": "فشل في إلغاء التحقق",
+      "revoked": "تم إلغاء التحقق"
+    },
+    "validation": {
+      "domain_required": "أدخل المجال"
     }
   }
 }

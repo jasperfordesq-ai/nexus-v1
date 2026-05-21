@@ -10589,135 +10589,244 @@
   },
   "municipal_reports": {
     "meta": {
-      "title": "Municipal Impact Reports",
-      "description": "Prepare KISS-style reporting for verified hours, active members, trusted organisations, and municipal value conversations."
+      "title": "自治体の影響レポート",
+      "description": "検証された時間、アクティブなメンバー、信頼できる組織、自治体の価値観に関する会話について、KISS スタイルのレポートを準備します。"
     },
     "actions": {
-      "analytics": "Community analytics",
-      "impact_report": "Impact report",
-      "open_source_report": "Open source report",
-      "export_csv": "Export CSV",
-      "export_pdf": "Export PDF"
+      "analytics": "コミュニティ分析",
+      "impact_report": "影響レポート",
+      "open_source_report": "オープンソースレポート",
+      "export_csv": "エクスポート CSV",
+      "export_pdf": "エクスポート PDF"
     },
     "stats": {
-      "report_pack": "Report pack",
-      "ready": "Ready",
-      "hours_source": "Hours source",
-      "verified": "Verified",
-      "audience": "Audience",
-      "municipal": "Municipal",
-      "exports": "Exports",
+      "report_pack": "レポートパック",
+      "ready": "準備ができて",
+      "hours_source": "時間ソース",
+      "verified": "確認済み",
+      "audience": "観客",
+      "municipal": "市営",
+      "exports": "輸出",
       "csv_pdf": "CSV/PDF",
-      "verified_hours": "Verified hours",
-      "participants": "Participants",
-      "organisations": "Organisations",
-      "total_value": "Total value"
+      "verified_hours": "確認済みの営業時間",
+      "participants": "参加者",
+      "organisations": "組織",
+      "total_value": "合計値"
     },
-    "loading": "Loading municipal impact data",
-    "period": "Reporting period",
-    "hour_value": "Hour value",
-    "multiplier": "Social multiplier",
+    "loading": "自治体の影響データをロードしています",
+    "period": "報告期間",
+    "hour_value": "時間値",
+    "multiplier": "ソーシャル乗数",
     "sections": {
-      "categories": "Support categories",
-      "trends": "Verified activity trend",
-      "readiness": "Procurement readiness signals"
+      "categories": "サポートカテゴリー",
+      "trends": "検証されたアクティビティの傾向",
+      "readiness": "調達準備シグナル"
     },
     "empty": {
-      "categories": "No completed support categories in this period.",
-      "trends": "No verified activity trend is available for this period."
+      "categories": "この期間中に完了したサポート カテゴリはありません。",
+      "trends": "この期間の検証済みのアクティビティ傾向はありません。"
     },
     "values": {
       "hours": "{{count}}h",
-      "activities": "{{count}} activities",
-      "trend_detail": "{{participants}} participants, {{activities}} activities",
-      "disabled": "Disabled"
+      "activities": "{{count}} アクティビティ",
+      "trend_detail": "{{participants}} 人の参加者、{{activities}} 人のアクティビティ",
+      "disabled": "無効"
     },
     "toast": {
-      "load_failed": "Failed to load municipal impact data.",
-      "export_started": "Report export started.",
-      "export_failed": "Failed to export the municipal report.",
-      "templates_load_failed": "Failed to load report templates.",
-      "template_saved": "Report template saved.",
-      "template_save_failed": "Failed to save the report template.",
-      "template_deleted": "Report template deleted.",
-      "template_delete_failed": "Failed to delete the report template."
+      "load_failed": "地方自治体の影響データをロードできませんでした。",
+      "export_started": "レポートのエクスポートが開始されました。",
+      "export_failed": "自治体レポートのエクスポートに失敗しました。",
+      "templates_load_failed": "レポートテンプレートの読み込みに失敗しました。",
+      "template_saved": "レポートテンプレートが保存されました。",
+      "template_save_failed": "レポートテンプレートの保存に失敗しました。",
+      "template_deleted": "レポートテンプレートが削除されました。",
+      "template_delete_failed": "レポートテンプレートの削除に失敗しました。"
     },
     "cards": {
       "verified_hours": {
-        "title": "Verified hours and economic value",
-        "description": "Summarise approved support hours, transaction volume, active contributors, and estimated value.",
-        "metric_1": "Approved hours",
-        "metric_2": "Active contributors",
-        "metric_3": "Value estimate"
+        "title": "検証済みの時間と経済的価値",
+        "description": "承認されたサポート時間、トランザクション量、アクティブな貢献者、および推定金額を要約します。",
+        "metric_1": "承認された時間",
+        "metric_2": "積極的な貢献者",
+        "metric_3": "価値の見積もり"
       },
       "active_members": {
-        "title": "Member reach and inclusion",
-        "description": "Track active members, new joiners, inactive members, and groups that need coordinator attention.",
-        "metric_1": "Active members",
-        "metric_2": "New joiners",
-        "metric_3": "Inactive members"
+        "title": "メンバーのリーチと参加",
+        "description": "アクティブなメンバー、新しい参加者、非アクティブなメンバー、およびコーディネーターの注意が必要なグループを追跡します。",
+        "metric_1": "アクティブなメンバー",
+        "metric_2": "新しい参加者",
+        "metric_3": "非アクティブなメンバー"
       },
       "organisations": {
-        "title": "Organisation and partner activity",
-        "description": "Show participating organisations, opportunities, verified logs, and coordinator workflows.",
-        "metric_1": "Organisations",
-        "metric_2": "Opportunities",
-        "metric_3": "Verified logs"
+        "title": "組織とパートナーの活動",
+        "description": "参加組織、機会、検証済みのログ、コーディネーターのワークフローを表示します。",
+        "metric_1": "組織",
+        "metric_2": "機会",
+        "metric_3": "検証されたログ"
       },
       "trust_pack": {
-        "title": "Trust, safeguarding, and compliance",
-        "description": "Surface verification, review, safeguarding, consent, and audit signals for sensitive care coordination.",
-        "metric_1": "Verification",
-        "metric_2": "Reviews",
-        "metric_3": "Audit trail"
+        "title": "信頼、保護、コンプライアンス",
+        "description": "デリケートなケアの調整のための検証、レビュー、保護、同意、および監査シグナルを表面化します。",
+        "metric_1": "検証",
+        "metric_2": "レビュー",
+        "metric_3": "監査証跡"
       }
     },
-    "policy_default": "Policy default",
-    "audience": "Audience",
+    "policy_default": "ポリシーのデフォルト",
+    "audience": "観客",
     "filters": {
-      "title": "Reporting window",
-      "description": "Use explicit dates when preparing canton, municipality, foundation, or cooperative packs.",
-      "date_from": "From",
-      "date_to": "To",
-      "apply": "Apply dates",
-      "clear": "Clear"
+      "title": "レポートウィンドウ",
+      "description": "州、地方自治体、財団、または協同組合のパックを準備するときは、明確な日付を使用してください。",
+      "date_from": "から",
+      "date_to": "に",
+      "apply": "申請日",
+      "clear": "クリア"
     },
     "readiness": {
-      "municipal_value": "Municipal value",
-      "participation": "Participation",
-      "partner_network": "Partner network",
-      "local_exchange": "Local exchange",
+      "municipal_value": "自治体の価値",
+      "participation": "参加",
+      "partner_network": "パートナーネットワーク",
+      "local_exchange": "現地交換所",
       "status": {
-        "ready": "Ready",
-        "needs_data": "Needs data"
+        "ready": "準備ができて",
+        "needs_data": "データが必要です"
       }
     },
     "templates": {
-      "title": "Saved report templates",
-      "description": "Prepare repeatable municipal, canton, cooperative, or foundation report packs with the right audience, period, and value assumptions.",
-      "create": "New template",
-      "select_label": "Report template",
-      "default_policy": "Use workflow policy defaults",
-      "apply": "Apply",
-      "delete": "Delete",
-      "cancel": "Cancel",
-      "save": "Save template",
-      "modal_title": "Create report template",
+      "title": "保存されたレポートテンプレート",
+      "description": "対象者、期間、価値を適切に想定して、再現可能な地方自治体、州、協同組合、または財団のレポート パックを作成します。",
+      "create": "新しいテンプレート",
+      "select_label": "レポートテンプレート",
+      "default_policy": "ワークフローポリシーのデフォルトを使用する",
+      "apply": "適用する",
+      "delete": "消去",
+      "cancel": "キャンセル",
+      "save": "テンプレートの保存",
+      "modal_title": "レポートテンプレートの作成",
       "hour_value_chip": "CHF {{value}}/h",
       "fields": {
-        "name": "Template name",
-        "description": "Description",
-        "audience": "Audience",
-        "period": "Reporting period",
-        "hour_value": "Hour value override (CHF)",
-        "include_social_value": "Include social value estimate"
+        "name": "テンプレート名",
+        "description": "説明",
+        "audience": "観客",
+        "period": "報告期間",
+        "hour_value": "時間値の上書き (CHF)",
+        "include_social_value": "社会的価値の推定を含める"
       },
       "audiences": {
-        "municipality": "Municipality",
-        "canton": "Canton",
-        "cooperative": "Cooperative",
-        "foundation": "Foundation"
+        "municipality": "自治体",
+        "canton": "カントン",
+        "cooperative": "協同組合",
+        "foundation": "財団"
+      },
+      "descriptions": {
+        "audience": "物語の枠組みと、PDF/CSV エクスポートに表示されるセクションを決定します。",
+        "hour_value": "費用相殺計算用の地域のフォーマルケアの時間料金 (例: スイスの場合は CHF 35)。テナントのデフォルトを使用する場合は空白のままにします。",
+        "period": "手動日付フィルタが設定されていない場合に適用されるデフォルトのレポートウィンドウ。"
+      },
+      "placeholders": {
+        "description": "将来の参照のためのオプションのメモ - 例: 「年次総会プレゼンテーションに使用」",
+        "name": "例えば2025 年第 3 四半期資金提供者向けカントンレポート"
       }
+    },
+    "about": {
+      "body_1_after_chf": "時間の値 x 予防乗数)。",
+      "body_1_after_kiss": "/Age-Stiftung 方法論、正式な介護サービスに対する推定コスト相殺 (",
+      "body_1_before_kiss": "自治体影響レポートは、プログラムの価値を実証するために自治体パートナー、州、資金提供者と共有する証拠パックです。検証されたケア時間、アクティブなメンバー、パートナー組織が表示されます。",
+      "body_2_after_audience": "切り替えて物語の枠組みを切り替えます。",
+      "body_2_after_canton": "複数の自治体を集約し、州規模でのコスト回避を示します。",
+      "body_2_after_cooperative": "メンバーの維持率、互恵率、コーディネーターの作業負荷を示します。 PDF としてエクスポートしてパートナーに送信するか、CSV としてエクスポートしてさらに分析します。レポート テンプレートを保存すると、将来同じ構成をすぐに再生成できます。",
+      "body_2_after_municipality": "地域住民とパートナー組織に焦点を当てます。",
+      "body_2_prefix": "を使用します。",
+      "chf_abbr": "CHF",
+      "kiss_abbr": "KISS",
+      "title": "このレポートについて"
+    },
+    "audience_selector": {
+      "description": "物語の枠組みを切り替えます。選択した対象ユーザー セクションのみが PDF/CSV エクスポートに含まれます。",
+      "title": "観客"
+    },
+    "export_note": {
+      "csv_label": "CSV エクスポート",
+      "csv_text": "スプレッドシート分析または補助金レポート用の生データを提供します。",
+      "pdf_label": "PDF エクスポート",
+      "pdf_text": "自治体のパートナーや資金提供者と共有できるようにフォーマットされています。"
+    },
+    "narrative": {
+      "canton": {
+        "description": "地方自治体全体の影響の合計、専門的ケアの費用回避、前年比の傾向。",
+        "empty_body": "カントンモードに切り替えて、カントンレベルの物語をロードします。",
+        "empty_description": "自治体全体の影響、コスト回避、前年比変化を集計します。",
+        "empty_title": "カントン (Kantonsrat / 地方政府)",
+        "estimated_cost_avoidance": "推定コストの回避",
+        "estimated_cost_avoidance_desc": "時間 x 保険金額 x {{multiplier}} (プロフェッショナルケア相当)。",
+        "multi_node_total_hours": "マルチノードの合計時間",
+        "multi_node_total_hours_desc": "オプトインされたすべてのノードで検証されます。",
+        "municipalities_reporting": "自治体の報告",
+        "municipalities_reporting_desc": "このビューに寄与するノードの総数。",
+        "prior_period_detail": "以前の期間: {{from}} から {{to}} - {{hours}} 時間の検証。",
+        "title": "確認済みのサポート時間{{tenant}} - {{from}} ～ {{to}}",
+        "yoy_change": "前年比変化"
+      },
+      "cooperative": {
+        "active_tandems": "アクティブタンデム",
+        "active_tandems_desc": "定期的なヘルパー/受信者のペア (2 回以上の交換)。",
+        "coordinator_load": "コーディネーターの負荷",
+        "coordinator_load_desc": "{{pending}} は {{coordinators}} コーディネーター間で保留中です。",
+        "description": "内部協力の健全性: 維持、互恵性、タンデム、コーディネーターの負荷、クレジット プール。",
+        "empty_body": "協力モードに切り替えて、協力内部の物語をロードします。",
+        "empty_description": "メンバーの維持、時間の相互関係、タンデム関係、コーディネーターの仕事量、将来のケアのクレジットプール。",
+        "empty_title": "協力的 (KISS-Genossenschaft 内部)",
+        "future_care_credit_pool": "フューチャーケア信用残高プール",
+        "future_care_credit_pool_desc": "正の組合員残高の合計 - 協同組合の暗黙の将来介護準備金。アクティブなメンバー ベース: {{count}}。",
+        "member_retention": "会員維持",
+        "member_retention_desc": "{{count}} メンバーは、この期間と以前の同等の期間の両方でアクティブでした。",
+        "reciprocity_rate": "相反率",
+        "reciprocity_rate_desc": "{{count}} サポーターも期間中に何時間も受け取りました。",
+        "title": "協力内部レポート - {{from}} から {{to}}"
+      },
+      "in_export": "輸出中",
+      "logs_count": "{{count}} ログ",
+      "municipality": {
+        "description": "地域の参加、指定されたパートナー組織、地理的/カテゴリの分割、受信者のリーチ。",
+        "empty_body": "自治体モードに切り替えて、自治体レベルのナラティブをロードします。",
+        "empty_description": "地域的な参加、指定されたパートナー組織、地理的/カテゴリの分割。",
+        "empty_title": "自治体 (ゲマインデ)",
+        "no_category_data": "この期間にはカテゴリ データがありません。",
+        "no_partner_activity": "この期間はパートナーによるアクティビティはありません。",
+        "partner_organisations": "パートナー組織",
+        "partner_organisations_by_hours": "パートナー組織（時間別）",
+        "recipients_reached": "受信者に到達しました",
+        "recipients_reached_desc": "完了した交換の個別の受信者。",
+        "title": "コミュニティへの影響 - {{from}} から {{to}}",
+        "top_5_categories": "上位 5 カテゴリ (地理的/アクティビティ分割)",
+        "top_categories": "トップカテゴリー",
+        "top_categories_desc": "以下に時間ごとに記載します。",
+        "trusted_total": "{{count}} 件の信頼できる合計。"
+      },
+      "no_prior_data": "以前のデータはありません"
+    },
+    "readiness_help": {
+      "local_exchange": {
+        "fix": "まだ完了した交換はありません。コーディネーターは保留中の時間ログを承認する必要があります。",
+        "what": "この期間に記録された検証済みの交換 (完了および承認)。"
+      },
+      "municipal_value": {
+        "fix": "コスト オフセットはまだ計算できません。保留中のボランティア時間ログを承認して、この指標を設定します。",
+        "what": "正式な治療に対する推定コスト相殺（時間 x 保険時間値 x 予防乗数）。"
+      },
+      "participation": {
+        "fix": "最低参加基準を下回っています。メンバーのオンボーディングと交換の完了を続けます。",
+        "what": "この時代に支援者や受給者として活躍する個性豊かなメンバー。"
+      },
+      "partner_network": {
+        "fix": "アクティブな信頼できる組織はありません。 「ボランティア」>「組織」から組織を参加させます。",
+        "what": "この期間に何時間も貢献した信頼できるパートナー組織。"
+      }
+    },
+    "readiness_intro": {
+      "needs_data_suffix": "= メトリクスがしきい値を下回っています - 各カードにカーソルを置くとガイダンスが表示されます。",
+      "prefix": "これら 4 つのシグナルは、レポートに外部の読者を納得させるのに十分なデータがあるかどうかを示します。",
+      "ready_suffix": "= 十分なデータ。"
     }
   },
   "caring_emergency": {
@@ -12525,6 +12634,257 @@
         "reject_failed": "キャンペーンを拒否できませんでした。",
         "required_fields": "名前、タイトル、本文は必須です。"
       }
+    }
+  },
+  "municipal_copilot": {
+    "about": {
+      "body": "市副操縦士は、明確で、適切に形式的で、専門用語のないアナウンスを作成するのに役立ちます。下書きを貼り付けます。AI は改善を提案し、口調の問題 (形式的すぎる、見下すような、または不明瞭な) にフラグを立て、モデレーションに関する懸念事項をリストします。何かが公開される前に、提案を確認して承認または拒否します。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "accept": "受け入れる",
+      "cancel": "キャンセル",
+      "generate_proposal": "提案書の生成",
+      "refresh": "リフレッシュ",
+      "reject": "拒否する",
+      "reject_proposal": "提案を拒否する",
+      "view": "ビュー"
+    },
+    "empty": {
+      "no_latest": "まだ提案はありません。左側のドラフトから 1 つを生成します。",
+      "no_proposals": "まだ提案はありません。分析した下書きは監査証跡としてここに表示されます。",
+      "value": "-"
+    },
+    "fields": {
+      "audience_description": "AI がトーンと語彙を適切に調整できるように、このアナウンスの対象者 (例: 「すべての住民」、「ボランティア」、「自治体の連絡先」) を指定します。",
+      "audience_hint": "視聴者へのヒント (オプション)",
+      "audience_placeholder": "例えば北部地域の介護者",
+      "character_count": "{{count}} / 4000 文字",
+      "draft_announcement": "ドラフト発表",
+      "draft_placeholder": "大まかなドラフトを貼り付けます。副操縦士が磨きをかけ、トーンをチェックし、問題にフラグを立てます。",
+      "polished_text": "洗練されたテキスト",
+      "reason": "理由",
+      "reason_placeholder": "なぜこの提案は拒否されるのでしょうか?"
+    },
+    "labels": {
+      "audience": "視聴者: {{audience}}",
+      "model": "モデル: {{model}}"
+    },
+    "meta": {
+      "page_title": "市営通信副操縦士",
+      "subtitle": "公式発表の下書きを作成し、AI によって洗練され、トーンと明瞭さをチェックしてから公開します。一貫したアクセス可能な音声で住民や自治体の担当者とコミュニケーションをとる必要があるコーディネーター向けに設計されています。",
+      "title": "市営通信副操縦士"
+    },
+    "modal": {
+      "reject_title": "提案を拒否する"
+    },
+    "sections": {
+      "clarity_warnings": "明確さに関する警告",
+      "latest_proposal": "最新の提案",
+      "moderation_flags": "モデレーションフラグ",
+      "new_draft": "新しいドラフト",
+      "recent_proposals": "最近の提案"
+    },
+    "states": {
+      "accepted": "受け入れられました。次に、お知らせ管理者を通じて洗練されたテキストを公開します。",
+      "rejected_reason": "拒否されました - 理由: {{reason}}"
+    },
+    "status": {
+      "accepted": "承認されました",
+      "proposed": "提案された",
+      "published": "発行済み",
+      "rejected": "拒否されました"
+    },
+    "table": {
+      "actions": "アクション",
+      "aria": "最近の副操縦士の提案",
+      "audience": "観客",
+      "created": "作成されました",
+      "draft": "下書き",
+      "status": "状態",
+      "tone": "トーン"
+    },
+    "toasts": {
+      "accept_failed": "提案を受け入れられませんでした",
+      "accepted": "提案が承認されました - お知らせ管理者経由で公開されるようになりました",
+      "draft_too_long": "下書きが長すぎます (最大 4000 文字)",
+      "enter_draft": "最初に下書きを入力してください",
+      "generate_failed": "プロポーザルの生成に失敗しました",
+      "generated": "生成された提案",
+      "load_failed": "副操縦士の提案をロードできませんでした",
+      "reason_required": "理由は必須です",
+      "reject_failed": "提案を拒否できませんでした",
+      "rejected": "提案は拒否されました"
+    },
+    "tone": {
+      "condescending": "見下すような",
+      "ok": "トーンOK",
+      "too_formal": "形式的すぎる",
+      "too_informal": "カジュアルすぎる"
+    },
+    "tone_legend": {
+      "condescending": "読者をひいきにするかもしれない",
+      "ok": "トーンの問題は検出されませんでした",
+      "prefix": "トーンレジェンド -",
+      "too_formal": "過度に官僚的",
+      "too_informal": "プロフェッショナルではないと思われるかもしれない"
+    }
+  },
+  "municipal_roi_page": {
+    "about": {
+      "body_middle": "レポートは、次の方法を使用して、地域ケア プログラムの社会的および経済的価値を計算します。",
+      "body_prefix": "市営",
+      "body_suffix": "Age-Stiftung 方法論。これには、正式なケア サービス (Spitex/Pflege) に対する推定コスト オフセット、生成された社会的価値、およびレポート期間にわたる傾向データが表示されます。このレポートは、プログラムの効果の証拠として自治体のパートナーや資金提供者と共有されるように設計されています。",
+      "formula_prefix": "コスト相殺 = 承認されたケア時間の合計 x",
+      "formula_suffix": "時給×予防乗数。 Age-Stiftung の調査に基づくと、予防乗数 (デフォルト: 2.0) は、1 時間の非公式ケアにより約 2 時間の正式なケア介入が防止されることを反映しています。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "export_csv": "エクスポート CSV",
+      "refresh_aria": "自治体の影響レポートを更新する",
+      "refresh_data": "データを更新する"
+    },
+    "breakdown": {
+      "aria": "サブリージョンの内訳",
+      "description": "サブ地域の内訳は、どの地域が最も多くのケア活動を行っているかを示します。これを使用して、コーディネーターのサポートやボランティアの募集がさらに必要な分野を特定します。",
+      "formal_care_offset": "フォーマルケアオフセット",
+      "hours": "営業時間",
+      "sub_region": "サブリージョン",
+      "title": "サブ地域別内訳",
+      "weighted_hours": "加重時間数"
+    },
+    "filters": {
+      "all_sub_regions": "すべてのサブリージョン",
+      "from": "から",
+      "period": "期間: {{from}} -> {{to}}",
+      "sub_region": "サブリージョン",
+      "to": "に"
+    },
+    "meta": {
+      "page_title": "自治体の影響レポート",
+      "subtitle": "B2G 調達の証拠 - 介護コストの相殺と社会資本の指標",
+      "title": "自治体の影響レポート"
+    },
+    "methodology": {
+      "chf_per_hour": "CHF {{amount}}/時",
+      "default_prevention_prefix": "防止値は Age-Stiftung/ ごとに 2 倍の乗数を適用します。",
+      "default_prevention_suffix": "評価方法論。",
+      "default_rate": "CHF 35/時間",
+      "default_source": "スイスの介護助手率、SECO 2024",
+      "hours_are_valued_at": "時間の価値は",
+      "hours_valued_at": "価値のある時間数",
+      "prevention_value_prefix": "防止値は、Age-Stiftung ごとに {{multiplier}}x 乗数を適用します/",
+      "prevention_value_suffix": "評価方法論。",
+      "substitution_applied": "時間はカテゴリごとの置換係数によって重み付けされます。",
+      "substitution_not_applied": "すべての時間は 1.0 倍で重み付けされます。",
+      "tenant_setting_source": "このテナント用に構成された"
+    },
+    "municipalities": {
+      "point_export": "CSV エクスポートが可能 - Age-Stiftung、Pro Senectute、および州の社会部門のレポートにはページ ヘッダーのボタンを使用します。",
+      "point_hour_prefix": "地域社会でのケアの時間を 1 時間ごとに約節約できます",
+      "point_hour_suffix": "正式な介護費用の中で",
+      "point_nexus": "この影響を州および地方自治体の調達に関して測定、監査、および報告できるようにします。",
+      "point_prevention": "地域社会の予防的支援により、居住介護の必要性を軽減できる - 推定乗数は 2 倍",
+      "title": "これが自治体にとって何を意味するか"
+    },
+    "roi": {
+      "default_multiplier_note": "(2倍の乗数)",
+      "multiplier_note": "({{multiplier}}x 乗数)",
+      "prevented_this_period": "この期間は正式な医療費が発生しませんでした",
+      "prevention_value": "予防価値",
+      "social_isolation_supported": "社会的孤立から支援された人々",
+      "title": "推定介護費用の相殺",
+      "yoy": "{{value}} YoY"
+    },
+    "stats": {
+      "active_members": "アクティブなメンバー",
+      "active_relationships": "活発な人間関係",
+      "care_recipients": "要介護者",
+      "total_hours": "合計時間",
+      "weighted_hours_note": "{{hours}} 置換係数後の加重時間数",
+      "weighted_hours_tooltip": "時間は、Age-Stiftung 方法論ごとにカテゴリ固有の代替率 (例: 交際 0.4 倍、移動 0.7 倍、用事 1.0 倍) によって重み付けされます。"
+    },
+    "toasts": {
+      "export_failed": "CSV をエクスポートできませんでした",
+      "load_failed": "地方自治体の影響データをロードできませんでした"
+    }
+  },
+  "municipal_verification": {
+    "about": {
+      "body": "Municipal Verification は、このコミュニティ ケア プログラムが要件を満たしているという自治体または州のパートナーからの正式な承認を記録します。パイロット打ち上げ準備状況チェックには検証が必要で、これにより自治体影響レポートのロックが解除されます。公式自治体ドメインには DNS TXT 検証を使用するか、DNS 制御が利用できない場合は管理者証明書を適用します。",
+      "pending_dns": "検証トークンが生成されました - DNS の伝播と確認を待っています。",
+      "revoked": "検証が削除されました - アクセスを復元するには再検証してください。",
+      "title": "このページについて",
+      "verified": "正式に確認されました - 自治体レポート パックのロックが解除されました。"
+    },
+    "actions": {
+      "apply_attestation": "証明書の適用",
+      "cancel": "キャンセル",
+      "generate_dns_token": "DNS トークンを生成する",
+      "refresh": "リフレッシュ",
+      "revoke": "取り消す"
+    },
+    "current": {
+      "not_verified": "このテナントは現在検証されていません。 DNS 検証を開始するか、手動の管理者証明書を適用するには、以下のオプションを使用します。",
+      "title": "現在の状況",
+      "verified_on": "{{date}} で確認済み"
+    },
+    "dns": {
+      "publish_record": "この TXT レコードを DNS で公開し、伝播を待ちます。",
+      "record_name": "レコード名",
+      "ttl_label": "TTL",
+      "ttl_value": "300",
+      "txt_type": "TXT",
+      "type_label": "タイプ",
+      "value": "価値"
+    },
+    "fields": {
+      "attestation_description": "DNS 検証を行わずにこれを証明するのはなぜですか? (監査証跡。)",
+      "attestation_note": "証明書メモ（オプション）",
+      "domain_or_organisation": "ドメインまたは組織",
+      "domain_placeholder": "例えばチューリッヒ",
+      "municipality_domain": "自治体ドメイン"
+    },
+    "history": {
+      "empty": "まだ検証記録がありません。",
+      "title": "検証",
+      "updated": "{{date}} を更新しました",
+      "via_method": "{{method}}経由"
+    },
+    "meta": {
+      "description": "このコミュニティを認証済み自治体パートナーとしてマークします。公開レポートに「認証済み自治体」バッジを追加します。",
+      "page_title": "市区町村の検証",
+      "title": "市区町村の検証"
+    },
+    "request": {
+      "attestation_body": "これは、DNS コントロールが使用できない場合にのみ使用してください。検証は、管理者が手動で証明したものとして記録されます。",
+      "attestation_tab": "管理者の証明書",
+      "dns_body": "あなたが管理する自治体の公式ドメインを指定してください。公開できる DNS TXT レコードを生成します。伝播すると、システムはこのテナントを検証済みとしてマークします。",
+      "dns_tab": "DNS TXT (推奨)",
+      "method_aria": "検証方法",
+      "title": "検証のリクエスト"
+    },
+    "revoke_modal": {
+      "body_prefix": "の検証を取り消します",
+      "body_suffix": "これにより、検証済みバッジが削除され、検証レコードは取り消されたものとしてマークされます。",
+      "title": "認証を取り消しますか?"
+    },
+    "status": {
+      "pending_dns": "保留中 DNS",
+      "revoked": "取り消されました",
+      "verified": "確認済み"
+    },
+    "toasts": {
+      "attest_failed": "検証を証明できませんでした",
+      "attested": "検証済み",
+      "dns_failed": "DNS 検証を開始できませんでした",
+      "dns_generated": "DNS 検証トークンが生成されました",
+      "load_failed": "検証ステータスのロードに失敗しました",
+      "revoke_failed": "検証の取り消しに失敗しました",
+      "revoked": "検証が取り消されました"
+    },
+    "validation": {
+      "domain_required": "ドメインを入力してください"
     }
   }
 }

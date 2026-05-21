@@ -10589,135 +10589,244 @@
   },
   "municipal_reports": {
     "meta": {
-      "title": "Municipal Impact Reports",
-      "description": "Prepare KISS-style reporting for verified hours, active members, trusted organisations, and municipal value conversations."
+      "title": "Relatórios de Impacto Municipal",
+      "description": "Prepare relatórios no estilo KISS para horários verificados, membros ativos, organizações confiáveis ​​e conversas sobre valores municipais."
     },
     "actions": {
-      "analytics": "Community analytics",
-      "impact_report": "Impact report",
-      "open_source_report": "Open source report",
-      "export_csv": "Export CSV",
-      "export_pdf": "Export PDF"
+      "analytics": "Análise da comunidade",
+      "impact_report": "Relatório de impacto",
+      "open_source_report": "Relatório de código aberto",
+      "export_csv": "Exportar CSV",
+      "export_pdf": "Exportar PDF"
     },
     "stats": {
-      "report_pack": "Report pack",
-      "ready": "Ready",
-      "hours_source": "Hours source",
-      "verified": "Verified",
-      "audience": "Audience",
-      "municipal": "Municipal",
-      "exports": "Exports",
+      "report_pack": "Pacote de relatórios",
+      "ready": "Preparar",
+      "hours_source": "Fonte de horas",
+      "verified": "Verificado",
+      "audience": "Público",
+      "municipal": "Munic?pio",
+      "exports": "Exportações",
       "csv_pdf": "CSV/PDF",
-      "verified_hours": "Verified hours",
-      "participants": "Participants",
-      "organisations": "Organisations",
-      "total_value": "Total value"
+      "verified_hours": "Horário verificado",
+      "participants": "Participantes",
+      "organisations": "Organizações",
+      "total_value": "Valor total"
     },
-    "loading": "Loading municipal impact data",
-    "period": "Reporting period",
-    "hour_value": "Hour value",
-    "multiplier": "Social multiplier",
+    "loading": "Carregando dados de impacto municipal",
+    "period": "Período do relatório",
+    "hour_value": "Valor da hora",
+    "multiplier": "Multiplicador social",
     "sections": {
-      "categories": "Support categories",
-      "trends": "Verified activity trend",
-      "readiness": "Procurement readiness signals"
+      "categories": "Categorias de suporte",
+      "trends": "Tendência de atividade verificada",
+      "readiness": "Sinais de prontidão para aquisições"
     },
     "empty": {
-      "categories": "No completed support categories in this period.",
-      "trends": "No verified activity trend is available for this period."
+      "categories": "Nenhuma categoria de suporte concluída neste período.",
+      "trends": "Nenhuma tendência de atividade verificada está disponível para este período."
     },
     "values": {
       "hours": "{{count}}h",
-      "activities": "{{count}} activities",
-      "trend_detail": "{{participants}} participants, {{activities}} activities",
-      "disabled": "Disabled"
+      "activities": "{{count}} atividades",
+      "trend_detail": "{{participants}} participantes, {{activities}} atividades",
+      "disabled": "Desabilitado"
     },
     "toast": {
-      "load_failed": "Failed to load municipal impact data.",
-      "export_started": "Report export started.",
-      "export_failed": "Failed to export the municipal report.",
-      "templates_load_failed": "Failed to load report templates.",
-      "template_saved": "Report template saved.",
-      "template_save_failed": "Failed to save the report template.",
-      "template_deleted": "Report template deleted.",
-      "template_delete_failed": "Failed to delete the report template."
+      "load_failed": "Falha ao carregar dados de impacto municipal.",
+      "export_started": "A exportação do relatório foi iniciada.",
+      "export_failed": "Falha ao exportar o relatório municipal.",
+      "templates_load_failed": "Falha ao carregar modelos de relatório.",
+      "template_saved": "Modelo de relatório salvo.",
+      "template_save_failed": "Falha ao salvar o modelo de relatório.",
+      "template_deleted": "Modelo de relatório excluído.",
+      "template_delete_failed": "Falha ao excluir o modelo de relatório."
     },
     "cards": {
       "verified_hours": {
-        "title": "Verified hours and economic value",
-        "description": "Summarise approved support hours, transaction volume, active contributors, and estimated value.",
-        "metric_1": "Approved hours",
-        "metric_2": "Active contributors",
-        "metric_3": "Value estimate"
+        "title": "Horário verificado e valor econômico",
+        "description": "Resuma as horas de suporte aprovadas, o volume de transações, os colaboradores ativos e o valor estimado.",
+        "metric_1": "Horário aprovado",
+        "metric_2": "Contribuidores ativos",
+        "metric_3": "Estimativa de valor"
       },
       "active_members": {
-        "title": "Member reach and inclusion",
-        "description": "Track active members, new joiners, inactive members, and groups that need coordinator attention.",
-        "metric_1": "Active members",
-        "metric_2": "New joiners",
-        "metric_3": "Inactive members"
+        "title": "Alcance e inclusão de membros",
+        "description": "Rastreie membros ativos, novos membros, membros inativos e grupos que precisam de atenção do coordenador.",
+        "metric_1": "Membros ativos",
+        "metric_2": "Novos ingressantes",
+        "metric_3": "Membros inativos"
       },
       "organisations": {
-        "title": "Organisation and partner activity",
-        "description": "Show participating organisations, opportunities, verified logs, and coordinator workflows.",
-        "metric_1": "Organisations",
-        "metric_2": "Opportunities",
-        "metric_3": "Verified logs"
+        "title": "Organização e atividade de parceiros",
+        "description": "Mostre organizações participantes, oportunidades, registros verificados e fluxos de trabalho de coordenadores.",
+        "metric_1": "Organizações",
+        "metric_2": "Oportunidades",
+        "metric_3": "Registros verificados"
       },
       "trust_pack": {
-        "title": "Trust, safeguarding, and compliance",
-        "description": "Surface verification, review, safeguarding, consent, and audit signals for sensitive care coordination.",
-        "metric_1": "Verification",
-        "metric_2": "Reviews",
-        "metric_3": "Audit trail"
+        "title": "Confiança, proteção e conformidade",
+        "description": "Verificação de superfície, revisão, proteção, consentimento e sinais de auditoria para coordenação de cuidados sensíveis.",
+        "metric_1": "Verificação",
+        "metric_2": "Avaliações",
+        "metric_3": "Trilha de auditoria"
       }
     },
-    "policy_default": "Policy default",
-    "audience": "Audience",
+    "policy_default": "Política padrão",
+    "audience": "Público",
     "filters": {
-      "title": "Reporting window",
-      "description": "Use explicit dates when preparing canton, municipality, foundation, or cooperative packs.",
-      "date_from": "From",
-      "date_to": "To",
-      "apply": "Apply dates",
-      "clear": "Clear"
+      "title": "Janela de relatórios",
+      "description": "Use datas explícitas ao preparar pacotes de cantão, município, fundação ou cooperativa.",
+      "date_from": "De",
+      "date_to": "Para",
+      "apply": "Aplicar datas",
+      "clear": "Claro"
     },
     "readiness": {
-      "municipal_value": "Municipal value",
-      "participation": "Participation",
-      "partner_network": "Partner network",
-      "local_exchange": "Local exchange",
+      "municipal_value": "Valor municipal",
+      "participation": "Participação",
+      "partner_network": "Rede de parceiros",
+      "local_exchange": "Troca local",
       "status": {
-        "ready": "Ready",
-        "needs_data": "Needs data"
+        "ready": "Preparar",
+        "needs_data": "Precisa de dados"
       }
     },
     "templates": {
-      "title": "Saved report templates",
-      "description": "Prepare repeatable municipal, canton, cooperative, or foundation report packs with the right audience, period, and value assumptions.",
-      "create": "New template",
-      "select_label": "Report template",
-      "default_policy": "Use workflow policy defaults",
-      "apply": "Apply",
-      "delete": "Delete",
-      "cancel": "Cancel",
-      "save": "Save template",
-      "modal_title": "Create report template",
+      "title": "Modelos de relatórios salvos",
+      "description": "Prepare pacotes de relatórios municipais, cantões, cooperativos ou de fundação repetíveis com o público, o período e as premissas de valor corretos.",
+      "create": "Novo modelo",
+      "select_label": "Modelo de relatório",
+      "default_policy": "Usar padrões de política de fluxo de trabalho",
+      "apply": "Aplicar",
+      "delete": "Excluir",
+      "cancel": "Cancelar",
+      "save": "Salvar modelo",
+      "modal_title": "Criar modelo de relatório",
       "hour_value_chip": "CHF {{value}}/h",
       "fields": {
-        "name": "Template name",
-        "description": "Description",
-        "audience": "Audience",
-        "period": "Reporting period",
-        "hour_value": "Hour value override (CHF)",
-        "include_social_value": "Include social value estimate"
+        "name": "Nome do modelo",
+        "description": "Descrição",
+        "audience": "Público",
+        "period": "Período do relatório",
+        "hour_value": "Substituição do valor da hora (CHF)",
+        "include_social_value": "Incluir estimativa de valor social"
       },
       "audiences": {
-        "municipality": "Municipality",
-        "canton": "Canton",
-        "cooperative": "Cooperative",
-        "foundation": "Foundation"
+        "municipality": "Município",
+        "canton": "Cantão",
+        "cooperative": "Cooperativa",
+        "foundation": "Fundação"
+      },
+      "descriptions": {
+        "audience": "Determina o enquadramento narrativo e quais seções aparecem na exportação PDF/CSV.",
+        "hour_value": "Taxa horária de cuidados formais locais para cálculo de compensação de custos (por exemplo, CHF 35 para a Suíça). Deixe em branco para usar o padrão do locatário.",
+        "period": "Janela de relatório padrão aplicada quando nenhum filtro manual de data está definido."
+      },
+      "placeholders": {
+        "description": "Nota opcional para referência futura - por ex. 'Usado para apresentação anual da AGM'",
+        "name": "por exemplo Relatório do Cantão do terceiro trimestre de 2025 para financiadores"
       }
+    },
+    "about": {
+      "body_1_after_chf": "valor de horas x multiplicador de prevenção).",
+      "body_1_after_kiss": "/Age-Stiftung metodologia, uma compensação de custo estimada para serviços de cuidados formais (",
+      "body_1_before_kiss": "O Relatório de Impacto Municipal é o pacote de evidências que você compartilha com parceiros municipais, cantões e financiadores para demonstrar o valor do programa. Mostra horas de atendimento verificadas, membros ativos, organizações parceiras e, usando o",
+      "body_2_after_audience": "alterne para mudar o enquadramento narrativo:",
+      "body_2_after_canton": "agrega vários municípios e mostra a evitação de custos à escala cantonal;",
+      "body_2_after_cooperative": "mostra retenção de membros, taxa de reciprocidade e carga de trabalho do coordenador. Exporte como PDF para enviar aos parceiros ou como CSV para análise posterior. Salve modelos de relatórios para regenerar rapidamente a mesma configuração em períodos futuros.",
+      "body_2_after_municipality": "centra-se nos residentes locais alcançados e nas organizações parceiras;",
+      "body_2_prefix": "Use o",
+      "chf_abbr": "CHF",
+      "kiss_abbr": "KISS",
+      "title": "Sobre este relatório"
+    },
+    "audience_selector": {
+      "description": "Mude o enquadramento narrativo. Somente a seção de público selecionada é incluída na exportação PDF/CSV.",
+      "title": "Público"
+    },
+    "export_note": {
+      "csv_label": "CSV exportar",
+      "csv_text": "fornece dados brutos para análise de planilhas ou relatórios de subsídios.",
+      "pdf_label": "PDF exportar",
+      "pdf_text": "está formatado para compartilhamento com parceiros e financiadores municipais."
+    },
+    "narrative": {
+      "canton": {
+        "description": "Impacto agregado entre municípios, prevenção de custos com cuidados profissionais, tendência ano após ano.",
+        "empty_body": "Mude para o modo Cantão para carregar a narrativa em nível de cantão.",
+        "empty_description": "Impacto agregado entre municípios, prevenção de custos e mudanças ano após ano.",
+        "empty_title": "Cantão (Kantonsrat/governo regional)",
+        "estimated_cost_avoidance": "Evitação de custos estimada",
+        "estimated_cost_avoidance_desc": "Horas x valor da apólice x {{multiplier}} (equivalência profissional-assistencial).",
+        "multi_node_total_hours": "Total de horas de vários nós",
+        "multi_node_total_hours_desc": "Verificado em todos os nós ativados.",
+        "municipalities_reporting": "Relatórios dos municípios",
+        "municipalities_reporting_desc": "Contagem agregada de nós que contribuem para esta visualização.",
+        "prior_period_detail": "Período anterior: {{from}} a {{to}} - {{hours}} horas verificadas.",
+        "title": "Horário de suporte verificado{{tenant}} - {{from}} a {{to}}",
+        "yoy_change": "Mudança ano após ano"
+      },
+      "cooperative": {
+        "active_tandems": "Tandens ativos",
+        "active_tandems_desc": "Pares recorrentes de ajudante/destinatário (2+ trocas).",
+        "coordinator_load": "Carga do coordenador",
+        "coordinator_load_desc": "{{pending}} pendente nos coordenadores {{coordinators}}.",
+        "description": "Saúde cooperativa interna: retenção, reciprocidade, tandems, carga de coordenador, pool de crédito.",
+        "empty_body": "Mude para o modo Cooperativo para carregar a narrativa interna cooperativa.",
+        "empty_description": "Retenção de membros, reciprocidade de horas, relacionamentos tandem, carga de trabalho do coordenador, conjunto de créditos para cuidados futuros.",
+        "empty_title": "Cooperativo (KISS-Genossenschaft interno)",
+        "future_care_credit_pool": "Pool de saldo de crédito para cuidados futuros",
+        "future_care_credit_pool_desc": "Soma dos saldos positivos dos associados - reserva implícita de assistência futura da cooperativa. Base de membros ativos: {{count}}.",
+        "member_retention": "Retenção de membros",
+        "member_retention_desc": "{{count}} membros ativos neste período e no período equivalente anterior.",
+        "reciprocity_rate": "Taxa de reciprocidade",
+        "reciprocity_rate_desc": "{{count}} apoiadores também receberam horas no período.",
+        "title": "Relatório interno cooperativo - {{from}} a {{to}}"
+      },
+      "in_export": "Na exportação",
+      "logs_count": "{{count}} registros",
+      "municipality": {
+        "description": "Participação local, organizações parceiras nomeadas, divisão geográfica/categoria, alcance do destinatário.",
+        "empty_body": "Mude para o modo Município para carregar a narrativa em nível de município.",
+        "empty_description": "Participação local, organizações parceiras nomeadas, divisão geográfica/categoria.",
+        "empty_title": "Município (Gemeinde)",
+        "no_category_data": "Não há dados de categoria neste período.",
+        "no_partner_activity": "Nenhuma atividade de parceiro neste período.",
+        "partner_organisations": "Organizações parceiras",
+        "partner_organisations_by_hours": "Organizações parceiras (por horas)",
+        "recipients_reached": "Destinatários alcançados",
+        "recipients_reached_desc": "Receptores distintos de trocas concluídas.",
+        "title": "Impacto na comunidade - {{from}} a {{to}}",
+        "top_5_categories": "5 principais categorias (divisão geográfica/atividade)",
+        "top_categories": "Principais categorias",
+        "top_categories_desc": "Listado abaixo por horas.",
+        "trusted_total": "de {{count}} total confiável."
+      },
+      "no_prior_data": "Sem dados anteriores"
+    },
+    "readiness_help": {
+      "local_exchange": {
+        "fix": "Nenhuma troca concluída ainda. Os coordenadores devem aprovar registros de horas pendentes.",
+        "what": "Trocas verificadas (concluídas e aprovadas) registradas neste período."
+      },
+      "municipal_value": {
+        "fix": "Nenhuma compensação de custo calculável ainda. Aprove registros de horas de voluntariado pendentes para preencher esta métrica.",
+        "what": "Compensação de custos estimados para cuidados formais (horas x valor da hora política x multiplicador de prevenção)."
+      },
+      "participation": {
+        "fix": "Abaixo do limite mínimo de participação. Continue integrando membros e concluindo trocas.",
+        "what": "Membros distintos atuaram como apoiadores ou beneficiários neste período."
+      },
+      "partner_network": {
+        "fix": "Nenhuma organização confiável ativa. Integrar organizações através de Voluntariado > Organizações.",
+        "what": "Organizações parceiras de confiança que contribuíram com horas neste período."
+      }
+    },
+    "readiness_intro": {
+      "needs_data_suffix": "= a métrica está abaixo do limite - passe o mouse sobre cada cartão para obter orientação.",
+      "prefix": "Estes quatro sinais indicam se o relatório contém dados suficientes para ser convincente para um público externo.",
+      "ready_suffix": "= dados suficientes;"
     }
   },
   "caring_emergency": {
@@ -12525,6 +12634,257 @@
         "reject_failed": "Falha ao rejeitar a campanha.",
         "required_fields": "Nome, cargo e corpo são obrigatórios."
       }
+    }
+  },
+  "municipal_copilot": {
+    "about": {
+      "body": "O Copiloto Municipal ajuda você a redigir anúncios claros, adequadamente formais e sem jargões. Cole um rascunho - o AI irá sugerir melhorias, sinalizar problemas de tom (muito formal, condescendente ou pouco claro) e listar quaisquer preocupações de moderação. Você analisa e aceita ou rejeita a sugestão antes que qualquer coisa seja publicada.",
+      "title": "Sobre esta página"
+    },
+    "actions": {
+      "accept": "Aceitar",
+      "cancel": "Cancelar",
+      "generate_proposal": "Gerar proposta",
+      "refresh": "Atualizar",
+      "reject": "Rejeitar",
+      "reject_proposal": "Rejeitar proposta",
+      "view": "Visualizar"
+    },
+    "empty": {
+      "no_latest": "Nenhuma proposta ainda. Gere um a partir do rascunho à esquerda.",
+      "no_proposals": "Ainda não há propostas. Os rascunhos que você analisar aparecerão aqui como uma trilha de auditoria.",
+      "value": "-"
+    },
+    "fields": {
+      "audience_description": "Especifique a quem se destina este anúncio (por exemplo, 'todos os residentes', 'voluntários', 'contactos do município') para que o AI possa calibrar o tom e o vocabulário adequadamente.",
+      "audience_hint": "Dica de público (opcional)",
+      "audience_placeholder": "por exemplo cuidadores na sub-região norte",
+      "character_count": "{{count}} / 4000 caracteres",
+      "draft_announcement": "Rascunho do anúncio",
+      "draft_placeholder": "Cole um rascunho - o copiloto irá polir, verificar o tom e sinalizar problemas.",
+      "polished_text": "Texto polido",
+      "reason": "Razão",
+      "reason_placeholder": "Por que esta proposta está sendo rejeitada?"
+    },
+    "labels": {
+      "audience": "Público: {{audience}}",
+      "model": "Modelo: {{model}}"
+    },
+    "meta": {
+      "page_title": "Copiloto de Comunicação Municipal",
+      "subtitle": "Elabore anúncios oficiais, faça com que eles sejam aprimorados por AI, verifique o tom e a clareza e depois publique. Projetado para coordenadores que precisam se comunicar com moradores e contatos do município de forma consistente e acessível.",
+      "title": "Copiloto de Comunicação Municipal"
+    },
+    "modal": {
+      "reject_title": "Rejeitar proposta"
+    },
+    "sections": {
+      "clarity_warnings": "Avisos de clareza",
+      "latest_proposal": "Última proposta",
+      "moderation_flags": "Sinalizadores de moderação",
+      "new_draft": "Novo rascunho",
+      "recent_proposals": "Propostas recentes"
+    },
+    "states": {
+      "accepted": "Aceito. Agora publique o texto refinado por meio do administrador de Anúncios.",
+      "rejected_reason": "Rejeitado - motivo: {{reason}}"
+    },
+    "status": {
+      "accepted": "Aceito",
+      "proposed": "Proposto",
+      "published": "Publicado",
+      "rejected": "Rejeitado"
+    },
+    "table": {
+      "actions": "AÇÕES",
+      "aria": "Propostas recentes de copiloto",
+      "audience": "PÚBLICO",
+      "created": "CRIADO",
+      "draft": "RASCUNHO",
+      "status": "Estado",
+      "tone": "TOM"
+    },
+    "toasts": {
+      "accept_failed": "Não foi possível aceitar a proposta",
+      "accepted": "Proposta aceita - agora publique através do administrador de anúncios",
+      "draft_too_long": "O rascunho é muito longo (máximo de 4.000 caracteres)",
+      "enter_draft": "Insira um rascunho primeiro",
+      "generate_failed": "Falha ao gerar proposta",
+      "generated": "Proposta gerada",
+      "load_failed": "Falha ao carregar propostas de copiloto",
+      "reason_required": "A razão é necessária",
+      "reject_failed": "Falha ao rejeitar proposta",
+      "rejected": "Proposta rejeitada"
+    },
+    "tone": {
+      "condescending": "Condescendente",
+      "ok": "Tom OK",
+      "too_formal": "Muito formal",
+      "too_informal": "Muito informal"
+    },
+    "tone_legend": {
+      "condescending": "pode patrocinar o leitor",
+      "ok": "nenhum problema de tom detectado",
+      "prefix": "Legenda do tom -",
+      "too_formal": "excessivamente burocrático",
+      "too_informal": "pode parecer pouco profissional"
+    }
+  },
+  "municipal_roi_page": {
+    "about": {
+      "body_middle": "O relatório calcula o valor social e econômico do seu programa de assistência comunitária usando o",
+      "body_prefix": "O Municipal",
+      "body_suffix": "Metodologia Age-Stiftung. Mostra a compensação de custos estimada para serviços de cuidados formais (Spitex/Pflege), o valor social gerado e dados de tendências ao longo dos períodos de relatório. Este relatório foi concebido para ser partilhado com parceiros municipais e financiadores como prova do impacto do programa.",
+      "formula_prefix": "Compensação de custos = total de horas de atendimento aprovadas x",
+      "formula_suffix": "taxa horária x multiplicador de prevenção. O multiplicador de prevenção (predefinição: 2,0) reflete que uma hora de cuidados informais evita aproximadamente duas horas de intervenção de cuidados formais, com base na investigação Age-Stiftung.",
+      "title": "Sobre esta página"
+    },
+    "actions": {
+      "export_csv": "Exportar CSV",
+      "refresh_aria": "Atualizar relatório de impacto municipal",
+      "refresh_data": "Atualizar dados"
+    },
+    "breakdown": {
+      "aria": "Divisão por sub-região",
+      "description": "A divisão por sub-região mostra quais bairros estão gerando mais atividades de cuidado. Utilize isto para identificar áreas que possam necessitar de mais apoio do coordenador ou recrutamento de voluntários.",
+      "formal_care_offset": "Compensação de cuidados formais",
+      "hours": "Horas",
+      "sub_region": "Sub-região",
+      "title": "Divisão por sub-região",
+      "weighted_hours": "Horas ponderadas"
+    },
+    "filters": {
+      "all_sub_regions": "Todas as sub-regiões",
+      "from": "De",
+      "period": "Período: {{from}} -> {{to}}",
+      "sub_region": "Sub-região",
+      "to": "Para"
+    },
+    "meta": {
+      "page_title": "Relatório de Impacto Municipal",
+      "subtitle": "Evidências para compras B2G – compensações de custos de cuidados e métricas de capital social",
+      "title": "Relatório de Impacto Municipal"
+    },
+    "methodology": {
+      "chf_per_hour": "CHF {{amount}}/h",
+      "default_prevention_prefix": "O valor de prevenção aplica um multiplicador de 2x por Age-Stiftung/",
+      "default_prevention_suffix": "metodologia de avaliação.",
+      "default_rate": "CHF 35/h",
+      "default_source": "Taxa de assistente de cuidados formais na Suíça, SECO 2024",
+      "hours_are_valued_at": "As horas são avaliadas em",
+      "hours_valued_at": "Horas avaliadas em",
+      "prevention_value_prefix": "O valor de prevenção aplica um multiplicador {{multiplier}}x por Age-Stiftung/",
+      "prevention_value_suffix": "metodologia de avaliação.",
+      "substitution_applied": "As horas são ponderadas por coeficientes de substituição por categoria.",
+      "substitution_not_applied": "Todas as horas ponderadas em 1,0x.",
+      "tenant_setting_source": "configurado para este locatário"
+    },
+    "municipalities": {
+      "point_export": "Exportação CSV disponível - use o botão no cabeçalho da página para relatórios Age-Stiftung, Pro Senectute e do departamento social cantonal.",
+      "point_hour_prefix": "Cada hora de cuidado comunitário economiza aproximadamente",
+      "point_hour_suffix": "em custos de cuidados formais",
+      "point_nexus": "torna esse impacto mensurável, auditável e reportável para compras cantonais e municipais",
+      "point_prevention": "O apoio preventivo da comunidade pode reduzir as necessidades de cuidados residenciais - multiplicador estimado em 2x",
+      "title": "O que isso significa para os municípios"
+    },
+    "roi": {
+      "default_multiplier_note": "(multiplicador 2x)",
+      "multiplier_note": "({{multiplier}}x multiplicador)",
+      "prevented_this_period": "nos custos de cuidados formais impediram este período",
+      "prevention_value": "Valor de prevenção",
+      "social_isolation_supported": "Pessoas apoiadas fora do isolamento social",
+      "title": "Compensação estimada de custos de cuidados",
+      "yoy": "{{value}} YoY"
+    },
+    "stats": {
+      "active_members": "Membros Ativos",
+      "active_relationships": "Relacionamentos Ativos",
+      "care_recipients": "Destinatários de cuidados",
+      "total_hours": "Total de horas",
+      "weighted_hours_note": "{{hours}} horas ponderadas após coeficientes de substituição",
+      "weighted_hours_tooltip": "As horas são ponderadas pelas taxas de substituição específicas da categoria (por exemplo, companhia 0,4x, transporte 0,7x, tarefas 1,0x) de acordo com a metodologia Age-Stiftung."
+    },
+    "toasts": {
+      "export_failed": "Falha ao exportar CSV",
+      "load_failed": "Falha ao carregar dados de impacto municipal"
+    }
+  },
+  "municipal_verification": {
+    "about": {
+      "body": "A Verificação Municipal registra a aprovação formal de um município ou cantão parceiro de que este programa de assistência comunitária atende aos seus requisitos. A verificação é necessária para a verificação da Prontidão do Lançamento Piloto e desbloqueia o Relatório de Impacto Municipal. Use a verificação DNS TXT para domínios municipais oficiais ou aplique um atestado de administrador se o controle DNS não estiver disponível.",
+      "pending_dns": "Token de verificação gerado - aguardando propagação e confirmação DNS.",
+      "revoked": "A verificação foi removida. Verifique novamente para restaurar o acesso.",
+      "title": "Sobre esta página",
+      "verified": "Verificado formalmente - o pacote de relatórios municipais está desbloqueado."
+    },
+    "actions": {
+      "apply_attestation": "Aplicar atestado",
+      "cancel": "Cancelar",
+      "generate_dns_token": "Gerar token DNS",
+      "refresh": "Atualizar",
+      "revoke": "Revogar"
+    },
+    "current": {
+      "not_verified": "Este locatário não está verificado no momento. Use as opções abaixo para iniciar uma verificação DNS ou aplicar um atestado de administrador manual.",
+      "title": "Estado atual",
+      "verified_on": "Verificado em {{date}}"
+    },
+    "dns": {
+      "publish_record": "Publique este registro TXT em seu DNS e aguarde a propagação:",
+      "record_name": "Nome do registro",
+      "ttl_label": "TTL",
+      "ttl_value": "300",
+      "txt_type": "TXT",
+      "type_label": "Tipo",
+      "value": "Valor"
+    },
+    "fields": {
+      "attestation_description": "Por que você está atestando isso sem verificação DNS? (Trilha de auditoria.)",
+      "attestation_note": "Nota de atestado (opcional)",
+      "domain_or_organisation": "Domínio ou organização",
+      "domain_placeholder": "por exemplo zurique.ch",
+      "municipality_domain": "Domínio do município"
+    },
+    "history": {
+      "empty": "Ainda não há registros de verificação.",
+      "title": "Verificações",
+      "updated": "Atualizado {{date}}",
+      "via_method": "através de {{method}}"
+    },
+    "meta": {
+      "description": "Marque esta comunidade como um parceiro municipal verificado. Adiciona um selo de 'Município verificado' aos relatórios públicos.",
+      "page_title": "Verificação municipal",
+      "title": "Verificação municipal"
+    },
+    "request": {
+      "attestation_body": "Use isto somente quando o controle DNS não estiver disponível. A verificação é registrada conforme atestada manualmente por um administrador.",
+      "attestation_tab": "Atestado de administrador",
+      "dns_body": "Forneça o domínio oficial do município que você controla. Geraremos um registro DNS TXT para você publicar; depois de propagado, o sistema marca esse locatário como verificado.",
+      "dns_tab": "DNS TXT (preferencial)",
+      "method_aria": "Método de verificação",
+      "title": "Solicitar verificação"
+    },
+    "revoke_modal": {
+      "body_prefix": "Revogar verificação para",
+      "body_suffix": "Isso remove o selo de verificação e o registro de verificação será marcado como revogado.",
+      "title": "Revogar verificação?"
+    },
+    "status": {
+      "pending_dns": "Pendente DNS",
+      "revoked": "Revogado",
+      "verified": "Verificado"
+    },
+    "toasts": {
+      "attest_failed": "Falha ao atestar a verificação",
+      "attested": "Verificação atestada",
+      "dns_failed": "Falha ao iniciar a verificação DNS",
+      "dns_generated": "DNS token de verificação gerado",
+      "load_failed": "Falha ao carregar o status de verificação",
+      "revoke_failed": "Falha ao revogar a verificação",
+      "revoked": "Verificação revogada"
+    },
+    "validation": {
+      "domain_required": "Insira um domínio"
     }
   }
 }

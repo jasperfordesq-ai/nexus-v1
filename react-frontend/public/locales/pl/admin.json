@@ -10589,135 +10589,244 @@
   },
   "municipal_reports": {
     "meta": {
-      "title": "Municipal Impact Reports",
-      "description": "Prepare KISS-style reporting for verified hours, active members, trusted organisations, and municipal value conversations."
+      "title": "Miejskie raporty oddziaływania",
+      "description": "Przygotuj raporty w stylu KISS dotyczące zweryfikowanych godzin, aktywnych członków, zaufanych organizacji i rozmów o wartościach miejskich."
     },
     "actions": {
-      "analytics": "Community analytics",
-      "impact_report": "Impact report",
-      "open_source_report": "Open source report",
-      "export_csv": "Export CSV",
-      "export_pdf": "Export PDF"
+      "analytics": "Analityka społeczności",
+      "impact_report": "Raport wpływu",
+      "open_source_report": "Raport open source",
+      "export_csv": "Eksportuj CSV",
+      "export_pdf": "Eksportuj PDF"
     },
     "stats": {
-      "report_pack": "Report pack",
-      "ready": "Ready",
-      "hours_source": "Hours source",
-      "verified": "Verified",
-      "audience": "Audience",
-      "municipal": "Municipal",
-      "exports": "Exports",
+      "report_pack": "Pakiet raportów",
+      "ready": "Gotowy",
+      "hours_source": "Źródło godzin",
+      "verified": "Zweryfikowano",
+      "audience": "Publiczność",
+      "municipal": "Komunalny",
+      "exports": "Eksport",
       "csv_pdf": "CSV/PDF",
-      "verified_hours": "Verified hours",
-      "participants": "Participants",
-      "organisations": "Organisations",
-      "total_value": "Total value"
+      "verified_hours": "Zweryfikowane godziny",
+      "participants": "Uczestnicy",
+      "organisations": "Organizacje",
+      "total_value": "Całkowita wartość"
     },
-    "loading": "Loading municipal impact data",
-    "period": "Reporting period",
-    "hour_value": "Hour value",
-    "multiplier": "Social multiplier",
+    "loading": "Ładowanie danych o wpływie na miasto",
+    "period": "Okres raportowania",
+    "hour_value": "Wartość godzinowa",
+    "multiplier": "Mnożnik społeczny",
     "sections": {
-      "categories": "Support categories",
-      "trends": "Verified activity trend",
-      "readiness": "Procurement readiness signals"
+      "categories": "Kategorie wsparcia",
+      "trends": "Zweryfikowany trend aktywności",
+      "readiness": "Sygnały gotowości zakupowej"
     },
     "empty": {
-      "categories": "No completed support categories in this period.",
-      "trends": "No verified activity trend is available for this period."
+      "categories": "Brak ukończonych kategorii wsparcia w tym okresie.",
+      "trends": "Dla tego okresu nie jest dostępny żaden zweryfikowany trend aktywności."
     },
     "values": {
-      "hours": "{{count}}h",
-      "activities": "{{count}} activities",
-      "trend_detail": "{{participants}} participants, {{activities}} activities",
-      "disabled": "Disabled"
+      "hours": "{{count}}godz",
+      "activities": "{{count}} działania",
+      "trend_detail": "{{participants}} uczestnicy, {{activities}} działania",
+      "disabled": "Wyłączony"
     },
     "toast": {
-      "load_failed": "Failed to load municipal impact data.",
-      "export_started": "Report export started.",
-      "export_failed": "Failed to export the municipal report.",
-      "templates_load_failed": "Failed to load report templates.",
-      "template_saved": "Report template saved.",
-      "template_save_failed": "Failed to save the report template.",
-      "template_deleted": "Report template deleted.",
-      "template_delete_failed": "Failed to delete the report template."
+      "load_failed": "Nie udało się załadować danych o wpływie na gminy.",
+      "export_started": "Rozpoczęto eksport raportu.",
+      "export_failed": "Nie udało się wyeksportować raportu miejskiego.",
+      "templates_load_failed": "Nie udało się załadować szablonów raportów.",
+      "template_saved": "Szablon raportu został zapisany.",
+      "template_save_failed": "Nie udało się zapisać szablonu raportu.",
+      "template_deleted": "Szablon raportu został usunięty.",
+      "template_delete_failed": "Nie udało się usunąć szablonu raportu."
     },
     "cards": {
       "verified_hours": {
-        "title": "Verified hours and economic value",
-        "description": "Summarise approved support hours, transaction volume, active contributors, and estimated value.",
-        "metric_1": "Approved hours",
-        "metric_2": "Active contributors",
-        "metric_3": "Value estimate"
+        "title": "Zweryfikowane godziny i wartość ekonomiczna",
+        "description": "Podsumuj zatwierdzone godziny wsparcia, wielkość transakcji, aktywnych współpracowników i szacowaną wartość.",
+        "metric_1": "Zatwierdzone godziny",
+        "metric_2": "Aktywni współpracownicy",
+        "metric_3": "Szacunek wartości"
       },
       "active_members": {
-        "title": "Member reach and inclusion",
-        "description": "Track active members, new joiners, inactive members, and groups that need coordinator attention.",
-        "metric_1": "Active members",
-        "metric_2": "New joiners",
-        "metric_3": "Inactive members"
+        "title": "Zasięg i włączenie członków",
+        "description": "Śledź aktywnych członków, nowych dołączających, nieaktywnych członków i grupy wymagające uwagi koordynatora.",
+        "metric_1": "Aktyw",
+        "metric_2": "Nowi stolarze",
+        "metric_3": "Nieaktywni członkowie"
       },
       "organisations": {
-        "title": "Organisation and partner activity",
-        "description": "Show participating organisations, opportunities, verified logs, and coordinator workflows.",
-        "metric_1": "Organisations",
-        "metric_2": "Opportunities",
-        "metric_3": "Verified logs"
+        "title": "Organizacja i działalność partnerska",
+        "description": "Pokaż organizacje uczestniczące, możliwości, zweryfikowane dzienniki i przepływy pracy koordynatorów.",
+        "metric_1": "Organizacje",
+        "metric_2": "Możliwości",
+        "metric_3": "Zweryfikowane logi"
       },
       "trust_pack": {
-        "title": "Trust, safeguarding, and compliance",
-        "description": "Surface verification, review, safeguarding, consent, and audit signals for sensitive care coordination.",
-        "metric_1": "Verification",
-        "metric_2": "Reviews",
-        "metric_3": "Audit trail"
+        "title": "Zaufanie, ochrona i zgodność",
+        "description": "Weryfikacja powierzchni, przegląd, zabezpieczenie, zgoda i sygnały audytu dla koordynacji opieki wrażliwej.",
+        "metric_1": "Weryfikacja",
+        "metric_2": "Recenzje",
+        "metric_3": "Ścieżka audytu"
       }
     },
-    "policy_default": "Policy default",
-    "audience": "Audience",
+    "policy_default": "Domyślne zasady",
+    "audience": "Publiczność",
     "filters": {
-      "title": "Reporting window",
-      "description": "Use explicit dates when preparing canton, municipality, foundation, or cooperative packs.",
-      "date_from": "From",
-      "date_to": "To",
-      "apply": "Apply dates",
-      "clear": "Clear"
+      "title": "Okno raportowania",
+      "description": "Przygotowując pakiety dotyczące kantonu, gminy, fundacji lub spółdzielni, używaj wyraźnych dat.",
+      "date_from": "Z",
+      "date_to": "Do",
+      "apply": "Zastosuj daty",
+      "clear": "Jasne"
     },
     "readiness": {
-      "municipal_value": "Municipal value",
-      "participation": "Participation",
-      "partner_network": "Partner network",
-      "local_exchange": "Local exchange",
+      "municipal_value": "Wartość komunalna",
+      "participation": "Udział",
+      "partner_network": "Sieć partnerska",
+      "local_exchange": "Lokalna wymiana",
       "status": {
-        "ready": "Ready",
-        "needs_data": "Needs data"
+        "ready": "Gotowy",
+        "needs_data": "Potrzebuje danych"
       }
     },
     "templates": {
-      "title": "Saved report templates",
-      "description": "Prepare repeatable municipal, canton, cooperative, or foundation report packs with the right audience, period, and value assumptions.",
-      "create": "New template",
-      "select_label": "Report template",
-      "default_policy": "Use workflow policy defaults",
-      "apply": "Apply",
-      "delete": "Delete",
-      "cancel": "Cancel",
-      "save": "Save template",
-      "modal_title": "Create report template",
-      "hour_value_chip": "CHF {{value}}/h",
+      "title": "Zapisane szablony raportów",
+      "description": "Przygotuj powtarzalne pakiety raportów gminnych, kantonowych, spółdzielczych lub fundacyjnych z właściwymi odbiorcami, okresem i założeniami dotyczącymi wartości.",
+      "create": "Nowy szablon",
+      "select_label": "Szablon raportu",
+      "default_policy": "Użyj domyślnych ustawień zasad przepływu pracy",
+      "apply": "Stosować",
+      "delete": "Usuwać",
+      "cancel": "Anulować",
+      "save": "Zapisz szablon",
+      "modal_title": "Utwórz szablon raportu",
+      "hour_value_chip": "CHF {{value}}/godz",
       "fields": {
-        "name": "Template name",
-        "description": "Description",
-        "audience": "Audience",
-        "period": "Reporting period",
-        "hour_value": "Hour value override (CHF)",
-        "include_social_value": "Include social value estimate"
+        "name": "Nazwa szablonu",
+        "description": "Opis",
+        "audience": "Publiczność",
+        "period": "Okres raportowania",
+        "hour_value": "Zastąpienie wartości godziny (CHF)",
+        "include_social_value": "Uwzględnij oszacowanie wartości społecznej"
       },
       "audiences": {
-        "municipality": "Municipality",
-        "canton": "Canton",
-        "cooperative": "Cooperative",
-        "foundation": "Foundation"
+        "municipality": "Miasto",
+        "canton": "Kanton",
+        "cooperative": "Spółdzielnia",
+        "foundation": "Fundacja"
+      },
+      "descriptions": {
+        "audience": "Określa ramę narracji i sekcje wyświetlane w eksporcie PDF/CSV.",
+        "hour_value": "Lokalna stawka godzinowa za opiekę formalną do obliczenia rekompensaty kosztów (np. CHF 35 dla Szwajcarii). Pozostaw puste, aby użyć domyślnej wartości dzierżawy.",
+        "period": "Domyślne okno raportowania stosowane, gdy nie ustawiono ręcznego filtra dat."
+      },
+      "placeholders": {
+        "description": "Opcjonalna uwaga do wykorzystania w przyszłości – np. „Używane do corocznej prezentacji na Walnym Zgromadzeniu”",
+        "name": "np. Raport kantonu za III kwartał 2025 r. dla darczyńców"
       }
+    },
+    "about": {
+      "body_1_after_chf": "wartość godzin x mnożnik zapobiegania).",
+      "body_1_after_kiss": "/Age-Stiftung metodologia, szacowany koszt usług opieki formalnej (",
+      "body_1_before_kiss": "Miejski Raport Oddziaływania to pakiet dowodów, który udostępniasz partnerom miejskim, kantonom i fundatorom, aby wykazać wartość programu. Pokazuje zweryfikowane godziny opieki, aktywnych członków, organizacje partnerskie i, korzystając z",
+      "body_2_after_audience": "przełącz, aby przełączyć oprawę narracji:",
+      "body_2_after_canton": "agreguje wiele gmin i wykazuje unikanie kosztów w skali kantonu;",
+      "body_2_after_cooperative": "pokazuje retencję członków, wskaźnik wzajemności i obciążenie pracą koordynatora. Eksportuj jako PDF, aby wysłać do partnerów lub jako CSV w celu dalszej analizy. Zapisz szablony raportów, aby szybko odtworzyć tę samą konfigurację w przyszłych okresach.",
+      "body_2_after_municipality": "koncentruje się na lokalnych mieszkańcach i organizacjach partnerskich;",
+      "body_2_prefix": "Skorzystaj z",
+      "chf_abbr": "CHF",
+      "kiss_abbr": "KISS",
+      "title": "O tym raporcie"
+    },
+    "audience_selector": {
+      "description": "Zmień ramy narracji. Eksport PDF/CSV obejmuje tylko wybraną sekcję odbiorców.",
+      "title": "Publiczność"
+    },
+    "export_note": {
+      "csv_label": "CSV eksportuj",
+      "csv_text": "dostarcza surowe dane do analizy w arkuszach kalkulacyjnych lub raportowania dotacji.",
+      "pdf_label": "PDF eksportuj",
+      "pdf_text": "jest przystosowany do udostępniania partnerom miejskim i fundatorom."
+    },
+    "narrative": {
+      "canton": {
+        "description": "Łączny wpływ we wszystkich gminach, unikanie kosztów profesjonalnej opieki, tendencja rok do roku.",
+        "empty_body": "Przełącz do trybu kantonu, aby załadować narrację na poziomie kantonu.",
+        "empty_description": "Łączny wpływ na gminy, unikanie kosztów i zmiany z roku na rok.",
+        "empty_title": "Kanton (Kantonsrat / samorząd regionalny)",
+        "estimated_cost_avoidance": "Szacowane uniknięcie kosztów",
+        "estimated_cost_avoidance_desc": "Godziny x wartość polisy x {{multiplier}} (odpowiednik opieki profesjonalnej).",
+        "multi_node_total_hours": "Łączna liczba godzin dla wielu węzłów",
+        "multi_node_total_hours_desc": "Zweryfikowano we wszystkich wybranych węzłach.",
+        "municipalities_reporting": "Sprawozdania gmin",
+        "municipalities_reporting_desc": "Łączna liczba węzłów tworząca ten widok.",
+        "prior_period_detail": "Poprzedni okres: {{from}} do {{to}} - {{hours}} zweryfikowane godziny.",
+        "title": "Zweryfikowane godziny wsparcia{{tenant}} - {{from}} do {{to}}",
+        "yoy_change": "Zmiana z roku na rok"
+      },
+      "cooperative": {
+        "active_tandems": "Aktywne tandemy",
+        "active_tandems_desc": "Powtarzające się pary pomocnik/odbiorca (ponad 2 wymiany).",
+        "coordinator_load": "Obciążenie koordynatora",
+        "coordinator_load_desc": "{{pending}} w toku u {{coordinators}} koordynatorów.",
+        "description": "Wewnętrzna kondycja spółdzielni: retencja, wzajemność, tandemy, obciążenie koordynatorów, pula kredytów.",
+        "empty_body": "Przejdź do trybu współpracy, aby załadować wewnętrzną narrację kooperacyjną.",
+        "empty_description": "Utrzymanie członków, wzajemność godzinowa, relacje tandemowe, obciążenie koordynatora pracą, pula kredytów na przyszłą opiekę.",
+        "empty_title": "Spółdzielnia (KISS-Genossenschaft wewnętrzna)",
+        "future_care_credit_pool": "Pula salda kredytu na przyszłość",
+        "future_care_credit_pool_desc": "Suma dodatnich sald członków – ukryta rezerwa spółdzielni na przyszłość. Aktywna baza członków: {{count}}.",
+        "member_retention": "Utrzymanie członków",
+        "member_retention_desc": "{{count}} członków aktywnych zarówno w tym okresie, jak i w poprzednim równoważnym okresie.",
+        "reciprocity_rate": "Stopa wzajemności",
+        "reciprocity_rate_desc": "{{count}} kibice również otrzymali godziny w tym okresie.",
+        "title": "Wewnętrzny raport spółdzielczy - {{from}} do {{to}}"
+      },
+      "in_export": "W eksporcie",
+      "logs_count": "{{count}} dzienniki",
+      "municipality": {
+        "description": "Udział lokalny, wymienione organizacje partnerskie, podział geograficzny/kategoryczny, zasięg odbiorców.",
+        "empty_body": "Przejdź do trybu gminy, aby załadować narrację na poziomie gminy.",
+        "empty_description": "Udział lokalny, wymienione organizacje partnerskie, podział geograficzny/kategoryczny.",
+        "empty_title": "Gmina (Gemeinde)",
+        "no_category_data": "Brak danych kategorii w tym okresie.",
+        "no_partner_activity": "Brak aktywności partnera w tym okresie.",
+        "partner_organisations": "Organizacje partnerskie",
+        "partner_organisations_by_hours": "Organizacje partnerskie (według godzin)",
+        "recipients_reached": "Dotarto do odbiorców",
+        "recipients_reached_desc": "Wyróżnieni odbiorcy zrealizowanych wymian.",
+        "title": "Wpływ na społeczność - {{from}} do {{to}}",
+        "top_5_categories": "5 najlepszych kategorii (podział geograficzny/aktywność)",
+        "top_categories": "Najlepsze kategorie",
+        "top_categories_desc": "Poniżej wymienione według godzin.",
+        "trusted_total": "z {{count}} zaufanej sumy."
+      },
+      "no_prior_data": "Brak wcześniejszych danych"
+    },
+    "readiness_help": {
+      "local_exchange": {
+        "fix": "Brak jeszcze zakończonych wymian. Koordynatorzy powinni zatwierdzić oczekujące dzienniki godzin.",
+        "what": "Zweryfikowane wymiany (ukończone i zatwierdzone) zarejestrowane w tym okresie."
+      },
+      "municipal_value": {
+        "fix": "Nie można jeszcze obliczyć offsetu kosztów. Zatwierdź oczekujące dzienniki godzin pracy wolontariuszy, aby wypełnić tę metrykę.",
+        "what": "Szacunkowe pokrycie kosztów opieki formalnej (godziny x wartość godzin polisowych x mnożnik zapobiegania)."
+      },
+      "participation": {
+        "fix": "Poniżej minimalnego progu uczestnictwa. Kontynuuj wdrażanie członków i uzupełnianie wymian.",
+        "what": "Wyróżnieni członkowie aktywnie wspierali lub odbiorcy w tym okresie."
+      },
+      "partner_network": {
+        "fix": "Brak aktywnych zaufanych organizacji. Dołącz do organizacji poprzez Wolontariat > Organizacje.",
+        "what": "Zaufane organizacje partnerskie, które przekazały godziny w tym okresie."
+      }
+    },
+    "readiness_intro": {
+      "needs_data_suffix": "= wskaźnik jest poniżej progu — najedź kursorem na każdą kartę, aby uzyskać wskazówki.",
+      "prefix": "Te cztery sygnały wskazują, czy raport zawiera wystarczającą ilość danych, aby przekonać odbiorców zewnętrznych.",
+      "ready_suffix": "= wystarczające dane;"
     }
   },
   "caring_emergency": {
@@ -12525,6 +12634,257 @@
         "reject_failed": "Nie udało się odrzucić kampanii.",
         "required_fields": "Imię i nazwisko, tytuł i treść są wymagane."
       }
+    }
+  },
+  "municipal_copilot": {
+    "about": {
+      "body": "Municipal Copilot pomoże Ci napisać ogłoszenia jasne, odpowiednio formalne i wolne od żargonu. Wklej wstępną wersję roboczą — element AI zasugeruje ulepszenia, oznaczy problemy z tonem (zbyt formalne, protekcjonalne lub niejasne) i wyświetli listę wszelkich problemów związanych z moderacją. Sprawdzasz i akceptujesz lub odrzucasz sugestię, zanim cokolwiek zostanie opublikowane.",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "accept": "Przyjąć",
+      "cancel": "Anulować",
+      "generate_proposal": "Wygeneruj propozycję",
+      "refresh": "Odświeżać",
+      "reject": "Odrzucić",
+      "reject_proposal": "Odrzuć propozycję",
+      "view": "Pogląd"
+    },
+    "empty": {
+      "no_latest": "Nie ma jeszcze propozycji. Wygeneruj jeden z wersji roboczej po lewej stronie.",
+      "no_proposals": "Nie ma jeszcze żadnych propozycji. Wersje robocze, które analizujesz, pojawią się tutaj jako ścieżka audytu.",
+      "value": "-"
+    },
+    "fields": {
+      "audience_description": "Określ, dla kogo jest przeznaczone to ogłoszenie (np. „wszyscy mieszkańcy”, „wolontariusze”, „osoby kontaktowe w gminie”), aby AI mógł odpowiednio skalibrować ton i słownictwo.",
+      "audience_hint": "Wskazówka dla odbiorców (opcjonalnie)",
+      "audience_placeholder": "np. opiekunów w podregionie północnym",
+      "character_count": "{{count}} / 4000 znaków",
+      "draft_announcement": "Projekt ogłoszenia",
+      "draft_placeholder": "Wklej wstępny szkic — drugi pilot wypoleruje, sprawdzi dźwięk i zasygnalizuje problemy.",
+      "polished_text": "Wypolerowany tekst",
+      "reason": "Powód",
+      "reason_placeholder": "Dlaczego ta propozycja zostaje odrzucona?"
+    },
+    "labels": {
+      "audience": "Publiczność: {{audience}}",
+      "model": "U?yty model: {{model}}"
+    },
+    "meta": {
+      "page_title": "Drugi pilot komunikacji miejskiej",
+      "subtitle": "Przygotuj projekty oficjalnych ogłoszeń, poproś o ich dopracowanie do AI, sprawdź ton i przejrzystość, a następnie opublikuj. Przeznaczony dla koordynatorów, którzy potrzebują komunikować się z mieszkańcami i kontaktami gminnymi spójnym, przystępnym głosem.",
+      "title": "Drugi pilot komunikacji miejskiej"
+    },
+    "modal": {
+      "reject_title": "Odrzuć propozycję"
+    },
+    "sections": {
+      "clarity_warnings": "Ostrzeżenia dotyczące przejrzystości",
+      "latest_proposal": "Najnowsza propozycja",
+      "moderation_flags": "Flagi moderacji",
+      "new_draft": "Nowy projekt",
+      "recent_proposals": "Najnowsze propozycje"
+    },
+    "states": {
+      "accepted": "Przyjęty. Teraz opublikuj poprawiony tekst za pośrednictwem panelu administracyjnego Ogłoszenia.",
+      "rejected_reason": "Odrzucono - powód: {{reason}}"
+    },
+    "status": {
+      "accepted": "Przyjęty",
+      "proposed": "Zaproponowano",
+      "published": "Opublikowany",
+      "rejected": "Odrzucony"
+    },
+    "table": {
+      "actions": "DZIAŁANIA",
+      "aria": "Najnowsze propozycje drugiego pilota",
+      "audience": "PUBLICZNOŚĆ",
+      "created": "STWORZONY",
+      "draft": "PROJEKT",
+      "status": "Status",
+      "tone": "TON"
+    },
+    "toasts": {
+      "accept_failed": "Nie udało się zaakceptować propozycji",
+      "accepted": "Propozycja zaakceptowana — teraz opublikuj za pośrednictwem administratora ogłoszeń",
+      "draft_too_long": "Wersja robocza jest za długa (maks. 4000 znaków)",
+      "enter_draft": "Najpierw wprowadź wersję roboczą",
+      "generate_failed": "Nie udało się wygenerować propozycji",
+      "generated": "Wygenerowano propozycję",
+      "load_failed": "Nie udało się załadować propozycji drugiego pilota",
+      "reason_required": "Powód jest wymagany",
+      "reject_failed": "Nie udało się odrzucić propozycji",
+      "rejected": "Propozycja odrzucona"
+    },
+    "tone": {
+      "condescending": "Protekcjonalny",
+      "ok": "Ton OK",
+      "too_formal": "Zbyt formalne",
+      "too_informal": "Zbyt nieformalne"
+    },
+    "tone_legend": {
+      "condescending": "może patronować czytelnikowi",
+      "ok": "nie wykryto żadnych problemów z dźwiękiem",
+      "prefix": "Legenda tonów -",
+      "too_formal": "nadmiernie biurokratyczny",
+      "too_informal": "może wydawać się nieprofesjonalne"
+    }
+  },
+  "municipal_roi_page": {
+    "about": {
+      "body_middle": "Raport oblicza wartość społeczną i ekonomiczną Twojego programu opieki społecznej za pomocą",
+      "body_prefix": "Miejski",
+      "body_suffix": "Metodologia Age-Stiftung. Pokazuje szacowany koszt usług opieki formalnej (Spitex/Pflege), wygenerowaną wartość społeczną i dane dotyczące trendów w okresach raportowania. Niniejszy raport ma zostać udostępniony partnerom miejskim i fundatorom jako dowód wpływu programu.",
+      "formula_prefix": "Rekompensata kosztów = całkowita liczba zatwierdzonych godzin opieki x",
+      "formula_suffix": "stawka godzinowa x mnożnik zapobiegania. Mnożnik zapobiegania (domyślnie: 2,0) odzwierciedla, że ​​jedna godzina opieki nieformalnej zapobiega w przybliżeniu dwóm godzinom interwencji w ramach opieki formalnej, jak wynika z badań Age-Stiftung.",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "export_csv": "Eksportuj CSV",
+      "refresh_aria": "Odśwież raport oddziaływania na gminę",
+      "refresh_data": "Odśwież dane"
+    },
+    "breakdown": {
+      "aria": "Podział podregionów",
+      "description": "Podział na podregiony pokazuje, które dzielnice generują najwięcej działań związanych z opieką. Użyj tego, aby zidentyfikować obszary, które mogą wymagać większego wsparcia koordynatorów lub rekrutacji wolontariuszy.",
+      "formal_care_offset": "Oficjalne przesunięcie opieki",
+      "hours": "Godziny",
+      "sub_region": "Podregion",
+      "title": "Podział na podregiony",
+      "weighted_hours": "Ważone godziny"
+    },
+    "filters": {
+      "all_sub_regions": "Wszystkie podregiony",
+      "from": "Z",
+      "period": "Okres: {{from}} -> {{to}}",
+      "sub_region": "Podregion",
+      "to": "Do"
+    },
+    "meta": {
+      "page_title": "Raport oddziaływania na gminę",
+      "subtitle": "Dowody na zamówienia B2G – kompensacja kosztów opieki i wskaźniki kapitału społecznego",
+      "title": "Raport oddziaływania na gminę"
+    },
+    "methodology": {
+      "chf_per_hour": "CHF {{amount}}/godz",
+      "default_prevention_prefix": "Wartość zapobiegania stosuje mnożnik 2x na Age-Stiftung/",
+      "default_prevention_suffix": "metodologia oceny.",
+      "default_rate": "CHF 35/godz",
+      "default_source": "Stawka asystenta opieki formalnej w Szwajcarii, SECO 2024",
+      "hours_are_valued_at": "Godziny są wyceniane na",
+      "hours_valued_at": "Godziny wyceniane na",
+      "prevention_value_prefix": "Wartość zapobiegania stosuje mnożnik {{multiplier}}x na Age-Stiftung/",
+      "prevention_value_suffix": "metodologia oceny.",
+      "substitution_applied": "Godziny są ważone współczynnikami substytucji według kategorii.",
+      "substitution_not_applied": "Wszystkie godziny ważone przy 1,0x.",
+      "tenant_setting_source": "skonfigurowany dla tego dzierżawcy"
+    },
+    "municipalities": {
+      "point_export": "Dostępny eksport CSV — użyj przycisku w nagłówku strony, aby uzyskać raporty Age-Stiftung, Pro Senectute i kantonalnego departamentu społecznego.",
+      "point_hour_prefix": "Każda godzina opieki społecznej pozwala zaoszczędzić około",
+      "point_hour_suffix": "w kosztach opieki formalnej",
+      "point_nexus": "sprawia, że ​​wpływ ten jest mierzalny, możliwy do kontrolowania i raportowania w przypadku zamówień kantonalnych i gminnych",
+      "point_prevention": "Profilaktyczne wsparcie społeczne może zmniejszyć potrzeby w zakresie opieki stacjonarnej – szacunkowy mnożnik dwukrotnie",
+      "title": "Co to oznacza dla gmin"
+    },
+    "roi": {
+      "default_multiplier_note": "(mnożnik 2x)",
+      "multiplier_note": "({{multiplier}}x mnożnik)",
+      "prevented_this_period": "koszty opieki formalnej uniemożliwiły ten okres",
+      "prevention_value": "Wartość zapobiegawcza",
+      "social_isolation_supported": "Osoby wspierane z powodu izolacji społecznej",
+      "title": "Szacowane przesunięcie kosztów opieki",
+      "yoy": "{{value}} YoY"
+    },
+    "stats": {
+      "active_members": "Aktyw",
+      "active_relationships": "Aktywne relacje",
+      "care_recipients": "Odbiorcy opieki",
+      "total_hours": "Łączna liczba godzin",
+      "weighted_hours_note": "{{hours}} godziny ważone po współczynnikach podstawienia",
+      "weighted_hours_tooltip": "Godziny są ważone współczynnikami substytucji specyficznymi dla kategorii (np. towarzystwo 0,4x, transport 0,7x, załatwianie spraw 1,0x) zgodnie z metodologią Age-Stiftung."
+    },
+    "toasts": {
+      "export_failed": "Nie udało się wyeksportować CSV",
+      "load_failed": "Nie udało się załadować danych o wpływie na gminy"
+    }
+  },
+  "municipal_verification": {
+    "about": {
+      "body": "Weryfikacja miejska rejestruje formalne potwierdzenie od partnera gminy lub kantonu, że ten program opieki środowiskowej spełnia jego wymagania. Weryfikacja jest wymagana do sprawdzenia gotowości do startu pilotażowego i odblokowuje raport oddziaływania na miasto. Użyj weryfikacji DNS TXT dla oficjalnych domen miejskich lub zastosuj zaświadczenie administratora, jeśli kontrola DNS nie jest dostępna.",
+      "pending_dns": "Wygenerowano token weryfikacyjny — oczekuje na propagację DNS i potwierdzenie.",
+      "revoked": "Weryfikacja została usunięta - zweryfikuj ponownie, aby przywrócić dostęp.",
+      "title": "O tej stronie",
+      "verified": "Formalnie zweryfikowane – pakiet raportowania miejskiego odblokowany."
+    },
+    "actions": {
+      "apply_attestation": "Zastosuj zaświadczenie",
+      "cancel": "Anulować",
+      "generate_dns_token": "Wygeneruj token DNS",
+      "refresh": "Odświeżać",
+      "revoke": "Unieważnić"
+    },
+    "current": {
+      "not_verified": "Ten najemca nie jest obecnie zweryfikowany. Skorzystaj z poniższych opcji, aby rozpocząć weryfikację DNS lub zastosować ręczne zaświadczenie administratora.",
+      "title": "Aktualny stan",
+      "verified_on": "Zweryfikowano {{date}}"
+    },
+    "dns": {
+      "publish_record": "Opublikuj ten rekord TXT na swoim DNS, a następnie poczekaj na propagację:",
+      "record_name": "Nazwa rekordu",
+      "ttl_label": "TTL",
+      "ttl_value": "300",
+      "txt_type": "TXT",
+      "type_label": "Typ",
+      "value": "Wartość"
+    },
+    "fields": {
+      "attestation_description": "Dlaczego potwierdzasz to bez weryfikacji DNS? (Ścieżka audytu.)",
+      "attestation_note": "Nota atestacyjna (opcjonalnie)",
+      "domain_or_organisation": "Domena lub organizacja",
+      "domain_placeholder": "np. zurich.ch",
+      "municipality_domain": "Domena gminy"
+    },
+    "history": {
+      "empty": "Nie ma jeszcze żadnych zapisów weryfikacyjnych.",
+      "title": "Weryfikacje",
+      "updated": "Zaktualizowano {{date}}",
+      "via_method": "przez {{method}}"
+    },
+    "meta": {
+      "description": "Oznacz tę gminę jako zweryfikowanego partnera miejskiego. Dodaje do raportów publicznych plakietkę „Zweryfikowana gmina”.",
+      "page_title": "Weryfikacja miejska",
+      "title": "Weryfikacja miejska"
+    },
+    "request": {
+      "attestation_body": "Używaj tej opcji tylko wtedy, gdy sterowanie DNS nie jest dostępne. Weryfikacja jest rejestrowana jako ręcznie potwierdzona przez administratora.",
+      "attestation_tab": "Zaświadczenie administratora",
+      "dns_body": "Podaj oficjalną domenę gminy, którą kontrolujesz. Wygenerujemy rekord DNS TXT do opublikowania; po rozprzestrzenieniu się system oznacza tego najemcę jako zweryfikowanego.",
+      "dns_tab": "DNS TXT (preferowane)",
+      "method_aria": "Metoda weryfikacji",
+      "title": "Poproś o weryfikację"
+    },
+    "revoke_modal": {
+      "body_prefix": "Cofnij weryfikację dla",
+      "body_suffix": "Spowoduje to usunięcie zweryfikowanej plakietki, a zapis weryfikacji zostanie oznaczony jako unieważniony.",
+      "title": "Cofnąć weryfikację?"
+    },
+    "status": {
+      "pending_dns": "Oczekuje DNS",
+      "revoked": "Odwołany",
+      "verified": "Zweryfikowano"
+    },
+    "toasts": {
+      "attest_failed": "Nie udało się potwierdzić weryfikacji",
+      "attested": "Weryfikacja potwierdzona",
+      "dns_failed": "Nie udało się rozpocząć weryfikacji DNS",
+      "dns_generated": "Wygenerowano token weryfikacyjny DNS",
+      "load_failed": "Nie udało się wczytać stanu weryfikacji",
+      "revoke_failed": "Nie udało się cofnąć weryfikacji",
+      "revoked": "Weryfikacja odwołana"
+    },
+    "validation": {
+      "domain_required": "Wpisz domenę"
     }
   }
 }
