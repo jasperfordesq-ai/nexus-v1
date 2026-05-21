@@ -293,7 +293,7 @@ export function GdprRequestDetail() {
                   <p className="font-medium">{request.user_id}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">{"GDPR created"}</p>
+                  <p className="text-sm text-default-500">{t('enterprise.gdpr_created')}</p>
                   <p className="font-medium">{new Date(request.created_at).toLocaleString()}</p>
                 </div>
                 {request.completed_at && (
@@ -368,7 +368,7 @@ export function GdprRequestDetail() {
                               {entry.action.replace(/_/g, ' ')}
                             </Chip>
                             {entry.user_name && (
-                              <span className="text-sm text-default-600">{`GDPR by User`}</span>
+                              <span className="text-sm text-default-600">{t('enterprise.gdpr_by_user')}</span>
                             )}
                           </div>
                           {(entry.old_value || entry.new_value) && (
@@ -414,7 +414,7 @@ export function GdprRequestDetail() {
                   value={slaProgress}
                   color={slaColor}
                   size="sm"
-                  aria-label="SLA progress"
+                  aria-label={t('enterprise.gdpr_sla_progress')}
                 />
               </div>
               {request.sla_overdue && (
@@ -435,7 +435,7 @@ export function GdprRequestDetail() {
             </CardHeader>
             <CardBody className="p-4 space-y-3">
               <div>
-                <p className="text-sm text-default-500">{"Assigned To"}</p>
+                <p className="text-sm text-default-500">{t('enterprise.gdpr_assigned_to')}</p>
                 <p className="font-medium">
                   {request.assigned_to_name || t('enterprise.gdpr_unassigned')}
                 </p>
@@ -523,7 +523,7 @@ export function GdprRequestDetail() {
           <ModalHeader>{t('enterprise.gdpr_add_note')}</ModalHeader>
           <ModalBody>
             <Textarea
-              label={"GDPR"}
+              label={t('enterprise.gdpr_note')}
               placeholder={t('enterprise.gdpr_note_placeholder')}
               value={noteText}
               onValueChange={setNoteText}

@@ -7786,6 +7786,7 @@
     "gdpr_sla_days_remaining": "SLA days remaining",
     "gdpr_sla_overdue": "{{count}} days overdue",
     "gdpr_sla_overdue_by": "Overdue By",
+    "gdpr_sla_progress": "SLA progress",
     "gdpr_sla_status": "SLA status",
     "gdpr_slug": "Slug",
     "gdpr_slug_name_required": "Slug and name are required",
