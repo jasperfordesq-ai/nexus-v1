@@ -44,7 +44,7 @@ interface ImportSummary {
 
 export function DataManagement() {
   const { t } = useTranslation('admin');
-  usePageTitle("Data Management");
+  usePageTitle(t('federation.data_management_title'));
   const toast = useToast();
 
   const [exporting, setExporting] = useState(false);
@@ -62,7 +62,7 @@ export function DataManagement() {
     setExporting(true);
     try {
       await adminFederation.exportFederationData();
-      toast.success("Export succeeded");
+      toast.success(t('federation.export_success'));
     } catch {
       toast.error(t('federation.export_failed'));
     }
@@ -83,38 +83,38 @@ export function DataManagement() {
       if (res.success && res.data) {
         setImportSummary(res.data);
         toast.success(
-          dryRun ? "Import Dry Run Ok" : "Import succeeded",
+          dryRun ? t('federation.import_dry_run_ok') : t('federation.import_success'),
         );
       } else {
-        toast.error(res.error || "Import failed");
+        toast.error(res.error || t('federation.import_failed'));
       }
     } catch {
-      toast.error("Import failed");
+      toast.error(t('federation.import_failed'));
     }
     setImporting(false);
-  }, [importFile, dryRun, toast]);
+  }, [importFile, dryRun, t, toast]);
 
   const handlePurge = useCallback(async () => {
     setPurging(true);
     try {
       const res = await adminFederation.purgeFederationData(purgeDays);
       if (res.success && res.data) {
-        toast.success(`Purge succeeded`);
+        toast.success(t('federation.purge_success'));
         purgeModal.onClose();
       } else {
-        toast.error(res.error || "Purge failed");
+        toast.error(res.error || t('federation.purge_failed'));
       }
     } catch {
-      toast.error("Purge failed");
+      toast.error(t('federation.purge_failed'));
     }
     setPurging(false);
-  }, [purgeDays, toast, purgeModal]);
+  }, [purgeDays, t, toast, purgeModal]);
 
   return (
     <div>
       <PageHeader
-        title={"Data Management"}
-        description={"Export and import federation data in CSV format"}
+        title={t('federation.data_management_title')}
+        description={t('federation.data_management_desc')}
       />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -122,21 +122,21 @@ export function DataManagement() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Download size={20} /> {"Export All"}
+              <Download size={20} /> {t('federation.export_all_title')}
             </h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-3">
             <p className="text-sm text-default-500">
-              {"Export All."}
+              {t('federation.export_all_desc')}
             </p>
             <ul className="text-xs text-default-500 list-disc pl-5 space-y-0.5">
-              <li>{"Export Item Partnerships"}</li>
-              <li>{"Export Item External Partners"}</li>
-              <li>{"Export Item Reputation"}</li>
-              <li>{"Export Item API Logs"}</li>
+              <li>{t('federation.export_item_partnerships')}</li>
+              <li>{t('federation.export_item_external_partners')}</li>
+              <li>{t('federation.export_item_reputation')}</li>
+              <li>{t('federation.export_item_api_logs')}</li>
             </ul>
             <p className="text-xs text-warning flex items-center gap-1">
-              <AlertTriangle size={12} /> {"Export Secrets"}
+              <AlertTriangle size={12} /> {t('federation.export_secrets_note')}
             </p>
             <Button
               color="primary"
@@ -144,13 +144,13 @@ export function DataManagement() {
               isLoading={exporting}
               onPress={handleExport}
             >
-              {"Export Download"}
+              {t('federation.export_download_button')}
             </Button>
             {exporting && (
               <Progress
                 size="sm"
                 isIndeterminate
-                aria-label={"Export in Progress"}
+                aria-label={t('federation.export_in_progress')}
               />
             )}
           </CardBody>
@@ -160,11 +160,11 @@ export function DataManagement() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Upload size={20} /> {"Import"}
+              <Upload size={20} /> {t('federation.import_title')}
             </h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-3">
-            <p className="text-sm text-default-500">{"Import."}</p>
+            <p className="text-sm text-default-500">{t('federation.import_desc')}</p>
 
             <input
               ref={fileInputRef}
@@ -179,14 +179,14 @@ export function DataManagement() {
               startContent={<Upload size={16} />}
               onPress={() => fileInputRef.current?.click()}
             >
-              {importFile ? importFile.name : "Import Choose File"}
+              {importFile ? importFile.name : t('federation.import_choose_file')}
             </Button>
 
             <div className="flex items-center justify-between rounded-lg border border-default-200 p-2">
               <div>
-                <p className="text-sm font-medium">{"Import Dry Run"}</p>
+                <p className="text-sm font-medium">{t('federation.import_dry_run_label')}</p>
                 <p className="text-xs text-default-400">
-                  {"Import Dry Run."}
+                  {t('federation.import_dry_run_hint')}
                 </p>
               </div>
               <Switch isSelected={dryRun} onValueChange={setDryRun} size="sm" />
@@ -198,21 +198,21 @@ export function DataManagement() {
               isLoading={importing}
               onPress={handleImport}
             >
-              {dryRun ? "Import Run Dry" : "Import Commit"}
+              {dryRun ? t('federation.import_run_dry') : t('federation.import_commit')}
             </Button>
 
             {importSummary && (
               <div className="mt-2 rounded-lg border border-default-200 p-3 text-sm">
                 <p className="font-medium mb-2 flex items-center gap-2">
-                  {"Import Summary"}
+                  {t('federation.import_summary_heading')}
                   <Chip
                     size="sm"
                     color={importSummary.dry_run ? 'primary' : 'success'}
                     variant="flat"
                   >
                     {importSummary.dry_run
-                      ? "Import Summary Dry Run"
-                      : "Import Summary Committed"}
+                      ? t('federation.import_summary_dry_run')
+                      : t('federation.import_summary_committed')}
                   </Chip>
                 </p>
                 <ul className="text-xs space-y-1">
@@ -240,16 +240,16 @@ export function DataManagement() {
         <Card shadow="sm" className="lg:col-span-2">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Trash2 size={20} /> {"Purge"}
+              <Trash2 size={20} /> {t('federation.purge_title')}
             </h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-3">
-            <p className="text-sm text-default-500">{"Purge."}</p>
+            <p className="text-sm text-default-500">{t('federation.purge_desc')}</p>
             <div className="flex items-center gap-3">
               <Input
                 type="number"
                 size="sm"
-                label={"Purge Days"}
+                label={t('federation.purge_days_label')}
                 value={String(purgeDays)}
                 onChange={(e) => setPurgeDays(Math.max(30, Math.min(3650, Number(e.target.value) || 0)))}
                 className="max-w-xs"
@@ -262,7 +262,7 @@ export function DataManagement() {
                 startContent={<Trash2 size={16} />}
                 onPress={purgeModal.onOpen}
               >
-                {"Purge"}
+                {t('federation.purge_title')}
               </Button>
             </div>
           </CardBody>
@@ -273,17 +273,17 @@ export function DataManagement() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <AlertTriangle className="text-warning" />
-            {"Are you sure you want to purge title?"}
+            {t('federation.confirm_purge_title')}
           </ModalHeader>
           <ModalBody>
-            <p>{`Are you sure you want to purge body?`}</p>
+            <p>{t('federation.confirm_purge_body')}</p>
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={purgeModal.onClose}>
-              {"Cancel"}
+              {t('federation.cancel')}
             </Button>
             <Button color="danger" isLoading={purging} onPress={handlePurge}>
-              {"Confirm Purge"}
+              {t('federation.confirm_purge_button')}
             </Button>
           </ModalFooter>
         </ModalContent>
