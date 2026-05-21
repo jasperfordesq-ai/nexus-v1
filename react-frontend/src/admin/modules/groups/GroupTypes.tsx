@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback, type CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   Table,
@@ -33,7 +34,8 @@ import type { GroupType } from '@/admin/api/types';
 import GroupPolicies from './GroupPolicies';
 
 export default function GroupTypes() {
-  usePageTitle("Groups");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('groups.page_title'));
   const { success, error } = useToast();
   const [types, setTypes] = useState<GroupType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,11 +57,11 @@ export default function GroupTypes() {
       const response = await adminGroups.getGroupTypes();
       setTypes((response.data as GroupType[]) || []);
     } catch {
-      error("Failed to load group types");
+      error(t('groups.failed_to_load_group_types'));
     } finally {
       setLoading(false);
     }
-  }, [error])
+  }, [error, t])
 
 
   useEffect(() => {
@@ -68,50 +70,50 @@ export default function GroupTypes() {
 
   const handleCreate = async () => {
     if (!formData.name.trim()) {
-      error("Name is Required");
+      error(t('groups.name_is_required'));
       return;
     }
 
     try {
       await adminGroups.createGroupType(formData);
-      success("Group type created");
+      success(t('groups.group_type_created'));
       onCreateClose();
       setFormData({ name: '', description: '', icon: 'fa-layer-group', color: '#6366f1' });
       loadTypes();
     } catch {
-      error("Failed to create group type");
+      error(t('groups.failed_to_create_group_type'));
     }
   };
 
   const handleEdit = async () => {
     if (!selectedType || !formData.name.trim()) {
-      error("Name is Required");
+      error(t('groups.name_is_required'));
       return;
     }
 
     try {
       await adminGroups.updateGroupType(selectedType.id, formData);
-      success("Group type updated");
+      success(t('groups.group_type_updated'));
       onEditClose();
       setSelectedType(null);
       setFormData({ name: '', description: '', icon: 'fa-layer-group', color: '#6366f1' });
       loadTypes();
     } catch {
-      error("Failed to update group type");
+      error(t('groups.failed_to_update_group_type'));
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Delete Group Type")) {
+    if (!confirm(t('groups.confirm_delete_group_type'))) {
       return;
     }
 
     try {
       await adminGroups.deleteGroupType(id);
-      success("Group type deleted");
+      success(t('groups.group_type_deleted'));
       loadTypes();
     } catch {
-      error("Failed to delete group type");
+      error(t('groups.failed_to_delete_group_type'));
     }
   };
 
@@ -135,28 +137,28 @@ export default function GroupTypes() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{"Group Types"}</h1>
+          <h1 className="text-2xl font-bold">{t('groups.group_types_title')}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {"Create and manage group type categories"}
+            {t('groups.group_types_desc')}
           </p>
         </div>
         <Button color="primary" startContent={<Plus className="w-4 h-4" />} onPress={onCreateOpen}>
-          {"Create Type"}
+          {t('groups.create_type')}
         </Button>
       </div>
 
       <Card className="p-4">
-        <Table aria-label={"Group Types Table"}>
+        <Table aria-label={t('groups.label_group_types_table')}>
           <TableHeader>
-            <TableColumn>{"Name"}</TableColumn>
-            <TableColumn>{"Icon"}</TableColumn>
-            <TableColumn>{"Groups"}</TableColumn>
-            <TableColumn>{"Policies"}</TableColumn>
-            <TableColumn>{"Created"}</TableColumn>
-            <TableColumn>{"Actions"}</TableColumn>
+            <TableColumn>{t('groups.col_name')}</TableColumn>
+            <TableColumn>{t('groups.col_icon')}</TableColumn>
+            <TableColumn>{t('groups.col_groups')}</TableColumn>
+            <TableColumn>{t('groups.col_policies')}</TableColumn>
+            <TableColumn>{t('groups.col_created')}</TableColumn>
+            <TableColumn>{t('groups.col_actions')}</TableColumn>
           </TableHeader>
           <TableBody
-            emptyContent={loading ? "Loading groups..." : "No group types found"}
+            emptyContent={loading ? t('groups.loading') : t('groups.no_group_types_found')}
             items={types}
           >
             {(type) => (
@@ -191,13 +193,13 @@ export default function GroupTypes() {
                       startContent={<Settings className="w-3 h-3" />}
                       onPress={() => openPolicies(type)}
                     >
-                      {"Policies"}
+                      {t('groups.policies')}
                     </Button>
                     <Button
                       size="sm"
                       variant="flat"
                       isIconOnly
-                      aria-label={"Edit Group Type"}
+                      aria-label={t('groups.label_edit_group_type')}
                       onPress={() => openEdit(type)}
                     >
                       <Edit2 className="w-4 h-4" />
@@ -207,7 +209,7 @@ export default function GroupTypes() {
                       variant="flat"
                       color="danger"
                       isIconOnly
-                      aria-label={"Delete Group Type"}
+                      aria-label={t('groups.label_delete_group_type')}
                       onPress={() => handleDelete(type.id)}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -223,30 +225,30 @@ export default function GroupTypes() {
       {/* Create Modal */}
       <Modal isOpen={isCreateOpen} onClose={onCreateClose}>
         <ModalContent>
-          <ModalHeader>{"Create Group Type"}</ModalHeader>
+          <ModalHeader>{t('groups.create_group_type')}</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Input
-                label={"Name"}
-                placeholder={"Enter Type Name..."}
+                label={t('groups.label_name')}
+                placeholder={t('groups.placeholder_enter_type_name')}
                 value={formData.name}
                 onValueChange={(value) => setFormData({ ...formData, name: value })}
               />
               <Textarea
-                label={"Description"}
-                placeholder={"Optional description..."}
+                label={t('groups.label_description')}
+                placeholder={t('groups.placeholder_optional_description')}
                 value={formData.description}
                 onValueChange={(value) => setFormData({ ...formData, description: value })}
               />
               <Input
-                label={"Icon Class"}
+                label={t('groups.label_icon_class')}
                 placeholder="e.g. fa-layer-group"
                 value={formData.icon}
                 onValueChange={(value) => setFormData({ ...formData, icon: value })}
               />
               <Input
                 type="color"
-                label={"Color"}
+                label={t('groups.label_color')}
                 value={formData.color}
                 onValueChange={(value) => setFormData({ ...formData, color: value })}
               />
@@ -254,10 +256,10 @@ export default function GroupTypes() {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={onCreateClose}>
-              {"Cancel"}
+              {t('groups.edit_cancel')}
             </Button>
             <Button color="primary" onPress={handleCreate}>
-              {"Create"}
+              {t('groups.create')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -266,30 +268,30 @@ export default function GroupTypes() {
       {/* Edit Modal */}
       <Modal isOpen={isEditOpen} onClose={onEditClose}>
         <ModalContent>
-          <ModalHeader>{"Edit Group Type"}</ModalHeader>
+          <ModalHeader>{t('groups.edit_group_type')}</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Input
-                label={"Name"}
-                placeholder={"Enter Type Name..."}
+                label={t('groups.label_name')}
+                placeholder={t('groups.placeholder_enter_type_name')}
                 value={formData.name}
                 onValueChange={(value) => setFormData({ ...formData, name: value })}
               />
               <Textarea
-                label={"Description"}
-                placeholder={"Optional description..."}
+                label={t('groups.label_description')}
+                placeholder={t('groups.placeholder_optional_description')}
                 value={formData.description}
                 onValueChange={(value) => setFormData({ ...formData, description: value })}
               />
               <Input
-                label={"Icon Class"}
+                label={t('groups.label_icon_class')}
                 placeholder="e.g. fa-layer-group"
                 value={formData.icon}
                 onValueChange={(value) => setFormData({ ...formData, icon: value })}
               />
               <Input
                 type="color"
-                label={"Color"}
+                label={t('groups.label_color')}
                 value={formData.color}
                 onValueChange={(value) => setFormData({ ...formData, color: value })}
               />
@@ -297,10 +299,10 @@ export default function GroupTypes() {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={onEditClose}>
-              {"Cancel"}
+              {t('groups.edit_cancel')}
             </Button>
             <Button color="primary" onPress={handleEdit}>
-              {"Save"}
+              {t('groups.save')}
             </Button>
           </ModalFooter>
         </ModalContent>
