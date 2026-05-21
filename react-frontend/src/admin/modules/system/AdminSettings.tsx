@@ -8,13 +8,15 @@
  * Global platform configuration and settings management.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner, Select, SelectItem, Chip, Tooltip } from '@heroui/react';
 import Settings from 'lucide-react/icons/settings';
 import Save from 'lucide-react/icons/save';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Scale from 'lucide-react/icons/scale';
 import Lock from 'lucide-react/icons/lock';
+import Upload from 'lucide-react/icons/upload';
+import X from 'lucide-react/icons/x';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useToast, useTenant, useAuth } from '@/contexts';
@@ -93,6 +95,8 @@ export function AdminSettings() {
   const [originalForm, setOriginalForm] = useState<SettingsForm>(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchSettings = useCallback(async () => {
     setLoading(true);
@@ -169,6 +173,27 @@ export function AdminSettings() {
       console.error('Settings save error:', err);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handlePartnerLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingLogo(true);
+    try {
+      const res = await adminSettings.uploadPartnerLogo(file);
+      if (res.data?.url) {
+        setForm(prev => ({ ...prev, partner_logo_url: res.data!.url }));
+        setOriginalForm(prev => ({ ...prev, partner_logo_url: res.data!.url }));
+        toast.success('Partner logo uploaded');
+      } else {
+        toast.error('Upload failed');
+      }
+    } catch {
+      toast.error('Upload failed');
+    } finally {
+      setUploadingLogo(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -263,25 +288,54 @@ export function AdminSettings() {
               value={form.footer_text}
               onValueChange={(val) => setForm(prev => ({ ...prev, footer_text: val }))}
             />
-            <Input
-              label="Partner Logo URL"
-              description="URL of the partner / community logo shown in the footer left slot. Use an externally hosted image or upload to your media library."
-              placeholder="https://example.com/partner-logo.png"
-              variant="bordered"
-              value={form.partner_logo_url}
-              onValueChange={(val) => setForm(prev => ({ ...prev, partner_logo_url: val }))}
-            />
-            {form.partner_logo_url && (
-              <div className="flex items-center gap-3 p-3 rounded-lg border border-default-200 bg-default-50">
-                <img
-                  src={form.partner_logo_url}
-                  alt="Partner logo preview"
-                  className="h-12 w-auto max-w-[160px] object-contain rounded"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
-                <span className="text-xs text-default-500">Footer preview</span>
+            {/* Partner Logo Upload */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Partner Logo</p>
+              <p className="text-xs text-default-500">
+                Shown in the footer left slot. PNG, JPEG, WebP or SVG — max 2 MB.
+              </p>
+              {form.partner_logo_url && (
+                <div className="flex items-start gap-3 p-3 rounded-lg border border-default-200 bg-default-50">
+                  <img
+                    src={form.partner_logo_url}
+                    alt="Partner logo preview"
+                    className="h-14 w-auto max-w-[180px] object-contain rounded"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  />
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="flat"
+                    color="danger"
+                    aria-label="Remove partner logo"
+                    onPress={() => {
+                      setForm(prev => ({ ...prev, partner_logo_url: '' }));
+                    }}
+                  >
+                    <X size={14} />
+                  </Button>
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                className="hidden"
+                onChange={handlePartnerLogoUpload}
+              />
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  variant="flat"
+                  color="primary"
+                  size="sm"
+                  isLoading={uploadingLogo}
+                  startContent={!uploadingLogo ? <Upload size={14} /> : undefined}
+                  onPress={() => fileInputRef.current?.click()}
+                >
+                  {form.partner_logo_url ? 'Replace image' : 'Upload image'}
+                </Button>
               </div>
-            )}
+            </div>
           </CardBody>
         </Card>
 

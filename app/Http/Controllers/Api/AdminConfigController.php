@@ -760,6 +760,53 @@ class AdminConfigController extends BaseApiController
         return substr($value, 0, 4) . str_repeat('•', max(4, $len - 8)) . substr($value, -4);
     }
 
+    /** POST /api/v2/admin/settings/partner-logo */
+    public function uploadPartnerLogo(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $this->rateLimit('admin_logo_upload', 10, 60);
+
+        $file = request()->file('logo');
+        if (!$file || !$file->isValid()) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No image uploaded.', 'logo', 400);
+        }
+
+        // Only allow image types
+        $mime = $file->getMimeType();
+        if (!in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'File must be an image (JPEG, PNG, GIF, WebP, or SVG).', 'logo', 422);
+        }
+
+        // Max 2 MB
+        if ($file->getSize() > 2 * 1024 * 1024) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Image must be 2 MB or smaller.', 'logo', 422);
+        }
+
+        try {
+            $fileArray = [
+                'name'     => $file->getClientOriginalName(),
+                'type'     => $file->getMimeType(),
+                'tmp_name' => $file->getRealPath(),
+                'error'    => UPLOAD_ERR_OK,
+                'size'     => $file->getSize(),
+            ];
+
+            $imageUrl = \App\Core\ImageUploader::upload($fileArray, 'partner-logos');
+
+            // Persist as a general setting
+            DB::table('tenant_settings')->updateOrInsert(
+                ['tenant_id' => $tenantId, 'setting_key' => 'general.partner_logo_url'],
+                ['setting_value' => $imageUrl, 'updated_at' => now()]
+            );
+
+            return $this->respondWithData(['url' => $imageUrl]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Partner logo upload failed', ['error' => $e->getMessage(), 'tenant_id' => $tenantId]);
+            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image. Please try again.', 'logo', 500);
+        }
+    }
+
     /** PUT /api/v2/admin/config/settings */
     public function updateSettings(): JsonResponse
     {

@@ -1126,6 +1126,7 @@ Route::get('/v2/admin/background-jobs', [\App\Http\Controllers\Api\AdminConfigCo
 Route::post('/v2/admin/background-jobs/{id}/run', [\App\Http\Controllers\Api\AdminConfigController::class, 'runJob']);
 Route::get('/v2/admin/settings', [\App\Http\Controllers\Api\AdminConfigController::class, 'getSettings']);
 Route::put('/v2/admin/settings', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateSettings']);
+Route::post('/v2/admin/settings/partner-logo', [\App\Http\Controllers\Api\AdminConfigController::class, 'uploadPartnerLogo']);
 Route::get('/v2/admin/config/registration-policy', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getPolicy']);
 Route::put('/v2/admin/config/registration-policy', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'updatePolicy']);
 Route::get('/v2/admin/identity/providers', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'listProviders']);
