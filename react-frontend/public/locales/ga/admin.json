@@ -9985,7 +9985,349 @@
       "email_warning_check_failed": {
         "title": "Warning check failed",
         "body": "Email warning checks could not complete."
+      },
+      "notification_queue_suppressed": {
+        "title": "R-phoist fógra faoi chois",
+        "body": "Cuireadh r-phoist fógartha scuaine {{count}} faoi chois sna huaireanta deireanacha {{window_hours}}."
+      },
+      "newsletter_queue_failures": {
+        "title": "Teip scuaine nuachtlitir",
+        "body": "Theip ar fhaighteoirí nuachtlitreach {{count}} sna huaireanta deireanacha {{window_hours}}."
+      },
+      "newsletter_queue_stale_processing": {
+        "title": "Scóráil nuachtlitir sean",
+        "body": "Tá faighteoirí nuachtlitir {{count}} ag próiseáil ar feadh níos mó ná nóiméad {{minutes}}."
+      },
+      "new_users_without_account_email_attempt": {
+        "title": "Níor spreag ríomhphost an chuntais",
+        "body": "Níl aon ghníomhachtú cuntais, fíorú, ceadú nó iarracht ríomhphoist fáilte ag úsáideoirí nua {{count}} sna huaireanta {{window_hours}} deireanach."
+      },
+      "password_resets_without_email_attempt": {
+        "title": "Níor spreag ríomhphost athshocraithe pasfhocail",
+        "body": "Níl aon iarracht ríomhphoist athshocraithe pasfhocal meaitseála ag comharthaí athshocraithe pasfhocail {{count}} sna huaireanta {{window_hours}} deireanach."
+      },
+      "group_invites_without_email_attempt": {
+        "title": "Níor spreag ríomhphost cuireadh grúpa",
+        "body": "Níl aon iarracht ríomhphoist ar an gcuireadh grúpa meaitseála ag cuirí ríomhphoist {{count}} sna huaireanta {{window_hours}} deiridh."
+      },
+      "group_members_tenant_mismatch": {
+        "title": "Mímheaitseáil tionóntaí ballraíochta grúpa",
+        "body": "{{count}} is le tionónta eile seachas lena ghrúpa féin ballraíocht ghrúpa. Tá riosca ag baint leis na sraitheanna seo maidir le ról mícheart tionónta agus ródú fógraí."
+      },
+      "group_member_joined_without_owner_notification_queue": {
+        "title": "Níor scuaine an fógra páirtíochta grúpa",
+        "body": "Tháinig ballraíochtaí grúpa {{count}} chun bheith gníomhach gan ró scuaine fógartha úinéara a mheaitseáil sna huaireanta {{window_hours}} deiridh."
+      },
+      "instant_notifications_stuck_pending": {
+        "title": "Tá ríomhphoist mheandaracha greamaithe",
+        "body": "Tá ríomhphoist fógra láithreach {{count}} ar feitheamh ar feadh níos mó ná nóiméad {{minutes}}."
+      },
+      "notification_queue_failed_recently": {
+        "title": "Theip ar ríomhphoist fógra",
+        "body": "Theip ar ríomhphoist fógra ciúáilte {{count}} sna huaireanta {{window_hours}} deiridh."
+      },
+      "notification_queue_suppressed_recently": {
+        "title": "R-phoist fógra faoi chois",
+        "body": "Cuireadh r-phoist fógartha scuaine {{count}} faoi chois sna huaireanta deireanacha {{window_hours}}."
+      },
+      "notification_queue_missing_tenant_id": {
+        "title": "Tionónta in easnamh scuaine fógra",
+        "body": "Tá fógraí ciúáilte {{count}} ar feitheamh nó á bpróiseáil gan úinéireacht tionónta. Ní féidir iad a stiúradh go hiontaofa go dtí go ndeiseofar iad."
+      },
+      "notification_queue_tenant_mismatch": {
+        "title": "Fógra neamhréir na scuaine tionónta",
+        "body": "Is le tionónta difriúil ná an t-úsáideoir faighteora iad fógraí ciúáilte {{count}}. Tá baol ródú mícheart tionóntaí i mbaol sna sraitheanna seo."
+      },
+      "notifications_missing_tenant_id": {
+        "title": "Fógraí ar iarraidh tionónta",
+        "body": "Níl aon úinéireacht ag tionóntaí ar fhógraí in-aip {{count}}, mar sin seans nach bhfeicfeadh úsáideoirí go comhsheasmhach iad."
+      },
+      "notifications_tenant_mismatch": {
+        "title": "Fógraí neamhréir tionóntaí",
+        "body": "Is le tionónta eile seachas leis an úsáideoir is faighteoir fógraí in-app {{count}}. Tá baol ann go gclisfeadh infheictheacht trasthionóntaí sna sraitheanna seo."
+      },
+      "notification_queue_marked_sent_without_email_log": {
+        "title": "Fógra marcáilte seolta gan fianaise ríomhphoist",
+        "body": "Marcáladh fógraí ciúáilte {{count}} seolta gan iontráil logála ríomhphoist meaitseála sna huaireanta {{window_hours}} deiridh."
+      },
+      "newsletter_queue_missing_tenant_id": {
+        "title": "Tionónta ar iarraidh scuaine nuachtlitir",
+        "body": "Níl aon úinéireacht tionónta ag sraitheanna scuaine nuachtlitreach {{count}}. Ní féidir iad a stiúradh go hiontaofa go dtí go ndeiseofar iad."
+      },
+      "newsletter_queue_tenant_mismatch": {
+        "title": "Mímheaitseáil tionónta scuaine nuachtlitir",
+        "body": "Baineann sraitheanna scuaine nuachtlitreach {{count}} le tionónta eile seachas lena nuachtlitir. Tá baol ródú mícheart tionóntaí i mbaol sna sraitheanna seo."
+      },
+      "newsletter_queue_stuck_pending": {
+        "title": "Tá ríomhphoist nuachtlitir i bhfostú",
+        "body": "Tá faighteoirí nuachtlitreach {{count}} ar feitheamh ar feadh níos mó ná nóiméad {{minutes}}."
+      },
+      "newsletter_queue_failed_recently": {
+        "title": "Theip ar ríomhphoist nuachtlitir",
+        "body": "Theip ar fhaighteoirí nuachtlitreach {{count}} sna huaireanta deireanacha {{window_hours}}."
+      },
+      "newsletter_queue_marked_sent_without_email_log": {
+        "title": "Tá an nuachtlitir marcáilte seolta gan fianaise ríomhphoist",
+        "body": "Marcáladh faighteoirí nuachtlitreach {{count}} seolta gan iontráil logála ríomhphoist rathúil a mheaitseáil sna huaireanta {{window_hours}} deiridh."
+      },
+      "event_reminders_overdue_pending": {
+        "title": "Meabhrúcháin imeachtaí thar téarma",
+        "body": "Tá meabhrúcháin imeachta {{count}} fós ar feitheamh níos mó ná {{minutes}} nóiméad tar éis a n-am seolta sceidealta."
+      },
+      "event_reminders_failed_recently": {
+        "title": "Theip ar mheabhrúcháin imeachta",
+        "body": "Theip ar mheabhrúcháin teagmhais {{count}} sna huaireanta {{window_hours}} deiridh."
+      },
+      "event_reminders_marked_sent_without_email_log": {
+        "title": "Meabhrúcháin imeachta marcáilte seolta gan fianaise ríomhphoist",
+        "body": "Marcáladh meabhrúcháin imeachta ríomhphoist {{count}} seolta gan iontráil logála ríomhphoist rathúil a mheaitseáil sna huaireanta {{window_hours}} deiridh."
+      },
+      "marketplace_report_received_without_notification_outbox": {
+        "title": "Ní raibh an ríomhphost admhála tuairisce Marketplace sa scuaine",
+        "body": "Fuarthas tuairiscí margaidh {{count}} gan ró fógra ríomhphoist admhála meaitseála sna huaireanta {{window_hours}} deiridh."
+      },
+      "marketplace_report_acknowledged_without_notification_outbox": {
+        "title": "Ní raibh an ríomhphost admhála tuairisce Marketplace i scuaine",
+        "body": "Admhaíodh tuairiscí margadh {{count}} gan ró fógra ríomhphoist admhála meaitseála sna huaireanta {{window_hours}} deiridh."
+      },
+      "marketplace_report_resolved_without_notification_outbox": {
+        "title": "Ní raibh an ríomhphost réitigh tuairisce margaidh i scuaine",
+        "body": "Réitíodh tuarascálacha margaidh {{count}} gan ró fógra ríomhphoist réitigh chomhoiriúnaithe sna huaireanta {{window_hours}} deiridh."
+      },
+      "marketplace_report_appealed_without_notification_outbox": {
+        "title": "Ní raibh an ríomhphost um achomharc tuairisce margaidh i scuaine",
+        "body": "Comhdaíodh achomhairc thuarascáil margaidh {{count}} gan ró fógra ríomhphoist admhála achomhairc sna huaireanta deireanacha {{window_hours}}."
+      },
+      "marketplace_report_appeal_resolved_without_notification_outbox": {
+        "title": "Ní raibh an ríomhphost um réiteach achomhairc tuairisce margaidh i scuaine",
+        "body": "Réitíodh achomhairc thuarascáil margaidh {{count}} gan an tsraith fógra ríomhphoist faoin gcinneadh deiridh a mheaitseáil sna huaireanta {{window_hours}} deiridh."
+      },
+      "federation_connection_without_email_evidence": {
+        "title": "Fianaise ríomhphoist nasc Cónaidhm in easnamh",
+        "body": "Níl aon fhianaise seachadta ríomhphoist rathúil ag imeachtaí cónasctha {{count}} sna huaireanta deireanacha {{window_hours}}."
+      },
+      "federation_connection_without_bell_evidence": {
+        "title": "Fianaise fógra maidir le ceangal Cónaidhm in easnamh",
+        "body": "Níl aon fhianaise fógra in-app ag imeachtaí cónasctha {{count}} sna huaireanta deireanacha {{window_hours}}."
+      },
+      "federation_review_without_email_evidence": {
+        "title": "Fianaise ríomhphoist athbhreithnithe Cónaidhm in easnamh",
+        "body": "Níor éirigh le hathbhreithnithe cónasctha {{count}} nó níor baineadh aon fhianaise ríomhphoist amach go hintinneach sna huaireanta {{window_hours}} deireanach."
+      },
+      "federation_review_without_bell_evidence": {
+        "title": "Fianaise fógra athbhreithnithe Cónaidhm in easnamh",
+        "body": "Níl aon fhianaise fógra in-app ag athbhreithnithe cónasctha {{count}} le huaireanta {{window_hours}} deireanach."
+      },
+      "member_subscription_event_without_email_evidence": {
+        "title": "Fianaise ríomhphoist síntiús ball in easnamh",
+        "body": "Níl aon fhianaise seachadta ríomhphoist rathúil ag imeachtaí billeála síntiús ball {{count}} sna huaireanta deireanacha {{window_hours}}."
+      },
+      "stripe_donation_without_receipt_email_evidence": {
+        "title": "Fianaise r-phoist admháil síntiús in easnamh",
+        "body": "{{count}} comhlánaithe Stripe Níl aon fhianaise r-phoist admhála rathúil ag síntiúis Stripe sna huaireanta {{window_hours}} deiridh."
+      },
+      "critical_email_attempts_missing_tenant_context": {
+        "title": "Ríomhphost criticiúil comhthéacs tionónta in easnamh",
+        "body": "Rinneadh iarrachtaí ríthábhachtacha ríomhphoist {{count}} a logáil gan comhthéacs tionónta sna huaireanta {{window_hours}} deiridh."
+      },
+      "sendgrid_events_not_confirming_delivery": {
+        "title": "Imeachtaí seachadta SendGrid in easnamh",
+        "body": "{{count}} Glactar le ríomhphoist SendGrid ach ní dheimhnítear iad tar éis níos mó ná uair an chloig {{hours}}."
+      },
+      "tenant_gmail_override_incomplete": {
+        "title": "Cumraíocht an Tionónta Gmail neamhiomlán",
+        "body": "Tá sárú neamhiomlán soláthraí ríomhphoist Gmail ag an tionónta seo."
+      },
+      "tenant_smtp_override_incomplete": {
+        "title": "Cumraíocht an Tionónta SMTP neamhiomlán",
+        "body": "Tá sárú neamhiomlán soláthraí ríomhphoist SMTP ag an tionónta seo."
+      },
+      "tenant_sendgrid_override_missing_api_key": {
+        "title": "Sáraíonn an tionónta SendGrid eochair API in easnamh",
+        "body": "Tá an tionónta seo socraithe chun sáraíocht SendGrid a úsáid ach níl aon eochair tionónta API aige, mar sin úsáidfear an t-aischur ardán."
+      },
+      "tenant_provider_config_check_failed": {
+        "title": "Theip ar sheiceáil soláthraí tionóntaí",
+        "body": "Níorbh fhéidir an t-iniúchadh cumraíochta soláthraí ríomhphoist a chur i gcrích don tionónta seo."
+      },
+      "direct_email_send_paths_remaining": {
+        "title": "Tá cosáin ríomhphoist dhíreacha oidhreachta fós ann",
+        "body": "Tá cosáin seolta ríomhphoist amh {{count}} fós ag seachaint an seoltaí fógra aontaithe. Lean na cosáin seo a chruasú go dtí go rachaidh gach modúl tríd an seoltóir in-iniúchta."
+      },
+      "email_dispatch_missing_explicit_tenant": {
+        "title": "Tá tionónta sainráite in easnamh ar ríomhphost seolta",
+        "body": "Tá suíomhanna glaonna seolta ríomhphoist {{count}} fós ag brath ar chomhthéacs an tionónta tátal. Pas tenant_id nó tenantId go sainráite ionas go mbeidh gach scuaine, cron, cuaille gréasáin agus seoladh tras-thionónta in-iniúchta."
+      },
+      "email_trigger_audit_failed": {
+        "title": "Theip ar iniúchadh truicear ríomhphoist",
+        "body": "Níorbh fhéidir an t-iniúchadh truicear ríomhphoist a chríochnú."
       }
+    },
+    "title": "Inseachadacht Ríomhphoist",
+    "subtitle": "Rianaigh fianaise truicear, seol iarrachtaí, stádas soláthraí, agus faighteoirí faoi chois don tionónta seo.",
+    "trigger_score": "Scór truicear",
+    "trigger_coverage": "Saincheisteanna {{issues}} trasna sreafaí monatóireachta {{count}}",
+    "actions": {
+      "refresh": "Athnuaigh",
+      "reset": "Athshocraigh",
+      "search": "Cuardach"
+    },
+    "windows": {
+      "1": "An 24 uair dheireanach",
+      "7": "7 lá seo caite",
+      "30": "30 lá anuas",
+      "90": "90 lá seo caite"
+    },
+    "filters": {
+      "all": "Gach",
+      "category": "Catagóir",
+      "email": "Ríomhphost",
+      "recipient": "Ríomhphost faighteora",
+      "reason": "Cúis",
+      "since": "Ós rud é",
+      "status": "Stádas",
+      "until": "Go dtí",
+      "window": "Fuinneog ama"
+    },
+    "metrics": {
+      "accepted": "Glactar leis",
+      "bad_outcomes": "Theip ar {{count}}, preabadh nó cuireadh faoi chois é",
+      "bounced": "Preab",
+      "delivered": "Seachadadh",
+      "not_available": "Uimh sonraí iniúchta truicear",
+      "total": "Iomlán",
+      "trigger_score": "Scór truicear",
+      "unconfirmed": "{{count}} glactha ach gan daingniú",
+      "webhook_confirmed": "Deimhnithe ag an soláthraí gréasáin",
+      "window_days": "Fuinneog lae {{days}}"
+    },
+    "status": {
+      "bounced": "Preab",
+      "delivered": "Seachadadh",
+      "failed": "Theip",
+      "pending": "Ar feitheamh",
+      "processing": "Próiseáil",
+      "queued": "Ciúáilte",
+      "sent": "Seolta",
+      "suppressed": "faoi ​​chois",
+      "unknown": "Stádas anaithnid: {{status}}"
+    },
+    "severity": {
+      "critical": "Criticiúil",
+      "info": "Eolas",
+      "warning": "Rabhadh"
+    },
+    "status_breakdown": {
+      "title": "Miondealú Stádais",
+      "subtitle": "Léargas dlúth ar thorthaí seolta an tionónta reatha don fhuinneog roghnaithe."
+    },
+    "trigger_health": {
+      "critical": "Saincheisteanna truicear ríthábhachtach",
+      "monitored": "Sreafaí faoi mhonatóireacht",
+      "warning": "Saincheisteanna truicear rabhaidh"
+    },
+    "trigger_issues": {
+      "title": "Ceisteanna Iniúchta Truicear",
+      "subtitle": "Sraitheanna foinse inar cheart go mbeadh r-phost nó fógra caite, ach nach bhfuil fianaise iontaofa seachadta ag an iniúchadh.",
+      "table_label": "Ceisteanna iniúchta truicear ríomhphoist",
+      "empty": "Níl aon cheisteanna iniúchta truicear don fhuinneog roghnaithe.",
+      "all_tenants": "Gach tionónta",
+      "columns": {
+        "event": "Imeacht",
+        "issue": "Eisiúint",
+        "module": "Modúl",
+        "params": "Fianaise",
+        "severity": "Déine",
+        "tenant": "Tionónta"
+      }
+    },
+    "queues": {
+      "title": "Diagnóisic scuaine",
+      "subtitle": "Theip ar, curtha faoi chois nó imithe i léig ar feitheamh sraitheanna ríomhphoist don tionónta seo.",
+      "table_label": "Diagnóisic scuaine ríomhphoist",
+      "empty": "Níl aon sraitheanna scuaine ríomhphoist theipthe, curtha faoi chois nó sean.",
+      "columns": {
+        "attempts": "Iarrachtaí",
+        "category": "Catagóir",
+        "error": "Earráid",
+        "last_attempt": "Iarracht dheireanach",
+        "recipient": "Faighteoir",
+        "source": "Foinse",
+        "status": "Stádas"
+      },
+      "sources": {
+        "civic_digest_delivery_claims": "Éileamh cathartha díolama",
+        "event_reminder_delivery_claims": "Éileamh meabhrúcháin imeachtaí",
+        "event_reminders": "Meabhrúchán imeachtaí",
+        "federation_inbound_connections": "Cónaidhm nasc",
+        "federation_messages": "Teachtaireacht Cónaidhme",
+        "federation_transactions": "Idirbheart Cónaidhm",
+        "goal_reminders": "Meabhrúchán sprice",
+        "job_interviews": "Meabhrúchán agallamh poist",
+        "listing_expiry_reminders_sent": "Meabhrúchán éaga a liostú",
+        "marketplace_disputes": "Aighneas sa mhargadh",
+        "marketplace_order_notification_deliveries": "Fógra ordú margadh",
+        "marketplace_report_notifications": "Tuarascáil ar an margadh",
+        "marketplace_seller_ratings": "Rátála díoltóra margadh",
+        "member_subscription_events": "Billeáil síntiús ball",
+        "newsletter_queue": "Nuachtlitir",
+        "notification_queue": "Fógra",
+        "notifications": "Fianaise fógra",
+        "reviews": "Athbhreithniú Cónaidhme",
+        "transaction_notification_deliveries": "Fógra idirbhirt",
+        "user_safeguarding_preferences": "Athbhreithniú ar shlándáil",
+        "vol_donations": "Admháil síntiús",
+        "vol_reminder_delivery_claims": "Éileamh meabhrúcháin oibrithe deonacha",
+        "vol_reminders_sent": "Meabhrúchán oibrithe deonacha"
+      }
+    },
+    "logs": {
+      "title": "Loga Iarrachta Ríomhphoist",
+      "subtitle": "Déan cuardach ar gach iarracht seolta de réir faighteora, catagóire, stádas agus dáta.",
+      "table_label": "Loga iarracht ríomhphoist",
+      "empty": "Níl aon ríomhphost ag teacht leis na scagairí reatha.",
+      "columns": {
+        "category": "Catagóir",
+        "delivered": "Seachadadh",
+        "error": "Earráid",
+        "provider": "Soláthraí",
+        "recipient": "Faighteoir",
+        "sent": "Seolta",
+        "status": "Stádas",
+        "subject": "Ábhar"
+      }
+    },
+    "pagination": {
+      "page_size": "Sraitheanna in aghaidh an leathanaigh",
+      "summary": "{{from}}-{{to}} de {{total}}"
+    },
+    "suppressions": {
+      "title": "Liosta faoi Shochtadh",
+      "subtitle": "Faighteoirí ar fud an ardáin a phreab soláthraithe, a chuir bac orthu, a neamhbhailíochtaíodh nó a dhíliostáil siad.",
+      "table_label": "Liosta faoi chois ríomhphoist",
+      "empty": "Ní mheaitseálann aon fhaighteoir faoi chois na scagairí reatha.",
+      "confirm_remove": "Bain {{email}} den liosta faoi shochtadh? Beidh siad i dteideal ríomhphost a fháil arís.",
+      "remove": "Bain faoi chois",
+      "remove_failed": "Theip ar an cosc ​​a bhaint.",
+      "removed": "Baineadh {{email}}.",
+      "columns": {
+        "actions": "Gníomhartha",
+        "detail": "Sonraigh",
+        "email": "Ríomhphost",
+        "reason": "Cúis",
+        "suppressed_at": "faoi ​​chois ag"
+      },
+      "reasons": {
+        "block": "Bloc",
+        "bounce": "Preab",
+        "invalid": "Neamhbhailí",
+        "spam_report": "Tuairisc spam",
+        "unsubscribe": "Díliostáil",
+        "unknown": "Cúis anaithnid: {{reason}}"
+      }
+    },
+    "empty": {
+      "no_statuses": "Níl aon stádas fós"
     }
   },
   "help_drawer": {

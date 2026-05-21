@@ -9985,7 +9985,349 @@
       "email_warning_check_failed": {
         "title": "Warning check failed",
         "body": "Email warning checks could not complete."
+      },
+      "notification_queue_suppressed": {
+        "title": "E-mails de notification supprimés",
+        "body": "Les e-mails de notification en file d'attente {{count}} ont été supprimés au cours des dernières heures {{window_hours}}."
+      },
+      "newsletter_queue_failures": {
+        "title": "Échecs de la file d’attente de la newsletter",
+        "body": "Les destinataires de la newsletter {{count}} ont échoué au cours des dernières heures {{window_hours}}."
+      },
+      "newsletter_queue_stale_processing": {
+        "title": "File d'attente de newsletter obsolète",
+        "body": "Les destinataires de la newsletter {{count}} traitent le message depuis plus de minutes {{minutes}}."
+      },
+      "new_users_without_account_email_attempt": {
+        "title": "L'e-mail du compte ne s'est pas déclenché",
+        "body": "Les nouveaux utilisateurs de {{count}} n'ont eu aucune tentative d'activation, de vérification, d'approbation ou d'e-mail de bienvenue au cours des dernières heures de {{window_hours}}."
+      },
+      "password_resets_without_email_attempt": {
+        "title": "L'e-mail de réinitialisation du mot de passe n'a pas été déclenché",
+        "body": "Les jetons de réinitialisation de mot de passe {{count}} n'ont reçu aucune tentative d'e-mail de réinitialisation de mot de passe correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "group_invites_without_email_attempt": {
+        "title": "L'e-mail d'invitation au groupe ne s'est pas déclenché",
+        "body": "Les invitations de groupe par courrier électronique {{count}} n'ont reçu aucune tentative de courrier électronique d'invitation à un groupe correspondant au cours des dernières heures {{window_hours}}."
+      },
+      "group_members_tenant_mismatch": {
+        "title": "Inadéquation des locataires d’appartenance à un groupe",
+        "body": "Les adhésions aux groupes {{count}} appartiennent à un locataire différent de leur groupe. Ces lignes risquent de comporter un rôle de locataire incorrect et un routage des notifications."
+      },
+      "group_member_joined_without_owner_notification_queue": {
+        "title": "La notification d'adhésion au groupe n'a pas été mise en file d'attente",
+        "body": "Les adhésions aux groupes {{count}} sont devenues actives sans ligne de file d'attente de notification de propriétaire correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "instant_notifications_stuck_pending": {
+        "title": "Les e-mails instantanés sont bloqués",
+        "body": "Les e-mails de notification instantanée {{count}} sont en attente depuis plus de minutes {{minutes}}."
+      },
+      "notification_queue_failed_recently": {
+        "title": "Les e-mails de notification ont échoué",
+        "body": "Les e-mails de notification mis en file d'attente {{count}} ont échoué au cours des dernières heures {{window_hours}}."
+      },
+      "notification_queue_suppressed_recently": {
+        "title": "E-mails de notification supprimés",
+        "body": "Les e-mails de notification en file d'attente {{count}} ont été supprimés au cours des dernières heures {{window_hours}}."
+      },
+      "notification_queue_missing_tenant_id": {
+        "title": "Locataire manquant dans la file d'attente de notification",
+        "body": "Les notifications en file d'attente {{count}} sont en attente ou en traitement sans propriété du locataire. Ils ne peuvent pas être acheminés de manière fiable tant qu'ils n'ont pas été réparés."
+      },
+      "notification_queue_tenant_mismatch": {
+        "title": "Incompatibilité des locataires de la file d'attente de notification",
+        "body": "Les notifications en file d'attente {{count}} appartiennent à un locataire différent de celui de leur utilisateur destinataire. Ces lignes risquent d’être acheminées par un mauvais locataire."
+      },
+      "notifications_missing_tenant_id": {
+        "title": "Notifications locataire manquant",
+        "body": "Les notifications intégrées à l'application {{count}} n'ont aucun propriétaire, les utilisateurs peuvent donc ne pas les voir de manière cohérente."
+      },
+      "notifications_tenant_mismatch": {
+        "title": "Incompatibilité des locataires des notifications",
+        "body": "Les notifications in-app {{count}} appartiennent à un locataire différent de leur utilisateur destinataire. Ces lignes risquent des échecs de visibilité entre locataires."
+      },
+      "notification_queue_marked_sent_without_email_log": {
+        "title": "Notification marquée envoyée sans preuve par courrier électronique",
+        "body": "Les notifications en file d'attente {{count}} ont été marquées comme envoyées sans entrée de journal de courrier électronique correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "newsletter_queue_missing_tenant_id": {
+        "title": "Locataire manquant dans la file d'attente de la newsletter",
+        "body": "Les lignes de file d’attente de newsletter {{count}} n’ont aucun propriétaire locataire. Ils ne peuvent pas être acheminés de manière fiable tant qu'ils n'ont pas été réparés."
+      },
+      "newsletter_queue_tenant_mismatch": {
+        "title": "Incompatibilité des locataires de la file d'attente de newsletter",
+        "body": "Les lignes de la file d’attente de la newsletter {{count}} appartiennent à un locataire différent de leur newsletter. Ces lignes risquent d’être acheminées par un mauvais locataire."
+      },
+      "newsletter_queue_stuck_pending": {
+        "title": "Les e-mails de newsletter sont bloqués",
+        "body": "Les destinataires de la newsletter {{count}} sont en attente depuis plus de minutes {{minutes}}."
+      },
+      "newsletter_queue_failed_recently": {
+        "title": "Échec des e-mails de newsletter",
+        "body": "Les destinataires de la newsletter {{count}} ont échoué au cours des dernières heures {{window_hours}}."
+      },
+      "newsletter_queue_marked_sent_without_email_log": {
+        "title": "Newsletter marquée envoyée sans preuve par email",
+        "body": "Les destinataires de la newsletter {{count}} ont été marqués comme envoyés sans entrée de journal de courrier électronique réussie au cours des dernières heures {{window_hours}}."
+      },
+      "event_reminders_overdue_pending": {
+        "title": "Rappels d'événements en retard",
+        "body": "Les rappels d'événements {{count}} sont toujours en attente plus de {{minutes}} minutes après leur heure d'envoi prévue."
+      },
+      "event_reminders_failed_recently": {
+        "title": "Les rappels d'événements ont échoué",
+        "body": "Les rappels d'événements {{count}} ont échoué au cours des dernières heures {{window_hours}}."
+      },
+      "event_reminders_marked_sent_without_email_log": {
+        "title": "Rappels d'événements marqués envoyés sans preuve par courrier électronique",
+        "body": "Les rappels d'événements par courrier électronique {{count}} ont été marqués comme envoyés sans entrée de journal de courrier électronique réussie correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "marketplace_report_received_without_notification_outbox": {
+        "title": "L'e-mail de réception du rapport Marketplace n'a pas été mis en file d'attente",
+        "body": "Des rapports de marché {{count}} ont été reçus sans ligne de notification par courrier électronique de réception correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "marketplace_report_acknowledged_without_notification_outbox": {
+        "title": "L'e-mail d'accusé de réception du rapport Marketplace n'a pas été mis en file d'attente",
+        "body": "Les rapports du marché {{count}} ont été accusés de réception sans ligne de notification par courrier électronique d'accusé de réception correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "marketplace_report_resolved_without_notification_outbox": {
+        "title": "L'e-mail de résolution du rapport Marketplace n'a pas été mis en file d'attente",
+        "body": "Les rapports du marché {{count}} ont été résolus sans ligne de notification par e-mail de résolution correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "marketplace_report_appealed_without_notification_outbox": {
+        "title": "L'e-mail d'appel du rapport Marketplace n'a pas été mis en file d'attente",
+        "body": "Des appels liés au rapport de marché {{count}} ont été déposés sans ligne de notification par courrier électronique de réception d'appel correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "marketplace_report_appeal_resolved_without_notification_outbox": {
+        "title": "L'e-mail de résolution d'appel du rapport Marketplace n'a pas été mis en file d'attente",
+        "body": "Les appels du rapport du marché {{count}} ont été résolus sans ligne de notification par courrier électronique de décision finale correspondante au cours des dernières heures {{window_hours}}."
+      },
+      "federation_connection_without_email_evidence": {
+        "title": "Preuve d'e-mail de connexion à la fédération manquante",
+        "body": "Les événements de connexion fédérés {{count}} n'ont aucune preuve de livraison réussie d'e-mails au cours des dernières heures {{window_hours}}."
+      },
+      "federation_connection_without_bell_evidence": {
+        "title": "Preuve de notification de connexion à la fédération manquante",
+        "body": "Les événements de connexion fédérés {{count}} n'ont aucune preuve de notification dans l'application au cours des dernières heures {{window_hours}}."
+      },
+      "federation_review_without_email_evidence": {
+        "title": "La Fédération examine les preuves par courrier électronique manquantes",
+        "body": "Les avis fédérés {{count}} n'ont aucune preuve d'e-mail réussie ou intentionnellement ignorée au cours des dernières heures {{window_hours}}."
+      },
+      "federation_review_without_bell_evidence": {
+        "title": "Preuve de notification de révision de la Fédération manquante",
+        "body": "Les avis fédérés {{count}} n'ont aucune preuve de notification dans l'application au cours des dernières heures {{window_hours}}."
+      },
+      "member_subscription_event_without_email_evidence": {
+        "title": "Il manque la preuve de l'e-mail d'abonnement du membre",
+        "body": "Les événements de facturation des abonnements des membres {{count}} n'ont aucune preuve de livraison réussie d'e-mails au cours des dernières heures {{window_hours}}."
+      },
+      "stripe_donation_without_receipt_email_evidence": {
+        "title": "Il manque une preuve par courrier électronique du reçu de don",
+        "body": "Les dons Stripe complétés par {{count}} n'ont aucune preuve de réception par courrier électronique réussie au cours des dernières heures {{window_hours}}."
+      },
+      "critical_email_attempts_missing_tenant_context": {
+        "title": "Contexte du locataire manquant dans l'e-mail critique",
+        "body": "Des tentatives de courrier électronique critiques {{count}} ont été enregistrées sans contexte de locataire au cours des dernières heures {{window_hours}}."
+      },
+      "sendgrid_events_not_confirming_delivery": {
+        "title": "Événements de livraison SendGrid manquants",
+        "body": "Les e-mails {{count}} SendGrid restent acceptés mais non confirmés après plus d'heures {{hours}}."
+      },
+      "tenant_gmail_override_incomplete": {
+        "title": "Configuration du locataire Gmail incomplète",
+        "body": "Ce locataire a un remplacement incomplet du fournisseur de messagerie Gmail."
+      },
+      "tenant_smtp_override_incomplete": {
+        "title": "Configuration du locataire SMTP incomplète",
+        "body": "Ce locataire a un remplacement incomplet du fournisseur de messagerie SMTP."
+      },
+      "tenant_sendgrid_override_missing_api_key": {
+        "title": "Le locataire SendGrid remplace la clé API manquante",
+        "body": "Ce locataire est configuré pour utiliser un remplacement SendGrid mais n'a pas de clé de locataire API, donc la solution de secours de la plateforme sera utilisée."
+      },
+      "tenant_provider_config_check_failed": {
+        "title": "La vérification du fournisseur de locataire a échoué",
+        "body": "L’audit de configuration du fournisseur de messagerie n’a pas pu être terminé pour ce locataire."
+      },
+      "direct_email_send_paths_remaining": {
+        "title": "Les anciens chemins de messagerie directe restent",
+        "body": "Les chemins d’envoi d’e-mails bruts {{count}} contournent toujours le répartiteur de notifications unifié. Continuez à renforcer ces chemins jusqu'à ce que chaque module soit acheminé via le répartiteur auditable."
+      },
+      "email_dispatch_missing_explicit_tenant": {
+        "title": "E-mail du répartiteur manquant de locataire explicite",
+        "body": "Les sites d’appel des répartiteurs de courrier électronique {{count}} s’appuient toujours sur le contexte de locataire déduit. Transmettez explicitement tenant_id ou tenantId afin que chaque envoi en file d'attente, cron, webhook et entre locataires soit auditable."
+      },
+      "email_trigger_audit_failed": {
+        "title": "Échec de l'audit du déclencheur d'e-mail",
+        "body": "L’audit du déclencheur d’e-mail n’a pas pu se terminer."
       }
+    },
+    "title": "Délivrabilité des e-mails",
+    "subtitle": "Suivez les preuves de déclenchement, les tentatives d'envoi, le statut du fournisseur et les destinataires supprimés pour ce locataire.",
+    "trigger_score": "Score de déclenchement",
+    "trigger_coverage": "Problèmes {{issues}} dans les flux surveillés {{count}}",
+    "actions": {
+      "refresh": "Rafraîchir",
+      "reset": "Réinitialiser",
+      "search": "Recherche"
+    },
+    "windows": {
+      "1": "Dernières 24 heures",
+      "7": "7 derniers jours",
+      "30": "30 derniers jours",
+      "90": "90 derniers jours"
+    },
+    "filters": {
+      "all": "Tous",
+      "category": "Catégorie",
+      "email": "E-mail",
+      "recipient": "E-mail du destinataire",
+      "reason": "Raison",
+      "since": "Depuis",
+      "status": "Statut",
+      "until": "Jusqu'à",
+      "window": "Fenêtre de temps"
+    },
+    "metrics": {
+      "accepted": "Accepté",
+      "bad_outcomes": "{{count}} a échoué, a été renvoyé ou supprimé",
+      "bounced": "Rebondi",
+      "delivered": "Livré",
+      "not_available": "Aucune donnée d’audit déclencheur",
+      "total": "Total",
+      "trigger_score": "Score de déclenchement",
+      "unconfirmed": "{{count}} accepté mais non confirmé",
+      "webhook_confirmed": "Confirmé par le webhook du fournisseur",
+      "window_days": "Fenêtre de jour {{days}}"
+    },
+    "status": {
+      "bounced": "Rebondi",
+      "delivered": "Livré",
+      "failed": "Échoué",
+      "pending": "En attente",
+      "processing": "Traitement",
+      "queued": "En file d'attente",
+      "sent": "Envoyé",
+      "suppressed": "Supprimé",
+      "unknown": "Statut inconnu : {{status}}"
+    },
+    "severity": {
+      "critical": "Critique",
+      "info": "Informations",
+      "warning": "Avertissement"
+    },
+    "status_breakdown": {
+      "title": "Répartition du statut",
+      "subtitle": "Une vue compacte des résultats d'envoi du locataire actuel pour la fenêtre sélectionnée."
+    },
+    "trigger_health": {
+      "critical": "Problèmes de déclenchement critiques",
+      "monitored": "Flux surveillés",
+      "warning": "Problèmes de déclenchement d'avertissement"
+    },
+    "trigger_issues": {
+      "title": "Déclencher des problèmes d'audit",
+      "subtitle": "Lignes sources où un e-mail ou une notification aurait dû être déclenché, mais l'audit ne dispose pas de preuves de livraison fiables.",
+      "table_label": "Problèmes d’audit des déclencheurs d’e-mails",
+      "empty": "Aucun problème d’audit de déclenchement pour la fenêtre sélectionnée.",
+      "all_tenants": "Tous les locataires",
+      "columns": {
+        "event": "Événement",
+        "issue": "Problème",
+        "module": "Module",
+        "params": "Preuve",
+        "severity": "Gravité",
+        "tenant": "Locataire"
+      }
+    },
+    "queues": {
+      "title": "Diagnostics de file d'attente",
+      "subtitle": "Lignes de file d'attente de courrier électronique en attente ayant échoué, supprimées ou obsolètes pour ce locataire.",
+      "table_label": "Diagnostic de la file d'attente des e-mails",
+      "empty": "Aucune ligne de file d'attente de courrier électronique ayant échoué, supprimée ou obsolète.",
+      "columns": {
+        "attempts": "Tentatives",
+        "category": "Catégorie",
+        "error": "Erreur",
+        "last_attempt": "Dernière tentative",
+        "recipient": "Destinataire",
+        "source": "Source",
+        "status": "Statut"
+      },
+      "sources": {
+        "civic_digest_delivery_claims": "Réclamation du résumé civique",
+        "event_reminder_delivery_claims": "Réclamation de rappel d'événement",
+        "event_reminders": "Rappel d'événement",
+        "federation_inbound_connections": "Connexion à la fédération",
+        "federation_messages": "Message de la Fédération",
+        "federation_transactions": "Opération de fédération",
+        "goal_reminders": "Rappel d'objectif",
+        "job_interviews": "Rappel d'entretien d'embauche",
+        "listing_expiry_reminders_sent": "Rappel d'expiration de l'annonce",
+        "marketplace_disputes": "Litige sur le marché",
+        "marketplace_order_notification_deliveries": "Notification de commande Marketplace",
+        "marketplace_report_notifications": "Rapport du marché",
+        "marketplace_seller_ratings": "Évaluation du vendeur sur le marché",
+        "member_subscription_events": "Facturation de l'abonnement des membres",
+        "newsletter_queue": "Bulletin",
+        "notification_queue": "Notification",
+        "notifications": "Preuve de notification",
+        "reviews": "Examen fédéré",
+        "transaction_notification_deliveries": "Avis de transaction",
+        "user_safeguarding_preferences": "Examen de la sauvegarde",
+        "vol_donations": "Reçu de don",
+        "vol_reminder_delivery_claims": "Réclamation de rappel aux bénévoles",
+        "vol_reminders_sent": "Rappel aux bénévoles"
+      }
+    },
+    "logs": {
+      "title": "Journal des tentatives d'envoi d'e-mails",
+      "subtitle": "Recherchez chaque tentative d'envoi par destinataire, catégorie, statut et date.",
+      "table_label": "Journal des tentatives d'envoi d'e-mails",
+      "empty": "Aucun e-mail ne correspond aux filtres actuels.",
+      "columns": {
+        "category": "Catégorie",
+        "delivered": "Livré",
+        "error": "Erreur",
+        "provider": "Fournisseur",
+        "recipient": "Destinataire",
+        "sent": "Envoyé",
+        "status": "Statut",
+        "subject": "Sujet"
+      }
+    },
+    "pagination": {
+      "page_size": "Lignes par page",
+      "summary": "{{from}}-{{to}} de {{total}}"
+    },
+    "suppressions": {
+      "title": "Liste de suppression",
+      "subtitle": "Destinataires à l'échelle de la plateforme que les fournisseurs ont renvoyés, bloqués, invalidés ou désabonnés.",
+      "table_label": "Liste de suppression d'e-mails",
+      "empty": "Aucun destinataire supprimé ne correspond aux filtres actuels.",
+      "confirm_remove": "Supprimer {{email}} de la liste de suppression ? Ils pourront à nouveau recevoir des e-mails.",
+      "remove": "Supprimer la suppression",
+      "remove_failed": "Échec de la suppression de la suppression.",
+      "removed": "{{email}} supprimé.",
+      "columns": {
+        "actions": "Actes",
+        "detail": "Détail",
+        "email": "E-mail",
+        "reason": "Raison",
+        "suppressed_at": "Supprimé à"
+      },
+      "reasons": {
+        "block": "Bloc",
+        "bounce": "Rebond",
+        "invalid": "Invalide",
+        "spam_report": "Rapport de spam",
+        "unsubscribe": "Se désabonner",
+        "unknown": "Raison inconnue : {{reason}}"
+      }
+    },
+    "empty": {
+      "no_statuses": "Aucun statut pour l'instant"
     }
   },
   "help_drawer": {

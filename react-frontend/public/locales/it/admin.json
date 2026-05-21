@@ -9985,7 +9985,349 @@
       "email_warning_check_failed": {
         "title": "Warning check failed",
         "body": "Email warning checks could not complete."
+      },
+      "notification_queue_suppressed": {
+        "title": "E-mail di notifica soppresse",
+        "body": "Le e-mail di notifica in coda di {{count}} sono state eliminate nelle ultime ore di {{window_hours}}."
+      },
+      "newsletter_queue_failures": {
+        "title": "Errori nella coda delle newsletter",
+        "body": "I destinatari della newsletter {{count}} hanno fallito nelle ultime ore {{window_hours}}."
+      },
+      "newsletter_queue_stale_processing": {
+        "title": "Coda di newsletter obsoleta",
+        "body": "I destinatari della newsletter {{count}} hanno elaborato per più di {{minutes}} minuti."
+      },
+      "new_users_without_account_email_attempt": {
+        "title": "L'e-mail dell'account non è stata attivata",
+        "body": "I nuovi utenti {{count}} non hanno ricevuto alcun tentativo di attivazione, verifica, approvazione o e-mail di benvenuto dell'account nelle ultime ore {{window_hours}}."
+      },
+      "password_resets_without_email_attempt": {
+        "title": "L'e-mail di reimpostazione della password non è stata attivata",
+        "body": "I token di reimpostazione della password {{count}} non hanno alcun tentativo e-mail di reimpostazione della password corrispondente nelle ultime ore {{window_hours}}."
+      },
+      "group_invites_without_email_attempt": {
+        "title": "L'e-mail di invito al gruppo non è stata attivata",
+        "body": "Gli inviti ai gruppi email {{count}} non hanno alcun tentativo di invito email ai gruppi corrispondente nelle ultime ore {{window_hours}}."
+      },
+      "group_members_tenant_mismatch": {
+        "title": "Mancata corrispondenza del tenant di appartenenza al gruppo",
+        "body": "Le appartenenze al gruppo {{count}} appartengono a un tenant diverso dal relativo gruppo. Queste righe rischiano di avere un ruolo tenant e un routing delle notifiche errati."
+      },
+      "group_member_joined_without_owner_notification_queue": {
+        "title": "La notifica di iscrizione al gruppo non è stata messa in coda",
+        "body": "Le appartenenze ai gruppi {{count}} sono diventate attive senza una riga corrispondente nella coda di notifica del proprietario nelle ultime ore {{window_hours}}."
+      },
+      "instant_notifications_stuck_pending": {
+        "title": "Le e-mail istantanee sono bloccate",
+        "body": "Le e-mail di notifica istantanea di {{count}} sono in sospeso da più di {{minutes}} minuti."
+      },
+      "notification_queue_failed_recently": {
+        "title": "Le email di notifica non sono riuscite",
+        "body": "Le e-mail di notifica in coda di {{count}} non sono riuscite nelle ultime ore {{window_hours}}."
+      },
+      "notification_queue_suppressed_recently": {
+        "title": "E-mail di notifica soppresse",
+        "body": "Le e-mail di notifica in coda di {{count}} sono state eliminate nelle ultime ore di {{window_hours}}."
+      },
+      "notification_queue_missing_tenant_id": {
+        "title": "Tenant mancante nella coda di notifica",
+        "body": "{{count}} le notifiche in coda sono in sospeso o in elaborazione senza proprietà del tenant. Non possono essere instradati in modo affidabile finché non vengono riparati."
+      },
+      "notification_queue_tenant_mismatch": {
+        "title": "Mancata corrispondenza del tenant della coda di notifica",
+        "body": "Le notifiche in coda {{count}} appartengono a un tenant diverso dall'utente destinatario. Queste righe rischiano il routing del tenant errato."
+      },
+      "notifications_missing_tenant_id": {
+        "title": "Notifiche inquilino mancante",
+        "body": "Le notifiche in-app {{count}} non hanno la proprietà del tenant, quindi gli utenti potrebbero non visualizzarle in modo coerente."
+      },
+      "notifications_tenant_mismatch": {
+        "title": "Mancata corrispondenza del tenant delle notifiche",
+        "body": "Le notifiche in-app {{count}} appartengono a un tenant diverso rispetto all'utente destinatario. Queste righe rischiano errori di visibilità tra tenant."
+      },
+      "notification_queue_marked_sent_without_email_log": {
+        "title": "Notifica contrassegnata come inviata senza prova email",
+        "body": "Le notifiche in coda {{count}} sono state contrassegnate come inviate senza una voce di log e-mail corrispondente nelle ultime ore {{window_hours}}."
+      },
+      "newsletter_queue_missing_tenant_id": {
+        "title": "Inquilino mancante nella coda della newsletter",
+        "body": "Le righe della coda della newsletter {{count}} non hanno la proprietà del tenant. Non possono essere instradati in modo affidabile finché non vengono riparati."
+      },
+      "newsletter_queue_tenant_mismatch": {
+        "title": "Mancata corrispondenza del tenant della coda della newsletter",
+        "body": "Le righe della coda della newsletter {{count}} appartengono a un tenant diverso rispetto alla newsletter. Queste righe rischiano il routing del tenant errato."
+      },
+      "newsletter_queue_stuck_pending": {
+        "title": "Le email della newsletter sono bloccate",
+        "body": "I destinatari della newsletter {{count}} sono in attesa da più di {{minutes}} minuti."
+      },
+      "newsletter_queue_failed_recently": {
+        "title": "Le email della newsletter non sono riuscite",
+        "body": "I destinatari della newsletter {{count}} hanno fallito nelle ultime ore {{window_hours}}."
+      },
+      "newsletter_queue_marked_sent_without_email_log": {
+        "title": "Newsletter contrassegnata come inviata senza prova email",
+        "body": "I destinatari della newsletter {{count}} sono stati contrassegnati come inviati senza una voce di registro e-mail riuscita corrispondente nelle ultime ore {{window_hours}}."
+      },
+      "event_reminders_overdue_pending": {
+        "title": "Promemoria eventi scaduti",
+        "body": "I promemoria degli eventi {{count}} sono ancora in sospeso per più di {{minutes}} minuti dopo l'orario di invio pianificato."
+      },
+      "event_reminders_failed_recently": {
+        "title": "I promemoria degli eventi non sono riusciti",
+        "body": "I promemoria degli eventi {{count}} non sono riusciti nelle ultime ore {{window_hours}}."
+      },
+      "event_reminders_marked_sent_without_email_log": {
+        "title": "Promemoria eventi contrassegnati come inviati senza prova email",
+        "body": "I promemoria degli eventi e-mail {{count}} sono stati contrassegnati come inviati senza una voce di registro e-mail riuscita corrispondente nelle ultime ore {{window_hours}}."
+      },
+      "marketplace_report_received_without_notification_outbox": {
+        "title": "L'e-mail di ricezione del rapporto del Marketplace non è stata messa in coda",
+        "body": "I report del marketplace {{count}} sono stati ricevuti senza una riga di notifica email di ricevuta corrispondente nelle ultime ore {{window_hours}}."
+      },
+      "marketplace_report_acknowledged_without_notification_outbox": {
+        "title": "L'e-mail di conferma del rapporto del Marketplace non è stata messa in coda",
+        "body": "I report del marketplace {{count}} sono stati confermati senza una riga di notifica e-mail di riconoscimento corrispondente nelle ultime ore {{window_hours}}."
+      },
+      "marketplace_report_resolved_without_notification_outbox": {
+        "title": "L'e-mail di risoluzione dei report del Marketplace non è stata messa in coda",
+        "body": "I report del marketplace {{count}} sono stati risolti senza una riga di notifica e-mail di risoluzione corrispondente nelle ultime ore {{window_hours}}."
+      },
+      "marketplace_report_appealed_without_notification_outbox": {
+        "title": "L'e-mail di ricorso per la segnalazione del Marketplace non è stata messa in coda",
+        "body": "I ricorsi relativi al rapporto sul mercato {{count}} sono stati presentati senza una riga di notifica e-mail di ricevuta del ricorso corrispondente nelle ultime ore {{window_hours}}."
+      },
+      "marketplace_report_appeal_resolved_without_notification_outbox": {
+        "title": "L'e-mail di risoluzione del ricorso per la segnalazione del Marketplace non è stata messa in coda",
+        "body": "I ricorsi relativi ai rapporti sul mercato {{count}} sono stati risolti senza una riga di notifica e-mail di decisione finale corrispondente nelle ultime ore {{window_hours}}."
+      },
+      "federation_connection_without_email_evidence": {
+        "title": "Manca la prova dell'e-mail di connessione alla federazione",
+        "body": "Gli eventi di connessione federata {{count}} non hanno prove di recapito di posta elettronica riuscito nelle ultime ore {{window_hours}}."
+      },
+      "federation_connection_without_bell_evidence": {
+        "title": "Manca la prova della notifica di connessione alla federazione",
+        "body": "Gli eventi di connessione federata {{count}} non hanno prove di notifica in-app nelle ultime ore {{window_hours}}."
+      },
+      "federation_review_without_email_evidence": {
+        "title": "Mancano le prove dell'e-mail di revisione della federazione",
+        "body": "Le revisioni federate di {{count}} non hanno avuto prove di posta elettronica riuscite o saltate intenzionalmente nelle ultime ore di {{window_hours}}."
+      },
+      "federation_review_without_bell_evidence": {
+        "title": "Mancano le prove della notifica di revisione della Federazione",
+        "body": "Le revisioni federate {{count}} non hanno prove di notifica in-app nelle ultime ore {{window_hours}}."
+      },
+      "member_subscription_event_without_email_evidence": {
+        "title": "Manca la prova dell'e-mail di iscrizione del membro",
+        "body": "Gli eventi di fatturazione dell'abbonamento membro {{count}} non hanno prove di recapito corretto della posta elettronica nelle ultime ore {{window_hours}}."
+      },
+      "stripe_donation_without_receipt_email_evidence": {
+        "title": "Manca la prova dell'e-mail di ricevuta della donazione",
+        "body": "Le donazioni {{count}} completate Stripe non hanno prove di ricezione e-mail di successo nelle ultime ore {{window_hours}}."
+      },
+      "critical_email_attempts_missing_tenant_context": {
+        "title": "Contesto tenant mancante per posta elettronica critica",
+        "body": "I tentativi di posta elettronica critici {{count}} sono stati registrati senza contesto tenant nelle ultime ore {{window_hours}}."
+      },
+      "sendgrid_events_not_confirming_delivery": {
+        "title": "Eventi di consegna SendGrid mancanti",
+        "body": "{{count}} Le email SendGrid rimangono accettate ma non confermate dopo più di {{hours}} ore."
+      },
+      "tenant_gmail_override_incomplete": {
+        "title": "Configurazione del tenant Gmail incompleta",
+        "body": "Questo tenant presenta un override del provider di posta elettronica Gmail incompleto."
+      },
+      "tenant_smtp_override_incomplete": {
+        "title": "Configurazione del tenant SMTP incompleta",
+        "body": "Questo tenant presenta un override del provider di posta elettronica SMTP incompleto."
+      },
+      "tenant_sendgrid_override_missing_api_key": {
+        "title": "Il tenant SendGrid esegue l'override della chiave API mancante",
+        "body": "Questo tenant è impostato per utilizzare un override SendGrid ma non dispone di una chiave API del tenant, quindi verrà utilizzato il fallback della piattaforma."
+      },
+      "tenant_provider_config_check_failed": {
+        "title": "Il controllo del fornitore del tenant non è riuscito",
+        "body": "Impossibile completare il controllo della configurazione del provider di posta elettronica per questo tenant."
+      },
+      "direct_email_send_paths_remaining": {
+        "title": "Rimangono i percorsi di posta elettronica diretta legacy",
+        "body": "I percorsi di invio di posta elettronica non elaborata {{count}} continuano a ignorare il dispatcher di notifiche unificato. Continua a rafforzare questi percorsi finché ogni modulo non passa attraverso il dispatcher controllabile."
+      },
+      "email_dispatch_missing_explicit_tenant": {
+        "title": "E-mail del dispatcher mancante del tenant esplicito",
+        "body": "I siti di chiamata del dispatcher di posta elettronica {{count}} si basano ancora sul contesto del tenant dedotto. Passare tenant_id o tenantId in modo esplicito in modo che ogni invio in coda, cron, webhook e tra tenant sia controllabile."
+      },
+      "email_trigger_audit_failed": {
+        "title": "Il controllo dell'attivazione dell'email non è riuscito",
+        "body": "Impossibile completare il controllo del trigger di posta elettronica."
       }
+    },
+    "title": "Consegnabilità della posta elettronica",
+    "subtitle": "Tieni traccia delle prove di attivazione, dei tentativi di invio, dello stato del provider e dei destinatari soppressi per questo tenant.",
+    "trigger_score": "Punteggio trigger",
+    "trigger_coverage": "Problemi di {{issues}} nei flussi monitorati di {{count}}",
+    "actions": {
+      "refresh": "Aggiorna",
+      "reset": "Reset",
+      "search": "Ricerca"
+    },
+    "windows": {
+      "1": "Ultime 24 ore",
+      "7": "Ultimi 7 giorni",
+      "30": "Ultimi 30 giorni",
+      "90": "Ultimi 90 giorni"
+    },
+    "filters": {
+      "all": "Tutto",
+      "category": "Categoria",
+      "email": "E-mail",
+      "recipient": "E-mail del destinatario",
+      "reason": "Motivo",
+      "since": "Da",
+      "status": "Stato",
+      "until": "Fino a",
+      "window": "Finestra temporale"
+    },
+    "metrics": {
+      "accepted": "Accettato",
+      "bad_outcomes": "{{count}} non è riuscito, è stato respinto o è stato soppresso",
+      "bounced": "Rimbalzato",
+      "delivered": "Consegnato",
+      "not_available": "Nessun dato di controllo del trigger",
+      "total": "Totale",
+      "trigger_score": "Punteggio trigger",
+      "unconfirmed": "{{count}} accettato ma non confermato",
+      "webhook_confirmed": "Confermato dal webhook del provider",
+      "window_days": "Finestra del giorno {{days}}"
+    },
+    "status": {
+      "bounced": "Rimbalzato",
+      "delivered": "Consegnato",
+      "failed": "Fallito",
+      "pending": "In attesa di",
+      "processing": "Elaborazione",
+      "queued": "In coda",
+      "sent": "Inviato",
+      "suppressed": "Soppresso",
+      "unknown": "Stato sconosciuto: {{status}}"
+    },
+    "severity": {
+      "critical": "Critico",
+      "info": "Informazioni",
+      "warning": "Avvertimento"
+    },
+    "status_breakdown": {
+      "title": "Ripartizione dello stato",
+      "subtitle": "Una visualizzazione compatta dei risultati di invio del tenant corrente per la finestra selezionata."
+    },
+    "trigger_health": {
+      "critical": "Problemi critici di attivazione",
+      "monitored": "Flussi monitorati",
+      "warning": "Problemi di attivazione degli avvisi"
+    },
+    "trigger_issues": {
+      "title": "Innescare problemi di audit",
+      "subtitle": "Righe di origine in cui avrebbe dovuto essere attivata un'e-mail o una notifica, ma il controllo non dispone di prove di consegna affidabili.",
+      "table_label": "Problemi di controllo del trigger di posta elettronica",
+      "empty": "Nessun problema di controllo del trigger per la finestra selezionata.",
+      "all_tenants": "Tutti gli inquilini",
+      "columns": {
+        "event": "Evento",
+        "issue": "Problema",
+        "module": "Modulo",
+        "params": "Prova",
+        "severity": "Gravità",
+        "tenant": "Inquilino"
+      }
+    },
+    "queues": {
+      "title": "Diagnostica della coda",
+      "subtitle": "Righe della coda di posta elettronica in sospeso non riuscite, soppresse o obsolete per questo tenant.",
+      "table_label": "Diagnostica della coda di posta elettronica",
+      "empty": "Nessuna riga della coda di posta elettronica non riuscita, soppressa o obsoleta.",
+      "columns": {
+        "attempts": "Tentativi",
+        "category": "Categoria",
+        "error": "Errore",
+        "last_attempt": "Ultimo tentativo",
+        "recipient": "Destinatario",
+        "source": "Fonte",
+        "status": "Stato"
+      },
+      "sources": {
+        "civic_digest_delivery_claims": "Affermazione del digest civico",
+        "event_reminder_delivery_claims": "Richiesta di promemoria dell'evento",
+        "event_reminders": "Promemoria evento",
+        "federation_inbound_connections": "Collegamento con la Federazione",
+        "federation_messages": "Messaggio della Federazione",
+        "federation_transactions": "Transazione della Federazione",
+        "goal_reminders": "Promemoria obiettivo",
+        "job_interviews": "Promemoria colloquio di lavoro",
+        "listing_expiry_reminders_sent": "Promemoria scadenza quotazione",
+        "marketplace_disputes": "Controversia sul mercato",
+        "marketplace_order_notification_deliveries": "Notifica degli ordini sul mercato",
+        "marketplace_report_notifications": "Rapporto sul mercato",
+        "marketplace_seller_ratings": "Valutazione del venditore sul mercato",
+        "member_subscription_events": "Fatturazione dell'abbonamento ai membri",
+        "newsletter_queue": "Notiziario",
+        "notification_queue": "Notifica",
+        "notifications": "Prove di notifica",
+        "reviews": "Revisione federata",
+        "transaction_notification_deliveries": "Notifica della transazione",
+        "user_safeguarding_preferences": "Revisione di salvaguardia",
+        "vol_donations": "Ricevuta della donazione",
+        "vol_reminder_delivery_claims": "Richiesta di promemoria del volontario",
+        "vol_reminders_sent": "Promemoria volontario"
+      }
+    },
+    "logs": {
+      "title": "Registro dei tentativi di posta elettronica",
+      "subtitle": "Cerca ogni tentativo di invio per destinatario, categoria, stato e data.",
+      "table_label": "Registro dei tentativi di posta elettronica",
+      "empty": "Nessuna email corrisponde ai filtri attuali.",
+      "columns": {
+        "category": "Categoria",
+        "delivered": "Consegnato",
+        "error": "Errore",
+        "provider": "Fornitore",
+        "recipient": "Destinatario",
+        "sent": "Inviato",
+        "status": "Stato",
+        "subject": "Soggetto"
+      }
+    },
+    "pagination": {
+      "page_size": "Righe per pagina",
+      "summary": "{{from}}-{{to}} di {{total}}"
+    },
+    "suppressions": {
+      "title": "Elenco di soppressione",
+      "subtitle": "Destinatari a livello di piattaforma a cui i fornitori hanno rifiutato, bloccato, invalidato o annullato l'iscrizione.",
+      "table_label": "Elenco di soppressione della posta elettronica",
+      "empty": "Nessun destinatario soppresso corrisponde ai filtri correnti.",
+      "confirm_remove": "Rimuovere {{email}} dall'elenco di soppressione? Avranno diritto a ricevere nuovamente e-mail.",
+      "remove": "Rimuovere la soppressione",
+      "remove_failed": "Impossibile rimuovere la soppressione.",
+      "removed": "Rimosso {{email}}.",
+      "columns": {
+        "actions": "Azioni",
+        "detail": "Dettaglio",
+        "email": "E-mail",
+        "reason": "Motivo",
+        "suppressed_at": "Soppresso a"
+      },
+      "reasons": {
+        "block": "Bloccare",
+        "bounce": "Rimbalzo",
+        "invalid": "Non valido",
+        "spam_report": "Segnalazione di spam",
+        "unsubscribe": "Annulla l'iscrizione",
+        "unknown": "Motivo sconosciuto: {{reason}}"
+      }
+    },
+    "empty": {
+      "no_statuses": "Nessuno stato ancora"
     }
   },
   "help_drawer": {

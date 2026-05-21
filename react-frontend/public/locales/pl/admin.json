@@ -9985,7 +9985,349 @@
       "email_warning_check_failed": {
         "title": "Warning check failed",
         "body": "Email warning checks could not complete."
+      },
+      "notification_queue_suppressed": {
+        "title": "E-maile z powiadomieniami zostały pominięte",
+        "body": "{{count}} wiadomości e-mail z powiadomieniami w kolejce zostały pominięte w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "newsletter_queue_failures": {
+        "title": "Awarie kolejki biuletynów",
+        "body": "Odbiorcom newslettera {{count}} nie udało się w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "newsletter_queue_stale_processing": {
+        "title": "Przestarzała kolejka biuletynów",
+        "body": "Odbiorcy newslettera {{count}} przetwarzali dane przez ponad minuty {{minutes}}."
+      },
+      "new_users_without_account_email_attempt": {
+        "title": "Adres e-mail konta nie został uruchomiony",
+        "body": "{{count}} nowi użytkownicy nie mieli aktywacji konta, weryfikacji, zatwierdzenia ani próby wysłania wiadomości powitalnej w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "password_resets_without_email_attempt": {
+        "title": "E-mail dotyczący resetowania hasła nie został uruchomiony",
+        "body": "Dla tokenów resetowania hasła {{count}} nie ma pasującej próby e-maila dotyczącego resetowania hasła w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "group_invites_without_email_attempt": {
+        "title": "E-mail z zaproszeniem do grupy nie został uruchomiony",
+        "body": "Zaproszenia e-mailowe do grup {{count}} nie odpowiadają żadnej próbie wysłania zaproszenia do grupy w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "group_members_tenant_mismatch": {
+        "title": "Niezgodność dzierżawy członkostwa w grupie",
+        "body": "Członkostwa w grupach {{count}} należą do innego dzierżawcy niż ich grupa. Wiersze te stwarzają ryzyko niewłaściwej roli dzierżawy i routingu powiadomień."
+      },
+      "group_member_joined_without_owner_notification_queue": {
+        "title": "Powiadomienie o dołączeniu do grupy nie pojawiło się w kolejce",
+        "body": "Członkostwa w grupach {{count}} stały się aktywne bez pasującego wiersza kolejki powiadomień właściciela w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "instant_notifications_stuck_pending": {
+        "title": "Natychmiastowe wiadomości e-mail są zablokowane",
+        "body": "Wiadomości e-mail z natychmiastowymi powiadomieniami {{count}} oczekują od ponad {{minutes}} minut."
+      },
+      "notification_queue_failed_recently": {
+        "title": "E-maile z powiadomieniami nie powiodły się",
+        "body": "{{count}} e-maile z powiadomieniami w kolejce nie powiodły się w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "notification_queue_suppressed_recently": {
+        "title": "E-maile z powiadomieniami zostały pominięte",
+        "body": "{{count}} wiadomości e-mail z powiadomieniami w kolejce zostały pominięte w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "notification_queue_missing_tenant_id": {
+        "title": "Brak dzierżawcy w kolejce powiadomień",
+        "body": "Powiadomienia w kolejce {{count}} oczekują lub są przetwarzane bez własności dzierżawcy. Do czasu naprawy nie można ich bezpiecznie poprowadzić."
+      },
+      "notification_queue_tenant_mismatch": {
+        "title": "Niezgodność dzierżawy kolejki powiadomień",
+        "body": "Powiadomienia w kolejce {{count}} należą do innego dzierżawcy niż użytkownik będący ich odbiorcą. Wiersze te stwarzają ryzyko routingu przez niewłaściwą dzierżawę."
+      },
+      "notifications_missing_tenant_id": {
+        "title": "Powiadomienia o braku najemcy",
+        "body": "Powiadomienia w aplikacji {{count}} nie są własnością dzierżawcy, więc użytkownicy mogą nie widzieć ich stale."
+      },
+      "notifications_tenant_mismatch": {
+        "title": "Niezgodność dzierżawy powiadomień",
+        "body": "Powiadomienia w aplikacji {{count}} należą do innego dzierżawcy niż użytkownik będący ich odbiorcą. Wiersze te stwarzają ryzyko błędów widoczności między dzierżawcami."
+      },
+      "notification_queue_marked_sent_without_email_log": {
+        "title": "Powiadomienie oznaczone jako wysłane bez potwierdzenia e-mailem",
+        "body": "Powiadomienia w kolejce {{count}} zostały oznaczone jako wysłane bez pasującego wpisu w dzienniku poczty e-mail w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "newsletter_queue_missing_tenant_id": {
+        "title": "Brak dzierżawcy w kolejce biuletynów",
+        "body": "Wiersze kolejki biuletynów {{count}} nie mają własności dzierżawcy. Do czasu naprawy nie można ich bezpiecznie poprowadzić."
+      },
+      "newsletter_queue_tenant_mismatch": {
+        "title": "Niezgodność dzierżawcy kolejki biuletynów",
+        "body": "Wiersze kolejki biuletynów {{count}} należą do innego dzierżawcy niż ich biuletyn. Wiersze te stwarzają ryzyko routingu przez niewłaściwą dzierżawę."
+      },
+      "newsletter_queue_stuck_pending": {
+        "title": "E-maile z biuletynami są zablokowane",
+        "body": "Odbiorcy newslettera {{count}} oczekują na wiadomość od ponad {{minutes}} minut."
+      },
+      "newsletter_queue_failed_recently": {
+        "title": "Nie udało się wysłać e-maili z biuletynami",
+        "body": "Odbiorcom newslettera {{count}} nie udało się w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "newsletter_queue_marked_sent_without_email_log": {
+        "title": "Biuletyn oznaczony jako wysłany bez potwierdzenia e-mailem",
+        "body": "Odbiorcy biuletynu {{count}} zostali oznaczeni jako wysłani bez pasującego wpisu w dzienniku poczty e-mail w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "event_reminders_overdue_pending": {
+        "title": "Przypomnienia o wydarzeniach są spóźnione",
+        "body": "Przypomnienia o wydarzeniach {{count}} nadal oczekują ponad {{minutes}} minut po zaplanowanym czasie wysłania."
+      },
+      "event_reminders_failed_recently": {
+        "title": "Przypomnienia o wydarzeniach nie powiodły się",
+        "body": "Przypomnienia o wydarzeniach {{count}} nie powiodły się w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "event_reminders_marked_sent_without_email_log": {
+        "title": "Przypomnienia o wydarzeniach oznaczone jako wysłane bez potwierdzenia e-mailem",
+        "body": "Przypomnienia e-mail o wydarzeniach {{count}} zostały oznaczone jako wysłane bez pasującego wpisu w dzienniku poczty e-mail w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "marketplace_report_received_without_notification_outbox": {
+        "title": "E-mail z potwierdzeniem raportu z Marketplace nie znalazł się w kolejce",
+        "body": "Otrzymano raporty z rynku {{count}} bez pasującego wiersza powiadomienia e-mail z potwierdzeniem w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "marketplace_report_acknowledged_without_notification_outbox": {
+        "title": "E-mail z potwierdzeniem raportu z Marketplace nie znalazł się w kolejce",
+        "body": "Raporty platformy handlowej {{count}} zostały potwierdzone bez pasującego wiersza powiadomienia e-mail z potwierdzeniem w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "marketplace_report_resolved_without_notification_outbox": {
+        "title": "Wiadomość e-mail z rozwiązaniem raportu z rynku nie została umieszczona w kolejce",
+        "body": "Raporty rynku {{count}} zostały rozwiązane bez pasującego wiersza powiadomienia e-mail o rozwiązaniu w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "marketplace_report_appealed_without_notification_outbox": {
+        "title": "E-mail z odwołaniem dotyczącym raportu z rynku nie trafił do kolejki",
+        "body": "Odwołania dotyczące raportów rynkowych {{count}} zostały złożone bez pasującego wiersza powiadomienia e-mail z potwierdzeniem odwołania w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "marketplace_report_appeal_resolved_without_notification_outbox": {
+        "title": "Wiadomość e-mail dotycząca odwołania w sprawie raportu z rynku nie została umieszczona w kolejce",
+        "body": "Odwołania dotyczące raportów rynkowych {{count}} zostały rozpatrzone bez pasującego wiersza powiadomienia e-mail o ostatecznej decyzji w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "federation_connection_without_email_evidence": {
+        "title": "Brakuje dowodu e-maila dotyczącego połączenia z federacją",
+        "body": "Zdarzenia połączenia federacyjnego {{count}} nie mają dowodu pomyślnego dostarczenia wiadomości e-mail w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "federation_connection_without_bell_evidence": {
+        "title": "Brak dowodów powiadomienia o połączeniu federacyjnym",
+        "body": "Zdarzenia połączenia federacyjnego {{count}} nie zawierają żadnych dowodów powiadomień w aplikacji w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "federation_review_without_email_evidence": {
+        "title": "Brak dowodów w wiadomości e-mail z oceną federacji",
+        "body": "W recenzjach stowarzyszonych {{count}} w ciągu ostatnich godzin {{window_hours}} nie znaleziono żadnych pomyślnych lub celowo pominiętych dowodów e-mail."
+      },
+      "federation_review_without_bell_evidence": {
+        "title": "Brak dowodów powiadomienia o przeglądzie federacyjnym",
+        "body": "W przypadku recenzji federacyjnych {{count}} w ciągu ostatnich godzin {{window_hours}} nie znaleziono żadnych powiadomień w aplikacji."
+      },
+      "member_subscription_event_without_email_evidence": {
+        "title": "Brakuje dowodu e-maila dotyczącego subskrypcji członkowskiej",
+        "body": "Zdarzenia rozliczeniowe subskrypcji członkowskiej {{count}} nie mają potwierdzenia dostarczenia wiadomości e-mail w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "stripe_donation_without_receipt_email_evidence": {
+        "title": "Brak potwierdzenia e-maila z potwierdzeniem przekazania darowizny",
+        "body": "{{count}} zakończone darowizny Stripe nie mają potwierdzenia odbioru e-mailem w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "critical_email_attempts_missing_tenant_context": {
+        "title": "W krytycznej wiadomości e-mail brakuje kontekstu dzierżawy",
+        "body": "W ci?gu ostatnich {{window_hours}} godzin zarejestrowano {{count}} krytycznych pr?b wys?ania wiadomo?ci e-mail bez kontekstu dzier?awy."
+      },
+      "sendgrid_events_not_confirming_delivery": {
+        "title": "Brak zdarzeń dostawy SendGrid",
+        "body": "E-maile {{count}} SendGrid pozostają akceptowane, ale niepotwierdzone po upływie więcej niż godzin {{hours}}."
+      },
+      "tenant_gmail_override_incomplete": {
+        "title": "Konfiguracja dzierżawy Gmail jest niekompletna",
+        "body": "Ten dzierżawca ma niekompletne zastąpienie dostawcy poczty e-mail Gmail."
+      },
+      "tenant_smtp_override_incomplete": {
+        "title": "Konfiguracja dzierżawy SMTP jest niekompletna",
+        "body": "Ten dzierżawca ma niekompletne zastąpienie dostawcy poczty e-mail SMTP."
+      },
+      "tenant_sendgrid_override_missing_api_key": {
+        "title": "Dzierżawca SendGrid zastępuje brakujący klucz API",
+        "body": "Ten dzierżawca jest skonfigurowany do używania zastąpienia SendGrid, ale nie ma klucza dzierżawy API, więc zostanie użyta rezerwowa platforma."
+      },
+      "tenant_provider_config_check_failed": {
+        "title": "Sprawdzenie dostawcy dzierżawy nie powiodło się",
+        "body": "Nie można ukończyć audytu konfiguracji dostawcy poczty e-mail dla tej dzierżawy."
+      },
+      "direct_email_send_paths_remaining": {
+        "title": "Starsze bezpośrednie ścieżki e-mail pozostają",
+        "body": "{{count}} surowe ścieżki wysyłania wiadomości e-mail nadal omijają ujednolicony moduł rozsyłający powiadomienia. Kontynuuj ulepszanie tych ścieżek, aż każdy moduł przejdzie przez kontrolowany moduł rozsyłający."
+      },
+      "email_dispatch_missing_explicit_tenant": {
+        "title": "W e-mailu dyspozytora brakuje wyraźnego dzierżawcy",
+        "body": "Witryny połączeń dyspozytorów poczty e-mail {{count}} nadal opierają się na wywnioskowanym kontekście dzierżawy. Przekazuj identyfikator_dzierżawcy lub identyfikator_dzierżawcy jawnie, aby można było kontrolować każde wysyłanie w kolejce, cron, webhook i między dzierżawcami."
+      },
+      "email_trigger_audit_failed": {
+        "title": "Kontrola wyzwalacza poczty e-mail nie powiodła się",
+        "body": "Nie można ukończyć kontroli wyzwalacza e-mail."
       }
+    },
+    "title": "Dostarczalność e-maili",
+    "subtitle": "Śledź dowody wyzwalacza, próby wysyłania, stan dostawcy i pominięci odbiorcy dla tego dzierżawcy.",
+    "trigger_score": "Wynik wyzwalacza",
+    "trigger_coverage": "Problemy z {{issues}} w monitorowanych przepływach {{count}}",
+    "actions": {
+      "refresh": "Odświeżać",
+      "reset": "Nastawić",
+      "search": "Szukaj"
+    },
+    "windows": {
+      "1": "Ostatnie 24 godziny",
+      "7": "Ostatnie 7 dni",
+      "30": "Ostatnie 30 dni",
+      "90": "Ostatnie 90 dni"
+    },
+    "filters": {
+      "all": "Wszystko",
+      "category": "Kategoria",
+      "email": "E-mail",
+      "recipient": "Adres e-mail odbiorcy",
+      "reason": "Powód",
+      "since": "Od",
+      "status": "Status",
+      "until": "Dopóki",
+      "window": "Okno czasowe"
+    },
+    "metrics": {
+      "accepted": "Przyjęty",
+      "bad_outcomes": "{{count}} nie powiódł się, został odrzucony lub pominięty",
+      "bounced": "Odbił się",
+      "delivered": "Dostarczony",
+      "not_available": "Brak danych kontroli wyzwalacza",
+      "total": "Całkowity",
+      "trigger_score": "Wynik wyzwalacza",
+      "unconfirmed": "{{count}} zaakceptowany, ale niepotwierdzony",
+      "webhook_confirmed": "Potwierdzone przez webhook dostawcy",
+      "window_days": "Okno dzienne {{days}}"
+    },
+    "status": {
+      "bounced": "Odbił się",
+      "delivered": "Dostarczony",
+      "failed": "Przegrany",
+      "pending": "Aż do",
+      "processing": "Przetwarzanie",
+      "queued": "W kolejce",
+      "sent": "Wysłano",
+      "suppressed": "Zduszony",
+      "unknown": "Nieznany status: {{status}}"
+    },
+    "severity": {
+      "critical": "Krytyczny",
+      "info": "Informacje",
+      "warning": "Ostrzeżenie"
+    },
+    "status_breakdown": {
+      "title": "Podział statusu",
+      "subtitle": "Kompaktowy widok wyników wysyłania bieżącego najemcy dla wybranego okna."
+    },
+    "trigger_health": {
+      "critical": "Krytyczne problemy z wyzwalaczem",
+      "monitored": "Monitorowane przepływy",
+      "warning": "Ostrzeżenie o problemach z wyzwalaczem"
+    },
+    "trigger_issues": {
+      "title": "Wywołaj problemy z audytem",
+      "subtitle": "Wiersze źródłowe, w których powinien zostać wysłany e-mail lub powiadomienie, ale audyt nie zawiera wiarygodnych dowodów dostarczenia.",
+      "table_label": "Problemy z inspekcją wyzwalaczy e-mail",
+      "empty": "Brak problemów z inspekcją wyzwalaczy dla wybranego okna.",
+      "all_tenants": "Wszyscy najemcy",
+      "columns": {
+        "event": "Wydarzenie",
+        "issue": "Wydanie",
+        "module": "Moduł",
+        "params": "Dowód",
+        "severity": "Powaga",
+        "tenant": "Najemca"
+      }
+    },
+    "queues": {
+      "title": "Diagnostyka kolejek",
+      "subtitle": "Nieudane, pominięte lub nieaktualne oczekujące wiersze kolejki poczty e-mail dla tej dzierżawy.",
+      "table_label": "Diagnostyka kolejki e-mailowej",
+      "empty": "Brak nieudanych, pominiętych lub nieaktualnych wierszy kolejki poczty e-mail.",
+      "columns": {
+        "attempts": "Próbowanie",
+        "category": "Kategoria",
+        "error": "Błąd",
+        "last_attempt": "Ostatnia próba",
+        "recipient": "Odbiorca",
+        "source": "Źródło",
+        "status": "Status"
+      },
+      "sources": {
+        "civic_digest_delivery_claims": "Roszczenie dotyczące podsumowania obywatelskiego",
+        "event_reminder_delivery_claims": "Roszczenie dotyczące przypomnienia o wydarzeniu",
+        "event_reminders": "Przypomnienie o wydarzeniu",
+        "federation_inbound_connections": "Połączenie federacyjne",
+        "federation_messages": "Komunikat Federacji",
+        "federation_transactions": "Transakcja federacyjna",
+        "goal_reminders": "Przypomnienie o celu",
+        "job_interviews": "Przypomnienie o rozmowie kwalifikacyjnej",
+        "listing_expiry_reminders_sent": "Przypomnienie o wygaśnięciu aukcji",
+        "marketplace_disputes": "Spór o targowisko",
+        "marketplace_order_notification_deliveries": "Powiadomienie o zamówieniu na rynku",
+        "marketplace_report_notifications": "Raport z rynku",
+        "marketplace_seller_ratings": "Ocena sprzedawcy na rynku",
+        "member_subscription_events": "Rozliczenia subskrypcji członkowskiej",
+        "newsletter_queue": "Biuletyn",
+        "notification_queue": "Powiadomienie",
+        "notifications": "Dowód powiadomienia",
+        "reviews": "Przegląd federacyjny",
+        "transaction_notification_deliveries": "Powiadomienie o transakcji",
+        "user_safeguarding_preferences": "Przegląd zabezpieczający",
+        "vol_donations": "Pokwitowanie darowizny",
+        "vol_reminder_delivery_claims": "Roszczenie przypominające o wolontariacie",
+        "vol_reminders_sent": "Przypomnienie o wolontariacie"
+      }
+    },
+    "logs": {
+      "title": "Dziennik prób e-mail",
+      "subtitle": "Przeszukuj każdą próbę wysłania według odbiorcy, kategorii, statusu i daty.",
+      "table_label": "Dziennik prób wysłania e-maila",
+      "empty": "Żadne e-maile nie pasują do bieżących filtrów.",
+      "columns": {
+        "category": "Kategoria",
+        "delivered": "Dostarczony",
+        "error": "Błąd",
+        "provider": "Dostawca",
+        "recipient": "Odbiorca",
+        "sent": "Wysłano",
+        "status": "Status",
+        "subject": "Temat"
+      }
+    },
+    "pagination": {
+      "page_size": "Wiersze na stronę",
+      "summary": "{{from}}-{{to}} z {{total}}"
+    },
+    "suppressions": {
+      "title": "Lista tłumień",
+      "subtitle": "Odbiorcy na całej platformie, których dostawcy odrzucili, zablokowali, unieważnili lub anulowali subskrypcję.",
+      "table_label": "Lista wykluczeń e-mailowych",
+      "empty": "Żaden pominięty adresat nie pasuje do bieżących filtrów.",
+      "confirm_remove": "Usunąć {{email}} z listy wykluczeń? Będą mogli ponownie otrzymywać e-maile.",
+      "remove": "Usuń tłumienie",
+      "remove_failed": "Nie udało się usunąć wykluczenia.",
+      "removed": "Usunięto {{email}}.",
+      "columns": {
+        "actions": "Działania",
+        "detail": "Szczegół",
+        "email": "E-mail",
+        "reason": "Powód",
+        "suppressed_at": "Stłumione o godz"
+      },
+      "reasons": {
+        "block": "Blok",
+        "bounce": "Odbić się",
+        "invalid": "Nieważny",
+        "spam_report": "Raport o spamie",
+        "unsubscribe": "Zrezygnuj z subskrypcji",
+        "unknown": "Nieznany powód: {{reason}}"
+      }
+    },
+    "empty": {
+      "no_statuses": "Nie ma jeszcze żadnych statusów"
     }
   },
   "help_drawer": {

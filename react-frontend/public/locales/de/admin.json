@@ -9985,7 +9985,349 @@
       "email_warning_check_failed": {
         "title": "Warning check failed",
         "body": "Email warning checks could not complete."
+      },
+      "notification_queue_suppressed": {
+        "title": "Benachrichtigungs-E-Mails unterdrückt",
+        "body": "{{count}}-Benachrichtigungs-E-Mails in der Warteschlange wurden in den letzten {{window_hours}}-Stunden unterdrückt."
+      },
+      "newsletter_queue_failures": {
+        "title": "Fehler in der Newsletter-Warteschlange",
+        "body": "Die Empfänger des {{count}}-Newsletters sind in den letzten {{window_hours}}-Stunden fehlgeschlagen."
+      },
+      "newsletter_queue_stale_processing": {
+        "title": "Veraltete Newsletter-Warteschlange",
+        "body": "Die Empfänger des {{count}}-Newsletters verarbeiten seit mehr als {{minutes}}-Minuten."
+      },
+      "new_users_without_account_email_attempt": {
+        "title": "Konto-E-Mail wurde nicht ausgelöst",
+        "body": "Neue {{count}}-Benutzer haben in den letzten {{window_hours}}-Stunden keinen Versuch unternommen, ihr Konto zu aktivieren, zu verifizieren, zu genehmigen oder eine Willkommens-E-Mail zu senden."
+      },
+      "password_resets_without_email_attempt": {
+        "title": "Die E-Mail zum Zurücksetzen des Passworts wurde nicht ausgelöst",
+        "body": "Für {{count}}-Passwort-Reset-Tokens gab es in den letzten {{window_hours}}-Stunden keinen passenden E-Mail-Versuch zum Zurücksetzen des Passworts."
+      },
+      "group_invites_without_email_attempt": {
+        "title": "Die Gruppeneinladungs-E-Mail wurde nicht ausgelöst",
+        "body": "Bei {{count}}-E-Mail-Gruppeneinladungen gab es in den letzten {{window_hours}}-Stunden keinen passenden Gruppeneinladungs-E-Mail-Versuch."
+      },
+      "group_members_tenant_mismatch": {
+        "title": "Nichtübereinstimmung der Gruppenmitgliedschaft mit Mietern",
+        "body": "{{count}}-Gruppenmitgliedschaften gehören zu einem anderen Mandanten als ihre Gruppe. Bei diesen Zeilen besteht das Risiko einer falschen Mandantenrolle und Benachrichtigungsweiterleitung."
+      },
+      "group_member_joined_without_owner_notification_queue": {
+        "title": "Die Gruppenbeitrittsbenachrichtigung wurde nicht in die Warteschlange gestellt",
+        "body": "{{count}}-Gruppenmitgliedschaften wurden in den letzten {{window_hours}}-Stunden ohne eine entsprechende Besitzerbenachrichtigungswarteschlangenzeile aktiv."
+      },
+      "instant_notifications_stuck_pending": {
+        "title": "Sofortige E-Mails bleiben hängen",
+        "body": "{{count}}-Sofortbenachrichtigungs-E-Mails stehen seit mehr als {{minutes}} Minuten aus."
+      },
+      "notification_queue_failed_recently": {
+        "title": "Benachrichtigungs-E-Mails sind fehlgeschlagen",
+        "body": "In den letzten {{window_hours}}-Stunden sind bei den E-Mail-Benachrichtigungen in der Warteschlange {{count}} Fehler aufgetreten."
+      },
+      "notification_queue_suppressed_recently": {
+        "title": "Benachrichtigungs-E-Mails unterdrückt",
+        "body": "{{count}}-Benachrichtigungs-E-Mails in der Warteschlange wurden in den letzten {{window_hours}}-Stunden unterdrückt."
+      },
+      "notification_queue_missing_tenant_id": {
+        "title": "Benachrichtigungswarteschlange fehlt Mandant",
+        "body": "{{count}}-Benachrichtigungen in der Warteschlange stehen aus oder werden ohne Mandantenbesitz verarbeitet. Sie können bis zur Reparatur nicht zuverlässig verlegt werden."
+      },
+      "notification_queue_tenant_mismatch": {
+        "title": "Nichtübereinstimmung des Mieters in der Benachrichtigungswarteschlange",
+        "body": "{{count}}-Benachrichtigungen in der Warteschlange gehören zu einem anderen Mandanten als ihr Empfängerbenutzer. Bei diesen Zeilen besteht das Risiko einer Weiterleitung an einen falschen Mandanten."
+      },
+      "notifications_missing_tenant_id": {
+        "title": "Benachrichtigungen fehlender Mieter",
+        "body": "{{count}}-In-App-Benachrichtigungen haben keinen Mandantenbesitz, sodass Benutzer sie möglicherweise nicht konsistent sehen."
+      },
+      "notifications_tenant_mismatch": {
+        "title": "Benachrichtigungen: Nichtübereinstimmung der Mieter",
+        "body": "{{count}}-In-App-Benachrichtigungen gehören zu einem anderen Mandanten als ihr Empfängerbenutzer. Bei diesen Zeilen besteht die Gefahr von mandantenübergreifenden Sichtbarkeitsfehlern."
+      },
+      "notification_queue_marked_sent_without_email_log": {
+        "title": "Benachrichtigung als ohne E-Mail-Beweis gesendet markiert",
+        "body": "{{count}}-Benachrichtigungen in der Warteschlange wurden in den letzten {{window_hours}}-Stunden als gesendet markiert, ohne dass ein passender E-Mail-Protokolleintrag vorhanden war."
+      },
+      "newsletter_queue_missing_tenant_id": {
+        "title": "Newsletter-Warteschlange fehlt Mandant",
+        "body": "{{count}}-Newsletter-Warteschlangenzeilen haben keinen Mandantenbesitz. Sie können bis zur Reparatur nicht zuverlässig verlegt werden."
+      },
+      "newsletter_queue_tenant_mismatch": {
+        "title": "Nicht übereinstimmende Mieter in der Newsletter-Warteschlange",
+        "body": "{{count}} Newsletter-Warteschlangenzeilen gehören zu einem anderen Mandanten als ihr Newsletter. Bei diesen Zeilen besteht das Risiko einer Weiterleitung an einen falschen Mandanten."
+      },
+      "newsletter_queue_stuck_pending": {
+        "title": "Newsletter-E-Mails bleiben hängen",
+        "body": "Die Empfänger des {{count}}-Newsletters warten seit mehr als {{minutes}} Minuten."
+      },
+      "newsletter_queue_failed_recently": {
+        "title": "Newsletter-E-Mails sind fehlgeschlagen",
+        "body": "Die Empfänger des {{count}}-Newsletters sind in den letzten {{window_hours}}-Stunden fehlgeschlagen."
+      },
+      "newsletter_queue_marked_sent_without_email_log": {
+        "title": "Newsletter als „ohne E-Mail-Nachweis gesendet“ gekennzeichnet",
+        "body": "{{count}}-Newsletterempfänger wurden in den letzten {{window_hours}}-Stunden ohne einen passenden erfolgreichen E-Mail-Protokolleintrag als gesendet markiert."
+      },
+      "event_reminders_overdue_pending": {
+        "title": "Terminerinnerungen überfällig",
+        "body": "{{count}}-Ereigniserinnerungen stehen mehr als {{minutes}} Minuten nach der geplanten Sendezeit immer noch aus."
+      },
+      "event_reminders_failed_recently": {
+        "title": "Terminerinnerungen sind fehlgeschlagen",
+        "body": "{{count}}-Ereigniserinnerungen sind in den letzten {{window_hours}}-Stunden fehlgeschlagen."
+      },
+      "event_reminders_marked_sent_without_email_log": {
+        "title": "Als „Versand ohne E-Mail-Nachweis“ markierte Terminerinnerungen",
+        "body": "{{count}}-E-Mail-Ereigniserinnerungen wurden als gesendet markiert, ohne dass in den letzten {{window_hours}}-Stunden ein passender erfolgreicher E-Mail-Protokolleintrag vorhanden war."
+      },
+      "marketplace_report_received_without_notification_outbox": {
+        "title": "Die E-Mail mit dem Eingang des Marketplace-Berichts wurde nicht in die Warteschlange gestellt",
+        "body": "{{count}}-Marktplatzberichte wurden in den letzten {{window_hours}}-Stunden ohne entsprechende E-Mail-Benachrichtigungszeile für den Empfang empfangen."
+      },
+      "marketplace_report_acknowledged_without_notification_outbox": {
+        "title": "Die Bestätigungs-E-Mail für den Marketplace-Bericht wurde nicht in die Warteschlange gestellt",
+        "body": "{{count}}-Marktplatzberichte wurden in den letzten {{window_hours}}-Stunden ohne entsprechende Bestätigungs-E-Mail-Benachrichtigungszeile bestätigt."
+      },
+      "marketplace_report_resolved_without_notification_outbox": {
+        "title": "Die E-Mail zur Lösung des Marketplace-Berichts wurde nicht in die Warteschlange gestellt",
+        "body": "{{count}}-Marktplatzberichte wurden in den letzten {{window_hours}}-Stunden ohne eine passende E-Mail-Benachrichtigungszeile zur Lösung gelöst."
+      },
+      "marketplace_report_appealed_without_notification_outbox": {
+        "title": "Die Einspruchs-E-Mail zum Marketplace-Bericht wurde nicht in die Warteschlange gestellt",
+        "body": "In den letzten {{window_hours}}-Stunden wurden Einsprüche gegen den {{count}}-Marktplatzbericht eingereicht, ohne dass eine entsprechende E-Mail-Benachrichtigungszeile für den Einspruchsbeleg vorhanden war."
+      },
+      "marketplace_report_appeal_resolved_without_notification_outbox": {
+        "title": "Die E-Mail zur Beschwerdelösung für den Marketplace-Bericht wurde nicht in die Warteschlange gestellt",
+        "body": "Einsprüche gegen {{count}}-Marktplatzberichte wurden in den letzten {{window_hours}}-Stunden gelöst, ohne dass eine entsprechende E-Mail-Benachrichtigungszeile für die endgültige Entscheidung vorhanden war."
+      },
+      "federation_connection_without_email_evidence": {
+        "title": "E-Mail-Beweise für die Föderationsverbindung fehlen",
+        "body": "{{count}}-Verbundverbindungsereignisse haben in den letzten {{window_hours}}-Stunden keine Beweise für eine erfolgreiche E-Mail-Zustellung vorliegen."
+      },
+      "federation_connection_without_bell_evidence": {
+        "title": "Beweise für die Benachrichtigung über die Verbundverbindung fehlen",
+        "body": "{{count}}-Verbundverbindungsereignisse haben in den letzten {{window_hours}}-Stunden keine In-App-Benachrichtigungsnachweise erbracht."
+      },
+      "federation_review_without_email_evidence": {
+        "title": "Beweise für die Überprüfungs-E-Mail der Föderation fehlen",
+        "body": "Die föderierten Überprüfungen von {{count}} haben in den letzten {{window_hours}}-Stunden keine erfolgreichen oder absichtlich übersprungenen E-Mail-Beweise erhalten."
+      },
+      "federation_review_without_bell_evidence": {
+        "title": "Beweise für die Benachrichtigung über die Überprüfung der Föderation fehlen",
+        "body": "Für die Verbundrezensionen von {{count}} liegen in den letzten {{window_hours}}-Stunden keine In-App-Benachrichtigungsnachweise vor."
+      },
+      "member_subscription_event_without_email_evidence": {
+        "title": "Der E-Mail-Beweis für das Mitgliedsabonnement fehlt",
+        "body": "Für {{count}}-Abrechnungsereignisse für Mitgliederabonnements liegt in den letzten {{window_hours}}-Stunden kein Nachweis über eine erfolgreiche E-Mail-Zustellung vor."
+      },
+      "stripe_donation_without_receipt_email_evidence": {
+        "title": "Der E-Mail-Beweis für die Spendenquittung fehlt",
+        "body": "{{count}} abgeschlossen. Stripe-Spenden haben in den letzten {{window_hours}}-Stunden keine E-Mail-Bestätigung für den erfolgreichen Empfang erhalten."
+      },
+      "critical_email_attempts_missing_tenant_context": {
+        "title": "Kritische E-Mail ohne Mandantenkontext",
+        "body": "Kritische {{count}}-E-Mail-Versuche wurden in den letzten {{window_hours}}-Stunden ohne Mandantenkontext protokolliert."
+      },
+      "sendgrid_events_not_confirming_delivery": {
+        "title": "SendGrid-Übermittlungsereignisse fehlen",
+        "body": "{{count}} SendGrid-E-Mails werden nach mehr als {{hours}} Stunden weiterhin akzeptiert, aber nicht bestätigt."
+      },
+      "tenant_gmail_override_incomplete": {
+        "title": "Die Gmail-Konfiguration des Mandanten ist unvollständig",
+        "body": "Dieser Mandant verfügt über eine unvollständige Gmail-E-Mail-Anbieterüberschreibung."
+      },
+      "tenant_smtp_override_incomplete": {
+        "title": "Die SMTP-Konfiguration des Mandanten ist unvollständig",
+        "body": "Dieser Mandant verfügt über eine unvollständige SMTP-E-Mail-Anbieterüberschreibung."
+      },
+      "tenant_sendgrid_override_missing_api_key": {
+        "title": "Mandant SendGrid überschreibt fehlenden API-Schlüssel",
+        "body": "Dieser Mandant ist so eingestellt, dass er eine SendGrid-Überschreibung verwendet, verfügt aber über keinen Mandanten-API-Schlüssel, sodass der Plattform-Fallback verwendet wird."
+      },
+      "tenant_provider_config_check_failed": {
+        "title": "Die Prüfung des Mieteranbieters ist fehlgeschlagen",
+        "body": "Die Konfigurationsprüfung des E-Mail-Anbieters konnte für diesen Mandanten nicht abgeschlossen werden."
+      },
+      "direct_email_send_paths_remaining": {
+        "title": "Die alten direkten E-Mail-Pfade bleiben bestehen",
+        "body": "{{count}}-Roh-E-Mail-Versandpfade umgehen weiterhin den einheitlichen Benachrichtigungs-Dispatcher. Verschärfen Sie diese Pfade weiter, bis jedes Modul den überprüfbaren Dispatcher passiert."
+      },
+      "email_dispatch_missing_explicit_tenant": {
+        "title": "Der Dispatcher-E-Mail fehlt ein expliziter Mandant",
+        "body": "{{count}}-E-Mail-Dispatcher-Anrufseiten stützen sich immer noch auf den abgeleiteten Mandantenkontext. Übergeben Sie „tenant_id“ oder „mieterId“ explizit, damit jeder in der Warteschlange befindliche, Cron-, Webhook- und mandantenübergreifende Versand überprüfbar ist."
+      },
+      "email_trigger_audit_failed": {
+        "title": "Die Prüfung des E-Mail-Triggers ist fehlgeschlagen",
+        "body": "Die Prüfung des E-Mail-Triggers konnte nicht abgeschlossen werden."
       }
+    },
+    "title": "E-Mail-Zustellbarkeit",
+    "subtitle": "Verfolgen Sie Triggernachweise, Sendeversuche, Anbieterstatus und unterdrückte Empfänger für diesen Mandanten.",
+    "trigger_score": "Triggerpunktzahl",
+    "trigger_coverage": "{{issues}}-Probleme in allen von {{count}} überwachten Flüssen",
+    "actions": {
+      "refresh": "Aktualisieren",
+      "reset": "Zurücksetzen",
+      "search": "Suchen"
+    },
+    "windows": {
+      "1": "Letzte 24 Stunden",
+      "7": "Letzte 7 Tage",
+      "30": "Letzte 30 Tage",
+      "90": "Letzte 90 Tage"
+    },
+    "filters": {
+      "all": "Alle",
+      "category": "Kategorie",
+      "email": "E-Mail",
+      "recipient": "Empfänger-E-Mail",
+      "reason": "Grund",
+      "since": "Seit",
+      "status": "Status",
+      "until": "Bis",
+      "window": "Zeitfenster"
+    },
+    "metrics": {
+      "accepted": "Akzeptiert",
+      "bad_outcomes": "{{count}} ist fehlgeschlagen, zurückgewiesen oder unterdrückt",
+      "bounced": "Abgeprallt",
+      "delivered": "Geliefert",
+      "not_available": "Keine Trigger-Audit-Daten",
+      "total": "Gesamt",
+      "trigger_score": "Triggerpunktzahl",
+      "unconfirmed": "{{count}} akzeptiert, aber nicht bestätigt",
+      "webhook_confirmed": "Bestätigt durch den Webhook des Anbieters",
+      "window_days": "{{days}}-Tagesfenster"
+    },
+    "status": {
+      "bounced": "Abgeprallt",
+      "delivered": "Geliefert",
+      "failed": "Fehlgeschlagen",
+      "pending": "Ausstehend",
+      "processing": "Verarbeitung",
+      "queued": "In der Warteschlange",
+      "sent": "Gesendet",
+      "suppressed": "Unterdrückt",
+      "unknown": "Unbekannter Status: {{status}}"
+    },
+    "severity": {
+      "critical": "Kritisch",
+      "info": "Info",
+      "warning": "Warnung"
+    },
+    "status_breakdown": {
+      "title": "Statusaufschlüsselung",
+      "subtitle": "Eine kompakte Ansicht der Sendeergebnisse des aktuellen Mandanten für das ausgewählte Fenster."
+    },
+    "trigger_health": {
+      "critical": "Kritische Triggerprobleme",
+      "monitored": "Überwachte Flüsse",
+      "warning": "Probleme mit der Auslösung von Warnungen"
+    },
+    "trigger_issues": {
+      "title": "Audit-Probleme auslösen",
+      "subtitle": "Quellzeilen, in denen eine E-Mail oder Benachrichtigung hätte ausgelöst werden sollen, die Prüfung jedoch keine zuverlässigen Zustellungsnachweise aufweist.",
+      "table_label": "E-Mail-Trigger-Audit-Probleme",
+      "empty": "Keine Trigger-Überwachungsprobleme für das ausgewählte Fenster.",
+      "all_tenants": "Alle Mieter",
+      "columns": {
+        "event": "Ereignis",
+        "issue": "Ausgabe",
+        "module": "Modul",
+        "params": "Beweis",
+        "severity": "Schwere",
+        "tenant": "Mieter"
+      }
+    },
+    "queues": {
+      "title": "Warteschlangendiagnose",
+      "subtitle": "Zeilen mit fehlgeschlagenen, unterdrückten oder veralteten E-Mail-Warteschlangen für diesen Mandanten.",
+      "table_label": "Diagnose der E-Mail-Warteschlange",
+      "empty": "Keine fehlgeschlagenen, unterdrückten oder veralteten E-Mail-Warteschlangenzeilen.",
+      "columns": {
+        "attempts": "Versuche",
+        "category": "Kategorie",
+        "error": "Fehler",
+        "last_attempt": "Letzter Versuch",
+        "recipient": "Empfänger",
+        "source": "Quelle",
+        "status": "Status"
+      },
+      "sources": {
+        "civic_digest_delivery_claims": "Civic Digest-Anspruch",
+        "event_reminder_delivery_claims": "Anspruch auf eine Veranstaltungserinnerung",
+        "event_reminders": "Ereigniserinnerung",
+        "federation_inbound_connections": "Föderationsverbindung",
+        "federation_messages": "Föderationsbotschaft",
+        "federation_transactions": "Föderationstransaktion",
+        "goal_reminders": "Zielerinnerung",
+        "job_interviews": "Erinnerung an Vorstellungsgespräche",
+        "listing_expiry_reminders_sent": "Erinnerung an den Ablauf des Angebots",
+        "marketplace_disputes": "Marktplatzstreit",
+        "marketplace_order_notification_deliveries": "Benachrichtigung über Marktplatzbestellungen",
+        "marketplace_report_notifications": "Marktplatzbericht",
+        "marketplace_seller_ratings": "Bewertung des Marktplatzverkäufers",
+        "member_subscription_events": "Abrechnung von Mitgliederabonnements",
+        "newsletter_queue": "Newsletter",
+        "notification_queue": "Benachrichtigung",
+        "notifications": "Benachrichtigungsbeweis",
+        "reviews": "Verbundrezension",
+        "transaction_notification_deliveries": "Transaktionsbenachrichtigung",
+        "user_safeguarding_preferences": "Sicherstellende Überprüfung",
+        "vol_donations": "Spendenquittung",
+        "vol_reminder_delivery_claims": "Ehrenamtlicher Erinnerungsanspruch",
+        "vol_reminders_sent": "Erinnerung an Freiwillige"
+      }
+    },
+    "logs": {
+      "title": "E-Mail-Versuchsprotokoll",
+      "subtitle": "Durchsuchen Sie jeden Sendeversuch nach Empfänger, Kategorie, Status und Datum.",
+      "table_label": "E-Mail-Versuchsprotokoll",
+      "empty": "Keine E-Mails entsprechen den aktuellen Filtern.",
+      "columns": {
+        "category": "Kategorie",
+        "delivered": "Geliefert",
+        "error": "Fehler",
+        "provider": "Anbieter",
+        "recipient": "Empfänger",
+        "sent": "Gesendet",
+        "status": "Status",
+        "subject": "Thema"
+      }
+    },
+    "pagination": {
+      "page_size": "Zeilen pro Seite",
+      "summary": "{{from}}-{{to}} von {{total}}"
+    },
+    "suppressions": {
+      "title": "Unterdrückungsliste",
+      "subtitle": "Plattformweite Empfänger, die von Anbietern zurückgesendet, blockiert, ungültig gemacht oder abgemeldet wurden.",
+      "table_label": "E-Mail-Unterdrückungsliste",
+      "empty": "Keine unterdrückten Empfänger entsprechen den aktuellen Filtern.",
+      "confirm_remove": "{{email}} aus der Unterdrückungsliste entfernen? Sie haben dann wieder Anspruch auf den Empfang von E-Mails.",
+      "remove": "Unterdrückung entfernen",
+      "remove_failed": "Die Unterdrückung konnte nicht entfernt werden.",
+      "removed": "{{email}} entfernt.",
+      "columns": {
+        "actions": "Aktionen",
+        "detail": "Detail",
+        "email": "E-Mail",
+        "reason": "Grund",
+        "suppressed_at": "Unterdrückt bei"
+      },
+      "reasons": {
+        "block": "Block",
+        "bounce": "Prallen",
+        "invalid": "Ungültig",
+        "spam_report": "Spam-Bericht",
+        "unsubscribe": "Abbestellen",
+        "unknown": "Unbekannter Grund: {{reason}}"
+      }
+    },
+    "empty": {
+      "no_statuses": "Noch keine Status"
     }
   },
   "help_drawer": {

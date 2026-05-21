@@ -9985,7 +9985,349 @@
       "email_warning_check_failed": {
         "title": "Warning check failed",
         "body": "Email warning checks could not complete."
+      },
+      "notification_queue_suppressed": {
+        "title": "E-mailmeldingen zijn onderdrukt",
+        "body": "{{count}} notificatie-e-mails in de wachtrij zijn onderdrukt in de afgelopen {{window_hours}}-uren."
+      },
+      "newsletter_queue_failures": {
+        "title": "Fouten in de wachtrij voor nieuwsbrieven",
+        "body": "Ontvangers van de {{count}}-nieuwsbrief zijn mislukt in de afgelopen {{window_hours}}-uren."
+      },
+      "newsletter_queue_stale_processing": {
+        "title": "Verouderde wachtrij voor nieuwsbrieven",
+        "body": "Ontvangers van de {{count}}-nieuwsbrief zijn al meer dan {{minutes}}-minuten bezig met het verwerken ervan."
+      },
+      "new_users_without_account_email_attempt": {
+        "title": "Account-e-mailadres is niet geactiveerd",
+        "body": "{{count}} nieuwe gebruikers hebben in de afgelopen {{window_hours}}-uren geen accountactivatie, verificatie, goedkeuring of welkomst-e-mailpoging gehad."
+      },
+      "password_resets_without_email_attempt": {
+        "title": "E-mail voor het opnieuw instellen van het wachtwoord is niet geactiveerd",
+        "body": "{{count}} tokens voor het opnieuw instellen van het wachtwoord hebben geen overeenkomende e-mailpogingen voor het opnieuw instellen van het wachtwoord gedaan in de afgelopen {{window_hours}}-uren."
+      },
+      "group_invites_without_email_attempt": {
+        "title": "E-mail met groepsuitnodiging is niet geactiveerd",
+        "body": "{{count}} e-mailgroepuitnodigingen hebben geen overeenkomende e-mailpoging voor groepsuitnodigingen gehad in de afgelopen {{window_hours}}-uren."
+      },
+      "group_members_tenant_mismatch": {
+        "title": "Tenant komt niet overeen met groepslidmaatschap",
+        "body": "{{count}}-groepslidmaatschappen behoren tot een andere tenant dan hun groep. Deze rijen riskeren een verkeerde tenantrol en meldingsroutering."
+      },
+      "group_member_joined_without_owner_notification_queue": {
+        "title": "Melding voor groepsdeelname is niet in de wachtrij geplaatst",
+        "body": "{{count}}-groepslidmaatschappen zijn in de afgelopen {{window_hours}}-uren actief geworden zonder een overeenkomende wachtrijrij voor eigenaarmeldingen."
+      },
+      "instant_notifications_stuck_pending": {
+        "title": "Instant e-mails lopen vast",
+        "body": "E-mails met onmiddellijke {{count}}-meldingen zijn al meer dan {{minutes}}-minuten in behandeling."
+      },
+      "notification_queue_failed_recently": {
+        "title": "E-mailmeldingen zijn mislukt",
+        "body": "{{count}} e-mailmeldingen in de wachtrij zijn mislukt in de afgelopen {{window_hours}}-uren."
+      },
+      "notification_queue_suppressed_recently": {
+        "title": "E-mailmeldingen zijn onderdrukt",
+        "body": "{{count}} notificatie-e-mails in de wachtrij zijn onderdrukt in de afgelopen {{window_hours}}-uren."
+      },
+      "notification_queue_missing_tenant_id": {
+        "title": "Meldingswachtrij ontbrekende tenant",
+        "body": "{{count}} meldingen in de wachtrij zijn in behandeling of worden verwerkt zonder eigenaar van de huurder. Ze kunnen pas op betrouwbare wijze worden gerouteerd als ze zijn gerepareerd."
+      },
+      "notification_queue_tenant_mismatch": {
+        "title": "Meldingswachtrij-tenant komt niet overeen",
+        "body": "{{count}} meldingen in de wachtrij behoren tot een andere tenant dan de ontvangende gebruiker. Deze rijen lopen het risico dat er verkeerde tenants worden verzonden."
+      },
+      "notifications_missing_tenant_id": {
+        "title": "Meldingen ontbrekende huurder",
+        "body": "{{count}} in-app-meldingen zijn niet eigendom van de tenant, waardoor gebruikers deze mogelijk niet consistent zien."
+      },
+      "notifications_tenant_mismatch": {
+        "title": "Meldingen dat huurder niet overeenkomt",
+        "body": "{{count}} in-app-meldingen behoren tot een andere tenant dan de ontvangende gebruiker. Deze rijen riskeren fouten in de zichtbaarheid van meerdere tenants."
+      },
+      "notification_queue_marked_sent_without_email_log": {
+        "title": "Melding gemarkeerd als verzonden zonder e-mailbewijs",
+        "body": "{{count}}-meldingen in de wachtrij zijn gemarkeerd als verzonden zonder een overeenkomend e-maillogboekitem in de afgelopen {{window_hours}}-uren."
+      },
+      "newsletter_queue_missing_tenant_id": {
+        "title": "Nieuwsbriefwachtrij ontbrekende huurder",
+        "body": "{{count}}-nieuwsbriefwachtrijrijen hebben geen tenanteigendom. Ze kunnen pas op betrouwbare wijze worden gerouteerd als ze zijn gerepareerd."
+      },
+      "newsletter_queue_tenant_mismatch": {
+        "title": "Huurder in wachtrij voor nieuwsbrief komt niet overeen",
+        "body": "{{count}} wachtrijrijen voor de nieuwsbrief behoren tot een andere tenant dan hun nieuwsbrief. Deze rijen lopen het risico dat er verkeerde tenants worden verzonden."
+      },
+      "newsletter_queue_stuck_pending": {
+        "title": "Nieuwsbrief e-mails blijven hangen",
+        "body": "Ontvangers van de {{count}}-nieuwsbrief zijn al meer dan {{minutes}}-minuten in behandeling."
+      },
+      "newsletter_queue_failed_recently": {
+        "title": "Nieuwsbrief-e-mails zijn mislukt",
+        "body": "Ontvangers van de {{count}}-nieuwsbrief zijn mislukt in de afgelopen {{window_hours}}-uren."
+      },
+      "newsletter_queue_marked_sent_without_email_log": {
+        "title": "Nieuwsbrief gemarkeerd als verzonden zonder e-mailbewijs",
+        "body": "{{count}}-nieuwsbriefontvangers zijn gemarkeerd als verzonden zonder een overeenkomende succesvolle e-mailloginvoer in de afgelopen {{window_hours}}-uren."
+      },
+      "event_reminders_overdue_pending": {
+        "title": "Herinneringen voor evenementen zijn te laat",
+        "body": "{{count}}-gebeurtenisherinneringen zijn meer dan {{minutes}}-minuten na de geplande verzendtijd nog steeds in behandeling."
+      },
+      "event_reminders_failed_recently": {
+        "title": "Afspraakherinneringen zijn mislukt",
+        "body": "{{count}}-gebeurtenisherinneringen zijn mislukt in de afgelopen {{window_hours}}-uren."
+      },
+      "event_reminders_marked_sent_without_email_log": {
+        "title": "Afspraakherinneringen gemarkeerd als verzonden zonder e-mailbewijs",
+        "body": "{{count}} herinneringen voor e-mailgebeurtenissen zijn in de afgelopen {{window_hours}}-uren gemarkeerd als verzonden zonder een overeenkomende succesvolle e-mailloginvoer."
+      },
+      "marketplace_report_received_without_notification_outbox": {
+        "title": "De ontvangst-e-mail van het Marketplace-rapport stond niet in de wachtrij",
+        "body": "In de afgelopen {{window_hours}}-uren zijn {{count}}-marktplaatsrapporten ontvangen zonder een overeenkomende e-mailmeldingsrij voor ontvangstbewijzen."
+      },
+      "marketplace_report_acknowledged_without_notification_outbox": {
+        "title": "De e-mail ter bevestiging van het marktplaatsrapport is niet in de wachtrij geplaatst",
+        "body": "{{count}}-marktplaatsrapporten zijn in de afgelopen {{window_hours}}-uren bevestigd zonder een overeenkomende bevestigings-e-mailmeldingsrij."
+      },
+      "marketplace_report_resolved_without_notification_outbox": {
+        "title": "De e-mail met oplossing voor het marktplaatsrapport is niet in de wachtrij geplaatst",
+        "body": "{{count}}-marktplaatsrapporten zijn in de afgelopen {{window_hours}}-uren opgelost zonder een rij met overeenkomende e-mailmeldingen."
+      },
+      "marketplace_report_appealed_without_notification_outbox": {
+        "title": "Bezwaar-e-mail voor marktplaatsrapport stond niet in de wachtrij",
+        "body": "In de afgelopen {{window_hours}}-uren zijn er beroepen tegen {{count}}-marktrapporten ingediend zonder een overeenkomende rij met e-mailmeldingen voor de ontvangst van het bezwaar."
+      },
+      "marketplace_report_appeal_resolved_without_notification_outbox": {
+        "title": "Marktplaats rapport bezwaar oplossing e-mail niet in de wachtrij geplaatst",
+        "body": "Bezwaren tegen {{count}}-marktrapporten zijn in de afgelopen {{window_hours}}-uren opgelost zonder een rij met overeenkomende e-mailmeldingen over de definitieve beslissing."
+      },
+      "federation_connection_without_email_evidence": {
+        "title": "E-mailbewijs van federatieverbinding ontbreekt",
+        "body": "{{count}} federatieve verbindingsgebeurtenissen hebben geen bewijs van succesvolle e-mailbezorging in de afgelopen {{window_hours}}-uren."
+      },
+      "federation_connection_without_bell_evidence": {
+        "title": "Bewijs van melding van federatieverbinding ontbreekt",
+        "body": "{{count}} federatieve verbindingsgebeurtenissen hebben geen in-app-meldingsbewijs opgeleverd in de afgelopen {{window_hours}}-uren."
+      },
+      "federation_review_without_email_evidence": {
+        "title": "E-mailbewijs van federatiebeoordeling ontbreekt",
+        "body": "{{count}} federatieve beoordelingen hebben geen succesvol of opzettelijk overgeslagen e-mailbewijs gevonden in de afgelopen {{window_hours}}-uren."
+      },
+      "federation_review_without_bell_evidence": {
+        "title": "Bewijs van kennisgeving van federatiebeoordeling ontbreekt",
+        "body": "{{count}} federatieve beoordelingen hebben geen in-app-meldingsbewijs opgeleverd in de afgelopen {{window_hours}}-uren."
+      },
+      "member_subscription_event_without_email_evidence": {
+        "title": "E-mailbewijs van lidmaatschapsabonnement ontbreekt",
+        "body": "Factureringsgebeurtenissen voor {{count}}-ledenabonnementen hebben geen bewijs van succesvolle e-mailbezorging in de afgelopen {{window_hours}}-uren."
+      },
+      "stripe_donation_without_receipt_email_evidence": {
+        "title": "E-mailbewijs van donatieontvangst ontbreekt",
+        "body": "{{count}} voltooide Stripe-donaties hebben geen succesvol ontvangstbewijs per e-mail in de afgelopen {{window_hours}}-uren."
+      },
+      "critical_email_attempts_missing_tenant_context": {
+        "title": "Kritieke e-mail waarin de tenantcontext ontbreekt",
+        "body": "{{count}} kritieke e-mailpogingen zijn geregistreerd zonder tenantcontext in de afgelopen {{window_hours}}-uren."
+      },
+      "sendgrid_events_not_confirming_delivery": {
+        "title": "SendGrid-leveringsgebeurtenissen ontbreken",
+        "body": "{{count}} SendGrid e-mails blijven na meer dan {{hours}}-uren geaccepteerd maar onbevestigd."
+      },
+      "tenant_gmail_override_incomplete": {
+        "title": "Tenant Gmail-configuratie onvolledig",
+        "body": "Deze tenant heeft een onvolledige overschrijving van de Gmail-e-mailprovider."
+      },
+      "tenant_smtp_override_incomplete": {
+        "title": "Tenant SMTP-configuratie onvolledig",
+        "body": "Deze tenant heeft een onvolledige overschrijving van de SMTP-e-mailprovider."
+      },
+      "tenant_sendgrid_override_missing_api_key": {
+        "title": "Tenant SendGrid overschrijft de ontbrekende API-sleutel",
+        "body": "Deze tenant is ingesteld op het gebruik van een SendGrid-overschrijving, maar heeft geen API-sleutel van de tenant, dus de fallback van het platform wordt gebruikt."
+      },
+      "tenant_provider_config_check_failed": {
+        "title": "Controle van huurderprovider is mislukt",
+        "body": "De configuratiecontrole van de e-mailprovider kan voor deze tenant niet worden voltooid."
+      },
+      "direct_email_send_paths_remaining": {
+        "title": "Verouderde directe e-mailpaden blijven bestaan",
+        "body": "{{count}} onbewerkte e-mailverzendpaden omzeilen nog steeds de uniforme notificatieverzender. Blijf deze paden versterken totdat elke module door de controleerbare coördinator gaat."
+      },
+      "email_dispatch_missing_explicit_tenant": {
+        "title": "In het e-mailadres van de verzender ontbreekt de expliciete tenant",
+        "body": "{{count}}-oproepsites voor e-mailverzenders zijn nog steeds afhankelijk van afgeleide tenantcontext. Geef tenant_id of tenantId expliciet door, zodat elke verzending in de wachtrij, cron, webhook en cross-tenant controleerbaar is."
+      },
+      "email_trigger_audit_failed": {
+        "title": "Controle van e-mailtrigger mislukt",
+        "body": "De e-mailtriggeraudit kon niet worden voltooid."
       }
+    },
+    "title": "E-mailbezorgbaarheid",
+    "subtitle": "Volg triggerbewijs, verzendpogingen, providerstatus en onderdrukte ontvangers voor deze tenant.",
+    "trigger_score": "Triggerscore",
+    "trigger_coverage": "{{issues}}-problemen in de door {{count}} bewaakte stromen",
+    "actions": {
+      "refresh": "Vernieuwen",
+      "reset": "Opnieuw instellen",
+      "search": "Zoekopdracht"
+    },
+    "windows": {
+      "1": "Afgelopen 24 uur",
+      "7": "Laatste 7 dagen",
+      "30": "Laatste 30 dagen",
+      "90": "Laatste 90 dagen"
+    },
+    "filters": {
+      "all": "Alle",
+      "category": "Categorie",
+      "email": "E-mail",
+      "recipient": "E-mailadres van ontvanger",
+      "reason": "Reden",
+      "since": "Sinds",
+      "status": "Status",
+      "until": "Tot",
+      "window": "Tijdvenster"
+    },
+    "metrics": {
+      "accepted": "Geaccepteerd",
+      "bad_outcomes": "{{count}} is mislukt, gestuiterd of onderdrukt",
+      "bounced": "Gestuiterd",
+      "delivered": "Afgeleverd",
+      "not_available": "Geen trigger-auditgegevens",
+      "total": "Totaal",
+      "trigger_score": "Triggerscore",
+      "unconfirmed": "{{count}} geaccepteerd maar niet bevestigd",
+      "webhook_confirmed": "Bevestigd door webhook van provider",
+      "window_days": "{{days}} dagvenster"
+    },
+    "status": {
+      "bounced": "Gestuiterd",
+      "delivered": "Afgeleverd",
+      "failed": "Mislukt",
+      "pending": "In behandeling",
+      "processing": "Verwerking",
+      "queued": "In de wachtrij",
+      "sent": "Verstuurd",
+      "suppressed": "Onderdrukt",
+      "unknown": "Onbekende status: {{status}}"
+    },
+    "severity": {
+      "critical": "Kritisch",
+      "info": "Info",
+      "warning": "Waarschuwing"
+    },
+    "status_breakdown": {
+      "title": "Statusverdeling",
+      "subtitle": "Een compact overzicht van de verzendresultaten van de huidige tenant voor het geselecteerde venster."
+    },
+    "trigger_health": {
+      "critical": "Kritieke triggerproblemen",
+      "monitored": "Gecontroleerde stromen",
+      "warning": "Waarschuwingstriggerproblemen"
+    },
+    "trigger_issues": {
+      "title": "Auditproblemen activeren",
+      "subtitle": "Bronrijen waarin een e-mail of melding had moeten worden verzonden, maar de audit geen betrouwbaar afleveringsbewijs bevat.",
+      "table_label": "E-mail triggert auditproblemen",
+      "empty": "Geen trigger-auditproblemen voor het geselecteerde venster.",
+      "all_tenants": "Alle huurders",
+      "columns": {
+        "event": "Evenement",
+        "issue": "Probleem",
+        "module": "Module",
+        "params": "Bewijs",
+        "severity": "Ernst",
+        "tenant": "Huurder"
+      }
+    },
+    "queues": {
+      "title": "Wachtrijdiagnostiek",
+      "subtitle": "Mislukte, onderdrukte of verouderde wachtrijrijen voor e-mail in behandeling voor deze tenant.",
+      "table_label": "Diagnostiek van e-mailwachtrijen",
+      "empty": "Geen mislukte, onderdrukte of verouderde rijen voor e-mailwachtrijen.",
+      "columns": {
+        "attempts": "Pogingen",
+        "category": "Categorie",
+        "error": "Fout",
+        "last_attempt": "Laatste poging",
+        "recipient": "Ontvanger",
+        "source": "Bron",
+        "status": "Status"
+      },
+      "sources": {
+        "civic_digest_delivery_claims": "Civic Digest-claim",
+        "event_reminder_delivery_claims": "Claim voor gebeurtenisherinnering",
+        "event_reminders": "Herinnering voor evenement",
+        "federation_inbound_connections": "Federatie-verbinding",
+        "federation_messages": "Federatie bericht",
+        "federation_transactions": "Transactie van de Federatie",
+        "goal_reminders": "Doelherinnering",
+        "job_interviews": "Herinnering sollicitatiegesprek",
+        "listing_expiry_reminders_sent": "Herinnering voor het verlopen van de aanbieding",
+        "marketplace_disputes": "Marktplaats geschil",
+        "marketplace_order_notification_deliveries": "Melding van bestelling op de marktplaats",
+        "marketplace_report_notifications": "Marktplaatsrapport",
+        "marketplace_seller_ratings": "Verkopersbeoordeling op Marktplaats",
+        "member_subscription_events": "Facturering van ledenabonnementen",
+        "newsletter_queue": "Nieuwsbrief",
+        "notification_queue": "Kennisgeving",
+        "notifications": "Bewijs van kennisgeving",
+        "reviews": "Federatieve beoordeling",
+        "transaction_notification_deliveries": "Transactiemelding",
+        "user_safeguarding_preferences": "Beoordeling veiligstellen",
+        "vol_donations": "Donatie ontvangstbewijs",
+        "vol_reminder_delivery_claims": "Herinneringsclaim voor vrijwilligers",
+        "vol_reminders_sent": "Herinnering vrijwilligers"
+      }
+    },
+    "logs": {
+      "title": "Logboek van e-mailpogingen",
+      "subtitle": "Zoek elke verzendpoging op ontvanger, categorie, status en datum.",
+      "table_label": "Logboek van e-mailpogingen",
+      "empty": "Er zijn geen e-mails die overeenkomen met de huidige filters.",
+      "columns": {
+        "category": "Categorie",
+        "delivered": "Afgeleverd",
+        "error": "Fout",
+        "provider": "Aanbieder",
+        "recipient": "Ontvanger",
+        "sent": "Verstuurd",
+        "status": "Status",
+        "subject": "Onderwerp"
+      }
+    },
+    "pagination": {
+      "page_size": "Rijen per pagina",
+      "summary": "{{from}}-{{to}} van {{total}}"
+    },
+    "suppressions": {
+      "title": "Onderdrukkingslijst",
+      "subtitle": "Platformbrede ontvangers die door providers zijn geweigerd, geblokkeerd, ongeldig gemaakt of afgemeld.",
+      "table_label": "E-mailonderdrukkingslijst",
+      "empty": "Er zijn geen onderdrukte ontvangers die overeenkomen met de huidige filters.",
+      "confirm_remove": "{{email}} verwijderen uit de onderdrukkingslijst? Ze komen opnieuw in aanmerking voor het ontvangen van e-mail.",
+      "remove": "Onderdrukking verwijderen",
+      "remove_failed": "Kan de onderdrukking niet verwijderen.",
+      "removed": "{{email}} verwijderd.",
+      "columns": {
+        "actions": "Acties",
+        "detail": "Detail",
+        "email": "E-mail",
+        "reason": "Reden",
+        "suppressed_at": "Onderdrukt bij"
+      },
+      "reasons": {
+        "block": "Blok",
+        "bounce": "Stuiteren",
+        "invalid": "Ongeldig",
+        "spam_report": "Spamrapport",
+        "unsubscribe": "Uitschrijven",
+        "unknown": "Onbekende reden: {{reason}}"
+      }
+    },
+    "empty": {
+      "no_statuses": "Nog geen statussen"
     }
   },
   "help_drawer": {

@@ -9985,7 +9985,349 @@
       "email_warning_check_failed": {
         "title": "Warning check failed",
         "body": "Email warning checks could not complete."
+      },
+      "notification_queue_suppressed": {
+        "title": "通知メールが抑制される",
+        "body": "{{count}} キューに登録された通知メールは、過去 {{window_hours}} 時間内に抑制されました。"
+      },
+      "newsletter_queue_failures": {
+        "title": "ニュースレターキューの失敗",
+        "body": "{{count}} ニュースレターの受信者は、過去 {{window_hours}} 時間内に失敗しました。"
+      },
+      "newsletter_queue_stale_processing": {
+        "title": "古いニュースレターのキュー",
+        "body": "{{count}} ニュースレターの受信者は、{{minutes}} 分を超えて処理を続けています。"
+      },
+      "new_users_without_account_email_attempt": {
+        "title": "アカウントのメールアドレスがトリガーされませんでした",
+        "body": "{{count}} の新規ユーザーは、過去 {{window_hours}} 時間内にアカウントのアクティベーション、検証、承認、またはウェルカム メールの試行を行っていません。"
+      },
+      "password_resets_without_email_attempt": {
+        "title": "パスワードリセットメールがトリガーされませんでした",
+        "body": "{{count}} パスワード リセット トークンには、過去 {{window_hours}} 時間内に試行されたパスワード リセット電子メールに一致するものはありません。"
+      },
+      "group_invites_without_email_attempt": {
+        "title": "グループ招待メールがトリガーされませんでした",
+        "body": "{{count}} のメール グループ招待には、過去 {{window_hours}} 時間内に一致するグループ招待メールの試行がありませんでした。"
+      },
+      "group_members_tenant_mismatch": {
+        "title": "グループメンバーシップテナントの不一致",
+        "body": "{{count}} ???????????????????????????????????????????????????????????????????????????"
+      },
+      "group_member_joined_without_owner_notification_queue": {
+        "title": "グループ参加通知がキューに登録されませんでした",
+        "body": "過去 {{window_hours}} 時間内に、一致する所有者通知キュー行がない状態で、{{count}} グループ メンバーシップがアクティブになりました。"
+      },
+      "instant_notifications_stuck_pending": {
+        "title": "インスタントメールが止まってしまう",
+        "body": "{{count}} ?????????? {{minutes}} ???????????"
+      },
+      "notification_queue_failed_recently": {
+        "title": "通知メールが失敗しました",
+        "body": "{{count}} キューに登録された通知メールは、過去 {{window_hours}} 時間内に失敗しました。"
+      },
+      "notification_queue_suppressed_recently": {
+        "title": "通知メールが抑制される",
+        "body": "{{count}} キューに登録された通知メールは、過去 {{window_hours}} 時間内に抑制されました。"
+      },
+      "notification_queue_missing_tenant_id": {
+        "title": "通知キューにテナントがありません",
+        "body": "{{count}} ???????????????????????????????????????????????????????"
+      },
+      "notification_queue_tenant_mismatch": {
+        "title": "通知キューのテナントの不一致",
+        "body": "{{count}} ????????????????????????????????????????????????????????????????"
+      },
+      "notifications_missing_tenant_id": {
+        "title": "テナントが見つからない通知",
+        "body": "{{count}} ??????????????????????????????????????????????"
+      },
+      "notifications_tenant_mismatch": {
+        "title": "通知テナントの不一致",
+        "body": "{{count}} ?????????????????????????????????????????????????????????????"
+      },
+      "notification_queue_marked_sent_without_email_log": {
+        "title": "電子メールによる証拠なしで送信済みとマークされた通知",
+        "body": "{{count}} のキューに登録された通知は、過去 {{window_hours}} 時間内に一致する電子メール ログ エントリなしで送信されたとマークされました。"
+      },
+      "newsletter_queue_missing_tenant_id": {
+        "title": "ニュースレターのキューにテナントがありません",
+        "body": "{{count}} ??????????????????????????????????????????????????"
+      },
+      "newsletter_queue_tenant_mismatch": {
+        "title": "ニュースレターキューのテナントの不一致",
+        "body": "{{count}} ニュースレター キュー行は、ニュースレターとは異なるテナントに属します。これらの行は、間違ったテナント ルーティングの危険性があります。"
+      },
+      "newsletter_queue_stuck_pending": {
+        "title": "ニュースレターのメールが止まってしまう",
+        "body": "{{count}} ニュースレターの受信者は、{{minutes}} 分以上保留されています。"
+      },
+      "newsletter_queue_failed_recently": {
+        "title": "ニュースレターメールが失敗しました",
+        "body": "{{count}} ニュースレターの受信者は、過去 {{window_hours}} 時間内に失敗しました。"
+      },
+      "newsletter_queue_marked_sent_without_email_log": {
+        "title": "電子メールによる証拠なしで送信済みとマークされたニュースレター",
+        "body": "{{count}} ニュースレターの受信者は、過去 {{window_hours}} 時間に、一致する成功した電子メール ログ エントリなしで送信済みとしてマークされました。"
+      },
+      "event_reminders_overdue_pending": {
+        "title": "イベントリマインダーの期限が切れています",
+        "body": "{{count}} イベント リマインダーは、予定された送信時刻から {{minutes}} 分以上経過しても保留中です。"
+      },
+      "event_reminders_failed_recently": {
+        "title": "イベントリマインダーが失敗しました",
+        "body": "過去 {{window_hours}} 時間で、{{count}} イベント リマインダーが失敗しました。"
+      },
+      "event_reminders_marked_sent_without_email_log": {
+        "title": "電子メールによる証拠なしで送信済みとマークされたイベントリマインダー",
+        "body": "{{count}} 電子メール イベント リマインダーは、過去 {{window_hours}} 時間内に一致する成功した電子メール ログ エントリなしで送信済みとしてマークされました。"
+      },
+      "marketplace_report_received_without_notification_outbox": {
+        "title": "マーケットプレイスのレポート受信メールがキューに登録されませんでした",
+        "body": "?? {{window_hours}} ??????{{count}} ????????????????????????????????????????"
+      },
+      "marketplace_report_acknowledged_without_notification_outbox": {
+        "title": "マーケットプレイスのレポート確認メールがキューに登録されませんでした",
+        "body": "{{count}} マーケットプレイス レポートは、過去 {{window_hours}} 時間内に、一致する確認メール通知行なしで確認されました。"
+      },
+      "marketplace_report_resolved_without_notification_outbox": {
+        "title": "マーケットプレイスのレポート解決メールがキューに登録されませんでした",
+        "body": "{{count}} マーケットプレイス レポートは、過去 {{window_hours}} 時間内に、一致する解決策の電子メール通知行なしで解決されました。"
+      },
+      "marketplace_report_appealed_without_notification_outbox": {
+        "title": "マーケットプレイス レポートの異議メールがキューに登録されませんでした",
+        "body": "?? {{window_hours}} ??????{{count}} ???????????????????????????????????????????????????"
+      },
+      "marketplace_report_appeal_resolved_without_notification_outbox": {
+        "title": "マーケットプレイス レポートの異議申し立て解決メールがキューに登録されませんでした",
+        "body": "{{count}} マーケットプレイス レポートの異議申し立ては、過去 {{window_hours}} 時間内に一致する最終決定メール通知行なしで解決されました。"
+      },
+      "federation_connection_without_email_evidence": {
+        "title": "フェデレーション接続電子メールの証拠がありません",
+        "body": "{{count}} フェデレーション接続イベントには、過去 {{window_hours}} 時間内に電子メール配信が成功したという証拠はありません。"
+      },
+      "federation_connection_without_bell_evidence": {
+        "title": "フェデレーション接続通知の証拠がありません",
+        "body": "{{count}} フェデレーション接続イベントには、過去 {{window_hours}} 時間におけるアプリ内通知の証拠はありません。"
+      },
+      "federation_review_without_email_evidence": {
+        "title": "フェデレーションレビュー電子メールの証拠が欠落している",
+        "body": "{{count}} フェデレーション レビューでは、過去 {{window_hours}} 時間内に成功した、または意図的にスキップされた電子メールの証拠はありません。"
+      },
+      "federation_review_without_bell_evidence": {
+        "title": "連盟審査通知の証拠が欠落している",
+        "body": "{{count}} フェデレーション レビューには、過去 {{window_hours}} 時間におけるアプリ内通知の証拠はありません。"
+      },
+      "member_subscription_event_without_email_evidence": {
+        "title": "メンバーのサブスクリプション電子メールの証拠がありません",
+        "body": "{{count}} メンバーのサブスクリプション請求イベントでは、過去 {{window_hours}} 時間内に電子メール配信が成功した証拠はありません。"
+      },
+      "stripe_donation_without_receipt_email_evidence": {
+        "title": "寄付金受領書メールの証拠が見つからない",
+        "body": "{{count}} が完了した Stripe 寄付は、過去 {{window_hours}} 時間以内に電子メールで正常に受信されたという証拠がありません。"
+      },
+      "critical_email_attempts_missing_tenant_context": {
+        "title": "重要な電子メールにテナント コンテキストがありません",
+        "body": "{{count}} の重要な電子メール試行は、過去 {{window_hours}} 時間にテナント コンテキストなしでログに記録されました。"
+      },
+      "sendgrid_events_not_confirming_delivery": {
+        "title": "SendGrid 配信イベントがありません",
+        "body": "{{count}} SendGrid の電子メールは引き続き受け付けられますが、{{hours}} 時間以上経過しても確認されません。"
+      },
+      "tenant_gmail_override_incomplete": {
+        "title": "テナント Gmail 構成が不完全",
+        "body": "このテナントには、Gmail 電子メール プロバイダーのオーバーライドが不完全です。"
+      },
+      "tenant_smtp_override_incomplete": {
+        "title": "テナント SMTP 構成が不完全",
+        "body": "このテナントには、SMTP 電子メール プロバイダーのオーバーライドが不完全です。"
+      },
+      "tenant_sendgrid_override_missing_api_key": {
+        "title": "テナントの SendGrid が欠落している API キーをオーバーライドします",
+        "body": "このテナントは SendGrid オーバーライドを使用するように設定されていますが、テナント API キーがないため、プラットフォーム フォールバックが使用されます。"
+      },
+      "tenant_provider_config_check_failed": {
+        "title": "テナントプロバイダーのチェックに失敗しました",
+        "body": "このテナントの電子メール プロバイダー構成監査を完了できませんでした。"
+      },
+      "direct_email_send_paths_remaining": {
+        "title": "従来のダイレクトメールパスはそのまま残ります",
+        "body": "{{count}} ?????????????????????????????????????????????????????????????????????????????????????"
+      },
+      "email_dispatch_missing_explicit_tenant": {
+        "title": "ディスパッチャーのメールに明示的なテナントがありません",
+        "body": "{{count}} ???????????????????????????????????????????????????cron?Webhook????????????????????????tenant_id ??? tenantId ?????????????"
+      },
+      "email_trigger_audit_failed": {
+        "title": "電子メールトリガー監査に失敗しました",
+        "body": "電子メール トリガーの監査を完了できませんでした。"
       }
+    },
+    "title": "電子メールの到達性",
+    "subtitle": "このテナントのトリガーの証拠、送信試行、プロバイダーのステータス、および抑制された受信者を追跡します。",
+    "trigger_score": "トリガースコア",
+    "trigger_coverage": "{{count}} が監視するフロー全体にわたる {{issues}} の問題",
+    "actions": {
+      "refresh": "リフレッシュ",
+      "reset": "リセット",
+      "search": "検索"
+    },
+    "windows": {
+      "1": "過去 24 時間",
+      "7": "過去 7 日間",
+      "30": "過去 30 日間",
+      "90": "過去90日間"
+    },
+    "filters": {
+      "all": "全て",
+      "category": "カテゴリ",
+      "email": "電子メール",
+      "recipient": "受信者の電子メール",
+      "reason": "理由",
+      "since": "以来",
+      "status": "状態",
+      "until": "それまで",
+      "window": "タイムウィンドウ"
+    },
+    "metrics": {
+      "accepted": "承認されました",
+      "bad_outcomes": "{{count}} が失敗、バウンス、または抑制されました",
+      "bounced": "跳ね返った",
+      "delivered": "納品済み",
+      "not_available": "トリガー監査データなし",
+      "total": "合計",
+      "trigger_score": "トリガースコア",
+      "unconfirmed": "{{count}} ??????????????",
+      "webhook_confirmed": "プロバイダー Webhook で確認済み",
+      "window_days": "{{days}} の日枠"
+    },
+    "status": {
+      "bounced": "跳ね返った",
+      "delivered": "納品済み",
+      "failed": "失敗した",
+      "pending": "保留中",
+      "processing": "処理",
+      "queued": "キューに入れられました",
+      "sent": "送信済み",
+      "suppressed": "抑制された",
+      "unknown": "不明なステータス: {{status}}"
+    },
+    "severity": {
+      "critical": "致命的",
+      "info": "情報",
+      "warning": "警告"
+    },
+    "status_breakdown": {
+      "title": "ステータスの内訳",
+      "subtitle": "選択したウィンドウに対する現在のテナントの送信結果のコンパクトなビュー。"
+    },
+    "trigger_health": {
+      "critical": "トリガーに関する重大な問題",
+      "monitored": "監視対象のフロー",
+      "warning": "警告トリガーの問題"
+    },
+    "trigger_issues": {
+      "title": "監査の問題のトリガー",
+      "subtitle": "電子メールまたは通知が発行されるべきソース行ですが、監査には信頼できる配信証拠がありません。",
+      "table_label": "電子メールトリガー監査の問題",
+      "empty": "選択したウィンドウにはトリガー監査の問題はありません。",
+      "all_tenants": "すべてのテナント",
+      "columns": {
+        "event": "イベント",
+        "issue": "問題",
+        "module": "モジュール",
+        "params": "証拠",
+        "severity": "重大度",
+        "tenant": "テナント"
+      }
+    },
+    "queues": {
+      "title": "キュー診断",
+      "subtitle": "このテナントの失敗した、抑制された、または古い保留中の電子メール キュー行。",
+      "table_label": "電子メールキュー診断",
+      "empty": "失敗した電子メール キュー行、抑制された電子メール キュー行、または古い電子メール キュー行はありません。",
+      "columns": {
+        "attempts": "試み",
+        "category": "カテゴリ",
+        "error": "エラー",
+        "last_attempt": "最後の試み",
+        "recipient": "受信者",
+        "source": "ソース",
+        "status": "状態"
+      },
+      "sources": {
+        "civic_digest_delivery_claims": "シビックダイジェスト請求",
+        "event_reminder_delivery_claims": "イベントリマインダーの請求",
+        "event_reminders": "イベントリマインダー",
+        "federation_inbound_connections": "フェデレーション接続",
+        "federation_messages": "フェデレーションメッセージ",
+        "federation_transactions": "フェデレーショントランザクション",
+        "goal_reminders": "目標リマインダー",
+        "job_interviews": "就職面接のリマインダー",
+        "listing_expiry_reminders_sent": "出品期限リマインダー",
+        "marketplace_disputes": "市場紛争",
+        "marketplace_order_notification_deliveries": "マーケットプレイスの注文通知",
+        "marketplace_report_notifications": "マーケットプレイスレポート",
+        "marketplace_seller_ratings": "マーケットプレイスの販売者の評価",
+        "member_subscription_events": "メンバーのサブスクリプションの請求",
+        "newsletter_queue": "ニュースレター",
+        "notification_queue": "通知",
+        "notifications": "通知証拠",
+        "reviews": "連合審査",
+        "transaction_notification_deliveries": "取引通知",
+        "user_safeguarding_preferences": "安全保護の見直し",
+        "vol_donations": "寄付金受領書",
+        "vol_reminder_delivery_claims": "ボランティアのリマインダー請求",
+        "vol_reminders_sent": "ボランティアのリマインダー"
+      }
+    },
+    "logs": {
+      "title": "電子メール試行ログ",
+      "subtitle": "すべての送信試行を受信者、カテゴリ、ステータス、日付で検索します。",
+      "table_label": "電子メール試行ログ",
+      "empty": "現在のフィルターに一致する電子メールはありません。",
+      "columns": {
+        "category": "カテゴリ",
+        "delivered": "納品済み",
+        "error": "エラー",
+        "provider": "プロバイダー",
+        "recipient": "受信者",
+        "sent": "送信済み",
+        "status": "状態",
+        "subject": "主題"
+      }
+    },
+    "pagination": {
+      "page_size": "ページあたりの行数",
+      "summary": "{{from}}-{{total}} の {{to}}"
+    },
+    "suppressions": {
+      "title": "抑制リスト",
+      "subtitle": "プロバイダーがバウンス、ブロック、無効化、または購読解除したプラットフォーム全体の受信者。",
+      "table_label": "電子メール抑制リスト",
+      "empty": "現在のフィルタに一致する抑制された受信者はありません。",
+      "confirm_remove": "{{email}} を抑制リストから削除しますか?再度メールを受信できるようになります。",
+      "remove": "抑制を解除する",
+      "remove_failed": "抑制を解除できませんでした。",
+      "removed": "{{email}} ????????",
+      "columns": {
+        "actions": "アクション",
+        "detail": "詳細",
+        "email": "電子メール",
+        "reason": "理由",
+        "suppressed_at": "で抑制されました"
+      },
+      "reasons": {
+        "block": "ブロック",
+        "bounce": "バウンス",
+        "invalid": "無効",
+        "spam_report": "スパムレポート",
+        "unsubscribe": "購読を解除する",
+        "unknown": "不明な理由: {{reason}}"
+      }
+    },
+    "empty": {
+      "no_statuses": "まだステータスがありません"
     }
   },
   "help_drawer": {
