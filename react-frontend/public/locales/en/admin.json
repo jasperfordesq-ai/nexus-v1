@@ -5467,6 +5467,110 @@
       "provisioning_log": "Provisioning log"
     }
   },
+  "pilot_inquiry_admin": {
+    "page_title": "Pilot Inquiries",
+    "page_subtitle": "Manage incoming Gemeinde pilot region expressions of interest",
+    "about": {
+      "title": "About this page",
+      "body_intro_before_gemeinden": "This is the top-of-funnel pipeline for municipalities (",
+      "gemeinden": "Gemeinden",
+      "body_intro_before_kiss": ") and regions interested in running a NEXUS/",
+      "body_intro_after_kiss": " pilot. Each inquiry is submitted via the public interest form and scored automatically using a fit algorithm (population size, existing KISS cooperative, digital readiness, budget indication, and timeline). Use this board to move inquiries through the pipeline, assign them to a sales or community contact, and track when proposals are sent and pilots go live.",
+      "pipeline_stages_label": "Pipeline stages:",
+      "pipeline_stages": "New -> Contacted -> Qualified -> Proposal sent -> Pilot agreed -> Live -> Rejected / Withdrawn.",
+      "fit_score_before": "The ",
+      "fit_score_label": "Fit score",
+      "fit_score_after": " (0-100) is calculated automatically - 70+ is a strong match. Click any card to view full details, update the stage, or add internal notes."
+    },
+    "actions": {
+      "close": "Close",
+      "export_csv": "Export CSV",
+      "refresh": "Refresh",
+      "save_notes": "Save Notes",
+      "save_stage": "Save Stage"
+    },
+    "empty": {
+      "title": "No pilot inquiries yet.",
+      "body": "Inquiries arrive via the public interest form on the NEXUS sales site. Once submitted, they appear here automatically. Use the stage filter above to check if inquiries exist in other stages."
+    },
+    "fields": {
+      "budget": "Budget",
+      "contact": "Contact",
+      "cooperative": "Cooperative",
+      "country_region": "Country / Region",
+      "existing_digital_tool": "Existing Digital Tool",
+      "fit_score_breakdown": "Fit Score Breakdown",
+      "internal_notes": "Internal Notes (admin only)",
+      "modules_of_interest": "Modules of Interest",
+      "notes_from_gemeinde": "Notes from Gemeinde",
+      "population": "Population",
+      "timeline": "Timeline",
+      "total": "Total",
+      "update_stage": "Update Stage"
+    },
+    "filters": {
+      "all": "All",
+      "stage": "Filter by stage:"
+    },
+    "fit_scale": {
+      "title": "Fit score scale (0-100):",
+      "good": "Good match - prioritise outreach",
+      "potential": "Potential - investigate further",
+      "weak": "Weak fit - low priority",
+      "factors_before_kiss": "Score factors: population size, existing ",
+      "factors_after_kiss": " cooperative, digital readiness, budget, timeline."
+    },
+    "placeholders": {
+      "internal_notes": "Add internal notes...",
+      "rejection_reason": "Rejection reason..."
+    },
+    "stages": {
+      "new": "New",
+      "qualified": "Qualified",
+      "proposal_sent": "Proposal Sent",
+      "pilot_agreed": "Pilot Agreed",
+      "live": "Live",
+      "rejected": "Rejected",
+      "dormant": "Dormant",
+      "unknown": "{{stage}}"
+    },
+    "stats": {
+      "avg_fit_score": "Avg Fit Score",
+      "in_pipeline": "In Pipeline",
+      "qualified": "Qualified",
+      "total_inquiries": "Total Inquiries"
+    },
+    "summary": {
+      "by_country": "By country"
+    },
+    "timestamps": {
+      "agreed": "Agreed",
+      "live": "Live",
+      "proposal": "Proposal",
+      "submitted": "Submitted"
+    },
+    "toasts": {
+      "load_failed": "Failed to load pilot inquiries",
+      "notes_save_failed": "Failed to save notes",
+      "notes_saved": "Notes saved",
+      "stage_update_failed": "Failed to update stage",
+      "stage_updated": "Stage updated"
+    },
+    "values": {
+      "asap": "ASAP",
+      "empty": "-",
+      "months": "{{count}} months",
+      "no": "No",
+      "yes": "Yes"
+    },
+    "velocity": {
+      "avg_to_agreed": "Avg to agreed:",
+      "avg_to_live": "Avg to live:",
+      "avg_to_proposal": "Avg to proposal:",
+      "days": "{{count}}d",
+      "title": "Pipeline velocity - average days from inquiry submission to each milestone:"
+    }
+  },
   "broker": {
     "a_reason_is_required": "A reason is required",
     "a_reason_is_required_for_bulk_rejection": "A reason is required for bulk rejection",

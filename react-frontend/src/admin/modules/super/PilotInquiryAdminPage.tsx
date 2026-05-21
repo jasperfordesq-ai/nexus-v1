@@ -19,6 +19,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Chip,
@@ -96,19 +97,23 @@ interface PipelineStats {
 }
 
 const STAGES = [
-  { key: 'new',           label: 'New',            color: 'default' },
-  { key: 'qualified',     label: 'Qualified',       color: 'primary' },
-  { key: 'proposal_sent', label: 'Proposal Sent',   color: 'warning' },
-  { key: 'pilot_agreed',  label: 'Pilot Agreed',    color: 'success' },
-  { key: 'live',          label: 'Live',            color: 'success' },
-  { key: 'rejected',      label: 'Rejected',        color: 'danger' },
-  { key: 'dormant',       label: 'Dormant',         color: 'default' },
+  { key: 'new',           color: 'default' },
+  { key: 'qualified',     color: 'primary' },
+  { key: 'proposal_sent', color: 'warning' },
+  { key: 'pilot_agreed',  color: 'success' },
+  { key: 'live',          color: 'success' },
+  { key: 'rejected',      color: 'danger' },
+  { key: 'dormant',       color: 'default' },
 ] as const;
 
 type StageKey = typeof STAGES[number]['key'];
 
 function stageConfig(stage: string) {
-  return STAGES.find(s => s.key === stage) ?? { key: stage, label: stage, color: 'default' as const };
+  return STAGES.find(s => s.key === stage) ?? { key: 'unknown', color: 'default' as const };
+}
+
+function stageTranslationKey(stage: string) {
+  return STAGES.some(s => s.key === stage) ? `stages.${stage}` : 'stages.unknown';
 }
 
 // ─── Fit score chip ───────────────────────────────────────────────────────────
@@ -132,6 +137,7 @@ function InquiryCard({
   inquiry: PilotInquiry;
   onClick: () => void;
 }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'pilot_inquiry_admin' });
   const sc = stageConfig(inquiry.stage);
   return (
     <Card
@@ -149,7 +155,9 @@ function InquiryCard({
         </div>
         <p className="text-xs text-gray-500">{inquiry.contact_name}</p>
         <div className="flex items-center justify-between">
-          <Chip size="sm" color={sc.color as never} variant="flat">{sc.label}</Chip>
+          <Chip size="sm" color={sc.color as never} variant="flat">
+            {t(stageTranslationKey(inquiry.stage), { stage: inquiry.stage })}
+          </Chip>
           {inquiry.assigned_user_name?.trim() && (
             <span className="text-xs text-gray-400 truncate max-w-[100px]">{inquiry.assigned_user_name.trim()}</span>
           )}
@@ -173,6 +181,7 @@ function InquiryDetailModal({
   onRefresh: () => void;
 }) {
   const toast = useToast();
+  const { t } = useTranslation('admin', { keyPrefix: 'pilot_inquiry_admin' });
   const [newStage, setNewStage]         = useState('');
   const [rejectionReason, setRejReason] = useState('');
   const [internalNotes, setNotes]       = useState('');
@@ -195,12 +204,12 @@ function InquiryDetailModal({
         stage: newStage,
         rejection_reason: newStage === 'rejected' ? rejectionReason : undefined,
       });
-      toast.success('Stage updated');
+      toast.success(t('toasts.stage_updated'));
       onRefresh();
       onClose();
     } catch (err) {
       logError('stage update failed', err);
-      toast.error('Failed to update stage');
+      toast.error(t('toasts.stage_update_failed'));
     } finally {
       setSaving(false);
     }
@@ -210,11 +219,11 @@ function InquiryDetailModal({
     setSaving(true);
     try {
       await api.post(`/v2/admin/pilot-inquiries/${inquiry!.id}/notes`, { internal_notes: internalNotes });
-      toast.success('Notes saved');
+      toast.success(t('toasts.notes_saved'));
       onRefresh();
     } catch (err) {
       logError('notes save failed', err);
-      toast.error('Failed to save notes');
+      toast.error(t('toasts.notes_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -239,26 +248,26 @@ function InquiryDetailModal({
           {/* Municipality info */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Country / Region</p>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.country_region')}</p>
               <p>{inquiry.country}{inquiry.region ? ` · ${inquiry.region}` : ''}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Population</p>
-              <p>{inquiry.population?.toLocaleString() ?? '—'}</p>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.population')}</p>
+              <p>{inquiry.population?.toLocaleString() ?? t('values.empty')}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5"><Abbr term="KISS">KISS</Abbr> Cooperative</p>
-              <p>{inquiry.has_kiss_cooperative ? 'Yes' : 'No'}</p>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5"><Abbr term="KISS">KISS</Abbr> {t('fields.cooperative')}</p>
+              <p>{inquiry.has_kiss_cooperative ? t('values.yes') : t('values.no')}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Existing Digital Tool</p>
-              <p>{inquiry.has_existing_digital_tool ? (inquiry.existing_tool_name ?? 'Yes') : 'No'}</p>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.existing_digital_tool')}</p>
+              <p>{inquiry.has_existing_digital_tool ? (inquiry.existing_tool_name ?? t('values.yes')) : t('values.no')}</p>
             </div>
           </div>
 
           {/* Contact */}
           <div>
-            <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Contact</p>
+            <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.contact')}</p>
             <p className="font-medium">{inquiry.contact_name}</p>
             <p className="text-indigo-400">{inquiry.contact_email}</p>
             {inquiry.contact_phone && <p>{inquiry.contact_phone}</p>}
@@ -268,7 +277,7 @@ function InquiryDetailModal({
           {/* Modules + timeline + budget */}
           {modules.length > 0 && (
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Modules of Interest</p>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.modules_of_interest')}</p>
               <div className="flex flex-wrap gap-1">
                 {modules.map((m: string) => (
                   <Chip key={m} size="sm" variant="flat" color="primary">{m.replace(/_/g, ' ')}</Chip>
@@ -279,19 +288,19 @@ function InquiryDetailModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Timeline</p>
-              <p>{inquiry.timeline_months === 0 ? 'ASAP' : inquiry.timeline_months ? `${inquiry.timeline_months} months` : '—'}</p>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.timeline')}</p>
+              <p>{inquiry.timeline_months === 0 ? t('values.asap') : inquiry.timeline_months ? t('values.months', { count: inquiry.timeline_months }) : t('values.empty')}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Budget</p>
-              <p>{inquiry.budget_indication?.replace(/_/g, ' ') ?? '—'}</p>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.budget')}</p>
+              <p>{inquiry.budget_indication?.replace(/_/g, ' ') ?? t('values.empty')}</p>
             </div>
           </div>
 
           {/* Notes */}
           {inquiry.notes && (
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Notes from Gemeinde</p>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.notes_from_gemeinde')}</p>
               <p className="text-gray-300 italic">{inquiry.notes}</p>
             </div>
           )}
@@ -299,7 +308,7 @@ function InquiryDetailModal({
           {/* Fit score breakdown */}
           {Object.keys(breakdown).length > 0 && (
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Fit Score Breakdown</p>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.fit_score_breakdown')}</p>
               <div className="grid grid-cols-2 gap-1">
                 {Object.entries(breakdown).map(([key, val]) => (
                   <div key={key} className="flex items-center justify-between text-xs bg-gray-800/40 rounded px-2 py-1">
@@ -308,7 +317,7 @@ function InquiryDetailModal({
                   </div>
                 ))}
                 <div className="flex items-center justify-between text-xs bg-indigo-500/20 rounded px-2 py-1 font-semibold col-span-2">
-                  <span>Total</span>
+                  <span>{t('fields.total')}</span>
                   <span>{inquiry.fit_score}</span>
                 </div>
               </div>
@@ -317,7 +326,7 @@ function InquiryDetailModal({
 
           {/* Stage update */}
           <div className="border-t border-white/10 pt-4">
-            <p className="text-gray-400 text-xs uppercase tracking-wide mb-2">Update Stage</p>
+            <p className="text-gray-400 text-xs uppercase tracking-wide mb-2">{t('fields.update_stage')}</p>
             <Select
               size="sm"
               selectedKeys={newStage ? [newStage] : []}
@@ -325,14 +334,14 @@ function InquiryDetailModal({
               classNames={{ trigger: 'bg-gray-800/50' }}
             >
               {STAGES.map(s => (
-                <SelectItem key={s.key}>{s.label}</SelectItem>
+                <SelectItem key={s.key}>{t(`stages.${s.key}`)}</SelectItem>
               ))}
             </Select>
             {newStage === 'rejected' && (
               <Textarea
                 className="mt-2"
                 size="sm"
-                placeholder="Rejection reason…"
+                placeholder={t('placeholders.rejection_reason')}
                 value={rejectionReason}
                 onValueChange={setRejReason}
               />
@@ -344,19 +353,19 @@ function InquiryDetailModal({
               isLoading={saving}
               onPress={saveStage}
             >
-              Save Stage
+              {t('actions.save_stage')}
             </Button>
           </div>
 
           {/* Internal notes */}
           <div className="border-t border-white/10 pt-4">
-            <p className="text-gray-400 text-xs uppercase tracking-wide mb-2">Internal Notes (admin only)</p>
+            <p className="text-gray-400 text-xs uppercase tracking-wide mb-2">{t('fields.internal_notes')}</p>
             <Textarea
               size="sm"
               minRows={2}
               value={internalNotes}
               onValueChange={setNotes}
-              placeholder="Add internal notes…"
+              placeholder={t('placeholders.internal_notes')}
             />
             <Button
               size="sm"
@@ -365,20 +374,20 @@ function InquiryDetailModal({
               isLoading={saving}
               onPress={saveNotes}
             >
-              Save Notes
+              {t('actions.save_notes')}
             </Button>
           </div>
 
           {/* Timestamps */}
           <div className="border-t border-white/10 pt-4 grid grid-cols-2 gap-2 text-xs text-gray-400">
-            <div><span className="font-medium text-gray-300">Submitted:</span> {new Date(inquiry.created_at).toLocaleDateString()}</div>
-            {inquiry.proposal_sent_at && <div><span className="font-medium text-gray-300">Proposal:</span> {new Date(inquiry.proposal_sent_at).toLocaleDateString()}</div>}
-            {inquiry.pilot_agreed_at  && <div><span className="font-medium text-gray-300">Agreed:</span>   {new Date(inquiry.pilot_agreed_at).toLocaleDateString()}</div>}
-            {inquiry.went_live_at     && <div><span className="font-medium text-gray-300">Live:</span>      {new Date(inquiry.went_live_at).toLocaleDateString()}</div>}
+            <div><span className="font-medium text-gray-300">{t('timestamps.submitted')}:</span> {new Date(inquiry.created_at).toLocaleDateString()}</div>
+            {inquiry.proposal_sent_at && <div><span className="font-medium text-gray-300">{t('timestamps.proposal')}:</span> {new Date(inquiry.proposal_sent_at).toLocaleDateString()}</div>}
+            {inquiry.pilot_agreed_at  && <div><span className="font-medium text-gray-300">{t('timestamps.agreed')}:</span>   {new Date(inquiry.pilot_agreed_at).toLocaleDateString()}</div>}
+            {inquiry.went_live_at     && <div><span className="font-medium text-gray-300">{t('timestamps.live')}:</span>      {new Date(inquiry.went_live_at).toLocaleDateString()}</div>}
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button variant="light" onPress={onClose}>Close</Button>
+          <Button variant="light" onPress={onClose}>{t('actions.close')}</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
@@ -388,7 +397,8 @@ function InquiryDetailModal({
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export function PilotInquiryAdminPage() {
-  usePageTitle("Pilot Inquiries");
+  const { t } = useTranslation('admin', { keyPrefix: 'pilot_inquiry_admin' });
+  usePageTitle(t('page_title'));
   const toast = useToast();
 
   const [inquiries, setInquiries]   = useState<PilotInquiry[]>([]);
@@ -411,11 +421,11 @@ export function PilotInquiryAdminPage() {
       if (statsData && typeof statsData === 'object') setStats(statsData as PipelineStats);
     } catch (err) {
       logError('PilotInquiryAdminPage loadData', err);
-      toast.error('Failed to load pilot inquiries');
+      toast.error(t('toasts.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [stageFilter, toast]);
+  }, [stageFilter, toast, t]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -437,8 +447,8 @@ export function PilotInquiryAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Pilot Inquiries"
-        subtitle="Manage incoming Gemeinde pilot region expressions of interest"
+        title={t('page_title')}
+        subtitle={t('page_subtitle')}
         icon={<MapPin className="w-6 h-6" />}
         actions={
           <div className="flex gap-2">
@@ -449,7 +459,7 @@ export function PilotInquiryAdminPage() {
               onPress={loadData}
               isLoading={loading}
             >
-              Refresh
+              {t('actions.refresh')}
             </Button>
             <Button
               size="sm"
@@ -458,7 +468,7 @@ export function PilotInquiryAdminPage() {
               startContent={<Download className="w-4 h-4" />}
               onPress={handleExport}
             >
-              Export CSV
+              {t('actions.export_csv')}
             </Button>
           </div>
         }
@@ -469,18 +479,14 @@ export function PilotInquiryAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('about.title')}</p>
               <p className="text-default-600">
-                This is the top-of-funnel pipeline for municipalities (<em>Gemeinden</em>) and regions interested
-                in running a NEXUS/<Abbr term="KISS">KISS</Abbr> pilot. Each inquiry is submitted via the public interest form and scored
-                automatically using a fit algorithm (population size, existing KISS cooperative, digital readiness,
-                budget indication, and timeline). Use this board to move inquiries through the pipeline, assign
-                them to a sales or community contact, and track when proposals are sent and pilots go live.
+                {t('about.body_intro_before_gemeinden')}<em>{t('about.gemeinden')}</em>{t('about.body_intro_before_kiss')}
+                <Abbr term="KISS">KISS</Abbr>{t('about.body_intro_after_kiss')}
               </p>
               <p className="text-default-500">
-                <strong>Pipeline stages:</strong> New → Contacted → Qualified → Proposal sent → Pilot agreed → Live → Rejected / Withdrawn.
-                The <strong>Fit score</strong> (0–100) is calculated automatically — 70+ is a strong match. Click any
-                card to view full details, update the stage, or add internal notes.
+                <strong>{t('about.pipeline_stages_label')}</strong> {t('about.pipeline_stages')}{' '}
+                {t('about.fit_score_before')}<strong>{t('about.fit_score_label')}</strong>{t('about.fit_score_after')}
               </p>
             </div>
           </div>
@@ -489,33 +495,33 @@ export function PilotInquiryAdminPage() {
 
       {/* Fit score scale */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-default-200 bg-default-50 px-3 py-2 text-xs text-default-500">
-        <span className="font-medium text-default-700">Fit score scale (0–100):</span>
-        <span className="flex items-center gap-1.5"><Chip size="sm" color="success" variant="flat">60–100</Chip>Good match — prioritise outreach</span>
-        <span className="flex items-center gap-1.5"><Chip size="sm" color="warning" variant="flat">40–59</Chip>Potential — investigate further</span>
-        <span className="flex items-center gap-1.5"><Chip size="sm" color="default" variant="flat">0–39</Chip>Weak fit — low priority</span>
-        <span className="ml-3 text-default-400">Score factors: population size, existing <Abbr term="KISS">KISS</Abbr> cooperative, digital readiness, budget, timeline.</span>
+        <span className="font-medium text-default-700">{t('fit_scale.title')}</span>
+        <span className="flex items-center gap-1.5"><Chip size="sm" color="success" variant="flat">60-100</Chip>{t('fit_scale.good')}</span>
+        <span className="flex items-center gap-1.5"><Chip size="sm" color="warning" variant="flat">40-59</Chip>{t('fit_scale.potential')}</span>
+        <span className="flex items-center gap-1.5"><Chip size="sm" color="default" variant="flat">0-39</Chip>{t('fit_scale.weak')}</span>
+        <span className="ml-3 text-default-400">{t('fit_scale.factors_before_kiss')}<Abbr term="KISS">KISS</Abbr>{t('fit_scale.factors_after_kiss')}</span>
       </div>
 
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard
-          title="Total Inquiries"
+          title={t('stats.total_inquiries')}
           value={stats?.total ?? 0}
           icon={<FileText className="w-5 h-5 text-indigo-400" />}
         />
         <StatCard
-          title="Qualified"
+          title={t('stats.qualified')}
           value={stats?.by_stage['qualified']?.count ?? 0}
           icon={<Star className="w-5 h-5 text-amber-400" />}
         />
         <StatCard
-          title="In Pipeline"
+          title={t('stats.in_pipeline')}
           value={inPipeline}
           icon={<TrendingUp className="w-5 h-5 text-emerald-400" />}
         />
         <StatCard
-          title="Avg Fit Score"
-          value={stats ? stats.avg_fit_score.toFixed(1) : '—'}
+          title={t('stats.avg_fit_score')}
+          value={stats ? stats.avg_fit_score.toFixed(1) : t('values.empty')}
           icon={<CheckCircle className="w-5 h-5 text-purple-400" />}
         />
       </div>
@@ -523,21 +529,21 @@ export function PilotInquiryAdminPage() {
       {/* Stage timing */}
       {stats && (
         <div className="flex flex-col gap-1">
-          <p className="text-xs font-medium text-default-600">Pipeline velocity — average days from inquiry submission to each milestone:</p>
+          <p className="text-xs font-medium text-default-600">{t('velocity.title')}</p>
           <div className="flex gap-4 text-xs text-gray-400 flex-wrap">
           {stats.avg_days_to_proposal !== null && (
             <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" /> Avg to proposal: <strong className="text-white">{stats.avg_days_to_proposal}d</strong>
+              <Clock className="w-3 h-3" /> {t('velocity.avg_to_proposal')} <strong className="text-white">{t('velocity.days', { count: stats.avg_days_to_proposal })}</strong>
             </span>
           )}
           {stats.avg_days_to_agreed !== null && (
             <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" /> Avg to agreed: <strong className="text-white">{stats.avg_days_to_agreed}d</strong>
+              <Clock className="w-3 h-3" /> {t('velocity.avg_to_agreed')} <strong className="text-white">{t('velocity.days', { count: stats.avg_days_to_agreed })}</strong>
             </span>
           )}
           {stats.avg_days_to_live !== null && (
             <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" /> Avg to live: <strong className="text-white">{stats.avg_days_to_live}d</strong>
+              <Clock className="w-3 h-3" /> {t('velocity.avg_to_live')} <strong className="text-white">{t('velocity.days', { count: stats.avg_days_to_live })}</strong>
             </span>
           )}
           </div>
@@ -546,14 +552,14 @@ export function PilotInquiryAdminPage() {
 
       {/* Stage filter */}
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="text-sm text-gray-400">Filter by stage:</span>
+        <span className="text-sm text-gray-400">{t('filters.stage')}</span>
         <Button
           size="sm"
           variant={stageFilter === '' ? 'solid' : 'flat'}
           color={stageFilter === '' ? 'primary' : 'default'}
           onPress={() => setStageFilter('')}
         >
-          All
+          {t('filters.all')}
         </Button>
         {STAGES.map(s => (
           <Button
@@ -563,7 +569,7 @@ export function PilotInquiryAdminPage() {
             color={stageFilter === s.key ? (s.color as never) : 'default'}
             onPress={() => setStageFilter(stageFilter === s.key ? '' : s.key)}
           >
-            {s.label}
+            {t(`stages.${s.key}`)}
             {stats?.by_stage[s.key] && (
               <span className="ml-1 opacity-60">({stats.by_stage[s.key]?.count ?? 0})</span>
             )}
@@ -579,10 +585,9 @@ export function PilotInquiryAdminPage() {
       ) : inquiries.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <MapPin className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="font-medium text-default-600">No pilot inquiries yet.</p>
+          <p className="font-medium text-default-600">{t('empty.title')}</p>
           <p className="text-sm mt-1 text-default-400">
-            Inquiries arrive via the public interest form on the NEXUS sales site. Once submitted, they appear
-            here automatically. Use the stage filter above to check if inquiries exist in other stages.
+            {t('empty.body')}
           </p>
         </div>
       ) : (
@@ -601,7 +606,7 @@ export function PilotInquiryAdminPage() {
       {stats && stats.by_country.length > 0 && (
         <div className="mt-4">
           <p className="text-xs text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1">
-            <Users className="w-3 h-3" /> By country
+            <Users className="w-3 h-3" /> {t('summary.by_country')}
           </p>
           <div className="flex gap-2 flex-wrap">
             {stats.by_country.map(c => (
