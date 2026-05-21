@@ -98,7 +98,7 @@ const CONFIG_KEYS: Record<string, { labelKey: string; descKey: string }> = {
 
 export function TranslationConfig() {
   const { t } = useTranslation('admin');
-  usePageTitle("Translation Settings");
+  usePageTitle(t('config.translation_settings_title'));
   const toast = useToast();
 
   const meta = (key: string) => {
@@ -135,11 +135,11 @@ export function TranslationConfig() {
         setDefaults(payload.defaults || {});
       }
     } catch {
-      toast.error("Failed to load translation settings");
+      toast.error(t('config.translation_load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   const loadGlossary = useCallback(async () => {
@@ -151,11 +151,11 @@ export function TranslationConfig() {
         setGlossary(payload.items || []);
       }
     } catch {
-      toast.error("Failed to load glossary");
+      toast.error(t('config.translation_glossary_load_failed'));
     } finally {
       setGlossaryLoading(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -181,9 +181,9 @@ export function TranslationConfig() {
     try {
       await api.put('/v2/admin/config/translation', { key, value });
       setConfig((prev) => ({ ...prev, [key]: value }));
-      toast.success(`${meta(key).label} updated`);
+      toast.success(t('config.translation_setting_updated', { setting: meta(key).label }));
     } catch {
-      toast.error(`Failed to update ${meta(key).label}`);
+      toast.error(t('config.translation_setting_update_failed', { setting: meta(key).label }));
     } finally {
       setSaving(null);
     }
@@ -193,7 +193,7 @@ export function TranslationConfig() {
 
   const handleAddEntry = async () => {
     if (!newSource.trim() || !newTarget.trim() || !newLang) {
-      toast.error("All fields are required");
+      toast.error(t('config.translation_glossary_fields_required'));
       return;
     }
     setAddingEntry(true);
@@ -203,13 +203,13 @@ export function TranslationConfig() {
         target_term: newTarget.trim(),
         target_language: newLang,
       });
-      toast.success("Glossary entry added");
+      toast.success(t('config.translation_glossary_entry_added'));
       setNewSource('');
       setNewTarget('');
       setNewLang('');
       loadGlossary();
     } catch {
-      toast.error("Failed to add glossary entry");
+      toast.error(t('config.translation_glossary_add_failed'));
     } finally {
       setAddingEntry(false);
     }
@@ -220,9 +220,9 @@ export function TranslationConfig() {
     try {
       await api.delete(`/v2/admin/translation/glossary/${id}`);
       setGlossary((prev) => prev.filter((e) => e.id !== id));
-      toast.success("Glossary entry removed");
+      toast.success(t('config.translation_glossary_entry_removed'));
     } catch {
-      toast.error("Failed to delete glossary entry");
+      toast.error(t('config.translation_glossary_delete_failed'));
     } finally {
       setDeletingId(null);
     }
@@ -243,8 +243,8 @@ export function TranslationConfig() {
   return (
     <div>
       <PageHeader
-        title={"Translation Settings"}
-        description={"Configure automatic translation, glossary, and per-tenant translation preferences"}
+        title={t('config.translation_settings_title')}
+        description={t('config.translation_settings_desc')}
       />
 
       <div className="space-y-6">
@@ -252,7 +252,7 @@ export function TranslationConfig() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Settings size={18} className="text-primary" />
-            <h3 className="font-semibold">{"General Settings"}</h3>
+            <h3 className="font-semibold">{t('config.translation_general_settings')}</h3>
           </CardHeader>
           <CardBody className="divide-y divide-divider px-4">
             {/* translation.enabled */}
@@ -276,7 +276,7 @@ export function TranslationConfig() {
                 <p className="text-sm text-default-500">{meta('translation.engine').description}</p>
               </div>
               <Select
-                aria-label={"Translation engine"}
+                aria-label={t('config.translation_engine_label')}
                 selectedKeys={[String(getValue('translation.engine') || 'openai')]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
@@ -387,31 +387,31 @@ export function TranslationConfig() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <BookOpen size={18} className="text-secondary" />
-              <h3 className="font-semibold">{"Glossary Management"}</h3>
-              <span className="text-sm text-default-400">{"Add custom translations for specific terms"}</span>
+              <h3 className="font-semibold">{t('config.translation_glossary_management')}</h3>
+              <span className="text-sm text-default-400">{t('config.translation_glossary_management_desc')}</span>
             </CardHeader>
             <CardBody className="px-4 pb-4 space-y-4">
               {/* Add entry form */}
               <div className="flex flex-wrap items-end gap-3">
                 <Input
-                  label={"Source term"}
-                  placeholder={"e.g. timebank"}
+                  label={t('config.translation_source_term')}
+                  placeholder={t('config.translation_source_term_placeholder')}
                   value={newSource}
                   onValueChange={setNewSource}
                   className="min-w-[160px] flex-1"
                   size="sm"
                 />
                 <Input
-                  label={"Target term"}
-                  placeholder={"Preferred translation"}
+                  label={t('config.translation_target_term')}
+                  placeholder={t('config.translation_target_term_placeholder')}
                   value={newTarget}
                   onValueChange={setNewTarget}
                   className="min-w-[160px] flex-1"
                   size="sm"
                 />
                 <Select
-                  label={"Language"}
-                  aria-label={"Target language"}
+                  label={t('config.translation_language')}
+                  aria-label={t('config.translation_target_language')}
                   selectedKeys={newLang ? [newLang] : []}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0] as string;
@@ -432,7 +432,7 @@ export function TranslationConfig() {
                   isDisabled={addingEntry}
                   size="sm"
                 >
-                  {"Add"}
+                  {t('config.translation_add')}
                 </Button>
               </div>
 
@@ -445,14 +445,14 @@ export function TranslationConfig() {
                 </div>
               ) : glossary.length === 0 ? (
                 <p className="py-4 text-center text-sm text-default-400">
-                  {"No glossary entries yet"}
+                  {t('config.translation_glossary_empty')}
                 </p>
               ) : (
-                <Table aria-label={"Glossary entries"} removeWrapper>
+                <Table aria-label={t('config.translation_glossary_entries')} removeWrapper>
                   <TableHeader>
-                    <TableColumn>{"Source term"}</TableColumn>
-                    <TableColumn>{"Target term"}</TableColumn>
-                    <TableColumn>{"Language"}</TableColumn>
+                    <TableColumn>{t('config.translation_col_source_term')}</TableColumn>
+                    <TableColumn>{t('config.translation_col_target_term')}</TableColumn>
+                    <TableColumn>{t('config.translation_col_language')}</TableColumn>
                     <TableColumn width={60}>{''}</TableColumn>
                   </TableHeader>
                   <TableBody>
@@ -471,7 +471,7 @@ export function TranslationConfig() {
                               color="danger"
                               onPress={() => handleDeleteEntry(entry.id)}
                               isDisabled={deletingId === entry.id}
-                              aria-label={`Delete entry for "${entry.source_term}"`}
+                              aria-label={t('config.translation_delete_entry', { term: entry.source_term })}
                             >
                               <Trash2 size={14} />
                             </Button>

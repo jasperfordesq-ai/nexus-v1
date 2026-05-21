@@ -33,7 +33,7 @@ type FilterType = 'all' | 'core' | 'feature';
 
 export default function ModuleConfiguration() {
   const { t } = useTranslation('admin');
-  usePageTitle("Module Configuration");
+  usePageTitle(t('config.module_configuration_title'));
   const toast = useToast();
   const { refreshTenant } = useTenant();
 
@@ -55,11 +55,11 @@ export default function ModuleConfiguration() {
         setConfig(res.data);
       }
     } catch {
-      toast.error("Failed to load module configuration");
+      toast.error(t('config.module_config_load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function ModuleConfiguration() {
       toast.success(t(enabled ? 'config.module_enabled' : 'config.module_disabled', { name: mod?.name || id }));
       refreshTenant();
     } else {
-      toast.error(res.error || "Failed to update module");
+      toast.error(res.error || t('config.failed_to_update_module'));
     }
     setToggling(null);
   };
@@ -129,15 +129,15 @@ export default function ModuleConfiguration() {
   return (
     <div className="max-w-7xl mx-auto px-4 pb-8">
       <PageHeader
-        title={"Module Configuration"}
-        description={"Enable, disable, and configure platform modules and features"}
+        title={t('config.module_configuration_title')}
+        description={t('config.module_configuration_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Chip color="warning" variant="flat" size="sm" startContent={<Construction size={14} />}>
-              {"Beta"}
+              {t('config.beta')}
             </Chip>
             <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={loadConfig}>
-              {"Refresh"}
+              {t('common.refresh')}
             </Button>
           </div>
         }
@@ -154,7 +154,7 @@ export default function ModuleConfiguration() {
           data-lpignore="true"
           data-bwignore="true"
           data-1p-ignore=""
-          placeholder={"Search modules"}
+          placeholder={t('config.search_modules')}
           startContent={<Search size={16} className="text-default-400" />}
           value={searchQuery}
           onValueChange={(val) => {
@@ -171,19 +171,19 @@ export default function ModuleConfiguration() {
             color={filterType === 'all' ? 'primary' : 'default'}
             onPress={() => setFilterType('all')}
           >
-            {"All"} ({coreModules.length + featureModules.length})
+            {t('config.filter_all')} ({coreModules.length + featureModules.length})
           </Button>
           <Button
             color={filterType === 'core' ? 'primary' : 'default'}
             onPress={() => setFilterType('core')}
           >
-            {"Core"} ({coreModules.length})
+            {t('config.filter_core')} ({coreModules.length})
           </Button>
           <Button
             color={filterType === 'feature' ? 'primary' : 'default'}
             onPress={() => setFilterType('feature')}
           >
-            {"Features"} ({featureModules.length})
+            {t('config.filter_features')} ({featureModules.length})
           </Button>
         </ButtonGroup>
       </div>
@@ -198,7 +198,7 @@ export default function ModuleConfiguration() {
       {/* Core Modules section */}
       {!loading && filteredCore.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-lg font-semibold mb-4">{"Core Modules"}</h2>
+          <h2 className="text-lg font-semibold mb-4">{t('config.core_modules')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredCore.map(mod => (
               <ModuleCard
@@ -217,7 +217,7 @@ export default function ModuleConfiguration() {
       {/* Optional Features section */}
       {!loading && filteredFeatures.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-lg font-semibold mb-4">{"Optional Features"}</h2>
+          <h2 className="text-lg font-semibold mb-4">{t('config.optional_features')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredFeatures.map(mod => (
               <ModuleCard
@@ -237,14 +237,14 @@ export default function ModuleConfiguration() {
       {!loading && filteredCore.length === 0 && filteredFeatures.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-default-400">
           <Search size={48} className="mb-4" />
-          <p className="text-lg">{"No modules match your search"}</p>
+          <p className="text-lg">{t('config.no_modules_match')}</p>
           <Button
             variant="light"
             size="sm"
             className="mt-2"
             onPress={() => { setSearchQuery(''); setFilterType('all'); }}
           >
-            {"Clear filters"}
+            {t('config.clear_filters')}
           </Button>
         </div>
       )}
@@ -252,9 +252,9 @@ export default function ModuleConfiguration() {
       {/* Platform Infrastructure — tenant-wide settings that aren't tied to a module */}
       {!loading && !searchQuery && (
         <section className="mt-10">
-          <h2 className="text-lg font-semibold mb-1">{"Platform Infrastructure"}</h2>
+          <h2 className="text-lg font-semibold mb-1">{t('config.platform_infrastructure')}</h2>
           <p className="text-sm text-default-500 mb-4">
-            {"Tenant-wide settings: languages, maps, and API keys."}
+            {t('config.platform_infrastructure_desc')}
           </p>
           <PlatformInfrastructure config={config} onConfigChange={setConfig} />
         </section>

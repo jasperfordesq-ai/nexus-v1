@@ -6287,6 +6287,8 @@
     "optional_features": "Optional Features",
     "no_modules_match": "No modules match your search",
     "clear_filters": "Clear filters",
+    "platform_infrastructure": "Platform Infrastructure",
+    "platform_infrastructure_desc": "Tenant-wide settings: languages, maps, and API keys.",
     "feature_toggled": "{{name}} {{status}}",
     "failed_to_update_feature": "Failed to update feature",
     "module_toggled": "{{name}} {{status}}",
