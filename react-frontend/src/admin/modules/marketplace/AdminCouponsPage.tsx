@@ -5,10 +5,10 @@
 
 /**
  * AdminCouponsPage — AG63 admin oversight: list / suspend / delete merchant coupons.
- * Admin panel is English-only — no t() calls.
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardBody,
@@ -43,7 +43,8 @@ interface AdminCoupon {
 }
 
 export default function AdminCouponsPage() {
-  usePageTitle('Merchant Coupons');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('marketplace.coupons.page_title'));
   const toast = useToast();
   const [items, setItems] = useState<AdminCoupon[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,49 +55,49 @@ export default function AdminCouponsPage() {
       const res = await api.get<{ items: AdminCoupon[] }>('/v2/admin/marketplace/coupons');
       setItems(res.data?.items ?? []);
     } catch {
-      toast.error('Failed to load coupons');
+      toast.error(t('marketplace.coupons.failed_load'));
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     load();
   }, [load]);
 
   const handleSuspend = async (id: number) => {
-    if (!window.confirm('Suspend this coupon?')) return;
+    if (!window.confirm(t('marketplace.coupons.confirm_suspend'))) return;
     try {
       await api.post(`/v2/admin/marketplace/coupons/${id}/suspend`, {});
-      toast.success('Coupon suspended');
+      toast.success(t('marketplace.coupons.suspended'));
       load();
     } catch {
-      toast.error('Failed to suspend');
+      toast.error(t('marketplace.coupons.failed_suspend'));
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Permanently delete this coupon? This cannot be undone.')) return;
+    if (!window.confirm(t('marketplace.coupons.confirm_delete'))) return;
     try {
       await api.delete(`/v2/admin/marketplace/coupons/${id}`);
-      toast.success('Coupon deleted');
+      toast.success(t('marketplace.coupons.deleted'));
       load();
     } catch {
-      toast.error('Failed to delete');
+      toast.error(t('marketplace.coupons.failed_delete'));
     }
   };
 
   const formatDiscount = (c: AdminCoupon): string => {
-    if (c.discount_type === 'percent') return `${c.discount_value}%`;
-    if (c.discount_type === 'fixed') return `€${(c.discount_value / 100).toFixed(2)}`;
-    return 'BOGO';
+    if (c.discount_type === 'percent') return t('marketplace.coupons.discount_percent', { value: c.discount_value });
+    if (c.discount_type === 'fixed') return t('marketplace.coupons.discount_fixed', { value: (c.discount_value / 100).toFixed(2) });
+    return t('marketplace.coupons.discount_bogo');
   };
 
   return (
     <div>
       <PageHeader
-        title="Merchant Coupons"
-        description="Oversight of merchant-issued discount coupons across all sellers."
+        title={t('marketplace.coupons.page_title')}
+        description={t('marketplace.coupons.description')}
       />
       {loading ? (
         <div className="flex justify-center py-12">
@@ -105,18 +106,18 @@ export default function AdminCouponsPage() {
       ) : (
         <Card>
           <CardBody>
-            <Table aria-label="Merchant coupons">
+            <Table aria-label={t('marketplace.coupons.table_aria')}>
               <TableHeader>
-                <TableColumn>Code</TableColumn>
-                <TableColumn>Title</TableColumn>
-                <TableColumn>Seller ID</TableColumn>
-                <TableColumn>Discount</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Uses</TableColumn>
-                <TableColumn>Valid until</TableColumn>
-                <TableColumn>Actions</TableColumn>
+                <TableColumn>{t('marketplace.coupons.columns.code')}</TableColumn>
+                <TableColumn>{t('marketplace.coupons.columns.title')}</TableColumn>
+                <TableColumn>{t('marketplace.coupons.columns.seller_id')}</TableColumn>
+                <TableColumn>{t('marketplace.coupons.columns.discount')}</TableColumn>
+                <TableColumn>{t('marketplace.coupons.columns.status')}</TableColumn>
+                <TableColumn>{t('marketplace.coupons.columns.uses')}</TableColumn>
+                <TableColumn>{t('marketplace.coupons.columns.valid_until')}</TableColumn>
+                <TableColumn>{t('marketplace.coupons.columns.actions')}</TableColumn>
               </TableHeader>
-              <TableBody emptyContent="No coupons.">
+              <TableBody emptyContent={t('marketplace.coupons.empty')}>
                 {items.map((c) => (
                   <TableRow key={c.id}>
                     <TableCell className="font-mono">{c.code}</TableCell>
@@ -129,12 +130,12 @@ export default function AdminCouponsPage() {
                         color={c.status === 'active' ? 'success' : c.status === 'paused' ? 'warning' : 'default'}
                         variant="flat"
                       >
-                        {c.status}
+                        {t(`marketplace.coupons.status.${c.status}`)}
                       </Chip>
                     </TableCell>
                     <TableCell>{c.usage_count}</TableCell>
                     <TableCell>
-                      {c.valid_until ? new Date(c.valid_until).toLocaleDateString() : '—'}
+                      {c.valid_until ? new Date(c.valid_until).toLocaleDateString() : t('marketplace.coupons.no_expiry')}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">
@@ -146,7 +147,7 @@ export default function AdminCouponsPage() {
                           onPress={() => handleSuspend(c.id)}
                           isDisabled={c.status === 'paused'}
                         >
-                          Suspend
+                          {t('marketplace.coupons.suspend')}
                         </Button>
                         <Button
                           size="sm"
@@ -155,7 +156,7 @@ export default function AdminCouponsPage() {
                           startContent={<Trash2 className="w-4 h-4" />}
                           onPress={() => handleDelete(c.id)}
                         >
-                          Delete
+                          {t('marketplace.coupons.delete')}
                         </Button>
                       </div>
                     </TableCell>
