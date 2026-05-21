@@ -50,13 +50,13 @@ export function MyProfile() {
   const { t } = useTranslation('admin');
 
   const CATEGORY_LABELS: Record<string, string> = {
-    care: t('federation.category_care', 'Care & Support'),
-    skills: t('federation.category_skills', 'Skills & Education'),
-    creative: t('federation.category_creative', 'Creative'),
-    home: t('federation.category_home', 'Home & Garden'),
-    health: t('federation.category_health', 'Health & Fitness'),
-    community: t('federation.category_community', 'Community'),
-    services: t('federation.category_services', 'Services'),
+    care: t('federation.category_care'),
+    skills: t('federation.category_skills'),
+    creative: t('federation.category_creative'),
+    home: t('federation.category_home'),
+    health: t('federation.category_health'),
+    community: t('federation.category_community'),
+    services: t('federation.category_services'),
   };
   usePageTitle(t('federation.my_profile_title'));
   const toast = useToast();
@@ -218,13 +218,13 @@ export function MyProfile() {
         Array.from(primaryTopicIds),
       );
       if (res.success) {
-        toast.success(t('federation.topics_updated_successfully', 'Topics updated successfully'));
+        toast.success(t('federation.topics_updated_successfully'));
         setTopicsDirty(false);
       } else {
-        toast.error(t('federation.failed_to_update_topics', 'Failed to update topics'));
+        toast.error(t('federation.failed_to_update_topics'));
       }
     } catch {
-      toast.error(t('federation.failed_to_update_topics', 'Failed to update topics'));
+      toast.error(t('federation.failed_to_update_topics'));
     } finally {
       setTopicsSaving(false);
     }
@@ -366,10 +366,10 @@ export function MyProfile() {
             <div>
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Tag size={18} />
-                {t('federation.topic_tags_title', 'Topic & Interest Tags')}
+                {t('federation.topic_tags_title')}
               </h3>
               <p className="text-sm text-default-400 mt-1">
-                {t('federation.topic_tags_desc', 'Select up to 10 topics that describe your community. Star up to 3 as primary — these appear first in the directory.')}
+                {t('federation.topic_tags_desc')}
               </p>
             </div>
             <Button
@@ -380,7 +380,7 @@ export function MyProfile() {
               isDisabled={!topicsDirty}
               size="sm"
             >
-              {t('federation.save_topics', 'Save Topics')}
+              {t('federation.save_topics')}
             </Button>
           </CardHeader>
           <CardBody className="gap-5">
@@ -402,7 +402,7 @@ export function MyProfile() {
 
                 {/* Helper text for primary topic toggle */}
                 <p className="text-xs text-default-400">
-                  {t('federation.click_star_for_primary_hint', 'Click \u2605 in the summary below to set a topic as primary')}
+                  {t('federation.click_star_for_primary_hint')}
                 </p>
 
                 {/* Topics grouped by category */}
@@ -444,9 +444,9 @@ export function MyProfile() {
                 {selectedTopicIds.size > 0 && (
                   <div className="border-t border-divider pt-4">
                     <h4 className="text-sm font-medium text-default-600 mb-2">
-                      {t('federation.your_selected_topics', 'Your Selected Topics')}
+                      {t('federation.your_selected_topics')}
                       <span className="font-normal text-default-400 ml-2">
-                        ({t('federation.click_star_for_primary', 'click star to toggle primary')})
+                        ({t('federation.click_star_for_primary')})
                       </span>
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -466,7 +466,7 @@ export function MyProfile() {
                                   size="sm"
                                   className="flex items-center min-w-0 w-auto h-auto p-0"
                                   onClick={(e) => { e.stopPropagation(); togglePrimary(topic.id); }}
-                                  aria-label={isPrimary ? t('federation.remove_primary', 'Remove primary') : t('federation.set_as_primary', 'Set as primary')}
+                                  aria-label={isPrimary ? t('federation.remove_primary') : t('federation.set_as_primary')}
                                 >
                                   <Star size={12} className={isPrimary ? 'fill-current' : 'opacity-40'} />
                                 </Button>

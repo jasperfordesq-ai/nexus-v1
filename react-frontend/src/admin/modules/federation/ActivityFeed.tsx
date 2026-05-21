@@ -461,7 +461,7 @@ export function ActivityFeed() {
   return (
     <div>
       <PageHeader
-        title={t('federation.activity_feed_title', 'Federation Activity Feed')}
+        title={t('federation.activity_feed_title')}
         description={t(
           'federation.activity_feed_desc',
           'Cross-tenant federation activity for your community',
@@ -475,7 +475,7 @@ export function ActivityFeed() {
               onPress={() => loadItems(false)}
               isLoading={loading}
             >
-              {t('federation.refresh', 'Refresh')}
+              {t('federation.refresh')}
             </Button>
             <div className="flex flex-col items-end gap-0.5">
               <Button
@@ -485,10 +485,10 @@ export function ActivityFeed() {
                 onPress={exportCsv}
                 isDisabled={items.length === 0}
               >
-                {t('federation.export_csv', 'Export CSV')}
+                {t('federation.export_csv')}
               </Button>
               <span className="text-xs text-default-400">
-                {t('federation.export_loaded_only', 'Exports currently loaded items')}
+                {t('federation.export_loaded_only')}
               </span>
             </div>
           </div>
@@ -498,28 +498,28 @@ export function ActivityFeed() {
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
-          label={t('federation.label_total_activity', 'Total Activity')}
+          label={t('federation.label_total_activity')}
           value={total}
           icon={Activity}
           color="primary"
           loading={loading && total === 0}
         />
         <StatCard
-          label={t('federation.label_messages_in_view', 'Messages (in view)')}
+          label={t('federation.label_messages_in_view')}
           value={statsMessages}
           icon={Mail}
           color="primary"
           loading={loading && total === 0}
         />
         <StatCard
-          label={t('federation.label_transactions_in_view', 'Transactions (in view)')}
+          label={t('federation.label_transactions_in_view')}
           value={statsTransactions}
           icon={CreditCard}
           color="success"
           loading={loading && total === 0}
         />
         <StatCard
-          label={t('federation.label_partnership_events_in_view', 'Partnership Events (in view)')}
+          label={t('federation.label_partnership_events_in_view')}
           value={statsPartnerships}
           icon={Handshake}
           color="secondary"
@@ -532,8 +532,8 @@ export function ActivityFeed() {
         <CardBody>
           <div className="flex flex-wrap gap-3 items-end">
             <Input type="search" name="admin-search" autoComplete="off"
-              label={t('federation.label_search', 'Search')}
-              placeholder={t('federation.search_placeholder', 'User name, description...')}
+              label={t('federation.label_search')}
+              placeholder={t('federation.search_placeholder')}
               size="sm"
               className="max-w-[220px]"
               value={search}
@@ -544,7 +544,7 @@ export function ActivityFeed() {
             />
 
             <Input
-              label={t('federation.label_from_date', 'From')}
+              label={t('federation.label_from_date')}
               type="date"
               size="sm"
               className="max-w-[170px]"
@@ -553,7 +553,7 @@ export function ActivityFeed() {
             />
 
             <Input
-              label={t('federation.label_to_date', 'To')}
+              label={t('federation.label_to_date')}
               type="date"
               size="sm"
               className="max-w-[170px]"
@@ -563,7 +563,7 @@ export function ActivityFeed() {
 
             {knownPartners.length > 0 && (
               <Select
-                label={t('federation.label_partner_community', 'Partner Community')}
+                label={t('federation.label_partner_community')}
                 size="sm"
                 className="max-w-[220px]"
                 selectedKeys={partnerFilter ? [partnerFilter] : []}
@@ -585,14 +585,14 @@ export function ActivityFeed() {
                 startContent={<X size={14} />}
                 onPress={clearFilters}
               >
-                {t('federation.clear', 'Clear')}
+                {t('federation.clear')}
               </Button>
             )}
           </div>
 
           {/* Event type checkboxes */}
           <div className="flex flex-wrap gap-3 mt-3">
-            <span className="text-xs text-default-500 self-center">{t('federation.event_types_label', 'Event types:')}</span>
+            <span className="text-xs text-default-500 self-center">{t('federation.event_types_label')}</span>
             {EVENT_TYPE_OPTION_KEYS.map((opt) => (
               <Checkbox
                 key={opt.key}
@@ -628,7 +628,7 @@ export function ActivityFeed() {
           <CardBody className="flex flex-col items-center justify-center py-16 text-center">
             <Inbox size={48} className="text-default-300 mb-3" />
             <p className="text-default-500 text-lg font-medium mb-1">
-              {t('federation.no_activity_title', 'No federation activity yet')}
+              {t('federation.no_activity_title')}
             </p>
             <p className="text-default-400 text-sm">
               {t(
@@ -653,7 +653,7 @@ export function ActivityFeed() {
                   onPress={handleLoadMore}
                   isLoading={loadingMore}
                 >
-                  {t('federation.load_more', 'Load more')}
+                  {t('federation.load_more')}
                 </Button>
               </div>
             )}

@@ -51,12 +51,12 @@ export function ApiKeys() {
     try {
       const res = await adminFederation.revokeApiKey(id);
       if (res.success) {
-        toast.success(t('federation.key_revoked', 'API key revoked successfully'));
+        toast.success(t('federation.key_revoked'));
         setItems(prev => prev.map(k => k.id === id ? { ...k, status: 'revoked' } : k));
       }
     } catch (err) {
       logError('ApiKeys: failed to revoke key', err);
-      toast.error(t('federation.revoke_failed', 'Failed to revoke API key'));
+      toast.error(t('federation.revoke_failed'));
     }
     setRevokingId(null);
     setRevokeTarget(null);
@@ -89,9 +89,9 @@ export function ApiKeys() {
   };
 
   const getStatusLabel = (item: ApiKey): string => {
-    if (item.status === 'revoked') return t('federation.status_revoked', 'Revoked');
-    if (item.expires_at && new Date(item.expires_at) < new Date()) return t('federation.status_expired', 'Expired');
-    return t('federation.status_active', 'Active');
+    if (item.status === 'revoked') return t('federation.status_revoked');
+    if (item.expires_at && new Date(item.expires_at) < new Date()) return t('federation.status_expired');
+    return t('federation.status_active');
   };
 
   const columns: Column<ApiKey>[] = [
@@ -111,9 +111,9 @@ export function ApiKeys() {
       render: (item) => <span className="text-sm text-default-500">{Array.isArray(item.scopes) ? item.scopes.join(', ') : '--'}</span>,
     },
     {
-      key: 'expires_at', label: t('federation.col_expires', 'Expires'),
+      key: 'expires_at', label: t('federation.col_expires'),
       render: (item) => {
-        if (!item.expires_at) return <span className="text-sm text-default-400">{t('federation.never_expires', 'Never')}</span>;
+        if (!item.expires_at) return <span className="text-sm text-default-400">{t('federation.never_expires')}</span>;
         const isExpired = new Date(item.expires_at) < new Date();
         return <span className={`text-sm ${isExpired ? 'text-warning' : 'text-default-500'}`}>{new Date(item.expires_at).toLocaleDateString()}</span>;
       },
@@ -137,7 +137,7 @@ export function ApiKeys() {
           isLoading={revokingId === item.id}
           onPress={() => setRevokeTarget(item)}
         >
-          {t('federation.revoke', 'Revoke')}
+          {t('federation.revoke')}
         </Button>
       ) : null,
     },
@@ -175,9 +175,9 @@ export function ApiKeys() {
           isOpen={!!revokeTarget}
           onClose={() => setRevokeTarget(null)}
           onConfirm={confirmRevoke}
-          title={t('federation.revoke_key_title', 'Revoke API Key')}
-          message={t('federation.confirm_revoke', 'Are you sure you want to revoke this API key? This cannot be undone.')}
-          confirmLabel={t('federation.revoke', 'Revoke')}
+          title={t('federation.revoke_key_title')}
+          message={t('federation.confirm_revoke')}
+          confirmLabel={t('federation.revoke')}
           confirmColor="danger"
           isLoading={revokingId === revokeTarget.id}
         />

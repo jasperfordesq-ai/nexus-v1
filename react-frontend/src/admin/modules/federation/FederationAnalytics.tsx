@@ -80,7 +80,7 @@ interface AnalyticsOverview {
 
 export function FederationAnalytics() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('federation.analytics.title', 'Federation Analytics'));
+  usePageTitle(t('federation.analytics.title'));
   const toast = useToast();
   const [data, setData] = useState<AnalyticsOverview | null>(null);
   const [loading, setLoading] = useState(true);

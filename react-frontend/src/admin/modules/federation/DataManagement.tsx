@@ -64,7 +64,7 @@ export function DataManagement() {
       await adminFederation.exportFederationData();
       toast.success("Export succeeded");
     } catch {
-      toast.error(t('federation.export_failed', 'Export failed'));
+      toast.error(t('federation.export_failed'));
     }
     setExporting(false);
   }, [t, toast]);

@@ -280,7 +280,7 @@ export function PartnerDirectory() {
             {topics.length > 0 && (
               <Select
                 className="w-full md:w-48"
-                placeholder={t('federation.placeholder_all_topics', 'All Topics')}
+                placeholder={t('federation.placeholder_all_topics')}
                 size="sm"
                 variant="bordered"
                 selectedKeys={topicFilter ? [topicFilter] : []}

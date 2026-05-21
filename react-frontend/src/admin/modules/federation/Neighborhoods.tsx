@@ -471,9 +471,9 @@ export function Neighborhoods() {
           isOpen={!!removeTenantTarget}
           onClose={() => setRemoveTenantTarget(null)}
           onConfirm={confirmRemoveTenant}
-          title={t('federation.remove_tenant_title', 'Remove Tenant')}
-          message={t('federation.confirm_remove_tenant', 'Are you sure you want to remove this tenant from the neighborhood?')}
-          confirmLabel={t('federation.remove', 'Remove')}
+          title={t('federation.remove_tenant_title')}
+          message={t('federation.confirm_remove_tenant')}
+          confirmLabel={t('federation.remove')}
           confirmColor="danger"
         />
       )}
@@ -484,9 +484,9 @@ export function Neighborhoods() {
           isOpen={deleteTarget !== null}
           onClose={() => setDeleteTarget(null)}
           onConfirm={confirmDelete}
-          title={t('federation.delete_neighborhood_title', 'Delete Neighborhood')}
-          message={t('federation.confirm_delete_neighborhood', 'Are you sure you want to delete this neighborhood? This cannot be undone.')}
-          confirmLabel={t('federation.delete', 'Delete')}
+          title={t('federation.delete_neighborhood_title')}
+          message={t('federation.confirm_delete_neighborhood')}
+          confirmLabel={t('federation.delete')}
           confirmColor="danger"
         />
       )}

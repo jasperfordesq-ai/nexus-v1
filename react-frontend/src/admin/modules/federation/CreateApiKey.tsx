@@ -143,8 +143,8 @@ export function CreateApiKey() {
           <div>
             <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
               <Calendar size={14} />
-              {t('federation.expiry_date', 'Expiry Date')}
-              <span className="text-default-400 font-normal">({t('federation.optional', 'optional')})</span>
+              {t('federation.expiry_date')}
+              <span className="text-default-400 font-normal">({t('federation.optional')})</span>
             </p>
             <Input
               type="date"
@@ -152,7 +152,7 @@ export function CreateApiKey() {
               value={expiresAt}
               onValueChange={setExpiresAt}
               min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
-              description={t('federation.expiry_description', 'Leave blank for a key that never expires. Expired keys are automatically deactivated.')}
+              description={t('federation.expiry_description')}
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">

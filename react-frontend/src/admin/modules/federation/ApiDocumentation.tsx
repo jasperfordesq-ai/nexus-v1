@@ -1285,7 +1285,7 @@ def verify_signature(payload: bytes, signature: str, secret: str) -> bool:
 
 @app.route('/webhooks/nexus', methods=['POST'])
 def handle_webhook():
-    signature = request.headers.get('X-Webhook-Signature', '')
+    signature = request.headers.get('X-Webhook-Signature')
     if not verify_signature(request.data, signature, WEBHOOK_SECRET):
         return jsonify({'error': 'Invalid signature'}), 401
 
