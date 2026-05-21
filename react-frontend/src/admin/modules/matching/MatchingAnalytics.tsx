@@ -70,7 +70,7 @@ const DIST_LABEL_KEYS: Record<string, string> = {
 
 export function MatchingAnalytics() {
   const { t } = useTranslation('admin');
-  usePageTitle("Matching");
+  usePageTitle(t('matching.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -86,11 +86,11 @@ export function MatchingAnalytics() {
         setStats(res.data);
       }
     } catch {
-      toast.error("Failed to load matching analytics");
+      toast.error(t('matching.failed_to_load_matching_analytics'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -109,8 +109,8 @@ export function MatchingAnalytics() {
   return (
     <div>
       <PageHeader
-        title={"Matching Analytics"}
-        description={"View match score distributions, approval rates, and distance data"}
+        title={t('matching.matching_analytics_title')}
+        description={t('matching.matching_analytics_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -119,7 +119,7 @@ export function MatchingAnalytics() {
               onPress={() => navigate(tenantPath('/admin/smart-matching'))}
               size="sm"
             >
-              {"Back"}
+              {t('common.back')}
             </Button>
             <Button
               variant="flat"
@@ -128,7 +128,7 @@ export function MatchingAnalytics() {
               isLoading={loading}
               size="sm"
             >
-              {"Refresh"}
+              {t('common.refresh')}
             </Button>
           </div>
         }
@@ -141,9 +141,9 @@ export function MatchingAnalytics() {
       ) : !hasData ? (
         <EmptyState
           icon={BarChart3}
-          title={"No matching data yet"}
-          description={"No matching data is available yet"}
-          actionLabel={"Configure Matching"}
+          title={t('matching.no_matching_data_yet')}
+          description={t('matching.no_matching_data_desc')}
+          actionLabel={t('matching.configure_matching')}
           onAction={() => navigate(tenantPath('/admin/smart-matching/configuration'))}
         />
       ) : (
@@ -151,21 +151,21 @@ export function MatchingAnalytics() {
           {/* Stats Row */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
             <StatCard
-              label={"Total Matches"}
+              label={t('matching.label_total_matches')}
               value={overview?.total_matches_month ?? 0}
               icon={Target}
               color="primary"
               loading={loading}
             />
             <StatCard
-              label={"Approval Rate"}
+              label={t('matching.label_approval_rate')}
               value={`${stats?.approval_rate ?? 0}%`}
               icon={CheckCircle}
               color="success"
               loading={loading}
             />
             <StatCard
-              label={"Average Score"}
+              label={t('matching.label_average_score')}
               value={overview?.avg_match_score !== undefined
                 ? `${overview.avg_match_score}%`
                 : '---'}
@@ -174,7 +174,7 @@ export function MatchingAnalytics() {
               loading={loading}
             />
             <StatCard
-              label={"Avg Distance"}
+              label={t('matching.label_avg_distance')}
               value={overview?.avg_distance_km !== undefined
                 ? `${overview.avg_distance_km} km`
                 : '---'}
@@ -189,7 +189,7 @@ export function MatchingAnalytics() {
             <Card shadow="sm">
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
                 <Zap size={18} className="text-primary" />
-                <h3 className="font-semibold">{"Score Distribution"}</h3>
+                <h3 className="font-semibold">{t('matching.score_distribution')}</h3>
               </CardHeader>
               <CardBody className="px-4 pb-4">
                 {stats?.score_distribution ? (
@@ -214,7 +214,11 @@ export function MatchingAnalytics() {
                             value={pct}
                             color={SCORE_COLORS[range] ?? 'primary'}
                             size="sm"
-                            aria-label={`${SCORE_LABEL_KEYS[range] ? t(SCORE_LABEL_KEYS[range]) : range}: ${count} matches (${pct}%)`}
+                            aria-label={t('matching.distribution_aria', {
+                              label: SCORE_LABEL_KEYS[range] ? t(SCORE_LABEL_KEYS[range]) : range,
+                              count,
+                              percent: pct,
+                            })}
                           />
                         </div>
                       );
@@ -222,7 +226,7 @@ export function MatchingAnalytics() {
                   </div>
                 ) : (
                   <p className="py-8 text-center text-sm text-default-400">
-                    {"No score data"}
+                    {t('matching.no_score_data')}
                   </p>
                 )}
               </CardBody>
@@ -232,7 +236,7 @@ export function MatchingAnalytics() {
             <Card shadow="sm">
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
                 <MapPin size={18} className="text-primary" />
-                <h3 className="font-semibold">{"Distance Distribution"}</h3>
+                <h3 className="font-semibold">{t('matching.distance_distribution')}</h3>
               </CardHeader>
               <CardBody className="px-4 pb-4">
                 {stats?.distance_distribution ? (
@@ -258,7 +262,11 @@ export function MatchingAnalytics() {
                               value={pct}
                               color={DIST_COLORS[band] ?? 'primary'}
                               size="sm"
-                              aria-label={`${DIST_LABEL_KEYS[band] ? t(DIST_LABEL_KEYS[band]) : band}: ${count} matches (${pct}%)`}
+                              aria-label={t('matching.distribution_aria', {
+                                label: DIST_LABEL_KEYS[band] ? t(DIST_LABEL_KEYS[band]) : band,
+                                count,
+                                percent: pct,
+                              })}
                             />
                           </div>
                         );
@@ -267,7 +275,7 @@ export function MatchingAnalytics() {
                   </div>
                 ) : (
                   <p className="py-8 text-center text-sm text-default-400">
-                    {"No distance data"}
+                    {t('matching.no_distance_data')}
                   </p>
                 )}
               </CardBody>
@@ -277,49 +285,49 @@ export function MatchingAnalytics() {
             <Card shadow="sm">
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
                 <Users size={18} className="text-primary" />
-                <h3 className="font-semibold">{"Matching Activity"}</h3>
+                <h3 className="font-semibold">{t('matching.matching_activity')}</h3>
               </CardHeader>
               <CardBody className="px-4 pb-4">
                 {overview ? (
                   <div className="space-y-3">
                     <ActivityRow
-                      label={"Matches Today"}
+                      label={t('matching.label_matches_today')}
                       value={overview.total_matches_today}
                     />
                     <Divider />
                     <ActivityRow
-                      label={"Matches This Week"}
+                      label={t('matching.label_matches_this_week')}
                       value={overview.total_matches_week}
                     />
                     <Divider />
                     <ActivityRow
-                      label={"Matches This Month"}
+                      label={t('matching.label_matches_this_month')}
                       value={overview.total_matches_month}
                     />
                     <Divider />
                     <ActivityRow
-                      label={"Hot Matches"}
+                      label={t('matching.label_hot_matches')}
                       value={overview.hot_matches_count}
                     />
                     <Divider />
                     <ActivityRow
-                      label={"Mutual Matches"}
+                      label={t('matching.label_mutual_matches')}
                       value={overview.mutual_matches_count}
                     />
                     <Divider />
                     <ActivityRow
-                      label={"Active Users in Matching"}
+                      label={t('matching.label_active_users_in_matching')}
                       value={overview.active_users_matching}
                     />
                     <Divider />
                     <ActivityRow
-                      label={"Cache Entries"}
+                      label={t('matching.label_cache_entries')}
                       value={overview.cache_entries}
                     />
                   </div>
                 ) : (
                   <p className="py-8 text-center text-sm text-default-400">
-                    {"No activity data"}
+                    {t('matching.no_activity_data')}
                   </p>
                 )}
               </CardBody>
@@ -329,31 +337,31 @@ export function MatchingAnalytics() {
             <Card shadow="sm">
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
                 <CheckCircle size={18} className="text-primary" />
-                <h3 className="font-semibold">{"Approval Metrics"}</h3>
+                <h3 className="font-semibold">{t('matching.approval_metrics')}</h3>
               </CardHeader>
               <CardBody className="px-4 pb-4">
                 {stats ? (
                   <div className="space-y-3">
                     <ActivityRow
-                      label={"Pending Approvals"}
+                      label={t('matching.label_pending_approvals')}
                       value={stats.pending_approvals}
                       color="text-warning"
                     />
                     <Divider />
                     <ActivityRow
-                      label={"Approved Matches"}
+                      label={t('matching.label_approved_matches')}
                       value={stats.approved_count}
                       color="text-success"
                     />
                     <Divider />
                     <ActivityRow
-                      label={"Rejected Matches"}
+                      label={t('matching.label_rejected_matches')}
                       value={stats.rejected_count}
                       color="text-danger"
                     />
                     <Divider />
                     <div className="flex items-center justify-between py-1">
-                      <span className="text-sm text-default-600">{"Approval Rate"}</span>
+                      <span className="text-sm text-default-600">{t('matching.label_approval_rate')}</span>
                       <span className="text-sm font-bold text-success">
                         {stats.approval_rate}%
                       </span>
@@ -362,12 +370,12 @@ export function MatchingAnalytics() {
                       value={stats.approval_rate}
                       color="success"
                       size="sm"
-                      aria-label={`Approval rate: ${stats.approval_rate}%`}
+                      aria-label={t('matching.approval_rate_aria', { value: stats.approval_rate })}
                     />
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                       <span className="text-sm text-default-600">
-                        {"Broker Approval"}
+                        {t('matching.label_broker_approval')}
                       </span>
                       <span
                         className={`text-sm font-medium ${
@@ -376,13 +384,13 @@ export function MatchingAnalytics() {
                             : 'text-default-400'
                         }`}
                       >
-                        {stats.broker_approval_enabled ? "Enabled" : "Disabled"}
+                        {stats.broker_approval_enabled ? t('matching.enabled') : t('matching.disabled')}
                       </span>
                     </div>
                   </div>
                 ) : (
                   <p className="py-8 text-center text-sm text-default-400">
-                    {"No approval data"}
+                    {t('matching.no_approval_data')}
                   </p>
                 )}
               </CardBody>
