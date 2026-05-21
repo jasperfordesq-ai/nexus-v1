@@ -5412,6 +5412,52 @@
       "kiss_agoris": "KISS & AGORIS"
     }
   },
+  "provisioning_requests": {
+    "page_title": "Provisioning Queue",
+    "page_subtitle": "Review and approve self-service tenant provisioning requests",
+    "refresh": "Refresh",
+    "load_failed": "Failed to load provisioning requests",
+    "approval_queued": "Approval queued - provisioning in progress",
+    "approve_failed": "Failed to approve",
+    "rejection_reason_required": "Please enter a rejection reason",
+    "request_rejected": "Request rejected - applicant notified by email",
+    "reject_failed": "Failed to reject",
+    "retry_queued": "Retry queued",
+    "retry_failed": "Failed to retry",
+    "empty_status": "No provisioning requests in this status.",
+    "empty_value": "-",
+    "languages_value": "{{languages}} (default: {{defaultLanguage}})",
+    "rejection_reason_label": "Rejection reason (required if rejecting)",
+    "rejection_reason_placeholder": "Why is this being rejected?",
+    "submitted": "Submitted",
+    "reviewed": "Reviewed",
+    "close": "Close",
+    "reject": "Reject",
+    "approve_and_provision": "Approve & Provision",
+    "retry": "Retry",
+    "statuses": {
+      "all": "All",
+      "pending": "Pending",
+      "under_review": "Under Review",
+      "approved": "Approved",
+      "provisioned": "Provisioned",
+      "rejected": "Rejected",
+      "failed": "Failed"
+    },
+    "fields": {
+      "applicant": "Applicant",
+      "country_region": "Country / Region",
+      "slug": "Slug",
+      "subdomain": "Subdomain",
+      "category": "Category",
+      "expected_size": "Expected size",
+      "languages": "Languages",
+      "provisioned_tenant": "Provisioned tenant",
+      "intended_use": "Intended use",
+      "rejection_reason": "Rejection reason",
+      "provisioning_log": "Provisioning log"
+    }
+  },
   "broker": {
     "a_reason_is_required": "A reason is required",
     "a_reason_is_required_for_bulk_rejection": "A reason is required for bulk rejection",

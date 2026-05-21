@@ -16,6 +16,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Chip,
@@ -67,13 +68,13 @@ interface ProvisioningRequest {
 }
 
 const STATUS_FILTERS = [
-  { key: '',             label: 'All',           color: 'default' as const },
-  { key: 'pending',      label: 'Pending',       color: 'default' as const },
-  { key: 'under_review', label: 'Under Review',  color: 'primary' as const },
-  { key: 'approved',     label: 'Approved',      color: 'primary' as const },
-  { key: 'provisioned',  label: 'Provisioned',   color: 'success' as const },
-  { key: 'rejected',     label: 'Rejected',      color: 'danger' as const },
-  { key: 'failed',       label: 'Failed',        color: 'warning' as const },
+  { key: '',             labelKey: 'all',           color: 'default' as const },
+  { key: 'pending',      labelKey: 'pending',       color: 'default' as const },
+  { key: 'under_review', labelKey: 'under_review',  color: 'primary' as const },
+  { key: 'approved',     labelKey: 'approved',      color: 'primary' as const },
+  { key: 'provisioned',  labelKey: 'provisioned',   color: 'success' as const },
+  { key: 'rejected',     labelKey: 'rejected',      color: 'danger' as const },
+  { key: 'failed',       labelKey: 'failed',        color: 'warning' as const },
 ];
 
 function statusColor(status: string): 'default' | 'primary' | 'success' | 'warning' | 'danger' {
@@ -81,7 +82,8 @@ function statusColor(status: string): 'default' | 'primary' | 'success' | 'warni
 }
 
 export function ProvisioningRequestsPage() {
-  usePageTitle('Provisioning Queue');
+  const { t } = useTranslation('admin', { keyPrefix: 'provisioning_requests' });
+  usePageTitle(t('page_title'));
   const toast = useToast();
 
   const [requests, setRequests] = useState<ProvisioningRequest[]>([]);
@@ -102,11 +104,11 @@ export function ProvisioningRequestsPage() {
       setRequests(Array.isArray(data) ? data : []);
     } catch (err) {
       logError('ProvisioningRequestsPage load failed', err);
-      toast.error('Failed to load provisioning requests');
+      toast.error(t('load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [filter, toast]);
+  }, [filter, t, toast]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -121,12 +123,12 @@ export function ProvisioningRequestsPage() {
     setActionInFlight(true);
     try {
       await api.post(`/v2/super-admin/provisioning-requests/${selected.id}/approve`, {});
-      toast.success('Approval queued — provisioning in progress');
+      toast.success(t('approval_queued'));
       detail.onClose();
       await load();
     } catch (err) {
       logError('approve failed', err);
-      toast.error('Failed to approve');
+      toast.error(t('approve_failed'));
     } finally {
       setActionInFlight(false);
     }
@@ -135,7 +137,7 @@ export function ProvisioningRequestsPage() {
   async function handleReject() {
     if (!selected) return;
     if (!rejectionReason.trim()) {
-      toast.error('Please enter a rejection reason');
+      toast.error(t('rejection_reason_required'));
       return;
     }
     setActionInFlight(true);
@@ -143,12 +145,12 @@ export function ProvisioningRequestsPage() {
       await api.post(`/v2/super-admin/provisioning-requests/${selected.id}/reject`, {
         reason: rejectionReason.trim(),
       });
-      toast.success('Request rejected — applicant notified by email');
+      toast.success(t('request_rejected'));
       detail.onClose();
       await load();
     } catch (err) {
       logError('reject failed', err);
-      toast.error('Failed to reject');
+      toast.error(t('reject_failed'));
     } finally {
       setActionInFlight(false);
     }
@@ -159,12 +161,12 @@ export function ProvisioningRequestsPage() {
     setActionInFlight(true);
     try {
       await api.post(`/v2/super-admin/provisioning-requests/${selected.id}/retry`, {});
-      toast.success('Retry queued');
+      toast.success(t('retry_queued'));
       detail.onClose();
       await load();
     } catch (err) {
       logError('retry failed', err);
-      toast.error('Failed to retry');
+      toast.error(t('retry_failed'));
     } finally {
       setActionInFlight(false);
     }
@@ -180,8 +182,8 @@ export function ProvisioningRequestsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Provisioning Queue"
-        subtitle="Review and approve self-service tenant provisioning requests"
+        title={t('page_title')}
+        subtitle={t('page_subtitle')}
         icon={<Building className="w-6 h-6" />}
         actions={
           <Button
@@ -191,7 +193,7 @@ export function ProvisioningRequestsPage() {
             onPress={load}
             isLoading={loading}
           >
-            Refresh
+            {t('refresh')}
           </Button>
         }
       />
@@ -206,7 +208,7 @@ export function ProvisioningRequestsPage() {
             color={filter === s.key ? s.color : 'default'}
             onPress={() => setFilter(s.key)}
           >
-            {s.label}
+            {t(`statuses.${s.labelKey}`)}
           </Button>
         ))}
       </div>
@@ -217,7 +219,7 @@ export function ProvisioningRequestsPage() {
       ) : requests.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <Building className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p>No provisioning requests in this status.</p>
+          <p>{t('empty_status')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -266,58 +268,58 @@ export function ProvisioningRequestsPage() {
               <ModalBody className="space-y-4 text-sm">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Applicant</p>
+                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.applicant')}</p>
                     <p>{selected.applicant_name}</p>
                     <p className="text-indigo-400">{selected.applicant_email}</p>
                     {selected.applicant_phone && <p>{selected.applicant_phone}</p>}
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Country / Region</p>
+                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.country_region')}</p>
                     <p>{selected.country_code}{selected.region_or_canton ? ` · ${selected.region_or_canton}` : ''}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Slug</p>
+                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.slug')}</p>
                     <p className="font-mono">{selected.requested_slug}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Subdomain</p>
+                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.subdomain')}</p>
                     <p className="font-mono">{selected.requested_subdomain ?? '—'}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Category</p>
+                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.category')}</p>
                     <p>{selected.tenant_category}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Expected size</p>
+                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.expected_size')}</p>
                     <p>{selected.expected_member_count_bucket ?? '—'}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Languages</p>
-                    <p>{parsedLanguages.length > 0 ? parsedLanguages.join(', ') : '—'} (default: {selected.default_language})</p>
+                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.languages')}</p>
+                    <p>{t('languages_value', { languages: parsedLanguages.length > 0 ? parsedLanguages.join(', ') : t('empty_value'), defaultLanguage: selected.default_language })}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Provisioned tenant</p>
+                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.provisioned_tenant')}</p>
                     <p>{selected.provisioned_tenant_id ? `#${selected.provisioned_tenant_id}` : '—'}</p>
                   </div>
                 </div>
 
                 {selected.intended_use && (
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Intended use</p>
+                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.intended_use')}</p>
                     <p className="text-gray-300 italic whitespace-pre-wrap">{selected.intended_use}</p>
                   </div>
                 )}
 
                 {selected.rejection_reason && (
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Rejection reason</p>
+                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.rejection_reason')}</p>
                     <p className="text-rose-400">{selected.rejection_reason}</p>
                   </div>
                 )}
 
                 {parsedLog !== null && (
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Provisioning log</p>
+                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.provisioning_log')}</p>
                     <pre className="text-xs bg-gray-800/40 rounded p-2 overflow-x-auto">
                       {JSON.stringify(parsedLog, null, 2)}
                     </pre>
@@ -328,27 +330,27 @@ export function ProvisioningRequestsPage() {
                 {(selected.status === 'pending' || selected.status === 'under_review') && (
                   <div className="border-t border-white/10 pt-4">
                     <p className="text-gray-400 text-xs uppercase tracking-wide mb-2">
-                      Rejection reason (required if rejecting)
+                      {t('rejection_reason_label')}
                     </p>
                     <Textarea
                       size="sm"
                       minRows={2}
                       value={rejectionReason}
                       onValueChange={setRejectionReason}
-                      placeholder="Why is this being rejected?"
+                      placeholder={t('rejection_reason_placeholder')}
                     />
                   </div>
                 )}
 
                 <div className="border-t border-white/10 pt-3 grid grid-cols-2 gap-2 text-xs text-gray-400">
-                  <div><span className="font-medium text-gray-300">Submitted:</span> {new Date(selected.created_at).toLocaleString()}</div>
+                  <div><span className="font-medium text-gray-300">{t('submitted')}:</span> {new Date(selected.created_at).toLocaleString()}</div>
                   {selected.reviewed_at && (
-                    <div><span className="font-medium text-gray-300">Reviewed:</span> {new Date(selected.reviewed_at).toLocaleString()}</div>
+                    <div><span className="font-medium text-gray-300">{t('reviewed')}:</span> {new Date(selected.reviewed_at).toLocaleString()}</div>
                   )}
                 </div>
               </ModalBody>
               <ModalFooter className="flex flex-wrap gap-2 justify-end">
-                <Button variant="light" onPress={detail.onClose}>Close</Button>
+                <Button variant="light" onPress={detail.onClose}>{t('close')}</Button>
                 {(selected.status === 'pending' || selected.status === 'under_review') && (
                   <>
                     <Button
@@ -358,7 +360,7 @@ export function ProvisioningRequestsPage() {
                       isLoading={actionInFlight}
                       onPress={handleReject}
                     >
-                      Reject
+                      {t('reject')}
                     </Button>
                     <Button
                       color="success"
@@ -366,7 +368,7 @@ export function ProvisioningRequestsPage() {
                       isLoading={actionInFlight}
                       onPress={handleApprove}
                     >
-                      Approve & Provision
+                      {t('approve_and_provision')}
                     </Button>
                   </>
                 )}
@@ -377,7 +379,7 @@ export function ProvisioningRequestsPage() {
                     isLoading={actionInFlight}
                     onPress={handleRetry}
                   >
-                    Retry
+                    {t('retry')}
                   </Button>
                 )}
               </ModalFooter>
