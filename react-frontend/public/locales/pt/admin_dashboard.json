@@ -45,7 +45,8 @@
     "listings_pending_text": "New listings awaiting moderation",
     "orgs_pending_one": "{{count}} Organization Pending",
     "orgs_pending_other": "{{count}} Organizations Pending",
-    "orgs_pending_text": "Volunteering organizations awaiting approval"
+    "orgs_pending_text": "Volunteering organizations awaiting approval",
+    "review": "Rever"
   },
   "modules": {
     "section_title": "Platform Modules",
