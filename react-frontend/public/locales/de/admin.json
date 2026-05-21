@@ -10411,5 +10411,283 @@
       "retention_save_failed": "Aufbewahrungskonfiguration konnte nicht gespeichert werden.",
       "retention_saved": "Aufbewahrungskonfiguration gespeichert."
     }
+  },
+  "ai": {
+    "common": {
+      "cancel": "Stornieren",
+      "close": "Schließen",
+      "empty_dash": "-",
+      "loading": "Laden...",
+      "save_changes": "Änderungen speichern"
+    },
+    "ki_agents": {
+      "meta": {
+        "title": "KI-Agenten",
+        "description": "AG61 – Autonomous Agent Framework. Agenten schlagen Aktionen vor; Menschen genehmigen, bevor etwas angewendet wird."
+      },
+      "about": {
+        "title": "Über KI-Agenten",
+        "body": "KI-Agenten (AI-Agenten) automatisieren routinemäßige Koordinationsaufgaben: Finden guter Pflegepaarungen, Anstoßen inaktiver Mitglieder, Zusammenfassen der Arbeitsbelastung der Koordinatoren und Weiterleiten offener Hilfeanfragen. Jeder Agent arbeitet nach einem Vorschlag-dann-Genehmigungsmodell: Agenten generieren Vorschläge, aber nichts wird angewendet, bis ein Mensch ihn genehmigt, es sei denn, der Konfidenzwert des Vorschlags überschreitet den von Ihnen konfigurierten Schwellenwert für die automatische Anwendung.",
+        "tandem_prefix": "schlägt vor",
+        "tandem_suffix": "- Individuelle Betreuungspaarungen basierend auf Fähigkeiten, Standort und Verfügbarkeit.",
+        "nudge": "sendet gezielte Aufforderungen an Mitglieder, die inaktiv waren oder deren Anfragen nicht erfüllt wurden.",
+        "demand": "prognostiziert den bevorstehenden Pflegebedarf anhand historischer Muster.",
+        "help": "schlägt den besten Koordinator für offene Hilfeanfragen vor.",
+        "activity": "sendet den Koordinatoren per E-Mail eine wöchentliche Zusammenfassung der Freiwilligenaktivitäten."
+      },
+      "tabs": {
+        "aria": "KI-Agenten-Registerkarten",
+        "config": "Konfig",
+        "proposals": "Vorschläge",
+        "runs": "Läuft"
+      },
+      "stats": {
+        "total_runs": "Gesamtläufe",
+        "total_proposals": "Gesamtvorschläge",
+        "pending_review": "{{count}} wartet auf Überprüfung"
+      },
+      "agent_types": {
+        "activity_summary": "Aktivitätszusammenfassung",
+        "demand_forecast": "Nachfrageprognose",
+        "help_routing": "Hilfe-Routing",
+        "member_welcome": "Mitglied willkommen",
+        "nudge_dispatch": "Nudge-Versand",
+        "tandem_matching": "Tandem-Matching"
+      },
+      "status": {
+        "all": "Alle",
+        "approved": "Genehmigt",
+        "auto_applied": "Automatisch angewendet",
+        "cancelled": "Abgesagt",
+        "completed": "Vollendet",
+        "expired": "Abgelaufen",
+        "failed": "Fehlgeschlagen",
+        "pending": "Ausstehend",
+        "pending_review": "Ausstehende Überprüfung",
+        "rejected": "Abgelehnt",
+        "running": "Läuft"
+      },
+      "triggered_by": {
+        "manual": "Handbuch",
+        "scheduled": "Geplant"
+      },
+      "config": {
+        "enable_title": "Aktivieren Sie KI-Agenten",
+        "enable_description": "Master ein/aus. Wenn diese Option deaktiviert ist, werden keine Agenten planmäßig ausgeführt.",
+        "agent_types_title": "Agententypen",
+        "tandem_description": "Unterstützungspaarungen im Stil",
+        "nudge_description": "Intelligentes Engagement fördert die Mitglieder",
+        "activity_description": "Wöchentliche Zusammenfassung des Freiwilligenprotokolls für die Koordinatoren",
+        "demand_description": "Prognostizieren Sie den Pflegebedarf anhand von Trends im Freiwilligenprotokoll",
+        "help_description": "Offene Hilfeanfragen automatisch weiterleiten",
+        "thresholds_title": "Schwellenwerte und Zeitplan",
+        "auto_apply_threshold": "Schwellenwert für die automatische Anwendung:",
+        "auto_apply_threshold_aria": "Schwellenwert automatisch anwenden",
+        "auto_apply_threshold_help": "Vorschläge über dieser Konfidenz werden automatisch und ohne Überprüfung angewendet.",
+        "max_proposals": "Maximale Vorschläge pro Lauf",
+        "schedule_hour": "Stundenplan (0–23, Server-Ortszeit)",
+        "notification_email": "Benachrichtigungs-E-Mail",
+        "notification_email_placeholder": "admin@example.org"
+      },
+      "actions": {
+        "approve": "Genehmigen",
+        "approve_all_eligible": "Genehmigen Sie alle Berechtigten",
+        "details": "Details",
+        "reject": "Ablehnen",
+        "save_config": "Konfiguration speichern",
+        "trigger": "Auslösen"
+      },
+      "empty": {
+        "loading_config": "Konfiguration wird geladen...",
+        "loading_proposals": "Vorschläge werden geladen...",
+        "loading_runs": "Läufe werden geladen...",
+        "no_filtered_proposals": "Keine Vorschläge entsprechen diesem Filter.",
+        "no_pending_proposals": "Keine Vorschläge warten auf Prüfung. Führen Sie einen Agenten über die Registerkarte „Ausführungen“ aus, um Vorschläge zu generieren.",
+        "no_runs": "Noch keine Läufe. Verwenden Sie das Auslösefeld oben, um Ihren ersten Agentenlauf zu starten."
+      },
+      "proposals": {
+        "approve_all_help": "Genehmigt alle Vorschläge zur ausstehenden Prüfung, deren Vertrauen den Schwellenwert für die automatische Anwendung erreicht.",
+        "table_aria": "Agentenvorschläge",
+        "columns": {
+          "actions": "Aktionen",
+          "confidence": "Vertrauen",
+          "created": "Erstellt",
+          "proposal_data": "Angebotsdaten",
+          "status": "Status",
+          "subject_user": "Betreff Benutzer",
+          "target_user": "Zielbenutzer",
+          "type": "Typ"
+        }
+      },
+      "legend": {
+        "status": "Status:",
+        "awaiting_decision": "Ich warte auf Ihre Entscheidung",
+        "human_approved": "vom Menschen genehmigt und angewendet",
+        "auto_applied": "automatisch nach Überschreiten des Schwellenwerts angewendet",
+        "rejected": "verworfen, nicht angewendet",
+        "confidence": "Vertrauen:",
+        "confidence_high": "Über 80 % sichere automatische Anwendung",
+        "confidence_medium": "50–79 % Bewertung empfohlen",
+        "confidence_low": "Unter 50 % geringes Vertrauen"
+      },
+      "runs": {
+        "agent_type_aria": "Auszulösender Agententyp",
+        "agent_type_title": "Agententyp",
+        "table_aria": "Agent läuft",
+        "trigger_title": "Jetzt einen Lauf auslösen",
+        "triggered_by_help": "Manuell bedeutet, dass es von einem Administrator auf dieser Seite ausgelöst wird; Geplant bedeutet, dass es automatisch zur konfigurierten Zeitplanstunde ausgeführt wird.",
+        "columns": {
+          "actions": "Aktionen",
+          "agent_type": "Agententyp",
+          "applied": "Angewandt",
+          "duration": "Dauer",
+          "proposals": "Vorschläge",
+          "started": "Begonnen",
+          "status": "Status",
+          "triggered_by": "Ausgelöst durch"
+        }
+      },
+      "run_detail": {
+        "title": "Führen Sie #{{id}} - {{type}} aus",
+        "status": "Status:",
+        "triggered_by": "Ausgelöst durch:",
+        "started": "Begonnen:",
+        "duration": "Dauer:",
+        "proposals_generated": "Generierte Vorschläge:",
+        "proposals_applied": "Beantragte Vorschläge:",
+        "proposals_count": "Vorschläge ({{count}})",
+        "proposals_table_aria": "Vorschläge ausführen",
+        "columns": {
+          "subject": "Thema"
+        }
+      },
+      "toasts": {
+        "approve_eligible_failed": "Geeignete Vorschläge konnten nicht genehmigt werden.",
+        "approved_eligible": "Genehmigte {{approved}}-Vorschläge ({{failed}} fehlgeschlagen, Schwellenwert {{threshold}} %).",
+        "config_load_failed": "Die Agentenkonfiguration konnte nicht geladen werden.",
+        "config_save_failed": "Konfiguration konnte nicht gespeichert werden.",
+        "config_saved": "Agentenkonfiguration gespeichert.",
+        "proposal_approve_failed": "Der Vorschlag konnte nicht genehmigt werden.",
+        "proposal_approved": "Vorschlag genehmigt und angewendet.",
+        "proposal_reject_failed": "Vorschlag konnte nicht abgelehnt werden.",
+        "proposal_rejected": "Vorschlag abgelehnt.",
+        "proposals_load_failed": "Die Vorschläge konnten nicht geladen werden.",
+        "run_details_load_failed": "Ausführungsdetails konnten nicht geladen werden.",
+        "run_trigger_failed": "Ausführung konnte nicht ausgelöst werden.",
+        "run_triggered": "Ausführung ausgelöst: {{count}}-Vorschläge generiert.",
+        "runs_load_failed": "Läufe konnten nicht geladen werden."
+      }
+    },
+    "module_docs": {
+      "meta": {
+        "title": "Dokumentation zum AI-Modul",
+        "description": "Plain-language descriptions of each module. Der AI-Chat-Assistent verwendet diese als kanonische Grundlage bei der Beantwortung von Mitgliederfragen."
+      },
+      "actions": {
+        "create_doc": "Dokument erstellen",
+        "delete": "Löschen",
+        "edit": "Bearbeiten",
+        "new_doc": "Neues Dokument",
+        "seed_defaults": "Seed-Standardwerte"
+      },
+      "about": {
+        "body": "Wenn die Chat-Nachricht eines Mitglieds Schlüsselwörter eines Dokuments enthält, wird der Text dieses Dokuments an die Systemeingabeaufforderung von AI angehängt. Pro Runde werden bis zu 3 Dokumente injiziert. Schreiben Sie im Klartext: Was die Funktion bewirkt, wie man sie nutzt und was nicht möglich ist.",
+        "tip_label": "Tipp:",
+        "tip_body": "Klicken Sie auf „Seed-Standardeinstellungen“, um mit 10 vorgefertigten Dokumenten zu beginnen, die die Kernmodule abdecken. Sie überschreiben nichts, was Sie angepasst haben."
+      },
+      "columns": {
+        "actions": "Aktionen",
+        "keywords": "Schlüsselwörter",
+        "slug": "Schnecke",
+        "status": "Status",
+        "title": "Titel",
+        "updated": "Aktualisiert"
+      },
+      "confirm_delete": "„{{title}}“ löschen? Dies kann nicht rückgängig gemacht werden.",
+      "empty": {
+        "no_docs": "Noch keine Moduldokumente. Verwenden Sie zum Starten die Seed-Standardeinstellungen oder Neues Dokument."
+      },
+      "editor": {
+        "create_title": "Neues Moduldokument",
+        "edit_title": "Bearbeiten Sie „{{title}}“",
+        "fields": {
+          "active": "Aktiv",
+          "body": "Körper",
+          "keywords": "Trigger-Schlüsselwörter (durch Kommas getrennt)",
+          "module_slug": "Modulschnecke",
+          "title": "Titel"
+        },
+        "hints": {
+          "active": "Inaktive Dokumente werden niemals in die AI-Eingabeaufforderung eingefügt.",
+          "keywords": "Wenn eines dieser Wörter in einer Chat-Nachricht erscheint, wird dieses Dokument in die AI-Eingabeaufforderung eingefügt.",
+          "module_slug": "Kleinbuchstaben, Zahlen, Unterstriche und Bindestriche. Kann nach der Erstellung nicht mehr geändert werden."
+        },
+        "placeholders": {
+          "body": "Beschreibung dieses Moduls in einfacher Sprache. Was es tut, wie man es nutzt und was nicht möglich ist.",
+          "keywords": "z.B. timebank, hours, credits, exchange",
+          "module_slug": "z.B. listings, wallet, events",
+          "title": "z.B. Wie lange funktioniert credits?"
+        }
+      },
+      "status": {
+        "active": "Aktiv",
+        "disabled": "Deaktiviert"
+      },
+      "table_aria": "Dokumentation zum AI-Modul",
+      "toasts": {
+        "created": "Dokument erstellt.",
+        "deleted": "Dokument gelöscht.",
+        "delete_failed": "Das Löschen ist fehlgeschlagen.",
+        "load_failed": "Moduldokumente konnten nicht geladen werden.",
+        "save_failed": "Speichern fehlgeschlagen.",
+        "seed_failed": "Saatgut ist fehlgeschlagen.",
+        "seeded": "Vorgegebene {{count}}-Standarddokumente.",
+        "updated": "Dokument aktualisiert."
+      }
+    },
+    "trace_metrics": {
+      "meta": {
+        "title": "AI Trace-Metriken",
+        "description": "Kosten, Latenz, Tool-Nutzung und unbeantwortete Fragen für den AI-Chat-Assistenten."
+      },
+      "empty": {
+        "loading_tools": "Tool-Nutzung wird geladen...",
+        "no_downvotes": "Keine Downvotes. Im Moment gibt es nichts zu verbessern.",
+        "no_tools": "In diesem Fenster gibt es keine Werkzeugaufrufe."
+      },
+      "filters": {
+        "window": "Fenster"
+      },
+      "stats": {
+        "avg_latency": "Durchschnittliche Latenz",
+        "cost": "Kosten (USD)",
+        "latency_value": "{{value}} ms",
+        "thumbs_down": "Daumen runter",
+        "thumbs_up": "Daumen hoch",
+        "turns": "Wendet sich"
+      },
+      "tools": {
+        "title": "Top-Tools genannt"
+      },
+      "toasts": {
+        "load_failed": "Die Messwerte konnten nicht geladen werden."
+      },
+      "unanswered": {
+        "title": "Unbeantwortete Fragen (Daumen nach unten)",
+        "description": "Dies sind Wendungen, für die die Mitglieder einen Daumen nach unten gegeben haben. Schreiben Sie ein neues AI-Moduldokument, um alle wiederkehrenden Muster abzudecken.",
+        "table_aria": "Unbeantwortete Fragen",
+        "columns": {
+          "assistant_reply": "Antwort des Assistenten (Auszug)",
+          "note": "Notiz",
+          "user_question": "Benutzerfrage",
+          "when": "Wann"
+        }
+      },
+      "windows": {
+        "7": "Letzte 7 Tage",
+        "30": "Letzte 30 Tage",
+        "90": "Letzte 90 Tage"
+      }
+    }
   }
 }

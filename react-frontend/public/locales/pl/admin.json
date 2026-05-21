@@ -10411,5 +10411,283 @@
       "retention_save_failed": "Nie udało się zapisać konfiguracji przechowywania.",
       "retention_saved": "Konfiguracja przechowywania została zapisana."
     }
+  },
+  "ai": {
+    "common": {
+      "cancel": "Anulować",
+      "close": "Zamknąć",
+      "empty_dash": "-",
+      "loading": "Załadunek...",
+      "save_changes": "Zapisz zmiany"
+    },
+    "ki_agents": {
+      "meta": {
+        "title": "KI-Agenten",
+        "description": "AG61 — Struktura agenta autonomicznego. Agenci proponują działania; ludzie zatwierdzają, zanim cokolwiek zostanie zastosowane."
+      },
+      "about": {
+        "title": "O KI-Agenten",
+        "body": "KI-Agenten (Agenci AI) automatyzują rutynowe zadania koordynacyjne: znajdowanie dobrych par opieki, szturchanie nieaktywnych członków, podsumowywanie obciążeń koordynatora i kierowanie otwartych próśb o pomoc. Każdy agent działa w oparciu o model „zaproponuj, a następnie zatwierdź”: agenci generują propozycje, ale nic nie jest stosowane, dopóki nie zostanie zatwierdzone przez człowieka, chyba że poziom pewności propozycji przekracza skonfigurowany próg automatycznego stosowania.",
+        "tandem_prefix": "sugeruje",
+        "tandem_suffix": "-styl łączenia opieki indywidualnej w oparciu o umiejętności, lokalizację i dostępność.",
+        "nudge": "wysyła ukierunkowane powiadomienia do członków, którzy byli nieaktywni lub mają niedopasowane żądania.",
+        "demand": "przewiduje nadchodzące zapotrzebowanie na opiekę na podstawie wzorców historycznych.",
+        "help": "sugeruje najlepszego koordynatora otwartych próśb o pomoc.",
+        "activity": "wysyła e-mailem koordynatorom cotygodniowe podsumowanie działań wolontariatu."
+      },
+      "tabs": {
+        "aria": "Zakładki KI-Agenten",
+        "config": "Konfig",
+        "proposals": "Propozycje",
+        "runs": "Biegnie"
+      },
+      "stats": {
+        "total_runs": "suma przebiegów",
+        "total_proposals": "propozycje ogółem",
+        "pending_review": "{{count}} oczekuje na sprawdzenie"
+      },
+      "agent_types": {
+        "activity_summary": "Podsumowanie działalności",
+        "demand_forecast": "Prognoza popytu",
+        "help_routing": "Pomoc w kierowaniu",
+        "member_welcome": "Członek Witamy",
+        "nudge_dispatch": "Przesyłka szturmowa",
+        "tandem_matching": "Dopasowanie tandemowe"
+      },
+      "status": {
+        "all": "Wszystko",
+        "approved": "Zatwierdzony",
+        "auto_applied": "Zastosowano automatycznie",
+        "cancelled": "Odwołany",
+        "completed": "Zakończony",
+        "expired": "Wygasły",
+        "failed": "Przegrany",
+        "pending": "Aż do",
+        "pending_review": "Oczekuje na recenzję",
+        "rejected": "Odrzucony",
+        "running": "Działanie"
+      },
+      "triggered_by": {
+        "manual": "Podręcznik",
+        "scheduled": "Zaplanowany"
+      },
+      "config": {
+        "enable_title": "Włącz KI-Agenten",
+        "enable_description": "Mistrz wł./wył. Gdy opcja jest wyłączona, żaden agent nie będzie działał zgodnie z harmonogramem.",
+        "agent_types_title": "Typy agentów",
+        "tandem_description": "-stylowe pary wsparcia",
+        "nudge_description": "Inteligentne zaangażowanie zachęca członków",
+        "activity_description": "Cotygodniowe podsumowanie dziennika wolontariuszy dla koordynatorów",
+        "demand_description": "Przewiduj zapotrzebowanie na opiekę na podstawie trendów w dziennikach wolontariuszy",
+        "help_description": "Automatyczne kierowanie otwartych próśb o pomoc",
+        "thresholds_title": "Progi i harmonogram",
+        "auto_apply_threshold": "Próg automatycznego zastosowania:",
+        "auto_apply_threshold_aria": "Próg automatycznego zastosowania",
+        "auto_apply_threshold_help": "Propozycje powyżej tego poziomu zaufania są stosowane automatycznie i bez sprawdzania.",
+        "max_proposals": "Maksymalna liczba propozycji na przebieg",
+        "schedule_hour": "Godzina harmonogramu (0–23, czas lokalny serwera)",
+        "notification_email": "E-mail z powiadomieniem",
+        "notification_email_placeholder": "admin@example.org"
+      },
+      "actions": {
+        "approve": "Zatwierdzić",
+        "approve_all_eligible": "Zatwierdź wszystkie kwalifikujące się",
+        "details": "Bliższe dane",
+        "reject": "Odrzucić",
+        "save_config": "Zapisz konfigurację",
+        "trigger": "Spust"
+      },
+      "empty": {
+        "loading_config": "Ładowanie konfiguracji...",
+        "loading_proposals": "Ładowanie propozycji...",
+        "loading_runs": "Trwa ładowanie...",
+        "no_filtered_proposals": "Żadna propozycja nie pasuje do tego filtra.",
+        "no_pending_proposals": "Brak propozycji oczekujących na sprawdzenie. Uruchom agenta z karty Uruchomienia, aby wygenerować propozycje.",
+        "no_runs": "Nie ma jeszcze żadnych biegów. Skorzystaj z powyższego panelu wyzwalaczy, aby rozpocząć swoją pierwszą kampanię agenta."
+      },
+      "proposals": {
+        "approve_all_help": "Zatwierdza wszystkie propozycje oczekujące na sprawdzenie, których poziom wiarygodności spełnia próg automatycznego zastosowania.",
+        "table_aria": "Propozycje agentów",
+        "columns": {
+          "actions": "Działania",
+          "confidence": "Zaufanie",
+          "created": "Stworzony",
+          "proposal_data": "Dane propozycji",
+          "status": "Status",
+          "subject_user": "Użytkownik tematu",
+          "target_user": "Użytkownik docelowy",
+          "type": "Typ"
+        }
+      },
+      "legend": {
+        "status": "Status:",
+        "awaiting_decision": "czekam na Twoją decyzję",
+        "human_approved": "zatwierdzone i stosowane przez człowieka",
+        "auto_applied": "naliczane automatycznie po przekroczeniu progu",
+        "rejected": "odrzucony, nie zastosowany",
+        "confidence": "Zaufanie:",
+        "confidence_high": "Ponad 80% bezpieczeństwa w stosowaniu automatycznym",
+        "confidence_medium": "Zalecana recenzja 50-79%.",
+        "confidence_low": "Poniżej 50% niskiego poziomu ufności"
+      },
+      "runs": {
+        "agent_type_aria": "Typ agenta do wyzwolenia",
+        "agent_type_title": "Typ agenta",
+        "table_aria": "Agent biegnie",
+        "trigger_title": "Uruchom teraz bieg",
+        "triggered_by_help": "Ręczny oznacza wyzwalany przez administratora z tej strony; zaplanowane oznacza uruchamianie się automatycznie o skonfigurowanej godzinie harmonogramu.",
+        "columns": {
+          "actions": "Działania",
+          "agent_type": "Typ agenta",
+          "applied": "Stosowany",
+          "duration": "Czas trwania",
+          "proposals": "Propozycje",
+          "started": "Rozpoczęło się",
+          "status": "Status",
+          "triggered_by": "Wywołane przez"
+        }
+      },
+      "run_detail": {
+        "title": "Uruchom #{{id}} - {{type}}",
+        "status": "Status:",
+        "triggered_by": "Wywołane przez:",
+        "started": "Rozpoczęto:",
+        "duration": "Czas trwania:",
+        "proposals_generated": "Wygenerowane propozycje:",
+        "proposals_applied": "Zastosowane propozycje:",
+        "proposals_count": "Propozycje ({{count}})",
+        "proposals_table_aria": "Uruchom propozycje",
+        "columns": {
+          "subject": "Temat"
+        }
+      },
+      "toasts": {
+        "approve_eligible_failed": "Nie udało się zatwierdzić kwalifikujących się propozycji.",
+        "approved_eligible": "Zatwierdzone propozycje {{approved}} ({{failed}} nie powiodło się, próg {{threshold}}%).",
+        "config_load_failed": "Nie udało się załadować konfiguracji agenta.",
+        "config_save_failed": "Nie udało się zapisać konfiguracji.",
+        "config_saved": "Konfiguracja agenta została zapisana.",
+        "proposal_approve_failed": "Nie udało się zatwierdzić propozycji.",
+        "proposal_approved": "Propozycja zatwierdzona i zastosowana.",
+        "proposal_reject_failed": "Nie udało się odrzucić propozycji.",
+        "proposal_rejected": "Propozycja odrzucona.",
+        "proposals_load_failed": "Nie udało się załadować propozycji.",
+        "run_details_load_failed": "Nie udało się wczytać szczegółów przebiegu.",
+        "run_trigger_failed": "Nie udało się uruchomić biegu.",
+        "run_triggered": "Uruchomiono uruchomienie: wygenerowano propozycje {{count}}.",
+        "runs_load_failed": "Nie udało się załadować przebiegów."
+      }
+    },
+    "module_docs": {
+      "meta": {
+        "title": "Dokumentacja modułu AI",
+        "description": "Opisy każdego modułu w prostym języku. Asystent czatu AI używa ich jako kanonicznej podstawy podczas odpowiadania na pytania członków."
+      },
+      "actions": {
+        "create_doc": "Utwórz dokument",
+        "delete": "Usuwać",
+        "edit": "Redagować",
+        "new_doc": "Nowy dokument",
+        "seed_defaults": "Domyślne ustawienia nasion"
+      },
+      "about": {
+        "body": "Jeśli wiadomość na czacie członka zawiera którekolwiek ze słów kluczowych dokumentu, treść tego dokumentu jest dodawana do zachęty systemowej AI. Na turę wstrzykiwane są maksymalnie 3 leki. Napisz prostym językiem: co robi dana funkcja, jak z niej korzystać i co nie jest możliwe.",
+        "tip_label": "Wskazówka:",
+        "tip_body": "Kliknij opcję Zainicjuj ustawienia domyślne, aby rozpocząć od 10 gotowych dokumentów obejmujących podstawowe moduły. Nie zastąpią niczego, co dostosowałeś."
+      },
+      "columns": {
+        "actions": "Działania",
+        "keywords": "Słowa kluczowe",
+        "slug": "Ślimak",
+        "status": "Status",
+        "title": "Tytuł",
+        "updated": "Zaktualizowano"
+      },
+      "confirm_delete": "Usunąć „{{title}}”? Tego nie można cofnąć.",
+      "empty": {
+        "no_docs": "Nie ma jeszcze dokumentacji modułu. Aby rozpocząć, użyj ustawień domyślnych nasion lub nowego dokumentu."
+      },
+      "editor": {
+        "create_title": "Dokument nowego modułu",
+        "edit_title": "Edytuj „{{title}}”",
+        "fields": {
+          "active": "Aktywny",
+          "body": "Ciało",
+          "keywords": "Wyzwalające słowa kluczowe (oddzielone przecinkami)",
+          "module_slug": "Usterka modułu",
+          "title": "Tytuł"
+        },
+        "hints": {
+          "active": "Nieaktywne dokumenty nigdy nie są wstawiane do zachęty AI.",
+          "keywords": "Kiedy którekolwiek z tych słów pojawi się w wiadomości na czacie, ten dokument zostanie wstawiony do zachęty AI.",
+          "module_slug": "Małe litery, cyfry, podkreślenia i myślniki. Nie można zmienić po utworzeniu."
+        },
+        "placeholders": {
+          "body": "Prosty opis tego modułu. Co robi, jak z niego korzystać i czego nie da się zrobić.",
+          "keywords": "np. timebank, hours, credits, exchange",
+          "module_slug": "np. listings, wallet, events",
+          "title": "np. Jak działa czas credits"
+        }
+      },
+      "status": {
+        "active": "Aktywny",
+        "disabled": "Wyłączony"
+      },
+      "table_aria": "Dokumentacja modułu AI",
+      "toasts": {
+        "created": "Dokument został utworzony.",
+        "deleted": "Dokument usunięty.",
+        "delete_failed": "Usunięcie nie powiodło się.",
+        "load_failed": "Nie udało się załadować dokumentacji modułu.",
+        "save_failed": "Zapisywanie nie powiodło się.",
+        "seed_failed": "Nasienie nie powiodło się.",
+        "seeded": "Domyślne dokumenty {{count}} zostały rozstawione.",
+        "updated": "Dokument zaktualizowany."
+      }
+    },
+    "trace_metrics": {
+      "meta": {
+        "title": "AI Metryki śledzenia",
+        "description": "Koszt, opóźnienia, wykorzystanie narzędzi i pytania bez odpowiedzi dla asystenta czatu AI."
+      },
+      "empty": {
+        "loading_tools": "Ładowanie użycia narzędzia...",
+        "no_downvotes": "Żadnych głosów negatywnych. Na razie nie ma nic do poprawy.",
+        "no_tools": "W tym oknie nie ma żadnych wywołań narzędzi."
+      },
+      "filters": {
+        "window": "Okno"
+      },
+      "stats": {
+        "avg_latency": "Średnie opóźnienie",
+        "cost": "Koszt (USD)",
+        "latency_value": "{{value}} ms",
+        "thumbs_down": "Kciuk w dół",
+        "thumbs_up": "Kciuki w górę",
+        "turns": "Zakręty"
+      },
+      "tools": {
+        "title": "Najlepsze narzędzia tzw"
+      },
+      "toasts": {
+        "load_failed": "Nie udało się załadować danych."
+      },
+      "unanswered": {
+        "title": "Pytania bez odpowiedzi (kciuk w dół)",
+        "description": "To są tury, które użytkownicy ocenili jako kciuki w dół. Napisz nową dokumentację modułu AI, aby uwzględnić wszelkie powtarzające się wzorce.",
+        "table_aria": "Pytania bez odpowiedzi",
+        "columns": {
+          "assistant_reply": "Odpowiedź asystenta (fragment)",
+          "note": "Notatka",
+          "user_question": "Pytanie użytkownika",
+          "when": "Gdy"
+        }
+      },
+      "windows": {
+        "7": "Ostatnie 7 dni",
+        "30": "Ostatnie 30 dni",
+        "90": "Ostatnie 90 dni"
+      }
+    }
   }
 }

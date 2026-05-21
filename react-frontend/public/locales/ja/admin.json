@@ -10411,5 +10411,283 @@
       "retention_save_failed": "保持設定の保存に失敗しました。",
       "retention_saved": "保持設定が保存されました。"
     }
+  },
+  "ai": {
+    "common": {
+      "cancel": "キャンセル",
+      "close": "近い",
+      "empty_dash": "-",
+      "loading": "読み込み中...",
+      "save_changes": "変更を保存する"
+    },
+    "ki_agents": {
+      "meta": {
+        "title": "KI-Agenten",
+        "description": "AG61 - 自律エージェント フレームワーク。エージェントはアクションを提案します。人間は何かが適用される前に承認します。"
+      },
+      "about": {
+        "title": "KI-Agentenについて",
+        "body": "KI-Agenten (AI エージェント) は、適切なケア ペアの検索、非アクティブなメンバーの誘導、コーディネーターのワークロードの要約、未解決のヘルプ リクエストのルーティングなどの日常的な調整タスクを自動化します。すべてのエージェントは、提案してから承認するモデルで動作します。エージェントは提案を生成しますが、提案の信頼スコアが設定した自動適用しきい値を超えない限り、人間が承認するまでは何も適用されません。",
+        "tandem_prefix": "示唆する",
+        "tandem_suffix": "- スキル、場所、空き状況に基づいた 1 対 1 のケアの組み合わせ。",
+        "nudge": "非アクティブなメンバー、または一致しないリクエストを持つメンバーに対象を絞ったプロンプトを送信します。",
+        "demand": "過去のパターンから今後の介護需要を予測します。",
+        "help": "オープンなヘルプ リクエストに最適なコーディネーターを提案します。",
+        "activity": "毎週のボランティア活動のダイジェストをコーディネーターに電子メールで送信します。"
+      },
+      "tabs": {
+        "aria": "KI-Agenten タブ",
+        "config": "構成",
+        "proposals": "提案",
+        "runs": "走る"
+      },
+      "stats": {
+        "total_runs": "総実行数",
+        "total_proposals": "トータル提案",
+        "pending_review": "{{count}} の審査待ち"
+      },
+      "agent_types": {
+        "activity_summary": "活動の概要",
+        "demand_forecast": "需要予測",
+        "help_routing": "ヘルプルーティング",
+        "member_welcome": "メンバー歓迎",
+        "nudge_dispatch": "ナッジディスパッチ",
+        "tandem_matching": "タンデムマッチング"
+      },
+      "status": {
+        "all": "全て",
+        "approved": "承認された",
+        "auto_applied": "自動適用",
+        "cancelled": "キャンセル",
+        "completed": "完了",
+        "expired": "期限切れ",
+        "failed": "失敗した",
+        "pending": "保留中",
+        "pending_review": "審査待ち",
+        "rejected": "拒否されました",
+        "running": "ランニング"
+      },
+      "triggered_by": {
+        "manual": "マニュアル",
+        "scheduled": "予定されている"
+      },
+      "config": {
+        "enable_title": "KI-Agenten を有効にする",
+        "enable_description": "マスターのオン/オフ。オフの場合、エージェントはスケジュールどおりに実行されません。",
+        "agent_types_title": "エージェントの種類",
+        "tandem_description": "-スタイルのサポートペアリング",
+        "nudge_description": "メンバーに対するスマートなエンゲージメントの促進",
+        "activity_description": "コーディネーター向けの毎週のボランティアログの概要",
+        "demand_description": "ボランティアログの傾向からケア需要を予測する",
+        "help_description": "オープンヘルプリクエストの自動ルーティング",
+        "thresholds_title": "しきい値とスケジュール",
+        "auto_apply_threshold": "自動適用しきい値:",
+        "auto_apply_threshold_aria": "自動適用しきい値",
+        "auto_apply_threshold_help": "この信頼度を超える提案はレビューなしで自動的に適用されます。",
+        "max_proposals": "実行ごとの最大提案",
+        "schedule_hour": "スケジュール時間 (0 ～ 23、サーバー現地時間)",
+        "notification_email": "通知メール",
+        "notification_email_placeholder": "admin@example.org"
+      },
+      "actions": {
+        "approve": "承認する",
+        "approve_all_eligible": "対象者全員を承認する",
+        "details": "詳細",
+        "reject": "拒否する",
+        "save_config": "設定を保存する",
+        "trigger": "トリガー"
+      },
+      "empty": {
+        "loading_config": "構成を読み込んでいます...",
+        "loading_proposals": "提案を読み込んでいます...",
+        "loading_runs": "実行をロード中...",
+        "no_filtered_proposals": "このフィルターに一致する提案はありません。",
+        "no_pending_proposals": "審査待ちの提案はありません。 「実行」タブからエージェントを実行して提案を生成します。",
+        "no_runs": "まだ実行はありません。上のトリガー パネルを使用して、最初のエージェントの実行を開始します。"
+      },
+      "proposals": {
+        "approve_all_help": "信頼度が自動適用のしきい値を満たしている保留中のレビュー提案をすべて承認します。",
+        "table_aria": "エージェントの提案",
+        "columns": {
+          "actions": "アクション",
+          "confidence": "自信",
+          "created": "作成されました",
+          "proposal_data": "提案データ",
+          "status": "状態",
+          "subject_user": "対象ユーザー",
+          "target_user": "対象ユーザー",
+          "type": "タイプ"
+        }
+      },
+      "legend": {
+        "status": "状態：",
+        "awaiting_decision": "あなたの決断を待っています",
+        "human_approved": "人間によって承認され適用される",
+        "auto_applied": "しきい値を超えると自動的に適用されます",
+        "rejected": "破棄され、適用されません",
+        "confidence": "自信：",
+        "confidence_high": "80% 以上安全に自動適用",
+        "confidence_medium": "50～79% のレビューを推奨",
+        "confidence_low": "50% 未満では信頼度が低い"
+      },
+      "runs": {
+        "agent_type_aria": "トリガーするエージェントの種類",
+        "agent_type_title": "エージェントの種類",
+        "table_aria": "エージェントの実行",
+        "trigger_title": "今すぐ実行をトリガーする",
+        "triggered_by_help": "手動とは、管理者によってこのページからトリガーされることを意味します。スケジュール済みとは、設定されたスケジュール時間に自動的に実行されることを意味します。",
+        "columns": {
+          "actions": "アクション",
+          "agent_type": "エージェントの種類",
+          "applied": "適用済み",
+          "duration": "間隔",
+          "proposals": "提案",
+          "started": "開始しました",
+          "status": "状態",
+          "triggered_by": "きっかけは"
+        }
+      },
+      "run_detail": {
+        "title": "#{{id}} - {{type}} を実行します",
+        "status": "状態：",
+        "triggered_by": "きっかけ:",
+        "started": "開始:",
+        "duration": "間隔：",
+        "proposals_generated": "生成された提案:",
+        "proposals_applied": "適用された提案:",
+        "proposals_count": "提案 ({{count}})",
+        "proposals_table_aria": "提案を実行する",
+        "columns": {
+          "subject": "主題"
+        }
+      },
+      "toasts": {
+        "approve_eligible_failed": "適格な提案を承認できませんでした。",
+        "approved_eligible": "{{approved}} プロポーザルが承認されました ({{failed}} は失敗しました、しきい値 {{threshold}}%)。",
+        "config_load_failed": "エージェント構成のロードに失敗しました。",
+        "config_save_failed": "設定の保存に失敗しました。",
+        "config_saved": "エージェント構成が保存されました。",
+        "proposal_approve_failed": "提案の承認に失敗しました。",
+        "proposal_approved": "提案は承認され、適用されました。",
+        "proposal_reject_failed": "提案を拒否できませんでした。",
+        "proposal_rejected": "提案は拒否されました。",
+        "proposals_load_failed": "プロポーザルの読み込みに失敗しました。",
+        "run_details_load_failed": "実行の詳細をロードできませんでした。",
+        "run_trigger_failed": "実行のトリガーに失敗しました。",
+        "run_triggered": "??????????: {{count}} ?????????????",
+        "runs_load_failed": "実行のロードに失敗しました。"
+      }
+    },
+    "module_docs": {
+      "meta": {
+        "title": "AI モジュールのドキュメント",
+        "description": "各モジュールのわかりやすい説明。 AI チャット アシスタントは、メンバーの質問に答えるときにこれらを正規の根拠として使用します。"
+      },
+      "actions": {
+        "create_doc": "ドキュメントの作成",
+        "delete": "消去",
+        "edit": "編集",
+        "new_doc": "新しいドキュメント",
+        "seed_defaults": "シードのデフォルト"
+      },
+      "about": {
+        "body": "メンバーのチャット メッセージにドキュメントのキーワードのいずれかが含まれている場合、そのドキュメントの本文が AI のシステム プロンプトに追加されます。 1 ターンごとに最大 3 つのドキュメントが挿入されます。機能が何をするのか、その使用方法、何ができないのかをわかりやすい言葉で書きます。",
+        "tip_label": "ヒント：",
+        "tip_body": "[デフォルトのシード] をクリックして、コア モジュールをカバーする 10 個の事前に作成されたドキュメントから開始します。カスタマイズしたものは上書きされません。"
+      },
+      "columns": {
+        "actions": "アクション",
+        "keywords": "キーワード",
+        "slug": "ナメクジ",
+        "status": "状態",
+        "title": "タイトル",
+        "updated": "更新されました"
+      },
+      "confirm_delete": "「{{title}}」を削除しますか?これを元に戻すことはできません。",
+      "empty": {
+        "no_docs": "モジュールのドキュメントはまだありません。シードのデフォルトまたは新しいドキュメントを使用して開始します。"
+      },
+      "editor": {
+        "create_title": "新しいモジュールのドキュメント",
+        "edit_title": "「{{title}}」を編集",
+        "fields": {
+          "active": "アクティブ",
+          "body": "体",
+          "keywords": "トリガーキーワード (カンマ区切り)",
+          "module_slug": "モジュールのスラグ",
+          "title": "タイトル"
+        },
+        "hints": {
+          "active": "非アクティブなドキュメントが NEXUSSTERM14TOKEN プロンプトに挿入されることはありません。",
+          "keywords": "これらの単語のいずれかがチャット メッセージに表示されると、このドキュメントが AI プロンプトに挿入されます。",
+          "module_slug": "小文字、数字、アンダースコア、ダッシュ。作成後に変更することはできません。"
+        },
+        "placeholders": {
+          "body": "このモジュールの平易な説明。何ができるのか、どうやって使うのか、何ができないのか。",
+          "keywords": "?: timebank?hours?credits?exchange",
+          "module_slug": "?: listings?wallet?events",
+          "title": "例えばcreditsの仕組み"
+        }
+      },
+      "status": {
+        "active": "アクティブ",
+        "disabled": "無効"
+      },
+      "table_aria": "AI モジュールのドキュメント",
+      "toasts": {
+        "created": "ドキュメントが作成されました。",
+        "deleted": "ドキュメントが削除されました。",
+        "delete_failed": "削除に失敗しました。",
+        "load_failed": "モジュールドキュメントのロードに失敗しました。",
+        "save_failed": "保存に失敗しました。",
+        "seed_failed": "シードに失敗しました。",
+        "seeded": "シードされた{{count}}のデフォルト・ドキュメント。",
+        "updated": "ドキュメントが更新されました。"
+      }
+    },
+    "trace_metrics": {
+      "meta": {
+        "title": "AI トレース メトリクス",
+        "description": "AI チャット アシスタントのコスト、レイテンシ、ツールの使用法、未回答の質問。"
+      },
+      "empty": {
+        "loading_tools": "ツールの使用法を読み込んでいます...",
+        "no_downvotes": "反対票はありません。今のところ改善すべき点は何もありません。",
+        "no_tools": "このウィンドウではツール呼び出しはありません。"
+      },
+      "filters": {
+        "window": "ウィンドウ"
+      },
+      "stats": {
+        "avg_latency": "平均レイテンシー",
+        "cost": "??? (USD)",
+        "latency_value": "{{value}} ミリ秒",
+        "thumbs_down": "親指を下げる",
+        "thumbs_up": "いいぞ",
+        "turns": "ターン"
+      },
+      "tools": {
+        "title": "と呼ばれるトップツール"
+      },
+      "toasts": {
+        "load_failed": "メトリクスのロードに失敗しました。"
+      },
+      "unanswered": {
+        "title": "未回答の質問 (サムダウン)",
+        "description": "これらはメンバーがサムダウンを与えたターンです。繰り返し発生するパターンをカバーするために、新しい AI モジュール ドキュメントを作成します。",
+        "table_aria": "答えのない質問",
+        "columns": {
+          "assistant_reply": "アシスタントの返答（抜粋）",
+          "note": "注記",
+          "user_question": "ユーザーの質問",
+          "when": "いつ"
+        }
+      },
+      "windows": {
+        "7": "過去 7 日間",
+        "30": "過去 30 日間",
+        "90": "過去90日間"
+      }
+    }
   }
 }

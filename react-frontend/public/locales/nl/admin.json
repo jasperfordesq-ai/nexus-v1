@@ -10411,5 +10411,283 @@
       "retention_save_failed": "Kan de retentieconfiguratie niet opslaan.",
       "retention_saved": "Bewaarconfiguratie opgeslagen."
     }
+  },
+  "ai": {
+    "common": {
+      "cancel": "Annuleren",
+      "close": "Dichtbij",
+      "empty_dash": "-",
+      "loading": "Laden...",
+      "save_changes": "Wijzigingen opslaan"
+    },
+    "ki_agents": {
+      "meta": {
+        "title": "KI-Agenten",
+        "description": "AG61 - Raamwerk voor autonome agenten. Agenten stellen acties voor; mensen keuren het goed voordat er iets wordt toegepast."
+      },
+      "about": {
+        "title": "Over KI-Agenten",
+        "body": "KI-Agenten (AI Agents) automatiseren routinematige coördinatietaken: het vinden van goede zorgcombinaties, het aansporen van inactieve leden, het samenvatten van de werklast van de coördinator en het doorsturen van open hulpverzoeken. Elke agent werkt volgens het model van eerst voorstellen en vervolgens goedkeuren: agenten genereren voorstellen, maar er wordt niets toegepast totdat een mens het goedkeurt, tenzij de betrouwbaarheidsscore van het voorstel de drempel voor automatisch toepassen overschrijdt die u configureert.",
+        "tandem_prefix": "suggereert",
+        "tandem_suffix": "-stijl één-op-één zorgcombinaties op basis van vaardigheden, locatie en beschikbaarheid.",
+        "nudge": "stuurt gerichte prompts naar leden die inactief zijn geweest of ongeëvenaarde verzoeken hebben.",
+        "demand": "voorspelt de komende zorgvraag op basis van historische patronen.",
+        "help": "stelt de beste coördinator voor open hulpvragen voor.",
+        "activity": "e-mailt coördinatoren een wekelijks overzicht van vrijwilligersactiviteiten."
+      },
+      "tabs": {
+        "aria": "KI-Agenten-tabbladen",
+        "config": "Configuratie",
+        "proposals": "Voorstellen",
+        "runs": "Loopt"
+      },
+      "stats": {
+        "total_runs": "totaal aantal runs",
+        "total_proposals": "totale voorstellen",
+        "pending_review": "{{count}} in afwachting van beoordeling"
+      },
+      "agent_types": {
+        "activity_summary": "Samenvatting van activiteiten",
+        "demand_forecast": "Vraagvoorspelling",
+        "help_routing": "Hulp routering",
+        "member_welcome": "Lid welkom",
+        "nudge_dispatch": "Nudge-verzending",
+        "tandem_matching": "Tandem-matching"
+      },
+      "status": {
+        "all": "Alle",
+        "approved": "Goedgekeurd",
+        "auto_applied": "Automatisch toegepast",
+        "cancelled": "Geannuleerd",
+        "completed": "Voltooid",
+        "expired": "Verlopen",
+        "failed": "Mislukt",
+        "pending": "In behandeling",
+        "pending_review": "In afwachting van beoordeling",
+        "rejected": "Afgewezen",
+        "running": "Rennen"
+      },
+      "triggered_by": {
+        "manual": "Handmatig",
+        "scheduled": "Gepland"
+      },
+      "config": {
+        "enable_title": "Schakel KI-Agenten in",
+        "enable_description": "Meester aan/uit. Als deze optie is uitgeschakeld, worden er geen agenten volgens schema uitgevoerd.",
+        "agent_types_title": "Agenttypen",
+        "tandem_description": "-stijl ondersteuningskoppelingen",
+        "nudge_description": "Slimme betrokkenheid stimuleert leden",
+        "activity_description": "Wekelijkse samenvatting van het vrijwilligerslogboek voor coördinatoren",
+        "demand_description": "Voorspel de zorgvraag op basis van trends in vrijwilligerslogboeken",
+        "help_description": "Openstaande hulpverzoeken automatisch routeren",
+        "thresholds_title": "Drempels en schema",
+        "auto_apply_threshold": "Drempel voor automatisch toepassen:",
+        "auto_apply_threshold_aria": "Drempel voor automatische toepassing",
+        "auto_apply_threshold_help": "Voorstellen boven dit vertrouwen worden automatisch zonder beoordeling toegepast.",
+        "max_proposals": "Max. aantal voorstellen per run",
+        "schedule_hour": "Schema-uur (0-23, lokale servertijd)",
+        "notification_email": "E-mailmelding",
+        "notification_email_placeholder": "admin@example.org"
+      },
+      "actions": {
+        "approve": "Goedkeuren",
+        "approve_all_eligible": "Keur alle in aanmerking komende zaken goed",
+        "details": "Details",
+        "reject": "Afwijzen",
+        "save_config": "Configuratie opslaan",
+        "trigger": "Trekker"
+      },
+      "empty": {
+        "loading_config": "Configuratie laden...",
+        "loading_proposals": "Voorstellen laden...",
+        "loading_runs": "Laadt runs...",
+        "no_filtered_proposals": "Er zijn geen voorstellen die overeenkomen met dit filter.",
+        "no_pending_proposals": "Er zijn geen voorstellen in afwachting van beoordeling. Voer een agent uit vanaf het tabblad Uitvoeringen om voorstellen te genereren.",
+        "no_runs": "Nog geen runs. Gebruik het triggerpaneel hierboven om je eerste agentrun te starten."
+      },
+      "proposals": {
+        "approve_all_help": "Keurt alle lopende beoordelingsvoorstellen goed waarvan het vertrouwen voldoet aan de drempel voor automatisch toepassen.",
+        "table_aria": "Voorstellen van agenten",
+        "columns": {
+          "actions": "Acties",
+          "confidence": "Vertrouwen",
+          "created": "Gemaakt",
+          "proposal_data": "Voorstelgegevens",
+          "status": "Status",
+          "subject_user": "Onderwerp gebruiker",
+          "target_user": "Doelgebruiker",
+          "type": "Type"
+        }
+      },
+      "legend": {
+        "status": "Status:",
+        "awaiting_decision": "in afwachting van uw beslissing",
+        "human_approved": "door mensen goedgekeurd en toegepast",
+        "auto_applied": "automatisch toegepast na overschrijding van de drempel",
+        "rejected": "weggegooid, niet toegepast",
+        "confidence": "Vertrouwen:",
+        "confidence_high": "80%+ veilig om automatisch toe te passen",
+        "confidence_medium": "50-79% beoordeling aanbevolen",
+        "confidence_low": "Minder dan 50% laag vertrouwen"
+      },
+      "runs": {
+        "agent_type_aria": "Agenttype dat moet worden geactiveerd",
+        "agent_type_title": "Agenttype",
+        "table_aria": "Agent vlucht",
+        "trigger_title": "Start nu een run",
+        "triggered_by_help": "Handmatig betekent geactiveerd door een beheerder vanaf deze pagina; gepland betekent dat het automatisch wordt uitgevoerd op het geconfigureerde schema-uur.",
+        "columns": {
+          "actions": "Acties",
+          "agent_type": "Agenttype",
+          "applied": "Toegepast",
+          "duration": "Duur",
+          "proposals": "Voorstellen",
+          "started": "Gestart",
+          "status": "Status",
+          "triggered_by": "Getriggerd door"
+        }
+      },
+      "run_detail": {
+        "title": "Voer #{{id}} - {{type}} uit",
+        "status": "Status:",
+        "triggered_by": "Geactiveerd door:",
+        "started": "Gestart:",
+        "duration": "Duur:",
+        "proposals_generated": "Voorstellen gegenereerd:",
+        "proposals_applied": "Voorstellen toegepast:",
+        "proposals_count": "Voorstellen ({{count}})",
+        "proposals_table_aria": "Voorstellen uitvoeren",
+        "columns": {
+          "subject": "Onderwerp"
+        }
+      },
+      "toasts": {
+        "approve_eligible_failed": "Kan in aanmerking komende voorstellen niet goedkeuren.",
+        "approved_eligible": "Goedgekeurde {{approved}}-voorstellen ({{failed}} mislukt, drempelwaarde {{threshold}}%).",
+        "config_load_failed": "Kan agentconfiguratie niet laden.",
+        "config_save_failed": "Kan configuratie niet opslaan.",
+        "config_saved": "Agentconfiguratie opgeslagen.",
+        "proposal_approve_failed": "Kan het voorstel niet goedkeuren.",
+        "proposal_approved": "Voorstel goedgekeurd en toegepast.",
+        "proposal_reject_failed": "Het voorstel kan niet worden afgewezen.",
+        "proposal_rejected": "Voorstel afgewezen.",
+        "proposals_load_failed": "Kan voorstellen niet laden.",
+        "run_details_load_failed": "Kan uitvoeringsdetails niet laden.",
+        "run_trigger_failed": "Kan run niet activeren.",
+        "run_triggered": "Run geactiveerd: {{count}}-voorstellen gegenereerd.",
+        "runs_load_failed": "Kan runs niet laden."
+      }
+    },
+    "module_docs": {
+      "meta": {
+        "title": "AI Moduledocumentatie",
+        "description": "Duidelijke beschrijvingen van elke module. De AI-chatassistent gebruikt deze als canonieke basis bij het beantwoorden van vragen van leden."
+      },
+      "actions": {
+        "create_doc": "Document maken",
+        "delete": "Verwijderen",
+        "edit": "Bewerking",
+        "new_doc": "Nieuw document",
+        "seed_defaults": "Standaardinstellingen voor Seed"
+      },
+      "about": {
+        "body": "Wanneer het chatbericht van een lid een van de trefwoorden van een document bevat, wordt de hoofdtekst van dat document toegevoegd aan de systeemprompt van de AI. Per beurt worden er maximaal 3 docs geïnjecteerd. Schrijf in duidelijke taal: wat de functie doet, hoe u deze kunt gebruiken en wat niet mogelijk is.",
+        "tip_label": "Tip:",
+        "tip_body": "Klik op Seed-standaarden om te beginnen met 10 vooraf geschreven documenten die de kernmodules behandelen. Ze overschrijven niets dat u hebt aangepast."
+      },
+      "columns": {
+        "actions": "Acties",
+        "keywords": "Trefwoorden",
+        "slug": "Naaktslak",
+        "status": "Status",
+        "title": "Titel",
+        "updated": "Bijgewerkt"
+      },
+      "confirm_delete": "\"{{title}}\" verwijderen? Dit kan niet ongedaan worden gemaakt.",
+      "empty": {
+        "no_docs": "Er zijn nog geen moduledocumenten. Gebruik Seed-standaardwaarden of Nieuw document om te starten."
+      },
+      "editor": {
+        "create_title": "Nieuw moduledocument",
+        "edit_title": "Bewerk \"{{title}}\"",
+        "fields": {
+          "active": "Actief",
+          "body": "Lichaam",
+          "keywords": "Triggerzoekwoorden (door komma's gescheiden)",
+          "module_slug": "Module-slak",
+          "title": "Titel"
+        },
+        "hints": {
+          "active": "Inactieve documenten worden nooit in de AI-prompt geïnjecteerd.",
+          "keywords": "Wanneer een van deze woorden in een chatbericht verschijnt, wordt dit document in de AI-prompt geïnjecteerd.",
+          "module_slug": "Kleine letters, cijfers, onderstrepingstekens en streepjes. Kan na creatie niet meer worden gewijzigd."
+        },
+        "placeholders": {
+          "body": "Duidelijke beschrijving van deze module. Wat het doet, hoe je het gebruikt en wat niet mogelijk is.",
+          "keywords": "bijv. timebank, hours, credits, exchange",
+          "module_slug": "bijv. listings, wallet, events",
+          "title": "bijv. Hoe tijd credits werkt"
+        }
+      },
+      "status": {
+        "active": "Actief",
+        "disabled": "Gehandicapt"
+      },
+      "table_aria": "AI-moduledocumentatie",
+      "toasts": {
+        "created": "Document gemaakt.",
+        "deleted": "Document verwijderd.",
+        "delete_failed": "Verwijderen is mislukt.",
+        "load_failed": "Kan moduledocumentatie niet laden.",
+        "save_failed": "Opslaan mislukt.",
+        "seed_failed": "Zaad is mislukt.",
+        "seeded": "{{count}} standaarddocument(en) geplaatst.",
+        "updated": "Document bijgewerkt."
+      }
+    },
+    "trace_metrics": {
+      "meta": {
+        "title": "AI Traceerstatistieken",
+        "description": "Kosten, latentie, toolgebruik en onbeantwoorde vragen voor de AI chatassistent."
+      },
+      "empty": {
+        "loading_tools": "Gereedschapsgebruik laden...",
+        "no_downvotes": "Geen minstemmen. Er valt op dit moment niets te verbeteren.",
+        "no_tools": "Geen gereedschapsoproepen in dit venster."
+      },
+      "filters": {
+        "window": "Raam"
+      },
+      "stats": {
+        "avg_latency": "Gem. latentie",
+        "cost": "Kosten (USD)",
+        "latency_value": "{{value}} ms",
+        "thumbs_down": "Duimen omlaag",
+        "thumbs_up": "Duimen omhoog",
+        "turns": "Bochten"
+      },
+      "tools": {
+        "title": "Toptools gebeld"
+      },
+      "toasts": {
+        "load_failed": "Kan statistieken niet laden."
+      },
+      "unanswered": {
+        "title": "Onbeantwoorde vragen (duim omlaag)",
+        "description": "Dit zijn beurten waar leden een duimpje voor hebben gegeven. Schrijf een nieuw AI Moduledocument om eventuele terugkerende patronen te beschrijven.",
+        "table_aria": "Onbeantwoorde vragen",
+        "columns": {
+          "assistant_reply": "Antwoord van de assistent (uittreksel)",
+          "note": "Opmerking",
+          "user_question": "Gebruikersvraag",
+          "when": "Wanneer"
+        }
+      },
+      "windows": {
+        "7": "Laatste 7 dagen",
+        "30": "Laatste 30 dagen",
+        "90": "Laatste 90 dagen"
+      }
+    }
   }
 }

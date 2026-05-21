@@ -10411,5 +10411,283 @@
       "retention_save_failed": "No se pudo guardar la configuración de retención.",
       "retention_saved": "Configuración de retención guardada."
     }
+  },
+  "ai": {
+    "common": {
+      "cancel": "Cancelar",
+      "close": "Cerca",
+      "empty_dash": "-",
+      "loading": "Cargando...",
+      "save_changes": "Guardar cambios"
+    },
+    "ki_agents": {
+      "meta": {
+        "title": "KI-Agenten",
+        "description": "AG61 - Marco de agentes autónomos. Los agentes proponen acciones; los humanos aprueban antes de que se aplique algo."
+      },
+      "about": {
+        "title": "Acerca de KI-Agenten",
+        "body": "KI-Agenten (agentes AI) automatizan tareas de coordinación de rutina: encontrar buenas parejas de atención, empujar a miembros inactivos, resumir las cargas de trabajo de los coordinadores y enrutar solicitudes de ayuda abiertas. Cada agente trabaja en un modelo de proponer y luego aprobar: los agentes generan propuestas, pero no se aplica nada hasta que un humano lo apruebe, a menos que la puntuación de confianza de la propuesta supere el umbral de aplicación automática que usted configure.",
+        "tandem_prefix": "sugiere",
+        "tandem_suffix": "-Estilo de emparejamientos de atención uno a uno según las habilidades, la ubicación y la disponibilidad.",
+        "nudge": "envía mensajes específicos a miembros que han estado inactivos o que tienen solicitudes no coincidentes.",
+        "demand": "predice la próxima demanda de atención a partir de patrones históricos.",
+        "help": "sugiere el mejor coordinador para solicitudes de ayuda abiertas.",
+        "activity": "envía por correo electrónico a los coordinadores un resumen semanal de la actividad voluntaria."
+      },
+      "tabs": {
+        "aria": "Pestañas KI-Agenten",
+        "config": "configuración",
+        "proposals": "Propuestas",
+        "runs": "Corre"
+      },
+      "stats": {
+        "total_runs": "carreras totales",
+        "total_proposals": "propuestas totales",
+        "pending_review": "{{count}} pendiente de revisión"
+      },
+      "agent_types": {
+        "activity_summary": "Resumen de actividad",
+        "demand_forecast": "Previsión de demanda",
+        "help_routing": "Ayuda enrutamiento",
+        "member_welcome": "Bienvenido miembro",
+        "nudge_dispatch": "Despacho de empujón",
+        "tandem_matching": "Emparejamiento en tándem"
+      },
+      "status": {
+        "all": "Todo",
+        "approved": "Aprobado",
+        "auto_applied": "Aplicado automáticamente",
+        "cancelled": "Cancelado",
+        "completed": "Terminado",
+        "expired": "Venció",
+        "failed": "Fallido",
+        "pending": "Pendiente",
+        "pending_review": "Pendiente de revisión",
+        "rejected": "Rechazado",
+        "running": "Correr"
+      },
+      "triggered_by": {
+        "manual": "Manual",
+        "scheduled": "Programado"
+      },
+      "config": {
+        "enable_title": "Habilitar KI-Agenten",
+        "enable_description": "Maestro encendido/apagado. Cuando esté desactivado, ningún agente funcionará según lo programado.",
+        "agent_types_title": "Tipos de agentes",
+        "tandem_description": "-emparejamientos de soporte de estilo",
+        "nudge_description": "El compromiso inteligente empuja a los miembros",
+        "activity_description": "Resumen semanal del registro de voluntarios para los coordinadores",
+        "demand_description": "Predecir la demanda de atención a partir de las tendencias de los registros de voluntarios",
+        "help_description": "Enrutar automáticamente solicitudes de ayuda abiertas",
+        "thresholds_title": "Umbrales y cronograma",
+        "auto_apply_threshold": "Umbral de aplicación automática:",
+        "auto_apply_threshold_aria": "Umbral de aplicación automática",
+        "auto_apply_threshold_help": "Las propuestas que superen este nivel de confianza se aplican automáticamente sin revisión.",
+        "max_proposals": "Propuestas máximas por ejecución",
+        "schedule_hour": "Hora programada (0-23, hora local del servidor)",
+        "notification_email": "Correo electrónico de notificación",
+        "notification_email_placeholder": "admin@example.org"
+      },
+      "actions": {
+        "approve": "Aprobar",
+        "approve_all_eligible": "Aprobar todos los elegibles",
+        "details": "Detalles",
+        "reject": "Rechazar",
+        "save_config": "Guardar configuración",
+        "trigger": "Desencadenar"
+      },
+      "empty": {
+        "loading_config": "Cargando configuración...",
+        "loading_proposals": "Cargando propuestas...",
+        "loading_runs": "Cargando ejecuciones...",
+        "no_filtered_proposals": "Ninguna propuesta coincide con este filtro.",
+        "no_pending_proposals": "No hay propuestas pendientes de revisión. Ejecute un agente desde la pestaña Ejecuciones para generar propuestas.",
+        "no_runs": "Aún no hay carreras. Utilice el panel de activación de arriba para iniciar su primera ejecución de agente."
+      },
+      "proposals": {
+        "approve_all_help": "Aprueba todas las propuestas pendientes de revisión cuya confianza alcanza el umbral de aplicación automática.",
+        "table_aria": "Propuestas de agentes",
+        "columns": {
+          "actions": "Comportamiento",
+          "confidence": "Confianza",
+          "created": "Creado",
+          "proposal_data": "Datos de la propuesta",
+          "status": "Estado",
+          "subject_user": "Usuario sujeto",
+          "target_user": "Usuario objetivo",
+          "type": "Tipo"
+        }
+      },
+      "legend": {
+        "status": "Estado:",
+        "awaiting_decision": "esperando tu decisión",
+        "human_approved": "aprobado y aplicado por humanos",
+        "auto_applied": "se aplica automáticamente después de superar el umbral",
+        "rejected": "descartado, no aplicado",
+        "confidence": "Confianza:",
+        "confidence_high": "80%+ seguro para aplicar automáticamente",
+        "confidence_medium": "50-79% de revisión recomendada",
+        "confidence_low": "Por debajo del 50 % de confianza baja"
+      },
+      "runs": {
+        "agent_type_aria": "Tipo de agente a activar",
+        "agent_type_title": "Tipo de agente",
+        "table_aria": "El agente se ejecuta",
+        "trigger_title": "Activa una carrera ahora",
+        "triggered_by_help": "Manual significa activado por un administrador desde esta página; programado significa que se ejecuta automáticamente en la hora programada configurada.",
+        "columns": {
+          "actions": "Comportamiento",
+          "agent_type": "Tipo de agente",
+          "applied": "Aplicado",
+          "duration": "Duración",
+          "proposals": "Propuestas",
+          "started": "Comenzó",
+          "status": "Estado",
+          "triggered_by": "Provocado por"
+        }
+      },
+      "run_detail": {
+        "title": "Ejecute #{{id}} - {{type}}",
+        "status": "Estado:",
+        "triggered_by": "Provocado por:",
+        "started": "Comenzó:",
+        "duration": "Duración:",
+        "proposals_generated": "Propuestas generadas:",
+        "proposals_applied": "Propuestas aplicadas:",
+        "proposals_count": "Propuestas ({{count}})",
+        "proposals_table_aria": "Ejecutar propuestas",
+        "columns": {
+          "subject": "Sujeto"
+        }
+      },
+      "toasts": {
+        "approve_eligible_failed": "No se pudieron aprobar las propuestas elegibles.",
+        "approved_eligible": "Propuestas {{approved}} aprobadas ({{failed}} falló, umbral {{threshold}}%).",
+        "config_load_failed": "No se pudo cargar la configuración del agente.",
+        "config_save_failed": "No se pudo guardar la configuración.",
+        "config_saved": "Configuración del agente guardada.",
+        "proposal_approve_failed": "No se pudo aprobar la propuesta.",
+        "proposal_approved": "Propuesta aprobada y aplicada.",
+        "proposal_reject_failed": "No se pudo rechazar la propuesta.",
+        "proposal_rejected": "Propuesta rechazada.",
+        "proposals_load_failed": "No se pudieron cargar las propuestas.",
+        "run_details_load_failed": "No se pudieron cargar los detalles de la ejecución.",
+        "run_trigger_failed": "No se pudo activar la ejecución.",
+        "run_triggered": "Ejecución activada: propuestas {{count}} generadas.",
+        "runs_load_failed": "No se pudieron cargar las ejecuciones."
+      }
+    },
+    "module_docs": {
+      "meta": {
+        "title": "Documentos del módulo AI",
+        "description": "Descripciones en lenguaje sencillo de cada módulo. El asistente de chat AI los utiliza como base canónica al responder las preguntas de los miembros."
+      },
+      "actions": {
+        "create_doc": "Crear documento",
+        "delete": "Borrar",
+        "edit": "Editar",
+        "new_doc": "Nuevo documento",
+        "seed_defaults": "Valores predeterminados de semillas"
+      },
+      "about": {
+        "body": "Cuando el mensaje de chat de un miembro contiene cualquiera de las palabras clave de un documento, el cuerpo de ese documento se agrega al indicador del sistema de AI. Se inyectan hasta 3 médicos por turno. Escriba en lenguaje sencillo: qué hace la función, cómo usarla y qué no es posible.",
+        "tip_label": "Consejo:",
+        "tip_body": "Haga clic en Valores predeterminados de semilla para comenzar con 10 documentos escritos previamente que cubren los módulos principales. No sobrescribirán nada que hayas personalizado."
+      },
+      "columns": {
+        "actions": "Comportamiento",
+        "keywords": "Palabras clave",
+        "slug": "Babosa",
+        "status": "Estado",
+        "title": "Título",
+        "updated": "Actualizado"
+      },
+      "confirm_delete": "¿Eliminar \"{{title}}\"? Esto no se puede deshacer.",
+      "empty": {
+        "no_docs": "Aún no hay documentos del módulo. Utilice los valores predeterminados de Seed o Nuevo documento para comenzar."
+      },
+      "editor": {
+        "create_title": "Nuevo documento del módulo",
+        "edit_title": "Editar \"{{title}}\"",
+        "fields": {
+          "active": "Activo",
+          "body": "Cuerpo",
+          "keywords": "Palabras clave de activación (separadas por comas)",
+          "module_slug": "Babosa del módulo",
+          "title": "Título"
+        },
+        "hints": {
+          "active": "Los documentos inactivos nunca se inyectan en el indicador AI.",
+          "keywords": "Cuando cualquiera de estas palabras aparezca en un mensaje de chat, este documento se insertará en el mensaje AI.",
+          "module_slug": "Letras minúsculas, números, guiones bajos y guiones. No se puede cambiar después de la creación."
+        },
+        "placeholders": {
+          "body": "Descripción en lenguaje sencillo de este módulo. Qué hace, cómo utilizarlo y qué no es posible.",
+          "keywords": "p.ej. timebank, hours, credits, exchange",
+          "module_slug": "p.ej. listings, wallet, events",
+          "title": "p.ej. ¿Cómo funciona el credits?"
+        }
+      },
+      "status": {
+        "active": "Activo",
+        "disabled": "Desactivado"
+      },
+      "table_aria": "Documentos del módulo AI",
+      "toasts": {
+        "created": "Doc creado.",
+        "deleted": "Documento eliminado.",
+        "delete_failed": "Error al eliminar.",
+        "load_failed": "No se pudieron cargar los documentos del módulo.",
+        "save_failed": "Error al guardar.",
+        "seed_failed": "La semilla falló.",
+        "seeded": "Documentos predeterminados {{count}} inicializados.",
+        "updated": "Documento actualizado."
+      }
+    },
+    "trace_metrics": {
+      "meta": {
+        "title": "Métricas de seguimiento de AI",
+        "description": "Costo, latencia, uso de herramientas y preguntas sin respuesta para el asistente de chat AI."
+      },
+      "empty": {
+        "loading_tools": "Cargando uso de herramientas...",
+        "no_downvotes": "Sin votos negativos. Nada que mejorar ahora mismo.",
+        "no_tools": "No hay llamadas de herramientas en esta ventana."
+      },
+      "filters": {
+        "window": "Ventana"
+      },
+      "stats": {
+        "avg_latency": "Latencia promedio",
+        "cost": "Costo (USD)",
+        "latency_value": "{{value}} ms",
+        "thumbs_down": "Pulgares abajo",
+        "thumbs_up": "Pulgares hacia arriba",
+        "turns": "vueltas"
+      },
+      "tools": {
+        "title": "Principales herramientas llamadas"
+      },
+      "toasts": {
+        "load_failed": "No se pudieron cargar las métricas."
+      },
+      "unanswered": {
+        "title": "Preguntas sin respuesta (pulgar hacia abajo)",
+        "description": "Estos son turnos que los miembros desaprobaron. Escriba un nuevo documento del módulo AI para cubrir cualquier patrón recurrente.",
+        "table_aria": "Preguntas sin respuesta",
+        "columns": {
+          "assistant_reply": "Respuesta del asistente (extracto)",
+          "note": "Nota",
+          "user_question": "Pregunta de usuario",
+          "when": "Cuando"
+        }
+      },
+      "windows": {
+        "7": "últimos 7 días",
+        "30": "últimos 30 días",
+        "90": "últimos 90 días"
+      }
+    }
   }
 }

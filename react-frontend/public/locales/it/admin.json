@@ -10411,5 +10411,283 @@
       "retention_save_failed": "Impossibile salvare la configurazione di conservazione.",
       "retention_saved": "Configurazione di conservazione salvata."
     }
+  },
+  "ai": {
+    "common": {
+      "cancel": "Cancellare",
+      "close": "Vicino",
+      "empty_dash": "-",
+      "loading": "Caricamento...",
+      "save_changes": "Salva modifiche"
+    },
+    "ki_agents": {
+      "meta": {
+        "title": "KI-Agenten",
+        "description": "AG61 - Framework dell'agente autonomo. Gli agenti propongono azioni; gli esseri umani approvano prima che venga applicata qualsiasi cosa."
+      },
+      "about": {
+        "title": "Informazioni su KI-Agenten",
+        "body": "KI-Agenten (agenti AI) automatizzano le attività di coordinamento di routine: ricerca di buoni abbinamenti di assistenza, sollecitazione dei membri inattivi, riepilogo dei carichi di lavoro dei coordinatori e instradamento delle richieste di aiuto aperte. Ogni agente funziona secondo un modello di proposta e poi approvazione: gli agenti generano proposte, ma nulla viene applicato finché un essere umano non la approva, a meno che il punteggio di confidenza della proposta non superi la soglia di applicazione automatica configurata.",
+        "tandem_prefix": "suggerisce",
+        "tandem_suffix": "-care abbinamenti individuali in base alle competenze, alla posizione e alla disponibilità.",
+        "nudge": "invia richieste mirate ai membri che sono stati inattivi o hanno richieste senza corrispondenza.",
+        "demand": "prevede la futura domanda di assistenza in base a modelli storici.",
+        "help": "suggerisce il miglior coordinatore per le richieste di aiuto aperte.",
+        "activity": "invia ai coordinatori un riepilogo settimanale delle attività di volontariato."
+      },
+      "tabs": {
+        "aria": "schede KI-Agenten",
+        "config": "Configurazione",
+        "proposals": "Proposte",
+        "runs": "Corre"
+      },
+      "stats": {
+        "total_runs": "corse totali",
+        "total_proposals": "proposte totali",
+        "pending_review": "{{count}} in attesa di revisione"
+      },
+      "agent_types": {
+        "activity_summary": "Riepilogo delle attività",
+        "demand_forecast": "Previsione della domanda",
+        "help_routing": "Aiuto Routing",
+        "member_welcome": "Benvenuto membro",
+        "nudge_dispatch": "Invio di spinta",
+        "tandem_matching": "Abbinamento tandem"
+      },
+      "status": {
+        "all": "Tutto",
+        "approved": "Approvato",
+        "auto_applied": "Applicazione automatica",
+        "cancelled": "Annullato",
+        "completed": "Completato",
+        "expired": "Scaduto",
+        "failed": "Fallito",
+        "pending": "In attesa di",
+        "pending_review": "In attesa di revisione",
+        "rejected": "Respinto",
+        "running": "Corsa"
+      },
+      "triggered_by": {
+        "manual": "Manuale",
+        "scheduled": "Programmato"
+      },
+      "config": {
+        "enable_title": "Abilita KI-Agenten",
+        "enable_description": "Accensione/spegnimento principale. Quando è disattivato, nessun agente verrà eseguito secondo la pianificazione.",
+        "agent_types_title": "Tipi di agenti",
+        "tandem_description": "accoppiamenti di supporto in stile",
+        "nudge_description": "Il coinvolgimento intelligente spinge i membri",
+        "activity_description": "Riepilogo settimanale del registro dei volontari per i coordinatori",
+        "demand_description": "Prevedere la domanda di assistenza in base alle tendenze del registro dei volontari",
+        "help_description": "Richieste di aiuto aperte con instradamento automatico",
+        "thresholds_title": "Soglie e pianificazione",
+        "auto_apply_threshold": "Soglia di applicazione automatica:",
+        "auto_apply_threshold_aria": "Soglia di applicazione automatica",
+        "auto_apply_threshold_help": "Le proposte superiori a questo livello di confidenza vengono applicate automaticamente senza revisione.",
+        "max_proposals": "Numero massimo di proposte per esecuzione",
+        "schedule_hour": "Orario di pianificazione (0-23, ora locale del server)",
+        "notification_email": "E-mail di notifica",
+        "notification_email_placeholder": "admin@example.org"
+      },
+      "actions": {
+        "approve": "Approvare",
+        "approve_all_eligible": "Approva tutti gli idonei",
+        "details": "Dettagli",
+        "reject": "Rifiutare",
+        "save_config": "Salva configurazione",
+        "trigger": "Grilletto"
+      },
+      "empty": {
+        "loading_config": "Caricamento configurazione...",
+        "loading_proposals": "Caricamento proposte...",
+        "loading_runs": "Caricamento corse...",
+        "no_filtered_proposals": "Nessuna proposta corrisponde a questo filtro.",
+        "no_pending_proposals": "Nessuna proposta in attesa di revisione. Esegui un agente dalla scheda Esecuzioni per generare proposte.",
+        "no_runs": "Nessuna corsa ancora. Utilizza il pannello di attivazione in alto per avviare la prima esecuzione dell'agente."
+      },
+      "proposals": {
+        "approve_all_help": "Approva tutte le proposte in attesa di revisione la cui attendibilità soddisfa la soglia di applicazione automatica.",
+        "table_aria": "Proposte dell'agente",
+        "columns": {
+          "actions": "Azioni",
+          "confidence": "Fiducia",
+          "created": "Creato",
+          "proposal_data": "Dati della proposta",
+          "status": "Stato",
+          "subject_user": "Utente soggetto",
+          "target_user": "Utente di destinazione",
+          "type": "Tipo"
+        }
+      },
+      "legend": {
+        "status": "Stato:",
+        "awaiting_decision": "in attesa della tua decisione",
+        "human_approved": "approvato e applicato dall'uomo",
+        "auto_applied": "applicato automaticamente dopo aver superato la soglia",
+        "rejected": "scartato, non applicato",
+        "confidence": "Fiducia:",
+        "confidence_high": "Sicuro per l'applicazione automatica oltre l'80%.",
+        "confidence_medium": "Recensione consigliata al 50-79%.",
+        "confidence_low": "Sotto il 50% bassa confidenza"
+      },
+      "runs": {
+        "agent_type_aria": "Tipo di agente da attivare",
+        "agent_type_title": "Tipo di agente",
+        "table_aria": "L'agente corre",
+        "trigger_title": "Avvia una corsa adesso",
+        "triggered_by_help": "Manuale significa attivato da un amministratore da questa pagina; pianificato significa che viene eseguito automaticamente all'ora di pianificazione configurata.",
+        "columns": {
+          "actions": "Azioni",
+          "agent_type": "Tipo di agente",
+          "applied": "Applicato",
+          "duration": "Durata",
+          "proposals": "Proposte",
+          "started": "Iniziato",
+          "status": "Stato",
+          "triggered_by": "Innescato da"
+        }
+      },
+      "run_detail": {
+        "title": "Esegui #{{id}} - {{type}}",
+        "status": "Stato:",
+        "triggered_by": "Innescato da:",
+        "started": "Iniziato:",
+        "duration": "Durata:",
+        "proposals_generated": "Proposte generate:",
+        "proposals_applied": "Proposte applicate:",
+        "proposals_count": "Proposte ({{count}})",
+        "proposals_table_aria": "Esegui proposte",
+        "columns": {
+          "subject": "Soggetto"
+        }
+      },
+      "toasts": {
+        "approve_eligible_failed": "Impossibile approvare le proposte idonee.",
+        "approved_eligible": "Proposte {{approved}} approvate ({{failed}} non riuscite, soglia {{threshold}}%).",
+        "config_load_failed": "Impossibile caricare la configurazione dell'agente.",
+        "config_save_failed": "Impossibile salvare la configurazione.",
+        "config_saved": "Configurazione dell'agente salvata.",
+        "proposal_approve_failed": "Impossibile approvare la proposta.",
+        "proposal_approved": "Proposta approvata e applicata.",
+        "proposal_reject_failed": "Impossibile rifiutare la proposta.",
+        "proposal_rejected": "Proposta respinta.",
+        "proposals_load_failed": "Impossibile caricare le proposte.",
+        "run_details_load_failed": "Impossibile caricare i dettagli della corsa.",
+        "run_trigger_failed": "Impossibile attivare l'esecuzione.",
+        "run_triggered": "Esecuzione attivata: proposte {{count}} generate.",
+        "runs_load_failed": "Impossibile caricare le esecuzioni."
+      }
+    },
+    "module_docs": {
+      "meta": {
+        "title": "Modulo AI Doc",
+        "description": "Descrizioni in linguaggio semplice di ciascun modulo. L'assistente chat AI li utilizza come base canonica quando risponde alle domande dei membri."
+      },
+      "actions": {
+        "create_doc": "Crea documento",
+        "delete": "Eliminare",
+        "edit": "Modificare",
+        "new_doc": "Nuovo documento",
+        "seed_defaults": "Impostazioni predefinite del seme"
+      },
+      "about": {
+        "body": "Quando il messaggio di chat di un membro contiene una qualsiasi delle parole chiave di un documento, il corpo del documento viene aggiunto al prompt di sistema di AI. Vengono iniettati fino a 3 documenti per turno. Scrivi in ​​un linguaggio semplice: cosa fa la funzionalità, come usarla e cosa non è possibile.",
+        "tip_label": "Mancia:",
+        "tip_body": "Fai clic su Impostazioni predefinite seed per iniziare con 10 documenti già scritti che coprono i moduli principali. Non sovrascriveranno nulla di ciò che hai personalizzato."
+      },
+      "columns": {
+        "actions": "Azioni",
+        "keywords": "Parole chiave",
+        "slug": "Lumaca",
+        "status": "Stato",
+        "title": "Titolo",
+        "updated": "Aggiornato"
+      },
+      "confirm_delete": "Eliminare \"{{title}}\"? Questa operazione non può essere annullata.",
+      "empty": {
+        "no_docs": "Nessun documento del modulo ancora. Utilizza le impostazioni predefinite del seed o Nuovo documento per iniziare."
+      },
+      "editor": {
+        "create_title": "Nuovo modulo doc",
+        "edit_title": "Modifica \"{{title}}\"",
+        "fields": {
+          "active": "Attivo",
+          "body": "Corpo",
+          "keywords": "Parole chiave attivatrici (separate da virgole)",
+          "module_slug": "Lumaca del modulo",
+          "title": "Titolo"
+        },
+        "hints": {
+          "active": "I documenti inattivi non vengono mai inseriti nel prompt AI.",
+          "keywords": "Quando una di queste parole appare in un messaggio di chat, questo documento verrà inserito nel prompt AI.",
+          "module_slug": "Lettere minuscole, numeri, trattini bassi e trattini. Non può essere modificato dopo la creazione."
+        },
+        "placeholders": {
+          "body": "Descrizione in linguaggio semplice di questo modulo. Cosa fa, come usarlo e cosa non è possibile.",
+          "keywords": "ad es. timebank, hours, credits, exchange",
+          "module_slug": "ad es. listings, wallet, events",
+          "title": "per esempio. Come funziona il tempo credits"
+        }
+      },
+      "status": {
+        "active": "Attivo",
+        "disabled": "Disabilitato"
+      },
+      "table_aria": "Documenti del modulo AI",
+      "toasts": {
+        "created": "Doc creato.",
+        "deleted": "Documento eliminato.",
+        "delete_failed": "Eliminazione non riuscita.",
+        "load_failed": "Impossibile caricare i documenti del modulo.",
+        "save_failed": "Salvataggio non riuscito.",
+        "seed_failed": "Il seme è fallito.",
+        "seeded": "Documenti predefiniti {{count}} seminati.",
+        "updated": "Documento aggiornato."
+      }
+    },
+    "trace_metrics": {
+      "meta": {
+        "title": "AI Metriche di traccia",
+        "description": "Costo, latenza, utilizzo degli strumenti e domande senza risposta per l'assistente chat AI."
+      },
+      "empty": {
+        "loading_tools": "Caricamento utilizzo strumento...",
+        "no_downvotes": "Nessun voto negativo. Niente da migliorare per ora.",
+        "no_tools": "Nessuna chiamata strumento in questa finestra."
+      },
+      "filters": {
+        "window": "Finestra"
+      },
+      "stats": {
+        "avg_latency": "Latenza media",
+        "cost": "Costo (USD)",
+        "latency_value": "{{value}} ms",
+        "thumbs_down": "Pollice in giù",
+        "thumbs_up": "Pollice su",
+        "turns": "Gira"
+      },
+      "tools": {
+        "title": "I migliori strumenti chiamati"
+      },
+      "toasts": {
+        "load_failed": "Impossibile caricare le metriche."
+      },
+      "unanswered": {
+        "title": "Domande senza risposta (pollice verso)",
+        "description": "Questi sono i turni su cui i membri hanno espresso il loro pollice in giù. Scrivi un nuovo modulo AI Doc per coprire eventuali schemi ricorrenti.",
+        "table_aria": "Domande senza risposta",
+        "columns": {
+          "assistant_reply": "Risposta dell'assistente (estratto)",
+          "note": "Nota",
+          "user_question": "Domanda dell'utente",
+          "when": "Quando"
+        }
+      },
+      "windows": {
+        "7": "Ultimi 7 giorni",
+        "30": "Ultimi 30 giorni",
+        "90": "Ultimi 90 giorni"
+      }
+    }
   }
 }

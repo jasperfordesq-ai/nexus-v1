@@ -157,8 +157,8 @@ function durationMs(run: AgentRun, empty: string): string {
   return `${Math.round(ms / 60000)}m`;
 }
 
-function agentTypeLabel(t: string): string {
-  return t.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+function identifierLabel(value: string): string {
+  return value.replace(/_/g, ' ');
 }
 
 // ---------------------------------------------------------------------------
@@ -354,9 +354,13 @@ export default function KiAgentAdminPage() {
 
   const pendingCount = proposals.filter((p) => p.status === 'pending_review').length;
   const empty = t('ai.common.empty_dash');
-  const agentTypeText = (value: string) => t(`ai.ki_agents.agent_types.${value}`, agentTypeLabel(value));
-  const statusText = (value: string) => t(`ai.ki_agents.status.${value}`, value.replace(/_/g, ' '));
-  const triggeredByText = (value: string) => t(`ai.ki_agents.triggered_by.${value}`, value);
+  const translatedIdentifier = (key: string, value: string) => {
+    const label = t(key);
+    return label === key ? identifierLabel(value) : label;
+  };
+  const agentTypeText = (value: string) => translatedIdentifier(`ai.ki_agents.agent_types.${value}`, value);
+  const statusText = (value: string) => translatedIdentifier(`ai.ki_agents.status.${value}`, value);
+  const triggeredByText = (value: string) => translatedIdentifier(`ai.ki_agents.triggered_by.${value}`, value);
   const proposalFilters = ['pending_review', 'approved', 'auto_applied', 'rejected', 'expired', ''] as const;
 
   return (

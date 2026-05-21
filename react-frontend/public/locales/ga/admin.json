@@ -10411,5 +10411,283 @@
       "retention_save_failed": "Theip ar shábháil an chumraíocht choinneála.",
       "retention_saved": "Sábháil an chumraíocht coinneála."
     }
+  },
+  "ai": {
+    "common": {
+      "cancel": "Cealaigh",
+      "close": "Dún",
+      "empty_dash": "-",
+      "loading": "Á lódáil...",
+      "save_changes": "Sábháil athruithe"
+    },
+    "ki_agents": {
+      "meta": {
+        "title": "KI-Agenten",
+        "description": "AG61 - Creat Gníomhaire Uathrialach. Gníomhairí bearta a mholadh; faomhann daoine sula gcuirtear aon rud i bhfeidhm."
+      },
+      "about": {
+        "title": "Maidir le KI-Agenten",
+        "body": "Déanann KI-Agenten (Gníomhairí AI) gnáththascanna comhordaithe a uathoibriú: teacht ar phéirí dea-chúraim, baill neamhghníomhacha a chothú, ualaí oibre an chomhordaitheora a achoimriú, agus iarratais ar chabhair oscailte a ródú. Oibríonn gach gníomhaire ar shamhail a mholann an t-am sin: gineann gníomhairí tograí, ach ní chuirtear aon rud i bhfeidhm go dtí go gceadaíonn duine é, ach amháin má sháraíonn scór muiníne an togra an tairseach um uath-iarratas a chumraíonn tú.",
+        "tandem_prefix": "le fios",
+        "tandem_suffix": "-stíl péireálacha cúraim duine le duine bunaithe ar scileanna, suíomh agus infhaighteacht.",
+        "nudge": "cuireann sé leideanna spriocdhírithe chuig baill a bhí neamhghníomhach nó a bhfuil iarratais nach bhfuil a leithéid acu.",
+        "demand": "réamh-mheastar éileamh cúraim atá le teacht ó phatrúin stairiúla.",
+        "help": "molann an comhordaitheoir is fearr le haghaidh iarratais ar chabhair oscailte.",
+        "activity": "seoltaí ríomhphoist chuig comhordaitheoirí achoimre sheachtainiúil ar ghníomhaíocht dheonach."
+      },
+      "tabs": {
+        "aria": "Cluaisíní KI-Agenten",
+        "config": "Cumraíocht",
+        "proposals": "Tograí",
+        "runs": "Ritheann"
+      },
+      "stats": {
+        "total_runs": "ritheann iomlán",
+        "total_proposals": "tograí iomlána",
+        "pending_review": "{{count}} ar feitheamh athbhreithnithe"
+      },
+      "agent_types": {
+        "activity_summary": "Achoimre ar Ghníomhaíocht",
+        "demand_forecast": "Réamhaisnéis Éileamh",
+        "help_routing": "Cabhair Ródú",
+        "member_welcome": "Fáilte roimh Bhall",
+        "nudge_dispatch": "Seolta Nudge",
+        "tandem_matching": "Comhoiriúnú Tandem"
+      },
+      "status": {
+        "all": "Gach",
+        "approved": "Ceadaithe",
+        "auto_applied": "Auto curtha i bhfeidhm",
+        "cancelled": "Ar ceal",
+        "completed": "Críochnaithe",
+        "expired": "imithe in éag",
+        "failed": "Theip",
+        "pending": "Ar feitheamh",
+        "pending_review": "Athbhreithniú ar feitheamh",
+        "rejected": "Diúltaithe",
+        "running": "Rith"
+      },
+      "triggered_by": {
+        "manual": "Lámhleabhar",
+        "scheduled": "Sceidealta"
+      },
+      "config": {
+        "enable_title": "Cumasaigh KI-Agenten",
+        "enable_description": "Máistir ar siúl / as. Nuair a bheidh sé múchta, ní reáchtálfar aon ghníomhairí de réir an sceidil.",
+        "agent_types_title": "Cineálacha gníomhairí",
+        "tandem_description": "-style tacaíocht pairings",
+        "nudge_description": "Spreagann rannpháirtíocht chliste do chomhaltaí",
+        "activity_description": "Achoimre ar loga oibrithe deonacha seachtainiúil do chomhordaitheoirí",
+        "demand_description": "Déan réamh-mheas ar éileamh cúraim ó threochtaí logála oibrithe deonacha",
+        "help_description": "Iarratais cabhrach oscailte a uathbhealaigh",
+        "thresholds_title": "Tairseacha agus sceideal",
+        "auto_apply_threshold": "Tairseach uathfheidhmithe:",
+        "auto_apply_threshold_aria": "Tairseach uathfheidhmithe",
+        "auto_apply_threshold_help": "Cuirtear moltaí os cionn na muiníne seo i bhfeidhm go huathoibríoch gan athbhreithniú.",
+        "max_proposals": "Moltaí uasta in aghaidh an rith",
+        "schedule_hour": "Uair an chloig sceidil (0-23, am áitiúil an fhreastalaí)",
+        "notification_email": "Ríomhphost fógra",
+        "notification_email_placeholder": "admin@example.org"
+      },
+      "actions": {
+        "approve": "Cheadaigh",
+        "approve_all_eligible": "Gach incháilithe a cheadú",
+        "details": "Sonraí",
+        "reject": "Diúltaigh",
+        "save_config": "Sábháil config",
+        "trigger": "Truicear"
+      },
+      "empty": {
+        "loading_config": "Cumraíocht á lódáil...",
+        "loading_proposals": "Moltaí á lódáil...",
+        "loading_runs": "Ritheann á lódáil...",
+        "no_filtered_proposals": "Níl aon mholadh ag teacht leis an scagaire seo.",
+        "no_pending_proposals": "Níl aon tograí ag fanacht le hathbhreithniú. Rith gníomhaire ón gcluaisín Rith chun moltaí a ghiniúint.",
+        "no_runs": "Níl aon rith fós. Bain úsáid as an bpainéal truicear thuas chun tús a chur le do chéad rith gníomhaire."
+      },
+      "proposals": {
+        "approve_all_help": "Formheasann sé gach togra athbhreithnithe ar feitheamh a shásaíonn a mhuinín an tairseach uath-iarratais.",
+        "table_aria": "Tograí gníomhaire",
+        "columns": {
+          "actions": "Gníomhartha",
+          "confidence": "Muinín",
+          "created": "Cruthaithe",
+          "proposal_data": "Sonraí tograí",
+          "status": "Stádas",
+          "subject_user": "Úsáideoir ábhar",
+          "target_user": "Úsáideoir sprice",
+          "type": "Cineál"
+        }
+      },
+      "legend": {
+        "status": "Stádas:",
+        "awaiting_decision": "ag fanacht le do chinneadh",
+        "human_approved": "duine-cheadaithe agus curtha i bhfeidhm",
+        "auto_applied": "i bhfeidhm go huathoibríoch tar éis dul thar an tairseach",
+        "rejected": "a chaitheamh i leataobh, gan a chur i bhfeidhm",
+        "confidence": "Muinín:",
+        "confidence_high": "80%+ sábháilte le hiarratas a dhéanamh go huathoibríoch",
+        "confidence_medium": "50-79% athbhreithniú molta",
+        "confidence_low": "Faoi bhun 50% muinín íseal"
+      },
+      "runs": {
+        "agent_type_aria": "Cineál gníomhaire le spreagadh",
+        "agent_type_title": "Cineál gníomhaire",
+        "table_aria": "Ritheann gníomhaire",
+        "trigger_title": "Spreag rith anois",
+        "triggered_by_help": "Ciallaíonn lámhleabhar a spreagtar riarthóir ón leathanach seo; reáchtálfar modhanna sceidealaithe go huathoibríoch ar an uair sceidil cumraithe.",
+        "columns": {
+          "actions": "Gníomhartha",
+          "agent_type": "Cineál gníomhaire",
+          "applied": "Fheidhmeach",
+          "duration": "Fad",
+          "proposals": "Tograí",
+          "started": "Thosaigh",
+          "status": "Stádas",
+          "triggered_by": "Spreagtha ag"
+        }
+      },
+      "run_detail": {
+        "title": "Rith #{{id}} - {{type}}",
+        "status": "Stádas:",
+        "triggered_by": "Arna spreagadh ag:",
+        "started": "Thosaigh:",
+        "duration": "Fad:",
+        "proposals_generated": "Moltaí ginte:",
+        "proposals_applied": "Moltaí a cuireadh i bhfeidhm:",
+        "proposals_count": "Tograí ({{count}})",
+        "proposals_table_aria": "Rith tograí",
+        "columns": {
+          "subject": "Ábhar"
+        }
+      },
+      "toasts": {
+        "approve_eligible_failed": "Theip ar thograí incháilithe a cheadú.",
+        "approved_eligible": "Tograí ceadaithe {{approved}} (Theip ar {{failed}}, tairseach {{threshold}}%).",
+        "config_load_failed": "Theip ar chumraíocht an ghníomhaire a lódáil.",
+        "config_save_failed": "Theip ar shábháil an chumraíocht.",
+        "config_saved": "Shábháil cumraíocht an ghníomhaire.",
+        "proposal_approve_failed": "Theip ar cheadú an togra.",
+        "proposal_approved": "Togra ceadaithe agus curtha i bhfeidhm.",
+        "proposal_reject_failed": "Theip ar dhiúltú don mholadh.",
+        "proposal_rejected": "Diúltaíodh don togra.",
+        "proposals_load_failed": "Theip ar na tograí a lódáil.",
+        "run_details_load_failed": "Theip ar lódáil sonraí an rith.",
+        "run_trigger_failed": "Theip ar rith a spreagadh.",
+        "run_triggered": "Spreag an rith: Gineadh tograí {{count}}.",
+        "runs_load_failed": "Theip ar ritheanna a lódáil."
+      }
+    },
+    "module_docs": {
+      "meta": {
+        "title": "AI Docs Modúl",
+        "description": "Cur síos simplí ar gach modúl. Úsáideann cúntóir comhrá AI iad seo mar bhunús canónach agus é ag freagairt ceisteanna na mball."
+      },
+      "actions": {
+        "create_doc": "Cruthaigh doc",
+        "delete": "Scrios",
+        "edit": "Cuir in eagar",
+        "new_doc": "Doc nua",
+        "seed_defaults": "Réamhshocrú síolta"
+      },
+      "about": {
+        "body": "Nuair a bhíonn aon cheann d’eochairfhocail doc i dteachtaireacht chomhrá comhalta, cuirtear corp an doic sin i gceangal le leid chórais AI. Instealladh suas le 3 doiciméad in aghaidh an cas. Scríobh i dteanga shimplí: cad a dhéanann an ghné, conas é a úsáid, agus cad nach féidir.",
+        "tip_label": "Leid:",
+        "tip_body": "Cliceáil ar réamhshocruithe Síl chun tosú le 10 ndoiciméad réamhscríofa a chlúdaíonn na croí-mhodúil. Ní dhéanfaidh siad aon rud atá saincheaptha agat a fhorscríobh."
+      },
+      "columns": {
+        "actions": "Gníomhartha",
+        "keywords": "Eochairfhocail",
+        "slug": "Drúchtín",
+        "status": "Stádas",
+        "title": "Teideal",
+        "updated": "Nuashonraithe"
+      },
+      "confirm_delete": "Scrios \"{{title}}\"? Ní féidir é seo a chealú.",
+      "empty": {
+        "no_docs": "Níl doiciméid mhodúil ar bith fós. Úsáid réamhshocruithe Síl nó doc Nua chun tosú."
+      },
+      "editor": {
+        "create_title": "Modúl nua doc",
+        "edit_title": "Cuir \"{{title}}\" in eagar",
+        "fields": {
+          "active": "Gníomhach",
+          "body": "Corp",
+          "keywords": "Eochairfhocail truicear (scartha le camóg)",
+          "module_slug": "Seilide modúl",
+          "title": "Teideal"
+        },
+        "hints": {
+          "active": "Ní instealladh doiciméid neamhghníomhacha isteach sa leid AI.",
+          "keywords": "Nuair a bhíonn aon cheann de na focail seo le feiceáil i dteachtaireacht chomhrá, cuirfear an doiciméad seo isteach sa leid AI.",
+          "module_slug": "Litreacha i gcás íochtair, uimhreacha, béim, agus daiseanna. Ní féidir é a athrú tar éis cruthú."
+        },
+        "placeholders": {
+          "body": "Cur síos simplí ar an modúl seo. Cad a dhéanann sé, conas é a úsáid, agus cad nach féidir.",
+          "keywords": "e.g. timebank, hours, credits, exchange",
+          "module_slug": "e.g. listings, wallet, events",
+          "title": "e.g. Conas a oibríonn credits"
+        }
+      },
+      "status": {
+        "active": "Gníomhach",
+        "disabled": "faoi ​​mhíchumas"
+      },
+      "table_aria": "Docs modúl AI",
+      "toasts": {
+        "created": "Doc cruthaithe.",
+        "deleted": "Scriosadh an doiciméad.",
+        "delete_failed": "Theip ar an scriosadh.",
+        "load_failed": "Theip ar lódáil doiciméid mhodúil.",
+        "save_failed": "Theip ar shábháil.",
+        "seed_failed": "Theip ar shíol.",
+        "seeded": "Doiciméid réamhshocraithe {{count}} sílithe.",
+        "updated": "Doc nuashonraithe."
+      }
+    },
+    "trace_metrics": {
+      "meta": {
+        "title": "AI Trace Metrics",
+        "description": "Costas, latency, úsáid uirlisí, agus ceisteanna gan freagra don chúntóir comhrá AI."
+      },
+      "empty": {
+        "loading_tools": "Úsáid uirlisí á lódáil...",
+        "no_downvotes": "Uimh downvotes. Níl aon rud le feabhsú faoi láthair.",
+        "no_tools": "Níl aon ghlaonna uirlis sa bhfuinneog seo."
+      },
+      "filters": {
+        "window": "Fuinneog"
+      },
+      "stats": {
+        "avg_latency": "Meán latency",
+        "cost": "Costas (USD)",
+        "latency_value": "{{value}} ms",
+        "thumbs_down": "Ordóga síos",
+        "thumbs_up": "Ordóga suas",
+        "turns": "Casadh"
+      },
+      "tools": {
+        "title": "Uirlisí Barr ar a dtugtar"
+      },
+      "toasts": {
+        "load_failed": "Theip ar an méadracht a lódáil."
+      },
+      "unanswered": {
+        "title": "Ceisteanna gan freagra (ordóga síos)",
+        "description": "Seo iad na baill a thug ordóg síos. Scríobh AI Modúl Doc nua chun aon phatrúin athfhillteacha a chlúdach.",
+        "table_aria": "Ceisteanna gan freagra",
+        "columns": {
+          "assistant_reply": "Freagra cúnta (sliocht)",
+          "note": "Nóta",
+          "user_question": "Ceist úsáideora",
+          "when": "Cathain"
+        }
+      },
+      "windows": {
+        "7": "7 lá seo caite",
+        "30": "30 lá anuas",
+        "90": "90 lá seo caite"
+      }
+    }
   }
 }
