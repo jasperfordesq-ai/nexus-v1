@@ -13,10 +13,10 @@
  * Implements the consent surface described in
  * docs/CARING_COMMUNITY_ARCHITECTURE.md (R1+R2).
  *
- * Admin English-only — no t() calls per project convention.
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -73,7 +73,8 @@ function unwrapData<T>(res: { data?: unknown }): T | null {
 }
 
 export default function FederationAggregatesPage() {
-  usePageTitle('Federation Aggregates');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('federation_aggregates.meta.title'));
   const toast = useToast();
 
   const [consent, setConsent] = useState<ConsentState | null>(null);
@@ -98,11 +99,11 @@ export default function FederationAggregatesPage() {
         data ?? { enabled: false, has_secret: false, last_rotated_at: null }
       );
     } catch {
-      toast.error('Failed to load federation aggregate consent');
+      toast.error(t('federation_aggregates.toasts.load_consent_failed'));
       setConsent({ enabled: false, has_secret: false, last_rotated_at: null });
     }
     setLoading(false);
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     loadConsent();
@@ -118,16 +119,16 @@ export default function FederationAggregatesPage() {
           setConsent(data);
           toast.success(
             next
-              ? 'Federation aggregate sharing enabled'
-              : 'Federation aggregate sharing disabled'
+              ? t('federation_aggregates.toasts.enabled')
+              : t('federation_aggregates.toasts.disabled')
           );
         }
       } catch {
-        toast.error('Failed to update consent');
+        toast.error(t('federation_aggregates.toasts.update_failed'));
       }
       setSaving(false);
     },
-    [toast]
+    [t, toast]
   );
 
   const handleRotate = useCallback(async () => {
@@ -137,13 +138,13 @@ export default function FederationAggregatesPage() {
       const data = unwrapData<{ rotated: boolean; consent: ConsentState }>(res);
       if (data?.consent) {
         setConsent(data.consent);
-        toast.success('Signing secret rotated');
+        toast.success(t('federation_aggregates.toasts.secret_rotated'));
       }
     } catch {
-      toast.error('Failed to rotate secret');
+      toast.error(t('federation_aggregates.toasts.rotate_failed'));
     }
     setRotating(false);
-  }, [toast]);
+  }, [t, toast]);
 
   const openAudit = useCallback(async () => {
     setAuditOpen(true);
@@ -153,11 +154,11 @@ export default function FederationAggregatesPage() {
       const data = unwrapData<{ entries: AuditEntry[] }>(res);
       setAuditEntries(data?.entries ?? []);
     } catch {
-      toast.error('Failed to load audit log');
+      toast.error(t('federation_aggregates.toasts.load_audit_failed'));
       setAuditEntries([]);
     }
     setAuditLoading(false);
-  }, [toast]);
+  }, [t, toast]);
 
   const openPreview = useCallback(async () => {
     setPreviewOpen(true);
@@ -167,44 +168,44 @@ export default function FederationAggregatesPage() {
       const data = unwrapData<{ payload: Record<string, unknown>; algorithm: string }>(res);
       setPreviewData(data?.payload ?? null);
     } catch {
-      toast.error('Failed to load preview');
+      toast.error(t('federation_aggregates.toasts.load_preview_failed'));
       setPreviewData(null);
     }
     setPreviewLoading(false);
-  }, [toast]);
+  }, [t, toast]);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Federation Aggregates"
-        description="Opt in to share signed, anonymised aggregate metrics across federated nodes. Member counts are bucketed and partner organisation names are never exposed."
+        title={t('federation_aggregates.meta.title')}
+        description={t('federation_aggregates.meta.description')}
       />
 
       <Card>
         <CardHeader className="flex items-center gap-2">
           <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-          <span className="font-semibold">Consent</span>
+          <span className="font-semibold">{t('federation_aggregates.consent.title')}</span>
         </CardHeader>
         <CardBody className="space-y-4">
           {loading ? (
             <div className="flex items-center gap-2">
-              <Spinner size="sm" /> Loading consent…
+              <Spinner size="sm" /> {t('federation_aggregates.consent.loading')}
             </div>
           ) : (
             <>
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <div className="font-medium">Enable federation aggregate sharing</div>
+                  <div className="font-medium">{t('federation_aggregates.consent.enable_label')}</div>
                   <div className="text-sm text-default-500">
-                    When enabled, the public endpoint <code>/api/v2/federation/aggregates</code>{' '}
-                    returns a signed JSON payload for this tenant. When disabled, it returns 404.
+                    {t('federation_aggregates.consent.endpoint_prefix')} <code>/api/v2/federation/aggregates</code>{' '}
+                    {t('federation_aggregates.consent.endpoint_suffix')}
                   </div>
                 </div>
                 <Switch
                   isSelected={!!consent?.enabled}
                   isDisabled={saving}
                   onValueChange={handleToggle}
-                  aria-label="Enable federation aggregate sharing"
+                  aria-label={t('federation_aggregates.consent.enable_label')}
                 />
               </div>
 
@@ -214,21 +215,21 @@ export default function FederationAggregatesPage() {
                   variant="flat"
                   size="sm"
                 >
-                  {consent?.enabled ? 'Enabled' : 'Disabled'}
+                  {consent?.enabled ? t('federation_aggregates.status.enabled') : t('federation_aggregates.status.disabled')}
                 </Chip>
                 <Chip
                   color={consent?.has_secret ? 'primary' : 'warning'}
                   variant="flat"
                   size="sm"
                 >
-                  {consent?.has_secret ? 'Signing secret present' : 'No signing secret'}
+                  {consent?.has_secret ? t('federation_aggregates.status.signing_secret_present') : t('federation_aggregates.status.no_signing_secret')}
                 </Chip>
                 {consent?.last_rotated_at ? (
                   <span className="text-default-500">
-                    Last rotated {new Date(consent.last_rotated_at).toLocaleString()}
+                    {t('federation_aggregates.status.last_rotated', { date: new Date(consent.last_rotated_at).toLocaleString() })}
                   </span>
                 ) : (
-                  <span className="text-default-500">Never rotated</span>
+                  <span className="text-default-500">{t('federation_aggregates.status.never_rotated')}</span>
                 )}
               </div>
 
@@ -240,28 +241,28 @@ export default function FederationAggregatesPage() {
                   isLoading={rotating}
                   onPress={handleRotate}
                 >
-                  Rotate secret
+                  {t('federation_aggregates.actions.rotate_secret')}
                 </Button>
                 <Button
                   variant="flat"
                   startContent={<Eye className="h-4 w-4" aria-hidden="true" />}
                   onPress={openPreview}
                 >
-                  Preview payload
+                  {t('federation_aggregates.actions.preview_payload')}
                 </Button>
                 <Button
                   variant="flat"
                   startContent={<FileSearch className="h-4 w-4" aria-hidden="true" />}
                   onPress={openAudit}
                 >
-                  Show audit log
+                  {t('federation_aggregates.actions.show_audit_log')}
                 </Button>
                 <Button
                   variant="light"
                   startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
                   onPress={loadConsent}
                 >
-                  Refresh
+                  {t('federation_aggregates.actions.refresh')}
                 </Button>
               </div>
             </>
@@ -276,31 +277,31 @@ export default function FederationAggregatesPage() {
         scrollBehavior="inside"
       >
         <ModalContent>
-          <ModalHeader>Aggregate query audit log (last 90 days)</ModalHeader>
+          <ModalHeader>{t('federation_aggregates.audit.title')}</ModalHeader>
           <ModalBody>
             {auditLoading ? (
               <div className="flex items-center gap-2">
-                <Spinner size="sm" /> Loading…
+                <Spinner size="sm" /> {t('federation_aggregates.audit.loading')}
               </div>
             ) : auditEntries.length === 0 ? (
-              <div className="text-default-500">No queries recorded.</div>
+              <div className="text-default-500">{t('federation_aggregates.audit.empty')}</div>
             ) : (
-              <Table aria-label="Aggregate query audit log">
+              <Table aria-label={t('federation_aggregates.audit.table_aria')}>
                 <TableHeader>
-                  <TableColumn>Time</TableColumn>
-                  <TableColumn>Requester</TableColumn>
-                  <TableColumn>Period</TableColumn>
-                  <TableColumn>Signature</TableColumn>
+                  <TableColumn>{t('federation_aggregates.audit.columns.time')}</TableColumn>
+                  <TableColumn>{t('federation_aggregates.audit.columns.requester')}</TableColumn>
+                  <TableColumn>{t('federation_aggregates.audit.columns.period')}</TableColumn>
+                  <TableColumn>{t('federation_aggregates.audit.columns.signature')}</TableColumn>
                 </TableHeader>
-                <TableBody emptyContent="No queries recorded">
+                <TableBody emptyContent={t('federation_aggregates.audit.empty')}>
                   {auditEntries.map((e) => (
                     <TableRow key={e.id}>
                       <TableCell>{new Date(e.created_at).toLocaleString()}</TableCell>
                       <TableCell className="font-mono text-xs">
-                        {e.requester_origin ?? 'unknown'}
+                        {e.requester_origin ?? t('federation_aggregates.audit.unknown_requester')}
                       </TableCell>
                       <TableCell className="text-xs">
-                        {e.period_from} → {e.period_to}
+                        {t('federation_aggregates.audit.period_range', { from: e.period_from, to: e.period_to })}
                       </TableCell>
                       <TableCell className="font-mono text-xs">
                         {e.signature_snippet}
@@ -313,7 +314,7 @@ export default function FederationAggregatesPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={() => setAuditOpen(false)}>
-              Close
+              {t('federation_aggregates.actions.close')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -326,23 +327,23 @@ export default function FederationAggregatesPage() {
         scrollBehavior="inside"
       >
         <ModalContent>
-          <ModalHeader>Preview — what would be exposed publicly</ModalHeader>
+          <ModalHeader>{t('federation_aggregates.preview.title')}</ModalHeader>
           <ModalBody>
             {previewLoading ? (
               <div className="flex items-center gap-2">
-                <Spinner size="sm" /> Computing aggregate…
+                <Spinner size="sm" /> {t('federation_aggregates.preview.loading')}
               </div>
             ) : previewData ? (
               <pre className="bg-default-100 rounded p-4 text-xs overflow-x-auto whitespace-pre-wrap">
                 {JSON.stringify(previewData, null, 2)}
               </pre>
             ) : (
-              <div className="text-default-500">No preview available.</div>
+              <div className="text-default-500">{t('federation_aggregates.preview.empty')}</div>
             )}
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={() => setPreviewOpen(false)}>
-              Close
+              {t('federation_aggregates.actions.close')}
             </Button>
           </ModalFooter>
         </ModalContent>

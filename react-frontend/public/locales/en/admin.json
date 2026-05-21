@@ -3159,6 +3159,63 @@
       "delete_failed": "Delete failed"
     }
   },
+  "federation_aggregates": {
+    "meta": {
+      "title": "Federation Aggregates",
+      "description": "Opt in to share signed, anonymised aggregate metrics across federated nodes. Member counts are bucketed and partner organisation names are never exposed."
+    },
+    "actions": {
+      "rotate_secret": "Rotate secret",
+      "preview_payload": "Preview payload",
+      "show_audit_log": "Show audit log",
+      "refresh": "Refresh",
+      "close": "Close"
+    },
+    "consent": {
+      "title": "Consent",
+      "loading": "Loading consent...",
+      "enable_label": "Enable federation aggregate sharing",
+      "endpoint_prefix": "When enabled, the public endpoint",
+      "endpoint_suffix": "returns a signed JSON payload for this tenant. When disabled, it returns 404."
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "signing_secret_present": "Signing secret present",
+      "no_signing_secret": "No signing secret",
+      "last_rotated": "Last rotated {{date}}",
+      "never_rotated": "Never rotated"
+    },
+    "audit": {
+      "title": "Aggregate query audit log (last 90 days)",
+      "loading": "Loading...",
+      "empty": "No queries recorded.",
+      "table_aria": "Aggregate query audit log",
+      "unknown_requester": "unknown",
+      "period_range": "{{from}} -> {{to}}",
+      "columns": {
+        "time": "Time",
+        "requester": "Requester",
+        "period": "Period",
+        "signature": "Signature"
+      }
+    },
+    "preview": {
+      "title": "Preview - what would be exposed publicly",
+      "loading": "Computing aggregate...",
+      "empty": "No preview available."
+    },
+    "toasts": {
+      "load_consent_failed": "Failed to load federation aggregate consent",
+      "enabled": "Federation aggregate sharing enabled",
+      "disabled": "Federation aggregate sharing disabled",
+      "update_failed": "Failed to update consent",
+      "secret_rotated": "Signing secret rotated",
+      "rotate_failed": "Failed to rotate secret",
+      "load_audit_failed": "Failed to load audit log",
+      "load_preview_failed": "Failed to load preview"
+    }
+  },
   "disclosure_pack": {
     "meta": {
       "page_title": "FADP / nDSG Disclosure Pack",
