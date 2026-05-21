@@ -1,18 +1,18 @@
-# Project NEXUS V1.5 — Open Source Announcement Email
+# Project NEXUS V1.5.1 — Open Source Announcement Email
 
-**Date:** 2026-04-12 (updated)
+**Date:** 2026-05-21 (updated)
 **Status:** Ready to send
-**Purpose:** Public announcement of Project NEXUS V1.5 open source release — refreshed with Spring 2026 feature work (Marketplace, Donations, Identity Verification, four-protocol Federation layer including Credit Commons / CEN, 11 languages, SEO at build time, and a hardened security/payments layer).
+**Purpose:** Public announcement of Project NEXUS V1.5.1 open source release — refreshed with Spring 2026 feature work (Marketplace, Donations, Identity Verification, four-protocol Federation layer including Credit Commons / CEN, 11 languages, self-hosted SEO pre-rendering, registration fraud prevention, and a hardened security/payments layer).
 
 ---
 
-**Subject: Project NEXUS V1.5 is Now Open Source — Building the Future of Community Exchange Together**
+**Subject: Project NEXUS V1.5.1 is Now Open Source — Building the Future of Community Exchange Together**
 
 Dear Community Builders, Developers, and Changemakers,
 
 Today marks a pivotal moment in our mission to reimagine how communities connect, exchange, and thrive.
 
-**We're releasing Project NEXUS V1.5 to the world — fully open source, built for everyone.**
+**We're releasing Project NEXUS V1.5.1 to the world — fully open source, built for everyone.**
 
 ---
 
@@ -24,15 +24,15 @@ But NEXUS goes far beyond timebanking. It's a complete ecosystem for building co
 
 ---
 
-## What's Inside V1.5?
+## What's Inside V1.5.1?
 
-At a glance: **timebanking engine, real-time messaging, AI-powered matching, multi-tenant architecture, a four-protocol federation layer (Nexus, Komunitin, Credit Commons, TimeOverflow), a Stripe payments layer (subscriptions, donations, marketplace payouts, identity verification), gamification, and a full social platform in 11 languages** — all production-ready and fully Dockerized.
+At a glance: **timebanking engine, real-time messaging, AI-powered matching, multi-tenant architecture, a four-protocol federation layer (Nexus, Komunitin, Credit Commons, TimeOverflow), a Stripe payments layer (subscriptions, donations, marketplace payouts, identity verification), gamification, registration fraud prevention, and a full social platform in 11 languages** — all production-ready and fully Dockerized.
 
 Here's the full breakdown:
 
 **Core Platform:**
 - ⏰ **Timebanking Engine** — Full credit exchange system with wallet, transactions, and broker controls
-- 🏢 **Multi-Tenancy** — Host unlimited communities on a single platform, each with their own branding and configuration
+- 🏢 **Multi-Tenancy** — Host unlimited communities on a single platform, each with their own branding and configuration; hierarchical parent-child tenant relationships with domain inheritance
 - 🎯 **Smart Matching** — AI-powered matching with semantic embeddings, collaborative filtering, availability scheduling, and learned preferences
 - 💬 **Real-Time Messaging** — Private conversations with Pusher WebSocket integration and real-time presence/online status
 - 📱 **Progressive Web App + Native Mobile App** — Install as a PWA on any device, or deploy as a native iOS/Android app via Capacitor
@@ -70,6 +70,7 @@ Here's the full breakdown:
 - 📚 **Resources & Knowledge Base** — Structured articles and shared resource library
 - ❓ **Help Center** — Documentation hub and FAQ
 - 📰 **Newsletter System** — Email campaign manager with A/B testing, smart segments, geo targeting, recurring sends, templates, send-time optimisation, and full open/click analytics
+- 🔔 **Notification digest** — Daily-digest opt-in, chatroom notification bell, and per-category From addresses for platform email deliverability
 - 🤖 **AI Chat** — OpenAI-powered assistant for platform guidance
 - 📄 **Legal Hub** — Versioned legal documents with acceptance gates and audit trail
 - 📊 **Impact Reports** — SROI analysis, member outcome reports, and social impact case studies
@@ -105,6 +106,7 @@ Here's the full breakdown:
 
 **Built for Production:**
 - 🔐 Enterprise security — CSRF, rate limiting, TOTP 2FA, WebAuthn passkeys, CSP nonces, a CORS allowlist, Form Request validation, email verification gates, and invite-code registration
+- 🛡️ Registration fraud prevention — multi-field honeypot, MX-record checks on email domains, disposable-email blocklist, per-IP daily signup cap, per-tenant hourly circuit breaker with admin one-click resume, and verified place-autocomplete location requirement
 - 💳 Stripe payments layer — subscriptions, donations, marketplace (Connect), and identity verification, with idempotent webhook handling and deep money-flow test coverage
 - 🛡️ GDPR compliance suite — data requests, consent management, cookie consent, breach tracking, and full audit log
 - 🚨 Fraud & abuse detection — automated suspicious activity alerts and content moderation
@@ -112,12 +114,13 @@ Here's the full breakdown:
 - 🏢 Enterprise RBAC — role-based access control across 13+ modules with a full permission matrix
 - ♿ WCAG 2.1 AA accessibility compliance
 - 🌍 Multi-language support — **11 languages**: English, Irish, German, French, Italian, Portuguese, Spanish, Dutch, Polish, Japanese, and **Arabic with full right-to-left layout**
-- 🔎 SEO at build time — 19+ public pages pre-rendered with Playwright, structured data, sitemaps, and Prerender.io fallback for dynamic routes
+- 🔎 SEO at build time — 19+ public pages fully self-hosted pre-rendered with Playwright, structured data (organization type, geo meta tags, lat/lng schema), sitemaps, and nginx-served HTML for bots and users alike
 - 🚀 Guided onboarding wizard for new members
 - 📊 Comprehensive admin panel with algorithm controls, diagnostics, cron job monitoring, and email deliverability monitoring
 - 🏗️ Tenant hierarchy — parent-child tenant relationships with feature toggling per tenant
 - 📧 Email webhook processing — SendGrid bounce, complaint, and delivery event handling
 - 🧪 500+ PHPUnit tests (money flow, webhooks, federation, groups, marketplace) plus Vitest suites
+- ⚙️ Queue watchdog — automated cron recovery for dead Horizon workers; zero manual intervention on transient queue failures
 - 📦 Fully Dockerized
 
 ---
@@ -126,11 +129,11 @@ Here's the full breakdown:
 
 This is where it gets exciting.
 
-**V1.5 ships with native adapters for four federation protocols** — Nexus (our own), the complete [Komunitin specification](https://github.com/komunitin/komunitin-spec) (all 15 endpoints), the [Credit Commons Protocol](https://creditcommons.org/) (11 endpoints, CEN-compatible mutual credit with P→V→C→E→X transaction lifecycle), and TimeOverflow. Two-way sync across 9 entity types (members, listings, events, groups, connections, volunteering, reviews, transfers, messages), event-driven push, reputation portability, and end-to-end integration test coverage. The vision is simple but ambitious: **a global time bank where external federation partners can discover each other, exchange services, and trade time credits across platforms and across borders.**
+**V1.5.1 ships with native adapters for four federation protocols** — Nexus (our own), the complete [Komunitin specification](https://github.com/komunitin/komunitin-spec) (all 15 endpoints), the [Credit Commons Protocol](https://creditcommons.org/) (11 endpoints, CEN-compatible mutual credit with P→V→C→E→X transaction lifecycle), and TimeOverflow. Two-way sync across 9 entity types (members, listings, events, groups, connections, volunteering, reviews, transfers, messages), event-driven push, reputation portability, and end-to-end integration test coverage. The vision is simple but ambitious: **a global time bank where external federation partners can discover each other, exchange services, and trade time credits across platforms and across borders.**
 
 Imagine a member in Dublin helping someone in São Paulo with web design, while a member in Tokyo teaches Irish students origami — all through interconnected timebanking platforms, all valuing every hour equally.
 
-The Federation API — available in V1.5 right now — enables:
+The Federation API — available in V1.5.1 right now — enables:
 - **Cross-platform discovery** — Find members and services on partner timebanking platforms globally
 - **Interoperable time credit exchange** — Trade time credits between different timebanking systems seamlessly
 - **Federation Neighborhoods** — Geographically grouped clusters of federated communities for regional coordination
@@ -275,7 +278,7 @@ Welcome to Project NEXUS. Welcome home.
 
 ---
 
-*Project NEXUS V1.5 — Built by Jasper Ford — Licensed under AGPL-3.0-or-later*
+*Project NEXUS V1.5.1 — Built by Jasper Ford — Licensed under AGPL-3.0-or-later*
 
 **"Every hour is equal. Every contribution matters. Every community deserves better. Everywhere."**
 

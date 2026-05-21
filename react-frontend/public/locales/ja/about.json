@@ -124,7 +124,11 @@
     "cta_contact": "会話を始める",
     "cta_view_plan": "戦略計画を見る",
     "our_partners_heading": "Our Partners & Supporters",
-    "partners_banner_alt": "Partner logos: West Cork Development Partnership, SICAP, Cork County Council, Department of Housing Planning Community and Local Government, European Structural and Investment Funds, European Social Fund"
+    "partners_banner_alt": "Partner logos: West Cork Development Partnership, SICAP, Cork County Council, Department of Housing Planning Community and Local Government, European Structural and Investment Funds, European Social Fund",
+    "tech_partner_label": "Technology Partner",
+    "tech_partner_logo_alt": "Project NEXUS logo",
+    "tech_partner_heading": "Timebank Island Project NEXUS",
+    "tech_partner_description": "hOUR Timebank is proudly powered by Project NEXUS — an open-source timebanking platform built to help communities exchange skills and strengthen social bonds. Our technology partnership ensures every member benefits from a modern, accessible, and community-first digital experience."
   },
   "social_prescribing": {
     "page_title": "社会的処方",
@@ -259,7 +263,12 @@
     "cta_full_report": "完全な報告書をダウンロード",
     "cta_exec_summary": "エグゼクティブサマリー",
     "cta_questions": "研究についての質問はありますか？",
-    "cta_contact": "お問い合わせ"
+    "cta_contact": "お問い合わせ",
+    "sroi_result_value": "€16 : €1",
+    "sroi_total_investment_value": "€50,000",
+    "sroi_total_present_value_amount": "€803,184",
+    "sroi_net_social_value_amount": "€753,184",
+    "sroi_ratio_value": "€16.06 : €1"
   },
   "strategic_plan": {
     "page_title": "戦略計画 2026–2030",

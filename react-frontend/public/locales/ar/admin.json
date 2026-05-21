@@ -10254,5 +10254,162 @@
         "rejected": "تم رفض الاقتراح"
       }
     }
+  },
+  "fadp": {
+    "meta": {
+      "page_title": "الامتثال FADP"
+    },
+    "header": {
+      "title": "امتثال Swiss FADP (nDSG)",
+      "description": "القانون الفيدرالي لحماية البيانات: معالجة السجل، وتكوين الاحتفاظ، وتدقيق الموافقة، وضوابط الإقامة."
+    },
+    "actions": {
+      "add_activity": "أضف نشاطًا",
+      "cancel": "يلغي",
+      "delete": "يمسح",
+      "edit": "يحرر",
+      "export_csv": "تصدير CSV",
+      "export_ledger_csv": "تصدير دفتر الأستاذ الكامل CSV",
+      "refresh": "ينعش",
+      "save_changes": "حفظ التغييرات",
+      "save_configuration": "حفظ التكوين"
+    },
+    "common": {
+      "empty_dash": "—",
+      "no": "لا"
+    },
+    "tabs": {
+      "aria": "أقسام FADP",
+      "ledger": "دفتر الموافقة",
+      "register": "سجل المعالجة",
+      "residency": "إقامة البيانات",
+      "retention": "تكوين الاحتفاظ"
+    },
+    "register": {
+      "description": "Article 12 يتطلب nDSG سجلاً لأنشطة المعالجة. أضف كل نشاط يتم فيه جمع البيانات الشخصية أو استخدامها أو مشاركتها أو الاحتفاظ بها.",
+      "empty": "لا توجد أنشطة معالجة حتى الآن. أضف نشاطًا لإنشاء السجل.",
+      "profiling_yes": "نعم: الموافقة مطلوبة",
+      "table_aria": "أنشطة المعالجة",
+      "columns": {
+        "actions": "الإجراءات",
+        "activity": "نشاط",
+        "automated_profiling": "التنميط الآلي",
+        "legal_basis": "الأساس القانوني",
+        "retention": "حفظ"
+      }
+    },
+    "retention": {
+      "data_residency_label": "إعلان إقامة البيانات",
+      "dpa_contact_description": "البريد الإلكتروني لمسؤول حماية البيانات أو الشخص المسؤول.",
+      "dpa_contact_label": "البريد الإلكتروني لجهة الاتصال DPA (اختياري)",
+      "periods_title": "فترات الاحتفاظ",
+      "residency_title": "مكان إقامة البيانات والاتصال بـ DPA",
+      "fields": {
+        "activity_logs_years": "سجلات النشاط (سنوات)",
+        "ai_embeddings_years": "تضمينات الذكاء الاصطناعي (بالسنوات)",
+        "member_data_years": "بيانات الأعضاء (سنوات)",
+        "messages_years": "الرسائل (سنوات)",
+        "transaction_data_years": "بيانات المعاملة (بالسنوات)"
+      },
+      "hints": {
+        "activity_logs_years": "نشاط المنصة وسجلات التدقيق.",
+        "ai_embeddings_years": "مطابقة التضمينات. الموافقة مطلوبة.",
+        "member_data_years": "التسجيل والملفات الشخصية وبيانات المصادقة.",
+        "messages_years": "الرسائل المباشرة والجماعية.",
+        "transaction_data_years": "سجلات تبادل الائتمان الوقت."
+      }
+    },
+    "ledger": {
+      "description": "سجل تدقيق غير قابل للتغيير لقرارات موافقة الأعضاء. مطلوب بواسطة Art. 6 nDSG لإثبات الشرعية.",
+      "empty": "لا توجد سجلات موافقة حتى الآن.",
+      "table_aria": "سجلات الموافقة",
+      "truncated": "عرض أحدث 200 سجل. قم بتصدير دفتر الأستاذ الكامل CSV لتنزيل جميع سجلات {{count}}.",
+      "columns": {
+        "action": "فعل",
+        "consent_type": "نوع الموافقة",
+        "date": "تاريخ",
+        "ip_address": "عنوان IP",
+        "member_id": "عضو ID"
+      }
+    },
+    "residency": {
+      "article_16": "يُسمح بالكشف عن البيانات الشخصية عبر الحدود إذا كانت دولة المقصد تضمن حماية كافية للبيانات معترف بها من قبل المجلس الفيدرالي. Switzerland والدول الأعضاء EU/EEA وقائمة صغيرة من البلدان الأخرى مؤهلة.",
+      "article_16_label": "FADP Art. 16",
+      "article_17": "إذا كانت الوجهة غير مؤهلة، فيجب وضع الضمانات المناسبة، مثل بنود حماية البيانات القياسية المعتمدة من قبل FDPIC، أو قواعد الشركة الملزمة، أو موافقة الأعضاء.",
+      "article_17_label": "FADP Art. 17",
+      "description": "حيث يتم تخزين بيانات العضو المستأجر ومعالجتها.",
+      "dpa_contact": "جهة اتصال DPA",
+      "title": "مكان إقامة البيانات المعلنة",
+      "update_hint_prefix": "لتحديث الإقامة المعلنة، استخدم",
+      "update_hint_suffix": "فاتورة غير مدفوعة.",
+      "copy": {
+        "EU": "يتم تخزين البيانات داخل EU/EEA. تعترف Switzerland بأن حماية بيانات EU كافية، لذلك ليست هناك حاجة إلى ضمانات FADP إضافية لعمليات النقل هذه.",
+        "International": "يتم تخزين البيانات خارج Switzerland وEU. Art. 16-17 يلزم توفير ضمانات nDSG، مثل الشروط التعاقدية القياسية أو موافقة الأعضاء الصريحة على كل عملية نقل.",
+        "Switzerland": "يتم تخزين البيانات بالكامل داخل Switzerland. أحكام النقل عبر الحدود ليست مطلوبة لهذا الإعلان."
+      }
+    },
+    "summary": {
+      "automated_profiling": "التنميط الآلي",
+      "generated": "تم إنشاؤها",
+      "tenant": "مستأجر",
+      "title": "تسجيل الملخص",
+      "total_activities": "إجمالي الأنشطة"
+    },
+    "activity_modal": {
+      "add_title": "إضافة نشاط المعالجة",
+      "edit_title": "تحرير نشاط المعالجة",
+      "fields": {
+        "activity_name": "اسم النشاط",
+        "automated_profiling": "التنميط الآلي",
+        "data_categories": "فئات البيانات (مفصولة بفواصل)",
+        "legal_basis": "الأساس القانوني",
+        "purpose": "غاية",
+        "recipients": "المستلمون (مفصولون بفواصل، اختياري)",
+        "retention_period": "فترة الاحتفاظ",
+        "sort_order": "ترتيب الترتيب"
+      },
+      "hints": {
+        "automated_profiling": "Art. 21 nDSG: يتطلب اتخاذ القرار الفردي الآلي موافقة صريحة وشفافية.",
+        "data_categories": "على سبيل المثال: الاسم والبريد الإلكتروني والهاتف والعنوان.",
+        "purpose": "لماذا تتم معالجة هذه البيانات؟ كن محددًا بشأن الغرض المشروع.",
+        "recipients": "من يتلقى هذه البيانات أو يصل إليها، مثل الفرق الداخلية أو المعالجين.",
+        "retention_period": "على سبيل المثال: بعد 7 سنوات من انتهاء العضوية، أو حتى يتم سحب الموافقة."
+      }
+    },
+    "delete_modal": {
+      "message": "هل تريد حذف نشاط المعالجة هذا؟ لا يمكن التراجع عن هذا.",
+      "title": "حذف نشاط المعالجة"
+    },
+    "legal_basis": {
+      "consent": "موافقة",
+      "contract": "عقد",
+      "legal_obligation": "التزام قانوني",
+      "legitimate_interest": "المصلحة المشروعة",
+      "unknown": "أساس قانوني غير معروف: {{basis}}"
+    },
+    "data_residency": {
+      "EU": "EU (EEA)",
+      "International": "دولي (خارج EU/Switzerland)",
+      "Switzerland": "Switzerland"
+    },
+    "consent_actions": {
+      "granted": "ممنوح",
+      "withdrawn": "انسحبت",
+      "unknown": "إجراء غير معروف: {{action}}"
+    },
+    "toasts": {
+      "activities_load_failed": "فشل تحميل أنشطة المعالجة.",
+      "activity_delete_failed": "فشل في حذف النشاط.",
+      "activity_deleted": "تم حذف النشاط.",
+      "activity_required": "مطلوب اسم النشاط والغرض منه.",
+      "activity_save_failed": "فشل حفظ النشاط.",
+      "activity_saved": "تم حفظ نشاط المعالجة.",
+      "consent_export_failed": "فشل تصدير دفتر أستاذ الموافقة.",
+      "consent_load_failed": "فشل تحميل دفتر الأستاذ الموافقة.",
+      "register_export_failed": "فشل تصدير السجل.",
+      "retention_load_failed": "فشل تحميل تكوين الاحتفاظ.",
+      "retention_save_failed": "فشل حفظ تكوين الاحتفاظ.",
+      "retention_saved": "تم حفظ تكوين الاحتفاظ."
+    }
   }
 }

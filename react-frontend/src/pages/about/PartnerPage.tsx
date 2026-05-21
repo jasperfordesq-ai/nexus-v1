@@ -163,7 +163,7 @@ export function PartnerPage() {
         </div>
       </section>
 
-      {/* ─── Partner Logos Banner ─── */}
+      {/* ─── Technology Partner: Project NEXUS ─── */}
       <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <motion.div
@@ -172,15 +172,25 @@ export function PartnerPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <GlassCard className="p-8 sm:p-10 text-center">
-              <h2 className="text-xl sm:text-2xl font-bold text-theme-primary mb-6">
-                {t('partner.our_partners_heading')}
-              </h2>
+            <GlassCard className="p-8 sm:p-10 text-center relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500" aria-hidden="true" />
+              <div className="inline-flex items-center justify-center p-2 rounded-xl bg-indigo-500/10 mb-4">
+                <Laptop className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+              </div>
+              <p className="text-sm font-semibold uppercase tracking-widest text-indigo-500 dark:text-indigo-400 mb-4">
+                {t('partner.tech_partner_label')}
+              </p>
               <img
-                src="/images/timebank_ireland_west_cork_partnership.jpg"
-                alt={t('partner.partners_banner_alt')}
-                className="w-full max-w-3xl mx-auto rounded-lg bg-white p-4"
+                src="/images/project-nexus-logo.png"
+                alt={t('partner.tech_partner_logo_alt')}
+                className="w-64 sm:w-80 mx-auto mb-6"
               />
+              <h2 className="text-xl sm:text-2xl font-bold text-theme-primary mb-3">
+                {t('partner.tech_partner_heading')}
+              </h2>
+              <p className="text-theme-muted max-w-xl mx-auto leading-relaxed">
+                {t('partner.tech_partner_description')}
+              </p>
             </GlassCard>
           </motion.div>
         </div>
@@ -267,6 +277,29 @@ export function PartnerPage() {
                 </GlassCard>
               </motion.div>
             ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── Partner Logos Banner ─── */}
+      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <GlassCard className="p-8 sm:p-10 text-center">
+              <h2 className="text-xl sm:text-2xl font-bold text-theme-primary mb-6">
+                {t('partner.our_partners_heading')}
+              </h2>
+              <img
+                src="/images/timebank_ireland_west_cork_partnership.jpg"
+                alt={t('partner.partners_banner_alt')}
+                className="w-full max-w-3xl mx-auto rounded-lg bg-white p-4"
+              />
+            </GlassCard>
           </motion.div>
         </div>
       </section>
