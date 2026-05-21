@@ -914,9 +914,9 @@ export function ProfilePage() {
               variant="light"
               classNames={{
                 base: 'w-full overflow-x-auto pb-1',
-                tabList: 'w-max min-w-max max-w-none bg-theme-elevated p-1 rounded-lg gap-1',
+                tabList: 'w-max max-w-full bg-theme-elevated p-1 rounded-lg gap-1',
                 cursor: 'bg-theme-hover shadow-sm',
-                tab: 'h-auto min-w-0 shrink-0 px-3 py-2 text-xs sm:text-sm',
+                tab: 'h-auto w-auto min-w-0 px-3 py-2 text-xs sm:text-sm',
                 tabContent: 'group-data-[selected=true]:text-theme-primary text-theme-muted',
               }}
             >
