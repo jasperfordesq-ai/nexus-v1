@@ -70,11 +70,11 @@ export function CrmDashboard() {
         setData(res.data as CrmDashboardData);
       }
     } catch {
-      toast.error("Failed to load CRM dashboard data");
+      toast.error(t('crm.failed_to_load_c_r_m_dashboard_data'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   const handleExport = useCallback(async (type: 'dashboard' | 'notes' | 'tasks') => {
@@ -82,11 +82,11 @@ export function CrmDashboard() {
       await api.download(`/v2/admin/crm/export/${type}`, {
         filename: `crm-${type}-${new Date().toISOString().slice(0, 10)}.csv`,
       });
-      toast.success(`Export successfully`);
+      toast.success(t('crm.export_success'));
     } catch {
-      toast.error(`Export Failed`);
+      toast.error(t('crm.export_failed'));
     }
-  }, [toast]);
+  }, [t, toast]);
 
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export function CrmDashboard() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <Spinner size="lg" label={"Loading Dashboard"} />
+        <Spinner size="lg" label={t('crm.loading_dashboard')} />
       </div>
     );
   }
@@ -104,8 +104,8 @@ export function CrmDashboard() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <PageHeader
-        title={"CRM Dashboard"}
-        description={"Overview of member engagement, tasks, tags, and onboarding progress"}
+        title={t('crm.crm_dashboard_title')}
+        description={t('crm.crm_dashboard_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -114,7 +114,7 @@ export function CrmDashboard() {
               startContent={<Download size={14} />}
               onPress={() => handleExport('dashboard')}
             >
-              {"Export Stats"}
+              {t('crm.export_stats')}
             </Button>
             <Button
               variant="flat"
@@ -122,7 +122,7 @@ export function CrmDashboard() {
               startContent={<Download size={14} />}
               onPress={() => handleExport('notes')}
             >
-              {"Export Notes"}
+              {t('crm.export_notes')}
             </Button>
             <Button
               variant="flat"
@@ -130,7 +130,7 @@ export function CrmDashboard() {
               startContent={<Download size={14} />}
               onPress={() => handleExport('tasks')}
             >
-              {"Export Tasks"}
+              {t('crm.export_tasks')}
             </Button>
             <Button
               variant="flat"
@@ -138,7 +138,7 @@ export function CrmDashboard() {
               onPress={loadDashboard}
               isLoading={loading}
             >
-              {"Refresh"}
+              {t('crm.refresh')}
             </Button>
           </div>
         }
@@ -147,56 +147,56 @@ export function CrmDashboard() {
       {/* Stat Cards */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatCard
-          label={"Total Members"}
+          label={t('crm.label_total_members')}
           value={data?.total_members ?? 0}
           icon={Users}
           color="primary"
           loading={!data}
         />
         <StatCard
-          label={"Active Members"}
+          label={t('crm.label_active_members')}
           value={data?.active_members ?? 0}
           icon={Activity}
           color="success"
           loading={!data}
         />
         <StatCard
-          label={"New Members This Month"}
+          label={t('crm.label_new_this_month')}
           value={data?.new_this_month ?? 0}
           icon={UserPlus}
           color="secondary"
           loading={!data}
         />
         <StatCard
-          label={"Pending Approvals"}
+          label={t('crm.label_pending_approvals')}
           value={data?.pending_approvals ?? 0}
           icon={UserCheck}
           color="warning"
           loading={!data}
         />
         <StatCard
-          label={"Open Tasks"}
+          label={t('crm.label_open_tasks')}
           value={data?.open_tasks ?? 0}
           icon={ClipboardList}
           color="primary"
           loading={!data}
         />
         <StatCard
-          label={"Overdue Tasks"}
+          label={t('crm.label_overdue_tasks')}
           value={data?.overdue_tasks ?? 0}
           icon={AlertTriangle}
           color={(data?.overdue_tasks ?? 0) > 0 ? 'danger' : 'default'}
           loading={!data}
         />
         <StatCard
-          label={"Member Notes"}
+          label={t('crm.label_member_notes')}
           value={data?.total_notes ?? 0}
           icon={StickyNote}
           color="secondary"
           loading={!data}
         />
         <StatCard
-          label={"30-Day Activity Rate"}
+          label={t('crm.label_retention_rate')}
           value={data ? `${data.retention_rate}%` : '0%'}
           icon={TrendingUp}
           color="success"
@@ -209,8 +209,8 @@ export function CrmDashboard() {
         {/* Quick Actions */}
         <Card shadow="sm">
           <CardHeader className="flex-col items-start px-4 pb-0 pt-4">
-            <h3 className="text-lg font-semibold text-foreground">{"Quick Actions"}</h3>
-            <p className="text-sm text-default-500">{"Common actions for managing members from the CRM dashboard"}</p>
+            <h3 className="text-lg font-semibold text-foreground">{t('crm.quick_actions_title')}</h3>
+            <p className="text-sm text-default-500">{t('crm.quick_actions_desc')}</p>
           </CardHeader>
           <CardBody className="gap-3 px-4 pb-4 pt-3">
             {QUICK_ACTIONS.map((action) => {
@@ -240,8 +240,8 @@ export function CrmDashboard() {
         {/* Activity Summary */}
         <Card shadow="sm">
           <CardHeader className="flex-col items-start px-4 pb-0 pt-4">
-            <h3 className="text-lg font-semibold text-foreground">{"Activity Summary"}</h3>
-            <p className="text-sm text-default-500">{"Summary of recent member activity across your community"}</p>
+            <h3 className="text-lg font-semibold text-foreground">{t('crm.activity_summary_title')}</h3>
+            <p className="text-sm text-default-500">{t('crm.activity_summary_desc')}</p>
           </CardHeader>
           <CardBody className="gap-4 px-4 pb-4 pt-3">
             <div className="flex items-center justify-between rounded-lg bg-default-50 p-3">
@@ -250,8 +250,8 @@ export function CrmDashboard() {
                   <Activity size={20} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">{"Active in Last 30 Days"}</p>
-                  <p className="text-xs text-default-500">{"Members active in the last 30 days"}</p>
+                  <p className="text-sm font-medium text-foreground">{t('crm.active_in_last_30')}</p>
+                  <p className="text-xs text-default-500">{t('crm.members_logged_in_recently')}</p>
                 </div>
               </div>
               <Chip color="success" variant="flat" size="lg">
@@ -265,8 +265,8 @@ export function CrmDashboard() {
                   <UserPlus size={20} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">{"New Members This Month"}</p>
-                  <p className="text-xs text-default-500">{"Approved members created this month"}</p>
+                  <p className="text-sm font-medium text-foreground">{t('crm.new_this_month_summary')}</p>
+                  <p className="text-xs text-default-500">{t('crm.signups_in_current_month')}</p>
                 </div>
               </div>
               <Chip color="secondary" variant="flat" size="lg">
@@ -280,8 +280,8 @@ export function CrmDashboard() {
                   <AlertTriangle size={20} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">{"Never logged in"}</p>
-                  <p className="text-xs text-default-500">{"Members not signed in"}</p>
+                  <p className="text-sm font-medium text-foreground">{t('crm.never_logged_in')}</p>
+                  <p className="text-xs text-default-500">{t('crm.members_not_signed_in')}</p>
                 </div>
               </div>
               <Chip color="warning" variant="flat" size="lg">
@@ -295,8 +295,8 @@ export function CrmDashboard() {
                   <TrendingUp size={20} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">{"30-Day Activity Rate"}</p>
-                  <p className="text-xs text-default-500">{"Active approved members vs total approved members"}</p>
+                  <p className="text-sm font-medium text-foreground">{t('crm.retention_rate_summary')}</p>
+                  <p className="text-xs text-default-500">{t('crm.members_active_vs_total')}</p>
                 </div>
               </div>
               <Chip
