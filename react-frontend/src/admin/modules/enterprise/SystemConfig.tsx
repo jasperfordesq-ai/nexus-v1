@@ -84,100 +84,100 @@ interface ConfigGroup {
 // Supported platform language codes — names resolved via i18n inside the component
 const SUPPORTED_LOCALE_CODES = ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'] as const;
 
-/** Build the config schema. Labels and descriptions are English-only (admin panel is not translated). */
-function buildConfigSchema(): ConfigGroup[] {
+/** Build the config schema with translated labels and descriptions. */
+function buildConfigSchema(t: (key: string, options?: Record<string, unknown>) => string): ConfigGroup[] {
   return [
     {
       key: 'general',
-      label: "General",
-      description: "Site identity, localization, and footer text.",
+      label: t('enterprise.config_group_general'),
+      description: t('enterprise.config_group_general_desc'),
       icon: <Settings2 size={18} />,
       settings: [
-        { key: 'site_name', label: "Site name", description: "Public name shown in the header, browser tab, and emails.", type: 'text', default: '' },
-        { key: 'site_description', label: "Site description", description: "Short tagline used in metadata and shared links.", type: 'textarea', default: '' },
-        { key: 'contact_email', label: "Contact email", description: "Address members use to reach support.", type: 'email', default: '' },
-        { key: 'contact_phone', label: "Contact phone", description: "Public phone number for support enquiries.", type: 'text', default: '' },
-        { key: 'timezone', label: "Timezone", description: "IANA timezone identifier (e.g. Europe/Dublin) used for scheduling and timestamps.", type: 'text', default: 'UTC' },
-        { key: 'footer_text', label: "Footer legal text", description: "Charity number, company registration, or other legal text displayed in the footer.", type: 'textarea', default: '' },
+        { key: 'site_name', label: t('enterprise.config_site_name'), description: t('enterprise.config_site_name_desc'), type: 'text', default: '' },
+        { key: 'site_description', label: t('enterprise.config_site_description'), description: t('enterprise.config_site_description_desc'), type: 'textarea', default: '' },
+        { key: 'contact_email', label: t('enterprise.config_contact_email'), description: t('enterprise.config_contact_email_desc'), type: 'email', default: '' },
+        { key: 'contact_phone', label: t('enterprise.config_contact_phone'), description: t('enterprise.config_contact_phone_desc'), type: 'text', default: '' },
+        { key: 'timezone', label: t('enterprise.config_timezone'), description: t('enterprise.config_timezone_desc'), type: 'text', default: 'UTC' },
+        { key: 'footer_text', label: t('enterprise.config_footer_text'), description: t('enterprise.config_footer_text_desc'), type: 'textarea', default: '' },
         {
-          key: 'locale', label: "Default locale", description: "Language used for new members until they pick their own.", type: 'select', default: 'en',
+          key: 'locale', label: t('enterprise.config_locale'), description: t('enterprise.config_locale_desc'), type: 'select', default: 'en',
           options: SUPPORTED_LOCALE_CODES.map((code) => ({ label: code, value: code })),
         },
       ],
     },
     {
       key: 'registration',
-      label: "Registration & onboarding",
-      description: "Who can sign up, what they verify, and how they're welcomed.",
+      label: t('enterprise.config_group_registration'),
+      description: t('enterprise.config_group_registration_desc'),
       icon: <UserPlus size={18} />,
       settings: [
-        { key: 'registration_enabled', label: "Registration enabled", description: "Turn off to close sign-ups entirely.", type: 'boolean', default: true },
-        { key: 'require_approval', label: "Admin approval required", description: "New accounts must be approved by an admin before they can sign in.", type: 'boolean', default: false },
-        { key: 'require_email_verification', label: "Require email verification", description: "Members must verify their email address before accessing the platform.", type: 'boolean', default: true },
-        { key: 'maintenance_mode', label: "Maintenance mode", description: "Read-only. Toggle via scripts/maintenance.sh on the server.", type: 'boolean', default: false },
+        { key: 'registration_enabled', label: t('enterprise.config_registration_enabled'), description: t('enterprise.config_registration_enabled_desc'), type: 'boolean', default: true },
+        { key: 'require_approval', label: t('enterprise.config_require_approval'), description: t('enterprise.config_require_approval_desc'), type: 'boolean', default: false },
+        { key: 'require_email_verification', label: t('enterprise.config_require_email_verification'), description: t('enterprise.config_require_email_verification_desc'), type: 'boolean', default: true },
+        { key: 'maintenance_mode', label: t('enterprise.config_maintenance_mode'), description: t('enterprise.config_maintenance_mode_desc'), type: 'boolean', default: false },
         {
           key: 'onboarding_enabled',
-          label: "Show onboarding flow",
-          description: "Walk new members through profile and skills setup after sign-up.",
+          label: t('enterprise.config_onboarding_enabled'),
+          description: t('enterprise.config_onboarding_enabled_desc'),
           type: 'boolean',
           default: true,
-          manage: { href: '/admin/onboarding-settings', label: "Configure steps" },
+          manage: { href: '/admin/onboarding-settings', label: t('enterprise.config_configure_steps') },
         },
-        { key: 'welcome_message', label: "Welcome message", description: "Shown to new members on their first sign-in.", type: 'textarea', default: '' },
+        { key: 'welcome_message', label: t('enterprise.config_welcome_message'), description: t('enterprise.config_welcome_message_desc'), type: 'textarea', default: '' },
       ],
     },
     {
       key: 'wallet',
-      label: "Wallet & credits",
-      description: "Time-credit balance, transfer caps, and how the currency is named.",
+      label: t('enterprise.config_group_wallet'),
+      description: t('enterprise.config_group_wallet_desc'),
       icon: <Wallet size={18} />,
       settings: [
-        { key: 'starting_balance', label: "Starting balance", description: "Time credits granted to new members on sign-up. Set to 0 to disable.", type: 'number', default: 0, validation: { min: 0 } },
-        { key: 'max_transaction', label: "Maximum transfer", description: "Largest single transfer between members. Set to 0 for no limit.", type: 'number', default: 0, validation: { min: 0 } },
-        { key: 'currency_name', label: "Currency name", description: "Display name for the time-bank currency (e.g. Hours, Credits, TimeBucks).", type: 'text', default: 'Hours' },
-        { key: 'currency_symbol', label: "Currency symbol", description: "Short symbol shown next to balances (e.g. h, ⌛, TC).", type: 'text', default: 'h' },
+        { key: 'starting_balance', label: t('enterprise.config_starting_balance'), description: t('enterprise.config_starting_balance_desc'), type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'max_transaction', label: t('enterprise.config_max_transaction'), description: t('enterprise.config_max_transaction_desc'), type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'currency_name', label: t('enterprise.config_currency_name'), description: t('enterprise.config_currency_name_desc'), type: 'text', default: 'Hours' },
+        { key: 'currency_symbol', label: t('enterprise.config_currency_symbol'), description: t('enterprise.config_currency_symbol_desc'), type: 'text', default: 'h' },
       ],
     },
     {
       key: 'content',
-      label: "Content & moderation",
-      description: "Approval rules and content filters for listings and posts.",
+      label: t('enterprise.config_group_content'),
+      description: t('enterprise.config_group_content_desc'),
       icon: <Shield size={18} />,
       settings: [
-        { key: 'auto_approve_listings', label: "Auto-approve listings", description: "Publish new listings immediately instead of holding them for moderator review.", type: 'boolean', default: true },
-        { key: 'auto_approve_blog', label: "Auto-approve blog posts", description: "Publish new blog posts immediately instead of holding them for moderator review.", type: 'boolean', default: false },
-        { key: 'max_listing_images', label: "Max images per listing", description: "Upper limit on photos attached to a single listing.", type: 'number', default: 5, validation: { min: 1, max: 20 } },
-        { key: 'profanity_filter', label: "Profanity filter", description: "Block submissions containing words on the platform's profanity list.", type: 'boolean', default: false },
+        { key: 'auto_approve_listings', label: t('enterprise.config_auto_approve_listings'), description: t('enterprise.config_auto_approve_listings_desc'), type: 'boolean', default: true },
+        { key: 'auto_approve_blog', label: t('enterprise.config_auto_approve_blog'), description: t('enterprise.config_auto_approve_blog_desc'), type: 'boolean', default: false },
+        { key: 'max_listing_images', label: t('enterprise.config_max_listing_images'), description: t('enterprise.config_max_listing_images_desc'), type: 'number', default: 5, validation: { min: 1, max: 20 } },
+        { key: 'profanity_filter', label: t('enterprise.config_profanity_filter'), description: t('enterprise.config_profanity_filter_desc'), type: 'boolean', default: false },
       ],
     },
     {
       key: 'notifications',
-      label: "Notifications",
-      description: "Default delivery channels for new accounts and digest cadence.",
+      label: t('enterprise.config_group_notifications'),
+      description: t('enterprise.config_group_notifications_desc'),
       icon: <Bell size={18} />,
       settings: [
-        { key: 'email_notifications_enabled', label: "Email notifications enabled", description: "Default for new accounts. Members can override in their own settings.", type: 'boolean', default: true },
-        { key: 'push_notifications_enabled', label: "Push notifications enabled", description: "Default for new accounts. Members can override in their own settings.", type: 'boolean', default: true },
+        { key: 'email_notifications_enabled', label: t('enterprise.config_email_notifications_enabled'), description: t('enterprise.config_email_notifications_enabled_desc'), type: 'boolean', default: true },
+        { key: 'push_notifications_enabled', label: t('enterprise.config_push_notifications_enabled'), description: t('enterprise.config_push_notifications_enabled_desc'), type: 'boolean', default: true },
         {
-          key: 'digest_frequency', label: "Digest frequency", description: "How often the activity digest email is sent.", type: 'select', default: 'monthly',
+          key: 'digest_frequency', label: t('enterprise.config_digest_frequency'), description: t('enterprise.config_digest_frequency_desc'), type: 'select', default: 'monthly',
           options: [
-            { label: "Daily", value: 'daily' },
-            { label: "Monthly", value: 'monthly' },
-            { label: "Monthly", value: 'monthly' },
-            { label: "Never", value: 'never' },
+            { label: t('enterprise.config_digest_daily'), value: 'daily' },
+            { label: t('enterprise.config_digest_weekly'), value: 'weekly' },
+            { label: t('enterprise.config_digest_monthly'), value: 'monthly' },
+            { label: t('enterprise.config_digest_never'), value: 'never' },
           ],
         },
       ],
     },
     {
       key: 'limits',
-      label: "Limits",
-      description: "Per-member caps and upload size.",
+      label: t('enterprise.config_group_limits'),
+      description: t('enterprise.config_group_limits_desc'),
       icon: <Gauge size={18} />,
       settings: [
-        { key: 'max_listings_per_user', label: "Max listings per member", description: "Most listings a single member can have active at once. Set to 0 for no limit.", type: 'number', default: 0, validation: { min: 0 } },
-        { key: 'max_groups_per_user', label: "Max groups per member", description: "Most groups a single member can join. Set to 0 for no limit.", type: 'number', default: 0, validation: { min: 0 } },
-        { key: 'max_file_upload_mb', label: "Max upload size (MB)", description: "Per-file upload size limit. Larger files are rejected at the server.", type: 'number', default: 10, validation: { min: 1, max: 100 } },
+        { key: 'max_listings_per_user', label: t('enterprise.config_max_listings_per_user'), description: t('enterprise.config_max_listings_per_user_desc'), type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'max_groups_per_user', label: t('enterprise.config_max_groups_per_user'), description: t('enterprise.config_max_groups_per_user_desc'), type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'max_file_upload_mb', label: t('enterprise.config_max_file_upload_mb'), description: t('enterprise.config_max_file_upload_mb_desc'), type: 'number', default: 10, validation: { min: 1, max: 100 } },
       ],
     },
   ];
@@ -224,67 +224,67 @@ const SCHEMA_KEYS = new Set(STATIC_SETTINGS.map((s) => s.key));
  * configuration pages that admins commonly reach for from the Settings page.
  */
 interface RelatedAdminPage {
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   /** Path relative to the tenant root (e.g. "/admin/federation"). Pass through tenantPath() at render. */
   href: string;
-  destLabel: string;
+  destLabelKey: string;
 }
 
 const RELATED_ADMIN_PAGES: RelatedAdminPage[] = [
   {
-    label: "Onboarding settings",
-    description: "Welcome steps, required profile fields, and skills setup for new members.",
+    labelKey: 'enterprise.related_onboarding_settings',
+    descriptionKey: 'enterprise.related_onboarding_settings_desc',
     href: '/admin/onboarding-settings',
-    destLabel: "Onboarding",
+    destLabelKey: 'enterprise.related_onboarding',
   },
   {
-    label: "Module configuration",
-    description: "Toggle features on/off and tune how each module behaves — the single home for tenant feature configuration.",
+    labelKey: 'enterprise.related_module_configuration',
+    descriptionKey: 'enterprise.related_module_configuration_desc',
     href: '/admin/module-configuration',
-    destLabel: "Module Configuration",
+    destLabelKey: 'enterprise.related_module_configuration_dest',
   },
   {
-    label: "Operations",
-    description: "Cache stats and background job controls.",
+    labelKey: 'enterprise.related_operations',
+    descriptionKey: 'enterprise.related_operations_desc',
     href: '/admin/operations',
-    destLabel: "Operations",
+    destLabelKey: 'enterprise.related_operations',
   },
   {
-    label: "Translation settings",
-    description: "Default language and the languages members can choose from.",
+    labelKey: 'enterprise.related_translation_settings',
+    descriptionKey: 'enterprise.related_translation_settings_desc',
     href: '/admin/translation-config',
-    destLabel: "Translation Settings",
+    destLabelKey: 'enterprise.related_translation_settings',
   },
   {
-    label: "Image settings",
-    description: "Default formats, sizes, and WebP conversion behaviour.",
+    labelKey: 'enterprise.related_image_settings',
+    descriptionKey: 'enterprise.related_image_settings_desc',
     href: '/admin/image-settings',
-    destLabel: "Image Settings",
+    destLabelKey: 'enterprise.related_image_settings',
   },
   {
-    label: "Registration policy",
-    description: "Granular sign-up rules — invite codes, allowlisted domains, captcha.",
+    labelKey: 'enterprise.related_registration_policy',
+    descriptionKey: 'enterprise.related_registration_policy_desc',
     href: '/admin/settings/registration-policy',
-    destLabel: "Registration Policy",
+    destLabelKey: 'enterprise.related_registration_policy',
   },
   {
-    label: "Federation",
-    description: "Inbound partnerships, auto-approval, shared categories, and partnership limits.",
+    labelKey: 'enterprise.related_federation',
+    descriptionKey: 'enterprise.related_federation_desc',
     href: '/admin/federation',
-    destLabel: "Federation",
+    destLabelKey: 'enterprise.related_federation',
   },
   {
-    label: "Broker controls",
-    description: "Exchange workflow, messaging review, and risk tagging.",
+    labelKey: 'enterprise.related_broker_controls',
+    descriptionKey: 'enterprise.related_broker_controls_desc',
     href: '/broker',
-    destLabel: "Broker Panel",
+    destLabelKey: 'enterprise.related_broker_panel',
   },
   {
-    label: "Safeguarding options",
-    description: "Reporting flows, escalation paths, and safeguarding policies.",
+    labelKey: 'enterprise.related_safeguarding_options',
+    descriptionKey: 'enterprise.related_safeguarding_options_desc',
     href: '/admin/safeguarding-options',
-    destLabel: "Safeguarding",
+    destLabelKey: 'enterprise.related_safeguarding',
   },
 ];
 
@@ -341,35 +341,35 @@ function normalizeConfig(data: Record<string, unknown>): Record<string, unknown>
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const URL_RE = /^https?:\/\/.+/;
 
-function validateSetting(def: ConfigSettingDef, value: unknown): string | null {
+function validateSetting(def: ConfigSettingDef, value: unknown, t: (key: string, options?: Record<string, unknown>) => string): string | null {
   const str = String(value ?? '');
 
   if (def.validation?.required && str.trim() === '') {
-    return "Required";
+    return t('enterprise.validation_required');
   }
 
   if (def.type === 'email' && str.trim() !== '' && !EMAIL_RE.test(str)) {
-    return "Enter a valid email address";
+    return t('enterprise.validation_email');
   }
 
   if (def.type === 'url' && str.trim() !== '' && !URL_RE.test(str)) {
-    return "Enter a valid URL (must start with http:// or https://)";
+    return t('enterprise.validation_url');
   }
 
   if (def.type === 'number' && str.trim() !== '') {
     const num = Number(str);
-    if (isNaN(num)) return "Must be a number";
+    if (isNaN(num)) return t('enterprise.validation_number');
     if (def.validation?.min !== undefined && num < def.validation.min) {
-      return `Must be ${def.validation.min} or greater`;
+      return t('enterprise.validation_min', { value: def.validation.min });
     }
     if (def.validation?.max !== undefined && num > def.validation.max) {
-      return `Must be ${def.validation.max} or less`;
+      return t('enterprise.validation_max', { value: def.validation.max });
     }
   }
 
   if (def.validation?.pattern && str.trim() !== '') {
     const re = new RegExp(def.validation.pattern);
-    if (!re.test(str)) return "Invalid format";
+    if (!re.test(str)) return t('enterprise.validation_format');
   }
 
   return null;
@@ -419,8 +419,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
     value: code,
   }));
 
-  // Config schema (English-only — admin panel is not translated)
-  const configSchema = buildConfigSchema()
+  const configSchema = buildConfigSchema(t)
     .map((g) => ({ ...g, settings: g.settings.filter((s) => !excludeSet.has(s.key)) }))
     .filter((g) => g.settings.length > 0);
 
@@ -432,7 +431,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
     try {
       const res = await adminEnterprise.getConfig();
       if (!res.success || !res.data) {
-        toast.error(res.error || "Failed to load settings");
+        toast.error(res.error || t('enterprise.failed_to_load_settings'));
         setLoadError(true);
         return;
       }
@@ -442,12 +441,12 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
       setEdited({ ...data });
       setErrors({});
     } catch {
-      toast.error("Failed to load settings");
+      toast.error(t('enterprise.failed_to_load_settings'));
       setLoadError(true);
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t]);
 
 
   useEffect(() => {
@@ -467,7 +466,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
     setEdited((prev) => ({ ...prev, [key]: value }));
 
     if (def) {
-      const error = validateSetting(def, value);
+      const error = validateSetting(def, value, t);
       setErrors((prev) => {
         const next = { ...prev };
         if (error) {
@@ -484,20 +483,20 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
 
   async function handleSave() {
     if (loadError) {
-      toast.error("Settings haven't loaded yet — reload before saving.");
+      toast.error(t('enterprise.settings_not_loaded'));
       return;
     }
     // Validate all schema fields
     const newErrors: Record<string, string> = {};
     for (const group of configSchema) {
       for (const def of group.settings) {
-        const error = validateSetting(def, getSettingValue(def.key, def.default));
+        const error = validateSetting(def, getSettingValue(def.key, def.default), t);
         if (error) newErrors[def.key] = error;
       }
     }
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
-      toast.error("Fix the highlighted errors before saving.");
+      toast.error(t('enterprise.fix_errors_before_saving'));
       return;
     }
 
@@ -514,16 +513,16 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
         }
       }
       if (Object.keys(payload).length === 0) {
-        toast.error("No changes to save.");
+        toast.error(t('enterprise.no_changes_to_save'));
         setSaving(false);
         return;
       }
       await adminEnterprise.updateConfig(payload);
-      toast.success("Settings saved.");
+      toast.success(t('enterprise.settings_saved'));
       await loadData();
       onAfterChange?.();
     } catch {
-      toast.error("Failed to save settings.");
+      toast.error(t('enterprise.failed_to_save_settings'));
     } finally {
       setSaving(false);
     }
@@ -535,12 +534,12 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
     setResetting(true);
     try {
       await adminEnterprise.resetConfig();
-      toast.success("Configuration reset to defaults.");
+      toast.success(t('enterprise.configuration_reset_to_defaults'));
       setShowResetModal(false);
       await loadData();
       onAfterChange?.();
     } catch {
-      toast.error("Failed to reset configuration.");
+      toast.error(t('enterprise.failed_to_reset_configuration'));
     } finally {
       setResetting(false);
     }
@@ -715,10 +714,10 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
     return (
       <Card shadow="sm" className="border-danger-200 bg-danger-50">
         <CardBody className="text-center py-12">
-          <p className="text-danger font-medium mb-3">{"Failed to load settings"}</p>
-          <p className="text-sm text-default-500 mb-4">{"We couldn't reach the configuration service. Check your connection and try again."}</p>
+          <p className="text-danger font-medium mb-3">{t('enterprise.failed_to_load_settings')}</p>
+          <p className="text-sm text-default-500 mb-4">{t('enterprise.failed_to_load_settings_desc')}</p>
           <Button color="primary" variant="flat" onPress={loadData} startContent={<RefreshCw size={16} />}>
-            {"Retry"}
+            {t('common.retry')}
           </Button>
         </CardBody>
       </Card>
@@ -737,7 +736,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
             onPress={loadData}
             size="sm"
           >
-            {"Reload"}
+            {t('enterprise.reload')}
           </Button>
           <Button
             variant="flat"
@@ -746,7 +745,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
             onPress={() => setShowResetModal(true)}
             size="sm"
           >
-            {"Reset to Defaults"}
+            {t('enterprise.reset_to_defaults')}
           </Button>
           <Button
             color="primary"
@@ -756,7 +755,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
             isDisabled={!hasChanges || Object.keys(errors).length > 0}
             size="sm"
           >
-            {"Save Changes"}
+            {t('enterprise.save_changes')}
           </Button>
         </div>
       </div>
@@ -790,9 +789,9 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
               <Settings2 size={18} />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-base font-semibold text-foreground">{"Related admin pages"}</h3>
+              <h3 className="text-base font-semibold text-foreground">{t('enterprise.related_admin_pages')}</h3>
               <p className="text-xs text-default-400">
-                {"Configuration that lives on its own dedicated page."}
+                {t('enterprise.related_admin_pages_desc')}
               </p>
             </div>
           </CardHeader>
@@ -801,8 +800,8 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
               {RELATED_ADMIN_PAGES.map((entry) => (
                 <div key={entry.href} className="flex items-center justify-between gap-4 py-3">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">{entry.label}</p>
-                    <p className="text-xs text-default-500 mt-0.5">{entry.description}</p>
+                    <p className="text-sm font-medium text-foreground">{t(entry.labelKey)}</p>
+                    <p className="text-xs text-default-500 mt-0.5">{t(entry.descriptionKey)}</p>
                   </div>
                   <Button
                     as={Link}
@@ -812,7 +811,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
                     color="primary"
                     endContent={<ArrowRight size={14} />}
                   >
-                    {`Open ${entry.destLabel}`}
+                    {t('enterprise.open_related_page', { name: t(entry.destLabelKey) })}
                   </Button>
                 </div>
               ))}
@@ -827,25 +826,25 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {"Reset configuration to defaults?"}
+                {t('enterprise.reset_configuration_to_defaults')}
               </ModalHeader>
               <ModalBody>
                 <p className="text-sm text-default-700">
-                  {"This restores all platform configuration to its default values."}
+                  {t('enterprise.reset_configuration_intro')}
                 </p>
                 <p className="text-sm text-default-600">
-                  {"Will be cleared: registration mode, email verification, admin approval, footer text, default locale, timezone, welcome message, wallet, content, notifications, and limits settings."}
+                  {t('enterprise.reset_configuration_cleared')}
                 </p>
                 <p className="text-sm text-default-600">
-                  {"Will be preserved: site name, description, contact details, default currency, and maintenance mode (CLI-managed)."}
+                  {t('enterprise.reset_configuration_preserved')}
                 </p>
                 <p className="text-sm font-medium text-danger">
-                  {"This action cannot be undone."}
+                  {t('enterprise.action_cannot_be_undone')}
                 </p>
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose} size="sm">
-                  {"Cancel"}
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   color="danger"
@@ -853,7 +852,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
                   isLoading={resetting}
                   size="sm"
                 >
-                  {"Reset All"}
+                  {t('enterprise.reset_all')}
                 </Button>
               </ModalFooter>
             </>
