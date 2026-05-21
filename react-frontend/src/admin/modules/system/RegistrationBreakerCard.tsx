@@ -20,6 +20,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@heroui/react';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import ShieldCheck from 'lucide-react/icons/shield-check';
@@ -36,6 +37,7 @@ interface BreakerStatus {
 }
 
 export function RegistrationBreakerCard() {
+  const { t } = useTranslation('admin');
   const toast = useToast();
   const [status, setStatus] = useState<BreakerStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,15 +67,15 @@ export function RegistrationBreakerCard() {
     try {
       const res = await api.post('/v2/admin/registration/resume-signups', {});
       if (res.success) {
-        toast.success('Registration resumed for this community.');
+        toast.success(t('system.registration_breaker.resume_success'));
         await fetchStatus();
       } else {
-        toast.error(res.error ?? 'Failed to resume registration.');
+        toast.error(res.error ?? t('system.registration_breaker.resume_failed'));
       }
     } finally {
       setResuming(false);
     }
-  }, [toast, fetchStatus]);
+  }, [t, toast, fetchStatus]);
 
   if (loading) {
     return (
@@ -106,9 +108,9 @@ export function RegistrationBreakerCard() {
               <ShieldCheck size={20} className="text-success" />
             )}
             <div>
-              <h3 className="text-lg font-semibold">Registration Security</h3>
+              <h3 className="text-lg font-semibold">{t('system.registration_breaker.title')}</h3>
               <p className="text-sm text-default-500 mt-1">
-                Automatic pause when this community gets an unusual flood of signups in one hour.
+                {t('system.registration_breaker.description')}
               </p>
             </div>
           </div>
@@ -117,7 +119,7 @@ export function RegistrationBreakerCard() {
             size="sm"
             variant="light"
             onPress={fetchStatus}
-            aria-label="Refresh status"
+            aria-label={t('system.registration_breaker.refresh_status')}
           >
             <RefreshCw size={16} />
           </Button>
@@ -130,13 +132,16 @@ export function RegistrationBreakerCard() {
             variant="flat"
             startContent={tripped ? <ShieldAlert size={14} /> : <ShieldCheck size={14} />}
           >
-            {tripped ? 'Signups paused' : 'Signups active'}
+            {tripped ? t('system.registration_breaker.status_paused') : t('system.registration_breaker.status_active')}
           </Chip>
           <span className="text-sm text-default-600">
-            {status.count_in_current_hour} of {status.threshold} signups this hour
+            {t('system.registration_breaker.signups_this_hour', {
+              count: status.count_in_current_hour,
+              threshold: status.threshold,
+            })}
             {pctOfThreshold >= 50 && !tripped && (
               <span className="text-warning ml-2">
-                ({pctOfThreshold}% of threshold)
+                {t('system.registration_breaker.threshold_percent', { percent: pctOfThreshold })}
               </span>
             )}
           </span>
@@ -144,12 +149,12 @@ export function RegistrationBreakerCard() {
 
         {tripped && (
           <div className="bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 rounded-lg p-3 text-sm">
-            <p className="font-medium text-danger">Account creation is currently paused.</p>
+            <p className="font-medium text-danger">{t('system.registration_breaker.paused_title')}</p>
             <p className="text-default-700 mt-1">
-              The hourly signup threshold ({status.threshold} new accounts) was exceeded.
-              Registration will auto-resume in about{' '}
-              {Math.ceil((status.auto_resume_in_seconds ?? 3600) / 60)} minutes, or you can resume it now.
-              Check Sentry / logs for the source IPs before clearing if you suspect an attack.
+              {t('system.registration_breaker.paused_body', {
+                threshold: status.threshold,
+                minutes: Math.ceil((status.auto_resume_in_seconds ?? 3600) / 60),
+              })}
             </p>
             <Button
               color="danger"
@@ -160,16 +165,16 @@ export function RegistrationBreakerCard() {
               onPress={handleResume}
               isLoading={resuming}
             >
-              Resume signups now
+              {t('system.registration_breaker.resume_now')}
             </Button>
           </div>
         )}
 
         {!tripped && (
           <p className="text-xs text-default-500">
-            Threshold is configured at the platform level via{' '}
+            {t('system.registration_breaker.threshold_prefix')}{' '}
             <code className="font-mono">REGISTRATION_TENANT_HOURLY_CAP</code>.
-            When tripped, this banner turns red and a one-click resume button appears here.
+            {' '}{t('system.registration_breaker.threshold_suffix')}
           </p>
         )}
       </CardBody>
