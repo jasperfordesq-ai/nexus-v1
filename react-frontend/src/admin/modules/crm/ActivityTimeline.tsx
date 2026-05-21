@@ -119,7 +119,7 @@ function formatDateTime(dateStr: string): string {
   });
 }
 
-function formatRelativeTime(dateStr: string): string {
+function formatRelativeTime(dateStr: string, t: (key: string, options?: Record<string, unknown>) => string): string {
   const now = new Date();
   const date = new Date(dateStr);
   const diffMs = now.getTime() - date.getTime();
@@ -127,10 +127,10 @@ function formatRelativeTime(dateStr: string): string {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return "Just Now";
-  if (diffMins < 60) return `Minutes Ago`;
-  if (diffHours < 24) return `Hours Ago`;
-  if (diffDays < 7) return `Days Ago`;
+  if (diffMins < 1) return t('crm.just_now');
+  if (diffMins < 60) return t('crm.minutes_ago', { count: diffMins });
+  if (diffHours < 24) return t('crm.hours_ago', { count: diffHours });
+  if (diffDays < 7) return t('crm.days_ago', { count: diffDays });
   return formatDateTime(dateStr);
 }
 
@@ -207,7 +207,7 @@ export function ActivityTimeline() {
             onPress={() => loadTimeline()}
             isDisabled={loading}
           >
-            {"Refresh"}
+            {t('crm.refresh')}
           </Button>
         }
       />
@@ -215,9 +215,9 @@ export function ActivityTimeline() {
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3 mb-6">
         <MemberSearchPicker
-          label={"Search Member"}
-          placeholder={"Type a Name or Email to Search..."}
-          noResultsText={"No members found found"}
+          label={t('crm.label_search_member')}
+          placeholder={t('crm.placeholder_type_name_or_email')}
+          noResultsText={t('crm.no_members_found')}
           clearText={t('common.clear')}
           className="w-full sm:w-72"
           size="sm"
@@ -231,8 +231,8 @@ export function ActivityTimeline() {
         />
 
         <Select
-          label={"Activity Type"}
-          placeholder={"All Types..."}
+          label={t('crm.label_activity_type')}
+          placeholder={t('crm.placeholder_all_types')}
           className="w-52"
           size="sm"
           startContent={<Filter size={14} />}
@@ -249,7 +249,7 @@ export function ActivityTimeline() {
         </Select>
 
         <Select
-          label={"Date Range"}
+          label={t('crm.label_date_range')}
           className="w-44"
           size="sm"
           selectedKeys={[filterDays]}
@@ -270,7 +270,7 @@ export function ActivityTimeline() {
             variant="flat"
             onPress={handleClearFilters}
           >
-            {"Clear Filters"}
+            {t('crm.clear_filters')}
           </Button>
         )}
       </div>
@@ -278,13 +278,13 @@ export function ActivityTimeline() {
       {/* Content */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" label={"Loading Activity"} />
+          <Spinner size="lg" label={t('crm.loading_activity')} />
         </div>
       ) : entries.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
             <Activity size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">{"No activity found"}</p>
+            <p className="text-default-500 text-lg font-medium">{t('crm.no_activity_found')}</p>
             <p className="text-default-400 text-sm mt-1">
               {hasActiveFilters
                 ? "No activity matches your current filters"
@@ -362,7 +362,7 @@ export function ActivityTimeline() {
                         {/* Right: timestamp */}
                         <div className="text-right shrink-0">
                           <p className="text-xs text-default-400 whitespace-nowrap" title={formatDateTime(entry.created_at)}>
-                            {formatRelativeTime(entry.created_at)}
+                            {formatRelativeTime(entry.created_at, t)}
                           </p>
                           <p className="text-xs text-default-300 mt-0.5">
                             #{entry.user_id}

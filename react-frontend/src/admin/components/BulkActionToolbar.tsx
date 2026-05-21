@@ -84,14 +84,14 @@ export function BulkActionToolbar({
       <div className="flex items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/10 px-4 py-2 mb-3">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">
-            {`${selectedCount} selected`}
+            {t('bulk.selected_count', { count: selectedCount })}
           </span>
           <Button
             size="sm"
             variant="light"
             isIconOnly
             onPress={onClearSelection}
-            aria-label={"Clear selection"}
+            aria-label={t('bulk.clear_selection')}
             isDisabled={isLoading || running}
           >
             <X size={14} />
@@ -135,7 +135,7 @@ export function BulkActionToolbar({
                 className={pending.destructive ? 'text-danger' : 'text-warning'}
               />
               {pending.confirmTitle
-                ?? `Confirm ${pending.label}`}
+                ?? t('bulk.confirm_title', { action: pending.label })}
             </ModalHeader>
             <ModalBody>
               <p className="text-default-600">
@@ -147,14 +147,14 @@ export function BulkActionToolbar({
               </p>
               {pending.destructive && (
                 <p className="mt-2 text-sm text-danger font-medium">
-                  {"This action cannot be undone."}
+                  {t('bulk.destructive_warning')}
                 </p>
               )}
               {pending.needsReason && (
                 <Textarea
                   className="mt-3"
-                  label={pending.reasonLabel ?? "Reason"}
-                  placeholder={pending.reasonPlaceholder ?? "Provide a reason for this action"}
+                  label={pending.reasonLabel ?? t('bulk.reason_label')}
+                  placeholder={pending.reasonPlaceholder ?? t('bulk.reason_placeholder')}
                   value={reason}
                   onValueChange={setReason}
                   minRows={3}
@@ -173,7 +173,7 @@ export function BulkActionToolbar({
                 }}
                 isDisabled={running}
               >
-                {"Cancel"}
+                {t('common.cancel')}
               </Button>
               <Button
                 color={pending.destructive ? 'danger' : pending.color ?? 'primary'}

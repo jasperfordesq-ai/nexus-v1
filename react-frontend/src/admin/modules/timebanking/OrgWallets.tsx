@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 
 export function OrgWallets() {
   const { t: tNav } = useTranslation('admin_nav');
+  const { t } = useTranslation('admin');
   useAdminPageMeta({ title: tNav('timebanking') });
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -43,11 +44,11 @@ export function OrgWallets() {
         }
       }
     } catch {
-      toast.error("Failed to load organization wallets");
+      toast.error(t('timebanking.failed_to_load_organization_wallets'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -58,7 +59,7 @@ export function OrgWallets() {
     () => [
       {
         key: 'org_name',
-        label: "Organization",
+        label: t('timebanking.col_organization'),
         sortable: true,
         render: (wallet) => (
           <span className="text-sm font-medium">{wallet.org_name}</span>
@@ -66,7 +67,7 @@ export function OrgWallets() {
       },
       {
         key: 'balance',
-        label: "Balance",
+        label: t('timebanking.col_balance'),
         sortable: true,
         render: (wallet) => (
           <span className="text-sm font-semibold">
@@ -76,7 +77,7 @@ export function OrgWallets() {
       },
       {
         key: 'total_in',
-        label: "Total in",
+        label: t('timebanking.col_total_in'),
         sortable: true,
         render: (wallet) => (
           <span className="text-sm text-success">
@@ -86,7 +87,7 @@ export function OrgWallets() {
       },
       {
         key: 'total_out',
-        label: "Total Out",
+        label: t('timebanking.col_total_out'),
         sortable: true,
         render: (wallet) => (
           <span className="text-sm text-danger">
@@ -96,7 +97,7 @@ export function OrgWallets() {
       },
       {
         key: 'member_count',
-        label: "Members",
+        label: t('timebanking.col_members'),
         sortable: true,
         render: (wallet) => (
           <span className="text-sm">{wallet.member_count}</span>
@@ -104,7 +105,7 @@ export function OrgWallets() {
       },
       {
         key: 'created_at',
-        label: "Created",
+        label: t('timebanking.col_created'),
         sortable: true,
         render: (wallet) => (
           <span className="text-sm text-default-500">
@@ -113,14 +114,14 @@ export function OrgWallets() {
         ),
       },
     ],
-    []
+    [t]
   );
 
   return (
     <div>
       <PageHeader
-        title={"Org Wallets"}
-        description={"View and manage time credit wallets for volunteer organisations"}
+        title={t('timebanking.org_wallets_title')}
+        description={t('timebanking.org_wallets_desc')}
         actions={
           <Button
             as={Link}
@@ -129,7 +130,7 @@ export function OrgWallets() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            {"Back to Timebanking"}
+            {t('timebanking.back_to_timebanking')}
           </Button>
         }
       />
@@ -143,7 +144,7 @@ export function OrgWallets() {
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8">
             <Building2 size={32} className="text-default-300" />
-            <p className="text-sm text-default-400">{"No org wallets"}</p>
+            <p className="text-sm text-default-400">{t('timebanking.no_org_wallets')}</p>
           </div>
         }
       />

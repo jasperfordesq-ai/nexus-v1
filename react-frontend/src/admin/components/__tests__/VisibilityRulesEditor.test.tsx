@@ -81,8 +81,7 @@ describe('VisibilityRulesEditor', () => {
     render(
       <W><VisibilityRulesEditor value={null} onChange={onChange} /></W>
     );
-    // Title uses translation key
-    expect(screen.getByText('visibility_rules.title')).toBeTruthy();
+    expect(screen.getByText('Visibility Rules')).toBeTruthy();
   });
 
   it('renders the requires_auth switch', () => {
@@ -90,7 +89,7 @@ describe('VisibilityRulesEditor', () => {
     render(
       <W><VisibilityRulesEditor value={null} onChange={onChange} /></W>
     );
-    expect(screen.getByText('visibility_rules.requires_auth')).toBeTruthy();
+    expect(screen.getByText('Requires Auth')).toBeTruthy();
   });
 
   it('renders the min_role select', () => {
@@ -99,7 +98,7 @@ describe('VisibilityRulesEditor', () => {
       <W><VisibilityRulesEditor value={null} onChange={onChange} /></W>
     );
     // HeroUI Select renders label in both a hidden <label> and a visible <label>
-    const labels = screen.getAllByText('visibility_rules.min_role');
+    const labels = screen.getAllByText('Min Role');
     expect(labels.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -109,7 +108,7 @@ describe('VisibilityRulesEditor', () => {
       <W><VisibilityRulesEditor value={null} onChange={onChange} /></W>
     );
     // HeroUI Select renders label in both a hidden <label> and a visible <label>
-    const labels = screen.getAllByText('visibility_rules.requires_feature');
+    const labels = screen.getAllByText('Requires Feature');
     expect(labels.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -124,7 +123,7 @@ describe('VisibilityRulesEditor', () => {
       </W>
     );
     // Should render without error with pre-filled values
-    expect(screen.getByText('visibility_rules.title')).toBeTruthy();
+    expect(screen.getByText('Visibility Rules')).toBeTruthy();
   });
 
   it('renders with null value (empty rules)', () => {
@@ -132,7 +131,7 @@ describe('VisibilityRulesEditor', () => {
     render(
       <W><VisibilityRulesEditor value={null} onChange={onChange} /></W>
     );
-    expect(screen.getByText('visibility_rules.title')).toBeTruthy();
+    expect(screen.getByText('Visibility Rules')).toBeTruthy();
   });
 
   it('renders role options in the select', () => {

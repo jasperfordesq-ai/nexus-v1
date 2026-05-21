@@ -11,6 +11,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Button, Chip } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
@@ -19,7 +20,8 @@ import type { Column } from '../../components';
 import type { ErrorLogEntry } from '../../api/types';
 
 export function ErrorLogs() {
-  usePageTitle("Enterprise");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.enterprise_dashboard_title'));
   const toast = useToast();
 
   const [logs, setLogs] = useState<ErrorLogEntry[]>([]);
@@ -43,11 +45,11 @@ export function ErrorLogs() {
         }
       }
     } catch {
-      toast.error("Failed to load error logs");
+      toast.error(t('enterprise.failed_to_load_error_logs'));
     } finally {
       setLoading(false);
     }
-  }, [page, toast])
+  }, [page, t, toast])
 
 
   useEffect(() => {
@@ -55,10 +57,10 @@ export function ErrorLogs() {
   }, [loadData]);
 
   const columns: Column<ErrorLogEntry>[] = [
-    { key: 'id', label: "ID", sortable: true },
+    { key: 'id', label: t('enterprise.col_id'), sortable: true },
     {
       key: 'action',
-      label: "Action",
+      label: t('enterprise.col_action'),
       sortable: true,
       render: (entry) => (
         <Chip size="sm" variant="flat" color="danger">
@@ -66,22 +68,22 @@ export function ErrorLogs() {
         </Chip>
       ),
     },
-    { key: 'description', label: "Description" },
+    { key: 'description', label: t('enterprise.col_description') },
     {
       key: 'user_name',
-      label: "User",
+      label: t('enterprise.col_user'),
       render: (entry) => entry.user_name || '---',
     },
     {
       key: 'ip_address',
-      label: "IP",
+      label: t('enterprise.col_ip'),
       render: (entry) => (
         <span className="text-xs font-mono">{entry.ip_address || '---'}</span>
       ),
     },
     {
       key: 'created_at',
-      label: "Date",
+      label: t('enterprise.col_date'),
       sortable: true,
       render: (entry) => new Date(entry.created_at).toLocaleString(),
     },
@@ -90,8 +92,8 @@ export function ErrorLogs() {
   return (
     <div>
       <PageHeader
-        title={"Error Logs"}
-        description={"View and manage system error logs"}
+        title={t('enterprise.error_logs_title')}
+        description={t('enterprise.error_logs_desc')}
         actions={
           <Button
             variant="flat"
@@ -100,7 +102,7 @@ export function ErrorLogs() {
             isLoading={loading}
             size="sm"
           >
-            {"Refresh"}
+            {t('enterprise.refresh')}
           </Button>
         }
       />
@@ -113,7 +115,7 @@ export function ErrorLogs() {
         page={page}
         onPageChange={setPage}
         searchable={false}
-        emptyContent={"No error logs"}
+        emptyContent={t('enterprise.no_error_logs')}
       />
     </div>
   );

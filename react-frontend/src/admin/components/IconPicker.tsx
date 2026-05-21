@@ -14,6 +14,7 @@ import {
 } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import X from 'lucide-react/icons/x';
+import { useTranslation } from 'react-i18next';
 import { ICON_MAP, ICON_NAMES, DynamicIcon } from '@/components/ui';
 
 interface IconPickerProps {
@@ -22,7 +23,9 @@ interface IconPickerProps {
   label?: string;
 }
 
-export function IconPicker({ value, onChange, label = 'Icon' }: IconPickerProps) {
+export function IconPicker({ value, onChange, label }: IconPickerProps) {
+  const { t } = useTranslation('admin');
+  const resolvedLabel = label ?? t('icon_picker.label');
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -44,7 +47,7 @@ export function IconPicker({ value, onChange, label = 'Icon' }: IconPickerProps)
 
   return (
     <div>
-      <p className="text-sm font-medium text-theme-primary mb-1.5">{label}</p>
+      <p className="text-sm font-medium text-theme-primary mb-1.5">{resolvedLabel}</p>
       <div className="flex items-center gap-2">
         <Button
           variant="flat"
@@ -57,7 +60,7 @@ export function IconPicker({ value, onChange, label = 'Icon' }: IconPickerProps)
               <span className="text-sm text-theme-primary">{value}</span>
             </>
           ) : (
-            <span className="text-sm text-theme-subtle">{"Search for an icon..."}</span>
+            <span className="text-sm text-theme-subtle">{t('icon_picker.search_for_icon')}</span>
           )}
         </Button>
         {value && (
@@ -66,7 +69,7 @@ export function IconPicker({ value, onChange, label = 'Icon' }: IconPickerProps)
             variant="light"
             size="sm"
             onPress={handleClear}
-            aria-label={"Clear Icon"}
+            aria-label={t('icon_picker.clear_icon')}
           >
             <X className="w-4 h-4" />
           </Button>
@@ -81,10 +84,10 @@ export function IconPicker({ value, onChange, label = 'Icon' }: IconPickerProps)
       >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-2">
-            <span>{"Choose Icon"}</span>
+            <span>{t('icon_picker.choose_icon')}</span>
             <Input
-              placeholder={"Search Icons"}
-              aria-label={"Search Icons"}
+              placeholder={t('icon_picker.search_icons')}
+              aria-label={t('icon_picker.search_icons')}
               value={search}
               onValueChange={setSearch}
               startContent={<Search className="w-4 h-4 text-theme-subtle" />}
@@ -94,7 +97,7 @@ export function IconPicker({ value, onChange, label = 'Icon' }: IconPickerProps)
           </ModalHeader>
           <ModalBody className="pb-6">
             {filteredIcons.length === 0 ? (
-              <p className="text-center text-theme-subtle py-8">No icons found matching &ldquo;{search}&rdquo;</p>
+              <p className="text-center text-theme-subtle py-8">{t('icon_picker.no_icons_found', { search })}</p>
             ) : (
               <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
                 {filteredIcons.map((name) => {

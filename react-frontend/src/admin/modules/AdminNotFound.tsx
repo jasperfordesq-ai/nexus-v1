@@ -13,27 +13,29 @@ import { Link } from 'react-router-dom';
 import { Card, CardBody, Button } from '@heroui/react';
 import FileQuestion from 'lucide-react/icons/file-question';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { PageHeader } from '../components';
 
 export function AdminNotFound() {
-  usePageTitle("Not Found");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('admin_not_found.title'));
   const { tenantPath } = useTenant();
 
   return (
     <div>
-      <PageHeader title={"Not Found"} />
+      <PageHeader title={t('admin_not_found.title')} />
       <Card shadow="sm">
         <CardBody className="flex flex-col items-center justify-center py-16 text-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-danger/10">
             <FileQuestion size={32} className="text-danger" />
           </div>
           <h3 className="text-lg font-semibold text-foreground">
-            {"Page Not Found"}
+            {t('admin_not_found.heading')}
           </h3>
           <p className="mt-2 max-w-md text-sm text-default-500">
-            {"The page you are looking for does not exist"}
+            {t('admin_not_found.description')}
           </p>
           <Button
             as={Link}
@@ -43,7 +45,7 @@ export function AdminNotFound() {
             className="mt-6"
             startContent={<ArrowLeft size={16} />}
           >
-            {"Back to Dashboard"}
+            {t('admin_not_found.back_to_dashboard')}
           </Button>
         </CardBody>
       </Card>

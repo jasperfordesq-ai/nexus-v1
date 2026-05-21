@@ -40,18 +40,18 @@ export function VisibilityRulesEditor({ value, onChange }: VisibilityRulesEditor
 
   return (
     <div className="space-y-4">
-      <p className="text-sm font-medium text-theme-primary">{"Visibility Rules"}</p>
+      <p className="text-sm font-medium text-theme-primary">{t('visibility_rules.title')}</p>
 
       <Switch
         isSelected={rules.requires_auth ?? false}
         onValueChange={(checked) => updateRule('requires_auth', checked || undefined)}
         size="sm"
       >
-        <span className="text-sm">{"Requires Auth"}</span>
+        <span className="text-sm">{t('visibility_rules.requires_auth')}</span>
       </Switch>
 
       <Select
-        label={"Min Role"}
+        label={t('visibility_rules.min_role')}
         selectedKeys={rules.min_role ? [rules.min_role] : []}
         onSelectionChange={(keys) => {
           const selected = Array.from(keys)[0] as string;
@@ -66,7 +66,7 @@ export function VisibilityRulesEditor({ value, onChange }: VisibilityRulesEditor
       </Select>
 
       <Select
-        label={"Requires Feature"}
+        label={t('visibility_rules.requires_feature')}
         selectedKeys={rules.requires_feature ? [rules.requires_feature] : []}
         onSelectionChange={(keys) => {
           const selected = Array.from(keys)[0] as string;

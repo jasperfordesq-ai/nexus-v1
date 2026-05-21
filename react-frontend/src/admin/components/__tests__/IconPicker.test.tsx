@@ -109,8 +109,7 @@ describe('IconPicker', () => {
   it('shows placeholder text when no value selected', () => {
     const onChange = vi.fn();
     render(<W><IconPicker value={null} onChange={onChange} /></W>);
-    // t('icon_picker.choose_icon_placeholder') returns fallback key
-    expect(screen.getByText('icon_picker.choose_icon_placeholder')).toBeTruthy();
+    expect(screen.getByText('Search for an icon...')).toBeTruthy();
   });
 
   it('shows icon name when a value is selected', () => {
@@ -122,21 +121,20 @@ describe('IconPicker', () => {
   it('shows clear button when a value is selected', () => {
     const onChange = vi.fn();
     render(<W><IconPicker value="Home" onChange={onChange} /></W>);
-    // t('icon_picker.clear_icon') returns fallback key
-    const clearBtn = screen.getByLabelText('icon_picker.clear_icon');
+    const clearBtn = screen.getByLabelText('Clear Icon');
     expect(clearBtn).toBeTruthy();
   });
 
   it('does not show clear button when no value', () => {
     const onChange = vi.fn();
     render(<W><IconPicker value={null} onChange={onChange} /></W>);
-    expect(screen.queryByLabelText('icon_picker.clear_icon')).toBeNull();
+    expect(screen.queryByLabelText('Clear Icon')).toBeNull();
   });
 
   it('calls onChange with null when clear button is clicked', () => {
     const onChange = vi.fn();
     render(<W><IconPicker value="Home" onChange={onChange} /></W>);
-    fireEvent.click(screen.getByLabelText('icon_picker.clear_icon'));
+    fireEvent.click(screen.getByLabelText('Clear Icon'));
     expect(onChange).toHaveBeenCalledWith(null);
   });
 

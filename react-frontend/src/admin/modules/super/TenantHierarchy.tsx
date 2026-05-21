@@ -21,6 +21,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Network from 'lucide-react/icons/network';
 import Plus from 'lucide-react/icons/plus';
 import List from 'lucide-react/icons/list';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
@@ -33,9 +34,10 @@ interface TreeNodeProps {
   onNavigate: (id: number) => void;
   expandedIds: Set<number>;
   onToggle: (id: number) => void;
+  t: (key: string) => string;
 }
 
-function TreeNode({ node, depth, onNavigate, expandedIds, onToggle }: TreeNodeProps) {
+function TreeNode({ node, depth, onNavigate, expandedIds, onToggle, t }: TreeNodeProps) {
   const expanded = expandedIds.has(node.id);
   const hasChildren = node.children && node.children.length > 0;
 
@@ -50,7 +52,7 @@ function TreeNode({ node, depth, onNavigate, expandedIds, onToggle }: TreeNodePr
             isIconOnly
             size="sm"
             variant="light"
-            aria-label={expanded ? "Collapse" : "Expand"}
+            aria-label={expanded ? t('common.collapse') : t('common.expand')}
             onPress={() => onToggle(node.id)}
             className="shrink-0"
           >
@@ -82,10 +84,10 @@ function TreeNode({ node, depth, onNavigate, expandedIds, onToggle }: TreeNodePr
               variant="flat"
               color={node.is_active ? 'success' : 'default'}
             >
-              {node.is_active ? 'Active' : 'Inactive'}
+              {node.is_active ? t('super.status_active_label') : t('super.status_inactive_label')}
             </Chip>
             {node.allows_subtenants && (
-              <Chip size="sm" variant="flat" color="secondary">Hub</Chip>
+              <Chip size="sm" variant="flat" color="secondary">{t('super.hub')}</Chip>
             )}
           </div>
         </div>
@@ -101,6 +103,7 @@ function TreeNode({ node, depth, onNavigate, expandedIds, onToggle }: TreeNodePr
               onNavigate={onNavigate}
               expandedIds={expandedIds}
               onToggle={onToggle}
+              t={t}
             />
           ))}
         </div>
@@ -110,7 +113,8 @@ function TreeNode({ node, depth, onNavigate, expandedIds, onToggle }: TreeNodePr
 }
 
 export function TenantHierarchy() {
-  usePageTitle("Super Admin");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super.super_dashboard_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -165,10 +169,10 @@ export function TenantHierarchy() {
         setExpandedIds(new Set(initialIds));
       }
     } catch {
-      toast.error("Failed to load hierarchy");
+      toast.error(t('super.failed_to_load_hierarchy'));
     }
     setLoading(false);
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -182,15 +186,15 @@ export function TenantHierarchy() {
   return (
     <div>
       <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.super_dashboard_title')}</Link>
         <span>/</span>
-        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">Tenants</Link>
+        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">{t('super.tenants')}</Link>
         <span>/</span>
-        <span className="text-foreground">{"Hierarchy"}</span>
+        <span className="text-foreground">{t('super.hierarchy')}</span>
       </nav>
       <PageHeader
-        title={"Tenant Hierarchy"}
-        description={"View the hierarchical structure of tenants and their relationships"}
+        title={t('super.tenant_hierarchy_title')}
+        description={t('super.tenant_hierarchy_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -199,7 +203,7 @@ export function TenantHierarchy() {
               onPress={expandAll}
               size="sm"
             >
-              Expand All
+              {t('super.expand_all')}
             </Button>
             <Button
               variant="flat"
@@ -207,7 +211,7 @@ export function TenantHierarchy() {
               onPress={collapseAll}
               size="sm"
             >
-              Collapse All
+              {t('super.collapse_all')}
             </Button>
             <Button
               as={Link}
@@ -216,7 +220,7 @@ export function TenantHierarchy() {
               startContent={<List size={16} />}
               size="sm"
             >
-              View All Tenants
+              {t('super.view_all_tenants')}
             </Button>
             <Button
               as={Link}
@@ -225,7 +229,7 @@ export function TenantHierarchy() {
               startContent={<Plus size={16} />}
               size="sm"
             >
-              Create Tenant
+              {t('super.create_tenant')}
             </Button>
             <Button
               variant="flat"
@@ -234,7 +238,7 @@ export function TenantHierarchy() {
               isLoading={loading}
               size="sm"
             >
-              Refresh
+              {t('super.refresh')}
             </Button>
           </div>
         }
@@ -248,8 +252,8 @@ export function TenantHierarchy() {
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center py-12 text-default-400">
             <Network size={40} className="mb-2" />
-            <p>No tenant hierarchy data available.</p>
-            <p className="text-xs">Create tenants with parent relationships to see the tree.</p>
+            <p>{t('super.no_hierarchy_data')}</p>
+            <p className="text-xs">{t('super.no_hierarchy_data_desc')}</p>
           </CardBody>
         </Card>
       ) : (
@@ -263,6 +267,7 @@ export function TenantHierarchy() {
                 onNavigate={handleNavigate}
                 expandedIds={expandedIds}
                 onToggle={handleToggle}
+                t={t}
               />
             ))}
           </CardBody>

@@ -19,6 +19,7 @@ import {
   Spinner,
 } from '@heroui/react';
 import X from 'lucide-react/icons/x';
+import { useTranslation } from 'react-i18next';
 import { adminNewsletters } from '../../api/adminApi';
 
 interface TemplatePreviewProps {
@@ -28,6 +29,7 @@ interface TemplatePreviewProps {
 }
 
 export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreviewProps) {
+  const { t } = useTranslation('admin');
   const [html, setHtml] = useState('');
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
@@ -42,7 +44,7 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
       if (res.success && res.data) {
         const data = res.data as { html?: string; name?: string; subject?: string };
         setHtml(data.html || '');
-        setName(data.name || "Template Preview");
+        setName(data.name || t('newsletters.template_preview_title'));
         setSubject(data.subject || '');
       }
     } catch {
@@ -50,7 +52,7 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
     } finally {
       setLoading(false);
     }
-  }, [templateId]);
+  }, [t, templateId]);
 
 
   useEffect(() => {
@@ -63,27 +65,27 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
     if (loading) {
       return (
         <div className="flex items-center justify-center py-20">
-          <Spinner size="lg" label={"Loading preview..."} />
+          <Spinner size="lg" label={t('newsletters.loading_preview')} />
         </div>
       );
     }
     if (loadError) {
       return (
         <div className="flex items-center justify-center py-20 text-danger">
-          {"Load failed"}
+          {t('newsletters.load_failed')}
         </div>
       );
     }
     if (!html) {
       return (
         <div className="flex items-center justify-center py-20 text-default-400">
-          {"No content found"}
+          {t('newsletters.no_content_found')}
         </div>
       );
     }
     return (
       <iframe
-        title={"Template Preview"}
+        title={t('newsletters.template_preview_title')}
         sandbox="allow-same-origin"
         srcDoc={html}
         className="w-full border-0"
@@ -104,7 +106,7 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
           <span>{name}</span>
           {subject && (
             <span className="text-sm font-normal text-default-500">
-              {"Subject"} {subject}
+              {t('newsletters.col_subject')} {subject}
             </span>
           )}
         </ModalHeader>
@@ -117,7 +119,7 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
             startContent={<X size={16} />}
             onPress={onClose}
           >
-            {"Close"}
+            {t('common.close')}
           </Button>
         </ModalFooter>
       </ModalContent>

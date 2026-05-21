@@ -5,6 +5,12 @@
   "enabled": "Enabled",
   "disabled": "Disabled",
   "something_wrong": "Something went wrong. Please try again.",
+  "admin_not_found": {
+    "title": "Not Found",
+    "heading": "Page Not Found",
+    "description": "The page you are looking for does not exist",
+    "back_to_dashboard": "Back to Dashboard"
+  },
   "api_partners": {
     "meta": {
       "title": "API Partners"
@@ -7500,10 +7506,10 @@
     "status_completed": "Completed",
     "status_in_progress": "In Progress",
     "status_pending": "Pending",
-    "days_ago": "Days Ago",
-    "hours_ago": "Hours Ago",
-    "just_now": "Just Now",
-    "minutes_ago": "Minutes Ago"
+    "days_ago": "{{count}} days ago",
+    "hours_ago": "{{count}} hours ago",
+    "just_now": "Just now",
+    "minutes_ago": "{{count}} minutes ago"
   },
   "data_table": {
     "admin_data_table": "Data",
@@ -9944,6 +9950,9 @@
     "choose_icon": "Choose Icon",
     "choose_icon_placeholder": "Search for an icon...",
     "clear_icon": "Clear Icon",
+    "label": "Icon",
+    "no_icons_found": "No icons found matching \"{{search}}\"",
+    "search_for_icon": "Search for an icon...",
     "search_icons": "Search Icons"
   },
   "ideation": {
@@ -10783,6 +10792,10 @@
     "template_content": "Template Content",
     "template_details": "Template Details",
     "template_not_found": "Template not found",
+    "template_preview_title": "Template Preview",
+    "loading_preview": "Loading preview...",
+    "load_failed": "Load failed",
+    "no_content_found": "No content found",
     "tip_content_width": "Keep email content around 600px wide for reliable rendering.",
     "tip_inline_css": "Use simple inline styles for broad email client support.",
     "tip_test_clients": "Test the template in common email clients before sending.",
@@ -12076,6 +12089,11 @@
     "tenant_added_to_whitelist": "Tenant Added to Whitelist",
     "tenant_hierarchy_desc": "View the hierarchical structure of tenants and their relationships",
     "tenant_hierarchy_title": "Tenant Hierarchy",
+    "hierarchy": "Hierarchy",
+    "expand_all": "Expand All",
+    "collapse_all": "Collapse All",
+    "no_hierarchy_data": "No tenant hierarchy data available.",
+    "no_hierarchy_data_desc": "Create tenants with parent relationships to see the tree.",
     "tenant_list_desc": "View and manage all tenants on the platform",
     "tenant_list_title": "Tenant List",
     "tenant_moved_successfully": "Tenant moved successfully",
@@ -14722,6 +14740,8 @@
     "col_status": "Status",
     "col_title": "Title",
     "col_total_sales": "Sales",
+    "col_sales": "Sales",
+    "col_rating": "Rating",
     "col_type": "Type",
     "coupons": {
       "page_title": "Merchant Coupons",
@@ -14772,6 +14792,11 @@
     "failed_verify_seller": "Failed to verify seller",
     "filter_all": "All",
     "filter_approved": "Approved",
+    "seller_filter_all": "All",
+    "seller_filter_private": "Private",
+    "seller_filter_business": "Business",
+    "seller_filter_verified": "Verified",
+    "seller_filter_unverified": "Unverified",
     "filter_flagged": "Flagged",
     "filter_pending": "Pending",
     "filter_rejected": "Rejected",
@@ -14818,6 +14843,7 @@
     "try_adjusting_filters": "Try adjusting your search or filters",
     "unexpected_error": "An unexpected error occurred",
     "verified_seller": "Verified",
+    "verify_business": "Verify Business",
     "verify_btn": "Verify",
     "verify_seller_message": "This will mark the seller as verified. Continue?",
     "verify_seller_title": "Verify Seller",
