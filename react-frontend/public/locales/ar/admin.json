@@ -8056,7 +8056,9 @@
     "adjust_time_credits": "Adjust Time Credits",
     "apply_adjustment": "Apply Adjustment",
     "back_to_users": "Back to Users",
-    "badges": "Badges",
+    "badges": {
+      "required": "مطلوب"
+    },
     "balance_adjusted": "Balance Adjusted",
     "balance_failed": "Balance Failed",
     "balance_invalid": "Balance Invalid",
@@ -8154,7 +8156,191 @@
     "vetting_status": "Vetting Status",
     "welcome_email_failed": "Failed to send welcome email",
     "welcome_email_sent": "Welcome email sent",
-    "withdrawn_on": "Withdrawn on"
+    "withdrawn_on": "Withdrawn on",
+    "actions": {
+      "adjust_balance": "ضبط التوازن",
+      "apply_adjustment": "تطبيق التعديل",
+      "back_to_users": "العودة إلى المستخدمين",
+      "cancel": "يلغي",
+      "impersonate": "انتحال شخصية",
+      "manage": "يدير",
+      "recheck_badges": "إعادة فحص الشارات",
+      "remove_badge": "إزالة الشارة",
+      "resend_welcome_email": "إعادة إرسال البريد الإلكتروني الترحيبي",
+      "return_to_list": "العودة إلى القائمة",
+      "save_changes": "حفظ التغييرات",
+      "send_password_reset": "إرسال إعادة تعيين كلمة المرور",
+      "set_password": "تعيين كلمة المرور"
+    },
+    "aria": {
+      "remove_badge": "إزالة الشارة: {{name}}",
+      "toggle_global_super_admin": "تبديل المشرف العالمي المتميز",
+      "toggle_municipal_announcer": "تبديل دور مذيع البلدية",
+      "toggle_tenant_super_admin": "تبديل المشرف المتميز للمستأجر"
+    },
+    "consents": {
+      "consented": "تمت الموافقة",
+      "consented_on": "تمت الموافقة على",
+      "given": "الموافقة الممنوحة",
+      "not_consented": "غير موافق",
+      "not_given": "لم يتم إعطاء الموافقة",
+      "withdrawn_on": "انسحبت على"
+    },
+    "descriptions": {
+      "balance_amount": "استخدم القيم السالبة لخصم أرصدة الوقت من هذا العضو",
+      "cannot_modify_self": "لا يمكنك تعديل حسابك الخاص من هذه اللوحة",
+      "global_super_admin": "يمنح الوصول الكامل لجميع المستأجرين على المنصة",
+      "municipal_announcer": "ستعرض مشاركات هذا المستخدم شارة رسمية وسيتم تثبيتها في الجزء العلوي من الخلاصة",
+      "tenant_super_admin": "يمنح حق الوصول الكامل للمسؤول داخل هذا المستأجر"
+    },
+    "empty": {
+      "no_badges": "لا شارات",
+      "no_consent_records": "لا توجد سجلات الموافقة",
+      "no_insurance_records": "لا توجد سجلات التأمين",
+      "no_vetting_records": "لا توجد سجلات التدقيق"
+    },
+    "errors": {
+      "load_error": "خطأ في التحميل",
+      "load_unexpected": "حدث خطأ غير متوقع أثناء تحميل هذا المستخدم",
+      "user_not_found": "لم يتم العثور على المستخدم"
+    },
+    "fields": {
+      "amount": "كمية",
+      "balance": "توازن",
+      "bio": "السيرة الذاتية",
+      "current_balance": "الرصيد الحالي",
+      "email": "بريد إلكتروني",
+      "first_name": "الاسم الأول",
+      "last_name": "اسم العائلة",
+      "location": "موقع",
+      "new_password": "كلمة المرور الجديدة",
+      "official_announcement_channel": "قناة الإعلان الرسمية",
+      "organisation_name": "اسم المنظمة",
+      "phone": "هاتف",
+      "platform_wide_access": "الوصول على مستوى المنصة",
+      "profile_type": "نوع الملف الشخصي",
+      "reason": "سبب",
+      "role": "دور",
+      "status": "حالة",
+      "tagline": "سطر الوصف",
+      "tenant_super_admin": "المستأجر سوبر المشرف"
+    },
+    "loading": {
+      "compliance": "تحميل الامتثال",
+      "consents": "جارٍ تحميل الموافقات",
+      "user": "جارٍ تحميل المستخدم"
+    },
+    "meta": {
+      "edit_named": "تحرير {{name}}",
+      "edit_user": "تحرير المستخدم",
+      "user_id_joined": "المستخدم ID وانضم"
+    },
+    "modals": {
+      "adjust_balance": {
+        "title": "ضبط اعتمادات الوقت"
+      },
+      "remove_badge": {
+        "message": "هل أنت متأكد أنك تريد إزالة هذه الشارة من العضو؟",
+        "title": "إزالة الشارة"
+      },
+      "set_password": {
+        "body": "قم بتعيين كلمة مرور جديدة لهذا المستخدم. سيتم تسجيل خروجهم من جميع الجلسات.",
+        "title": "تعيين كلمة المرور"
+      }
+    },
+    "placeholders": {
+      "balance_amount": "على سبيل المثال 2 أو -1.5",
+      "balance_reason": "لماذا تعدل هذا التوازن؟",
+      "bio": "سيرة ذاتية قصيرة لهذا المستخدم...",
+      "email": "user@example.com",
+      "first_name": "أدخل الاسم الأول...",
+      "last_name": "أدخل الاسم الأخير...",
+      "location": "على سبيل المثال نيويورك، الولايات المتحدة الأمريكية",
+      "new_password": "كلمة المرور الجديدة...",
+      "organisation_name": "مثلا مركز المجتمع...",
+      "phone": "على سبيل المثال +1 555 123 4567",
+      "profile_type": "اختر النوع...",
+      "role": "تحديد دور...",
+      "status": "حدد الحالة...",
+      "tagline": "مثلا التطوع المجتمعي..."
+    },
+    "profile_types": {
+      "individual": "فردي",
+      "organisation": "منظمة"
+    },
+    "roles": {
+      "admin": "مسؤل",
+      "broker": "وسيط",
+      "member": "عضو",
+      "moderator": "مشرف",
+      "newsletter_admin": "مدير النشرة الإخبارية",
+      "tenant_admin": "مشرف المستأجر"
+    },
+    "sections": {
+      "account_actions": "إجراءات الحساب",
+      "badges": "شارات",
+      "gdpr_consents": "GDPR الموافقات",
+      "global_super_admin": "المشرف العالمي الفائق",
+      "insurance_certificates": "شهادات التأمين",
+      "municipal_announcer": "مذيع البلدية",
+      "safeguarding": "الحماية",
+      "super_admin_access": "وصول المشرف الفائق",
+      "time_credits": "الاعتمادات الزمنية",
+      "vetting_status": "حالة الفحص"
+    },
+    "statuses": {
+      "active": "نشيط",
+      "banned": "محظور",
+      "pending": "قيد الانتظار",
+      "suspended": "معلق"
+    },
+    "summary": {
+      "more_certificates": "المزيد من الشهادات",
+      "more_records": "المزيد من السجلات"
+    },
+    "toasts": {
+      "announcer_failed": "فشل تحديث دور مُعلن البلدية",
+      "announcer_granted": "تم منح دور المذيع البلدي",
+      "announcer_revoked": "تم إلغاء دور المذيع البلدي",
+      "balance_adjusted": "تم تعديل الرصيد",
+      "balance_failed": "فشل الرصيد",
+      "balance_invalid": "الرصيد غير صالح",
+      "generic_error": "حدث خطأ",
+      "global_super_admin_failed": "فشل تحديث حالة المشرف العالمي المتميز",
+      "global_super_admin_granted": "تم منح المشرف العالمي المتميز",
+      "global_super_admin_revoked": "تم إبطال المشرف المتميز العالمي",
+      "impersonate_failed": "فشل انتحال الشخصية",
+      "impersonate_success": "انتحال الشخصية بنجاح",
+      "password_failed": "فشل كلمة المرور",
+      "password_reset_failed": "فشلت إعادة تعيين كلمة المرور",
+      "password_reset_sent": "تم إرسال البريد الإلكتروني لإعادة تعيين كلمة المرور",
+      "password_updated": "تم تحديث كلمة المرور",
+      "recheck_complete": "إعادة فحص كاملة",
+      "recheck_failed": "فشل إعادة الفحص",
+      "remove_badge_failed": "فشلت إزالة الشارة",
+      "remove_badge_success": "تمت إزالة الشارة بنجاح",
+      "tenant_super_admin_failed": "فشل تحديث حالة المشرف المتميز للمستأجر",
+      "tenant_super_admin_granted": "تم منح المشرف المتميز للمستأجر",
+      "tenant_super_admin_revoked": "تم إبطال المشرف المتميز للمستأجر",
+      "update_failed": "فشل التحديث",
+      "update_success": "تم التحديث بنجاح",
+      "welcome_email_failed": "فشل في إرسال البريد الإلكتروني الترحيبي",
+      "welcome_email_sent": "تم إرسال البريد الإلكتروني الترحيبي"
+    },
+    "validation": {
+      "email_invalid": "البريد الإلكتروني غير صالح",
+      "email_required": "البريد الإلكتروني مطلوب",
+      "first_name_required": "الاسم الأول مطلوب",
+      "last_name_required": "الاسم الأخير مطلوب",
+      "password_min": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+      "role_required": "الدور مطلوب",
+      "status_required": "الحالة مطلوبة"
+    },
+    "values": {
+      "expires_prefix": "- تنتهي",
+      "no_reference": "لا مرجع",
+      "unknown_provider": "مقدم غير معروف"
+    }
   },
   "users": {
     "action_approve": "Approve",
@@ -8935,7 +9121,42 @@
     "verify_btn": "Verify",
     "verify_seller_message": "This will mark the seller as verified. Continue?",
     "verify_seller_title": "Verify Seller",
-    "view_all": "View All"
+    "view_all": "View All",
+    "coupons": {
+      "columns": {
+        "actions": "الإجراءات",
+        "code": "شفرة",
+        "discount": "تخفيض",
+        "seller_id": "البائع ID",
+        "status": "حالة",
+        "title": "عنوان",
+        "uses": "الاستخدامات",
+        "valid_until": "صالحة حتى"
+      },
+      "confirm_delete": "هل تريد حذف هذه القسيمة نهائيًا؟ لا يمكن التراجع عن هذا.",
+      "confirm_suspend": "هل تريد تعليق هذه القسيمة؟",
+      "delete": "يمسح",
+      "deleted": "تم حذف القسيمة",
+      "description": "الإشراف على كوبونات الخصم التي يصدرها التاجر لجميع البائعين.",
+      "discount_bogo": "BOGO",
+      "discount_fixed": "€{{value}}",
+      "discount_percent": "{{value}}%",
+      "empty": "لا كوبونات.",
+      "failed_delete": "فشل الحذف",
+      "failed_load": "فشل تحميل الكوبونات",
+      "failed_suspend": "فشل التعليق",
+      "no_expiry": "-",
+      "page_title": "كوبونات التاجر",
+      "status": {
+        "active": "نشيط",
+        "draft": "مسودة",
+        "expired": "منتهي الصلاحية",
+        "paused": "متوقف مؤقتًا"
+      },
+      "suspend": "تعليق",
+      "suspended": "القسيمة معلقة",
+      "table_aria": "كوبونات التاجر"
+    }
   },
   "spam": {
     "title": "Spam Detection",
@@ -12885,6 +13106,112 @@
     },
     "validation": {
       "domain_required": "أدخل المجال"
+    }
+  },
+  "member_premium_admin": {
+    "actions": {
+      "cancel": "يلغي",
+      "create_tier": "إنشاء الطبقة",
+      "delete": "يمسح",
+      "edit": "يحرر",
+      "new_tier": "الطبقة الجديدة",
+      "save_changes": "حفظ التغييرات",
+      "subscribers": "المشتركين",
+      "sync_stripe": "مزامنة مع Stripe"
+    },
+    "confirm_delete": "هل تريد حذف الطبقة \"{{name}}\"؟ لا يمكن التراجع عن هذا.",
+    "empty": {
+      "tiers": "لا توجد مستويات بعد. قم بإنشاء الطبقة المميزة الأولى الخاصة بك أعلاه.",
+      "value": "-"
+    },
+    "form": {
+      "description": "وصف",
+      "features": "مفاتيح الميزات (مفصولة بفواصل)",
+      "features_description": "على سبيل المثال تم التحقق من الشارة، ومطابقة الأولوية، والبحث المتقدم، وخالية من الإعلانات",
+      "name": "اسم",
+      "price_month": "السعر / شهر",
+      "price_year": "السعر / سنة",
+      "slug": "سبيكة",
+      "slug_description": "الحروف الصغيرة والأرقام والشرطات/الشرطات السفلية",
+      "sort_order": "ترتيب الترتيب"
+    },
+    "meta": {
+      "description": "تحديد المستويات المميزة المدفوعة التي يمكن للأعضاء الاشتراك فيها. يفتح كل مستوى مفاتيح ميزات محددة.",
+      "title": "مستويات الأعضاء المميزة"
+    },
+    "modal": {
+      "edit_title": "تحرير الطبقة",
+      "new_title": "الطبقة الجديدة",
+      "stripe_price_note": "ملاحظة: يؤدي تغيير الأسعار إلى مسح Stripe Price IDs. قم بتشغيل \"مزامنة مع Stripe\" بعد الحفظ حتى يعمل الخروج مرة أخرى."
+    },
+    "status": {
+      "active": "نشيط",
+      "inactive": "غير نشط"
+    },
+    "stripe": {
+      "needs_sync": "يحتاج إلى مزامنة",
+      "synced": "تمت المزامنة"
+    },
+    "subscribers_page": {
+      "all": "الجميع",
+      "columns": {
+        "email": "مAIل",
+        "interval": "فاصلة",
+        "member": "عضو",
+        "next_billing": "الفواتير القادمة",
+        "started": "بدأت",
+        "status": "حالة",
+        "tier": "الطبقة"
+      },
+      "description": "الأعضاء مشتركون حاليًا في الطبقة المميزة.",
+      "empty": "لا يوجد مشتركون مطابقون للفلتر.",
+      "failed_load": "فشل في تحميل المشتركين",
+      "interval": {
+        "annual": "سنوي",
+        "month": "شهر",
+        "monthly": "شهريا",
+        "year": "سنة",
+        "yearly": "سنوي"
+      },
+      "refresh": "ينعش",
+      "status": {
+        "active": "نشيط",
+        "canceled": "تم الإلغاء",
+        "incomplete": "غير مكتمل",
+        "past_due": "فات موعد استحقاقها",
+        "trialing": "محاكمة"
+      },
+      "status_filter": "مرشح الحالة",
+      "table_aria": "المشتركين",
+      "title": "المشتركون المتميزون",
+      "total": "{{count}} الإجمالي",
+      "user_fallback": "المستخدم #{{id}}"
+    },
+    "table": {
+      "actions": "الإجراءات",
+      "aria": "طبقات متميزة",
+      "features": "سمات",
+      "name": "اسم",
+      "price_month": "السعر / الشهر",
+      "price_year": "السعر / سنة",
+      "slug": "سبيكة",
+      "status": "حالة",
+      "stripe": "شريط",
+      "subscribers": "المشتركين"
+    },
+    "toasts": {
+      "created": "تم إنشاء الطبقة",
+      "delete_failed": "فشل الحذف",
+      "deleted": "تم حذف الطبقة",
+      "load_failed": "فشل تحميل الطبقات",
+      "save_failed": "فشل الحفظ",
+      "stripe_sync_failed": "فشلت مزامنة Stripe",
+      "synced": "تمت مزامنة \"{{name}}\" مع Stripe",
+      "updated": "تم تحديث الطبقة"
+    },
+    "validation": {
+      "slug_format": "يجب أن يكون الرقم الثابت عبارة عن أحرف صغيرة من a إلى z، ومن 0 إلى 9، وشرطات/شرطات سفلية",
+      "slug_name_required": "سبيكة والاسم مطلوبة"
     }
   }
 }

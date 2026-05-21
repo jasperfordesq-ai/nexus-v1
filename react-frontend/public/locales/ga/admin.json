@@ -8056,7 +8056,9 @@
     "adjust_time_credits": "Adjust Time Credits",
     "apply_adjustment": "Apply Adjustment",
     "back_to_users": "Back to Users",
-    "badges": "Badges",
+    "badges": {
+      "required": "Ag teastáil"
+    },
     "balance_adjusted": "Balance Adjusted",
     "balance_failed": "Balance Failed",
     "balance_invalid": "Balance Invalid",
@@ -8154,7 +8156,191 @@
     "vetting_status": "Vetting Status",
     "welcome_email_failed": "Failed to send welcome email",
     "welcome_email_sent": "Welcome email sent",
-    "withdrawn_on": "Withdrawn on"
+    "withdrawn_on": "Withdrawn on",
+    "actions": {
+      "adjust_balance": "Coigeartaigh Iarmhéid",
+      "apply_adjustment": "Cuir Coigeartú i bhfeidhm",
+      "back_to_users": "Ar ais chuig Úsáideoirí",
+      "cancel": "Cealaigh",
+      "impersonate": "Déan aithris",
+      "manage": "Bainistigh",
+      "recheck_badges": "Suaitheantais a Athsheiceáil",
+      "remove_badge": "Bain Suaitheantas",
+      "resend_welcome_email": "Seol Ríomhphost Fáilte arís",
+      "return_to_list": "Fill ar an Liosta",
+      "save_changes": "Sábháil Athruithe",
+      "send_password_reset": "Seol Pasfhocal Athshocraigh",
+      "set_password": "Socraigh Pasfhocal"
+    },
+    "aria": {
+      "remove_badge": "Bain suaitheantas: {{name}}",
+      "toggle_global_super_admin": "Scoránaigh super admin domhanda",
+      "toggle_municipal_announcer": "Scoránaigh ról an fhógraeora chathrach",
+      "toggle_tenant_super_admin": "Scoránaigh tionónta super admin"
+    },
+    "consents": {
+      "consented": "Toiliú",
+      "consented_on": "Toiliú ar",
+      "given": "Toiliú tugtha",
+      "not_consented": "Gan Toiliú",
+      "not_given": "Ní thugtar toiliú",
+      "withdrawn_on": "Tarraingthe siar ar"
+    },
+    "descriptions": {
+      "balance_amount": "Úsáid luachanna diúltacha chun creidmheasanna ama a asbhaint ón mball seo",
+      "cannot_modify_self": "Ní féidir leat do chuntas féin a mhionathrú ón bpainéal seo",
+      "global_super_admin": "Tugann sé rochtain iomlán do gach tionónta ar an ardán",
+      "municipal_announcer": "Taispeánfaidh postálacha ón úsáideoir seo suaitheantas Oifigiúil agus pinneofar iad ar bharr an fhotha",
+      "tenant_super_admin": "Deonaíonn rochtain iomlán riaracháin laistigh den tionónta seo"
+    },
+    "empty": {
+      "no_badges": "Gan suaitheantais",
+      "no_consent_records": "Uimh taifid toilithe",
+      "no_insurance_records": "Uimh taifid árachais",
+      "no_vetting_records": "Gan taifid ghrinnfhiosrúcháin"
+    },
+    "errors": {
+      "load_error": "Earráid luchtaithe",
+      "load_unexpected": "Tharla earráid gan choinne agus an t-úsáideoir seo á lódáil",
+      "user_not_found": "Úsáideoir gan Aimsiú"
+    },
+    "fields": {
+      "amount": "Méid",
+      "balance": "Iarmhéid",
+      "bio": "Bith",
+      "current_balance": "Iarmhéid Reatha",
+      "email": "Ríomhphost",
+      "first_name": "Céad Ainm",
+      "last_name": "Sloinne",
+      "location": "Suíomh",
+      "new_password": "Pasfhocal Nua",
+      "official_announcement_channel": "Cainéal fógartha oifigiúil",
+      "organisation_name": "Ainm Eagraíochta",
+      "phone": "Fón",
+      "platform_wide_access": "Rochtain ar fud an ardáin",
+      "profile_type": "Cineál Próifíl",
+      "reason": "Cúis",
+      "role": "Ról",
+      "status": "Stádas",
+      "tagline": "Tagline",
+      "tenant_super_admin": "Sár-Riarachán Tionónta"
+    },
+    "loading": {
+      "compliance": "Comhlíonadh á Luchtú",
+      "consents": "Ceadanna Luchtaithe",
+      "user": "Úsáideoir á Luchtú"
+    },
+    "meta": {
+      "edit_named": "Cuir {{name}} in eagar",
+      "edit_user": "Cuir Úsáideoir in Eagar",
+      "user_id_joined": "Úsáideoir ID & Glactha leis"
+    },
+    "modals": {
+      "adjust_balance": {
+        "title": "Coigeartaigh Creidmheasanna Ama"
+      },
+      "remove_badge": {
+        "message": "An bhfuil tú cinnte gur mhaith leat an suaitheantas seo a bhaint den bhall?",
+        "title": "Bain Suaitheantas"
+      },
+      "set_password": {
+        "body": "Socraigh pasfhocal nua don úsáideoir seo. Déanfar iad a logáil amach as gach seisiún.",
+        "title": "Socraigh Pasfhocal"
+      }
+    },
+    "placeholders": {
+      "balance_amount": "e.g. 2 nó -1.5",
+      "balance_reason": "Cén fáth a bhfuil an t-iarmhéid seo á choigeartú agat?",
+      "bio": "Beathaisnéis ghearr don Úsáideoir Seo...",
+      "email": "úsáideoir@sampla.com",
+      "first_name": "Iontráil Céad Ainm...",
+      "last_name": "Iontráil Sloinne...",
+      "location": "e.g. Nua Eabhrac, SAM",
+      "new_password": "Pasfhocal nua...",
+      "organisation_name": "m.sh. Ionad Pobail...",
+      "phone": "e.g. +1 555 123 4567",
+      "profile_type": "Roghnaigh Cineál...",
+      "role": "Roghnaigh Ról...",
+      "status": "Roghnaigh Stádas...",
+      "tagline": "m.sh. Oibrí Deonach Pobail..."
+    },
+    "profile_types": {
+      "individual": "Aonair",
+      "organisation": "Eagraíocht"
+    },
+    "roles": {
+      "admin": "Riarachán",
+      "broker": "Bróicéir",
+      "member": "Ball",
+      "moderator": "Modhnóir",
+      "newsletter_admin": "Riarachán Nuachtlitir",
+      "tenant_admin": "Riarachán Tionónta"
+    },
+    "sections": {
+      "account_actions": "Gníomhartha Cuntas",
+      "badges": "Suaitheantais",
+      "gdpr_consents": "GDPR Toiliú",
+      "global_super_admin": "Sár-Riarachán Domhanda",
+      "insurance_certificates": "Deimhnithe Árachais",
+      "municipal_announcer": "Fógróir Bardasach",
+      "safeguarding": "Cosaint",
+      "super_admin_access": "Sár-Rochtain Riaracháin",
+      "time_credits": "Creidmheasanna Ama",
+      "vetting_status": "Stádas Grinnfhiosrúcháin"
+    },
+    "statuses": {
+      "active": "Gníomhach",
+      "banned": "Cosc",
+      "pending": "Ar feitheamh",
+      "suspended": "Ar fionraí"
+    },
+    "summary": {
+      "more_certificates": "Tuilleadh Deimhnithe",
+      "more_records": "Tuilleadh Taifead"
+    },
+    "toasts": {
+      "announcer_failed": "Theip ar ról an Fhógraí Chathrach a nuashonrú",
+      "announcer_granted": "Deonaíodh ról an Fhógróra Chathrach",
+      "announcer_revoked": "Cúlghaireadh ról an Fhógróra Chathrach",
+      "balance_adjusted": "Iarmhéid Coigeartaithe",
+      "balance_failed": "Theip ar Iarmhéid",
+      "balance_invalid": "Iarmhéid Neamhbhailí",
+      "generic_error": "Tharla earráid",
+      "global_super_admin_failed": "Theip ar an stádas sár-riaracháin domhanda a nuashonrú",
+      "global_super_admin_granted": "Sár-riarthóir domhanda ceadaithe",
+      "global_super_admin_revoked": "Cúlghaireadh sár-riarthóir domhanda",
+      "impersonate_failed": "Theip ar Impersonate",
+      "impersonate_success": "Déan aithris go rathúil",
+      "password_failed": "Theip ar an bPasfhocal",
+      "password_reset_failed": "Theip ar athshocrú pasfhocail",
+      "password_reset_sent": "Seoladh ríomhphost um athshocrú pasfhocail",
+      "password_updated": "Pasfhocal Nuashonraithe",
+      "recheck_complete": "Athsheiceáil Críochnaithe",
+      "recheck_failed": "Theip ar an Athsheiceáil",
+      "remove_badge_failed": "Theip ar bhaint an suaitheantais",
+      "remove_badge_success": "Bain an Suaitheantas go rathúil",
+      "tenant_super_admin_failed": "Theip ar stádas sár-riaracháin an tionónta a nuashonrú",
+      "tenant_super_admin_granted": "Deonaíodh sár-riarthóir don thionónta",
+      "tenant_super_admin_revoked": "Cúlghairm an t-ard-riarthóir tionónta",
+      "update_failed": "Theip ar Nuashonrú",
+      "update_success": "D'éirigh leis an nuashonrú",
+      "welcome_email_failed": "Theip ar ríomhphost fáilte a sheoladh",
+      "welcome_email_sent": "Seoladh ríomhphost fáilte"
+    },
+    "validation": {
+      "email_invalid": "Ríomhphost Neamhbhailí",
+      "email_required": "Ríomhphost de dhíth",
+      "first_name_required": "Céad ainm ag teastáil",
+      "last_name_required": "Tá sloinne ag teastáil",
+      "password_min": "Caithfidh pasfhocal a bheith 8 gcarachtar ar a laghad",
+      "role_required": "Ról ag Teastáil",
+      "status_required": "Stádas ag Teastáil"
+    },
+    "values": {
+      "expires_prefix": "- In éag",
+      "no_reference": "Gan tagairt",
+      "unknown_provider": "Soláthraí Anaithnid"
+    }
   },
   "users": {
     "action_approve": "Approve",
@@ -8935,7 +9121,42 @@
     "verify_btn": "Verify",
     "verify_seller_message": "This will mark the seller as verified. Continue?",
     "verify_seller_title": "Verify Seller",
-    "view_all": "View All"
+    "view_all": "View All",
+    "coupons": {
+      "columns": {
+        "actions": "Gníomhartha",
+        "code": "Cód",
+        "discount": "Lascaine",
+        "seller_id": "Díoltóir ID",
+        "status": "Stádas",
+        "title": "Teideal",
+        "uses": "Úsáidí",
+        "valid_until": "Bailí go dtí"
+      },
+      "confirm_delete": "An bhfuil fonn ort an cúpón seo a scriosadh go buan? Ní féidir é seo a chealú.",
+      "confirm_suspend": "Cuir an cúpón seo ar fionraí?",
+      "delete": "Scrios",
+      "deleted": "Scriosadh an cúpón",
+      "description": "Maoirseacht ar chúpóin lascaine arna n-eisiúint ag ceannaí thar na díoltóirí go léir.",
+      "discount_bogo": "BOGO",
+      "discount_fixed": "€{{value}}",
+      "discount_percent": "{{value}}%",
+      "empty": "Uimh cúpóin.",
+      "failed_delete": "Theip ar scriosadh",
+      "failed_load": "Theip ar lódáil cúpóin",
+      "failed_suspend": "Theip ar chur ar fionraí",
+      "no_expiry": "-",
+      "page_title": "Cúpóin Cheannaíochta",
+      "status": {
+        "active": "Gníomhach",
+        "draft": "Dréacht",
+        "expired": "imithe in éag",
+        "paused": "Sos"
+      },
+      "suspend": "Fionraí",
+      "suspended": "Cúpón ar fionraí",
+      "table_aria": "Cúpóin ceannaí"
+    }
   },
   "spam": {
     "title": "Spam Detection",
@@ -12885,6 +13106,112 @@
     },
     "validation": {
       "domain_required": "Cuir isteach fearann"
+    }
+  },
+  "member_premium_admin": {
+    "actions": {
+      "cancel": "Cealaigh",
+      "create_tier": "Cruthaigh sraith",
+      "delete": "Scrios",
+      "edit": "Cuir in eagar",
+      "new_tier": "Sraith Nua",
+      "save_changes": "Sábháil athruithe",
+      "subscribers": "Síntiúsóirí",
+      "sync_stripe": "Sioncronaigh go Stripe"
+    },
+    "confirm_delete": "Scrios sraith \"{{name}}\"? Ní féidir é seo a chealú.",
+    "empty": {
+      "tiers": "Níl aon sraitheanna fós. Cruthaigh do chéad sraith préimhe thuas.",
+      "value": "-"
+    },
+    "form": {
+      "description": "Cur síos",
+      "features": "Eochracha gné (scartha le camóg)",
+      "features_description": "e.g. fíoraithe_badge, tosaíocht_meaitseáil, cuardaigh_chun cinn, ad_free",
+      "name": "Ainm",
+      "price_month": "Praghas / mí",
+      "price_year": "Praghas / bliain",
+      "slug": "Drúchtín",
+      "slug_description": "Litreacha i gcás íochtair, uimhreacha, daiseanna/fothaí",
+      "sort_order": "Ordú sórtála"
+    },
+    "meta": {
+      "description": "Sainmhínigh sraitheanna préimheanna íoctha ar féidir le baill síntiús a thabhairt dóibh. Díghlasálann gach sraith eochracha gné ar leith.",
+      "title": "Sraitheanna Préimhe Ball"
+    },
+    "modal": {
+      "edit_title": "Cuir Sraith in Eagar",
+      "new_title": "Sraith Nua",
+      "stripe_price_note": "Tabhair faoi deara: glanann athrú praghsanna an Stripe Price IDs. Rith \"Sioncronaigh go Stripe\" tar éis an tsábháil ionas go n-oibríonn an tseiceáil amach arís."
+    },
+    "status": {
+      "active": "Gníomhach",
+      "inactive": "Neamhghníomhach"
+    },
+    "stripe": {
+      "needs_sync": "Tá sioncronú de dhíth",
+      "synced": "sioncronaithe"
+    },
+    "subscribers_page": {
+      "all": "Gach",
+      "columns": {
+        "email": "EMAIL",
+        "interval": "INTERVAL",
+        "member": "COMHALTACH",
+        "next_billing": "AN CHÉAD BILLEADH",
+        "started": "TOSAITHE",
+        "status": "STÁDAS",
+        "tier": "SRAITH"
+      },
+      "description": "Tá na baill suibscríofa faoi láthair do shraith préimhe.",
+      "empty": "Ní mheaitseálann aon síntiúsóir an scagaire.",
+      "failed_load": "Theip ar lódáil na síntiúsóirí",
+      "interval": {
+        "annual": "Bliantúil",
+        "month": "Mí",
+        "monthly": "go míosúil",
+        "year": "Bliain",
+        "yearly": "Bliantúil"
+      },
+      "refresh": "Athnuaigh",
+      "status": {
+        "active": "Gníomhach",
+        "canceled": "Ar ceal",
+        "incomplete": "Neamhiomlán",
+        "past_due": "Past dlite",
+        "trialing": "Triail"
+      },
+      "status_filter": "Scagaire stádais",
+      "table_aria": "Síntiúsóirí",
+      "title": "Síntiúsóirí Préimh",
+      "total": "{{count}} iomlán",
+      "user_fallback": "Úsáideoir #{{id}}"
+    },
+    "table": {
+      "actions": "GNÍOMHAÍOCHTAÍ",
+      "aria": "Sraitheanna préimhe",
+      "features": "GNÉITHE",
+      "name": "AINM",
+      "price_month": "PRAGHAS / MÍ",
+      "price_year": "PRAGHAS / BLIAIN",
+      "slug": "SLUG",
+      "status": "STÁDAS",
+      "stripe": "STRIPE",
+      "subscribers": "SUBSCRIBERS"
+    },
+    "toasts": {
+      "created": "Sraith cruthaithe",
+      "delete_failed": "Theip ar an scriosadh",
+      "deleted": "Scriosadh an tsraith",
+      "load_failed": "Theip ar na sraitheanna a lódáil",
+      "save_failed": "Theip ar shábháil",
+      "stripe_sync_failed": "Theip ar shioncronú Stripe",
+      "synced": "Sioncronaithe \"{{name}}\" go Stripe",
+      "updated": "Sraith nuashonraithe"
+    },
+    "validation": {
+      "slug_format": "Ní mór seilide a bheith i gcás íochtair a-z, 0-9, daiseanna/fothaí",
+      "slug_name_required": "Tá Sluga agus Ainm ag teastáil"
     }
   }
 }

@@ -8056,7 +8056,9 @@
     "adjust_time_credits": "Adjust Time Credits",
     "apply_adjustment": "Apply Adjustment",
     "back_to_users": "Back to Users",
-    "badges": "Badges",
+    "badges": {
+      "required": "Requis"
+    },
     "balance_adjusted": "Balance Adjusted",
     "balance_failed": "Balance Failed",
     "balance_invalid": "Balance Invalid",
@@ -8154,7 +8156,191 @@
     "vetting_status": "Vetting Status",
     "welcome_email_failed": "Failed to send welcome email",
     "welcome_email_sent": "Welcome email sent",
-    "withdrawn_on": "Withdrawn on"
+    "withdrawn_on": "Withdrawn on",
+    "actions": {
+      "adjust_balance": "Ajuster l'équilibre",
+      "apply_adjustment": "Appliquer l'ajustement",
+      "back_to_users": "Retour aux utilisateurs",
+      "cancel": "Annuler",
+      "impersonate": "Imiter",
+      "manage": "Gérer",
+      "recheck_badges": "Revérifier les badges",
+      "remove_badge": "Supprimer le badge",
+      "resend_welcome_email": "Renvoyer l'e-mail de bienvenue",
+      "return_to_list": "Retour à la liste",
+      "save_changes": "Enregistrer les modifications",
+      "send_password_reset": "Envoyer la réinitialisation du mot de passe",
+      "set_password": "Définir le mot de passe"
+    },
+    "aria": {
+      "remove_badge": "Supprimer le badge: {{name}}",
+      "toggle_global_super_admin": "Activer/désactiver le super-administrateur global",
+      "toggle_municipal_announcer": "Basculer le rôle d'annonceur municipal",
+      "toggle_tenant_super_admin": "Activer/désactiver le super-administrateur locataire"
+    },
+    "consents": {
+      "consented": "Consentement",
+      "consented_on": "Consenti sur",
+      "given": "Consentement donné",
+      "not_consented": "Non consenti",
+      "not_given": "Consentement non donné",
+      "withdrawn_on": "Retiré le"
+    },
+    "descriptions": {
+      "balance_amount": "Utiliser des valeurs négatives pour déduire les crédits de temps de ce membre",
+      "cannot_modify_self": "Vous ne pouvez pas modifier votre propre compte depuis ce panneau",
+      "global_super_admin": "Accorde un accès complet à tous les locataires de la plateforme",
+      "municipal_announcer": "Les publications de cet utilisateur afficheront un badge officiel et seront épinglées en haut du flux.",
+      "tenant_super_admin": "Accorde un accès administrateur complet au sein de ce locataire"
+    },
+    "empty": {
+      "no_badges": "Pas de badge",
+      "no_consent_records": "Aucun enregistrement de consentement",
+      "no_insurance_records": "Aucun dossier d'assurance",
+      "no_vetting_records": "Aucun dossier de vérification"
+    },
+    "errors": {
+      "load_error": "Erreur de chargement",
+      "load_unexpected": "Une erreur inattendue s'est produite lors du chargement de cet utilisateur",
+      "user_not_found": "Utilisateur introuvable"
+    },
+    "fields": {
+      "amount": "Montant",
+      "balance": "Équilibre",
+      "bio": "Biographie",
+      "current_balance": "Solde actuel",
+      "email": "E-mail",
+      "first_name": "Prénom",
+      "last_name": "Nom de famille",
+      "location": "Emplacement",
+      "new_password": "Nouveau mot de passe",
+      "official_announcement_channel": "Chaîne d'annonce officielle",
+      "organisation_name": "Nom de l'organisation",
+      "phone": "Téléphone",
+      "platform_wide_access": "Accès à l’ensemble de la plateforme",
+      "profile_type": "Type de profil",
+      "reason": "Raison",
+      "role": "Rôle",
+      "status": "Statut",
+      "tagline": "Slogan",
+      "tenant_super_admin": "Super administrateur du locataire"
+    },
+    "loading": {
+      "compliance": "Conformité de chargement",
+      "consents": "Chargement des consentements",
+      "user": "Chargement de l'utilisateur"
+    },
+    "meta": {
+      "edit_named": "Modifier {{name}}",
+      "edit_user": "Modifier l'utilisateur",
+      "user_id_joined": "Utilisateur ID et rejoint"
+    },
+    "modals": {
+      "adjust_balance": {
+        "title": "Ajuster les crédits de temps"
+      },
+      "remove_badge": {
+        "message": "Êtes-vous sûr de vouloir supprimer ce badge du membre?",
+        "title": "Supprimer le badge"
+      },
+      "set_password": {
+        "body": "Définissez un nouveau mot de passe pour cet utilisateur. Ils seront déconnectés de toutes les sessions.",
+        "title": "Définir le mot de passe"
+      }
+    },
+    "placeholders": {
+      "balance_amount": "par ex. 2 ou -1,5",
+      "balance_reason": "Pourquoi ajustez-vous cet équilibre?",
+      "bio": "Une courte biographie pour cet utilisateur...",
+      "email": "utilisateur@exemple.com",
+      "first_name": "Entrez le prénom...",
+      "last_name": "Entrez le nom de famille...",
+      "location": "par ex. New York, États-Unis",
+      "new_password": "Nouveau mot de passe...",
+      "organisation_name": "Par exemple, un centre communautaire...",
+      "phone": "par ex. +1 555 123 4567",
+      "profile_type": "Sélectionnez Type...",
+      "role": "Sélectionnez un rôle...",
+      "status": "Sélectionnez un statut...",
+      "tagline": "Par exemple, bénévole communautaire..."
+    },
+    "profile_types": {
+      "individual": "Individuel",
+      "organisation": "Organisation"
+    },
+    "roles": {
+      "admin": "Administrateur",
+      "broker": "Courtier",
+      "member": "Membre",
+      "moderator": "Modérateur",
+      "newsletter_admin": "Administrateur de la newsletter",
+      "tenant_admin": "Administrateur des locataires"
+    },
+    "sections": {
+      "account_actions": "Actions sur le compte",
+      "badges": "Insignes",
+      "gdpr_consents": "GDPR Consentements",
+      "global_super_admin": "Super administrateur mondial",
+      "insurance_certificates": "Certificats d'assurance",
+      "municipal_announcer": "Annonceur municipal",
+      "safeguarding": "Sauvegarde",
+      "super_admin_access": "Accès super-administrateur",
+      "time_credits": "Crédits de temps",
+      "vetting_status": "Statut de vérification"
+    },
+    "statuses": {
+      "active": "Actif",
+      "banned": "Interdit",
+      "pending": "En attente",
+      "suspended": "Suspendu"
+    },
+    "summary": {
+      "more_certificates": "Plus de certificats",
+      "more_records": "Plus d'enregistrements"
+    },
+    "toasts": {
+      "announcer_failed": "Échec de la mise à jour du rôle d'annonceur municipal",
+      "announcer_granted": "Rôle d’annonceur municipal accordé",
+      "announcer_revoked": "Rôle d'annonceur municipal révoqué",
+      "balance_adjusted": "Solde ajusté",
+      "balance_failed": "Échec du solde",
+      "balance_invalid": "Solde invalide",
+      "generic_error": "Erreur survenue",
+      "global_super_admin_failed": "Échec de la mise à jour du statut de super-administrateur global",
+      "global_super_admin_granted": "Super administrateur mondial accordé",
+      "global_super_admin_revoked": "Super administrateur global révoqué",
+      "impersonate_failed": "Échec de l'usurpation d'identité",
+      "impersonate_success": "Usurper l'identité avec succès",
+      "password_failed": "Échec du mot de passe",
+      "password_reset_failed": "Échec de la réinitialisation du mot de passe",
+      "password_reset_sent": "E-mail de réinitialisation du mot de passe envoyé",
+      "password_updated": "Mot de passe mis à jour",
+      "recheck_complete": "Revérification terminée",
+      "recheck_failed": "Échec de la nouvelle vérification",
+      "remove_badge_failed": "Échec de la suppression du badge",
+      "remove_badge_success": "Supprimer le badge avec succès",
+      "tenant_super_admin_failed": "Échec de la mise à jour du statut de super-administrateur du locataire",
+      "tenant_super_admin_granted": "Super administrateur locataire accordé",
+      "tenant_super_admin_revoked": "Super-administrateur locataire révoqué",
+      "update_failed": "Échec de la mise à jour",
+      "update_success": "Mise à jour réussie",
+      "welcome_email_failed": "Échec de l'envoi de l'e-mail de bienvenue",
+      "welcome_email_sent": "E-mail de bienvenue envoyé"
+    },
+    "validation": {
+      "email_invalid": "E-mail invalide",
+      "email_required": "E-mail requis",
+      "first_name_required": "Le prénom est obligatoire",
+      "last_name_required": "Le nom de famille est obligatoire",
+      "password_min": "Le mot de passe doit contenir au moins 8 caractères",
+      "role_required": "Rôle requis",
+      "status_required": "Statut requis"
+    },
+    "values": {
+      "expires_prefix": "- Expire",
+      "no_reference": "Aucune référence",
+      "unknown_provider": "Fournisseur inconnu"
+    }
   },
   "users": {
     "action_approve": "Approve",
@@ -8935,7 +9121,42 @@
     "verify_btn": "Verify",
     "verify_seller_message": "This will mark the seller as verified. Continue?",
     "verify_seller_title": "Verify Seller",
-    "view_all": "View All"
+    "view_all": "View All",
+    "coupons": {
+      "columns": {
+        "actions": "Actes",
+        "code": "Code",
+        "discount": "Rabais",
+        "seller_id": "Vendeur ID",
+        "status": "Statut",
+        "title": "Titre",
+        "uses": "Utilisations",
+        "valid_until": "Valable jusqu'au"
+      },
+      "confirm_delete": "Supprimer définitivement ce coupon? Cela ne peut pas être annulé.",
+      "confirm_suspend": "Suspendre ce coupon?",
+      "delete": "Supprimer",
+      "deleted": "Coupon supprimé",
+      "description": "Surveillance des coupons de réduction émis par les commerçants pour tous les vendeurs.",
+      "discount_bogo": "BOGO",
+      "discount_fixed": "€{{value}}",
+      "discount_percent": "{{value}}%",
+      "empty": "Pas de bons de réduction.",
+      "failed_delete": "Échec de la suppression",
+      "failed_load": "Échec du chargement des coupons",
+      "failed_suspend": "Échec de la suspension",
+      "no_expiry": "-",
+      "page_title": "Coupons marchands",
+      "status": {
+        "active": "Actif",
+        "draft": "Brouillon",
+        "expired": "Expiré",
+        "paused": "En pause"
+      },
+      "suspend": "Suspendre",
+      "suspended": "Coupon suspendu",
+      "table_aria": "Coupons marchands"
+    }
   },
   "spam": {
     "title": "Spam Detection",
@@ -12885,6 +13106,112 @@
     },
     "validation": {
       "domain_required": "Entrez un domaine"
+    }
+  },
+  "member_premium_admin": {
+    "actions": {
+      "cancel": "Annuler",
+      "create_tier": "Créer un niveau",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "new_tier": "Nouveau niveau",
+      "save_changes": "Enregistrer les modifications",
+      "subscribers": "Abonnés",
+      "sync_stripe": "Synchroniser avec Stripe"
+    },
+    "confirm_delete": "Supprimer le niveau \"{{name}}\"? Cela ne peut pas être annulé.",
+    "empty": {
+      "tiers": "Aucun niveau pour l'instant. Créez votre premier niveau premium ci-dessus.",
+      "value": "-"
+    },
+    "form": {
+      "description": "Description",
+      "features": "Touches de fonctionnalité (séparées par des virgules)",
+      "features_description": "par ex. badge_vérifié, correspondance_priorité, recherche_avancée, ad_free",
+      "name": "Nom",
+      "price_month": "Prix ​​/ mois",
+      "price_year": "Prix ​​/ an",
+      "slug": "Limace",
+      "slug_description": "Lettres minuscules, chiffres, tirets/traits de soulignement",
+      "sort_order": "Ordre de tri"
+    },
+    "meta": {
+      "description": "Définissez des niveaux premium payants auxquels les membres peuvent souscrire. Chaque niveau déverrouille des clés de fonctionnalité spécifiques.",
+      "title": "Niveaux Premium de membre"
+    },
+    "modal": {
+      "edit_title": "Modifier le niveau",
+      "new_title": "Nouveau niveau",
+      "stripe_price_note": "Remarque: la modification des prix efface le Stripe Price IDs. Exécutez « Synchroniser avec Stripe » après l'enregistrement pour que le paiement fonctionne à nouveau."
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "stripe": {
+      "needs_sync": "Nécessite une synchronisation",
+      "synced": "Synchronisé"
+    },
+    "subscribers_page": {
+      "all": "Tous",
+      "columns": {
+        "email": "EMAIL",
+        "interval": "INTERVALLE",
+        "member": "MEMBRE",
+        "next_billing": "PROCHAINE FACTURATION",
+        "started": "COMMENCÉ",
+        "status": "STATUT",
+        "tier": "ÉTAGE"
+      },
+      "description": "Membres actuellement abonnés à un niveau premium.",
+      "empty": "Aucun abonné ne correspond au filtre.",
+      "failed_load": "Échec du chargement des abonnés",
+      "interval": {
+        "annual": "Annuel",
+        "month": "Mois",
+        "monthly": "Mensuel",
+        "year": "Année",
+        "yearly": "Annuel"
+      },
+      "refresh": "Rafraîchir",
+      "status": {
+        "active": "Actif",
+        "canceled": "Annulé",
+        "incomplete": "Incomplet",
+        "past_due": "En souffrance",
+        "trialing": "Essai"
+      },
+      "status_filter": "Filtre d'état",
+      "table_aria": "Abonnés",
+      "title": "Abonnés Premium",
+      "total": "{{count}} total",
+      "user_fallback": "Utilisateur #{{id}}"
+    },
+    "table": {
+      "actions": "ACTES",
+      "aria": "Niveaux Premium",
+      "features": "CARACTÉRISTIQUES",
+      "name": "NOM",
+      "price_month": "PRIX / MOIS",
+      "price_year": "PRIX / ANNÉE",
+      "slug": "LIMACE",
+      "status": "STATUT",
+      "stripe": "BANDE",
+      "subscribers": "ABONNÉS"
+    },
+    "toasts": {
+      "created": "Niveau créé",
+      "delete_failed": "Échec de la suppression",
+      "deleted": "Niveau supprimé",
+      "load_failed": "Échec du chargement des niveaux",
+      "save_failed": "Échec de l'enregistrement",
+      "stripe_sync_failed": "Échec de la synchronisation Stripe",
+      "synced": "Synchronisé \"{{name}}\" avec Stripe",
+      "updated": "Niveau mis à jour"
+    },
+    "validation": {
+      "slug_format": "Le slug doit être en minuscules de a à z, de 0 à 9, avec des tirets/traits de soulignement.",
+      "slug_name_required": "Le slug et le nom sont requis"
     }
   }
 }

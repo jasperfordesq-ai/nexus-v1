@@ -8056,7 +8056,9 @@
     "adjust_time_credits": "Adjust Time Credits",
     "apply_adjustment": "Apply Adjustment",
     "back_to_users": "Back to Users",
-    "badges": "Badges",
+    "badges": {
+      "required": "Erforderlich"
+    },
     "balance_adjusted": "Balance Adjusted",
     "balance_failed": "Balance Failed",
     "balance_invalid": "Balance Invalid",
@@ -8154,7 +8156,191 @@
     "vetting_status": "Vetting Status",
     "welcome_email_failed": "Failed to send welcome email",
     "welcome_email_sent": "Welcome email sent",
-    "withdrawn_on": "Withdrawn on"
+    "withdrawn_on": "Withdrawn on",
+    "actions": {
+      "adjust_balance": "Balance anpassen",
+      "apply_adjustment": "Anpassung anwenden",
+      "back_to_users": "Zurück zu Benutzer",
+      "cancel": "Stornieren",
+      "impersonate": "Imitieren",
+      "manage": "Verwalten",
+      "recheck_badges": "Überprüfen Sie die Abzeichen erneut",
+      "remove_badge": "Abzeichen entfernen",
+      "resend_welcome_email": "Willkommens-E-Mail erneut senden",
+      "return_to_list": "Zurück zur Liste",
+      "save_changes": "Änderungen speichern",
+      "send_password_reset": "Passwort-Reset senden",
+      "set_password": "Passwort festlegen"
+    },
+    "aria": {
+      "remove_badge": "Abzeichen entfernen: {{name}}",
+      "toggle_global_super_admin": "Schalten Sie den globalen Superadministrator um",
+      "toggle_municipal_announcer": "Schalten Sie die Rolle des kommunalen Sprechers um",
+      "toggle_tenant_super_admin": "Schalten Sie den Mandanten-Superadministrator um"
+    },
+    "consents": {
+      "consented": "Zugestimmt",
+      "consented_on": "Zugestimmt",
+      "given": "Einwilligung erteilt",
+      "not_consented": "Nicht eingewilligt",
+      "not_given": "Einwilligung nicht erteilt",
+      "withdrawn_on": "Zurückgezogen am"
+    },
+    "descriptions": {
+      "balance_amount": "Verwenden Sie negative Werte, um Zeitguthaben von diesem Mitglied abzuziehen",
+      "cannot_modify_self": "In diesem Bereich können Sie Ihr eigenes Konto nicht ändern",
+      "global_super_admin": "Gewährt vollen Zugriff für alle Mandanten auf der Plattform",
+      "municipal_announcer": "Beiträge dieses Benutzers werden mit einem offiziellen Abzeichen angezeigt und oben im Feed angeheftet",
+      "tenant_super_admin": "Gewährt vollständigen Administratorzugriff innerhalb dieses Mandanten"
+    },
+    "empty": {
+      "no_badges": "Keine Abzeichen",
+      "no_consent_records": "Keine Einwilligungsunterlagen",
+      "no_insurance_records": "Keine Versicherungsunterlagen",
+      "no_vetting_records": "Keine Überprüfungsunterlagen"
+    },
+    "errors": {
+      "load_error": "Ladefehler",
+      "load_unexpected": "Beim Laden dieses Benutzers ist ein unerwarteter Fehler aufgetreten",
+      "user_not_found": "Benutzer nicht gefunden"
+    },
+    "fields": {
+      "amount": "Menge",
+      "balance": "Gleichgewicht",
+      "bio": "Bio",
+      "current_balance": "Aktueller Kontostand",
+      "email": "E-Mail",
+      "first_name": "Vorname",
+      "last_name": "Nachname",
+      "location": "Standort",
+      "new_password": "Neues Passwort",
+      "official_announcement_channel": "Offizieller Ankündigungskanal",
+      "organisation_name": "Name der Organisation",
+      "phone": "Telefon",
+      "platform_wide_access": "Plattformweiter Zugriff",
+      "profile_type": "Profiltyp",
+      "reason": "Grund",
+      "role": "Rolle",
+      "status": "Status",
+      "tagline": "Slogan",
+      "tenant_super_admin": "Mieter-Superadministrator"
+    },
+    "loading": {
+      "compliance": "Compliance wird geladen",
+      "consents": "Einwilligungen laden",
+      "user": "Benutzer wird geladen"
+    },
+    "meta": {
+      "edit_named": "Bearbeiten Sie {{name}}",
+      "edit_user": "Benutzer bearbeiten",
+      "user_id_joined": "Benutzer ID & beigetreten"
+    },
+    "modals": {
+      "adjust_balance": {
+        "title": "Zeitguthaben anpassen"
+      },
+      "remove_badge": {
+        "message": "Sind Sie sicher, dass Sie dieses Abzeichen vom Mitglied entfernen möchten?",
+        "title": "Abzeichen entfernen"
+      },
+      "set_password": {
+        "body": "Legen Sie ein neues Passwort für diesen Benutzer fest. Sie werden von allen Sitzungen abgemeldet.",
+        "title": "Passwort festlegen"
+      }
+    },
+    "placeholders": {
+      "balance_amount": "z.B. 2 oder -1,5",
+      "balance_reason": "Warum passen Sie dieses Gleichgewicht an?",
+      "bio": "Eine kurze Biografie für diesen Benutzer...",
+      "email": "user@example.com",
+      "first_name": "Vornamen eingeben...",
+      "last_name": "Nachnamen eingeben...",
+      "location": "z.B. New York, USA",
+      "new_password": "Neues Passwort...",
+      "organisation_name": "ZB Gemeindezentrum...",
+      "phone": "z.B. +1 555 123 4567",
+      "profile_type": "Typ auswählen...",
+      "role": "Wählen Sie eine Rolle...",
+      "status": "Wählen Sie einen Status...",
+      "tagline": "Z. B. Freiwilliger in der Gemeinde..."
+    },
+    "profile_types": {
+      "individual": "Person",
+      "organisation": "Organisation"
+    },
+    "roles": {
+      "admin": "Admin",
+      "broker": "Makler",
+      "member": "Mitglied",
+      "moderator": "Moderator",
+      "newsletter_admin": "Newsletter-Administrator",
+      "tenant_admin": "Mieteradministrator"
+    },
+    "sections": {
+      "account_actions": "Kontoaktionen",
+      "badges": "Abzeichen",
+      "gdpr_consents": "GDPR Einwilligungen",
+      "global_super_admin": "Globaler Superadministrator",
+      "insurance_certificates": "Versicherungszertifikate",
+      "municipal_announcer": "Kommunaler Ansager",
+      "safeguarding": "Sicherung",
+      "super_admin_access": "Super-Admin-Zugriff",
+      "time_credits": "Zeitguthaben",
+      "vetting_status": "Überprüfungsstatus"
+    },
+    "statuses": {
+      "active": "Aktiv",
+      "banned": "Verboten",
+      "pending": "Ausstehend",
+      "suspended": "Ausgesetzt"
+    },
+    "summary": {
+      "more_certificates": "Weitere Zertifikate",
+      "more_records": "Weitere Datensätze"
+    },
+    "toasts": {
+      "announcer_failed": "Die Rolle des städtischen Ansagers konnte nicht aktualisiert werden",
+      "announcer_granted": "Die Rolle des städtischen Sprechers wurde gewährt",
+      "announcer_revoked": "Die Rolle des städtischen Ansagers wurde widerrufen",
+      "balance_adjusted": "Balance angepasst",
+      "balance_failed": "Balance fehlgeschlagen",
+      "balance_invalid": "Kontostand ungültig",
+      "generic_error": "Es ist ein Fehler aufgetreten",
+      "global_super_admin_failed": "Der Status des globalen Superadministrators konnte nicht aktualisiert werden",
+      "global_super_admin_granted": "Globaler Superadministrator gewährt",
+      "global_super_admin_revoked": "Globaler Superadministrator widerrufen",
+      "impersonate_failed": "Identitätswechsel fehlgeschlagen",
+      "impersonate_success": "Erfolgreich imitieren",
+      "password_failed": "Passwort fehlgeschlagen",
+      "password_reset_failed": "Das Zurücksetzen des Passworts ist fehlgeschlagen",
+      "password_reset_sent": "E-Mail zum Zurücksetzen des Passworts gesendet",
+      "password_updated": "Passwort aktualisiert",
+      "recheck_complete": "Erneute Prüfung abgeschlossen",
+      "recheck_failed": "Erneute Überprüfung fehlgeschlagen",
+      "remove_badge_failed": "Abzeichen konnte nicht entfernt werden",
+      "remove_badge_success": "Abzeichen erfolgreich entfernen",
+      "tenant_super_admin_failed": "Der Superadministratorstatus des Mandanten konnte nicht aktualisiert werden",
+      "tenant_super_admin_granted": "Mieter-Superadministrator gewährt",
+      "tenant_super_admin_revoked": "Der Superadministrator des Mieters wurde widerrufen",
+      "update_failed": "Aktualisierung fehlgeschlagen",
+      "update_success": "Update erfolgreich",
+      "welcome_email_failed": "Willkommens-E-Mail konnte nicht gesendet werden",
+      "welcome_email_sent": "Willkommens-E-Mail gesendet"
+    },
+    "validation": {
+      "email_invalid": "E-Mail ungültig",
+      "email_required": "E-Mail erforderlich",
+      "first_name_required": "Der Vorname ist erforderlich",
+      "last_name_required": "Nachname ist erforderlich",
+      "password_min": "Das Passwort muss mindestens 8 Zeichen lang sein",
+      "role_required": "Rolle erforderlich",
+      "status_required": "Status erforderlich"
+    },
+    "values": {
+      "expires_prefix": "- Läuft ab",
+      "no_reference": "Kein Hinweis",
+      "unknown_provider": "Unbekannter Anbieter"
+    }
   },
   "users": {
     "action_approve": "Approve",
@@ -8935,7 +9121,42 @@
     "verify_btn": "Verify",
     "verify_seller_message": "This will mark the seller as verified. Continue?",
     "verify_seller_title": "Verify Seller",
-    "view_all": "View All"
+    "view_all": "View All",
+    "coupons": {
+      "columns": {
+        "actions": "Aktionen",
+        "code": "Code",
+        "discount": "Rabatt",
+        "seller_id": "Verkäufer ID",
+        "status": "Status",
+        "title": "Titel",
+        "uses": "Verwendungsmöglichkeiten",
+        "valid_until": "Gültig bis"
+      },
+      "confirm_delete": "Diesen Coupon endgültig löschen? Dies kann nicht rückgängig gemacht werden.",
+      "confirm_suspend": "Diesen Coupon aussetzen?",
+      "delete": "Löschen",
+      "deleted": "Gutschein gelöscht",
+      "description": "Überwachung der vom Händler ausgestellten Rabattgutscheine für alle Verkäufer.",
+      "discount_bogo": "BOGO",
+      "discount_fixed": "€{{value}}",
+      "discount_percent": "{{value}}%",
+      "empty": "Keine Gutscheine.",
+      "failed_delete": "Fehler beim Löschen",
+      "failed_load": "Gutscheine konnten nicht geladen werden",
+      "failed_suspend": "Suspendierung fehlgeschlagen",
+      "no_expiry": "-",
+      "page_title": "Händlergutscheine",
+      "status": {
+        "active": "Aktiv",
+        "draft": "Entwurf",
+        "expired": "Abgelaufen",
+        "paused": "Angehalten"
+      },
+      "suspend": "Aussetzen",
+      "suspended": "Coupon ausgesetzt",
+      "table_aria": "Händlergutscheine"
+    }
   },
   "spam": {
     "title": "Spam Detection",
@@ -12885,6 +13106,112 @@
     },
     "validation": {
       "domain_required": "Geben Sie eine Domäne ein"
+    }
+  },
+  "member_premium_admin": {
+    "actions": {
+      "cancel": "Stornieren",
+      "create_tier": "Stufe erstellen",
+      "delete": "Löschen",
+      "edit": "Bearbeiten",
+      "new_tier": "Neue Stufe",
+      "save_changes": "Änderungen speichern",
+      "subscribers": "Abonnenten",
+      "sync_stripe": "Mit Stripe synchronisieren"
+    },
+    "confirm_delete": "Stufe „{{name}}“ löschen? Dies kann nicht rückgängig gemacht werden.",
+    "empty": {
+      "tiers": "Noch keine Stufen. Erstellen Sie oben Ihre erste Premium-Stufe.",
+      "value": "-"
+    },
+    "form": {
+      "description": "Beschreibung",
+      "features": "Funktionstasten (durch Kommas getrennt)",
+      "features_description": "z.B. Verifiziertes_Badge, Priority_Matching, Advanced_Search, Ad_Free",
+      "name": "Name",
+      "price_month": "Preis / Monat",
+      "price_year": "Preis / Jahr",
+      "slug": "Schnecke",
+      "slug_description": "Kleinbuchstaben, Zahlen, Bindestriche/Unterstriche",
+      "sort_order": "Sortierreihenfolge"
+    },
+    "meta": {
+      "description": "Definieren Sie kostenpflichtige Premium-Stufen, die Mitglieder abonnieren können. Jede Stufe schaltet bestimmte Funktionsschlüssel frei.",
+      "title": "Premium-Stufen für Mitglieder"
+    },
+    "modal": {
+      "edit_title": "Stufe bearbeiten",
+      "new_title": "Neue Stufe",
+      "stripe_price_note": "Hinweis: Durch das Ändern der Preise wird das Stripe Price IDs gelöscht. Führen Sie nach dem Speichern „Sync to Stripe“ aus, damit der Checkout wieder funktioniert."
+    },
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "stripe": {
+      "needs_sync": "Synchronisierung erforderlich",
+      "synced": "Synchronisiert"
+    },
+    "subscribers_page": {
+      "all": "Alle",
+      "columns": {
+        "email": "EMAIL",
+        "interval": "INTERVALL",
+        "member": "MITGLIED",
+        "next_billing": "NÄCHSTE RECHNUNG",
+        "started": "GESTARTET",
+        "status": "STATUS",
+        "tier": "STUFE"
+      },
+      "description": "Mitglieder haben derzeit ein Premium-Abonnement.",
+      "empty": "Keine Abonnenten entsprechen dem Filter.",
+      "failed_load": "Abonnenten konnten nicht geladen werden",
+      "interval": {
+        "annual": "Jährlich",
+        "month": "Monat",
+        "monthly": "Monatlich",
+        "year": "Jahr",
+        "yearly": "Jährlich"
+      },
+      "refresh": "Aktualisieren",
+      "status": {
+        "active": "Aktiv",
+        "canceled": "Abgesagt",
+        "incomplete": "Unvollständig",
+        "past_due": "Überfällig",
+        "trialing": "Versuch"
+      },
+      "status_filter": "Statusfilter",
+      "table_aria": "Abonnenten",
+      "title": "Premium-Abonnenten",
+      "total": "{{count}} insgesamt",
+      "user_fallback": "Benutzer #{{id}}"
+    },
+    "table": {
+      "actions": "AKTIONEN",
+      "aria": "Premium-Stufen",
+      "features": "MERKMALE",
+      "name": "NAME",
+      "price_month": "PREIS / MONAT",
+      "price_year": "PREIS / JAHR",
+      "slug": "SCHLECKE",
+      "status": "STATUS",
+      "stripe": "STREIFEN",
+      "subscribers": "ABONNENTEN"
+    },
+    "toasts": {
+      "created": "Stufe erstellt",
+      "delete_failed": "Das Löschen ist fehlgeschlagen",
+      "deleted": "Stufe gelöscht",
+      "load_failed": "Die Ebenen konnten nicht geladen werden",
+      "save_failed": "Speichern fehlgeschlagen",
+      "stripe_sync_failed": "Stripe-Synchronisierung fehlgeschlagen",
+      "synced": "„{{name}}“ mit Stripe synchronisiert",
+      "updated": "Stufe aktualisiert"
+    },
+    "validation": {
+      "slug_format": "Slug muss aus Kleinbuchstaben a–z, 0–9 und Bindestrichen/Unterstrichen bestehen",
+      "slug_name_required": "Slug und Name sind erforderlich"
     }
   }
 }

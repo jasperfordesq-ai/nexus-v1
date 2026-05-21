@@ -8056,7 +8056,9 @@
     "adjust_time_credits": "Adjust Time Credits",
     "apply_adjustment": "Apply Adjustment",
     "back_to_users": "Back to Users",
-    "badges": "Badges",
+    "badges": {
+      "required": "Vereist"
+    },
     "balance_adjusted": "Balance Adjusted",
     "balance_failed": "Balance Failed",
     "balance_invalid": "Balance Invalid",
@@ -8154,7 +8156,191 @@
     "vetting_status": "Vetting Status",
     "welcome_email_failed": "Failed to send welcome email",
     "welcome_email_sent": "Welcome email sent",
-    "withdrawn_on": "Withdrawn on"
+    "withdrawn_on": "Withdrawn on",
+    "actions": {
+      "adjust_balance": "Pas de balans aan",
+      "apply_adjustment": "Aanpassing toepassen",
+      "back_to_users": "Terug naar Gebruikers",
+      "cancel": "Annuleren",
+      "impersonate": "Doe na",
+      "manage": "Beheren",
+      "recheck_badges": "Controleer de badges opnieuw",
+      "remove_badge": "Badge verwijderen",
+      "resend_welcome_email": "Welkomstmail opnieuw verzenden",
+      "return_to_list": "Terug naar lijst",
+      "save_changes": "Wijzigingen opslaan",
+      "send_password_reset": "Wachtwoord opnieuw instellen",
+      "set_password": "Wachtwoord instellen"
+    },
+    "aria": {
+      "remove_badge": "Badge verwijderen: {{name}}",
+      "toggle_global_super_admin": "Schakel globale superbeheerder in",
+      "toggle_municipal_announcer": "Schakel de rol van gemeentelijke omroeper in",
+      "toggle_tenant_super_admin": "Schakel tenant-superbeheerder in of uit"
+    },
+    "consents": {
+      "consented": "Toegestemd",
+      "consented_on": "Toegestemd op",
+      "given": "Toestemming gegeven",
+      "not_consented": "Niet goedgekeurd",
+      "not_given": "Toestemming niet gegeven",
+      "withdrawn_on": "Ingetrokken op"
+    },
+    "descriptions": {
+      "balance_amount": "Gebruik negatieve waarden om tijdskredieten van dit lid af te trekken",
+      "cannot_modify_self": "U kunt uw eigen account niet vanuit dit paneel wijzigen",
+      "global_super_admin": "Verleent volledige toegang aan alle tenants op het platform",
+      "municipal_announcer": "Bij berichten van deze gebruiker wordt een officiële badge weergegeven en bovenaan de feed vastgezet",
+      "tenant_super_admin": "Verleent volledige beheerderstoegang binnen deze tenant"
+    },
+    "empty": {
+      "no_badges": "Geen insignes",
+      "no_consent_records": "Geen toestemmingsregistratie",
+      "no_insurance_records": "Geen verzekeringsgegevens",
+      "no_vetting_records": "Geen controlegegevens"
+    },
+    "errors": {
+      "load_error": "Fout bij laden",
+      "load_unexpected": "Er is een onverwachte fout opgetreden tijdens het laden van deze gebruiker",
+      "user_not_found": "Gebruiker niet gevonden"
+    },
+    "fields": {
+      "amount": "Hoeveelheid",
+      "balance": "Evenwicht",
+      "bio": "Bio",
+      "current_balance": "Huidig ​​saldo",
+      "email": "E-mail",
+      "first_name": "Voornaam",
+      "last_name": "Achternaam",
+      "location": "Locatie",
+      "new_password": "Nieuw wachtwoord",
+      "official_announcement_channel": "Officieel aankondigingskanaal",
+      "organisation_name": "Organisatienaam",
+      "phone": "Telefoon",
+      "platform_wide_access": "Platformbrede toegang",
+      "profile_type": "Profieltype",
+      "reason": "Reden",
+      "role": "Rol",
+      "status": "Status",
+      "tagline": "Slogan",
+      "tenant_super_admin": "Huurder superbeheerder"
+    },
+    "loading": {
+      "compliance": "Naleving laden",
+      "consents": "Toestemmingen laden",
+      "user": "Gebruiker laden"
+    },
+    "meta": {
+      "edit_named": "Bewerk {{name}}",
+      "edit_user": "Gebruiker bewerken",
+      "user_id_joined": "Gebruiker ID en lid"
+    },
+    "modals": {
+      "adjust_balance": {
+        "title": "Pas tijdskredieten aan"
+      },
+      "remove_badge": {
+        "message": "Weet u zeker dat u deze badge van het lid wilt verwijderen?",
+        "title": "Badge verwijderen"
+      },
+      "set_password": {
+        "body": "Stel een nieuw wachtwoord in voor deze gebruiker. Ze worden bij alle sessies uitgelogd.",
+        "title": "Wachtwoord instellen"
+      }
+    },
+    "placeholders": {
+      "balance_amount": "bijv. 2 of -1,5",
+      "balance_reason": "Waarom past u dit saldo aan?",
+      "bio": "Een korte biografie voor deze gebruiker...",
+      "email": "gebruiker@voorbeeld.com",
+      "first_name": "Voer de voornaam in...",
+      "last_name": "Voer achternaam in...",
+      "location": "bijv. New York, VS",
+      "new_password": "Nieuw wachtwoord...",
+      "organisation_name": "Bv gemeenschapscentrum...",
+      "phone": "bijv. +1 555 123 4567",
+      "profile_type": "Selecteer soort...",
+      "role": "Selecteer een rol...",
+      "status": "Selecteer een status...",
+      "tagline": "Bijvoorbeeld gemeenschapsvrijwilliger..."
+    },
+    "profile_types": {
+      "individual": "Individueel",
+      "organisation": "Organisatie"
+    },
+    "roles": {
+      "admin": "Beheerder",
+      "broker": "Makelaar",
+      "member": "Lid",
+      "moderator": "Moderator",
+      "newsletter_admin": "Nieuwsbrief beheerder",
+      "tenant_admin": "Huurder beheerder"
+    },
+    "sections": {
+      "account_actions": "Accountacties",
+      "badges": "Insignes",
+      "gdpr_consents": "GDPR Toestemmingen",
+      "global_super_admin": "Wereldwijde superbeheerder",
+      "insurance_certificates": "Verzekeringscertificaten",
+      "municipal_announcer": "Gemeentelijke Omroeper",
+      "safeguarding": "Beveiliging",
+      "super_admin_access": "Superbeheerderstoegang",
+      "time_credits": "Tijdkredieten",
+      "vetting_status": "Controlestatus"
+    },
+    "statuses": {
+      "active": "Actief",
+      "banned": "Verboden",
+      "pending": "In behandeling",
+      "suspended": "Opgeschort"
+    },
+    "summary": {
+      "more_certificates": "Meer certificaten",
+      "more_records": "Meer records"
+    },
+    "toasts": {
+      "announcer_failed": "Kan de rol van gemeentelijke omroeper niet updaten",
+      "announcer_granted": "Rol gemeentelijk omroeper toegekend",
+      "announcer_revoked": "De rol van gemeentelijke omroeper is ingetrokken",
+      "balance_adjusted": "Saldo aangepast",
+      "balance_failed": "Saldo mislukt",
+      "balance_invalid": "Saldo ongeldig",
+      "generic_error": "Er is een fout opgetreden",
+      "global_super_admin_failed": "Kan de status van de globale hoofdbeheerder niet updaten",
+      "global_super_admin_granted": "Globale superbeheerder toegestaan",
+      "global_super_admin_revoked": "Globale superbeheerder ingetrokken",
+      "impersonate_failed": "Imiteren is mislukt",
+      "impersonate_success": "Succesvol nabootsen",
+      "password_failed": "Wachtwoord mislukt",
+      "password_reset_failed": "Wachtwoord opnieuw instellen mislukt",
+      "password_reset_sent": "E-mail voor wachtwoordherstel verzonden",
+      "password_updated": "Wachtwoord bijgewerkt",
+      "recheck_complete": "Controleer opnieuw Voltooid",
+      "recheck_failed": "Opnieuw controleren mislukt",
+      "remove_badge_failed": "Kan de badge niet verwijderen",
+      "remove_badge_success": "Badge succesvol verwijderen",
+      "tenant_super_admin_failed": "Kan de status van de tenant-superbeheerder niet bijwerken",
+      "tenant_super_admin_granted": "Huurder-superbeheerder toegekend",
+      "tenant_super_admin_revoked": "Superbeheerder van huurder ingetrokken",
+      "update_failed": "Update mislukt",
+      "update_success": "Update succesvol",
+      "welcome_email_failed": "Kan geen welkomstmail verzenden",
+      "welcome_email_sent": "Welkomstmail verzonden"
+    },
+    "validation": {
+      "email_invalid": "E-mail ongeldig",
+      "email_required": "E-mailadres vereist",
+      "first_name_required": "Voornaam is vereist",
+      "last_name_required": "Achternaam is vereist",
+      "password_min": "Wachtwoord moet minimaal 8 tekens lang zijn",
+      "role_required": "Rol vereist",
+      "status_required": "Status vereist"
+    },
+    "values": {
+      "expires_prefix": "- Verloopt",
+      "no_reference": "Geen referentie",
+      "unknown_provider": "Onbekende aanbieder"
+    }
   },
   "users": {
     "action_approve": "Approve",
@@ -8935,7 +9121,42 @@
     "verify_btn": "Verify",
     "verify_seller_message": "This will mark the seller as verified. Continue?",
     "verify_seller_title": "Verify Seller",
-    "view_all": "View All"
+    "view_all": "View All",
+    "coupons": {
+      "columns": {
+        "actions": "Acties",
+        "code": "Code",
+        "discount": "Korting",
+        "seller_id": "Verkoper ID",
+        "status": "Status",
+        "title": "Titel",
+        "uses": "Gebruik",
+        "valid_until": "Geldig tot"
+      },
+      "confirm_delete": "Deze kortingsbon definitief verwijderen? Dit kan niet ongedaan worden gemaakt.",
+      "confirm_suspend": "Deze kortingsbon opschorten?",
+      "delete": "Verwijderen",
+      "deleted": "Bon verwijderd",
+      "description": "Toezicht op door verkopers uitgegeven kortingsbonnen voor alle verkopers.",
+      "discount_bogo": "BOGO",
+      "discount_fixed": "€{{value}}",
+      "discount_percent": "{{value}}%",
+      "empty": "Geen kortingsbonnen.",
+      "failed_delete": "Kan niet verwijderen",
+      "failed_load": "Kan kortingsbonnen niet laden",
+      "failed_suspend": "Opschorten is mislukt",
+      "no_expiry": "-",
+      "page_title": "Koopmanscoupons",
+      "status": {
+        "active": "Actief",
+        "draft": "Voorlopige versie",
+        "expired": "Verlopen",
+        "paused": "Gepauzeerd"
+      },
+      "suspend": "Opschorten",
+      "suspended": "Coupon opgeschort",
+      "table_aria": "Koopmanscoupons"
+    }
   },
   "spam": {
     "title": "Spam Detection",
@@ -12885,6 +13106,112 @@
     },
     "validation": {
       "domain_required": "Voer een domein in"
+    }
+  },
+  "member_premium_admin": {
+    "actions": {
+      "cancel": "Annuleren",
+      "create_tier": "Niveau maken",
+      "delete": "Verwijderen",
+      "edit": "Bewerking",
+      "new_tier": "Nieuw niveau",
+      "save_changes": "Wijzigingen opslaan",
+      "subscribers": "Abonnees",
+      "sync_stripe": "Synchroniseer met Stripe"
+    },
+    "confirm_delete": "Niveau \"{{name}}\" verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "empty": {
+      "tiers": "Nog geen niveaus. Creëer hierboven uw eerste premiumlaag.",
+      "value": "-"
+    },
+    "form": {
+      "description": "Beschrijving",
+      "features": "Functietoetsen (door komma's gescheiden)",
+      "features_description": "bijv. geverifieerde_badge, prioriteitsmatching, geavanceerd zoeken, advertentievrij",
+      "name": "Naam",
+      "price_month": "Prijs / maand",
+      "price_year": "Prijs / jaar",
+      "slug": "Naaktslak",
+      "slug_description": "Kleine letters, cijfers, streepjes/underscores",
+      "sort_order": "Sorteervolgorde"
+    },
+    "meta": {
+      "description": "Definieer betaalde premiumniveaus waarop leden zich kunnen abonneren. Elke laag ontgrendelt specifieke functiesleutels.",
+      "title": "Premiumniveaus voor leden"
+    },
+    "modal": {
+      "edit_title": "Niveau bewerken",
+      "new_title": "Nieuw niveau",
+      "stripe_price_note": "Let op: door prijzen te wijzigen wordt de Stripe Price IDs gewist. Voer na het opslaan 'Synchroniseren met Stripe' uit, zodat het afrekenen weer werkt."
+    },
+    "status": {
+      "active": "Actief",
+      "inactive": "Inactief"
+    },
+    "stripe": {
+      "needs_sync": "Synchronisatie nodig",
+      "synced": "Gesynchroniseerd"
+    },
+    "subscribers_page": {
+      "all": "Alle",
+      "columns": {
+        "email": "EMAIL",
+        "interval": "INTERVAL",
+        "member": "LID",
+        "next_billing": "VOLGENDE FACTUREER",
+        "started": "BEGONNEN",
+        "status": "STATUS",
+        "tier": "LAAG"
+      },
+      "description": "Leden die momenteel zijn geabonneerd op een premiumniveau.",
+      "empty": "Er zijn geen abonnees die aan het filter voldoen.",
+      "failed_load": "Kan abonnees niet laden",
+      "interval": {
+        "annual": "Jaarlijks",
+        "month": "Maand",
+        "monthly": "Maandelijks",
+        "year": "Jaar",
+        "yearly": "Jaarlijks"
+      },
+      "refresh": "Vernieuwen",
+      "status": {
+        "active": "Actief",
+        "canceled": "Geannuleerd",
+        "incomplete": "Onvolledig",
+        "past_due": "Achterstallig",
+        "trialing": "Proeven"
+      },
+      "status_filter": "Statusfilter",
+      "table_aria": "Abonnees",
+      "title": "Premium-abonnees",
+      "total": "{{count}} totaal",
+      "user_fallback": "Gebruiker #{{id}}"
+    },
+    "table": {
+      "actions": "ACTIES",
+      "aria": "Premium-niveaus",
+      "features": "FUNCTIES",
+      "name": "NAAM",
+      "price_month": "PRIJS / MAAND",
+      "price_year": "PRIJS / JAAR",
+      "slug": "NAAKTSLAK",
+      "status": "STATUS",
+      "stripe": "STREEP",
+      "subscribers": "ABONNEES"
+    },
+    "toasts": {
+      "created": "Niveau gemaakt",
+      "delete_failed": "Verwijderen is mislukt",
+      "deleted": "Niveau verwijderd",
+      "load_failed": "Kan lagen niet laden",
+      "save_failed": "Opslaan mislukt",
+      "stripe_sync_failed": "Stripe-synchronisatie mislukt",
+      "synced": "Gesynchroniseerd \"{{name}}\" met Stripe",
+      "updated": "Niveau bijgewerkt"
+    },
+    "validation": {
+      "slug_format": "De slug moet bestaan ​​uit kleine letters a-z, 0-9, streepjes/onderstrepingstekens",
+      "slug_name_required": "Slug en naam zijn vereist"
     }
   }
 }

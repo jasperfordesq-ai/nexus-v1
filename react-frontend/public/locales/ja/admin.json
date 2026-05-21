@@ -8056,7 +8056,9 @@
     "adjust_time_credits": "Adjust Time Credits",
     "apply_adjustment": "Apply Adjustment",
     "back_to_users": "Back to Users",
-    "badges": "Badges",
+    "badges": {
+      "required": "必須"
+    },
     "balance_adjusted": "Balance Adjusted",
     "balance_failed": "Balance Failed",
     "balance_invalid": "Balance Invalid",
@@ -8154,7 +8156,191 @@
     "vetting_status": "Vetting Status",
     "welcome_email_failed": "Failed to send welcome email",
     "welcome_email_sent": "Welcome email sent",
-    "withdrawn_on": "Withdrawn on"
+    "withdrawn_on": "Withdrawn on",
+    "actions": {
+      "adjust_balance": "バランスを調整する",
+      "apply_adjustment": "調整を適用する",
+      "back_to_users": "ユーザーに戻る",
+      "cancel": "キャンセル",
+      "impersonate": "なりすます",
+      "manage": "管理",
+      "recheck_badges": "バッジを再確認する",
+      "remove_badge": "バッジを削除する",
+      "resend_welcome_email": "ウェルカムメールを再送信する",
+      "return_to_list": "リストに戻る",
+      "save_changes": "変更を保存",
+      "send_password_reset": "パスワードリセットを送信",
+      "set_password": "パスワードを設定する"
+    },
+    "aria": {
+      "remove_badge": "バッジを削除: {{name}}",
+      "toggle_global_super_admin": "グローバルスーパー管理者の切り替え",
+      "toggle_municipal_announcer": "市アナウンサーの役割を切り替えます",
+      "toggle_tenant_super_admin": "テナントのスーパー管理者の切り替え"
+    },
+    "consents": {
+      "consented": "同意済み",
+      "consented_on": "に同意しました",
+      "given": "同意あり",
+      "not_consented": "同意されていません",
+      "not_given": "同意が得られませんでした",
+      "withdrawn_on": "撤回日"
+    },
+    "descriptions": {
+      "balance_amount": "このメンバーから時間クレジットを差し引くには、負の値を使用してください",
+      "cannot_modify_self": "このパネルから自分のアカウントを変更することはできません",
+      "global_super_admin": "プラットフォーム上のすべてのテナントにフルアクセスを付与します",
+      "municipal_announcer": "このユーザーによる投稿には公式バッジが表示され、フィードの上部に固定されます",
+      "tenant_super_admin": "このテナント内で完全な管理者アクセスを許可します"
+    },
+    "empty": {
+      "no_badges": "バッジはありません",
+      "no_consent_records": "同意記録がない",
+      "no_insurance_records": "保険記録がない",
+      "no_vetting_records": "審査記録がない"
+    },
+    "errors": {
+      "load_error": "ロードエラー",
+      "load_unexpected": "このユーザーのロード中に予期しないエラーが発生しました",
+      "user_not_found": "ユーザーが見つかりません"
+    },
+    "fields": {
+      "amount": "額",
+      "balance": "バランス",
+      "bio": "バイオ",
+      "current_balance": "現在の残高",
+      "email": "電子メール",
+      "first_name": "ファーストネーム",
+      "last_name": "苗字",
+      "location": "位置",
+      "new_password": "新しいパスワード",
+      "official_announcement_channel": "公式アナウンスチャンネル",
+      "organisation_name": "組織名",
+      "phone": "電話",
+      "platform_wide_access": "プラットフォーム全体のアクセス",
+      "profile_type": "プロファイルの種類",
+      "reason": "理由",
+      "role": "役割",
+      "status": "状態",
+      "tagline": "キャッチフレーズ",
+      "tenant_super_admin": "テナントのスーパー管理者"
+    },
+    "loading": {
+      "compliance": "ロードコンプライアンス",
+      "consents": "同意の読み込み中",
+      "user": "ユーザーをロード中"
+    },
+    "meta": {
+      "edit_named": "{{name}} を編集",
+      "edit_user": "ユーザーの編集",
+      "user_id_joined": "ユーザー ID と参加済み"
+    },
+    "modals": {
+      "adjust_balance": {
+        "title": "時間クレジットを調整する"
+      },
+      "remove_badge": {
+        "message": "このバッジをメンバーから削除してもよろしいですか?",
+        "title": "バッジを削除する"
+      },
+      "set_password": {
+        "body": "このユーザーに新しいパスワードを設定します。すべてのセッションからログアウトされます。",
+        "title": "パスワードを設定する"
+      }
+    },
+    "placeholders": {
+      "balance_amount": "例えば2 または -1.5",
+      "balance_reason": "なぜこのバランスを調整するのでしょうか？",
+      "bio": "このユーザーの簡単な経歴...",
+      "email": "user@example.com",
+      "first_name": "名を入力してください...",
+      "last_name": "姓を入力してください...",
+      "location": "例えば米国ニューヨーク州",
+      "new_password": "新しいパスワード...",
+      "organisation_name": "例：コミュニティセンター...",
+      "phone": "例えば+1 555 123 4567",
+      "profile_type": "タイプを選択...",
+      "role": "役割を選択してください...",
+      "status": "ステータスを選択してください...",
+      "tagline": "例：地域ボランティア..."
+    },
+    "profile_types": {
+      "individual": "個人",
+      "organisation": "組織"
+    },
+    "roles": {
+      "admin": "管理者",
+      "broker": "ブローカ",
+      "member": "メンバー",
+      "moderator": "モデレータ",
+      "newsletter_admin": "ニュースレター管理者",
+      "tenant_admin": "テナント管理者"
+    },
+    "sections": {
+      "account_actions": "アカウントのアクション",
+      "badges": "バッジ",
+      "gdpr_consents": "GDPR 同意",
+      "global_super_admin": "グローバルスーパー管理者",
+      "insurance_certificates": "保険証書",
+      "municipal_announcer": "市営アナウンサー",
+      "safeguarding": "保護",
+      "super_admin_access": "スーパー管理者アクセス",
+      "time_credits": "タイムクレジット",
+      "vetting_status": "審査ステータス"
+    },
+    "statuses": {
+      "active": "アクティブ",
+      "banned": "禁止",
+      "pending": "保留中",
+      "suspended": "一時停止中"
+    },
+    "summary": {
+      "more_certificates": "その他の証明書",
+      "more_records": "さらなる記録"
+    },
+    "toasts": {
+      "announcer_failed": "市政アナウンサーの役割を更新できませんでした",
+      "announcer_granted": "市アナウンサーの役割が付与されました",
+      "announcer_revoked": "市アナウンサーの職を剥奪される",
+      "balance_adjusted": "バランス調整済み",
+      "balance_failed": "バランスに失敗しました",
+      "balance_invalid": "残高が無効です",
+      "generic_error": "発生したエラー",
+      "global_super_admin_failed": "グローバルスーパー管理者のステータスを更新できませんでした",
+      "global_super_admin_granted": "グローバルスーパー管理者が付与されました",
+      "global_super_admin_revoked": "グローバルスーパー管理者が取り消されました",
+      "impersonate_failed": "偽装が失敗しました",
+      "impersonate_success": "正常に偽装する",
+      "password_failed": "パスワードが失敗しました",
+      "password_reset_failed": "パスワードのリセットに失敗しました",
+      "password_reset_sent": "パスワードリセットメールを送信しました",
+      "password_updated": "パスワードが更新されました",
+      "recheck_complete": "再チェック完了",
+      "recheck_failed": "再チェックに失敗しました",
+      "remove_badge_failed": "バッジの削除に失敗しました",
+      "remove_badge_success": "バッジを正常に削除しました",
+      "tenant_super_admin_failed": "テナントのスーパー管理者ステータスを更新できませんでした",
+      "tenant_super_admin_granted": "テナントのスーパー管理者が付与されました",
+      "tenant_super_admin_revoked": "テナントのスーパー管理者が取り消されました",
+      "update_failed": "更新に失敗しました",
+      "update_success": "正常に更新されました",
+      "welcome_email_failed": "ウェルカムメールの送信に失敗しました",
+      "welcome_email_sent": "ウェルカムメールが送信されました"
+    },
+    "validation": {
+      "email_invalid": "メールアドレスが無効です",
+      "email_required": "メールアドレスが必要です",
+      "first_name_required": "名は必須です",
+      "last_name_required": "姓は必須です",
+      "password_min": "パスワードは8文字以上である必要があります",
+      "role_required": "必要な役割",
+      "status_required": "必要なステータス"
+    },
+    "values": {
+      "expires_prefix": "- 有効期限が切れます",
+      "no_reference": "参考文献なし",
+      "unknown_provider": "不明なプロバイダー"
+    }
   },
   "users": {
     "action_approve": "Approve",
@@ -8935,7 +9121,42 @@
     "verify_btn": "Verify",
     "verify_seller_message": "This will mark the seller as verified. Continue?",
     "verify_seller_title": "Verify Seller",
-    "view_all": "View All"
+    "view_all": "View All",
+    "coupons": {
+      "columns": {
+        "actions": "アクション",
+        "code": "コード",
+        "discount": "割引",
+        "seller_id": "販売者 ID",
+        "status": "状態",
+        "title": "タイトル",
+        "uses": "用途",
+        "valid_until": "まで有効"
+      },
+      "confirm_delete": "このクーポンを完全に削除しますか?これを元に戻すことはできません。",
+      "confirm_suspend": "このクーポンを一時停止しますか?",
+      "delete": "消去",
+      "deleted": "クーポンが削除されました",
+      "description": "すべての販売者にわたって販売者が発行した割引クーポンを監視します。",
+      "discount_bogo": "BOGO",
+      "discount_fixed": "€{{value}}",
+      "discount_percent": "{{value}}%",
+      "empty": "クーポンはありません。",
+      "failed_delete": "削除に失敗しました",
+      "failed_load": "クーポンの読み込みに失敗しました",
+      "failed_suspend": "一時停止に失敗しました",
+      "no_expiry": "-",
+      "page_title": "加盟店クーポン",
+      "status": {
+        "active": "アクティブ",
+        "draft": "下書き",
+        "expired": "期限切れ",
+        "paused": "一時停止中"
+      },
+      "suspend": "つるす",
+      "suspended": "クーポン停止中",
+      "table_aria": "加盟店クーポン"
+    }
   },
   "spam": {
     "title": "Spam Detection",
@@ -12885,6 +13106,112 @@
     },
     "validation": {
       "domain_required": "ドメインを入力してください"
+    }
+  },
+  "member_premium_admin": {
+    "actions": {
+      "cancel": "キャンセル",
+      "create_tier": "階層の作成",
+      "delete": "消去",
+      "edit": "編集",
+      "new_tier": "新しい階層",
+      "save_changes": "変更を保存する",
+      "subscribers": "購読者",
+      "sync_stripe": "Stripe に同期"
+    },
+    "confirm_delete": "層「{{name}}」を削除しますか?これを元に戻すことはできません。",
+    "empty": {
+      "tiers": "まだ階層はありません。上記で最初のプレミアム層を作成します。",
+      "value": "-"
+    },
+    "form": {
+      "description": "説明",
+      "features": "機能キー (カンマ区切り)",
+      "features_description": "例えば検証済みバッジ、優先順位マッチング、高度な検索、広告なし",
+      "name": "名前",
+      "price_month": "料金/月",
+      "price_year": "価格/年",
+      "slug": "ナメクジ",
+      "slug_description": "小文字、数字、ダッシュ/アンダースコア",
+      "sort_order": "並べ替え順序"
+    },
+    "meta": {
+      "description": "メンバーが購読できる有料のプレミアム層を定義します。各段階では、特定の機能キーのロックが解除されます。",
+      "title": "メンバーのプレミアム層"
+    },
+    "modal": {
+      "edit_title": "階層の編集",
+      "new_title": "新しい階層",
+      "stripe_price_note": "注: 価格を変更すると、Stripe Price IDs がクリアされます。保存後に「Stripe に同期」を実行すると、チェックアウトが再び機能します。"
+    },
+    "status": {
+      "active": "アクティブ",
+      "inactive": "非アクティブ"
+    },
+    "stripe": {
+      "needs_sync": "同期が必要です",
+      "synced": "同期済み"
+    },
+    "subscribers_page": {
+      "all": "全て",
+      "columns": {
+        "email": "EMAIL",
+        "interval": "間隔",
+        "member": "メンバー",
+        "next_billing": "次回の請求",
+        "started": "開始しました",
+        "status": "状態",
+        "tier": "ティア"
+      },
+      "description": "現在プレミアム層に加入しているメンバー。",
+      "empty": "フィルタに一致する加入者がいません。",
+      "failed_load": "購読者のロードに失敗しました",
+      "interval": {
+        "annual": "年間",
+        "month": "月",
+        "monthly": "毎月",
+        "year": "年",
+        "yearly": "毎年"
+      },
+      "refresh": "リフレッシュ",
+      "status": {
+        "active": "アクティブ",
+        "canceled": "キャンセル",
+        "incomplete": "不完全",
+        "past_due": "期限を過ぎた",
+        "trialing": "トライアル中"
+      },
+      "status_filter": "ステータスフィルター",
+      "table_aria": "購読者",
+      "title": "プレミアム購読者",
+      "total": "{{count}} 合計",
+      "user_fallback": "ユーザー番号{{id}}"
+    },
+    "table": {
+      "actions": "アクション",
+      "aria": "プレミアム層",
+      "features": "特徴",
+      "name": "名前",
+      "price_month": "料金/月",
+      "price_year": "価格/年",
+      "slug": "ナメクジ",
+      "status": "状態",
+      "stripe": "ストライプ",
+      "subscribers": "購読者"
+    },
+    "toasts": {
+      "created": "階層が作成されました",
+      "delete_failed": "削除に失敗しました",
+      "deleted": "階層が削除されました",
+      "load_failed": "層のロードに失敗しました",
+      "save_failed": "保存に失敗しました",
+      "stripe_sync_failed": "Stripe 同期に失敗しました",
+      "synced": "「{{name}}」を Stripe に同期しました",
+      "updated": "階層が更新されました"
+    },
+    "validation": {
+      "slug_format": "スラグは小文字の a ～ z、0 ～ 9、ダッシュ/アンダースコアでなければなりません",
+      "slug_name_required": "スラッグと名前は必須です"
     }
   }
 }
