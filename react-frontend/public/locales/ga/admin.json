@@ -10042,13 +10042,21 @@
   "caring_workflow": {
     "meta": {
       "title": "KISS Workflow Console",
-      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements.",
+      "page_title": "Sreabhadh Oibre Pobail Cúramach"
     },
-    "loading": "Loading KISS workflow data",
+    "loading": {
+      "workflow": "Sreabhadh oibre pobail cúraim á lódáil..."
+    },
     "actions": {
       "open_hour_review": "Open hour review",
       "open_report_pack": "Open report pack",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "retry": "Bain triail eile as",
+      "approve": "Cheadaigh",
+      "decline": "Meath",
+      "escalate": "Ardaigh",
+      "re_escalate": "Athmhéadaigh"
     },
     "stats": {
       "pending_reviews": "Pending reviews",
@@ -10182,7 +10190,11 @@
         "last_90_days": "Last 90 days",
         "year_to_date": "Year to date",
         "previous_quarter": "Previous quarter"
-      }
+      },
+      "review_sla_days_description": "Cuirfear in iúl go bhfuil na huaireanta nach ndéantar athbhreithniú orthu laistigh den iliomad laethanta seo thar téarma sa scuaine.",
+      "escalation_sla_days_description": "Déanfar míreanna thar téarma nár gníomhaíodh laistigh den iliomad laethanta breise seo a ardú go huathoibríoch.",
+      "monthly_statement_day_description": "Lá den mhí ar a ngintear ráitis na mball (m.sh. 1 = 1ú de gach mí).",
+      "default_hour_value_chf_description": "Úsáidtear é chun luach sóisialta measta ar ráitis agus tuarascálacha cathrach a ríomh."
     },
     "member_statement": {
       "title": "Member statements",
@@ -10201,7 +10213,11 @@
       "invalid_member": "Enter a valid member ID.",
       "load_failed": "Failed to load the member statement.",
       "export_success": "Member statement CSV prepared.",
-      "export_failed": "Failed to export the member statement."
+      "export_failed": "Failed to export the member statement.",
+      "approved_support_hours": "Uaireanta tacaíochta ceadaithe",
+      "pending_support_hours": "Uaireanta tacaíochta ar feitheamh",
+      "wallet_hours_earned": "Uaireanta tuillte sparán",
+      "wallet_hours_spent": "Sparán uaireanta caite"
     },
     "support_relationships": {
       "title": "Recurring support relationships",
@@ -10298,13 +10314,277 @@
       "upload_failed": "Could not upload the paper form.",
       "confirmed": "Paper onboarding confirmed and member account created.",
       "confirm_failed": "Could not confirm this paper onboarding intake.",
-      "load_failed": "Could not load paper onboarding intakes."
+      "load_failed": "Could not load paper onboarding intakes.",
+      "upload_success": "Iontógáil páipéir a uaslódáil.",
+      "confirm_success": "Deimhníodh an ball agus cruthaíodh cuntas."
     },
     "invite_card": {
       "brand": "Caring Community",
       "subtitle": "Your Invitation Code",
       "instructions": "Visit the link below or ask your coordinator to help you get started.",
       "valid_until": "Valid until {{date}}"
+    },
+    "empty": {
+      "value": "-",
+      "unassigned": "Neamhshannta"
+    },
+    "pending": {
+      "title": "Léirmheasanna ar Feitheamh",
+      "description_prefix": "Uaireanta ag fanacht ar athbhreithniú agus formheas an chomhordaitheora. Míreanna marcáilte",
+      "description_middle": "gur sháraigh an t-athbhreithniú SLA; míreanna marcáilte",
+      "description_suffix": "gur sháraigh an t-ardú SLA. Ceadaigh nó diúltaigh do gach aighneacht, nó sann do chomhordaitheoir ar leith í.",
+      "needs_review": "Athbhreithniú de dhíth",
+      "escalate_now": "Ardaigh anois",
+      "escalated_count": "Mhéadaigh {{count}}",
+      "overdue_count": "{{count}} thar téarma",
+      "empty": "Ní dhéanfaidh aon ní ar feitheamh. Tá an scuaine athbhreithnithe soiléir.",
+      "logged": "Logáilte {{date}}",
+      "submitted": "Curtha isteach {{date}}",
+      "age_days": "{{count}} lá d'aois",
+      "age_days_plural": "{{count}} lá d'aois",
+      "assigned_to": "Sannta do {{name}}",
+      "escalated_at": "Ardaithe {{date}}",
+      "assign_coordinator": "Sann comhordaitheoir",
+      "assign_success": "Comhordaitheoir sannta.",
+      "assign_failed": "Níorbh fhéidir comhordaitheoir a shannadh.",
+      "manual_escalation_note": "Ardaithe de láimh tar éis laethanta ar feitheamh {{count}}.",
+      "escalate_success": "Méadaíodh an t-athbhreithniú.",
+      "escalate_failed": "Níorbh fhéidir athbhreithniú a ardú.",
+      "approve_success": "Athbhreithniú ceadaithe.",
+      "decline_success": "Diúltaíodh don athbhreithniú.",
+      "decision_failed": "Níorbh fhéidir an cinneadh a thaifeadadh."
+    },
+    "tandem": {
+      "title": "Tandem Moltaí",
+      "description": "AI-péirí tacadóirí-faighteoirí a mholtar bunaithe ar shuíomh, teanga, scileanna agus infhaighteacht.",
+      "empty": "Níl aon mholtaí ann faoi láthair. Cuir tuilleadh ball leis nó coigeartaigh infhaighteacht.",
+      "load_failed": "Níorbh fhéidir moltaí comhuaineach a lódáil.",
+      "dismiss_success": "Díbheadh ​​an moladh.",
+      "dismiss_failed": "Níorbh fhéidir an moladh a dhíbhe.",
+      "relationship_title": "Tandem: {{supporter}} & {{recipient}}",
+      "distance_km": "{{value}} km",
+      "same_language": "Teanga chéanna",
+      "complementary_skills": "Scileanna comhlántacha",
+      "availability_overlap": "Forluí infhaighteachta",
+      "shared_interests": "Leasanna roinnte",
+      "score": "Scór {{value}}%",
+      "dismiss": "Díbhe",
+      "create": "Cruthaigh Tandem"
+    },
+    "safeguarding": {
+      "title": "Tuarascálacha Coimirce",
+      "description": "Ábhair imní a d’ardaigh baill faoi chomhaltaí, faoi chomhordaitheoirí nó faoi eagraíochtaí eile.",
+      "view_all": "Féach ar fad",
+      "no_data": "Níl aon sonraí cosanta ar fáil go fóill.",
+      "overdue": "thar téarma",
+      "no_reports": "Níl aon tuairiscí fós.",
+      "table_aria": "Tuarascálacha cosanta le déanaí",
+      "open": "Oscail",
+      "org_subject": "Eagra?ocht #{{id}}",
+      "age_hours": "{{count}}h",
+      "age_days": "{{count}}D",
+      "columns": {
+        "severity": "Déine",
+        "category": "Catagóir",
+        "subject": "Ábhar",
+        "status": "Stádas",
+        "age": "Aois",
+        "action": "Gníomh"
+      },
+      "severity": {
+        "critical": "Criticiúil",
+        "high": "Ard",
+        "medium": "Meánach",
+        "low": "Íseal"
+      },
+      "status": {
+        "submitted": "Arna chur isteach",
+        "triaged": "Triáiseadh",
+        "investigating": "Ag fiosrú",
+        "resolved": "Réitíodh",
+        "dismissed": "Briseadh as a phost"
+      }
+    },
+    "role_pack": {
+      "title": "Réamhshocruithe róil",
+      "description": "Leagann ceadanna réamhchumraithe le haghaidh gach ról pobail cúraim. Suiteáil an rólphaca iomlán chun do chomhordaitheoirí a shocrú go tapa leis an rochtain cheart. {{countLabel}}.",
+      "installed_count": "{{installed}} de réamhshocruithe ról {{total}} suiteáilte",
+      "available_count": "Réamhshocruithe róil {{count}} ar fáil",
+      "installing": "Suiteáil...",
+      "install": "Suiteáil pacáiste ról",
+      "install_success": "Rólphacáiste suiteáilte.",
+      "install_failed": "Níorbh fhéidir rólphacáiste a shuiteáil.",
+      "installed": "Suiteáilte",
+      "not_installed": "Gan suiteáilte",
+      "permissions_granted": "{{installed}} de cheadanna {{total}} arna dheonú",
+      "presets": {
+        "national_admin": {
+          "title": "Riarachán Náisiúnta",
+          "description": "Maoirseacht ar fud an ardáin ar fud na gcatúin agus na n-eagraíochtaí go léir."
+        },
+        "canton_admin": {
+          "title": "Riarachán Canton",
+          "description": "Gach gníomhaíocht chomhbhách pobail a bhainistiú laistigh de chanton."
+        },
+        "municipality_admin": {
+          "title": "Riarachán Bardasach",
+          "description": "Gníomhaíocht chomhbhách pobail a bhainistiú laistigh de bhardas."
+        },
+        "cooperative_coordinator": {
+          "title": "Comhordaitheoir an Chomharchumainn",
+          "description": "Comharchumann áitiúil agus a chomhaltaí a chomhordú."
+        },
+        "organisation_coordinator": {
+          "title": "Comhordaitheoir Eagraíochta",
+          "description": "Saorálaithe agus comhpháirtithe a chomhordú d’eagraíocht amháin."
+        },
+        "trusted_reviewer": {
+          "title": "Athbhreithneoir Iontaofa",
+          "description": "Faomhadh uaireanta go tapa le maoirseacht éadrom-dteagmháil."
+        }
+      }
+    },
+    "favours": {
+      "title": "Fabhar Neamhfhoirmiúil",
+      "loading": "Á lódáil...",
+      "total_recorded": "Iomlán {{count}} taifeadta",
+      "loading_favours": "Fabhar á lódáil...",
+      "empty": "Níor taifeadadh aon fhabhar fós.",
+      "anonymous": "Gan ainm",
+      "unknown": "Anaithnid"
+    },
+    "invite_codes": {
+      "title": "Cóid Cuireadh",
+      "description": "Gin cód inphriontáilte is féidir le ball nua a úsáid chun páirt a ghlacadh gan cuireadh ríomhphoist a bheith ag teastáil.",
+      "label": "Lipéad (roghnach)",
+      "label_placeholder": "e.g. Do chomharsa Mháire",
+      "generate": "Gin Cód",
+      "new_code": "Cód cuireadh nua",
+      "expires": "In éag: {{date}}",
+      "copied": "Cóipeáladh!",
+      "copy_url": "Cóipeáil URL",
+      "print_card": "Cárta Priontála",
+      "open": "Oscail",
+      "table_aria": "Cóid cuireadh",
+      "empty": "Níl aon chóid cuireadh ann fós. Gin ceann thuas le roinnt le ball ionchasach.",
+      "load_failed": "Níorbh fhéidir cóid cuireadh a lódáil.",
+      "generate_success": "Cód cuireadh ginte.",
+      "generate_failed": "Níorbh fhéidir cód cuirí a ghiniúint.",
+      "columns": {
+        "code": "Cód",
+        "label": "Lipéad",
+        "expires": "In éag",
+        "status": "Stádas",
+        "actions": "Gníomhartha"
+      },
+      "status": {
+        "active": "Gníomhach",
+        "used": "Úsáidte",
+        "used_by": "Arna úsáid ag {{name}}",
+        "expired": "imithe in éag"
+      }
+    },
+    "predictive": {
+      "title": "Léargais Thuarthacha",
+      "subtitle": "Réamhaisnéisí réamhbhreathnaitheacha agus foláirimh réamhghníomhacha. Breathnaigh ar easnaimh chúraim réigiúnacha sula n-éiríonn siad éigeandálaí.",
+      "not_enough_activity": "Níl go leor gníomhaíochta fós le réamhaisnéis. Tar ar ais i gceann cúpla seachtain.",
+      "no_forecast": "Níl aon sonraí réamhaisnéise ar fáil go fóill.",
+      "hours_forecast": "Réamhaisnéis na n-uaireanta",
+      "active_members": "Baill ghníomhacha",
+      "recipients_reached": "Faighteoirí bainte amach",
+      "history": "Stair",
+      "forecast": "Réamhaisnéis",
+      "confidence": "Muinín",
+      "trend_growing": "{{value}}% ag fás",
+      "trend_declining": "Laghdú {{value}}%",
+      "trend_stable": "Cobhsaí",
+      "sub_region_coverage": "Clúdach fo-réigiún (na laethanta {{days}} deiridh)",
+      "under_supplied_count": "{{count}} tearcsholáthar",
+      "sub_region_coverage_aria": "Clúdach fo-réigiún",
+      "helper_churn": "Chuinneog chúntóra (curtha i léig >= laethanta {{days}})",
+      "overall_percent": "{{value}}% ar an iomlán",
+      "helper_churn_note": "{{lapsed}} ó {{prior}} Níor logáil cúntóirí a bhí gníomhach roimhe seo uaireanta le déanaí.",
+      "helper_churn_aria": "Cúntóir churn de réir catagóire",
+      "coefficient_drift": "Drift chomhéifeacht chatagóir",
+      "drifting_count": "{{count}} ag sruth",
+      "coefficient_drift_note": "Catagóirí le sruth iomlán > {{threshold}}% atá bratach. Déan athbhreithniú ar chomhéifeachtaí bonnlíne san eagarthóir comhéifeacht chatagóir.",
+      "coefficient_drift_aria": "Drift chomhéifeacht chatagóir",
+      "proactive_alerts": "Foláirimh réamhghníomhacha",
+      "columns": {
+        "sub_region": "Fo-réigiún",
+        "requested_90d": "Iarrtha (90d)",
+        "fulfilled_90d": "Comhlíonta (90d)",
+        "coverage": "Clúdach",
+        "status": "Stádas",
+        "category": "Catagóir",
+        "prior_active": "Réamhghníomhach",
+        "lapsed": "imithe i léig",
+        "churn_rate": "Ráta cúinne",
+        "baseline": "Bunlíne",
+        "expected_hrs": "Uaireanta ionchais",
+        "observed_hrs": "Breathnaíodh uaireanta",
+        "drift": "Sruthán",
+        "sample": "Sampla"
+      },
+      "status": {
+        "under_supplied": "Gannsoláthar",
+        "ok": "ceart go leor"
+      },
+      "severity": {
+        "critical": "Criticiúil",
+        "warning": "Rabhadh",
+        "info": "Eolas"
+      }
+    },
+    "relationships": {
+      "title": "Caidrimh tacaíochta",
+      "description": "Péirí tacaíochta-faighteoirí leanúnacha agus seiceálacha athfhillteacha.",
+      "active": "Gníomhach",
+      "paused": "Sos",
+      "check_ins_due": "Seiceálacha isteach dlite",
+      "expected_hours": "Uaireanta ionchais",
+      "supporter": "Tacadóir",
+      "supporter_placeholder": "Cuardaigh an tacadóir",
+      "recipient": "Faighteoir",
+      "recipient_placeholder": "Cuardaigh an faighteoir",
+      "no_members": "Níor aimsíodh aon bhall",
+      "clear": "Glan",
+      "relationship_title": "Teideal an chaidrimh",
+      "frequency_label": "Minicíocht",
+      "expected_hours_per_visit": "Uaireanta ionchais in aghaidh na cuairte",
+      "start_date": "Dáta tosaithe",
+      "create": "Cruthaigh caidreamh",
+      "empty": "Níl caidreamh tacaíochta ar bith fós. Cruthaigh ceann thuas.",
+      "pair": "{{supporter}} ag tacú le {{recipient}}",
+      "started": "Thosaigh {{date}}",
+      "next_check_in": "An chéad seiceáil isteach eile {{date}}",
+      "pause": "Sos",
+      "resume": "Atosaigh",
+      "log_date": "Dáta",
+      "log_hours": "Uaireanta",
+      "log_note": "Nóta (roghnach)",
+      "log_hours_action": "Uaireanta logáil",
+      "load_failed": "Níorbh fhéidir caidreamh tacaíochta a luchtú.",
+      "pick_different_members": "Roghnaigh beirt bhall éagsúla.",
+      "create_success": "Cruthaíodh caidreamh tacaíochta.",
+      "create_failed": "Níorbh fhéidir caidreamh tacaíochta a chruthú.",
+      "update_success": "Nuashonraíodh an caidreamh tacaíochta.",
+      "update_failed": "Níorbh fhéidir an caidreamh tacaíochta a nuashonrú.",
+      "log_validation_failed": "Cuir isteach dáta bailí agus uaireanta 0.25-24.",
+      "log_success": "Uaireanta tacaíochta logáilte.",
+      "log_failed": "Níorbh fhéidir uaireanta tacaíochta a logáil.",
+      "frequency": {
+        "weekly": "Seachtainiúil",
+        "fortnightly": "coicís",
+        "monthly": "go míosúil",
+        "ad_hoc": "Ad hoc"
+      },
+      "status": {
+        "active": "Gníomhach",
+        "paused": "Sos",
+        "completed": "Críochnaithe",
+        "cancelled": "Ar ceal"
+      }
     }
   },
   "municipal_reports": {

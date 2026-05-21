@@ -10042,13 +10042,21 @@
   "caring_workflow": {
     "meta": {
       "title": "KISS Workflow Console",
-      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements.",
+      "page_title": "Fürsorglicher Community-Workflow"
     },
-    "loading": "Loading KISS workflow data",
+    "loading": {
+      "workflow": "Lade den Caring-Community-Workflow..."
+    },
     "actions": {
       "open_hour_review": "Open hour review",
       "open_report_pack": "Open report pack",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "retry": "Wiederholen",
+      "approve": "Genehmigen",
+      "decline": "Abfall",
+      "escalate": "Eskalieren",
+      "re_escalate": "Erneut eskalieren"
     },
     "stats": {
       "pending_reviews": "Pending reviews",
@@ -10182,7 +10190,11 @@
         "last_90_days": "Last 90 days",
         "year_to_date": "Year to date",
         "previous_quarter": "Previous quarter"
-      }
+      },
+      "review_sla_days_description": "Stunden, die innerhalb dieser Anzahl von Tagen nicht überprüft wurden, werden in der Warteschlange als überfällig gekennzeichnet.",
+      "escalation_sla_days_description": "Überfällige Posten, die innerhalb dieser zusätzlichen Tage nicht bearbeitet werden, werden automatisch eskaliert.",
+      "monthly_statement_day_description": "Tag des Monats, an dem Mitgliedsabrechnungen erstellt werden (z. B. 1 = 1. jedes Monats).",
+      "default_hour_value_chf_description": "Wird zur Berechnung des geschätzten sozialen Werts von Kontoauszügen und Gemeindeberichten verwendet."
     },
     "member_statement": {
       "title": "Member statements",
@@ -10201,7 +10213,11 @@
       "invalid_member": "Enter a valid member ID.",
       "load_failed": "Failed to load the member statement.",
       "export_success": "Member statement CSV prepared.",
-      "export_failed": "Failed to export the member statement."
+      "export_failed": "Failed to export the member statement.",
+      "approved_support_hours": "Genehmigte Supportzeiten",
+      "pending_support_hours": "Ausstehende Supportzeiten",
+      "wallet_hours_earned": "Verdiente Wallet-Stunden",
+      "wallet_hours_spent": "Verbrachte Stunden im Portemonnaie"
     },
     "support_relationships": {
       "title": "Recurring support relationships",
@@ -10298,13 +10314,277 @@
       "upload_failed": "Could not upload the paper form.",
       "confirmed": "Paper onboarding confirmed and member account created.",
       "confirm_failed": "Could not confirm this paper onboarding intake.",
-      "load_failed": "Could not load paper onboarding intakes."
+      "load_failed": "Could not load paper onboarding intakes.",
+      "upload_success": "Papieraufnahme hochgeladen.",
+      "confirm_success": "Mitglied bestätigt und Konto erstellt."
     },
     "invite_card": {
       "brand": "Caring Community",
       "subtitle": "Your Invitation Code",
       "instructions": "Visit the link below or ask your coordinator to help you get started.",
       "valid_until": "Valid until {{date}}"
+    },
+    "empty": {
+      "value": "-",
+      "unassigned": "Nicht zugewiesen"
+    },
+    "pending": {
+      "title": "Ausstehende Bewertungen",
+      "description_prefix": "Stunden warten auf die Überprüfung und Genehmigung durch den Koordinator. Artikel markiert",
+      "description_middle": "haben die Überprüfung SLA überschritten; Artikel markiert",
+      "description_suffix": "haben die Eskalation SLA überschritten. Genehmigen oder lehnen Sie jede Einreichung ab oder weisen Sie sie einem bestimmten Koordinator zu.",
+      "needs_review": "Muss überprüft werden",
+      "escalate_now": "Jetzt eskalieren",
+      "escalated_count": "{{count}} eskaliert",
+      "overdue_count": "{{count}} überfällig",
+      "empty": "Nichts ausstehend. Die Bewertungswarteschlange ist leer.",
+      "logged": "Protokolliertes {{date}}",
+      "submitted": "{{date}} übermittelt",
+      "age_days": "{{count}} Tag alt",
+      "age_days_plural": "{{count}} Tage alt",
+      "assigned_to": "Zugewiesen an {{name}}",
+      "escalated_at": "{{date}} eskaliert",
+      "assign_coordinator": "Koordinator benennen",
+      "assign_success": "Koordinator zugewiesen.",
+      "assign_failed": "Koordinator konnte nicht zugewiesen werden.",
+      "manual_escalation_note": "Manuell eskaliert nach {{count}} ausstehenden Tagen.",
+      "escalate_success": "Die Rezension eskalierte.",
+      "escalate_failed": "Die Bewertung konnte nicht eskaliert werden.",
+      "approve_success": "Rezension genehmigt.",
+      "decline_success": "Rezension abgelehnt.",
+      "decision_failed": "Entscheidung konnte nicht aufgezeichnet werden."
+    },
+    "tandem": {
+      "title": "Tandem-Vorschläge",
+      "description": "Von AI vorgeschlagene Unterstützer-Empfänger-Paare basierend auf Standort, Sprache, Fähigkeiten und Verfügbarkeit.",
+      "empty": "Im Moment keine Vorschläge. Fügen Sie weitere Mitglieder hinzu oder passen Sie die Verfügbarkeit an.",
+      "load_failed": "Tandemvorschläge konnten nicht geladen werden.",
+      "dismiss_success": "Vorschlag abgelehnt.",
+      "dismiss_failed": "Vorschlag konnte nicht abgelehnt werden.",
+      "relationship_title": "Tandem: {{supporter}} & {{recipient}}",
+      "distance_km": "{{value}} km",
+      "same_language": "Gleiche Sprache",
+      "complementary_skills": "Komplementäre Fähigkeiten",
+      "availability_overlap": "Überlappung der Verfügbarkeit",
+      "shared_interests": "Gemeinsame Interessen",
+      "score": "Ergebnis {{value}}%",
+      "dismiss": "Zurückweisen",
+      "create": "Erstellen Sie Tandem"
+    },
+    "safeguarding": {
+      "title": "Schutzberichte",
+      "description": "Von Mitgliedern geäußerte Bedenken gegenüber anderen Mitgliedern, Koordinatoren oder Organisationen.",
+      "view_all": "Alle anzeigen",
+      "no_data": "Es liegen noch keine Schutzdaten vor.",
+      "overdue": "Überfällig",
+      "no_reports": "Noch keine Berichte.",
+      "table_aria": "Aktuelle Schutzberichte",
+      "open": "Offen",
+      "org_subject": "Organisation #{{id}}",
+      "age_hours": "{{count}}h",
+      "age_days": "{{count}}d",
+      "columns": {
+        "severity": "Schwere",
+        "category": "Kategorie",
+        "subject": "Thema",
+        "status": "Status",
+        "age": "Alter",
+        "action": "Aktion"
+      },
+      "severity": {
+        "critical": "Kritisch",
+        "high": "Hoch",
+        "medium": "Medium",
+        "low": "Niedrig"
+      },
+      "status": {
+        "submitted": "Eingereicht",
+        "triaged": "Triagiert",
+        "investigating": "Untersuchen",
+        "resolved": "Gelöst",
+        "dismissed": "Entlassen"
+      }
+    },
+    "role_pack": {
+      "title": "Rollenvoreinstellungen",
+      "description": "Vorkonfigurierte Berechtigungssätze für jede Caring-Community-Rolle. Installieren Sie das vollständige Rollenpaket, um Ihren Koordinatoren schnell den richtigen Zugriff einzurichten. {{countLabel}}.",
+      "installed_count": "{{installed}} der {{total}}-Rollenvoreinstellungen installiert",
+      "available_count": "{{count}}-Rollenvoreinstellungen verfügbar",
+      "installing": "Installieren...",
+      "install": "Rollenpaket installieren",
+      "install_success": "Rollenpaket installiert.",
+      "install_failed": "Das Rollenpaket konnte nicht installiert werden.",
+      "installed": "Installiert",
+      "not_installed": "Nicht installiert",
+      "permissions_granted": "{{installed}} von {{total}}-Berechtigungen erteilt",
+      "presets": {
+        "national_admin": {
+          "title": "Nationale Verwaltung",
+          "description": "Plattformweite Aufsicht über alle Kantone und Organisationen hinweg."
+        },
+        "canton_admin": {
+          "title": "Kantonsverwaltung",
+          "description": "Verwalten Sie alle gemeinnützigen Aktivitäten innerhalb eines Kantons."
+        },
+        "municipality_admin": {
+          "title": "Gemeindeverwaltung",
+          "description": "Verwalten Sie fürsorgliche Gemeinschaftsaktivitäten innerhalb einer Gemeinde."
+        },
+        "cooperative_coordinator": {
+          "title": "Kooperativer Koordinator",
+          "description": "Koordinieren Sie eine lokale Genossenschaft und ihre Mitglieder."
+        },
+        "organisation_coordinator": {
+          "title": "Organisationskoordinator",
+          "description": "Koordinieren Sie Freiwillige und Partner für eine Organisation."
+        },
+        "trusted_reviewer": {
+          "title": "Vertrauenswürdiger Rezensent",
+          "description": "Genehmigen Sie Stunden schnell mit einfacher Aufsicht."
+        }
+      }
+    },
+    "favours": {
+      "title": "Informelle Gefälligkeiten",
+      "loading": "Laden...",
+      "total_recorded": "{{count}} insgesamt aufgezeichnet",
+      "loading_favours": "Gefälligkeiten werden geladen...",
+      "empty": "Es wurden noch keine Gefälligkeiten erfasst.",
+      "anonymous": "Anonym",
+      "unknown": "Unbekannt"
+    },
+    "invite_codes": {
+      "title": "Einladungscodes",
+      "description": "Generieren Sie einen ausdruckbaren Code, mit dem ein neues Mitglied beitreten kann, ohne dass eine E-Mail-Einladung erforderlich ist.",
+      "label": "Etikett (optional)",
+      "label_placeholder": "z.B. Für Marys Nachbarin",
+      "generate": "Code generieren",
+      "new_code": "Neuer Einladungscode",
+      "expires": "Läuft ab: {{date}}",
+      "copied": "Kopiert!",
+      "copy_url": "Kopieren Sie URL",
+      "print_card": "Karte drucken",
+      "open": "Offen",
+      "table_aria": "Einladungscodes",
+      "empty": "Noch keine Einladungscodes. Erstellen Sie oben eines, um es mit einem potenziellen Mitglied zu teilen.",
+      "load_failed": "Einladungscodes konnten nicht geladen werden.",
+      "generate_success": "Einladungscode generiert.",
+      "generate_failed": "Der Einladungscode konnte nicht generiert werden.",
+      "columns": {
+        "code": "Code",
+        "label": "Etikett",
+        "expires": "Läuft ab",
+        "status": "Status",
+        "actions": "Aktionen"
+      },
+      "status": {
+        "active": "Aktiv",
+        "used": "Gebraucht",
+        "used_by": "Wird von {{name}} verwendet",
+        "expired": "Abgelaufen"
+      }
+    },
+    "predictive": {
+      "title": "Prädiktive Erkenntnisse",
+      "subtitle": "Vorausschauende Prognosen und proaktive Warnungen. Erkennen Sie regionale Versorgungsdefizite, bevor sie zu Notfällen werden.",
+      "not_enough_activity": "Noch nicht genügend Aktivität, um eine Vorhersage zu treffen. Kommen Sie in ein paar Wochen wieder.",
+      "no_forecast": "Noch keine Prognosedaten verfügbar.",
+      "hours_forecast": "Stundenprognose",
+      "active_members": "Aktive Mitglieder",
+      "recipients_reached": "Empfänger erreicht",
+      "history": "Geschichte",
+      "forecast": "Vorhersage",
+      "confidence": "Vertrauen",
+      "trend_growing": "{{value}} % wächst",
+      "trend_declining": "{{value}} % sinkt",
+      "trend_stable": "Stabil",
+      "sub_region_coverage": "Abdeckung der Unterregion (letzte {{days}}-Tage)",
+      "under_supplied_count": "{{count}} nicht ausreichend bereitgestellt",
+      "sub_region_coverage_aria": "Abdeckung der Teilregion",
+      "helper_churn": "Helferabwanderung (verstrichen >= {{days}} Tage)",
+      "overall_percent": "{{value}} % insgesamt",
+      "helper_churn_note": "{{lapsed}} von {{prior}} zuvor aktiven Helfern haben in letzter Zeit keine Stunden protokolliert.",
+      "helper_churn_aria": "Helferabwanderung nach Kategorie",
+      "coefficient_drift": "Drift der Kategoriekoeffizienten",
+      "drifting_count": "{{count}} driftet",
+      "coefficient_drift_note": "Kategorien mit absoluter Drift > {{threshold}}% werden markiert. Überprüfen Sie die Basiskoeffizienten im Kategorienkoeffizienteneditor.",
+      "coefficient_drift_aria": "Drift der Kategoriekoeffizienten",
+      "proactive_alerts": "Proaktive Warnungen",
+      "columns": {
+        "sub_region": "Unterregion",
+        "requested_90d": "Angefordert (90 Tage)",
+        "fulfilled_90d": "Erfüllt (90 Tage)",
+        "coverage": "Abdeckung",
+        "status": "Status",
+        "category": "Kategorie",
+        "prior_active": "Vorher aktiv",
+        "lapsed": "Verfallen",
+        "churn_rate": "Abwanderungsrate",
+        "baseline": "Grundlinie",
+        "expected_hrs": "Voraussichtliche Stunden",
+        "observed_hrs": "Beobachtete Stunden",
+        "drift": "Drift",
+        "sample": "Probe"
+      },
+      "status": {
+        "under_supplied": "Unterversorgt",
+        "ok": "OK"
+      },
+      "severity": {
+        "critical": "Kritisch",
+        "warning": "Warnung",
+        "info": "Info"
+      }
+    },
+    "relationships": {
+      "title": "Unterstützen Sie Beziehungen",
+      "description": "Laufende Unterstützer-Empfänger-Paare und wiederkehrende Check-ins.",
+      "active": "Aktiv",
+      "paused": "Angehalten",
+      "check_ins_due": "Check-ins fällig",
+      "expected_hours": "Erwartete Stunden",
+      "supporter": "Fan",
+      "supporter_placeholder": "Suchen Sie nach dem Unterstützer",
+      "recipient": "Empfänger",
+      "recipient_placeholder": "Suchen Sie nach dem Empfänger",
+      "no_members": "Keine Mitglieder gefunden",
+      "clear": "Klar",
+      "relationship_title": "Beziehungstitel",
+      "frequency_label": "Frequenz",
+      "expected_hours_per_visit": "Erwartete Stunden pro Besuch",
+      "start_date": "Startdatum",
+      "create": "Beziehung herstellen",
+      "empty": "Noch keine Supportbeziehungen. Erstellen Sie oben eines.",
+      "pair": "{{supporter}} unterstützt {{recipient}}",
+      "started": "{{date}} gestartet",
+      "next_check_in": "Nächster Check-in {{date}}",
+      "pause": "Pause",
+      "resume": "Wieder aufnehmen",
+      "log_date": "Datum",
+      "log_hours": "Std",
+      "log_note": "Hinweis (optional)",
+      "log_hours_action": "Protokollieren Sie die Stunden",
+      "load_failed": "Supportbeziehungen konnten nicht geladen werden.",
+      "pick_different_members": "Wählen Sie zwei verschiedene Mitglieder aus.",
+      "create_success": "Support-Beziehung erstellt.",
+      "create_failed": "Die Supportbeziehung konnte nicht erstellt werden.",
+      "update_success": "Support-Beziehung aktualisiert.",
+      "update_failed": "Die Supportbeziehung konnte nicht aktualisiert werden.",
+      "log_validation_failed": "Geben Sie ein gültiges Datum und 0.25-24 Stunden ein.",
+      "log_success": "Support-Stunden protokolliert.",
+      "log_failed": "Support-Stunden konnten nicht protokolliert werden.",
+      "frequency": {
+        "weekly": "Wöchentlich",
+        "fortnightly": "Alle zwei Wochen",
+        "monthly": "Monatlich",
+        "ad_hoc": "Ad hoc"
+      },
+      "status": {
+        "active": "Aktiv",
+        "paused": "Angehalten",
+        "completed": "Vollendet",
+        "cancelled": "Abgesagt"
+      }
     }
   },
   "municipal_reports": {

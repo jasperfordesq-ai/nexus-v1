@@ -10042,13 +10042,21 @@
   "caring_workflow": {
     "meta": {
       "title": "KISS Workflow Console",
-      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements.",
+      "page_title": "سير عمل مجتمع الرعاية"
     },
-    "loading": "Loading KISS workflow data",
+    "loading": {
+      "workflow": "جارٍ تحميل سير عمل مجتمع الرعاية..."
+    },
     "actions": {
       "open_hour_review": "Open hour review",
       "open_report_pack": "Open report pack",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "retry": "أعد المحاولة",
+      "approve": "يعتمد",
+      "decline": "انخفاض",
+      "escalate": "تصعيد",
+      "re_escalate": "إعادة التصعيد"
     },
     "stats": {
       "pending_reviews": "Pending reviews",
@@ -10182,7 +10190,11 @@
         "last_90_days": "Last 90 days",
         "year_to_date": "Year to date",
         "previous_quarter": "Previous quarter"
-      }
+      },
+      "review_sla_days_description": "سيتم وضع علامة على الساعات التي لم تتم مراجعتها خلال هذه الأيام العديدة على أنها متأخرة في قائمة الانتظار.",
+      "escalation_sla_days_description": "سيتم تصعيد العناصر المتأخرة التي لم يتم اتخاذ إجراء بشأنها خلال هذه الأيام الإضافية العديدة تلقائيًا.",
+      "monthly_statement_day_description": "يوم الشهر الذي يتم فيه إنشاء كشوفات الأعضاء (على سبيل المثال، 1 = اليوم الأول من كل شهر).",
+      "default_hour_value_chf_description": "يستخدم لحساب القيمة الاجتماعية المقدرة على البيانات والتقارير البلدية."
     },
     "member_statement": {
       "title": "Member statements",
@@ -10201,7 +10213,11 @@
       "invalid_member": "Enter a valid member ID.",
       "load_failed": "Failed to load the member statement.",
       "export_success": "Member statement CSV prepared.",
-      "export_failed": "Failed to export the member statement."
+      "export_failed": "Failed to export the member statement.",
+      "approved_support_hours": "ساعات الدعم المعتمدة",
+      "pending_support_hours": "ساعات الدعم المعلقة",
+      "wallet_hours_earned": "ساعات المحفظة المكتسبة",
+      "wallet_hours_spent": "ساعات المحفظة التي قضاها"
     },
     "support_relationships": {
       "title": "Recurring support relationships",
@@ -10298,13 +10314,277 @@
       "upload_failed": "Could not upload the paper form.",
       "confirmed": "Paper onboarding confirmed and member account created.",
       "confirm_failed": "Could not confirm this paper onboarding intake.",
-      "load_failed": "Could not load paper onboarding intakes."
+      "load_failed": "Could not load paper onboarding intakes.",
+      "upload_success": "تم تحميل كمية الورق.",
+      "confirm_success": "تم تأكيد العضو وإنشاء الحساب."
     },
     "invite_card": {
       "brand": "Caring Community",
       "subtitle": "Your Invitation Code",
       "instructions": "Visit the link below or ask your coordinator to help you get started.",
       "valid_until": "Valid until {{date}}"
+    },
+    "empty": {
+      "value": "-",
+      "unassigned": "غير معين"
+    },
+    "pending": {
+      "title": "المراجعات المعلقة",
+      "description_prefix": "ساعات في انتظار مراجعة المنسق والموافقة عليه. العناصر التي تم وضع علامة عليها",
+      "description_middle": "لقد تجاوزت المراجعة SLA؛ تم وضع علامة على العناصر",
+      "description_suffix": "لقد تجاوزت التصعيد SLA. الموافقة على كل طلب أو رفضه أو إسناده إلى منسق محدد.",
+      "needs_review": "يحتاج إلى مراجعة",
+      "escalate_now": "تصعيد الآن",
+      "escalated_count": "تم تصعيد {{count}}",
+      "overdue_count": "{{count}} متأخر",
+      "empty": "لا شيء معلق. قائمة انتظار المراجعة واضحة.",
+      "logged": "تم تسجيل {{date}}",
+      "submitted": "تم إرسال {{date}}",
+      "age_days": "{{count}} عمره يوم",
+      "age_days_plural": "{{count}} عمرها أيام",
+      "assigned_to": "تم تعيينه إلى {{name}}",
+      "escalated_at": "تم تصعيد {{date}}",
+      "assign_coordinator": "تعيين منسق",
+      "assign_success": "تم تعيين المنسق.",
+      "assign_failed": "لا يمكن تعيين المنسق.",
+      "manual_escalation_note": "تم التصعيد يدويًا بعد أيام {{count}} المعلقة.",
+      "escalate_success": "تم تصعيد المراجعة.",
+      "escalate_failed": "تعذر تصعيد المراجعة.",
+      "approve_success": "تمت الموافقة على المراجعة.",
+      "decline_success": "تم رفض المراجعة.",
+      "decision_failed": "لا يمكن تسجيل القرار."
+    },
+    "tandem": {
+      "title": "اقتراحات Tandem",
+      "description": "AI أزواج الداعم والمتلقي المقترحة بناءً على الموقع واللغة والمهارات والتوافر.",
+      "empty": "لا توجد اقتراحات في الوقت الراهن. أضف المزيد من الأعضاء أو اضبط مدى التوفر.",
+      "load_failed": "تعذر تحميل الاقتراحات الترادفية.",
+      "dismiss_success": "تم رفض الاقتراح.",
+      "dismiss_failed": "تعذر رفض الاقتراح.",
+      "relationship_title": "Tandem: {{supporter}} و{{recipient}}",
+      "distance_km": "{{value}} كم",
+      "same_language": "نفس اللغة",
+      "complementary_skills": "مهارات تكميلية",
+      "availability_overlap": "تداخل التوفر",
+      "shared_interests": "المصالح المشتركة",
+      "score": "النتيجة {{value}}%",
+      "dismiss": "رفض",
+      "create": "قم بإنشاء Tandem"
+    },
+    "safeguarding": {
+      "title": "تقارير الحماية",
+      "description": "المخاوف التي أثارها الأعضاء بشأن الأعضاء أو المنسقين أو المنظمات الأخرى.",
+      "view_all": "عرض الكل",
+      "no_data": "لا توجد بيانات حماية متاحة حتى الآن.",
+      "overdue": "تأخرت",
+      "no_reports": "لا توجد تقارير حتى الآن.",
+      "table_aria": "تقارير الحماية الأخيرة",
+      "open": "يفتح",
+      "org_subject": "????? #{{id}}",
+      "age_hours": "{{count}}h",
+      "age_days": "{{count}}d",
+      "columns": {
+        "severity": "خطورة",
+        "category": "فئة",
+        "subject": "موضوع",
+        "status": "حالة",
+        "age": "عمر",
+        "action": "فعل"
+      },
+      "severity": {
+        "critical": "شديد الأهمية",
+        "high": "عالي",
+        "medium": "واسطة",
+        "low": "قليل"
+      },
+      "status": {
+        "submitted": "مُقَدَّم",
+        "triaged": "فرز",
+        "investigating": "التحقيق",
+        "resolved": "تم الحل",
+        "dismissed": "مرفوض"
+      }
+    },
+    "role_pack": {
+      "title": "الإعدادات المسبقة للدور",
+      "description": "مجموعات الأذونات التي تم تكوينها مسبقًا لكل دور مجتمع رعاية. قم بتثبيت حزمة الأدوار الكاملة لإعداد منسقيك بسرعة مع الوصول الصحيح. {{countLabel}}.",
+      "installed_count": "تم تثبيت الإعدادات المسبقة لدور {{installed}} لـ {{total}}",
+      "available_count": "تتوفر الإعدادات المسبقة لدور {{count}}",
+      "installing": "جارٍ التثبيت...",
+      "install": "تثبيت حزمة الدور",
+      "install_success": "تم تثبيت حزمة الدور.",
+      "install_failed": "تعذر تثبيت حزمة الأدوار.",
+      "installed": "تم التثبيت",
+      "not_installed": "غير مثبت",
+      "permissions_granted": "تم منح أذونات {{installed}} لـ {{total}}",
+      "presets": {
+        "national_admin": {
+          "title": "المشرف الوطني",
+          "description": "الإشراف على مستوى المنصة في جميع الكانتونات والمنظمات."
+        },
+        "canton_admin": {
+          "title": "مدير الكانتون",
+          "description": "إدارة جميع أنشطة مجتمع الرعاية داخل الكانتون."
+        },
+        "municipality_admin": {
+          "title": "مدير البلدية",
+          "description": "إدارة نشاط مجتمع الرعاية داخل البلدية."
+        },
+        "cooperative_coordinator": {
+          "title": "منسق التعاونية",
+          "description": "التنسيق بين التعاونية المحلية وأعضائها."
+        },
+        "organisation_coordinator": {
+          "title": "منسق المنظمة",
+          "description": "تنسيق المتطوعين والشركاء لمنظمة واحدة."
+        },
+        "trusted_reviewer": {
+          "title": "مراجع موثوق",
+          "description": "قم بالموافقة على ساعات العمل بسرعة من خلال الإشراف الخفيف."
+        }
+      }
+    },
+    "favours": {
+      "title": "تفضل غير رسمية",
+      "loading": "تحميل...",
+      "total_recorded": "تم تسجيل إجمالي {{count}}",
+      "loading_favours": "جارٍ تحميل المزايا...",
+      "empty": "لم يتم تسجيل أي تفضل حتى الآن.",
+      "anonymous": "مجهول",
+      "unknown": "مجهول"
+    },
+    "invite_codes": {
+      "title": "رموز الدعوة",
+      "description": "قم بإنشاء رمز قابل للطباعة يمكن للعضو الجديد استخدامه للانضمام دون الحاجة إلى دعوة عبر البريد الإلكتروني.",
+      "label": "التسمية (اختياري)",
+      "label_placeholder": "على سبيل المثال لجارة مريم",
+      "generate": "إنشاء رمز",
+      "new_code": "كود الدعوة الجديد",
+      "expires": "تنتهي الصلاحية: {{date}}",
+      "copied": "منسوخ!",
+      "copy_url": "انسخ URL",
+      "print_card": "طباعة البطاقة",
+      "open": "يفتح",
+      "table_aria": "رموز الدعوة",
+      "empty": "لا توجد رموز دعوة حتى الآن. قم بإنشاء واحد أعلاه لمشاركته مع عضو محتمل.",
+      "load_failed": "تعذر تحميل رموز الدعوة.",
+      "generate_success": "تم إنشاء رمز الدعوة.",
+      "generate_failed": "تعذر إنشاء رمز الدعوة.",
+      "columns": {
+        "code": "شفرة",
+        "label": "ملصق",
+        "expires": "تنتهي",
+        "status": "حالة",
+        "actions": "الإجراءات"
+      },
+      "status": {
+        "active": "نشيط",
+        "used": "مستخدم",
+        "used_by": "يستخدم بواسطة {{name}}",
+        "expired": "منتهي الصلاحية"
+      }
+    },
+    "predictive": {
+      "title": "رؤى تنبؤية",
+      "subtitle": "توقعات تطلعية وتنبيهات استباقية. اكتشف أوجه القصور في الرعاية الإقليمية قبل أن تصبح حالات طوارئ.",
+      "not_enough_activity": "لا يوجد نشاط كافٍ حتى الآن للتنبؤ به. أعود في غضون بضعة أسابيع.",
+      "no_forecast": "لا توجد بيانات توقعات متاحة حتى الآن.",
+      "hours_forecast": "توقعات ساعات",
+      "active_members": "الأعضاء النشطين",
+      "recipients_reached": "وصلت المستلمين",
+      "history": "تاريخ",
+      "forecast": "تنبؤ بالمناخ",
+      "confidence": "ثقة",
+      "trend_growing": "نمو {{value}}%",
+      "trend_declining": "انخفاض {{value}}%",
+      "trend_stable": "مستقر",
+      "sub_region_coverage": "تغطية المنطقة الفرعية (آخر {{days}} أيام)",
+      "under_supplied_count": "{{count}} غير متوفر",
+      "sub_region_coverage_aria": "تغطية المنطقة الفرعية",
+      "helper_churn": "التغيير المساعد (منقضي >= {{days}} من الأيام)",
+      "overall_percent": "{{value}}% بشكل عام",
+      "helper_churn_note": "{{lapsed}} من {{prior}} المساعدون النشطون سابقًا لم يسجلوا ساعات العمل مؤخرًا.",
+      "helper_churn_aria": "مساعد بعنف حسب الفئة",
+      "coefficient_drift": "معامل الفئة الانجراف",
+      "drifting_count": "{{count}} الانجراف",
+      "coefficient_drift_note": "يتم وضع علامة على الفئات ذات الانجراف المطلق > {{threshold}}%. قم بمراجعة المعاملات الأساسية في محرر معاملات الفئة.",
+      "coefficient_drift_aria": "معامل الفئة الانجراف",
+      "proactive_alerts": "تنبيهات استباقية",
+      "columns": {
+        "sub_region": "المنطقة الفرعية",
+        "requested_90d": "مطلوب (90د)",
+        "fulfilled_90d": "مستوفاة (90 د)",
+        "coverage": "التغطية",
+        "status": "حالة",
+        "category": "فئة",
+        "prior_active": "نشط مسبقًا",
+        "lapsed": "انقضت",
+        "churn_rate": "معدل الزبد",
+        "baseline": "خط الأساس",
+        "expected_hrs": "الساعات المتوقعة",
+        "observed_hrs": "ساعات ملاحظه",
+        "drift": "الانجراف",
+        "sample": "عينة"
+      },
+      "status": {
+        "under_supplied": "نقص المعروض",
+        "ok": "نعم"
+      },
+      "severity": {
+        "critical": "شديد الأهمية",
+        "warning": "تحذير",
+        "info": "معلومات"
+      }
+    },
+    "relationships": {
+      "title": "دعم العلاقات",
+      "description": "أزواج الداعمين والمتلقين المستمرة وعمليات تسجيل الوصول المتكررة.",
+      "active": "نشيط",
+      "paused": "متوقف مؤقتًا",
+      "check_ins_due": "تسجيلات الوصول مستحقة",
+      "expected_hours": "الساعات المتوقعة",
+      "supporter": "مؤيد",
+      "supporter_placeholder": "ابحث عن الداعم",
+      "recipient": "متلقي",
+      "recipient_placeholder": "ابحث عن المستلم",
+      "no_members": "لم يتم العثور على أعضاء",
+      "clear": "واضح",
+      "relationship_title": "عنوان العلاقة",
+      "frequency_label": "تكرار",
+      "expected_hours_per_visit": "الساعات المتوقعة لكل زيارة",
+      "start_date": "تاريخ البدء",
+      "create": "إنشاء علاقة",
+      "empty": "لا توجد علاقات دعم حتى الآن. إنشاء واحد أعلاه.",
+      "pair": "{{supporter}} يدعم {{recipient}}",
+      "started": "تم بدء تشغيل {{date}}",
+      "next_check_in": "تسجيل الوصول التالي {{date}}",
+      "pause": "يوقف",
+      "resume": "سيرة ذاتية",
+      "log_date": "تاريخ",
+      "log_hours": "ساعات",
+      "log_note": "ملاحظة (اختياري)",
+      "log_hours_action": "ساعات السجل",
+      "load_failed": "تعذر تحميل علاقات الدعم.",
+      "pick_different_members": "اختر عضوين مختلفين.",
+      "create_success": "تم إنشاء علاقة دعم.",
+      "create_failed": "لا يمكن إنشاء علاقة دعم.",
+      "update_success": "تم تحديث علاقة الدعم.",
+      "update_failed": "لا يمكن تحديث علاقة الدعم.",
+      "log_validation_failed": "أدخل تاريخًا صالحًا و0.25-24 ساعة.",
+      "log_success": "تم تسجيل ساعات الدعم.",
+      "log_failed": "لا يمكن تسجيل ساعات الدعم.",
+      "frequency": {
+        "weekly": "أسبوعي",
+        "fortnightly": "كل أسبوعين",
+        "monthly": "شهريا",
+        "ad_hoc": "مخصصة"
+      },
+      "status": {
+        "active": "نشيط",
+        "paused": "متوقف مؤقتًا",
+        "completed": "مكتمل",
+        "cancelled": "تم الإلغاء"
+      }
     }
   },
   "municipal_reports": {

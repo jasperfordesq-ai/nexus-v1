@@ -10042,13 +10042,21 @@
   "caring_workflow": {
     "meta": {
       "title": "KISS Workflow Console",
-      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements.",
+      "page_title": "Zorgzame gemeenschapsworkflow"
     },
-    "loading": "Loading KISS workflow data",
+    "loading": {
+      "workflow": "Zorgzame community-workflow laden..."
+    },
     "actions": {
       "open_hour_review": "Open hour review",
       "open_report_pack": "Open report pack",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "retry": "Opnieuw proberen",
+      "approve": "Goedkeuren",
+      "decline": "Afwijzen",
+      "escalate": "Escaleren",
+      "re_escalate": "Opnieuw escaleren"
     },
     "stats": {
       "pending_reviews": "Pending reviews",
@@ -10182,7 +10190,11 @@
         "last_90_days": "Last 90 days",
         "year_to_date": "Year to date",
         "previous_quarter": "Previous quarter"
-      }
+      },
+      "review_sla_days_description": "Uren die binnen dit aantal dagen niet zijn beoordeeld, worden als te laat in de wachtrij gemarkeerd.",
+      "escalation_sla_days_description": "Achterstallige items die niet binnen dit aantal extra dagen worden afgehandeld, worden automatisch geëscaleerd.",
+      "monthly_statement_day_description": "Dag van de maand waarop ledenoverzichten worden gegenereerd (bijvoorbeeld 1 = 1e van elke maand).",
+      "default_hour_value_chf_description": "Wordt gebruikt voor het berekenen van de geschatte maatschappelijke waarde op opgaven en gemeentelijke rapporten."
     },
     "member_statement": {
       "title": "Member statements",
@@ -10201,7 +10213,11 @@
       "invalid_member": "Enter a valid member ID.",
       "load_failed": "Failed to load the member statement.",
       "export_success": "Member statement CSV prepared.",
-      "export_failed": "Failed to export the member statement."
+      "export_failed": "Failed to export the member statement.",
+      "approved_support_hours": "Goedgekeurde ondersteuningsuren",
+      "pending_support_hours": "Ondersteuningsuren in behandeling",
+      "wallet_hours_earned": "Verdiende portemonnee-uren",
+      "wallet_hours_spent": "Bestede portemonnee-uren"
     },
     "support_relationships": {
       "title": "Recurring support relationships",
@@ -10298,13 +10314,277 @@
       "upload_failed": "Could not upload the paper form.",
       "confirmed": "Paper onboarding confirmed and member account created.",
       "confirm_failed": "Could not confirm this paper onboarding intake.",
-      "load_failed": "Could not load paper onboarding intakes."
+      "load_failed": "Could not load paper onboarding intakes.",
+      "upload_success": "Papierinvoer geüpload.",
+      "confirm_success": "Lid bevestigd en account aangemaakt."
     },
     "invite_card": {
       "brand": "Caring Community",
       "subtitle": "Your Invitation Code",
       "instructions": "Visit the link below or ask your coordinator to help you get started.",
       "valid_until": "Valid until {{date}}"
+    },
+    "empty": {
+      "value": "-",
+      "unassigned": "Niet toegewezen"
+    },
+    "pending": {
+      "title": "In afwachting van beoordelingen",
+      "description_prefix": "Uren in afwachting van beoordeling en goedkeuring van de coördinator. Artikelen gemarkeerd",
+      "description_middle": "hebben de beoordeling SLA overtroffen; artikelen gemarkeerd",
+      "description_suffix": "hebben de escalatie SLA overschreden. Keur elke inzending goed of af, of wijs deze toe aan een specifieke coördinator.",
+      "needs_review": "Moet worden beoordeeld",
+      "escalate_now": "Escaleer nu",
+      "escalated_count": "{{count}} geëscaleerd",
+      "overdue_count": "{{count}} te laat",
+      "empty": "Niets in behandeling. De beoordelingswachtrij is duidelijk.",
+      "logged": "{{date}} geregistreerd",
+      "submitted": "{{date}} ingediend",
+      "age_days": "{{count}} dag oud",
+      "age_days_plural": "{{count}} dagen oud",
+      "assigned_to": "Toegewezen aan {{name}}",
+      "escalated_at": "{{date}} geëscaleerd",
+      "assign_coordinator": "Coördinator aanstellen",
+      "assign_success": "Coördinator toegewezen.",
+      "assign_failed": "Kan coördinator niet toewijzen.",
+      "manual_escalation_note": "Handmatig geëscaleerd na dagen in behandeling met {{count}}.",
+      "escalate_success": "Beoordeling geëscaleerd.",
+      "escalate_failed": "Kan de beoordeling niet escaleren.",
+      "approve_success": "Beoordeling goedgekeurd.",
+      "decline_success": "Beoordeling afgewezen.",
+      "decision_failed": "Kan beslissing niet opnemen."
+    },
+    "tandem": {
+      "title": "Tandem-suggesties",
+      "description": "AI-voorgestelde supporter-ontvangerparen op basis van locatie, taal, vaardigheden en beschikbaarheid.",
+      "empty": "Er zijn momenteel geen suggesties. Voeg meer leden toe of pas de beschikbaarheid aan.",
+      "load_failed": "Kan tandemsuggesties niet laden.",
+      "dismiss_success": "Suggestie afgewezen.",
+      "dismiss_failed": "Kan suggestie niet afwijzen.",
+      "relationship_title": "Tandem: {{supporter}} & {{recipient}}",
+      "distance_km": "{{value}} km",
+      "same_language": "Dezelfde taal",
+      "complementary_skills": "Complementaire vaardigheden",
+      "availability_overlap": "Beschikbaarheid overlapt",
+      "shared_interests": "Gedeelde interesses",
+      "score": "Score {{value}}%",
+      "dismiss": "Afwijzen",
+      "create": "Maak Tandem aan"
+    },
+    "safeguarding": {
+      "title": "Beveiligingsrapporten",
+      "description": "Door leden geuite zorgen over andere leden, coördinatoren of organisaties.",
+      "view_all": "Bekijk alles",
+      "no_data": "Er zijn nog geen beveiligingsgegevens beschikbaar.",
+      "overdue": "Verlopen",
+      "no_reports": "Nog geen rapporten.",
+      "table_aria": "Recente beveiligingsrapporten",
+      "open": "Open",
+      "org_subject": "Organisatie #{{id}}",
+      "age_hours": "{{count}}h",
+      "age_days": "{{count}}d",
+      "columns": {
+        "severity": "Ernst",
+        "category": "Categorie",
+        "subject": "Onderwerp",
+        "status": "Status",
+        "age": "Leeftijd",
+        "action": "Actie"
+      },
+      "severity": {
+        "critical": "Kritisch",
+        "high": "Hoog",
+        "medium": "Medium",
+        "low": "Laag"
+      },
+      "status": {
+        "submitted": "Ingediend",
+        "triaged": "Triaged",
+        "investigating": "Onderzoeken",
+        "resolved": "Opgelost",
+        "dismissed": "Afgewezen"
+      }
+    },
+    "role_pack": {
+      "title": "Voorinstellingen voor rollen",
+      "description": "Vooraf geconfigureerde machtigingensets voor elke zorgzame gemeenschapsrol. Installeer het volledige rollenpakket om uw coördinatoren snel de juiste toegang te geven. {{countLabel}}.",
+      "installed_count": "{{installed}} van {{total}} rolvoorinstellingen geïnstalleerd",
+      "available_count": "{{count}} rolvoorinstellingen beschikbaar",
+      "installing": "Installeren...",
+      "install": "Rolpakket installeren",
+      "install_success": "Rolpakket geïnstalleerd.",
+      "install_failed": "Kan rolpakket niet installeren.",
+      "installed": "Geïnstalleerd",
+      "not_installed": "Niet geïnstalleerd",
+      "permissions_granted": "{{installed}} van {{total}}-machtigingen verleend",
+      "presets": {
+        "national_admin": {
+          "title": "Nationale admin",
+          "description": "Platformbreed toezicht over alle kantons en organisaties."
+        },
+        "canton_admin": {
+          "title": "Kanton beheerder",
+          "description": "Beheer alle zorgzame gemeenschapsactiviteiten binnen een kanton."
+        },
+        "municipality_admin": {
+          "title": "Gemeente administr",
+          "description": "Beheer zorgzame gemeenschapsactiviteiten binnen een gemeente."
+        },
+        "cooperative_coordinator": {
+          "title": "Coöperatie Coördinator",
+          "description": "Coördineren van een lokale coöperatie en haar leden."
+        },
+        "organisation_coordinator": {
+          "title": "Organisatie Coördinator",
+          "description": "Coördineer vrijwilligers en partners voor één organisatie."
+        },
+        "trusted_reviewer": {
+          "title": "Vertrouwde recensent",
+          "description": "Keur uren snel goed met eenvoudig overzicht."
+        }
+      }
+    },
+    "favours": {
+      "title": "Informele gunsten",
+      "loading": "Laden...",
+      "total_recorded": "{{count}} totaal geregistreerd",
+      "loading_favours": "Gunsten laden...",
+      "empty": "Er zijn nog geen gunsten geregistreerd.",
+      "anonymous": "Anoniem",
+      "unknown": "Onbekend"
+    },
+    "invite_codes": {
+      "title": "Uitnodigingscodes",
+      "description": "Genereer een afdrukbare code die een nieuw lid kan gebruiken om lid te worden zonder dat hij een e-mailuitnodiging nodig heeft.",
+      "label": "Etiket (optioneel)",
+      "label_placeholder": "bijv. Voor de buurvrouw van Maria",
+      "generate": "Code genereren",
+      "new_code": "Nieuwe uitnodigingscode",
+      "expires": "Verloopt: {{date}}",
+      "copied": "Gekopieerd!",
+      "copy_url": "Kopieer URL",
+      "print_card": "Kaart afdrukken",
+      "open": "Open",
+      "table_aria": "Uitnodigingscodes",
+      "empty": "Nog geen uitnodigingscodes. Genereer er hierboven één om te delen met een toekomstig lid.",
+      "load_failed": "Kan uitnodigingscodes niet laden.",
+      "generate_success": "Uitnodigingscode gegenereerd.",
+      "generate_failed": "Kan uitnodigingscode niet genereren.",
+      "columns": {
+        "code": "Code",
+        "label": "Label",
+        "expires": "Verloopt",
+        "status": "Status",
+        "actions": "Acties"
+      },
+      "status": {
+        "active": "Actief",
+        "used": "Gebruikt",
+        "used_by": "Gebruikt door {{name}}",
+        "expired": "Verlopen"
+      }
+    },
+    "predictive": {
+      "title": "Voorspellende inzichten",
+      "subtitle": "Toekomstgerichte voorspellingen en proactieve waarschuwingen. Spoor regionale zorgtekorten op voordat ze een noodsituatie worden.",
+      "not_enough_activity": "Nog niet genoeg activiteit om te voorspellen. Kom over een paar weken terug.",
+      "no_forecast": "Er zijn nog geen prognosegegevens beschikbaar.",
+      "hours_forecast": "Uur voorspelling",
+      "active_members": "Actieve leden",
+      "recipients_reached": "Ontvangers bereikt",
+      "history": "Geschiedenis",
+      "forecast": "Voorspelling",
+      "confidence": "Vertrouwen",
+      "trend_growing": "Groeiende {{value}}%",
+      "trend_declining": "Dalende {{value}}%",
+      "trend_stable": "Stabiel",
+      "sub_region_coverage": "Subregiodekking (laatste {{days}}-dagen)",
+      "under_supplied_count": "{{count}} onvoldoende geleverd",
+      "sub_region_coverage_aria": "Subregiodekking",
+      "helper_churn": "Helperchurn (verstreken >= {{days}} dagen)",
+      "overall_percent": "{{value}}% in totaal",
+      "helper_churn_note": "{{lapsed}} van {{prior}} eerder actieve helpers hebben de laatste tijd geen uren geregistreerd.",
+      "helper_churn_aria": "Helperverloop per categorie",
+      "coefficient_drift": "Categoriecoëfficiëntafwijking",
+      "drifting_count": "{{count}} drijft af",
+      "coefficient_drift_note": "Categorieën met absolute afwijking > {{threshold}}% zijn gemarkeerd. Bekijk de basislijncoëfficiënten in de categoriecoëfficiënteditor.",
+      "coefficient_drift_aria": "Categoriecoëfficiëntafwijking",
+      "proactive_alerts": "Proactieve waarschuwingen",
+      "columns": {
+        "sub_region": "Subregio",
+        "requested_90d": "Aangevraagd (90d)",
+        "fulfilled_90d": "Vervuld (90d)",
+        "coverage": "Dekking",
+        "status": "Status",
+        "category": "Categorie",
+        "prior_active": "Eerder actief",
+        "lapsed": "Vervallen",
+        "churn_rate": "Verlooppercentage",
+        "baseline": "Basislijn",
+        "expected_hrs": "Verwachte uren",
+        "observed_hrs": "Waargenomen uur",
+        "drift": "Drift",
+        "sample": "Steekproef"
+      },
+      "status": {
+        "under_supplied": "Te weinig geleverd",
+        "ok": "OK"
+      },
+      "severity": {
+        "critical": "Kritisch",
+        "warning": "Waarschuwing",
+        "info": "Info"
+      }
+    },
+    "relationships": {
+      "title": "Ondersteun relaties",
+      "description": "Doorlopende supporter-ontvangerparen en terugkerende check-ins.",
+      "active": "Actief",
+      "paused": "Gepauzeerd",
+      "check_ins_due": "Inchecken is vereist",
+      "expected_hours": "Verwachte uren",
+      "supporter": "Supporter",
+      "supporter_placeholder": "Zoek de ondersteuner",
+      "recipient": "Ontvanger",
+      "recipient_placeholder": "Zoek de ontvanger",
+      "no_members": "Geen leden gevonden",
+      "clear": "Duidelijk",
+      "relationship_title": "Titel van de relatie",
+      "frequency_label": "Frequentie",
+      "expected_hours_per_visit": "Verwachte uren per bezoek",
+      "start_date": "Startdatum",
+      "create": "Creëer een relatie",
+      "empty": "Nog geen ondersteuningsrelaties. Maak er hierboven één aan.",
+      "pair": "{{supporter}} ondersteunt {{recipient}}",
+      "started": "{{date}} gestart",
+      "next_check_in": "Volgende check-in {{date}}",
+      "pause": "Pauze",
+      "resume": "Cv",
+      "log_date": "Datum",
+      "log_hours": "Uur",
+      "log_note": "Opmerking (optioneel)",
+      "log_hours_action": "Uren registreren",
+      "load_failed": "Kan ondersteuningsrelaties niet laden.",
+      "pick_different_members": "Kies twee verschillende leden.",
+      "create_success": "Ondersteuningsrelatie gecreëerd.",
+      "create_failed": "Kan geen ondersteuningsrelatie maken.",
+      "update_success": "Ondersteuningsrelatie bijgewerkt.",
+      "update_failed": "Kan ondersteuningsrelatie niet updaten.",
+      "log_validation_failed": "Voer een geldige datum en 0.25-24 uren in.",
+      "log_success": "Ondersteuningsuren geregistreerd.",
+      "log_failed": "Kan ondersteuningsuren niet registreren.",
+      "frequency": {
+        "weekly": "Wekelijks",
+        "fortnightly": "Tweewekelijks",
+        "monthly": "Maandelijks",
+        "ad_hoc": "Ad-hoc"
+      },
+      "status": {
+        "active": "Actief",
+        "paused": "Gepauzeerd",
+        "completed": "Voltooid",
+        "cancelled": "Geannuleerd"
+      }
     }
   },
   "municipal_reports": {

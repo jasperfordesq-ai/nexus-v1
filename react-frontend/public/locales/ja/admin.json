@@ -10042,13 +10042,21 @@
   "caring_workflow": {
     "meta": {
       "title": "KISS Workflow Console",
-      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements.",
+      "page_title": "思いやりのあるコミュニティのワークフロー"
     },
-    "loading": "Loading KISS workflow data",
+    "loading": {
+      "workflow": "思いやりのあるコミュニティのワークフローを読み込んでいます..."
+    },
     "actions": {
       "open_hour_review": "Open hour review",
       "open_report_pack": "Open report pack",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "retry": "リトライ",
+      "approve": "承認する",
+      "decline": "衰退",
+      "escalate": "エスカレート",
+      "re_escalate": "再エスカレーション"
     },
     "stats": {
       "pending_reviews": "Pending reviews",
@@ -10182,7 +10190,11 @@
         "last_90_days": "Last 90 days",
         "year_to_date": "Year to date",
         "previous_quarter": "Previous quarter"
-      }
+      },
+      "review_sla_days_description": "この日数以内にレビューされなかった時間には、キュー内で期限超過としてフラグが立てられます。",
+      "escalation_sla_days_description": "この追加日数以内に対応されなかった期限を過ぎた項目は、自動的にエスカレーションされます。",
+      "monthly_statement_day_description": "メンバーステートメントが生成される月の日 (例: 1 = 毎月 1 日)。",
+      "default_hour_value_chf_description": "ステートメントや自治体の報告書の社会的価値の推定値を計算するために使用されます。"
     },
     "member_statement": {
       "title": "Member statements",
@@ -10201,7 +10213,11 @@
       "invalid_member": "Enter a valid member ID.",
       "load_failed": "Failed to load the member statement.",
       "export_success": "Member statement CSV prepared.",
-      "export_failed": "Failed to export the member statement."
+      "export_failed": "Failed to export the member statement.",
+      "approved_support_hours": "承認されたサポート時間",
+      "pending_support_hours": "保留中のサポート時間",
+      "wallet_hours_earned": "ウォレットで獲得した時間数",
+      "wallet_hours_spent": "ウォレットに費やした時間数"
     },
     "support_relationships": {
       "title": "Recurring support relationships",
@@ -10298,13 +10314,277 @@
       "upload_failed": "Could not upload the paper form.",
       "confirmed": "Paper onboarding confirmed and member account created.",
       "confirm_failed": "Could not confirm this paper onboarding intake.",
-      "load_failed": "Could not load paper onboarding intakes."
+      "load_failed": "Could not load paper onboarding intakes.",
+      "upload_success": "紙の摂取量をアップロードしました。",
+      "confirm_success": "メンバーが確認され、アカウントが作成されました。"
     },
     "invite_card": {
       "brand": "Caring Community",
       "subtitle": "Your Invitation Code",
       "instructions": "Visit the link below or ask your coordinator to help you get started.",
       "valid_until": "Valid until {{date}}"
+    },
+    "empty": {
+      "value": "-",
+      "unassigned": "未割り当て"
+    },
+    "pending": {
+      "title": "保留中のレビュー",
+      "description_prefix": "コーディネーターのレビューと承認を待つ時間。マークのある項目",
+      "description_middle": "???? SLA ?????????????????????",
+      "description_suffix": "エスカレーション SLA を超えています。各提出物を承認または拒否するか、特定のコーディネーターに割り当てます。",
+      "needs_review": "見直しが必要",
+      "escalate_now": "今すぐエスカレーションしてください",
+      "escalated_count": "{{count}} がエスカレーションされました",
+      "overdue_count": "{{count}} 期限切れ",
+      "empty": "保留中のものはありません。レビューのキューは空になっています。",
+      "logged": "記録された {{date}}",
+      "submitted": "{{date}}を提出しました",
+      "age_days": "{{count}} 1 日目",
+      "age_days_plural": "{{count}} 日前",
+      "assigned_to": "{{name}} に割り当てられました",
+      "escalated_at": "エスカレートされた {{date}}",
+      "assign_coordinator": "コーディネーターの割り当て",
+      "assign_success": "コーディネーターが割り当てられました。",
+      "assign_failed": "コーディネーターを割り当てることができませんでした。",
+      "manual_escalation_note": "{{count}} の保留日数が経過した後、手動でエスカレーションされました。",
+      "escalate_success": "レビューがエスカレートしました。",
+      "escalate_failed": "レビューをエスカレーションできませんでした。",
+      "approve_success": "レビューが承認されました。",
+      "decline_success": "レビューは拒否されました。",
+      "decision_failed": "決定を記録できませんでした。"
+    },
+    "tandem": {
+      "title": "Tandem の提案",
+      "description": "??????????????????? AI ????????????????????",
+      "empty": "現在提案はありません。さらにメンバーを追加するか、空き状況を調整します。",
+      "load_failed": "タンデムの提案を読み込めませんでした。",
+      "dismiss_success": "提案は却下されました。",
+      "dismiss_failed": "提案を却下できませんでした。",
+      "relationship_title": "Tandem: {{supporter}} ? {{recipient}}",
+      "distance_km": "{{value}} km",
+      "same_language": "同じ言語",
+      "complementary_skills": "補完的なスキル",
+      "availability_overlap": "可用性の重複",
+      "shared_interests": "共通の興味",
+      "score": "スコア {{value}}%",
+      "dismiss": "却下する",
+      "create": "Tandem ???"
+    },
+    "safeguarding": {
+      "title": "レポートの保護",
+      "description": "メンバーが他のメンバー、コーディネーター、または組織に関して提起した懸念。",
+      "view_all": "すべて見る",
+      "no_data": "利用可能な保護データはまだありません。",
+      "overdue": "期限を過ぎました",
+      "no_reports": "まだ報告はありません。",
+      "table_aria": "最近の安全対策レポート",
+      "open": "開ける",
+      "org_subject": "?? #{{id}}",
+      "age_hours": "{{count}}h",
+      "age_days": "{{count}}?",
+      "columns": {
+        "severity": "重大度",
+        "category": "カテゴリ",
+        "subject": "主題",
+        "status": "状態",
+        "age": "年",
+        "action": "アクション"
+      },
+      "severity": {
+        "critical": "致命的",
+        "high": "高い",
+        "medium": "中くらい",
+        "low": "低い"
+      },
+      "status": {
+        "submitted": "提出済み",
+        "triaged": "トリアージ",
+        "investigating": "調査中",
+        "resolved": "解決済み",
+        "dismissed": "解雇されました"
+      }
+    },
+    "role_pack": {
+      "title": "役割のプリセット",
+      "description": "??????????????????????????????????????????????????????????????????????????????{{countLabel}}?",
+      "installed_count": "{{total}} ロール プリセットの {{installed}} がインストールされました",
+      "available_count": "{{count}} ???????????????",
+      "installing": "インストール中...",
+      "install": "役割パックをインストールする",
+      "install_success": "ロールパックがインストールされました。",
+      "install_failed": "役割パックをインストールできませんでした。",
+      "installed": "インストール済み",
+      "not_installed": "インストールされていません",
+      "permissions_granted": "{{total}} 権限のうち {{installed}} 権限が付与されました",
+      "presets": {
+        "national_admin": {
+          "title": "国家管理者",
+          "description": "すべての州および組織にわたるプラットフォーム全体の監視。"
+        },
+        "canton_admin": {
+          "title": "カントン管理者",
+          "description": "カントン内のすべての思いやりのあるコミュニティ活動を管理します。"
+        },
+        "municipality_admin": {
+          "title": "自治体の管理者",
+          "description": "自治体内で思いやりのあるコミュニティ活動を管理します。"
+        },
+        "cooperative_coordinator": {
+          "title": "協力コーディネーター",
+          "description": "地元の協同組合とそのメンバーを調整します。"
+        },
+        "organisation_coordinator": {
+          "title": "組織コーディネーター",
+          "description": "1 つの組織のボランティアとパートナーを調整します。"
+        },
+        "trusted_reviewer": {
+          "title": "信頼できるレビュアー",
+          "description": "軽いタッチで監視しながら時間をすばやく承認します。"
+        }
+      }
+    },
+    "favours": {
+      "title": "非公式の好意",
+      "loading": "読み込み中...",
+      "total_recorded": "?? {{count}} ?????",
+      "loading_favours": "好意を読み込んでいます...",
+      "empty": "まだ好意は記録されていません。",
+      "anonymous": "匿名",
+      "unknown": "未知"
+    },
+    "invite_codes": {
+      "title": "招待コード",
+      "description": "新しいメンバーが電子メールの招待状を必要とせずに参加するために使用できる、印刷可能なコードを生成します。",
+      "label": "ラベル (オプション)",
+      "label_placeholder": "例えばメアリーの隣人のために",
+      "generate": "コードの生成",
+      "new_code": "新しい招待コード",
+      "expires": "有効期限: {{date}}",
+      "copied": "コピーしました！",
+      "copy_url": "URLをコピーする",
+      "print_card": "プリントカード",
+      "open": "開ける",
+      "table_aria": "招待コード",
+      "empty": "招待コードはまだありません。上記のものを生成して、将来のメンバーと共有します。",
+      "load_failed": "招待コードを読み込めませんでした。",
+      "generate_success": "招待コードが生成されました。",
+      "generate_failed": "招待コードを生成できませんでした。",
+      "columns": {
+        "code": "コード",
+        "label": "ラベル",
+        "expires": "有効期限が切れます",
+        "status": "状態",
+        "actions": "アクション"
+      },
+      "status": {
+        "active": "アクティブ",
+        "used": "使用済み",
+        "used_by": "{{name}} によって使用されます",
+        "expired": "期限切れ"
+      }
+    },
+    "predictive": {
+      "title": "予測的洞察",
+      "subtitle": "将来を見据えた予測とプロアクティブなアラート。地域のケア不足を緊急事態になる前に発見します。",
+      "not_enough_activity": "予測するにはまだ十分な活動がありません。数週間後にまた来てください。",
+      "no_forecast": "まだ予測データはありません。",
+      "hours_forecast": "時間予測",
+      "active_members": "アクティブなメンバー",
+      "recipients_reached": "受信者に到達しました",
+      "history": "歴史",
+      "forecast": "予報",
+      "confidence": "自信",
+      "trend_growing": "{{value}}% の成長",
+      "trend_declining": "{{value}}% の下落",
+      "trend_stable": "安定した",
+      "sub_region_coverage": "サブリージョンの適用範囲 (過去 {{days}} 日間)",
+      "under_supplied_count": "{{count}}の供給が不足しています",
+      "sub_region_coverage_aria": "サブリージョンのカバー範囲",
+      "helper_churn": "?????? ({{days}} ??????)",
+      "overall_percent": "全体で {{value}}%",
+      "helper_churn_note": "以前アクティブだった {{prior}} の {{lapsed}} は、最近時間を記録していません。",
+      "helper_churn_aria": "カテゴリ別のヘルパー チャーン",
+      "coefficient_drift": "カテゴリ係数ドリフト",
+      "drifting_count": "{{count}} ???????",
+      "coefficient_drift_note": "絶対ドリフト > {{threshold}}% を持つカテゴリにはフラグが立てられます。カテゴリ係数エディタでベースライン係数を確認します。",
+      "coefficient_drift_aria": "カテゴリ係数ドリフト",
+      "proactive_alerts": "プロアクティブなアラート",
+      "columns": {
+        "sub_region": "サブリージョン",
+        "requested_90d": "リクエスト済み (90日)",
+        "fulfilled_90d": "満たされました (90日)",
+        "coverage": "カバレッジ",
+        "status": "状態",
+        "category": "カテゴリ",
+        "prior_active": "以前のアクティブな",
+        "lapsed": "失効しました",
+        "churn_rate": "チャーンレート",
+        "baseline": "ベースライン",
+        "expected_hrs": "予想時間",
+        "observed_hrs": "観測時間",
+        "drift": "ドリフト",
+        "sample": "サンプル"
+      },
+      "status": {
+        "under_supplied": "供給不足",
+        "ok": "わかりました"
+      },
+      "severity": {
+        "critical": "致命的",
+        "warning": "警告",
+        "info": "情報"
+      }
+    },
+    "relationships": {
+      "title": "サポート関係",
+      "description": "継続的な支援者と受信者のペアと定期的なチェックイン。",
+      "active": "アクティブ",
+      "paused": "一時停止中",
+      "check_ins_due": "チェックイン期限",
+      "expected_hours": "予定時間",
+      "supporter": "サポーター",
+      "supporter_placeholder": "サポーターを探す",
+      "recipient": "受信者",
+      "recipient_placeholder": "受信者を検索する",
+      "no_members": "メンバーが見つかりませんでした",
+      "clear": "クリア",
+      "relationship_title": "関係タイトル",
+      "frequency_label": "頻度",
+      "expected_hours_per_visit": "1回の訪問あたりの予想時間",
+      "start_date": "開始日",
+      "create": "関係を築く",
+      "empty": "まだサポート関係はありません。上に作成します。",
+      "pair": "{{recipient}} をサポートする {{supporter}}",
+      "started": "{{date}} ???",
+      "next_check_in": "???????? {{date}}",
+      "pause": "一時停止",
+      "resume": "再開する",
+      "log_date": "日付",
+      "log_hours": "営業時間",
+      "log_note": "注記 (オプション)",
+      "log_hours_action": "時間を記録する",
+      "load_failed": "サポート関係を読み込めませんでした。",
+      "pick_different_members": "2 人の異なるメンバーを選択します。",
+      "create_success": "サポート関係が構築されました。",
+      "create_failed": "サポート関係を作成できませんでした。",
+      "update_success": "サポート関係を更新しました。",
+      "update_failed": "サポート関係を更新できませんでした。",
+      "log_validation_failed": "有効な日付と 0.25-24 時間を入力してください。",
+      "log_success": "サポート時間が記録されました。",
+      "log_failed": "サポート時間を記録できませんでした。",
+      "frequency": {
+        "weekly": "毎週",
+        "fortnightly": "隔週",
+        "monthly": "毎月",
+        "ad_hoc": "このために"
+      },
+      "status": {
+        "active": "アクティブ",
+        "paused": "一時停止中",
+        "completed": "完了しました",
+        "cancelled": "キャンセル"
+      }
     }
   },
   "municipal_reports": {
