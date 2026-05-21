@@ -12,13 +12,15 @@ import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Input, Switch, Button, Spinner } from '@heroui/react';
 import Image from 'lucide-react/icons/image';
 import Save from 'lucide-react/icons/save';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 
 export function ImageSettings() {
-  usePageTitle("System");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -40,7 +42,7 @@ export function ImageSettings() {
           setFormData(prev => ({ ...prev, ...res.data }));
         }
       })
-      .catch(() => toast.error("Failed to load image settings"))
+      .catch(() => toast.error(t('system.failed_to_load_image_settings')))
       .finally(() => setLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount
   }, []);
@@ -49,9 +51,9 @@ export function ImageSettings() {
     setSaving(true);
     try {
       await adminSettings.updateImageSettings(formData);
-      toast.success("Image settings saved successfully");
+      toast.success(t('system.image_settings_saved_successfully'));
     } catch {
-      toast.error("Failed to save image settings");
+      toast.error(t('system.failed_to_save_image_settings'));
     } finally {
       setSaving(false);
     }
@@ -71,35 +73,35 @@ export function ImageSettings() {
 
   return (
     <div>
-      <PageHeader title={"Image Settings"} description={"Configure image upload settings including formats, resizing, and WebP conversion"} />
+      <PageHeader title={t('system.image_settings_title')} description={t('system.image_settings_desc')} />
 
       <div className="space-y-4">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Image size={20} /> {"Upload Limits"}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Image size={20} /> {t('system.upload_limits')}</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={"Max File Size"}
+              label={t('system.label_max_file_size')}
               type="number"
               variant="bordered"
               value={String(formData.max_file_size || '')}
               onValueChange={(v) => updateField('max_file_size', v)}
             />
             <Input
-              label={"Max Width"}
+              label={t('system.label_max_width')}
               type="number"
               variant="bordered"
               value={String(formData.max_width || '')}
               onValueChange={(v) => updateField('max_width', v)}
             />
             <Input
-              label={"Max Height"}
+              label={t('system.label_max_height')}
               type="number"
               variant="bordered"
               value={String(formData.max_height || '')}
               onValueChange={(v) => updateField('max_height', v)}
             />
             <Input
-              label={"Allowed Formats"}
+              label={t('system.label_allowed_formats')}
               variant="bordered"
               isReadOnly
               value={String(formData.allowed_formats || 'jpg, jpeg, png, gif, webp')}
@@ -108,41 +110,41 @@ export function ImageSettings() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{"Processing"}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('system.processing_heading')}</h3></CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{"Auto Resize"}</p>
-                <p className="text-sm text-default-500">{"Auto Resize."}</p>
+                <p className="font-medium">{t('system.auto_resize')}</p>
+                <p className="text-sm text-default-500">{t('system.auto_resize_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.auto_resize} onValueChange={(v) => updateField('auto_resize', v)} aria-label={"Auto Resize"} />
+              <Switch isSelected={!!formData.auto_resize} onValueChange={(v) => updateField('auto_resize', v)} aria-label={t('system.auto_resize')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{"Auto Convert WebP"}</p>
-                <p className="text-sm text-default-500">{"Auto Convert WebP."}</p>
+                <p className="font-medium">{t('system.auto_convert_webp')}</p>
+                <p className="text-sm text-default-500">{t('system.auto_convert_webp_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.auto_webp} onValueChange={(v) => updateField('auto_webp', v)} aria-label={"Auto WebP"} />
+              <Switch isSelected={!!formData.auto_webp} onValueChange={(v) => updateField('auto_webp', v)} aria-label={t('system.label_auto_web_p')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{"Strip Exif"}</p>
-                <p className="text-sm text-default-500">{"Strip Exif."}</p>
+                <p className="font-medium">{t('system.strip_exif')}</p>
+                <p className="text-sm text-default-500">{t('system.strip_exif_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.strip_exif} onValueChange={(v) => updateField('strip_exif', v)} aria-label={"Strip EXIF Data"} />
+              <Switch isSelected={!!formData.strip_exif} onValueChange={(v) => updateField('strip_exif', v)} aria-label={t('system.label_strip_e_x_i_f')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{"Generate Thumbnails"}</p>
-                <p className="text-sm text-default-500">{"Generate Thumbnails."}</p>
+                <p className="font-medium">{t('system.generate_thumbnails')}</p>
+                <p className="text-sm text-default-500">{t('system.generate_thumbnails_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.generate_thumbnails} onValueChange={(v) => updateField('generate_thumbnails', v)} aria-label={"Thumbnails"} />
+              <Switch isSelected={!!formData.generate_thumbnails} onValueChange={(v) => updateField('generate_thumbnails', v)} aria-label={t('system.label_thumbnails')} />
             </div>
           </CardBody>
         </Card>
 
         <div className="flex justify-end">
-          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>{"Save Settings"}</Button>
+          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>{t('system.save_settings')}</Button>
         </div>
       </div>
     </div>
