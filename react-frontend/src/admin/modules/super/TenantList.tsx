@@ -10,6 +10,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Chip,
@@ -36,7 +37,8 @@ import { DataTable, PageHeader, ConfirmModal, type Column } from '../../componen
 import type { SuperAdminTenant } from '../../api/types';
 
 export function TenantList() {
-  usePageTitle("Super Admin");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -68,13 +70,13 @@ export function TenantList() {
         setTenants(Array.isArray(res.data) ? res.data : []);
         setLastRefreshed(new Date());
       } else if (!res.success) {
-        toast.error(`${"Tenants"}: ${res.error || "Failed to load tenant list"}`);
+        toast.error(`${t('super.tenants')}: ${res.error || t('super.failed_to_load_tenant_list')}`);
       }
     } catch (err) {
-      toast.error(`${"Tenants error"}: ${err instanceof Error ? err.message : "Unknown error"}`);
+      toast.error(`${t('super.tenants_error')}: ${err instanceof Error ? err.message : t('common.unknown')}`);
     }
     setLoading(false);
-  }, [filter, search, toast])
+  }, [filter, search, t, toast])
 
 
   useEffect(() => {
@@ -104,10 +106,10 @@ export function TenantList() {
     }
 
     if (res?.success) {
-      toast.success(`Tenant Action succeeded`);
+      toast.success(t('super.tenant_action_succeeded'));
       loadTenants();
     } else {
-      toast.error(res?.error || `Failed to action tenant`);
+      toast.error(res?.error || t('super.failed_to_action_tenant'));
     }
 
     setActionLoading(false);
@@ -116,24 +118,24 @@ export function TenantList() {
 
   const confirmMessages: Record<string, { title: string; message: string; label: string }> = {
     delete: {
-      title: "Are you sure you want to delete title?",
-      message: "Confirm Delete",
-      label: "Confirm Delete",
+      title: t('super.confirm_delete_tenant_title'),
+      message: t('super.confirm_delete_tenant_message'),
+      label: t('super.confirm_delete'),
     },
     deactivate: {
-      title: "Are you sure you want to deactivate title?",
-      message: "Confirm Deactivate",
-      label: "Confirm Deactivate",
+      title: t('super.confirm_deactivate_tenant_title'),
+      message: t('super.confirm_deactivate_tenant_message'),
+      label: t('super.confirm_deactivate'),
     },
     reactivate: {
-      title: "Are you sure you want to reactivate title?",
-      message: "Confirm Reactivate",
-      label: "Confirm Reactivate",
+      title: t('super.confirm_reactivate_tenant_title'),
+      message: t('super.confirm_reactivate_tenant_message'),
+      label: t('super.confirm_reactivate'),
     },
     'toggle-hub': {
-      title: "Are you sure you want to toggle hub title?",
-      message: "Confirm Toggle Hub",
-      label: "Confirm Toggle Hub",
+      title: t('super.confirm_toggle_hub_title'),
+      message: t('super.confirm_toggle_hub_message'),
+      label: t('super.confirm_toggle_hub'),
     },
   };
 
@@ -154,31 +156,31 @@ export function TenantList() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={"Tenant Actions"}>
+          <Button isIconOnly size="sm" variant="light" aria-label={t('super.tenant_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
-        <DropdownMenu aria-label={"Tenant Actions"} onAction={handleMenuAction}>
+        <DropdownMenu aria-label={t('super.tenant_actions')} onAction={handleMenuAction}>
           <DropdownItem key="view" startContent={<Eye size={14} />}>
-            {"View"}
+            {t('super.action_view')}
           </DropdownItem>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
-            {"Edit"}
+            {t('common.edit')}
           </DropdownItem>
           <DropdownItem key="toggle-hub" startContent={tenant.allows_subtenants ? <ToggleLeft size={14} /> : <ToggleRight size={14} />}>
-            {tenant.allows_subtenants ? "Disable Hub" : "Enable Hub"}
+            {tenant.allows_subtenants ? t('super.disable_hub') : t('super.enable_hub')}
           </DropdownItem>
           {tenant.is_active ? (
             <DropdownItem key="deactivate" startContent={<Shield size={14} />} className="text-warning" color="warning">
-              {"Deactivate"}
+              {t('super.deactivate')}
             </DropdownItem>
           ) : (
             <DropdownItem key="reactivate" startContent={<Shield size={14} />} className="text-success" color="success">
-              {"Reactivate"}
+              {t('super.reactivate')}
             </DropdownItem>
           )}
           <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
-            {"Delete"}
+            {t('common.delete')}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -188,7 +190,7 @@ export function TenantList() {
   const columns: Column<SuperAdminTenant>[] = [
     {
       key: 'name',
-      label: "Tenant",
+      label: t('super.label_tenant'),
       sortable: true,
       render: (tenant) => (
         <div>
@@ -204,40 +206,40 @@ export function TenantList() {
     },
     {
       key: 'domain',
-      label: "Domain",
+      label: t('super.label_domain'),
       render: (tenant) => (
         <span className="text-sm text-default-500">{tenant.domain || '---'}</span>
       ),
     },
     {
       key: 'is_active',
-      label: "Status",
+      label: t('super.label_status'),
       sortable: true,
       render: (tenant) => (
         <Chip size="sm" variant="flat" color={tenant.is_active ? 'success' : 'default'}>
-          {tenant.is_active ? "Active" : "Inactive"}
+          {tenant.is_active ? t('common.active') : t('super.inactive_label')}
         </Chip>
       ),
     },
     {
       key: 'user_count',
-      label: "Users",
+      label: t('super.label_users'),
       sortable: true,
       render: (tenant) => <span>{tenant.user_count ?? 0}</span>,
     },
     {
       key: 'allows_subtenants',
-      label: "Hub",
+      label: t('super.hub'),
       render: (tenant) =>
         tenant.allows_subtenants ? (
-          <Chip size="sm" variant="flat" color="secondary">{"Hub"}</Chip>
+          <Chip size="sm" variant="flat" color="secondary">{t('super.hub')}</Chip>
         ) : (
           <span className="text-default-400">---</span>
         ),
     },
     {
       key: 'parent_name',
-      label: "Parent",
+      label: t('super.parent'),
       render: (tenant) => (
         <span className="text-sm text-default-500">
           {tenant.parent_name || '---'}
@@ -246,7 +248,7 @@ export function TenantList() {
     },
     {
       key: 'created_at',
-      label: "Created",
+      label: t('super.created'),
       sortable: true,
       render: (tenant) => (
         <span className="text-sm text-default-500">
@@ -256,7 +258,7 @@ export function TenantList() {
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('common.actions'),
       render: (tenant) => <TenantActionsMenu tenant={tenant} />,
     },
   ];
@@ -264,18 +266,18 @@ export function TenantList() {
   return (
     <div>
       <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{"Super Admin"}</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
-        <span className="text-foreground">{"Breadcrumb Tenants"}</span>
+        <span className="text-foreground">{t('super.breadcrumb_tenants')}</span>
       </nav>
       <PageHeader
-        title={"Tenant List"}
-        description={"View and manage all tenants on the platform"}
+        title={t('super.tenant_list_title')}
+        description={t('super.tenant_list_desc')}
         actions={
           <div className="flex items-center gap-2">
             {lastRefreshed && (
               <span className="text-xs text-default-400">
-                Updated {lastRefreshed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                {t('super.updated_at', { time: lastRefreshed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) })}
               </span>
             )}
             <Button
@@ -285,14 +287,14 @@ export function TenantList() {
               startContent={<Network size={16} />}
               size="sm"
             >
-              {"View Hierarchy"}
+              {t('super.view_hierarchy')}
             </Button>
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/super/tenants/create'))}
             >
-              {"Create Tenant"}
+              {t('super.create_tenant')}
             </Button>
           </div>
         }
@@ -305,10 +307,10 @@ export function TenantList() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={"All"} />
-          <Tab key="active" title={"Active"} />
-          <Tab key="inactive" title={"Inactive"} />
-          <Tab key="hub" title={"Hub"} />
+          <Tab key="all" title={t('common.all')} />
+          <Tab key="active" title={t('common.active')} />
+          <Tab key="inactive" title={t('super.inactive_label')} />
+          <Tab key="hub" title={t('super.hub')} />
         </Tabs>
       </div>
 
@@ -316,7 +318,7 @@ export function TenantList() {
         columns={columns}
         data={tenants}
         isLoading={loading}
-        searchPlaceholder={"Enter search tenants..."}
+        searchPlaceholder={t('super.search_tenants_placeholder')}
         onSearch={(q) => setSearch(q)}
         onRefresh={loadTenants}
       />
@@ -327,7 +329,10 @@ export function TenantList() {
           onClose={() => setConfirmAction(null)}
           onConfirm={handleAction}
           title={confirmMessages[confirmAction.type]?.title ?? ''}
-          message={`${confirmMessages[confirmAction.type]?.message ?? ''}\n\nTenant: ${confirmAction.tenant.name}`}
+          message={t('super.confirm_tenant_message', {
+            message: confirmMessages[confirmAction.type]?.message ?? '',
+            tenant: confirmAction.tenant.name,
+          })}
           confirmLabel={confirmMessages[confirmAction.type]?.label ?? ''}
           confirmColor={confirmAction.type === 'reactivate' ? 'primary' : 'danger'}
           isLoading={actionLoading}
