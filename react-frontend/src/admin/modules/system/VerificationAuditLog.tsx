@@ -35,20 +35,20 @@ interface AuditEvent {
   user_email: string | null;
 }
 
-const EVENT_TYPE_LABELS: Record<string, { label: string; color: 'success' | 'danger' | 'warning' | 'primary' | 'default' }> = {
-  registration_started: { label: 'Registration', color: 'primary' },
-  verification_created: { label: 'Session Created', color: 'default' },
-  verification_started: { label: 'Started', color: 'primary' },
-  verification_processing: { label: 'Processing', color: 'warning' },
-  verification_passed: { label: 'Passed', color: 'success' },
-  verification_failed: { label: 'Failed', color: 'danger' },
-  verification_expired: { label: 'Expired', color: 'warning' },
-  verification_cancelled: { label: 'Cancelled', color: 'default' },
-  admin_review_started: { label: 'Admin Review', color: 'warning' },
-  admin_approved: { label: 'Admin Approved', color: 'success' },
-  admin_rejected: { label: 'Admin Rejected', color: 'danger' },
-  account_activated: { label: 'Activated', color: 'success' },
-  fallback_triggered: { label: 'Fallback', color: 'warning' },
+const EVENT_TYPE_LABELS: Record<string, { color: 'success' | 'danger' | 'warning' | 'primary' | 'default' }> = {
+  registration_started: { color: 'primary' },
+  verification_created: { color: 'default' },
+  verification_started: { color: 'primary' },
+  verification_processing: { color: 'warning' },
+  verification_passed: { color: 'success' },
+  verification_failed: { color: 'danger' },
+  verification_expired: { color: 'warning' },
+  verification_cancelled: { color: 'default' },
+  admin_review_started: { color: 'warning' },
+  admin_approved: { color: 'success' },
+  admin_rejected: { color: 'danger' },
+  account_activated: { color: 'success' },
+  fallback_triggered: { color: 'warning' },
 };
 
 const EVENT_TYPES = Object.keys(EVENT_TYPE_LABELS);
@@ -96,13 +96,14 @@ export function VerificationAuditLog() {
       <CardHeader className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center px-6 pt-5 pb-0">
         <div className="flex items-center gap-2">
           <ScrollText className="w-5 h-5 text-indigo-500" />
-          <h3 className="text-lg font-semibold">{"Verification Audit Log"}</h3>
-          <Chip size="sm" variant="flat">{`${total} events`}</Chip>
+          <h3 className="text-lg font-semibold">{t('verification.audit_log_title')}</h3>
+          <Chip size="sm" variant="flat">{t('verification.total_events', { count: total })}</Chip>
         </div>
         <div className="flex items-center gap-2">
           <Select
             size="sm"
-            placeholder={"Filter events..."}
+            aria-label={t('verification.filter_events_aria')}
+            placeholder={t('verification.filter_all_events')}
             className="w-48"
             selectedKeys={filterType ? [filterType] : []}
             onSelectionChange={(keys) => {
@@ -112,12 +113,12 @@ export function VerificationAuditLog() {
             }}
           >
             {EVENT_TYPES.map((type) => (
-              <SelectItem key={type} textValue={t(`verification.event_type_${type}`, EVENT_TYPE_LABELS[type]?.label ?? type)}>
-                {t(`verification.event_type_${type}`, EVENT_TYPE_LABELS[type]?.label ?? type)}
+              <SelectItem key={type} textValue={t(`verification.event_type_${type}`)}>
+                {t(`verification.event_type_${type}`)}
               </SelectItem>
             ))}
           </Select>
-          <Button isIconOnly size="sm" variant="flat" onPress={fetchEvents} aria-label={"Refresh audit log"}>
+          <Button isIconOnly size="sm" variant="flat" onPress={fetchEvents} aria-label={t('verification.refresh_aria')}>
             <RefreshCw className="w-4 h-4" />
           </Button>
         </div>
@@ -128,23 +129,23 @@ export function VerificationAuditLog() {
             <Spinner size="lg" />
           </div>
         ) : events.length === 0 ? (
-          <p className="text-center py-8 text-theme-muted">{"No audit events found."}</p>
+          <p className="text-center py-8 text-theme-muted">{t('verification.no_events')}</p>
         ) : (
           <>
-            <Table aria-label={"Verification audit log"} removeWrapper>
+            <Table aria-label={t('verification.audit_log_aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>{"Time"}</TableColumn>
-                <TableColumn>{"User"}</TableColumn>
-                <TableColumn>{"Event"}</TableColumn>
-                <TableColumn>{"Actor"}</TableColumn>
-                <TableColumn>{"IP"}</TableColumn>
-                <TableColumn>{"Details"}</TableColumn>
+                <TableColumn>{t('verification.col_time')}</TableColumn>
+                <TableColumn>{t('verification.col_user')}</TableColumn>
+                <TableColumn>{t('verification.col_event')}</TableColumn>
+                <TableColumn>{t('verification.col_actor')}</TableColumn>
+                <TableColumn>{t('verification.col_ip')}</TableColumn>
+                <TableColumn>{t('verification.col_details')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {events.map((event) => {
-                  const typeInfo = EVENT_TYPE_LABELS[event.event_type] || { label: event.event_type, color: 'default' as const };
-                  const typeLabel = t(`verification.event_type_${event.event_type}`, typeInfo.label);
-                  const userName = [event.first_name, event.last_name].filter(Boolean).join(' ') || `User #${event.user_id}`;
+                  const typeInfo = EVENT_TYPE_LABELS[event.event_type] || { color: 'default' as const };
+                  const typeLabel = t(`verification.event_type_${event.event_type}`);
+                  const userName = [event.first_name, event.last_name].filter(Boolean).join(' ') || t('verification.user_with_id', { id: event.user_id });
                   let details = '';
                   if (event.details) {
                     try {
@@ -175,10 +176,10 @@ export function VerificationAuditLog() {
                         {event.actor_type}
                       </TableCell>
                       <TableCell className="text-xs text-theme-muted font-mono">
-                        {event.ip_address || '—'}
+                        {event.ip_address || t('verification.empty_value')}
                       </TableCell>
                       <TableCell className="text-xs text-theme-muted max-w-[200px] truncate" title={details}>
-                        {details || '—'}
+                        {details || t('verification.empty_value')}
                       </TableCell>
                     </TableRow>
                   );
@@ -190,7 +191,7 @@ export function VerificationAuditLog() {
             {totalPages > 1 && (
               <div className="flex justify-between items-center mt-4">
                 <span className="text-sm text-theme-muted">
-                  {`Page ${page + 1} of ${totalPages}`}
+                  {t('verification.page_of', { page: page + 1, total: totalPages })}
                 </span>
                 <div className="flex gap-2">
                   <Button
@@ -200,7 +201,7 @@ export function VerificationAuditLog() {
                     onPress={() => setPage((p) => p - 1)}
                     startContent={<ChevronLeft className="w-4 h-4" />}
                   >
-                    {"Previous"}
+                    {t('verification.previous')}
                   </Button>
                   <Button
                     size="sm"
@@ -209,7 +210,7 @@ export function VerificationAuditLog() {
                     onPress={() => setPage((p) => p + 1)}
                     endContent={<ChevronRight className="w-4 h-4" />}
                   >
-                    {"Next"}
+                    {t('verification.next')}
                   </Button>
                 </div>
               </div>
