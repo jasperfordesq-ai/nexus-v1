@@ -105,7 +105,7 @@ const partnershipStatusConfig: Record<string, { color: 'success' | 'warning' | '
 
 export function PartnerDirectory() {
   const { t } = useTranslation('admin');
-  usePageTitle("Federation");
+  usePageTitle(t('federation.page_title'));
   const toast = useToast();
 
   const [communities, setCommunities] = useState<Community[]>([]);
@@ -168,16 +168,16 @@ export function PartnerDirectory() {
     try {
       const res = await adminFederation.requestPartnership(requestTarget.id, requestNotes || undefined);
       if (res.success) {
-        toast.success(`Partnership request sent`);
+        toast.success(t('federation.partnership_request_sent'));
         setRequestTarget(null);
         setRequestNotes('');
         loadData({ search, region: regionFilter, category: categoryFilter, topic: topicFilter, exclude_partnered: hidePartnered });
       } else {
         const errorData = res.data as { error?: string } | undefined;
-        toast.error(errorData?.error || "Failed to send partnership request");
+        toast.error(errorData?.error || t('federation.failed_to_send_partnership_request'));
       }
     } catch {
-      toast.error("Failed to send partnership request");
+      toast.error(t('federation.failed_to_send_partnership_request'));
     } finally {
       setRequestLoading(false);
     }
@@ -185,12 +185,12 @@ export function PartnerDirectory() {
 
   const enabledFeatures = (community: Community): string[] => {
     const features: string[] = [];
-    if (community.profiles_enabled) features.push("Feature Profiles");
-    if (community.listings_enabled) features.push("Feature Listings");
-    if (community.messaging_enabled) features.push("Feature Messages");
-    if (community.transactions_enabled) features.push("Feature Transactions");
-    if (community.events_enabled) features.push("Feature Events");
-    if (community.groups_enabled) features.push("Feature Groups");
+    if (community.profiles_enabled) features.push('federation.feature_profiles');
+    if (community.listings_enabled) features.push('federation.feature_listings');
+    if (community.messaging_enabled) features.push('federation.feature_messages');
+    if (community.transactions_enabled) features.push('federation.feature_transactions');
+    if (community.events_enabled) features.push('federation.feature_events');
+    if (community.groups_enabled) features.push('federation.feature_groups');
     return features;
   };
 
@@ -215,8 +215,8 @@ export function PartnerDirectory() {
   return (
     <div>
       <PageHeader
-        title={"Partner Directory"}
-        description={"Browse the directory of communities available to partner with"}
+        title={t('federation.partner_directory_title')}
+        description={t('federation.partner_directory_desc')}
         actions={
           <Button
             variant="flat"
@@ -224,7 +224,7 @@ export function PartnerDirectory() {
             onPress={() => loadData({ search, region: regionFilter, category: categoryFilter, topic: topicFilter, exclude_partnered: hidePartnered })}
             isLoading={loading}
           >
-            {"Refresh"}
+            {t('federation.refresh')}
           </Button>
         }
       />
@@ -235,8 +235,8 @@ export function PartnerDirectory() {
           <div className="flex flex-col md:flex-row gap-3">
             <Input type="search" name="admin-search" autoComplete="off"
               className="flex-1"
-              placeholder={"Search communities..."}
-              aria-label={"Search Partner Communities"}
+              placeholder={t('federation.search_communities_placeholder')}
+              aria-label={t('federation.label_search_partner_communities')}
               startContent={<Search size={16} className="text-default-400" />}
               value={search}
               onValueChange={setSearch}
@@ -246,7 +246,7 @@ export function PartnerDirectory() {
             {regions.length > 0 && (
               <Select
                 className="w-full md:w-48"
-                placeholder={"All Regions..."}
+                placeholder={t('federation.placeholder_all_regions')}
                 size="sm"
                 variant="bordered"
                 selectedKeys={regionFilter ? [regionFilter] : []}
@@ -263,7 +263,7 @@ export function PartnerDirectory() {
             {categories.length > 0 && (
               <Select
                 className="w-full md:w-48"
-                placeholder={"All Categories..."}
+                placeholder={t('federation.placeholder_all_categories')}
                 size="sm"
                 variant="bordered"
                 selectedKeys={categoryFilter ? [categoryFilter] : []}
@@ -307,16 +307,16 @@ export function PartnerDirectory() {
                 startContent={<Filter size={14} />}
                 onPress={() => setHidePartnered(!hidePartnered)}
               >
-                {"Hide Partnered"}
+                {t('federation.hide_partnered')}
               </Button>
               {activeFilters > 0 && (
                 <Button variant="light" size="sm" onPress={clearFilters}>
-                  {`Clear Filters`}
+                  {t('federation.clear_filters')}
                 </Button>
               )}
             </div>
             <span className="text-sm text-default-400">
-              {loading ? "Loading federation..." : `Communities Found`}
+              {loading ? t('federation.loading') : t('federation.communities_found')}
             </span>
           </div>
         </CardBody>
@@ -351,10 +351,10 @@ export function PartnerDirectory() {
       {!loading && communities.length === 0 && (
         <EmptyState
           icon={Globe}
-          title={"No communities found"}
+          title={t('federation.no_communities_found')}
           description={activeFilters > 0
-            ? "No communities match filters"
-            : "No directory found"
+            ? t('federation.no_communities_match_filters')
+            : t('federation.directory_empty')
           }
         />
       )}
@@ -414,7 +414,7 @@ export function PartnerDirectory() {
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-default-400">
                     {community.member_count != null && (
                       <span className="flex items-center gap-1">
-                        <Users size={12} /> {`Members`}
+                        <Users size={12} /> {t('federation.members_count')}
                       </span>
                     )}
                     {community.region && (
@@ -424,7 +424,7 @@ export function PartnerDirectory() {
                     )}
                     {community.contact_email && (
                       <span className="flex items-center gap-1">
-                        <Mail size={12} /> {community.contact_name || "Contact"}
+                        <Mail size={12} /> {community.contact_name || t('federation.contact')}
                       </span>
                     )}
                   </div>
@@ -444,7 +444,7 @@ export function PartnerDirectory() {
                       ))}
                       {communityTopics.length > 5 && (
                         <Chip size="sm" variant="flat" color="default">
-                          {`More`}
+                          {t('federation.more_count')}
                         </Chip>
                       )}
                     </div>
@@ -454,7 +454,7 @@ export function PartnerDirectory() {
                     <div className="flex flex-wrap gap-1">
                       {features.map((f) => (
                         <Chip key={f} size="sm" variant="dot" color="success" className="text-xs">
-                          {f}
+                          {t(f)}
                         </Chip>
                       ))}
                     </div>
@@ -472,7 +472,7 @@ export function PartnerDirectory() {
                       size="sm"
                       startContent={<ExternalLink size={14} />}
                     >
-                      {"Visit"}
+                      {t('federation.visit')}
                     </Button>
                   )}
 
@@ -484,7 +484,7 @@ export function PartnerDirectory() {
                       startContent={<Handshake size={14} />}
                       onPress={() => setRequestTarget(community)}
                     >
-                      {"Request Partnership"}
+                      {t('federation.request_partnership')}
                     </Button>
                   )}
                   {status === 'active' && (
@@ -495,7 +495,7 @@ export function PartnerDirectory() {
                       isDisabled
                       startContent={<CheckCircle size={14} />}
                     >
-                      {"Active Partner"}
+                      {t('federation.active_partner')}
                     </Button>
                   )}
                   {status === 'pending' && (
@@ -506,7 +506,7 @@ export function PartnerDirectory() {
                       isDisabled
                       startContent={<Clock size={14} />}
                     >
-                      {"Request Pending"}
+                      {t('federation.request_pending')}
                     </Button>
                   )}
                 </CardFooter>
@@ -521,14 +521,14 @@ export function PartnerDirectory() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Handshake size={20} />
-            {"Request Partnership"}
+            {t('federation.request_partnership')}
           </ModalHeader>
           <ModalBody>
             {requestTarget && (
               <div className="space-y-4">
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-default-100">
                   {requestTarget.logo_url ? (
-                    <img src={requestTarget.logo_url} alt={`${requestTarget.name || 'Partner'} logo`} className="w-10 h-10 rounded-lg object-cover" loading="lazy" />
+                    <img src={requestTarget.logo_url} alt={t('federation.partner_logo_alt', { name: requestTarget.name || t('federation.label_partner') })} className="w-10 h-10 rounded-lg object-cover" loading="lazy" />
                   ) : (
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                       <Globe size={18} className="text-primary" />
@@ -542,11 +542,11 @@ export function PartnerDirectory() {
                   </div>
                 </div>
                 <p className="text-sm text-default-500">
-                  {"Partnership Request"}
+                  {t('federation.partnership_request_description')}
                 </p>
                 <Textarea
-                  label={"Message Optional"}
-                  placeholder={"Optional message to the partner community..."}
+                  label={t('federation.message_optional')}
+                  placeholder={t('federation.partnership_message_placeholder')}
                   value={requestNotes}
                   onValueChange={setRequestNotes}
                   variant="bordered"
@@ -558,7 +558,7 @@ export function PartnerDirectory() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => { setRequestTarget(null); setRequestNotes(''); }}>
-              {"Cancel"}
+              {t('federation.cancel')}
             </Button>
             <Button
               color="primary"
@@ -566,7 +566,7 @@ export function PartnerDirectory() {
               onPress={handleRequestPartnership}
               isLoading={requestLoading}
             >
-              {"Send Request"}
+              {t('federation.send_request')}
             </Button>
           </ModalFooter>
         </ModalContent>
