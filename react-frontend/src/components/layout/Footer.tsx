@@ -62,8 +62,8 @@ export function Footer({ children, copyright }: FooterProps) {
               src="/images/project-nexus-open-source-community-platform.png"
               alt="Project NEXUS — Open-source timebanking and community platform"
               className="h-24 w-auto object-contain"
-              width="1383"
-              height="581"
+              width="1536"
+              height="1024"
             />
           </a>
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
@@ -290,9 +290,9 @@ export function Footer({ children, copyright }: FooterProps) {
                     <img
                       src="/images/project-nexus-open-source-community-platform.png"
                       alt="Project NEXUS — Open-source timebanking and community platform"
-                      className="h-28 w-auto object-contain"
-                      width="1383"
-                      height="581"
+                      className="h-32 w-auto object-contain"
+                      width="1536"
+                      height="1024"
                     />
                   </a>
                   <a
