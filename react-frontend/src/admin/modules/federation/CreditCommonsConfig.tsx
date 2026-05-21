@@ -53,7 +53,7 @@ interface CcNodeConfig {
 
 export function CreditCommonsConfig() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('federation.cc_config_title', 'Credit Commons Configuration'));
+  usePageTitle(t('federation.cc_config_title'));
   const toast = useToast();
 
   const [config, setConfig] = useState<CcNodeConfig | null>(null);
@@ -86,7 +86,7 @@ export function CreditCommonsConfig() {
       }
     } catch (err) {
       logError('CreditCommonsConfig.load', err);
-      toast.error(t('federation.cc_config_load_failed', 'Failed to load CC configuration'));
+      toast.error(t('federation.cc_config_load_failed'));
     }
     setLoading(false);
   }, [t, toast]);
@@ -98,13 +98,13 @@ export function CreditCommonsConfig() {
 
   const handleSave = useCallback(async () => {
     if (!nodeSlug.trim()) {
-      toast.error(t('federation.cc_node_slug_required', 'Node slug is required'));
+      toast.error(t('federation.cc_node_slug_required'));
       return;
     }
 
     // Validate node slug format: 3-15 chars, lowercase alphanumeric + hyphens
     if (!/^[0-9a-z-]{3,15}$/.test(nodeSlug)) {
-      toast.error(t('federation.cc_node_slug_invalid', 'Node slug must be 3-15 characters, lowercase letters, numbers, and hyphens only'));
+      toast.error(t('federation.cc_node_slug_invalid'));
       return;
     }
 
@@ -121,15 +121,15 @@ export function CreditCommonsConfig() {
       });
 
       if (res.success) {
-        toast.success(t('federation.cc_config_saved', 'Credit Commons configuration saved'));
+        toast.success(t('federation.cc_config_saved'));
         loadConfig();
       } else {
-        const errorMsg = (res as { error?: string }).error || "Cc Config Save failed";
+        const errorMsg = (res as { error?: string }).error || t('federation.cc_config_save_failed');
         toast.error(errorMsg);
       }
     } catch (err) {
       logError('CreditCommonsConfig.save', err);
-      toast.error(t('federation.cc_config_save_failed', 'Failed to save CC configuration'));
+      toast.error(t('federation.cc_config_save_failed'));
     }
     setSaving(false);
   }, [nodeSlug, displayName, currencyFormat, exchangeRate, validatedWindow, parentNodeUrl, parentNodeSlug, toast, t, loadConfig]);
@@ -138,8 +138,8 @@ export function CreditCommonsConfig() {
     return (
       <div>
         <PageHeader
-          title={t('federation.cc_config_title', 'Credit Commons Configuration')}
-          description={t('federation.cc_config_desc', 'Configure this community\'s Credit Commons node identity')}
+          title={t('federation.cc_config_title')}
+          description={t('federation.cc_config_desc')}
         />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
@@ -151,15 +151,15 @@ export function CreditCommonsConfig() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('federation.cc_config_title', 'Credit Commons Configuration')}
-        description={t('federation.cc_config_desc', 'Configure this community\'s Credit Commons node identity for the CEN federation network')}
+        title={t('federation.cc_config_title')}
+        description={t('federation.cc_config_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={loadConfig}>
-              {t('federation.refresh', 'Refresh')}
+              {t('federation.refresh')}
             </Button>
             <Button color="primary" size="sm" startContent={<Save size={16} />} isLoading={saving} onPress={handleSave}>
-              {t('federation.save_changes', 'Save Changes')}
+              {t('federation.save_changes')}
             </Button>
           </div>
         }
@@ -170,35 +170,35 @@ export function CreditCommonsConfig() {
         <Card>
           <CardHeader className="flex items-center gap-2 pb-2">
             <Globe size={18} />
-            <h3 className="text-lg font-semibold">{t('federation.cc_node_identity', 'Node Identity')}</h3>
+            <h3 className="text-lg font-semibold">{t('federation.cc_node_identity')}</h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={t('federation.cc_node_slug', 'Node Slug')}
-              description={t('federation.cc_node_slug_desc', '3-15 characters, lowercase letters, numbers, and hyphens. This is your node\'s unique identifier in the CC network.')}
-              placeholder="my-timebank"
+              label={t('federation.cc_node_slug')}
+              description={t('federation.cc_node_slug_desc')}
+              placeholder={t('federation.cc_node_slug_placeholder')}
               value={nodeSlug}
               onValueChange={setNodeSlug}
               isRequired
               maxLength={15}
             />
             <Input
-              label={t('federation.cc_display_name', 'Display Name')}
-              placeholder="My Timebank Community"
+              label={t('federation.cc_display_name')}
+              placeholder={t('federation.cc_display_name_placeholder')}
               value={displayName}
               onValueChange={setDisplayName}
             />
             <Input
-              label={t('federation.cc_currency_format', 'Currency Format')}
-              description={t('federation.cc_currency_format_desc', 'How amounts are displayed. Use <quantity> as placeholder.')}
-              placeholder="<quantity> hours"
+              label={t('federation.cc_currency_format')}
+              description={t('federation.cc_currency_format_desc')}
+              placeholder={t('federation.cc_currency_format_placeholder')}
               value={currencyFormat}
               onValueChange={setCurrencyFormat}
             />
 
             {config?.absolute_path && (
               <div className="pt-2">
-                <p className="text-sm text-default-500 mb-1">{t('federation.cc_node_path', 'Node Path in Network')}</p>
+                <p className="text-sm text-default-500 mb-1">{t('federation.cc_node_path')}</p>
                 <div className="flex items-center gap-1">
                   {config.absolute_path.map((segment, i) => (
                     <span key={i} className="flex items-center gap-1">
@@ -218,27 +218,27 @@ export function CreditCommonsConfig() {
         <Card>
           <CardHeader className="flex items-center gap-2 pb-2">
             <Link2 size={18} />
-            <h3 className="text-lg font-semibold">{t('federation.cc_parent_node', 'Parent Node')}</h3>
+            <h3 className="text-lg font-semibold">{t('federation.cc_parent_node')}</h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={t('federation.cc_parent_url', 'Parent Node URL')}
-              description={t('federation.cc_parent_url_desc', 'URL of the parent CC node. Leave empty if this is a standalone/root node.')}
-              placeholder="https://cc.example.org"
+              label={t('federation.cc_parent_url')}
+              description={t('federation.cc_parent_url_desc')}
+              placeholder={t('federation.cc_parent_url_placeholder')}
               value={parentNodeUrl}
               onValueChange={setParentNodeUrl}
             />
             <Input
-              label={t('federation.cc_parent_slug', 'Parent Node Slug')}
-              description={t('federation.cc_parent_slug_desc', 'The parent node\'s slug identifier.')}
-              placeholder="parent-network"
+              label={t('federation.cc_parent_slug')}
+              description={t('federation.cc_parent_slug_desc')}
+              placeholder={t('federation.cc_parent_slug_placeholder')}
               value={parentNodeSlug}
               onValueChange={setParentNodeSlug}
             />
             <Input
-              label={t('federation.cc_exchange_rate', 'Exchange Rate')}
-              description={t('federation.cc_exchange_rate_desc', 'Exchange rate relative to parent node. 1.0 = same unit.')}
-              placeholder="1.0"
+              label={t('federation.cc_exchange_rate')}
+              description={t('federation.cc_exchange_rate_desc')}
+              placeholder={t('federation.cc_exchange_rate_placeholder')}
               type="number"
               step="0.01"
               min="0.01"
@@ -246,9 +246,9 @@ export function CreditCommonsConfig() {
               onValueChange={setExchangeRate}
             />
             <Input
-              label={t('federation.cc_validated_window', 'Validation Window (seconds)')}
-              description={t('federation.cc_validated_window_desc', 'How long a validated transaction stays valid before auto-expiring. Default: 300 (5 minutes).')}
-              placeholder="300"
+              label={t('federation.cc_validated_window')}
+              description={t('federation.cc_validated_window_desc')}
+              placeholder={t('federation.cc_validated_window_placeholder')}
               type="number"
               min="30"
               max="86400"
@@ -262,32 +262,32 @@ export function CreditCommonsConfig() {
         <Card>
           <CardHeader className="flex items-center gap-2 pb-2">
             <Hash size={18} />
-            <h3 className="text-lg font-semibold">{t('federation.cc_hashchain', 'Hashchain')}</h3>
+            <h3 className="text-lg font-semibold">{t('federation.cc_hashchain')}</h3>
           </CardHeader>
           <CardBody>
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-default-500">{t('federation.cc_last_hash', 'Last Hash')}</p>
+                <p className="text-sm text-default-500">{t('federation.cc_last_hash')}</p>
                 <code className="text-xs bg-default-100 px-2 py-1 rounded block mt-1 break-all">
-                  {config?.last_hash || t('federation.cc_no_hash', 'No hashchain started yet')}
+                  {config?.last_hash || t('federation.cc_no_hash')}
                 </code>
               </div>
               <Divider />
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-default-500">{t('federation.cc_total_trades', 'Total Trades')}</p>
+                  <p className="text-sm text-default-500">{t('federation.cc_total_trades')}</p>
                   <p className="text-lg font-semibold">{config?.stats?.trades ?? 0}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">{t('federation.cc_active_traders', 'Active Traders')}</p>
+                  <p className="text-sm text-default-500">{t('federation.cc_active_traders')}</p>
                   <p className="text-lg font-semibold">{config?.stats?.traders ?? 0}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">{t('federation.cc_volume', 'Volume')}</p>
+                  <p className="text-sm text-default-500">{t('federation.cc_volume')}</p>
                   <p className="text-lg font-semibold">{(config?.stats?.volume ?? 0).toFixed(2)}h</p>
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">{t('federation.cc_accounts', 'Accounts')}</p>
+                  <p className="text-sm text-default-500">{t('federation.cc_accounts')}</p>
                   <p className="text-lg font-semibold">{config?.stats?.accounts ?? 0}</p>
                 </div>
               </div>
