@@ -73,62 +73,49 @@ function OverviewTab() {
         <CardHeader className="flex items-center gap-2">
           <HelpCircle size={20} className="text-primary" />
           <div>
-            <h3 className="text-lg font-semibold">Start here — federation in plain English</h3>
-            <p className="text-sm text-default-500">For non-technical admins. No jargon.</p>
+            <h3 className="text-lg font-semibold">{t('federation.api_doc_overview_title')}</h3>
+            <p className="text-sm text-default-500">{t('federation.api_doc_overview_subtitle')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-5 text-sm leading-relaxed">
           <div>
-            <h4 className="font-semibold text-base mb-1">What is federation?</h4>
+            <h4 className="font-semibold text-base mb-1">{t('federation.api_doc_what_is_federation')}</h4>
             <p>
-              Federation lets your timebank talk to another timebank. Think of two separate
-              timebanking websites as two islands — on their own, members can only trade with
-              their own neighbours. <strong>Federation is the bridge between the islands.</strong>
-              {' '}Once the bridge is open, members can send time credits, message each other,
-              see each other's listings, and leave reviews across the bridge.
+              {t('federation.api_doc_federation_intro')}
             </p>
             <p className="mt-2">
-              Both sides must agree before the bridge opens, and either side can close it at any
-              time.
+              {t('federation.api_doc_federation_agreement')}
             </p>
           </div>
 
           <Divider />
 
           <div>
-            <h4 className="font-semibold text-base mb-1">What is an API key?</h4>
+            <h4 className="font-semibold text-base mb-1">{t('federation.api_doc_what_is_api_key')}</h4>
             <p>
-              A <strong>very long password</strong>. When you federate with another timebank, you
-              give them an API key and they give you one. Whenever their platform needs to ask
-              yours a question ("show me your public listings"), it sends the key along so yours
-              knows the request is genuine.
+              {t('federation.api_doc_api_key_plain_intro')}
             </p>
             <p className="mt-2">
-              Keys are revocable (click "revoke" and it's dead) and scoped (you can limit a key
-              to read-only, for example).
+              {t('federation.api_doc_api_key_plain_scope')}
             </p>
           </div>
 
           <Divider />
 
           <div>
-            <h4 className="font-semibold text-base mb-1">What is a webhook?</h4>
+            <h4 className="font-semibold text-base mb-1">{t('federation.api_doc_what_is_webhook')}</h4>
             <p>
-              A <strong>doorbell</strong>. API keys are for when you want to <em>ask</em> the
-              other side something. Webhooks are for when something happens on your side that
-              the other side needs to know about <em>right now</em> — like a cancelled transfer
-              or a new message. Instead of them checking every 30 seconds, you ring their
-              doorbell.
+              {t('federation.api_doc_webhook_plain_intro')}
             </p>
             <p className="mt-2">
-              Every webhook is signed like a wax seal. Forgeries get rejected automatically.
+              {t('federation.api_doc_webhook_signed')}
             </p>
           </div>
 
           <Divider />
 
           <div>
-            <h4 className="font-semibold text-base mb-2">When do I need what?</h4>
+            <h4 className="font-semibold text-base mb-2">{t('federation.api_doc_when_need_what')}</h4>
             <Table aria-label={t('federation.api_doc_overview_scenarios_aria')} removeWrapper>
               <TableHeader>
                 <TableColumn>{t('federation.api_doc_col_scenario')}</TableColumn>
@@ -137,66 +124,65 @@ function OverviewTab() {
               </TableHeader>
               <TableBody>
                 <TableRow key="nexus-nexus">
-                  <TableCell>Nexus ↔ another Nexus</TableCell>
+                  <TableCell>{t('federation.api_doc_scenario_nexus')}</TableCell>
                   <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
                   <TableCell><Chip size="sm" color="default" variant="flat">{t('federation.api_doc_optional')}</Chip></TableCell>
                 </TableRow>
                 <TableRow key="timeoverflow">
-                  <TableCell>Nexus ↔ TimeOverflow</TableCell>
+                  <TableCell>{t('federation.api_doc_scenario_timeoverflow')}</TableCell>
                   <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
                   <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
                 </TableRow>
                 <TableRow key="komunitin">
-                  <TableCell>Nexus ↔ Komunitin / Credit Commons</TableCell>
+                  <TableCell>{t('federation.api_doc_scenario_komunitin')}</TableCell>
                   <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
                   <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
                 </TableRow>
                 <TableRow key="listings">
-                  <TableCell>Reading another timebank's listings</TableCell>
+                  <TableCell>{t('federation.api_doc_scenario_reading_listings')}</TableCell>
                   <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
                   <TableCell><Chip size="sm" color="default" variant="flat">{t('federation.api_doc_not_needed')}</Chip></TableCell>
                 </TableRow>
                 <TableRow key="transfer-send">
-                  <TableCell>Sending a time-credit transfer</TableCell>
+                  <TableCell>{t('federation.api_doc_scenario_sending_transfer')}</TableCell>
                   <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
                   <TableCell><Chip size="sm" color="default" variant="flat">{t('federation.api_doc_not_needed')}</Chip></TableCell>
                 </TableRow>
                 <TableRow key="transfer-cancel">
-                  <TableCell>Being told a transfer you sent was cancelled</TableCell>
+                  <TableCell>{t('federation.api_doc_scenario_transfer_cancelled')}</TableCell>
                   <TableCell><Chip size="sm" color="default" variant="flat">{t('federation.api_doc_not_needed')}</Chip></TableCell>
                   <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
                 </TableRow>
                 <TableRow key="messages">
-                  <TableCell>Receiving messages from the other side</TableCell>
+                  <TableCell>{t('federation.api_doc_scenario_receiving_messages')}</TableCell>
                   <TableCell><Chip size="sm" color="default" variant="flat">{t('federation.api_doc_not_needed')}</Chip></TableCell>
                   <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
                 </TableRow>
               </TableBody>
             </Table>
             <p className="mt-3 text-default-600">
-              <strong>Rule of thumb:</strong> API keys handle requests you make on purpose.
-              Webhooks handle surprises you need to know about without asking.
+              {t('federation.api_doc_rule_of_thumb')}
             </p>
           </div>
 
           <Divider />
 
           <div>
-            <h4 className="font-semibold text-base mb-2">How do I set up a connection? (6 steps)</h4>
+            <h4 className="font-semibold text-base mb-2">{t('federation.api_doc_setup_title')}</h4>
             <ol className="list-decimal pl-6 space-y-1">
-              <li><strong>Find a partner.</strong> Another timebank running compatible federation software.</li>
-              <li><strong>Both admins agree</strong> to federate. Nothing starts without both sides saying yes.</li>
-              <li><strong>Exchange API keys.</strong> Paste theirs into <em>External Partners</em>. Keep yours safe.</li>
-              <li><strong>Exchange webhook URLs</strong> (if you want real-time events).</li>
-              <li><strong>Test the handshake.</strong> One click sends a test request. Green means it's working.</li>
-              <li><strong>Turn on features</strong> you want to share: listings, messages, transactions, reviews. Start with the safest and only enable transactions once you trust the partner.</li>
+              <li>{t('federation.api_doc_setup_step_partner')}</li>
+              <li>{t('federation.api_doc_setup_step_agree')}</li>
+              <li>{t('federation.api_doc_setup_step_keys')}</li>
+              <li>{t('federation.api_doc_setup_step_webhooks')}</li>
+              <li>{t('federation.api_doc_setup_step_handshake')}</li>
+              <li>{t('federation.api_doc_setup_step_features')}</li>
             </ol>
           </div>
 
           <Divider />
 
           <div>
-            <h4 className="font-semibold text-base mb-2">What could go wrong? (and what we do about it)</h4>
+            <h4 className="font-semibold text-base mb-2">{t('federation.api_doc_safeguards_title')}</h4>
             <Table aria-label={t('federation.api_doc_overview_safeguards_aria')} removeWrapper>
               <TableHeader>
                 <TableColumn>{t('federation.api_doc_col_worry')}</TableColumn>
@@ -204,28 +190,28 @@ function OverviewTab() {
               </TableHeader>
               <TableBody>
                 <TableRow key="stolen-key">
-                  <TableCell>Someone steals our API key</TableCell>
-                  <TableCell>Revoke in one click. New key in seconds.</TableCell>
+                  <TableCell>{t('federation.api_doc_worry_stolen_key')}</TableCell>
+                  <TableCell>{t('federation.api_doc_safeguard_stolen_key')}</TableCell>
                 </TableRow>
                 <TableRow key="fake-webhook">
-                  <TableCell>A partner sends a fake webhook</TableCell>
-                  <TableCell>Every webhook is signed. Fakes rejected automatically.</TableCell>
+                  <TableCell>{t('federation.api_doc_worry_fake_webhook')}</TableCell>
+                  <TableCell>{t('federation.api_doc_safeguard_fake_webhook')}</TableCell>
                 </TableRow>
                 <TableRow key="dup-webhook">
-                  <TableCell>A webhook arrives twice</TableCell>
-                  <TableCell>Unique IDs and nonces. Duplicates ignored.</TableCell>
+                  <TableCell>{t('federation.api_doc_worry_duplicate_webhook')}</TableCell>
+                  <TableCell>{t('federation.api_doc_safeguard_duplicate_webhook')}</TableCell>
                 </TableRow>
                 <TableRow key="partner-down">
-                  <TableCell>A partner's server is offline</TableCell>
-                  <TableCell>Queued delivery with retries. Circuit breaker stops hammering a dead partner.</TableCell>
+                  <TableCell>{t('federation.api_doc_worry_partner_down')}</TableCell>
+                  <TableCell>{t('federation.api_doc_safeguard_partner_down')}</TableCell>
                 </TableRow>
                 <TableRow key="misbehaves">
-                  <TableCell>A partner misbehaves (spam, fraud)</TableCell>
-                  <TableCell>Per-partner rate limits. Per-feature kill switches. One-click suspension.</TableCell>
+                  <TableCell>{t('federation.api_doc_worry_partner_misbehaves')}</TableCell>
+                  <TableCell>{t('federation.api_doc_safeguard_partner_misbehaves')}</TableCell>
                 </TableRow>
                 <TableRow key="global">
-                  <TableCell>We lose trust in federation entirely</TableCell>
-                  <TableCell>Platform-wide kill switch in super-admin. Disables all federation everywhere, instantly.</TableCell>
+                  <TableCell>{t('federation.api_doc_worry_global_trust')}</TableCell>
+                  <TableCell>{t('federation.api_doc_safeguard_global_trust')}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -234,12 +220,9 @@ function OverviewTab() {
           <Divider />
 
           <div>
-            <h4 className="font-semibold text-base mb-1">One-sentence summary</h4>
+            <h4 className="font-semibold text-base mb-1">{t('federation.api_doc_summary_title')}</h4>
             <blockquote className="border-l-4 border-primary pl-4 italic text-default-700">
-              Federation is two timebanks agreeing to act as one network. API keys let them ask
-              each other questions. Webhooks let them tap each other on the shoulder when
-              something urgent happens. Everything is signed, revocable, and off by default until
-              both sides say yes.
+              {t('federation.api_doc_summary_body')}
             </blockquote>
           </div>
 
@@ -247,12 +230,10 @@ function OverviewTab() {
 
           <div className="text-default-500">
             <p>
-              Ready for the technical detail? Use the other tabs above: <strong>Authentication</strong>,
-              {' '}<strong>Endpoints</strong>, <strong>Examples</strong>, <strong>Error Codes</strong>,
-              {' '}<strong>Webhooks</strong>.
+              {t('federation.api_doc_technical_tabs_hint')}
             </p>
             <p className="mt-2">
-              Full manual (MD + PDF): <code>docs/FEDERATION_API_MANUAL.md</code>.
+              {t('federation.api_doc_full_manual')} <code>docs/FEDERATION_API_MANUAL.md</code>.
             </p>
           </div>
         </CardBody>
@@ -274,8 +255,8 @@ function AuthenticationTab() {
         <CardHeader className="flex items-center gap-2">
           <Shield size={20} className="text-primary" />
           <div>
-            <h3 className="text-lg font-semibold">{"API Doc API Key Auth"}</h3>
-            <p className="text-sm text-default-500">{"API Doc API Key."}</p>
+            <h3 className="text-lg font-semibold">{t('federation.api_doc_api_key_auth')}</h3>
+            <p className="text-sm text-default-500">{t('federation.api_doc_api_key_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -299,15 +280,15 @@ Content-Type: application/json
         <CardHeader className="flex items-center gap-2">
           <Shield size={20} className="text-warning" />
           <div>
-            <h3 className="text-lg font-semibold">{"API Doc Hmac Auth"}</h3>
-            <p className="text-sm text-default-500">{"API Doc Hmac."}</p>
+            <h3 className="text-lg font-semibold">{t('federation.api_doc_hmac_auth')}</h3>
+            <p className="text-sm text-default-500">{t('federation.api_doc_hmac_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
             {t('federation.api_doc_hmac_instructions')}
           </p>
-          <p className="text-sm font-semibold text-default-700">String to sign:</p>
+          <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_string_to_sign')}</p>
           <CodeBlock>{`
 METHOD\n
 URL\n
@@ -315,8 +296,7 @@ TIMESTAMP\n
 BODY
           `}</CodeBlock>
           <p className="text-sm text-default-600">
-            Concatenate the HTTP method, full URL path, Unix timestamp, and the raw request body
-            (use empty string for GET requests with no body), each separated by a newline character.
+            {t('federation.api_doc_string_to_sign_desc')}
           </p>
           <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_required_headers')}</p>
           <Table aria-label={t('api_docs.aria_hmac_headers')} removeWrapper>
@@ -327,19 +307,19 @@ BODY
             <TableBody>
               <TableRow key="sig">
                 <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Federation-Signature</code></TableCell>
-                <TableCell>HMAC-SHA256 hex digest of the string-to-sign using your API secret</TableCell>
+                <TableCell>{t('federation.api_doc_header_signature_desc')}</TableCell>
               </TableRow>
               <TableRow key="ts">
                 <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Federation-Timestamp</code></TableCell>
-                <TableCell>Unix timestamp (seconds). Requests older than 5 minutes are rejected.</TableCell>
+                <TableCell>{t('federation.api_doc_header_timestamp_desc')}</TableCell>
               </TableRow>
               <TableRow key="nonce">
                 <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Federation-Nonce</code></TableCell>
-                <TableCell>Unique random string per request. Prevents replay attacks.</TableCell>
+                <TableCell>{t('federation.api_doc_header_nonce_desc')}</TableCell>
               </TableRow>
               <TableRow key="platform-id">
                 <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Federation-Platform-Id</code></TableCell>
-                <TableCell>Your platform identifier (the key_prefix from your API key)</TableCell>
+                <TableCell>{t('federation.api_doc_header_platform_id_desc')}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -351,8 +331,8 @@ BODY
         <CardHeader className="flex items-center gap-2">
           <Shield size={20} className="text-success" />
           <div>
-            <h3 className="text-lg font-semibold">{"API Doc JWT Auth"}</h3>
-            <p className="text-sm text-default-500">{"API Doc JWT."}</p>
+            <h3 className="text-lg font-semibold">{t('federation.api_doc_jwt_auth')}</h3>
+            <p className="text-sm text-default-500">{t('federation.api_doc_jwt_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -385,8 +365,8 @@ grant_type=client_credentials&scope=members:read listings:read
         <CardHeader className="flex items-center gap-2">
           <AlertTriangle size={20} className="text-danger" />
           <div>
-            <h3 className="text-lg font-semibold">{"API Doc Rate Limits"}</h3>
-            <p className="text-sm text-default-500">{"API Doc Rate Limits."}</p>
+            <h3 className="text-lg font-semibold">{t('federation.api_doc_rate_limits')}</h3>
+            <p className="text-sm text-default-500">{t('federation.api_doc_rate_limits_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -401,15 +381,15 @@ grant_type=client_credentials&scope=members:read listings:read
             <TableBody>
               <TableRow key="limit">
                 <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-RateLimit-Limit</code></TableCell>
-                <TableCell>Maximum requests per window (default: 60/min)</TableCell>
+                <TableCell>{t('federation.api_doc_rate_limit_limit_desc')}</TableCell>
               </TableRow>
               <TableRow key="remaining">
                 <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-RateLimit-Remaining</code></TableCell>
-                <TableCell>Requests remaining in the current window</TableCell>
+                <TableCell>{t('federation.api_doc_rate_limit_remaining_desc')}</TableCell>
               </TableRow>
               <TableRow key="reset">
                 <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-RateLimit-Reset</code></TableCell>
-                <TableCell>Unix timestamp when the window resets</TableCell>
+                <TableCell>{t('federation.api_doc_rate_limit_reset_desc')}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -1047,7 +1027,7 @@ function ExamplesTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">{"API Doc Example API Key"}</h3>
+          <h3 className="text-lg font-semibold">{t('federation.api_doc_example_api_key')}</h3>
         </CardHeader>
         <CardBody>
           <CodeBlock>{EXAMPLES.apiKey[lang]}</CodeBlock>
@@ -1056,7 +1036,7 @@ function ExamplesTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">{"API Doc Example Hmac"}</h3>
+          <h3 className="text-lg font-semibold">{t('federation.api_doc_example_hmac')}</h3>
         </CardHeader>
         <CardBody>
           <CodeBlock>{EXAMPLES.hmac[lang]}</CodeBlock>
@@ -1065,7 +1045,7 @@ function ExamplesTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">{"API Doc Example"}</h3>
+          <h3 className="text-lg font-semibold">{t('federation.api_doc_example_message')}</h3>
         </CardHeader>
         <CardBody>
           <CodeBlock>{EXAMPLES.message[lang]}</CodeBlock>
@@ -1080,13 +1060,13 @@ function ExamplesTab() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ERROR_CODES = [
-  { code: 400, name: 'Bad Request', description: 'The request body is malformed or missing required fields. Check the validation error message for details.' },
-  { code: 401, name: 'Unauthorized', description: 'Missing, invalid, or expired authentication credentials. Ensure your API key or JWT is valid.' },
-  { code: 403, name: 'Forbidden', description: 'Your API key does not have the required permission scope, or the target resource is restricted.' },
-  { code: 404, name: 'Not Found', description: 'The requested resource does not exist, or the member/listing is not accessible via federation.' },
-  { code: 409, name: 'Conflict', description: 'The request conflicts with the current state (e.g. duplicate transaction, already opted-in).' },
-  { code: 429, name: 'Rate Limited', description: 'Too many requests. Check X-RateLimit-Reset header for when to retry.' },
-  { code: 500, name: 'Internal Server Error', description: 'An unexpected error occurred. Contact support if the issue persists.' },
+  { code: 400, nameKey: 'federation.api_doc_error_bad_request', descriptionKey: 'federation.api_doc_error_bad_request_desc' },
+  { code: 401, nameKey: 'federation.api_doc_error_unauthorized', descriptionKey: 'federation.api_doc_error_unauthorized_desc' },
+  { code: 403, nameKey: 'federation.api_doc_error_forbidden', descriptionKey: 'federation.api_doc_error_forbidden_desc' },
+  { code: 404, nameKey: 'federation.api_doc_error_not_found', descriptionKey: 'federation.api_doc_error_not_found_desc' },
+  { code: 409, nameKey: 'federation.api_doc_error_conflict', descriptionKey: 'federation.api_doc_error_conflict_desc' },
+  { code: 429, nameKey: 'federation.api_doc_error_rate_limited', descriptionKey: 'federation.api_doc_error_rate_limited_desc' },
+  { code: 500, nameKey: 'federation.api_doc_error_internal', descriptionKey: 'federation.api_doc_error_internal_desc' },
 ];
 
 function ErrorCodesTab() {
@@ -1094,7 +1074,7 @@ function ErrorCodesTab() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-default-600">
-        All error responses follow a consistent JSON format:
+        {t('federation.api_doc_error_format_intro')}
       </p>
       <CodeBlock>{`{
   "error": true,
@@ -1122,8 +1102,8 @@ function ErrorCodesTab() {
                   {err.code}
                 </Chip>
               </TableCell>
-              <TableCell><span className="text-sm font-medium">{err.name}</span></TableCell>
-              <TableCell><span className="text-sm text-default-600">{err.description}</span></TableCell>
+              <TableCell><span className="text-sm font-medium">{t(err.nameKey)}</span></TableCell>
+              <TableCell><span className="text-sm text-default-600">{t(err.descriptionKey)}</span></TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -1137,19 +1117,19 @@ function ErrorCodesTab() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const WEBHOOK_EVENTS = [
-  { event: 'partnership.requested', description: 'A new partnership request was sent to your timebank' },
-  { event: 'partnership.approved', description: 'A partnership request was approved' },
-  { event: 'partnership.rejected', description: 'A partnership request was rejected' },
-  { event: 'partnership.terminated', description: 'An active partnership was terminated' },
-  { event: 'member.opted_in', description: 'A member opted in to federation' },
-  { event: 'member.opted_out', description: 'A member opted out of federation' },
-  { event: 'message.sent', description: 'A federated message was sent from your timebank' },
-  { event: 'message.received', description: 'A federated message was received by a member in your timebank' },
-  { event: 'transaction.created', description: 'A time credit transaction was initiated' },
-  { event: 'transaction.completed', description: 'A time credit transaction was completed' },
-  { event: 'connection.requested', description: 'A cross-timebank connection request was sent' },
-  { event: 'connection.accepted', description: 'A cross-timebank connection was accepted' },
-  { event: 'listing.shared', description: 'A listing was shared to the federation network' },
+  { event: 'partnership.requested', descriptionKey: 'federation.api_doc_webhook_event_partnership_requested' },
+  { event: 'partnership.approved', descriptionKey: 'federation.api_doc_webhook_event_partnership_approved' },
+  { event: 'partnership.rejected', descriptionKey: 'federation.api_doc_webhook_event_partnership_rejected' },
+  { event: 'partnership.terminated', descriptionKey: 'federation.api_doc_webhook_event_partnership_terminated' },
+  { event: 'member.opted_in', descriptionKey: 'federation.api_doc_webhook_event_member_opted_in' },
+  { event: 'member.opted_out', descriptionKey: 'federation.api_doc_webhook_event_member_opted_out' },
+  { event: 'message.sent', descriptionKey: 'federation.api_doc_webhook_event_message_sent' },
+  { event: 'message.received', descriptionKey: 'federation.api_doc_webhook_event_message_received' },
+  { event: 'transaction.created', descriptionKey: 'federation.api_doc_webhook_event_transaction_created' },
+  { event: 'transaction.completed', descriptionKey: 'federation.api_doc_webhook_event_transaction_completed' },
+  { event: 'connection.requested', descriptionKey: 'federation.api_doc_webhook_event_connection_requested' },
+  { event: 'connection.accepted', descriptionKey: 'federation.api_doc_webhook_event_connection_accepted' },
+  { event: 'listing.shared', descriptionKey: 'federation.api_doc_webhook_event_listing_shared' },
 ];
 
 function WebhooksTab() {
@@ -1160,15 +1140,15 @@ function WebhooksTab() {
         <CardHeader className="flex items-center gap-2">
           <Webhook size={20} className="text-primary" />
           <div>
-            <h3 className="text-lg font-semibold">{"API Doc Webhook Events"}</h3>
-            <p className="text-sm text-default-500">{"API Doc Webhook Events."}</p>
+            <h3 className="text-lg font-semibold">{t('federation.api_doc_webhook_events')}</h3>
+            <p className="text-sm text-default-500">{t('federation.api_doc_webhook_events_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
-            Webhooks are sent as <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">POST</code> requests
-            to your configured HTTPS endpoint. Configure webhooks on the{' '}
-            <a href="../webhooks" className="text-primary underline">Webhooks</a> page.
+            {t('federation.api_doc_webhook_delivery_intro')}{' '}
+            <a href="../webhooks" className="text-primary underline">{t('federation.api_docs_webhooks')}</a>
+            {' '}{t('federation.api_doc_webhook_delivery_suffix')}
           </p>
           <Table aria-label={t('federation.api_doc_webhook_events_aria')} removeWrapper>
             <TableHeader>
@@ -1181,7 +1161,7 @@ function WebhooksTab() {
                   <TableCell>
                     <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">{evt.event}</code>
                   </TableCell>
-                  <TableCell><span className="text-sm text-default-600">{evt.description}</span></TableCell>
+                  <TableCell><span className="text-sm text-default-600">{t(evt.descriptionKey)}</span></TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -1191,11 +1171,11 @@ function WebhooksTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">{"API Doc Payload Format"}</h3>
+          <h3 className="text-lg font-semibold">{t('federation.api_doc_payload_format')}</h3>
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
-            Every webhook delivery includes these standard fields:
+            {t('federation.api_doc_payload_format_desc')}
           </p>
           <CodeBlock>{`{
   "event": "message.received",
@@ -1223,18 +1203,17 @@ function WebhooksTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">{"API Doc Signature Verification"}</h3>
+          <h3 className="text-lg font-semibold">{t('federation.api_doc_signature_verification')}</h3>
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
-            Every webhook delivery is signed with your webhook secret using HMAC-SHA256.
-            Verify the signature to ensure the payload is authentic and has not been tampered with.
-            The signature is sent in the <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Webhook-Signature</code> header.
+            {t('federation.api_doc_signature_verification_desc')}{' '}
+            <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Webhook-Signature</code>.
           </p>
 
           <Divider />
 
-          <p className="text-sm font-semibold text-default-700">Node.js verification example:</p>
+          <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_node_verification_example')}</p>
           <CodeBlock>{`const crypto = require('crypto');
 
 function verifyWebhookSignature(payload, signature, secret) {
@@ -1269,7 +1248,7 @@ app.post('/webhooks/nexus', (req, res) => {
   res.status(200).json({ received: true });
 });`}</CodeBlock>
 
-          <p className="text-sm font-semibold text-default-700">Python verification example:</p>
+          <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_python_verification_example')}</p>
           <CodeBlock>{`import hashlib
 import hmac
 from flask import Flask, request, jsonify
