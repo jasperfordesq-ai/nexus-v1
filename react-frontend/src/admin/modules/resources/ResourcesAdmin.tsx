@@ -150,12 +150,12 @@ export function ResourcesAdmin() {
       label: "Author",
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.author_name || t('resources.unknown', 'Unknown')}</span>
+        <span className="text-sm text-default-600">{item.author_name || t('resources.unknown')}</span>
       ),
     },
     {
       key: 'views',
-      label: t('resources.views', 'Views'),
+      label: t('resources.views'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1 text-sm text-default-500">
@@ -166,7 +166,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'helpful_votes',
-      label: t('resources.helpful', 'Helpful'),
+      label: t('resources.helpful'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1 text-sm text-default-500">
@@ -192,7 +192,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'updated_at',
-      label: t('resources.updated', 'Updated'),
+      label: t('resources.updated'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -211,7 +211,7 @@ export function ResourcesAdmin() {
             variant="flat"
             color="primary"
             onPress={() => navigate(tenantPath(`/admin/resources/edit/${item.id}`))}
-            aria-label={t('resources.label_edit_resource', 'Edit article')}
+            aria-label={t('resources.label_edit_resource')}
           >
             <Pencil size={14} />
           </Button>
@@ -257,14 +257,14 @@ export function ResourcesAdmin() {
               startContent={<FolderTree size={16} />}
               onPress={() => navigate(tenantPath('/admin/resources/categories'))}
             >
-              {t('resources.manage_categories', 'Manage Categories')}
+              {t('resources.manage_categories')}
             </Button>
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/resources/create'))}
             >
-              {t('resources.new_article', 'New Article')}
+              {t('resources.new_article')}
             </Button>
           </div>
         }
@@ -278,8 +278,8 @@ export function ResourcesAdmin() {
           size="sm"
         >
           <Tab key="all" title={"All"} />
-          <Tab key="published" title={t('content.published', 'Published')} />
-          <Tab key="draft" title={t('content.draft', 'Draft')} />
+          <Tab key="published" title={t('content.published')} />
+          <Tab key="draft" title={t('content.draft')} />
         </Tabs>
       </div>
 
@@ -287,7 +287,7 @@ export function ResourcesAdmin() {
         columns={columns}
         data={items}
         isLoading={loading}
-        searchPlaceholder={t('data_table.search', 'Search resources...')}
+        searchPlaceholder={t('data_table.search')}
         onSearch={(q) => { setSearch(q); setPage(1); }}
         onRefresh={loadItems}
         totalItems={total}

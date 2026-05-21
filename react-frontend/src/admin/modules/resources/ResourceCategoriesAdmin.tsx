@@ -66,7 +66,7 @@ const EMPTY_FORM: CategoryFormData = {
 
 export function ResourceCategoriesAdmin() {
   const { t } = useTranslation('admin');
-  useAdminPageMeta({ title: t('resources.categories_page_title', 'Resource Categories') });
+  useAdminPageMeta({ title: t('resources.categories_page_title') });
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -99,7 +99,7 @@ export function ResourceCategoriesAdmin() {
         }
       }
     } catch {
-      toast.error(t('resources.failed_to_load_resources', 'Failed to load categories'));
+      toast.error(t('resources.failed_to_load_resources'));
     } finally {
       setLoading(false);
     }
@@ -144,7 +144,7 @@ export function ResourceCategoriesAdmin() {
     const newErrors: Record<string, string> = {};
 
     if (!form.name.trim()) {
-      newErrors.name = t('blog.title_required', 'Name is required');
+      newErrors.name = t('blog.title_required');
     }
 
     setErrors(newErrors);
@@ -174,16 +174,16 @@ export function ResourceCategoriesAdmin() {
       if (res.success) {
         toast.success(
           editingItem
-            ? t('resources.category_updated', 'Category updated successfully')
-            : t('resources.category_created', 'Category created successfully')
+            ? t('resources.category_updated')
+            : t('resources.category_created')
         );
         closeModal();
         loadItems();
       } else {
-        toast.error(res.error || t('resources.an_unexpected_error_occurred', 'An unexpected error occurred'));
+        toast.error(res.error || t('resources.an_unexpected_error_occurred'));
       }
     } catch {
-      toast.error(t('resources.an_unexpected_error_occurred', 'An unexpected error occurred'));
+      toast.error(t('resources.an_unexpected_error_occurred'));
     } finally {
       setSubmitting(false);
     }
@@ -198,13 +198,13 @@ export function ResourceCategoriesAdmin() {
     try {
       const res = await api.delete(`/v2/resources/categories/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success(t('resources.category_deleted', 'Category deleted successfully'));
+        toast.success(t('resources.category_deleted'));
         loadItems();
       } else {
-        toast.error(res?.error || t('resources.an_unexpected_error_occurred', 'An unexpected error occurred'));
+        toast.error(res?.error || t('resources.an_unexpected_error_occurred'));
       }
     } catch {
-      toast.error(t('resources.an_unexpected_error_occurred', 'An unexpected error occurred'));
+      toast.error(t('resources.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -224,7 +224,7 @@ export function ResourceCategoriesAdmin() {
     },
     {
       key: 'slug',
-      label: t('federation.col_slug', 'Slug'),
+      label: t('federation.col_slug'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">{item.slug}</span>
@@ -232,7 +232,7 @@ export function ResourceCategoriesAdmin() {
     },
     {
       key: 'description',
-      label: t('content.label_description', 'Description'),
+      label: t('content.label_description'),
       render: (item) => (
         <span className="text-sm text-default-500 line-clamp-2">
           {item.description || '--'}
@@ -241,7 +241,7 @@ export function ResourceCategoriesAdmin() {
     },
     {
       key: 'sort_order',
-      label: t('resources.sort_order', 'Sort Order'),
+      label: t('resources.sort_order'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">{item.sort_order}</span>
@@ -258,7 +258,7 @@ export function ResourceCategoriesAdmin() {
             variant="flat"
             color="primary"
             onPress={() => openEditModal(item)}
-            aria-label={t('resources.label_edit_category', 'Edit category')}
+            aria-label={t('resources.label_edit_category')}
           >
             <Pencil size={14} />
           </Button>
@@ -268,7 +268,7 @@ export function ResourceCategoriesAdmin() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label={t('resources.label_delete_category', 'Delete category')}
+            aria-label={t('resources.label_delete_category')}
           >
             <Trash2 size={14} />
           </Button>
@@ -282,8 +282,8 @@ export function ResourceCategoriesAdmin() {
   return (
     <div>
       <PageHeader
-        title={t('resources.categories_page_title', 'Resource Categories')}
-        description={t('resources.categories_page_desc', 'Manage Knowledge Base categories')}
+        title={t('resources.categories_page_title')}
+        description={t('resources.categories_page_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -291,14 +291,14 @@ export function ResourceCategoriesAdmin() {
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/resources'))}
             >
-              {t('common.back', 'Back')}
+              {t('common.back')}
             </Button>
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={openCreateModal}
             >
-              {t('resources.new_category', 'New Category')}
+              {t('resources.new_category')}
             </Button>
           </div>
         }
@@ -308,14 +308,14 @@ export function ResourceCategoriesAdmin() {
         columns={columns}
         data={items}
         isLoading={loading}
-        searchPlaceholder={t('data_table.search', 'Search categories...')}
+        searchPlaceholder={t('data_table.search')}
         onRefresh={loadItems}
         totalItems={items.length}
         emptyContent={
           <EmptyState
             icon={FolderTree}
-            title={t('no_data', 'No data')}
-            description={t('resources.categories_page_desc', 'Manage Knowledge Base categories')}
+            title={t('no_data')}
+            description={t('resources.categories_page_desc')}
           />
         }
       />
@@ -325,13 +325,13 @@ export function ResourceCategoriesAdmin() {
         <ModalContent>
           <ModalHeader>
             {editingItem
-              ? `${t('breadcrumbs.edit', 'Edit')}: ${editingItem.name}`
-              : t('resources.new_category', 'New Category')}
+              ? `${t('breadcrumbs.edit')}: ${editingItem.name}`
+              : t('resources.new_category')}
           </ModalHeader>
           <ModalBody className="gap-4">
             <Input
               label={"Name"}
-              placeholder={t('resources.category_name_placeholder', 'Enter category name')}
+              placeholder={t('resources.category_name_placeholder')}
               value={form.name}
               onValueChange={(val) => setForm((prev) => ({ ...prev, name: val }))}
               isRequired
@@ -340,8 +340,8 @@ export function ResourceCategoriesAdmin() {
               isDisabled={submitting}
             />
             <Textarea
-              label={t('content.label_description', 'Description')}
-              placeholder={t('resources.category_desc_placeholder', 'Optional description')}
+              label={t('content.label_description')}
+              placeholder={t('resources.category_desc_placeholder')}
               value={form.description}
               onValueChange={(val) => setForm((prev) => ({ ...prev, description: val }))}
               minRows={2}
@@ -349,7 +349,7 @@ export function ResourceCategoriesAdmin() {
               isDisabled={submitting}
             />
             <Input
-              label={t('resources.sort_order', 'Sort Order')}
+              label={t('resources.sort_order')}
               type="number"
               placeholder="0"
               value={String(form.sort_order)}
@@ -359,17 +359,17 @@ export function ResourceCategoriesAdmin() {
               isDisabled={submitting}
             />
             <Input
-              label={t('resources.icon_label', 'Icon')}
-              placeholder={t('resources.icon_placeholder', 'Lucide icon name (e.g. book-open)')}
+              label={t('resources.icon_label')}
+              placeholder={t('resources.icon_placeholder')}
               value={form.icon}
               onValueChange={(val) => setForm((prev) => ({ ...prev, icon: val }))}
               isDisabled={submitting}
-              description={t('resources.icon_desc', 'Optional Lucide React icon name')}
+              description={t('resources.icon_desc')}
             />
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={closeModal} isDisabled={submitting}>
-              {t('cancel', 'Cancel')}
+              {t('cancel')}
             </Button>
             <Button
               color="primary"
@@ -378,8 +378,8 @@ export function ResourceCategoriesAdmin() {
               isDisabled={submitting}
             >
               {editingItem
-                ? t('federation.save_changes', 'Save Changes')
-                : t('resources.new_category', 'New Category')}
+                ? t('federation.save_changes')
+                : t('resources.new_category')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -391,9 +391,9 @@ export function ResourceCategoriesAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={`${t('common.delete', 'Delete')} ${t('breadcrumbs.categories', 'Category')}`}
+          title={`${t('common.delete')} ${t('breadcrumbs.categories')}`}
           message={`Delete Campaign`}
-          confirmLabel={t('common.delete', 'Delete')}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />
