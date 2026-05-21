@@ -62,6 +62,7 @@ class AdminConfigController extends BaseApiController
         'time_format', 'items_per_page', 'max_upload_size_mb',
         'email_verification', 'admin_approval', 'welcome_credits',
         'footer_text',
+        'partner_logo_url',
         'map_provider', 'geocoding_provider',
         'google_maps_api_key', 'google_maps_map_id', 'maptiler_api_key',
     ];

@@ -692,6 +692,22 @@ class TenantBootstrapController extends BaseApiController
             $publicConfig['footer_text'] = $footerText;
         }
 
+        // Partner logo URL (shown in footer left slot)
+        if ($tenantId > 0) {
+            try {
+                $row = DB::table('tenant_settings')
+                    ->where('tenant_id', $tenantId)
+                    ->where('setting_key', 'general.partner_logo_url')
+                    ->select('setting_value')
+                    ->first();
+                if ($row && !empty($row->setting_value)) {
+                    $publicConfig['partner_logo_url'] = $row->setting_value;
+                }
+            } catch (\Exception $e) {
+                // table may not exist yet
+            }
+        }
+
         if ($config === null) {
             return $publicConfig;
         }

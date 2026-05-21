@@ -57,10 +57,18 @@ export function Footer({ children, copyright }: FooterProps) {
             className="h-20 w-auto"
           />
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
-          {/* Tenant placeholder */}
-          <div className="w-full max-w-[18rem] border-2 border-dashed border-theme-default/40 rounded-xl h-14 flex items-center justify-center">
-            <span className="text-xs text-theme-subtle/40">{t('footer.tenant_logo_placeholder')}</span>
-          </div>
+          {/* Tenant partner logo — real or placeholder */}
+          {tenant?.config?.partner_logo_url ? (
+            <img
+              src={tenant.config.partner_logo_url as string}
+              alt={branding.name}
+              className="h-14 w-auto max-w-[12rem] object-contain"
+            />
+          ) : (
+            <div className="w-full max-w-[18rem] border-2 border-dashed border-theme-default/40 rounded-xl h-14 flex items-center justify-center">
+              <span className="text-xs text-theme-subtle/40">{t('footer.tenant_logo_placeholder')}</span>
+            </div>
+          )}
           <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-theme-subtle/70">
             <span>{t('footer.agpl_notice', { year })}</span>
             <span aria-hidden="true">&middot;</span>
@@ -225,16 +233,24 @@ export function Footer({ children, copyright }: FooterProps) {
             <div className="border-t border-theme-default pt-6 flex flex-col gap-5">
               <div className="flex flex-col sm:flex-row items-center sm:items-stretch justify-between gap-6">
 
-                {/* LEFT: tenant / community partner logo placeholder */}
+                {/* LEFT: tenant / community partner logo — real or placeholder */}
                 <div className="flex flex-col items-start gap-2">
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-theme-subtle/50">
                     {t('footer.community_partner')}
                   </span>
-                  <div className="h-20 w-48 border-2 border-dashed border-theme-default/40 rounded-xl flex items-center justify-center">
-                    <span className="text-xs text-theme-subtle/40 text-center leading-snug px-3">
-                      {t('footer.tenant_logo_placeholder')}
-                    </span>
-                  </div>
+                  {tenant?.config?.partner_logo_url ? (
+                    <img
+                      src={tenant.config.partner_logo_url as string}
+                      alt={branding.name}
+                      className="h-20 w-auto max-w-[12rem] object-contain"
+                    />
+                  ) : (
+                    <div className="h-20 w-48 border-2 border-dashed border-theme-default/40 rounded-xl flex items-center justify-center">
+                      <span className="text-xs text-theme-subtle/40 text-center leading-snug px-3">
+                        {t('footer.tenant_logo_placeholder')}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* RIGHT: GitHub button + NEXUS logo */}

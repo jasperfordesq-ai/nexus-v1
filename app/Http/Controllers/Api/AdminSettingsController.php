@@ -37,6 +37,7 @@ class AdminSettingsController extends BaseApiController
         'general.items_per_page',
         'general.welcome_credits',
         'general.footer_text',
+        'general.partner_logo_url',
         // Onboarding keys are managed by AdminOnboardingConfigController with its own whitelist
     ];
 

@@ -49,6 +49,7 @@ interface SettingsForm {
   admin_approval: boolean;    // general.admin_approval
   maintenance_mode: boolean;  // general.maintenance_mode
   footer_text: string;        // general.footer_text (charity number, legal name, etc.)
+  partner_logo_url: string;   // general.partner_logo_url (shown in footer left slot)
   default_currency: string;   // general.default_currency (ISO 4217 lowercase, e.g. 'eur', 'usd')
 }
 
@@ -71,6 +72,7 @@ const DEFAULT_SETTINGS: SettingsForm = {
   admin_approval: false,
   maintenance_mode: false,
   footer_text: '',
+  partner_logo_url: '',
   default_currency: 'eur',
 };
 
@@ -112,6 +114,7 @@ export function AdminSettings() {
           admin_approval: settings.admin_approval === 'true' || settings.admin_approval === '1',
           maintenance_mode: settings.maintenance_mode === 'true' || settings.maintenance_mode === '1',
           footer_text: (settings.footer_text as string) ?? '',
+          partner_logo_url: (settings.partner_logo_url as string) ?? '',
           default_currency: (settings.default_currency as string)?.toLowerCase() || 'eur',
         };
         setForm(loaded);
@@ -143,6 +146,7 @@ export function AdminSettings() {
       if (form.email_verification !== originalForm.email_verification) changes.email_verification = String(form.email_verification);
       if (form.admin_approval !== originalForm.admin_approval) changes.admin_approval = String(form.admin_approval);
       if (form.footer_text !== originalForm.footer_text) changes.footer_text = form.footer_text;
+      if (form.partner_logo_url !== originalForm.partner_logo_url) changes.partner_logo_url = form.partner_logo_url;
       if (form.default_currency !== originalForm.default_currency) changes.default_currency = form.default_currency;
 
       if (Object.keys(changes).length === 0) {
@@ -259,6 +263,25 @@ export function AdminSettings() {
               value={form.footer_text}
               onValueChange={(val) => setForm(prev => ({ ...prev, footer_text: val }))}
             />
+            <Input
+              label="Partner Logo URL"
+              description="URL of the partner / community logo shown in the footer left slot. Use an externally hosted image or upload to your media library."
+              placeholder="https://example.com/partner-logo.png"
+              variant="bordered"
+              value={form.partner_logo_url}
+              onValueChange={(val) => setForm(prev => ({ ...prev, partner_logo_url: val }))}
+            />
+            {form.partner_logo_url && (
+              <div className="flex items-center gap-3 p-3 rounded-lg border border-default-200 bg-default-50">
+                <img
+                  src={form.partner_logo_url}
+                  alt="Partner logo preview"
+                  className="h-12 w-auto max-w-[160px] object-contain rounded"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+                <span className="text-xs text-default-500">Footer preview</span>
+              </div>
+            )}
           </CardBody>
         </Card>
 
