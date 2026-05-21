@@ -185,6 +185,24 @@ export function ModerationQueuePage() {
   // Local settings copy for editing
   const [localSettings, setLocalSettings] = useState<ModerationSettings | null>(null);
 
+  const contentTypeLabel = useCallback(
+    (type: string) => (
+      Object.prototype.hasOwnProperty.call(TYPE_COLORS, type)
+        ? t(`reports.content_type_${type}`)
+        : t('reports.unknown_content_type', { type })
+    ),
+    [t],
+  );
+
+  const statusLabel = useCallback(
+    (status: string) => (
+      Object.prototype.hasOwnProperty.call(STATUS_COLORS, status)
+        ? t(`reports.status_${status}`)
+        : t('reports.unknown_status', { status })
+    ),
+    [t],
+  );
+
   // Load queue
   const loadQueue = useCallback(async () => {
     setLoading(true);
@@ -416,7 +434,7 @@ export function ModerationQueuePage() {
                 <div key={type} className="rounded-lg border border-divider p-3">
                     <div className="flex items-center gap-2 mb-2">
                       <Chip size="sm" variant="flat" color={TYPE_COLORS[type] ?? 'default'}>
-                        {t(`reports.content_type_${type}`, { defaultValue: type })}
+                        {contentTypeLabel(type)}
                       </Chip>
                     </div>
                     <div className="grid grid-cols-2 gap-1 text-xs">
@@ -510,7 +528,7 @@ export function ModerationQueuePage() {
               </TableCell>
               <TableCell>
                 <Chip size="sm" variant="flat" color={TYPE_COLORS[item.content_type] ?? 'default'}>
-                  {t(`reports.content_type_${item.content_type}`, { defaultValue: item.content_type })}
+                  {contentTypeLabel(item.content_type)}
                 </Chip>
               </TableCell>
               <TableCell>
@@ -521,7 +539,7 @@ export function ModerationQueuePage() {
               </TableCell>
               <TableCell>
                 <Chip size="sm" variant="flat" color={STATUS_COLORS[item.status] ?? 'default'}>
-                  {t(`reports.status_${item.status}`, { defaultValue: item.status })}
+                  {statusLabel(item.status)}
                 </Chip>
                 {item.rejection_reason && (
                   <p className="text-xs text-danger mt-1 max-w-[120px] truncate">

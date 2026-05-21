@@ -113,6 +113,7 @@ const legalBasisColor: Record<string, 'primary' | 'success' | 'warning' | 'secon
   legal_obligation: 'warning',
   legitimate_interest: 'secondary',
 };
+const consentActionKeys = new Set(['granted', 'withdrawn']);
 
 const emptyActivity = {
   id: undefined as number | undefined,
@@ -187,6 +188,24 @@ export function FadpAdminPage() {
   });
   const [retentionLoading, setRetentionLoading] = useState(true);
   const [retentionSaving, setRetentionSaving] = useState(false);
+
+  const legalBasisLabel = useCallback(
+    (basis: string) => (
+      Object.prototype.hasOwnProperty.call(legalBasisColor, basis)
+        ? t(`fadp.legal_basis.${basis}`)
+        : t('fadp.legal_basis.unknown', { basis })
+    ),
+    [t],
+  );
+
+  const consentActionLabel = useCallback(
+    (action: string) => (
+      consentActionKeys.has(action)
+        ? t(`fadp.consent_actions.${action}`)
+        : t('fadp.consent_actions.unknown', { action })
+    ),
+    [t],
+  );
 
   const [consentRecords, setConsentRecords] = useState<ConsentRecord[]>([]);
   const [consentLoading, setConsentLoading] = useState(true);
@@ -444,7 +463,7 @@ export function FadpAdminPage() {
                               color={legalBasisColor[a.legal_basis] ?? 'default'}
                               variant="flat"
                             >
-                              {t(`fadp.legal_basis.${a.legal_basis}`, { defaultValue: a.legal_basis.replace('_', ' ') })}
+                              {legalBasisLabel(a.legal_basis)}
                             </Chip>
                           </TableCell>
                           <TableCell>
@@ -602,7 +621,7 @@ export function FadpAdminPage() {
                               color={r.action === 'granted' ? 'success' : r.action === 'withdrawn' ? 'danger' : 'warning'}
                               variant="flat"
                             >
-                              {t(`fadp.consent_actions.${r.action}`, { defaultValue: r.action })}
+                              {consentActionLabel(r.action)}
                             </Chip>
                           </TableCell>
                           <TableCell>

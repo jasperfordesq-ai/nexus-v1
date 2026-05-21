@@ -1881,6 +1881,15 @@ function EventsTab() {
       .finally(() => setLoading(false));
   }, [limit, t, toast]);
 
+  const eventTypeLabel = useCallback(
+    (event: string) => (
+      ['success', 'partial', 'fail', 'supersede'].includes(event)
+        ? t(`types.${event}`)
+        : t('types.unknown', { event })
+    ),
+    [t],
+  );
+
   useEffect(() => { load(); }, [load]);
 
   return (
@@ -1932,7 +1941,7 @@ function EventsTab() {
                   <TableCell className="text-xs">{ts ? formatTs(ts) : '—'}</TableCell>
                   <TableCell>
                     <Chip color={color} variant="flat" size="sm">
-                      {ev ? t(`types.${ev}`, { defaultValue: ev }) : '—'}
+                      {ev ? eventTypeLabel(ev) : '—'}
                     </Chip>
                   </TableCell>
                   <TableCell className="text-xs font-mono">{commit || '—'}</TableCell>

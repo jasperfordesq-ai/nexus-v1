@@ -432,7 +432,8 @@
         "name_match": "Name match",
         "name_similar": "Name similar",
         "phone_match": "Phone match",
-        "website_match": "Website match"
+        "website_match": "Website match",
+        "unknown": "Unknown signal: {{signal}}"
       },
       "status": {
         "active": "Active",
@@ -915,12 +916,14 @@
         "family": "Family",
         "friend": "Friend",
         "neighbour": "Neighbour",
-        "professional": "Professional"
+        "professional": "Professional",
+        "unknown": "Unknown relationship: {{type}}"
       },
       "status": {
         "active": "Active",
         "paused": "Paused",
-        "ended": "Ended"
+        "ended": "Ended",
+        "unknown": "Unknown status: {{status}}"
       },
       "relationships": {
         "title": "Support Relationships",

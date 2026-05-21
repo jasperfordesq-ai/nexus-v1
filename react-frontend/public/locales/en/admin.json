@@ -668,7 +668,8 @@
       "consent": "Consent",
       "contract": "Contract",
       "legal_obligation": "Legal obligation",
-      "legitimate_interest": "Legitimate interest"
+      "legitimate_interest": "Legitimate interest",
+      "unknown": "Unknown legal basis: {{basis}}"
     },
     "data_residency": {
       "EU": "EU (EEA)",
@@ -677,7 +678,8 @@
     },
     "consent_actions": {
       "granted": "Granted",
-      "withdrawn": "Withdrawn"
+      "withdrawn": "Withdrawn",
+      "unknown": "Unknown action: {{action}}"
     },
     "toasts": {
       "activities_load_failed": "Failed to load processing activities.",
@@ -2259,12 +2261,13 @@
         },
         "summary": "{{count}} events",
         "table_aria": "Events",
-        "types": {
-          "fail": "Fail",
-          "partial": "Partial",
-          "success": "Success",
-          "supersede": "Supersede"
-        }
+      "types": {
+        "fail": "Fail",
+        "partial": "Partial",
+        "success": "Success",
+        "supersede": "Supersede",
+        "unknown": "Unknown event: {{event}}"
+      }
       },
       "failures": {
         "columns": {
@@ -11516,6 +11519,8 @@
     "status_flagged": "Flagged",
     "status_pending": "Pending",
     "status_rejected": "Rejected",
+    "unknown_content_type": "Unknown type: {{type}}",
+    "unknown_status": "Unknown status: {{status}}",
     "tab_by_category": "By Category",
     "tab_by_member": "By Member",
     "tab_monthly_trend": "Monthly Trend"
@@ -16577,7 +16582,8 @@
       "processing": "Processing",
       "queued": "Queued",
       "sent": "Sent",
-      "suppressed": "Suppressed"
+      "suppressed": "Suppressed",
+      "unknown": "Unknown status: {{status}}"
     },
     "severity": {
       "critical": "Critical",
@@ -16689,7 +16695,8 @@
         "bounce": "Bounce",
         "invalid": "Invalid",
         "spam_report": "Spam report",
-        "unsubscribe": "Unsubscribe"
+        "unsubscribe": "Unsubscribe",
+        "unknown": "Unknown reason: {{reason}}"
       }
     },
     "empty": {

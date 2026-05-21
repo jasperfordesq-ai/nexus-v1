@@ -110,6 +110,15 @@ const EMPTY_FORM: ProviderFormData = {
   website_url: '',
 };
 
+const PROVIDER_SIGNAL_KEYS = new Set([
+  'address_overlap',
+  'email_match',
+  'name_match',
+  'name_similar',
+  'phone_match',
+  'website_match',
+]);
+
 const PROVIDER_TYPES: ProviderType[] = ['spitex', 'tagesstätte', 'private', 'verein', 'volunteer'];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -446,7 +455,9 @@ export default function CareProviderAdminPage() {
                   <div className="flex items-center gap-1.5 mt-2 flex-wrap">
                     {pair.signals.map((sig) => (
                       <Chip key={sig} size="sm" variant="flat" color="primary">
-                        {t(`admin.providers.signals.${sig}`, { defaultValue: sig })}
+                        {PROVIDER_SIGNAL_KEYS.has(sig)
+                          ? t(`admin.providers.signals.${sig}`)
+                          : t('admin.providers.signals.unknown', { signal: sig })}
                       </Chip>
                     ))}
                   </div>

@@ -69,6 +69,8 @@ function tierColor(tier: number): 'default' | 'warning' | 'success' | 'primary' 
 }
 
 const TIER_KEYS = ['newcomer', 'member', 'trusted', 'verified', 'coordinator'] as const;
+const STATUS_KEYS = new Set(['active', 'paused', 'ended']);
+const RELATIONSHIP_TYPE_KEYS = new Set(['care', 'support', 'family', 'friend', 'neighbour', 'professional']);
 
 function fmtDate(iso: string | null, emptyValue: string): string {
   if (!iso) return emptyValue;
@@ -121,12 +123,20 @@ export default function CareRecipientCirclePage() {
   );
 
   const statusLabel = useCallback(
-    (status: string) => t(`admin.recipient_circle.status.${status}`, { defaultValue: status.replace(/_/g, ' ') }),
+    (status: string) => (
+      STATUS_KEYS.has(status)
+        ? t(`admin.recipient_circle.status.${status}`)
+        : t('admin.recipient_circle.status.unknown', { status })
+    ),
     [t],
   );
 
   const relationshipTypeLabel = useCallback(
-    (type: string) => t(`admin.recipient_circle.relationship_types.${type}`, { defaultValue: type.replace(/_/g, ' ') }),
+    (type: string) => (
+      RELATIONSHIP_TYPE_KEYS.has(type)
+        ? t(`admin.recipient_circle.relationship_types.${type}`)
+        : t('admin.recipient_circle.relationship_types.unknown', { type })
+    ),
     [t],
   );
 

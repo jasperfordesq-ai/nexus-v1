@@ -156,6 +156,7 @@ const SEVERITY_COLORS: Record<TriggerAuditIssue['severity'], 'default' | 'warnin
 const PAGE_SIZE_OPTIONS = [25, 50, 100];
 const LOG_STATUSES = ['', 'sent', 'delivered', 'bounced', 'failed', 'suppressed'];
 const SUPPRESSION_REASONS = ['', 'bounce', 'block', 'invalid', 'spam_report', 'unsubscribe'];
+const KNOWN_SUPPRESSION_REASONS = new Set(SUPPRESSION_REASONS.filter(Boolean));
 
 export default function EmailDeliverability() {
   const { t } = useTranslation('admin');
@@ -304,9 +305,21 @@ export default function EmailDeliverability() {
     setSuppPage(1);
   };
 
+  const statusLabel = (status: string) => (
+    Object.prototype.hasOwnProperty.call(STATUS_COLORS, status)
+      ? t(`email_deliverability.status.${status}`)
+      : t('email_deliverability.status.unknown', { status })
+  );
+
+  const suppressionReasonLabel = (reason: string) => (
+    KNOWN_SUPPRESSION_REASONS.has(reason)
+      ? t(`email_deliverability.suppressions.reasons.${reason}`)
+      : t('email_deliverability.suppressions.reasons.unknown', { reason })
+  );
+
   const statusChip = (status: string) => (
     <Chip size="sm" color={STATUS_COLORS[status] ?? 'default'} variant="flat">
-      {t(`email_deliverability.status.${status}`, { defaultValue: status })}
+      {statusLabel(status)}
     </Chip>
   );
 
@@ -409,13 +422,14 @@ export default function EmailDeliverability() {
               color={warning.severity === 'critical' ? 'danger' : warning.severity === 'warning' ? 'warning' : 'primary'}
               variant="flat"
               startContent={<AlertTriangle className="h-4 w-4" />}
-              title={t(`email_deliverability.warnings.${warning.code}.title`, {
-                defaultValue: t('email_deliverability.warnings.default_title'),
-              })}
-              description={t(`email_deliverability.warnings.${warning.code}.body`, {
-                ...(warning.params ?? {}),
-                defaultValue: t('email_deliverability.warnings.default_body'),
-              })}
+              title={t([
+                `email_deliverability.warnings.${warning.code}.title`,
+                'email_deliverability.warnings.default_title',
+              ])}
+              description={t([
+                `email_deliverability.warnings.${warning.code}.body`,
+                'email_deliverability.warnings.default_body',
+              ], warning.params ?? {})}
             />
           ))}
         </section>
@@ -448,7 +462,7 @@ export default function EmailDeliverability() {
           <div className="flex flex-wrap gap-2">
             {summaryStatuses.length > 0 ? summaryStatuses.map((status) => (
               <Chip key={status} size="sm" color={STATUS_COLORS[status] ?? 'default'} variant="flat">
-                {t(`email_deliverability.status.${status}`, { defaultValue: status })}: {summary?.by_status[status]}
+                {statusLabel(status)}: {summary?.by_status[status]}
               </Chip>
             )) : (
               <Chip size="sm" variant="flat">{t('email_deliverability.empty.no_statuses')}</Chip>
@@ -503,15 +517,16 @@ export default function EmailDeliverability() {
                   <TableCell>
                     <div className="max-w-sm">
                       <div className="font-medium text-theme-primary">
-                        {t(`email_deliverability.warnings.${issue.code}.title`, {
-                          defaultValue: t('email_deliverability.warnings.default_title'),
-                        })}
+                        {t([
+                          `email_deliverability.warnings.${issue.code}.title`,
+                          'email_deliverability.warnings.default_title',
+                        ])}
                       </div>
                       <div className="text-xs text-theme-secondary">
-                        {t(`email_deliverability.warnings.${issue.code}.body`, {
-                          ...(issue.params ?? {}),
-                          defaultValue: t('email_deliverability.warnings.default_body'),
-                        })}
+                        {t([
+                          `email_deliverability.warnings.${issue.code}.body`,
+                          'email_deliverability.warnings.default_body',
+                        ], issue.params ?? {})}
                       </div>
                     </div>
                   </TableCell>
@@ -722,7 +737,7 @@ export default function EmailDeliverability() {
                   <TableRow key={row.id}>
                     <TableCell className="font-mono text-xs">{row.email}</TableCell>
                     <TableCell>
-                      <Chip size="sm" variant="flat">{t(`email_deliverability.suppressions.reasons.${row.reason}`, { defaultValue: row.reason })}</Chip>
+                      <Chip size="sm" variant="flat">{suppressionReasonLabel(row.reason)}</Chip>
                     </TableCell>
                     <TableCell className="max-w-xs truncate">{row.detail ?? '-'}</TableCell>
                     <TableCell className="text-xs">{row.suppressed_at}</TableCell>
