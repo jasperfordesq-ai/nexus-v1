@@ -417,7 +417,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
               </p>
               <div className="flex gap-2">
                 <Input
-                  aria-label="Google Maps API key"
+                  aria-label={t('tenant_features.google_maps_api_key_label')}
                   placeholder={googleMapsKeySet ? googleMapsKeyDisplay : 'AIza…'}
                   value={googleMapsKeyInput}
                   onValueChange={setGoogleMapsKeyInput}
@@ -460,8 +460,8 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 {t('tenant_features.google_map_id_hint')}
               </p>
               <Input
-                aria-label="Google Map ID"
-                placeholder="map-id…"
+                aria-label={t('tenant_features.google_map_id_label')}
+                placeholder={t('tenant_features.google_map_id_placeholder')}
                 value={googleMapId}
                 onValueChange={setGoogleMapId}
                 size="sm"
@@ -489,7 +489,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
               </p>
               <div className="flex gap-2">
                 <Input
-                  aria-label="MapTiler API key"
+                  aria-label={t('tenant_features.maptiler_api_key_label')}
                   placeholder={maptilerKeySet ? maptilerKeyDisplay : '…'}
                   value={maptilerKeyInput}
                   onValueChange={setMaptilerKeyInput}

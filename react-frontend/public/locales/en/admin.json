@@ -13521,6 +13521,7 @@
     "google_maps_api_key_hint": "Used for both map display (Google branch) and Places autocomplete. One key with both APIs enabled is the typical setup. Get one at console.cloud.google.com → APIs & Services → Credentials.",
     "google_map_id_label": "Google Map ID (optional)",
     "google_map_id_hint": "A Map ID enables custom Cloud-based map styling. Leave blank for default styling.",
+    "google_map_id_placeholder": "map-id...",
     "maptiler_api_key_label": "MapTiler API key (paid OSM tile host)",
     "maptiler_api_key_hint": "Only used when this tenant's map_provider is OpenStreetMap. Switches from the free tile.openstreetmap.org service (subject to OSMF policy at scale) to MapTiler's paid host with proper dark mode and high-throughput tile delivery. Free tier covers ~100k tiles/month. Get a key at maptiler.com → Cloud → API keys.",
     "key_status_set": "Tenant key set",
