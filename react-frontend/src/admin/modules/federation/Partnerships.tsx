@@ -646,9 +646,9 @@ export function Partnerships() {
           isOpen={!!approveTarget}
           onClose={() => setApproveTarget(null)}
           onConfirm={confirmApprove}
-          title={t('federation.approve_partnership', 'Approve Partnership')}
+          title={t('federation.approve_partnership')}
           message={`Are you sure you want to approve partnership?`}
-          confirmLabel={t('federation.approve', 'Approve')}
+          confirmLabel={t('federation.approve')}
           confirmColor="primary"
           isLoading={actionLoading}
         />
@@ -660,9 +660,9 @@ export function Partnerships() {
           isOpen={!!rejectTarget}
           onClose={() => setRejectTarget(null)}
           onConfirm={confirmReject}
-          title={t('federation.reject_partnership', 'Reject Partnership')}
+          title={t('federation.reject_partnership')}
           message={`Are you sure you want to reject partnership?`}
-          confirmLabel={t('federation.reject', 'Reject')}
+          confirmLabel={t('federation.reject')}
           confirmColor="danger"
           isLoading={actionLoading}
         />

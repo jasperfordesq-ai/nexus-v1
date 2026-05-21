@@ -136,7 +136,7 @@ const EMPTY_FORM: WebhookFormData = {
 
 export function Webhooks() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('federation.webhooks_title', 'Federation Webhooks'));
+  usePageTitle(t('federation.webhooks_title'));
   const toast = useToast();
 
   const ALL_EVENTS = ALL_EVENT_KEYS.map((key) => ({
@@ -187,7 +187,7 @@ export function Webhooks() {
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return;
       logError('Webhooks.load', err);
-      toast.error(t('federation.webhooks_load_failed', 'Failed to load webhooks'));
+      toast.error(t('federation.webhooks_load_failed'));
     }
     setLoading(false);
   }, [t, toast]);
@@ -221,15 +221,15 @@ export function Webhooks() {
   // ─── Save (create or update) ───
   const handleSave = useCallback(async () => {
     if (!form.url.trim()) {
-      toast.error(t('federation.webhooks_url_required', 'Webhook URL is required'));
+      toast.error(t('federation.webhooks_url_required'));
       return;
     }
     if (!form.url.startsWith('https://')) {
-      toast.error(t('federation.webhooks_https_required', 'URL must use HTTPS'));
+      toast.error(t('federation.webhooks_https_required'));
       return;
     }
     if (form.events.length === 0) {
-      toast.error(t('federation.webhooks_events_required', 'Select at least one event'));
+      toast.error(t('federation.webhooks_events_required'));
       return;
     }
 
@@ -254,14 +254,14 @@ export function Webhooks() {
           const data = res.data as { secret?: string };
           if (data?.secret) {
             setCreatedSecret(data.secret);
-            toast.success(t('federation.webhooks_created', 'Webhook created. Copy your signing secret now — it will not be shown again.'));
+            toast.success(t('federation.webhooks_created'));
           } else {
             formModal.onClose();
-            toast.success(t('federation.webhooks_created_no_secret', 'Webhook created successfully'));
+            toast.success(t('federation.webhooks_created_no_secret'));
           }
         } else {
           formModal.onClose();
-          toast.success(t('federation.webhooks_updated', 'Webhook updated successfully'));
+          toast.success(t('federation.webhooks_updated'));
         }
         loadData();
       } else {
@@ -270,7 +270,7 @@ export function Webhooks() {
       }
     } catch (err) {
       logError('Webhooks.save', err);
-      toast.error(t('federation.webhooks_save_failed', 'Failed to save webhook'));
+      toast.error(t('federation.webhooks_save_failed'));
     }
     setSaving(false);
   }, [form, editingId, toast, t, formModal, loadData]);
@@ -282,15 +282,15 @@ export function Webhooks() {
     try {
       const res = await api.delete(`/v2/admin/federation/webhooks/${deleteTarget.id}`);
       if (res.success) {
-        toast.success(t('federation.webhooks_deleted', 'Webhook deleted'));
+        toast.success(t('federation.webhooks_deleted'));
         setDeleteTarget(null);
         loadData();
       } else {
-        toast.error(t('federation.webhooks_delete_failed', 'Failed to delete webhook'));
+        toast.error(t('federation.webhooks_delete_failed'));
       }
     } catch (err) {
       logError('Webhooks.delete', err);
-      toast.error(t('federation.webhooks_delete_failed', 'Failed to delete webhook'));
+      toast.error(t('federation.webhooks_delete_failed'));
     }
     setDeleting(false);
   }, [deleteTarget, toast, t, loadData]);
@@ -317,7 +317,7 @@ export function Webhooks() {
       if (res.success) {
         const data = res.data as { response_time_ms?: number; response_code?: number };
         toast.success(
-          t('federation.webhooks_test_success', 'Test delivery successful ({{code}}, {{time}}ms)', {
+          t('federation.webhooks_test_success', {
             code: data?.response_code ?? '?',
             time: data?.response_time_ms ?? '?',
           })
@@ -329,7 +329,7 @@ export function Webhooks() {
       }
     } catch (err) {
       logError('Webhooks.test', err);
-      toast.error(t('federation.webhooks_test_failed', 'Test delivery failed'));
+      toast.error(t('federation.webhooks_test_failed'));
     }
     setTestingId(null);
   }, [testPreview, toast, t, loadData]);
@@ -350,7 +350,7 @@ export function Webhooks() {
       }
     } catch (err) {
       logError('Webhooks.logs', err);
-      toast.error(t('federation.webhooks_logs_failed', 'Failed to load delivery logs'));
+      toast.error(t('federation.webhooks_logs_failed'));
     }
     setLogsLoading(false);
   }, [toast, t, logsModal]);
@@ -363,12 +363,12 @@ export function Webhooks() {
       if (res.success) {
         const data = res.data as { success?: boolean; response_code?: number; response_time_ms?: number; error_message?: string };
         if (data?.success) {
-          toast.success(t('federation.webhooks_retry_success', 'Retry successful ({{code}}, {{time}}ms)', {
+          toast.success(t('federation.webhooks_retry_success', {
             code: data?.response_code ?? '?',
             time: data?.response_time_ms ?? '?',
           }));
         } else {
-          toast.error(data?.error_message || t('federation.webhooks_retry_failed', 'Retry failed'));
+          toast.error(data?.error_message || t('federation.webhooks_retry_failed'));
         }
         // Reload logs by re-fetching from the webhook
         const webhook = webhooks.find(w => w.id === logEntry.webhook_id);
@@ -380,11 +380,11 @@ export function Webhooks() {
           }
         }
       } else {
-        toast.error(t('federation.webhooks_retry_failed', 'Retry failed'));
+        toast.error(t('federation.webhooks_retry_failed'));
       }
     } catch (err) {
       logError('Webhooks.retry', err);
-      toast.error(t('federation.webhooks_retry_failed', 'Retry failed'));
+      toast.error(t('federation.webhooks_retry_failed'));
     }
     setRetryingLogId(null);
   }, [toast, t, webhooks]);
@@ -400,8 +400,8 @@ export function Webhooks() {
     return (
       <div>
         <PageHeader
-          title={t('federation.webhooks_title', 'Webhooks')}
-          description={t('federation.webhooks_desc', 'Manage webhook subscriptions for federation events')}
+          title={t('federation.webhooks_title')}
+          description={t('federation.webhooks_desc')}
         />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
@@ -413,31 +413,31 @@ export function Webhooks() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('federation.webhooks_title', 'Webhooks')}
-        description={t('federation.webhooks_desc', 'Manage webhook subscriptions for federation events')}
+        title={t('federation.webhooks_title')}
+        description={t('federation.webhooks_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
-              {t('federation.refresh', 'Refresh')}
+              {t('federation.refresh')}
             </Button>
             <Button color="primary" size="sm" startContent={<Plus size={16} />} onPress={openCreate}>
-              {t('federation.webhooks_add', 'Add Webhook')}
+              {t('federation.webhooks_add')}
             </Button>
           </div>
         }
       />
 
       {/* Webhooks table */}
-      <Table aria-label={t('federation.webhooks_title', 'Webhooks')} removeWrapper>
+      <Table aria-label={t('federation.webhooks_title')} removeWrapper>
         <TableHeader>
-          <TableColumn>{t('federation.webhooks_col_url', 'URL')}</TableColumn>
-          <TableColumn>{t('federation.webhooks_col_events', 'Events')}</TableColumn>
-          <TableColumn>{t('federation.col_status', 'Status')}</TableColumn>
-          <TableColumn>{t('federation.webhooks_col_last_triggered', 'Last Triggered')}</TableColumn>
-          <TableColumn>{t('federation.webhooks_col_failures', 'Failures')}</TableColumn>
-          <TableColumn>{t('federation.col_actions', 'Actions')}</TableColumn>
+          <TableColumn>{t('federation.webhooks_col_url')}</TableColumn>
+          <TableColumn>{t('federation.webhooks_col_events')}</TableColumn>
+          <TableColumn>{t('federation.col_status')}</TableColumn>
+          <TableColumn>{t('federation.webhooks_col_last_triggered')}</TableColumn>
+          <TableColumn>{t('federation.webhooks_col_failures')}</TableColumn>
+          <TableColumn>{t('federation.col_actions')}</TableColumn>
         </TableHeader>
-        <TableBody emptyContent={t('federation.webhooks_empty', 'No webhooks configured')}>
+        <TableBody emptyContent={t('federation.webhooks_empty')}>
           {webhooks.map((webhook) => (
             <TableRow key={webhook.id}>
               <TableCell>
@@ -476,7 +476,7 @@ export function Webhooks() {
               </TableCell>
               <TableCell>
                 <span className="text-sm text-default-500">
-                  {webhook.last_triggered_at ? formatRelativeTime(webhook.last_triggered_at) : t('federation.never', 'Never')}
+                  {webhook.last_triggered_at ? formatRelativeTime(webhook.last_triggered_at) : t('federation.never')}
                 </span>
               </TableCell>
               <TableCell>
@@ -487,12 +487,12 @@ export function Webhooks() {
               <TableCell>
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button isIconOnly size="sm" variant="light" aria-label={t('federation.label_actions', 'Actions')}>
+                    <Button isIconOnly size="sm" variant="light" aria-label={t('federation.label_actions')}>
                       <MoreVertical size={16} />
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu
-                    aria-label={t('federation.webhooks_actions', 'Webhook actions')}
+                    aria-label={t('federation.webhooks_actions')}
                     onAction={(key) => {
                       if (key === 'edit') openEdit(webhook);
                       else if (key === 'test') setTestPreview(webhook);
@@ -501,16 +501,16 @@ export function Webhooks() {
                     }}
                   >
                     <DropdownItem key="edit" startContent={<Pencil size={14} />}>
-                      {t('federation.edit', 'Edit')}
+                      {t('federation.edit')}
                     </DropdownItem>
                     <DropdownItem key="test" startContent={testingId === webhook.id ? <Spinner size="sm" /> : <Send size={14} />}>
-                      {t('federation.webhooks_test', 'Test')}
+                      {t('federation.webhooks_test')}
                     </DropdownItem>
                     <DropdownItem key="logs" startContent={<ScrollText size={14} />}>
-                      {t('federation.view_logs', 'View Logs')}
+                      {t('federation.view_logs')}
                     </DropdownItem>
                     <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
-                      {t('federation.delete', 'Delete')}
+                      {t('federation.delete')}
                     </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
@@ -528,15 +528,15 @@ export function Webhooks() {
               <ModalHeader className="flex items-center gap-2">
                 <Webhook size={20} />
                 {editingId
-                  ? t('federation.webhooks_edit', 'Edit Webhook')
-                  : t('federation.webhooks_add', 'Add Webhook')}
+                  ? t('federation.webhooks_edit')
+                  : t('federation.webhooks_add')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 {/* Show secret after creation */}
                 {createdSecret && (
                   <div className="rounded-lg border border-warning-200 bg-warning-50 p-4 space-y-2">
                     <p className="text-sm font-semibold text-warning-700">
-                      {t('federation.webhooks_secret_warning', 'Save your signing secret now. It will not be shown again.')}
+                      {t('federation.webhooks_secret_warning')}
                     </p>
                     <Snippet
                       symbol=""
@@ -550,18 +550,18 @@ export function Webhooks() {
                 )}
 
                 <Input
-                  label={t('federation.webhooks_label_url', 'Webhook URL')}
+                  label={t('federation.webhooks_label_url')}
                   placeholder="https://example.com/webhooks/nexus"
                   value={form.url}
                   onValueChange={(v) => setForm((prev) => ({ ...prev, url: v }))}
                   isRequired
                   isDisabled={!!createdSecret}
-                  description={t('federation.webhooks_url_hint', 'Must use HTTPS')}
+                  description={t('federation.webhooks_url_hint')}
                 />
 
                 <Textarea
-                  label={t('federation.label_description', 'Description')}
-                  placeholder={t('federation.webhooks_desc_placeholder', 'Optional description for this webhook')}
+                  label={t('federation.label_description')}
+                  placeholder={t('federation.webhooks_desc_placeholder')}
                   value={form.description}
                   onValueChange={(v) => setForm((prev) => ({ ...prev, description: v }))}
                   minRows={2}
@@ -571,7 +571,7 @@ export function Webhooks() {
                 {/* Event checkboxes */}
                 <div className="space-y-3">
                   <p className="text-sm font-semibold text-default-700">
-                    {t('federation.webhooks_events_label', 'Events to subscribe to')}
+                    {t('federation.webhooks_events_label')}
                   </p>
                   <CheckboxGroup
                     value={form.events}
@@ -593,7 +593,7 @@ export function Webhooks() {
                       onPress={() => setForm((prev) => ({ ...prev, events: ALL_EVENT_KEYS }))}
                       isDisabled={!!createdSecret}
                     >
-                      {t('federation.webhooks_select_all', 'Select All')}
+                      {t('federation.webhooks_select_all')}
                     </Button>
                     <Button
                       size="sm"
@@ -601,14 +601,14 @@ export function Webhooks() {
                       onPress={() => setForm((prev) => ({ ...prev, events: [] }))}
                       isDisabled={!!createdSecret}
                     >
-                      {t('federation.webhooks_clear_all', 'Clear All')}
+                      {t('federation.webhooks_clear_all')}
                     </Button>
                   </div>
                 </div>
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  {createdSecret ? t('federation.close', 'Close') : t('federation.cancel', 'Cancel')}
+                  {createdSecret ? t('federation.close') : t('federation.cancel')}
                 </Button>
                 {!createdSecret && (
                   <Button
@@ -618,8 +618,8 @@ export function Webhooks() {
                     onPress={handleSave}
                   >
                     {editingId
-                      ? t('federation.save_changes', 'Save Changes')
-                      : t('federation.webhooks_create', 'Create Webhook')}
+                      ? t('federation.save_changes')
+                      : t('federation.webhooks_create')}
                   </Button>
                 )}
               </ModalFooter>
@@ -635,7 +635,7 @@ export function Webhooks() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <ScrollText size={20} />
-                {t('federation.webhooks_logs_title', 'Delivery Logs')}
+                {t('federation.webhooks_logs_title')}
                 <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded ml-2">{truncateUrl(logsWebhookUrl, 60)}</code>
               </ModalHeader>
               <ModalBody>
@@ -645,7 +645,7 @@ export function Webhooks() {
                   </div>
                 ) : logs.length === 0 ? (
                   <div className="flex h-48 items-center justify-center text-default-400">
-                    {t('federation.webhooks_no_logs', 'No delivery logs found')}
+                    {t('federation.webhooks_no_logs')}
                   </div>
                 ) : (
                   <div className="space-y-0">
@@ -659,7 +659,7 @@ export function Webhooks() {
                               size="sm"
                               variant="light"
                               onPress={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
-                              aria-label={t('federation.webhooks_expand', 'Toggle details')}
+                              aria-label={t('federation.webhooks_expand')}
                             >
                               {expandedLogId === log.id
                                 ? <ChevronDown size={14} className="text-default-400" />
@@ -686,14 +686,14 @@ export function Webhooks() {
                             </span>
                             <div>
                               {!log.success && (
-                                <Tooltip content={t('federation.webhooks_retry', 'Retry delivery')}>
+                                <Tooltip content={t('federation.webhooks_retry')}>
                                   <Button
                                     isIconOnly
                                     size="sm"
                                     variant="light"
                                     isLoading={retryingLogId === log.id}
                                     onPress={() => handleRetry(log)}
-                                    aria-label={t('federation.webhooks_retry', 'Retry delivery')}
+                                    aria-label={t('federation.webhooks_retry')}
                                   >
                                     <RotateCcw size={14} />
                                   </Button>
@@ -708,19 +708,19 @@ export function Webhooks() {
                           <div className="rounded-lg border border-default-200 p-4 space-y-3 bg-default-50 my-2">
                             {log.error_message && (
                               <div>
-                                <p className="text-xs font-semibold text-danger mb-1">{t('federation.webhooks_error', 'Error')}</p>
+                                <p className="text-xs font-semibold text-danger mb-1">{t('federation.webhooks_error')}</p>
                                 <p className="text-sm text-danger">{log.error_message}</p>
                               </div>
                             )}
                             <div>
-                              <p className="text-xs font-semibold text-default-500 mb-1">{t('federation.webhooks_payload', 'Payload')}</p>
+                              <p className="text-xs font-semibold text-default-500 mb-1">{t('federation.webhooks_payload')}</p>
                               <pre className="text-xs bg-default-100 rounded p-2 overflow-x-auto max-h-48">
                                 {JSON.stringify(log.payload, null, 2)}
                               </pre>
                             </div>
                             {log.response_body && (
                               <div>
-                                <p className="text-xs font-semibold text-default-500 mb-1">{t('federation.webhooks_response', 'Response Body')}</p>
+                                <p className="text-xs font-semibold text-default-500 mb-1">{t('federation.webhooks_response')}</p>
                                 <pre className="text-xs bg-default-100 rounded p-2 overflow-x-auto max-h-48">
                                   {log.response_body}
                                 </pre>
@@ -734,7 +734,7 @@ export function Webhooks() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('federation.close', 'Close')}</Button>
+                <Button variant="flat" onPress={onClose}>{t('federation.close')}</Button>
               </ModalFooter>
             </>
           )}
@@ -747,11 +747,11 @@ export function Webhooks() {
           isOpen={!!deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
-          title={t('federation.webhooks_delete_title', 'Delete Webhook')}
+          title={t('federation.webhooks_delete_title')}
           message={t('federation.webhooks_delete_confirm', {
             url: deleteTarget.url,
           })}
-          confirmLabel={t('federation.delete', 'Delete')}
+          confirmLabel={t('federation.delete')}
           confirmColor="danger"
           isLoading={deleting}
         />
@@ -764,39 +764,39 @@ export function Webhooks() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <Send size={20} />
-                {t('federation.webhooks_test_preview_title', 'Test Webhook Delivery')}
+                {t('federation.webhooks_test_preview_title')}
               </ModalHeader>
               <ModalBody>
                 <p className="text-sm text-default-500 mb-3">
-                  {t('federation.webhooks_test_preview_desc', 'A test payload will be sent to this endpoint. The payload below shows the format that will be delivered.')}
+                  {t('federation.webhooks_test_preview_desc')}
                 </p>
                 {testPreview && (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-default-700">{t('federation.webhooks_endpoint', 'Endpoint')}:</span>
+                      <span className="text-sm font-medium text-default-700">{t('federation.webhooks_endpoint')}:</span>
                       <code className="text-xs bg-default-100 px-2 py-1 rounded break-all">{testPreview.url}</code>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-default-700 mb-1">{t('federation.webhooks_sample_payload', 'Sample Payload')}</p>
+                      <p className="text-sm font-medium text-default-700 mb-1">{t('federation.webhooks_sample_payload')}</p>
                       <pre className="text-xs bg-default-100 rounded p-3 overflow-x-auto max-h-48 border border-default-200">
                         {JSON.stringify(SAMPLE_PAYLOAD, null, 2)}
                       </pre>
                     </div>
                     <p className="text-xs text-default-400">
-                      {t('federation.webhooks_test_note', 'The payload will be signed with the webhook\'s secret using HMAC-SHA256. The X-Webhook-Signature header will be included.')}
+                      {t('federation.webhooks_test_note')}
                     </p>
                   </div>
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('federation.cancel', 'Cancel')}</Button>
+                <Button variant="flat" onPress={onClose}>{t('federation.cancel')}</Button>
                 <Button
                   color="primary"
                   startContent={<Send size={16} />}
                   onPress={handleTestConfirm}
                   isLoading={testingId === testPreview?.id}
                 >
-                  {t('federation.webhooks_send_test', 'Send Test')}
+                  {t('federation.webhooks_send_test')}
                 </Button>
               </ModalFooter>
             </>

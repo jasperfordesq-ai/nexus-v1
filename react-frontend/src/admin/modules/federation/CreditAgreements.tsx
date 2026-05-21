@@ -837,8 +837,8 @@ export function CreditAgreements() {
         }}
         title={
           pendingAction?.action === 'terminate'
-            ? t('federation.terminate_agreement', 'Terminate Agreement')
-            : t('federation.suspend_agreement', 'Suspend Agreement')
+            ? t('federation.terminate_agreement')
+            : t('federation.suspend_agreement')
         }
         message={
           pendingAction?.action === 'terminate'
@@ -851,8 +851,8 @@ export function CreditAgreements() {
         }
         confirmLabel={
           pendingAction?.action === 'terminate'
-            ? t('federation.terminate', 'Terminate')
-            : t('federation.suspend', 'Suspend')
+            ? t('federation.terminate')
+            : t('federation.suspend')
         }
         confirmColor="danger"
       />

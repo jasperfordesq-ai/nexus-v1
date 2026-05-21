@@ -215,7 +215,7 @@ export function ExternalPartners() {
       }
     } catch (err) {
       logError('ExternalPartners.load', err);
-      toast.error(t('federation.failed_to_load_external_partners', 'Failed to load external partners'));
+      toast.error(t('federation.failed_to_load_external_partners'));
     }
     setLoading(false);
   }, [t, toast]);
@@ -261,7 +261,7 @@ export function ExternalPartners() {
   // ─── Save (create or update) ───
   const handleSave = useCallback(async () => {
     if (!form.name.trim() || !form.base_url.trim()) {
-      toast.error(t('federation.name_and_url_required', 'Name and Base URL are required'));
+      toast.error(t('federation.name_and_url_required'));
       return;
     }
 
@@ -299,8 +299,8 @@ export function ExternalPartners() {
       if (res.success) {
         toast.success(
           editingId
-            ? t('federation.partner_updated', 'Partner updated successfully')
-            : t('federation.partner_created', 'Partner created successfully')
+            ? t('federation.partner_updated')
+            : t('federation.partner_created')
         );
         formModal.onClose();
         loadData();
@@ -310,7 +310,7 @@ export function ExternalPartners() {
       }
     } catch (err) {
       logError('ExternalPartners.save', err);
-      toast.error(t('federation.failed_to_save_partner', 'Failed to save partner'));
+      toast.error(t('federation.failed_to_save_partner'));
     }
     setSaving(false);
   }, [form, editingId, toast, t, formModal, loadData]);
@@ -326,11 +326,11 @@ export function ExternalPartners() {
         setDeleteTarget(null);
         loadData();
       } else {
-        toast.error(t('federation.failed_to_delete_partner', 'Failed to delete partner'));
+        toast.error(t('federation.failed_to_delete_partner'));
       }
     } catch (err) {
       logError('ExternalPartners.delete', err);
-      toast.error(t('federation.failed_to_delete_partner', 'Failed to delete partner'));
+      toast.error(t('federation.failed_to_delete_partner'));
     }
     setDeleting(false);
   }, [deleteTarget, toast, t, loadData]);
@@ -384,7 +384,7 @@ export function ExternalPartners() {
       }
     } catch (err) {
       logError('ExternalPartners.logs', err);
-      toast.error(t('federation.failed_to_load_logs', 'Failed to load partner logs'));
+      toast.error(t('federation.failed_to_load_logs'));
     }
     setLogsLoading(false);
   }, [toast, t, logsModal]);
@@ -399,8 +399,8 @@ export function ExternalPartners() {
     return (
       <div>
         <PageHeader
-          title={t('federation.external_partners_title', 'External Partners')}
-          description={t('federation.external_partners_desc', 'Manage connections to external federation partners')}
+          title={t('federation.external_partners_title')}
+          description={t('federation.external_partners_desc')}
         />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
@@ -412,33 +412,33 @@ export function ExternalPartners() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('federation.external_partners_title', 'External Partners')}
-        description={t('federation.external_partners_desc', 'Manage connections to external federation partners')}
+        title={t('federation.external_partners_title')}
+        description={t('federation.external_partners_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
               {t('federation.refresh')}
             </Button>
             <Button color="primary" size="sm" startContent={<Plus size={16} />} onPress={openCreate}>
-              {t('federation.add_partner', 'Add Partner')}
+              {t('federation.add_partner')}
             </Button>
           </div>
         }
       />
 
       {/* Partners table */}
-      <Table aria-label={t('federation.external_partners_title', 'External Partners')} removeWrapper>
+      <Table aria-label={t('federation.external_partners_title')} removeWrapper>
         <TableHeader>
-          <TableColumn>{t('federation.col_name', 'Name')}</TableColumn>
-          <TableColumn>{t('federation.col_base_url', 'Base URL')}</TableColumn>
-          <TableColumn>{t('federation.col_auth_method', 'Auth Method')}</TableColumn>
-          <TableColumn>{t('federation.col_protocol', 'Protocol')}</TableColumn>
-          <TableColumn>{t('federation.col_status', 'Status')}</TableColumn>
-          <TableColumn>{t('federation.col_last_sync', 'Last Sync')}</TableColumn>
-          <TableColumn>{t('federation.col_created', 'Created')}</TableColumn>
-          <TableColumn>{t('federation.col_actions', 'Actions')}</TableColumn>
+          <TableColumn>{t('federation.col_name')}</TableColumn>
+          <TableColumn>{t('federation.col_base_url')}</TableColumn>
+          <TableColumn>{t('federation.col_auth_method')}</TableColumn>
+          <TableColumn>{t('federation.col_protocol')}</TableColumn>
+          <TableColumn>{t('federation.col_status')}</TableColumn>
+          <TableColumn>{t('federation.col_last_sync')}</TableColumn>
+          <TableColumn>{t('federation.col_created')}</TableColumn>
+          <TableColumn>{t('federation.col_actions')}</TableColumn>
         </TableHeader>
-        <TableBody emptyContent={t('federation.no_external_partners', 'No external partners configured')}>
+        <TableBody emptyContent={t('federation.no_external_partners')}>
           {partners.map((partner) => (
             <TableRow key={partner.id}>
               <TableCell>
@@ -473,7 +473,7 @@ export function ExternalPartners() {
               </TableCell>
               <TableCell>
                 <span className="text-sm text-default-500">
-                  {partner.last_sync_at ? formatRelativeTime(partner.last_sync_at) : t('federation.never', 'Never')}
+                  {partner.last_sync_at ? formatRelativeTime(partner.last_sync_at) : t('federation.never')}
                 </span>
               </TableCell>
               <TableCell>
@@ -484,12 +484,12 @@ export function ExternalPartners() {
               <TableCell>
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button isIconOnly size="sm" variant="light" aria-label={t('federation.label_actions', 'Actions')}>
+                    <Button isIconOnly size="sm" variant="light" aria-label={t('federation.label_actions')}>
                       <MoreVertical size={16} />
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu
-                    aria-label={t('federation.label_partner_actions', 'Partner actions')}
+                    aria-label={t('federation.label_partner_actions')}
                     onAction={(key) => {
                       if (key === 'edit') openEdit(partner);
                       else if (key === 'health') handleHealthCheck(partner);
@@ -498,16 +498,16 @@ export function ExternalPartners() {
                     }}
                   >
                     <DropdownItem key="edit" startContent={<Pencil size={14} />}>
-                      {t('federation.edit', 'Edit')}
+                      {t('federation.edit')}
                     </DropdownItem>
                     <DropdownItem key="health" startContent={healthCheckLoading === partner.id ? <Spinner size="sm" /> : <HeartPulse size={14} />}>
-                      {t('federation.health_check', 'Health Check')}
+                      {t('federation.health_check')}
                     </DropdownItem>
                     <DropdownItem key="logs" startContent={<ScrollText size={14} />}>
-                      {t('federation.view_logs', 'View Logs')}
+                      {t('federation.view_logs')}
                     </DropdownItem>
                     <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
-                      {t('federation.delete', 'Delete')}
+                      {t('federation.delete')}
                     </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
@@ -525,35 +525,35 @@ export function ExternalPartners() {
               <ModalHeader className="flex items-center gap-2">
                 <Globe size={20} />
                 {editingId
-                  ? t('federation.edit_partner', 'Edit External Partner')
-                  : t('federation.add_partner', 'Add External Partner')}
+                  ? t('federation.edit_partner')
+                  : t('federation.add_partner')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 {/* Basic fields */}
                 <Input
-                  label={t('federation.label_partner_name', 'Partner Name')}
-                  placeholder={t('federation.placeholder_partner_name', 'e.g. Community Exchange Network')}
+                  label={t('federation.label_partner_name')}
+                  placeholder={t('federation.placeholder_partner_name')}
                   value={form.name}
                   onValueChange={(v) => updateForm('name', v)}
                   isRequired
                 />
                 <Input
-                  label={t('federation.label_base_url', 'Base URL')}
+                  label={t('federation.label_base_url')}
                   placeholder="https://api.partner-timebank.org"
                   value={form.base_url}
                   onValueChange={(v) => updateForm('base_url', v)}
                   isRequired
                 />
                 <Input
-                  label={t('federation.label_api_path', 'API Path')}
+                  label={t('federation.label_api_path')}
                   placeholder="/api/v1/federation"
                   value={form.api_path}
                   onValueChange={(v) => updateForm('api_path', v)}
                 />
                 {/* Federation protocol */}
                 <Select
-                  label={t('federation.label_protocol_type', 'Federation Protocol')}
-                  description={t('federation.protocol_type_desc', 'The protocol this partner uses for data exchange')}
+                  label={t('federation.label_protocol_type')}
+                  description={t('federation.protocol_type_desc')}
                   selectedKeys={[form.protocol_type]}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0];
@@ -579,8 +579,8 @@ export function ExternalPartners() {
                 </Select>
 
                 <Textarea
-                  label={t('federation.label_description', 'Description')}
-                  placeholder={t('federation.placeholder_description', 'Brief description of this partner')}
+                  label={t('federation.label_description')}
+                  placeholder={t('federation.placeholder_description')}
                   value={form.description}
                   onValueChange={(v) => updateForm('description', v)}
                   minRows={2}
@@ -589,7 +589,7 @@ export function ExternalPartners() {
                 {/* Status — only shown when editing */}
                 {editingId && (
                   <Select
-                    label={t('federation.label_status', 'Status')}
+                    label={t('federation.label_status')}
                     selectedKeys={[form.status]}
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys)[0];
@@ -604,7 +604,7 @@ export function ExternalPartners() {
 
                 {/* Auth method */}
                 <Select
-                  label={t('federation.label_auth_method', 'Authentication Method')}
+                  label={t('federation.label_auth_method')}
                   selectedKeys={[form.auth_method]}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0];
@@ -619,8 +619,8 @@ export function ExternalPartners() {
                 {/* Credential fields — shown based on auth_method */}
                 {(form.auth_method === 'api_key' || form.auth_method === 'oauth2') && (
                   <Input
-                    label={t('federation.label_api_key', 'API Key / Token')}
-                    placeholder={editingId ? t('federation.placeholder_leave_blank', 'Leave blank to keep existing') : ''}
+                    label={t('federation.label_api_key')}
+                    placeholder={editingId ? t('federation.placeholder_leave_blank') : ''}
                     value={form.api_key}
                     onValueChange={(v) => updateForm('api_key', v)}
                     type="password"
@@ -628,8 +628,8 @@ export function ExternalPartners() {
                 )}
                 {form.auth_method === 'hmac' && (
                   <Input
-                    label={t('federation.label_signing_secret', 'Signing Secret')}
-                    placeholder={editingId ? t('federation.placeholder_leave_blank', 'Leave blank to keep existing') : ''}
+                    label={t('federation.label_signing_secret')}
+                    placeholder={editingId ? t('federation.placeholder_leave_blank') : ''}
                     value={form.signing_secret}
                     onValueChange={(v) => updateForm('signing_secret', v)}
                     type="password"
@@ -638,19 +638,19 @@ export function ExternalPartners() {
                 {form.auth_method === 'oauth2' && (
                   <>
                     <Input
-                      label={t('federation.label_oauth_client_id', 'OAuth Client ID')}
+                      label={t('federation.label_oauth_client_id')}
                       value={form.oauth_client_id}
                       onValueChange={(v) => updateForm('oauth_client_id', v)}
                     />
                     <Input
-                      label={t('federation.label_oauth_client_secret', 'OAuth Client Secret')}
-                      placeholder={editingId ? t('federation.placeholder_leave_blank', 'Leave blank to keep existing') : ''}
+                      label={t('federation.label_oauth_client_secret')}
+                      placeholder={editingId ? t('federation.placeholder_leave_blank') : ''}
                       value={form.oauth_client_secret}
                       onValueChange={(v) => updateForm('oauth_client_secret', v)}
                       type="password"
                     />
                     <Input
-                      label={t('federation.label_oauth_token_url', 'OAuth Token URL')}
+                      label={t('federation.label_oauth_token_url')}
                       placeholder="https://api.partner-timebank.org/oauth/token"
                       value={form.oauth_token_url}
                       onValueChange={(v) => updateForm('oauth_token_url', v)}
@@ -661,7 +661,7 @@ export function ExternalPartners() {
                 {/* Feature toggles */}
                 <div className="space-y-3 pt-2">
                   <p className="text-sm font-semibold text-default-700">
-                    {t('federation.feature_toggles', 'Feature Toggles')}
+                    {t('federation.feature_toggles')}
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <Switch
@@ -669,55 +669,55 @@ export function ExternalPartners() {
                       onValueChange={(v) => updateForm('allow_member_search', v)}
                       size="sm"
                     >
-                      {t('federation.member_search_enabled', 'Member Search')}
+                      {t('federation.member_search_enabled')}
                     </Switch>
                     <Switch
                       isSelected={form.allow_listing_search}
                       onValueChange={(v) => updateForm('allow_listing_search', v)}
                       size="sm"
                     >
-                      {t('federation.listing_search_enabled', 'Listing Search')}
+                      {t('federation.listing_search_enabled')}
                     </Switch>
                     <Switch
                       isSelected={form.allow_messaging}
                       onValueChange={(v) => updateForm('allow_messaging', v)}
                       size="sm"
                     >
-                      {t('federation.messaging_enabled', 'Messaging')}
+                      {t('federation.messaging_enabled')}
                     </Switch>
                     <Switch
                       isSelected={form.allow_transactions}
                       onValueChange={(v) => updateForm('allow_transactions', v)}
                       size="sm"
                     >
-                      {t('federation.transactions_enabled', 'Transactions')}
+                      {t('federation.transactions_enabled')}
                     </Switch>
                     <Switch
                       isSelected={form.allow_events}
                       onValueChange={(v) => updateForm('allow_events', v)}
                       size="sm"
                     >
-                      {t('federation.events_enabled', 'Events')}
+                      {t('federation.events_enabled')}
                     </Switch>
                     <Switch
                       isSelected={form.allow_groups}
                       onValueChange={(v) => updateForm('allow_groups', v)}
                       size="sm"
                     >
-                      {t('federation.groups_enabled', 'Groups')}
+                      {t('federation.groups_enabled')}
                     </Switch>
                   </div>
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('federation.cancel', 'Cancel')}</Button>
+                <Button variant="flat" onPress={onClose}>{t('federation.cancel')}</Button>
                 <Button
                   color="primary"
                   isLoading={saving}
                   isDisabled={!form.name.trim() || !form.base_url.trim()}
                   onPress={handleSave}
                 >
-                  {editingId ? t('federation.save_changes', 'Save Changes') : t('federation.create_partner', 'Create Partner')}
+                  {editingId ? t('federation.save_changes') : t('federation.create_partner')}
                 </Button>
               </ModalFooter>
             </>
@@ -732,7 +732,7 @@ export function ExternalPartners() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <ScrollText size={20} />
-                {t('federation.api_logs_for', 'API Logs for')} {logsPartnerName}
+                {t('federation.api_logs_for')} {logsPartnerName}
               </ModalHeader>
               <ModalBody>
                 {logsLoading ? (
@@ -741,17 +741,17 @@ export function ExternalPartners() {
                   </div>
                 ) : logs.length === 0 ? (
                   <div className="flex h-48 items-center justify-center text-default-400">
-                    {t('federation.no_logs', 'No API call logs found')}
+                    {t('federation.no_logs')}
                   </div>
                 ) : (
-                  <Table aria-label={t('federation.api_logs', 'API Logs')} removeWrapper>
+                  <Table aria-label={t('federation.api_logs')} removeWrapper>
                     <TableHeader>
-                      <TableColumn>{t('federation.col_endpoint', 'Endpoint')}</TableColumn>
-                      <TableColumn>{t('federation.col_method', 'Method')}</TableColumn>
-                      <TableColumn>{t('federation.col_status_code', 'Status')}</TableColumn>
-                      <TableColumn>{t('federation.col_success', 'Success')}</TableColumn>
-                      <TableColumn>{t('federation.col_response_time', 'Response Time')}</TableColumn>
-                      <TableColumn>{t('federation.col_timestamp', 'Timestamp')}</TableColumn>
+                      <TableColumn>{t('federation.col_endpoint')}</TableColumn>
+                      <TableColumn>{t('federation.col_method')}</TableColumn>
+                      <TableColumn>{t('federation.col_status_code')}</TableColumn>
+                      <TableColumn>{t('federation.col_success')}</TableColumn>
+                      <TableColumn>{t('federation.col_response_time')}</TableColumn>
+                      <TableColumn>{t('federation.col_timestamp')}</TableColumn>
                     </TableHeader>
                     <TableBody>
                       {logs.map((log) => (
@@ -789,7 +789,7 @@ export function ExternalPartners() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('federation.close', 'Close')}</Button>
+                <Button variant="flat" onPress={onClose}>{t('federation.close')}</Button>
               </ModalFooter>
             </>
           )}
@@ -802,11 +802,11 @@ export function ExternalPartners() {
           isOpen={!!deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
-          title={t('federation.delete_partner', 'Delete Partner')}
+          title={t('federation.delete_partner')}
           message={t('federation.delete_partner_confirm', {
             name: deleteTarget.name,
           })}
-          confirmLabel={t('federation.delete', 'Delete')}
+          confirmLabel={t('federation.delete')}
           confirmColor="danger"
           isLoading={deleting}
         />
