@@ -14066,5 +14066,476 @@
       "render_template_failed": "No se pudo renderizar la plantilla",
       "revoke_export_failed": "No se pudo revocar la exportación del conjunto de datos"
     }
+  },
+  "commercial_boundary": {
+    "about": {
+      "body_prefix": "El Límite Comercial define qué tipos de trabajo remunerado están permitidos dentro del programa de atención comunitaria y cuáles deben seguir siendo créditos de tiempo no remunerados. Este límite es un requisito de la",
+      "body_suffix": "metodología y debe acordarse con su socio municipal antes del lanzamiento del piloto. La siguiente matriz enumera las categorías de actividades y su tipo de intercambio permitido.",
+      "override_prefix": "Utilice la anulación por fila para registrar una clasificación específica de inquilino (por ejemplo, una implementación privada que tiene un paquete comercial). Las anulaciones se almacenan únicamente en la configuración del inquilino; nunca alteran la clasificación pública canónica enviada con el",
+      "override_suffix": "repositorio. Una vez que confirme la matriz de límites, el acuerdo se registra con una marca de tiempo y su ID de usuario, formando parte de la documentación de gobernanza del piloto que aparece en la verificación de preparación del lanzamiento piloto.",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "export": "Exportar",
+      "export_markdown": "Exportar como Markdown",
+      "refresh_aria": "Actualizar mapa de límites comerciales",
+      "refresh_data": "Actualizar datos",
+      "reset_default": "Restablecer el valor predeterminado canónico",
+      "reset_default_aria": "Restablecer los valores predeterminados"
+    },
+    "classification": {
+      "agpl_public": "AGPL público",
+      "commercial": "Comercial",
+      "private_deployment": "Implementación privada",
+      "tenant_config": "Configuración de inquilino"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "export": {
+      "agpl_module": "módulo AGPL",
+      "capability": "Capacidad",
+      "classification": "Clasificación",
+      "default": "Por defecto",
+      "generated": "Generado {{date}} desde el panel de administración NEXUS.",
+      "last_updated": "Última actualización: {{date}}",
+      "no": "No",
+      "notes": "Notas",
+      "overridden": "Anulado",
+      "yes": "Sí"
+    },
+    "fields": {
+      "classification_aria": "Clasificación para {{label}}",
+      "set_classification": "Clasificación de conjuntos"
+    },
+    "labels": {
+      "canonical_default": "Valor predeterminado canónico:",
+      "key": "Llave",
+      "module": "módulo",
+      "out_of_tree": "Fuera del árbol",
+      "overridden": "Anulado"
+    },
+    "meta": {
+      "page_title": "Mapa de límites comerciales",
+      "subtitle": "AG82: ¿qué es AGPL público, configurable por inquilino, de capa de implementación o comercial?",
+      "title": "Mapa de límites comerciales"
+    },
+    "overrides_count": "{{count}} anulación",
+    "overrides_count_plural": "{{count}} anulaciones",
+    "sections": {
+      "classifications": "Clasificaciones"
+    },
+    "toasts": {
+      "export_empty": "Exportación devuelta vacía",
+      "export_failed": "No se pudo exportar el mapa de límites",
+      "exported": "Mapa de límites exportado",
+      "load_failed": "No se pudo cargar el mapa de límites comerciales",
+      "reverted": "Revertido al valor predeterminado canónico",
+      "update_failed": "No se pudo actualizar la clasificación",
+      "updated": "Clasificación actualizada"
+    }
+  },
+  "federation_aggregates": {
+    "actions": {
+      "close": "Cerca",
+      "preview_payload": "Vista previa de carga útil",
+      "refresh": "Refrescar",
+      "rotate_secret": "Rotar secreto",
+      "show_audit_log": "Mostrar registro de auditoría"
+    },
+    "audit": {
+      "columns": {
+        "period": "Período",
+        "requester": "Solicitante",
+        "signature": "Firma",
+        "time": "Tiempo"
+      },
+      "empty": "No se registraron consultas.",
+      "loading": "Cargando...",
+      "period_range": "{{from}} -> {{to}}",
+      "table_aria": "Registro de auditoría de consultas agregadas",
+      "title": "Registro de auditoría de consultas agregadas (últimos 90 días)",
+      "unknown_requester": "desconocido"
+    },
+    "consent": {
+      "enable_label": "Habilitar el uso compartido de agregados de federación",
+      "endpoint_prefix": "Cuando está habilitado, el punto final público",
+      "endpoint_suffix": "devuelve una carga útil JSON firmada para este inquilino. Cuando está deshabilitado, devuelve 404.",
+      "loading": "Cargando consentimiento...",
+      "title": "Consentir"
+    },
+    "meta": {
+      "description": "Opte por compartir métricas agregadas anónimas y firmadas entre nodos federados. El número de miembros se agrupa y los nombres de las organizaciones asociadas nunca se exponen.",
+      "title": "Agregados de la Federación"
+    },
+    "preview": {
+      "empty": "No hay vista previa disponible.",
+      "loading": "Agregado informático...",
+      "title": "Vista previa: lo que se expondría públicamente"
+    },
+    "status": {
+      "disabled": "Desactivado",
+      "enabled": "Activado",
+      "last_rotated": "Última rotación {{date}}",
+      "never_rotated": "Nunca rotado",
+      "no_signing_secret": "Sin secreto de firma",
+      "signing_secret_present": "Firma de regalo secreto"
+    },
+    "toasts": {
+      "disabled": "Compartir agregados de federación deshabilitado",
+      "enabled": "Uso compartido agregado de federación habilitado",
+      "load_audit_failed": "No se pudo cargar el registro de auditoría",
+      "load_consent_failed": "No se pudo cargar el consentimiento agregado de la federación",
+      "load_preview_failed": "No se pudo cargar la vista previa",
+      "rotate_failed": "No se pudo rotar el secreto",
+      "secret_rotated": "Secreto de firma rotado",
+      "update_failed": "No se pudo actualizar el consentimiento"
+    }
+  },
+  "pilot_inquiry_admin": {
+    "about": {
+      "body_intro_after_kiss": "piloto. Cada consulta se envía a través del formulario de interés público y se califica automáticamente utilizando un algoritmo de ajuste (tamaño de la población, cooperativa KISS existente, preparación digital, indicación de presupuesto y cronograma). Utilice este tablero para mover consultas a través del proceso, asignarlas a un contacto de ventas o de la comunidad y realizar un seguimiento de cuándo se envían las propuestas y cuándo se activan los pilotos.",
+      "body_intro_before_gemeinden": "Esta es la tubería superior del embudo para los municipios (",
+      "body_intro_before_kiss": ") y regiones interesadas en ejecutar un NEXUS/",
+      "fit_score_after": "(0-100) se calcula automáticamente; 70+ es una buena coincidencia. Haga clic en cualquier tarjeta para ver todos los detalles, actualizar la etapa o agregar notas internas.",
+      "fit_score_before": "El",
+      "fit_score_label": "Puntuación de ajuste",
+      "gemeinden": "Gemeinden",
+      "pipeline_stages": "Nuevo -> Contactado -> Calificado -> Propuesta enviada -> Piloto acordado -> En vivo -> Rechazado / Retirado.",
+      "pipeline_stages_label": "Etapas del oleoducto:",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "close": "Cerca",
+      "export_csv": "Exportar CSV",
+      "refresh": "Refrescar",
+      "save_notes": "Guardar notas",
+      "save_stage": "Guardar etapa"
+    },
+    "empty": {
+      "body": "Las consultas llegan a través del formulario de interés público en el sitio de ventas NEXUS. Una vez enviados, aparecen aquí automáticamente. Utilice el filtro de etapa anterior para verificar si existen consultas en otras etapas.",
+      "title": "Aún no hay consultas piloto."
+    },
+    "fields": {
+      "budget": "Presupuesto",
+      "contact": "Contacto",
+      "cooperative": "Cooperativa",
+      "country_region": "País / Región",
+      "existing_digital_tool": "Herramienta digital existente",
+      "fit_score_breakdown": "Desglose de la puntuación de ajuste",
+      "internal_notes": "Notas internas (solo administrador)",
+      "modules_of_interest": "Módulos de interés",
+      "notes_from_gemeinde": "Notas de Gemeinde",
+      "population": "Población",
+      "timeline": "Línea de tiempo",
+      "total": "Total",
+      "update_stage": "Etapa de actualización"
+    },
+    "filters": {
+      "all": "Todo",
+      "stage": "Filtrar por etapa:"
+    },
+    "fit_scale": {
+      "factors_after_kiss": "cooperativa, preparación digital, presupuesto, cronograma.",
+      "factors_before_kiss": "Factores de puntuación: tamaño de la población, existente.",
+      "good": "Buen partido: priorice la divulgación",
+      "potential": "Potencial: investigue más a fondo",
+      "title": "Escala de puntuación de ajuste (0-100):",
+      "weak": "Ajuste débil - prioridad baja"
+    },
+    "page_subtitle": "Gestionar las expresiones de interés entrantes de Gemeinde región piloto",
+    "page_title": "Consultas piloto",
+    "placeholders": {
+      "internal_notes": "Añadir notas internas...",
+      "rejection_reason": "Motivo del rechazo..."
+    },
+    "stages": {
+      "dormant": "Latente",
+      "live": "Vivir",
+      "new": "Nuevo",
+      "pilot_agreed": "Piloto de acuerdo",
+      "proposal_sent": "Propuesta enviada",
+      "qualified": "Calificado",
+      "rejected": "Rechazado",
+      "unknown": "{{stage}}"
+    },
+    "stats": {
+      "avg_fit_score": "Puntuación de ajuste promedio",
+      "in_pipeline": "En proceso",
+      "qualified": "Calificado",
+      "total_inquiries": "Consultas totales"
+    },
+    "summary": {
+      "by_country": "Por pais"
+    },
+    "timestamps": {
+      "agreed": "Acordado",
+      "live": "Vivir",
+      "proposal": "Propuesta",
+      "submitted": "Enviado"
+    },
+    "toasts": {
+      "load_failed": "No se pudieron cargar las consultas piloto",
+      "notes_save_failed": "No se pudieron guardar las notas",
+      "notes_saved": "Notas guardadas",
+      "stage_update_failed": "No se pudo actualizar la etapa",
+      "stage_updated": "Etapa actualizada"
+    },
+    "values": {
+      "asap": "lo antes posible",
+      "empty": "-",
+      "months": "{{count}} meses",
+      "no": "No",
+      "yes": "Sí"
+    },
+    "velocity": {
+      "avg_to_agreed": "Promedio acordado:",
+      "avg_to_live": "Promedio de vida:",
+      "avg_to_proposal": "Promedio de la propuesta:",
+      "days": "{{count}}d",
+      "title": "Velocidad del proceso: promedio de días desde el envío de la consulta hasta cada hito:"
+    }
+  },
+  "pilot_launch_readiness": {
+    "about": {
+      "body": "Esta es la puerta de entrada o salida antes de que se active el piloto de Caring Community. Cada sección a continuación corresponde a un módulo de configuración o evaluación (AG80-AG87). Todas las secciones deben alcanzar el estado Listo antes de que se habilite el botón Iniciar. Una vez lanzado, se trata de una acción unidireccional: la marca de tiempo del lanzamiento y el operador se registran permanentemente.",
+      "review_help": "Las secciones que muestran la revisión de Necesidades tienen una configuración faltante o incompleta. Haga clic en el módulo correspondiente para resolver los elementos enumerados.",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "acknowledge_default_matrix": "Reconocer matriz predeterminada",
+      "cancel": "Cancelar",
+      "confirm_launch": "Sí, lanza el piloto.",
+      "launch_pilot": "Piloto de lanzamiento",
+      "open": "Abierto",
+      "refresh": "Refrescar",
+      "refresh_aria": "Actualizar informe de preparación para el lanzamiento",
+      "retry": "Rever"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "errors": {
+      "load_failed": "No se pudo cargar el informe de preparación para el lanzamiento.",
+      "unavailable_title": "Informe de preparación no disponible",
+      "unexpected_response": "El informe de preparación para el lanzamiento arrojó una respuesta inesperada."
+    },
+    "isolated_node": {
+      "informational": "La puerta de nodo aislado es informativa para implementaciones hospedadas estándar. Solo bloquea el inicio cuando AG85modo_despliegue está configurado en canton_isolated_node. Si su municipio no ha especificado un requisito de nodo aislado, puede ignorar los elementos de esta sección.",
+      "required": "La puerta de nodo aislado está activa: esta implementación está configurada como un nodo aislado de cantón (AG85). Todos los artículos deben alcanzar el estado Decidido antes del lanzamiento."
+    },
+    "meta": {
+      "page_title": "Preparación para el lanzamiento piloto",
+      "subtitle": "AG95 - informe pasa/no pasa que combina superficies de evaluación AG80-AG87",
+      "title": "Preparación para el lanzamiento piloto"
+    },
+    "missing": {
+      "acknowledgement": "Reconocimiento del coordinador",
+      "backlog_empty": "Trabajo pendiente de integración vacío",
+      "controller_contact_email": "Correo electrónico de contacto del controlador",
+      "controller_data_protection_officer": "Delegado de protección de datos",
+      "controller_name": "Nombre del controlador",
+      "danger_checks": "Problemas de calidad de datos",
+      "incident_response_contact_email": "Correo electrónico de contacto de respuesta a incidentes",
+      "policy_appendix_url": "Apéndice de política URL",
+      "pre_pilot_baseline": "Línea de base del marcador previo al piloto",
+      "safeguarding_escalation_user_id": "Contacto de protección de escalada",
+      "workshop_not_run": "Taller de política operativa no realizado"
+    },
+    "modal": {
+      "body_prefix": "Lanzar el piloto es un",
+      "body_suffix": "Registra la marca de tiempo de lanzamiento y el operador en el inquilino, y los informes de la plataforma comienzan a tratar a la comunidad como si estuviera en vivo.",
+      "check_baseline": "Se ha capturado la línea de base del marcador previo al piloto.",
+      "check_data_quality": "Los controles de calidad de los datos están en verde",
+      "check_disclosure": "Se aprueba el paquete de divulgación, la política operativa y el límite comercial.",
+      "check_residents": "Los verdaderos residentes están listos para ser invitados.",
+      "confirm_intro": "Antes de continuar, confirma con tu equipo coordinador que:",
+      "one_way_action": "acción unidireccional",
+      "section_summary": "Resumen de la sección",
+      "title": "¿Lanzar el piloto?"
+    },
+    "more_count": "+{{count}} más",
+    "overall": {
+      "blocked": "Inicio bloqueado: solucione los problemas primero",
+      "needs_review": "Revisión del coordinador de necesidades piloto",
+      "not_started": "La evaluación piloto aún no se ha realizado",
+      "ready": "El piloto está listo para lanzarse"
+    },
+    "progress": {
+      "aria": "Progreso de la preparación del lanzamiento",
+      "ready_count": "{{ready}} / {{total}} listo"
+    },
+    "states": {
+      "blocked_body": "Resuelva cada sección a continuación antes de habilitar el botón de inicio.",
+      "blocked_title": "Aún no se puede iniciar: el bloqueador {{count}} permanece",
+      "blocked_title_plural": "Aún no se puede iniciar: quedan {{count}} bloqueadores",
+      "launched_body": "Lanzado el {{date}}>{{user}}. Se trata de un hito unidireccional: las comprobaciones de preparación siguen siendo visibles para la auditoría.",
+      "launched_by_user": "por el usuario #{{id}}",
+      "launched_title": "Lanzamiento piloto",
+      "ready_body_prefix": "Cada sección de preparación está lista. Hacer clic",
+      "ready_body_suffix": "cuando su equipo coordinador esté listo para tomar esta decisión unidireccional.",
+      "ready_title": "Listo para lanzar"
+    },
+    "status": {
+      "blocked": "Obstruido",
+      "needs_review": "Necesita revisión",
+      "not_started": "No iniciado",
+      "ready": "Listo"
+    },
+    "timestamps": {
+      "last_updated": "Última actualización {{date}}",
+      "report_generated": "Informe generado {{date}}. Haga clic en cualquier sección para abrir la superficie de administración correspondiente."
+    },
+    "toasts": {
+      "already_launched": "Este piloto ya ha sido lanzado.",
+      "boundary_acknowledge_failed": "No se pudo reconocer el límite",
+      "boundary_acknowledged": "Se reconoce límite comercial",
+      "cannot_launch": "No se puede iniciar: la puerta de preparación no está cerrada.",
+      "launch_failed": "No se pudo iniciar el piloto.",
+      "launch_success": "El piloto se lanzó con éxito.",
+      "load_failed": "No se pudo cargar el informe de preparación para el lanzamiento"
+    }
+  },
+  "pilot_scoreboard": {
+    "about": {
+      "age_stiftung": "Age-Stiftung",
+      "age_stiftung_title": "Fundación para el cambio",
+      "body": "Todas las métricas utilizan una ventana móvil de 90 días. Capture una línea de base previa al piloto antes de incorporar a residentes reales y luego ejecute una instantánea de revisión trimestral cada 3 meses. La tabla de comparación muestra cómo se ha movido cada métrica en relación con esa línea de base.",
+      "methodology_middle": "metodología: horas de cuidado informal x",
+      "methodology_prefix": "La compensación de costos se calcula utilizando el",
+      "methodology_suffix": "35/h (tarifa suiza de asistente de cuidados formales) x 2 (multiplicador de prevención que refleja los costos evitados de cuidados formales). Esta metodología está reconocida por los servicios sociales cantonales suizos para la elaboración de informes piloto.",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "capture_baseline": "Capturar línea base",
+      "capture_pre": "Capture la línea de base previa al piloto",
+      "capture_quarterly": "Capturar revisión trimestral",
+      "pre_set": "Conjunto de referencia previo al piloto",
+      "refresh": "Refrescar"
+    },
+    "baselines": {
+      "captured": "capturado",
+      "label": "Etiqueta",
+      "notes": "Notas",
+      "period": "Período",
+      "pre_pilot": "Pre-piloto",
+      "quarterly": "Trimestral",
+      "type": "Tipo"
+    },
+    "currency": {
+      "chf": "CHF"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "fields": {
+      "label_optional": "Etiqueta (opcional)",
+      "notes_optional": "Notas (opcional)"
+    },
+    "meta": {
+      "subtitle": "AG83: referencia previa al piloto + métricas continuas de 90 días con cadencia de revisión trimestral",
+      "title": "Cuadro de indicadores de éxito del piloto"
+    },
+    "methodology": {
+      "multiplier": "multiplicador de prevención.",
+      "per_hour": "/h x",
+      "prefix": "Metodología: horas x",
+      "window": "Ventana: {{days}} días."
+    },
+    "metrics": {
+      "active_members": "Miembros activos (90d)",
+      "approved_hours": "Horas aprobadas (90d)",
+      "business_participation": "Negocios activos (90d)",
+      "comms_reach_pct": "Alcance de las comunicaciones",
+      "coordinator_workload_hrs": "Carga de trabajo del coordinador",
+      "cost_offset_chf": "Compensación de costos estimados (CHF)",
+      "first_response_hours": "Mediana de primera respuesta",
+      "recurring_relationships": "Relaciones recurrentes",
+      "satisfaction_score": "Puntuación de satisfacción (1-5)",
+      "social_isolation_pct": "Proxy de aislamiento social"
+    },
+    "pre_modal": {
+      "body": "Capture esto UNA VEZ antes de incorporar a residentes reales. Congela las métricas actuales de 90 días como línea de base de comparación. Todas las revisiones trimestrales futuras calcularán la delta con respecto a esta instantánea. Esta acción no se puede deshacer.",
+      "notes_placeholder": "Región piloto, municipio participante, decisiones tomadas antes del lanzamiento...",
+      "title": "Capture la línea de base previa al piloto"
+    },
+    "quarterly": {
+      "next_review": "Próxima revisión trimestral:",
+      "overdue": "Atrasado"
+    },
+    "quarterly_modal": {
+      "body": "Ejecutar cada 3 meses después del lanzamiento piloto. La etiqueta de la instantánea tiene como valor predeterminado el trimestre actual (por ejemplo, Q2_2026), pero puede personalizarla. Agregue notas para registrar los cambios desde la última revisión: hitos alcanzados, cambios de políticas, comentarios de los residentes. La instantánea cubre el período de 90 días más reciente a partir de hoy.",
+      "label_description": "Utilice una etiqueta reconocible como Q2_2026 o 2026_Q3. El valor predeterminado es trimestral_AAAA_MM.",
+      "label_placeholder": "trimestral_2026_07",
+      "notes_placeholder": "Qué cambió este trimestre, hitos alcanzados...",
+      "title": "Capturar revisión trimestral"
+    },
+    "sections": {
+      "captured_baselines": "Líneas de base capturadas",
+      "comparing_baseline": "Comparación con la línea base previa al piloto capturada {{date}}",
+      "metrics": "Métricas piloto",
+      "no_baseline": "Aún no hay una línea de base previa al piloto: los valores actuales se muestran solos"
+    },
+    "table": {
+      "change": "Cambiar",
+      "current": "Actual",
+      "delta": "Delta",
+      "metric": "Métrico",
+      "pre_pilot": "Pre-piloto"
+    },
+    "toasts": {
+      "load_failed": "No se pudo cargar el marcador piloto",
+      "pre_captured": "Línea de base previa al piloto capturada",
+      "pre_failed": "No se pudo capturar la línea de base previa al piloto",
+      "quarterly_captured": "Revisión trimestral capturada",
+      "quarterly_failed": "No se pudo capturar la revisión trimestral"
+    }
+  },
+  "provisioning_requests": {
+    "approval_queued": "Aprobación en cola: aprovisionamiento en curso",
+    "approve_and_provision": "Aprobar y provisionar",
+    "approve_failed": "No se pudo aprobar",
+    "close": "Cerca",
+    "empty_status": "No hay solicitudes de aprovisionamiento en este estado.",
+    "empty_value": "-",
+    "fields": {
+      "applicant": "Solicitante",
+      "category": "Categoría",
+      "country_region": "País / Región",
+      "expected_size": "Tamaño esperado",
+      "intended_use": "Uso previsto",
+      "languages": "Idiomas",
+      "provisioned_tenant": "Inquilino provisionado",
+      "provisioning_log": "Registro de aprovisionamiento",
+      "rejection_reason": "Motivo del rechazo",
+      "slug": "Babosa",
+      "subdomain": "Subdominio"
+    },
+    "languages_value": "{{languages}} (predeterminado: {{defaultLanguage}})",
+    "load_failed": "No se pudieron cargar las solicitudes de aprovisionamiento",
+    "page_subtitle": "Revisar y aprobar solicitudes de aprovisionamiento de inquilinos de autoservicio",
+    "page_title": "Cola de aprovisionamiento",
+    "refresh": "Refrescar",
+    "reject": "Rechazar",
+    "reject_failed": "No se pudo rechazar",
+    "rejection_reason_label": "Motivo del rechazo (obligatorio si se rechaza)",
+    "rejection_reason_placeholder": "¿Por qué se rechaza esto?",
+    "rejection_reason_required": "Por favor ingrese un motivo de rechazo",
+    "request_rejected": "Solicitud rechazada: solicitante notificado por correo electrónico",
+    "retry": "Rever",
+    "retry_failed": "No se pudo volver a intentar",
+    "retry_queued": "Reintentar en cola",
+    "reviewed": "Revisado",
+    "statuses": {
+      "all": "Todo",
+      "approved": "Aprobado",
+      "failed": "Fallido",
+      "pending": "Pendiente",
+      "provisioned": "Aprovisionado",
+      "rejected": "Rechazado",
+      "under_review": "En revisión"
+    },
+    "submitted": "Enviado"
   }
 }

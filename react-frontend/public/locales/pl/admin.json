@@ -14066,5 +14066,476 @@
       "render_template_failed": "Nie udało się wyrenderować szablonu",
       "revoke_export_failed": "Nie udało się odwołać eksportu zbioru danych"
     }
+  },
+  "commercial_boundary": {
+    "about": {
+      "body_prefix": "Granica komercyjna określa, jakie rodzaje pracy zarobkowej są dozwolone w ramach programu opieki społecznej, a które muszą pozostać nieodpłatnymi kredytami czasowymi. Ta granica jest wymogiem art",
+      "body_suffix": "metodologii i musi zostać uzgodniony z partnerem miejskim przed rozpoczęciem pilotażu. Poniższa matryca przedstawia kategorie działań i ich dozwolony typ wymiany.",
+      "override_prefix": "Użyj zastąpienia wiersza, aby zarejestrować klasyfikację specyficzną dla dzierżawy (na przykład wdrożenie prywatne z pakietem komercyjnym). Zastąpienia są przechowywane tylko w ustawieniach dzierżawy — nigdy nie zmieniają kanonicznej klasyfikacji publicznej dostarczanej z plikiem",
+      "override_suffix": "repozytorium. Po potwierdzeniu macierzy granic umowa jest rejestrowana wraz ze znacznikiem czasu i identyfikatorem użytkownika, co stanowi część dokumentacji zarządzania pilotażem, która pojawia się podczas sprawdzania gotowości do startu pilotażowego.",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "export": "Eksport",
+      "export_markdown": "Eksportuj jako Markdown",
+      "refresh_aria": "Odśwież mapę granic handlowych",
+      "refresh_data": "Odśwież dane",
+      "reset_default": "Przywróć domyślne ustawienia kanoniczne",
+      "reset_default_aria": "Przywróć ustawienia domyślne"
+    },
+    "classification": {
+      "agpl_public": "AGPL publiczny",
+      "commercial": "Handlowy",
+      "private_deployment": "Wdrożenie prywatne",
+      "tenant_config": "Konfiguracja najemcy"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "export": {
+      "agpl_module": "Moduł AGPL",
+      "capability": "Zdolność",
+      "classification": "Klasyfikacja",
+      "default": "Domyślny",
+      "generated": "Wygenerowano {{date}} z panelu administracyjnego NEXUS.",
+      "last_updated": "Ostatnia aktualizacja: {{date}}",
+      "no": "NIE",
+      "notes": "Notatki",
+      "overridden": "Zastąpione",
+      "yes": "Tak"
+    },
+    "fields": {
+      "classification_aria": "Klasyfikacja dla {{label}}",
+      "set_classification": "Ustaw klasyfikację"
+    },
+    "labels": {
+      "canonical_default": "Wartość domyślna kanoniczna:",
+      "key": "Klawisz",
+      "module": "moduł",
+      "out_of_tree": "Poza drzewem",
+      "overridden": "Zastąpione"
+    },
+    "meta": {
+      "page_title": "Mapa granic handlowych",
+      "subtitle": "AG82 — co jest AGPL publiczne, konfigurowalne przez dzierżawcę, warstwy wdrożeniowej lub komercyjne",
+      "title": "Mapa granic handlowych"
+    },
+    "overrides_count": "Zastąpienie {{count}}",
+    "overrides_count_plural": "{{count}} zastępuje",
+    "sections": {
+      "classifications": "Klasyfikacje"
+    },
+    "toasts": {
+      "export_empty": "Eksport zwrócił pusty",
+      "export_failed": "Nie udało się wyeksportować mapy granic",
+      "exported": "Wyeksportowana mapa granic",
+      "load_failed": "Nie udało się załadować mapy granic handlowych",
+      "reverted": "Przywrócono do wartości domyślnych kanonicznych",
+      "update_failed": "Nie udało się zaktualizować klasyfikacji",
+      "updated": "Klasyfikacja zaktualizowana"
+    }
+  },
+  "federation_aggregates": {
+    "actions": {
+      "close": "Zamknąć",
+      "preview_payload": "Podgląd ładunku",
+      "refresh": "Odświeżać",
+      "rotate_secret": "Obróć sekret",
+      "show_audit_log": "Pokaż dziennik audytu"
+    },
+    "audit": {
+      "columns": {
+        "period": "Okres",
+        "requester": "Osoba żądająca",
+        "signature": "Podpis",
+        "time": "Czas"
+      },
+      "empty": "Nie zarejestrowano żadnych zapytań.",
+      "loading": "Załadunek...",
+      "period_range": "{{from}} -> {{to}}",
+      "table_aria": "Zagregowany dziennik kontroli zapytań",
+      "title": "Zbiorczy dziennik kontroli zapytań (ostatnie 90 dni)",
+      "unknown_requester": "nieznany"
+    },
+    "consent": {
+      "enable_label": "Włącz zbiorcze udostępnianie federacji",
+      "endpoint_prefix": "Po włączeniu publiczny punkt końcowy",
+      "endpoint_suffix": "zwraca podpisany ładunek JSON dla tej dzierżawy. Po wyłączeniu zwraca 404.",
+      "loading": "Ładowanie zgody...",
+      "title": "Zgoda"
+    },
+    "meta": {
+      "description": "Wyraź zgodę na udostępnianie podpisanych, anonimowych zbiorczych danych w węzłach stowarzyszonych. Liczba członków jest grupowana, a nazwy organizacji partnerskich nigdy nie są ujawniane.",
+      "title": "Agregaty Federacji"
+    },
+    "preview": {
+      "empty": "Brak podglądu.",
+      "loading": "Agregat obliczeniowy...",
+      "title": "Podgląd - co byłoby ujawnione publicznie"
+    },
+    "status": {
+      "disabled": "Wyłączony",
+      "enabled": "Włączony",
+      "last_rotated": "Ostatni obrót {{date}}",
+      "never_rotated": "Nigdy nie obracany",
+      "no_signing_secret": "Żadnej tajemnicy podpisania",
+      "signing_secret_present": "Prezent w postaci tajnego podpisu"
+    },
+    "toasts": {
+      "disabled": "Zagregowane udostępnianie federacyjne wyłączone",
+      "enabled": "Włączono zbiorcze udostępnianie federacyjne",
+      "load_audit_failed": "Nie udało się załadować dziennika kontroli",
+      "load_consent_failed": "Nie udało się załadować zbiorczej zgody federacji",
+      "load_preview_failed": "Nie udało się załadować podglądu",
+      "rotate_failed": "Nie udało się obrócić sekretu",
+      "secret_rotated": "Tajemnica podpisu została obrócona",
+      "update_failed": "Nie udało się zaktualizować zgody"
+    }
+  },
+  "pilot_inquiry_admin": {
+    "about": {
+      "body_intro_after_kiss": "pilot. Każde zapytanie jest składane za pośrednictwem formularza interesu publicznego i oceniane automatycznie przy użyciu algorytmu dopasowania (wielkość populacji, istniejąca KISS spółdzielnia, gotowość cyfrowa, wskazanie budżetu i harmonogram). Użyj tej tablicy, aby przekazywać zapytania w ramach rurociągu, przypisywać je do kontaktu w zakresie sprzedaży lub społeczności oraz śledzić, kiedy propozycje są wysyłane, a programy pilotażowe rozpoczynają się.",
+      "body_intro_before_gemeinden": "Jest to rurociąg typu „góra lejka” dla gmin (",
+      "body_intro_before_kiss": ") i regiony zainteresowane prowadzeniem NEXUS/",
+      "fit_score_after": "(0-100) jest obliczane automatycznie - 70+ to mocne dopasowanie. Kliknij dowolną kartę, aby wyświetlić wszystkie szczegóły, zaktualizować scenę lub dodać notatki wewnętrzne.",
+      "fit_score_before": "The",
+      "fit_score_label": "Wynik dopasowania",
+      "gemeinden": "Gemeinden",
+      "pipeline_stages": "Nowy -> Skontaktowano -> Zakwalifikowano -> Propozycja wysłana -> Pilot zgodził się -> Na żywo -> Odrzucony/wycofany.",
+      "pipeline_stages_label": "Etapy rurociągu:",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "close": "Zamknąć",
+      "export_csv": "Eksportuj plik CSV",
+      "refresh": "Odświeżać",
+      "save_notes": "Zapisz notatki",
+      "save_stage": "Zapisz scenę"
+    },
+    "empty": {
+      "body": "Zapytania można przesyłać za pośrednictwem formularza interesu publicznego w witrynie sprzedaży NEXUS. Po przesłaniu pojawiają się tutaj automatycznie. Użyj powyższego filtra etapów, aby sprawdzić, czy zapytania istnieją na innych etapach.",
+      "title": "Nie ma jeszcze żadnych zapytań pilotażowych."
+    },
+    "fields": {
+      "budget": "Budżet",
+      "contact": "Kontakt",
+      "cooperative": "Spółdzielnia",
+      "country_region": "Kraj/region",
+      "existing_digital_tool": "Istniejące narzędzie cyfrowe",
+      "fit_score_breakdown": "Podział wyniku dopasowania",
+      "internal_notes": "Notatki wewnętrzne (tylko administrator)",
+      "modules_of_interest": "Moduły zainteresowań",
+      "notes_from_gemeinde": "Notatki z Gemeinde",
+      "population": "Populacja",
+      "timeline": "Oś czasu",
+      "total": "Całkowity",
+      "update_stage": "Aktualizuj etap"
+    },
+    "filters": {
+      "all": "Wszystko",
+      "stage": "Filtruj według etapu:"
+    },
+    "fit_scale": {
+      "factors_after_kiss": "spółdzielnia, gotowość cyfrowa, budżet, harmonogram.",
+      "factors_before_kiss": "Czynniki punktowe: wielkość populacji, istniejące",
+      "good": "Dobre dopasowanie – priorytetem jest zasięg",
+      "potential": "Potencjał – zbadaj dalej",
+      "title": "Skala wyników dopasowania (0-100):",
+      "weak": "Słabe dopasowanie – niski priorytet"
+    },
+    "page_subtitle": "Zarządzaj przychodzącymi zgłoszeniami zainteresowania Gemeinde regionu pilotażowego",
+    "page_title": "Zapytania pilotażowe",
+    "placeholders": {
+      "internal_notes": "Dodaj notatki wewnętrzne...",
+      "rejection_reason": "Powód odrzucenia..."
+    },
+    "stages": {
+      "dormant": "Uśpiony",
+      "live": "Na żywo",
+      "new": "Nowy",
+      "pilot_agreed": "Pilot Zgoda",
+      "proposal_sent": "Propozycja wysłana",
+      "qualified": "Wykwalifikowany",
+      "rejected": "Odrzucony",
+      "unknown": "{{stage}}"
+    },
+    "stats": {
+      "avg_fit_score": "Średni wynik dopasowania",
+      "in_pipeline": "W rurociągu",
+      "qualified": "Wykwalifikowany",
+      "total_inquiries": "Łączna liczba zapytań"
+    },
+    "summary": {
+      "by_country": "Według kraju"
+    },
+    "timestamps": {
+      "agreed": "Zgoda",
+      "live": "Na żywo",
+      "proposal": "Wniosek",
+      "submitted": "Złożony"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się wczytać zapytań pilotażowych",
+      "notes_save_failed": "Nie udało się zapisać notatek",
+      "notes_saved": "Notatki zapisane",
+      "stage_update_failed": "Nie udało się zaktualizować etapu",
+      "stage_updated": "Etap zaktualizowany"
+    },
+    "values": {
+      "asap": "JAK NAJSZYBCIEJ",
+      "empty": "-",
+      "months": "{{count}} miesięcy",
+      "no": "NIE",
+      "yes": "Tak"
+    },
+    "velocity": {
+      "avg_to_agreed": "Średnia do uzgodnionej:",
+      "avg_to_live": "Średnia życia:",
+      "avg_to_proposal": "Średnia do oferty pakietowej:",
+      "days": "{{count}}d",
+      "title": "Prędkość rurociągu – średnia liczba dni od złożenia zapytania do każdego kamienia milowego:"
+    }
+  },
+  "pilot_launch_readiness": {
+    "about": {
+      "body": "To jest bramka typu „go/no-go”, zanim Twój program pilotażowy Caring Community zostanie uruchomiony. Każda sekcja poniżej odpowiada modułowi konfiguracyjnemu lub ewaluacyjnemu (AG80-AG87). Wszystkie sekcje muszą osiągnąć stan Gotowe, zanim zostanie włączony przycisk Uruchom. Po uruchomieniu jest to działanie jednokierunkowe – znacznik czasu uruchomienia i operator są rejestrowane na stałe.",
+      "review_help": "W sekcjach pokazujących Przegląd potrzeb brakuje konfiguracji lub jest ona niekompletna. Kliknij odpowiedni moduł, aby rozwiązać wymienione problemy.",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "acknowledge_default_matrix": "Potwierdź domyślną macierz",
+      "cancel": "Anulować",
+      "confirm_launch": "Tak, uruchom pilota",
+      "launch_pilot": "Uruchom pilota",
+      "open": "Otwarte",
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież raport gotowości do startu",
+      "retry": "Spróbować ponownie"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "errors": {
+      "load_failed": "Nie można załadować raportu gotowości do uruchomienia.",
+      "unavailable_title": "Raport gotowości niedostępny",
+      "unexpected_response": "Raport gotowości do uruchomienia zwrócił nieoczekiwaną odpowiedź."
+    },
+    "isolated_node": {
+      "informational": "Brama izolowanego węzła ma charakter informacyjny w przypadku standardowych wdrożeń hostowanych. Blokuje uruchamianie tylko wtedy, gdy AG85 tryb_wdrożenia jest ustawiony na canton_isolated_node. Jeśli Twoja gmina nie określiła wymogu izolowanego węzła, możesz pominąć pozycje w tej sekcji.",
+      "required": "Brama izolowanego węzła jest aktywna — to wdrożenie jest skonfigurowane jako węzeł izolowany w kantonie (AG85). Wszystkie elementy muszą osiągnąć status Zdecydowano przed uruchomieniem."
+    },
+    "meta": {
+      "page_title": "Gotowość do startu pilotażowego",
+      "subtitle": "AG95 - raport go/no-go łączący powierzchnie oceny AG80-AG87",
+      "title": "Gotowość do startu pilotażowego"
+    },
+    "missing": {
+      "acknowledgement": "Potwierdzenie koordynatora",
+      "backlog_empty": "Zaległości w integracji puste",
+      "controller_contact_email": "Adres e-mail kontaktowy kontrolera",
+      "controller_data_protection_officer": "Inspektor ochrony danych",
+      "controller_name": "Nazwa kontrolera",
+      "danger_checks": "Problemy z jakością danych",
+      "incident_response_contact_email": "Kontaktowy adres e-mail dotyczący reakcji na incydenty",
+      "policy_appendix_url": "Załącznik do zasad URL",
+      "pre_pilot_baseline": "Linia bazowa tablicy wyników przed pilotażem",
+      "safeguarding_escalation_user_id": "Ochrona kontaktu eskalacyjnego",
+      "workshop_not_run": "Warsztaty dotyczące polityki operacyjnej nie są prowadzone"
+    },
+    "modal": {
+      "body_prefix": "Uruchomienie pilotażu to a",
+      "body_suffix": "Rejestruje sygnaturę czasową i operatora w dzierżawie, a raporty platformy zaczynają traktować społeczność jako aktywną.",
+      "check_baseline": "Przechwycono linię bazową tablicy wyników przed pilotażem",
+      "check_data_quality": "Kontrole jakości danych są zielone",
+      "check_disclosure": "Pakiet informacyjny, zasady operacyjne i granice handlowe zostały podpisane",
+      "check_residents": "Prawdziwi mieszkańcy są gotowi na zaproszenie",
+      "confirm_intro": "Zanim przejdziesz dalej, potwierdź u swojego zespołu koordynatorów, że:",
+      "one_way_action": "działanie jednokierunkowe",
+      "section_summary": "Podsumowanie sekcji",
+      "title": "Uruchomić pilota?"
+    },
+    "more_count": "+{{count}} więcej",
+    "overall": {
+      "blocked": "Uruchomienie zablokowane — najpierw napraw problemy",
+      "needs_review": "Pilot wymaga przeglądu przez koordynatora",
+      "not_started": "Ocena pilotażowa nie została jeszcze przeprowadzona",
+      "ready": "Pilot jest gotowy do startu"
+    },
+    "progress": {
+      "aria": "Postęp w gotowości do uruchomienia",
+      "ready_count": "{{ready}} / {{total}} gotowy"
+    },
+    "states": {
+      "blocked_body": "Rozwiąż każdą sekcję poniżej, zanim przycisk uruchamiania zostanie włączony.",
+      "blocked_title": "Nie można jeszcze uruchomić — pozostała blokada {{count}}",
+      "blocked_title_plural": "Nie można jeszcze uruchomić – pozostały {{count}} blokery",
+      "launched_body": "Uruchomiono {{date}}{{user}}. Jest to kamień milowy w jedną stronę – kontrole gotowości pozostają widoczne na potrzeby audytu.",
+      "launched_by_user": "przez użytkownika #{{id}}",
+      "launched_title": "Uruchomiono pilotaż",
+      "ready_body_prefix": "Każda sekcja gotowości jest gotowa. Trzask",
+      "ready_body_suffix": "kiedy zespół koordynatorów będzie gotowy do podjęcia jednostronnej decyzji.",
+      "ready_title": "Gotowy do uruchomienia"
+    },
+    "status": {
+      "blocked": "Zablokowany",
+      "needs_review": "Wymaga przeglądu",
+      "not_started": "Nie rozpoczęte",
+      "ready": "Gotowy"
+    },
+    "timestamps": {
+      "last_updated": "Ostatnia aktualizacja {{date}}",
+      "report_generated": "Raport wygenerowano {{date}}. Kliknij dowolną sekcję, aby otworzyć odpowiednią powierzchnię administracyjną."
+    },
+    "toasts": {
+      "already_launched": "Ten pilotaż został już uruchomiony.",
+      "boundary_acknowledge_failed": "Nie udało się potwierdzić granicy",
+      "boundary_acknowledged": "Uznano granicę handlową",
+      "cannot_launch": "Nie można uruchomić – bramka gotowości nie jest zamknięta.",
+      "launch_failed": "Nie udało się uruchomić pilota.",
+      "launch_success": "Pilotaż został pomyślnie uruchomiony.",
+      "load_failed": "Nie udało się załadować raportu gotowości do uruchomienia"
+    }
+  },
+  "pilot_scoreboard": {
+    "about": {
+      "age_stiftung": "Age-Stiftung",
+      "age_stiftung_title": "Stiftung für das Alter",
+      "body": "Wszystkie wskaźniki korzystają z 90-dniowego okna kroczącego. Przed wdrożeniem prawdziwych mieszkańców przeprowadź ocenę bazową przed pilotażem, a następnie co 3 miesiące wykonuj kwartalną analizę stanu. Tabela porównawcza pokazuje, jak zmieniły się poszczególne dane w stosunku do wartości bazowej.",
+      "methodology_middle": "metodologia: godziny nieformalnej opieki x",
+      "methodology_prefix": "Odliczenie kosztów oblicza się za pomocą",
+      "methodology_suffix": "35/godz. (stawka asystenta opieki formalnej w Szwajcarii) x 2 (mnożnik zapobiegania odzwierciedlający uniknięte koszty opieki formalnej). Metodologia ta jest uznawana przez szwajcarskie służby socjalne kantonów w zakresie sprawozdawczości pilotażowej.",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "cancel": "Anulować",
+      "capture_baseline": "Przechwytywanie linii bazowej",
+      "capture_pre": "Przechwyć linię bazową przed pilotażem",
+      "capture_quarterly": "Przechwytuj kwartalny przegląd",
+      "pre_set": "Zestaw bazowy przed pilotażem",
+      "refresh": "Odświeżać"
+    },
+    "baselines": {
+      "captured": "Złapany",
+      "label": "Etykieta",
+      "notes": "Notatki",
+      "period": "Okres",
+      "pre_pilot": "Wstępny pilot",
+      "quarterly": "Kwartalny",
+      "type": "Typ"
+    },
+    "currency": {
+      "chf": "CHF"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "fields": {
+      "label_optional": "Etykieta (opcjonalnie)",
+      "notes_optional": "Notatki (opcjonalnie)"
+    },
+    "meta": {
+      "subtitle": "AG83 – wartość bazowa przed pilotażem + 90-dniowe wskaźniki kroczące z częstotliwością kwartalnych przeglądów",
+      "title": "Tablica wyników pilotażu"
+    },
+    "methodology": {
+      "multiplier": "mnożnik zapobiegania.",
+      "per_hour": "/godz. x",
+      "prefix": "Metodologia: godziny x",
+      "window": "Okno: {{days}} dni."
+    },
+    "metrics": {
+      "active_members": "Aktywni członkowie (90d)",
+      "approved_hours": "Zatwierdzone godziny (90d)",
+      "business_participation": "Aktywne firmy (90d)",
+      "comms_reach_pct": "Zasięg komunikacji",
+      "coordinator_workload_hrs": "Obciążenie koordynatora",
+      "cost_offset_chf": "Szacowane przesunięcie kosztów (CHF)",
+      "first_response_hours": "Mediana pierwszej odpowiedzi",
+      "recurring_relationships": "Powtarzające się relacje",
+      "satisfaction_score": "Wynik satysfakcji (1-5)",
+      "social_isolation_pct": "Serwer proxy izolacji społecznej"
+    },
+    "pre_modal": {
+      "body": "Zrób to RAZ przed wejściem na pokład prawdziwych mieszkańców. Zamraża bieżące dane z 90 dni jako punkt odniesienia dla porównania. Wszystkie przyszłe przeglądy kwartalne będą obliczać deltę na podstawie tej migawki. Tej akcji nie można cofnąć.",
+      "notes_placeholder": "Region pilotażowy, uczestnicząca gmina, decyzje podjęte przed uruchomieniem...",
+      "title": "Przechwyć linię bazową przed pilotażem"
+    },
+    "quarterly": {
+      "next_review": "Kolejny przegląd kwartalny:",
+      "overdue": "Zaległy"
+    },
+    "quarterly_modal": {
+      "body": "Uruchamiaj co 3 miesiące po uruchomieniu pilotażu. Etykieta migawki domyślnie wskazuje bieżący kwartał (np. Q2_2026), ale możesz ją dostosować. Dodawaj notatki, aby rejestrować, co się zmieniło od czasu ostatniej recenzji – osiągnięte kamienie milowe, zmiany zasad, opinie mieszkańców. Migawka obejmuje ostatnie 90-dniowe okno z dzisiaj.",
+      "label_description": "Użyj rozpoznawalnej etykiety, takiej jak Q2_2026 lub 2026_Q3. Domyślnie jest to kwartalny_RRRR_MM.",
+      "label_placeholder": "kwartalnie_2026_07",
+      "notes_placeholder": "Co zmieniło się w tym kwartale, kamienie milowe osiągnięte…",
+      "title": "Przechwytuj kwartalny przegląd"
+    },
+    "sections": {
+      "captured_baselines": "Przechwycone linie bazowe",
+      "comparing_baseline": "Porównanie z wartością bazową zarejestrowaną przed pilotażem {{date}}",
+      "metrics": "Metryki pilotażowe",
+      "no_baseline": "Nie ma jeszcze wartości bazowych przed pilotażem – pokazane są same bieżące wartości"
+    },
+    "table": {
+      "change": "Zmiana",
+      "current": "Aktualny",
+      "delta": "Delta",
+      "metric": "Metryczny",
+      "pre_pilot": "Wstępny pilot"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować tablicy wyników pilota",
+      "pre_captured": "Przechwycono linię bazową przed pilotażem",
+      "pre_failed": "Nie udało się przechwycić wartości bazowej przed pilotażem",
+      "quarterly_captured": "Przechwycono przegląd kwartalny",
+      "quarterly_failed": "Nie udało się przechwycić przeglądu kwartalnego"
+    }
+  },
+  "provisioning_requests": {
+    "approval_queued": "Zatwierdzenie w kolejce – trwa udostępnianie",
+    "approve_and_provision": "Zatwierdź i udostępnij",
+    "approve_failed": "Nie udało się zatwierdzić",
+    "close": "Zamknąć",
+    "empty_status": "Brak żądań udostępnienia w tym stanie.",
+    "empty_value": "-",
+    "fields": {
+      "applicant": "Petent",
+      "category": "Kategoria",
+      "country_region": "Kraj/region",
+      "expected_size": "Oczekiwany rozmiar",
+      "intended_use": "Przeznaczenie",
+      "languages": "Języki",
+      "provisioned_tenant": "Zapewniony najemca",
+      "provisioning_log": "Dziennik udostępniania",
+      "rejection_reason": "Powód odrzucenia",
+      "slug": "Ślimak",
+      "subdomain": "Subdomena"
+    },
+    "languages_value": "{{languages}} (domyślnie: {{defaultLanguage}})",
+    "load_failed": "Nie udało się wczytać żądań udostępnienia",
+    "page_subtitle": "Przejrzyj i zatwierdź żądania samoobsługowej aprowizacji dzierżawy",
+    "page_title": "Kolejka zaopatrzenia",
+    "refresh": "Odświeżać",
+    "reject": "Odrzucić",
+    "reject_failed": "Nie udało się odrzucić",
+    "rejection_reason_label": "Powód odrzucenia (wymagany w przypadku odrzucenia)",
+    "rejection_reason_placeholder": "Dlaczego jest to odrzucane?",
+    "rejection_reason_required": "Proszę podać powód odrzucenia",
+    "request_rejected": "Wniosek odrzucony – wnioskodawca powiadomiony e-mailem",
+    "retry": "Spróbować ponownie",
+    "retry_failed": "Nie udało się ponowić próby",
+    "retry_queued": "Ponów próbę w kolejce",
+    "reviewed": "Recenzja",
+    "statuses": {
+      "all": "Wszystko",
+      "approved": "Zatwierdzony",
+      "failed": "Przegrany",
+      "pending": "Aż do",
+      "provisioned": "Zapewnione",
+      "rejected": "Odrzucony",
+      "under_review": "W trakcie przeglądu"
+    },
+    "submitted": "Złożony"
   }
 }

@@ -14066,5 +14066,476 @@
       "render_template_failed": "テンプレートのレンダリングに失敗しました",
       "revoke_export_failed": "データセットのエクスポートを取り消すことができませんでした"
     }
+  },
+  "commercial_boundary": {
+    "about": {
+      "body_prefix": "商業境界は、地域ケア プログラム内でどの種類の有給労働が許可され、どの種類の労働が無給時間単位のままにしなければならないかを定義します。この境界は、",
+      "body_suffix": "試験運用を開始する前に、自治体のパートナーと合意する必要があります。以下のマトリックスは、アクティビティ カテゴリと許可される交換タイプを示しています。",
+      "override_prefix": "行ごとのオーバーライドを使用して、テナント固有の分類 (商用バンドルを含むプライベート展開など) を記録します。オーバーライドはテナント設定にのみ保存されます。オーバーライドは、テナントに付属する正規のパブリック分類を変更することはありません。",
+      "override_suffix": "レポ。境界マトリックスを確認すると、契約書がタイムスタンプとユーザー ID とともに記録され、パイロット起動準備チェックに表示されるパイロット ガバナンス文書の一部を形成します。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "export": "輸出",
+      "export_markdown": "Markdown としてエクスポート",
+      "refresh_aria": "商業境界線マップを更新する",
+      "refresh_data": "データを更新する",
+      "reset_default": "正規のデフォルトにリセットする",
+      "reset_default_aria": "デフォルトにリセットする"
+    },
+    "classification": {
+      "agpl_public": "AGPL パブリック",
+      "commercial": "コマーシャル",
+      "private_deployment": "プライベート展開",
+      "tenant_config": "テナント構成"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "export": {
+      "agpl_module": "AGPL モジュール",
+      "capability": "能力",
+      "classification": "分類",
+      "default": "デフォルト",
+      "generated": "NEXUS 管理パネルから {{date}} が生成されました。",
+      "last_updated": "最終更新日: {{date}}",
+      "no": "いいえ",
+      "notes": "注意事項",
+      "overridden": "オーバーライドされました",
+      "yes": "はい"
+    },
+    "fields": {
+      "classification_aria": "{{label}} の分類",
+      "set_classification": "セット分類"
+    },
+    "labels": {
+      "canonical_default": "正規のデフォルト:",
+      "key": "鍵",
+      "module": "モジュール",
+      "out_of_tree": "樹外",
+      "overridden": "オーバーライドされました"
+    },
+    "meta": {
+      "page_title": "商業境界図",
+      "subtitle": "AG82 - AGPL パブリック、テナント構成可能、展開層、商用とは何ですか",
+      "title": "商業境界図"
+    },
+    "overrides_count": "{{count}} オーバーライド",
+    "overrides_count_plural": "{{count}} オーバーライド",
+    "sections": {
+      "classifications": "分類"
+    },
+    "toasts": {
+      "export_empty": "エクスポートが空で返されました",
+      "export_failed": "境界マップのエクスポートに失敗しました",
+      "exported": "境界マップがエクスポートされました",
+      "load_failed": "商業境界線マップの読み込みに失敗しました",
+      "reverted": "正規のデフォルトに戻しました",
+      "update_failed": "分類の更新に失敗しました",
+      "updated": "分類が更新されました"
+    }
+  },
+  "federation_aggregates": {
+    "actions": {
+      "close": "近い",
+      "preview_payload": "ペイロードのプレビュー",
+      "refresh": "リフレッシュ",
+      "rotate_secret": "シークレットの回転",
+      "show_audit_log": "監査ログを表示する"
+    },
+    "audit": {
+      "columns": {
+        "period": "期間",
+        "requester": "依頼者",
+        "signature": "サイン",
+        "time": "時間"
+      },
+      "empty": "クエリは記録されていません。",
+      "loading": "読み込み中...",
+      "period_range": "{{from}} -> {{to}}",
+      "table_aria": "集計クエリ監査ログ",
+      "title": "集計クエリ監査ログ (過去 90 日間)",
+      "unknown_requester": "未知"
+    },
+    "consent": {
+      "enable_label": "フェデレーション集約共有を有効にする",
+      "endpoint_prefix": "有効にすると、パブリック エンドポイント",
+      "endpoint_suffix": "このテナントの署名付き JSON ペイロードを返します。無効にすると 404 が返されます。",
+      "loading": "同意を読み込んでいます...",
+      "title": "同意"
+    },
+    "meta": {
+      "description": "署名済み、匿名化された集計メトリクスをフェデレーテッド ノード間で共有するには、オプトインします。メンバー数はバケット化され、パートナー組織名が公開されることはありません。",
+      "title": "フェデレーション集合体"
+    },
+    "preview": {
+      "empty": "プレビューは利用できません。",
+      "loading": "集計を計算しています...",
+      "title": "プレビュー - 何が公開されるのか"
+    },
+    "status": {
+      "disabled": "無効",
+      "enabled": "有効",
+      "last_rotated": "最後に回転した {{date}}",
+      "never_rotated": "回転させない",
+      "no_signing_secret": "署名の秘密はありません",
+      "signing_secret_present": "サイン入りシークレットプレゼント"
+    },
+    "toasts": {
+      "disabled": "フェデレーション集約共有が無効になっています",
+      "enabled": "フェデレーション集約共有が有効になっています",
+      "load_audit_failed": "監査ログのロードに失敗しました",
+      "load_consent_failed": "フェデレーション集約の同意をロードできませんでした",
+      "load_preview_failed": "プレビューの読み込みに失敗しました",
+      "rotate_failed": "シークレットのローテーションに失敗しました",
+      "secret_rotated": "署名シークレットがローテーションされました",
+      "update_failed": "同意を更新できませんでした"
+    }
+  },
+  "pilot_inquiry_admin": {
+    "about": {
+      "body_intro_after_kiss": "パイロット。各問い合わせは公益フォーム経由で送信され、適合アルゴリズム (人口規模、既存の KISS 協同組合、デジタル対応状況、予算の表示、スケジュール) を使用して自動的に採点されます。このボードを使用して、パイプラインを通じて問い合わせを移動し、営業またはコミュニティの連絡先に割り当て、提案が送信され、パイロットがいつ開始されるかを追跡します。",
+      "body_intro_before_gemeinden": "これは自治体向けのトップオブファネルのパイプラインです（",
+      "body_intro_before_kiss": ") と NEXUS/ の実行に関心のあるリージョン",
+      "fit_score_after": "(0-100) は自動的に計算されます - 70+ は強力な一致です。任意のカードをクリックして詳細を表示したり、ステージを更新したり、内部メモを追加したりできます。",
+      "fit_score_before": "の",
+      "fit_score_label": "フィットスコア",
+      "gemeinden": "Gemeinden",
+      "pipeline_stages": "新規 -> 連絡済み -> 認定 -> 提案送信 -> パイロット同意 -> ライブ -> 拒否/撤回。",
+      "pipeline_stages_label": "パイプラインのステージ:",
+      "title": "このページについて"
+    },
+    "actions": {
+      "close": "近い",
+      "export_csv": "CSVのエクスポート",
+      "refresh": "リフレッシュ",
+      "save_notes": "メモの保存",
+      "save_stage": "ステージの保存"
+    },
+    "empty": {
+      "body": "お問い合わせは販売サイトNEXUSの公益フォームより受け付けております。送信すると、ここに自動的に表示されます。上記のステージ フィルターを使用して、他のステージに問い合わせが存在するかどうかを確認します。",
+      "title": "パイロットに関する問い合わせはまだありません。"
+    },
+    "fields": {
+      "budget": "予算",
+      "contact": "接触",
+      "cooperative": "協同組合",
+      "country_region": "国・地域",
+      "existing_digital_tool": "既存のデジタルツール",
+      "fit_score_breakdown": "フィットスコアの内訳",
+      "internal_notes": "内部メモ (管理者のみ)",
+      "modules_of_interest": "興味のあるモジュール",
+      "notes_from_gemeinde": "Gemeinde からのメモ",
+      "population": "人口",
+      "timeline": "タイムライン",
+      "total": "合計",
+      "update_stage": "アップデートステージ"
+    },
+    "filters": {
+      "all": "全て",
+      "stage": "ステージごとにフィルターします:"
+    },
+    "fit_scale": {
+      "factors_after_kiss": "協力、デジタル対応、予算、スケジュール。",
+      "factors_before_kiss": "スコア要素: 人口規模、既存",
+      "good": "良好なマッチング - アウトリーチを優先する",
+      "potential": "可能性 - さらに調査する",
+      "title": "適合スコアスケール (0-100):",
+      "weak": "適合性が低い - 優先度が低い"
+    },
+    "page_subtitle": "受信する Gemeinde パイロット領域の対象式を管理する",
+    "page_title": "パイロットに関するお問い合わせ",
+    "placeholders": {
+      "internal_notes": "内部メモを追加...",
+      "rejection_reason": "拒否理由..."
+    },
+    "stages": {
+      "dormant": "睡眠状態",
+      "live": "ライブ",
+      "new": "新しい",
+      "pilot_agreed": "パイロットの同意",
+      "proposal_sent": "提案を送信しました",
+      "qualified": "資格のある",
+      "rejected": "拒否されました",
+      "unknown": "{{stage}}"
+    },
+    "stats": {
+      "avg_fit_score": "平均フィットスコア",
+      "in_pipeline": "パイプライン中",
+      "qualified": "資格のある",
+      "total_inquiries": "総問い合わせ数"
+    },
+    "summary": {
+      "by_country": "国別"
+    },
+    "timestamps": {
+      "agreed": "同意しました",
+      "live": "ライブ",
+      "proposal": "提案",
+      "submitted": "提出済み"
+    },
+    "toasts": {
+      "load_failed": "パイロットの問い合わせを読み込めませんでした",
+      "notes_save_failed": "メモの保存に失敗しました",
+      "notes_saved": "メモが保存されました",
+      "stage_update_failed": "ステージの更新に失敗しました",
+      "stage_updated": "ステージを更新しました"
+    },
+    "values": {
+      "asap": "できるだけ早く",
+      "empty": "-",
+      "months": "{{count}} か月",
+      "no": "いいえ",
+      "yes": "はい"
+    },
+    "velocity": {
+      "avg_to_agreed": "同意までの平均:",
+      "avg_to_live": "平均生存期間:",
+      "avg_to_proposal": "プロポーザルまでの平均:",
+      "days": "{{count}}d",
+      "title": "パイプラインの速度 - 問い合わせの送信から各マイルストーンまでの平均日数:"
+    }
+  },
+  "pilot_launch_readiness": {
+    "about": {
+      "body": "これは、Caring Community の試験運用を開始する前の、ゴー/ノーゴーのゲートです。以下の各セクションは、構成または評価モジュール (AG80 ～ AG87) に対応します。 「起動」ボタンが有効になる前に、すべてのセクションが「準備完了」ステータスになる必要があります。起動すると、これは一方向のアクションです。起動タイムスタンプとオペレーターは永続的に記録されます。",
+      "review_help": "「要検討」と表示されているセクションには構成が欠落しているか不完全です。関連するモジュールをクリックして、リストされた項目を解決します。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "acknowledge_default_matrix": "デフォルトのマトリックスを承認する",
+      "cancel": "キャンセル",
+      "confirm_launch": "はい、パイロットを開始します",
+      "launch_pilot": "パイロットを開始",
+      "open": "開ける",
+      "refresh": "リフレッシュ",
+      "refresh_aria": "起動準備レポートを更新する",
+      "retry": "リトライ"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "errors": {
+      "load_failed": "打ち上げ準備レポートをロードできませんでした。",
+      "unavailable_title": "準備状況レポートは利用できません",
+      "unexpected_response": "打ち上げ準備状況レポートから予期しない応答が返されました。"
+    },
+    "isolated_node": {
+      "informational": "分離ノード ゲートは、標準のホスト型展開に関する情報です。 AG85deployment_mode が canton_isoulated_node に設定されている場合にのみ起動をブロックします。自治体が分離ノード要件を指定していない場合は、このセクションの項目を無視できます。",
+      "required": "分離ノード ゲートがアクティブです - この展開はカントン分離ノード (AG85) として構成されています。すべてのアイテムは、発売前に決定ステータスに到達する必要があります。"
+    },
+    "meta": {
+      "page_title": "パイロット打ち上げの準備状況",
+      "subtitle": "AG95 - AG80～AG87 の評価面を組み合わせたゴー/ノーゴー レポート",
+      "title": "パイロット打ち上げの準備状況"
+    },
+    "missing": {
+      "acknowledgement": "コーディネーターの承認",
+      "backlog_empty": "統合バックログが空です",
+      "controller_contact_email": "管理者の連絡先メールアドレス",
+      "controller_data_protection_officer": "データ保護責任者",
+      "controller_name": "コントローラ名",
+      "danger_checks": "データ品質の問題",
+      "incident_response_contact_email": "インシデント対応の連絡先メールアドレス",
+      "policy_appendix_url": "ポリシー付録 URL",
+      "pre_pilot_baseline": "パイロット前のスコアボードのベースライン",
+      "safeguarding_escalation_user_id": "エスカレーション連絡先の保護",
+      "workshop_not_run": "運営方針ワークショップは実施されない"
+    },
+    "modal": {
+      "body_prefix": "パイロット版の立ち上げは、",
+      "body_suffix": "テナントの起動タイムスタンプとオペレーターが記録され、プラットフォーム レポートはコミュニティをライブとして扱い始めます。",
+      "check_baseline": "パイロット前のスコアボードのベースラインが取得されました",
+      "check_data_quality": "データ品質チェックは緑色です",
+      "check_disclosure": "開示パック、運営方針、および商業境界が承認される",
+      "check_residents": "実際の居住者は招待される準備ができています",
+      "confirm_intro": "続行する前に、コーディネーター チームに次のことを確認してください。",
+      "one_way_action": "一方通行の行動",
+      "section_summary": "セクションの概要",
+      "title": "パイロットを起動しますか?"
+    },
+    "more_count": "+{{count}} もっと見る",
+    "overall": {
+      "blocked": "起動がブロックされました - まず問題を修正してください",
+      "needs_review": "パイロットにはコーディネーターによるレビューが必要",
+      "not_started": "パイロット評価はまだ実行されていません",
+      "ready": "パイロットは打ち上げの準備ができています"
+    },
+    "progress": {
+      "aria": "打ち上げ準備の進捗状況",
+      "ready_count": "{{ready}} / {{total}} 準備完了"
+    },
+    "states": {
+      "blocked_body": "起動ボタンを有効にする前に、以下のすべてのセクションを解決してください。",
+      "blocked_title": "まだ起動できません - {{count}} ブロッカーが残っています",
+      "blocked_title_plural": "まだ起動できません - {{count}} ブロッカーが残っています",
+      "launched_body": "{{date}}{{user}} にリリースされました。これは一方向のマイルストーンです。準備状況チェックは監査のために表示されたままになります。",
+      "launched_by_user": "ユーザー #{{id}} による",
+      "launched_title": "試験運用開始",
+      "ready_body_prefix": "すべての準備セクションの準備が整いました。クリック",
+      "ready_body_suffix": "コーディネーター チームがこれを一方的な決定を下す準​​備ができているとき。",
+      "ready_title": "起動準備完了"
+    },
+    "status": {
+      "blocked": "ブロックされました",
+      "needs_review": "見直しが必要",
+      "not_started": "開始されていません",
+      "ready": "準備ができて"
+    },
+    "timestamps": {
+      "last_updated": "最終更新日 {{date}}",
+      "report_generated": "レポートが生成されました {{date}}。任意のセクションをクリックして、対応する管理画面を開きます。"
+    },
+    "toasts": {
+      "already_launched": "このパイロットはすでに開始されています。",
+      "boundary_acknowledge_failed": "境界の確認に失敗しました",
+      "boundary_acknowledged": "商業境界が認められている",
+      "cannot_launch": "発射できません - 準備ゲートが閉じられていません。",
+      "launch_failed": "パイロットの起動に失敗しました。",
+      "launch_success": "パイロットは無事に打ち上げられました。",
+      "load_failed": "起動準備レポートの読み込みに失敗しました"
+    }
+  },
+  "pilot_scoreboard": {
+    "about": {
+      "age_stiftung": "Age-Stiftung",
+      "age_stiftung_title": "Stiftung für das Alter",
+      "body": "すべての指標は 90 日のローリング ウィンドウを使用します。実際の居住者をオンボーディングする前にパイロット前のベースラインを取得し、3 か月ごとに四半期レビューのスナップショットを実行します。比較表は、各メトリックがそのベースラインに対してどのように変化したかを示します。",
+      "methodology_middle": "方法論: 非公式ケアの時間 x",
+      "methodology_prefix": "コスト オフセットは、次の方法を使用して計算されます。",
+      "methodology_suffix": "35/時間（スイスのフォーマル・ケア・アシスタントのレート）× 2（回避されたフォーマル・ケア費用を反映した予防乗数）。この方法論は、試験的な報告に関してスイス州の社会サービスによって認められています。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "cancel": "キャンセル",
+      "capture_baseline": "ベースラインをキャプチャ",
+      "capture_pre": "パイロット前のベースラインをキャプチャする",
+      "capture_quarterly": "四半期レビューを取得する",
+      "pre_set": "プレパイロットベースラインセット",
+      "refresh": "リフレッシュ"
+    },
+    "baselines": {
+      "captured": "捕らえられた",
+      "label": "ラベル",
+      "notes": "注意事項",
+      "period": "期間",
+      "pre_pilot": "プレパイロット",
+      "quarterly": "四半期ごと",
+      "type": "タイプ"
+    },
+    "currency": {
+      "chf": "CHF"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "fields": {
+      "label_optional": "ラベル (オプション)",
+      "notes_optional": "注記 (オプション)"
+    },
+    "meta": {
+      "subtitle": "AG83 - パイロット前のベースライン + 四半期ごとのレビュー頻度による 90 日間のローリング指標",
+      "title": "パイロットの成功スコアボード"
+    },
+    "methodology": {
+      "multiplier": "予防乗数。",
+      "per_hour": "/時間×",
+      "prefix": "方法論: 時間 x",
+      "window": "期間: {{days}} 日。"
+    },
+    "metrics": {
+      "active_members": "アクティブなメンバー (90 日)",
+      "approved_hours": "承認された時間 (90 日)",
+      "business_participation": "アクティブなビジネス (90d)",
+      "comms_reach_pct": "通信範囲",
+      "coordinator_workload_hrs": "コーディネーターのワークロード",
+      "cost_offset_chf": "推定コストオフセット (CHF)",
+      "first_response_hours": "最初の反応の中央値",
+      "recurring_relationships": "繰り返し起こる関係",
+      "satisfaction_score": "満足度スコア (1-5)",
+      "social_isolation_pct": "社会的隔離代理人"
+    },
+    "pre_modal": {
+      "body": "実際の居住者をオンボーディングする前に、これを一度キャプチャしてください。現在の 90 日間の指標を比較のベースラインとして凍結します。今後のすべての四半期レビューでは、このスナップショットに対してデルタが計算されます。この操作は元に戻すことができません。",
+      "notes_placeholder": "パイロット地域、参加自治体、開始前に行われた決定...",
+      "title": "パイロット前のベースラインをキャプチャする"
+    },
+    "quarterly": {
+      "next_review": "次の四半期レビュー:",
+      "overdue": "期限を過ぎました"
+    },
+    "quarterly_modal": {
+      "body": "パイロットの開始後、3 か月ごとに実行します。スナップショット ラベルはデフォルトで現在の四半期 (例: Q2_2026) ですが、カスタマイズできます。メモを追加して、到達したマイルストーン、ポリシーの変更、常駐者のフィードバックなど、前回のレビュー以降に変更された内容を記録します。スナップショットは、今日から直近の 90 日間をカバーします。",
+      "label_description": "Q2_2026 や 2026_Q3 などの認識可能なラベルを使用します。デフォルトは四半期_YYYY_MMです。",
+      "label_placeholder": "季刊_2026_07",
+      "notes_placeholder": "この四半期に何が変化したか、マイルストーンが達成されました...",
+      "title": "四半期レビューを取得する"
+    },
+    "sections": {
+      "captured_baselines": "捕捉されたベースライン",
+      "comparing_baseline": "キャプチャされたパイロット前のベースラインとの比較 {{date}}",
+      "metrics": "パイロットメトリクス",
+      "no_baseline": "プレパイロットベースラインはまだありません - 現在の値のみが表示されます"
+    },
+    "table": {
+      "change": "変化",
+      "current": "現在",
+      "delta": "デルタ",
+      "metric": "メトリック",
+      "pre_pilot": "プレパイロット"
+    },
+    "toasts": {
+      "load_failed": "パイロット スコアボードのロードに失敗しました",
+      "pre_captured": "パイロット前のベースラインを取得",
+      "pre_failed": "パイロット前のベースラインをキャプチャできませんでした",
+      "quarterly_captured": "四半期レビューのキャプチャ",
+      "quarterly_failed": "四半期レビューを取得できませんでした"
+    }
+  },
+  "provisioning_requests": {
+    "approval_queued": "承認が待機中 - プロビジョニングが進行中",
+    "approve_and_provision": "承認と提供",
+    "approve_failed": "承認に失敗しました",
+    "close": "近い",
+    "empty_status": "このステータスではプロビジョニング要求はありません。",
+    "empty_value": "-",
+    "fields": {
+      "applicant": "申請者",
+      "category": "カテゴリ",
+      "country_region": "国・地域",
+      "expected_size": "予想されるサイズ",
+      "intended_use": "使用目的",
+      "languages": "言語",
+      "provisioned_tenant": "プロビジョニングされたテナント",
+      "provisioning_log": "プロビジョニングログ",
+      "rejection_reason": "拒否理由",
+      "slug": "ナメクジ",
+      "subdomain": "サブドメイン"
+    },
+    "languages_value": "{{languages}} (デフォルト: {{defaultLanguage}})",
+    "load_failed": "プロビジョニングリクエストのロードに失敗しました",
+    "page_subtitle": "セルフサービスのテナント プロビジョニング リクエストを確認して承認する",
+    "page_title": "プロビジョニングキュー",
+    "refresh": "リフレッシュ",
+    "reject": "拒否する",
+    "reject_failed": "拒否できませんでした",
+    "rejection_reason_label": "拒否理由（拒否する場合は必須）",
+    "rejection_reason_placeholder": "なぜこれが拒否されるのでしょうか?",
+    "rejection_reason_required": "拒否理由を入力してください",
+    "request_rejected": "リクエストが拒否されました - 申請者に電子メールで通知されました",
+    "retry": "リトライ",
+    "retry_failed": "再試行に失敗しました",
+    "retry_queued": "再試行が待機中",
+    "reviewed": "レビュー済み",
+    "statuses": {
+      "all": "全て",
+      "approved": "承認された",
+      "failed": "失敗した",
+      "pending": "保留中",
+      "provisioned": "プロビジョニング済み",
+      "rejected": "拒否されました",
+      "under_review": "検討中"
+    },
+    "submitted": "提出済み"
   }
 }

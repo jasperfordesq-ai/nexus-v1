@@ -14066,5 +14066,476 @@
       "render_template_failed": "Vorlage konnte nicht gerendert werden",
       "revoke_export_failed": "Der Export des Datensatzes konnte nicht widerrufen werden"
     }
+  },
+  "commercial_boundary": {
+    "about": {
+      "body_prefix": "Die kommerzielle Grenze definiert, welche Arten bezahlter Arbeit im Rahmen des Community Care-Programms zulässig sind und welche unbezahlten Zeitguthaben bleiben müssen. Diese Grenze ist eine Anforderung der",
+      "body_suffix": "Methodik und muss vor dem Start des Pilotprojekts mit Ihrem kommunalen Partner vereinbart werden. Die folgende Matrix listet Aktivitätskategorien und deren zulässige Austauschart auf.",
+      "override_prefix": "Verwenden Sie die Überschreibung pro Zeile, um eine mandantenspezifische Klassifizierung aufzuzeichnen (z. B. eine private Bereitstellung mit einem kommerziellen Paket). Überschreibungen werden nur in Mandanteneinstellungen gespeichert – sie ändern niemals die mit dem ausgelieferte kanonische öffentliche Klassifizierung",
+      "override_suffix": "Repo. Sobald Sie die Grenzmatrix bestätigt haben, wird die Vereinbarung mit einem Zeitstempel und Ihrer Benutzer-ID aufgezeichnet und ist Teil der Pilot-Governance-Dokumentation, die in der Prüfung der Pilotstartbereitschaft angezeigt wird.",
+      "title": "Über diese Seite"
+    },
+    "actions": {
+      "export": "Export",
+      "export_markdown": "Exportieren als Markdown",
+      "refresh_aria": "Aktualisieren Sie die Karte der Handelsgrenzen",
+      "refresh_data": "Daten aktualisieren",
+      "reset_default": "Zurücksetzen auf den kanonischen Standard",
+      "reset_default_aria": "Auf Standard zurücksetzen"
+    },
+    "classification": {
+      "agpl_public": "AGPL öffentlich",
+      "commercial": "Kommerziell",
+      "private_deployment": "Privater Einsatz",
+      "tenant_config": "Mieterkonfiguration"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "export": {
+      "agpl_module": "AGPL Modul",
+      "capability": "Fähigkeit",
+      "classification": "Einstufung",
+      "default": "Standard",
+      "generated": "Generiert {{date}} aus dem NEXUS Admin-Panel.",
+      "last_updated": "Letzte Aktualisierung: {{date}}",
+      "no": "NEIN",
+      "notes": "Notizen",
+      "overridden": "Überschrieben",
+      "yes": "Ja"
+    },
+    "fields": {
+      "classification_aria": "Klassifizierung für {{label}}",
+      "set_classification": "Klassifizierung festlegen"
+    },
+    "labels": {
+      "canonical_default": "Kanonischer Standard:",
+      "key": "Schlüssel",
+      "module": "Modul",
+      "out_of_tree": "Außerhalb des Baumes",
+      "overridden": "Überschrieben"
+    },
+    "meta": {
+      "page_title": "Karte der Handelsgrenzen",
+      "subtitle": "AG82 – was ist AGPL öffentlich, vom Mandanten konfigurierbar, auf Bereitstellungsebene oder kommerziell?",
+      "title": "Karte der Handelsgrenzen"
+    },
+    "overrides_count": "{{count}} überschreiben",
+    "overrides_count_plural": "{{count}} überschreibt",
+    "sections": {
+      "classifications": "Klassifizierungen"
+    },
+    "toasts": {
+      "export_empty": "Der Export wurde leer zurückgegeben",
+      "export_failed": "Grenzkarte konnte nicht exportiert werden",
+      "exported": "Grenzkarte exportiert",
+      "load_failed": "Die Karte der kommerziellen Grenzen konnte nicht geladen werden",
+      "reverted": "Zurück zur kanonischen Standardeinstellung",
+      "update_failed": "Die Klassifizierung konnte nicht aktualisiert werden",
+      "updated": "Klassifizierung aktualisiert"
+    }
+  },
+  "federation_aggregates": {
+    "actions": {
+      "close": "Schließen",
+      "preview_payload": "Vorschau der Nutzlast",
+      "refresh": "Aktualisieren",
+      "rotate_secret": "Geheimnis drehen",
+      "show_audit_log": "Audit-Protokoll anzeigen"
+    },
+    "audit": {
+      "columns": {
+        "period": "Zeitraum",
+        "requester": "Anforderer",
+        "signature": "Unterschrift",
+        "time": "Zeit"
+      },
+      "empty": "Es wurden keine Abfragen aufgezeichnet.",
+      "loading": "Laden...",
+      "period_range": "{{from}} -> {{to}}",
+      "table_aria": "Aggregiertes Abfrage-Audit-Protokoll",
+      "title": "Aggregiertes Abfrage-Audit-Log (letzte 90 Tage)",
+      "unknown_requester": "unbekannt"
+    },
+    "consent": {
+      "enable_label": "Aktivieren Sie die gemeinsame Nutzung von Verbundaggregaten",
+      "endpoint_prefix": "Wenn aktiviert, der öffentliche Endpunkt",
+      "endpoint_suffix": "gibt eine signierte JSON-Nutzlast für diesen Mandanten zurück. Wenn es deaktiviert ist, wird 404 zurückgegeben.",
+      "loading": "Einwilligung wird geladen...",
+      "title": "Zustimmung"
+    },
+    "meta": {
+      "description": "Melden Sie sich an, um signierte, anonymisierte aggregierte Metriken über Verbundknoten hinweg zu teilen. Die Anzahl der Mitglieder wird in Gruppen unterteilt und die Namen der Partnerorganisationen werden niemals offengelegt.",
+      "title": "Föderationsaggregate"
+    },
+    "preview": {
+      "empty": "Keine Vorschau verfügbar.",
+      "loading": "Rechenaggregat...",
+      "title": "Vorschau – was öffentlich zugänglich gemacht würde"
+    },
+    "status": {
+      "disabled": "Deaktiviert",
+      "enabled": "Ermöglicht",
+      "last_rotated": "Zuletzt gedreht {{date}}",
+      "never_rotated": "Nie gedreht",
+      "no_signing_secret": "Kein Signaturgeheimnis",
+      "signing_secret_present": "Unterzeichnung eines geheimen Geschenks"
+    },
+    "toasts": {
+      "disabled": "Verbundaggregatfreigabe deaktiviert",
+      "enabled": "Verbundaggregatfreigabe aktiviert",
+      "load_audit_failed": "Das Audit-Protokoll konnte nicht geladen werden",
+      "load_consent_failed": "Die aggregierte Einwilligung des Verbunds konnte nicht geladen werden",
+      "load_preview_failed": "Vorschau konnte nicht geladen werden",
+      "rotate_failed": "Das Geheimnis konnte nicht rotiert werden",
+      "secret_rotated": "Signaturgeheimnis gedreht",
+      "update_failed": "Die Einwilligung konnte nicht aktualisiert werden"
+    }
+  },
+  "pilot_inquiry_admin": {
+    "about": {
+      "body_intro_after_kiss": "Pilot. Jede Anfrage wird über das Formular für öffentliches Interesse eingereicht und automatisch mithilfe eines Anpassungsalgorithmus bewertet (Bevölkerungsgröße, bestehende KISS-Kooperative, digitale Bereitschaft, Budgetangabe und Zeitplan). Verwenden Sie dieses Board, um Anfragen durch die Pipeline zu leiten, sie einem Vertriebs- oder Community-Kontakt zuzuweisen und zu verfolgen, wann Vorschläge gesendet werden und Piloten live gehen.",
+      "body_intro_before_gemeinden": "Dies ist die Top-of-Funnel-Pipeline für Kommunen (",
+      "body_intro_before_kiss": ") und Regionen, die an der Durchführung eines NEXUS/ interessiert sind",
+      "fit_score_after": "(0-100) wird automatisch berechnet – 70+ ist eine starke Übereinstimmung. Klicken Sie auf eine beliebige Karte, um alle Details anzuzeigen, die Phase zu aktualisieren oder interne Notizen hinzuzufügen.",
+      "fit_score_before": "Der",
+      "fit_score_label": "Fit-Score",
+      "gemeinden": "Gemeinden",
+      "pipeline_stages": "Neu -> Kontaktiert -> Qualifiziert -> Angebot gesendet -> Pilot zugestimmt -> Live -> Abgelehnt/Zurückgezogen.",
+      "pipeline_stages_label": "Pipeline-Stufen:",
+      "title": "Über diese Seite"
+    },
+    "actions": {
+      "close": "Schließen",
+      "export_csv": "CSV exportieren",
+      "refresh": "Aktualisieren",
+      "save_notes": "Notizen speichern",
+      "save_stage": "Bühne speichern"
+    },
+    "empty": {
+      "body": "Anfragen kommen über das Formular für öffentliches Interesse auf der NEXUS-Verkaufsseite. Nach dem Absenden erscheinen sie automatisch hier. Nutzen Sie den Stufenfilter oben, um zu prüfen, ob Anfragen in anderen Stufen vorliegen.",
+      "title": "Noch keine Pilotanfragen."
+    },
+    "fields": {
+      "budget": "Budget",
+      "contact": "Kontakt",
+      "cooperative": "Kooperative",
+      "country_region": "Land / Region",
+      "existing_digital_tool": "Vorhandenes digitales Tool",
+      "fit_score_breakdown": "Aufschlüsselung des Fit-Scores",
+      "internal_notes": "Interne Notizen (nur Administrator)",
+      "modules_of_interest": "Interessante Module",
+      "notes_from_gemeinde": "Notizen von Gemeinde",
+      "population": "Bevölkerung",
+      "timeline": "Zeitleiste",
+      "total": "Gesamt",
+      "update_stage": "Aktualisierungsphase"
+    },
+    "filters": {
+      "all": "Alle",
+      "stage": "Nach Stufe filtern:"
+    },
+    "fit_scale": {
+      "factors_after_kiss": "kooperativ, digitale Bereitschaft, Budget, Zeitplan.",
+      "factors_before_kiss": "Bewertungsfaktoren: Bevölkerungsgröße, vorhanden",
+      "good": "Gute Übereinstimmung – Outreach priorisieren",
+      "potential": "Potenzial – weiter untersuchen",
+      "title": "Fit-Score-Skala (0-100):",
+      "weak": "Schwache Passform – niedrige Priorität"
+    },
+    "page_subtitle": "Verwalten Sie eingehende Interessenbekundungen der Pilotregion Gemeinde",
+    "page_title": "Pilotenanfragen",
+    "placeholders": {
+      "internal_notes": "Interne Notizen hinzufügen...",
+      "rejection_reason": "Ablehnungsgrund..."
+    },
+    "stages": {
+      "dormant": "Ruhend",
+      "live": "Live",
+      "new": "Neu",
+      "pilot_agreed": "Pilot stimmte zu",
+      "proposal_sent": "Vorschlag gesendet",
+      "qualified": "Qualifiziert",
+      "rejected": "Abgelehnt",
+      "unknown": "{{stage}}"
+    },
+    "stats": {
+      "avg_fit_score": "Durchschnittlicher Fit-Score",
+      "in_pipeline": "In der Pipeline",
+      "qualified": "Qualifiziert",
+      "total_inquiries": "Gesamtzahl der Anfragen"
+    },
+    "summary": {
+      "by_country": "Nach Ländern"
+    },
+    "timestamps": {
+      "agreed": "Vereinbart",
+      "live": "Live",
+      "proposal": "Vorschlag",
+      "submitted": "Eingereicht"
+    },
+    "toasts": {
+      "load_failed": "Pilotanfragen konnten nicht geladen werden",
+      "notes_save_failed": "Notizen konnten nicht gespeichert werden",
+      "notes_saved": "Notizen gespeichert",
+      "stage_update_failed": "Die Stufe konnte nicht aktualisiert werden",
+      "stage_updated": "Bühne aktualisiert"
+    },
+    "values": {
+      "asap": "So schnell wie möglich",
+      "empty": "-",
+      "months": "{{count}} Monate",
+      "no": "NEIN",
+      "yes": "Ja"
+    },
+    "velocity": {
+      "avg_to_agreed": "Durchschnittlich bis vereinbart:",
+      "avg_to_live": "Durchschnittliche Lebenserwartung:",
+      "avg_to_proposal": "Durchschnitt zum Vorschlag:",
+      "days": "{{count}}d",
+      "title": "Pipeline-Geschwindigkeit – durchschnittliche Tage von der Einreichung der Anfrage bis zu jedem Meilenstein:"
+    }
+  },
+  "pilot_launch_readiness": {
+    "about": {
+      "body": "Dies ist das Go/No-Go-Gate, bevor Ihr Caring Community-Pilotprojekt live geht. Jeder Abschnitt unten entspricht einem Konfigurations- oder Evaluierungsmodul (AG80-AG87). Alle Abschnitte müssen den Status „Bereit“ erreichen, bevor die Schaltfläche „Starten“ aktiviert wird. Nach dem Start handelt es sich um eine einseitige Aktion – der Startzeitstempel und der Betreiber werden dauerhaft aufgezeichnet.",
+      "review_help": "Abschnitte, in denen „Überprüfung erforderlich“ angezeigt wird, weisen fehlende oder unvollständige Konfigurationen auf. Klicken Sie sich durch das entsprechende Modul, um die aufgelisteten Probleme zu lösen.",
+      "title": "Über diese Seite"
+    },
+    "actions": {
+      "acknowledge_default_matrix": "Standardmatrix bestätigen",
+      "cancel": "Stornieren",
+      "confirm_launch": "Ja, starten Sie den Piloten",
+      "launch_pilot": "Pilot starten",
+      "open": "Offen",
+      "refresh": "Aktualisieren",
+      "refresh_aria": "Aktualisieren Sie den Bericht zur Startbereitschaft",
+      "retry": "Wiederholen"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "errors": {
+      "load_failed": "Der Startbereitschaftsbericht konnte nicht geladen werden.",
+      "unavailable_title": "Bereitschaftsbericht nicht verfügbar",
+      "unexpected_response": "Der Startbereitschaftsbericht lieferte eine unerwartete Antwort."
+    },
+    "isolated_node": {
+      "informational": "Das isolierte Knoten-Gate dient zur Information für gehostete Standardbereitstellungen. Es blockiert den Start nur, wenn AG85bereitstellungsmodus auf canton_isolated_node gesetzt ist. Wenn Ihre Gemeinde keine Anforderung für isolierte Knoten festgelegt hat, können Sie die Punkte in diesem Abschnitt ignorieren.",
+      "required": "Das Gate für isolierte Knoten ist aktiv – diese Bereitstellung ist als kantonaler Knoten (AG85) konfiguriert. Alle Elemente müssen vor der Veröffentlichung den Status „Entschieden“ erreichen."
+    },
+    "meta": {
+      "page_title": "Pilotstartbereitschaft",
+      "subtitle": "AG95 – Go/No-Go-Bericht, der AG80-AG87-Bewertungsoberflächen kombiniert",
+      "title": "Pilotstartbereitschaft"
+    },
+    "missing": {
+      "acknowledgement": "Danksagung des Koordinators",
+      "backlog_empty": "Integrationsrückstand leer",
+      "controller_contact_email": "E-Mail-Adresse des Controllers",
+      "controller_data_protection_officer": "Datenschutzbeauftragter",
+      "controller_name": "Controllername",
+      "danger_checks": "Probleme mit der Datenqualität",
+      "incident_response_contact_email": "Kontakt-E-Mail für die Reaktion auf den Vorfall",
+      "policy_appendix_url": "Richtlinienanhang URL",
+      "pre_pilot_baseline": "Basiswert der Anzeigetafel vor dem Piloten",
+      "safeguarding_escalation_user_id": "Sicherstellung des Eskalationskontakts",
+      "workshop_not_run": "Betriebsrichtlinien-Workshop nicht durchgeführt"
+    },
+    "modal": {
+      "body_prefix": "Der Start des Pilotprojekts ist ein",
+      "body_suffix": "Es zeichnet den Startzeitstempel und den Betreiber auf dem Mandanten auf, und Plattformberichte beginnen, die Community als live zu behandeln.",
+      "check_baseline": "Der Basiswert der Anzeigetafel vor dem Pilotprojekt wurde erfasst",
+      "check_data_quality": "Datenqualitätsprüfungen sind grün",
+      "check_disclosure": "Das Offenlegungspaket, die Betriebsrichtlinien und die Geschäftsgrenzen werden unterzeichnet",
+      "check_residents": "Echte Bewohner sind bereit, eingeladen zu werden",
+      "confirm_intro": "Bevor Sie fortfahren, bestätigen Sie mit Ihrem Koordinatorteam Folgendes:",
+      "one_way_action": "einseitige Aktion",
+      "section_summary": "Abschnittszusammenfassung",
+      "title": "Den Piloten starten?"
+    },
+    "more_count": "+{{count}} mehr",
+    "overall": {
+      "blocked": "Start blockiert – Probleme zuerst beheben",
+      "needs_review": "Der Pilot muss vom Koordinator überprüft werden",
+      "not_started": "Pilotbewertung noch nicht durchgeführt",
+      "ready": "Der Pilot ist startbereit"
+    },
+    "progress": {
+      "aria": "Fortschritt der Startbereitschaft",
+      "ready_count": "{{ready}} / {{total}} bereit"
+    },
+    "states": {
+      "blocked_body": "Lösen Sie alle folgenden Abschnitte, bevor die Startschaltfläche aktiviert wird.",
+      "blocked_title": "Kann noch nicht gestartet werden – {{count}}-Blocker bleibt bestehen",
+      "blocked_title_plural": "Kann noch nicht gestartet werden – {{count}}-Blocker bleiben bestehen",
+      "launched_body": "Gestartet am {{date}}{{user}}. Dies ist ein einseitiger Meilenstein – Bereitschaftsprüfungen bleiben für die Prüfung sichtbar.",
+      "launched_by_user": "von Benutzer #{{id}}",
+      "launched_title": "Pilot gestartet",
+      "ready_body_prefix": "Jeder Bereitschaftsbereich ist bereit. Klicken",
+      "ready_body_suffix": "wenn Ihr Koordinatorteam bereit ist, diese Entscheidung in eine Richtung zu treffen.",
+      "ready_title": "Bereit zum Start"
+    },
+    "status": {
+      "blocked": "Blockiert",
+      "needs_review": "Muss überprüft werden",
+      "not_started": "Nicht gestartet",
+      "ready": "Bereit"
+    },
+    "timestamps": {
+      "last_updated": "Letzte Aktualisierung {{date}}",
+      "report_generated": "Bericht generiert {{date}}. Klicken Sie auf einen beliebigen Abschnitt, um die entsprechende Admin-Oberfläche zu öffnen."
+    },
+    "toasts": {
+      "already_launched": "Dieses Pilotprojekt wurde bereits gestartet.",
+      "boundary_acknowledge_failed": "Grenze konnte nicht bestätigt werden",
+      "boundary_acknowledged": "Handelsgrenze anerkannt",
+      "cannot_launch": "Start nicht möglich – Bereitschaftstor ist nicht geschlossen.",
+      "launch_failed": "Pilot konnte nicht gestartet werden.",
+      "launch_success": "Pilot erfolgreich gestartet.",
+      "load_failed": "Der Startbereitschaftsbericht konnte nicht geladen werden"
+    }
+  },
+  "pilot_scoreboard": {
+    "about": {
+      "age_stiftung": "Age-Stiftung",
+      "age_stiftung_title": "Stiftung für das Alter",
+      "body": "Alle Metriken verwenden ein rollierendes 90-Tage-Fenster. Erfassen Sie eine Ausgangslage vor dem Pilotprojekt, bevor Sie echte Bewohner einbinden, und erstellen Sie dann alle drei Monate einen vierteljährlichen Überprüfungs-Snapshot. Die Vergleichstabelle zeigt, wie sich jede Metrik relativ zu dieser Basislinie verändert hat.",
+      "methodology_middle": "Methodik: Stunden informeller Pflege x",
+      "methodology_prefix": "Der Kostenausgleich wird anhand der berechnet",
+      "methodology_suffix": "35/Std. (Schweizer Tarif für formelle Pflegeassistenten) x 2 (Präventionsmultiplikator, der die vermiedenen Kosten für formelle Pflege widerspiegelt). Diese Methodik wird von den kantonalen Sozialdiensten der Schweiz für die Pilotberichterstattung anerkannt.",
+      "title": "Über diese Seite"
+    },
+    "actions": {
+      "cancel": "Stornieren",
+      "capture_baseline": "Erfassen Sie die Grundlinie",
+      "capture_pre": "Erfassen Sie die Basislinie vor dem Pilotprojekt",
+      "capture_quarterly": "Erfassen Sie eine vierteljährliche Überprüfung",
+      "pre_set": "Grundliniensatz vor dem Piloten",
+      "refresh": "Aktualisieren"
+    },
+    "baselines": {
+      "captured": "Gefangen",
+      "label": "Etikett",
+      "notes": "Notizen",
+      "period": "Zeitraum",
+      "pre_pilot": "Vor dem Piloten",
+      "quarterly": "Vierteljährlich",
+      "type": "Typ"
+    },
+    "currency": {
+      "chf": "CHF"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "fields": {
+      "label_optional": "Etikett (optional)",
+      "notes_optional": "Notizen (optional)"
+    },
+    "meta": {
+      "subtitle": "AG83 – Basislinie vor dem Pilotprojekt + fortlaufende 90-Tage-Metriken mit vierteljährlicher Überprüfungshäufigkeit",
+      "title": "Pilot-Erfolgsanzeiger"
+    },
+    "methodology": {
+      "multiplier": "Präventionsmultiplikator.",
+      "per_hour": "/Std. x",
+      "prefix": "Methodik: Stunden x",
+      "window": "Fenster: {{days}} Tage."
+    },
+    "metrics": {
+      "active_members": "Aktive Mitglieder (90 Tage)",
+      "approved_hours": "Genehmigte Stunden (90 Tage)",
+      "business_participation": "Aktive Unternehmen (90d)",
+      "comms_reach_pct": "Kommunikationsreichweite",
+      "coordinator_workload_hrs": "Arbeitsbelastung des Koordinators",
+      "cost_offset_chf": "Geschätzter Kostenversatz (CHF)",
+      "first_response_hours": "Mittlere Erstreaktion",
+      "recurring_relationships": "Wiederkehrende Beziehungen",
+      "satisfaction_score": "Zufriedenheitswert (1-5)",
+      "social_isolation_pct": "Stellvertreter der sozialen Isolation"
+    },
+    "pre_modal": {
+      "body": "Erfassen Sie dies EINMAL, bevor Sie echte Bewohner einbinden. Es friert die aktuellen 90-Tage-Metriken als Vergleichsbasislinie ein. Bei allen zukünftigen vierteljährlichen Überprüfungen wird das Delta anhand dieser Momentaufnahme berechnet. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "notes_placeholder": "Pilotregion, teilnehmende Kommune, getroffene Entscheidungen vor dem Start...",
+      "title": "Erfassen Sie die Basislinie vor dem Pilotprojekt"
+    },
+    "quarterly": {
+      "next_review": "Nächster vierteljährlicher Rückblick:",
+      "overdue": "Überfällig"
+    },
+    "quarterly_modal": {
+      "body": "Alle drei Monate nach dem Pilotstart ausführen. Die Snapshot-Beschriftung ist standardmäßig auf das aktuelle Quartal eingestellt (z. B. Q2_2026), Sie können sie jedoch anpassen. Fügen Sie Notizen hinzu, um aufzuzeichnen, was sich seit der letzten Überprüfung geändert hat – erreichte Meilensteine, Richtlinienänderungen, Feedback der Bewohner. Der Snapshot deckt das aktuellste 90-Tage-Fenster von heute ab.",
+      "label_description": "Verwenden Sie eine erkennbare Bezeichnung wie Q2_2026 oder 2026_Q3. Der Standardwert ist vierteljährlich_JJJJ_MM.",
+      "label_placeholder": "vierteljährlich_2026_07",
+      "notes_placeholder": "Was sich in diesem Quartal verändert hat, welche Meilensteine ​​erreicht wurden...",
+      "title": "Erfassen Sie eine vierteljährliche Überprüfung"
+    },
+    "sections": {
+      "captured_baselines": "Erfasste Grundlinien",
+      "comparing_baseline": "Vergleich mit der vor dem Pilotprojekt erfassten Basislinie {{date}}",
+      "metrics": "Pilotmetriken",
+      "no_baseline": "Noch kein Ausgangswert vor dem Pilotprojekt – aktuelle Werte werden nur angezeigt"
+    },
+    "table": {
+      "change": "Ändern",
+      "current": "Aktuell",
+      "delta": "Delta",
+      "metric": "Metrisch",
+      "pre_pilot": "Vor dem Piloten"
+    },
+    "toasts": {
+      "load_failed": "Pilotenanzeigetafel konnte nicht geladen werden",
+      "pre_captured": "Die Grundlinie vor dem Pilotprojekt wurde erfasst",
+      "pre_failed": "Die Erfassung der Basislinie vor dem Pilotprojekt ist fehlgeschlagen",
+      "quarterly_captured": "Vierteljährliche Überprüfung erfasst",
+      "quarterly_failed": "Die vierteljährliche Überprüfung konnte nicht erfasst werden"
+    }
+  },
+  "provisioning_requests": {
+    "approval_queued": "Genehmigung in der Warteschlange – Bereitstellung läuft",
+    "approve_and_provision": "Genehmigen und bereitstellen",
+    "approve_failed": "Genehmigung fehlgeschlagen",
+    "close": "Schließen",
+    "empty_status": "Keine Bereitstellungsanfragen in diesem Status.",
+    "empty_value": "-",
+    "fields": {
+      "applicant": "Antragsteller",
+      "category": "Kategorie",
+      "country_region": "Land / Region",
+      "expected_size": "Erwartete Größe",
+      "intended_use": "Verwendungszweck",
+      "languages": "Sprachen",
+      "provisioned_tenant": "Bereitgestellter Mieter",
+      "provisioning_log": "Bereitstellungsprotokoll",
+      "rejection_reason": "Ablehnungsgrund",
+      "slug": "Schnecke",
+      "subdomain": "Subdomain"
+    },
+    "languages_value": "{{languages}} (Standard: {{defaultLanguage}})",
+    "load_failed": "Bereitstellungsanfragen konnten nicht geladen werden",
+    "page_subtitle": "Überprüfen und genehmigen Sie Anfragen zur Self-Service-Mandantenbereitstellung",
+    "page_title": "Bereitstellungswarteschlange",
+    "refresh": "Aktualisieren",
+    "reject": "Ablehnen",
+    "reject_failed": "Ablehnung fehlgeschlagen",
+    "rejection_reason_label": "Ablehnungsgrund (erforderlich bei Ablehnung)",
+    "rejection_reason_placeholder": "Warum wird dies abgelehnt?",
+    "rejection_reason_required": "Bitte geben Sie einen Ablehnungsgrund ein",
+    "request_rejected": "Antrag abgelehnt – Antragsteller per E-Mail benachrichtigt",
+    "retry": "Wiederholen",
+    "retry_failed": "Der erneute Versuch ist fehlgeschlagen",
+    "retry_queued": "Wiederholungsversuch in der Warteschlange",
+    "reviewed": "Bewertet",
+    "statuses": {
+      "all": "Alle",
+      "approved": "Genehmigt",
+      "failed": "Fehlgeschlagen",
+      "pending": "Ausstehend",
+      "provisioned": "Bereitgestellt",
+      "rejected": "Abgelehnt",
+      "under_review": "Wird überprüft"
+    },
+    "submitted": "Eingereicht"
   }
 }

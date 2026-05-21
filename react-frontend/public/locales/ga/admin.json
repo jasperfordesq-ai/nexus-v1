@@ -14066,5 +14066,476 @@
       "render_template_failed": "Theip ar an teimpléad a sholáthar",
       "revoke_export_failed": "Theip ar easpórtáil na dtacar sonraí a chúlghairm"
     }
+  },
+  "commercial_boundary": {
+    "about": {
+      "body_prefix": "Sainmhíníonn an Teorainn Tráchtála na cineálacha oibre íoctha a cheadaítear laistigh den chlár cúraim phobail agus nach mór a bheith ina gcreidmheasanna ama gan íoc. Tá an teorainn seo ina riachtanas de chuid an",
+      "body_suffix": "modheolaíocht agus ní mór é a chomhaontú le do chomhpháirtí bardasach sula seolfar an treoirthionscadal. Sa mhaitrís thíos liostaítear catagóirí gníomhaíochta agus a gcineál malartaithe ceadaithe.",
+      "override_prefix": "Bain úsáid as an sárú in aghaidh an tsraithe chun aicmiú a bhaineann go sonrach le tionónta a thaifeadadh (mar shampla, imscaradh príobháideach a bhfuil beart tráchtála aige). Stóráiltear sáruithe i suíomhanna tionónta amháin - ní athraíonn siad riamh an t-aicmiú poiblí canónach a sheoltar leis an",
+      "override_suffix": "repo. Nuair a dheimhníonn tú an mhaitrís teorann, déantar an comhaontú a thaifeadadh le stampa ama agus le d’aitheantas úsáideora, atá mar chuid den doiciméadú rialachais píolótach atá le feiceáil sa seiceáil ar Ullmhacht Seoladh Píolótach.",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "export": "Easpórtáil",
+      "export_markdown": "Easpórtáil mar Markdown",
+      "refresh_aria": "Íosluchtaigh léarscáil teorann tráchtála",
+      "refresh_data": "Athnuaigh sonraí",
+      "reset_default": "Athshocraigh go réamhshocraithe canonical",
+      "reset_default_aria": "Athshocraigh go réamhshocrú"
+    },
+    "classification": {
+      "agpl_public": "AGPL poiblí",
+      "commercial": "Tráchtála",
+      "private_deployment": "Imscaradh príobháideach",
+      "tenant_config": "Cumraíocht an Tionónta"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "export": {
+      "agpl_module": "AGPL modúl",
+      "capability": "Cumas",
+      "classification": "Aicmiú",
+      "default": "Réamhshocrú",
+      "generated": "Gineadh {{date}} ón bpainéal admin NEXUS.",
+      "last_updated": "Nuashonrú is déanaí: {{date}}",
+      "no": "níl",
+      "notes": "Nótaí",
+      "overridden": "Sáraithe",
+      "yes": "tá"
+    },
+    "fields": {
+      "classification_aria": "Aicmiú do {{label}}",
+      "set_classification": "Socraigh rangú"
+    },
+    "labels": {
+      "canonical_default": "Réamhshocrú Canonical:",
+      "key": "eochair",
+      "module": "modúl",
+      "out_of_tree": "Lasmuigh den chrann",
+      "overridden": "Sáraithe"
+    },
+    "meta": {
+      "page_title": "Léarscáil Teorainneacha Tráchtála",
+      "subtitle": "AG82 - cad é AGPL poiblí, tionónta-chumraithe, ciseal imlonnaithe, nó tráchtála",
+      "title": "Léarscáil Teorainneacha Tráchtála"
+    },
+    "overrides_count": "{{count}} shárú",
+    "overrides_count_plural": "{{count}} sáraíonn",
+    "sections": {
+      "classifications": "Aicmithe"
+    },
+    "toasts": {
+      "export_empty": "Easpórtáil ar ais folamh",
+      "export_failed": "Theip ar easpórtáil léarscáil na teorann",
+      "exported": "Easpórtáladh léarscáil teorann",
+      "load_failed": "Theip ar léarscáil teorann tráchtála a lódáil",
+      "reverted": "Ar ais go réamhshocrú canonical",
+      "update_failed": "Theip ar an rangú a nuashonrú",
+      "updated": "Nuashonraíodh an t-aicmiú"
+    }
+  },
+  "federation_aggregates": {
+    "actions": {
+      "close": "Dún",
+      "preview_payload": "Réamhamharc ar ualach pá",
+      "refresh": "Athnuaigh",
+      "rotate_secret": "Rothlaigh an rún",
+      "show_audit_log": "Taispeáin loga iniúchta"
+    },
+    "audit": {
+      "columns": {
+        "period": "Tréimhse",
+        "requester": "Iarrthóir",
+        "signature": "Síniú",
+        "time": "Am"
+      },
+      "empty": "Níor taifeadadh aon fhiosrúcháin.",
+      "loading": "Á lódáil...",
+      "period_range": "{{from}} --> {{to}}",
+      "table_aria": "Loga comhiomlán iniúchta fiosrúcháin",
+      "title": "Loga iniúchta comhiomlán na gceisteanna (90 lá deiridh)",
+      "unknown_requester": "anaithnid"
+    },
+    "consent": {
+      "enable_label": "Cumasaigh comhroinnt an chónaidhm",
+      "endpoint_prefix": "Nuair a bheidh sé cumasaithe, an críochphointe poiblí",
+      "endpoint_suffix": "seolann sé pálasta sínithe JSON don tionónta seo ar ais. Nuair a bheidh sé díchumasaithe, filleann sé 404.",
+      "loading": "Toiliú á lódáil...",
+      "title": "Toiliú"
+    },
+    "meta": {
+      "description": "Liostáil chun méadracht chomhiomlán sínithe, gan ainm a roinnt thar nóid chónasctha. Cuirtear buicéad ar chomhaireamh na mball agus ní nochtar ainmneacha eagraíochtaí comhpháirtíochta riamh.",
+      "title": "Comhiomláin na Cónaidhme"
+    },
+    "preview": {
+      "empty": "Níl réamhamharc ar fáil.",
+      "loading": "Comhiomlán ríomhaireachta...",
+      "title": "Réamhamharc - cad a nochtfaí go poiblí"
+    },
+    "status": {
+      "disabled": "faoi ​​mhíchumas",
+      "enabled": "Cumasaithe",
+      "last_rotated": "Rothlaigh {{date}} an uair dheireanach",
+      "never_rotated": "Ná rothlú riamh",
+      "no_signing_secret": "Gan rún sínithe",
+      "signing_secret_present": "Rún a shíniú i láthair"
+    },
+    "toasts": {
+      "disabled": "Díchumasaíodh comhroinnt na Cónaidhme",
+      "enabled": "Cumasaíodh comhroinnt na Cónaidhme",
+      "load_audit_failed": "Theip ar an loga iniúchta a lódáil",
+      "load_consent_failed": "Theip ar thoiliú comhiomlán na Cónaidhme a lódáil",
+      "load_preview_failed": "Theip ar an réamhamharc a lódáil",
+      "rotate_failed": "Theip ar an rún a rothlú",
+      "secret_rotated": "Rothlú an rún sínithe",
+      "update_failed": "Theip ar an toiliú a nuashonrú"
+    }
+  },
+  "pilot_inquiry_admin": {
+    "about": {
+      "body_intro_after_kiss": "píolótach. Cuirtear gach fiosrúchán isteach tríd an bhfoirm leas an phobail agus déantar é a scóráil go huathoibríoch trí úsáid a bhaint as algartam oiriúnach (méid an daonra, comharchumann KISS reatha, ullmhacht dhigiteach, tásc buiséid, agus amlíne). Bain úsáid as an mbord seo chun fiosrúcháin a chur ar aghaidh tríd an bpíblíne, iad a shannadh do theagmhálaí díolacháin nó pobail, agus rianú nuair a sheoltar moltaí agus a théann píolótaí beo.",
+      "body_intro_before_gemeinden": "Seo an phíblíne barr-an tonnadóir do bhardas (",
+      "body_intro_before_kiss": ") agus réigiúin ar spéis leo NEXUS/",
+      "fit_score_after": "(0-100) a ríomh go huathoibríoch - is cluiche láidir é 70+. Cliceáil ar aon chárta chun na sonraí iomlána a fheiceáil, chun an chéim a nuashonrú, nó chun nótaí inmheánacha a chur leis.",
+      "fit_score_before": "Tá an",
+      "fit_score_label": "Scór oiriúnach",
+      "gemeinden": "Gemeinden",
+      "pipeline_stages": "Nua -> Teagmháil -> Cáilithe -> Togra seolta -> Píolótach aontaithe -> Beo -> Diúltaithe / Tarraingthe siar.",
+      "pipeline_stages_label": "Céimeanna píblíne:",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "close": "Dún",
+      "export_csv": "Easpórtáil CSV",
+      "refresh": "Athnuaigh",
+      "save_notes": "Sábháil Nótaí",
+      "save_stage": "Sábháil Céim"
+    },
+    "empty": {
+      "body": "Tagann fiosrúcháin tríd an bhfoirm leasa phoiblí ar an suíomh díolacháin NEXUS. Nuair a chuirtear isteach iad, feictear iad anseo go huathoibríoch. Úsáid an scagaire stáitse thuas le seiceáil an bhfuil fiosrúcháin ann i gcéimeanna eile.",
+      "title": "Níl aon fhiosrúcháin phíolótacha fós."
+    },
+    "fields": {
+      "budget": "Buiséad",
+      "contact": "Teagmháil",
+      "cooperative": "Comharchumann",
+      "country_region": "Tír / Réigiún",
+      "existing_digital_tool": "Uirlis Dhigiteach Reatha",
+      "fit_score_breakdown": "Miondealú Scór Fit",
+      "internal_notes": "Nótaí Inmheánacha (riarthóir amháin)",
+      "modules_of_interest": "Modúil Suime",
+      "notes_from_gemeinde": "Nótaí ó Gemeinde",
+      "population": "Daonra",
+      "timeline": "Amlíne",
+      "total": "Iomlán",
+      "update_stage": "Céim Nuashonraithe"
+    },
+    "filters": {
+      "all": "Gach",
+      "stage": "Scag de réir céime:"
+    },
+    "fit_scale": {
+      "factors_after_kiss": "comharchumann, ullmhacht dhigiteach, buiséad, amlíne.",
+      "factors_before_kiss": "Fachtóirí scóir: méid an daonra, reatha",
+      "good": "Meaitseáil mhaith - tosaíocht a thabhairt do fhor-rochtain",
+      "potential": "Acmhainneacht - imscrúdú breise a dhéanamh",
+      "title": "Scála scóir oiriúnach (0-100):",
+      "weak": "Fit lag - tosaíocht íseal"
+    },
+    "page_subtitle": "Bainistigh léirithe spéise sa réigiún píolótach Gemeinde atá ag teacht isteach",
+    "page_title": "Fiosrúcháin Phíolótacha",
+    "placeholders": {
+      "internal_notes": "Cuir nótaí inmheánacha leis...",
+      "rejection_reason": "Cúis diúltaithe..."
+    },
+    "stages": {
+      "dormant": "Díomhaoin",
+      "live": "Beo",
+      "new": "Nua",
+      "pilot_agreed": "Píolótach Comhaontaithe",
+      "proposal_sent": "Togra Seolta",
+      "qualified": "Cáilithe",
+      "rejected": "Diúltaithe",
+      "unknown": "{{stage}}"
+    },
+    "stats": {
+      "avg_fit_score": "Meán Scór Fit",
+      "in_pipeline": "Sa Phíblíne",
+      "qualified": "Cáilithe",
+      "total_inquiries": "Fiosrúcháin Iomlána"
+    },
+    "summary": {
+      "by_country": "De réir tíre"
+    },
+    "timestamps": {
+      "agreed": "Comhaontaithe",
+      "live": "Beo",
+      "proposal": "Togra",
+      "submitted": "Arna chur isteach"
+    },
+    "toasts": {
+      "load_failed": "Theip ar lódáil fiosrúchán píolótach",
+      "notes_save_failed": "Theip ar shábháil nótaí",
+      "notes_saved": "Nótaí sábháilte",
+      "stage_update_failed": "Theip ar an gcéim nuashonraithe",
+      "stage_updated": "Céim nuashonraithe"
+    },
+    "values": {
+      "asap": "ASAP",
+      "empty": "-",
+      "months": "{{count}} mhí",
+      "no": "Níl",
+      "yes": "Tá"
+    },
+    "velocity": {
+      "avg_to_agreed": "Meán go dtí aontaithe:",
+      "avg_to_live": "Meán le maireachtáil:",
+      "avg_to_proposal": "Meán an togra:",
+      "days": "{{count}}d",
+      "title": "Treoluas píblíne - meánlaethanta ó chur isteach fiosrúcháin go dtí gach cloch mhíle:"
+    }
+  },
+  "pilot_launch_readiness": {
+    "about": {
+      "body": "Seo é an geata fág/gan imeacht sula rachaidh do phíolóta Pobal Cúraim beo. Freagraíonn gach cuid thíos do mhodúl cumraíochta nó meastóireachta (AG80-AG87). Ní mór do gach rannóg stádas Réidh a bhaint amach sula mbeidh an cnaipe Seoladh cumasaithe. Nuair a sheoltar é, is gníomh aontreo é seo - déantar an stampa ama seolta agus an t-oibreoir a thaifeadadh go buan.",
+      "review_help": "Tá cumraíocht in easnamh nó neamhiomlán i gcodanna a léiríonn athbhreithniú riachtanas. Cliceáil ar aghaidh chuig an modúl ábhartha chun na míreanna liostaithe a réiteach.",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "acknowledge_default_matrix": "Admháil maitrís réamhshocraithe",
+      "cancel": "Cealaigh",
+      "confirm_launch": "Sea, seoladh an píolótach",
+      "launch_pilot": "Seoladh píolótach",
+      "open": "Oscail",
+      "refresh": "Athnuaigh",
+      "refresh_aria": "Athnuaigh an tuarascáil ullmhachta seolta",
+      "retry": "Bain triail eile as"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "errors": {
+      "load_failed": "Níorbh fhéidir an tuarascáil ullmhachta seolta a lódáil.",
+      "unavailable_title": "Níl tuairisc ullmhachta ar fáil",
+      "unexpected_response": "Thug an tuarascáil ullmhachta seolta freagra gan choinne."
+    },
+    "isolated_node": {
+      "informational": "Tá geata nód leithlis faisnéiseach le haghaidh imlonnaithe óstaithe caighdeánacha. Ní chuireann sé bac ar sheoladh ach amháin nuair a shocraítear AG85 deployment_mode go canton_isolated_node. Mura bhfuil ceanglas nód leithlis sonraithe ag do bhardas, is féidir leat neamhaird a dhéanamh ar mhíreanna sa chuid seo.",
+      "required": "Tá geata nód leithlisithe gníomhach - tá an t-imscaradh seo cumraithe mar nód aonraíoch canton (AG85). Ní mór do gach earra stádas Cinnte a bhaint amach roimh é a sheoladh."
+    },
+    "meta": {
+      "page_title": "Ullmhacht Seoladh Píolótach",
+      "subtitle": "AG95 - tuairisc go/no-go a chomhcheanglaíonn dromchlaí meastóireachta AG80-AG87",
+      "title": "Ullmhacht Seoladh Píolótach"
+    },
+    "missing": {
+      "acknowledgement": "Admháil an chomhordaitheora",
+      "backlog_empty": "Riaráiste comhtháthú folamh",
+      "controller_contact_email": "Ríomhphost teagmhála rialtóir",
+      "controller_data_protection_officer": "Oifigeach cosanta sonraí",
+      "controller_name": "Ainm rialtóir",
+      "danger_checks": "Saincheisteanna cáilíochta sonraí",
+      "incident_response_contact_email": "Ríomhphost teagmhála freagartha teagmhas",
+      "policy_appendix_url": "Aguisín polasaí URL",
+      "pre_pilot_baseline": "Bunlíne scórchlár réamh-phíolótach",
+      "safeguarding_escalation_user_id": "Teagmháil um ardú céime a chosaint",
+      "workshop_not_run": "Ceardlann ar bheartas oibriúcháin nach bhfuil á reáchtáil"
+    },
+    "modal": {
+      "body_prefix": "Tá seoladh an phíolóta a",
+      "body_suffix": "Taifeadann sé stampa ama an tseolta agus an t-oibreoir ar an tionónta, agus tosaíonn tuarascálacha ardáin ag caitheamh leis an bpobal mar phobal beo.",
+      "check_baseline": "Gabhadh bonnlíne an scórchláir réamh-phíolótach",
+      "check_data_quality": "Is glas iad seiceálacha cáilíochta sonraí",
+      "check_disclosure": "Tá an pacáiste nochta, an beartas oibriúcháin, agus an teorainn tráchtála sínithe",
+      "check_residents": "Tá fíor-chónaitheoirí réidh le cuireadh a fháil",
+      "confirm_intro": "Sula leanann tú ar aghaidh, deimhnigh le d’fhoireann comhordaitheoirí:",
+      "one_way_action": "gníomh aontreo",
+      "section_summary": "Achoimre alt",
+      "title": "Seoladh an píolótach?"
+    },
+    "more_count": "+ {{count}} níos mó",
+    "overall": {
+      "blocked": "Seoladh bac - saincheisteanna a shocrú ar dtús",
+      "needs_review": "Athbhreithniú comhordaitheoir riachtanas píolótach",
+      "not_started": "Níl an measúnú píolótach ar siúl go fóill",
+      "ready": "Tá an píolótach réidh le seoladh"
+    },
+    "progress": {
+      "aria": "Dul chun cinn ullmhachta seolta",
+      "ready_count": "{{ready}} / {{total}} réidh"
+    },
+    "states": {
+      "blocked_body": "Réitigh gach cuid thíos sula mbeidh an cnaipe seolta cumasaithe.",
+      "blocked_title": "Ní féidir seoladh fós - tá an bacadóir {{count}} fós ann",
+      "blocked_title_plural": "Ní féidir seoladh fós - tá bacóirí {{count}} fós ann",
+      "launched_body": "Seolta ar {{date}}{{user}}. Is cloch mhíle aontreo é seo - tá seiceálacha ullmhachta fós le feiceáil le haghaidh iniúchta.",
+      "launched_by_user": "ag úsáideoir #{{id}}",
+      "launched_title": "Seoladh píolótach",
+      "ready_body_prefix": "Tá gach rannán ullmhachta réidh. Cliceáil",
+      "ready_body_suffix": "nuair a bheidh d’fhoireann comhordaitheora réidh chun cinneadh aontreo a dhéanamh.",
+      "ready_title": "Réidh le seoladh"
+    },
+    "status": {
+      "blocked": "bactha",
+      "needs_review": "Athbhreithniú de dhíth",
+      "not_started": "Gan tús",
+      "ready": "Réidh"
+    },
+    "timestamps": {
+      "last_updated": "Nuashonraithe {{date}} is déanaí",
+      "report_generated": "Gineadh an tuairisc {{date}}. Cliceáil ar aon chuid chun an dromchla riaracháin comhfhreagrach a oscailt."
+    },
+    "toasts": {
+      "already_launched": "Tá an clár píolótach seo seolta cheana féin.",
+      "boundary_acknowledge_failed": "Theip ar an teorainn a admháil",
+      "boundary_acknowledged": "Admhaítear teorainn tráchtála",
+      "cannot_launch": "Ní féidir seoladh - níl an geata ullmhachta dúnta.",
+      "launch_failed": "Theip ar an gclár píolótach a sheoladh.",
+      "launch_success": "Seoladh an píolótach go rathúil.",
+      "load_failed": "Theip ar an tuairisc ullmhachta seolta a lódáil"
+    }
+  },
+  "pilot_scoreboard": {
+    "about": {
+      "age_stiftung": "Age-Stiftung",
+      "age_stiftung_title": "Stiftung für das Alter",
+      "body": "Úsáideann gach méadracht fuinneog rollta 90-lá. Gabh bunlíne réamh-phíolótach sula dtéann tú ar bord fíor-chónaitheoirí, ansin reáchtáil pictiúr athbhreithnithe ráithiúil gach 3 mhí. Léiríonn an tábla comparáide conas a bhog gach méadrach i gcoibhneas leis an mbunlíne sin.",
+      "methodology_middle": "modheolaíocht: uaireanta an chúraim neamhfhoirmiúil x",
+      "methodology_prefix": "Ríomhtar fritháireamh costais ag baint úsáide as an",
+      "methodology_suffix": "35/uair (ráta cúntóir cúraim fhoirmiúil na hEilvéise) x 2 (iolraitheoir coiscthe a léiríonn costais chúraim fhoirmiúla seachanta). Aithníonn seirbhísí sóisialta cantonal na hEilvéise an mhodheolaíocht seo le haghaidh tuairisciú píolótach.",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "cancel": "Cealaigh",
+      "capture_baseline": "Gabháil bunlíne",
+      "capture_pre": "Gabháil bunlíne réamh-phíolótach",
+      "capture_quarterly": "Gabháil athbhreithniú ráithiúil",
+      "pre_set": "Tacar bunlíne réamh-phíolótach",
+      "refresh": "Athnuaigh"
+    },
+    "baselines": {
+      "captured": "Gabhadh",
+      "label": "Lipéad",
+      "notes": "Nótaí",
+      "period": "Tréimhse",
+      "pre_pilot": "Réamhphíolótach",
+      "quarterly": "Ráithiúil",
+      "type": "Cineál"
+    },
+    "currency": {
+      "chf": "CHF"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "fields": {
+      "label_optional": "Lipéad (roghnach)",
+      "notes_optional": "Nótaí (roghnach)"
+    },
+    "meta": {
+      "subtitle": "AG83 - bunlíne réamh-phíolótach + méadracht rollach 90 lá le deireadh athbhreithnithe ráithiúil",
+      "title": "Scórchlár Rath Píolótach"
+    },
+    "methodology": {
+      "multiplier": "iolraitheoir coiscthe.",
+      "per_hour": "/uair x",
+      "prefix": "Modheolaíocht: uaireanta x",
+      "window": "Fuinneog: {{days}} lá."
+    },
+    "metrics": {
+      "active_members": "Baill ghníomhacha (90d)",
+      "approved_hours": "Uaireanta ceadaithe (90d)",
+      "business_participation": "Gnólachtaí gníomhacha (90d)",
+      "comms_reach_pct": "Sroicheann Comms",
+      "coordinator_workload_hrs": "Ualach oibre an chomhordaitheora",
+      "cost_offset_chf": "Fritháireamh costas measta (CHF)",
+      "first_response_hours": "Céad fhreagra airmheánach",
+      "recurring_relationships": "Caidrimh athfhillteacha",
+      "satisfaction_score": "Scór sástachta (1-5)",
+      "social_isolation_pct": "seachfhreastalaí leithlisiú sóisialta"
+    },
+    "pre_modal": {
+      "body": "Gabh é seo AMHÁIN sula dtéann tú ar bord fíor-chónaitheoirí. Déanann sé an mhéadracht reatha 90-lá a reoiteáil mar do bhunlíne comparáide. Ríomhfaidh gach athbhreithniú ráithiúil amach anseo deilt i gcoinne an ailt seo. Ní féidir an gníomh seo a chealú.",
+      "notes_placeholder": "Réigiún píolótach, bardas rannpháirteach, cinntí a rinneadh roimh an seoladh...",
+      "title": "Gabháil bunlíne réamh-phíolótach"
+    },
+    "quarterly": {
+      "next_review": "Léirmheas ráithiúil eile:",
+      "overdue": "thar téarma"
+    },
+    "quarterly_modal": {
+      "body": "Rith gach 3 mhí tar éis seoladh píolótach. Tá an lipéad seat réamhshocraithe go dtí an ráithe reatha (m.sh. Q2_2026) ach is féidir leat é a shaincheapadh. Cuir nótaí leis chun an méid a d’athraigh ón athbhreithniú deireanach a thaifeadadh – garspriocanna a baineadh amach, athruithe polasaí, aiseolas ó chónaitheoirí. Clúdaíonn Snapshot an fhuinneog 90 lá is déanaí ón lá inniu.",
+      "label_description": "Úsáid lipéad inaitheanta ar nós Q2_2026 nó 2026_Q3. Réamhshocrú go ráithiúil_YYYY_MM.",
+      "label_placeholder": "ráithiúil_2026_07",
+      "notes_placeholder": "Rud a d’athraigh an ráithe seo, tá garspriocanna bainte amach...",
+      "title": "Gabháil athbhreithniú ráithiúil"
+    },
+    "sections": {
+      "captured_baselines": "Bunlínte gafa",
+      "comparing_baseline": "Comparáid a dhéanamh le bunlíne réamh-phíolótach a gabhadh {{date}}",
+      "metrics": "Méadracht phíolótach",
+      "no_baseline": "Níl aon bhunlíne réamh-phíolótach ar bith fós - na luachanna reatha léirithe leo féin"
+    },
+    "table": {
+      "change": "Athrú",
+      "current": "Reatha",
+      "delta": "Delta",
+      "metric": "méadrach",
+      "pre_pilot": "Réamhphíolótach"
+    },
+    "toasts": {
+      "load_failed": "Theip ar an scórchlár píolótach a lódáil",
+      "pre_captured": "Gabhadh bunlíne réamh-phíolótach",
+      "pre_failed": "Theip ar an mbunlíne réamh-phíolótach a ghabháil",
+      "quarterly_captured": "Léirmheas ráithiúil gafa",
+      "quarterly_failed": "Theip ar an athbhreithniú ráithiúil a ghabháil"
+    }
+  },
+  "provisioning_requests": {
+    "approval_queued": "Faomhadh scuaine - soláthar ar siúl",
+    "approve_and_provision": "Faomhadh & Soláthar",
+    "approve_failed": "Theip ar cheadú",
+    "close": "Dún",
+    "empty_status": "Níl aon iarratas ar sholáthar sa stádas seo.",
+    "empty_value": "-",
+    "fields": {
+      "applicant": "Iarratasóir",
+      "category": "Catagóir",
+      "country_region": "Tír / Réigiún",
+      "expected_size": "Méid ionchais",
+      "intended_use": "Úsáid atá beartaithe",
+      "languages": "Teangacha",
+      "provisioned_tenant": "Tionónta sealadach",
+      "provisioning_log": "Loga soláthair",
+      "rejection_reason": "Cúis diúltaithe",
+      "slug": "Drúchtín",
+      "subdomain": "Fofhearann"
+    },
+    "languages_value": "{{languages}} (réamhshocraithe: {{defaultLanguage}})",
+    "load_failed": "Theip ar iarratais soláthair a lódáil",
+    "page_subtitle": "Iarratais ar sholáthar tionóntaí féinseirbhíse a athbhreithniú agus a cheadú",
+    "page_title": "Ciú Soláthair",
+    "refresh": "Athnuaigh",
+    "reject": "Diúltaigh",
+    "reject_failed": "Theip ar dhiúltú",
+    "rejection_reason_label": "Cúis diúltaithe (riachtanach má dhiúltaítear)",
+    "rejection_reason_placeholder": "Cén fáth go bhfuil sé seo á dhiúltú?",
+    "rejection_reason_required": "Cuir isteach cúis diúltaithe",
+    "request_rejected": "Diúltaíodh don iarratas - cuireadh an t-iarratasóir ar an eolas trí ríomhphost",
+    "retry": "Bain triail eile as",
+    "retry_failed": "Theip ar atriail",
+    "retry_queued": "Bain triail eile as ciúáilte",
+    "reviewed": "Athbhreithnithe",
+    "statuses": {
+      "all": "Gach",
+      "approved": "Ceadaithe",
+      "failed": "Theip",
+      "pending": "Ar feitheamh",
+      "provisioned": "Foráladh",
+      "rejected": "Diúltaithe",
+      "under_review": "Faoi Léirmheas"
+    },
+    "submitted": "Arna chur isteach"
   }
 }

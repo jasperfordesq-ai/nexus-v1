@@ -14066,5 +14066,476 @@
       "render_template_failed": "Kan de sjabloon niet weergeven",
       "revoke_export_failed": "Kan de export van de gegevensset niet intrekken"
     }
+  },
+  "commercial_boundary": {
+    "about": {
+      "body_prefix": "De Commerciële Grens bepaalt welke soorten betaald werk zijn toegestaan ​​binnen het gemeenschapszorgprogramma en welke onbetaalde tijdskredieten moeten blijven. Deze grens is een vereiste van de",
+      "body_suffix": "methodiek en moet vóór aanvang van de pilot met uw gemeentelijke partner worden afgestemd. De onderstaande matrix geeft een overzicht van de activiteitscategorieën en hun toegestane uitwisselingstype.",
+      "override_prefix": "Gebruik de overschrijving per rij om een ​​tenantspecifieke classificatie vast te leggen (bijvoorbeeld een privé-implementatie met een commerciële bundel). Overschrijvingen worden alleen opgeslagen in tenantinstellingen: ze wijzigen nooit de canonieke openbare classificatie die bij de",
+      "override_suffix": "repository. Zodra u de grensmatrix heeft bevestigd, wordt de overeenkomst vastgelegd met een tijdstempel en uw gebruikers-ID, die deel uitmaakt van de pilot-governancedocumentatie die verschijnt in de Pilot Launch Readiness-controle.",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "export": "Exporteren",
+      "export_markdown": "Exporteer als Markdown",
+      "refresh_aria": "Vernieuw de commerciële grenskaart",
+      "refresh_data": "Gegevens vernieuwen",
+      "reset_default": "Reset naar canonieke standaard",
+      "reset_default_aria": "Resetten naar standaard"
+    },
+    "classification": {
+      "agpl_public": "AGPL openbaar",
+      "commercial": "Commercieel",
+      "private_deployment": "Privé-implementatie",
+      "tenant_config": "Tenantconfiguratie"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "export": {
+      "agpl_module": "AGPL-module",
+      "capability": "Vermogen",
+      "classification": "Classificatie",
+      "default": "Standaard",
+      "generated": "Gegenereerd {{date}} vanuit het NEXUS beheerdersdashboard.",
+      "last_updated": "Laatst bijgewerkt: {{date}}",
+      "no": "Nee",
+      "notes": "Opmerkingen",
+      "overridden": "Overschreven",
+      "yes": "Ja"
+    },
+    "fields": {
+      "classification_aria": "Classificatie voor {{label}}",
+      "set_classification": "Classificatie instellen"
+    },
+    "labels": {
+      "canonical_default": "Canonieke standaard:",
+      "key": "Sleutel",
+      "module": "module",
+      "out_of_tree": "Uit de boom",
+      "overridden": "Overschreven"
+    },
+    "meta": {
+      "page_title": "Commerciële grenskaart",
+      "subtitle": "AG82 - wat is AGPL openbaar, tenant-configureerbaar, implementatielaag of commercieel",
+      "title": "Commerciële grenskaart"
+    },
+    "overrides_count": "{{count}} overschrijven",
+    "overrides_count_plural": "{{count}} overschrijft",
+    "sections": {
+      "classifications": "Classificaties"
+    },
+    "toasts": {
+      "export_empty": "Export is leeg geretourneerd",
+      "export_failed": "Kan grenskaart niet exporteren",
+      "exported": "Grenskaart geëxporteerd",
+      "load_failed": "Kan commerciële grenskaart niet laden",
+      "reverted": "Teruggekeerd naar de canonieke standaard",
+      "update_failed": "Kan de classificatie niet updaten",
+      "updated": "Classificatie bijgewerkt"
+    }
+  },
+  "federation_aggregates": {
+    "actions": {
+      "close": "Dichtbij",
+      "preview_payload": "Voorbeeld van de payload",
+      "refresh": "Vernieuwen",
+      "rotate_secret": "Geheim draaien",
+      "show_audit_log": "Auditlogboek weergeven"
+    },
+    "audit": {
+      "columns": {
+        "period": "Periode",
+        "requester": "Aanvrager",
+        "signature": "Handtekening",
+        "time": "Tijd"
+      },
+      "empty": "Geen zoekopdrachten geregistreerd.",
+      "loading": "Laden...",
+      "period_range": "{{from}} -> {{to}}",
+      "table_aria": "Geaggregeerd query-auditlogboek",
+      "title": "Geaggregeerd query-auditlogboek (laatste 90 dagen)",
+      "unknown_requester": "onbekend"
+    },
+    "consent": {
+      "enable_label": "Schakel federatie-geaggregeerd delen in",
+      "endpoint_prefix": "Indien ingeschakeld, het openbare eindpunt",
+      "endpoint_suffix": "retourneert een ondertekende JSON payload voor deze tenant. Indien uitgeschakeld, retourneert het 404.",
+      "loading": "Toestemming laden...",
+      "title": "Toestemming"
+    },
+    "meta": {
+      "description": "Meld u aan om ondertekende, geanonimiseerde verzamelde statistieken te delen tussen federatieve knooppunten. Het aantal leden wordt in buckets opgedeeld en de namen van partnerorganisaties worden nooit openbaar gemaakt.",
+      "title": "Federatie-aggregaten"
+    },
+    "preview": {
+      "empty": "Geen voorbeeld beschikbaar.",
+      "loading": "Berekeningsaggregaat...",
+      "title": "Preview - wat publiekelijk zou worden onthuld"
+    },
+    "status": {
+      "disabled": "Gehandicapt",
+      "enabled": "Ingeschakeld",
+      "last_rotated": "Laatst geroteerd {{date}}",
+      "never_rotated": "Nooit gedraaid",
+      "no_signing_secret": "Geen ondertekeningsgeheim",
+      "signing_secret_present": "Ondertekening geheim aanwezig"
+    },
+    "toasts": {
+      "disabled": "Samengevat delen van de federatie staat uit",
+      "enabled": "Geaggregeerd delen via federatie ingeschakeld",
+      "load_audit_failed": "Kan het auditlogboek niet laden",
+      "load_consent_failed": "Kan de samengevoegde toestemming van de federatie niet laden",
+      "load_preview_failed": "Kan voorbeeld niet laden",
+      "rotate_failed": "Kan geheim niet roteren",
+      "secret_rotated": "Ondertekeningsgeheim gedraaid",
+      "update_failed": "Kan de toestemming niet updaten"
+    }
+  },
+  "pilot_inquiry_admin": {
+    "about": {
+      "body_intro_after_kiss": "piloot. Elke aanvraag wordt ingediend via het formulier voor algemeen belang en wordt automatisch gescoord met behulp van een geschikt algoritme (populatieomvang, bestaande KISS coöperatie, digitale gereedheid, budgetindicatie en tijdlijn). Gebruik dit bord om vragen door de pijplijn te loodsen, ze toe te wijzen aan een verkoop- of gemeenschapscontactpersoon en bij te houden wanneer voorstellen worden verzonden en pilots live gaan.",
+      "body_intro_before_gemeinden": "Dit is de top-of-funnel pijplijn voor gemeenten (",
+      "body_intro_before_kiss": ") en regio's die geïnteresseerd zijn in het uitvoeren van een NEXUS/",
+      "fit_score_after": "(0-100) wordt automatisch berekend - 70+ is een sterke match. Klik op een kaart om de volledige details te bekijken, de fase bij te werken of interne notities toe te voegen.",
+      "fit_score_before": "De",
+      "fit_score_label": "Fitscore",
+      "gemeinden": "Gemeinden",
+      "pipeline_stages": "Nieuw -> Gecontacteerd -> Gekwalificeerd -> Voorstel verzonden -> Pilot akkoord -> Live -> Afgewezen / Ingetrokken.",
+      "pipeline_stages_label": "Pijplijnfasen:",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "close": "Dichtbij",
+      "export_csv": "CSV exporteren",
+      "refresh": "Vernieuwen",
+      "save_notes": "Bewaar notities",
+      "save_stage": "Fase opslaan"
+    },
+    "empty": {
+      "body": "Vragen komen binnen via het formulier voor algemeen belang op de NEXUS verkoopsite. Eenmaal ingediend, verschijnen ze hier automatisch. Gebruik het fasefilter hierboven om te controleren of er vragen bestaan ​​in andere fasen.",
+      "title": "Er zijn nog geen pilotaanvragen."
+    },
+    "fields": {
+      "budget": "Begroting",
+      "contact": "Contact",
+      "cooperative": "Coöperatief",
+      "country_region": "Land/regio",
+      "existing_digital_tool": "Bestaande digitale tool",
+      "fit_score_breakdown": "Uitsplitsing van de fitscore",
+      "internal_notes": "Interne notities (alleen beheerder)",
+      "modules_of_interest": "Interessante modules",
+      "notes_from_gemeinde": "Notities van Gemeinde",
+      "population": "Bevolking",
+      "timeline": "Tijdlijn",
+      "total": "Totaal",
+      "update_stage": "Fase bijwerken"
+    },
+    "filters": {
+      "all": "Alle",
+      "stage": "Filter op fase:"
+    },
+    "fit_scale": {
+      "factors_after_kiss": "coöperatief, digitale gereedheid, budget, tijdlijn.",
+      "factors_before_kiss": "Scorefactoren: populatieomvang, bestaand",
+      "good": "Goede match - geef prioriteit aan outreach",
+      "potential": "Potentieel - verder onderzoeken",
+      "title": "Fitscoreschaal (0-100):",
+      "weak": "Zwakke pasvorm - lage prioriteit"
+    },
+    "page_subtitle": "Beheer binnenkomende Gemeinde blijken van belangstelling uit de pilotregio",
+    "page_title": "Vragen van piloten",
+    "placeholders": {
+      "internal_notes": "Interne notities toevoegen...",
+      "rejection_reason": "Reden van afwijzing..."
+    },
+    "stages": {
+      "dormant": "Slaperig",
+      "live": "Live",
+      "new": "Nieuw",
+      "pilot_agreed": "Piloot akkoord",
+      "proposal_sent": "Voorstel verzonden",
+      "qualified": "Gekwalificeerd",
+      "rejected": "Afgewezen",
+      "unknown": "{{stage}}"
+    },
+    "stats": {
+      "avg_fit_score": "Gemiddelde fitscore",
+      "in_pipeline": "In pijplijn",
+      "qualified": "Gekwalificeerd",
+      "total_inquiries": "Totaal aantal vragen"
+    },
+    "summary": {
+      "by_country": "Per land"
+    },
+    "timestamps": {
+      "agreed": "Overeengekomen",
+      "live": "Live",
+      "proposal": "Voorstel",
+      "submitted": "Ingediend"
+    },
+    "toasts": {
+      "load_failed": "Kan pilotvragen niet laden",
+      "notes_save_failed": "Kan notities niet opslaan",
+      "notes_saved": "Notities opgeslagen",
+      "stage_update_failed": "Kan fase niet updaten",
+      "stage_updated": "Fase bijgewerkt"
+    },
+    "values": {
+      "asap": "Zo snel mogelijk",
+      "empty": "-",
+      "months": "{{count}} maanden",
+      "no": "Nee",
+      "yes": "Ja"
+    },
+    "velocity": {
+      "avg_to_agreed": "Gem. tot akkoord:",
+      "avg_to_live": "Gem. leven:",
+      "avg_to_proposal": "Gem. tot voorstel:",
+      "days": "{{count}}d",
+      "title": "Pijplijnsnelheid - gemiddelde dagen vanaf het indienen van een aanvraag tot elke mijlpaal:"
+    }
+  },
+  "pilot_launch_readiness": {
+    "about": {
+      "body": "Dit is de go/no-go-poort voordat uw Caring Community-pilot live gaat. Elke sectie hieronder komt overeen met een configuratie- of evaluatiemodule (AG80-AG87). Alle secties moeten de status Gereed hebben voordat de knop Starten wordt ingeschakeld. Eenmaal gelanceerd, is dit een eenrichtingsactie: het lanceringstijdstempel en de operator worden permanent vastgelegd.",
+      "review_help": "Secties met Behoeftenbeoordeling hebben een ontbrekende of onvolledige configuratie. Klik door naar de betreffende module om de genoemde items op te lossen.",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "acknowledge_default_matrix": "Bevestig de standaardmatrix",
+      "cancel": "Annuleren",
+      "confirm_launch": "Ja, start de pilot",
+      "launch_pilot": "Lancering piloot",
+      "open": "Open",
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Vernieuw het lanceringsgereedheidsrapport",
+      "retry": "Opnieuw proberen"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "errors": {
+      "load_failed": "Het rapport over de gereedheid voor lancering kan niet worden geladen.",
+      "unavailable_title": "Gereedheidsrapport niet beschikbaar",
+      "unexpected_response": "Het rapport over de gereedheid voor lancering gaf een onverwacht antwoord."
+    },
+    "isolated_node": {
+      "informational": "Gate met geïsoleerde knooppunten is informatief voor standaard gehoste implementaties. Het blokkeert alleen het starten wanneer AG85 deployment_mode is ingesteld op canton_isolated_node. Als uw gemeente geen vereiste voor geïsoleerde knooppunten heeft gespecificeerd, kunt u de items in deze sectie negeren.",
+      "required": "Poort met geïsoleerd knooppunt is actief: deze implementatie is geconfigureerd als een kanton-geïsoleerd knooppunt (AG85). Alle items moeten vóór de lancering de status Besloten hebben."
+    },
+    "meta": {
+      "page_title": "Gereedheid voor pilootlancering",
+      "subtitle": "AG95 - go/no-go-rapport waarin AG80-AG87 evaluatieoppervlakken worden gecombineerd",
+      "title": "Gereedheid voor pilootlancering"
+    },
+    "missing": {
+      "acknowledgement": "Erkenning coördinator",
+      "backlog_empty": "Integratieachterstand leeg",
+      "controller_contact_email": "E-mailadres voor contactpersoon van de controller",
+      "controller_data_protection_officer": "Functionaris voor gegevensbescherming",
+      "controller_name": "Naam van controller",
+      "danger_checks": "Problemen met de gegevenskwaliteit",
+      "incident_response_contact_email": "Contact-e-mailadres voor reactie op incidenten",
+      "policy_appendix_url": "Beleidsbijlage URL",
+      "pre_pilot_baseline": "Basislijn scorebord vóór de pilot",
+      "safeguarding_escalation_user_id": "Borgen van escalatiecontact",
+      "workshop_not_run": "Workshop over operationeel beleid wordt niet uitgevoerd"
+    },
+    "modal": {
+      "body_prefix": "Het lanceren van de pilot is een",
+      "body_suffix": "Het registreert het starttijdstempel en de operator van de tenant, en platformrapporten beginnen de community als live te beschouwen.",
+      "check_baseline": "De basislijn van het scorebord van vóór de pilot is vastgelegd",
+      "check_data_quality": "Gegevenskwaliteitscontroles zijn groen",
+      "check_disclosure": "Het openbaarmakingspakket, het operationele beleid en de commerciële grens zijn ondertekend",
+      "check_residents": "Echte bewoners staan ​​klaar om uitgenodigd te worden",
+      "confirm_intro": "Voordat u doorgaat, moet u bij uw coördinatorenteam bevestigen dat:",
+      "one_way_action": "eenrichtingsactie",
+      "section_summary": "Sectie samenvatting",
+      "title": "De pilot lanceren?"
+    },
+    "more_count": "+{{count}} meer",
+    "overall": {
+      "blocked": "Start geblokkeerd - los eerst de problemen op",
+      "needs_review": "Piloot heeft coördinatorbeoordeling nodig",
+      "not_started": "Pilotevaluatie nog niet uitgevoerd",
+      "ready": "Piloot is klaar om te lanceren"
+    },
+    "progress": {
+      "aria": "Vooruitgang in voorbereidingsbereidheid",
+      "ready_count": "{{ready}} / {{total}} gereed"
+    },
+    "states": {
+      "blocked_body": "Los elk gedeelte hieronder op voordat de startknop wordt ingeschakeld.",
+      "blocked_title": "Kan nog niet starten - {{count}} blocker blijft bestaan",
+      "blocked_title_plural": "Kan nog niet starten - {{count}} blokkers blijven bestaan",
+      "launched_body": "Gelanceerd op {{date}}{{user}}. Dit is een mijlpaal in één richting: gereedheidscontroles blijven zichtbaar voor audits.",
+      "launched_by_user": "door gebruiker #{{id}}",
+      "launched_title": "Piloot gelanceerd",
+      "ready_body_prefix": "Elke gereedheidssectie is gereed. Klik",
+      "ready_body_suffix": "wanneer uw coördinatorenteam er klaar voor is om dit een eenrichtingsbeslissing te laten nemen.",
+      "ready_title": "Klaar om te lanceren"
+    },
+    "status": {
+      "blocked": "Geblokkeerd",
+      "needs_review": "Moet worden beoordeeld",
+      "not_started": "Niet gestart",
+      "ready": "Klaar"
+    },
+    "timestamps": {
+      "last_updated": "Laatst bijgewerkt {{date}}",
+      "report_generated": "Rapport gegenereerd {{date}}. Klik op een sectie om het bijbehorende beheerdersoppervlak te openen."
+    },
+    "toasts": {
+      "already_launched": "Deze pilot is inmiddels gestart.",
+      "boundary_acknowledge_failed": "Kan de grens niet erkennen",
+      "boundary_acknowledged": "Commerciële grens erkend",
+      "cannot_launch": "Kan niet starten - de paraatheidshek is niet gesloten.",
+      "launch_failed": "Kan de pilot niet starten.",
+      "launch_success": "Pilot succesvol gelanceerd.",
+      "load_failed": "Kan het gereedheidsrapport voor opstarten niet laden"
+    }
+  },
+  "pilot_scoreboard": {
+    "about": {
+      "age_stiftung": "Age-Stiftung",
+      "age_stiftung_title": "Stiftung für das Alter",
+      "body": "Alle statistieken gebruiken een voortschrijdende periode van 90 dagen. Leg een pre-pilot-basislijn vast voordat u echte bewoners aan boord neemt, en voer vervolgens elke drie maanden een driemaandelijkse beoordelingsmomentopname uit. De vergelijkingstabel laat zien hoe elke metriek is verschoven ten opzichte van die basislijn.",
+      "methodology_middle": "methodiek: uren mantelzorg x",
+      "methodology_prefix": "De kostencompensatie wordt berekend met behulp van de",
+      "methodology_suffix": "35/uur (Zwitsers tarief voor formele zorgassistenten) x 2 (preventiemultiplier die de vermeden formele zorgkosten weerspiegelt). Deze methodologie wordt erkend door de Zwitserse kantonnale sociale diensten voor pilotrapportage.",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "cancel": "Annuleren",
+      "capture_baseline": "Basislijn vastleggen",
+      "capture_pre": "Leg de pre-pilot basislijn vast",
+      "capture_quarterly": "Kwartaaloverzicht vastleggen",
+      "pre_set": "Basislijnset vóór de pilot",
+      "refresh": "Vernieuwen"
+    },
+    "baselines": {
+      "captured": "Gevangen",
+      "label": "Label",
+      "notes": "Opmerkingen",
+      "period": "Periode",
+      "pre_pilot": "Pre-piloot",
+      "quarterly": "Driemaandelijks",
+      "type": "Type"
+    },
+    "currency": {
+      "chf": "CHF"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "fields": {
+      "label_optional": "Etiket (optioneel)",
+      "notes_optional": "Opmerkingen (optioneel)"
+    },
+    "meta": {
+      "subtitle": "AG83 - basislijn vóór de pilot + voortschrijdende statistieken over 90 dagen met driemaandelijkse beoordelingsfrequentie",
+      "title": "Scorebord voor succes van piloten"
+    },
+    "methodology": {
+      "multiplier": "preventievermenigvuldiger.",
+      "per_hour": "/uur x",
+      "prefix": "Methodiek: uur x",
+      "window": "Periode: {{days}} dagen."
+    },
+    "metrics": {
+      "active_members": "Actieve leden (90d)",
+      "approved_hours": "Goedgekeurde uren (90d)",
+      "business_participation": "Actieve bedrijven (90d)",
+      "comms_reach_pct": "Communicatiebereik",
+      "coordinator_workload_hrs": "Werklast coördinator",
+      "cost_offset_chf": "Geschatte kostencompensatie (CHF)",
+      "first_response_hours": "Mediane eerste reactie",
+      "recurring_relationships": "Terugkerende relaties",
+      "satisfaction_score": "Tevredenheidsscore (1-5)",
+      "social_isolation_pct": "Proxy voor sociaal isolement"
+    },
+    "pre_modal": {
+      "body": "Leg dit EENMAAL vast voordat u echte bewoners aan boord haalt. Het bevriest de huidige statistieken van 90 dagen als uw vergelijkingsbasislijn. Bij alle toekomstige kwartaalbeoordelingen wordt de delta berekend op basis van deze momentopname. Deze actie kan niet ongedaan worden gemaakt.",
+      "notes_placeholder": "Pilotregio, deelnemende gemeente, beslissingen vóór lancering...",
+      "title": "Leg de pre-pilot basislijn vast"
+    },
+    "quarterly": {
+      "next_review": "Volgende kwartaaloverzicht:",
+      "overdue": "Verlopen"
+    },
+    "quarterly_modal": {
+      "body": "Wordt elke drie maanden uitgevoerd na de lancering van de pilot. Het momentopnamelabel is standaard ingesteld op het huidige kwartaal (bijvoorbeeld Q2_2026), maar u kunt dit aanpassen. Voeg notities toe om vast te leggen wat er is veranderd sinds de laatste beoordeling: bereikte mijlpalen, beleidswijzigingen, feedback van bewoners. De momentopname bestrijkt de meest recente periode van 90 dagen vanaf vandaag.",
+      "label_description": "Gebruik een herkenbaar label zoals Q2_2026 of 2026_Q3. Standaard ingesteld op driemaandelijks_JJJJ_MM.",
+      "label_placeholder": "driemaandelijks_2026_07",
+      "notes_placeholder": "Wat is er dit kwartaal veranderd, mijlpalen bereikt...",
+      "title": "Kwartaaloverzicht vastleggen"
+    },
+    "sections": {
+      "captured_baselines": "Vastgelegde basislijnen",
+      "comparing_baseline": "Vergelijking met de basislijn vóór de pilot vastgelegd {{date}}",
+      "metrics": "Pilotstatistieken",
+      "no_baseline": "Er is nog geen pre-pilot basislijn; alleen de huidige waarden worden weergegeven"
+    },
+    "table": {
+      "change": "Wijziging",
+      "current": "Huidig",
+      "delta": "Delta",
+      "metric": "Metrisch",
+      "pre_pilot": "Pre-piloot"
+    },
+    "toasts": {
+      "load_failed": "Kan het scorebord van de piloot niet laden",
+      "pre_captured": "Basislijn vóór de piloot vastgelegd",
+      "pre_failed": "Het is niet gelukt om de pre-pilot basislijn vast te leggen",
+      "quarterly_captured": "Kwartaaloverzicht vastgelegd",
+      "quarterly_failed": "Kan kwartaaloverzicht niet vastleggen"
+    }
+  },
+  "provisioning_requests": {
+    "approval_queued": "Goedkeuring in de wachtrij geplaatst - inrichting wordt uitgevoerd",
+    "approve_and_provision": "Goedkeuren en ter beschikking stellen",
+    "approve_failed": "Goedkeuren is niet gelukt",
+    "close": "Dichtbij",
+    "empty_status": "Geen inrichtingsverzoeken in deze status.",
+    "empty_value": "-",
+    "fields": {
+      "applicant": "Aanvrager",
+      "category": "Categorie",
+      "country_region": "Land/regio",
+      "expected_size": "Verwachte maat",
+      "intended_use": "Beoogd gebruik",
+      "languages": "Talen",
+      "provisioned_tenant": "Ingerichte huurder",
+      "provisioning_log": "Inrichtingslogboek",
+      "rejection_reason": "Reden van afwijzing",
+      "slug": "Naaktslak",
+      "subdomain": "Subdomein"
+    },
+    "languages_value": "{{languages}} (standaard: {{defaultLanguage}})",
+    "load_failed": "Kan inrichtingsverzoeken niet laden",
+    "page_subtitle": "Beoordeel en keur aanvragen voor selfservice-tenantinrichting goed",
+    "page_title": "Voorzieningenwachtrij",
+    "refresh": "Vernieuwen",
+    "reject": "Afwijzen",
+    "reject_failed": "Het is niet gelukt om te weigeren",
+    "rejection_reason_label": "Reden van afwijzing (verplicht bij afwijzing)",
+    "rejection_reason_placeholder": "Waarom wordt dit afgewezen?",
+    "rejection_reason_required": "Voer een reden voor afwijzing in",
+    "request_rejected": "Verzoek afgewezen - aanvrager wordt per e-mail geïnformeerd",
+    "retry": "Opnieuw proberen",
+    "retry_failed": "Opnieuw proberen mislukt",
+    "retry_queued": "Opnieuw proberen in de wachtrij",
+    "reviewed": "Beoordeeld",
+    "statuses": {
+      "all": "Alle",
+      "approved": "Goedgekeurd",
+      "failed": "Mislukt",
+      "pending": "In behandeling",
+      "provisioned": "Voorzien",
+      "rejected": "Afgewezen",
+      "under_review": "Onder beoordeling"
+    },
+    "submitted": "Ingediend"
   }
 }
