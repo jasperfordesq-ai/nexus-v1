@@ -7566,7 +7566,19 @@
       "verification_settings": "Verification Settings",
       "verification_settings_desc": "Configure identity verification requirements for new member registrations",
       "waitlist_info": "Members on the waitlist are approved manually by an admin",
-      "your_community": "Your Community"
+      "your_community": "Your Community",
+      "active": "Gníomhach",
+      "cancel": "Cealaigh",
+      "copy_code": "Cóipeáil Cód",
+      "copy_invite_code": "Cóipeáil an Cód Cuireadh",
+      "credentials_removed": "Baineadh na dintiúir go rathúil",
+      "deactivate_invite_code": "Díghníomhachtaigh an Cód Cuireadh",
+      "expiry_desc": "Téann cóid in éag ag meán oíche ar an dáta seo. Fág folamh gan aon dul in éag.",
+      "god_only": "Dia amháin",
+      "note_desc": "Nóta inmheánach chun cabhrú leat cuimhneamh ar cad chuige atá an dintiúir seo",
+      "require_email_tooltip": "Ní féidir ach le sár-riarthóirí ardáin an socrú seo a athrú",
+      "total_codes_count": "Cóid iomlána: {{count}}",
+      "webhook_desc": "Úsáidtear é chun barántúlacht na n-ualaí pálasta gréasáin isteach a fhíorú"
     },
     "registration_policy_saved_successfully": "Registration policy saved successfully",
     "registration_policy_settings_title": "Registration Policy Settings",
@@ -7932,6 +7944,22 @@
       "tenant_branded_ready": "Tenant-branded ready",
       "tenant_channel_prefix": "Tenant channel prefix",
       "theme_color": "Theme color"
+    },
+    "registration_breaker": {
+      "description": "Sos uathoibríoch nuair a fhaigheann an pobal seo tuile neamhghnách de chlárú in aon uair an chloig.",
+      "paused_body": "Sáraíodh an tairseach clárúcháin in aghaidh na huaire ({{threshold}} cuntais nua). Atosóidh an clárú go huathoibríoch i gceann timpeall {{minutes}} nóiméad, nó is féidir leat é a atosú anois. Seiceáil Sentry / logs do na IPanna foinse roimh imréitigh má tá amhras ort faoi ionsaí.",
+      "paused_title": "Tá cruthú cuntais ar sos faoi láthair.",
+      "refresh_status": "Stádas a athnuachan",
+      "resume_failed": "Theip ar an gclárú a atosú.",
+      "resume_now": "Lean ar aghaidh le clárú anois",
+      "resume_success": "Clárú arís don phobal seo.",
+      "signups_this_hour": "Cláraíonn {{count}} de {{threshold}} an uair seo",
+      "status_active": "Clárúcháin gníomhach",
+      "status_paused": "Cuireadh na clárúcháin ar sos",
+      "threshold_percent": "({{percent}}% den tairseach)",
+      "threshold_prefix": "Tá tairseach cumraithe ag leibhéal an ardáin via",
+      "threshold_suffix": "Nuair a thuislítear é, casann an bhratach seo dearg agus feictear cnaipe atosú aon-cliceáil anseo.",
+      "title": "Slándáil Chláraithe"
     }
   },
   "timebanking": {
@@ -13750,6 +13778,293 @@
       "longitude_number": "Caithfidh gur uimhir é an Domhanfhad.",
       "name_required": "Tá ainm ag teastáil.",
       "type_required": "Cineál ag teastáil."
+    }
+  },
+  "federation_peers_admin": {
+    "about": {
+      "active_body": "Ceangailte agus sioncronaithe.",
+      "body": "Is comharchumainn NEXUS eile iad Peers na Cónaidhme a bhfuil sé aontaithe ag do phobal baill agus uaireanta a roinnt leo. Nuair a bhíonn nasc piaraí bunaithe, is féidir le baill uaireanta a aistriú idir pobail agus féachaint ar liostaí cónasctha. Éilíonn gach nasc piaraí rún comhroinnte a chaithfidh an dá thaobh a chumrú - déan teagmháil le riarthóir an chomhoibrithe piaraí chun dintiúir a mhalartú.",
+      "pending_body": "Dintiúir socraithe, ag fanacht leis an gcéad ghlao API rathúil.",
+      "shared_secret_body": "Comhartha cripteagrafach a úsáidtear chun glaonna piara le piaraí API a fhíordheimhniú. Caithfidh sé a mheaitseáil go díreach ar an dá thaobh. Rothlaigh é go tréimhsiúil (gach 6-12 mhí) agus rothlaigh láithreach i gcónaí má tá amhras ort go bhfuil sé curtha i gcontúirt.",
+      "shared_secret_label": "Rún comhroinnte:",
+      "suspended_body": "Theip ar an sioncronú deireanach nó cuireadh ar fionraí de láimh - seiceáil go bhfuil bonn an chomhghleacaí URL ceart agus insroichte.",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "add_peer": "Cuir Piaraí leis",
+      "cancel": "Cealaigh",
+      "copied_secret": "Tá an rún cóipeáilte agam",
+      "copy_peer_slug": "Cóipeáil Drúchtín Piaraí",
+      "copy_secret": "Cóip Rún",
+      "create_reveal_secret": "Cruthaigh & Nocht Rún",
+      "delete_peer": "Scrios piaraí",
+      "refresh": "Athnuaigh",
+      "refresh_aria": "Athnuaigh piaraí cónaidhm",
+      "rotate_secret": "Rothlaigh rún roinnte"
+    },
+    "confirm_delete": "An bhfuil fonn ort an piara cónaidhme \"{{name}}\" a scriosadh? Tá sé seo buan.",
+    "confirm_rotate": "Rothlaigh an rún roinnte le haghaidh \"{{name}}\"? Stopann an sean-rún ag obair láithreach agus ní mór duit an taobh iargúlta a nuashonrú.",
+    "create_modal": {
+      "base_url": "Bonn URL",
+      "base_url_description": "HTTPS URL den chianda NEXUS API. Cuirtear an cosán /v2/cónaidhm/aistriú uair an chloig/isteach i gceangal leis go huathoibríoch.",
+      "base_url_placeholder": "https://api.kiss-bern.ch",
+      "display_name": "Ainm Taispeána",
+      "display_name_placeholder": "Comharchumann KISS Bern",
+      "notes": "Nótaí",
+      "notes_placeholder": "Nótaí inmheánacha - teagmháil comhpháirtíochta, tagairt comhaontaithe...",
+      "peer_slug": "Drúchtín Piaraí",
+      "peer_slug_description": "Cás íochtair alfa-uimhriúla + Ceachtanna. Úsáidtear é mar seilide comhoibríoch ceann scríbe le haghaidh aistrithe amach.",
+      "peer_slug_placeholder": "póg-beirn",
+      "status_hint_middle": "Tar éis don taobh iargúlta an rún comhroinnte céanna a chlárú, socraigh an dá thaobh",
+      "status_hint_prefix": "Tosaíonn stádas mar",
+      "title": "Cuir Piaraí Cónaidhme leis"
+    },
+    "empty": {
+      "never": "Riamh"
+    },
+    "meta": {
+      "page_title": "Piaraí Cónaidhm - Riarachán",
+      "subtitle": "Comhpháirtíochtaí tras-ardáin le haghaidh aistrithe uaire comhoibríocha go comharchumann",
+      "title": "Piaraí Cónaidhme"
+    },
+    "peers": {
+      "empty": "Níl aon phiaraí cónaidhm fós - cuir ceann leis chun tús a chur leis.",
+      "table_aria": "Piaraí Cónaidhm",
+      "title": "Piaraí Cláraithe"
+    },
+    "secret_modal": {
+      "base_url_label": "Bonn URL:",
+      "body_prefix": "Taispeántar an rún seo",
+      "body_suffix": "Cóipeáil anois é agus greamaigh isteach in iontráil phiara cónaidhm an tsuiteála cianda NEXUS don chomharchumann seo. Má chailleann tú é, ní mór duit an rún a rothlú anseo agus an taobh cianda a nuashonrú arís.",
+      "only_once": "ach uair amháin",
+      "peer_slug_label": "seilide piaraí:",
+      "title": "Rún Roinnte Aonuaire"
+    },
+    "status": {
+      "active": "Gníomhach",
+      "pending": "Ar feitheamh",
+      "suspended": "Ar fionraí"
+    },
+    "table": {
+      "actions": "Gníomhartha",
+      "base_url": "Bonn URL",
+      "last_handshake": "Croitheadh ​​láimhe deiridh",
+      "name": "Ainm",
+      "slug": "Drúchtín",
+      "status": "Stádas"
+    },
+    "toasts": {
+      "copied": "Cóipeáladh chuig an ngearrthaisce.",
+      "copy_failed": "Theip ar chóipeáil.",
+      "create_failed": "Theip ar chruthú piara.",
+      "created": "Cruthaíodh piaraí Cónaidhm.",
+      "delete_failed": "Theip ar an gcomhghleacaí a scriosadh.",
+      "deleted": "Scriosadh piaraí.",
+      "load_failed": "Theip ar lódáil piaraí an chónaidhm.",
+      "rotate_failed": "Theip ar an rún a rothlú.",
+      "secret_rotated": "Rún comhroinnte rothlaithe.",
+      "status_failed": "Theip ar stádas an chomhghleacaí a nuashonrú.",
+      "status_updated": "Stádas piaraí socraithe go {{status}}."
+    },
+    "validation": {
+      "required_fields": "Ní mór na réimsí riachtanacha go léir a líonadh."
+    }
+  },
+  "help_request_sla": {
+    "about": {
+      "body": "Socraíonn Comhaontuithe Leibhéal Seirbhíse (SLAs) na hamanna freagartha agus réitigh uasta a bhfuiltear ag súil leo d’iarratais ar chabhair. Nuair a thagann iarratas i dtreo nó nuair a sháraíonn sé a SLA, cuirtear in iúl go bhfuil sé thar téarma sa daais seo. Cuidíonn SLAs leat cáilíocht chomhsheasmhach seirbhíse a choinneáil agus méadracht phíolótach cruinn a chruthú.",
+      "first_response_label": "An chéad fhreagra",
+      "first_response_prefix": "an t-am ó iarratas a chur isteach go dtí an chéad teagmháil le comhordaitheoir (aistrítear an stádas ó",
+      "first_response_suffix": ")",
+      "note": "Tá fuinneoga SLA socraithe sa AG81 Beartas Oibriúcháin. Cuir in eagar iad ag baint úsáide as an gcnaipe \"Cuir polasaí in eagar\" thuas. Socraigh SLAs do chatagóirí cúraim phráinnigh (m.sh. iompar leighis) agus cinn níos scaoilte do ghníomhaíochtaí sóisialta.",
+      "resolution_label": "Rún",
+      "resolution_prefix": "an t-am ón gcéad fhreagra go dtí an t-iarratas a mheaitseáil agus a dhearbhú (sroicheann an stádas",
+      "resolution_suffix": ")",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "edit_policy": "Cuir polasaí in eagar",
+      "refresh": "Athnuaigh",
+      "refresh_aria": "Athnuaigh an painéal SLA"
+    },
+    "answers": {
+      "no": "Níl",
+      "yes": "Tá"
+    },
+    "buckets": {
+      "at_risk": "I mbaol",
+      "breached": "Sáraíodh",
+      "on_track": "Ar an mbóthar"
+    },
+    "dimensions": {
+      "first_response": "An chéad fhreagra",
+      "resolution": "Rún"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "footer": {
+      "generated": "Gineadh an tuairisc {{date}}.",
+      "proxy_end": "fuinneoga i mbeartas oibriúcháin AG81.",
+      "proxy_middle": "taifeach = sroicheann stádas",
+      "proxy_prefix": "seachfhreastalaí: first-response = bogann an stádas as",
+      "proxy_suffix": "Coigeartaigh"
+    },
+    "meta": {
+      "page_title": "Iarratas Cabhrach SLA Painéal na nIonstraimí",
+      "subtitle_prefix": "AG96 - céad fhreagra agus réiteach",
+      "subtitle_suffix": "rianú i gcoinne AG81 polasaí oibriúcháin",
+      "title": "Iarratas Cabhrach SLA Painéal na nIonstraimí"
+    },
+    "metrics": {
+      "first_response_at_risk": "An chéad fhreagra i mbaol",
+      "first_response_breached": "Sáraíodh an chéad fhreagra",
+      "in_progress": "Ar siúl",
+      "pending": "Ar feitheamh",
+      "resolution_at_risk": "Rún i mbaol",
+      "resolution_breached": "Rún sáraithe",
+      "resolved_24h": "Réitithe <24h (le déanaí)"
+    },
+    "open": {
+      "all_count": "Gach ({{count}})",
+      "at_risk_count": "I mbaol ({{count}})",
+      "breached_count": "Sáraithe ({{count}})",
+      "bucket_filter_aria": "Scagaire buicéad",
+      "empty_bucket": "Níl aon iarratas cabhrach oscailte sa bhuicéad seo.",
+      "left": "{{duration}} fágtha",
+      "on_track_count": "Ar an mbóthar ({{count}})",
+      "over_by": "Thar le {{duration}}",
+      "request_meta": "Cathain: {{when}} - úsáideoir #{{userId}} - aois {{age}}",
+      "subtitle": "{{count}} oscailte - sórtáilte sáraithe ar dtús",
+      "table_aria": "Oscail iarratais cabhrach",
+      "target_hours": "Sprioc {{hours}}h",
+      "title": "Oscail iarratais cabhrach"
+    },
+    "policy": {
+      "first_response_description": "- an t-am idir an t-iarratas a chur isteach go dtí an chéad teagmháil le comhordaitheoir",
+      "platform_defaults": "Réamhshocrú ardáin - ní raibh ceardlann AG81 á reáchtáil",
+      "resolution_description": "- an t-am ón gcéad fhreagra go dtí an t-iarratas a mheaitseáil agus a dhearbhú",
+      "tenant_policy": "Polasaí tionóntaí curtha i bhfeidhm"
+    },
+    "resolved": {
+      "table_aria": "Réitíodh iarratais cabhrach le déanaí",
+      "title": "Réitithe le déanaí (72h)",
+      "user_id": "úsáideoir #{{userId}}"
+    },
+    "table": {
+      "bucket": "buicéad",
+      "created": "Cruthaithe",
+      "request": "Iarratas",
+      "resolved": "Réitíodh",
+      "status": "Stádas",
+      "turnaround": "slánúcháin",
+      "within": "Laistigh de"
+    },
+    "toasts": {
+      "load_failed": "Theip ar lódáil an deais SLA"
+    }
+  },
+  "research_partnerships": {
+    "about": {
+      "body": "Tugann comhpháirtíochtaí taighde rochtain rialaithe do thaighdeoirí acadúla nó do thaighdeoirí beartais ar shonraí ardán gan ainm chun críocha meastóireachta. Sainmhíníonn gach comhpháirtíocht raon feidhme sonraí ar leith, fad ama agus comhaontú comhroinnte sonraí. Tá gach rochtain logáilte. Ní fheiceann comhpháirtithe sonraí ball aonair - ní fheiceann siad ach tacair sonraí comhiomlánaithe nó anaithnide.",
+      "data_scope_body": "Sainmhínigh go díreach cad iad na sonraí is féidir leis an taighdeoir rochtain a fháil orthu, mar shampla uaireanta cúraim chomhiomlána míosúla de réir fo-réigiúin, gan na haitheantóirí pearsanta go léir a áireamh. Tá an raon feidhme ceangailteach de réir conartha agus déantar iniúchadh ráithiúil air.",
+      "data_scope_label": "Scóip sonraí:",
+      "download_history_body": "Déantar gach onnmhairiú sonraí a logáil le stampa ama agus sonraí an taighdeora. Tá an loga seo ar fáil do do Data Protection Officer ach é a iarraidh. Úsáid Cúlghairm chun tacar sonraí a eisíodh roimhe seo a tharraingt siar.",
+      "download_history_label": "Íosluchtaigh stair:",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "add_partner": "Cuir comhpháirtí leis",
+      "cancel": "Cealaigh",
+      "close": "Dún",
+      "create": "Cruthaigh",
+      "download_markdown": "Íoslódáil Markdown",
+      "generate": "Gin",
+      "generate_export": "Gin onnmhairiú",
+      "open": "Oscail",
+      "refresh": "Athnuaigh",
+      "refresh_aria": "Comhpháirtíochtaí taighde a athnuachan",
+      "render": "Rindreáil",
+      "rerender": "Athsholáthar",
+      "revoke": "chúlghairm",
+      "view": "Amharc"
+    },
+    "columns": {
+      "actions": "Gníomhartha",
+      "agreement": "Comhaontú",
+      "created": "Cruthaithe",
+      "hash": "Hais",
+      "methodology": "Modheolaíocht",
+      "partner": "Comhpháirtí",
+      "period": "Tréimhse",
+      "rows": "Sraitheanna",
+      "status": "Stádas"
+    },
+    "export_modal": {
+      "active_partner": "Comhpháirtí gníomhach taighde",
+      "privacy_note": "Tá onnmhairí comhiomlán amháin agus úsáideann siad tairseacha faoi chois. Níl aitheantóirí díreacha ball san áireamh.",
+      "title": "Gin Tacar Sonraí Comhiomlán"
+    },
+    "exports": {
+      "empty": "Níl aon easpórtáil tacar sonraí fós.",
+      "partner_fallback": "Comhpháirtí #{{id}}",
+      "table_aria": "Déan taighde ar easpórtálacha tacair sonraí",
+      "title": "Stair Easpórtála tacair Sonraí"
+    },
+    "fields": {
+      "agreement_reference": "Tagairt comhaontaithe",
+      "contact_email": "Ríomhphost teagmhála",
+      "dataset_scope": "Scóip tacair sonraí",
+      "dataset_scope_description": "Eochracha tacair sonraí camóg-scartha.",
+      "institution": "Institiúid",
+      "methodology_url": "Modheolaíocht URL",
+      "name": "Ainm",
+      "period_end": "Deireadh tréimhse",
+      "period_start": "Tús na tréimhse",
+      "status": "Stádas"
+    },
+    "meta": {
+      "subtitle": "Bainistigh comhpháirtithe taighde príobháideachta-sábháilte, onnmhairithe tacar sonraí comhiomlán, agus stair chúlghairme",
+      "title": "Comhpháirtíochtaí Taighde"
+    },
+    "partner_modal": {
+      "title": "Cuir Comhpháirtí Taighde leis"
+    },
+    "partners": {
+      "empty": "Níl aon chomhpháirtithe taighde fós.",
+      "table_aria": "Comhpháirtithe taighde",
+      "title": "Comhpháirtithe Taighde"
+    },
+    "statuses": {
+      "active": "Gníomhach",
+      "draft": "Dréacht",
+      "ended": "dar críoch",
+      "generated": "Gineadh",
+      "paused": "Sos",
+      "revoked": "Cúlghairthe",
+      "superseded": "curtha ina ionad"
+    },
+    "templates": {
+      "empty": "Níl teimpléid chomhaontaithe ar fáil.",
+      "fallback_title": "Teimpléad Comhaontaithe",
+      "missing_placeholder_count_one": "{{count}} ionadsealbhóir in easnamh",
+      "missing_placeholder_count_other": "{{count}} áitshealbhóirí in easnamh",
+      "placeholder_count_one": "{{count}} ionadsealbhóir",
+      "placeholder_count_other": "{{count}} áitshealbhóirí",
+      "placeholder_label": "{{placeholder}}",
+      "rendered_markdown": "Rindreáilte Markdown ({{count}} charachtair)",
+      "subtitle": "FADP/nDSG-dréachtaí ailínithe le haghaidh athbhreithniú dlíthiúil",
+      "title": "Teimpléid comhaontuithe"
+    },
+    "toasts": {
+      "create_partner_failed": "Theip ar chomhpháirtí taighde a chruthú",
+      "export_generated": "Easpórtáil tacar sonraí comhiomlán ginte",
+      "export_revoked": "Tá easpórtáil tacair sonraí cúlghairthe",
+      "generate_export_failed": "Theip ar easpórtáil na dtacar sonraí a ghiniúint",
+      "load_failed": "Theip ar chomhpháirtíochtaí taighde a lódáil",
+      "partner_created": "Comhpháirtí taighde cruthaithe",
+      "render_template_failed": "Theip ar an teimpléad a sholáthar",
+      "revoke_export_failed": "Theip ar easpórtáil na dtacar sonraí a chúlghairm"
     }
   }
 }

@@ -7566,7 +7566,19 @@
       "verification_settings": "Verification Settings",
       "verification_settings_desc": "Configure identity verification requirements for new member registrations",
       "waitlist_info": "Members on the waitlist are approved manually by an admin",
-      "your_community": "Your Community"
+      "your_community": "Your Community",
+      "active": "Aktiv",
+      "cancel": "Stornieren",
+      "copy_code": "Code kopieren",
+      "copy_invite_code": "Einladungscode kopieren",
+      "credentials_removed": "Anmeldeinformationen erfolgreich entfernt",
+      "deactivate_invite_code": "Einladungscode deaktivieren",
+      "expiry_desc": "Die Codes laufen an diesem Datum um Mitternacht ab. Leer lassen, damit kein Ablaufdatum besteht.",
+      "god_only": "Nur Gott",
+      "note_desc": "Interner Hinweis, der Ihnen hilft, sich daran zu erinnern, wozu dieser Ausweis dient",
+      "require_email_tooltip": "Nur Plattform-Superadministratoren dürfen diese Einstellung ändern",
+      "total_codes_count": "Gesamtcodes: {{count}}",
+      "webhook_desc": "Wird verwendet, um die Authentizität eingehender Webhook-Nutzlasten zu überprüfen"
     },
     "registration_policy_saved_successfully": "Registration policy saved successfully",
     "registration_policy_settings_title": "Registration Policy Settings",
@@ -7932,6 +7944,22 @@
       "tenant_branded_ready": "Tenant-branded ready",
       "tenant_channel_prefix": "Tenant channel prefix",
       "theme_color": "Theme color"
+    },
+    "registration_breaker": {
+      "description": "Automatische Pause, wenn diese Community innerhalb einer Stunde eine ungewöhnliche Flut an Anmeldungen erhält.",
+      "paused_body": "Der stündliche Anmeldeschwellenwert ({{threshold}} neue Konten) wurde überschritten. Die Registrierung wird in etwa {{minutes}} Minuten automatisch fortgesetzt, oder Sie können sie jetzt fortsetzen. Überprüfen Sie die Sentry /-Protokolle auf die Quell-IPs, bevor Sie sie löschen, wenn Sie einen Angriff vermuten.",
+      "paused_title": "Die Kontoerstellung ist derzeit pausiert.",
+      "refresh_status": "Status aktualisieren",
+      "resume_failed": "Die Registrierung konnte nicht fortgesetzt werden.",
+      "resume_now": "Nehmen Sie die Anmeldung jetzt wieder auf",
+      "resume_success": "Die Registrierung für diese Community wurde fortgesetzt.",
+      "signups_this_hour": "{{count}} von {{threshold}} Anmeldungen diese Stunde",
+      "status_active": "Anmeldungen aktiv",
+      "status_paused": "Anmeldungen pausiert",
+      "threshold_percent": "({{percent}} % des Schwellenwerts)",
+      "threshold_prefix": "Der Schwellenwert wird auf Plattformebene über konfiguriert",
+      "threshold_suffix": "Wenn es ausgelöst wird, wird dieses Banner rot und hier wird eine Schaltfläche zum Fortsetzen mit einem Klick angezeigt.",
+      "title": "Registrierungssicherheit"
     }
   },
   "timebanking": {
@@ -13750,6 +13778,293 @@
       "longitude_number": "Der Längengrad muss eine Zahl sein.",
       "name_required": "Name ist erforderlich.",
       "type_required": "Typ ist erforderlich."
+    }
+  },
+  "federation_peers_admin": {
+    "about": {
+      "active_body": "Verbunden und synchronisiert.",
+      "body": "Federation Peers sind andere NEXUS Genossenschaften, mit denen Ihre Community Mitglieder und Stunden teilt. Sobald eine Peer-Verbindung hergestellt ist, können Mitglieder Stunden zwischen Communities übertragen und Verbundeinträge anzeigen. Für jede Peer-Verbindung ist ein gemeinsames Geheimnis erforderlich, das beide Seiten konfigurieren müssen. Wenden Sie sich an den Administrator der Peer-Kooperative, um Anmeldeinformationen auszutauschen.",
+      "pending_body": "Anmeldeinformationen festgelegt, warten auf den ersten erfolgreichen API-Aufruf.",
+      "shared_secret_body": "Ein kryptografisches Token, das zur Authentifizierung von Peer-to-Peer-API-Aufrufen verwendet wird. Es muss auf beiden Seiten genau übereinstimmen. Wechseln Sie es regelmäßig (alle 6–12 Monate) und wechseln Sie immer sofort, wenn Sie den Verdacht haben, dass es beeinträchtigt wurde.",
+      "shared_secret_label": "Geteiltes Geheimnis:",
+      "suspended_body": "Die letzte Synchronisierung ist fehlgeschlagen oder wurde manuell angehalten. Überprüfen Sie, ob die Basis URL des Peers korrekt und erreichbar ist.",
+      "title": "Über diese Seite"
+    },
+    "actions": {
+      "add_peer": "Peer hinzufügen",
+      "cancel": "Stornieren",
+      "copied_secret": "Ich habe das Geheimnis kopiert",
+      "copy_peer_slug": "Peer Slug kopieren",
+      "copy_secret": "Geheimnis kopieren",
+      "create_reveal_secret": "Geheimnis erschaffen und enthüllen",
+      "delete_peer": "Peer löschen",
+      "refresh": "Aktualisieren",
+      "refresh_aria": "Verbund-Peers aktualisieren",
+      "rotate_secret": "Gemeinsames Geheimnis rotieren"
+    },
+    "confirm_delete": "Verbund-Peer „{{name}}“ löschen? Dies ist dauerhaft.",
+    "confirm_rotate": "Gemeinsames Geheimnis für „{{name}}“ rotieren? Das alte Geheimnis funktioniert sofort nicht mehr und Sie müssen die Remote-Seite aktualisieren.",
+    "create_modal": {
+      "base_url": "Basis URL",
+      "base_url_description": "HTTPS URL der Fernbedienung NEXUS API. Der Pfad /v2/federation/hour-transfer/inbound wird automatisch angehängt.",
+      "base_url_placeholder": "https://api.kiss-bern.ch",
+      "display_name": "Anzeigename",
+      "display_name_placeholder": "KISS Genossenschaft Bern",
+      "notes": "Notizen",
+      "notes_placeholder": "Interne Notizen – Partnerkontakt, Vertragsreferenz...",
+      "peer_slug": "Peer-Schnecke",
+      "peer_slug_description": "Kleinbuchstaben alphanumerisch + Bindestriche. Wird als kooperativer Ziel-Slug für ausgehende Übertragungen verwendet.",
+      "peer_slug_placeholder": "Kuss-Bern",
+      "status_hint_middle": "Nachdem die Gegenseite das gleiche gemeinsame Geheimnis registriert hat, stellen Sie beide Seiten auf ein",
+      "status_hint_prefix": "Status beginnt als",
+      "title": "Verbund-Peer hinzufügen"
+    },
+    "empty": {
+      "never": "Niemals"
+    },
+    "meta": {
+      "page_title": "Föderationskollegen – Admin",
+      "subtitle": "Plattformübergreifende Partnerschaften für Stundentransfers von Genossenschaft zu Genossenschaft",
+      "title": "Föderationskollegen"
+    },
+    "peers": {
+      "empty": "Noch keine Federation-Peers – fügen Sie zunächst einen hinzu.",
+      "table_aria": "Föderationskollegen",
+      "title": "Registrierte Peers"
+    },
+    "secret_modal": {
+      "base_url_label": "Basis URL:",
+      "body_prefix": "Dieses Geheimnis wird gelüftet",
+      "body_suffix": "Kopieren Sie es jetzt und fügen Sie es in den Federation-Peer-Eintrag der Remote-NEXUS-Installation für diese Genossenschaft ein. Wenn Sie es verlieren, müssen Sie das Geheimnis hier rotieren und die Remote-Seite erneut aktualisieren.",
+      "only_once": "nur einmal",
+      "peer_slug_label": "Peer-Schnecke:",
+      "title": "Einmaliges gemeinsames Geheimnis"
+    },
+    "status": {
+      "active": "Aktiv",
+      "pending": "Ausstehend",
+      "suspended": "Ausgesetzt"
+    },
+    "table": {
+      "actions": "Aktionen",
+      "base_url": "Basis URL",
+      "last_handshake": "Letzter Händedruck",
+      "name": "Name",
+      "slug": "Schnecke",
+      "status": "Status"
+    },
+    "toasts": {
+      "copied": "In die Zwischenablage kopiert.",
+      "copy_failed": "Kopieren fehlgeschlagen.",
+      "create_failed": "Peer konnte nicht erstellt werden.",
+      "created": "Verbund-Peer erstellt.",
+      "delete_failed": "Peer konnte nicht gelöscht werden.",
+      "deleted": "Peer gelöscht.",
+      "load_failed": "Verbund-Peers konnten nicht geladen werden.",
+      "rotate_failed": "Geheimnis konnte nicht rotiert werden.",
+      "secret_rotated": "Gemeinsames Geheimnis rotiert.",
+      "status_failed": "Der Peer-Status konnte nicht aktualisiert werden.",
+      "status_updated": "Peer-Status auf {{status}} gesetzt."
+    },
+    "validation": {
+      "required_fields": "Alle Pflichtfelder müssen ausgefüllt sein."
+    }
+  },
+  "help_request_sla": {
+    "about": {
+      "body": "Service Level Agreements (SLAs) legen die maximal erwarteten Antwort- und Lösungszeiten für Hilfeanfragen fest. Wenn sich eine Anfrage ihrem SLA nähert oder diesen überschreitet, wird sie in diesem Dashboard als überfällig gekennzeichnet. SLAs helfen Ihnen, eine gleichbleibende Servicequalität aufrechtzuerhalten und genaue Pilotkennzahlen zu generieren.",
+      "first_response_label": "Erste Antwort",
+      "first_response_prefix": "Zeit von der Einreichung der Anfrage bis zum ersten Kontakt mit dem Koordinator (Status wechselt aus).",
+      "first_response_suffix": ")",
+      "note": "SLA-Fenster werden in der AG81-Betriebsrichtlinie festgelegt. Bearbeiten Sie sie über die Schaltfläche „Richtlinie bearbeiten“ oben. Legen Sie strengere SLAs für Notfallversorgungskategorien (z. B. medizinischer Transport) und lockerere Werte für soziale Aktivitäten fest.",
+      "resolution_label": "Auflösung",
+      "resolution_prefix": "Zeit von der ersten Antwort bis zur Zuordnung und Bestätigung der Anfrage (Status erreicht).",
+      "resolution_suffix": ")",
+      "title": "Über diese Seite"
+    },
+    "actions": {
+      "edit_policy": "Richtlinie bearbeiten",
+      "refresh": "Aktualisieren",
+      "refresh_aria": "SLA-Dashboard aktualisieren"
+    },
+    "answers": {
+      "no": "NEIN",
+      "yes": "Ja"
+    },
+    "buckets": {
+      "at_risk": "Gefährdet",
+      "breached": "Durchbrochen",
+      "on_track": "Auf dem richtigen Weg"
+    },
+    "dimensions": {
+      "first_response": "Erste Antwort",
+      "resolution": "Auflösung"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "footer": {
+      "generated": "Bericht generiert {{date}}.",
+      "proxy_end": "Windows in der Betriebsrichtlinie AG81.",
+      "proxy_middle": "Auflösung = Status erreicht",
+      "proxy_prefix": "Proxy: First-Response = Status wechselt aus",
+      "proxy_suffix": "Anpassen"
+    },
+    "meta": {
+      "page_title": "Hilfeanforderung SLA Dashboard",
+      "subtitle_prefix": "AG96 – Erste Antwort und Lösung",
+      "subtitle_suffix": "Verfolgung anhand der Betriebsrichtlinie AG81",
+      "title": "Hilfeanforderung SLA Dashboard"
+    },
+    "metrics": {
+      "first_response_at_risk": "Erste Hilfe gefährdet",
+      "first_response_breached": "Die Erste-Hilfe-Maßnahme wurde verletzt",
+      "in_progress": "Im Gange",
+      "pending": "Ausstehend",
+      "resolution_at_risk": "Auflösung gefährdet",
+      "resolution_breached": "Auflösung verletzt",
+      "resolved_24h": "<24h behoben (kürzlich)"
+    },
+    "open": {
+      "all_count": "Alle ({{count}})",
+      "at_risk_count": "Gefährdet ({{count}})",
+      "breached_count": "Verstoß ({{count}})",
+      "bucket_filter_aria": "Eimerfilter",
+      "empty_bucket": "In diesem Bucket sind keine offenen Hilfeanfragen vorhanden.",
+      "left": "{{duration}} übrig",
+      "on_track_count": "Auf Kurs ({{count}})",
+      "over_by": "Vorbei um {{duration}}",
+      "request_meta": "Wann: {{when}} – Benutzer #{{userId}} – Alter {{age}}",
+      "subtitle": "{{count}} offen – zuerst nach Verstößen sortiert",
+      "table_aria": "Offene Hilfeanfragen",
+      "target_hours": "Ziel {{hours}}h",
+      "title": "Offene Hilfeanfragen"
+    },
+    "policy": {
+      "first_response_description": "- Zeit von der Einreichung bis zum ersten Kontakt mit dem Koordinator",
+      "platform_defaults": "Plattformstandards – kein AG81-Workshop-Lauf",
+      "resolution_description": "- Zeit von der ersten Antwort bis zur Zuordnung und Bestätigung der Anfrage",
+      "tenant_policy": "Mieterrichtlinie angewendet"
+    },
+    "resolved": {
+      "table_aria": "Kürzlich gelöste Hilfeanfragen",
+      "title": "Kürzlich gelöst (letzte 72 Stunden)",
+      "user_id": "Benutzer #{{userId}}"
+    },
+    "table": {
+      "bucket": "Eimer",
+      "created": "Erstellt",
+      "request": "Anfrage",
+      "resolved": "Gelöst",
+      "status": "Status",
+      "turnaround": "Umdrehen",
+      "within": "Innerhalb"
+    },
+    "toasts": {
+      "load_failed": "Das SLA-Dashboard konnte nicht geladen werden"
+    }
+  },
+  "research_partnerships": {
+    "about": {
+      "body": "Forschungspartnerschaften ermöglichen anerkannten akademischen oder politischen Forschern kontrollierten Zugriff auf anonymisierte Plattformdaten zu Evaluierungszwecken. Jede Partnerschaft definiert einen spezifischen Datenumfang, eine Dauer und eine Datenfreigabevereinbarung. Alle Zugriffe werden protokolliert. Partner sehen niemals einzelne Mitgliedsdaten, sondern nur aggregierte oder anonymisierte Datensätze.",
+      "data_scope_body": "Definieren Sie genau, auf welche Daten der Forscher zugreifen kann, z. B. die aggregierten monatlichen Pflegestunden nach Unterregion, ohne alle persönlichen Identifikatoren. Der Umfang ist vertraglich bindend und wird vierteljährlich geprüft.",
+      "data_scope_label": "Datenumfang:",
+      "download_history_body": "Jeder Datenexport wird mit einem Zeitstempel und den Angaben des Forschers protokolliert. Dieses Protokoll steht Ihrem Data Protection Officer auf Anfrage zur Verfügung. Verwenden Sie „Revoke“, um einen zuvor ausgegebenen Datensatz zurückzuziehen.",
+      "download_history_label": "Download-Verlauf:",
+      "title": "Über diese Seite"
+    },
+    "actions": {
+      "add_partner": "Partner hinzufügen",
+      "cancel": "Stornieren",
+      "close": "Schließen",
+      "create": "Erstellen",
+      "download_markdown": "Laden Sie Markdown herunter",
+      "generate": "Erzeugen",
+      "generate_export": "Export generieren",
+      "open": "Offen",
+      "refresh": "Aktualisieren",
+      "refresh_aria": "Forschungskooperationen auffrischen",
+      "render": "Machen",
+      "rerender": "Neu rendern",
+      "revoke": "Widerrufen",
+      "view": "Sicht"
+    },
+    "columns": {
+      "actions": "Aktionen",
+      "agreement": "Vereinbarung",
+      "created": "Erstellt",
+      "hash": "Hash",
+      "methodology": "Methodik",
+      "partner": "Partner",
+      "period": "Zeitraum",
+      "rows": "Reihen",
+      "status": "Status"
+    },
+    "export_modal": {
+      "active_partner": "Aktiver Forschungspartner",
+      "privacy_note": "Exporte sind nur aggregiert und verwenden Unterdrückungsschwellenwerte. Direkte Mitgliedskennungen sind nicht enthalten.",
+      "title": "Generieren Sie einen aggregierten Datensatz"
+    },
+    "exports": {
+      "empty": "Noch keine Datensatzexporte.",
+      "partner_fallback": "Partner #{{id}}",
+      "table_aria": "Exporte von Forschungsdatensätzen",
+      "title": "Datensatz-Exportverlauf"
+    },
+    "fields": {
+      "agreement_reference": "Vertragsreferenz",
+      "contact_email": "Kontakt-E-Mail",
+      "dataset_scope": "Datensatzumfang",
+      "dataset_scope_description": "Durch Kommas getrennte Datensatzschlüssel.",
+      "institution": "Institution",
+      "methodology_url": "Methodik URL",
+      "name": "Name",
+      "period_end": "Periodenende",
+      "period_start": "Beginn der Periode",
+      "status": "Status"
+    },
+    "meta": {
+      "subtitle": "Verwalten Sie datenschutzsichere Forschungspartner, aggregierte Datensatzexporte und den Widerrufsverlauf",
+      "title": "Forschungspartnerschaften"
+    },
+    "partner_modal": {
+      "title": "Forschungspartner hinzufügen"
+    },
+    "partners": {
+      "empty": "Noch keine Forschungspartner.",
+      "table_aria": "Forschungspartner",
+      "title": "Forschungspartner"
+    },
+    "statuses": {
+      "active": "Aktiv",
+      "draft": "Entwurf",
+      "ended": "Beendet",
+      "generated": "Generiert",
+      "paused": "Angehalten",
+      "revoked": "Widerrufen",
+      "superseded": "Abgelöst"
+    },
+    "templates": {
+      "empty": "Keine Vertragsvorlagen verfügbar.",
+      "fallback_title": "Vereinbarungsvorlage",
+      "missing_placeholder_count_one": "Platzhalter {{count}} fehlt",
+      "missing_placeholder_count_other": "{{count}} Platzhalter fehlen",
+      "placeholder_count_one": "{{count}}-Platzhalter",
+      "placeholder_count_other": "{{count}} Platzhalter",
+      "placeholder_label": "{{placeholder}}",
+      "rendered_markdown": "Gerendert Markdown ({{count}} Zeichen)",
+      "subtitle": "FADP/nDSG-abgeglichene Entwürfe zur rechtlichen Prüfung",
+      "title": "Vereinbarungsvorlagen"
+    },
+    "toasts": {
+      "create_partner_failed": "Forschungspartner konnte nicht erstellt werden",
+      "export_generated": "Aggregierter Datensatzexport generiert",
+      "export_revoked": "Datensatzexport widerrufen",
+      "generate_export_failed": "Datensatzexport konnte nicht generiert werden",
+      "load_failed": "Forschungspartnerschaften konnten nicht geladen werden",
+      "partner_created": "Forschungspartner erstellt",
+      "render_template_failed": "Vorlage konnte nicht gerendert werden",
+      "revoke_export_failed": "Der Export des Datensatzes konnte nicht widerrufen werden"
     }
   }
 }

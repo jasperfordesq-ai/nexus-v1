@@ -7566,7 +7566,19 @@
       "verification_settings": "Verification Settings",
       "verification_settings_desc": "Configure identity verification requirements for new member registrations",
       "waitlist_info": "Members on the waitlist are approved manually by an admin",
-      "your_community": "Your Community"
+      "your_community": "Your Community",
+      "active": "نشيط",
+      "cancel": "يلغي",
+      "copy_code": "نسخ الرمز",
+      "copy_invite_code": "انسخ رمز الدعوة",
+      "credentials_removed": "تمت إزالة بيانات الاعتماد بنجاح",
+      "deactivate_invite_code": "قم بإلغاء تنشيط رمز الدعوة",
+      "expiry_desc": "تنتهي صلاحية الرموز عند منتصف ليل هذا التاريخ. اتركها فارغة لعدم انتهاء الصلاحية.",
+      "god_only": "الله فقط",
+      "note_desc": "ملاحظة داخلية لمساعدتك على تذكر الغرض من بيانات الاعتماد هذه",
+      "require_email_tooltip": "يمكن فقط للمسؤولين المتميزين في النظام الأساسي تغيير هذا الإعداد",
+      "total_codes_count": "إجمالي الرموز: {{count}}",
+      "webhook_desc": "يُستخدم للتحقق من صحة حمولات webhook الواردة"
     },
     "registration_policy_saved_successfully": "Registration policy saved successfully",
     "registration_policy_settings_title": "Registration Policy Settings",
@@ -7932,6 +7944,22 @@
       "tenant_branded_ready": "Tenant-branded ready",
       "tenant_channel_prefix": "Tenant channel prefix",
       "theme_color": "Theme color"
+    },
+    "registration_breaker": {
+      "description": "يتم الإيقاف المؤقت تلقائيًا عندما يحصل هذا المجتمع على سيل غير عادي من الاشتراكات خلال ساعة واحدة.",
+      "paused_body": "تم تجاوز حد التسجيل بالساعة ({{threshold}} حسابات جديدة). سيتم استئناف التسجيل تلقائيًا خلال {{minutes}} دقيقة تقريبًا، أو يمكنك استئنافه الآن. تحقق من سجلات Sentry لعناوين IP المصدر قبل مسح ما إذا كنت تشك في حدوث هجوم.",
+      "paused_title": "إنشاء الحساب متوقف مؤقتًا حاليًا.",
+      "refresh_status": "تحديث الحالة",
+      "resume_failed": "فشل في استئناف التسجيل.",
+      "resume_now": "استئناف الاشتراكات الآن",
+      "resume_success": "تم استئناف التسجيل لهذا المجتمع.",
+      "signups_this_hour": "{{count}} من إجمالي عدد الاشتراكات {{threshold}} هذه الساعة",
+      "status_active": "الاشتراكات نشطة",
+      "status_paused": "تم إيقاف الاشتراكات مؤقتًا",
+      "threshold_percent": "({{percent}}% من العتبة)",
+      "threshold_prefix": "يتم تكوين العتبة على مستوى النظام الأساسي عبر",
+      "threshold_suffix": "عند التعثر، يتحول لون هذا الشعار إلى اللون الأحمر ويظهر هنا زر استئناف بنقرة واحدة.",
+      "title": "أمن التسجيل"
     }
   },
   "timebanking": {
@@ -13750,6 +13778,293 @@
       "longitude_number": "يجب أن يكون خط الطول رقمًا.",
       "name_required": "الاسم مطلوب.",
       "type_required": "النوع مطلوب."
+    }
+  },
+  "federation_peers_admin": {
+    "about": {
+      "active_body": "متصل ومزامنة.",
+      "body": "أقران الاتحاد هم تعاونيات NEXUS أخرى وافق مجتمعك على مشاركة الأعضاء وساعات العمل معها. بمجرد إنشاء اتصال نظير، يمكن للأعضاء نقل الساعات بين المجتمعات وعرض القوائم الموحدة. يتطلب كل اتصال نظير سرًا مشتركًا يجب على كلا الجانبين تكوينه - اتصل بمسؤول التعاونية النظيرة لتبادل بيانات الاعتماد.",
+      "pending_body": "تم تعيين بيانات الاعتماد، في انتظار أول مكالمة ناجحة API.",
+      "shared_secret_body": "رمز تشفير يستخدم لمصادقة مكالمات نظير إلى نظير API. يجب أن تتطابق تماما على كلا الجانبين. قم بتدويره بشكل دوري (كل 6 إلى 12 شهرًا) وقم دائمًا بتدويره على الفور إذا كنت تشك في تعرضه للاختراق.",
+      "shared_secret_label": "سر مشترك:",
+      "suspended_body": "فشلت آخر مزامنة أو تم تعليقها يدويًا - تأكد من صحة قاعدة النظير URL وإمكانية الوصول إليها.",
+      "title": "حول هذه الصفحة"
+    },
+    "actions": {
+      "add_peer": "إضافة النظير",
+      "cancel": "يلغي",
+      "copied_secret": "لقد نسخت السر",
+      "copy_peer_slug": "نسخ سبيكة النظير",
+      "copy_secret": "نسخ السرية",
+      "create_reveal_secret": "إنشاء وكشف السر",
+      "delete_peer": "حذف النظير",
+      "refresh": "ينعش",
+      "refresh_aria": "تحديث أقرانهم الاتحاد",
+      "rotate_secret": "تدوير السر المشترك"
+    },
+    "confirm_delete": "هل تريد حذف نظير الاتحاد \"{{name}}\"؟ هذا دائم.",
+    "confirm_rotate": "هل تريد تدوير السر المشترك لـ \"{{name}}\"؟ السر القديم يتوقف عن العمل فورًا ويجب عليك تحديث الجانب البعيد.",
+    "create_modal": {
+      "base_url": "القاعدة URL",
+      "base_url_description": "HTTPS URL لجهاز التحكم عن بعد NEXUS API. يتم إلحاق المسار /v2/federation/hour-transfer/inbound تلقائيًا.",
+      "base_url_placeholder": "https://api.kiss-bern.ch",
+      "display_name": "اسم العرض",
+      "display_name_placeholder": "تعاونية كيس بيرن",
+      "notes": "ملحوظات",
+      "notes_placeholder": "ملاحظات داخلية - جهة اتصال الشريك، مرجع الاتفاقية...",
+      "peer_slug": "سبيكة الأقران",
+      "peer_slug_description": "حروف أبجدية رقمية صغيرة + واصلات. تستخدم كوجهة تعاونية للتحويلات الخارجية.",
+      "peer_slug_placeholder": "قبلة برن",
+      "status_hint_middle": "بعد أن يقوم الجانب البعيد بتسجيل نفس السر المشترك، قم بتعيين كلا الجانبين على",
+      "status_hint_prefix": "الحالة تبدأ ك",
+      "title": "إضافة نظير الاتحاد"
+    },
+    "empty": {
+      "never": "أبداً"
+    },
+    "meta": {
+      "page_title": "أقران الاتحاد - المشرف",
+      "subtitle": "شراكات عبر الأنظمة الأساسية لعمليات نقل الساعات التعاونية إلى التعاونية",
+      "title": "أقران الاتحاد"
+    },
+    "peers": {
+      "empty": "لا يوجد أي نظير اتحادي حتى الآن - قم بإضافة واحد للبدء.",
+      "table_aria": "أقران الاتحاد",
+      "title": "أقرانهم المسجلين"
+    },
+    "secret_modal": {
+      "base_url_label": "القاعدة URL:",
+      "body_prefix": "يظهر هذا السر",
+      "body_suffix": "انسخه الآن والصقه في إدخال نظير اتحاد تثبيت NEXUS البعيد لهذه التعاونية. إذا فقدته، يجب عليك تدوير السر هنا وتحديث الجانب البعيد مرة أخرى.",
+      "only_once": "مرة واحدة فقط",
+      "peer_slug_label": "سبيكة الأقران:",
+      "title": "سر مشترك لمرة واحدة"
+    },
+    "status": {
+      "active": "نشيط",
+      "pending": "قيد الانتظار",
+      "suspended": "معلق"
+    },
+    "table": {
+      "actions": "الإجراءات",
+      "base_url": "القاعدة URL",
+      "last_handshake": "المصافحة الأخيرة",
+      "name": "اسم",
+      "slug": "سبيكة",
+      "status": "حالة"
+    },
+    "toasts": {
+      "copied": "تم النسخ إلى الحافظة.",
+      "copy_failed": "فشل النسخ.",
+      "create_failed": "فشل في إنشاء النظير.",
+      "created": "تم إنشاء نظير الاتحاد.",
+      "delete_failed": "فشل حذف النظير.",
+      "deleted": "تم حذف النظير.",
+      "load_failed": "فشل تحميل أقران الاتحاد.",
+      "rotate_failed": "فشل تدوير السر.",
+      "secret_rotated": "تم تدوير السر المشترك.",
+      "status_failed": "فشل تحديث حالة النظير.",
+      "status_updated": "تم ضبط حالة النظير على {{status}}."
+    },
+    "validation": {
+      "required_fields": "يجب ملء جميع الحقول المطلوبة."
+    }
+  },
+  "help_request_sla": {
+    "about": {
+      "body": "تقوم اتفاقيات مستوى الخدمة (SLAs) بتعيين الحد الأقصى المتوقع للاستجابة وأوقات الحل لطلبات المساعدة. عندما يقترب الطلب من SLA أو يتجاوزه، يتم وضع علامة عليه على أنه متأخر في لوحة المعلومات هذه. تساعدك SLA في الحفاظ على جودة الخدمة المتسقة وإنشاء مقاييس تجريبية دقيقة.",
+      "first_response_label": "الرد الأول",
+      "first_response_prefix": "الوقت من تقديم الطلب إلى أول اتصال للمنسق (تنتقل الحالة خارج",
+      "first_response_suffix": ")",
+      "note": "تم تعيين النوافذ SLA في سياسة التشغيل AG81. قم بتحريرها باستخدام زر \"تحرير السياسة\" أعلاه. قم بتعيين SLA أكثر صرامة لفئات الرعاية العاجلة (مثل النقل الطبي) وفئات أكثر مرونة للأنشطة الاجتماعية.",
+      "resolution_label": "دقة",
+      "resolution_prefix": "الوقت منذ الاستجابة الأولى للطلب الذي تتم مطابقته وتأكيده (تصل الحالة",
+      "resolution_suffix": ")",
+      "title": "حول هذه الصفحة"
+    },
+    "actions": {
+      "edit_policy": "تحرير السياسة",
+      "refresh": "ينعش",
+      "refresh_aria": "قم بتحديث لوحة التحكم SLA"
+    },
+    "answers": {
+      "no": "لا",
+      "yes": "نعم"
+    },
+    "buckets": {
+      "at_risk": "في خطر",
+      "breached": "خرق",
+      "on_track": "على المسار الصحيح"
+    },
+    "dimensions": {
+      "first_response": "الرد الأول",
+      "resolution": "دقة"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "footer": {
+      "generated": "تم إنشاء التقرير {{date}}.",
+      "proxy_end": "النوافذ في سياسة التشغيل AG81.",
+      "proxy_middle": "القرار = الوصول إلى الحالة",
+      "proxy_prefix": "الوكيل: الاستجابة الأولى = خروج الحالة من",
+      "proxy_suffix": "يُعدِّل"
+    },
+    "meta": {
+      "page_title": "طلب مساعدة SLA لوحة التحكم",
+      "subtitle_prefix": "AG96 - الاستجابة الأولى والحل",
+      "subtitle_suffix": "تتبع سياسة التشغيل AG81",
+      "title": "طلب مساعدة SLA لوحة التحكم"
+    },
+    "metrics": {
+      "first_response_at_risk": "الاستجابة الأولى في خطر",
+      "first_response_breached": "تم انتهاك الرد الأول",
+      "in_progress": "في تَقَدم",
+      "pending": "قيد الانتظار",
+      "resolution_at_risk": "القرار في خطر",
+      "resolution_breached": "خرق القرار",
+      "resolved_24h": "تم الحل <24 ساعة (الأخيرة)"
+    },
+    "open": {
+      "all_count": "الكل ({{count}})",
+      "at_risk_count": "معرض للخطر ({{count}})",
+      "breached_count": "تم الاختراق ({{count}})",
+      "bucket_filter_aria": "مرشح دلو",
+      "empty_bucket": "لا توجد طلبات مساعدة مفتوحة في هذه المجموعة.",
+      "left": "{{duration}} اليسار",
+      "on_track_count": "على المسار الصحيح ({{count}})",
+      "over_by": "انتهى {{duration}}",
+      "request_meta": "متى: {{when}} - المستخدم رقم {{userId}} - العمر {{age}}",
+      "subtitle": "{{count}} مفتوح - تم فرزه وتم اختراقه أولاً",
+      "table_aria": "فتح طلبات المساعدة",
+      "target_hours": "الهدف {{hours}}ح",
+      "title": "فتح طلبات المساعدة"
+    },
+    "policy": {
+      "first_response_description": "- الوقت من تاريخ التقديم إلى أول اتصال بالمنسق",
+      "platform_defaults": "الإعدادات الافتراضية للنظام الأساسي - لا يتم تشغيل ورشة عمل AG81",
+      "resolution_description": "- الوقت من الاستجابة الأولى للطلب الذي تتم مطابقته وتأكيده",
+      "tenant_policy": "تم تطبيق سياسة المستأجر"
+    },
+    "resolved": {
+      "table_aria": "طلبات المساعدة التي تم حلها مؤخرًا",
+      "title": "تم حلها مؤخرًا (آخر 72 ساعة)",
+      "user_id": "المستخدم #{{userId}}"
+    },
+    "table": {
+      "bucket": "دلو",
+      "created": "مخلوق",
+      "request": "طلب",
+      "resolved": "تم الحل",
+      "status": "حالة",
+      "turnaround": "التف حوله",
+      "within": "داخل"
+    },
+    "toasts": {
+      "load_failed": "فشل تحميل لوحة التحكم SLA"
+    }
+  },
+  "research_partnerships": {
+    "about": {
+      "body": "تمنح الشراكات البحثية الباحثين الأكاديميين أو الباحثين السياسيين المعتمدين إمكانية الوصول المتحكم إلى بيانات النظام الأساسي مجهولة المصدر لأغراض التقييم. تحدد كل شراكة نطاقًا محددًا للبيانات، ومدتها، واتفاقية مشاركة البيانات. يتم تسجيل كل الوصول. لا يرى الشركاء أبدًا بيانات الأعضاء الفردية - فقط مجموعات البيانات المجمعة أو مجهولة المصدر.",
+      "data_scope_body": "حدد بالضبط البيانات التي يمكن للباحث الوصول إليها، على سبيل المثال إجمالي ساعات الرعاية الشهرية حسب المنطقة الفرعية، باستثناء جميع المعرفات الشخصية. النطاق ملزم تعاقديًا ويتم تدقيقه كل ثلاثة أشهر.",
+      "data_scope_label": "نطاق البيانات:",
+      "download_history_body": "يتم تسجيل كل عملية تصدير بيانات بطابع زمني وتفاصيل الباحث. هذا السجل متاح لجهاز Data Protection Officer الخاص بك عند الطلب. استخدم إبطال لسحب مجموعة بيانات تم إصدارها مسبقًا.",
+      "download_history_label": "تاريخ التنزيل:",
+      "title": "حول هذه الصفحة"
+    },
+    "actions": {
+      "add_partner": "إضافة شريك",
+      "cancel": "يلغي",
+      "close": "يغلق",
+      "create": "يخلق",
+      "download_markdown": "تحميل Markdown",
+      "generate": "يولد",
+      "generate_export": "توليد التصدير",
+      "open": "يفتح",
+      "refresh": "ينعش",
+      "refresh_aria": "تحديث الشراكات البحثية",
+      "render": "يجعل",
+      "rerender": "إعادة العرض",
+      "revoke": "إبطال",
+      "view": "منظر"
+    },
+    "columns": {
+      "actions": "الإجراءات",
+      "agreement": "اتفاق",
+      "created": "مخلوق",
+      "hash": "التجزئة",
+      "methodology": "المنهجية",
+      "partner": "شريك",
+      "period": "فترة",
+      "rows": "الصفوف",
+      "status": "حالة"
+    },
+    "export_modal": {
+      "active_partner": "شريك بحث نشط",
+      "privacy_note": "الصادرات مجمعة فقط وتستخدم عتبات القمع. لا يتم تضمين معرفات الأعضاء المباشرة.",
+      "title": "إنشاء مجموعة بيانات مجمعة"
+    },
+    "exports": {
+      "empty": "لم يتم تصدير أي مجموعة بيانات حتى الآن.",
+      "partner_fallback": "الشريك رقم{{id}}",
+      "table_aria": "صادرات مجموعة البيانات البحثية",
+      "title": "تاريخ تصدير مجموعة البيانات"
+    },
+    "fields": {
+      "agreement_reference": "مرجع الاتفاقية",
+      "contact_email": "البريد الإلكتروني للاتصال",
+      "dataset_scope": "نطاق مجموعة البيانات",
+      "dataset_scope_description": "مفاتيح مجموعة البيانات مفصولة بفواصل.",
+      "institution": "مؤسسة",
+      "methodology_url": "المنهجية URL",
+      "name": "اسم",
+      "period_end": "نهاية الفترة",
+      "period_start": "بداية الدورة الشهرية",
+      "status": "حالة"
+    },
+    "meta": {
+      "subtitle": "إدارة شركاء البحث الآمنين للخصوصية، وصادرات مجموعة البيانات المجمعة، وسجل الإلغاء",
+      "title": "الشراكات البحثية"
+    },
+    "partner_modal": {
+      "title": "إضافة شريك بحثي"
+    },
+    "partners": {
+      "empty": "لا يوجد شركاء بحث حتى الآن.",
+      "table_aria": "شركاء البحث",
+      "title": "شركاء البحث"
+    },
+    "statuses": {
+      "active": "نشيط",
+      "draft": "مسودة",
+      "ended": "انتهى",
+      "generated": "تم إنشاؤها",
+      "paused": "متوقف مؤقتًا",
+      "revoked": "تم إبطاله",
+      "superseded": "تم استبداله"
+    },
+    "templates": {
+      "empty": "لا توجد قوالب اتفاق متاحة.",
+      "fallback_title": "نموذج الاتفاقية",
+      "missing_placeholder_count_one": "العنصر النائب {{count}} مفقود",
+      "missing_placeholder_count_other": "العناصر النائبة {{count}} مفقودة",
+      "placeholder_count_one": "{{count}} العنصر النائب",
+      "placeholder_count_other": "{{count}} العناصر النائبة",
+      "placeholder_label": "{{placeholder}}",
+      "rendered_markdown": "تم تقديم Markdown ({{count}} من الأحرف)",
+      "subtitle": "FADP/nDSG-مسودات محاذاة للمراجعة القانونية",
+      "title": "نماذج الاتفاقية"
+    },
+    "toasts": {
+      "create_partner_failed": "فشل إنشاء شريك البحث",
+      "export_generated": "تم إنشاء تصدير مجموعة البيانات المجمعة",
+      "export_revoked": "تم إبطال تصدير مجموعة البيانات",
+      "generate_export_failed": "فشل في إنشاء تصدير مجموعة البيانات",
+      "load_failed": "فشل تحميل الشراكات البحثية",
+      "partner_created": "تم إنشاء شريك البحث",
+      "render_template_failed": "فشل في تقديم القالب",
+      "revoke_export_failed": "فشل في إبطال تصدير مجموعة البيانات"
     }
   }
 }

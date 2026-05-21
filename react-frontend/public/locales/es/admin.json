@@ -7566,7 +7566,19 @@
       "verification_settings": "Verification Settings",
       "verification_settings_desc": "Configure identity verification requirements for new member registrations",
       "waitlist_info": "Members on the waitlist are approved manually by an admin",
-      "your_community": "Your Community"
+      "your_community": "Your Community",
+      "active": "Activo",
+      "cancel": "Cancelar",
+      "copy_code": "Copiar código",
+      "copy_invite_code": "Copiar código de invitación",
+      "credentials_removed": "Credenciales eliminadas exitosamente",
+      "deactivate_invite_code": "Desactivar código de invitación",
+      "expiry_desc": "Los códigos caducan a la medianoche de esta fecha. Déjelo vacío para que no caduque.",
+      "god_only": "solo dios",
+      "note_desc": "Nota interna para ayudarte a recordar para qué sirve esta credencial",
+      "require_email_tooltip": "Solo los superadministradores de la plataforma pueden cambiar esta configuración",
+      "total_codes_count": "Códigos totales: {{count}}",
+      "webhook_desc": "Se utiliza para verificar la autenticidad de las cargas útiles de webhooks entrantes."
     },
     "registration_policy_saved_successfully": "Registration policy saved successfully",
     "registration_policy_settings_title": "Registration Policy Settings",
@@ -7932,6 +7944,22 @@
       "tenant_branded_ready": "Tenant-branded ready",
       "tenant_channel_prefix": "Tenant channel prefix",
       "theme_color": "Theme color"
+    },
+    "registration_breaker": {
+      "description": "Pausa automática cuando esta comunidad recibe una avalancha inusual de registros en una hora.",
+      "paused_body": "Se superó el umbral de registro por hora ({{threshold}} cuentas nuevas). El registro se reanudará automáticamente en aproximadamente {{minutes}} minutos, o puedes reanudarlo ahora. Verifique Sentry / logs para las IP de origen antes de borrarlas si sospecha de un ataque.",
+      "paused_title": "La creación de cuenta está actualmente pausada.",
+      "refresh_status": "Actualizar estado",
+      "resume_failed": "No se pudo reanudar el registro.",
+      "resume_now": "Reanudar inscripciones ahora",
+      "resume_success": "Se reanudó el registro para esta comunidad.",
+      "signups_this_hour": "{{count}} de {{threshold}} registros esta hora",
+      "status_active": "Inscripciones activas",
+      "status_paused": "Registros en pausa",
+      "threshold_percent": "({{percent}}% del umbral)",
+      "threshold_prefix": "El umbral se configura a nivel de plataforma mediante",
+      "threshold_suffix": "Cuando se activa, este banner se vuelve rojo y aquí aparece un botón de reanudación con un solo clic.",
+      "title": "Seguridad de registro"
     }
   },
   "timebanking": {
@@ -13750,6 +13778,293 @@
       "longitude_number": "La longitud debe ser un número.",
       "name_required": "El nombre es obligatorio.",
       "type_required": "Se requiere tipo."
+    }
+  },
+  "federation_peers_admin": {
+    "about": {
+      "active_body": "Conectado y sincronizado.",
+      "body": "Los Federation Peers son otras NEXUS cooperativas con las que tu comunidad ha acordado compartir miembros y horas. Una vez que se establece una conexión entre pares, los miembros pueden transferir horas entre comunidades y ver listados federados. Cada conexión entre pares requiere un secreto compartido que ambas partes deben configurar; comuníquese con el administrador de la cooperativa entre pares para intercambiar credenciales.",
+      "pending_body": "Credenciales establecidas, a la espera de la primera llamada API exitosa.",
+      "shared_secret_body": "Un token criptográfico utilizado para autenticar llamadas de igual a igual API. Debe coincidir exactamente en ambos lados. Gírelo periódicamente (cada 6 a 12 meses) y gírelo siempre inmediatamente si sospecha que se ha visto comprometido.",
+      "shared_secret_label": "Secreto compartido:",
+      "suspended_body": "La última sincronización falló o se suspendió manualmente: verifique que la base del igual URL sea correcta y accesible.",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "add_peer": "Agregar par",
+      "cancel": "Cancelar",
+      "copied_secret": "he copiado el secreto",
+      "copy_peer_slug": "Copiar babosa de pares",
+      "copy_secret": "Copiar secreto",
+      "create_reveal_secret": "Crear y revelar secretos",
+      "delete_peer": "Eliminar par",
+      "refresh": "Refrescar",
+      "refresh_aria": "Actualizar pares de la federación",
+      "rotate_secret": "Rotar secreto compartido"
+    },
+    "confirm_delete": "¿Eliminar el par de federación \"{{name}}\"? Esto es permanente.",
+    "confirm_rotate": "¿Rotar el secreto compartido para \"{{name}}\"? El antiguo secreto deja de funcionar inmediatamente y debes actualizar el lado remoto.",
+    "create_modal": {
+      "base_url": "Base URL",
+      "base_url_description": "HTTPS URL del control remoto NEXUS API. La ruta /v2/federation/hour-transfer/inbound se agrega automáticamente.",
+      "base_url_placeholder": "https://api.kiss-bern.ch",
+      "display_name": "Nombre para mostrar",
+      "display_name_placeholder": "Cooperativa KISS Berna",
+      "notes": "Notas",
+      "notes_placeholder": "Notas internas: contacto con el socio, referencia del acuerdo...",
+      "peer_slug": "Babosa de pares",
+      "peer_slug_description": "Alfanuméricos en minúsculas + guiones. Se utiliza como babosa cooperativa de destino para transferencias salientes.",
+      "peer_slug_placeholder": "beso-berna",
+      "status_hint_middle": "Después de que el lado remoto haya registrado el mismo secreto compartido, configure ambos lados en",
+      "status_hint_prefix": "El estado comienza como",
+      "title": "Agregar par de federación"
+    },
+    "empty": {
+      "never": "Nunca"
+    },
+    "meta": {
+      "page_title": "Compañeros de federación: administrador",
+      "subtitle": "Asociaciones multiplataforma para transferencias de horas de cooperativa a cooperativa",
+      "title": "Compañeros de la Federación"
+    },
+    "peers": {
+      "empty": "Aún no hay pares de la federación; agregue uno para comenzar.",
+      "table_aria": "Compañeros de la federación",
+      "title": "Compañeros registrados"
+    },
+    "secret_modal": {
+      "base_url_label": "Base URL:",
+      "body_prefix": "Este secreto se muestra",
+      "body_suffix": "Cópielo ahora y péguelo en la entrada de pares de federación de instalación remota NEXUS para esta cooperativa. Si lo pierde, debe rotar el secreto aquí y actualizar el lado remoto nuevamente.",
+      "only_once": "sólo una vez",
+      "peer_slug_label": "Babosa de pares:",
+      "title": "Secreto compartido por única vez"
+    },
+    "status": {
+      "active": "Activo",
+      "pending": "Pendiente",
+      "suspended": "Suspendido"
+    },
+    "table": {
+      "actions": "Comportamiento",
+      "base_url": "Base URL",
+      "last_handshake": "último apretón de manos",
+      "name": "Nombre",
+      "slug": "Babosa",
+      "status": "Estado"
+    },
+    "toasts": {
+      "copied": "Copiado al portapapeles.",
+      "copy_failed": "No se pudo copiar.",
+      "create_failed": "No se pudo crear un par.",
+      "created": "Par de federación creado.",
+      "delete_failed": "No se pudo eliminar el par.",
+      "deleted": "Compañero eliminado.",
+      "load_failed": "No se pudieron cargar los pares de la federación.",
+      "rotate_failed": "No se pudo rotar el secreto.",
+      "secret_rotated": "Secreto compartido rotado.",
+      "status_failed": "No se pudo actualizar el estado del par.",
+      "status_updated": "Estado del par establecido en {{status}}."
+    },
+    "validation": {
+      "required_fields": "Se deben completar todos los campos obligatorios."
+    }
+  },
+  "help_request_sla": {
+    "about": {
+      "body": "Los acuerdos de nivel de servicio (SLAs) establecen los tiempos máximos esperados de respuesta y resolución para solicitudes de ayuda. Cuando una solicitud se acerca o excede su SLA, se marca como vencida en este panel. Los SLA le ayudan a mantener una calidad de servicio constante y a generar métricas piloto precisas.",
+      "first_response_label": "Primera respuesta",
+      "first_response_prefix": "tiempo desde el envío de la solicitud hasta el primer contacto con el coordinador (el estado sale de",
+      "first_response_suffix": ")",
+      "note": "SLA ventanas están configuradas en la política operativa AG81. Edítelos usando el botón \"Editar política\" de arriba. Establezca SLAs más estrictos para las categorías de atención de urgencia (por ejemplo, transporte médico) y otros más flexibles para las actividades sociales.",
+      "resolution_label": "Resolución",
+      "resolution_prefix": "tiempo desde la primera respuesta hasta que se coteja y confirma la solicitud (el estado alcanza",
+      "resolution_suffix": ")",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "edit_policy": "Editar política",
+      "refresh": "Refrescar",
+      "refresh_aria": "Actualizar el panel SLA"
+    },
+    "answers": {
+      "no": "No",
+      "yes": "Sí"
+    },
+    "buckets": {
+      "at_risk": "En riesgo",
+      "breached": "violado",
+      "on_track": "En camino"
+    },
+    "dimensions": {
+      "first_response": "Primera respuesta",
+      "resolution": "Resolución"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "footer": {
+      "generated": "Informe generado {{date}}.",
+      "proxy_end": "ventanas en AG81 política operativa.",
+      "proxy_middle": "resolución = estado alcanzado",
+      "proxy_prefix": "proxy: primera respuesta = el estado sale de",
+      "proxy_suffix": "Ajustar"
+    },
+    "meta": {
+      "page_title": "Solicitud de ayuda SLA Panel de control",
+      "subtitle_prefix": "AG96 - primera respuesta y resolución",
+      "subtitle_suffix": "seguimiento según la política operativa AG81",
+      "title": "Solicitud de ayuda SLA Panel de control"
+    },
+    "metrics": {
+      "first_response_at_risk": "Primera respuesta en riesgo",
+      "first_response_breached": "Primera respuesta violada",
+      "in_progress": "En curso",
+      "pending": "Pendiente",
+      "resolution_at_risk": "Resolución en riesgo",
+      "resolution_breached": "Resolución incumplida",
+      "resolved_24h": "Resuelto <24h (reciente)"
+    },
+    "open": {
+      "all_count": "Todos ({{count}})",
+      "at_risk_count": "En riesgo ({{count}})",
+      "breached_count": "Incumplido ({{count}})",
+      "bucket_filter_aria": "Filtro de cubo",
+      "empty_bucket": "No hay solicitudes de ayuda abiertas en este segmento.",
+      "left": "{{duration}} izquierda",
+      "on_track_count": "En camino ({{count}})",
+      "over_by": "Terminado por {{duration}}",
+      "request_meta": "Cuándo: {{when}} - usuario #{{userId}} - edad {{age}}",
+      "subtitle": "{{count}} abierto: ordenado violado primero",
+      "table_aria": "Abrir solicitudes de ayuda",
+      "target_hours": "Objetivo {{hours}}h",
+      "title": "Abrir solicitudes de ayuda"
+    },
+    "policy": {
+      "first_response_description": "- tiempo desde la presentación hasta el primer contacto con el coordinador",
+      "platform_defaults": "Valores predeterminados de la plataforma: no se ha realizado el taller AG81",
+      "resolution_description": "- tiempo desde la primera respuesta hasta que la solicitud se coteja y confirma",
+      "tenant_policy": "Política de inquilinos aplicada"
+    },
+    "resolved": {
+      "table_aria": "Solicitudes de ayuda resueltas recientemente",
+      "title": "Resuelto recientemente (últimas 72 h)",
+      "user_id": "usuario #{{userId}}"
+    },
+    "table": {
+      "bucket": "Balde",
+      "created": "Creado",
+      "request": "Pedido",
+      "resolved": "Resuelto",
+      "status": "Estado",
+      "turnaround": "Giro de vuelta",
+      "within": "Dentro"
+    },
+    "toasts": {
+      "load_failed": "No se pudo cargar el panel SLA"
+    }
+  },
+  "research_partnerships": {
+    "about": {
+      "body": "Las asociaciones de investigación brindan a los investigadores académicos o políticos aprobados acceso controlado a datos anonimizados de la plataforma con fines de evaluación. Cada asociación define un alcance de datos específico, una duración y un acuerdo para compartir datos. Todo el acceso está registrado. Los socios nunca ven los datos de los miembros individuales, solo conjuntos de datos agregados o anonimizados.",
+      "data_scope_body": "Defina exactamente a qué datos puede acceder el investigador, por ejemplo, horas de atención mensuales agregadas por subregión, excluyendo todos los identificadores personales. El alcance es contractualmente vinculante y se audita trimestralmente.",
+      "data_scope_label": "Alcance de los datos:",
+      "download_history_body": "Cada exportación de datos se registra con una marca de tiempo y los detalles del investigador. Este registro está disponible para su Data Protection Officer si lo solicita. Utilice Revocar para retirar un conjunto de datos emitido anteriormente.",
+      "download_history_label": "Historial de descargas:",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "add_partner": "Agregar socio",
+      "cancel": "Cancelar",
+      "close": "Cerca",
+      "create": "Crear",
+      "download_markdown": "Descargar Markdown",
+      "generate": "Generar",
+      "generate_export": "Generar exportación",
+      "open": "Abierto",
+      "refresh": "Refrescar",
+      "refresh_aria": "Actualizar las asociaciones de investigación",
+      "render": "Prestar",
+      "rerender": "Volver a renderizar",
+      "revoke": "Revocar",
+      "view": "Vista"
+    },
+    "columns": {
+      "actions": "Comportamiento",
+      "agreement": "Acuerdo",
+      "created": "Creado",
+      "hash": "Picadillo",
+      "methodology": "Metodología",
+      "partner": "Pareja",
+      "period": "Período",
+      "rows": "Filas",
+      "status": "Estado"
+    },
+    "export_modal": {
+      "active_partner": "Socio de investigación activo",
+      "privacy_note": "Las exportaciones son únicamente agregadas y utilizan umbrales de supresión. Los identificadores directos de miembros no están incluidos.",
+      "title": "Generar conjunto de datos agregados"
+    },
+    "exports": {
+      "empty": "Aún no se han exportado conjuntos de datos.",
+      "partner_fallback": "Socio #{{id}}",
+      "table_aria": "Exportaciones de conjuntos de datos de investigación",
+      "title": "Historial de exportación de conjuntos de datos"
+    },
+    "fields": {
+      "agreement_reference": "Referencia del acuerdo",
+      "contact_email": "Correo electrónico de contacto",
+      "dataset_scope": "Alcance del conjunto de datos",
+      "dataset_scope_description": "Claves de conjuntos de datos separadas por comas.",
+      "institution": "Institución",
+      "methodology_url": "Metodología URL",
+      "name": "Nombre",
+      "period_end": "Fin del período",
+      "period_start": "Inicio del período",
+      "status": "Estado"
+    },
+    "meta": {
+      "subtitle": "Administre socios de investigación seguros para la privacidad, exportaciones de conjuntos de datos agregados e historial de revocaciones",
+      "title": "Asociaciones de investigación"
+    },
+    "partner_modal": {
+      "title": "Agregar socio de investigación"
+    },
+    "partners": {
+      "empty": "Aún no hay socios de investigación.",
+      "table_aria": "Socios de investigación",
+      "title": "Socios de investigación"
+    },
+    "statuses": {
+      "active": "Activo",
+      "draft": "Borrador",
+      "ended": "Terminado",
+      "generated": "Generado",
+      "paused": "En pausa",
+      "revoked": "Revocado",
+      "superseded": "Reemplazado"
+    },
+    "templates": {
+      "empty": "No hay plantillas de acuerdo disponibles.",
+      "fallback_title": "Plantilla de acuerdo",
+      "missing_placeholder_count_one": "Falta el marcador de posición {{count}}",
+      "missing_placeholder_count_other": "Faltan {{count}} marcadores de posición",
+      "placeholder_count_one": "{{count}} marcador de posición",
+      "placeholder_count_other": "{{count}} marcadores de posición",
+      "placeholder_label": "{{placeholder}}",
+      "rendered_markdown": "Representado Markdown ({{count}} caracteres)",
+      "subtitle": "FADP/nDSG-borradores alineados para revisión legal",
+      "title": "Plantillas de acuerdos"
+    },
+    "toasts": {
+      "create_partner_failed": "No se pudo crear un socio de investigación",
+      "export_generated": "Exportación de conjunto de datos agregado generada",
+      "export_revoked": "Exportación de conjunto de datos revocada",
+      "generate_export_failed": "No se pudo generar la exportación del conjunto de datos",
+      "load_failed": "No se pudieron cargar las asociaciones de investigación",
+      "partner_created": "Socio de investigación creado",
+      "render_template_failed": "No se pudo renderizar la plantilla",
+      "revoke_export_failed": "No se pudo revocar la exportación del conjunto de datos"
     }
   }
 }
