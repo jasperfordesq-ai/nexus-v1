@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import {
   Card,
@@ -52,6 +53,7 @@ import { PageHeader, ConfirmModal } from '../../components';
 import type { AdminUserDetail, AdminBadge, UpdateUserPayload, UserConsent, VettingRecord, InsuranceCertificate } from '../../api/types';
 
 export function UserEdit() {
+  const { t } = useTranslation('admin', { keyPrefix: 'user_edit' });
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -126,7 +128,7 @@ export function UserEdit() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  usePageTitle(user ? `Edit ${user.name}` : "Edit User");
+  usePageTitle(user ? t('meta.edit_named', { name: user.name }) : t('meta.edit_user'));
 
   const loadUser = useCallback(async () => {
     if (!id) return;
@@ -152,14 +154,14 @@ export function UserEdit() {
         setIsGlobalSuperAdmin(userData.is_super_admin || false);
         setIsMunicipalityAnnouncer(Array.isArray(userData.roles) ? userData.roles.includes('municipality_announcer') : false);
       } else {
-        setLoadError(res.error || "Load error");
+        setLoadError(res.error || t('errors.load_error'));
       }
     } catch {
-      setLoadError("An unexpected error occurred while loading this user");
+      setLoadError(t('errors.load_unexpected'));
     } finally {
       setLoading(false);
     }
-  }, [id])
+  }, [id, t])
 
 
   const loadConsents = useCallback(async () => {
@@ -198,15 +200,15 @@ export function UserEdit() {
 
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
-    if (!firstName.trim()) newErrors.first_name = "First name is required";
-    if (!lastName.trim()) newErrors.last_name = "Last name is required";
+    if (!firstName.trim()) newErrors.first_name = t('validation.first_name_required');
+    if (!lastName.trim()) newErrors.last_name = t('validation.last_name_required');
     if (!email.trim()) {
-      newErrors.email = "Email Required";
+      newErrors.email = t('validation.email_required');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Email Invalid";
+      newErrors.email = t('validation.email_invalid');
     }
-    if (!role) newErrors.role = "Role Required";
-    if (!status) newErrors.status = "Status Required";
+    if (!role) newErrors.role = t('validation.role_required');
+    if (!status) newErrors.status = t('validation.status_required');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
@@ -231,13 +233,13 @@ export function UserEdit() {
       };
       const res = await adminUsers.update(Number(id), payload);
       if (res.success) {
-        toast.success("Update successfully");
+        toast.success(t('toasts.update_success'));
         loadUser();
       } else {
-        toast.error(res.error || "Update Failed");
+        toast.error(res.error || t('toasts.update_failed'));
       }
     } catch {
-      toast.error("Occurred error");
+      toast.error(t('toasts.generic_error'));
     } finally {
       setSubmitting(false);
     }
@@ -250,12 +252,12 @@ export function UserEdit() {
       const res = await adminUsers.setSuperAdmin(Number(id), !isTenantSuperAdmin);
       if (res.success) {
         setIsTenantSuperAdmin(!isTenantSuperAdmin);
-        toast.success(!isTenantSuperAdmin ? "Tenant super admin granted" : "Tenant super admin revoked");
+        toast.success(!isTenantSuperAdmin ? t('toasts.tenant_super_admin_granted') : t('toasts.tenant_super_admin_revoked'));
       } else {
-        toast.error(res.error || "Failed to update tenant super admin status");
+        toast.error(res.error || t('toasts.tenant_super_admin_failed'));
       }
     } catch {
-      toast.error("Failed to update tenant super admin status");
+      toast.error(t('toasts.tenant_super_admin_failed'));
     } finally {
       setTenantSuperAdminLoading(false);
     }
@@ -268,12 +270,12 @@ export function UserEdit() {
       const res = await adminUsers.setGlobalSuperAdmin(Number(id), !isGlobalSuperAdmin);
       if (res.success) {
         setIsGlobalSuperAdmin(!isGlobalSuperAdmin);
-        toast.success(!isGlobalSuperAdmin ? "Global super admin granted" : "Global super admin revoked");
+        toast.success(!isGlobalSuperAdmin ? t('toasts.global_super_admin_granted') : t('toasts.global_super_admin_revoked'));
       } else {
-        toast.error(res.error || "Failed to update global super admin status");
+        toast.error(res.error || t('toasts.global_super_admin_failed'));
       }
     } catch {
-      toast.error("Failed to update global super admin status");
+      toast.error(t('toasts.global_super_admin_failed'));
     } finally {
       setGlobalSuperAdminLoading(false);
     }
@@ -286,14 +288,14 @@ export function UserEdit() {
       if (isMunicipalityAnnouncer) {
         await api.delete(`/v2/admin/feed/revoke-announcer/${id}`);
         setIsMunicipalityAnnouncer(false);
-        toast.success("Municipal Announcer role revoked");
+        toast.success(t('toasts.announcer_revoked'));
       } else {
         await api.post('/v2/admin/feed/grant-announcer', { user_id: Number(id) });
         setIsMunicipalityAnnouncer(true);
-        toast.success("Municipal Announcer role granted");
+        toast.success(t('toasts.announcer_granted'));
       }
     } catch {
-      toast.error("Failed to update Municipal Announcer role");
+      toast.error(t('toasts.announcer_failed'));
     } finally {
       setAnnouncerLoading(false);
     }
@@ -317,13 +319,13 @@ export function UserEdit() {
             : `${window.location.origin}/`;
           const { sendImpersonationToken } = await import('@/lib/impersonate');
           sendImpersonationToken(token, targetUrl);
-          toast.success(`Impersonate successfully`);
+          toast.success(t('toasts.impersonate_success'));
         }
       } else {
-        toast.error(res.error || "Impersonate Failed");
+        toast.error(res.error || t('toasts.impersonate_failed'));
       }
     } catch {
-      toast.error("Impersonate Failed");
+      toast.error(t('toasts.impersonate_failed'));
     } finally {
       setImpersonateLoading(false);
     }
@@ -332,21 +334,21 @@ export function UserEdit() {
   async function handleAdjustBalance() {
     if (!id || !balanceAmount.trim() || !balanceReason.trim()) return;
     const amount = parseFloat(balanceAmount);
-    if (isNaN(amount) || amount === 0) { toast.error("Balance Invalid"); return; }
+    if (isNaN(amount) || amount === 0) { toast.error(t('toasts.balance_invalid')); return; }
     setBalanceLoading(true);
     try {
       const res = await adminTimebanking.adjustBalance(Number(id), amount, balanceReason.trim());
       if (res.success) {
-        toast.success(`Balance Adjusted`);
+        toast.success(t('toasts.balance_adjusted'));
         setBalanceModalOpen(false);
         setBalanceAmount('');
         setBalanceReason('');
         loadUser();
       } else {
-        toast.error(res.error || "Balance Failed");
+        toast.error(res.error || t('toasts.balance_failed'));
       }
     } catch {
-      toast.error("Balance Failed");
+      toast.error(t('toasts.balance_failed'));
     } finally {
       setBalanceLoading(false);
     }
@@ -358,15 +360,15 @@ export function UserEdit() {
     try {
       const res = await adminUsers.removeBadge(Number(id), badgeToRemove.id);
       if (res.success) {
-        toast.success(`Remove Badge successfully`);
+        toast.success(t('toasts.remove_badge_success'));
         setUser((prev) =>
           prev ? { ...prev, badges: prev.badges.filter((b) => b.id !== badgeToRemove.id) } : prev
         );
       } else {
-        toast.error(res.error || "Failed to remove badge");
+        toast.error(res.error || t('toasts.remove_badge_failed'));
       }
     } catch {
-      toast.error("Occurred error");
+      toast.error(t('toasts.generic_error'));
     } finally {
       setRemovingBadge(false);
       setBadgeToRemove(null);
@@ -383,12 +385,12 @@ export function UserEdit() {
         if (data.badges) {
           setUser((prev) => prev ? { ...prev, badges: data.badges! } : prev);
         }
-        toast.success("Recheck Complete");
+        toast.success(t('toasts.recheck_complete'));
       } else {
-        toast.error(res.error || "Recheck Failed");
+        toast.error(res.error || t('toasts.recheck_failed'));
       }
     } catch {
-      toast.error("Recheck Failed");
+      toast.error(t('toasts.recheck_failed'));
     } finally {
       setRecheckingBadges(false);
     }
@@ -396,19 +398,19 @@ export function UserEdit() {
 
   async function handleSetPassword() {
     if (!id || !newPassword.trim()) return;
-    if (newPassword.length < 8) { toast.error("Password must be at least 8 characters"); return; }
+    if (newPassword.length < 8) { toast.error(t('validation.password_min')); return; }
     setPasswordLoading(true);
     try {
       const res = await adminUsers.setPassword(Number(id), newPassword);
       if (res.success) {
-        toast.success("Password Updated");
+        toast.success(t('toasts.password_updated'));
         setPasswordModalOpen(false);
         setNewPassword('');
       } else {
-        toast.error(res.error || "Password Failed");
+        toast.error(res.error || t('toasts.password_failed'));
       }
     } catch {
-      toast.error("Password Failed");
+      toast.error(t('toasts.password_failed'));
     } finally {
       setPasswordLoading(false);
     }
@@ -420,12 +422,12 @@ export function UserEdit() {
     try {
       const res = await adminUsers.sendPasswordReset(Number(id));
       if (res.success) {
-        toast.success("Password reset email sent");
+        toast.success(t('toasts.password_reset_sent'));
       } else {
-        toast.error(res.error || "Password reset failed");
+        toast.error(res.error || t('toasts.password_reset_failed'));
       }
     } catch {
-      toast.error("Password reset failed");
+      toast.error(t('toasts.password_reset_failed'));
     } finally {
       setResetEmailLoading(false);
     }
@@ -437,12 +439,12 @@ export function UserEdit() {
     try {
       const res = await adminUsers.sendWelcomeEmail(Number(id));
       if (res.success) {
-        toast.success("Welcome email sent");
+        toast.success(t('toasts.welcome_email_sent'));
       } else {
-        toast.error(res.error || "Failed to send welcome email");
+        toast.error(res.error || t('toasts.welcome_email_failed'));
       }
     } catch {
-      toast.error("Failed to send welcome email");
+      toast.error(t('toasts.welcome_email_failed'));
     } finally {
       setWelcomeEmailLoading(false);
     }
@@ -451,7 +453,7 @@ export function UserEdit() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label={"Loading User"} />
+        <Spinner size="lg" label={t('loading.user')} />
       </div>
     );
   }
@@ -460,18 +462,18 @@ export function UserEdit() {
     return (
       <div>
         <PageHeader
-          title={"Edit User"}
+          title={t('meta.edit_user')}
           actions={
             <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
-              {"Back to Users"}
+              {t('actions.back_to_users')}
             </Button>
           }
         />
         <Card className="max-w-2xl">
           <CardBody className="p-6">
-            <p className="text-center text-danger">{loadError || "User not Found"}</p>
+            <p className="text-center text-danger">{loadError || t('errors.user_not_found')}</p>
             <div className="mt-4 flex justify-center">
-              <Button variant="flat" onPress={() => navigate(tenantPath('/admin/users'))}>{"Return to List"}</Button>
+              <Button variant="flat" onPress={() => navigate(tenantPath('/admin/users'))}>{t('actions.return_to_list')}</Button>
             </div>
           </CardBody>
         </Card>
@@ -484,8 +486,8 @@ export function UserEdit() {
   return (
     <div>
       <PageHeader
-        title={`Edit User`}
-        description={`User ID & Joined`}
+        title={t('meta.edit_user')}
+        description={t('meta.user_id_joined')}
         actions={
           <div className="flex items-center gap-2">
             {canImpersonate && (
@@ -497,11 +499,11 @@ export function UserEdit() {
                 isLoading={impersonateLoading}
                 size="sm"
               >
-                {"Impersonate"}
+                {t('actions.impersonate')}
               </Button>
             )}
             <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
-              {"Back to Users"}
+              {t('actions.back_to_users')}
             </Button>
           </div>
         }
@@ -518,7 +520,7 @@ export function UserEdit() {
                   <h3 className="text-lg font-semibold text-foreground">{user.name}</h3>
                   <p className="text-sm text-default-500">{user.email}</p>
                   {user.balance !== undefined && (
-                    <p className="text-xs text-default-400 mt-0.5">{`Balance`}</p>
+                    <p className="text-xs text-default-400 mt-0.5">{t('fields.balance')}</p>
                   )}
                 </div>
               </div>
@@ -526,58 +528,58 @@ export function UserEdit() {
             <CardBody className="gap-5 p-6">
               {/* Name */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Input label={"First Name"} placeholder={"Enter First Name..."} value={firstName} onValueChange={setFirstName}
+                <Input label={t('fields.first_name')} placeholder={t('placeholders.first_name')} value={firstName} onValueChange={setFirstName}
                   isRequired isInvalid={!!errors.first_name} errorMessage={errors.first_name} isDisabled={submitting} />
-                <Input label={"Last Name"} placeholder={"Enter Last Name..."} value={lastName} onValueChange={setLastName}
+                <Input label={t('fields.last_name')} placeholder={t('placeholders.last_name')} value={lastName} onValueChange={setLastName}
                   isRequired isInvalid={!!errors.last_name} errorMessage={errors.last_name} isDisabled={submitting} />
               </div>
 
               {/* Email + Phone */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Input label={"Email"} type="email" placeholder="user@example.com" value={email} onValueChange={setEmail}
+                <Input label={t('fields.email')} type="email" placeholder={t('placeholders.email')} value={email} onValueChange={setEmail}
                   isRequired isInvalid={!!errors.email} errorMessage={errors.email} isDisabled={submitting} />
-                <Input label={"Phone"} type="tel" placeholder="e.g. +1 555 123 4567" value={phone}
+                <Input label={t('fields.phone')} type="tel" placeholder={t('placeholders.phone')} value={phone}
                   onValueChange={setPhone} isDisabled={submitting} />
               </div>
 
               {/* Role + Status */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Select label={"Role"} placeholder={"Select a Role..."} selectedKeys={role ? [role] : []}
+                <Select label={t('fields.role')} placeholder={t('placeholders.role')} selectedKeys={role ? [role] : []}
                   onSelectionChange={(keys) => setRole(Array.from(keys)[0] as string)}
                   isRequired isInvalid={!!errors.role} errorMessage={errors.role} isDisabled={submitting}>
-                  <SelectItem key="member">{"Member"}</SelectItem>
-                  <SelectItem key="broker">{"Broker"}</SelectItem>
-                  <SelectItem key="moderator">{"Moderator"}</SelectItem>
-                  <SelectItem key="newsletter_admin">{"Newsletter Admin"}</SelectItem>
-                  <SelectItem key="admin">{"Admin"}</SelectItem>
-                  <SelectItem key="tenant_admin">{"Tenant Admin"}</SelectItem>
+                  <SelectItem key="member">{t('roles.member')}</SelectItem>
+                  <SelectItem key="broker">{t('roles.broker')}</SelectItem>
+                  <SelectItem key="moderator">{t('roles.moderator')}</SelectItem>
+                  <SelectItem key="newsletter_admin">{t('roles.newsletter_admin')}</SelectItem>
+                  <SelectItem key="admin">{t('roles.admin')}</SelectItem>
+                  <SelectItem key="tenant_admin">{t('roles.tenant_admin')}</SelectItem>
                 </Select>
-                <Select label={"Status"} placeholder={"Select a Status..."} selectedKeys={status ? [status] : []}
+                <Select label={t('fields.status')} placeholder={t('placeholders.status')} selectedKeys={status ? [status] : []}
                   onSelectionChange={(keys) => setStatus(Array.from(keys)[0] as string)}
                   isRequired isInvalid={!!errors.status} errorMessage={errors.status} isDisabled={submitting}>
-                  <SelectItem key="active">{"Active"}</SelectItem>
-                  <SelectItem key="pending">{"Pending"}</SelectItem>
-                  <SelectItem key="suspended">{"Suspended"}</SelectItem>
-                  <SelectItem key="banned">{"Banned"}</SelectItem>
+                  <SelectItem key="active">{t('statuses.active')}</SelectItem>
+                  <SelectItem key="pending">{t('statuses.pending')}</SelectItem>
+                  <SelectItem key="suspended">{t('statuses.suspended')}</SelectItem>
+                  <SelectItem key="banned">{t('statuses.banned')}</SelectItem>
                 </Select>
               </div>
 
               {/* Profile Type + Organization */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Select
-                  label={"Profile Type"}
-                  placeholder={"Select Type..."}
+                  label={t('fields.profile_type')}
+                  placeholder={t('placeholders.profile_type')}
                   selectedKeys={[profileType]}
                   onSelectionChange={(keys) => setProfileType(Array.from(keys)[0] as 'individual' | 'organisation')}
                   isDisabled={submitting}
                 >
-                  <SelectItem key="individual">{"Individual"}</SelectItem>
-                  <SelectItem key="organisation">{"Organisation"}</SelectItem>
+                  <SelectItem key="individual">{t('profile_types.individual')}</SelectItem>
+                  <SelectItem key="organisation">{t('profile_types.organisation')}</SelectItem>
                 </Select>
                 {profileType === 'organisation' && (
                   <Input
-                    label={"Organisation Name"}
-                    placeholder={"Eg Community Centre..."}
+                  label={t('fields.organisation_name')}
+                  placeholder={t('placeholders.organisation_name')}
                     value={organizationName}
                     onValueChange={setOrganizationName}
                     startContent={<Building2 size={14} className="text-default-400" />}
@@ -587,25 +589,25 @@ export function UserEdit() {
               </div>
 
               {/* Bio */}
-              <Textarea label={"Bio"} placeholder={"A Short Biography for This User..."} value={bio} onValueChange={setBio}
+              <Textarea label={t('fields.bio')} placeholder={t('placeholders.bio')} value={bio} onValueChange={setBio}
                 minRows={3} maxRows={6} isDisabled={submitting} />
 
               {/* Tagline + Location */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Input label={"Tagline"} placeholder={"Eg Community Volunteer..."} value={tagline}
+              <Input label={t('fields.tagline')} placeholder={t('placeholders.tagline')} value={tagline}
                   onValueChange={setTagline} isDisabled={submitting} />
-                <Input label={"Location"} placeholder="e.g. New York, USA" value={location}
+              <Input label={t('fields.location')} placeholder={t('placeholders.location')} value={location}
                   onValueChange={setLocation} isDisabled={submitting} />
               </div>
 
               {/* Submit */}
               <div className="flex justify-end gap-3 pt-2">
                 <Button variant="flat" onPress={() => navigate(tenantPath('/admin/users'))} isDisabled={submitting}>
-                  {"Cancel"}
+                {t('actions.cancel')}
                 </Button>
                 <Button type="submit" color="primary" startContent={!submitting ? <Save size={16} /> : undefined}
                   isLoading={submitting}>
-                  {"Save Changes"}
+                {t('actions.save_changes')}
                 </Button>
               </div>
             </CardBody>
@@ -618,15 +620,15 @@ export function UserEdit() {
             <CardHeader className="px-6 pt-5 pb-0">
               <div className="flex items-center gap-2">
                 <ShieldAlert size={18} className="text-warning" />
-                <h3 className="text-lg font-semibold text-foreground">{"Super Admin Access"}</h3>
+                <h3 className="text-lg font-semibold text-foreground">{t('sections.super_admin_access')}</h3>
               </div>
             </CardHeader>
             <CardBody className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">{"Tenant Super Admin"}</p>
+                  <p className="font-medium text-foreground">{t('fields.tenant_super_admin')}</p>
                   <p className="text-sm text-default-500">
-                    {"Grants full admin access within this tenant"}
+                    {t('descriptions.tenant_super_admin')}
                   </p>
                 </div>
                 <Switch
@@ -634,11 +636,11 @@ export function UserEdit() {
                   onValueChange={handleToggleTenantSuperAdmin}
                   isDisabled={tenantSuperAdminLoading || user.id === currentUser?.id}
                   color="warning"
-                  aria-label={"Toggle tenant super admin"}
+                  aria-label={t('aria.toggle_tenant_super_admin')}
                 />
               </div>
               {user.id === currentUser?.id && (
-                <p className="text-xs text-default-400 mt-2">{"You cannot modify your own account from this panel"}</p>
+                <p className="text-xs text-default-400 mt-2">{t('descriptions.cannot_modify_self')}</p>
               )}
             </CardBody>
           </Card>
@@ -650,15 +652,15 @@ export function UserEdit() {
             <CardHeader className="px-6 pt-5 pb-0">
               <div className="flex items-center gap-2">
                 <ShieldAlert size={18} className="text-danger" />
-                <h3 className="text-lg font-semibold text-danger">{"Global Super Admin"}</h3>
+                <h3 className="text-lg font-semibold text-danger">{t('sections.global_super_admin')}</h3>
               </div>
             </CardHeader>
             <CardBody className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">{"Platform-wide access"}</p>
+                  <p className="font-medium text-foreground">{t('fields.platform_wide_access')}</p>
                   <p className="text-sm text-default-500">
-                    {"Grants full access across all tenants on the platform"}
+                    {t('descriptions.global_super_admin')}
                   </p>
                 </div>
                 <Switch
@@ -666,11 +668,11 @@ export function UserEdit() {
                   onValueChange={handleToggleGlobalSuperAdmin}
                   isDisabled={globalSuperAdminLoading || user.id === currentUser?.id}
                   color="danger"
-                  aria-label={"Toggle global super admin"}
+                  aria-label={t('aria.toggle_global_super_admin')}
                 />
               </div>
               {user.id === currentUser?.id && (
-                <p className="text-xs text-default-400 mt-2">{"You cannot modify your own account from this panel"}</p>
+                <p className="text-xs text-default-400 mt-2">{t('descriptions.cannot_modify_self')}</p>
               )}
             </CardBody>
           </Card>
@@ -682,15 +684,15 @@ export function UserEdit() {
             <CardHeader className="px-6 pt-5 pb-0">
               <div className="flex items-center gap-2">
                 <Landmark size={18} className="text-indigo-500" />
-                <h3 className="text-lg font-semibold text-foreground">{"Municipal Announcer"}</h3>
+                <h3 className="text-lg font-semibold text-foreground">{t('sections.municipal_announcer')}</h3>
               </div>
             </CardHeader>
             <CardBody className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">{"Official announcement channel"}</p>
+                  <p className="font-medium text-foreground">{t('fields.official_announcement_channel')}</p>
                   <p className="text-sm text-default-500">
-                    {"Posts by this user will display an Official badge and be pinned to the top of the feed"}
+                    {t('descriptions.municipal_announcer')}
                   </p>
                 </div>
                 <Switch
@@ -698,7 +700,7 @@ export function UserEdit() {
                   onValueChange={handleToggleMunicipalityAnnouncer}
                   isDisabled={announcerLoading}
                   color="primary"
-                  aria-label={"Toggle municipal announcer role"}
+                  aria-label={t('aria.toggle_municipal_announcer')}
                 />
               </div>
             </CardBody>
@@ -710,7 +712,7 @@ export function UserEdit() {
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center gap-2">
               <KeyRound size={18} className="text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">{"Account Actions"}</h3>
+              <h3 className="text-lg font-semibold text-foreground">{t('sections.account_actions')}</h3>
             </div>
           </CardHeader>
           <CardBody className="p-6">
@@ -722,7 +724,7 @@ export function UserEdit() {
                 startContent={<KeyRound size={14} />}
                 onPress={() => setPasswordModalOpen(true)}
               >
-                {"Set Password"}
+                {t('actions.set_password')}
               </Button>
               <Button
                 size="sm"
@@ -731,7 +733,7 @@ export function UserEdit() {
                 onPress={handleSendPasswordReset}
                 isLoading={resetEmailLoading}
               >
-                {"Send Password Reset"}
+                {t('actions.send_password_reset')}
               </Button>
               <Button
                 size="sm"
@@ -740,7 +742,7 @@ export function UserEdit() {
                 onPress={handleSendWelcomeEmail}
                 isLoading={welcomeEmailLoading}
               >
-                {"Resend Welcome Email"}
+                {t('actions.resend_welcome_email')}
               </Button>
             </div>
           </CardBody>
@@ -752,17 +754,17 @@ export function UserEdit() {
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2">
                 <Coins size={18} className="text-primary" />
-                <h3 className="text-lg font-semibold text-foreground">{"Time Credits"}</h3>
+                <h3 className="text-lg font-semibold text-foreground">{t('sections.time_credits')}</h3>
               </div>
               <Button size="sm" variant="flat" color="primary" onPress={() => setBalanceModalOpen(true)}>
-                {"Adjust Balance"}
+                {t('actions.adjust_balance')}
               </Button>
             </div>
           </CardHeader>
           <CardBody className="p-6">
             <div className="flex items-center gap-4">
               <div className="text-3xl font-bold text-foreground">{user.balance ?? 0}h</div>
-              <p className="text-sm text-default-500">{"Current Balance"}</p>
+              <p className="text-sm text-default-500">{t('fields.current_balance')}</p>
             </div>
           </CardBody>
         </Card>
@@ -771,7 +773,7 @@ export function UserEdit() {
         <Card>
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center justify-between w-full">
-              <h3 className="text-lg font-semibold text-foreground">{"Badges"}</h3>
+              <h3 className="text-lg font-semibold text-foreground">{t('sections.badges')}</h3>
               <Button
                 size="sm"
                 variant="flat"
@@ -779,7 +781,7 @@ export function UserEdit() {
                 onPress={handleRecheckBadges}
                 isLoading={recheckingBadges}
               >
-                {"Recheck Badges"}
+                {t('actions.recheck_badges')}
               </Button>
             </div>
           </CardHeader>
@@ -796,7 +798,7 @@ export function UserEdit() {
                     endContent={
                       <Button isIconOnly variant="light" size="sm" onPress={() => setBadgeToRemove(badge)}
                         className="ml-1 min-w-0 w-5 h-5 rounded-full text-default-400 hover:bg-danger-100 hover:text-danger"
-                        aria-label={`Remove badge: ${badge.name}`}>
+                        aria-label={t('aria.remove_badge', { name: badge.name })}>
                         <Trash2 size={12} />
                       </Button>
                     }
@@ -806,7 +808,7 @@ export function UserEdit() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-default-400">{"No badges"}</p>
+              <p className="text-sm text-default-400">{t('empty.no_badges')}</p>
             )}
           </CardBody>
         </Card>
@@ -816,12 +818,12 @@ export function UserEdit() {
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center gap-2">
               <ShieldCheck size={18} className="text-success" />
-              <h3 className="text-lg font-semibold text-foreground">{"GDPR Consents"}</h3>
+              <h3 className="text-lg font-semibold text-foreground">{t('sections.gdpr_consents')}</h3>
             </div>
           </CardHeader>
           <CardBody className="p-6">
             {consentsLoading ? (
-              <Spinner size="sm" label={"Loading Consents"} />
+              <Spinner size="sm" label={t('loading.consents')} />
             ) : consents.length > 0 ? (
               <div className="flex flex-col gap-3">
                 {consents.map((consent) => (
@@ -835,7 +837,7 @@ export function UserEdit() {
                           {consent.name || consent.consent_type.replace(/_/g, ' ')}
                         </p>
                         {consent.is_required && (
-                          <Chip size="sm" variant="flat" color="warning">{"Required"}</Chip>
+                          <Chip size="sm" variant="flat" color="warning">{t('badges.required')}</Chip>
                         )}
                       </div>
                       {consent.description && (
@@ -843,10 +845,10 @@ export function UserEdit() {
                       )}
                       <p className="text-xs text-default-400 mt-1">
                         {consent.consent_given
-                          ? (consent.given_at ? `Consented on` : "Consented")
+                          ? (consent.given_at ? t('consents.consented_on') : t('consents.consented'))
                           : consent.withdrawn_at
-                            ? `Withdrawn on`
-                            : "Not Consented"
+                            ? t('consents.withdrawn_on')
+                            : t('consents.not_consented')
                         }
                         {consent.consent_version && ` (v${consent.consent_version})`}
                       </p>
@@ -856,13 +858,13 @@ export function UserEdit() {
                       variant="flat"
                       color={consent.consent_given ? 'success' : 'danger'}
                     >
-                      {consent.consent_given ? "Consent Given" : "Consent not given"}
+                      {consent.consent_given ? t('consents.given') : t('consents.not_given')}
                     </Chip>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-default-400">{"No consent records"}</p>
+              <p className="text-sm text-default-400">{t('empty.no_consent_records')}</p>
             )}
           </CardBody>
         </Card>
@@ -872,12 +874,12 @@ export function UserEdit() {
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center gap-2">
               <ShieldAlert size={18} className="text-warning" />
-              <h3 className="text-lg font-semibold text-foreground">{"Safeguarding"}</h3>
+              <h3 className="text-lg font-semibold text-foreground">{t('sections.safeguarding')}</h3>
             </div>
           </CardHeader>
           <CardBody className="p-6">
             {complianceLoading ? (
-              <Spinner size="sm" label={"Loading Compliance"} />
+              <Spinner size="sm" label={t('loading.compliance')} />
             ) : (
               <div className="flex flex-col gap-6">
                 {/* Vetting Status */}
@@ -885,7 +887,7 @@ export function UserEdit() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <ShieldCheck size={16} className="text-primary" />
-                      <p className="font-medium text-foreground">{"Vetting Status"}</p>
+                      <p className="font-medium text-foreground">{t('sections.vetting_status')}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Chip
@@ -908,7 +910,7 @@ export function UserEdit() {
                         variant="flat"
                         color="primary"
                       >
-                        {"Manage"}
+                        {t('actions.manage')}
                       </Button>
                     </div>
                   </div>
@@ -921,8 +923,8 @@ export function UserEdit() {
                               {vr.vetting_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                             </p>
                             <p className="text-xs text-default-400">
-                              {vr.reference_number || "No reference"}
-                              {vr.expiry_date ? ` — ${`Expires`}` : ''}
+                              {vr.reference_number || t('values.no_reference')}
+                              {vr.expiry_date ? t('values.expires_prefix') : ''}
                             </p>
                           </div>
                           <Chip
@@ -941,11 +943,11 @@ export function UserEdit() {
                         </div>
                       ))}
                       {vettingRecords.length > 3 && (
-                        <p className="text-xs text-default-400">{`More Records`}</p>
+                        <p className="text-xs text-default-400">{t('summary.more_records')}</p>
                       )}
                     </div>
                   ) : (
-                    <p className="text-sm text-default-400">{"No vetting records"}</p>
+                    <p className="text-sm text-default-400">{t('empty.no_vetting_records')}</p>
                   )}
                 </div>
 
@@ -954,7 +956,7 @@ export function UserEdit() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <FileCheck size={16} className="text-primary" />
-                      <p className="font-medium text-foreground">{"Insurance Certificates"}</p>
+                      <p className="font-medium text-foreground">{t('sections.insurance_certificates')}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Chip
@@ -977,7 +979,7 @@ export function UserEdit() {
                         variant="flat"
                         color="primary"
                       >
-                        {"Manage"}
+                        {t('actions.manage')}
                       </Button>
                     </div>
                   </div>
@@ -990,8 +992,8 @@ export function UserEdit() {
                               {ic.insurance_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                             </p>
                             <p className="text-xs text-default-400">
-                              {ic.provider_name || "Unknown Provider"}
-                              {ic.expiry_date ? ` — ${`Expires`}` : ''}
+                              {ic.provider_name || t('values.unknown_provider')}
+                              {ic.expiry_date ? t('values.expires_prefix') : ''}
                             </p>
                           </div>
                           <Chip
@@ -1010,11 +1012,11 @@ export function UserEdit() {
                         </div>
                       ))}
                       {insuranceRecords.length > 3 && (
-                        <p className="text-xs text-default-400">{`More Certificates`}</p>
+                        <p className="text-xs text-default-400">{t('summary.more_certificates')}</p>
                       )}
                     </div>
                   ) : (
-                    <p className="text-sm text-default-400">{"No insurance records"}</p>
+                    <p className="text-sm text-default-400">{t('empty.no_insurance_records')}</p>
                   )}
                 </div>
               </div>
@@ -1029,9 +1031,9 @@ export function UserEdit() {
           isOpen={!!badgeToRemove}
           onClose={() => setBadgeToRemove(null)}
           onConfirm={handleRemoveBadge}
-          title={"Remove Badge"}
-          message={`Are you sure you want to remove this badge from the member?`}
-          confirmLabel={"Remove Badge"}
+          title={t('modals.remove_badge.title')}
+          message={t('modals.remove_badge.message')}
+          confirmLabel={t('actions.remove_badge')}
           confirmColor="danger"
           isLoading={removingBadge}
         />
@@ -1044,15 +1046,15 @@ export function UserEdit() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Coins size={20} className="text-primary" />
-            {"Adjust Time Credits"}
+            {t('modals.adjust_balance.title')}
           </ModalHeader>
           <ModalBody className="gap-4">
-            <p className="text-sm text-default-500">{`Current balance`}</p>
-            <Input label={"Amount"} placeholder="e.g. 2 or -1.5"
-              description={"Use negative values to deduct time credits from this member"}
+            <p className="text-sm text-default-500">{t('fields.current_balance')}</p>
+            <Input label={t('fields.amount')} placeholder={t('placeholders.balance_amount')}
+              description={t('descriptions.balance_amount')}
               value={balanceAmount} onValueChange={setBalanceAmount}
               type="number" step="0.5" isDisabled={balanceLoading} />
-            <Input label={"Reason"} placeholder="Why are you adjusting this balance?"
+            <Input label={t('fields.reason')} placeholder={t('placeholders.balance_reason')}
               value={balanceReason} onValueChange={setBalanceReason}
               isRequired isDisabled={balanceLoading} />
           </ModalBody>
@@ -1060,11 +1062,11 @@ export function UserEdit() {
             <Button variant="flat"
               onPress={() => { setBalanceModalOpen(false); setBalanceAmount(''); setBalanceReason(''); }}
               isDisabled={balanceLoading}>
-              {"Cancel"}
+              {t('actions.cancel')}
             </Button>
             <Button color="primary" onPress={handleAdjustBalance} isLoading={balanceLoading}
               isDisabled={!balanceAmount.trim() || !balanceReason.trim() || balanceLoading}>
-              {"Apply Adjustment"}
+              {t('actions.apply_adjustment')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -1077,31 +1079,31 @@ export function UserEdit() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <KeyRound size={20} className="text-primary" />
-            {"Set Password"}
+            {t('modals.set_password.title')}
           </ModalHeader>
           <ModalBody className="gap-4">
             <p className="text-sm text-default-500">
-              {`Set a new password for this user. They will be logged out of all sessions.`}
+              {t('modals.set_password.body')}
             </p>
             <Input
-              label={"New Password"}
+              label={t('fields.new_password')}
               type="password"
-              placeholder={"New password..."}
+              placeholder={t('placeholders.new_password')}
               value={newPassword}
               onValueChange={setNewPassword}
               isDisabled={passwordLoading}
-              description={"Password must be at least 8 characters"}
+              description={t('validation.password_min')}
             />
           </ModalBody>
           <ModalFooter>
             <Button variant="flat"
               onPress={() => { setPasswordModalOpen(false); setNewPassword(''); }}
               isDisabled={passwordLoading}>
-              {"Cancel"}
+              {t('actions.cancel')}
             </Button>
             <Button color="primary" onPress={handleSetPassword} isLoading={passwordLoading}
               isDisabled={newPassword.length < 8 || passwordLoading}>
-              {"Set Password"}
+              {t('actions.set_password')}
             </Button>
           </ModalFooter>
         </ModalContent>
