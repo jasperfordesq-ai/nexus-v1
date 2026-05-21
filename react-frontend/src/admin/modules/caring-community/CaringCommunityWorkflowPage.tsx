@@ -278,25 +278,11 @@ const rolePresets = [
 const reportPeriods = ['last_30_days', 'last_90_days', 'year_to_date', 'previous_quarter'] as const;
 const relationshipFrequencies = ['weekly', 'fortnightly', 'monthly', 'ad_hoc'] as const;
 
-const frequencyLabels: Record<'weekly' | 'fortnightly' | 'monthly' | 'ad_hoc', string> = {
-  weekly: 'Weekly',
-  fortnightly: 'Fortnightly',
-  monthly: 'Monthly',
-  ad_hoc: 'Ad hoc',
-};
-
 const reportPeriodLabels: Record<'last_30_days' | 'last_90_days' | 'year_to_date' | 'previous_quarter', string> = {
   last_30_days: 'Last 30 days',
   last_90_days: 'Last 90 days',
   year_to_date: 'Year to date',
   previous_quarter: 'Previous quarter',
-};
-
-const supportRelationshipStatusLabels: Record<'active' | 'paused' | 'completed' | 'cancelled', string> = {
-  active: 'Active',
-  paused: 'Paused',
-  completed: 'Completed',
-  cancelled: 'Cancelled',
 };
 
 const stageContent: Record<'intake' | 'match' | 'log' | 'verify' | 'statement', { title: string; description: string }> = {
@@ -966,11 +952,11 @@ export default function CaringCommunityWorkflowPage() {
       const res = await api.get<SupportRelationshipList>('/v2/admin/caring-community/support-relationships?status=all');
       if (isSupportRelationshipList(res.data)) setRelationships(res.data);
     } catch {
-      toast.error('Could not load support relationships.');
+      toast.error(t('caring_workflow.relationships.load_failed'));
     } finally {
       setLoadingRelationships(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     loadSupportRelationships();
@@ -1026,11 +1012,11 @@ export default function CaringCommunityWorkflowPage() {
         setPaperIntakes(res.data.items);
       }
     } catch {
-      toast.error('Could not load paper onboarding intakes.');
+      toast.error(t('caring_workflow.paper_onboarding.load_failed'));
     } finally {
       setPaperLoading(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     loadPaperIntakes();
@@ -1047,11 +1033,11 @@ export default function CaringCommunityWorkflowPage() {
         setTandemSuggestions([]);
       }
     } catch {
-      setTandemError('Could not load tandem suggestions.');
+      setTandemError(t('caring_workflow.tandem.load_failed'));
     } finally {
       setLoadingTandems(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadTandemSuggestions();
@@ -1066,13 +1052,13 @@ export default function CaringCommunityWorkflowPage() {
         recipient_id: suggestion.recipient.id,
       });
       setTandemSuggestions((prev) => prev.filter((s) => `${s.supporter.id}:${s.recipient.id}` !== key));
-      toast.success('Suggestion dismissed.');
+      toast.success(t('caring_workflow.tandem.dismiss_success'));
     } catch {
-      toast.error('Could not dismiss suggestion.');
+      toast.error(t('caring_workflow.tandem.dismiss_failed'));
     } finally {
       setDismissingTandemKey(null);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   const createTandemFromSuggestion = useCallback((suggestion: TandemSuggestion) => {
     const supporter: MemberSearchMember = {
@@ -1091,7 +1077,10 @@ export default function CaringCommunityWorkflowPage() {
     setRelationshipRecipientId(String(suggestion.recipient.id));
     setRelationshipSupporter(supporter);
     setRelationshipRecipient(recipient);
-    setRelationshipTitle(`Tandem: ${suggestion.supporter.name} & ${suggestion.recipient.name}`);
+    setRelationshipTitle(t('caring_workflow.tandem.relationship_title', {
+      supporter: suggestion.supporter.name,
+      recipient: suggestion.recipient.name,
+    }));
     // Scroll to the support-relationships create form so the coordinator sees it.
     if (typeof window !== 'undefined') {
       const target = document.getElementById('caring-support-relationship-form');
@@ -1099,7 +1088,7 @@ export default function CaringCommunityWorkflowPage() {
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     setLoadingFavours(true);
@@ -1117,26 +1106,28 @@ export default function CaringCommunityWorkflowPage() {
   const signals = summary?.coordinator_signals;
   const rolePack = summary?.role_pack;
   const formatHours = (value: number) => `${Number(value.toFixed(1))} h`;
-  const formatChf = (value: number) => `Estimated social value: CHF ${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  const formatChf = (value: number) => t('caring_workflow.member_statement.chf_value', {
+    value: value.toLocaleString(undefined, { maximumFractionDigits: 0 }),
+  });
 
   const roleCountLabel = useMemo(() => (
     rolePack
-      ? `${rolePack.installed_count} of ${rolePack.total_count} role presets installed`
-      : `${rolePresets.length} role presets available`
-  ), [rolePack]);
+      ? t('caring_workflow.role_pack.installed_count', { installed: rolePack.installed_count, total: rolePack.total_count })
+      : t('caring_workflow.role_pack.available_count', { count: rolePresets.length })
+  ), [rolePack, t]);
 
   const roleStatusByKey = useMemo(() => {
     const statuses = rolePack?.presets ?? [];
     return new Map(statuses.map((status) => [status.key, status]));
   }, [rolePack]);
   const coordinatorOptions = useMemo(() => [
-    { id: 'unassigned', label: 'Unassigned' },
+    { id: 'unassigned', label: t('caring_workflow.empty.unassigned') },
     ...(summary?.coordinators ?? []).map((coordinator) => ({ id: String(coordinator.id), label: coordinator.name })),
-  ], [summary?.coordinators]);
+  ], [summary?.coordinators, t]);
   const frequencyOptions = useMemo(() => relationshipFrequencies.map((frequency) => ({
     id: frequency,
-    label: frequencyLabels[frequency],
-  })), []);
+    label: t(`caring_workflow.relationships.frequency.${frequency}`),
+  })), [t]);
 
   const replaceReview = useCallback((review: PendingReview) => {
     setSummary((current) => {
@@ -1160,13 +1151,13 @@ export default function CaringCommunityWorkflowPage() {
     try {
       const res = await api.post<RolePack>('/v2/admin/caring-community/role-presets/install', {});
       setSummary((current) => current ? { ...current, role_pack: res.data } : current);
-      toast.success('Role pack installed.');
+      toast.success(t('caring_workflow.role_pack.install_success'));
     } catch {
-      toast.error('Could not install role pack.');
+      toast.error(t('caring_workflow.role_pack.install_failed'));
     } finally {
       setInstallingRoles(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   const savePolicy = useCallback(async () => {
     if (!summary?.policy) return;
@@ -1175,13 +1166,13 @@ export default function CaringCommunityWorkflowPage() {
     try {
       const res = await api.put<WorkflowPolicy>('/v2/admin/caring-community/workflow/policy', summary.policy);
       setSummary((current) => current ? { ...current, policy: res.data } : current);
-      toast.success('Workflow policy saved.');
+      toast.success(t('caring_workflow.policy.save_success'));
     } catch {
-      toast.error('Could not save workflow policy.');
+      toast.error(t('caring_workflow.policy.save_failed'));
     } finally {
       setSavingPolicy(false);
     }
-  }, [summary?.policy, toast]);
+  }, [summary?.policy, t, toast]);
 
   const assignReview = useCallback(async (reviewId: number, assignedTo: number | null) => {
     setAssigningReviewId(reviewId);
@@ -1190,28 +1181,28 @@ export default function CaringCommunityWorkflowPage() {
         assigned_to: assignedTo,
       });
       if (res.data?.review) replaceReview(res.data.review);
-      toast.success('Coordinator assigned.');
+      toast.success(t('caring_workflow.pending.assign_success'));
     } catch {
-      toast.error('Could not assign coordinator.');
+      toast.error(t('caring_workflow.pending.assign_failed'));
     } finally {
       setAssigningReviewId(null);
     }
-  }, [replaceReview, toast]);
+  }, [replaceReview, t, toast]);
 
   const escalateReview = useCallback(async (review: PendingReview) => {
     setEscalatingReviewId(review.id);
     try {
       const res = await api.put<{ review: PendingReview }>(`/v2/admin/caring-community/workflow/reviews/${review.id}/escalate`, {
-        note: `Manually escalated after ${review.age_days} day${review.age_days === 1 ? '' : 's'} pending.`,
+        note: t('caring_workflow.pending.manual_escalation_note', { count: review.age_days }),
       });
       if (res.data?.review) replaceReview(res.data.review);
-      toast.success('Review escalated.');
+      toast.success(t('caring_workflow.pending.escalate_success'));
     } catch {
-      toast.error('Could not escalate review.');
+      toast.error(t('caring_workflow.pending.escalate_failed'));
     } finally {
       setEscalatingReviewId(null);
     }
-  }, [replaceReview, toast]);
+  }, [replaceReview, t, toast]);
 
   const decideReview = useCallback(async (review: PendingReview, action: 'approve' | 'decline') => {
     setDecidingReviewId(review.id);
@@ -1220,13 +1211,13 @@ export default function CaringCommunityWorkflowPage() {
         action,
       });
       if (res.data?.review?.summary) setSummary(res.data.review.summary);
-      toast.success(action === 'approve' ? 'Review approved.' : 'Review declined.');
+      toast.success(action === 'approve' ? t('caring_workflow.pending.approve_success') : t('caring_workflow.pending.decline_success'));
     } catch {
-      toast.error('Could not record decision.');
+      toast.error(t('caring_workflow.pending.decision_failed'));
     } finally {
       setDecidingReviewId(null);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   const statementQuery = useCallback((format?: 'csv') => {
     const params = new URLSearchParams();
@@ -1240,7 +1231,7 @@ export default function CaringCommunityWorkflowPage() {
   const loadMemberStatement = useCallback(async () => {
     const memberId = Number(statementMemberId);
     if (!Number.isInteger(memberId) || memberId <= 0) {
-      toast.error('Enter a valid member ID.');
+      toast.error(t('caring_workflow.member_statement.invalid_member'));
       return;
     }
 
@@ -1249,16 +1240,16 @@ export default function CaringCommunityWorkflowPage() {
       const res = await api.get<MemberStatement>(`/v2/admin/caring-community/member-statements/${memberId}${statementQuery()}`);
       setMemberStatement(res.data ?? null);
     } catch {
-      toast.error('Could not load member statement.');
+      toast.error(t('caring_workflow.member_statement.load_failed'));
     } finally {
       setLoadingStatement(false);
     }
-  }, [statementMemberId, statementQuery, toast]);
+  }, [statementMemberId, statementQuery, t, toast]);
 
   const exportMemberStatement = useCallback(async () => {
     const memberId = Number(statementMemberId);
     if (!Number.isInteger(memberId) || memberId <= 0) {
-      toast.error('Enter a valid member ID.');
+      toast.error(t('caring_workflow.member_statement.invalid_member'));
       return;
     }
 
@@ -1274,19 +1265,19 @@ export default function CaringCommunityWorkflowPage() {
       anchor.download = res.data.filename;
       anchor.click();
       URL.revokeObjectURL(url);
-      toast.success('Statement exported.');
+      toast.success(t('caring_workflow.member_statement.export_success'));
     } catch {
-      toast.error('Could not export statement.');
+      toast.error(t('caring_workflow.member_statement.export_failed'));
     } finally {
       setLoadingStatement(false);
     }
-  }, [statementMemberId, statementQuery, toast]);
+  }, [statementMemberId, statementQuery, t, toast]);
 
   const createSupportRelationship = useCallback(async () => {
     const supporterId = Number(relationshipSupporterId);
     const recipientId = Number(relationshipRecipientId);
     if (!Number.isInteger(supporterId) || !Number.isInteger(recipientId) || supporterId <= 0 || recipientId <= 0 || supporterId === recipientId) {
-      toast.error('Pick two different members.');
+      toast.error(t('caring_workflow.relationships.pick_different_members'));
       return;
     }
 
@@ -1307,10 +1298,10 @@ export default function CaringCommunityWorkflowPage() {
       setRelationshipTitle('');
       setRelationshipExpectedHours('1');
       setRelationshipStartDate('');
-      toast.success('Support relationship created.');
+      toast.success(t('caring_workflow.relationships.create_success'));
       loadSupportRelationships();
     } catch {
-      toast.error('Could not create support relationship.');
+      toast.error(t('caring_workflow.relationships.create_failed'));
     } finally {
       setSavingRelationship(false);
     }
@@ -1322,6 +1313,7 @@ export default function CaringCommunityWorkflowPage() {
     relationshipStartDate,
     relationshipSupporterId,
     relationshipTitle,
+    t,
     toast,
   ]);
 
@@ -1329,19 +1321,19 @@ export default function CaringCommunityWorkflowPage() {
     setUpdatingRelationshipId(relationship.id);
     try {
       await api.put<SupportRelationship>(`/v2/admin/caring-community/support-relationships/${relationship.id}`, { status });
-      toast.success('Support relationship updated.');
+      toast.success(t('caring_workflow.relationships.update_success'));
       loadSupportRelationships();
     } catch {
-      toast.error('Could not update support relationship.');
+      toast.error(t('caring_workflow.relationships.update_failed'));
     } finally {
       setUpdatingRelationshipId(null);
     }
-  }, [loadSupportRelationships, toast]);
+  }, [loadSupportRelationships, t, toast]);
 
   const logSupportRelationshipHours = useCallback(async (relationship: SupportRelationship) => {
     const hours = Number(relationshipLogHours || relationship.expected_hours);
     if (!relationshipLogDate || !Number.isFinite(hours) || hours <= 0 || hours > 24) {
-      toast.error('Enter a valid date and 0.25–24 hours.');
+      toast.error(t('caring_workflow.relationships.log_validation_failed'));
       return;
     }
 
@@ -1352,14 +1344,14 @@ export default function CaringCommunityWorkflowPage() {
         hours,
         description: relationshipLogDescription || undefined,
       });
-      toast.success('Support hours logged.');
+      toast.success(t('caring_workflow.relationships.log_success'));
       setRelationshipLogDate('');
       setRelationshipLogHours('');
       setRelationshipLogDescription('');
       loadSupportRelationships();
       loadWorkflow();
     } catch {
-      toast.error('Could not log support hours.');
+      toast.error(t('caring_workflow.relationships.log_failed'));
     } finally {
       setLoggingRelationshipId(null);
     }
@@ -1369,6 +1361,7 @@ export default function CaringCommunityWorkflowPage() {
     relationshipLogDate,
     relationshipLogDescription,
     relationshipLogHours,
+    t,
     toast,
   ]);
 
@@ -1701,8 +1694,8 @@ export default function CaringCommunityWorkflowPage() {
           <Card shadow="sm">
             <CardHeader className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold">Support relationships</h2>
-                <p className="mt-1 text-sm text-default-500">Ongoing supporter–recipient pairs and recurring check-ins.</p>
+                <h2 className="text-lg font-semibold">{t('caring_workflow.relationships.title')}</h2>
+                <p className="mt-1 text-sm text-default-500">{t('caring_workflow.relationships.description')}</p>
               </div>
               <Button
                 size="sm"
@@ -1711,16 +1704,16 @@ export default function CaringCommunityWorkflowPage() {
                 isLoading={loadingRelationships}
                 onPress={loadSupportRelationships}
               >
-                Refresh
+                {t('caring_workflow.actions.refresh')}
               </Button>
             </CardHeader>
             <Divider />
             <CardBody className="gap-4">
               <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                <SignalRow label="Active" value={relationships?.stats.active_count ?? 0} />
-                <SignalRow label="Paused" value={relationships?.stats.paused_count ?? 0} />
-                <SignalRow label="Check-ins due" value={relationships?.stats.check_ins_due ?? 0} />
-                <SignalRow label="Expected hours" value={relationships?.stats.expected_active_hours ?? 0} />
+                <SignalRow label={t('caring_workflow.relationships.active')} value={relationships?.stats.active_count ?? 0} />
+                <SignalRow label={t('caring_workflow.relationships.paused')} value={relationships?.stats.paused_count ?? 0} />
+                <SignalRow label={t('caring_workflow.relationships.check_ins_due')} value={relationships?.stats.check_ins_due ?? 0} />
+                <SignalRow label={t('caring_workflow.relationships.expected_hours')} value={relationships?.stats.expected_active_hours ?? 0} />
               </div>
               <div id="caring-support-relationship-form" className="rounded-lg border border-default-200 p-3">
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -1729,10 +1722,10 @@ export default function CaringCommunityWorkflowPage() {
                     onValueChange={setRelationshipSupporterId}
                     selectedMember={relationshipSupporter}
                     onSelectedMemberChange={setRelationshipSupporter}
-                    label="Supporter"
-                    placeholder="Search for the supporter"
-                    noResultsText="No members found"
-                    clearText="Clear"
+                    label={t('caring_workflow.relationships.supporter')}
+                    placeholder={t('caring_workflow.relationships.supporter_placeholder')}
+                    noResultsText={t('caring_workflow.relationships.no_members')}
+                    clearText={t('caring_workflow.relationships.clear')}
                     isRequired
                   />
                   <MemberSearchPicker
@@ -1740,33 +1733,33 @@ export default function CaringCommunityWorkflowPage() {
                     onValueChange={setRelationshipRecipientId}
                     selectedMember={relationshipRecipient}
                     onSelectedMemberChange={setRelationshipRecipient}
-                    label="Recipient"
-                    placeholder="Search for the recipient"
-                    noResultsText="No members found"
-                    clearText="Clear"
+                    label={t('caring_workflow.relationships.recipient')}
+                    placeholder={t('caring_workflow.relationships.recipient_placeholder')}
+                    noResultsText={t('caring_workflow.relationships.no_members')}
+                    clearText={t('caring_workflow.relationships.clear')}
                     isRequired
                   />
-                  <Input label="Relationship title" value={relationshipTitle} onValueChange={setRelationshipTitle} />
+                  <Input label={t('caring_workflow.relationships.relationship_title')} value={relationshipTitle} onValueChange={setRelationshipTitle} />
                   <Select
-                    label="Frequency"
+                    label={t('caring_workflow.relationships.frequency_label')}
                     selectedKeys={[relationshipFrequency]}
                     onSelectionChange={(keys) => setRelationshipFrequency((Array.from(keys)[0]?.toString() as SupportRelationship['frequency']) || 'weekly')}
                     items={frequencyOptions}
                   >
                     {(item) => <SelectItem key={item.id}>{item.label}</SelectItem>}
                   </Select>
-                  <Input type="number" min={0.25} step={0.25} label="Expected hours per visit" value={relationshipExpectedHours} onValueChange={setRelationshipExpectedHours} />
-                  <Input type="date" label="Start date" value={relationshipStartDate} onValueChange={setRelationshipStartDate} />
+                  <Input type="number" min={0.25} step={0.25} label={t('caring_workflow.relationships.expected_hours_per_visit')} value={relationshipExpectedHours} onValueChange={setRelationshipExpectedHours} />
+                  <Input type="date" label={t('caring_workflow.relationships.start_date')} value={relationshipStartDate} onValueChange={setRelationshipStartDate} />
                 </div>
                 <div className="mt-3">
                   <Button color="primary" variant="flat" startContent={<Plus size={16} />} isLoading={savingRelationship} onPress={createSupportRelationship}>
-                    Create relationship
+                    {t('caring_workflow.relationships.create')}
                   </Button>
                 </div>
               </div>
               {(relationships?.items.length ?? 0) === 0 ? (
                 <div className="rounded-lg bg-default-100 p-4 text-sm text-default-500">
-                  No support relationships yet. Create one above.
+                  {t('caring_workflow.relationships.empty')}
                 </div>
               ) : relationships?.items.map((relationship) => (
                 <div key={relationship.id} className="rounded-lg border border-default-200 p-4">
@@ -1774,20 +1767,20 @@ export default function CaringCommunityWorkflowPage() {
                     <div>
                       <p className="text-sm font-semibold text-default-900">{relationship.title}</p>
                       <p className="mt-1 text-sm text-default-500">
-                        {`${relationship.supporter.name} supporting ${relationship.recipient.name}`}
+                        {t('caring_workflow.relationships.pair', { supporter: relationship.supporter.name, recipient: relationship.recipient.name })}
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       <Chip size="sm" color={relationship.status === 'active' ? 'success' : 'warning'} variant="flat">
-                        {supportRelationshipStatusLabels[relationship.status]}
+                        {t(`caring_workflow.relationships.status.${relationship.status}`)}
                       </Chip>
                       <Chip size="sm" color="primary" variant="flat">{formatHours(relationship.expected_hours)}</Chip>
                     </div>
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2 text-xs text-default-500">
-                    <span>{frequencyLabels[relationship.frequency]}</span>
-                    <span>{`Started ${relationship.start_date}`}</span>
-                    {relationship.next_check_in_at && <span>{`Next check-in ${relationship.next_check_in_at}`}</span>}
+                    <span>{t(`caring_workflow.relationships.frequency.${relationship.frequency}`)}</span>
+                    <span>{t('caring_workflow.relationships.started', { date: relationship.start_date })}</span>
+                    {relationship.next_check_in_at && <span>{t('caring_workflow.relationships.next_check_in', { date: relationship.next_check_in_at })}</span>}
                     {relationship.organization_name && <span>{relationship.organization_name}</span>}
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -1799,7 +1792,7 @@ export default function CaringCommunityWorkflowPage() {
                       isLoading={updatingRelationshipId === relationship.id}
                       onPress={() => updateSupportRelationshipStatus(relationship, relationship.status === 'active' ? 'paused' : 'active')}
                     >
-                      {relationship.status === 'active' ? 'Pause' : 'Resume'}
+                      {relationship.status === 'active' ? t('caring_workflow.relationships.pause') : t('caring_workflow.relationships.resume')}
                     </Button>
                   </div>
                   {relationship.status === 'active' && (
@@ -1808,7 +1801,7 @@ export default function CaringCommunityWorkflowPage() {
                         <Input
                           type="date"
                           size="sm"
-                          label="Date"
+                          label={t('caring_workflow.relationships.log_date')}
                           value={relationshipLogDate}
                           onValueChange={setRelationshipLogDate}
                         />
@@ -1818,14 +1811,14 @@ export default function CaringCommunityWorkflowPage() {
                           min={0.25}
                           max={24}
                           step={0.25}
-                          label="Hours"
+                          label={t('caring_workflow.relationships.log_hours')}
                           placeholder={String(relationship.expected_hours)}
                           value={relationshipLogHours}
                           onValueChange={setRelationshipLogHours}
                         />
                         <Input
                           size="sm"
-                          label="Note (optional)"
+                          label={t('caring_workflow.relationships.log_note')}
                           value={relationshipLogDescription}
                           onValueChange={setRelationshipLogDescription}
                         />
@@ -1838,7 +1831,7 @@ export default function CaringCommunityWorkflowPage() {
                           isLoading={loggingRelationshipId === relationship.id}
                           onPress={() => logSupportRelationshipHours(relationship)}
                         >
-                          Log hours
+                          {t('caring_workflow.relationships.log_hours_action')}
                         </Button>
                       </div>
                     </div>

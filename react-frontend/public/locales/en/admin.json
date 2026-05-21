@@ -3805,7 +3805,41 @@
       "age_days_plural": "{{count}} days old",
       "assigned_to": "Assigned to {{name}}",
       "escalated_at": "Escalated {{date}}",
-      "assign_coordinator": "Assign coordinator"
+      "assign_coordinator": "Assign coordinator",
+      "assign_success": "Coordinator assigned.",
+      "assign_failed": "Could not assign coordinator.",
+      "manual_escalation_note": "Manually escalated after {{count}} pending days.",
+      "escalate_success": "Review escalated.",
+      "escalate_failed": "Could not escalate review.",
+      "approve_success": "Review approved.",
+      "decline_success": "Review declined.",
+      "decision_failed": "Could not record decision."
+    },
+    "paper_onboarding": {
+      "load_failed": "Could not load paper onboarding intakes."
+    },
+    "tandem": {
+      "load_failed": "Could not load tandem suggestions.",
+      "dismiss_success": "Suggestion dismissed.",
+      "dismiss_failed": "Could not dismiss suggestion.",
+      "relationship_title": "Tandem: {{supporter}} & {{recipient}}"
+    },
+    "role_pack": {
+      "installed_count": "{{installed}} of {{total}} role presets installed",
+      "available_count": "{{count}} role presets available",
+      "install_success": "Role pack installed.",
+      "install_failed": "Could not install role pack."
+    },
+    "policy": {
+      "save_success": "Workflow policy saved.",
+      "save_failed": "Could not save workflow policy."
+    },
+    "member_statement": {
+      "chf_value": "Estimated social value: CHF {{value}}",
+      "invalid_member": "Enter a valid member ID.",
+      "load_failed": "Could not load member statement.",
+      "export_success": "Statement exported.",
+      "export_failed": "Could not export statement."
     },
     "predictive": {
       "title": "Predictive Insights",
@@ -3857,6 +3891,56 @@
         "critical": "Critical",
         "warning": "Warning",
         "info": "Info"
+      }
+    },
+    "relationships": {
+      "title": "Support relationships",
+      "description": "Ongoing supporter-recipient pairs and recurring check-ins.",
+      "active": "Active",
+      "paused": "Paused",
+      "check_ins_due": "Check-ins due",
+      "expected_hours": "Expected hours",
+      "supporter": "Supporter",
+      "supporter_placeholder": "Search for the supporter",
+      "recipient": "Recipient",
+      "recipient_placeholder": "Search for the recipient",
+      "no_members": "No members found",
+      "clear": "Clear",
+      "relationship_title": "Relationship title",
+      "frequency_label": "Frequency",
+      "expected_hours_per_visit": "Expected hours per visit",
+      "start_date": "Start date",
+      "create": "Create relationship",
+      "empty": "No support relationships yet. Create one above.",
+      "pair": "{{supporter}} supporting {{recipient}}",
+      "started": "Started {{date}}",
+      "next_check_in": "Next check-in {{date}}",
+      "pause": "Pause",
+      "resume": "Resume",
+      "log_date": "Date",
+      "log_hours": "Hours",
+      "log_note": "Note (optional)",
+      "log_hours_action": "Log hours",
+      "load_failed": "Could not load support relationships.",
+      "pick_different_members": "Pick two different members.",
+      "create_success": "Support relationship created.",
+      "create_failed": "Could not create support relationship.",
+      "update_success": "Support relationship updated.",
+      "update_failed": "Could not update support relationship.",
+      "log_validation_failed": "Enter a valid date and 0.25-24 hours.",
+      "log_success": "Support hours logged.",
+      "log_failed": "Could not log support hours.",
+      "frequency": {
+        "weekly": "Weekly",
+        "fortnightly": "Fortnightly",
+        "monthly": "Monthly",
+        "ad_hoc": "Ad hoc"
+      },
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
       }
     }
   },
