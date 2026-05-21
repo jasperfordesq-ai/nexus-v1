@@ -217,7 +217,7 @@ function MiniBarChart({
   t: Translate;
 }) {
   if (breakdown.length === 0) {
-    return <p className="text-default-400 text-sm">{t('advertising.push.no_daily_data', 'No daily data yet.')}</p>;
+    return <p className="text-default-400 text-sm">{t('advertising.push.no_daily_data')}</p>;
   }
 
   const maxSends = Math.max(...breakdown.map((d) => d.sends), 1);
@@ -227,11 +227,11 @@ function MiniBarChart({
       <div className="flex gap-4 text-xs text-default-400 mb-2">
         <span className="flex items-center gap-1">
           <span className="inline-block w-3 h-3 rounded-sm bg-primary" />
-          {t('advertising.push.metrics.sends', 'Sends')}
+          {t('advertising.push.metrics.sends')}
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block w-3 h-3 rounded-sm bg-success" />
-          {t('advertising.push.metrics.opens', 'Opens')}
+          {t('advertising.push.metrics.opens')}
         </span>
       </div>
       <div className="overflow-x-auto">
@@ -338,7 +338,7 @@ export default function PushCampaignAdminPage() {
       const statsData = ((statsRaw as unknown as { data?: OverviewStats }).data ?? statsRaw) as OverviewStats;
       setStats(statsData);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : t('advertising.push.toasts.load_failed', 'Failed to load campaigns'));
+      setError(e instanceof Error ? e.message : t('advertising.push.toasts.load_failed'));
     } finally {
       setLoading(false);
     }
@@ -360,7 +360,7 @@ export default function PushCampaignAdminPage() {
       setActionMsg(t('advertising.push.toasts.approved', { name: campaign.name }));
       await fetchCampaigns();
     } catch (e: unknown) {
-      setActionMsg(e instanceof Error ? e.message : t('advertising.push.toasts.approve_failed', 'Failed to approve campaign.'));
+      setActionMsg(e instanceof Error ? e.message : t('advertising.push.toasts.approve_failed'));
     } finally {
       setApproving(null);
     }
@@ -374,7 +374,7 @@ export default function PushCampaignAdminPage() {
       setActionMsg(t('advertising.push.toasts.dispatched', { name: campaign.name }));
       await fetchCampaigns();
     } catch (e: unknown) {
-      setActionMsg(e instanceof Error ? e.message : t('advertising.push.toasts.dispatch_failed', 'Failed to dispatch campaign.'));
+      setActionMsg(e instanceof Error ? e.message : t('advertising.push.toasts.dispatch_failed'));
     } finally {
       setDispatching(null);
     }
@@ -397,7 +397,7 @@ export default function PushCampaignAdminPage() {
       setActionMsg(t('advertising.push.toasts.rejected', { name: rejectTarget.name }));
       await fetchCampaigns();
     } catch (e: unknown) {
-      setActionMsg(e instanceof Error ? e.message : t('advertising.push.toasts.reject_failed', 'Failed to reject campaign.'));
+      setActionMsg(e instanceof Error ? e.message : t('advertising.push.toasts.reject_failed'));
     } finally {
       setRejectSubmitting(false);
     }
@@ -421,7 +421,7 @@ export default function PushCampaignAdminPage() {
 
   const handleCreate = async () => {
     if (!createName.trim() || !createTitle.trim() || !createBody.trim()) {
-      setCreateError(t('advertising.push.toasts.required_fields', 'Name, title, and body are required.'));
+      setCreateError(t('advertising.push.toasts.required_fields'));
       return;
     }
     setCreateSubmitting(true);
@@ -444,7 +444,7 @@ export default function PushCampaignAdminPage() {
       setCreateScheduledAt('');
       await fetchCampaigns();
     } catch (e: unknown) {
-      setCreateError(e instanceof Error ? e.message : t('advertising.push.toasts.create_failed', 'Failed to create campaign.'));
+      setCreateError(e instanceof Error ? e.message : t('advertising.push.toasts.create_failed'));
     } finally {
       setCreateSubmitting(false);
     }
@@ -468,23 +468,23 @@ export default function PushCampaignAdminPage() {
       <div className="flex flex-wrap gap-3 mb-6">
         <StatCard
           icon={<Megaphone size={16} />}
-          label={t('advertising.push.stats.total_campaigns', 'Total campaigns')}
+          label={t('advertising.push.stats.total_campaigns')}
           value={stats?.total_campaigns ?? 0}
         />
         <StatCard
           icon={<Clock size={16} />}
-          label={t('advertising.push.stats.pending_review', 'Pending review')}
+          label={t('advertising.push.stats.pending_review')}
           value={pendingCount}
-          sub={pendingCount > 0 ? t('advertising.push.stats.needs_attention', 'Needs attention') : undefined}
+          sub={pendingCount > 0 ? t('advertising.push.stats.needs_attention') : undefined}
         />
         <StatCard
           icon={<Users size={16} />}
-          label={t('advertising.push.stats.sends_this_month', 'Sends this month')}
+          label={t('advertising.push.stats.sends_this_month')}
           value={(stats?.sends_this_month ?? 0).toLocaleString()}
         />
         <StatCard
           icon={<TrendingUp size={16} />}
-          label={t('advertising.push.stats.revenue_this_month', 'Revenue this month')}
+          label={t('advertising.push.stats.revenue_this_month')}
           value={formatCents(stats?.revenue_cents_this_month ?? 0)}
         />
       </div>
@@ -496,14 +496,14 @@ export default function PushCampaignAdminPage() {
         <CardHeader className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-2">
             <Bell size={20} className="text-primary" />
-            <h2 className="text-lg font-semibold">{t('advertising.push.header.title', 'Paid push campaigns (AG57)')}</h2>
+            <h2 className="text-lg font-semibold">{t('advertising.push.header.title')}</h2>
           </div>
           <Button
             color="primary"
             startContent={<Send size={16} />}
             onPress={createDisc.onOpen}
           >
-            {t('advertising.shared.actions.new_campaign', 'New campaign')}
+            {t('advertising.shared.actions.new_campaign')}
           </Button>
         </CardHeader>
         <Divider />
@@ -516,18 +516,18 @@ export default function PushCampaignAdminPage() {
 
           {/* Status filter tabs */}
           <Tabs
-            aria-label={t('advertising.shared.filter_by_status', 'Filter by status')}
+            aria-label={t('advertising.shared.filter_by_status')}
             selectedKey={statusFilter}
             onSelectionChange={(k) => setStatusFilter(k as string)}
             className="mb-4"
             size="sm"
           >
-            <Tab key="all" title={t('advertising.status.all', 'All')} />
-            <Tab key="pending_review" title={t('advertising.status.pending_review', 'Pending Review')} />
-            <Tab key="scheduled" title={t('advertising.status.scheduled', 'Scheduled')} />
-            <Tab key="sent" title={t('advertising.status.sent', 'Sent')} />
-            <Tab key="rejected" title={t('advertising.status.rejected', 'Rejected')} />
-            <Tab key="draft" title={t('advertising.status.drafts', 'Drafts')} />
+            <Tab key="all" title={t('advertising.status.all')} />
+            <Tab key="pending_review" title={t('advertising.status.pending_review')} />
+            <Tab key="scheduled" title={t('advertising.status.scheduled')} />
+            <Tab key="sent" title={t('advertising.status.sent')} />
+            <Tab key="rejected" title={t('advertising.status.rejected')} />
+            <Tab key="draft" title={t('advertising.status.drafts')} />
           </Tabs>
 
           {loading && (
@@ -541,21 +541,21 @@ export default function PushCampaignAdminPage() {
           )}
 
           {!loading && !error && campaigns.length === 0 && (
-            <p className="text-default-400 text-sm py-4">{t('advertising.shared.empty.no_campaigns', 'No campaigns found.')}</p>
+            <p className="text-default-400 text-sm py-4">{t('advertising.shared.empty.no_campaigns')}</p>
           )}
 
           {!loading && !error && campaigns.length > 0 && (
-            <Table aria-label={t('advertising.push.table_aria', 'Push campaigns')} removeWrapper>
+            <Table aria-label={t('advertising.push.table_aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>{t('advertising.shared.columns.campaign', 'Campaign')}</TableColumn>
-                <TableColumn>{t('advertising.shared.columns.advertiser', 'Advertiser')}</TableColumn>
-                <TableColumn>{t('advertising.shared.columns.status', 'Status')}</TableColumn>
-                <TableColumn>{t('advertising.push.columns.title_preview', 'Title preview')}</TableColumn>
-                <TableColumn>{t('advertising.push.columns.targets', 'Targets')}</TableColumn>
-                <TableColumn>{t('advertising.push.columns.open_rate', 'Open rate')}</TableColumn>
-                <TableColumn>{t('advertising.push.columns.cost', 'Cost')}</TableColumn>
-                <TableColumn>{t('advertising.push.columns.scheduled', 'Scheduled')}</TableColumn>
-                <TableColumn>{t('advertising.shared.columns.actions', 'Actions')}</TableColumn>
+                <TableColumn>{t('advertising.shared.columns.campaign')}</TableColumn>
+                <TableColumn>{t('advertising.shared.columns.advertiser')}</TableColumn>
+                <TableColumn>{t('advertising.shared.columns.status')}</TableColumn>
+                <TableColumn>{t('advertising.push.columns.title_preview')}</TableColumn>
+                <TableColumn>{t('advertising.push.columns.targets')}</TableColumn>
+                <TableColumn>{t('advertising.push.columns.open_rate')}</TableColumn>
+                <TableColumn>{t('advertising.push.columns.cost')}</TableColumn>
+                <TableColumn>{t('advertising.push.columns.scheduled')}</TableColumn>
+                <TableColumn>{t('advertising.shared.columns.actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {campaigns.map((c) => (
@@ -606,7 +606,7 @@ export default function PushCampaignAdminPage() {
                     </TableCell>
                     <TableCell>
                       <span className="text-xs text-default-400">
-                        {c.scheduled_at ? formatDate(c.scheduled_at) : t('advertising.push.immediate', 'Immediate')}
+                        {c.scheduled_at ? formatDate(c.scheduled_at) : t('advertising.push.immediate')}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -621,7 +621,7 @@ export default function PushCampaignAdminPage() {
                               isLoading={approving === c.id}
                               onPress={() => handleApprove(c)}
                             >
-                              {t('advertising.shared.actions.approve', 'Approve')}
+                              {t('advertising.shared.actions.approve')}
                             </Button>
                             <Button
                               size="sm"
@@ -630,7 +630,7 @@ export default function PushCampaignAdminPage() {
                               startContent={<XCircle size={14} />}
                               onPress={() => openRejectModal(c)}
                             >
-                              {t('advertising.shared.actions.reject', 'Reject')}
+                              {t('advertising.shared.actions.reject')}
                             </Button>
                           </>
                         )}
@@ -643,7 +643,7 @@ export default function PushCampaignAdminPage() {
                             isLoading={dispatching === c.id}
                             onPress={() => handleDispatch(c)}
                           >
-                            {t('advertising.push.actions.dispatch_now', 'Dispatch now')}
+                            {t('advertising.push.actions.dispatch_now')}
                           </Button>
                         )}
                         <Button
@@ -652,7 +652,7 @@ export default function PushCampaignAdminPage() {
                           startContent={<BarChart3 size={14} />}
                           onPress={() => openDetailModal(c)}
                         >
-                          {t('advertising.shared.actions.details', 'Details')}
+                          {t('advertising.shared.actions.details')}
                         </Button>
                       </div>
                     </TableCell>
@@ -676,7 +676,7 @@ export default function PushCampaignAdminPage() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <BarChart3 size={18} />
-            {t('advertising.shared.campaign_details', 'Campaign details')}
+            {t('advertising.shared.campaign_details')}
           </ModalHeader>
           <ModalBody>
             {detailLoading && (
@@ -689,33 +689,33 @@ export default function PushCampaignAdminPage() {
                 {/* Summary */}
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.shared.fields.campaign_name', 'Campaign name')}</p>
+                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.shared.fields.campaign_name')}</p>
                     <p className="font-medium">{detailCampaign.name}</p>
                   </div>
                   <div>
-                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.shared.columns.status', 'Status')}</p>
+                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.shared.columns.status')}</p>
                     <StatusChip status={detailCampaign.status} t={t} />
                   </div>
                   <div>
-                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.shared.columns.advertiser', 'Advertiser')}</p>
+                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.shared.columns.advertiser')}</p>
                     <p>{detailCampaign.advertiser_name || '—'}</p>
                     <p className="text-default-400 text-xs">{detailCampaign.advertiser_email}</p>
                   </div>
                   <div>
-                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.shared.fields.type', 'Type')}</p>
+                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.shared.fields.type')}</p>
                     <p>{t(ADVERTISER_LABEL_KEYS[detailCampaign.advertiser_type], detailCampaign.advertiser_type)}</p>
                   </div>
                   <div className="col-span-2">
-                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.push.fields.push_title', 'Push title')}</p>
+                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.push.fields.push_title')}</p>
                     <p className="font-medium">{detailCampaign.title}</p>
                   </div>
                   <div className="col-span-2">
-                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.push.fields.push_body', 'Push body')}</p>
+                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.push.fields.push_body')}</p>
                     <p>{detailCampaign.body}</p>
                   </div>
                   {detailCampaign.cta_url && (
                     <div className="col-span-2">
-                      <p className="text-default-400 text-xs mb-0.5">{t('advertising.push.fields.cta_url', 'CTA URL')}</p>
+                      <p className="text-default-400 text-xs mb-0.5">{t('advertising.push.fields.cta_url')}</p>
                       <a
                         href={detailCampaign.cta_url}
                         target="_blank"
@@ -734,19 +734,19 @@ export default function PushCampaignAdminPage() {
                 <div className="grid grid-cols-4 gap-3 text-center text-sm">
                   <div>
                     <p className="text-2xl font-bold">{detailCampaign.actual_send_count.toLocaleString()}</p>
-                    <p className="text-default-400 text-xs">{t('advertising.push.metrics.sent', 'Sent')}</p>
+                    <p className="text-default-400 text-xs">{t('advertising.push.metrics.sent')}</p>
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{detailCampaign.open_count.toLocaleString()}</p>
-                    <p className="text-default-400 text-xs">{t('advertising.push.metrics.opens', 'Opens')}</p>
+                    <p className="text-default-400 text-xs">{t('advertising.push.metrics.opens')}</p>
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{openRate(detailCampaign)}</p>
-                    <p className="text-default-400 text-xs">{t('advertising.push.columns.open_rate', 'Open rate')}</p>
+                    <p className="text-default-400 text-xs">{t('advertising.push.columns.open_rate')}</p>
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{formatCents(detailCampaign.total_cost_cents)}</p>
-                    <p className="text-default-400 text-xs">{t('advertising.push.metrics.revenue', 'Revenue')}</p>
+                    <p className="text-default-400 text-xs">{t('advertising.push.metrics.revenue')}</p>
                   </div>
                 </div>
 
@@ -755,7 +755,7 @@ export default function PushCampaignAdminPage() {
                   <>
                     <Divider />
                     <div>
-                      <p className="text-sm font-medium mb-3">{t('advertising.push.daily_breakdown', 'Daily breakdown')}</p>
+                      <p className="text-sm font-medium mb-3">{t('advertising.push.daily_breakdown')}</p>
                       <MiniBarChart breakdown={detailCampaign.analytics.daily_breakdown} t={t} />
                     </div>
                   </>
@@ -766,7 +766,7 @@ export default function PushCampaignAdminPage() {
                   <>
                     <Divider />
                     <div className="rounded-lg bg-danger-50 border border-danger-200 p-3 text-sm">
-                      <p className="font-medium text-danger mb-1">{t('advertising.shared.rejection_reason', 'Rejection reason')}</p>
+                      <p className="font-medium text-danger mb-1">{t('advertising.shared.rejection_reason')}</p>
                       <p className="text-danger-700">{detailCampaign.rejection_reason}</p>
                     </div>
                   </>
@@ -776,19 +776,19 @@ export default function PushCampaignAdminPage() {
                 <Divider />
                 <div className="grid grid-cols-2 gap-3 text-xs text-default-400">
                   <div>
-                    <span>{t('advertising.push.dates.created', 'Created')}: </span>
+                    <span>{t('advertising.push.dates.created')}: </span>
                     <span>{formatDate(detailCampaign.created_at)}</span>
                   </div>
                   <div>
-                    <span>{t('advertising.push.dates.approved', 'Approved')}: </span>
+                    <span>{t('advertising.push.dates.approved')}: </span>
                     <span>{formatDate(detailCampaign.approved_at)}</span>
                   </div>
                   <div>
-                    <span>{t('advertising.push.dates.scheduled', 'Scheduled')}: </span>
-                    <span>{detailCampaign.scheduled_at ? formatDate(detailCampaign.scheduled_at) : t('advertising.push.immediate', 'Immediate')}</span>
+                    <span>{t('advertising.push.dates.scheduled')}: </span>
+                    <span>{detailCampaign.scheduled_at ? formatDate(detailCampaign.scheduled_at) : t('advertising.push.immediate')}</span>
                   </div>
                   <div>
-                    <span>{t('advertising.push.dates.sent', 'Sent')}: </span>
+                    <span>{t('advertising.push.dates.sent')}: </span>
                     <span>{formatDate(detailCampaign.sent_at)}</span>
                   </div>
                 </div>
@@ -797,7 +797,7 @@ export default function PushCampaignAdminPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={detailDisc.onClose}>
-              {t('advertising.shared.actions.close', 'Close')}
+              {t('advertising.shared.actions.close')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -810,17 +810,17 @@ export default function PushCampaignAdminPage() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <XCircle size={18} className="text-danger" />
-            {t('advertising.shared.actions.reject_campaign', 'Reject campaign')}
+            {t('advertising.shared.actions.reject_campaign')}
           </ModalHeader>
           <ModalBody>
             {rejectTarget && (
               <>
                 <p className="text-sm text-default-600">
-                  {t('advertising.push.reject_intro_prefix', 'Rejecting')} <strong>{rejectTarget.name}</strong>. {t('advertising.push.reject_intro_suffix', 'Please provide a reason that will be visible to the advertiser.')}
+                  {t('advertising.push.reject_intro_prefix')} <strong>{rejectTarget.name}</strong>. {t('advertising.push.reject_intro_suffix')}
                 </p>
                 <Textarea
-                  label={t('advertising.shared.rejection_reason', 'Rejection reason')}
-                  placeholder={t('advertising.push.rejection_placeholder', 'e.g. Content does not comply with community guidelines...')}
+                  label={t('advertising.shared.rejection_reason')}
+                  placeholder={t('advertising.push.rejection_placeholder')}
                   value={rejectReason}
                   onValueChange={setRejectReason}
                   variant="bordered"
@@ -832,7 +832,7 @@ export default function PushCampaignAdminPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={rejectDisc.onClose}>
-              {t('advertising.shared.actions.cancel', 'Cancel')}
+              {t('advertising.shared.actions.cancel')}
             </Button>
             <Button
               color="danger"
@@ -840,7 +840,7 @@ export default function PushCampaignAdminPage() {
               isDisabled={!rejectReason.trim()}
               onPress={handleReject}
             >
-              {t('advertising.shared.actions.reject_campaign', 'Reject campaign')}
+              {t('advertising.shared.actions.reject_campaign')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -853,7 +853,7 @@ export default function PushCampaignAdminPage() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Megaphone size={18} className="text-primary" />
-            {t('advertising.push.create_title', 'New push campaign')}
+            {t('advertising.push.create_title')}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-3">
@@ -861,15 +861,15 @@ export default function PushCampaignAdminPage() {
                 <p className="text-danger text-sm">{createError}</p>
               )}
               <Input
-                label={t('advertising.shared.fields.campaign_name', 'Campaign name')}
-                placeholder={t('advertising.push.placeholders.campaign_name', 'e.g. Spring Promotion - Cafe Seeblick')}
+                label={t('advertising.shared.fields.campaign_name')}
+                placeholder={t('advertising.push.placeholders.campaign_name')}
                 value={createName}
                 onValueChange={setCreateName}
                 variant="bordered"
                 isRequired
               />
               <Select
-                label={t('advertising.shared.fields.advertiser_type', 'Advertiser type')}
+                label={t('advertising.shared.fields.advertiser_type')}
                 selectedKeys={[createType]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as AdvertiserType;
@@ -877,14 +877,14 @@ export default function PushCampaignAdminPage() {
                 }}
                 variant="bordered"
               >
-                <SelectItem key="sme">{t('advertising.advertiser.sme', 'SME')}</SelectItem>
-                <SelectItem key="verein">{t('advertising.advertiser.verein', 'Association')}</SelectItem>
-                <SelectItem key="gemeinde">{t('advertising.advertiser.gemeinde', 'Municipality')}</SelectItem>
-                <SelectItem key="private">{t('advertising.advertiser.private', 'Private')}</SelectItem>
+                <SelectItem key="sme">{t('advertising.advertiser.sme')}</SelectItem>
+                <SelectItem key="verein">{t('advertising.advertiser.verein')}</SelectItem>
+                <SelectItem key="gemeinde">{t('advertising.advertiser.gemeinde')}</SelectItem>
+                <SelectItem key="private">{t('advertising.advertiser.private')}</SelectItem>
               </Select>
               <Input
-                label={t('advertising.push.fields.notification_title', 'Push notification title')}
-                placeholder={t('advertising.push.placeholders.title', 'Max 100 characters')}
+                label={t('advertising.push.fields.notification_title')}
+                placeholder={t('advertising.push.placeholders.title')}
                 value={createTitle}
                 onValueChange={setCreateTitle}
                 variant="bordered"
@@ -893,8 +893,8 @@ export default function PushCampaignAdminPage() {
                 maxLength={100}
               />
               <Textarea
-                label={t('advertising.push.fields.notification_body', 'Push notification body')}
-                placeholder={t('advertising.push.placeholders.body', 'Max 400 characters')}
+                label={t('advertising.push.fields.notification_body')}
+                placeholder={t('advertising.push.placeholders.body')}
                 value={createBody}
                 onValueChange={setCreateBody}
                 variant="bordered"
@@ -904,7 +904,7 @@ export default function PushCampaignAdminPage() {
                 maxLength={400}
               />
               <Input
-                label={t('advertising.push.fields.cta_url_optional', 'CTA URL (optional)')}
+                label={t('advertising.push.fields.cta_url_optional')}
                 placeholder="https://... or nexus://..."
                 value={createCtaUrl}
                 onValueChange={setCreateCtaUrl}
@@ -912,7 +912,7 @@ export default function PushCampaignAdminPage() {
               />
               <Input
                 type="datetime-local"
-                label={t('advertising.push.fields.scheduled_at', 'Scheduled at (optional - leave blank to send on approval)')}
+                label={t('advertising.push.fields.scheduled_at')}
                 value={createScheduledAt}
                 onValueChange={setCreateScheduledAt}
                 variant="bordered"
@@ -921,7 +921,7 @@ export default function PushCampaignAdminPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={createDisc.onClose}>
-              {t('advertising.shared.actions.cancel', 'Cancel')}
+              {t('advertising.shared.actions.cancel')}
             </Button>
             <Button
               color="primary"
@@ -930,7 +930,7 @@ export default function PushCampaignAdminPage() {
               isDisabled={!createName.trim() || !createTitle.trim() || !createBody.trim()}
               onPress={handleCreate}
             >
-              {t('advertising.shared.actions.create_campaign', 'Create campaign')}
+              {t('advertising.shared.actions.create_campaign')}
             </Button>
           </ModalFooter>
         </ModalContent>
