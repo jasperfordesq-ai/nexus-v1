@@ -10254,5 +10254,162 @@
         "rejected": "提案は拒否されました"
       }
     }
+  },
+  "fadp": {
+    "meta": {
+      "page_title": "FADP のコンプライアンス"
+    },
+    "header": {
+      "title": "Swiss FADP コンプライアンス (nDSG)",
+      "description": "データ保護に関する連邦法: 登録処理、保持設定、同意監査、および居住管理。"
+    },
+    "actions": {
+      "add_activity": "アクティビティの追加",
+      "cancel": "キャンセル",
+      "delete": "消去",
+      "edit": "編集",
+      "export_csv": "CSV をエクスポートする",
+      "export_ledger_csv": "完全な台帳をエクスポートする CSV",
+      "refresh": "リフレッシュ",
+      "save_changes": "変更を保存する",
+      "save_configuration": "設定の保存"
+    },
+    "common": {
+      "empty_dash": "—",
+      "no": "いいえ"
+    },
+    "tabs": {
+      "aria": "FADP セクション",
+      "ledger": "同意台帳",
+      "register": "処理レジスタ",
+      "residency": "データの常駐性",
+      "retention": "保持設定"
+    },
+    "register": {
+      "description": "Article 12 nDSG には、処理アクティビティの記録が必要です。個人データが収集、使用、共有、または保持される各アクティビティを追加します。",
+      "empty": "まだ処理アクティビティはありません。レジスタを作成するアクティビティを追加します。",
+      "profiling_yes": "はい: 同意が必要です",
+      "table_aria": "処理アクティビティ",
+      "columns": {
+        "actions": "アクション",
+        "activity": "活動",
+        "automated_profiling": "自動プロファイリング",
+        "legal_basis": "法的根拠",
+        "retention": "保持"
+      }
+    },
+    "retention": {
+      "data_residency_label": "データ常駐宣言",
+      "dpa_contact_description": "データ保護責任者または責任者の電子メール。",
+      "dpa_contact_label": "NEXUSSTERM0TOKEN の連絡先メールアドレス (オプション)",
+      "periods_title": "保存期間",
+      "residency_title": "データの保存場所と DPA への連絡先",
+      "fields": {
+        "activity_logs_years": "活動ログ（年）",
+        "ai_embeddings_years": "AI の埋め込み (年)",
+        "member_data_years": "会員データ（年）",
+        "messages_years": "メッセージ (年)",
+        "transaction_data_years": "取引データ（年）"
+      },
+      "hints": {
+        "activity_logs_years": "プラットフォームのアクティビティと監査ログ。",
+        "ai_embeddings_years": "一致する埋め込み。同意が必要です。",
+        "member_data_years": "登録、プロファイル、認証データ。",
+        "messages_years": "ダイレクトメッセージとグループメッセージ。",
+        "transaction_data_years": "タイムクレジット交換記録。"
+      }
+    },
+    "ledger": {
+      "description": "メンバーの同意決定に関する不変の監査ログ。合法性を証明するために Art. 6 nDSG によって要求されます。",
+      "empty": "同意記録はまだありません。",
+      "table_aria": "同意記録",
+      "truncated": "最新の 200 件のレコードを表示します。完全な台帳 CSV をエクスポートして、すべての {{count}} レコードをダウンロードします。",
+      "columns": {
+        "action": "アクション",
+        "consent_type": "同意の種類",
+        "date": "日付",
+        "ip_address": "IP アドレス",
+        "member_id": "メンバー NEXUSSTERM0TOKEN"
+      }
+    },
+    "residency": {
+      "article_16": "国境を越えた個人データの開示は、宛先国が連邦理事会によって認められた適切なデータ保護を確保している場合に許可されます。 Switzerland、EU/EEA 加盟国、およびその他の少数の国が対象となります。",
+      "article_16_label": "FADP Art. 16",
+      "article_17": "宛先が適格でない場合は、NEXUSSTERM0TOKEN によって承認された標準データ保護条項、拘束力のある企業規則、メンバーの同意など、適切な保護措置を講じる必要があります。",
+      "article_17_label": "FADP Art. 17",
+      "description": "テナント メンバー データが保存および処理される場所。",
+      "dpa_contact": "NEXUSSTERM0TOKEN の連絡先",
+      "title": "宣言されたデータ常駐性",
+      "update_hint_prefix": "宣言された居住権を更新するには、",
+      "update_hint_suffix": "タブ。",
+      "copy": {
+        "EU": "データは EU/EEA 内に保存されます。 Switzerland は、EU のデータ保護が適切であると認識するため、これらの転送には追加の FADP 保護手段は必要ありません。",
+        "International": "データは Switzerland および EU の外部に保存されます。 Art. 16-17 nDSG の安全対策（標準の契約条項や転送ごとの明示的なメンバーの同意など）が必要です。",
+        "Switzerland": "データはすべて Switzerland 内に保存されます。この宣言には国境を越えた転送規定は必要ありません。"
+      }
+    },
+    "summary": {
+      "automated_profiling": "自動プロファイリング",
+      "generated": "生成された",
+      "tenant": "テナント",
+      "title": "レジスタ概要",
+      "total_activities": "活動合計"
+    },
+    "activity_modal": {
+      "add_title": "処理アクティビティの追加",
+      "edit_title": "処理アクティビティの編集",
+      "fields": {
+        "activity_name": "アクティビティ名",
+        "automated_profiling": "自動プロファイリング",
+        "data_categories": "データ カテゴリ (カンマ区切り)",
+        "legal_basis": "法的根拠",
+        "purpose": "目的",
+        "recipients": "受信者 (カンマ区切り、オプション)",
+        "retention_period": "保存期間",
+        "sort_order": "並べ替え順序"
+      },
+      "hints": {
+        "automated_profiling": "Art. 21 nDSG: 自動化された個人の意思決定には、明示的な同意と透明性が必要です。",
+        "data_categories": "例: 名前、電子メール、電話番号、住所。",
+        "purpose": "このデータはなぜ処理されるのですか?正当な目的については具体的に説明してください。",
+        "recipients": "このデータを受信またはアクセスする人 (内部チームや処理者など)。",
+        "retention_period": "例: メンバーシップ終了後 7 年間、または同意が撤回されるまで。"
+      }
+    },
+    "delete_modal": {
+      "message": "この処理アクティビティを削除しますか?これを元に戻すことはできません。",
+      "title": "処理アクティビティの削除"
+    },
+    "legal_basis": {
+      "consent": "同意",
+      "contract": "契約",
+      "legal_obligation": "法的義務",
+      "legitimate_interest": "正当な利益",
+      "unknown": "不明な法的根拠: {{basis}}"
+    },
+    "data_residency": {
+      "EU": "EU (EEA)",
+      "International": "インターナショナル (EU/Switzerland 以外)",
+      "Switzerland": "Switzerland"
+    },
+    "consent_actions": {
+      "granted": "付与された",
+      "withdrawn": "撤回されました",
+      "unknown": "不明なアクション: {{action}}"
+    },
+    "toasts": {
+      "activities_load_failed": "処理アクティビティのロードに失敗しました。",
+      "activity_delete_failed": "アクティビティの削除に失敗しました。",
+      "activity_deleted": "アクティビティが削除されました。",
+      "activity_required": "アクティビティ名と目的は必須です。",
+      "activity_save_failed": "アクティビティを保存できませんでした。",
+      "activity_saved": "処理アクティビティが保存されました。",
+      "consent_export_failed": "同意台帳のエクスポートに失敗しました。",
+      "consent_load_failed": "同意台帳の読み込みに失敗しました。",
+      "register_export_failed": "レジスタのエクスポートに失敗しました。",
+      "retention_load_failed": "保持設定のロードに失敗しました。",
+      "retention_save_failed": "保持設定の保存に失敗しました。",
+      "retention_saved": "保持設定が保存されました。"
+    }
   }
 }

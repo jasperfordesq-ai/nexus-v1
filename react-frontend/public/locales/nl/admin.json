@@ -10254,5 +10254,162 @@
         "rejected": "Voorstel afgewezen"
       }
     }
+  },
+  "fadp": {
+    "meta": {
+      "page_title": "FADP-naleving"
+    },
+    "header": {
+      "title": "Swiss FADP-naleving (nDSG)",
+      "description": "Federale wet inzake gegevensbescherming: verwerkingsregister, bewaarconfiguratie, toestemmingsaudit en ingezetenschapscontroles."
+    },
+    "actions": {
+      "add_activity": "Activiteit toevoegen",
+      "cancel": "Annuleren",
+      "delete": "Verwijderen",
+      "edit": "Bewerking",
+      "export_csv": "CSV exporteren",
+      "export_ledger_csv": "Exporteer het volledige grootboek CSV",
+      "refresh": "Vernieuwen",
+      "save_changes": "Wijzigingen opslaan",
+      "save_configuration": "Configuratie opslaan"
+    },
+    "common": {
+      "empty_dash": "—",
+      "no": "Nee"
+    },
+    "tabs": {
+      "aria": "FADP-secties",
+      "ledger": "Toestemmingsgrootboek",
+      "register": "Verwerkingsregister",
+      "residency": "Gegevensresidentie",
+      "retention": "Retentieconfiguratie"
+    },
+    "register": {
+      "description": "Article 12 nDSG vereist een register van verwerkingsactiviteiten. Voeg elke activiteit toe waarbij persoonlijke gegevens worden verzameld, gebruikt, gedeeld of bewaard.",
+      "empty": "Nog geen verwerkingsactiviteiten. Voeg een activiteit toe om het register aan te maken.",
+      "profiling_yes": "Ja: toestemming vereist",
+      "table_aria": "Verwerkingsactiviteiten",
+      "columns": {
+        "actions": "Acties",
+        "activity": "Activiteit",
+        "automated_profiling": "Geautomatiseerde profilering",
+        "legal_basis": "Wettelijke basis",
+        "retention": "Behoud"
+      }
+    },
+    "retention": {
+      "data_residency_label": "Verklaring van woonplaats van gegevens",
+      "dpa_contact_description": "E-mailadres van functionaris voor gegevensbescherming of verantwoordelijke persoon.",
+      "dpa_contact_label": "DPA e-mailadres voor contact (optioneel)",
+      "periods_title": "Bewaartermijnen",
+      "residency_title": "Gegevensresidentie en DPA-contact",
+      "fields": {
+        "activity_logs_years": "Activiteitenlogboeken (jaren)",
+        "ai_embeddings_years": "AI-inbedding (jaren)",
+        "member_data_years": "Ledengegevens (jaren)",
+        "messages_years": "Berichten (jaren)",
+        "transaction_data_years": "Transactiegegevens (jaren)"
+      },
+      "hints": {
+        "activity_logs_years": "Platformactiviteit en auditlogboeken.",
+        "ai_embeddings_years": "Bijpassende insluitingen. Toestemming is vereist.",
+        "member_data_years": "Registratie-, profielen- en authenticatiegegevens.",
+        "messages_years": "Directe en groepsberichten.",
+        "transaction_data_years": "Uitwisselingsgegevens van tijdskredieten."
+      }
+    },
+    "ledger": {
+      "description": "Onveranderlijk auditlogboek van toestemmingsbeslissingen van leden. Vereist door Art. 6 nDSG om wettigheid aan te tonen.",
+      "empty": "Er zijn nog geen toestemmingsgegevens.",
+      "table_aria": "Toestemmingsregistraties",
+      "truncated": "Toont de meest recente 200 records. Exporteer het volledige grootboek CSV om alle {{count}}-records te downloaden.",
+      "columns": {
+        "action": "Actie",
+        "consent_type": "Toestemmingstype",
+        "date": "Datum",
+        "ip_address": "IP-adres",
+        "member_id": "Lid ID"
+      }
+    },
+    "residency": {
+      "article_16": "Grensoverschrijdende openbaarmaking van persoonsgegevens is toegestaan ​​als het land van bestemming een adequate gegevensbescherming waarborgt, erkend door de Federale Raad. Switzerland, EU/EEA-lidstaten en een kleine lijst met andere landen komen in aanmerking.",
+      "article_16_label": "FADP Art. 16",
+      "article_17": "Als de bestemming niet in aanmerking komt, moeten er passende waarborgen worden getroffen, zoals standaardclausules voor gegevensbescherming die zijn goedgekeurd door de FDPIC, bindende bedrijfsregels of toestemming van leden.",
+      "article_17_label": "FADP Art. 17",
+      "description": "Waar gegevens van huurderleden worden opgeslagen en verwerkt.",
+      "dpa_contact": "DPA-contactpersoon",
+      "title": "Aangegeven gegevensresidentie",
+      "update_hint_prefix": "Om de aangegeven ingezetenschap bij te werken, gebruikt u de",
+      "update_hint_suffix": "tabblad.",
+      "copy": {
+        "EU": "Gegevens worden opgeslagen binnen de EU/EEA. Switzerland erkent de gegevensbescherming van EU als adequaat, dus er zijn geen aanvullende FADP-beveiligingen nodig voor deze overdrachten.",
+        "International": "Gegevens worden buiten Switzerland en de EU opgeslagen. Art. 16-17 nDSG-waarborgen zijn vereist, zoals standaardcontractbepalingen of expliciete toestemming van leden voor elke overdracht.",
+        "Switzerland": "Gegevens worden volledig binnen Switzerland opgeslagen. Voor deze aangifte zijn geen grensoverschrijdende overdrachtsbepalingen vereist."
+      }
+    },
+    "summary": {
+      "automated_profiling": "Geautomatiseerde profilering",
+      "generated": "Gegenereerd",
+      "tenant": "Huurder",
+      "title": "Registeroverzicht",
+      "total_activities": "Totaal activiteiten"
+    },
+    "activity_modal": {
+      "add_title": "Voeg verwerkingsactiviteit toe",
+      "edit_title": "Verwerkingsactiviteit bewerken",
+      "fields": {
+        "activity_name": "Naam van activiteit",
+        "automated_profiling": "Geautomatiseerde profilering",
+        "data_categories": "Gegevenscategorieën (door komma's gescheiden)",
+        "legal_basis": "Wettelijke basis",
+        "purpose": "Doel",
+        "recipients": "Ontvangers (door komma's gescheiden, optioneel)",
+        "retention_period": "Bewaartermijn",
+        "sort_order": "Sorteervolgorde"
+      },
+      "hints": {
+        "automated_profiling": "Art. 21 nDSG: geautomatiseerde individuele besluitvorming vereist expliciete toestemming en transparantie.",
+        "data_categories": "Bijvoorbeeld: naam, e-mailadres, telefoonnummer, adres.",
+        "purpose": "Waarom worden deze gegevens verwerkt? Wees specifiek over het legitieme doel.",
+        "recipients": "Wie deze gegevens ontvangt of er toegang toe heeft, zoals interne teams of verwerkers.",
+        "retention_period": "Bijvoorbeeld: 7 jaar nadat het lidmaatschap eindigt, of totdat de toestemming wordt ingetrokken."
+      }
+    },
+    "delete_modal": {
+      "message": "Deze verwerkingsactiviteit verwijderen? Dit kan niet ongedaan worden gemaakt.",
+      "title": "Verwerkingsactiviteit verwijderen"
+    },
+    "legal_basis": {
+      "consent": "Toestemming",
+      "contract": "Contract",
+      "legal_obligation": "Wettelijke verplichting",
+      "legitimate_interest": "Gerechtvaardigd belang",
+      "unknown": "Onbekende wettelijke basis: {{basis}}"
+    },
+    "data_residency": {
+      "EU": "EU (EEA)",
+      "International": "Internationaal (buiten EU/Switzerland)",
+      "Switzerland": "Switzerland"
+    },
+    "consent_actions": {
+      "granted": "Toegekend",
+      "withdrawn": "Ingetrokken",
+      "unknown": "Onbekende actie: {{action}}"
+    },
+    "toasts": {
+      "activities_load_failed": "Kan verwerkingsactiviteiten niet laden.",
+      "activity_delete_failed": "Kan activiteit niet verwijderen.",
+      "activity_deleted": "Activiteit verwijderd.",
+      "activity_required": "Naam en doel van de activiteit zijn vereist.",
+      "activity_save_failed": "Kan activiteit niet opslaan.",
+      "activity_saved": "Verwerkingsactiviteit opgeslagen.",
+      "consent_export_failed": "Kan toestemmingsgrootboek niet exporteren.",
+      "consent_load_failed": "Kan toestemmingsgrootboek niet laden.",
+      "register_export_failed": "Kan het register niet exporteren.",
+      "retention_load_failed": "Kan retentieconfiguratie niet laden.",
+      "retention_save_failed": "Kan de retentieconfiguratie niet opslaan.",
+      "retention_saved": "Bewaarconfiguratie opgeslagen."
+    }
   }
 }

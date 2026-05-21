@@ -10254,5 +10254,162 @@
         "rejected": "Diúltaíodh don togra"
       }
     }
+  },
+  "fadp": {
+    "meta": {
+      "page_title": "FADP Comhlíonadh"
+    },
+    "header": {
+      "title": "Swiss Comhlíonadh FADP (nDSG)",
+      "description": "An tAcht Cónaidhme um Chosaint Sonraí: clár próiseála, cumraíocht coinneála, iniúchadh toilithe, agus rialuithe cónaitheachta."
+    },
+    "actions": {
+      "add_activity": "Cuir gníomhaíocht leis",
+      "cancel": "Cealaigh",
+      "delete": "Scrios",
+      "edit": "Cuir in eagar",
+      "export_csv": "Easpórtáil CSV",
+      "export_ledger_csv": "Easpórtáil mórleabhar iomlán CSV",
+      "refresh": "Athnuaigh",
+      "save_changes": "Sábháil athruithe",
+      "save_configuration": "Sábháil cumraíocht"
+    },
+    "common": {
+      "empty_dash": "—",
+      "no": "Níl"
+    },
+    "tabs": {
+      "aria": "Ailt FADP",
+      "ledger": "Mórleabhar toilithe",
+      "register": "Clár próiseála",
+      "residency": "Cónaitheacht sonraí",
+      "retention": "Cumraíocht coinneála"
+    },
+    "register": {
+      "description": "Article 12 Tá taifead de ghníomhaíochtaí próiseála ag teastáil ó nDSG. Cuir leis gach gníomhaíocht ina mbailítear, ina n-úsáidtear, ina roinntear nó ina gcoimeádtar sonraí pearsanta.",
+      "empty": "Níl aon ghníomhaíochtaí próiseála fós. Cuir gníomhaíocht leis chun an clár a chruthú.",
+      "profiling_yes": "Sea: teastaíonn toiliú",
+      "table_aria": "Gníomhaíochtaí próiseála",
+      "columns": {
+        "actions": "Gníomhartha",
+        "activity": "Gníomhaíocht",
+        "automated_profiling": "Próifíleáil uathoibrithe",
+        "legal_basis": "Bunús dlí",
+        "retention": "Coinneáil"
+      }
+    },
+    "retention": {
+      "data_residency_label": "Dearbhú cónaitheachta sonraí",
+      "dpa_contact_description": "Ríomhphost Oifigeach Cosanta Sonraí nó duine freagrach.",
+      "dpa_contact_label": "Ríomhphost teagmhála DPA (roghnach)",
+      "periods_title": "Tréimhsí coinneála",
+      "residency_title": "Cónaitheacht sonraí agus teagmháil DPA",
+      "fields": {
+        "activity_logs_years": "Logaí gníomhaíochta (blianta)",
+        "ai_embeddings_years": "Leabú AI (blianta)",
+        "member_data_years": "Sonraí ball (blianta)",
+        "messages_years": "Teachtaireachtaí (blianta)",
+        "transaction_data_years": "Sonraí idirbhirt (blianta)"
+      },
+      "hints": {
+        "activity_logs_years": "Gníomhaíocht ardáin agus logaí iniúchta.",
+        "ai_embeddings_years": "Leabú meaitseála. Tá cead ag teastáil.",
+        "member_data_years": "Clárú, próifílí, agus sonraí fíordheimhnithe.",
+        "messages_years": "Teachtaireachtaí díreacha agus grúpa.",
+        "transaction_data_years": "Taifid malartaithe creidmheasa ama."
+      }
+    },
+    "ledger": {
+      "description": "Loga iniúchta domhalartaithe ar chinntí um thoiliú na mball. Teastaíonn ó Art. 6 nDSG chun dleathacht a léiriú.",
+      "empty": "Níl aon taifid toilithe fós.",
+      "table_aria": "Taifid toilithe",
+      "truncated": "Ag taispeáint an 200 taifead is déanaí. Easpórtáil an mórleabhar iomlán CSV chun gach taifead {{count}} a íoslódáil.",
+      "columns": {
+        "action": "Gníomh",
+        "consent_type": "Cineál toilithe",
+        "date": "Dáta",
+        "ip_address": "Seoladh IP",
+        "member_id": "Ball ID"
+      }
+    },
+    "residency": {
+      "article_16": "Ceadaítear nochtadh trasteorann sonraí pearsanta má áirithíonn an tír chinn scríbe cosaint leordhóthanach sonraí arna aithint ag an gComhairle Chónaidhme. Cáilíonn ballstáit Switzerland, EU/EEA, agus liosta beag de thíortha eile.",
+      "article_16_label": "FADP Art. 16",
+      "article_17": "Mura gcáilíonn an ceann scríbe, ní mór cosaintí iomchuí a bheith i bhfeidhm, amhail clásail chaighdeánacha um chosaint sonraí arna bhformheas ag FDPIC, rialacha ceangailteacha corparáideacha, nó toiliú na mball.",
+      "article_17_label": "FADP Art. 17",
+      "description": "Sa chás go ndéantar sonraí ball tionónta a stóráil agus a phróiseáil.",
+      "dpa_contact": "teagmhálaí DPA",
+      "title": "Cónaitheacht sonraí dearbhaithe",
+      "update_hint_prefix": "Chun an chónaitheacht dearbhaithe a nuashonrú, bain úsáid as an",
+      "update_hint_suffix": "cluaisín.",
+      "copy": {
+        "EU": "Stóráiltear sonraí laistigh den EU/EEA. Aithníonn Switzerland go bhfuil cosaint sonraí EU leordhóthanach, agus mar sin níl gá le cosaintí FADP breise le haghaidh na n-aistrithe sin.",
+        "International": "Stóráiltear sonraí lasmuigh de Switzerland agus den EU. Art. 16-17 nDSG Tá gá le cosaintí, amhail clásail chaighdeánacha chonarthacha nó toiliú sainráite comhalta le haghaidh gach aistrithe.",
+        "Switzerland": "Stóráiltear sonraí go hiomlán laistigh de Switzerland. Níl forálacha aistrithe trasteorann ag teastáil don dearbhú seo."
+      }
+    },
+    "summary": {
+      "automated_profiling": "Próifíleáil uathoibrithe",
+      "generated": "Gineadh",
+      "tenant": "Tionónta",
+      "title": "Clár achoimre",
+      "total_activities": "Gníomhaíochtaí iomlána"
+    },
+    "activity_modal": {
+      "add_title": "Cuir gníomhaíocht phróiseála leis",
+      "edit_title": "Cuir an ghníomhaíocht phróiseála in eagar",
+      "fields": {
+        "activity_name": "Ainm gníomhaíochta",
+        "automated_profiling": "Próifíleáil uathoibrithe",
+        "data_categories": "Catagóirí sonraí (scartha le camóg)",
+        "legal_basis": "Bunús dlí",
+        "purpose": "Cuspóir",
+        "recipients": "Faighteoirí (scartha le camóg, roghnach)",
+        "retention_period": "Tréimhse choinneála",
+        "sort_order": "Ordú sórtála"
+      },
+      "hints": {
+        "automated_profiling": "Art. 21 nDSG: teastaíonn toiliú sainráite agus trédhearcacht le haghaidh cinnteoireachta aonair uathoibrithe.",
+        "data_categories": "Mar shampla: ainm, ríomhphost, fón, seoladh.",
+        "purpose": "Cén fáth a ndéantar na sonraí seo a phróiseáil? Bí sonrach faoin gcuspóir dlisteanach.",
+        "recipients": "Cé a fhaigheann nó a fhaigheann rochtain ar na sonraí seo, amhail foirne inmheánacha nó próiseálaithe.",
+        "retention_period": "Mar shampla: 7 mbliana tar éis don bhallraíocht críochnú, nó go dtí go dtarraingítear siar an toiliú."
+      }
+    },
+    "delete_modal": {
+      "message": "An bhfuil fonn ort an ghníomhaíocht phróiseála seo a scriosadh? Ní féidir é seo a chealú.",
+      "title": "Scrios an ghníomhaíocht phróiseála"
+    },
+    "legal_basis": {
+      "consent": "Toiliú",
+      "contract": "Conradh",
+      "legal_obligation": "Oibleagáid dhlíthiúil",
+      "legitimate_interest": "Leas dlisteanach",
+      "unknown": "Bunús dlí anaithnid: {{basis}}"
+    },
+    "data_residency": {
+      "EU": "EU (EEA)",
+      "International": "Idirnáisiúnta (lasmuigh de EU/Switzerland)",
+      "Switzerland": "Switzerland"
+    },
+    "consent_actions": {
+      "granted": "Deonaithe",
+      "withdrawn": "Tarraingthe siar",
+      "unknown": "Gníomh anaithnid: {{action}}"
+    },
+    "toasts": {
+      "activities_load_failed": "Theip ar ghníomhaíochtaí próiseála a lódáil.",
+      "activity_delete_failed": "Theip ar an ngníomhaíocht a scriosadh.",
+      "activity_deleted": "Scriosadh an ghníomhaíocht.",
+      "activity_required": "Tá ainm agus cuspóir na gníomhaíochta ag teastáil.",
+      "activity_save_failed": "Theip ar an ngníomhaíocht a shábháil.",
+      "activity_saved": "Sábháladh an ghníomhaíocht phróiseála.",
+      "consent_export_failed": "Theip ar easpórtáil mórleabhar toilithe.",
+      "consent_load_failed": "Theip ar lódáil mórleabhar toilithe.",
+      "register_export_failed": "Theip ar easpórtáil an chláir.",
+      "retention_load_failed": "Theip ar lódáil an chumraíocht choinneála.",
+      "retention_save_failed": "Theip ar shábháil an chumraíocht choinneála.",
+      "retention_saved": "Sábháil an chumraíocht coinneála."
+    }
   }
 }

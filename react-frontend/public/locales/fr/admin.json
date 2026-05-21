@@ -10254,5 +10254,162 @@
         "rejected": "Proposition rejetée"
       }
     }
+  },
+  "fadp": {
+    "meta": {
+      "page_title": "Conformité FADP"
+    },
+    "header": {
+      "title": "Conformité Swiss FADP (nDSG)",
+      "description": "Loi fédérale sur la protection des données : registre de traitement, configuration de la conservation, contrôle du consentement et contrôle du séjour."
+    },
+    "actions": {
+      "add_activity": "Ajouter une activité",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "export_csv": "Exporter CSV",
+      "export_ledger_csv": "Exporter le grand livre complet CSV",
+      "refresh": "Rafraîchir",
+      "save_changes": "Enregistrer les modifications",
+      "save_configuration": "Enregistrer la configuration"
+    },
+    "common": {
+      "empty_dash": "—",
+      "no": "Non"
+    },
+    "tabs": {
+      "aria": "Sections FADP",
+      "ledger": "Registre des consentements",
+      "register": "Registre de traitement",
+      "residency": "Résidence des données",
+      "retention": "Configuration de rétention"
+    },
+    "register": {
+      "description": "Article 12 nDSG nécessite un enregistrement des activités de traitement. Ajoutez chaque activité dans laquelle des données personnelles sont collectées, utilisées, partagées ou conservées.",
+      "empty": "Aucune activité de traitement pour l'instant. Ajoutez une activité pour créer le registre.",
+      "profiling_yes": "Oui : consentement requis",
+      "table_aria": "Activités de traitement",
+      "columns": {
+        "actions": "Actes",
+        "activity": "Activité",
+        "automated_profiling": "Profilage automatisé",
+        "legal_basis": "Base juridique",
+        "retention": "Rétention"
+      }
+    },
+    "retention": {
+      "data_residency_label": "Déclaration de résidence des données",
+      "dpa_contact_description": "E-mail du délégué à la protection des données ou de la personne responsable.",
+      "dpa_contact_label": "E-mail de contact DPA (facultatif)",
+      "periods_title": "Périodes de conservation",
+      "residency_title": "Résidence des données et contact DPA",
+      "fields": {
+        "activity_logs_years": "Journaux d'activité (années)",
+        "ai_embeddings_years": "Intégrations d'IA (années)",
+        "member_data_years": "Données des membres (années)",
+        "messages_years": "Messages (années)",
+        "transaction_data_years": "Données de transaction (années)"
+      },
+      "hints": {
+        "activity_logs_years": "Activités de la plateforme et journaux d’audit.",
+        "ai_embeddings_years": "Intégrations correspondantes. Le consentement est requis.",
+        "member_data_years": "Données d’enregistrement, de profils et d’authentification.",
+        "messages_years": "Messages directs et de groupe.",
+        "transaction_data_years": "Registres d'échange de crédits-temps."
+      }
+    },
+    "ledger": {
+      "description": "Journal d'audit immuable des décisions de consentement des membres. Requis par Art. 6 nDSG pour démontrer la légalité.",
+      "empty": "Aucun enregistrement de consentement pour l'instant.",
+      "table_aria": "Dossiers de consentement",
+      "truncated": "Affichage des 200 enregistrements les plus récents. Exportez le registre complet CSV pour télécharger tous les enregistrements {{count}}.",
+      "columns": {
+        "action": "Action",
+        "consent_type": "Type de consentement",
+        "date": "Date",
+        "ip_address": "Adresse IP",
+        "member_id": "Membre ID"
+      }
+    },
+    "residency": {
+      "article_16": "La divulgation transfrontalière de données personnelles est autorisée si le pays de destination garantit une protection des données adéquate, reconnue par le Conseil fédéral. Les États membres de Switzerland, EU/EEA et une petite liste d'autres pays sont éligibles.",
+      "article_16_label": "FADP Art. 16",
+      "article_17": "Si la destination n'est pas éligible, des garanties appropriées doivent être en place, telles que des clauses standard de protection des données approuvées par FDPIC, des règles d'entreprise contraignantes ou le consentement des membres.",
+      "article_17_label": "FADP Art. 17",
+      "description": "Où les données des membres locataires sont stockées et traitées.",
+      "dpa_contact": "DPA contact",
+      "title": "Résidence déclarée des données",
+      "update_hint_prefix": "Pour mettre à jour la résidence déclarée, utilisez le",
+      "update_hint_suffix": "languette.",
+      "copy": {
+        "EU": "Les données sont stockées dans le EU/EEA. Switzerland reconnaît la protection des données EU comme adéquate, donc aucune protection FADP supplémentaire n'est nécessaire pour ces transferts.",
+        "International": "Les données sont stockées en dehors de Switzerland et de EU. Art. 16-17 nDSG des garanties sont requises, telles que des clauses contractuelles standard ou le consentement explicite des membres pour chaque transfert.",
+        "Switzerland": "Les données sont entièrement stockées dans Switzerland. Aucune disposition relative aux transferts transfrontaliers n’est requise pour cette déclaration."
+      }
+    },
+    "summary": {
+      "automated_profiling": "Profilage automatisé",
+      "generated": "Généré",
+      "tenant": "Locataire",
+      "title": "Résumé de l'inscription",
+      "total_activities": "Activités totales"
+    },
+    "activity_modal": {
+      "add_title": "Ajouter une activité de traitement",
+      "edit_title": "Modifier l'activité de traitement",
+      "fields": {
+        "activity_name": "Nom de l'activité",
+        "automated_profiling": "Profilage automatisé",
+        "data_categories": "Catégories de données (séparées par des virgules)",
+        "legal_basis": "Base juridique",
+        "purpose": "But",
+        "recipients": "Destinataires (séparés par des virgules, facultatif)",
+        "retention_period": "Période de conservation",
+        "sort_order": "Ordre de tri"
+      },
+      "hints": {
+        "automated_profiling": "Art. 21 nDSG : la prise de décision individuelle automatisée nécessite un consentement explicite et de la transparence.",
+        "data_categories": "Par exemple : nom, email, téléphone, adresse.",
+        "purpose": "Pourquoi ces données sont-elles traitées ? Soyez précis sur le but légitime.",
+        "recipients": "Qui reçoit ou accède à ces données, comme les équipes internes ou les sous-traitants.",
+        "retention_period": "Par exemple : 7 ans après la fin de l’adhésion ou jusqu’au retrait du consentement."
+      }
+    },
+    "delete_modal": {
+      "message": "Supprimer cette activité de traitement ? Cela ne peut pas être annulé.",
+      "title": "Supprimer l'activité de traitement"
+    },
+    "legal_basis": {
+      "consent": "Consentement",
+      "contract": "Contracter",
+      "legal_obligation": "Obligation légale",
+      "legitimate_interest": "Intérêt légitime",
+      "unknown": "Base légale inconnue : {{basis}}"
+    },
+    "data_residency": {
+      "EU": "EU (EEA)",
+      "International": "International (en dehors de EU/Switzerland)",
+      "Switzerland": "Switzerland"
+    },
+    "consent_actions": {
+      "granted": "Accordé",
+      "withdrawn": "Retiré",
+      "unknown": "Action inconnue : {{action}}"
+    },
+    "toasts": {
+      "activities_load_failed": "Échec du chargement des activités de traitement.",
+      "activity_delete_failed": "Échec de la suppression de l'activité.",
+      "activity_deleted": "Activité supprimée.",
+      "activity_required": "Le nom et le but de l’activité sont requis.",
+      "activity_save_failed": "Échec de l'enregistrement de l'activité.",
+      "activity_saved": "Activité de traitement enregistrée.",
+      "consent_export_failed": "Échec de l'exportation du registre des consentements.",
+      "consent_load_failed": "Échec du chargement du registre des consentements.",
+      "register_export_failed": "Échec de l'exportation du registre.",
+      "retention_load_failed": "Échec du chargement de la configuration de rétention.",
+      "retention_save_failed": "Échec de l'enregistrement de la configuration de rétention.",
+      "retention_saved": "Configuration de rétention enregistrée."
+    }
   }
 }

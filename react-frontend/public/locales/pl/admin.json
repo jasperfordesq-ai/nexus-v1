@@ -10254,5 +10254,162 @@
         "rejected": "Propozycja odrzucona"
       }
     }
+  },
+  "fadp": {
+    "meta": {
+      "page_title": "Zgodność z FADP"
+    },
+    "header": {
+      "title": "Swiss FADP Zgodność (nDSG)",
+      "description": "Federalna ustawa o ochronie danych: rejestr przetwarzania, konfiguracja przechowywania, kontrola zgód i kontrola miejsca zamieszkania."
+    },
+    "actions": {
+      "add_activity": "Dodaj aktywność",
+      "cancel": "Anulować",
+      "delete": "Usuwać",
+      "edit": "Redagować",
+      "export_csv": "Eksportuj CSV",
+      "export_ledger_csv": "Eksportuj pełną księgę CSV",
+      "refresh": "Odświeżać",
+      "save_changes": "Zapisz zmiany",
+      "save_configuration": "Zapisz konfigurację"
+    },
+    "common": {
+      "empty_dash": "—",
+      "no": "NIE"
+    },
+    "tabs": {
+      "aria": "Sekcje FADP",
+      "ledger": "Księga zgód",
+      "register": "Rejestr przetwarzania",
+      "residency": "Miejsce zamieszkania danych",
+      "retention": "Konfiguracja przechowywania"
+    },
+    "register": {
+      "description": "Article 12 nDSG wymaga zapisu czynności przetwarzania. Dodaj każde działanie, podczas którego gromadzone, wykorzystywane, udostępniane lub przechowywane są dane osobowe.",
+      "empty": "Nie ma jeszcze żadnych działań związanych z przetwarzaniem. Dodaj działanie, aby utworzyć rejestr.",
+      "profiling_yes": "Tak: wymagana zgoda",
+      "table_aria": "Czynności związane z przetwarzaniem",
+      "columns": {
+        "actions": "Działania",
+        "activity": "Działalność",
+        "automated_profiling": "Zautomatyzowane profilowanie",
+        "legal_basis": "Podstawa prawna",
+        "retention": "Zatrzymanie"
+      }
+    },
+    "retention": {
+      "data_residency_label": "Oświadczenie o miejscu zamieszkania danych",
+      "dpa_contact_description": "Adres e-mail inspektora ochrony danych lub osoby odpowiedzialnej.",
+      "dpa_contact_label": "DPA kontaktowy adres e-mail (opcjonalnie)",
+      "periods_title": "Okresy przechowywania",
+      "residency_title": "Miejsce zamieszkania danych i kontakt DPA",
+      "fields": {
+        "activity_logs_years": "Dzienniki aktywności (lata)",
+        "ai_embeddings_years": "Osadzanie AI (lata)",
+        "member_data_years": "Dane członkowskie (lata)",
+        "messages_years": "Wiadomości (lata)",
+        "transaction_data_years": "Dane transakcji (lata)"
+      },
+      "hints": {
+        "activity_logs_years": "Dzienniki aktywności platformy i audytu.",
+        "ai_embeddings_years": "Pasujące osadzenia. Wymagana jest zgoda.",
+        "member_data_years": "Rejestracja, profile i dane uwierzytelniające.",
+        "messages_years": "Wiadomości bezpośrednie i grupowe.",
+        "transaction_data_years": "Zapisy wymiany czasowo-kredytowej."
+      }
+    },
+    "ledger": {
+      "description": "Niezmienny dziennik audytu decyzji o zgodzie członków. Wymagane przez Art. 6 nDSG w celu wykazania zgodności z prawem.",
+      "empty": "Nie ma jeszcze żadnych zapisów dotyczących zgód.",
+      "table_aria": "Zapisy zgód",
+      "truncated": "Wyświetlanie ostatnich 200 rekordów. Wyeksportuj pełną księgę CSV, aby pobrać wszystkie rekordy {{count}}.",
+      "columns": {
+        "action": "Działanie",
+        "consent_type": "Rodzaj zgody",
+        "date": "Data",
+        "ip_address": "Adres IP",
+        "member_id": "Członek ID"
+      }
+    },
+    "residency": {
+      "article_16": "Transgraniczne ujawnianie danych osobowych jest dozwolone, jeżeli kraj docelowy zapewnia odpowiednią ochronę danych uznaną przez Radę Federalną. Kwalifikują się państwa członkowskie Switzerland, EU/EEA i niewielka lista innych krajów.",
+      "article_16_label": "FADP Art. 16",
+      "article_17": "Jeżeli miejsce docelowe nie kwalifikuje się, należy zastosować odpowiednie zabezpieczenia, takie jak standardowe klauzule ochrony danych zatwierdzone przez FDPIC, wiążące zasady korporacyjne lub zgoda członka.",
+      "article_17_label": "FADP Art. 17",
+      "description": "Miejsce przechowywania i przetwarzania danych członków najemcy.",
+      "dpa_contact": "Kontakt DPA",
+      "title": "Deklarowana rezydencja danych",
+      "update_hint_prefix": "Aby zaktualizować zadeklarowaną rezydencję, użyj",
+      "update_hint_suffix": "patka.",
+      "copy": {
+        "EU": "Dane przechowywane są w ramach EU/EEA. Switzerland uznaje ochronę danych EU za odpowiednią, dlatego w przypadku tych transferów nie są potrzebne żadne dodatkowe zabezpieczenia FADP.",
+        "International": "Dane są przechowywane poza Switzerland i EU. Art. 16-17 nDSG wymagane są zabezpieczenia, takie jak standardowe klauzule umowne lub wyraźna zgoda członka na każdy transfer.",
+        "Switzerland": "Dane są przechowywane w całości w Switzerland. Do tego oświadczenia nie są wymagane przepisy dotyczące transferu transgranicznego."
+      }
+    },
+    "summary": {
+      "automated_profiling": "Zautomatyzowane profilowanie",
+      "generated": "Wygenerowano",
+      "tenant": "Najemca",
+      "title": "Podsumowanie rejestru",
+      "total_activities": "Łączna aktywność"
+    },
+    "activity_modal": {
+      "add_title": "Dodaj czynność przetwarzania",
+      "edit_title": "Edytuj czynność przetwarzania",
+      "fields": {
+        "activity_name": "Nazwa działania",
+        "automated_profiling": "Zautomatyzowane profilowanie",
+        "data_categories": "Kategorie danych (oddzielone przecinkami)",
+        "legal_basis": "Podstawa prawna",
+        "purpose": "Zamiar",
+        "recipients": "Odbiorcy (oddzieleni przecinkami, opcjonalnie)",
+        "retention_period": "Okres przechowywania",
+        "sort_order": "Kolejność sortowania"
+      },
+      "hints": {
+        "automated_profiling": "Art. 21 nDSG: zautomatyzowane indywidualne podejmowanie decyzji wymaga wyraźnej zgody i przejrzystości.",
+        "data_categories": "Na przykład: imię i nazwisko, adres e-mail, telefon, adres.",
+        "purpose": "Dlaczego te dane są przetwarzane? Konkretnie określ uzasadniony cel.",
+        "recipients": "Kto otrzymuje te dane lub uzyskuje do nich dostęp, np. wewnętrzne zespoły lub podmioty przetwarzające.",
+        "retention_period": "Na przykład: 7 lat po zakończeniu członkostwa lub do wycofania zgody."
+      }
+    },
+    "delete_modal": {
+      "message": "Usunąć tę czynność przetwarzania? Tego nie można cofnąć.",
+      "title": "Usuń czynność przetwarzania"
+    },
+    "legal_basis": {
+      "consent": "Zgoda",
+      "contract": "Umowa",
+      "legal_obligation": "Obowiązek prawny",
+      "legitimate_interest": "Uzasadniony interes",
+      "unknown": "Nieznana podstawa prawna: {{basis}}"
+    },
+    "data_residency": {
+      "EU": "EU (EEA)",
+      "International": "Międzynarodowe (poza EU/Switzerland)",
+      "Switzerland": "Switzerland"
+    },
+    "consent_actions": {
+      "granted": "Nadany",
+      "withdrawn": "Zamknięty w sobie",
+      "unknown": "Nieznana akcja: {{action}}"
+    },
+    "toasts": {
+      "activities_load_failed": "Nie udało się wczytać działań związanych z przetwarzaniem.",
+      "activity_delete_failed": "Nie udało się usunąć aktywności.",
+      "activity_deleted": "Aktywność została usunięta.",
+      "activity_required": "Nazwa i cel działania są wymagane.",
+      "activity_save_failed": "Nie udało się zapisać aktywności.",
+      "activity_saved": "Zapisano czynność przetwarzania.",
+      "consent_export_failed": "Nie udało się wyeksportować księgi zgód.",
+      "consent_load_failed": "Nie udało się załadować księgi zgód.",
+      "register_export_failed": "Nie udało się wyeksportować rejestru.",
+      "retention_load_failed": "Nie udało się wczytać konfiguracji przechowywania.",
+      "retention_save_failed": "Nie udało się zapisać konfiguracji przechowywania.",
+      "retention_saved": "Konfiguracja przechowywania została zapisana."
+    }
   }
 }
