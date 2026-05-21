@@ -283,7 +283,7 @@ export function EmailSettings() {
               />
               <Input
                 label={t('label_from_email')}
-                placeholder="noreply@example.com"
+                placeholder={t('placeholder_noreply_example')}
                 variant="bordered"
                 value={formData.sendgrid_from_email}
                 onValueChange={(v) => updateField('sendgrid_from_email', v)}
@@ -340,7 +340,7 @@ export function EmailSettings() {
               <Input
                 label={t('label_client_secret')}
                 type="password"
-                placeholder="GOCSPX-xxxxx"
+                placeholder={t('placeholder_gocspx')}
                 variant="bordered"
                 description={secretHint(formData._gmail_client_secret_set)}
                 value={formData.gmail_client_secret}
@@ -356,7 +356,7 @@ export function EmailSettings() {
               />
               <Input
                 label={t('label_sender_email')}
-                placeholder="noreply@example.com"
+                placeholder={t('placeholder_noreply_example')}
                 variant="bordered"
                 value={formData.gmail_sender_email}
                 onValueChange={(v) => updateField('gmail_sender_email', v)}
@@ -390,14 +390,14 @@ export function EmailSettings() {
               />
               <Input
                 label={t('label_port')}
-                placeholder="587"
+                placeholder={t('placeholder_smtp_port')}
                 variant="bordered"
                 value={formData.smtp_port}
                 onValueChange={(v) => updateField('smtp_port', v)}
               />
               <Input
                 label={t('label_username')}
-                placeholder="user@example.com"
+                placeholder={t('placeholder_user_example')}
                 variant="bordered"
                 value={formData.smtp_user}
                 onValueChange={(v) => updateField('smtp_user', v)}
@@ -425,7 +425,7 @@ export function EmailSettings() {
               </Select>
               <Input
                 label={t('label_from_email')}
-                placeholder="noreply@example.com"
+                placeholder={t('placeholder_noreply_example')}
                 variant="bordered"
                 value={formData.smtp_from_email}
                 onValueChange={(v) => updateField('smtp_from_email', v)}
@@ -476,7 +476,7 @@ export function EmailSettings() {
             </p>
             <Input
               label={t('label_test_email_address')}
-              placeholder="test@example.com"
+              placeholder={t('placeholder_test_example')}
               variant="bordered"
               value={testEmail}
               onValueChange={setTestEmail}
