@@ -94,6 +94,25 @@ function actionChipColor(
   }
 }
 
+function actionLabelKey(action: string): string {
+  switch (action) {
+    case 'plan_assigned':
+      return 'billing.action_plan_assigned';
+    case 'grace_period_set':
+      return 'billing.action_grace_period_set';
+    case 'plan_paused':
+      return 'billing.action_plan_paused';
+    case 'plan_resumed':
+      return 'billing.action_plan_resumed';
+    case 'delegate_granted':
+      return 'billing.action_delegate_granted';
+    case 'delegate_revoked':
+      return 'billing.action_delegate_revoked';
+    default:
+      return 'billing.action_unknown';
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Stat Card
 // ─────────────────────────────────────────────────────────────────────────────
@@ -133,7 +152,7 @@ function StatCard({ label, value, color = 'default', icon }: StatCardProps) {
 
 export function RevenueDashboard() {
   const { t } = useTranslation('admin');
-  usePageTitle("Revenue");
+  usePageTitle(t('billing.revenue_title'));
   const { user } = useAuth();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -159,12 +178,12 @@ export function RevenueDashboard() {
         if (res.success && res.data) {
           setData(res.data as unknown as RevenueDashboardData);
         } else {
-          setError("Failed to load");
+          setError(t('billing.failed_to_load'));
         }
       })
-      .catch(() => setError("Failed to load"))
+      .catch(() => setError(t('billing.failed_to_load')))
       .finally(() => setLoading(false));
-  }, [user]);
+  }, [user, t]);
 
 
   if (!user?.is_god) return null;
@@ -177,8 +196,8 @@ export function RevenueDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold">{"Revenue"}</h1>
-          <p className="text-default-500 text-sm mt-1">{"Revenue."}</p>
+          <h1 className="text-2xl font-bold">{t('billing.revenue_title')}</h1>
+          <p className="text-default-500 text-sm mt-1">{t('billing.revenue_desc')}</p>
         </div>
         <Button
           as={Link}
@@ -186,7 +205,7 @@ export function RevenueDashboard() {
           variant="flat"
           size="sm"
         >
-          {"Back to Billing"}
+          {t('billing.back_to_billing')}
         </Button>
       </div>
 
@@ -205,24 +224,24 @@ export function RevenueDashboard() {
           {/* ── Row 1: Revenue & users ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
-              label={"Mrr"}
+              label={t('billing.mrr')}
               value={`${formatCurrency(data.mrr)}/mo`}
               color="primary"
               icon={<DollarSign className="w-4 h-4" />}
             />
             <StatCard
-              label={"Arr"}
+              label={t('billing.arr')}
               value={`${formatCurrency(data.arr)}/yr`}
               color="success"
               icon={<TrendingUp className="w-4 h-4" />}
             />
             <StatCard
-              label={"Active Tenants"}
+              label={t('billing.active_tenants')}
               value={data.active_tenants}
               icon={<Building2 className="w-4 h-4" />}
             />
             <StatCard
-              label={"Total Users"}
+              label={t('billing.total_users')}
               value={data.total_platform_users.toLocaleString()}
               icon={<Users className="w-4 h-4" />}
             />
@@ -231,21 +250,21 @@ export function RevenueDashboard() {
           {/* ── Row 2: Status indicators ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
-              label={"Free Tenants"}
+              label={t('billing.free_tenants')}
               value={data.free_tenants}
             />
             <StatCard
-              label={"Over Limit Tenants"}
+              label={t('billing.over_limit_tenants')}
               value={data.over_limit_tenants}
               color={data.over_limit_tenants > 0 ? 'danger' : 'default'}
             />
             <StatCard
-              label={"In Grace"}
+              label={t('billing.in_grace')}
               value={data.in_grace_period}
               color={data.in_grace_period > 0 ? 'warning' : 'default'}
             />
             <StatCard
-              label={"Paused Tenants"}
+              label={t('billing.paused_tenants')}
               value={data.paused_tenants}
               color={data.paused_tenants > 0 ? 'warning' : 'default'}
             />
@@ -254,18 +273,18 @@ export function RevenueDashboard() {
           {/* ── Plan Breakdown ── */}
           <Card>
             <CardHeader>
-              <h2 className="text-lg font-semibold">{"Plan Breakdown"}</h2>
+              <h2 className="text-lg font-semibold">{t('billing.plan_breakdown')}</h2>
             </CardHeader>
             <Divider />
             <CardBody className="p-0">
-              <Table removeWrapper aria-label={"Plan Breakdown"}>
+              <Table removeWrapper aria-label={t('billing.plan_breakdown')}>
                 <TableHeader>
-                  <TableColumn>{"Current Plan"}</TableColumn>
-                  <TableColumn>{"Users"}</TableColumn>
-                  <TableColumn>{"Mrr Contribution"}</TableColumn>
-                  <TableColumn>% MRR</TableColumn>
+                  <TableColumn>{t('billing.current_plan')}</TableColumn>
+                  <TableColumn>{t('billing.col_users')}</TableColumn>
+                  <TableColumn>{t('billing.mrr_contribution')}</TableColumn>
+                  <TableColumn>{t('billing.percent_mrr')}</TableColumn>
                 </TableHeader>
-                <TableBody emptyContent={"No plan found"}>
+                <TableBody emptyContent={t('billing.no_plan')}>
                   {data.plan_breakdown.map((row) => {
                     const pct = totalMrr > 0 ? Math.round((row.mrr_contribution / totalMrr) * 100) : 0;
                     return (
@@ -295,16 +314,16 @@ export function RevenueDashboard() {
           {/* ── Recent Changes ── */}
           <Card>
             <CardHeader>
-              <h2 className="text-lg font-semibold">{"Recent Changes"}</h2>
+              <h2 className="text-lg font-semibold">{t('billing.recent_changes')}</h2>
             </CardHeader>
             <Divider />
             <CardBody className="p-0">
-              <Table removeWrapper aria-label={"Recent Changes"}>
+              <Table removeWrapper aria-label={t('billing.recent_changes')}>
                 <TableHeader>
-                  <TableColumn>{"Tenant"}</TableColumn>
-                  <TableColumn>{"Assign Plan"}</TableColumn>
-                  <TableColumn>{"Changed by"}</TableColumn>
-                  <TableColumn>{"Expiry Date"}</TableColumn>
+                  <TableColumn>{t('billing.col_tenant')}</TableColumn>
+                  <TableColumn>{t('billing.assign_plan')}</TableColumn>
+                  <TableColumn>{t('billing.changed_by')}</TableColumn>
+                  <TableColumn>{t('billing.expiry_date')}</TableColumn>
                 </TableHeader>
                 <TableBody emptyContent="-">
                   {data.recent_changes.slice(0, 10).map((change, idx) => (
@@ -316,7 +335,7 @@ export function RevenueDashboard() {
                           variant="flat"
                           color={actionChipColor(change.action)}
                         >
-                          {t(`billing.action_${change.action}`, change.action)}
+                          {t(actionLabelKey(change.action))}
                         </Chip>
                       </TableCell>
                       <TableCell>{change.acted_by ?? '—'}</TableCell>
