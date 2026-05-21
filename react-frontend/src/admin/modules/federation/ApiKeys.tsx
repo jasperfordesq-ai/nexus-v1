@@ -35,7 +35,7 @@ interface ApiKey {
 
 export function ApiKeys() {
   const { t } = useTranslation('admin');
-  usePageTitle("Federation");
+  usePageTitle(t('federation.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -95,19 +95,19 @@ export function ApiKeys() {
   };
 
   const columns: Column<ApiKey>[] = [
-    { key: 'name', label: "Key Name", sortable: true },
+    { key: 'name', label: t('federation.col_key_name'), sortable: true },
     {
-      key: 'key_prefix', label: "Prefix",
+      key: 'key_prefix', label: t('federation.col_prefix'),
       render: (item) => <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">{item.key_prefix}...</code>,
     },
     {
-      key: 'status', label: "Status",
+      key: 'status', label: t('federation.col_status'),
       render: (item) => (
         <Chip size="sm" variant="flat" color={getStatusColor(item)} className="capitalize">{getStatusLabel(item)}</Chip>
       ),
     },
     {
-      key: 'scopes', label: "Scopes",
+      key: 'scopes', label: t('federation.col_scopes'),
       render: (item) => <span className="text-sm text-default-500">{Array.isArray(item.scopes) ? item.scopes.join(', ') : '--'}</span>,
     },
     {
@@ -119,11 +119,11 @@ export function ApiKeys() {
       },
     },
     {
-      key: 'last_used_at', label: "Last Used",
-      render: (item) => <span className="text-sm text-default-500">{item.last_used_at ? new Date(item.last_used_at).toLocaleDateString() : "Never"}</span>,
+      key: 'last_used_at', label: t('federation.col_last_used'),
+      render: (item) => <span className="text-sm text-default-500">{item.last_used_at ? new Date(item.last_used_at).toLocaleDateString() : t('federation.never')}</span>,
     },
     {
-      key: 'created_at', label: "Created", sortable: true,
+      key: 'created_at', label: t('federation.col_created'), sortable: true,
       render: (item) => <span className="text-sm text-default-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
     },
     {
@@ -147,11 +147,11 @@ export function ApiKeys() {
     return (
       <div>
         <PageHeader
-          title={"API Keys"}
-          description={"Manage API keys for federation integration with external systems"}
-          actions={<Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>{"Create Key"}</Button>}
+          title={t('federation.api_keys_title')}
+          description={t('federation.api_keys_desc')}
+          actions={<Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>{t('federation.create_key')}</Button>}
         />
-        <EmptyState icon={Key} title={"No API keys"} description={"Create an API key to enable federation integration"} actionLabel={"Create API Key"} onAction={() => navigate(tenantPath('/admin/federation/api-keys/create'))} />
+        <EmptyState icon={Key} title={t('federation.no_api_keys')} description={t('federation.no_api_keys_desc')} actionLabel={t('federation.create_api_key_action')} onAction={() => navigate(tenantPath('/admin/federation/api-keys/create'))} />
       </div>
     );
   }
@@ -159,12 +159,12 @@ export function ApiKeys() {
   return (
     <div>
       <PageHeader
-        title={"API Keys"}
-        description={"Manage API keys for federation integration with external systems"}
+        title={t('federation.api_keys_title')}
+        description={t('federation.api_keys_desc')}
         actions={
           <div className="flex gap-2">
-            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{"Refresh"}</Button>
-            <Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>{"Create Key"}</Button>
+            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh')}</Button>
+            <Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>{t('federation.create_key')}</Button>
           </div>
         }
       />

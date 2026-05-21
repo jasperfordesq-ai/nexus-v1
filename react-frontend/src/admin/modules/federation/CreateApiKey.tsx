@@ -38,14 +38,14 @@ const SCOPE_KEYS = [
 
 export function CreateApiKey() {
   const { t } = useTranslation('admin');
-  usePageTitle("Federation");
+  usePageTitle(t('federation.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
 
   const AVAILABLE_SCOPES = SCOPE_KEYS.map((key) => ({
     key,
-    description: t(`federation.scope_${key.replace(':', '_')}`, key),
+    description: t(`federation.scope_${key.replace(':', '_')}`),
   }));
   const [name, setName] = useState('');
   const [scopes, setScopes] = useState<string[]>([]);
@@ -83,7 +83,7 @@ export function CreateApiKey() {
       }
     } catch (err) {
       logError('CreateApiKey: failed to create API key', err);
-      toast.error("Failed to create API key. Please try again");
+      toast.error(t('federation.key_create_failed'));
     }
     setSaving(false);
   };
@@ -99,16 +99,16 @@ export function CreateApiKey() {
   if (createdKey) {
     return (
       <div>
-        <PageHeader title={"Create API Key"} description={"Create a new API key to enable external access to your federation data"} />
+        <PageHeader title={t('federation.create_api_key_title')} description={t('federation.create_api_key_desc')} />
         <Card shadow="sm">
           <CardBody className="gap-4">
             <div className="rounded-lg bg-success-50 border border-success-200 p-4">
-              <p className="text-sm font-medium text-success-700 mb-2">{"Your New API Key"}</p>
+              <p className="text-sm font-medium text-success-700 mb-2">{t('federation.your_new_api_key')}</p>
               <code className="block break-all text-sm bg-white p-3 rounded border">{createdKey}</code>
             </div>
             <div className="flex gap-2">
-              <Button variant="flat" startContent={<Copy size={16} />} onPress={handleCopy}>{copied ? "Copied" : "Copy Key"}</Button>
-              <Button color="primary" onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{"Done"}</Button>
+              <Button variant="flat" startContent={<Copy size={16} />} onPress={handleCopy}>{copied ? t('federation.copied') : t('federation.copy_key')}</Button>
+              <Button color="primary" onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{t('federation.done')}</Button>
             </div>
           </CardBody>
         </Card>
@@ -119,16 +119,16 @@ export function CreateApiKey() {
   return (
     <div>
       <PageHeader
-        title={"Create API Key"}
-        description={"Create a new API key to enable external access to your federation data"}
-        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{"Back"}</Button>}
+        title={t('federation.create_api_key_title')}
+        description={t('federation.create_api_key_desc')}
+        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{t('federation.back')}</Button>}
       />
       <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Key size={20} /> {"New API Key"}</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Key size={20} /> {t('federation.new_api_key')}</h3></CardHeader>
         <CardBody className="gap-4">
-          <Input label={"Key Name"} placeholder={"Key Name..."} value={name} onValueChange={setName} isRequired variant="bordered" />
+          <Input label={t('federation.key_name')} placeholder={t('federation.key_name_placeholder')} value={name} onValueChange={setName} isRequired variant="bordered" />
           <div>
-            <p className="text-sm font-medium mb-2">{"Scopes"}</p>
+            <p className="text-sm font-medium mb-2">{t('federation.scopes')}</p>
             <div className="space-y-2">
               {AVAILABLE_SCOPES.map(scope => (
                 <Checkbox key={scope.key} isSelected={scopes.includes(scope.key)} onValueChange={() => toggleScope(scope.key)}>
@@ -156,8 +156,8 @@ export function CreateApiKey() {
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{"Cancel"}</Button>
-            <Button color="primary" onPress={handleSubmit} isLoading={saving} isDisabled={!name.trim()}>{"Create Key"}</Button>
+            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{t('common.cancel')}</Button>
+            <Button color="primary" onPress={handleSubmit} isLoading={saving} isDisabled={!name.trim()}>{t('federation.create_key')}</Button>
           </div>
         </CardBody>
       </Card>
