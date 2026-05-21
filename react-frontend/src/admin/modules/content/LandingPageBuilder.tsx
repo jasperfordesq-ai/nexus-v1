@@ -311,7 +311,7 @@ function AudienceCardsEditor({
       ...content,
       cards: [
         ...cards,
-        { title: '', description: '', cta_label: 'Learn more', target_url: '/' },
+        { title: '', description: '', cta_label: t('content.landing_default_cta_learn_more'), target_url: '/' },
       ],
     });
   };
