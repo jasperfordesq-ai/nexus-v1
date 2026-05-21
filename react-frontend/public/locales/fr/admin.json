@@ -10109,5 +10109,150 @@
     "table": {
       "aria": "Partenaires API"
     }
+  },
+  "agents": {
+    "actions": {
+      "cancel": "Annuler",
+      "refresh": "Rafraîchir",
+      "save": "Sauvegarder"
+    },
+    "common": {
+      "empty_dash": "-"
+    },
+    "status": {
+      "disabled": "Désactivé",
+      "enabled": "Activé"
+    },
+    "run_status": {
+      "completed": "Complété",
+      "failed": "Échoué",
+      "pending": "En attente",
+      "running": "En cours d'exécution"
+    },
+    "proposal_status": {
+      "approved": "Approuvé",
+      "pending": "En attente",
+      "pending_review": "En attente d'examen",
+      "rejected": "Rejeté"
+    },
+    "definitions": {
+      "title": "Agents AI",
+      "subtitle": "Les agents autonomes rédigent des propositions pour approbation par l'administrateur. Les actions restent en file d'attente jusqu'à ce que vous les approuviez.",
+      "loading": "Chargement des définitions d'agent...",
+      "last_run": "Dernière exécution : {{date}}",
+      "meta": {
+        "title": "Agents AI",
+        "description": "Configurez les définitions d'agent autonome et exécutez des générateurs de propositions pour ce locataire."
+      },
+      "actions": {
+        "edit_config": "Modifier la configuration",
+        "run_now": "Courez maintenant"
+      },
+      "empty": {
+        "title": "Aucune définition d'agent pour l'instant",
+        "description": "Amorcez les définitions d'agent par défaut du locataire avant d'utiliser des workflows de proposition autonomes."
+      },
+      "edit_modal": {
+        "config_json": "Configuration (JSON)",
+        "name": "Nom",
+        "title": "Modifier {{name}}"
+      },
+      "toasts": {
+        "disabled": "{{name}} désactivé",
+        "enabled": "{{name}} activé",
+        "invalid_json": "La configuration n'est pas valide JSON",
+        "load_failed": "Échec du chargement des définitions d'agent",
+        "run_created": "Exécuter #{{runId}} a créé une ou plusieurs propositions {{count}}",
+        "run_failed": "Échec de l'exécution de l'agent",
+        "run_failed_with_error": "Échec de l'exécution : {{error}}",
+        "toggle_failed": "Échec du basculement de l'agent",
+        "updated": "Agent mis à jour",
+        "update_failed": "Échec de la mise à jour de l'agent"
+      }
+    },
+    "runs": {
+      "title": "Exécutions d'agents",
+      "subtitle": "Historique de chaque exécution d'agent. Sélectionnez une ligne pour développer les détails de l'erreur.",
+      "loading": "L'agent de chargement s'exécute...",
+      "table_aria": "L'agent s'exécute",
+      "proposals_cell": "{{generated}} ({{applied}} appliqué)",
+      "meta": {
+        "title": "Exécutions de l'agent AI",
+        "description": "Examinez l’historique d’exécution, le statut, l’utilisation des jetons, les coûts et les erreurs des agents autonomes."
+      },
+      "columns": {
+        "agent": "Agent",
+        "cost": "Coût",
+        "id": "ID",
+        "proposals": "Propositions",
+        "started": "Commencé",
+        "status": "Statut",
+        "tokens": "Jetons (entrée/sortie)",
+        "triggered": "Déclenché"
+      },
+      "detail": {
+        "completed": "Terminé : {{date}}",
+        "error": "Erreur",
+        "summary": "Résumé"
+      },
+      "empty": {
+        "title": "Aucune course pour l'instant",
+        "description": "L'historique d'exécution de l'agent apparaîtra ici après l'exécution d'un agent."
+      },
+      "toasts": {
+        "load_failed": "Échec du chargement des exécutions"
+      }
+    },
+    "proposals": {
+      "title": "Propositions d'agents",
+      "subtitle": "Examiner et approuver les propositions générées par des agents autonomes.",
+      "loading": "Chargement des propositions d'agent...",
+      "confidence": "Confiance : {{score}}",
+      "run_id": "Exécutez #{{id}}",
+      "subject_user": "Utilisateur concerné : {{id}}",
+      "target_user": "Utilisateur cible : {{id}}",
+      "meta": {
+        "title": "Propositions d'agents AI",
+        "description": "Examinez, modifiez, approuvez ou rejetez les propositions d’agents autonomes avant qu’elles n’affectent les données des locataires."
+      },
+      "actions": {
+        "approve": "Approuver",
+        "edit_approve": "Modifier et approuver",
+        "reject": "Rejeter",
+        "save_approve": "Enregistrer et approuver"
+      },
+      "empty": {
+        "title": "Aucune proposition",
+        "description": "Les propositions correspondantes apparaîtront ici lorsque les agents créeront des éléments de révision pour ce filtre."
+      },
+      "edit_modal": {
+        "payload_json": "Charge utile (JSON)",
+        "title": "Modifier et approuver la proposition #{{id}}"
+      },
+      "labels": {
+        "payload": "Charge utile",
+        "reasoning": "Raisonnement"
+      },
+      "reject_modal": {
+        "note": "Remarque (facultatif)",
+        "title": "Rejeter la proposition #{{id}}"
+      },
+      "tabs": {
+        "all": "Tous",
+        "approved": "Approuvé",
+        "pending": "En attente",
+        "rejected": "Rejeté"
+      },
+      "toasts": {
+        "approved": "Proposition approuvée et exécutée",
+        "approve_failed": "Échec de l'approbation",
+        "edit_approve_failed": "Échec de la modification et de l'approbation",
+        "edited_approved": "Proposition éditée et approuvée",
+        "invalid_json": "La charge utile modifiée n'est pas valide JSON",
+        "load_failed": "Échec du chargement des propositions",
+        "reject_failed": "Échec du rejet",
+        "rejected": "Proposition rejetée"
+      }
+    }
   }
 }

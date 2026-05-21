@@ -10109,5 +10109,150 @@
     "table": {
       "aria": "Comhpháirtithe API"
     }
+  },
+  "agents": {
+    "actions": {
+      "cancel": "Cealaigh",
+      "refresh": "Athnuaigh",
+      "save": "Sábháil"
+    },
+    "common": {
+      "empty_dash": "-"
+    },
+    "status": {
+      "disabled": "faoi ​​mhíchumas",
+      "enabled": "Cumasaithe"
+    },
+    "run_status": {
+      "completed": "Críochnaithe",
+      "failed": "Theip",
+      "pending": "Ar feitheamh",
+      "running": "Rith"
+    },
+    "proposal_status": {
+      "approved": "Ceadaithe",
+      "pending": "Ar feitheamh",
+      "pending_review": "Athbhreithniú ar feitheamh",
+      "rejected": "Diúltaithe"
+    },
+    "definitions": {
+      "title": "Gníomhairí AI",
+      "subtitle": "Dréachtaíonn gníomhairí uathrialacha tograí lena gceadú ag an riarthóir. Fanann gníomhartha i scuaine go dtí go gceadaíonn tú iad.",
+      "loading": "Sainmhínithe gníomhaire á lódáil...",
+      "last_run": "Rith dheireanach: {{date}}",
+      "meta": {
+        "title": "Gníomhairí AI",
+        "description": "Cumraigh sainmhínithe gníomhaire uathrialaitheach agus rith gineadóirí tograí don tionónta seo."
+      },
+      "actions": {
+        "edit_config": "Cuir cumraíocht in eagar",
+        "run_now": "Rith anois"
+      },
+      "empty": {
+        "title": "Níl aon sainmhínithe gníomhaire fós",
+        "description": "Síl sainmhínithe gníomhaire réamhshocraithe an tionónta sula n-úsáidfear sreafaí oibre tograí uathrialacha."
+      },
+      "edit_modal": {
+        "config_json": "Cumraíocht (JSON)",
+        "name": "Ainm",
+        "title": "Cuir {{name}} in eagar"
+      },
+      "toasts": {
+        "disabled": "{{name}} díchumasaithe",
+        "enabled": "{{name}} cumasaithe",
+        "invalid_json": "Níl an chumraíocht bailí JSON",
+        "load_failed": "Theip ar lódáil sainmhínithe gníomhairí",
+        "run_created": "Rith #{{runId}} togra(í) cruthaithe {{count}}",
+        "run_failed": "Theip ar an ngníomhaire a rith",
+        "run_failed_with_error": "Theip ar rith: {{error}}",
+        "toggle_failed": "Theip ar an ngníomhaire a scoránaigh",
+        "updated": "Nuashonraíodh an gníomhaire",
+        "update_failed": "Theip ar an ngníomhaire a nuashonrú"
+      }
+    },
+    "runs": {
+      "title": "Ritheann Gníomhaire",
+      "subtitle": "Stair fhorghníomhú gach gníomhaire. Roghnaigh ró chun sonraí earráide a leathnú.",
+      "loading": "Ritheann gníomhaire lódála...",
+      "table_aria": "Ritheann gníomhaire",
+      "proposals_cell": "{{generated}} ({{applied}} curtha i bhfeidhm)",
+      "meta": {
+        "title": "Ritheann Gníomhaire AI",
+        "description": "Athbhreithnigh stair forghníomhaithe, stádas, úsáid chomharthaí, costais, agus earráidí do ghníomhairí uathrialacha."
+      },
+      "columns": {
+        "agent": "Gníomhaire",
+        "cost": "Costas",
+        "id": "ID",
+        "proposals": "Tograí",
+        "started": "Thosaigh",
+        "status": "Stádas",
+        "tokens": "Comharthaí (isteach/amach)",
+        "triggered": "Spreagtha"
+      },
+      "detail": {
+        "completed": "Críochnaithe: {{date}}",
+        "error": "Earráid",
+        "summary": "Achoimre"
+      },
+      "empty": {
+        "title": "Níl aon rith fós",
+        "description": "Taispeánfar stair forghníomhaithe gníomhairí anseo nuair a ritheann gníomhaire."
+      },
+      "toasts": {
+        "load_failed": "Theip ar ritheanna a lódáil"
+      }
+    },
+    "proposals": {
+      "title": "Tograí Gníomhaire",
+      "subtitle": "Athbhreithniú agus formheas a dhéanamh ar thograí arna nginiúint ag gníomhairí uathrialacha.",
+      "loading": "Moltaí gníomhaire á lódáil...",
+      "confidence": "Muinín: {{score}}",
+      "run_id": "Rith #{{id}}",
+      "subject_user": "Úsáideoir ábhair: {{id}}",
+      "target_user": "Úsáideoir sprice: {{id}}",
+      "meta": {
+        "title": "AI Tograí Gníomhaire",
+        "description": "Tograí gníomhaire uathrialaitheach a athbhreithniú, a chur in eagar, a cheadú nó a dhiúltú sula ndéanann siad difear do shonraí tionóntaí."
+      },
+      "actions": {
+        "approve": "Cheadaigh",
+        "edit_approve": "Cuir in eagar & ceadaigh",
+        "reject": "Diúltaigh",
+        "save_approve": "Sábháil & ceadaigh"
+      },
+      "empty": {
+        "title": "Uimh moltaí",
+        "description": "Beidh moltaí meaitseála le feiceáil anseo nuair a chruthaíonn gníomhairí míreanna athbhreithnithe don scagaire seo."
+      },
+      "edit_modal": {
+        "payload_json": "Ualach Pála (JSON)",
+        "title": "Cuir an togra in eagar agus formheas #{{id}}"
+      },
+      "labels": {
+        "payload": "Ualach pá",
+        "reasoning": "Réasúnaíocht"
+      },
+      "reject_modal": {
+        "note": "Nóta (roghnach)",
+        "title": "Diúltaigh an togra #{{id}}"
+      },
+      "tabs": {
+        "all": "Gach",
+        "approved": "Ceadaithe",
+        "pending": "Ar feitheamh",
+        "rejected": "Diúltaithe"
+      },
+      "toasts": {
+        "approved": "Togra ceadaithe agus curtha i gcrích",
+        "approve_failed": "Theip ar cheadú",
+        "edit_approve_failed": "Theip ar chur in eagar agus a cheadú",
+        "edited_approved": "Cuireadh an togra in eagar agus faomhadh",
+        "invalid_json": "Níl an pálasta curtha in eagar bailí JSON",
+        "load_failed": "Theip ar na tograí a lódáil",
+        "reject_failed": "Theip ar dhiúltú",
+        "rejected": "Diúltaíodh don togra"
+      }
+    }
   }
 }

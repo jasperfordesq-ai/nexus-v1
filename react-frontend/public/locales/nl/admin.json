@@ -10109,5 +10109,150 @@
     "table": {
       "aria": "API-partners"
     }
+  },
+  "agents": {
+    "actions": {
+      "cancel": "Annuleren",
+      "refresh": "Vernieuwen",
+      "save": "Redden"
+    },
+    "common": {
+      "empty_dash": "-"
+    },
+    "status": {
+      "disabled": "Gehandicapt",
+      "enabled": "Ingeschakeld"
+    },
+    "run_status": {
+      "completed": "Voltooid",
+      "failed": "Mislukt",
+      "pending": "In behandeling",
+      "running": "Rennen"
+    },
+    "proposal_status": {
+      "approved": "Goedgekeurd",
+      "pending": "In behandeling",
+      "pending_review": "In afwachting van beoordeling",
+      "rejected": "Afgewezen"
+    },
+    "definitions": {
+      "title": "AI-agenten",
+      "subtitle": "Autonome agenten stellen voorstellen op ter goedkeuring door de beheerder. Actions stay queued until you approve them.",
+      "loading": "Agentdefinities laden...",
+      "last_run": "Laatste run: {{date}}",
+      "meta": {
+        "title": "AI-agenten",
+        "description": "Configureer autonome agentdefinities en voer voorstelgeneratoren uit voor deze tenant."
+      },
+      "actions": {
+        "edit_config": "Configuratie bewerken",
+        "run_now": "Ren nu"
+      },
+      "empty": {
+        "title": "Nog geen agentdefinities",
+        "description": "Seed de standaardagentdefinities van de tenant voordat u autonome voorstelworkflows gebruikt."
+      },
+      "edit_modal": {
+        "config_json": "Configuratie (JSON)",
+        "name": "Naam",
+        "title": "{{name}} bewerken"
+      },
+      "toasts": {
+        "disabled": "{{name}} uitgeschakeld",
+        "enabled": "{{name}} ingeschakeld",
+        "invalid_json": "Configuratie is niet geldig JSON",
+        "load_failed": "Kan agentdefinities niet laden",
+        "run_created": "Voer #{{runId}} uit en heeft {{count}}-voorstellen gemaakt",
+        "run_failed": "Kan agent niet uitvoeren",
+        "run_failed_with_error": "Uitvoering mislukt: {{error}}",
+        "toggle_failed": "Kan agent niet wisselen",
+        "updated": "Agent bijgewerkt",
+        "update_failed": "Kan agent niet updaten"
+      }
+    },
+    "runs": {
+      "title": "Agent loopt",
+      "subtitle": "Geschiedenis van elke executie van agenten. Selecteer een rij om foutdetails uit te vouwen.",
+      "loading": "Laadagent wordt uitgevoerd...",
+      "table_aria": "Agent vlucht",
+      "proposals_cell": "{{generated}} ({{applied}} toegepast)",
+      "meta": {
+        "title": "AI Agent wordt uitgevoerd",
+        "description": "Bekijk de uitvoeringsgeschiedenis, status, tokengebruik, kosten en fouten voor autonome agenten."
+      },
+      "columns": {
+        "agent": "Tussenpersoon",
+        "cost": "Kosten",
+        "id": "ID",
+        "proposals": "Voorstellen",
+        "started": "Gestart",
+        "status": "Status",
+        "tokens": "Tokens (in/uit)",
+        "triggered": "Geactiveerd"
+      },
+      "detail": {
+        "completed": "Voltooid: {{date}}",
+        "error": "Fout",
+        "summary": "Samenvatting"
+      },
+      "empty": {
+        "title": "Nog geen runs",
+        "description": "De uitvoeringsgeschiedenis van agenten wordt hier weergegeven nadat een agent is uitgevoerd."
+      },
+      "toasts": {
+        "load_failed": "Kan uitvoeringen niet laden"
+      }
+    },
+    "proposals": {
+      "title": "Voorstellen van agenten",
+      "subtitle": "Beoordeel en keur voorstellen goed die zijn gegenereerd door autonome agenten.",
+      "loading": "Agentvoorstellen laden...",
+      "confidence": "Vertrouwen: {{score}}",
+      "run_id": "Voer #{{id}} uit",
+      "subject_user": "Onderwerpgebruiker: {{id}}",
+      "target_user": "Doelgebruiker: {{id}}",
+      "meta": {
+        "title": "AI Agentvoorstellen",
+        "description": "Voorstellen van autonome agenten beoordelen, bewerken, goedkeuren of afwijzen voordat deze van invloed zijn op tenantgegevens."
+      },
+      "actions": {
+        "approve": "Goedkeuren",
+        "edit_approve": "Bewerken en goedkeuren",
+        "reject": "Afwijzen",
+        "save_approve": "Opslaan en goedkeuren"
+      },
+      "empty": {
+        "title": "Geen voorstellen",
+        "description": "Overeenkomende voorstellen verschijnen hier wanneer agenten beoordelingsitems voor dit filter maken."
+      },
+      "edit_modal": {
+        "payload_json": "Payload (JSON)",
+        "title": "Voorstel bewerken en goedkeuren #{{id}}"
+      },
+      "labels": {
+        "payload": "Laadvermogen",
+        "reasoning": "Redenering"
+      },
+      "reject_modal": {
+        "note": "Opmerking (optioneel)",
+        "title": "Voorstel afwijzen #{{id}}"
+      },
+      "tabs": {
+        "all": "Alle",
+        "approved": "Goedgekeurd",
+        "pending": "In behandeling",
+        "rejected": "Afgewezen"
+      },
+      "toasts": {
+        "approved": "Voorstel goedgekeurd en uitgevoerd",
+        "approve_failed": "Goedkeuren is niet gelukt",
+        "edit_approve_failed": "Bewerken en goedkeuren is niet gelukt",
+        "edited_approved": "Voorstel aangepast en goedgekeurd",
+        "invalid_json": "Bewerkte payload is niet geldig JSON",
+        "load_failed": "Kan voorstellen niet laden",
+        "reject_failed": "Het is niet gelukt om te weigeren",
+        "rejected": "Voorstel afgewezen"
+      }
+    }
   }
 }

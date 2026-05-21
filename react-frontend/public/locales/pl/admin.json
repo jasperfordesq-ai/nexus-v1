@@ -10109,5 +10109,150 @@
     "table": {
       "aria": "Partnerzy API"
     }
+  },
+  "agents": {
+    "actions": {
+      "cancel": "Anulować",
+      "refresh": "Odświeżać",
+      "save": "Ratować"
+    },
+    "common": {
+      "empty_dash": "-"
+    },
+    "status": {
+      "disabled": "Wyłączony",
+      "enabled": "Włączony"
+    },
+    "run_status": {
+      "completed": "Zakończony",
+      "failed": "Przegrany",
+      "pending": "Aż do",
+      "running": "Działanie"
+    },
+    "proposal_status": {
+      "approved": "Zatwierdzony",
+      "pending": "Aż do",
+      "pending_review": "Oczekuje na recenzję",
+      "rejected": "Odrzucony"
+    },
+    "definitions": {
+      "title": "AI Agenci",
+      "subtitle": "Agenci autonomiczni przygotowują propozycje do zatwierdzenia przez administratora. Akcje pozostają w kolejce do czasu ich zatwierdzenia.",
+      "loading": "Ładowanie definicji agentów...",
+      "last_run": "Ostatnie uruchomienie: {{date}}",
+      "meta": {
+        "title": "AI Agenci",
+        "description": "Skonfiguruj definicje agentów autonomicznych i uruchom generatory propozycji dla tego najemcy."
+      },
+      "actions": {
+        "edit_config": "Edytuj konfigurację",
+        "run_now": "Uciekaj teraz"
+      },
+      "empty": {
+        "title": "Nie ma jeszcze definicji agenta",
+        "description": "Zaszczep domyślne definicje agentów dzierżawcy przed użyciem autonomicznych przepływów pracy związanych z propozycjami."
+      },
+      "edit_modal": {
+        "config_json": "Konfiguracja (JSON)",
+        "name": "Nazwa",
+        "title": "Edytuj {{name}}"
+      },
+      "toasts": {
+        "disabled": "{{name}} wyłączony",
+        "enabled": "Włączono {{name}}",
+        "invalid_json": "Konfiguracja jest nieprawidłowa JSON",
+        "load_failed": "Nie udało się załadować definicji agentów",
+        "run_created": "Uruchom #{{runId}} utworzono propozycje {{count}}",
+        "run_failed": "Nie udało się uruchomić agenta",
+        "run_failed_with_error": "Uruchomienie nie powiodło się: {{error}}",
+        "toggle_failed": "Nie udało się przełączyć agenta",
+        "updated": "Zaktualizowano agenta",
+        "update_failed": "Nie udało się zaktualizować agenta"
+      }
+    },
+    "runs": {
+      "title": "Agent biegnie",
+      "subtitle": "Historia każdej egzekucji agenta. Wybierz wiersz, aby rozwinąć szczegóły błędu.",
+      "loading": "Agent ładowania działa...",
+      "table_aria": "Agent biegnie",
+      "proposals_cell": "{{generated}} (zastosowano {{applied}})",
+      "meta": {
+        "title": "AI Agent działa",
+        "description": "Przeglądaj historię realizacji, status, wykorzystanie tokenów, koszty i błędy agentów autonomicznych."
+      },
+      "columns": {
+        "agent": "Agent",
+        "cost": "Koszt",
+        "id": "ID",
+        "proposals": "Propozycje",
+        "started": "Rozpoczęło się",
+        "status": "Status",
+        "tokens": "Tokeny (wejście/wyjście)",
+        "triggered": "Wyzwolono"
+      },
+      "detail": {
+        "completed": "Ukończono: {{date}}",
+        "error": "Błąd",
+        "summary": "Streszczenie"
+      },
+      "empty": {
+        "title": "Nie ma jeszcze żadnych biegów",
+        "description": "Historia wykonywania agenta pojawi się tutaj po uruchomieniu agenta."
+      },
+      "toasts": {
+        "load_failed": "Nie udało się wczytać przebiegów"
+      }
+    },
+    "proposals": {
+      "title": "Propozycje agentów",
+      "subtitle": "Przeglądanie i zatwierdzanie propozycji generowanych przez niezależnych agentów.",
+      "loading": "Ładowanie propozycji agentów...",
+      "confidence": "Pewność: {{score}}",
+      "run_id": "Uruchom #{{id}}",
+      "subject_user": "Użytkownik tematyczny: {{id}}",
+      "target_user": "Użytkownik docelowy: {{id}}",
+      "meta": {
+        "title": "AI Propozycje agentów",
+        "description": "Przeglądaj, edytuj, zatwierdzaj lub odrzucaj propozycje agentów autonomicznych, zanim wpłyną one na dane najemcy."
+      },
+      "actions": {
+        "approve": "Zatwierdzić",
+        "edit_approve": "Edytuj i zatwierdź",
+        "reject": "Odrzucić",
+        "save_approve": "Zapisz i zatwierdź"
+      },
+      "empty": {
+        "title": "Żadnych propozycji",
+        "description": "Pasujące propozycje pojawią się tutaj, gdy agenci utworzą elementy recenzji dla tego filtra."
+      },
+      "edit_modal": {
+        "payload_json": "Ładunek (JSON)",
+        "title": "Edytuj i zatwierdź propozycję #{{id}}"
+      },
+      "labels": {
+        "payload": "Ładunek",
+        "reasoning": "Rozumowanie"
+      },
+      "reject_modal": {
+        "note": "Uwaga (opcjonalnie)",
+        "title": "Odrzuć propozycję #{{id}}"
+      },
+      "tabs": {
+        "all": "Wszystko",
+        "approved": "Zatwierdzony",
+        "pending": "Aż do",
+        "rejected": "Odrzucony"
+      },
+      "toasts": {
+        "approved": "Propozycja zatwierdzona i wykonana",
+        "approve_failed": "Nie udało się zatwierdzić",
+        "edit_approve_failed": "Nie udało się edytować i zatwierdzić",
+        "edited_approved": "Propozycja poprawiona i zatwierdzona",
+        "invalid_json": "Edytowany ładunek jest nieprawidłowy JSON",
+        "load_failed": "Nie udało się załadować propozycji",
+        "reject_failed": "Nie udało się odrzucić",
+        "rejected": "Propozycja odrzucona"
+      }
+    }
   }
 }

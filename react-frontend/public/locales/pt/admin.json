@@ -10109,5 +10109,150 @@
     "table": {
       "aria": "Parceiros API"
     }
+  },
+  "agents": {
+    "actions": {
+      "cancel": "Cancelar",
+      "refresh": "Atualizar",
+      "save": "Salvar"
+    },
+    "common": {
+      "empty_dash": "-"
+    },
+    "status": {
+      "disabled": "Desabilitado",
+      "enabled": "Habilitado"
+    },
+    "run_status": {
+      "completed": "Concluído",
+      "failed": "Fracassado",
+      "pending": "Pendente",
+      "running": "Correndo"
+    },
+    "proposal_status": {
+      "approved": "Aprovado",
+      "pending": "Pendente",
+      "pending_review": "Revisão pendente",
+      "rejected": "Rejeitado"
+    },
+    "definitions": {
+      "title": "Agentes AI",
+      "subtitle": "Agentes autônomos elaboram propostas para aprovação do administrador. As ações permanecem na fila até que você as aprove.",
+      "loading": "Carregando definições de agente...",
+      "last_run": "Última execução: {{date}}",
+      "meta": {
+        "title": "Agentes AI",
+        "description": "Configure definições de agente autônomo e execute geradores de propostas para este locatário."
+      },
+      "actions": {
+        "edit_config": "Editar configuração",
+        "run_now": "Corra agora"
+      },
+      "empty": {
+        "title": "Ainda não há definições de agente",
+        "description": "Propague as definições de agente padrão do locatário antes de usar fluxos de trabalho de proposta autônomos."
+      },
+      "edit_modal": {
+        "config_json": "Configuração (JSON)",
+        "name": "Nome",
+        "title": "Editar {{name}}"
+      },
+      "toasts": {
+        "disabled": "{{name}} desativado",
+        "enabled": "{{name}} ativado",
+        "invalid_json": "A configuração não é válida JSON",
+        "load_failed": "Falha ao carregar definições de agente",
+        "run_created": "Execute #{{runId}} propostas {{count}} criadas",
+        "run_failed": "Falha ao executar o agente",
+        "run_failed_with_error": "Falha na execução: {{error}}",
+        "toggle_failed": "Falha ao alternar agente",
+        "updated": "Agente atualizado",
+        "update_failed": "Falha ao atualizar o agente"
+      }
+    },
+    "runs": {
+      "title": "Execuções de Agente",
+      "subtitle": "Histórico de execução de cada agente. Selecione uma linha para expandir os detalhes do erro.",
+      "loading": "Carregando execuções do agente...",
+      "table_aria": "Execuções do agente",
+      "proposals_cell": "{{generated}} ({{applied}} aplicado)",
+      "meta": {
+        "title": "Execuções do agente AI",
+        "description": "Revise o histórico de execução, status, uso de token, custos e erros de agentes autônomos."
+      },
+      "columns": {
+        "agent": "Agente",
+        "cost": "Custo",
+        "id": "ID",
+        "proposals": "Propostas",
+        "started": "Iniciado",
+        "status": "Status",
+        "tokens": "Tokens (entrada/saída)",
+        "triggered": "Provocado"
+      },
+      "detail": {
+        "completed": "Concluído: {{date}}",
+        "error": "Erro",
+        "summary": "Resumo"
+      },
+      "empty": {
+        "title": "Ainda não há corridas",
+        "description": "O histórico de execução do agente aparecerá aqui após a execução de um agente."
+      },
+      "toasts": {
+        "load_failed": "Falha ao carregar execuções"
+      }
+    },
+    "proposals": {
+      "title": "Propostas de agentes",
+      "subtitle": "Analisar e aprovar propostas geradas por agentes autônomos.",
+      "loading": "Carregando propostas de agentes...",
+      "confidence": "Confiança: {{score}}",
+      "run_id": "Execute #{{id}}",
+      "subject_user": "Usuário do assunto: {{id}}",
+      "target_user": "Usuário alvo: {{id}}",
+      "meta": {
+        "title": "Propostas de agentes AI",
+        "description": "Revise, edite, aprove ou rejeite propostas de agentes autônomos antes que elas afetem os dados do locatário."
+      },
+      "actions": {
+        "approve": "Aprovar",
+        "edit_approve": "Editar e aprovar",
+        "reject": "Rejeitar",
+        "save_approve": "Salvar e aprovar"
+      },
+      "empty": {
+        "title": "Sem propostas",
+        "description": "As propostas correspondentes aparecerão aqui quando os agentes criarem itens de revisão para este filtro."
+      },
+      "edit_modal": {
+        "payload_json": "Carga útil (JSON)",
+        "title": "Editar e aprovar proposta #{{id}}"
+      },
+      "labels": {
+        "payload": "Carga útil",
+        "reasoning": "Raciocínio"
+      },
+      "reject_modal": {
+        "note": "Nota (opcional)",
+        "title": "Rejeitar proposta #{{id}}"
+      },
+      "tabs": {
+        "all": "Todos",
+        "approved": "Aprovado",
+        "pending": "Pendente",
+        "rejected": "Rejeitado"
+      },
+      "toasts": {
+        "approved": "Proposta aprovada e executada",
+        "approve_failed": "Falha ao aprovar",
+        "edit_approve_failed": "Falha ao editar e aprovar",
+        "edited_approved": "Proposta editada e aprovada",
+        "invalid_json": "A carga útil editada não é válida JSON",
+        "load_failed": "Falha ao carregar propostas",
+        "reject_failed": "Falha ao rejeitar",
+        "rejected": "Proposta rejeitada"
+      }
+    }
   }
 }

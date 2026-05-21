@@ -10109,5 +10109,150 @@
     "table": {
       "aria": "Partner API"
     }
+  },
+  "agents": {
+    "actions": {
+      "cancel": "Cancellare",
+      "refresh": "Aggiorna",
+      "save": "Salva"
+    },
+    "common": {
+      "empty_dash": "-"
+    },
+    "status": {
+      "disabled": "Disabilitato",
+      "enabled": "Abilitato"
+    },
+    "run_status": {
+      "completed": "Completato",
+      "failed": "Fallito",
+      "pending": "In attesa di",
+      "running": "Corsa"
+    },
+    "proposal_status": {
+      "approved": "Approvato",
+      "pending": "In attesa di",
+      "pending_review": "In attesa di revisione",
+      "rejected": "Respinto"
+    },
+    "definitions": {
+      "title": "AI Agenti",
+      "subtitle": "Gli agenti autonomi elaborano proposte per l'approvazione dell'amministratore. Le azioni rimangono in coda finché non le approvi.",
+      "loading": "Caricamento definizioni agente...",
+      "last_run": "Ultima esecuzione: {{date}}",
+      "meta": {
+        "title": "AI Agenti",
+        "description": "Configura le definizioni degli agenti autonomi ed esegui i generatori di proposte per questo tenant."
+      },
+      "actions": {
+        "edit_config": "Modifica configurazione",
+        "run_now": "Corri adesso"
+      },
+      "empty": {
+        "title": "Nessuna definizione di agente ancora",
+        "description": "Eseguire il seeding delle definizioni dell'agente predefinito del tenant prima di utilizzare flussi di lavoro di proposta autonomi."
+      },
+      "edit_modal": {
+        "config_json": "Configurazione (JSON)",
+        "name": "Nome",
+        "title": "Modifica {{name}}"
+      },
+      "toasts": {
+        "disabled": "{{name}} disabilitato",
+        "enabled": "{{name}} abilitato",
+        "invalid_json": "La configurazione non è valida JSON",
+        "load_failed": "Impossibile caricare le definizioni dell'agente",
+        "run_created": "Esegui #{{runId}} proposte {{count}} create",
+        "run_failed": "Impossibile eseguire l'agente",
+        "run_failed_with_error": "Esecuzione non riuscita: {{error}}",
+        "toggle_failed": "Impossibile attivare/disattivare l'agente",
+        "updated": "Agente aggiornato",
+        "update_failed": "Impossibile aggiornare l'agente"
+      }
+    },
+    "runs": {
+      "title": "L'agente corre",
+      "subtitle": "Storia di ogni esecuzione dell'agente. Seleziona una riga per espandere i dettagli dell'errore.",
+      "loading": "Caricamento agente in esecuzione...",
+      "table_aria": "L'agente corre",
+      "proposals_cell": "{{generated}} ({{applied}} applicato)",
+      "meta": {
+        "title": "L'agente AI viene eseguito",
+        "description": "Esamina la cronologia di esecuzione, lo stato, l'utilizzo dei token, i costi e gli errori per gli agenti autonomi."
+      },
+      "columns": {
+        "agent": "Agente",
+        "cost": "Costo",
+        "id": "ID",
+        "proposals": "Proposte",
+        "started": "Iniziato",
+        "status": "Stato",
+        "tokens": "Gettoni (entrata/uscita)",
+        "triggered": "Innescato"
+      },
+      "detail": {
+        "completed": "Completato: {{date}}",
+        "error": "Errore",
+        "summary": "Riepilogo"
+      },
+      "empty": {
+        "title": "Nessuna corsa ancora",
+        "description": "La cronologia di esecuzione dell'agente verrà visualizzata qui dopo l'esecuzione di un agente."
+      },
+      "toasts": {
+        "load_failed": "Impossibile caricare le esecuzioni"
+      }
+    },
+    "proposals": {
+      "title": "Proposte dell'agente",
+      "subtitle": "Esaminare e approvare le proposte generate da agenti autonomi.",
+      "loading": "Caricamento proposte agente...",
+      "confidence": "Fiducia: {{score}}",
+      "run_id": "Esegui #{{id}}",
+      "subject_user": "Utente soggetto: {{id}}",
+      "target_user": "Utente di destinazione: {{id}}",
+      "meta": {
+        "title": "AI Proposte agente",
+        "description": "Esaminare, modificare, approvare o rifiutare le proposte degli agenti autonomi prima che incidano sui dati del tenant."
+      },
+      "actions": {
+        "approve": "Approvare",
+        "edit_approve": "Modifica e approva",
+        "reject": "Rifiutare",
+        "save_approve": "Salva e approva"
+      },
+      "empty": {
+        "title": "Nessuna proposta",
+        "description": "Le proposte corrispondenti verranno visualizzate qui quando gli agenti creano elementi di revisione per questo filtro."
+      },
+      "edit_modal": {
+        "payload_json": "Carico utile (JSON)",
+        "title": "Modifica e approva la proposta n. {{id}}"
+      },
+      "labels": {
+        "payload": "Carico utile",
+        "reasoning": "Ragionamento"
+      },
+      "reject_modal": {
+        "note": "Nota (facoltativa)",
+        "title": "Rifiuta la proposta #{{id}}"
+      },
+      "tabs": {
+        "all": "Tutto",
+        "approved": "Approvato",
+        "pending": "In attesa di",
+        "rejected": "Respinto"
+      },
+      "toasts": {
+        "approved": "Proposta approvata ed eseguita",
+        "approve_failed": "Impossibile approvare",
+        "edit_approve_failed": "Impossibile modificare e approvare",
+        "edited_approved": "Proposta modificata e approvata",
+        "invalid_json": "Il payload modificato non è valido JSON",
+        "load_failed": "Impossibile caricare le proposte",
+        "reject_failed": "Impossibile rifiutare",
+        "rejected": "Proposta respinta"
+      }
+    }
   }
 }

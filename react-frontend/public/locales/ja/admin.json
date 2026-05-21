@@ -10109,5 +10109,150 @@
     "table": {
       "aria": "API ?????"
     }
+  },
+  "agents": {
+    "actions": {
+      "cancel": "キャンセル",
+      "refresh": "リフレッシュ",
+      "save": "保存"
+    },
+    "common": {
+      "empty_dash": "-"
+    },
+    "status": {
+      "disabled": "無効",
+      "enabled": "有効"
+    },
+    "run_status": {
+      "completed": "完了",
+      "failed": "失敗した",
+      "pending": "保留中",
+      "running": "ランニング"
+    },
+    "proposal_status": {
+      "approved": "承認された",
+      "pending": "保留中",
+      "pending_review": "審査待ち",
+      "rejected": "拒否されました"
+    },
+    "definitions": {
+      "title": "AI エージェント",
+      "subtitle": "自律エージェントは、管理者の承認を得るために提案を作成します。アクションは、承認されるまでキューに残ります。",
+      "loading": "エージェント定義をロードしています...",
+      "last_run": "最終実行: {{date}}",
+      "meta": {
+        "title": "AI エージェント",
+        "description": "自律エージェント定義を構成し、このテナントの提案ジェネレーターを実行します。"
+      },
+      "actions": {
+        "edit_config": "構成の編集",
+        "run_now": "今すぐ実行"
+      },
+      "empty": {
+        "title": "エージェント定義がまだありません",
+        "description": "自律型提案ワークフローを使用する前に、テナントのデフォルトのエージェント定義をシードします。"
+      },
+      "edit_modal": {
+        "config_json": "構成 (JSON)",
+        "name": "名前",
+        "title": "{{name}} を編集する"
+      },
+      "toasts": {
+        "disabled": "{{name}} が無効になりました",
+        "enabled": "{{name}} が有効になりました",
+        "invalid_json": "構成が無効です JSON",
+        "load_failed": "エージェント定義のロードに失敗しました",
+        "run_created": "#{{runId}} を実行して {{count}} プロポーザルを作成しました",
+        "run_failed": "エージェントの実行に失敗しました",
+        "run_failed_with_error": "実行に失敗しました: {{error}}",
+        "toggle_failed": "エージェントの切り替えに失敗しました",
+        "updated": "エージェントが更新されました",
+        "update_failed": "エージェントの更新に失敗しました"
+      }
+    },
+    "runs": {
+      "title": "エージェントの実行",
+      "subtitle": "すべてのエージェント実行の履歴。行を選択してエラーの詳細を展開します。",
+      "loading": "エージェント実行を読み込み中...",
+      "table_aria": "エージェントの実行",
+      "proposals_cell": "{{generated}} ({{applied}} 適用)",
+      "meta": {
+        "title": "AI エージェントの実行",
+        "description": "自律エージェントの実行履歴、ステータス、トークン使用量、コスト、エラーを確認します。"
+      },
+      "columns": {
+        "agent": "エージェント",
+        "cost": "料金",
+        "id": "ID",
+        "proposals": "提案",
+        "started": "開始しました",
+        "status": "状態",
+        "tokens": "トークン (入/出)",
+        "triggered": "トリガーされた"
+      },
+      "detail": {
+        "completed": "完了: {{date}}",
+        "error": "エラー",
+        "summary": "まとめ"
+      },
+      "empty": {
+        "title": "まだ実行はありません",
+        "description": "エージェントの実行後、エージェントの実行履歴がここに表示されます。"
+      },
+      "toasts": {
+        "load_failed": "実行のロードに失敗しました"
+      }
+    },
+    "proposals": {
+      "title": "エージェントの提案",
+      "subtitle": "自律エージェントによって生成された提案をレビューおよび承認します。",
+      "loading": "エージェントの提案を読み込んでいます...",
+      "confidence": "信頼性: {{score}}",
+      "run_id": "#{{id}} を実行します",
+      "subject_user": "対象ユーザー: {{id}}",
+      "target_user": "対象ユーザー：{{id}}",
+      "meta": {
+        "title": "NEXUSSTERM0TOKEN エージェントの提案",
+        "description": "テナント データに影響を与える前に、自律エージェントの提案を確認、編集、承認、または拒否します。"
+      },
+      "actions": {
+        "approve": "承認する",
+        "edit_approve": "編集して承認する",
+        "reject": "拒否する",
+        "save_approve": "保存して承認する"
+      },
+      "empty": {
+        "title": "提案なし",
+        "description": "エージェントがこのフィルターのレビュー項目を作成すると、一致する提案がここに表示されます。"
+      },
+      "edit_modal": {
+        "payload_json": "ペイロード (JSON)",
+        "title": "提案 #{{id}} を編集して承認する"
+      },
+      "labels": {
+        "payload": "ペイロード",
+        "reasoning": "推論"
+      },
+      "reject_modal": {
+        "note": "注記 (オプション)",
+        "title": "提案 #{{id}} を拒否"
+      },
+      "tabs": {
+        "all": "全て",
+        "approved": "承認された",
+        "pending": "保留中",
+        "rejected": "拒否されました"
+      },
+      "toasts": {
+        "approved": "提案が承認および実行されました",
+        "approve_failed": "承認に失敗しました",
+        "edit_approve_failed": "編集と承認に失敗しました",
+        "edited_approved": "提案が編集および承認されました",
+        "invalid_json": "編集されたペイロードが無効です JSON",
+        "load_failed": "プロポーザルの読み込みに失敗しました",
+        "reject_failed": "拒否できませんでした",
+        "rejected": "提案は拒否されました"
+      }
+    }
   }
 }
