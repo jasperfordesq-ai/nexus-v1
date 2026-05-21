@@ -905,7 +905,132 @@
     "refresh": "Refresh",
     "top_areas_title": "Top Areas",
     "top_earners_title": "Top Earners",
-    "top_spenders_title": "Top Spenders"
+    "top_spenders_title": "Top Spenders",
+    "regional": {
+      "meta": {
+        "title": "Anailísí Réigiúnacha",
+        "description": "Léargais gheografacha, déimeagrafacha, rannpháirtíochta, oibrithe deonacha, agus iarratais cabhrach do chomhpháirtithe réigiúnacha."
+      },
+      "controls": {
+        "period": "Tréimhse"
+      },
+      "periods": {
+        "last_30d": "30 lá anuas",
+        "last_90d": "90 lá seo caite",
+        "last_12m": "12 mhí anuas",
+        "all_time": "An t-am ar fad"
+      },
+      "actions": {
+        "refresh_cache": "Athnuaigh taisce",
+        "export_report": "Tuarascáil easpórtála"
+      },
+      "stats": {
+        "active_members": "Baill ghníomhacha",
+        "active_members_description": "Comhaltaí atá gníomhach sa tréimhse tuairiscithe roghnaithe",
+        "vol_hours_this_month": "Uaireanta oibrithe deonacha",
+        "vol_hours_description": "Taifeadadh uaireanta oibrithe deonacha an mhí seo",
+        "help_requests_this_month": "Iarratais cabhrach",
+        "help_requests_description": "Osclaíodh iarratais cabhrach an mhí seo",
+        "most_needed_category": "An chatagóir is mó a bhfuil gá leis",
+        "most_needed_description": "Catagóir leis an éileamh is airde le déanaí"
+      },
+      "tabs": {
+        "aria": "Rannóga réigiúnacha anailíse",
+        "heatmap": "Léarscáil teasa ball",
+        "demographics": "Déimeagrafaic",
+        "demand_supply": "Éileamh agus soláthar",
+        "engagement": "Rannpháirtíocht",
+        "help_requests": "Iarratais cabhrach",
+        "volunteer": "Deonach"
+      },
+      "sections": {
+        "geographic_activity_density": "Dlús gníomhaíochta geografach",
+        "member_demographics": "Déimeagrafaic na mball",
+        "demand_supply_by_category": "Éileamh vs soláthar de réir catagóire",
+        "demand_supply_note": "Ciallaíonn cóimheas os cionn 1.0 go bhfuil an t-éileamh níos airde ná na tairiscintí atá ar fáil sa chatagóir sin.",
+        "monthly_engagement_metrics": "Méadracht mhíosúil rannpháirtíochta",
+        "volunteer_activity": "Gníomhaíocht oibrithe deonacha",
+        "help_request_analysis": "Anailís cabhrach-iarratas"
+      },
+      "columns": {
+        "rank": "Céim",
+        "latitude": "Domhanleithead",
+        "longitude": "Domhanfhad",
+        "members": "Baill",
+        "density": "Dlús",
+        "month": "Mí",
+        "new_members": "Baill nua",
+        "cumulative_total": "Iomlán carnach",
+        "category": "Catagóir",
+        "requests": "Iarratais",
+        "offers": "Tairiscintí",
+        "ratio": "Cóimheas",
+        "trend": "Treocht",
+        "active_members": "Baill ghníomhacha",
+        "vol_hours": "Uaireanta oibrithe deonacha",
+        "new_listings": "Liostaí nua",
+        "new_events": "Imeachtaí nua",
+        "help_requests": "Iarratais cabhrach",
+        "organisation": "Eagraíocht",
+        "volunteers": "Oibrithe Deonacha",
+        "total": "Iomlán",
+        "resolved": "Réitíodh",
+        "resolution_rate": "Ráta réitigh",
+        "avg_days_to_resolve": "Meán laethanta le réiteach"
+      },
+      "heatmap": {
+        "description": "Suímh is fearr de réir gníomhaíochta agus dlús na mball."
+      },
+      "demographics": {
+        "age_distribution": "Dáileadh aoise",
+        "language_distribution": "Dáileadh teanga",
+        "member_growth_12m": "Fás na mball, 12 mhí anuas",
+        "total_with_data": "Baill {{total}} le sonraí déimeagrafacha",
+        "total_active_members": "{{total}} baill ghníomhacha"
+      },
+      "volunteer": {
+        "total_hours": "Uaireanta iomlána",
+        "avg_hours_per_volunteer": "Meán uair an chloig in aghaidh an oibrí deonach",
+        "reciprocity_ratio": "Cóimheas cómhalartachta",
+        "reciprocity_description": "Cothromaíocht idir uaireanta tugtha agus uaireanta faighte ar fud an réigiúin.",
+        "top_orgs_title": "Na heagraíochtaí deonacha is fearr"
+      },
+      "help": {
+        "by_category": "Iarratais cabhrach de réir catagóire",
+        "resolution_trend_6m": "Treocht réitigh, 6 mhí seo caite"
+      },
+      "empty": {
+        "infinity": "∞",
+        "no_geographic_data": "Níl aon sonraí geografacha ar fáil don tréimhse seo.",
+        "no_listing_data": "Níl aon sonraí maidir le héileamh liostála ar fáil don tréimhse seo.",
+        "no_engagement_data": "Níl aon sonraí rannpháirtíochta ar fáil don tréimhse seo.",
+        "no_organisation_data": "Níl aon ghníomhaíocht eagraíochta ar fáil don tréimhse seo.",
+        "no_help_request_data": "Níl aon sonraí iarratais cabhrach ar fáil don tréimhse seo.",
+        "select_tab_to_load": "Roghnaigh an cluaisín seo chun sonraí a luchtú."
+      },
+      "empty_value": "-",
+      "loading": {
+        "section": "Anailísíocht á lódáil"
+      },
+      "errors": {
+        "data_unavailable": "Níl sonraí ar fáil don tréimhse seo.",
+        "load_data": "Níorbh fhéidir an roinn anailíse seo a lódáil: {{error}}",
+        "load_overview": "Níorbh fhéidir an forbhreathnú ar anailísíocht réigiúnach a lódáil.",
+        "failed_to_load_data": "Níorbh fhéidir sonraí anailíse a lódáil."
+      },
+      "units": {
+        "days_count": "Laethanta {{count}}"
+      },
+      "age_groups": {
+        "under_25": "Faoi 25",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
+        "65_plus": "65+",
+        "unknown": "Anaithnid"
+      }
+    }
   },
   "billing": {
     "actions": "Actions",
@@ -10602,13 +10727,99 @@
     "trust_tier": {
       "errors": {
         "recompute_failed": "Failed to recompute trust tiers.",
-        "save_failed": "Failed to save trust tier settings."
+        "save_failed": "Failed to save trust tier settings.",
+        "load_failed": "Theip ar chumraíocht na sraithe muiníne a lódáil."
       },
       "messages": {
-        "recomputed": "Trust tiers recomputed.",
+        "recomputed": "R?omhadh na sraitheanna muin?ne ar?s do {{count}} ball.",
         "saved": "Trust tier settings saved."
       },
-      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes."
+      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes.",
+      "title": "Cumraíocht Sraithe Iontaobhais",
+      "subtitle": "Socraigh na critéir critéar do gach leibhéal iontaobhais. Beidh athruithe i bhfeidhm ar an gcéad rith ríomha eile.",
+      "loading": "Cumraíocht sraithe iontaobhais á lódáil",
+      "recompute_hint": "Úsáid athríomh nuair a athraíonn na tairseacha agus nuair is gá na baill reatha a athmheasúnú láithreach. Ritheann sé sa chúlra agus féadfaidh sé soicind 30-60 a ghlacadh.",
+      "meta": {
+        "title": "Cumraíocht Sraithe Iontaobhais",
+        "description": "Cumraigh tairseacha sraitheanna muiníne, athríomh sraitheanna na mball, agus athbhreithnigh an méid a dhíghlasálann gach sraith."
+      },
+      "actions": {
+        "recompute": "Ríomh gach sraith",
+        "save": "Sábháil cumraíocht"
+      },
+      "about": {
+        "title": "Maidir leis an leathanach seo",
+        "body": "Dréimire clú is ea sraitheanna iontaobhais a scaoileann pribhléidí de réir mar a éiríonn baill níos gníomhaí agus níos fíoraithe. Téann comhaltaí chun cinn go huathoibríoch nuair a chomhlíonann siad na critéir thíos. Úsáid athríomh chun athríomh láithreach a bhrú ar gach ball. Bíonn tionchar ag dul chun cinn sraithe ar Warmth Pass, ar incháilitheacht an chomhordaitheora, agus ar infheictheacht san eolaire ball."
+      },
+      "criteria": {
+        "title": "Tairseacha critéar sraithe"
+      },
+      "fields": {
+        "hours_logged": "Uaireanta logáilte (íosmhéid)",
+        "reviews_received": "Léirmheasanna faighte (íosmhéid)",
+        "identity_verified": "A cheangal ar chéannacht a fhíorú"
+      },
+      "tiers": {
+        "member": {
+          "label": "Ball",
+          "description": "Ball pobail bunúsach le logáil isteach 1 uair an chloig ar a laghad."
+        },
+        "trusted": {
+          "label": "Iontaofa",
+          "description": "Ball gníomhach le roinnt uaireanta an chloig agus léirmheasanna."
+        },
+        "verified": {
+          "label": "Fíoraithe",
+          "description": "Ball iontaofa le haitheantas deimhnithe."
+        },
+        "coordinator": {
+          "label": "Comhordaitheoir",
+          "description": "Ball fíoraithe fíorghníomhach atá incháilithe chun comhordú a dhéanamh."
+        }
+      },
+      "reference": {
+        "title": "Tagairt sraithe",
+        "aria": "Tagairt sraithe iontaobhais",
+        "columns": {
+          "tier": "Sraith",
+          "level": "Leibhéal",
+          "color": "Dath",
+          "description": "Cur síos",
+          "unlocks": "Cad a dhíghlasálann sé"
+        },
+        "rows": {
+          "0": {
+            "name": "núíosach",
+            "color": "Liath",
+            "description": "Just isteach, níl aon ghníomhaíocht ag teastáil.",
+            "unlocks": "Bunrochtain ball."
+          },
+          "1": {
+            "name": "Ball",
+            "color": "Gorm",
+            "description": "Tá uaireanta logáilte aige.",
+            "unlocks": "Is féidir leis liostaí cabhrach a phostáil agus uaireanta cúraim a fháil."
+          },
+          "2": {
+            "name": "Iontaofa",
+            "color": "Glas",
+            "description": "Gníomhach le hathbhreithnithe.",
+            "unlocks": "Incháilithe do Warmth Pass agus is féidir é a mholadh le haghaidh cúraim."
+          },
+          "3": {
+            "name": "Fíoraithe",
+            "color": "Corcra",
+            "description": "Aitheantas fíoraithe.",
+            "unlocks": "Infheictheacht iomlán an chomhordaitheora cúraim agus suaitheantas aitheantais."
+          },
+          "4": {
+            "name": "Comhordaitheoir",
+            "color": "Ómra",
+            "description": "An-ghníomhach le haitheantas fíoraithe.",
+            "unlocks": "Incháilithe chun uaireanta a cheadú agus cluichí a chomhordú."
+          }
+        }
+      }
     },
     "warmth_pass": {
       "title": "Warmth Pass",
@@ -10647,6 +10858,109 @@
       "not_eligible_notice": {
         "title": "Not eligible yet",
         "body": "This member does not yet meet the requirements for a Warmth Pass."
+      }
+    },
+    "operating_policy": {
+      "title": "Beartas Oibriúcháin",
+      "subtitle": "Ceardlann ar bheartas oibriúcháin KISS: ní féidir le bogearraí rialacha buille faoi thuairim.",
+      "loading": "Beartas oibriúcháin á lódáil",
+      "last_updated": "{{date}} nuashonraithe is déanaí",
+      "meta": {
+        "title": "Beartas Oibriúcháin",
+        "description": "Formheas, cosaint, SLA, agus rialacha beartais um luach sóisialta a chumrú don chlár cúraim."
+      },
+      "actions": {
+        "refresh": "Athnuaigh",
+        "save": "Sábháil athruithe"
+      },
+      "about": {
+        "title": "Maidir leis an leathanach seo",
+        "body": "Sainmhíníonn Beartas Oibriúcháin rialacha do chlár cúraim phobail: cé atá in ann uaireanta a cheadú, cé chomh tapa agus a chaithfidh comhordaitheoirí freagairt, conas a ríomhtar luach sóisialta, agus cén chuma atá ar an timthriall tuairiscithe. Cumraigh é seo roimh an treoir phíolótach a sheoladh. Tagann athruithe i bhfeidhm láithreach agus déantar iad a logáil chun críocha iniúchta.",
+        "methodology_prefix": "Tá an",
+        "methodology_middle": "ráta in aghaidh na huaire agus réimsí iolraitheora chosc úsáid an",
+        "methodology_suffix": "modheolaíocht (Koordination und Innovation fur Soziales, Schwyz) forbartha le Age-Stiftung. Mura bhfuil tú ag rith na hEilvéise KISS/",
+        "methodology_tail": "píolótach, socraigh an ráta chuig do choibhéis uaire áitiúil um chúram foirmiúil agus an t-iolraitheoir go 1.0."
+      },
+      "sections": {
+        "approvals": "Ceaduithe agus muinín",
+        "sla": "Fuinneoga SLA",
+        "hours": "Bainistíocht uair an chloig",
+        "safeguarding": "Cosaint",
+        "social_value": "modheolaíocht luach sóisialta",
+        "appendix": "Aguisín polasaí píolótach"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "Údarás formheasa",
+          "help": "Cé a fhéadfaidh uaireanta ceadaithe a thabhairt chun críche: riarthóir tionónta, comhordaitheoirí, nó an dá pháirtí trí fhaomhadh frithpháirteach."
+        },
+        "trusted_reviewer_threshold": {
+          "label": "Tairseach athbhreithneora iontaofa (uaireanta logáilte)",
+          "help": "Íos-uaireanta ceadaithe sula dtiocfaidh ball chun bheith ina léirmheastóir iontaofa nó sula sroicheann sé an ciseal Iontaoibhe."
+        },
+        "sla_first_response_hours": {
+          "label": "SLA: an chéad fhreagra (uaireanta)",
+          "help": "Sprioc-am chun an chéad fhreagra a thabhairt ar iarratas nua ar chabhair."
+        },
+        "sla_help_request_hours": {
+          "label": "SLA: réiteach iarratais cabhrach (uaireanta)",
+          "help": "Sprioc-am chun iarratas cabhrach a dhúnadh nó a mheaitseáil."
+        },
+        "legacy_hour_settlement": {
+          "label": "Beartas socraíochta oidhreachta-uair an chloig",
+          "help": "Conas a shocraítear uaireanta fágtha an chomhalta nach maireann."
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "Tairseach idirghabhála cómhalartach-iarmhéid (uaireanta)",
+          "help": "Nuair a bhíonn éagothroime tugtha/fhaighte ag ball spreagtar seiceáil isteach an chomhordaitheora."
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "Úinéir formhéadaithe á chosaint (úsáideoir ID)",
+          "help": "Úsáideoir ID ag fáil arduithe cosanta. Fág bán chun riarthóirí a úsáid mar ghrúpa."
+        },
+        "chf_hourly_rate": {
+          "label": "CHF luach sóisialta in aghaidh na huaire",
+          "help": "Luach CHF in aghaidh na huaire cúraim do thuairisciú ROI ag baint úsáide as ráta cúntóir cúraim fhoirmiúil na hEilvéise."
+        },
+        "chf_prevention_multiplier": {
+          "label": "Iolraitheoir coiscthe CHF",
+          "help": "Cuireadh an t-iolraitheoir i bhfeidhm ar fhritháireamh cúraim fhoirmiúil do mhodheolaíocht Age-Stiftung agus KISS."
+        },
+        "statement_cadence": {
+          "label": "Cadence ráiteas ball",
+          "help": "Cé chomh minic is a fhaigheann comhaltaí ráiteas uair an chloig in aghaidh an chomhalta."
+        },
+        "policy_appendix_url": {
+          "label": "aguisín polasaí sínithe URL",
+          "help": "Greamaigh an URL poiblí den chomhaontú beartais sínithe idir do chomharchumann agus an bhardas. Tá sé seo le feiceáil i dtuarascálacha iniúchta agus sa phacáiste tuairiscithe cathrach."
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "Riarachán",
+          "coordinator": "Comhordaitheoir",
+          "mutual": "frithpháirteach"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "Deonaigh don linn",
+          "expire": "In éag",
+          "transfer_to_nominee": "Aistriú chuig an ainmnitheach"
+        },
+        "statement_cadence": {
+          "monthly": "go míosúil",
+          "quarterly": "Ráithiúil",
+          "annual": "Bliantúil"
+        }
+      },
+      "placeholders": {
+        "url": "https://..."
+      },
+      "errors": {
+        "load_failed": "Theip ar an mbeartas oibriúcháin a lódáil.",
+        "save_failed": "Theip ar an mbeartas oibriúcháin a shábháil."
+      },
+      "messages": {
+        "saved": "Beartas oibriúcháin sábháilte. Baineann athruithe le gach malartú nua láithreach."
       }
     }
   },

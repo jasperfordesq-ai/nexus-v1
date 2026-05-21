@@ -905,7 +905,132 @@
     "refresh": "Refresh",
     "top_areas_title": "Top Areas",
     "top_earners_title": "Top Earners",
-    "top_spenders_title": "Top Spenders"
+    "top_spenders_title": "Top Spenders",
+    "regional": {
+      "meta": {
+        "title": "地域分析",
+        "description": "地域パートナーに関する地理的、人口統計的、エンゲージメント、ボランティア、支援要請に関する洞察。"
+      },
+      "controls": {
+        "period": "期間"
+      },
+      "periods": {
+        "last_30d": "過去 30 日間",
+        "last_90d": "過去90日間",
+        "last_12m": "過去 12 か月",
+        "all_time": "ずっと"
+      },
+      "actions": {
+        "refresh_cache": "キャッシュを更新する",
+        "export_report": "レポートのエクスポート"
+      },
+      "stats": {
+        "active_members": "アクティブなメンバー",
+        "active_members_description": "選択したレポート期間にアクティブなメンバー",
+        "vol_hours_this_month": "ボランティアの時間",
+        "vol_hours_description": "今月記録されたボランティア時間",
+        "help_requests_this_month": "ヘルプリクエスト",
+        "help_requests_description": "今月開始されたヘルプリクエスト",
+        "most_needed_category": "最も必要なカテゴリ",
+        "most_needed_description": "最近需要が最も高いカテゴリー"
+      },
+      "tabs": {
+        "aria": "地域分析セクション",
+        "heatmap": "メンバーのヒートマップ",
+        "demographics": "人口統計",
+        "demand_supply": "需要と供給",
+        "engagement": "婚約",
+        "help_requests": "ヘルプリクエスト",
+        "volunteer": "ボランティア"
+      },
+      "sections": {
+        "geographic_activity_density": "地理的な活動密度",
+        "member_demographics": "会員層",
+        "demand_supply_by_category": "カテゴリ別の需要と供給",
+        "demand_supply_note": "1.0 ??????????????????????????????????????????",
+        "monthly_engagement_metrics": "毎月のエンゲージメント指標",
+        "volunteer_activity": "ボランティア活動",
+        "help_request_analysis": "ヘルプリクエストの分析"
+      },
+      "columns": {
+        "rank": "ランク",
+        "latitude": "緯度",
+        "longitude": "経度",
+        "members": "メンバー",
+        "density": "密度",
+        "month": "月",
+        "new_members": "新しいメンバー",
+        "cumulative_total": "累計",
+        "category": "カテゴリ",
+        "requests": "リクエスト",
+        "offers": "オファー",
+        "ratio": "比率",
+        "trend": "傾向",
+        "active_members": "アクティブなメンバー",
+        "vol_hours": "ボランティアの時間",
+        "new_listings": "新規出品",
+        "new_events": "新しいイベント",
+        "help_requests": "ヘルプリクエスト",
+        "organisation": "組織",
+        "volunteers": "ボランティア",
+        "total": "合計",
+        "resolved": "解決済み",
+        "resolution_rate": "解像度率",
+        "avg_days_to_resolve": "平均解決までの日数"
+      },
+      "heatmap": {
+        "description": "メンバーのアクティビティと密度による上位の場所。"
+      },
+      "demographics": {
+        "age_distribution": "年齢分布",
+        "language_distribution": "言語の分布",
+        "member_growth_12m": "過去 12 か月間のメンバーの増加",
+        "total_with_data": "?????????????? {{total}} ?",
+        "total_active_members": "????????? {{total}} ?"
+      },
+      "volunteer": {
+        "total_hours": "合計時間",
+        "avg_hours_per_volunteer": "平均ボランティア1人当たりの時間",
+        "reciprocity_ratio": "相反比",
+        "reciprocity_description": "地域全体で与えられた時間と受け取られた時間のバランスをとる。",
+        "top_orgs_title": "トップのボランティア団体"
+      },
+      "help": {
+        "by_category": "カテゴリ別のヘルプ リクエスト",
+        "resolution_trend_6m": "過去 6 か月間の解決傾向"
+      },
+      "empty": {
+        "infinity": "∞",
+        "no_geographic_data": "この期間の地理データはありません。",
+        "no_listing_data": "この期間の上場需要データはありません。",
+        "no_engagement_data": "この期間のエンゲージメント データはありません。",
+        "no_organisation_data": "この期間中は組織活動はありません。",
+        "no_help_request_data": "この期間に利用可能な支援要請データはありません。",
+        "select_tab_to_load": "データをロードするには、このタブを選択します。"
+      },
+      "empty_value": "-",
+      "loading": {
+        "section": "分析を読み込み中"
+      },
+      "errors": {
+        "data_unavailable": "この期間はデータが利用できません。",
+        "load_data": "この分析セクションを読み込めませんでした: {{error}}",
+        "load_overview": "地域分析の概要を読み込めませんでした。",
+        "failed_to_load_data": "分析データを読み込めませんでした。"
+      },
+      "units": {
+        "days_count": "{{count}} 日"
+      },
+      "age_groups": {
+        "under_25": "25歳未満",
+        "25_34": "NEXUSTERM0トークン",
+        "35_44": "NEXUSTERM0トークン",
+        "45_54": "NEXUSTERM0トークン",
+        "55_64": "NEXUSTERM0トークン",
+        "65_plus": "65歳以上",
+        "unknown": "未知"
+      }
+    }
   },
   "billing": {
     "actions": "Actions",
@@ -10602,13 +10727,99 @@
     "trust_tier": {
       "errors": {
         "recompute_failed": "Failed to recompute trust tiers.",
-        "save_failed": "Failed to save trust tier settings."
+        "save_failed": "Failed to save trust tier settings.",
+        "load_failed": "信頼層構成のロードに失敗しました。"
       },
       "messages": {
-        "recomputed": "Trust tiers recomputed.",
+        "recomputed": "{{count}} ?????????????????????",
         "saved": "Trust tier settings saved."
       },
-      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes."
+      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes.",
+      "title": "トラスト層の構成",
+      "subtitle": "信頼レベルごとに基準のしきい値を設定します。変更は次回の再計算実行時に適用されます。",
+      "loading": "信頼層構成をロードしています",
+      "recompute_hint": "しきい値が変更され、既存のメンバーを直ちに再評価する必要がある場合は、再計算を使用します。バックグラウンドで実行され、30-60 秒かかる場合があります。",
+      "meta": {
+        "title": "トラスト層の構成",
+        "description": "信頼層のしきい値を構成し、メンバー層を再計算し、各層のロックが解除される内容を確認します。"
+      },
+      "actions": {
+        "recompute": "すべての層を再計算する",
+        "save": "設定の保存"
+      },
+      "about": {
+        "title": "このページについて",
+        "body": "信頼層は、メンバーがよりアクティブになり、認証されるにつれて特権を解放する評判のはしごです。メンバーは、以下の基準のしきい値を満たした場合に自動的に昇格します。 recompute を使用して、すべてのメンバーに対して即時再計算を強制します。ティアの進行は、Warmth Pass、コーディネーターの資格、およびメンバー ディレクトリでの可視性に影響します。"
+      },
+      "criteria": {
+        "title": "階層基準のしきい値"
+      },
+      "fields": {
+        "hours_logged": "記録された時間数 (最小)",
+        "reviews_received": "受け取ったレビュー (最低)",
+        "identity_verified": "本人確認が必要"
+      },
+      "tiers": {
+        "member": {
+          "label": "メンバー",
+          "description": "少なくとも 1 時間ログインしている基本コミュニティ メンバー。"
+        },
+        "trusted": {
+          "label": "信頼できる",
+          "description": "数時間のレビューとレビューを持つアクティブなメンバー。"
+        },
+        "verified": {
+          "label": "確認済み",
+          "description": "身元が確認された信頼できるメンバー。"
+        },
+        "coordinator": {
+          "label": "コーディネーター",
+          "description": "コーディネートする資格のある非常にアクティブな認証済みメンバー。"
+        }
+      },
+      "reference": {
+        "title": "階層リファレンス",
+        "aria": "信頼層のリファレンス",
+        "columns": {
+          "tier": "階層",
+          "level": "レベル",
+          "color": "色",
+          "description": "説明",
+          "unlocks": "ロックを解除するもの"
+        },
+        "rows": {
+          "0": {
+            "name": "新人",
+            "color": "グレー",
+            "description": "参加しただけなので、アクティビティは必要ありません。",
+            "unlocks": "基本的なメンバーアクセス。"
+          },
+          "1": {
+            "name": "メンバー",
+            "color": "青",
+            "description": "時間が記録されています。",
+            "unlocks": "ヘルプリストを投稿したり、ケア時間を受け取ることができます。"
+          },
+          "2": {
+            "name": "信頼できる",
+            "color": "緑",
+            "description": "口コミで活躍中。",
+            "unlocks": "Warmth Pass ?????????????????"
+          },
+          "3": {
+            "name": "確認済み",
+            "color": "紫",
+            "description": "身元が確認されました。",
+            "unlocks": "フルケア コーディネーターの可視性と ID バッジ。"
+          },
+          "4": {
+            "name": "コーディネーター",
+            "color": "アンバー",
+            "description": "身元確認済みで非常にアクティブです。",
+            "unlocks": "時間を承認し、試合を調整する資格があります。"
+          }
+        }
+      }
     },
     "warmth_pass": {
       "title": "Warmth Pass",
@@ -10647,6 +10858,109 @@
       "not_eligible_notice": {
         "title": "Not eligible yet",
         "body": "This member does not yet meet the requirements for a Warmth Pass."
+      }
+    },
+    "operating_policy": {
+      "title": "運営方針",
+      "subtitle": "KISS ?????????????: ??????????????????",
+      "loading": "操作ポリシーをロードしています",
+      "last_updated": "最終更新日: {{date}}",
+      "meta": {
+        "title": "運営方針",
+        "description": "ケア プログラムの承認、保護、SLA、および社会的価値のポリシー ルールを構成します。"
+      },
+      "actions": {
+        "refresh": "リフレッシュ",
+        "save": "変更を保存する"
+      },
+      "about": {
+        "title": "このページについて",
+        "body": "運営ポリシーでは、誰が時間を承認できるか、コーディネーターがどれだけ早く対応しなければならないか、社会的価値の計算方法、報告サイクルがどのようなものであるかなど、地域ケア プログラムのルールを定義します。パイロットを開始する前にこれを構成します。変更はすぐに有効になり、監査のために記録されます。",
+        "methodology_prefix": "の",
+        "methodology_middle": "時間単価と予防乗数フィールドでは、",
+        "methodology_suffix": "Age-Stiftung とともに開発された方法論 (Koordination und Innovation fur Soziales、Schwyz)。 Swiss KISS/ を実行していない場合",
+        "methodology_tail": "????????????????????????????????? 1.0 ???????"
+      },
+      "sections": {
+        "approvals": "承認と信頼",
+        "sla": "SLA のウィンドウ",
+        "hours": "時間管理",
+        "safeguarding": "保護",
+        "social_value": "社会的価値の方法論",
+        "appendix": "パイロットポリシーの付録"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "承認権限",
+          "help": "承認された時間を最終的に決定できるのは、テナント管理者、コーディネーター、または相互承認による両当事者です。"
+        },
+        "trusted_reviewer_threshold": {
+          "label": "信頼できるレビュー担当者のしきい値 (記録時間)",
+          "help": "メンバーが信頼できるレビュー担当者になるか、信頼できるレベルに到達するまでの最小承認時間。"
+        },
+        "sla_first_response_hours": {
+          "label": "SLA: ???? (??)",
+          "help": "新しいヘルプ リクエストに対する最初の応答までの目標時間を設定します。"
+        },
+        "sla_help_request_hours": {
+          "label": "SLA: ?????????? (??)",
+          "help": "ヘルプ リクエストを終了または一致させるまでの目標時間を設定します。"
+        },
+        "legacy_hour_settlement": {
+          "label": "従来の時間決済ポリシー",
+          "help": "死亡したメンバーの残りの時間はどのように精算されるか。"
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "相互バランス介入閾値 (時間)",
+          "help": "メンバーの授受の不均衡により、コーディネーターのチェックインがトリガーされた場合。"
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "????????????????????? (???? ID)",
+          "help": "??????????????????????????? ID??????????????????????????"
+        },
+        "chf_hourly_rate": {
+          "label": "CHF 1 時間あたりの社会的価値",
+          "help": "スイスの正規介護アシスタント率を使用した ROI レポートの介護時間あたりの CHF 価値。"
+        },
+        "chf_prevention_multiplier": {
+          "label": "CHF 防止乗数",
+          "help": "Age-Stiftung および KISS 方法論のフォーマルケア オフセットに適用される乗数。"
+        },
+        "statement_cadence": {
+          "label": "メンバーの発言の頻度",
+          "help": "メンバーがメンバーごとの時間明細を受け取る頻度。"
+        },
+        "policy_appendix_url": {
+          "label": "署名済みポリシーの付録 URL",
+          "help": "協同組合と自治体の間で署名された政策協定の公開 URL を貼り付けます。これは監査報告書と地方自治体の報告パックに記載されます。"
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "管理者",
+          "coordinator": "コーディネーター",
+          "mutual": "共通の"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "プールに寄付する",
+          "expire": "期限切れ",
+          "transfer_to_nominee": "候補者に転送"
+        },
+        "statement_cadence": {
+          "monthly": "毎月",
+          "quarterly": "四半期ごと",
+          "annual": "年間"
+        }
+      },
+      "placeholders": {
+        "url": "NEXUSTERM0トークン"
+      },
+      "errors": {
+        "load_failed": "運用ポリシーの読み込みに失敗しました。",
+        "save_failed": "運用ポリシーの保存に失敗しました。"
+      },
+      "messages": {
+        "saved": "運用ポリシーが保存されました。変更はすべての新しい取引所に直ちに適用されます。"
       }
     }
   },

@@ -905,7 +905,132 @@
     "refresh": "Refresh",
     "top_areas_title": "Top Areas",
     "top_earners_title": "Top Earners",
-    "top_spenders_title": "Top Spenders"
+    "top_spenders_title": "Top Spenders",
+    "regional": {
+      "meta": {
+        "title": "Análise Regional",
+        "description": "Informações geográficas, demográficas, de engajamento, de voluntariado e de solicitação de ajuda para parceiros regionais."
+      },
+      "controls": {
+        "period": "Período"
+      },
+      "periods": {
+        "last_30d": "Últimos 30 dias",
+        "last_90d": "Últimos 90 dias",
+        "last_12m": "Últimos 12 meses",
+        "all_time": "Todo o tempo"
+      },
+      "actions": {
+        "refresh_cache": "Atualizar cache",
+        "export_report": "Exportar relatório"
+      },
+      "stats": {
+        "active_members": "Membros ativos",
+        "active_members_description": "Membros ativos no período do relatório selecionado",
+        "vol_hours_this_month": "Horas de voluntariado",
+        "vol_hours_description": "Horas de voluntariado registradas este mês",
+        "help_requests_this_month": "Pedidos de ajuda",
+        "help_requests_description": "Solicitações de ajuda abertas este mês",
+        "most_needed_category": "Categoria mais necessária",
+        "most_needed_description": "Categoria com maior demanda recente"
+      },
+      "tabs": {
+        "aria": "Seções de análise regional",
+        "heatmap": "Mapa de calor dos membros",
+        "demographics": "Demografia",
+        "demand_supply": "Demanda e oferta",
+        "engagement": "Noivado",
+        "help_requests": "Pedidos de ajuda",
+        "volunteer": "Voluntário"
+      },
+      "sections": {
+        "geographic_activity_density": "Densidade de atividade geográfica",
+        "member_demographics": "Dados demográficos dos membros",
+        "demand_supply_by_category": "Demanda versus oferta por categoria",
+        "demand_supply_note": "Um índice acima de 1.0 significa que a demanda é maior do que as ofertas disponíveis nessa categoria.",
+        "monthly_engagement_metrics": "Métricas de engajamento mensais",
+        "volunteer_activity": "Atividade voluntária",
+        "help_request_analysis": "Análise de pedido de ajuda"
+      },
+      "columns": {
+        "rank": "Classificação",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "members": "Membros",
+        "density": "Densidade",
+        "month": "Mês",
+        "new_members": "Novos membros",
+        "cumulative_total": "Total acumulado",
+        "category": "Categoria",
+        "requests": "Solicitações",
+        "offers": "Ofertas",
+        "ratio": "Razão",
+        "trend": "Tendência",
+        "active_members": "Membros ativos",
+        "vol_hours": "Horas de voluntariado",
+        "new_listings": "Novas listagens",
+        "new_events": "Novos eventos",
+        "help_requests": "Pedidos de ajuda",
+        "organisation": "Organização",
+        "volunteers": "Voluntários",
+        "total": "Total",
+        "resolved": "Resolvido",
+        "resolution_rate": "Taxa de resolução",
+        "avg_days_to_resolve": "Média dias para resolver"
+      },
+      "heatmap": {
+        "description": "Principais locais por atividade e densidade de membros."
+      },
+      "demographics": {
+        "age_distribution": "Distribuição etária",
+        "language_distribution": "Distribuição de idiomas",
+        "member_growth_12m": "Crescimento de associados, últimos 12 meses",
+        "total_with_data": "Membros {{total}} com dados demográficos",
+        "total_active_members": "{{total}} membros ativos"
+      },
+      "volunteer": {
+        "total_hours": "Total de horas",
+        "avg_hours_per_volunteer": "Média horas por voluntário",
+        "reciprocity_ratio": "Razão de reciprocidade",
+        "reciprocity_description": "Equilíbrio entre horas dadas e horas recebidas em toda a região.",
+        "top_orgs_title": "Principais organizações voluntárias"
+      },
+      "help": {
+        "by_category": "Solicitações de ajuda por categoria",
+        "resolution_trend_6m": "Tendência de resolução, últimos 6 meses"
+      },
+      "empty": {
+        "infinity": "∞",
+        "no_geographic_data": "Não há dados geográficos disponíveis para este período.",
+        "no_listing_data": "Não há dados de demanda de listagem disponíveis para este período.",
+        "no_engagement_data": "Não há dados de engajamento disponíveis para este período.",
+        "no_organisation_data": "Nenhuma atividade da organização está disponível para este período.",
+        "no_help_request_data": "Nenhum dado de solicitação de ajuda está disponível para este período.",
+        "select_tab_to_load": "Selecione esta guia para carregar dados."
+      },
+      "empty_value": "-",
+      "loading": {
+        "section": "Carregando análises"
+      },
+      "errors": {
+        "data_unavailable": "Os dados não estão disponíveis para este período.",
+        "load_data": "Não foi possível carregar esta seção de análise: {{error}}",
+        "load_overview": "Não foi possível carregar a visão geral da análise regional.",
+        "failed_to_load_data": "Não foi possível carregar dados analíticos."
+      },
+      "units": {
+        "days_count": "{{count}} dias"
+      },
+      "age_groups": {
+        "under_25": "Menos de 25 anos",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
+        "65_plus": "65+",
+        "unknown": "Desconhecido"
+      }
+    }
   },
   "billing": {
     "actions": "Actions",
@@ -10602,13 +10727,99 @@
     "trust_tier": {
       "errors": {
         "recompute_failed": "Failed to recompute trust tiers.",
-        "save_failed": "Failed to save trust tier settings."
+        "save_failed": "Failed to save trust tier settings.",
+        "load_failed": "Falha ao carregar a configuração do nível confiável."
       },
       "messages": {
-        "recomputed": "Trust tiers recomputed.",
+        "recomputed": "N?veis de confian?a recalculados para {{count}} membros.",
         "saved": "Trust tier settings saved."
       },
-      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes."
+      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes.",
+      "title": "Configuração de nível de confiança",
+      "subtitle": "Defina os limites dos critérios para cada nível de confiança. As alterações se aplicam na próxima execução de recomputação.",
+      "loading": "Carregando configuração de nível confiável",
+      "recompute_hint": "Use o recálculo quando os limites mudarem e os membros existentes precisarem ser reavaliados imediatamente. É executado em segundo plano e pode levar 30-60 segundos.",
+      "meta": {
+        "title": "Configuração de nível de confiança",
+        "description": "Configure limites de nível de confiança, recalcule os níveis de membros e revise o que cada nível desbloqueia."
+      },
+      "actions": {
+        "recompute": "Recalcular todas as camadas",
+        "save": "Salvar configuração"
+      },
+      "about": {
+        "title": "Sobre esta página",
+        "body": "Os níveis de confiança são uma escada de reputação que desbloqueia privilégios à medida que os membros se tornam mais ativos e verificados. Os membros avançam automaticamente quando atendem aos critérios abaixo. Use recalcular para forçar um recálculo imediato para todos os membros. A progressão de nível afeta o Warmth Pass, a elegibilidade do coordenador e a visibilidade no diretório de membros."
+      },
+      "criteria": {
+        "title": "Limites de critérios de nível"
+      },
+      "fields": {
+        "hours_logged": "Horas registradas (mínimo)",
+        "reviews_received": "Avaliações recebidas (mínimo)",
+        "identity_verified": "Exigir verificação de identidade"
+      },
+      "tiers": {
+        "member": {
+          "label": "Membro",
+          "description": "Membro básico da comunidade com pelo menos 1 hora logada."
+        },
+        "trusted": {
+          "label": "Confiável",
+          "description": "Membro ativo com várias horas e avaliações."
+        },
+        "verified": {
+          "label": "Verificado",
+          "description": "Membro confiável com identidade confirmada."
+        },
+        "coordinator": {
+          "label": "Coordenador",
+          "description": "Membro verificado altamente ativo e elegível para coordenar."
+        }
+      },
+      "reference": {
+        "title": "Referência de nível",
+        "aria": "Referência de nível de confiança",
+        "columns": {
+          "tier": "Nível",
+          "level": "Nível",
+          "color": "Cor",
+          "description": "Descrição",
+          "unlocks": "O que isso desbloqueia"
+        },
+        "rows": {
+          "0": {
+            "name": "Recém-chegado",
+            "color": "Cinza",
+            "description": "Acabei de entrar, nenhuma atividade necessária.",
+            "unlocks": "Acesso básico de membro."
+          },
+          "1": {
+            "name": "Membro",
+            "color": "Azul",
+            "description": "Possui horas registradas.",
+            "unlocks": "Pode postar listas de ajuda e receber horários de atendimento."
+          },
+          "2": {
+            "name": "Confiável",
+            "color": "Verde",
+            "description": "Ativo com comentários.",
+            "unlocks": "Elegível para Warmth Pass e pode ser recomendado para cuidados."
+          },
+          "3": {
+            "name": "Verificado",
+            "color": "Roxo",
+            "description": "Identidade verificada.",
+            "unlocks": "Visibilidade total do coordenador de atendimento e crachá de identidade."
+          },
+          "4": {
+            "name": "Coordenador",
+            "color": "Âmbar",
+            "description": "Altamente ativo com identidade verificada.",
+            "unlocks": "Elegível para aprovar horários e coordenar partidas."
+          }
+        }
+      }
     },
     "warmth_pass": {
       "title": "Warmth Pass",
@@ -10647,6 +10858,109 @@
       "not_eligible_notice": {
         "title": "Not eligible yet",
         "body": "This member does not yet meet the requirements for a Warmth Pass."
+      }
+    },
+    "operating_policy": {
+      "title": "Política Operacional",
+      "subtitle": "Workshop de política operacional KISS: regras que o software não consegue adivinhar.",
+      "loading": "Carregando política operacional",
+      "last_updated": "Última atualização {{date}}",
+      "meta": {
+        "title": "Política Operacional",
+        "description": "Configure regras de aprovação, proteção, SLA e políticas de valor social para o programa de cuidados."
+      },
+      "actions": {
+        "refresh": "Atualizar",
+        "save": "Salvar alterações"
+      },
+      "about": {
+        "title": "Sobre esta página",
+        "body": "A Política Operacional define as regras do seu programa de cuidados comunitários: quem pode aprovar os horários, com que rapidez os coordenadores devem responder, como o valor social é calculado e como é o ciclo de relatórios. Configure isso antes de lançar o piloto. As alterações entram em vigor imediatamente e são registradas para fins de auditoria.",
+        "methodology_prefix": "O",
+        "methodology_middle": "Os campos de taxa horária e multiplicador de prevenção usam o",
+        "methodology_suffix": "metodologia (Koordination und Innovation fur Soziales, Schwyz) desenvolvida com Age-Stiftung. Se você não estiver executando um Swiss KISS/",
+        "methodology_tail": "piloto, defina a taxa para o equivalente por hora de cuidado formal local e o multiplicador para 1.0."
+      },
+      "sections": {
+        "approvals": "Aprovações e confiança",
+        "sla": "Janelas SLA",
+        "hours": "Gerenciamento de horas",
+        "safeguarding": "Salvaguarda",
+        "social_value": "metodologia de valor social",
+        "appendix": "Apêndice da política piloto"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "Autoridade de aprovação",
+          "help": "Quem pode finalizar os horários aprovados: administrador do inquilino, coordenadores ou ambas as partes por aprovação mútua."
+        },
+        "trusted_reviewer_threshold": {
+          "label": "Limite de revisor confiável (horas registradas)",
+          "help": "Mínimo de horas aprovadas antes que um membro se torne um revisor confiável ou atinja o nível Confiável."
+        },
+        "sla_first_response_hours": {
+          "label": "SLA: primeira resposta (horas)",
+          "help": "Defina o tempo para a primeira resposta a uma nova solicitação de ajuda."
+        },
+        "sla_help_request_hours": {
+          "label": "SLA: resolução de solicitação de ajuda (horas)",
+          "help": "Tempo previsto para fechar ou corresponder a uma solicitação de ajuda."
+        },
+        "legacy_hour_settlement": {
+          "label": "Política de liquidação por hora legada",
+          "help": "Como são liquidadas as horas restantes de um membro falecido."
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "Limite de intervenção de equilíbrio recíproco (horas)",
+          "help": "Quando o desequilíbrio entre dar/receber de um membro aciona um check-in do coordenador."
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "Protegendo o proprietário do escalonamento (usuário ID)",
+          "help": "Usuário ID recebendo escalonamentos de proteção. Deixe em branco para usar administradores como um grupo."
+        },
+        "chf_hourly_rate": {
+          "label": "Valor social CHF por hora",
+          "help": "Valor CHF por hora de atendimento para relatórios ROI usando a taxa de assistente de atendimento formal suíço."
+        },
+        "chf_prevention_multiplier": {
+          "label": "Multiplicador de prevenção CHF",
+          "help": "Multiplicador aplicado à compensação de cuidados formais para a metodologia Age-Stiftung e KISS."
+        },
+        "statement_cadence": {
+          "label": "Cadência de declaração de membro",
+          "help": "Com que frequência os membros recebem um extrato de horas por membro."
+        },
+        "policy_appendix_url": {
+          "label": "Apêndice de política assinado URL",
+          "help": "Cole o URL público do acordo político assinado entre sua cooperativa e o município. Isto aparece nos relatórios de auditoria e no pacote de relatórios municipais."
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "Administrador",
+          "coordinator": "Coordenador",
+          "mutual": "Mútuo"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "Doe para a piscina",
+          "expire": "Expirar",
+          "transfer_to_nominee": "Transferir para o indicado"
+        },
+        "statement_cadence": {
+          "monthly": "Mensal",
+          "quarterly": "Trimestral",
+          "annual": "Anual"
+        }
+      },
+      "placeholders": {
+        "url": "https://..."
+      },
+      "errors": {
+        "load_failed": "Falha ao carregar a política operacional.",
+        "save_failed": "Falha ao salvar a política operacional."
+      },
+      "messages": {
+        "saved": "Política operacional salva. As alterações se aplicam a todas as novas exchanges imediatamente."
       }
     }
   },

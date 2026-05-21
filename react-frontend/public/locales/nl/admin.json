@@ -905,7 +905,132 @@
     "refresh": "Refresh",
     "top_areas_title": "Top Areas",
     "top_earners_title": "Top Earners",
-    "top_spenders_title": "Top Spenders"
+    "top_spenders_title": "Top Spenders",
+    "regional": {
+      "meta": {
+        "title": "Regionale analyses",
+        "description": "Geografische, demografische, betrokkenheids-, vrijwilligers- en hulpverzoekinzichten voor regionale partners."
+      },
+      "controls": {
+        "period": "Periode"
+      },
+      "periods": {
+        "last_30d": "Laatste 30 dagen",
+        "last_90d": "Laatste 90 dagen",
+        "last_12m": "Laatste 12 maanden",
+        "all_time": "Altijd"
+      },
+      "actions": {
+        "refresh_cache": "Cache vernieuwen",
+        "export_report": "Rapport exporteren"
+      },
+      "stats": {
+        "active_members": "Actieve leden",
+        "active_members_description": "Leden die actief zijn in de geselecteerde rapportageperiode",
+        "vol_hours_this_month": "Vrijwilligers uren",
+        "vol_hours_description": "Vrijwilligersuren geregistreerd deze maand",
+        "help_requests_this_month": "Hulpverzoeken",
+        "help_requests_description": "Hulpverzoeken zijn deze maand geopend",
+        "most_needed_category": "Meest noodzakelijke categorie",
+        "most_needed_description": "Categorie met de hoogste recente vraag"
+      },
+      "tabs": {
+        "aria": "Regionale analysesecties",
+        "heatmap": "Heatmap voor leden",
+        "demographics": "Demografie",
+        "demand_supply": "Vraag en aanbod",
+        "engagement": "Betrokkenheid",
+        "help_requests": "Hulpverzoeken",
+        "volunteer": "Vrijwilliger"
+      },
+      "sections": {
+        "geographic_activity_density": "Geografische activiteitsdichtheid",
+        "member_demographics": "Demografische gegevens van leden",
+        "demand_supply_by_category": "Vraag versus aanbod per categorie",
+        "demand_supply_note": "Een ratio boven 1.0 betekent dat de vraag hoger is dan de beschikbare aanbiedingen in die categorie.",
+        "monthly_engagement_metrics": "Maandelijkse betrokkenheidsstatistieken",
+        "volunteer_activity": "Vrijwilligerswerk",
+        "help_request_analysis": "Analyse van hulpverzoeken"
+      },
+      "columns": {
+        "rank": "Rang",
+        "latitude": "Breedte",
+        "longitude": "Lengte",
+        "members": "Leden",
+        "density": "Dikte",
+        "month": "Maand",
+        "new_members": "Nieuwe leden",
+        "cumulative_total": "Cumulatief totaal",
+        "category": "Categorie",
+        "requests": "Verzoeken",
+        "offers": "Aanbiedingen",
+        "ratio": "Verhouding",
+        "trend": "Trend",
+        "active_members": "Actieve leden",
+        "vol_hours": "Vrijwilligers uren",
+        "new_listings": "Nieuwe vermeldingen",
+        "new_events": "Nieuwe evenementen",
+        "help_requests": "Hulpverzoeken",
+        "organisation": "Organisatie",
+        "volunteers": "Vrijwilligers",
+        "total": "Totaal",
+        "resolved": "Opgelost",
+        "resolution_rate": "Resolutiepercentage",
+        "avg_days_to_resolve": "Gem. dagen op te lossen"
+      },
+      "heatmap": {
+        "description": "Toplocaties op basis van ledenactiviteit en dichtheid."
+      },
+      "demographics": {
+        "age_distribution": "Leeftijdsverdeling",
+        "language_distribution": "Taaldistributie",
+        "member_growth_12m": "Ledengroei, afgelopen 12 maanden",
+        "total_with_data": "{{total}}-leden met demografische gegevens",
+        "total_active_members": "{{total}} actieve leden"
+      },
+      "volunteer": {
+        "total_hours": "Totaal uren",
+        "avg_hours_per_volunteer": "Gem. uur per vrijwilliger",
+        "reciprocity_ratio": "Wederkerigheid verhouding",
+        "reciprocity_description": "Saldo tussen gegeven en ontvangen uren voor de hele regio.",
+        "top_orgs_title": "Top vrijwilligersorganisaties"
+      },
+      "help": {
+        "by_category": "Hulpverzoeken per categorie",
+        "resolution_trend_6m": "Resolutietrend, afgelopen 6 maanden"
+      },
+      "empty": {
+        "infinity": "∞",
+        "no_geographic_data": "Voor deze periode zijn geen geografische gegevens beschikbaar.",
+        "no_listing_data": "Er zijn voor deze periode geen gegevens over de vraag naar vermeldingen beschikbaar.",
+        "no_engagement_data": "Voor deze periode zijn geen engagementgegevens beschikbaar.",
+        "no_organisation_data": "Er zijn geen organisatieactiviteiten beschikbaar voor deze periode.",
+        "no_help_request_data": "Voor deze periode zijn geen hulpvraaggegevens beschikbaar.",
+        "select_tab_to_load": "Selecteer dit tabblad om gegevens te laden."
+      },
+      "empty_value": "-",
+      "loading": {
+        "section": "Analyses laden"
+      },
+      "errors": {
+        "data_unavailable": "Voor deze periode zijn er geen gegevens beschikbaar.",
+        "load_data": "Kan deze analysesectie niet laden: {{error}}",
+        "load_overview": "Kan het regionale analyseoverzicht niet laden.",
+        "failed_to_load_data": "Kan analysegegevens niet laden."
+      },
+      "units": {
+        "days_count": "{{count}} dagen"
+      },
+      "age_groups": {
+        "under_25": "Onder de 25",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
+        "65_plus": "65+",
+        "unknown": "Onbekend"
+      }
+    }
   },
   "billing": {
     "actions": "Actions",
@@ -10602,13 +10727,99 @@
     "trust_tier": {
       "errors": {
         "recompute_failed": "Failed to recompute trust tiers.",
-        "save_failed": "Failed to save trust tier settings."
+        "save_failed": "Failed to save trust tier settings.",
+        "load_failed": "Kan de configuratie van de vertrouwenslaag niet laden."
       },
       "messages": {
-        "recomputed": "Trust tiers recomputed.",
+        "recomputed": "Vertrouwensniveaus opnieuw berekend voor {{count}} leden.",
         "saved": "Trust tier settings saved."
       },
-      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes."
+      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes.",
+      "title": "Configuratie van vertrouwensniveau",
+      "subtitle": "Stel de criteriadrempels in voor elk vertrouwensniveau. Wijzigingen zijn van toepassing bij de volgende herberekeningsrun.",
+      "loading": "Configuratie van vertrouwenslaag laden",
+      "recompute_hint": "Gebruik herberekening wanneer drempels veranderen en bestaande leden onmiddellijk opnieuw moeten worden geëvalueerd. Draait op de achtergrond en kan 30-60 seconden duren.",
+      "meta": {
+        "title": "Configuratie van vertrouwensniveau",
+        "description": "Configureer drempelwaarden voor vertrouwensniveaus, bereken de niveaus van leden opnieuw en bekijk wat elke laag ontgrendelt."
+      },
+      "actions": {
+        "recompute": "Bereken alle niveaus opnieuw",
+        "save": "Configuratie opslaan"
+      },
+      "about": {
+        "title": "Over deze pagina",
+        "body": "Vertrouwensniveaus zijn een reputatieladder die privileges ontgrendelt naarmate leden actiever en geverifieerd worden. Leden gaan automatisch vooruit als ze aan de onderstaande criteria voldoen. Gebruik herberekenen om een ​​onmiddellijke herberekening voor alle leden af ​​te dwingen. Niveauvoortgang heeft invloed op de Warmth Pass, de geschiktheid van de coördinator en de zichtbaarheid in de ledenlijst."
+      },
+      "criteria": {
+        "title": "Drempels voor niveaucriteria"
+      },
+      "fields": {
+        "hours_logged": "Gelogde uren (minimaal)",
+        "reviews_received": "Ontvangen beoordelingen (minimaal)",
+        "identity_verified": "Vereisen dat identiteit wordt geverifieerd"
+      },
+      "tiers": {
+        "member": {
+          "label": "Lid",
+          "description": "Basiscommunitylid met minimaal 1 uur ingelogd."
+        },
+        "trusted": {
+          "label": "Vertrouwd",
+          "description": "Actief lid met meerdere uren en recensies."
+        },
+        "verified": {
+          "label": "Geverifieerd",
+          "description": "Vertrouwd lid met bevestigde identiteit."
+        },
+        "coordinator": {
+          "label": "Coördinator",
+          "description": "Zeer actief, geverifieerd lid dat in aanmerking komt om te coördineren."
+        }
+      },
+      "reference": {
+        "title": "Niveaureferentie",
+        "aria": "Referentie van vertrouwensniveau",
+        "columns": {
+          "tier": "Laag",
+          "level": "Niveau",
+          "color": "Kleur",
+          "description": "Beschrijving",
+          "unlocks": "Wat het ontgrendelt"
+        },
+        "rows": {
+          "0": {
+            "name": "Nieuwkomer",
+            "color": "Grijs",
+            "description": "Net lid geworden, geen activiteit vereist.",
+            "unlocks": "Basistoegang voor leden."
+          },
+          "1": {
+            "name": "Lid",
+            "color": "Blauw",
+            "description": "Heeft uren geregistreerd.",
+            "unlocks": "Kan hulplijsten plaatsen en zorguren ontvangen."
+          },
+          "2": {
+            "name": "Vertrouwd",
+            "color": "Groente",
+            "description": "Actief met recensies.",
+            "unlocks": "Komt in aanmerking voor Warmth Pass en kan worden aanbevolen voor onderhoud."
+          },
+          "3": {
+            "name": "Geverifieerd",
+            "color": "Paars",
+            "description": "Identiteit geverifieerd.",
+            "unlocks": "Volledige zichtbaarheid en identiteitsbadge van de zorgcoördinator."
+          },
+          "4": {
+            "name": "Coördinator",
+            "color": "Amber",
+            "description": "Zeer actief met geverifieerde identiteit.",
+            "unlocks": "Komt in aanmerking om uren goed te keuren en wedstrijden te coördineren."
+          }
+        }
+      }
     },
     "warmth_pass": {
       "title": "Warmth Pass",
@@ -10647,6 +10858,109 @@
       "not_eligible_notice": {
         "title": "Not eligible yet",
         "body": "This member does not yet meet the requirements for a Warmth Pass."
+      }
+    },
+    "operating_policy": {
+      "title": "Operationeel beleid",
+      "subtitle": "KISS workshop over operationeel beleid: regels die software niet kan raden.",
+      "loading": "Operationeel beleid laden",
+      "last_updated": "Laatst bijgewerkt {{date}}",
+      "meta": {
+        "title": "Operationeel beleid",
+        "description": "Configureer goedkeurings-, waarborgings-, SLA- en sociale waardebeleidsregels voor het zorgprogramma."
+      },
+      "actions": {
+        "refresh": "Vernieuwen",
+        "save": "Wijzigingen opslaan"
+      },
+      "about": {
+        "title": "Over deze pagina",
+        "body": "Operating Policy definieert de regels van uw wijkzorgprogramma: wie uren kan goedkeuren, hoe snel coördinatoren moeten reageren, hoe maatschappelijke waarde wordt berekend en hoe de rapportagecyclus eruit ziet. Configureer dit voordat u de pilot start. Wijzigingen worden onmiddellijk van kracht en worden geregistreerd voor auditdoeleinden.",
+        "methodology_prefix": "De",
+        "methodology_middle": "uurtarief en preventie-multipliervelden gebruiken de",
+        "methodology_suffix": "methodologie (Koordination und Innovation fur Soziales, Schwyz) ontwikkeld met Age-Stiftung. Als u geen Zwitserse KISS/",
+        "methodology_tail": "pilot, stel het tarief in op uw lokale uuruurequivalent voor formele zorg en de vermenigvuldiger op 1.0."
+      },
+      "sections": {
+        "approvals": "Goedkeuringen en vertrouwen",
+        "sla": "SLA-ramen",
+        "hours": "Uurbeheer",
+        "safeguarding": "Beveiliging",
+        "social_value": "methodologie op het gebied van sociale waarden",
+        "appendix": "Bijlage pilotbeleid"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "Goedkeuringsautoriteit",
+          "help": "Wie goedgekeurde uren mag finaliseren: huurderbeheerder, coördinatoren of beide partijen met wederzijdse goedkeuring."
+        },
+        "trusted_reviewer_threshold": {
+          "label": "Drempel voor vertrouwde reviewer (gelogde uren)",
+          "help": "Minimaal goedgekeurde uren voordat een lid een vertrouwde beoordelaar wordt of het Vertrouwde niveau bereikt."
+        },
+        "sla_first_response_hours": {
+          "label": "SLA: eerste reactie (uren)",
+          "help": "Richt de tijd tot de eerste reactie op een nieuw hulpverzoek."
+        },
+        "sla_help_request_hours": {
+          "label": "SLA: oplossing van hulpverzoeken (uren)",
+          "help": "Streeftijd voor het sluiten of matchen van een hulpverzoek."
+        },
+        "legacy_hour_settlement": {
+          "label": "Legacy-uur-afrekeningsbeleid",
+          "help": "Hoe de resterende uren van een overleden lid worden verrekend."
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "Interventiedrempel voor wederkerig evenwicht (uren)",
+          "help": "Wanneer de onevenwichtigheid van geven/ontvangen bij een lid een check-in door de coördinator activeert."
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "Beveiliging van escalatie-eigenaar (gebruiker ID)",
+          "help": "Gebruiker ID ontvangt veiligheidsescalaties. Laat dit leeg als u beheerders als groep wilt gebruiken."
+        },
+        "chf_hourly_rate": {
+          "label": "CHF sociale waarde per uur",
+          "help": "CHF-waarde per zorguur voor ROI-rapportage op basis van het Zwitserse tarief voor formele zorgassistenten."
+        },
+        "chf_prevention_multiplier": {
+          "label": "CHF preventiemultiplier",
+          "help": "Multiplier toegepast op compensatie voor formele zorg voor de Age-Stiftung- en KISS-methodologie."
+        },
+        "statement_cadence": {
+          "label": "Cadans van ledenverklaring",
+          "help": "Hoe vaak leden een urenoverzicht per lid ontvangen."
+        },
+        "policy_appendix_url": {
+          "label": "Ondertekende beleidsbijlage URL",
+          "help": "Plak de openbare URL van de ondertekende beleidsovereenkomst tussen uw coöperatie en de gemeente. Dit blijkt uit accountantsrapporten en het gemeentelijke rapportagepakket."
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "Beheerder",
+          "coordinator": "Coördinator",
+          "mutual": "Wederzijds"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "Doneer aan het zwembad",
+          "expire": "Verlopen",
+          "transfer_to_nominee": "Overdracht naar genomineerde"
+        },
+        "statement_cadence": {
+          "monthly": "Maandelijks",
+          "quarterly": "Driemaandelijks",
+          "annual": "Jaarlijks"
+        }
+      },
+      "placeholders": {
+        "url": "https://..."
+      },
+      "errors": {
+        "load_failed": "Kan operationeel beleid niet laden.",
+        "save_failed": "Kan het operationele beleid niet opslaan."
+      },
+      "messages": {
+        "saved": "Bedrijfsbeleid opgeslagen. Wijzigingen zijn onmiddellijk van toepassing op alle nieuwe uitwisselingen."
       }
     }
   },

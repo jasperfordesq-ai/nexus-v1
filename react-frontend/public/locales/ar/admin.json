@@ -905,7 +905,132 @@
     "refresh": "Refresh",
     "top_areas_title": "Top Areas",
     "top_earners_title": "Top Earners",
-    "top_spenders_title": "Top Spenders"
+    "top_spenders_title": "Top Spenders",
+    "regional": {
+      "meta": {
+        "title": "التحليلات الإقليمية",
+        "description": "رؤى جغرافية وديموغرافية ومشاركة وتطوعية وطلب مساعدة للشركاء الإقليميين."
+      },
+      "controls": {
+        "period": "فترة"
+      },
+      "periods": {
+        "last_30d": "آخر 30 يومًا",
+        "last_90d": "آخر 90 يومًا",
+        "last_12m": "آخر 12 شهرًا",
+        "all_time": "كل الوقت"
+      },
+      "actions": {
+        "refresh_cache": "تحديث ذاكرة التخزين المؤقت",
+        "export_report": "تقرير التصدير"
+      },
+      "stats": {
+        "active_members": "الأعضاء النشطين",
+        "active_members_description": "الأعضاء النشطون في الفترة المشمولة بالتقارير المحددة",
+        "vol_hours_this_month": "ساعات تطوعية",
+        "vol_hours_description": "الساعات التطوعية المسجلة هذا الشهر",
+        "help_requests_this_month": "طلبات المساعدة",
+        "help_requests_description": "تم فتح طلبات المساعدة هذا الشهر",
+        "most_needed_category": "الفئة الأكثر حاجة",
+        "most_needed_description": "الفئة ذات الطلب الأعلى مؤخرًا"
+      },
+      "tabs": {
+        "aria": "أقسام التحليلات الإقليمية",
+        "heatmap": "خريطة حرارة الأعضاء",
+        "demographics": "التركيبة السكانية",
+        "demand_supply": "الطلب والعرض",
+        "engagement": "ارتباط",
+        "help_requests": "طلبات المساعدة",
+        "volunteer": "متطوع"
+      },
+      "sections": {
+        "geographic_activity_density": "كثافة النشاط الجغرافي",
+        "member_demographics": "التركيبة السكانية للأعضاء",
+        "demand_supply_by_category": "الطلب مقابل العرض حسب الفئة",
+        "demand_supply_note": "النسبة الأعلى من 1.0 تعني أن الطلب أعلى من العروض المتاحة في تلك الفئة.",
+        "monthly_engagement_metrics": "مقاييس المشاركة الشهرية",
+        "volunteer_activity": "النشاط التطوعي",
+        "help_request_analysis": "تحليل طلب المساعدة"
+      },
+      "columns": {
+        "rank": "رتبة",
+        "latitude": "خط العرض",
+        "longitude": "خط الطول",
+        "members": "أعضاء",
+        "density": "كثافة",
+        "month": "شهر",
+        "new_members": "أعضاء جدد",
+        "cumulative_total": "المجموع التراكمي",
+        "category": "فئة",
+        "requests": "الطلبات",
+        "offers": "العروض",
+        "ratio": "نسبة",
+        "trend": "اتجاه",
+        "active_members": "الأعضاء النشطين",
+        "vol_hours": "ساعات تطوعية",
+        "new_listings": "قوائم جديدة",
+        "new_events": "أحداث جديدة",
+        "help_requests": "طلبات المساعدة",
+        "organisation": "منظمة",
+        "volunteers": "المتطوعين",
+        "total": "المجموع",
+        "resolved": "تم الحل",
+        "resolution_rate": "معدل القرار",
+        "avg_days_to_resolve": "متوسط أيام لحلها"
+      },
+      "heatmap": {
+        "description": "أفضل المواقع حسب نشاط الأعضاء وكثافتهم."
+      },
+      "demographics": {
+        "age_distribution": "التوزيع العمري",
+        "language_distribution": "توزيع اللغة",
+        "member_growth_12m": "نمو الأعضاء، آخر 12 شهرًا",
+        "total_with_data": "أعضاء {{total}} مع البيانات الديموغرافية",
+        "total_active_members": "{{total}} الأعضاء النشطين"
+      },
+      "volunteer": {
+        "total_hours": "إجمالي الساعات",
+        "avg_hours_per_volunteer": "متوسط ساعة لكل متطوع",
+        "reciprocity_ratio": "نسبة المعاملة بالمثل",
+        "reciprocity_description": "التوازن بين الساعات المقدمة والساعات المستلمة في جميع أنحاء المنطقة.",
+        "top_orgs_title": "أهم المنظمات التطوعية"
+      },
+      "help": {
+        "by_category": "طلبات المساعدة حسب الفئة",
+        "resolution_trend_6m": "اتجاه القرار، آخر 6 أشهر"
+      },
+      "empty": {
+        "infinity": "∞",
+        "no_geographic_data": "لا توجد بيانات جغرافية متاحة لهذه الفترة.",
+        "no_listing_data": "لا تتوفر بيانات طلب الإدراج لهذه الفترة.",
+        "no_engagement_data": "لا تتوفر بيانات المشاركة لهذه الفترة.",
+        "no_organisation_data": "لا يوجد نشاط تنظيمي متاح لهذه الفترة.",
+        "no_help_request_data": "لا توجد بيانات لطلب المساعدة متاحة لهذه الفترة.",
+        "select_tab_to_load": "حدد علامة التبويب هذه لتحميل البيانات."
+      },
+      "empty_value": "-",
+      "loading": {
+        "section": "جارٍ تحميل التحليلات"
+      },
+      "errors": {
+        "data_unavailable": "البيانات غير متوفرة لهذه الفترة.",
+        "load_data": "تعذر تحميل قسم التحليلات هذا: {{error}}",
+        "load_overview": "تعذر تحميل النظرة العامة على التحليلات الإقليمية.",
+        "failed_to_load_data": "تعذر تحميل بيانات التحليلات."
+      },
+      "units": {
+        "days_count": "{{count}} من الأيام"
+      },
+      "age_groups": {
+        "under_25": "تحت 25",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
+        "65_plus": "65+",
+        "unknown": "مجهول"
+      }
+    }
   },
   "billing": {
     "actions": "Actions",
@@ -10602,13 +10727,99 @@
     "trust_tier": {
       "errors": {
         "recompute_failed": "Failed to recompute trust tiers.",
-        "save_failed": "Failed to save trust tier settings."
+        "save_failed": "Failed to save trust tier settings.",
+        "load_failed": "فشل تحميل تكوين طبقة الثقة."
       },
       "messages": {
-        "recomputed": "Trust tiers recomputed.",
+        "recomputed": "??? ????? ???? ??????? ????? ?? {{count}} ?????.",
         "saved": "Trust tier settings saved."
       },
-      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes."
+      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes.",
+      "title": "تكوين طبقة الثقة",
+      "subtitle": "قم بتعيين عتبات المعايير لكل مستوى ثقة. تنطبق التغييرات على عملية إعادة الحساب التالية.",
+      "loading": "جارٍ تحميل تكوين طبقة الثقة",
+      "recompute_hint": "استخدم إعادة الحساب عندما تتغير الحدود ويلزم إعادة تقييم الأعضاء الحاليين على الفور. يعمل في الخلفية وقد يستغرق 30-60 ثانية.",
+      "meta": {
+        "title": "تكوين طبقة الثقة",
+        "description": "قم بتكوين حدود طبقة الثقة، وأعد حساب طبقات الأعضاء، وراجع ما تفتحه كل طبقة."
+      },
+      "actions": {
+        "recompute": "إعادة حساب كافة المستويات",
+        "save": "حفظ التكوين"
+      },
+      "about": {
+        "title": "حول هذه الصفحة",
+        "body": "طبقات الثقة هي سلم السمعة الذي يفتح الامتيازات عندما يصبح الأعضاء أكثر نشاطًا ويتم التحقق منهم. يتقدم الأعضاء تلقائيًا عندما يستوفون حدود المعايير أدناه. استخدم إعادة الحساب لفرض إعادة الحساب الفوري لجميع الأعضاء. يؤثر تقدم المستوى على Warmth Pass وأهلية المنسق والرؤية في دليل الأعضاء."
+      },
+      "criteria": {
+        "title": "عتبات معايير الطبقة"
+      },
+      "fields": {
+        "hours_logged": "الساعات المسجلة (الحد الأدنى)",
+        "reviews_received": "المراجعات المستلمة (الحد الأدنى)",
+        "identity_verified": "تتطلب التحقق من الهوية"
+      },
+      "tiers": {
+        "member": {
+          "label": "عضو",
+          "description": "عضو أساسي في المجتمع تم تسجيله لمدة ساعة واحدة على الأقل."
+        },
+        "trusted": {
+          "label": "موثوق به",
+          "description": "عضو نشط مع عدة ساعات ومراجعات."
+        },
+        "verified": {
+          "label": "تم التحقق منه",
+          "description": "عضو موثوق به مع هوية مؤكدة."
+        },
+        "coordinator": {
+          "label": "منسق",
+          "description": "عضو نشط للغاية تم التحقق منه ومؤهل للتنسيق."
+        }
+      },
+      "reference": {
+        "title": "مرجع الطبقة",
+        "aria": "مرجع مستوى الثقة",
+        "columns": {
+          "tier": "الطبقة",
+          "level": "مستوى",
+          "color": "لون",
+          "description": "وصف",
+          "unlocks": "ما يفتح"
+        },
+        "rows": {
+          "0": {
+            "name": "الوافد الجديد",
+            "color": "رمادي",
+            "description": "انضم للتو، لا يوجد نشاط مطلوب.",
+            "unlocks": "وصول الأعضاء الأساسية."
+          },
+          "1": {
+            "name": "عضو",
+            "color": "أزرق",
+            "description": "لقد تم تسجيل الساعات.",
+            "unlocks": "يمكن نشر قوائم المساعدة وتلقي ساعات الرعاية."
+          },
+          "2": {
+            "name": "موثوق به",
+            "color": "أخضر",
+            "description": "نشط مع الاستعراضات.",
+            "unlocks": "مؤهل للحصول على Warmth Pass ويمكن التوصية به للرعاية."
+          },
+          "3": {
+            "name": "تم التحقق منه",
+            "color": "أرجواني",
+            "description": "تم التحقق من الهوية.",
+            "unlocks": "رؤية منسق الرعاية الكاملة وشارة الهوية."
+          },
+          "4": {
+            "name": "منسق",
+            "color": "العنبر",
+            "description": "نشط للغاية مع هوية تم التحقق منها.",
+            "unlocks": "مؤهلة للموافقة على ساعات وتنسيق المباريات."
+          }
+        }
+      }
     },
     "warmth_pass": {
       "title": "Warmth Pass",
@@ -10647,6 +10858,109 @@
       "not_eligible_notice": {
         "title": "Not eligible yet",
         "body": "This member does not yet meet the requirements for a Warmth Pass."
+      }
+    },
+    "operating_policy": {
+      "title": "سياسة التشغيل",
+      "subtitle": "ورشة عمل سياسة التشغيل KISS: لا يمكن لبرنامج القواعد تخمينها.",
+      "loading": "جارٍ تحميل سياسة التشغيل",
+      "last_updated": "آخر تحديث لـ {{date}}",
+      "meta": {
+        "title": "سياسة التشغيل",
+        "description": "قم بتكوين الموافقة والحماية وSLA وقواعد سياسة القيمة الاجتماعية لبرنامج الرعاية."
+      },
+      "actions": {
+        "refresh": "ينعش",
+        "save": "حفظ التغييرات"
+      },
+      "about": {
+        "title": "حول هذه الصفحة",
+        "body": "تحدد سياسة التشغيل قواعد برنامج رعاية المجتمع الخاص بك: من يمكنه الموافقة على ساعات العمل، ومدى سرعة استجابة المنسقين، وكيفية حساب القيمة الاجتماعية، وكيف تبدو دورة إعداد التقارير. قم بتكوين هذا قبل إطلاق البرنامج التجريبي. تسري التغييرات على الفور ويتم تسجيلها لأغراض التدقيق.",
+        "methodology_prefix": "ال",
+        "methodology_middle": "تستخدم حقول معدل الأجر بالساعة ومضاعف المنع",
+        "methodology_suffix": "المنهجية (Koordination und Innovation fur Soziales، Schwyz) تم تطويرها باستخدام Age-Stiftung. إذا كنت لا تقوم بتشغيل Swiss KISS/",
+        "methodology_tail": "تجريبي، قم بتعيين السعر على ما يعادل الرعاية الرسمية المحلية الخاصة بك بالساعة والمضاعف على 1.0."
+      },
+      "sections": {
+        "approvals": "الموافقات والثقة",
+        "sla": "نوافذ SLA",
+        "hours": "إدارة الساعة",
+        "safeguarding": "الحماية",
+        "social_value": "منهجية القيمة الاجتماعية",
+        "appendix": "ملحق السياسة التجريبية"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "سلطة الموافقة",
+          "help": "من يمكنه إنهاء الساعات المعتمدة: مسؤول المستأجر أو المنسقون أو كلا الطرفين بالموافقة المتبادلة."
+        },
+        "trusted_reviewer_threshold": {
+          "label": "حد المراجع الموثوق به (ساعات التسجيل)",
+          "help": "الحد الأدنى من الساعات المعتمدة قبل أن يصبح العضو مراجعًا موثوقًا به أو يصل إلى الطبقة الموثوقة."
+        },
+        "sla_first_response_hours": {
+          "label": "SLA: الاستجابة الأولى (ساعات)",
+          "help": "الوقت المستهدف للرد الأول على طلب مساعدة جديد."
+        },
+        "sla_help_request_hours": {
+          "label": "SLA: حل طلب المساعدة (ساعات)",
+          "help": "الوقت المستهدف لإغلاق طلب المساعدة أو مطابقته."
+        },
+        "legacy_hour_settlement": {
+          "label": "سياسة تسوية الساعات القديمة",
+          "help": "كيفية تسوية الساعات المتبقية للعضو المتوفى."
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "عتبة تدخل التوازن المتبادل (ساعات)",
+          "help": "عندما يؤدي عدم توازن العطاء/الاستلام لدى أحد الأعضاء إلى قيام المنسق بتسجيل الوصول."
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "حماية مالك التصعيد (المستخدم ID)",
+          "help": "يتلقى المستخدم ID تصعيدات الحماية. اتركه فارغًا لاستخدام المسؤولين كمجموعة."
+        },
+        "chf_hourly_rate": {
+          "label": "CHF القيمة الاجتماعية لكل ساعة",
+          "help": "قيمة CHF لكل ساعة رعاية لتقارير ROI باستخدام معدل مساعد الرعاية الرسمية السويسري."
+        },
+        "chf_prevention_multiplier": {
+          "label": "CHF مضاعف الوقاية",
+          "help": "يتم تطبيق المضاعف على تعويض الرعاية الرسمية لمنهجية Age-Stiftung وKISS."
+        },
+        "statement_cadence": {
+          "label": "إيقاع بيان العضو",
+          "help": "عدد المرات التي يتلقى فيها الأعضاء بيانًا بالساعة لكل عضو."
+        },
+        "policy_appendix_url": {
+          "label": "ملحق السياسة الموقعة URL",
+          "help": "قم بلصق URL العام لاتفاقية السياسة الموقعة بين تعاونيتك والبلدية. يظهر هذا في تقارير التدقيق وحزمة التقارير البلدية."
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "مسؤل",
+          "coordinator": "منسق",
+          "mutual": "مشترك"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "تبرع للمسبح",
+          "expire": "تنتهي",
+          "transfer_to_nominee": "نقل إلى المرشح"
+        },
+        "statement_cadence": {
+          "monthly": "شهريا",
+          "quarterly": "ربع سنوية",
+          "annual": "سنوي"
+        }
+      },
+      "placeholders": {
+        "url": "https://..."
+      },
+      "errors": {
+        "load_failed": "فشل تحميل سياسة التشغيل.",
+        "save_failed": "فشل في حفظ سياسة التشغيل."
+      },
+      "messages": {
+        "saved": "تم حفظ سياسة التشغيل. تنطبق التغييرات على جميع البورصات الجديدة على الفور."
       }
     }
   },

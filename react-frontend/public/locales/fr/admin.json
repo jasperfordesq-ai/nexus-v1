@@ -905,7 +905,132 @@
     "refresh": "Refresh",
     "top_areas_title": "Top Areas",
     "top_earners_title": "Top Earners",
-    "top_spenders_title": "Top Spenders"
+    "top_spenders_title": "Top Spenders",
+    "regional": {
+      "meta": {
+        "title": "Analyse régionale",
+        "description": "Informations géographiques, démographiques, d’engagement, de bénévolat et de demande d’aide pour les partenaires régionaux."
+      },
+      "controls": {
+        "period": "Période"
+      },
+      "periods": {
+        "last_30d": "30 derniers jours",
+        "last_90d": "90 derniers jours",
+        "last_12m": "12 derniers mois",
+        "all_time": "Tout le temps"
+      },
+      "actions": {
+        "refresh_cache": "Actualiser le cache",
+        "export_report": "Exporter le rapport"
+      },
+      "stats": {
+        "active_members": "Membres actifs",
+        "active_members_description": "Membres actifs dans la période de reporting sélectionnée",
+        "vol_hours_this_month": "Heures de bénévolat",
+        "vol_hours_description": "Heures de bénévolat enregistrées ce mois-ci",
+        "help_requests_this_month": "Demandes d'aide",
+        "help_requests_description": "Demandes d'aide ouvertes ce mois-ci",
+        "most_needed_category": "Catégorie la plus recherchée",
+        "most_needed_description": "Catégorie avec la demande récente la plus élevée"
+      },
+      "tabs": {
+        "aria": "Sections d'analyse régionale",
+        "heatmap": "Carte thermique des membres",
+        "demographics": "Données démographiques",
+        "demand_supply": "Demande et offre",
+        "engagement": "Fiançailles",
+        "help_requests": "Demandes d'aide",
+        "volunteer": "Bénévole"
+      },
+      "sections": {
+        "geographic_activity_density": "Densité géographique d'activité",
+        "member_demographics": "Données démographiques des membres",
+        "demand_supply_by_category": "Demande vs offre par catégorie",
+        "demand_supply_note": "Un ratio supérieur à 1.0 signifie que la demande est supérieure aux offres disponibles dans cette catégorie.",
+        "monthly_engagement_metrics": "Mesures d'engagement mensuelles",
+        "volunteer_activity": "Activité bénévole",
+        "help_request_analysis": "Analyse des demandes d'aide"
+      },
+      "columns": {
+        "rank": "Rang",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "members": "Membres",
+        "density": "Densité",
+        "month": "Mois",
+        "new_members": "Nouveaux membres",
+        "cumulative_total": "Total cumulé",
+        "category": "Catégorie",
+        "requests": "Demandes",
+        "offers": "Offres",
+        "ratio": "Rapport",
+        "trend": "S'orienter",
+        "active_members": "Membres actifs",
+        "vol_hours": "Heures de bénévolat",
+        "new_listings": "Nouvelles annonces",
+        "new_events": "Nouveaux événements",
+        "help_requests": "Demandes d'aide",
+        "organisation": "Organisation",
+        "volunteers": "Bénévoles",
+        "total": "Total",
+        "resolved": "Résolu",
+        "resolution_rate": "Taux de résolution",
+        "avg_days_to_resolve": "Moy. jours pour résoudre"
+      },
+      "heatmap": {
+        "description": "Principaux emplacements par activité et densité des membres."
+      },
+      "demographics": {
+        "age_distribution": "Répartition par âge",
+        "language_distribution": "Répartition linguistique",
+        "member_growth_12m": "Croissance des membres, 12 derniers mois",
+        "total_with_data": "Membres de {{total}} avec données démographiques",
+        "total_active_members": "Membres actifs {{total}}"
+      },
+      "volunteer": {
+        "total_hours": "Heures totales",
+        "avg_hours_per_volunteer": "Moy. heures par bénévole",
+        "reciprocity_ratio": "Rapport de réciprocité",
+        "reciprocity_description": "Equilibre entre les heures données et les heures reçues sur l'ensemble de la région.",
+        "top_orgs_title": "Meilleures organisations bénévoles"
+      },
+      "help": {
+        "by_category": "Demandes d'aide par catégorie",
+        "resolution_trend_6m": "Tendance de résolution, 6 derniers mois"
+      },
+      "empty": {
+        "infinity": "∞",
+        "no_geographic_data": "Aucune donnée géographique n'est disponible pour cette période.",
+        "no_listing_data": "Aucune donnée sur la demande d’inscription n’est disponible pour cette période.",
+        "no_engagement_data": "Aucune donnée d'engagement n'est disponible pour cette période.",
+        "no_organisation_data": "Aucune activité d'organisation n'est disponible pour cette période.",
+        "no_help_request_data": "Aucune donnée de demande d'aide n'est disponible pour cette période.",
+        "select_tab_to_load": "Sélectionnez cet onglet pour charger les données."
+      },
+      "empty_value": "-",
+      "loading": {
+        "section": "Chargement des analyses"
+      },
+      "errors": {
+        "data_unavailable": "Les données ne sont pas disponibles pour cette période.",
+        "load_data": "Impossible de charger cette section d'analyse : {{error}}",
+        "load_overview": "Impossible de charger l'aperçu des analyses régionales.",
+        "failed_to_load_data": "Impossible de charger les données d'analyse."
+      },
+      "units": {
+        "days_count": "{{count}} jours"
+      },
+      "age_groups": {
+        "under_25": "Moins de 25 ans",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
+        "65_plus": "65+",
+        "unknown": "Inconnu"
+      }
+    }
   },
   "billing": {
     "actions": "Actions",
@@ -10602,13 +10727,99 @@
     "trust_tier": {
       "errors": {
         "recompute_failed": "Failed to recompute trust tiers.",
-        "save_failed": "Failed to save trust tier settings."
+        "save_failed": "Failed to save trust tier settings.",
+        "load_failed": "Échec du chargement de la configuration du niveau de confiance."
       },
       "messages": {
-        "recomputed": "Trust tiers recomputed.",
+        "recomputed": "Niveaux de confiance recalcul?s pour {{count}} membres.",
         "saved": "Trust tier settings saved."
       },
-      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes."
+      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes.",
+      "title": "Configuration du niveau de confiance",
+      "subtitle": "Définissez les seuils de critères pour chaque niveau de confiance. Les modifications s’appliquent lors de la prochaine exécution de recalcul.",
+      "loading": "Chargement de la configuration du niveau de confiance",
+      "recompute_hint": "Utilisez le recalcul lorsque les seuils changent et que les membres existants doivent être réévalués immédiatement. S'exécute en arrière-plan et peut prendre 30-60 secondes.",
+      "meta": {
+        "title": "Configuration du niveau de confiance",
+        "description": "Configurez les seuils de niveau de confiance, recalculez les niveaux de membres et examinez ce que chaque niveau débloque."
+      },
+      "actions": {
+        "recompute": "Recalculer tous les niveaux",
+        "save": "Enregistrer la configuration"
+      },
+      "about": {
+        "title": "À propos de cette page",
+        "body": "Les niveaux de confiance sont une échelle de réputation qui débloque des privilèges à mesure que les membres deviennent plus actifs et vérifiés. Les membres avancent automatiquement lorsqu’ils atteignent les seuils de critères ci-dessous. Utilisez recalcul pour forcer un recalcul immédiat pour tous les membres. La progression de niveau affecte le Warmth Pass, l’éligibilité du coordinateur et la visibilité dans l’annuaire des membres."
+      },
+      "criteria": {
+        "title": "Seuils de critères de niveau"
+      },
+      "fields": {
+        "hours_logged": "Heures enregistrées (minimum)",
+        "reviews_received": "Avis reçus (minimum)",
+        "identity_verified": "Exiger une vérification de l'identité"
+      },
+      "tiers": {
+        "member": {
+          "label": "Membre",
+          "description": "Membre de la communauté de base avec au moins 1 heure de connexion."
+        },
+        "trusted": {
+          "label": "Confiance",
+          "description": "Membre actif avec plusieurs heures et avis."
+        },
+        "verified": {
+          "label": "Vérifié",
+          "description": "Membre de confiance avec identité confirmée."
+        },
+        "coordinator": {
+          "label": "Coordinateur",
+          "description": "Membre vérifié très actif éligible à la coordination."
+        }
+      },
+      "reference": {
+        "title": "Référence de niveau",
+        "aria": "Référence du niveau de confiance",
+        "columns": {
+          "tier": "Étage",
+          "level": "Niveau",
+          "color": "Couleur",
+          "description": "Description",
+          "unlocks": "Ce qu'il débloque"
+        },
+        "rows": {
+          "0": {
+            "name": "Nouveau venu",
+            "color": "Gris",
+            "description": "Je viens de m'inscrire, aucune activité requise.",
+            "unlocks": "Accès membre de base."
+          },
+          "1": {
+            "name": "Membre",
+            "color": "Bleu",
+            "description": "A enregistré des heures.",
+            "unlocks": "Peut publier des listes d'aide et recevoir des heures de soins."
+          },
+          "2": {
+            "name": "Confiance",
+            "color": "Vert",
+            "description": "Actif avec des critiques.",
+            "unlocks": "Éligible au Warmth Pass et peut être recommandé pour les soins."
+          },
+          "3": {
+            "name": "Vérifié",
+            "color": "Violet",
+            "description": "Identité vérifiée.",
+            "unlocks": "Visibilité et badge d'identité du coordinateur de soins complet."
+          },
+          "4": {
+            "name": "Coordinateur",
+            "color": "Ambre",
+            "description": "Très actif avec une identité vérifiée.",
+            "unlocks": "Éligible pour approuver les heures et coordonner les matchs."
+          }
+        }
+      }
     },
     "warmth_pass": {
       "title": "Warmth Pass",
@@ -10647,6 +10858,109 @@
       "not_eligible_notice": {
         "title": "Not eligible yet",
         "body": "This member does not yet meet the requirements for a Warmth Pass."
+      }
+    },
+    "operating_policy": {
+      "title": "Politique de fonctionnement",
+      "subtitle": "Atelier de politique d'exploitation KISS : les logiciels de règles ne peuvent pas deviner.",
+      "loading": "Politique d'exploitation de chargement",
+      "last_updated": "Dernière mise à jour {{date}}",
+      "meta": {
+        "title": "Politique de fonctionnement",
+        "description": "Configurez les règles d'approbation, de sauvegarde, de SLA et de politique de valeur sociale pour le programme de soins."
+      },
+      "actions": {
+        "refresh": "Rafraîchir",
+        "save": "Enregistrer les modifications"
+      },
+      "about": {
+        "title": "À propos de cette page",
+        "body": "La politique opérationnelle définit les règles de votre programme de soins communautaires : qui peut approuver les heures, à quelle vitesse les coordinateurs doivent répondre, comment la valeur sociale est calculée et à quoi ressemble le cycle de reporting. Configurez-le avant de lancer le pilote. Les modifications prennent effet immédiatement et sont enregistrées à des fins d'audit.",
+        "methodology_prefix": "Le",
+        "methodology_middle": "Les champs taux horaire et multiplicateur de prévention utilisent le",
+        "methodology_suffix": "méthodologie (Koordination und Innovation fur Soziales, Schwyz) développée avec Age-Stiftung. Si vous n'utilisez pas de compte Swiss KISS/",
+        "methodology_tail": "pilote, définissez le tarif sur votre équivalent horaire local de soins formels et le multiplicateur sur 1.0."
+      },
+      "sections": {
+        "approvals": "Approbations et confiance",
+        "sla": "Fenêtres SLA",
+        "hours": "Gestion des heures",
+        "safeguarding": "Sauvegarde",
+        "social_value": "méthodologie de la valeur sociale",
+        "appendix": "Annexe sur la politique pilote"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "Autorité d'approbation",
+          "help": "Qui peut finaliser les heures approuvées : l'administrateur du locataire, les coordinateurs ou les deux parties par approbation mutuelle."
+        },
+        "trusted_reviewer_threshold": {
+          "label": "Seuil d'évaluateur de confiance (heures enregistrées)",
+          "help": "Nombre minimum d'heures approuvées avant qu'un membre devienne un évaluateur de confiance ou atteigne le niveau de confiance."
+        },
+        "sla_first_response_hours": {
+          "label": "SLA : première réponse (heures)",
+          "help": "Ciblez le délai de première réponse à une nouvelle demande d'aide."
+        },
+        "sla_help_request_hours": {
+          "label": "SLA : résolution des demandes d'aide (heures)",
+          "help": "Ciblez le temps nécessaire pour clôturer ou faire correspondre une demande d'aide."
+        },
+        "legacy_hour_settlement": {
+          "label": "Politique de règlement en heures héritées",
+          "help": "Comment sont réglées les heures restantes d'un membre décédé."
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "Seuil d'intervention en équilibre réciproque (heures)",
+          "help": "Lorsque le déséquilibre donner/recevoir d’un membre déclenche un enregistrement du coordinateur."
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "Propriétaire de l’escalade de protection (utilisateur ID)",
+          "help": "L'utilisateur ID reçoit des escalades de sauvegarde. Laissez vide pour utiliser les administrateurs en tant que groupe."
+        },
+        "chf_hourly_rate": {
+          "label": "CHF valeur sociale par heure",
+          "help": "Valeur CHF par heure de soins pour le reporting ROI utilisant le tarif suisse des aides-soignantes."
+        },
+        "chf_prevention_multiplier": {
+          "label": "Multiplicateur de prévention CHF",
+          "help": "Multiplicateur appliqué à la compensation des soins formels pour les méthodologies Age-Stiftung et KISS."
+        },
+        "statement_cadence": {
+          "label": "Cadence des déclarations des membres",
+          "help": "À quelle fréquence les membres reçoivent un relevé horaire par membre."
+        },
+        "policy_appendix_url": {
+          "label": "Annexe à la politique signée URL",
+          "help": "Collez le URL public de l'entente de politique signée entre votre coopérative et la municipalité. Cela apparaît dans les rapports d’audit et dans le dossier de reporting municipal."
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "Administrateur",
+          "coordinator": "Coordinateur",
+          "mutual": "Mutuel"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "Faire un don à la piscine",
+          "expire": "Expirer",
+          "transfer_to_nominee": "Transfert au candidat"
+        },
+        "statement_cadence": {
+          "monthly": "Mensuel",
+          "quarterly": "Trimestriel",
+          "annual": "Annuel"
+        }
+      },
+      "placeholders": {
+        "url": "https://..."
+      },
+      "errors": {
+        "load_failed": "Échec du chargement de la stratégie d'exploitation.",
+        "save_failed": "Échec de l'enregistrement de la stratégie d'exploitation."
+      },
+      "messages": {
+        "saved": "Politique de fonctionnement enregistrée. Les modifications s’appliquent immédiatement à tous les nouveaux échanges."
       }
     }
   },
