@@ -30,6 +30,7 @@ import XCircle from 'lucide-react/icons/circle-x';
 import FileEdit from 'lucide-react/icons/file-pen';
 import Vote from 'lucide-react/icons/vote';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -107,6 +108,7 @@ interface ChallengeActionsProps {
 }
 
 function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: ChallengeActionsProps) {
+  const { t } = useTranslation('admin');
   type ActionKey = 'view' | ChallengeStatus | 'delete';
 
   const handleAction = (key: React.Key) => {
@@ -123,20 +125,20 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
   return (
     <Dropdown>
       <DropdownTrigger>
-        <Button isIconOnly size="sm" variant="light" aria-label={"Actions"}>
+        <Button isIconOnly size="sm" variant="light" aria-label={t('common.actions')}>
           <MoreVertical size={16} />
         </Button>
       </DropdownTrigger>
-      <DropdownMenu aria-label={"Challenge Actions"} onAction={handleAction}>
+      <DropdownMenu aria-label={t('ideation.label_challenge_actions')} onAction={handleAction}>
         <DropdownItem key="view" startContent={<Eye size={14} />}>
-          {"View Details"}
+          {t('ideation.view_details')}
         </DropdownItem>
         <DropdownItem
           key="draft"
           startContent={<FileEdit size={14} />}
           className={challenge.status !== 'draft' ? '' : 'hidden'}
         >
-          {"Mark as Draft"}
+          {t('ideation.mark_as_draft')}
         </DropdownItem>
         <DropdownItem
           key="open"
@@ -144,7 +146,7 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           color="success"
           className={challenge.status !== 'open' ? 'text-success' : 'hidden'}
         >
-          {"Mark as Open"}
+          {t('ideation.mark_as_open')}
         </DropdownItem>
         <DropdownItem
           key="voting"
@@ -152,7 +154,7 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           color="primary"
           className={challenge.status !== 'voting' ? 'text-primary' : 'hidden'}
         >
-          {"Mark as Voting"}
+          {t('ideation.mark_as_voting')}
         </DropdownItem>
         <DropdownItem
           key="evaluating"
@@ -160,21 +162,21 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           color="warning"
           className={challenge.status !== 'evaluating' ? 'text-warning' : 'hidden'}
         >
-          {"Mark as Evaluating"}
+          {t('ideation.mark_as_evaluating')}
         </DropdownItem>
         <DropdownItem
           key="closed"
           startContent={<XCircle size={14} />}
           className={challenge.status !== 'closed' ? '' : 'hidden'}
         >
-          {"Mark as Closed"}
+          {t('ideation.mark_as_closed')}
         </DropdownItem>
         <DropdownItem
           key="archived"
           startContent={<Archive size={14} />}
           className={challenge.status !== 'archived' ? '' : 'hidden'}
         >
-          {"Mark as Archived"}
+          {t('ideation.mark_as_archived')}
         </DropdownItem>
         <DropdownItem
           key="delete"
@@ -182,7 +184,7 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           className="text-danger"
           color="danger"
         >
-          {"Delete"}
+          {t('common.delete')}
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
@@ -194,7 +196,8 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function IdeationAdmin() {
-  usePageTitle("Ideation");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('ideation.ideation_admin_title'));
   const toast = useToast();
 
   const [items, setItems] = useState<Challenge[]>([]);
@@ -228,11 +231,11 @@ export function IdeationAdmin() {
         setTotal(res.meta?.total ?? 0);
       }
     } catch {
-      toast.error("Failed to load ideation challenges");
+      toast.error(t('ideation.failed_to_load_ideation_challenges'));
     } finally {
       setLoading(false);
     }
-  }, [page, search, status, toast])
+  }, [page, search, status, t, toast])
 
 
   useEffect(() => {
@@ -247,13 +250,13 @@ export function IdeationAdmin() {
         status: newStatus,
       });
       if (res?.success) {
-        toast.success(`Challenge status changed`);
+        toast.success(t('ideation.challenge_status_changed'));
         loadItems();
       } else {
-        toast.error(res?.error || "Failed to update challenge status");
+        toast.error(res?.error || t('ideation.failed_to_update_challenge_status'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('common.an_unexpected_error'));
     }
   };
 
@@ -265,13 +268,13 @@ export function IdeationAdmin() {
     try {
       const res = await api.delete(`/v2/admin/ideation/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success("Challenge deleted successfully");
+        toast.success(t('ideation.challenge_deleted_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || "Failed to delete challenge");
+        toast.error(res?.error || t('ideation.failed_to_delete_challenge'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('common.an_unexpected_error'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -283,7 +286,7 @@ export function IdeationAdmin() {
   const columns: Column<Challenge>[] = [
     {
       key: 'title',
-      label: "Title",
+      label: t('ideation.col_title'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground line-clamp-1">{item.title}</span>
@@ -291,15 +294,15 @@ export function IdeationAdmin() {
     },
     {
       key: 'creator_name',
-      label: "Creator",
+      label: t('ideation.col_creator'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.creator_name || "Unknown"}</span>
+        <span className="text-sm text-default-600">{item.creator_name || t('common.unknown')}</span>
       ),
     },
     {
       key: 'ideas_count',
-      label: "Ideas",
+      label: t('ideation.col_ideas'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">{item.ideas_count}</span>
@@ -307,7 +310,7 @@ export function IdeationAdmin() {
     },
     {
       key: 'status',
-      label: "Status",
+      label: t('ideation.col_status'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -316,13 +319,13 @@ export function IdeationAdmin() {
           color={statusColors[item.status] || 'default'}
           className="capitalize"
         >
-          {item.status}
+          {t(`ideation.status_${item.status}`)}
         </Chip>
       ),
     },
     {
       key: 'start_date',
-      label: "Start Date",
+      label: t('ideation.col_start_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -332,7 +335,7 @@ export function IdeationAdmin() {
     },
     {
       key: 'end_date',
-      label: "End Date",
+      label: t('ideation.col_end_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -342,7 +345,7 @@ export function IdeationAdmin() {
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('common.actions'),
       render: (item) => (
         <ChallengeActions
           challenge={item}
@@ -359,19 +362,19 @@ export function IdeationAdmin() {
   return (
     <div>
       <PageHeader
-        title={"Ideation Admin"}
-        description={"View and manage ideation challenges submitted by community members"}
+        title={t('ideation.ideation_admin_title')}
+        description={t('ideation.ideation_admin_desc')}
         actions={
           <div className="flex gap-2 items-center">
             <Chip variant="flat" startContent={<Lightbulb size={14} />}>
-              {`Total`}
+              {t('ideation.total_count', { count: total.toLocaleString() })}
             </Chip>
             <Button
               isIconOnly
               size="sm"
               variant="flat"
               onPress={loadItems}
-              aria-label={"Refresh"}
+              aria-label={t('common.refresh')}
             >
               <RefreshCw size={14} />
             </Button>
@@ -389,13 +392,13 @@ export function IdeationAdmin() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={"All"} />
-          <Tab key="draft" title={"Draft"} />
-          <Tab key="open" title={"Open"} />
-          <Tab key="voting" title={"Voting"} />
-          <Tab key="evaluating" title={"Evaluating"} />
-          <Tab key="closed" title={"Closed"} />
-          <Tab key="archived" title={"Archived"} />
+          <Tab key="all" title={t('common.all')} />
+          <Tab key="draft" title={t('ideation.status_draft')} />
+          <Tab key="open" title={t('ideation.status_open')} />
+          <Tab key="voting" title={t('ideation.status_voting')} />
+          <Tab key="evaluating" title={t('ideation.status_evaluating')} />
+          <Tab key="closed" title={t('ideation.status_closed')} />
+          <Tab key="archived" title={t('ideation.status_archived')} />
         </Tabs>
       </div>
 
@@ -403,13 +406,13 @@ export function IdeationAdmin() {
         columns={columns}
         data={items}
         isLoading={loading}
-        searchPlaceholder={"Search challenges..."}
+        searchPlaceholder={t('ideation.search_challenges_placeholder')}
         emptyContent={
           search
-            ? "No matching challenges found"
+            ? t('ideation.no_matching_challenges')
             : status === 'all'
-              ? "No challenges found found"
-              : `No status challenges found`
+              ? t('ideation.no_challenges_found')
+              : t('ideation.no_status_challenges')
         }
         onSearch={(q) => {
           setSearch(q);
@@ -428,9 +431,9 @@ export function IdeationAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={"Delete Challenge"}
-          message={`Delete Challenge`}
-          confirmLabel={"Delete"}
+          title={t('ideation.delete_challenge')}
+          message={t('ideation.confirm_delete_challenge')}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />
@@ -442,29 +445,29 @@ export function IdeationAdmin() {
           isOpen={!!detailItem}
           onClose={() => setDetailItem(null)}
           onConfirm={() => setDetailItem(null)}
-          title={"Challenge Details"}
+          title={t('ideation.challenge_details')}
           message=""
-          confirmLabel={"Close"}
+          confirmLabel={t('common.close')}
           confirmColor="primary"
         >
           <div className="space-y-3">
             <div>
-              <span className="text-sm font-medium text-default-500">{"Ideation"}</span>
+              <span className="text-sm font-medium text-default-500">{t('ideation.ideation')}</span>
               <p className="text-foreground">{detailItem.title}</p>
             </div>
             <div className="flex gap-6">
               <div>
-                <span className="text-sm font-medium text-default-500">{"Creator"}</span>
-                <p className="text-foreground">{detailItem.creator_name || "Unknown"}</p>
+                <span className="text-sm font-medium text-default-500">{t('ideation.col_creator')}</span>
+                <p className="text-foreground">{detailItem.creator_name || t('common.unknown')}</p>
               </div>
               <div>
-                <span className="text-sm font-medium text-default-500">{"Ideas"}</span>
+                <span className="text-sm font-medium text-default-500">{t('ideation.col_ideas')}</span>
                 <p className="text-foreground">{detailItem.ideas_count}</p>
               </div>
             </div>
             <div className="flex gap-6">
               <div>
-                <span className="text-sm font-medium text-default-500">{"Status"}</span>
+                <span className="text-sm font-medium text-default-500">{t('ideation.col_status')}</span>
                 <p>
                   <Chip
                     size="sm"
@@ -472,12 +475,12 @@ export function IdeationAdmin() {
                     color={statusColors[detailItem.status] || 'default'}
                     className="capitalize"
                   >
-                    {detailItem.status}
+                    {t(`ideation.status_${detailItem.status}`)}
                   </Chip>
                 </p>
               </div>
               <div>
-                <span className="text-sm font-medium text-default-500">{"Start Date"}</span>
+                <span className="text-sm font-medium text-default-500">{t('ideation.col_start_date')}</span>
                 <p className="text-foreground">
                   {detailItem.start_date
                     ? new Date(detailItem.start_date).toLocaleDateString()
@@ -485,7 +488,7 @@ export function IdeationAdmin() {
                 </p>
               </div>
               <div>
-                <span className="text-sm font-medium text-default-500">{"End Date"}</span>
+                <span className="text-sm font-medium text-default-500">{t('ideation.col_end_date')}</span>
                 <p className="text-foreground">
                   {detailItem.end_date
                     ? new Date(detailItem.end_date).toLocaleDateString()
@@ -494,7 +497,7 @@ export function IdeationAdmin() {
               </div>
             </div>
             <div>
-              <span className="text-sm font-medium text-default-500">{"Created"}</span>
+              <span className="text-sm font-medium text-default-500">{t('ideation.col_created')}</span>
               <p className="text-foreground">
                 {new Date(detailItem.created_at).toLocaleString()}
               </p>
