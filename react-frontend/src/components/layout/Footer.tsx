@@ -52,7 +52,7 @@ export function Footer({ children, copyright }: FooterProps) {
         <div className="flex flex-col items-center gap-2">
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
           <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-theme-subtle/75">
-            <span className="font-medium text-theme-subtle">{t('footer.project_nexus')}</span>
+            <img src="/images/project-nexus-logo.png" alt={t('footer.project_nexus')} className="h-5 w-auto opacity-70 hover:opacity-100 transition-opacity" />
             <span aria-hidden="true">&middot;</span>
             <span>{t('footer.agpl_notice', { year })}</span>
             <span aria-hidden="true">&middot;</span>
@@ -217,7 +217,7 @@ export function Footer({ children, copyright }: FooterProps) {
             <div className="pt-4 flex flex-col items-center justify-center gap-3 text-center">
               <SourceRepositoryLink />
               <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-theme-subtle/70">
-                <span className="font-medium text-theme-subtle">{t('footer.project_nexus')}</span>
+                <img src="/images/project-nexus-logo.png" alt={t('footer.project_nexus')} className="h-5 w-auto opacity-70 hover:opacity-100 transition-opacity" />
                 <span aria-hidden="true">&middot;</span>
                 <span>{t('footer.agpl_notice', { year })}</span>
                 <span aria-hidden="true">&middot;</span>
