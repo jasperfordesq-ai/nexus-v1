@@ -11231,11 +11231,13 @@
     "question": "Question",
     "search_polls_placeholder": "Search polls...",
     "status": "Status",
+    "status_active": "Active",
+    "status_ended": "Ended",
     "total_count": "Total",
     "unknown": "Unknown",
     "votes": "Votes",
     "no_matching_polls": "No matching polls found",
-    "no_polls_found": "No polls found found"
+    "no_polls_found": "No polls found"
   },
   "quick_actions": {
     "advanced_controls": "Advanced Controls",

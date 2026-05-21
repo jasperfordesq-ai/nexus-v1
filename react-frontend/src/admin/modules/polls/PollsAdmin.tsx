@@ -13,6 +13,7 @@ import { Chip, Button } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Eye from 'lucide-react/icons/eye';
 import Trash2 from 'lucide-react/icons/trash-2';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -74,7 +75,8 @@ function normalizePoll(item: RawPoll): Poll {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function PollsAdmin() {
-  usePageTitle("Polls");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('polls.page_title'));
   const toast = useToast();
 
   const [items, setItems] = useState<Poll[]>([]);
@@ -106,11 +108,11 @@ export function PollsAdmin() {
         setTotal(res.meta?.total ?? 0);
       }
     } catch {
-      toast.error("Failed to load polls");
+      toast.error(t('polls.failed_to_load_polls'));
     } finally {
       setLoading(false);
     }
-  }, [page, search, toast])
+  }, [page, search, t, toast])
 
 
   useEffect(() => {
@@ -125,13 +127,13 @@ export function PollsAdmin() {
     try {
       const res = await api.delete(`/v2/admin/polls/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success("Poll deleted successfully");
+        toast.success(t('polls.poll_deleted_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || "Failed to delete poll");
+        toast.error(res?.error || t('polls.failed_to_delete_poll'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('polls.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -143,7 +145,7 @@ export function PollsAdmin() {
   const columns: Column<Poll>[] = [
     {
       key: 'question',
-      label: "Question",
+      label: t('polls.col_question'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground line-clamp-2">
@@ -153,7 +155,7 @@ export function PollsAdmin() {
     },
     {
       key: 'options_count',
-      label: "Options",
+      label: t('polls.col_options'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">{item.options_count}</span>
@@ -161,7 +163,7 @@ export function PollsAdmin() {
     },
     {
       key: 'votes_count',
-      label: "Votes",
+      label: t('polls.col_votes'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">{item.votes_count}</span>
@@ -169,17 +171,17 @@ export function PollsAdmin() {
     },
     {
       key: 'creator_name',
-      label: "Creator",
+      label: t('polls.col_creator'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">
-          {item.creator_name || "Unknown"}
+          {item.creator_name || t('polls.unknown')}
         </span>
       ),
     },
     {
       key: 'status',
-      label: "Status",
+      label: t('polls.col_status'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -188,13 +190,13 @@ export function PollsAdmin() {
           color={statusColors[item.status] || 'default'}
           className="capitalize"
         >
-          {item.status}
+          {t(`polls.status_${item.status}`)}
         </Chip>
       ),
     },
     {
       key: 'created_at',
-      label: "Created",
+      label: t('polls.col_created'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -204,7 +206,7 @@ export function PollsAdmin() {
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('polls.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -213,7 +215,7 @@ export function PollsAdmin() {
             variant="flat"
             color="primary"
             onPress={() => setDetailPoll(item)}
-            aria-label={"View Poll Details"}
+            aria-label={t('polls.label_view_poll_details')}
           >
             <Eye size={14} />
           </Button>
@@ -223,7 +225,7 @@ export function PollsAdmin() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label={"Delete Poll"}
+            aria-label={t('polls.label_delete_poll')}
           >
             <Trash2 size={14} />
           </Button>
@@ -237,11 +239,11 @@ export function PollsAdmin() {
   return (
     <div>
       <PageHeader
-        title={"Polls Admin"}
-        description={"View and manage polls created by community members"}
+        title={t('polls.polls_admin_title')}
+        description={t('polls.polls_admin_desc')}
         actions={
           <Chip variant="flat" startContent={<BarChart3 size={14} />}>
-            {`Total`}
+            {t('polls.total_count')}
           </Chip>
         }
       />
@@ -250,11 +252,11 @@ export function PollsAdmin() {
         columns={columns}
         data={items}
         isLoading={loading}
-        searchPlaceholder={"Search polls..."}
+        searchPlaceholder={t('polls.search_polls_placeholder')}
         emptyContent={
           search
-            ? "No matching polls found"
-            : "No polls found found"
+            ? t('polls.no_matching_polls')
+            : t('polls.no_polls_found')
         }
         onSearch={(q) => {
           setSearch(q);
@@ -273,9 +275,9 @@ export function PollsAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={"Delete Poll"}
-          message={`Delete Poll`}
-          confirmLabel={"Delete"}
+          title={t('polls.delete_poll')}
+          message={t('polls.confirm_delete_poll')}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />
@@ -287,33 +289,33 @@ export function PollsAdmin() {
           isOpen={!!detailPoll}
           onClose={() => setDetailPoll(null)}
           onConfirm={() => setDetailPoll(null)}
-          title={"Poll Details"}
+          title={t('polls.poll_details')}
           message=""
-          confirmLabel={"Close"}
+          confirmLabel={t('common.close')}
           confirmColor="primary"
         >
           <div className="space-y-3">
             <div>
-              <span className="text-sm font-medium text-default-500">{"Question"}</span>
+              <span className="text-sm font-medium text-default-500">{t('polls.question')}</span>
               <p className="text-foreground">{detailPoll.question}</p>
             </div>
             <div className="flex gap-6">
               <div>
-                <span className="text-sm font-medium text-default-500">{"Options"}</span>
+                <span className="text-sm font-medium text-default-500">{t('polls.options')}</span>
                 <p className="text-foreground">{detailPoll.options_count}</p>
               </div>
               <div>
-                <span className="text-sm font-medium text-default-500">{"Votes"}</span>
+                <span className="text-sm font-medium text-default-500">{t('polls.votes')}</span>
                 <p className="text-foreground">{detailPoll.votes_count}</p>
               </div>
             </div>
             <div className="flex gap-6">
               <div>
-                <span className="text-sm font-medium text-default-500">{"Creator"}</span>
-                <p className="text-foreground">{detailPoll.creator_name || "Unknown"}</p>
+                <span className="text-sm font-medium text-default-500">{t('polls.creator')}</span>
+                <p className="text-foreground">{detailPoll.creator_name || t('polls.unknown')}</p>
               </div>
               <div>
-                <span className="text-sm font-medium text-default-500">{"Status"}</span>
+                <span className="text-sm font-medium text-default-500">{t('polls.status')}</span>
                 <p>
                   <Chip
                     size="sm"
@@ -321,13 +323,13 @@ export function PollsAdmin() {
                     color={statusColors[detailPoll.status] || 'default'}
                     className="capitalize"
                   >
-                    {detailPoll.status}
+                    {t(`polls.status_${detailPoll.status}`)}
                   </Chip>
                 </p>
               </div>
             </div>
             <div>
-              <span className="text-sm font-medium text-default-500">{"Created"}</span>
+              <span className="text-sm font-medium text-default-500">{t('polls.created')}</span>
               <p className="text-foreground">
                 {new Date(detailPoll.created_at).toLocaleString()}
               </p>
