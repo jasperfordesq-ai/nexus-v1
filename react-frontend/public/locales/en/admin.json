@@ -1282,6 +1282,25 @@
       "title": "Municipal Impact Reports",
       "description": "Prepare KISS-style reporting for verified hours, active members, trusted organisations, and municipal value conversations."
     },
+    "export_note": {
+      "pdf_label": "PDF export",
+      "pdf_text": " is formatted for sharing with municipal partners and funders.",
+      "csv_label": "CSV export",
+      "csv_text": " gives raw data for spreadsheet analysis or grant reporting."
+    },
+    "about": {
+      "title": "About this report",
+      "body_1_before_kiss": "The Municipal Impact Report is the evidence pack you share with municipal partners, cantons, and funders to demonstrate the programme's value. It shows verified care hours, active members, partner organisations, and, using the",
+      "body_1_after_kiss": "/Age-Stiftung methodology, an estimated cost offset to formal care services (",
+      "body_1_after_chf": " value of hours x prevention multiplier).",
+      "kiss_abbr": "KISS",
+      "chf_abbr": "CHF",
+      "body_2_prefix": "Use the",
+      "body_2_after_audience": " toggle to switch the narrative framing:",
+      "body_2_after_canton": " aggregates multiple municipalities and shows cost-avoidance at cantonal scale;",
+      "body_2_after_municipality": " focuses on local residents reached and partner organisations;",
+      "body_2_after_cooperative": " shows member retention, reciprocity rate, and coordinator workload. Export as PDF to send to partners or as CSV for further analysis. Save report templates to quickly regenerate the same configuration in future periods."
+    },
     "actions": {
       "analytics": "Community analytics",
       "impact_report": "Impact report",
@@ -1334,6 +1353,29 @@
       "status": {
         "ready": "Ready",
         "needs_data": "Needs data"
+      }
+    },
+    "readiness_intro": {
+      "prefix": "These four signals indicate whether the report has enough data to be convincing to an external audience.",
+      "ready_suffix": " = sufficient data;",
+      "needs_data_suffix": " = metric is below threshold - hover each card for guidance."
+    },
+    "readiness_help": {
+      "municipal_value": {
+        "what": "Estimated cost offset to formal care (hours x policy hour value x prevention multiplier).",
+        "fix": "No cost offset calculable yet. Approve pending volunteer hour logs to populate this metric."
+      },
+      "participation": {
+        "what": "Distinct members active as supporters or recipients in this period.",
+        "fix": "Below the minimum participation threshold. Continue onboarding members and completing exchanges."
+      },
+      "partner_network": {
+        "what": "Trusted partner organisations that contributed hours in this period.",
+        "fix": "No trusted organisations active. Onboard organisations via Volunteering > Organisations."
+      },
+      "local_exchange": {
+        "what": "Verified exchanges (completed and approved) recorded in this period.",
+        "fix": "No completed exchanges yet. Coordinators should approve pending hour logs."
       }
     },
     "empty": {
@@ -1390,6 +1432,60 @@
         "canton": "Canton",
         "cooperative": "Cooperative",
         "foundation": "Foundation"
+      }
+    },
+    "narrative": {
+      "in_export": "In export",
+      "no_prior_data": "No prior data",
+      "logs_count": "{{count}} logs",
+      "canton": {
+        "empty_title": "Canton (Kantonsrat / regional government)",
+        "empty_description": "Aggregate impact across municipalities, cost-avoidance, and year-over-year change.",
+        "empty_body": "Switch to Canton mode to load the canton-level narrative.",
+        "title": "Verified support hours{{tenant}} - {{from}} to {{to}}",
+        "description": "Aggregate impact across municipalities, professional-care cost avoidance, year-over-year trend.",
+        "municipalities_reporting": "Municipalities reporting",
+        "municipalities_reporting_desc": "Aggregate node count contributing to this view.",
+        "multi_node_total_hours": "Multi-node total hours",
+        "multi_node_total_hours_desc": "Verified across all opted-in nodes.",
+        "estimated_cost_avoidance": "Estimated cost avoidance",
+        "estimated_cost_avoidance_desc": "Hours x policy value x {{multiplier}} (professional-care equivalency).",
+        "yoy_change": "Year-over-year change",
+        "prior_period_detail": "Prior period: {{from}} to {{to}} - {{hours}} verified hours."
+      },
+      "municipality": {
+        "empty_title": "Municipality (Gemeinde)",
+        "empty_description": "Local participation, named partner organisations, geographic / category split.",
+        "empty_body": "Switch to Municipality mode to load the municipality-level narrative.",
+        "title": "Community impact - {{from}} to {{to}}",
+        "description": "Local participation, named partner organisations, geographic / category split, recipient reach.",
+        "partner_organisations": "Partner organisations",
+        "trusted_total": "of {{count}} trusted total.",
+        "recipients_reached": "Recipients reached",
+        "recipients_reached_desc": "Distinct receivers of completed exchanges.",
+        "top_categories": "Top categories",
+        "top_categories_desc": "Listed below by hours.",
+        "partner_organisations_by_hours": "Partner organisations (by hours)",
+        "no_partner_activity": "No partner activity in this period.",
+        "top_5_categories": "Top 5 categories (geographic / activity split)",
+        "no_category_data": "No category data in this period."
+      },
+      "cooperative": {
+        "empty_title": "Cooperative (KISS-Genossenschaft internal)",
+        "empty_description": "Member retention, hour reciprocity, tandem relationships, coordinator workload, future-care credit pool.",
+        "empty_body": "Switch to Cooperative mode to load the cooperative-internal narrative.",
+        "title": "Cooperative internal report - {{from}} to {{to}}",
+        "description": "Internal cooperative health: retention, reciprocity, tandems, coordinator load, credit pool.",
+        "member_retention": "Member retention",
+        "member_retention_desc": "{{count}} members active in both this period and the prior equivalent period.",
+        "reciprocity_rate": "Reciprocity rate",
+        "reciprocity_rate_desc": "{{count}} supporters also received hours in the period.",
+        "active_tandems": "Active tandems",
+        "active_tandems_desc": "Recurring helper/recipient pairs (2+ exchanges).",
+        "coordinator_load": "Coordinator load",
+        "coordinator_load_desc": "{{pending}} pending across {{coordinators}} coordinators.",
+        "future_care_credit_pool": "Future-care credit balance pool",
+        "future_care_credit_pool_desc": "Sum of positive member balances - the cooperative's implicit future-care reserve. Active member base: {{count}}."
       }
     },
     "cards": {

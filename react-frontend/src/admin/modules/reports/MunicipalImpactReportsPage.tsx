@@ -129,22 +129,22 @@ type TemplatesResponse = {
   templates: ReportTemplate[];
 };
 
-const READINESS_HELP: Record<string, { what: string; fix: string }> = {
+const READINESS_HELP: Record<string, { whatKey: string; fixKey: string }> = {
   municipal_value: {
-    what: 'Estimated cost offset to formal care (hours × policy hour value × prevention multiplier).',
-    fix: 'No cost offset calculable yet. Approve pending volunteer hour logs to populate this metric.',
+    whatKey: 'municipal_reports.readiness_help.municipal_value.what',
+    fixKey: 'municipal_reports.readiness_help.municipal_value.fix',
   },
   participation: {
-    what: 'Distinct members active as supporters or recipients in this period.',
-    fix: 'Below the minimum participation threshold. Continue onboarding members and completing exchanges.',
+    whatKey: 'municipal_reports.readiness_help.participation.what',
+    fixKey: 'municipal_reports.readiness_help.participation.fix',
   },
   partner_network: {
-    what: 'Trusted partner organisations that contributed hours in this period.',
-    fix: 'No trusted organisations active. Onboard organisations via Volunteering → Organisations.',
+    whatKey: 'municipal_reports.readiness_help.partner_network.what',
+    fixKey: 'municipal_reports.readiness_help.partner_network.fix',
   },
   local_exchange: {
-    what: 'Verified exchanges (completed and approved) recorded in this period.',
-    fix: 'No completed exchanges yet. Coordinators should approve pending hour logs.',
+    whatKey: 'municipal_reports.readiness_help.local_exchange.what',
+    fixKey: 'municipal_reports.readiness_help.local_exchange.fix',
   },
 };
 
@@ -414,8 +414,8 @@ export default function MunicipalImpactReportsPage() {
       />
 
       <p className="mb-2 text-xs text-default-400">
-        <strong>PDF export</strong> is formatted for sharing with municipal partners and funders.{' '}
-        <strong>CSV export</strong> gives raw data for spreadsheet analysis or grant reporting.
+        <strong>{t('municipal_reports.export_note.pdf_label')}</strong>{t('municipal_reports.export_note.pdf_text')}{' '}
+        <strong>{t('municipal_reports.export_note.csv_label')}</strong>{t('municipal_reports.export_note.csv_text')}
       </p>
 
       <Card className="mb-4 border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
@@ -423,20 +423,18 @@ export default function MunicipalImpactReportsPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this report</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('municipal_reports.about.title')}</p>
               <p className="text-default-600">
-                The Municipal Impact Report is the evidence pack you share with municipal partners, cantons, and
-                funders to demonstrate the programme's value. It shows verified care hours, active members,
-                partner organisations, and — using the <Abbr term="KISS">KISS</Abbr>/Age-Stiftung methodology — an estimated cost offset
-                to formal care services (<Abbr term="CHF">CHF</Abbr> value of hours × prevention multiplier).
+                {t('municipal_reports.about.body_1_before_kiss')} <Abbr term={t('municipal_reports.about.kiss_abbr')}>{t('municipal_reports.about.kiss_abbr')}</Abbr>
+                {t('municipal_reports.about.body_1_after_kiss')} <Abbr term={t('municipal_reports.about.chf_abbr')}>{t('municipal_reports.about.chf_abbr')}</Abbr>
+                {t('municipal_reports.about.body_1_after_chf')}
               </p>
               <p className="text-default-500">
-                Use the <strong>Audience</strong> toggle to switch the narrative framing: <strong>Canton</strong> —
-                aggregates multiple municipalities and shows cost-avoidance at cantonal scale;{' '}
-                <strong>Municipality</strong> — focuses on local residents reached and partner organisations;{' '}
-                <strong>Cooperative</strong> — shows member retention, reciprocity rate, and coordinator workload.
-                Export as PDF to send to partners or as CSV for further analysis. Save report templates to
-                quickly regenerate the same configuration in future periods.
+                {t('municipal_reports.about.body_2_prefix')} <strong>{t('municipal_reports.audience_selector.title')}</strong>
+                {t('municipal_reports.about.body_2_after_audience')} <strong>{t('municipal_reports.templates.audiences.canton')}</strong>
+                {t('municipal_reports.about.body_2_after_canton')}{' '}
+                <strong>{t('municipal_reports.templates.audiences.municipality')}</strong>{t('municipal_reports.about.body_2_after_municipality')}{' '}
+                <strong>{t('municipal_reports.templates.audiences.cooperative')}</strong>{t('municipal_reports.about.body_2_after_cooperative')}
               </p>
             </div>
           </div>
@@ -678,9 +676,11 @@ export default function MunicipalImpactReportsPage() {
             <CardHeader className="flex flex-col items-start gap-1">
               <h2 className="text-base font-semibold">{t('municipal_reports.sections.readiness')}</h2>
               <p className="text-xs text-default-500">
-                These four signals indicate whether the report has enough data to be convincing to an external audience.
-                <strong className="text-success-600"> Ready</strong> = sufficient data;
-                <strong className="text-warning-600"> Needs data</strong> = metric is below threshold — hover each card for guidance.
+                {t('municipal_reports.readiness_intro.prefix')}
+                <strong className="text-success-600"> {t('municipal_reports.readiness.status.ready')}</strong>
+                {t('municipal_reports.readiness_intro.ready_suffix')}
+                <strong className="text-warning-600"> {t('municipal_reports.readiness.status.needs_data')}</strong>
+                {t('municipal_reports.readiness_intro.needs_data_suffix')}
               </p>
             </CardHeader>
             <Divider />
@@ -691,7 +691,7 @@ export default function MunicipalImpactReportsPage() {
                   <div
                     key={signal.key}
                     className="rounded-lg border border-default-200 p-3"
-                    title={help ? (signal.status === 'needs_data' ? help.fix : help.what) : undefined}
+                    title={help ? t(signal.status === 'needs_data' ? help.fixKey : help.whatKey) : undefined}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-medium text-default-800">{t(`municipal_reports.readiness.${signal.key}`)}</p>
@@ -702,7 +702,7 @@ export default function MunicipalImpactReportsPage() {
                     <p className="mt-2 text-2xl font-semibold text-default-900">{signal.value.toLocaleString(undefined, { maximumFractionDigits: 1 })}</p>
                     {help && (
                       <p className="mt-1 text-xs text-default-400">
-                        {signal.status === 'needs_data' ? help.fix : help.what}
+                        {t(signal.status === 'needs_data' ? help.fixKey : help.whatKey)}
                       </p>
                     )}
                   </div>
@@ -874,6 +874,8 @@ function NarrativeShell({
   description: string;
   children: ReactNode;
 }) {
+  const { t } = useTranslation('admin');
+
   return (
     <Card shadow="sm" className={isActive ? 'border-2 border-primary/40' : 'opacity-70'}>
       <CardHeader className="flex flex-col items-start gap-1">
@@ -881,7 +883,7 @@ function NarrativeShell({
           <h2 className="text-base font-semibold">{title}</h2>
           {isActive && (
             <Chip size="sm" color="primary" variant="flat">
-              In export
+              {t('municipal_reports.narrative.in_export')}
             </Chip>
           )}
         </div>
@@ -906,6 +908,7 @@ function CantonNarrativeSection({
   tenantName: string | null;
   period: Period;
 }) {
+  const { t } = useTranslation('admin');
   const formatter = useMemo(
     () => new Intl.NumberFormat(undefined, { style: 'currency', currency, maximumFractionDigits: 0 }),
     [currency],
@@ -915,11 +918,11 @@ function CantonNarrativeSection({
     return (
       <NarrativeShell
         isActive={isActive}
-        title="Canton (Kantonsrat / regional government)"
-        description="Aggregate impact across municipalities, cost-avoidance, and year-over-year change."
+        title={t('municipal_reports.narrative.canton.empty_title')}
+        description={t('municipal_reports.narrative.canton.empty_description')}
       >
         <p className="text-sm text-default-500">
-          Switch to Canton mode to load the canton-level narrative.
+          {t('municipal_reports.narrative.canton.empty_body')}
         </p>
       </NarrativeShell>
     );
@@ -928,7 +931,7 @@ function CantonNarrativeSection({
   const yoy = variant.yoy_change_percent;
   const yoyChip =
     yoy === null ? (
-      <Chip size="sm" variant="flat">No prior data</Chip>
+      <Chip size="sm" variant="flat">{t('municipal_reports.narrative.no_prior_data')}</Chip>
     ) : (
       <Chip size="sm" color={yoy >= 0 ? 'success' : 'warning'} variant="flat">
         {yoy >= 0 ? '+' : ''}
@@ -939,41 +942,49 @@ function CantonNarrativeSection({
   return (
     <NarrativeShell
       isActive={isActive}
-      title={`Verified support hours${tenantName ? ` - ${tenantName}` : ''} - ${period.from} to ${period.to}`}
-      description="Aggregate impact across municipalities, professional-care cost avoidance, year-over-year trend."
+      title={t('municipal_reports.narrative.canton.title', {
+        tenant: tenantName ? ` - ${tenantName}` : '',
+        from: period.from,
+        to: period.to,
+      })}
+      description={t('municipal_reports.narrative.canton.description')}
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">Municipalities reporting</p>
+          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.canton.municipalities_reporting')}</p>
           <p className="mt-1 text-2xl font-semibold">{variant.aggregate_municipalities_count.toLocaleString()}</p>
           <p className="text-xs text-default-500 mt-1">
-            Aggregate node count contributing to this view.
+            {t('municipal_reports.narrative.canton.municipalities_reporting_desc')}
           </p>
         </div>
         <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">Multi-node total hours</p>
+          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.canton.multi_node_total_hours')}</p>
           <p className="mt-1 text-2xl font-semibold">
             {variant.multi_node_total_hours.toLocaleString(undefined, { maximumFractionDigits: 1 })}
           </p>
-          <p className="text-xs text-default-500 mt-1">Verified across all opted-in nodes.</p>
+          <p className="text-xs text-default-500 mt-1">{t('municipal_reports.narrative.canton.multi_node_total_hours_desc')}</p>
         </div>
         <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">Estimated cost avoidance</p>
+          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.canton.estimated_cost_avoidance')}</p>
           <p className="mt-1 text-2xl font-semibold">{formatter.format(variant.est_cost_avoidance_chf)}</p>
           <p className="text-xs text-default-500 mt-1">
-            Hours x policy value x {variant.cost_avoidance_multiplier.toFixed(1)} (professional-care equivalency).
+            {t('municipal_reports.narrative.canton.estimated_cost_avoidance_desc', {
+              multiplier: variant.cost_avoidance_multiplier.toFixed(1),
+            })}
           </p>
         </div>
       </div>
       <div className="rounded-lg border border-default-200 p-3">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold">Year-over-year change</p>
+          <p className="text-sm font-semibold">{t('municipal_reports.narrative.canton.yoy_change')}</p>
           {yoyChip}
         </div>
         <p className="mt-1 text-xs text-default-500">
-          Prior period: {variant.yoy_prior_period.from} to {variant.yoy_prior_period.to} -
-          {' '}
-          {variant.yoy_prior_hours.toLocaleString(undefined, { maximumFractionDigits: 1 })} verified hours.
+          {t('municipal_reports.narrative.canton.prior_period_detail', {
+            from: variant.yoy_prior_period.from,
+            to: variant.yoy_prior_period.to,
+            hours: variant.yoy_prior_hours.toLocaleString(undefined, { maximumFractionDigits: 1 }),
+          })}
         </p>
       </div>
     </NarrativeShell>
@@ -989,15 +1000,17 @@ function MunicipalityNarrativeSection({
   variant?: MunicipalityVariant;
   period: Period;
 }) {
+  const { t } = useTranslation('admin');
+
   if (!variant) {
     return (
       <NarrativeShell
         isActive={isActive}
-        title="Municipality (Gemeinde)"
-        description="Local participation, named partner orgs, geographic / category split."
+        title={t('municipal_reports.narrative.municipality.empty_title')}
+        description={t('municipal_reports.narrative.municipality.empty_description')}
       >
         <p className="text-sm text-default-500">
-          Switch to Municipality mode to load the municipality-level narrative.
+          {t('municipal_reports.narrative.municipality.empty_body')}
         </p>
       </NarrativeShell>
     );
@@ -1006,43 +1019,43 @@ function MunicipalityNarrativeSection({
   return (
     <NarrativeShell
       isActive={isActive}
-      title={`Community impact - ${period.from} to ${period.to}`}
-      description="Local participation, named partner organisations, geographic / category split, recipient reach."
+      title={t('municipal_reports.narrative.municipality.title', { from: period.from, to: period.to })}
+      description={t('municipal_reports.narrative.municipality.description')}
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">Partner organisations</p>
+          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.municipality.partner_organisations')}</p>
           <p className="mt-1 text-2xl font-semibold">{variant.partner_organisations_count}</p>
           <p className="text-xs text-default-500 mt-1">
-            of {variant.trusted_organisations_total} trusted total.
+            {t('municipal_reports.narrative.municipality.trusted_total', { count: variant.trusted_organisations_total })}
           </p>
         </div>
         <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">Recipients reached</p>
+          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.municipality.recipients_reached')}</p>
           <p className="mt-1 text-2xl font-semibold">{variant.recipients_reached_count.toLocaleString()}</p>
-          <p className="text-xs text-default-500 mt-1">Distinct receivers of completed exchanges.</p>
+          <p className="text-xs text-default-500 mt-1">{t('municipal_reports.narrative.municipality.recipients_reached_desc')}</p>
         </div>
         <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">Top categories</p>
+          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.municipality.top_categories')}</p>
           <p className="mt-1 text-2xl font-semibold">{variant.geographic_distribution.length}</p>
-          <p className="text-xs text-default-500 mt-1">Listed below by hours.</p>
+          <p className="text-xs text-default-500 mt-1">{t('municipal_reports.narrative.municipality.top_categories_desc')}</p>
         </div>
       </div>
 
       <div>
-        <p className="text-sm font-semibold mb-2">Partner organisations (by hours)</p>
+        <p className="text-sm font-semibold mb-2">{t('municipal_reports.narrative.municipality.partner_organisations_by_hours')}</p>
         {variant.partner_organisations.length === 0 ? (
-          <p className="text-sm text-default-500">No partner activity in this period.</p>
+          <p className="text-sm text-default-500">{t('municipal_reports.narrative.municipality.no_partner_activity')}</p>
         ) : (
           <div className="space-y-1">
             {variant.partner_organisations.map((org) => (
               <div key={org.id} className="flex items-center justify-between rounded border border-default-200 px-3 py-2">
                 <div>
                   <p className="text-sm font-medium">{org.name}</p>
-                  <p className="text-xs text-default-500">{org.log_count} logs</p>
+                  <p className="text-xs text-default-500">{t('municipal_reports.narrative.logs_count', { count: org.log_count })}</p>
                 </div>
                 <Chip size="sm" variant="flat" color="success">
-                  {org.hours.toLocaleString(undefined, { maximumFractionDigits: 1 })} h
+                  {t('municipal_reports.values.hours', { count: org.hours.toLocaleString(undefined, { maximumFractionDigits: 1 }) })}
                 </Chip>
               </div>
             ))}
@@ -1051,19 +1064,19 @@ function MunicipalityNarrativeSection({
       </div>
 
       <div>
-        <p className="text-sm font-semibold mb-2">Top 5 categories (geographic / activity split)</p>
+        <p className="text-sm font-semibold mb-2">{t('municipal_reports.narrative.municipality.top_5_categories')}</p>
         {variant.geographic_distribution.length === 0 ? (
-          <p className="text-sm text-default-500">No category data in this period.</p>
+          <p className="text-sm text-default-500">{t('municipal_reports.narrative.municipality.no_category_data')}</p>
         ) : (
           <div className="space-y-1">
             {variant.geographic_distribution.map((cat) => (
               <div key={cat.name} className="flex items-center justify-between rounded border border-default-200 px-3 py-2">
                 <div>
                   <p className="text-sm font-medium">{cat.name}</p>
-                  <p className="text-xs text-default-500">{cat.count} activities</p>
+                  <p className="text-xs text-default-500">{t('municipal_reports.values.activities', { count: cat.count })}</p>
                 </div>
                 <Chip size="sm" variant="flat" color="primary">
-                  {cat.hours.toLocaleString(undefined, { maximumFractionDigits: 1 })} h
+                  {t('municipal_reports.values.hours', { count: cat.hours.toLocaleString(undefined, { maximumFractionDigits: 1 }) })}
                 </Chip>
               </div>
             ))}
@@ -1083,15 +1096,17 @@ function CooperativeNarrativeSection({
   variant?: CooperativeVariant;
   period: Period;
 }) {
+  const { t } = useTranslation('admin');
+
   if (!variant) {
     return (
       <NarrativeShell
         isActive={isActive}
-        title="Cooperative (KISS-Genossenschaft internal)"
-        description="Member retention, hour reciprocity, tandem relationships, coordinator workload, future-care credit pool."
+        title={t('municipal_reports.narrative.cooperative.empty_title')}
+        description={t('municipal_reports.narrative.cooperative.empty_description')}
       >
         <p className="text-sm text-default-500">
-          Switch to Cooperative mode to load the cooperative-internal narrative.
+          {t('municipal_reports.narrative.cooperative.empty_body')}
         </p>
       </NarrativeShell>
     );
@@ -1103,44 +1118,50 @@ function CooperativeNarrativeSection({
   return (
     <NarrativeShell
       isActive={isActive}
-      title={`Cooperative internal report - ${period.from} to ${period.to}`}
-      description="Internal cooperative health: retention, reciprocity, tandems, coordinator load, credit pool."
+      title={t('municipal_reports.narrative.cooperative.title', { from: period.from, to: period.to })}
+      description={t('municipal_reports.narrative.cooperative.description')}
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">Member retention</p>
+          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.cooperative.member_retention')}</p>
           <p className="mt-1 text-2xl font-semibold">{retentionPct}%</p>
           <p className="text-xs text-default-500 mt-1">
-            {variant.retained_members_count} members active in both this period and the prior equivalent period.
+            {t('municipal_reports.narrative.cooperative.member_retention_desc', { count: variant.retained_members_count })}
           </p>
         </div>
         <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">Reciprocity rate</p>
+          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.cooperative.reciprocity_rate')}</p>
           <p className="mt-1 text-2xl font-semibold">{reciprocityPct}%</p>
           <p className="text-xs text-default-500 mt-1">
-            {variant.reciprocal_members_count} supporters also received hours in the period.
+            {t('municipal_reports.narrative.cooperative.reciprocity_rate_desc', { count: variant.reciprocal_members_count })}
           </p>
         </div>
         <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">Active tandems</p>
+          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.cooperative.active_tandems')}</p>
           <p className="mt-1 text-2xl font-semibold">{variant.tandem_count}</p>
-          <p className="text-xs text-default-500 mt-1">Recurring helper/recipient pairs (2+ exchanges).</p>
+          <p className="text-xs text-default-500 mt-1">{t('municipal_reports.narrative.cooperative.active_tandems_desc')}</p>
         </div>
         <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">Coordinator load</p>
+          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.cooperative.coordinator_load')}</p>
           <p className="mt-1 text-2xl font-semibold">{variant.coordinator_load_avg.toFixed(1)}</p>
           <p className="text-xs text-default-500 mt-1">
-            {variant.pending_reviews_total} pending across {variant.coordinator_count} coordinators.
+            {t('municipal_reports.narrative.cooperative.coordinator_load_desc', {
+              pending: variant.pending_reviews_total,
+              coordinators: variant.coordinator_count,
+            })}
           </p>
         </div>
         <div className="rounded-lg border border-default-200 p-3 md:col-span-2">
-          <p className="text-xs uppercase text-default-500">Future-care credit balance pool</p>
+          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.cooperative.future_care_credit_pool')}</p>
           <p className="mt-1 text-2xl font-semibold">
-            {variant.future_care_credit_pool.toLocaleString(undefined, { maximumFractionDigits: 1 })} h
+            {t('municipal_reports.values.hours', {
+              count: variant.future_care_credit_pool.toLocaleString(undefined, { maximumFractionDigits: 1 }),
+            })}
           </p>
           <p className="text-xs text-default-500 mt-1">
-            Sum of positive member balances - the cooperative's implicit future-care reserve.
-            Active member base: {variant.active_members_total.toLocaleString()}.
+            {t('municipal_reports.narrative.cooperative.future_care_credit_pool_desc', {
+              count: variant.active_members_total.toLocaleString(),
+            })}
           </p>
         </div>
       </div>
