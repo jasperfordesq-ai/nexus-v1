@@ -1516,12 +1516,113 @@ body.menu-open {
   }
 }
 
+/* ---------- Technology Partners ---------- */
+.partners-banner {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 3rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.partners-banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-lg);
+}
+
+.partners-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.partner-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  transition: all var(--transition);
+  text-align: center;
+}
+
+.partner-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-light);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(129,140,248,0.1);
+}
+
+.partner-logo {
+  height: 80px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.partner-logo-wide {
+  height: 64px;
+}
+
+.partner-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.partner-desc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin: 0;
+  flex: 1;
+}
+
+.partner-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary-light);
+  transition: color var(--transition);
+  margin-top: auto;
+}
+
+.partner-link:hover {
+  color: var(--primary);
+}
+
+.partner-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  background: rgba(129,140,248,0.1);
+  color: var(--primary-light);
+  border: 1px solid rgba(129,140,248,0.2);
+}
+
 @media (max-width: 480px) {
   .contributors-grid {
     grid-template-columns: 1fr;
   }
 
   .footer-grid-5 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .partners-grid {
     grid-template-columns: 1fr;
   }
 }
