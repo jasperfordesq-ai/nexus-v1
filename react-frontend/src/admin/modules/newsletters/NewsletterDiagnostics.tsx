@@ -10,6 +10,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Button, Card, CardBody, CardHeader, Chip, Progress,
 } from '@heroui/react';
@@ -29,7 +30,8 @@ import { PageHeader } from '../../components';
 import type { NewsletterDiagnostics as DiagnosticsData } from '../../api/types';
 
 export function NewsletterDiagnostics() {
-  usePageTitle("Newsletters");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('newsletters.newsletter_diagnostics_title'));
   const toast = useToast();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
@@ -45,10 +47,10 @@ export function NewsletterDiagnostics() {
       }
     } catch {
       setData(null);
-      toast.error("Failed to load diagnostics");
+      toast.error(t('newsletters.failed_to_load_diagnostics'));
     }
     setLoading(false);
-  }, [toast]);
+  }, [t, toast]);
 
 
   const handleRepairQueue = useCallback(() => {
@@ -96,8 +98,8 @@ export function NewsletterDiagnostics() {
   return (
     <div>
       <PageHeader
-        title={"Newsletter Diagnostics"}
-        description={"Diagnose delivery issues and check newsletter queue health"}
+        title={t('newsletters.newsletter_diagnostics_title')}
+        description={t('newsletters.newsletter_diagnostics_desc')}
         actions={
           <Button
             variant="flat"
@@ -105,7 +107,7 @@ export function NewsletterDiagnostics() {
             onPress={loadData}
             isLoading={loading}
           >
-            {"Refresh"}
+            {t('newsletters.refresh')}
           </Button>
         }
       />
@@ -116,11 +118,11 @@ export function NewsletterDiagnostics() {
           <CardBody className="flex-row items-center gap-4">
             {data && getHealthIcon(data.health_status)}
             <div className="flex-1">
-              <p className="text-lg font-semibold">{"System Health"}</p>
+              <p className="text-lg font-semibold">{t('newsletter_diagnostics.system_health')}</p>
               <p className="text-sm text-default-500">
-                {data?.health_status === 'healthy' && "Healthy"}
-                {data?.health_status === 'warning' && "Warning"}
-                {data?.health_status === 'critical' && "Critical"}
+                {data?.health_status === 'healthy' && t('newsletter_diagnostics.status_healthy')}
+                {data?.health_status === 'warning' && t('newsletter_diagnostics.status_warning')}
+                {data?.health_status === 'critical' && t('newsletter_diagnostics.status_critical')}
               </p>
             </div>
             {data && (
@@ -129,7 +131,7 @@ export function NewsletterDiagnostics() {
                 variant="flat"
                 size="lg"
               >
-                {data.health_status.toUpperCase()}
+                {t(`newsletter_diagnostics.status_${data.health_status}`)}
               </Chip>
             )}
           </CardBody>
@@ -140,41 +142,41 @@ export function NewsletterDiagnostics() {
           <Card>
             <CardHeader className="flex gap-2 items-center">
               <Mail size={20} />
-              <span>{"Queue Status"}</span>
+              <span>{t('newsletter_diagnostics.queue_status')}</span>
             </CardHeader>
             <CardBody className="gap-4">
               {loading ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="text-default-400">{"Loading"}</div>
+                  <div className="text-default-400">{t('newsletter_diagnostics.loading')}</div>
                 </div>
               ) : (
                 <>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-default-600">{"Total"}</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.total')}</span>
                       <span className="font-semibold">{queueTotal.toLocaleString()}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-default-600">{"Pending"}</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.pending')}</span>
                       <Chip size="sm" color="warning" variant="flat">{queuePending}</Chip>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-default-600">{"Sending"}</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.sending')}</span>
                       <Chip size="sm" color="primary" variant="flat">{queueSending}</Chip>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-default-600">{"Sent"}</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.sent')}</span>
                       <Chip size="sm" color="success" variant="flat">{queueSent}</Chip>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-default-600">{"Failed"}</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.failed')}</span>
                       <Chip size="sm" color="danger" variant="flat">{queueFailed}</Chip>
                     </div>
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-default-600">{"Success Rate"}</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.success_rate')}</span>
                       <span className="text-sm font-semibold">{queueHealth.toFixed(1)}%</span>
                     </div>
                     <Progress
@@ -192,7 +194,7 @@ export function NewsletterDiagnostics() {
                       startContent={<Wrench size={16} />}
                       onPress={handleRepairQueue}
                     >
-                      {"View Bounces"}
+                      {t('newsletter_diagnostics.view_bounces')}
                     </Button>
                   )}
                 </>
@@ -204,36 +206,36 @@ export function NewsletterDiagnostics() {
           <Card>
             <CardHeader className="flex gap-2 items-center">
               <Activity size={20} />
-              <span>{"Delivery Health"}</span>
+              <span>{t('newsletter_diagnostics.delivery_health')}</span>
             </CardHeader>
             <CardBody className="gap-4">
               {loading ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="text-default-400">{"Loading"}</div>
+                  <div className="text-default-400">{t('newsletter_diagnostics.loading')}</div>
                 </div>
               ) : (
                 <>
                   <div>
-                    <p className="text-sm text-default-600 mb-2">{"Bounce Rate"}</p>
+                    <p className="text-sm text-default-600 mb-2">{t('newsletter_diagnostics.bounce_rate')}</p>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-bold">
                         {data?.bounce_rate?.toFixed(2) || '0.00'}%
                       </span>
                       {data && data.bounce_rate < 5 && (
-                        <Chip size="sm" color="success" variant="flat">{"Bounce Chip Good"}</Chip>
+                        <Chip size="sm" color="success" variant="flat">{t('newsletter_diagnostics.bounce_chip_good')}</Chip>
                       )}
                       {data && data.bounce_rate >= 5 && data.bounce_rate < 10 && (
-                        <Chip size="sm" color="warning" variant="flat">{"Bounce Chip Warning"}</Chip>
+                        <Chip size="sm" color="warning" variant="flat">{t('newsletter_diagnostics.bounce_chip_warning')}</Chip>
                       )}
                       {data && data.bounce_rate >= 10 && (
-                        <Chip size="sm" color="danger" variant="flat">{"Bounce Chip Critical"}</Chip>
+                        <Chip size="sm" color="danger" variant="flat">{t('newsletter_diagnostics.bounce_chip_critical')}</Chip>
                       )}
                     </div>
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-default-600">{"Health"}</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.health')}</span>
                       <span className="text-sm font-semibold">
                         {data && data.bounce_rate < 5 ? '95%+' : data && data.bounce_rate < 10 ? '85-95%' : '<85%'}
                       </span>
@@ -246,7 +248,7 @@ export function NewsletterDiagnostics() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-default-600 mb-2">{"Sender Score"}</p>
+                    <p className="text-sm text-default-600 mb-2">{t('newsletter_diagnostics.sender_score')}</p>
                     <div className="flex items-baseline gap-2">
                       <span className={`text-3xl font-bold ${
                         (data?.sender_score ?? 100) >= 80 ? 'text-success' :
@@ -266,34 +268,34 @@ export function NewsletterDiagnostics() {
 
                   {data?.sender_score_breakdown && (
                     <div className="space-y-1.5 pt-2 border-t border-default-200">
-                      <p className="text-xs font-medium text-default-500 mb-1">{"Score Breakdown"}</p>
+                      <p className="text-xs font-medium text-default-500 mb-1">{t('newsletter_diagnostics.score_breakdown')}</p>
                       {data.sender_score_breakdown.bounce_penalty > 0 && (
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-default-600">{"Bounce Penalty"}</span>
+                          <span className="text-default-600">{t('newsletter_diagnostics.bounce_penalty')}</span>
                           <span className="text-danger font-medium">-{data.sender_score_breakdown.bounce_penalty}</span>
                         </div>
                       )}
                       {data.sender_score_breakdown.complaint_penalty > 0 && (
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-default-600">{"Complaint Penalty"}</span>
+                          <span className="text-default-600">{t('newsletter_diagnostics.complaint_penalty')}</span>
                           <span className="text-danger font-medium">-{data.sender_score_breakdown.complaint_penalty}</span>
                         </div>
                       )}
                       {data.sender_score_breakdown.failure_penalty > 0 && (
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-default-600">{"Failure Penalty"}</span>
+                          <span className="text-default-600">{t('newsletter_diagnostics.failure_penalty')}</span>
                           <span className="text-danger font-medium">-{data.sender_score_breakdown.failure_penalty}</span>
                         </div>
                       )}
                       {data.sender_score_breakdown.suppression_penalty > 0 && (
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-default-600">{"Suppression Penalty"}</span>
+                          <span className="text-default-600">{t('newsletter_diagnostics.suppression_penalty')}</span>
                           <span className="text-danger font-medium">-{data.sender_score_breakdown.suppression_penalty}</span>
                         </div>
                       )}
                       {data.sender_score_breakdown.volume_bonus > 0 && (
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-default-600">{"Volume Bonus"}</span>
+                          <span className="text-default-600">{t('newsletter_diagnostics.volume_bonus')}</span>
                           <span className="text-success font-medium">+{data.sender_score_breakdown.volume_bonus}</span>
                         </div>
                       )}
@@ -301,7 +303,7 @@ export function NewsletterDiagnostics() {
                        data.sender_score_breakdown.complaint_penalty === 0 &&
                        data.sender_score_breakdown.failure_penalty === 0 &&
                        data.sender_score_breakdown.suppression_penalty === 0 && (
-                        <p className="text-xs text-success">{"No penalties found"}</p>
+                        <p className="text-xs text-success">{t('newsletter_diagnostics.no_penalties')}</p>
                       )}
                     </div>
                   )}
@@ -315,21 +317,21 @@ export function NewsletterDiagnostics() {
         <Card>
           <CardHeader className="flex gap-2 items-center">
             <Settings size={20} />
-            <span>{"Email Configuration"}</span>
+            <span>{t('newsletter_diagnostics.email_configuration')}</span>
           </CardHeader>
           <CardBody>
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="text-default-400">{"Loading"}</div>
+                <div className="text-default-400">{t('newsletter_diagnostics.loading')}</div>
               </div>
             ) : (
               <div className="grid gap-3 md:grid-cols-3">
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-default-100 dark:bg-default-50">
                   {getConfigIcon(data?.configuration?.smtp_configured || false)}
                   <div className="flex-1">
-                    <p className="text-sm font-medium">{"SMTP Configured"}</p>
+                    <p className="text-sm font-medium">{t('newsletter_diagnostics.smtp_configured')}</p>
                     <p className="text-xs text-default-500">
-                      {data?.configuration?.smtp_configured ? "Active" : "Not Configured"}
+                      {data?.configuration?.smtp_configured ? t('newsletter_diagnostics.status_active') : t('newsletter_diagnostics.status_not_configured')}
                     </p>
                   </div>
                 </div>
@@ -337,9 +339,9 @@ export function NewsletterDiagnostics() {
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-default-100 dark:bg-default-50">
                   {getConfigIcon(data?.configuration?.api_configured || false)}
                   <div className="flex-1">
-                    <p className="text-sm font-medium">{"Gmail API"}</p>
+                    <p className="text-sm font-medium">{t('newsletter_diagnostics.gmail_api')}</p>
                     <p className="text-xs text-default-500">
-                      {data?.configuration?.api_configured ? "Active" : "Not Configured"}
+                      {data?.configuration?.api_configured ? t('newsletter_diagnostics.status_active') : t('newsletter_diagnostics.status_not_configured')}
                     </p>
                   </div>
                 </div>
@@ -347,9 +349,9 @@ export function NewsletterDiagnostics() {
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-default-100 dark:bg-default-50">
                   {getConfigIcon(data?.configuration?.tracking_enabled || false)}
                   <div className="flex-1">
-                    <p className="text-sm font-medium">{"Tracking Enabled"}</p>
+                    <p className="text-sm font-medium">{t('newsletter_diagnostics.tracking_enabled')}</p>
                     <p className="text-xs text-default-500">
-                      {data?.configuration?.tracking_enabled ? "Active" : "Disabled"}
+                      {data?.configuration?.tracking_enabled ? t('newsletter_diagnostics.status_active') : t('newsletter_diagnostics.status_disabled')}
                     </p>
                   </div>
                 </div>
@@ -364,31 +366,31 @@ export function NewsletterDiagnostics() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <AlertCircle size={20} className="text-warning" />
-                <span className="font-semibold text-warning">{"Recommendations"}</span>
+                <span className="font-semibold text-warning">{t('newsletter_diagnostics.recommendations')}</span>
               </div>
             </CardHeader>
             <CardBody>
               <ul className="space-y-2 text-sm text-warning-700 dark:text-warning-300">
                 {data.bounce_rate > 5 && (
-                  <li>• {`Rec High Bounce Rate`}</li>
+                  <li>• {t('newsletter_diagnostics.rec_high_bounce_rate')}</li>
                 )}
                 {data.sender_score_breakdown?.complaint_penalty > 0 && (
-                  <li>• {"Rec Spam Complaints"}</li>
+                  <li>• {t('newsletter_diagnostics.rec_spam_complaints')}</li>
                 )}
                 {data.sender_score_breakdown?.suppression_penalty > 5 && (
-                  <li>• {"Rec High Suppression"}</li>
+                  <li>• {t('newsletter_diagnostics.rec_high_suppression')}</li>
                 )}
                 {queueFailed > 10 && (
-                  <li>• {`Rec Failed Sends`}</li>
+                  <li>• {t('newsletter_diagnostics.rec_failed_sends')}</li>
                 )}
                 {data.sender_score < 70 && data.sender_score >= 50 && (
-                  <li>• {"Rec Low Score Warning"}</li>
+                  <li>• {t('newsletter_diagnostics.rec_low_score_warning')}</li>
                 )}
                 {data.sender_score < 50 && (
-                  <li>• {`Rec Low Score Critical`}</li>
+                  <li>• {t('newsletter_diagnostics.rec_low_score_critical')}</li>
                 )}
                 {!data.configuration.smtp_configured && !data.configuration.api_configured && (
-                  <li>• {"Rec No Email Service"}</li>
+                  <li>• {t('newsletter_diagnostics.rec_no_email_service')}</li>
                 )}
               </ul>
             </CardBody>
