@@ -8056,7 +8056,9 @@
     "adjust_time_credits": "Adjust Time Credits",
     "apply_adjustment": "Apply Adjustment",
     "back_to_users": "Back to Users",
-    "badges": "Badges",
+    "badges": {
+      "required": "Obrigatório"
+    },
     "balance_adjusted": "Balance Adjusted",
     "balance_failed": "Balance Failed",
     "balance_invalid": "Balance Invalid",
@@ -8154,7 +8156,191 @@
     "vetting_status": "Vetting Status",
     "welcome_email_failed": "Failed to send welcome email",
     "welcome_email_sent": "Welcome email sent",
-    "withdrawn_on": "Withdrawn on"
+    "withdrawn_on": "Withdrawn on",
+    "actions": {
+      "adjust_balance": "Ajustar equilíbrio",
+      "apply_adjustment": "Aplicar ajuste",
+      "back_to_users": "Voltar para Usuários",
+      "cancel": "Cancelar",
+      "impersonate": "Personificar",
+      "manage": "Gerenciar",
+      "recheck_badges": "Verifique novamente os emblemas",
+      "remove_badge": "Remover selo",
+      "resend_welcome_email": "Reenviar e-mail de boas-vindas",
+      "return_to_list": "Voltar à lista",
+      "save_changes": "Salvar alterações",
+      "send_password_reset": "Enviar redefinição de senha",
+      "set_password": "Definir senha"
+    },
+    "aria": {
+      "remove_badge": "Remover selo: {{name}}",
+      "toggle_global_super_admin": "Alternar superadministrador global",
+      "toggle_municipal_announcer": "Alternar função de locutor municipal",
+      "toggle_tenant_super_admin": "Alternar superadministrador de locatário"
+    },
+    "consents": {
+      "consented": "Consentido",
+      "consented_on": "Consentido em",
+      "given": "Consentimento dado",
+      "not_consented": "Não consentido",
+      "not_given": "Consentimento não dado",
+      "withdrawn_on": "Retirado em"
+    },
+    "descriptions": {
+      "balance_amount": "Use valores negativos para deduzir créditos de tempo deste membro",
+      "cannot_modify_self": "Você não pode modificar sua própria conta neste painel",
+      "global_super_admin": "Concede acesso total a todos os locatários da plataforma",
+      "municipal_announcer": "As postagens deste usuário exibirão um selo oficial e serão fixadas na parte superior do feed",
+      "tenant_super_admin": "Concede acesso total de administrador neste locatário"
+    },
+    "empty": {
+      "no_badges": "Sem emblemas",
+      "no_consent_records": "Nenhum registro de consentimento",
+      "no_insurance_records": "Sem registros de seguro",
+      "no_vetting_records": "Sem registros de verificação"
+    },
+    "errors": {
+      "load_error": "Erro de carregamento",
+      "load_unexpected": "Ocorreu um erro inesperado ao carregar este usuário",
+      "user_not_found": "Usuário não encontrado"
+    },
+    "fields": {
+      "amount": "Quantia",
+      "balance": "Equilíbrio",
+      "bio": "Biografia",
+      "current_balance": "Saldo Atual",
+      "email": "E-mail",
+      "first_name": "Primeiro nome",
+      "last_name": "Sobrenome",
+      "location": "Localização",
+      "new_password": "Nova Senha",
+      "official_announcement_channel": "Canal de anúncio oficial",
+      "organisation_name": "Nome da organização",
+      "phone": "Telefone",
+      "platform_wide_access": "Acesso em toda a plataforma",
+      "profile_type": "Tipo de perfil",
+      "reason": "Razão",
+      "role": "Papel",
+      "status": "Status",
+      "tagline": "Slogan",
+      "tenant_super_admin": "Superadministrador do locatário"
+    },
+    "loading": {
+      "compliance": "Carregando Conformidade",
+      "consents": "Carregando consentimentos",
+      "user": "Carregando usuário"
+    },
+    "meta": {
+      "edit_named": "Editar {{name}}",
+      "edit_user": "Editar usuário",
+      "user_id_joined": "Usuário ID e ingressou"
+    },
+    "modals": {
+      "adjust_balance": {
+        "title": "Ajustar créditos de tempo"
+      },
+      "remove_badge": {
+        "message": "Tem certeza de que deseja remover este selo do membro?",
+        "title": "Remover selo"
+      },
+      "set_password": {
+        "body": "Defina uma nova senha para este usuário. Eles serão desconectados de todas as sessões.",
+        "title": "Definir senha"
+      }
+    },
+    "placeholders": {
+      "balance_amount": "por exemplo 2 ou -1,5",
+      "balance_reason": "Por que você está ajustando esse equilíbrio?",
+      "bio": "Uma breve biografia para este usuário...",
+      "email": "usuário@exemplo.com",
+      "first_name": "Digite o primeiro nome...",
+      "last_name": "Digite o sobrenome...",
+      "location": "por exemplo Nova York, EUA",
+      "new_password": "Nova Senha...",
+      "organisation_name": "Por exemplo, Centro Comunitário...",
+      "phone": "por exemplo +1 555 123 4567",
+      "profile_type": "Selecione Tipo...",
+      "role": "Selecione uma função...",
+      "status": "Selecione um status...",
+      "tagline": "Por exemplo, voluntário da comunidade..."
+    },
+    "profile_types": {
+      "individual": "Individual",
+      "organisation": "Organização"
+    },
+    "roles": {
+      "admin": "Administrador",
+      "broker": "Corretor",
+      "member": "Membro",
+      "moderator": "Moderador",
+      "newsletter_admin": "Administrador do boletim informativo",
+      "tenant_admin": "Administrador de locatário"
+    },
+    "sections": {
+      "account_actions": "Ações da conta",
+      "badges": "Emblemas",
+      "gdpr_consents": "GDPR Consentimentos",
+      "global_super_admin": "Superadministrador Global",
+      "insurance_certificates": "Certificados de Seguro",
+      "municipal_announcer": "Locutor Municipal",
+      "safeguarding": "Salvaguarda",
+      "super_admin_access": "Acesso de superadministrador",
+      "time_credits": "Créditos de tempo",
+      "vetting_status": "Status de verificação"
+    },
+    "statuses": {
+      "active": "Ativo",
+      "banned": "Banido",
+      "pending": "Pendente",
+      "suspended": "Suspenso"
+    },
+    "summary": {
+      "more_certificates": "Mais certificados",
+      "more_records": "Mais registros"
+    },
+    "toasts": {
+      "announcer_failed": "Falha ao atualizar a função de locutor municipal",
+      "announcer_granted": "Função de locutor municipal concedida",
+      "announcer_revoked": "Função de locutor municipal revogada",
+      "balance_adjusted": "Saldo ajustado",
+      "balance_failed": "Falha no saldo",
+      "balance_invalid": "Saldo inválido",
+      "generic_error": "Ocorreu um erro",
+      "global_super_admin_failed": "Falha ao atualizar o status de superadministrador global",
+      "global_super_admin_granted": "Superadministrador global concedido",
+      "global_super_admin_revoked": "Superadministrador global revogado",
+      "impersonate_failed": "Falha na representação",
+      "impersonate_success": "Personificar com sucesso",
+      "password_failed": "Falha na senha",
+      "password_reset_failed": "Falha na redefinição de senha",
+      "password_reset_sent": "E-mail de redefinição de senha enviado",
+      "password_updated": "Senha atualizada",
+      "recheck_complete": "Verifique novamente concluído",
+      "recheck_failed": "Falha na nova verificação",
+      "remove_badge_failed": "Falha ao remover selo",
+      "remove_badge_success": "Remover selo com sucesso",
+      "tenant_super_admin_failed": "Falha ao atualizar o status de superadministrador do locatário",
+      "tenant_super_admin_granted": "Superadministrador do locatário concedido",
+      "tenant_super_admin_revoked": "Superadministrador do locatário revogado",
+      "update_failed": "Falha na atualização",
+      "update_success": "Atualização com sucesso",
+      "welcome_email_failed": "Falha ao enviar e-mail de boas-vindas",
+      "welcome_email_sent": "E-mail de boas-vindas enviado"
+    },
+    "validation": {
+      "email_invalid": "E-mail inválido",
+      "email_required": "E-mail obrigatório",
+      "first_name_required": "O primeiro nome é obrigatório",
+      "last_name_required": "O sobrenome é obrigatório",
+      "password_min": "A senha deve ter pelo menos 8 caracteres",
+      "role_required": "Função necessária",
+      "status_required": "Status obrigatório"
+    },
+    "values": {
+      "expires_prefix": "- Expira",
+      "no_reference": "Sem referência",
+      "unknown_provider": "Provedor desconhecido"
+    }
   },
   "users": {
     "action_approve": "Approve",
@@ -8935,7 +9121,42 @@
     "verify_btn": "Verify",
     "verify_seller_message": "This will mark the seller as verified. Continue?",
     "verify_seller_title": "Verify Seller",
-    "view_all": "View All"
+    "view_all": "View All",
+    "coupons": {
+      "columns": {
+        "actions": "Ações",
+        "code": "Código",
+        "discount": "Desconto",
+        "seller_id": "Vendedor ID",
+        "status": "Status",
+        "title": "Título",
+        "uses": "Usos",
+        "valid_until": "Válido até"
+      },
+      "confirm_delete": "Excluir permanentemente este cupom? Isto não pode ser desfeito.",
+      "confirm_suspend": "Suspender este cupom?",
+      "delete": "Excluir",
+      "deleted": "Cupom excluído",
+      "description": "Supervisão de cupons de desconto emitidos pelo comerciante em todos os vendedores.",
+      "discount_bogo": "BOGO",
+      "discount_fixed": "€{{value}}",
+      "discount_percent": "{{value}}%",
+      "empty": "Sem cupons.",
+      "failed_delete": "Falha ao excluir",
+      "failed_load": "Falha ao carregar cupons",
+      "failed_suspend": "Falha ao suspender",
+      "no_expiry": "-",
+      "page_title": "Cupons de comerciante",
+      "status": {
+        "active": "Ativo",
+        "draft": "Rascunho",
+        "expired": "Expirado",
+        "paused": "Pausado"
+      },
+      "suspend": "Suspender",
+      "suspended": "Cupom suspenso",
+      "table_aria": "Cupons de comerciante"
+    }
   },
   "spam": {
     "title": "Spam Detection",
@@ -12885,6 +13106,112 @@
     },
     "validation": {
       "domain_required": "Insira um domínio"
+    }
+  },
+  "member_premium_admin": {
+    "actions": {
+      "cancel": "Cancelar",
+      "create_tier": "Criar nível",
+      "delete": "Excluir",
+      "edit": "Editar",
+      "new_tier": "Novo nível",
+      "save_changes": "Salvar alterações",
+      "subscribers": "Assinantes",
+      "sync_stripe": "Sincronizar com Stripe"
+    },
+    "confirm_delete": "Excluir camada \"{{name}}\"? Isto não pode ser desfeito.",
+    "empty": {
+      "tiers": "Ainda não há níveis. Crie seu primeiro nível premium acima.",
+      "value": "-"
+    },
+    "form": {
+      "description": "Descrição",
+      "features": "Chaves de recurso (separadas por vírgula)",
+      "features_description": "por exemplo verificado_badge, prioridade_correspondência, pesquisa avançada, ad_free",
+      "name": "Nome",
+      "price_month": "Preço / mês",
+      "price_year": "Preço / ano",
+      "slug": "Lesma",
+      "slug_description": "Letras minúsculas, números, travessões/sublinhados",
+      "sort_order": "Ordem de classificação"
+    },
+    "meta": {
+      "description": "Defina níveis premium pagos que os membros podem assinar. Cada camada desbloqueia chaves de recursos específicas.",
+      "title": "Níveis Premium para Membros"
+    },
+    "modal": {
+      "edit_title": "Editar nível",
+      "new_title": "Novo nível",
+      "stripe_price_note": "Nota: alterar os preços limpa o Stripe Price IDs. Execute \"Sync to Stripe\" depois de salvar para que a finalização da compra funcione novamente."
+    },
+    "status": {
+      "active": "Ativo",
+      "inactive": "Inativo"
+    },
+    "stripe": {
+      "needs_sync": "Precisa de sincronização",
+      "synced": "Sincronizado"
+    },
+    "subscribers_page": {
+      "all": "Todos",
+      "columns": {
+        "email": "EMAIL",
+        "interval": "INTERVALO",
+        "member": "MEMBRO",
+        "next_billing": "PRÓXIMO FATURAMENTO",
+        "started": "INICIADO",
+        "status": "STATUS",
+        "tier": "NÍVEL"
+      },
+      "description": "Membros atualmente inscritos em um nível premium.",
+      "empty": "Nenhum assinante corresponde ao filtro.",
+      "failed_load": "Falha ao carregar assinantes",
+      "interval": {
+        "annual": "Anual",
+        "month": "Mês",
+        "monthly": "Mensal",
+        "year": "Ano",
+        "yearly": "Anual"
+      },
+      "refresh": "Atualizar",
+      "status": {
+        "active": "Ativo",
+        "canceled": "Cancelado",
+        "incomplete": "Incompleto",
+        "past_due": "Vencido",
+        "trialing": "Teste"
+      },
+      "status_filter": "Filtro de status",
+      "table_aria": "Assinantes",
+      "title": "Assinantes Premium",
+      "total": "{{count}} total",
+      "user_fallback": "Usuário #{{id}}"
+    },
+    "table": {
+      "actions": "AÇÕES",
+      "aria": "Camadas premium",
+      "features": "CARACTERÍSTICAS",
+      "name": "NOME",
+      "price_month": "PREÇO / MÊS",
+      "price_year": "PREÇO / ANO",
+      "slug": "SLUG",
+      "status": "STATUS",
+      "stripe": "LISTRA",
+      "subscribers": "ASSINANTES"
+    },
+    "toasts": {
+      "created": "Camada criada",
+      "delete_failed": "Falha na exclusão",
+      "deleted": "Camada excluída",
+      "load_failed": "Falha ao carregar níveis",
+      "save_failed": "Falha ao salvar",
+      "stripe_sync_failed": "Stripe falha na sincronização",
+      "synced": "Sincronizado \"{{name}}\" com Stripe",
+      "updated": "Camada atualizada"
+    },
+    "validation": {
+      "slug_format": "O slug deve estar em letras minúsculas a-z, 0-9, travessões/sublinhados",
+      "slug_name_required": "Slug e Nome são obrigatórios"
     }
   }
 }

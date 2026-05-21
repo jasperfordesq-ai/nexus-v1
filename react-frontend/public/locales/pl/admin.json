@@ -8056,7 +8056,9 @@
     "adjust_time_credits": "Adjust Time Credits",
     "apply_adjustment": "Apply Adjustment",
     "back_to_users": "Back to Users",
-    "badges": "Badges",
+    "badges": {
+      "required": "Wymagany"
+    },
     "balance_adjusted": "Balance Adjusted",
     "balance_failed": "Balance Failed",
     "balance_invalid": "Balance Invalid",
@@ -8154,7 +8156,191 @@
     "vetting_status": "Vetting Status",
     "welcome_email_failed": "Failed to send welcome email",
     "welcome_email_sent": "Welcome email sent",
-    "withdrawn_on": "Withdrawn on"
+    "withdrawn_on": "Withdrawn on",
+    "actions": {
+      "adjust_balance": "Dostosuj balans",
+      "apply_adjustment": "Zastosuj korektę",
+      "back_to_users": "Powrót do Użytkownicy",
+      "cancel": "Anulować",
+      "impersonate": "Personifikować",
+      "manage": "Zarządzać",
+      "recheck_badges": "Sprawdź ponownie odznaki",
+      "remove_badge": "Usuń odznakę",
+      "resend_welcome_email": "Wyślij ponownie wiadomość powitalną",
+      "return_to_list": "Wróć do listy",
+      "save_changes": "Zapisz zmiany",
+      "send_password_reset": "Wyślij reset hasła",
+      "set_password": "Ustaw hasło"
+    },
+    "aria": {
+      "remove_badge": "Usuń odznakę: {{name}}",
+      "toggle_global_super_admin": "Przełącz globalnego superadministratora",
+      "toggle_municipal_announcer": "Przełącz rolę spikera miejskiego",
+      "toggle_tenant_super_admin": "Przełącz superadministratora najemcy"
+    },
+    "consents": {
+      "consented": "Zgodził się",
+      "consented_on": "Zgodził się",
+      "given": "Wyrażono zgodę",
+      "not_consented": "Brak zgody",
+      "not_given": "Nie wyrażono zgody",
+      "withdrawn_on": "Wycofane"
+    },
+    "descriptions": {
+      "balance_amount": "Użyj wartości ujemnych, aby odliczyć kredyty czasowe od tego członka",
+      "cannot_modify_self": "Z poziomu tego panelu nie można modyfikować własnego konta",
+      "global_super_admin": "Zapewnia pełny dostęp wszystkim dzierżawcom na platformie",
+      "municipal_announcer": "Posty tego użytkownika będą oznaczone oficjalną plakietką i będą przypięte na górze kanału",
+      "tenant_super_admin": "Przyznaje pełny dostęp administracyjny w ramach tej dzierżawy"
+    },
+    "empty": {
+      "no_badges": "Żadnych odznak",
+      "no_consent_records": "Brak zapisów dotyczących zgód",
+      "no_insurance_records": "Brak dokumentów ubezpieczeniowych",
+      "no_vetting_records": "Brak protokołów lustracyjnych"
+    },
+    "errors": {
+      "load_error": "Błąd ładowania",
+      "load_unexpected": "Wystąpił nieoczekiwany błąd podczas ładowania tego użytkownika",
+      "user_not_found": "Nie znaleziono użytkownika"
+    },
+    "fields": {
+      "amount": "Kwota",
+      "balance": "Balansować",
+      "bio": "Bio",
+      "current_balance": "Aktualne saldo",
+      "email": "E-mail",
+      "first_name": "Imię",
+      "last_name": "Nazwisko",
+      "location": "Lokalizacja",
+      "new_password": "Nowe hasło",
+      "official_announcement_channel": "Oficjalny kanał ogłoszeń",
+      "organisation_name": "Nazwa organizacji",
+      "phone": "Telefon",
+      "platform_wide_access": "Dostęp na całej platformie",
+      "profile_type": "Typ profilu",
+      "reason": "Powód",
+      "role": "Rola",
+      "status": "Status",
+      "tagline": "Hasło",
+      "tenant_super_admin": "Superadministrator najemcy"
+    },
+    "loading": {
+      "compliance": "Zgodność ładowania",
+      "consents": "Ładowanie zgód",
+      "user": "Ładowanie użytkownika"
+    },
+    "meta": {
+      "edit_named": "Edytuj {{name}}",
+      "edit_user": "Edytuj użytkownika",
+      "user_id_joined": "Użytkownik ID i dołączył"
+    },
+    "modals": {
+      "adjust_balance": {
+        "title": "Dostosuj kredyty czasowe"
+      },
+      "remove_badge": {
+        "message": "Czy na pewno chcesz usunąć tę plakietkę z członka?",
+        "title": "Usuń odznakę"
+      },
+      "set_password": {
+        "body": "Ustaw nowe hasło dla tego użytkownika. Zostaną wylogowani ze wszystkich sesji.",
+        "title": "Ustaw hasło"
+      }
+    },
+    "placeholders": {
+      "balance_amount": "np. 2 lub -1,5",
+      "balance_reason": "Dlaczego korygujesz tę równowagę?",
+      "bio": "Krótka biografia tego użytkownika...",
+      "email": "użytkownik@example.com",
+      "first_name": "Wpisz imię...",
+      "last_name": "Wpisz nazwisko...",
+      "location": "np. Nowy Jork, USA",
+      "new_password": "Nowe hasło...",
+      "organisation_name": "Np. Centrum Społeczności...",
+      "phone": "np. +1 555 123 4567",
+      "profile_type": "Wybierz typ...",
+      "role": "Wybierz rolę...",
+      "status": "Wybierz stan...",
+      "tagline": "Np. wolontariusz społeczny..."
+    },
+    "profile_types": {
+      "individual": "Indywidualny",
+      "organisation": "Organizacja"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "broker": "Pośrednik",
+      "member": "Członek",
+      "moderator": "Moderator",
+      "newsletter_admin": "Administrator biuletynu",
+      "tenant_admin": "Administrator najemcy"
+    },
+    "sections": {
+      "account_actions": "Działania na koncie",
+      "badges": "Odznaki",
+      "gdpr_consents": "GDPR Zgody",
+      "global_super_admin": "Globalny superadministrator",
+      "insurance_certificates": "Certyfikaty ubezpieczeniowe",
+      "municipal_announcer": "Spiker miejski",
+      "safeguarding": "Ochrona",
+      "super_admin_access": "Dostęp superadministratora",
+      "time_credits": "Kredyty czasowe",
+      "vetting_status": "Stan weryfikacji"
+    },
+    "statuses": {
+      "active": "Aktywny",
+      "banned": "Zakazany",
+      "pending": "Aż do",
+      "suspended": "Zawieszony"
+    },
+    "summary": {
+      "more_certificates": "Więcej certyfikatów",
+      "more_records": "Więcej rekordów"
+    },
+    "toasts": {
+      "announcer_failed": "Nie udało się zaktualizować roli spikera miejskiego",
+      "announcer_granted": "Przyznano rolę spikera miejskiego",
+      "announcer_revoked": "Odebrano funkcję spikera miejskiego",
+      "balance_adjusted": "Saldo skorygowane",
+      "balance_failed": "Saldo nie powiodło się",
+      "balance_invalid": "Saldo nieprawidłowe",
+      "generic_error": "Wystąpił błąd",
+      "global_super_admin_failed": "Nie udało się zaktualizować statusu superadministratora globalnego",
+      "global_super_admin_granted": "Przyznano globalnego superadministratora",
+      "global_super_admin_revoked": "Globalny superadministrator został odwołany",
+      "impersonate_failed": "Podszywanie się nie powiodło się",
+      "impersonate_success": "Podszywanie się pomyślnie",
+      "password_failed": "Hasło nie powiodło się",
+      "password_reset_failed": "Resetowanie hasła nie powiodło się",
+      "password_reset_sent": "Wysłano wiadomość e-mail dotyczącą resetowania hasła",
+      "password_updated": "Hasło zaktualizowane",
+      "recheck_complete": "Sprawdź ponownie Ukończono",
+      "recheck_failed": "Ponowne sprawdzenie nie powiodło się",
+      "remove_badge_failed": "Nie udało się usunąć plakietki",
+      "remove_badge_success": "Pomyślnie usuń odznakę",
+      "tenant_super_admin_failed": "Nie udało się zaktualizować statusu superadministratora dzierżawy",
+      "tenant_super_admin_granted": "Przyznano superadministratora najemcy",
+      "tenant_super_admin_revoked": "Superadministrator najemcy został odwołany",
+      "update_failed": "Aktualizacja nie powiodła się",
+      "update_success": "Aktualizacja pomyślnie",
+      "welcome_email_failed": "Nie udało się wysłać wiadomości powitalnej",
+      "welcome_email_sent": "Wiadomość powitalna została wysłana"
+    },
+    "validation": {
+      "email_invalid": "Nieprawidłowy adres e-mail",
+      "email_required": "Wymagany e-mail",
+      "first_name_required": "Imię jest wymagane",
+      "last_name_required": "Nazwisko jest wymagane",
+      "password_min": "Hasło musi mieć co najmniej 8 znaków",
+      "role_required": "Wymagana rola",
+      "status_required": "Stan Wymagany"
+    },
+    "values": {
+      "expires_prefix": "- Wygasa",
+      "no_reference": "Brak odniesienia",
+      "unknown_provider": "Nieznany dostawca"
+    }
   },
   "users": {
     "action_approve": "Approve",
@@ -8935,7 +9121,42 @@
     "verify_btn": "Verify",
     "verify_seller_message": "This will mark the seller as verified. Continue?",
     "verify_seller_title": "Verify Seller",
-    "view_all": "View All"
+    "view_all": "View All",
+    "coupons": {
+      "columns": {
+        "actions": "Działania",
+        "code": "Kod",
+        "discount": "Rabat",
+        "seller_id": "Sprzedawca ID",
+        "status": "Status",
+        "title": "Tytuł",
+        "uses": "Używa",
+        "valid_until": "Ważne do"
+      },
+      "confirm_delete": "Trwale usunąć ten kupon? Tego nie można cofnąć.",
+      "confirm_suspend": "Zawiesić ten kupon?",
+      "delete": "Usuwać",
+      "deleted": "Kupon usunięty",
+      "description": "Nadzór nad kuponami rabatowymi wydawanymi przez handlowców u wszystkich sprzedawców.",
+      "discount_bogo": "BOGO",
+      "discount_fixed": "€{{value}}",
+      "discount_percent": "{{value}}%",
+      "empty": "Żadnych kuponów.",
+      "failed_delete": "Nie udało się usunąć",
+      "failed_load": "Nie udało się załadować kuponów",
+      "failed_suspend": "Nie udało się zawiesić",
+      "no_expiry": "-",
+      "page_title": "Kupony handlowe",
+      "status": {
+        "active": "Aktywny",
+        "draft": "Projekt",
+        "expired": "Wygasły",
+        "paused": "Wstrzymano"
+      },
+      "suspend": "Wstrzymać",
+      "suspended": "Kupon zawieszony",
+      "table_aria": "Kupony handlowe"
+    }
   },
   "spam": {
     "title": "Spam Detection",
@@ -12885,6 +13106,112 @@
     },
     "validation": {
       "domain_required": "Wpisz domenę"
+    }
+  },
+  "member_premium_admin": {
+    "actions": {
+      "cancel": "Anulować",
+      "create_tier": "Utwórz poziom",
+      "delete": "Usuwać",
+      "edit": "Redagować",
+      "new_tier": "Nowy poziom",
+      "save_changes": "Zapisz zmiany",
+      "subscribers": "Abonenci",
+      "sync_stripe": "Synchronizuj z Stripe"
+    },
+    "confirm_delete": "Usunąć poziom „{{name}}”? Tego nie można cofnąć.",
+    "empty": {
+      "tiers": "Nie ma jeszcze poziomów. Utwórz powyżej swój pierwszy poziom premium.",
+      "value": "-"
+    },
+    "form": {
+      "description": "Opis",
+      "features": "Klawisze funkcyjne (oddzielone przecinkami)",
+      "features_description": "np. zweryfikowana_badge, dopasowanie_priorytetu, zaawansowane_wyszukiwanie, brak reklam",
+      "name": "Nazwa",
+      "price_month": "Cena / miesiąc",
+      "price_year": "Cena / rok",
+      "slug": "Ślimak",
+      "slug_description": "Małe litery, cyfry, myślniki/podkreślenia",
+      "sort_order": "Kolejność sortowania"
+    },
+    "meta": {
+      "description": "Zdefiniuj płatne poziomy premium, które członkowie mogą subskrybować. Każdy poziom odblokowuje określone klucze funkcji.",
+      "title": "Poziomy premium dla członków"
+    },
+    "modal": {
+      "edit_title": "Edytuj poziom",
+      "new_title": "Nowy poziom",
+      "stripe_price_note": "Uwaga: zmiana cen kasuje Stripe Price IDs. Po zapisaniu uruchom opcję „Synchronizuj z Stripe”, aby transakcja ponownie działała."
+    },
+    "status": {
+      "active": "Aktywny",
+      "inactive": "Nieaktywny"
+    },
+    "stripe": {
+      "needs_sync": "Potrzebuje synchronizacji",
+      "synced": "Zsynchronizowane"
+    },
+    "subscribers_page": {
+      "all": "Wszystko",
+      "columns": {
+        "email": "EMAIL",
+        "interval": "INTERWAŁ",
+        "member": "CZŁONEK",
+        "next_billing": "NASTĘPNE ROZLICZENIE",
+        "started": "ROZPOCZĘTO",
+        "status": "STATUS",
+        "tier": "SZCZEBEL"
+      },
+      "description": "Członkowie obecnie subskrybują poziom premium.",
+      "empty": "Żaden subskrybent nie pasuje do filtra.",
+      "failed_load": "Nie udało się wczytać subskrybentów",
+      "interval": {
+        "annual": "Coroczny",
+        "month": "Miesiąc",
+        "monthly": "Miesięczny",
+        "year": "Rok",
+        "yearly": "Rocznie"
+      },
+      "refresh": "Odświeżać",
+      "status": {
+        "active": "Aktywny",
+        "canceled": "Odwołany",
+        "incomplete": "Niekompletny",
+        "past_due": "Przeterminowany",
+        "trialing": "Próba"
+      },
+      "status_filter": "Filtr stanu",
+      "table_aria": "Abonenci",
+      "title": "Subskrybenci Premium",
+      "total": "{{count}} łącznie",
+      "user_fallback": "Użytkownik #{{id}}"
+    },
+    "table": {
+      "actions": "DZIAŁANIA",
+      "aria": "Poziomy premium",
+      "features": "CECHY",
+      "name": "NAZWA",
+      "price_month": "CENA / MIESIĄC",
+      "price_year": "CENA / ROK",
+      "slug": "ŚLIMAK",
+      "status": "STATUS",
+      "stripe": "NASZYWKA",
+      "subscribers": "SUBSKRYBENCI"
+    },
+    "toasts": {
+      "created": "Poziom został utworzony",
+      "delete_failed": "Usunięcie nie powiodło się",
+      "deleted": "Poziom usunięty",
+      "load_failed": "Nie udało się wczytać poziomów",
+      "save_failed": "Zapisywanie nie powiodło się",
+      "stripe_sync_failed": "Stripe synchronizacja nie powiodła się",
+      "synced": "Zsynchronizowano „{{name}}” z Stripe",
+      "updated": "Poziom zaktualizowany"
+    },
+    "validation": {
+      "slug_format": "Informacje muszą być pisane małymi literami a–z, 0–9, myślnikami/podkreśleniami",
+      "slug_name_required": "Wymagane są Slug i Imię"
     }
   }
 }
