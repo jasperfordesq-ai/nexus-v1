@@ -4543,7 +4543,27 @@
     "jwt_federation_auth_platform_title": "JWT-based federation auth is configured at platform level",
     "label_super_admin": "Super Admin",
     "analytics": {
-      "title": "Federation Analytics"
+      "title": "تحليلات الاتحاد",
+      "chart_daily_calls": "المكالمات اليومية API",
+      "chart_top_partners": "كبار الشركاء",
+      "col_ip": "الملكية الفكرية",
+      "description": "عرض التحليلات الخاصة بالنشاط عبر المجتمع وصحة الشراكة",
+      "kpi_active_partnerships": "الشراكات النشطة",
+      "kpi_external_partners": "الشركاء الخارجيين",
+      "kpi_federated_listings": "القوائم الموحدة",
+      "kpi_federated_messages": "الرسائل الموحدة",
+      "kpi_federated_transactions": "المعاملات الاتحادية",
+      "kpi_inbound_reviews": "المراجعات الواردة",
+      "kpi_pending_partnerships": "الشراكات المعلقة",
+      "kpi_total_partnerships": "مجموع الشراكات",
+      "kpi_window": "النطاق المحدد",
+      "no_partner_activity": "لم يتم العثور على أي نشاط شريك",
+      "no_recent_errors": "لم يتم العثور على أي أخطاء حديثة",
+      "range_30d": "آخر 30 يومًا",
+      "range_7d": "آخر 7 أيام",
+      "range_90d": "آخر 90 يومًا",
+      "range_label": "نطاق التحليلات",
+      "recent_errors": "الأخطاء الأخيرة"
     },
     "partnerships": {
       "bulk_approved_count": "Approved {{count}} partnership request",
@@ -13212,6 +13232,217 @@
     "validation": {
       "slug_format": "يجب أن يكون الرقم الثابت عبارة عن أحرف صغيرة من a إلى z، ومن 0 إلى 9، وشرطات/شرطات سفلية",
       "slug_name_required": "سبيكة والاسم مطلوبة"
+    }
+  },
+  "national_kiss_dashboard": {
+    "about": {
+      "body_prefix": "KISS (Koordination und Innovation für Soziales) هي منهجية سويسرية لتنسيق الرعاية المجتمعية تم تطويرها بواسطة Age-Stiftung. تقوم لوحة التحكم الخاصة بالمشرف المتميز هذه بتجميع المقاييس عبر كل تعاونية NEXUS تدير برنامج Caring Community على المستوى الوطني - مما يمنح المؤسسة",
+      "body_suffix": "وجهة نظر تعاونية مشتركة لساعات التبادل ومشاركة الأعضاء والصحة التعاونية. يتم عرض أعداد الأعضاء كأقواس للحفاظ على الخصوصية (على سبيل المثال، \"50-99\") بدلاً من الأرقام الدقيقة.",
+      "health_prefix": "استخدم محدد الفترة لمقارنة الأرباع. يصنف الجدول المقارن التعاونيات حسب ساعات العمل أو الأعضاء أو الحالة الصحية. الحالة الصحية مستمدة من اتجاهات النشاط:",
+      "stable_definition": "نشاط مسطح,",
+      "struggling_definition": "انخفاض النشاط أو المشاركة المنخفضة جدًا.",
+      "thriving_definition": "ينمو بسرعة،",
+      "title": "حول لوحة القيادة هذه"
+    },
+    "actions": {
+      "refresh": "ينعش"
+    },
+    "comparative": {
+      "aria": "المقاييس المقارنة من قبل التعاونية",
+      "cooperative": "تعاونية",
+      "empty_middle": "التعاونيات تكوينها حتى الآن. اذهب الى",
+      "empty_prefix": "لا",
+      "empty_suffix": "وقم بتعيين فئة المستأجر على",
+      "empty_tail": "على مستأجر واحد على الأقل لملء لوحة المعلومات هذه.",
+      "hours_sort": "ساعات <->",
+      "hours_title": "إجمالي ساعات الرعاية التي تم التحقق منها في الفترة المحددة",
+      "members": "أعضاء",
+      "members_title": "يظهر عدد الأعضاء النشطين على شكل شريحة للحفاظ على الخصوصية",
+      "recipients": "المستلمون",
+      "recipients_title": "تم الوصول إلى متلقي الرعاية (شريحة الحفاظ على الخصوصية)",
+      "reciprocity_sort": "المعاملة بالمثل <->",
+      "reciprocity_title": "نسبة المؤيدين الذين حصلوا أيضًا على ساعات في الفترة - تشير إلى صحة التبادل المتبادل",
+      "retention_sort": "الاحتفاظ <->",
+      "retention_title": "النسبة المئوية للأعضاء النشطين في كل من هذه الفترة والفترة المماثلة السابقة",
+      "sort_hint": "انقر فوق عمود للفرز",
+      "status": "حالة",
+      "super_admin_tenants": "المشرف المتميز -> المستأجرين",
+      "tandems_sort": "جنبا إلى جنب <->",
+      "tandems_title": "أزواج المساعد/المستلم المتكررة مع أكثر من 2 عمليات تبادل مكتملة",
+      "title": "مقاييس المقارنة"
+    },
+    "empty": {
+      "no_active_cooperatives": "لا توجد تعاونيات نشطة في هذه الفترة.",
+      "no_data": "لا توجد بيانات."
+    },
+    "filters": {
+      "from": "من",
+      "from_aria": "الفترة من",
+      "period": "فترة",
+      "period_aria": "فترة التقرير",
+      "to": "ل",
+      "to_aria": "فترة ل"
+    },
+    "footer": {
+      "generated_at": "تم إنشاؤها في {{date}}.",
+      "privacy_note": "يتم الإبلاغ عن أعداد الأعضاء بين قوسين للحفاظ على الخصوصية - ولا تظهر معرفات الأعضاء الفردية في أي مكان في هذه الصفحة."
+    },
+    "health_legend": {
+      "privacy_note": "يتم عرض أعداد الأعضاء بين قوسين للحفاظ على الخصوصية (على سبيل المثال، \"50-99\") - ولا تظهر هنا أي بيانات فردية على الإطلاق.",
+      "stable": "نشاط ثابت (+/-10%)",
+      "struggling": "انخفاض النشاط أو أقل من 5 ساعات تم التحقق منها في الفترة",
+      "thriving": "ساعات النمو بقوة (> 10% مقارنة بالفترة السابقة)",
+      "title": "مفتاح الحالة الصحية:"
+    },
+    "inline": {
+      "active_members": "الأعضاء النشطين:",
+      "recipients_reached": "تم الوصول إلى المستلمين:",
+      "safeguarding_reports": "تقارير الحماية:"
+    },
+    "leaderboards": {
+      "bottom_title": "أسفل 5 (نشط فقط)",
+      "top_title": "أعلى 5 ساعات"
+    },
+    "meta": {
+      "description": "عرض المشرف المتميز التعاوني عبر كل تعاونية KISS على النظام الأساسي. يتم الإبلاغ عن أعداد الأعضاء بين قوسين للحفاظ على الخصوصية.",
+      "page_title": "Fondation KISS - لوحة المعلومات الوطنية",
+      "title": "Fondation KISS - لوحة المعلومات الوطنية"
+    },
+    "metrics": {
+      "yoy": "{{value}} YoY"
+    },
+    "periods": {
+      "custom": "نطاق مخصص",
+      "last_quarter": "الربع الأخير (90 يومًا)",
+      "last_year": "العام الماضي",
+      "this_month": "هذا الشهر"
+    },
+    "stats": {
+      "active_cooperatives": "التعاونيات النشطة",
+      "active_description": "{{active}} من {{total}} نشط في الفترة",
+      "active_tandems": "ترادفات نشطة",
+      "total_cooperatives": "إجمالي التعاونيات",
+      "total_hours": "إجمالي الساعات (وطني)"
+    },
+    "status": {
+      "stable": "مستقر",
+      "struggling": "يكافح",
+      "thriving": "مزدهرة"
+    },
+    "toasts": {
+      "load_failed": "فشل تحميل لوحة القيادة"
+    },
+    "trend": {
+      "active_cooperatives": "التعاونيات النشطة",
+      "cooperatives_axis": "التعاونيات",
+      "empty": "لا توجد بيانات الاتجاه المتاحة.",
+      "hours_axis": "ساعات",
+      "title": "الاتجاه الوطني لمدة 12 شهرا",
+      "total_hours_all": "إجمالي الساعات (جميع التعاونيات)"
+    }
+  },
+  "success_stories_admin": {
+    "about": {
+      "body": "بطاقات الإثبات عبارة عن قصص تأثير منظمة مرتبطة بالمقاييس المباشرة من النظام الأساسي. تعرض كل بطاقة مقارنة قبل/بعد مع مصدر الدليل المستشهد به ومذكرة المنهجية. البطاقات التي تحمل علامة \"تجريبية\" هي بطاقات توضيحية فقط؛ ضع علامة على البطاقة على أنها \"دليل حقيقي\" بمجرد التحقق من البيانات. تظهر البطاقات المنشورة في تقرير التأثير البلدي وصفحة التأثير العامة.",
+      "title": "حول هذه الصفحة"
+    },
+    "actions": {
+      "cancel": "يلغي",
+      "create_story": "إنشاء قصة",
+      "delete": "يمسح",
+      "edit": "يحرر",
+      "new_story": "قصة جديدة",
+      "refresh": "ينعش",
+      "refresh_live": "تحديث من البيانات الحية",
+      "remove": "يزيل",
+      "save_changes": "حفظ التغييرات",
+      "seed_demo": "البذور 3 بطاقات العرض التوضيحي"
+    },
+    "audience": {
+      "all_residents": "جميع السكان",
+      "kanton": "كانتون",
+      "municipality": "بلدية",
+      "recipients": "متلقي الرعاية",
+      "verein_members": "أعضاء فيرين",
+      "volunteers": "المتطوعين"
+    },
+    "delete_modal": {
+      "body_prefix": "سيؤدي هذا إلى إزالة بشكل دائم",
+      "body_suffix": "من المعرض.",
+      "title": "إزالة قصة النجاح",
+      "warning": "لا يمكن التراجع عن هذا الإجراء."
+    },
+    "editor": {
+      "after_value": "بعد القيمة",
+      "audience": "جمهور",
+      "before_value": "قبل القيمة",
+      "demo_description": "تم تصنيف البطاقة على أنها عرض توضيحي في المعرض",
+      "demo_label": "تجريبي / توضيحي",
+      "edit_title": "تحرير: {{title}}",
+      "evidence_source": "مصدر الأدلة",
+      "evidence_source_description": "مطلوب - من أين يأتي الرقم. مثال: \"بيانات النظام الأساسي NEXUS، فترة متجددة مدتها 90 يومًا تنتهي في 01-04-2026\" أو \"Swiss Federal Statistical Office 2023.\"",
+      "evidence_source_placeholder": "على سبيل المثال \"AG83 لوحة النتائج التجريبية 30/04/2026 خط الأساس\"",
+      "method_caveat": "تحذير الطريقة",
+      "method_caveat_description": "مطلوب - ملاحظة من جملة واحدة حول قيود المنهجية. يحافظ على المطالبات صادقة مع الممولين. مثال: \"استنادًا إلى ساعات العمل المبلغ عنها ذاتيًا؛ التدقيق الخارجي معلق.'",
+      "method_caveat_placeholder": "على سبيل المثال \"المنطقة التجريبية فقط؛ العدد = 42 عضوًا؛ نافذة لمدة 90 يومًا\"",
+      "metric_key": "مفتاح متري",
+      "metric_key_description": "مطلوب للمصادر غير اليدوية",
+      "metric_key_placeholder": "على سبيل المثال المعتمدة_ساعات،formal_care_offset_chf",
+      "metric_source": "مصدر متري",
+      "metric_source_description": "Pilot_scoreboard: السحب التلقائي من AG83؛ Municipal_roi: عمليات السحب التلقائي من AG76؛ يدوي: تقوم بإدخال القيم يدويًا.",
+      "narrative": "رواية",
+      "narrative_placeholder": "2-4 جمل تشرح القصة لمسؤول المشتريات أو الممول.",
+      "new_title": "قصة نجاح جديدة",
+      "published_description": "مرئي في المعرض الذي يواجه الأعضاء",
+      "published_label": "تم النشر",
+      "sub_region_id": "المنطقة الفرعية ID (اختياري)",
+      "sub_region_placeholder": "اتركه فارغا للجميع",
+      "title": "عنوان",
+      "title_placeholder": "على سبيل المثال جهد أقل في توزيع المعلومات بنسبة 30%",
+      "unit": "وحدة",
+      "unit_placeholder": "على سبيل المثال ساعات، CHF، %"
+    },
+    "empty": {
+      "body": "قم بتأسيس 3 بطاقات توضيحية توضيحية لإظهار الشكل الذي تبدو عليه بطاقات الإثبات لمسؤولي المشتريات والممولين. يتم تصنيفها بوضوح على أنها \"تجريبية/توضيحية\" حتى يتم وضع علامة عليها كدليل حقيقي يدويًا.",
+      "title": "لا توجد قصص نجاح حتى الآن"
+    },
+    "meta": {
+      "subtitle": "قم بإنشاء وإدارة بطاقات إثبات توضح تأثير المجتمع - مصممة للمشاركة مع مسؤولي المشتريات والممولين وشركاء البلديات.",
+      "title": "قصص النجاح"
+    },
+    "metric_sources": {
+      "manual": "دليل / توضيحي",
+      "municipal_roi": "AG76 بلدية ROI",
+      "pilot_scoreboard": "AG83 لوحة النتائج التجريبية"
+    },
+    "status": {
+      "demo": "تجريبي",
+      "published": "تم النشر",
+      "real": "حقيقي",
+      "unpublished": "غير منشورة"
+    },
+    "table": {
+      "actions": "الإجراءات",
+      "aria": "قصص النجاح",
+      "audience": "جمهور",
+      "demo": "تجريبي",
+      "metric": "متري",
+      "row_actions": "إجراءات الصف",
+      "status": "حالة",
+      "title": "عنوان"
+    },
+    "toasts": {
+      "create_failed": "فشل الإنشاء",
+      "created": "تم إنشاء القصة",
+      "delete_failed": "فشل الحذف",
+      "load_failed": "فشل تحميل قصص النجاح",
+      "metric_refreshed": "تم تحديث المقياس المباشر",
+      "refresh_failed": "فشل التحديث",
+      "removed": "تمت إزالة القصة",
+      "seed_failed": "فشلت البذور",
+      "seeded": "المصنف 3 بطاقات تجريبية",
+      "update_failed": "فشل التحديث",
+      "updated": "تم تحديث القصة"
     }
   }
 }

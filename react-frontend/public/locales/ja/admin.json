@@ -4543,7 +4543,27 @@
     "jwt_federation_auth_platform_title": "JWT-based federation auth is configured at platform level",
     "label_super_admin": "Super Admin",
     "analytics": {
-      "title": "Federation Analytics"
+      "title": "フェデレーション分析",
+      "chart_daily_calls": "毎日の API 通話",
+      "chart_top_partners": "トップパートナー",
+      "col_ip": "IP",
+      "description": "コミュニティ間の活動とパートナーシップの健全性に関する分析を表示する",
+      "kpi_active_partnerships": "積極的なパートナーシップ",
+      "kpi_external_partners": "外部パートナー",
+      "kpi_federated_listings": "フェデレーテッド リスティング",
+      "kpi_federated_messages": "フェデレーションメッセージ",
+      "kpi_federated_transactions": "フェデレーショントランザクション",
+      "kpi_inbound_reviews": "インバウンドレビュー",
+      "kpi_pending_partnerships": "保留中のパートナーシップ",
+      "kpi_total_partnerships": "トータルパートナーシップ",
+      "kpi_window": "選択範囲",
+      "no_partner_activity": "パートナーアクティビティが見つかりません",
+      "no_recent_errors": "最近のエラーは見つかりませんでした",
+      "range_30d": "過去 30 日間",
+      "range_7d": "過去 7 日間",
+      "range_90d": "過去90日間",
+      "range_label": "分析範囲",
+      "recent_errors": "最近のエラー"
     },
     "partnerships": {
       "bulk_approved_count": "Approved {{count}} partnership request",
@@ -13212,6 +13232,217 @@
     "validation": {
       "slug_format": "スラグは小文字の a ～ z、0 ～ 9、ダッシュ/アンダースコアでなければなりません",
       "slug_name_required": "スラッグと名前は必須です"
+    }
+  },
+  "national_kiss_dashboard": {
+    "about": {
+      "body_prefix": "KISS (Coordination und Innovation fur Soziales) は、Age-Stiftung と開発された地域ベースのケア調整のためのスイスの方法論です。このスーパー管理者ダッシュボードは、全国的にケアリング コミュニティ プログラムを実行しているすべての NEXUS 協同組合の指標を集計し、財団に提供します。",
+      "body_suffix": "交換時間、メンバーの参加、協同組合の健全性を協同組合全体で見ることができます。メンバー数は、正確な数字ではなく、プライバシー保護のため括弧書き (例: 「50-99」) で表示されます。",
+      "health_prefix": "期間セレクターを使用して四半期を比較します。比較表では、協同組合を営業時間、組合員、または健康状態によってランク付けしています。健康状態は活動の傾向から導き出されます。",
+      "stable_definition": "フラットなアクティビティ、",
+      "struggling_definition": "アクティビティが低下しているか、エンゲージメントが非常に低い。",
+      "thriving_definition": "急速に成長し、",
+      "title": "このダッシュボードについて"
+    },
+    "actions": {
+      "refresh": "リフレッシュ"
+    },
+    "comparative": {
+      "aria": "協同組合ごとの比較指標",
+      "cooperative": "協同組合",
+      "empty_middle": "協同組合はまだ設定されていません。に行く",
+      "empty_prefix": "いいえ",
+      "empty_suffix": "テナント カテゴリを次のように設定します。",
+      "empty_tail": "少なくとも 1 つのテナントでこのダッシュボードに入力します。",
+      "hours_sort": "営業時間 <->",
+      "hours_title": "選択した期間の検証済みケア時間の合計",
+      "members": "メンバー",
+      "members_title": "アクティブなメンバー数はプライバシー保護括弧として表示されます",
+      "recipients": "受信者",
+      "recipients_title": "要介護者に到達（プライバシー保護枠）",
+      "reciprocity_sort": "互恵性 <->",
+      "reciprocity_title": "期間中に時間も受け取ったサポーターの割合 - 相互交流の健全性を示す",
+      "retention_sort": "保持 <->",
+      "retention_title": "この期間と以前の同等の期間の両方でアクティブだったメンバーの割合",
+      "sort_hint": "列をクリックして並べ替えます",
+      "status": "状態",
+      "super_admin_tenants": "スーパー管理者 -> テナント",
+      "tandems_sort": "タンデム <->",
+      "tandems_title": "2 回以上の交換が完了した繰り返しのヘルパー/受信者のペア",
+      "title": "比較指標"
+    },
+    "empty": {
+      "no_active_cooperatives": "この期間に活動している協同組合はありません。",
+      "no_data": "データがありません。"
+    },
+    "filters": {
+      "from": "から",
+      "from_aria": "からの期間",
+      "period": "期間",
+      "period_aria": "報告期間",
+      "to": "に",
+      "to_aria": "までの期間"
+    },
+    "footer": {
+      "generated_at": "{{date}} で生成されます。",
+      "privacy_note": "メンバー数はプライバシー保護のため括弧内に報告されます。このページには個々のメンバー ID は表示されません。"
+    },
+    "health_legend": {
+      "privacy_note": "会員数はプライバシー保護のため括弧書きで表示されます (例: 「50-99」)。ここでは個人データは一切公開されません。",
+      "stable": "平坦なアクティビティ (+/-10%)",
+      "struggling": "活動性が低下しているか、確認された期間が 5 時間未満である",
+      "thriving": "時間数は大幅に増加 (前期比 >10%)",
+      "title": "健康状態キー:"
+    },
+    "inline": {
+      "active_members": "アクティブなメンバー:",
+      "recipients_reached": "受信者に到達しました:",
+      "safeguarding_reports": "レポートの保護:"
+    },
+    "leaderboards": {
+      "bottom_title": "下位 5 (アクティブのみ)",
+      "top_title": "時間別トップ 5"
+    },
+    "meta": {
+      "description": "プラットフォーム上のすべての KISS 協同組合にわたる協同組合間のスーパー管理者ビュー。メンバー数はプライバシー保護のため括弧書きで報告されます。",
+      "page_title": "Fondation KISS - 全国ダッシュボード",
+      "title": "Fondation KISS - 全国ダッシュボード"
+    },
+    "metrics": {
+      "yoy": "{{value}} YoY"
+    },
+    "periods": {
+      "custom": "カスタム範囲",
+      "last_quarter": "最後の四半期 (90 日)",
+      "last_year": "去年",
+      "this_month": "今月"
+    },
+    "stats": {
+      "active_cooperatives": "活発な協同組合",
+      "active_description": "{{active}}/{{total}} が期間内にアクティブです",
+      "active_tandems": "アクティブタンデム",
+      "total_cooperatives": "協同組合合計",
+      "total_hours": "合計時間（国内）"
+    },
+    "status": {
+      "stable": "安定した",
+      "struggling": "もがく",
+      "thriving": "繁栄する"
+    },
+    "toasts": {
+      "load_failed": "ダッシュボードの読み込みに失敗しました"
+    },
+    "trend": {
+      "active_cooperatives": "活発な協同組合",
+      "cooperatives_axis": "協同組合",
+      "empty": "利用可能な傾向データはありません。",
+      "hours_axis": "営業時間",
+      "title": "全国の 12 か月の傾向",
+      "total_hours_all": "合計時間（すべての協同組合）"
+    }
+  },
+  "success_stories_admin": {
+    "about": {
+      "body": "プルーフ カードは、プラットフォームからのライブ メトリクスに関連付けられた構造化された影響ストーリーです。各カードには、引用された証拠ソースおよび方法論のメモとの前後の比較が表示されます。 「デモ」とマークされているカードは説明のみを目的としています。データを検証したら、カードを「本物の証拠」としてマークします。公開されたカードは、地方自治体の影響レポートおよび一般向けの影響ページに表示されます。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "cancel": "キャンセル",
+      "create_story": "ストーリーを作成する",
+      "delete": "消去",
+      "edit": "編集",
+      "new_story": "新しい物語",
+      "refresh": "リフレッシュ",
+      "refresh_live": "ライブデータから更新する",
+      "remove": "取り除く",
+      "save_changes": "変更を保存する",
+      "seed_demo": "シード 3 デモ カード"
+    },
+    "audience": {
+      "all_residents": "住民の皆様",
+      "kanton": "カントン",
+      "municipality": "自治体",
+      "recipients": "要介護者",
+      "verein_members": "ヴェラインのメンバー",
+      "volunteers": "ボランティア"
+    },
+    "delete_modal": {
+      "body_prefix": "これにより完全に削除されます",
+      "body_suffix": "ギャラリーから。",
+      "title": "成功事例を削除する",
+      "warning": "この操作は元に戻すことができません。"
+    },
+    "editor": {
+      "after_value": "後の値",
+      "audience": "観客",
+      "before_value": "前の値",
+      "demo_description": "カードはギャラリー上でデモとしてラベル付けされています",
+      "demo_label": "デモ/説明",
+      "edit_title": "編集: {{title}}",
+      "evidence_source": "証拠の出典",
+      "evidence_source_description": "必須 - 番号の由来。例: 「NEXUS プラットフォーム データ、2026 年 4 月 1 日までの 90 日間のローリング ウィンドウ」または「Swiss Federal Statistical Office 2023」。",
+      "evidence_source_placeholder": "例えば「AG83 パイロット スコアボード 2026-04-30 ベースライン」",
+      "method_caveat": "メソッドに関する注意事項",
+      "method_caveat_description": "必須 - 方法論の制限に関する 1 文のメモ。資金提供者に対して請求を誠実に保ちます。例: '自己申告の時間に基づいています。外部監査は保留中です。」",
+      "method_caveat_placeholder": "例えば「パイロット リージョンのみ、n=42 メンバー、90 日の期間」",
+      "metric_key": "メトリックキー",
+      "metric_key_description": "手動以外のソースには必須",
+      "metric_key_placeholder": "例えば承認済み_時間、フォーマル_ケア_オフセット_chf",
+      "metric_source": "メトリクスソース",
+      "metric_source_description": "pilot_scoreboard: AG83 から自動取得します。自治体_roi: AG76 から自動プルします。手動: 値を手動で入力します。",
+      "narrative": "物語",
+      "narrative_placeholder": "調達担当者または資金提供者にストーリーを説明する 2 ～ 4 文。",
+      "new_title": "新たな成功事例",
+      "published_description": "会員向けギャラリーに表示されます",
+      "published_label": "発行済み",
+      "sub_region_id": "サブ領域 ID (オプション)",
+      "sub_region_placeholder": "すべて空白のままにしておきます",
+      "title": "タイトル",
+      "title_placeholder": "例えば情報配布の労力を 30% 削減",
+      "unit": "ユニット",
+      "unit_placeholder": "例えば時間、CHF、%"
+    },
+    "empty": {
+      "body": "3 つの例示的なデモ カードをシードして、調達担当者や資金提供者にとってプルーフ カードがどのように見えるかを示します。実際の証拠として手動でマークするまで、それらには明確に「デモ/説明」というラベルが付けられます。",
+      "title": "まだ成功事例はありません"
+    },
+    "meta": {
+      "subtitle": "コミュニティの影響を示すプルーフ カードを作成および管理します。調達担当者、資金提供者、自治体のパートナーと共有できるように設計されています。",
+      "title": "成功事例"
+    },
+    "metric_sources": {
+      "manual": "マニュアル・イラスト",
+      "municipal_roi": "AG76 市営 ROI",
+      "pilot_scoreboard": "AG83 パイロット スコアボード"
+    },
+    "status": {
+      "demo": "デモ",
+      "published": "発行済み",
+      "real": "本物",
+      "unpublished": "未公開"
+    },
+    "table": {
+      "actions": "アクション",
+      "aria": "成功事例",
+      "audience": "観客",
+      "demo": "デモ",
+      "metric": "メトリック",
+      "row_actions": "行アクション",
+      "status": "状態",
+      "title": "タイトル"
+    },
+    "toasts": {
+      "create_failed": "作成に失敗しました",
+      "created": "ストーリーが作成されました",
+      "delete_failed": "削除に失敗しました",
+      "load_failed": "成功事例の読み込みに失敗しました",
+      "metric_refreshed": "ライブメトリクスが更新されました",
+      "refresh_failed": "更新に失敗しました",
+      "removed": "ストーリーが削除されました",
+      "seed_failed": "シードに失敗しました",
+      "seeded": "シード済みのデモ カード 3 枚",
+      "update_failed": "アップデートに失敗しました",
+      "updated": "ストーリーが更新されました"
     }
   }
 }

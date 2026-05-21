@@ -4543,7 +4543,27 @@
     "jwt_federation_auth_platform_title": "JWT-based federation auth is configured at platform level",
     "label_super_admin": "Super Admin",
     "analytics": {
-      "title": "Federation Analytics"
+      "title": "Anailísí Cónaidhm",
+      "chart_daily_calls": "Glaonna laethúla API",
+      "chart_top_partners": "Comhpháirtithe Barr",
+      "col_ip": "IP",
+      "description": "Féach ar anailísíocht le haghaidh gníomhaíochta trasphobail agus sláinte comhpháirtíochta",
+      "kpi_active_partnerships": "Comhpháirtíochtaí Gníomhacha",
+      "kpi_external_partners": "Comhpháirtithe Seachtracha",
+      "kpi_federated_listings": "Liostaí Cónaidhme",
+      "kpi_federated_messages": "Teachtaireachtaí Cónaidhme",
+      "kpi_federated_transactions": "Idirbhearta Cónaidhme",
+      "kpi_inbound_reviews": "Léirmheasanna Isteach",
+      "kpi_pending_partnerships": "Comhpháirtíochtaí ar Feitheamh",
+      "kpi_total_partnerships": "Comhpháirtíochtaí Iomlána",
+      "kpi_window": "Raon roghnaithe",
+      "no_partner_activity": "Níor aimsíodh aon ghníomhaíocht chomhpháirtí",
+      "no_recent_errors": "Níor aimsíodh aon earráidí le déanaí",
+      "range_30d": "30 lá anuas",
+      "range_7d": "7 lá seo caite",
+      "range_90d": "90 lá seo caite",
+      "range_label": "Raon anailíse",
+      "recent_errors": "Earráidí Déanaí"
     },
     "partnerships": {
       "bulk_approved_count": "Approved {{count}} partnership request",
@@ -13212,6 +13232,217 @@
     "validation": {
       "slug_format": "Ní mór seilide a bheith i gcás íochtair a-z, 0-9, daiseanna/fothaí",
       "slug_name_required": "Tá Sluga agus Ainm ag teastáil"
+    }
+  },
+  "national_kiss_dashboard": {
+    "about": {
+      "body_prefix": "Is modheolaíocht na hEilvéise é KISS (Koordination und Innovation fur Soziales) do chomhordú cúraim phobalbhunaithe a forbraíodh le Age-Stiftung. Comhiomlánaíonn an painéal sár-riaracháin seo méadracht ar fud gach comharchumann NEXUS a reáchtálann an clár Caring Community go náisiúnta - ag tabhairt an Fondation",
+      "body_suffix": "dearcadh tras-chomhoibríoch ar uaireanta a mhalartaítear, rannpháirtíocht na mball, agus sláinte chomhoibríoch. Taispeántar comhaireamh na mball mar lúibíní caomhnaithe príobháideachais (m.sh. \"50-99\") seachas mar uimhreacha beachta.",
+      "health_prefix": "Úsáid an roghnóir peiriad chun ceathrúna a chur i gcomparáid. Rangaíonn an tábla comparáideach comharchumainn de réir uaireanta, baill, nó stádas sláinte. Díorthaítear stádas sláinte ó threochtaí gníomhaíochta:",
+      "stable_definition": "gníomhaíocht chothrom,",
+      "struggling_definition": "laghdú ar ghníomhaíocht nó rannpháirtíocht an-íseal.",
+      "thriving_definition": "ag fás go tapa,",
+      "title": "Maidir leis an painéal seo"
+    },
+    "actions": {
+      "refresh": "Athnuaigh"
+    },
+    "comparative": {
+      "aria": "Méadracht chomparáideach de réir comharchumainn",
+      "cooperative": "Comharchumann",
+      "empty_middle": "comharchumainn cumraithe fós. Téigh go dtí",
+      "empty_prefix": "Níl",
+      "empty_suffix": "agus an catagóir tionónta a shocrú go",
+      "empty_tail": "ar thionónta amháin ar a laghad chun an painéal seo a líonadh.",
+      "hours_sort": "Uaireanta <->",
+      "hours_title": "Iomlán na n-uaireanta cúraim fíoraithe sa tréimhse roghnaithe",
+      "members": "Baill",
+      "members_title": "Taispeántar comhaireamh ball gníomhach mar lúibín caomhnaithe príobháideachta",
+      "recipients": "Faighteoirí",
+      "recipients_title": "Faighteoirí cúraim bainte amach (lúibín caomhnaithe príobháideachta)",
+      "reciprocity_sort": "Cómhalartacht <->",
+      "reciprocity_title": "% de lucht tacaíochta a fuair freisin uair an chloig sa tréimhse - léiríonn sláinte a mhalartú frithpháirteach",
+      "retention_sort": "Coinneáil <->",
+      "retention_title": "% de na comhaltaí a bhí gníomhach sa tréimhse seo agus sa tréimhse choibhéiseach roimhe sin",
+      "sort_hint": "Cliceáil colún le sórtáil",
+      "status": "Stádas",
+      "super_admin_tenants": "Sár-Riarachán -> Tionóntaí",
+      "tandems_sort": "Tandems <->",
+      "tandems_title": "Péirí cúntóra/faighteoirí athfhillteacha le 2+ malartú críochnaithe",
+      "title": "Méadracht chomparáideach"
+    },
+    "empty": {
+      "no_active_cooperatives": "Uimh comharchumainn gníomhach sa tréimhse seo.",
+      "no_data": "Gan sonraí."
+    },
+    "filters": {
+      "from": "Ó",
+      "from_aria": "Tréimhse ó",
+      "period": "Tréimhse",
+      "period_aria": "Tréimhse tuairiscithe",
+      "to": "Chuig",
+      "to_aria": "Tréimhse go"
+    },
+    "footer": {
+      "generated_at": "Gintear ag {{date}}.",
+      "privacy_note": "Tuairiscítear comhaireamh na mball idir lúibíní caomhnaithe príobháideachais - ní thaispeántar aitheantóirí baill aonair ar bith ar an leathanach seo."
+    },
+    "health_legend": {
+      "privacy_note": "Taispeántar comhaireamh na mball mar lúibíní caomhnaithe príobháideachta (m.sh. \"50-99\") - ní thugtar aon sonraí aonair riamh anseo.",
+      "stable": "gníomhaíocht leata (+/- 10%)",
+      "struggling": "gníomhaíocht laghdaithe nó níos lú ná 5 huaire fíoraithe sa tréimhse",
+      "thriving": "uaireanta ag fás go láidir (>10% vs tréimhse roimhe sin)",
+      "title": "Eochair stádais sláinte:"
+    },
+    "inline": {
+      "active_members": "Baill ghníomhacha:",
+      "recipients_reached": "Shroich na faighteoirí:",
+      "safeguarding_reports": "Tuarascálacha cosanta:"
+    },
+    "leaderboards": {
+      "bottom_title": "Bun 5 (gníomhach amháin)",
+      "top_title": "Barr 5 in aghaidh na huaire"
+    },
+    "meta": {
+      "description": "Radharc sár-riaracháin tras-chomhoibríoch thar gach comharchumann KISS ar an ardán. Tuairiscítear comhaireamh na mball idir lúibíní caomhnaithe príobháideachais.",
+      "page_title": "Fondation KISS - An Painéal Náisiúnta",
+      "title": "Fondation KISS - An Painéal Náisiúnta"
+    },
+    "metrics": {
+      "yoy": "{{value}} YoY"
+    },
+    "periods": {
+      "custom": "Raon saincheaptha",
+      "last_quarter": "An ceathrú deiridh (90 lá)",
+      "last_year": "An bhliain seo caite",
+      "this_month": "an mhí seo"
+    },
+    "stats": {
+      "active_cooperatives": "Comharchumainn ghníomhacha",
+      "active_description": "{{active}} de {{total}} gníomhach sa tréimhse",
+      "active_tandems": "Tandems gníomhacha",
+      "total_cooperatives": "Comharchumainn iomlána",
+      "total_hours": "Uaireanta iomlána (náisiúnta)"
+    },
+    "status": {
+      "stable": "Cobhsaí",
+      "struggling": "Ag streachailt",
+      "thriving": "Faoi rath"
+    },
+    "toasts": {
+      "load_failed": "Theip ar lódáil an deais"
+    },
+    "trend": {
+      "active_cooperatives": "Comharchumainn ghníomhacha",
+      "cooperatives_axis": "Comharchumainn",
+      "empty": "Níl aon sonraí treochtaí ar fáil.",
+      "hours_axis": "Uaireanta",
+      "title": "Treocht náisiúnta 12 mhí",
+      "total_hours_all": "Uaireanta iomlána (gach comharchumann)"
+    }
+  },
+  "success_stories_admin": {
+    "about": {
+      "body": "Is scéalta tionchair struchtúrtha iad cártaí cruthúnais atá ceangailte le méadracht bheo ón ardán. Taispeánann gach cárta comparáid roimh/i ndiaidh le foinse fianaise a luadh agus nóta modheolaíochta. Léiriúcháin amháin a bhíonn sna cártaí atá marcáilte mar “Demo”; marcáil cárta mar “Fhíorfhianaise” a luaithe a bheidh na sonraí fíoraithe agat. Tá cártaí foilsithe le feiceáil sa Tuarascáil Tionchair Chathrach agus ar an leathanach tionchair poiblí.",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "cancel": "Cealaigh",
+      "create_story": "Cruthaigh scéal",
+      "delete": "Scrios",
+      "edit": "Cuir in eagar",
+      "new_story": "Scéal nua",
+      "refresh": "Athnuaigh",
+      "refresh_live": "Athnuaigh ó shonraí beo",
+      "remove": "Bain",
+      "save_changes": "Sábháil athruithe",
+      "seed_demo": "Síl 3 cártaí taispeána"
+    },
+    "audience": {
+      "all_residents": "Gach cónaitheoir",
+      "kanton": "Kanton",
+      "municipality": "Bardas",
+      "recipients": "Faighteoirí cúraim",
+      "verein_members": "Baill Verein",
+      "volunteers": "Oibrithe Deonacha"
+    },
+    "delete_modal": {
+      "body_prefix": "Bainfidh sé seo go buan",
+      "body_suffix": "ón gailearaí.",
+      "title": "Bain scéal ratha",
+      "warning": "Ní féidir an gníomh seo a chealú."
+    },
+    "editor": {
+      "after_value": "Tar éis luach",
+      "audience": "Lucht Féachana",
+      "before_value": "Roimh luach",
+      "demo_description": "Tá an cárta lipéadaithe mar thaispeántas sa ghailearaí",
+      "demo_label": "Taispeántas/léiritheach",
+      "edit_title": "Cuir: {{title}}",
+      "evidence_source": "Foinse fianaise",
+      "evidence_source_description": "Ag teastáil - cén áit a dtagann an uimhir. Sampla: 'Sonraí ardáin NEXUS, fuinneog rollta 90 lá dar críoch 2026-04-01' nó 'Swiss Federal Statistical Office 2023.'",
+      "evidence_source_placeholder": "e.g. \"AG83 scórchlár píolótach 2026-04-30 bunlíne\"",
+      "method_caveat": "Cabhlaigh modh",
+      "method_caveat_description": "Ag teastáil - nóta aon abairte ar theorainneacha modheolaíochta. Coinníonn sé éilimh macánta le maoinitheoirí. Sampla: 'Bunaithe ar uaireanta féintuairiscithe; iniúchadh seachtrach ar feitheamh.'",
+      "method_caveat_placeholder": "e.g. \"Réigiún píolótach amháin; n=42 ball; fuinneog 90 lá\"",
+      "metric_key": "Eochair méadrach",
+      "metric_key_description": "Ag teastáil le haghaidh foinsí neamhláimhe",
+      "metric_key_placeholder": "e.g. ceadaithe_uaireanta, formal_care_offset_chf",
+      "metric_source": "Foinse méadrach",
+      "metric_source_description": "pilot_scoreboard: tarraingíonn uathoibríoch ó AG83; municipal_roi: auto-tarraingt ó AG76; lámhleabhar: cuireann tú luachanna isteach de láimh.",
+      "narrative": "Insint",
+      "narrative_placeholder": "2-4 abairt ag míniú an scéil d’oifigeach soláthair nó maoinitheoir.",
+      "new_title": "Scéal ratha nua",
+      "published_description": "Le feiceáil ar an gailearaí os comhair na mball",
+      "published_label": "Foilsithe",
+      "sub_region_id": "Fo-réigiún ID (roghnach)",
+      "sub_region_placeholder": "Fág bán do chách",
+      "title": "Teideal",
+      "title_placeholder": "e.g. Iarracht dáilte faisnéise 30% níos ísle",
+      "unit": "Aonad",
+      "unit_placeholder": "e.g. uair an chloig, CHF, %"
+    },
+    "empty": {
+      "body": "Síol 3 chárta taispeána léiriúcháin chun a thaispeáint cad é an chuma atá ar chártaí cruthúnais d’oifigigh soláthair agus do mhaoinitheoirí. Tá siad lipéadaithe go soiléir mar “Demo / Illustrative” go dtí go marcálann tú iad mar fhíorfhianaise de láimh.",
+      "title": "Níl aon scéal ratha fós"
+    },
+    "meta": {
+      "subtitle": "Cártaí cruthúnais a chruthú agus a bhainistiú a léiríonn tionchar an phobail - deartha chun iad a roinnt le hoifigigh soláthair, maoinitheoirí, agus comhpháirtithe bardais.",
+      "title": "Scéalta Ratha"
+    },
+    "metric_sources": {
+      "manual": "Lámhleabhar / léiriúcháin",
+      "municipal_roi": "AG76 cathrach ROI",
+      "pilot_scoreboard": "AG83 scórchlár píolótach"
+    },
+    "status": {
+      "demo": "Taispeántas",
+      "published": "Foilsithe",
+      "real": "Fíor",
+      "unpublished": "Neamhfhoilsithe"
+    },
+    "table": {
+      "actions": "Gníomhartha",
+      "aria": "Scéalta ratha",
+      "audience": "Lucht Féachana",
+      "demo": "Taispeántas",
+      "metric": "méadrach",
+      "row_actions": "Gníomhartha as a chéile",
+      "status": "Stádas",
+      "title": "Teideal"
+    },
+    "toasts": {
+      "create_failed": "Theip ar chruthú",
+      "created": "Scéal cruthaithe",
+      "delete_failed": "Theip ar an scriosadh",
+      "load_failed": "Theip ar scéalta ratha a lódáil",
+      "metric_refreshed": "Athnuachan méadrach beo",
+      "refresh_failed": "Theip ar an athnuachan",
+      "removed": "Scéal bainte",
+      "seed_failed": "Theip ar shíol",
+      "seeded": "Seeded 3 cártaí taispeána",
+      "update_failed": "Theip ar an nuashonrú",
+      "updated": "Nuashonraíodh an scéal"
     }
   }
 }

@@ -4543,7 +4543,27 @@
     "jwt_federation_auth_platform_title": "JWT-based federation auth is configured at platform level",
     "label_super_admin": "Super Admin",
     "analytics": {
-      "title": "Federation Analytics"
+      "title": "Analityka Federacji",
+      "chart_daily_calls": "Codzienne API połączenia",
+      "chart_top_partners": "Najlepsi partnerzy",
+      "col_ip": "IP",
+      "description": "Przeglądaj analizy dotyczące aktywności między społecznościami i kondycji partnerstwa",
+      "kpi_active_partnerships": "Aktywne partnerstwa",
+      "kpi_external_partners": "Partnerzy zewnętrzni",
+      "kpi_federated_listings": "Listy federacyjne",
+      "kpi_federated_messages": "Wiadomości federacyjne",
+      "kpi_federated_transactions": "Transakcje federacyjne",
+      "kpi_inbound_reviews": "Recenzje przychodzące",
+      "kpi_pending_partnerships": "Oczekujące partnerstwa",
+      "kpi_total_partnerships": "Totalne partnerstwa",
+      "kpi_window": "Wybrany zakres",
+      "no_partner_activity": "Nie znaleziono aktywności partnera",
+      "no_recent_errors": "Nie znaleziono żadnych ostatnich błędów",
+      "range_30d": "Ostatnie 30 dni",
+      "range_7d": "Ostatnie 7 dni",
+      "range_90d": "Ostatnie 90 dni",
+      "range_label": "Zakres analityki",
+      "recent_errors": "Ostatnie błędy"
     },
     "partnerships": {
       "bulk_approved_count": "Approved {{count}} partnership request",
@@ -13212,6 +13232,217 @@
     "validation": {
       "slug_format": "Informacje muszą być pisane małymi literami a–z, 0–9, myślnikami/podkreśleniami",
       "slug_name_required": "Wymagane są Slug i Imię"
+    }
+  },
+  "national_kiss_dashboard": {
+    "about": {
+      "body_prefix": "KISS (Koordynacja und Innovation fur Soziales) to szwajcarska metodologia koordynacji opieki środowiskowej opracowana wspólnie z Age-Stiftung. Ten panel superadministratora gromadzi dane dotyczące każdej NEXUS spółdzielni prowadzącej program Caring Community na poziomie krajowym, dzięki czemu Fundacja",
+      "body_suffix": "międzyspółdzielczy pogląd na wymieniane godziny, uczestnictwo członków i zdrowie spółdzielni. Liczba członków jest pokazywana w nawiasach chroniących prywatność (np. „50–99”), a nie w dokładnych liczbach.",
+      "health_prefix": "Użyj selektora okresu, aby porównać kwartały. Tabela porównawcza klasyfikuje spółdzielnie według godzin pracy, członków lub stanu zdrowia. Stan zdrowia wynika z trendów aktywności:",
+      "stable_definition": "płaska aktywność,",
+      "struggling_definition": "spadek aktywności lub bardzo niskie zaangażowanie.",
+      "thriving_definition": "szybko rośnie,",
+      "title": "Informacje o tym panelu"
+    },
+    "actions": {
+      "refresh": "Odświeżać"
+    },
+    "comparative": {
+      "aria": "Wskaźniki porównawcze według spółdzielni",
+      "cooperative": "Spółdzielnia",
+      "empty_middle": "spółdzielnie są jeszcze skonfigurowane. Idź do",
+      "empty_prefix": "NIE",
+      "empty_suffix": "i ustaw kategorię najemcy na",
+      "empty_tail": "na co najmniej jednej dzierżawie, aby wypełnić ten pulpit nawigacyjny.",
+      "hours_sort": "Godziny <->",
+      "hours_title": "Łączna liczba zweryfikowanych godzin opieki w wybranym okresie",
+      "members": "Członkowie",
+      "members_title": "Liczba aktywnych członków pokazana w nawiasie chroniącym prywatność",
+      "recipients": "Odbiorcy",
+      "recipients_title": "Dotarcie do odbiorców opieki (przedział chroniący prywatność)",
+      "reciprocity_sort": "Wzajemność <->",
+      "reciprocity_title": "% kibiców, którzy w tym okresie otrzymali także godziny – wskazuje na zdrowie wzajemnej wymiany",
+      "retention_sort": "Zatrzymanie <->",
+      "retention_title": "% członków aktywnych zarówno w tym okresie, jak i w poprzednim równoważnym okresie",
+      "sort_hint": "Kliknij kolumnę, aby posortować",
+      "status": "Status",
+      "super_admin_tenants": "Superadministrator -> Najemcy",
+      "tandems_sort": "Tandemy <->",
+      "tandems_title": "Powtarzające się pary pomocnika/odbiorcy z ponad 2 ukończonymi wymianami",
+      "title": "Metryki porównawcze"
+    },
+    "empty": {
+      "no_active_cooperatives": "Brak aktywnych spółdzielni w tym okresie.",
+      "no_data": "Brak danych."
+    },
+    "filters": {
+      "from": "Z",
+      "from_aria": "Okres od",
+      "period": "Okres",
+      "period_aria": "Okres raportowania",
+      "to": "Do",
+      "to_aria": "Okres do"
+    },
+    "footer": {
+      "generated_at": "Wygenerowano o {{date}}.",
+      "privacy_note": "Liczbę członków podaje się w nawiasach chroniących prywatność — na tej stronie nie są wyświetlane żadne indywidualne identyfikatory członków."
+    },
+    "health_legend": {
+      "privacy_note": "Liczba członków pokazana jest w nawiasach chroniących prywatność (np. „50–99”) – nie pojawiają się tutaj żadne indywidualne dane.",
+      "stable": "aktywność płaska (+/-10%)",
+      "struggling": "malejąca aktywność lub mniej niż 5 zweryfikowanych godzin w okresie",
+      "thriving": "godzin silnie rośnie (>10% w porównaniu z poprzednim okresem)",
+      "title": "Klucz stanu zdrowia:"
+    },
+    "inline": {
+      "active_members": "Aktyw:",
+      "recipients_reached": "Odbiorcy dotarli:",
+      "safeguarding_reports": "Raporty zabezpieczające:"
+    },
+    "leaderboards": {
+      "bottom_title": "Dolne 5 (tylko aktywne)",
+      "top_title": "Top 5 według godzin"
+    },
+    "meta": {
+      "description": "Międzykooperacyjny widok superadministratora dla każdej KISS spółdzielni na platformie. Liczbę członków podaje się w nawiasach chroniących prywatność.",
+      "page_title": "Fondation KISS - Panel krajowy",
+      "title": "Fondation KISS - Panel krajowy"
+    },
+    "metrics": {
+      "yoy": "{{value}} YoY"
+    },
+    "periods": {
+      "custom": "Zakres niestandardowy",
+      "last_quarter": "Ostatni kwartał (90 dni)",
+      "last_year": "W ubiegłym roku",
+      "this_month": "W tym miesiącu"
+    },
+    "stats": {
+      "active_cooperatives": "Aktywne spółdzielnie",
+      "active_description": "{{active}} z {{total}} aktywne w okresie",
+      "active_tandems": "Aktywne tandemy",
+      "total_cooperatives": "Razem spółdzielnie",
+      "total_hours": "Całkowita liczba godzin (krajowa)"
+    },
+    "status": {
+      "stable": "Stabilny",
+      "struggling": "Zmagający się",
+      "thriving": "Kwitnie"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować panelu"
+    },
+    "trend": {
+      "active_cooperatives": "Aktywne spółdzielnie",
+      "cooperatives_axis": "Spółdzielnie",
+      "empty": "Brak dostępnych danych dotyczących trendów.",
+      "hours_axis": "Godziny",
+      "title": "Krajowy trend 12-miesięczny",
+      "total_hours_all": "Łączna liczba godzin (wszystkie spółdzielnie)"
+    }
+  },
+  "success_stories_admin": {
+    "about": {
+      "body": "Karty dowodów to ustrukturyzowane historie wpływu powiązane z bieżącymi wskaźnikami z platformy. Każda karta przedstawia porównanie przed/po z cytowanym źródłem dowodów i uwagą metodologiczną. Karty oznaczone jako „Demo” mają charakter wyłącznie poglądowy; po zweryfikowaniu danych oznacz kartę jako „Prawdziwy dowód”. Opublikowane karty pojawiają się w Raporcie oddziaływania na gminę i na stronie wpływu dostępnej publicznie.",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "cancel": "Anulować",
+      "create_story": "Stwórz historię",
+      "delete": "Usuwać",
+      "edit": "Redagować",
+      "new_story": "Nowa historia",
+      "refresh": "Odświeżać",
+      "refresh_live": "Odśwież na podstawie danych bieżących",
+      "remove": "Usunąć",
+      "save_changes": "Zapisz zmiany",
+      "seed_demo": "Załóż 3 karty demonstracyjne"
+    },
+    "audience": {
+      "all_residents": "Wszyscy mieszkańcy",
+      "kanton": "Kanton",
+      "municipality": "Miasto",
+      "recipients": "Odbiorcy opieki",
+      "verein_members": "Członkowie Verein",
+      "volunteers": "Wolontariusze"
+    },
+    "delete_modal": {
+      "body_prefix": "Spowoduje to trwałe usunięcie",
+      "body_suffix": "z galerii.",
+      "title": "Usuń historię sukcesu",
+      "warning": "Tej akcji nie można cofnąć."
+    },
+    "editor": {
+      "after_value": "Po wartości",
+      "audience": "Publiczność",
+      "before_value": "Przed wartością",
+      "demo_description": "Karta oznaczona jest w galerii jako demo",
+      "demo_label": "Demo / ilustracyjne",
+      "edit_title": "Edycja: {{title}}",
+      "evidence_source": "Źródło dowodów",
+      "evidence_source_description": "Wymagane - skąd pochodzi numer. Przykład: „Dane platformy NEXUS, 90-dniowe okno kroczące kończące się 2026-04-01” lub „Swiss Federal Statistical Office 2023”.",
+      "evidence_source_placeholder": "np. „AG83 pilotażowa tablica wyników na dzień bazowy 30.04.2026 r.”",
+      "method_caveat": "Zastrzeżenie dotyczące metody",
+      "method_caveat_description": "Wymagane – jednozdaniowa uwaga dotycząca ograniczeń metodologicznych. Zapewnia uczciwość roszczeń wobec fundatorów. Przykład: „Na podstawie godzin samodzielnie zgłoszonych; audyt zewnętrzny w toku.”",
+      "method_caveat_placeholder": "np. „Tylko region pilotażowy; n=42 członków; okno 90-dniowe”",
+      "metric_key": "Klucz metryczny",
+      "metric_key_description": "Wymagane w przypadku źródeł innych niż ręczne",
+      "metric_key_placeholder": "np. zatwierdzone_godziny, formal_care_offset_chf",
+      "metric_source": "Źródło metryczne",
+      "metric_source_description": "pilot_scoreboard: automatyczne pobieranie z AG83; Municipal_roi: automatycznie pobiera z AG76; ręcznie: wartości wprowadzasz ręcznie.",
+      "narrative": "Narracja",
+      "narrative_placeholder": "2–4 zdania wyjaśniające historię urzędnikowi ds. zamówień publicznych lub fundatorowi.",
+      "new_title": "Nowa historia sukcesu",
+      "published_description": "Widoczne w galerii skierowanej do członków",
+      "published_label": "Opublikowany",
+      "sub_region_id": "Podregion ID (opcjonalnie)",
+      "sub_region_placeholder": "Pozostaw puste dla wszystkich",
+      "title": "Tytuł",
+      "title_placeholder": "np. O 30% mniejszy wysiłek związany z dystrybucją informacji",
+      "unit": "Jednostka",
+      "unit_placeholder": "np. godziny, CHF,%"
+    },
+    "empty": {
+      "body": "Załóż 3 ilustracyjne karty demonstracyjne, aby pokazać urzędnikom ds. zamówień publicznych i podmiotom finansującym, jak wyglądają karty próbne. Są one wyraźnie oznaczone jako „Demo / ilustracyjne”, dopóki nie oznaczysz ich ręcznie jako prawdziwy dowód.",
+      "title": "Nie ma jeszcze żadnych historii sukcesu"
+    },
+    "meta": {
+      "subtitle": "Twórz karty potwierdzające, które pokazują wpływ społeczności, i zarządzaj nimi – przeznaczone do udostępniania urzędnikom odpowiedzialnym za zamówienia, fundatorom i partnerom miejskim.",
+      "title": "Historie sukcesu"
+    },
+    "metric_sources": {
+      "manual": "Instrukcja/ilustracja",
+      "municipal_roi": "AG76miejskie ROI",
+      "pilot_scoreboard": "AG83 tablica wyników pilotażu"
+    },
+    "status": {
+      "demo": "Demonstracja",
+      "published": "Opublikowany",
+      "real": "Prawdziwy",
+      "unpublished": "Niepublikowane"
+    },
+    "table": {
+      "actions": "Działania",
+      "aria": "Historie sukcesu",
+      "audience": "Publiczność",
+      "demo": "Demonstracja",
+      "metric": "Metryczny",
+      "row_actions": "Działania wierszowe",
+      "status": "Status",
+      "title": "Tytuł"
+    },
+    "toasts": {
+      "create_failed": "Tworzenie nie powiodło się",
+      "created": "Historia stworzona",
+      "delete_failed": "Usunięcie nie powiodło się",
+      "load_failed": "Nie udało się załadować historii sukcesu",
+      "metric_refreshed": "Odświeżono dane na żywo",
+      "refresh_failed": "Odświeżanie nie powiodło się",
+      "removed": "Historia usunięta",
+      "seed_failed": "Nasienie nie powiodło się",
+      "seeded": "Rozstawione 3 karty demo",
+      "update_failed": "Aktualizacja nie powiodła się",
+      "updated": "Historia zaktualizowana"
     }
   }
 }

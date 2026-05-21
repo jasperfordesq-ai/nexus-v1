@@ -4543,7 +4543,27 @@
     "jwt_federation_auth_platform_title": "JWT-based federation auth is configured at platform level",
     "label_super_admin": "Super Admin",
     "analytics": {
-      "title": "Federation Analytics"
+      "title": "Federatieanalyse",
+      "chart_daily_calls": "Dagelijkse API oproepen",
+      "chart_top_partners": "Toppartners",
+      "col_ip": "IP",
+      "description": "Bekijk analyses voor activiteiten tussen gemeenschappen en de gezondheid van partnerschappen",
+      "kpi_active_partnerships": "Actieve partnerschappen",
+      "kpi_external_partners": "Externe partners",
+      "kpi_federated_listings": "Federatieve vermeldingen",
+      "kpi_federated_messages": "Federatieve berichten",
+      "kpi_federated_transactions": "Federatieve transacties",
+      "kpi_inbound_reviews": "Inkomende beoordelingen",
+      "kpi_pending_partnerships": "Partnerschappen in behandeling",
+      "kpi_total_partnerships": "Totale partnerschappen",
+      "kpi_window": "Geselecteerd bereik",
+      "no_partner_activity": "Geen partneractiviteit gevonden",
+      "no_recent_errors": "Geen recente fouten gevonden",
+      "range_30d": "Laatste 30 dagen",
+      "range_7d": "Laatste 7 dagen",
+      "range_90d": "Laatste 90 dagen",
+      "range_label": "Analytics-bereik",
+      "recent_errors": "Recente fouten"
     },
     "partnerships": {
       "bulk_approved_count": "Approved {{count}} partnership request",
@@ -13212,6 +13232,217 @@
     "validation": {
       "slug_format": "De slug moet bestaan ​​uit kleine letters a-z, 0-9, streepjes/onderstrepingstekens",
       "slug_name_required": "Slug en naam zijn vereist"
+    }
+  },
+  "national_kiss_dashboard": {
+    "about": {
+      "body_prefix": "KISS (Koördinatie und Innovation fur Soziales) is een Zwitserse methodologie voor zorgcoördinatie in de gemeenschap, ontwikkeld in samenwerking met Age-Stiftung. Dit superbeheerdersdashboard verzamelt statistieken van elke NEXUS coöperatie die het Caring Community-programma op nationaal niveau uitvoert, waardoor de Fondation",
+      "body_suffix": "een coöperatief beeld van uitgewisselde uren, ledenparticipatie en coöperatieve gezondheid. Het aantal leden wordt weergegeven als privacybeschermende haakjes (bijvoorbeeld '50-99') in plaats van exacte cijfers.",
+      "health_prefix": "Gebruik de periodekiezer om kwartalen te vergelijken. De vergelijkende tabel rangschikt coöperaties op uren, leden of gezondheidsstatus. De gezondheidsstatus wordt afgeleid van activiteitstrends:",
+      "stable_definition": "vlakke activiteit,",
+      "struggling_definition": "afnemende activiteit of een zeer lage betrokkenheid.",
+      "thriving_definition": "snel groeiend,",
+      "title": "Over dit dashboard"
+    },
+    "actions": {
+      "refresh": "Vernieuwen"
+    },
+    "comparative": {
+      "aria": "Vergelijkende statistieken per coöperatie",
+      "cooperative": "Coöperatief",
+      "empty_middle": "coöperaties nog niet geconfigureerd. Ga naar",
+      "empty_prefix": "Nee",
+      "empty_suffix": "en stel de tenantcategorie in op",
+      "empty_tail": "op ten minste één tenant om dit dashboard te vullen.",
+      "hours_sort": "Uren <->",
+      "hours_title": "Totaal geverifieerde zorguren in de geselecteerde periode",
+      "members": "Leden",
+      "members_title": "Het aantal actieve leden wordt weergegeven als een privacybeschermende beugel",
+      "recipients": "Ontvangers",
+      "recipients_title": "Zorgontvangers bereikt (privacybeschermende beugel)",
+      "reciprocity_sort": "Wederkerigheid <->",
+      "reciprocity_title": "% supporters dat in de periode ook uren kreeg - duidt op onderlinge uitwisselingsgezondheid",
+      "retention_sort": "Retentie <->",
+      "retention_title": "% leden actief in zowel deze periode als de voorgaande equivalente periode",
+      "sort_hint": "Klik op een kolom om te sorteren",
+      "status": "Status",
+      "super_admin_tenants": "Superbeheerder -> Huurders",
+      "tandems_sort": "Tandems <->",
+      "tandems_title": "Terugkerende helper/ontvanger-paren met meer dan 2 voltooide uitwisselingen",
+      "title": "Vergelijkende statistieken"
+    },
+    "empty": {
+      "no_active_cooperatives": "Geen actieve coöperaties in deze periode.",
+      "no_data": "Geen gegevens."
+    },
+    "filters": {
+      "from": "Van",
+      "from_aria": "Periode vanaf",
+      "period": "Periode",
+      "period_aria": "Rapportageperiode",
+      "to": "Naar",
+      "to_aria": "Periode tot"
+    },
+    "footer": {
+      "generated_at": "Gegenereerd op {{date}}.",
+      "privacy_note": "Het aantal leden wordt gerapporteerd tussen haakjes ter bescherming van de privacy. Er worden nergens op deze pagina individuele identificatiegegevens van leden weergegeven."
+    },
+    "health_legend": {
+      "privacy_note": "Het aantal leden wordt weergegeven als privacybeschermende haakjes (bijvoorbeeld '50-99'). Er worden hier nooit individuele gegevens weergegeven.",
+      "stable": "vlakke activiteit (+/-10%)",
+      "struggling": "afnemende activiteit of minder dan 5 geverifieerde uren in de periode",
+      "thriving": "uren groeien sterk (>10% versus voorgaande periode)",
+      "title": "Gezondheidsstatussleutel:"
+    },
+    "inline": {
+      "active_members": "Actieve leden:",
+      "recipients_reached": "Ontvangers bereikt:",
+      "safeguarding_reports": "Beveiligingsrapporten:"
+    },
+    "leaderboards": {
+      "bottom_title": "Onderste 5 (alleen actief)",
+      "top_title": "Top 5 per uur"
+    },
+    "meta": {
+      "description": "Cross-coöperatieve superbeheerdersweergave van elke KISS coöperatie op het platform. Ledenaantallen worden gerapporteerd tussen haakjes ter bescherming van de privacy.",
+      "page_title": "Fondation KISS - Nationaal dashboard",
+      "title": "Fondation KISS - Nationaal dashboard"
+    },
+    "metrics": {
+      "yoy": "{{value}} YoY"
+    },
+    "periods": {
+      "custom": "Aangepast bereik",
+      "last_quarter": "Laatste kwartaal (90 dagen)",
+      "last_year": "Vorig jaar",
+      "this_month": "Deze maand"
+    },
+    "stats": {
+      "active_cooperatives": "Actieve coöperaties",
+      "active_description": "{{active}} van {{total}} actief in periode",
+      "active_tandems": "Actieve tandems",
+      "total_cooperatives": "Totaal coöperaties",
+      "total_hours": "Totaal uren (nationaal)"
+    },
+    "status": {
+      "stable": "Stabiel",
+      "struggling": "Worstelend",
+      "thriving": "Gezond"
+    },
+    "toasts": {
+      "load_failed": "Kan dashboard niet laden"
+    },
+    "trend": {
+      "active_cooperatives": "Actieve coöperaties",
+      "cooperatives_axis": "Coöperaties",
+      "empty": "Geen trendgegevens beschikbaar.",
+      "hours_axis": "Uur",
+      "title": "Nationale trend over 12 maanden",
+      "total_hours_all": "Totaal aantal uren (alle coöperaties)"
+    }
+  },
+  "success_stories_admin": {
+    "about": {
+      "body": "Bewijskaarten zijn gestructureerde impactverhalen gekoppeld aan live statistieken van het platform. Elke kaart toont een voor/na-vergelijking met een geciteerde bewijsbron en methodologienota. Kaarten gemarkeerd als \"Demo\" zijn alleen ter illustratie; markeer een kaart als 'echt bewijs' zodra u de gegevens heeft geverifieerd. Gepubliceerde kaarten verschijnen in het Gemeentelijk Impactrapport en de publieksgerichte impactpagina.",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "cancel": "Annuleren",
+      "create_story": "Creëer een verhaal",
+      "delete": "Verwijderen",
+      "edit": "Bewerking",
+      "new_story": "Nieuw verhaal",
+      "refresh": "Vernieuwen",
+      "refresh_live": "Vernieuwen vanuit live gegevens",
+      "remove": "Verwijderen",
+      "save_changes": "Wijzigingen opslaan",
+      "seed_demo": "Plaats 3 demokaarten"
+    },
+    "audience": {
+      "all_residents": "Alle bewoners",
+      "kanton": "Kanton",
+      "municipality": "Gemeente",
+      "recipients": "Ontvangers van zorg",
+      "verein_members": "Verein-leden",
+      "volunteers": "Vrijwilligers"
+    },
+    "delete_modal": {
+      "body_prefix": "Dit wordt permanent verwijderd",
+      "body_suffix": "van de galerij.",
+      "title": "Succesverhaal verwijderen",
+      "warning": "Deze actie kan niet ongedaan worden gemaakt."
+    },
+    "editor": {
+      "after_value": "Na waarde",
+      "audience": "Publiek",
+      "before_value": "Vóór waarde",
+      "demo_description": "Kaart is gelabeld als demo op de galerij",
+      "demo_label": "Demo / illustratief",
+      "edit_title": "Bewerken: {{title}}",
+      "evidence_source": "Bewijsbron",
+      "evidence_source_description": "Vereist - waar het nummer vandaan komt. Voorbeeld: 'NEXUS platformgegevens, voortschrijdende periode van 90 dagen eindigend op 01-04-2026' of 'Swiss Federal Statistical Office 2023.'",
+      "evidence_source_placeholder": "bijv. \"AG83 pilotscorebord 30-04-2026 basislijn\"",
+      "method_caveat": "Methodevoorbehoud",
+      "method_caveat_description": "Vereist: een opmerking van één zin over de beperkingen van de methodologie. Houdt claims eerlijk tegenover financiers. Voorbeeld: 'Op basis van zelfgerapporteerde uren; externe audit in behandeling.'",
+      "method_caveat_placeholder": "bijv. \"Alleen pilotregio; n=42 leden; venster van 90 dagen\"",
+      "metric_key": "Metrische sleutel",
+      "metric_key_description": "Vereist voor niet-handmatige bronnen",
+      "metric_key_placeholder": "bijv. goedgekeurde_uren, formele_zorg_offset_chf",
+      "metric_source": "Metrische bron",
+      "metric_source_description": "pilot_scoreboard: haalt automatisch op van AG83; gemeentelijke_roi: haalt automatisch op van AG76; handmatig: u voert waarden handmatig in.",
+      "narrative": "Verhaal",
+      "narrative_placeholder": "2-4 zinnen waarin het verhaal wordt uitgelegd aan een inkoper of financier.",
+      "new_title": "Nieuw succesverhaal",
+      "published_description": "Zichtbaar op de ledengerichte galerij",
+      "published_label": "Gepubliceerd",
+      "sub_region_id": "Subregio ID (optioneel)",
+      "sub_region_placeholder": "Laat voor iedereen leeg",
+      "title": "Titel",
+      "title_placeholder": "bijv. 30% minder inspanning voor informatiedistributie",
+      "unit": "Eenheid",
+      "unit_placeholder": "bijv. uur, CHF, %"
+    },
+    "empty": {
+      "body": "Plaats 3 illustratieve demokaarten om te laten zien hoe proefkaarten eruit zien voor inkopers en financiers. Ze zijn duidelijk voorzien van het label \"Demo/illustratief\" totdat u ze met de hand als echt bewijs markeert.",
+      "title": "Nog geen succesverhalen"
+    },
+    "meta": {
+      "subtitle": "Maak en beheer proefkaarten die de impact van de gemeenschap aantonen - ontworpen om te delen met inkopers, financiers en gemeentelijke partners.",
+      "title": "Succesverhalen"
+    },
+    "metric_sources": {
+      "manual": "Handleiding / illustratief",
+      "municipal_roi": "AG76 gemeentelijk ROI",
+      "pilot_scoreboard": "AG83 pilotscorebord"
+    },
+    "status": {
+      "demo": "Demo",
+      "published": "Gepubliceerd",
+      "real": "Echt",
+      "unpublished": "Niet gepubliceerd"
+    },
+    "table": {
+      "actions": "Acties",
+      "aria": "Succesverhalen",
+      "audience": "Publiek",
+      "demo": "Demo",
+      "metric": "Metrisch",
+      "row_actions": "Rij-acties",
+      "status": "Status",
+      "title": "Titel"
+    },
+    "toasts": {
+      "create_failed": "Maken mislukt",
+      "created": "Verhaal gemaakt",
+      "delete_failed": "Verwijderen is mislukt",
+      "load_failed": "Kan succesverhalen niet laden",
+      "metric_refreshed": "Live-statistiek vernieuwd",
+      "refresh_failed": "Vernieuwen mislukt",
+      "removed": "Verhaal verwijderd",
+      "seed_failed": "Zaad is mislukt",
+      "seeded": "3 demokaarten geplaatst",
+      "update_failed": "Update mislukt",
+      "updated": "Verhaal bijgewerkt"
     }
   }
 }

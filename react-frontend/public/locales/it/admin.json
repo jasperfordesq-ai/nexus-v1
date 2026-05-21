@@ -4543,7 +4543,27 @@
     "jwt_federation_auth_platform_title": "JWT-based federation auth is configured at platform level",
     "label_super_admin": "Super Admin",
     "analytics": {
-      "title": "Federation Analytics"
+      "title": "Analisi della federazione",
+      "chart_daily_calls": "API Chiamate giornaliere",
+      "chart_top_partners": "I migliori partner",
+      "col_ip": "IP",
+      "description": "Visualizza l'analisi delle attività intercomunitarie e dello stato di salute della partnership",
+      "kpi_active_partnerships": "Partenariati attivi",
+      "kpi_external_partners": "Partner esterni",
+      "kpi_federated_listings": "Elenchi federati",
+      "kpi_federated_messages": "Messaggi federati",
+      "kpi_federated_transactions": "Transazioni federate",
+      "kpi_inbound_reviews": "Recensioni in entrata",
+      "kpi_pending_partnerships": "Partenariati in sospeso",
+      "kpi_total_partnerships": "Partenariati totali",
+      "kpi_window": "Intervallo selezionato",
+      "no_partner_activity": "Nessuna attività del partner trovata",
+      "no_recent_errors": "Nessun errore recente trovato",
+      "range_30d": "Ultimi 30 giorni",
+      "range_7d": "Ultimi 7 giorni",
+      "range_90d": "Ultimi 90 giorni",
+      "range_label": "Gamma di analisi",
+      "recent_errors": "Errori recenti"
     },
     "partnerships": {
       "bulk_approved_count": "Approved {{count}} partnership request",
@@ -13212,6 +13232,217 @@
     "validation": {
       "slug_format": "Lo slug deve essere minuscolo, a-z, 0-9, trattini/trattini bassi",
       "slug_name_required": "Lumaca e Nome sono obbligatori"
+    }
+  },
+  "national_kiss_dashboard": {
+    "about": {
+      "body_prefix": "KISS (Koordination und Innovation fur Soziales) è una metodologia svizzera per il coordinamento dell'assistenza su base comunitaria sviluppata con Age-Stiftung. Questa dashboard di super amministratore aggrega i parametri di ogni cooperativa NEXUS che gestisce il programma Caring Community a livello nazionale, offrendo alla Fondazione",
+      "body_suffix": "una visione inter-cooperativa delle ore scambiate, della partecipazione dei membri e della salute cooperativa. I conteggi dei membri vengono visualizzati come parentesi di tutela della privacy (ad esempio \"50-99\") anziché come numeri esatti.",
+      "health_prefix": "Utilizza il selettore del periodo per confrontare i trimestri. La tabella comparativa classifica le cooperative in base agli orari, ai soci o allo stato di salute. Lo stato di salute deriva dalle tendenze dell'attività:",
+      "stable_definition": "attività piatta,",
+      "struggling_definition": "attività in calo o coinvolgimento molto basso.",
+      "thriving_definition": "crescendo velocemente,",
+      "title": "Informazioni su questa dashboard"
+    },
+    "actions": {
+      "refresh": "Aggiorna"
+    },
+    "comparative": {
+      "aria": "Metriche comparative per cooperativa",
+      "cooperative": "Cooperativa",
+      "empty_middle": "cooperative già configurate. Vai a",
+      "empty_prefix": "NO",
+      "empty_suffix": "e impostare la categoria dell'inquilino su",
+      "empty_tail": "su almeno un tenant per popolare questo dashboard.",
+      "hours_sort": "Orari <->",
+      "hours_title": "Ore di assistenza totali verificate nel periodo selezionato",
+      "members": "Membri",
+      "members_title": "Conteggio dei membri attivi mostrato come fascia di tutela della privacy",
+      "recipients": "Destinatari",
+      "recipients_title": "Destinatari delle cure raggiunti (fascia di tutela della privacy)",
+      "reciprocity_sort": "Reciprocità <->",
+      "reciprocity_title": "% di sostenitori che hanno ricevuto anche ore nel periodo - indica la salute dello scambio reciproco",
+      "retention_sort": "Conservazione <->",
+      "retention_title": "% di membri attivi sia in questo periodo che nel periodo equivalente precedente",
+      "sort_hint": "Fare clic su una colonna per ordinare",
+      "status": "Stato",
+      "super_admin_tenants": "Super amministratore -> Inquilini",
+      "tandems_sort": "Tandem <->",
+      "tandems_title": "Coppie ricorrenti aiutante/destinatario con 2+ scambi completati",
+      "title": "Metriche comparative"
+    },
+    "empty": {
+      "no_active_cooperatives": "Nessuna cooperativa attiva in questo periodo.",
+      "no_data": "Nessun dato."
+    },
+    "filters": {
+      "from": "Da",
+      "from_aria": "Periodo da",
+      "period": "Periodo",
+      "period_aria": "Periodo di riferimento",
+      "to": "A",
+      "to_aria": "Periodo a"
+    },
+    "footer": {
+      "generated_at": "Generato alle {{date}}.",
+      "privacy_note": "I conteggi dei membri sono riportati tra parentesi che tutelano la privacy: nessun identificatore dei singoli membri viene mostrato in nessuna parte di questa pagina."
+    },
+    "health_legend": {
+      "privacy_note": "Il numero dei membri viene mostrato come parentesi di tutela della privacy (ad esempio \"50-99\"): qui non vengono mai visualizzati dati individuali.",
+      "stable": "attività piatta (+/-10%)",
+      "struggling": "attività in calo o meno di 5 ore verificate nel periodo",
+      "thriving": "ore in forte crescita (>10% vs periodo precedente)",
+      "title": "Chiave dello stato di salute:"
+    },
+    "inline": {
+      "active_members": "Membri attivi:",
+      "recipients_reached": "Destinatari raggiunti:",
+      "safeguarding_reports": "Rapporti di salvaguardia:"
+    },
+    "leaderboards": {
+      "bottom_title": "Ultimi 5 (solo attivi)",
+      "top_title": "I primi 5 per ora"
+    },
+    "meta": {
+      "description": "Visualizzazione super amministratore multi-cooperativa per ogni KISS cooperativa sulla piattaforma. I conteggi dei membri sono riportati tra parentesi che tutelano la privacy.",
+      "page_title": "Fondation KISS - Cruscotto nazionale",
+      "title": "Fondation KISS - Cruscotto nazionale"
+    },
+    "metrics": {
+      "yoy": "{{value}} YoY"
+    },
+    "periods": {
+      "custom": "Gamma personalizzata",
+      "last_quarter": "Ultimo trimestre (90 giorni)",
+      "last_year": "L'anno scorso",
+      "this_month": "Questo mese"
+    },
+    "stats": {
+      "active_cooperatives": "Cooperative attive",
+      "active_description": "{{active}} di {{total}} attivi nel periodo",
+      "active_tandems": "Tandem attivi",
+      "total_cooperatives": "Cooperative totali",
+      "total_hours": "Ore totali (nazionale)"
+    },
+    "status": {
+      "stable": "Stabile",
+      "struggling": "Lottando",
+      "thriving": "Fiorente"
+    },
+    "toasts": {
+      "load_failed": "Impossibile caricare il dashboard"
+    },
+    "trend": {
+      "active_cooperatives": "Cooperative attive",
+      "cooperatives_axis": "Cooperative",
+      "empty": "Nessun dato di tendenza disponibile.",
+      "hours_axis": "Ore",
+      "title": "Andamento nazionale sui 12 mesi",
+      "total_hours_all": "Ore totali (tutte le cooperative)"
+    }
+  },
+  "success_stories_admin": {
+    "about": {
+      "body": "Le schede dimostrative sono storie di impatto strutturate legate a metriche in tempo reale dalla piattaforma. Ogni scheda mostra un confronto prima/dopo con una fonte di prova citata e una nota metodologica. Le carte contrassegnate come \"Demo\" sono solo illustrative; contrassegnare una carta come \"Prova reale\" dopo aver verificato i dati. Le schede pubblicate vengono visualizzate nel Rapporto sull'impatto municipale e nella pagina sull'impatto rivolta al pubblico.",
+      "title": "A proposito di questa pagina"
+    },
+    "actions": {
+      "cancel": "Cancellare",
+      "create_story": "Crea una storia",
+      "delete": "Eliminare",
+      "edit": "Modificare",
+      "new_story": "Nuova storia",
+      "refresh": "Aggiorna",
+      "refresh_live": "Aggiorna dai dati in tempo reale",
+      "remove": "Rimuovere",
+      "save_changes": "Salva modifiche",
+      "seed_demo": "Semina 3 carte demo"
+    },
+    "audience": {
+      "all_residents": "Tutti i residenti",
+      "kanton": "Kanton",
+      "municipality": "Comune",
+      "recipients": "Destinatari delle cure",
+      "verein_members": "Membri del Verein",
+      "volunteers": "Volontari"
+    },
+    "delete_modal": {
+      "body_prefix": "Questo verrà rimosso permanentemente",
+      "body_suffix": "dalla galleria.",
+      "title": "Rimuovere la storia di successo",
+      "warning": "Questa azione non può essere annullata."
+    },
+    "editor": {
+      "after_value": "Dopo il valore",
+      "audience": "Pubblico",
+      "before_value": "Prima del valore",
+      "demo_description": "La scheda è etichettata come demo nella galleria",
+      "demo_label": "Dimostrativo/illustrativo",
+      "edit_title": "Modifica: {{title}}",
+      "evidence_source": "Fonte della prova",
+      "evidence_source_description": "Obbligatorio: da dove proviene il numero. Esempio: \"NEXUS dati della piattaforma, finestra mobile di 90 giorni che termina il 01-04-2026\" o \"Swiss Federal Statistical Office 2023\".",
+      "evidence_source_placeholder": "per esempio. \"AG83 quadro di valutazione pilota 30 aprile 2026\"",
+      "method_caveat": "Avvertenza sul metodo",
+      "method_caveat_description": "Obbligatorio: una nota di una frase sui limiti della metodologia. Mantiene le richieste oneste con i finanziatori. Esempio: 'Sulla base delle ore dichiarate personalmente; audit esterno in attesa.\"",
+      "method_caveat_placeholder": "per esempio. \"Solo regione pilota; n=42 membri; finestra di 90 giorni\"",
+      "metric_key": "Chiave metrica",
+      "metric_key_description": "Obbligatorio per origini non manuali",
+      "metric_key_placeholder": "per esempio. approvate_ore, formal_care_offset_chf",
+      "metric_source": "Fonte metrica",
+      "metric_source_description": "pilot_scoreboard: estrae automaticamente da AG83; municipal_roi: prelievo automatico da AG76; manuale: si inseriscono i valori manualmente.",
+      "narrative": "Narrativa",
+      "narrative_placeholder": "2-4 frasi che spiegano la storia a un responsabile degli appalti o a un finanziatore.",
+      "new_title": "Nuova storia di successo",
+      "published_description": "Visibile nella galleria rivolta ai membri",
+      "published_label": "Pubblicato",
+      "sub_region_id": "Sottoregione ID (facoltativo)",
+      "sub_region_placeholder": "Lascia vuoto per tutti",
+      "title": "Titolo",
+      "title_placeholder": "per esempio. Sforzo di distribuzione delle informazioni ridotto del 30%.",
+      "unit": "Unità",
+      "unit_placeholder": "per esempio. ore, CHF, %"
+    },
+    "empty": {
+      "body": "Semina 3 carte dimostrative illustrative per mostrare come appaiono le carte di prova ai responsabili degli appalti e ai finanziatori. Sono chiaramente etichettati come \"Demo/illustrativi\" finché non vengono contrassegnati a mano come prove reali.",
+      "title": "Ancora nessuna storia di successo"
+    },
+    "meta": {
+      "subtitle": "Crea e gestisci schede dimostrative che dimostrano l'impatto della comunità, progettate per essere condivise con responsabili degli appalti, finanziatori e partner municipali.",
+      "title": "Storie di successo"
+    },
+    "metric_sources": {
+      "manual": "Manuale/illustrativo",
+      "municipal_roi": "AG76 comunale ROI",
+      "pilot_scoreboard": "AG83 Tabellone segnapunti pilota"
+    },
+    "status": {
+      "demo": "Dimostrazione",
+      "published": "Pubblicato",
+      "real": "Vero",
+      "unpublished": "Inedito"
+    },
+    "table": {
+      "actions": "Azioni",
+      "aria": "Storie di successo",
+      "audience": "Pubblico",
+      "demo": "Dimostrazione",
+      "metric": "Metrico",
+      "row_actions": "Azioni di riga",
+      "status": "Stato",
+      "title": "Titolo"
+    },
+    "toasts": {
+      "create_failed": "Creazione fallita",
+      "created": "Storia creata",
+      "delete_failed": "Eliminazione non riuscita",
+      "load_failed": "Impossibile caricare le storie di successo",
+      "metric_refreshed": "Metrica in tempo reale aggiornata",
+      "refresh_failed": "Aggiornamento non riuscito",
+      "removed": "Storia rimossa",
+      "seed_failed": "Il seme è fallito",
+      "seeded": "Hai seminato 3 carte demo",
+      "update_failed": "Aggiornamento non riuscito",
+      "updated": "Storia aggiornata"
     }
   }
 }

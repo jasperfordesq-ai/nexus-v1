@@ -4543,7 +4543,27 @@
     "jwt_federation_auth_platform_title": "JWT-based federation auth is configured at platform level",
     "label_super_admin": "Super Admin",
     "analytics": {
-      "title": "Federation Analytics"
+      "title": "Föderationsanalyse",
+      "chart_daily_calls": "Tägliche API Anrufe",
+      "chart_top_partners": "Top-Partner",
+      "col_ip": "IP",
+      "description": "Sehen Sie sich Analysen für gemeinschaftsübergreifende Aktivitäten und Partnerschaftsgesundheit an",
+      "kpi_active_partnerships": "Aktive Partnerschaften",
+      "kpi_external_partners": "Externe Partner",
+      "kpi_federated_listings": "Verbundeinträge",
+      "kpi_federated_messages": "Verbundnachrichten",
+      "kpi_federated_transactions": "Verbundtransaktionen",
+      "kpi_inbound_reviews": "Eingehende Bewertungen",
+      "kpi_pending_partnerships": "Ausstehende Partnerschaften",
+      "kpi_total_partnerships": "Gesamtzahl der Partnerschaften",
+      "kpi_window": "Ausgewählter Bereich",
+      "no_partner_activity": "Keine Partneraktivität gefunden",
+      "no_recent_errors": "Keine aktuellen Fehler gefunden",
+      "range_30d": "Letzte 30 Tage",
+      "range_7d": "Letzte 7 Tage",
+      "range_90d": "Letzte 90 Tage",
+      "range_label": "Analytics-Bereich",
+      "recent_errors": "Aktuelle Fehler"
     },
     "partnerships": {
       "bulk_approved_count": "Approved {{count}} partnership request",
@@ -13212,6 +13232,217 @@
     "validation": {
       "slug_format": "Slug muss aus Kleinbuchstaben a–z, 0–9 und Bindestrichen/Unterstrichen bestehen",
       "slug_name_required": "Slug und Name sind erforderlich"
+    }
+  },
+  "national_kiss_dashboard": {
+    "about": {
+      "body_prefix": "KISS (Koordination und Innovation für Soziales) ist eine Schweizer Methodik zur gemeindenahen Pflegekoordination, die mit Age-Stiftung entwickelt wurde. Dieses Super-Admin-Dashboard fasst Kennzahlen aller NEXUS Genossenschaften zusammen, die landesweit das Caring Community-Programm durchführen – und zwar der Fondation",
+      "body_suffix": "eine genossenschaftsübergreifende Sicht auf die ausgetauschten Stunden, die Beteiligung der Mitglieder und die Gesundheit der Genossenschaft. Die Anzahl der Mitglieder wird aus Datenschutzgründen in Klammern (z. B. „50-99“) und nicht in genauen Zahlen angezeigt.",
+      "health_prefix": "Verwenden Sie die Periodenauswahl, um Quartale zu vergleichen. Die Vergleichstabelle ordnet Genossenschaften nach Stunden, Mitgliedern oder Gesundheitszustand. Der Gesundheitszustand wird aus Aktivitätstrends abgeleitet:",
+      "stable_definition": "flache Aktivität,",
+      "struggling_definition": "sinkende Aktivität oder sehr geringes Engagement.",
+      "thriving_definition": "wächst schnell,",
+      "title": "Über dieses Dashboard"
+    },
+    "actions": {
+      "refresh": "Aktualisieren"
+    },
+    "comparative": {
+      "aria": "Vergleichsmetriken nach Genossenschaft",
+      "cooperative": "Kooperative",
+      "empty_middle": "Genossenschaften noch konfiguriert. Gehe zu",
+      "empty_prefix": "NEIN",
+      "empty_suffix": "und legen Sie die Mieterkategorie auf fest",
+      "empty_tail": "auf mindestens einem Mandanten, um dieses Dashboard zu füllen.",
+      "hours_sort": "Stunden <->",
+      "hours_title": "Gesamte verifizierte Pflegestunden im ausgewählten Zeitraum",
+      "members": "Mitglieder",
+      "members_title": "Die Anzahl der aktiven Mitglieder wird als datenschutzrechtliche Klammer angezeigt",
+      "recipients": "Empfänger",
+      "recipients_title": "Erreichte Pflegebedürftige (Datenschutzgruppe)",
+      "reciprocity_sort": "Gegenseitigkeit <->",
+      "reciprocity_title": "% der Unterstützer, die in diesem Zeitraum auch Stunden erhalten haben – zeigt die Gesundheit des gegenseitigen Austauschs an",
+      "retention_sort": "Aufbewahrung <->",
+      "retention_title": "% der Mitglieder, die sowohl in diesem Zeitraum als auch im vorherigen entsprechenden Zeitraum aktiv waren",
+      "sort_hint": "Klicken Sie zum Sortieren auf eine Spalte",
+      "status": "Status",
+      "super_admin_tenants": "Super Admin -> Mieter",
+      "tandems_sort": "Tandems <->",
+      "tandems_title": "Wiederkehrende Helfer/Empfänger-Paare mit mehr als 2 abgeschlossenen Austauschvorgängen",
+      "title": "Vergleichsmetriken"
+    },
+    "empty": {
+      "no_active_cooperatives": "Keine aktiven Genossenschaften in diesem Zeitraum.",
+      "no_data": "Keine Daten."
+    },
+    "filters": {
+      "from": "Aus",
+      "from_aria": "Zeitraum von",
+      "period": "Zeitraum",
+      "period_aria": "Berichtszeitraum",
+      "to": "Zu",
+      "to_aria": "Zeitraum bis"
+    },
+    "footer": {
+      "generated_at": "Erstellt am {{date}}.",
+      "privacy_note": "Die Anzahl der Mitglieder wird in datenschutzrechtlichen Klammern angegeben. Auf dieser Seite werden keine individuellen Mitgliedskennungen angezeigt."
+    },
+    "health_legend": {
+      "privacy_note": "Mitgliederzahlen werden in datenschutzrechtlichen Klammern angezeigt (z. B. „50-99“) – hier werden niemals individuelle Daten angezeigt.",
+      "stable": "flache Aktivität (+/-10 %)",
+      "struggling": "rückläufige Aktivität oder weniger als 5 verifizierte Stunden im Zeitraum",
+      "thriving": "Stunden steigen stark an (>10 % gegenüber dem Vorzeitraum)",
+      "title": "Schlüssel zum Gesundheitszustand:"
+    },
+    "inline": {
+      "active_members": "Aktive Mitglieder:",
+      "recipients_reached": "Empfänger erreicht:",
+      "safeguarding_reports": "Schutzberichte:"
+    },
+    "leaderboards": {
+      "bottom_title": "Unten 5 (nur aktiv)",
+      "top_title": "Top 5 nach Stunden"
+    },
+    "meta": {
+      "description": "Genossenschaftsübergreifende Superadministratoransicht aller KISS-Genossenschaften auf der Plattform. Die Mitgliederzahlen werden in datenschutzrechtlichen Klammern angegeben.",
+      "page_title": "Fondation KISS – Nationales Dashboard",
+      "title": "Fondation KISS – Nationales Dashboard"
+    },
+    "metrics": {
+      "yoy": "{{value}} YoY"
+    },
+    "periods": {
+      "custom": "Benutzerdefiniertes Sortiment",
+      "last_quarter": "Letztes Quartal (90 Tage)",
+      "last_year": "Letztes Jahr",
+      "this_month": "Diesen Monat"
+    },
+    "stats": {
+      "active_cooperatives": "Aktive Genossenschaften",
+      "active_description": "{{active}} von {{total}} aktiv im Zeitraum",
+      "active_tandems": "Aktive Tandems",
+      "total_cooperatives": "Gesamtgenossenschaften",
+      "total_hours": "Gesamtstunden (national)"
+    },
+    "status": {
+      "stable": "Stabil",
+      "struggling": "Kämpfend",
+      "thriving": "Gedeihend"
+    },
+    "toasts": {
+      "load_failed": "Das Dashboard konnte nicht geladen werden"
+    },
+    "trend": {
+      "active_cooperatives": "Aktive Genossenschaften",
+      "cooperatives_axis": "Genossenschaften",
+      "empty": "Keine Trenddaten verfügbar.",
+      "hours_axis": "Std",
+      "title": "Nationaler 12-Monats-Trend",
+      "total_hours_all": "Gesamtstunden (alle Genossenschaften)"
+    }
+  },
+  "success_stories_admin": {
+    "about": {
+      "body": "Proof-Karten sind strukturierte Wirkungsgeschichten, die mit Live-Metriken der Plattform verknüpft sind. Jede Karte zeigt einen Vorher-/Nachher-Vergleich mit einer zitierten Beweisquelle und einem Hinweis zur Methodik. Als „Demo“ gekennzeichnete Karten dienen nur zur Veranschaulichung; Markieren Sie eine Karte als „Echter Beweis“, sobald Sie die Daten überprüft haben. Veröffentlichte Karten erscheinen im Municipal Impact Report und auf der öffentlich zugänglichen Impact-Seite.",
+      "title": "Über diese Seite"
+    },
+    "actions": {
+      "cancel": "Stornieren",
+      "create_story": "Erstelle eine Geschichte",
+      "delete": "Löschen",
+      "edit": "Bearbeiten",
+      "new_story": "Neue Geschichte",
+      "refresh": "Aktualisieren",
+      "refresh_live": "Aktualisieren Sie aus Live-Daten",
+      "remove": "Entfernen",
+      "save_changes": "Änderungen speichern",
+      "seed_demo": "Setze 3 Demokarten ein"
+    },
+    "audience": {
+      "all_residents": "Alle Bewohner",
+      "kanton": "Kanton",
+      "municipality": "Gemeinde",
+      "recipients": "Pflegebedürftige",
+      "verein_members": "Vereinsmitglieder",
+      "volunteers": "Freiwillige"
+    },
+    "delete_modal": {
+      "body_prefix": "Dies wird dauerhaft entfernt",
+      "body_suffix": "aus der Galerie.",
+      "title": "Erfolgsgeschichte entfernen",
+      "warning": "Diese Aktion kann nicht rückgängig gemacht werden."
+    },
+    "editor": {
+      "after_value": "Nach Wert",
+      "audience": "Publikum",
+      "before_value": "Vor Wert",
+      "demo_description": "Die Karte ist in der Galerie als Demo gekennzeichnet",
+      "demo_label": "Demo / illustrativ",
+      "edit_title": "Bearbeiten: {{title}}",
+      "evidence_source": "Beweisquelle",
+      "evidence_source_description": "Erforderlich – woher die Nummer kommt. Beispiel: „NEXUS Plattformdaten, gleitendes 90-Tage-Fenster bis 01.04.2026“ oder „Swiss Federal Statistical Office 2023.“",
+      "evidence_source_placeholder": "z.B. „AG83 Pilotanzeigetafel 2026-04-30 Basislinie“",
+      "method_caveat": "Vorbehalt zur Methode",
+      "method_caveat_description": "Erforderlich – ein einsatziger Hinweis zu methodischen Einschränkungen. Hält die Forderungen gegenüber den Geldgebern ehrlich. Beispiel: „Basierend auf selbst gemeldeten Stunden; externes Audit steht noch aus.'",
+      "method_caveat_placeholder": "z.B. „Nur Pilotregion; n=42 Mitglieder; 90-Tage-Fenster“",
+      "metric_key": "Metrischer Schlüssel",
+      "metric_key_description": "Erforderlich für nicht manuelle Quellen",
+      "metric_key_placeholder": "z.B. genehmigte_Stunden, formaler_Pflege_Offset_CHF",
+      "metric_source": "Metrische Quelle",
+      "metric_source_description": "pilot_scoreboard: zieht automatisch von AG83; Municipal_roi: zieht automatisch von AG76; Manuell: Sie geben Werte manuell ein.",
+      "narrative": "Erzählung",
+      "narrative_placeholder": "2-4 Sätze, in denen einem Beschaffungsbeauftragten oder Geldgeber die Geschichte erklärt wird.",
+      "new_title": "Neue Erfolgsgeschichte",
+      "published_description": "Sichtbar auf der den Mitgliedern zugewandten Galerie",
+      "published_label": "Veröffentlicht",
+      "sub_region_id": "Unterregion ID (optional)",
+      "sub_region_placeholder": "Für alle leer lassen",
+      "title": "Titel",
+      "title_placeholder": "z.B. 30 % geringerer Informationsverteilungsaufwand",
+      "unit": "Einheit",
+      "unit_placeholder": "z.B. Stunden, CHF, %"
+    },
+    "empty": {
+      "body": "Bereiten Sie drei anschauliche Demokarten vor, um Beschaffungsbeauftragten und Geldgebern zu zeigen, wie Proofkarten aussehen. Sie sind deutlich mit „Demo/illustrativ“ gekennzeichnet, bis Sie sie handschriftlich als echten Beweis markieren.",
+      "title": "Noch keine Erfolgsgeschichten"
+    },
+    "meta": {
+      "subtitle": "Erstellen und verwalten Sie Nachweiskarten, die den Einfluss der Gemeinschaft verdeutlichen – konzipiert für die Weitergabe an Beschaffungsbeauftragte, Geldgeber und kommunale Partner.",
+      "title": "Erfolgsgeschichten"
+    },
+    "metric_sources": {
+      "manual": "Handbuch / illustrativ",
+      "municipal_roi": "AG76 kommunal ROI",
+      "pilot_scoreboard": "AG83 Pilotenanzeigetafel"
+    },
+    "status": {
+      "demo": "Demo",
+      "published": "Veröffentlicht",
+      "real": "Real",
+      "unpublished": "Unveröffentlicht"
+    },
+    "table": {
+      "actions": "Aktionen",
+      "aria": "Erfolgsgeschichten",
+      "audience": "Publikum",
+      "demo": "Demo",
+      "metric": "Metrisch",
+      "row_actions": "Zeilenaktionen",
+      "status": "Status",
+      "title": "Titel"
+    },
+    "toasts": {
+      "create_failed": "Erstellen ist fehlgeschlagen",
+      "created": "Geschichte erstellt",
+      "delete_failed": "Das Löschen ist fehlgeschlagen",
+      "load_failed": "Erfolgsgeschichten konnten nicht geladen werden",
+      "metric_refreshed": "Live-Metrik aktualisiert",
+      "refresh_failed": "Aktualisierung fehlgeschlagen",
+      "removed": "Geschichte entfernt",
+      "seed_failed": "Saatgut ist fehlgeschlagen",
+      "seeded": "3 Demokarten gesetzt",
+      "update_failed": "Update fehlgeschlagen",
+      "updated": "Geschichte aktualisiert"
     }
   }
 }
