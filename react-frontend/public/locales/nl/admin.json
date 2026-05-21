@@ -10689,5 +10689,193 @@
         "90": "Laatste 90 dagen"
       }
     }
+  },
+  "advertising": {
+    "status": {
+      "all": "Alle",
+      "active": "Actief",
+      "cancelled": "Geannuleerd",
+      "completed": "Voltooid",
+      "draft": "Voorlopige versie",
+      "drafts": "Concepten",
+      "paused": "Gepauzeerd",
+      "pending_review": "In afwachting van beoordeling",
+      "rejected": "Afgewezen",
+      "scheduled": "Gepland",
+      "sending": "Verzenden",
+      "sent": "Verstuurd"
+    },
+    "advertiser": {
+      "gemeinde": "Gemeente",
+      "private": "Privé",
+      "sme": "SME",
+      "sme_local": "SME (lokaal bedrijf)",
+      "verein": "Vereniging"
+    },
+    "shared": {
+      "campaign_details": "Campagnedetails",
+      "filter_by_status": "Filter op status",
+      "rejection_reason": "Reden van afwijzing",
+      "search_campaigns": "Zoekcampagnes...",
+      "unexpected_error": "Er is een onverwachte fout opgetreden",
+      "actions": {
+        "approve": "Goedkeuren",
+        "cancel": "Annuleren",
+        "close": "Dichtbij",
+        "create_campaign": "Campagne maken",
+        "details": "Details",
+        "new_campaign": "Nieuwe campagne",
+        "pause": "Pauze",
+        "reject": "Afwijzen",
+        "reject_campaign": "Campagne afwijzen",
+        "submit_for_review": "Ter beoordeling indienen",
+        "view_details": "Bekijk details"
+      },
+      "columns": {
+        "actions": "Acties",
+        "advertiser": "Adverteerder",
+        "campaign": "Campagne",
+        "clicks": "Klikken",
+        "ctr": "CTR",
+        "id": "ID",
+        "impressions": "Indrukken",
+        "status": "Status"
+      },
+      "empty": {
+        "no_campaigns": "Geen campagnes gevonden."
+      },
+      "fields": {
+        "advertiser_type": "Type adverteerder",
+        "campaign_name": "Campagnenaam",
+        "type": "Type"
+      }
+    },
+    "ad": {
+      "page_title": "Advertentiecampagnes",
+      "budget_description": "Voer 0 in voor een onbeperkt budget",
+      "audience_description": "Laat dit veld leeg om alle communityleden te targeten",
+      "creative_alt": "Creatief",
+      "create_title": "Advertentiecampagne maken",
+      "creatives_count": "Advertenties ({{count}})",
+      "no_creatives": "Er zijn nog geen advertenties aan deze campagne gekoppeld.",
+      "performance_30_days": "Prestaties (30 dagen)",
+      "reject_intro_prefix": "Jij wijst af",
+      "reject_intro_suffix": "Geef een reden op, zodat de adverteerder weet hoe hij zijn inzending kan verbeteren.",
+      "rejection_placeholder": "bijv. Inhoud is in strijd met de communityrichtlijnen. Pas de kop aan.",
+      "columns": {
+        "budget_spent": "Budget / Besteed"
+      },
+      "fields": {
+        "audience_filters": "Doelgroepfilters (JSON, optioneel)",
+        "end_date": "Einddatum",
+        "placement": "Plaatsing",
+        "start_date": "Startdatum",
+        "total_budget_cents": "Totaal budget (in centen)"
+      },
+      "header": {
+        "title": "Lokale reclame",
+        "description": "Beheer lokale advertentiecampagnes van SMEs, verenigingen en gemeenten"
+      },
+      "placement": {
+        "all": "Alle plaatsingen",
+        "discovery": "Ontdekking",
+        "feed": "Voer",
+        "market": "Markt"
+      },
+      "placeholders": {
+        "budget": "bijv. 5000 = EUR 50,00",
+        "campaign_name": "Zomeruitverkoop - Cafe Helvetia"
+      },
+      "stats": {
+        "active_campaigns": "Actieve campagnes",
+        "clicks_today": "Klikken vandaag",
+        "impressions_today": "Indrukken vandaag",
+        "total_revenue": "Totale omzet"
+      },
+      "toasts": {
+        "approved": "Campagne '{{name}}' goedgekeurd",
+        "approve_failed": "Kan de campagne niet goedkeuren",
+        "audience_json_invalid": "Doelgroepfilters moeten geldig JSON zijn",
+        "created": "Campagne gemaakt en ter beoordeling ingediend",
+        "create_failed": "Kan campagne niet maken",
+        "details_failed": "Kan campagnedetails niet laden",
+        "load_failed": "Kan advertentiecampagnes niet laden",
+        "name_required": "Campagnenaam is vereist",
+        "paused": "Campagne '{{name}}' is onderbroken",
+        "pause_failed": "Kan de campagne niet onderbreken",
+        "rejected": "Campagne '{{name}}' afgewezen",
+        "reject_failed": "Kan de campagne niet afwijzen"
+      }
+    },
+    "push": {
+      "chart_opens_title": "{{count}} wordt geopend",
+      "chart_sends_title": "{{count}} verzendt",
+      "create_title": "Nieuwe push-campagne",
+      "daily_breakdown": "Dagelijkse uitsplitsing",
+      "immediate": "Onmiddellijk",
+      "no_daily_data": "Nog geen dagelijkse gegevens.",
+      "reject_intro_prefix": "Afwijzen",
+      "reject_intro_suffix": "Geef een reden op die zichtbaar is voor de adverteerder.",
+      "rejection_placeholder": "bijv. Inhoud voldoet niet aan de communityrichtlijnen...",
+      "table_aria": "Push-campagnes",
+      "actions": {
+        "dispatch_now": "Nu verzenden"
+      },
+      "columns": {
+        "cost": "Kosten",
+        "open_rate": "Open tarief",
+        "scheduled": "Gepland",
+        "targets": "Doelstellingen",
+        "title_preview": "Titelvoorbeeld"
+      },
+      "dates": {
+        "approved": "Goedgekeurd",
+        "created": "Gemaakt",
+        "scheduled": "Gepland",
+        "sent": "Verstuurd"
+      },
+      "fields": {
+        "cta_url": "CTA URL",
+        "cta_url_optional": "CTA URL (optioneel)",
+        "notification_body": "Pushmeldingstekst",
+        "notification_title": "Titel van pushmelding",
+        "push_body": "Duw lichaam",
+        "push_title": "Titel pushen",
+        "scheduled_at": "Gepland om (optioneel - laat leeg om ter goedkeuring te verzenden)"
+      },
+      "header": {
+        "title": "Betaalde pushcampagnes (AG57)"
+      },
+      "metrics": {
+        "opens": "Opent",
+        "revenue": "Winst",
+        "sends": "Verzendt",
+        "sent": "Verstuurd"
+      },
+      "placeholders": {
+        "body": "Maximaal 400 tekens",
+        "campaign_name": "bijv. Lentepromotie - Cafe Seeblick",
+        "title": "Maximaal 100 tekens"
+      },
+      "stats": {
+        "needs_attention": "Heeft aandacht nodig",
+        "pending_review": "In afwachting van beoordeling",
+        "revenue_this_month": "Inkomsten deze maand",
+        "sends_this_month": "Wordt deze maand verzonden",
+        "total_campaigns": "Totaal aantal campagnes"
+      },
+      "toasts": {
+        "approved": "Campagne '{{name}}' goedgekeurd.",
+        "approve_failed": "Kan de campagne niet goedkeuren.",
+        "created": "Campagne gemaakt.",
+        "create_failed": "Kan campagne niet maken.",
+        "dispatched": "Campagne \"{{name}}\" verzonden.",
+        "dispatch_failed": "Kan campagne niet verzenden.",
+        "load_failed": "Kan campagnes niet laden",
+        "rejected": "Campagne '{{name}}' afgewezen.",
+        "reject_failed": "Kan de campagne niet afwijzen.",
+        "required_fields": "Naam, titel en hoofdtekst zijn vereist."
+      }
+    }
   }
 }

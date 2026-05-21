@@ -10689,5 +10689,193 @@
         "90": "آخر 90 يومًا"
       }
     }
+  },
+  "advertising": {
+    "status": {
+      "all": "الجميع",
+      "active": "نشيط",
+      "cancelled": "تم الإلغاء",
+      "completed": "مكتمل",
+      "draft": "مسودة",
+      "drafts": "المسودات",
+      "paused": "متوقف مؤقتًا",
+      "pending_review": "في انتظار المراجعة",
+      "rejected": "مرفوض",
+      "scheduled": "المقرر",
+      "sending": "إرسال",
+      "sent": "مرسل"
+    },
+    "advertiser": {
+      "gemeinde": "بلدية",
+      "private": "خاص",
+      "sme": "SME",
+      "sme_local": "SME (الأعمال التجارية المحلية)",
+      "verein": "منظمة"
+    },
+    "shared": {
+      "campaign_details": "تفاصيل الحملة",
+      "filter_by_status": "التصفية حسب الحالة",
+      "rejection_reason": "سبب الرفض",
+      "search_campaigns": "حملات البحث...",
+      "unexpected_error": "حدث خطأ غير متوقع",
+      "actions": {
+        "approve": "يعتمد",
+        "cancel": "يلغي",
+        "close": "يغلق",
+        "create_campaign": "إنشاء حملة",
+        "details": "تفاصيل",
+        "new_campaign": "حملة جديدة",
+        "pause": "يوقف",
+        "reject": "يرفض",
+        "reject_campaign": "رفض الحملة",
+        "submit_for_review": "إرسال للمراجعة",
+        "view_details": "عرض التفاصيل"
+      },
+      "columns": {
+        "actions": "الإجراءات",
+        "advertiser": "معلن",
+        "campaign": "حملة",
+        "clicks": "النقرات",
+        "ctr": "CTR",
+        "id": "ID",
+        "impressions": "انطباعات",
+        "status": "حالة"
+      },
+      "empty": {
+        "no_campaigns": "لم يتم العثور على حملات."
+      },
+      "fields": {
+        "advertiser_type": "نوع المعلن",
+        "campaign_name": "اسم الحملة",
+        "type": "يكتب"
+      }
+    },
+    "ad": {
+      "page_title": "الحملات الإعلانية",
+      "budget_description": "أدخل 0 للميزانية غير المحدودة",
+      "audience_description": "اتركه فارغًا لاستهداف جميع أفراد المجتمع",
+      "creative_alt": "مبدع",
+      "create_title": "إنشاء حملة إعلانية",
+      "creatives_count": "التصميمات ({{count}})",
+      "no_creatives": "لا توجد تصميمات إعلانية مرفقة بهذه الحملة حتى الآن.",
+      "performance_30_days": "الأداء (30 يومًا)",
+      "reject_intro_prefix": "أنت ترفض",
+      "reject_intro_suffix": "يرجى تقديم السبب حتى يعرف المعلن كيفية تحسين عملية الإرسال.",
+      "rejection_placeholder": "على سبيل المثال المحتوى ينتهك إرشادات المجتمع - يرجى مراجعة العنوان.",
+      "columns": {
+        "budget_spent": "الميزانية / الإنفاق"
+      },
+      "fields": {
+        "audience_filters": "مرشحات الجمهور (JSON، اختياري)",
+        "end_date": "تاريخ الانتهاء",
+        "placement": "التنسيب",
+        "start_date": "تاريخ البدء",
+        "total_budget_cents": "الميزانية الإجمالية (بالسنتات)"
+      },
+      "header": {
+        "title": "الإعلان المحلي",
+        "description": "إدارة الحملات الإعلانية المحلية من SMEs والجمعيات والبلديات"
+      },
+      "placement": {
+        "all": "جميع المواضع",
+        "discovery": "اكتشاف",
+        "feed": "يٌطعم",
+        "market": "سوق"
+      },
+      "placeholders": {
+        "budget": "على سبيل المثال 5000 = EUR 50.00",
+        "campaign_name": "تخفيضات الصيف - Cafe Helvetia"
+      },
+      "stats": {
+        "active_campaigns": "الحملات النشطة",
+        "clicks_today": "نقرات اليوم",
+        "impressions_today": "الانطباعات اليوم",
+        "total_revenue": "إجمالي الإيرادات"
+      },
+      "toasts": {
+        "approved": "تمت الموافقة على الحملة \"{{name}}\".",
+        "approve_failed": "فشلت الموافقة على الحملة",
+        "audience_json_invalid": "يجب أن تكون عوامل تصفية الجمهور صالحة JSON",
+        "created": "تم إنشاء الحملة وتقديمها للمراجعة",
+        "create_failed": "فشل إنشاء الحملة",
+        "details_failed": "فشل تحميل تفاصيل الحملة",
+        "load_failed": "فشل تحميل الحملات الإعلانية",
+        "name_required": "اسم الحملة مطلوب",
+        "paused": "الحملة \"{{name}}\" متوقفة مؤقتًا",
+        "pause_failed": "فشل إيقاف الحملة مؤقتًا",
+        "rejected": "تم رفض الحملة \"{{name}}\".",
+        "reject_failed": "فشل رفض الحملة"
+      }
+    },
+    "push": {
+      "chart_opens_title": "يتم فتح {{count}}",
+      "chart_sends_title": "يرسل {{count}}",
+      "create_title": "حملة دفع جديدة",
+      "daily_breakdown": "انهيار يومي",
+      "immediate": "مباشر",
+      "no_daily_data": "لا توجد بيانات يومية حتى الآن.",
+      "reject_intro_prefix": "رفض",
+      "reject_intro_suffix": "يرجى تقديم السبب الذي سيكون مرئيًا للمعلن.",
+      "rejection_placeholder": "على سبيل المثال المحتوى لا يتوافق مع إرشادات المجتمع...",
+      "table_aria": "حملات الدفع",
+      "actions": {
+        "dispatch_now": "أرسل الآن"
+      },
+      "columns": {
+        "cost": "يكلف",
+        "open_rate": "معدل مفتوح",
+        "scheduled": "المقرر",
+        "targets": "الأهداف",
+        "title_preview": "معاينة العنوان"
+      },
+      "dates": {
+        "approved": "موافقة",
+        "created": "مخلوق",
+        "scheduled": "المقرر",
+        "sent": "مرسل"
+      },
+      "fields": {
+        "cta_url": "CTA URL",
+        "cta_url_optional": "CTA URL (اختياري)",
+        "notification_body": "دفع هيئة الإخطار",
+        "notification_title": "دفع عنوان الإخطار",
+        "push_body": "دفع الجسم",
+        "push_title": "دفع العنوان",
+        "scheduled_at": "تمت جدولته في (اختياري - اتركه فارغًا للإرسال عند الموافقة)"
+      },
+      "header": {
+        "title": "حملات الدفع المدفوعة (AG57)"
+      },
+      "metrics": {
+        "opens": "يفتح",
+        "revenue": "ربح",
+        "sends": "يرسل",
+        "sent": "مرسل"
+      },
+      "placeholders": {
+        "body": "الحد الأقصى 400 حرف",
+        "campaign_name": "على سبيل المثال ترويج الربيع - Cafe Seeblick",
+        "title": "الحد الأقصى 100 حرف"
+      },
+      "stats": {
+        "needs_attention": "يحتاج إلى اهتمام",
+        "pending_review": "في انتظار المراجعة",
+        "revenue_this_month": "الإيرادات هذا الشهر",
+        "sends_this_month": "يرسل هذا الشهر",
+        "total_campaigns": "إجمالي الحملات"
+      },
+      "toasts": {
+        "approved": "تمت الموافقة على الحملة \"{{name}}\".",
+        "approve_failed": "فشلت الموافقة على الحملة.",
+        "created": "تم إنشاء الحملة.",
+        "create_failed": "فشل إنشاء الحملة.",
+        "dispatched": "تم إرسال الحملة \"{{name}}\".",
+        "dispatch_failed": "فشل في إرسال الحملة.",
+        "load_failed": "فشل تحميل الحملات",
+        "rejected": "تم رفض الحملة \"{{name}}\".",
+        "reject_failed": "فشل رفض الحملة.",
+        "required_fields": "الاسم والعنوان والجسم مطلوبة."
+      }
+    }
   }
 }

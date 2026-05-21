@@ -10689,5 +10689,193 @@
         "90": "90 lá seo caite"
       }
     }
+  },
+  "advertising": {
+    "status": {
+      "all": "Gach",
+      "active": "Gníomhach",
+      "cancelled": "Ar ceal",
+      "completed": "Críochnaithe",
+      "draft": "Dréacht",
+      "drafts": "Dréachtaí",
+      "paused": "Sos",
+      "pending_review": "Athbhreithniú ar Feitheamh",
+      "rejected": "Diúltaithe",
+      "scheduled": "Sceidealta",
+      "sending": "Ag seoladh",
+      "sent": "Seolta"
+    },
+    "advertiser": {
+      "gemeinde": "Bardas",
+      "private": "Príobháideach",
+      "sme": "SME",
+      "sme_local": "SME (gnó áitiúil)",
+      "verein": "Comhlachas"
+    },
+    "shared": {
+      "campaign_details": "Sonraí feachtais",
+      "filter_by_status": "Scag de réir stádais",
+      "rejection_reason": "Cúis diúltaithe",
+      "search_campaigns": "Feachtais chuardaigh...",
+      "unexpected_error": "Tharla earráid gan choinne",
+      "actions": {
+        "approve": "Cheadaigh",
+        "cancel": "Cealaigh",
+        "close": "Dún",
+        "create_campaign": "Cruthaigh feachtas",
+        "details": "Sonraí",
+        "new_campaign": "Feachtas nua",
+        "pause": "Sos",
+        "reject": "Diúltaigh",
+        "reject_campaign": "Diúltaigh feachtas",
+        "submit_for_review": "Cuir isteach le haghaidh athbhreithnithe",
+        "view_details": "Féach ar na sonraí"
+      },
+      "columns": {
+        "actions": "Gníomhartha",
+        "advertiser": "Fógróir",
+        "campaign": "Feachtas",
+        "clicks": "Cliceáil",
+        "ctr": "CTR",
+        "id": "ID",
+        "impressions": "Imprisean",
+        "status": "Stádas"
+      },
+      "empty": {
+        "no_campaigns": "Níor aimsíodh feachtais ar bith."
+      },
+      "fields": {
+        "advertiser_type": "Cineál fógróra",
+        "campaign_name": "Ainm feachtais",
+        "type": "Cineál"
+      }
+    },
+    "ad": {
+      "page_title": "Feachtais Fógraíochta",
+      "budget_description": "Cuir isteach 0 le haghaidh buiséad neamhtheoranta",
+      "audience_description": "Fág bán chun díriú ar gach ball den phobal",
+      "creative_alt": "Cruthaitheach",
+      "create_title": "Cruthaigh feachtas fógraíochta",
+      "creatives_count": "Cruthaitheacha ({{count}})",
+      "no_creatives": "Níl daoine cruthaitheacha ag gabháil leis an bhfeachtas seo fós.",
+      "performance_30_days": "Feidhmíocht (30 lá)",
+      "reject_intro_prefix": "Tá tú ag diúltú",
+      "reject_intro_suffix": "Tabhair cúis le do thoil ionas go mbeidh a fhios ag an bhfógróir conas a n-aighneacht a fheabhsú.",
+      "rejection_placeholder": "e.g. Sáraíonn ábhar treoirlínte pobail - athbhreithnigh an ceannlíne le do thoil.",
+      "columns": {
+        "budget_spent": "Buiséad / Chaite"
+      },
+      "fields": {
+        "audience_filters": "Scagairí lucht éisteachta (JSON, roghnach)",
+        "end_date": "Dáta deiridh",
+        "placement": "Socrúchán",
+        "start_date": "Dáta tosaithe",
+        "total_budget_cents": "Buiséad iomlán (i gcentin)"
+      },
+      "header": {
+        "title": "Fógraíocht Áitiúil",
+        "description": "Bainistigh feachtais áitiúla fógraíochta ó SMEs, cumainn, agus bardais"
+      },
+      "placement": {
+        "all": "Gach socrúchán",
+        "discovery": "Fionnachtain",
+        "feed": "Feed",
+        "market": "Margadh"
+      },
+      "placeholders": {
+        "budget": "e.g. 5000 = EUR 50.00",
+        "campaign_name": "Díolachán Samhraidh - Cafe Helvetia"
+      },
+      "stats": {
+        "active_campaigns": "Feachtais ghníomhacha",
+        "clicks_today": "Cliceáil inniu",
+        "impressions_today": "Imprisean inniu",
+        "total_revenue": "Ioncam iomlán"
+      },
+      "toasts": {
+        "approved": "Feachtas \"{{name}}\" ceadaithe",
+        "approve_failed": "Theip ar cheadú an fheachtais",
+        "audience_json_invalid": "Caithfidh scagairí lucht éisteachta a bheith bailí JSON",
+        "created": "Feachtas cruthaithe agus curtha isteach lena athbhreithniú",
+        "create_failed": "Theip ar an bhfeachtas a chruthú",
+        "details_failed": "Theip ar lódáil sonraí feachtais",
+        "load_failed": "Theip ar lódáil feachtais fógraíochta",
+        "name_required": "Tá ainm feachtais ag teastáil",
+        "paused": "Feachtas \"{{name}}\" ar sos",
+        "pause_failed": "Theip ar an bhfeachtas a chur ar sos",
+        "rejected": "Diúltaíodh don fheachtas \"{{name}}\".",
+        "reject_failed": "Theip ar an bhfeachtas a dhiúltú"
+      }
+    },
+    "push": {
+      "chart_opens_title": "Osclaíonn {{count}}",
+      "chart_sends_title": "Seolann {{count}}",
+      "create_title": "Feachtas brú nua",
+      "daily_breakdown": "Miondealú laethúil",
+      "immediate": "Láithreach",
+      "no_daily_data": "Níl aon sonraí laethúla fós.",
+      "reject_intro_prefix": "Ag diúltú",
+      "reject_intro_suffix": "Tabhair cúis a bheidh le feiceáil ag an bhfógróir.",
+      "rejection_placeholder": "e.g. Ní chloíonn an t-ábhar le treoirlínte an phobail...",
+      "table_aria": "Feachtais a bhrú",
+      "actions": {
+        "dispatch_now": "Seol anois"
+      },
+      "columns": {
+        "cost": "Costas",
+        "open_rate": "Ráta oscailte",
+        "scheduled": "Sceidealta",
+        "targets": "Spriocanna",
+        "title_preview": "Réamhamharc teidil"
+      },
+      "dates": {
+        "approved": "Ceadaithe",
+        "created": "Cruthaithe",
+        "scheduled": "Sceidealta",
+        "sent": "Seolta"
+      },
+      "fields": {
+        "cta_url": "CTA URL",
+        "cta_url_optional": "CTA URL (roghnach)",
+        "notification_body": "Comhlacht fógra a bhrú",
+        "notification_title": "Brúigh teideal an fhógra",
+        "push_body": "Comhlacht a bhrú",
+        "push_title": "Brúigh teideal",
+        "scheduled_at": "Sceidealta ag (roghnach - fág bán lena sheoladh ar fhaomhadh)"
+      },
+      "header": {
+        "title": "Feachtais bhrú íoctha (AG57)"
+      },
+      "metrics": {
+        "opens": "Osclaíonn",
+        "revenue": "Ioncam",
+        "sends": "Seolann",
+        "sent": "Seolta"
+      },
+      "placeholders": {
+        "body": "400 carachtar ar a mhéad",
+        "campaign_name": "e.g. Cur Chun Cinn an Earraigh - Cafe Seeblick",
+        "title": "100 carachtar ar a mhéad"
+      },
+      "stats": {
+        "needs_attention": "Teastaíonn aird",
+        "pending_review": "Athbhreithniú ar feitheamh",
+        "revenue_this_month": "Ioncam an mhí seo",
+        "sends_this_month": "Seolann an mhí seo",
+        "total_campaigns": "Iomlán feachtais"
+      },
+      "toasts": {
+        "approved": "Feachtas \"{{name}}\" ceadaithe.",
+        "approve_failed": "Theip ar cheadú an fheachtais.",
+        "created": "Feachtas cruthaithe.",
+        "create_failed": "Theip ar an bhfeachtas a chruthú.",
+        "dispatched": "Seoladh an feachtas \"{{name}}\".",
+        "dispatch_failed": "Theip ar an bhfeachtas a sheoladh.",
+        "load_failed": "Theip ar lódáil feachtais",
+        "rejected": "Diúltaíodh don fheachtas \"{{name}}\".",
+        "reject_failed": "Theip ar an bhfeachtas a dhiúltú.",
+        "required_fields": "Tá ainm, teideal agus corp ag teastáil."
+      }
+    }
   }
 }

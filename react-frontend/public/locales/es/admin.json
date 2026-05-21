@@ -10689,5 +10689,193 @@
         "90": "últimos 90 días"
       }
     }
+  },
+  "advertising": {
+    "status": {
+      "all": "Todo",
+      "active": "Activo",
+      "cancelled": "Cancelado",
+      "completed": "Terminado",
+      "draft": "Borrador",
+      "drafts": "Damas",
+      "paused": "En pausa",
+      "pending_review": "Revisión pendiente",
+      "rejected": "Rechazado",
+      "scheduled": "Programado",
+      "sending": "Envío",
+      "sent": "Enviado"
+    },
+    "advertiser": {
+      "gemeinde": "Municipio",
+      "private": "Privado",
+      "sme": "SME",
+      "sme_local": "SME (empresa local)",
+      "verein": "Asociación"
+    },
+    "shared": {
+      "campaign_details": "Detalles de la campaña",
+      "filter_by_status": "Filtrar por estado",
+      "rejection_reason": "Motivo del rechazo",
+      "search_campaigns": "Campañas de búsqueda...",
+      "unexpected_error": "Ocurrió un error inesperado",
+      "actions": {
+        "approve": "Aprobar",
+        "cancel": "Cancelar",
+        "close": "Cerca",
+        "create_campaign": "Crear campaña",
+        "details": "Detalles",
+        "new_campaign": "Nueva campaña",
+        "pause": "Pausa",
+        "reject": "Rechazar",
+        "reject_campaign": "Rechazar campaña",
+        "submit_for_review": "Enviar para revisión",
+        "view_details": "Ver detalles"
+      },
+      "columns": {
+        "actions": "Comportamiento",
+        "advertiser": "Anunciante",
+        "campaign": "Campaña",
+        "clicks": "Clics",
+        "ctr": "CTR",
+        "id": "ID",
+        "impressions": "Impresiones",
+        "status": "Estado"
+      },
+      "empty": {
+        "no_campaigns": "No se encontraron campañas."
+      },
+      "fields": {
+        "advertiser_type": "Tipo de anunciante",
+        "campaign_name": "Nombre de la campaña",
+        "type": "Tipo"
+      }
+    },
+    "ad": {
+      "page_title": "Campañas publicitarias",
+      "budget_description": "Ingrese 0 para un presupuesto ilimitado",
+      "audience_description": "Déjelo en blanco para dirigirse a todos los miembros de la comunidad.",
+      "creative_alt": "Creativo",
+      "create_title": "Crear campaña publicitaria",
+      "creatives_count": "Creatividades ({{count}})",
+      "no_creatives": "Aún no hay creatividades adjuntas a esta campaña.",
+      "performance_30_days": "Rendimiento (30 días)",
+      "reject_intro_prefix": "tu estas rechazando",
+      "reject_intro_suffix": "Proporcione un motivo para que el anunciante sepa cómo mejorar su envío.",
+      "rejection_placeholder": "p.ej. El contenido viola las pautas de la comunidad; revise el título.",
+      "columns": {
+        "budget_spent": "Presupuesto / Gastado"
+      },
+      "fields": {
+        "audience_filters": "Filtros de audiencia (JSON, opcional)",
+        "end_date": "Fecha de finalización",
+        "placement": "Colocación",
+        "start_date": "Fecha de inicio",
+        "total_budget_cents": "Presupuesto total (en centavos)"
+      },
+      "header": {
+        "title": "Publicidad Local",
+        "description": "Gestione campañas publicitarias locales de SME, asociaciones y municipios."
+      },
+      "placement": {
+        "all": "Todas las ubicaciones",
+        "discovery": "Descubrimiento",
+        "feed": "Alimentar",
+        "market": "Mercado"
+      },
+      "placeholders": {
+        "budget": "p.ej. 5000 = EUR 50.00",
+        "campaign_name": "Rebajas de Verano - Cafe Helvetia"
+      },
+      "stats": {
+        "active_campaigns": "Campañas activas",
+        "clicks_today": "Clics hoy",
+        "impressions_today": "Impresiones hoy",
+        "total_revenue": "Ingresos totales"
+      },
+      "toasts": {
+        "approved": "Aprobada la campaña \"{{name}}\"",
+        "approve_failed": "No se pudo aprobar la campaña",
+        "audience_json_invalid": "Los filtros de audiencia deben ser válidos JSON",
+        "created": "Campaña creada y enviada para revisión",
+        "create_failed": "No se pudo crear la campaña",
+        "details_failed": "No se pudieron cargar los detalles de la campaña",
+        "load_failed": "No se pudieron cargar las campañas publicitarias",
+        "name_required": "El nombre de la campaña es obligatorio.",
+        "paused": "Campaña \"{{name}}\" en pausa",
+        "pause_failed": "No se pudo pausar la campaña",
+        "rejected": "Campaña \"{{name}}\" rechazada",
+        "reject_failed": "No se pudo rechazar la campaña"
+      }
+    },
+    "push": {
+      "chart_opens_title": "Se abre {{count}}",
+      "chart_sends_title": "{{count}} envía",
+      "create_title": "Nueva campaña de empuje",
+      "daily_breakdown": "Desglose diario",
+      "immediate": "Inmediato",
+      "no_daily_data": "Aún no hay datos diarios.",
+      "reject_intro_prefix": "Rechazando",
+      "reject_intro_suffix": "Proporcione un motivo que será visible para el anunciante.",
+      "rejection_placeholder": "p.ej. El contenido no cumple con las pautas de la comunidad...",
+      "table_aria": "Campañas push",
+      "actions": {
+        "dispatch_now": "Enviar ahora"
+      },
+      "columns": {
+        "cost": "Costo",
+        "open_rate": "Tasa de apertura",
+        "scheduled": "Programado",
+        "targets": "Objetivos",
+        "title_preview": "Vista previa del título"
+      },
+      "dates": {
+        "approved": "Aprobado",
+        "created": "Creado",
+        "scheduled": "Programado",
+        "sent": "Enviado"
+      },
+      "fields": {
+        "cta_url": "CTA URL",
+        "cta_url_optional": "CTA URL (opcional)",
+        "notification_body": "Cuerpo de notificación push",
+        "notification_title": "Título de la notificación push",
+        "push_body": "cuerpo de empuje",
+        "push_title": "Empujar título",
+        "scheduled_at": "Programado en (opcional: déjelo en blanco para enviarlo tras la aprobación)"
+      },
+      "header": {
+        "title": "Campañas push pagas (AG57)"
+      },
+      "metrics": {
+        "opens": "Abre",
+        "revenue": "Ganancia",
+        "sends": "Envía",
+        "sent": "Enviado"
+      },
+      "placeholders": {
+        "body": "Máximo 400 caracteres",
+        "campaign_name": "p.ej. Promoción de Primavera - Cafe Seeblick",
+        "title": "Máximo 100 caracteres"
+      },
+      "stats": {
+        "needs_attention": "necesita atencion",
+        "pending_review": "Pendiente de revisión",
+        "revenue_this_month": "Ingresos este mes",
+        "sends_this_month": "Envía este mes",
+        "total_campaigns": "Campañas totales"
+      },
+      "toasts": {
+        "approved": "Campaña \"{{name}}\" aprobada.",
+        "approve_failed": "No se pudo aprobar la campaña.",
+        "created": "Campaña creada.",
+        "create_failed": "No se pudo crear la campaña.",
+        "dispatched": "Campaña \"{{name}}\" enviada.",
+        "dispatch_failed": "No se pudo enviar la campaña.",
+        "load_failed": "No se pudieron cargar las campañas",
+        "rejected": "Campaña \"{{name}}\" rechazada.",
+        "reject_failed": "No se pudo rechazar la campaña.",
+        "required_fields": "Se requieren nombre, título y cuerpo."
+      }
+    }
   }
 }

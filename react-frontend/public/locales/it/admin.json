@@ -10689,5 +10689,193 @@
         "90": "Ultimi 90 giorni"
       }
     }
+  },
+  "advertising": {
+    "status": {
+      "all": "Tutto",
+      "active": "Attivo",
+      "cancelled": "Annullato",
+      "completed": "Completato",
+      "draft": "Bozza",
+      "drafts": "Bozze",
+      "paused": "In pausa",
+      "pending_review": "In attesa di revisione",
+      "rejected": "Respinto",
+      "scheduled": "Programmato",
+      "sending": "Invio",
+      "sent": "Inviato"
+    },
+    "advertiser": {
+      "gemeinde": "Comune",
+      "private": "Privato",
+      "sme": "SME",
+      "sme_local": "SME (impresa locale)",
+      "verein": "Associazione"
+    },
+    "shared": {
+      "campaign_details": "Dettagli della campagna",
+      "filter_by_status": "Filtra per stato",
+      "rejection_reason": "Motivo del rifiuto",
+      "search_campaigns": "Campagne di ricerca...",
+      "unexpected_error": "Si è verificato un errore imprevisto",
+      "actions": {
+        "approve": "Approvare",
+        "cancel": "Cancellare",
+        "close": "Vicino",
+        "create_campaign": "Crea campagna",
+        "details": "Dettagli",
+        "new_campaign": "Nuova campagna",
+        "pause": "Pausa",
+        "reject": "Rifiutare",
+        "reject_campaign": "Rifiuta la campagna",
+        "submit_for_review": "Invia per la revisione",
+        "view_details": "Visualizza i dettagli"
+      },
+      "columns": {
+        "actions": "Azioni",
+        "advertiser": "Inserzionista",
+        "campaign": "Campagna",
+        "clicks": "Clic",
+        "ctr": "CTR",
+        "id": "ID",
+        "impressions": "Impressioni",
+        "status": "Stato"
+      },
+      "empty": {
+        "no_campaigns": "Nessuna campagna trovata."
+      },
+      "fields": {
+        "advertiser_type": "Tipo di inserzionista",
+        "campaign_name": "Nome della campagna",
+        "type": "Tipo"
+      }
+    },
+    "ad": {
+      "page_title": "Campagne pubblicitarie",
+      "budget_description": "Inserisci 0 per un budget illimitato",
+      "audience_description": "Lascia vuoto per scegliere come target tutti i membri della comunità",
+      "creative_alt": "Creativo",
+      "create_title": "Crea campagna pubblicitaria",
+      "creatives_count": "Creatività ({{count}})",
+      "no_creatives": "Nessuna creatività ancora collegata a questa campagna.",
+      "performance_30_days": "Prestazioni (30 giorni)",
+      "reject_intro_prefix": "Stai rifiutando",
+      "reject_intro_suffix": "Fornisci un motivo in modo che l'inserzionista sappia come migliorare la propria presentazione.",
+      "rejection_placeholder": "per esempio. Il contenuto viola le linee guida della community: modifica il titolo.",
+      "columns": {
+        "budget_spent": "Budget/speso"
+      },
+      "fields": {
+        "audience_filters": "Filtri del pubblico (JSON, opzionale)",
+        "end_date": "Data di fine",
+        "placement": "Posizionamento",
+        "start_date": "Data di inizio",
+        "total_budget_cents": "Budget totale (in centesimi)"
+      },
+      "header": {
+        "title": "Pubblicità locale",
+        "description": "Gestisci campagne pubblicitarie locali da SME, associazioni e comuni"
+      },
+      "placement": {
+        "all": "Tutti i posizionamenti",
+        "discovery": "Scoperta",
+        "feed": "Foraggio",
+        "market": "Mercato"
+      },
+      "placeholders": {
+        "budget": "per esempio. 5000 = EUR 50,00",
+        "campaign_name": "Saldi estivi - Cafe Helvetia"
+      },
+      "stats": {
+        "active_campaigns": "Campagne attive",
+        "clicks_today": "Clic oggi",
+        "impressions_today": "Impressioni oggi",
+        "total_revenue": "Entrate totali"
+      },
+      "toasts": {
+        "approved": "Campagna \"{{name}}\" approvata",
+        "approve_failed": "Impossibile approvare la campagna",
+        "audience_json_invalid": "I filtri del pubblico devono essere JSON validi",
+        "created": "Campagna creata e inviata per la revisione",
+        "create_failed": "Impossibile creare la campagna",
+        "details_failed": "Impossibile caricare i dettagli della campagna",
+        "load_failed": "Impossibile caricare le campagne pubblicitarie",
+        "name_required": "Il nome della campagna è obbligatorio",
+        "paused": "La campagna \"{{name}}\" è stata messa in pausa",
+        "pause_failed": "Impossibile mettere in pausa la campagna",
+        "rejected": "Campagna \"{{name}}\" rifiutata",
+        "reject_failed": "Impossibile rifiutare la campagna"
+      }
+    },
+    "push": {
+      "chart_opens_title": "Si apre {{count}}",
+      "chart_sends_title": "{{count}} invia",
+      "create_title": "Nuova campagna push",
+      "daily_breakdown": "Ripartizione quotidiana",
+      "immediate": "Immediato",
+      "no_daily_data": "Nessun dato giornaliero ancora.",
+      "reject_intro_prefix": "Rifiutando",
+      "reject_intro_suffix": "Fornisci un motivo che sarà visibile all'inserzionista.",
+      "rejection_placeholder": "per esempio. Il contenuto non è conforme alle linee guida della community...",
+      "table_aria": "Campagne push",
+      "actions": {
+        "dispatch_now": "Spedisci adesso"
+      },
+      "columns": {
+        "cost": "Costo",
+        "open_rate": "Tasso di apertura",
+        "scheduled": "Programmato",
+        "targets": "Obiettivi",
+        "title_preview": "Anteprima del titolo"
+      },
+      "dates": {
+        "approved": "Approvato",
+        "created": "Creato",
+        "scheduled": "Programmato",
+        "sent": "Inviato"
+      },
+      "fields": {
+        "cta_url": "URL CTA",
+        "cta_url_optional": "CTA URL (opzionale)",
+        "notification_body": "Corpo della notifica push",
+        "notification_title": "Titolo della notifica push",
+        "push_body": "Spingere il corpo",
+        "push_title": "Spingi il titolo",
+        "scheduled_at": "Programmato alle (facoltativo: lasciare vuoto per inviare dopo l'approvazione)"
+      },
+      "header": {
+        "title": "Campagne push a pagamento (AG57)"
+      },
+      "metrics": {
+        "opens": "Si apre",
+        "revenue": "Reddito",
+        "sends": "Invia",
+        "sent": "Inviato"
+      },
+      "placeholders": {
+        "body": "Massimo 400 caratteri",
+        "campaign_name": "per esempio. Promozione primaverile - Cafe Seeblick",
+        "title": "Massimo 100 caratteri"
+      },
+      "stats": {
+        "needs_attention": "Ha bisogno di attenzione",
+        "pending_review": "In attesa di revisione",
+        "revenue_this_month": "Entrate questo mese",
+        "sends_this_month": "Invia questo mese",
+        "total_campaigns": "Campagne totali"
+      },
+      "toasts": {
+        "approved": "Campagna \"{{name}}\" approvata.",
+        "approve_failed": "Impossibile approvare la campagna.",
+        "created": "Campagna creata.",
+        "create_failed": "Impossibile creare la campagna.",
+        "dispatched": "Campagna \"{{name}}\" inviata.",
+        "dispatch_failed": "Impossibile inviare la campagna.",
+        "load_failed": "Impossibile caricare le campagne",
+        "rejected": "Campagna \"{{name}}\" rifiutata.",
+        "reject_failed": "Impossibile rifiutare la campagna.",
+        "required_fields": "Nome, titolo e corpo sono obbligatori."
+      }
+    }
   }
 }

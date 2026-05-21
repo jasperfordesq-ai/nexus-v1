@@ -10689,5 +10689,193 @@
         "90": "Ostatnie 90 dni"
       }
     }
+  },
+  "advertising": {
+    "status": {
+      "all": "Wszystko",
+      "active": "Aktywny",
+      "cancelled": "Odwołany",
+      "completed": "Zakończony",
+      "draft": "Projekt",
+      "drafts": "Warcaby",
+      "paused": "Wstrzymano",
+      "pending_review": "Oczekuje na recenzję",
+      "rejected": "Odrzucony",
+      "scheduled": "Zaplanowany",
+      "sending": "Przesyłka",
+      "sent": "Wysłano"
+    },
+    "advertiser": {
+      "gemeinde": "Miasto",
+      "private": "Prywatny",
+      "sme": "SME",
+      "sme_local": "SME (biznes lokalny)",
+      "verein": "Stowarzyszenie"
+    },
+    "shared": {
+      "campaign_details": "Szczegóły kampanii",
+      "filter_by_status": "Filtruj według stanu",
+      "rejection_reason": "Powód odrzucenia",
+      "search_campaigns": "Kampanie w sieci wyszukiwania...",
+      "unexpected_error": "Wystąpił nieoczekiwany błąd",
+      "actions": {
+        "approve": "Zatwierdzić",
+        "cancel": "Anulować",
+        "close": "Zamknąć",
+        "create_campaign": "Utwórz kampanię",
+        "details": "Bliższe dane",
+        "new_campaign": "Nowa kampania",
+        "pause": "Pauza",
+        "reject": "Odrzucić",
+        "reject_campaign": "Odrzuć kampanię",
+        "submit_for_review": "Prześlij do sprawdzenia",
+        "view_details": "Zobacz szczegóły"
+      },
+      "columns": {
+        "actions": "Działania",
+        "advertiser": "Człowiek ogłaszający",
+        "campaign": "Kampania",
+        "clicks": "Kliknięcia",
+        "ctr": "CTR",
+        "id": "ID",
+        "impressions": "Wrażenia",
+        "status": "Status"
+      },
+      "empty": {
+        "no_campaigns": "Nie znaleziono kampanii."
+      },
+      "fields": {
+        "advertiser_type": "Typ reklamodawcy",
+        "campaign_name": "Nazwa kampanii",
+        "type": "Typ"
+      }
+    },
+    "ad": {
+      "page_title": "Kampanie reklamowe",
+      "budget_description": "Wpisz 0, aby uzyskać nieograniczony budżet",
+      "audience_description": "Pozostaw puste, aby kierować reklamy na wszystkich członków społeczności",
+      "creative_alt": "Twórczy",
+      "create_title": "Utwórz kampanię reklamową",
+      "creatives_count": "Kreacje ({{count}})",
+      "no_creatives": "Do tej kampanii nie są jeszcze dołączone żadne kreacje.",
+      "performance_30_days": "Wydajność (30 dni)",
+      "reject_intro_prefix": "Odrzucasz",
+      "reject_intro_suffix": "Podaj powód, aby reklamodawca wiedział, jak poprawić swoje zgłoszenie.",
+      "rejection_placeholder": "np. Treść narusza wytyczne dla społeczności – popraw nagłówek.",
+      "columns": {
+        "budget_spent": "Budżet / wydane"
+      },
+      "fields": {
+        "audience_filters": "Filtry odbiorców (JSON, opcjonalnie)",
+        "end_date": "Data końcowa",
+        "placement": "Umieszczenie",
+        "start_date": "Data rozpoczęcia",
+        "total_budget_cents": "Całkowity budżet (w centach)"
+      },
+      "header": {
+        "title": "Reklama lokalna",
+        "description": "Zarządzaj lokalnymi kampaniami reklamowymi SME, stowarzyszeń i gmin"
+      },
+      "placement": {
+        "all": "Wszystkie miejsca docelowe",
+        "discovery": "Odkrycie",
+        "feed": "Karmić",
+        "market": "Rynek"
+      },
+      "placeholders": {
+        "budget": "np. 5000 = EUR 50,00",
+        "campaign_name": "Letnia Wyprzedaż - Cafe Helvetia"
+      },
+      "stats": {
+        "active_campaigns": "Aktywne kampanie",
+        "clicks_today": "Kliknięcia dzisiaj",
+        "impressions_today": "Wrażenia dzisiaj",
+        "total_revenue": "Całkowity dochód"
+      },
+      "toasts": {
+        "approved": "Kampania „{{name}}” została zatwierdzona",
+        "approve_failed": "Nie udało się zatwierdzić kampanii",
+        "audience_json_invalid": "Filtry odbiorców muszą mieć prawidłowy JSON",
+        "created": "Kampania utworzona i przesłana do sprawdzenia",
+        "create_failed": "Nie udało się utworzyć kampanii",
+        "details_failed": "Nie udało się załadować szczegółów kampanii",
+        "load_failed": "Nie udało się załadować kampanii reklamowych",
+        "name_required": "Nazwa kampanii jest wymagana",
+        "paused": "Kampania „{{name}}” została wstrzymana",
+        "pause_failed": "Nie udało się wstrzymać kampanii",
+        "rejected": "Kampania „{{name}}” została odrzucona",
+        "reject_failed": "Nie udało się odrzucić kampanii"
+      }
+    },
+    "push": {
+      "chart_opens_title": "Otwiera się {{count}}",
+      "chart_sends_title": "{{count}} wysyła",
+      "create_title": "Nowa kampania push",
+      "daily_breakdown": "Codzienny podział",
+      "immediate": "Natychmiastowy",
+      "no_daily_data": "Brak jeszcze danych dziennych.",
+      "reject_intro_prefix": "Odrzucanie",
+      "reject_intro_suffix": "Podaj powód, który będzie widoczny dla reklamodawcy.",
+      "rejection_placeholder": "np. Treść jest niezgodna z wytycznymi społeczności...",
+      "table_aria": "Kampanie push",
+      "actions": {
+        "dispatch_now": "Wyślij teraz"
+      },
+      "columns": {
+        "cost": "Koszt",
+        "open_rate": "Kurs otwarcia",
+        "scheduled": "Zaplanowany",
+        "targets": "Cele",
+        "title_preview": "Podgląd tytułu"
+      },
+      "dates": {
+        "approved": "Zatwierdzony",
+        "created": "Stworzony",
+        "scheduled": "Zaplanowany",
+        "sent": "Wysłano"
+      },
+      "fields": {
+        "cta_url": "URL CTA",
+        "cta_url_optional": "URL CTA (opcjonalnie)",
+        "notification_body": "Treść powiadomienia push",
+        "notification_title": "Tytuł powiadomienia push",
+        "push_body": "Pchnij ciało",
+        "push_title": "Naciśnij tytuł",
+        "scheduled_at": "Zaplanowano o (opcjonalnie — pozostaw puste, aby wysłać po zatwierdzeniu)"
+      },
+      "header": {
+        "title": "Płatne kampanie push (AG57)"
+      },
+      "metrics": {
+        "opens": "Otwiera się",
+        "revenue": "Przychód",
+        "sends": "Wysyła",
+        "sent": "Wysłano"
+      },
+      "placeholders": {
+        "body": "Maks. 400 znaków",
+        "campaign_name": "np. Wiosenna promocja - Cafe Seeblick",
+        "title": "Maks. 100 znaków"
+      },
+      "stats": {
+        "needs_attention": "Potrzebuje uwagi",
+        "pending_review": "Oczekuje na recenzję",
+        "revenue_this_month": "Przychody w tym miesiącu",
+        "sends_this_month": "Wysyła w tym miesiącu",
+        "total_campaigns": "Łączna liczba kampanii"
+      },
+      "toasts": {
+        "approved": "Kampania „{{name}}” została zatwierdzona.",
+        "approve_failed": "Nie udało się zatwierdzić kampanii.",
+        "created": "Kampania została utworzona.",
+        "create_failed": "Nie udało się utworzyć kampanii.",
+        "dispatched": "Kampania „{{name}}” została wysłana.",
+        "dispatch_failed": "Nie udało się wysłać kampanii.",
+        "load_failed": "Nie udało się załadować kampanii",
+        "rejected": "Kampania „{{name}}” została odrzucona.",
+        "reject_failed": "Nie udało się odrzucić kampanii.",
+        "required_fields": "Imię i nazwisko, tytuł i treść są wymagane."
+      }
+    }
   }
 }
