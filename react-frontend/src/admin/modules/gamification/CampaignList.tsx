@@ -26,6 +26,7 @@ import Megaphone from 'lucide-react/icons/megaphone';
 import Play from 'lucide-react/icons/play';
 import Pause from 'lucide-react/icons/pause';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
@@ -37,7 +38,8 @@ import type { Campaign } from '../../api/types';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CampaignList() {
-  usePageTitle("Gamification");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('gamification.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -56,10 +58,10 @@ export function CampaignList() {
       // res.data is already unwrapped by the API client — never double-unwrap
       setCampaigns(Array.isArray(res.data) ? res.data : []);
     } else {
-      toast.error("Failed to load campaigns");
+      toast.error(t('gamification.failed_to_load_campaigns'));
     }
     setLoading(false);
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => {
@@ -72,11 +74,11 @@ export function CampaignList() {
 
     const res = await adminGamification.deleteCampaign(deleteTarget.id);
     if (res.success) {
-      toast.success(`Campaign Deleted`);
+      toast.success(t('gamification.campaign_deleted'));
       setDeleteTarget(null);
       loadCampaigns();
     } else {
-      toast.error("Failed to delete campaign");
+      toast.error(t('gamification.failed_to_delete_campaign'));
     }
 
     setDeleting(false);
@@ -85,10 +87,10 @@ export function CampaignList() {
   const handleStatusChange = async (campaign: Campaign, newStatus: Campaign['status']) => {
     const res = await adminGamification.updateCampaign(campaign.id, { status: newStatus });
     if (res.success) {
-      toast.success(`Campaign status changed`);
+      toast.success(t('gamification.campaign_status_changed'));
       loadCampaigns();
     } else {
-      toast.error("Failed to update status");
+      toast.error(t('gamification.failed_to_update_status'));
     }
   };
 
@@ -114,13 +116,13 @@ export function CampaignList() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={"Campaign Actions"}>
+          <Button isIconOnly size="sm" variant="light" aria-label={t('gamification.label_campaign_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
-        <DropdownMenu aria-label={"Campaign Actions"} onAction={handleAction}>
+        <DropdownMenu aria-label={t('gamification.label_campaign_actions')} onAction={handleAction}>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
-            {"Edit"}
+            {t('gamification.edit')}
           </DropdownItem>
           <DropdownItem
             key="activate"
@@ -128,7 +130,7 @@ export function CampaignList() {
             color="success"
             className={campaign.status === 'draft' ? 'text-success' : 'hidden'}
           >
-            {"Activate"}
+            {t('gamification.activate')}
           </DropdownItem>
           <DropdownItem
             key="pause"
@@ -136,7 +138,7 @@ export function CampaignList() {
             color="warning"
             className={campaign.status === 'active' ? 'text-warning' : 'hidden'}
           >
-            {"Pause"}
+            {t('gamification.pause')}
           </DropdownItem>
           <DropdownItem
             key="resume"
@@ -144,10 +146,10 @@ export function CampaignList() {
             color="success"
             className={campaign.status === 'paused' ? 'text-success' : 'hidden'}
           >
-            {"Resume"}
+            {t('gamification.resume')}
           </DropdownItem>
           <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
-            {"Delete"}
+            {t('gamification.delete')}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -157,7 +159,7 @@ export function CampaignList() {
   const columns: Column<Campaign>[] = [
     {
       key: 'name',
-      label: "Name",
+      label: t('gamification.col_name'),
       sortable: true,
       render: (c) => (
         <span className="font-medium text-foreground">{c.name}</span>
@@ -165,20 +167,20 @@ export function CampaignList() {
     },
     {
       key: 'status',
-      label: "Status",
+      label: t('gamification.col_status'),
       sortable: true,
       render: (c) => <StatusBadge status={c.status} />,
     },
     {
       key: 'badge_name',
-      label: "Badge",
+      label: t('gamification.col_badge'),
       render: (c) => (
         <span className="text-sm text-default-600">{c.badge_name || c.badge_key || '—'}</span>
       ),
     },
     {
       key: 'target_audience',
-      label: "Target",
+      label: t('gamification.col_target'),
       render: (c) => (
         <span className="text-sm text-default-600 capitalize">
           {(c.target_audience || '').replace(/_/g, ' ')}
@@ -187,7 +189,7 @@ export function CampaignList() {
     },
     {
       key: 'total_awards',
-      label: "Awards",
+      label: t('gamification.col_awards'),
       sortable: true,
       render: (c) => (
         <span className="text-sm text-foreground">{c.total_awards ?? 0}</span>
@@ -195,7 +197,7 @@ export function CampaignList() {
     },
     {
       key: 'created_at',
-      label: "Created",
+      label: t('gamification.col_created'),
       sortable: true,
       render: (c) => (
         <span className="text-sm text-default-500">
@@ -205,7 +207,7 @@ export function CampaignList() {
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('gamification.col_actions'),
       render: (c) => <CampaignActions campaign={c} />,
     },
   ];
@@ -213,12 +215,12 @@ export function CampaignList() {
   return (
     <div>
       <PageHeader
-        title={"Campaign List"}
-        description={"View and manage all badge campaigns"}
+        title={t('gamification.campaign_list_title')}
+        description={t('gamification.campaign_list_desc')}
         actions={
           <Link to={tenantPath("/admin/gamification/campaigns/create")}>
             <Button color="primary" startContent={<Plus size={16} />}>
-              {"Create Campaign"}
+              {t('gamification.create_campaign')}
             </Button>
           </Link>
         }
@@ -227,9 +229,9 @@ export function CampaignList() {
       {campaigns.length === 0 && !loading ? (
         <EmptyState
           icon={Megaphone}
-          title={"No campaigns yet"}
-          description={"Create your first campaign to start awarding badges and rewards"}
-          actionLabel={"Create Campaign"}
+          title={t('gamification.no_campaigns_yet')}
+          description={t('gamification.desc_create_your_first_campaign_to_start_awar')}
+          actionLabel={t('gamification.create_campaign')}
           onAction={() => navigate(tenantPath('/admin/gamification/campaigns/create'))}
         />
       ) : (
@@ -237,9 +239,9 @@ export function CampaignList() {
           columns={columns}
           data={campaigns}
           isLoading={loading}
-          searchPlaceholder={"Search Campaigns"}
+          searchPlaceholder={t('gamification.search_campaigns')}
           onRefresh={loadCampaigns}
-          emptyContent={"No campaigns match search"}
+          emptyContent={t('gamification.no_campaigns_match_search')}
         />
       )}
 
@@ -249,9 +251,9 @@ export function CampaignList() {
           isOpen={!!deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
-          title={"Delete Campaign"}
-          message={`Delete Campaign`}
-          confirmLabel={"Delete"}
+          title={t('gamification.delete_campaign')}
+          message={t('gamification.confirm_delete_campaign')}
+          confirmLabel={t('gamification.delete')}
           confirmColor="danger"
           isLoading={deleting}
         />
