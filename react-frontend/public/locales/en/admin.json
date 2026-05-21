@@ -3072,6 +3072,41 @@
       "tiers": "No tiers yet. Create your first premium tier above.",
       "value": "-"
     },
+    "subscribers_page": {
+      "title": "Premium Subscribers",
+      "description": "Members currently subscribed to a premium tier.",
+      "failed_load": "Failed to load subscribers",
+      "status_filter": "Status filter",
+      "all": "All",
+      "total": "{{count}} total",
+      "refresh": "Refresh",
+      "empty": "No subscribers match the filter.",
+      "table_aria": "Subscribers",
+      "user_fallback": "User #{{id}}",
+      "columns": {
+        "member": "MEMBER",
+        "email": "EMAIL",
+        "tier": "TIER",
+        "interval": "INTERVAL",
+        "status": "STATUS",
+        "next_billing": "NEXT BILLING",
+        "started": "STARTED"
+      },
+      "status": {
+        "active": "Active",
+        "past_due": "Past due",
+        "canceled": "Canceled",
+        "trialing": "Trialing",
+        "incomplete": "Incomplete"
+      },
+      "interval": {
+        "month": "Month",
+        "monthly": "Monthly",
+        "year": "Year",
+        "yearly": "Yearly",
+        "annual": "Annual"
+      }
+    },
     "table": {
       "aria": "Premium tiers",
       "name": "NAME",

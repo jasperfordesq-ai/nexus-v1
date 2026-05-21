@@ -5,10 +5,10 @@
 
 /**
  * AG58 — Admin: Member Premium subscriber list.
- * English-only per project convention for /admin/.
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardBody,
@@ -52,7 +52,8 @@ function statusColor(s: string): 'success' | 'warning' | 'danger' | 'default' {
 }
 
 export function MemberPremiumSubscribersPage() {
-  usePageTitle('Premium Subscribers');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('member_premium_admin.subscribers_page.title'));
   const toast = useToast();
 
   const [rows, setRows] = useState<MemberSubscriberRow[]>([]);
@@ -73,11 +74,11 @@ export function MemberPremiumSubscribersPage() {
       setRows(res.data?.rows ?? []);
       setTotal(res.data?.total ?? 0);
     } catch {
-      toast.error('Failed to load subscribers');
+      toast.error(t('member_premium_admin.subscribers_page.failed_load'));
     } finally {
       setLoading(false);
     }
-  }, [page, perPage, statusFilter, toast]);
+  }, [page, perPage, statusFilter, t, toast]);
 
   useEffect(() => {
     load();
@@ -88,15 +89,15 @@ export function MemberPremiumSubscribersPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Premium Subscribers"
-        description="Members currently subscribed to a premium tier."
+        title={t('member_premium_admin.subscribers_page.title')}
+        description={t('member_premium_admin.subscribers_page.description')}
         icon={<Users size={24} />}
       />
 
       <Card>
         <CardBody className="flex flex-row items-center gap-3 flex-wrap">
           <Select
-            label="Status filter"
+            label={t('member_premium_admin.subscribers_page.status_filter')}
             size="sm"
             className="max-w-xs"
             selectedKeys={statusFilter ? [statusFilter] : []}
@@ -107,12 +108,14 @@ export function MemberPremiumSubscribersPage() {
             }}
           >
             {STATUS_OPTIONS.map((s) => (
-              <SelectItem key={s} textValue={s || 'All'}>{s || 'All'}</SelectItem>
+              <SelectItem key={s} textValue={s ? t(`member_premium_admin.subscribers_page.status.${s}`) : t('member_premium_admin.subscribers_page.all')}>
+                {s ? t(`member_premium_admin.subscribers_page.status.${s}`) : t('member_premium_admin.subscribers_page.all')}
+              </SelectItem>
             ))}
           </Select>
-          <span className="text-sm text-default-500">{total} total</span>
+          <span className="text-sm text-default-500">{t('member_premium_admin.subscribers_page.total', { count: total })}</span>
           <div className="flex-1" />
-          <Button size="sm" variant="flat" onPress={load} isLoading={loading}>Refresh</Button>
+          <Button size="sm" variant="flat" onPress={load} isLoading={loading}>{t('member_premium_admin.subscribers_page.refresh')}</Button>
         </CardBody>
       </Card>
 
@@ -121,30 +124,30 @@ export function MemberPremiumSubscribersPage() {
           {loading ? (
             <div className="flex justify-center py-10"><Spinner /></div>
           ) : rows.length === 0 ? (
-            <div className="text-center py-10 text-default-500">No subscribers match the filter.</div>
+            <div className="text-center py-10 text-default-500">{t('member_premium_admin.subscribers_page.empty')}</div>
           ) : (
-            <Table removeWrapper aria-label="Subscribers">
+            <Table removeWrapper aria-label={t('member_premium_admin.subscribers_page.table_aria')}>
               <TableHeader>
-                <TableColumn>MEMBER</TableColumn>
-                <TableColumn>EMAIL</TableColumn>
-                <TableColumn>TIER</TableColumn>
-                <TableColumn>INTERVAL</TableColumn>
-                <TableColumn>STATUS</TableColumn>
-                <TableColumn>NEXT BILLING</TableColumn>
-                <TableColumn>STARTED</TableColumn>
+                <TableColumn>{t('member_premium_admin.subscribers_page.columns.member')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.subscribers_page.columns.email')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.subscribers_page.columns.tier')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.subscribers_page.columns.interval')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.subscribers_page.columns.status')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.subscribers_page.columns.next_billing')}</TableColumn>
+                <TableColumn>{t('member_premium_admin.subscribers_page.columns.started')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {rows.map((r) => (
                   <TableRow key={r.id}>
-                    <TableCell>{r.user_name || r.first_name || `User #${r.user_id}`}</TableCell>
-                    <TableCell><span className="text-xs">{r.email ?? '—'}</span></TableCell>
+                    <TableCell>{r.user_name || r.first_name || t('member_premium_admin.subscribers_page.user_fallback', { id: r.user_id })}</TableCell>
+                    <TableCell><span className="text-xs">{r.email ?? t('member_premium_admin.empty.value')}</span></TableCell>
                     <TableCell>{r.tier_name}</TableCell>
-                    <TableCell>{r.billing_interval}</TableCell>
+                    <TableCell>{t(`member_premium_admin.subscribers_page.interval.${r.billing_interval}`)}</TableCell>
                     <TableCell>
-                      <Chip size="sm" color={statusColor(r.status)} variant="flat">{r.status}</Chip>
+                      <Chip size="sm" color={statusColor(r.status)} variant="flat">{t(`member_premium_admin.subscribers_page.status.${r.status}`)}</Chip>
                     </TableCell>
                     <TableCell>
-                      {r.current_period_end ? new Date(r.current_period_end).toLocaleDateString() : '—'}
+                      {r.current_period_end ? new Date(r.current_period_end).toLocaleDateString() : t('member_premium_admin.empty.value')}
                     </TableCell>
                     <TableCell>
                       {new Date(r.created_at).toLocaleDateString()}
