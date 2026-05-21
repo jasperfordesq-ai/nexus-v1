@@ -38,7 +38,7 @@ import type { FederationSystemControls as FederationSystemControlsType, Federati
 import { useTranslation } from 'react-i18next';
 export function FederationControls() {
   const { t } = useTranslation('admin');
-  usePageTitle("Super Admin");
+  usePageTitle(t('super.federation_controls_title'));
   const toast = useToast();
   const toastRef = useRef(toast);
   toastRef.current = toast;
@@ -69,10 +69,10 @@ export function FederationControls() {
       if (pRes.success && pRes.data) setPartnerships(Array.isArray(pRes.data) ? pRes.data : []);
       if (jwtRes.success && jwtRes.data) setJwtStatus(jwtRes.data);
     } catch {
-      toastRef.current.error(`Federation error`);
+      toastRef.current.error(t('super.federation_error'));
     }
     setLoading(false);
-  }, [])
+  }, [t])
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -86,7 +86,7 @@ export function FederationControls() {
         toastRef.current.error(t('super.failed_to_update_setting'));
       }
     } catch {
-      toastRef.current.error(`Failed to update setting detail`);
+      toastRef.current.error(t('super.failed_to_update_setting_detail'));
     } finally {
       setSaving(null);
     }
@@ -108,7 +108,7 @@ export function FederationControls() {
         else toastRef.current.error(t('super.failed_to_activate_lockdown'));
       }
     } catch {
-      toastRef.current.error(`Lockdown Action Failed Detail`);
+      toastRef.current.error(t('super.lockdown_action_failed_detail'));
     } finally {
       setLockdownConfirm(false);
     }
@@ -192,9 +192,24 @@ export function FederationControls() {
     danger: { bg: 'bg-danger/10', text: 'text-danger' },
   };
 
+  const partnershipStatusLabel = (status: string) => {
+    switch (status) {
+      case 'active':
+        return t('super.status_active');
+      case 'pending':
+        return t('super.status_pending');
+      case 'suspended':
+        return t('super.status_suspended');
+      case 'terminated':
+        return t('super.status_terminated');
+      default:
+        return status;
+    }
+  };
+
   const quickLinks = [
-    { label: t('super.link_whitelist'), description: `Manage the federation whitelist`, href: '/admin/super/federation/whitelist', icon: ListChecks, color: 'success' as const },
-    { label: t('super.link_partnerships'), description: `View and manage federation partnerships`, href: '/admin/super/federation/partnerships', icon: Handshake, color: 'secondary' as const },
+    { label: t('super.link_whitelist'), description: t('super.link_whitelist_desc'), href: '/admin/super/federation/whitelist', icon: ListChecks, color: 'success' as const },
+    { label: t('super.link_partnerships'), description: t('super.link_partnerships_desc'), href: '/admin/super/federation/partnerships', icon: Handshake, color: 'secondary' as const },
     { label: t('super.link_audit_log'), description: t('super.link_audit_log_desc'), href: '/admin/super/federation/audit', icon: Activity, color: 'warning' as const },
   ];
 
@@ -208,32 +223,32 @@ export function FederationControls() {
       </nav>
 
       <PageHeader
-        title={"Federation Controls"}
-        description={"Control federation settings at the platform level"}
+        title={t('super.federation_controls_title')}
+        description={t('super.federation_controls_desc')}
       />
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          label={"Federation Status"}
+          label={t('super.label_federation_status')}
           value={controls.federation_enabled ? t('super.status_active') : t('super.status_disabled')}
           icon={Globe}
           color={controls.federation_enabled ? 'success' : 'danger'}
         />
         <StatCard
-          label={"Whitelisted Tenants"}
+          label={t('super.label_whitelisted_tenants')}
           value={whitelist.length}
           icon={Shield}
           color="primary"
         />
         <StatCard
-          label={"Active Partnerships"}
+          label={t('super.label_active_partnerships')}
           value={activePartnerships}
           icon={Handshake}
           color="secondary"
         />
         <StatCard
-          label={"System Status"}
+          label={t('super.label_system_status')}
           value={controls.emergency_lockdown_active ? t('super.status_lockdown') : t('super.status_normal')}
           icon={controls.emergency_lockdown_active ? Lock : Unlock}
           color={controls.emergency_lockdown_active ? 'danger' : 'success'}
@@ -246,16 +261,16 @@ export function FederationControls() {
         <CardHeader className="flex items-center gap-3">
           <KeyRound size={20} className={jwtStatus?.configured ? 'text-success' : 'text-warning'} />
           <div className="flex-1">
-            <p className="font-semibold">{"Title"}</p>
+            <p className="font-semibold">{t('super.jwt_auth_title')}</p>
             <p className="text-xs text-default-500">
-              {"Subtitle"}
+              {t('super.jwt_auth_subtitle')}
             </p>
           </div>
           {jwtStatus ? (
             jwtStatus.configured ? (
-              <Chip color="success" variant="flat" size="sm">{`Configured`}</Chip>
+              <Chip color="success" variant="flat" size="sm">{t('super.status_configured')}</Chip>
             ) : (
-              <Chip color="warning" variant="flat" size="sm" startContent={<AlertTriangle size={14} />}>{"Not Configured"}</Chip>
+              <Chip color="warning" variant="flat" size="sm" startContent={<AlertTriangle size={14} />}>{t('super.status_not_configured')}</Chip>
             )
           ) : (
             <Chip variant="flat" size="sm">…</Chip>
@@ -264,21 +279,21 @@ export function FederationControls() {
         <CardBody className="gap-3 text-sm">
           {jwtStatus?.configured && jwtStatus.key_bits < jwtStatus.recommended_bits && (
             <div className="rounded-md border border-warning bg-warning-50 dark:bg-warning-950 p-3 text-warning-700 dark:text-warning-300">
-              <strong>{"Warn Weak Key"}</strong>{' '}
-              {`Warn Weak Key Body`}
+              <strong>{t('super.jwt_warn_weak_key')}</strong>{' '}
+              {t('super.jwt_warn_weak_key_body')}
             </div>
           )}
 
           {!jwtStatus?.configured && (
             <div className="rounded-md border border-warning bg-warning-50 dark:bg-warning-950 p-3 text-warning-700 dark:text-warning-300">
-              <strong>{"Warn Not Set"}</strong>{' '}
-              {"Warn Not Set Body"}
+              <strong>{t('super.jwt_warn_not_set')}</strong>{' '}
+              {t('super.jwt_warn_not_set_body')}
             </div>
           )}
 
           <div className="text-default-600">
-            <span className="font-medium">{"Issuer"}</span>{' '}
-            <Code size="sm">{jwtStatus?.issuer || "Issuer Fallback"}</Code>
+            <span className="font-medium">{t('super.jwt_issuer')}</span>{' '}
+            <Code size="sm">{jwtStatus?.issuer || t('super.jwt_issuer_not_set')}</Code>
           </div>
 
           <Divider />
@@ -286,112 +301,107 @@ export function FederationControls() {
           <Accordion variant="light" isCompact>
             <AccordionItem
               key="what"
-              aria-label={"Accordion What"}
-              title={<span className="font-medium">{"Accordion What"}</span>}
+              aria-label={t('super.jwt_accordion_what')}
+              title={<span className="font-medium">{t('super.jwt_accordion_what')}</span>}
             >
               <div className="space-y-2 text-default-600">
                 <p>
-                  NEXUS can authenticate incoming and outgoing federation requests with four
-                  different methods: <strong>api_key</strong>, <strong>hmac</strong>,{' '}
-                  <strong>oauth2</strong>, and <strong>jwt</strong>. The first three store
-                  credentials per partner in the database — no server-wide config needed.
+                  {t('super.jwt_what_p1_intro')}{' '}
+                  <strong>api_key</strong>, <strong>hmac</strong>, <strong>oauth2</strong>, {t('super.common_and')}{' '}
+                  <strong>jwt</strong>. {t('super.jwt_what_p1_suffix')}
                 </p>
                 <p>
-                  The JWT method signs tokens with a single server-wide HMAC-SHA256 secret
-                  (this one). It is used by the V2 and native-ingest cross-tenant bridges, and
-                  by some newer partner protocols that prefer signed tokens to API keys.
+                  {t('super.jwt_what_p2')}
                 </p>
                 <p>
-                  If you are <strong>not using JWT-based federation partnerships</strong>, you
-                  can leave this unset — federation will work via api_key / hmac / oauth2. You
-                  will get a clear log entry the first time JWT is actually needed.
+                  {t('super.jwt_what_p3_prefix')}{' '}
+                  <strong>{t('super.jwt_based_federation_partnerships')}</strong>, {t('super.jwt_what_p3_suffix')}
                 </p>
               </div>
             </AccordionItem>
 
             <AccordionItem
               key="setup"
-              aria-label={"Accordion Setup"}
-              title={<span className="font-medium">{"Accordion Setup"}</span>}
+              aria-label={t('super.jwt_accordion_setup')}
+              title={<span className="font-medium">{t('super.jwt_accordion_setup')}</span>}
             >
               <div className="space-y-3 text-default-600">
                 <div>
-                  <p className="mb-1"><strong>Step 1.</strong> Generate a 256-bit random secret on any machine:</p>
+                  <p className="mb-1"><strong>{t('super.step_number', { number: 1 })}</strong> {t('super.jwt_setup_step_1')}</p>
                   <Snippet size="sm" symbol="$" hideCopyButton={false}>openssl rand -hex 32</Snippet>
-                  <p className="text-xs text-default-500 mt-1">(Copy the 64-character hex string it prints.)</p>
+                  <p className="text-xs text-default-500 mt-1">{t('super.jwt_setup_step_1_note')}</p>
                 </div>
 
                 <div>
-                  <p className="mb-1"><strong>Step 2.</strong> Set it as an environment variable on the server. Use exactly ONE of the options below — whichever matches your hosting stack:</p>
+                  <p className="mb-1"><strong>{t('super.step_number', { number: 2 })}</strong> {t('super.jwt_setup_step_2')}</p>
                   <ul className="list-disc pl-5 space-y-1 text-xs">
-                    <li><strong>Docker Compose / plain Linux server with .env file:</strong> append to <Code size="sm">/opt/nexus-php/.env</Code>:<br/>
+                    <li><strong>{t('super.jwt_setup_docker_env')}</strong> {t('super.jwt_setup_append_to')} <Code size="sm">/opt/nexus-php/.env</Code>:<br/>
                       <Code size="sm">FEDERATION_JWT_SECRET=&lt;paste 64-char hex&gt;</Code><br/>
                       <Code size="sm">FEDERATION_JWT_ISSUER=https://api.your-domain.com</Code>
                     </li>
-                    <li><strong>Docker Compose without .env file:</strong> add under the app service&apos;s <Code size="sm">environment:</Code> key in the compose file.</li>
-                    <li><strong>Kubernetes:</strong> create a <Code size="sm">Secret</Code> and reference it via <Code size="sm">envFrom</Code> or <Code size="sm">env.valueFrom.secretKeyRef</Code>.</li>
-                    <li><strong>AWS ECS / Fargate:</strong> add to the task-definition <Code size="sm">secrets</Code> (AWS Secrets Manager) or <Code size="sm">environment</Code> block.</li>
-                    <li><strong>Heroku / Render / Fly.io:</strong> <Code size="sm">heroku config:set FEDERATION_JWT_SECRET=&lt;hex&gt;</Code> (or the equivalent dashboard field).</li>
-                    <li><strong>systemd service:</strong> add <Code size="sm">Environment=&quot;FEDERATION_JWT_SECRET=&lt;hex&gt;&quot;</Code> to the service unit file.</li>
-                    <li><strong>Plesk / cPanel / IIS:</strong> use the hosting panel&apos;s environment-variable editor (Plesk: PHP Settings → Env Vars; IIS: web.config <Code size="sm">&lt;environmentVariables&gt;</Code>).</li>
+                    <li><strong>{t('super.jwt_setup_docker_no_env')}</strong> {t('super.jwt_setup_docker_no_env_body')} <Code size="sm">environment:</Code> {t('super.jwt_setup_compose_key_suffix')}</li>
+                    <li><strong>{t('super.jwt_setup_kubernetes')}</strong> {t('super.jwt_setup_kubernetes_body')} <Code size="sm">{t('super.kubernetes_secret_resource')}</Code> {t('super.jwt_setup_and_reference')} <Code size="sm">envFrom</Code> {t('super.common_or')} <Code size="sm">env.valueFrom.secretKeyRef</Code>.</li>
+                    <li><strong>{t('super.jwt_setup_aws')}</strong> {t('super.jwt_setup_aws_body')} <Code size="sm">secrets</Code> {t('super.jwt_setup_aws_middle')} <Code size="sm">environment</Code> {t('super.jwt_setup_aws_suffix')}</li>
+                    <li><strong>{t('super.jwt_setup_paas')}</strong> <Code size="sm">heroku config:set FEDERATION_JWT_SECRET=&lt;hex&gt;</Code> {t('super.jwt_setup_paas_suffix')}</li>
+                    <li><strong>{t('super.jwt_setup_systemd')}</strong> {t('super.jwt_setup_systemd_body')} <Code size="sm">Environment=&quot;FEDERATION_JWT_SECRET=&lt;hex&gt;&quot;</Code> {t('super.jwt_setup_systemd_suffix')}</li>
+                    <li><strong>{t('super.jwt_setup_hosting_panel')}</strong> {t('super.jwt_setup_hosting_panel_body')} <Code size="sm">&lt;environmentVariables&gt;</Code>).</li>
                   </ul>
                 </div>
 
                 <div>
-                  <p className="mb-1"><strong>Step 3.</strong> Restart the PHP container (or reload PHP-FPM) so the new env var is picked up. If you use <Code size="sm">php artisan config:cache</Code>, re-run it before the restart.</p>
+                  <p className="mb-1"><strong>{t('super.step_number', { number: 3 })}</strong> {t('super.jwt_setup_step_3_prefix')} <Code size="sm">php artisan config:cache</Code>{t('super.jwt_setup_step_3_suffix')}</p>
                 </div>
 
                 <div>
-                  <p className="mb-1"><strong>Step 4.</strong> Refresh this page. The status pill should flip to green &quot;Configured · 256-bit&quot;.</p>
+                  <p className="mb-1"><strong>{t('super.step_number', { number: 4 })}</strong> {t('super.jwt_setup_step_4')}</p>
                 </div>
               </div>
             </AccordionItem>
 
             <AccordionItem
               key="rotate"
-              aria-label={"Accordion Rotate"}
-              title={<span className="font-medium">{"Accordion Rotate"}</span>}
+              aria-label={t('super.jwt_accordion_rotate')}
+              title={<span className="font-medium">{t('super.jwt_accordion_rotate')}</span>}
             >
               <div className="space-y-2 text-default-600">
-                <p>Rotate this secret when:</p>
+                <p>{t('super.jwt_rotate_intro')}</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>You suspect the secret was exposed (committed to git, leaked in logs, a developer who had access has left).</li>
-                  <li>A federation partner using JWT auth has reported token abuse.</li>
-                  <li>Routine schedule — annually is reasonable.</li>
+                  <li>{t('super.jwt_rotate_reason_exposed')}</li>
+                  <li>{t('super.jwt_rotate_reason_abuse')}</li>
+                  <li>{t('super.jwt_rotate_reason_routine')}</li>
                 </ul>
-                <p><strong>Rotation procedure:</strong></p>
+                <p><strong>{t('super.jwt_rotation_procedure')}</strong></p>
                 <ol className="list-decimal pl-5 space-y-1">
-                  <li>Generate a new 256-bit secret: <Code size="sm">openssl rand -hex 32</Code>.</li>
-                  <li>Replace <Code size="sm">FEDERATION_JWT_SECRET</Code> in server env (same method as initial setup).</li>
-                  <li>Restart the PHP container.</li>
-                  <li>Notify any federation partners that rely on verifying tokens issued by us — they may need to update their trusted-issuer cache (usually no action needed because we publish the secret out-of-band to them, not the public).</li>
+                  <li>{t('super.jwt_rotate_step_1')} <Code size="sm">openssl rand -hex 32</Code>.</li>
+                  <li>{t('super.jwt_rotate_step_2_prefix')} <Code size="sm">FEDERATION_JWT_SECRET</Code> {t('super.jwt_rotate_step_2_suffix')}</li>
+                  <li>{t('super.jwt_rotate_step_3')}</li>
+                  <li>{t('super.jwt_rotate_step_4')}</li>
                 </ol>
                 <p className="text-xs text-default-500">
-                  Rotation invalidates all outstanding tokens. Tokens already in flight at the
-                  moment of rotation will fail verification; the requesting partner will re-mint.
+                  {t('super.jwt_rotate_note')}
                 </p>
               </div>
             </AccordionItem>
 
             <AccordionItem
               key="troubleshoot"
-              aria-label={"Accordion Troubleshoot"}
-              title={<span className="font-medium">{"Accordion Troubleshoot"}</span>}
+              aria-label={t('super.jwt_accordion_troubleshoot')}
+              title={<span className="font-medium">{t('super.jwt_accordion_troubleshoot')}</span>}
             >
               <div className="space-y-2 text-default-600 text-xs">
-                <p><strong>Status shows &quot;Not configured&quot; but I set the env var:</strong></p>
+                <p><strong>{t('super.jwt_troubleshoot_not_configured')}</strong></p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Restart the PHP container. PHP reads env vars at process start.</li>
-                  <li>If you use <Code size="sm">php artisan config:cache</Code>, re-run it after setting the var, then restart.</li>
-                  <li>Check the var actually reaches PHP: <Code size="sm">docker exec nexus-php-app printenv FEDERATION_JWT_SECRET</Code>.</li>
+                  <li>{t('super.jwt_troubleshoot_restart')}</li>
+                  <li>{t('super.jwt_troubleshoot_config_cache_prefix')} <Code size="sm">php artisan config:cache</Code>{t('super.jwt_troubleshoot_config_cache_suffix')}</li>
+                  <li>{t('super.jwt_troubleshoot_printenv')} <Code size="sm">docker exec nexus-php-app printenv FEDERATION_JWT_SECRET</Code>.</li>
                 </ul>
-                <p className="pt-2"><strong>Key bits shows a low number:</strong></p>
+                <p className="pt-2"><strong>{t('super.jwt_troubleshoot_low_bits')}</strong></p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Someone used a short / human-memorable string. Regenerate with <Code size="sm">openssl rand -hex 32</Code> (gives 256 bits).</li>
+                  <li>{t('super.jwt_troubleshoot_low_bits_body_prefix')} <Code size="sm">openssl rand -hex 32</Code> {t('super.jwt_troubleshoot_low_bits_body_suffix')}</li>
                 </ul>
-                <p className="pt-2"><strong>Federation was working with api_key/hmac and still works — do I need this at all?</strong></p>
+                <p className="pt-2"><strong>{t('super.jwt_troubleshoot_needed')}</strong></p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>No. JWT is only for the JWT auth method. Existing partners with api_key / hmac / oauth2 are unaffected.</li>
+                  <li>{t('super.jwt_troubleshoot_needed_body')}</li>
                 </ul>
               </div>
             </AccordionItem>
@@ -551,7 +561,7 @@ export function FederationControls() {
             <div className="flex gap-2">
               <Input
                 size="sm"
-                label={"Tenant I D"}
+                label={t('super.label_tenant_id')}
                 value={addTenantId}
                 onValueChange={setAddTenantId}
                 className="max-w-[120px]"
@@ -568,9 +578,9 @@ export function FederationControls() {
                     <Link to={tenantPath(`/admin/super/tenants/${entry.tenant_id}`)} className="hover:text-primary font-medium text-sm">
                       {entry.tenant_name}
                     </Link>
-                    {' '}<span className="text-xs text-default-400">(ID: {entry.tenant_id})</span>
+                    {' '}<span className="text-xs text-default-400">{t('super.tenant_id_compact', { id: entry.tenant_id })}</span>
                   </span>
-                  <Button size="sm" variant="light" color="danger" isIconOnly aria-label={"Remove from Whitelist"} onPress={() => handleRemoveWhitelist(entry.tenant_id)}>
+                  <Button size="sm" variant="light" color="danger" isIconOnly aria-label={t('super.remove_from_whitelist')} onPress={() => handleRemoveWhitelist(entry.tenant_id)}>
                     <Trash2 size={14} />
                   </Button>
                 </div>
@@ -616,7 +626,7 @@ export function FederationControls() {
                         {p.tenant_2_name}
                       </span>
                       <Chip size="sm" variant="flat" color={statusColor} className="shrink-0">
-                        {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
+                        {partnershipStatusLabel(p.status)}
                       </Chip>
                     </div>
                     {p.status === 'active' && (
@@ -659,8 +669,8 @@ export function FederationControls() {
       >
         {!controls.emergency_lockdown_active && (
           <Input
-            label={"Lockdown Reason"}
-            placeholder={"Describe Reason for Emergency Lockdown..."}
+            label={t('super.lockdown_reason')}
+            placeholder={t('super.lockdown_reason_placeholder')}
             value={lockdownReason}
             onValueChange={setLockdownReason}
             className="mt-3"
