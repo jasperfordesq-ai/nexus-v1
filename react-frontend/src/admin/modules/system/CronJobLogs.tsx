@@ -10,6 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardBody,
@@ -53,7 +54,8 @@ import type { CronLog } from '../../api/types';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CronJobLogs() {
-  usePageTitle("Cron Job Logs");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.cron_job_logs_title'));
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -111,38 +113,48 @@ export function CronJobLogs() {
 
   const handleClearLogs = async () => {
     if (!clearBeforeDate) {
-      toast.error("Please Select a Date");
+      toast.error(t('system.please_select_a_date'));
       return;
     }
 
     try {
       const res = await adminCron.clearLogs(clearBeforeDate);
       if (res.success) {
-        toast.success(res.message || "Logs cleared successfully");
+        toast.success(res.message || t('system.logs_cleared_successfully'));
         onClearClose();
         setClearBeforeDate('');
         loadLogs();
       } else {
-        toast.error(res.error || "Failed to clear logs");
+        toast.error(res.error || t('system.failed_to_clear_logs'));
       }
     } catch {
-      toast.error("Failed to clear logs");
+      toast.error(t('system.failed_to_clear_logs'));
     }
+  };
+
+  const getStatusLabel = (status: string) => {
+    if (status === 'success') {
+      return t('system.status_success');
+    }
+    if (status === 'failed') {
+      return t('system.status_failed');
+    }
+    return status;
   };
 
   const exportToCSV = () => {
     const headers = [
-      "ID",
-      "Job name",
-      "Status",
-      "Duration",
-      "Executed at",
-      "Executed by",
+      t('system.csv_header_id'),
+      t('system.csv_header_job_name'),
+      t('system.csv_header_status'),
+      t('system.csv_header_duration'),
+      t('system.csv_header_executed_at'),
+      t('system.csv_header_executed_by'),
     ];
     const rows = logs.map((log) => [
       log.id,
       log.job_name,
-      log.status,
+      getStatusLabel(log.status),
       log.duration_seconds,
       log.executed_at,
       log.executed_by,
@@ -171,8 +183,8 @@ export function CronJobLogs() {
   return (
     <div>
       <PageHeader
-        title={"Cron Job Logs"}
-        description={"View logs for all scheduled cron job executions"}
+        title={t('system.cron_job_logs_title')}
+        description={t('system.cron_job_logs_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -182,7 +194,7 @@ export function CronJobLogs() {
               onPress={exportToCSV}
               isDisabled={logs.length === 0}
             >
-              {"Export CSV"}
+              {t('system.btn_export_csv')}
             </Button>
             <Button
               size="sm"
@@ -191,7 +203,7 @@ export function CronJobLogs() {
               startContent={<Trash2 size={16} />}
               onPress={onClearOpen}
             >
-              {"Clear old logs"}
+              {t('system.btn_clear_old_logs')}
             </Button>
             <Button
               size="sm"
@@ -200,7 +212,7 @@ export function CronJobLogs() {
               onPress={loadLogs}
               isLoading={loading}
             >
-              {"Refresh"}
+              {t('common.refresh')}
             </Button>
           </div>
         }
@@ -210,12 +222,12 @@ export function CronJobLogs() {
       <Card shadow="sm" className="mb-6">
         <CardHeader className="flex items-center gap-2 pb-0">
           <Filter size={16} className="text-default-500" />
-          <span className="text-sm font-medium">{"Filters"}</span>
+          <span className="text-sm font-medium">{t('system.filter_section_header')}</span>
         </CardHeader>
         <CardBody className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Select
-            label={"Status"}
-            placeholder={"All Statuses..."}
+            label={t('system.label_status')}
+            placeholder={t('system.placeholder_all_statuses')}
             size="sm"
             variant="bordered"
             selectedKeys={statusFilter ? [statusFilter] : []}
@@ -225,16 +237,16 @@ export function CronJobLogs() {
             }}
           >
             <SelectItem key="success">
-              {"Success"}
+              {t('system.status_success')}
             </SelectItem>
             <SelectItem key="failed">
-              {"Failed"}
+              {t('system.status_failed')}
             </SelectItem>
           </Select>
 
           <Input
-            label={"Job ID"}
-            placeholder={"Filter by job ID..."}
+            label={t('system.label_job_i_d')}
+            placeholder={t('system.placeholder_filter_by_job_i_d')}
             size="sm"
             variant="bordered"
             value={jobIdFilter}
@@ -245,7 +257,7 @@ export function CronJobLogs() {
           />
 
           <Input
-            label={"Start Date"}
+            label={t('system.label_start_date')}
             type="date"
             size="sm"
             variant="bordered"
@@ -257,7 +269,7 @@ export function CronJobLogs() {
           />
 
           <Input
-            label={"End Date"}
+            label={t('system.label_end_date')}
             type="date"
             size="sm"
             variant="bordered"
@@ -273,7 +285,7 @@ export function CronJobLogs() {
       {/* Loading state */}
       {loading && logs.length === 0 && (
         <div className="flex items-center justify-center py-20">
-          <Spinner size="lg" label={"Loading logs"} />
+          <Spinner size="lg" label={t('system.loading_logs')} />
         </div>
       )}
 
@@ -282,8 +294,8 @@ export function CronJobLogs() {
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center gap-3 py-16 text-default-400">
             <FileText size={48} />
-            <p className="text-lg font-medium">{"No logs found"}</p>
-            <p className="text-sm">{"Try adjusting your filters or run a cron job"}</p>
+            <p className="text-lg font-medium">{t('system.no_logs_found')}</p>
+            <p className="text-sm">{t('system.try_filters_or_run_cron')}</p>
           </CardBody>
         </Card>
       )}
@@ -292,14 +304,14 @@ export function CronJobLogs() {
       {!loading && logs.length > 0 && (
         <Card shadow="sm">
           <CardBody className="p-0">
-            <Table aria-label={"Cron Job Logs"} removeWrapper>
+            <Table aria-label={t('system.cron_job_logs_title')} removeWrapper>
               <TableHeader>
-                <TableColumn>{"Job name"}</TableColumn>
-                <TableColumn>{"Status"}</TableColumn>
-                <TableColumn>{"Duration"}</TableColumn>
-                <TableColumn>{"Output"}</TableColumn>
-                <TableColumn>{"Executed at"}</TableColumn>
-                <TableColumn>{"Executed by"}</TableColumn>
+                <TableColumn>{t('system.col_job_name')}</TableColumn>
+                <TableColumn>{t('system.col_status')}</TableColumn>
+                <TableColumn>{t('system.col_duration')}</TableColumn>
+                <TableColumn>{t('system.col_output')}</TableColumn>
+                <TableColumn>{t('system.col_executed_at')}</TableColumn>
+                <TableColumn>{t('system.col_executed_by')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {logs.map((log) => (
@@ -325,7 +337,7 @@ export function CronJobLogs() {
                           )
                         }
                       >
-                        {log.status}
+                        {getStatusLabel(log.status)}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -335,7 +347,7 @@ export function CronJobLogs() {
                     </TableCell>
                     <TableCell>
                       <span className="text-xs text-default-600 line-clamp-2">
-                        {log.output || "No output"}
+                        {log.output || t('system.table_no_output')}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -374,7 +386,7 @@ export function CronJobLogs() {
       <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
-            <span>{"Log detail"}</span>
+            <span>{t('system.modal_log_detail')}</span>
             {selectedLog && (
               <span className="text-sm font-normal text-default-500">
                 {selectedLog.job_name} ({selectedLog.job_id})
@@ -386,7 +398,7 @@ export function CronJobLogs() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-default-500 mb-1">{"Status"}</p>
+                    <p className="text-xs text-default-500 mb-1">{t('system.modal_label_status')}</p>
                     <Chip
                       size="sm"
                       variant="flat"
@@ -401,23 +413,23 @@ export function CronJobLogs() {
                         )
                       }
                     >
-                      {selectedLog.status}
+                      {getStatusLabel(selectedLog.status)}
                     </Chip>
                   </div>
                   <div>
-                    <p className="text-xs text-default-500 mb-1">{"Duration"}</p>
+                    <p className="text-xs text-default-500 mb-1">{t('system.modal_label_duration')}</p>
                     <p className="text-sm font-medium">
                       {Number(selectedLog.duration_seconds).toFixed(2)}s
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-default-500 mb-1">{"Executed at"}</p>
+                    <p className="text-xs text-default-500 mb-1">{t('system.modal_label_executed_at')}</p>
                     <p className="text-sm font-medium">
                       {new Date(selectedLog.executed_at).toLocaleString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-default-500 mb-1">{"Executed by"}</p>
+                    <p className="text-xs text-default-500 mb-1">{t('system.modal_label_executed_by')}</p>
                     <p className="text-sm font-medium">
                       {selectedLog.executed_by}
                     </p>
@@ -425,9 +437,9 @@ export function CronJobLogs() {
                 </div>
 
                 <div>
-                  <p className="text-xs text-default-500 mb-2">{"Output"}</p>
+                  <p className="text-xs text-default-500 mb-2">{t('system.modal_label_output')}</p>
                   <pre className="bg-default-100 p-3 rounded-lg text-xs overflow-x-auto whitespace-pre-wrap break-all">
-                    {selectedLog.output || "No output"}
+                    {selectedLog.output || t('system.table_no_output')}
                   </pre>
                 </div>
               </div>
@@ -435,7 +447,7 @@ export function CronJobLogs() {
           </ModalBody>
           <ModalFooter>
             <Button size="sm" variant="flat" onPress={onClose}>
-              {"Close"}
+              {t('system.btn_close')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -444,13 +456,13 @@ export function CronJobLogs() {
       {/* Clear Logs Modal */}
       <Modal isOpen={isClearOpen} onClose={onClearClose}>
         <ModalContent>
-          <ModalHeader>{"Clear old logs"}</ModalHeader>
+          <ModalHeader>{t('system.clear_old_logs')}</ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-600 mb-4">
-              {"Logs executed before the chosen date will be permanently deleted."}
+              {t('system.clear_old_logs_warning')}
             </p>
             <Input
-              label={"Delete Logs Before"}
+              label={t('system.label_delete_logs_before')}
               type="date"
               variant="bordered"
               value={clearBeforeDate}
@@ -459,7 +471,7 @@ export function CronJobLogs() {
           </ModalBody>
           <ModalFooter>
             <Button size="sm" variant="flat" onPress={onClearClose}>
-              {"Cancel"}
+              {t('common.cancel')}
             </Button>
             <Button
               size="sm"
@@ -467,7 +479,7 @@ export function CronJobLogs() {
               onPress={handleClearLogs}
               isDisabled={!clearBeforeDate}
             >
-              {"Clear logs"}
+              {t('system.clear_logs')}
             </Button>
           </ModalFooter>
         </ModalContent>
