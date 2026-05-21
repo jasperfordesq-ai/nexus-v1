@@ -28,7 +28,7 @@ import { useTranslation } from 'react-i18next';
 
 export function PlansAdmin() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('content.plans_admin_title', 'Plans'));
+  usePageTitle(t('content.plans_admin_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ export function PlansAdmin() {
         setData(Array.isArray(result) ? result as PlanListItem[] : []);
       }
     } catch {
-      toast.error(t('content.failed_to_load_plans', 'Failed to load plans'));
+      toast.error(t('content.failed_to_load_plans'));
     } finally {
       setLoading(false);
     }
@@ -69,13 +69,13 @@ export function PlansAdmin() {
     try {
       const res = await adminPlans.delete(confirmDelete.id);
       if (res?.success) {
-        toast.success(t('content.plan_deleted_successfully', 'Plan deleted'));
+        toast.success(t('content.plan_deleted_successfully'));
         fetchData();
       } else {
-        toast.error(t('content.failed_to_delete_plan', 'Failed to delete plan'));
+        toast.error(t('content.failed_to_delete_plan'));
       }
     } catch {
-      toast.error(t('content.an_unexpected_error_occurred', 'An unexpected error occurred'));
+      toast.error(t('content.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -87,20 +87,20 @@ export function PlansAdmin() {
     try {
       const res = await adminPlans.syncStripe(plan.id);
       if (res.success) {
-        toast.success(`${plan.name} synced to Stripe`);
+        toast.success(t('content.plan_synced_to_stripe', { name: plan.name }));
         fetchData();
       } else {
-        toast.error("Stripe sync failed");
+        toast.error(t('content.stripe_sync_failed'));
       }
     } catch {
-      toast.error("Stripe sync failed — ensure STRIPE_SECRET_KEY is configured");
+      toast.error(t('content.stripe_sync_failed_config'));
     } finally {
       setSyncingId(null);
     }
   };
 
   const formatPrice = (price: number) => {
-    if (!price) return t('content.free', 'Free');
+    if (!price) return t('content.free');
     return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' }).format(Number(price));
   };
 
@@ -114,7 +114,7 @@ export function PlansAdmin() {
   const columns: Column<PlanListItem>[] = [
     {
       key: 'name',
-      label: t('content.label_name', 'Name'),
+      label: t('content.label_name'),
       sortable: true,
       render: (item) => (
         <div className="flex flex-col gap-0.5">
@@ -138,7 +138,7 @@ export function PlansAdmin() {
     },
     {
       key: 'tier_level',
-      label: t('content.tier', 'Tier'),
+      label: t('content.tier'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -146,25 +146,25 @@ export function PlansAdmin() {
           variant="flat"
           color={TIER_COLORS[item.tier_level] ?? 'default'}
         >
-          {item.tier_level === 0 ? 'Free' : `Tier ${item.tier_level}`}
+          {item.tier_level === 0 ? t('content.free') : t('content.tier_level_badge', { level: item.tier_level })}
         </Chip>
       ),
     },
     {
       key: 'price_monthly',
-      label: t('content.monthly_price', 'Monthly'),
+      label: t('content.monthly_price'),
       sortable: true,
       render: (item) => (
         <div className="flex flex-col gap-0.5">
           <span className="text-sm font-medium">{formatPrice(item.price_monthly)}</span>
-          <span className="text-xs text-default-400">{formatPrice(item.price_yearly)}/yr</span>
+          <span className="text-xs text-default-400">{t('content.yearly_price_suffix', { price: formatPrice(item.price_yearly) })}</span>
         </div>
       ),
     },
     {
       key: 'tenant_count',
       label: (
-        <span className="flex items-center gap-1"><Users size={13} /> Tenants</span>
+        <span className="flex items-center gap-1"><Users size={13} /> {t('content.tenants')}</span>
       ) as unknown as string,
       sortable: true,
       render: (item) => (
@@ -173,13 +173,13 @@ export function PlansAdmin() {
     },
     {
       key: 'stripe_synced',
-      label: 'Stripe',
+      label: t('content.stripe'),
       render: (item) => (
         <Tooltip
           content={
             item.stripe_synced
-              ? `Product: ${item.stripe_product_id}`
-              : 'Not synced to Stripe — click Sync'
+              ? t('content.stripe_product', { id: item.stripe_product_id })
+              : t('content.not_synced_to_stripe')
           }
         >
           <span className="flex items-center gap-1 text-sm">
@@ -189,7 +189,7 @@ export function PlansAdmin() {
               <AlertCircle size={15} className="text-warning" />
             )}
             <span className={item.stripe_synced ? 'text-success' : 'text-warning'}>
-              {item.stripe_synced ? 'Synced' : 'Unsynced'}
+              {item.stripe_synced ? t('content.synced') : t('content.unsynced')}
             </span>
           </span>
         </Tooltip>
@@ -197,43 +197,43 @@ export function PlansAdmin() {
     },
     {
       key: 'is_active',
-      label: t('content.label_active', 'Status'),
+      label: t('content.label_status'),
       render: (item) => (
         <Chip size="sm" variant="flat" color={item.is_active ? 'success' : 'default'}>
-          {item.is_active ? t('content.label_active', 'Active') : t('reports.label_inactive', 'Inactive')}
+          {item.is_active ? t('content.label_active') : t('reports.label_inactive')}
         </Chip>
       ),
     },
     ...(isSuperAdmin ? [{
       key: 'actions',
-      label: t('listings.actions', 'Actions'),
+      label: t('listings.actions'),
       render: (item: PlanListItem) => (
         <div className="flex gap-1">
-          <Tooltip content="Edit plan">
+          <Tooltip content={t('content.edit_plan')}>
             <Button
               isIconOnly size="sm" variant="flat" color="primary"
               onPress={() => navigate(tenantPath(`/admin/plans/edit/${item.id}`))}
-              aria-label={t('content.label_edit_plan', 'Edit')}
+              aria-label={t('content.label_edit_plan')}
             >
               <Pencil size={14} />
             </Button>
           </Tooltip>
-          <Tooltip content="Sync to Stripe">
+          <Tooltip content={t('content.sync_to_stripe')}>
             <Button
               isIconOnly size="sm" variant="flat" color="secondary"
               onPress={() => handleSyncStripe(item)}
               isLoading={syncingId === item.id}
-              aria-label="Sync to Stripe"
+              aria-label={t('content.sync_to_stripe')}
             >
               <RefreshCw size={14} />
             </Button>
           </Tooltip>
-          <Tooltip content={item.tenant_count > 0 ? `${item.tenant_count} active tenant(s) — cannot delete` : 'Delete plan'}>
+          <Tooltip content={item.tenant_count > 0 ? t('content.active_tenants_cannot_delete', { count: item.tenant_count }) : t('content.delete_plan')}>
             <Button
               isIconOnly size="sm" variant="flat" color="danger"
               onPress={() => setConfirmDelete(item)}
               isDisabled={item.tenant_count > 0}
-              aria-label={t('content.label_delete_plan', 'Delete')}
+              aria-label={t('content.label_delete_plan')}
             >
               <Trash2 size={14} />
             </Button>
@@ -246,7 +246,7 @@ export function PlansAdmin() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('content.plans_admin_title', 'Subscription Plans')} description={t('content.plans_admin_desc', 'Manage pricing tiers and feature sets')} />
+        <PageHeader title={t('content.plans_admin_title')} description={t('content.plans_admin_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -255,8 +255,8 @@ export function PlansAdmin() {
   return (
     <div>
       <PageHeader
-        title={t('content.plans_admin_title', 'Subscription Plans')}
-        description={t('content.plans_admin_desc', 'Manage pricing tiers, feature sets, and Stripe product sync')}
+        title={t('content.plans_admin_title')}
+        description={t('content.plans_admin_desc')}
         actions={
           isSuperAdmin ? (
             <Button
@@ -264,7 +264,7 @@ export function PlansAdmin() {
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/plans/create'))}
             >
-              {t('breadcrumbs.create', 'Create')} {t('breadcrumbs.plans', 'Plan')}
+              {t('breadcrumbs.create')} {t('content.plan')}
             </Button>
           ) : undefined
         }
@@ -273,10 +273,10 @@ export function PlansAdmin() {
       {data.length === 0 ? (
         <EmptyState
           icon={CreditCard}
-          title={t('no_data', 'No plans')}
-          description={t('content.desc_create_subscription_plans_to_offer_diffe', 'Create plans to offer different tiers to your tenants')}
+          title={t('content.no_plans')}
+          description={t('content.desc_create_subscription_plans_to_offer_diffe')}
           {...(isSuperAdmin ? {
-            actionLabel: `${t('breadcrumbs.create', 'Create')} ${t('breadcrumbs.plans', 'Plan')}`,
+            actionLabel: `${t('breadcrumbs.create')} ${t('content.plan')}`,
             onAction: () => navigate(tenantPath('/admin/plans/create')),
           } : {})}
         />
@@ -284,7 +284,7 @@ export function PlansAdmin() {
         <DataTable
           columns={columns}
           data={data}
-          searchPlaceholder={t('data_table.search', 'Search plans...')}
+          searchPlaceholder={t('content.search_plans')}
           onRefresh={fetchData}
         />
       )}
@@ -294,9 +294,9 @@ export function PlansAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={`${t('common.delete', 'Delete')} ${t('breadcrumbs.plans', 'Plan')}`}
-          message={t('content.confirm_delete_plan', `Delete plan "${confirmDelete.name}"? This cannot be undone.`, { name: confirmDelete.name })}
-          confirmLabel={t('common.delete', 'Delete')}
+          title={`${t('common.delete')} ${t('content.plan')}`}
+          message={t('content.confirm_delete_plan_named', { name: confirmDelete.name })}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />
