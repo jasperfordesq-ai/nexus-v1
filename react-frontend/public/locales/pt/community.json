@@ -128,8 +128,11 @@
   },
   "organisations": {
     "page_title": "Organizações",
+    "page_description": "Descobre organizações de voluntariado, parceiros locais e grupos comunitários que oferecem oportunidades, apoio e serviços através da tua rede de banco de tempo.",
     "heading": "Organizações",
     "subtitle": "Descubra organizações de voluntariado na sua comunidade",
+    "hero_eyebrow": "Parceiros locais de confiança",
+    "hero_partners_label": "Parceiros exibidos",
     "breadcrumb_volunteering": "Voluntariado",
     "breadcrumb_organisations": "Organizações",
     "search_placeholder": "Pesquisar organizações...",
@@ -140,10 +143,13 @@
     "no_organisations_found": "Nenhuma organização encontrada",
     "try_different_search": "Tente um termo de pesquisa diferente",
     "no_organisations_available": "Ainda não há organizações de voluntariado disponíveis",
+    "empty_tip_volunteer": "Grupos de voluntariado",
+    "empty_tip_partner": "Parceiros comunitários",
+    "empty_tip_register": "Registar uma organização",
     "load_more": "Carregar Mais",
     "volunteer_count": "{{count}} voluntários",
     "hours_logged": "{{hours}}h registadas",
-    "website": "Website",
+    "website": "Site",
     "register_button": "Registar Organização",
     "register_page_title": "Registar Organização",
     "register_heading": "Registar a Sua Organização",
@@ -178,13 +184,7 @@
     "terms_agreement": "Li e concordo com os termos de registo de organização acima.",
     "terms_required": "Deve concordar com os termos para registar a sua organização.",
     "opportunity_count_one": "{{count}} oportunidade",
-    "opportunity_count_other": "{{count}} oportunidades",
-    "page_description": "Descobre organizações de voluntariado, parceiros locais e grupos comunitários que oferecem oportunidades, apoio e serviços através da tua rede de banco de tempo.",
-    "hero_eyebrow": "Parceiros locais de confiança",
-    "hero_partners_label": "Parceiros exibidos",
-    "empty_tip_volunteer": "Grupos de voluntariado",
-    "empty_tip_partner": "Parceiros comunitários",
-    "empty_tip_register": "Registar uma organização"
+    "opportunity_count_other": "{{count}} oportunidades"
   },
   "organisation_detail": {
     "page_title": "Organização",
@@ -195,9 +195,10 @@
     "not_found": "Organização não encontrada.",
     "error_load_retry": "Falha ao carregar detalhes da organização. Tente novamente.",
     "unable_to_load": "Não Foi Possível Carregar a Organização",
+    "meta_description_fallback": "Explora {{name}} e {{count}} oportunidades de voluntariado ativas neste banco de tempo comunitário.",
     "try_again": "Tentar Novamente",
     "browse_organisations": "Explorar Organizações",
-    "website": "Website",
+    "website": "Site",
     "contact": "Contacto",
     "opportunities": "Oportunidades",
     "volunteers": "Voluntários",
@@ -216,8 +217,7 @@
     "cover_message_placeholder": "Diga à organização porque gostaria de ser voluntário...",
     "cancel": "Cancelar",
     "submit_application": "Submeter Candidatura",
-    "job_openings": "Vagas de emprego",
-    "meta_description_fallback": "Explora {{name}} e {{count}} oportunidades de voluntariado ativas neste banco de tempo comunitário."
+    "job_openings": "Vagas de emprego"
   },
   "emergency_alerts": {
     "heading": "Alertas de Emergência",
@@ -285,11 +285,11 @@
     "load_failed": "Falha ao carregar certificados",
     "load_error": "Não foi possível carregar certificados."
   },
+  "remote": "Remoto",
+  "closes_date": "Fecha {{date}}",
   "page_meta": {
     "register_organisation": {
       "title": "Registrar Organização"
     }
-  },
-  "remote": "Remoto",
-  "closes_date": "Fecha {{date}}"
+  }
 }

@@ -128,8 +128,11 @@
   },
   "organisations": {
     "page_title": "Organisationen",
+    "page_description": "Entdecken Sie Freiwilligenorganisationen, lokale Partner und Gemeinschaftsgruppen, die Möglichkeiten, Unterstützung und Dienstleistungen über Ihr Zeitbank-Netzwerk anbieten.",
     "heading": "Organisationen",
     "subtitle": "Entdecken Sie Freiwilligenorganisationen in Ihrer Gemeinschaft",
+    "hero_eyebrow": "Vertrauenswürdige lokale Partner",
+    "hero_partners_label": "Angezeigte Partner",
     "breadcrumb_volunteering": "Freiwilligenarbeit",
     "breadcrumb_organisations": "Organisationen",
     "search_placeholder": "Organisationen suchen...",
@@ -140,6 +143,9 @@
     "no_organisations_found": "Keine Organisationen gefunden",
     "try_different_search": "Versuchen Sie einen anderen Suchbegriff",
     "no_organisations_available": "Noch keine Freiwilligenorganisationen verfügbar",
+    "empty_tip_volunteer": "Freiwilligengruppen",
+    "empty_tip_partner": "Gemeinschaftspartner",
+    "empty_tip_register": "Organisation registrieren",
     "load_more": "Mehr laden",
     "volunteer_count": "{{count}} Freiwillige",
     "hours_logged": "{{hours}} Std. erfasst",
@@ -178,13 +184,7 @@
     "terms_agreement": "Ich habe die oben genannten Registrierungsbedingungen für Organisationen gelesen und stimme ihnen zu.",
     "terms_required": "Sie müssen den Bedingungen zustimmen, um Ihre Organisation zu registrieren.",
     "opportunity_count_one": "{{count}} Einsatz",
-    "opportunity_count_other": "{{count}} Einsätze",
-    "page_description": "Entdecken Sie Freiwilligenorganisationen, lokale Partner und Gemeinschaftsgruppen, die Möglichkeiten, Unterstützung und Dienstleistungen über Ihr Zeitbank-Netzwerk anbieten.",
-    "hero_eyebrow": "Vertrauenswürdige lokale Partner",
-    "hero_partners_label": "Angezeigte Partner",
-    "empty_tip_volunteer": "Freiwilligengruppen",
-    "empty_tip_partner": "Gemeinschaftspartner",
-    "empty_tip_register": "Organisation registrieren"
+    "opportunity_count_other": "{{count}} Einsätze"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -195,6 +195,7 @@
     "not_found": "Organisation nicht gefunden.",
     "error_load_retry": "Laden der Organisationsdetails fehlgeschlagen. Bitte versuchen Sie es erneut.",
     "unable_to_load": "Organisation konnte nicht geladen werden",
+    "meta_description_fallback": "Entdecken Sie {{name}} und {{count}} aktive Freiwilligenmöglichkeiten in dieser Gemeinschafts-Zeitbank.",
     "try_again": "Erneut versuchen",
     "browse_organisations": "Organisationen durchsuchen",
     "website": "Webseite",
@@ -207,7 +208,7 @@
     "active_opportunities": "Aktive Einsätze",
     "no_active_opportunities": "Keine aktiven Einsätze",
     "no_opportunities_description": "Diese Organisation hat derzeit keine offenen Freiwilligeneinsätze",
-    "remote": "Remote",
+    "remote": "Fernbedienung",
     "applied": "Beworben",
     "apply": "Bewerben",
     "reviews": "Bewertungen",
@@ -216,8 +217,7 @@
     "cover_message_placeholder": "Erzählen Sie der Organisation, warum Sie sich freiwillig engagieren möchten...",
     "cancel": "Abbrechen",
     "submit_application": "Bewerbung absenden",
-    "job_openings": "Stellenangebote",
-    "meta_description_fallback": "Entdecken Sie {{name}} und {{count}} aktive Freiwilligenmöglichkeiten in dieser Gemeinschafts-Zeitbank."
+    "job_openings": "Stellenangebote"
   },
   "emergency_alerts": {
     "heading": "Notfallwarnungen",
@@ -285,11 +285,11 @@
     "load_failed": "Zertifikate konnten nicht geladen werden",
     "load_error": "Fehler beim Laden der Zertifikate"
   },
+  "remote": "Fernbedienung",
+  "closes_date": "Schließt {{date}}",
   "page_meta": {
     "register_organisation": {
       "title": "Organisation registrieren"
     }
-  },
-  "remote": "Remote",
-  "closes_date": "Schließt {{date}}"
+  }
 }

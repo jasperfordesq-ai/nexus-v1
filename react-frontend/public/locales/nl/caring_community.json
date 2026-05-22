@@ -54,6 +54,9 @@
     "search_placeholder": "Zoek op naam",
     "searching": "Leden zoeken...",
     "no_search_results": "Geen overeenkomende leden gevonden",
+    "search_results_aria": "Matchende leden",
+    "search_error": "We konden geen leden zoeken. Probeer het opnieuw.",
+    "select_member_error": "Kies een lid voordat u een zorgontvanger koppelt.",
     "relationship_label": "Relatie",
     "start_date_label": "De zorg is begonnen",
     "notes_label": "Opmerkingen",
@@ -62,10 +65,7 @@
     "upcoming_care": "Aankomende zorg",
     "recent_care": "Recente zorg",
     "no_upcoming_care": "Nog geen geplande ondersteuning",
-    "no_recent_care": "Nog geen recente zorglogboeken",
-    "search_results_aria": "Matchende leden",
-    "search_error": "We konden geen leden zoeken. Probeer het opnieuw.",
-    "select_member_error": "Kies een lid voordat u een zorgontvanger koppelt."
+    "no_recent_care": "Nog geen recente zorglogboeken"
   },
   "cover": {
     "title": "Dekking zorg",
@@ -223,6 +223,7 @@
     "error": "Kan uw Warmtepas niet laden"
   },
   "panel": {
+    "meta_title": "Zorgzame gemeenschapsbeheerder",
     "header": {
       "toggle_sidebar": "Zijbalk schakelen",
       "back_to_site": "Terug naar de site",
@@ -231,6 +232,10 @@
       "user_menu": "Gebruikersmenu",
       "my_profile": "Mijn profiel",
       "sign_out": "Meld u af"
+    },
+    "navigation": {
+      "label": "Zorgzame gemeenschapsnavigatie",
+      "close": "Zorgzame community-navigatie"
     },
     "breadcrumbs": {
       "aria": "Paneermeel",
@@ -275,15 +280,15 @@
       }
     },
     "sidebar": {
-      "search_aria": "Search caring community navigation",
-      "search_placeholder": "Search navigation...",
-      "clear_search": "Duidelijke zoekopdracht",
-      "no_search_results": "No matching pages found",
       "brand": "Gemeenschapszorg",
       "expand": "Zijbalk uitvouwen",
       "collapse": "Zijbalk samenvouwen",
       "help_centre": "Helpcentrum",
       "full_admin": "Volledige beheerder",
+      "search_aria": "Search caring community navigation",
+      "search_placeholder": "Search navigation...",
+      "clear_search": "Duidelijke zoekopdracht",
+      "no_search_results": "No matching pages found",
       "sections": {
         "overview": "Overzicht",
         "operations": "Operaties",
@@ -332,14 +337,16 @@
         "municipal_roi": "Gemeentelijke ROI",
         "category_coefficients": "Categoriecoëfficiënten"
       }
-    },
-    "navigation": {
-      "label": "Zorgzame gemeenschapsnavigatie",
-      "close": "Zorgzame community-navigatie"
-    },
-    "meta_title": "Zorgzame gemeenschapsbeheerder"
+    }
   },
   "admin": {
+    "common": {
+      "refresh": "Vernieuwen",
+      "cancel": "Annuleren",
+      "all": "Alle",
+      "close": "Dichtbij",
+      "empty_dash": "-"
+    },
     "providers": {
       "meta_title": "Zorgverlenerslijst - Beheerder",
       "title": "Zorgaanbiederlijst",
@@ -448,63 +455,6 @@
         "volunteer": "Vrijwilligers groep"
       }
     },
-    "warmth_pass": {
-      "title": "Warmtepas opzoeken",
-      "subtitle": "Bekijk de vertrouwensreferenties van de community van elk lid",
-      "eligible": "In aanmerking komend",
-      "not_eligible": "Niet geschikt",
-      "verified": "Geverifieerd",
-      "not_verified": "Niet geverifieerd",
-      "loading": "Ledenpas laden...",
-      "empty_date": "Niet ingesteld",
-      "no_categories": "Geen categorieën geregistreerd.",
-      "tier_chip": "{{label}} (niveau {{tier}})",
-      "about": {
-        "title": "Over deze pagina",
-        "body": "Een Warmtepas is een draagbare vertrouwensreferentie waaruit blijkt dat een lid het Trusted-niveau heeft bereikt, peer reviews heeft ontvangen en in aanmerking komt voor het verlenen van informele buurtzorg. Ontvangers kunnen vragen om de Warmtepas van een helper te zien voordat ze hulp accepteren. Gebruik deze zoekopdracht om op verzoek de inloggegevens van een lid te verifiëren of om een ​​lid te helpen dat niet zeker weet of hij of zij in aanmerking komt."
-      },
-      "lookup": {
-        "title": "Leden opzoeken",
-        "member_id": "Lid-ID",
-        "placeholder": "Voer een numerieke lid-ID in",
-        "button": "Kijk omhoog"
-      },
-      "errors": {
-        "no_data": "Er zijn geen gegevens geretourneerd voor deze lid-ID.",
-        "lookup_failed": "Lid niet gevonden of er is een fout opgetreden."
-      },
-      "not_eligible_notice": {
-        "title": "Het lid heeft nog geen Trusted-niveau en beschikt niet over een Warmtepas.",
-        "body": "Om in aanmerking te komen, moeten ze meer zorguren registreren en minimaal één peer review ontvangen. Ze kunnen hun eigen voortgang controleren op de Trust-profielpagina."
-      },
-      "fields": {
-        "help_categories": "Hulpcategorieën",
-        "hours_logged": "Uren geregistreerd",
-        "identity_verified": "Identiteit geverifieerd",
-        "member_since": "Lid sinds",
-        "pass_active_since": "Pass actief sinds",
-        "reviews_received": "Recensies ontvangen",
-        "trust_tier": "Vertrouwensniveau"
-      }
-    },
-    "trust_tier": {
-      "recompute_confirm": "Vertrouwensniveaus voor alle actieve leden opnieuw berekenen? Dit kan even duren.",
-      "messages": {
-        "saved": "Configuratie van vertrouwenslaag opgeslagen. Wijzigingen zijn van toepassing bij de volgende herberekeningsrun.",
-        "recomputed": "Niveaus opnieuw berekend voor {{count}} leden."
-      },
-      "errors": {
-        "save_failed": "Kan configuratie niet opslaan.",
-        "recompute_failed": "Kan niveaus niet opnieuw berekenen."
-      }
-    },
-    "common": {
-      "refresh": "Vernieuwen",
-      "cancel": "Annuleren",
-      "empty_dash": "-",
-      "all": "Alle",
-      "close": "Dichtbij"
-    },
     "loyalty": {
       "title": "Loyaliteitsprogramma",
       "description": "Tijdkrediet voor marktbrug. Leden verdienen uren, verkopers kiezen ervoor om deze te accepteren als CHF-korting op hun vermeldingen.",
@@ -594,34 +544,15 @@
       },
       "pending": {
         "title": "In afwachting van uw goedkeuring",
-        "empty": "Geen lopende overdrachten.",
         "description": "Elke overdracht moet handmatig worden goedgekeurd door een beheerder. Controleer of het e-mailadres van het bestemmingslid overeenkomt met het nieuwe account van het lid voordat u het goedkeurt.",
+        "empty": "Geen lopende overdrachten.",
         "table_aria": "In afwachting van uitgaande urenoverdrachten"
       },
       "inbound": {
         "title": "Ontvangen van andere coöperaties (laatste 90 dagen)",
-        "empty": "Geen overboekingen ontvangen in de afgelopen 90 dagen.",
         "description": "Dit is alleen een auditlogboek: inkomende overdrachten worden automatisch verwerkt wanneer de broncoöperatie ze goedkeurt. Hier is geen actie vereist.",
+        "empty": "Geen overboekingen ontvangen in de afgelopen 90 dagen.",
         "table_aria": "Inkomende uuroverdrachten"
-      },
-      "actions": {
-        "approve": "Goedkeuren",
-        "reject": "Afwijzen"
-      },
-      "reject_modal": {
-        "title": "Overdracht weigeren",
-        "reason_label": "Reden van afwijzing (optioneel)",
-        "reason_placeholder": "Voeg context toe voor het auditlogboek"
-      },
-      "messages": {
-        "approved": "Overdracht goedgekeurd en afgeleverd.",
-        "rejected": "Overboeking afgewezen."
-      },
-      "errors": {
-        "load_pending": "Kan openstaande overdrachten niet laden",
-        "load_inbound": "Kan inkomende overdrachten niet laden",
-        "approve": "Goedkeuring mislukt",
-        "reject": "Afwijzing is mislukt"
       },
       "table": {
         "actions": "Acties",
@@ -641,14 +572,28 @@
         "received": "Ontvangen",
         "rejected": "Afgewezen",
         "sent": "Verstuurd"
+      },
+      "actions": {
+        "approve": "Goedkeuren",
+        "reject": "Afwijzen"
+      },
+      "reject_modal": {
+        "title": "Overdracht weigeren",
+        "reason_label": "Reden van afwijzing (optioneel)",
+        "reason_placeholder": "Voeg context toe voor het auditlogboek"
+      },
+      "messages": {
+        "approved": "Overdracht goedgekeurd en afgeleverd.",
+        "rejected": "Overboeking afgewezen."
+      },
+      "errors": {
+        "load_pending": "Kan openstaande overdrachten niet laden",
+        "load_inbound": "Kan inkomende overdrachten niet laden",
+        "approve": "Goedkeuring mislukt",
+        "reject": "Afwijzing is mislukt"
       }
     },
     "surveys": {
-      "errors": {
-        "export_failed": "Kan enquêtereacties niet exporteren.",
-        "load": "Kan enquêtes niet laden",
-        "create": "Kan enquête niet maken"
-      },
       "meta_title": "Gemeentelijke enquêtes",
       "title": "Gemeentelijke enquêtes",
       "subtitle": "Verzamel gestructureerde feedback van inwoners, gemeentelijke partners en programmateams.",
@@ -738,24 +683,16 @@
         "yes": "Ja",
         "no": "Nee",
         "date_unknown": "Niet ingesteld"
+      },
+      "errors": {
+        "load": "Kan enquêtes niet laden",
+        "create": "Kan enquête niet maken",
+        "export_failed": "Kan enquêtereacties niet exporteren."
       }
     },
     "feedback": {
       "title": "Feedback-inbox van de gemeente",
       "subtitle": "Feedback van bewoners ontvangen, beoordelen en oplossen: vragen, ideeën, problemen en klachten worden doorgestuurd naar de gemeente of het gemeenschapsteam.",
-      "messages": {
-        "triage_saved": "Triage opgeslagen",
-        "resolved": "Gemarkeerd als opgelost",
-        "closed": "Gesloten"
-      },
-      "errors": {
-        "load": "Kan feedback niet laden",
-        "save_triage": "Kan triage niet opslaan",
-        "resolution_required": "Resolutienotities zijn vereist",
-        "resolve": "Kan niet worden opgelost",
-        "close": "Kan niet worden afgesloten",
-        "export": "Kan niet exporteren"
-      },
       "about": {
         "title": "Over deze pagina",
         "body": "Deze inbox verzamelt feedback van bewoners via het platform. Elk item wordt gecategoriseerd als vraag, idee, probleemrapport of sentimentnota en krijgt een sentimentscore toegewezen. Gebruik de triagecontroles om eigendom toe te wijzen, interne notities toe te voegen en de resolutie bij te houden. Items die zichtbaar zijn voor alle bewoners worden gemarkeerd als openbaar; antwoorden kunnen worden gezien door de indiener en andere leden.",
@@ -866,6 +803,19 @@
         "days_ago_other": "{{count}}d geleden",
         "months_ago_one": "{{count}}ma geleden",
         "months_ago_other": "{{count}}ma geleden"
+      },
+      "messages": {
+        "triage_saved": "Triage opgeslagen",
+        "resolved": "Gemarkeerd als opgelost",
+        "closed": "Gesloten"
+      },
+      "errors": {
+        "load": "Kan feedback niet laden",
+        "save_triage": "Kan triage niet opslaan",
+        "resolution_required": "Resolutienotities zijn vereist",
+        "resolve": "Kan niet worden opgelost",
+        "close": "Kan niet worden afgesloten",
+        "export": "Kan niet exporteren"
       }
     },
     "civic_digest": {
@@ -1092,6 +1042,56 @@
         "escalate": "Escalatie is mislukt",
         "status": "Statuswijziging mislukt",
         "note": "Notitie mislukt"
+      }
+    },
+    "warmth_pass": {
+      "title": "Warmtepas opzoeken",
+      "subtitle": "Bekijk de vertrouwensreferenties van de community van elk lid",
+      "eligible": "In aanmerking komend",
+      "not_eligible": "Niet geschikt",
+      "verified": "Geverifieerd",
+      "not_verified": "Niet geverifieerd",
+      "loading": "Ledenpas laden...",
+      "empty_date": "Niet ingesteld",
+      "no_categories": "Geen categorieën geregistreerd.",
+      "tier_chip": "{{label}} (niveau {{tier}})",
+      "about": {
+        "title": "Over deze pagina",
+        "body": "Een Warmtepas is een draagbare vertrouwensreferentie waaruit blijkt dat een lid het Trusted-niveau heeft bereikt, peer reviews heeft ontvangen en in aanmerking komt voor het verlenen van informele buurtzorg. Ontvangers kunnen vragen om de Warmtepas van een helper te zien voordat ze hulp accepteren. Gebruik deze zoekopdracht om op verzoek de inloggegevens van een lid te verifiëren of om een ​​lid te helpen dat niet zeker weet of hij of zij in aanmerking komt."
+      },
+      "lookup": {
+        "title": "Leden opzoeken",
+        "member_id": "Lid-ID",
+        "placeholder": "Voer een numerieke lid-ID in",
+        "button": "Kijk omhoog"
+      },
+      "errors": {
+        "no_data": "Er zijn geen gegevens geretourneerd voor deze lid-ID.",
+        "lookup_failed": "Lid niet gevonden of er is een fout opgetreden."
+      },
+      "not_eligible_notice": {
+        "title": "Het lid heeft nog geen Trusted-niveau en beschikt niet over een Warmtepas.",
+        "body": "Om in aanmerking te komen, moeten ze meer zorguren registreren en minimaal één peer review ontvangen. Ze kunnen hun eigen voortgang controleren op de Trust-profielpagina."
+      },
+      "fields": {
+        "help_categories": "Hulpcategorieën",
+        "hours_logged": "Uren geregistreerd",
+        "identity_verified": "Identiteit geverifieerd",
+        "member_since": "Lid sinds",
+        "pass_active_since": "Pass actief sinds",
+        "reviews_received": "Recensies ontvangen",
+        "trust_tier": "Vertrouwensniveau"
+      }
+    },
+    "trust_tier": {
+      "recompute_confirm": "Vertrouwensniveaus voor alle actieve leden opnieuw berekenen? Dit kan even duren.",
+      "messages": {
+        "saved": "Configuratie van vertrouwenslaag opgeslagen. Wijzigingen zijn van toepassing bij de volgende herberekeningsrun.",
+        "recomputed": "Niveaus opnieuw berekend voor {{count}} leden."
+      },
+      "errors": {
+        "save_failed": "Kan configuratie niet opslaan.",
+        "recompute_failed": "Kan niveaus niet opnieuw berekenen."
       }
     },
     "regional_points": {

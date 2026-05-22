@@ -54,6 +54,9 @@
     "search_placeholder": "Szukaj według nazwy",
     "searching": "Wyszukiwanie członków...",
     "no_search_results": "Nie znaleziono pasujących członków",
+    "search_results_aria": "Pasujący członkowie",
+    "search_error": "Nie mogliśmy przeszukać członków. Spróbuj ponownie.",
+    "select_member_error": "Wybierz członka przed połączeniem odbiorcy opieki.",
     "relationship_label": "Relacja",
     "start_date_label": "Rozpoczęła się pielęgnacja",
     "notes_label": "Notatki",
@@ -62,10 +65,7 @@
     "upcoming_care": "Nadchodząca opieka",
     "recent_care": "Niedawna pielęgnacja",
     "no_upcoming_care": "Nie ma jeszcze zaplanowanego wsparcia",
-    "no_recent_care": "Nie ma jeszcze żadnych aktualnych dzienników opieki",
-    "search_results_aria": "Pasujący członkowie",
-    "search_error": "Nie mogliśmy przeszukać członków. Spróbuj ponownie.",
-    "select_member_error": "Wybierz członka przed połączeniem odbiorcy opieki."
+    "no_recent_care": "Nie ma jeszcze żadnych aktualnych dzienników opieki"
   },
   "cover": {
     "title": "Pielęgnacja okładki",
@@ -223,6 +223,7 @@
     "error": "Nie udało się załadować przepustki Warmth Pass"
   },
   "panel": {
+    "meta_title": "Troskliwy administrator społeczności",
     "header": {
       "toggle_sidebar": "Przełącz pasek boczny",
       "back_to_site": "Powrót do serwisu",
@@ -231,6 +232,10 @@
       "user_menu": "Menu użytkownika",
       "my_profile": "Mój profil",
       "sign_out": "Wyloguj się"
+    },
+    "navigation": {
+      "label": "Troskliwa nawigacja społecznościowa",
+      "close": "Zamknij troskliwą nawigację społecznościową"
     },
     "breadcrumbs": {
       "aria": "Bułka tarta",
@@ -275,15 +280,15 @@
       }
     },
     "sidebar": {
-      "search_aria": "Search caring community navigation",
-      "search_placeholder": "Search navigation...",
-      "clear_search": "Wyczyść wyszukiwanie",
-      "no_search_results": "No matching pages found",
       "brand": "Opieka społeczna",
       "expand": "Rozwiń pasek boczny",
       "collapse": "Zwiń pasek boczny",
       "help_centre": "Centrum pomocy",
       "full_admin": "Pełny administrator",
+      "search_aria": "Search caring community navigation",
+      "search_placeholder": "Search navigation...",
+      "clear_search": "Wyczyść wyszukiwanie",
+      "no_search_results": "No matching pages found",
       "sections": {
         "overview": "Przegląd",
         "operations": "Operacje",
@@ -332,14 +337,16 @@
         "municipal_roi": "Miejski zwrot z inwestycji",
         "category_coefficients": "Współczynniki kategorii"
       }
-    },
-    "navigation": {
-      "label": "Troskliwa nawigacja społecznościowa",
-      "close": "Zamknij troskliwą nawigację społecznościową"
-    },
-    "meta_title": "Troskliwy administrator społeczności"
+    }
   },
   "admin": {
+    "common": {
+      "refresh": "Odświeżać",
+      "cancel": "Anulować",
+      "all": "Wszystko",
+      "close": "Zamknąć",
+      "empty_dash": "-"
+    },
     "providers": {
       "meta_title": "Katalog dostawców opieki — administrator",
       "title": "Katalog dostawców usług opieki",
@@ -448,63 +455,6 @@
         "volunteer": "Grupa Wolontariuszy"
       }
     },
-    "warmth_pass": {
-      "title": "Wyszukiwanie przepustki ciepła",
-      "subtitle": "Wyświetl poświadczenia zaufania społeczności dowolnego członka",
-      "eligible": "Odpowiedni",
-      "not_eligible": "Nie kwalifikuje się",
-      "verified": "Zweryfikowano",
-      "not_verified": "Nie zweryfikowano",
-      "loading": "Ładowanie przepustki członkowskiej...",
-      "empty_date": "Nie ustawiono",
-      "no_categories": "Brak zarejestrowanych kategorii.",
-      "tier_chip": "{{label}} (Poziom {{tier}})",
-      "about": {
-        "title": "O tej stronie",
-        "body": "Warmth Pass to przenośne poświadczenie zaufania potwierdzające, że członek osiągnął poziom Zaufany, otrzymał recenzje wzajemne i jest uprawniony do zapewniania nieformalnej opieki sąsiedzkiej. Odbiorcy mogą poprosić o pokazanie Karty Ciepła pomocnika przed przyjęciem pomocy. Użyj tego wyszukiwania, aby na żądanie zweryfikować referencje członka lub pomóc członkowi, który nie jest pewien, czy się kwalifikuje."
-      },
-      "lookup": {
-        "title": "Wyszukiwanie członków",
-        "member_id": "Identyfikator członka",
-        "placeholder": "Wprowadź numeryczny identyfikator członka",
-        "button": "Spojrzeć w górę"
-      },
-      "errors": {
-        "no_data": "Nie zwrócono żadnych danych dla tego identyfikatora członkowskiego.",
-        "lookup_failed": "Nie znaleziono członka lub wystąpił błąd."
-      },
-      "not_eligible_notice": {
-        "title": "Członek nie ma jeszcze poziomu Zaufany i nie posiada Karnetu Ciepła.",
-        "body": "Aby się zakwalifikować, muszą przepracować więcej godzin opieki i otrzymać co najmniej jedną ocenę partnerską. Mogą sprawdzić własne postępy na stronie profilu Trust."
-      },
-      "fields": {
-        "help_categories": "Kategorie pomocy",
-        "hours_logged": "Zarejestrowane godziny",
-        "identity_verified": "Tożsamość zweryfikowana",
-        "member_since": "Członek od",
-        "pass_active_since": "Pass aktywny od",
-        "reviews_received": "Otrzymane recenzje",
-        "trust_tier": "Poziom zaufania"
-      }
-    },
-    "trust_tier": {
-      "recompute_confirm": "Czy ponownie obliczyć poziomy zaufania dla wszystkich aktywnych członków? Może to chwilę potrwać.",
-      "messages": {
-        "saved": "Zapisano konfigurację warstwy zaufania. Zmiany zostaną zastosowane przy następnym przeliczeniu.",
-        "recomputed": "Poziomy obliczone ponownie dla członków {{count}}."
-      },
-      "errors": {
-        "save_failed": "Nie udało się zapisać konfiguracji.",
-        "recompute_failed": "Nie udało się ponownie obliczyć poziomów."
-      }
-    },
-    "common": {
-      "refresh": "Odświeżać",
-      "cancel": "Anulować",
-      "empty_dash": "-",
-      "all": "Wszystko",
-      "close": "Zamknąć"
-    },
     "loyalty": {
       "title": "Program lojalnościowy",
       "description": "Kredyt czasowy do mostu rynkowego. Członkowie zarabiają godziny, a sprzedawcy wyrażają zgodę na akceptowanie ich jako zniżki w CHF na swoich aukcjach.",
@@ -594,34 +544,15 @@
       },
       "pending": {
         "title": "Oczekiwanie na Twoją zgodę",
-        "empty": "Brak oczekujących transferów.",
         "description": "Każdy przelew musi zostać ręcznie zatwierdzony przez administratora. Przed zatwierdzeniem sprawdź, czy adres e-mail członka docelowego jest zgodny z nowym kontem członka.",
+        "empty": "Brak oczekujących transferów.",
         "table_aria": "Oczekujące wychodzące przelewy godzinowe"
       },
       "inbound": {
         "title": "Otrzymane od innych spółdzielni (ostatnie 90 dni)",
-        "empty": "W ciągu ostatnich 90 dni nie otrzymano żadnych przelewów.",
         "description": "Jest to wyłącznie dziennik audytu – przelewy przychodzące są przetwarzane automatycznie po zatwierdzeniu przez spółdzielnię źródłową. Tutaj nie jest wymagane żadne działanie.",
+        "empty": "W ciągu ostatnich 90 dni nie otrzymano żadnych przelewów.",
         "table_aria": "Przychodzące transfery godzinowe"
-      },
-      "actions": {
-        "approve": "Zatwierdzić",
-        "reject": "Odrzucić"
-      },
-      "reject_modal": {
-        "title": "Odrzuć przelew",
-        "reason_label": "Powód odrzucenia (opcjonalnie)",
-        "reason_placeholder": "Dodaj kontekst dziennika kontroli"
-      },
-      "messages": {
-        "approved": "Transfer zatwierdzony i dostarczony.",
-        "rejected": "Transfer odrzucony."
-      },
-      "errors": {
-        "load_pending": "Nie udało się wczytać oczekujących przelewów",
-        "load_inbound": "Nie udało się wczytać przelewów przychodzących",
-        "approve": "Zatwierdzenie nie powiodło się",
-        "reject": "Odrzucenie nie powiodło się"
       },
       "table": {
         "actions": "Działania",
@@ -641,14 +572,28 @@
         "received": "Otrzymane",
         "rejected": "Odrzucony",
         "sent": "Wysłano"
+      },
+      "actions": {
+        "approve": "Zatwierdzić",
+        "reject": "Odrzucić"
+      },
+      "reject_modal": {
+        "title": "Odrzuć przelew",
+        "reason_label": "Powód odrzucenia (opcjonalnie)",
+        "reason_placeholder": "Dodaj kontekst dziennika kontroli"
+      },
+      "messages": {
+        "approved": "Transfer zatwierdzony i dostarczony.",
+        "rejected": "Transfer odrzucony."
+      },
+      "errors": {
+        "load_pending": "Nie udało się wczytać oczekujących przelewów",
+        "load_inbound": "Nie udało się wczytać przelewów przychodzących",
+        "approve": "Zatwierdzenie nie powiodło się",
+        "reject": "Odrzucenie nie powiodło się"
       }
     },
     "surveys": {
-      "errors": {
-        "export_failed": "Nie udało się wyeksportować odpowiedzi na ankietę.",
-        "load": "Nie udało się załadować ankiet",
-        "create": "Nie udało się utworzyć ankiety"
-      },
       "meta_title": "Ankiety gminne",
       "title": "Ankiety gminne",
       "subtitle": "Zbieraj uporządkowane opinie od mieszkańców, partnerów miejskich i zespołów programowych.",
@@ -738,24 +683,16 @@
         "yes": "Tak",
         "no": "NIE",
         "date_unknown": "Nie ustawiono"
+      },
+      "errors": {
+        "load": "Nie udało się załadować ankiet",
+        "create": "Nie udało się utworzyć ankiety",
+        "export_failed": "Nie udało się wyeksportować odpowiedzi na ankietę."
       }
     },
     "feedback": {
       "title": "Skrzynka odbiorcza opinii gminy",
       "subtitle": "Otrzymuj, selekcjonuj i rozwiązuj opinie mieszkańców: pytania, pomysły, problemy i skargi kierowane do władz miejskich lub społeczności.",
-      "messages": {
-        "triage_saved": "Segregacja zapisana",
-        "resolved": "Oznaczono jako rozwiązane",
-        "closed": "Zamknięte"
-      },
-      "errors": {
-        "load": "Nie udało się załadować opinii",
-        "save_triage": "Nie udało się zapisać segregacji",
-        "resolution_required": "Wymagane są notatki dotyczące uchwały",
-        "resolve": "Nie udało się rozwiązać",
-        "close": "Nie udało się zamknąć",
-        "export": "Nie udało się wyeksportować"
-      },
       "about": {
         "title": "O tej stronie",
         "body": "W tej skrzynce odbiorczej gromadzone są opinie przesyłane przez mieszkańców za pośrednictwem platformy. Każdy element jest kategoryzowany jako pytanie, pomysł, raport problemu lub notatka z opiniami i przypisuje się mu ocenę opinii. Użyj elementów sterujących segregacją, aby przypisać własność, dodać notatki wewnętrzne i śledzić rozdzielczość. Elementy widoczne dla wszystkich mieszkańców są oznaczone jako publiczne; odpowiedzi mogą być widoczne dla osoby przesyłającej i innych członków.",
@@ -866,6 +803,19 @@
         "days_ago_other": "{{count}}d temu",
         "months_ago_one": "{{count}}miesiąc temu",
         "months_ago_other": "{{count}}miesiąc temu"
+      },
+      "messages": {
+        "triage_saved": "Segregacja zapisana",
+        "resolved": "Oznaczono jako rozwiązane",
+        "closed": "Zamknięte"
+      },
+      "errors": {
+        "load": "Nie udało się załadować opinii",
+        "save_triage": "Nie udało się zapisać segregacji",
+        "resolution_required": "Wymagane są notatki dotyczące uchwały",
+        "resolve": "Nie udało się rozwiązać",
+        "close": "Nie udało się zamknąć",
+        "export": "Nie udało się wyeksportować"
       }
     },
     "civic_digest": {
@@ -1092,6 +1042,56 @@
         "escalate": "Eskalacja nie powiodła się",
         "status": "Zmiana statusu nie powiodła się",
         "note": "Uwaga nie powiodła się"
+      }
+    },
+    "warmth_pass": {
+      "title": "Wyszukiwanie przepustki ciepła",
+      "subtitle": "Wyświetl poświadczenia zaufania społeczności dowolnego członka",
+      "eligible": "Odpowiedni",
+      "not_eligible": "Nie kwalifikuje się",
+      "verified": "Zweryfikowano",
+      "not_verified": "Nie zweryfikowano",
+      "loading": "Ładowanie przepustki członkowskiej...",
+      "empty_date": "Nie ustawiono",
+      "no_categories": "Brak zarejestrowanych kategorii.",
+      "tier_chip": "{{label}} (Poziom {{tier}})",
+      "about": {
+        "title": "O tej stronie",
+        "body": "Warmth Pass to przenośne poświadczenie zaufania potwierdzające, że członek osiągnął poziom Zaufany, otrzymał recenzje wzajemne i jest uprawniony do zapewniania nieformalnej opieki sąsiedzkiej. Odbiorcy mogą poprosić o pokazanie Karty Ciepła pomocnika przed przyjęciem pomocy. Użyj tego wyszukiwania, aby na żądanie zweryfikować referencje członka lub pomóc członkowi, który nie jest pewien, czy się kwalifikuje."
+      },
+      "lookup": {
+        "title": "Wyszukiwanie członków",
+        "member_id": "Identyfikator członka",
+        "placeholder": "Wprowadź numeryczny identyfikator członka",
+        "button": "Spojrzeć w górę"
+      },
+      "errors": {
+        "no_data": "Nie zwrócono żadnych danych dla tego identyfikatora członkowskiego.",
+        "lookup_failed": "Nie znaleziono członka lub wystąpił błąd."
+      },
+      "not_eligible_notice": {
+        "title": "Członek nie ma jeszcze poziomu Zaufany i nie posiada Karnetu Ciepła.",
+        "body": "Aby się zakwalifikować, muszą przepracować więcej godzin opieki i otrzymać co najmniej jedną ocenę partnerską. Mogą sprawdzić własne postępy na stronie profilu Trust."
+      },
+      "fields": {
+        "help_categories": "Kategorie pomocy",
+        "hours_logged": "Zarejestrowane godziny",
+        "identity_verified": "Tożsamość zweryfikowana",
+        "member_since": "Członek od",
+        "pass_active_since": "Pass aktywny od",
+        "reviews_received": "Otrzymane recenzje",
+        "trust_tier": "Poziom zaufania"
+      }
+    },
+    "trust_tier": {
+      "recompute_confirm": "Czy ponownie obliczyć poziomy zaufania dla wszystkich aktywnych członków? Może to chwilę potrwać.",
+      "messages": {
+        "saved": "Zapisano konfigurację warstwy zaufania. Zmiany zostaną zastosowane przy następnym przeliczeniu.",
+        "recomputed": "Poziomy obliczone ponownie dla członków {{count}}."
+      },
+      "errors": {
+        "save_failed": "Nie udało się zapisać konfiguracji.",
+        "recompute_failed": "Nie udało się ponownie obliczyć poziomów."
       }
     },
     "regional_points": {
