@@ -171,8 +171,8 @@
     "create_failed": "Impossible de créer l'échange",
     "something_wrong": "Une erreur est survenue. Veuillez réessayer."
   },
-  "participants_count_one": "Participant à {{count}}",
-  "participants_count_other": "Participants à {{count}}",
+  "participants_count_one": "{{count}} participant",
+  "participants_count_other": "{{count}} participants",
   "hours_count_one": "{{count}} heure",
   "hours_count_other": "{{count}} heures",
   "page_meta": {

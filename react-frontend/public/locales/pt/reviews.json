@@ -1,37 +1,37 @@
 {
-  "page_title": "Reviews",
+  "page_title": "Avaliações",
   "tabs": {
-    "received": "Reviews Received",
-    "given": "Reviews Given",
-    "pending": "Pending Reviews"
+    "given": "Avaliações dadas",
+    "pending": "Avaliações pendentes",
+    "received": "Avaliações recebidas"
   },
   "stats": {
-    "average": "Average Rating",
-    "total": "Total Reviews",
-    "no_reviews": "No reviews yet"
+    "average": "Classificação média",
+    "no_reviews": "Ainda sem avaliações",
+    "total": "Total de avaliações"
   },
   "review_card": {
-    "anonymous": "Anonymous",
-    "delete": "Delete Review",
-    "delete_confirm": "Are you sure you want to delete this review?",
-    "delete_success": "Review deleted",
-    "delete_error": "Failed to delete review"
+    "anonymous": "Anónimo",
+    "delete": "Eliminar avaliação",
+    "delete_confirm": "Tens a certeza de que queres eliminar esta avaliação?",
+    "delete_error": "Falha ao eliminar avaliação",
+    "delete_success": "Avaliação eliminada"
   },
   "pending": {
-    "empty": "No pending reviews",
-    "empty_subtitle": "You're all caught up! Reviews for your completed exchanges will appear here.",
-    "write_review": "Write Review"
+    "empty": "Nenhuma avaliação pendente",
+    "empty_subtitle": "Estás em dia! As avaliações das tuas trocas concluídas aparecerão aqui.",
+    "write_review": "Escrever avaliação"
   },
   "received": {
-    "empty": "No reviews received yet",
-    "empty_subtitle": "Complete exchanges with community members to start earning reviews."
+    "empty": "Nenhuma avaliação recebida ainda",
+    "empty_subtitle": "Conclui trocas com membros da comunidade para começares a receber avaliações."
   },
   "given": {
-    "empty": "You haven't written any reviews yet",
-    "empty_subtitle": "After completing exchanges, you can leave reviews for other members."
+    "empty": "Ainda não escreveste nenhuma avaliação",
+    "empty_subtitle": "Após concluir trocas, podes deixar avaliações para outros membros."
   },
-  "load_error": "Failed to load reviews. Please try again.",
-  "load_more": "Load more",
-  "stars": "{{count}} star",
-  "stars_plural": "{{count}} stars"
+  "load_error": "Falha ao carregar avaliações. Por favor, tenta novamente.",
+  "load_more": "Carregar mais",
+  "stars": "{{count}} estrela",
+  "stars_plural": "{{count}} estrelas"
 }

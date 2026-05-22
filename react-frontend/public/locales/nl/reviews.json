@@ -1,37 +1,37 @@
 {
-  "page_title": "Reviews",
+  "page_title": "Beoordelingen",
   "tabs": {
-    "received": "Reviews Received",
-    "given": "Reviews Given",
-    "pending": "Pending Reviews"
+    "given": "Gegeven beoordelingen",
+    "pending": "Openstaande beoordelingen",
+    "received": "Ontvangen beoordelingen"
   },
   "stats": {
-    "average": "Average Rating",
-    "total": "Total Reviews",
-    "no_reviews": "No reviews yet"
+    "average": "Gemiddelde beoordeling",
+    "no_reviews": "Nog geen beoordelingen",
+    "total": "Totaal beoordelingen"
   },
   "review_card": {
-    "anonymous": "Anonymous",
-    "delete": "Delete Review",
-    "delete_confirm": "Are you sure you want to delete this review?",
-    "delete_success": "Review deleted",
-    "delete_error": "Failed to delete review"
+    "anonymous": "Anoniem",
+    "delete": "Beoordeling verwijderen",
+    "delete_confirm": "Weet je zeker dat je deze beoordeling wilt verwijderen?",
+    "delete_error": "Verwijderen van beoordeling mislukt",
+    "delete_success": "Beoordeling verwijderd"
   },
   "pending": {
-    "empty": "No pending reviews",
-    "empty_subtitle": "You're all caught up! Reviews for your completed exchanges will appear here.",
-    "write_review": "Write Review"
+    "empty": "Geen openstaande beoordelingen",
+    "empty_subtitle": "Je bent helemaal bij! Beoordelingen voor je voltooide uitwisselingen verschijnen hier.",
+    "write_review": "Beoordeling schrijven"
   },
   "received": {
-    "empty": "No reviews received yet",
-    "empty_subtitle": "Complete exchanges with community members to start earning reviews."
+    "empty": "Nog geen beoordelingen ontvangen",
+    "empty_subtitle": "Voltooi uitwisselingen met communityleden om beoordelingen te verdienen."
   },
   "given": {
-    "empty": "You haven't written any reviews yet",
-    "empty_subtitle": "After completing exchanges, you can leave reviews for other members."
+    "empty": "Je hebt nog geen beoordelingen geschreven",
+    "empty_subtitle": "Na het voltooien van uitwisselingen kun je beoordelingen achterlaten voor andere leden."
   },
-  "load_error": "Failed to load reviews. Please try again.",
-  "load_more": "Load more",
-  "stars": "{{count}} star",
-  "stars_plural": "{{count}} stars"
+  "load_error": "Laden van beoordelingen mislukt. Probeer het opnieuw.",
+  "load_more": "Meer laden",
+  "stars": "{{count}} ster",
+  "stars_plural": "{{count}} sterren"
 }

@@ -1,27 +1,27 @@
 {
   "shift_reminder": {
-    "subject": "Meabhrúchán: Aistriú oibrithe deonacha amárach — {{title}} — {{community}}",
-    "title": "Meabhrúchán Shift",
-    "preview": "Tá d'aistriú deonach le haghaidh {{title}} ag teacht suas",
-    "body": "Is meabhrúchán cairdiúil é seo faoin aistriú deonach atá agat le teacht.",
-    "label_opportunity": "Opportunity",
-    "label_when": "When",
-    "label_location": "Location",
-    "cta": "Sonraí Amharc"
+    "subject": "Meabhrúchán: Seal deonach amárach — {{title}} — {{community}}",
+    "title": "Meabhrúchán Seala",
+    "preview": "Tá do sheal deonach do {{title}} ag teacht",
+    "body": "Is meabhrúchán cairdiúil é seo faoi do sheal deonach atá le teacht.",
+    "label_opportunity": "Deis",
+    "label_when": "Cathain",
+    "label_location": "Suíomh",
+    "cta": "Féach ar Shonraí"
   },
   "shift_starting_soon": {
-    "subject": "Cuirfear tús le d’aistriú deonach gan mhoill — {{title}}",
-    "title": "Shift Ag Tosú Go luath",
-    "preview": "Tosaíonn d’aistriú deonach le haghaidh {{title}} go luath",
-    "body": "Tá d'aistriú deonach ag tosú go luath. Go raibh maith agat as do thiomantas don phobal!",
-    "cta": "Féach ar Shonraí Shift"
+    "subject": "Tosaíonn do sheal deonach go luath — {{title}}",
+    "title": "Seal ag Tosú Go Luath",
+    "preview": "Tosaíonn do sheal deonach do {{title}} go luath",
+    "body": "Tá do sheal deonach ag tosú go luath. Go raibh maith agat as do thiomantas don phobal!",
+    "cta": "Féach ar Shonraí an tSeala"
   },
   "post_shift_feedback": {
-    "subject": "Go raibh maith agat as obair dheonach - {{title}}",
-    "title": "Go raibh maith agat as Obair Dheonach!",
-    "preview": "Go raibh maith agat as do aistriú deonach le {{title}}",
-    "body": "Go raibh maith agat as do sheal deonach a chríochnú le <strong>{{title}}</strong>. Déanann do ranníocaíocht fíor-dhifríocht!",
-    "log_hours_prompt": "Cuimhnigh, le do thoil, d’uaireanta a logáil le do ranníocaíocht a thaifeadadh.",
-    "cta": "Logáil Do Uaireanta"
+    "subject": "Go raibh maith agat as obair dheonach — {{title}}",
+    "title": "Go Raibh Maith Agat as Obair Dheonach!",
+    "preview": "Go raibh maith agat as do sheal deonach le {{title}}",
+    "body": "Go raibh maith agat as do sheal deonach a chríochnú le <strong>{{title}}</strong>. Déanann do chuid ranníocaíochta difear fíor!",
+    "log_hours_prompt": "Ná déan dearmad do chuid uaireanta a logáil ionas go gcomhairfear do ranníocaíocht.",
+    "cta": "Logáil Do Chuid Uaireanta"
   }
 }

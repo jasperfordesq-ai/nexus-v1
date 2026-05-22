@@ -43,7 +43,7 @@
     "find_members": "Faigh Comhaltaí",
     "browse_events": "Brabhsáil Imeachtaí",
     "notifications": "Fógraí",
-    "caring_community": "Care Hub"
+    "caring_community": "Mol Cúraim"
   },
   "listings": {
     "offering": "Ag Tairiscint",
@@ -52,7 +52,7 @@
     "request": "Iarratas",
     "empty": "Gan liostaí le déanaí",
     "create_first": "Cruthaigh do chéad liosta",
-    "user_fallback": "User",
+    "user_fallback": "Úsáideoir",
     "empty_description": "Cruthaigh iarratas nó tairiscint chun tús a chur le meaitseáil le daoine in aice leat."
   },
   "activity": {
@@ -114,21 +114,21 @@
     "received": "Faighte {{amount}}u",
     "review": "Léirmheas",
     "none_pending": "Gan léirmheasanna ar feitheamh",
-    "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending",
+    "pending_subtitle": "Oscail an t-iarratas athbhreithniúcháin seo",
+    "view_all_pending": "Féach ar Gach Ceann Ar Feitheamh",
     "none_pending_description": "Taispeánfar malartuithe críochnaithe a bhfuil aiseolas de dhíth orthu anseo."
   },
-  "fallback_name": "there",
+  "fallback_name": "a chara",
   "common": {
-    "loading": "Loading"
+    "loading": "Ag luchtú"
   },
   "caring_community": {
-    "title": "Caring Community",
-    "subtitle": "Coordinate help requests, time offers, verified volunteering hours, and trusted support from one place.",
+    "title": "Pobal Cúraim",
+    "subtitle": "Comhordaigh iarratais cabhrach, tairiscintí ama, uaireanta deonaíochta fíoraithe, agus tacaíocht iontaofa ó aon áit amháin.",
     "actions": {
-      "open_hub": "Open hub",
-      "request_help": "Request help",
-      "log_hours": "Log hours"
+      "open_hub": "Oscail mol",
+      "request_help": "Iarr cabhair",
+      "log_hours": "Logáil uaireanta"
     }
   }
 }

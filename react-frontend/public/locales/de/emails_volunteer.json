@@ -1,27 +1,27 @@
 {
   "shift_reminder": {
-    "subject": "Erinnerung: Freiwilligenschicht morgen – {{title}} – {{community}}",
+    "subject": "Erinnerung: Freiwilligenschicht morgen — {{title}} — {{community}}",
     "title": "Schichterinnerung",
-    "preview": "Deine Freiwilligenschicht für {{title}} steht vor der Tür",
-    "body": "Dies ist eine freundliche Erinnerung an Ihren bevorstehenden Freiwilligendienst.",
-    "label_opportunity": "Opportunity",
-    "label_when": "When",
-    "label_location": "Location",
+    "preview": "Ihre Freiwilligenschicht für {{title}} steht bevor",
+    "body": "Dies ist eine freundliche Erinnerung an Ihre bevorstehende Freiwilligenschicht.",
+    "label_opportunity": "Einsatz",
+    "label_when": "Wann",
+    "label_location": "Ort",
     "cta": "Details anzeigen"
   },
   "shift_starting_soon": {
-    "subject": "Deine Freiwilligenschicht beginnt bald – {{title}}",
-    "title": "Die Schicht beginnt bald",
-    "preview": "Dein Freiwilligendienst für {{title}} beginnt bald",
-    "body": "Ihr Freiwilligendienst beginnt bald. Vielen Dank für Ihr Engagement für die Gemeinschaft!",
+    "subject": "Ihre Freiwilligenschicht beginnt bald — {{title}}",
+    "title": "Schicht beginnt bald",
+    "preview": "Ihre Freiwilligenschicht für {{title}} beginnt bald",
+    "body": "Ihre Freiwilligenschicht beginnt bald. Vielen Dank für Ihr Engagement für die Gemeinschaft!",
     "cta": "Schichtdetails anzeigen"
   },
   "post_shift_feedback": {
-    "subject": "Vielen Dank für Ihre Freiwilligenarbeit – {{title}}",
-    "title": "Vielen Dank für Ihr ehrenamtliches Engagement!",
-    "preview": "Vielen Dank für Ihren ehrenamtlichen Einsatz bei {{title}}",
-    "body": "Vielen Dank, dass Sie Ihre Freiwilligenschicht bei <strong>{{title}}</strong> absolviert haben. Ihr Beitrag macht einen echten Unterschied!",
-    "log_hours_prompt": "Bitte denken Sie daran, Ihre Stunden zu protokollieren, damit Ihr Beitrag erfasst wird.",
-    "cta": "Protokollieren Sie Ihre Stunden"
+    "subject": "Danke für Ihre Freiwilligenarbeit — {{title}}",
+    "title": "Danke für Ihre Freiwilligenarbeit!",
+    "preview": "Vielen Dank für Ihre Freiwilligenschicht bei {{title}}",
+    "body": "Vielen Dank, dass Sie Ihre Freiwilligenschicht bei <strong>{{title}}</strong> abgeschlossen haben. Ihr Beitrag macht einen echten Unterschied!",
+    "log_hours_prompt": "Bitte denken Sie daran, Ihre Stunden zu erfassen, damit Ihr Beitrag dokumentiert wird.",
+    "cta": "Stunden erfassen"
   }
 }

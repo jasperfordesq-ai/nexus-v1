@@ -1,16 +1,16 @@
 {
   "legal_update": {
-    "subject": "Ważne: zaktualizowano {{doc_type}} — {{community}}",
-    "title": "Aktualizacja zasad",
-    "preview": "{{community}} has updated its {{doc_type}}",
-    "body": "{{community}} opublikował zaktualizowaną wersję {{doc_type}}. Aby kontynuować korzystanie z platformy, zapoznaj się i zaakceptuj zaktualizowane warunki.",
+    "subject": "Ważne: Zaktualizowany dokument {{doc_type}} — {{community}}",
+    "title": "Aktualizacja polityki",
+    "preview": "{{community}} zaktualizował swój dokument {{doc_type}}",
+    "body": "{{community}} opublikował zaktualizowany dokument {{doc_type}}. Prosimy o zapoznanie się z zaktualizowanymi warunkami i ich akceptację w celu dalszego korzystania z platformy.",
     "action_required": "Dalsze korzystanie z platformy wymaga akceptacji najnowszych warunków.",
     "cta": "Przejrzyj i zaakceptuj"
   },
   "kb_published": {
     "subject": "Twój artykuł jest opublikowany: {{title}} — {{community}}",
     "title": "Artykuł opublikowany!",
-    "preview": "Twój artykuł w bazie wiedzy „{{title}}” jest już dostępny",
+    "preview": "Twój artykuł w bazie wiedzy \"{{title}}\" jest już opublikowany",
     "body": "Twój artykuł został opublikowany w bazie wiedzy {{community}} i jest teraz widoczny dla wszystkich członków.",
     "cta": "Zobacz artykuł"
   },
@@ -18,7 +18,7 @@
     "subject": "Artykuł zaktualizowany: {{title}} — {{community}}",
     "title": "Artykuł zaktualizowany",
     "preview": "Twój artykuł w bazie wiedzy został zaktualizowany",
-    "body": "Nowa wersja Twojego artykułu <strong>„{{title}}”</strong> została opublikowana w bazie wiedzy {{community}}.",
+    "body": "Nowa wersja Twojego artykułu <strong>\"{{title}}\"</strong> została opublikowana w bazie wiedzy {{community}}.",
     "cta": "Zobacz artykuł"
   }
 }

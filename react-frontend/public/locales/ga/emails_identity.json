@@ -1,29 +1,29 @@
 {
   "started": {
     "subject": "Fíorú aitheantais ar siúl — {{community}}",
-    "title": "Cuireadh tús le Fíorú Aitheantais",
+    "title": "Tosaíodh Fíorú Aitheantais",
     "preview": "Tá d'fhíorú aitheantais ar siúl",
-    "body": "Tá tús curtha agat leis an bpróiseas fíoraithe aitheantais ar {{community}}. De ghnáth ní thógann sé seo ach cúpla nóiméad.",
+    "body": "Thosaigh tú an próiseas fíoraithe aitheantais ar {{community}}. De ghnáth ní thógann sé ach cúpla nóiméad.",
     "next_steps": "Gheobhaidh tú ríomhphost eile nuair a bheidh do fhíorú críochnaithe.",
     "cta": "Seiceáil Stádas Fíoraithe",
-    "note": "Déanann Stripe Identity do dhoiciméid a phróiseáil go slán."
+    "note": "Próiseálann Stripe Identity do dhoiciméid go slán."
   },
   "passed": {
     "subject": "Aitheantas fíoraithe! — {{community}}",
-    "title": "Aitheantais Deimhnithe",
-    "preview": "D'éirigh le d'aitheantas a fhíorú",
-    "body": "D'éirigh le d'aitheantas a fhíorú ar {{community}}. Cuireadh suaitheantas ball fíoraithe le do phróifíl.",
+    "title": "Aitheantas Fíoraithe",
+    "preview": "Fíoraíodh d'aitheantas go rathúil",
+    "body": "Fíoraíodh d'aitheantas ar {{community}} go rathúil. Cuireadh suaitheantas ball fíoraithe le do phróifíl.",
     "highlight": "Ball Fíoraithe",
     "cta": "Féach ar Do Phróifíl",
     "badge_note": "Tá do shuaitheantas fíoraithe le feiceáil ag baill eile anois."
   },
   "failed": {
-    "subject": "Níorbh fhéidir fíorú aitheantais a chur i gcrích — {{community}}",
-    "title": "Níor éirigh leis an bhfíorú",
-    "preview": "Níor cuireadh d'fhíorú aitheantais i gcrích",
-    "body": "Níorbh fhéidir linn d'fhíorú aitheantais a chur i gcrích ar {{community}}.",
+    "subject": "Níorbh fhéidir an fíorú aitheantais a chríochnú — {{community}}",
+    "title": "Fíorú Mírathúil",
+    "preview": "Níor críochnaíodh d'fhíorú aitheantais",
+    "body": "Níorbh fhéidir linn d'fhíorú aitheantais ar {{community}} a chríochnú.",
     "reason_label": "Cúis:",
-    "retry_note": "Is féidir leat triail eile a bhaint as do shocruithe próifíle. Má tá fadhbanna agat fós, déan teagmháil leis an bhfoireann tacaíochta.",
-    "cta": "Bain triail eile as"
+    "retry_note": "Is féidir leat triail a bhaint as arís ó shocruithe do phróifíle. Má leanann an fhadhb, déan teagmháil le tacaíocht le do thoil.",
+    "cta": "Bain triail as arís"
   }
 }

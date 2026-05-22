@@ -43,7 +43,7 @@
     "find_members": "Mitglieder finden",
     "browse_events": "Veranstaltungen suchen",
     "notifications": "Benachrichtigungen",
-    "caring_community": "Care Hub"
+    "caring_community": "Pflegehub"
   },
   "listings": {
     "offering": "Angebot",
@@ -52,7 +52,7 @@
     "request": "Gesuch",
     "empty": "Keine aktuellen Inserate",
     "create_first": "Erstellen Sie Ihr erstes Inserat",
-    "user_fallback": "User",
+    "user_fallback": "Benutzer",
     "empty_description": "Erstelle ein Gesuch oder Angebot, um Übereinstimmungen mit Menschen in deiner Nähe zu finden."
   },
   "activity": {
@@ -114,21 +114,21 @@
     "received": "Erhalten {{amount}}h",
     "review": "Bewertung",
     "none_pending": "Keine ausstehenden Bewertungen",
-    "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending",
+    "pending_subtitle": "Diese Rezensionsanfrage öffnen",
+    "view_all_pending": "Alle ausstehenden anzeigen",
     "none_pending_description": "Abgeschlossene Tausche, die noch eine Bewertung benötigen, erscheinen hier."
   },
-  "fallback_name": "there",
+  "fallback_name": "dort",
   "common": {
-    "loading": "Loading"
+    "loading": "Wird geladen"
   },
   "caring_community": {
-    "title": "Caring Community",
-    "subtitle": "Coordinate help requests, time offers, verified volunteering hours, and trusted support from one place.",
+    "title": "Pflegende Gemeinschaft",
+    "subtitle": "Koordinieren Sie Hilfeanfragen, Zeitangebote, verifizierte Freiwilligenstunden und vertrauenswürdige Unterstützung von einem Ort aus.",
     "actions": {
-      "open_hub": "Open hub",
-      "request_help": "Request help",
-      "log_hours": "Log hours"
+      "open_hub": "Hub öffnen",
+      "request_help": "Hilfe anfordern",
+      "log_hours": "Stunden erfassen"
     }
   }
 }

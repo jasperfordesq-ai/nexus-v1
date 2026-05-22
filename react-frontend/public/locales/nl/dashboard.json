@@ -14,10 +14,10 @@
   },
   "new_listing": "Nieuwe aanbieding",
   "stats": {
-    "balance": "Balance",
+    "balance": "Saldo",
     "active_listings": "Actieve aanbiedingen",
-    "messages": "Messages",
-    "pending": "Pending",
+    "messages": "Berichten",
+    "pending": "In behandeling",
     "hours_value": "{{value}} u"
   },
   "sections": {
@@ -29,7 +29,7 @@
     "upcoming_events": "Aankomende evenementen",
     "your_progress": "Jouw voortgang",
     "pending_reviews": "In afwachting van beoordelingen",
-    "endorsements": "Endorsements"
+    "endorsements": "Aanbevelingen"
   },
   "view_all": "Bekijk alles",
   "view_all_caps": "Bekijk alles",
@@ -38,21 +38,21 @@
   "view_all_transactions": "Bekijk alle transacties",
   "quick_actions": {
     "create_listing": "Aanbieding maken",
-    "messages": "Messages",
+    "messages": "Berichten",
     "view_wallet": "Bekijk portemonnee",
     "find_members": "Vind leden",
     "browse_events": "Blader door evenementen",
-    "notifications": "Notifications",
-    "caring_community": "Care Hub"
+    "notifications": "Meldingen",
+    "caring_community": "Zorghub"
   },
   "listings": {
-    "offering": "Offering",
-    "requesting": "Requesting",
-    "offer": "Offer",
-    "request": "Request",
+    "offering": "Aanbod",
+    "requesting": "Aanvragen",
+    "offer": "Aanbod",
+    "request": "Aanvraag",
     "empty": "Geen recente aanbiedingen",
     "create_first": "Maak je eerste aanbieding",
-    "user_fallback": "User",
+    "user_fallback": "Gebruiker",
     "empty_description": "Maak een verzoek of aanbod om matches te vinden met mensen in de buurt."
   },
   "activity": {
@@ -84,7 +84,7 @@
   "gamification": {
     "level": "Niveau {{level}}",
     "badges": "Badges",
-    "streak": "Streak",
+    "streak": "Reeks",
     "xp_progress": "XP Vooruitgang",
     "start_earning": "Begin XP te verdienen door deel te nemen aan de gemeenschap!",
     "streak_days_one": "{{count}} dag",
@@ -112,23 +112,23 @@
   "reviews": {
     "sent": "Verzonden {{amount}}h",
     "received": "Ontvangen {{amount}}h",
-    "review": "Review",
+    "review": "Beoordeling",
     "none_pending": "Geen uitstaande beoordelingen",
-    "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending",
+    "pending_subtitle": "Dit beoordelingsverzoek openen",
+    "view_all_pending": "Alle openstaande bekijken",
     "none_pending_description": "Voltooide uitwisselingen die feedback nodig hebben, verschijnen hier."
   },
-  "fallback_name": "there",
+  "fallback_name": "daar",
   "common": {
-    "loading": "Loading"
+    "loading": "Laden"
   },
   "caring_community": {
-    "title": "Caring Community",
-    "subtitle": "Coordinate help requests, time offers, verified volunteering hours, and trusted support from one place.",
+    "title": "Zorgzame gemeenschap",
+    "subtitle": "Coördineer hulpverzoeken, tijdaanbiedingen, geverifieerde vrijwilligersuren en betrouwbare ondersteuning vanuit één plek.",
     "actions": {
-      "open_hub": "Open hub",
-      "request_help": "Request help",
-      "log_hours": "Log hours"
+      "open_hub": "Hub openen",
+      "request_help": "Hulp aanvragen",
+      "log_hours": "Uren registreren"
     }
   }
 }

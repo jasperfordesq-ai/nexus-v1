@@ -712,7 +712,7 @@
     "category_financial": "Finanziell",
     "category_health_safety": "Gesundheit & Sicherheit",
     "category_legal": "Rechtlich",
-    "category_reputation": "Reputation",
+    "category_reputation": "Ruf",
     "category_other": "Sonstige",
     "category_fraud": "Möglicher Betrug"
   },
@@ -1016,7 +1016,7 @@
       "title": "Überprüfungsdatensätze (DBS, Garda, PVG, AccessNI)",
       "intro": "Ein Überprüfungsdatensatz erfasst eine eingereichte Hintergrundprüfungs-Referenz. Unterstützte Typen:",
       "type_garda": "<b>garda_vetting</b> — Irland, National Vetting Bureau (NVB).",
-      "type_dbs": "<b>dbs_basic / standard / enhanced</b> — England & Wales, Disclosure & Barring Service.",
+      "type_dbs": "<b>dbs_basic / standard / enhanced</b> — England und Wales, Disclosure and Barring Service.",
       "type_pvg": "<b>pvg_scotland</b> — Schottland, Protecting-Vulnerable-Groups-Schema.",
       "type_access_ni": "<b>access_ni</b> — Nordirland, AccessNI-Offenlegung.",
       "type_international": "<b>international</b> — für Mitglieder mit ausländischer Überprüfung.",

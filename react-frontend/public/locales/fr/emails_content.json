@@ -1,24 +1,24 @@
 {
   "legal_update": {
-    "subject": "Important : mise à jour de {{doc_type}} — {{community}}",
+    "subject": "Important : {{doc_type}} mise à jour — {{community}}",
     "title": "Mise à jour de la politique",
-    "preview": "{{community}} has updated its {{doc_type}}",
-    "body": "{{community}} a publié un {{doc_type}} mis à jour. Veuillez lire et accepter les conditions mises à jour pour continuer à utiliser la plateforme.",
-    "action_required": "Votre utilisation continue de la plateforme nécessite l'acceptation des dernières conditions.",
-    "cta": "Vérifier et accepter"
+    "preview": "{{community}} a mis à jour sa {{doc_type}}",
+    "body": "{{community}} a publié une {{doc_type}} mise à jour. Veuillez consulter et accepter les conditions mises à jour pour continuer à utiliser la plateforme.",
+    "action_required": "La poursuite de votre utilisation de la plateforme nécessite l'acceptation des dernières conditions.",
+    "cta": "Consulter et accepter"
   },
   "kb_published": {
-    "subject": "Votre article est en ligne : {{title}} — {{community}}",
+    "subject": "Votre article est en ligne : {{title}} — {{community}}",
     "title": "Article publié !",
-    "preview": "L'article de votre base de connaissances \"{{title}}\" est désormais en ligne",
-    "body": "Votre article a été publié dans la base de connaissances {{community}} et est désormais visible par tous les membres.",
+    "preview": "Votre article de la base de connaissances \"{{title}}\" est maintenant en ligne",
+    "body": "Votre article a été publié dans la base de connaissances de {{community}} et est maintenant visible par tous les membres.",
     "cta": "Voir l'article"
   },
   "kb_updated": {
-    "subject": "Article mis à jour : {{title}} — {{community}}",
+    "subject": "Article mis à jour : {{title}} — {{community}}",
     "title": "Article mis à jour",
-    "preview": "L'article de votre base de connaissances a été mis à jour",
-    "body": "Une nouvelle version de votre article <strong>\"{{title}}\"</strong> a été publiée dans la base de connaissances {{community}}.",
+    "preview": "Votre article de la base de connaissances a été mis à jour",
+    "body": "Une nouvelle version de votre article <strong>\"{{title}}\"</strong> a été publiée dans la base de connaissances de {{community}}.",
     "cta": "Voir l'article"
   }
 }

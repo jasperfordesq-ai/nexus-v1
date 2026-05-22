@@ -43,7 +43,7 @@
     "find_members": "Trouver des membres",
     "browse_events": "Parcourir les événements",
     "notifications": "Notifications",
-    "caring_community": "Care Hub"
+    "caring_community": "Centre de soin"
   },
   "listings": {
     "offering": "Offre",
@@ -52,7 +52,7 @@
     "request": "Demande",
     "empty": "Aucune annonce récente",
     "create_first": "Créez votre première annonce",
-    "user_fallback": "User",
+    "user_fallback": "Utilisateur",
     "empty_description": "Créez une demande ou une offre pour commencer à trouver des correspondances avec des personnes près de chez vous."
   },
   "activity": {
@@ -114,21 +114,21 @@
     "received": "Reçu {{amount}}h",
     "review": "Évaluation",
     "none_pending": "Aucun avis en attente",
-    "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending",
+    "pending_subtitle": "Ouvrir cette demande d'évaluation",
+    "view_all_pending": "Voir tous les en attente",
     "none_pending_description": "Les échanges terminés qui nécessitent un retour apparaîtront ici."
   },
-  "fallback_name": "there",
+  "fallback_name": "là",
   "common": {
-    "loading": "Loading"
+    "loading": "Chargement"
   },
   "caring_community": {
-    "title": "Caring Community",
-    "subtitle": "Coordinate help requests, time offers, verified volunteering hours, and trusted support from one place.",
+    "title": "Communauté bienveillante",
+    "subtitle": "Coordonnez les demandes d'aide, les offres de temps, les heures de bénévolat vérifiées et le soutien de confiance depuis un seul endroit.",
     "actions": {
-      "open_hub": "Open hub",
-      "request_help": "Request help",
-      "log_hours": "Log hours"
+      "open_hub": "Ouvrir le hub",
+      "request_help": "Demander de l'aide",
+      "log_hours": "Enregistrer les heures"
     }
   }
 }

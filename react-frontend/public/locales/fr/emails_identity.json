@@ -1,29 +1,29 @@
 {
   "started": {
     "subject": "Vérification d'identité en cours — {{community}}",
-    "title": "Vérification d'identité commencée",
+    "title": "Vérification d'identité démarrée",
     "preview": "Votre vérification d'identité est en cours",
     "body": "Vous avez démarré le processus de vérification d'identité sur {{community}}. Cela ne prend généralement que quelques minutes.",
     "next_steps": "Vous recevrez un autre e-mail une fois votre vérification terminée.",
-    "cta": "Vérifier l'état de la vérification",
-    "note": "Vos documents sont traités en toute sécurité par Stripe Identity."
+    "cta": "Vérifier le statut de vérification",
+    "note": "Vos documents sont traités de manière sécurisée par Stripe Identity."
   },
   "passed": {
-    "subject": "Identité vérifiée ! -{{community}}",
+    "subject": "Identité vérifiée ! — {{community}}",
     "title": "Identité vérifiée",
     "preview": "Votre identité a été vérifiée avec succès",
     "body": "Votre identité a été vérifiée avec succès sur {{community}}. Un badge de membre vérifié a été ajouté à votre profil.",
     "highlight": "Membre vérifié",
-    "cta": "Afficher votre profil",
-    "badge_note": "Votre badge vérifié est désormais visible par les autres membres."
+    "cta": "Voir votre profil",
+    "badge_note": "Votre badge vérifié est maintenant visible par les autres membres."
   },
   "failed": {
-    "subject": "La vérification de l'identité n'a pas pu être effectuée — {{community}}",
+    "subject": "La vérification d'identité n'a pas pu être finalisée — {{community}}",
     "title": "Vérification échouée",
-    "preview": "Votre vérification d'identité n'a pas été complétée",
-    "body": "Nous n'avons pas pu terminer votre vérification d'identité sur {{community}}.",
-    "reason_label": "Raison:",
-    "retry_note": "Vous pouvez réessayer à partir des paramètres de votre profil. Si vous continuez à rencontrer des problèmes, veuillez contacter l'assistance.",
-    "cta": "Essayer à nouveau"
+    "preview": "Votre vérification d'identité n'a pas été finalisée",
+    "body": "Nous n'avons pas pu finaliser votre vérification d'identité sur {{community}}.",
+    "reason_label": "Raison :",
+    "retry_note": "Vous pouvez réessayer depuis les paramètres de votre profil. Si le problème persiste, veuillez contacter le support.",
+    "cta": "Réessayer"
   }
 }

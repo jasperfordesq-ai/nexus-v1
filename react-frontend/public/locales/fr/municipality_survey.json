@@ -1,28 +1,28 @@
 {
   "meta": {
-    "title": "Community Surveys",
-    "description": "Share your feedback on local issues"
+    "title": "Sondages communautaires",
+    "description": "Partagez votre avis sur les enjeux locaux"
   },
-  "empty": "No surveys available at this time",
-  "already_responded": "You have already participated in this survey.",
-  "submit": "Submit responses",
-  "submitting": "Submitting…",
-  "success_title": "Thank you!",
-  "success_body": "Your feedback has been recorded.",
-  "back": "Back to Surveys",
-  "required_error": "Please answer all required questions.",
-  "take_survey": "Take survey",
-  "question_required": "Required",
+  "empty": "Aucun sondage disponible pour le moment",
+  "already_responded": "Vous avez déjà participé à ce sondage.",
+  "submit": "Envoyer les réponses",
+  "submitting": "Envoi en cours…",
+  "success_title": "Merci !",
+  "success_body": "Votre avis a été enregistré.",
+  "back": "Retour aux sondages",
+  "required_error": "Veuillez répondre à toutes les questions obligatoires.",
+  "take_survey": "Répondre au sondage",
+  "question_required": "Obligatoire",
   "likert_options": {
-    "1": "Very dissatisfied",
-    "2": "Dissatisfied",
-    "3": "Neutral",
-    "4": "Satisfied",
-    "5": "Very satisfied"
+    "1": "Très insatisfait",
+    "2": "Insatisfait",
+    "3": "Neutre",
+    "4": "Satisfait",
+    "5": "Très satisfait"
   },
-  "submit_error": "Error submitting response. Please try again.",
-  "load_error": "Failed to load surveys. Please try again.",
-  "yes": "Yes",
+  "submit_error": "Erreur lors de l'envoi de la réponse. Veuillez réessayer.",
+  "load_error": "Impossible de charger les sondages. Veuillez réessayer.",
+  "yes": "Oui",
   "no": "No",
-  "closes_on": "Closes: {{date}}"
+  "closes_on": "Ferme le : {{date}}"
 }

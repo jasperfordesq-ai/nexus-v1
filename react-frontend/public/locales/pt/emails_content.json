@@ -1,24 +1,24 @@
 {
   "legal_update": {
-    "subject": "Importante: {{doc_type}} atualizado - {{community}}",
+    "subject": "Importante: {{doc_type}} atualizada — {{community}}",
     "title": "Atualização de política",
-    "preview": "{{community}} has updated its {{doc_type}}",
-    "body": "{{community}} publicou um {{doc_type}} atualizado. Revise e aceite os termos atualizados para continuar usando a plataforma.",
-    "action_required": "O uso contínuo da plataforma exige a aceitação dos termos mais recentes.",
-    "cta": "Revise e aceite"
+    "preview": "A {{community}} atualizou a sua {{doc_type}}",
+    "body": "A {{community}} publicou uma {{doc_type}} atualizada. Por favor, revise e aceite os termos atualizados para continuar a usar a plataforma.",
+    "action_required": "O uso continuado da plataforma requer a aceitação dos termos mais recentes.",
+    "cta": "Rever e aceitar"
   },
   "kb_published": {
-    "subject": "Seu artigo está ativo: {{title}} — {{community}}",
+    "subject": "O seu artigo está publicado: {{title}} — {{community}}",
     "title": "Artigo publicado!",
-    "preview": "O artigo da sua base de conhecimento \"{{title}}\" já está disponível",
-    "body": "Seu artigo foi publicado na base de conhecimento {{community}} e agora está visível para todos os membros.",
+    "preview": "O seu artigo da base de conhecimento \"{{title}}\" está agora publicado",
+    "body": "O seu artigo foi publicado na base de conhecimento da {{community}} e agora está visível para todos os membros.",
     "cta": "Ver artigo"
   },
   "kb_updated": {
     "subject": "Artigo atualizado: {{title}} — {{community}}",
     "title": "Artigo atualizado",
-    "preview": "O artigo da sua base de conhecimento foi atualizado",
-    "body": "Uma nova versão do seu artigo <strong>\"{{title}}\"</strong> foi publicada na base de conhecimento {{community}}.",
+    "preview": "O seu artigo da base de conhecimento foi atualizado",
+    "body": "Uma nova versão do seu artigo <strong>\"{{title}}\"</strong> foi publicada na base de conhecimento da {{community}}.",
     "cta": "Ver artigo"
   }
 }

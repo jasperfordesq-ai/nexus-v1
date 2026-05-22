@@ -1,27 +1,27 @@
 {
   "shift_reminder": {
-    "subject": "Lembrete: turno voluntário amanhã — {{title}} — {{community}}",
+    "subject": "Lembrete: Turno de voluntariado amanhã — {{title}} — {{community}}",
     "title": "Lembrete de turno",
-    "preview": "Seu turno de voluntariado para {{title}} está chegando",
-    "body": "Este é um lembrete amigável sobre seu próximo turno de voluntariado.",
-    "label_opportunity": "Opportunity",
-    "label_when": "When",
-    "label_location": "Location",
+    "preview": "O seu turno de voluntariado para {{title}} está a aproximar-se",
+    "body": "Este é um lembrete amigável sobre o seu próximo turno de voluntariado.",
+    "label_opportunity": "Oportunidade",
+    "label_when": "Quando",
+    "label_location": "Local",
     "cta": "Ver detalhes"
   },
   "shift_starting_soon": {
-    "subject": "Seu turno de voluntariado começa em breve — {{title}}",
-    "title": "Mudança começando em breve",
-    "preview": "Seu turno de voluntariado para {{title}} começa em breve",
-    "body": "Seu turno de voluntariado começará em breve. Obrigado pelo seu compromisso com a comunidade!",
+    "subject": "O seu turno de voluntariado começa em breve — {{title}}",
+    "title": "O turno começa em breve",
+    "preview": "O seu turno de voluntariado para {{title}} começa em breve",
+    "body": "O seu turno de voluntariado está prestes a começar. Obrigado pelo seu compromisso com a comunidade!",
     "cta": "Ver detalhes do turno"
   },
   "post_shift_feedback": {
-    "subject": "Obrigado pelo voluntariado — {{title}}",
-    "title": "Obrigado pelo voluntariado!",
-    "preview": "Obrigado pelo seu turno voluntário com {{title}}",
-    "body": "Obrigado por concluir seu turno voluntário com <strong>{{title}}</strong>. Sua contribuição faz muita diferença!",
-    "log_hours_prompt": "Lembre-se de registrar suas horas para que sua contribuição seja registrada.",
-    "cta": "Registre seu horário"
+    "subject": "Obrigado pelo seu voluntariado — {{title}}",
+    "title": "Obrigado pelo seu voluntariado!",
+    "preview": "Obrigado pelo seu turno de voluntariado com {{title}}",
+    "body": "Obrigado por concluir o seu turno de voluntariado com <strong>{{title}}</strong>. A sua contribuição faz uma diferença real!",
+    "log_hours_prompt": "Lembre-se de registar as suas horas para que a sua contribuição fique registada.",
+    "cta": "Registar as suas horas"
   }
 }

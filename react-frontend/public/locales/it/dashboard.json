@@ -43,7 +43,7 @@
     "find_members": "Trova Membri",
     "browse_events": "Sfoglia Eventi",
     "notifications": "Notifiche",
-    "caring_community": "Care Hub"
+    "caring_community": "Centro cura"
   },
   "listings": {
     "offering": "Offerta",
@@ -52,7 +52,7 @@
     "request": "Richiesta",
     "empty": "Nessun annuncio recente",
     "create_first": "Crei il Suo primo annuncio",
-    "user_fallback": "User",
+    "user_fallback": "Utente",
     "empty_description": "Crea una richiesta o un'offerta per iniziare a trovare corrispondenze con persone vicine."
   },
   "activity": {
@@ -114,21 +114,21 @@
     "received": "Ricevuto {{amount}}h",
     "review": "Recensione",
     "none_pending": "Nessuna recensione in sospeso",
-    "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending",
+    "pending_subtitle": "Apri questa richiesta di recensione",
+    "view_all_pending": "Vedi tutti i pendenti",
     "none_pending_description": "Gli scambi completati che necessitano di un riscontro appariranno qui."
   },
-  "fallback_name": "there",
+  "fallback_name": "là",
   "common": {
-    "loading": "Loading"
+    "loading": "Caricamento"
   },
   "caring_community": {
-    "title": "Caring Community",
-    "subtitle": "Coordinate help requests, time offers, verified volunteering hours, and trusted support from one place.",
+    "title": "Comunità solidale",
+    "subtitle": "Coordina le richieste di aiuto, le offerte di tempo, le ore di volontariato verificate e il supporto affidabile da un unico posto.",
     "actions": {
-      "open_hub": "Open hub",
-      "request_help": "Request help",
-      "log_hours": "Log hours"
+      "open_hub": "Apri hub",
+      "request_help": "Richiedi aiuto",
+      "log_hours": "Registra ore"
     }
   }
 }

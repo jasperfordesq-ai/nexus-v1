@@ -1,29 +1,29 @@
 {
   "started": {
-    "subject": "Trwa weryfikacja tożsamości — {{community}}",
+    "subject": "Weryfikacja tożsamości w toku — {{community}}",
     "title": "Rozpoczęto weryfikację tożsamości",
-    "preview": "Trwa weryfikacja Twojej tożsamości",
-    "body": "Rozpocząłeś proces weryfikacji tożsamości na {{community}}. Zwykle zajmuje to tylko kilka minut.",
-    "next_steps": "Po zakończeniu weryfikacji otrzymasz kolejny e-mail.",
+    "preview": "Weryfikacja Twojej tożsamości jest w toku",
+    "body": "Rozpocząłeś proces weryfikacji tożsamości na {{community}}. Zwykle trwa to tylko kilka minut.",
+    "next_steps": "Otrzymasz kolejny e-mail po zakończeniu weryfikacji.",
     "cta": "Sprawdź status weryfikacji",
     "note": "Twoje dokumenty są bezpiecznie przetwarzane przez Stripe Identity."
   },
   "passed": {
-    "subject": "Tożsamość potwierdzona! — {{community}}",
+    "subject": "Tożsamość zweryfikowana! — {{community}}",
     "title": "Tożsamość zweryfikowana",
     "preview": "Twoja tożsamość została pomyślnie zweryfikowana",
-    "body": "Twoja tożsamość została pomyślnie zweryfikowana na {{community}}. Odznaka zweryfikowanego członka została dodana do Twojego profilu.",
+    "body": "Twoja tożsamość została pomyślnie zweryfikowana na {{community}}. Do Twojego profilu dodano odznakę zweryfikowanego członka.",
     "highlight": "Zweryfikowany członek",
-    "cta": "Wyświetl swój profil",
-    "badge_note": "Twoja zweryfikowana plakietka jest teraz widoczna dla innych członków."
+    "cta": "Zobacz swój profil",
+    "badge_note": "Twoja odznaka zweryfikowanego użytkownika jest teraz widoczna dla innych członków."
   },
   "failed": {
-    "subject": "Nie można ukończyć weryfikacji tożsamości — {{community}}",
+    "subject": "Weryfikacja tożsamości nie mogła zostać ukończona — {{community}}",
     "title": "Weryfikacja nieudana",
     "preview": "Weryfikacja Twojej tożsamości nie została ukończona",
-    "body": "Nie udało nam się dokończyć weryfikacji Twojej tożsamości na {{community}}.",
+    "body": "Nie udało nam się zakończyć weryfikacji Twojej tożsamości na {{community}}.",
     "reason_label": "Powód:",
-    "retry_note": "Możesz spróbować ponownie w ustawieniach swojego profilu. Jeżeli problemy nadal występują, skontaktuj się z pomocą techniczną.",
+    "retry_note": "Możesz spróbować ponownie z poziomu ustawień swojego profilu. Jeśli problem będzie się powtarzał, skontaktuj się z pomocą techniczną.",
     "cta": "Spróbuj ponownie"
   }
 }

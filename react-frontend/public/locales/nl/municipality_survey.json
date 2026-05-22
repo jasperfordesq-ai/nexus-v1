@@ -1,28 +1,28 @@
 {
   "meta": {
-    "title": "Community Surveys",
-    "description": "Share your feedback on local issues"
+    "title": "Gemeenschapsenquêtes",
+    "description": "Deel uw feedback over lokale kwesties"
   },
-  "empty": "No surveys available at this time",
-  "already_responded": "You have already participated in this survey.",
-  "submit": "Submit responses",
-  "submitting": "Submitting…",
-  "success_title": "Thank you!",
-  "success_body": "Your feedback has been recorded.",
-  "back": "Back to Surveys",
-  "required_error": "Please answer all required questions.",
-  "take_survey": "Take survey",
-  "question_required": "Required",
+  "empty": "Momenteel zijn er geen enquêtes beschikbaar",
+  "already_responded": "U heeft al deelgenomen aan deze enquête.",
+  "submit": "Antwoorden verzenden",
+  "submitting": "Verzenden…",
+  "success_title": "Dank u!",
+  "success_body": "Uw feedback is geregistreerd.",
+  "back": "Terug naar enquêtes",
+  "required_error": "Beantwoord alle verplichte vragen.",
+  "take_survey": "Enquête invullen",
+  "question_required": "Verplicht",
   "likert_options": {
-    "1": "Very dissatisfied",
-    "2": "Dissatisfied",
-    "3": "Neutral",
-    "4": "Satisfied",
-    "5": "Very satisfied"
+    "1": "Zeer ontevreden",
+    "2": "Ontevreden",
+    "3": "Neutraal",
+    "4": "Tevreden",
+    "5": "Zeer tevreden"
   },
-  "submit_error": "Error submitting response. Please try again.",
-  "load_error": "Failed to load surveys. Please try again.",
-  "yes": "Yes",
+  "submit_error": "Fout bij verzenden van antwoord. Probeer het opnieuw.",
+  "load_error": "Laden van enquêtes mislukt. Probeer het opnieuw.",
+  "yes": "Ja",
   "no": "No",
-  "closes_on": "Closes: {{date}}"
+  "closes_on": "Sluit: {{date}}"
 }

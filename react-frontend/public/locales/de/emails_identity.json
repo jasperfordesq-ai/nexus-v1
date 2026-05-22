@@ -1,29 +1,29 @@
 {
   "started": {
-    "subject": "Identitätsüberprüfung läuft – {{community}}",
-    "title": "Identitätsüberprüfung gestartet",
-    "preview": "Ihre Identitätsüberprüfung wird durchgeführt",
-    "body": "Sie haben den Identitätsüberprüfungsprozess auf {{community}} gestartet. Dies dauert in der Regel nur wenige Minuten.",
-    "next_steps": "Sobald Ihre Verifizierung abgeschlossen ist, erhalten Sie eine weitere E-Mail.",
-    "cta": "Überprüfen Sie den Verifizierungsstatus",
+    "subject": "Identitätsverifizierung läuft — {{community}}",
+    "title": "Identitätsverifizierung gestartet",
+    "preview": "Ihre Identitätsverifizierung läuft",
+    "body": "Sie haben den Identitätsverifizierungsprozess auf {{community}} gestartet. Dies dauert in der Regel nur wenige Minuten.",
+    "next_steps": "Sie erhalten eine weitere E-Mail, sobald Ihre Verifizierung abgeschlossen ist.",
+    "cta": "Verifizierungsstatus prüfen",
     "note": "Ihre Dokumente werden sicher von Stripe Identity verarbeitet."
   },
   "passed": {
-    "subject": "Identität überprüft! — {{community}}",
-    "title": "Identität überprüft",
-    "preview": "Ihre Identität wurde erfolgreich überprüft",
-    "body": "Ihre Identität wurde auf {{community}} erfolgreich überprüft. Ihrem Profil wurde ein verifizierter Mitgliedsausweis hinzugefügt.",
+    "subject": "Identität verifiziert! — {{community}}",
+    "title": "Identität verifiziert",
+    "preview": "Ihre Identität wurde erfolgreich verifiziert",
+    "body": "Ihre Identität wurde auf {{community}} erfolgreich verifiziert. Ihrem Profil wurde ein Abzeichen als verifiziertes Mitglied hinzugefügt.",
     "highlight": "Verifiziertes Mitglied",
-    "cta": "Sehen Sie sich Ihr Profil an",
-    "badge_note": "Ihr verifiziertes Abzeichen ist jetzt für andere Mitglieder sichtbar."
+    "cta": "Ihr Profil anzeigen",
+    "badge_note": "Ihr verifiziertes Abzeichen ist nun für andere Mitglieder sichtbar."
   },
   "failed": {
-    "subject": "Die Identitätsüberprüfung konnte nicht abgeschlossen werden – {{community}}",
-    "title": "Überprüfung fehlgeschlagen",
-    "preview": "Ihre Identitätsüberprüfung wurde nicht abgeschlossen",
-    "body": "Wir konnten Ihre Identitätsüberprüfung auf {{community}} nicht abschließen.",
+    "subject": "Identitätsverifizierung konnte nicht abgeschlossen werden — {{community}}",
+    "title": "Verifizierung nicht erfolgreich",
+    "preview": "Ihre Identitätsverifizierung wurde nicht abgeschlossen",
+    "body": "Wir konnten Ihre Identitätsverifizierung auf {{community}} nicht abschließen.",
     "reason_label": "Grund:",
-    "retry_note": "Sie können es in Ihren Profileinstellungen erneut versuchen. Sollten Sie weiterhin Probleme haben, wenden Sie sich bitte an den Support.",
-    "cta": "Versuchen Sie es erneut"
+    "retry_note": "Sie können es erneut über Ihre Profileinstellungen versuchen. Falls das Problem weiterhin besteht, wenden Sie sich bitte an den Support.",
+    "cta": "Erneut versuchen"
   }
 }

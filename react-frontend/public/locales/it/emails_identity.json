@@ -1,10 +1,10 @@
 {
   "started": {
-    "subject": "Verifica dell'identità in corso: {{community}}",
-    "title": "Verifica dell'identità avviata",
+    "subject": "Verifica identità in corso — {{community}}",
+    "title": "Verifica identità avviata",
     "preview": "La verifica della tua identità è in corso",
-    "body": "Hai avviato il processo di verifica dell'identità su {{community}}. Solitamente l'operazione richiede solo pochi minuti.",
-    "next_steps": "Riceverai un'altra email una volta completata la verifica.",
+    "body": "Hai avviato il processo di verifica dell'identità su {{community}}. Di solito richiede solo pochi minuti.",
+    "next_steps": "Riceverai un'altra email al completamento della verifica.",
     "cta": "Controlla lo stato della verifica",
     "note": "I tuoi documenti vengono elaborati in modo sicuro da Stripe Identity."
   },
@@ -18,12 +18,12 @@
     "badge_note": "Il tuo badge verificato è ora visibile agli altri membri."
   },
   "failed": {
-    "subject": "Impossibile completare la verifica dell'identità: {{community}}",
+    "subject": "La verifica dell'identità non ha potuto essere completata — {{community}}",
     "title": "Verifica non riuscita",
-    "preview": "La tua verifica dell'identità non è stata completata",
-    "body": "Non siamo riusciti a completare la verifica dell'identità su {{community}}.",
+    "preview": "La verifica della tua identità non è stata completata",
+    "body": "Non siamo riusciti a completare la verifica della tua identità su {{community}}.",
     "reason_label": "Motivo:",
-    "retry_note": "Puoi riprovare dalle impostazioni del tuo profilo. Se continui ad avere problemi, contatta l'assistenza.",
+    "retry_note": "Puoi riprovare dalle impostazioni del tuo profilo. Se il problema persiste, contatta il supporto.",
     "cta": "Riprova"
   }
 }

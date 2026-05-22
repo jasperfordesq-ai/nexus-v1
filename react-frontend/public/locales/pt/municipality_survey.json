@@ -1,28 +1,28 @@
 {
   "meta": {
-    "title": "Community Surveys",
-    "description": "Share your feedback on local issues"
+    "title": "Inquéritos da Comunidade",
+    "description": "Partilhe a sua opinião sobre questões locais"
   },
-  "empty": "No surveys available at this time",
-  "already_responded": "You have already participated in this survey.",
-  "submit": "Submit responses",
-  "submitting": "Submitting…",
-  "success_title": "Thank you!",
-  "success_body": "Your feedback has been recorded.",
-  "back": "Back to Surveys",
-  "required_error": "Please answer all required questions.",
-  "take_survey": "Take survey",
-  "question_required": "Required",
+  "empty": "Não há inquéritos disponíveis de momento",
+  "already_responded": "Já participou neste inquérito.",
+  "submit": "Enviar respostas",
+  "submitting": "A enviar…",
+  "success_title": "Obrigado!",
+  "success_body": "O seu feedback foi registado.",
+  "back": "Voltar aos inquéritos",
+  "required_error": "Por favor, responda a todas as perguntas obrigatórias.",
+  "take_survey": "Responder ao inquérito",
+  "question_required": "Obrigatório",
   "likert_options": {
-    "1": "Very dissatisfied",
-    "2": "Dissatisfied",
-    "3": "Neutral",
-    "4": "Satisfied",
-    "5": "Very satisfied"
+    "1": "Muito insatisfeito",
+    "2": "Insatisfeito",
+    "3": "Neutro",
+    "4": "Satisfeito",
+    "5": "Muito satisfeito"
   },
-  "submit_error": "Error submitting response. Please try again.",
-  "load_error": "Failed to load surveys. Please try again.",
-  "yes": "Yes",
+  "submit_error": "Erro ao enviar resposta. Por favor, tente novamente.",
+  "load_error": "Falha ao carregar inquéritos. Por favor, tente novamente.",
+  "yes": "Sim",
   "no": "No",
-  "closes_on": "Closes: {{date}}"
+  "closes_on": "Fecha: {{date}}"
 }

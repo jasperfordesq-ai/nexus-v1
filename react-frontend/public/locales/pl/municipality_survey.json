@@ -1,28 +1,28 @@
 {
   "meta": {
-    "title": "Community Surveys",
-    "description": "Share your feedback on local issues"
+    "title": "Ankiety społecznościowe",
+    "description": "Podziel się swoją opinią na temat lokalnych kwestii"
   },
-  "empty": "No surveys available at this time",
-  "already_responded": "You have already participated in this survey.",
-  "submit": "Submit responses",
-  "submitting": "Submitting…",
-  "success_title": "Thank you!",
-  "success_body": "Your feedback has been recorded.",
-  "back": "Back to Surveys",
-  "required_error": "Please answer all required questions.",
-  "take_survey": "Take survey",
-  "question_required": "Required",
+  "empty": "W tej chwili nie ma dostępnych ankiet",
+  "already_responded": "Już wzięłeś/wzięłaś udział w tej ankiecie.",
+  "submit": "Wyślij odpowiedzi",
+  "submitting": "Wysyłanie…",
+  "success_title": "Dziękujemy!",
+  "success_body": "Twoja opinia została zapisana.",
+  "back": "Wróć do ankiet",
+  "required_error": "Odpowiedz na wszystkie wymagane pytania.",
+  "take_survey": "Wypełnij ankietę",
+  "question_required": "Wymagane",
   "likert_options": {
-    "1": "Very dissatisfied",
-    "2": "Dissatisfied",
-    "3": "Neutral",
-    "4": "Satisfied",
-    "5": "Very satisfied"
+    "1": "Bardzo niezadowolony",
+    "2": "Niezadowolony",
+    "3": "Neutralny",
+    "4": "Zadowolony",
+    "5": "Bardzo zadowolony"
   },
-  "submit_error": "Error submitting response. Please try again.",
-  "load_error": "Failed to load surveys. Please try again.",
-  "yes": "Yes",
+  "submit_error": "Błąd podczas wysyłania odpowiedzi. Spróbuj ponownie.",
+  "load_error": "Nie udało się załadować ankiet. Spróbuj ponownie.",
+  "yes": "Tak",
   "no": "No",
-  "closes_on": "Closes: {{date}}"
+  "closes_on": "Zamknięcie: {{date}}"
 }

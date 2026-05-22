@@ -1,24 +1,24 @@
 {
   "legal_update": {
-    "subject": "Wichtig: {{doc_type}} – {{community}} aktualisiert",
+    "subject": "Wichtig: Aktualisierte {{doc_type}} — {{community}}",
     "title": "Richtlinienaktualisierung",
-    "preview": "{{community}} has updated its {{doc_type}}",
-    "body": "{{community}} hat ein aktualisiertes {{doc_type}} veröffentlicht. Bitte lesen und akzeptieren Sie die aktualisierten Bedingungen, um die Plattform weiterhin nutzen zu können.",
-    "action_required": "Ihre weitere Nutzung der Plattform setzt die Annahme der neuesten Bedingungen voraus.",
-    "cta": "Überprüfen und akzeptieren"
+    "preview": "{{community}} hat seine {{doc_type}} aktualisiert",
+    "body": "{{community}} hat eine aktualisierte {{doc_type}} veröffentlicht. Bitte lesen und akzeptieren Sie die aktualisierten Bedingungen, um die Plattform weiter zu nutzen.",
+    "action_required": "Für die weitere Nutzung der Plattform müssen Sie den aktuellen Bedingungen zustimmen.",
+    "cta": "Überprüfen & Akzeptieren"
   },
   "kb_published": {
-    "subject": "Ihr Artikel ist online: {{title}} – {{community}}",
+    "subject": "Ihr Artikel ist live: {{title}} — {{community}}",
     "title": "Artikel veröffentlicht!",
-    "preview": "Ihr Wissensdatenbankartikel „{{title}}“ ist jetzt online",
-    "body": "Ihr Artikel wurde in der {{community}}-Wissensdatenbank veröffentlicht und ist nun für alle Mitglieder sichtbar.",
-    "cta": "Artikel ansehen"
+    "preview": "Ihr Wissensdatenbank-Artikel \"{{title}}\" ist jetzt live",
+    "body": "Ihr Artikel wurde in der Wissensdatenbank von {{community}} veröffentlicht und ist nun für alle Mitglieder sichtbar.",
+    "cta": "Artikel anzeigen"
   },
   "kb_updated": {
-    "subject": "Artikel aktualisiert: {{title}} – {{community}}",
+    "subject": "Artikel aktualisiert: {{title}} — {{community}}",
     "title": "Artikel aktualisiert",
-    "preview": "Ihr Wissensdatenbankartikel wurde aktualisiert",
-    "body": "Eine neue Version Ihres Artikels <strong>\"{{title}}\"</strong> wurde in der {{community}}-Wissensdatenbank veröffentlicht.",
-    "cta": "Artikel ansehen"
+    "preview": "Ihr Wissensdatenbank-Artikel wurde aktualisiert",
+    "body": "Eine neue Version Ihres Artikels <strong>\"{{title}}\"</strong> wurde in der Wissensdatenbank von {{community}} veröffentlicht.",
+    "cta": "Artikel anzeigen"
   }
 }

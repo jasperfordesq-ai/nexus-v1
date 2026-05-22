@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Dashboard",
+    "title": "Panel",
     "description": "Twój osobisty pulpit nawigacyjny. Zobacz swoje saldo, oferty i aktywność."
   },
   "welcome_back": "Witaj ponownie, {{name}}!",
@@ -14,10 +14,10 @@
   },
   "new_listing": "Nowa oferta",
   "stats": {
-    "balance": "Balance",
+    "balance": "Saldo",
     "active_listings": "Aktywne oferty",
-    "messages": "Messages",
-    "pending": "Pending",
+    "messages": "Wiadomości",
+    "pending": "Oczekujące",
     "hours_value": "{{value}} godz."
   },
   "sections": {
@@ -29,7 +29,7 @@
     "upcoming_events": "Nadchodzące wydarzenia",
     "your_progress": "Twój postęp",
     "pending_reviews": "Oczekujące recenzje",
-    "endorsements": "Endorsements"
+    "endorsements": "Rekomendacje"
   },
   "view_all": "Zobacz wszystko",
   "view_all_caps": "Zobacz Wszystko",
@@ -38,21 +38,21 @@
   "view_all_transactions": "Zobacz wszystkie transakcje",
   "quick_actions": {
     "create_listing": "Utwórz ofertę",
-    "messages": "Messages",
+    "messages": "Wiadomości",
     "view_wallet": "Zobacz portfel",
     "find_members": "Znajdź członków",
     "browse_events": "Przeglądaj wydarzenia",
-    "notifications": "Notifications",
-    "caring_community": "Care Hub"
+    "notifications": "Powiadomienia",
+    "caring_community": "Centrum opieki"
   },
   "listings": {
-    "offering": "Offering",
-    "requesting": "Requesting",
-    "offer": "Offer",
-    "request": "Request",
+    "offering": "Oferowanie",
+    "requesting": "Wnioskowanie",
+    "offer": "Oferta",
+    "request": "Prośba",
     "empty": "Brak niedawnych ofert",
     "create_first": "Utwórz swoją pierwszą ofertę",
-    "user_fallback": "User",
+    "user_fallback": "Użytkownik",
     "empty_description": "Utwórz prośbę lub ofertę, aby zacząć dopasowywać się do osób w pobliżu."
   },
   "activity": {
@@ -83,8 +83,8 @@
   },
   "gamification": {
     "level": "Poziom {{level}}",
-    "badges": "Badges",
-    "streak": "Streak",
+    "badges": "Odznaki",
+    "streak": "Seria",
     "xp_progress": "Postęp XP",
     "start_earning": "Zacznij zdobywać XP, uczestnicząc w społeczności!",
     "streak_days_one": "{{count}} dzień",
@@ -112,23 +112,23 @@
   "reviews": {
     "sent": "Wysłano {{amount}}h",
     "received": "Otrzymano {{amount}}h",
-    "review": "Review",
+    "review": "Recenzja",
     "none_pending": "Brak oczekujących recenzji",
-    "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending",
+    "pending_subtitle": "Otwórz to żądanie recenzji",
+    "view_all_pending": "Zobacz wszystkie oczekujące",
     "none_pending_description": "Zakończone wymiany wymagające oceny pojawią się tutaj."
   },
-  "fallback_name": "there",
+  "fallback_name": "tam",
   "common": {
-    "loading": "Loading"
+    "loading": "Ładowanie"
   },
   "caring_community": {
-    "title": "Caring Community",
-    "subtitle": "Coordinate help requests, time offers, verified volunteering hours, and trusted support from one place.",
+    "title": "Wspólnota opiekuńcza",
+    "subtitle": "Koordynuj prośby o pomoc, oferty czasu, zweryfikowane godziny wolontariatu i zaufane wsparcie z jednego miejsca.",
     "actions": {
-      "open_hub": "Open hub",
-      "request_help": "Request help",
-      "log_hours": "Log hours"
+      "open_hub": "Otwórz centrum",
+      "request_help": "Poproś o pomoc",
+      "log_hours": "Zapisz godziny"
     }
   }
 }

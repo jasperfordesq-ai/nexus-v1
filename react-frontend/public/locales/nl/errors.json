@@ -1,38 +1,38 @@
 {
-  "community_not_found": "Community not found",
-  "community_not_found_message": "No community found at '{{slug}}'.",
-  "community_not_found_detail": "This timebank may have moved, been renamed, or may not exist yet.",
-  "go_home": "Go home",
-  "find_community": "Find a community",
+  "community_not_found": "Gemeenschap niet gevonden",
+  "community_not_found_message": "Geen gemeenschap gevonden op '{{slug}}'.",
+  "community_not_found_detail": "Deze tijdbank is mogelijk verplaatst, hernoemd, of bestaat nog niet.",
+  "go_home": "Ga naar home",
+  "find_community": "Zoek een gemeenschap",
   "admin": {
     "federation": {
-      "unknown_key": "Unknown key: :key",
-      "must_be_array": ":field must be an array",
-      "failed_to_load_partner": "Failed to load partner"
+      "unknown_key": "Onbekende sleutel: :key",
+      "must_be_array": ":field moet een array zijn",
+      "failed_to_load_partner": "Laden van partner mislukt"
     }
   },
   "validation": {
-    "badge_keys_must_be_array": "badge_keys must be an array",
-    "member_ids_must_be_array": "member_ids must be an array"
+    "badge_keys_must_be_array": "badge_keys moet een array zijn",
+    "member_ids_must_be_array": "member_ids moet een array zijn"
   },
   "group_files": {
-    "listing_failed": "Error listing files",
-    "upload_failed": "Upload failed",
-    "download_failed": "Download failed",
-    "delete_failed": "Delete failed"
+    "listing_failed": "Fout bij weergeven van bestanden",
+    "upload_failed": "Uploaden mislukt",
+    "download_failed": "Downloaden mislukt",
+    "delete_failed": "Verwijderen mislukt"
   },
   "group_invites": {
-    "listing_failed": "Error listing invites",
-    "create_failed": "Error creating invite link",
-    "send_failed": "Error sending invites",
-    "revoke_failed": "Error revoking invite",
-    "accept_failed": "Error accepting invite"
+    "listing_failed": "Fout bij weergeven van uitnodigingen",
+    "create_failed": "Fout bij aanmaken van uitnodigingslink",
+    "send_failed": "Fout bij verzenden van uitnodigingen",
+    "revoke_failed": "Fout bij intrekken van uitnodiging",
+    "accept_failed": "Fout bij accepteren van uitnodiging"
   },
   "generic": {
-    "export_failed": "Export failed",
-    "update_failed": "Failed to update"
+    "export_failed": "Export mislukt",
+    "update_failed": "Bijwerken mislukt"
   },
   "federation": {
-    "feature_disabled": "Federation is not enabled for this community"
+    "feature_disabled": "Federatie is niet ingeschakeld voor deze gemeenschap"
   }
 }

@@ -1,24 +1,24 @@
 {
   "legal_update": {
-    "subject": "重要: 更新された {{doc_type}} — {{community}}",
+    "subject": "重要：{{doc_type}} の更新 — {{community}}",
     "title": "ポリシーの更新",
-    "preview": "{{community}} has updated its {{doc_type}}",
-    "body": "{{community}} は、更新された {{doc_type}} を公開しました。プラットフォームの使用を続けるには、更新された規約を確認して同意してください。",
-    "action_required": "プラットフォームを継続して使用するには、最新の規約に同意する必要があります。",
+    "preview": "{{community}} が {{doc_type}} を更新しました",
+    "body": "{{community}} が更新された {{doc_type}} を公開しました。プラットフォームをご利用いただくには、更新された規約をご確認のうえ、同意してください。",
+    "action_required": "プラットフォームを引き続きご利用いただくには、最新の利用規約に同意していただく必要があります。",
     "cta": "確認して同意する"
   },
   "kb_published": {
-    "subject": "あなたの記事は公開中です: {{title}} — {{community}}",
+    "subject": "記事が公開されました：{{title}} — {{community}}",
     "title": "記事が公開されました！",
     "preview": "ナレッジベース記事「{{title}}」が公開されました",
-    "body": "あなたの記事は {{community}} ナレッジ ベースに公開され、すべてのメンバーが閲覧できるようになりました。",
+    "body": "あなたの記事が {{community}} のナレッジベースに公開され、すべてのメンバーに表示されるようになりました。",
     "cta": "記事を見る"
   },
   "kb_updated": {
-    "subject": "記事が更新されました: {{title}} — {{community}}",
-    "title": "記事を更新しました",
+    "subject": "記事が更新されました：{{title}} — {{community}}",
+    "title": "記事が更新されました",
     "preview": "ナレッジベースの記事が更新されました",
-    "body": "記事の新しいバージョン<strong>「{{title}}」</strong> が {{community}} ナレッジ ベースに公開されました。",
+    "body": "{{community}} のナレッジベースにあなたの記事 <strong>「{{title}}」</strong> の新しいバージョンが公開されました。",
     "cta": "記事を見る"
   }
 }

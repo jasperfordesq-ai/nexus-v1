@@ -1,27 +1,27 @@
 {
   "shift_reminder": {
-    "subject": "Przypomnienie: jutro zmiana wolontariuszy — {{title}} — {{community}}",
+    "subject": "Przypomnienie: Zmiana wolontariacka jutro — {{title}} — {{community}}",
     "title": "Przypomnienie o zmianie",
-    "preview": "Zbliża się Twoja zmiana wolontariusza w {{title}}",
-    "body": "To przyjazne przypomnienie o nadchodzącej zmianie wolontariusza.",
-    "label_opportunity": "Opportunity",
-    "label_when": "When",
-    "label_location": "Location",
+    "preview": "Twoja zmiana wolontariacka dla {{title}} zbliża się",
+    "body": "To przyjazne przypomnienie o Twojej nadchodzącej zmianie wolontariackiej.",
+    "label_opportunity": "Możliwość",
+    "label_when": "Kiedy",
+    "label_location": "Lokalizacja",
     "cta": "Zobacz szczegóły"
   },
   "shift_starting_soon": {
-    "subject": "Twoja zmiana wolontariusza wkrótce się rozpocznie — {{title}}",
-    "title": "Wkrótce początek zmiany",
-    "preview": "Twoja zmiana wolontariusza w {{title}} rozpocznie się wkrótce",
-    "body": "Twoja zmiana wolontariusza wkrótce się rozpocznie. Dziękujemy za zaangażowanie na rzecz społeczności!",
-    "cta": "Wyświetl szczegóły zmiany"
+    "subject": "Twoja zmiana wolontariacka wkrótce się rozpocznie — {{title}}",
+    "title": "Zmiana wkrótce się rozpocznie",
+    "preview": "Twoja zmiana wolontariacka dla {{title}} wkrótce się rozpocznie",
+    "body": "Twoja zmiana wolontariacka wkrótce się rozpocznie. Dziękujemy za zaangażowanie w społeczność!",
+    "cta": "Zobacz szczegóły zmiany"
   },
   "post_shift_feedback": {
     "subject": "Dziękujemy za wolontariat — {{title}}",
     "title": "Dziękujemy za wolontariat!",
-    "preview": "Dziękujemy za Twoją zmianę jako wolontariusz w {{title}}",
-    "body": "Dziękujemy za ukończenie zmiany wolontariackiej z <strong>{{title}}</strong>. Twój wkład naprawdę robi różnicę!",
-    "log_hours_prompt": "Pamiętaj, aby rejestrować swoje godziny pracy, aby Twój wkład został zarejestrowany.",
-    "cta": "Rejestruj swoje godziny"
+    "preview": "Dziękujemy za zmianę wolontariacką z {{title}}",
+    "body": "Dziękujemy za ukończenie zmiany wolontariackiej z <strong>{{title}}</strong>. Twój wkład robi prawdziwą różnicę!",
+    "log_hours_prompt": "Pamiętaj o zarejestrowaniu godzin, aby Twój wkład został odnotowany.",
+    "cta": "Zarejestruj swoje godziny"
   }
 }

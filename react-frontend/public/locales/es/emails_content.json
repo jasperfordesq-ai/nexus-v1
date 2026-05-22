@@ -1,24 +1,24 @@
 {
   "legal_update": {
-    "subject": "Importante: {{doc_type}} actualizado — {{community}}",
+    "subject": "Importante: {{doc_type}} actualizada — {{community}}",
     "title": "Actualización de política",
-    "preview": "{{community}} has updated its {{doc_type}}",
-    "body": "{{community}} ha publicado un {{doc_type}} actualizado. Revise y acepte los términos actualizados para continuar usando la plataforma.",
-    "action_required": "El uso continuado de la plataforma requiere la aceptación de los términos más recientes.",
+    "preview": "{{community}} ha actualizado su {{doc_type}}",
+    "body": "{{community}} ha publicado una {{doc_type}} actualizada. Por favor, revisa y acepta los términos actualizados para continuar usando la plataforma.",
+    "action_required": "El uso continuado de la plataforma requiere la aceptación de los últimos términos.",
     "cta": "Revisar y aceptar"
   },
   "kb_published": {
-    "subject": "Su artículo está activo: {{title}} — {{community}}",
+    "subject": "Tu artículo está publicado: {{title}} — {{community}}",
     "title": "¡Artículo publicado!",
-    "preview": "El artículo de su base de conocimientos \"{{title}}\" ya está disponible",
-    "body": "Su artículo se publicó en la base de conocimientos de {{community}} y ahora es visible para todos los miembros.",
+    "preview": "Tu artículo de la base de conocimientos \"{{title}}\" ya está publicado",
+    "body": "Tu artículo ha sido publicado en la base de conocimientos de {{community}} y ahora es visible para todos los miembros.",
     "cta": "Ver artículo"
   },
   "kb_updated": {
     "subject": "Artículo actualizado: {{title}} — {{community}}",
     "title": "Artículo actualizado",
-    "preview": "El artículo de su base de conocimientos ha sido actualizado.",
-    "body": "Se ha publicado una nueva versión de su artículo <strong>\"{{title}}\"</strong> en la base de conocimientos de {{community}}.",
+    "preview": "Tu artículo de la base de conocimientos ha sido actualizado",
+    "body": "Se ha publicado una nueva versión de tu artículo <strong>\"{{title}}\"</strong> en la base de conocimientos de {{community}}.",
     "cta": "Ver artículo"
   }
 }

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Dashboard",
+    "title": "لوحة التحكم",
     "description": "لوحة التحكم الشخصية الخاصة بك. عرض رصيدك، القوائم، والنشاط."
   },
   "welcome_back": "مرحبًا بعودتك، {{name}}!",
@@ -14,10 +14,10 @@
   },
   "new_listing": "قائمة جديدة",
   "stats": {
-    "balance": "Balance",
+    "balance": "الرصيد",
     "active_listings": "القوائم النشطة",
-    "messages": "Messages",
-    "pending": "Pending",
+    "messages": "الرسائل",
+    "pending": "قيد الانتظار",
     "hours_value": "{{value}} س"
   },
   "sections": {
@@ -29,7 +29,7 @@
     "upcoming_events": "الفعاليات القادمة",
     "your_progress": "تقدمك",
     "pending_reviews": "المراجعات المعلقة",
-    "endorsements": "Endorsements"
+    "endorsements": "التوصيات"
   },
   "view_all": "عرض الكل",
   "view_all_caps": "عرض الكل",
@@ -38,21 +38,21 @@
   "view_all_transactions": "عرض جميع المعاملات",
   "quick_actions": {
     "create_listing": "إنشاء قائمة",
-    "messages": "Messages",
+    "messages": "الرسائل",
     "view_wallet": "عرض المحفظة",
     "find_members": "البحث عن الأعضاء",
     "browse_events": "تصفح الفعاليات",
-    "notifications": "Notifications",
-    "caring_community": "Care Hub"
+    "notifications": "الإشعارات",
+    "caring_community": "مركز الرعاية"
   },
   "listings": {
-    "offering": "Offering",
-    "requesting": "Requesting",
-    "offer": "Offer",
-    "request": "Request",
+    "offering": "يقدم",
+    "requesting": "يطلب",
+    "offer": "عرض",
+    "request": "طلب",
     "empty": "لا توجد قوائم حديثة",
     "create_first": "أنشئ قائمتك الأولى",
-    "user_fallback": "User",
+    "user_fallback": "المستخدم",
     "empty_description": "أنشئ طلبًا أو عرضًا لبدء التطابق مع أشخاص بالقرب منك."
   },
   "activity": {
@@ -83,8 +83,8 @@
   },
   "gamification": {
     "level": "المستوى {{level}}",
-    "badges": "Badges",
-    "streak": "Streak",
+    "badges": "الشارات",
+    "streak": "سلسلة",
     "xp_progress": "تقدم XP",
     "start_earning": "ابدأ في كسب XP من خلال المشاركة في المجتمع!",
     "streak_days_one": "{{count}} يوم",
@@ -112,23 +112,23 @@
   "reviews": {
     "sent": "أرسل {{amount}} ساعة",
     "received": "استلم {{amount}} ساعة",
-    "review": "Review",
+    "review": "تقييم",
     "none_pending": "لا توجد مراجعات معلقة",
-    "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending",
+    "pending_subtitle": "افتح هذا الطلب",
+    "view_all_pending": "عرض جميع المعلقة",
     "none_pending_description": "ستظهر هنا التبادلات المكتملة التي تحتاج إلى تقييم."
   },
-  "fallback_name": "there",
+  "fallback_name": "مرحباً",
   "common": {
-    "loading": "Loading"
+    "loading": "جارٍ التحميل"
   },
   "caring_community": {
-    "title": "Caring Community",
-    "subtitle": "Coordinate help requests, time offers, verified volunteering hours, and trusted support from one place.",
+    "title": "مجتمع الرعاية",
+    "subtitle": "نسّق طلبات المساعدة، وعروض الوقت، وساعات التطوع الموثقة، والدعم الموثوق من مكان واحد.",
     "actions": {
-      "open_hub": "Open hub",
-      "request_help": "Request help",
-      "log_hours": "Log hours"
+      "open_hub": "فتح المركز",
+      "request_help": "طلب مساعدة",
+      "log_hours": "تسجيل الساعات"
     }
   }
 }

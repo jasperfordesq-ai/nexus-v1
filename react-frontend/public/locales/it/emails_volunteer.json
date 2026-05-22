@@ -1,24 +1,24 @@
 {
   "shift_reminder": {
-    "subject": "Promemoria: turno di volontari domani - {{title}} - {{community}}",
-    "title": "Promemoria del turno",
-    "preview": "Il tuo turno di volontariato per {{title}} è alle porte",
-    "body": "Questo è un promemoria amichevole sul tuo prossimo turno di volontariato.",
-    "label_opportunity": "Opportunity",
-    "label_when": "When",
-    "label_location": "Location",
+    "subject": "Promemoria: Turno di volontariato domani — {{title}} — {{community}}",
+    "title": "Promemoria turno",
+    "preview": "Il tuo turno di volontariato per {{title}} si avvicina",
+    "body": "Questo è un promemoria per il tuo prossimo turno di volontariato.",
+    "label_opportunity": "Opportunità",
+    "label_when": "Quando",
+    "label_location": "Luogo",
     "cta": "Visualizza dettagli"
   },
   "shift_starting_soon": {
-    "subject": "Il tuo turno di volontariato inizierà presto: {{title}}",
-    "title": "Turno che inizierà presto",
-    "preview": "Il tuo turno di volontariato per {{title}} inizierà presto",
-    "body": "Il tuo turno di volontariato inizierà presto. Grazie per il tuo impegno verso la comunità!",
-    "cta": "Visualizza i dettagli del turno"
+    "subject": "Il tuo turno di volontariato inizia presto — {{title}}",
+    "title": "Il turno inizia presto",
+    "preview": "Il tuo turno di volontariato per {{title}} inizia presto",
+    "body": "Il tuo turno di volontariato sta per iniziare. Grazie per il tuo impegno verso la comunità!",
+    "cta": "Visualizza dettagli turno"
   },
   "post_shift_feedback": {
-    "subject": "Grazie per il tuo volontariato: {{title}}",
-    "title": "Grazie per il volontariato!",
+    "subject": "Grazie per il tuo volontariato — {{title}}",
+    "title": "Grazie per il tuo volontariato!",
     "preview": "Grazie per il tuo turno di volontariato con {{title}}",
     "body": "Grazie per aver completato il tuo turno di volontariato con <strong>{{title}}</strong>. Il tuo contributo fa davvero la differenza!",
     "log_hours_prompt": "Ricordati di registrare le tue ore in modo che il tuo contributo venga registrato.",

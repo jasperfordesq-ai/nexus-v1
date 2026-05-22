@@ -1,24 +1,24 @@
 {
   "legal_update": {
-    "subject": "Tábhachtach: Nuashonraithe {{doc_type}} — {{community}}",
+    "subject": "Tábhachtach: {{doc_type}} Nuashonraithe — {{community}}",
     "title": "Nuashonrú Beartais",
-    "preview": "{{community}} has updated its {{doc_type}}",
-    "body": "Tá {{community}} nuashonraithe {{doc_type}} foilsithe. Athbhreithnigh agus glac leis na téarmaí nuashonraithe chun leanúint ar aghaidh ag úsáid an ardáin.",
-    "action_required": "Teastaíonn glacadh leis na téarmaí is déanaí chun úsáid leanúnach a bhaint as an ardán.",
-    "cta": "Athbhreithniú & Glac"
+    "preview": "Nuashonraigh {{community}} a {{doc_type}}",
+    "body": "D'fhoilsigh {{community}} {{doc_type}} nuashonraithe. Léigh agus glac leis na téarmaí nuashonraithe le do thoil chun leanúint ar aghaidh ag úsáid na hardáin.",
+    "action_required": "Ní mór duit glacadh leis na téarmaí is déanaí chun leanúint ar aghaidh ag úsáid na hardáin.",
+    "cta": "Athbhreithnigh & Glac"
   },
   "kb_published": {
     "subject": "Tá d'alt beo: {{title}} — {{community}}",
-    "title": "Airteagal Foilsithe!",
-    "preview": "Tá d'alt bonn eolais \"{{title}}\" beo anois",
-    "body": "Foilsíodh d’alt chuig bonn eolais {{community}} agus tá sé le feiceáil ag gach ball anois.",
-    "cta": "Féach ar an Airteagal"
+    "title": "Alt Foilsithe!",
+    "preview": "Tá d'alt bunachair eolais \"{{title}}\" beo anois",
+    "body": "Foilsíodh d'alt i mbunachar eolais {{community}} agus tá sé le feiceáil ag gach ball anois.",
+    "cta": "Féach ar an Alt"
   },
   "kb_updated": {
-    "subject": "Airteagal nuashonraithe: {{title}} — {{community}}",
-    "title": "Airteagal Nuashonraithe",
-    "preview": "Nuashonraíodh d'alt bonn eolais",
-    "body": "Foilsíodh leagan nua de d'alt <strong>\"{{title}}\"</strong> chuig an mbunachar eolais {{community}}.",
-    "cta": "Féach ar an Airteagal"
+    "subject": "Alt nuashonraithe: {{title}} — {{community}}",
+    "title": "Alt Nuashonraithe",
+    "preview": "Nuashonraíodh d'alt bunachair eolais",
+    "body": "Foilsíodh leagan nua de d'alt <strong>\"{{title}}\"</strong> i mbunachar eolais {{community}}.",
+    "cta": "Féach ar an Alt"
   }
 }

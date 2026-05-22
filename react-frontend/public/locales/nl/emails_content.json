@@ -1,24 +1,24 @@
 {
   "legal_update": {
-    "subject": "Belangrijk: {{doc_type}} bijgewerkt — {{community}}",
+    "subject": "Belangrijk: Bijgewerkte {{doc_type}} — {{community}}",
     "title": "Beleidsupdate",
-    "preview": "{{community}} has updated its {{doc_type}}",
-    "body": "{{community}} heeft een bijgewerkte {{doc_type}} gepubliceerd. Lees en accepteer de bijgewerkte voorwaarden om het platform te blijven gebruiken.",
-    "action_required": "Voor uw voortgezette gebruik van het platform is acceptatie van de meest recente voorwaarden vereist.",
-    "cta": "Beoordelen en accepteren"
+    "preview": "{{community}} heeft zijn {{doc_type}} bijgewerkt",
+    "body": "{{community}} heeft een bijgewerkte {{doc_type}} gepubliceerd. Lees de bijgewerkte voorwaarden en accepteer deze om het platform te blijven gebruiken.",
+    "action_required": "Voor voortgezet gebruik van het platform is acceptatie van de nieuwste voorwaarden vereist.",
+    "cta": "Bekijken en accepteren"
   },
   "kb_published": {
     "subject": "Uw artikel is live: {{title}} — {{community}}",
     "title": "Artikel gepubliceerd!",
     "preview": "Uw kennisbankartikel \"{{title}}\" is nu live",
     "body": "Uw artikel is gepubliceerd in de kennisbank van {{community}} en is nu zichtbaar voor alle leden.",
-    "cta": "Bekijk artikel"
+    "cta": "Artikel bekijken"
   },
   "kb_updated": {
     "subject": "Artikel bijgewerkt: {{title}} — {{community}}",
     "title": "Artikel bijgewerkt",
     "preview": "Uw kennisbankartikel is bijgewerkt",
-    "body": "Er is een nieuwe versie van uw artikel <strong>\"{{title}}\"</strong> gepubliceerd in de kennisbank van {{community}}.",
-    "cta": "Bekijk artikel"
+    "body": "Een nieuwe versie van uw artikel <strong>\"{{title}}\"</strong> is gepubliceerd in de kennisbank van {{community}}.",
+    "cta": "Artikel bekijken"
   }
 }

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Dashboard",
+    "title": "ダッシュボード",
     "description": "あなたの個人ダッシュボード。残高、リスト、アクティビティを表示します。"
   },
   "welcome_back": "おかえりなさい、{{name}}！",
@@ -14,10 +14,10 @@
   },
   "new_listing": "新しいリスト",
   "stats": {
-    "balance": "Balance",
+    "balance": "残高",
     "active_listings": "アクティブなリスト",
-    "messages": "Messages",
-    "pending": "Pending",
+    "messages": "メッセージ",
+    "pending": "保留中",
     "hours_value": "{{value}}時間"
   },
   "sections": {
@@ -29,7 +29,7 @@
     "upcoming_events": "今後のイベント",
     "your_progress": "あなたの進捗",
     "pending_reviews": "保留中のレビュー",
-    "endorsements": "Endorsements"
+    "endorsements": "推薦"
   },
   "view_all": "すべて表示",
   "view_all_caps": "すべて表示",
@@ -38,21 +38,21 @@
   "view_all_transactions": "すべての取引を表示",
   "quick_actions": {
     "create_listing": "リストを作成",
-    "messages": "Messages",
+    "messages": "メッセージ",
     "view_wallet": "ウォレットを表示",
     "find_members": "メンバーを探す",
     "browse_events": "イベントをブラウズ",
-    "notifications": "Notifications",
-    "caring_community": "Care Hub"
+    "notifications": "通知",
+    "caring_community": "ケアハブ"
   },
   "listings": {
-    "offering": "Offering",
-    "requesting": "Requesting",
-    "offer": "Offer",
-    "request": "Request",
+    "offering": "提供中",
+    "requesting": "リクエスト中",
+    "offer": "提供",
+    "request": "リクエスト",
     "empty": "最近のリストはありません",
     "create_first": "最初のリストを作成してください",
-    "user_fallback": "User",
+    "user_fallback": "ユーザー",
     "empty_description": "リクエストまたはオファーを作成して、近くの人とのマッチングを始めましょう。"
   },
   "activity": {
@@ -83,8 +83,8 @@
   },
   "gamification": {
     "level": "レベル {{level}}",
-    "badges": "Badges",
-    "streak": "Streak",
+    "badges": "バッジ",
+    "streak": "ストリーク",
     "xp_progress": "XPの進捗",
     "start_earning": "コミュニティに参加してXPを獲得し始めましょう！",
     "streak_days_one": "{{count}} 日",
@@ -112,23 +112,23 @@
   "reviews": {
     "sent": "{{amount}}hを送信しました",
     "received": "{{amount}}hを受信しました",
-    "review": "Review",
+    "review": "レビュー",
     "none_pending": "保留中のレビューはありません",
-    "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending",
+    "pending_subtitle": "このレビューリクエストを開く",
+    "view_all_pending": "保留中をすべて表示",
     "none_pending_description": "フィードバックが必要な完了済みの交換がここに表示されます。"
   },
-  "fallback_name": "there",
+  "fallback_name": "こんにちは",
   "common": {
-    "loading": "Loading"
+    "loading": "読み込み中"
   },
   "caring_community": {
-    "title": "Caring Community",
-    "subtitle": "Coordinate help requests, time offers, verified volunteering hours, and trusted support from one place.",
+    "title": "ケアコミュニティ",
+    "subtitle": "ヘルプリクエスト、時間の提供、認証済みボランティア時間、信頼できるサポートを一か所から調整できます。",
     "actions": {
-      "open_hub": "Open hub",
-      "request_help": "Request help",
-      "log_hours": "Log hours"
+      "open_hub": "ハブを開く",
+      "request_help": "助けを求める",
+      "log_hours": "時間を記録する"
     }
   }
 }

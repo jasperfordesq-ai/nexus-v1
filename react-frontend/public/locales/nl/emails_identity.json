@@ -3,27 +3,27 @@
     "subject": "Identiteitsverificatie bezig — {{community}}",
     "title": "Identiteitsverificatie gestart",
     "preview": "Uw identiteitsverificatie is bezig",
-    "body": "U bent begonnen met het identiteitsverificatieproces op {{community}}. Dit duurt meestal slechts een paar minuten.",
-    "next_steps": "U ontvangt nog een e-mail zodra uw verificatie is voltooid.",
-    "cta": "Controleer de verificatiestatus",
+    "body": "U heeft het identiteitsverificatieproces op {{community}} gestart. Dit duurt meestal slechts een paar minuten.",
+    "next_steps": "U ontvangt een andere e-mail zodra uw verificatie is voltooid.",
+    "cta": "Verificatiestatus controleren",
     "note": "Uw documenten worden veilig verwerkt door Stripe Identity."
   },
   "passed": {
     "subject": "Identiteit geverifieerd! — {{community}}",
     "title": "Identiteit geverifieerd",
     "preview": "Uw identiteit is succesvol geverifieerd",
-    "body": "Uw identiteit is met succes geverifieerd op {{community}}. Er is een geverifieerde ledenbadge aan uw profiel toegevoegd.",
+    "body": "Uw identiteit is succesvol geverifieerd op {{community}}. Er is een geverifieerd ledenbadge aan uw profiel toegevoegd.",
     "highlight": "Geverifieerd lid",
-    "cta": "Bekijk uw profiel",
+    "cta": "Uw profiel bekijken",
     "badge_note": "Uw geverifieerde badge is nu zichtbaar voor andere leden."
   },
   "failed": {
-    "subject": "Identiteitsverificatie kon niet worden voltooid: {{community}}",
+    "subject": "Identiteitsverificatie kon niet worden voltooid — {{community}}",
     "title": "Verificatie mislukt",
     "preview": "Uw identiteitsverificatie is niet voltooid",
-    "body": "We kunnen uw identiteitsverificatie op {{community}} niet voltooien.",
+    "body": "We konden uw identiteitsverificatie op {{community}} niet voltooien.",
     "reason_label": "Reden:",
-    "retry_note": "U kunt het opnieuw proberen via uw profielinstellingen. Als u problemen blijft ondervinden, kunt u contact opnemen met de ondersteuning.",
-    "cta": "Probeer het opnieuw"
+    "retry_note": "U kunt het opnieuw proberen via uw profielinstellingen. Als het probleem aanhoudt, neem dan contact op met de ondersteuning.",
+    "cta": "Opnieuw proberen"
   }
 }

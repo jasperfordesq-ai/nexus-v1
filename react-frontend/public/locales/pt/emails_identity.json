@@ -1,29 +1,29 @@
 {
   "started": {
-    "subject": "Verificação de identidade em andamento — {{community}}",
+    "subject": "Verificação de identidade em curso — {{community}}",
     "title": "Verificação de identidade iniciada",
-    "preview": "Sua verificação de identidade está em andamento",
-    "body": "Você iniciou o processo de verificação de identidade em {{community}}. Isso geralmente leva apenas alguns minutos.",
-    "next_steps": "Você receberá outro e-mail assim que sua verificação for concluída.",
-    "cta": "Verifique o status da verificação",
-    "note": "Seus documentos são processados ​​com segurança pelo Stripe Identity."
+    "preview": "A sua verificação de identidade está em curso",
+    "body": "Iniciou o processo de verificação de identidade na {{community}}. Normalmente demora apenas alguns minutos.",
+    "next_steps": "Receberá outro e-mail assim que a sua verificação estiver concluída.",
+    "cta": "Verificar estado da verificação",
+    "note": "Os seus documentos são processados de forma segura pela Stripe Identity."
   },
   "passed": {
     "subject": "Identidade verificada! — {{community}}",
     "title": "Identidade verificada",
-    "preview": "Sua identidade foi verificada com sucesso",
-    "body": "Sua identidade foi verificada com sucesso em {{community}}. Um crachá de membro verificado foi adicionado ao seu perfil.",
+    "preview": "A sua identidade foi verificada com sucesso",
+    "body": "A sua identidade foi verificada com sucesso na {{community}}. Foi adicionado um crachá de membro verificado ao seu perfil.",
     "highlight": "Membro verificado",
-    "cta": "Veja seu perfil",
-    "badge_note": "Seu crachá verificado agora está visível para outros membros."
+    "cta": "Ver o seu perfil",
+    "badge_note": "O seu crachá de verificado já está visível para outros membros."
   },
   "failed": {
-    "subject": "A verificação de identidade não pôde ser concluída — {{community}}",
-    "title": "Verificação malsucedida",
-    "preview": "Sua verificação de identidade não foi concluída",
-    "body": "Não foi possível concluir a verificação de sua identidade em {{community}}.",
-    "reason_label": "Razão:",
-    "retry_note": "Você pode tentar novamente nas configurações do seu perfil. Se você continuar tendo problemas, entre em contato com o suporte.",
-    "cta": "Tente novamente"
+    "subject": "Não foi possível concluir a verificação de identidade — {{community}}",
+    "title": "Verificação sem sucesso",
+    "preview": "A sua verificação de identidade não foi concluída",
+    "body": "Não foi possível concluir a verificação de identidade na {{community}}.",
+    "reason_label": "Motivo:",
+    "retry_note": "Pode tentar novamente a partir das configurações do seu perfil. Se o problema persistir, entre em contacto com o suporte.",
+    "cta": "Tentar novamente"
   }
 }
