@@ -1,24 +1,24 @@
 {
   "legal_update": {
-    "subject": "Important: Updated {{doc_type}} — {{community}}",
-    "title": "Policy Update",
+    "subject": "Belangrijk: {{doc_type}} bijgewerkt — {{community}}",
+    "title": "Beleidsupdate",
     "preview": "{{community}} has updated its {{doc_type}}",
-    "body": "{{community}} has published an updated {{doc_type}}. Please review and accept the updated terms to continue using the platform.",
-    "action_required": "Your continued use of the platform requires acceptance of the latest terms.",
-    "cta": "Review & Accept"
+    "body": "{{community}} heeft een bijgewerkte {{doc_type}} gepubliceerd. Lees en accepteer de bijgewerkte voorwaarden om het platform te blijven gebruiken.",
+    "action_required": "Voor uw voortgezette gebruik van het platform is acceptatie van de meest recente voorwaarden vereist.",
+    "cta": "Beoordelen en accepteren"
   },
   "kb_published": {
-    "subject": "Your article is live: {{title}} — {{community}}",
-    "title": "Article Published!",
-    "preview": "Your knowledge base article \"{{title}}\" is now live",
-    "body": "Your article has been published to the {{community}} knowledge base and is now visible to all members.",
-    "cta": "View Article"
+    "subject": "Uw artikel is live: {{title}} — {{community}}",
+    "title": "Artikel gepubliceerd!",
+    "preview": "Uw kennisbankartikel \"{{title}}\" is nu live",
+    "body": "Uw artikel is gepubliceerd in de kennisbank van {{community}} en is nu zichtbaar voor alle leden.",
+    "cta": "Bekijk artikel"
   },
   "kb_updated": {
-    "subject": "Article updated: {{title}} — {{community}}",
-    "title": "Article Updated",
-    "preview": "Your knowledge base article has been updated",
-    "body": "A new version of your article <strong>\"{{title}}\"</strong> has been published to the {{community}} knowledge base.",
-    "cta": "View Article"
+    "subject": "Artikel bijgewerkt: {{title}} — {{community}}",
+    "title": "Artikel bijgewerkt",
+    "preview": "Uw kennisbankartikel is bijgewerkt",
+    "body": "Er is een nieuwe versie van uw artikel <strong>\"{{title}}\"</strong> gepubliceerd in de kennisbank van {{community}}.",
+    "cta": "Bekijk artikel"
   }
 }

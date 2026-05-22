@@ -1,29 +1,29 @@
 {
   "started": {
-    "subject": "Identity verification in progress — {{community}}",
-    "title": "Identity Verification Started",
-    "preview": "Your identity verification is in progress",
-    "body": "You have started the identity verification process on {{community}}. This usually takes just a few minutes.",
-    "next_steps": "You will receive another email once your verification is complete.",
-    "cta": "Check Verification Status",
-    "note": "Your documents are processed securely by Stripe Identity."
+    "subject": "Identiteitsverificatie bezig — {{community}}",
+    "title": "Identiteitsverificatie gestart",
+    "preview": "Uw identiteitsverificatie is bezig",
+    "body": "U bent begonnen met het identiteitsverificatieproces op {{community}}. Dit duurt meestal slechts een paar minuten.",
+    "next_steps": "U ontvangt nog een e-mail zodra uw verificatie is voltooid.",
+    "cta": "Controleer de verificatiestatus",
+    "note": "Uw documenten worden veilig verwerkt door Stripe Identity."
   },
   "passed": {
-    "subject": "Identity verified! — {{community}}",
-    "title": "Identity Verified",
-    "preview": "Your identity has been successfully verified",
-    "body": "Your identity has been successfully verified on {{community}}. A verified member badge has been added to your profile.",
-    "highlight": "Verified Member",
-    "cta": "View Your Profile",
-    "badge_note": "Your verified badge is now visible to other members."
+    "subject": "Identiteit geverifieerd! — {{community}}",
+    "title": "Identiteit geverifieerd",
+    "preview": "Uw identiteit is succesvol geverifieerd",
+    "body": "Uw identiteit is met succes geverifieerd op {{community}}. Er is een geverifieerde ledenbadge aan uw profiel toegevoegd.",
+    "highlight": "Geverifieerd lid",
+    "cta": "Bekijk uw profiel",
+    "badge_note": "Uw geverifieerde badge is nu zichtbaar voor andere leden."
   },
   "failed": {
-    "subject": "Identity verification could not be completed — {{community}}",
-    "title": "Verification Unsuccessful",
-    "preview": "Your identity verification was not completed",
-    "body": "We were unable to complete your identity verification on {{community}}.",
-    "reason_label": "Reason:",
-    "retry_note": "You may try again from your profile settings. If you continue to have issues, please contact support.",
-    "cta": "Try Again"
+    "subject": "Identiteitsverificatie kon niet worden voltooid: {{community}}",
+    "title": "Verificatie mislukt",
+    "preview": "Uw identiteitsverificatie is niet voltooid",
+    "body": "We kunnen uw identiteitsverificatie op {{community}} niet voltooien.",
+    "reason_label": "Reden:",
+    "retry_note": "U kunt het opnieuw proberen via uw profielinstellingen. Als u problemen blijft ondervinden, kunt u contact opnemen met de ondersteuning.",
+    "cta": "Probeer het opnieuw"
   }
 }

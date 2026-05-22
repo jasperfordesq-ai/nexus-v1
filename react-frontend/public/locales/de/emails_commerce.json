@@ -1,33 +1,33 @@
 {
   "job_application_applicant": {
-    "subject": "Application received: {{job_title}} — {{community}}",
-    "title": "Application Submitted!",
-    "preview": "Your application for {{job_title}} has been received",
-    "body": "Your application for <strong>{{job_title}}</strong> has been received and is being reviewed.",
-    "next_steps": "The hiring team will review your application and be in touch if you're shortlisted.",
-    "cta": "View Application"
+    "subject": "Bewerbung erhalten: {{job_title}} – {{community}}",
+    "title": "Bewerbung eingereicht!",
+    "preview": "Ihre Bewerbung für {{job_title}} ist eingegangen",
+    "body": "Ihre Bewerbung für <strong>{{job_title}}</strong> ist eingegangen und wird derzeit geprüft.",
+    "next_steps": "Das Einstellungsteam wird Ihre Bewerbung prüfen und sich mit Ihnen in Verbindung setzen, wenn Sie in die engere Wahl kommen.",
+    "cta": "Anwendung anzeigen"
   },
   "job_application_employer": {
-    "subject": "New application for: {{job_title}} — {{community}}",
-    "title": "New Job Application",
+    "subject": "Neue Anwendung für: {{job_title}} – {{community}}",
+    "title": "Neue Bewerbung",
     "preview": "{{applicant_name}} applied for {{job_title}}",
-    "body": "<strong>{{applicant_name}}</strong> has submitted an application for your vacancy: <strong>{{job_title}}</strong>.",
-    "cta": "Review Application"
+    "body": "<strong>{{applicant_name}}</strong> hat eine Bewerbung für Ihre Stelle eingereicht: <strong>{{job_title}}</strong>.",
+    "cta": "Bewerbung prüfen"
   },
   "group_removed": {
-    "subject": "You have been removed from {{group_name}} — {{community}}",
-    "title": "Group Membership Update",
-    "preview": "Your membership in {{group_name}} has ended",
-    "body": "Your membership in the group <strong>\"{{group_name}}\"</strong> on {{community}} has ended.",
-    "suggestion": "You can discover and join other groups in your community.",
-    "cta": "Browse Groups"
+    "subject": "Sie wurden aus {{group_name}} – {{community}} entfernt",
+    "title": "Aktualisierung der Gruppenmitgliedschaft",
+    "preview": "Ihre Mitgliedschaft bei {{group_name}} ist beendet",
+    "body": "Ihre Mitgliedschaft in der Gruppe <strong>\"{{group_name}}\"</strong> auf {{community}} ist beendet.",
+    "suggestion": "Sie können andere Gruppen in Ihrer Community entdecken und ihnen beitreten.",
+    "cta": "Gruppen durchsuchen"
   },
   "group_promoted": {
-    "subject": "You're now a {{role}} of {{group_name}} — {{community}}",
-    "title": "Role Update",
-    "preview": "Congratulations — you've been made a {{role}} of {{group_name}}",
-    "body": "You have been promoted to <strong>{{role}}</strong> of the group <strong>\"{{group_name}}\"</strong> on {{community}}.",
-    "responsibilities": "As {{role}}, you can help manage the group and support its members.",
-    "cta": "Go to Group"
+    "subject": "Sie sind jetzt ein {{role}} von {{group_name}} – {{community}}",
+    "title": "Rollenaktualisierung",
+    "preview": "Herzlichen Glückwunsch – Sie wurden zum {{role}} von {{group_name}} ernannt",
+    "body": "Sie wurden zum <strong>{{role}}</strong> der Gruppe <strong>\"{{group_name}}\"</strong> auf {{community}} befördert.",
+    "responsibilities": "Als {{role}} können Sie bei der Verwaltung der Gruppe helfen und ihre Mitglieder unterstützen.",
+    "cta": "Gehen Sie zur Gruppe"
   }
 }

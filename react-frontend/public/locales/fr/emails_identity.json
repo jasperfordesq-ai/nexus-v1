@@ -1,29 +1,29 @@
 {
   "started": {
-    "subject": "Identity verification in progress — {{community}}",
-    "title": "Identity Verification Started",
-    "preview": "Your identity verification is in progress",
-    "body": "You have started the identity verification process on {{community}}. This usually takes just a few minutes.",
-    "next_steps": "You will receive another email once your verification is complete.",
-    "cta": "Check Verification Status",
-    "note": "Your documents are processed securely by Stripe Identity."
+    "subject": "Vérification d'identité en cours — {{community}}",
+    "title": "Vérification d'identité commencée",
+    "preview": "Votre vérification d'identité est en cours",
+    "body": "Vous avez démarré le processus de vérification d'identité sur {{community}}. Cela ne prend généralement que quelques minutes.",
+    "next_steps": "Vous recevrez un autre e-mail une fois votre vérification terminée.",
+    "cta": "Vérifier l'état de la vérification",
+    "note": "Vos documents sont traités en toute sécurité par Stripe Identity."
   },
   "passed": {
-    "subject": "Identity verified! — {{community}}",
-    "title": "Identity Verified",
-    "preview": "Your identity has been successfully verified",
-    "body": "Your identity has been successfully verified on {{community}}. A verified member badge has been added to your profile.",
-    "highlight": "Verified Member",
-    "cta": "View Your Profile",
-    "badge_note": "Your verified badge is now visible to other members."
+    "subject": "Identité vérifiée ! -{{community}}",
+    "title": "Identité vérifiée",
+    "preview": "Votre identité a été vérifiée avec succès",
+    "body": "Votre identité a été vérifiée avec succès sur {{community}}. Un badge de membre vérifié a été ajouté à votre profil.",
+    "highlight": "Membre vérifié",
+    "cta": "Afficher votre profil",
+    "badge_note": "Votre badge vérifié est désormais visible par les autres membres."
   },
   "failed": {
-    "subject": "Identity verification could not be completed — {{community}}",
-    "title": "Verification Unsuccessful",
-    "preview": "Your identity verification was not completed",
-    "body": "We were unable to complete your identity verification on {{community}}.",
-    "reason_label": "Reason:",
-    "retry_note": "You may try again from your profile settings. If you continue to have issues, please contact support.",
-    "cta": "Try Again"
+    "subject": "La vérification de l'identité n'a pas pu être effectuée — {{community}}",
+    "title": "Vérification échouée",
+    "preview": "Votre vérification d'identité n'a pas été complétée",
+    "body": "Nous n'avons pas pu terminer votre vérification d'identité sur {{community}}.",
+    "reason_label": "Raison:",
+    "retry_note": "Vous pouvez réessayer à partir des paramètres de votre profil. Si vous continuez à rencontrer des problèmes, veuillez contacter l'assistance.",
+    "cta": "Essayer à nouveau"
   }
 }

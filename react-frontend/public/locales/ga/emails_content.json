@@ -1,24 +1,24 @@
 {
   "legal_update": {
-    "subject": "Important: Updated {{doc_type}} — {{community}}",
-    "title": "Policy Update",
+    "subject": "Tábhachtach: Nuashonraithe {{doc_type}} — {{community}}",
+    "title": "Nuashonrú Beartais",
     "preview": "{{community}} has updated its {{doc_type}}",
-    "body": "{{community}} has published an updated {{doc_type}}. Please review and accept the updated terms to continue using the platform.",
-    "action_required": "Your continued use of the platform requires acceptance of the latest terms.",
-    "cta": "Review & Accept"
+    "body": "Tá {{community}} nuashonraithe {{doc_type}} foilsithe. Athbhreithnigh agus glac leis na téarmaí nuashonraithe chun leanúint ar aghaidh ag úsáid an ardáin.",
+    "action_required": "Teastaíonn glacadh leis na téarmaí is déanaí chun úsáid leanúnach a bhaint as an ardán.",
+    "cta": "Athbhreithniú & Glac"
   },
   "kb_published": {
-    "subject": "Your article is live: {{title}} — {{community}}",
-    "title": "Article Published!",
-    "preview": "Your knowledge base article \"{{title}}\" is now live",
-    "body": "Your article has been published to the {{community}} knowledge base and is now visible to all members.",
-    "cta": "View Article"
+    "subject": "Tá d'alt beo: {{title}} — {{community}}",
+    "title": "Airteagal Foilsithe!",
+    "preview": "Tá d'alt bonn eolais \"{{title}}\" beo anois",
+    "body": "Foilsíodh d’alt chuig bonn eolais {{community}} agus tá sé le feiceáil ag gach ball anois.",
+    "cta": "Féach ar an Airteagal"
   },
   "kb_updated": {
-    "subject": "Article updated: {{title}} — {{community}}",
-    "title": "Article Updated",
-    "preview": "Your knowledge base article has been updated",
-    "body": "A new version of your article <strong>\"{{title}}\"</strong> has been published to the {{community}} knowledge base.",
-    "cta": "View Article"
+    "subject": "Airteagal nuashonraithe: {{title}} — {{community}}",
+    "title": "Airteagal Nuashonraithe",
+    "preview": "Nuashonraíodh d'alt bonn eolais",
+    "body": "Foilsíodh leagan nua de d'alt <strong>\"{{title}}\"</strong> chuig an mbunachar eolais {{community}}.",
+    "cta": "Féach ar an Airteagal"
   }
 }
