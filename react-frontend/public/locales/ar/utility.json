@@ -60,7 +60,9 @@
     "still_need_help_description": "لا تستطيع العثور على ما تبحث عنه؟ فريقنا هنا لمساعدتك.",
     "contact_support": "اتصل بالدعم",
     "load_error_title": "Could not load FAQs",
-    "load_error_description": "Please try refreshing the page or contact support."
+    "load_error_description": "Please try refreshing the page or contact support.",
+    "hero_eyebrow": "إجابات وأدلة عملية",
+    "loading": "جارٍ تحميل مقالات المساعدة..."
   },
   "resources": {
     "page_title": "Resources",
@@ -125,7 +127,13 @@
     "collapse_category": "Collapse category",
     "expand_category": "Expand category",
     "hide_categories": "Hide categories",
-    "show_categories": "Show categories"
+    "show_categories": "Show categories",
+    "page_description": "ابحث عن مستندات المجتمع المشتركة والأدلة والقوالب والملفات المفيدة التي تساعد الأعضاء والمتطوعين والشركاء المحليين على اتخاذ إجراء.",
+    "hero_eyebrow": "مكتبة معرفة المجتمع",
+    "hero_resources_label": "الموارد المعروضة",
+    "empty_tip_guides": "الأدلة",
+    "empty_tip_templates": "القوالب",
+    "empty_tip_files": "الملفات"
   },
   "not_found": {
     "page_title": "الصفحة غير موجودة",

@@ -178,7 +178,13 @@
     "terms_agreement": "Ich habe die oben genannten Registrierungsbedingungen für Organisationen gelesen und stimme ihnen zu.",
     "terms_required": "Sie müssen den Bedingungen zustimmen, um Ihre Organisation zu registrieren.",
     "opportunity_count_one": "{{count}} Einsatz",
-    "opportunity_count_other": "{{count}} Einsätze"
+    "opportunity_count_other": "{{count}} Einsätze",
+    "page_description": "Entdecken Sie Freiwilligenorganisationen, lokale Partner und Gemeinschaftsgruppen, die Möglichkeiten, Unterstützung und Dienstleistungen über Ihr Zeitbank-Netzwerk anbieten.",
+    "hero_eyebrow": "Vertrauenswürdige lokale Partner",
+    "hero_partners_label": "Angezeigte Partner",
+    "empty_tip_volunteer": "Freiwilligengruppen",
+    "empty_tip_partner": "Gemeinschaftspartner",
+    "empty_tip_register": "Organisation registrieren"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -210,7 +216,8 @@
     "cover_message_placeholder": "Erzählen Sie der Organisation, warum Sie sich freiwillig engagieren möchten...",
     "cancel": "Abbrechen",
     "submit_application": "Bewerbung absenden",
-    "job_openings": "Job Openings"
+    "job_openings": "Job Openings",
+    "meta_description_fallback": "Entdecken Sie {{name}} und {{count}} aktive Freiwilligenmöglichkeiten in dieser Gemeinschafts-Zeitbank."
   },
   "emergency_alerts": {
     "heading": "Notfallwarnungen",

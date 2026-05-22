@@ -88,7 +88,8 @@
     "no_members_found": "検索に一致するメンバーは見つかりませんでした。",
     "done": "Done",
     "aria_exchange_participants": "交換参加者",
-    "aria_hour_split": "時間分割"
+    "aria_hour_split": "時間分割",
+    "hours_amount": "{{count}}時間"
   },
   "create": {
     "page_title": "グループ交換を作成",
@@ -142,7 +143,12 @@
     "weight_placeholder": "Weight",
     "hours_for": "{{name}}の時間",
     "weight_for": "{{name}}の重み",
-    "aria_hour_split_preview": "時間分割プレビュー"
+    "aria_hour_split_preview": "時間分割プレビュー",
+    "current_step": "現在のステップ",
+    "step_of_named": "ステップ {{current}}/{{total}}: {{name}}",
+    "hours_value": "{{hours}}時間",
+    "hours_suffix": "時間",
+    "weight_suffix": "×"
   },
   "toast": {
     "load_more_failed": "さらに交換を読み込めませんでした",

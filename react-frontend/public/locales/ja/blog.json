@@ -56,5 +56,10 @@
     "reaction_sad": "Sad",
     "reaction_celebrate": "Celebrate"
   },
-  "page_description": "Stories, guides, and updates from the timebanking community — exchanges that worked, lessons learned, and the latest from local groups and partners."
+  "page_description": "Stories, guides, and updates from the timebanking community — exchanges that worked, lessons learned, and the latest from local groups and partners.",
+  "hero_eyebrow": "コミュニティのストーリー",
+  "hero_posts_label": "表示中の投稿",
+  "empty_tip_stories": "メンバーの体験談",
+  "empty_tip_guides": "ガイド",
+  "empty_tip_updates": "アップデート"
 }

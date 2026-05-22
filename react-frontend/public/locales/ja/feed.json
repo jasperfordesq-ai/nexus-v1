@@ -34,7 +34,8 @@
     "saved": "Saved",
     "clear": "Clear feed filters",
     "more": "More",
-    "select": "Select feed filter"
+    "select": "Select feed filter",
+    "show_all": "すべての投稿を表示"
   },
   "report": {
     "title": "投稿を報告",
@@ -350,7 +351,9 @@
     "your_vote": "Your vote"
   },
   "feed": {
-    "end_of_feed": "You're all caught up!"
+    "end_of_feed": "You're all caught up!",
+    "current_view": "{{filter}} を表示中",
+    "region_label": "コミュニティフィード"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -595,5 +598,9 @@
     "back": "Back to Feed",
     "not_found": "Item not found",
     "load_failed": "Failed to load item"
-  }
+  },
+  "meta_description": "アップデート、リスティング、イベント、投票、目標、会話のためのプライベートなコミュニティフィードです。",
+  "error_hint": "フィルターと下書きエディタはそのままです。接続が安定したらフィードを更新してください。",
+  "loading_label": "コミュニティの更新を読み込み中...",
+  "empty_filtered_with_filter": "現在 {{filter}} の更新はありません。すべての投稿を見るか、新しい会話を始めてみてください。"
 }

@@ -88,7 +88,8 @@
     "no_members_found": "Keine Mitglieder gefunden, die Ihrer Suche entsprechen.",
     "done": "Fertig",
     "aria_exchange_participants": "Austauschteilnehmer",
-    "aria_hour_split": "Stundenaufteilung"
+    "aria_hour_split": "Stundenaufteilung",
+    "hours_amount": "{{count}} Std."
   },
   "create": {
     "page_title": "Gruppentausch erstellen",
@@ -142,7 +143,12 @@
     "weight_placeholder": "Gewichtung",
     "hours_for": "Stunden für {{name}}",
     "weight_for": "Gewichtung für {{name}}",
-    "aria_hour_split_preview": "Vorschau der Stundenaufteilung"
+    "aria_hour_split_preview": "Vorschau der Stundenaufteilung",
+    "current_step": "Aktueller Schritt",
+    "step_of_named": "Schritt {{current}} von {{total}}: {{name}}",
+    "hours_value": "{{hours}} Std.",
+    "hours_suffix": "Std.",
+    "weight_suffix": "x"
   },
   "toast": {
     "load_more_failed": "Weitere Tauschvorgänge konnten nicht geladen werden",

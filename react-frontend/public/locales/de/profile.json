@@ -46,7 +46,9 @@
   "about": {
     "heading": "Über mich",
     "no_bio": "Noch keine Biografie hinzugefügt.",
-    "skills": "Fähigkeiten"
+    "skills": "Fähigkeiten",
+    "no_skills_own": "Fügen Sie in den Einstellungen Fähigkeiten hinzu, damit andere Mitglieder wissen, wobei Sie helfen können.",
+    "no_skills_other": "Dieses Mitglied hat noch keine Fähigkeiten hinzugefügt."
   },
   "listing_type": {
     "offer": "Anbieten",
@@ -134,7 +136,8 @@
     "submit_failed_fallback": "Bewertung konnte nicht abgesendet werden"
   },
   "page_meta": {
-    "title": "Profile"
+    "title": "Profile",
+    "description": "Mitgliedsprofil von {{name}}"
   },
   "more_options": "More options",
   "profile_actions": "Profil-Aktionen",
@@ -181,5 +184,6 @@
   "hours_abbrev": "{{hours}}h",
   "post_hidden": "Hidden from your feed",
   "hide_failed": "Failed to hide",
-  "like_failed": "Failed to update like"
+  "like_failed": "Failed to update like",
+  "not_available_abbrev": "k.A."
 }

@@ -202,5 +202,10 @@
       "title": "Conversation"
     }
   },
-  "character_count": "{{current}}/{{max}}"
+  "character_count": "{{current}}/{{max}}",
+  "aria_messages_region": "Teachtaireachtaí le {{name}}",
+  "context_offer": "tairiscint",
+  "context_request": "iarratas",
+  "online_status": "Ar líne",
+  "offline_status": "As líne"
 }

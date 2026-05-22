@@ -178,7 +178,13 @@
     "terms_agreement": "I have read and agree to the organisation registration terms above.",
     "terms_required": "You must agree to the terms to register your organisation.",
     "opportunity_count_one": "{{count}} opportunity",
-    "opportunity_count_other": "{{count}} opportunities"
+    "opportunity_count_other": "{{count}} opportunities",
+    "page_description": "Ontdek vrijwilligersorganisaties, lokale partners en gemeenschapsgroepen die kansen, ondersteuning en diensten aanbieden via je tijdbanknetwerk.",
+    "hero_eyebrow": "Vertrouwde lokale partners",
+    "hero_partners_label": "Getoonde partners",
+    "empty_tip_volunteer": "Vrijwilligersgroepen",
+    "empty_tip_partner": "Gemeenschapspartners",
+    "empty_tip_register": "Een organisatie registreren"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -210,7 +216,8 @@
     "cover_message_placeholder": "Tell the organisation why you'd like to volunteer...",
     "cancel": "Cancel",
     "submit_application": "Submit Application",
-    "job_openings": "Job Openings"
+    "job_openings": "Job Openings",
+    "meta_description_fallback": "Ontdek {{name}} en {{count}} actieve vrijwilligersmogelijkheden op deze gemeenschapstijdbank."
   },
   "emergency_alerts": {
     "heading": "Emergency Alerts",

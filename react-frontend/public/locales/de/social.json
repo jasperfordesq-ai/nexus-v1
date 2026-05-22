@@ -118,7 +118,14 @@
     "collection_name": "Name",
     "cancel": "Cancel",
     "save": "Save",
-    "create": "Create"
+    "create": "Create",
+    "meta_description": "Überprüfen und organisieren Sie Ihre gespeicherten Beiträge, Anzeigen, Veranstaltungen, Stellen, Blogbeiträge und Diskussionen.",
+    "collection_filter_label": "Sammlung",
+    "remove": "Aus Gespeichertem entfernen",
+    "delete_collection_title": "Sammlung löschen",
+    "delete_collection_body": "„{{name}}“ löschen? Lesezeichen in dieser Sammlung werden behalten.",
+    "delete_collection_action": "Sammlung löschen",
+    "collection_actions_named": "Aktionen für die Sammlung {{name}}"
   },
   "verified": "Verified",
   "hover_card": {

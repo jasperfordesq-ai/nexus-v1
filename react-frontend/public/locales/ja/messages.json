@@ -202,5 +202,10 @@
       "title": "Conversation"
     }
   },
-  "character_count": "{{current}}/{{max}}"
+  "character_count": "{{current}}/{{max}}",
+  "aria_messages_region": "{{name}} とのメッセージ",
+  "context_offer": "オファー",
+  "context_request": "リクエスト",
+  "online_status": "オンライン",
+  "offline_status": "オフライン"
 }

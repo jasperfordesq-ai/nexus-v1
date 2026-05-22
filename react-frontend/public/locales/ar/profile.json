@@ -46,7 +46,9 @@
   "about": {
     "heading": "About",
     "no_bio": "لم يتم إضافة سيرة ذاتية بعد.",
-    "skills": "Skills"
+    "skills": "Skills",
+    "no_skills_own": "أضف المهارات في الإعدادات حتى يعرف الأعضاء الآخرون فيم يمكنك المساعدة.",
+    "no_skills_other": "لم يضف هذا العضو أي مهارات بعد."
   },
   "listing_type": {
     "offer": "Offering",
@@ -134,7 +136,8 @@
     "submit_failed_fallback": "فشل في إرسال المراجعة"
   },
   "page_meta": {
-    "title": "Profile"
+    "title": "Profile",
+    "description": "الملف الشخصي للعضو {{name}}"
   },
   "more_options": "More options",
   "profile_actions": "Profile actions",
@@ -181,5 +184,6 @@
   "hours_abbrev": "{{hours}}h",
   "post_hidden": "Hidden from your feed",
   "hide_failed": "Failed to hide",
-  "like_failed": "Failed to update like"
+  "like_failed": "Failed to update like",
+  "not_available_abbrev": "غ/م"
 }

@@ -34,7 +34,8 @@
     "saved": "Gespeichert",
     "clear": "Feed-Filter zurücksetzen",
     "more": "Mehr",
-    "select": "Feed-Filter auswählen"
+    "select": "Feed-Filter auswählen",
+    "show_all": "Alle Beiträge anzeigen"
   },
   "report": {
     "title": "Beitrag melden",
@@ -350,7 +351,9 @@
     "your_vote": "Ihre Stimme"
   },
   "feed": {
-    "end_of_feed": "Sie sind auf dem neuesten Stand!"
+    "end_of_feed": "Sie sind auf dem neuesten Stand!",
+    "current_view": "{{filter}} wird angezeigt",
+    "region_label": "Community-Feed"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -595,5 +598,9 @@
     "back": "Back to Feed",
     "not_found": "Item not found",
     "load_failed": "Failed to load item"
-  }
+  },
+  "meta_description": "Ein privater Community-Feed für Aktualisierungen, Einträge, Veranstaltungen, Umfragen, Ziele und Gespräche.",
+  "error_hint": "Ihre Filter und der Entwurfseditor sind noch hier. Aktualisieren Sie den Feed, sobald Ihre Verbindung bereit ist.",
+  "loading_label": "Community-Aktualisierungen werden geladen...",
+  "empty_filtered_with_filter": "Es gibt derzeit keine {{filter}}-Aktualisierungen. Versuchen Sie alle Beiträge oder starten Sie ein neues Gespräch."
 }

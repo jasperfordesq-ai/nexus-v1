@@ -46,7 +46,9 @@
   "about": {
     "heading": "Acerca de",
     "no_bio": "Aún no se ha añadido biografía.",
-    "skills": "Habilidades"
+    "skills": "Habilidades",
+    "no_skills_own": "Añade habilidades en los ajustes para que otros miembros sepan en qué puedes ayudar.",
+    "no_skills_other": "Este miembro aún no ha añadido habilidades."
   },
   "listing_type": {
     "offer": "Ofreciendo",
@@ -134,7 +136,8 @@
     "submit_failed_fallback": "No se pudo enviar la reseña"
   },
   "page_meta": {
-    "title": "Profile"
+    "title": "Profile",
+    "description": "Perfil de miembro de {{name}}"
   },
   "more_options": "More options",
   "profile_actions": "Profile actions",
@@ -181,5 +184,6 @@
   "hours_abbrev": "{{hours}}h",
   "post_hidden": "Hidden from your feed",
   "hide_failed": "Failed to hide",
-  "like_failed": "Failed to update like"
+  "like_failed": "Failed to update like",
+  "not_available_abbrev": "n/d"
 }

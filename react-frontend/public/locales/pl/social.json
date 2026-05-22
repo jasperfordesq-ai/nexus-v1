@@ -118,7 +118,14 @@
     "collection_name": "Name",
     "cancel": "Cancel",
     "save": "Save",
-    "create": "Create"
+    "create": "Create",
+    "meta_description": "Przeglądaj i porządkuj zapisane wpisy, ogłoszenia, wydarzenia, oferty pracy, posty na blogu i dyskusje.",
+    "collection_filter_label": "Kolekcja",
+    "remove": "Usuń z zapisanych",
+    "delete_collection_title": "Usuń kolekcję",
+    "delete_collection_body": "Usunąć „{{name}}”? Zakładki w tej kolekcji zostaną zachowane.",
+    "delete_collection_action": "Usuń kolekcję",
+    "collection_actions_named": "Akcje dla kolekcji {{name}}"
   },
   "verified": "Verified",
   "hover_card": {

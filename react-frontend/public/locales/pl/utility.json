@@ -60,7 +60,9 @@
     "still_need_help_description": "Nie możesz znaleźć tego, czego szukasz? Nasz zespół jest tutaj, aby pomóc.",
     "contact_support": "Skontaktuj się z pomocą",
     "load_error_title": "Nie mozna zaladowac FAQ",
-    "load_error_description": "Odswiez strone albo skontaktuj sie z pomoca techniczna."
+    "load_error_description": "Odswiez strone albo skontaktuj sie z pomoca techniczna.",
+    "hero_eyebrow": "Odpowiedzi i praktyczne poradniki",
+    "loading": "Ładowanie artykułów pomocy..."
   },
   "resources": {
     "page_title": "Resources",
@@ -125,7 +127,13 @@
     "collapse_category": "Collapse category",
     "expand_category": "Expand category",
     "hide_categories": "Hide categories",
-    "show_categories": "Show categories"
+    "show_categories": "Show categories",
+    "page_description": "Znajdź wspólne dokumenty społeczności, poradniki, szablony i przydatne pliki, które pomagają członkom, wolontariuszom i lokalnym partnerom podejmować działania.",
+    "hero_eyebrow": "Biblioteka wiedzy społeczności",
+    "hero_resources_label": "Wyświetlone zasoby",
+    "empty_tip_guides": "Poradniki",
+    "empty_tip_templates": "Szablony",
+    "empty_tip_files": "Pliki"
   },
   "not_found": {
     "page_title": "Strona nie znaleziona",

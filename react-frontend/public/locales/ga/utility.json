@@ -60,7 +60,9 @@
     "contact_support": "Déan Teagmháil le Tacaíocht",
     "meta_description": "Browse help articles, guides, and FAQs to get the most out of the platform.",
     "load_error_title": "Could not load FAQs",
-    "load_error_description": "Please try refreshing the page or contact support."
+    "load_error_description": "Please try refreshing the page or contact support.",
+    "hero_eyebrow": "Freagraí agus treoracha praiticiúla",
+    "loading": "Ailt chabhrach á luchtú..."
   },
   "resources": {
     "page_title": "Acmhainní",
@@ -125,7 +127,13 @@
     "collapse_category": "Collapse category",
     "expand_category": "Expand category",
     "hide_categories": "Hide categories",
-    "show_categories": "Show categories"
+    "show_categories": "Show categories",
+    "page_description": "Aimsigh cáipéisí comhroinnte pobail, treoracha, teimpléid agus comhaid úsáideacha a chabhraíonn le baill, oibrithe deonacha agus comhpháirtithe áitiúla gníomh a dhéanamh.",
+    "hero_eyebrow": "Leabharlann eolais an phobail",
+    "hero_resources_label": "Acmhainní ar taispeáint",
+    "empty_tip_guides": "Treoracha",
+    "empty_tip_templates": "Teimpléid",
+    "empty_tip_files": "Comhaid"
   },
   "not_found": {
     "page_title": "Leathanach Gan Aimsiú",

@@ -178,7 +178,13 @@
     "terms_agreement": "I have read and agree to the organisation registration terms above.",
     "terms_required": "You must agree to the terms to register your organisation.",
     "opportunity_count_one": "{{count}} opportunity",
-    "opportunity_count_other": "{{count}} opportunities"
+    "opportunity_count_other": "{{count}} opportunities",
+    "page_description": "ボランティア団体、地域のパートナー、機会・支援・サービスを提供するコミュニティグループを、タイムバンクのネットワークから見つけましょう。",
+    "hero_eyebrow": "信頼できる地域パートナー",
+    "hero_partners_label": "表示中のパートナー",
+    "empty_tip_volunteer": "ボランティアグループ",
+    "empty_tip_partner": "コミュニティパートナー",
+    "empty_tip_register": "団体を登録する"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -210,7 +216,8 @@
     "cover_message_placeholder": "Tell the organisation why you'd like to volunteer...",
     "cancel": "Cancel",
     "submit_application": "Submit Application",
-    "job_openings": "Job Openings"
+    "job_openings": "Job Openings",
+    "meta_description_fallback": "このコミュニティタイムバンクで {{name}} と {{count}} 件の有効なボランティア機会を見つけましょう。"
   },
   "emergency_alerts": {
     "heading": "Emergency Alerts",

@@ -202,5 +202,10 @@
       "title": "Conversation"
     }
   },
-  "character_count": "{{current}}/{{max}}"
+  "character_count": "{{current}}/{{max}}",
+  "aria_messages_region": "الرسائل مع {{name}}",
+  "context_offer": "عرض",
+  "context_request": "طلب",
+  "online_status": "متصل",
+  "offline_status": "غير متصل"
 }

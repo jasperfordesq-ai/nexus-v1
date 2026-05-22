@@ -46,7 +46,9 @@
   "about": {
     "heading": "Sobre",
     "no_bio": "Ainda sem biografia.",
-    "skills": "Competências"
+    "skills": "Competências",
+    "no_skills_own": "Adiciona competências nas definições para que outros membros saibam em que podes ajudar.",
+    "no_skills_other": "Este membro ainda não adicionou competências."
   },
   "listing_type": {
     "offer": "A Oferecer",
@@ -134,7 +136,8 @@
     "submit_failed_fallback": "Falha ao submeter avaliação"
   },
   "page_meta": {
-    "title": "Profile"
+    "title": "Profile",
+    "description": "Perfil de membro de {{name}}"
   },
   "more_options": "More options",
   "profile_actions": "Profile actions",
@@ -181,5 +184,6 @@
   "hours_abbrev": "{{hours}}h",
   "post_hidden": "Hidden from your feed",
   "hide_failed": "Failed to hide",
-  "like_failed": "Failed to update like"
+  "like_failed": "Failed to update like",
+  "not_available_abbrev": "n/d"
 }

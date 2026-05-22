@@ -202,5 +202,10 @@
       "title": "Conversation"
     }
   },
-  "character_count": "{{current}}/{{max}}"
+  "character_count": "{{current}}/{{max}}",
+  "aria_messages_region": "Berichten met {{name}}",
+  "context_offer": "aanbod",
+  "context_request": "verzoek",
+  "online_status": "Online",
+  "offline_status": "Offline"
 }

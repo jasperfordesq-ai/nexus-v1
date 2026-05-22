@@ -88,7 +88,8 @@
     "no_members_found": "Nie znaleziono członków pasujących do twojego wyszukiwania.",
     "done": "Done",
     "aria_exchange_participants": "Uczestnicy wymiany",
-    "aria_hour_split": "Podział godzin"
+    "aria_hour_split": "Podział godzin",
+    "hours_amount": "{{count}} godz."
   },
   "create": {
     "page_title": "Utwórz Wymianę Grupową",
@@ -142,7 +143,12 @@
     "weight_placeholder": "Weight",
     "hours_for": "Godziny dla {{name}}",
     "weight_for": "Waga dla {{name}}",
-    "aria_hour_split_preview": "Podgląd podziału godzin"
+    "aria_hour_split_preview": "Podgląd podziału godzin",
+    "current_step": "Aktualny krok",
+    "step_of_named": "Krok {{current}} z {{total}}: {{name}}",
+    "hours_value": "{{hours}} godz.",
+    "hours_suffix": "godz.",
+    "weight_suffix": "x"
   },
   "toast": {
     "load_more_failed": "Nie udało się załadować więcej wymian",
