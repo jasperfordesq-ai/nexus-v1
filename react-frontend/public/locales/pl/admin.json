@@ -1,7 +1,7 @@
 {
-  "active": "Active",
+  "active": "Aktywny",
   "activity": {
-    "card_title": "Activity",
+    "card_title": "Aktywność",
     "empty": "Nie znaleziono żadnej aktywności",
     "view_all": "Zobacz wszystko"
   },
@@ -2157,7 +2157,7 @@
     "smart_match_users_title": "Użytkownicy inteligentnego dopasowania",
     "approval_rate_aria": "Wskaźnik akceptacji:{{value}}%"
   },
-  "completed": "Completed",
+  "completed": "Ukończono",
   "config": {
     "cache_cleared_successfully": "Pamięć podręczna została pomyślnie wyczyszczona",
     "failed_to_clear_cache": "Nie udało się wyczyścić pamięci podręcznej",
@@ -3407,10 +3407,10 @@
     "status_cancelled": "Odwołany"
   },
   "data_table": {
-    "admin_data_table": "Data",
+    "admin_data_table": "Dane",
     "no_data": "Brak danych",
-    "refresh": "Refresh",
-    "search": "Search"
+    "refresh": "Odśwież",
+    "search": "Szukaj"
   },
   "deliverability": {
     "an_unexpected_error_occurred": "Wystąpił nieoczekiwany błąd",
@@ -3490,7 +3490,7 @@
     "status_planned": "Planowany",
     "status_review": "W przeglądzie"
   },
-  "details": "Details",
+  "details": "Szczegóły",
   "diagnostics": {
     "failed_to_diagnose_listing": "Nie udało się zdiagnozować wpisu",
     "failed_to_diagnose_user": "Nie udało się zdiagnozować użytkownika",
@@ -7036,7 +7036,7 @@
   },
   "placeholder": {
     "migration_description": "Migracja starszej zawartości do nowego systemu",
-    "migration_title": "Migration",
+    "migration_title": "Migracja",
     "open_legacy": "Otwórz dziedzictwo"
   },
   "polls": {
@@ -7076,12 +7076,12 @@
   "quick_actions": {
     "advanced_controls": "Zaawansowane sterowanie",
     "card_title": "Szybkie działania",
-    "enterprise": "Enterprise",
-    "gamification": "Gamification",
+    "enterprise": "Przedsiębiorstwo",
+    "gamification": "Grywalizacja",
     "manage_users": "Zarządzaj użytkownikami",
     "new_blog_post": "Nowy wpis na blogu",
     "send_newsletter": "Wyślij biuletyn",
-    "settings": "Settings",
+    "settings": "Ustawienia",
     "view_listings": "Zobacz oferty"
   },
   "reports": {
@@ -7364,7 +7364,7 @@
     "sort_order_placeholder": "0",
     "video_url_placeholder": "https://www.youtube.com/watch?v=..."
   },
-  "review": "Review",
+  "review": "Recenzja",
   "safeguarding": {
     "active": "Aktywny",
     "active_options": "Aktywne opcje",
@@ -9333,7 +9333,7 @@
     "tab_reviewing": "Przeglądanie"
   },
   "trends": {
-    "card_title": "Trends",
+    "card_title": "Trendy",
     "hours_suffix": "hrs",
     "no_data": "Brak dostępnych danych"
   },
@@ -9547,7 +9547,7 @@
       "profile_type": "Typ profilu",
       "reason": "Powód",
       "role": "Rola",
-      "status": "Status",
+      "status": "Stan",
       "tagline": "Hasło",
       "tenant_super_admin": "Superadministrator najemcy"
     },
@@ -10718,8 +10718,8 @@
   "spam": {
     "title": "Wykrywanie spamu",
     "avg_score": "Średni wynik",
-    "blocked_count": "Blocked",
-    "flagged_count": "Flagged",
+    "blocked_count": "Zablokowany",
+    "flagged_count": "Oznaczone",
     "total_analyzed": "Łącznie przeanalizowane"
   },
   "bulk": {
@@ -10968,11 +10968,11 @@
   "api_docs": {
     "aria_api_documentation_sections": "Sekcje dokumentacji API",
     "aria_hmac_headers": "Nagłówki Hmac",
-    "aria_parameters": "Parameters",
+    "aria_parameters": "Parametry",
     "aria_rate_limit_headers": "Nagłówki limitów szybkości"
   },
   "aria": {
-    "breadcrumbs": "Breadcrumbs"
+    "breadcrumbs": "Bułka tarta"
   },
   "badge_configuration": {
     "aria_badge_filter": "Filtr odznak",
@@ -11072,10 +11072,10 @@
     "select_all": "Wybierz wszystko",
     "select_tenants": "Wybierz Najemców"
   },
-  "cancel": "Cancel",
+  "cancel": "Anuluj",
   "checking_permissions": "Sprawdzanie uprawnień",
-  "clear": "Clear",
-  "close": "Close",
+  "clear": "Jasne",
+  "close": "Zamknij",
   "common:nav": {
     "about": "O",
     "achievements": "Osiągnięcia",
@@ -11115,7 +11115,7 @@
   },
   "error_occurred": "Wystąpił błąd",
   "federation_audit": {
-    "clear": "Clear",
+    "clear": "Jasne",
     "export_csv": "Eksportuj plik CSV",
     "total_actions_30d": "Łączna liczba działań 30d"
   },
@@ -11147,11 +11147,11 @@
     "whitelisted_tenants_aria": "Najemcy na białej liście"
   },
   "impact_report_labels": {
-    "transactions": "Transactions",
+    "transactions": "Transakcje",
     "unique_givers": "Wyjątkowi Dawcy",
     "unique_receivers": "Wyjątkowi odbiorcy"
   },
-  "import": "Import",
+  "import": "Importuj",
   "legal_doc_form": {
     "back_to_documents": "Powrót do Dokumentów",
     "cancel": "Anuluj",
@@ -11211,7 +11211,7 @@
     "total_files": "Całkowita liczba plików",
     "total_size": "Całkowity rozmiar"
   },
-  "manage": "Manage",
+  "manage": "Zarządzaj",
   "match_detail": {
     "associated_listing": "Powiązane zestawienie",
     "category": "Kategoria",
@@ -11408,8 +11408,8 @@
   },
   "newsletter_send_time": {
     "engagement_heatmap": "Mapa cieplna zaangażowania",
-    "high": "High",
-    "low": "Low",
+    "high": "Wysoka",
+    "low": "Niski",
     "top_recommended": "Top Recommended",
     "day_friday": "piątek",
     "day_monday": "pon",
@@ -11441,7 +11441,7 @@
   "provider_health": {
     "aria_success_rate": "Wskaźnik sukcesu"
   },
-  "refresh": "Refresh",
+  "refresh": "Odśwież",
   "rte": {
     "block_quote": "Block Quote",
     "bold": "Odważne",
@@ -11476,7 +11476,7 @@
     "count_aria_label": "Liczba {{label}}",
     "data_types_heading": "Typy danych",
     "development_only": "Tylko rozwój",
-    "generate_button": "Generate",
+    "generate_button": "Wygeneruj",
     "warning_body": "Warning Body",
     "option_users_label": "Użytkownicy",
     "option_users_desc": "Wygeneruj przykładowe konta członkowskie",
@@ -11592,10 +11592,10 @@
     "data_table": "Dane",
     "total_count": "Łącznie{{count}}"
   },
-  "subtitle": "Subtitle",
+  "subtitle": "Podtytuł",
   "super_controls": {
     "bulk_operations": "Operacje zbiorcze",
-    "hierarchy": "Hierarchy"
+    "hierarchy": "Hierarchia"
   },
   "super_user_form": {
     "account_status": "Stan konta",
@@ -11914,7 +11914,7 @@
     "tab_inactive": "Nieaktywny",
     "view_hierarchy": "Zobacz hierarchię"
   },
-  "title": "Title",
+  "title": "Tytuł",
   "webp_converter": {
     "already_webp": "Już WebP",
     "pending_conversion": "Oczekująca konwersja",
@@ -11925,8 +11925,8 @@
   "label_pending_approvals": "Oczekujące zatwierdzenia",
   "label_retention_rate": "Wskaźnik retencji",
   "label_total_members": "Całkowita liczba członków",
-  "enabled": "Enabled",
-  "disabled": "Disabled",
+  "enabled": "Włączone",
+  "disabled": "Niepełnosprawny",
   "caring_community": {
     "meta": {
       "title": "Troskliwa społeczność",
@@ -13324,8 +13324,8 @@
   "panel": {
     "sidebar": {
       "items": {
-        "surveys": "Surveys",
-        "projects": "Projects",
+        "surveys": "Ankiety",
+        "projects": "Projekty",
         "trust_tier": "Poziom zaufania"
       }
     }
@@ -13912,7 +13912,7 @@
         "id": "ID",
         "proposals": "Propozycje",
         "started": "Rozpoczęło się",
-        "status": "Status",
+        "status": "Stan",
         "tokens": "Tokeny (wejście/wyjście)",
         "triggered": "Wyzwolono"
       },
@@ -14465,7 +14465,7 @@
         "ctr": "CTR",
         "id": "ID",
         "impressions": "Wrażenia",
-        "status": "Status"
+        "status": "Stan"
       },
       "empty": {
         "no_campaigns": "Nie znaleziono kampanii."
@@ -14992,7 +14992,7 @@
       "retention_sort": "Zatrzymanie <->",
       "retention_title": "% członków aktywnych zarówno w tym okresie, jak i w poprzednim równoważnym okresie",
       "sort_hint": "Kliknij kolumnę, aby posortować",
-      "status": "Status",
+      "status": "Stan",
       "super_admin_tenants": "Superadministrator -> Najemcy",
       "tandems_sort": "Tandemy <->",
       "tandems_title": "Powtarzające się pary pomocnika/odbiorcy z ponad 2 ukończonymi wymianami",
@@ -15155,7 +15155,7 @@
       "demo": "Demonstracja",
       "metric": "Metryczny",
       "row_actions": "Działania wierszowe",
-      "status": "Status",
+      "status": "Stan",
       "title": "Tytuł"
     },
     "toasts": {
@@ -15328,7 +15328,7 @@
       "owner_name_placeholder": "Imię i nazwisko kontaktu zewnętrznego",
       "sandbox_placeholder": "https://sandbox.partner.example",
       "sandbox_url": "Piaskownica URL",
-      "status": "Status"
+      "status": "Stan"
     },
     "empty": {
       "body": "Stwórz wyselekcjonowany zestaw dobrze znanych, zależnych od partnerów integracji (złożenie AHV, przekazanie Spitex, kantonalne źródło danych podstawowych, PostFinance, Twint, weryfikacja adresu pocztowego), aby operator platformy mógł śledzić właściciela, status DSA i gotowość piaskownicy.",
@@ -15356,7 +15356,7 @@
       "owner": "Właściciel",
       "row_actions": "Działania wierszowe",
       "sandbox": "Piaskownica",
-      "status": "Status",
+      "status": "Stan",
       "updated": "Zaktualizowano"
     },
     "toasts": {
@@ -15411,7 +15411,7 @@
       "slug": "Informacja o błędzie (generowana automatycznie, jeśli jest pusta)",
       "slug_description": "Identyfikator z małymi literami i łącznikami używany w URLs i filtrach.",
       "slug_placeholder": "np. Lozenhof",
-      "status": "Status",
+      "status": "Stan",
       "type": "Typ"
     },
     "meta": {
@@ -15434,7 +15434,7 @@
       "empty": "Nie ma jeszcze podregionów — dodaj jeden, aby rozpocząć geograficzną segmentację najemcy.",
       "name": "Nazwa",
       "postal_codes": "Kody pocztowe",
-      "status": "Status",
+      "status": "Stan",
       "type": "Typ"
     },
     "toasts": {
@@ -15528,7 +15528,7 @@
       "last_handshake": "Ostatni uścisk dłoni",
       "name": "Nazwa",
       "slug": "Ślimak",
-      "status": "Status"
+      "status": "Stan"
     },
     "toasts": {
       "copied": "Skopiowano do schowka.",
@@ -15633,7 +15633,7 @@
       "created": "Stworzony",
       "request": "Wniosek",
       "resolved": "Rozwiązany",
-      "status": "Status",
+      "status": "Stan",
       "turnaround": "Zwrot",
       "within": "W"
     },
@@ -15672,10 +15672,10 @@
       "created": "Stworzony",
       "hash": "Haszysz",
       "methodology": "Metodologia",
-      "partner": "Partner",
+      "partner": "Partnera",
       "period": "Okres",
       "rows": "Wydziwianie",
-      "status": "Status"
+      "status": "Stan"
     },
     "export_modal": {
       "active_partner": "Aktywny partner badawczy",
@@ -15698,7 +15698,7 @@
       "name": "Nazwa",
       "period_end": "Koniec okresu",
       "period_start": "Początek okresu",
-      "status": "Status"
+      "status": "Stan"
     },
     "meta": {
       "subtitle": "Zarządzaj partnerami badawczymi zapewniającymi ochronę prywatności, eksportem zbiorczych zbiorów danych i historią odwołań",
@@ -16313,7 +16313,7 @@
       "id": "ID",
       "identifier": "Identyfikator",
       "name": "Nazwa",
-      "status": "Status"
+      "status": "Stan"
     },
     "toasts": {
       "load_failed": "Nie udało się załadować raportu o jakości danych",
@@ -16344,7 +16344,7 @@
       "notes_description": "Kontekst, linki, odniesienia do umów lub elementy blokujące",
       "owner": "Właściciel",
       "owner_description": "Osoba lub organizacja odpowiedzialna za tę decyzję",
-      "status": "Status",
+      "status": "Stan",
       "url_placeholder": "https://...",
       "value": "Wartość"
     },
@@ -16520,7 +16520,7 @@
       "business": "Biznes",
       "investor": "Inwestor",
       "municipality": "Miasto",
-      "partner": "Partner",
+      "partner": "Partnera",
       "resident": "Rezydent"
     },
     "stages": {
@@ -16622,11 +16622,11 @@
     "tables": {
       "actions": "Działania",
       "modules": "Moduły",
-      "partner": "Partner",
+      "partner": "Partnera",
       "period_end": "Koniec okresu",
-      "plan": "Plan",
+      "plan": "Planuj",
       "price_per_month": "Cena / mc",
-      "status": "Status",
+      "status": "Stan",
       "subscriptions_aria": "Subskrypcje analiz regionalnych",
       "type": "Typ"
     },
@@ -16711,7 +16711,7 @@
     "table": {
       "score": "Wynik",
       "sent": "Wysłano",
-      "status": "Status",
+      "status": "Stan",
       "suggested_partner": "Sugerowany partner",
       "target": "Cel",
       "target_user": "Użytkownik docelowy"
@@ -16838,7 +16838,7 @@
   "newsletter_segments": {
     "col_created": "Stworzony",
     "col_members": "Członkowie",
-    "col_status": "Status",
+    "col_status": "Stan",
     "create_first_segment": "Utwórz swój pierwszy segment",
     "delete_confirm": "Usunąć segment „{{name}}”? Kampanie korzystające z niego nie będą już mogły kierować reklam do tej grupy odbiorców.",
     "delete_confirm_label": "Usuń segment",
@@ -16855,7 +16855,7 @@
     "category_saved": "Zapisano",
     "category_starter": "Rozrusznik",
     "col_created": "Stworzony",
-    "col_status": "Status",
+    "col_status": "Stan",
     "col_template_name": "Nazwa szablonu",
     "delete_confirm": "Usunąć szablon „{{name}}”? Tego nie można cofnąć.",
     "delete_confirm_label": "Usuń szablon",

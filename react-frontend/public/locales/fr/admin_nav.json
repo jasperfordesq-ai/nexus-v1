@@ -16,7 +16,7 @@
   "system": "Système",
   "partner_timebanks": "Banques de temps des partenaires",
   "super_admin": "Super administrateur",
-  "transactions": "Transactions",
+  "transactions": "Opérations",
   "events": "Événements",
   "groups": "Groupes",
   "organizations": "Organisations",
@@ -137,7 +137,7 @@
   "sections": {
     "content": "Contenu",
     "community": "Communauté",
-    "intelligence": "Intelligence",
+    "intelligence": "Renseignement",
     "engagement": "Fiançailles",
     "system": "Système"
   },

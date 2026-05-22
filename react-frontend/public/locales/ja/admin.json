@@ -1,7 +1,7 @@
 {
-  "active": "Active",
+  "active": "アクティブ",
   "activity": {
-    "card_title": "Activity",
+    "card_title": "アクティビティ",
     "empty": "アクティビティが見つかりませんでした",
     "view_all": "すべて見る"
   },
@@ -2157,7 +2157,7 @@
     "smart_match_users_title": "スマートマッチユーザー",
     "approval_rate_aria": "承認率:{{value}}%"
   },
-  "completed": "Completed",
+  "completed": "完了しました",
   "config": {
     "cache_cleared_successfully": "キャッシュが正常にクリアされました",
     "failed_to_clear_cache": "キャッシュのクリアに失敗しました",
@@ -3407,10 +3407,10 @@
     "status_cancelled": "キャンセル"
   },
   "data_table": {
-    "admin_data_table": "Data",
+    "admin_data_table": "データ",
     "no_data": "データなし",
-    "refresh": "Refresh",
-    "search": "Search"
+    "refresh": "リフレッシュ",
+    "search": "検索"
   },
   "deliverability": {
     "an_unexpected_error_occurred": "予期しないエラーが発生しました",
@@ -3490,7 +3490,7 @@
     "status_planned": "計画済み",
     "status_review": "レビュー中"
   },
-  "details": "Details",
+  "details": "詳細",
   "diagnostics": {
     "failed_to_diagnose_listing": "リスティングの診断に失敗しました",
     "failed_to_diagnose_user": "ユーザーの診断に失敗しました",
@@ -7036,7 +7036,7 @@
   },
   "placeholder": {
     "migration_description": "レガシーコンテンツを新しいシステムに移行する",
-    "migration_title": "Migration",
+    "migration_title": "移行",
     "open_legacy": "オープンレガシー"
   },
   "polls": {
@@ -7076,12 +7076,12 @@
   "quick_actions": {
     "advanced_controls": "高度なコントロール",
     "card_title": "クイックアクション",
-    "enterprise": "Enterprise",
-    "gamification": "Gamification",
+    "enterprise": "エンタープライズ",
+    "gamification": "ゲーミフィケーション",
     "manage_users": "ユーザーの管理",
     "new_blog_post": "新しいブログ投稿",
     "send_newsletter": "ニュースレターを送信する",
-    "settings": "Settings",
+    "settings": "設定",
     "view_listings": "リストを見る"
   },
   "reports": {
@@ -7364,7 +7364,7 @@
     "sort_order_placeholder": "0",
     "video_url_placeholder": "https://www.youtube.com/watch?v=..."
   },
-  "review": "Review",
+  "review": "レビュー",
   "safeguarding": {
     "active": "アクティブ",
     "active_options": "アクティブなオプション",
@@ -9333,7 +9333,7 @@
     "tab_reviewing": "レビュー中"
   },
   "trends": {
-    "card_title": "Trends",
+    "card_title": "トレンド",
     "hours_suffix": "hrs",
     "no_data": "利用可能なデータがありません"
   },
@@ -10718,8 +10718,8 @@
   "spam": {
     "title": "スパムの検出",
     "avg_score": "平均スコア",
-    "blocked_count": "Blocked",
-    "flagged_count": "Flagged",
+    "blocked_count": "ブロックされました",
+    "flagged_count": "フラグ付き",
     "total_analyzed": "分析合計"
   },
   "bulk": {
@@ -10968,11 +10968,11 @@
   "api_docs": {
     "aria_api_documentation_sections": "API ドキュメントのセクション",
     "aria_hmac_headers": "Hmac ヘッダー",
-    "aria_parameters": "Parameters",
+    "aria_parameters": "パラメータ",
     "aria_rate_limit_headers": "レート制限ヘッダー"
   },
   "aria": {
-    "breadcrumbs": "Breadcrumbs"
+    "breadcrumbs": "ブレッドクラム"
   },
   "badge_configuration": {
     "aria_badge_filter": "バッジフィルター",
@@ -11072,10 +11072,10 @@
     "select_all": "すべて選択",
     "select_tenants": "テナントの選択"
   },
-  "cancel": "Cancel",
+  "cancel": "キャンセル",
   "checking_permissions": "権限の確認",
-  "clear": "Clear",
-  "close": "Close",
+  "clear": "クリア",
+  "close": "閉じる",
   "common:nav": {
     "about": "について",
     "achievements": "業績",
@@ -11115,7 +11115,7 @@
   },
   "error_occurred": "発生したエラー",
   "federation_audit": {
-    "clear": "Clear",
+    "clear": "クリア",
     "export_csv": "CSVのエクスポート",
     "total_actions_30d": "合計アクション 30 日"
   },
@@ -11147,11 +11147,11 @@
     "whitelisted_tenants_aria": "ホワイトリストに登録されたテナント"
   },
   "impact_report_labels": {
-    "transactions": "Transactions",
+    "transactions": "取引",
     "unique_givers": "ユニークなギバー",
     "unique_receivers": "ユニークな受信機"
   },
-  "import": "Import",
+  "import": "インポート",
   "legal_doc_form": {
     "back_to_documents": "ドキュメントに戻る",
     "cancel": "キャンセル",
@@ -11211,7 +11211,7 @@
     "total_files": "総ファイル数",
     "total_size": "合計サイズ"
   },
-  "manage": "Manage",
+  "manage": "管理する",
   "match_detail": {
     "associated_listing": "関連リスト",
     "category": "カテゴリ",
@@ -11408,8 +11408,8 @@
   },
   "newsletter_send_time": {
     "engagement_heatmap": "エンゲージメントヒートマップ",
-    "high": "High",
-    "low": "Low",
+    "high": "高",
+    "low": "低い",
     "top_recommended": "Top Recommended",
     "day_friday": "金",
     "day_monday": "月",
@@ -11441,7 +11441,7 @@
   "provider_health": {
     "aria_success_rate": "成功率"
   },
-  "refresh": "Refresh",
+  "refresh": "リフレッシュ",
   "rte": {
     "block_quote": "Block Quote",
     "bold": "太字",
@@ -11476,7 +11476,7 @@
     "count_aria_label": "{{label}} ?",
     "data_types_heading": "データ型",
     "development_only": "開発のみ",
-    "generate_button": "Generate",
+    "generate_button": "生成する",
     "warning_body": "Warning Body",
     "option_users_label": "ユーザー",
     "option_users_desc": "サンプルメンバーアカウントを生成する",
@@ -11592,10 +11592,10 @@
     "data_table": "データ",
     "total_count": "{{count}}合計"
   },
-  "subtitle": "Subtitle",
+  "subtitle": "サブタイトル",
   "super_controls": {
     "bulk_operations": "一括操作",
-    "hierarchy": "Hierarchy"
+    "hierarchy": "階層"
   },
   "super_user_form": {
     "account_status": "アカウントのステータス",
@@ -11914,7 +11914,7 @@
     "tab_inactive": "非アクティブ",
     "view_hierarchy": "ビュー階層"
   },
-  "title": "Title",
+  "title": "タイトル",
   "webp_converter": {
     "already_webp": "すでにWebP",
     "pending_conversion": "変換保留中",
@@ -11925,8 +11925,8 @@
   "label_pending_approvals": "承認待ち",
   "label_retention_rate": "定着率",
   "label_total_members": "総会員数",
-  "enabled": "Enabled",
-  "disabled": "Disabled",
+  "enabled": "有効",
+  "disabled": "障害者",
   "caring_community": {
     "meta": {
       "title": "思いやりのあるコミュニティ",
@@ -13324,8 +13324,8 @@
   "panel": {
     "sidebar": {
       "items": {
-        "surveys": "Surveys",
-        "projects": "Projects",
+        "surveys": "アンケート",
+        "projects": "プロジェクト",
         "trust_tier": "トラスト層"
       }
     }

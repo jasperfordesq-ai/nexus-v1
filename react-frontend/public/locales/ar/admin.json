@@ -1,7 +1,7 @@
 {
-  "active": "Active",
+  "active": "نشيط",
   "activity": {
-    "card_title": "Activity",
+    "card_title": "نشاط",
     "empty": "لم يتم العثور على أي نشاط",
     "view_all": "عرض الكل"
   },
@@ -2157,7 +2157,7 @@
     "smart_match_users_title": "مستخدمو المطابقة الذكية",
     "approval_rate_aria": "معدل الموافقة:{{value}}%"
   },
-  "completed": "Completed",
+  "completed": "مكتمل",
   "config": {
     "cache_cleared_successfully": "تم مسح ذاكرة التخزين المؤقت بنجاح",
     "failed_to_clear_cache": "فشل في مسح ذاكرة التخزين المؤقت",
@@ -3407,10 +3407,10 @@
     "status_cancelled": "تم الإلغاء"
   },
   "data_table": {
-    "admin_data_table": "Data",
+    "admin_data_table": "بيانات",
     "no_data": "لا توجد بيانات",
-    "refresh": "Refresh",
-    "search": "Search"
+    "refresh": "ينعش",
+    "search": "يبحث"
   },
   "deliverability": {
     "an_unexpected_error_occurred": "حدث خطأ غير متوقع",
@@ -3490,7 +3490,7 @@
     "status_planned": "المخطط لها",
     "status_review": "قيد المراجعة"
   },
-  "details": "Details",
+  "details": "تفاصيل",
   "diagnostics": {
     "failed_to_diagnose_listing": "فشل في تشخيص القائمة",
     "failed_to_diagnose_user": "فشل في تشخيص المستخدم",
@@ -7036,7 +7036,7 @@
   },
   "placeholder": {
     "migration_description": "ترحيل المحتوى القديم إلى النظام الجديد",
-    "migration_title": "Migration",
+    "migration_title": "الهجرة",
     "open_legacy": "فتح تراث"
   },
   "polls": {
@@ -7076,12 +7076,12 @@
   "quick_actions": {
     "advanced_controls": "الضوابط المتقدمة",
     "card_title": "إجراءات سريعة",
-    "enterprise": "Enterprise",
-    "gamification": "Gamification",
+    "enterprise": "مَشرُوع",
+    "gamification": "التلعيب",
     "manage_users": "إدارة المستخدمين",
     "new_blog_post": "مشاركة مدونة جديدة",
     "send_newsletter": "إرسال النشرة الإخبارية",
-    "settings": "Settings",
+    "settings": "إعدادات",
     "view_listings": "عرض القوائم"
   },
   "reports": {
@@ -7364,7 +7364,7 @@
     "sort_order_placeholder": "0",
     "video_url_placeholder": "https://www.youtube.com/watch?v=..."
   },
-  "review": "Review",
+  "review": "مراجعة",
   "safeguarding": {
     "active": "نشيط",
     "active_options": "الخيارات النشطة",
@@ -9333,7 +9333,7 @@
     "tab_reviewing": "مراجعة"
   },
   "trends": {
-    "card_title": "Trends",
+    "card_title": "الاتجاهات",
     "hours_suffix": "hrs",
     "no_data": "لا توجد بيانات متاحة"
   },
@@ -10718,8 +10718,8 @@
   "spam": {
     "title": "كشف البريد العشوائي",
     "avg_score": "متوسط ​​النتيجة",
-    "blocked_count": "Blocked",
-    "flagged_count": "Flagged",
+    "blocked_count": "محظور",
+    "flagged_count": "تم وضع علامة عليها",
     "total_analyzed": "إجمالي التحليل"
   },
   "bulk": {
@@ -10968,11 +10968,11 @@
   "api_docs": {
     "aria_api_documentation_sections": "أقسام توثيق API",
     "aria_hmac_headers": "رؤوس هماك",
-    "aria_parameters": "Parameters",
+    "aria_parameters": "حدود",
     "aria_rate_limit_headers": "رؤوس حدود المعدل"
   },
   "aria": {
-    "breadcrumbs": "Breadcrumbs"
+    "breadcrumbs": "فتات الخبز"
   },
   "badge_configuration": {
     "aria_badge_filter": "مرشح الشارة",
@@ -11072,10 +11072,10 @@
     "select_all": "حدد الكل",
     "select_tenants": "حدد المستأجرين"
   },
-  "cancel": "Cancel",
+  "cancel": "يلغي",
   "checking_permissions": "التحقق من الأذونات",
-  "clear": "Clear",
-  "close": "Close",
+  "clear": "واضح",
+  "close": "يغلق",
   "common:nav": {
     "about": "عن",
     "achievements": "الإنجازات",
@@ -11115,7 +11115,7 @@
   },
   "error_occurred": "حدث خطأ",
   "federation_audit": {
-    "clear": "Clear",
+    "clear": "واضح",
     "export_csv": "تصدير CSV",
     "total_actions_30d": "إجمالي الإجراءات 30 د"
   },
@@ -11147,11 +11147,11 @@
     "whitelisted_tenants_aria": "المستأجرين المدرجين في القائمة البيضاء"
   },
   "impact_report_labels": {
-    "transactions": "Transactions",
+    "transactions": "المعاملات",
     "unique_givers": "المانحون الفريدون",
     "unique_receivers": "أجهزة الاستقبال الفريدة"
   },
-  "import": "Import",
+  "import": "يستورد",
   "legal_doc_form": {
     "back_to_documents": "العودة إلى المستندات",
     "cancel": "يلغي",
@@ -11211,7 +11211,7 @@
     "total_files": "إجمالي الملفات",
     "total_size": "الحجم الإجمالي"
   },
-  "manage": "Manage",
+  "manage": "يدير",
   "match_detail": {
     "associated_listing": "القائمة المرتبطة",
     "category": "فئة",
@@ -11408,8 +11408,8 @@
   },
   "newsletter_send_time": {
     "engagement_heatmap": "خريطة الحرارة للمشاركة",
-    "high": "High",
-    "low": "Low",
+    "high": "عالي",
+    "low": "قليل",
     "top_recommended": "Top Recommended",
     "day_friday": "الجمعة",
     "day_monday": "الاثنين",
@@ -11441,7 +11441,7 @@
   "provider_health": {
     "aria_success_rate": "معدل النجاح"
   },
-  "refresh": "Refresh",
+  "refresh": "ينعش",
   "rte": {
     "block_quote": "Block Quote",
     "bold": "عريض",
@@ -11476,7 +11476,7 @@
     "count_aria_label": "??? {{label}}",
     "data_types_heading": "أنواع البيانات",
     "development_only": "التطوير فقط",
-    "generate_button": "Generate",
+    "generate_button": "يولد",
     "warning_body": "Warning Body",
     "option_users_label": "المستخدمين",
     "option_users_desc": "إنشاء نماذج حسابات الأعضاء",
@@ -11592,10 +11592,10 @@
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
   },
-  "subtitle": "Subtitle",
+  "subtitle": "الترجمة",
   "super_controls": {
     "bulk_operations": "العمليات السائبة",
-    "hierarchy": "Hierarchy"
+    "hierarchy": "تَسَلسُل"
   },
   "super_user_form": {
     "account_status": "حالة الحساب",
@@ -11914,7 +11914,7 @@
     "tab_inactive": "غير نشط",
     "view_hierarchy": "عرض التسلسل الهرمي"
   },
-  "title": "Title",
+  "title": "عنوان",
   "webp_converter": {
     "already_webp": "بالفعل WebP",
     "pending_conversion": "في انتظار التحويل",
@@ -11925,8 +11925,8 @@
   "label_pending_approvals": "الموافقات المعلقة",
   "label_retention_rate": "معدل الاحتفاظ",
   "label_total_members": "إجمالي الأعضاء",
-  "enabled": "Enabled",
-  "disabled": "Disabled",
+  "enabled": "ممكّن",
+  "disabled": "عاجز",
   "caring_community": {
     "meta": {
       "title": "مجتمع الرعاية",
@@ -13324,8 +13324,8 @@
   "panel": {
     "sidebar": {
       "items": {
-        "surveys": "Surveys",
-        "projects": "Projects",
+        "surveys": "المسوحات",
+        "projects": "المشاريع",
         "trust_tier": "طبقة الثقة"
       }
     }

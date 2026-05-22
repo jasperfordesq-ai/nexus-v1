@@ -1,7 +1,7 @@
 {
-  "active": "Active",
+  "active": "Ativo",
   "activity": {
-    "card_title": "Activity",
+    "card_title": "Atividade",
     "empty": "Nenhuma atividade encontrada",
     "view_all": "Ver tudo"
   },
@@ -2087,7 +2087,7 @@
     "planned": "Planejado",
     "refresh": "Atualizar",
     "unexpected_error": "Erro inesperado",
-    "unfeature": "Unfeature",
+    "unfeature": "Desapresentar",
     "actions": "Ações",
     "active": "Ativo",
     "all": "Todos",
@@ -2096,8 +2096,8 @@
     "clear_filters": "Limpar filtros",
     "clear_selection": "Limpar seleção",
     "close": "Fechar",
-    "collapse": "Collapse",
-    "confirm": "Confirm",
+    "collapse": "Recolher",
+    "confirm": "Confirmar",
     "create": "Criar",
     "declined": "Recusado",
     "download": "Baixar",
@@ -2157,7 +2157,7 @@
     "smart_match_users_title": "Usuários de correspondência inteligente",
     "approval_rate_aria": "Taxa de aprovação:{{value}}%"
   },
-  "completed": "Completed",
+  "completed": "Concluído",
   "config": {
     "cache_cleared_successfully": "Cache limpo com sucesso",
     "failed_to_clear_cache": "Falha ao limpar o cache",
@@ -3407,10 +3407,10 @@
     "status_cancelled": "Cancelado"
   },
   "data_table": {
-    "admin_data_table": "Data",
+    "admin_data_table": "Dados",
     "no_data": "Sem dados",
-    "refresh": "Refresh",
-    "search": "Search"
+    "refresh": "Atualizar",
+    "search": "Pesquisar"
   },
   "deliverability": {
     "an_unexpected_error_occurred": "Ocorreu um erro inesperado",
@@ -3490,7 +3490,7 @@
     "status_planned": "Planejado",
     "status_review": "Em revisão"
   },
-  "details": "Details",
+  "details": "Detalhes",
   "diagnostics": {
     "failed_to_diagnose_listing": "Falha ao diagnosticar listagem",
     "failed_to_diagnose_user": "Falha ao diagnosticar o usuário",
@@ -7036,7 +7036,7 @@
   },
   "placeholder": {
     "migration_description": "Migrando conteúdo legado para o novo sistema",
-    "migration_title": "Migration",
+    "migration_title": "Migração",
     "open_legacy": "Legado aberto"
   },
   "polls": {
@@ -7076,12 +7076,12 @@
   "quick_actions": {
     "advanced_controls": "Controles Avançados",
     "card_title": "Ações rápidas",
-    "enterprise": "Enterprise",
-    "gamification": "Gamification",
+    "enterprise": "Empresa",
+    "gamification": "Gamificação",
     "manage_users": "Gerenciar usuários",
     "new_blog_post": "Nova postagem no blog",
     "send_newsletter": "Enviar boletim informativo",
-    "settings": "Settings",
+    "settings": "Configurações",
     "view_listings": "Ver listagens"
   },
   "reports": {
@@ -7364,7 +7364,7 @@
     "sort_order_placeholder": "0",
     "video_url_placeholder": "https://www.youtube.com/watch?v=..."
   },
-  "review": "Review",
+  "review": "Revisão",
   "safeguarding": {
     "active": "Ativo",
     "active_options": "Opções ativas",
@@ -9333,7 +9333,7 @@
     "tab_reviewing": "Revendo"
   },
   "trends": {
-    "card_title": "Trends",
+    "card_title": "Tendências",
     "hours_suffix": "hrs",
     "no_data": "Não há dados disponíveis"
   },
@@ -9547,7 +9547,7 @@
       "profile_type": "Tipo de perfil",
       "reason": "Razão",
       "role": "Papel",
-      "status": "Status",
+      "status": "Estado",
       "tagline": "Slogan",
       "tenant_super_admin": "Superadministrador do locatário"
     },
@@ -10718,8 +10718,8 @@
   "spam": {
     "title": "Detecção de Spam",
     "avg_score": "Pontuação média",
-    "blocked_count": "Blocked",
-    "flagged_count": "Flagged",
+    "blocked_count": "Bloqueado",
+    "flagged_count": "Sinalizado",
     "total_analyzed": "Total Analisado"
   },
   "bulk": {
@@ -10968,11 +10968,11 @@
   "api_docs": {
     "aria_api_documentation_sections": "Seções de documentação da API",
     "aria_hmac_headers": "Cabeçalhos Hmac",
-    "aria_parameters": "Parameters",
+    "aria_parameters": "Parâmetros",
     "aria_rate_limit_headers": "Cabeçalhos de limite de taxa"
   },
   "aria": {
-    "breadcrumbs": "Breadcrumbs"
+    "breadcrumbs": "Pão ralado"
   },
   "badge_configuration": {
     "aria_badge_filter": "Filtro de emblema",
@@ -11072,10 +11072,10 @@
     "select_all": "Selecionar tudo",
     "select_tenants": "Selecione inquilinos"
   },
-  "cancel": "Cancel",
+  "cancel": "Cancelar",
   "checking_permissions": "Verificando permissões",
-  "clear": "Clear",
-  "close": "Close",
+  "clear": "Limpar",
+  "close": "Fechar",
   "common:nav": {
     "about": "Sobre",
     "achievements": "Conquistas",
@@ -11115,7 +11115,7 @@
   },
   "error_occurred": "Ocorreu um erro",
   "federation_audit": {
-    "clear": "Clear",
+    "clear": "Limpar",
     "export_csv": "Exportar CSV",
     "total_actions_30d": "Total de ações 30d"
   },
@@ -11147,11 +11147,11 @@
     "whitelisted_tenants_aria": "Inquilinos na lista de permissões"
   },
   "impact_report_labels": {
-    "transactions": "Transactions",
+    "transactions": "Transações",
     "unique_givers": "Doadores Únicos",
     "unique_receivers": "Receptores exclusivos"
   },
-  "import": "Import",
+  "import": "Importar",
   "legal_doc_form": {
     "back_to_documents": "Voltar para Documentos",
     "cancel": "Cancelar",
@@ -11211,7 +11211,7 @@
     "total_files": "Total de arquivos",
     "total_size": "Tamanho total"
   },
-  "manage": "Manage",
+  "manage": "Gerenciar",
   "match_detail": {
     "associated_listing": "Listagem Associada",
     "category": "Categoria",
@@ -11408,8 +11408,8 @@
   },
   "newsletter_send_time": {
     "engagement_heatmap": "Mapa de calor de engajamento",
-    "high": "High",
-    "low": "Low",
+    "high": "Alto",
+    "low": "Baixo",
     "top_recommended": "Top Recommended",
     "day_friday": "sex",
     "day_monday": "seg",
@@ -11441,7 +11441,7 @@
   "provider_health": {
     "aria_success_rate": "Taxa de sucesso"
   },
-  "refresh": "Refresh",
+  "refresh": "Atualizar",
   "rte": {
     "block_quote": "Block Quote",
     "bold": "Ousado",
@@ -11476,7 +11476,7 @@
     "count_aria_label": "Contagem de {{label}}",
     "data_types_heading": "Tipos de dados",
     "development_only": "Apenas desenvolvimento",
-    "generate_button": "Generate",
+    "generate_button": "Gerar",
     "warning_body": "Warning Body",
     "option_users_label": "Usuários",
     "option_users_desc": "Gerar exemplos de contas-membro",
@@ -11592,10 +11592,10 @@
     "data_table": "Dados",
     "total_count": "{{count}}total"
   },
-  "subtitle": "Subtitle",
+  "subtitle": "Legenda",
   "super_controls": {
     "bulk_operations": "Operações em massa",
-    "hierarchy": "Hierarchy"
+    "hierarchy": "Hierarquia"
   },
   "super_user_form": {
     "account_status": "Status da conta",
@@ -11914,7 +11914,7 @@
     "tab_inactive": "Inativo",
     "view_hierarchy": "Ver hierarquia"
   },
-  "title": "Title",
+  "title": "Título",
   "webp_converter": {
     "already_webp": "Já WebP",
     "pending_conversion": "Conversão pendente",
@@ -11925,8 +11925,8 @@
   "label_pending_approvals": "Aprovações pendentes",
   "label_retention_rate": "Taxa de retenção",
   "label_total_members": "Total de membros",
-  "enabled": "Enabled",
-  "disabled": "Disabled",
+  "enabled": "Habilitado",
+  "disabled": "Desativado",
   "caring_community": {
     "meta": {
       "title": "Comunidade atenciosa",
@@ -13324,8 +13324,8 @@
   "panel": {
     "sidebar": {
       "items": {
-        "surveys": "Surveys",
-        "projects": "Projects",
+        "surveys": "Pesquisas",
+        "projects": "Projetos",
         "trust_tier": "Nível de confiança"
       }
     }
@@ -13912,7 +13912,7 @@
         "id": "ID",
         "proposals": "Propostas",
         "started": "Iniciado",
-        "status": "Status",
+        "status": "Estado",
         "tokens": "Tokens (entrada/saída)",
         "triggered": "Provocado"
       },
@@ -14465,7 +14465,7 @@
         "ctr": "CTR",
         "id": "ID",
         "impressions": "Impressões",
-        "status": "Status"
+        "status": "Estado"
       },
       "empty": {
         "no_campaigns": "Nenhuma campanha encontrada."
@@ -14992,7 +14992,7 @@
       "retention_sort": "Retenção <->",
       "retention_title": "% de membros ativos neste período e no período equivalente anterior",
       "sort_hint": "Clique em uma coluna para classificar",
-      "status": "Status",
+      "status": "Estado",
       "super_admin_tenants": "Superadministrador -> Locatários",
       "tandems_sort": "Conjuntos <->",
       "tandems_title": "Pares recorrentes de ajudante/destinatário com mais de 2 trocas concluídas",
@@ -15145,7 +15145,7 @@
     "status": {
       "demo": "Demonstração",
       "published": "Publicado",
-      "real": "Real",
+      "real": "Verdadeiro",
       "unpublished": "Não publicado"
     },
     "table": {
@@ -15155,7 +15155,7 @@
       "demo": "Demonstração",
       "metric": "Métrica",
       "row_actions": "Ações de linha",
-      "status": "Status",
+      "status": "Estado",
       "title": "Título"
     },
     "toasts": {
@@ -15328,7 +15328,7 @@
       "owner_name_placeholder": "Nome completo do contato externo",
       "sandbox_placeholder": "https://sandbox.partner.example",
       "sandbox_url": "Caixa de areia URL",
-      "status": "Status"
+      "status": "Estado"
     },
     "empty": {
       "body": "Propague um conjunto selecionado de integrações bem conhecidas dependentes de parceiros (envio AHV, transferência Spitex, feed de dados mestre cantonal, PostFinance, Twint, verificação de endereço postal) para que o operador da plataforma possa rastrear o proprietário, o status DSA e a prontidão do sandbox.",
@@ -15356,7 +15356,7 @@
       "owner": "Proprietário",
       "row_actions": "Ações de linha",
       "sandbox": "Caixa de areia",
-      "status": "Status",
+      "status": "Estado",
       "updated": "Atualizado"
     },
     "toasts": {
@@ -15411,7 +15411,7 @@
       "slug": "Slug (gerado automaticamente se estiver em branco)",
       "slug_description": "Identificador hifenizado em letras minúsculas usado em URLs e filtros.",
       "slug_placeholder": "por exemplo Lorzenhof",
-      "status": "Status",
+      "status": "Estado",
       "type": "Tipo"
     },
     "meta": {
@@ -15434,7 +15434,7 @@
       "empty": "Ainda não há sub-regiões. Adicione uma para começar a segmentar geograficamente seu locatário.",
       "name": "Nome",
       "postal_codes": "Códigos postais",
-      "status": "Status",
+      "status": "Estado",
       "type": "Tipo"
     },
     "toasts": {
@@ -15528,7 +15528,7 @@
       "last_handshake": "Último aperto de mão",
       "name": "Nome",
       "slug": "Lesma",
-      "status": "Status"
+      "status": "Estado"
     },
     "toasts": {
       "copied": "Copiado para a área de transferência.",
@@ -15633,7 +15633,7 @@
       "created": "Criado",
       "request": "Solicitar",
       "resolved": "Resolvido",
-      "status": "Status",
+      "status": "Estado",
       "turnaround": "Inversão de marcha",
       "within": "Dentro de"
     },
@@ -15675,7 +15675,7 @@
       "partner": "Parceiro",
       "period": "Período",
       "rows": "Linhas",
-      "status": "Status"
+      "status": "Estado"
     },
     "export_modal": {
       "active_partner": "Parceiro de pesquisa ativo",
@@ -15698,7 +15698,7 @@
       "name": "Nome",
       "period_end": "Fim do período",
       "period_start": "Início do período",
-      "status": "Status"
+      "status": "Estado"
     },
     "meta": {
       "subtitle": "Gerencie parceiros de pesquisa com privacidade segura, agregue exportações de conjuntos de dados e histórico de revogação",
@@ -16313,7 +16313,7 @@
       "id": "ID",
       "identifier": "Identificador",
       "name": "Nome",
-      "status": "Status"
+      "status": "Estado"
     },
     "toasts": {
       "load_failed": "Falha ao carregar o relatório de qualidade de dados",
@@ -16344,7 +16344,7 @@
       "notes_description": "Contexto, links, referências de contrato ou bloqueadores",
       "owner": "Proprietário",
       "owner_description": "Pessoa ou organização responsável por esta decisão",
-      "status": "Status",
+      "status": "Estado",
       "url_placeholder": "https://...",
       "value": "Valor"
     },
@@ -16626,7 +16626,7 @@
       "period_end": "Fim do período",
       "plan": "Plano",
       "price_per_month": "Preço / mês",
-      "status": "Status",
+      "status": "Estado",
       "subscriptions_aria": "Assinaturas de análises regionais",
       "type": "Tipo"
     },
@@ -16711,7 +16711,7 @@
     "table": {
       "score": "Pontuação",
       "sent": "Enviado",
-      "status": "Status",
+      "status": "Estado",
       "suggested_partner": "Parceiro sugerido",
       "target": "Alvo",
       "target_user": "Usuário alvo"
@@ -16838,7 +16838,7 @@
   "newsletter_segments": {
     "col_created": "Criado",
     "col_members": "Membros",
-    "col_status": "Status",
+    "col_status": "Estado",
     "create_first_segment": "Crie seu primeiro segmento",
     "delete_confirm": "Excluir o segmento \"{{name}}\"? As campanhas que o utilizam não poderão mais atingir esse público.",
     "delete_confirm_label": "Excluir segmento",
@@ -16855,7 +16855,7 @@
     "category_saved": "Salvo",
     "category_starter": "Iniciante",
     "col_created": "Criado",
-    "col_status": "Status",
+    "col_status": "Estado",
     "col_template_name": "Nome do modelo",
     "delete_confirm": "Excluir o modelo \"{{name}}\"? Isto não pode ser desfeito.",
     "delete_confirm_label": "Excluir modelo",

@@ -1,7 +1,7 @@
 {
-  "active": "Active",
+  "active": "Gníomhach",
   "activity": {
-    "card_title": "Activity",
+    "card_title": "Gníomhaíocht",
     "empty": "Níor aimsíodh aon ghníomhaíocht",
     "view_all": "Féach ar Uile"
   },
@@ -2157,7 +2157,7 @@
     "smart_match_users_title": "Úsáideoirí Cliste Meaitseála",
     "approval_rate_aria": "Ráta ceadaithe:{{value}}%"
   },
-  "completed": "Completed",
+  "completed": "Críochnaithe",
   "config": {
     "cache_cleared_successfully": "Glanadh an taisce go rathúil",
     "failed_to_clear_cache": "Theip ar an taisce a ghlanadh",
@@ -3407,10 +3407,10 @@
     "status_cancelled": "Ar ceal"
   },
   "data_table": {
-    "admin_data_table": "Data",
+    "admin_data_table": "Sonraí",
     "no_data": "Gan sonraí",
-    "refresh": "Refresh",
-    "search": "Search"
+    "refresh": "Athnuaigh",
+    "search": "Cuardach"
   },
   "deliverability": {
     "an_unexpected_error_occurred": "Tharla earráid gan choinne",
@@ -3490,7 +3490,7 @@
     "status_planned": "Pleanáilte",
     "status_review": "In Léirmheas"
   },
-  "details": "Details",
+  "details": "Sonraí",
   "diagnostics": {
     "failed_to_diagnose_listing": "Theip ar dhiagnóiseadh liostú",
     "failed_to_diagnose_user": "Theip ar dhiagnóiseadh an úsáideora",
@@ -7036,7 +7036,7 @@
   },
   "placeholder": {
     "migration_description": "Ábhar oidhreachta a aistriú chuig an gcóras nua",
-    "migration_title": "Migration",
+    "migration_title": "Imirce",
     "open_legacy": "Oidhreacht Oscailte"
   },
   "polls": {
@@ -7076,12 +7076,12 @@
   "quick_actions": {
     "advanced_controls": "Ard-rialuithe",
     "card_title": "Gníomhartha Tapa",
-    "enterprise": "Enterprise",
-    "gamification": "Gamification",
+    "enterprise": "Fiontar",
+    "gamification": "Cearrbhachas",
     "manage_users": "Bainistigh Úsáideoirí",
     "new_blog_post": "Blagphost Nua",
     "send_newsletter": "Seol Nuachtlitir",
-    "settings": "Settings",
+    "settings": "Socruithe",
     "view_listings": "Féach ar Liostaí"
   },
   "reports": {
@@ -7364,7 +7364,7 @@
     "sort_order_placeholder": "0",
     "video_url_placeholder": "https://www.youtube.com/watch?v=..."
   },
-  "review": "Review",
+  "review": "Léirmheas",
   "safeguarding": {
     "active": "Gníomhach",
     "active_options": "Roghanna Gníomhacha",
@@ -9333,7 +9333,7 @@
     "tab_reviewing": "Athbhreithniú"
   },
   "trends": {
-    "card_title": "Trends",
+    "card_title": "Treochtaí",
     "hours_suffix": "hrs",
     "no_data": "Níl aon sonraí ar fáil"
   },
@@ -10718,8 +10718,8 @@
   "spam": {
     "title": "Brath Turscar",
     "avg_score": "Meán Scór",
-    "blocked_count": "Blocked",
-    "flagged_count": "Flagged",
+    "blocked_count": "bactha",
+    "flagged_count": "Bratach",
     "total_analyzed": "Iomlán Anailísithe"
   },
   "bulk": {
@@ -10968,11 +10968,11 @@
   "api_docs": {
     "aria_api_documentation_sections": "Rannóga Doiciméadúcháin API",
     "aria_hmac_headers": "Ceanntásca Hmac",
-    "aria_parameters": "Parameters",
+    "aria_parameters": "Paraiméadair",
     "aria_rate_limit_headers": "Ceanntásca Teorainn Rátaí"
   },
   "aria": {
-    "breadcrumbs": "Breadcrumbs"
+    "breadcrumbs": "Brioscáin aráin"
   },
   "badge_configuration": {
     "aria_badge_filter": "Scagaire Suaitheantais",
@@ -11072,10 +11072,10 @@
     "select_all": "Roghnaigh Uile",
     "select_tenants": "Roghnaigh Tionóntaí"
   },
-  "cancel": "Cancel",
+  "cancel": "Cealaigh",
   "checking_permissions": "Ceadanna á Seiceáil",
-  "clear": "Clear",
-  "close": "Close",
+  "clear": "Glan",
+  "close": "Dún",
   "common:nav": {
     "about": "Maidir",
     "achievements": "Éachtaí",
@@ -11115,7 +11115,7 @@
   },
   "error_occurred": "Tharla earráid",
   "federation_audit": {
-    "clear": "Clear",
+    "clear": "Glan",
     "export_csv": "Easpórtáil CSV",
     "total_actions_30d": "Gníomhartha Iomlána 30d"
   },
@@ -11147,11 +11147,11 @@
     "whitelisted_tenants_aria": "Tionóntaí ar an liosta bán"
   },
   "impact_report_labels": {
-    "transactions": "Transactions",
+    "transactions": "Idirbhearta",
     "unique_givers": "Tabhartóirí Uathúla",
     "unique_receivers": "Glacadóirí Uathúla"
   },
-  "import": "Import",
+  "import": "Iompórtáil",
   "legal_doc_form": {
     "back_to_documents": "Ar ais go Doiciméid",
     "cancel": "Cealaigh",
@@ -11211,7 +11211,7 @@
     "total_files": "Comhaid Iomlán",
     "total_size": "Méid Iomlán"
   },
-  "manage": "Manage",
+  "manage": "Bainistigh",
   "match_detail": {
     "associated_listing": "Liostú Gaolmhar",
     "category": "Catagóir",
@@ -11408,8 +11408,8 @@
   },
   "newsletter_send_time": {
     "engagement_heatmap": "Léarscáil Teasa Rannpháirtíochta",
-    "high": "High",
-    "low": "Low",
+    "high": "Ard",
+    "low": "Íseal",
     "top_recommended": "Top Recommended",
     "day_friday": "Aoine",
     "day_monday": "Mon",
@@ -11441,7 +11441,7 @@
   "provider_health": {
     "aria_success_rate": "Ráta Ratha"
   },
-  "refresh": "Refresh",
+  "refresh": "Athnuaigh",
   "rte": {
     "block_quote": "Block Quote",
     "bold": "Trom",
@@ -11476,7 +11476,7 @@
     "count_aria_label": "L?on {{label}}",
     "data_types_heading": "Cineálacha Sonraí",
     "development_only": "Forbairt Amháin",
-    "generate_button": "Generate",
+    "generate_button": "Gin",
     "warning_body": "Warning Body",
     "option_users_label": "Úsáideoirí",
     "option_users_desc": "Gin cuntais bhall samplach",
@@ -11592,10 +11592,10 @@
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
   },
-  "subtitle": "Subtitle",
+  "subtitle": "Fotheideal",
   "super_controls": {
     "bulk_operations": "Oibríochtaí Bulc",
-    "hierarchy": "Hierarchy"
+    "hierarchy": "Ordlathas"
   },
   "super_user_form": {
     "account_status": "Stádas Cuntais",
@@ -11914,7 +11914,7 @@
     "tab_inactive": "Neamhghníomhach",
     "view_hierarchy": "Amharc ar an Ordlathas"
   },
-  "title": "Title",
+  "title": "Teideal",
   "webp_converter": {
     "already_webp": "WebP cheana féin",
     "pending_conversion": "Tiontú ar Feitheamh",
@@ -11925,8 +11925,8 @@
   "label_pending_approvals": "Ceaduithe ar Feitheamh",
   "label_retention_rate": "Ráta Coinneála",
   "label_total_members": "Iomlán na mBall",
-  "enabled": "Enabled",
-  "disabled": "Disabled",
+  "enabled": "Cumasaithe",
+  "disabled": "faoi mhíchumas",
   "caring_community": {
     "meta": {
       "title": "Pobal Cúramach",
@@ -13324,8 +13324,8 @@
   "panel": {
     "sidebar": {
       "items": {
-        "surveys": "Surveys",
-        "projects": "Projects",
+        "surveys": "Suirbhéanna",
+        "projects": "Tionscadail",
         "trust_tier": "Sraith Iontaobhais"
       }
     }

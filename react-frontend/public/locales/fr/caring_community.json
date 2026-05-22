@@ -121,7 +121,7 @@
     "filter_verein": "Associations",
     "filter_volunteer": "Bénévoles",
     "verified_badge": "Vérifié",
-    "contact": "Contact",
+    "contact": "Contacter",
     "website": "Site web",
     "call_aria": "Fournisseur d'appel chez{{phone}}",
     "email_aria": "Fournisseur de messagerie chez{{email}}",
@@ -137,7 +137,7 @@
   "emergency_alert": {
     "region_label": "Alertes d'urgence",
     "dismiss": "Fermer",
-    "severity_info": "Information",
+    "severity_info": "Informations",
     "severity_warning": "Avertissement",
     "severity_danger": "Urgence"
   },

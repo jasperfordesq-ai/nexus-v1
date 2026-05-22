@@ -117,7 +117,7 @@
     "card_title": "Estado del sistema",
     "details": "Detalles",
     "database": "Base de datos",
-    "cache": "Cache",
+    "cache": "caché",
     "queue": "Trabajos cronificados",
     "api": "API de correo electrónico"
   }

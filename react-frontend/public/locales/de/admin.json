@@ -1,7 +1,7 @@
 {
-  "active": "Active",
+  "active": "Aktiv",
   "activity": {
-    "card_title": "Activity",
+    "card_title": "Aktivität",
     "empty": "Keine Aktivität gefunden",
     "view_all": "Alle anzeigen"
   },
@@ -2157,7 +2157,7 @@
     "smart_match_users_title": "Smart Match-Benutzer",
     "approval_rate_aria": "Genehmigungsrate:{{value}}%"
   },
-  "completed": "Completed",
+  "completed": "Abgeschlossen",
   "config": {
     "cache_cleared_successfully": "Cache erfolgreich geleert",
     "failed_to_clear_cache": "Cache konnte nicht geleert werden",
@@ -3407,10 +3407,10 @@
     "status_cancelled": "Abgesagt"
   },
   "data_table": {
-    "admin_data_table": "Data",
+    "admin_data_table": "Daten",
     "no_data": "Keine Daten",
-    "refresh": "Refresh",
-    "search": "Search"
+    "refresh": "Aktualisieren",
+    "search": "Suchen"
   },
   "deliverability": {
     "an_unexpected_error_occurred": "Es ist ein unerwarteter Fehler aufgetreten",
@@ -7076,12 +7076,12 @@
   "quick_actions": {
     "advanced_controls": "Erweiterte Steuerelemente",
     "card_title": "Schnelle Aktionen",
-    "enterprise": "Enterprise",
-    "gamification": "Gamification",
+    "enterprise": "Unternehmen",
+    "gamification": "Gamifizierung",
     "manage_users": "Benutzer verwalten",
     "new_blog_post": "Neuer Blogbeitrag",
     "send_newsletter": "Newsletter versenden",
-    "settings": "Settings",
+    "settings": "Einstellungen",
     "view_listings": "Einträge anzeigen"
   },
   "reports": {
@@ -7364,7 +7364,7 @@
     "sort_order_placeholder": "0",
     "video_url_placeholder": "https://www.youtube.com/watch?v=..."
   },
-  "review": "Review",
+  "review": "Rezension",
   "safeguarding": {
     "active": "Aktiv",
     "active_options": "Aktive Optionen",
@@ -10718,8 +10718,8 @@
   "spam": {
     "title": "Spam-Erkennung",
     "avg_score": "Durchschnittlicher Wert",
-    "blocked_count": "Blocked",
-    "flagged_count": "Flagged",
+    "blocked_count": "Blockiert",
+    "flagged_count": "Gekennzeichnet",
     "total_analyzed": "Insgesamt analysiert"
   },
   "bulk": {
@@ -10968,11 +10968,11 @@
   "api_docs": {
     "aria_api_documentation_sections": "API-Dokumentationsabschnitte",
     "aria_hmac_headers": "Hmac-Header",
-    "aria_parameters": "Parameters",
+    "aria_parameters": "Parameter",
     "aria_rate_limit_headers": "Rate-Limit-Header"
   },
   "aria": {
-    "breadcrumbs": "Breadcrumbs"
+    "breadcrumbs": "Semmelbrösel"
   },
   "badge_configuration": {
     "aria_badge_filter": "Abzeichenfilter",
@@ -11072,10 +11072,10 @@
     "select_all": "Wählen Sie „Alle“ aus",
     "select_tenants": "Wählen Sie Mieter aus"
   },
-  "cancel": "Cancel",
+  "cancel": "Abbrechen",
   "checking_permissions": "Berechtigungen prüfen",
-  "clear": "Clear",
-  "close": "Close",
+  "clear": "Klar",
+  "close": "Schließen",
   "common:nav": {
     "about": "Über",
     "achievements": "Erfolge",
@@ -11115,7 +11115,7 @@
   },
   "error_occurred": "Es ist ein Fehler aufgetreten",
   "federation_audit": {
-    "clear": "Clear",
+    "clear": "Klar",
     "export_csv": "CSV exportieren",
     "total_actions_30d": "Gesamtaktionen 30 Tage"
   },
@@ -11147,11 +11147,11 @@
     "whitelisted_tenants_aria": "Mieter auf der Whitelist"
   },
   "impact_report_labels": {
-    "transactions": "Transactions",
+    "transactions": "Transaktionen",
     "unique_givers": "Einzigartige Geber",
     "unique_receivers": "Einzigartige Empfänger"
   },
-  "import": "Import",
+  "import": "Importieren",
   "legal_doc_form": {
     "back_to_documents": "Zurück zu Dokumenten",
     "cancel": "Abbrechen",
@@ -11211,7 +11211,7 @@
     "total_files": "Gesamtdateien",
     "total_size": "Gesamtgröße"
   },
-  "manage": "Manage",
+  "manage": "Verwalten",
   "match_detail": {
     "associated_listing": "Zugehöriger Eintrag",
     "category": "Kategorie",
@@ -11408,8 +11408,8 @@
   },
   "newsletter_send_time": {
     "engagement_heatmap": "Engagement-Heatmap",
-    "high": "High",
-    "low": "Low",
+    "high": "Hoch",
+    "low": "Niedrig",
     "top_recommended": "Top Recommended",
     "day_friday": "Fr",
     "day_monday": "Mo",
@@ -11441,7 +11441,7 @@
   "provider_health": {
     "aria_success_rate": "Erfolgsquote"
   },
-  "refresh": "Refresh",
+  "refresh": "Aktualisieren",
   "rte": {
     "block_quote": "Block Quote",
     "bold": "Fett",
@@ -11476,7 +11476,7 @@
     "count_aria_label": "Anzahl {{label}}",
     "data_types_heading": "Datentypen",
     "development_only": "Nur Entwicklung",
-    "generate_button": "Generate",
+    "generate_button": "Generieren",
     "warning_body": "Warning Body",
     "option_users_label": "Benutzer",
     "option_users_desc": "Generieren Sie Beispiel-Mitgliedskonten",
@@ -11592,10 +11592,10 @@
     "data_table": "Daten",
     "total_count": "{{count}}insgesamt"
   },
-  "subtitle": "Subtitle",
+  "subtitle": "Untertitel",
   "super_controls": {
     "bulk_operations": "Massenoperationen",
-    "hierarchy": "Hierarchy"
+    "hierarchy": "Hierarchie"
   },
   "super_user_form": {
     "account_status": "Kontostatus",
@@ -11914,7 +11914,7 @@
     "tab_inactive": "Inaktiv",
     "view_hierarchy": "Hierarchie anzeigen"
   },
-  "title": "Title",
+  "title": "Titel",
   "webp_converter": {
     "already_webp": "Bereits WebP",
     "pending_conversion": "Ausstehende Konvertierung",
@@ -11925,8 +11925,8 @@
   "label_pending_approvals": "Ausstehende Genehmigungen",
   "label_retention_rate": "Retentionsrate",
   "label_total_members": "Gesamtzahl der Mitglieder",
-  "enabled": "Enabled",
-  "disabled": "Disabled",
+  "enabled": "Aktiviert",
+  "disabled": "Deaktiviert",
   "caring_community": {
     "meta": {
       "title": "Fürsorgliche Gemeinschaft",
@@ -13324,8 +13324,8 @@
   "panel": {
     "sidebar": {
       "items": {
-        "surveys": "Surveys",
-        "projects": "Projects",
+        "surveys": "Umfragen",
+        "projects": "Projekte",
         "trust_tier": "Vertrauensstufe"
       }
     }
@@ -15145,7 +15145,7 @@
     "status": {
       "demo": "Demo",
       "published": "Veröffentlicht",
-      "real": "Real",
+      "real": "Echt",
       "unpublished": "Unveröffentlicht"
     },
     "table": {
@@ -15342,7 +15342,7 @@
     "statuses": {
       "blocked": "Blockiert",
       "deprecated": "Veraltet",
-      "live": "Live",
+      "live": "Lebe",
       "proposed": "Vorgeschlagen",
       "sandbox": "Sandkasten",
       "scoping": "Scoping"
@@ -15753,7 +15753,7 @@
       "title": "Über diese Seite"
     },
     "actions": {
-      "export": "Export",
+      "export": "Exportieren",
       "export_markdown": "Exportieren als Markdown",
       "refresh_aria": "Aktualisieren Sie die Karte der Handelsgrenzen",
       "refresh_data": "Daten aktualisieren",
@@ -15928,7 +15928,7 @@
     },
     "stages": {
       "dormant": "Ruhend",
-      "live": "Live",
+      "live": "Lebe",
       "new": "Neu",
       "pilot_agreed": "Pilot stimmte zu",
       "proposal_sent": "Vorschlag gesendet",
@@ -15947,7 +15947,7 @@
     },
     "timestamps": {
       "agreed": "Vereinbart",
-      "live": "Live",
+      "live": "Lebe",
       "proposal": "Vorschlag",
       "submitted": "Eingereicht"
     },
@@ -16289,7 +16289,7 @@
     },
     "severity": {
       "danger": "Gefahr",
-      "info": "Info",
+      "info": "Infos",
       "ok": "OK",
       "warning": "Warnung"
     },
@@ -16609,7 +16609,7 @@
       "sme_partner": "SME Partner"
     },
     "plan_tiers": {
-      "basic": "Basic",
+      "basic": "Einfach",
       "enterprise": "Unternehmen",
       "pro": "Profi"
     },

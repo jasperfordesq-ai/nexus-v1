@@ -13,7 +13,7 @@
   "advanced": "Zaawansowany",
   "financial": "Budżetowy",
   "enterprise": "Przedsiębiorstwo",
-  "system": "System",
+  "system": "Systemu",
   "partner_timebanks": "Partnerskie banki czasu",
   "super_admin": "Superadministrator",
   "transactions": "Transakcje",
@@ -139,7 +139,7 @@
     "community": "Wspólnota",
     "intelligence": "Inteligencja",
     "engagement": "Zaręczyny",
-    "system": "System"
+    "system": "Systemu"
   },
   "sidebar": {
     "admin": "Administrator",

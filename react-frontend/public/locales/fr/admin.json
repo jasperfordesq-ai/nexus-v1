@@ -1,7 +1,7 @@
 {
-  "active": "Active",
+  "active": "Actif",
   "activity": {
-    "card_title": "Activity",
+    "card_title": "Activité",
     "empty": "Aucune activité trouvée",
     "view_all": "Tout afficher"
   },
@@ -2157,7 +2157,7 @@
     "smart_match_users_title": "Utilisateurs Smart Match",
     "approval_rate_aria": "Taux d'approbation:{{value}}%"
   },
-  "completed": "Completed",
+  "completed": "Terminé",
   "config": {
     "cache_cleared_successfully": "Cache vidé avec succès",
     "failed_to_clear_cache": "Échec de la suppression du cache",
@@ -3407,10 +3407,10 @@
     "status_cancelled": "Annulé"
   },
   "data_table": {
-    "admin_data_table": "Data",
+    "admin_data_table": "Données",
     "no_data": "Aucune donnée",
-    "refresh": "Refresh",
-    "search": "Search"
+    "refresh": "Actualiser",
+    "search": "Rechercher"
   },
   "deliverability": {
     "an_unexpected_error_occurred": "Une erreur inattendue s'est produite",
@@ -3490,7 +3490,7 @@
     "status_planned": "Prévu",
     "status_review": "En revue"
   },
-  "details": "Details",
+  "details": "Détails",
   "diagnostics": {
     "failed_to_diagnose_listing": "Échec du diagnostic de la fiche",
     "failed_to_diagnose_user": "Échec du diagnostic de l'utilisateur",
@@ -7036,7 +7036,7 @@
   },
   "placeholder": {
     "migration_description": "Migration du contenu existant vers le nouveau système",
-    "migration_title": "Migration",
+    "migration_title": "Migrations",
     "open_legacy": "Ouvrir l'héritage"
   },
   "polls": {
@@ -7076,12 +7076,12 @@
   "quick_actions": {
     "advanced_controls": "Contrôles avancés",
     "card_title": "Actions rapides",
-    "enterprise": "Enterprise",
+    "enterprise": "Entreprise",
     "gamification": "Gamification",
     "manage_users": "Gérer les utilisateurs",
     "new_blog_post": "Nouvel article de blog",
     "send_newsletter": "Envoyer la newsletter",
-    "settings": "Settings",
+    "settings": "Paramètres",
     "view_listings": "Voir les annonces"
   },
   "reports": {
@@ -7364,7 +7364,7 @@
     "sort_order_placeholder": "0",
     "video_url_placeholder": "https://www.youtube.com/watch?v=..."
   },
-  "review": "Review",
+  "review": "Examen",
   "safeguarding": {
     "active": "Actif",
     "active_options": "Options actives",
@@ -9333,7 +9333,7 @@
     "tab_reviewing": "Révision"
   },
   "trends": {
-    "card_title": "Trends",
+    "card_title": "Tendances",
     "hours_suffix": "hrs",
     "no_data": "Aucune donnée disponible"
   },
@@ -10718,8 +10718,8 @@
   "spam": {
     "title": "Détection du spam",
     "avg_score": "Score moyen",
-    "blocked_count": "Blocked",
-    "flagged_count": "Flagged",
+    "blocked_count": "Bloqué",
+    "flagged_count": "Marqué",
     "total_analyzed": "Total analysé"
   },
   "bulk": {
@@ -10968,11 +10968,11 @@
   "api_docs": {
     "aria_api_documentation_sections": "Sections de documentation de l'API",
     "aria_hmac_headers": "En-têtes Hmac",
-    "aria_parameters": "Parameters",
+    "aria_parameters": "Paramètres",
     "aria_rate_limit_headers": "En-têtes de limite de débit"
   },
   "aria": {
-    "breadcrumbs": "Breadcrumbs"
+    "breadcrumbs": "Fil d'Ariane"
   },
   "badge_configuration": {
     "aria_badge_filter": "Filtre de badges",
@@ -11072,10 +11072,10 @@
     "select_all": "Sélectionner tout",
     "select_tenants": "Sélectionnez les locataires"
   },
-  "cancel": "Cancel",
+  "cancel": "Annuler",
   "checking_permissions": "Vérification des autorisations",
-  "clear": "Clear",
-  "close": "Close",
+  "clear": "Effacer",
+  "close": "Fermer",
   "common:nav": {
     "about": "À propos",
     "achievements": "Réalisations",
@@ -11115,7 +11115,7 @@
   },
   "error_occurred": "Erreur survenue",
   "federation_audit": {
-    "clear": "Clear",
+    "clear": "Effacer",
     "export_csv": "Exporter au format CSV",
     "total_actions_30d": "Total des actions 30j"
   },
@@ -11147,11 +11147,11 @@
     "whitelisted_tenants_aria": "Locataires sur liste blanche"
   },
   "impact_report_labels": {
-    "transactions": "Transactions",
+    "transactions": "Opérations",
     "unique_givers": "Donateurs uniques",
     "unique_receivers": "Récepteurs uniques"
   },
-  "import": "Import",
+  "import": "Importer",
   "legal_doc_form": {
     "back_to_documents": "Retour aux documents",
     "cancel": "Annuler",
@@ -11211,7 +11211,7 @@
     "total_files": "Total des fichiers",
     "total_size": "Taille totale"
   },
-  "manage": "Manage",
+  "manage": "Gérer",
   "match_detail": {
     "associated_listing": "Annonce associée",
     "category": "Catégorie",
@@ -11408,8 +11408,8 @@
   },
   "newsletter_send_time": {
     "engagement_heatmap": "Carte thermique d'engagement",
-    "high": "High",
-    "low": "Low",
+    "high": "Élevé",
+    "low": "Faible",
     "top_recommended": "Top Recommended",
     "day_friday": "Ven",
     "day_monday": "Lun",
@@ -11441,7 +11441,7 @@
   "provider_health": {
     "aria_success_rate": "Taux de réussite"
   },
-  "refresh": "Refresh",
+  "refresh": "Actualiser",
   "rte": {
     "block_quote": "Block Quote",
     "bold": "Audacieux",
@@ -11476,13 +11476,13 @@
     "count_aria_label": "Nombre de {{label}}",
     "data_types_heading": "Types de données",
     "development_only": "Développement uniquement",
-    "generate_button": "Generate",
+    "generate_button": "Générer",
     "warning_body": "Warning Body",
     "option_users_label": "Utilisateurs",
     "option_users_desc": "Générer des exemples de comptes de membres",
     "option_listings_label": "Annonces",
     "option_listings_desc": "Générer des exemples d'offres et de demandes",
-    "option_transactions_label": "Transactions",
+    "option_transactions_label": "Opérations",
     "option_transactions_desc": "Générer des exemples de transactions de crédit-temps",
     "option_feed_posts_label": "Publications dans le fil",
     "option_feed_posts_desc": "Générer des exemples de publications dans le fil de la communauté",
@@ -11592,10 +11592,10 @@
     "data_table": "Données",
     "total_count": "{{count}}total"
   },
-  "subtitle": "Subtitle",
+  "subtitle": "Sous-titre",
   "super_controls": {
     "bulk_operations": "Opérations groupées",
-    "hierarchy": "Hierarchy"
+    "hierarchy": "Hiérarchie"
   },
   "super_user_form": {
     "account_status": "Statut du compte",
@@ -11914,7 +11914,7 @@
     "tab_inactive": "Inactif",
     "view_hierarchy": "Afficher la hiérarchie"
   },
-  "title": "Title",
+  "title": "Titre",
   "webp_converter": {
     "already_webp": "Déjà WebP",
     "pending_conversion": "En attente de conversion",
@@ -11925,8 +11925,8 @@
   "label_pending_approvals": "Approbations en attente",
   "label_retention_rate": "Taux de rétention",
   "label_total_members": "Nombre total de membres",
-  "enabled": "Enabled",
-  "disabled": "Disabled",
+  "enabled": "Activé",
+  "disabled": "Désactivé",
   "caring_community": {
     "meta": {
       "title": "Communauté bienveillante",
@@ -13324,8 +13324,8 @@
   "panel": {
     "sidebar": {
       "items": {
-        "surveys": "Surveys",
-        "projects": "Projects",
+        "surveys": "Enquêtes",
+        "projects": "Projets",
         "trust_tier": "Niveau de confiance"
       }
     }
@@ -14494,7 +14494,7 @@
       "fields": {
         "audience_filters": "Filtres d'audience (JSON, en option)",
         "end_date": "Date de fin",
-        "placement": "Placement",
+        "placement": "Emplacement",
         "start_date": "Date de début",
         "total_budget_cents": "Budget total (en centimes)"
       },
@@ -14872,7 +14872,7 @@
       "value": "-"
     },
     "form": {
-      "description": "Description",
+      "description": "Descriptif",
       "features": "Touches de fonctionnalité (séparées par des virgules)",
       "features_description": "par ex. badge_vérifié, correspondance_priorité, recherche_avancée, ad_free",
       "name": "Nom",
@@ -15296,7 +15296,7 @@
       "municipal_data": "Données municipales",
       "other": "Autre",
       "payment": "Paiement",
-      "postal": "Postal",
+      "postal": "Poste",
       "professional_care": "Soins professionnels"
     },
     "delete_modal": {
@@ -15399,7 +15399,7 @@
     "form": {
       "centre_latitude": "Latitude centrale",
       "centre_longitude": "Longitude du centre",
-      "description": "Description",
+      "description": "Descriptif",
       "description_placeholder": "Brève description de cette zone...",
       "latitude_placeholder": "47.1758",
       "longitude_placeholder": "8.4622",
@@ -15693,7 +15693,7 @@
       "contact_email": "E-mail de contact",
       "dataset_scope": "Portée de l'ensemble de données",
       "dataset_scope_description": "Clés d'ensemble de données séparées par des virgules.",
-      "institution": "Institution",
+      "institution": "Établissement",
       "methodology_url": "Méthodologie URL",
       "name": "Nom",
       "period_end": "Fin de période",
@@ -15772,7 +15772,7 @@
     "export": {
       "agpl_module": "Module AGPL",
       "capability": "Capacité",
-      "classification": "Classification",
+      "classification": "Classement",
       "default": "Défaut",
       "generated": "Généré {{date}} à partir du panneau d'administration NEXUS.",
       "last_updated": "Dernière mise à jour: {{date}}",
@@ -15895,7 +15895,7 @@
     },
     "fields": {
       "budget": "Budget",
-      "contact": "Contact",
+      "contact": "Contacter",
       "cooperative": "Coopérative",
       "country_region": "Pays/Région",
       "existing_digital_tool": "Outil numérique existant",
@@ -16253,7 +16253,7 @@
       "aria": "Coefficients de substitution de catégorie",
       "category": "Catégorie",
       "coefficient": "Coefficient",
-      "source": "Source"
+      "source": "Origine"
     },
     "toasts": {
       "invalid_number": "Le coefficient doit être un nombre",
@@ -16545,7 +16545,7 @@
       "name_email": "Nom/E-mail",
       "organisation": "Organisation",
       "segment": "Segment",
-      "source": "Source",
+      "source": "Origine",
       "stage": "Scène"
     },
     "toasts": {
@@ -16624,7 +16624,7 @@
       "modules": "Modules",
       "partner": "Partenaire",
       "period_end": "Fin de période",
-      "plan": "Plan",
+      "plan": "Planifier",
       "price_per_month": "Prix ​​/ mois",
       "status": "Statut",
       "subscriptions_aria": "Abonnements aux analyses régionales",

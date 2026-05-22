@@ -1,7 +1,7 @@
 {
-  "active": "Active",
+  "active": "Actief",
   "activity": {
-    "card_title": "Activity",
+    "card_title": "Activiteit",
     "empty": "Geen activiteit gevonden",
     "view_all": "Bekijk alles"
   },
@@ -2096,7 +2096,7 @@
     "clear_filters": "Filters wissen",
     "clear_selection": "Selectie wissen",
     "close": "Sluiten",
-    "collapse": "Collapse",
+    "collapse": "Samenvouwen",
     "confirm": "Bevestig",
     "create": "Creëer",
     "declined": "Geweigerd",
@@ -2157,7 +2157,7 @@
     "smart_match_users_title": "Smart Match-gebruikers",
     "approval_rate_aria": "Goedkeuringspercentage:{{value}}%"
   },
-  "completed": "Completed",
+  "completed": "Voltooid",
   "config": {
     "cache_cleared_successfully": "Cache is succesvol gewist",
     "failed_to_clear_cache": "Kan de cache niet wissen",
@@ -3407,10 +3407,10 @@
     "status_cancelled": "Geannuleerd"
   },
   "data_table": {
-    "admin_data_table": "Data",
+    "admin_data_table": "Gegevens",
     "no_data": "Geen gegevens",
-    "refresh": "Refresh",
-    "search": "Search"
+    "refresh": "Vernieuwen",
+    "search": "Zoeken"
   },
   "deliverability": {
     "an_unexpected_error_occurred": "Er is een onverwachte fout opgetreden",
@@ -5820,7 +5820,7 @@
     "choose_icon_placeholder": "Zoek naar een pictogram...",
     "clear_icon": "Duidelijk pictogram",
     "search_icons": "Zoek iconen",
-    "label": "Icon",
+    "label": "Icoon",
     "no_icons_found": "Geen iconen gevonden die overeenkomen met \"{{search}}\"",
     "search_for_icon": "Zoek naar een pictogram..."
   },
@@ -7036,7 +7036,7 @@
   },
   "placeholder": {
     "migration_description": "Verouderde inhoud migreren naar het nieuwe systeem",
-    "migration_title": "Migration",
+    "migration_title": "Migratie",
     "open_legacy": "Open erfenis"
   },
   "polls": {
@@ -7076,12 +7076,12 @@
   "quick_actions": {
     "advanced_controls": "Geavanceerde bedieningselementen",
     "card_title": "Snelle acties",
-    "enterprise": "Enterprise",
-    "gamification": "Gamification",
+    "enterprise": "Onderneming",
+    "gamification": "Gamificatie",
     "manage_users": "Beheer gebruikers",
     "new_blog_post": "Nieuwe blogpost",
     "send_newsletter": "Nieuwsbrief versturen",
-    "settings": "Settings",
+    "settings": "Instellingen",
     "view_listings": "Bekijk aanbiedingen"
   },
   "reports": {
@@ -7364,7 +7364,7 @@
     "sort_order_placeholder": "0",
     "video_url_placeholder": "https://www.youtube.com/watch?v=..."
   },
-  "review": "Review",
+  "review": "Beoordeling",
   "safeguarding": {
     "active": "Actief",
     "active_options": "Actieve opties",
@@ -9533,7 +9533,7 @@
     "fields": {
       "amount": "Hoeveelheid",
       "balance": "Evenwicht",
-      "bio": "Bio",
+      "bio": "Biografie",
       "current_balance": "Huidig ​​saldo",
       "email": "E-mail",
       "first_name": "Voornaam",
@@ -10718,8 +10718,8 @@
   "spam": {
     "title": "Spamdetectie",
     "avg_score": "Gem. score",
-    "blocked_count": "Blocked",
-    "flagged_count": "Flagged",
+    "blocked_count": "Geblokkeerd",
+    "flagged_count": "Gemarkeerd",
     "total_analyzed": "Totaal geanalyseerd"
   },
   "bulk": {
@@ -10972,7 +10972,7 @@
     "aria_rate_limit_headers": "Kopteksten voor tarieflimieten"
   },
   "aria": {
-    "breadcrumbs": "Breadcrumbs"
+    "breadcrumbs": "Broodkruimels"
   },
   "badge_configuration": {
     "aria_badge_filter": "Badgefilter",
@@ -11072,10 +11072,10 @@
     "select_all": "Selecteer Alles",
     "select_tenants": "Selecteer Huurders"
   },
-  "cancel": "Cancel",
+  "cancel": "Annuleer",
   "checking_permissions": "Machtigingen controleren",
-  "clear": "Clear",
-  "close": "Close",
+  "clear": "Duidelijk",
+  "close": "Sluiten",
   "common:nav": {
     "about": "Over",
     "achievements": "Prestaties",
@@ -11115,7 +11115,7 @@
   },
   "error_occurred": "Er is een fout opgetreden",
   "federation_audit": {
-    "clear": "Clear",
+    "clear": "Duidelijk",
     "export_csv": "CSV exporteren",
     "total_actions_30d": "Totaal aantal acties 30d"
   },
@@ -11147,11 +11147,11 @@
     "whitelisted_tenants_aria": "Witte lijst huurders"
   },
   "impact_report_labels": {
-    "transactions": "Transactions",
+    "transactions": "Transacties",
     "unique_givers": "Unieke gevers",
     "unique_receivers": "Unieke ontvangers"
   },
-  "import": "Import",
+  "import": "Importeren",
   "legal_doc_form": {
     "back_to_documents": "Terug naar Documenten",
     "cancel": "Annuleer",
@@ -11211,7 +11211,7 @@
     "total_files": "Totaal aantal bestanden",
     "total_size": "Totale grootte"
   },
-  "manage": "Manage",
+  "manage": "Beheer",
   "match_detail": {
     "associated_listing": "Bijbehorende vermelding",
     "category": "Categorie",
@@ -11408,8 +11408,8 @@
   },
   "newsletter_send_time": {
     "engagement_heatmap": "Betrokkenheidshittekaart",
-    "high": "High",
-    "low": "Low",
+    "high": "Hoog",
+    "low": "Laag",
     "top_recommended": "Top Recommended",
     "day_friday": "Vr",
     "day_monday": "ma",
@@ -11441,7 +11441,7 @@
   "provider_health": {
     "aria_success_rate": "Succespercentage"
   },
-  "refresh": "Refresh",
+  "refresh": "Vernieuwen",
   "rte": {
     "block_quote": "Block Quote",
     "bold": "Vet",
@@ -11476,7 +11476,7 @@
     "count_aria_label": "Aantal {{label}}",
     "data_types_heading": "Gegevenstypen",
     "development_only": "Alleen ontwikkeling",
-    "generate_button": "Generate",
+    "generate_button": "Genereer",
     "warning_body": "Warning Body",
     "option_users_label": "Gebruikers",
     "option_users_desc": "Genereer voorbeeldlidaccounts",
@@ -11592,10 +11592,10 @@
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
   },
-  "subtitle": "Subtitle",
+  "subtitle": "Ondertitel",
   "super_controls": {
     "bulk_operations": "Bulkoperaties",
-    "hierarchy": "Hierarchy"
+    "hierarchy": "Hiërarchie"
   },
   "super_user_form": {
     "account_status": "Accountstatus",
@@ -11914,7 +11914,7 @@
     "tab_inactive": "Inactief",
     "view_hierarchy": "Hiërarchie bekijken"
   },
-  "title": "Title",
+  "title": "Titel",
   "webp_converter": {
     "already_webp": "Al WebP",
     "pending_conversion": "Conversie in behandeling",
@@ -11925,8 +11925,8 @@
   "label_pending_approvals": "In afwachting van goedkeuringen",
   "label_retention_rate": "Retentiepercentage",
   "label_total_members": "Totaal aantal leden",
-  "enabled": "Enabled",
-  "disabled": "Disabled",
+  "enabled": "Ingeschakeld",
+  "disabled": "Uitgeschakeld",
   "caring_community": {
     "meta": {
       "title": "Zorgzame gemeenschap",
@@ -13324,8 +13324,8 @@
   "panel": {
     "sidebar": {
       "items": {
-        "surveys": "Surveys",
-        "projects": "Projects",
+        "surveys": "Enquêtes",
+        "projects": "Projecten",
         "trust_tier": "Vertrouwensniveau"
       }
     }
@@ -14473,7 +14473,7 @@
       "fields": {
         "advertiser_type": "Type adverteerder",
         "campaign_name": "Campagnenaam",
-        "type": "Type"
+        "type": "Typ"
       }
     },
     "ad": {
@@ -15282,7 +15282,7 @@
       "create": "Creëer integratie",
       "delete": "Verwijderen",
       "edit": "Bewerking",
-      "open": "Open",
+      "open": "Openen",
       "refresh": "Vernieuwen",
       "remove": "Verwijderen",
       "save_changes": "Wijzigingen opslaan",
@@ -15342,7 +15342,7 @@
     "statuses": {
       "blocked": "Geblokkeerd",
       "deprecated": "Afgekeurd",
-      "live": "Live",
+      "live": "Leef",
       "proposed": "Voorgesteld",
       "sandbox": "Zandbak",
       "scoping": "Scoring"
@@ -15412,7 +15412,7 @@
       "slug_description": "Identificatie met koppelteken in kleine letters, gebruikt in URLs en filters.",
       "slug_placeholder": "bijv. lorzenhof",
       "status": "Status",
-      "type": "Type"
+      "type": "Typ"
     },
     "meta": {
       "page_title": "Subregio's - Beheerder",
@@ -15435,7 +15435,7 @@
       "name": "Naam",
       "postal_codes": "Postcodes",
       "status": "Status",
-      "type": "Type"
+      "type": "Typ"
     },
     "toasts": {
       "created": "Subregio is succesvol aangemaakt.",
@@ -15658,7 +15658,7 @@
       "download_markdown": "Markdown downloaden",
       "generate": "Genereer",
       "generate_export": "Exporteren genereren",
-      "open": "Open",
+      "open": "Openen",
       "refresh": "Vernieuwen",
       "refresh_aria": "Onderzoekspartnerschappen vernieuwen",
       "render": "Veroorzaken",
@@ -15895,7 +15895,7 @@
     },
     "fields": {
       "budget": "Begroting",
-      "contact": "Contact",
+      "contact": "Contacteer",
       "cooperative": "Coöperatief",
       "country_region": "Land/regio",
       "existing_digital_tool": "Bestaande digitale tool",
@@ -15928,7 +15928,7 @@
     },
     "stages": {
       "dormant": "Slaperig",
-      "live": "Live",
+      "live": "Leef",
       "new": "Nieuw",
       "pilot_agreed": "Piloot akkoord",
       "proposal_sent": "Voorstel verzonden",
@@ -15947,7 +15947,7 @@
     },
     "timestamps": {
       "agreed": "Overeengekomen",
-      "live": "Live",
+      "live": "Leef",
       "proposal": "Voorstel",
       "submitted": "Ingediend"
     },
@@ -15984,7 +15984,7 @@
       "cancel": "Annuleren",
       "confirm_launch": "Ja, start de pilot",
       "launch_pilot": "Lancering piloot",
-      "open": "Open",
+      "open": "Openen",
       "refresh": "Vernieuwen",
       "refresh_aria": "Vernieuw het lanceringsgereedheidsrapport",
       "retry": "Opnieuw proberen"
@@ -16093,12 +16093,12 @@
     },
     "baselines": {
       "captured": "Gevangen",
-      "label": "Label",
+      "label": "Etiket",
       "notes": "Opmerkingen",
       "period": "Periode",
       "pre_pilot": "Pre-piloot",
       "quarterly": "Driemaandelijks",
-      "type": "Type"
+      "type": "Typ"
     },
     "currency": {
       "chf": "CHF"
@@ -16458,7 +16458,7 @@
       "active_relationships": "Actieve relaties",
       "aria": "KPI Basislijnen",
       "captured": "Gevangen",
-      "label": "Label",
+      "label": "Etiket",
       "members": "Leden",
       "total_exchanges": "Totaal aantal uitwisselingen",
       "volunteer_hours": "Vrijwilligersuren"
@@ -16502,7 +16502,7 @@
     "filters": {
       "all_segments": "Alle segmenten",
       "all_stages": "Alle fasen",
-      "segment": "Segment",
+      "segment": "Segmenteren",
       "segment_description": "gemeente: lokaal bestuur; investeerder: financier; zakelijk: sponsoring; ingezetene: individu; partner: NGO/goed doel.",
       "stage": "Fase",
       "title": "Filters"
@@ -16544,7 +16544,7 @@
       "follow_up": "Vervolg",
       "name_email": "Naam / E-mail",
       "organisation": "Organisatie",
-      "segment": "Segment",
+      "segment": "Segmenteren",
       "source": "Bron",
       "stage": "Fase"
     },
@@ -16624,11 +16624,11 @@
       "modules": "Modules",
       "partner": "Partner",
       "period_end": "Einde periode",
-      "plan": "Plan",
+      "plan": "Plannen",
       "price_per_month": "Prijs / ma",
       "status": "Status",
       "subscriptions_aria": "Abonnementen op regionale analyses",
-      "type": "Type"
+      "type": "Typ"
     },
     "toasts": {
       "create_failed": "Maken mislukt",
@@ -16776,7 +16776,7 @@
     "col_date": "Datum",
     "col_reason": "Reden",
     "col_suppressed_at": "Onderdrukt bij",
-    "col_type": "Type",
+    "col_type": "Typ",
     "description": "Bekijk teruggestuurde e-mails, ontdek bezorgpatronen en beheer de onderdrukkingslijst.",
     "email_unsuppressed": "E-mail verwijderd van de onderdrukkingslijst.",
     "failed_to_unsuppress_email": "Het is niet gelukt om de onderdrukking van deze e-mail op te heffen.",
@@ -16853,7 +16853,7 @@
   "newsletter_templates": {
     "category_custom": "Aangepast",
     "category_saved": "Opgeslagen",
-    "category_starter": "Starter",
+    "category_starter": "Voorgerecht",
     "col_created": "Gemaakt",
     "col_status": "Status",
     "col_template_name": "Sjabloonnaam",

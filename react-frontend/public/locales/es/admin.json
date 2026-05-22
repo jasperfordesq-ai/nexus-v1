@@ -1,7 +1,7 @@
 {
-  "active": "Active",
+  "active": "Activo",
   "activity": {
-    "card_title": "Activity",
+    "card_title": "Actividad",
     "empty": "No se encontró actividad",
     "view_all": "Ver todo"
   },
@@ -2157,7 +2157,7 @@
     "smart_match_users_title": "Usuarios de coincidencias inteligentes",
     "approval_rate_aria": "Tasa de aprobación:{{value}}%"
   },
-  "completed": "Completed",
+  "completed": "Completado",
   "config": {
     "cache_cleared_successfully": "Caché borrado exitosamente",
     "failed_to_clear_cache": "No se pudo borrar el caché",
@@ -3407,10 +3407,10 @@
     "status_cancelled": "Cancelado"
   },
   "data_table": {
-    "admin_data_table": "Data",
+    "admin_data_table": "Datos",
     "no_data": "Sin datos",
-    "refresh": "Refresh",
-    "search": "Search"
+    "refresh": "Actualizar",
+    "search": "Buscar"
   },
   "deliverability": {
     "an_unexpected_error_occurred": "Ocurrió un error inesperado",
@@ -3490,7 +3490,7 @@
     "status_planned": "Planificado",
     "status_review": "En revisión"
   },
-  "details": "Details",
+  "details": "Detalles",
   "diagnostics": {
     "failed_to_diagnose_listing": "No se pudo diagnosticar el listado",
     "failed_to_diagnose_user": "No se pudo diagnosticar al usuario",
@@ -7036,7 +7036,7 @@
   },
   "placeholder": {
     "migration_description": "Migrar contenido heredado al nuevo sistema",
-    "migration_title": "Migration",
+    "migration_title": "Migración",
     "open_legacy": "Legado abierto"
   },
   "polls": {
@@ -7076,12 +7076,12 @@
   "quick_actions": {
     "advanced_controls": "Controles avanzados",
     "card_title": "Acciones rápidas",
-    "enterprise": "Enterprise",
-    "gamification": "Gamification",
+    "enterprise": "Empresa",
+    "gamification": "Gamificación",
     "manage_users": "Administrar usuarios",
     "new_blog_post": "Nueva publicación de blog",
     "send_newsletter": "Enviar boletín",
-    "settings": "Settings",
+    "settings": "Configuración",
     "view_listings": "Ver listados"
   },
   "reports": {
@@ -7364,7 +7364,7 @@
     "sort_order_placeholder": "0",
     "video_url_placeholder": "https://www.youtube.com/watch?v=..."
   },
-  "review": "Review",
+  "review": "Revisión",
   "safeguarding": {
     "active": "Activo",
     "active_options": "Opciones activas",
@@ -9333,7 +9333,7 @@
     "tab_reviewing": "Revisando"
   },
   "trends": {
-    "card_title": "Trends",
+    "card_title": "Tendencias",
     "hours_suffix": "hrs",
     "no_data": "No hay datos disponibles"
   },
@@ -9532,7 +9532,7 @@
     },
     "fields": {
       "amount": "Cantidad",
-      "balance": "Balance",
+      "balance": "Saldo",
       "bio": "Biografía",
       "current_balance": "Saldo actual",
       "email": "Correo electrónico",
@@ -9546,7 +9546,7 @@
       "platform_wide_access": "Acceso a toda la plataforma",
       "profile_type": "Tipo de perfil",
       "reason": "Razón",
-      "role": "Role",
+      "role": "Rol",
       "status": "Estado",
       "tagline": "Lema",
       "tenant_super_admin": "Superadministrador de inquilinos"
@@ -9591,7 +9591,7 @@
       "tagline": "Por ejemplo, voluntario comunitario..."
     },
     "profile_types": {
-      "individual": "Individual",
+      "individual": "individuo",
       "organisation": "Organización"
     },
     "roles": {
@@ -10718,8 +10718,8 @@
   "spam": {
     "title": "Detección de spam",
     "avg_score": "Puntuación promedio",
-    "blocked_count": "Blocked",
-    "flagged_count": "Flagged",
+    "blocked_count": "Bloqueado",
+    "flagged_count": "Marcado",
     "total_analyzed": "Total analizado"
   },
   "bulk": {
@@ -10968,11 +10968,11 @@
   "api_docs": {
     "aria_api_documentation_sections": "Secciones de documentación API",
     "aria_hmac_headers": "Encabezados Hmac",
-    "aria_parameters": "Parameters",
+    "aria_parameters": "Parámetros",
     "aria_rate_limit_headers": "Encabezados de límite de tasa"
   },
   "aria": {
-    "breadcrumbs": "Breadcrumbs"
+    "breadcrumbs": "Pan rallado"
   },
   "badge_configuration": {
     "aria_badge_filter": "Filtro de insignia",
@@ -11072,10 +11072,10 @@
     "select_all": "Seleccionar todo",
     "select_tenants": "Seleccionar inquilinos"
   },
-  "cancel": "Cancel",
+  "cancel": "Cancelar",
   "checking_permissions": "Comprobando permisos",
-  "clear": "Clear",
-  "close": "Close",
+  "clear": "Borrar",
+  "close": "Cerrar",
   "common:nav": {
     "about": "Acerca de",
     "achievements": "Logros",
@@ -11115,7 +11115,7 @@
   },
   "error_occurred": "Error ocurrido",
   "federation_audit": {
-    "clear": "Clear",
+    "clear": "Borrar",
     "export_csv": "Exportar CSV",
     "total_actions_30d": "Acciones totales 30d"
   },
@@ -11147,11 +11147,11 @@
     "whitelisted_tenants_aria": "Inquilinos incluidos en la lista blanca"
   },
   "impact_report_labels": {
-    "transactions": "Transactions",
+    "transactions": "Transacciones",
     "unique_givers": "Donantes únicos",
     "unique_receivers": "Receptores únicos"
   },
-  "import": "Import",
+  "import": "Importar",
   "legal_doc_form": {
     "back_to_documents": "Volver a Documentos",
     "cancel": "Cancelar",
@@ -11211,7 +11211,7 @@
     "total_files": "Archivos totales",
     "total_size": "Tamaño total"
   },
-  "manage": "Manage",
+  "manage": "Administrar",
   "match_detail": {
     "associated_listing": "Listado asociado",
     "category": "categoría",
@@ -11408,8 +11408,8 @@
   },
   "newsletter_send_time": {
     "engagement_heatmap": "Mapa de calor de participación",
-    "high": "High",
-    "low": "Low",
+    "high": "Alto",
+    "low": "Bajo",
     "top_recommended": "Top Recommended",
     "day_friday": "Vie",
     "day_monday": "Lun",
@@ -11441,7 +11441,7 @@
   "provider_health": {
     "aria_success_rate": "Tasa de éxito"
   },
-  "refresh": "Refresh",
+  "refresh": "Actualizar",
   "rte": {
     "block_quote": "Block Quote",
     "bold": "Negrita",
@@ -11476,7 +11476,7 @@
     "count_aria_label": "Recuento de {{label}}",
     "data_types_heading": "Tipos de datos",
     "development_only": "Sólo desarrollo",
-    "generate_button": "Generate",
+    "generate_button": "generar",
     "warning_body": "Warning Body",
     "option_users_label": "Usuarios",
     "option_users_desc": "Generar cuentas de miembros de muestra",
@@ -11592,10 +11592,10 @@
     "data_table": "Datos",
     "total_count": "{{count}}total"
   },
-  "subtitle": "Subtitle",
+  "subtitle": "Subtítulo",
   "super_controls": {
     "bulk_operations": "Operaciones masivas",
-    "hierarchy": "Hierarchy"
+    "hierarchy": "Jerarquía"
   },
   "super_user_form": {
     "account_status": "Estado de la cuenta",
@@ -11914,7 +11914,7 @@
     "tab_inactive": "Inactivo",
     "view_hierarchy": "Ver jerarquía"
   },
-  "title": "Title",
+  "title": "Título",
   "webp_converter": {
     "already_webp": "Ya WebP",
     "pending_conversion": "Conversión pendiente",
@@ -11925,8 +11925,8 @@
   "label_pending_approvals": "Aprobaciones pendientes",
   "label_retention_rate": "Tasa de retención",
   "label_total_members": "Total de miembros",
-  "enabled": "Enabled",
-  "disabled": "Disabled",
+  "enabled": "Habilitado",
+  "disabled": "Discapacitado",
   "caring_community": {
     "meta": {
       "title": "Comunidad solidaria",
@@ -13324,8 +13324,8 @@
   "panel": {
     "sidebar": {
       "items": {
-        "surveys": "Surveys",
-        "projects": "Projects",
+        "surveys": "Encuestas",
+        "projects": "Proyectos",
         "trust_tier": "Nivel de confianza"
       }
     }
@@ -13918,7 +13918,7 @@
       },
       "detail": {
         "completed": "Completado: {{date}}",
-        "error": "Error",
+        "error": "error",
         "summary": "Resumen"
       },
       "empty": {
@@ -15145,7 +15145,7 @@
     "status": {
       "demo": "Manifestación",
       "published": "Publicado",
-      "real": "Real",
+      "real": "reales",
       "unpublished": "Inédito"
     },
     "table": {
@@ -15296,7 +15296,7 @@
       "municipal_data": "Datos municipales",
       "other": "Otro",
       "payment": "Pago",
-      "postal": "Postal",
+      "postal": "Correos",
       "professional_care": "Atención profesional"
     },
     "delete_modal": {
@@ -15905,7 +15905,7 @@
       "notes_from_gemeinde": "Notas de Gemeinde",
       "population": "Población",
       "timeline": "Línea de tiempo",
-      "total": "Total",
+      "total": "totales",
       "update_stage": "Etapa de actualización"
     },
     "filters": {
@@ -16157,7 +16157,7 @@
     "table": {
       "change": "Cambiar",
       "current": "Actual",
-      "delta": "Delta",
+      "delta": "delta",
       "metric": "Métrico",
       "pre_pilot": "Pre-piloto"
     },
@@ -16611,7 +16611,7 @@
     "plan_tiers": {
       "basic": "Básico",
       "enterprise": "Empresa",
-      "pro": "Pro"
+      "pro": "profesional"
     },
     "statuses": {
       "active": "Activo",
@@ -16624,7 +16624,7 @@
       "modules": "Módulos",
       "partner": "Pareja",
       "period_end": "Fin del período",
-      "plan": "Plan",
+      "plan": "Planificar",
       "price_per_month": "Precio / mes",
       "status": "Estado",
       "subscriptions_aria": "Suscripciones a análisis regionales",
