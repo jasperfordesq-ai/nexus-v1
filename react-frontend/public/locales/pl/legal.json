@@ -413,21 +413,57 @@
     "title": "Zrzeczenie się odpowiedzialności platformy",
     "subtitle": "Wažne zrzeczenia się odpowiedzialności i ograniczenia odpowiedzialności dla platformy Project NEXUS",
     "link_terms": "Warunki korzystania z platformy",
-    "link_privacy": "Polityka prywatności platformy"
+    "link_privacy": "Polityka prywatności platformy",
+    "sections": {
+      "no-warranty": "Brak gwarancji",
+      "no-advice": "Brak doradztwa prawnego, finansowego ani regulacyjnego",
+      "operator-independence": "Niezależność operatorów społeczności",
+      "member-interactions": "Interakcje między członkami",
+      "content-uploads": "Treści i przesyłane pliki",
+      "identity-verification": "Weryfikacja tożsamości",
+      "third-party": "Usługi podmiotów trzecich",
+      "limitation-of-liability": "Ograniczenie odpowiedzialności"
+    }
   },
   "platform_privacy": {
     "page_title": "Polityka prywatności platformy",
     "title": "Polityka prywatności platformy",
     "subtitle": "Jak Project NEXUS zarządza danymi na poziomie infrastruktury platformy",
     "link_terms": "Warunki korzystania z platformy",
-    "link_disclaimer": "Zrzeczenie się odpowiedzialności platformy"
+    "link_disclaimer": "Zrzeczenie się odpowiedzialności platformy",
+    "sections": {
+      "introduction": "Wprowadzenie",
+      "controller-processor": "Administrator danych a podmiot przetwarzający",
+      "data-collected": "Dane gromadzone na poziomie platformy",
+      "legal-basis": "Podstawa prawna przetwarzania",
+      "data-sharing": "Udostępnianie danych",
+      "international-transfers": "Międzynarodowe przekazywanie danych",
+      "retention": "Okres przechowywania danych",
+      "your-rights": "Twoje prawa wynikające z RODO",
+      "security": "Środki bezpieczeństwa",
+      "contact": "Kontakt"
+    }
   },
   "platform_terms": {
     "page_title": "Warunki korzystania z platformy",
     "title": "Warunki korzystania z platformy",
     "subtitle": "Warunki regulujące infrastrukturę platformy Project NEXUS",
     "link_privacy": "Polityka prywatności platformy",
-    "link_disclaimer": "Zrzeczenie się odpowiedzialności platformy"
+    "link_disclaimer": "Zrzeczenie się odpowiedzialności platformy",
+    "sections": {
+      "introduction": "Wprowadzenie i akceptacja",
+      "provider": "Tożsamość dostawcy platformy",
+      "definitions": "Definicje",
+      "operator-responsibilities": "Obowiązki operatora",
+      "acceptable-use": "Dopuszczalne korzystanie",
+      "intellectual-property": "Własność intelektualna",
+      "limitation-of-liability": "Ograniczenie odpowiedzialności",
+      "indemnification": "Zwolnienie z odpowiedzialności",
+      "data-processing": "Przetwarzanie danych",
+      "termination": "Wygaśnięcie",
+      "changes": "Zmiany warunków",
+      "governing-law": "Prawo właściwe"
+    }
   },
   "gate": {
     "title": "Zaktualizowane dokumenty prawne",
@@ -576,5 +612,184 @@
     "contact_cta_body": "Get in touch and a coordinator will get back to you. Most messages are answered within one working day.",
     "contact_cta_button": "Contact us",
     "community_guidelines_link": "Read the Community Guidelines"
+  },
+  "community_guidelines": {
+    "default_community_name": "ta społeczność",
+    "heading": "Zasady społeczności",
+    "page_title": "Zasady społeczności",
+    "subtitle": "Jak oczekujemy, że wszyscy w {{communityName}} będą się wzajemnie traktować. Krótko, prostym językiem i z odniesieniem do każdej wymiany, wiadomości, wpisu i wydarzenia.",
+    "version": "Wersja 1.0 - Ostatnia aktualizacja 13.05.2026",
+    "sections": {
+      "kind": {
+        "title": "1. Bądź życzliwy i okazuj szacunek",
+        "body": "Traktuj innych członków tak, jak traktowałbyś sąsiada. Można się nie zgadzać; pogarda, wyzwiska, kpina i ataki osobiste są niedopuszczalne.",
+        "items": {
+          "0": "Brak nękania, zastraszania, stalkingu ani gróźb.",
+          "1": "Brak mowy nienawiści, obelg i treści poniżających ze względu na tożsamość, w tym pochodzenie, etniczność, narodowość, religię, płeć, seksualność, niepełnosprawność, wiek lub status społeczny.",
+          "2": "Brak gróźb użycia przemocy, bezpośrednich i pośrednich."
+        }
+      },
+      "honest": {
+        "title": "2. Bądź uczciwy",
+        "body": "Zaufanie jest fundamentem działania banku czasu. Wprowadzanie w błąd co do siebie lub oferowanej usługi szkodzi całej społeczności.",
+        "items": {
+          "0": "Używaj prawdziwego imienia i prawdziwego zdjęcia w profilu.",
+          "1": "Opisuj umiejętności, ogłoszenia i prośby zgodnie z prawdą. Nie wyolbrzymiaj swoich możliwości ani czasu potrzebnego na realizację.",
+          "2": "Rejestruj godziny uczciwie. Nie zgłaszaj czasu, którego nie poświęciłeś.",
+          "3": "Jedna osoba, jedno konto."
+        }
+      },
+      "relevant": {
+        "title": "3. Trzymaj się tematu",
+        "body": "To miejsce wymiany w społeczności, a nie targowisko, tablica ogłoszeń ani platforma polityczna.",
+        "items": {
+          "0": "Brak spamu, powtarzanej promocji ani masowych wpisów poza tematem.",
+          "1": "Brak sprzedaży komercyjnej, rekrutacji ani zbiórek poza funkcjonalnościami stworzonymi w tym celu, takimi jak oferty pracy, organizacje czy targowisko, jeśli zostały włączone.",
+          "2": "Brak materiałów wyborczych, organizacji partyjnej ani treści mających na celu podsycanie konfliktów politycznych. Zaangażowanie obywatelskie jest mile widziane; walka partyjna nie."
+        }
+      },
+      "privacy": {
+        "title": "4. Chroń prywatność",
+        "body": "To, co członkowie udostępniają wewnątrz społeczności, pozostaje w społeczności.",
+        "items": {
+          "0": "Nie udostępniaj danych osobowych innego członka, takich jak adres, telefon, zdjęcia, dane o zdrowiu lub sytuacja rodzinna, bez jego wyraźnej zgody.",
+          "1": "Nie publikuj zrzutów ekranu z prywatnych wiadomości.",
+          "2": "Nie rób zdjęć na wydarzeniach społeczności bez zgody osób, które się na nich znajdują.",
+          "3": "Korzystaj z wiadomości platformy do komunikacji związanej z wymianą; nie nakłaniaj nikogo do przechodzenia na zewnętrzne kanały, dopóki dana osoba nie czuje się na to gotowa."
+        }
+      },
+      "in_person": {
+        "title": "5. Dbajcie o siebie podczas spotkań osobistych",
+        "body": "Wymiany często odbywają się osobiście, czasem w czyimś domu. Kieruj się zdrowym rozsądkiem.",
+        "items": {
+          "0": "Przed pierwszą wymianą przeczytaj profil i opinie o członku.",
+          "1": "Jeśli to możliwe, pierwsze spotkanie umów w miejscu publicznym.",
+          "2": "Powiedz zaufanej osobie, dokąd idziesz i o której planujesz wrócić.",
+          "3": "Przerwij wymianę i odejdź, jeśli coś wydaje się niewłaściwe. Nie jesteś nikomu winny wyjaśnień w danej chwili.",
+          "4": "Jeśli ktoś jest w niebezpieczeństwie, sam lub w towarzystwie innych, sprawdź sekcję Zaufanie i Bezpieczeństwo, aby dowiedzieć się, jak zgłosić sprawę. W sytuacji nagłej najpierw skontaktuj się z lokalnymi służbami ratunkowymi."
+        }
+      },
+      "report": {
+        "title": "6. Zgłaszanie obaw",
+        "body_before": "Jeśli widzisz coś, co narusza te zasady lub Cię niepokoi, powiedz nam. Możesz:",
+        "items": {
+          "0": "skorzystać z przycisku zgłoszenia przy dowolnym profilu, ogłoszeniu, wiadomości, wpisie lub wydarzeniu.",
+          "1": "wysłać wiadomość do zespołu społeczności przez stronę Kontakt.",
+          "2": "W kwestiach ochrony, np. dziecka lub dorosłej osoby narażonej na zagrożenie, skorzystaj z dedykowanej ścieżki zgłoszeniowej opisanej na stronie Zaufanie i Bezpieczeństwo."
+        },
+        "body_after": "Zgłoszenia są analizowane przez moderatorów i traktowane poufnie. Nie ujawniamy Twojej tożsamości osobie, której dotyczy zgłoszenie, chyba że poprosisz nas o to lub wymaga tego prawo."
+      },
+      "enforcement": {
+        "title": "7. Co dzieje się, gdy zasady zostaną naruszone",
+        "body_before": "Większość spraw to drobne nieporozumienia, które można rozwiązać spokojną rozmową. Przy wyraźniejszych naruszeniach stosujemy proporcjonalne kroki:",
+        "items": {
+          "0": "Przypomnienie - przy pierwszym, drobnym naruszeniu.",
+          "1": "Usunięcie treści - np. wpisu, ogłoszenia lub wiadomości.",
+          "2": "Ostrzeżenie odnotowane na koncie.",
+          "3": "Tymczasowe zawieszenie przy powtarzających się lub poważnych naruszeniach.",
+          "4": "Trwałe usunięcie konta za nękanie, naruszenia ochrony, oszustwa, groźby, mowę nienawiści lub powtarzające się zawieszenia."
+        },
+        "body_serious": "Poważne sprawy, w tym znęcanie się, groźby, oszustwa lub wyzysk, mogą zostać zgłoszone właściwym organom ścigania lub innym organom, niezależnie od działań podjętych na platformie.",
+        "body_appeal": "Jeśli uważasz, że decyzja była niesłuszna, możesz się od niej odwołać przez stronę Kontakt. Sprawę rozpatrzy moderator, który nie brał udziału w pierwotnej decyzji."
+      },
+      "changes": {
+        "title": "Zmiany w zasadach",
+        "body": "Możemy aktualizować te zasady w miarę rozwoju społeczności. Istotne zmiany będą ogłaszane na platformie i odnotowywane w historii wersji dokumentów prawnych."
+      }
+    }
+  },
+  "acceptable_use": {
+    "default_platform_name": "platforma",
+    "heading": "Polityka dopuszczalnego korzystania",
+    "page_title": "Polityka dopuszczalnego korzystania",
+    "subtitle": "Konkretne zachowania, które są niedozwolone na {{platformName}}. Niniejsza polityka uzupełnia Warunki świadczenia usług i Zasady społeczności oraz obowiązuje na każdym koncie.",
+    "version": "Wersja 1.0 - Ostatnia aktualizacja 13.05.2026",
+    "sections": {
+      "scope": {
+        "title": "1. Zakres",
+        "body": "Niniejsza polityka dotyczy każdego, kto korzysta z {{platformName}}: członków, organizacji, odwiedzających, użytkowników API i integratorów. Obejmuje całą aktywność na platformie, w tym profile, ogłoszenia, wiadomości, wydarzenia, wpisy, ankiety, oferty pracy, pliki oraz komunikację wychodzącą wysyłaną za pośrednictwem platformy."
+      },
+      "illegal": {
+        "title": "2. Brak działań niezgodnych z prawem",
+        "body": "Nie wolno korzystać z platformy w celu:",
+        "items": {
+          "0": "podejmowania, planowania lub ułatwiania działań niezgodnych z prawem w miejscu, w którym znajdujesz się Ty, druga osoba lub w którym odbywa się dana aktywność.",
+          "1": "oferowania lub zamawiania usług wymagających uprawnień zawodowych lub regulacji, których nie posiadasz, takich jak nieuprawnione usługi medyczne, prawne, finansowe, elektryczne, gazowe lub opieki nad dziećmi.",
+          "2": "handlu towarami regulowanymi lub zabronionymi, w tym alkoholem, tytoniem, lekami na receptę, bronią palną, środkami odurzającymi lub innymi podobnie ograniczonymi produktami.",
+          "3": "prania pieniędzy lub uchylania się od obowiązków podatkowych."
+        }
+      },
+      "fraud": {
+        "title": "3. Brak oszustw i podszywania się",
+        "items": {
+          "0": "Nie podszywaj się pod inną osobę, organizację ani organ urzędowy.",
+          "1": "Nie zakładaj kont fałszywych, podstawionych ani zduplikowanych w celu manipulowania ocenami, recenzjami, ankietami lub dopasowaniami.",
+          "2": "Nie fałszuj swojej tożsamości, kwalifikacji ani statusu weryfikacji.",
+          "3": "Nie manipuluj saldami kredytów czasowych przez fikcyjne wymiany, zmowę lub pozorne transakcje."
+        }
+      },
+      "harm": {
+        "title": "4. Brak krzywdzenia ludzi",
+        "items": {
+          "0": "Brak nękania, zastraszania, stalkingu, doxxingu ani skoordynowanych ataków.",
+          "1": "Brak mowy nienawiści, obelg ani treści poniżających ze względu na cechy chronione.",
+          "2": "Brak gróźb, podżegania ani gloryfikacji przemocy.",
+          "3": "Brak treści seksualizujących dzieci w jakiejkolwiek formie.",
+          "4": "Brak treści seksualnych bez zgody, nadużyć z wykorzystaniem materiałów intymnych ani treści publikowanych w celu poniżenia lub szantażu.",
+          "5": "Brak promowania samookaleczenia ani samobójstwa. Jeśli Ty lub ktoś, kogo znasz, jesteście w kryzysie, skontaktujcie się z lokalnymi służbami ratunkowymi lub uznaną linią wsparcia."
+        }
+      },
+      "content": {
+        "title": "5. Brak zabronionych treści",
+        "items": {
+          "0": "Treści o charakterze jednoznacznie seksualnym, przemoc bez uzasadnienia lub treści szokujące.",
+          "1": "Treści naruszające prawa autorskie, znaki towarowe lub inne prawa własności intelektualnej osób trzecich.",
+          "2": "Informacje poufne, do których ujawnienia nie masz uprawnień, takie jak tajemnice pracodawcy lub chronione informacje o stanie zdrowia.",
+          "3": "Dane osobowe innych osób publikowane bez ich zgody."
+        }
+      },
+      "misuse": {
+        "title": "6. Brak spamu, nadużyć i nadużywania platformy",
+        "items": {
+          "0": "Brak niezamówionych wiadomości masowych, powielanych identycznych wpisów ani masowych wysyłek promocyjnych.",
+          "1": "Brak scrapingu, masowego pobierania i automatycznego zbierania profili, ogłoszeń lub innych danych, z wyjątkiem korzystania z udokumentowanych API w obowiązujących limitach.",
+          "2": "Brak sztucznego zwiększania zaangażowania, w tym fałszywych polubień, recenzji, rekomendacji, dopasowań, odznak lub pozycji w rankingach.",
+          "3": "Brak schematów polecających, MLM, piramidalnych ani opartych na płatności za kliknięcie.",
+          "4": "Brak korzystania z platformy głównie w celu kierowania ruchu do zewnętrznych witryn lub usług niezwiązanych z wymianą społecznościową."
+        }
+      },
+      "interference": {
+        "title": "7. Brak ingerencji w platformę",
+        "items": {
+          "0": "Brak sondowania, skanowania ani testowania podatności bez uprzedniej pisemnej zgody. Skoordynowane zgłoszenia podatności są mile widziane przez stronę Kontakt.",
+          "1": "Brak złośliwego oprogramowania, wirusów, robaków ani innego szkodliwego kodu.",
+          "2": "Brak prób obchodzenia uwierzytelniania, limitów, dostępu płatnego, blokad funkcji ani narzędzi moderacyjnych.",
+          "3": "Brak prób ataków typu denial-of-service oraz działań istotnie pogarszających usługę dla innych.",
+          "4": "Brak inżynierii wstecznej, dekompilacji ani pozyskiwania kodu źródłowego, z wyjątkiem przypadków wyraźnie dozwolonych licencją AGPL-3.0."
+        }
+      },
+      "account": {
+        "title": "8. Higiena konta",
+        "items": {
+          "0": "Nie udostępniaj danych logowania. Odpowiadasz za działania prowadzone z Twojego konta.",
+          "1": "Niezwłocznie powiadom nas, jeśli podejrzewasz, że Twoje konto zostało przejęte.",
+          "2": "Nie przekazuj ani nie sprzedawaj swojego konta innym osobom.",
+          "3": "Do usunięcia lub eksportu danych korzystaj z narzędzi platformy; nie próbuj ich pozyskiwać za pomocą automatyzacji."
+        }
+      },
+      "enforcement": {
+        "title": "9. Egzekwowanie",
+        "body": "Naruszenia mogą skutkować usunięciem treści, ostrzeżeniami, czasowym zawieszeniem lub trwałym odebraniem dostępu, proporcjonalnie do wagi naruszenia i historii. Poważne naruszenia mogą zostać zgłoszone właściwym organom ścigania, właściwemu organowi ochrony danych osobowych lub innym organom, a w niektórych przypadkach mamy ku temu obowiązek prawny.",
+        "appeal": "Od decyzji egzekucyjnej można się odwołać przez stronę Kontakt. Odwołania są rozpatrywane przez osobę, która nie brała udziału w pierwotnej decyzji."
+      },
+      "reporting": {
+        "title": "10. Zgłaszanie naruszeń",
+        "body": "Jeśli zauważysz coś, co narusza tę politykę, skorzystaj z wbudowanego w produkt narzędzia zgłoszeń przy odpowiednim profilu, ogłoszeniu, wiadomości, wpisie lub wydarzeniu albo napisz do zespołu przez stronę Kontakt. W sprawach ochrony dziecka lub dorosłej osoby narażonej na zagrożenie kieruj się dedykowaną ścieżką opisaną na stronie Zaufanie i Bezpieczeństwo."
+      },
+      "changes": {
+        "title": "11. Zmiany",
+        "body": "Możemy aktualizować tę politykę wraz z rozwojem platformy i zmianami otoczenia regulacyjnego. Istotne zmiany będą ogłaszane i odnotowywane w historii wersji dokumentów prawnych."
+      }
+    }
   }
 }

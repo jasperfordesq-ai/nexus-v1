@@ -413,21 +413,57 @@
     "title": "Plattform-Haftungsausschluss",
     "subtitle": "Wichtige Haftungsausschlüsse und Haftungsbeschränkungen für die Project NEXUS-Plattform",
     "link_terms": "Plattform-Nutzungsbedingungen",
-    "link_privacy": "Plattform-Datenschutzrichtlinie"
+    "link_privacy": "Plattform-Datenschutzrichtlinie",
+    "sections": {
+      "no-warranty": "Keine Gewährleistung",
+      "no-advice": "Keine Rechts-, Finanz- oder Regulierungsberatung",
+      "operator-independence": "Unabhängigkeit der Community-Betreiber",
+      "member-interactions": "Interaktionen zwischen Mitgliedern",
+      "content-uploads": "Inhalte und Uploads",
+      "identity-verification": "Identitätsprüfung",
+      "third-party": "Dienste Dritter",
+      "limitation-of-liability": "Haftungsbeschränkung"
+    }
   },
   "platform_privacy": {
     "page_title": "Plattform-Datenschutzrichtlinie",
     "title": "Plattform-Datenschutzrichtlinie",
     "subtitle": "Wie Project NEXUS Daten auf Plattform-Infrastrukturebene handhabt",
     "link_terms": "Plattform-Nutzungsbedingungen",
-    "link_disclaimer": "Plattform-Haftungsausschluss"
+    "link_disclaimer": "Plattform-Haftungsausschluss",
+    "sections": {
+      "introduction": "Einleitung",
+      "controller-processor": "Verantwortlicher vs. Auftragsverarbeiter",
+      "data-collected": "Auf Plattformebene erfasste Daten",
+      "legal-basis": "Rechtsgrundlage der Verarbeitung",
+      "data-sharing": "Datenweitergabe",
+      "international-transfers": "Internationale Datenübermittlung",
+      "retention": "Aufbewahrung der Daten",
+      "your-rights": "Ihre Rechte nach der DSGVO",
+      "security": "Sicherheitsmaßnahmen",
+      "contact": "Kontakt"
+    }
   },
   "platform_terms": {
     "page_title": "Plattform-Nutzungsbedingungen",
     "title": "Plattform-Nutzungsbedingungen",
     "subtitle": "Die Nutzungsbedingungen für die Project NEXUS-Plattforminfrastruktur",
     "link_privacy": "Plattform-Datenschutzrichtlinie",
-    "link_disclaimer": "Plattform-Haftungsausschluss"
+    "link_disclaimer": "Plattform-Haftungsausschluss",
+    "sections": {
+      "introduction": "Einleitung & Annahme",
+      "provider": "Identität des Plattformanbieters",
+      "definitions": "Begriffsbestimmungen",
+      "operator-responsibilities": "Pflichten der Betreiber",
+      "acceptable-use": "Zulässige Nutzung",
+      "intellectual-property": "Geistiges Eigentum",
+      "limitation-of-liability": "Haftungsbeschränkung",
+      "indemnification": "Freistellung",
+      "data-processing": "Datenverarbeitung",
+      "termination": "Beendigung",
+      "changes": "Änderungen der Bedingungen",
+      "governing-law": "Anwendbares Recht"
+    }
   },
   "gate": {
     "title": "Aktualisierte Rechtsdokumente",
@@ -576,5 +612,184 @@
     "contact_cta_body": "Get in touch and a coordinator will get back to you. Most messages are answered within one working day.",
     "contact_cta_button": "Contact us",
     "community_guidelines_link": "Read the Community Guidelines"
+  },
+  "community_guidelines": {
+    "default_community_name": "diese Community",
+    "heading": "Community-Richtlinien",
+    "page_title": "Community-Richtlinien",
+    "subtitle": "Wie wir erwarten, dass alle in {{communityName}} miteinander umgehen. Kurz, in einfacher Sprache, und gilt für jeden Austausch, jede Nachricht, jeden Beitrag und jede Veranstaltung.",
+    "version": "Version 1.0 - Zuletzt aktualisiert am 13.05.2026",
+    "sections": {
+      "kind": {
+        "title": "1. Sei freundlich und respektvoll",
+        "body": "Behandle andere Mitglieder so, wie du eine Nachbarin oder einen Nachbarn behandeln würdest. Meinungsverschiedenheiten sind in Ordnung; Verachtung, Beleidigungen, Spott und persönliche Angriffe nicht.",
+        "items": {
+          "0": "Keine Belästigung, kein Mobbing, kein Stalking, keine Einschüchterung.",
+          "1": "Keine Hassrede, keine Beleidigungen und keine Inhalte, die Menschen aufgrund ihrer Identität herabwürdigen, einschließlich Herkunft, Ethnie, Nationalität, Religion, Geschlecht, Sexualität, Behinderung, Alter oder sozialem Hintergrund.",
+          "2": "Keine Gewaltandrohungen, weder direkt noch indirekt."
+        }
+      },
+      "honest": {
+        "title": "2. Sei ehrlich",
+        "body": "Vertrauen ist die Grundlage einer funktionierenden Zeitbank. Wer sich selbst oder das eigene Angebot falsch darstellt, schadet der gesamten Community.",
+        "items": {
+          "0": "Verwende deinen echten Namen und ein echtes Foto in deinem Profil.",
+          "1": "Beschreibe Fähigkeiten, Angebote und Anfragen wahrheitsgemäß. Übertreibe nicht, was du kannst oder wie lange etwas dauert.",
+          "2": "Erfasse Stunden ehrlich. Buche keine Zeit, die du nicht geleistet hast.",
+          "3": "Eine Person, ein Konto."
+        }
+      },
+      "relevant": {
+        "title": "3. Bleib beim Thema",
+        "body": "Dies ist ein Raum für den Austausch in der Community, kein Marktplatz, keine Werbefläche und keine politische Plattform.",
+        "items": {
+          "0": "Kein Spam, keine wiederholten Werbebeiträge und keine themenfremden Massenposts.",
+          "1": "Kein gewerblicher Verkauf, kein Recruiting und kein Fundraising außerhalb der dafür vorgesehenen Funktionen wie Jobs, Organisationen oder Marktplatz, sofern aktiviert.",
+          "2": "Kein Wahlkampfmaterial, keine parteipolitische Organisation und keine Inhalte, die darauf abzielen, politische Konflikte zu schüren. Bürgerschaftliches Engagement ist willkommen; parteipolitische Auseinandersetzungen sind es nicht."
+        }
+      },
+      "privacy": {
+        "title": "4. Privatsphäre schützen",
+        "body": "Was Mitglieder innerhalb der Community teilen, bleibt in der Community.",
+        "items": {
+          "0": "Gib keine persönlichen Informationen anderer Mitglieder weiter, wie Adresse, Telefonnummer, Fotos, Gesundheitsdaten oder familiäre Verhältnisse, ohne deren ausdrückliche Zustimmung.",
+          "1": "Veröffentliche keine Screenshots privater Nachrichten.",
+          "2": "Fotografiere bei Community-Veranstaltungen niemanden ohne vorherige Zustimmung der Abgebildeten.",
+          "3": "Nutze die plattformeigenen Nachrichten für die Kommunikation rund um Austausche; dränge niemanden auf externe Kanäle, bevor er oder sie damit einverstanden ist."
+        }
+      },
+      "in_person": {
+        "title": "5. Achtet aufeinander bei persönlichen Treffen",
+        "body": "Austausche finden oft persönlich statt, manchmal in der Wohnung einer anderen Person. Nutze deinen gesunden Menschenverstand.",
+        "items": {
+          "0": "Lies vor dem ersten Austausch das Profil und die Bewertungen des Mitglieds.",
+          "1": "Triff dich beim ersten Austausch nach Möglichkeit an einem öffentlichen Ort.",
+          "2": "Sag einer Vertrauensperson, wohin du gehst und wann du voraussichtlich zurück bist.",
+          "3": "Brich den Austausch ab und geh, wenn sich etwas falsch anfühlt. Du schuldest niemandem eine Erklärung in dem Moment.",
+          "4": "Wenn jemand gefährdet ist, selbst oder durch andere, findest du im Bereich Vertrauen & Sicherheit Informationen zur Meldung. In einem Notfall wende dich zuerst an die örtlichen Notdienste."
+        }
+      },
+      "report": {
+        "title": "6. Bedenken melden",
+        "body_before": "Wenn du etwas siehst, das gegen diese Richtlinien verstößt oder dich beunruhigt, sag es uns. Du kannst:",
+        "items": {
+          "0": "den Melde-Button bei jedem Profil, Angebot, jeder Nachricht, jedem Beitrag oder jeder Veranstaltung nutzen.",
+          "1": "das Community-Team per E-Mail über die Kontaktseite erreichen.",
+          "2": "Bei Schutzbedenken, etwa wenn ein Kind oder eine schutzbedürftige erwachsene Person in Gefahr ist, findest du auf der Seite Vertrauen & Sicherheit den dafür vorgesehenen Meldeweg."
+        },
+        "body_after": "Meldungen werden von Moderatorinnen und Moderatoren geprüft und vertraulich behandelt. Deine Identität wird der gemeldeten Person nicht offengelegt, es sei denn, du wünschst es oder das Gesetz verlangt es."
+      },
+      "enforcement": {
+        "title": "7. Was passiert, wenn Richtlinien verletzt werden",
+        "body_before": "Die meisten Vorfälle sind kleine Missverständnisse, die sich durch ein klärendes Gespräch lösen lassen. Bei klareren Verstößen gehen wir verhältnismäßig vor:",
+        "items": {
+          "0": "Ein Hinweis bei erstmaligen, geringfügigen Vorfällen.",
+          "1": "Entfernung von Inhalten, etwa Beitrag, Angebot oder Nachricht.",
+          "2": "Eine Verwarnung, die im Konto vermerkt wird.",
+          "3": "Vorübergehende Sperrung bei wiederholten oder schweren Vorfällen.",
+          "4": "Endgültiger Ausschluss bei Belästigung, Verletzungen von Schutzpflichten, Betrug, Drohungen, Hassrede oder wiederholten Sperrungen."
+        },
+        "body_serious": "Schwere Vorfälle, darunter Missbrauch, Drohungen, Betrug oder Ausbeutung, können unabhängig von der plattformseitigen Maßnahme den zuständigen Strafverfolgungs- oder anderen Behörden gemeldet werden.",
+        "body_appeal": "Wenn du eine Entscheidung für falsch hältst, kannst du über die Kontaktseite Widerspruch einlegen. Sie wird von einer Moderationsperson überprüft, die an der ursprünglichen Entscheidung nicht beteiligt war."
+      },
+      "changes": {
+        "title": "Änderungen dieser Richtlinien",
+        "body": "Wir können diese Richtlinien anpassen, während die Community wächst. Wesentliche Änderungen werden auf der Plattform angekündigt und in der rechtlichen Versionshistorie dokumentiert."
+      }
+    }
+  },
+  "acceptable_use": {
+    "default_platform_name": "die Plattform",
+    "heading": "Richtlinie zur zulässigen Nutzung",
+    "page_title": "Richtlinie zur zulässigen Nutzung",
+    "subtitle": "Die konkreten Verhaltensweisen, die auf {{platformName}} nicht zulässig sind. Diese Richtlinie ergänzt die Nutzungsbedingungen und die Community-Richtlinien und gilt für jedes Konto.",
+    "version": "Version 1.0 - Zuletzt aktualisiert am 13.05.2026",
+    "sections": {
+      "scope": {
+        "title": "1. Geltungsbereich",
+        "body": "Diese Richtlinie gilt für alle, die {{platformName}} nutzen: Mitglieder, Organisationen, Besucherinnen und Besucher, API-Nutzende und Integrationspartner. Sie gilt für sämtliche Aktivitäten auf der Plattform, einschließlich Profile, Angebote, Nachrichten, Veranstaltungen, Beiträge, Umfragen, Jobs, Dateien und über die Plattform versandte Mitteilungen."
+      },
+      "illegal": {
+        "title": "2. Keine rechtswidrigen Aktivitäten",
+        "body": "Du darfst die Plattform nicht nutzen, um:",
+        "items": {
+          "0": "etwas Rechtswidriges auszuführen, zu planen oder zu fördern, gleich ob am Ort der handelnden Person, der anderen Person oder der Aktivität.",
+          "1": "Leistungen anzubieten oder anzufragen, die eine berufliche Zulassung oder Regulierung erfordern, über die du nicht verfügst, wie unlizenzierte medizinische, rechtliche, finanzielle, elektrische, gastechnische oder Kinderbetreuungsleistungen.",
+          "2": "mit regulierten oder verbotenen Waren zu handeln, darunter Alkohol, Tabak, verschreibungspflichtige Arzneimittel, Schusswaffen, kontrollierte Drogen oder ähnliche eingeschränkte Güter.",
+          "3": "Geld zu waschen oder steuerliche Pflichten zu umgehen."
+        }
+      },
+      "fraud": {
+        "title": "3. Kein Betrug, keine Identitätsanmaßung",
+        "items": {
+          "0": "Gib dich nicht als andere Person, Organisation oder offizielle Stelle aus.",
+          "1": "Erstelle keine gefälschten Konten, keine Strohmann-Konten und keine Mehrfachkonten, um Bewertungen, Rezensionen, Umfragen oder das Matching zu manipulieren.",
+          "2": "Stelle deine Identität, Qualifikationen oder Prüfstatus nicht falsch dar.",
+          "3": "Manipuliere keine Zeitguthaben durch Scheinaustausche, Absprachen oder konstruierte Transaktionen."
+        }
+      },
+      "harm": {
+        "title": "4. Kein Schaden für Menschen",
+        "items": {
+          "0": "Keine Belästigung, kein Mobbing, kein Stalking, kein Doxxing und keine koordinierten Angriffe.",
+          "1": "Keine Hassrede, keine Beleidigungen und keine Inhalte, die Menschen aufgrund geschützter Merkmale herabwürdigen.",
+          "2": "Keine Drohungen, keine Anstachelung und keine Verherrlichung von Gewalt.",
+          "3": "Keine Inhalte, die Kinder in irgendeiner Form sexualisieren.",
+          "4": "Keine sexuellen Inhalte ohne Einwilligung, kein Missbrauch intimer Aufnahmen und keine Inhalte, die zur Demütigung oder Erpressung veröffentlicht werden.",
+          "5": "Keine Verherrlichung von Selbstverletzung oder Suizid. Wenn du oder eine dir bekannte Person in einer Krise ist, wende dich an die örtlichen Notdienste oder eine anerkannte Beratungsstelle."
+        }
+      },
+      "content": {
+        "title": "5. Keine verbotenen Inhalte",
+        "items": {
+          "0": "Sexuell explizite Inhalte, übermäßige Gewaltdarstellungen oder Schockinhalte.",
+          "1": "Inhalte, die das Urheberrecht, Markenrecht oder andere Schutzrechte Dritter verletzen.",
+          "2": "Vertrauliche Informationen, zu deren Weitergabe du nicht berechtigt bist, etwa Betriebsgeheimnisse oder geschützte Gesundheitsdaten.",
+          "3": "Personenbezogene Daten anderer, die ohne deren Einwilligung veröffentlicht werden."
+        }
+      },
+      "misuse": {
+        "title": "6. Kein Spam, kein Missbrauch, keine Zweckentfremdung der Plattform",
+        "items": {
+          "0": "Keine unerwünschten Massennachrichten, keine wiederholten identischen Beiträge und keine Werbeflut.",
+          "1": "Kein Scraping, kein massenhaftes Herunterladen und keine automatisierte Erhebung von Profilen, Angeboten oder anderen Daten, außer über dokumentierte APIs und im Rahmen ihrer Ratenbegrenzungen.",
+          "2": "Keine künstliche Steigerung von Interaktionen, einschließlich gefälschter Likes, Bewertungen, Empfehlungen, Matches, Abzeichen oder Bestenlistenpositionen.",
+          "3": "Keine Empfehlungs-, MLM-, Pyramiden- oder Bezahl-pro-Klick-Systeme.",
+          "4": "Keine vorrangige Nutzung der Plattform, um Traffic auf eine externe Seite oder einen Dienst ohne Bezug zum Gemeinschaftsaustausch zu lenken."
+        }
+      },
+      "interference": {
+        "title": "7. Keine Beeinträchtigung der Plattform",
+        "items": {
+          "0": "Kein Ausspähen, Scannen oder Testen auf Sicherheitslücken ohne vorherige schriftliche Erlaubnis. Eine koordinierte Offenlegung ist über die Kontaktseite willkommen.",
+          "1": "Keine Schadsoftware, keine Viren, Würmer oder sonstige schädliche Codes.",
+          "2": "Keine Versuche, Authentifizierung, Ratenbegrenzungen, Bezahlschranken, Funktionssperren oder Moderationswerkzeuge zu umgehen.",
+          "3": "Keine Denial-of-Service-Versuche und keine Aktivitäten, die den Dienst für andere erheblich beeinträchtigen.",
+          "4": "Kein Reverse Engineering, kein Dekompilieren und kein Extrahieren des Quellcodes, außer soweit dies ausdrücklich durch die AGPL-3.0-Lizenz gestattet ist."
+        }
+      },
+      "account": {
+        "title": "8. Konto-Hygiene",
+        "items": {
+          "0": "Gib deine Anmeldedaten nicht weiter. Du bist für die Aktivitäten unter deinem Konto verantwortlich.",
+          "1": "Informiere uns umgehend, wenn du den Verdacht hast, dass dein Konto kompromittiert wurde.",
+          "2": "Übertrage oder verkaufe dein Konto nicht an andere.",
+          "3": "Nutze die Werkzeuge der Plattform, um deine Daten zu löschen oder zu exportieren; versuche nicht, sie automatisiert auszulesen."
+        }
+      },
+      "enforcement": {
+        "title": "9. Durchsetzung",
+        "body": "Verstöße können zur Entfernung von Inhalten, zu Verwarnungen, vorübergehenden Sperrungen oder zum dauerhaften Entzug des Zugangs führen, jeweils im Verhältnis zur Schwere und Vorgeschichte. Schwere Verstöße können den zuständigen Strafverfolgungsbehörden, der zuständigen Datenschutzaufsicht oder anderen Behörden gemeldet werden, und wir können dazu gesetzlich verpflichtet sein.",
+        "appeal": "Du kannst eine Durchsetzungsentscheidung über die Kontaktseite anfechten. Widersprüche werden von einer Person geprüft, die an der ursprünglichen Entscheidung nicht beteiligt war."
+      },
+      "reporting": {
+        "title": "10. Verstöße melden",
+        "body": "Wenn dir etwas auffällt, das gegen diese Richtlinie verstößt, nutze die produktinterne Meldefunktion beim betreffenden Profil, Angebot, der Nachricht, dem Beitrag oder der Veranstaltung, oder schreibe dem Team über die Kontaktseite. Bei Schutzbedenken betreffend ein Kind oder eine schutzbedürftige erwachsene Person folge dem dafür vorgesehenen Weg auf der Seite Vertrauen & Sicherheit."
+      },
+      "changes": {
+        "title": "11. Änderungen",
+        "body": "Wir können diese Richtlinie anpassen, wenn sich die Plattform und das regulatorische Umfeld weiterentwickeln. Wesentliche Änderungen werden angekündigt und in der rechtlichen Versionshistorie dokumentiert."
+      }
+    }
   }
 }
