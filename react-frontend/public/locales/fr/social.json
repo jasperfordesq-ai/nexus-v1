@@ -118,7 +118,14 @@
     "collection_name": "Name",
     "cancel": "Cancel",
     "save": "Save",
-    "create": "Create"
+    "create": "Create",
+    "meta_description": "Consultez et organisez vos publications, annonces, événements, emplois, articles de blog et discussions enregistrés.",
+    "collection_filter_label": "Collection",
+    "remove": "Retirer des éléments enregistrés",
+    "delete_collection_title": "Supprimer la collection",
+    "delete_collection_body": "Supprimer \"{{name}}\" ? Les favoris de cette collection seront conservés.",
+    "delete_collection_action": "Supprimer la collection",
+    "collection_actions_named": "Actions pour la collection {{name}}"
   },
   "verified": "Verified",
   "hover_card": {

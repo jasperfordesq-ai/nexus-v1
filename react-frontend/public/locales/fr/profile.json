@@ -46,7 +46,9 @@
   "about": {
     "heading": "À propos",
     "no_bio": "Aucune biographie ajoutée.",
-    "skills": "Compétences"
+    "skills": "Compétences",
+    "no_skills_own": "Ajoutez des compétences dans les paramètres pour que les autres membres sachent en quoi vous pouvez aider.",
+    "no_skills_other": "Ce membre n'a pas encore ajouté de compétences."
   },
   "listing_type": {
     "offer": "Proposé",
@@ -134,7 +136,8 @@
     "submit_failed_fallback": "Impossible de soumettre l'avis"
   },
   "page_meta": {
-    "title": "Profile"
+    "title": "Profile",
+    "description": "Profil du membre {{name}}"
   },
   "more_options": "Plus d'options",
   "profile_actions": "Actions sur le profil",
@@ -181,5 +184,6 @@
   "hours_abbrev": "{{hours}}h",
   "post_hidden": "Hidden from your feed",
   "hide_failed": "Failed to hide",
-  "like_failed": "Failed to update like"
+  "like_failed": "Failed to update like",
+  "not_available_abbrev": "n/d"
 }

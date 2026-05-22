@@ -34,7 +34,8 @@
     "saved": "Saved",
     "clear": "Clear feed filters",
     "more": "More",
-    "select": "Select feed filter"
+    "select": "Select feed filter",
+    "show_all": "Pokaż wszystkie wpisy"
   },
   "report": {
     "title": "Zgłoś post",
@@ -350,7 +351,9 @@
     "your_vote": "Your vote"
   },
   "feed": {
-    "end_of_feed": "You're all caught up!"
+    "end_of_feed": "You're all caught up!",
+    "current_view": "Wyświetlanie {{filter}}",
+    "region_label": "Strumień społeczności"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -595,5 +598,9 @@
     "back": "Back to Feed",
     "not_found": "Item not found",
     "load_failed": "Failed to load item"
-  }
+  },
+  "meta_description": "Prywatny strumień społeczności dla aktualizacji, ogłoszeń, wydarzeń, ankiet, celów i rozmów.",
+  "error_hint": "Twoje filtry i edytor wersji roboczych są nadal tutaj. Odśwież strumień, gdy połączenie będzie gotowe.",
+  "loading_label": "Ładowanie aktualizacji społeczności...",
+  "empty_filtered_with_filter": "Nie ma teraz aktualizacji typu {{filter}}. Spróbuj wszystkich wpisów lub rozpocznij nową rozmowę."
 }

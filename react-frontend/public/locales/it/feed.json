@@ -34,7 +34,8 @@
     "saved": "Saved",
     "clear": "Clear feed filters",
     "more": "More",
-    "select": "Select feed filter"
+    "select": "Select feed filter",
+    "show_all": "Mostra tutti i post"
   },
   "report": {
     "title": "Segnala post",
@@ -350,7 +351,9 @@
     "your_vote": "Your vote"
   },
   "feed": {
-    "end_of_feed": "You're all caught up!"
+    "end_of_feed": "You're all caught up!",
+    "current_view": "Visualizzazione di {{filter}}",
+    "region_label": "Feed della comunità"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -595,5 +598,9 @@
     "back": "Back to Feed",
     "not_found": "Item not found",
     "load_failed": "Failed to load item"
-  }
+  },
+  "meta_description": "Un feed comunitario privato per aggiornamenti, annunci, eventi, sondaggi, obiettivi e conversazioni.",
+  "error_hint": "I tuoi filtri e l'editor di bozze sono ancora qui. Aggiorna il feed quando la tua connessione è pronta.",
+  "loading_label": "Caricamento degli aggiornamenti della comunità...",
+  "empty_filtered_with_filter": "Al momento non ci sono aggiornamenti {{filter}}. Prova tutti i post o avvia una nuova conversazione."
 }

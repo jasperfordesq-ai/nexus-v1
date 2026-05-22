@@ -60,7 +60,9 @@
     "still_need_help_description": "Non trova quello che cerca? Il nostro team è qui per aiutarLa.",
     "contact_support": "Contatta il supporto",
     "load_error_title": "Impossibile caricare le FAQ",
-    "load_error_description": "Aggiorna la pagina o contatta il supporto."
+    "load_error_description": "Aggiorna la pagina o contatta il supporto.",
+    "hero_eyebrow": "Risposte e guide pratiche",
+    "loading": "Caricamento degli articoli di aiuto..."
   },
   "resources": {
     "page_title": "Risorse",
@@ -125,7 +127,13 @@
     "collapse_category": "Collapse category",
     "expand_category": "Expand category",
     "hide_categories": "Hide categories",
-    "show_categories": "Show categories"
+    "show_categories": "Show categories",
+    "page_description": "Trova documenti condivisi della comunità, guide, modelli e file utili che aiutano membri, volontari e partner locali ad agire.",
+    "hero_eyebrow": "Libreria di conoscenza della comunità",
+    "hero_resources_label": "Risorse mostrate",
+    "empty_tip_guides": "Guide",
+    "empty_tip_templates": "Modelli",
+    "empty_tip_files": "File"
   },
   "not_found": {
     "page_title": "Pagina non trovata",

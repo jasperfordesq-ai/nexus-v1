@@ -34,7 +34,8 @@
     "saved": "Saved",
     "clear": "Clear feed filters",
     "more": "More",
-    "select": "Select feed filter"
+    "select": "Select feed filter",
+    "show_all": "Taispeáin gach postáil"
   },
   "report": {
     "title": "Tuairiscigh Postáil",
@@ -350,7 +351,9 @@
     "your_vote": "Your vote"
   },
   "feed": {
-    "end_of_feed": "You're all caught up!"
+    "end_of_feed": "You're all caught up!",
+    "current_view": "{{filter}} á thaispeáint",
+    "region_label": "Fotha an phobail"
   },
   "hashtag": {
     "title": "Haischlib",
@@ -595,5 +598,9 @@
     "back": "Back to Feed",
     "not_found": "Item not found",
     "load_failed": "Failed to load item"
-  }
+  },
+  "meta_description": "Fotha pobail príobháideach do nuashonruithe, liostáin, imeachtaí, vótaíochtaí, spriocanna agus comhráite.",
+  "error_hint": "Tá do scagairí agus an cumadóir dréachta fós anseo. Athnuaigh an fotha nuair atá do cheangal réidh.",
+  "loading_label": "Nuashonruithe pobail á luchtú...",
+  "empty_filtered_with_filter": "Níl aon nuashonrú de chineál {{filter}} ann faoi láthair. Bain triail as gach postáil nó tosaigh comhrá nua."
 }

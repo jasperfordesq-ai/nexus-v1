@@ -202,5 +202,10 @@
       "title": "Conversation"
     }
   },
-  "character_count": "{{current}}/{{max}}"
+  "character_count": "{{current}}/{{max}}",
+  "aria_messages_region": "Mensagens com {{name}}",
+  "context_offer": "oferta",
+  "context_request": "pedido",
+  "online_status": "Online",
+  "offline_status": "Offline"
 }

@@ -60,7 +60,9 @@
     "still_need_help_description": "探しているものが見つかりませんか？私たちのチームがサポートします。",
     "contact_support": "サポートに連絡する",
     "load_error_title": "Could not load FAQs",
-    "load_error_description": "Please try refreshing the page or contact support."
+    "load_error_description": "Please try refreshing the page or contact support.",
+    "hero_eyebrow": "回答と実用ガイド",
+    "loading": "ヘルプ記事を読み込み中..."
   },
   "resources": {
     "page_title": "Resources",
@@ -125,7 +127,13 @@
     "collapse_category": "Collapse category",
     "expand_category": "Expand category",
     "hide_categories": "Hide categories",
-    "show_categories": "Show categories"
+    "show_categories": "Show categories",
+    "page_description": "メンバー、ボランティア、地域パートナーが行動を起こすのに役立つ、共有のコミュニティドキュメント、ガイド、テンプレート、ファイルを探しましょう。",
+    "hero_eyebrow": "コミュニティのナレッジライブラリ",
+    "hero_resources_label": "表示中のリソース",
+    "empty_tip_guides": "ガイド",
+    "empty_tip_templates": "テンプレート",
+    "empty_tip_files": "ファイル"
   },
   "not_found": {
     "page_title": "ページが見つかりません",

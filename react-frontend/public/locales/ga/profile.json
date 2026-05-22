@@ -46,7 +46,9 @@
   "about": {
     "heading": "Faoi",
     "no_bio": "Níl aon bhitheolaíocht curtha leis go fóill.",
-    "skills": "Scileanna"
+    "skills": "Scileanna",
+    "no_skills_own": "Cuir scileanna leis sna socruithe ionas go mbeidh a fhios ag baill eile cén áit ar féidir leat cabhrú.",
+    "no_skills_other": "Níor chuir an ball seo scileanna ar bith leis go fóill."
   },
   "listing_type": {
     "offer": "Á thairiscint",
@@ -134,7 +136,8 @@
     "submit_failed_fallback": "Theip ar léirmheas a sheoladh"
   },
   "page_meta": {
-    "title": "Profile"
+    "title": "Profile",
+    "description": "Próifíl bhall {{name}}"
   },
   "more_options": "More options",
   "profile_actions": "Profile actions",
@@ -181,5 +184,6 @@
   "hours_abbrev": "{{hours}}h",
   "post_hidden": "Hidden from your feed",
   "hide_failed": "Failed to hide",
-  "like_failed": "Failed to update like"
+  "like_failed": "Failed to update like",
+  "not_available_abbrev": "n/a"
 }

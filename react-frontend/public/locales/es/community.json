@@ -178,7 +178,13 @@
     "terms_agreement": "He leído y acepto los términos de registro de organización anteriores.",
     "terms_required": "Debes aceptar los términos para registrar tu organización.",
     "opportunity_count_one": "{{count}} oportunidad",
-    "opportunity_count_other": "{{count}} oportunidades"
+    "opportunity_count_other": "{{count}} oportunidades",
+    "page_description": "Descubre organizaciones de voluntariado, socios locales y grupos comunitarios que ofrecen oportunidades, apoyo y servicios a través de tu red de banco de tiempo.",
+    "hero_eyebrow": "Socios locales de confianza",
+    "hero_partners_label": "Socios mostrados",
+    "empty_tip_volunteer": "Grupos de voluntariado",
+    "empty_tip_partner": "Socios comunitarios",
+    "empty_tip_register": "Registrar una organización"
   },
   "organisation_detail": {
     "page_title": "Organización",
@@ -210,7 +216,8 @@
     "cover_message_placeholder": "Cuéntale a la organización por qué te gustaría ser voluntario...",
     "cancel": "Cancelar",
     "submit_application": "Enviar Solicitud",
-    "job_openings": "Job Openings"
+    "job_openings": "Job Openings",
+    "meta_description_fallback": "Explora {{name}} y {{count}} oportunidades activas de voluntariado en este banco de tiempo comunitario."
   },
   "emergency_alerts": {
     "heading": "Alertas de Emergencia",

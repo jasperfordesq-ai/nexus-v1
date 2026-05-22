@@ -178,7 +178,13 @@
     "terms_agreement": "J'ai lu et j'accepte les conditions d'enregistrement d'organisation ci-dessus.",
     "terms_required": "Vous devez accepter les conditions pour enregistrer votre organisation.",
     "opportunity_count_one": "{{count}} opportunité",
-    "opportunity_count_other": "{{count}} opportunités"
+    "opportunity_count_other": "{{count}} opportunités",
+    "page_description": "Découvrez des organisations bénévoles, des partenaires locaux et des groupes communautaires offrant des opportunités, un soutien et des services via votre réseau de banque de temps.",
+    "hero_eyebrow": "Partenaires locaux de confiance",
+    "hero_partners_label": "Partenaires affichés",
+    "empty_tip_volunteer": "Groupes de bénévoles",
+    "empty_tip_partner": "Partenaires communautaires",
+    "empty_tip_register": "Enregistrer une organisation"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -210,7 +216,8 @@
     "cover_message_placeholder": "Expliquez à l'organisation pourquoi vous souhaitez faire du bénévolat...",
     "cancel": "Annuler",
     "submit_application": "Envoyer la candidature",
-    "job_openings": "Job Openings"
+    "job_openings": "Job Openings",
+    "meta_description_fallback": "Explorez {{name}} et {{count}} opportunités de bénévolat actives sur cette banque de temps communautaire."
   },
   "emergency_alerts": {
     "heading": "Alertes d'urgence",

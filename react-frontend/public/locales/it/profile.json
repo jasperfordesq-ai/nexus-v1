@@ -46,7 +46,9 @@
   "about": {
     "heading": "Informazioni",
     "no_bio": "Nessuna biografia aggiunta.",
-    "skills": "Competenze"
+    "skills": "Competenze",
+    "no_skills_own": "Aggiungi competenze nelle impostazioni in modo che gli altri membri sappiano in cosa puoi aiutare.",
+    "no_skills_other": "Questo membro non ha ancora aggiunto alcuna competenza."
   },
   "listing_type": {
     "offer": "Offerto",
@@ -134,7 +136,8 @@
     "submit_failed_fallback": "Impossibile inviare la recensione"
   },
   "page_meta": {
-    "title": "Profile"
+    "title": "Profile",
+    "description": "Profilo membro di {{name}}"
   },
   "more_options": "Altre opzioni",
   "profile_actions": "Azioni sul profilo",
@@ -181,5 +184,6 @@
   "hours_abbrev": "{{hours}}h",
   "post_hidden": "Hidden from your feed",
   "hide_failed": "Failed to hide",
-  "like_failed": "Failed to update like"
+  "like_failed": "Failed to update like",
+  "not_available_abbrev": "n/d"
 }

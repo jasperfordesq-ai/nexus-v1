@@ -88,7 +88,8 @@
     "no_members_found": "Níor aimsíodh aon bhaill a mheaitseálann do chuardach.",
     "done": "Déanta",
     "aria_exchange_participants": "Rannpháirtithe malartú",
-    "aria_hour_split": "Roinnt uaireanta"
+    "aria_hour_split": "Roinnt uaireanta",
+    "hours_amount": "{{count}} u."
   },
   "create": {
     "page_title": "Cruthaigh Malartú Grúpa",
@@ -142,7 +143,12 @@
     "weight_placeholder": "Ualú",
     "hours_for": "Uaireanta do {{name}}",
     "weight_for": "Ualú do {{name}}",
-    "aria_hour_split_preview": "Réamhamharc roinnt uaireanta"
+    "aria_hour_split_preview": "Réamhamharc roinnt uaireanta",
+    "current_step": "Céim reatha",
+    "step_of_named": "Céim {{current}} as {{total}}: {{name}}",
+    "hours_value": "{{hours}} u.",
+    "hours_suffix": "u.",
+    "weight_suffix": "x"
   },
   "toast": {
     "load_more_failed": "Theip ar thuilleadh malartuithe a lódáil",

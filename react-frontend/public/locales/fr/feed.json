@@ -34,7 +34,8 @@
     "saved": "Saved",
     "clear": "Clear feed filters",
     "more": "More",
-    "select": "Select feed filter"
+    "select": "Select feed filter",
+    "show_all": "Afficher toutes les publications"
   },
   "report": {
     "title": "Signaler la publication",
@@ -350,7 +351,9 @@
     "your_vote": "Your vote"
   },
   "feed": {
-    "end_of_feed": "You're all caught up!"
+    "end_of_feed": "You're all caught up!",
+    "current_view": "Affichage de {{filter}}",
+    "region_label": "Flux communautaire"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -595,5 +598,9 @@
     "back": "Back to Feed",
     "not_found": "Item not found",
     "load_failed": "Failed to load item"
-  }
+  },
+  "meta_description": "Un flux communautaire privé pour les mises à jour, annonces, événements, sondages, objectifs et conversations.",
+  "error_hint": "Vos filtres et le compositeur de brouillon sont toujours là. Actualisez le flux lorsque votre connexion est prête.",
+  "loading_label": "Chargement des mises à jour de la communauté...",
+  "empty_filtered_with_filter": "Aucune mise à jour {{filter}} pour le moment. Essayez tous les articles ou démarrez une nouvelle conversation."
 }

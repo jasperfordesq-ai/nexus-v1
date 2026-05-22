@@ -56,5 +56,10 @@
     "reaction_sad": "Sad",
     "reaction_celebrate": "Celebrate"
   },
-  "page_description": "Stories, guides, and updates from the timebanking community — exchanges that worked, lessons learned, and the latest from local groups and partners."
+  "page_description": "Stories, guides, and updates from the timebanking community — exchanges that worked, lessons learned, and the latest from local groups and partners.",
+  "hero_eyebrow": "Histoires de la communauté",
+  "hero_posts_label": "Articles affichés",
+  "empty_tip_stories": "Récits des membres",
+  "empty_tip_guides": "Guides",
+  "empty_tip_updates": "Mises à jour"
 }

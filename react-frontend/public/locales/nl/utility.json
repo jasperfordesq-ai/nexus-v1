@@ -60,7 +60,9 @@
     "still_need_help_description": "Kun je niet vinden wat je zoekt? Ons team staat klaar om te helpen.",
     "contact_support": "Neem contact op met Ondersteuning",
     "load_error_title": "FAQ kan niet worden geladen",
-    "load_error_description": "Vernieuw de pagina of neem contact op met support."
+    "load_error_description": "Vernieuw de pagina of neem contact op met support.",
+    "hero_eyebrow": "Antwoorden en praktische gidsen",
+    "loading": "Helpartikelen worden geladen..."
   },
   "resources": {
     "page_title": "Resources",
@@ -125,7 +127,13 @@
     "collapse_category": "Collapse category",
     "expand_category": "Expand category",
     "hide_categories": "Hide categories",
-    "show_categories": "Show categories"
+    "show_categories": "Show categories",
+    "page_description": "Vind gedeelde communitydocumenten, gidsen, sjablonen en nuttige bestanden die leden, vrijwilligers en lokale partners helpen om in actie te komen.",
+    "hero_eyebrow": "Kennisbibliotheek van de community",
+    "hero_resources_label": "Getoonde bronnen",
+    "empty_tip_guides": "Gidsen",
+    "empty_tip_templates": "Sjablonen",
+    "empty_tip_files": "Bestanden"
   },
   "not_found": {
     "page_title": "Pagina Niet Gevonden",

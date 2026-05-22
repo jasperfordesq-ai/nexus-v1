@@ -118,7 +118,14 @@
     "collection_name": "Name",
     "cancel": "Cancel",
     "save": "Save",
-    "create": "Create"
+    "create": "Create",
+    "meta_description": "Rivedi e organizza i tuoi post salvati, annunci, eventi, offerte di lavoro, articoli del blog e discussioni.",
+    "collection_filter_label": "Raccolta",
+    "remove": "Rimuovi dai salvati",
+    "delete_collection_title": "Elimina raccolta",
+    "delete_collection_body": "Eliminare \"{{name}}\"? I segnalibri di questa raccolta verranno conservati.",
+    "delete_collection_action": "Elimina raccolta",
+    "collection_actions_named": "Azioni per la raccolta {{name}}"
   },
   "verified": "Verified",
   "hover_card": {

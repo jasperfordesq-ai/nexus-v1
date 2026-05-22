@@ -178,7 +178,13 @@
     "terms_agreement": "Léigh mé agus aontaím leis na téarmaí cláraithe eagrais thuas.",
     "terms_required": "Ní mór duit aontú leis na téarmaí chun d'eagras a chlárú.",
     "opportunity_count_one": "{{count}} deis",
-    "opportunity_count_other": "{{count}} deiseanna"
+    "opportunity_count_other": "{{count}} deiseanna",
+    "page_description": "Faigh amach faoi eagraíochtaí deonacha, comhpháirtithe áitiúla, agus grúpaí pobail a sholáthraíonn deiseanna, tacaíocht agus seirbhísí trí do líonra bainc ama.",
+    "hero_eyebrow": "Comhpháirtithe áitiúla iontaofa",
+    "hero_partners_label": "Comhpháirtithe ar taispeáint",
+    "empty_tip_volunteer": "Grúpaí deonacha",
+    "empty_tip_partner": "Comhpháirtithe pobail",
+    "empty_tip_register": "Cláraigh eagraíocht"
   },
   "organisation_detail": {
     "page_title": "Eagras",
@@ -210,7 +216,8 @@
     "cover_message_placeholder": "Inis don eagras cén fáth ar mhaith leat obair dheonach a dhéanamh...",
     "cancel": "Cealaigh",
     "submit_application": "Cuir Iarratas Isteach",
-    "job_openings": "Job Openings"
+    "job_openings": "Job Openings",
+    "meta_description_fallback": "Faigh amach faoi {{name}} agus {{count}} deis dheonach gníomhach ar an mbanc ama pobail seo."
   },
   "emergency_alerts": {
     "heading": "Foláirimh Éigeandála",

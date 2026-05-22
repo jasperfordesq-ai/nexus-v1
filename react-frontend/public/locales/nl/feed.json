@@ -34,7 +34,8 @@
     "saved": "Saved",
     "clear": "Clear feed filters",
     "more": "More",
-    "select": "Select feed filter"
+    "select": "Select feed filter",
+    "show_all": "Alle berichten tonen"
   },
   "report": {
     "title": "Post rapporteren",
@@ -350,7 +351,9 @@
     "your_vote": "Your vote"
   },
   "feed": {
-    "end_of_feed": "You're all caught up!"
+    "end_of_feed": "You're all caught up!",
+    "current_view": "{{filter}} wordt weergegeven",
+    "region_label": "Communityfeed"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -595,5 +598,9 @@
     "back": "Back to Feed",
     "not_found": "Item not found",
     "load_failed": "Failed to load item"
-  }
+  },
+  "meta_description": "Een privé-communityfeed voor updates, advertenties, evenementen, polls, doelen en gesprekken.",
+  "error_hint": "Je filters en concept-editor staan er nog. Ververs de feed zodra je verbinding klaar is.",
+  "loading_label": "Community-updates worden geladen...",
+  "empty_filtered_with_filter": "Er zijn nu geen {{filter}}-updates. Probeer alle berichten of start een nieuw gesprek."
 }

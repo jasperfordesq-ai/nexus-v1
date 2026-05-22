@@ -60,7 +60,9 @@
     "still_need_help_description": "Sie finden nicht, was Sie suchen? Unser Team hilft Ihnen gerne.",
     "contact_support": "Support kontaktieren",
     "load_error_title": "FAQs konnten nicht geladen werden",
-    "load_error_description": "Bitte aktualisieren Sie die Seite oder kontaktieren Sie den Support."
+    "load_error_description": "Bitte aktualisieren Sie die Seite oder kontaktieren Sie den Support.",
+    "hero_eyebrow": "Antworten und praktische Anleitungen",
+    "loading": "Hilfeartikel werden geladen..."
   },
   "resources": {
     "page_title": "Ressourcen",
@@ -125,7 +127,13 @@
     "collapse_category": "Collapse category",
     "expand_category": "Expand category",
     "hide_categories": "Hide categories",
-    "show_categories": "Show categories"
+    "show_categories": "Show categories",
+    "page_description": "Finden Sie gemeinsame Community-Dokumente, Anleitungen, Vorlagen und nützliche Dateien, die Mitgliedern, Freiwilligen und lokalen Partnern helfen, aktiv zu werden.",
+    "hero_eyebrow": "Wissensbibliothek der Community",
+    "hero_resources_label": "Angezeigte Ressourcen",
+    "empty_tip_guides": "Anleitungen",
+    "empty_tip_templates": "Vorlagen",
+    "empty_tip_files": "Dateien"
   },
   "not_found": {
     "page_title": "Seite nicht gefunden",

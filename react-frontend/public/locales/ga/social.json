@@ -118,7 +118,14 @@
     "collection_description": "Description (optional)",
     "cancel": "Cancel",
     "save": "Save",
-    "create": "Create"
+    "create": "Create",
+    "meta_description": "Athbhreithnigh agus eagraigh do phostálacha sábháilte, liostaí, imeachtaí, poist, alt bhlag agus pléanna.",
+    "collection_filter_label": "Bailiúchán",
+    "remove": "Bain ón liosta sábháilte",
+    "delete_collection_title": "Scrios an bailiúchán",
+    "delete_collection_body": "An bhfuil tú cinnte gur mhaith leat \"{{name}}\" a scriosadh? Coinneofar na leabharmharcanna sa bhailiúchán seo.",
+    "delete_collection_action": "Scrios an bailiúchán",
+    "collection_actions_named": "Gníomhartha don bhailiúchán {{name}}"
   },
   "verified": "Verified",
   "hover_card": {

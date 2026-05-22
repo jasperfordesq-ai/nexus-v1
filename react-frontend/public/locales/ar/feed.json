@@ -34,7 +34,8 @@
     "saved": "Saved",
     "clear": "Clear feed filters",
     "more": "More",
-    "select": "Select feed filter"
+    "select": "Select feed filter",
+    "show_all": "عرض كل المنشورات"
   },
   "report": {
     "title": "الإبلاغ عن المنشور",
@@ -350,7 +351,9 @@
     "your_vote": "Your vote"
   },
   "feed": {
-    "end_of_feed": "You're all caught up!"
+    "end_of_feed": "You're all caught up!",
+    "current_view": "عرض {{filter}}",
+    "region_label": "موجز المجتمع"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -595,5 +598,9 @@
     "back": "Back to Feed",
     "not_found": "Item not found",
     "load_failed": "Failed to load item"
-  }
+  },
+  "meta_description": "موجز مجتمعي خاص للتحديثات والقوائم والفعاليات والاستطلاعات والأهداف والمحادثات.",
+  "error_hint": "لا تزال عوامل التصفية ومحرر المسودات هنا. حدّث الموجز عند جاهزية الاتصال.",
+  "loading_label": "جارٍ تحميل تحديثات المجتمع...",
+  "empty_filtered_with_filter": "لا توجد تحديثات من نوع {{filter}} الآن. جرّب جميع المنشورات أو ابدأ محادثة جديدة."
 }

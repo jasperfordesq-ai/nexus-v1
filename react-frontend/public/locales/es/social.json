@@ -118,7 +118,14 @@
     "collection_name": "Name",
     "cancel": "Cancel",
     "save": "Save",
-    "create": "Create"
+    "create": "Create",
+    "meta_description": "Revisa y organiza tus publicaciones guardadas, anuncios, eventos, empleos, entradas de blog y debates.",
+    "collection_filter_label": "Colección",
+    "remove": "Quitar de guardados",
+    "delete_collection_title": "Eliminar colección",
+    "delete_collection_body": "¿Eliminar \"{{name}}\"? Los marcadores de esta colección se conservarán.",
+    "delete_collection_action": "Eliminar colección",
+    "collection_actions_named": "Acciones de la colección {{name}}"
   },
   "verified": "Verified",
   "hover_card": {

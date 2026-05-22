@@ -88,7 +88,8 @@
     "no_members_found": "لم يتم العثور على أعضاء يتطابقون مع بحثك.",
     "done": "Done",
     "aria_exchange_participants": "مشاركو المبادلة",
-    "aria_hour_split": "تقسيم الساعات"
+    "aria_hour_split": "تقسيم الساعات",
+    "hours_amount": "{{count}}س"
   },
   "create": {
     "page_title": "إنشاء مبادلة جماعية",
@@ -142,7 +143,12 @@
     "weight_placeholder": "Weight",
     "hours_for": "الساعات لـ {{name}}",
     "weight_for": "الوزن لـ {{name}}",
-    "aria_hour_split_preview": "معاينة تقسيم الساعات"
+    "aria_hour_split_preview": "معاينة تقسيم الساعات",
+    "current_step": "الخطوة الحالية",
+    "step_of_named": "الخطوة {{current}} من {{total}}: {{name}}",
+    "hours_value": "{{hours}}س",
+    "hours_suffix": "س",
+    "weight_suffix": "×"
   },
   "toast": {
     "load_more_failed": "فشل في تحميل المزيد من التبادلات",
