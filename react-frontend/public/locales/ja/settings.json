@@ -334,7 +334,6 @@
     "frequency": "ダイジェストの頻度",
     "frequency_description": "マッチダイジェストメールを受け取る頻度",
     "daily": "毎日",
-    "weekly": "毎週",
     "fortnightly": "2週間ごと",
     "never": "なし",
     "monthly": "毎月"
