@@ -1,27 +1,27 @@
 {
   "shift_reminder": {
-    "subject": "Reminder: Volunteer shift tomorrow — {{title}} — {{community}}",
-    "title": "Shift Reminder",
-    "preview": "Your volunteer shift for {{title}} is coming up",
-    "body": "This is a friendly reminder about your upcoming volunteer shift.",
+    "subject": "Rappel : Changement de bénévole demain — {{title}} — {{community}}",
+    "title": "Rappel de quart de travail",
+    "preview": "Votre quart de travail bénévole pour {{title}} approche",
+    "body": "Ceci est un rappel amical concernant votre prochain quart de travail bénévole.",
     "label_opportunity": "Opportunity",
     "label_when": "When",
     "label_location": "Location",
-    "cta": "View Details"
+    "cta": "Afficher les détails"
   },
   "shift_starting_soon": {
-    "subject": "Your volunteer shift starts soon — {{title}}",
-    "title": "Shift Starting Soon",
-    "preview": "Your volunteer shift for {{title}} starts soon",
-    "body": "Your volunteer shift is starting soon. Thank you for your commitment to the community!",
-    "cta": "View Shift Details"
+    "subject": "Votre quart de travail bénévole commence bientôt — {{title}}",
+    "title": "Changement commençant bientôt",
+    "preview": "Votre quart de travail bénévole pour {{title}} commence bientôt",
+    "body": "Votre quart de bénévolat commence bientôt. Merci pour votre engagement envers la communauté!",
+    "cta": "Afficher les détails du quart de travail"
   },
   "post_shift_feedback": {
-    "subject": "Thank you for volunteering — {{title}}",
-    "title": "Thank You for Volunteering!",
-    "preview": "Thank you for your volunteer shift with {{title}}",
-    "body": "Thank you for completing your volunteer shift with <strong>{{title}}</strong>. Your contribution makes a real difference!",
-    "log_hours_prompt": "Please remember to log your hours so your contribution is recorded.",
-    "cta": "Log Your Hours"
+    "subject": "Merci pour votre bénévolat — {{title}}",
+    "title": "Merci pour votre bénévolat !",
+    "preview": "Merci pour votre quart de bénévolat avec {{title}}",
+    "body": "Merci d'avoir terminé votre quart de travail bénévole avec <strong>{{title}}</strong>. Votre contribution fait une réelle différence !",
+    "log_hours_prompt": "N'oubliez pas de consigner vos heures afin que votre contribution soit enregistrée.",
+    "cta": "Enregistrez vos heures"
   }
 }
