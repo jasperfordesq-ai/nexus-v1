@@ -268,32 +268,32 @@ class ImageUploader
                 $newHeight = (int)($srcWidth / $thumbRatio);
             }
 
-            $xOffset = ($srcWidth - $newWidth) / 2;
-            $yOffset = ($srcHeight - $newHeight) / 2;
+            $xOffset = (int) (($srcWidth - $newWidth) / 2);
+            $yOffset = (int) (($srcHeight - $newHeight) / 2);
 
-            $thumb = \imagecreatetruecolor($targetWidth, $targetHeight);
+            $thumb = \imagecreatetruecolor((int) $targetWidth, (int) $targetHeight);
 
             if ($mime == 'image/png' || $mime == 'image/webp') {
                 \imagealphablending($thumb, false);
                 \imagesavealpha($thumb, true);
             }
 
-            \imagecopyresampled($thumb, $image, 0, 0, $xOffset, $yOffset, $targetWidth, $targetHeight, $newWidth, $newHeight);
+            \imagecopyresampled($thumb, $image, 0, 0, $xOffset, $yOffset, (int) $targetWidth, (int) $targetHeight, $newWidth, $newHeight);
             $image = $thumb;
         } elseif (isset($options['width'])) {
             $ratio = $srcWidth / $srcHeight;
             if ($targetWidth / $targetHeight > $ratio) {
-                $targetWidth = $targetHeight * $ratio;
+                $targetWidth = (int) ($targetHeight * $ratio);
             } else {
-                $targetHeight = $targetWidth / $ratio;
+                $targetHeight = (int) ($targetWidth / $ratio);
             }
 
-            $thumb = \imagecreatetruecolor($targetWidth, $targetHeight);
+            $thumb = \imagecreatetruecolor((int) $targetWidth, (int) $targetHeight);
             if ($mime == 'image/png' || $mime == 'image/webp') {
                 \imagealphablending($thumb, false);
                 \imagesavealpha($thumb, true);
             }
-            \imagecopyresampled($thumb, $image, 0, 0, 0, 0, $targetWidth, $targetHeight, $srcWidth, $srcHeight);
+            \imagecopyresampled($thumb, $image, 0, 0, 0, 0, (int) $targetWidth, (int) $targetHeight, $srcWidth, $srcHeight);
             $image = $thumb;
         }
 

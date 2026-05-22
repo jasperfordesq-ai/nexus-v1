@@ -162,7 +162,11 @@ function getStoredTheme(): ThemeMode | null {
 
 function storeTheme(theme: ThemeMode): void {
   if (typeof localStorage === 'undefined') return;
-  localStorage.setItem(THEME_STORAGE_KEY, theme);
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch {
+    // QuotaExceededError or storage disabled — non-fatal, theme still applies in-memory
+  }
 }
 
 function getStoredPreferences(): ThemePreferences | null {
@@ -189,7 +193,11 @@ function getStoredPreferences(): ThemePreferences | null {
 
 function storePreferences(prefs: ThemePreferences): void {
   if (typeof localStorage === 'undefined') return;
-  localStorage.setItem(THEME_PREFS_STORAGE_KEY, JSON.stringify(prefs));
+  try {
+    localStorage.setItem(THEME_PREFS_STORAGE_KEY, JSON.stringify(prefs));
+  } catch {
+    // QuotaExceededError or storage disabled — non-fatal, prefs still apply in-memory
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
