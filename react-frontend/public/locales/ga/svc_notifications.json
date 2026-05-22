@@ -1,135 +1,135 @@
 {
   "badge_collection": {
-    "collection_complete": "Collection Complete! You finished '{{name}}' and earned {{xp}} bonus XP! {{icon}}"
+    "collection_complete": "Bailiúchán Críochnaithe! Chríochnaigh tú '{{name}}' agus thuill tú bónas {{xp}} XP! {{icon}}"
   },
   "broker": {
-    "message_for_review": "New message for review from {{sender}}"
+    "message_for_review": "Teachtaireacht nua le léirmheas ó {{sender}}"
   },
   "federation": {
     "message_received": "Teachtaireacht chónasctha nua ó {{sender}} ({{partner}})",
     "transaction_received": "Fuair tú {{amount}} creidiúintí ama ó {{sender}} ({{partner}})",
-    "connection_request": "{{sender}} from {{community}} wants to connect with you",
-    "connection_accepted": "{{name}} accepted your connection request",
-    "connection_declined": "Your connection request was declined"
+    "connection_request": "Tá {{sender}} ó {{community}} ag iarraidh ceangal a dhéanamh leat",
+    "connection_accepted": "Ghlac {{name}} le d'iarratas ceangail",
+    "connection_declined": "Diúltaíodh do d'iarratas ceangail"
+  },
+  "job_application": {
+    "shortlisted": "Tá d’iarratas ar {{title}} curtha ar an ngearrliosta!",
+    "rejected": "Níor éirigh le d’iarratas ar {{title}}",
+    "hired": "Comhghairdeachas! Tá tú fostaithe le haghaidh {{title}}",
+    "status_updated": "Nuashonraíodh d’iarratas ar stádas {{title}} go {{status}}",
+    "status_updated_generic": "Nuashonraíodh stádas d'fheidhmchláir",
+    "stuck_in_stage": "Tá feidhmchlár #{{id}} curtha in '{{stage}}' le laethanta {{days}}+"
+  },
+  "job_team": {
+    "added_as_role": "Tá tú curtha leis mar {{role}} le haghaidh '{{title}}'"
+  },
+  "shift_swap": {
+    "requested": "Tá iarratas nua ar mhalartú sealaíochta agat",
+    "declined": "Diúltaíodh d'iarratas ar mhalartú sealaíochta",
+    "accepted": "Glacadh le d'iarratas ar mhalartú sealaíochta",
+    "declined_by_admin": "Dhiúltaigh riarthóir d'iarratas ar mhalartú sealaíochta",
+    "accepted_swap_declined_by_admin": "Dhiúltaigh riarthóir babhtáil sealaíochta ar ghlac tú leis",
+    "approved_by_admin": "Cheadaigh riarthóir do bhabhtáil sealaíochta",
+    "accepted_swap_approved_by_admin": "D'fhaomh riarthóir babhtáil seala ar ghlac tú leis"
+  },
+  "user_security": {
+    "email_changed": "Athraíodh do sheoladh ríomhphoist. Mura ndearna tú é seo, déan teagmháil leis an bhfoireann tacaíochta láithreach."
+  },
+  "group_mention": {
+    "mentioned_in_group": "Luadh thú i {{group}}"
+  },
+  "idea_team": {
+    "added_to_group": "Cuireadh le {{group}} thú"
   },
   "challenge": {
-    "complete_claim": "Challenge Complete! You finished '{{title}}' — claim your reward!",
-    "complete_earned": "Challenge Complete! You finished '{{title}}' and earned {{xp}} XP!"
+    "complete_claim": "Dúshlán Críochnaithe! Chríochnaigh tú '{{title}}' - éileamh do luaíocht!",
+    "complete_earned": "Dúshlán Críochnaithe! Chríochnaigh tú '{{title}}' agus thuill tú {{xp}} XP!"
   },
   "gamification": {
-    "badge_earned": "You earned the '{{name}}' badge! {{icon}}",
-    "level_up": "Congratulations! You've reached Level {{level}}!"
+    "badge_earned": "Tá an suaitheantas ‘{{name}}’ tuillte agat! {{icon}}",
+    "level_up": "Comhghairdeachas! Tá Leibhéal {{level}} sroichte agat!"
   },
   "job_offer": {
-    "received_bell": "You have received a job offer for {{title}}",
-    "received_push_title": "Job Offer Received!",
-    "received_push_message": "You have received a job offer for {{title}}",
-    "credits_earned_bell": "You earned {{amount}} time credits for completing {{title}}!",
-    "credits_earned_push_title": "Time Credits Earned!",
-    "credits_earned_push_message": "You earned {{amount}} time credits for completing {{title}}!",
-    "accepted_bell": "Offer accepted for {{title}}",
-    "accepted_push_title": "Offer accepted for {{title}}",
-    "accepted_push_message": "Offer accepted for {{title}}",
-    "rejected_bell": "Offer rejected for {{title}}",
-    "rejected_push_title": "Offer rejected for {{title}}",
-    "rejected_push_message": "Offer rejected for {{title}}",
-    "withdrawn_bell": "Job offer withdrawn for {{title}}",
-    "withdrawn_push_title": "Job offer withdrawn for {{title}}",
-    "withdrawn_push_message": "Job offer withdrawn for {{title}}"
+    "received_bell": "Tá tairiscint poist faighte agat do {{title}}",
+    "received_push_title": "Tairiscint Poist faighte!",
+    "received_push_message": "Tá tairiscint poist faighte agat do {{title}}",
+    "credits_earned_bell": "Thuill tú creidmheasanna ama {{amount}} as {{title}} a chomhlánú!",
+    "credits_earned_push_title": "Creidmheasanna Ama Tuillte!",
+    "credits_earned_push_message": "Thuill tú creidmheasanna ama {{amount}} as {{title}} a chomhlánú!",
+    "accepted_bell": "Glacadh le tairiscint le haghaidh {{title}}",
+    "accepted_push_title": "Glacadh le tairiscint le haghaidh {{title}}",
+    "accepted_push_message": "Glacadh le tairiscint le haghaidh {{title}}",
+    "rejected_bell": "Tairiscint diúltaithe do {{title}}",
+    "rejected_push_title": "Tairiscint diúltaithe do {{title}}",
+    "rejected_push_message": "Tairiscint diúltaithe do {{title}}",
+    "withdrawn_bell": "Tairiscint fostaíochta tarraingthe siar do {{title}}",
+    "withdrawn_push_title": "Tairiscint fostaíochta tarraingthe siar do {{title}}",
+    "withdrawn_push_message": "Tairiscint fostaíochta tarraingthe siar do {{title}}"
   },
   "job_alert": {
-    "match_bell": "New job matching your alert: {{title}}",
-    "match_push_title": "New Job Match",
-    "match_push_message": "New job matching your alert: {{title}}"
+    "match_bell": "Post nua ag teacht leis an bhfoláireamh: {{title}}",
+    "match_push_title": "Cluiche Nua Poist",
+    "match_push_message": "Post nua ag teacht leis an bhfoláireamh: {{title}}"
   },
   "legal": {
-    "update_title": "Updated: {{title}}",
-    "update_message": "Please review version {{version}} of our {{title}}"
+    "update_title": "Nuashonraithe: {{title}}",
+    "update_message": "Déan athbhreithniú le do thoil ar leagan {{version}} dár {{title}}"
   },
   "verification_badge": {
-    "granted": "You have been granted the '{{label}}' verification badge"
+    "granted": "Deonaíodh an suaitheantas fíorúcháin '{{label}}' duit"
   },
   "mention": {
-    "mentioned_in": "@{{name}} mentioned you in a {{entity}}",
-    "mentioned_in_with_preview": "@{{name}} mentioned you in a {{entity}}: \"{{preview}}\""
+    "mentioned_in": "@{{name}} luaigh tú i {{entity}}",
+    "mentioned_in_with_preview": "@{{name}} luaite agat i {{entity}}: \"{{preview}}\""
   },
   "story": {
-    "reaction": "{{name}} reacted {{emoji}} to your story"
+    "reaction": "D’fhreagair {{name}} {{emoji}} le do scéal"
   },
   "sub_account": {
     "management_request": "{{name}} has requested to manage your account as a {{type}}"
   },
   "totp": {
-    "rate_limited": "Too many failed attempts. Please try again in {{minutes}} minutes."
+    "rate_limited": "An iomarca iarrachtaí ar theip orthu. Bain triail eile as i gceann {{minutes}} nóiméad."
   },
   "registration": {
-    "admin_pending_approval": "New user {{name}} ({{email}}) requires approval"
+    "admin_pending_approval": "Teastaíonn ceadú ó úsáideoir nua {{name}} ({{email}})."
   },
   "nexus_score": {
-    "strength_title": "{{name}} is your strongest area!",
-    "strength_message": "You're in the top tier with {{percentage}}% in {{name}}.",
-    "improvement_title": "Grow your {{name}} score",
-    "tip_engagement": "Try sending and receiving time credits with different community members.",
-    "tip_quality": "Focus on completing transactions successfully and earning positive reviews.",
-    "tip_volunteer": "Log your volunteer hours regularly and maintain consistency.",
-    "tip_activity": "Create listings, join groups, and maintain a daily login streak.",
-    "tip_badges": "Complete challenges to earn more badges and achievements.",
-    "tip_impact": "Share posts and engage with the community feed.",
-    "tip_default": "Keep participating in the community!",
-    "suggestion_connect_title": "Connect with more community members",
-    "suggestion_connect_message": "Exchange credits with new people to increase your network diversity.",
-    "suggestion_exchanges_title": "Complete more exchanges",
-    "suggestion_exchanges_message": "Build your reputation by completing transactions and earning reviews."
+    "strength_title": "Is é {{name}} an limistéar is láidre atá agat!",
+    "strength_message": "Tá tú sa tsraith is airde le {{percentage}}% i {{name}}.",
+    "improvement_title": "Fás do scór {{name}}",
+    "tip_engagement": "Déan iarracht creidmheasanna ama a sheoladh agus a fháil le baill éagsúla den phobal.",
+    "tip_quality": "Fócas ar idirbhearta a chomhlánú go rathúil agus athbhreithnithe dearfacha a thuilleamh.",
+    "tip_volunteer": "Logáil d'uaireanta deonacha go rialta agus coinnigh comhsheasmhacht.",
+    "tip_activity": "Cruthaigh liostaí, ceangail le grúpaí, agus coinnigh stríoc logáil isteach laethúil.",
+    "tip_badges": "Dúshláin a chríochnú chun níos mó suaitheantais agus éachtaí a thuilleamh.",
+    "tip_impact": "Roinn postálacha agus téigh i dteagmháil leis an bhfotha pobail.",
+    "tip_default": "Leanaigí páirt sa phobal!",
+    "suggestion_connect_title": "Déan teagmháil le níos mó baill den phobal",
+    "suggestion_connect_message": "Malartaigh creidmheasanna le daoine nua chun éagsúlacht do líonra a mhéadú.",
+    "suggestion_exchanges_title": "Críochnaigh níos mó malartuithe",
+    "suggestion_exchanges_message": "Tóg do chlú trí idirbhearta a chomhlánú agus athbhreithnithe a thuilleamh."
   },
-  "vetting_approved_title": "Your verification has been approved!",
-  "vetting_approved_heading": "Verification Approved",
-  "vetting_approved_body": "Your background check verification has been approved. Your verified status is now active on your profile.",
-  "vetting_go_to_dashboard": "Go to Dashboard",
-  "vetting_rejected_title": "Your verification could not be completed. Please contact support.",
-  "vetting_rejected_heading": "Verification Not Completed",
-  "vetting_rejected_body": "Your background check verification could not be completed at this time. Please contact your community coordinator for more information or to resubmit.",
-  "vetting_contact_support": "Contact Support",
-  "suspended_by_admin": "Suspended by admin",
-  "account_suspended_title": "Account Suspended",
-  "account_banned_title": "Account Banned",
-  "banned_by_admin": "Banned by admin",
-  "account_deleted_title": "Account Deleted",
-  "reset_by_admin": "Reset by admin",
-  "password_changed_title": "Password Changed",
-  "get_started": "Get Started",
-  "account_reactivated_title": "Account Reactivated",
-  "job_application": {
-    "shortlisted": "Your application for {{title}} has been shortlisted!",
-    "rejected": "Your application for {{title}} was not successful",
-    "hired": "Congratulations! You've been hired for {{title}}",
-    "status_updated": "Your application for {{title}} status updated to {{status}}",
-    "status_updated_generic": "Your application status has been updated",
-    "stuck_in_stage": "Application #{{id}} has been in '{{stage}}' for {{days}}+ days"
-  },
-  "job_team": {
-    "added_as_role": "You've been added as a {{role}} for '{{title}}'"
-  },
-  "shift_swap": {
-    "requested": "You have a new shift swap request",
-    "declined": "Your shift swap request was declined",
-    "accepted": "Your shift swap request was accepted",
-    "declined_by_admin": "Your shift swap request was declined by an admin",
-    "accepted_swap_declined_by_admin": "A shift swap you accepted was declined by an admin",
-    "approved_by_admin": "Your shift swap was approved by an admin",
-    "accepted_swap_approved_by_admin": "A shift swap you accepted was approved by an admin"
-  },
-  "user_security": {
-    "email_changed": "Your email address has been changed. If you did not do this, contact support immediately."
-  },
-  "group_mention": {
-    "mentioned_in_group": "You were mentioned in {{group}}"
-  },
-  "idea_team": {
-    "added_to_group": "You've been added to {{group}}"
-  },
+  "vetting_approved_title": "Tá d'fhíorú ceadaithe!",
+  "vetting_approved_heading": "Fíorú Faofa",
+  "vetting_approved_body": "Faomhadh do fhíorú seiceála cúlra. Tá do stádas fíoraithe gníomhach ar do phróifíl anois.",
+  "vetting_go_to_dashboard": "Téigh go dtí an Deais",
+  "vetting_rejected_title": "Níorbh fhéidir d'fhíorú a chur i gcrích. Déan teagmháil le tacaíocht.",
+  "vetting_rejected_heading": "Fíorú gan chríochnú",
+  "vetting_rejected_body": "Níorbh fhéidir do fhíorú cúlra a chur i gcrích faoi láthair. Déan teagmháil le do chomhordaitheoir pobail le do thoil chun tuilleadh eolais a fháil nó chun é a chur isteach arís.",
+  "vetting_contact_support": "Tacaíocht Teagmhála",
+  "suspended_by_admin": "Ar fionraí ag an riarthóir",
+  "account_suspended_title": "Cuntas ar Fionraí",
+  "account_banned_title": "Cuntas Cosc",
+  "banned_by_admin": "Cosc ag an admin",
+  "account_deleted_title": "Cuntas Scriosta",
+  "reset_by_admin": "Athshocraigh an riarthóir",
+  "password_changed_title": "Athraíodh an Pasfhocal",
+  "get_started": "Faigh Tosaigh",
+  "account_reactivated_title": "Cuntas athghníomhachtaithe",
   "goal": {
-    "reminder_bell": "Goal reminder: \"{{title}}\"",
-    "reminder_push_title": "Goal Reminder",
-    "reminder_push_message": "Don't forget your goal: \"{{title}}\""
+    "reminder_bell": "Meabhrúchán sprice: \"{{title}}\"",
+    "reminder_push_title": "Meabhrúchán Sprioc",
+    "reminder_push_message": "Ná déan dearmad ar do sprioc: \"{{title}}\""
   }
 }

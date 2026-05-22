@@ -1,135 +1,135 @@
 {
   "badge_collection": {
-    "collection_complete": "Collection Complete! You finished '{{name}}' and earned {{xp}} bonus XP! {{icon}}"
+    "collection_complete": "Kolekcja ukończona! Ukończyłeś „{{name}}” i zdobyłeś dodatkowe PD {{xp}}! {{icon}}"
   },
   "broker": {
-    "message_for_review": "New message for review from {{sender}}"
+    "message_for_review": "Nowa wiadomość do sprawdzenia od {{sender}}"
   },
   "federation": {
-    "message_received": "New federated message from {{sender}} ({{partner}})",
-    "transaction_received": "You received {{amount}} time credits from {{sender}} ({{partner}})",
-    "connection_request": "{{sender}} from {{community}} wants to connect with you",
-    "connection_accepted": "{{name}} accepted your connection request",
-    "connection_declined": "Your connection request was declined"
+    "message_received": "Nowa wiadomość federacyjna od {{sender}} ({{partner}})",
+    "transaction_received": "Otrzymałeś kredyty czasowe {{amount}} od {{sender}} ({{partner}})",
+    "connection_request": "{{sender}} z {{community}} chce się z Tobą połączyć",
+    "connection_accepted": "{{name}} zaakceptował Twoją prośbę o połączenie",
+    "connection_declined": "Twoja prośba o połączenie została odrzucona"
+  },
+  "job_application": {
+    "shortlisted": "Twoja aplikacja dla {{title}} znalazła się na krótkiej liście!",
+    "rejected": "Twoja aplikacja dla {{title}} nie powiodła się",
+    "hired": "Gratulacje! Zostałeś zatrudniony w {{title}}",
+    "status_updated": "Twoja aplikacja o status {{title}} została zaktualizowana do {{status}}",
+    "status_updated_generic": "Status Twojego wniosku został zaktualizowany",
+    "stuck_in_stage": "Aplikacja #{{id}} znajduje się w „{{stage}}” od ponad dni {{days}}"
+  },
+  "job_team": {
+    "added_as_role": "Dodano Cię jako {{role}} dla „{{title}}”"
+  },
+  "shift_swap": {
+    "requested": "Masz nową prośbę o zamianę zmiany",
+    "declined": "Twoja prośba o zamianę zmiany została odrzucona",
+    "accepted": "Twoja prośba o zamianę zmiany została zaakceptowana",
+    "declined_by_admin": "Twoja prośba o zamianę zmiany została odrzucona przez administratora",
+    "accepted_swap_declined_by_admin": "Zaakceptowana zamiana zmian została odrzucona przez administratora",
+    "approved_by_admin": "Twoja zamiana zmian została zatwierdzona przez administratora",
+    "accepted_swap_approved_by_admin": "Zaakceptowana zamiana zmian została zatwierdzona przez administratora"
+  },
+  "user_security": {
+    "email_changed": "Twój adres e-mail został zmieniony. Jeśli tego nie zrobiłeś, natychmiast skontaktuj się z pomocą techniczną."
+  },
+  "group_mention": {
+    "mentioned_in_group": "Wspomniano o Tobie w {{group}}"
+  },
+  "idea_team": {
+    "added_to_group": "Dodano Cię do {{group}}"
   },
   "challenge": {
-    "complete_claim": "Challenge Complete! You finished '{{title}}' — claim your reward!",
-    "complete_earned": "Challenge Complete! You finished '{{title}}' and earned {{xp}} XP!"
+    "complete_claim": "Wyzwanie ukończone! Ukończyłeś „{{title}}” — odbierz nagrodę!",
+    "complete_earned": "Wyzwanie ukończone! Ukończyłeś „{{title}}” i zdobyłeś {{xp}} XP!"
   },
   "gamification": {
-    "badge_earned": "You earned the '{{name}}' badge! {{icon}}",
-    "level_up": "Congratulations! You've reached Level {{level}}!"
+    "badge_earned": "Zdobyłeś odznakę „{{name}}”! {{icon}}",
+    "level_up": "Gratulacje! Osiągnąłeś poziom {{level}}!"
   },
   "job_offer": {
-    "received_bell": "You have received a job offer for {{title}}",
-    "received_push_title": "Job Offer Received!",
-    "received_push_message": "You have received a job offer for {{title}}",
-    "credits_earned_bell": "You earned {{amount}} time credits for completing {{title}}!",
-    "credits_earned_push_title": "Time Credits Earned!",
-    "credits_earned_push_message": "You earned {{amount}} time credits for completing {{title}}!",
-    "accepted_bell": "Offer accepted for {{title}}",
-    "accepted_push_title": "Offer accepted for {{title}}",
-    "accepted_push_message": "Offer accepted for {{title}}",
-    "rejected_bell": "Offer rejected for {{title}}",
-    "rejected_push_title": "Offer rejected for {{title}}",
-    "rejected_push_message": "Offer rejected for {{title}}",
-    "withdrawn_bell": "Job offer withdrawn for {{title}}",
-    "withdrawn_push_title": "Job offer withdrawn for {{title}}",
-    "withdrawn_push_message": "Job offer withdrawn for {{title}}"
+    "received_bell": "Otrzymałeś ofertę pracy dla {{title}}",
+    "received_push_title": "Otrzymano ofertę pracy!",
+    "received_push_message": "Otrzymałeś ofertę pracy dla {{title}}",
+    "credits_earned_bell": "Zdobyłeś kredyty czasowe {{amount}} za ukończenie {{title}}!",
+    "credits_earned_push_title": "Zdobyte kredyty czasowe!",
+    "credits_earned_push_message": "Zdobyłeś kredyty czasowe {{amount}} za ukończenie {{title}}!",
+    "accepted_bell": "Oferta zaakceptowana dla {{title}}",
+    "accepted_push_title": "Oferta zaakceptowana dla {{title}}",
+    "accepted_push_message": "Oferta zaakceptowana dla {{title}}",
+    "rejected_bell": "Oferta dla {{title}} odrzucona",
+    "rejected_push_title": "Oferta dla {{title}} odrzucona",
+    "rejected_push_message": "Oferta dla {{title}} odrzucona",
+    "withdrawn_bell": "Oferta pracy dla {{title}} została wycofana",
+    "withdrawn_push_title": "Oferta pracy dla {{title}} została wycofana",
+    "withdrawn_push_message": "Oferta pracy dla {{title}} została wycofana"
   },
   "job_alert": {
-    "match_bell": "New job matching your alert: {{title}}",
-    "match_push_title": "New Job Match",
-    "match_push_message": "New job matching your alert: {{title}}"
+    "match_bell": "Nowa oferta pracy pasująca do Twojego alertu: {{title}}",
+    "match_push_title": "Nowe dopasowanie pracy",
+    "match_push_message": "Nowa oferta pracy pasująca do Twojego alertu: {{title}}"
   },
   "legal": {
-    "update_title": "Updated: {{title}}",
-    "update_message": "Please review version {{version}} of our {{title}}"
+    "update_title": "Zaktualizowano: {{title}}",
+    "update_message": "Proszę zapoznać się z wersją {{version}} naszego {{title}}"
   },
   "verification_badge": {
-    "granted": "You have been granted the '{{label}}' verification badge"
+    "granted": "Otrzymałeś plakietkę weryfikacyjną „{{label}}”."
   },
   "mention": {
-    "mentioned_in": "@{{name}} mentioned you in a {{entity}}",
-    "mentioned_in_with_preview": "@{{name}} mentioned you in a {{entity}}: \"{{preview}}\""
+    "mentioned_in": "@{{name}} wspomniał o Tobie w {{entity}}",
+    "mentioned_in_with_preview": "@{{name}} wspomniał o Tobie w {{entity}}: „{{preview}}”"
   },
   "story": {
-    "reaction": "{{name}} reacted {{emoji}} to your story"
+    "reaction": "{{name}} zareagował {{emoji}} na Twoją historię"
   },
   "sub_account": {
     "management_request": "{{name}} has requested to manage your account as a {{type}}"
   },
   "totp": {
-    "rate_limited": "Too many failed attempts. Please try again in {{minutes}} minutes."
+    "rate_limited": "Zbyt wiele nieudanych prób. Spróbuj ponownie za {{minutes}} minut."
   },
   "registration": {
-    "admin_pending_approval": "New user {{name}} ({{email}}) requires approval"
+    "admin_pending_approval": "Nowy użytkownik {{name}} ({{email}}) wymaga zatwierdzenia"
   },
   "nexus_score": {
-    "strength_title": "{{name}} is your strongest area!",
-    "strength_message": "You're in the top tier with {{percentage}}% in {{name}}.",
-    "improvement_title": "Grow your {{name}} score",
-    "tip_engagement": "Try sending and receiving time credits with different community members.",
-    "tip_quality": "Focus on completing transactions successfully and earning positive reviews.",
-    "tip_volunteer": "Log your volunteer hours regularly and maintain consistency.",
-    "tip_activity": "Create listings, join groups, and maintain a daily login streak.",
-    "tip_badges": "Complete challenges to earn more badges and achievements.",
-    "tip_impact": "Share posts and engage with the community feed.",
-    "tip_default": "Keep participating in the community!",
-    "suggestion_connect_title": "Connect with more community members",
-    "suggestion_connect_message": "Exchange credits with new people to increase your network diversity.",
-    "suggestion_exchanges_title": "Complete more exchanges",
-    "suggestion_exchanges_message": "Build your reputation by completing transactions and earning reviews."
+    "strength_title": "{{name}} to Twój najmocniejszy obszar!",
+    "strength_message": "Jesteś na najwyższym poziomie z {{percentage}}% w {{name}}.",
+    "improvement_title": "Zwiększ swój wynik {{name}}",
+    "tip_engagement": "Spróbuj wysyłać i odbierać kredyty czasowe u różnych członków społeczności.",
+    "tip_quality": "Skoncentruj się na pomyślnym zakończeniu transakcji i zdobyciu pozytywnych recenzji.",
+    "tip_volunteer": "Regularnie zapisuj godziny pracy wolontariuszy i zachowuj spójność.",
+    "tip_activity": "Twórz oferty, dołączaj do grup i utrzymuj codzienną passę logowania.",
+    "tip_badges": "Wykonuj wyzwania, aby zdobyć więcej odznak i osiągnięć.",
+    "tip_impact": "Udostępniaj posty i korzystaj z kanału społecznościowego.",
+    "tip_default": "Kontynuuj uczestnictwo w społeczności!",
+    "suggestion_connect_title": "Połącz się z większą liczbą członków społeczności",
+    "suggestion_connect_message": "Wymieniaj kredyty z nowymi osobami, aby zwiększyć różnorodność swojej sieci.",
+    "suggestion_exchanges_title": "Dokończ więcej wymian",
+    "suggestion_exchanges_message": "Buduj swoją reputację, realizując transakcje i zdobywając recenzje."
   },
-  "vetting_approved_title": "Your verification has been approved!",
-  "vetting_approved_heading": "Verification Approved",
-  "vetting_approved_body": "Your background check verification has been approved. Your verified status is now active on your profile.",
-  "vetting_go_to_dashboard": "Go to Dashboard",
-  "vetting_rejected_title": "Your verification could not be completed. Please contact support.",
-  "vetting_rejected_heading": "Verification Not Completed",
-  "vetting_rejected_body": "Your background check verification could not be completed at this time. Please contact your community coordinator for more information or to resubmit.",
-  "vetting_contact_support": "Contact Support",
-  "suspended_by_admin": "Suspended by admin",
-  "account_suspended_title": "Account Suspended",
-  "account_banned_title": "Account Banned",
-  "banned_by_admin": "Banned by admin",
-  "account_deleted_title": "Account Deleted",
-  "reset_by_admin": "Reset by admin",
-  "password_changed_title": "Password Changed",
-  "get_started": "Get Started",
-  "account_reactivated_title": "Account Reactivated",
-  "job_application": {
-    "shortlisted": "Your application for {{title}} has been shortlisted!",
-    "rejected": "Your application for {{title}} was not successful",
-    "hired": "Congratulations! You've been hired for {{title}}",
-    "status_updated": "Your application for {{title}} status updated to {{status}}",
-    "status_updated_generic": "Your application status has been updated",
-    "stuck_in_stage": "Application #{{id}} has been in '{{stage}}' for {{days}}+ days"
-  },
-  "job_team": {
-    "added_as_role": "You've been added as a {{role}} for '{{title}}'"
-  },
-  "shift_swap": {
-    "requested": "You have a new shift swap request",
-    "declined": "Your shift swap request was declined",
-    "accepted": "Your shift swap request was accepted",
-    "declined_by_admin": "Your shift swap request was declined by an admin",
-    "accepted_swap_declined_by_admin": "A shift swap you accepted was declined by an admin",
-    "approved_by_admin": "Your shift swap was approved by an admin",
-    "accepted_swap_approved_by_admin": "A shift swap you accepted was approved by an admin"
-  },
-  "user_security": {
-    "email_changed": "Your email address has been changed. If you did not do this, contact support immediately."
-  },
-  "group_mention": {
-    "mentioned_in_group": "You were mentioned in {{group}}"
-  },
-  "idea_team": {
-    "added_to_group": "You've been added to {{group}}"
-  },
+  "vetting_approved_title": "Twoja weryfikacja została zatwierdzona!",
+  "vetting_approved_heading": "Weryfikacja zatwierdzona",
+  "vetting_approved_body": "Twoja weryfikacja przeszłości została zatwierdzona. Twój zweryfikowany status jest teraz aktywny w Twoim profilu.",
+  "vetting_go_to_dashboard": "Przejdź do Panelu",
+  "vetting_rejected_title": "Nie można ukończyć weryfikacji. Skontaktuj się z pomocą techniczną.",
+  "vetting_rejected_heading": "Weryfikacja nie została ukończona",
+  "vetting_rejected_body": "Weryfikacja dotycząca sprawdzenia przeszłości nie mogła zostać ukończona w tej chwili. Skontaktuj się ze swoim koordynatorem społeczności, aby uzyskać więcej informacji lub ponownie przesłać zgłoszenie.",
+  "vetting_contact_support": "Skontaktuj się z pomocą techniczną",
+  "suspended_by_admin": "Zawieszony przez administratora",
+  "account_suspended_title": "Konto zawieszone",
+  "account_banned_title": "Konto zbanowane",
+  "banned_by_admin": "Zbanowany przez administratora",
+  "account_deleted_title": "Konto usunięte",
+  "reset_by_admin": "Zresetuj przez administratora",
+  "password_changed_title": "Hasło zmienione",
+  "get_started": "Rozpocznij",
+  "account_reactivated_title": "Konto reaktywowane",
   "goal": {
-    "reminder_bell": "Goal reminder: \"{{title}}\"",
-    "reminder_push_title": "Goal Reminder",
-    "reminder_push_message": "Don't forget your goal: \"{{title}}\""
+    "reminder_bell": "Przypomnienie o celu: „{{title}}”",
+    "reminder_push_title": "Przypomnienie o celu",
+    "reminder_push_message": "Nie zapomnij o swoim celu: „{{title}}”"
   }
 }
