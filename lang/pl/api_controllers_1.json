@@ -160,6 +160,7 @@
   },
   "auth": {
     "two_factor_required": "Two-factor authentication required",
+    "two_factor_setup_required": "W przypadku kont administratora wymagane jest uwierzytelnianie dwuskładnikowe. Aby kontynuować, skonfiguruj 2FA.",
     "logged_out": "Logged out successfully",
     "session_refreshed": "Session refreshed",
     "session_restored": "Session restored from token",

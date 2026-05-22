@@ -160,6 +160,7 @@
   },
   "auth": {
     "two_factor_required": "Two-factor authentication required",
+    "two_factor_setup_required": "管理者アカウントには 2 要素認証が必要です。続行するには 2FA をセットアップしてください。",
     "logged_out": "Logged out successfully",
     "session_refreshed": "Session refreshed",
     "session_restored": "Session restored from token",

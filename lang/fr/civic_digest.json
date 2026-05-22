@@ -1,16 +1,18 @@
 {
   "email": {
     "subject_daily": "Votre digest communal du jour — {{community}}",
-    "subject_weekly": "Votre digest communal de la semaine — {{community}}",
+    "subject_monthly": "Votre résumé civique monthly — {{community}}",
     "greeting": "Bonjour {{name}},",
     "intro_daily": "Voici les nouveautés du jour dans votre communauté — {{count}} actualité(s) sélectionnée(s) selon votre sous-région et vos centres d'intérêt.",
-    "intro_weekly": "Voici votre récap hebdomadaire — {{count}} actualité(s) sélectionnée(s) selon votre sous-région et vos centres d'intérêt.",
+    "intro_monthly": "Voici votre résumé de monthly – mises à jour {{count}} sélectionnées pour vous en fonction de votre sous-région et de vos intérêts.",
     "empty": "Rien de neuf dans votre communauté pour l'instant. Nous vous tiendrons informé.",
     "cta_open": "Ouvrir",
     "cta_manage_prefs": "Gérer les préférences du digest",
     "footer": "Vous recevez ce message car vous avez activé le digest communal de {{community}}. Vous pouvez modifier la fréquence ou vous désabonner à tout moment.",
     "match_score": "Pertinence {{score}}",
-    "view_all": "Voir le digest complet"
+    "view_all": "Voir le digest complet",
+    "subject_weekly": "Votre digest communal de la semaine — {{community}}",
+    "intro_weekly": "Voici votre récap hebdomadaire — {{count}} actualité(s) sélectionnée(s) selon votre sous-région et vos centres d'intérêt."
   },
   "push": {
     "title": "Votre digest communal est prêt",

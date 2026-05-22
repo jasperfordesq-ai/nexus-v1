@@ -1,16 +1,18 @@
 {
   "email": {
     "subject_daily": "Il tuo digest comunale di oggi — {{community}}",
-    "subject_weekly": "Il tuo digest comunale della settimana — {{community}}",
+    "subject_monthly": "Il tuo digest civico monthly: {{community}}",
     "greeting": "Ciao {{name}},",
     "intro_daily": "Ecco le novità di oggi nella tua comunità — {{count}} aggiornamento/i selezionati in base alla tua sottoregione e ai tuoi interessi.",
-    "intro_weekly": "Ecco il tuo riepilogo settimanale — {{count}} aggiornamento/i selezionati in base alla tua sottoregione e ai tuoi interessi.",
+    "intro_monthly": "Ecco il riepilogo di monthly: aggiornamenti {{count}} selezionati per te in base alla tua sottoregione e ai tuoi interessi.",
     "empty": "Nessuna novità nella tua comunità per ora. Ti terremo aggiornato.",
     "cta_open": "Apri",
     "cta_manage_prefs": "Gestisci le preferenze del digest",
     "footer": "Stai ricevendo questa e-mail perché hai attivato il digest comunale di {{community}}. Puoi modificare la frequenza o disiscriverti in qualsiasi momento.",
     "match_score": "Affinità {{score}}",
-    "view_all": "Vedi il digest completo"
+    "view_all": "Vedi il digest completo",
+    "subject_weekly": "Il tuo digest comunale della settimana — {{community}}",
+    "intro_weekly": "Ecco il tuo riepilogo settimanale — {{count}} aggiornamento/i selezionati in base alla tua sottoregione e ai tuoi interessi."
   },
   "push": {
     "title": "Il tuo digest comunale è pronto",

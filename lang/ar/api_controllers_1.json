@@ -160,6 +160,7 @@
   },
   "auth": {
     "two_factor_required": "Two-factor authentication required",
+    "two_factor_setup_required": "المصادقة الثنائية مطلوبة لحسابات المسؤول. يرجى إعداد 2FA للمتابعة.",
     "logged_out": "Logged out successfully",
     "session_refreshed": "Session refreshed",
     "session_restored": "Session restored from token",

@@ -16,8 +16,19 @@
       "redemption_not_found": "Redemption not found.",
       "redemption_not_reversible": "Only applied redemptions can be reversed.",
       "reversal_reason_too_long": "Reversal reason must be 500 characters or fewer.",
+      "invalid_listing": "Ní leis an díoltóir seo an liostú.",
+      "listing_unavailable": "Níl an liostú seo ar fáil le haghaidh fuascailte dílseachta.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
       "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+    }
+  },
+  "survey": {
+    "errors": {
+      "already_responded": "D'fhreagair tú an suirbhé seo cheana.",
+      "closed": "Tá an suirbhé seo dúnta.",
+      "not_accepting": "Níl an suirbhé seo ag glacadh le freagraí faoi láthair.",
+      "not_found": "Suirbhé gan aimsiú.",
+      "required_question": "Níl freagra ar an gceist riachtanach #:id."
     }
   },
   "forecast": {
@@ -52,10 +63,97 @@
       "message": "We've missed you lately — would you like a warmth pass with a fellow helper?"
     },
     "unfulfilled_help_request": {
-      "message": "{name}'s help request has been waiting more than {days} days — could we widen the search?"
+      "message": "T? iarratas cabhrach :name ag fanacht le breis agus :days l?. An bhf?adfaimis an cuardach a leathn??"
     },
     "low_coverage_subregion": {
-      "message": "{name} is under-supplied right now — consider recruiting more helpers there."
+      "message": "T? ganntanas taca?ochta ag :name faoi l?thair. Smaoinigh ar n?os m? c?nt?ir? a earc? ansin."
     }
+  },
+  "requests": {
+    "submitted": "Iarratas curtha isteach."
+  },
+  "favour": {
+    "recorded": "Fabhar taifeadta."
+  },
+  "alerts": {
+    "recipients_without_tandem_title": "Faighteoirí gan tacadóir rialta",
+    "recipients_without_tandem_message": "Fuair ​​na baill seo cabhair le sé mhí anuas ach níl aon chomhcheangal gníomhach athfhillteach acu. Péireáil le tacadóir seasta iad chun leanúnachas a ghlasáil.",
+    "inactive_members_title": "Na baill ghníomhacha imithe ciúin",
+    "inactive_members_message": "Baill a logáil uaireanta le sé mhí anuas ach gan aon rud le 30 lá anuas. Is minic a tharraingíonn seiceáil isteach cairdiúil arís iad.",
+    "overdue_reviews_title": "Léirmheasanna uair an chloig caite SLA",
+    "overdue_reviews_message": "Ar feitheamh logs toirte níos sine ná laethanta :sla. Faomh nó formhéadaigh iad ionas go bhfaighidh na baill creidiúint.",
+    "coordinators_overloaded_title": "Comhordaitheoirí ró-ualaithe",
+    "coordinators_overloaded_message": "Tá níos mó ná 10 n-athbhreithniú ar feitheamh sannta ag comhordaitheoir amháin nó níos mó. Athshannadh sula dtagann scrogaill.",
+    "overdue_check_ins_title": "Seiceálacha tandem thar téarma",
+    "overdue_check_ins_message": "Caidrimh ghníomhacha athfhillteacha a bhfuil a sheiceáil-isteach sceidealta caite. Déan teagmháil lena dheimhniú go bhfuil an dá thaobh fós go maith.",
+    "low_supply_title": "Catagóirí a bhfuil éileamh neamhchomhlíonta acu",
+    "low_supply_message": "Catagóirí a bhfuil níos mó iarrataí gníomhacha iontu ná na tairiscintí atá ar fáil. Is fiú aird a tharraingt ar lucht tacaíochta féideartha."
+  },
+  "civic_digest": {
+    "cadence_invalid": "ní mór an deireadh a bheith mar cheann de: off, daily, monthly",
+    "preferred_sub_region_invalid": "Caithfidh preferred_sub_region_id a bheith uimhriúil nó null",
+    "opt_out_sources_invalid": "Caithfidh opt_out_sources a bheith ina sraith eochracha foinse"
+  },
+  "readiness": {
+    "unknown_item": "Mír geata cinnteoireachta anaithnid: :item",
+    "storage_unavailable": "Níl tábla tenant_settings ar fáil",
+    "owner_invalid": "Ní mór don úinéir a bheith ina sreang",
+    "owner_too_long": "Caithfidh 255 carachtar nó níos lú a bheith san úinéir",
+    "status_invalid": "Caithfidh an stádas a bheith mar cheann de: :statuses",
+    "notes_invalid": "Ní mór do nótaí a bheith ina sreang",
+    "notes_too_long": "Caithfidh 2000 carachtar nó níos lú a bheith sna nótaí",
+    "value_string": "Ní mór luach a bheith ina sreang",
+    "choice_invalid": "Caithfidh luach a bheith mar cheann de: :choices",
+    "url_invalid": "Caithfidh luach a bheith ina URL bailí",
+    "url_too_long": "Caithfidh URL a bheith 1000 carachtar nó níos lú",
+    "value_too_long": "Caithfidh luach a bheith 1000 carachtar nó níos lú"
+  },
+  "feedback": {
+    "table_not_found": "Níl an tábla aiseolais soláthraithe fós.",
+    "not_found": "Ní bhfuarthas aiseolas.",
+    "invalid_status": "Stádas neamhbhailí.",
+    "invalid_assignee": "Caithfidh assigned_user_id a bheith uimhriúil.",
+    "resolution_notes_required": "Tá nótaí réitigh ag teastáil.",
+    "invalid_category": "Catagóir neamhbhailí.",
+    "subject_required": "Ábhar ag teastáil.",
+    "subject_too_long": "Ábhar ró-fhada.",
+    "body_required": "Tá corp ag teastáil.",
+    "body_too_long": "Tá an corp ró-fhada.",
+    "invalid_sentiment": "Clib sentiment neamhbhailí.",
+    "invalid_sub_region": "Ní mór don fho-réigiún a bheith uimhriúil."
+  },
+  "external_integrations": {
+    "validation": {
+      "name_required": "Tá ainm ag teastáil.",
+      "name_too_long": "Caithfidh 200 carachtar nó níos lú a bheith san ainm.",
+      "category_invalid": "Tá an chatagóir neamhbhailí.",
+      "status_invalid": "Tá an stádas neamhbhailí.",
+      "dsa_status_invalid": "Tá stádas DSA neamhbhailí.",
+      "owner_email_invalid": "Caithfidh ríomhphost an úinéara a bheith ina sheoladh ríomhphoist bailí.",
+      "interface_spec_url_invalid": "Ní mór sonraíocht an chomhéadain URL a bheith ina URL bailí.",
+      "sandbox_url_invalid": "Caithfidh bosca gainimh URL a bheith ina URL bailí."
+    }
+  },
+  "success_stories": {
+    "validation": {
+      "title_required": "Tá teideal ag teastáil.",
+      "title_too_long": "Caithfidh 200 carachtar nó níos lú a bheith sa teideal.",
+      "narrative_required": "Tá insint ag teastáil.",
+      "narrative_too_long": "Caithfidh 1500 carachtar nó níos lú a bheith sa scéal.",
+      "method_caveat_required": "Tá caveat modh ag teastáil.",
+      "method_caveat_too_long": "Caithfidh 500 carachtar nó níos lú a bheith i caveat an mhodha.",
+      "evidence_source_required": "Tá foinse fianaise ag teastáil.",
+      "evidence_source_too_long": "Caithfidh 300 carachtar nó níos lú a bheith mar fhoinse fianaise.",
+      "metric_source_invalid": "Tá foinse méadrach neamhbhailí.",
+      "unit_too_long": "Caithfidh 30 carachtar nó níos lú a bheith san aonad.",
+      "audience_too_long": "Ní mór don lucht éisteachta a bheith 50 carachtar nó níos lú."
+    }
+  },
+  "data_quality": {
+    "missing_language_positive": "Gheobhaidh na comhaltaí seo ríomhphoist agus fógraí i réamhshocrú an ardáin. Socraigh a rogha teanga le haghaidh logánú ceart.",
+    "missing_language_ok": "Tá rogha teanga ag gach ball.",
+    "no_sub_region_column": "Níl aon cholún users.sub_region_id ar an scéimre seo. Déantar nasc fo-réigiún a rianú in áiteanna eile.",
+    "no_sub_regions": "Níl aon fho-réigiúin sainithe don tionónta seo. Seiceáil gan bacadh le.",
+    "no_coordinator_column": "Níl aon cholún comhordaitheora ar an scéimre seo."
   }
 }

@@ -62,14 +62,26 @@
     "expiry": "This link expires in {{hours}} hours."
   },
   "password_reset": {
-    "subject": "Reset your password",
+    "subject": "إعادة تعيين كلمة المرور الخاصة بك — {{community}}",
+    "title": "Reset Your Password",
+    "preview": "You requested a password reset link",
     "greeting": "Hi {{name}},",
     "body": "You requested a password reset. Click the button below to set a new password.",
     "cta": "Reset Password",
-    "expiry": "This link expires in {{hours}} hours.",
-    "ignore": "If you did not request this, you can safely ignore this email.",
-    "title": "Reset Your Password",
-    "preview": "You requested a password reset link"
+    "expiry": "تنتهي صلاحية هذا الرابط خلال ساعة واحدة.",
+    "ignore": "If you did not request this, you can safely ignore this email."
+  },
+  "security": {
+    "password_changed_subject": "Security Alert: Your password was changed — {{community}}",
+    "password_changed_title": "Password Changed",
+    "password_changed_preview": "Your account password was recently changed",
+    "password_changed_body": "Your account password was recently changed. If you made this change, no action is needed.",
+    "password_changed_warning": "If you did not make this change, please contact support immediately to secure your account.",
+    "email_changed_subject": "Security Alert: Your email address was changed — {{community}}",
+    "email_changed_title": "Email Address Changed",
+    "email_changed_preview": "The email address on your account has been changed",
+    "email_changed_body": "The email address on your <strong>{{community}}</strong> account has been updated to a new address.",
+    "email_changed_warning": "If you did not make this change, please contact support immediately to secure your account."
   },
   "transaction": {
     "subject": "Time credit transaction — {{amount}}h",
@@ -79,8 +91,8 @@
     "description": "Description: {{description}}"
   },
   "review_request": {
-    "subject": "Leave a review for {{name}}",
-    "greeting": "Hi {{name}},",
+    "subject": "ترك التعليق ل:name",
+    "greeting": "مرحبًا :name،",
     "body": "How was your exchange with :name? Leave a review to help the community.",
     "cta": "Leave Review"
   },
@@ -90,10 +102,22 @@
     "body": "{{sender}} sent you a message.",
     "cta": "View Message"
   },
+  "message": {
+    "in_app_content": "{{sender}} sent you a message",
+    "title": "New Message",
+    "preview": "{{sender}} sent you a message",
+    "body_intro": "You have a new message from <strong>{{sender}}</strong>.",
+    "voice_notice": "This is a voice message — listen to it on the platform.",
+    "view_button": "View Conversation",
+    "footer_note": "You can reply directly from the platform. To stop receiving message emails, update your <a href=\"{{url}}\">notification preferences</a>.",
+    "fallback_recipient_name": "there",
+    "fallback_sender_name": "Someone"
+  },
   "common": {
     "greeting": "Hi {{name}},",
     "button_fallback": "If the button above doesn't work, copy and paste this link into your browser:",
     "button_fallback_short": "If the button doesn't work, copy this link:",
+    "platform_name": "Project NEXUS",
     "fallback_name": "there",
     "fallback_member_name": "A member",
     "fallback_someone": "Someone",
@@ -101,10 +125,12 @@
     "fallback_federation_member": "A federation member",
     "fallback_partner_community": "a partner community",
     "fallback_federation_level": "Level {{level}}",
-    "or_separator": "or",
     "fallback_job": "a job",
+    "fallback_goal": "هدفك",
     "fallback_manager": "Manager",
     "fallback_organization": "Organization",
+    "community_label": "مجتمع",
+    "or_separator": "or",
     "signoff": "Thanks,\n{{app}}"
   },
   "footer": {
@@ -139,6 +165,7 @@
     "rank": "Rank",
     "streak": "Streak",
     "streak_days": "{{days}} days",
+    "badge_fallback": "شارة",
     "encouragement": "Keep up the great work — your contributions make the community stronger!",
     "view_leaderboard": "View Leaderboard"
   },
@@ -154,6 +181,7 @@
     "badge_earned_preview": "You earned the {{badge}} badge!",
     "badge_earned_highlight": "You've earned the <strong>{{icon}} {{badge}}</strong> badge!",
     "badge_earned_body": "Great work contributing to your community!",
+    "badge_fallback": "شارة جديدة",
     "view_badges": "View Your Badges",
     "streak_subject": "Amazing! {{days}}-day login streak",
     "streak_title": "Streak Milestone!",
@@ -244,7 +272,11 @@
     "manage_preferences": "Manage Preferences",
     "manage_email_preferences": "Manage Email Preferences",
     "test_prefix": "[TEST]",
-    "no_subject": "No Subject"
+    "no_subject": "No Subject",
+    "unsubscribed_subject": "لقد تم إلغاء اشتراكك - {{community}}",
+    "unsubscribed_title": "غير مشترك",
+    "unsubscribed_body": "لقد تم إلغاء اشتراكك بنجاح من الرسائل الإخبارية عبر البريد الإلكتروني التي أرسلها <strong>{{community}}</strong>. لن تتلقى بعد الآن رسائل إخبارية عبر البريد الإلكتروني من هذا المجتمع.",
+    "unsubscribed_body_contact": "إذا كنت تعتقد أن هذا كان خطأ، يمكنك إعادة الاشتراك عن طريق زيارة منصة المجتمع."
   },
   "notification": {
     "sent_by": "This email was sent by {{community}}",
@@ -390,29 +422,20 @@
     "exchange_disputed": "⚠️ Exchange Dispute - Broker Review Needed",
     "default": "Notification from Project NEXUS"
   },
-  "security": {
-    "password_changed_subject": "Security Alert: Your password was changed — {{community}}",
-    "password_changed_title": "Password Changed",
-    "password_changed_preview": "Your account password was recently changed",
-    "password_changed_body": "Your account password was recently changed. If you made this change, no action is needed.",
-    "password_changed_warning": "If you did not make this change, please contact support immediately to secure your account.",
-    "email_changed_subject": "Security Alert: Your email address was changed — {{community}}",
-    "email_changed_title": "Email Address Changed",
-    "email_changed_preview": "The email address on your account has been changed",
-    "email_changed_body": "The email address on your <strong>{{community}}</strong> account has been updated to a new address.",
-    "email_changed_warning": "If you did not make this change, please contact support immediately to secure your account."
+  "exchange_dispute": {
+    "subject": "Your exchange has been flagged for review",
+    "title": "Exchange Under Review",
+    "preview": "An exchange you participated in needs attention",
+    "body": "Your recent exchange has been flagged as disputed due to a difference in reported hours. A coordinator will review this and reach out shortly.",
+    "next_steps": "You may be contacted by a broker or coordinator to help resolve this. In the meantime, you can view the exchange details.",
+    "cta": "View Exchange"
   },
-  "message": {
-    "in_app_content": "{{sender}} sent you a message",
-    "title": "New Message",
-    "preview": "{{sender}} sent you a message",
-    "body_intro": "You have a new message from <strong>{{sender}}</strong>.",
-    "voice_notice": "This is a voice message — listen to it on the platform.",
-    "view_button": "View Conversation",
-    "footer_note": "You can reply directly from the platform. To stop receiving message emails, update your <a href=\"{{url}}\">notification preferences</a>.",
-    "fallback_recipient_name": "there",
-    "fallback_sender_name": "Someone"
-  },
+  "dispute_resolved_subject": "Your exchange dispute has been resolved",
+  "dispute_resolved_title": "Dispute Resolved",
+  "dispute_resolved_preview": "Your exchange has been successfully completed",
+  "dispute_resolved_body": "Your exchange has been reviewed and a final agreement of :hours hours has been reached.",
+  "dispute_resolved_hours_label": "Final Hours Agreed",
+  "dispute_resolved_cta": "View Exchange",
   "donation": {
     "sent_subject": "You donated :amount time credits",
     "sent_title": "Donation Sent",
@@ -427,7 +450,8 @@
     "received_greeting": "Great news!",
     "received_body": ":donor has donated :amount time credits to your wallet.",
     "received_message_label": "Their message",
-    "received_cta": "View Your Wallet"
+    "received_cta": "View Your Wallet",
+    "no_message": "(?? ????)"
   },
   "identity_verification": {
     "passed_subject": "Your identity has been verified",
@@ -474,14 +498,6 @@
     "hours_declined_body": "Your volunteer hours for ':opportunity' could not be confirmed at this time. Please contact your coordinator.",
     "hours_declined_cta": "View Volunteering"
   },
-  "exchange_dispute": {
-    "subject": "Your exchange has been flagged for review",
-    "title": "Exchange Under Review",
-    "preview": "An exchange you participated in needs attention",
-    "body": "Your recent exchange has been flagged as disputed due to a difference in reported hours. A coordinator will review this and reach out shortly.",
-    "next_steps": "You may be contacted by a broker or coordinator to help resolve this. In the meantime, you can view the exchange details.",
-    "cta": "View Exchange"
-  },
   "onboarding_nurture": {
     "day2_subject": "Complete your profile to get more connections",
     "day2_title": "Your Profile Is Almost Ready",
@@ -502,12 +518,6 @@
     "day7_body": "You've been part of :community for a week! Here's a quick reminder of everything you can do: browse listings, make connections, join groups, and attend events.",
     "day7_cta": "Explore Your Community"
   },
-  "dispute_resolved_subject": "Your exchange dispute has been resolved",
-  "dispute_resolved_title": "Dispute Resolved",
-  "dispute_resolved_preview": "Your exchange has been successfully completed",
-  "dispute_resolved_body": "Your exchange has been reviewed and a final agreement of :hours hours has been reached.",
-  "dispute_resolved_hours_label": "Final Hours Agreed",
-  "dispute_resolved_cta": "View Exchange",
   "billing_upgrade_request": {
     "subject": "Plan Upgrade Request — :tenant",
     "body": "Upgrade request from tenant: :tenant (ID: :tenant_id)\n\nRequested by: :email\n\nMessage: :message",
@@ -539,6 +549,12 @@
     "cta_pay": "Pay membership dues",
     "cta_view": "View my dues",
     "cta_receipt": "View Stripe receipt"
+  },
+  "regional_analytics": {
+    "subject": "تقرير التحليلات الإقليمية - :period",
+    "report_ready": "تقرير التحليلات الإقليمية الخاص بك لـ :period جاهز.",
+    "download_report": "تنزيل التقرير",
+    "privacy_note": "يتم تجميع جميع الأرقام وفقًا لضمانات الخصوصية Project NEXUS."
   },
   "appreciation": {
     "subject": "{{sender}} sent you a thank-you",

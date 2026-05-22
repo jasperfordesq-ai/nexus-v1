@@ -1,4 +1,32 @@
 {
+  "announcement": {
+    "template_name": "Platform Update — Spring 2026",
+    "template_description": "Spring 2026 announcement covering marketplace, donations, identity verification, volunteering payments, federation, languages, SEO, and security.",
+    "subject": "What's new in {{community}} — Spring 2026",
+    "preview_text": "Marketplace, donations, identity verification, federation, 11 languages, and more.",
+    "heading": "What's new in {{community}}",
+    "intro": "Hi {{name}}, the platform has grown a lot in the last few weeks. Here's a quick tour of what you can do today.",
+    "section_marketplace_title": "Marketplace",
+    "section_marketplace_body": "A new standalone marketplace for classifieds, with Stripe Connect payouts and AI-powered reply suggestions.",
+    "section_donations_title": "Donations",
+    "section_donations_body": "One-off and recurring donations via Stripe, with full dashboards and receipts for organisations.",
+    "section_identity_title": "Identity verification",
+    "section_identity_body": "Optional Stripe Identity flow with document and selfie checks, plus a verified-member badge on your profile.",
+    "section_volunteering_title": "Volunteering — now with payments",
+    "section_volunteering_body": "Organisations can now top up a volunteer wallet and pay volunteers directly for approved hours.",
+    "section_federation_title": "Federation",
+    "section_federation_body": "The full Komunitin federation spec is live — members, listings, events, and reputation now travel with you across connected communities.",
+    "section_languages_title": "11 languages (including Arabic)",
+    "section_languages_body": "We now support English, Irish, German, French, Italian, Portuguese, Spanish, Dutch, Polish, Japanese, and Arabic with full right-to-left layout.",
+    "section_seo_title": "Faster, more discoverable",
+    "section_seo_body": "Public pages are now pre-rendered at build time for search engines, and we've added structured data and sitemaps across the platform.",
+    "section_security_title": "Hardened security",
+    "section_security_body": "Passkeys, CSP nonces, a CORS allowlist, and a much deeper test suite across payments, webhooks, and federation.",
+    "cta_primary": "Open the platform",
+    "cta_secondary": "See the full development status",
+    "thanks": "Thank you for being part of this community — more to come soon.",
+    "signoff": "— The {{community}} team"
+  },
   "welcome": {
     "subject": "Willkommen bei {{community}}!",
     "greeting": "Willkommen, {{name}}!",
@@ -34,144 +62,14 @@
     "expiry": "Dieser Link läuft in {{hours}} Stunden ab."
   },
   "password_reset": {
-    "subject": "Passwort zurücksetzen",
+    "subject": "Passwort zurücksetzen? {{community}}",
+    "title": "Reset Your Password",
+    "preview": "You requested a password reset link",
     "greeting": "Sehr geehrte/r {{name}},",
     "body": "Sie haben das Zurücksetzen Ihres Passworts angefordert. Klicken Sie auf die Schaltfläche unten, um ein neues Passwort festzulegen.",
     "cta": "Passwort zurücksetzen",
-    "expiry": "Dieser Link läuft in {{hours}} Stunden ab.",
-    "ignore": "Falls Sie dies nicht angefordert haben, können Sie diese E-Mail ignorieren.",
-    "title": "Reset Your Password",
-    "preview": "You requested a password reset link"
-  },
-  "transaction": {
-    "subject": "Zeitguthaben-Transaktion — {{amount}}h",
-    "greeting": "Sehr geehrte/r {{name}},",
-    "sent": "Sie haben {{amount}} Stunde(n) an {{recipient}} gesendet.",
-    "received": "Sie haben {{amount}} Stunde(n) von {{sender}} erhalten.",
-    "description": "Beschreibung: {{description}}"
-  },
-  "review_request": {
-    "subject": "Bewertung für {{name}} abgeben",
-    "greeting": "Sehr geehrte/r {{name}},",
-    "body": "How was your exchange with :name? Leave a review to help the community.",
-    "cta": "Bewertung abgeben"
-  },
-  "new_message": {
-    "subject": "Neue Nachricht von {{sender}}",
-    "greeting": "Sehr geehrte/r {{name}},",
-    "body": "{{sender}} hat Ihnen eine Nachricht gesendet.",
-    "cta": "Nachricht anzeigen"
-  },
-  "footer": {
-    "unsubscribe": "Von diesen E-Mails abmelden",
-    "sent_by": "Gesendet von {{community}}, betrieben durch Project NEXUS",
-    "address": "{{community}}",
-    "all_rights_reserved": "All rights reserved.",
-    "manage_preferences": "Manage Preferences",
-    "member_notice": "You received this email because you are a member of the {{community}} community."
-  },
-  "weekly_digest": {
-    "title": "Community Pulse - Weekly Digest",
-    "heading": "Community Pulse",
-    "subheading": "Your Weekly Digest",
-    "preview_text": "Your weekly community highlights - new offers, requests, and upcoming events",
-    "greeting": "Hi {{name}},",
-    "intro": "Here's what's happening in your community this week.",
-    "new_offers": "New Offers",
-    "new_requests": "New Requests",
-    "upcoming_events": "Upcoming Events",
-    "by_author": "by {{name}}",
-    "visit_platform": "Visit Platform",
-    "opted_in_notice": "You received this email because you opted into weekly digests.",
-    "unsubscribe": "Unsubscribe"
-  },
-  "match_digest": {
-    "title": "Your {{period}} Match Digest",
-    "preview_new_matches": "{{count}} new match(es) this {{period}}!",
-    "preview_hot": "Including {{count}} hot match(es).",
-    "preview_mutual": "{{count}} mutual match(es)!",
-    "heading": "Your {{period}} Digest",
-    "new_matches_waiting": "{{count}} new match(es) waiting for you",
-    "greeting": "Hi {{name}},",
-    "intro": "Here's a summary of your new matches from the past {{period}}. Don't miss out on these opportunities!",
-    "hot_matches": "Hot Match(es)",
-    "hot_compatibility": "85%+ compatibility",
-    "mutual_matches": "Mutual Match(es)",
-    "win_win": "Win-win opportunities",
-    "top_matches": "Top Matches",
-    "by_author": "by {{name}}",
-    "a_member": "A member",
-    "more_matches": "+ {{count}} more match(es) to explore",
-    "view_all_matches": "View All Matches",
-    "hot_matches_link": "Hot matches",
-    "mutual_matches_link": "Mutual matches",
-    "all_matches_link": "All matches",
-    "receiving_digest": "You're receiving this {{period}} digest because you have matches enabled.",
-    "manage_frequency": "Manage digest frequency"
-  },
-  "match_hot": {
-    "title": "Hot Match Found!",
-    "preview": "{{score}}% match found! {{name}} posted \"{{title}}\"",
-    "heading": "Hot Match Found!",
-    "compatibility_score": "Compatibility Score",
-    "greeting": "Hi {{name}},",
-    "intro": "Great news! We found a highly compatible listing that matches your preferences. This is a <strong style=\"color: {{color}};\">hot match</strong> - don't miss out!",
-    "posted_by": "Posted by {{name}}",
-    "walking_distance": "Walking distance",
-    "nearby": "Nearby",
-    "in_your_area": "In your area",
-    "regional": "Regional",
-    "why_matches": "Why this matches you",
-    "view_match": "View This Match",
-    "view_all_matches": "view all your matches",
-    "receiving_notice": "You're receiving this because you enabled hot match notifications.",
-    "manage_preferences": "Manage notification preferences"
-  },
-  "match_mutual": {
-    "title": "Mutual Match Found!",
-    "preview": "Perfect exchange opportunity with {{name}}! You can both help each other - {{score}}% compatibility.",
-    "heading": "Mutual Match!",
-    "subheading": "A Perfect Exchange Opportunity",
-    "greeting": "Hi {{name}},",
-    "intro": "We found a <strong style=\"color: {{color}};\">mutual exchange opportunity</strong> with <strong>{{partner}}</strong>. You can both help each other - this is a win-win!",
-    "match_label": "Match",
-    "they_offer": "THEY OFFER",
-    "you_offer": "YOU OFFER",
-    "can_help_you": "{{name}} can help you with",
-    "you_can_help": "You can help {{name}} with",
-    "rare_notice": "Mutual matches are rare! This is a win-win opportunity where both parties benefit from the exchange.",
-    "connect_with": "Connect with {{name}}",
-    "view_all_mutual": "view all mutual matches",
-    "receiving_notice": "You're receiving this because you enabled mutual match notifications.",
-    "manage_preferences": "Manage notification preferences"
-  },
-  "announcement": {
-    "template_name": "Platform Update — Spring 2026",
-    "template_description": "Spring 2026 announcement covering marketplace, donations, identity verification, volunteering payments, federation, languages, SEO, and security.",
-    "subject": "What's new in {{community}} — Spring 2026",
-    "preview_text": "Marketplace, donations, identity verification, federation, 11 languages, and more.",
-    "heading": "What's new in {{community}}",
-    "intro": "Hi {{name}}, the platform has grown a lot in the last few weeks. Here's a quick tour of what you can do today.",
-    "section_marketplace_title": "Marketplace",
-    "section_marketplace_body": "A new standalone marketplace for classifieds, with Stripe Connect payouts and AI-powered reply suggestions.",
-    "section_donations_title": "Donations",
-    "section_donations_body": "One-off and recurring donations via Stripe, with full dashboards and receipts for organisations.",
-    "section_identity_title": "Identity verification",
-    "section_identity_body": "Optional Stripe Identity flow with document and selfie checks, plus a verified-member badge on your profile.",
-    "section_volunteering_title": "Volunteering — now with payments",
-    "section_volunteering_body": "Organisations can now top up a volunteer wallet and pay volunteers directly for approved hours.",
-    "section_federation_title": "Federation",
-    "section_federation_body": "The full Komunitin federation spec is live — members, listings, events, and reputation now travel with you across connected communities.",
-    "section_languages_title": "11 languages (including Arabic)",
-    "section_languages_body": "We now support English, Irish, German, French, Italian, Portuguese, Spanish, Dutch, Polish, Japanese, and Arabic with full right-to-left layout.",
-    "section_seo_title": "Faster, more discoverable",
-    "section_seo_body": "Public pages are now pre-rendered at build time for search engines, and we've added structured data and sitemaps across the platform.",
-    "section_security_title": "Hardened security",
-    "section_security_body": "Passkeys, CSP nonces, a CORS allowlist, and a much deeper test suite across payments, webhooks, and federation.",
-    "cta_primary": "Open the platform",
-    "cta_secondary": "See the full development status",
-    "thanks": "Thank you for being part of this community — more to come soon.",
-    "signoff": "— The {{community}} team"
+    "expiry": "Dieser Link läuft in 1 Stunde ab.",
+    "ignore": "Falls Sie dies nicht angefordert haben, können Sie diese E-Mail ignorieren."
   },
   "security": {
     "password_changed_subject": "Security Alert: Your password was changed — {{community}}",
@@ -184,6 +82,25 @@
     "email_changed_preview": "The email address on your account has been changed",
     "email_changed_body": "The email address on your <strong>{{community}}</strong> account has been updated to a new address.",
     "email_changed_warning": "If you did not make this change, please contact support immediately to secure your account."
+  },
+  "transaction": {
+    "subject": "Zeitguthaben-Transaktion — {{amount}}h",
+    "greeting": "Sehr geehrte/r {{name}},",
+    "sent": "Sie haben {{amount}} Stunde(n) an {{recipient}} gesendet.",
+    "received": "Sie haben {{amount}} Stunde(n) von {{sender}} erhalten.",
+    "description": "Beschreibung: {{description}}"
+  },
+  "review_request": {
+    "subject": "Hinterlassen Sie eine Bewertung für :name",
+    "greeting": "Hallo :name,",
+    "body": "How was your exchange with :name? Leave a review to help the community.",
+    "cta": "Bewertung abgeben"
+  },
+  "new_message": {
+    "subject": "Neue Nachricht von {{sender}}",
+    "greeting": "Sehr geehrte/r {{name}},",
+    "body": "{{sender}} hat Ihnen eine Nachricht gesendet.",
+    "cta": "Nachricht anzeigen"
   },
   "message": {
     "in_app_content": "{{sender}} sent you a message",
@@ -200,6 +117,7 @@
     "greeting": "Hi {{name}},",
     "button_fallback": "If the button above doesn't work, copy and paste this link into your browser:",
     "button_fallback_short": "If the button doesn't work, copy this link:",
+    "platform_name": "Project NEXUS",
     "fallback_name": "there",
     "fallback_member_name": "A member",
     "fallback_someone": "Someone",
@@ -207,11 +125,21 @@
     "fallback_federation_member": "A federation member",
     "fallback_partner_community": "a partner community",
     "fallback_federation_level": "Level {{level}}",
-    "or_separator": "or",
     "fallback_job": "a job",
+    "fallback_goal": "Dein Ziel",
     "fallback_manager": "Manager",
     "fallback_organization": "Organization",
+    "community_label": "Gemeinschaft",
+    "or_separator": "or",
     "signoff": "Thanks,\n{{app}}"
+  },
+  "footer": {
+    "unsubscribe": "Von diesen E-Mails abmelden",
+    "sent_by": "Gesendet von {{community}}, betrieben durch Project NEXUS",
+    "address": "{{community}}",
+    "all_rights_reserved": "All rights reserved.",
+    "manage_preferences": "Manage Preferences",
+    "member_notice": "You received this email because you are a member of the {{community}} community."
   },
   "job_alert": {
     "subject_single": "New job matching your alert: {{title}}",
@@ -237,6 +165,7 @@
     "rank": "Rank",
     "streak": "Streak",
     "streak_days": "{{days}} days",
+    "badge_fallback": "Abzeichen",
     "encouragement": "Keep up the great work — your contributions make the community stronger!",
     "view_leaderboard": "View Leaderboard"
   },
@@ -252,6 +181,7 @@
     "badge_earned_preview": "You earned the {{badge}} badge!",
     "badge_earned_highlight": "You've earned the <strong>{{icon}} {{badge}}</strong> badge!",
     "badge_earned_body": "Great work contributing to your community!",
+    "badge_fallback": "ein neues Abzeichen",
     "view_badges": "View Your Badges",
     "streak_subject": "Amazing! {{days}}-day login streak",
     "streak_title": "Streak Milestone!",
@@ -342,7 +272,11 @@
     "manage_preferences": "Manage Preferences",
     "manage_email_preferences": "Manage Email Preferences",
     "test_prefix": "[TEST]",
-    "no_subject": "No Subject"
+    "no_subject": "No Subject",
+    "unsubscribed_subject": "Sie wurden abgemeldet – {{community}}",
+    "unsubscribed_title": "Abgemeldet",
+    "unsubscribed_body": "Sie wurden erfolgreich vom E-Mail-Newsletter von <strong>{{community}}</strong> abgemeldet. Sie erhalten keine Newsletter-E-Mails mehr von dieser Community.",
+    "unsubscribed_body_contact": "Wenn Sie glauben, dass dies ein Fehler war, können Sie sich erneut anmelden, indem Sie die Community-Plattform besuchen."
   },
   "notification": {
     "sent_by": "This email was sent by {{community}}",
@@ -362,6 +296,63 @@
     "intro": "Here is a summary of what you missed on Project NEXUS:",
     "opted_in_notice": "You received this email because you opted for a {{frequency}} summary.",
     "manage_notifications": "Manage Notifications"
+  },
+  "weekly_digest": {
+    "title": "Community Pulse - Weekly Digest",
+    "heading": "Community Pulse",
+    "subheading": "Your Weekly Digest",
+    "preview_text": "Your weekly community highlights - new offers, requests, and upcoming events",
+    "greeting": "Hi {{name}},",
+    "intro": "Here's what's happening in your community this week.",
+    "new_offers": "New Offers",
+    "new_requests": "New Requests",
+    "upcoming_events": "Upcoming Events",
+    "by_author": "by {{name}}",
+    "visit_platform": "Visit Platform",
+    "opted_in_notice": "You received this email because you opted into weekly digests.",
+    "unsubscribe": "Unsubscribe"
+  },
+  "match_digest": {
+    "title": "Your {{period}} Match Digest",
+    "preview_new_matches": "{{count}} new match(es) this {{period}}!",
+    "preview_hot": "Including {{count}} hot match(es).",
+    "preview_mutual": "{{count}} mutual match(es)!",
+    "heading": "Your {{period}} Digest",
+    "new_matches_waiting": "{{count}} new match(es) waiting for you",
+    "greeting": "Hi {{name}},",
+    "intro": "Here's a summary of your new matches from the past {{period}}. Don't miss out on these opportunities!",
+    "hot_matches": "Hot Match(es)",
+    "hot_compatibility": "85%+ compatibility",
+    "mutual_matches": "Mutual Match(es)",
+    "win_win": "Win-win opportunities",
+    "top_matches": "Top Matches",
+    "by_author": "by {{name}}",
+    "a_member": "A member",
+    "more_matches": "+ {{count}} more match(es) to explore",
+    "view_all_matches": "View All Matches",
+    "hot_matches_link": "Hot matches",
+    "mutual_matches_link": "Mutual matches",
+    "all_matches_link": "All matches",
+    "receiving_digest": "You're receiving this {{period}} digest because you have matches enabled.",
+    "manage_frequency": "Manage digest frequency"
+  },
+  "match_hot": {
+    "title": "Hot Match Found!",
+    "preview": "{{score}}% match found! {{name}} posted \"{{title}}\"",
+    "heading": "Hot Match Found!",
+    "compatibility_score": "Compatibility Score",
+    "greeting": "Hi {{name}},",
+    "intro": "Great news! We found a highly compatible listing that matches your preferences. This is a <strong style=\"color: {{color}};\">hot match</strong> - don't miss out!",
+    "posted_by": "Posted by {{name}}",
+    "walking_distance": "Walking distance",
+    "nearby": "Nearby",
+    "in_your_area": "In your area",
+    "regional": "Regional",
+    "why_matches": "Why this matches you",
+    "view_match": "View This Match",
+    "view_all_matches": "view all your matches",
+    "receiving_notice": "You're receiving this because you enabled hot match notifications.",
+    "manage_preferences": "Manage notification preferences"
   },
   "events": {
     "update_subject": "Update: {{title}}",
@@ -394,6 +385,24 @@
     "online_event": "Online Event",
     "location_label": "Location: {{location}}"
   },
+  "match_mutual": {
+    "title": "Mutual Match Found!",
+    "preview": "Perfect exchange opportunity with {{name}}! You can both help each other - {{score}}% compatibility.",
+    "heading": "Mutual Match!",
+    "subheading": "A Perfect Exchange Opportunity",
+    "greeting": "Hi {{name}},",
+    "intro": "We found a <strong style=\"color: {{color}};\">mutual exchange opportunity</strong> with <strong>{{partner}}</strong>. You can both help each other - this is a win-win!",
+    "match_label": "Match",
+    "they_offer": "THEY OFFER",
+    "you_offer": "YOU OFFER",
+    "can_help_you": "{{name}} can help you with",
+    "you_can_help": "You can help {{name}} with",
+    "rare_notice": "Mutual matches are rare! This is a win-win opportunity where both parties benefit from the exchange.",
+    "connect_with": "Connect with {{name}}",
+    "view_all_mutual": "view all mutual matches",
+    "receiving_notice": "You're receiving this because you enabled mutual match notifications.",
+    "manage_preferences": "Manage notification preferences"
+  },
   "notification_subject": {
     "new_topic": "New Discussion: {{snippet}}",
     "new_reply": "New Reply to Discussion",
@@ -413,6 +422,20 @@
     "exchange_disputed": "⚠️ Exchange Dispute - Broker Review Needed",
     "default": "Notification from Project NEXUS"
   },
+  "exchange_dispute": {
+    "subject": "Your exchange has been flagged for review",
+    "title": "Exchange Under Review",
+    "preview": "An exchange you participated in needs attention",
+    "body": "Your recent exchange has been flagged as disputed due to a difference in reported hours. A coordinator will review this and reach out shortly.",
+    "next_steps": "You may be contacted by a broker or coordinator to help resolve this. In the meantime, you can view the exchange details.",
+    "cta": "View Exchange"
+  },
+  "dispute_resolved_subject": "Your exchange dispute has been resolved",
+  "dispute_resolved_title": "Dispute Resolved",
+  "dispute_resolved_preview": "Your exchange has been successfully completed",
+  "dispute_resolved_body": "Your exchange has been reviewed and a final agreement of :hours hours has been reached.",
+  "dispute_resolved_hours_label": "Final Hours Agreed",
+  "dispute_resolved_cta": "View Exchange",
   "donation": {
     "sent_subject": "You donated :amount time credits",
     "sent_title": "Donation Sent",
@@ -427,7 +450,8 @@
     "received_greeting": "Great news!",
     "received_body": ":donor has donated :amount time credits to your wallet.",
     "received_message_label": "Their message",
-    "received_cta": "View Your Wallet"
+    "received_cta": "View Your Wallet",
+    "no_message": "(keine)"
   },
   "identity_verification": {
     "passed_subject": "Your identity has been verified",
@@ -474,14 +498,6 @@
     "hours_declined_body": "Your volunteer hours for ':opportunity' could not be confirmed at this time. Please contact your coordinator.",
     "hours_declined_cta": "View Volunteering"
   },
-  "exchange_dispute": {
-    "subject": "Your exchange has been flagged for review",
-    "title": "Exchange Under Review",
-    "preview": "An exchange you participated in needs attention",
-    "body": "Your recent exchange has been flagged as disputed due to a difference in reported hours. A coordinator will review this and reach out shortly.",
-    "next_steps": "You may be contacted by a broker or coordinator to help resolve this. In the meantime, you can view the exchange details.",
-    "cta": "View Exchange"
-  },
   "onboarding_nurture": {
     "day2_subject": "Complete your profile to get more connections",
     "day2_title": "Your Profile Is Almost Ready",
@@ -502,12 +518,6 @@
     "day7_body": "You've been part of :community for a week! Here's a quick reminder of everything you can do: browse listings, make connections, join groups, and attend events.",
     "day7_cta": "Explore Your Community"
   },
-  "dispute_resolved_subject": "Your exchange dispute has been resolved",
-  "dispute_resolved_title": "Dispute Resolved",
-  "dispute_resolved_preview": "Your exchange has been successfully completed",
-  "dispute_resolved_body": "Your exchange has been reviewed and a final agreement of :hours hours has been reached.",
-  "dispute_resolved_hours_label": "Final Hours Agreed",
-  "dispute_resolved_cta": "View Exchange",
   "billing_upgrade_request": {
     "subject": "Plan Upgrade Request — :tenant",
     "body": "Upgrade request from tenant: :tenant (ID: :tenant_id)\n\nRequested by: :email\n\nMessage: :message",
@@ -539,6 +549,12 @@
     "cta_pay": "Pay membership dues",
     "cta_view": "View my dues",
     "cta_receipt": "View Stripe receipt"
+  },
+  "regional_analytics": {
+    "subject": "Regionaler Analysebericht – :period",
+    "report_ready": "Ihr regionaler Analysebericht für :period ist fertig.",
+    "download_report": "Bericht herunterladen",
+    "privacy_note": "Alle Zahlen sind gemäß den Project NEXUS-Datenschutzgarantien gegliedert."
   },
   "appreciation": {
     "subject": "{{sender}} sent you a thank-you",

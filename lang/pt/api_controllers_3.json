@@ -36,6 +36,93 @@
   "listings": {
     "listing_saved_notification": ":saver_name saved your listing \":title\""
   },
+  "goals": {
+    "progress_mentor": "{{name}} made progress on their goal: \"{{title}}\"",
+    "completed_mentor": "{{name}} completed their goal: \"{{title}}\"",
+    "completed_self": "Congratulations! You completed your goal: \"{{title}}\"",
+    "buddy_joined_owner": "{{name}} tornou-se um amigo do seu objetivo: \"{{title}}\"",
+    "checkin_mentor": "{{name}} fez check-in em seu objetivo: “{{title}}”",
+    "history_created": "Meta criada",
+    "history_progress": "Progresso atualizado para {{percent}}%",
+    "history_checkin": "Check-in registrado em {{percent}}%",
+    "history_buddy_joined": "Um amigo de meta se juntou",
+    "history_buddy_action": "Apoio ao amigo da meta enviado",
+    "history_milestone": "Marco alcançado: {{title}}",
+    "history_completed": "Meta concluída",
+    "milestone_quarter": "Primeiro trimestre",
+    "milestone_half": "No meio do caminho",
+    "milestone_three_quarters": "Três quartos",
+    "milestone_complete": "Meta concluída",
+    "milestone_generic": "Marco {{number}}",
+    "buddy_note_nudge": "Um lembrete gentil para fazer check-in quando puder.",
+    "buddy_note_encouragement": "Você está indo bem. Continue.",
+    "buddy_note_offer_help": "Posso ajudar se você quiser conversar sobre a próxima etapa.",
+    "buddy_note_celebration": "Vale a pena comemorar esse progresso!",
+    "buddy_note_note": "Seu amigo enviou uma nota.",
+    "buddy_action_nudge": "mandou uma cutucada para",
+    "buddy_action_encouragement": "enviou incentivo para",
+    "buddy_action_offer_help": "ofereceu ajuda com",
+    "buddy_action_celebration": "comemorou o progresso em",
+    "buddy_action_note": "enviou uma nota sobre",
+    "buddy_action_owner": "{{name}} {{action}} seu objetivo: \"{{title}}\""
+  },
+  "feed": {
+    "post_shared": "{{name}} shared your post"
+  },
+  "polls": {
+    "vote_received": "{{name}} voted on your poll: \"{{title}}\"",
+    "ranking_received": "{{name}} submitted a ranking on your poll: \"{{title}}\""
+  },
+  "deliverable": {
+    "assigned": "You've been assigned a deliverable: \"{{title}}\"",
+    "reassigned": "You've been assigned to deliverable: \"{{title}}\""
+  },
+  "deliverable_comment": {
+    "posted": "{{name}} commented on your deliverable \"{{title}}\""
+  },
+  "wallet_admin": {
+    "grant_received": "You received {{amount}} {{unit}} from your timebank coordinator",
+    "balance_adjusted_added": "Your balance was adjusted: +{{amount}} {{unit}} added by coordinator",
+    "balance_adjusted_removed": "Your balance was adjusted: -{{amount}} {{unit}} removed by coordinator"
+  },
+  "comments": {
+    "reaction": "{{name}} reacted to your comment"
+  },
+  "federation": {
+    "review_received": "{{name}} left you a {{rating}}-star review"
+  },
+  "federation_credit": {
+    "action_taken": "{{tenant}} has {{action}} your federation credit agreement."
+  },
+  "volunteer": {
+    "shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
+    "shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
+    "opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
+  },
+  "marketplace_offer": {
+    "received": "{{buyer}} made an offer of {{amount}} on your listing \"{{title}}\"",
+    "accepted": "Your offer on \"{{title}}\" has been accepted!",
+    "declined": "Your offer on \"{{title}}\" was declined.",
+    "countered": "The seller countered your offer on \"{{title}}\" with {{amount}}",
+    "counter_accepted": "Your counter-offer on \"{{title}}\" was accepted!",
+    "withdrawn": "{{buyer}} withdrew their offer on your listing \"{{title}}\""
+  },
+  "marketplace_order": {
+    "confirmed_buyer": "Order #{{order_number}} confirmed — \"{{title}}\"",
+    "confirmed_seller": "You have a new order #{{order_number}} for \"{{title}}\"",
+    "paid_buyer": "Pagamento recebido pelo pedido #{{order_number}}: {{amount}}",
+    "paid_seller": "O pedido #{{order_number}} foi pago: {{amount}}",
+    "shipped": "Your order #{{order_number}} has been shipped!",
+    "delivered": "Order #{{order_number}} — buyer confirmed delivery",
+    "cancelled": "Order #{{order_number}} has been cancelled",
+    "completed": "Order #{{order_number}} has been completed!",
+    "refunded": "Refund of {{amount}} {{currency}} processed for order #{{order_number}}",
+    "partially_refunded": "Partial refund of {{amount}} {{currency}} processed for order #{{order_number}}"
+  },
+  "marketplace_payment": {
+    "local_order_not_found": "Nenhum pedido local foi encontrado para este pagamento.",
+    "only_buyer_confirm": "Somente o comprador pode confirmar o pagamento."
+  },
   "admin_bells": {
     "comment_hidden": "Your comment has been hidden by a moderator.",
     "comment_removed": "Your comment has been removed by a moderator.",
@@ -65,61 +152,5 @@
     "account_reactivated": "Your account has been reactivated. Welcome back to {{community}}!",
     "super_admin_granted": "You have been granted Tenant Super Admin privileges.",
     "super_admin_revoked": "Your Tenant Super Admin privileges have been removed."
-  },
-  "deliverable": {
-    "assigned": "You've been assigned a deliverable: \"{{title}}\"",
-    "reassigned": "You've been assigned to deliverable: \"{{title}}\""
-  },
-  "deliverable_comment": {
-    "posted": "{{name}} commented on your deliverable \"{{title}}\""
-  },
-  "wallet_admin": {
-    "grant_received": "You received {{amount}} {{unit}} from your timebank coordinator",
-    "balance_adjusted_added": "Your balance was adjusted: +{{amount}} {{unit}} added by coordinator",
-    "balance_adjusted_removed": "Your balance was adjusted: -{{amount}} {{unit}} removed by coordinator"
-  },
-  "comments": {
-    "reaction": "{{name}} reacted to your comment"
-  },
-  "federation": {
-    "review_received": "{{name}} left you a {{rating}}-star review"
-  },
-  "federation_credit": {
-    "action_taken": "{{tenant}} has {{action}} your federation credit agreement."
-  },
-  "volunteer": {
-    "shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
-    "shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
-    "opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
-  },
-  "goals": {
-    "progress_mentor": "{{name}} made progress on their goal: \"{{title}}\"",
-    "completed_mentor": "{{name}} completed their goal: \"{{title}}\"",
-    "completed_self": "Congratulations! You completed your goal: \"{{title}}\""
-  },
-  "feed": {
-    "post_shared": "{{name}} shared your post"
-  },
-  "polls": {
-    "vote_received": "{{name}} voted on your poll: \"{{title}}\"",
-    "ranking_received": "{{name}} submitted a ranking on your poll: \"{{title}}\""
-  },
-  "marketplace_offer": {
-    "received": "{{buyer}} made an offer of {{amount}} on your listing \"{{title}}\"",
-    "accepted": "Your offer on \"{{title}}\" has been accepted!",
-    "declined": "Your offer on \"{{title}}\" was declined.",
-    "countered": "The seller countered your offer on \"{{title}}\" with {{amount}}",
-    "counter_accepted": "Your counter-offer on \"{{title}}\" was accepted!",
-    "withdrawn": "{{buyer}} withdrew their offer on your listing \"{{title}}\""
-  },
-  "marketplace_order": {
-    "confirmed_buyer": "Order #{{order_number}} confirmed — \"{{title}}\"",
-    "confirmed_seller": "You have a new order #{{order_number}} for \"{{title}}\"",
-    "shipped": "Your order #{{order_number}} has been shipped!",
-    "delivered": "Order #{{order_number}} — buyer confirmed delivery",
-    "cancelled": "Order #{{order_number}} has been cancelled",
-    "completed": "Order #{{order_number}} has been completed!",
-    "refunded": "Refund of {{amount}} {{currency}} processed for order #{{order_number}}",
-    "partially_refunded": "Partial refund of {{amount}} {{currency}} processed for order #{{order_number}}"
   }
 }

@@ -16,8 +16,19 @@
       "redemption_not_found": "Redemption not found.",
       "redemption_not_reversible": "Only applied redemptions can be reversed.",
       "reversal_reason_too_long": "Reversal reason must be 500 characters or fewer.",
+      "invalid_listing": "De vermelding is niet van deze verkoper.",
+      "listing_unavailable": "Deze aanbieding is niet beschikbaar voor loyaliteitsinwisseling.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
       "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+    }
+  },
+  "survey": {
+    "errors": {
+      "already_responded": "U heeft al op deze enquête gereageerd.",
+      "closed": "Deze enquête is gesloten.",
+      "not_accepting": "Deze enquête accepteert momenteel geen reacties.",
+      "not_found": "Enquête niet gevonden.",
+      "required_question": "Verplichte vraag #:id is niet beantwoord."
     }
   },
   "forecast": {
@@ -52,10 +63,97 @@
       "message": "We've missed you lately — would you like a warmth pass with a fellow helper?"
     },
     "unfulfilled_help_request": {
-      "message": "{name}'s help request has been waiting more than {days} days — could we widen the search?"
+      "message": "De hulpvraag van :name wacht al meer dan :days dagen. Kunnen we de zoektocht verbreden?"
     },
     "low_coverage_subregion": {
-      "message": "{name} is under-supplied right now — consider recruiting more helpers there."
+      "message": ":name heeft momenteel te weinig aanbod. Overweeg daar meer helpers te werven."
     }
+  },
+  "requests": {
+    "submitted": "Verzoek ingediend."
+  },
+  "favour": {
+    "recorded": "Gunst opgenomen."
+  },
+  "alerts": {
+    "recipients_without_tandem_title": "Ontvangers zonder vaste ondersteuner",
+    "recipients_without_tandem_message": "Deze leden hebben het afgelopen half jaar hulp gekregen, maar hebben geen actieve terugkerende tandem. Koppel ze aan een vaste supporter om de continuïteit te garanderen.",
+    "inactive_members_title": "Actieve leden zijn stil geworden",
+    "inactive_members_message": "Leden die in de afgelopen zes maanden uren hebben geregistreerd, maar niets in de afgelopen 30 dagen. Een vriendelijke check-in zorgt er vaak voor dat ze opnieuw betrokken raken.",
+    "overdue_reviews_title": "Uurbeoordelingen voorbij SLA",
+    "overdue_reviews_message": "Openstaande urenlogs ouder dan :sla dagen. Keur ze goed of escaleer ze, zodat leden worden gecrediteerd.",
+    "coordinators_overloaded_title": "Coördinatoren overbelast",
+    "coordinators_overloaded_message": "Aan een of meer coördinatoren zijn meer dan 10 openstaande beoordelingen toegewezen. Wijs opnieuw toe voordat er knelpunten ontstaan.",
+    "overdue_check_ins_title": "Tandem-check-ins te laat",
+    "overdue_check_ins_message": "Actieve terugkerende relaties waarvan de geplande check-in is verstreken. Neem contact op om te bevestigen dat beide partijen nog steeds in orde zijn.",
+    "low_supply_title": "Categorieën met onvervulde vraag",
+    "low_supply_message": "Categorieën waar actieve verzoeken groter zijn dan beschikbare aanbiedingen. Het is de moeite waard om dit onder de aandacht te brengen van potentiële supporters."
+  },
+  "civic_digest": {
+    "cadence_invalid": "cadans moet een van de volgende zijn: off, daily, monthly",
+    "preferred_sub_region_invalid": "preferred_sub_region_id moet numeriek zijn of null",
+    "opt_out_sources_invalid": "opt_out_sources moet een array van bronsleutels zijn"
+  },
+  "readiness": {
+    "unknown_item": "Onbekend beslissingspoortitem: :item",
+    "storage_unavailable": "tenant_settings-tabel is niet beschikbaar",
+    "owner_invalid": "Eigenaar moet een string zijn",
+    "owner_too_long": "Eigenaar moet 255 tekens of minder bevatten",
+    "status_invalid": "De status moet een van de volgende zijn: :statuses",
+    "notes_invalid": "Notities moeten een tekenreeks zijn",
+    "notes_too_long": "Notities moeten uit 2000 tekens of minder bestaan",
+    "value_string": "Waarde moet een tekenreeks zijn",
+    "choice_invalid": "De waarde moet een van de volgende zijn: :choices",
+    "url_invalid": "Waarde moet een geldige URL zijn",
+    "url_too_long": "URL moet 1000 tekens of minder bevatten",
+    "value_too_long": "De waarde moet 1000 tekens of minder bevatten"
+  },
+  "feedback": {
+    "table_not_found": "Feedbacktabel nog niet ingericht.",
+    "not_found": "Feedback niet gevonden.",
+    "invalid_status": "Ongeldige status.",
+    "invalid_assignee": "assigned_user_id moet numeriek zijn.",
+    "resolution_notes_required": "Resolutienotities zijn vereist.",
+    "invalid_category": "Ongeldige categorie.",
+    "subject_required": "Onderwerp is vereist.",
+    "subject_too_long": "Onderwerp is te lang.",
+    "body_required": "Lichaam is vereist.",
+    "body_too_long": "Lichaam is te lang.",
+    "invalid_sentiment": "Ongeldige sentimenttag.",
+    "invalid_sub_region": "Subregio moet numeriek zijn."
+  },
+  "external_integrations": {
+    "validation": {
+      "name_required": "Naam is vereist.",
+      "name_too_long": "Naam moet 200 tekens of minder bevatten.",
+      "category_invalid": "Categorie is ongeldig.",
+      "status_invalid": "Status is ongeldig.",
+      "dsa_status_invalid": "DSA-status is ongeldig.",
+      "owner_email_invalid": "Het e-mailadres van de eigenaar moet een geldig e-mailadres zijn.",
+      "interface_spec_url_invalid": "Interfacespecificatie URL moet een geldige URL zijn.",
+      "sandbox_url_invalid": "Sandbox URL moet een geldige URL zijn."
+    }
+  },
+  "success_stories": {
+    "validation": {
+      "title_required": "Titel is vereist.",
+      "title_too_long": "Titel moet 200 tekens of minder bevatten.",
+      "narrative_required": "Verhaal is vereist.",
+      "narrative_too_long": "Het verhaal mag maximaal 1500 tekens lang zijn.",
+      "method_caveat_required": "Methodevoorbehoud is vereist.",
+      "method_caveat_too_long": "Methodevoorbehoud moet 500 tekens of minder bevatten.",
+      "evidence_source_required": "Bewijsbron is vereist.",
+      "evidence_source_too_long": "De bewijsbron mag maximaal 300 tekens lang zijn.",
+      "metric_source_invalid": "Gegevensbron is ongeldig.",
+      "unit_too_long": "De eenheid moet uit 30 tekens of minder bestaan.",
+      "audience_too_long": "Het publiek moet uit 50 tekens of minder bestaan."
+    }
+  },
+  "data_quality": {
+    "missing_language_positive": "Deze leden ontvangen standaard e-mails en meldingen op het platform. Stel hun voorkeurstaal in voor een juiste lokalisatie.",
+    "missing_language_ok": "Elk lid heeft een voorkeurstaal.",
+    "no_sub_region_column": "Geen users.sub_region_id-kolom in dit schema. De koppeling met subregio's wordt elders gevolgd.",
+    "no_sub_regions": "Er zijn geen subregio's gedefinieerd voor deze tenant. Controle overslaan.",
+    "no_coordinator_column": "Geen coördinatorkolom in dit schema."
   }
 }

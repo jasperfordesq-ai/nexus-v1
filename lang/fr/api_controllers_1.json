@@ -160,6 +160,7 @@
   },
   "auth": {
     "two_factor_required": "Two-factor authentication required",
+    "two_factor_setup_required": "Une authentification à deux facteurs est requise pour les comptes d'administrateur. Veuillez configurer 2FA pour continuer.",
     "logged_out": "Logged out successfully",
     "session_refreshed": "Session refreshed",
     "session_restored": "Session restored from token",

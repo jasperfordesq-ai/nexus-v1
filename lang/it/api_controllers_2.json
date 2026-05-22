@@ -90,6 +90,7 @@
   "identity.start_failed": "Unable to start verification.",
   "password_reset.link_sent": "If an account exists with that email address, a password reset link has been sent.",
   "password_reset.updated": "Password updated successfully. Please log in with your new password.",
+  "password_reset.changed_bell": "Your password was changed. If you did not do this, contact support immediately.",
   "peer_endorsement.recorded": "Peer endorsement recorded",
   "push.unsubscribed": "Unsubscribed successfully",
   "push.no_subscribers": "No subscribers found",
@@ -102,6 +103,12 @@
   "skill_taxonomy.skill_removed": "Skill removed",
   "sub_account.relationship_revoked": "Relationship revoked",
   "two_factor.disabled": "Two-factor authentication has been disabled",
+  "two_factor.enabled_notification": "Two-factor authentication has been enabled on your account.",
+  "two_factor.disabled_notification": "Two-factor authentication has been disabled on your account. If you did not do this, secure your account immediately.",
+  "two_factor.disabled_email_title": "Two-Factor Authentication Disabled",
+  "two_factor.disabled_email_preview": "2FA has been disabled on your account.",
+  "two_factor.disabled_email_body": "Two-factor authentication has been disabled on your account. If you did not make this change, please secure your account immediately by changing your password and re-enabling 2FA.",
+  "two_factor.disabled_email_subject": "Security Alert: 2FA Disabled — {{tenant}}",
   "users.theme_updated": "Theme preference updated",
   "users.password_updated": "Password updated successfully",
   "users.account_deleted": "Account deleted successfully",
@@ -126,6 +133,7 @@
   "volunteer.no_fields_to_update": "No fields to update",
   "volunteer.signed_up_for_shift": "Successfully signed up for shift",
   "volunteer.hours_logged_pending": "Hours logged successfully, pending verification",
+  "volunteer.hours_logged_approved": "Hours logged successfully and approved",
   "volunteer.review_submitted": "Review submitted successfully",
   "volunteer_wellbeing.emergency_alert_sent": "Emergency alert sent",
   "wallet.donation_successful": "Donation successful. Thank you!",
@@ -143,6 +151,8 @@
   "webauthn.auth_successful": "Authentication successful",
   "webauthn.credentials_removed": "Credential(s) removed",
   "webauthn.all_removed": "Removed :count passkey(s). You can now re-register on any device.",
+  "webauthn.passkey_removed_bell": "A passkey was removed from your account. If you did not do this, secure your account immediately.",
+  "webauthn.all_passkeys_removed_bell": "All passkeys ({{count}}) were removed from your account. If you did not do this, secure your account immediately.",
   "maintenance.under_maintenance": "Platform is currently under maintenance. Please check back soon.",
   "block_user.cannot_block_self": "You cannot block yourself",
   "group_conversation.body_required": "Message body is required",
@@ -162,15 +172,6 @@
   "verification_badge.user_not_found": "User not found",
   "verification_badge.badge_already_active": "Badge already active",
   "verification_badge.invalid_badge_type": "Invalid badge type: :type",
-  "two_factor.disabled_notification": "Two-factor authentication has been disabled on your account. If you did not do this, secure your account immediately.",
-  "two_factor.disabled_email_title": "Two-Factor Authentication Disabled",
-  "two_factor.disabled_email_preview": "2FA has been disabled on your account.",
-  "two_factor.disabled_email_body": "Two-factor authentication has been disabled on your account. If you did not make this change, please secure your account immediately by changing your password and re-enabling 2FA.",
-  "two_factor.disabled_email_subject": "Security Alert: 2FA Disabled — {{tenant}}",
-  "password_reset.changed_bell": "Your password was changed. If you did not do this, contact support immediately.",
-  "two_factor.enabled_notification": "Two-factor authentication has been enabled on your account.",
-  "webauthn.passkey_removed_bell": "A passkey was removed from your account. If you did not do this, secure your account immediately.",
-  "webauthn.all_passkeys_removed_bell": "All passkeys ({{count}}) were removed from your account. If you did not do this, secure your account immediately.",
   "email_test": {
     "subject": "Project NEXUS — Email Test",
     "heading": "Email Test",
@@ -184,5 +185,8 @@
     "seller_suspended": "Your seller account is suspended and cannot create new listings.",
     "create_failed": "Failed to create listing."
   },
-  "volunteer.hours_logged_approved": "Hours logged successfully and approved"
+  "marketplace_offer": {
+    "listing_not_found": "Annuncio non trovato.",
+    "buyer_tenant_mismatch": "Puoi fare offerte solo dalla tua comunità attuale."
+  }
 }

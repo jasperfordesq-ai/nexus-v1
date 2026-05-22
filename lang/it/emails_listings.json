@@ -20,10 +20,10 @@
       "days_one": "1 day",
       "days_other": "{{count}} days",
       "urgent_note": "Act soon to keep your listing visible!",
-      "expired_subject": "Your listing ':title' has expired",
+      "expired_subject": "La tua inserzione \"{{title}}\" è scaduta",
       "expired_title": "Listing Expired",
       "expired_preview": "Your listing has expired — renew it to stay visible",
-      "expired_body": "Your listing ':title' has expired. Renew it now to continue receiving responses from community members.",
+      "expired_body": "La tua scheda <strong>\"{{title}}\"</strong> è scaduta. Rinnovalo ora per continuare a ricevere risposte dai membri della community.",
       "expired_cta": "Renew Listing"
     },
     "approved": {

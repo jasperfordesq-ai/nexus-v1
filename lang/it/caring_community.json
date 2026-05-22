@@ -16,8 +16,19 @@
       "redemption_not_found": "Redemption not found.",
       "redemption_not_reversible": "Only applied redemptions can be reversed.",
       "reversal_reason_too_long": "Reversal reason must be 500 characters or fewer.",
+      "invalid_listing": "L'inserzione non appartiene a questo commerciante.",
+      "listing_unavailable": "Questo elenco non è disponibile per il riscatto fedeltà.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
       "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+    }
+  },
+  "survey": {
+    "errors": {
+      "already_responded": "Hai già risposto a questo sondaggio.",
+      "closed": "Questo sondaggio è stato chiuso.",
+      "not_accepting": "Questo sondaggio al momento non accetta risposte.",
+      "not_found": "Sondaggio non trovato.",
+      "required_question": "La domanda obbligatoria #:id non ha risposta."
     }
   },
   "forecast": {
@@ -52,10 +63,97 @@
       "message": "We've missed you lately — would you like a warmth pass with a fellow helper?"
     },
     "unfulfilled_help_request": {
-      "message": "{name}'s help request has been waiting more than {days} days — could we widen the search?"
+      "message": "La richiesta di aiuto di :name ? in attesa da pi? di :days giorni. Possiamo ampliare la ricerca?"
     },
     "low_coverage_subregion": {
-      "message": "{name} is under-supplied right now — consider recruiting more helpers there."
+      "message": ":name ? al momento poco coperta. Valuta di reclutare pi? aiutanti l?."
     }
+  },
+  "requests": {
+    "submitted": "Richiesta inviata."
+  },
+  "favour": {
+    "recorded": "Favore registrato."
+  },
+  "alerts": {
+    "recipients_without_tandem_title": "Destinatari senza un sostenitore regolare",
+    "recipients_without_tandem_message": "Questi membri hanno ricevuto aiuto negli ultimi sei mesi ma non hanno un tandem ricorrente attivo. Abbinateli a un sostenitore costante per garantire la continuità.",
+    "inactive_members_title": "I membri attivi si sono calmati",
+    "inactive_members_message": "Membri che hanno registrato ore negli ultimi sei mesi ma niente negli ultimi 30 giorni. Un check-in amichevole spesso li coinvolge nuovamente.",
+    "overdue_reviews_title": "Revisioni delle ore precedenti allo SLA",
+    "overdue_reviews_message": "Registri vol in sospeso più vecchi di :sla giorni. Approvali o intensificali in modo che i membri vengano accreditati.",
+    "coordinators_overloaded_title": "I coordinatori sono sovraccarichi",
+    "coordinators_overloaded_message": "A uno o più coordinatori sono assegnate più di 10 revisioni in sospeso. Riassegnare prima che si formino colli di bottiglia.",
+    "overdue_check_ins_title": "Check-in tandem in ritardo",
+    "overdue_check_ins_message": "Relazioni ricorrenti attive il cui check-in pianificato è stato superato. Contattarli per confermare che entrambe le parti stanno ancora bene.",
+    "low_supply_title": "Categorie con domanda non soddisfatta",
+    "low_supply_message": "Categorie in cui le richieste attive superano le offerte disponibili. Vale la pena segnalarlo ai potenziali sostenitori."
+  },
+  "civic_digest": {
+    "cadence_invalid": "la cadenza deve essere una tra: off, daily, monthly",
+    "preferred_sub_region_invalid": "preferred_sub_region_id deve essere numerico o null",
+    "opt_out_sources_invalid": "opt_out_sources deve essere un array di chiavi di origine"
+  },
+  "readiness": {
+    "unknown_item": "Elemento decisionale sconosciuto: :item",
+    "storage_unavailable": "La tabella tenant_settings non è disponibile",
+    "owner_invalid": "Il proprietario deve essere una stringa",
+    "owner_too_long": "Il proprietario deve contenere al massimo 255 caratteri",
+    "status_invalid": "Lo stato deve essere uno tra: :statuses",
+    "notes_invalid": "Le note devono essere una stringa",
+    "notes_too_long": "Le note devono contenere 2000 caratteri o meno",
+    "value_string": "Il valore deve essere una stringa",
+    "choice_invalid": "Il valore deve essere uno tra: :choices",
+    "url_invalid": "Il valore deve essere un URL valido",
+    "url_too_long": "URL deve contenere 1000 caratteri o meno",
+    "value_too_long": "Il valore deve contenere massimo 1000 caratteri"
+  },
+  "feedback": {
+    "table_not_found": "Tabella di feedback non ancora fornita.",
+    "not_found": "Feedback non trovato.",
+    "invalid_status": "Stato non valido.",
+    "invalid_assignee": "assigned_user_id deve essere numerico.",
+    "resolution_notes_required": "Sono necessarie note di risoluzione.",
+    "invalid_category": "Categoria non valida.",
+    "subject_required": "L'oggetto è obbligatorio.",
+    "subject_too_long": "L'argomento è troppo lungo.",
+    "body_required": "È richiesto il corpo.",
+    "body_too_long": "Il corpo è troppo lungo.",
+    "invalid_sentiment": "Tag sentimento non valido.",
+    "invalid_sub_region": "La sottoregione deve essere numerica."
+  },
+  "external_integrations": {
+    "validation": {
+      "name_required": "Il nome è obbligatorio.",
+      "name_too_long": "Il nome deve contenere massimo 200 caratteri.",
+      "category_invalid": "La categoria non è valida.",
+      "status_invalid": "Lo stato non è valido.",
+      "dsa_status_invalid": "Lo stato DSA non è valido.",
+      "owner_email_invalid": "L'e-mail del proprietario deve essere un indirizzo e-mail valido.",
+      "interface_spec_url_invalid": "La specifica dell'interfaccia URL deve essere un URL valido.",
+      "sandbox_url_invalid": "Sandbox URL deve essere un URL valido."
+    }
+  },
+  "success_stories": {
+    "validation": {
+      "title_required": "Il titolo è obbligatorio.",
+      "title_too_long": "Il titolo deve contenere massimo 200 caratteri.",
+      "narrative_required": "È necessaria la narrazione.",
+      "narrative_too_long": "La narrazione deve contenere al massimo 1500 caratteri.",
+      "method_caveat_required": "È necessario un avvertimento sul metodo.",
+      "method_caveat_too_long": "L'avvertenza sul metodo deve contenere al massimo 500 caratteri.",
+      "evidence_source_required": "La fonte della prova è obbligatoria.",
+      "evidence_source_too_long": "La fonte della prova deve contenere al massimo 300 caratteri.",
+      "metric_source_invalid": "L'origine della metrica non è valida.",
+      "unit_too_long": "L'unità deve contenere 30 caratteri o meno.",
+      "audience_too_long": "Il pubblico deve contenere massimo 50 caratteri."
+    }
+  },
+  "data_quality": {
+    "missing_language_positive": "Questi membri riceveranno e-mail e notifiche nell'impostazione predefinita della piattaforma. Imposta la lingua preferita per una corretta localizzazione.",
+    "missing_language_ok": "Ogni membro ha un set di lingue preferito.",
+    "no_sub_region_column": "Nessuna colonna users.sub_region_id su questo schema. Il collegamento tra sottoregioni viene monitorato altrove.",
+    "no_sub_regions": "Nessuna sottoregione definita per questo tenant. Saltare il controllo.",
+    "no_coordinator_column": "Nessuna colonna coordinatore su questo schema."
   }
 }

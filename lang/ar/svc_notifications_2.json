@@ -79,9 +79,6 @@
   "safeguarding.assignment_created": "Safeguarding assignment created",
   "review.submitted_successfully": "Review submitted successfully",
   "event.added_to_waitlist": "This event is full. You have been added to the waitlist.",
-  "comment.deleted": "Comment deleted",
-  "webhook.test_delivery": "This is a test webhook delivery.",
-  "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
   "event.reminder_tomorrow": "Reminder: \"{{title}}\" is tomorrow — {{when}}",
   "event.reminder_1h": "Starting soon: \"{{title}}\" begins in 1 hour — {{when}}",
   "event.cancelled_notification": "The event \"{{title}}\" has been cancelled.",
@@ -90,10 +87,27 @@
   "event.rsvp_ended": "This event has already ended",
   "event.rsvp_confirmed_going": "You're going to \"{{title}}\"!",
   "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
+  "comment.deleted": "Comment deleted",
+  "webhook.test_delivery": "This is a test webhook delivery.",
+  "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
   "volunteer.shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
   "volunteer.shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
   "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled",
   "federation": {
     "notify_partnership_reactivated": "Partnership reactivated with {{partner}}."
+  },
+  "vol_org_wallet": {
+    "deposit_from_user": "الإيداع من {{name}}",
+    "payment_to_volunteer": "الدفع إلى {{name}}{{context}}",
+    "for_approved_hours": "للساعات المعتمدة",
+    "admin_adjustment_description": "تعديل المسؤول: {{reason}}"
+  },
+  "event": {
+    "reminder_7d": "تذكير: \"{{title}}\" سيتم عرضه خلال 7 أيام — {{when}}"
+  },
+  "credit_donation": {
+    "transaction_description": "التبرع: :message",
+    "no_message": "(?? ????)",
+    "community_fund": "صندوق المجتمع"
   }
 }

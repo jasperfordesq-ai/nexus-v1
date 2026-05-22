@@ -16,8 +16,19 @@
       "redemption_not_found": "Redemption not found.",
       "redemption_not_reversible": "Only applied redemptions can be reversed.",
       "reversal_reason_too_long": "Reversal reason must be 500 characters or fewer.",
+      "invalid_listing": "出品はこの業者のものではありません。",
+      "listing_unavailable": "このリストはロイヤリティの引き換えには利用できません。",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
       "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+    }
+  },
+  "survey": {
+    "errors": {
+      "already_responded": "あなたはすでにこのアンケートに回答しています。",
+      "closed": "このアンケートは終了しました。",
+      "not_accepting": "このアンケートは現在回答を受け付けておりません。",
+      "not_found": "調査が見つかりませんでした。",
+      "required_question": "必須の質問 #:id は回答されていません。"
     }
   },
   "forecast": {
@@ -52,10 +63,97 @@
       "message": "We've missed you lately — would you like a warmth pass with a fellow helper?"
     },
     "unfulfilled_help_request": {
-      "message": "{name}'s help request has been waiting more than {days} days — could we widen the search?"
+      "message": ":name ?????? :days ??????????????????????"
     },
     "low_coverage_subregion": {
-      "message": "{name} is under-supplied right now — consider recruiting more helpers there."
+      "message": ":name ????????????????????????????????????"
     }
+  },
+  "requests": {
+    "submitted": "リクエストが送信されました。"
+  },
+  "favour": {
+    "recorded": "好意が記録されました。"
+  },
+  "alerts": {
+    "recipients_without_tandem_title": "定期的な支援者がいない受給者",
+    "recipients_without_tandem_message": "これらのメンバーは過去 6 か月間支援を受けていますが、定期的に活動する活動はありません。安定したサポーターと組み合わせて、継続性を確保します。",
+    "inactive_members_title": "アクティブなメンバーが沈黙した",
+    "inactive_members_message": "過去 6 か月間に時間数を記録したが、過去 30 日間に何も記録しなかったメンバー。フレンドリーにチェックインすると、再びエンゲージメントが高まることがよくあります。",
+    "overdue_reviews_title": "SLAを過ぎた時間のレビュー",
+    "overdue_reviews_message": ":sla 日より古い保留中のボリュームのログ。メンバーがクレジットされるように承認またはエスカレーションします。",
+    "coordinators_overloaded_title": "コーディネーターの過負荷",
+    "coordinators_overloaded_message": "1 人以上のコーディネーターに 10 件を超える保留中のレビューが割り当てられています。ボトルネックが形成される前に再割り当てします。",
+    "overdue_check_ins_title": "タンデムチェックインの期限切れ",
+    "overdue_check_ins_message": "スケジュールされたチェックインが過ぎたアクティブな定期的な関係。連絡して双方がまだ元気であることを確認してください。",
+    "low_supply_title": "需要が満たされていないカテゴリー",
+    "low_supply_message": "アクティブなリクエストが利用可能なオファーよりも多いカテゴリ。潜在的なサポーターに強調する価値があります。"
+  },
+  "civic_digest": {
+    "cadence_invalid": "ケイデンスは off、daily、monthly のいずれかである必要があります。",
+    "preferred_sub_region_invalid": "preferred_sub_region_id は数値または null である必要があります",
+    "opt_out_sources_invalid": "opt_out_sources はソースキーの配列である必要があります"
+  },
+  "readiness": {
+    "unknown_item": "不明なディシジョンゲート項目: :item",
+    "storage_unavailable": "tenant_settings テーブルは使用できません",
+    "owner_invalid": "所有者は文字列である必要があります",
+    "owner_too_long": "所有者は 255 文字以下である必要があります",
+    "status_invalid": "ステータスは次のいずれかである必要があります: :statuses",
+    "notes_invalid": "メモは文字列である必要があります",
+    "notes_too_long": "メモは 2000 文字以下にする必要があります",
+    "value_string": "値は文字列である必要があります",
+    "choice_invalid": "値は次のいずれかである必要があります: :choices",
+    "url_invalid": "値は有効な URL である必要があります",
+    "url_too_long": "URL は 1000 文字以下である必要があります",
+    "value_too_long": "値は 1000 文字以下である必要があります"
+  },
+  "feedback": {
+    "table_not_found": "フィードバック テーブルはまだプロビジョニングされていません。",
+    "not_found": "フィードバックが見つかりませんでした。",
+    "invalid_status": "無効なステータスです。",
+    "invalid_assignee": "assigned_user_id は数値である必要があります。",
+    "resolution_notes_required": "解決メモは必須です。",
+    "invalid_category": "無効なカテゴリです。",
+    "subject_required": "件名は必須です。",
+    "subject_too_long": "件名が長すぎます。",
+    "body_required": "本体は必須です。",
+    "body_too_long": "体が長すぎます。",
+    "invalid_sentiment": "無効な感情タグです。",
+    "invalid_sub_region": "サブ領域は数値である必要があります。"
+  },
+  "external_integrations": {
+    "validation": {
+      "name_required": "名前は必須です。",
+      "name_too_long": "名前は 200 文字以下にする必要があります。",
+      "category_invalid": "カテゴリが無効です。",
+      "status_invalid": "ステータスが無効です。",
+      "dsa_status_invalid": "DSA ステータスが無効です。",
+      "owner_email_invalid": "所有者の電子メールは有効な電子メール アドレスである必要があります。",
+      "interface_spec_url_invalid": "インターフェイス仕様 URL は有効な URL である必要があります。",
+      "sandbox_url_invalid": "サンドボックス URL は有効な URL である必要があります。"
+    }
+  },
+  "success_stories": {
+    "validation": {
+      "title_required": "タイトルは必須です。",
+      "title_too_long": "タイトルは 200 文字以内にしてください。",
+      "narrative_required": "物語性は必須です。",
+      "narrative_too_long": "物語は 1500 文字以下にする必要があります。",
+      "method_caveat_required": "メソッドの注意が必要です。",
+      "method_caveat_too_long": "メソッドの警告は 500 文字以下にする必要があります。",
+      "evidence_source_required": "証拠の出典が必要です。",
+      "evidence_source_too_long": "証拠の出典は 300 文字以内である必要があります。",
+      "metric_source_invalid": "メトリクス ソースが無効です。",
+      "unit_too_long": "単位は30文字以内にしてください。",
+      "audience_too_long": "対象者は 50 文字以下である必要があります。"
+    }
+  },
+  "data_quality": {
+    "missing_language_positive": "これらのメンバーは、プラットフォームのデフォルトで電子メールと通知を受け取ります。適切なローカライズのために優先言語を設定します。",
+    "missing_language_ok": "すべてのメンバーには優先言語セットがあります。",
+    "no_sub_region_column": "このスキーマには users.sub_region_id 列がありません。サブリージョンのつながりは別の場所で追跡されます。",
+    "no_sub_regions": "このテナントにはサブリージョンが定義されていません。チェックをスキップします。",
+    "no_coordinator_column": "このスキーマにはコーディネーター列がありません。"
   }
 }

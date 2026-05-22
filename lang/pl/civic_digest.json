@@ -1,16 +1,18 @@
 {
   "email": {
     "subject_daily": "Your daily civic digest — {{community}}",
-    "subject_weekly": "Your weekly civic digest — {{community}}",
+    "subject_monthly": "Twoje obywatelskie podsumowanie monthly — {{community}}",
     "greeting": "Hi {{name}},",
     "intro_daily": "Here's what's new in your community today — {{count}} update(s) selected for you based on your sub-region and interests.",
-    "intro_weekly": "Here's your weekly round-up — {{count}} update(s) selected for you based on your sub-region and interests.",
+    "intro_monthly": "Oto podsumowanie monthly — aktualizacje {{count}} wybrane dla Ciebie na podstawie Twojego podregionu i zainteresowań.",
     "empty": "Nothing new in your community for now. We'll keep you posted.",
     "cta_open": "Open",
     "cta_manage_prefs": "Manage digest preferences",
     "footer": "You're receiving this because you opted into the {{community}} civic digest. You can change cadence or opt out at any time.",
     "match_score": "Match {{score}}",
-    "view_all": "View full digest"
+    "view_all": "View full digest",
+    "subject_weekly": "Your weekly civic digest — {{community}}",
+    "intro_weekly": "Here's your weekly round-up — {{count}} update(s) selected for you based on your sub-region and interests."
   },
   "push": {
     "title": "Your civic digest is ready",

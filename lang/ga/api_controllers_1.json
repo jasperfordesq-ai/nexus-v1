@@ -160,6 +160,7 @@
   },
   "auth": {
     "two_factor_required": "Two-factor authentication required",
+    "two_factor_setup_required": "Tá fíordheimhniú dhá fhachtóir riachtanach do chuntais riarthóra. Socraigh 2FA le leanúint ar aghaidh.",
     "logged_out": "Logged out successfully",
     "session_refreshed": "Session refreshed",
     "session_restored": "Session restored from token",
