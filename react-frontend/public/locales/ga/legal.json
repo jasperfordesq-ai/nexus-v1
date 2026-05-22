@@ -1,5 +1,6 @@
 {
   "terms": {
+    "meta_description": "Téarmaí agus coinníollacha a rialaíonn úsáid ár n-ardán bainc ama pobail.",
     "page_title": "Tearmai Seirbhise",
     "heading": "Tearmai Seirbhise",
     "subtitle": "Na rialacha agus na treoirlinte chun ar n-ardan a usaid",
@@ -93,10 +94,10 @@
     "cta_title": "Ceisteanna Agat?",
     "cta_body": "Ma ta aon cheisteanna agat faoi na Tearmai Seirbhise seo no ma theastaionn soileiriu ar aon phointai uait, ta ar bhfoireann anseo chun cabhru leat.",
     "contact_us": "Dean Teagmhail Linn",
-    "privacy_policy_link": "Polasai Priobhaideachta",
-    "meta_description": "Terms and conditions governing the use of our community timebanking platform."
+    "privacy_policy_link": "Polasai Priobhaideachta"
   },
   "privacy": {
+    "meta_description": "Conas a bhailímid, a úsáidimid agus a chosnaíonn tú do shonraí pearsanta ar ár n-ardán pobail.",
     "page_title": "Polasai Priobhaideachta",
     "heading": "Polasai Priobhaideachta",
     "subtitle": "Conas a bhailimid, a usaidimid agus a chosnaomid do chuid faisneise pearsanta",
@@ -204,10 +205,10 @@
     "retention_logs_desc": "Coinnitear seoltai IP agus logai rochtana ar feadh 12 mi",
     "cta_title": "Ceisteanna faoi do Phriobhaideacht?",
     "cta_body": "Taimid anseo chun cabhru leat. Ma ta aon cheisteanna agat faoin bpolasai seo no ma theastaionn uait do chearta sonrai a fheidhmiu, na bith drogallach teagmhail a dheanamh linn.",
-    "contact_privacy_team": "Dean Teagmhail lenr bhFoireann Priobhaideachta",
-    "meta_description": "How we collect, use, and protect your personal data on our community platform."
+    "contact_privacy_team": "Dean Teagmhail lenr bhFoireann Priobhaideachta"
   },
   "cookies": {
+    "meta_description": "Eolas faoin gcaoi a n-úsáidimid fianáin chun d’eispéireas ar ár n-ardán a fheabhsú.",
     "page_title": "Polasai Fianain",
     "heading": "Polasai Fianain",
     "subtitle": "Conas a usaidimid fianain agus teicneolaiochtai comhchosuela ar ar n-ardan",
@@ -267,7 +268,7 @@
     "third_party_intro": "I gcasanna airithe, usaidimid seirbhisi triiiu pairtithe a d'fheadfadh a gcuid fianain fein a shocriu. Airaitear orthu seo:",
     "third_party_sentry_label": "Sentry",
     "third_party_sentry_desc": "Rianaithe earraidi agus monatoriocht feidhmiiochta (gniomhach le toiliiu anailisiochta amhain)",
-    "third_party_pusher_label": "Pusher",
+    "third_party_pusher_label": "Brúiteoir",
     "third_party_pusher_desc": "Le haghaidh fograi fior-ama agus feidhmiiocht teachtaireachta",
     "third_party_compliance": "Roghnaimid ar bpairtneirti triiiu pairtiihe go curamach agus cinntiomid go gcloionn siad le rialachan cosanta sonrai infheidhmhe. Rialaionn polasai priobhaideachta an triiiu pairtiihe faoi seach na fianain triiiu pairtithe.",
     "manage_title": "Conas Fianain a Bhainistiu",
@@ -281,15 +282,15 @@
     "browser_firefox_path": "Socruithe > Priobhaideacht & Slandail > Fianain agus Sonrai Suimh",
     "browser_safari": "Safari",
     "browser_safari_path": "Roghanna > Priobhaideacht > Bainistigh Sonrai Suimh Greasain",
-    "browser_edge": "Edge",
+    "browser_edge": "Imeall",
     "browser_edge_path": "Socruithe > Fianain agus ceadanna suimh > Fianain agus sonrai suimh",
     "cta_title": "Ceisteanna faoi Fhianain?",
     "cta_body": "Ma ta aon cheisteanna agat faoin usaid a bhainimid as fianain no faoin bpolasai seo, na bith drogallach teagmhail a dheanamh linn.",
     "contact_us": "Dean Teagmhail Linn",
-    "privacy_policy_link": "Polasai Priobhaideachta",
-    "meta_description": "Information about how we use cookies to improve your experience on our platform."
+    "privacy_policy_link": "Polasai Priobhaideachta"
   },
   "accessibility": {
+    "meta_description": "Ár dtiomantas an t-ardán a dhéanamh inrochtana do chách, ag cloí le caighdeáin WCAG 2.1 AA.",
     "page_title": "Inrochtaineacht",
     "heading": "Raitis Inrochtaineachta",
     "subtitle": "Ta {{name}} tiomanta d'inrochtaineacht dhigiteach a chinntiiu do dhaoine de gach cumas.",
@@ -333,8 +334,7 @@
     "tech_svg": "SVG le roghanna malartacha cuio",
     "tech_react": "React le leabharlann chomhphairteanna inrochtana",
     "tech_recommendation": "Braitear ar na teicneolaiochtai seo le haghaidh comhliontachta leis na caighdeain inrochtaineachta a usaidtear. Molaimid an leagan is deanaiohe de do bhrosalai a usaid le teicneolaiocht chunta cothrom le data chun an taithi is fearr a fhail.",
-    "last_updated": "Nuashonraiodh an raitis seo go deireanach i bhFeabhra 2026.",
-    "meta_description": "Our commitment to making the platform accessible to everyone, following WCAG 2.1 AA standards."
+    "last_updated": "Nuashonraiodh an raitis seo go deireanach i bhFeabhra 2026."
   },
   "hub": {
     "page_title": "Dli",
@@ -352,7 +352,7 @@
     "doc_cookies_title": "Polasai Fianain",
     "doc_cookies_desc": "Sonrai faoi na fianain a usaidimid, cen fath a usaidimid iad agus conas is feidir leat do roghanna fianain a bhainistiu.",
     "doc_accessibility_title": "Raitis Inrochtaineachta",
-    "doc_accessibility_desc": "Our commitment to making the platform accessible to everyone, including our progress toward WCAG 2.1 AA conformance.",
+    "doc_accessibility_desc": "Ár dtiomantas an t-ardán a dhéanamh inrochtana do chách, lena n-áirítear ár ndul chun cinn i dtreo comhlíonta WCAG 2.1 AA.",
     "doc_community_guidelines_title": "Treoirlinte Pobail",
     "doc_community_guidelines_desc": "Na caighdeain agus na hionchais maidir le rannphairtiocht mheasuil, thogalach inar bpobal.",
     "doc_acceptable_use_title": "Polasai Usaide Inghlactha",
@@ -363,13 +363,13 @@
     "cta_body": "Ma ta aon cheisteanna agat faoinr gcaipeiisi dli, cleachtais sonrai, no ma theastaionn uait do chearta RGCS a fheidhmiu, dean teagmhail linn le do thoil.",
     "contact_team": "Dean Teagmhail lenr bhFoireann",
     "privacy_policy_link": "Polasai Priobhaideachta",
-    "doc_trust_safety_title": "Trust & Safety",
-    "doc_trust_safety_desc": "Plain-English guide to how exchanges work, what we do to keep the community safe, what we don’t, and how to report a safeguarding concern.",
-    "platform_section_title": "Platform Provider Legal",
-    "platform_section_desc": "These documents govern the Project NEXUS platform infrastructure and are separate from your community's policies.",
-    "platform_terms": "Platform Terms",
-    "platform_privacy": "Platform Privacy",
-    "platform_disclaimer": "Disclaimer"
+    "doc_trust_safety_title": "Iontaobhas & Sábháilteacht",
+    "doc_trust_safety_desc": "Treoir shoiléir-Bhéarla ar an gcaoi a n-oibríonn malartuithe, cad a dhéanaimid chun an pobal a choinneáil sábháilte, cad nach ndéanaimid, agus conas imní faoi chosaint a thuairisciú.",
+    "platform_section_title": "Dlí Soláthraí Ardán",
+    "platform_section_desc": "Rialaíonn na doiciméid seo bonneagar ardán Project NEXUS agus tá siad scartha ó bheartais do phobail.",
+    "platform_terms": "Téarmaí Ardáin",
+    "platform_privacy": "Príobháideacht Ardán",
+    "platform_disclaimer": "Séanadh"
   },
   "version_history": {
     "page_title": "Stair Leaganacha",
@@ -491,127 +491,11 @@
     "contact_us": "Déan Teagmháil Linn"
   },
   "fadp": {
-    "fadp_banner_title": "Swiss Data Protection (nDSG)",
-    "fadp_banner_body": "Under the Swiss Federal Act on Data Protection, we need your explicit consent before using AI-powered features like smart matching and personalisation.",
-    "fadp_accept": "Accept AI features",
-    "fadp_decline": "Use basic features only",
-    "fadp_learn_more": "Learn more about your rights"
-  },
-  "page_meta": {
-    "platform_terms": {
-      "title": "Platform Terms of Service",
-      "description": "Terms of service governing use of the NEXUS community timebanking platform."
-    },
-    "platform_privacy": {
-      "title": "Platform Privacy Policy",
-      "description": "How the NEXUS platform collects, processes, and protects your personal data."
-    },
-    "platform_disclaimer": {
-      "title": "Platform Disclaimer",
-      "description": "Important disclaimers about the use of the NEXUS community timebanking platform."
-    },
-    "community_guidelines": {
-      "title": "Community Guidelines",
-      "description": "Community guidelines for respectful and productive timebanking."
-    },
-    "acceptable_use": {
-      "title": "Acceptable Use Policy",
-      "description": "Acceptable use policy for our community timebanking platform."
-    },
-    "legal_hub": {
-      "title": "Legal Information",
-      "description": "Legal documents, policies, and compliance information."
-    },
-    "legal_version_history": {
-      "title": "Legal Version History",
-      "description": "Version history of our legal documents and policies."
-    },
-    "trust_safety": {
-      "title": "Trust & Safety",
-      "description": "How exchanges work on {{name}}, what we do to keep the community safe, what we don’t do, and how to report a concern. Plain-English trust and safeguarding."
-    }
-  },
-  "trust_safety": {
-    "page_title": "Trust & Safety",
-    "meta_description": "How exchanges work on {{name}}, what we do to keep the community safe, what we don’t do, and how to report a concern. Plain-English trust and safeguarding.",
-    "heading": "Trust & Safety",
-    "subtitle": "{{name}} connects neighbours so they can share skills using time credits. This page explains how that works in practice — what the platform does, what it doesn’t, and how you can stay safe.",
-    "safeguarding_title": "Report a safeguarding concern",
-    "safeguarding_body": "If you’re worried about a member, an exchange, or something you’ve seen on the platform, please tell us. We respond to safeguarding reports within one working day.",
-    "safeguarding_step_1": "Use the Report button on the relevant listing, message, or profile.",
-    "safeguarding_step_2": "Or email us via the Contact page — mark the subject as “Safeguarding”.",
-    "safeguarding_step_3": "If anyone is in immediate danger, contact An Garda Síochána on 999 or 112 first.",
-    "how_exchanges_title": "How an exchange works",
-    "how_exchanges_intro": "Every exchange follows the same simple flow. There is no money involved — just time credits.",
-    "how_exchanges_steps": {
-      "0": "Find a member offering what you need, or post a request describing what you’re looking for.",
-      "1": "Message them through the platform to agree the details — time, place, and what’s involved.",
-      "2": "Complete the exchange. You only meet in person if you both want to.",
-      "3": "Log the hours. Both members confirm — that’s the receipt.",
-      "4": "Time credits transfer automatically. One hour of help = one time credit, no matter what skill was shared."
-    },
-    "what_we_do_title": "What the platform does",
-    "what_we_do_items": {
-      "0": "Verifies every member’s email address at registration; offers optional photo-ID verification with a Verified Member badge for those who want extra trust signals.",
-      "1": "Shows reviews and ratings on member profiles so the community can see who’s been a reliable exchange partner.",
-      "2": "Asks every member to accept our Community Guidelines and Acceptable Use Policy at signup, and to keep to them while they’re here.",
-      "3": "Gives every listing, message, and profile a Report button that goes straight to coordinators.",
-      "4": "Has human coordinators who can mediate, support, and step in when something goes wrong.",
-      "5": "Connects with other timebanks across Ireland and Europe through federation, so reputation travels with you."
-    },
-    "what_we_dont_title": "What the platform doesn’t do",
-    "what_we_dont_intro": "Timebanking is built on neighbours helping neighbours, not on us standing between you. That’s a feature, not a bug — but it does mean we need to be clear about our limits.",
-    "what_we_dont_items": {
-      "0": "We don’t vet, train, or certify members for specific services. We’re not a recruitment agency.",
-      "1": "We don’t provide insurance coverage for the work members do for each other.",
-      "2": "We don’t supervise exchanges or act as anyone’s employer or service provider.",
-      "3": "We don’t guarantee any specific outcome, level of skill, or punctuality. Reviews are how the community keeps itself accountable."
-    },
-    "precautions_title": "Sensible precautions for a first exchange",
-    "precautions_intro": "You’d apply the same common sense here as you would meeting anyone new through a community group.",
-    "precautions_items": {
-      "0": "Meet in a public place the first time, or bring a friend if you’re inviting someone to your home.",
-      "1": "Read the other member’s reviews and check how long they’ve been on the platform.",
-      "2": "For services involving children, vulnerable adults, or work inside your home, ask about Garda vetting before agreeing.",
-      "3": "Trust your instincts. You can say no, end an exchange, or report a concern at any time."
-    },
-    "vetting_title": "Background checks and vetting",
-    "vetting_body": "Some exchanges — for example childcare, elderly care, or support for vulnerable adults — may legally require a background check or vetting under local law (such as Garda vetting in Ireland, an enhanced DBS check in the UK, or equivalent schemes elsewhere). Members offering these kinds of services are responsible for holding current, valid vetting where their jurisdiction requires it, and you’re entitled to ask to see it before you agree to an exchange. The platform doesn’t hold vetting on members’ behalf and doesn’t verify it.",
-    "insurance_title": "Insurance and liability",
-    "insurance_items": {
-      "0": "{{name}} does not provide insurance for exchanges between members. The platform is a connection service — it does not insure, indemnify, or underwrite the work members do for each other.",
-      "1": "Members are NOT covered by any platform insurance for the work they do for each other. Exchanges are entirely between members and at members’ own risk. See our Terms of Service for the full liability and indemnity position.",
-      "2": "If you offer professional services (plumbing, electrical, healthcare, legal, financial advice), you’re responsible for your own professional indemnity insurance and any regulatory obligations that apply.",
-      "3": "Time credits have no monetary value. They can’t be exchanged for cash, sold, or used outside the timebanking community."
-    },
-    "disputes_title": "When something goes wrong",
-    "disputes_intro": "Most disagreements can be sorted out between members. If they can’t, we’ll help.",
-    "disputes_steps": {
-      "0": "Try first to resolve it directly through messages — most misunderstandings are just that.",
-      "1": "If that doesn’t work, contact a coordinator via the Contact page. Coordinators can mediate.",
-      "2": "If a member breaches our Community Guidelines, we take action — warnings, mediation, suspension, or removal, depending on severity.",
-      "3": "Time-credit disputes (hours logged in error, etc.) are reviewed by an admin who can adjust balances on either side."
-    },
-    "responsibilities_title": "Your responsibilities as a member",
-    "responsibilities_intro": "By using {{name}} you agree to:",
-    "responsibilities_items": {
-      "0": "Treat other members with respect (Community Guidelines).",
-      "1": "Be honest about your skills, qualifications, and limitations.",
-      "2": "Show up when you commit, or cancel with reasonable notice.",
-      "3": "Log hours fairly — for the time actually given.",
-      "4": "Use the platform only for community time exchanges, not paid work, sales solicitation, or anything illegal (Acceptable Use Policy)."
-    },
-    "rights_title": "Your rights",
-    "rights_items": {
-      "0": "Leave at any time and request your data be deleted (GDPR).",
-      "1": "Block other members so they can’t contact you.",
-      "2": "Make your profile invisible to search or browsing.",
-      "3": "Opt out of all optional cookies, analytics, and email notifications."
-    },
-    "contact_cta_title": "Have a question we haven’t answered?",
-    "contact_cta_body": "Get in touch and a coordinator will get back to you. Most messages are answered within one working day.",
-    "contact_cta_button": "Contact us",
-    "community_guidelines_link": "Read the Community Guidelines"
+    "fadp_banner_title": "Cosaint Sonraí na hEilvéise (nDSG)",
+    "fadp_banner_body": "Faoi Acht Chónaidhme na hEilvéise um Chosaint Sonraí, ní mór dúinn do thoiliú sainráite a fháil sula n-úsáidfimid gnéithe atá á gcumhachtú le AI amhail meaitseáil chliste agus oiriúnú.",
+    "fadp_accept": "Glac le gnéithe AI",
+    "fadp_decline": "Bain úsáid as bunghnéithe amháin",
+    "fadp_learn_more": "Foghlaim tuilleadh faoi do chearta"
   },
   "community_guidelines": {
     "default_community_name": "an pobal seo",
@@ -791,5 +675,121 @@
         "body": "D'fhéadfaimis an polasaí seo a nuashonrú de réir mar a fhorbraíonn an t-ardán agus an timpeallacht rialála. Fógrófar athruithe ábhartha agus déanfar iad a thaifeadadh i stair dhlí na leaganacha."
       }
     }
+  },
+  "page_meta": {
+    "platform_terms": {
+      "title": "Ardán Téarmaí Seirbhíse",
+      "description": "Téarmaí seirbhíse a rialaíonn úsáid ardán bainc ama pobail NEXUS."
+    },
+    "platform_privacy": {
+      "title": "Ardán Polasaí Príobháideachta",
+      "description": "Conas a bhailíonn, a phróiseálann agus a chosnaíonn ardán NEXUS do shonraí pearsanta."
+    },
+    "platform_disclaimer": {
+      "title": "Séanadh Ardáin",
+      "description": "Séanadh tábhachtach maidir le húsáid ardán bainc ama pobail NEXUS."
+    },
+    "community_guidelines": {
+      "title": "Treoirlínte Pobail",
+      "description": "Treoirlínte Comhphobail maidir le baincéireacht ama atá measúil agus táirgiúil."
+    },
+    "acceptable_use": {
+      "title": "Beartas Úsáide Inghlactha",
+      "description": "Beartas úsáide inghlactha dár n-ardán bainc ama pobail."
+    },
+    "legal_hub": {
+      "title": "Eolas Dlí",
+      "description": "Doiciméid dlí, beartais, agus faisnéis chomhlíonta."
+    },
+    "legal_version_history": {
+      "title": "Stair Leagan Dlí",
+      "description": "Stair leagan ár ndoiciméid agus ár mbeartais dlí."
+    },
+    "trust_safety": {
+      "title": "Iontaobhas & Sábháilteacht",
+      "description": "Conas a oibríonn malartuithe ar {{name}}, cad a dhéanaimid chun an pobal a choinneáil sábháilte, cad nach ndéanaimid, agus conas ábhar imní a thuairisciú. Iontaobhas agus cosaint Bhéarla shimplí."
+    }
+  },
+  "trust_safety": {
+    "page_title": "Iontaobhas & Sábháilteacht",
+    "meta_description": "Conas a oibríonn malartuithe ar {{name}}, cad a dhéanaimid chun an pobal a choinneáil sábháilte, cad nach ndéanaimid, agus conas ábhar imní a thuairisciú. Iontaobhas agus cosaint Bhéarla shimplí.",
+    "heading": "Iontaobhas & Sábháilteacht",
+    "subtitle": "nascann {{name}} comharsana ionas gur féidir leo scileanna a roinnt trí úsáid a bhaint as creidmheasanna ama. Míníonn an leathanach seo conas a oibríonn sé sin go praiticiúil - cad a dhéanann an t-ardán, cad nach ndéanann sé, agus conas is féidir leat fanacht sábháilte.",
+    "safeguarding_title": "Tuairiscigh imní faoi chosaint",
+    "safeguarding_body": "Má tá imní ort faoi bhall, faoi mhalartú, nó faoi rud éigin atá feicthe agat ar an ardán, inis dúinn le do thoil. Tugaimid freagra ar thuarascálacha cosanta laistigh de lá oibre amháin.",
+    "safeguarding_step_1": "Úsáid an cnaipe Tuairiscigh ar an liostú, ar an teachtaireacht nó ar an bpróifíl ábhartha.",
+    "safeguarding_step_2": "Nó seol ríomhphost chugainn tríd an leathanach Teagmhála — marcáil an t-ábhar mar “Cosaint”.",
+    "safeguarding_step_3": "If anyone is in immediate danger, contact An Garda Síochána on 999 or 112 first.",
+    "how_exchanges_title": "Conas a oibríonn malartú",
+    "how_exchanges_intro": "Leanann gach malartú an sreabhadh simplí céanna. Níl aon airgead i gceist — díreach creidmheasanna ama.",
+    "how_exchanges_steps": {
+      "0": "Aimsigh ball a thairgeann a bhfuil uait, nó postáil iarratas ag cur síos ar a bhfuil uait.",
+      "1": "Cuir teachtaireacht chucu tríd an ardán chun na sonraí a aontú - am, áit, agus cad atá i gceist.",
+      "2": "Comhlánaigh an malartú. Ní bhuaileann tú go pearsanta ach amháin más mian leat araon.",
+      "3": "Logáil na huaireanta. Deimhníonn an dá chomhalta - sin an admháil.",
+      "4": "Aistrítear creidmheasanna ama go huathoibríoch. Uair an chloig de chabhair = creidiúint ama amháin, is cuma cén scil a roinneadh."
+    },
+    "what_we_do_title": "Cad a dhéanann an ardán",
+    "what_we_do_items": {
+      "0": "Fíoraíonn sé seoladh ríomhphoist gach ball ag an gclárú; tairgeann sé fíorú fóta-aitheantais roghnach le suaitheantas Ball Fíoraithe dóibh siúd ar mian leo comharthaí muiníne breise.",
+      "1": "Léirmheasanna agus rátálacha a thaispeáint ar phróifílí na mball ionas gur féidir leis an bpobal a fheiceáil cé a bhí ina chomhpháirtí malairte iontaofa.",
+      "2": "Iarrann sí ar gach ball glacadh lenár dTreoirlínte Pobail agus lenár mBeartas Úsáide Inghlactha agus iad ag clárú, agus cloí leo agus iad anseo.",
+      "3": "Tugtar cnaipe Tuairisce do gach liostú, teachtaireacht agus próifíl a théann díreach chuig na comhordaitheoirí.",
+      "4": "Tá comhordaitheoirí daonna ann ar féidir leo idirghabháil a dhéanamh, tacaíocht a thabhairt dóibh agus céim isteach nuair a théann rud éigin mícheart.",
+      "5": "Connects with other timebanks across Ireland and Europe through federation, so reputation travels with you."
+    },
+    "what_we_dont_title": "Cad nach ndéanann an t-ardán",
+    "what_we_dont_intro": "Tógtar baincéireacht ama ar chomharsana ag cabhrú le comharsana, ní orainne a bheith ag seasamh eadrainn. Is gné é sin, ní fabht - ach ciallaíonn sé go gcaithfimid a bheith soiléir faoi na teorainneacha atá againn.",
+    "what_we_dont_items": {
+      "0": "Ní dhéanaimid tréidlia, ní dhéanaimid oiliúint ná baill a dheimhniú le haghaidh seirbhísí ar leith. Ní gníomhaireacht earcaíochta muid.",
+      "1": "Ní chuirimid clúdach árachais ar fáil don obair a dhéanann baill dá chéile.",
+      "2": "Ní dhéanaimid maoirsiú ar mhalartuithe ná ní fheidhmímid mar fhostóir nó soláthraí seirbhíse aon duine.",
+      "3": "Ní ráthaimid aon toradh sonrach, leibhéal scile ná poncúlacht. Léirmheasanna is ea an chaoi a gcoimeádann an pobal cuntasach air féin."
+    },
+    "precautions_title": "Réamhchúraimí ciallmhara don chéad mhalartú",
+    "precautions_intro": "Chuirfeá an chiall chéanna i bhfeidhm anseo agus a dhéanfá bualadh le haon duine nua trí ghrúpa pobail.",
+    "precautions_items": {
+      "0": "Buail le chéile in áit phoiblí den chéad uair, nó beir leat cara má tá cuireadh á thabhairt agat do dhuine éigin chuig do theach.",
+      "1": "Léigh léirmheasanna an bhaill eile agus seiceáil cé chomh fada agus atá siad ar an ardán.",
+      "2": "For services involving children, vulnerable adults, or work inside your home, ask about Garda vetting before agreeing.",
+      "3": "Iontaobhas do instincts. Is féidir leat a rá nach bhfuil, deireadh a chur le malartú, nó imní a thuairisciú ag am ar bith."
+    },
+    "vetting_title": "Seiceálacha cúlra agus grinnfhiosrúchán",
+    "vetting_body": "Some exchanges — for example childcare, elderly care, or support for vulnerable adults — may legally require a background check or vetting under local law (such as Garda vetting in Ireland, an enhanced DBS check in the UK, or equivalent schemes elsewhere). Members offering these kinds of services are responsible for holding current, valid vetting where their jurisdiction requires it, and you’re entitled to ask to see it before you agree to an exchange. The platform doesn’t hold vetting on members’ behalf and doesn’t verify it.",
+    "insurance_title": "Árachas agus dliteanas",
+    "insurance_items": {
+      "0": "Ní sholáthraíonn {{name}} árachas do mhalartuithe idir comhaltaí. Is seirbhís nasctha é an t-ardán - ní chuireann sé árachas, slánaíocht nó frithghealladh ar an obair a dhéanann baill dá chéile.",
+      "1": "NÍL comhaltaí clúdaithe ag aon árachas ardáin don obair a dhéanann siad ar a chéile. Déantar malartuithe go hiomlán idir comhaltaí agus ar phriacal na gcomhaltaí féin. Féach ar ár dTéarmaí Seirbhíse chun an suíomh iomlán dliteanais agus slánaíochta a fháil.",
+      "2": "Má thairgeann tú seirbhísí gairmiúla (pluiméireachta, leictreacha, cúram sláinte, comhairle dlí, airgeadais), tá tú freagrach as d’árachas slánaíochta gairmiúla féin agus as aon oibleagáidí rialála a bhaineann leis.",
+      "3": "Níl aon luach airgid ag creidmheasanna ama. Ní féidir iad a mhalartú ar airgead tirim, a dhíol, ná a úsáid lasmuigh den phobal bainc ama."
+    },
+    "disputes_title": "Nuair a théann rud éigin mícheart",
+    "disputes_intro": "Is féidir formhór na n-easaontais a réiteach idir baill. Mura féidir leo, cabhróimid.",
+    "disputes_steps": {
+      "0": "Déan iarracht ar dtús é a réiteach go díreach trí theachtaireachtaí - is é sin an chuid is mó de na míthuiscintí.",
+      "1": "Mura n-oibríonn sin, déan teagmháil le comhordaitheoir tríd an leathanach Teagmhála. Is féidir le comhordaitheoirí idirghabháil a dhéanamh.",
+      "2": "Má sháraíonn ball ár dTreoirlínte Comhphobail, déanaimid beart — rabhaidh, idirghabháil, fionraí nó aistriú, ag brath ar dhéine.",
+      "3": "Déanann riarthóir athbhreithniú ar dhíospóidí maidir le creidmheas ama (uaireanta logáilte isteach, etc.) ar féidir leis iarmhéideanna ar an dá thaobh a choigeartú."
+    },
+    "responsibilities_title": "Do fhreagrachtaí mar bhall",
+    "responsibilities_intro": "Trí úsáid a bhaint as {{name}} aontaíonn tú le:",
+    "responsibilities_items": {
+      "0": "Caitheamh le comhaltaí eile le meas (Treoirlínte an Chomhphobail).",
+      "1": "Bí macánta faoi do scileanna, cáilíochtaí, agus teorainneacha.",
+      "2": "Taispeáin suas nuair a dhéanann tú gealltanas, nó cealú le fógra réasúnta.",
+      "3": "Logáil uaireanta go cothrom - don am a thugtar i ndáiríre.",
+      "4": "Bain úsáid as an ardán ach amháin le haghaidh malartuithe ama pobail, ní obair íoctha, solicitation díolacháin, nó aon rud mídhleathach (Beartas Úsáide Inghlactha)."
+    },
+    "rights_title": "Do chearta",
+    "rights_items": {
+      "0": "Fág am ar bith agus iarr ar do shonraí a scriosadh (GDPR).",
+      "1": "Cuir bac ar bhaill eile ionas nach mbeidh siad in ann teagmháil a dhéanamh leat.",
+      "2": "Déan do phróifíl dofheicthe le cuardach nó le brabhsáil.",
+      "3": "Diúltaigh as gach fianán roghnach, anailísíocht agus fógra ríomhphoist."
+    },
+    "contact_cta_title": "An bhfuil ceist agat nár fhreagair muid?",
+    "contact_cta_body": "Bí i dteagmháil agus gheobhaidh comhordaitheoir ar ais chugat. Freagraítear formhór na dteachtaireachtaí laistigh de lá oibre amháin.",
+    "contact_cta_button": "Déan teagmháil linn",
+    "community_guidelines_link": "Léigh na Treoirlínte Pobail"
   }
 }
