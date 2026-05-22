@@ -89,7 +89,8 @@
     "no_members_found": "لم يتم العثور على أعضاء يتطابقون مع بحثك.",
     "done": "تم",
     "aria_exchange_participants": "مشاركو المبادلة",
-    "aria_hour_split": "تقسيم الساعات"
+    "aria_hour_split": "تقسيم الساعات",
+    "hours_amount": "{{count}}س"
   },
   "create": {
     "page_title": "إنشاء مبادلة جماعية",

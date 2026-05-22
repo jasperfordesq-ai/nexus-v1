@@ -145,12 +145,10 @@ if [ "$MODE" != "--react-only" ]; then
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# PHASE 2: React admin — REMOVED
+# PHASE 2: React admin — TODO: re-enable audit once admin t() coverage is complete
 # ═══════════════════════════════════════════════════════════════════════════════
-# Admin panel (react-frontend/src/admin/) is ENGLISH-ONLY by design.
-# Hardcoded English strings in admin code are INTENTIONAL, not violations.
-# See feedback_admin_english_only.md in memory.
-# Do NOT re-enable admin i18n audits without explicit user instruction.
+# Admin panel (react-frontend/src/admin/) is now being translated.
+# Hardcoded English strings in admin code are violations — use t() like everywhere else.
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # REPORT

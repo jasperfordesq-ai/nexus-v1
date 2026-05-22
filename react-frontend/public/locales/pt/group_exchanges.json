@@ -89,7 +89,8 @@
     "no_members_found": "Nenhum membro encontrado correspondente à sua pesquisa.",
     "done": "Concluído",
     "aria_exchange_participants": "Participantes da troca",
-    "aria_hour_split": "Divisão de horas"
+    "aria_hour_split": "Divisão de horas",
+    "hours_amount": "{{count}} h"
   },
   "create": {
     "page_title": "Criar Troca de Grupo",

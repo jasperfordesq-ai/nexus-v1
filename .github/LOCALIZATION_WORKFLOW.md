@@ -37,7 +37,7 @@ Use these states mentally when reviewing locale work:
 
 1. Add or update English source strings first.
 2. Run `node scripts/check-i18n-drift.mjs` and confirm structural drift stays at zero.
-3. Run `node scripts/translate-i18n-gaps.mjs --summary` to see non-admin English fallback debt.
+3. Run `node scripts/translate-i18n-gaps.mjs --summary` to see English fallback debt.
 4. Run `node scripts/check-i18n-gap-regression.mjs` and confirm the baseline does not regress.
 5. If translation credentials are available, run `node scripts/translate-i18n-gaps.mjs`.
 6. Add `Translation Status:` and `Translation Reviewer:` to the PR description before merge.
@@ -45,5 +45,5 @@ Use these states mentally when reviewing locale work:
 
 ## Notes
 
-- Admin namespaces are intentionally skipped by `translate-i18n-gaps.mjs` unless that policy changes later.
+- Admin namespaces (`admin.json`, `admin_nav.json`, `admin_dashboard.json`, `super_admin.json`) are included in translation like all other namespaces.
 - Irish (`ga`) uses the OpenAI path when `OPENAI_API_KEY` is available because DeepL does not support Irish.

@@ -89,7 +89,8 @@
     "no_members_found": "No se encontraron miembros que coincidan con tu búsqueda.",
     "done": "Listo",
     "aria_exchange_participants": "Participantes del intercambio",
-    "aria_hour_split": "Division de horas"
+    "aria_hour_split": "Division de horas",
+    "hours_amount": "{{count}} h"
   },
   "create": {
     "page_title": "Crear Intercambio Grupal",

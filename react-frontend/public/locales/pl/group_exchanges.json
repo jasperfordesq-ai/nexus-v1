@@ -89,7 +89,8 @@
     "no_members_found": "Nie znaleziono członków pasujących do twojego wyszukiwania.",
     "done": "Gotowe",
     "aria_exchange_participants": "Uczestnicy wymiany",
-    "aria_hour_split": "Podział godzin"
+    "aria_hour_split": "Podział godzin",
+    "hours_amount": "{{count}} godz."
   },
   "create": {
     "page_title": "Utwórz Wymianę Grupową",
