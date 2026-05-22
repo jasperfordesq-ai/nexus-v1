@@ -439,18 +439,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   <span className="hidden md:inline">{t('nav.dashboard')}</span>
                 </Button>
               )}
-              {/* Help Center — authenticated users */}
-              {isAuthenticated && (
-                <Button
-                  variant="light"
-                  size="sm"
-                  className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
-                  onPress={() => navigate(tenantPath('/help'))}
-                >
-                  <HelpCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                  <span className="hidden md:inline">{t('user_menu.help_center')}</span>
-                </Button>
-              )}
               {/* Federation Hub — authenticated users with federation feature */}
               {isAuthenticated && hasFeature('federation') && (
                 <Button
