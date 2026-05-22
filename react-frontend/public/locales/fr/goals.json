@@ -19,9 +19,9 @@
     "cancel": "Annuler",
     "submit": "Enregistrer le suivi",
     "check_in_button": "Faire le point",
-    "progress_help": "Set this to the real progress you want shown on the goal. Recording a check-in updates the goal bar and the timeline.",
+    "progress_help": "Définissez ceci sur le progrès réel que vous souhaitez afficher pour l'objectif. Enregistrer un check-in met à jour la barre de l'objectif et la chronologie.",
     "progress_value": "{{percent}}%",
-    "progress_unknown": "Progress not recorded"
+    "progress_unknown": "Progrès non enregistré"
   },
   "mood": {
     "great": "Formidable",
@@ -45,7 +45,7 @@
     "weekly": "Hebdomadaire",
     "biweekly": "Toutes les 2 semaines",
     "monthly": "Mensuel",
-    "none": "No cadence"
+    "none": "Aucune cadence"
   },
   "template": {
     "title": "Commencer à partir d’un modèle",
@@ -65,13 +65,13 @@
     "no_activity": "Aucune activité enregistrée pour le moment.",
     "progress_aria": "Progression : {{percent}} %",
     "event": {
-      "progress_update": "Progress update",
+      "progress_update": "Mise à jour du progrès",
       "checkin": "Check-in",
-      "milestone": "Milestone",
-      "buddy_joined": "Buddy joined",
-      "buddy_action": "Buddy support",
-      "completed": "Completed",
-      "created": "Created"
+      "milestone": "Étape",
+      "buddy_joined": "Binôme rejoint",
+      "buddy_action": "Soutien du binôme",
+      "completed": "Terminé",
+      "created": "Créé"
     }
   },
   "template_picker": {
@@ -81,53 +81,53 @@
     "none_in_category": "Aucun modèle dans cette catégorie."
   },
   "detail": {
-    "back_to_goals": "Back to goals",
-    "view_all_goals": "View all goals",
-    "not_found_title": "Goal not found",
-    "not_found_description": "This goal may have been deleted or never existed.",
-    "private_title": "This goal is private",
-    "private_description": "Only the goal owner can view this goal.",
-    "overdue_chip": "Overdue",
-    "checkin_frequency": "Check-in frequency",
+    "back_to_goals": "Retour aux objectifs",
+    "view_all_goals": "Voir tous les objectifs",
+    "not_found_title": "Objectif introuvable",
+    "not_found_description": "Cet objectif a peut-être été supprimé ou n'a jamais existé.",
+    "private_title": "Cet objectif est privé",
+    "private_description": "Seul le propriétaire de l'objectif peut le consulter.",
+    "overdue_chip": "En retard",
+    "checkin_frequency": "Fréquence de check-in",
     "meta_description": "{{owner}} suit \"{{title}}\" avec {{progress}} % de progression dans cet objectif communautaire."
   },
   "goals": {
-    "load_error": "Failed to load goals. Please try again."
+    "load_error": "Échec du chargement des objectifs. Veuillez réessayer."
   },
   "insights": {
-    "loading": "Loading goal insights",
-    "load_failed": "Failed to load goal insights.",
-    "current_streak": "Current streak",
+    "loading": "Chargement des aperçus de l'objectif",
+    "load_failed": "Échec du chargement des aperçus de l'objectif.",
+    "current_streak": "Série actuelle",
     "streak_value": "{{count}} check-ins",
-    "best_streak": "Best streak: {{count}}",
-    "next_checkin": "Next check-in",
-    "no_cadence": "No cadence set",
-    "no_cadence_helper": "Set a cadence when editing this goal.",
-    "checkin_due": "A check-in is due",
-    "frequency": "{{frequency}} cadence",
+    "best_streak": "Meilleure série : {{count}}",
+    "next_checkin": "Prochain check-in",
+    "no_cadence": "Aucune cadence définie",
+    "no_cadence_helper": "Définissez une cadence lors de la modification de cet objectif.",
+    "checkin_due": "Un check-in est dû",
+    "frequency": "Cadence {{frequency}}",
     "checkins": "Check-ins",
-    "checkins_value": "{{count}} recorded",
-    "last_checkin": "Last check-in {{time}}",
-    "no_checkins": "No check-ins yet",
-    "milestones": "Milestones",
-    "milestones_value": "{{completed}} of {{total}}",
-    "milestones_progress_aria": "Milestone progress: {{percent}}%",
-    "milestone_plan": "Milestone plan",
-    "milestone_done": "Done",
+    "checkins_value": "{{count}} enregistrés",
+    "last_checkin": "Dernier check-in {{time}}",
+    "no_checkins": "Pas encore de check-ins",
+    "milestones": "Étapes",
+    "milestones_value": "{{completed}} sur {{total}}",
+    "milestones_progress_aria": "Progression des étapes : {{percent}}%",
+    "milestone_plan": "Plan des étapes",
+    "milestone_done": "Terminé",
     "milestone_target": "{{percent}}%",
-    "buddy_actions_title": "Buddy actions",
-    "buddy_actions_body": "Send a small, visible bit of support. Nudges are gentle reminders, not pressure.",
-    "action_nudge": "Send nudge",
-    "action_encourage": "Encourage",
-    "action_offer_help": "Offer help",
-    "buddy_sent": "Buddy support sent",
-    "buddy_failed": "Failed to send buddy support.",
-    "recent_buddy_support": "Recent buddy support",
+    "buddy_actions_title": "Actions du binôme",
+    "buddy_actions_body": "Envoyez un petit soutien visible. Les rappels sont des encouragements doux, pas de la pression.",
+    "action_nudge": "Envoyer un rappel",
+    "action_encourage": "Encourager",
+    "action_offer_help": "Proposer de l'aide",
+    "buddy_sent": "Soutien du binôme envoyé",
+    "buddy_failed": "Échec de l'envoi du soutien du binôme.",
+    "recent_buddy_support": "Soutien récent du binôme",
     "note_type": {
-      "nudge": "Nudge",
+      "nudge": "Rappel",
       "encouragement": "Encouragement",
-      "offer_help": "Offer to help",
-      "celebration": "Celebration",
+      "offer_help": "Proposition d'aide",
+      "celebration": "Célébration",
       "note": "Note"
     }
   }

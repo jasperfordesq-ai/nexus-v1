@@ -110,9 +110,9 @@
     "user_reviews": "Recensioni dell'utente",
     "user_achievements": "Traguardi dell'utente",
     "loading_reviews": "Caricamento recensioni",
-    "rating_summary": "Rating: {{rating}} out of 5",
-    "nexus_score_summary": "NexusScore: {{score}} ({{tier}})",
-    "nexus_score_link": "NexusScore: {{score}} ({{tier}}) - view breakdown",
+    "rating_summary": "Valutazione: {{rating}} su 5",
+    "nexus_score_summary": "Punteggio NEXUS: {{score}} ({{tier}})",
+    "nexus_score_link": "Punteggio NEXUS: {{score}} ({{tier}}) - vedi dettaglio",
     "listing_card": "{{type}}: {{title}}"
   },
   "review_modal": {
@@ -136,7 +136,7 @@
     "submit_failed_fallback": "Impossibile inviare la recensione"
   },
   "page_meta": {
-    "title": "Profile",
+    "title": "Profilo",
     "description": "Profilo membro di {{name}}"
   },
   "more_options": "Altre opzioni",
@@ -175,15 +175,15 @@
   "blocked_by_you": "Hai bloccato questo membro",
   "unblock_to_interact": "Sbloccalo per inviare messaggi o recensioni.",
   "member_fallback": "Membro",
-  "cancel_request": "Cancel Request",
-  "login_to_review": "Log in to write a review",
-  "show_more_skills": "Show {{count}} more",
-  "show_less": "Show less",
-  "read_more": "Read more",
-  "read_less": "Read less",
+  "cancel_request": "Annulla richiesta",
+  "login_to_review": "Accedi per scrivere una recensione",
+  "show_more_skills": "Mostra {{count}} in più",
+  "show_less": "Mostra meno",
+  "read_more": "Leggi di più",
+  "read_less": "Leggi di meno",
   "hours_abbrev": "{{hours}}h",
-  "post_hidden": "Hidden from your feed",
-  "hide_failed": "Failed to hide",
-  "like_failed": "Failed to update like",
+  "post_hidden": "Nascosto dal tuo feed",
+  "hide_failed": "Nascondimento non riuscito",
+  "like_failed": "Aggiornamento del mi piace non riuscito",
   "not_available_abbrev": "n/d"
 }

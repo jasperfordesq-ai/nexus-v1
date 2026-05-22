@@ -46,8 +46,8 @@
   },
   "identity_verified_lock_dob": "Ihr Geburtsdatum ist gesperrt, da Ihre Identität verifiziert wurde.",
   "marketing_consent_confirm_title": "Marketing-E-Mails abonnieren",
-  "marketing_consent_confirm_body": "Möchten Sie wirklich gelegentlich Marketing-E-Mails, Produkt-Updates und Highlights aus der Gemeinschaft erhalten? Sie können sich jederzeit abmelden.",
-  "marketing_consent_confirm_button": "Ja, ich abonniere",
+  "marketing_consent_confirm_body": "Möchten Sie gelegentlich Marketing-E-Mails, Produktupdates und Community-Highlights erhalten? Sie können sich jederzeit abmelden.",
+  "marketing_consent_confirm_button": "Ja, anmelden",
   "cancel": "Abbrechen",
   "title": "Einstellungen",
   "account": "Konto",
@@ -200,7 +200,7 @@
     "upload_photo_aria": "Profilbild hochladen",
     "change_photo_aria": "Profilbild ändern",
     "identity_verified_lock": "Ihr Name ist gesperrt, da Ihre Identität verifiziert wurde.",
-    "phone_invalid": "Telefonnummer muss im internationalen E.164-Format sein (z. B. +1 555 123 4567)",
+    "phone_invalid": "Die Telefonnummer muss im internationalen Format eingegeben werden (z. B. +1 555 123 4567)",
     "date_of_birth": "Geburtsdatum",
     "dob_description": "Erforderlich für die Identitätsverifizierung"
   },
@@ -273,19 +273,19 @@
     "translation": "Übersetzung"
   },
   "safeguarding": {
-    "page_title": "Schutzeinstellungen",
-    "intro": "Überprüfen oder widerrufen Sie die Schutzeinstellungen, die Sie beim Onboarding festgelegt haben. Ihre Koordinatoren können diese sehen, andere Mitglieder jedoch nicht.",
-    "no_preferences": "Sie haben keine aktiven Schutzeinstellungen. Sie können diese jederzeit auf der Hilfeseite zum Schutz festlegen.",
+    "page_title": "Schutzpräferenzen",
+    "intro": "Überprüfen oder widerrufen Sie die Schutzpräferenzen, die Sie während der Einrichtung festgelegt haben. Ihre Koordinatoren können diese sehen, andere Mitglieder jedoch nicht.",
+    "no_preferences": "Sie haben keine aktiven Schutzpräferenzen. Sie können diese jederzeit auf der Schutz-Hilfeseite festlegen.",
     "selected_on": "Ausgewählt am {{date}}",
     "revoke_button": "Widerrufen",
-    "revoke_confirm_title": "Diese Einstellung widerrufen?",
-    "revoke_confirm_body": "Diese Einstellung gilt nicht mehr für Ihr Konto. Ihre Koordinatoren werden über die Änderung informiert.",
+    "revoke_confirm_title": "Diese Präferenz widerrufen?",
+    "revoke_confirm_body": "Diese Präferenz gilt nicht mehr für Ihr Konto. Ihre Koordinatoren werden über die Änderung informiert.",
     "revoke_confirm_yes": "Ja, widerrufen",
-    "revoke_confirm_no": "Beibehalten",
-    "revoked_toast": "Einstellung widerrufen.",
+    "revoke_confirm_no": "Behalten",
+    "revoked_toast": "Präferenz widerrufen.",
     "revoke_error_toast": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
-    "chip_broker_review": "Vermittlerprüfung",
-    "chip_match_approval": "Treffer-Genehmigung",
+    "chip_broker_review": "Maklerbewertung",
+    "chip_match_approval": "Übereinstimmungsgenehmigung",
     "chip_vetted_only": "Nur geprüfte Kontakte"
   },
   "header": {
@@ -591,17 +591,17 @@
     "go_to_login": "Zur Anmeldung"
   },
   "unsaved_changes": {
-    "title": "Ungespeicherte Änderungen",
-    "message": "Sie haben ungespeicherte Änderungen. Wenn Sie die Seite verlassen, gehen Ihre Änderungen verloren.",
+    "title": "Nicht gespeicherte Änderungen",
+    "message": "Sie haben nicht gespeicherte Änderungen. Wenn Sie die Seite verlassen, gehen Ihre Änderungen verloren.",
     "leave": "Trotzdem verlassen",
     "stay": "Bleiben"
   },
-  "push_campaign_opt_in": "Beworbene Push-Mitteilungen erhalten",
-  "push_campaign_opt_in_description": "Erlauben Sie lokalen Unternehmen und Organisationen, Ihnen gezielte Push-Mitteilungen zu senden. Sie können sich jederzeit abmelden.",
+  "push_campaign_opt_in": "Geförderte Push-Benachrichtigungen erhalten",
+  "push_campaign_opt_in_description": "Erlauben Sie lokalen Unternehmen und Organisationen, Ihnen gezielte Push-Benachrichtigungen zu senden. Sie können sich jederzeit abmelden.",
   "push_status": {
-    "unsupported": "Your browser does not support push notifications.",
-    "denied": "You have blocked notifications. Update your browser settings to re-enable.",
-    "subscribed": "You are subscribed on this device."
+    "unsupported": "Ihr Browser unterstützt keine Push-Benachrichtigungen.",
+    "denied": "Sie haben Benachrichtigungen blockiert. Aktualisieren Sie Ihre Browsereinstellungen, um sie wieder zu aktivieren.",
+    "subscribed": "Sie sind auf diesem Gerät angemeldet."
   },
   "activity_digest": {
     "off": "Aus",

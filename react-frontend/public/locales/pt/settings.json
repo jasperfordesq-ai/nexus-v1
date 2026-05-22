@@ -44,10 +44,10 @@
     "error_missing_dob": "Por favor, introduz a tua data de nascimento.",
     "error_start_verification": "Não foi possível iniciar a verificação. Por favor, tenta novamente mais tarde."
   },
-  "identity_verified_lock_dob": "Your date of birth is locked because your identity has been verified.",
-  "marketing_consent_confirm_title": "Subscribe to Marketing Emails",
-  "marketing_consent_confirm_body": "Are you sure you want to receive occasional marketing emails, product updates, and community highlights? You can unsubscribe at any time.",
-  "marketing_consent_confirm_button": "Yes, subscribe me",
+  "identity_verified_lock_dob": "A sua data de nascimento está bloqueada porque a sua identidade foi verificada.",
+  "marketing_consent_confirm_title": "Subscrever e-mails de marketing",
+  "marketing_consent_confirm_body": "Tem a certeza de que quer receber e-mails de marketing ocasionais, atualizações de produtos e destaques da comunidade? Pode cancelar a subscrição a qualquer momento.",
+  "marketing_consent_confirm_button": "Sim, subscrever-me",
   "cancel": "Cancelar",
   "title": "Definições",
   "account": "Conta",
@@ -199,8 +199,8 @@
     "location_placeholder": "Cidade, País",
     "upload_photo_aria": "Carregar foto de perfil",
     "change_photo_aria": "Alterar foto de perfil",
-    "identity_verified_lock": "Your name is locked because your identity has been verified.",
-    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)",
+    "identity_verified_lock": "O seu nome está bloqueado porque a sua identidade foi verificada.",
+    "phone_invalid": "O telefone deve estar em formato internacional (p. ex. +1 555 123 4567)",
     "date_of_birth": "Data de Nascimento",
     "dob_description": "Necessária para verificação de identidade"
   },
@@ -273,20 +273,20 @@
     "translation": "Tradução"
   },
   "safeguarding": {
-    "page_title": "Safeguarding preferences",
-    "intro": "Review or revoke the safeguarding preferences you set during onboarding. Your coordinators can see these but other members cannot.",
-    "no_preferences": "You have no active safeguarding preferences. You can set these at any time from the safeguarding help page.",
-    "selected_on": "Selected on {{date}}",
-    "revoke_button": "Revoke",
-    "revoke_confirm_title": "Revoke this preference?",
-    "revoke_confirm_body": "This preference will no longer apply to your account. Your coordinators will be notified of the change.",
-    "revoke_confirm_yes": "Yes, revoke",
-    "revoke_confirm_no": "Keep it",
-    "revoked_toast": "Preference revoked.",
-    "revoke_error_toast": "Something went wrong. Please try again.",
-    "chip_broker_review": "Broker review",
-    "chip_match_approval": "Match approval",
-    "chip_vetted_only": "Vetted contacts only"
+    "page_title": "Preferências de salvaguarda",
+    "intro": "Reveja ou revogue as preferências de salvaguarda que definiu durante a integração. Os seus coordenadores podem vê-las, mas outros membros não.",
+    "no_preferences": "Não tem preferências de salvaguarda ativas. Pode defini-las a qualquer momento na página de ajuda de salvaguarda.",
+    "selected_on": "Selecionado em {{date}}",
+    "revoke_button": "Revogar",
+    "revoke_confirm_title": "Revogar esta preferência?",
+    "revoke_confirm_body": "Esta preferência deixará de ser aplicada à sua conta. Os seus coordenadores serão notificados da alteração.",
+    "revoke_confirm_yes": "Sim, revogar",
+    "revoke_confirm_no": "Manter",
+    "revoked_toast": "Preferência revogada.",
+    "revoke_error_toast": "Algo correu mal. Por favor tente novamente.",
+    "chip_broker_review": "Revisão de corretor",
+    "chip_match_approval": "Aprovação de correspondência",
+    "chip_vetted_only": "Apenas contactos verificados"
   },
   "header": {
     "title": "Definições",
@@ -545,16 +545,16 @@
     "density_compact": "Compacto",
     "density_comfortable": "Confortável",
     "density_spacious": "Espaçoso",
-    "accessibility_profile": "Accessibility Profile",
-    "accessibility_profile_desc": "Choose how the interface should adapt for easier reading, calmer motion, and simpler screens",
-    "large_text": "Large Text",
-    "large_text_desc": "Use the largest base text size across the interface",
+    "accessibility_profile": "Perfil de acessibilidade",
+    "accessibility_profile_desc": "Escolha como a interface deve adaptar-se para leitura mais fácil, movimento mais calmo e ecrãs mais simples",
+    "large_text": "Texto grande",
+    "large_text_desc": "Usar o maior tamanho de texto base em toda a interface",
     "high_contrast": "Alto contraste",
     "high_contrast_desc": "Aumenta bordas, contraste do texto e indicadores de foco para melhor acessibilidade",
-    "reduced_motion": "Reduced Motion",
-    "reduced_motion_desc": "Reduce animation and scrolling effects throughout the interface",
-    "simplified_layout": "Simplified Layout",
-    "simplified_layout_desc": "Reduce blur, shadows, and decorative depth while keeping the same navigation"
+    "reduced_motion": "Movimento reduzido",
+    "reduced_motion_desc": "Reduzir animação e efeitos de rolagem em toda a interface",
+    "simplified_layout": "Esquema simplificado",
+    "simplified_layout_desc": "Reduzir desfoque, sombras e profundidade decorativa mantendo a mesma navegação"
   },
   "blocked_users": {
     "title": "Usuários Bloqueados",
@@ -562,7 +562,7 @@
     "description": "Membros bloqueados não podem visualizar seu perfil, enviar mensagens ou interagir com seu conteúdo.",
     "empty": "Nenhum usuário bloqueado",
     "empty_desc": "Os usuários que você bloquear não poderão ver seu perfil, enviar mensagens ou interagir com seu conteúdo.",
-    "unblock": "Unblock",
+    "unblock": "Desbloquear",
     "unblock_confirm": "Desbloquear {{name}}?",
     "unblock_confirm_body": "Eles poderão ver seu perfil e enviar mensagens novamente. Você não será reconectado automaticamente.",
     "unblocked": "Usuário desbloqueado",
@@ -577,31 +577,31 @@
   "block_user": {
     "title": "Bloquear {{name}}?",
     "body": "Eles não poderão ver seu perfil, enviar mensagens ou interagir com seu conteúdo. Qualquer conexão existente será removida.",
-    "confirm": "Block",
-    "cancel": "Cancel",
+    "confirm": "Bloquear",
+    "cancel": "Cancelar",
     "blocked": "Usuário bloqueado",
     "blocked_desc": "{{name}} foi bloqueado.",
     "error": "Falha ao bloquear usuário"
   },
   "page_meta": {
-    "title": "Settings"
+    "title": "Definições"
   },
   "identity_auth": {
-    "please_login": "Please log in to verify your identity.",
-    "go_to_login": "Go to Login"
+    "please_login": "Inicie sessão para verificar a sua identidade.",
+    "go_to_login": "Ir para o Login"
   },
   "unsaved_changes": {
-    "title": "Unsaved Changes",
-    "message": "You have unsaved changes. If you leave, your changes will be lost.",
-    "leave": "Leave Anyway",
-    "stay": "Stay"
+    "title": "Alterações não guardadas",
+    "message": "Tem alterações não guardadas. Se sair, as suas alterações serão perdidas.",
+    "leave": "Sair mesmo assim",
+    "stay": "Ficar"
   },
-  "push_campaign_opt_in": "Receive promoted push notifications",
-  "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time.",
+  "push_campaign_opt_in": "Receber notificações push patrocinadas",
+  "push_campaign_opt_in_description": "Permita que empresas e organizações locais lhe enviem notificações push direcionadas. Pode cancelar a qualquer momento.",
   "push_status": {
-    "unsupported": "Your browser does not support push notifications.",
-    "denied": "You have blocked notifications. Update your browser settings to re-enable.",
-    "subscribed": "You are subscribed on this device."
+    "unsupported": "O seu navegador não suporta notificações push.",
+    "denied": "Bloqueou as notificações. Atualize as definições do navegador para as reativar.",
+    "subscribed": "Está subscrito neste dispositivo."
   },
   "activity_digest": {
     "off": "Desativado",

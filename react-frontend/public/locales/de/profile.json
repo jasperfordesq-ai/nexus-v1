@@ -110,9 +110,9 @@
     "user_reviews": "Bewertungen des Benutzers",
     "user_achievements": "Erfolge des Benutzers",
     "loading_reviews": "Bewertungen werden geladen",
-    "rating_summary": "Rating: {{rating}} out of 5",
-    "nexus_score_summary": "NexusScore: {{score}} ({{tier}})",
-    "nexus_score_link": "NexusScore: {{score}} ({{tier}}) - view breakdown",
+    "rating_summary": "Bewertung: {{rating}} von 5",
+    "nexus_score_summary": "NEXUS-Score: {{score}} ({{tier}})",
+    "nexus_score_link": "NEXUS-Score: {{score}} ({{tier}}) - Aufschlüsselung anzeigen",
     "listing_card": "{{type}}: {{title}}"
   },
   "review_modal": {
@@ -136,10 +136,10 @@
     "submit_failed_fallback": "Bewertung konnte nicht abgesendet werden"
   },
   "page_meta": {
-    "title": "Profile",
+    "title": "Profil",
     "description": "Mitgliedsprofil von {{name}}"
   },
-  "more_options": "More options",
+  "more_options": "Weitere Optionen",
   "profile_actions": "Profil-Aktionen",
   "block_user": "Mitglied blockieren",
   "block_modal_title": "{{name}} blockieren?",
@@ -175,15 +175,15 @@
   "blocked_by_you": "Sie haben dieses Mitglied blockiert",
   "unblock_to_interact": "Heben Sie die Blockierung auf, um Nachrichten oder Bewertungen zu senden.",
   "member_fallback": "Mitglied",
-  "cancel_request": "Cancel Request",
-  "login_to_review": "Log in to write a review",
-  "show_more_skills": "Show {{count}} more",
-  "show_less": "Show less",
-  "read_more": "Read more",
-  "read_less": "Read less",
+  "cancel_request": "Anfrage abbrechen",
+  "login_to_review": "Anmelden, um eine Bewertung zu schreiben",
+  "show_more_skills": "{{count}} weitere anzeigen",
+  "show_less": "Weniger anzeigen",
+  "read_more": "Mehr lesen",
+  "read_less": "Weniger lesen",
   "hours_abbrev": "{{hours}}h",
-  "post_hidden": "Hidden from your feed",
-  "hide_failed": "Failed to hide",
-  "like_failed": "Failed to update like",
+  "post_hidden": "Aus Ihrem Feed ausgeblendet",
+  "hide_failed": "Ausblenden fehlgeschlagen",
+  "like_failed": "Gefällt-mir konnte nicht aktualisiert werden",
   "not_available_abbrev": "k.A."
 }

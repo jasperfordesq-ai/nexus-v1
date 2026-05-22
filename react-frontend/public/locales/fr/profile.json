@@ -110,10 +110,10 @@
     "user_reviews": "Avis sur l’utilisateur",
     "user_achievements": "Réalisations de l’utilisateur",
     "loading_reviews": "Chargement des avis",
-    "rating_summary": "Rating: {{rating}} out of 5",
-    "nexus_score_summary": "NexusScore: {{score}} ({{tier}})",
-    "nexus_score_link": "NexusScore: {{score}} ({{tier}}) - view breakdown",
-    "listing_card": "{{type}}: {{title}}"
+    "rating_summary": "Note : {{rating}} sur 5",
+    "nexus_score_summary": "Score NEXUS : {{score}} ({{tier}})",
+    "nexus_score_link": "Score NEXUS : {{score}} ({{tier}}) - voir le détail",
+    "listing_card": "{{type}} : {{title}}"
   },
   "review_modal": {
     "title": "Écrire un avis",
@@ -136,7 +136,7 @@
     "submit_failed_fallback": "Impossible de soumettre l'avis"
   },
   "page_meta": {
-    "title": "Profile",
+    "title": "Profil",
     "description": "Profil du membre {{name}}"
   },
   "more_options": "Plus d'options",
@@ -175,15 +175,15 @@
   "blocked_by_you": "Vous avez bloqué ce membre",
   "unblock_to_interact": "Débloquez-le pour envoyer des messages ou des évaluations.",
   "member_fallback": "Membre",
-  "cancel_request": "Cancel Request",
-  "login_to_review": "Log in to write a review",
-  "show_more_skills": "Show {{count}} more",
-  "show_less": "Show less",
-  "read_more": "Read more",
-  "read_less": "Read less",
+  "cancel_request": "Annuler la demande",
+  "login_to_review": "Connectez-vous pour écrire un avis",
+  "show_more_skills": "Afficher {{count}} de plus",
+  "show_less": "Afficher moins",
+  "read_more": "Lire plus",
+  "read_less": "Lire moins",
   "hours_abbrev": "{{hours}}h",
-  "post_hidden": "Hidden from your feed",
-  "hide_failed": "Failed to hide",
-  "like_failed": "Failed to update like",
+  "post_hidden": "Masqué de votre fil",
+  "hide_failed": "Échec du masquage",
+  "like_failed": "Impossible de mettre à jour le j'aime",
   "not_available_abbrev": "n/d"
 }
