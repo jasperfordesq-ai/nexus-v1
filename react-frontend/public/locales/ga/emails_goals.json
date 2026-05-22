@@ -1,39 +1,39 @@
 {
   "created": {
-    "subject": "Goal set: {{title}} — {{community}}",
-    "title": "Goal Created!",
-    "preview": "You've set a new goal: {{title}}",
-    "body": "You've set a new goal on {{community}}. Keep going — we'll send you reminders to help you stay on track.",
-    "cta": "View Your Goal"
+    "subject": "Tacar spriocanna: {{title}} — {{community}}",
+    "title": "Sprioc Cruthaithe!",
+    "preview": "Tá sprioc nua socraithe agat: {{title}}",
+    "body": "Tá sprioc nua socraithe agat ar {{community}}. Lean ort - seolfaimid meabhrúcháin chugat chun cabhrú leat fanacht ar an mbóthar ceart.",
+    "cta": "Féach ar Do Sprioc"
   },
   "completed": {
-    "subject": "Goal achieved: {{title}} — {{community}}",
-    "title": "Goal Achieved!",
-    "preview": "Congratulations! You've completed your goal: {{title}}",
-    "body": "Amazing work! You've completed your goal on {{community}}. Your contribution to the community is truly valued.",
-    "highlight": "Goal Completed",
-    "cta": "View Your Achievements"
+    "subject": "Sprioc bainte amach: {{title}} — {{community}}",
+    "title": "Sprioc bainte amach!",
+    "preview": "Comhghairdeachas! Tá do sprioc críochnaithe agat: {{title}}",
+    "body": "Obair iontach! Tá do sprioc críochnaithe agat ar {{community}}. Tá fíor-luach ar do chuid oibre leis an bpobal.",
+    "highlight": "Sprioc Críochnaithe",
+    "cta": "Féach ar Do Ghnóthachtálacha"
   },
   "abandoned": {
-    "subject": "Goal removed: {{title}} — {{community}}",
-    "title": "Goal Removed",
-    "preview": "Your goal has been removed",
-    "body": "Your goal <strong>\"{{title}}\"</strong> has been removed from {{community}}.",
-    "note": "You can set a new goal any time from your profile.",
-    "cta": "Set a New Goal"
+    "subject": "Baineadh an sprioc: {{title}} — {{community}}",
+    "title": "Baineadh an Sprioc",
+    "preview": "Baineadh do sprioc",
+    "body": "Baineadh do sprioc <strong>\"{{title}}\"</strong> de {{community}}.",
+    "note": "Is féidir leat sprioc nua a shocrú am ar bith ó do phróifíl.",
+    "cta": "Socraigh Sprioc Nua"
   },
   "goal_milestone": {
-    "progress_subject": "You're {{percent}}% of the way to your goal!",
-    "progress_title": "{{percent}}% Complete",
-    "progress_preview": "Great progress on '{{goal}}'",
-    "progress_greeting": "Keep it up, {{name}}!",
-    "progress_body": "You've reached {{percent}}% of your goal '{{goal}}'. You're making fantastic progress — keep going!",
-    "progress_cta": "View Your Goal",
-    "complete_subject": "You achieved your goal!",
-    "complete_title": "Goal Achieved!",
-    "complete_preview": "Congratulations — you completed '{{goal}}'",
-    "complete_greeting": "Congratulations, {{name}}!",
-    "complete_body": "You've successfully completed your goal '{{goal}}'. This is a fantastic achievement — well done!",
-    "complete_cta": "View Your Achievement"
+    "progress_subject": "Tá tú {{percent}}% den bhealach chuig do sprioc!",
+    "progress_title": "{{percent}}% Críochnaithe",
+    "progress_preview": "Dul chun cinn iontach ar '{{goal}}'",
+    "progress_greeting": "Coinnigh suas é, {{name}}!",
+    "progress_body": "Tá {{percent}}% de do sprioc '{{goal}}' sroichte agat. Tá dul chun cinn iontach á dhéanamh agat - lean ort!",
+    "progress_cta": "Féach ar Do Sprioc",
+    "complete_subject": "Bhain tú amach do sprioc!",
+    "complete_title": "Sprioc bainte amach!",
+    "complete_preview": "Comhghairdeas - chríochnaigh tú '{{goal}}'",
+    "complete_greeting": "Comhghairdeas, {{name}}!",
+    "complete_body": "D'éirigh leat do sprioc '{{goal}}' a chríochnú. Is éacht iontach é seo - maith sibh!",
+    "complete_cta": "Féach ar Do Ghnóthachtáil"
   }
 }

@@ -1,39 +1,39 @@
 {
   "created": {
-    "subject": "Goal set: {{title}} — {{community}}",
-    "title": "Goal Created!",
-    "preview": "You've set a new goal: {{title}}",
-    "body": "You've set a new goal on {{community}}. Keep going — we'll send you reminders to help you stay on track.",
-    "cta": "View Your Goal"
+    "subject": "Meta definida: {{title}} — {{community}}",
+    "title": "Meta criada!",
+    "preview": "Você definiu uma nova meta: {{title}}",
+    "body": "Você definiu uma nova meta no {{community}}. Continue: enviaremos lembretes para ajudá-lo a se manter no caminho certo.",
+    "cta": "Veja sua meta"
   },
   "completed": {
-    "subject": "Goal achieved: {{title}} — {{community}}",
-    "title": "Goal Achieved!",
-    "preview": "Congratulations! You've completed your goal: {{title}}",
-    "body": "Amazing work! You've completed your goal on {{community}}. Your contribution to the community is truly valued.",
-    "highlight": "Goal Completed",
-    "cta": "View Your Achievements"
+    "subject": "Meta alcançada: {{title}} — {{community}}",
+    "title": "Meta alcançada!",
+    "preview": "Parabéns! Você completou seu objetivo: {{title}}",
+    "body": "Trabalho incrível! Você completou seu objetivo no {{community}}. Sua contribuição para a comunidade é verdadeiramente valorizada.",
+    "highlight": "Meta concluída",
+    "cta": "Veja suas conquistas"
   },
   "abandoned": {
-    "subject": "Goal removed: {{title}} — {{community}}",
-    "title": "Goal Removed",
-    "preview": "Your goal has been removed",
-    "body": "Your goal <strong>\"{{title}}\"</strong> has been removed from {{community}}.",
-    "note": "You can set a new goal any time from your profile.",
-    "cta": "Set a New Goal"
+    "subject": "Meta removida: {{title}} — {{community}}",
+    "title": "Meta removida",
+    "preview": "Sua meta foi removida",
+    "body": "Sua meta <strong>\"{{title}}\"</strong> foi removida de {{community}}.",
+    "note": "Você pode definir uma nova meta a qualquer momento em seu perfil.",
+    "cta": "Defina uma nova meta"
   },
   "goal_milestone": {
-    "progress_subject": "You're {{percent}}% of the way to your goal!",
-    "progress_title": "{{percent}}% Complete",
-    "progress_preview": "Great progress on '{{goal}}'",
-    "progress_greeting": "Keep it up, {{name}}!",
-    "progress_body": "You've reached {{percent}}% of your goal '{{goal}}'. You're making fantastic progress — keep going!",
-    "progress_cta": "View Your Goal",
-    "complete_subject": "You achieved your goal!",
-    "complete_title": "Goal Achieved!",
-    "complete_preview": "Congratulations — you completed '{{goal}}'",
-    "complete_greeting": "Congratulations, {{name}}!",
-    "complete_body": "You've successfully completed your goal '{{goal}}'. This is a fantastic achievement — well done!",
-    "complete_cta": "View Your Achievement"
+    "progress_subject": "Você está {{percent}}% do caminho até seu objetivo!",
+    "progress_title": "{{percent}}% Concluído",
+    "progress_preview": "Grande progresso em '{{goal}}'",
+    "progress_greeting": "Continue assim, {{name}}!",
+    "progress_body": "Você atingiu {{percent}}% de sua meta '{{goal}}'. Você está fazendo um progresso fantástico – continue!",
+    "progress_cta": "Veja sua meta",
+    "complete_subject": "Você alcançou seu objetivo!",
+    "complete_title": "Meta alcançada!",
+    "complete_preview": "Parabéns — você completou '{{goal}}'",
+    "complete_greeting": "Parabéns, {{name}}!",
+    "complete_body": "Você completou com sucesso seu objetivo '{{goal}}'. Esta é uma conquista fantástica – muito bem!",
+    "complete_cta": "Veja sua conquista"
   }
 }

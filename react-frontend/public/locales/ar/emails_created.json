@@ -1,50 +1,50 @@
 {
   "listing": {
-    "subject": "Your listing is live: {{title}} — {{community}}",
-    "title": "Listing Posted!",
-    "preview": "Your listing \"{{title}}\" is now live on {{community}}",
-    "body": "Your listing is now live on {{community}} and can be discovered by other members.",
-    "cta": "View Your Listing"
+    "subject": "قائمتك مباشرة: {{title}} — {{community}}",
+    "title": "تم نشر القائمة!",
+    "preview": "أصبحت قائمتك \"{{title}}\" متاحة الآن على {{community}}",
+    "body": "أصبحت قائمتك متاحة الآن على {{community}} ويمكن للأعضاء الآخرين اكتشافها.",
+    "cta": "عرض القائمة الخاصة بك"
   },
   "event": {
-    "subject": "Your event is scheduled: {{title}} — {{community}}",
-    "title": "Event Created!",
-    "preview": "Your event \"{{title}}\" has been scheduled on {{community}}",
-    "body": "Your event has been created and is now visible to the community. Members can start RSVPing.",
-    "cta": "View Your Event"
+    "subject": "تمت جدولة الحدث الخاص بك: {{title}} — {{community}}",
+    "title": "تم إنشاء الحدث!",
+    "preview": "تمت جدولة الحدث الخاص بك \"{{title}}\" على {{community}}",
+    "body": "لقد تم إنشاء الحدث الخاص بك وهو الآن مرئي للمجتمع. يمكن للأعضاء بدء الرد على الدعوة.",
+    "cta": "عرض الحدث الخاص بك"
   },
   "group": {
-    "subject": "Your group is live: {{name}} — {{community}}",
-    "title": "Group Created!",
-    "preview": "Your group \"{{name}}\" is now live on {{community}}",
-    "body": "Your group has been created on {{community}}. Invite members to get things started.",
-    "cta": "View Your Group"
+    "subject": "مجموعتك مباشرة: {{name}} — {{community}}",
+    "title": "تم إنشاء المجموعة!",
+    "preview": "أصبحت مجموعتك \"{{name}}\" متاحة الآن على {{community}}",
+    "body": "تم إنشاء مجموعتك على {{community}}. قم بدعوة الأعضاء لبدء الأمور.",
+    "cta": "عرض مجموعتك"
   },
   "credits_sent": {
-    "subject": "You sent {{amount}} hour(s) to {{recipient}} — {{community}}",
-    "title": "Time Credits Sent",
-    "preview": "You sent {{amount}} hour(s) to {{recipient}} on {{community}}",
-    "body": "Your time credit transfer to <strong>{{recipient}}</strong> has been processed successfully.",
+    "subject": "لقد أرسلت {{amount}} ساعة (ساعات) إلى {{recipient}} — {{community}}",
+    "title": "الاعتمادات الوقت المرسلة",
+    "preview": "لقد أرسلت {{amount}} ساعة (ساعات) إلى {{recipient}} على {{community}}",
+    "body": "تمت معالجة تحويل رصيد الوقت الخاص بك إلى <strong>{{recipient}}</strong> بنجاح.",
     "label_amount": "Amount",
-    "label_recipient": "Sent To",
+    "label_recipient": "تم الإرسال إلى",
     "label_description": "Description",
-    "cta": "View Your Wallet"
+    "cta": "عرض محفظتك"
   },
   "donation": {
-    "subject": "Thank you for your donation to {{community}}",
-    "title": "Donation Received",
-    "preview": "Thank you for your generous donation to {{community}}",
-    "body": "Thank you for your generous donation to <strong>{{community}}</strong>. Your support makes a real difference.",
+    "subject": "شكرًا لك على تبرعك لـ {{community}}",
+    "title": "تم استلام التبرع",
+    "preview": "شكرًا لك على تبرعك السخي لـ {{community}}",
+    "body": "نشكرك على تبرعك السخي إلى <strong>{{community}}</strong>. دعمكم يحدث فرقا حقيقيا.",
     "label_amount": "Amount",
     "label_date": "Date",
-    "recurring_note": "This is a recurring donation. You can manage your donations from your account settings.",
-    "cta": "View Your Account"
+    "recurring_note": "هذا هو التبرع المتكرر. يمكنك إدارة تبرعاتك من إعدادات حسابك.",
+    "cta": "عرض حسابك"
   },
   "listing_updated": {
-    "subject": "A listing you saved has been updated — {{community}}",
-    "title": "Saved Listing Updated",
-    "preview": "\"{{title}}\" has been updated on {{community}}",
-    "body": "A listing you saved, <strong>\"{{title}}\"</strong>, has been updated on {{community}}.",
-    "cta": "View Listing"
+    "subject": "تم تحديث القائمة التي قمت بحفظها — {{community}}",
+    "title": "تم تحديث القائمة المحفوظة",
+    "preview": "تم تحديث \"{{title}}\" على {{community}}",
+    "body": "تم تحديث القائمة التي قمت بحفظها، <strong>\"{{title}}\"</strong>، على {{community}}.",
+    "cta": "عرض القائمة"
   }
 }

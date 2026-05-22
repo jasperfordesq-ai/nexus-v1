@@ -1,50 +1,50 @@
 {
   "listing": {
-    "subject": "Your listing is live: {{title}} — {{community}}",
-    "title": "Listing Posted!",
-    "preview": "Your listing \"{{title}}\" is now live on {{community}}",
-    "body": "Your listing is now live on {{community}} and can be discovered by other members.",
-    "cta": "View Your Listing"
+    "subject": "Tá do liostú beo: {{title}} — {{community}}",
+    "title": "Liostáil Postáilte!",
+    "preview": "Tá do liostú \"{{title}}\" beo anois ar {{community}}",
+    "body": "Tá do liostú beo anois ar {{community}} agus is féidir le baill eile teacht air.",
+    "cta": "Féach ar Do Liostú"
   },
   "event": {
-    "subject": "Your event is scheduled: {{title}} — {{community}}",
-    "title": "Event Created!",
-    "preview": "Your event \"{{title}}\" has been scheduled on {{community}}",
-    "body": "Your event has been created and is now visible to the community. Members can start RSVPing.",
-    "cta": "View Your Event"
+    "subject": "Tá d'imeacht sceidealta: {{title}} — {{community}}",
+    "title": "Imeacht Cruthaithe!",
+    "preview": "Tá d'imeacht \"{{title}}\" sceidealaithe ar {{community}}",
+    "body": "Cruthaíodh d'imeacht agus tá sé le feiceáil ag an bpobal anois. Is féidir le baill tosú ar RSVPing.",
+    "cta": "Féach ar d'Imeacht"
   },
   "group": {
-    "subject": "Your group is live: {{name}} — {{community}}",
-    "title": "Group Created!",
-    "preview": "Your group \"{{name}}\" is now live on {{community}}",
-    "body": "Your group has been created on {{community}}. Invite members to get things started.",
-    "cta": "View Your Group"
+    "subject": "Tá do ghrúpa ag craoladh beo: {{name}} — {{community}}",
+    "title": "Grúpa Cruthaithe!",
+    "preview": "Tá do ghrúpa \"{{name}}\" beo anois ar {{community}}",
+    "body": "Cruthaíodh do ghrúpa ar {{community}}. Tabhair cuireadh do bhaill tús a chur le rudaí.",
+    "cta": "Féach ar Do Ghrúpa"
   },
   "credits_sent": {
-    "subject": "You sent {{amount}} hour(s) to {{recipient}} — {{community}}",
-    "title": "Time Credits Sent",
-    "preview": "You sent {{amount}} hour(s) to {{recipient}} on {{community}}",
-    "body": "Your time credit transfer to <strong>{{recipient}}</strong> has been processed successfully.",
+    "subject": "Sheol tú uair an chloig {{amount}} chuig {{recipient}} - {{community}}",
+    "title": "Creidmheasanna Ama Seolta",
+    "preview": "Sheol tú uair an chloig {{amount}} chuig {{recipient}} ar {{community}}",
+    "body": "Próiseáladh d'aistriú creidmheasa ama go <strong>{{recipient}}</strong> go rathúil.",
     "label_amount": "Amount",
-    "label_recipient": "Sent To",
+    "label_recipient": "Seolta Chuig",
     "label_description": "Description",
-    "cta": "View Your Wallet"
+    "cta": "Féach ar Do Sparán"
   },
   "donation": {
-    "subject": "Thank you for your donation to {{community}}",
-    "title": "Donation Received",
-    "preview": "Thank you for your generous donation to {{community}}",
-    "body": "Thank you for your generous donation to <strong>{{community}}</strong>. Your support makes a real difference.",
+    "subject": "Go raibh maith agat as do thabhartas do {{community}}",
+    "title": "Síntiús a Fuarthas",
+    "preview": "Go raibh maith agat as do thabhartas flaithiúil do {{community}}",
+    "body": "Go raibh maith agat as do thabhartas flaithiúil do <strong>{{community}}</strong>. Déanann do thacaíocht difríocht mhór.",
     "label_amount": "Amount",
     "label_date": "Date",
-    "recurring_note": "This is a recurring donation. You can manage your donations from your account settings.",
-    "cta": "View Your Account"
+    "recurring_note": "Is síntiús athfhillteach é seo. Is féidir leat do thabhartais a bhainistiú ó do shocruithe cuntais.",
+    "cta": "Féach ar Do Chuntas"
   },
   "listing_updated": {
-    "subject": "A listing you saved has been updated — {{community}}",
-    "title": "Saved Listing Updated",
-    "preview": "\"{{title}}\" has been updated on {{community}}",
-    "body": "A listing you saved, <strong>\"{{title}}\"</strong>, has been updated on {{community}}.",
-    "cta": "View Listing"
+    "subject": "Nuashonraíodh liostú a shábháil tú — {{community}}",
+    "title": "Nuashonraíodh an Liosta Sábháilte",
+    "preview": "Tá \"{{title}}\" nuashonraithe ar {{community}}",
+    "body": "Nuashonraíodh liostú a shábháil tú, <strong>\"{{title}}\"</strong> ar {{community}}.",
+    "cta": "Amharc ar Liostú"
   }
 }

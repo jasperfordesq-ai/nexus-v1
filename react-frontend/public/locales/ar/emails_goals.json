@@ -1,39 +1,39 @@
 {
   "created": {
-    "subject": "Goal set: {{title}} — {{community}}",
-    "title": "Goal Created!",
-    "preview": "You've set a new goal: {{title}}",
-    "body": "You've set a new goal on {{community}}. Keep going — we'll send you reminders to help you stay on track.",
-    "cta": "View Your Goal"
+    "subject": "مجموعة الأهداف: {{title}} — {{community}}",
+    "title": "تم إنشاء الهدف!",
+    "preview": "لقد حددت هدفًا جديدًا: {{title}}",
+    "body": "لقد حددت هدفًا جديدًا على {{community}}. استمر - سنرسل إليك تذكيرات لمساعدتك على البقاء على المسار الصحيح.",
+    "cta": "عرض هدفك"
   },
   "completed": {
-    "subject": "Goal achieved: {{title}} — {{community}}",
-    "title": "Goal Achieved!",
-    "preview": "Congratulations! You've completed your goal: {{title}}",
-    "body": "Amazing work! You've completed your goal on {{community}}. Your contribution to the community is truly valued.",
-    "highlight": "Goal Completed",
-    "cta": "View Your Achievements"
+    "subject": "تم تحقيق الهدف: {{title}} — {{community}}",
+    "title": "تم تحقيق الهدف!",
+    "preview": "تهانينا! لقد أكملت هدفك: {{title}}",
+    "body": "عمل مذهل! لقد أكملت هدفك على {{community}}. مساهمتك في المجتمع موضع تقدير حقًا.",
+    "highlight": "الهدف مكتمل",
+    "cta": "عرض إنجازاتك"
   },
   "abandoned": {
-    "subject": "Goal removed: {{title}} — {{community}}",
-    "title": "Goal Removed",
-    "preview": "Your goal has been removed",
-    "body": "Your goal <strong>\"{{title}}\"</strong> has been removed from {{community}}.",
-    "note": "You can set a new goal any time from your profile.",
-    "cta": "Set a New Goal"
+    "subject": "تمت إزالة الهدف: {{title}} — {{community}}",
+    "title": "تمت إزالة الهدف",
+    "preview": "تمت إزالة هدفك",
+    "body": "تمت إزالة هدفك <strong>\"{{title}}\"</strong> من {{community}}.",
+    "note": "يمكنك تحديد هدف جديد في أي وقت من ملفك الشخصي.",
+    "cta": "حدد هدفًا جديدًا"
   },
   "goal_milestone": {
-    "progress_subject": "You're {{percent}}% of the way to your goal!",
-    "progress_title": "{{percent}}% Complete",
-    "progress_preview": "Great progress on '{{goal}}'",
-    "progress_greeting": "Keep it up, {{name}}!",
-    "progress_body": "You've reached {{percent}}% of your goal '{{goal}}'. You're making fantastic progress — keep going!",
-    "progress_cta": "View Your Goal",
-    "complete_subject": "You achieved your goal!",
-    "complete_title": "Goal Achieved!",
-    "complete_preview": "Congratulations — you completed '{{goal}}'",
-    "complete_greeting": "Congratulations, {{name}}!",
-    "complete_body": "You've successfully completed your goal '{{goal}}'. This is a fantastic achievement — well done!",
-    "complete_cta": "View Your Achievement"
+    "progress_subject": "لقد قطعت {{percent}}% من الطريق نحو هدفك!",
+    "progress_title": "اكتمل {{percent}}%",
+    "progress_preview": "تقدم كبير في \"{{goal}}\"",
+    "progress_greeting": "استمر في ذلك، {{name}}!",
+    "progress_body": "لقد وصلت إلى {{percent}}% من هدفك \"{{goal}}\". أنت تحرز تقدمًا رائعًا – استمر!",
+    "progress_cta": "عرض هدفك",
+    "complete_subject": "لقد حققت هدفك!",
+    "complete_title": "تم تحقيق الهدف!",
+    "complete_preview": "تهانينا - لقد أكملت \"{{goal}}\"",
+    "complete_greeting": "???????? {{name}}!",
+    "complete_body": "لقد أكملت هدفك \"{{goal}}\" بنجاح. هذا إنجاز رائع – أحسنت!",
+    "complete_cta": "عرض إنجازك"
   }
 }

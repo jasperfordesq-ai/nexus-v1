@@ -1,39 +1,39 @@
 {
   "created": {
-    "subject": "Goal set: {{title}} — {{community}}",
-    "title": "Goal Created!",
-    "preview": "You've set a new goal: {{title}}",
-    "body": "You've set a new goal on {{community}}. Keep going — we'll send you reminders to help you stay on track.",
-    "cta": "View Your Goal"
+    "subject": "Doelstelling: {{title}} — {{community}}",
+    "title": "Doel gecreëerd!",
+    "preview": "Je hebt een nieuw doel gesteld: {{title}}",
+    "body": "Je hebt een nieuw doel gesteld op {{community}}. Blijf doorgaan: we sturen u herinneringen om u te helpen op koers te blijven.",
+    "cta": "Bekijk uw doel"
   },
   "completed": {
-    "subject": "Goal achieved: {{title}} — {{community}}",
-    "title": "Goal Achieved!",
-    "preview": "Congratulations! You've completed your goal: {{title}}",
-    "body": "Amazing work! You've completed your goal on {{community}}. Your contribution to the community is truly valued.",
-    "highlight": "Goal Completed",
-    "cta": "View Your Achievements"
+    "subject": "Doel bereikt: {{title}} — {{community}}",
+    "title": "Doel bereikt!",
+    "preview": "Gefeliciteerd! Je hebt je doel bereikt: {{title}}",
+    "body": "Geweldig werk! Je hebt je doel op {{community}} bereikt. Jouw bijdrage aan de gemeenschap wordt echt gewaardeerd.",
+    "highlight": "Doel voltooid",
+    "cta": "Bekijk uw prestaties"
   },
   "abandoned": {
-    "subject": "Goal removed: {{title}} — {{community}}",
-    "title": "Goal Removed",
-    "preview": "Your goal has been removed",
-    "body": "Your goal <strong>\"{{title}}\"</strong> has been removed from {{community}}.",
-    "note": "You can set a new goal any time from your profile.",
-    "cta": "Set a New Goal"
+    "subject": "Doel verwijderd: {{title}} — {{community}}",
+    "title": "Doel verwijderd",
+    "preview": "Je doel is verwijderd",
+    "body": "Uw doel <strong>\"{{title}}\"</strong> is verwijderd uit {{community}}.",
+    "note": "U kunt op elk gewenst moment vanuit uw profiel een nieuw doel instellen.",
+    "cta": "Stel een nieuw doel"
   },
   "goal_milestone": {
-    "progress_subject": "You're {{percent}}% of the way to your goal!",
-    "progress_title": "{{percent}}% Complete",
-    "progress_preview": "Great progress on '{{goal}}'",
-    "progress_greeting": "Keep it up, {{name}}!",
-    "progress_body": "You've reached {{percent}}% of your goal '{{goal}}'. You're making fantastic progress — keep going!",
-    "progress_cta": "View Your Goal",
-    "complete_subject": "You achieved your goal!",
-    "complete_title": "Goal Achieved!",
-    "complete_preview": "Congratulations — you completed '{{goal}}'",
-    "complete_greeting": "Congratulations, {{name}}!",
-    "complete_body": "You've successfully completed your goal '{{goal}}'. This is a fantastic achievement — well done!",
-    "complete_cta": "View Your Achievement"
+    "progress_subject": "Je bent {{percent}}% op weg naar je doel!",
+    "progress_title": "{{percent}}% voltooid",
+    "progress_preview": "Grote vooruitgang op '{{goal}}'",
+    "progress_greeting": "Ga zo door, {{name}}!",
+    "progress_body": "U heeft {{percent}}% van uw doel '{{goal}}' bereikt. Je boekt fantastische vooruitgang – ga door!",
+    "progress_cta": "Bekijk uw doel",
+    "complete_subject": "Je hebt je doel bereikt!",
+    "complete_title": "Doel bereikt!",
+    "complete_preview": "Gefeliciteerd: je hebt '{{goal}}' voltooid",
+    "complete_greeting": "Gefeliciteerd, {{name}}!",
+    "complete_body": "Je hebt je doel '{{goal}}' succesvol voltooid. Dit is een fantastische prestatie – goed gedaan!",
+    "complete_cta": "Bekijk uw prestatie"
   }
 }
