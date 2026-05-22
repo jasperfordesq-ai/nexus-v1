@@ -416,5 +416,419 @@
     "view_on_github": "View on GitHub",
     "loading": "Loading changelog...",
     "error": "Could not load the changelog. You can read it directly on GitHub."
+  },
+  "features_page": {
+    "chips": {
+      "beta": "Béite",
+      "preview": "Réamhamharc"
+    },
+    "title": "Gnéithe",
+    "meta_title": "Gnéithe - Project NEXUS v1.5",
+    "meta_description": "Gach modúl atá curtha ar fáil i Project NEXUS v1.5, le lipéid mhacánta aibíochta don chónaidhm, do bhanc ama, don mhargadh, d'uirlisí pobail, don tslándáil, don anailísíocht agus don bhonneagar foinse oscailte.",
+    "heading": "Cad a dhéanann Project NEXUS",
+    "subheading": "Ardán pobail ilthionónta de chineál fiontair is ea Project NEXUS. Tá gach modúl thíos ar fáil i v1.5 inniu. Lipéadaimid an aibíocht go macánta: tá míreanna gan lipéad ar fáil go ginearálta; iompraíonn dromchlaí níos nuaí nó dromchlaí atá á neartú lipéad Béite nó Réamhamharc.",
+    "maturity_key_title": "Conas a lipéadaímid aibíocht",
+    "maturity_ga": "Ar fáil go ginearálta - cobhsaí, tacaithe, in úsáid i dtáirgeadh ar fud na dtionóntaí píolótacha.",
+    "maturity_beta": "Ag obair i dtáirgeadh inniu, ach tá an dromchla poiblí nó an prótacal sreangach á neartú fós.",
+    "maturity_preview": "Eisithe le déanaí agus ar fáil ar bhonn rogha. Bíodh súil agat le hathrú tapa - d'fhéadfadh an API agus an UX athrú.",
+    "tech_stack_title": "Cruach theicniúil nua-aimseartha",
+    "open_source_title": "Foinse oscailte - AGPL-3.0",
+    "open_source_body": "Tá Project NEXUS go hiomlán foinse oscailte faoi AGPL-3.0. Is féidir gach líne den chód a iniúchadh, a fhorcáil agus a fhéinóstáil. Tá na prótacail chónaidhme doiciméadaithe mar chaighdeáin oscailte ionas nach mbeidh aon ardán amháin i gceannas ar an líonra domhanda banc ama.",
+    "link_repo": "Stór foinseach",
+    "link_changelog": "Logleabhar athruithe",
+    "link_report_bug": "Tuairiscigh fabht",
+    "link_about": "Maidir leis an tionónta seo",
+    "security_title": "Nochtadh slándála",
+    "security_body_before": "An bhfuair tú saincheist slándála? Tuairiscigh go príobháideach í chuig ",
+    "security_body_after": " seachas saincheist phoiblí a chomhdú. Tá an polasaí iomlán um nochtadh leochaileachta in SECURITY.md sa stór foinseach.",
+    "security_email": "jasper@hour-timebank.ie",
+    "tech_stack": {
+      "ai_label": "IS",
+      "ai_value": "OpenAI text-embedding-3-small",
+      "backend_label": "Cúl",
+      "backend_value": "Laravel 12 + PHP 8.2+",
+      "database_label": "Bunachar sonraí",
+      "database_value": "MariaDB 10.11",
+      "frontend_label": "Tosach",
+      "frontend_value": "React 18 + TypeScript + HeroUI + Tailwind CSS 4",
+      "infrastructure_label": "Bonneagar",
+      "infrastructure_value": "Docker, Redis, PWA iomlán",
+      "mobile_label": "Soghluaiste",
+      "mobile_value": "Capacitor (iOS + Android)",
+      "realtime_label": "Fíor-ama",
+      "realtime_value": "Pusher WebSockets, Firebase Cloud Messaging",
+      "search_label": "Cuardach",
+      "search_value": "Meilisearch v1.7"
+    },
+    "groups": {
+      "core_platform": {
+        "title": "Ardán lárnach",
+        "items": {
+          "timebanking_engine": {
+            "title": "Inneall banc ama",
+            "description": "Córas iomlán malartaithe creidmheasa le sparán, idirbhearta agus rialuithe bróicéara."
+          },
+          "multi_tenancy": {
+            "title": "Iltionóntacht",
+            "description": "Óstáil pobail gan teorainn ar ardán amháin, gach ceann acu lena bhrandáil, lena chumraíocht agus lena thacar gnéithe féin."
+          },
+          "tenant_hierarchy": {
+            "title": "Ordlathas tionóntaí",
+            "description": "Caidreamh tuismitheoir–leanbh idir tionóntaí le scoránú gnéithe agus scóip chónaidhme."
+          },
+          "smart_matching": {
+            "title": "Meaitseáil chliste",
+            "description": "Meaitseáil chumhachtaithe ag IS le leabuithe séimeantacha, scagadh comhoibríoch, sceidealú infhaighteachta agus sainroghanna foghlamtha."
+          },
+          "real_time_messaging": {
+            "title": "Teachtaireachtaí fíor-ama",
+            "description": "Comhráite príobháideacha le comhtháthú Pusher WebSocket agus láithreacht fíor-ama."
+          },
+          "progressive_web_app": {
+            "title": "Feidhmchlár gréasáin forásach",
+            "description": "Suiteáil mar PWA ar aon ghléas — sliogán as líne, fógraí brú, sreabhadh nuashonraithe NetworkFirst."
+          },
+          "native_mobile_app": {
+            "title": "Aip dhúchasach soghluaiste",
+            "description": "Tógálacha iOS agus Android ón mbunchód céanna React trí Capacitor.",
+            "note": "Is é an gréasán an príomhchainéal dáilte; tá tógálacha dúchasacha tástáilte ach níl siad i scaoileadh leanúnach fós."
+          }
+        }
+      },
+      "federation": {
+        "title": "Cónaidhm",
+        "intro": "Ciseal cónaidhme le ceithre phrótacal le haghaidh malartaithe idirphobail — Nexus (dúchasach), Komunitin (15 chríochphointe), Credit Commons Protocol (11 chríochphointe, comhoiriúnach le CEN) agus TimeOverflow.",
+        "items": {
+          "federation_network": {
+            "title": "Líonra cónaidhme",
+            "description": "Nasc pobail NEXUS iolracha i líonra le haghaidh aimsithe, fógraí, imeachtaí agus teachtaireachtaí idirphobail."
+          },
+          "external_partner_federation": {
+            "title": "Cónaidhm le páirtithe seachtracha",
+            "description": "Beo le hardáin sheachtracha banc ama — comhpháirtíochtaí bunaithe, teachtaireachtaí ag sreabhadh, malartú creidmheasa á thástáil go gníomhach.",
+            "note": "Tá comhpháirtíochtaí fíora ann a mhalartaíonn sonraí gach lá. Tá na prótacail sreangacha á neartú fós in aghaidh cásanna teorann — caith le haistrithe creidmheasa seachtracha mar fheighilte, ní mar uathoibríocha."
+          },
+          "multi_protocol_adapters": {
+            "title": "Cuibheoirí ilphrótacal",
+            "description": "Sioncrónú dhá-bhealaigh do 9 gcineál aonáin: baill, fógraí, imeachtaí, grúpaí, naisc, obair dheonach, athbhreithnithe, aistrithe, teachtaireachtaí."
+          },
+          "federation_neighborhoods": {
+            "title": "Comharsanachtaí cónaidhme",
+            "description": "Braislí geografacha de phobail chónasctha le haghaidh comhordaithe réigiúnaigh."
+          },
+          "credit_agreements": {
+            "title": "Comhaontuithe creidmheasa",
+            "description": "Téarmaí ráta malairte idirbheartaithe idir pobail chónasctha."
+          },
+          "federation_analytics": {
+            "title": "Anailísíocht chónaidhme",
+            "description": "Painéil riaracháin bheo le haghaidh ghníomhaíocht na bpáirtithe, sláinte sioncrónaithe agus líon na n-idirbheart cónasctha."
+          }
+        }
+      },
+      "member_experience": {
+        "title": "Eispéireas baill",
+        "items": {
+          "service_listings": {
+            "title": "Fógraí seirbhísí",
+            "description": "Postáil tairiscintí agus iarratais, brabhsáil agus meaitseáil fógraí go cliste."
+          },
+          "marketplace": {
+            "title": "Margadh",
+            "description": "Modúl fógraí aicmithe neamhspleách le híocaíochtaí Stripe Connect, orduithe, próifílí díoltóra agus moltaí freagartha cumhachtaithe ag IS."
+          },
+          "donations": {
+            "title": "Síntiúis",
+            "description": "Síntiúis aon-uaire agus athfhillteacha trí Stripe le painéil iomlána agus admhálacha d'eagraíochtaí."
+          },
+          "identity_verification": {
+            "title": "Fíorú aitheantais",
+            "description": "Sreabhadh roghnach Stripe Identity (cáipéis + féinphic + meaitseáil ainm/dáta breithe) le suaitheantas baill fíoraithe."
+          },
+          "exchange_workflow": {
+            "title": "Sreabhadh oibre malartaithe",
+            "description": "Saolré struchtúrtha malartaithe seirbhíse le ceadú bróicéara agus láimhseáil aighnis."
+          },
+          "group_exchanges": {
+            "title": "Malartuithe grúpa",
+            "description": "Mórmhalartuithe pobail seirbhíse thar bhaill iomadúla."
+          },
+          "social_feed": {
+            "title": "Fotha sóisialta",
+            "description": "Postálacha, tráchtanna, taitneamhachtaí, pobalbhreitheanna, haischlibeanna, teachtaireachtaí gutha, ceangaltáin meán, réamhamhairc nasc agus @luaitear."
+          },
+          "stories": {
+            "title": "Scéalta",
+            "description": "Scéalta gearrshaolacha grianghraf agus físeáin 24 uair an chloig le freagairtí, pobalbhreitheanna agus buaicphointí."
+          },
+          "presence_system": {
+            "title": "Córas láithreachta",
+            "description": "Stádas ar líne/as líne fíor-ama le rialuithe príobháideachta agus teachtaireachtaí stádais saincheaptha."
+          },
+          "events_and_groups": {
+            "title": "Imeachtaí agus grúpaí",
+            "description": "Cruinnithe pobail, grúpaí spéise agus meabhrúcháin imeachtaí."
+          },
+          "connections": {
+            "title": "Naisc",
+            "description": "Lean agus nasc le baill eile den phobal."
+          },
+          "members_directory": {
+            "title": "Eolaire ball",
+            "description": "Brabhsáil, scag agus aimsigh daoine i do phobal."
+          },
+          "gamification": {
+            "title": "Cluichíocht",
+            "description": "Suaitheantais fíoraithe, turais, XP, cláir cheannairí, éachtaí, dúshláin, sraitheanna, luaíochtaí siopa XP, painéal pobail agus comórtais shéasúracha."
+          },
+          "goals_and_impact": {
+            "title": "Spriocanna agus tionchar",
+            "description": "Lean spriocanna pearsanta agus tionchar pobail le meantóireacht agus rianú soláthartha."
+          },
+          "ideation_challenges": {
+            "title": "Dúshláin smaointeoireachta",
+            "description": "Mol nuálaíochta le feachtais, smaointe, vótáil agus rianú torthaí."
+          },
+          "volunteering": {
+            "title": "Obair dheonach",
+            "description": "Deiseanna oibre deonaí, rianú uaireanta, seiceáil isteach, costais, teastais, monatóireacht folláine, foláirimh éigeandála agus sparán eagraíochta oibre deonaí a íocann creidmheasanna ama ar uaireanta ceadaithe."
+          },
+          "job_vacancies": {
+            "title": "Folúntais phoist",
+            "description": "Modúl iomlán earcaíochta le foláirimh, anailísíocht agus fotha post RSS/JSON poiblí d'aigréadóirí."
+          },
+          "organisations": {
+            "title": "Eagraíochtaí",
+            "description": "Próifílí cuideachta agus fostóra le foghníomhartha agus sparán tiomnaithe eagraíochta."
+          },
+          "sub_accounts_family_accounts": {
+            "title": "Foghníomhartha / Cuntais teaghlaigh",
+            "description": "Caidrimh chuntais tuismitheoir–leanbh do bhainistíocht líon tí agus teaghlaigh."
+          },
+          "reviews_and_ratings": {
+            "title": "Athbhreithnithe agus rátálacha",
+            "description": "Tóg muinín trí aiseolas struchtúrtha ó bhaill."
+          },
+          "endorsements": {
+            "title": "Formhuinithe",
+            "description": "Formhuinithe scileanna agus taithí ó phiaraí."
+          },
+          "polls": {
+            "title": "Pobalbhreitheanna",
+            "description": "Vótáil agus suirbhéanna pobail le cineálacha éagsúla ceisteanna."
+          },
+          "skills_browse": {
+            "title": "Brabhsáil scileanna",
+            "description": "Iniúch tacsanomaíocht na scileanna agus aimsigh saineolas."
+          },
+          "availability_scheduling": {
+            "title": "Sceidealú infhaighteachta",
+            "description": "Sceidealú sliotán ama atá feasach ar chriosanna ama do mheaitseáil chliste agus áirithintí."
+          }
+        }
+      },
+      "content_and_communication": {
+        "title": "Ábhar agus cumarsáid",
+        "items": {
+          "blog": {
+            "title": "Blag",
+            "description": "Bainistíocht ábhair agus nuacht pobail á riaradh ag an tionónta."
+          },
+          "resources_and_knowledge_base": {
+            "title": "Acmhainní agus bonn eolais",
+            "description": "Ailt struchtúrtha agus leabharlann acmhainní comhroinnte."
+          },
+          "help_center": {
+            "title": "Lárionad cabhrach",
+            "description": "Mol doiciméadachta agus CCanna."
+          },
+          "custom_pages": {
+            "title": "Leathanaigh shaincheaptha",
+            "description": "Leathanaigh CMS á riaradh ag an tionónta d'ábhar pobail."
+          },
+          "newsletter_system": {
+            "title": "Córas nuachtlitreach",
+            "description": "Bainisteoir feachtas ríomhphoist le tástáil A/B, deighiltí cliste, spriocdhíriú geo, seoltaí athfhillteacha, teimpléid, optamú ama seolta agus anailísíocht iomlán oscailtí/cliceanna."
+          },
+          "ai_chat": {
+            "title": "Comhrá IS",
+            "description": "Cúntóir cumhachtaithe ag OpenAI le haghaidh treoir ardáin."
+          },
+          "legal_hub": {
+            "title": "Mol dlí",
+            "description": "Doiciméid dhlíthiúla leaganaithe le geataí glactha agus lorg iniúchta."
+          },
+          "impact_reports": {
+            "title": "Tuarascálacha tionchair",
+            "description": "Anailís SROI, tuarascálacha torthaí ball agus cás-staidéir tionchair shóisialta."
+          },
+          "social_prescribing": {
+            "title": "Oideas sóisialta",
+            "description": "Eolas agus uirlisí do shreabha oibre comhtháthaithe le sláinte pobail."
+          }
+        }
+      },
+      "trust_reputation_and_safety": {
+        "title": "Muinín, clú agus sábháilteacht",
+        "items": {
+          "member_verification_badges": {
+            "title": "Suaitheantais fíoraithe ball",
+            "description": "Táscairí stádais fíoraithe ar phróifílí ball."
+          },
+          "nexusscore": {
+            "title": "NexusScore",
+            "description": "Scóráil dhílseánaigh do chlú agus iontaofacht."
+          },
+          "streaks": {
+            "title": "Sraitheanna",
+            "description": "Rianú gníomhaíochta comhleanúnaí chun rannpháirtíocht chomhsheasmhach a luach saothair."
+          },
+          "personal_insights_dashboard": {
+            "title": "Painéal léargas pearsanta",
+            "description": "Méadrachtaí rannpháirtíochta aonair, uaireanta tugtha/faighte, miondealú scileanna, cairteacha míosúla agus moltaí pearsantaithe."
+          },
+          "safeguarding_module": {
+            "title": "Modúl cosanta",
+            "description": "Sreabhadh oibre athbhreithnithe ábhair fhógartha, tuairisciú teagmhas, rianú sannta cosanta agus painéal sábháilteachta pobail."
+          },
+          "crm": {
+            "title": "CRM",
+            "description": "Bainistíocht teagmhála ar thaobh an riaracháin le nótaí, tascanna, clibeanna, amlínte gníomhaíochta agus easpórtáil."
+          }
+        }
+      },
+      "ai_and_recommendation_engine": {
+        "title": "Inneall IS agus moltaí",
+        "items": {
+          "semantic_search": {
+            "title": "Cuardach séimeantach",
+            "description": "Cuardach lántéacs cumhachtaithe ag Meilisearch thar fhógraí, baill, imeachtaí agus grúpaí le caoinfhulaingt clóscríofa, comhchiallaigh agus aonrú per tionónta."
+          },
+          "collaborative_filtering": {
+            "title": "Scagadh comhoibríoch",
+            "description": "Moltaí mírbhunaithe ó shonraí fíora idirghníomhaíochta pobail."
+          },
+          "semantic_embeddings": {
+            "title": "Leabuithe séimeantacha",
+            "description": "Meaitseáil ábhair chumhachtaithe ag OpenAI d'fhógraí, baill agus iarratais."
+          },
+          "edgerank_feed": {
+            "title": "Fotha EdgeRank",
+            "description": "Rangú fotha meáite ag meath ama, gaol agus rannpháirtíocht."
+          },
+          "matchrank_and_communityrank": {
+            "title": "MatchRank agus CommunityRank",
+            "description": "Scóráil chaighdeáin Bayesach le heatraimh mhuiníne Wilson."
+          },
+          "group_recommendations": {
+            "title": "Moltaí grúpa",
+            "description": "Aimsiú grúpaí bunaithe ar threochtaí agus ar ghaol."
+          },
+          "match_learning": {
+            "title": "Foghlaim meaitseála",
+            "description": "Lúb aiseolais a fheabhsaíonn moltaí ó idirghníomhaíochtaí úsáideoirí."
+          },
+          "algorithm_health_dashboard": {
+            "title": "Painéal sláinte algartam",
+            "description": "Monatóireacht bheo riaracháin agus tiúnadh na gcóras rangaithe go léir."
+          }
+        }
+      },
+      "caring_community_layer": {
+        "title": "Ciseal pobail chúraim",
+        "intro": "Ciseal rialachais ullmhachta píolótaí d'imscaradh sibhialta agus pobail chúraim — formhór na modúl seachadta idir Aibreán agus Bealtaine 2026.",
+        "items": {
+          "civic_digest": {
+            "title": "Achoimre shibhialta",
+            "description": "Achoimre thréimhsiúil ar ghníomhaíocht agus torthaí an phobail do pháirtithe leasmhara."
+          },
+          "success_stories": {
+            "title": "Scéalta rathúla",
+            "description": "Cás-staidéir roghnaithe ar thorthaí faoi cheannaireacht ball."
+          },
+          "feedback_inbox": {
+            "title": "Bosca aiseolais isteach",
+            "description": "Bailiú lárnach aiseolais píolóta le sórtáil riaracháin."
+          },
+          "integration_showcase": {
+            "title": "Taispeántas comhtháthaithe",
+            "description": "Dromchla poiblí do pháirtithe agus do chomhtháthuithe nasctha."
+          },
+          "lead_nurture": {
+            "title": "Cothú leads",
+            "description": "Uirlisí sreabhadh oibre le haghaidh leantóireachta ar pháirtithe leasmhara píolóta."
+          },
+          "copilot": {
+            "title": "Copilot",
+            "description": "Cúntóir IS comhthéacsúil do riarthóirí pobail."
+          }
+        }
+      },
+      "built_for_production": {
+        "title": "Tógtha don táirgeadh",
+        "items": {
+          "enterprise_security": {
+            "title": "Slándáil fhiontair",
+            "description": "CSRF, srianadh rátaí, 2FA TOTP, eochracha pasanna WebAuthn, nonces CSP, liosta ceadaithe CORS, bailíochtú Form Request, geataí fíoraithe ríomhphoist agus clárú trí chód cuiridh."
+          },
+          "stripe_payments_layer": {
+            "title": "Ciseal íocaíochtaí Stripe",
+            "description": "Síntiúis, síntiúis, margadh (Connect) agus fíorú aitheantais, le láimhseáil idempotent webhook agus clúdach domhain tástála ar shreabhadh airgid."
+          },
+          "gdpr_compliance_suite": {
+            "title": "Sraith chomhlíonta GDPR",
+            "description": "Iarratais sonraí, bainistíocht toiliúna, toiliú fianán, rianú sárú agus loga iomlán iniúchta."
+          },
+          "fraud_and_abuse_detection": {
+            "title": "Brath calaoise agus mí-úsáide",
+            "description": "Foláirimh uathoibríocha ar ghníomhaíocht amhrasach agus modhnóireacht ábhair."
+          },
+          "insurance_certificate_tracking": {
+            "title": "Rianú teastas árachais",
+            "description": "Bainistíocht agus fíorú árachais d'oibrithe deonacha."
+          },
+          "enterprise_rbac": {
+            "title": "RBAC fiontair",
+            "description": "Rialú rochtana bunaithe ar róil thar 13+ modúl le maitrís iomlán ceadanna."
+          },
+          "wcag_2_1_aa_accessibility": {
+            "title": "Inrochtaineacht WCAG 2.1 AA",
+            "description": "Comhlíonadh inrochtaineachta iniúchta thar an dromchla úsáideora."
+          },
+          "multi_language_support": {
+            "title": "Tacaíocht ilteangach",
+            "description": "11 theanga: Béarla, Gaeilge, Gearmáinis, Fraincis, Iodáilis, Portaingéilis, Spáinnis, Ollainnis, Polainnis, Seapáinis agus Araibis (RTL iomlán)."
+          },
+          "self_hosted_prerendering": {
+            "title": "Réamhrindreáil féinóstáilte",
+            "description": "Pictiúir Playwright le haghaidh bot amháin, freastalaithe ar chreaplaitheoirí SEO; faigheann úsáideoirí an SPA bheo i gcónaí."
+          },
+          "guided_onboarding": {
+            "title": "Tús treoraithe",
+            "description": "Draoi do bhaill nua le réamhshocruithe cliste."
+          },
+          "admin_panel": {
+            "title": "Painéal riaracháin",
+            "description": "Rialuithe algartaim, diagnóisic, monatóireacht poist cron agus monatóireacht inseachadta ríomhphoist."
+          },
+          "email_webhook_processing": {
+            "title": "Próiseáil webhook ríomhphoist",
+            "description": "Láimhseáil eachtraí SendGrid de phreaba, gearáin agus seachadtaí."
+          },
+          "500plus_phpunit_tests": {
+            "title": "500+ tástálacha PHPUnit",
+            "description": "Sreabhadh airgid, webhooks, cónaidhm, grúpaí, margadh — móide sraitheanna tosaigh Vitest."
+          },
+          "openapi_3_0_specification": {
+            "title": "Sonraíocht OpenAPI 3.0",
+            "description": "Sonraíocht iomlán API le doiciméadachta Swagger UI."
+          },
+          "fully_dockerized": {
+            "title": "Go hiomlán Dockeraithe",
+            "description": "Ritheann an táirgeadh agus an forbairt ar na bunsraitheanna Docker Compose céanna."
+          }
+        }
+      }
+    }
   }
 }
