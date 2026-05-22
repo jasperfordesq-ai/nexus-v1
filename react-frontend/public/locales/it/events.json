@@ -104,7 +104,28 @@
     "view_all_series": "Visualizza tutti i {{count}} eventi della serie",
     "no_other_series_events": "Nessun altro evento trovato in questa serie.",
     "remote_attendance_available": "Partecipazione da remoto disponibile",
-    "join_meeting": "Partecipa alla riunione"
+    "join_meeting": "Partecipa alla riunione",
+    "community_member": "Membro della community",
+    "capacity_label": "Capienza",
+    "waitlist_label": "Lista d'attesa",
+    "attendance_total": "{{count}} risposte",
+    "no_attendees_title": "Ancora nessun partecipante",
+    "no_checkin_attendees_title": "Ancora nessun check-in",
+    "rsvp_panel_title": "Conferma la presenza a questo evento",
+    "rsvp_panel_desc": "Fai sapere all'organizzatore se hai intenzione di partecipare.",
+    "rsvp_going_aria": "Indica che parteciperai",
+    "rsvp_interested_aria": "Indica che sei interessato",
+    "rsvp_not_going_aria": "Indica che non parteciperai",
+    "share_aria": "Copia il link a {{title}}",
+    "event_link_aria": "Apri il link dell'evento {{title}}",
+    "meta_description_fallback": "{{title}} è un evento della community il {{date}} con {{organizer}} a {{location}}.",
+    "edit_event_aria": "Modifica {{title}}",
+    "cancel_event_aria": "Annulla {{title}}",
+    "delete_event_aria": "Elimina {{title}}",
+    "on_waitlist_position": "In lista d'attesa (n. {{position}})",
+    "join_meeting_aria": "Unisciti alla riunione per {{title}}",
+    "join_waitlist_aria": "Iscriviti alla lista d'attesa di questo evento",
+    "leave_waitlist_aria": "Esci dalla lista d'attesa di questo evento"
   },
   "card": {
     "cancelled": "Annullato",
@@ -270,5 +291,9 @@
   "active_filters": "Active filters",
   "active_search": "Search: {{query}}",
   "active_near_me": "Within {{radius}} km",
-  "clear_filters": "Clear filters"
+  "clear_filters": "Clear filters",
+  "hero_events_label": "Eventi",
+  "empty_tip_workshops": "Workshop",
+  "empty_tip_social": "Incontri sociali",
+  "empty_tip_online": "Sessioni online"
 }

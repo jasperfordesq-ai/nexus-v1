@@ -17,7 +17,8 @@
     "balance": "Balance",
     "active_listings": "アクティブなリスト",
     "messages": "Messages",
-    "pending": "Pending"
+    "pending": "Pending",
+    "hours_value": "{{value}}時間"
   },
   "sections": {
     "recent_listings": "最近のリスト",
@@ -51,7 +52,8 @@
     "request": "Request",
     "empty": "最近のリストはありません",
     "create_first": "最初のリストを作成してください",
-    "user_fallback": "User"
+    "user_fallback": "User",
+    "empty_description": "リクエストまたはオファーを作成して、近くの人とのマッチングを始めましょう。"
   },
   "activity": {
     "action_listing": "リストを共有しました",
@@ -60,20 +62,24 @@
     "action_goal": "新しい目標を設定しました",
     "action_post": "投稿を共有しました",
     "empty": "最近の活動はありません",
-    "check_feed": "フィードをチェックしてください"
+    "check_feed": "フィードをチェックしてください",
+    "empty_description": "メンバーが投稿を始めると、コミュニティのアップデートがここに表示されます。"
   },
   "suggestions": {
-    "empty": "まだ提案はありません"
+    "empty": "まだ提案はありません",
+    "empty_description": "リスティングやプロフィールの詳細が増えるほど、マッチングの精度が向上します。"
   },
   "groups": {
     "members_count": "{{count}} メンバー",
     "empty": "まだグループに参加していません",
-    "discover": "グループを見つける"
+    "discover": "グループを見つける",
+    "empty_description": "グループは共通の興味、プロジェクト、地域のサークルをフォローするのに役立ちます。"
   },
   "events": {
     "online_event": "オンラインイベント",
     "empty": "今後のイベントはありません",
-    "browse": "イベントをブラウズする"
+    "browse": "イベントをブラウズする",
+    "empty_description": "コミュニティのイベントが予定されると、ここに表示されます。"
   },
   "gamification": {
     "level": "レベル {{level}}",
@@ -82,7 +88,8 @@
     "xp_progress": "XPの進捗",
     "start_earning": "コミュニティに参加してXPを獲得し始めましょう！",
     "streak_days_one": "{{count}} 日",
-    "streak_days_other": "{{count}} 日間"
+    "streak_days_other": "{{count}} 日間",
+    "xp_value": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "リストを読み込み中",
@@ -92,7 +99,15 @@
     "loading_progress": "進捗を読み込み中",
     "loading_suggestions": "提案を読み込み中",
     "loading_endorsements": "推薦を読み込み中",
-    "loading_pending_reviews": "保留中のレビューを読み込み中"
+    "loading_pending_reviews": "保留中のレビューを読み込み中",
+    "view_all_listings": "すべてのリスティングを表示",
+    "view_all_activity": "最近のアクティビティをすべて表示",
+    "view_all_events": "すべてのイベントを表示",
+    "view_all_groups": "すべてのグループを表示",
+    "view_achievements": "達成項目を表示",
+    "browse_all_listings": "すべてのリスティングを閲覧",
+    "view_all_endorsements": "すべての推薦を表示",
+    "view_pending_reviews": "保留中のレビューをすべて表示"
   },
   "reviews": {
     "sent": "{{amount}}hを送信しました",
@@ -100,7 +115,8 @@
     "review": "Review",
     "none_pending": "保留中のレビューはありません",
     "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending"
+    "view_all_pending": "View All Pending",
+    "none_pending_description": "フィードバックが必要な完了済みの交換がここに表示されます。"
   },
   "fallback_name": "there",
   "common": {

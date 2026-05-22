@@ -39,7 +39,10 @@
     "waiting": "Waiting for verification result...",
     "cancel_start_over": "Cancel & Start Over",
     "error_save_dob": "Failed to save date of birth. Please try again.",
-    "error_create_payment": "Failed to create payment. Please try again."
+    "error_create_payment": "Failed to create payment. Please try again.",
+    "error_check_status": "تعذر التحقق من حالة التحقق. يرجى المحاولة مرة أخرى.",
+    "error_missing_dob": "يرجى إدخال تاريخ ميلادك.",
+    "error_start_verification": "تعذر بدء التحقق. يرجى المحاولة لاحقًا."
   },
   "identity_verified_lock_dob": "Your date of birth is locked because your identity has been verified.",
   "marketing_consent_confirm_title": "Subscribe to Marketing Emails",
@@ -217,7 +220,10 @@
     "hot_match_alerts": "تنبيهات المطابقة الساخنة",
     "mutual_match_alerts": "تنبيهات المطابقة المتبادلة",
     "enable_push": "تفعيل إشعارات الدفع",
-    "marketing_emails": "رسائل التسويق"
+    "marketing_emails": "رسائل التسويق",
+    "caring_smart_nudges": "تنبيهات ذكية لمجتمع الرعاية",
+    "federation_notifications": "إشعارات الاتحاد عبر المنصات",
+    "activity_digest": "تكرار ملخص النشاط"
   },
   "privacy_prefs": {
     "profile_visibility": "من يمكنه رؤية ملفك الشخصي",
@@ -284,7 +290,10 @@
   },
   "header": {
     "title": "Settings",
-    "subtitle": "إدارة تفضيلات حسابك"
+    "subtitle": "إدارة تفضيلات حسابك",
+    "badge": "إعدادات الحساب",
+    "unsaved_badge": "تغييرات غير محفوظة",
+    "current_section": "القسم الحالي"
   },
   "save_changes": "حفظ التغييرات",
   "save_preferences": "حفظ التفضيلات",
@@ -316,7 +325,10 @@
     "hot_match_alerts": "احصل على إشعار حول المطابقات ذات التوافق العالي",
     "mutual_match_alerts": "احصل على إشعار عندما يتطابق شخص قمت بمطابقته معك أيضًا",
     "enable_push": "استقبل إشعارات في الوقت الحقيقي على جهازك",
-    "marketing_emails": "استقبل النشرات الإخبارية، والعروض الترويجية، وتحديثات المجتمع"
+    "marketing_emails": "استقبل النشرات الإخبارية، والعروض الترويجية، وتحديثات المجتمع",
+    "caring_smart_nudges": "تذكيرات شخصية للاطمئنان على الأعضاء الذين قد يحتاجون إلى دعم. تُرسل فقط عندما يحدد محرك مجتمع الرعاية لدينا تنبيهًا واضحًا قابلاً للتنفيذ.",
+    "federation_notifications": "إشعارات حول النشاط من الأعضاء على بنوك الوقت الشريكة، بما في ذلك التقييمات وطلبات الاتصال والتحديثات الأخرى بين المجتمعات.",
+    "activity_digest": "عدد المرات التي نرسل لك فيها بالبريد الإلكتروني ملخصًا لنشاط مجموعاتك ومحادثاتك. الرسائل المباشرة وطلبات الاتصال وتأكيدات المعاملات تُرسل دائمًا فورًا."
   },
   "match_digest": {
     "frequency": "تكرار الملخص",
@@ -324,7 +336,8 @@
     "daily": "Daily",
     "weekly": "Weekly",
     "fortnightly": "Fortnightly",
-    "never": "Never"
+    "never": "Never",
+    "monthly": "شهريًا"
   },
   "privacy_sections": {
     "title": "إعدادات الخصوصية",
@@ -556,7 +569,10 @@
     "unblocked_desc": "تم فك حظر {{name}}.",
     "unblock_error": "فشل في فك حظر المستخدم",
     "blocked_on": "محظور على {{date}}",
-    "link": "المستخدمون المحظورون"
+    "link": "المستخدمون المحظورون",
+    "privacy_badge": "ضبط الخصوصية",
+    "summary_label": "الأعضاء المحظورون",
+    "count": "{{count}} محظور"
   },
   "block_user": {
     "title": "هل تريد حظر {{name}}؟",
@@ -586,5 +602,11 @@
     "unsupported": "Your browser does not support push notifications.",
     "denied": "You have blocked notifications. Update your browser settings to re-enable.",
     "subscribed": "You are subscribed on this device."
+  },
+  "activity_digest": {
+    "off": "إيقاف",
+    "instant": "فوري",
+    "daily": "يوميًا",
+    "monthly": "شهريًا"
   }
 }

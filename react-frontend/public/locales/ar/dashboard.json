@@ -17,7 +17,8 @@
     "balance": "Balance",
     "active_listings": "القوائم النشطة",
     "messages": "Messages",
-    "pending": "Pending"
+    "pending": "Pending",
+    "hours_value": "{{value}} س"
   },
   "sections": {
     "recent_listings": "القوائم الأخيرة",
@@ -51,7 +52,8 @@
     "request": "Request",
     "empty": "لا توجد قوائم حديثة",
     "create_first": "أنشئ قائمتك الأولى",
-    "user_fallback": "User"
+    "user_fallback": "User",
+    "empty_description": "أنشئ طلبًا أو عرضًا لبدء التطابق مع أشخاص بالقرب منك."
   },
   "activity": {
     "action_listing": "شارك قائمة",
@@ -60,20 +62,24 @@
     "action_goal": "حدد هدفًا جديدًا",
     "action_post": "شارك منشورًا",
     "empty": "لا توجد أنشطة حديثة",
-    "check_feed": "تحقق من الخلاصة"
+    "check_feed": "تحقق من الخلاصة",
+    "empty_description": "ستظهر تحديثات المجتمع هنا بمجرد أن يبدأ الأشخاص في النشر."
   },
   "suggestions": {
-    "empty": "لا توجد اقتراحات بعد"
+    "empty": "لا توجد اقتراحات بعد",
+    "empty_description": "تتحسن المطابقة كلما تمت إضافة المزيد من الإعلانات وتفاصيل الملف الشخصي."
   },
   "groups": {
     "members_count": "{{count}} أعضاء",
     "empty": "لم تنضم إلى أي مجموعات بعد",
-    "discover": "اكتشف المجموعات"
+    "discover": "اكتشف المجموعات",
+    "empty_description": "تساعدك المجموعات على متابعة الاهتمامات المشتركة والمشاريع والدوائر المحلية."
   },
   "events": {
     "online_event": "حدث عبر الإنترنت",
     "empty": "لا توجد أحداث قادمة",
-    "browse": "تصفح الأحداث"
+    "browse": "تصفح الأحداث",
+    "empty_description": "ستظهر فعاليات مجتمعك هنا عند جدولتها."
   },
   "gamification": {
     "level": "المستوى {{level}}",
@@ -82,7 +88,8 @@
     "xp_progress": "تقدم XP",
     "start_earning": "ابدأ في كسب XP من خلال المشاركة في المجتمع!",
     "streak_days_one": "{{count}} يوم",
-    "streak_days_other": "{{count}} أيام"
+    "streak_days_other": "{{count}} أيام",
+    "xp_value": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "جارٍ تحميل القوائم",
@@ -92,7 +99,15 @@
     "loading_progress": "جارٍ تحميل التقدم",
     "loading_suggestions": "جارٍ تحميل الاقتراحات",
     "loading_endorsements": "جارٍ تحميل التوصيات",
-    "loading_pending_reviews": "جارٍ تحميل المراجعات المعلقة"
+    "loading_pending_reviews": "جارٍ تحميل المراجعات المعلقة",
+    "view_all_listings": "عرض جميع الإعلانات",
+    "view_all_activity": "عرض جميع الأنشطة الأخيرة",
+    "view_all_events": "عرض جميع الفعاليات",
+    "view_all_groups": "عرض جميع المجموعات",
+    "view_achievements": "عرض الإنجازات",
+    "browse_all_listings": "تصفح جميع الإعلانات",
+    "view_all_endorsements": "عرض جميع التزكيات",
+    "view_pending_reviews": "عرض جميع التقييمات المعلقة"
   },
   "reviews": {
     "sent": "أرسل {{amount}} ساعة",
@@ -100,7 +115,8 @@
     "review": "Review",
     "none_pending": "لا توجد مراجعات معلقة",
     "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending"
+    "view_all_pending": "View All Pending",
+    "none_pending_description": "ستظهر هنا التبادلات المكتملة التي تحتاج إلى تقييم."
   },
   "fallback_name": "there",
   "common": {

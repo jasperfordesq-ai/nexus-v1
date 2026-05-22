@@ -101,7 +101,28 @@
     "view_all_series": "View all {{count}} events in series",
     "no_other_series_events": "No other events found in this series.",
     "remote_attendance_available": "Remote attendance available",
-    "join_meeting": "Join Meeting"
+    "join_meeting": "Join Meeting",
+    "community_member": "عضو في المجتمع",
+    "capacity_label": "السعة",
+    "waitlist_label": "قائمة الانتظار",
+    "attendance_total": "{{count}} رد",
+    "no_attendees_title": "لا يوجد حاضرون بعد",
+    "no_checkin_attendees_title": "لا توجد عمليات تسجيل دخول بعد",
+    "rsvp_panel_title": "رد على هذه الفعالية",
+    "rsvp_panel_desc": "أخبر المنظم ما إذا كنت تخطط للحضور.",
+    "rsvp_going_aria": "وضع علامة أنك ستحضر",
+    "rsvp_interested_aria": "وضع علامة أنك مهتم",
+    "rsvp_not_going_aria": "وضع علامة أنك لن تحضر",
+    "share_aria": "نسخ رابط {{title}}",
+    "event_link_aria": "فتح رابط فعالية {{title}}",
+    "meta_description_fallback": "{{title}} هي فعالية مجتمعية في {{date}} مع {{organizer}} في {{location}}.",
+    "edit_event_aria": "تعديل {{title}}",
+    "cancel_event_aria": "إلغاء {{title}}",
+    "delete_event_aria": "حذف {{title}}",
+    "on_waitlist_position": "في قائمة الانتظار (#{{position}})",
+    "join_meeting_aria": "الانضمام إلى اجتماع {{title}}",
+    "join_waitlist_aria": "الانضمام إلى قائمة انتظار هذه الفعالية",
+    "leave_waitlist_aria": "مغادرة قائمة انتظار هذه الفعالية"
   },
   "card": {
     "cancelled": "Cancelled",
@@ -270,5 +291,9 @@
   "active_filters": "Active filters",
   "active_search": "Search: {{query}}",
   "active_near_me": "Within {{radius}} km",
-  "clear_filters": "Clear filters"
+  "clear_filters": "Clear filters",
+  "hero_events_label": "الفعاليات",
+  "empty_tip_workshops": "ورش عمل",
+  "empty_tip_social": "لقاءات اجتماعية",
+  "empty_tip_online": "جلسات عبر الإنترنت"
 }

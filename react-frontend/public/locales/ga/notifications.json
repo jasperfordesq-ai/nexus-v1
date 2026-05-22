@@ -70,9 +70,31 @@
     "toast_vol_hours_approved": "Uaireanta Ceadaithe",
     "toast_vol_hours_declined": "Uaireanta Diúltaithe",
     "toast_vol_opportunity_closed": "Deis Dúnta",
-    "toast_default": "Fógra"
+    "toast_default": "Fógra",
+    "toast_safeguarding_flag": "Foláireamh Cosanta",
+    "toast_safeguarding_assignment": "Sannadh Cosanta",
+    "toast_job_application_status": "Nuashonrú Iarratais",
+    "toast_job_application": "Iarratas Poist",
+    "toast_job_interview_proposed": "Agallamh Iarrtha",
+    "toast_job_interview_accepted": "Agallamh Glactha",
+    "toast_job_interview_declined": "Agallamh Diúltaithe",
+    "toast_job_interview_cancelled": "Agallamh Curtha ar Ceal",
+    "toast_job_offer_received": "Tairiscint Phoist Faighte!",
+    "toast_job_offer_accepted": "Tairiscint Glactha",
+    "toast_job_offer_rejected": "Tairiscint Diúltaithe",
+    "toast_job_offer_withdrawn": "Tairiscint Tarraingthe Siar",
+    "toast_job_alert_match": "Meaitseáil Phoist Nua",
+    "toast_job_interview_reminder": "Meabhrúchán Agallaimh",
+    "toast_job_completion_credits": "Creidmheasanna Ama Tuillte!"
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "caught_up_badge": "Cothrom le dáta",
+  "settings_label": "Socruithe",
+  "mark_group_read_aria": "Marcáil grúpa mar léite",
+  "expand_group": "Leathnaigh",
+  "collapse_group": "Laghdaigh",
+  "notifications_count": "fógraí",
+  "and_others": "agus {{count}} eile"
 }

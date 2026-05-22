@@ -101,7 +101,28 @@
     "view_all_series": "View all {{count}} events in series",
     "no_other_series_events": "No other events found in this series.",
     "remote_attendance_available": "Remote attendance available",
-    "join_meeting": "Join Meeting"
+    "join_meeting": "Join Meeting",
+    "community_member": "コミュニティメンバー",
+    "capacity_label": "定員",
+    "waitlist_label": "キャンセル待ち",
+    "attendance_total": "{{count}} 件の返信",
+    "no_attendees_title": "まだ参加者はいません",
+    "no_checkin_attendees_title": "まだチェックインはありません",
+    "rsvp_panel_title": "このイベントに出欠を回答",
+    "rsvp_panel_desc": "主催者に参加の予定をお知らせください。",
+    "rsvp_going_aria": "参加するとマーク",
+    "rsvp_interested_aria": "興味ありとマーク",
+    "rsvp_not_going_aria": "不参加とマーク",
+    "share_aria": "{{title}} のリンクをコピー",
+    "event_link_aria": "{{title}} のイベントリンクを開く",
+    "meta_description_fallback": "{{title}} は {{date}} に {{organizer}} が {{location}} で開催するコミュニティイベントです。",
+    "edit_event_aria": "{{title}} を編集",
+    "cancel_event_aria": "{{title}} をキャンセル",
+    "delete_event_aria": "{{title}} を削除",
+    "on_waitlist_position": "キャンセル待ち (#{{position}})",
+    "join_meeting_aria": "{{title}} のミーティングに参加",
+    "join_waitlist_aria": "このイベントのキャンセル待ちに参加",
+    "leave_waitlist_aria": "このイベントのキャンセル待ちから外れる"
   },
   "card": {
     "cancelled": "Cancelled",
@@ -270,5 +291,9 @@
   "active_filters": "Active filters",
   "active_search": "Search: {{query}}",
   "active_near_me": "Within {{radius}} km",
-  "clear_filters": "Clear filters"
+  "clear_filters": "Clear filters",
+  "hero_events_label": "イベント",
+  "empty_tip_workshops": "ワークショップ",
+  "empty_tip_social": "親睦会",
+  "empty_tip_online": "オンラインセッション"
 }

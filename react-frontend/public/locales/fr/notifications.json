@@ -70,9 +70,31 @@
     "toast_vol_hours_approved": "Heures approuvées",
     "toast_vol_hours_declined": "Heures refusées",
     "toast_vol_opportunity_closed": "Opportunité fermée",
-    "toast_default": "Notification"
+    "toast_default": "Notification",
+    "toast_safeguarding_flag": "Alerte de protection",
+    "toast_safeguarding_assignment": "Attribution de protection",
+    "toast_job_application_status": "Mise à jour de candidature",
+    "toast_job_application": "Candidature d'emploi",
+    "toast_job_interview_proposed": "Entretien demandé",
+    "toast_job_interview_accepted": "Entretien accepté",
+    "toast_job_interview_declined": "Entretien refusé",
+    "toast_job_interview_cancelled": "Entretien annulé",
+    "toast_job_offer_received": "Offre d'emploi reçue !",
+    "toast_job_offer_accepted": "Offre acceptée",
+    "toast_job_offer_rejected": "Offre refusée",
+    "toast_job_offer_withdrawn": "Offre retirée",
+    "toast_job_alert_match": "Nouvelle correspondance d'emploi",
+    "toast_job_interview_reminder": "Rappel d'entretien",
+    "toast_job_completion_credits": "Crédits temps gagnés !"
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "caught_up_badge": "Tout est à jour",
+  "settings_label": "Paramètres",
+  "mark_group_read_aria": "Marquer le groupe comme lu",
+  "expand_group": "Développer",
+  "collapse_group": "Réduire",
+  "notifications_count": "notifications",
+  "and_others": "et {{count}} autres"
 }

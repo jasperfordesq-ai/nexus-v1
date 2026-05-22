@@ -39,7 +39,10 @@
     "waiting": "Waiting for verification result...",
     "cancel_start_over": "Cancel & Start Over",
     "error_save_dob": "Failed to save date of birth. Please try again.",
-    "error_create_payment": "Failed to create payment. Please try again."
+    "error_create_payment": "Failed to create payment. Please try again.",
+    "error_check_status": "Ní féidir stádas an fhíoraithe a sheiceáil. Bain triail eile as.",
+    "error_missing_dob": "Iontráil do dháta breithe.",
+    "error_start_verification": "Ní féidir an fíorú a thosú. Bain triail eile as ar ball."
   },
   "identity_verified_lock_dob": "Your date of birth is locked because your identity has been verified.",
   "marketing_consent_confirm_title": "Subscribe to Marketing Emails",
@@ -217,7 +220,10 @@
     "hot_match_alerts": "Foláirimh Meaitseanna Teo",
     "mutual_match_alerts": "Foláirimh Meaitseanna Cómhalartacha",
     "enable_push": "Cumasaigh Brúfhógraí",
-    "marketing_emails": "Ríomhphoist Margaíochta"
+    "marketing_emails": "Ríomhphoist Margaíochta",
+    "caring_smart_nudges": "Spreagthaí cliste an phobail chúramaigh",
+    "federation_notifications": "Fógraí cónaidhme trasardáin",
+    "activity_digest": "Minicíocht achoimre gníomhaíochta"
   },
   "privacy_prefs": {
     "profile_visibility": "Cé a fheiceann do phróifíl",
@@ -284,7 +290,10 @@
   },
   "header": {
     "title": "Socruithe",
-    "subtitle": "Bainistigh do roghanna cuntais"
+    "subtitle": "Bainistigh do roghanna cuntais",
+    "badge": "Rialuithe an chuntais",
+    "unsaved_badge": "Athruithe gan sábháil",
+    "current_section": "An chuid reatha"
   },
   "save_changes": "Sábháil Athruithe",
   "save_preferences": "Sábháil Roghanna",
@@ -316,7 +325,10 @@
     "hot_match_alerts": "Faigh fógra faoi mheaitseanna ardchomhoiriúnachta",
     "mutual_match_alerts": "Faigh fógra nuair a mheaitseálann duine a mheaitseáil tú leo tusa freisin",
     "enable_push": "Faigh fógraí fíor-ama ar do ghléas",
-    "marketing_emails": "Faigh nuachtlitreacha, arduithe, agus nuashonruithe pobail"
+    "marketing_emails": "Faigh nuachtlitreacha, arduithe, agus nuashonruithe pobail",
+    "caring_smart_nudges": "Meabhrúcháin phearsantaithe chun seiceáil isteach ar bhaill a d'fhéadfadh tacaíocht a theastáil uathu. Ní sheoltar iad ach amháin nuair a aithníonn ár n-inneall pobail chúramaigh spreagadh soiléir, indéanta.",
+    "federation_notifications": "Fógraí faoi ghníomhaíocht ó bhaill ar bhainc ama chomhpháirtíochta, lena n-áirítear léirmheasanna, iarratais cheangail, agus nuashonruithe eile trasphobail.",
+    "activity_digest": "Cé chomh minic a sheolfaimid achoimre ríomhphoist chugat ar an ngníomhaíocht i do ghrúpaí agus i do shnáitheanna. Seoltar teachtaireachtaí díreacha, iarratais cheangail agus deimhnithe idirbhirt láithreach i gcónaí."
   },
   "match_digest": {
     "frequency": "Minicíocht Achoimre",
@@ -324,7 +336,8 @@
     "daily": "Laethúil",
     "weekly": "Seachtainiúil",
     "fortnightly": "Coicísiúil",
-    "never": "Riamh"
+    "never": "Riamh",
+    "monthly": "Míosúil"
   },
   "privacy_sections": {
     "title": "Socruithe Príobháideachais",
@@ -556,7 +569,10 @@
     "unblocked_desc": "{{name}} has been unblocked.",
     "unblock_error": "Failed to unblock user",
     "blocked_on": "Blocked on {{date}}",
-    "link": "Blocked Users"
+    "link": "Blocked Users",
+    "privacy_badge": "Rialú príobháideachais",
+    "summary_label": "Baill bhactha",
+    "count": "{{count}} bactha"
   },
   "block_user": {
     "title": "Block {{name}}?",
@@ -586,5 +602,11 @@
     "unsupported": "Your browser does not support push notifications.",
     "denied": "You have blocked notifications. Update your browser settings to re-enable.",
     "subscribed": "You are subscribed on this device."
+  },
+  "activity_digest": {
+    "off": "As",
+    "instant": "Láithreach",
+    "daily": "Laethúil",
+    "monthly": "Míosúil"
   }
 }

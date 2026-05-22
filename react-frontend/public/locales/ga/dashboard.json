@@ -17,7 +17,8 @@
     "balance": "Iarmhéid",
     "active_listings": "Liostaí Gníomhacha",
     "messages": "Teachtaireachtaí",
-    "pending": "Ar feitheamh"
+    "pending": "Ar feitheamh",
+    "hours_value": "{{value}} u"
   },
   "sections": {
     "recent_listings": "Liostaí le Déanaí",
@@ -51,7 +52,8 @@
     "request": "Iarratas",
     "empty": "Gan liostaí le déanaí",
     "create_first": "Cruthaigh do chéad liosta",
-    "user_fallback": "User"
+    "user_fallback": "User",
+    "empty_description": "Cruthaigh iarratas nó tairiscint chun tús a chur le meaitseáil le daoine in aice leat."
   },
   "activity": {
     "action_listing": "roinnt liosta",
@@ -60,20 +62,24 @@
     "action_goal": "leag sprioc nua síos",
     "action_post": "roinnt postáil",
     "empty": "Gan gníomhaíocht le déanaí",
-    "check_feed": "Féach ar an sruth"
+    "check_feed": "Féach ar an sruth",
+    "empty_description": "Taispeánfar nuashonruithe an phobail anseo nuair a thosaíonn daoine ag postáil."
   },
   "suggestions": {
-    "empty": "Gan moltaí fós"
+    "empty": "Gan moltaí fós",
+    "empty_description": "Feabhsaíonn an mheaitseáil de réir mar a chuirtear níos mó liostaí agus sonraí próifíle leis."
   },
   "groups": {
     "members_count": "{{count}} comhalta",
     "empty": "Níl tú páirteach in aon ghrúpa fós",
-    "discover": "Faigh grúpaí"
+    "discover": "Faigh grúpaí",
+    "empty_description": "Cuidíonn grúpaí leat leanúint le suimeanna comhroinnte, tionscadail, agus ciorcail áitiúla."
   },
   "events": {
     "online_event": "Imeacht ar líne",
     "empty": "Gan imeachtaí atá le teacht",
-    "browse": "Brabhsáil imeachtaí"
+    "browse": "Brabhsáil imeachtaí",
+    "empty_description": "Taispeánfar imeachtaí ó do phobal anseo nuair a sceidealtar iad."
   },
   "gamification": {
     "level": "Leibhéal {{level}}",
@@ -82,7 +88,8 @@
     "xp_progress": "Dul Chun Cinn XP",
     "start_earning": "Tosaigh ag tuilleamh XP trí bheith rannpháirteach sa phobal!",
     "streak_days_one": "{{count}} la",
-    "streak_days_other": "{{count}} la"
+    "streak_days_other": "{{count}} la",
+    "xp_value": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "Liostaí á luchtú",
@@ -92,7 +99,15 @@
     "loading_progress": "Dul chun cinn á luchtú",
     "loading_suggestions": "Moltaí á luchtú",
     "loading_endorsements": "Formhuinithí á luchtú",
-    "loading_pending_reviews": "Léirmheasanna ar feitheamh á luchtú"
+    "loading_pending_reviews": "Léirmheasanna ar feitheamh á luchtú",
+    "view_all_listings": "Féach ar na liostaí go léir",
+    "view_all_activity": "Féach ar an ngníomhaíocht is déanaí ar fad",
+    "view_all_events": "Féach ar na himeachtaí go léir",
+    "view_all_groups": "Féach ar na grúpaí go léir",
+    "view_achievements": "Féach ar na héachtaí",
+    "browse_all_listings": "Brabhsáil na liostaí go léir",
+    "view_all_endorsements": "Féach ar na formhuinithe go léir",
+    "view_pending_reviews": "Féach ar na hathbhreithnithe ar feitheamh ar fad"
   },
   "reviews": {
     "sent": "Seolta {{amount}}u",
@@ -100,7 +115,8 @@
     "review": "Léirmheas",
     "none_pending": "Gan léirmheasanna ar feitheamh",
     "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending"
+    "view_all_pending": "View All Pending",
+    "none_pending_description": "Taispeánfar malartuithe críochnaithe a bhfuil aiseolas de dhíth orthu anseo."
   },
   "fallback_name": "there",
   "common": {

@@ -17,7 +17,8 @@
     "balance": "Saldo",
     "active_listings": "Annunci Attivi",
     "messages": "Messaggi",
-    "pending": "In Attesa"
+    "pending": "In Attesa",
+    "hours_value": "{{value}} h"
   },
   "sections": {
     "recent_listings": "Annunci Recenti",
@@ -51,7 +52,8 @@
     "request": "Richiesta",
     "empty": "Nessun annuncio recente",
     "create_first": "Crei il Suo primo annuncio",
-    "user_fallback": "User"
+    "user_fallback": "User",
+    "empty_description": "Crea una richiesta o un'offerta per iniziare a trovare corrispondenze con persone vicine."
   },
   "activity": {
     "action_listing": "ha condiviso un annuncio",
@@ -60,20 +62,24 @@
     "action_goal": "ha fissato un nuovo obiettivo",
     "action_post": "ha condiviso un post",
     "empty": "Nessuna attività recente",
-    "check_feed": "Consulti il Feed"
+    "check_feed": "Consulti il Feed",
+    "empty_description": "Gli aggiornamenti della community appariranno qui quando le persone inizieranno a pubblicare."
   },
   "suggestions": {
-    "empty": "Ancora nessun suggerimento"
+    "empty": "Ancora nessun suggerimento",
+    "empty_description": "Le corrispondenze migliorano man mano che vengono aggiunti più annunci e dettagli del profilo."
   },
   "groups": {
     "members_count": "{{count}} membri",
     "empty": "Non ha ancora aderito a nessun gruppo",
-    "discover": "Scopri i gruppi"
+    "discover": "Scopri i gruppi",
+    "empty_description": "I gruppi ti aiutano a seguire interessi condivisi, progetti e cerchie locali."
   },
   "events": {
     "online_event": "Evento online",
     "empty": "Nessun evento in programma",
-    "browse": "Sfoglia eventi"
+    "browse": "Sfoglia eventi",
+    "empty_description": "Gli eventi della tua community appariranno qui quando saranno programmati."
   },
   "gamification": {
     "level": "Livello {{level}}",
@@ -82,7 +88,8 @@
     "xp_progress": "Progresso XP",
     "start_earning": "Inizi a guadagnare XP partecipando alla comunità!",
     "streak_days_one": "{{count}} giorno",
-    "streak_days_other": "{{count}} giorni"
+    "streak_days_other": "{{count}} giorni",
+    "xp_value": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "Caricamento annunci",
@@ -92,7 +99,15 @@
     "loading_progress": "Caricamento progressi",
     "loading_suggestions": "Caricamento suggerimenti",
     "loading_endorsements": "Caricamento raccomandazioni",
-    "loading_pending_reviews": "Caricamento recensioni in sospeso"
+    "loading_pending_reviews": "Caricamento recensioni in sospeso",
+    "view_all_listings": "Vedi tutti gli annunci",
+    "view_all_activity": "Vedi tutta l'attività recente",
+    "view_all_events": "Vedi tutti gli eventi",
+    "view_all_groups": "Vedi tutti i gruppi",
+    "view_achievements": "Vedi i traguardi",
+    "browse_all_listings": "Sfoglia tutti gli annunci",
+    "view_all_endorsements": "Vedi tutte le segnalazioni",
+    "view_pending_reviews": "Vedi tutte le recensioni in attesa"
   },
   "reviews": {
     "sent": "Inviato {{amount}}h",
@@ -100,7 +115,8 @@
     "review": "Recensione",
     "none_pending": "Nessuna recensione in sospeso",
     "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending"
+    "view_all_pending": "View All Pending",
+    "none_pending_description": "Gli scambi completati che necessitano di un riscontro appariranno qui."
   },
   "fallback_name": "there",
   "common": {

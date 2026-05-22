@@ -17,7 +17,8 @@
     "balance": "Solde",
     "active_listings": "Annonces actives",
     "messages": "Messages",
-    "pending": "En attente"
+    "pending": "En attente",
+    "hours_value": "{{value}} h"
   },
   "sections": {
     "recent_listings": "Annonces récentes",
@@ -51,7 +52,8 @@
     "request": "Demande",
     "empty": "Aucune annonce récente",
     "create_first": "Créez votre première annonce",
-    "user_fallback": "User"
+    "user_fallback": "User",
+    "empty_description": "Créez une demande ou une offre pour commencer à trouver des correspondances avec des personnes près de chez vous."
   },
   "activity": {
     "action_listing": "a partagé une annonce",
@@ -60,20 +62,24 @@
     "action_goal": "a défini un nouvel objectif",
     "action_post": "a partagé une publication",
     "empty": "Aucune activité récente",
-    "check_feed": "Consultez le fil d'actualité"
+    "check_feed": "Consultez le fil d'actualité",
+    "empty_description": "Les actualités de la communauté apparaîtront ici dès que les membres commenceront à publier."
   },
   "suggestions": {
-    "empty": "Aucune suggestion pour l'instant"
+    "empty": "Aucune suggestion pour l'instant",
+    "empty_description": "Les correspondances s'améliorent à mesure que davantage d'annonces et de détails de profil sont ajoutés."
   },
   "groups": {
     "members_count": "{{count}} membres",
     "empty": "Vous n'avez rejoint aucun groupe",
-    "discover": "Découvrir des groupes"
+    "discover": "Découvrir des groupes",
+    "empty_description": "Les groupes vous aident à suivre des centres d'intérêt communs, des projets et des cercles locaux."
   },
   "events": {
     "online_event": "Événement en ligne",
     "empty": "Aucun événement à venir",
-    "browse": "Parcourir les événements"
+    "browse": "Parcourir les événements",
+    "empty_description": "Les événements de votre communauté apparaîtront ici lorsqu'ils seront programmés."
   },
   "gamification": {
     "level": "Niveau {{level}}",
@@ -82,7 +88,8 @@
     "xp_progress": "Progression XP",
     "start_earning": "Commencez à gagner des XP en participant à la communauté !",
     "streak_days_one": "{{count}} jour",
-    "streak_days_other": "{{count}} jours"
+    "streak_days_other": "{{count}} jours",
+    "xp_value": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "Chargement des annonces",
@@ -92,7 +99,15 @@
     "loading_progress": "Chargement de la progression",
     "loading_suggestions": "Chargement des suggestions",
     "loading_endorsements": "Chargement des recommandations",
-    "loading_pending_reviews": "Chargement des avis en attente"
+    "loading_pending_reviews": "Chargement des avis en attente",
+    "view_all_listings": "Voir toutes les annonces",
+    "view_all_activity": "Voir toute l'activité récente",
+    "view_all_events": "Voir tous les événements",
+    "view_all_groups": "Voir tous les groupes",
+    "view_achievements": "Voir les réussites",
+    "browse_all_listings": "Parcourir toutes les annonces",
+    "view_all_endorsements": "Voir toutes les recommandations",
+    "view_pending_reviews": "Voir tous les avis en attente"
   },
   "reviews": {
     "sent": "Envoyé {{amount}}h",
@@ -100,7 +115,8 @@
     "review": "Évaluation",
     "none_pending": "Aucun avis en attente",
     "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending"
+    "view_all_pending": "View All Pending",
+    "none_pending_description": "Les échanges terminés qui nécessitent un retour apparaîtront ici."
   },
   "fallback_name": "there",
   "common": {

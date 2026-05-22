@@ -101,7 +101,28 @@
     "view_all_series": "Féach ar gach {{count}} imeacht sa tsraith",
     "no_other_series_events": "Níor aimsíodh aon imeachtaí eile sa tsraith seo.",
     "remote_attendance_available": "Freastal cianda ar fáil",
-    "join_meeting": "Bí páirteach sa chruinniú"
+    "join_meeting": "Bí páirteach sa chruinniú",
+    "community_member": "Ball den Phobal",
+    "capacity_label": "Cumas",
+    "waitlist_label": "Liosta feithimh",
+    "attendance_total": "{{count}} freagra",
+    "no_attendees_title": "Níl aon rannpháirtithe go fóill",
+    "no_checkin_attendees_title": "Níl aon seiceáil isteach go fóill",
+    "rsvp_panel_title": "Freagair don imeacht seo",
+    "rsvp_panel_desc": "Cuir in iúl don eagraitheoir an bhfuil tú ag dul ann.",
+    "rsvp_going_aria": "Marcáil go bhfuil tú ag dul ann",
+    "rsvp_interested_aria": "Marcáil go bhfuil suim agat ann",
+    "rsvp_not_going_aria": "Marcáil nach bhfuil tú ag dul ann",
+    "share_aria": "Cóipeáil nasc chuig {{title}}",
+    "event_link_aria": "Oscail nasc imeachta do {{title}}",
+    "meta_description_fallback": "Is imeacht pobail é {{title}} ar {{date}} le {{organizer}} ag {{location}}.",
+    "edit_event_aria": "Cuir {{title}} in eagar",
+    "cancel_event_aria": "Cuir {{title}} ar ceal",
+    "delete_event_aria": "Scrios {{title}}",
+    "on_waitlist_position": "Ar an liosta feithimh (#{{position}})",
+    "join_meeting_aria": "Glac páirt sa chruinniú do {{title}}",
+    "join_waitlist_aria": "Téigh ar liosta feithimh an imeachta seo",
+    "leave_waitlist_aria": "Fág liosta feithimh an imeachta seo"
   },
   "card": {
     "cancelled": "Cealaithe",
@@ -270,5 +291,9 @@
   "active_filters": "Active filters",
   "active_search": "Search: {{query}}",
   "active_near_me": "Within {{radius}} km",
-  "clear_filters": "Clear filters"
+  "clear_filters": "Clear filters",
+  "hero_events_label": "Imeachtaí",
+  "empty_tip_workshops": "Ceardlanna",
+  "empty_tip_social": "Tionóil shóisialta",
+  "empty_tip_online": "Seisiúin ar líne"
 }

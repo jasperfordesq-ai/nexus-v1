@@ -104,7 +104,28 @@
     "view_all_series": "Voir les {{count}} événements de la série",
     "no_other_series_events": "Aucun autre événement trouvé dans cette série.",
     "remote_attendance_available": "Participation à distance disponible",
-    "join_meeting": "Rejoindre la réunion"
+    "join_meeting": "Rejoindre la réunion",
+    "community_member": "Membre de la communauté",
+    "capacity_label": "Capacité",
+    "waitlist_label": "Liste d'attente",
+    "attendance_total": "{{count}} réponses",
+    "no_attendees_title": "Aucun participant pour le moment",
+    "no_checkin_attendees_title": "Aucune arrivée enregistrée",
+    "rsvp_panel_title": "Confirmez votre présence à cet événement",
+    "rsvp_panel_desc": "Indiquez à l'organisateur si vous comptez participer.",
+    "rsvp_going_aria": "Indiquer que vous y allez",
+    "rsvp_interested_aria": "Indiquer que vous êtes intéressé",
+    "rsvp_not_going_aria": "Indiquer que vous n'y allez pas",
+    "share_aria": "Copier le lien vers {{title}}",
+    "event_link_aria": "Ouvrir le lien de l'événement {{title}}",
+    "meta_description_fallback": "{{title}} est un événement communautaire le {{date}} avec {{organizer}} à {{location}}.",
+    "edit_event_aria": "Modifier {{title}}",
+    "cancel_event_aria": "Annuler {{title}}",
+    "delete_event_aria": "Supprimer {{title}}",
+    "on_waitlist_position": "Sur liste d'attente (n°{{position}})",
+    "join_meeting_aria": "Rejoindre la réunion pour {{title}}",
+    "join_waitlist_aria": "Rejoindre la liste d'attente de cet événement",
+    "leave_waitlist_aria": "Quitter la liste d'attente de cet événement"
   },
   "card": {
     "cancelled": "Annulé",
@@ -270,5 +291,9 @@
   "active_filters": "Active filters",
   "active_search": "Search: {{query}}",
   "active_near_me": "Within {{radius}} km",
-  "clear_filters": "Clear filters"
+  "clear_filters": "Clear filters",
+  "hero_events_label": "Événements",
+  "empty_tip_workshops": "Ateliers",
+  "empty_tip_social": "Rencontres conviviales",
+  "empty_tip_online": "Sessions en ligne"
 }

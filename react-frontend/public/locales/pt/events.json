@@ -104,7 +104,28 @@
     "view_all_series": "Ver todos os {{count}} eventos da série",
     "no_other_series_events": "Nenhum outro evento encontrado nesta série.",
     "remote_attendance_available": "Participação remota disponível",
-    "join_meeting": "Entrar na reunião"
+    "join_meeting": "Entrar na reunião",
+    "community_member": "Membro da comunidade",
+    "capacity_label": "Lotação",
+    "waitlist_label": "Lista de espera",
+    "attendance_total": "{{count}} respostas",
+    "no_attendees_title": "Ainda sem participantes",
+    "no_checkin_attendees_title": "Ainda sem check-ins",
+    "rsvp_panel_title": "Confirma a presença neste evento",
+    "rsvp_panel_desc": "Diz ao organizador se pretendes participar.",
+    "rsvp_going_aria": "Marcar como vou participar",
+    "rsvp_interested_aria": "Marcar como interessado",
+    "rsvp_not_going_aria": "Marcar como não vou participar",
+    "share_aria": "Copiar ligação para {{title}}",
+    "event_link_aria": "Abrir ligação do evento {{title}}",
+    "meta_description_fallback": "{{title}} é um evento comunitário em {{date}} com {{organizer}} em {{location}}.",
+    "edit_event_aria": "Editar {{title}}",
+    "cancel_event_aria": "Cancelar {{title}}",
+    "delete_event_aria": "Eliminar {{title}}",
+    "on_waitlist_position": "Em lista de espera (#{{position}})",
+    "join_meeting_aria": "Entrar na reunião de {{title}}",
+    "join_waitlist_aria": "Entrar na lista de espera deste evento",
+    "leave_waitlist_aria": "Sair da lista de espera deste evento"
   },
   "card": {
     "cancelled": "Cancelado",
@@ -270,5 +291,9 @@
   "active_filters": "Active filters",
   "active_search": "Search: {{query}}",
   "active_near_me": "Within {{radius}} km",
-  "clear_filters": "Clear filters"
+  "clear_filters": "Clear filters",
+  "hero_events_label": "Eventos",
+  "empty_tip_workshops": "Workshops",
+  "empty_tip_social": "Encontros sociais",
+  "empty_tip_online": "Sessões online"
 }

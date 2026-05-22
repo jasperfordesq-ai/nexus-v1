@@ -70,9 +70,31 @@
     "toast_vol_hours_approved": "الساعات المعتمدة",
     "toast_vol_hours_declined": "الساعات المرفوضة",
     "toast_vol_opportunity_closed": "تم إغلاق الفرصة",
-    "toast_default": "Notification"
+    "toast_default": "Notification",
+    "toast_safeguarding_flag": "تنبيه حماية",
+    "toast_safeguarding_assignment": "تعيين حماية",
+    "toast_job_application_status": "تحديث الطلب",
+    "toast_job_application": "طلب وظيفة",
+    "toast_job_interview_proposed": "طلب مقابلة",
+    "toast_job_interview_accepted": "تم قبول المقابلة",
+    "toast_job_interview_declined": "تم رفض المقابلة",
+    "toast_job_interview_cancelled": "تم إلغاء المقابلة",
+    "toast_job_offer_received": "تم استلام عرض عمل!",
+    "toast_job_offer_accepted": "تم قبول العرض",
+    "toast_job_offer_rejected": "تم رفض العرض",
+    "toast_job_offer_withdrawn": "تم سحب العرض",
+    "toast_job_alert_match": "تطابق وظيفي جديد",
+    "toast_job_interview_reminder": "تذكير بالمقابلة",
+    "toast_job_completion_credits": "تم كسب أرصدة وقت!"
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "caught_up_badge": "اطلعت على كل شيء",
+  "settings_label": "الإعدادات",
+  "mark_group_read_aria": "وضع علامة مقروء على المجموعة",
+  "expand_group": "توسيع",
+  "collapse_group": "طي",
+  "notifications_count": "إشعارات",
+  "and_others": "و{{count}} آخرين"
 }
