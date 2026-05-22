@@ -1,38 +1,38 @@
 {
   "2fa_enabled": {
-    "subject": "Foláireamh Slándála: Fíordheimhniú dhá fhachtóir cumasaithe - {{community}}",
-    "title": "Fíordheimhniú Dhá-Fachtóir Cumasaithe",
-    "preview": "Cumasaíodh fíordheimhniú dhá fhachtóir ar do chuntas",
-    "body": "Cumasaíodh fíordheimhniú dhá fhachtóir ar do chuntas. Tá do chuntas níos sláine anois.",
-    "warning": "Mura ndearna tú an t-athrú seo, déan teagmháil leis an bhfoireann tacaíochta láithreach chun do chuntas a dhéanamh slán."
+    "subject": "Foláireamh Slándála: Fíordheimhniú dhá chéim cumasaithe — {{community}}",
+    "title": "Fíordheimhniú Dhá Chéim Cumasaithe",
+    "preview": "Cumasaíodh an fíordheimhniú dhá chéim ar do chuntas",
+    "body": "Cumasaíodh an fíordheimhniú dhá chéim ar do chuntas. Tá do chuntas níos sábháilte anois.",
+    "warning": "Mura ndearna tú an athrú seo, déan teagmháil leis an tacaíocht láithreach bonn chun do chuntas a dhaingniú."
   },
   "2fa_disabled": {
-    "subject": "Foláireamh Slándála: Díchumasaíodh fíordheimhniú dhá-fhachtóir — {{community}}",
-    "title": "Fíordheimhniú Dhá-Fachtóir faoi Mhíchumas",
-    "preview": "Díchumasaíodh fíordheimhniú dhá-fhachtóir ar do chuntas",
-    "body": "Díchumasaíodh fíordheimhniú dhá-fhachtóir ar do chuntas.",
-    "warning": "Mura ndearna tú an t-athrú seo, téigh i dteagmháil leis an bhfoireann tacaíochta láithreach toisc go bhféadfadh do chuntas a bheith i mbaol."
+    "subject": "Foláireamh Slándála: Fíordheimhniú dhá chéim díchumasaithe — {{community}}",
+    "title": "Fíordheimhniú Dhá Chéim Díchumasaithe",
+    "preview": "Díchumasaíodh an fíordheimhniú dhá chéim ar do chuntas",
+    "body": "Díchumasaíodh an fíordheimhniú dhá chéim ar do chuntas.",
+    "warning": "Mura ndearna tú an athrú seo, déan teagmháil leis an tacaíocht láithreach bonn mar d'fhéadfadh do chuntas a bheith i mbaol."
   },
   "passkey_registered": {
-    "subject": "Foláireamh Slándála: Pasfhocal nua cláraithe - {{community}}",
-    "title": "Pasfhocal Nua Cláraithe",
-    "preview": "Cuireadh paseochair nua le do chuntas",
-    "body": "Cláraíodh eochair pas nua ar do chuntas {{community}}.",
-    "warning": "Murar chláraigh tú an pasfhocal seo, déan teagmháil leis an bhfoireann tacaíochta láithreach chun do chuntas a dhéanamh slán."
+    "subject": "Foláireamh Slándála: Eochair rochtana nua cláraithe — {{community}}",
+    "title": "Eochair Rochtana Nua Cláraithe",
+    "preview": "Cuireadh eochair rochtana nua le do chuntas",
+    "body": "Cláraíodh eochair rochtana nua ar do chuntas {{community}}.",
+    "warning": "Mura ndearna tú an eochair rochtana seo a chlárú, déan teagmháil leis an tacaíocht láithreach bonn chun do chuntas a dhaingniú."
   },
   "passkey_removed": {
-    "subject": "Foláireamh Slándála: Baineadh an pasfhocal — {{community}}",
-    "title": "Baineadh an Pasfhocal",
-    "preview": "Baineadh eochair pas de do chuntas",
-    "body": "Baineadh eochair pas de do chuntas {{community}}.",
-    "warning": "Mura ndearna tú an t-athrú seo, déan teagmháil leis an bhfoireann tacaíochta láithreach chun do chuntas a dhéanamh slán."
+    "subject": "Foláireamh Slándála: Eochair rochtana bainte — {{community}}",
+    "title": "Eochair Rochtana Bainte",
+    "preview": "Baineadh eochair rochtana de do chuntas",
+    "body": "Baineadh eochair rochtana de do chuntas {{community}}.",
+    "warning": "Mura ndearna tú an athrú seo, déan teagmháil leis an tacaíocht láithreach bonn chun do chuntas a dhaingniú."
   },
   "connection_declined": {
     "subject": "Níor glacadh le d'iarratas ceangail — {{community}}",
-    "title": "Nuashonrú Iarratas Ceangail",
-    "preview": "Níor glacadh le d'iarratas ar cheangail le {{name}}",
+    "title": "Nuashonrú ar Iarratas Ceangail",
+    "preview": "Níor glacadh le d'iarratas ceangail chuig {{name}}",
     "body": "Níor glacadh le d'iarratas ceangail chuig <strong>{{name}}</strong> ar {{community}} faoi láthair.",
-    "suggestion": "Ná bíodh dímholadh ort - tá go leor ball eile i do phobal le nascadh leo.",
-    "cta": "Faigh amach Baill"
+    "suggestion": "Ná bí míshásta — tá go leor comhaltaí eile i do phobal ar féidir leat nascadh leo.",
+    "cta": "Aimsigh Comhaltaí"
   }
 }

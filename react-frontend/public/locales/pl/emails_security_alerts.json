@@ -1,38 +1,38 @@
 {
   "2fa_enabled": {
-    "subject": "Alert bezpieczeństwa: włączone uwierzytelnianie dwuskładnikowe — {{community}}",
-    "title": "Włączono uwierzytelnianie dwuskładnikowe",
-    "preview": "Na Twoim koncie zostało włączone uwierzytelnianie dwuskładnikowe",
-    "body": "Na Twoim koncie zostało włączone uwierzytelnianie dwuskładnikowe. Twoje konto jest teraz bezpieczniejsze.",
-    "warning": "Jeśli nie dokonałeś tej zmiany, natychmiast skontaktuj się z pomocą techniczną, aby zabezpieczyć swoje konto."
+    "subject": "Alert bezpieczeństwa: Uwierzytelnianie dwuskładnikowe włączone — {{community}}",
+    "title": "Uwierzytelnianie dwuskładnikowe włączone",
+    "preview": "Uwierzytelnianie dwuskładnikowe zostało włączone na Twoim koncie",
+    "body": "Uwierzytelnianie dwuskładnikowe zostało włączone na Twoim koncie. Twoje konto jest teraz bezpieczniejsze.",
+    "warning": "Jeśli nie dokonałeś(-aś) tej zmiany, natychmiast skontaktuj się z pomocą techniczną, aby zabezpieczyć swoje konto."
   },
   "2fa_disabled": {
-    "subject": "Alert zabezpieczeń: wyłączone uwierzytelnianie dwuskładnikowe — {{community}}",
+    "subject": "Alert bezpieczeństwa: Uwierzytelnianie dwuskładnikowe wyłączone — {{community}}",
     "title": "Uwierzytelnianie dwuskładnikowe wyłączone",
     "preview": "Uwierzytelnianie dwuskładnikowe zostało wyłączone na Twoim koncie",
     "body": "Uwierzytelnianie dwuskładnikowe zostało wyłączone na Twoim koncie.",
-    "warning": "Jeśli nie dokonałeś tej zmiany, natychmiast skontaktuj się z pomocą techniczną, ponieważ Twoje konto może być zagrożone."
+    "warning": "Jeśli nie dokonałeś(-aś) tej zmiany, natychmiast skontaktuj się z pomocą techniczną, ponieważ Twoje konto może być zagrożone."
   },
   "passkey_registered": {
-    "subject": "Alert bezpieczeństwa: Zarejestrowano nowy klucz — {{community}}",
+    "subject": "Alert bezpieczeństwa: Zarejestrowano nowy klucz dostępu — {{community}}",
     "title": "Zarejestrowano nowy klucz dostępu",
     "preview": "Do Twojego konta dodano nowy klucz dostępu",
     "body": "Na Twoim koncie {{community}} zarejestrowano nowy klucz dostępu.",
-    "warning": "Jeśli nie zarejestrowałeś tego klucza, natychmiast skontaktuj się z pomocą techniczną, aby zabezpieczyć swoje konto."
+    "warning": "Jeśli nie zarejestrowałeś(-aś) tego klucza dostępu, natychmiast skontaktuj się z pomocą techniczną, aby zabezpieczyć swoje konto."
   },
   "passkey_removed": {
     "subject": "Alert bezpieczeństwa: Usunięto klucz dostępu — {{community}}",
-    "title": "Klucz dostępu został usunięty",
-    "preview": "Klucz dostępu został usunięty z Twojego konta",
-    "body": "Klucz dostępu został usunięty z Twojego konta {{community}}.",
-    "warning": "Jeśli nie dokonałeś tej zmiany, natychmiast skontaktuj się z pomocą techniczną, aby zabezpieczyć swoje konto."
+    "title": "Klucz dostępu usunięty",
+    "preview": "Z Twojego konta usunięto klucz dostępu",
+    "body": "Z Twojego konta {{community}} usunięto klucz dostępu.",
+    "warning": "Jeśli nie dokonałeś(-aś) tej zmiany, natychmiast skontaktuj się z pomocą techniczną, aby zabezpieczyć swoje konto."
   },
   "connection_declined": {
     "subject": "Twoja prośba o połączenie nie została zaakceptowana — {{community}}",
-    "title": "Aktualizacja żądania połączenia",
+    "title": "Aktualizacja prośby o połączenie",
     "preview": "Twoja prośba o połączenie z {{name}} nie została zaakceptowana",
-    "body": "Twoja prośba o połączenie z <strong>{{name}}</strong> na {{community}} nie została obecnie zaakceptowana.",
-    "suggestion": "Nie zniechęcaj się — w Twojej społeczności jest wielu innych członków, z którymi możesz nawiązać kontakt.",
+    "body": "Twoja prośba o połączenie z <strong>{{name}}</strong> na {{community}} nie została w tej chwili zaakceptowana.",
+    "suggestion": "Nie zniechęcaj się — w Twojej społeczności jest wielu innych członków, z którymi możesz się połączyć.",
     "cta": "Odkryj członków"
   }
 }

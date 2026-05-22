@@ -1,43 +1,43 @@
 {
   "new_idea": {
-    "subject": "Nuova idea presentata alla tua sfida: {{challenge}} — {{community}}",
+    "subject": "Nuova idea inviata alla tua sfida: {{challenge}} — {{community}}",
     "title": "Nuova idea inviata!",
     "preview": "{{submitter}} ha inviato un'idea alla tua sfida \"{{challenge}}\"",
     "body": "<strong>{{submitter}}</strong> ha inviato una nuova idea alla tua sfida <strong>\"{{challenge}}\"</strong>.",
-    "cta": "Visualizza l'idea"
+    "cta": "Visualizza idea"
   },
   "idea_commented": {
-    "subject": "Nuovo commento sulla tua idea: {{community}}",
+    "subject": "Nuovo commento sulla tua idea — {{community}}",
     "title": "Nuovo commento sulla tua idea",
     "preview": "{{commenter}} ha commentato la tua idea",
     "body": "<strong>{{commenter}}</strong> ha commentato la tua idea <strong>\"{{title}}\"</strong>.",
     "cta": "Visualizza commento"
   },
   "notifications": {
-    "submitted_subject": "La tua idea è stata inviata: {{community}}",
+    "submitted_subject": "La tua idea è stata inviata — {{community}}",
     "submitted_title": "Idea inviata!",
     "submitted_preview": "La tua idea \"{{title}}\" è stata inviata a {{challenge}}",
-    "submitted_body": "La tua idea <strong>\"{{title}}\"</strong> è stata inviata alla sfida <strong>\"{{challenge}}\"</strong>. La comunità ora può votare e commentare.",
+    "submitted_body": "La tua idea <strong>\"{{title}}\"</strong> è stata inviata alla sfida <strong>\"{{challenge}}\"</strong>. La community può ora votare e commentare.",
     "submitted_cta": "Visualizza la tua idea",
-    "voted_subject": "Qualcuno ha votato per la tua idea: {{community}}",
-    "voted_title": "Nuovo voto sulla tua idea",
-    "voted_preview": "{{voter}} ha votato la tua idea \"{{title}}\"",
-    "voted_body": "<strong>{{voter}}</strong> ha votato per la tua idea <strong>\"{{title}}\"</strong>. Mantieni lo slancio!",
+    "voted_subject": "Qualcuno ha votato per la tua idea — {{community}}",
+    "voted_title": "Nuovo voto per la tua idea",
+    "voted_preview": "{{voter}} ha votato per la tua idea \"{{title}}\"",
+    "voted_body": "<strong>{{voter}}</strong> ha votato per la tua idea <strong>\"{{title}}\"</strong>. Continua con questo slancio!",
     "voted_cta": "Visualizza la tua idea",
-    "commented_subject": "Nuovo commento sulla tua idea: {{community}}",
+    "commented_subject": "Nuovo commento sulla tua idea — {{community}}",
     "commented_title": "Nuovo commento sulla tua idea",
     "commented_preview": "{{commenter}} ha commentato la tua idea \"{{title}}\"",
     "commented_body": "<strong>{{commenter}}</strong> ha lasciato un commento sulla tua idea <strong>\"{{title}}\"</strong>.",
     "commented_cta": "Visualizza commento",
-    "status_subject": "Lo stato della tua idea è stato aggiornato: {{community}}",
-    "status_title": "Aggiornamento dello stato dell'idea",
+    "status_subject": "Lo stato della tua idea è stato aggiornato — {{community}}",
+    "status_title": "Aggiornamento stato idea",
     "status_preview": "La tua idea \"{{title}}\" è stata contrassegnata come {{status}}",
     "status_body": "La tua idea <strong>\"{{title}}\"</strong> è stata aggiornata allo stato: <strong>{{status}}</strong>.",
     "status_cta": "Visualizza la tua idea",
     "won_subject": "La tua idea è stata selezionata! — {{community}}",
     "won_title": "La tua idea ha vinto!",
     "won_preview": "Congratulazioni! La tua idea \"{{title}}\" è stata selezionata come vincitrice",
-    "won_body": "Congratulazioni! La tua idea <strong>\"{{title}}\"</strong> è stata selezionata come vincitrice. Ben fatto!",
+    "won_body": "Congratulazioni! La tua idea <strong>\"{{title}}\"</strong> è stata selezionata come vincitrice. Ottimo lavoro!",
     "won_cta": "Visualizza la tua idea"
   }
 }

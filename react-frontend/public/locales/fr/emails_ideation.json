@@ -1,9 +1,9 @@
 {
   "new_idea": {
-    "subject": "Nouvelle idée soumise à votre défi : {{challenge}} — {{community}}",
-    "title": "Nouvelle idée soumise !",
-    "preview": "{{submitter}} a soumis une idée pour votre défi \"{{challenge}}\"",
-    "body": "<strong>{{submitter}}</strong> a soumis une nouvelle idée pour votre défi <strong>\"{{challenge}}\"</strong>.",
+    "subject": "Nouvelle idée soumise à votre défi : {{challenge}} — {{community}}",
+    "title": "Nouvelle idée soumise !",
+    "preview": "{{submitter}} a soumis une idée à votre défi \"{{challenge}}\"",
+    "body": "<strong>{{submitter}}</strong> a soumis une nouvelle idée à votre défi <strong>\"{{challenge}}\"</strong>.",
     "cta": "Voir l'idée"
   },
   "idea_commented": {
@@ -11,33 +11,33 @@
     "title": "Nouveau commentaire sur votre idée",
     "preview": "{{commenter}} a commenté votre idée",
     "body": "<strong>{{commenter}}</strong> a commenté votre idée <strong>\"{{title}}\"</strong>.",
-    "cta": "Afficher le commentaire"
+    "cta": "Voir le commentaire"
   },
   "notifications": {
     "submitted_subject": "Votre idée a été soumise — {{community}}",
-    "submitted_title": "Idée soumise !",
+    "submitted_title": "Idée soumise !",
     "submitted_preview": "Votre idée \"{{title}}\" a été soumise à {{challenge}}",
-    "submitted_body": "Votre idée <strong>\"{{title}}\"</strong> a été soumise au défi <strong>\"{{challenge}}\"</strong>. La communauté peut désormais voter et commenter.",
-    "submitted_cta": "Visualisez votre idée",
+    "submitted_body": "Votre idée <strong>\"{{title}}\"</strong> a été soumise au défi <strong>\"{{challenge}}\"</strong>. La communauté peut maintenant voter et commenter.",
+    "submitted_cta": "Voir votre idée",
     "voted_subject": "Quelqu'un a voté pour votre idée — {{community}}",
-    "voted_title": "Nouveau vote sur votre idée",
+    "voted_title": "Nouveau vote pour votre idée",
     "voted_preview": "{{voter}} a voté pour votre idée \"{{title}}\"",
-    "voted_body": "<strong>{{voter}}</strong> a voté pour votre idée <strong>\"{{title}}\"</strong>. Continuez sur votre lancée !",
-    "voted_cta": "Visualisez votre idée",
+    "voted_body": "<strong>{{voter}}</strong> a voté pour votre idée <strong>\"{{title}}\"</strong>. Continuez sur cette lancée !",
+    "voted_cta": "Voir votre idée",
     "commented_subject": "Nouveau commentaire sur votre idée — {{community}}",
     "commented_title": "Nouveau commentaire sur votre idée",
     "commented_preview": "{{commenter}} a commenté votre idée \"{{title}}\"",
     "commented_body": "<strong>{{commenter}}</strong> a laissé un commentaire sur votre idée <strong>\"{{title}}\"</strong>.",
-    "commented_cta": "Afficher le commentaire",
+    "commented_cta": "Voir le commentaire",
     "status_subject": "Le statut de votre idée a été mis à jour — {{community}}",
     "status_title": "Mise à jour du statut de l'idée",
     "status_preview": "Votre idée \"{{title}}\" a été marquée comme {{status}}",
-    "status_body": "Votre idée <strong>\"{{title}}\"</strong> a été mise à jour avec le statut : <strong>{{status}}</strong>.",
-    "status_cta": "Visualisez votre idée",
-    "won_subject": "Votre idée a été sélectionnée ! -{{community}}",
-    "won_title": "Votre idée a gagné !",
-    "won_preview": "Félicitations! Votre idée \"{{title}}\" a été sélectionnée comme gagnante",
-    "won_body": "Félicitations! Votre idée <strong>\"{{title}}\"</strong> a été sélectionnée comme gagnante. Bien joué!",
-    "won_cta": "Visualisez votre idée"
+    "status_body": "Votre idée <strong>\"{{title}}\"</strong> a été mise à jour vers le statut : <strong>{{status}}</strong>.",
+    "status_cta": "Voir votre idée",
+    "won_subject": "Votre idée a été sélectionnée ! — {{community}}",
+    "won_title": "Votre idée a gagné !",
+    "won_preview": "Félicitations ! Votre idée \"{{title}}\" a été sélectionnée comme gagnante",
+    "won_body": "Félicitations ! Votre idée <strong>\"{{title}}\"</strong> a été sélectionnée comme gagnante. Bravo !",
+    "won_cta": "Voir votre idée"
   }
 }

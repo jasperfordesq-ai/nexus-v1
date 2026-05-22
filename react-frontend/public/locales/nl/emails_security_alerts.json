@@ -1,38 +1,38 @@
 {
   "2fa_enabled": {
-    "subject": "Beveiligingswaarschuwing: tweefactorauthenticatie ingeschakeld: {{community}}",
-    "title": "Tweefactorauthenticatie ingeschakeld",
-    "preview": "Tweefactorauthenticatie is ingeschakeld voor uw account",
-    "body": "Tweefactorauthenticatie is ingeschakeld voor uw account. Uw account is nu veiliger.",
+    "subject": "Beveiligingswaarschuwing: Tweestapsverificatie ingeschakeld — {{community}}",
+    "title": "Tweestapsverificatie ingeschakeld",
+    "preview": "Tweestapsverificatie is ingeschakeld op uw account",
+    "body": "Tweestapsverificatie is ingeschakeld op uw account. Uw account is nu veiliger.",
     "warning": "Als u deze wijziging niet heeft aangebracht, neem dan onmiddellijk contact op met de ondersteuning om uw account te beveiligen."
   },
   "2fa_disabled": {
-    "subject": "Beveiligingswaarschuwing: tweefactorauthenticatie uitgeschakeld: {{community}}",
-    "title": "Tweefactorauthenticatie uitgeschakeld",
-    "preview": "Tweefactorauthenticatie is uitgeschakeld voor uw account",
-    "body": "Tweefactorauthenticatie is uitgeschakeld voor uw account.",
-    "warning": "Als u deze wijziging niet heeft aangebracht, neem dan onmiddellijk contact op met de ondersteuning, aangezien uw account mogelijk gevaar loopt."
+    "subject": "Beveiligingswaarschuwing: Tweestapsverificatie uitgeschakeld — {{community}}",
+    "title": "Tweestapsverificatie uitgeschakeld",
+    "preview": "Tweestapsverificatie is uitgeschakeld op uw account",
+    "body": "Tweestapsverificatie is uitgeschakeld op uw account.",
+    "warning": "Als u deze wijziging niet heeft aangebracht, neem dan onmiddellijk contact op met de ondersteuning, want uw account loopt mogelijk gevaar."
   },
   "passkey_registered": {
-    "subject": "Beveiligingswaarschuwing: nieuwe toegangssleutel geregistreerd - {{community}}",
-    "title": "Nieuwe toegangscode geregistreerd",
-    "preview": "Er is een nieuwe toegangscode aan uw account toegevoegd",
+    "subject": "Beveiligingswaarschuwing: Nieuwe toegangssleutel geregistreerd — {{community}}",
+    "title": "Nieuwe toegangssleutel geregistreerd",
+    "preview": "Er is een nieuwe toegangssleutel toegevoegd aan uw account",
     "body": "Er is een nieuwe toegangssleutel geregistreerd op uw {{community}}-account.",
-    "warning": "Als u deze toegangscode niet heeft geregistreerd, neem dan onmiddellijk contact op met de ondersteuning om uw account te beveiligen."
+    "warning": "Als u deze toegangssleutel niet heeft geregistreerd, neem dan onmiddellijk contact op met de ondersteuning om uw account te beveiligen."
   },
   "passkey_removed": {
-    "subject": "Beveiligingswaarschuwing: toegangssleutel verwijderd - {{community}}",
-    "title": "Wachtwoord verwijderd",
-    "preview": "Er is een toegangssleutel uit uw account verwijderd",
-    "body": "Er is een toegangssleutel verwijderd uit uw {{community}}-account.",
+    "subject": "Beveiligingswaarschuwing: Toegangssleutel verwijderd — {{community}}",
+    "title": "Toegangssleutel verwijderd",
+    "preview": "Er is een toegangssleutel verwijderd van uw account",
+    "body": "Er is een toegangssleutel verwijderd van uw {{community}}-account.",
     "warning": "Als u deze wijziging niet heeft aangebracht, neem dan onmiddellijk contact op met de ondersteuning om uw account te beveiligen."
   },
   "connection_declined": {
     "subject": "Uw verbindingsverzoek is niet geaccepteerd — {{community}}",
-    "title": "Update van verbindingsverzoek",
-    "preview": "Uw verbindingsverzoek met {{name}} is niet geaccepteerd",
-    "body": "Uw verbindingsverzoek met <strong>{{name}}</strong> op {{community}} is op dit moment niet geaccepteerd.",
-    "suggestion": "Wees niet ontmoedigd; er zijn veel andere leden in uw gemeenschap waarmee u contact kunt maken.",
-    "cta": "Ontdek leden"
+    "title": "Update verbindingsverzoek",
+    "preview": "Uw verbindingsverzoek aan {{name}} is niet geaccepteerd",
+    "body": "Uw verbindingsverzoek aan <strong>{{name}}</strong> op {{community}} is momenteel niet geaccepteerd.",
+    "suggestion": "Laat u niet ontmoedigen — er zijn veel andere leden in uw gemeenschap waarmee u verbinding kunt maken.",
+    "cta": "Leden ontdekken"
   }
 }

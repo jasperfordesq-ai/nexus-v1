@@ -1,38 +1,38 @@
 {
   "2fa_enabled": {
-    "subject": "Sicherheitswarnung: Zwei-Faktor-Authentifizierung aktiviert – {{community}}",
+    "subject": "Sicherheitswarnung: Zwei-Faktor-Authentifizierung aktiviert — {{community}}",
     "title": "Zwei-Faktor-Authentifizierung aktiviert",
-    "preview": "Für Ihr Konto wurde die Zwei-Faktor-Authentifizierung aktiviert",
-    "body": "Für Ihr Konto wurde die Zwei-Faktor-Authentifizierung aktiviert. Ihr Konto ist jetzt sicherer.",
-    "warning": "Wenn Sie diese Änderung nicht vorgenommen haben, wenden Sie sich bitte umgehend an den Support, um Ihr Konto zu sichern."
+    "preview": "Die Zwei-Faktor-Authentifizierung wurde für Ihr Konto aktiviert",
+    "body": "Die Zwei-Faktor-Authentifizierung wurde für Ihr Konto aktiviert. Ihr Konto ist jetzt sicherer.",
+    "warning": "Wenn Sie diese Änderung nicht vorgenommen haben, wenden Sie sich bitte sofort an den Support, um Ihr Konto zu sichern."
   },
   "2fa_disabled": {
-    "subject": "Sicherheitswarnung: Zwei-Faktor-Authentifizierung deaktiviert – {{community}}",
+    "subject": "Sicherheitswarnung: Zwei-Faktor-Authentifizierung deaktiviert — {{community}}",
     "title": "Zwei-Faktor-Authentifizierung deaktiviert",
     "preview": "Die Zwei-Faktor-Authentifizierung wurde für Ihr Konto deaktiviert",
     "body": "Die Zwei-Faktor-Authentifizierung wurde für Ihr Konto deaktiviert.",
-    "warning": "Wenn Sie diese Änderung nicht vorgenommen haben, wenden Sie sich bitte umgehend an den Support, da Ihr Konto möglicherweise gefährdet ist."
+    "warning": "Wenn Sie diese Änderung nicht vorgenommen haben, wenden Sie sich bitte sofort an den Support, da Ihr Konto gefährdet sein könnte."
   },
   "passkey_registered": {
-    "subject": "Sicherheitswarnung: Neuer Passkey registriert – {{community}}",
+    "subject": "Sicherheitswarnung: Neuer Passkey registriert — {{community}}",
     "title": "Neuer Passkey registriert",
-    "preview": "Ihrem Konto wurde ein neuer Passkey hinzugefügt",
-    "body": "Für Ihr {{community}}-Konto wurde ein neuer Passkey registriert.",
-    "warning": "Wenn Sie diesen Passkey nicht registriert haben, wenden Sie sich bitte umgehend an den Support, um Ihr Konto zu sichern."
+    "preview": "Ein neuer Passkey wurde Ihrem Konto hinzugefügt",
+    "body": "Ein neuer Passkey wurde für Ihr {{community}}-Konto registriert.",
+    "warning": "Wenn Sie diesen Passkey nicht registriert haben, wenden Sie sich bitte sofort an den Support, um Ihr Konto zu sichern."
   },
   "passkey_removed": {
-    "subject": "Sicherheitswarnung: Passkey entfernt – {{community}}",
-    "title": "Passschlüssel entfernt",
+    "subject": "Sicherheitswarnung: Passkey entfernt — {{community}}",
+    "title": "Passkey entfernt",
     "preview": "Ein Passkey wurde von Ihrem Konto entfernt",
     "body": "Ein Passkey wurde von Ihrem {{community}}-Konto entfernt.",
-    "warning": "Wenn Sie diese Änderung nicht vorgenommen haben, wenden Sie sich bitte umgehend an den Support, um Ihr Konto zu sichern."
+    "warning": "Wenn Sie diese Änderung nicht vorgenommen haben, wenden Sie sich bitte sofort an den Support, um Ihr Konto zu sichern."
   },
   "connection_declined": {
-    "subject": "Ihre Verbindungsanfrage wurde nicht akzeptiert – {{community}}",
-    "title": "Aktualisierung der Verbindungsanfrage",
-    "preview": "Ihre Verbindungsanfrage zu {{name}} wurde nicht akzeptiert",
-    "body": "Ihre Verbindungsanfrage zu <strong>{{name}}</strong> auf {{community}} wurde derzeit nicht akzeptiert.",
-    "suggestion": "Lassen Sie sich nicht entmutigen – es gibt viele andere Mitglieder in Ihrer Community, mit denen Sie in Kontakt treten können.",
-    "cta": "Entdecken Sie Mitglieder"
+    "subject": "Ihre Verbindungsanfrage wurde nicht angenommen — {{community}}",
+    "title": "Update zur Verbindungsanfrage",
+    "preview": "Ihre Verbindungsanfrage an {{name}} wurde nicht angenommen",
+    "body": "Ihre Verbindungsanfrage an <strong>{{name}}</strong> auf {{community}} wurde derzeit nicht angenommen.",
+    "suggestion": "Lassen Sie sich nicht entmutigen — es gibt viele andere Mitglieder in Ihrer Community, mit denen Sie sich vernetzen können.",
+    "cta": "Mitglieder entdecken"
   }
 }

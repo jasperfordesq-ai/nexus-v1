@@ -1,43 +1,43 @@
 {
   "new_idea": {
-    "subject": "Nieuw idee ingediend voor uw uitdaging: {{challenge}} — {{community}}",
+    "subject": "Nieuw idee ingediend bij uw uitdaging: {{challenge}} — {{community}}",
     "title": "Nieuw idee ingediend!",
-    "preview": "{{submitter}} heeft een idee ingediend voor uw uitdaging \"{{challenge}}\"",
-    "body": "<strong>{{submitter}}</strong> heeft een nieuw idee ingediend voor jouw uitdaging <strong>\"{{challenge}}\"</strong>.",
-    "cta": "Bekijk idee"
+    "preview": "{{submitter}} heeft een idee ingediend bij uw uitdaging \"{{challenge}}\"",
+    "body": "<strong>{{submitter}}</strong> heeft een nieuw idee ingediend bij uw uitdaging <strong>\"{{challenge}}\"</strong>.",
+    "cta": "Idee bekijken"
   },
   "idea_commented": {
     "subject": "Nieuwe reactie op uw idee — {{community}}",
     "title": "Nieuwe reactie op uw idee",
-    "preview": "{{commenter}} heeft gereageerd op uw idee",
-    "body": "<strong>{{commenter}}</strong> heeft gereageerd op uw idee <strong>\"{{title}}\"</strong>.",
-    "cta": "Bekijk reactie"
+    "preview": "{{commenter}} heeft uw idee becommentarieerd",
+    "body": "<strong>{{commenter}}</strong> heeft uw idee <strong>\"{{title}}\"</strong> becommentarieerd.",
+    "cta": "Reactie bekijken"
   },
   "notifications": {
-    "submitted_subject": "Uw idee is ingediend: {{community}}",
+    "submitted_subject": "Uw idee is ingediend — {{community}}",
     "submitted_title": "Idee ingediend!",
     "submitted_preview": "Uw idee \"{{title}}\" is ingediend bij {{challenge}}",
-    "submitted_body": "Je idee <strong>\"{{title}}\"</strong> is ingediend voor de uitdaging <strong>\"{{challenge}}\"</strong>. De gemeenschap kan er nu op stemmen en reageren.",
-    "submitted_cta": "Bekijk uw idee",
-    "voted_subject": "Iemand heeft op jouw idee gestemd: {{community}}",
+    "submitted_body": "Uw idee <strong>\"{{title}}\"</strong> is ingediend bij de uitdaging <strong>\"{{challenge}}\"</strong>. De community kan er nu op stemmen en reageren.",
+    "submitted_cta": "Uw idee bekijken",
+    "voted_subject": "Iemand heeft gestemd op uw idee — {{community}}",
     "voted_title": "Nieuwe stem op uw idee",
-    "voted_preview": "{{voter}} heeft op uw idee \"{{title}}\" gestemd",
-    "voted_body": "<strong>{{voter}}</strong> heeft op uw idee <strong>\"{{title}}\"</strong> gestemd. Houd de vaart erin!",
-    "voted_cta": "Bekijk uw idee",
+    "voted_preview": "{{voter}} heeft gestemd op uw idee \"{{title}}\"",
+    "voted_body": "<strong>{{voter}}</strong> heeft gestemd op uw idee <strong>\"{{title}}\"</strong>. Houd de vaart erin!",
+    "voted_cta": "Uw idee bekijken",
     "commented_subject": "Nieuwe reactie op uw idee — {{community}}",
     "commented_title": "Nieuwe reactie op uw idee",
-    "commented_preview": "{{commenter}} heeft gereageerd op uw idee \"{{title}}\"",
+    "commented_preview": "{{commenter}} heeft uw idee \"{{title}}\" becommentarieerd",
     "commented_body": "<strong>{{commenter}}</strong> heeft een reactie achtergelaten op uw idee <strong>\"{{title}}\"</strong>.",
-    "commented_cta": "Bekijk reactie",
-    "status_subject": "De status van uw idee is bijgewerkt: {{community}}",
-    "status_title": "Ideestatusupdate",
+    "commented_cta": "Reactie bekijken",
+    "status_subject": "De status van uw idee is bijgewerkt — {{community}}",
+    "status_title": "Update idee-status",
     "status_preview": "Uw idee \"{{title}}\" is gemarkeerd als {{status}}",
     "status_body": "Uw idee <strong>\"{{title}}\"</strong> is bijgewerkt naar de status: <strong>{{status}}</strong>.",
-    "status_cta": "Bekijk uw idee",
-    "won_subject": "Jouw idee is geselecteerd! — {{community}}",
-    "won_title": "Jouw idee heeft gewonnen!",
-    "won_preview": "Gefeliciteerd! Jouw idee \"{{title}}\" is als winnaar geselecteerd",
-    "won_body": "Gefeliciteerd! Uw idee <strong>\"{{title}}\"</strong> is als winnaar geselecteerd. Goed gedaan!",
-    "won_cta": "Bekijk uw idee"
+    "status_cta": "Uw idee bekijken",
+    "won_subject": "Uw idee is geselecteerd! — {{community}}",
+    "won_title": "Uw idee heeft gewonnen!",
+    "won_preview": "Gefeliciteerd! Uw idee \"{{title}}\" is geselecteerd als winnaar",
+    "won_body": "Gefeliciteerd! Uw idee <strong>\"{{title}}\"</strong> is geselecteerd als winnaar. Goed gedaan!",
+    "won_cta": "Uw idee bekijken"
   }
 }

@@ -1,38 +1,38 @@
 {
   "2fa_enabled": {
-    "subject": "Alerte de sécurité : authentification à deux facteurs activée – {{community}}",
+    "subject": "Alerte de sécurité : Authentification à deux facteurs activée — {{community}}",
     "title": "Authentification à deux facteurs activée",
     "preview": "L'authentification à deux facteurs a été activée sur votre compte",
-    "body": "L'authentification à deux facteurs a été activée sur votre compte. Votre compte est désormais plus sécurisé.",
-    "warning": "Si vous n'avez pas effectué cette modification, veuillez contacter immédiatement l'assistance pour sécuriser votre compte."
+    "body": "L'authentification à deux facteurs a été activée sur votre compte. Votre compte est maintenant plus sécurisé.",
+    "warning": "Si vous n'avez pas effectué ce changement, veuillez contacter le support immédiatement pour sécuriser votre compte."
   },
   "2fa_disabled": {
-    "subject": "Alerte de sécurité : authentification à deux facteurs désactivée – {{community}}",
+    "subject": "Alerte de sécurité : Authentification à deux facteurs désactivée — {{community}}",
     "title": "Authentification à deux facteurs désactivée",
     "preview": "L'authentification à deux facteurs a été désactivée sur votre compte",
     "body": "L'authentification à deux facteurs a été désactivée sur votre compte.",
-    "warning": "Si vous n'avez pas effectué cette modification, veuillez contacter immédiatement l'assistance car votre compte pourrait être en danger."
+    "warning": "Si vous n'avez pas effectué ce changement, veuillez contacter le support immédiatement car votre compte pourrait être en danger."
   },
   "passkey_registered": {
-    "subject": "Alerte de sécurité : nouveau mot de passe enregistré – {{community}}",
-    "title": "Nouveau mot de passe enregistré",
-    "preview": "Un nouveau mot de passe a été ajouté à votre compte",
-    "body": "Un nouveau mot de passe a été enregistré sur votre compte {{community}}.",
-    "warning": "Si vous n'avez pas enregistré ce mot de passe, veuillez contacter immédiatement l'assistance pour sécuriser votre compte."
+    "subject": "Alerte de sécurité : Nouvelle clé d'accès enregistrée — {{community}}",
+    "title": "Nouvelle clé d'accès enregistrée",
+    "preview": "Une nouvelle clé d'accès a été ajoutée à votre compte",
+    "body": "Une nouvelle clé d'accès a été enregistrée sur votre compte {{community}}.",
+    "warning": "Si vous n'avez pas enregistré cette clé d'accès, veuillez contacter le support immédiatement pour sécuriser votre compte."
   },
   "passkey_removed": {
-    "subject": "Alerte de sécurité : clé d'accès supprimée – {{community}}",
+    "subject": "Alerte de sécurité : Clé d'accès supprimée — {{community}}",
     "title": "Clé d'accès supprimée",
-    "preview": "Un mot de passe a été supprimé de votre compte",
-    "body": "Un mot de passe a été supprimé de votre compte {{community}}.",
-    "warning": "Si vous n'avez pas effectué cette modification, veuillez contacter immédiatement l'assistance pour sécuriser votre compte."
+    "preview": "Une clé d'accès a été supprimée de votre compte",
+    "body": "Une clé d'accès a été supprimée de votre compte {{community}}.",
+    "warning": "Si vous n'avez pas effectué ce changement, veuillez contacter le support immédiatement pour sécuriser votre compte."
   },
   "connection_declined": {
     "subject": "Votre demande de connexion n'a pas été acceptée — {{community}}",
     "title": "Mise à jour de la demande de connexion",
-    "preview": "Votre demande de connexion à {{name}} n'a ​​pas été acceptée",
-    "body": "Votre demande de connexion à <strong>{{name}}</strong> sur {{community}} n'a ​​pas été acceptée pour le moment.",
-    "suggestion": "Ne vous découragez pas : il existe de nombreux autres membres de votre communauté avec lesquels vous pouvez vous connecter.",
-    "cta": "Découvrez les membres"
+    "preview": "Votre demande de connexion à {{name}} n'a pas été acceptée",
+    "body": "Votre demande de connexion à <strong>{{name}}</strong> sur {{community}} n'a pas été acceptée pour le moment.",
+    "suggestion": "Ne vous découragez pas — il y a de nombreux autres membres dans votre communauté avec qui vous connecter.",
+    "cta": "Découvrir les membres"
   }
 }

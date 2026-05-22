@@ -1,38 +1,38 @@
 {
   "2fa_enabled": {
-    "subject": "Alerta de segurança: autenticação de dois fatores habilitada — {{community}}",
-    "title": "Autenticação de dois fatores habilitada",
-    "preview": "A autenticação de dois fatores foi ativada em sua conta",
-    "body": "A autenticação de dois fatores foi habilitada em sua conta. Sua conta agora está mais segura.",
-    "warning": "Se você não fez essa alteração, entre em contato com o suporte imediatamente para proteger sua conta."
+    "subject": "Alerta de segurança: Autenticação de dois fatores ativada — {{community}}",
+    "title": "Autenticação de dois fatores ativada",
+    "preview": "A autenticação de dois fatores foi ativada na sua conta",
+    "body": "A autenticação de dois fatores foi ativada na sua conta. Sua conta agora está mais segura.",
+    "warning": "Se você não fez esta alteração, entre em contato com o suporte imediatamente para proteger sua conta."
   },
   "2fa_disabled": {
-    "subject": "Alerta de segurança: autenticação de dois fatores desativada — {{community}}",
+    "subject": "Alerta de segurança: Autenticação de dois fatores desativada — {{community}}",
     "title": "Autenticação de dois fatores desativada",
-    "preview": "A autenticação de dois fatores foi desativada em sua conta",
+    "preview": "A autenticação de dois fatores foi desativada na sua conta",
     "body": "A autenticação de dois fatores foi desativada na sua conta.",
-    "warning": "Se você não fez essa alteração, entre em contato com o suporte imediatamente, pois sua conta pode estar em risco."
+    "warning": "Se você não fez esta alteração, entre em contato com o suporte imediatamente, pois sua conta pode estar em risco."
   },
   "passkey_registered": {
-    "subject": "Alerta de segurança: Nova senha registrada — {{community}}",
-    "title": "Nova senha registrada",
+    "subject": "Alerta de segurança: Nova chave de acesso registrada — {{community}}",
+    "title": "Nova chave de acesso registrada",
     "preview": "Uma nova chave de acesso foi adicionada à sua conta",
-    "body": "Uma nova chave de acesso foi registrada em sua conta {{community}}.",
+    "body": "Uma nova chave de acesso foi registrada na sua conta {{community}}.",
     "warning": "Se você não registrou esta chave de acesso, entre em contato com o suporte imediatamente para proteger sua conta."
   },
   "passkey_removed": {
-    "subject": "Alerta de segurança: senha removida — {{community}}",
+    "subject": "Alerta de segurança: Chave de acesso removida — {{community}}",
     "title": "Chave de acesso removida",
     "preview": "Uma chave de acesso foi removida da sua conta",
     "body": "Uma chave de acesso foi removida da sua conta {{community}}.",
-    "warning": "Se você não fez essa alteração, entre em contato com o suporte imediatamente para proteger sua conta."
+    "warning": "Se você não fez esta alteração, entre em contato com o suporte imediatamente para proteger sua conta."
   },
   "connection_declined": {
     "subject": "Sua solicitação de conexão não foi aceita — {{community}}",
     "title": "Atualização de solicitação de conexão",
-    "preview": "Sua solicitação de conexão com {{name}} não foi aceita",
-    "body": "Sua solicitação de conexão para <strong>{{name}}</strong> em {{community}} não foi aceita neste momento.",
-    "suggestion": "Não desanime – há muitos outros membros em sua comunidade com quem você pode se conectar.",
-    "cta": "Descubra membros"
+    "preview": "Sua solicitação de conexão a {{name}} não foi aceita",
+    "body": "Sua solicitação de conexão a <strong>{{name}}</strong> em {{community}} não foi aceita no momento.",
+    "suggestion": "Não se desanime — há muitos outros membros na sua comunidade para se conectar.",
+    "cta": "Descobrir membros"
   }
 }

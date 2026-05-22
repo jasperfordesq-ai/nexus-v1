@@ -1,38 +1,38 @@
 {
   "2fa_enabled": {
-    "subject": "Avviso di sicurezza: autenticazione a due fattori abilitata: {{community}}",
-    "title": "Autenticazione a due fattori abilitata",
-    "preview": "L'autenticazione a due fattori è stata abilitata sul tuo account",
-    "body": "L'autenticazione a due fattori è stata abilitata sul tuo account. Il tuo account ora è più sicuro.",
-    "warning": "Se non hai apportato tu questa modifica, contatta immediatamente l'assistenza per proteggere il tuo account."
+    "subject": "Avviso di sicurezza: Autenticazione a due fattori attivata — {{community}}",
+    "title": "Autenticazione a due fattori attivata",
+    "preview": "L'autenticazione a due fattori è stata attivata sul tuo account",
+    "body": "L'autenticazione a due fattori è stata attivata sul tuo account. Il tuo account è ora più sicuro.",
+    "warning": "Se non hai effettuato questa modifica, contatta il supporto immediatamente per proteggere il tuo account."
   },
   "2fa_disabled": {
-    "subject": "Avviso di sicurezza: autenticazione a due fattori disabilitata: {{community}}",
-    "title": "Autenticazione a due fattori disabilitata",
-    "preview": "L'autenticazione a due fattori è stata disabilitata sul tuo account",
-    "body": "L'autenticazione a due fattori è stata disabilitata sul tuo account.",
-    "warning": "Se non hai apportato tu questa modifica, contatta immediatamente l'assistenza poiché il tuo account potrebbe essere a rischio."
+    "subject": "Avviso di sicurezza: Autenticazione a due fattori disattivata — {{community}}",
+    "title": "Autenticazione a due fattori disattivata",
+    "preview": "L'autenticazione a due fattori è stata disattivata sul tuo account",
+    "body": "L'autenticazione a due fattori è stata disattivata sul tuo account.",
+    "warning": "Se non hai effettuato questa modifica, contatta il supporto immediatamente poiché il tuo account potrebbe essere a rischio."
   },
   "passkey_registered": {
-    "subject": "Avviso di sicurezza: nuova passkey registrata: {{community}}",
+    "subject": "Avviso di sicurezza: Nuova passkey registrata — {{community}}",
     "title": "Nuova passkey registrata",
-    "preview": "Una nuova passkey è stata aggiunta al tuo account",
-    "body": "Una nuova passkey è stata registrata sul tuo account {{community}}.",
-    "warning": "Se non hai registrato questa passkey, contatta immediatamente l'assistenza per proteggere il tuo account."
+    "preview": "È stata aggiunta una nuova passkey al tuo account",
+    "body": "È stata registrata una nuova passkey sul tuo account {{community}}.",
+    "warning": "Se non hai registrato questa passkey, contatta il supporto immediatamente per proteggere il tuo account."
   },
   "passkey_removed": {
-    "subject": "Avviso di sicurezza: chiave di accesso rimossa: {{community}}",
-    "title": "Chiave di accesso rimossa",
+    "subject": "Avviso di sicurezza: Passkey rimossa — {{community}}",
+    "title": "Passkey rimossa",
     "preview": "Una passkey è stata rimossa dal tuo account",
     "body": "Una passkey è stata rimossa dal tuo account {{community}}.",
-    "warning": "Se non hai apportato tu questa modifica, contatta immediatamente l'assistenza per proteggere il tuo account."
+    "warning": "Se non hai effettuato questa modifica, contatta il supporto immediatamente per proteggere il tuo account."
   },
   "connection_declined": {
-    "subject": "La tua richiesta di connessione non è stata accettata: {{community}}",
-    "title": "Aggiornamento della richiesta di connessione",
+    "subject": "La tua richiesta di connessione non è stata accettata — {{community}}",
+    "title": "Aggiornamento richiesta di connessione",
     "preview": "La tua richiesta di connessione a {{name}} non è stata accettata",
     "body": "La tua richiesta di connessione a <strong>{{name}}</strong> su {{community}} non è stata accettata in questo momento.",
-    "suggestion": "Non scoraggiarti: ci sono molti altri membri nella tua comunità con cui entrare in contatto.",
+    "suggestion": "Non scoraggiarti — ci sono molti altri membri nella tua community con cui connetterti.",
     "cta": "Scopri i membri"
   }
 }

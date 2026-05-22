@@ -1,38 +1,38 @@
 {
   "2fa_enabled": {
-    "subject": "Alerta de seguridad: autenticación de dos factores habilitada - {{community}}",
-    "title": "Autenticación de dos factores habilitada",
-    "preview": "La autenticación de dos factores ha sido habilitada en su cuenta",
-    "body": "La autenticación de dos factores se ha habilitado en su cuenta. Tu cuenta ahora es más segura.",
-    "warning": "Si no realizó este cambio, comuníquese con el soporte de inmediato para proteger su cuenta."
+    "subject": "Alerta de seguridad: Autenticación de dos factores activada — {{community}}",
+    "title": "Autenticación de dos factores activada",
+    "preview": "La autenticación de dos factores ha sido activada en su cuenta",
+    "body": "La autenticación de dos factores ha sido activada en su cuenta. Su cuenta es ahora más segura.",
+    "warning": "Si no realizó este cambio, póngase en contacto con el soporte de inmediato para proteger su cuenta."
   },
   "2fa_disabled": {
-    "subject": "Alerta de seguridad: Autenticación de dos factores deshabilitada — {{community}}",
-    "title": "Autenticación de dos factores deshabilitada",
-    "preview": "La autenticación de dos factores ha sido deshabilitada en su cuenta",
-    "body": "La autenticación de dos factores ha sido deshabilitada en su cuenta.",
-    "warning": "Si no realizó este cambio, comuníquese con el soporte técnico de inmediato, ya que su cuenta puede estar en riesgo."
+    "subject": "Alerta de seguridad: Autenticación de dos factores desactivada — {{community}}",
+    "title": "Autenticación de dos factores desactivada",
+    "preview": "La autenticación de dos factores ha sido desactivada en su cuenta",
+    "body": "La autenticación de dos factores ha sido desactivada en su cuenta.",
+    "warning": "Si no realizó este cambio, póngase en contacto con el soporte de inmediato, ya que su cuenta puede estar en riesgo."
   },
   "passkey_registered": {
-    "subject": "Alerta de seguridad: Nueva clave de acceso registrada: {{community}}",
+    "subject": "Alerta de seguridad: Nueva clave de acceso registrada — {{community}}",
     "title": "Nueva clave de acceso registrada",
-    "preview": "Se ha agregado una nueva clave de acceso a su cuenta.",
-    "body": "Se ha registrado una nueva clave de acceso en su cuenta {{community}}.",
-    "warning": "Si no registró esta clave de acceso, comuníquese con el soporte de inmediato para proteger su cuenta."
+    "preview": "Se ha añadido una nueva clave de acceso a su cuenta",
+    "body": "Se ha registrado una nueva clave de acceso en su cuenta de {{community}}.",
+    "warning": "Si no registró esta clave de acceso, póngase en contacto con el soporte de inmediato para proteger su cuenta."
   },
   "passkey_removed": {
-    "subject": "Alerta de seguridad: Clave de acceso eliminada - {{community}}",
+    "subject": "Alerta de seguridad: Clave de acceso eliminada — {{community}}",
     "title": "Clave de acceso eliminada",
-    "preview": "Se ha eliminado una clave de acceso de su cuenta.",
-    "body": "Se eliminó una clave de acceso de su cuenta {{community}}.",
-    "warning": "Si no realizó este cambio, comuníquese con el soporte de inmediato para proteger su cuenta."
+    "preview": "Se ha eliminado una clave de acceso de su cuenta",
+    "body": "Se ha eliminado una clave de acceso de su cuenta de {{community}}.",
+    "warning": "Si no realizó este cambio, póngase en contacto con el soporte de inmediato para proteger su cuenta."
   },
   "connection_declined": {
     "subject": "Su solicitud de conexión no fue aceptada — {{community}}",
     "title": "Actualización de solicitud de conexión",
     "preview": "Su solicitud de conexión a {{name}} no fue aceptada",
     "body": "Su solicitud de conexión a <strong>{{name}}</strong> en {{community}} no fue aceptada en este momento.",
-    "suggestion": "No se desanime: hay muchos otros miembros en su comunidad con quienes conectarse.",
+    "suggestion": "No se desanime — hay muchos otros miembros en su comunidad con quienes conectarse.",
     "cta": "Descubrir miembros"
   }
 }
