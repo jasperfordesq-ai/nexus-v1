@@ -39,7 +39,9 @@
     "cta_manage_prefs": "Manage digest preferences",
     "footer": "You're receiving this because you opted into the {{community}} civic digest. You can change cadence or opt out at any time.",
     "match_score": "Match {{score}}",
-    "view_all": "View full digest"
+    "view_all": "View full digest",
+    "subject_monthly": "Je maandelijkse burgerdigest — {{community}}",
+    "intro_monthly": "Hier is je maandelijkse overzicht — {{count}} update(s) voor jou geselecteerd op basis van je subregio en interesses."
   },
   "push": {
     "title": "Your civic digest is ready",
@@ -58,5 +60,6 @@
     "reason_safety": "Safety alert",
     "reason_announcement": "Official announcement",
     "no_reasons": "Default ranking"
-  }
+  },
+  "prefs_cadence_monthly": "Maandelijkse samenvatting"
 }

@@ -39,7 +39,9 @@
     "cta_manage_prefs": "Gérer les préférences du digest",
     "footer": "Vous recevez ce message car vous avez activé le digest communal de {{community}}. Vous pouvez modifier la fréquence ou vous désabonner à tout moment.",
     "match_score": "Pertinence {{score}}",
-    "view_all": "Voir le digest complet"
+    "view_all": "Voir le digest complet",
+    "subject_monthly": "Votre récapitulatif civique mensuel — {{community}}",
+    "intro_monthly": "Voici votre récapitulatif mensuel — {{count}} mise(s) à jour sélectionnée(s) pour vous en fonction de votre sous-région et de vos centres d'intérêt."
   },
   "push": {
     "title": "Votre digest communal est prêt",
@@ -58,5 +60,6 @@
     "reason_safety": "Safety alert",
     "reason_announcement": "Official announcement",
     "no_reasons": "Default ranking"
-  }
+  },
+  "prefs_cadence_monthly": "Récapitulatif mensuel"
 }

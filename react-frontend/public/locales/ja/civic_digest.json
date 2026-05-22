@@ -39,7 +39,9 @@
     "cta_manage_prefs": "Manage digest preferences",
     "footer": "You're receiving this because you opted into the {{community}} civic digest. You can change cadence or opt out at any time.",
     "match_score": "Match {{score}}",
-    "view_all": "View full digest"
+    "view_all": "View full digest",
+    "subject_monthly": "あなたの月次シビックダイジェスト — {{community}}",
+    "intro_monthly": "今月のまとめです — あなたのサブ地域と関心に基づいて選ばれた {{count}} 件の更新があります。"
   },
   "push": {
     "title": "Your civic digest is ready",
@@ -58,5 +60,6 @@
     "reason_safety": "Safety alert",
     "reason_announcement": "Official announcement",
     "no_reasons": "Default ranking"
-  }
+  },
+  "prefs_cadence_monthly": "月次サマリー"
 }

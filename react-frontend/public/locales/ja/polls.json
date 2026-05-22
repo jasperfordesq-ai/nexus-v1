@@ -75,7 +75,9 @@
   "anonymous_voting": "匿名投票",
   "anonymous_voting_desc": "結果に投票者の身元を隠す",
   "aria": {
-    "export_csv": "結果をCSVとしてエクスポート"
+    "export_csv": "結果をCSVとしてエクスポート",
+    "move_rank_down": "{{option}} を下に移動",
+    "move_rank_up": "{{option}} を上に移動"
   },
   "page_meta": {
     "title": "Polls"

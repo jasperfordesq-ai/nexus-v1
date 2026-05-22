@@ -35,5 +35,8 @@
   "card_online": "Online",
   "card_remote": "Remote",
   "card_wallet_title": "Your wallet",
-  "card_wallet_transactions": "{{count}} transactions in last 30 days"
+  "card_wallet_transactions": "{{count}} transactions in last 30 days",
+  "tool_results": {
+    "view": "Ansehen"
+  }
 }

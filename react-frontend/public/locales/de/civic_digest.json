@@ -39,7 +39,9 @@
     "cta_manage_prefs": "Digest-Einstellungen verwalten",
     "footer": "Sie erhalten diese E-Mail, weil Sie den Gemeinde-Digest von {{community}} aktiviert haben. Sie können die Häufigkeit jederzeit ändern oder den Versand abbestellen.",
     "match_score": "Treffer {{score}}",
-    "view_all": "Vollständigen Digest ansehen"
+    "view_all": "Vollständigen Digest ansehen",
+    "subject_monthly": "Ihre monatliche Bürgerzusammenfassung — {{community}}",
+    "intro_monthly": "Hier ist Ihre monatliche Übersicht — {{count}} Aktualisierung(en) basierend auf Ihrer Teilregion und Ihren Interessen für Sie ausgewählt."
   },
   "push": {
     "title": "Ihr Gemeinde-Digest ist bereit",
@@ -58,5 +60,6 @@
     "reason_safety": "Safety alert",
     "reason_announcement": "Official announcement",
     "no_reasons": "Default ranking"
-  }
+  },
+  "prefs_cadence_monthly": "Monatliche Zusammenfassung"
 }

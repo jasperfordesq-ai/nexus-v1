@@ -75,7 +75,9 @@
   "anonymous_voting": "Vótáil Gan Ainm",
   "anonymous_voting_desc": "Ceil aitheantas na vótálaithe sna torthaí",
   "aria": {
-    "export_csv": "Easpórtáil torthaí mar CSV"
+    "export_csv": "Easpórtáil torthaí mar CSV",
+    "move_rank_down": "Bog {{option}} síos",
+    "move_rank_up": "Bog {{option}} suas"
   },
   "page_meta": {
     "title": "Polls"
