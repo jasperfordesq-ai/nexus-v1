@@ -21,39 +21,39 @@
     "engagement": {
       "title": "Coinvolgimento mensile",
       "months_active": "{{count}} di 12 mesi",
-      "month_active_tooltip": "Active: {{count}} activities",
-      "month_inactive_tooltip": "Inactive",
+      "month_active_tooltip": "Attivo: attività {{count}}",
+      "month_inactive_tooltip": "Inattivo",
       "description": "Mesi in cui ha completato almeno un'attività significativa (scambio, annuncio, recensione o ore di volontariato)."
     },
     "badge_type": {
-      "vol": "Volunteering",
-      "offer": "Offers",
-      "request": "Requests",
-      "earn": "Earning",
-      "spend": "Spending",
-      "transaction": "Transactions",
-      "diversity": "Community Diversity",
-      "connection": "Connections",
-      "message": "Messaging",
-      "review_given": "Reviews",
-      "5star": "5-Star Reviews",
-      "event_attend": "Event Attendance",
-      "event_host": "Event Hosting",
-      "group_join": "Groups",
-      "group_create": "Group Creation",
-      "post": "Posts",
-      "likes_received": "Likes",
-      "profile": "Profile",
-      "membership": "Membership",
-      "streak": "Streaks",
-      "level": "Levels",
-      "special": "Special",
-      "vol_org": "Organisations",
-      "quality": "Quality",
-      "reliability": "Reliability",
-      "mentoring": "Mentoring",
-      "reciprocity": "Reciprocity",
-      "verification": "Verification"
+      "vol": "Volontariato",
+      "offer": "Offerte",
+      "request": "Richieste",
+      "earn": "Guadagnare",
+      "spend": "Spesa",
+      "transaction": "Transazioni",
+      "diversity": "Diversità della comunità",
+      "connection": "Connessioni",
+      "message": "Messaggistica",
+      "review_given": "Recensioni",
+      "5star": "Recensioni a 5 stelle",
+      "event_attend": "Partecipazione all'evento",
+      "event_host": "Ospitalità di eventi",
+      "group_join": "Gruppi",
+      "group_create": "Creazione di gruppi",
+      "post": "Messaggi",
+      "likes_received": "Mi piace",
+      "profile": "Profilo",
+      "membership": "Appartenenza",
+      "streak": "Strisce",
+      "level": "Livelli",
+      "special": "Speciale",
+      "vol_org": "Organizzazioni",
+      "quality": "Qualità",
+      "reliability": "Affidabilità",
+      "mentoring": "Tutoraggio",
+      "reciprocity": "Reciprocità",
+      "verification": "Verifica"
     },
     "filter_by_type": "Filtra per tipo",
     "filter_badges_aria": "Filtra badge per tipo",
@@ -84,7 +84,7 @@
       "completed": "Completate",
       "empty_title": "Nessuna sfida attiva",
       "empty_description": "Torni presto per nuove sfide da completare!",
-      "progress_aria": "Challenge progress: {{percent}}%",
+      "progress_aria": "Avanzamento della sfida: {{percent}}%",
       "claim_xp": "Reclama {{xp}} XP",
       "claimed": "Reclamato",
       "load_failed": "Caricamento fallito",
@@ -100,7 +100,7 @@
       "empty_description": "Le collezioni di badge appariranno qui quando saranno disponibili.",
       "complete": "Completa",
       "badges_collected": "{{earned}} / {{total}} badge collezionati",
-      "progress_aria": "Collection progress: {{percent}}%",
+      "progress_aria": "Avanzamento della raccolta: {{percent}}%",
       "load_failed": "Caricamento fallito",
       "load_failed_desc": "Impossibile caricare le collezioni."
     },
@@ -125,27 +125,27 @@
     },
     "loading": "Caricamento traguardi",
     "badge_detail": {
-      "title": "Badge Details",
-      "earned_on": "Earned on {{date}}",
-      "not_earned": "Not yet earned",
-      "not_earned_desc": "Keep going — you'll unlock this badge soon!",
-      "type": "Category",
-      "threshold": "Requirement",
+      "title": "Dettagli del distintivo",
+      "earned_on": "Guadagnato su {{date}}",
+      "not_earned": "Non ancora guadagnato",
+      "not_earned_desc": "Continua così: sbloccherai presto questo badge!",
+      "type": "Categoria",
+      "threshold": "Requisito",
       "threshold_value": "{{threshold}} {{type}}",
-      "rarity": "Rarity",
-      "xp_reward": "XP Reward",
+      "rarity": "Rarità",
+      "xp_reward": "Premio XP",
       "xp_value": "{{xp}} XP",
-      "tier": "Tier",
-      "close": "Close",
-      "rarity_common": "Common",
-      "rarity_uncommon": "Uncommon",
-      "rarity_rare": "Rare",
-      "rarity_epic": "Epic",
-      "rarity_legendary": "Legendary",
-      "tier_core": "Core",
+      "tier": "Livello",
+      "close": "Vicino",
+      "rarity_common": "Comune",
+      "rarity_uncommon": "Non comune",
+      "rarity_rare": "Raro",
+      "rarity_epic": "Epico",
+      "rarity_legendary": "Leggendario",
+      "tier_core": "Nucleo",
       "tier_template": "Standard",
-      "tier_custom": "Custom",
-      "load_failed": "Could not load badge details."
+      "tier_custom": "Costume",
+      "load_failed": "Impossibile caricare i dettagli del badge."
     },
     "showcase": {
       "manage_title": "Gestisca la vetrina badge",
@@ -168,6 +168,17 @@
     "title": "Obiettivi",
     "loading": "Caricamento obiettivi",
     "subtitle": "Definisca obiettivi e segua i Suoi progressi",
+    "buddy_explainer": {
+      "title": "I compagni di obiettivo mantengono le persone in movimento",
+      "body": "Un amico è un altro membro che sceglie di sostenere un obiettivo pubblico. Possono vedere i tuoi aggiornamenti, notare quando i progressi si bloccano e offrire incoraggiamento senza prendere il sopravvento sull'obiettivo.",
+      "how": "Rendi pubblico un obiettivo se desideri supporto. Usa Discover per diventare amico di qualcun altro o Goal Buddies per seguire gli obiettivi a cui stai aiutando."
+    },
+    "guide": {
+      "checkins_title": "Check-in",
+      "checkins_body": "Registra dove si trova l'obiettivo, come ci si sente e qualsiasi contesto utile per te o il tuo amico.",
+      "progress_title": "Progressi",
+      "progress_body": "La percentuale è la tua ultima stima rispetto al valore target. I check-in ora aggiornano l'obiettivo e la sequenza temporale."
+    },
     "new_goal": "Nuovo obiettivo",
     "from_template": "Da modello",
     "load_error": "Impossibile caricare gli obiettivi. La preghiamo di riprovare.",
@@ -188,11 +199,13 @@
     "due": "Scadenza: ",
     "buddy_label": "Compagno",
     "youre_a_buddy": "Lei è un compagno!",
+    "streak_label": "{{count}} serie di check-in",
     "mark_complete": "Segna come completato",
     "become_buddy": "Diventa compagno",
     "actions_aria": "Azioni obiettivo",
     "action_edit": "Modifica",
     "action_delete": "Elimina",
+    "action_nudge": "Spinta",
     "status": {
       "completed": "Completato",
       "active": "Attivo"
@@ -208,13 +221,13 @@
       "deadline": "Scadenza",
       "created": "Creato",
       "buddy": "Compagno",
+      "no_buddy": "Nessun amico, ancora. Gli obiettivi pubblici possono essere raccolti da Discover da un altro membro.",
       "social": "Sociale",
       "goal_owner": "Proprietario dell'obiettivo",
+      "insights": "Approfondimenti sugli obiettivi",
       "progress_timeline": "Cronologia progressi",
-      "no_progress": "Nessun aggiornamento dei progressi registrato finora.",
-      "no_buddy": "No buddy yet. Public goals can be picked up from Discover by another member.",
-      "insights": "Goal insights",
-      "progress_explainer": "Progress is calculated from the current value against the target. Check-ins can update this percentage directly."
+      "progress_explainer": "Il progresso viene calcolato dal valore corrente rispetto al target. I check-in possono aggiornare direttamente questa percentuale.",
+      "no_progress": "Nessun aggiornamento dei progressi registrato finora."
     },
     "modal": {
       "create_title": "Crea nuovo obiettivo",
@@ -225,6 +238,9 @@
       "description_label": "Descrizione",
       "description_placeholder": "Descriva il Suo obiettivo...",
       "target_value_label": "Valore obiettivo",
+      "target_value_placeholder": "100",
+      "target_value_help": "Utilizza l'obiettivo come importo che desideri raggiungere, ad esempio 10 ore, 5 sessioni o 100%.",
+      "checkin_frequency_label": "Cadenza del check-in",
       "deadline_label": "Scadenza (facoltativo)",
       "make_public": "Rendi pubblico",
       "make_public_desc": "Gli altri possono vedere e sostenere il Suo obiettivo",
@@ -233,10 +249,7 @@
       "save_changes": "Salva modifiche",
       "delete_goal": "Elimina obiettivo",
       "delete_confirm": "È sicuro di voler eliminare \"{{title}}\"?",
-      "delete_warning": "Questa azione non può essere annullata.",
-      "target_value_placeholder": "100",
-      "target_value_help": "Use the target as the amount you want to reach, such as 10 hours, 5 sessions, or 100 percent.",
-      "checkin_frequency_label": "Check-in cadence"
+      "delete_warning": "Questa azione non può essere annullata."
     },
     "toast": {
       "created": "Obiettivo creato!",
@@ -251,22 +264,16 @@
       "progress_failed": "Impossibile aggiornare i progressi",
       "buddy_joined": "Ora Lei è un compagno!",
       "buddy_failed": "Impossibile diventare compagno",
-      "buddy_action_sent": "Buddy support sent",
-      "buddy_action_failed": "Failed to send buddy support"
-    },
-    "buddy_explainer": {
-      "title": "Goal buddies keep people moving",
-      "body": "A buddy is another member who chooses to support a public goal. They can see your updates, notice when progress stalls, and offer encouragement without taking over the goal.",
-      "how": "Make a goal public if you want support. Use Discover to become a buddy for someone else, or Goal Buddies to follow goals you are helping with."
-    },
-    "guide": {
-      "checkins_title": "Check-ins",
-      "checkins_body": "Record where the goal stands, how it feels, and any useful context for you or your buddy.",
-      "progress_title": "Progress",
-      "progress_body": "The percentage is your latest estimate against the target value. Check-ins now update the goal and timeline."
-    },
-    "streak_label": "{{count}} check-in streak",
-    "action_nudge": "Nudge"
+      "buddy_action_sent": "Supporto amico inviato",
+      "buddy_action_failed": "Impossibile inviare il supporto agli amici"
+    }
+  },
+  "frequency": {
+    "none": "Nessuna cadenza",
+    "daily": "Quotidiano",
+    "weekly": "Settimanale",
+    "biweekly": "Ogni 2 settimane",
+    "monthly": "Mensile"
   },
   "leaderboard": {
     "page_title": "Classifica",
@@ -316,25 +323,25 @@
       "history": "Cronologia stagioni",
       "active": "Attiva",
       "loading": "Caricamento stagione",
+      "unavailable": "Dati stagionali non disponibili",
+      "unavailable_desc": "Impossibile caricare le informazioni sulla stagione. Le classifiche sottostanti sono ancora disponibili.",
+      "rank_label": "Classifica {{rank}}",
+      "xp_reward": "{{xp}} XP",
       "load_failed": "Caricamento fallito",
-      "load_failed_desc": "Impossibile caricare la cronologia delle stagioni.",
-      "unavailable": "Season data unavailable",
-      "unavailable_desc": "Could not load season information. Rankings below are still available.",
-      "rank_label": "Rank {{rank}}",
-      "xp_reward": "{{xp}} XP"
+      "load_failed_desc": "Impossibile caricare la cronologia delle stagioni."
+    },
+    "score_unit": {
+      "hours": "H",
+      "credits": "cr",
+      "nexus_score": "/1000",
+      "xp": "XP"
     },
     "season_unavailable": "Dati della stagione non disponibili",
     "season_unavailable_desc": "Impossibile caricare le informazioni sulla stagione. Le classifiche qui sotto sono ancora disponibili.",
     "session_expired": "La sessione è scaduta. Effettua nuovamente l'accesso.",
     "load_error": "Impossibile caricare la classifica. Riprova.",
     "type_nexus_score": "NexusScore",
-    "load_more": "Load More",
-    "score_unit": {
-      "hours": "h",
-      "credits": "cr",
-      "nexus_score": "/1000",
-      "xp": "XP"
-    }
+    "load_more": "Carica altro"
   },
   "community": {
     "total_hours": "Ore totali scambiate",
@@ -347,17 +354,17 @@
     "new_connections": "Nuove connessioni",
     "new_exchanges": "Nuovi scambi",
     "new_members": "Nuovi membri",
-    "total_badges": "Badges Awarded",
-    "volunteer_hours": "Volunteer Hours",
-    "total_xp": "Total XP Earned",
-    "total_listings": "Listings",
-    "total_connections": "Connections",
-    "total_reviews": "Reviews",
-    "badges_awarded": "Badges Awarded",
-    "new_listings": "New Listings",
-    "new_posts": "New Posts",
-    "load_error": "Failed to load community data",
-    "no_change": "No change"
+    "total_badges": "Distintivi assegnati",
+    "volunteer_hours": "Orari di volontariato",
+    "total_xp": "XP totali guadagnati",
+    "total_listings": "Annunci",
+    "total_connections": "Connessioni",
+    "total_reviews": "Recensioni",
+    "badges_awarded": "Distintivi assegnati",
+    "new_listings": "Nuovi elenchi",
+    "new_posts": "Nuovi post",
+    "load_error": "Impossibile caricare i dati della comunità",
+    "no_change": "Nessun cambiamento"
   },
   "journey": {
     "hours_earned": "Ore guadagnate",
@@ -384,60 +391,53 @@
   },
   "nexus_score": {
     "title": "NexusScore",
-    "subtitle": "Your community reputation score",
+    "subtitle": "Il tuo punteggio di reputazione della comunità",
     "points_to_next": "{{count}} points to {{tier}}",
-    "max_tier": "You have reached the highest tier!",
-    "breakdown_title": "Score Breakdown",
-    "insights_title": "How to improve",
-    "remaining": "remaining",
-    "view_leaderboard": "View Leaderboard",
-    "my_profile": "My Profile",
-    "load_error": "Could not load your NexusScore. Please try again.",
-    "refresh_error": "Refresh failed",
-    "refresh": "Refresh",
-    "try_again": "Try again",
-    "top_percent": "Top {{percent}}%",
-    "remaining_count": "{{count}} remaining",
+    "max_tier": "Hai raggiunto il livello più alto!",
+    "breakdown_title": "Ripartizione del punteggio",
+    "insights_title": "Come migliorare",
+    "remaining": "rimanente",
+    "view_leaderboard": "Visualizza la classifica",
+    "my_profile": "Il mio profilo",
+    "load_error": "Impossibile caricare il tuo NexusScore. Per favore riprova.",
+    "refresh_error": "Aggiornamento non riuscito",
+    "refresh": "Aggiorna",
+    "try_again": "Riprova",
+    "top_percent": "Migliori {{percent}}%",
+    "remaining_count": "{{count}} rimanente",
     "category_progress_aria": "{{category}}: {{score}} of {{max}}",
     "tier_threshold": "{{tier}} ({{min}}+)",
     "tiers": {
-      "novice": "Novice",
-      "beginner": "Beginner",
-      "developing": "Developing",
-      "intermediate": "Intermediate",
-      "proficient": "Proficient",
-      "advanced": "Advanced",
-      "expert": "Expert",
+      "novice": "Novizio",
+      "beginner": "Principiante",
+      "developing": "Sviluppo",
+      "intermediate": "Intermedio",
+      "proficient": "Competente",
+      "advanced": "Avanzato",
+      "expert": "Esperto",
       "elite": "Elite",
-      "legendary": "Legendary"
+      "legendary": "Leggendario"
     },
     "max_score_label": "/ {{max}}"
   },
   "common": {
-    "refresh": "Refresh",
-    "try_again": "Try Again"
+    "refresh": "Aggiorna",
+    "try_again": "Riprova"
   },
   "page_meta": {
-    "leaderboard": {
-      "description": "Classifica della comunità — guarda i migliori contributori e i membri più attivi.",
-      "title": "Leaderboard"
-    },
     "achievements": {
-      "title": "Achievements"
+      "title": "Risultati"
+    },
+    "leaderboard": {
+      "title": "Classifica",
+      "description": "Classifica della comunità — guarda i migliori contributori e i membri più attivi."
     },
     "goals": {
-      "title": "Goals"
+      "title": "Obiettivi"
     },
     "nexus_score": {
       "title": "NexusScore",
-      "description": "Your private NexusScore breakdown, including community reputation tier, score categories, and tailored ways to improve your impact."
+      "description": "La tua suddivisione privata del NexusScore, incluso il livello di reputazione della comunità, le categorie di punteggio e modi su misura per migliorare il tuo impatto."
     }
-  },
-  "frequency": {
-    "none": "No cadence",
-    "daily": "Daily",
-    "weekly": "Weekly",
-    "biweekly": "Every 2 weeks",
-    "monthly": "Monthly"
   }
 }

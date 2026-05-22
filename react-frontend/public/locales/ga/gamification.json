@@ -21,39 +21,39 @@
     "engagement": {
       "title": "Rannpháirtíocht Mhíosúil",
       "months_active": "{{count}} as 12 mhí",
-      "month_active_tooltip": "Active: {{count}} activities",
-      "month_inactive_tooltip": "Inactive",
+      "month_active_tooltip": "Gníomhach: gníomhaíochtaí {{count}}",
+      "month_inactive_tooltip": "Neamhghníomhach",
       "description": "Míonna inar chomáin tú gníomhaíocht fhiúntach amháin ar a laghad (malartú, liostú, léirmheas, nó uaireanta deonacha)."
     },
     "badge_type": {
-      "vol": "Volunteering",
-      "offer": "Offers",
-      "request": "Requests",
-      "earn": "Earning",
-      "spend": "Spending",
-      "transaction": "Transactions",
-      "diversity": "Community Diversity",
-      "connection": "Connections",
-      "message": "Messaging",
-      "review_given": "Reviews",
-      "5star": "5-Star Reviews",
-      "event_attend": "Event Attendance",
-      "event_host": "Event Hosting",
-      "group_join": "Groups",
-      "group_create": "Group Creation",
-      "post": "Posts",
-      "likes_received": "Likes",
-      "profile": "Profile",
-      "membership": "Membership",
-      "streak": "Streaks",
-      "level": "Levels",
-      "special": "Special",
-      "vol_org": "Organisations",
-      "quality": "Quality",
-      "reliability": "Reliability",
-      "mentoring": "Mentoring",
-      "reciprocity": "Reciprocity",
-      "verification": "Verification"
+      "vol": "Obair dheonach",
+      "offer": "Tairiscintí",
+      "request": "Iarratais",
+      "earn": "Tuilleamh",
+      "spend": "Caiteachas",
+      "transaction": "Idirbhearta",
+      "diversity": "Éagsúlacht Phobail",
+      "connection": "Naisc",
+      "message": "teachtaireachtaí",
+      "review_given": "Léirmheasanna",
+      "5star": "Léirmheasanna 5-Star",
+      "event_attend": "Tinreamh Imeachta",
+      "event_host": "Óstáil Imeachtaí",
+      "group_join": "Grúpaí",
+      "group_create": "Cruthú Grúpa",
+      "post": "Poist",
+      "likes_received": "Is maith",
+      "profile": "Próifíl",
+      "membership": "Ballraíocht",
+      "streak": "Sruthanna",
+      "level": "Leibhéil",
+      "special": "Speisialta",
+      "vol_org": "Eagraíochtaí",
+      "quality": "Cáilíocht",
+      "reliability": "Iontaofacht",
+      "mentoring": "Meantóireachta",
+      "reciprocity": "Cómhalartacht",
+      "verification": "Fíorú"
     },
     "filter_by_type": "Scag de réir cineáil",
     "filter_badges_aria": "Scag suaitheantais de réir cineáil",
@@ -84,7 +84,7 @@
       "completed": "Comhlánaithe",
       "empty_title": "Gan dúshláin ghníomhacha",
       "empty_description": "Seiceáil ar ais go luath le haghaidh dúshláin nua!",
-      "progress_aria": "Challenge progress: {{percent}}%",
+      "progress_aria": "Dul chun cinn an dúshláin: {{percent}}%",
       "claim_xp": "Éiligh {{xp}} XP",
       "claimed": "Éilithe",
       "load_failed": "Theip ar Lódáil",
@@ -100,7 +100,7 @@
       "empty_description": "Beidh bailiúcháin suaitheantais le feiceáil anseo nuair a bheidh siad ar fáil.",
       "complete": "Iomlán",
       "badges_collected": "{{earned}} / {{total}} suaitheantas bailithe",
-      "progress_aria": "Collection progress: {{percent}}%",
+      "progress_aria": "Dul chun cinn bailiúcháin: {{percent}}%",
       "load_failed": "Theip ar Lódáil",
       "load_failed_desc": "Ní fhéadfaí bailiúcháin a lódáil."
     },
@@ -140,27 +140,27 @@
     },
     "load_error": "Theip ar lódáil na n-éachtaí. Bain triail eile as le do thoil.",
     "badge_detail": {
-      "title": "Badge Details",
-      "earned_on": "Earned on {{date}}",
-      "not_earned": "Not yet earned",
-      "not_earned_desc": "Keep going — you'll unlock this badge soon!",
-      "type": "Category",
-      "threshold": "Requirement",
+      "title": "Sonraí Suaitheantais",
+      "earned_on": "Tuillte ar {{date}}",
+      "not_earned": "Gan tuillte go fóill",
+      "not_earned_desc": "Lean ort - díghlasálfaidh tú an suaitheantas seo go luath!",
+      "type": "Catagóir",
+      "threshold": "Riachtanas",
       "threshold_value": "{{threshold}} {{type}}",
-      "rarity": "Rarity",
-      "xp_reward": "XP Reward",
+      "rarity": "Uathúlacht",
+      "xp_reward": "Luaíocht XP",
       "xp_value": "{{xp}} XP",
-      "tier": "Tier",
-      "close": "Close",
-      "rarity_common": "Common",
-      "rarity_uncommon": "Uncommon",
-      "rarity_rare": "Rare",
+      "tier": "Sraith",
+      "close": "Dún",
+      "rarity_common": "Coitianta",
+      "rarity_uncommon": "Neamhchoitianta",
+      "rarity_rare": "Annamh",
       "rarity_epic": "Epic",
-      "rarity_legendary": "Legendary",
-      "tier_core": "Core",
-      "tier_template": "Standard",
-      "tier_custom": "Custom",
-      "load_failed": "Could not load badge details."
+      "rarity_legendary": "Finscéalach",
+      "tier_core": "Croílár",
+      "tier_template": "Caighdeán",
+      "tier_custom": "Saincheaptha",
+      "load_failed": "Níorbh fhéidir sonraí suaitheantais a lódáil."
     }
   },
   "goals": {
@@ -212,9 +212,9 @@
       "goal_owner": "Úinéir Sprice",
       "progress_timeline": "Amlíne Dul Chun Cinn",
       "no_progress": "Níl aon nuashonruithe dul chun cinn taifeadta fós.",
-      "no_buddy": "No buddy yet. Public goals can be picked up from Discover by another member.",
-      "insights": "Goal insights",
-      "progress_explainer": "Progress is calculated from the current value against the target. Check-ins can update this percentage directly."
+      "no_buddy": "Níl aon chara fós. Is féidir le ball eile spriocanna poiblí a phiocadh suas ó Discover.",
+      "insights": "Léargais spriocanna",
+      "progress_explainer": "Ríomhtar an dul chun cinn ón luach reatha in aghaidh na sprice. Is féidir le seiceálacha isteach an céatadán seo a nuashonrú go díreach."
     },
     "modal": {
       "create_title": "Cruthaigh Sprioc Nua",
@@ -235,8 +235,8 @@
       "delete_confirm": "An bhfuil tú cinnte gur mhaith leat \"{{title}}\" a scriosadh?",
       "delete_warning": "Ní féidir é seo a chealú.",
       "target_value_placeholder": "100",
-      "target_value_help": "Use the target as the amount you want to reach, such as 10 hours, 5 sessions, or 100 percent.",
-      "checkin_frequency_label": "Check-in cadence"
+      "target_value_help": "Bain úsáid as an sprioc mar an méid is mian leat a bhaint amach, mar shampla 10 n-uaire, 5 sheisiún, nó 100 faoin gcéad.",
+      "checkin_frequency_label": "Cadence seiceála isteach"
     },
     "toast": {
       "created": "Sprioc cruthaithe!",
@@ -251,22 +251,22 @@
       "progress_failed": "Theip ar dhul chun cinn a nuashonrú",
       "buddy_joined": "Is cara thú anois!",
       "buddy_failed": "Theip ar bheith i do chara",
-      "buddy_action_sent": "Buddy support sent",
-      "buddy_action_failed": "Failed to send buddy support"
+      "buddy_action_sent": "Tacaíocht cara seolta",
+      "buddy_action_failed": "Theip ar thacaíocht charad a sheoladh"
     },
     "buddy_explainer": {
-      "title": "Goal buddies keep people moving",
-      "body": "A buddy is another member who chooses to support a public goal. They can see your updates, notice when progress stalls, and offer encouragement without taking over the goal.",
-      "how": "Make a goal public if you want support. Use Discover to become a buddy for someone else, or Goal Buddies to follow goals you are helping with."
+      "title": "Coinníonn cairde sprice daoine ag gluaiseacht",
+      "body": "Is éard is cara ann ná ball eile a roghnaíonn tacaíocht a thabhairt do sprioc phoiblí. Is féidir leo do nuashonruithe a fheiceáil, fógra a thabhairt nuair a stopann dul chun cinn, agus spreagadh a thairiscint gan an sprioc a ghlacadh.",
+      "how": "Déan sprioc poiblí má tá tacaíocht uait. Bain úsáid as Discover le bheith i do chara do dhuine eile, nó chun na spriocanna a bhfuil tú ag cabhrú leo a leanúint."
     },
     "guide": {
-      "checkins_title": "Check-ins",
-      "checkins_body": "Record where the goal stands, how it feels, and any useful context for you or your buddy.",
-      "progress_title": "Progress",
-      "progress_body": "The percentage is your latest estimate against the target value. Check-ins now update the goal and timeline."
+      "checkins_title": "Seiceáil isteach",
+      "checkins_body": "Taifead cá seasann an sprioc, conas a mhothaíonn sé, agus aon chomhthéacs úsáideach duit féin nó do do chara.",
+      "progress_title": "Dul chun cinn",
+      "progress_body": "Is é an céatadán do mheastachán is déanaí i gcoinne an luach sprice. Nuashonraíonn seiceálaithe an sprioc agus an t-amlíne anois."
     },
-    "streak_label": "{{count}} check-in streak",
-    "action_nudge": "Nudge"
+    "streak_label": "Stráice seiceála isteach {{count}}",
+    "action_nudge": "Nudaigh"
   },
   "leaderboard": {
     "page_title": "Clár Ceannairí",
@@ -296,7 +296,7 @@
       "xp": "XP",
       "volunteer_hours": "Uaireanta Deonacha",
       "credits_earned": "Creidmheasanna Tuillte",
-      "nexus_score": "NexusScore"
+      "nexus_score": "NexusScór"
     },
     "period": {
       "all": "Gach Am",
@@ -318,17 +318,17 @@
       "loading": "Séasúr á lódáil",
       "load_failed": "Theip ar Lódáil",
       "load_failed_desc": "Ní fhéadfaí stair séasúir a lódáil.",
-      "unavailable": "Season data unavailable",
-      "unavailable_desc": "Could not load season information. Rankings below are still available.",
-      "rank_label": "Rank {{rank}}",
+      "unavailable": "Níl sonraí an tséasúir ar fáil",
+      "unavailable_desc": "Níorbh fhéidir faisnéis an tséasúir a lódáil. Tá na rangú thíos fós ar fáil.",
+      "rank_label": "Céim {{rank}}",
       "xp_reward": "{{xp}} XP"
     },
     "season_unavailable": "Sonraí séasúir gan fáil",
     "season_unavailable_desc": "Níorbh fhéidir faisnéis séasúir a lódáil. Tá na ranguithe thíos fós ar fáil.",
     "session_expired": "Tá do sheisiún éagtha. Logáil isteach arís le do thoil.",
     "load_error": "Theip ar lódáil an chláir ceannais. Bain triail eile as le do thoil.",
-    "type_nexus_score": "NexusScore",
-    "load_more": "Load More",
+    "type_nexus_score": "NexusScór",
+    "load_more": "Luchtaigh Níos mó",
     "score_unit": {
       "hours": "h",
       "credits": "cr",
@@ -347,17 +347,17 @@
     "new_connections": "Ceangail Nua",
     "new_exchanges": "Malartuithe Nua",
     "new_members": "Baill Nua",
-    "total_badges": "Badges Awarded",
-    "volunteer_hours": "Volunteer Hours",
-    "total_xp": "Total XP Earned",
-    "total_listings": "Listings",
-    "total_connections": "Connections",
-    "total_reviews": "Reviews",
-    "badges_awarded": "Badges Awarded",
-    "new_listings": "New Listings",
-    "new_posts": "New Posts",
-    "load_error": "Failed to load community data",
-    "no_change": "No change"
+    "total_badges": "Suaitheantais Bronnta",
+    "volunteer_hours": "Uaireanta Oibrithe Deonacha",
+    "total_xp": "Iomlán XP Tuillte",
+    "total_listings": "Liostaí",
+    "total_connections": "Naisc",
+    "total_reviews": "Léirmheasanna",
+    "badges_awarded": "Suaitheantais Bronnta",
+    "new_listings": "Liostaí Nua",
+    "new_posts": "Poist Nua",
+    "load_error": "Theip ar lódáil sonraí pobail",
+    "no_change": "Gan athrú"
   },
   "journey": {
     "hours_earned": "Uaireanta Tuillte",
@@ -383,61 +383,61 @@
     "empty_description": "Cuirfear baill ghníomhacha i láthair anseo nuair a thosóidh an pobal ag malartú."
   },
   "nexus_score": {
-    "title": "NexusScore",
-    "subtitle": "Your community reputation score",
+    "title": "NexusScór",
+    "subtitle": "Do scór clú pobail",
     "points_to_next": "{{count}} points to {{tier}}",
-    "max_tier": "You have reached the highest tier!",
-    "breakdown_title": "Score Breakdown",
-    "insights_title": "How to improve",
-    "remaining": "remaining",
-    "view_leaderboard": "View Leaderboard",
-    "my_profile": "My Profile",
-    "load_error": "Could not load your NexusScore. Please try again.",
-    "refresh_error": "Refresh failed",
-    "refresh": "Refresh",
-    "try_again": "Try again",
-    "top_percent": "Top {{percent}}%",
-    "remaining_count": "{{count}} remaining",
+    "max_tier": "Tá an leibhéal is airde sroichte agat!",
+    "breakdown_title": "Miondealú Scór",
+    "insights_title": "Conas a fheabhsú",
+    "remaining": "fágtha",
+    "view_leaderboard": "Féach ar an gclár ceannaire",
+    "my_profile": "Mo Phróifíl",
+    "load_error": "Níorbh fhéidir do NexusScore a lódáil. Bain triail eile as.",
+    "refresh_error": "Theip ar an athnuachan",
+    "refresh": "Athnuaigh",
+    "try_again": "Bain triail eile as",
+    "top_percent": "{{percent}}% barr",
+    "remaining_count": "{{count}} fágtha",
     "category_progress_aria": "{{category}}: {{score}} of {{max}}",
     "tier_threshold": "{{tier}} ({{min}}+)",
     "tiers": {
-      "novice": "Novice",
-      "beginner": "Beginner",
-      "developing": "Developing",
-      "intermediate": "Intermediate",
-      "proficient": "Proficient",
-      "advanced": "Advanced",
-      "expert": "Expert",
-      "elite": "Elite",
-      "legendary": "Legendary"
+      "novice": "Nuaí",
+      "beginner": "Tosaitheoir",
+      "developing": "Ag forbairt",
+      "intermediate": "Idirmheánach",
+      "proficient": "líofa",
+      "advanced": "Casta",
+      "expert": "Saineolaí",
+      "elite": "mionlach",
+      "legendary": "Finscéalach"
     },
     "max_score_label": "/ {{max}}"
   },
   "common": {
-    "refresh": "Refresh",
-    "try_again": "Try Again"
+    "refresh": "Athnuaigh",
+    "try_again": "Bain triail eile as"
   },
   "page_meta": {
     "achievements": {
-      "title": "Achievements"
+      "title": "Éachtaí"
     },
     "leaderboard": {
-      "title": "Leaderboard",
-      "description": "Community leaderboard — see top contributors and most active members."
+      "title": "Clár ceannaire",
+      "description": "Clár ceannairí pobail — féach ar na rannpháirtithe is mó agus na baill is gníomhaí."
     },
     "goals": {
-      "title": "Goals"
+      "title": "Spriocanna"
     },
     "nexus_score": {
-      "title": "NexusScore",
-      "description": "Your private NexusScore breakdown, including community reputation tier, score categories, and tailored ways to improve your impact."
+      "title": "NexusScór",
+      "description": "Do mhiondealú príobháideach NexusScore, lena n-áirítear sraith clú pobail, catagóirí scór, agus bealaí saincheaptha chun do thionchar a fheabhsú."
     }
   },
   "frequency": {
-    "none": "No cadence",
-    "daily": "Daily",
-    "weekly": "Weekly",
-    "biweekly": "Every 2 weeks",
-    "monthly": "Monthly"
+    "none": "Gan deireadh",
+    "daily": "laethúil",
+    "weekly": "Seachtainiúil",
+    "biweekly": "Gach 2 sheachtain",
+    "monthly": "go míosúil"
   }
 }
