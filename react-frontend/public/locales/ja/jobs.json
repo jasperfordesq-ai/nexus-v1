@@ -42,7 +42,8 @@
     "offer": "Offer",
     "accepted": "Accepted",
     "rejected": "Rejected",
-    "withdrawn": "Withdrawn"
+    "withdrawn": "Withdrawn",
+    "unknown": "不明"
   },
   "views": "{{count}} 回の閲覧",
   "applications": "{{count}} 件の応募",
@@ -130,7 +131,32 @@
     "no_roles": "現在オープンポジションはありません",
     "error": "雇用者プロフィールを読み込めませんでした",
     "employer_jobs": "雇用者の仕事",
-    "employees": "{{size}} の従業員"
+    "employees": "{{size}} の従業員",
+    "open_roles_count": "{{count}}件の募集中の職務",
+    "meta_description": "{{count}}件の現在の機会から、雇用主のプロフィール、募集中の職務、コミュニティのレビューを表示します。",
+    "review_submit_failed": "レビューの送信に失敗しました",
+    "reviews_heading": "雇用主レビュー",
+    "leave_review": "レビューを残す",
+    "reviews_count": "{{count}}件のレビュー",
+    "reviews_count_one": "{{count}}件のレビュー",
+    "reviews_count_other": "{{count}}件のレビュー",
+    "star_distribution": "{{star}}つ星: {{count}}件のレビュー",
+    "star_distribution_one": "{{star}}つ星: {{count}}件のレビュー",
+    "star_distribution_other": "{{star}}つ星: {{count}}件のレビュー",
+    "star_option": "{{count}}つ星",
+    "star_option_one": "{{count}}つ星",
+    "star_option_other": "{{count}}つ星",
+    "write_review": "レビューを書く",
+    "overall_rating": "総合評価",
+    "dim_respect": "尊重",
+    "dim_communication": "コミュニケーション",
+    "dim_flexibility": "柔軟性",
+    "dim_impact": "コミュニティへの影響",
+    "review_comment": "コメント",
+    "review_comment_placeholder": "この雇用主との就労経験を共有してください...",
+    "submit_review": "レビューを送信",
+    "no_reviews": "まだレビューはありません",
+    "anonymous": "匿名"
   },
   "bulk": {
     "select_action": "ステージに移動...",
@@ -211,7 +237,26 @@
     "referral_apps": "紹介申請",
     "referral_conversion": "紹介換算",
     "scorecard_avg": "平均スコアカード",
-    "export_csv": "CSVをエクスポート"
+    "export_csv": "CSVをエクスポート",
+    "load_error": "分析の読み込みに失敗しました",
+    "views_tooltip": "{{date}}: {{count}}回の閲覧",
+    "applications_tooltip": "{{week}}: {{count}}件の応募",
+    "stage_progress_aria": "{{stage}}応募ステージの進捗",
+    "predictions": "AI予測",
+    "based_on": "{{count}}件の類似求人に基づく",
+    "no_predictions": "予測のためのデータが不足しています。",
+    "expected_apps": "予想応募数",
+    "current": "現在",
+    "posted_days_ago": "{{days}}日前に投稿",
+    "conversion_comparison": "コンバージョン率",
+    "avg": "平均",
+    "salary_comparison": "給与と市場の比較",
+    "yours": "あなた",
+    "versus": "対",
+    "market_avg": "市場平均",
+    "ai_insights": "AIインサイト",
+    "days_short_value": "{{count}}日",
+    "not_available": "該当なし"
   },
   "salary": {
     "label": "Compensation",
@@ -318,7 +363,18 @@
     "personal_message": "個人的なメッセージ",
     "personal_message_placeholder": "候補者へのメモ...",
     "select_applicant": "選択{{name}}",
-    "ai_score": "AI: {{score}}/100"
+    "ai_score": "AI: {{score}}/100",
+    "ai_rank": "AIランク",
+    "ai_ranked": "AIにより候補者がランク付けされました",
+    "ai_rank_failed": "AIランク付けに失敗しました",
+    "tab_pipeline": "パイプライン",
+    "tab_activity": "アクティビティログ",
+    "no_activity": "まだアクティビティはありません",
+    "no_activity_hint": "採用プロセスが進むにつれてイベントがここに表示されます。",
+    "previous": "前へ",
+    "next": "次へ",
+    "interview_location_placeholder": "https://meet.google.com/...",
+    "offer_salary_placeholder": "例: 45000"
   },
   "apply": {
     "button": "今すぐ応募",
@@ -344,7 +400,9 @@
     "message_employer": "雇用主にメッセージを送る",
     "cv_parse_error": "CVの解析に失敗しました。手動で申請を提出することはできます。",
     "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Quick Apply with Saved Profile"
+    "quick_apply": "Quick Apply with Saved Profile",
+    "this_job": "この求人",
+    "view": "表示"
   },
   "detail": {
     "loading": "求人情報を読み込んでいます...",
@@ -762,7 +820,8 @@
     "note_privacy": "このレポートはプロセスメトリのみを分析します。人口統計データは収集または使用されません。",
     "stages": "stages",
     "not_available": "N/A",
-    "access_denied": "Access denied"
+    "access_denied": "Access denied",
+    "rejection_rates_table_aria": "採用ステージ別の不採用率"
   },
   "self_scheduling": {
     "title": "面接スロット",
@@ -937,13 +996,15 @@
       "title": "バイアス監査"
     },
     "create": {
-      "title": "求人を投稿する"
+      "title": "求人を投稿する",
+      "description": "コミュニティのために求人、ボランティア、またはタイムバンキングの募集を作成します。"
     },
     "talent_search": {
       "title": "タレント検索"
     },
     "my_applications": {
-      "title": "私の応募"
+      "title": "私の応募",
+      "description": "1つのプライベートダッシュボードから、求人、ボランティア、タイムバンキングの応募を追跡します。"
     },
     "analytics": {
       "title": "求人分析"
@@ -959,11 +1020,16 @@
     },
     "employer_brand": {
       "title": "雇用主ブランド"
+    },
+    "edit": {
+      "title": "求人を編集",
+      "description": "求人の詳細、報酬、チーム設定、公開オプションを更新します。"
     }
   },
   "page_title": "Job Vacancies",
   "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
   "jobs": {
     "view_details": "View job details"
-  }
+  },
+  "cancel": "キャンセル"
 }

@@ -24,7 +24,11 @@
     "load_more_failed": "追加のリスティングの読み込みに失敗しました",
     "my_listings": "My Listings",
     "my_offers": "My Offers",
-    "my_orders": "My Orders"
+    "my_orders": "My Orders",
+    "eyebrow": "コミュニティマーケットプレイス",
+    "categories_stat": "カテゴリー",
+    "listings_stat": "表示中の出品",
+    "featured_stat": "注目"
   },
   "hub_feature_gate": {
     "title": "マーケットプレイスはご利用いただけません",
@@ -74,7 +78,17 @@
     "get_directions": "Directions",
     "promoted": "Promoted",
     "unsave": "Remove from saved",
-    "save": "Save listing"
+    "save": "Save listing",
+    "video": "出品動画",
+    "video_unsupported": "お使いのブラウザはvideoタグをサポートしていません。",
+    "report_submitted": "報告を送信しました。ありがとうございます。",
+    "report_error": "報告の送信に失敗しました",
+    "order_created": "注文を作成しました！",
+    "message_template": "こんにちは、あなたの出品に興味があります: {{title}}",
+    "member_since": "{{date}}よりメンバー",
+    "sign_in_to_report": "報告するにはサインイン",
+    "meta_description_fallback": "マーケットプレイスの出品",
+    "detail_field_label": "{{field}}"
   },
   "offer": {
     "modal_title": "オファーを出す",
@@ -104,7 +118,8 @@
     "counter": "カウンター",
     "withdraw": "取り下げ",
     "accept_counter": "カウンターを承諾",
-    "amount_invalid": "Please enter a valid offer amount"
+    "amount_invalid": "Please enter a valid offer amount",
+    "amount_placeholder": "0.00"
   },
   "create": {
     "page_title": "出品する - マーケットプレイス",
@@ -153,7 +168,17 @@
     "created_success": "リスティングを作成しました!",
     "created_error": "リスティングの作成に失敗しました",
     "created_error_retry": "リスティングの作成に失敗しました。もう一度お試しください。",
-    "draft_saved": "Draft saved"
+    "draft_saved": "Draft saved",
+    "image_alt": "アップロード {{number}}",
+    "video": "動画",
+    "video_optional": "（任意、最大1本、50MB）",
+    "remove_video": "動画を削除",
+    "video_drop_zone": "クリックして動画を追加",
+    "video_limits": "MP4、WebM、またはMOV。最大50MB。",
+    "video_type_error": "MP4、WebM、MOVの動画ファイルのみ許可されています。",
+    "video_size_error": "{{name}}は50MBの動画サイズ制限を超えています。",
+    "select_field_placeholder": "{{field}}を選択",
+    "enter_field_placeholder": "{{field}}を入力"
   },
   "search": {
     "page_title": "マーケットプレイスを検索",
@@ -250,7 +275,9 @@
     "results_count_one": "{{count}} 件の結果",
     "results_count_other": "{{count}} 件の結果",
     "load_more": "さらに読み込む",
-    "browse_description": "マーケットプレイスで {{name}} のリスティングを閲覧。"
+    "browse_description": "マーケットプレイスで {{name}} のリスティングを閲覧。",
+    "any_field": "すべての{{field}}",
+    "filter_by_field": "{{field}}でフィルター"
   },
   "common": {
     "free": "無料",
@@ -266,7 +293,9 @@
     "load_more": "さらに読み込む",
     "try_again": "再試行",
     "cancel": "キャンセル",
-    "sort_by": "並び替え"
+    "sort_by": "並び替え",
+    "go_back": "戻る",
+    "dismiss": "閉じる"
   },
   "condition": {
     "new": "新品",
@@ -284,7 +313,8 @@
     "pickup": "引き取りのみ",
     "shipping": "配送のみ",
     "both": "引き取りまたは配送",
-    "community_delivery": "コミュニティ配送"
+    "community_delivery": "コミュニティ配送",
+    "other": "その他の配送方法"
   },
   "sort": {
     "newest": "新着順",
@@ -321,7 +351,10 @@
     "posted_within": "投稿期間",
     "apply": "フィルターを適用",
     "clear": "すべてクリア",
-    "title": "フィルター"
+    "title": "フィルター",
+    "posted_any_time": "いつでも",
+    "posted_today": "今日",
+    "posted_last_days": "過去{{count}}日間"
   },
   "gallery": {
     "no_images": "画像はありません",
@@ -382,7 +415,8 @@
     "empty_sold_title": "まだ売却がありません",
     "empty_sold_description": "まだアイテムを売却していません。",
     "empty_expired_title": "期限切れのリスティングはありません",
-    "empty_expired_description": "期限切れのリスティングはありません。"
+    "empty_expired_description": "期限切れのリスティングはありません。",
+    "views_count_aria": "{{count}}回の閲覧"
   },
   "my_offers": {
     "page_title": "マイオファー - マーケットプレイス",
@@ -527,7 +561,20 @@
     "offer_accepted": "配達オファーを承諾しました!",
     "accept_failed": "オファーの承諾に失敗しました",
     "delivery_confirmed": "配達を確認しました!タイムクレジットが付与されました。",
-    "confirm_failed": "配達の確認に失敗しました"
+    "confirm_failed": "配達の確認に失敗しました",
+    "offers_title_count": "配送オファー（{{count}}件）",
+    "time_credits_value": "{{count}} TC",
+    "estimated_minutes": "約{{count}}分",
+    "time_credits_placeholder": "1.0",
+    "estimated_time_placeholder": "30",
+    "cancel": "キャンセル",
+    "status": {
+      "pending": "保留中",
+      "accepted": "承諾済み",
+      "declined": "辞退",
+      "completed": "完了",
+      "cancelled": "キャンセル済み"
+    }
   },
   "ai_reply": {
     "suggest": "返信を提案",
@@ -558,7 +605,9 @@
     "use_my_location": "現在地を使用",
     "search_this_area": "このエリアを検索",
     "distance_km": "{{km}} km 先",
-    "distance_meters": "{{m}} m 先"
+    "distance_meters": "{{m}} m 先",
+    "radius_option": "{{km}} km",
+    "location_required": "この機能を使用するには、プロフィールで位置情報を設定してください"
   },
   "shipping": {
     "title": "配送オプション",
@@ -589,7 +638,9 @@
     "local_pickup_subtitle": "直接受け取り",
     "recommended": "おすすめ",
     "loading": "配送オプションを読み込み中…",
-    "no_options": "このセラーには利用可能な配送オプションがありません。"
+    "no_options": "このセラーには利用可能な配送オプションがありません。",
+    "price_placeholder": "0.00",
+    "cancel": "キャンセル"
   },
   "listing_location": {
     "location_title": "場所",
@@ -600,7 +651,18 @@
     "choose_slot": "Choose pickup slot",
     "no_slot_selected": "No pickup slot",
     "left": "left",
-    "slot_fallback": "Slot #{{id}}"
+    "slot_fallback": "Slot #{{id}}",
+    "my_pickups_title": "私の受け取り",
+    "my_pickups_subtitle": "売り手の場所でこのコードを提示して注文を受け取ってください。",
+    "no_pickups": "予定されている受け取りはありません。",
+    "order_n": "注文 #{{id}}",
+    "window": "受け取り時間帯",
+    "show_this_code": "売り手にこのコードを提示してください",
+    "status_reserved": "予約済み",
+    "status_picked_up": "受け取り済み",
+    "status_cancelled": "キャンセル済み",
+    "status_no_show": "未到着",
+    "status_unknown": "不明"
   },
   "orders": {
     "load_error": "注文の読み込みに失敗しました",
@@ -686,7 +748,8 @@
       "select_rating": "評価を選択してください",
       "success": "評価を送信しました!",
       "error": "評価の送信に失敗しました"
-    }
+    },
+    "quantity_multiplier": "×{{count}}"
   },
   "onboarding": {
     "page_title": "セラーオンボーディング - マーケットプレイス",
@@ -711,7 +774,10 @@
     "incomplete_description": "Stripe アカウントの設定はまだ完了していません。支払いを受け取るためにオンボーディングを完了してください。",
     "continue_onboarding": "オンボーディングを続行",
     "check_status": "ステータスを確認",
-    "start_error": "オンボーディングの開始に失敗しました"
+    "start_error": "オンボーディングの開始に失敗しました",
+    "nudge_title": "販売者オンボーディングを完了する",
+    "nudge_description": "ビジネス詳細、ブランディング、支払いを追加して、マーケットプレイスパートナーバッジを獲得しましょう。",
+    "start_cta": "オンボーディングを開始"
   },
   "checkout": {
     "title": "Secure Checkout",
@@ -727,5 +793,16 @@
     "payment_error": "An unexpected error occurred. Please try again.",
     "not_available_title": "Payment Processing Being Set Up",
     "not_available_description": "Payment processing is being set up. Please contact the seller to arrange payment."
+  },
+  "inventory": {
+    "section_title": "在庫",
+    "section_subtitle": "在庫を追跡し、過剰販売を防ぎます。",
+    "unlimited": "在庫無制限",
+    "count": "在庫数",
+    "low_stock_threshold": "在庫不足アラート",
+    "oversold_protected": "在庫を超える注文を拒否",
+    "sold_out": "売り切れ",
+    "low_chip": "在庫: {{count}}（少）",
+    "count_chip": "在庫: {{count}}"
   }
 }

@@ -23,7 +23,11 @@
     "categories": "Categories",
     "my_listings": "My Listings",
     "my_offers": "My Offers",
-    "my_orders": "My Orders"
+    "my_orders": "My Orders",
+    "eyebrow": "Mercado comunitario",
+    "categories_stat": "Categorías",
+    "listings_stat": "Anuncios visibles",
+    "featured_stat": "Destacados"
   },
   "hub_feature_gate": {
     "title": "Mercado No Disponible",
@@ -73,7 +77,17 @@
     "get_directions": "Directions",
     "promoted": "Promoted",
     "unsave": "Remove from saved",
-    "save": "Save listing"
+    "save": "Save listing",
+    "video": "Vídeo del anuncio",
+    "video_unsupported": "Tu navegador no admite la etiqueta de vídeo.",
+    "report_submitted": "Denuncia enviada. Gracias.",
+    "report_error": "No se pudo enviar la denuncia",
+    "order_created": "¡Pedido creado!",
+    "message_template": "Hola, me interesa tu anuncio: {{title}}",
+    "member_since": "Miembro desde {{date}}",
+    "sign_in_to_report": "Inicia sesión para denunciar",
+    "meta_description_fallback": "Anuncio del mercado",
+    "detail_field_label": "{{field}}"
   },
   "offer": {
     "modal_title": "Hacer una oferta",
@@ -103,7 +117,8 @@
     "decline": "Decline",
     "counter": "Counter",
     "withdraw": "Withdraw",
-    "amount_invalid": "Please enter a valid offer amount"
+    "amount_invalid": "Please enter a valid offer amount",
+    "amount_placeholder": "0,00"
   },
   "create": {
     "page_title": "Vender algo - Mercado",
@@ -152,7 +167,17 @@
     "currency_label": "Currency",
     "location_label": "Location",
     "cancel": "Cancel",
-    "draft_saved": "Draft saved"
+    "draft_saved": "Draft saved",
+    "image_alt": "Subir {{number}}",
+    "video": "Vídeo",
+    "video_optional": "(opcional, máx. 1 vídeo, 50 MB)",
+    "remove_video": "Eliminar vídeo",
+    "video_drop_zone": "Haz clic para añadir un vídeo",
+    "video_limits": "MP4, WebM o MOV. Máx. 50 MB.",
+    "video_type_error": "Solo se permiten archivos de vídeo MP4, WebM y MOV.",
+    "video_size_error": "{{name}} supera el límite de 50 MB de tamaño de vídeo.",
+    "select_field_placeholder": "Selecciona {{field}}",
+    "enter_field_placeholder": "Introduce {{field}}"
   },
   "search": {
     "page_title": "Buscar en el mercado",
@@ -249,7 +274,9 @@
     "filters_title": "Filters",
     "price_min": "Min",
     "price_max": "Max",
-    "condition_label": "Condition"
+    "condition_label": "Condition",
+    "any_field": "Cualquier {{field}}",
+    "filter_by_field": "Filtrar por {{field}}"
   },
   "common": {
     "save_listing": "Guardar listado",
@@ -265,7 +292,9 @@
     "negotiable": "Negotiable",
     "save": "Save",
     "unsave": "Unsave",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "go_back": "Volver",
+    "dismiss": "Descartar"
   },
   "condition": {
     "like_new": "Como nuevo",
@@ -283,7 +312,8 @@
     "pickup": "Solo recogida",
     "shipping": "Solo envío",
     "both": "Recogida o envío",
-    "community_delivery": "Entrega comunitaria"
+    "community_delivery": "Entrega comunitaria",
+    "other": "Otro método de entrega"
   },
   "sort": {
     "newest": "Más nuevo primero",
@@ -320,7 +350,10 @@
     "delivery_all": "All",
     "delivery_shipping": "Shipping",
     "delivery_both": "Both",
-    "title": "Filters"
+    "title": "Filters",
+    "posted_any_time": "En cualquier momento",
+    "posted_today": "Hoy",
+    "posted_last_days": "Últimos {{count}} días"
   },
   "gallery": {
     "no_images": "No hay imágenes disponibles",
@@ -381,7 +414,8 @@
     "stat_revenue": "Revenue",
     "action_edit": "Edit",
     "action_renew": "Renew",
-    "action_remove": "Remove"
+    "action_remove": "Remove",
+    "views_count_aria": "{{count}} vistas"
   },
   "my_offers": {
     "page_title": "Mis Ofertas - Mercado",
@@ -526,7 +560,20 @@
     "delivery_confirmed": "¡Entrega confirmada! Créditos de tiempo otorgados.",
     "confirm_failed": "Error al confirmar la entrega",
     "unknown": "Unknown",
-    "accept": "Accept"
+    "accept": "Accept",
+    "offers_title_count": "Ofertas de entrega ({{count}})",
+    "time_credits_value": "{{count}} CT",
+    "estimated_minutes": "~{{count}} min",
+    "time_credits_placeholder": "1,0",
+    "estimated_time_placeholder": "30",
+    "cancel": "Cancelar",
+    "status": {
+      "pending": "Pendiente",
+      "accepted": "Aceptada",
+      "declined": "Rechazada",
+      "completed": "Completada",
+      "cancelled": "Cancelada"
+    }
   },
   "ai_reply": {
     "suggest": "Sugerir Respuesta",
@@ -557,7 +604,9 @@
     "search_this_area": "Buscar en Esta Área",
     "distance_km": "{{km}} km de distancia",
     "distance_meters": "{{m}}m de distancia",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "radius_option": "{{km}} km",
+    "location_required": "Establece tu ubicación en tu perfil para usar esta función"
   },
   "shipping": {
     "title": "Opciones de Envío",
@@ -588,7 +637,9 @@
     "price": "Price",
     "currency": "Currency",
     "default_badge": "Default",
-    "recommended": "Recommended"
+    "recommended": "Recommended",
+    "price_placeholder": "0,00",
+    "cancel": "Cancelar"
   },
   "listing_location": {
     "approximate_location": "Ubicación aproximada",
@@ -599,7 +650,18 @@
     "choose_slot": "Choose pickup slot",
     "no_slot_selected": "No pickup slot",
     "left": "left",
-    "slot_fallback": "Slot #{{id}}"
+    "slot_fallback": "Slot #{{id}}",
+    "my_pickups_title": "Mis recogidas",
+    "my_pickups_subtitle": "Muestra este código en la ubicación del vendedor para recoger tu pedido.",
+    "no_pickups": "No hay recogidas pendientes.",
+    "order_n": "Pedido n.º {{id}}",
+    "window": "Franja de recogida",
+    "show_this_code": "Muestra este código al vendedor",
+    "status_reserved": "Reservado",
+    "status_picked_up": "Recogido",
+    "status_cancelled": "Cancelado",
+    "status_no_show": "No se presentó",
+    "status_unknown": "Desconocido"
   },
   "orders": {
     "load_error": "Error al cargar los pedidos",
@@ -685,7 +747,8 @@
     "track": "Track",
     "tab_all": "All",
     "tab_active": "Active",
-    "tab_completed": "Completed"
+    "tab_completed": "Completed",
+    "quantity_multiplier": "x{{count}}"
   },
   "onboarding": {
     "page_title": "Incorporación de Vendedores - Mercado",
@@ -710,7 +773,10 @@
     "incomplete_description": "La configuración de tu cuenta de Stripe aún no está completa. Por favor, termina el proceso de incorporación para comenzar a recibir pagos.",
     "continue_onboarding": "Continuar con la Incorporación",
     "check_status": "Ver Estado",
-    "start_error": "Error al iniciar la incorporación"
+    "start_error": "Error al iniciar la incorporación",
+    "nudge_title": "Completa tu incorporación como comerciante",
+    "nudge_description": "Añade datos del negocio, marca y pagos para desbloquear la insignia de Socio del Mercado.",
+    "start_cta": "Iniciar incorporación"
   },
   "page_title": "Marketplace",
   "checkout": {
@@ -727,5 +793,16 @@
     "payment_error": "An unexpected error occurred. Please try again.",
     "not_available_title": "Payment Processing Being Set Up",
     "not_available_description": "Payment processing is being set up. Please contact the seller to arrange payment."
+  },
+  "inventory": {
+    "section_title": "Inventario",
+    "section_subtitle": "Controla el stock y evita las ventas excesivas.",
+    "unlimited": "Stock ilimitado",
+    "count": "Cantidad en stock",
+    "low_stock_threshold": "Alerta de stock bajo en",
+    "oversold_protected": "Rechazar pedidos que superen el stock",
+    "sold_out": "Agotado",
+    "low_chip": "Inventario: {{count}} (Bajo)",
+    "count_chip": "Inventario: {{count}}"
   }
 }

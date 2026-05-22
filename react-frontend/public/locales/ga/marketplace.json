@@ -24,7 +24,11 @@
     "load_more_failed": "Theip ar luchtú tuilleadh liostaí",
     "my_listings": "My Listings",
     "my_offers": "My Offers",
-    "my_orders": "My Orders"
+    "my_orders": "My Orders",
+    "eyebrow": "Margadh pobail",
+    "categories_stat": "Catagóirí",
+    "listings_stat": "Liostaí infheicthe",
+    "featured_stat": "Sainráite"
   },
   "hub_feature_gate": {
     "title": "Níl an Margadh ar Fáil",
@@ -74,7 +78,17 @@
     "get_directions": "Directions",
     "promoted": "Promoted",
     "unsave": "Remove from saved",
-    "save": "Save listing"
+    "save": "Save listing",
+    "video": "Físeán liosta",
+    "video_unsupported": "Ní thacaíonn do bhrabhsálaí leis an gclib físe.",
+    "report_submitted": "Tuairisc curtha isteach. Go raibh maith agat.",
+    "report_error": "Theip ar an tuairisc a chur isteach",
+    "order_created": "Cruthaíodh ordú!",
+    "message_template": "Dia duit, tá suim agam i do liosta: {{title}}",
+    "member_since": "Ball ó {{date}}",
+    "sign_in_to_report": "Sínigh isteach chun tuairisc a thabhairt",
+    "meta_description_fallback": "Liosta margaidh",
+    "detail_field_label": "{{field}}"
   },
   "offer": {
     "modal_title": "Déan Tairiscint",
@@ -104,7 +118,8 @@
     "counter": "Frith-thairg",
     "withdraw": "Tarraing Siar",
     "accept_counter": "Glac leis an bhFrith-thairiscint",
-    "amount_invalid": "Please enter a valid offer amount"
+    "amount_invalid": "Please enter a valid offer amount",
+    "amount_placeholder": "0.00"
   },
   "create": {
     "page_title": "Díol Rud Éigin - Margadh",
@@ -153,7 +168,17 @@
     "created_success": "D'éirigh le cruthú an liosta!",
     "created_error": "Theip ar chruthú an liosta",
     "created_error_retry": "Theip ar chruthú an liosta. Bain triail eile as.",
-    "draft_saved": "Draft saved"
+    "draft_saved": "Draft saved",
+    "image_alt": "Uaslódáil {{number}}",
+    "video": "Físeán",
+    "video_optional": "(roghnach, uasmhéid 1 físeán, 50MB)",
+    "remove_video": "Bain físeán",
+    "video_drop_zone": "Cliceáil chun físeán a chur leis",
+    "video_limits": "MP4, WebM, nó MOV. Uasmhéid 50MB.",
+    "video_type_error": "Ní cheadaítear ach comhaid físe MP4, WebM agus MOV.",
+    "video_size_error": "Sáraíonn {{name}} an teorainn méid físe 50MB.",
+    "select_field_placeholder": "Roghnaigh {{field}}",
+    "enter_field_placeholder": "Iontráil {{field}}"
   },
   "search": {
     "page_title": "Cuardaigh an Margadh",
@@ -250,7 +275,9 @@
     "results_count_one": "{{count}} toradh",
     "results_count_other": "{{count}} toradh",
     "load_more": "Luchtaigh Tuilleadh",
-    "browse_description": "Brabhsáil liostaí {{name}} sa mhargadh."
+    "browse_description": "Brabhsáil liostaí {{name}} sa mhargadh.",
+    "any_field": "Aon {{field}}",
+    "filter_by_field": "Scag de réir {{field}}"
   },
   "common": {
     "free": "Saor in Aisce",
@@ -266,7 +293,9 @@
     "load_more": "Luchtaigh Tuilleadh",
     "try_again": "Bain Triail Eile As",
     "cancel": "Cealaigh",
-    "sort_by": "Sórtáil de réir"
+    "sort_by": "Sórtáil de réir",
+    "go_back": "Téigh ar ais",
+    "dismiss": "Dífhostaigh"
   },
   "condition": {
     "new": "Nua",
@@ -284,7 +313,8 @@
     "pickup": "Bailiúchán Amháin",
     "shipping": "Loingseoireacht Amháin",
     "both": "Bailiúchán nó Loingseoireacht",
-    "community_delivery": "Seachadadh Pobail"
+    "community_delivery": "Seachadadh Pobail",
+    "other": "Modh seachadta eile"
   },
   "sort": {
     "newest": "Is Nuaí ar dTús",
@@ -321,7 +351,10 @@
     "posted_within": "Postáilte Laistigh de",
     "apply": "Cuir Scagairí i bhFeidhm",
     "clear": "Glan Gach",
-    "title": "Scagairí"
+    "title": "Scagairí",
+    "posted_any_time": "Aon am",
+    "posted_today": "Inniu",
+    "posted_last_days": "Na {{count}} lá deireanacha"
   },
   "gallery": {
     "no_images": "Níl aon íomhánna ar fáil",
@@ -382,7 +415,8 @@
     "empty_sold_title": "Gan Díolacháin Fós",
     "empty_sold_description": "Níor dhíol tú aon earra fós.",
     "empty_expired_title": "Gan Liostaí in Éag",
-    "empty_expired_description": "Níl aon liostaí in éag agat."
+    "empty_expired_description": "Níl aon liostaí in éag agat.",
+    "views_count_aria": "{{count}} amharc"
   },
   "my_offers": {
     "page_title": "Mo Thairiscintí - Margadh",
@@ -527,7 +561,20 @@
     "offer_accepted": "Glacadh leis an tairiscint seachadta!",
     "accept_failed": "Theip ar ghlacadh leis an tairiscint",
     "delivery_confirmed": "Deimhníodh an seachadadh! Bronnadh creidmheasanna ama.",
-    "confirm_failed": "Theip ar dheimhniú an tseachadta"
+    "confirm_failed": "Theip ar dheimhniú an tseachadta",
+    "offers_title_count": "Tairiscintí seachadta ({{count}})",
+    "time_credits_value": "{{count}} CA",
+    "estimated_minutes": "~{{count}} nóim",
+    "time_credits_placeholder": "1.0",
+    "estimated_time_placeholder": "30",
+    "cancel": "Cealaigh",
+    "status": {
+      "pending": "Ar feitheamh",
+      "accepted": "Glactha",
+      "declined": "Diúltaithe",
+      "completed": "Críochnaithe",
+      "cancelled": "Cealaithe"
+    }
   },
   "ai_reply": {
     "suggest": "Mol Freagra",
@@ -558,7 +605,9 @@
     "use_my_location": "Úsáid Mo Shuíomh",
     "search_this_area": "Cuardaigh an Limistéar Seo",
     "distance_km": "{{km}} km ar shiúl",
-    "distance_meters": "{{m}}m ar shiúl"
+    "distance_meters": "{{m}}m ar shiúl",
+    "radius_option": "{{km}} km",
+    "location_required": "Socraigh do shuíomh i do phróifíl chun an ghné seo a úsáid"
   },
   "shipping": {
     "title": "Roghanna Loingseoireachta",
@@ -589,7 +638,9 @@
     "local_pickup_subtitle": "Bailigh go pearsanta",
     "recommended": "Molta",
     "loading": "Roghanna loingseoireachta á luchtú...",
-    "no_options": "Níl aon roghanna loingseoireachta ar fáil don díoltóir seo."
+    "no_options": "Níl aon roghanna loingseoireachta ar fáil don díoltóir seo.",
+    "price_placeholder": "0.00",
+    "cancel": "Cealaigh"
   },
   "listing_location": {
     "location_title": "Suíomh",
@@ -600,7 +651,18 @@
     "choose_slot": "Choose pickup slot",
     "no_slot_selected": "No pickup slot",
     "left": "left",
-    "slot_fallback": "Slot #{{id}}"
+    "slot_fallback": "Slot #{{id}}",
+    "my_pickups_title": "Mo bhailiúcháin",
+    "my_pickups_subtitle": "Taispeáin an cód seo ag suíomh an díoltóra chun d'ordú a bhailiú.",
+    "no_pickups": "Gan bhailiúcháin amach romhainn.",
+    "order_n": "Ordú #{{id}}",
+    "window": "Fuinneog bhailithe",
+    "show_this_code": "Taispeáin an cód seo don díoltóir",
+    "status_reserved": "Curtha in áirithe",
+    "status_picked_up": "Bailithe",
+    "status_cancelled": "Cealaithe",
+    "status_no_show": "Níor tháinig",
+    "status_unknown": "Anaithnid"
   },
   "orders": {
     "load_error": "Theip ar luchtú na n-orduithe",
@@ -686,7 +748,8 @@
       "select_rating": "Roghnaigh rátáil, le do thoil",
       "success": "Cuireadh an rátáil isteach go rathúil!",
       "error": "Theip ar chur isteach na rátála"
-    }
+    },
+    "quantity_multiplier": "×{{count}}"
   },
   "onboarding": {
     "page_title": "Ionduchtú an Díoltóra - Margadh",
@@ -711,7 +774,10 @@
     "incomplete_description": "Níl socrú do chuntais Stripe críochnaithe fós. Críochnaigh an próiseas ionduchtaithe le do thoil chun tosú ag fáil íocaíochtaí.",
     "continue_onboarding": "Lean ar Aghaidh leis an Ionduchtú",
     "check_status": "Seiceáil Stádas",
-    "start_error": "Theip ar thús an ionduchtaithe"
+    "start_error": "Theip ar thús an ionduchtaithe",
+    "nudge_title": "Críochnaigh do thús ceannaí",
+    "nudge_description": "Cuir sonraí gnó, branda agus íocaíochtaí leis chun an suaitheantas Comhpháirtí Margaidh a oscailt.",
+    "start_cta": "Tosaigh an tús"
   },
   "checkout": {
     "title": "Secure Checkout",
@@ -727,5 +793,16 @@
     "payment_error": "An unexpected error occurred. Please try again.",
     "not_available_title": "Payment Processing Being Set Up",
     "not_available_description": "Payment processing is being set up. Please contact the seller to arrange payment."
+  },
+  "inventory": {
+    "section_title": "Stoc",
+    "section_subtitle": "Lean stoc agus cosc a chur ar ródhíol.",
+    "unlimited": "Stoc gan teorainn",
+    "count": "Méid stoic",
+    "low_stock_threshold": "Foláireamh stoc íseal ag",
+    "oversold_protected": "Diúltaigh d'orduithe a sháródh an stoc",
+    "sold_out": "Díolta amach",
+    "low_chip": "Stoc: {{count}} (Íseal)",
+    "count_chip": "Stoc: {{count}}"
   }
 }

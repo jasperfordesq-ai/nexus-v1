@@ -42,7 +42,8 @@
     "offer": "Oferta",
     "accepted": "Aceptado",
     "rejected": "Rechazado",
-    "withdrawn": "Retirado"
+    "withdrawn": "Retirado",
+    "unknown": "Desconocido"
   },
   "views": "{{count}} vistas",
   "applications": "{{count}} solicitudes",
@@ -130,7 +131,32 @@
     "no_roles": "Sin puestos abiertos en este momento",
     "error": "No se pudo cargar el perfil del empleador",
     "employer_jobs": "Empleos del Empleador",
-    "employees": "{{size}} empleados"
+    "employees": "{{size}} empleados",
+    "open_roles_count": "{{count}} puestos abiertos",
+    "meta_description": "Ve el perfil del empleador, los puestos abiertos y las reseñas de la comunidad a través de {{count}} oportunidades actuales.",
+    "review_submit_failed": "No se pudo enviar la reseña",
+    "reviews_heading": "Reseñas del empleador",
+    "leave_review": "Dejar una reseña",
+    "reviews_count": "{{count}} reseñas",
+    "reviews_count_one": "{{count}} reseña",
+    "reviews_count_other": "{{count}} reseñas",
+    "star_distribution": "{{star}} estrellas: {{count}} reseñas",
+    "star_distribution_one": "{{star}} estrella: {{count}} reseña",
+    "star_distribution_other": "{{star}} estrellas: {{count}} reseñas",
+    "star_option": "{{count}} estrellas",
+    "star_option_one": "{{count}} estrella",
+    "star_option_other": "{{count}} estrellas",
+    "write_review": "Escribir una reseña",
+    "overall_rating": "Calificación general",
+    "dim_respect": "Respeto",
+    "dim_communication": "Comunicación",
+    "dim_flexibility": "Flexibilidad",
+    "dim_impact": "Impacto en la comunidad",
+    "review_comment": "Comentario",
+    "review_comment_placeholder": "Comparte tu experiencia trabajando con este empleador...",
+    "submit_review": "Enviar reseña",
+    "no_reviews": "Aún no hay reseñas",
+    "anonymous": "Anónimo"
   },
   "bulk": {
     "select_action": "Mover a etapa...",
@@ -211,7 +237,26 @@
     "referral_apps": "Solicitudes por Referencia",
     "referral_conversion": "Conversión de Referencias",
     "scorecard_avg": "Puntuación Media",
-    "export_csv": "Exportar CSV"
+    "export_csv": "Exportar CSV",
+    "load_error": "Error al cargar las analíticas",
+    "views_tooltip": "{{date}}: {{count}} vistas",
+    "applications_tooltip": "{{week}}: {{count}} solicitudes",
+    "stage_progress_aria": "Progreso de la etapa de solicitud {{stage}}",
+    "predictions": "Predicciones de IA",
+    "based_on": "Basado en {{count}} empleos similares",
+    "no_predictions": "Datos insuficientes para predicciones.",
+    "expected_apps": "Solicitudes esperadas",
+    "current": "Actual",
+    "posted_days_ago": "Publicado hace {{days}} días",
+    "conversion_comparison": "Tasa de conversión",
+    "avg": "Prom.",
+    "salary_comparison": "Salario vs. mercado",
+    "yours": "El tuyo",
+    "versus": "vs.",
+    "market_avg": "Promedio del mercado",
+    "ai_insights": "Información de IA",
+    "days_short_value": "{{count}} d",
+    "not_available": "N/D"
   },
   "salary": {
     "label": "Compensación",
@@ -318,7 +363,18 @@
     "personal_message": "Mensaje Personal",
     "personal_message_placeholder": "Una nota para el candidato...",
     "select_applicant": "Seleccionar {{name}}",
-    "ai_score": "AI: {{score}}/100"
+    "ai_score": "AI: {{score}}/100",
+    "ai_rank": "Rango IA",
+    "ai_ranked": "Candidatos clasificados por IA",
+    "ai_rank_failed": "Falló la clasificación por IA",
+    "tab_pipeline": "Pipeline",
+    "tab_activity": "Registro de actividad",
+    "no_activity": "Aún no hay actividad",
+    "no_activity_hint": "Los eventos aparecerán aquí a medida que avance el proceso de contratación.",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "interview_location_placeholder": "https://meet.google.com/...",
+    "offer_salary_placeholder": "p. ej., 45000"
   },
   "apply": {
     "button": "Solicitar Ahora",
@@ -344,7 +400,9 @@
     "message_employer": "Mensaje al Empleador",
     "cv_parse_error": "No se pudo analizar el CV. Aún puede enviar su solicitud manualmente.",
     "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Quick Apply with Saved Profile"
+    "quick_apply": "Quick Apply with Saved Profile",
+    "this_job": "este empleo",
+    "view": "Ver"
   },
   "detail": {
     "loading": "Cargando oferta...",
@@ -762,7 +820,8 @@
     "note_privacy": "Este informe solo analiza métricas de proceso. No se recopilan ni utilizan datos demográficos.",
     "stages": "stages",
     "not_available": "N/A",
-    "access_denied": "Access denied"
+    "access_denied": "Access denied",
+    "rejection_rates_table_aria": "Tasas de rechazo por etapa de contratación"
   },
   "self_scheduling": {
     "title": "Horarios de Entrevista",
@@ -937,13 +996,15 @@
       "title": "Auditoría de sesgos"
     },
     "create": {
-      "title": "Publicar un trabajo"
+      "title": "Publicar un trabajo",
+      "description": "Crea una vacante de empleo, voluntariado o banco de tiempo para tu comunidad."
     },
     "talent_search": {
       "title": "Búsqueda de talento"
     },
     "my_applications": {
-      "title": "Mis solicitudes"
+      "title": "Mis solicitudes",
+      "description": "Sigue tus solicitudes de empleo, voluntariado y banco de tiempo desde un único panel privado."
     },
     "analytics": {
       "title": "Análisis de trabajos"
@@ -959,11 +1020,16 @@
     },
     "employer_brand": {
       "title": "Marca del empleador"
+    },
+    "edit": {
+      "title": "Editar empleo",
+      "description": "Actualiza los detalles de la vacante, la remuneración, la configuración del equipo y las opciones de publicación."
     }
   },
   "page_title": "Job Vacancies",
   "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
   "jobs": {
     "view_details": "View job details"
-  }
+  },
+  "cancel": "Cancelar"
 }

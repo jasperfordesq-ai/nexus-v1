@@ -24,7 +24,11 @@
     "load_more_failed": "Nie udało się załadować kolejnych ogłoszeń",
     "my_listings": "My Listings",
     "my_offers": "My Offers",
-    "my_orders": "My Orders"
+    "my_orders": "My Orders",
+    "eyebrow": "Społecznościowy marketplace",
+    "categories_stat": "Kategorie",
+    "listings_stat": "Widoczne ogłoszenia",
+    "featured_stat": "Wyróżnione"
   },
   "hub_feature_gate": {
     "title": "Marketplace niedostępny",
@@ -74,7 +78,17 @@
     "get_directions": "Directions",
     "promoted": "Promoted",
     "unsave": "Remove from saved",
-    "save": "Save listing"
+    "save": "Save listing",
+    "video": "Wideo ogłoszenia",
+    "video_unsupported": "Twoja przeglądarka nie obsługuje tagu wideo.",
+    "report_submitted": "Zgłoszenie wysłane. Dziękujemy.",
+    "report_error": "Nie udało się wysłać zgłoszenia",
+    "order_created": "Zamówienie utworzone!",
+    "message_template": "Cześć, interesuje mnie Twoje ogłoszenie: {{title}}",
+    "member_since": "Członek od {{date}}",
+    "sign_in_to_report": "Zaloguj się, aby zgłosić",
+    "meta_description_fallback": "Ogłoszenie z marketplace",
+    "detail_field_label": "{{field}}"
   },
   "offer": {
     "modal_title": "Złóż ofertę",
@@ -104,7 +118,8 @@
     "counter": "Kontroferta",
     "withdraw": "Wycofaj",
     "accept_counter": "Zaakceptuj kontrofertę",
-    "amount_invalid": "Please enter a valid offer amount"
+    "amount_invalid": "Please enter a valid offer amount",
+    "amount_placeholder": "0,00"
   },
   "create": {
     "page_title": "Sprzedaj coś - Marketplace",
@@ -153,7 +168,17 @@
     "created_success": "Ogłoszenie utworzone pomyślnie!",
     "created_error": "Nie udało się utworzyć ogłoszenia",
     "created_error_retry": "Nie udało się utworzyć ogłoszenia. Spróbuj ponownie.",
-    "draft_saved": "Draft saved"
+    "draft_saved": "Draft saved",
+    "image_alt": "Prześlij {{number}}",
+    "video": "Wideo",
+    "video_optional": "(opcjonalnie, maks. 1 wideo, 50 MB)",
+    "remove_video": "Usuń wideo",
+    "video_drop_zone": "Kliknij, aby dodać wideo",
+    "video_limits": "MP4, WebM lub MOV. Maks. 50 MB.",
+    "video_type_error": "Dozwolone są tylko pliki wideo MP4, WebM i MOV.",
+    "video_size_error": "{{name}} przekracza limit rozmiaru wideo wynoszący 50 MB.",
+    "select_field_placeholder": "Wybierz {{field}}",
+    "enter_field_placeholder": "Wprowadź {{field}}"
   },
   "search": {
     "page_title": "Przeszukaj marketplace",
@@ -250,7 +275,9 @@
     "results_count_one": "{{count}} wynik",
     "results_count_other": "{{count}} wyników",
     "load_more": "Załaduj więcej",
-    "browse_description": "Przeglądaj ogłoszenia w kategorii {{name}} na marketplace."
+    "browse_description": "Przeglądaj ogłoszenia w kategorii {{name}} na marketplace.",
+    "any_field": "Dowolny {{field}}",
+    "filter_by_field": "Filtruj według {{field}}"
   },
   "common": {
     "free": "Za darmo",
@@ -266,7 +293,9 @@
     "load_more": "Załaduj więcej",
     "try_again": "Spróbuj ponownie",
     "cancel": "Anuluj",
-    "sort_by": "Sortuj według"
+    "sort_by": "Sortuj według",
+    "go_back": "Wróć",
+    "dismiss": "Odrzuć"
   },
   "condition": {
     "new": "Nowy",
@@ -284,7 +313,8 @@
     "pickup": "Tylko odbiór osobisty",
     "shipping": "Tylko wysyłka",
     "both": "Odbiór lub wysyłka",
-    "community_delivery": "Dostawa społecznościowa"
+    "community_delivery": "Dostawa społecznościowa",
+    "other": "Inna metoda dostawy"
   },
   "sort": {
     "newest": "Najnowsze",
@@ -321,7 +351,10 @@
     "posted_within": "Dodano w ciągu",
     "apply": "Zastosuj filtry",
     "clear": "Wyczyść wszystko",
-    "title": "Filtry"
+    "title": "Filtry",
+    "posted_any_time": "Dowolny czas",
+    "posted_today": "Dzisiaj",
+    "posted_last_days": "Ostatnie {{count}} dni"
   },
   "gallery": {
     "no_images": "Brak dostępnych obrazów",
@@ -382,7 +415,8 @@
     "empty_sold_title": "Brak sprzedaży",
     "empty_sold_description": "Nie sprzedałeś jeszcze żadnych przedmiotów.",
     "empty_expired_title": "Brak wygasłych ogłoszeń",
-    "empty_expired_description": "Nie masz żadnych wygasłych ogłoszeń."
+    "empty_expired_description": "Nie masz żadnych wygasłych ogłoszeń.",
+    "views_count_aria": "{{count}} wyświetleń"
   },
   "my_offers": {
     "page_title": "Moje oferty - Marketplace",
@@ -527,7 +561,20 @@
     "offer_accepted": "Oferta dostawy zaakceptowana!",
     "accept_failed": "Nie udało się zaakceptować oferty",
     "delivery_confirmed": "Dostawa potwierdzona! Kredyty czasu przyznane.",
-    "confirm_failed": "Nie udało się potwierdzić dostawy"
+    "confirm_failed": "Nie udało się potwierdzić dostawy",
+    "offers_title_count": "Oferty dostawy ({{count}})",
+    "time_credits_value": "{{count}} KC",
+    "estimated_minutes": "~{{count}} min",
+    "time_credits_placeholder": "1,0",
+    "estimated_time_placeholder": "30",
+    "cancel": "Anuluj",
+    "status": {
+      "pending": "Oczekująca",
+      "accepted": "Zaakceptowana",
+      "declined": "Odrzucona",
+      "completed": "Zakończona",
+      "cancelled": "Anulowana"
+    }
   },
   "ai_reply": {
     "suggest": "Zaproponuj odpowiedź",
@@ -558,7 +605,9 @@
     "use_my_location": "Użyj mojej lokalizacji",
     "search_this_area": "Przeszukaj ten obszar",
     "distance_km": "{{km}} km stąd",
-    "distance_meters": "{{m}} m stąd"
+    "distance_meters": "{{m}} m stąd",
+    "radius_option": "{{km}} km",
+    "location_required": "Ustaw swoją lokalizację w profilu, aby korzystać z tej funkcji"
   },
   "shipping": {
     "title": "Opcje wysyłki",
@@ -589,7 +638,9 @@
     "local_pickup_subtitle": "Odbierz osobiście",
     "recommended": "Polecane",
     "loading": "Ładowanie opcji wysyłki...",
-    "no_options": "Brak dostępnych opcji wysyłki dla tego sprzedawcy."
+    "no_options": "Brak dostępnych opcji wysyłki dla tego sprzedawcy.",
+    "price_placeholder": "0,00",
+    "cancel": "Anuluj"
   },
   "listing_location": {
     "location_title": "Lokalizacja",
@@ -600,7 +651,18 @@
     "choose_slot": "Choose pickup slot",
     "no_slot_selected": "No pickup slot",
     "left": "left",
-    "slot_fallback": "Slot #{{id}}"
+    "slot_fallback": "Slot #{{id}}",
+    "my_pickups_title": "Moje odbiory",
+    "my_pickups_subtitle": "Pokaż ten kod w lokalizacji sprzedawcy, aby odebrać zamówienie.",
+    "no_pickups": "Brak nadchodzących odbiorów.",
+    "order_n": "Zamówienie #{{id}}",
+    "window": "Okno odbioru",
+    "show_this_code": "Pokaż ten kod sprzedawcy",
+    "status_reserved": "Zarezerwowane",
+    "status_picked_up": "Odebrane",
+    "status_cancelled": "Anulowane",
+    "status_no_show": "Nie pojawił się",
+    "status_unknown": "Nieznany"
   },
   "orders": {
     "load_error": "Nie udało się załadować zamówień",
@@ -686,7 +748,8 @@
       "select_rating": "Wybierz ocenę",
       "success": "Ocena wysłana pomyślnie!",
       "error": "Nie udało się wysłać oceny"
-    }
+    },
+    "quantity_multiplier": "×{{count}}"
   },
   "onboarding": {
     "page_title": "Wdrożenie sprzedawcy - Marketplace",
@@ -711,7 +774,10 @@
     "incomplete_description": "Konfiguracja twojego konta Stripe nie została jeszcze ukończona. Dokończ proces wdrożenia, aby zacząć otrzymywać płatności.",
     "continue_onboarding": "Kontynuuj wdrożenie",
     "check_status": "Sprawdź status",
-    "start_error": "Nie udało się rozpocząć wdrożenia"
+    "start_error": "Nie udało się rozpocząć wdrożenia",
+    "nudge_title": "Dokończ proces wdrożenia sprzedawcy",
+    "nudge_description": "Dodaj dane firmy, branding i wypłaty, aby odblokować odznakę Partnera Marketplace.",
+    "start_cta": "Rozpocznij wdrożenie"
   },
   "checkout": {
     "title": "Secure Checkout",
@@ -727,5 +793,16 @@
     "payment_error": "An unexpected error occurred. Please try again.",
     "not_available_title": "Payment Processing Being Set Up",
     "not_available_description": "Payment processing is being set up. Please contact the seller to arrange payment."
+  },
+  "inventory": {
+    "section_title": "Stan magazynowy",
+    "section_subtitle": "Śledź stan magazynowy i unikaj nadsprzedaży.",
+    "unlimited": "Nieograniczony stan magazynowy",
+    "count": "Liczba sztuk",
+    "low_stock_threshold": "Alert niskiego stanu przy",
+    "oversold_protected": "Odrzucaj zamówienia przekraczające stan magazynowy",
+    "sold_out": "Wyprzedane",
+    "low_chip": "Stan: {{count}} (Niski)",
+    "count_chip": "Stan: {{count}}"
   }
 }

@@ -42,7 +42,8 @@
     "offer": "Offer",
     "accepted": "Accepted",
     "rejected": "Rejected",
-    "withdrawn": "Withdrawn"
+    "withdrawn": "Withdrawn",
+    "unknown": "Onbekend"
   },
   "views": "{{count}} weergaven",
   "applications": "{{count}} aanvragen",
@@ -130,7 +131,32 @@
     "no_roles": "Geen openstaande rollen op dit moment",
     "error": "Kan werkgeversprofiel niet laden",
     "employer_jobs": "Werkgeversbanen",
-    "employees": "{{size}} medewerkers"
+    "employees": "{{size}} medewerkers",
+    "open_roles_count": "{{count}} openstaande vacatures",
+    "meta_description": "Bekijk dit werkgeversprofiel, openstaande vacatures en community-recensies over {{count}} actuele kansen.",
+    "review_submit_failed": "Recensie versturen mislukt",
+    "reviews_heading": "Werkgeversrecensies",
+    "leave_review": "Een recensie achterlaten",
+    "reviews_count": "{{count}} recensies",
+    "reviews_count_one": "{{count}} recensie",
+    "reviews_count_other": "{{count}} recensies",
+    "star_distribution": "{{star}} sterren: {{count}} recensies",
+    "star_distribution_one": "{{star}} ster: {{count}} recensie",
+    "star_distribution_other": "{{star}} sterren: {{count}} recensies",
+    "star_option": "{{count}} sterren",
+    "star_option_one": "{{count}} ster",
+    "star_option_other": "{{count}} sterren",
+    "write_review": "Recensie schrijven",
+    "overall_rating": "Algemene beoordeling",
+    "dim_respect": "Respect",
+    "dim_communication": "Communicatie",
+    "dim_flexibility": "Flexibiliteit",
+    "dim_impact": "Impact op de gemeenschap",
+    "review_comment": "Opmerking",
+    "review_comment_placeholder": "Deel je ervaring met deze werkgever...",
+    "submit_review": "Recensie versturen",
+    "no_reviews": "Nog geen recensies",
+    "anonymous": "Anoniem"
   },
   "bulk": {
     "select_action": "Verplaatsen naar fase...",
@@ -211,7 +237,26 @@
     "referral_apps": "Verwijsaanvragen",
     "referral_conversion": "Verwijsconversie",
     "scorecard_avg": "Gem. Scorekaart",
-    "export_csv": "Exporteer CSV"
+    "export_csv": "Exporteer CSV",
+    "load_error": "Analyses laden mislukt",
+    "views_tooltip": "{{date}}: {{count}} weergaven",
+    "applications_tooltip": "{{week}}: {{count}} sollicitaties",
+    "stage_progress_aria": "Voortgang van sollicitatiefase {{stage}}",
+    "predictions": "AI-voorspellingen",
+    "based_on": "Gebaseerd op {{count}} vergelijkbare banen",
+    "no_predictions": "Onvoldoende gegevens voor voorspellingen.",
+    "expected_apps": "Verwachte sollicitaties",
+    "current": "Huidig",
+    "posted_days_ago": "{{days}} dagen geleden geplaatst",
+    "conversion_comparison": "Conversieratio",
+    "avg": "Gem.",
+    "salary_comparison": "Salaris vs. markt",
+    "yours": "Jouwe",
+    "versus": "vs.",
+    "market_avg": "Marktgemiddelde",
+    "ai_insights": "AI-inzichten",
+    "days_short_value": "{{count}} d",
+    "not_available": "N.v.t."
   },
   "salary": {
     "label": "Compensation",
@@ -318,7 +363,18 @@
     "personal_message": "Persoonlijk bericht",
     "personal_message_placeholder": "Een notitie voor de kandidaat...",
     "select_applicant": "Selecteer {{name}}",
-    "ai_score": "AI: {{score}}/100"
+    "ai_score": "AI: {{score}}/100",
+    "ai_rank": "AI-rang",
+    "ai_ranked": "Kandidaten gerangschikt door AI",
+    "ai_rank_failed": "AI-rangschikking mislukt",
+    "tab_pipeline": "Pipeline",
+    "tab_activity": "Activiteitenlogboek",
+    "no_activity": "Nog geen activiteit",
+    "no_activity_hint": "Gebeurtenissen verschijnen hier naarmate het wervingsproces vordert.",
+    "previous": "Vorige",
+    "next": "Volgende",
+    "interview_location_placeholder": "https://meet.google.com/...",
+    "offer_salary_placeholder": "bijv. 45000"
   },
   "apply": {
     "button": "Nu solliciteren",
@@ -344,7 +400,9 @@
     "message_employer": "Bericht Werkgever",
     "cv_parse_error": "Kon CV niet parseren. Je kunt je aanvraag nog steeds handmatig indienen.",
     "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Quick Apply with Saved Profile"
+    "quick_apply": "Quick Apply with Saved Profile",
+    "this_job": "deze vacature",
+    "view": "Bekijken"
   },
   "detail": {
     "loading": "Vacature laden...",
@@ -762,7 +820,8 @@
     "note_privacy": "Dit rapport analyseert alleen processtatistieken. Er worden geen demografische gegevens verzameld of gebruikt.",
     "stages": "stages",
     "not_available": "N/A",
-    "access_denied": "Access denied"
+    "access_denied": "Access denied",
+    "rejection_rates_table_aria": "Afwijzingspercentages per wervingsfase"
   },
   "self_scheduling": {
     "title": "Interviewslots",
@@ -937,13 +996,15 @@
       "title": "Bias Audit"
     },
     "create": {
-      "title": "Plaats een baan"
+      "title": "Plaats een baan",
+      "description": "Maak een vacature voor werk, vrijwilligerswerk of tijdbanken voor je gemeenschap."
     },
     "talent_search": {
       "title": "Talentzoektocht"
     },
     "my_applications": {
-      "title": "Mijn aanvragen"
+      "title": "Mijn aanvragen",
+      "description": "Volg sollicitaties voor werk, vrijwilligerswerk en tijdbanken vanuit één persoonlijk dashboard."
     },
     "analytics": {
       "title": "Banenanalyse"
@@ -959,11 +1020,16 @@
     },
     "employer_brand": {
       "title": "Werkgever Merk"
+    },
+    "edit": {
+      "title": "Vacature bewerken",
+      "description": "Werk vacaturegegevens, vergoeding, teaminstellingen en publicatieopties bij."
     }
   },
   "page_title": "Job Vacancies",
   "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
   "jobs": {
     "view_details": "View job details"
-  }
+  },
+  "cancel": "Annuleren"
 }
