@@ -1,38 +1,38 @@
 {
   "2fa_enabled": {
-    "subject": "Security Alert: Two-factor authentication enabled — {{community}}",
-    "title": "Two-Factor Authentication Enabled",
-    "preview": "Two-factor authentication has been enabled on your account",
-    "body": "Two-factor authentication has been enabled on your account. Your account is now more secure.",
-    "warning": "If you did not make this change, please contact support immediately to secure your account."
+    "subject": "تنبيه الأمان: تم تمكين المصادقة الثنائية - {{community}}",
+    "title": "تم تمكين المصادقة الثنائية",
+    "preview": "لقد تم تفعيل المصادقة الثنائية في حسابك",
+    "body": "لقد تم تفعيل المصادقة الثنائية في حسابك. أصبح حسابك الآن أكثر أمانًا.",
+    "warning": "إذا لم تقم بإجراء هذا التغيير، فيرجى الاتصال بالدعم على الفور لتأمين حسابك."
   },
   "2fa_disabled": {
-    "subject": "Security Alert: Two-factor authentication disabled — {{community}}",
-    "title": "Two-Factor Authentication Disabled",
-    "preview": "Two-factor authentication has been disabled on your account",
-    "body": "Two-factor authentication has been disabled on your account.",
-    "warning": "If you did not make this change, please contact support immediately as your account may be at risk."
+    "subject": "تنبيه الأمان: تم تعطيل المصادقة الثنائية — {{community}}",
+    "title": "تم تعطيل المصادقة الثنائية",
+    "preview": "لقد تم تعطيل المصادقة الثنائية في حسابك",
+    "body": "لقد تم تعطيل المصادقة الثنائية في حسابك.",
+    "warning": "إذا لم تقم بإجراء هذا التغيير، فيرجى الاتصال بالدعم على الفور لأن حسابك قد يكون في خطر."
   },
   "passkey_registered": {
-    "subject": "Security Alert: New passkey registered — {{community}}",
-    "title": "New Passkey Registered",
-    "preview": "A new passkey has been added to your account",
-    "body": "A new passkey has been registered on your {{community}} account.",
-    "warning": "If you did not register this passkey, please contact support immediately to secure your account."
+    "subject": "تنبيه أمني: تم تسجيل مفتاح مرور جديد — {{community}}",
+    "title": "تم تسجيل مفتاح المرور الجديد",
+    "preview": "تمت إضافة مفتاح مرور جديد إلى حسابك",
+    "body": "تم تسجيل مفتاح مرور جديد في حساب {{community}} الخاص بك.",
+    "warning": "إذا لم تقم بتسجيل مفتاح المرور هذا، فيرجى الاتصال بالدعم على الفور لتأمين حسابك."
   },
   "passkey_removed": {
-    "subject": "Security Alert: Passkey removed — {{community}}",
-    "title": "Passkey Removed",
-    "preview": "A passkey has been removed from your account",
-    "body": "A passkey has been removed from your {{community}} account.",
-    "warning": "If you did not make this change, please contact support immediately to secure your account."
+    "subject": "تنبيه الأمان: تمت إزالة مفتاح المرور — {{community}}",
+    "title": "تمت إزالة مفتاح المرور",
+    "preview": "تمت إزالة مفتاح المرور من حسابك",
+    "body": "تمت إزالة مفتاح المرور من حساب {{community}} الخاص بك.",
+    "warning": "إذا لم تقم بإجراء هذا التغيير، فيرجى الاتصال بالدعم على الفور لتأمين حسابك."
   },
   "connection_declined": {
-    "subject": "Your connection request was not accepted — {{community}}",
-    "title": "Connection Request Update",
-    "preview": "Your connection request to {{name}} was not accepted",
-    "body": "Your connection request to <strong>{{name}}</strong> on {{community}} was not accepted at this time.",
-    "suggestion": "Don't be discouraged — there are many other members in your community to connect with.",
-    "cta": "Discover Members"
+    "subject": "لم يتم قبول طلب الاتصال الخاص بك — {{community}}",
+    "title": "تحديث طلب الاتصال",
+    "preview": "لم يتم قبول طلب الاتصال الخاص بك بـ {{name}}",
+    "body": "لم يتم قبول طلب الاتصال الخاص بك بـ <strong>{{name}}</strong> على {{community}} في الوقت الحالي.",
+    "suggestion": "لا تثبط عزيمتك، فهناك العديد من الأعضاء الآخرين في مجتمعك الذين يمكنك التواصل معهم.",
+    "cta": "اكتشف الأعضاء"
   }
 }

@@ -1,38 +1,38 @@
 {
   "2fa_enabled": {
-    "subject": "Security Alert: Two-factor authentication enabled — {{community}}",
-    "title": "Two-Factor Authentication Enabled",
-    "preview": "Two-factor authentication has been enabled on your account",
-    "body": "Two-factor authentication has been enabled on your account. Your account is now more secure.",
-    "warning": "If you did not make this change, please contact support immediately to secure your account."
+    "subject": "Foláireamh Slándála: Fíordheimhniú dhá fhachtóir cumasaithe - {{community}}",
+    "title": "Fíordheimhniú Dhá-Fachtóir Cumasaithe",
+    "preview": "Cumasaíodh fíordheimhniú dhá fhachtóir ar do chuntas",
+    "body": "Cumasaíodh fíordheimhniú dhá fhachtóir ar do chuntas. Tá do chuntas níos sláine anois.",
+    "warning": "Mura ndearna tú an t-athrú seo, déan teagmháil leis an bhfoireann tacaíochta láithreach chun do chuntas a dhéanamh slán."
   },
   "2fa_disabled": {
-    "subject": "Security Alert: Two-factor authentication disabled — {{community}}",
-    "title": "Two-Factor Authentication Disabled",
-    "preview": "Two-factor authentication has been disabled on your account",
-    "body": "Two-factor authentication has been disabled on your account.",
-    "warning": "If you did not make this change, please contact support immediately as your account may be at risk."
+    "subject": "Foláireamh Slándála: Díchumasaíodh fíordheimhniú dhá-fhachtóir — {{community}}",
+    "title": "Fíordheimhniú Dhá-Fachtóir faoi Mhíchumas",
+    "preview": "Díchumasaíodh fíordheimhniú dhá-fhachtóir ar do chuntas",
+    "body": "Díchumasaíodh fíordheimhniú dhá-fhachtóir ar do chuntas.",
+    "warning": "Mura ndearna tú an t-athrú seo, téigh i dteagmháil leis an bhfoireann tacaíochta láithreach toisc go bhféadfadh do chuntas a bheith i mbaol."
   },
   "passkey_registered": {
-    "subject": "Security Alert: New passkey registered — {{community}}",
-    "title": "New Passkey Registered",
-    "preview": "A new passkey has been added to your account",
-    "body": "A new passkey has been registered on your {{community}} account.",
-    "warning": "If you did not register this passkey, please contact support immediately to secure your account."
+    "subject": "Foláireamh Slándála: Pasfhocal nua cláraithe - {{community}}",
+    "title": "Pasfhocal Nua Cláraithe",
+    "preview": "Cuireadh paseochair nua le do chuntas",
+    "body": "Cláraíodh eochair pas nua ar do chuntas {{community}}.",
+    "warning": "Murar chláraigh tú an pasfhocal seo, déan teagmháil leis an bhfoireann tacaíochta láithreach chun do chuntas a dhéanamh slán."
   },
   "passkey_removed": {
-    "subject": "Security Alert: Passkey removed — {{community}}",
-    "title": "Passkey Removed",
-    "preview": "A passkey has been removed from your account",
-    "body": "A passkey has been removed from your {{community}} account.",
-    "warning": "If you did not make this change, please contact support immediately to secure your account."
+    "subject": "Foláireamh Slándála: Baineadh an pasfhocal — {{community}}",
+    "title": "Baineadh an Pasfhocal",
+    "preview": "Baineadh eochair pas de do chuntas",
+    "body": "Baineadh eochair pas de do chuntas {{community}}.",
+    "warning": "Mura ndearna tú an t-athrú seo, déan teagmháil leis an bhfoireann tacaíochta láithreach chun do chuntas a dhéanamh slán."
   },
   "connection_declined": {
-    "subject": "Your connection request was not accepted — {{community}}",
-    "title": "Connection Request Update",
-    "preview": "Your connection request to {{name}} was not accepted",
-    "body": "Your connection request to <strong>{{name}}</strong> on {{community}} was not accepted at this time.",
-    "suggestion": "Don't be discouraged — there are many other members in your community to connect with.",
-    "cta": "Discover Members"
+    "subject": "Níor glacadh le d'iarratas ceangail — {{community}}",
+    "title": "Nuashonrú Iarratas Ceangail",
+    "preview": "Níor glacadh le d'iarratas ar cheangail le {{name}}",
+    "body": "Níor glacadh le d'iarratas ceangail chuig <strong>{{name}}</strong> ar {{community}} faoi láthair.",
+    "suggestion": "Ná bíodh dímholadh ort - tá go leor ball eile i do phobal le nascadh leo.",
+    "cta": "Faigh amach Baill"
   }
 }

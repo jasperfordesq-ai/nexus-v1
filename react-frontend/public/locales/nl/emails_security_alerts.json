@@ -1,38 +1,38 @@
 {
   "2fa_enabled": {
-    "subject": "Security Alert: Two-factor authentication enabled — {{community}}",
-    "title": "Two-Factor Authentication Enabled",
-    "preview": "Two-factor authentication has been enabled on your account",
-    "body": "Two-factor authentication has been enabled on your account. Your account is now more secure.",
-    "warning": "If you did not make this change, please contact support immediately to secure your account."
+    "subject": "Beveiligingswaarschuwing: tweefactorauthenticatie ingeschakeld: {{community}}",
+    "title": "Tweefactorauthenticatie ingeschakeld",
+    "preview": "Tweefactorauthenticatie is ingeschakeld voor uw account",
+    "body": "Tweefactorauthenticatie is ingeschakeld voor uw account. Uw account is nu veiliger.",
+    "warning": "Als u deze wijziging niet heeft aangebracht, neem dan onmiddellijk contact op met de ondersteuning om uw account te beveiligen."
   },
   "2fa_disabled": {
-    "subject": "Security Alert: Two-factor authentication disabled — {{community}}",
-    "title": "Two-Factor Authentication Disabled",
-    "preview": "Two-factor authentication has been disabled on your account",
-    "body": "Two-factor authentication has been disabled on your account.",
-    "warning": "If you did not make this change, please contact support immediately as your account may be at risk."
+    "subject": "Beveiligingswaarschuwing: tweefactorauthenticatie uitgeschakeld: {{community}}",
+    "title": "Tweefactorauthenticatie uitgeschakeld",
+    "preview": "Tweefactorauthenticatie is uitgeschakeld voor uw account",
+    "body": "Tweefactorauthenticatie is uitgeschakeld voor uw account.",
+    "warning": "Als u deze wijziging niet heeft aangebracht, neem dan onmiddellijk contact op met de ondersteuning, aangezien uw account mogelijk gevaar loopt."
   },
   "passkey_registered": {
-    "subject": "Security Alert: New passkey registered — {{community}}",
-    "title": "New Passkey Registered",
-    "preview": "A new passkey has been added to your account",
-    "body": "A new passkey has been registered on your {{community}} account.",
-    "warning": "If you did not register this passkey, please contact support immediately to secure your account."
+    "subject": "Beveiligingswaarschuwing: nieuwe toegangssleutel geregistreerd - {{community}}",
+    "title": "Nieuwe toegangscode geregistreerd",
+    "preview": "Er is een nieuwe toegangscode aan uw account toegevoegd",
+    "body": "Er is een nieuwe toegangssleutel geregistreerd op uw {{community}}-account.",
+    "warning": "Als u deze toegangscode niet heeft geregistreerd, neem dan onmiddellijk contact op met de ondersteuning om uw account te beveiligen."
   },
   "passkey_removed": {
-    "subject": "Security Alert: Passkey removed — {{community}}",
-    "title": "Passkey Removed",
-    "preview": "A passkey has been removed from your account",
-    "body": "A passkey has been removed from your {{community}} account.",
-    "warning": "If you did not make this change, please contact support immediately to secure your account."
+    "subject": "Beveiligingswaarschuwing: toegangssleutel verwijderd - {{community}}",
+    "title": "Wachtwoord verwijderd",
+    "preview": "Er is een toegangssleutel uit uw account verwijderd",
+    "body": "Er is een toegangssleutel verwijderd uit uw {{community}}-account.",
+    "warning": "Als u deze wijziging niet heeft aangebracht, neem dan onmiddellijk contact op met de ondersteuning om uw account te beveiligen."
   },
   "connection_declined": {
-    "subject": "Your connection request was not accepted — {{community}}",
-    "title": "Connection Request Update",
-    "preview": "Your connection request to {{name}} was not accepted",
-    "body": "Your connection request to <strong>{{name}}</strong> on {{community}} was not accepted at this time.",
-    "suggestion": "Don't be discouraged — there are many other members in your community to connect with.",
-    "cta": "Discover Members"
+    "subject": "Uw verbindingsverzoek is niet geaccepteerd — {{community}}",
+    "title": "Update van verbindingsverzoek",
+    "preview": "Uw verbindingsverzoek met {{name}} is niet geaccepteerd",
+    "body": "Uw verbindingsverzoek met <strong>{{name}}</strong> op {{community}} is op dit moment niet geaccepteerd.",
+    "suggestion": "Wees niet ontmoedigd; er zijn veel andere leden in uw gemeenschap waarmee u contact kunt maken.",
+    "cta": "Ontdek leden"
   }
 }

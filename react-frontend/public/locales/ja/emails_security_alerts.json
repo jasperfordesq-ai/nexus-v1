@@ -1,38 +1,38 @@
 {
   "2fa_enabled": {
-    "subject": "Security Alert: Two-factor authentication enabled — {{community}}",
-    "title": "Two-Factor Authentication Enabled",
-    "preview": "Two-factor authentication has been enabled on your account",
-    "body": "Two-factor authentication has been enabled on your account. Your account is now more secure.",
-    "warning": "If you did not make this change, please contact support immediately to secure your account."
+    "subject": "セキュリティ警告: 2 要素認証が有効になっています — {{community}}",
+    "title": "二要素認証が有効になっています",
+    "preview": "アカウントで 2 要素認証が有効になっています",
+    "body": "お使いのアカウントでは 2 要素認証が有効になっています。あなたのアカウントはより安全になりました。",
+    "warning": "この変更を行っていない場合は、すぐにサポートに連絡してアカウントを保護してください。"
   },
   "2fa_disabled": {
-    "subject": "Security Alert: Two-factor authentication disabled — {{community}}",
-    "title": "Two-Factor Authentication Disabled",
-    "preview": "Two-factor authentication has been disabled on your account",
-    "body": "Two-factor authentication has been disabled on your account.",
-    "warning": "If you did not make this change, please contact support immediately as your account may be at risk."
+    "subject": "セキュリティ警告: 2 要素認証が無効になっています — {{community}}",
+    "title": "二要素認証が無効になっています",
+    "preview": "お使いのアカウントでは 2 要素認証が無効になっています",
+    "body": "お使いのアカウントでは 2 要素認証が無効になっています。",
+    "warning": "この変更を行っていない場合は、アカウントが危険にさらされている可能性があるため、すぐにサポートにご連絡ください。"
   },
   "passkey_registered": {
-    "subject": "Security Alert: New passkey registered — {{community}}",
-    "title": "New Passkey Registered",
-    "preview": "A new passkey has been added to your account",
-    "body": "A new passkey has been registered on your {{community}} account.",
-    "warning": "If you did not register this passkey, please contact support immediately to secure your account."
+    "subject": "セキュリティ警告: 新しいパスキーが登録されました — {{community}}",
+    "title": "新しいパスキーが登録されました",
+    "preview": "新しいパスキーがアカウントに追加されました",
+    "body": "新しいパスキーが {{community}} アカウントに登録されました。",
+    "warning": "このパスキーを登録していない場合は、アカウントを保護するために直ちにサポートに連絡してください。"
   },
   "passkey_removed": {
-    "subject": "Security Alert: Passkey removed — {{community}}",
-    "title": "Passkey Removed",
-    "preview": "A passkey has been removed from your account",
-    "body": "A passkey has been removed from your {{community}} account.",
-    "warning": "If you did not make this change, please contact support immediately to secure your account."
+    "subject": "セキュリティ警告: パスキーが削除されました — {{community}}",
+    "title": "パスキーが削除されました",
+    "preview": "パスキーがアカウントから削除されました",
+    "body": "パスキーが {{community}} アカウントから削除されました。",
+    "warning": "この変更を行っていない場合は、すぐにサポートに連絡してアカウントを保護してください。"
   },
   "connection_declined": {
-    "subject": "Your connection request was not accepted — {{community}}",
-    "title": "Connection Request Update",
-    "preview": "Your connection request to {{name}} was not accepted",
-    "body": "Your connection request to <strong>{{name}}</strong> on {{community}} was not accepted at this time.",
-    "suggestion": "Don't be discouraged — there are many other members in your community to connect with.",
-    "cta": "Discover Members"
+    "subject": "接続リクエストは受け入れられませんでした — {{community}}",
+    "title": "接続要求の更新",
+    "preview": "{{name}} への接続要求は受け付けられませんでした",
+    "body": "現時点では、{{community}} 上の <strong>{{name}}</strong> への接続リクエストは受け付けられませんでした。",
+    "suggestion": "落胆しないでください。コミュニティには他にもつながりを必要とするメンバーがたくさんいます。",
+    "cta": "メンバーを発見する"
   }
 }
