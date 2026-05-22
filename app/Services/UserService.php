@@ -144,6 +144,16 @@ class UserService
 
         $profile = self::formatProfile($user, false);
 
+        // Hide last name from non-admin viewers — surnames are private by default
+        if ($viewerId !== $userId) {
+            if (!$viewerId || !self::isViewerAdmin($viewerId)) {
+                unset($profile['last_name']);
+                if (($user->profile_type ?? 'individual') !== 'organisation') {
+                    $profile['name'] = $user->first_name ?? '';
+                }
+            }
+        }
+
         // Add connection status if viewer is logged in
         if ($viewerId && $viewerId !== $userId) {
             $profile['connection_status'] = self::getConnectionStatus($userId, $viewerId);
@@ -889,6 +899,25 @@ class UserService
     // ================================================================
     // Private helpers
     // ================================================================
+
+    /**
+     * Check whether the given viewer user ID belongs to an admin.
+     * Bypasses tenant scope so super-admins from other tenants are recognised.
+     */
+    private static function isViewerAdmin(int $viewerId): bool
+    {
+        $viewer = User::withoutGlobalScope(TenantScope::class)
+            ->select(['id', 'role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god'])
+            ->find($viewerId);
+        if (!$viewer) {
+            return false;
+        }
+        return in_array($viewer->role ?? '', ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || (bool) ($viewer->is_admin ?? false)
+            || (bool) ($viewer->is_super_admin ?? false)
+            || (bool) ($viewer->is_tenant_super_admin ?? false)
+            || (bool) ($viewer->is_god ?? false);
+    }
 
     /**
      * Format user model for API response.

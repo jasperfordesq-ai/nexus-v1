@@ -133,6 +133,22 @@ class UsersController extends BaseApiController
 
         $results = $this->userService->search($q, $limit);
 
+        // Hide surnames from non-admin viewers
+        $viewer = Auth::user();
+        $viewerIsAdmin = $viewer && (
+            in_array($viewer->role ?? '', ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || (bool) ($viewer->is_admin ?? false)
+            || (bool) ($viewer->is_super_admin ?? false)
+            || (bool) ($viewer->is_tenant_super_admin ?? false)
+            || (bool) ($viewer->is_god ?? false)
+        );
+        if (!$viewerIsAdmin && isset($results['items'])) {
+            $results['items'] = array_map(static function (array $u): array {
+                unset($u['last_name']);
+                return $u;
+            }, $results['items']);
+        }
+
         return $this->respondWithData($results);
     }
 
@@ -1227,6 +1243,13 @@ class UsersController extends BaseApiController
         $tenantId = $this->getTenantId();
         $viewerId = $this->getOptionalUserId();
         $viewer = Auth::user();
+        $viewerIsAdmin = $viewer && (
+            in_array($viewer->role ?? '', ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || (bool) ($viewer->is_admin ?? false)
+            || (bool) ($viewer->is_super_admin ?? false)
+            || (bool) ($viewer->is_tenant_super_admin ?? false)
+            || (bool) ($viewer->is_god ?? false)
+        );
 
         $limit = min((int) $request->query('limit', 50), 100);
         $offset = max((int) $request->query('offset', 0), 0);
@@ -1353,8 +1376,14 @@ class UsersController extends BaseApiController
                 unset($user);
             }
 
-            $users = array_map(static function (array $u): array {
+            $users = array_map(static function (array $u) use ($viewerIsAdmin): array {
                 unset($u['hours_given'], $u['offer_count'], $u['request_count'], $u['last_login_at']);
+                if (!$viewerIsAdmin) {
+                    unset($u['last_name']);
+                    if (($u['profile_type'] ?? 'individual') !== 'organisation') {
+                        $u['name'] = $u['first_name'] ?? '';
+                    }
+                }
                 return $u;
             }, $users);
 
@@ -1504,8 +1533,14 @@ class UsersController extends BaseApiController
         }
 
         // Clean up internal fields before returning
-        $users = array_map(static function (array $u): array {
+        $users = array_map(static function (array $u) use ($viewerIsAdmin): array {
             unset($u['hours_given'], $u['offer_count'], $u['request_count'], $u['last_login_at']);
+            if (!$viewerIsAdmin) {
+                unset($u['last_name']);
+                if (($u['profile_type'] ?? 'individual') !== 'organisation') {
+                    $u['name'] = $u['first_name'] ?? '';
+                }
+            }
             return $u;
         }, $users);
 
