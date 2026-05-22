@@ -3,7 +3,9 @@
   "title": "Fógraí",
   "subtitle": "Fan ar an eolas le do ghníomhaíocht",
   "unread_badge": "{{count}} nua",
+  "caught_up_badge": "Cothrom le dáta",
   "mark_all_read": "Marcáil uile mar léite",
+  "settings_label": "Socruithe",
   "settings_aria": "Socruithe fógraí",
   "filter_all": "Uile",
   "filter_unread": "Neamhléite ({{count}})",
@@ -12,7 +14,12 @@
   "empty_caught_up": "Tá tú ar an eolas!",
   "empty_caught_up_desc": "Tá do chuid fógraí uile léite agat",
   "mark_read_aria": "Marcáil mar léite",
+  "mark_group_read_aria": "Marcáil grúpa mar léite",
   "delete_aria": "Scrios fógra",
+  "expand_group": "Leathnaigh",
+  "collapse_group": "Laghdaigh",
+  "notifications_count": "fógraí",
+  "and_others": "agus {{count}} eile",
   "loading_aria": "Fógraí á lódáil",
   "error_title": "Ní féidir a lódáil",
   "error_load": "Chuaigh rud éigin mícheart ag lódáil d'fhógraí",
@@ -37,15 +44,15 @@
     "system": "Córas",
     "default": "Fógra"
   },
-  "load_more": "Load more",
+  "load_more": "Luchtaigh níos mó",
   "undo": "Undo",
   "toast": {
     "mark_read_failed": "Theip ar an bhfógra a mharcáil mar léite",
     "all_read": "Gach fógra marcáilte mar léite",
     "mark_all_failed": "Theip ar gach fógra a mharcáil mar léite",
     "delete_failed": "Theip ar an bhfógra a scriosadh",
-    "deleted": "Notification deleted",
-    "undo_hint": "Click Undo to restore"
+    "deleted": "Scriosadh an fógra",
+    "undo_hint": "Cliceáil Cealaigh a chur ar ais"
   },
   "realtime": {
     "new_message": "Teachtaireacht Nua",
@@ -60,6 +67,8 @@
     "toast_group": "Fógra Grúpa",
     "toast_achievement": "Éacht Bainte Amach!",
     "toast_broker_review": "Teachtaireacht le hAthbhreithniú",
+    "toast_safeguarding_flag": "Foláireamh Cosanta",
+    "toast_safeguarding_assignment": "Sannadh Cosanta",
     "toast_system": "Fógra Córais",
     "toast_vol_application_received": "Iarratas Nua",
     "toast_vol_application_approved": "Iarratas Ceadaithe",
@@ -70,9 +79,6 @@
     "toast_vol_hours_approved": "Uaireanta Ceadaithe",
     "toast_vol_hours_declined": "Uaireanta Diúltaithe",
     "toast_vol_opportunity_closed": "Deis Dúnta",
-    "toast_default": "Fógra",
-    "toast_safeguarding_flag": "Foláireamh Cosanta",
-    "toast_safeguarding_assignment": "Sannadh Cosanta",
     "toast_job_application_status": "Nuashonrú Iarratais",
     "toast_job_application": "Iarratas Poist",
     "toast_job_interview_proposed": "Agallamh Iarrtha",
@@ -85,16 +91,10 @@
     "toast_job_offer_withdrawn": "Tairiscint Tarraingthe Siar",
     "toast_job_alert_match": "Meaitseáil Phoist Nua",
     "toast_job_interview_reminder": "Meabhrúchán Agallaimh",
-    "toast_job_completion_credits": "Creidmheasanna Ama Tuillte!"
+    "toast_job_completion_credits": "Creidmheasanna Ama Tuillte!",
+    "toast_default": "Fógra"
   },
   "page_meta": {
     "title": "Notifications"
-  },
-  "caught_up_badge": "Cothrom le dáta",
-  "settings_label": "Socruithe",
-  "mark_group_read_aria": "Marcáil grúpa mar léite",
-  "expand_group": "Leathnaigh",
-  "collapse_group": "Laghdaigh",
-  "notifications_count": "fógraí",
-  "and_others": "agus {{count}} eile"
+  }
 }

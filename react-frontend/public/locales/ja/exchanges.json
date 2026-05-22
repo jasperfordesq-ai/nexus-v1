@@ -1,25 +1,25 @@
 {
-  "page_title": "Exchanges",
+  "page_title": "交換",
   "title": "私の交換",
   "subtitle": "サービス交換リクエストと確認を追跡します",
   "browse_listings": "リストをブラウズ",
   "load_more": "もっと読み込む",
   "try_again": "再試行",
   "service_exchange": "サービス交換",
-  "unknown": "Unknown",
+  "unknown": "不明",
   "hours_count": "{{count}} 時間",
   "hours_count_other": "{{count}} 時間",
   "workflow_not_enabled_title": "交換ワークフローが有効になっていません",
   "workflow_not_enabled_description": "このコミュニティでは交換ワークフローシステムが有効になっていません。詳細についてはコーディネーターにお問い合わせください。",
   "tabs": {
     "aria_label": "交換ステータスフィルター",
-    "active": "Active",
+    "active": "アクティブ",
     "active_aria": "アクティブな交換を表示",
     "needs_confirmation": "確認が必要",
     "needs_confirmation_aria": "確認が必要な交換を表示",
-    "completed": "Completed",
+    "completed": "完了",
     "completed_aria": "完了した交換を表示",
-    "all": "All",
+    "all": "すべて",
     "all_aria": "すべての交換を表示"
   },
   "error": {
@@ -39,11 +39,11 @@
     "you_providing": "あなたが提供しています",
     "confirm_hours": "時間を確認",
     "waiting_for_other": "他を待っています",
-    "respond": "Respond"
+    "respond": "返信"
   },
   "breadcrumb": {
-    "exchanges": "Exchanges",
-    "exchange": "Exchange"
+    "exchanges": "交換",
+    "exchange": "交換"
   },
   "toast": {
     "load_more_failed": "さらに交換を読み込むのに失敗しました",
@@ -72,20 +72,20 @@
     "not_found_description": "お探しの交換は存在しません",
     "view_exchanges": "私の交換を表示",
     "exchange_details": "交換の詳細",
-    "service": "Service",
-    "requester": "Requester",
-    "provider": "Provider",
-    "you": "You",
+    "service": "サービス",
+    "requester": "依頼者",
+    "provider": "提供者",
+    "you": "あなた",
     "other_party": "相手方",
     "confirmed_hours": "確認済み{{hours}}時間",
     "message_party": "メッセージ{{name}}",
     "proposed_hours": "提案された時間",
     "final_hours": "最終時間",
-    "created": "Created",
+    "created": "作成済み",
     "message_from_requester": "リクエスターからのメッセージ",
     "broker_notes": "ブローカーのメモ",
     "accept_request": "リクエストを受け入れる",
-    "decline": "Decline",
+    "decline": "辞退",
     "start_exchange": "交換を開始",
     "mark_complete": "完了をマーク",
     "confirm_hours": "時間を確認",
@@ -105,7 +105,7 @@
       "fallback": "ステータスが更新されました"
     },
     "prep_time": "準備時間",
-    "ratings": "Ratings",
+    "ratings": "評価",
     "rate_exchange": "この交換を評価",
     "prep_time_value": "{{count}}h"
   },
@@ -114,12 +114,12 @@
     "decline_reason_label": "理由（任意）",
     "decline_reason_placeholder": "なぜ拒否するのか教えてください...",
     "decline_confirm": "リクエストを拒否",
-    "cancel": "Cancel",
+    "cancel": "キャンセル",
     "confirm_title": "働いた時間を確認",
     "confirm_description": "この交換のために実際に働いた時間は何時間ですか？",
-    "hours_label": "Hours",
+    "hours_label": "時間",
     "hours_placeholder": "時間を入力",
-    "hours_unit": "hours",
+    "hours_unit": "時間",
     "originally_proposed": "元々提案された: {{hours}} 時間（最大: {{max}}）",
     "cancel_title": "交換をキャンセルしますか？",
     "cancel_description": "この交換をキャンセルしてもよろしいですか？この操作は元に戻せません。",
@@ -138,8 +138,8 @@
     "own_listing_title": "これはあなたのリストです",
     "own_listing_description": "自分のリストに対して交換リクエストを送信することはできません。",
     "view_listing": "リストを見る",
-    "breadcrumb_listings": "Listings",
-    "breadcrumb_listing": "Listing",
+    "breadcrumb_listings": "リスティング",
+    "breadcrumb_listing": "リスティング",
     "breadcrumb_request": "交換リクエスト",
     "estimated_hours": "~{{hours}} 時間",
     "service_offer": "サービス提供",
@@ -147,30 +147,30 @@
     "proposed_hours_label": "提案された時間",
     "proposed_hours_placeholder": "何時間必要ですか？",
     "proposed_hours_description": "このサービスの推定時間（最大: {{max}}）",
-    "hours_unit": "hours",
+    "hours_unit": "時間",
     "message_label": "メッセージ（任意）",
     "message_placeholder": "サービス提供者にメッセージを追加...",
     "message_description": "あなたのニーズを説明するか、質問をしてください",
     "broker_approval_title": "ブローカーの承認が必要",
     "broker_approval_description": "この交換は進行する前にコミュニティコーディネーターの承認が必要です。",
-    "cancel": "Cancel",
+    "cancel": "キャンセル",
     "send_request": "リクエストを送信",
-    "prep_time_label": "Preparation Time",
-    "prep_time_placeholder": "0",
-    "prep_time_description": "Additional time needed for preparation (optional)",
     "summary_estimate": "推定時間",
     "form_heading": "リクエストの詳細",
-    "form_description": "提案された時間を確認し、相手のメンバーが自信を持って返信できるよう背景情報を追加してください。"
+    "form_description": "提案された時間を確認し、相手のメンバーが自信を持って返信できるよう背景情報を追加してください。",
+    "prep_time_label": "準備時間",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "準備に追加の時間が必要（オプション）"
   },
   "page_meta": {
+    "list": {
+      "title": "交換"
+    },
     "request": {
       "title": "交換リクエスト"
     },
     "detail": {
       "title": "交換の詳細"
-    },
-    "list": {
-      "title": "Exchanges"
     }
   }
 }

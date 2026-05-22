@@ -3,7 +3,9 @@
   "title": "Notifications",
   "subtitle": "アクティビティの最新情報を受け取る",
   "unread_badge": "{{count}} 件の新着",
+  "caught_up_badge": "すべて確認済み",
   "mark_all_read": "すべて既読にする",
+  "settings_label": "設定",
   "settings_aria": "通知設定",
   "filter_all": "All",
   "filter_unread": "未読 ({{count}})",
@@ -12,7 +14,12 @@
   "empty_caught_up": "すべて確認済み！",
   "empty_caught_up_desc": "すべての通知を読みました",
   "mark_read_aria": "既読にする",
+  "mark_group_read_aria": "グループを既読にする",
   "delete_aria": "通知を削除",
+  "expand_group": "展開",
+  "collapse_group": "折りたたむ",
+  "notifications_count": "件の通知",
+  "and_others": "他{{count}}件",
   "loading_aria": "通知を読み込んでいます",
   "error_title": "読み込めませんでした",
   "error_load": "通知の読み込み中に問題が発生しました",
@@ -37,15 +44,15 @@
     "system": "System",
     "default": "Notification"
   },
-  "load_more": "Load more",
+  "load_more": "さらにロードする",
   "undo": "Undo",
   "toast": {
     "mark_read_failed": "通知を既読にするのに失敗しました",
     "all_read": "すべての通知が既読にマークされました",
     "mark_all_failed": "すべてを既読にするのに失敗しました",
     "delete_failed": "通知の削除に失敗しました",
-    "deleted": "Notification deleted",
-    "undo_hint": "Click Undo to restore"
+    "deleted": "通知が削除されました",
+    "undo_hint": "元に戻すには「元に戻す」をクリックしてください"
   },
   "realtime": {
     "new_message": "新しいメッセージ",
@@ -60,6 +67,8 @@
     "toast_group": "グループ通知",
     "toast_achievement": "達成しました！",
     "toast_broker_review": "レビューのためのメッセージ",
+    "toast_safeguarding_flag": "保護アラート",
+    "toast_safeguarding_assignment": "保護担当の割り当て",
     "toast_system": "システム通知",
     "toast_vol_application_received": "新しい申請",
     "toast_vol_application_approved": "申請が承認されました",
@@ -70,9 +79,6 @@
     "toast_vol_hours_approved": "時間が承認されました",
     "toast_vol_hours_declined": "時間が却下されました",
     "toast_vol_opportunity_closed": "機会が終了しました",
-    "toast_default": "Notification",
-    "toast_safeguarding_flag": "保護アラート",
-    "toast_safeguarding_assignment": "保護担当の割り当て",
     "toast_job_application_status": "応募の更新",
     "toast_job_application": "求人応募",
     "toast_job_interview_proposed": "面接の依頼",
@@ -85,16 +91,10 @@
     "toast_job_offer_withdrawn": "オファーが取り下げられました",
     "toast_job_alert_match": "新しい求人マッチ",
     "toast_job_interview_reminder": "面接のリマインダー",
-    "toast_job_completion_credits": "タイムクレジットを獲得しました!"
+    "toast_job_completion_credits": "タイムクレジットを獲得しました!",
+    "toast_default": "Notification"
   },
   "page_meta": {
     "title": "Notifications"
-  },
-  "caught_up_badge": "すべて確認済み",
-  "settings_label": "設定",
-  "mark_group_read_aria": "グループを既読にする",
-  "expand_group": "展開",
-  "collapse_group": "折りたたむ",
-  "notifications_count": "件の通知",
-  "and_others": "他{{count}}件"
+  }
 }

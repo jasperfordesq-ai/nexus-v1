@@ -1,8 +1,9 @@
 {
   "page_title": "Descubrir",
-  "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
+  "page_description": "Encuentre listados, eventos, grupos, miembros y oportunidades en toda la comunidad: su punto de partida para involucrarse y conectarse localmente.",
   "heading": "Descubrir",
   "subtitle": "Encuentra habilidades, eventos, grupos y más en tu comunidad",
+  "see_all": "Ver todo",
   "search_placeholder": "Descubre habilidades, eventos, grupos...",
   "stats": {
     "members": "Miembros",
@@ -52,7 +53,7 @@
   "featured_challenges": {
     "title": "Desafíos Destacados",
     "subtitle": "Comparte tus ideas y genera un impacto",
-    "ideas_count": "{{count}} ideas",
+    "ideas_count": "Ideas {{count}}",
     "ends": "Termina {{date}}",
     "progress": "Progreso del desafío"
   },
@@ -152,6 +153,5 @@
   "empty_groups": "Aún no hay grupos activos. ¡Inicia un grupo sobre tus intereses!",
   "create_listing": "Crear Anuncio",
   "create_event": "Crear Evento",
-  "create_group": "Crear Grupo",
-  "see_all": "Ver todo"
+  "create_group": "Crear Grupo"
 }

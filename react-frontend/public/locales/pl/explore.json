@@ -1,11 +1,12 @@
 {
-  "page_title": "Discover",
-  "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
-  "heading": "Discover",
+  "page_title": "Odkryj",
+  "page_description": "Znajdź oferty, wydarzenia, grupy, członków i możliwości w całej społeczności — Twój punkt wyjścia do zaangażowania się i nawiązania kontaktów lokalnych.",
+  "heading": "Odkryj",
   "subtitle": "Znajdź umiejętności, wydarzenia, grupy i więcej w swojej społeczności",
+  "see_all": "Zobacz wszystko",
   "search_placeholder": "Odkryj umiejętności, wydarzenia, grupy...",
   "stats": {
-    "members": "Members",
+    "members": "Członkowie",
     "exchanges_this_month": "Wymiany w tym miesiącu",
     "hours_exchanged": "Godziny wymienione",
     "active_listings": "Aktywne ogłoszenia"
@@ -33,7 +34,7 @@
   "top_contributors": {
     "title": "Najlepsi współpracownicy",
     "subtitle": "Liderzy społeczności według doświadczenia",
-    "level": "Lv.{{level}}"
+    "level": "Poz.{{level}}"
   },
   "trending_hashtags": {
     "title": "Trendy hashtagi",
@@ -47,7 +48,7 @@
   "new_members": {
     "title": "Witamy naszych najnowszych członków",
     "subtitle": "Przywitaj się z nowymi członkami",
-    "connect": "Connect"
+    "connect": "Połącz"
   },
   "featured_challenges": {
     "title": "Wyróżnione wyzwania",
@@ -62,7 +63,7 @@
     "days_ago": "{{count}}d temu"
   },
   "error_loading": "Nie mogliśmy załadować strony Odkryj. To może być tymczasowy problem.",
-  "retry": "Retry",
+  "retry": "Spróbuj ponownie",
   "near_you": {
     "title": "W Twojej okolicy",
     "subtitle": "Ogłoszenia blisko Twojej lokalizacji",
@@ -71,7 +72,7 @@
   "suggested_connections": {
     "title": "Ludzie, których możesz znać",
     "subtitle": "Połącz się z członkami, którzy dzielą Twoje zainteresowania",
-    "connect": "Connect",
+    "connect": "Połącz",
     "mutual": "Wzajemne połączenia",
     "similar": "Podobne zainteresowania",
     "recommended": "Polecane dla Ciebie"
@@ -89,7 +90,7 @@
     "view_opportunity": "Zobacz możliwość"
   },
   "organisations": {
-    "title": "Organisations",
+    "title": "Organizacje",
     "subtitle": "Partnerzy społecznościowi, którzy mają wpływ",
     "opportunities": "{{count}} możliwości"
   },
@@ -123,17 +124,17 @@
     "content_tabs": "Przeglądaj zakładki z treściami"
   },
   "tabs": {
-    "all": "All",
+    "all": "Wszystko",
     "for_you": "Dla Ciebie",
-    "listings": "Listings",
-    "people": "People",
-    "events": "Events",
-    "groups": "Groups"
+    "listings": "Ogłoszenia",
+    "people": "Osoby",
+    "events": "Wydarzenia",
+    "groups": "Grupy"
   },
   "recently_viewed": {
     "title": "Ostatnio przeglądane",
     "subtitle": "Przedmioty, które ostatnio oglądałeś",
-    "clear": "Clear"
+    "clear": "Wyczyść"
   },
   "match_score": "{{score}}% dopasowanie",
   "dismiss": "Nie zainteresowany",
@@ -152,6 +153,5 @@
   "empty_groups": "Brak aktywnych grup. Załóż grupę wokół swoich zainteresowań!",
   "create_listing": "Utwórz ogłoszenie",
   "create_event": "Utwórz wydarzenie",
-  "create_group": "Utwórz Grupę",
-  "see_all": "Zobacz wszystko"
+  "create_group": "Utwórz Grupę"
 }

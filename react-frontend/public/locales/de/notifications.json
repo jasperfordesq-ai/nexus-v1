@@ -3,7 +3,9 @@
   "title": "Benachrichtigungen",
   "subtitle": "Bleiben Sie über Ihre Aktivitäten informiert",
   "unread_badge": "{{count}} neu",
+  "caught_up_badge": "Alles gelesen",
   "mark_all_read": "Alle als gelesen markieren",
+  "settings_label": "Einstellungen",
   "settings_aria": "Benachrichtigungseinstellungen",
   "filter_all": "Alle",
   "filter_unread": "Ungelesen ({{count}})",
@@ -12,7 +14,12 @@
   "empty_caught_up": "Alles gelesen!",
   "empty_caught_up_desc": "Sie haben alle Ihre Benachrichtigungen gelesen",
   "mark_read_aria": "Als gelesen markieren",
+  "mark_group_read_aria": "Gruppe als gelesen markieren",
   "delete_aria": "Benachrichtigung löschen",
+  "expand_group": "Erweitern",
+  "collapse_group": "Einklappen",
+  "notifications_count": "Benachrichtigungen",
+  "and_others": "und {{count}} weitere",
   "loading_aria": "Benachrichtigungen werden geladen",
   "error_title": "Laden nicht möglich",
   "error_load": "Beim Laden Ihrer Benachrichtigungen ist etwas schiefgelaufen",
@@ -37,13 +44,15 @@
     "system": "System",
     "default": "Benachrichtigung"
   },
+  "load_more": "Mehr laden",
+  "undo": "Undo",
   "toast": {
     "mark_read_failed": "Benachrichtigung konnte nicht als gelesen markiert werden",
     "all_read": "Alle Benachrichtigungen als gelesen markiert",
     "mark_all_failed": "Benachrichtigungen konnten nicht als gelesen markiert werden",
     "delete_failed": "Benachrichtigung konnte nicht gelöscht werden",
-    "deleted": "Notification deleted",
-    "undo_hint": "Click Undo to restore"
+    "deleted": "Benachrichtigung gelöscht",
+    "undo_hint": "Klicken Sie zum Wiederherstellen auf „Rückgängig“."
   },
   "realtime": {
     "new_message": "Neue Nachricht",
@@ -58,6 +67,8 @@
     "toast_group": "Gruppenbenachrichtigung",
     "toast_achievement": "Errungenschaft freigeschaltet!",
     "toast_broker_review": "Nachricht zur Überprüfung",
+    "toast_safeguarding_flag": "Schutzwarnung",
+    "toast_safeguarding_assignment": "Schutzzuweisung",
     "toast_system": "Systembenachrichtigung",
     "toast_vol_application_received": "Neue Bewerbung",
     "toast_vol_application_approved": "Bewerbung genehmigt",
@@ -68,9 +79,6 @@
     "toast_vol_hours_approved": "Stunden genehmigt",
     "toast_vol_hours_declined": "Stunden abgelehnt",
     "toast_vol_opportunity_closed": "Möglichkeit geschlossen",
-    "toast_default": "Benachrichtigung",
-    "toast_safeguarding_flag": "Schutzwarnung",
-    "toast_safeguarding_assignment": "Schutzzuweisung",
     "toast_job_application_status": "Bewerbungsupdate",
     "toast_job_application": "Stellenbewerbung",
     "toast_job_interview_proposed": "Bewerbungsgespräch angefragt",
@@ -83,18 +91,10 @@
     "toast_job_offer_withdrawn": "Angebot zurückgezogen",
     "toast_job_alert_match": "Neue Job-Übereinstimmung",
     "toast_job_interview_reminder": "Erinnerung an Bewerbungsgespräch",
-    "toast_job_completion_credits": "Zeitguthaben verdient!"
+    "toast_job_completion_credits": "Zeitguthaben verdient!",
+    "toast_default": "Benachrichtigung"
   },
   "page_meta": {
     "title": "Notifications"
-  },
-  "load_more": "Load more",
-  "undo": "Undo",
-  "caught_up_badge": "Alles gelesen",
-  "settings_label": "Einstellungen",
-  "mark_group_read_aria": "Gruppe als gelesen markieren",
-  "expand_group": "Erweitern",
-  "collapse_group": "Einklappen",
-  "notifications_count": "Benachrichtigungen",
-  "and_others": "und {{count}} weitere"
+  }
 }

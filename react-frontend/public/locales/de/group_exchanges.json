@@ -67,6 +67,7 @@
     "col_name": "Name",
     "col_role": "Rolle",
     "col_hours": "Stunden",
+    "hours_amount": "{{count}} Std.",
     "col_weight": "Gewichtung",
     "col_confirmed": "Bestätigt",
     "col_provider": "Anbietend",
@@ -88,8 +89,7 @@
     "no_members_found": "Keine Mitglieder gefunden, die Ihrer Suche entsprechen.",
     "done": "Fertig",
     "aria_exchange_participants": "Austauschteilnehmer",
-    "aria_hour_split": "Stundenaufteilung",
-    "hours_amount": "{{count}} Std."
+    "aria_hour_split": "Stundenaufteilung"
   },
   "create": {
     "page_title": "Gruppentausch erstellen",

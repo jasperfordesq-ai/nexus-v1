@@ -21,11 +21,11 @@
   "updated": "更新された {{time}}",
   "views_one": "{{count}} ビュー",
   "views_other": "{{count}} ビュー",
-  "general_category": "General",
+  "general_category": "一般",
   "related_articles": "関連する記事",
   "feedback.question": "Was this article helpful?",
-  "feedback.yes": "Yes",
-  "feedback.no": "No",
+  "feedback.yes": "はい",
+  "feedback.no": "いいえ",
   "feedback_thanks": "フィードバックありがとうございます！",
   "feedback_failed": "フィードバックの送信に失敗しました。",
   "error": {
@@ -43,12 +43,12 @@
   },
   "feedback": {
     "question": "この記事は役に立ちましたか？",
-    "yes": "Yes",
-    "no": "No"
+    "yes": "はい",
+    "no": "いいえ"
   },
-  "page_title": "Knowledge Base",
-  "page_description": "Articles, guides, and tutorials for the community.",
-  "all_categories": "All",
-  "author_by": "by {{name}}",
-  "attachments": "Attachments"
+  "page_title": "ナレッジベース",
+  "page_description": "コミュニティ用の記事、ガイド、チュートリアル。",
+  "all_categories": "すべて",
+  "author_by": "{{name}}による",
+  "attachments": "添付ファイル"
 }

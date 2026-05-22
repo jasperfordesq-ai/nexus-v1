@@ -1,25 +1,25 @@
 {
-  "page_title": "Exchanges",
+  "page_title": "التبادلات",
   "title": "تبادلاتي",
   "subtitle": "تتبع طلبات تبادل الخدمة والتأكيدات الخاصة بك",
   "browse_listings": "تصفح القوائم",
   "load_more": "تحميل المزيد",
   "try_again": "حاول مرة أخرى",
   "service_exchange": "تبادل الخدمة",
-  "unknown": "Unknown",
+  "unknown": "غير معروف",
   "hours_count": "{{count}} ساعة",
   "hours_count_other": "{{count}} ساعات",
   "workflow_not_enabled_title": "نظام سير العمل للتبادل غير مفعل",
   "workflow_not_enabled_description": "نظام سير العمل للتبادل غير مفعل لهذه المجتمع. اتصل بمنسقك لمزيد من المعلومات.",
   "tabs": {
     "aria_label": "فلتر حالة التبادل",
-    "active": "Active",
+    "active": "نشط",
     "active_aria": "عرض التبادلات النشطة",
     "needs_confirmation": "يحتاج إلى تأكيد",
     "needs_confirmation_aria": "عرض التبادلات التي تحتاج إلى تأكيد",
-    "completed": "Completed",
+    "completed": "مكتمل",
     "completed_aria": "عرض التبادلات المكتملة",
-    "all": "All",
+    "all": "الكل",
     "all_aria": "عرض جميع التبادلات"
   },
   "error": {
@@ -39,11 +39,11 @@
     "you_providing": "أنت تقدم",
     "confirm_hours": "تأكيد الساعات",
     "waiting_for_other": "في انتظار الآخرين",
-    "respond": "Respond"
+    "respond": "رد"
   },
   "breadcrumb": {
-    "exchanges": "Exchanges",
-    "exchange": "Exchange"
+    "exchanges": "التبادلات",
+    "exchange": "تبادل"
   },
   "toast": {
     "load_more_failed": "فشل في تحميل المزيد من التبادلات",
@@ -72,20 +72,20 @@
     "not_found_description": "التبادل الذي تبحث عنه غير موجود",
     "view_exchanges": "عرض تبادلاتي",
     "exchange_details": "تفاصيل التبادل",
-    "service": "Service",
-    "requester": "Requester",
-    "provider": "Provider",
-    "you": "You",
+    "service": "الخدمة",
+    "requester": "طالب الخدمة",
+    "provider": "مقدم الخدمة",
+    "you": "أنت",
     "other_party": "الطرف الآخر",
     "confirmed_hours": "تم تأكيد {{hours}}س",
     "message_party": "رسالة {{name}}",
     "proposed_hours": "الساعات المقترحة",
     "final_hours": "الساعات النهائية",
-    "created": "Created",
+    "created": "تم الإنشاء",
     "message_from_requester": "رسالة من الطالب",
     "broker_notes": "ملاحظات الوسيط",
     "accept_request": "قبول الطلب",
-    "decline": "Decline",
+    "decline": "رفض",
     "start_exchange": "ابدأ التبادل",
     "mark_complete": "حدد كمكتمل",
     "confirm_hours": "أكد الساعات",
@@ -105,7 +105,7 @@
       "fallback": "تم تحديث الحالة"
     },
     "prep_time": "وقت التحضير",
-    "ratings": "Ratings",
+    "ratings": "التقييمات",
     "rate_exchange": "قيم هذا التبادل",
     "prep_time_value": "{{count}}h"
   },
@@ -114,12 +114,12 @@
     "decline_reason_label": "السبب (اختياري)",
     "decline_reason_placeholder": "أخبرهم لماذا ترفض...",
     "decline_confirm": "رفض الطلب",
-    "cancel": "Cancel",
+    "cancel": "إلغاء",
     "confirm_title": "أكد الساعات التي تم العمل بها",
     "confirm_description": "كم عدد الساعات التي تم العمل بها فعليًا لهذا التبادل؟",
-    "hours_label": "Hours",
+    "hours_label": "الساعات",
     "hours_placeholder": "أدخل الساعات",
-    "hours_unit": "hours",
+    "hours_unit": "ساعات",
     "originally_proposed": "مقترح أصلاً: {{hours}} ساعات (الحد الأقصى: {{max}})",
     "cancel_title": "ألغِ التبادل؟",
     "cancel_description": "هل أنت متأكد أنك تريد إلغاء هذا التبادل؟ لا يمكن التراجع عن هذا الإجراء.",
@@ -138,8 +138,8 @@
     "own_listing_title": "هذه هي قائمتك",
     "own_listing_description": "لا يمكنك طلب تبادل لقائمتك الخاصة.",
     "view_listing": "عرض القائمة",
-    "breadcrumb_listings": "Listings",
-    "breadcrumb_listing": "Listing",
+    "breadcrumb_listings": "القوائم",
+    "breadcrumb_listing": "قائمة",
     "breadcrumb_request": "طلب تبادل",
     "estimated_hours": "~{{hours}} ساعات",
     "service_offer": "عرض الخدمة",
@@ -147,30 +147,30 @@
     "proposed_hours_label": "الساعات المقترحة",
     "proposed_hours_placeholder": "كم عدد الساعات التي تحتاجها؟",
     "proposed_hours_description": "الوقت المقدر لهذه الخدمة (الحد الأقصى: {{max}})",
-    "hours_unit": "hours",
+    "hours_unit": "ساعات",
     "message_label": "رسالة (اختياري)",
     "message_placeholder": "أضف رسالة لمقدم الخدمة...",
     "message_description": "اشرح احتياجاتك أو اطرح أي أسئلة",
     "broker_approval_title": "موافقة الوسيط مطلوبة",
     "broker_approval_description": "سيحتاج هذا التبادل إلى موافقة منسق المجتمع قبل أن يتمكن من المتابعة.",
-    "cancel": "Cancel",
+    "cancel": "إلغاء",
     "send_request": "أرسل الطلب",
-    "prep_time_label": "Preparation Time",
-    "prep_time_placeholder": "0",
-    "prep_time_description": "Additional time needed for preparation (optional)",
     "summary_estimate": "الوقت التقديري",
     "form_heading": "تفاصيل الطلب",
-    "form_description": "أكد الساعات المقترحة وأضف السياق حتى يتمكن العضو الآخر من الرد بثقة."
+    "form_description": "أكد الساعات المقترحة وأضف السياق حتى يتمكن العضو الآخر من الرد بثقة.",
+    "prep_time_label": "وقت التحضير",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "الوقت الإضافي اللازم للتحضير (اختياري)"
   },
   "page_meta": {
+    "list": {
+      "title": "التبادلات"
+    },
     "request": {
       "title": "طلب تبادل"
     },
     "detail": {
       "title": "تفاصيل التبادل"
-    },
-    "list": {
-      "title": "Exchanges"
     }
   }
 }

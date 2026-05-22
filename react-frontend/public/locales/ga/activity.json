@@ -9,6 +9,8 @@
   "error_load_failed_detail": "Theip ar do shonraí gníomhaíochta a lódáil. Bain triail eile as le do thoil.",
   "unable_to_load": "Ní féidir a lódáil",
   "try_again": "Bain Triail Eile As",
+  "loading": "Sonraí gníomhaíochta á lódáil...",
+  "refresh": "Athnuaigh",
   "stats": {
     "hours_given": "Uaireanta Tugtha",
     "hours_received": "Uaireanta Faighte",
@@ -30,15 +32,13 @@
   "quick_stats": "Mearstaitisticí",
   "groups_joined": "Grúpaí a d'Imir tú leo",
   "posts_30d": "Postálacha (30l)",
-  "likes_received_30d": "Maith Liom Faighte (30l)",
-  "net_balance": "Glaniarmhéid",
-  "my_skills": "Mo Scileanna",
-  "skill_offer": "Tairiscint",
-  "loading": "Sonraí gníomhaíochta á lódáil...",
-  "refresh": "Athnuaigh",
   "comments_30d": "Tuairimí (30l)",
   "likes_given_30d": "Maith Liom Tugtha (30l)",
+  "likes_received_30d": "Maith Liom Faighte (30l)",
+  "net_balance": "Glaniarmhéid",
   "hours_suffix": "u",
+  "my_skills": "Mo Scileanna",
+  "skill_offer": "Tairiscint",
   "skill_request": "Iarratas",
   "activity_types": {
     "exchange": "Malartú",
@@ -53,6 +53,6 @@
   "endorsements_count_one": "{{count}} tacaíocht",
   "endorsements_count_other": "{{count}} tacaíocht",
   "page_meta": {
-    "title": "Activity Dashboard"
+    "title": "Painéal Gníomhaíochta"
   }
 }

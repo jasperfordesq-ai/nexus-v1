@@ -43,9 +43,9 @@
     "yes": "S?",
     "no": "No"
   },
-  "page_title": "Knowledge Base",
-  "page_description": "Articles, guides, and tutorials for the community.",
-  "all_categories": "All",
-  "author_by": "by {{name}}",
-  "attachments": "Attachments"
+  "page_title": "Base de conocimientos",
+  "page_description": "Artículos, guías y tutoriales para la comunidad.",
+  "all_categories": "Todo",
+  "author_by": "por {{name}}",
+  "attachments": "Archivos adjuntos"
 }

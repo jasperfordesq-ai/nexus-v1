@@ -1,6 +1,4 @@
 {
-  "feedback_thanks": "Vielen Dank für Ihr Feedback!",
-  "feedback_failed": "Feedback konnte nicht gesendet werden.",
   "title": "Wissensdatenbank",
   "description": "Antworten, Anleitungen und hilfreiche Ressourcen finden",
   "search_placeholder": "Wissensdatenbank durchsuchen...",
@@ -28,6 +26,8 @@
   "feedback.question": "War dieser Artikel hilfreich?",
   "feedback.yes": "Ja ({{count}})",
   "feedback.no": "Nein ({{count}})",
+  "feedback_thanks": "Vielen Dank für Ihr Feedback!",
+  "feedback_failed": "Feedback konnte nicht gesendet werden.",
   "error": {
     "title": "Laden nicht möglich",
     "article_not_found": "Artikel nicht gefunden.",
@@ -46,9 +46,9 @@
     "yes": "Ja",
     "no": "Nein"
   },
-  "page_title": "Knowledge Base",
-  "page_description": "Articles, guides, and tutorials for the community.",
-  "all_categories": "All",
-  "author_by": "by {{name}}",
-  "attachments": "Attachments"
+  "page_title": "Wissensdatenbank",
+  "page_description": "Artikel, Leitfäden und Tutorials für die Community.",
+  "all_categories": "Alle",
+  "author_by": "von {{name}}",
+  "attachments": "Anhänge"
 }

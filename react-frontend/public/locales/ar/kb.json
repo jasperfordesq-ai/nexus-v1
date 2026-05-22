@@ -21,11 +21,11 @@
   "updated": "تم تحديث {{time}}",
   "views_one": "{{count}} عرض",
   "views_other": "{{count}} مشاهدات",
-  "general_category": "General",
+  "general_category": "عام",
   "related_articles": "المقالات ذات الصلة",
   "feedback.question": "Was this article helpful?",
-  "feedback.yes": "Yes",
-  "feedback.no": "No",
+  "feedback.yes": "نعم",
+  "feedback.no": "لا",
   "feedback_thanks": "شكراً لملاحظاتك!",
   "feedback_failed": "فشل في إرسال الملاحظات.",
   "error": {
@@ -43,12 +43,12 @@
   },
   "feedback": {
     "question": "هل كانت هذه المقالة مفيدة؟",
-    "yes": "Yes",
-    "no": "No"
+    "yes": "نعم",
+    "no": "لا"
   },
-  "page_title": "Knowledge Base",
-  "page_description": "Articles, guides, and tutorials for the community.",
-  "all_categories": "All",
-  "author_by": "by {{name}}",
-  "attachments": "Attachments"
+  "page_title": "قاعدة المعرفة",
+  "page_description": "مقالات وأدلة وبرامج تعليمية للمجتمع.",
+  "all_categories": "الكل",
+  "author_by": "بواسطة {{name}}",
+  "attachments": "المرفقات"
 }

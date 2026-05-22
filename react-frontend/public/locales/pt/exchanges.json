@@ -155,22 +155,22 @@
     "broker_approval_description": "Esta troca terá de ser aprovada por um coordenador da comunidade antes de poder prosseguir.",
     "cancel": "Cancelar",
     "send_request": "Enviar Pedido",
-    "prep_time_label": "Preparation Time",
-    "prep_time_placeholder": "0",
-    "prep_time_description": "Additional time needed for preparation (optional)",
     "summary_estimate": "Tempo estimado",
     "form_heading": "Detalhes do pedido",
-    "form_description": "Confirma as horas propostas e adiciona contexto para que o outro membro possa responder com confiança."
+    "form_description": "Confirma as horas propostas e adiciona contexto para que o outro membro possa responder com confiança.",
+    "prep_time_label": "Tempo de preparação",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Tempo adicional necessário para preparação (opcional)"
   },
   "page_meta": {
+    "list": {
+      "title": "Trocas"
+    },
     "request": {
       "title": "Solicitar Troca"
     },
     "detail": {
       "title": "Detalhes da Troca"
-    },
-    "list": {
-      "title": "Exchanges"
     }
   }
 }

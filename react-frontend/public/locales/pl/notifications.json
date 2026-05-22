@@ -3,7 +3,9 @@
   "title": "Notifications",
   "subtitle": "Bądź na bieżąco ze swoją aktywnością",
   "unread_badge": "{{count}} nowe",
+  "caught_up_badge": "Na bieżąco",
   "mark_all_read": "Oznacz wszystkie jako przeczytane",
+  "settings_label": "Ustawienia",
   "settings_aria": "Ustawienia powiadomień",
   "filter_all": "All",
   "filter_unread": "Nieprzeczytane ({{count}})",
@@ -12,7 +14,12 @@
   "empty_caught_up": "Wszystko nadrobione!",
   "empty_caught_up_desc": "Przeczytałeś wszystkie swoje powiadomienia",
   "mark_read_aria": "Oznacz jako przeczytane",
+  "mark_group_read_aria": "Oznacz grupę jako przeczytaną",
   "delete_aria": "Usuń powiadomienie",
+  "expand_group": "Rozwiń",
+  "collapse_group": "Zwiń",
+  "notifications_count": "powiadomienia",
+  "and_others": "i {{count}} innych",
   "loading_aria": "Ładowanie powiadomień",
   "error_title": "Nie można załadować",
   "error_load": "Coś poszło nie tak podczas ładowania powiadomień",
@@ -37,15 +44,15 @@
     "system": "System",
     "default": "Notification"
   },
-  "load_more": "Load more",
+  "load_more": "Załaduj więcej",
   "undo": "Undo",
   "toast": {
     "mark_read_failed": "Nie udało się oznaczyć powiadomienia jako przeczytane",
     "all_read": "Wszystkie powiadomienia oznaczone jako przeczytane",
     "mark_all_failed": "Nie udało się oznaczyć wszystkich jako przeczytane",
     "delete_failed": "Nie udało się usunąć powiadomienia",
-    "deleted": "Notification deleted",
-    "undo_hint": "Click Undo to restore"
+    "deleted": "Powiadomienie usunięte",
+    "undo_hint": "Kliknij Cofnij, aby przywrócić"
   },
   "realtime": {
     "new_message": "Nowa wiadomość",
@@ -60,6 +67,8 @@
     "toast_group": "Powiadomienie grupowe",
     "toast_achievement": "Osiągnięcie odblokowane!",
     "toast_broker_review": "Wiadomość do przeglądu",
+    "toast_safeguarding_flag": "Alert ochrony",
+    "toast_safeguarding_assignment": "Przydział ochrony",
     "toast_system": "Powiadomienie systemowe",
     "toast_vol_application_received": "Nowa aplikacja",
     "toast_vol_application_approved": "Aplikacja zatwierdzona",
@@ -70,9 +79,6 @@
     "toast_vol_hours_approved": "Godziny zatwierdzone",
     "toast_vol_hours_declined": "Godziny odrzucone",
     "toast_vol_opportunity_closed": "Możliwość zamknięta",
-    "toast_default": "Notification",
-    "toast_safeguarding_flag": "Alert ochrony",
-    "toast_safeguarding_assignment": "Przydział ochrony",
     "toast_job_application_status": "Aktualizacja aplikacji",
     "toast_job_application": "Aplikacja o pracę",
     "toast_job_interview_proposed": "Prośba o rozmowę kwalifikacyjną",
@@ -85,16 +91,10 @@
     "toast_job_offer_withdrawn": "Oferta wycofana",
     "toast_job_alert_match": "Nowe dopasowanie pracy",
     "toast_job_interview_reminder": "Przypomnienie o rozmowie",
-    "toast_job_completion_credits": "Zdobyto kredyty czasu!"
+    "toast_job_completion_credits": "Zdobyto kredyty czasu!",
+    "toast_default": "Notification"
   },
   "page_meta": {
     "title": "Notifications"
-  },
-  "caught_up_badge": "Na bieżąco",
-  "settings_label": "Ustawienia",
-  "mark_group_read_aria": "Oznacz grupę jako przeczytaną",
-  "expand_group": "Rozwiń",
-  "collapse_group": "Zwiń",
-  "notifications_count": "powiadomienia",
-  "and_others": "i {{count}} innych"
+  }
 }

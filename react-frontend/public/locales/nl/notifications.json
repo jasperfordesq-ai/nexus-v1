@@ -3,7 +3,9 @@
   "title": "Notifications",
   "subtitle": "Blijf op de hoogte van je activiteit",
   "unread_badge": "{{count}} nieuw",
+  "caught_up_badge": "Bijgewerkt",
   "mark_all_read": "Markeer alles als gelezen",
+  "settings_label": "Instellingen",
   "settings_aria": "Notificatie-instellingen",
   "filter_all": "All",
   "filter_unread": "Ongelezen ({{count}})",
@@ -12,7 +14,12 @@
   "empty_caught_up": "Alles bijgelezen!",
   "empty_caught_up_desc": "Je hebt al je notificaties gelezen",
   "mark_read_aria": "Markeer als gelezen",
+  "mark_group_read_aria": "Groep als gelezen markeren",
   "delete_aria": "Verwijder notificatie",
+  "expand_group": "Uitvouwen",
+  "collapse_group": "Inklappen",
+  "notifications_count": "meldingen",
+  "and_others": "en {{count}} anderen",
   "loading_aria": "Notificaties laden",
   "error_title": "Niet mogelijk om te laden",
   "error_load": "Er is iets misgegaan bij het laden van je notificaties",
@@ -37,15 +44,15 @@
     "system": "System",
     "default": "Notification"
   },
-  "load_more": "Load more",
+  "load_more": "Laad meer",
   "undo": "Undo",
   "toast": {
     "mark_read_failed": "Mislukt om notificatie als gelezen te markeren",
     "all_read": "Alle notificaties gemarkeerd als gelezen",
     "mark_all_failed": "Mislukt om alles als gelezen te markeren",
     "delete_failed": "Mislukt om notificatie te verwijderen",
-    "deleted": "Notification deleted",
-    "undo_hint": "Click Undo to restore"
+    "deleted": "Melding verwijderd",
+    "undo_hint": "Klik op Ongedaan maken om te herstellen"
   },
   "realtime": {
     "new_message": "Nieuw Bericht",
@@ -60,6 +67,8 @@
     "toast_group": "Groep Notificatie",
     "toast_achievement": "Prestatie Ontgrendeld!",
     "toast_broker_review": "Bericht voor Beoordeling",
+    "toast_safeguarding_flag": "Beschermingswaarschuwing",
+    "toast_safeguarding_assignment": "Beschermingstoewijzing",
     "toast_system": "Systeem Notificatie",
     "toast_vol_application_received": "Nieuwe Aanvraag",
     "toast_vol_application_approved": "Aanvraag Goedgekeurd",
@@ -70,9 +79,6 @@
     "toast_vol_hours_approved": "Uren Goedgekeurd",
     "toast_vol_hours_declined": "Uren Geweigerd",
     "toast_vol_opportunity_closed": "Kans Gesloten",
-    "toast_default": "Notification",
-    "toast_safeguarding_flag": "Beschermingswaarschuwing",
-    "toast_safeguarding_assignment": "Beschermingstoewijzing",
     "toast_job_application_status": "Sollicitatie-update",
     "toast_job_application": "Sollicitatie",
     "toast_job_interview_proposed": "Sollicitatiegesprek aangevraagd",
@@ -85,16 +91,10 @@
     "toast_job_offer_withdrawn": "Aanbod ingetrokken",
     "toast_job_alert_match": "Nieuwe vacaturematch",
     "toast_job_interview_reminder": "Herinnering sollicitatiegesprek",
-    "toast_job_completion_credits": "Tijdkrediet verdiend!"
+    "toast_job_completion_credits": "Tijdkrediet verdiend!",
+    "toast_default": "Notification"
   },
   "page_meta": {
     "title": "Notifications"
-  },
-  "caught_up_badge": "Bijgewerkt",
-  "settings_label": "Instellingen",
-  "mark_group_read_aria": "Groep als gelezen markeren",
-  "expand_group": "Uitvouwen",
-  "collapse_group": "Inklappen",
-  "notifications_count": "meldingen",
-  "and_others": "en {{count}} anderen"
+  }
 }

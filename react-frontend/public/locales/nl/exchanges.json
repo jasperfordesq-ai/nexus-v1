@@ -1,25 +1,25 @@
 {
-  "page_title": "Exchanges",
+  "page_title": "Uitwisselingen",
   "title": "Mijn Uitwisselingen",
   "subtitle": "Volg je verzoeken en bevestigingen voor service-uitwisselingen",
   "browse_listings": "Blader door Lijsten",
   "load_more": "Laad Meer",
   "try_again": "Probeer Opnieuw",
   "service_exchange": "Service-uitwisseling",
-  "unknown": "Unknown",
+  "unknown": "Onbekend",
   "hours_count": "{{count}} uur",
   "hours_count_other": "{{count}} uren",
   "workflow_not_enabled_title": "Uitwisselingsworkflow Niet Ingeschakeld",
   "workflow_not_enabled_description": "Het uitwisselingsworkflow-systeem is niet ingeschakeld voor deze gemeenschap. Neem contact op met je coördinator voor meer informatie.",
   "tabs": {
     "aria_label": "Filter voor uitwisselingsstatus",
-    "active": "Active",
+    "active": "Actief",
     "active_aria": "Toon actieve uitwisselingen",
     "needs_confirmation": "Bevestiging Vereist",
     "needs_confirmation_aria": "Toon uitwisselingen die bevestiging nodig hebben",
-    "completed": "Completed",
+    "completed": "Voltooid",
     "completed_aria": "Toon voltooide uitwisselingen",
-    "all": "All",
+    "all": "Alles",
     "all_aria": "Toon alle uitwisselingen"
   },
   "error": {
@@ -39,11 +39,11 @@
     "you_providing": "Je biedt aan",
     "confirm_hours": "Bevestig Uren",
     "waiting_for_other": "Wachten op anderen",
-    "respond": "Respond"
+    "respond": "Reageren"
   },
   "breadcrumb": {
-    "exchanges": "Exchanges",
-    "exchange": "Exchange"
+    "exchanges": "Uitwisselingen",
+    "exchange": "Uitwisseling"
   },
   "toast": {
     "load_more_failed": "Kon meer uitwisselingen niet laden",
@@ -72,20 +72,20 @@
     "not_found_description": "De ruil waar je naar op zoek bent bestaat niet",
     "view_exchanges": "Bekijk Mijn Ruilen",
     "exchange_details": "Ruildetails",
-    "service": "Service",
-    "requester": "Requester",
-    "provider": "Provider",
-    "you": "You",
+    "service": "Dienst",
+    "requester": "Aanvrager",
+    "provider": "Aanbieder",
+    "you": "Jij",
     "other_party": "Andere Partij",
     "confirmed_hours": "Bevestigd {{hours}}u",
     "message_party": "Bericht {{name}}",
     "proposed_hours": "Voorgestelde Uren",
     "final_hours": "Einduren",
-    "created": "Created",
+    "created": "Aangemaakt",
     "message_from_requester": "Bericht van aanvrager",
     "broker_notes": "Broker Notities",
     "accept_request": "Accepteer Verzoek",
-    "decline": "Decline",
+    "decline": "Weigeren",
     "start_exchange": "Start Uitwisseling",
     "mark_complete": "Markeer Voltooid",
     "confirm_hours": "Bevestig Uren",
@@ -105,7 +105,7 @@
       "fallback": "Status Bijgewerkt"
     },
     "prep_time": "Voorbereidingstijd",
-    "ratings": "Ratings",
+    "ratings": "Beoordelingen",
     "rate_exchange": "Beoordeel Deze Uitwisseling",
     "prep_time_value": "{{count}}h"
   },
@@ -114,12 +114,12 @@
     "decline_reason_label": "Reden (optioneel)",
     "decline_reason_placeholder": "Laat ze weten waarom je weigert...",
     "decline_confirm": "Weiger Verzoek",
-    "cancel": "Cancel",
+    "cancel": "Annuleren",
     "confirm_title": "Bevestig Gewerkte Uren",
     "confirm_description": "Hoeveel uren zijn er daadwerkelijk gewerkt voor deze uitwisseling?",
-    "hours_label": "Hours",
+    "hours_label": "Uren",
     "hours_placeholder": "Voer uren in",
-    "hours_unit": "hours",
+    "hours_unit": "uur",
     "originally_proposed": "Oorspronkelijk voorgesteld: {{hours}} uren (max: {{max}})",
     "cancel_title": "Annuleer Uitwisseling?",
     "cancel_description": "Weet je zeker dat je deze uitwisseling wilt annuleren? Deze actie kan niet ongedaan worden gemaakt.",
@@ -138,8 +138,8 @@
     "own_listing_title": "Dit is Jouw Lijst",
     "own_listing_description": "Je kunt geen uitwisseling aanvragen voor je eigen lijst.",
     "view_listing": "Bekijk Lijst",
-    "breadcrumb_listings": "Listings",
-    "breadcrumb_listing": "Listing",
+    "breadcrumb_listings": "Vermeldingen",
+    "breadcrumb_listing": "Vermelding",
     "breadcrumb_request": "Vraag Uitwisseling Aan",
     "estimated_hours": "~{{hours}} uren",
     "service_offer": "Dienstenaanbod",
@@ -147,30 +147,30 @@
     "proposed_hours_label": "Voorgestelde Uren",
     "proposed_hours_placeholder": "Hoeveel uren heb je nodig?",
     "proposed_hours_description": "De geschatte tijd voor deze dienst (max: {{max}})",
-    "hours_unit": "hours",
+    "hours_unit": "uur",
     "message_label": "Bericht (optioneel)",
     "message_placeholder": "Voeg een bericht toe aan de dienstverlener...",
     "message_description": "Leg je behoeften uit of stel vragen",
     "broker_approval_title": "Goedkeuring van de Broker Vereist",
     "broker_approval_description": "Deze uitwisseling moet goedgekeurd worden door een coördinator van de gemeenschap voordat deze kan doorgaan.",
-    "cancel": "Cancel",
+    "cancel": "Annuleren",
     "send_request": "Verzoek Verzenden",
-    "prep_time_label": "Preparation Time",
-    "prep_time_placeholder": "0",
-    "prep_time_description": "Additional time needed for preparation (optional)",
     "summary_estimate": "Geschatte tijd",
     "form_heading": "Aanvraagdetails",
-    "form_description": "Bevestig de voorgestelde uren en voeg context toe zodat het andere lid met vertrouwen kan reageren."
+    "form_description": "Bevestig de voorgestelde uren en voeg context toe zodat het andere lid met vertrouwen kan reageren.",
+    "prep_time_label": "Voorbereidingstijd",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Extra tijd nodig voor voorbereiding (optioneel)"
   },
   "page_meta": {
+    "list": {
+      "title": "Uitwisselingen"
+    },
     "request": {
       "title": "Vraag Uitwisseling Aan"
     },
     "detail": {
       "title": "Uitwisselingsdetails"
-    },
-    "list": {
-      "title": "Exchanges"
     }
   }
 }

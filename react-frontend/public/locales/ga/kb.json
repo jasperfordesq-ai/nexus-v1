@@ -1,6 +1,4 @@
 {
-  "feedback_thanks": "Go raibh maith agat as d'aiseolas!",
-  "feedback_failed": "Theip ar an aiseolas a sheoladh.",
   "title": "Bunachar Eolais",
   "description": "Aimsigh freagraí, treoraithe, agus acmhainní cabhraithe",
   "search_placeholder": "Cuardaigh an bunachar eolais...",
@@ -28,13 +26,15 @@
   "feedback.question": "Was this article helpful?",
   "feedback.yes": "Yes ({{count}})",
   "feedback.no": "No ({{count}})",
+  "feedback_thanks": "Go raibh maith agat as d'aiseolas!",
+  "feedback_failed": "Theip ar an aiseolas a sheoladh.",
   "error": {
     "title": "Ní féidir a lódáil",
+    "article_not_found": "Ailt gan aimsiú.",
+    "article_title": "Ní féidir alt a lódáil",
     "load_articles": "Theip ar ailt bhunachar eolais a lódáil.",
     "load_retry": "Theip ar ailt a lódáil. Bain triail eile as le do thoil.",
-    "article_not_found": "Ailt gan aimsiú.",
-    "article_load_retry": "Theip ar alt a lódáil. Bain triail eile as le do thoil.",
-    "article_title": "Ní féidir alt a lódáil"
+    "article_load_retry": "Theip ar alt a lódáil. Bain triail eile as le do thoil."
   },
   "empty": {
     "title": "Níor aimsíodh ailt ar bith",
@@ -46,9 +46,9 @@
     "yes": "T?",
     "no": "N?l"
   },
-  "page_title": "Knowledge Base",
-  "page_description": "Articles, guides, and tutorials for the community.",
-  "all_categories": "All",
-  "author_by": "by {{name}}",
-  "attachments": "Attachments"
+  "page_title": "Bonn Eolais",
+  "page_description": "Airteagail, treoracha, agus ranganna teagaisc don phobal....",
+  "all_categories": "Uile",
+  "author_by": "ag {{name}}",
+  "attachments": "Ceangaltáin"
 }

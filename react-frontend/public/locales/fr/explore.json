@@ -1,8 +1,9 @@
 {
   "page_title": "Découvrir",
-  "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
+  "page_description": "Trouvez des annonces, des événements, des groupes, des membres et des opportunités dans la communauté : votre point de départ pour vous impliquer et vous connecter localement.",
   "heading": "Découvrir",
   "subtitle": "Trouvez des compétences, des événements, des groupes et plus encore dans votre communauté",
+  "see_all": "Tout voir",
   "search_placeholder": "Découvrir des compétences, événements, groupes...",
   "stats": {
     "members": "Membres",
@@ -96,8 +97,8 @@
   "polls": {
     "title": "Sondages Actifs",
     "subtitle": "Donnez votre avis sur les sujets communautaires",
-    "votes": "{{count}} votes",
-    "options": "{{count}} options",
+    "votes": "Votes {{count}}",
+    "options": "Options de {{count}}",
     "vote_now": "Voter Maintenant",
     "closes": "Se termine le {{date}}"
   },
@@ -152,6 +153,5 @@
   "empty_groups": "Aucun groupe actif pour le moment. Créez un groupe autour de vos centres d'intérêt !",
   "create_listing": "Créer une annonce",
   "create_event": "Créer un événement",
-  "create_group": "Créer un groupe",
-  "see_all": "Tout voir"
+  "create_group": "Créer un groupe"
 }

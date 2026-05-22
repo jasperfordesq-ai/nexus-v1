@@ -1,8 +1,9 @@
 {
   "page_title": "Descobrir",
-  "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
+  "page_description": "Encontre listagens, eventos, grupos, membros e oportunidades em toda a comunidade — seu ponto de partida para se envolver e se conectar localmente.",
   "heading": "Descobrir",
   "subtitle": "Encontre competências, eventos, grupos e mais na sua comunidade",
+  "see_all": "Ver tudo",
   "search_placeholder": "Descobrir competências, eventos, grupos...",
   "stats": {
     "members": "Membros",
@@ -152,6 +153,5 @@
   "empty_groups": "Ainda não há grupos ativos. Comece um grupo sobre os seus interesses!",
   "create_listing": "Criar Anúncio",
   "create_event": "Criar Evento",
-  "create_group": "Criar Grupo",
-  "see_all": "Ver tudo"
+  "create_group": "Criar Grupo"
 }

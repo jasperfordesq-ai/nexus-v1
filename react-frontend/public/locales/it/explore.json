@@ -1,8 +1,9 @@
 {
   "page_title": "Esplora",
-  "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
+  "page_description": "Trova elenchi, eventi, gruppi, membri e opportunità in tutta la community: il tuo punto di partenza per partecipare e connetterti a livello locale.",
   "heading": "Esplora",
   "subtitle": "Trova competenze, eventi, gruppi e altro nella tua comunità",
+  "see_all": "Vedi tutto",
   "search_placeholder": "Cerca competenze, eventi, gruppi...",
   "stats": {
     "members": "Membri",
@@ -152,6 +153,5 @@
   "empty_groups": "Nessun gruppo attivo. Avvia un gruppo sui tuoi interessi!",
   "create_listing": "Crea Annuncio",
   "create_event": "Crea Evento",
-  "create_group": "Crea Gruppo",
-  "see_all": "Vedi tutto"
+  "create_group": "Crea Gruppo"
 }

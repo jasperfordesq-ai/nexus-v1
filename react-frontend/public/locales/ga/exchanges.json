@@ -155,22 +155,22 @@
     "broker_approval_description": "Beidh gá le faomhadh ó chomhordaitheoir pobail sula bhféadfaidh an malartú seo dul ar aghaidh.",
     "cancel": "Cealaigh",
     "send_request": "Seol Iarratas",
-    "prep_time_label": "Preparation Time",
-    "prep_time_placeholder": "0",
-    "prep_time_description": "Additional time needed for preparation (optional)",
     "summary_estimate": "Am measta",
     "form_heading": "Sonraí an iarratais",
-    "form_description": "Deimhnigh na huaireanta atá molta agus cuir comhthéacs leis ionas gur féidir leis an mball eile freagra a thabhairt go muiníneach."
+    "form_description": "Deimhnigh na huaireanta atá molta agus cuir comhthéacs leis ionas gur féidir leis an mball eile freagra a thabhairt go muiníneach.",
+    "prep_time_label": "Am Ullmhúcháin",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Am breise ag teastáil le haghaidh ullmhúcháin (roghnach)"
   },
   "page_meta": {
     "list": {
-      "title": "Exchanges"
+      "title": "Malartuithe"
     },
     "request": {
-      "title": "Request Exchange"
+      "title": "Malartú Iarratas"
     },
     "detail": {
-      "title": "Exchange Details"
+      "title": "Sonraí Malartú"
     }
   }
 }

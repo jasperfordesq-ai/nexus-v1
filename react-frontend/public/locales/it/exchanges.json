@@ -155,22 +155,22 @@
     "broker_approval_description": "Questo scambio dovrà essere approvato da un coordinatore della comunità prima di poter procedere.",
     "cancel": "Annulla",
     "send_request": "Invia richiesta",
-    "prep_time_label": "Preparation Time",
-    "prep_time_placeholder": "0",
-    "prep_time_description": "Additional time needed for preparation (optional)",
     "summary_estimate": "Tempo stimato",
     "form_heading": "Dettagli della richiesta",
-    "form_description": "Conferma le ore proposte e aggiungi contesto in modo che l'altro membro possa rispondere con sicurezza."
+    "form_description": "Conferma le ore proposte e aggiungi contesto in modo che l'altro membro possa rispondere con sicurezza.",
+    "prep_time_label": "Tempo di preparazione",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Tempo aggiuntivo necessario per la preparazione (facoltativo)"
   },
   "page_meta": {
+    "list": {
+      "title": "Scambi"
+    },
     "request": {
       "title": "Richiedi Scambio"
     },
     "detail": {
       "title": "Dettagli dello Scambio"
-    },
-    "list": {
-      "title": "Exchanges"
     }
   }
 }

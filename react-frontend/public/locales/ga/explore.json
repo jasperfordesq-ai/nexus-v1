@@ -1,7 +1,9 @@
 {
   "page_title": "Aimsigh",
+  "page_description": "Aimsigh liostaí, imeachtaí, grúpaí, baill, agus deiseanna ar fud an phobail - an pointe tosaigh atá agat le bheith páirteach agus le nascadh go háitiúil.",
   "heading": "Aimsigh",
   "subtitle": "Aimsigh scileanna, imeachtaí, grúpaí, agus tuilleadh i do phobal",
+  "see_all": "Féach ar fad",
   "search_placeholder": "Aimsigh scileanna, imeachtaí, grúpaí...",
   "stats": {
     "members": "Baill",
@@ -151,7 +153,5 @@
   "empty_groups": "Níl aon ghrúpaí gníomhacha fós. Tosaigh grúpa bunaithe ar do spéiseanna!",
   "create_listing": "Cruthaigh Liostú",
   "create_event": "Cruthaigh Imeacht",
-  "create_group": "Cruthaigh Grúpa",
-  "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
-  "see_all": "Féach ar fad"
+  "create_group": "Cruthaigh Grúpa"
 }

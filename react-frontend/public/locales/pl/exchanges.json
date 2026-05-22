@@ -1,25 +1,25 @@
 {
-  "page_title": "Exchanges",
+  "page_title": "Wymiany",
   "title": "Moje wymiany",
   "subtitle": "Śledź swoje prośby o wymianę usług i potwierdzenia",
   "browse_listings": "Przeglądaj oferty",
   "load_more": "Załaduj więcej",
   "try_again": "Spróbuj ponownie",
   "service_exchange": "Wymiana usług",
-  "unknown": "Unknown",
+  "unknown": "Nieznane",
   "hours_count": "{{count}} godzina",
   "hours_count_other": "{{count}} godziny",
   "workflow_not_enabled_title": "Workflow wymiany nie jest włączony",
   "workflow_not_enabled_description": "System workflow wymiany nie jest włączony dla tej społeczności. Skontaktuj się ze swoim koordynatorem, aby uzyskać więcej informacji.",
   "tabs": {
     "aria_label": "Filtr statusu wymiany",
-    "active": "Active",
+    "active": "Aktywne",
     "active_aria": "Pokaż aktywne wymiany",
     "needs_confirmation": "Potrzebuje potwierdzenia",
     "needs_confirmation_aria": "Pokaż wymiany wymagające potwierdzenia",
-    "completed": "Completed",
+    "completed": "Ukończone",
     "completed_aria": "Pokaż zakończone wymiany",
-    "all": "All",
+    "all": "Wszystko",
     "all_aria": "Pokaż wszystkie wymiany"
   },
   "error": {
@@ -39,11 +39,11 @@
     "you_providing": "Świadczysz",
     "confirm_hours": "Potwierdź godziny",
     "waiting_for_other": "Czekam na innych",
-    "respond": "Respond"
+    "respond": "Odpowiedz"
   },
   "breadcrumb": {
-    "exchanges": "Exchanges",
-    "exchange": "Exchange"
+    "exchanges": "Wymiany",
+    "exchange": "Wymiana"
   },
   "toast": {
     "load_more_failed": "Nie udało się załadować więcej wymian",
@@ -72,20 +72,20 @@
     "not_found_description": "Wymiana, której szukasz, nie istnieje",
     "view_exchanges": "Zobacz moje wymiany",
     "exchange_details": "Szczegóły wymiany",
-    "service": "Service",
-    "requester": "Requester",
-    "provider": "Provider",
-    "you": "You",
+    "service": "Usługa",
+    "requester": "Zgłaszający",
+    "provider": "Dostawca",
+    "you": "Ty",
     "other_party": "Druga strona",
     "confirmed_hours": "Potwierdzone {{hours}}h",
     "message_party": "Wiadomość {{name}}",
     "proposed_hours": "Proponowane godziny",
     "final_hours": "Ostateczne godziny",
-    "created": "Created",
+    "created": "Utworzono",
     "message_from_requester": "Wiadomość od wnioskodawcy",
     "broker_notes": "Notatki brokera",
     "accept_request": "Zaakceptuj prośbę",
-    "decline": "Decline",
+    "decline": "Odrzuć",
     "start_exchange": "Rozpocznij wymianę",
     "mark_complete": "Oznacz jako zakończone",
     "confirm_hours": "Potwierdź godziny",
@@ -105,7 +105,7 @@
       "fallback": "Status zaktualizowany"
     },
     "prep_time": "Czas przygotowania",
-    "ratings": "Ratings",
+    "ratings": "Oceny",
     "rate_exchange": "Oceń tę wymianę",
     "prep_time_value": "{{count}}h"
   },
@@ -114,12 +114,12 @@
     "decline_reason_label": "Powód (opcjonalnie)",
     "decline_reason_placeholder": "Daj im znać, dlaczego odrzucasz...",
     "decline_confirm": "Odrzuć prośbę",
-    "cancel": "Cancel",
+    "cancel": "Anuluj",
     "confirm_title": "Potwierdź przepracowane godziny",
     "confirm_description": "Ile godzin faktycznie przepracowano w tej wymianie?",
-    "hours_label": "Hours",
+    "hours_label": "Godziny",
     "hours_placeholder": "Wprowadź godziny",
-    "hours_unit": "hours",
+    "hours_unit": "godziny",
     "originally_proposed": "Początkowo zaproponowane: {{hours}} godziny (maks: {{max}})",
     "cancel_title": "Anulować wymianę?",
     "cancel_description": "Czy na pewno chcesz anulować tę wymianę? Ta akcja nie może być cofnięta.",
@@ -138,8 +138,8 @@
     "own_listing_title": "To jest Twoja oferta",
     "own_listing_description": "Nie możesz złożyć prośby o wymianę dla własnej oferty.",
     "view_listing": "Zobacz ofertę",
-    "breadcrumb_listings": "Listings",
-    "breadcrumb_listing": "Listing",
+    "breadcrumb_listings": "Ogłoszenia",
+    "breadcrumb_listing": "Ogłoszenie",
     "breadcrumb_request": "Złóż prośbę o wymianę",
     "estimated_hours": "~{{hours}} godziny",
     "service_offer": "Oferta usługi",
@@ -147,30 +147,30 @@
     "proposed_hours_label": "Proponowane godziny",
     "proposed_hours_placeholder": "Ile godzin potrzebujesz?",
     "proposed_hours_description": "Szacowany czas na tę usługę (maks: {{max}})",
-    "hours_unit": "hours",
+    "hours_unit": "godziny",
     "message_label": "Wiadomość (opcjonalnie)",
     "message_placeholder": "Dodaj wiadomość do dostawcy usługi...",
     "message_description": "Wyjaśnij swoje potrzeby lub zadaj pytania",
     "broker_approval_title": "Wymagana zgoda brokera",
     "broker_approval_description": "Ta wymiana musi zostać zatwierdzona przez koordynatora społeczności, zanim będzie mogła zostać zrealizowana.",
-    "cancel": "Cancel",
+    "cancel": "Anuluj",
     "send_request": "Wyślij prośbę",
-    "prep_time_label": "Preparation Time",
-    "prep_time_placeholder": "0",
-    "prep_time_description": "Additional time needed for preparation (optional)",
     "summary_estimate": "Szacowany czas",
     "form_heading": "Szczegóły prośby",
-    "form_description": "Potwierdź proponowane godziny i dodaj kontekst, aby drugi członek mógł odpowiedzieć z pewnością."
+    "form_description": "Potwierdź proponowane godziny i dodaj kontekst, aby drugi członek mógł odpowiedzieć z pewnością.",
+    "prep_time_label": "Czas przygotowania",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Dodatkowy czas potrzebny na przygotowanie (opcjonalnie)"
   },
   "page_meta": {
+    "list": {
+      "title": "Wymiany"
+    },
     "request": {
       "title": "Złóż prośbę o wymianę"
     },
     "detail": {
       "title": "Szczegóły wymiany"
-    },
-    "list": {
-      "title": "Exchanges"
     }
   }
 }

@@ -1,11 +1,12 @@
 {
-  "page_title": "Discover",
-  "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
-  "heading": "Discover",
+  "page_title": "見つける",
+  "page_description": "コミュニティ全体でリスト、イベント、グループ、メンバー、機会を見つけてください。参加し、ローカルでつながるための出発点となります。",
+  "heading": "見つける",
   "subtitle": "あなたのコミュニティでスキル、イベント、グループなどを見つけましょう",
+  "see_all": "すべて表示",
   "search_placeholder": "スキル、イベント、グループを発見...",
   "stats": {
-    "members": "Members",
+    "members": "メンバー",
     "exchanges_this_month": "今月の交換",
     "hours_exchanged": "交換された時間",
     "active_listings": "アクティブなリスト"
@@ -21,7 +22,7 @@
   "upcoming_events": {
     "title": "今後のイベント",
     "subtitle": "あなたのコミュニティに参加しましょう",
-    "online": "Online",
+    "online": "オンライン",
     "attending": "{{count}} が参加中"
   },
   "active_groups": {
@@ -47,7 +48,7 @@
   "new_members": {
     "title": "新しいメンバーを歓迎します",
     "subtitle": "最近参加した人に挨拶しましょう",
-    "connect": "Connect"
+    "connect": "つながる"
   },
   "featured_challenges": {
     "title": "注目のチャレンジ",
@@ -62,7 +63,7 @@
     "days_ago": "{{count}}日前"
   },
   "error_loading": "Discoverページを読み込めませんでした。これは一時的な問題かもしれません。",
-  "retry": "Retry",
+  "retry": "再試行",
   "near_you": {
     "title": "あなたの近く",
     "subtitle": "あなたの位置に近いリスト",
@@ -71,7 +72,7 @@
   "suggested_connections": {
     "title": "あなたが知っているかもしれない人々",
     "subtitle": "あなたの興味を共有するメンバーとつながりましょう",
-    "connect": "Connect",
+    "connect": "つながる",
     "mutual": "相互接続",
     "similar": "似たような興味",
     "recommended": "あなたへのおすすめ"
@@ -89,7 +90,7 @@
     "view_opportunity": "機会を表示"
   },
   "organisations": {
-    "title": "Organisations",
+    "title": "組織",
     "subtitle": "影響を与えるコミュニティパートナー",
     "opportunities": "{{count}}件の機会"
   },
@@ -123,17 +124,17 @@
     "content_tabs": "コンテンツタブを探索"
   },
   "tabs": {
-    "all": "All",
+    "all": "すべて",
     "for_you": "あなたのために",
-    "listings": "Listings",
-    "people": "People",
-    "events": "Events",
-    "groups": "Groups"
+    "listings": "リスティング",
+    "people": "人",
+    "events": "イベント",
+    "groups": "グループ"
   },
   "recently_viewed": {
     "title": "最近見たもの",
     "subtitle": "最近見たアイテム",
-    "clear": "Clear"
+    "clear": "クリア"
   },
   "match_score": "{{score}}% マッチ",
   "dismiss": "興味なし",
@@ -152,6 +153,5 @@
   "empty_groups": "まだアクティブなグループはありません。あなたの興味に基づいてグループを始めましょう！",
   "create_listing": "リスティングを作成",
   "create_event": "イベントを作成",
-  "create_group": "グループを作成",
-  "see_all": "すべて表示"
+  "create_group": "グループを作成"
 }

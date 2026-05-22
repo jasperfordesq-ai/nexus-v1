@@ -155,22 +155,22 @@
     "broker_approval_description": "Dieses Tauschgeschäft muss von einem Gemeinschaftskoordinator genehmigt werden, bevor es fortfahren kann.",
     "cancel": "Abbrechen",
     "send_request": "Anfrage senden",
-    "prep_time_label": "Preparation Time",
-    "prep_time_placeholder": "0",
-    "prep_time_description": "Additional time needed for preparation (optional)",
     "summary_estimate": "Geschätzte Zeit",
     "form_heading": "Anfragedetails",
-    "form_description": "Bestätigen Sie die vorgeschlagenen Stunden und ergänzen Sie Kontext, damit das andere Mitglied selbstbewusst antworten kann."
+    "form_description": "Bestätigen Sie die vorgeschlagenen Stunden und ergänzen Sie Kontext, damit das andere Mitglied selbstbewusst antworten kann.",
+    "prep_time_label": "Vorbereitungszeit",
+    "prep_time_placeholder": "0",
+    "prep_time_description": "Zusätzlicher Zeitaufwand für die Vorbereitung (optional)"
   },
   "page_meta": {
+    "list": {
+      "title": "Austausche"
+    },
     "request": {
       "title": "Austausch anfordern"
     },
     "detail": {
       "title": "Austauschdetails"
-    },
-    "list": {
-      "title": "Exchanges"
     }
   }
 }

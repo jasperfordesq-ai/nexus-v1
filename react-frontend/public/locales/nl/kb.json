@@ -21,11 +21,11 @@
   "updated": "Bijgewerkt {{time}}",
   "views_one": "{{count}} weergave",
   "views_other": "{{count}} weergaven",
-  "general_category": "General",
+  "general_category": "Algemeen",
   "related_articles": "Gerelateerde Artikelen",
   "feedback.question": "Was this article helpful?",
-  "feedback.yes": "Yes",
-  "feedback.no": "No",
+  "feedback.yes": "Ja",
+  "feedback.no": "Nee",
   "feedback_thanks": "Bedankt voor je feedback!",
   "feedback_failed": "Het is niet gelukt om feedback in te dienen.",
   "error": {
@@ -43,12 +43,12 @@
   },
   "feedback": {
     "question": "Was dit artikel nuttig?",
-    "yes": "Yes",
-    "no": "No"
+    "yes": "Ja",
+    "no": "Nee"
   },
-  "page_title": "Knowledge Base",
-  "page_description": "Articles, guides, and tutorials for the community.",
-  "all_categories": "All",
-  "author_by": "by {{name}}",
-  "attachments": "Attachments"
+  "page_title": "Kennisbank",
+  "page_description": "Artikelen, handleidingen en tutorials voor de community.",
+  "all_categories": "Alles",
+  "author_by": "door {{name}}",
+  "attachments": "Bijlagen"
 }

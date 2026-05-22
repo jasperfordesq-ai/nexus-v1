@@ -1,6 +1,4 @@
 {
-  "feedback_thanks": "Grazie per il tuo feedback!",
-  "feedback_failed": "Impossibile inviare il feedback.",
   "title": "Base di Conoscenza",
   "description": "Trova risposte, guide e risorse utili",
   "search_placeholder": "Cerca nella base di conoscenza...",
@@ -28,13 +26,15 @@
   "feedback.question": "Questo articolo è stato utile?",
   "feedback.yes": "Sì ({{count}})",
   "feedback.no": "No ({{count}})",
+  "feedback_thanks": "Grazie per il tuo feedback!",
+  "feedback_failed": "Impossibile inviare il feedback.",
   "error": {
     "title": "Impossibile caricare",
+    "article_not_found": "Articolo non trovato.",
+    "article_title": "Impossibile caricare l'articolo",
     "load_articles": "Impossibile caricare gli articoli della base di conoscenza.",
     "load_retry": "Impossibile caricare gli articoli. Riprova.",
-    "article_not_found": "Articolo non trovato.",
-    "article_load_retry": "Impossibile caricare l'articolo. Riprova.",
-    "article_title": "Impossibile caricare l'articolo"
+    "article_load_retry": "Impossibile caricare l'articolo. Riprova."
   },
   "empty": {
     "title": "Nessun articolo trovato",
@@ -46,9 +46,9 @@
     "yes": "S?",
     "no": "No"
   },
-  "page_title": "Knowledge Base",
-  "page_description": "Articles, guides, and tutorials for the community.",
-  "all_categories": "All",
-  "author_by": "by {{name}}",
-  "attachments": "Attachments"
+  "page_title": "Base di conoscenza",
+  "page_description": "Articoli, guide ed esercitazioni per la community.",
+  "all_categories": "Tutto",
+  "author_by": "di {{name}}",
+  "attachments": "Allegati"
 }

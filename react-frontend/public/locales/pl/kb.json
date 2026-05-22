@@ -21,11 +21,11 @@
   "updated": "Zaktualizowano {{time}}",
   "views_one": "{{count}} widok",
   "views_other": "{{count}} widoki",
-  "general_category": "General",
+  "general_category": "Ogólne",
   "related_articles": "Pokrewne Artykuły",
   "feedback.question": "Was this article helpful?",
-  "feedback.yes": "Yes",
-  "feedback.no": "No",
+  "feedback.yes": "Tak",
+  "feedback.no": "Nie",
   "feedback_thanks": "Dziękujemy za Twoją opinię!",
   "feedback_failed": "Nie udało się przesłać opinii.",
   "error": {
@@ -43,12 +43,12 @@
   },
   "feedback": {
     "question": "Czy ten artykuł był pomocny?",
-    "yes": "Yes",
-    "no": "No"
+    "yes": "Tak",
+    "no": "Nie"
   },
-  "page_title": "Knowledge Base",
-  "page_description": "Articles, guides, and tutorials for the community.",
-  "all_categories": "All",
-  "author_by": "by {{name}}",
-  "attachments": "Attachments"
+  "page_title": "Baza wiedzy",
+  "page_description": "Artykuły, przewodniki i samouczki dla społeczności.",
+  "all_categories": "Wszystko",
+  "author_by": "przez {{name}}",
+  "attachments": "Załączniki"
 }

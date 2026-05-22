@@ -1,11 +1,12 @@
 {
-  "page_title": "Discover",
-  "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
-  "heading": "Discover",
+  "page_title": "Ontdekken",
+  "page_description": "Vind vermeldingen, evenementen, groepen, leden en mogelijkheden in de hele gemeenschap - uw startpunt om betrokken te raken en lokaal verbinding te maken.",
+  "heading": "Ontdekken",
   "subtitle": "Vind vaardigheden, evenementen, groepen en meer in jouw gemeenschap",
+  "see_all": "Alles bekijken",
   "search_placeholder": "Ontdek vaardigheden, evenementen, groepen...",
   "stats": {
-    "members": "Members",
+    "members": "Leden",
     "exchanges_this_month": "Ruilingen Deze Maand",
     "hours_exchanged": "Uren Gewisseld",
     "active_listings": "Actieve Aanbiedingen"
@@ -47,7 +48,7 @@
   "new_members": {
     "title": "Welkom Onze Nieuwste Leden",
     "subtitle": "Zeg hallo tegen recente nieuwkomers",
-    "connect": "Connect"
+    "connect": "Verbinden"
   },
   "featured_challenges": {
     "title": "Uitgelichte Uitdagingen",
@@ -62,7 +63,7 @@
     "days_ago": "{{count}} dagen geleden"
   },
   "error_loading": "We konden de Ontdek-pagina niet laden. Dit kan een tijdelijk probleem zijn.",
-  "retry": "Retry",
+  "retry": "Opnieuw proberen",
   "near_you": {
     "title": "Bij jou in de buurt",
     "subtitle": "Lijsten dicht bij jouw locatie",
@@ -71,7 +72,7 @@
   "suggested_connections": {
     "title": "Mensen die je misschien kent",
     "subtitle": "Verbind met leden die jouw interesses delen",
-    "connect": "Connect",
+    "connect": "Verbinden",
     "mutual": "Wederzijdse connecties",
     "similar": "Vergelijkbare interesses",
     "recommended": "Aanbevolen voor jou"
@@ -89,7 +90,7 @@
     "view_opportunity": "Bekijk Kans"
   },
   "organisations": {
-    "title": "Organisations",
+    "title": "Organisaties",
     "subtitle": "Gemeenschapspartners die impact maken",
     "opportunities": "{{count}} mogelijkheden"
   },
@@ -123,17 +124,17 @@
     "content_tabs": "Verken inhoudstabbladen"
   },
   "tabs": {
-    "all": "All",
+    "all": "Alles",
     "for_you": "Voor jou",
-    "listings": "Listings",
-    "people": "People",
-    "events": "Events",
-    "groups": "Groups"
+    "listings": "Vermeldingen",
+    "people": "Mensen",
+    "events": "Evenementen",
+    "groups": "Groepen"
   },
   "recently_viewed": {
     "title": "Recent bekeken",
     "subtitle": "Items die je recent hebt bekeken",
-    "clear": "Clear"
+    "clear": "Wissen"
   },
   "match_score": "{{score}}% overeenkomst",
   "dismiss": "Niet geïnteresseerd",
@@ -152,6 +153,5 @@
   "empty_groups": "Nog geen actieve groepen. Start een groep rond jouw interesses!",
   "create_listing": "Aanbieding maken",
   "create_event": "Evenement maken",
-  "create_group": "Groep Aanmaken",
-  "see_all": "Alles bekijken"
+  "create_group": "Groep Aanmaken"
 }

@@ -1,11 +1,12 @@
 {
-  "page_title": "Discover",
-  "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
-  "heading": "Discover",
+  "page_title": "اكتشف",
+  "page_description": "ابحث عن القوائم والأحداث والمجموعات والأعضاء والفرص عبر المجتمع - نقطة البداية للمشاركة والتواصل محليًا.",
+  "heading": "اكتشف",
   "subtitle": "ابحث عن المهارات، والفعاليات، والمجموعات، والمزيد في مجتمعك",
+  "see_all": "عرض الكل",
   "search_placeholder": "اكتشف المهارات، والفعاليات، والمجموعات...",
   "stats": {
-    "members": "Members",
+    "members": "الأعضاء",
     "exchanges_this_month": "التبادلات هذا الشهر",
     "hours_exchanged": "الساعات المتبادلة",
     "active_listings": "القوائم النشطة"
@@ -21,7 +22,7 @@
   "upcoming_events": {
     "title": "الفعاليات القادمة",
     "subtitle": "انضم إلى مجتمعك",
-    "online": "Online",
+    "online": "عبر الإنترنت",
     "attending": "{{count}} يحضر"
   },
   "active_groups": {
@@ -47,7 +48,7 @@
   "new_members": {
     "title": "مرحبًا بأحدث أعضائنا",
     "subtitle": "قل مرحبًا للمنضمين الجدد",
-    "connect": "Connect"
+    "connect": "تواصل"
   },
   "featured_challenges": {
     "title": "التحديات المميزة",
@@ -62,7 +63,7 @@
     "days_ago": "{{count}} يوم مضى"
   },
   "error_loading": "لم نتمكن من تحميل صفحة الاكتشاف. قد تكون هذه مشكلة مؤقتة.",
-  "retry": "Retry",
+  "retry": "إعادة المحاولة",
   "near_you": {
     "title": "قريب منك",
     "subtitle": "قوائم قريبة من موقعك",
@@ -71,7 +72,7 @@
   "suggested_connections": {
     "title": "أشخاص قد تعرفهم",
     "subtitle": "تواصل مع الأعضاء الذين يشاركونك اهتماماتك",
-    "connect": "Connect",
+    "connect": "تواصل",
     "mutual": "اتصالات متبادلة",
     "similar": "اهتمامات مشابهة",
     "recommended": "موصى به لك"
@@ -89,7 +90,7 @@
     "view_opportunity": "عرض الفرصة"
   },
   "organisations": {
-    "title": "Organisations",
+    "title": "المنظمات",
     "subtitle": "شركاء المجتمع الذين يحدثون تأثيرًا",
     "opportunities": "{{count}} فرص"
   },
@@ -123,17 +124,17 @@
     "content_tabs": "استكشاف علامات المحتوى"
   },
   "tabs": {
-    "all": "All",
+    "all": "الكل",
     "for_you": "لك",
-    "listings": "Listings",
-    "people": "People",
-    "events": "Events",
-    "groups": "Groups"
+    "listings": "القوائم",
+    "people": "الأشخاص",
+    "events": "الفعاليات",
+    "groups": "المجموعات"
   },
   "recently_viewed": {
     "title": "تمت مشاهدته مؤخرًا",
     "subtitle": "العناصر التي نظرت إليها مؤخرًا",
-    "clear": "Clear"
+    "clear": "مسح"
   },
   "match_score": "{{score}}% تطابق",
   "dismiss": "غير مهتم",
@@ -152,6 +153,5 @@
   "empty_groups": "لا توجد مجموعات نشطة بعد. ابدأ مجموعة حول اهتماماتك!",
   "create_listing": "إنشاء قائمة",
   "create_event": "إنشاء حدث",
-  "create_group": "إنشاء مجموعة",
-  "see_all": "عرض الكل"
+  "create_group": "إنشاء مجموعة"
 }
