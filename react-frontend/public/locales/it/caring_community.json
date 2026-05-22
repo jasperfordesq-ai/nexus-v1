@@ -2,7 +2,7 @@
   "trust_tier": {
     "title": "Il mio livello di fiducia",
     "subtitle": "La tua posizione nella comunità",
-    "back": "Back to Community Hub",
+    "back": "Torna all'hub della comunità",
     "tier_newcomer": "Nuovo arrivato",
     "tier_member": "Membro",
     "tier_trusted": "Persona di fiducia",
@@ -15,20 +15,20 @@
     "criteria_identity": "Identità verificata",
     "progress_to_next": "Progresso verso {{tier}}",
     "breakdown": {
-      "title": "Your trust tier breakdown",
-      "subtitle": "Here's how you've earned your current tier and what you need for the next one.",
-      "signal_progress": "{{current}} of {{required}}",
-      "achieved": "Achieved",
-      "in_progress": "In progress",
-      "next_tier_hint": "Complete the remaining signals to reach the next tier.",
-      "no_signals": "No signals tracked for your current tier.",
-      "error": "We couldn't load your trust tier breakdown.",
-      "retry": "Try again"
+      "title": "La ripartizione del livello di fiducia",
+      "subtitle": "Ecco come hai guadagnato il tuo livello attuale e cosa ti serve per quello successivo.",
+      "signal_progress": "{{current}} di {{required}}",
+      "achieved": "Raggiunto",
+      "in_progress": "In corso",
+      "next_tier_hint": "Completa i segnali rimanenti per raggiungere il livello successivo.",
+      "no_signals": "Nessun segnale tracciato per il tuo livello attuale.",
+      "error": "Non è stato possibile caricare la suddivisione del livello di fiducia.",
+      "retry": "Riprova"
     },
     "signals": {
-      "hours_logged": "Volunteer hours logged",
-      "reviews_received": "Positive reviews received",
-      "identity_verified": "Identity verified"
+      "hours_logged": "Ore di volontariato registrate",
+      "reviews_received": "Recensioni positive ricevute",
+      "identity_verified": "Identità verificata"
     }
   },
   "caregiver": {
@@ -63,9 +63,9 @@
     "recent_care": "Accompagnamento recente",
     "no_upcoming_care": "Nessun accompagnamento programmato",
     "no_recent_care": "Nessun registro di accompagnamento recente",
-    "search_results_aria": "Matching members",
-    "search_error": "We couldn't search members. Please try again.",
-    "select_member_error": "Choose a member before linking a care receiver."
+    "search_results_aria": "Membri corrispondenti",
+    "search_error": "Non è stato possibile cercare i membri. Per favore riprova.",
+    "select_member_error": "Scegli un membro prima di collegare un destinatario dell'assistenza."
   },
   "cover": {
     "title": "Accompagnamento sostitutivo",
@@ -123,83 +123,83 @@
     "verified_badge": "Verificato",
     "contact": "Contatto",
     "website": "Sito web",
-    "call_aria": "Call provider at {{phone}}",
-    "email_aria": "Email provider at {{email}}",
-    "website_aria": "Visit provider website {{url}}",
+    "call_aria": "Chiama il fornitore a{{phone}}",
+    "email_aria": "Provider di posta elettronica presso{{email}}",
+    "website_aria": "Visita il sito web del fornitore{{url}}",
     "opening_hours": "Orari di apertura",
     "no_providers": "Nessun fornitore di cura trovato",
     "no_providers_hint": "Modifica i filtri o la ricerca",
-    "unavailable": "The care provider directory is not available for this community.",
-    "error_title": "Care providers could not be loaded",
-    "error_body": "Please try again. If this keeps happening, contact your community coordinator.",
-    "retry": "Try again"
+    "unavailable": "L'elenco dei fornitori di servizi sanitari non è disponibile per questa comunità.",
+    "error_title": "Impossibile caricare gli operatori sanitari",
+    "error_body": "Per favore riprova. Se il problema persiste, contatta il coordinatore della tua comunità.",
+    "retry": "Riprova"
   },
   "emergency_alert": {
-    "region_label": "Emergency alerts",
+    "region_label": "Avvisi di emergenza",
     "dismiss": "Chiudi",
     "severity_info": "Informazione",
     "severity_warning": "Avviso",
     "severity_danger": "Emergenza"
   },
   "federation_picker": {
-    "title": "Browse federated communities",
-    "search_placeholder": "Search by community name or region",
-    "browse_button": "Browse communities",
-    "selected_label": "Selected:",
-    "no_selection": "No community selected",
-    "select_button": "Select",
-    "cancel_button": "Cancel",
-    "empty": "No federated communities are currently discoverable. You can still enter a community slug manually.",
-    "fallback_label": "Or enter a community slug manually",
-    "member_count_label": "members"
+    "title": "Sfoglia le comunità federate",
+    "search_placeholder": "Cerca per nome della comunità o regione",
+    "browse_button": "Sfoglia le comunità",
+    "selected_label": "Selezionato:",
+    "no_selection": "Nessuna comunità selezionata",
+    "select_button": "Selezionare",
+    "cancel_button": "Cancellare",
+    "empty": "Nessuna comunità federata è attualmente rilevabile. Puoi comunque inserire manualmente uno slug della community.",
+    "fallback_label": "Oppure inserisci manualmente uno slug della community",
+    "member_count_label": "membri"
   },
   "onboarding": {
-    "title": "Welcome to your Caring Community",
-    "intro": "We'll show you the most useful actions based on what you need.",
-    "choice_recipient": "I need help",
-    "choice_recipient_desc": "Find support, manage care, get help with daily tasks",
-    "choice_helper": "I want to help others",
-    "choice_helper_desc": "Offer your time, support neighbours, log care hours",
-    "choice_browse": "Show me everything",
-    "choice_browse_desc": "Explore the full hub of caring community features",
-    "show_all": "Show all features",
-    "show_recommended": "Show recommended",
-    "change_answer": "Change answer",
-    "refine": "Refine my view"
+    "title": "Benvenuto nella tua comunità di cura",
+    "intro": "Ti mostreremo le azioni più utili in base a ciò di cui hai bisogno.",
+    "choice_recipient": "Ho bisogno di aiuto",
+    "choice_recipient_desc": "Trova supporto, gestisci le cure, ottieni aiuto con le attività quotidiane",
+    "choice_helper": "Voglio aiutare gli altri",
+    "choice_helper_desc": "Offri il tuo tempo, supporta i vicini, registra le ore di assistenza",
+    "choice_browse": "Mostrami tutto",
+    "choice_browse_desc": "Esplora l'hub completo di funzionalità della comunità premurosa",
+    "show_all": "Mostra tutte le funzionalità",
+    "show_recommended": "Mostra consigliato",
+    "change_answer": "Cambia risposta",
+    "refine": "Affina la mia visione"
   },
   "relationships": {
     "actions": {
-      "pause": "Pause",
-      "end": "End relationship",
-      "resume": "Resume"
+      "pause": "Pausa",
+      "end": "Fine della relazione",
+      "resume": "Riprendere"
     },
     "pause_modal": {
-      "title": "Pause this support relationship",
-      "description": "You can resume later. Would you like to add a reason or set a resume date?",
-      "reason_label": "Reason (optional)",
-      "resume_at_label": "Resume on (optional)",
-      "confirm": "Pause"
+      "title": "Metti in pausa questa relazione di supporto",
+      "description": "Puoi riprendere più tardi. Desideri aggiungere un motivo o impostare una data di ripresa?",
+      "reason_label": "Motivo (facoltativo)",
+      "resume_at_label": "Riprendi il (facoltativo)",
+      "confirm": "Pausa"
     },
     "end_modal": {
-      "title": "End this support relationship",
-      "description": "This action is permanent. The relationship will be marked ended and remain in your history.",
-      "reason_label": "Reason (optional)",
-      "confirm": "End relationship"
+      "title": "Termina questa relazione di supporto",
+      "description": "Questa azione è permanente. La relazione verrà contrassegnata come terminata e rimarrà nella tua cronologia.",
+      "reason_label": "Motivo (facoltativo)",
+      "confirm": "Fine della relazione"
     },
-    "toast_paused": "Relationship paused.",
-    "toast_ended": "Relationship ended.",
-    "toast_resumed": "Relationship resumed."
+    "toast_paused": "La relazione si è interrotta.",
+    "toast_ended": "La relazione è finita.",
+    "toast_resumed": "La relazione è ripresa."
   },
   "data_export": {
-    "title": "My data export",
-    "intro": "Download a complete copy of your personal data held by this caring community, in compliance with the Swiss Federal Act on Data Protection (FADP) and GDPR. The export includes your profile, hours logged, support relationships, hour gifts and transfers, loyalty redemptions, regional points, safeguarding reports you've filed, and your civic digest preferences.",
-    "download_button": "Download my data (JSON)",
-    "format_note": "Your export will be a JSON file. Contact your community coordinator if you'd prefer another format.",
-    "privacy_note": "Your export contains only data you've submitted or actions you've taken. It does not include other members' personal information.",
-    "downloading": "Preparing your export…",
-    "success_toast": "Your export has started downloading.",
-    "error_toast": "We couldn't generate your export. Please try again or contact support.",
-    "back": "Back"
+    "title": "L'esportazione dei miei dati",
+    "intro": "Scarica una copia completa dei tuoi dati personali conservati da questa comunità premurosa, in conformità con la legge federale svizzera sulla protezione dei dati (LPD) e GDPR. L'esportazione include il tuo profilo, le ore registrate, le relazioni di supporto, i regali e i trasferimenti di ore, i riscatti fedeltà, i punti regionali, i rapporti di salvaguardia che hai archiviato e le tue preferenze di digest civico.",
+    "download_button": "Scarica i miei dati (JSON)",
+    "format_note": "L'esportazione sarà un file JSON. Contatta il coordinatore della tua comunità se preferisci un altro formato.",
+    "privacy_note": "La tua esportazione contiene solo i dati che hai inviato o le azioni che hai intrapreso. Non include le informazioni personali degli altri membri.",
+    "downloading": "Preparazione dell'esportazione…",
+    "success_toast": "Il download dell'esportazione è iniziato.",
+    "error_toast": "Non è stato possibile generare l'esportazione. Riprova o contatta l'assistenza.",
+    "back": "Indietro"
   },
   "warmth_pass": {
     "title": "Il mio pass di fiducia",
@@ -211,7 +211,7 @@
     "reviews_received": "Valutazioni ricevute",
     "identity_verified": "Identità verificata",
     "yes": "Sì",
-    "no": "No",
+    "no": "NO",
     "categories": "Ambiti in cui aiuto",
     "no_categories": "Nessun ambito per ora",
     "member_since": "Membro da",
@@ -277,65 +277,65 @@
     "sidebar": {
       "search_aria": "Search caring community navigation",
       "search_placeholder": "Search navigation...",
-      "clear_search": "Clear search",
+      "clear_search": "Cancella ricerca",
       "no_search_results": "No matching pages found",
-      "brand": "Community Caring",
-      "expand": "Expand sidebar",
-      "collapse": "Collapse sidebar",
-      "help_centre": "Help Centre",
-      "full_admin": "Full Admin",
+      "brand": "Cura della comunità",
+      "expand": "Espandi la barra laterale",
+      "collapse": "Comprimi la barra laterale",
+      "help_centre": "Centro assistenza",
+      "full_admin": "Amministrazione completa",
       "sections": {
-        "overview": "Overview",
-        "operations": "Operations",
-        "engagement": "Engagement",
-        "trust_safety": "Trust & Safety",
-        "pilot_governance": "Pilot Governance",
-        "partnerships": "Partnerships",
-        "reporting": "Reporting"
+        "overview": "Panoramica",
+        "operations": "Operazioni",
+        "engagement": "Fidanzamento",
+        "trust_safety": "Fiducia e sicurezza",
+        "pilot_governance": "Governance pilota",
+        "partnerships": "Partenariati",
+        "reporting": "Segnalazione"
       },
       "items": {
-        "dashboard": "Caring Community",
-        "workflow": "Caring Workflow",
-        "projects": "Caring Projects",
-        "loyalty": "Loyalty Programme",
-        "hour_transfers": "Hour Transfers",
-        "regional_points": "Regional Points",
-        "sub_regions": "Sub-Regions",
-        "federation_peers": "Federation Peers",
-        "sla_dashboard": "SLA Dashboard",
-        "providers": "Providers",
-        "warmth_pass": "Warmth Pass",
-        "recipient_circle": "Care Recipient Circle",
-        "nudges": "Smart Nudges",
-        "emergency_alerts": "Emergency Alerts",
-        "surveys": "Municipal Surveys",
-        "copilot": "Communication Copilot",
-        "civic_digest": "Civic Digest",
-        "lead_nurture": "Lead Nurture",
-        "success_stories": "Success Stories",
-        "feedback": "Feedback Inbox",
-        "verification": "Municipal Verification",
-        "safeguarding": "Safeguarding Reports",
-        "trust_tier": "Trust Tiers",
-        "launch_readiness": "Launch Readiness",
-        "pilot_scoreboard": "Pilot Scoreboard",
-        "data_quality": "Pilot Data Quality",
-        "operating_policy": "Operating Policy",
-        "disclosure_pack": "Disclosure Pack",
-        "commercial_boundary": "Commercial Boundary",
-        "isolated_node": "Isolated Node Gate",
-        "research": "Research Partnerships",
-        "external_integrations": "External Integrations",
-        "integration_showcase": "Integration Showcase",
-        "municipal_impact": "Municipal Impact Reports",
-        "kpi_baselines": "KPI Baselines",
-        "municipal_roi": "Municipal ROI",
-        "category_coefficients": "Category Coefficients"
+        "dashboard": "Comunità premurosa",
+        "workflow": "Flusso di lavoro premuroso",
+        "projects": "Progetti di cura",
+        "loyalty": "Programma fedeltà",
+        "hour_transfers": "Trasferimenti orari",
+        "regional_points": "Punti regionali",
+        "sub_regions": "Sottoregioni",
+        "federation_peers": "Pari della Federazione",
+        "sla_dashboard": "Cruscotto SLA",
+        "providers": "Fornitori",
+        "warmth_pass": "Passaggio di calore",
+        "recipient_circle": "Circolo dei destinatari delle cure",
+        "nudges": "Nudge intelligenti",
+        "emergency_alerts": "Avvisi di emergenza",
+        "surveys": "Indagini comunali",
+        "copilot": "Copilota di comunicazione",
+        "civic_digest": "Compendio Civico",
+        "lead_nurture": "Coltivare il piombo",
+        "success_stories": "Storie di successo",
+        "feedback": "Posta in arrivo di feedback",
+        "verification": "Verifica comunale",
+        "safeguarding": "Rapporti di salvaguardia",
+        "trust_tier": "Livelli di fiducia",
+        "launch_readiness": "Preparazione al lancio",
+        "pilot_scoreboard": "Tabellone segnapunti pilota",
+        "data_quality": "Qualità dei dati pilota",
+        "operating_policy": "Politica operativa",
+        "disclosure_pack": "Pacchetto di divulgazione",
+        "commercial_boundary": "Confine commerciale",
+        "isolated_node": "Cancello del nodo isolato",
+        "research": "Partenariati di ricerca",
+        "external_integrations": "Integrazioni esterne",
+        "integration_showcase": "Vetrina dell'integrazione",
+        "municipal_impact": "Rapporti sull'impatto municipale",
+        "kpi_baselines": "Linee di base KPI",
+        "municipal_roi": "ROI comunale",
+        "category_coefficients": "Coefficienti di categoria"
       }
     },
     "navigation": {
-      "label": "Caring community navigation",
-      "close": "Close caring community navigation"
+      "label": "Navigazione comunitaria premurosa",
+      "close": "Chiudi la navigazione della comunità premurosa"
     },
     "meta_title": "Amministratore della comunità premurosa"
   },
@@ -499,84 +499,84 @@
       }
     },
     "common": {
-      "refresh": "Refresh",
-      "cancel": "Cancel",
+      "refresh": "Aggiorna",
+      "cancel": "Cancellare",
       "empty_dash": "-",
       "all": "Tutto",
       "close": "Vicino"
     },
     "loyalty": {
-      "title": "Loyalty Programme",
-      "description": "Time-credit to marketplace bridge. Members earn hours, merchants opt in to accept them as a CHF discount on their listings.",
-      "refresh": "Refresh",
+      "title": "Programma fedeltà",
+      "description": "Credito temporale al ponte del mercato. I membri guadagnano ore, i commercianti scelgono di accettarle come sconto in CHF sulle loro inserzioni.",
+      "refresh": "Aggiorna",
       "about": {
-        "title": "About this page",
-        "body": "The Loyalty programme rewards members for sustained participation beyond direct care exchanges, including events, training, surveys, and milestones. Rewards are funded by time credits redeemed at participating marketplace sellers. Configure per-seller settings and review redemption history here. The programme is optional and can be disabled without affecting core timebank functionality.",
-        "rate_label": "Per-seller exchange rate:",
-        "rate_body": "How many CHF a member saves for each hour they apply.",
-        "discount_label": "Max discount per order (%):",
-        "discount_body": "Cap on how much of the order total can be paid in time credits."
+        "title": "A proposito di questa pagina",
+        "body": "Il programma fedeltà premia i membri per la partecipazione prolungata al di là degli scambi diretti di assistenza, inclusi eventi, formazione, sondaggi e traguardi. I premi sono finanziati dai crediti temporali riscattati presso i venditori del mercato partecipanti. Configura le impostazioni per venditore e rivedi la cronologia dei riscatti qui. Il programma è facoltativo e può essere disabilitato senza compromettere la funzionalità principale della banca del tempo.",
+        "rate_label": "Tasso di cambio per venditore:",
+        "rate_body": "Quanti CHF risparmia un membro per ogni ora di applicazione.",
+        "discount_label": "Sconto massimo per ordine (%):",
+        "discount_body": "Limite alla percentuale del totale dell'ordine che può essere pagata in crediti temporali."
       },
       "stats": {
-        "total_redemptions": "Total Redemptions",
-        "hours_redeemed": "Hours Redeemed",
-        "total_chf_discount": "Total CHF Discount"
+        "total_redemptions": "Rimborsi totali",
+        "hours_redeemed": "Ore riscattate",
+        "total_chf_discount": "Sconto totale in CHF"
       },
       "settings": {
-        "title": "Per-Seller Loyalty Settings",
-        "description": "Pick a seller to configure whether they accept time credits as a discount on their listings, the exchange rate, and the max discount per order.",
-        "seller_label": "Seller (member)",
-        "seller_placeholder": "Search by name or email",
-        "no_matching_members": "No matching members",
-        "clear": "Clear",
-        "accept_time_credits": "Accept time credits",
-        "accept_time_credits_hint": "When enabled, this seller's listings show a time-credit option to members at checkout.",
-        "exchange_rate": "Exchange rate (CHF per hour)",
-        "exchange_rate_description": "How many CHF a member saves for each hour they apply.",
-        "maximum_discount": "Maximum discount per order (%)",
-        "maximum_discount_description": "Cap on how much of the order total can be paid in time credits.",
-        "save": "Save settings",
-        "view_only": "View-only users cannot change loyalty settings."
+        "title": "Impostazioni fedeltà per venditore",
+        "description": "Scegli un venditore per configurare se accetta crediti temporali come sconto sulle sue inserzioni, il tasso di cambio e lo sconto massimo per ordine.",
+        "seller_label": "Venditore (membro)",
+        "seller_placeholder": "Cerca per nome o email",
+        "no_matching_members": "Nessun membro corrispondente",
+        "clear": "Chiaro",
+        "accept_time_credits": "Accetta crediti di tempo",
+        "accept_time_credits_hint": "Se abilitate, le inserzioni di questo venditore mostrano un'opzione di credito temporale per i membri al momento del pagamento.",
+        "exchange_rate": "Tasso di cambio (CHF all'ora)",
+        "exchange_rate_description": "Quanti CHF risparmia un membro per ogni ora di applicazione.",
+        "maximum_discount": "Sconto massimo per ordine (%)",
+        "maximum_discount_description": "Limite alla percentuale del totale dell'ordine che può essere pagata in crediti temporali.",
+        "save": "Salva impostazioni",
+        "view_only": "Gli utenti di sola visualizzazione non possono modificare le impostazioni di fedeltà."
       },
       "ledger": {
-        "title": "Recent Redemptions",
-        "empty": "No redemptions yet. Once a merchant opts in and a member redeems credits, the ledger will appear here.",
-        "date": "Date",
-        "member": "Member",
-        "merchant": "Merchant",
-        "item": "Item",
-        "hours": "Hours",
-        "rate": "Rate",
-        "discount": "Discount",
-        "status": "Status",
-        "actions": "Actions",
-        "reverse": "Reverse",
+        "title": "Rimborsi recenti",
+        "empty": "Nessun riscatto ancora. Una volta che un commerciante ha aderito e un membro ha riscattato i crediti, il registro verrà visualizzato qui.",
+        "date": "Data",
+        "member": "Membro",
+        "merchant": "Mercante",
+        "item": "Articolo",
+        "hours": "Ore",
+        "rate": "Valutare",
+        "discount": "Sconto",
+        "status": "Stato",
+        "actions": "Azioni",
+        "reverse": "Inversione",
         "empty_value": "-",
         "aria": "Riscatti fedeltà recenti"
       },
       "reverse_modal": {
-        "title": "Reverse redemption",
-        "body": "This will restore {{hours}} hours to {{member}}'s wallet and mark the redemption as reversed. This cannot be undone.",
-        "member_fallback": "the member",
-        "merchant": "Merchant: {{merchant}}",
-        "discount": "Discount: CHF {{discount}} on order of CHF {{total}}",
-        "redeemed": "Redeemed: {{date}}",
-        "reason": "Reason (optional)",
-        "reason_placeholder": "e.g. Refunded order, member request, error correction",
-        "cancel": "Cancel",
-        "confirm": "Confirm reversal"
+        "title": "Redenzione inversa",
+        "body": "Ciò ripristinerà le ore{{hours}}nel portafoglio di{{member}}e contrassegnerà il riscatto come annullato. Questa operazione non può essere annullata.",
+        "member_fallback": "il membro",
+        "merchant": "Commerciante:{{merchant}}",
+        "discount": "Sconto: CHF{{discount}}per ordini di CHF{{total}}",
+        "redeemed": "Riscattato:{{date}}",
+        "reason": "Motivo (facoltativo)",
+        "reason_placeholder": "per esempio. Ordine rimborsato, richiesta membro, correzione errori",
+        "cancel": "Cancellare",
+        "confirm": "Conferma l'inversione"
       },
       "messages": {
-        "settings_saved": "Loyalty settings saved",
-        "reversed": "Reversed: {{hours}} hours restored to member."
+        "settings_saved": "Impostazioni fedeltà salvate",
+        "reversed": "Invertito: ore{{hours}}ripristinate per il membro."
       },
       "errors": {
-        "load_redemptions": "Failed to load redemptions",
-        "load_settings": "Failed to load seller settings",
-        "rate_positive": "CHF per hour must be greater than 0",
-        "discount_range": "Max discount percent must be between 0 and 100",
-        "save_settings": "Failed to save settings",
-        "reverse": "Failed to reverse redemption"
+        "load_redemptions": "Impossibile caricare i riscatti",
+        "load_settings": "Impossibile caricare le impostazioni del venditore",
+        "rate_positive": "CHF all'ora deve essere maggiore di 0",
+        "discount_range": "La percentuale di sconto massima deve essere compresa tra 0 e 100",
+        "save_settings": "Impossibile salvare le impostazioni",
+        "reverse": "Impossibile annullare la redenzione"
       },
       "status": {
         "pending": "In attesa di",
@@ -585,43 +585,43 @@
       }
     },
     "hour_transfers": {
-      "title": "Cooperative Hour Transfers",
-      "subtitle": "When a member moves to another cooperative running NEXUS, they can transfer banked hours with them. Review outbound requests and approve only after confirming the member has registered at the destination cooperative.",
+      "title": "Trasferimenti orari cooperativi",
+      "subtitle": "Quando un membro si trasferisce in un'altra cooperativa che gestisce NEXUS, può trasferire con sé le ore bancarie. Esamina le richieste in uscita e approva solo dopo aver confermato che il membro si è registrato presso la cooperativa di destinazione.",
       "tabs": {
-        "aria": "Hour transfer tabs",
-        "pending": "Pending Outbound",
-        "inbound": "Recent Inbound"
+        "aria": "Schede del trasferimento orario",
+        "pending": "In attesa di uscita",
+        "inbound": "Entrata recente"
       },
       "pending": {
-        "title": "Awaiting your approval",
-        "empty": "No pending transfers.",
+        "title": "In attesa della tua approvazione",
+        "empty": "Nessun trasferimento in sospeso.",
         "description": "Ogni trasferimento deve essere approvato manualmente da un amministratore. Verifica che l'e-mail del membro di destinazione corrisponda al nuovo account del membro prima di approvare.",
         "table_aria": "Trasferimenti orari in uscita in sospeso"
       },
       "inbound": {
-        "title": "Received from other cooperatives (last 90 days)",
-        "empty": "No transfers received in the last 90 days.",
+        "title": "Ricevuti da altre cooperative (ultimi 90 giorni)",
+        "empty": "Nessun trasferimento ricevuto negli ultimi 90 giorni.",
         "description": "Questo è solo un registro di controllo: i trasferimenti in entrata vengono elaborati automaticamente quando la cooperativa di origine li approva. Non è richiesta alcuna azione qui.",
         "table_aria": "Trasferimenti orari in entrata"
       },
       "actions": {
-        "approve": "Approve",
-        "reject": "Reject"
+        "approve": "Approvare",
+        "reject": "Rifiutare"
       },
       "reject_modal": {
-        "title": "Reject transfer",
-        "reason_label": "Reason for rejection (optional)",
-        "reason_placeholder": "Add context for the audit log"
+        "title": "Rifiuta il trasferimento",
+        "reason_label": "Motivo del rifiuto (facoltativo)",
+        "reason_placeholder": "Aggiungi contesto per il registro di controllo"
       },
       "messages": {
-        "approved": "Transfer approved and delivered.",
-        "rejected": "Transfer rejected."
+        "approved": "Trasferimento approvato e consegnato.",
+        "rejected": "Trasferimento rifiutato."
       },
       "errors": {
-        "load_pending": "Failed to load pending transfers",
-        "load_inbound": "Failed to load inbound transfers",
-        "approve": "Approval failed",
-        "reject": "Rejection failed"
+        "load_pending": "Impossibile caricare i trasferimenti in sospeso",
+        "load_inbound": "Impossibile caricare i trasferimenti in entrata",
+        "approve": "Approvazione non riuscita",
+        "reject": "Il rifiuto è fallito"
       },
       "table": {
         "actions": "Azioni",
@@ -645,227 +645,227 @@
     },
     "surveys": {
       "errors": {
-        "export_failed": "Failed to export survey responses.",
-        "load": "Failed to load surveys",
-        "create": "Failed to create survey"
+        "export_failed": "Impossibile esportare le risposte al sondaggio.",
+        "load": "Impossibile caricare i sondaggi",
+        "create": "Impossibile creare il sondaggio"
       },
-      "meta_title": "Municipality Surveys",
-      "title": "Municipality Surveys",
-      "subtitle": "Collect structured feedback from residents, municipal partners, and programme teams.",
-      "empty": "No surveys yet.",
+      "meta_title": "Indagini comunali",
+      "title": "Indagini comunali",
+      "subtitle": "Raccogli feedback strutturato da residenti, partner municipali e team di programma.",
+      "empty": "Nessun sondaggio ancora",
       "about": {
-        "title": "About this page",
-        "body": "Municipal surveys collect structured feedback from residents, municipal contacts, and partners about the community care programme. Use surveys to measure resident satisfaction, coordinator workload, and municipal partner sentiment. Survey responses feed directly into the pilot scoreboard and KPI metrics. Results are anonymous unless the respondent opts to be identified.",
-        "draft": "Not yet sent; you can still edit questions.",
-        "active": "Live; respondents can submit responses.",
-        "closed": "No longer accepting responses; results are finalised.",
-        "export_note": "Response data can be exported as CSV for analysis in Excel or statistical tools. The platform calculates average scores and sentiment breakdowns automatically."
+        "title": "A proposito di questa pagina",
+        "body": "Le indagini comunali raccolgono feedback strutturati da residenti, contatti comunali e partner sul programma di assistenza comunitaria. Utilizza i sondaggi per misurare la soddisfazione dei residenti, il carico di lavoro dei coordinatori e il sentiment dei partner municipali. Le risposte al sondaggio confluiscono direttamente nel quadro di valutazione pilota e nelle metriche KPI. I risultati sono anonimi a meno che l'intervistato non scelga di essere identificato.",
+        "draft": "Non ancora inviato; puoi ancora modificare le domande.",
+        "active": "Vivere; gli intervistati possono inviare risposte.",
+        "closed": "Non accettare più risposte; i risultati sono definitivi.",
+        "export_note": "I dati di risposta possono essere esportati come CSV per l'analisi in Excel o strumenti statistici. La piattaforma calcola automaticamente i punteggi medi e le ripartizioni del sentiment."
       },
       "list": {
-        "title": "Municipality surveys",
-        "subtitle": "Manage survey launches, response counts, analytics, and exports."
+        "title": "Indagini comunali",
+        "subtitle": "Gestisci i lanci dei sondaggi, il conteggio delle risposte, le analisi e le esportazioni."
       },
       "filters": {
-        "status": "Filter by status",
-        "all_statuses": "All statuses"
+        "status": "Filtra per stato",
+        "all_statuses": "Tutti gli stati"
       },
       "status": {
-        "draft": "Draft",
-        "active": "Active",
-        "closed": "Closed"
+        "draft": "Bozza",
+        "active": "Attivo",
+        "closed": "Chiuso"
       },
       "question_types": {
-        "single_choice": "Single choice",
-        "multi_choice": "Multiple choice",
-        "likert": "Likert scale (1-5)",
-        "yes_no": "Yes / No",
-        "open_text": "Open text"
+        "single_choice": "Scelta unica",
+        "multi_choice": "Scelta multipla",
+        "likert": "Scala Likert (1-5)",
+        "yes_no": "Sì/no",
+        "open_text": "Apri testo"
       },
       "table": {
-        "aria": "Municipality surveys",
-        "title": "Title",
-        "status": "Status",
-        "questions": "Questions",
-        "responses": "Responses",
-        "anonymous": "Anonymous",
-        "ends": "Ends",
-        "actions": "Actions"
+        "aria": "Indagini comunali",
+        "title": "Titolo",
+        "status": "Stato",
+        "questions": "Domande",
+        "responses": "Risposte",
+        "anonymous": "Anonimo",
+        "ends": "Finisce",
+        "actions": "Azioni"
       },
       "actions": {
-        "create": "Create survey",
-        "publish": "Publish",
-        "close": "Close",
-        "analytics": "Analytics",
+        "create": "Crea sondaggio",
+        "publish": "Pubblicare",
+        "close": "Vicino",
+        "analytics": "Analitica",
         "csv": "CSV",
-        "remove": "Remove",
-        "add_question": "Add question",
-        "back": "Back",
-        "cancel": "Cancel",
-        "next_questions": "Next: questions",
-        "close_modal": "Close"
+        "remove": "Rimuovere",
+        "add_question": "Aggiungi domanda",
+        "back": "Indietro",
+        "cancel": "Cancellare",
+        "next_questions": "Poi: domande",
+        "close_modal": "Vicino"
       },
       "fields": {
-        "title": "Survey title",
-        "title_placeholder": "e.g. Satisfaction with local cycling lanes",
-        "description": "Description (optional)",
-        "description_placeholder": "Briefly explain what this survey is about and why it matters.",
-        "anonymous": "Anonymous responses",
-        "anonymous_help": "When enabled, respondent identities are not stored.",
-        "starts_at": "Opens at (optional)",
-        "ends_at": "Closes at (optional)",
-        "question_text": "Question text",
-        "question_type": "Question type",
-        "options": "Options (one per line)",
-        "options_placeholder": "Option A\nOption B\nOption C",
-        "options_help": "Each line becomes one selectable option.",
-        "likert_help": "Likert scale uses the standard 5-point scale from very dissatisfied to very satisfied.",
-        "required": "Required"
+        "title": "Titolo del sondaggio",
+        "title_placeholder": "per esempio. Soddisfazione per le piste ciclabili locali",
+        "description": "Descrizione (facoltativa)",
+        "description_placeholder": "Spiega brevemente di cosa tratta questo sondaggio e perché è importante.",
+        "anonymous": "Risposte anonime",
+        "anonymous_help": "Se abilitata, le identità degli intervistati non vengono archiviate.",
+        "starts_at": "Apre alle (facoltativo)",
+        "ends_at": "Chiude alle (facoltativo)",
+        "question_text": "Testo della domanda",
+        "question_type": "Tipo di domanda",
+        "options": "Opzioni (una per riga)",
+        "options_placeholder": "Opzione A\nOpzione B\nOpzione C",
+        "options_help": "Ogni riga diventa un'opzione selezionabile.",
+        "likert_help": "La scala Likert utilizza la scala standard a 5 punti da molto insoddisfatto a molto soddisfatto.",
+        "required": "Necessario"
       },
       "create_modal": {
-        "title": "Create survey - step {{step}} of 2",
-        "questions_intro": "Add the questions respondents will see. At least one question is required to publish.",
-        "question_number": "Question {{number}}"
+        "title": "Crea sondaggio - passaggio{{step}}di 2",
+        "questions_intro": "Aggiungi le domande che gli intervistati vedranno. Per pubblicare è necessaria almeno una domanda.",
+        "question_number": "Domanda{{number}}"
       },
       "analytics": {
-        "total_responses": "Total responses",
-        "answer_count_one": "{{count}} answer",
-        "answer_count_other": "{{count}} answers",
-        "no_open_text": "No open-text responses yet.",
-        "modal_title": "Analytics - {{title}}",
-        "empty": "No analytics data available yet."
+        "total_responses": "Risposte totali",
+        "answer_count_one": "{{count}}risposta",
+        "answer_count_other": "{{count}}risponde",
+        "no_open_text": "Nessuna risposta a testo aperto ancora.",
+        "modal_title": "Analisi -{{title}}",
+        "empty": "Nessun dato analitico ancora disponibile."
       },
       "common": {
-        "yes": "Yes",
-        "no": "No",
-        "date_unknown": "Not set"
+        "yes": "SÌ",
+        "no": "NO",
+        "date_unknown": "Non impostato"
       }
     },
     "feedback": {
-      "title": "Municipality Feedback Inbox",
-      "subtitle": "Receive, triage, and resolve resident feedback: questions, ideas, issues, and complaints routed to the municipality or community team.",
+      "title": "Casella di feedback del Comune",
+      "subtitle": "Ricevi, valuta e risolvi il feedback dei residenti: domande, idee, problemi e reclami indirizzati al comune o al team della comunità.",
       "messages": {
-        "triage_saved": "Triage saved",
-        "resolved": "Marked as resolved",
-        "closed": "Closed"
+        "triage_saved": "Triage salvato",
+        "resolved": "Contrassegnato come risolto",
+        "closed": "Chiuso"
       },
       "errors": {
-        "load": "Failed to load feedback",
-        "save_triage": "Failed to save triage",
-        "resolution_required": "Resolution notes are required",
-        "resolve": "Failed to resolve",
-        "close": "Failed to close",
-        "export": "Failed to export"
+        "load": "Impossibile caricare il feedback",
+        "save_triage": "Impossibile salvare il triage",
+        "resolution_required": "Sono necessarie note di risoluzione",
+        "resolve": "Impossibile risolvere",
+        "close": "Impossibile chiudere",
+        "export": "Impossibile esportare"
       },
       "about": {
-        "title": "About this page",
-        "body": "This inbox collects feedback submitted by residents through the platform. Each item is categorised as a question, idea, issue report, or sentiment note and assigned a sentiment score. Use the triage controls to assign ownership, add internal notes, and track resolution. Items visible to all residents are marked as public; replies may be seen by the submitter and other members.",
-        "workflow": "Status workflow: new means received and not yet reviewed; triaging means reviewed and assigned to an owner; in progress means actively being worked on; resolved means closed with a documented resolution; closed means closed without resolution."
+        "title": "A proposito di questa pagina",
+        "body": "Questa casella di posta raccoglie i feedback inviati dai residenti attraverso la piattaforma. Ogni elemento è classificato come domanda, idea, rapporto sul problema o nota di opinione e gli viene assegnato un punteggio di opinione. Utilizza i controlli di valutazione per assegnare la proprietà, aggiungere note interne e monitorare la risoluzione. Gli elementi visibili a tutti i residenti sono contrassegnati come pubblici; le risposte possono essere viste dal mittente e dagli altri membri.",
+        "workflow": "Flusso di lavoro dello stato: nuovi mezzi ricevuti e non ancora revisionati; triaging significa rivisto e assegnato a un proprietario; in progress significa essere attivamente in lavorazione; risolti significa chiusi con delibera documentata; chiuso significa chiuso senza risoluzione."
       },
       "actions": {
-        "refresh": "Refresh",
-        "export_csv": "Export CSV",
-        "view": "View",
-        "cancel": "Cancel",
-        "close_no_resolution": "Close (no resolution)",
-        "resolve": "Resolve",
-        "save_triage": "Save triage"
+        "refresh": "Aggiorna",
+        "export_csv": "Esporta CSV",
+        "view": "Visualizzazione",
+        "cancel": "Cancellare",
+        "close_no_resolution": "Chiudi (nessuna risoluzione)",
+        "resolve": "Risolvere",
+        "save_triage": "Salva il triage"
       },
       "stats": {
-        "total_open": "Total open",
-        "last_7_days": "Last 7 days",
-        "by_status": "By status:",
-        "by_category": "By category:",
-        "sentiment": "Sentiment:"
+        "total_open": "Apertura totale",
+        "last_7_days": "Ultimi 7 giorni",
+        "by_status": "Per stato:",
+        "by_category": "Per categoria:",
+        "sentiment": "Sentimento:"
       },
       "filters": {
-        "status": "Status",
-        "all_statuses": "All statuses",
-        "category": "Category",
-        "all_categories": "All categories",
-        "sub_region": "Sub-region ID",
-        "sub_region_placeholder": "e.g. 12"
+        "status": "Stato",
+        "all_statuses": "Tutti gli stati",
+        "category": "Categoria",
+        "all_categories": "Tutte le categorie",
+        "sub_region": "ID della sottoregione",
+        "sub_region_placeholder": "per esempio. 12"
       },
       "status": {
-        "new": "New",
-        "triaging": "Triaging",
-        "in_progress": "In progress",
-        "resolved": "Resolved",
-        "closed": "Closed"
+        "new": "Nuovo",
+        "triaging": "Triage",
+        "in_progress": "In corso",
+        "resolved": "Risolto",
+        "closed": "Chiuso"
       },
       "categories": {
-        "question": "Question",
+        "question": "Domanda",
         "idea": "Idea",
-        "issue_report": "Issue report",
-        "sentiment": "Sentiment"
+        "issue_report": "Rapporto sul problema",
+        "sentiment": "Sentimento"
       },
       "sentiments": {
-        "positive": "Positive",
-        "neutral": "Neutral",
-        "negative": "Negative",
-        "concerned": "Concerned"
+        "positive": "Positivo",
+        "neutral": "Neutro",
+        "negative": "Negativo",
+        "concerned": "Interessato"
       },
       "empty": {
-        "title": "No feedback submissions match these filters.",
-        "description": "Try widening the filters or refreshing the inbox.",
-        "stats": "No submissions yet."
+        "title": "Nessun feedback inviato corrisponde a questi filtri.",
+        "description": "Prova ad ampliare i filtri o ad aggiornare la posta in arrivo.",
+        "stats": "Nessuna presentazione ancora."
       },
       "table": {
-        "aria": "Feedback submissions",
+        "aria": "Invii di feedback",
         "id": "ID",
-        "category": "Category",
-        "subject": "Subject",
-        "submitter": "Submitter",
-        "status": "Status",
-        "created": "Created",
-        "actions": "Actions"
+        "category": "Categoria",
+        "subject": "Soggetto",
+        "submitter": "Inviato",
+        "status": "Stato",
+        "created": "Creato",
+        "actions": "Azioni"
       },
       "pagination": {
-        "summary": "Page {{page}} of {{totalPages}} ({{total}} total)",
-        "previous": "Previous",
-        "next": "Next"
+        "summary": "Pagina{{page}}di{{totalPages}}({{total}}totale)",
+        "previous": "Precedente",
+        "next": "Prossimo"
       },
       "modal": {
-        "title": "Feedback #{{id}}",
-        "category": "Category",
-        "submitter": "Submitter",
-        "sentiment": "Sentiment",
-        "sub_region": "Sub-region",
-        "public_visible": "Public visible",
-        "timestamps": "Submitted {{created}} · Updated {{updated}}",
-        "body": "Body"
+        "title": "Feedback n.{{id}}",
+        "category": "Categoria",
+        "submitter": "Inviato",
+        "sentiment": "Sentimento",
+        "sub_region": "Sottoregione",
+        "public_visible": "Pubblico visibile",
+        "timestamps": "Inserito{{created}}· Aggiornato{{updated}}",
+        "body": "Corpo"
       },
       "fields": {
-        "assigned_user_id": "Assigned user ID",
-        "assigned_user_id_placeholder": "Numeric user ID",
-        "assigned_role": "Assigned role",
-        "assigned_role_placeholder": "e.g. coordinator, municipality_announcer",
-        "triage_notes": "Triage notes",
-        "triage_notes_placeholder": "Internal notes for the triage team",
-        "triage_notes_description": "Internal only; not visible to the submitter. Use for team coordination, links to related issues, or escalation context.",
-        "resolution_notes": "Resolution notes (required for resolve)",
-        "resolution_notes_placeholder": "What was done to address this?",
-        "resolution_notes_description": "Required when resolving. Summarise what action was taken. May be shown to the submitter depending on the item's public visibility setting."
+        "assigned_user_id": "ID utente assegnato",
+        "assigned_user_id_placeholder": "ID utente numerico",
+        "assigned_role": "Ruolo assegnato",
+        "assigned_role_placeholder": "per esempio. coordinatore, comune_annunciatore",
+        "triage_notes": "Note sul triage",
+        "triage_notes_placeholder": "Note interne per il team di triage",
+        "triage_notes_description": "Solo interno; non visibile al mittente. Utilizzare per il coordinamento del team, collegamenti a problemi correlati o contesto di escalation.",
+        "resolution_notes": "Note sulla risoluzione (richieste per la risoluzione)",
+        "resolution_notes_placeholder": "Cosa è stato fatto per risolvere questo problema?",
+        "resolution_notes_description": "Obbligatorio durante la risoluzione. Riepilogare l'azione intrapresa. Può essere mostrato al mittente a seconda dell'impostazione di visibilità pubblica dell'elemento."
       },
       "submitter": {
-        "anonymous": "Anonymous",
-        "anonymous_admin": "Anonymous (ID #{{id}}, admin only)",
-        "user": "User #{{id}}"
+        "anonymous": "Anonimo",
+        "anonymous_admin": "Anonimo (ID n.{{id}}, solo amministratore)",
+        "user": "Utente n.{{id}}"
       },
       "common": {
-        "yes": "Yes",
-        "no": "No",
-        "date_unknown": "Not set"
+        "yes": "SÌ",
+        "no": "NO",
+        "date_unknown": "Non impostato"
       },
       "relative": {
-        "just_now": "Just now",
-        "minutes_ago_one": "{{count}}m ago",
-        "minutes_ago_other": "{{count}}m ago",
-        "hours_ago_one": "{{count}}h ago",
-        "hours_ago_other": "{{count}}h ago",
-        "days_ago_one": "{{count}}d ago",
-        "days_ago_other": "{{count}}d ago",
-        "months_ago_one": "{{count}}mo ago",
-        "months_ago_other": "{{count}}mo ago"
+        "just_now": "Proprio adesso",
+        "minutes_ago_one": "{{count}}m fa",
+        "minutes_ago_other": "{{count}}m fa",
+        "hours_ago_one": "{{count}}h fa",
+        "hours_ago_other": "{{count}}h fa",
+        "days_ago_one": "{{count}}giorni fa",
+        "days_ago_other": "{{count}}giorni fa",
+        "months_ago_one": "{{count}}mo fa",
+        "months_ago_other": "{{count}}mo fa"
       }
     },
     "civic_digest": {
@@ -873,7 +873,7 @@
       "title": "Cadenza del digest civico",
       "subtitle": "Configura la cadenza di consegna predefinita per il compendio civico personalizzato che i membri ricevono. Il riepilogo aggrega i contenuti rilevanti della comunità (avvisi di sicurezza, aggiornamenti di progetti, avvisi di eventi e annunci) in un unico riepilogo.",
       "preview_member_view": "Anteprima della visualizzazione dei membri",
-      "reset": "Reset",
+      "reset": "Reimposta",
       "save": "Risparmia cadenza",
       "member_override": "I membri possono ignorare la cadenza e disattivare singole fonti dalla propria pagina delle preferenze del digest.",
       "about": {
@@ -929,7 +929,7 @@
       "recipient": "Destinatario",
       "loading": "Caricamento cerchia destinatari...",
       "member_since": "Membro dal {{date}}",
-      "member_id_value": "ID {{id}}",
+      "member_id_value": "ID{{id}}",
       "safeguarding_flags_one": "{{count}} bandiera di salvaguardia",
       "safeguarding_flags_other": "{{count}} bandiere di salvaguardia",
       "about": {
@@ -1044,7 +1044,7 @@
         "aria": "Salvaguardia dei rapporti",
         "severity": "Gravità",
         "category": "Categoria",
-        "reporter": "Reporter",
+        "reporter": "Segnalante",
         "subject": "Soggetto",
         "status": "Stato",
         "assigned": "Assegnato",
@@ -1055,7 +1055,7 @@
       },
       "fields": {
         "category": "Categoria",
-        "reporter": "Reporter",
+        "reporter": "Segnalante",
         "subject": "Soggetto",
         "description": "Descrizione",
         "evidence": "Prova",

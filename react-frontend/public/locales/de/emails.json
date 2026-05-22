@@ -345,7 +345,7 @@
     "manage_preferences": "Benachrichtigungseinstellungen verwalten"
   },
   "events": {
-    "update_subject": "Update: {{title}}",
+    "update_subject": "Aktualisierung: {{title}}",
     "cancelled_subject": "Abgesagt: „{{title}}“",
     "updated_subject": "Aktualisiert: „{{title}}“ ({{changes}})",
     "rsvp_subject": "{{name}} {{status_label}} Ihrer Veranstaltung „{{title}}“",
