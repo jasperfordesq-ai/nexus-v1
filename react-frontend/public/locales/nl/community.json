@@ -1,6 +1,6 @@
 {
   "credentials": {
-    "heading": "Credential Verification",
+    "heading": "Gemeenschapsreferenties",
     "upload_new": "Upload New Credential",
     "try_again": "Try Again",
     "no_credentials_title": "No credentials uploaded",
@@ -30,7 +30,7 @@
     "type_driving_licence": "Driving Licence",
     "type_professional_registration": "Professional Registration",
     "type_other": "Other",
-    "load_failed": "Failed to load credentials. Please try again.",
+    "load_failed": "Referenties konden niet worden geladen",
     "load_error": "Unable to load credentials. Please try again.",
     "file_too_large": "File size must be under 10MB.",
     "invalid_file_type": "Please upload a PDF or image file (JPG, PNG, WebP).",
@@ -40,10 +40,15 @@
     "credential_type_placeholder": "Select credential type",
     "document_label": "Document",
     "expiry_date_label": "Expiry Date (optional)",
-    "expiry_date_placeholder": "Leave blank if no expiry"
+    "expiry_date_placeholder": "Leave blank if no expiry",
+    "subtitle": "Bewijs jouw bijdragen en vaardigheden",
+    "empty_state": "Nog geen referenties",
+    "empty_state_desc": "Voltooi uitwisselingen en ontvang erkenning voor jouw vaardigheden",
+    "view_all": "Alles weergeven",
+    "awarded_on": "Toegekend op {{date}}"
   },
   "swaps": {
-    "heading": "Shift Swaps",
+    "heading": "Gemeenschapsruilingen",
     "refresh": "Refresh",
     "all": "All",
     "sent": "Sent",
@@ -61,10 +66,15 @@
     "load_error": "Unable to load shift swap requests. Please try again.",
     "accept_failed": "Failed to accept swap request. Please try again.",
     "reject_failed": "Failed to decline swap request. Please try again.",
-    "reject_confirm": "Are you sure you want to decline this swap request?"
+    "reject_confirm": "Are you sure you want to decline this swap request?",
+    "subtitle": "Houd dienstruilingen met andere leden bij",
+    "empty_state": "Nog geen ruilingen",
+    "empty_state_desc": "Begin vandaag met je eerste ruiling",
+    "view_all": "Alles weergeven",
+    "load_failed": "Ruilingen konden niet worden geladen"
   },
   "waitlist": {
-    "heading": "My Waitlists",
+    "heading": "Wachtlijst",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_entries_title": "No waitlist entries",
@@ -76,10 +86,15 @@
     "load_error": "Unable to load your waitlist entries. Please try again.",
     "leave_confirm": "Are you sure you want to leave this waitlist? You will lose your position.",
     "leave_success": "You have left the waitlist.",
-    "leave_failed": "Failed to leave waitlist. Please try again."
+    "leave_failed": "Failed to leave waitlist. Please try again.",
+    "subtitle": "Beheer openstaande lidmaatschapsverzoeken",
+    "empty_state": "Wachtlijst is leeg",
+    "approve": "Goedkeuren",
+    "reject": "Afwijzen",
+    "load_failed": "Wachtlijst kon niet worden geladen"
   },
   "wellbeing": {
-    "heading": "Volunteer Wellbeing",
+    "heading": "Gemeenschapswelzijn",
     "log_feeling": "Log How I'm Feeling",
     "try_again": "Try Again",
     "no_data_title": "No wellbeing data yet",
@@ -124,7 +139,12 @@
     "tip_boundaries": "Set boundaries on your availability",
     "tip_connect": "Connect with fellow volunteers for support",
     "tip_celebrate": "Celebrate your impact -- every hour counts",
-    "tip_reduce": "Consider reducing frequency if feeling overwhelmed"
+    "tip_reduce": "Consider reducing frequency if feeling overwhelmed",
+    "subtitle": "Volg de gezondheid en activiteit van je gemeenschap",
+    "load_failed": "Welzijnsgegevens konden niet worden geladen",
+    "members_active": "Actieve leden",
+    "exchanges_this_month": "Uitwisselingen deze maand",
+    "hours_exchanged": "Geruilte uren"
   },
   "organisations": {
     "page_title": "Organisations",
@@ -132,7 +152,7 @@
     "subtitle": "Discover volunteer organisations in your community",
     "breadcrumb_volunteering": "Volunteering",
     "breadcrumb_organisations": "Organisations",
-    "search_placeholder": "Search organisations...",
+    "search_placeholder": "Zoek organisaties…",
     "unable_to_load": "Unable to Load Organisations",
     "error_load": "Failed to load organisations.",
     "error_load_retry": "Failed to load organisations. Please try again.",
@@ -184,7 +204,15 @@
     "hero_partners_label": "Getoonde partners",
     "empty_tip_volunteer": "Vrijwilligersgroepen",
     "empty_tip_partner": "Gemeenschapspartners",
-    "empty_tip_register": "Een organisatie registreren"
+    "empty_tip_register": "Een organisatie registreren",
+    "load_failed": "Organisaties konden niet worden geladen",
+    "load_error": "Fout bij laden van organisaties",
+    "register_cta": "Registreer je organisatie",
+    "register_cta_desc": "Word lid van ons netwerk van gemeenschapsorganisaties",
+    "filter_all": "Alle",
+    "filter_verified": "Geverifieerd",
+    "no_results": "Geen organisaties gevonden",
+    "no_results_desc": "Probeer een andere zoekterm of blader door alle organisaties"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -192,13 +220,13 @@
     "breadcrumb_organisations": "Organisations",
     "breadcrumb_error": "Error",
     "loading": "Loading organisation...",
-    "not_found": "Organisation not found.",
+    "not_found": "Organisatie niet gevonden",
     "error_load_retry": "Failed to load organisation details. Please try again.",
     "unable_to_load": "Unable to Load Organisation",
     "try_again": "Try Again",
     "browse_organisations": "Browse Organisations",
     "website": "Website",
-    "contact": "Contact",
+    "contact": "Contact opnemen",
     "opportunities": "Opportunities",
     "volunteers": "Volunteers",
     "hours_logged": "Hours Logged",
@@ -216,17 +244,22 @@
     "cover_message_placeholder": "Tell the organisation why you'd like to volunteer...",
     "cancel": "Cancel",
     "submit_application": "Submit Application",
-    "job_openings": "Job Openings",
-    "meta_description_fallback": "Ontdek {{name}} en {{count}} actieve vrijwilligersmogelijkheden op deze gemeenschapstijdbank."
+    "job_openings": "Vacatures",
+    "meta_description_fallback": "Ontdek {{name}} en {{count}} actieve vrijwilligersmogelijkheden op deze gemeenschapstijdbank.",
+    "load_failed": "Organisatiedetails konden niet worden geladen",
+    "members_count": "{{count}} leden",
+    "join": "Lid worden van organisatie",
+    "leave": "Organisatie verlaten",
+    "edit": "Bewerken"
   },
   "emergency_alerts": {
-    "heading": "Emergency Alerts",
+    "heading": "Noodmeldingen",
     "pending_count": "{{count}} pending",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_alerts_title": "No emergency alerts",
     "no_alerts_desc": "You don't have any emergency shift requests at the moment.",
-    "load_failed": "Failed to load alerts. Please try again.",
+    "load_failed": "Meldingen konden niet worden geladen",
     "load_error": "Unable to load alerts. Please try again.",
     "priority_critical": "Critical",
     "priority_urgent": "Urgent",
@@ -236,15 +269,18 @@
     "accepted": "Accepted",
     "declined": "Declined",
     "from_coordinator": "From {{name}}",
-    "expires": "Expires {{date}}"
+    "expires": "Expires {{date}}",
+    "subtitle": "Stuur urgente meldingen naar gemeenschapsleden",
+    "send": "Melding verzenden",
+    "no_alerts": "Geen actieve meldingen"
   },
   "group_signups": {
-    "heading": "Group Sign-ups",
+    "heading": "Groepsaanmeldingen",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_signups_title": "No group sign-ups",
     "no_signups_desc": "You are not part of any group shift reservations yet. Group sign-ups let you volunteer together with friends or team members.",
-    "load_failed": "Failed to load group reservations. Please try again.",
+    "load_failed": "Aanmeldingen konden niet worden geladen",
     "load_error": "Unable to load group reservations. Please try again.",
     "leader": "Leader",
     "members": "Members",
@@ -256,20 +292,26 @@
     "email_placeholder": "member@example.com",
     "cancel": "Cancel",
     "add_member_failed": "Failed to add member. They may already be in the group or the email is invalid.",
-    "add_member_error": "Unable to add member. Please check the email and try again."
+    "add_member_error": "Unable to add member. Please check the email and try again.",
+    "subtitle": "Beheer verzoeken om toe te treden tot groepen",
+    "empty_state": "Geen openstaande aanmeldingsverzoeken",
+    "approve": "Goedkeuren",
+    "reject": "Afwijzen"
   },
   "recommended_shifts": {
-    "heading": "Recommended for You",
+    "heading": "Aanbevolen diensten",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_recommendations_title": "No recommendations yet",
     "no_recommendations_desc": "Add skills to your profile to get personalized shift recommendations.",
     "match_score": "{{score}}% match",
-    "load_failed": "Failed to load recommendations. Please try again.",
-    "load_error": "Unable to load recommendations. Please try again."
+    "load_failed": "Aanbevolen diensten konden niet worden geladen",
+    "load_error": "Unable to load recommendations. Please try again.",
+    "subtitle": "Voorgestelde diensten op basis van jouw vaardigheden en beschikbaarheid",
+    "empty_state": "Geen aanbevolen diensten"
   },
   "certificates_tab": {
-    "heading": "Impact Certificates",
+    "heading": "Certificaten",
     "generate": "Generate Certificate",
     "description": "Certificates include all of your approved volunteer hours across every organisation.",
     "try_again": "Try Again",
@@ -282,14 +324,16 @@
     "generated_success": "Certificate generated!",
     "no_verified_hours": "No verified volunteer hours found. Hours must be approved before generating a certificate.",
     "generate_failed": "Failed to generate certificate. Please try again.",
-    "load_failed": "Failed to load certificates. Please try again.",
-    "load_error": "Unable to load certificates. Please try again."
+    "load_failed": "Certificaten konden niet worden geladen",
+    "load_error": "Fout bij laden van certificaten",
+    "subtitle": "Behaalde certificaten en badges",
+    "empty_state": "Nog geen certificaten"
   },
   "page_meta": {
     "register_organisation": {
       "title": "Register Organisation"
     }
   },
-  "remote": "Remote",
-  "closes_date": "Closes {{date}}"
+  "remote": "Op afstand",
+  "closes_date": "Sluit {{date}}"
 }

@@ -1,6 +1,6 @@
 {
   "credentials": {
-    "heading": "Credential Verification",
+    "heading": "اعتمادات المجتمع",
     "upload_new": "Upload New Credential",
     "try_again": "Try Again",
     "no_credentials_title": "No credentials uploaded",
@@ -30,7 +30,7 @@
     "type_driving_licence": "Driving Licence",
     "type_professional_registration": "Professional Registration",
     "type_other": "Other",
-    "load_failed": "Failed to load credentials. Please try again.",
+    "load_failed": "تعذّر تحميل الاعتمادات",
     "load_error": "Unable to load credentials. Please try again.",
     "file_too_large": "File size must be under 10MB.",
     "invalid_file_type": "Please upload a PDF or image file (JPG, PNG, WebP).",
@@ -40,10 +40,15 @@
     "credential_type_placeholder": "Select credential type",
     "document_label": "Document",
     "expiry_date_label": "Expiry Date (optional)",
-    "expiry_date_placeholder": "Leave blank if no expiry"
+    "expiry_date_placeholder": "Leave blank if no expiry",
+    "subtitle": "إثبات مساهماتك ومهاراتك",
+    "empty_state": "لا توجد اعتمادات حتى الآن",
+    "empty_state_desc": "أكمل عمليات التبادل واحصل على اعتراف بمهاراتك",
+    "view_all": "عرض الكل",
+    "awarded_on": "ممنوحة في {{date}}"
   },
   "swaps": {
-    "heading": "Shift Swaps",
+    "heading": "تبادلات المجتمع",
     "refresh": "Refresh",
     "all": "All",
     "sent": "Sent",
@@ -61,10 +66,15 @@
     "load_error": "Unable to load shift swap requests. Please try again.",
     "accept_failed": "Failed to accept swap request. Please try again.",
     "reject_failed": "Failed to decline swap request. Please try again.",
-    "reject_confirm": "Are you sure you want to decline this swap request?"
+    "reject_confirm": "Are you sure you want to decline this swap request?",
+    "subtitle": "تتبع تبادلات الخدمات مع الأعضاء الآخرين",
+    "empty_state": "لا توجد تبادلات حتى الآن",
+    "empty_state_desc": "ابدأ أول تبادل لك اليوم",
+    "view_all": "عرض الكل",
+    "load_failed": "تعذّر تحميل التبادلات"
   },
   "waitlist": {
-    "heading": "My Waitlists",
+    "heading": "قائمة الانتظار",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_entries_title": "No waitlist entries",
@@ -76,10 +86,15 @@
     "load_error": "Unable to load your waitlist entries. Please try again.",
     "leave_confirm": "Are you sure you want to leave this waitlist? You will lose your position.",
     "leave_success": "You have left the waitlist.",
-    "leave_failed": "Failed to leave waitlist. Please try again."
+    "leave_failed": "Failed to leave waitlist. Please try again.",
+    "subtitle": "إدارة طلبات العضوية المعلّقة",
+    "empty_state": "قائمة الانتظار فارغة",
+    "approve": "قبول",
+    "reject": "رفض",
+    "load_failed": "تعذّر تحميل قائمة الانتظار"
   },
   "wellbeing": {
-    "heading": "Volunteer Wellbeing",
+    "heading": "رفاهية المجتمع",
     "log_feeling": "Log How I'm Feeling",
     "try_again": "Try Again",
     "no_data_title": "No wellbeing data yet",
@@ -124,7 +139,12 @@
     "tip_boundaries": "Set boundaries on your availability",
     "tip_connect": "Connect with fellow volunteers for support",
     "tip_celebrate": "Celebrate your impact -- every hour counts",
-    "tip_reduce": "Consider reducing frequency if feeling overwhelmed"
+    "tip_reduce": "Consider reducing frequency if feeling overwhelmed",
+    "subtitle": "تتبع صحة مجتمعك ونشاطه",
+    "load_failed": "تعذّر تحميل بيانات الرفاهية",
+    "members_active": "الأعضاء النشطون",
+    "exchanges_this_month": "التبادلات هذا الشهر",
+    "hours_exchanged": "الساعات المُتبادلة"
   },
   "organisations": {
     "page_title": "Organisations",
@@ -132,7 +152,7 @@
     "subtitle": "Discover volunteer organisations in your community",
     "breadcrumb_volunteering": "Volunteering",
     "breadcrumb_organisations": "Organisations",
-    "search_placeholder": "Search organisations...",
+    "search_placeholder": "ابحث عن المنظمات…",
     "unable_to_load": "Unable to Load Organisations",
     "error_load": "Failed to load organisations.",
     "error_load_retry": "Failed to load organisations. Please try again.",
@@ -184,7 +204,15 @@
     "hero_partners_label": "الشركاء المعروضون",
     "empty_tip_volunteer": "مجموعات التطوع",
     "empty_tip_partner": "شركاء المجتمع",
-    "empty_tip_register": "تسجيل منظمة"
+    "empty_tip_register": "تسجيل منظمة",
+    "load_failed": "تعذّر تحميل المنظمات",
+    "load_error": "خطأ في تحميل المنظمات",
+    "register_cta": "سجّل منظمتك",
+    "register_cta_desc": "انضم إلى شبكتنا من منظمات المجتمع",
+    "filter_all": "الكل",
+    "filter_verified": "موثّق",
+    "no_results": "لم يتم العثور على منظمات",
+    "no_results_desc": "جرّب مصطلح بحث مختلف أو تصفّح جميع المنظمات"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -192,13 +220,13 @@
     "breadcrumb_organisations": "Organisations",
     "breadcrumb_error": "Error",
     "loading": "Loading organisation...",
-    "not_found": "Organisation not found.",
+    "not_found": "المنظمة غير موجودة",
     "error_load_retry": "Failed to load organisation details. Please try again.",
     "unable_to_load": "Unable to Load Organisation",
     "try_again": "Try Again",
     "browse_organisations": "Browse Organisations",
-    "website": "Website",
-    "contact": "Contact",
+    "website": "الموقع الإلكتروني",
+    "contact": "تواصل",
     "opportunities": "Opportunities",
     "volunteers": "Volunteers",
     "hours_logged": "Hours Logged",
@@ -216,17 +244,22 @@
     "cover_message_placeholder": "Tell the organisation why you'd like to volunteer...",
     "cancel": "Cancel",
     "submit_application": "Submit Application",
-    "job_openings": "Job Openings",
-    "meta_description_fallback": "استكشف {{name}} و{{count}} فرصة تطوعية نشطة في بنك الوقت المجتمعي هذا."
+    "job_openings": "الوظائف الشاغرة",
+    "meta_description_fallback": "استكشف {{name}} و{{count}} فرصة تطوعية نشطة في بنك الوقت المجتمعي هذا.",
+    "load_failed": "تعذّر تحميل تفاصيل المنظمة",
+    "members_count": "{{count}} عضو",
+    "join": "الانضمام إلى المنظمة",
+    "leave": "مغادرة المنظمة",
+    "edit": "تعديل"
   },
   "emergency_alerts": {
-    "heading": "Emergency Alerts",
+    "heading": "التنبيهات الطارئة",
     "pending_count": "{{count}} pending",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_alerts_title": "No emergency alerts",
     "no_alerts_desc": "You don't have any emergency shift requests at the moment.",
-    "load_failed": "Failed to load alerts. Please try again.",
+    "load_failed": "تعذّر تحميل التنبيهات",
     "load_error": "Unable to load alerts. Please try again.",
     "priority_critical": "Critical",
     "priority_urgent": "Urgent",
@@ -236,15 +269,18 @@
     "accepted": "Accepted",
     "declined": "Declined",
     "from_coordinator": "From {{name}}",
-    "expires": "Expires {{date}}"
+    "expires": "Expires {{date}}",
+    "subtitle": "إرسال إشعارات عاجلة إلى أعضاء المجتمع",
+    "send": "إرسال تنبيه",
+    "no_alerts": "لا توجد تنبيهات نشطة"
   },
   "group_signups": {
-    "heading": "Group Sign-ups",
+    "heading": "التسجيل في المجموعات",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_signups_title": "No group sign-ups",
     "no_signups_desc": "You are not part of any group shift reservations yet. Group sign-ups let you volunteer together with friends or team members.",
-    "load_failed": "Failed to load group reservations. Please try again.",
+    "load_failed": "تعذّر تحميل التسجيلات",
     "load_error": "Unable to load group reservations. Please try again.",
     "leader": "Leader",
     "members": "Members",
@@ -256,20 +292,26 @@
     "email_placeholder": "member@example.com",
     "cancel": "Cancel",
     "add_member_failed": "Failed to add member. They may already be in the group or the email is invalid.",
-    "add_member_error": "Unable to add member. Please check the email and try again."
+    "add_member_error": "Unable to add member. Please check the email and try again.",
+    "subtitle": "إدارة طلبات الانضمام إلى المجموعات",
+    "empty_state": "لا توجد طلبات تسجيل معلّقة",
+    "approve": "قبول",
+    "reject": "رفض"
   },
   "recommended_shifts": {
-    "heading": "Recommended for You",
+    "heading": "الوردیات الموصى بها",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_recommendations_title": "No recommendations yet",
     "no_recommendations_desc": "Add skills to your profile to get personalized shift recommendations.",
     "match_score": "{{score}}% match",
-    "load_failed": "Failed to load recommendations. Please try again.",
-    "load_error": "Unable to load recommendations. Please try again."
+    "load_failed": "تعذّر تحميل الوردیات الموصى بها",
+    "load_error": "Unable to load recommendations. Please try again.",
+    "subtitle": "الوردیات المقترحة بناءً على مهاراتك وتوافرك",
+    "empty_state": "لا توجد وردیات موصى بها"
   },
   "certificates_tab": {
-    "heading": "Impact Certificates",
+    "heading": "الشهادات",
     "generate": "Generate Certificate",
     "description": "Certificates include all of your approved volunteer hours across every organisation.",
     "try_again": "Try Again",
@@ -282,14 +324,16 @@
     "generated_success": "Certificate generated!",
     "no_verified_hours": "No verified volunteer hours found. Hours must be approved before generating a certificate.",
     "generate_failed": "Failed to generate certificate. Please try again.",
-    "load_failed": "Failed to load certificates. Please try again.",
-    "load_error": "Unable to load certificates. Please try again."
+    "load_failed": "تعذّر تحميل الشهادات",
+    "load_error": "خطأ في تحميل الشهادات",
+    "subtitle": "الشهادات والأوسمة المكتسبة",
+    "empty_state": "لا توجد شهادات بعد"
   },
   "page_meta": {
     "register_organisation": {
-      "title": "Register Organisation"
+      "title": "تسجيل منظمة"
     }
   },
-  "remote": "Remote",
-  "closes_date": "Closes {{date}}"
+  "remote": "عن بُعد",
+  "closes_date": "يُغلق {{date}}"
 }

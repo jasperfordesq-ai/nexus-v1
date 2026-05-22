@@ -216,7 +216,7 @@
     "cover_message_placeholder": "Expliquez à l'organisation pourquoi vous souhaitez faire du bénévolat...",
     "cancel": "Annuler",
     "submit_application": "Envoyer la candidature",
-    "job_openings": "Job Openings",
+    "job_openings": "Offres d'emploi",
     "meta_description_fallback": "Explorez {{name}} et {{count}} opportunités de bénévolat actives sur cette banque de temps communautaire."
   },
   "emergency_alerts": {
@@ -290,6 +290,6 @@
       "title": "Enregistrer l'organisation"
     }
   },
-  "remote": "Remote",
-  "closes_date": "Closes {{date}}"
+  "remote": "À distance",
+  "closes_date": "Ferme le {{date}}"
 }

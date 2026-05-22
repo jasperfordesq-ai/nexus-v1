@@ -216,7 +216,7 @@
     "cover_message_placeholder": "Cuéntale a la organización por qué te gustaría ser voluntario...",
     "cancel": "Cancelar",
     "submit_application": "Enviar Solicitud",
-    "job_openings": "Job Openings",
+    "job_openings": "Ofertas de empleo",
     "meta_description_fallback": "Explora {{name}} y {{count}} oportunidades activas de voluntariado en este banco de tiempo comunitario."
   },
   "emergency_alerts": {
@@ -290,6 +290,6 @@
       "title": "Registrar Organización"
     }
   },
-  "remote": "Remote",
-  "closes_date": "Closes {{date}}"
+  "remote": "Remoto",
+  "closes_date": "Cierra {{date}}"
 }

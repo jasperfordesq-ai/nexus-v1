@@ -1,6 +1,6 @@
 {
   "credentials": {
-    "heading": "Credential Verification",
+    "heading": "Poświadczenia społeczności",
     "upload_new": "Upload New Credential",
     "try_again": "Try Again",
     "no_credentials_title": "No credentials uploaded",
@@ -30,7 +30,7 @@
     "type_driving_licence": "Driving Licence",
     "type_professional_registration": "Professional Registration",
     "type_other": "Other",
-    "load_failed": "Failed to load credentials. Please try again.",
+    "load_failed": "Nie udało się załadować poświadczeń",
     "load_error": "Unable to load credentials. Please try again.",
     "file_too_large": "File size must be under 10MB.",
     "invalid_file_type": "Please upload a PDF or image file (JPG, PNG, WebP).",
@@ -40,10 +40,15 @@
     "credential_type_placeholder": "Select credential type",
     "document_label": "Document",
     "expiry_date_label": "Expiry Date (optional)",
-    "expiry_date_placeholder": "Leave blank if no expiry"
+    "expiry_date_placeholder": "Leave blank if no expiry",
+    "subtitle": "Udowodnij swój wkład i umiejętności",
+    "empty_state": "Brak poświadczeń",
+    "empty_state_desc": "Ukończ wymiany i zdobądź uznanie za swoje umiejętności",
+    "view_all": "Wyświetl wszystkie",
+    "awarded_on": "Przyznano {{date}}"
   },
   "swaps": {
-    "heading": "Shift Swaps",
+    "heading": "Wymiany w społeczności",
     "refresh": "Refresh",
     "all": "All",
     "sent": "Sent",
@@ -61,10 +66,15 @@
     "load_error": "Unable to load shift swap requests. Please try again.",
     "accept_failed": "Failed to accept swap request. Please try again.",
     "reject_failed": "Failed to decline swap request. Please try again.",
-    "reject_confirm": "Are you sure you want to decline this swap request?"
+    "reject_confirm": "Are you sure you want to decline this swap request?",
+    "subtitle": "Śledź wymiany usług z innymi członkami",
+    "empty_state": "Brak wymian",
+    "empty_state_desc": "Rozpocznij swoją pierwszą wymianę już dziś",
+    "view_all": "Wyświetl wszystkie",
+    "load_failed": "Nie udało się załadować wymian"
   },
   "waitlist": {
-    "heading": "My Waitlists",
+    "heading": "Lista oczekujących",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_entries_title": "No waitlist entries",
@@ -76,10 +86,15 @@
     "load_error": "Unable to load your waitlist entries. Please try again.",
     "leave_confirm": "Are you sure you want to leave this waitlist? You will lose your position.",
     "leave_success": "You have left the waitlist.",
-    "leave_failed": "Failed to leave waitlist. Please try again."
+    "leave_failed": "Failed to leave waitlist. Please try again.",
+    "subtitle": "Zarządzaj oczekującymi wnioskami o członkostwo",
+    "empty_state": "Lista oczekujących jest pusta",
+    "approve": "Zatwierdź",
+    "reject": "Odrzuć",
+    "load_failed": "Nie udało się załadować listy oczekujących"
   },
   "wellbeing": {
-    "heading": "Volunteer Wellbeing",
+    "heading": "Dobrostan społeczności",
     "log_feeling": "Log How I'm Feeling",
     "try_again": "Try Again",
     "no_data_title": "No wellbeing data yet",
@@ -124,7 +139,12 @@
     "tip_boundaries": "Set boundaries on your availability",
     "tip_connect": "Connect with fellow volunteers for support",
     "tip_celebrate": "Celebrate your impact -- every hour counts",
-    "tip_reduce": "Consider reducing frequency if feeling overwhelmed"
+    "tip_reduce": "Consider reducing frequency if feeling overwhelmed",
+    "subtitle": "Śledź kondycję i aktywność swojej społeczności",
+    "load_failed": "Nie udało się załadować danych dotyczących dobrostanu",
+    "members_active": "Aktywni członkowie",
+    "exchanges_this_month": "Wymiany w tym miesiącu",
+    "hours_exchanged": "Wymienione godziny"
   },
   "organisations": {
     "page_title": "Organisations",
@@ -132,7 +152,7 @@
     "subtitle": "Discover volunteer organisations in your community",
     "breadcrumb_volunteering": "Volunteering",
     "breadcrumb_organisations": "Organisations",
-    "search_placeholder": "Search organisations...",
+    "search_placeholder": "Szukaj organizacji…",
     "unable_to_load": "Unable to Load Organisations",
     "error_load": "Failed to load organisations.",
     "error_load_retry": "Failed to load organisations. Please try again.",
@@ -184,7 +204,15 @@
     "hero_partners_label": "Pokazywani partnerzy",
     "empty_tip_volunteer": "Grupy wolontariackie",
     "empty_tip_partner": "Partnerzy społeczni",
-    "empty_tip_register": "Zarejestruj organizację"
+    "empty_tip_register": "Zarejestruj organizację",
+    "load_failed": "Nie udało się załadować organizacji",
+    "load_error": "Błąd ładowania organizacji",
+    "register_cta": "Zarejestruj swoją organizację",
+    "register_cta_desc": "Dołącz do naszej sieci organizacji społecznych",
+    "filter_all": "Wszystkie",
+    "filter_verified": "Zweryfikowane",
+    "no_results": "Nie znaleziono organizacji",
+    "no_results_desc": "Spróbuj innego wyszukiwania lub przeglądaj wszystkie organizacje"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -192,13 +220,13 @@
     "breadcrumb_organisations": "Organisations",
     "breadcrumb_error": "Error",
     "loading": "Loading organisation...",
-    "not_found": "Organisation not found.",
+    "not_found": "Organizacja nie została znaleziona",
     "error_load_retry": "Failed to load organisation details. Please try again.",
     "unable_to_load": "Unable to Load Organisation",
     "try_again": "Try Again",
     "browse_organisations": "Browse Organisations",
-    "website": "Website",
-    "contact": "Contact",
+    "website": "Strona internetowa",
+    "contact": "Skontaktuj się",
     "opportunities": "Opportunities",
     "volunteers": "Volunteers",
     "hours_logged": "Hours Logged",
@@ -216,17 +244,22 @@
     "cover_message_placeholder": "Tell the organisation why you'd like to volunteer...",
     "cancel": "Cancel",
     "submit_application": "Submit Application",
-    "job_openings": "Job Openings",
-    "meta_description_fallback": "Poznaj {{name}} i {{count}} aktywnych możliwości wolontariatu w tym społecznościowym banku czasu."
+    "job_openings": "Oferty pracy",
+    "meta_description_fallback": "Poznaj {{name}} i {{count}} aktywnych możliwości wolontariatu w tym społecznościowym banku czasu.",
+    "load_failed": "Nie udało się załadować szczegółów organizacji",
+    "members_count": "{{count}} członków",
+    "join": "Dołącz do organizacji",
+    "leave": "Opuść organizację",
+    "edit": "Edytuj"
   },
   "emergency_alerts": {
-    "heading": "Emergency Alerts",
+    "heading": "Alerty awaryjne",
     "pending_count": "{{count}} pending",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_alerts_title": "No emergency alerts",
     "no_alerts_desc": "You don't have any emergency shift requests at the moment.",
-    "load_failed": "Failed to load alerts. Please try again.",
+    "load_failed": "Nie udało się załadować alertów",
     "load_error": "Unable to load alerts. Please try again.",
     "priority_critical": "Critical",
     "priority_urgent": "Urgent",
@@ -236,15 +269,18 @@
     "accepted": "Accepted",
     "declined": "Declined",
     "from_coordinator": "From {{name}}",
-    "expires": "Expires {{date}}"
+    "expires": "Expires {{date}}",
+    "subtitle": "Wysyłaj pilne powiadomienia do członków społeczności",
+    "send": "Wyślij alert",
+    "no_alerts": "Brak aktywnych alertów"
   },
   "group_signups": {
-    "heading": "Group Sign-ups",
+    "heading": "Zapisy do grup",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_signups_title": "No group sign-ups",
     "no_signups_desc": "You are not part of any group shift reservations yet. Group sign-ups let you volunteer together with friends or team members.",
-    "load_failed": "Failed to load group reservations. Please try again.",
+    "load_failed": "Nie udało się załadować zapisów",
     "load_error": "Unable to load group reservations. Please try again.",
     "leader": "Leader",
     "members": "Members",
@@ -256,20 +292,26 @@
     "email_placeholder": "member@example.com",
     "cancel": "Cancel",
     "add_member_failed": "Failed to add member. They may already be in the group or the email is invalid.",
-    "add_member_error": "Unable to add member. Please check the email and try again."
+    "add_member_error": "Unable to add member. Please check the email and try again.",
+    "subtitle": "Zarządzaj wnioskami o dołączenie do grup",
+    "empty_state": "Brak oczekujących wniosków o zapis",
+    "approve": "Zatwierdź",
+    "reject": "Odrzuć"
   },
   "recommended_shifts": {
-    "heading": "Recommended for You",
+    "heading": "Zalecane zmiany",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_recommendations_title": "No recommendations yet",
     "no_recommendations_desc": "Add skills to your profile to get personalized shift recommendations.",
     "match_score": "{{score}}% match",
-    "load_failed": "Failed to load recommendations. Please try again.",
-    "load_error": "Unable to load recommendations. Please try again."
+    "load_failed": "Nie udało się załadować zalecanych zmian",
+    "load_error": "Unable to load recommendations. Please try again.",
+    "subtitle": "Proponowane zmiany na podstawie Twoich umiejętności i dostępności",
+    "empty_state": "Brak zalecanych zmian"
   },
   "certificates_tab": {
-    "heading": "Impact Certificates",
+    "heading": "Certyfikaty",
     "generate": "Generate Certificate",
     "description": "Certificates include all of your approved volunteer hours across every organisation.",
     "try_again": "Try Again",
@@ -282,14 +324,16 @@
     "generated_success": "Certificate generated!",
     "no_verified_hours": "No verified volunteer hours found. Hours must be approved before generating a certificate.",
     "generate_failed": "Failed to generate certificate. Please try again.",
-    "load_failed": "Failed to load certificates. Please try again.",
-    "load_error": "Unable to load certificates. Please try again."
+    "load_failed": "Nie udało się załadować certyfikatów",
+    "load_error": "Błąd ładowania certyfikatów",
+    "subtitle": "Zdobyte certyfikaty i odznaki",
+    "empty_state": "Brak certyfikatów"
   },
   "page_meta": {
     "register_organisation": {
       "title": "Register Organisation"
     }
   },
-  "remote": "Remote",
-  "closes_date": "Closes {{date}}"
+  "remote": "Zdalnie",
+  "closes_date": "Zamknięcie {{date}}"
 }

@@ -8,7 +8,7 @@
   "quoted_post_image": "Zitiertes Beitragsbild",
   "create_poll_aria": "Umfrage erstellen",
   "create_post": "Beitrag erstellen",
-  "author_unknown": "Unknown",
+  "author_unknown": "Unbekannt",
   "load_more": "Mehr laden",
   "unable_to_load": "Feed konnte nicht geladen werden",
   "try_again": "Erneut versuchen",
@@ -200,7 +200,7 @@
     "schedule_confirm": "Zeitplan festlegen",
     "schedule_button": "Planen",
     "post_scheduled": "Beitrag geplant!",
-    "selected_gif_alt": "Selected GIF",
+    "selected_gif_alt": "Ausgewähltes GIF",
     "groups_loading": "Gruppen werden geladen...",
     "create_post": "Beitrag erstellen",
     "alt_text_placeholder": "Dieses Bild beschreiben...",
@@ -213,15 +213,15 @@
     "content_required": "Der Beitragsinhalt darf nicht leer sein.",
     "content_too_long": "Der Beitrag ist zu lang (max. {{max}} Zeichen).",
     "groups_load_error": "Gruppen konnten nicht geladen werden.",
-    "upload_preview_alt": "Upload preview {{number}}",
-    "image_remove_number_aria": "Remove image {{number}}",
-    "alt_text_add": "Add alt text",
-    "alt_text_edit": "Edit alt text",
-    "location_from_profile": "From your profile — update in Settings",
-    "video_invalid_type": "Invalid video format. Use MP4, WebM, OGG, or MOV.",
-    "video_too_large": "Video must be under {{size}}MB.",
+    "upload_preview_alt": "Upload-Vorschau {{number}}",
+    "image_remove_number_aria": "Bild {{number}} entfernen",
+    "alt_text_add": "Alternativtext hinzufügen",
+    "alt_text_edit": "Alternativtext bearbeiten",
+    "location_from_profile": "Aus Ihrem Profil — in Einstellungen aktualisieren",
+    "video_invalid_type": "Ungültiges Videoformat. Verwenden Sie MP4, WebM, OGG oder MOV.",
+    "video_too_large": "Video muss kleiner als {{size}}MB sein.",
     "video": "Video",
-    "video_remove": "Remove video",
+    "video_remove": "Video entfernen",
     "file_size_mb": "{{name}} ({{size}}MB)"
   },
   "moderation": {
@@ -248,7 +248,7 @@
     "unlike": "Gefällt mir nicht mehr",
     "like_action": "Gefällt mir",
     "view_comments": "Kommentare anzeigen",
-    "view_reactions_aria": "View reactions: {{summary}}",
+    "view_reactions_aria": "Reaktionen anzeigen: {{summary}}",
     "comment_action": "Kommentieren",
     "write_comment": "Kommentar schreiben...",
     "no_comments": "Noch keine Kommentare. Teilen Sie als Erste Person Ihre Gedanken!",
@@ -302,7 +302,7 @@
     "delete": "Löschen",
     "delete_comment_confirm": "Diesen Kommentar löschen?",
     "delete_comment_title": "Kommentar löschen",
-    "delete_comment_body": "Möchten Sie diesen Kommentar wirklich löschen? Dies kann nicht rückgängig gemacht werden.",
+    "delete_comment_body": "Sind Sie sicher, dass Sie diesen Kommentar löschen möchten? Dies kann nicht rückgängig gemacht werden.",
     "comments_load_failed": "Kommentare konnten nicht geladen werden.",
     "mute_user_label": "{{name}} stummschalten",
     "event": {
@@ -315,15 +315,15 @@
       "type_timebank": "Zeitgutschriften",
       "commitment_full_time": "Vollzeit",
       "commitment_part_time": "Teilzeit",
-      "commitment_contract": "Auftrag",
+      "commitment_contract": "Vertrag",
       "commitment_flexible": "Flexibel"
     },
     "volunteer": {
       "credits_offered": "{{count}} Zeitgutschriften"
     },
     "challenge": {
-      "closing_soon": "Schliesst bald",
-      "closes_on": "Schliesst am {{date}}",
+      "closing_soon": "Endet bald",
+      "closes_on": "Endet am {{date}}",
       "ideas_count": "{{count}} Ideen"
     },
     "review": {
@@ -333,21 +333,21 @@
       "badge_unlocked": "Abzeichen freigeschaltet",
       "level_reached": "Stufe erreicht"
     },
-    "type_resource": "Resource"
+    "type_resource": "Ressource"
   },
   "poll": {
     "load_failed": "Umfragedaten konnten nicht geladen werden.",
     "expired": "Diese Umfrage ist beendet.",
-    "expiry_past": "Das Ablaufdatum der Umfrage muss in der Zukunft liegen.",
-    "min_options_hint": "Es sind mindestens 2 Optionen erforderlich.",
+    "expiry_past": "Das Ablaufdatum muss in der Zukunft liegen.",
+    "min_options_hint": "Mindestens 2 Optionen sind erforderlich.",
     "closed": "Geschlossen",
-    "closes_minutes": "Schliesst in {{minutes}} Min.",
-    "closes_hours": "Schliesst in {{hours}} Std.",
-    "closes_days": "Schliesst in {{days}} T.",
-    "live": "Live",
+    "closes_minutes": "Endet in {{minutes}} Min.",
+    "closes_hours": "Endet in {{hours}} Std.",
+    "closes_days": "Endet in {{days}} T.",
+    "live": "Aktiv",
     "view_full": "Vollständige Umfrage anzeigen",
     "vote_to_see_results": "Abstimmen, um Ergebnisse zu sehen",
-    "results_hidden_until_close": "Ergebnisse werden bei Schliessung der Umfrage offengelegt",
+    "results_hidden_until_close": "Ergebnisse erscheinen nach Ablauf der Umfrage",
     "your_vote": "Ihre Stimme"
   },
   "feed": {
@@ -389,7 +389,7 @@
     "shared_by_text": "hat dies geteilt",
     "cannot_share_own_post": "Sie können Ihren eigenen Beitrag nicht teilen",
     "menu_label": "Teilen-Optionen",
-    "default_title": "Post",
+    "default_title": "Beitrag",
     "repost": "Erneut posten",
     "repost_desc": "In deinem Feed teilen",
     "repost_remove": "Repost entfernen",
@@ -427,10 +427,10 @@
     "mute": "Stummschalten",
     "unmute": "Stummschaltung aufheben",
     "pause": "Pause",
-    "play": "Play",
+    "play": "Abspielen",
     "aria_label": "Video",
-    "unavailable": "Video unavailable",
-    "unavailable_desc": "This video could not be loaded."
+    "unavailable": "Video nicht verfügbar",
+    "unavailable_desc": "Dieses Video konnte nicht geladen werden."
   },
   "trending": {
     "title": "Im Trend",
@@ -532,7 +532,7 @@
     "next": "Nächstes Bild",
     "go_to_image": "Zu Bild {{number}} gehen",
     "more_images": "{{count}} weitere Bilder",
-    "video_of": "Video {{current}} of {{total}}"
+    "video_of": "Video {{current}} von {{total}}"
   },
   "lightbox": {
     "aria_label": "Bildansicht",
@@ -555,7 +555,7 @@
   "why_shown": {
     "label": "Warum sehe ich das?",
     "title": "Warum Sie das sehen",
-    "default_reason": "Für Sie aufgrund Ihrer Aktivität gerankt",
+    "default_reason": "Für Sie basierend auf Ihrer Aktivität angezeigt",
     "popular": "Beliebt in Ihrer Gemeinschaft",
     "some_engagement": "Erhält Engagement",
     "community_content": "Gemeinschaftsaktivität",
@@ -571,12 +571,12 @@
   "suggestions": {
     "title": "Personen, die Sie kennen könnten",
     "see_all": "Alle anzeigen",
-    "mutual": "{{count}} gemeinsame Verbindungen",
+    "mutual": "{{count}} gemeinsame Kontakte",
     "connect": "Verbinden",
     "connect_sent": "Verbindungsanfrage gesendet!",
     "connect_failed": "Anfrage konnte nicht gesendet werden",
     "pending": "Ausstehend",
-    "dismiss": "Verwerfen",
+    "dismiss": "Ablehnen",
     "load_failed": "Vorschläge konnten nicht geladen werden"
   },
   "analytics": {
@@ -594,10 +594,10 @@
   "you": "Sie",
   "items_loaded": "{{count}} Beiträge",
   "post_detail": {
-    "title": "Post",
-    "back": "Back to Feed",
-    "not_found": "Item not found",
-    "load_failed": "Failed to load item"
+    "title": "Beitrag",
+    "back": "Zurück zum Feed",
+    "not_found": "Element nicht gefunden",
+    "load_failed": "Element konnte nicht geladen werden"
   },
   "meta_description": "Ein privater Community-Feed für Aktualisierungen, Einträge, Veranstaltungen, Umfragen, Ziele und Gespräche.",
   "error_hint": "Ihre Filter und der Entwurfseditor sind noch hier. Aktualisieren Sie den Feed, sobald Ihre Verbindung bereit ist.",

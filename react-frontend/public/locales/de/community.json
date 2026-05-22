@@ -216,7 +216,7 @@
     "cover_message_placeholder": "Erzählen Sie der Organisation, warum Sie sich freiwillig engagieren möchten...",
     "cancel": "Abbrechen",
     "submit_application": "Bewerbung absenden",
-    "job_openings": "Job Openings",
+    "job_openings": "Stellenangebote",
     "meta_description_fallback": "Entdecken Sie {{name}} und {{count}} aktive Freiwilligenmöglichkeiten in dieser Gemeinschafts-Zeitbank."
   },
   "emergency_alerts": {
@@ -226,7 +226,7 @@
     "try_again": "Erneut versuchen",
     "no_alerts_title": "Keine Notfallwarnungen",
     "no_alerts_desc": "Sie haben derzeit keine Notfall-Schichtanfragen.",
-    "load_failed": "Failed to load alerts",
+    "load_failed": "Notfallmeldungen konnten nicht geladen werden",
     "load_error": "Warnungen konnten nicht geladen werden.",
     "priority_critical": "KRITISCH",
     "priority_urgent": "DRINGEND",
@@ -244,7 +244,7 @@
     "try_again": "Erneut versuchen",
     "no_signups_title": "Keine Gruppenanmeldungen",
     "no_signups_desc": "Sie sind noch an keiner Gruppen-Schichtreservierung beteiligt. Gruppenanmeldungen ermöglichen es Ihnen, gemeinsam mit Freunden oder Teammitgliedern freiwillig zu arbeiten.",
-    "load_failed": "Failed to load group reservations.",
+    "load_failed": "Gruppenanmeldungen konnten nicht geladen werden",
     "load_error": "Gruppenreservierungen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
     "leader": "Anführer",
     "members": "Mitglieder",
@@ -265,7 +265,7 @@
     "no_recommendations_title": "Noch keine Empfehlungen",
     "no_recommendations_desc": "Fügen Sie Fähigkeiten zu Ihrem Profil hinzu, um personalisierte Schichtempfehlungen zu erhalten.",
     "match_score": "{{score}}% Übereinstimmung",
-    "load_failed": "Failed to load recommendations",
+    "load_failed": "Empfohlene Schichten konnten nicht geladen werden",
     "load_error": "Empfehlungen konnten nicht geladen werden. Bitte versuchen Sie es erneut."
   },
   "certificates_tab": {
@@ -282,8 +282,8 @@
     "generated_success": "Zertifikat erstellt!",
     "no_verified_hours": "Keine verifizierten Freiwilligenstunden gefunden. Stunden müssen vor der Zertifikatserstellung genehmigt werden.",
     "generate_failed": "Zertifikat konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
-    "load_failed": "Failed to load certificates",
-    "load_error": "Zertifikate konnten nicht geladen werden."
+    "load_failed": "Zertifikate konnten nicht geladen werden",
+    "load_error": "Fehler beim Laden der Zertifikate"
   },
   "page_meta": {
     "register_organisation": {
@@ -291,5 +291,5 @@
     }
   },
   "remote": "Remote",
-  "closes_date": "Closes {{date}}"
+  "closes_date": "Schließt {{date}}"
 }

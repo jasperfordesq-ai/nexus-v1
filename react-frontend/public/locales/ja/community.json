@@ -1,6 +1,6 @@
 {
   "credentials": {
-    "heading": "Credential Verification",
+    "heading": "コミュニティ資格情報",
     "upload_new": "Upload New Credential",
     "try_again": "Try Again",
     "no_credentials_title": "No credentials uploaded",
@@ -30,7 +30,7 @@
     "type_driving_licence": "Driving Licence",
     "type_professional_registration": "Professional Registration",
     "type_other": "Other",
-    "load_failed": "Failed to load credentials. Please try again.",
+    "load_failed": "資格情報を読み込めませんでした",
     "load_error": "Unable to load credentials. Please try again.",
     "file_too_large": "File size must be under 10MB.",
     "invalid_file_type": "Please upload a PDF or image file (JPG, PNG, WebP).",
@@ -40,10 +40,15 @@
     "credential_type_placeholder": "Select credential type",
     "document_label": "Document",
     "expiry_date_label": "Expiry Date (optional)",
-    "expiry_date_placeholder": "Leave blank if no expiry"
+    "expiry_date_placeholder": "Leave blank if no expiry",
+    "subtitle": "あなたの貢献とスキルを証明する",
+    "empty_state": "資格情報はまだありません",
+    "empty_state_desc": "交換を完了してスキルの認定を取得しましょう",
+    "view_all": "すべて表示",
+    "awarded_on": "{{date}}に授与"
   },
   "swaps": {
-    "heading": "Shift Swaps",
+    "heading": "コミュニティスワップ",
     "refresh": "Refresh",
     "all": "All",
     "sent": "Sent",
@@ -61,10 +66,15 @@
     "load_error": "Unable to load shift swap requests. Please try again.",
     "accept_failed": "Failed to accept swap request. Please try again.",
     "reject_failed": "Failed to decline swap request. Please try again.",
-    "reject_confirm": "Are you sure you want to decline this swap request?"
+    "reject_confirm": "Are you sure you want to decline this swap request?",
+    "subtitle": "他のメンバーとのサービス交換を追跡する",
+    "empty_state": "まだスワップはありません",
+    "empty_state_desc": "今日初めての交換を始めましょう",
+    "view_all": "すべて表示",
+    "load_failed": "スワップを読み込めませんでした"
   },
   "waitlist": {
-    "heading": "My Waitlists",
+    "heading": "順番待ちリスト",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_entries_title": "No waitlist entries",
@@ -76,10 +86,15 @@
     "load_error": "Unable to load your waitlist entries. Please try again.",
     "leave_confirm": "Are you sure you want to leave this waitlist? You will lose your position.",
     "leave_success": "You have left the waitlist.",
-    "leave_failed": "Failed to leave waitlist. Please try again."
+    "leave_failed": "Failed to leave waitlist. Please try again.",
+    "subtitle": "保留中のメンバーシップリクエストを管理する",
+    "empty_state": "順番待ちリストは空です",
+    "approve": "承認",
+    "reject": "却下",
+    "load_failed": "順番待ちリストを読み込めませんでした"
   },
   "wellbeing": {
-    "heading": "Volunteer Wellbeing",
+    "heading": "コミュニティの幸福",
     "log_feeling": "Log How I'm Feeling",
     "try_again": "Try Again",
     "no_data_title": "No wellbeing data yet",
@@ -124,7 +139,12 @@
     "tip_boundaries": "Set boundaries on your availability",
     "tip_connect": "Connect with fellow volunteers for support",
     "tip_celebrate": "Celebrate your impact -- every hour counts",
-    "tip_reduce": "Consider reducing frequency if feeling overwhelmed"
+    "tip_reduce": "Consider reducing frequency if feeling overwhelmed",
+    "subtitle": "コミュニティの健全性と活動を追跡する",
+    "load_failed": "幸福データを読み込めませんでした",
+    "members_active": "アクティブメンバー",
+    "exchanges_this_month": "今月の交換数",
+    "hours_exchanged": "交換された時間"
   },
   "organisations": {
     "page_title": "Organisations",
@@ -132,7 +152,7 @@
     "subtitle": "Discover volunteer organisations in your community",
     "breadcrumb_volunteering": "Volunteering",
     "breadcrumb_organisations": "Organisations",
-    "search_placeholder": "Search organisations...",
+    "search_placeholder": "組織を検索…",
     "unable_to_load": "Unable to Load Organisations",
     "error_load": "Failed to load organisations.",
     "error_load_retry": "Failed to load organisations. Please try again.",
@@ -184,7 +204,15 @@
     "hero_partners_label": "表示中のパートナー",
     "empty_tip_volunteer": "ボランティアグループ",
     "empty_tip_partner": "コミュニティパートナー",
-    "empty_tip_register": "団体を登録する"
+    "empty_tip_register": "団体を登録する",
+    "load_failed": "組織を読み込めませんでした",
+    "load_error": "組織の読み込みエラー",
+    "register_cta": "組織を登録する",
+    "register_cta_desc": "コミュニティ組織ネットワークに参加する",
+    "filter_all": "すべて",
+    "filter_verified": "認証済み",
+    "no_results": "組織が見つかりませんでした",
+    "no_results_desc": "別の検索語を試すか、すべての組織を閲覧してください"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -192,13 +220,13 @@
     "breadcrumb_organisations": "Organisations",
     "breadcrumb_error": "Error",
     "loading": "Loading organisation...",
-    "not_found": "Organisation not found.",
+    "not_found": "組織が見つかりません",
     "error_load_retry": "Failed to load organisation details. Please try again.",
     "unable_to_load": "Unable to Load Organisation",
     "try_again": "Try Again",
     "browse_organisations": "Browse Organisations",
-    "website": "Website",
-    "contact": "Contact",
+    "website": "ウェブサイト",
+    "contact": "連絡する",
     "opportunities": "Opportunities",
     "volunteers": "Volunteers",
     "hours_logged": "Hours Logged",
@@ -216,17 +244,22 @@
     "cover_message_placeholder": "Tell the organisation why you'd like to volunteer...",
     "cancel": "Cancel",
     "submit_application": "Submit Application",
-    "job_openings": "Job Openings",
-    "meta_description_fallback": "このコミュニティタイムバンクで {{name}} と {{count}} 件の有効なボランティア機会を見つけましょう。"
+    "job_openings": "求人情報",
+    "meta_description_fallback": "このコミュニティタイムバンクで {{name}} と {{count}} 件の有効なボランティア機会を見つけましょう。",
+    "load_failed": "組織の詳細を読み込めませんでした",
+    "members_count": "{{count}}人のメンバー",
+    "join": "組織に参加する",
+    "leave": "組織を退会する",
+    "edit": "編集"
   },
   "emergency_alerts": {
-    "heading": "Emergency Alerts",
+    "heading": "緊急アラート",
     "pending_count": "{{count}} pending",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_alerts_title": "No emergency alerts",
     "no_alerts_desc": "You don't have any emergency shift requests at the moment.",
-    "load_failed": "Failed to load alerts. Please try again.",
+    "load_failed": "アラートを読み込めませんでした",
     "load_error": "Unable to load alerts. Please try again.",
     "priority_critical": "Critical",
     "priority_urgent": "Urgent",
@@ -236,15 +269,18 @@
     "accepted": "Accepted",
     "declined": "Declined",
     "from_coordinator": "From {{name}}",
-    "expires": "Expires {{date}}"
+    "expires": "Expires {{date}}",
+    "subtitle": "コミュニティメンバーに緊急通知を送信する",
+    "send": "アラートを送信",
+    "no_alerts": "アクティブなアラートはありません"
   },
   "group_signups": {
-    "heading": "Group Sign-ups",
+    "heading": "グループ登録",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_signups_title": "No group sign-ups",
     "no_signups_desc": "You are not part of any group shift reservations yet. Group sign-ups let you volunteer together with friends or team members.",
-    "load_failed": "Failed to load group reservations. Please try again.",
+    "load_failed": "登録を読み込めませんでした",
     "load_error": "Unable to load group reservations. Please try again.",
     "leader": "Leader",
     "members": "Members",
@@ -256,20 +292,26 @@
     "email_placeholder": "member@example.com",
     "cancel": "Cancel",
     "add_member_failed": "Failed to add member. They may already be in the group or the email is invalid.",
-    "add_member_error": "Unable to add member. Please check the email and try again."
+    "add_member_error": "Unable to add member. Please check the email and try again.",
+    "subtitle": "グループ参加リクエストを管理する",
+    "empty_state": "保留中の登録リクエストはありません",
+    "approve": "承認",
+    "reject": "却下"
   },
   "recommended_shifts": {
-    "heading": "Recommended for You",
+    "heading": "おすすめのシフト",
     "refresh": "Refresh",
     "try_again": "Try Again",
     "no_recommendations_title": "No recommendations yet",
     "no_recommendations_desc": "Add skills to your profile to get personalized shift recommendations.",
     "match_score": "{{score}}% match",
-    "load_failed": "Failed to load recommendations. Please try again.",
-    "load_error": "Unable to load recommendations. Please try again."
+    "load_failed": "おすすめシフトを読み込めませんでした",
+    "load_error": "Unable to load recommendations. Please try again.",
+    "subtitle": "スキルと空き状況に基づく提案シフト",
+    "empty_state": "おすすめのシフトはありません"
   },
   "certificates_tab": {
-    "heading": "Impact Certificates",
+    "heading": "証明書",
     "generate": "Generate Certificate",
     "description": "Certificates include all of your approved volunteer hours across every organisation.",
     "try_again": "Try Again",
@@ -282,14 +324,16 @@
     "generated_success": "Certificate generated!",
     "no_verified_hours": "No verified volunteer hours found. Hours must be approved before generating a certificate.",
     "generate_failed": "Failed to generate certificate. Please try again.",
-    "load_failed": "Failed to load certificates. Please try again.",
-    "load_error": "Unable to load certificates. Please try again."
+    "load_failed": "証明書を読み込めませんでした",
+    "load_error": "証明書の読み込みエラー",
+    "subtitle": "取得した証明書とバッジ",
+    "empty_state": "まだ証明書はありません"
   },
   "page_meta": {
     "register_organisation": {
       "title": "Register Organisation"
     }
   },
-  "remote": "Remote",
-  "closes_date": "Closes {{date}}"
+  "remote": "リモート",
+  "closes_date": "{{date}}に締め切り"
 }

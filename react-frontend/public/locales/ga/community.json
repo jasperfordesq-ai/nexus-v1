@@ -287,9 +287,9 @@
   },
   "page_meta": {
     "register_organisation": {
-      "title": "Register Organisation"
+      "title": "Eagraíocht a Chlárú"
     }
   },
-  "remote": "Remote",
-  "closes_date": "Closes {{date}}"
+  "remote": "Cianda",
+  "closes_date": "Dúnann {{date}}"
 }
