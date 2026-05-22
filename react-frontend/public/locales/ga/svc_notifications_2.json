@@ -85,12 +85,142 @@
   "event.cancelled_reason_suffix": " Reason: {{reason}}",
   "event.rsvp_cancelled": "This event has been cancelled",
   "event.rsvp_ended": "This event has already ended",
+  "event.rsvp_confirmed_going": "You're going to \"{{title}}\"!",
+  "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
   "comment.deleted": "Comment deleted",
   "webhook.test_delivery": "This is a test webhook delivery.",
   "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
-  "event.rsvp_confirmed_going": "You're going to \"{{title}}\"!",
-  "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
   "volunteer.shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
   "volunteer.shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
-  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
+  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled",
+  "org_wallet": {
+    "amount_must_be_greater_than_zero": "Caithfidh an méid a bheith níos mó ná nialas",
+    "user_not_active_member": "Níl an t-úsáideoir ina bhall gníomhach den eagraíocht seo",
+    "insufficient_balance": "Cothromaíocht neamhleor",
+    "requester_not_active_member": "Níl an t-iarratasóir ina bhall gníomhach den eagraíocht seo",
+    "insufficient_org_wallet_balance": "Iarmhéid sparán eagraíochta neamhleor",
+    "transfer_request_not_found_or_not_pending": "Níor aimsíodh iarratas aistrithe nó níl sé ar feitheamh",
+    "only_admin_or_owner_can_approve": "Ní féidir ach le riarthóir nó úinéir iarratais a cheadú",
+    "transfer_request_not_found_or_already_processed": "Níor aimsíodh an t-iarratas aistrithe nó próiseáladh é cheana",
+    "only_admin_or_owner_can_reject": "Ní féidir ach le riarthóir nó úinéir iarratais a dhiúltú",
+    "transfer_request_already_processed": "Iarratas aistrithe próiseáilte cheana féin",
+    "only_requester_can_cancel": "Ní féidir ach leis an iarratasóir an t-iarratas seo a chealú",
+    "admin_user_id_required": "Teastaíonn aitheantas úsáideora riaracháin le haghaidh aistrithe díreacha",
+    "only_admin_or_owner_can_direct_transfer": "Ní féidir ach le riarthóir nó úinéir aistrithe díreacha a dhéanamh"
+  },
+  "vol_org_wallet": {
+    "amount_must_be_greater_than_zero": "Caithfidh an méid a bheith níos mó ná 0",
+    "deposit_cannot_exceed_1000": "Ní féidir leis an méid taisce a bheith níos mó ná 1000 uair",
+    "user_not_found": "Úsáideoir gan aimsiú",
+    "organization_not_found": "Eagraíocht gan aimsiú",
+    "amount_must_be_at_least_1": "Ní mór méid a bheith ar a laghad 1 uair an chloig",
+    "insufficient_personal_balance": "Cothromaíocht phearsanta neamhleor",
+    "deposit_successful": "Éarlais rathúil",
+    "insufficient_organization_balance": "Cothromaíocht eagraíochta neamhleor",
+    "volunteer_not_found": "Deonach gan aimsiú",
+    "payment_successful": "D'éirigh leis an íocaíocht",
+    "amount_cannot_be_zero": "Ní féidir leis an méid a bheith nialas",
+    "adjustment_negative_balance": "Bheadh ​​cothromaíocht dhiúltach mar thoradh ar choigeartú",
+    "adjustment_applied": "Coigeartú i bhfeidhm"
+  },
+  "registration": {
+    "queued_for_review": "Tá do chuntas ciúáilte le haghaidh athbhreithniú láimhe.",
+    "complete": "Clárú críochnaithe!",
+    "verification_unavailable": "Níl fíorú aitheantais ar fáil faoi láthair.",
+    "welcome": "Clárú críochnaithe! Fáilte romhat ar bord.",
+    "pending_admin_approval": "Clárú rathúil! Tá do chuntas ar feitheamh ceadú an riarthóir.",
+    "verify_identity": "Clárú rathúil! Fíoraigh d'aitheantas chun leanúint ar aghaidh.",
+    "pending_review": "Clárú faighte. Déanfaidh riarthóir d'iarratas a athbhreithniú.",
+    "added_to_waitlist": "Cuireadh leis an liosta feithimh thú. Cuirfimid tú ar an eolas nuair a osclaíonn láthair.",
+    "user_approved_activated": "Tá an t-úsáideoir ceadaithe agus gníomhachtaithe.",
+    "user_verification_rejected": "Diúltaíodh don fhíorú úsáideora."
+  },
+  "federation": {
+    "partnership_request_sent": "Iarratas comhpháirtíochta seolta",
+    "partnership_approved": "Comhpháirtíocht faofa",
+    "counter_proposal_sent": "Frith-togra seolta",
+    "counter_proposal_accepted": "Glacadh leis an bhfrith-mholta, tá an chomhpháirtíocht gníomhach anois",
+    "partnership_request_rejected": "Diúltaíodh don iarratas comhpháirtíochta",
+    "partnership_suspended": "Comhpháirtíocht ar fionraí",
+    "partnership_reactivated": "Comhpháirtíocht athghníomhachtaithe",
+    "partnership_terminated": "Cuireadh deireadh le comhpháirtíocht",
+    "permissions_updated": "Ceadanna nuashonraithe",
+    "notify_partnership_approved": "Tá d’iarratas comhpháirtíochta cónaidhm ceadaithe ag {{tenant_name}}.",
+    "notify_partnership_rejected": "Dhiúltaigh {{tenant_name}} d’iarratas comhpháirtíochta an chónaidhm.",
+    "notify_partnership_terminated": "Chuir {{tenant_name}} deireadh le comhpháirtíocht na Cónaidhme."
+  },
+  "team_task": {
+    "title_required": "Tá teideal ag teastáil",
+    "invalid_status": "Stádas neamhbhailí",
+    "invalid_priority": "Tosaíocht neamhbhailí",
+    "task_not_found": "Níor aimsíodh an tasc",
+    "title_cannot_be_empty": "Ní féidir leis an teideal a bheith folamh"
+  },
+  "team_document": {
+    "no_file_provided": "Níor soláthraíodh aon chomhad",
+    "file_upload_failed": "Theip ar uaslódáil an chomhaid",
+    "file_type_not_allowed": "Ní cheadaítear an cineál comhaid. Glactar leis: PDF, íomhánna, doiciméid Oifige, CSV, téacs.",
+    "file_must_be_under_20mb": "Ní mór don chomhad a bheith faoi 20MB",
+    "failed_to_save_file": "Theip ar shábháil an chomhaid uaslódáilte",
+    "document_not_found": "Níor aimsíodh an doiciméad"
+  },
+  "moderation": {
+    "invalid_decision": "Cinneadh neamhbhailí. Ní mór é a cheadú nó a dhiúltú.",
+    "item_not_found": "Níor aimsíodh an scuaine modhnóireachta.",
+    "already_reviewed": "Tá athbhreithniú déanta ar an mír seo cheana féin.",
+    "rejection_reason_required": "Tá cúis diúltaithe ag teastáil.",
+    "content_decision": "Ábhar: Cinneadh."
+  },
+  "tenant_settings": {
+    "pending_verification": "Tá d'fhíorú aitheantais ar feitheamh. Fan le faomhadh.",
+    "verification_failed": "Theip ar d'fhíorú aitheantais. Déan teagmháil le tacaíocht.",
+    "email_not_verified": "Fíoraigh do sheoladh ríomhphoist roimh logáil isteach.",
+    "pending_admin_approval": "Tá do chuntas ar feitheamh ceadú an riarthóir."
+  },
+  "ai": {
+    "provider_not_configured": "Níl an soláthraí cumraithe (eochair API in easnamh)",
+    "connection_successful": "Ceangal rathúil",
+    "ollama_not_configured": "URL óstaigh Ollama gan a bheith cumraithe",
+    "ollama_cannot_connect": "Ní féidir ceangal le Ollama: :error",
+    "ollama_connected": "Ceangailte le hOllama (:samhlacha comhairimh ar fáil)",
+    "ollama_http_error": "Chuir Ollama HTTP :code ar ais",
+    "provider_error": "Tharla earráid agus d'iarratas AI á phróiseáil. Bain triail eile as."
+  },
+  "report_export": {
+    "no_data": "Níor aimsíodh aon sonraí don tuarascáil agus do na scagairí roghnaithe."
+  },
+  "transaction_export": {
+    "failed": "Theip ar ráiteas a ghiniúint. Bain triail eile as."
+  },
+  "streak": {
+    "already_recorded": "Taifeadta cheana inniu"
+  },
+  "safeguarding": {
+    "assignment_created": "Cruthaíodh tasc cosanta"
+  },
+  "review": {
+    "submitted_successfully": "D'éirigh leis an athbhreithniú a chur isteach"
+  },
+  "event": {
+    "added_to_waitlist": "Tá an ócáid ​​seo lán. Cuireadh leis an liosta feithimh thú.",
+    "reminder_tomorrow": "Meabhrúchán: Tá \"{{title}}\" amárach - {{when}}",
+    "reminder_1h": "Ag tosú go luath: tosaíonn \"{{title}}\" i 1 uair - {{when}}",
+    "cancelled_notification": "Cuireadh an imeacht \"{{title}}\" ar ceal.",
+    "cancelled_reason_suffix": "Cúis: {{reason}}",
+    "rsvp_cancelled": "Cuireadh an imeacht seo ar ceal",
+    "rsvp_ended": "Tá deireadh leis an imeacht seo cheana féin",
+    "rsvp_confirmed_going": "Tá tú ag dul go dtí \"{{title}}\"!",
+    "rsvp_confirmed_interested": "Léirigh tú spéis in \"{{title}}\""
+  },
+  "comment": {
+    "deleted": "Trácht scriosta"
+  },
+  "webhook": {
+    "test_delivery": "Is seachadadh crúca gréasáin tástála é seo."
+  },
+  "volunteer": {
+    "shift_signup_confirmed": "Tá tú cláraithe le haghaidh athrú deonach ar {{date}}",
+    "shift_signup_cancelled": "Cuireadh do chlárú le haghaidh shift deonach ar ceal",
+    "opportunity_cancelled": "Tá deis oibrithe deonacha \"{{title}}\" curtha ar ceal"
+  }
 }

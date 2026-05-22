@@ -79,9 +79,6 @@
   "safeguarding.assignment_created": "Safeguarding assignment created",
   "review.submitted_successfully": "Review submitted successfully",
   "event.added_to_waitlist": "This event is full. You have been added to the waitlist.",
-  "comment.deleted": "Comment deleted",
-  "webhook.test_delivery": "This is a test webhook delivery.",
-  "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
   "event.reminder_tomorrow": "Reminder: \"{{title}}\" is tomorrow — {{when}}",
   "event.reminder_1h": "Starting soon: \"{{title}}\" begins in 1 hour — {{when}}",
   "event.cancelled_notification": "The event \"{{title}}\" has been cancelled.",
@@ -90,7 +87,140 @@
   "event.rsvp_ended": "This event has already ended",
   "event.rsvp_confirmed_going": "You're going to \"{{title}}\"!",
   "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
+  "comment.deleted": "Comment deleted",
+  "webhook.test_delivery": "This is a test webhook delivery.",
+  "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
   "volunteer.shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
   "volunteer.shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
-  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
+  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled",
+  "org_wallet": {
+    "amount_must_be_greater_than_zero": "Het bedrag moet groter zijn dan nul",
+    "user_not_active_member": "Gebruiker is geen actief lid van deze organisatie",
+    "insufficient_balance": "Onvoldoende evenwicht",
+    "requester_not_active_member": "Aanvrager is geen actief lid van deze organisatie",
+    "insufficient_org_wallet_balance": "Onvoldoende saldo van de organisatieportemonnee",
+    "transfer_request_not_found_or_not_pending": "Overdrachtsverzoek niet gevonden of niet in behandeling",
+    "only_admin_or_owner_can_approve": "Alleen de beheerder of eigenaar kan verzoeken goedkeuren",
+    "transfer_request_not_found_or_already_processed": "Overboekingsverzoek niet gevonden of al verwerkt",
+    "only_admin_or_owner_can_reject": "Alleen de beheerder of eigenaar kan verzoeken afwijzen",
+    "transfer_request_already_processed": "Overboekingsverzoek al verwerkt",
+    "only_requester_can_cancel": "Alleen de aanvrager kan dit verzoek annuleren",
+    "admin_user_id_required": "Voor directe overdrachten is een beheerdersgebruikers-ID vereist",
+    "only_admin_or_owner_can_direct_transfer": "Alleen de beheerder of eigenaar kan directe overdrachten uitvoeren"
+  },
+  "vol_org_wallet": {
+    "amount_must_be_greater_than_zero": "Bedrag moet groter zijn dan 0",
+    "deposit_cannot_exceed_1000": "Het stortingsbedrag mag niet groter zijn dan 1000 uur",
+    "user_not_found": "Gebruiker niet gevonden",
+    "organization_not_found": "Organisatie niet gevonden",
+    "amount_must_be_at_least_1": "Het bedrag moet minimaal 1 uur zijn",
+    "insufficient_personal_balance": "Onvoldoende persoonlijk evenwicht",
+    "deposit_successful": "Storting succesvol",
+    "insufficient_organization_balance": "Onvoldoende organisatieevenwicht",
+    "volunteer_not_found": "Vrijwilliger niet gevonden",
+    "payment_successful": "Betaling succesvol",
+    "amount_cannot_be_zero": "Het bedrag kan niet nul zijn",
+    "adjustment_negative_balance": "Aanpassing zou resulteren in een negatief saldo",
+    "adjustment_applied": "Aanpassing toegepast"
+  },
+  "registration": {
+    "queued_for_review": "Uw account staat in de wachtrij voor handmatige beoordeling.",
+    "complete": "Registratie voltooid!",
+    "verification_unavailable": "Identiteitsverificatie is momenteel niet beschikbaar.",
+    "welcome": "Registratie voltooid! Welkom aan boord.",
+    "pending_admin_approval": "Registratie succesvol! Uw account wacht op goedkeuring door de beheerder.",
+    "verify_identity": "Registratie succesvol! Verifieer uw identiteit om door te gaan.",
+    "pending_review": "Registratie ontvangen. Een beheerder zal uw verzoek beoordelen.",
+    "added_to_waitlist": "U bent toegevoegd aan de wachtlijst. We laten het je weten als er een plekje vrijkomt.",
+    "user_approved_activated": "Gebruiker is goedgekeurd en geactiveerd.",
+    "user_verification_rejected": "Gebruikersverificatie is afgewezen."
+  },
+  "federation": {
+    "partnership_request_sent": "Partnerschapsverzoek verzonden",
+    "partnership_approved": "Partnerschap goedgekeurd",
+    "counter_proposal_sent": "Tegenvoorstel verzonden",
+    "counter_proposal_accepted": "Tegenvoorstel aanvaard, partnerschap is nu actief",
+    "partnership_request_rejected": "Partnerschapsverzoek afgewezen",
+    "partnership_suspended": "Partnerschap opgeschort",
+    "partnership_reactivated": "Partnerschap opnieuw geactiveerd",
+    "partnership_terminated": "Partnerschap beëindigd",
+    "permissions_updated": "Machtigingen bijgewerkt",
+    "notify_partnership_approved": "{{tenant_name}} heeft uw federatiepartnerschapsverzoek goedgekeurd.",
+    "notify_partnership_rejected": "{{tenant_name}} heeft het federatiepartnerschapsverzoek afgewezen.",
+    "notify_partnership_terminated": "{{tenant_name}} heeft het federatiepartnerschap beëindigd."
+  },
+  "team_task": {
+    "title_required": "Titel is vereist",
+    "invalid_status": "Ongeldige status",
+    "invalid_priority": "Ongeldige prioriteit",
+    "task_not_found": "Taak niet gevonden",
+    "title_cannot_be_empty": "Titel mag niet leeg zijn"
+  },
+  "team_document": {
+    "no_file_provided": "Geen bestand opgegeven",
+    "file_upload_failed": "Bestandsupload mislukt",
+    "file_type_not_allowed": "Bestandstype niet toegestaan. Geaccepteerd: PDF, afbeeldingen, Office-documenten, CSV, tekst.",
+    "file_must_be_under_20mb": "Het bestand moet kleiner zijn dan 20 MB",
+    "failed_to_save_file": "Kan het geüploade bestand niet opslaan",
+    "document_not_found": "Document niet gevonden"
+  },
+  "moderation": {
+    "invalid_decision": "Ongeldige beslissing. Moet worden goedgekeurd of afgewezen.",
+    "item_not_found": "Moderatiewachtrijitem niet gevonden.",
+    "already_reviewed": "Dit artikel is al beoordeeld.",
+    "rejection_reason_required": "Reden voor afwijzing is vereist.",
+    "content_decision": "Inhoud was: beslissing."
+  },
+  "tenant_settings": {
+    "pending_verification": "Uw identiteitsverificatie is in behandeling. Wacht op goedkeuring.",
+    "verification_failed": "Uw identiteitsverificatie is mislukt. Neem contact op met de ondersteuning.",
+    "email_not_verified": "Controleer uw e-mailadres voordat u inlogt.",
+    "pending_admin_approval": "Uw account wacht op goedkeuring door de beheerder."
+  },
+  "ai": {
+    "provider_not_configured": "Provider niet geconfigureerd (ontbrekende API-sleutel)",
+    "connection_successful": "Verbinding succesvol",
+    "ollama_not_configured": "Ollama-host-URL niet geconfigureerd",
+    "ollama_cannot_connect": "Kan geen verbinding maken met Ollama::fout",
+    "ollama_connected": "Verbonden met Ollama (:aantal modellen beschikbaar)",
+    "ollama_http_error": "Ollama heeft HTTP:code geretourneerd",
+    "provider_error": "Er is een fout opgetreden tijdens het verwerken van uw AI-verzoek. Probeer het opnieuw."
+  },
+  "report_export": {
+    "no_data": "Er zijn geen gegevens gevonden voor het geselecteerde rapport en de filters."
+  },
+  "transaction_export": {
+    "failed": "Kan geen verklaring genereren. Probeer het opnieuw."
+  },
+  "streak": {
+    "already_recorded": "Vandaag al opgenomen"
+  },
+  "safeguarding": {
+    "assignment_created": "Beveiligingsopdracht aangemaakt"
+  },
+  "review": {
+    "submitted_successfully": "Beoordeling succesvol verzonden"
+  },
+  "event": {
+    "added_to_waitlist": "Dit evenement is vol. U bent toegevoegd aan de wachtlijst.",
+    "reminder_tomorrow": "Herinnering: \"{{title}}\" is morgen: {{when}}",
+    "reminder_1h": "Binnenkort van start: \"{{title}}\" begint over 1 uur — {{when}}",
+    "cancelled_notification": "Het evenement \"{{title}}\" is geannuleerd.",
+    "cancelled_reason_suffix": "Reden: {{reason}}",
+    "rsvp_cancelled": "Dit evenement is geannuleerd",
+    "rsvp_ended": "Dit evenement is al afgelopen",
+    "rsvp_confirmed_going": "Je gaat naar \"{{title}}\"!",
+    "rsvp_confirmed_interested": "Je hebt interesse getoond in '{{title}}'"
+  },
+  "comment": {
+    "deleted": "Reactie verwijderd"
+  },
+  "webhook": {
+    "test_delivery": "Dit is een testwebhooklevering."
+  },
+  "volunteer": {
+    "shift_signup_confirmed": "Je bent aangemeld voor een vrijwilligersdienst op {{date}}",
+    "shift_signup_cancelled": "Je aanmelding voor vrijwilligerswerk is geannuleerd",
+    "opportunity_cancelled": "Vrijwilligerskans \"{{title}}\" is geannuleerd"
+  }
 }

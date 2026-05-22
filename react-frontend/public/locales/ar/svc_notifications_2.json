@@ -79,9 +79,6 @@
   "safeguarding.assignment_created": "Safeguarding assignment created",
   "review.submitted_successfully": "Review submitted successfully",
   "event.added_to_waitlist": "This event is full. You have been added to the waitlist.",
-  "comment.deleted": "Comment deleted",
-  "webhook.test_delivery": "This is a test webhook delivery.",
-  "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
   "event.reminder_tomorrow": "Reminder: \"{{title}}\" is tomorrow — {{when}}",
   "event.reminder_1h": "Starting soon: \"{{title}}\" begins in 1 hour — {{when}}",
   "event.cancelled_notification": "The event \"{{title}}\" has been cancelled.",
@@ -90,7 +87,140 @@
   "event.rsvp_ended": "This event has already ended",
   "event.rsvp_confirmed_going": "You're going to \"{{title}}\"!",
   "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
+  "comment.deleted": "Comment deleted",
+  "webhook.test_delivery": "This is a test webhook delivery.",
+  "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
   "volunteer.shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
   "volunteer.shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
-  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
+  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled",
+  "org_wallet": {
+    "amount_must_be_greater_than_zero": "يجب أن يكون المبلغ أكبر من الصفر",
+    "user_not_active_member": "المستخدم ليس عضوا نشطا في هذه المنظمة",
+    "insufficient_balance": "رصيد غير كاف",
+    "requester_not_active_member": "الطالب ليس عضوا نشطا في هذه المنظمة",
+    "insufficient_org_wallet_balance": "رصيد محفظة المنظمة غير كافي",
+    "transfer_request_not_found_or_not_pending": "لم يتم العثور على طلب النقل أو أنه غير معلق",
+    "only_admin_or_owner_can_approve": "يمكن للمسؤول أو المالك فقط الموافقة على الطلبات",
+    "transfer_request_not_found_or_already_processed": "لم يتم العثور على طلب النقل أو تمت معالجته بالفعل",
+    "only_admin_or_owner_can_reject": "يمكن للمسؤول أو المالك فقط رفض الطلبات",
+    "transfer_request_already_processed": "تمت معالجة طلب النقل بالفعل",
+    "only_requester_can_cancel": "يمكن لمقدم الطلب فقط إلغاء هذا الطلب",
+    "admin_user_id_required": "مطلوب معرف المستخدم المسؤول لعمليات النقل المباشر",
+    "only_admin_or_owner_can_direct_transfer": "يمكن فقط للمسؤول أو المالك إجراء عمليات النقل المباشرة"
+  },
+  "vol_org_wallet": {
+    "amount_must_be_greater_than_zero": "يجب أن يكون المبلغ أكبر من 0",
+    "deposit_cannot_exceed_1000": "لا يمكن أن يتجاوز مبلغ الإيداع 1000 ساعة",
+    "user_not_found": "لم يتم العثور على المستخدم",
+    "organization_not_found": "لم يتم العثور على المنظمة",
+    "amount_must_be_at_least_1": "يجب أن يكون المبلغ على الأقل 1 ساعة",
+    "insufficient_personal_balance": "عدم كفاية التوازن الشخصي",
+    "deposit_successful": "تم الإيداع بنجاح",
+    "insufficient_organization_balance": "عدم كفاية التوازن التنظيمي",
+    "volunteer_not_found": "لم يتم العثور على المتطوع",
+    "payment_successful": "تم الدفع بنجاح",
+    "amount_cannot_be_zero": "لا يمكن أن يكون المبلغ صفراً",
+    "adjustment_negative_balance": "التعديل سيؤدي إلى رصيد سلبي",
+    "adjustment_applied": "تم تطبيق التعديل"
+  },
+  "registration": {
+    "queued_for_review": "لقد تم وضع حسابك في قائمة الانتظار للمراجعة اليدوية.",
+    "complete": "اكتمل التسجيل!",
+    "verification_unavailable": "التحقق من الهوية غير متوفر حاليا.",
+    "welcome": "اكتمل التسجيل! مرحبا بكم على متن الطائرة.",
+    "pending_admin_approval": "التسجيل ناجح! حسابك في انتظار موافقة المشرف.",
+    "verify_identity": "التسجيل ناجح! يرجى التحقق من هويتك للمتابعة.",
+    "pending_review": "تم استلام التسجيل سيقوم أحد المسؤولين بمراجعة طلبك.",
+    "added_to_waitlist": "لقد تمت إضافتك إلى قائمة الانتظار. سنقوم بإعلامك عند فتح مكان.",
+    "user_approved_activated": "تمت الموافقة على المستخدم وتفعيله.",
+    "user_verification_rejected": "تم رفض التحقق من المستخدم."
+  },
+  "federation": {
+    "partnership_request_sent": "تم إرسال طلب الشراكة",
+    "partnership_approved": "تمت الموافقة على الشراكة",
+    "counter_proposal_sent": "تم إرسال الاقتراح المضاد",
+    "counter_proposal_accepted": "تم قبول الاقتراح المضاد، وأصبحت الشراكة نشطة الآن",
+    "partnership_request_rejected": "تم رفض طلب الشراكة",
+    "partnership_suspended": "تم تعليق الشراكة",
+    "partnership_reactivated": "تم إعادة تفعيل الشراكة",
+    "partnership_terminated": "تم إنهاء الشراكة",
+    "permissions_updated": "تم تحديث الأذونات",
+    "notify_partnership_approved": "لقد وافق {{tenant_name}} على طلب شراكة الاتحاد الخاص بك.",
+    "notify_partnership_rejected": "لقد رفض {{tenant_name}} طلب شراكة الاتحاد.",
+    "notify_partnership_terminated": "أنهت {{tenant_name}} شراكة الاتحاد."
+  },
+  "team_task": {
+    "title_required": "العنوان مطلوب",
+    "invalid_status": "الحالة غير صالحة",
+    "invalid_priority": "الأولوية غير صالحة",
+    "task_not_found": "لم يتم العثور على المهمة",
+    "title_cannot_be_empty": "لا يمكن أن يكون العنوان فارغًا"
+  },
+  "team_document": {
+    "no_file_provided": "لم يتم تقديم أي ملف",
+    "file_upload_failed": "فشل تحميل الملف",
+    "file_type_not_allowed": "نوع الملف غير مسموح به. المقبولة: PDF، الصور، مستندات Office، CSV، النص.",
+    "file_must_be_under_20mb": "يجب أن يكون حجم الملف أقل من 20 ميغابايت",
+    "failed_to_save_file": "فشل حفظ الملف الذي تم تحميله",
+    "document_not_found": "لم يتم العثور على الوثيقة"
+  },
+  "moderation": {
+    "invalid_decision": "قرار غير صالح. يجب الموافقة أو الرفض.",
+    "item_not_found": "لم يتم العثور على عنصر قائمة انتظار الإشراف.",
+    "already_reviewed": "لقد تمت مراجعة هذا العنصر بالفعل.",
+    "rejection_reason_required": "سبب الرفض مطلوب",
+    "content_decision": "المحتوى كان: القرار."
+  },
+  "tenant_settings": {
+    "pending_verification": "التحقق من هويتك معلق. يرجى الانتظار للحصول على الموافقة.",
+    "verification_failed": "لقد فشل التحقق من هويتك. يرجى الاتصال بالدعم.",
+    "email_not_verified": "يرجى التحقق من عنوان بريدك الإلكتروني قبل تسجيل الدخول.",
+    "pending_admin_approval": "حسابك في انتظار موافقة المشرف."
+  },
+  "ai": {
+    "provider_not_configured": "لم يتم تكوين الموفر (مفتاح API مفقود)",
+    "connection_successful": "تم الاتصال بنجاح",
+    "ollama_not_configured": "لم يتم تكوين عنوان URL لمضيف Olma",
+    "ollama_cannot_connect": "لا يمكن الاتصال بـ Olma: :error",
+    "ollama_connected": "متصل بـ Ollama (: عدد النماذج المتاحة)",
+    "ollama_http_error": "قام Olma بإرجاع HTTP :code",
+    "provider_error": "حدث خطأ أثناء معالجة طلب الذكاء الاصطناعي الخاص بك. يرجى المحاولة مرة أخرى."
+  },
+  "report_export": {
+    "no_data": "لم يتم العثور على بيانات للتقرير والمرشحات المحددة."
+  },
+  "transaction_export": {
+    "failed": "فشل في إنشاء البيان. يرجى المحاولة مرة أخرى."
+  },
+  "streak": {
+    "already_recorded": "تم تسجيلها بالفعل اليوم"
+  },
+  "safeguarding": {
+    "assignment_created": "تم إنشاء مهمة الحماية"
+  },
+  "review": {
+    "submitted_successfully": "تم إرسال المراجعة بنجاح"
+  },
+  "event": {
+    "added_to_waitlist": "هذا الحدث ممتلئ. لقد تمت إضافتك إلى قائمة الانتظار.",
+    "reminder_tomorrow": "تذكير: \"{{title}}\" سيصدر غدًا — {{when}}",
+    "reminder_1h": "سيبدأ قريبًا: سيبدأ \"{{title}}\" خلال ساعة واحدة — {{when}}",
+    "cancelled_notification": "تم إلغاء الحدث \"{{title}}\".",
+    "cancelled_reason_suffix": "السبب: {{reason}}",
+    "rsvp_cancelled": "تم إلغاء هذا الحدث",
+    "rsvp_ended": "لقد انتهى هذا الحدث بالفعل",
+    "rsvp_confirmed_going": "أنت ذاهب إلى \"{{title}}\"!",
+    "rsvp_confirmed_interested": "لقد أبديت اهتمامك بـ \"{{title}}\""
+  },
+  "comment": {
+    "deleted": "تم حذف التعليق"
+  },
+  "webhook": {
+    "test_delivery": "هذا هو تسليم اختبار webhook."
+  },
+  "volunteer": {
+    "shift_signup_confirmed": "لقد قمت بالتسجيل في مناوبة تطوعية على {{date}}",
+    "shift_signup_cancelled": "لقد تم إلغاء الاشتراك في الوردية التطوعية الخاصة بك",
+    "opportunity_cancelled": "تم إلغاء الفرصة التطوعية \"{{title}}\"."
+  }
 }

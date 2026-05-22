@@ -79,9 +79,6 @@
   "safeguarding.assignment_created": "Safeguarding assignment created",
   "review.submitted_successfully": "Review submitted successfully",
   "event.added_to_waitlist": "This event is full. You have been added to the waitlist.",
-  "comment.deleted": "Comment deleted",
-  "webhook.test_delivery": "This is a test webhook delivery.",
-  "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
   "event.reminder_tomorrow": "Reminder: \"{{title}}\" is tomorrow — {{when}}",
   "event.reminder_1h": "Starting soon: \"{{title}}\" begins in 1 hour — {{when}}",
   "event.cancelled_notification": "The event \"{{title}}\" has been cancelled.",
@@ -90,7 +87,140 @@
   "event.rsvp_ended": "This event has already ended",
   "event.rsvp_confirmed_going": "You're going to \"{{title}}\"!",
   "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
+  "comment.deleted": "Comment deleted",
+  "webhook.test_delivery": "This is a test webhook delivery.",
+  "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
   "volunteer.shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
   "volunteer.shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
-  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
+  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled",
+  "org_wallet": {
+    "amount_must_be_greater_than_zero": "金額はゼロより大きくなければなりません",
+    "user_not_active_member": "ユーザーはこの組織のアクティブなメンバーではありません",
+    "insufficient_balance": "残高不足",
+    "requester_not_active_member": "リクエスタはこの組織のアクティブなメンバーではありません",
+    "insufficient_org_wallet_balance": "組織のウォレット残高が不十分です",
+    "transfer_request_not_found_or_not_pending": "転送リクエストが見つからないか保留中ではありません",
+    "only_admin_or_owner_can_approve": "管理者または所有者のみがリクエストを承認できます",
+    "transfer_request_not_found_or_already_processed": "転送リクエストが見つからないか、すでに処理されています",
+    "only_admin_or_owner_can_reject": "管理者または所有者のみがリクエストを拒否できます",
+    "transfer_request_already_processed": "転送リクエストはすでに処理されています",
+    "only_requester_can_cancel": "このリクエストをキャンセルできるのはリクエスト者のみです",
+    "admin_user_id_required": "直接転送には管理者ユーザーIDが必要です",
+    "only_admin_or_owner_can_direct_transfer": "直接転送を実行できるのは管理者または所有者のみです"
+  },
+  "vol_org_wallet": {
+    "amount_must_be_greater_than_zero": "金額は0より大きくなければなりません",
+    "deposit_cannot_exceed_1000": "デポジット額は 1000 時間を超えることはできません",
+    "user_not_found": "ユーザーが見つかりません",
+    "organization_not_found": "組織が見つかりません",
+    "amount_must_be_at_least_1": "量は少なくとも 1 時間である必要があります",
+    "insufficient_personal_balance": "個人のバランスが不十分",
+    "deposit_successful": "入金成功",
+    "insufficient_organization_balance": "組織バランスが不十分",
+    "volunteer_not_found": "ボランティアが見つからない",
+    "payment_successful": "支払いが成功しました",
+    "amount_cannot_be_zero": "金額をゼロにすることはできません",
+    "adjustment_negative_balance": "調整すると残高がマイナスになる",
+    "adjustment_applied": "調整が適用されました"
+  },
+  "registration": {
+    "queued_for_review": "あなたのアカウントは手動レビューのためにキューに入れられています。",
+    "complete": "登録完了！",
+    "verification_unavailable": "現在、本人確認をご利用いただけません。",
+    "welcome": "登録完了！ようこそ。",
+    "pending_admin_approval": "登録が成功しました！あなたのアカウントは管理者の承認待ちです。",
+    "verify_identity": "登録が成功しました！続行するには身元を確認してください。",
+    "pending_review": "登録を受け付けました。管理者がリクエストを検討します。",
+    "added_to_waitlist": "あなたは待機リストに追加されました。スポットが空いたらお知らせします。",
+    "user_approved_activated": "ユーザーは承認され、アクティブ化されました。",
+    "user_verification_rejected": "ユーザー認証が拒否されました。"
+  },
+  "federation": {
+    "partnership_request_sent": "パートナーシップリクエストを送信しました",
+    "partnership_approved": "パートナーシップが承認されました",
+    "counter_proposal_sent": "対案を送信しました",
+    "counter_proposal_accepted": "対案は受け入れられ、パートナーシップは現在アクティブです",
+    "partnership_request_rejected": "パートナーシップのリクエストが拒否されました",
+    "partnership_suspended": "パートナーシップの停止",
+    "partnership_reactivated": "パートナーシップが再開されました",
+    "partnership_terminated": "パートナーシップの終了",
+    "permissions_updated": "権限が更新されました",
+    "notify_partnership_approved": "{{tenant_name}} は、フェデレーション パートナーシップ リクエストを承認しました。",
+    "notify_partnership_rejected": "{{tenant_name}} はフェデレーション パートナーシップ要求を拒否しました。",
+    "notify_partnership_terminated": "{{tenant_name}} はフェデレーション パートナーシップを終了しました。"
+  },
+  "team_task": {
+    "title_required": "タイトルは必須です",
+    "invalid_status": "無効なステータス",
+    "invalid_priority": "無効な優先度",
+    "task_not_found": "タスクが見つかりません",
+    "title_cannot_be_empty": "タイトルを空にすることはできません"
+  },
+  "team_document": {
+    "no_file_provided": "ファイルが提供されていません",
+    "file_upload_failed": "ファイルのアップロードに失敗しました",
+    "file_type_not_allowed": "ファイルの種類は許可されていません。受け入れられる: PDF、画像、Office ドキュメント、CSV、テキスト。",
+    "file_must_be_under_20mb": "ファイルは 20MB 未満である必要があります",
+    "failed_to_save_file": "アップロードされたファイルの保存に失敗しました",
+    "document_not_found": "ドキュメントが見つかりません"
+  },
+  "moderation": {
+    "invalid_decision": "無効な決定。承認または拒否する必要があります。",
+    "item_not_found": "モデレーションキュー項目が見つかりません。",
+    "already_reviewed": "この商品はすでにレビューされています。",
+    "rejection_reason_required": "拒否理由は必須です。",
+    "content_decision": "内容は決定しました。"
+  },
+  "tenant_settings": {
+    "pending_verification": "本人確認が保留中です。承認をお待ちください。",
+    "verification_failed": "本人確認に失敗しました。サポートにお問い合わせください。",
+    "email_not_verified": "ログインする前にメールアドレスを確認してください。",
+    "pending_admin_approval": "あなたのアカウントは管理者の承認待ちです。"
+  },
+  "ai": {
+    "provider_not_configured": "プロバイダーが構成されていません (API キーがありません)",
+    "connection_successful": "接続成功",
+    "ollama_not_configured": "Ollama ホスト URL が構成されていません",
+    "ollama_cannot_connect": "Ollama に接続できません: :error",
+    "ollama_connected": "Ollama に接続 (:数個のモデルが利用可能)",
+    "ollama_http_error": "オラマが HTTP :code を返しました",
+    "provider_error": "AI リクエストの処理中にエラーが発生しました。もう一度試してください。"
+  },
+  "report_export": {
+    "no_data": "選択したレポートとフィルターのデータが見つかりません。"
+  },
+  "transaction_export": {
+    "failed": "ステートメントの生成に失敗しました。もう一度試してください。"
+  },
+  "streak": {
+    "already_recorded": "今日はすでに録音されています"
+  },
+  "safeguarding": {
+    "assignment_created": "保護割り当てが作成されました"
+  },
+  "review": {
+    "submitted_successfully": "レビューが正常に送信されました"
+  },
+  "event": {
+    "added_to_waitlist": "このイベントは満席です。あなたは待機リストに追加されました。",
+    "reminder_tomorrow": "リマインダー: 「{{title}}」は明日です — {{when}}",
+    "reminder_1h": "間もなく開始: 「{{title}}」は 1 時間後に始まります — {{when}}",
+    "cancelled_notification": "イベント「{{title}}」は中止となりました。",
+    "cancelled_reason_suffix": "理由: {{reason}}",
+    "rsvp_cancelled": "このイベントは中止されました",
+    "rsvp_ended": "このイベントはすでに終了しています",
+    "rsvp_confirmed_going": "「{{title}}」に行くんですね！",
+    "rsvp_confirmed_interested": "「{{title}}」に興味を示しました"
+  },
+  "comment": {
+    "deleted": "コメントが削除されました"
+  },
+  "webhook": {
+    "test_delivery": "これはテスト Webhook 配信です。"
+  },
+  "volunteer": {
+    "shift_signup_confirmed": "{{date}} のボランティア シフトに登録しています",
+    "shift_signup_cancelled": "ボランティアシフトの登録がキャンセルされました",
+    "opportunity_cancelled": "ボランティアの機会「{{title}}」はキャンセルされました"
+  }
 }

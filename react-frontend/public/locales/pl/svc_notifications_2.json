@@ -79,9 +79,6 @@
   "safeguarding.assignment_created": "Safeguarding assignment created",
   "review.submitted_successfully": "Review submitted successfully",
   "event.added_to_waitlist": "This event is full. You have been added to the waitlist.",
-  "comment.deleted": "Comment deleted",
-  "webhook.test_delivery": "This is a test webhook delivery.",
-  "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
   "event.reminder_tomorrow": "Reminder: \"{{title}}\" is tomorrow — {{when}}",
   "event.reminder_1h": "Starting soon: \"{{title}}\" begins in 1 hour — {{when}}",
   "event.cancelled_notification": "The event \"{{title}}\" has been cancelled.",
@@ -90,7 +87,140 @@
   "event.rsvp_ended": "This event has already ended",
   "event.rsvp_confirmed_going": "You're going to \"{{title}}\"!",
   "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
+  "comment.deleted": "Comment deleted",
+  "webhook.test_delivery": "This is a test webhook delivery.",
+  "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
   "volunteer.shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
   "volunteer.shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
-  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
+  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled",
+  "org_wallet": {
+    "amount_must_be_greater_than_zero": "Kwota musi być większa od zera",
+    "user_not_active_member": "Użytkownik nie jest aktywnym członkiem tej organizacji",
+    "insufficient_balance": "Niewystarczająca równowaga",
+    "requester_not_active_member": "Osoba zgłaszająca żądanie nie jest aktywnym członkiem tej organizacji",
+    "insufficient_org_wallet_balance": "Niewystarczające saldo portfela organizacji",
+    "transfer_request_not_found_or_not_pending": "Nie znaleziono prośby o przeniesienie lub nie oczekuje ona na realizację",
+    "only_admin_or_owner_can_approve": "Tylko administrator lub właściciel może zatwierdzać żądania",
+    "transfer_request_not_found_or_already_processed": "Nie znaleziono prośby o przeniesienie lub została ona już przetworzona",
+    "only_admin_or_owner_can_reject": "Tylko administrator lub właściciel może odrzucać prośby",
+    "transfer_request_already_processed": "Żądanie przeniesienia zostało już przetworzone",
+    "only_requester_can_cancel": "Tylko osoba żądająca może anulować to żądanie",
+    "admin_user_id_required": "Do przelewów bezpośrednich wymagany jest identyfikator administratora",
+    "only_admin_or_owner_can_direct_transfer": "Tylko administrator lub właściciel może wykonywać bezpośrednie przelewy"
+  },
+  "vol_org_wallet": {
+    "amount_must_be_greater_than_zero": "Kwota musi być większa niż 0",
+    "deposit_cannot_exceed_1000": "Kwota depozytu nie może przekraczać 1000 godzin",
+    "user_not_found": "Nie znaleziono użytkownika",
+    "organization_not_found": "Nie znaleziono organizacji",
+    "amount_must_be_at_least_1": "Kwota musi wynosić co najmniej 1 godzinę",
+    "insufficient_personal_balance": "Niewystarczająca równowaga osobista",
+    "deposit_successful": "Wpłata pomyślna",
+    "insufficient_organization_balance": "Niewystarczająca równowaga organizacyjna",
+    "volunteer_not_found": "Nie znaleziono ochotnika",
+    "payment_successful": "Płatność pomyślna",
+    "amount_cannot_be_zero": "Kwota nie może wynosić zero",
+    "adjustment_negative_balance": "Korekta skutkowałaby saldem ujemnym",
+    "adjustment_applied": "Zastosowano korektę"
+  },
+  "registration": {
+    "queued_for_review": "Twoje konto zostało oczekujące w kolejce do ręcznego sprawdzenia.",
+    "complete": "Rejestracja zakończona!",
+    "verification_unavailable": "Weryfikacja tożsamości jest obecnie niedostępna.",
+    "welcome": "Rejestracja zakończona! Witamy na pokładzie.",
+    "pending_admin_approval": "Registration successful! Twoje konto oczekuje na zatwierdzenie przez administratora.",
+    "verify_identity": "Rejestracja pomyślna! Aby kontynuować, zweryfikuj swoją tożsamość.",
+    "pending_review": "Rejestracja otrzymana. Administrator rozpatrzy Twoją prośbę.",
+    "added_to_waitlist": "Zostałeś dodany do listy oczekujących. Powiadomimy Cię, gdy zwolni się miejsce.",
+    "user_approved_activated": "Użytkownik został zatwierdzony i aktywowany.",
+    "user_verification_rejected": "Weryfikacja użytkownika została odrzucona."
+  },
+  "federation": {
+    "partnership_request_sent": "Wysłano prośbę o partnerstwo",
+    "partnership_approved": "Partnerstwo zatwierdzone",
+    "counter_proposal_sent": "Wysłano kontrpropozycję",
+    "counter_proposal_accepted": "Kontrpropozycja zaakceptowana, partnerstwo jest teraz aktywne",
+    "partnership_request_rejected": "Prośba o partnerstwo odrzucona",
+    "partnership_suspended": "Współpraca zawieszona",
+    "partnership_reactivated": "Partnerstwo reaktywowane",
+    "partnership_terminated": "Współpraca rozwiązana",
+    "permissions_updated": "Uprawnienia zaktualizowano",
+    "notify_partnership_approved": "{{tenant_name}} zatwierdził Twoją prośbę o partnerstwo w federacji.",
+    "notify_partnership_rejected": "{{tenant_name}} odrzucił prośbę o partnerstwo federacyjne.",
+    "notify_partnership_terminated": "{{tenant_name}} zakończył partnerstwo federacyjne."
+  },
+  "team_task": {
+    "title_required": "Tytuł jest wymagany",
+    "invalid_status": "Nieprawidłowy stan",
+    "invalid_priority": "Nieprawidłowy priorytet",
+    "task_not_found": "Nie znaleziono zadania",
+    "title_cannot_be_empty": "Tytuł nie może być pusty"
+  },
+  "team_document": {
+    "no_file_provided": "Nie podano pliku",
+    "file_upload_failed": "Przesyłanie pliku nie powiodło się",
+    "file_type_not_allowed": "Typ pliku nie jest dozwolony. Akceptowane: PDF, obrazy, dokumenty Office, CSV, tekst.",
+    "file_must_be_under_20mb": "Plik musi mieć mniej niż 20 MB",
+    "failed_to_save_file": "Nie udało się zapisać przesłanego pliku",
+    "document_not_found": "Nie znaleziono dokumentu"
+  },
+  "moderation": {
+    "invalid_decision": "Nieprawidłowa decyzja. Należy zatwierdzić lub odrzucić.",
+    "item_not_found": "Nie znaleziono elementu kolejki moderacji.",
+    "already_reviewed": "Ten element został już sprawdzony.",
+    "rejection_reason_required": "Wymagany jest powód odrzucenia.",
+    "content_decision": "Treść została:decyzja."
+  },
+  "tenant_settings": {
+    "pending_verification": "Twoja weryfikacja tożsamości oczekuje na realizację. Proszę poczekać na zatwierdzenie.",
+    "verification_failed": "Weryfikacja Twojej tożsamości nie powiodła się. Skontaktuj się z pomocą techniczną.",
+    "email_not_verified": "Przed zalogowaniem sprawdź swój adres e-mail.",
+    "pending_admin_approval": "Twoje konto oczekuje na zatwierdzenie przez administratora."
+  },
+  "ai": {
+    "provider_not_configured": "Dostawca nie skonfigurowany (brak klucza API)",
+    "connection_successful": "Połączenie pomyślne",
+    "ollama_not_configured": "Adres URL hosta Ollama nie jest skonfigurowany",
+    "ollama_cannot_connect": "Nie można połączyć się z Ollamą: :error",
+    "ollama_connected": "Połączono z Ollamą (dostępne modele zliczające)",
+    "ollama_http_error": "Ollama zwrócił HTTP :code",
+    "provider_error": "Wystąpił błąd podczas przetwarzania Twojego żądania AI. Spróbuj ponownie."
+  },
+  "report_export": {
+    "no_data": "Nie znaleziono danych dla wybranego raportu i filtrów."
+  },
+  "transaction_export": {
+    "failed": "Nie udało się wygenerować wyciągu. Spróbuj ponownie."
+  },
+  "streak": {
+    "already_recorded": "Już dzisiaj nagrane"
+  },
+  "safeguarding": {
+    "assignment_created": "Utworzono zadanie zabezpieczające"
+  },
+  "review": {
+    "submitted_successfully": "Recenzja przesłana pomyślnie"
+  },
+  "event": {
+    "added_to_waitlist": "To wydarzenie jest pełne. Zostałeś dodany do listy oczekujących.",
+    "reminder_tomorrow": "Przypomnienie: „{{title}}” będzie jutro — {{when}}",
+    "reminder_1h": "Już wkrótce: „{{title}}” rozpocznie się za 1 godzinę — {{when}}",
+    "cancelled_notification": "Wydarzenie „{{title}}” zostało odwołane.",
+    "cancelled_reason_suffix": "Powód: {{reason}}",
+    "rsvp_cancelled": "To wydarzenie zostało odwołane",
+    "rsvp_ended": "To wydarzenie już się zakończyło",
+    "rsvp_confirmed_going": "Idziesz do „{{title}}”!",
+    "rsvp_confirmed_interested": "Wykazałeś zainteresowanie „{{title}}”"
+  },
+  "comment": {
+    "deleted": "Komentarz usunięty"
+  },
+  "webhook": {
+    "test_delivery": "To jest testowa dostawa webhooka."
+  },
+  "volunteer": {
+    "shift_signup_confirmed": "Zapisałeś się na zmianę wolontariusza na {{date}}",
+    "shift_signup_cancelled": "Twoja rejestracja na zmianę wolontariusza została anulowana",
+    "opportunity_cancelled": "Możliwość wolontariatu „{{title}}” została anulowana"
+  }
 }

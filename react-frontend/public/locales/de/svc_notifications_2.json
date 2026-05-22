@@ -85,12 +85,142 @@
   "event.cancelled_reason_suffix": " Reason: {{reason}}",
   "event.rsvp_cancelled": "This event has been cancelled",
   "event.rsvp_ended": "This event has already ended",
+  "event.rsvp_confirmed_going": "You're going to \"{{title}}\"!",
+  "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
   "comment.deleted": "Comment deleted",
   "webhook.test_delivery": "This is a test webhook delivery.",
   "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
-  "event.rsvp_confirmed_going": "You're going to \"{{title}}\"!",
-  "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
   "volunteer.shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
   "volunteer.shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
-  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
+  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled",
+  "org_wallet": {
+    "amount_must_be_greater_than_zero": "Der Betrag muss größer als Null sein",
+    "user_not_active_member": "Der Benutzer ist kein aktives Mitglied dieser Organisation",
+    "insufficient_balance": "Unzureichendes Gleichgewicht",
+    "requester_not_active_member": "Der Antragsteller ist kein aktives Mitglied dieser Organisation",
+    "insufficient_org_wallet_balance": "Unzureichendes Guthaben in der Brieftasche der Organisation",
+    "transfer_request_not_found_or_not_pending": "Übertragungsanfrage nicht gefunden oder nicht ausstehend",
+    "only_admin_or_owner_can_approve": "Nur der Administrator oder Eigentümer kann Anfragen genehmigen",
+    "transfer_request_not_found_or_already_processed": "Übertragungsanfrage nicht gefunden oder bereits bearbeitet",
+    "only_admin_or_owner_can_reject": "Nur der Administrator oder Eigentümer kann Anfragen ablehnen",
+    "transfer_request_already_processed": "Übertragungsanfrage bereits bearbeitet",
+    "only_requester_can_cancel": "Nur der Anforderer kann diese Anfrage stornieren",
+    "admin_user_id_required": "Für direkte Übertragungen ist eine Admin-Benutzer-ID erforderlich",
+    "only_admin_or_owner_can_direct_transfer": "Nur der Administrator oder Eigentümer kann direkte Übertragungen durchführen"
+  },
+  "vol_org_wallet": {
+    "amount_must_be_greater_than_zero": "Der Betrag muss größer als 0 sein",
+    "deposit_cannot_exceed_1000": "Der Einzahlungsbetrag darf 1000 Stunden nicht überschreiten",
+    "user_not_found": "Benutzer nicht gefunden",
+    "organization_not_found": "Organisation nicht gefunden",
+    "amount_must_be_at_least_1": "Der Betrag muss mindestens 1 Stunde betragen",
+    "insufficient_personal_balance": "Unzureichendes persönliches Gleichgewicht",
+    "deposit_successful": "Einzahlung erfolgreich",
+    "insufficient_organization_balance": "Unzureichende Ausgewogenheit der Organisation",
+    "volunteer_not_found": "Freiwilliger nicht gefunden",
+    "payment_successful": "Zahlung erfolgreich",
+    "amount_cannot_be_zero": "Der Betrag darf nicht Null sein",
+    "adjustment_negative_balance": "Eine Anpassung würde zu einem negativen Saldo führen",
+    "adjustment_applied": "Anpassung angewendet"
+  },
+  "registration": {
+    "queued_for_review": "Ihr Konto wurde zur manuellen Überprüfung in die Warteschlange gestellt.",
+    "complete": "Registrierung abgeschlossen!",
+    "verification_unavailable": "Die Identitätsüberprüfung ist derzeit nicht verfügbar.",
+    "welcome": "Registrierung abgeschlossen! Willkommen an Bord.",
+    "pending_admin_approval": "Registrierung erfolgreich! Ihr Konto muss noch vom Administrator genehmigt werden.",
+    "verify_identity": "Registrierung erfolgreich! Bitte bestätigen Sie Ihre Identität, um fortzufahren.",
+    "pending_review": "Anmeldung erhalten. Ein Administrator wird Ihre Anfrage prüfen.",
+    "added_to_waitlist": "Sie wurden zur Warteliste hinzugefügt. Wir benachrichtigen Sie, wenn ein Platz frei wird.",
+    "user_approved_activated": "Der Benutzer wurde genehmigt und aktiviert.",
+    "user_verification_rejected": "Die Benutzerüberprüfung wurde abgelehnt."
+  },
+  "federation": {
+    "partnership_request_sent": "Partnerschaftsanfrage gesendet",
+    "partnership_approved": "Partnerschaft genehmigt",
+    "counter_proposal_sent": "Gegenvorschlag gesendet",
+    "counter_proposal_accepted": "Gegenvorschlag angenommen, Partnerschaft ist nun aktiv",
+    "partnership_request_rejected": "Partnerschaftsantrag abgelehnt",
+    "partnership_suspended": "Partnerschaft ausgesetzt",
+    "partnership_reactivated": "Partnerschaft reaktiviert",
+    "partnership_terminated": "Partnerschaft beendet",
+    "permissions_updated": "Berechtigungen aktualisiert",
+    "notify_partnership_approved": "{{tenant_name}} hat Ihren Antrag auf Föderationspartnerschaft genehmigt.",
+    "notify_partnership_rejected": "{{tenant_name}} hat den Antrag auf Föderationspartnerschaft abgelehnt.",
+    "notify_partnership_terminated": "{{tenant_name}} hat die Föderationspartnerschaft beendet."
+  },
+  "team_task": {
+    "title_required": "Titel ist erforderlich",
+    "invalid_status": "Ungültiger Status",
+    "invalid_priority": "Ungültige Priorität",
+    "task_not_found": "Aufgabe nicht gefunden",
+    "title_cannot_be_empty": "Der Titel darf nicht leer sein"
+  },
+  "team_document": {
+    "no_file_provided": "Keine Datei bereitgestellt",
+    "file_upload_failed": "Das Hochladen der Datei ist fehlgeschlagen",
+    "file_type_not_allowed": "Dateityp nicht zulässig. Akzeptiert: PDF, Bilder, Office-Dokumente, CSV, Text.",
+    "file_must_be_under_20mb": "Die Datei muss weniger als 20 MB groß sein",
+    "failed_to_save_file": "Die hochgeladene Datei konnte nicht gespeichert werden",
+    "document_not_found": "Dokument nicht gefunden"
+  },
+  "moderation": {
+    "invalid_decision": "Ungültige Entscheidung. Muss genehmigt oder abgelehnt werden.",
+    "item_not_found": "Element der Moderationswarteschlange nicht gefunden.",
+    "already_reviewed": "Dieser Artikel wurde bereits überprüft.",
+    "rejection_reason_required": "Ein Ablehnungsgrund ist erforderlich.",
+    "content_decision": "Der Inhalt war: Entscheidung."
+  },
+  "tenant_settings": {
+    "pending_verification": "Ihre Identitätsüberprüfung steht noch aus. Bitte warten Sie auf die Genehmigung.",
+    "verification_failed": "Ihre Identitätsüberprüfung ist fehlgeschlagen. Bitte wenden Sie sich an den Support.",
+    "email_not_verified": "Bitte überprüfen Sie Ihre E-Mail-Adresse, bevor Sie sich anmelden.",
+    "pending_admin_approval": "Ihr Konto muss noch vom Administrator genehmigt werden."
+  },
+  "ai": {
+    "provider_not_configured": "Anbieter nicht konfiguriert (fehlender API-Schlüssel)",
+    "connection_successful": "Verbindung erfolgreich",
+    "ollama_not_configured": "Ollama-Host-URL nicht konfiguriert",
+    "ollama_cannot_connect": "Es kann keine Verbindung zu Ollama hergestellt werden: :error",
+    "ollama_connected": "Verbunden mit Ollama (:anzahl verfügbarer Modelle)",
+    "ollama_http_error": "Ollama hat HTTP :code zurückgegeben",
+    "provider_error": "Bei der Verarbeitung Ihrer AI-Anfrage ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
+  },
+  "report_export": {
+    "no_data": "Für den ausgewählten Bericht und die ausgewählten Filter wurden keine Daten gefunden."
+  },
+  "transaction_export": {
+    "failed": "Die Anweisung konnte nicht generiert werden. Bitte versuchen Sie es erneut."
+  },
+  "streak": {
+    "already_recorded": "Heute schon aufgenommen"
+  },
+  "safeguarding": {
+    "assignment_created": "Sicherungsauftrag erstellt"
+  },
+  "review": {
+    "submitted_successfully": "Bewertung erfolgreich eingereicht"
+  },
+  "event": {
+    "added_to_waitlist": "Diese Veranstaltung ist ausgebucht. Sie wurden zur Warteliste hinzugefügt.",
+    "reminder_tomorrow": "Erinnerung: „{{title}}“ ist morgen – {{when}}",
+    "reminder_1h": "Bald beginnt: „{{title}}“ beginnt in 1 Stunde – {{when}}",
+    "cancelled_notification": "Das Ereignis „{{title}}“ wurde abgesagt.",
+    "cancelled_reason_suffix": "Grund: {{reason}}",
+    "rsvp_cancelled": "Diese Veranstaltung wurde abgesagt",
+    "rsvp_ended": "Diese Veranstaltung ist bereits beendet",
+    "rsvp_confirmed_going": "Du gehst zu „{{title}}“!",
+    "rsvp_confirmed_interested": "Sie haben Interesse an „{{title}}“ gezeigt"
+  },
+  "comment": {
+    "deleted": "Kommentar gelöscht"
+  },
+  "webhook": {
+    "test_delivery": "Dies ist eine Test-Webhook-Lieferung."
+  },
+  "volunteer": {
+    "shift_signup_confirmed": "Sie haben sich für eine Freiwilligenschicht auf {{date}} angemeldet",
+    "shift_signup_cancelled": "Ihre Anmeldung zur Freiwilligenschicht wurde storniert",
+    "opportunity_cancelled": "Das Freiwilligenangebot „{{title}}“ wurde abgesagt"
+  }
 }

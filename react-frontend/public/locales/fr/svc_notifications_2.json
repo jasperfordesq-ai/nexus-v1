@@ -85,12 +85,142 @@
   "event.cancelled_reason_suffix": " Reason: {{reason}}",
   "event.rsvp_cancelled": "This event has been cancelled",
   "event.rsvp_ended": "This event has already ended",
+  "event.rsvp_confirmed_going": "You're going to \"{{title}}\"!",
+  "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
   "comment.deleted": "Comment deleted",
   "webhook.test_delivery": "This is a test webhook delivery.",
   "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
-  "event.rsvp_confirmed_going": "You're going to \"{{title}}\"!",
-  "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
   "volunteer.shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
   "volunteer.shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
-  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
+  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled",
+  "org_wallet": {
+    "amount_must_be_greater_than_zero": "Le montant doit être supérieur à zéro",
+    "user_not_active_member": "L'utilisateur n'est pas un membre actif de cette organisation",
+    "insufficient_balance": "Solde insuffisant",
+    "requester_not_active_member": "Le demandeur n'est pas un membre actif de cette organisation",
+    "insufficient_org_wallet_balance": "Solde du portefeuille de l'organisation insuffisant",
+    "transfer_request_not_found_or_not_pending": "Demande de transfert introuvable ou non en attente",
+    "only_admin_or_owner_can_approve": "Seul l'administrateur ou le propriétaire peut approuver les demandes",
+    "transfer_request_not_found_or_already_processed": "Demande de transfert introuvable ou déjà traitée",
+    "only_admin_or_owner_can_reject": "Seul l'administrateur ou le propriétaire peut rejeter les demandes",
+    "transfer_request_already_processed": "Demande de transfert déjà traitée",
+    "only_requester_can_cancel": "Seul le demandeur peut annuler cette demande",
+    "admin_user_id_required": "L'ID utilisateur administrateur est requis pour les transferts directs",
+    "only_admin_or_owner_can_direct_transfer": "Seul l'administrateur ou le propriétaire peut effectuer des transferts directs"
+  },
+  "vol_org_wallet": {
+    "amount_must_be_greater_than_zero": "Le montant doit être supérieur à 0",
+    "deposit_cannot_exceed_1000": "Le montant du dépôt ne peut pas dépasser 1000 heures",
+    "user_not_found": "Utilisateur introuvable",
+    "organization_not_found": "Organisation introuvable",
+    "amount_must_be_at_least_1": "La durée doit être d'au moins 1 heure",
+    "insufficient_personal_balance": "Un équilibre personnel insuffisant",
+    "deposit_successful": "Dépôt réussi",
+    "insufficient_organization_balance": "Un équilibre organisationnel insuffisant",
+    "volunteer_not_found": "Bénévole introuvable",
+    "payment_successful": "Paiement réussi",
+    "amount_cannot_be_zero": "Le montant ne peut pas être nul",
+    "adjustment_negative_balance": "Un ajustement entraînerait un solde négatif",
+    "adjustment_applied": "Ajustement appliqué"
+  },
+  "registration": {
+    "queued_for_review": "Votre compte a été mis en file d'attente pour examen manuel.",
+    "complete": "Inscription terminée !",
+    "verification_unavailable": "La vérification de l'identité n'est actuellement pas disponible.",
+    "welcome": "Inscription terminée ! Bienvenue à bord.",
+    "pending_admin_approval": "Inscription réussie ! Votre compte est en attente d'approbation par l'administrateur.",
+    "verify_identity": "Inscription réussie ! Veuillez vérifier votre identité pour continuer.",
+    "pending_review": "Inscription reçue. Un administrateur examinera votre demande.",
+    "added_to_waitlist": "Vous avez été ajouté à la liste d'attente. Nous vous informerons lorsqu'une place se libérera.",
+    "user_approved_activated": "L'utilisateur a été approuvé et activé.",
+    "user_verification_rejected": "La vérification de l'utilisateur a été rejetée."
+  },
+  "federation": {
+    "partnership_request_sent": "Demande de partenariat envoyée",
+    "partnership_approved": "Partenariat approuvé",
+    "counter_proposal_sent": "Contre-proposition envoyée",
+    "counter_proposal_accepted": "Contre-proposition acceptée, le partenariat est désormais actif",
+    "partnership_request_rejected": "Demande de partenariat rejetée",
+    "partnership_suspended": "Partenariat suspendu",
+    "partnership_reactivated": "Partenariat réactivé",
+    "partnership_terminated": "Partenariat terminé",
+    "permissions_updated": "Autorisations mises à jour",
+    "notify_partnership_approved": "{{tenant_name}} a approuvé votre demande de partenariat avec la fédération.",
+    "notify_partnership_rejected": "{{tenant_name}} a rejeté la demande de partenariat de la fédération.",
+    "notify_partnership_terminated": "{{tenant_name}} a mis fin au partenariat avec la fédération."
+  },
+  "team_task": {
+    "title_required": "Le titre est requis",
+    "invalid_status": "Statut invalide",
+    "invalid_priority": "Priorité invalide",
+    "task_not_found": "Tâche introuvable",
+    "title_cannot_be_empty": "Le titre ne peut pas être vide"
+  },
+  "team_document": {
+    "no_file_provided": "Aucun fichier fourni",
+    "file_upload_failed": "Échec du téléchargement du fichier",
+    "file_type_not_allowed": "Type de fichier non autorisé. Acceptés : PDF, images, documents Office, CSV, texte.",
+    "file_must_be_under_20mb": "Le fichier doit faire moins de 20 Mo",
+    "failed_to_save_file": "Échec de l'enregistrement du fichier téléchargé",
+    "document_not_found": "Document introuvable"
+  },
+  "moderation": {
+    "invalid_decision": "Décision invalide. Doit être approuvé ou rejeté.",
+    "item_not_found": "Élément de la file de modération introuvable.",
+    "already_reviewed": "Cet article a déjà été examiné.",
+    "rejection_reason_required": "Le motif du refus est requis.",
+    "content_decision": "Le contenu a été : décision."
+  },
+  "tenant_settings": {
+    "pending_verification": "Votre vérification d'identité est en attente. Veuillez attendre l'approbation.",
+    "verification_failed": "Votre vérification d'identité a échoué. Veuillez contacter l'assistance.",
+    "email_not_verified": "Veuillez vérifier votre adresse e-mail avant de vous connecter.",
+    "pending_admin_approval": "Votre compte est en attente d'approbation par l'administrateur."
+  },
+  "ai": {
+    "provider_not_configured": "Fournisseur non configuré (clé API manquante)",
+    "connection_successful": "Connexion réussie",
+    "ollama_not_configured": "URL de l'hôte Ollama non configurée",
+    "ollama_cannot_connect": "Impossible de se connecter à Ollama : erreur",
+    "ollama_connected": "Connecté à Ollama (: nombre de modèles disponibles)",
+    "ollama_http_error": "Ollama a renvoyé HTTP :code",
+    "provider_error": "Une erreur s'est produite lors du traitement de votre demande AI. Veuillez réessayer."
+  },
+  "report_export": {
+    "no_data": "Aucune donnée trouvée pour le rapport et les filtres sélectionnés."
+  },
+  "transaction_export": {
+    "failed": "Échec de la génération de l'instruction. Veuillez réessayer."
+  },
+  "streak": {
+    "already_recorded": "Déjà enregistré aujourd'hui"
+  },
+  "safeguarding": {
+    "assignment_created": "Mission de sauvegarde créée"
+  },
+  "review": {
+    "submitted_successfully": "Avis soumis avec succès"
+  },
+  "event": {
+    "added_to_waitlist": "Cet événement est complet. Vous avez été ajouté à la liste d'attente.",
+    "reminder_tomorrow": "Rappel : \"{{title}}\" c'est demain — {{when}}",
+    "reminder_1h": "Bientôt : \"{{title}}\" commence dans 1 heure — {{when}}",
+    "cancelled_notification": "L'événement \"{{title}}\" a été annulé.",
+    "cancelled_reason_suffix": "Raison : {{reason}}",
+    "rsvp_cancelled": "Cet événement a été annulé",
+    "rsvp_ended": "Cet événement est déjà terminé",
+    "rsvp_confirmed_going": "Vous allez vers \"{{title}}\" !",
+    "rsvp_confirmed_interested": "Vous avez manifesté votre intérêt pour \"{{title}}\"."
+  },
+  "comment": {
+    "deleted": "Commentaire supprimé"
+  },
+  "webhook": {
+    "test_delivery": "Il s'agit d'une livraison de webhook de test."
+  },
+  "volunteer": {
+    "shift_signup_confirmed": "Vous êtes inscrit pour un quart de bénévolat sur {{date}}",
+    "shift_signup_cancelled": "Votre inscription à l'équipe de bénévole a été annulée",
+    "opportunity_cancelled": "L'opportunité de bénévolat \"{{title}}\" a été annulée"
+  }
 }
