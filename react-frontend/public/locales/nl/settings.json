@@ -39,7 +39,10 @@
     "waiting": "Waiting for verification result...",
     "cancel_start_over": "Cancel & Start Over",
     "error_save_dob": "Failed to save date of birth. Please try again.",
-    "error_create_payment": "Failed to create payment. Please try again."
+    "error_create_payment": "Failed to create payment. Please try again.",
+    "error_check_status": "Kan verificatiestatus niet controleren. Probeer het opnieuw.",
+    "error_missing_dob": "Voer je geboortedatum in.",
+    "error_start_verification": "Kan verificatie niet starten. Probeer het later opnieuw."
   },
   "identity_verified_lock_dob": "Your date of birth is locked because your identity has been verified.",
   "marketing_consent_confirm_title": "Subscribe to Marketing Emails",
@@ -217,7 +220,10 @@
     "hot_match_alerts": "Hot Match Alerts",
     "mutual_match_alerts": "Mutual Match Alerts",
     "enable_push": "Schakel pushmeldingen in",
-    "marketing_emails": "Marketing E-mails"
+    "marketing_emails": "Marketing E-mails",
+    "caring_smart_nudges": "Slimme herinneringen van zorgzame community",
+    "federation_notifications": "Platformoverstijgende federatiemeldingen",
+    "activity_digest": "Frequentie van activiteitsoverzicht"
   },
   "privacy_prefs": {
     "profile_visibility": "Wie kan jouw profiel zien",
@@ -284,7 +290,10 @@
   },
   "header": {
     "title": "Settings",
-    "subtitle": "Beheer je accountvoorkeuren"
+    "subtitle": "Beheer je accountvoorkeuren",
+    "badge": "Accountinstellingen",
+    "unsaved_badge": "Niet-opgeslagen wijzigingen",
+    "current_section": "Huidige sectie"
   },
   "save_changes": "Wijzigingen opslaan",
   "save_preferences": "Voorkeuren opslaan",
@@ -316,7 +325,10 @@
     "hot_match_alerts": "Ontvang meldingen over hoog-compatibele matches",
     "mutual_match_alerts": "Ontvang een melding wanneer iemand met wie je gematcht bent ook jou matcht",
     "enable_push": "Ontvang meldingen in real-time op je apparaat",
-    "marketing_emails": "Ontvang nieuwsbrieven, promoties en gemeenschapsupdates"
+    "marketing_emails": "Ontvang nieuwsbrieven, promoties en gemeenschapsupdates",
+    "caring_smart_nudges": "Gepersonaliseerde herinneringen om bij leden langs te gaan die mogelijk ondersteuning nodig hebben. Alleen verzonden wanneer onze zorgzame community-engine een duidelijke, uitvoerbare herinnering herkent.",
+    "federation_notifications": "Meldingen over activiteit van leden van partner-tijdbanken, waaronder beoordelingen, verbindingsverzoeken en andere cross-community-updates.",
+    "activity_digest": "Hoe vaak we je een overzicht e-mailen van de activiteit in je groepen en discussies. Directe berichten, verbindingsverzoeken en transactiebevestigingen worden altijd direct verzonden."
   },
   "match_digest": {
     "frequency": "Digest Frequentie",
@@ -324,7 +336,8 @@
     "daily": "Daily",
     "weekly": "Weekly",
     "fortnightly": "Fortnightly",
-    "never": "Never"
+    "never": "Never",
+    "monthly": "Maandelijks"
   },
   "privacy_sections": {
     "title": "Privacy Instellingen",
@@ -556,7 +569,10 @@
     "unblocked_desc": "{{name}} is ontgrendeld.",
     "unblock_error": "Kon gebruiker niet ontgrendelen",
     "blocked_on": "Geblokkeerd op {{date}}",
-    "link": "Geblokkeerde gebruikers"
+    "link": "Geblokkeerde gebruikers",
+    "privacy_badge": "Privacy-instelling",
+    "summary_label": "Geblokkeerde leden",
+    "count": "{{count}} geblokkeerd"
   },
   "block_user": {
     "title": "Blokkeer {{name}}?",
@@ -586,5 +602,11 @@
     "unsupported": "Your browser does not support push notifications.",
     "denied": "You have blocked notifications. Update your browser settings to re-enable.",
     "subscribed": "You are subscribed on this device."
+  },
+  "activity_digest": {
+    "off": "Uit",
+    "instant": "Direct",
+    "daily": "Dagelijks",
+    "monthly": "Maandelijks"
   }
 }

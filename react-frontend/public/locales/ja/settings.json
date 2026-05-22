@@ -39,7 +39,10 @@
     "waiting": "Waiting for verification result...",
     "cancel_start_over": "Cancel & Start Over",
     "error_save_dob": "Failed to save date of birth. Please try again.",
-    "error_create_payment": "Failed to create payment. Please try again."
+    "error_create_payment": "Failed to create payment. Please try again.",
+    "error_check_status": "認証状況を確認できませんでした。もう一度お試しください。",
+    "error_missing_dob": "生年月日を入力してください。",
+    "error_start_verification": "認証を開始できませんでした。しばらくしてからもう一度お試しください。"
   },
   "identity_verified_lock_dob": "Your date of birth is locked because your identity has been verified.",
   "marketing_consent_confirm_title": "Subscribe to Marketing Emails",
@@ -217,7 +220,10 @@
     "hot_match_alerts": "ホットマッチアラート",
     "mutual_match_alerts": "相互マッチアラート",
     "enable_push": "プッシュ通知を有効にする",
-    "marketing_emails": "マーケティングメール"
+    "marketing_emails": "マーケティングメール",
+    "caring_smart_nudges": "ケアリングコミュニティのスマートリマインダー",
+    "federation_notifications": "プラットフォーム間連携通知",
+    "activity_digest": "アクティビティダイジェストの頻度"
   },
   "privacy_prefs": {
     "profile_visibility": "プロフィールを見られる人",
@@ -284,7 +290,10 @@
   },
   "header": {
     "title": "Settings",
-    "subtitle": "アカウント設定を管理する"
+    "subtitle": "アカウント設定を管理する",
+    "badge": "アカウント設定",
+    "unsaved_badge": "未保存の変更",
+    "current_section": "現在のセクション"
   },
   "save_changes": "変更を保存",
   "save_preferences": "設定を保存",
@@ -316,7 +325,10 @@
     "hot_match_alerts": "高い互換性のあるマッチについて通知を受け取る",
     "mutual_match_alerts": "マッチした相手があなたとマッチしたときに通知を受け取る",
     "enable_push": "デバイスでリアルタイム通知を受け取る",
-    "marketing_emails": "ニュースレター、プロモーション、コミュニティの更新を受け取る"
+    "marketing_emails": "ニュースレター、プロモーション、コミュニティの更新を受け取る",
+    "caring_smart_nudges": "サポートを必要としているかもしれないメンバーの様子を確認するためのパーソナライズされたリマインダー。ケアリングコミュニティエンジンが明確で実行可能なお知らせを認識した場合にのみ送信されます。",
+    "federation_notifications": "パートナータイムバンクのメンバーからのアクティビティに関する通知。レビュー、つながり申請、その他のコミュニティ間アップデートを含みます。",
+    "activity_digest": "グループとスレッドのアクティビティのダイジェストをメールでお送りする頻度。ダイレクトメッセージ、つながり申請、取引確認は常に即時送信されます。"
   },
   "match_digest": {
     "frequency": "ダイジェストの頻度",
@@ -324,7 +336,8 @@
     "daily": "Daily",
     "weekly": "Weekly",
     "fortnightly": "Fortnightly",
-    "never": "Never"
+    "never": "Never",
+    "monthly": "毎月"
   },
   "privacy_sections": {
     "title": "プライバシー設定",
@@ -556,7 +569,10 @@
     "unblocked_desc": "{{name}}のブロックを解除しました。",
     "unblock_error": "ユーザーのブロック解除に失敗しました",
     "blocked_on": "{{date}}をブロックしました",
-    "link": "ブロックされたユーザー"
+    "link": "ブロックされたユーザー",
+    "privacy_badge": "プライバシー設定",
+    "summary_label": "ブロック済みメンバー",
+    "count": "{{count}} 件ブロック中"
   },
   "block_user": {
     "title": "{{name}}をブロックしますか？",
@@ -586,5 +602,11 @@
     "unsupported": "Your browser does not support push notifications.",
     "denied": "You have blocked notifications. Update your browser settings to re-enable.",
     "subscribed": "You are subscribed on this device."
+  },
+  "activity_digest": {
+    "off": "オフ",
+    "instant": "即時",
+    "daily": "毎日",
+    "monthly": "毎月"
   }
 }

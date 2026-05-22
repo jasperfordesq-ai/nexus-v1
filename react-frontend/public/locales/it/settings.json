@@ -39,7 +39,10 @@
     "waiting": "Waiting for verification result...",
     "cancel_start_over": "Cancel & Start Over",
     "error_save_dob": "Failed to save date of birth. Please try again.",
-    "error_create_payment": "Failed to create payment. Please try again."
+    "error_create_payment": "Failed to create payment. Please try again.",
+    "error_check_status": "Impossibile verificare lo stato della verifica. Riprova.",
+    "error_missing_dob": "Inserisci la tua data di nascita.",
+    "error_start_verification": "Impossibile avviare la verifica. Riprova più tardi."
   },
   "identity_verified_lock_dob": "Your date of birth is locked because your identity has been verified.",
   "marketing_consent_confirm_title": "Subscribe to Marketing Emails",
@@ -217,7 +220,10 @@
     "hot_match_alerts": "Avvisi Abbinamenti Top",
     "mutual_match_alerts": "Avvisi Abbinamenti Reciproci",
     "enable_push": "Abilita Notifiche Push",
-    "marketing_emails": "Email Marketing"
+    "marketing_emails": "Email Marketing",
+    "caring_smart_nudges": "Promemoria intelligenti della community solidale",
+    "federation_notifications": "Notifiche di federazione tra piattaforme",
+    "activity_digest": "Frequenza del riepilogo delle attività"
   },
   "privacy_prefs": {
     "profile_visibility": "Chi può vedere il tuo profilo",
@@ -284,7 +290,10 @@
   },
   "header": {
     "title": "Impostazioni",
-    "subtitle": "Gestisci le preferenze del tuo account"
+    "subtitle": "Gestisci le preferenze del tuo account",
+    "badge": "Controlli account",
+    "unsaved_badge": "Modifiche non salvate",
+    "current_section": "Sezione attuale"
   },
   "save_changes": "Salva Modifiche",
   "save_preferences": "Salva Preferenze",
@@ -316,7 +325,10 @@
     "hot_match_alerts": "Ricevi notifiche sugli abbinamenti ad alta compatibilità",
     "mutual_match_alerts": "Ricevi notifiche quando qualcuno che hai abbinato ti abbina a sua volta",
     "enable_push": "Ricevi notifiche in tempo reale sul tuo dispositivo",
-    "marketing_emails": "Ricevi newsletter, promozioni e aggiornamenti della comunità"
+    "marketing_emails": "Ricevi newsletter, promozioni e aggiornamenti della comunità",
+    "caring_smart_nudges": "Promemoria personalizzati per controllare i membri che potrebbero aver bisogno di supporto. Inviati solo quando il nostro motore di community solidale identifica un suggerimento chiaro e attuabile.",
+    "federation_notifications": "Notifiche sull'attività dei membri delle banche del tempo partner, incluse recensioni, richieste di connessione e altri aggiornamenti tra community.",
+    "activity_digest": "Con quale frequenza inviarti via e-mail un riepilogo dell'attività nei tuoi gruppi e thread. I messaggi diretti, le richieste di connessione e le conferme di transazione vengono sempre inviati immediatamente."
   },
   "match_digest": {
     "frequency": "Frequenza Riepilogo",
@@ -324,7 +336,8 @@
     "daily": "Giornaliero",
     "weekly": "Settimanale",
     "fortnightly": "Quindicinale",
-    "never": "Mai"
+    "never": "Mai",
+    "monthly": "Mensile"
   },
   "privacy_sections": {
     "title": "Impostazioni Privacy",
@@ -556,7 +569,10 @@
     "unblocked_desc": "{{name}} è stato sbloccato.",
     "unblock_error": "Impossibile sbloccare l'utente",
     "blocked_on": "Bloccato su {{date}}",
-    "link": "Utenti bloccati"
+    "link": "Utenti bloccati",
+    "privacy_badge": "Controllo della privacy",
+    "summary_label": "Membri bloccati",
+    "count": "{{count}} bloccati"
   },
   "block_user": {
     "title": "Bloccare {{name}}?",
@@ -586,5 +602,11 @@
     "unsupported": "Your browser does not support push notifications.",
     "denied": "You have blocked notifications. Update your browser settings to re-enable.",
     "subscribed": "You are subscribed on this device."
+  },
+  "activity_digest": {
+    "off": "Disattivato",
+    "instant": "Immediato",
+    "daily": "Giornaliero",
+    "monthly": "Mensile"
   }
 }

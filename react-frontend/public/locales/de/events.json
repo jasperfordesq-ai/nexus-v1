@@ -104,7 +104,28 @@
     "view_all_series": "Alle {{count}} Veranstaltungen der Reihe anzeigen",
     "no_other_series_events": "Keine weiteren Veranstaltungen in dieser Reihe gefunden.",
     "remote_attendance_available": "Fernteilnahme verfügbar",
-    "join_meeting": "Meeting beitreten"
+    "join_meeting": "Meeting beitreten",
+    "community_member": "Community-Mitglied",
+    "capacity_label": "Kapazität",
+    "waitlist_label": "Warteliste",
+    "attendance_total": "{{count}} Antworten",
+    "no_attendees_title": "Noch keine Teilnehmer",
+    "no_checkin_attendees_title": "Noch keine Check-ins",
+    "rsvp_panel_title": "Für diese Veranstaltung zusagen",
+    "rsvp_panel_desc": "Lass den Organisator wissen, ob du teilnehmen möchtest.",
+    "rsvp_going_aria": "Als teilnehmend markieren",
+    "rsvp_interested_aria": "Als interessiert markieren",
+    "rsvp_not_going_aria": "Als nicht teilnehmend markieren",
+    "share_aria": "Link zu {{title}} kopieren",
+    "event_link_aria": "Veranstaltungslink für {{title}} öffnen",
+    "meta_description_fallback": "{{title}} ist eine Community-Veranstaltung am {{date}} mit {{organizer}} in {{location}}.",
+    "edit_event_aria": "{{title}} bearbeiten",
+    "cancel_event_aria": "{{title}} absagen",
+    "delete_event_aria": "{{title}} löschen",
+    "on_waitlist_position": "Auf der Warteliste (#{{position}})",
+    "join_meeting_aria": "Meeting für {{title}} beitreten",
+    "join_waitlist_aria": "Der Warteliste für diese Veranstaltung beitreten",
+    "leave_waitlist_aria": "Warteliste für diese Veranstaltung verlassen"
   },
   "card": {
     "cancelled": "Abgesagt",
@@ -270,5 +291,9 @@
   "active_filters": "Active filters",
   "active_search": "Search: {{query}}",
   "active_near_me": "Within {{radius}} km",
-  "clear_filters": "Clear filters"
+  "clear_filters": "Clear filters",
+  "hero_events_label": "Veranstaltungen",
+  "empty_tip_workshops": "Workshops",
+  "empty_tip_social": "Soziale Treffen",
+  "empty_tip_online": "Online-Sitzungen"
 }

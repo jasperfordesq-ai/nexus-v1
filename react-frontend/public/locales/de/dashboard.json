@@ -17,7 +17,8 @@
     "balance": "Guthaben",
     "active_listings": "Aktive Inserate",
     "messages": "Nachrichten",
-    "pending": "Ausstehend"
+    "pending": "Ausstehend",
+    "hours_value": "{{value}} Std."
   },
   "sections": {
     "recent_listings": "Neueste Inserate",
@@ -51,7 +52,8 @@
     "request": "Gesuch",
     "empty": "Keine aktuellen Inserate",
     "create_first": "Erstellen Sie Ihr erstes Inserat",
-    "user_fallback": "User"
+    "user_fallback": "User",
+    "empty_description": "Erstelle ein Gesuch oder Angebot, um Übereinstimmungen mit Menschen in deiner Nähe zu finden."
   },
   "activity": {
     "action_listing": "hat ein Inserat geteilt",
@@ -60,20 +62,24 @@
     "action_goal": "hat ein neues Ziel gesetzt",
     "action_post": "hat einen Beitrag geteilt",
     "empty": "Keine aktuelle Aktivität",
-    "check_feed": "Den Feed ansehen"
+    "check_feed": "Den Feed ansehen",
+    "empty_description": "Community-Updates erscheinen hier, sobald Mitglieder beginnen, Beiträge zu veröffentlichen."
   },
   "suggestions": {
-    "empty": "Noch keine Empfehlungen"
+    "empty": "Noch keine Empfehlungen",
+    "empty_description": "Die Übereinstimmung verbessert sich, je mehr Anzeigen und Profildaten hinzugefügt werden."
   },
   "groups": {
     "members_count": "{{count}} Mitglieder",
     "empty": "Sie sind noch keiner Gruppe beigetreten",
-    "discover": "Gruppen entdecken"
+    "discover": "Gruppen entdecken",
+    "empty_description": "Gruppen helfen dir, gemeinsamen Interessen, Projekten und lokalen Kreisen zu folgen."
   },
   "events": {
     "online_event": "Online-Veranstaltung",
     "empty": "Keine bevorstehenden Veranstaltungen",
-    "browse": "Veranstaltungen suchen"
+    "browse": "Veranstaltungen suchen",
+    "empty_description": "Veranstaltungen aus deiner Community erscheinen hier, sobald sie geplant sind."
   },
   "gamification": {
     "level": "Stufe {{level}}",
@@ -82,7 +88,8 @@
     "xp_progress": "XP-Fortschritt",
     "start_earning": "Verdienen Sie XP, indem Sie an der Gemeinschaft teilnehmen!",
     "streak_days_one": "{{count}} Tag",
-    "streak_days_other": "{{count}} Tage"
+    "streak_days_other": "{{count}} Tage",
+    "xp_value": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "Inserate werden geladen",
@@ -92,7 +99,15 @@
     "loading_progress": "Fortschritt wird geladen",
     "loading_suggestions": "Vorschläge werden geladen",
     "loading_endorsements": "Empfehlungen werden geladen",
-    "loading_pending_reviews": "Ausstehende Bewertungen werden geladen"
+    "loading_pending_reviews": "Ausstehende Bewertungen werden geladen",
+    "view_all_listings": "Alle Anzeigen anzeigen",
+    "view_all_activity": "Alle neuen Aktivitäten anzeigen",
+    "view_all_events": "Alle Veranstaltungen anzeigen",
+    "view_all_groups": "Alle Gruppen anzeigen",
+    "view_achievements": "Erfolge anzeigen",
+    "browse_all_listings": "Alle Anzeigen durchsuchen",
+    "view_all_endorsements": "Alle Empfehlungen anzeigen",
+    "view_pending_reviews": "Alle ausstehenden Bewertungen anzeigen"
   },
   "reviews": {
     "sent": "Gesendet {{amount}}h",
@@ -100,7 +115,8 @@
     "review": "Bewertung",
     "none_pending": "Keine ausstehenden Bewertungen",
     "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending"
+    "view_all_pending": "View All Pending",
+    "none_pending_description": "Abgeschlossene Tausche, die noch eine Bewertung benötigen, erscheinen hier."
   },
   "fallback_name": "there",
   "common": {

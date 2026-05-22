@@ -70,9 +70,31 @@
     "toast_vol_hours_approved": "時間が承認されました",
     "toast_vol_hours_declined": "時間が却下されました",
     "toast_vol_opportunity_closed": "機会が終了しました",
-    "toast_default": "Notification"
+    "toast_default": "Notification",
+    "toast_safeguarding_flag": "保護アラート",
+    "toast_safeguarding_assignment": "保護担当の割り当て",
+    "toast_job_application_status": "応募の更新",
+    "toast_job_application": "求人応募",
+    "toast_job_interview_proposed": "面接の依頼",
+    "toast_job_interview_accepted": "面接が承諾されました",
+    "toast_job_interview_declined": "面接が辞退されました",
+    "toast_job_interview_cancelled": "面接がキャンセルされました",
+    "toast_job_offer_received": "求人オファーを受け取りました!",
+    "toast_job_offer_accepted": "オファーが承諾されました",
+    "toast_job_offer_rejected": "オファーが辞退されました",
+    "toast_job_offer_withdrawn": "オファーが取り下げられました",
+    "toast_job_alert_match": "新しい求人マッチ",
+    "toast_job_interview_reminder": "面接のリマインダー",
+    "toast_job_completion_credits": "タイムクレジットを獲得しました!"
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "caught_up_badge": "すべて確認済み",
+  "settings_label": "設定",
+  "mark_group_read_aria": "グループを既読にする",
+  "expand_group": "展開",
+  "collapse_group": "折りたたむ",
+  "notifications_count": "件の通知",
+  "and_others": "他{{count}}件"
 }

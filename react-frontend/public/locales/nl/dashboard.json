@@ -17,7 +17,8 @@
     "balance": "Balance",
     "active_listings": "Actieve aanbiedingen",
     "messages": "Messages",
-    "pending": "Pending"
+    "pending": "Pending",
+    "hours_value": "{{value}} u"
   },
   "sections": {
     "recent_listings": "Recente aanbiedingen",
@@ -51,7 +52,8 @@
     "request": "Request",
     "empty": "Geen recente aanbiedingen",
     "create_first": "Maak je eerste aanbieding",
-    "user_fallback": "User"
+    "user_fallback": "User",
+    "empty_description": "Maak een verzoek of aanbod om matches te vinden met mensen in de buurt."
   },
   "activity": {
     "action_listing": "deelde een aanbieding",
@@ -60,20 +62,24 @@
     "action_goal": "heeft een nieuw doel gesteld",
     "action_post": "heeft een bericht gedeeld",
     "empty": "Geen recente activiteit",
-    "check_feed": "Bekijk de feed"
+    "check_feed": "Bekijk de feed",
+    "empty_description": "Community-updates verschijnen hier zodra mensen beginnen te plaatsen."
   },
   "suggestions": {
-    "empty": "Nog geen suggesties"
+    "empty": "Nog geen suggesties",
+    "empty_description": "De matching verbetert naarmate er meer advertenties en profielgegevens worden toegevoegd."
   },
   "groups": {
     "members_count": "{{count}} leden",
     "empty": "Je bent nog niet lid van groepen",
-    "discover": "Ontdek groepen"
+    "discover": "Ontdek groepen",
+    "empty_description": "Groepen helpen je gedeelde interesses, projecten en lokale kringen te volgen."
   },
   "events": {
     "online_event": "Online evenement",
     "empty": "Geen aankomende evenementen",
-    "browse": "Blader door evenementen"
+    "browse": "Blader door evenementen",
+    "empty_description": "Evenementen uit jouw community verschijnen hier zodra ze gepland zijn."
   },
   "gamification": {
     "level": "Niveau {{level}}",
@@ -82,7 +88,8 @@
     "xp_progress": "XP Vooruitgang",
     "start_earning": "Begin XP te verdienen door deel te nemen aan de gemeenschap!",
     "streak_days_one": "{{count}} dag",
-    "streak_days_other": "{{count}} dagen"
+    "streak_days_other": "{{count}} dagen",
+    "xp_value": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "Laden van lijsten",
@@ -92,7 +99,15 @@
     "loading_progress": "Laden van voortgang",
     "loading_suggestions": "Laden van suggesties",
     "loading_endorsements": "Laden van goedkeuringen",
-    "loading_pending_reviews": "Laden van uitstaande beoordelingen"
+    "loading_pending_reviews": "Laden van uitstaande beoordelingen",
+    "view_all_listings": "Bekijk alle advertenties",
+    "view_all_activity": "Bekijk alle recente activiteit",
+    "view_all_events": "Bekijk alle evenementen",
+    "view_all_groups": "Bekijk alle groepen",
+    "view_achievements": "Bekijk prestaties",
+    "browse_all_listings": "Blader door alle advertenties",
+    "view_all_endorsements": "Bekijk alle aanbevelingen",
+    "view_pending_reviews": "Bekijk alle openstaande beoordelingen"
   },
   "reviews": {
     "sent": "Verzonden {{amount}}h",
@@ -100,7 +115,8 @@
     "review": "Review",
     "none_pending": "Geen uitstaande beoordelingen",
     "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending"
+    "view_all_pending": "View All Pending",
+    "none_pending_description": "Voltooide uitwisselingen die feedback nodig hebben, verschijnen hier."
   },
   "fallback_name": "there",
   "common": {

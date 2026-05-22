@@ -101,7 +101,28 @@
     "view_all_series": "View all {{count}} events in series",
     "no_other_series_events": "No other events found in this series.",
     "remote_attendance_available": "Remote attendance available",
-    "join_meeting": "Join Meeting"
+    "join_meeting": "Join Meeting",
+    "community_member": "Członek społeczności",
+    "capacity_label": "Liczba miejsc",
+    "waitlist_label": "Lista oczekujących",
+    "attendance_total": "{{count}} odpowiedzi",
+    "no_attendees_title": "Jeszcze brak uczestników",
+    "no_checkin_attendees_title": "Jeszcze brak zameldowań",
+    "rsvp_panel_title": "Potwierdź obecność na tym wydarzeniu",
+    "rsvp_panel_desc": "Daj znać organizatorowi, czy planujesz przyjść.",
+    "rsvp_going_aria": "Oznacz jako wybieram się",
+    "rsvp_interested_aria": "Oznacz jako zainteresowany",
+    "rsvp_not_going_aria": "Oznacz jako nie wybieram się",
+    "share_aria": "Kopiuj link do {{title}}",
+    "event_link_aria": "Otwórz link wydarzenia {{title}}",
+    "meta_description_fallback": "{{title}} to wydarzenie społecznościowe {{date}} z {{organizer}} w {{location}}.",
+    "edit_event_aria": "Edytuj {{title}}",
+    "cancel_event_aria": "Odwołaj {{title}}",
+    "delete_event_aria": "Usuń {{title}}",
+    "on_waitlist_position": "Na liście oczekujących (#{{position}})",
+    "join_meeting_aria": "Dołącz do spotkania {{title}}",
+    "join_waitlist_aria": "Dołącz do listy oczekujących na to wydarzenie",
+    "leave_waitlist_aria": "Opuść listę oczekujących na to wydarzenie"
   },
   "card": {
     "cancelled": "Cancelled",
@@ -270,5 +291,9 @@
   "active_filters": "Active filters",
   "active_search": "Search: {{query}}",
   "active_near_me": "Within {{radius}} km",
-  "clear_filters": "Clear filters"
+  "clear_filters": "Clear filters",
+  "hero_events_label": "Wydarzenia",
+  "empty_tip_workshops": "Warsztaty",
+  "empty_tip_social": "Spotkania towarzyskie",
+  "empty_tip_online": "Sesje online"
 }

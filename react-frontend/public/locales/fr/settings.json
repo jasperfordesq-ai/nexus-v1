@@ -39,7 +39,10 @@
     "waiting": "Waiting for verification result...",
     "cancel_start_over": "Cancel & Start Over",
     "error_save_dob": "Failed to save date of birth. Please try again.",
-    "error_create_payment": "Failed to create payment. Please try again."
+    "error_create_payment": "Failed to create payment. Please try again.",
+    "error_check_status": "Impossible de vérifier l'état de la vérification. Veuillez réessayer.",
+    "error_missing_dob": "Veuillez saisir votre date de naissance.",
+    "error_start_verification": "Impossible de démarrer la vérification. Veuillez réessayer plus tard."
   },
   "identity_verified_lock_dob": "Your date of birth is locked because your identity has been verified.",
   "marketing_consent_confirm_title": "Subscribe to Marketing Emails",
@@ -217,7 +220,10 @@
     "hot_match_alerts": "Alertes de correspondances prioritaires",
     "mutual_match_alerts": "Alertes de correspondances mutuelles",
     "enable_push": "Activer les notifications push",
-    "marketing_emails": "E-mails marketing"
+    "marketing_emails": "E-mails marketing",
+    "caring_smart_nudges": "Rappels intelligents de communauté bienveillante",
+    "federation_notifications": "Notifications de fédération inter-plateformes",
+    "activity_digest": "Fréquence du résumé d'activité"
   },
   "privacy_prefs": {
     "profile_visibility": "Qui peut voir votre profil",
@@ -284,7 +290,10 @@
   },
   "header": {
     "title": "Paramètres",
-    "subtitle": "Gérez les préférences de votre compte"
+    "subtitle": "Gérez les préférences de votre compte",
+    "badge": "Paramètres du compte",
+    "unsaved_badge": "Modifications non enregistrées",
+    "current_section": "Section actuelle"
   },
   "save_changes": "Enregistrer les modifications",
   "save_preferences": "Enregistrer les préférences",
@@ -316,7 +325,10 @@
     "hot_match_alerts": "Soyez notifié(e) des correspondances à haute compatibilité",
     "mutual_match_alerts": "Soyez notifié(e) lorsqu'une personne avec qui vous vous êtes mis(e) en correspondance vous correspond également",
     "enable_push": "Recevez des notifications en temps réel sur votre appareil",
-    "marketing_emails": "Recevez des newsletters, promotions et mises à jour communautaires"
+    "marketing_emails": "Recevez des newsletters, promotions et mises à jour communautaires",
+    "caring_smart_nudges": "Rappels personnalisés pour prendre des nouvelles des membres qui pourraient avoir besoin de soutien. Envoyés uniquement lorsque notre moteur de communauté bienveillante identifie un rappel clair et exploitable.",
+    "federation_notifications": "Notifications sur l'activité des membres des banques de temps partenaires, y compris les avis, demandes de connexion et autres mises à jour entre communautés.",
+    "activity_digest": "À quelle fréquence nous vous enverrons par e-mail un résumé de l'activité dans vos groupes et fils de discussion. Les messages directs, demandes de connexion et confirmations de transactions sont toujours envoyés immédiatement."
   },
   "match_digest": {
     "frequency": "Fréquence du récapitulatif",
@@ -324,7 +336,8 @@
     "daily": "Quotidien",
     "weekly": "Hebdomadaire",
     "fortnightly": "Bimensuel",
-    "never": "Jamais"
+    "never": "Jamais",
+    "monthly": "Mensuel"
   },
   "privacy_sections": {
     "title": "Paramètres de confidentialité",
@@ -556,7 +569,10 @@
     "unblocked_desc": "{{name}} a été débloqué.",
     "unblock_error": "Échec du déblocage de l'utilisateur",
     "blocked_on": "Bloqué sur {{date}}",
-    "link": "Utilisateurs bloqués"
+    "link": "Utilisateurs bloqués",
+    "privacy_badge": "Contrôle de la vie privée",
+    "summary_label": "Membres bloqués",
+    "count": "{{count}} bloqué(s)"
   },
   "block_user": {
     "title": "Bloquer {{name}} ?",
@@ -586,5 +602,11 @@
     "unsupported": "Your browser does not support push notifications.",
     "denied": "You have blocked notifications. Update your browser settings to re-enable.",
     "subscribed": "You are subscribed on this device."
+  },
+  "activity_digest": {
+    "off": "Désactivé",
+    "instant": "Instantané",
+    "daily": "Quotidien",
+    "monthly": "Mensuel"
   }
 }

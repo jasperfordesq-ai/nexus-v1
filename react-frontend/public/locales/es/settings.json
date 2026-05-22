@@ -39,7 +39,10 @@
     "waiting": "Waiting for verification result...",
     "cancel_start_over": "Cancel & Start Over",
     "error_save_dob": "Failed to save date of birth. Please try again.",
-    "error_create_payment": "Failed to create payment. Please try again."
+    "error_create_payment": "Failed to create payment. Please try again.",
+    "error_check_status": "No se pudo comprobar el estado de verificación. Por favor, inténtalo de nuevo.",
+    "error_missing_dob": "Por favor, introduce tu fecha de nacimiento.",
+    "error_start_verification": "No se pudo iniciar la verificación. Por favor, inténtalo de nuevo más tarde."
   },
   "identity_verified_lock_dob": "Your date of birth is locked because your identity has been verified.",
   "marketing_consent_confirm_title": "Subscribe to Marketing Emails",
@@ -217,7 +220,10 @@
     "hot_match_alerts": "Alertas de Coincidencias Destacadas",
     "mutual_match_alerts": "Alertas de Coincidencias Mutuas",
     "enable_push": "Activar Notificaciones Push",
-    "marketing_emails": "Correos de Marketing"
+    "marketing_emails": "Correos de Marketing",
+    "caring_smart_nudges": "Avisos inteligentes de comunidad solidaria",
+    "federation_notifications": "Notificaciones de federación entre plataformas",
+    "activity_digest": "Frecuencia del resumen de actividad"
   },
   "privacy_prefs": {
     "profile_visibility": "Quién puede ver tu perfil",
@@ -284,7 +290,10 @@
   },
   "header": {
     "title": "Configuración",
-    "subtitle": "Gestiona las preferencias de tu cuenta"
+    "subtitle": "Gestiona las preferencias de tu cuenta",
+    "badge": "Controles de cuenta",
+    "unsaved_badge": "Cambios sin guardar",
+    "current_section": "Sección actual"
   },
   "save_changes": "Guardar Cambios",
   "save_preferences": "Guardar Preferencias",
@@ -316,7 +325,10 @@
     "hot_match_alerts": "Recibe notificaciones sobre coincidencias de alta compatibilidad",
     "mutual_match_alerts": "Recibe notificaciones cuando alguien con quien coincidiste también coincide contigo",
     "enable_push": "Recibe notificaciones en tiempo real en tu dispositivo",
-    "marketing_emails": "Recibe boletines, promociones y novedades de la comunidad"
+    "marketing_emails": "Recibe boletines, promociones y novedades de la comunidad",
+    "caring_smart_nudges": "Recordatorios personalizados para comprobar el estado de miembros que puedan necesitar apoyo. Se envían solo cuando nuestro motor de comunidad solidaria identifica un aviso claro y accionable.",
+    "federation_notifications": "Notificaciones sobre la actividad de miembros en bancos de tiempo asociados, incluyendo valoraciones, solicitudes de conexión y otras actualizaciones entre comunidades.",
+    "activity_digest": "Con qué frecuencia te enviaremos por correo un resumen de la actividad en tus grupos y conversaciones. Los mensajes directos, las solicitudes de conexión y las confirmaciones de transacciones siempre se envían al instante."
   },
   "match_digest": {
     "frequency": "Frecuencia del Resumen",
@@ -324,7 +336,8 @@
     "daily": "Diario",
     "weekly": "Semanal",
     "fortnightly": "Quincenal",
-    "never": "Nunca"
+    "never": "Nunca",
+    "monthly": "Mensual"
   },
   "privacy_sections": {
     "title": "Configuración de Privacidad",
@@ -556,7 +569,10 @@
     "unblocked_desc": "{{name}} ha sido desbloqueado.",
     "unblock_error": "Error al desbloquear al usuario",
     "blocked_on": "Bloqueado en {{date}}",
-    "link": "Usuarios bloqueados"
+    "link": "Usuarios bloqueados",
+    "privacy_badge": "Control de privacidad",
+    "summary_label": "Miembros bloqueados",
+    "count": "{{count}} bloqueados"
   },
   "block_user": {
     "title": "¿Bloquear {{name}}?",
@@ -586,5 +602,11 @@
     "unsupported": "Your browser does not support push notifications.",
     "denied": "You have blocked notifications. Update your browser settings to re-enable.",
     "subscribed": "You are subscribed on this device."
+  },
+  "activity_digest": {
+    "off": "Desactivado",
+    "instant": "Instantáneo",
+    "daily": "Diario",
+    "monthly": "Mensual"
   }
 }

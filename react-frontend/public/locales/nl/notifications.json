@@ -70,9 +70,31 @@
     "toast_vol_hours_approved": "Uren Goedgekeurd",
     "toast_vol_hours_declined": "Uren Geweigerd",
     "toast_vol_opportunity_closed": "Kans Gesloten",
-    "toast_default": "Notification"
+    "toast_default": "Notification",
+    "toast_safeguarding_flag": "Beschermingswaarschuwing",
+    "toast_safeguarding_assignment": "Beschermingstoewijzing",
+    "toast_job_application_status": "Sollicitatie-update",
+    "toast_job_application": "Sollicitatie",
+    "toast_job_interview_proposed": "Sollicitatiegesprek aangevraagd",
+    "toast_job_interview_accepted": "Sollicitatiegesprek geaccepteerd",
+    "toast_job_interview_declined": "Sollicitatiegesprek afgewezen",
+    "toast_job_interview_cancelled": "Sollicitatiegesprek geannuleerd",
+    "toast_job_offer_received": "Vacaturevoorstel ontvangen!",
+    "toast_job_offer_accepted": "Aanbod geaccepteerd",
+    "toast_job_offer_rejected": "Aanbod afgewezen",
+    "toast_job_offer_withdrawn": "Aanbod ingetrokken",
+    "toast_job_alert_match": "Nieuwe vacaturematch",
+    "toast_job_interview_reminder": "Herinnering sollicitatiegesprek",
+    "toast_job_completion_credits": "Tijdkrediet verdiend!"
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "caught_up_badge": "Bijgewerkt",
+  "settings_label": "Instellingen",
+  "mark_group_read_aria": "Groep als gelezen markeren",
+  "expand_group": "Uitvouwen",
+  "collapse_group": "Inklappen",
+  "notifications_count": "meldingen",
+  "and_others": "en {{count}} anderen"
 }

@@ -101,7 +101,28 @@
     "view_all_series": "View all {{count}} events in series",
     "no_other_series_events": "No other events found in this series.",
     "remote_attendance_available": "Remote attendance available",
-    "join_meeting": "Join Meeting"
+    "join_meeting": "Join Meeting",
+    "community_member": "Communitylid",
+    "capacity_label": "Capaciteit",
+    "waitlist_label": "Wachtlijst",
+    "attendance_total": "{{count}} reacties",
+    "no_attendees_title": "Nog geen deelnemers",
+    "no_checkin_attendees_title": "Nog geen check-ins",
+    "rsvp_panel_title": "Reageer op dit evenement",
+    "rsvp_panel_desc": "Laat de organisator weten of je van plan bent te komen.",
+    "rsvp_going_aria": "Markeer jezelf als aanwezig",
+    "rsvp_interested_aria": "Markeer jezelf als geïnteresseerd",
+    "rsvp_not_going_aria": "Markeer jezelf als afwezig",
+    "share_aria": "Link naar {{title}} kopiëren",
+    "event_link_aria": "Evenementlink voor {{title}} openen",
+    "meta_description_fallback": "{{title}} is een community-evenement op {{date}} met {{organizer}} in {{location}}.",
+    "edit_event_aria": "{{title}} bewerken",
+    "cancel_event_aria": "{{title}} annuleren",
+    "delete_event_aria": "{{title}} verwijderen",
+    "on_waitlist_position": "Op wachtlijst (#{{position}})",
+    "join_meeting_aria": "Deelnemen aan vergadering voor {{title}}",
+    "join_waitlist_aria": "Op de wachtlijst voor dit evenement",
+    "leave_waitlist_aria": "Wachtlijst voor dit evenement verlaten"
   },
   "card": {
     "cancelled": "Cancelled",
@@ -270,5 +291,9 @@
   "active_filters": "Active filters",
   "active_search": "Search: {{query}}",
   "active_near_me": "Within {{radius}} km",
-  "clear_filters": "Clear filters"
+  "clear_filters": "Clear filters",
+  "hero_events_label": "Evenementen",
+  "empty_tip_workshops": "Workshops",
+  "empty_tip_social": "Sociale ontmoetingen",
+  "empty_tip_online": "Online sessies"
 }

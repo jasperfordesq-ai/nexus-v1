@@ -17,7 +17,8 @@
     "balance": "Saldo",
     "active_listings": "Anuncios Activos",
     "messages": "Mensajes",
-    "pending": "Pendientes"
+    "pending": "Pendientes",
+    "hours_value": "{{value}} h"
   },
   "sections": {
     "recent_listings": "Anuncios Recientes",
@@ -51,7 +52,8 @@
     "request": "Solicitud",
     "empty": "No hay anuncios recientes",
     "create_first": "Crea tu primer anuncio",
-    "user_fallback": "User"
+    "user_fallback": "User",
+    "empty_description": "Crea una solicitud o una oferta para empezar a encontrar coincidencias con personas cercanas."
   },
   "activity": {
     "action_listing": "compartió un anuncio",
@@ -60,20 +62,24 @@
     "action_goal": "estableció una nueva meta",
     "action_post": "compartió una publicación",
     "empty": "No hay actividad reciente",
-    "check_feed": "Consulta el feed"
+    "check_feed": "Consulta el feed",
+    "empty_description": "Las novedades de la comunidad aparecerán aquí cuando los miembros empiecen a publicar."
   },
   "suggestions": {
-    "empty": "Aún no hay sugerencias"
+    "empty": "Aún no hay sugerencias",
+    "empty_description": "Las coincidencias mejoran a medida que se añaden más anuncios y detalles del perfil."
   },
   "groups": {
     "members_count": "{{count}} miembros",
     "empty": "Aún no te has unido a ningún grupo",
-    "discover": "Descubrir grupos"
+    "discover": "Descubrir grupos",
+    "empty_description": "Los grupos te ayudan a seguir intereses compartidos, proyectos y círculos locales."
   },
   "events": {
     "online_event": "Evento en línea",
     "empty": "No hay próximos eventos",
-    "browse": "Explorar eventos"
+    "browse": "Explorar eventos",
+    "empty_description": "Los eventos de tu comunidad aparecerán aquí cuando se programen."
   },
   "gamification": {
     "level": "Nivel {{level}}",
@@ -82,7 +88,8 @@
     "xp_progress": "Progreso de XP",
     "start_earning": "¡Empieza a ganar XP participando en la comunidad!",
     "streak_days_one": "{{count}} dia",
-    "streak_days_other": "{{count}} dias"
+    "streak_days_other": "{{count}} dias",
+    "xp_value": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "Cargando anuncios",
@@ -92,7 +99,15 @@
     "loading_progress": "Cargando progreso",
     "loading_suggestions": "Cargando sugerencias",
     "loading_endorsements": "Cargando recomendaciones",
-    "loading_pending_reviews": "Cargando reseñas pendientes"
+    "loading_pending_reviews": "Cargando reseñas pendientes",
+    "view_all_listings": "Ver todos los anuncios",
+    "view_all_activity": "Ver toda la actividad reciente",
+    "view_all_events": "Ver todos los eventos",
+    "view_all_groups": "Ver todos los grupos",
+    "view_achievements": "Ver logros",
+    "browse_all_listings": "Explorar todos los anuncios",
+    "view_all_endorsements": "Ver todas las recomendaciones",
+    "view_pending_reviews": "Ver todas las valoraciones pendientes"
   },
   "reviews": {
     "sent": "Enviado {{amount}}h",
@@ -100,7 +115,8 @@
     "review": "Reseña",
     "none_pending": "Sin reseñas pendientes",
     "pending_subtitle": "Open this review request",
-    "view_all_pending": "View All Pending"
+    "view_all_pending": "View All Pending",
+    "none_pending_description": "Los intercambios completados que necesitan valoración aparecerán aquí."
   },
   "fallback_name": "there",
   "common": {
